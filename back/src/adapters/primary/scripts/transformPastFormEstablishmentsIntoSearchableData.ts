@@ -2,11 +2,11 @@ import { Pool } from "pg";
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 
 import { random, sleep } from "shared/src/utils";
-import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { InsertEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
 import { createLogger } from "../../../utils/logger";
 import { notifyDiscord } from "../../../utils/notifyDiscord";
+import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { RealClock } from "../../secondary/core/ClockImplementations";
 import {
   defaultMaxBackoffPeriodMs,
@@ -17,14 +17,13 @@ import { QpsRateLimiter } from "../../secondary/core/QpsRateLimiter";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { HttpsSireneGateway } from "../../secondary/HttpsSireneGateway";
 import {
-  apiAddressBaseUrl,
   apiAddressRateLimiter,
   HttpAddressAPI,
+  httpAddressApiClient,
 } from "../../secondary/immersionOffer/HttpAddressAPI";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { AppConfig } from "../config/appConfig";
 import { createPgUow } from "../config/uowConfig";
-import { createManagedAxiosInstance } from "shared/src/httpClient/ports/axios.port";
 
 const maxQpsSireneApi = 0.25;
 
@@ -52,7 +51,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
   });
   const clientDestination = await poolDestination.connect();
   const addressAPI = new HttpAddressAPI(
-    createManagedAxiosInstance({ baseURL: apiAddressBaseUrl }),
+    httpAddressApiClient,
     apiAddressRateLimiter(clock),
     new ExponentialBackoffRetryStrategy(
       defaultMaxBackoffPeriodMs,

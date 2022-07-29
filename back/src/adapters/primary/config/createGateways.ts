@@ -1,7 +1,8 @@
-import { onFullfilledDefaultResponseInterceptorMaker } from "shared/src/serenity-http-client";
-import { ManagedAxios } from "shared/src/serenity-http-client";
 import { Pool } from "pg";
-import { createManagedAxiosInstance } from "shared/src/httpClient/ports/axios.port";
+import {
+  ManagedAxios,
+  onFullfilledDefaultResponseInterceptorMaker,
+} from "shared/src/serenity-http-client";
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
 import { Clock } from "../../../domain/core/ports/Clock";
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
@@ -11,15 +12,11 @@ import { CachingAccessTokenGateway } from "../../secondary/core/CachingAccessTok
 import { HybridEmailGateway } from "../../secondary/emailGateway/HybridEmailGateway";
 import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmailGateway";
 import { SendinblueEmailGateway } from "../../secondary/emailGateway/SendinblueEmailGateway";
-import {
-  HttpPeConnectGateway,
-  PeConnectUrlTargets,
-} from "../../secondary/PeConnectGateway/HttpPeConnectGateway";
 import { HttpsSireneGateway } from "../../secondary/HttpsSireneGateway";
 import {
-  apiAddressBaseUrl,
   apiAddressRateLimiter,
   HttpAddressAPI,
+  httpAddressApiClient,
 } from "../../secondary/immersionOffer/HttpAddressAPI";
 import { HttpLaBonneBoiteAPI } from "../../secondary/immersionOffer/HttpLaBonneBoiteAPI";
 import { HttpPassEmploiGateway } from "../../secondary/immersionOffer/HttpPassEmploiGateway";
@@ -30,18 +27,22 @@ import { InMemoryLaBonneBoiteAPI } from "../../secondary/immersionOffer/InMemory
 import { InMemoryPassEmploiGateway } from "../../secondary/immersionOffer/InMemoryPassEmploiGateway";
 import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { InMemoryDocumentGateway } from "../../secondary/InMemoryDocumentGateway";
-import { InMemoryPeConnectGateway } from "../../secondary/PeConnectGateway/InMemoryPeConnectGateway";
 import { InMemoryPoleEmploiGateway } from "../../secondary/InMemoryPoleEmploiGateway";
 import { InMemorySireneGateway } from "../../secondary/InMemorySireneGateway";
 import { MinioDocumentGateway } from "../../secondary/MinioDocumentGateway";
-import { ExcelReportingGateway } from "../../secondary/reporting/ExcelReportingGateway";
-import { InMemoryReportingGateway } from "../../secondary/reporting/InMemoryReportingGateway";
-import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
+import {
+  HttpPeConnectGateway,
+  PeConnectUrlTargets,
+} from "../../secondary/PeConnectGateway/HttpPeConnectGateway";
 import {
   httpPeConnectGatewayTargetMapperMaker,
   onRejectPeSpecificResponseInterceptorMaker,
   peConnectApiErrorsToDomainErrors,
 } from "../../secondary/PeConnectGateway/HttpPeConnectGateway.config";
+import { InMemoryPeConnectGateway } from "../../secondary/PeConnectGateway/InMemoryPeConnectGateway";
+import { ExcelReportingGateway } from "../../secondary/reporting/ExcelReportingGateway";
+import { InMemoryReportingGateway } from "../../secondary/reporting/InMemoryReportingGateway";
+import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
 
 const logger = createLogger(__filename);
 
@@ -101,7 +102,7 @@ export const createGateways = async (config: AppConfig, clock: Clock) => {
     addressApi:
       config.apiAddress === "HTTPS"
         ? new HttpAddressAPI(
-            createManagedAxiosInstance({ baseURL: apiAddressBaseUrl }),
+            httpAddressApiClient,
             apiAddressRateLimiter(clock),
             noRetries,
           )

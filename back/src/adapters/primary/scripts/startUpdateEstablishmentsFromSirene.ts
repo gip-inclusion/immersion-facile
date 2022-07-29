@@ -1,5 +1,4 @@
 import { Pool } from "pg";
-import { createManagedAxiosInstance } from "shared/src/httpClient/ports/axios.port";
 import { random, sleep } from "shared/src/utils";
 import { UpdateEstablishmentsFromSireneAPI } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentsFromSireneAPI";
 import { createLogger } from "../../../utils/logger";
@@ -13,9 +12,9 @@ import {
 import { QpsRateLimiter } from "../../secondary/core/QpsRateLimiter";
 import { HttpsSireneGateway } from "../../secondary/HttpsSireneGateway";
 import {
-  apiAddressBaseUrl,
   apiAddressRateLimiter,
   HttpAddressAPI,
+  httpAddressApiClient,
 } from "../../secondary/immersionOffer/HttpAddressAPI";
 import { AppConfig } from "../config/appConfig";
 import { createUowPerformer } from "../config/uowConfig";
@@ -55,7 +54,7 @@ const main = async () => {
   );
 
   const addressAPI = new HttpAddressAPI(
-    createManagedAxiosInstance({ baseURL: apiAddressBaseUrl }),
+    httpAddressApiClient,
     apiAddressRateLimiter(clock),
     retryStrategy,
   );

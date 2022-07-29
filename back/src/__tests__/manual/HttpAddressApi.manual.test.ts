@@ -1,19 +1,9 @@
-import { AxiosResponse } from "axios";
 import { AddressDto } from "shared/src/address/address.dto";
-import { createManagedAxiosInstance } from "shared/src/httpClient/ports/axios.port";
 import { LatLonDto } from "shared/src/latLon";
-import {
-  ContextType,
-  ManagedAxios,
-  TargetUrlsMapper,
-} from "shared/src/serenity-http-client";
 import { RealClock } from "../../adapters/secondary/core/ClockImplementations";
 import {
   apiAddressRateLimiter,
-  apiAddressBaseUrl,
   HttpAddressAPI,
-  apiRoutes,
-  targetUrlsMapper,
   httpAddressApiClient,
 } from "../../adapters/secondary/immersionOffer/HttpAddressAPI";
 import { noRetries } from "../../domain/core/ports/RetryStrategy";
@@ -76,9 +66,7 @@ describe("HttpAddressAPI", () => {
   const parallelCalls = 200;
   it(`Should support ${parallelCalls} of parallel calls`, async () => {
     const adapter = new HttpAddressAPI(
-      createManagedAxiosInstance({
-        baseURL: apiAddressBaseUrl,
-      }),
+      httpAddressApiClient,
       apiAddressRateLimiter(new RealClock()),
       noRetries,
     );
@@ -98,11 +86,10 @@ describe("HttpAddressAPI", () => {
         postcode: "67120",
       });
     }
-    expectTypeToMatchAndEqual(
-      await Promise.all(
-        coordinates.map((latLon) => adapter.getAddressFromPosition(latLon)),
-      ),
-      expectedResults,
-    );
-  }, 20000);
+    const results: (AddressDto | undefined)[] = [];
+    for (const coordinate of coordinates) {
+      results.push(await adapter.getAddressFromPosition(coordinate));
+    }
+    expectTypeToMatchAndEqual(results, expectedResults);
+  }, 30000);
 });

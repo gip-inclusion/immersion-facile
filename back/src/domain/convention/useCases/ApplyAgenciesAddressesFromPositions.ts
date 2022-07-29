@@ -41,36 +41,44 @@ export class ApplyAgenciesAddressesFromPositions extends TransactionalUseCase<vo
   }
 
   protected async _execute(_: void, uow: UnitOfWork): Promise<void> {
-    const agenciesWithoutAddresses =
-      await this.retrieveAgenciesWithoutAddresses(uow);
-    const agenciesupdated = await Promise.all(
-      agenciesWithoutAddresses.map(this.updateAgencyAddress),
+    const agenciesupdated: AgencyDto[] = [];
+    for (const agency of await this.retrieveAgenciesWithoutAddresses(uow))
+      agenciesupdated.push(await this.updateAgencyAddress(agency));
+    await this.updateAgencies(agenciesupdated, uow);
+  }
+
+  private async updateAgencies(
+    agenciesupdated: AgencyDto[],
+    uow: UnitOfWork,
+  ): Promise<void> {
+    await Promise.all(
+      agenciesupdated.map((agency) => uow.agencyRepository.update(agency)),
     );
-    await Promise.all(agenciesupdated.map(uow.agencyRepository.update));
   }
 
   private async retrieveAgenciesWithoutAddresses(
     uow: UnitOfWork,
   ): Promise<AgencyDto[]> {
-    const agencies = await uow.agencyRepository.getAgencies({});
-
-    const agenciesWithoutAddresses = agencies.filter(
-      (agency) =>
-        isAddressIdentical(agency.address, unknownAddress) ||
-        isAddressIdentical(agency.address, noAddress),
+    const allAgencies = await uow.agencyRepository.getAgencies({});
+    const agenciesWithoutAddresses = allAgencies.filter((agency) =>
+      isWithoutAddress(agency.address),
     );
-    logger.info(`${agencies.length} agencies without addresses retrieved.`);
+    logger.info(
+      `${agenciesWithoutAddresses.length} agencies without addresses retrieved.`,
+    );
     return agenciesWithoutAddresses;
   }
 
   private async updateAgencyAddress(agency: AgencyDto): Promise<AgencyDto> {
-    const address = await this.addressApi.getAddressFromPosition(
-      agency.position,
-    );
-
     return {
       ...agency,
-      address: address || unknownAddress,
+      address:
+        (await this.addressApi.getAddressFromPosition(agency.position)) ||
+        unknownAddress,
     };
   }
 }
+
+const isWithoutAddress = (address: AddressDto) =>
+  isAddressIdentical(address, unknownAddress) ||
+  isAddressIdentical(address, noAddress);

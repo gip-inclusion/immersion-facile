@@ -5,17 +5,17 @@ import { AdminToken } from "shared/src/admin/admin.dto";
 import {
   AgencyDto,
   AgencyId,
+  AgencyIdAndName,
   AgencyPublicDisplayDto,
   AgencyStatus,
-  AgencyIdAndName,
   CreateAgencyDto,
-  ListAgenciesWithPositionRequestDto,
+  ListAgenciesWithDepartmentCodeRequestDto,
   UpdateAgencyRequestDto,
   WithAgencyId,
 } from "shared/src/agency/agency.dto";
 import {
+  agenciesIdAndNameSchema,
   agenciesSchema,
-  agenciesWithPositionSchema,
   agencyIdResponseSchema,
   agencyPublicDisplaySchema,
 } from "shared/src/agency/agency.schema";
@@ -63,7 +63,7 @@ export class HttpAgencyGateway implements AgencyGateway {
   public listAllAgenciesWithPosition(
     departmentCode: DepartmentCode,
   ): Promise<AgencyIdAndName[]> {
-    const request: ListAgenciesWithPositionRequestDto = {
+    const request: ListAgenciesWithDepartmentCodeRequestDto = {
       departmentCode,
     };
     return this.getAgencies(request);
@@ -72,7 +72,7 @@ export class HttpAgencyGateway implements AgencyGateway {
   public listPeAgencies(
     departmentCode: DepartmentCode,
   ): Promise<AgencyIdAndName[]> {
-    const request: ListAgenciesWithPositionRequestDto = {
+    const request: ListAgenciesWithDepartmentCodeRequestDto = {
       departmentCode,
       filter: "peOnly",
     };
@@ -82,7 +82,7 @@ export class HttpAgencyGateway implements AgencyGateway {
   public listNonPeAgencies(
     departmentCode: DepartmentCode,
   ): Promise<AgencyIdAndName[]> {
-    const request: ListAgenciesWithPositionRequestDto = {
+    const request: ListAgenciesWithDepartmentCodeRequestDto = {
       departmentCode,
       filter: "peExcluded",
     };
@@ -120,12 +120,12 @@ export class HttpAgencyGateway implements AgencyGateway {
   }
 
   private async getAgencies(
-    request: ListAgenciesWithPositionRequestDto,
+    request: ListAgenciesWithDepartmentCodeRequestDto,
   ): Promise<AgencyIdAndName[]> {
-    const { data } = await this.httpClient.get<unknown>(`/${agenciesRoute}`, {
-      params: request,
-    });
-    const agenciesWithPositionDto = agenciesWithPositionSchema.parse(data);
-    return agenciesWithPositionDto;
+    return agenciesIdAndNameSchema.parse(
+      await this.httpClient.get<unknown>(`/${agenciesRoute}`, {
+        params: request,
+      }),
+    );
   }
 }

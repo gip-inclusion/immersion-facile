@@ -80,6 +80,7 @@ describe("Apply agencies address DTOs from positions", () => {
   });
   it("Don't apply address when agency already have it", async () => {
     agencyRepository.setAgencies([agencyWithAddress]);
+    httpAddressApi.setNextAddress(address);
     await useCase.execute();
     expectTypeToMatchAndEqual(agencyRepository.agencies, [agencyWithAddress]);
   });

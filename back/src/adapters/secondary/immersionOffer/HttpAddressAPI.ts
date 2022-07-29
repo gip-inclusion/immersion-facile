@@ -3,7 +3,6 @@ import { secondsToMilliseconds } from "date-fns";
 import { AddressDto } from "shared/src/address/address.dto";
 import { LatLonDto } from "shared/src/latLon";
 import {
-  HttpClient,
   ManagedAxios,
   TargetUrlsMapper,
 } from "shared/src/serenity-http-client";
@@ -22,6 +21,8 @@ import {
 import { createLogger } from "../../../utils/logger";
 import { RealClock } from "../core/ClockImplementations";
 import { QpsRateLimiter } from "../core/QpsRateLimiter";
+import { toFeatureCollection } from "shared/src/apiAdresse/apiAddress.schema";
+import { featureToAddressDto } from "shared/src/apiAdresse/apiAddress.dto";
 
 const logger = createLogger(__filename);
 
@@ -61,7 +62,7 @@ type TargetUrl = "apiAddressReverse";
 
 export class HttpAddressAPI implements AddressAPI {
   public constructor(
-    private readonly httpClient: HttpClient,
+    private readonly httpClient: ManagedAxios<TargetUrl>,
     private readonly rateLimiter: RateLimiter,
     private readonly retryStrategy: RetryStrategy,
   ) {}
@@ -72,19 +73,15 @@ export class HttpAddressAPI implements AddressAPI {
     logger.debug({ latLongDto }, "getAddressFromPosition");
     return this.retryStrategy.apply(async () => {
       try {
-        const response = await this.rateLimiter.whenReady(() =>this.httpClient.get({
-            target: this.httpClient.
-          })
-
-          /*
-          .get<any>(apiRoutes.reverse, {
-            timeout: secondsToMilliseconds(10),
-            params: { lat: latLongDto.lat, lon: latLongDto.lon },
+        const response = await this.rateLimiter.whenReady(() =>
+          this.httpClient.get({
+            target: this.httpClient.targetsUrls.apiAddressReverse,
+            targetParams: latLongDto,
           }),
-          */
         );
-        return response.data.features && response.data.features.length > 0
-          ? featureToAddressDto(response.data.features[0])
+        const features = toFeatureCollection(response.data).features;
+        return features.length > 0
+          ? featureToAddressDto(features[0])
           : undefined;
       } catch (error: any) {
         if (isRetryableError(logger, error)) throw new RetryableError(error);
@@ -148,10 +145,3 @@ export class HttpAddressAPI implements AddressAPI {
     });
   }
 }
-
-const featureToAddressDto = (feature: any): AddressDto => ({
-  streetNumberAndAddress: feature.properties.name,
-  city: feature.properties.city,
-  departmentCode: feature.properties.context.split(", ")[0],
-  postcode: feature.properties.postcode,
-});

@@ -1,5 +1,4 @@
 import { Pool } from "pg";
-import { createManagedAxiosInstance } from "shared/src/httpClient/ports/axios.port";
 import { random, sleep } from "shared/src/utils";
 import { UpdateAllPeAgencies } from "../../../domain/convention/useCases/UpdateAllPeAgencies";
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
@@ -13,9 +12,9 @@ import {
 } from "../../secondary/core/ExponentialBackoffRetryStrategy";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import {
-  apiAddressBaseUrl,
   apiAddressRateLimiter,
   HttpAddressAPI,
+  httpAddressApiClient,
 } from "../../secondary/immersionOffer/HttpAddressAPI";
 import { HttpPeAgenciesReferential } from "../../secondary/immersionOffer/HttpPeAgenciesReferential";
 import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
@@ -39,7 +38,7 @@ const updateAllPeAgenciesScript = async () => {
   const clock = new RealClock();
 
   const adressAPI = new HttpAddressAPI(
-    createManagedAxiosInstance({ baseURL: apiAddressBaseUrl }),
+    httpAddressApiClient,
     apiAddressRateLimiter(clock),
     new ExponentialBackoffRetryStrategy(
       defaultMaxBackoffPeriodMs,

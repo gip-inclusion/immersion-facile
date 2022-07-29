@@ -1,4 +1,3 @@
-import { createManagedAxiosInstance } from "shared/src/httpClient/ports/axios.port";
 import { SiretDto } from "shared/src/siret";
 import { sleep } from "shared/src/utils";
 import {
@@ -65,9 +64,9 @@ import { RomeSearch } from "../../../domain/rome/useCases/RomeSearch";
 import { GetSiret } from "../../../domain/sirene/useCases/GetSiret";
 import { GetSiretIfNotAlreadySaved } from "../../../domain/sirene/useCases/GetSiretIfNotAlreadySaved";
 import {
-  apiAddressBaseUrl,
   apiAddressRateLimiter,
   HttpAddressAPI,
+  httpAddressApiClient,
 } from "../../secondary/immersionOffer/HttpAddressAPI";
 import { AppConfig } from "./appConfig";
 import { Gateways } from "./createGateways";
@@ -93,7 +92,7 @@ export const createUseCases = (
   });
   const getSiret = new GetSiret(gateways.sirene);
   const addressAPI = new HttpAddressAPI(
-    createManagedAxiosInstance({ baseURL: apiAddressBaseUrl }),
+    httpAddressApiClient,
     apiAddressRateLimiter(clock),
     noRetries,
   );
