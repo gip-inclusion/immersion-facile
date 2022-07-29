@@ -31,7 +31,7 @@ applyAgenciesAddressDtosFromPositions()
     process.exit(0);
   })
   .catch((error) => {
-    logger.error("Script failed with error : ", error);
+    logger.error(error, "Script failed with error : ");
     notifyObjectDiscord({
       message:
         "applyAgenciesAddressDtosFromPositions, script failed with error",

@@ -179,7 +179,7 @@ export class PgAgencyRepository implements AgencyRepository {
     WHERE id = %1$L`;
 
     const params = entityToPgArray(agency);
-    params[11] =
+    params[10] =
       agency.position && `POINT(${agency.position.lon} ${agency.position.lat})`;
     await this.client.query(format(query, ...params));
   }

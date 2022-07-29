@@ -82,6 +82,7 @@ export const createGateways = async (config: AppConfig, clock: Clock) => {
     repositories: config.repositories,
     romeRepository: config.romeRepository,
     sireneGateway: config.sireneGateway,
+    apiAddress: config.apiAddress,
   });
 
   const cachingAccessTokenGateway = [

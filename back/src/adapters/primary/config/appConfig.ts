@@ -168,7 +168,6 @@ export class AppConfig {
       processEnv: this.env,
       variableName: "ADDRESS_API_GATEWAY",
       authorizedValues: ["IN_MEMORY", "HTTPS"],
-      defaultValue: "IN_MEMORY",
     });
   }
 

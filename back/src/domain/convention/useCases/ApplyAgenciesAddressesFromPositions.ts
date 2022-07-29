@@ -51,6 +51,9 @@ export class ApplyAgenciesAddressesFromPositions extends TransactionalUseCase<vo
     agenciesupdated: AgencyDto[],
     uow: UnitOfWork,
   ): Promise<void> {
+    logger.info(
+      `Update ${agenciesupdated.length} agencies with their addresses.`,
+    );
     await Promise.all(
       agenciesupdated.map((agency) => uow.agencyRepository.update(agency)),
     );
@@ -70,11 +73,18 @@ export class ApplyAgenciesAddressesFromPositions extends TransactionalUseCase<vo
   }
 
   private async updateAgencyAddress(agency: AgencyDto): Promise<AgencyDto> {
+    const address = await this.addressApi.getAddressFromPosition(
+      agency.position,
+    );
+    if (!address)
+      logger.warn(
+        `No address found for agency [${agency.id} - ${
+          agency.name
+        }] at position ${JSON.stringify(agency.position)}`,
+      );
     return {
       ...agency,
-      address:
-        (await this.addressApi.getAddressFromPosition(agency.position)) ||
-        unknownAddress,
+      address: address || unknownAddress,
     };
   }
 }
