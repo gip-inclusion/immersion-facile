@@ -8,6 +8,7 @@ import { TrefleIcon } from "src/icons/TrefleIcon";
 import { ContactMethod } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
 import { ButtonSearch } from "react-design-system/immersionFacile";
+import { addressDtoToString } from "shared/src/utils/address";
 
 type EnterpriseSearchResultProps = {
   searchResult: SearchImmersionResultDto;
@@ -82,7 +83,7 @@ export const EnterpriseSearchResult = ({
         </div>
       </SearchResultInfo>
       <SearchResultInfo icon={<LocationOnIcon sx={{ color: iconColor }} />}>
-        {address.toLocaleLowerCase()}
+        {addressDtoToString(address).toLocaleLowerCase()}
       </SearchResultInfo>
       {website && (
         <SearchResultInfo icon={<LaunchIcon sx={{ color: iconColor }} />}>

@@ -1,6 +1,9 @@
 import { AddressDto } from "shared/src/address/address.dto";
 import { LatLonDto } from "shared/src/latLon";
-import { AddressAPI } from "../../../domain/immersionOffer/ports/AddressAPI";
+import {
+  AddressAPI,
+  AddressAndPosition,
+} from "../../../domain/immersionOffer/ports/AddressAPI";
 
 export class InMemoryAddressAPI implements AddressAPI {
   constructor(
@@ -15,8 +18,11 @@ export class InMemoryAddressAPI implements AddressAPI {
     return this._address;
   }
 
-  public async getPositionFromAddress(): Promise<LatLonDto | undefined> {
-    return this._position;
+  public async getAddressAndPositionFromString(): Promise<
+    AddressAndPosition | undefined
+  > {
+    if (!this._position || !this._address) return;
+    return { position: this._position, address: this._address };
   }
 
   public async getCityCodeFromPosition(): Promise<number | undefined> {

@@ -15,8 +15,8 @@ import {
   SiretDto,
   tooManiSirenRequestsSiretErrorMessage,
 } from "shared/src/siret";
-import { HttpClientError } from "src/../../shared/src/httpClient/errors/4xxClientError.error";
-import { HttpServerError } from "src/../../shared/src/httpClient/errors/5xxServerError.error";
+import { HttpClientError } from "shared/src/httpClient/errors/4xxClientError.error";
+import { HttpServerError } from "shared/src/httpClient/errors/5xxServerError.error";
 import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
 
 export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {

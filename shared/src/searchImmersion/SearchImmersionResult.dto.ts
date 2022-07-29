@@ -1,3 +1,4 @@
+import { AddressDto } from "../address/address.dto";
 import { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
 import { LatLonDto } from "../latLon";
 import { RomeCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
@@ -23,8 +24,7 @@ export type SearchImmersionResultDto = {
   customizedName?: string;
   voluntaryToImmersion: boolean;
   position: LatLonDto;
-  address: string;
-  city: string;
+  address: AddressDto;
   contactMode?: ContactMethod;
   distance_m?: number;
   contactDetails?: SearchContactDto;

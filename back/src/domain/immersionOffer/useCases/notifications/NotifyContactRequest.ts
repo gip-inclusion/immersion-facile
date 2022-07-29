@@ -2,6 +2,7 @@ import {
   ContactEstablishmentRequestDto,
   contactEstablishmentRequestSchema,
 } from "shared/src/contactEstablishment";
+import { addressDtoToString } from "shared/src/utils/address";
 import { EmailGateway } from "../../../convention/ports/EmailGateway";
 import {
   UnitOfWork,
@@ -88,7 +89,9 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
             businessName: establishmentAggregate.establishment.name,
             contactFirstName: contact.firstName,
             contactLastName: contact.lastName,
-            businessAddress: establishmentAggregate.establishment.address,
+            businessAddress: addressDtoToString(
+              establishmentAggregate.establishment.address,
+            ),
             potentialBeneficiaryFirstName:
               payload.potentialBeneficiaryFirstName,
             potentialBeneficiaryLastName: payload.potentialBeneficiaryLastName,

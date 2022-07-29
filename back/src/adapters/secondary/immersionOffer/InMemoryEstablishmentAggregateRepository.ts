@@ -216,7 +216,6 @@ export class InMemoryEstablishmentAggregateRepository
       numberOfEmployeeRange: aggregate.establishment.numberEmployeesRange,
       position: aggregate?.establishment.position,
       address: aggregate.establishment.address,
-      city: TEST_CITY,
       contactMode: aggregate.contact?.contactMethod,
       contactDetails: aggregate.contact && {
         id: aggregate.contact.id,
@@ -296,7 +295,6 @@ const buildSearchImmersionResultDto = (
     searchMade.lon,
   ),
   position: TEST_POSITION,
-  city: TEST_CITY,
   ...(withContactDetails &&
     contact && {
       contactDetails: {

@@ -40,7 +40,7 @@ export type FormEstablishmentDto = {
   siret: SiretDto; // 14 characters string
   businessName: string;
   businessNameCustomized?: string;
-  businessAddress: string; // must include post code
+  businessAddress: string;
   isEngagedEnterprise?: boolean;
   naf?: NafDto; // { code: string, nomenclature: string }
   appellations: AppellationDto[]; // at least one

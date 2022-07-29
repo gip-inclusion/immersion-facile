@@ -9,7 +9,6 @@ import { ImmersionOfferEntityV2Builder } from "../../_testBuilders/ImmersionOffe
 import { InMemoryUnitOfWork } from "../../adapters/primary/config/uowConfig";
 import { SearchImmersionResultPublicV0 } from "../../adapters/primary/routers/DtoAndSchemas/v0/output/SearchImmersionResultPublicV0.dto";
 import {
-  TEST_CITY,
   TEST_NAF_LABEL,
   TEST_POSITION,
   TEST_ROME_LABEL,
@@ -18,6 +17,10 @@ import {
   GenerateApiConsumerJtw,
   makeGenerateJwtES256,
 } from "../../domain/auth/jwt";
+import {
+  rueSaintHonore,
+  rueSaintHonoreDto,
+} from "../../_testBuilders/addressDtos";
 
 const authorizedApiKeyId = "my-authorized-id";
 const immersionOfferId = "78000403200019-B1805";
@@ -42,7 +45,7 @@ describe("Route to get immersion offer by id", () => {
           .withEstablishment(
             new EstablishmentEntityV2Builder()
               .withPosition(TEST_POSITION)
-              .withAddress("55 rue de Faubourg Sante Honoré 75008 Paris")
+              .withAddress(rueSaintHonoreDto)
               .withNumberOfEmployeeRange("10-19")
               .build(),
           )
@@ -69,10 +72,10 @@ describe("Route to get immersion offer by id", () => {
       name: "Company inside repository",
       voluntaryToImmersion: true,
       location: TEST_POSITION,
-      address: "55 rue de Faubourg Sante Honoré 75008 Paris",
+      address: rueSaintHonore,
       romeLabel: TEST_ROME_LABEL,
       nafLabel: TEST_NAF_LABEL,
-      city: TEST_CITY,
+      city: rueSaintHonoreDto.city,
       contactMode: "EMAIL",
       numberOfEmployeeRange: "10-19",
     };
@@ -92,7 +95,7 @@ describe("Route to get immersion offer by id", () => {
       name: "Company inside repository",
       voluntaryToImmersion: true,
       location: TEST_POSITION,
-      address: "55 rue de Faubourg Sante Honoré 75008 Paris",
+      address: rueSaintHonore,
       contactMode: "EMAIL",
       contactDetails: {
         id: "3ca6e619-d654-4d0d-8fa6-2febefbe953d",
@@ -105,7 +108,7 @@ describe("Route to get immersion offer by id", () => {
       numberOfEmployeeRange: "10-19",
       romeLabel: TEST_ROME_LABEL,
       nafLabel: TEST_NAF_LABEL,
-      city: TEST_CITY,
+      city: rueSaintHonoreDto.city,
     };
 
     const authToken = generateApiJwt({

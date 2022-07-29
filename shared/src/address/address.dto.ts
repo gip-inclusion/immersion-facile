@@ -18,5 +18,3 @@ export const isAddressIdentical = (
   address.postcode === addressToCompare.postcode &&
   address.streetNumberAndAddress === addressToCompare.streetNumberAndAddress &&
   address.departmentCode === addressToCompare.departmentCode;
-
-

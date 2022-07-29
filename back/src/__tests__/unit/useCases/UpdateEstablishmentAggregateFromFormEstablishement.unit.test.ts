@@ -17,6 +17,7 @@ import {
   SireneEstablishmentProps,
   SireneEstablishmentVO,
 } from "../../../domain/sirene/valueObjects/SireneEstablishmentVO";
+import { rueGuillaumeTellDto } from "../../../_testBuilders/addressDtos";
 
 const prepareSireneRepo = (
   sireneRepo: InMemorySireneGateway,
@@ -69,8 +70,11 @@ describe("Update Establishment aggregate from form data", () => {
   });
   it("Replaces establishment and offers with same siret", async () => {
     const siret = "12345678911234";
+    const newPosition = { lon: 1, lat: 2 };
+    const newAddress = rueGuillaumeTellDto;
     prepareSireneRepo(sireneRepo, siret);
-    addressAPI.setNextPosition({ lon: 1, lat: 2 });
+    addressAPI.setNextPosition(newPosition);
+    addressAPI.setNextAddress(newAddress);
     // Prepare : insert an establishment aggregate from LBB with siret
     const previousContact = new ContactEntityV2Builder()
       .withEmail("previous.contact@gmail.com")
@@ -116,7 +120,8 @@ describe("Update Establishment aggregate from form data", () => {
     // Establishment matches update from form
     const partialExpectedEstablishment: Partial<EstablishmentEntityV2> = {
       siret,
-      address: formEstablishment.businessAddress,
+      address: newAddress,
+      position: newPosition,
       dataSource: "form",
       isActive: true,
       name: formEstablishment.businessName,

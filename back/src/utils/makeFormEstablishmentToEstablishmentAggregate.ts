@@ -38,9 +38,19 @@ export const makeFormEstablishmentToEstablishmentAggregate = ({
   const formEstablishmentToEstablishmentAggregate = async (
     formEstablishment: FormEstablishmentDto,
   ): Promise<EstablishmentAggregate | undefined> => {
-    const position = await addressAPI.getPositionFromAddress(
+    const positionAndAddress = await addressAPI.getAddressAndPositionFromString(
       formEstablishment.businessAddress,
     );
+    if (!positionAndAddress) {
+      notifyAndThrowErrorDiscord(
+        new Error(
+          `Cannot find the address ${formEstablishment.businessAddress} in API for establishment with siret ${formEstablishment.siret}`,
+        ),
+      );
+      return;
+    }
+    const { address, position } = positionAndAddress;
+
     const sireneRepoAnswer = await sireneGateway.get(formEstablishment.siret);
     if (!sireneRepoAnswer || !sireneRepoAnswer.etablissements[0]) {
       await notifyAndThrowErrorDiscord(
@@ -57,7 +67,7 @@ export const makeFormEstablishmentToEstablishmentAggregate = ({
     const nafDto = sireneEstablishmentVo.nafAndNomenclature;
     const numberEmployeesRange = sireneEstablishmentVo.numberEmployeesRange;
 
-    if (!nafDto || !position || numberEmployeesRange === undefined) {
+    if (!nafDto || numberEmployeesRange === undefined) {
       notifyAndThrowErrorDiscord(
         new Error(
           `Some field from siren gateway are missing for establishment with siret ${formEstablishment.siret} : nafDto=${nafDto}; position=${position}; numberEmployeesRange=${numberEmployeesRange}`,
@@ -83,7 +93,7 @@ export const makeFormEstablishmentToEstablishmentAggregate = ({
       website: formEstablishment.website,
       additionalInformation: formEstablishment.additionalInformation,
       isCommited: formEstablishment.isEngagedEnterprise,
-      address: formEstablishment.businessAddress,
+      address,
       voluntaryToImmersion: true,
       dataSource: "form",
       sourceProvider: formEstablishment.source,

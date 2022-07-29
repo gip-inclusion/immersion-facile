@@ -1,3 +1,4 @@
+import { AddressDto } from "shared/src/address/address.dto";
 import { Builder } from "shared/src/Builder";
 import { FormEstablishmentSource } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { LatLonDto } from "shared/src/latLon";
@@ -7,11 +8,12 @@ import {
   EstablishmentEntityV2,
   NumberEmployeesRange,
 } from "../domain/immersionOffer/entities/EstablishmentEntity";
+import { avenueChampsElyseesDto } from "./addressDtos";
 
 export const validEstablishmentEntityV2: EstablishmentEntityV2 = {
   siret: "78000403200019",
   name: "Company inside repository",
-  address: "30 avenue des champs Elysées, 75017 Paris",
+  address: avenueChampsElyseesDto,
   website: "www.jobs.fr",
   additionalInformation: "",
   customizedName: undefined,
@@ -38,7 +40,7 @@ export class EstablishmentEntityV2Builder
     return new EstablishmentEntityV2Builder({ ...this.entity, siret });
   }
 
-  withAddress(address: string) {
+  withAddress(address: AddressDto) {
     return new EstablishmentEntityV2Builder({ ...this.entity, address });
   }
   withWebsite(website: string) {

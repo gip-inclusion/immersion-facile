@@ -9,7 +9,6 @@ import { InMemoryUnitOfWork } from "../../adapters/primary/config/uowConfig";
 import { SearchImmersionResultPublicV1 } from "../../adapters/primary/routers/DtoAndSchemas/v1/output/SearchImmersionResultPublicV1.dto";
 import {
   TEST_APPELLATION_LABEL,
-  TEST_CITY,
   TEST_NAF_LABEL,
   TEST_POSITION,
   TEST_ROME_LABEL,
@@ -18,6 +17,10 @@ import {
   GenerateApiConsumerJtw,
   makeGenerateJwtES256,
 } from "../../domain/auth/jwt";
+import {
+  rueSaintHonore,
+  rueSaintHonoreDto,
+} from "../../_testBuilders/addressDtos";
 
 const authorizedApiKeyId = "my-authorized-id";
 const immersionOfferRome = "B1805";
@@ -44,7 +47,7 @@ describe("Route to get ImmersionSearchResultDto by siret and rome", () => {
               .withSiret(immersionOfferSiret)
               .withPosition(TEST_POSITION)
               .withNumberOfEmployeeRange("10-19")
-              .withAddress("55 rue de Faubourg Sante Honoré 75008 Paris")
+              .withAddress(rueSaintHonoreDto)
               .build(),
           )
           .withContact(
@@ -76,7 +79,7 @@ describe("Route to get ImmersionSearchResultDto by siret and rome", () => {
       voluntaryToImmersion: true,
       position: TEST_POSITION,
       numberOfEmployeeRange: "10-19",
-      address: "55 rue de Faubourg Sante Honoré 75008 Paris",
+      address: rueSaintHonore,
       contactMode: "EMAIL",
       contactDetails: {
         id: "3ca6e619-d654-4d0d-8fa6-2febefbe953d",
@@ -89,7 +92,7 @@ describe("Route to get ImmersionSearchResultDto by siret and rome", () => {
       romeLabel: TEST_ROME_LABEL,
       appellationLabels: [TEST_APPELLATION_LABEL],
       nafLabel: TEST_NAF_LABEL,
-      city: TEST_CITY,
+      city: rueSaintHonoreDto.city,
     };
 
     const authToken = generateApiJwt({

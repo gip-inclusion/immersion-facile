@@ -178,6 +178,12 @@ describe("Update establishments from Sirene API", () => {
       );
       const newEstablishmentPosition = { lon: 2.2931917, lat: 48.8840654 };
       addressAPI.setNextPosition(newEstablishmentPosition);
+      addressAPI.setNextAddress({
+        streetNumberAndAddress: "7 RUE GUILLAUME TELL",
+        city: "PARIS",
+        departmentCode: "75",
+        postcode: "75017",
+      });
       clock.setNextDate(now);
 
       // Act
@@ -191,7 +197,12 @@ describe("Update establishments from Sirene API", () => {
         ),
         {
           updatedAt: now,
-          address: "7 rue Guillaume Tell 75017 Paris",
+          address: {
+            streetNumberAndAddress: "7 RUE GUILLAUME TELL",
+            city: "PARIS",
+            departmentCode: "75",
+            postcode: "75017",
+          },
           position: newEstablishmentPosition,
         },
       );

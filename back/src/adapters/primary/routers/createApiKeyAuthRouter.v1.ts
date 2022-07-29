@@ -1,6 +1,5 @@
 import { Router } from "express";
 import promClient from "prom-client";
-import { formEstablishmentSchema } from "shared/src/formEstablishment/FormEstablishment.schema";
 import { pipeWithValue } from "shared/src/pipeWithValue";
 import {
   formEstablishmentsRoute,
@@ -13,6 +12,9 @@ import {
   validateAndParseZodSchema,
 } from "../helpers/httpErrors";
 import { sendHttpResponse } from "../helpers/sendHttpResponse";
+import { formEstablishmentDtoPublicV1ToDomain } from "./DtoAndSchemas/v1/input/FormEstablishmentPublicV1.dto";
+import { formEstablishmentPublicV1Schema } from "./DtoAndSchemas/v1/input/FormEstablishmentPublicV1.schema";
+import { domainToSearchImmersionResultPublicV1 } from "./DtoAndSchemas/v1/output/SearchImmersionResultPublicV1.dto";
 
 const counterFormEstablishmentCaller = new promClient.Counter({
   name: "form_establishment_v1_callers_counter",
@@ -34,7 +36,8 @@ export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
       if (!req.apiConsumer?.isAuthorized) throw new ForbiddenError();
 
       return pipeWithValue(
-        validateAndParseZodSchema(formEstablishmentSchema, req.body),
+        validateAndParseZodSchema(formEstablishmentPublicV1Schema, req.body),
+        formEstablishmentDtoPublicV1ToDomain,
         (domainFormEstablishmentWithoutSource) =>
           deps.useCases.addFormEstablishment.execute({
             ...domainFormEstablishmentWithoutSource,
@@ -51,9 +54,13 @@ export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
       await deps.useCases.callLaBonneBoiteAndUpdateRepositories.execute(
         req.query as any,
       );
-      return deps.useCases.searchImmersion.execute(
-        req.query as any,
-        req.apiConsumer,
+      const searchImmersionResultDtos =
+        await deps.useCases.searchImmersion.execute(
+          req.query as any,
+          req.apiConsumer,
+        );
+      return searchImmersionResultDtos.map(
+        domainToSearchImmersionResultPublicV1,
       );
     }),
   );
@@ -62,9 +69,14 @@ export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
     .get(async (req, res) =>
       sendHttpResponse(req, res, async () => {
         if (!req.apiConsumer?.isAuthorized) throw new ForbiddenError();
-        return deps.useCases.getImmersionOfferBySiretAndRome.execute(
-          { siret: req.params.siret, rome: req.params.rome } as SiretAndRomeDto,
-          req.apiConsumer,
+        return domainToSearchImmersionResultPublicV1(
+          await deps.useCases.getImmersionOfferBySiretAndRome.execute(
+            {
+              siret: req.params.siret,
+              rome: req.params.rome,
+            } as SiretAndRomeDto,
+            req.apiConsumer,
+          ),
         );
       }),
     );

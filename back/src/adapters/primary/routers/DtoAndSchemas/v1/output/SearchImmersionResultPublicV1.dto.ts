@@ -1,3 +1,4 @@
+import { addressDtoToString } from "shared/src/utils/address";
 import { LatLonDto } from "shared/src/latLon";
 import { RomeCode } from "shared/src/rome";
 import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
@@ -36,4 +37,8 @@ export type SearchImmersionResultPublicV1 = {
 
 export const domainToSearchImmersionResultPublicV1 = (
   domain: SearchImmersionResultDto,
-): SearchImmersionResultPublicV1 => domain;
+): SearchImmersionResultPublicV1 => ({
+  ...domain,
+  address: addressDtoToString(domain.address),
+  city: domain.address.city,
+});

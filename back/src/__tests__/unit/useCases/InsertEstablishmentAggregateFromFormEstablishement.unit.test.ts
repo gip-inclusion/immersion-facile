@@ -21,9 +21,15 @@ import {
   SireneEstablishmentProps,
   SireneEstablishmentVO,
 } from "../../../domain/sirene/valueObjects/SireneEstablishmentVO";
+import {
+  avenueChampsElyseesDto,
+  rueGuillaumeTellDto,
+} from "../../../_testBuilders/addressDtos";
 
 const fakeSiret = "90040893100013";
 const fakePosition: LatLonDto = { lat: 49.119146, lon: 6.17602 };
+const fakeAddress = avenueChampsElyseesDto;
+const fakeCityCode = 75;
 const fakeBusinessContact = new ContactEntityV2Builder().build();
 
 const expectedNafDto: NafDto = { code: "8559A", nomenclature: "nomencl" };
@@ -58,7 +64,11 @@ describe("Insert Establishment aggregate from form data", () => {
     establishmentAggregateRepo = new InMemoryEstablishmentAggregateRepository();
     outboxRepo = new InMemoryOutboxRepository();
 
-    addressAPI = new InMemoryAddressAPI(fakePosition);
+    addressAPI = new InMemoryAddressAPI(
+      fakePosition,
+      fakeCityCode,
+      fakeAddress,
+    );
     uuidGenerator = new TestUuidGenerator();
 
     const uowPerformer = new InMemoryUowPerformer({
@@ -208,7 +218,7 @@ describe("Insert Establishment aggregate from form data", () => {
       .build();
 
     prepareSireneRepo(sireneRepo, siret);
-
+    addressAPI.setNextAddress(rueGuillaumeTellDto);
     // Act : execute use-case with same siret
     await useCase.execute(formEstablishment);
 
@@ -219,7 +229,7 @@ describe("Insert Establishment aggregate from form data", () => {
     // Establishment matches update from form
     const partialExpectedEstablishment: Partial<EstablishmentEntityV2> = {
       siret,
-      address: formEstablishment.businessAddress,
+      address: rueGuillaumeTellDto,
       dataSource: "form",
       isActive: true,
       name: formEstablishment.businessName,

@@ -4,6 +4,10 @@ import { buildTestApp } from "../../_testBuilders/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentEntityV2Builder";
 import { TEST_ESTABLISHMENT1_SIRET } from "../../adapters/secondary/InMemorySireneGateway";
+import {
+  rueSaintHonore,
+  rueSaintHonoreDto,
+} from "../../_testBuilders/addressDtos";
 
 describe("Route to retrieve form establishment given an establishment JWT", () => {
   it("Throws 401 if not authenticated", async () => {
@@ -25,7 +29,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
             new EstablishmentEntityV2Builder()
               .withSiret(siret)
               .withDataSource("form")
-              .withAddress("108 rue des prunes, 75019 Paris")
+              .withAddress(rueSaintHonoreDto)
               .build(),
           )
           .build(),
@@ -48,7 +52,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
     expect(response.body).toMatchObject({
       siret,
       source: "immersion-facile",
-      businessAddress: "108 rue des prunes, 75019 Paris",
+      businessAddress: rueSaintHonore,
     });
     expect(response.status).toBe(200);
   });

@@ -5,6 +5,7 @@ import { buildTestApp, TestAppAndDeps } from "../../_testBuilders/buildTestApp";
 import { FormEstablishmentDtoPublicV0 } from "../../adapters/primary/routers/DtoAndSchemas/v0/input/FormEstablishmentPublicV0.dto";
 import { FormEstablishmentDtoPublicV1 } from "../../adapters/primary/routers/DtoAndSchemas/v1/input/FormEstablishmentPublicV1.dto";
 import { TEST_ESTABLISHMENT1_SIRET } from "../../adapters/secondary/InMemorySireneGateway";
+import { avenueChampsElysees } from "../../_testBuilders/addressDtos";
 
 describe("Route to post form establishments from front (hence, without API key)", () => {
   // from front
@@ -179,11 +180,14 @@ describe("Route to add an establishment form with API key (for exemple for un-je
 
     it("support adding establishment from known api consumer (for exemple Un Jeune Une Solution)", async () => {
       const { request, generateApiJwt } = await buildTestApp();
+      const formEstablishmentDto = FormEstablishmentDtoBuilder.valid()
+        .withSiret(TEST_ESTABLISHMENT1_SIRET)
+        .build();
 
-      const formEstablishmentDtoPublicV1: FormEstablishmentDtoPublicV1 =
-        FormEstablishmentDtoBuilder.valid()
-          .withSiret(TEST_ESTABLISHMENT1_SIRET)
-          .build();
+      const formEstablishmentDtoPublicV1: FormEstablishmentDtoPublicV1 = {
+        ...formEstablishmentDto,
+        businessAddress: avenueChampsElysees,
+      };
 
       const jwt = generateApiJwt({ id: "my-authorized-id" });
 

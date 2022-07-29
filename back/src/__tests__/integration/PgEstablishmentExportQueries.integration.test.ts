@@ -21,8 +21,9 @@ describe("PgEstablishmentExportQueries", () => {
   });
 
   beforeEach(async () => {
-    await client.query("DELETE FROM establishments");
+    await client.query("DELETE FROM establishments__immersion_contacts");
     await client.query("DELETE FROM immersion_contacts");
+    await client.query("DELETE FROM establishments");
 
     establishmentAggregateRepository = new PgEstablishmentAggregateRepository(
       client,
@@ -223,7 +224,12 @@ describe("PgEstablishmentExportQueries", () => {
 const establishmentAggregateArtusInterim = (): EstablishmentAggregate => ({
   establishment: new EstablishmentEntityV2Builder()
     .withSiret("79158476600012")
-    .withAddress("9 PL DE LA VENDEE 85000 LA ROCHE-SUR-YON")
+    .withAddress({
+      streetNumberAndAddress: "9 PL DE LA VENDEE",
+      postcode: "85000",
+      city: "LA ROCHE-SUR-YON",
+      departmentCode: "85",
+    })
     .withName("ARTUS INTERIM LA ROCHE SUR YON")
     .withDataSource("form")
     .withSourceProvider("immersion-facile")
@@ -253,7 +259,12 @@ const establishmentAggregateArtusInterim = (): EstablishmentAggregate => ({
 const establishmentAggregateMiniWorldLyon = (): EstablishmentAggregate => ({
   establishment: new EstablishmentEntityV2Builder()
     .withSiret("79341726200037")
-    .withAddress("2 RUE JACQUARD 69120 VAULX-EN-VELIN")
+    .withAddress({
+      streetNumberAndAddress: "2 RUE JACQUARD",
+      postcode: "69120",
+      city: "VAULX-EN-VELIN",
+      departmentCode: "69",
+    })
     .withName("MINI WORLD LYON")
     .withDataSource("form")
     .withSourceProvider("cci")

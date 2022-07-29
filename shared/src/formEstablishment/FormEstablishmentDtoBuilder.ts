@@ -9,7 +9,7 @@ import { Builder } from "../Builder";
 
 const validFormEstablishment: FormEstablishmentDto = {
   source: "immersion-facile",
-  businessAddress: "1 Rue du Moulin 12345 Quelque Part",
+  businessAddress: "1 Rue du Moulin, 12345 Quelque Part",
   businessContact: {
     email: "amil@mail.com",
     firstName: "Esteban",

@@ -65,7 +65,7 @@ export class InMemoryEstablishmentGateway implements EstablishmentGateway {
       source: "immersion-facile",
       businessName: `My business name, retrieved from jwt ${jwt}`,
       businessNameCustomized: `My business customized name, retrieved from jwt ${jwt}`,
-      businessAddress: "5 Rue de la Huchette 75005 Paris",
+      businessAddress: "5 Rue de la Huchette, 75005 Paris",
       isEngagedEnterprise: true,
       appellations: [
         {

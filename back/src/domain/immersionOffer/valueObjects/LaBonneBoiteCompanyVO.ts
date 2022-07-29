@@ -1,5 +1,6 @@
 import { NafDto } from "shared/src/naf";
 import { SiretDto } from "shared/src/siret";
+import { addressStringToDto } from "shared/src/utils/address";
 import { createLogger } from "../../../utils/logger";
 import { Clock } from "../../core/ports/Clock";
 import {
@@ -48,7 +49,7 @@ export class LaBonneBoiteCompanyVO {
     },
   ): EstablishmentAggregate {
     const establishment: EstablishmentEntityV2 = {
-      address: this.props.address,
+      address: addressStringToDto(this.props.address),
       position: {
         lat: this.props.lat,
         lon: this.props.lon,

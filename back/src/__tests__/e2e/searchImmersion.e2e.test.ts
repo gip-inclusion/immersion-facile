@@ -7,6 +7,11 @@ import { SearchImmersionResultPublicV0 } from "../../adapters/primary/routers/Dt
 import { SearchImmersionResultPublicV1 } from "../../adapters/primary/routers/DtoAndSchemas/v1/output/SearchImmersionResultPublicV1.dto";
 import { InMemoryEstablishmentAggregateRepository } from "../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { GenerateApiConsumerJtw } from "../../domain/auth/jwt";
+import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
+import {
+  avenueChampsElysees,
+  avenueChampsElyseesDto,
+} from "../../_testBuilders/addressDtos";
 
 describe("search-immersion route", () => {
   let request: SuperTest<Test>;
@@ -49,7 +54,7 @@ describe("search-immersion route", () => {
         // Act and assert
         const expectedResult: SearchImmersionResultPublicV0[] = [
           {
-            address: "30 avenue des champs Elysées, 75017 Paris",
+            address: avenueChampsElysees,
             naf: "8539A",
             nafLabel: "test_naf_label",
             name: "Company inside repository",
@@ -61,7 +66,7 @@ describe("search-immersion route", () => {
             numberOfEmployeeRange: "10-19",
             distance_m: 719436,
             location: { lat: 43.8666, lon: 8.3333 },
-            city: "test_city",
+            city: avenueChampsElyseesDto.city,
             id: "78000403200019-A1000",
           },
         ];
@@ -150,7 +155,7 @@ describe("search-immersion route", () => {
         // Act and assert
         const expectedResult: SearchImmersionResultPublicV1[] = [
           {
-            address: "30 avenue des champs Elysées, 75017 Paris",
+            address: avenueChampsElysees,
             naf: "8539A",
             nafLabel: "test_naf_label",
             name: "Company inside repository",
@@ -165,7 +170,7 @@ describe("search-immersion route", () => {
             numberOfEmployeeRange: "10-19",
             distance_m: 719436,
             position: { lat: 43.8666, lon: 8.3333 },
-            city: "test_city",
+            city: avenueChampsElyseesDto.city,
             contactDetails: {
               id: "3ca6e619-d654-4d0d-8fa6-2febefbe953d",
               firstName: "Alain",
@@ -236,9 +241,9 @@ describe("search-immersion route", () => {
         ]);
 
         // Act and assert
-        const expectedResult: SearchImmersionResultPublicV1[] = [
+        const expectedResult: SearchImmersionResultDto[] = [
           {
-            address: "30 avenue des champs Elysées, 75017 Paris",
+            address: avenueChampsElyseesDto,
             naf: "8539A",
             nafLabel: "test_naf_label",
             name: "Company inside repository",
@@ -251,7 +256,6 @@ describe("search-immersion route", () => {
             numberOfEmployeeRange: "10-19",
             distance_m: 719436,
             position: { lat: 43.8666, lon: 8.3333 },
-            city: "test_city",
             website: "www.jobs.fr",
             additionalInformation: "",
           },

@@ -5,6 +5,7 @@ import { ContactEstablishmentRequestDto } from "shared/src/contactEstablishment"
 import { SearchImmersionQueryParamsDto } from "shared/src/searchImmersion/SearchImmersionQueryParams.dto";
 import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
 import { sleep } from "shared/src/utils";
+import { AddressDto } from "shared/src/address/address.dto";
 
 export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
   private readonly _results$: Subject<SearchImmersionResultDto[]>;
@@ -62,7 +63,12 @@ export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
 }
 
 const defaultNaf = "MyNaf";
-
+const defaultAddress: AddressDto = {
+  streetNumberAndAddress: "55 rue du Faubourg Saint-Honoré",
+  postcode: "75001",
+  city: "Paris",
+  departmentCode: "75",
+};
 export const seedSearchResults: SearchImmersionResultDto[] = [
   {
     rome: "A0000",
@@ -71,12 +77,11 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     name: "Super Corp",
     voluntaryToImmersion: true,
     position: { lat: 48.8666, lon: 2.3333 },
-    address: "55 rue du Faubourg Saint-Honoré, 75017 Paris",
+    address: defaultAddress,
     contactMode: "EMAIL",
     romeLabel: "Super métier",
     appellationLabels: ["Facteur", "Développeuse"],
     nafLabel: "Métallurgie",
-    city: "xxxx",
     website: "www.corp.com/job",
     additionalInformation:
       "Si vous aimez la métallurgie et la bonne bière, vous serez ravis !",
@@ -89,13 +94,12 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     customizedName: "Mega Corp nom personnalisé",
     voluntaryToImmersion: false,
     position: { lat: 48.8666, lon: 2.3333 },
-    address: "55 rue du Faubourg Saint-Honoré",
+    address: defaultAddress,
     contactMode: "PHONE",
     romeLabel:
       "Méga métier, avec un texte très long pour le décrire, et qui va peut-être aller à la ligne",
     appellationLabels: [],
     nafLabel: "Accueil et Restauration",
-    city: "xxxx",
     numberOfEmployeeRange: "11-49",
     website: "www.mega-corp.com/job",
     additionalInformation:
@@ -109,12 +113,11 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     customizedName: "Hyper Corp nom personnalisé",
     voluntaryToImmersion: false,
     position: { lat: 48.8666, lon: 2.3333 },
-    address: "55 rue du Faubourg Saint-Honoré",
+    address: defaultAddress,
     contactMode: "IN_PERSON",
     romeLabel: "Hyper métier",
     appellationLabels: ["Hyper", "Méga"],
     nafLabel: "",
-    city: "xxxx",
   },
   {
     rome: "A0003",
@@ -123,11 +126,10 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     name: "Giga Corp",
     voluntaryToImmersion: false,
     position: { lat: 48.8666, lon: 2.3333 },
-    address: "55 rue du Faubourg Saint-Honoré",
+    address: defaultAddress,
     contactMode: undefined,
     romeLabel: "Giga métier",
     appellationLabels: [],
     nafLabel: "",
-    city: "xxxx",
   },
 ];

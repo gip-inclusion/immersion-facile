@@ -9,6 +9,7 @@ import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { RetrieveFormEstablishmentFromAggregates } from "../../../domain/immersionOffer/useCases/RetrieveFormEstablishmentFromAggregates";
+import { addressDtoToString } from "shared/src/utils/address";
 
 const prepareUseCase = () => {
   const uow = createInMemoryUow();
@@ -90,7 +91,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       source: "immersion-facile",
       businessName: establishment.name,
       businessNameCustomized: establishment.customizedName,
-      businessAddress: establishment.address,
+      businessAddress: addressDtoToString(establishment.address),
       isEngagedEnterprise: establishment.isCommited,
       naf: establishment.nafDto,
       isSearchable: establishment.isSearchable,

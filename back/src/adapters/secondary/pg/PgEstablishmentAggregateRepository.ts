@@ -127,7 +127,10 @@ export class PgEstablishmentAggregateRepository
       establishment.customizedName,
       establishment.website,
       establishment.additionalInformation,
-      establishment.address,
+      establishment.address.streetNumberAndAddress,
+      establishment.address.postcode,
+      establishment.address.city,
+      establishment.address.departmentCode,
       establishment.numberEmployeesRange,
       establishment.nafDto.code,
       establishment.nafDto.nomenclature,
@@ -148,14 +151,17 @@ export class PgEstablishmentAggregateRepository
       const query = fixStGeographyEscapingInQuery(
         format(
           `INSERT INTO establishments (
-          siret, name, customized_name, website, additional_information, address, number_employees, naf_code, naf_nomenclature, data_source, source_provider, gps, lon, lat, update_date, is_active, is_searchable, is_commited
+          siret, name, customized_name, website, additional_information, street_number_and_address, post_code, city, department_code, number_employees, naf_code, naf_nomenclature, data_source, source_provider, gps, lon, lat, update_date, is_active, is_searchable, is_commited
         ) VALUES %L
         ON CONFLICT
           ON CONSTRAINT establishments_pkey
             DO UPDATE
               SET
                 name=EXCLUDED.name,
-                address=EXCLUDED.address,
+                street_number_and_address=EXCLUDED.street_number_and_address,
+                post_code=EXCLUDED.post_code,
+                city=EXCLUDED.city,
+                department_code=EXCLUDED.department_code,
                 number_employees=EXCLUDED.number_employees,
                 naf_code=EXCLUDED.naf_code,
                 data_source=EXCLUDED.data_source
@@ -431,43 +437,46 @@ export class PgEstablishmentAggregateRepository
                    }
                    ${
                      propertiesToUpdate.address && propertiesToUpdate.position // Update address and position together.
-                       ? ", address=%6$L, gps=ST_GeographyFromText(%7$L), lon=%8$L, lat=%9$L"
+                       ? ", street_number_and_address=%6$L, post_code=%7$L, city=%8$L, department_code=%9$L, gps=ST_GeographyFromText(%10$L), lon=%11$L, lat=%12$L"
                        : ""
                    }
-                   ${propertiesToUpdate.name ? ", name=%10$L" : ""}
+                   ${propertiesToUpdate.name ? ", name=%13$L" : ""}
                    ${
                      propertiesToUpdate.customizedName
-                       ? ", customized_name=%11$L"
+                       ? ", customized_name=%14$L"
                        : ""
                    }
                    ${
                      propertiesToUpdate.isSearchable !== undefined
-                       ? ", is_searchable=%12$L"
+                       ? ", is_searchable=%15$L"
                        : ""
                    }
                    ${
                      propertiesToUpdate.isCommited !== undefined
-                       ? ", is_commited=%13$L"
+                       ? ", is_commited=%16$L"
                        : ""
                    }
                    ${
                      propertiesToUpdate.website !== undefined
-                       ? ", website=%14$L"
+                       ? ", website=%17$L"
                        : ""
                    }
                   ${
                     propertiesToUpdate.additionalInformation !== undefined
-                      ? ", additional_information=%15$L"
+                      ? ", additional_information=%18$L"
                       : ""
                   }
-                   WHERE siret=%16$L;`;
+                   WHERE siret=%19$L;`;
     const queryArgs = [
       propertiesToUpdate.updatedAt.toISOString(),
       propertiesToUpdate.isActive,
       propertiesToUpdate.nafDto?.code,
       propertiesToUpdate.nafDto?.nomenclature,
       propertiesToUpdate.numberEmployeesRange,
-      propertiesToUpdate.address,
+      propertiesToUpdate.address?.streetNumberAndAddress,
+      propertiesToUpdate.address?.postcode,
+      propertiesToUpdate.address?.city,
+      propertiesToUpdate.address?.departmentCode,
       propertiesToUpdate.position
         ? `POINT(${propertiesToUpdate.position.lon} ${propertiesToUpdate.position.lat})`
         : undefined,
@@ -626,7 +635,10 @@ export class PgEstablishmentAggregateRepository
             'customizedName', e.customized_name, 
             'website', e.website, 
             'additionalInformation', e.additional_information, 
-            'address', e.address, 
+            'address', JSON_BUILD_OBJECT('streetNumberAndAddress', e.street_number_and_address, 
+                                         'postcode', e.post_code,
+                                         'city', e.city,
+                                         'departmentCode', e.department_code),
             'voluntaryToImmersion', e.data_source = 'form',
             'dataSource', e.data_source, 
             'sourceProvider', e.source_provider, 
@@ -718,8 +730,10 @@ const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
       'appellationLabels',  io.appellation_labels,
       'naf', e.naf_code,
       'nafLabel', public_naf_classes_2008.class_label,
-      'address', e.address, 
-      'city', (REGEXP_MATCH(e.address,  '^.*\\d{5}\\s(.*)$'))[1],
+      'address', JSON_BUILD_OBJECT('streetNumberAndAddress', e.street_number_and_address, 
+                                    'postcode', e.post_code,
+                                    'city', e.city,
+                                    'departmentCode', e.department_code),
       'contactMode', ic.contact_mode,
       'contactDetails', JSON_BUILD_OBJECT('id', ic.uuid, 'firstName', ic.firstname, 'lastName', ic.lastname, 'email', ic.email, 'job', ic.job, 'phone', ic.phone ),
       'numberOfEmployeeRange', e.number_employees 

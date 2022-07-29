@@ -1,3 +1,4 @@
+import { addressDtoToString } from "shared/src/utils/address";
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { SiretDto, siretSchema } from "shared/src/siret";
 import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
@@ -56,7 +57,9 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
       businessName: establishmentAggregate.establishment.name,
       businessNameCustomized:
         establishmentAggregate.establishment.customizedName,
-      businessAddress: establishmentAggregate.establishment.address,
+      businessAddress: addressDtoToString(
+        establishmentAggregate.establishment.address,
+      ),
       isEngagedEnterprise: establishmentAggregate.establishment.isCommited,
       naf: establishmentAggregate.establishment?.nafDto,
       appellations: offersAsAppellationDto,

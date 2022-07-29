@@ -34,7 +34,7 @@ const sqlSelectAllEstablishmentsQuery = `
       SELECT 
         establishments.siret, 
         establishments.name, 
-        establishments.address,
+        CONCAT(establishments.street_number_and_address, ' ', establishments.post_code, ' ', establishments.city)::text AS address,
         establishments.naf_code,
         establishments.customized_name, 
         establishments.created_at,

@@ -1,3 +1,4 @@
+import { addressDtoToString } from "shared/src/utils/address";
 import { ImmersionContactInEstablishmentId } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { LatLonDto } from "shared/src/latLon";
 import { RomeCode } from "shared/src/rome";
@@ -59,5 +60,7 @@ export const domainToSearchImmersionResultPublicV0 = (
     contactDetails: domain.contactDetails
       ? domainToContactDetailsV0(domain.contactDetails)
       : undefined,
+    address: addressDtoToString(domain.address),
+    city: domain.address.city,
   };
 };

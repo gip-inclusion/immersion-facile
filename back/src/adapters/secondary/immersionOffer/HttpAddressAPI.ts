@@ -12,7 +12,10 @@ import {
   RetryableError,
   RetryStrategy,
 } from "../../../domain/core/ports/RetryStrategy";
-import { AddressAPI } from "../../../domain/immersionOffer/ports/AddressAPI";
+import {
+  AddressAPI,
+  AddressAndPosition as AddressAndPosition,
+} from "../../../domain/immersionOffer/ports/AddressAPI";
 import {
   createAxiosInstance,
   isRetryableError,
@@ -91,9 +94,9 @@ export class HttpAddressAPI implements AddressAPI {
     });
   }
 
-  public async getPositionFromAddress(
+  public async getAddressAndPositionFromString(
     address: string,
-  ): Promise<LatLonDto | undefined> {
+  ): Promise<AddressAndPosition | undefined> {
     logger.debug({ address }, "getPositionFromAddress");
 
     return this.retryStrategy.apply(async () => {
@@ -110,11 +113,8 @@ export class HttpAddressAPI implements AddressAPI {
 
         if (!response.data.features || response.data.features.length == 0)
           return;
-
-        return {
-          lat: response.data.features[0].geometry.coordinates[1],
-          lon: response.data.features[0].geometry.coordinates[0],
-        };
+        const feature = response.data.features[0];
+        return featureToAddressAndPosition(feature);
       } catch (error: any) {
         if (isRetryableError(logger, error)) throw new RetryableError(error);
         logAxiosError(logger, error);
@@ -145,3 +145,39 @@ export class HttpAddressAPI implements AddressAPI {
     });
   }
 }
+
+type ValidFeature = {
+  properties: {
+    type: string;
+    label: string;
+    name: string;
+    city: string;
+    postcode: string;
+    context: string;
+  };
+  geometry: {
+    type: "Point";
+    coordinates: [number, number];
+  };
+};
+
+const featureToAddressAndPosition = (
+  feature: ValidFeature,
+): AddressAndPosition | undefined => {
+  const position: LatLonDto = {
+    lat: feature.geometry.coordinates[1],
+    lon: feature.geometry.coordinates[0],
+  };
+  const address: AddressDto = {
+    streetNumberAndAddress: feature.properties.name,
+    postcode: feature.properties.postcode,
+    city: feature.properties.city,
+    departmentCode: getDepartmentCodeFromFeature(feature),
+  };
+  return { address, position };
+};
+
+const getDepartmentCodeFromFeature = (feature: ValidFeature) => {
+  const context = feature.properties.context;
+  return context.split(", ")[0];
+};

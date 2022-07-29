@@ -1,3 +1,4 @@
+import { AddressDto } from "shared/src/address/address.dto";
 import { FormEstablishmentSource } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { LatLonDto } from "shared/src/latLon";
 import { NafDto } from "shared/src/naf";
@@ -16,7 +17,7 @@ export type EstablishmentEntityV2 = {
   siret: SiretDto;
   name: string;
   customizedName?: string;
-  address: string;
+  address: AddressDto;
   voluntaryToImmersion: boolean;
   dataSource: DataSource;
   sourceProvider: SourceProvider;

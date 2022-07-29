@@ -9,7 +9,6 @@ import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGenerato
 import {
   InMemoryEstablishmentAggregateRepository,
   TEST_APPELLATION_LABEL,
-  TEST_CITY,
   TEST_NAF_LABEL,
   TEST_POSITION,
   TEST_ROME_LABEL,
@@ -18,6 +17,7 @@ import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPer
 import { ApiConsumer } from "../../../domain/core/valueObjects/ApiConsumer";
 import { SearchMadeEntity } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { SearchImmersion } from "../../../domain/immersionOffer/useCases/SearchImmersion";
+import { AddressDto } from "shared/src/address/address.dto";
 
 const secretariatRome = "M1607";
 const boulangerRome = "D1102";
@@ -27,6 +27,13 @@ const searchInMetzParams: SearchImmersionQueryParamsDto = {
   longitude: 6.17602,
   latitude: 49.119146,
   sortedBy: "distance",
+};
+
+const rueSaintHonore: AddressDto = {
+  streetNumberAndAddress: "55 Rue du Faubourg Saint-Honoré",
+  postcode: "75001",
+  city: "Paris",
+  departmentCode: "75",
 };
 
 const insertLBBAggregate = async (
@@ -57,7 +64,12 @@ const prepareSearchableData = async () => {
 
   const establishment = new EstablishmentEntityV2Builder()
     .withSiret(siret)
-    .withAddress("55 Rue du Faubourg Saint-Honoré")
+    .withAddress({
+      streetNumberAndAddress: "55 Rue du Faubourg Saint-Honoré",
+      postcode: "75001",
+      city: "Paris",
+      departmentCode: "75",
+    })
     .withDataSource("form")
     .withNumberOfEmployeeRange("20-49")
     .withWebsite("www.website.com")
@@ -149,10 +161,9 @@ describe("SearchImmersionUseCase", () => {
       name: "Company inside repository",
       voluntaryToImmersion: true,
       position: TEST_POSITION,
-      address: "55 Rue du Faubourg Saint-Honoré",
+      address: rueSaintHonore,
       contactMode: "EMAIL",
       distance_m: 606885,
-      city: TEST_CITY,
       nafLabel: TEST_NAF_LABEL,
       romeLabel: TEST_ROME_LABEL,
       website: "www.website.com",
@@ -206,10 +217,9 @@ describe("SearchImmersionUseCase", () => {
           name: "Company inside repository",
           voluntaryToImmersion: true,
           position: TEST_POSITION,
-          address: "55 Rue du Faubourg Saint-Honoré",
+          address: rueSaintHonore,
           contactMode: "EMAIL",
           distance_m: 606885,
-          city: TEST_CITY,
           nafLabel: TEST_NAF_LABEL,
           romeLabel: TEST_ROME_LABEL,
           appellationLabels: [TEST_APPELLATION_LABEL],
@@ -243,10 +253,9 @@ describe("SearchImmersionUseCase", () => {
           name: "Company inside repository",
           voluntaryToImmersion: true,
           position: TEST_POSITION,
-          address: "55 Rue du Faubourg Saint-Honoré",
+          address: rueSaintHonore,
           contactMode: "EMAIL",
           distance_m: 606885,
-          city: TEST_CITY,
           nafLabel: TEST_NAF_LABEL,
           romeLabel: TEST_ROME_LABEL,
           appellationLabels: [TEST_APPELLATION_LABEL],

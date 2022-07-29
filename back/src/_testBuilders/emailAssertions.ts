@@ -8,6 +8,7 @@ import {
 import { ConventionDto } from "shared/src/convention/convention.dto";
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { frontRoutes } from "shared/src/routes";
+import { addressDtoToString } from "shared/src/utils/address";
 import { getValidatedApplicationFinalConfirmationParams } from "../domain/convention/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
 import { ContactEntityV2 } from "../domain/immersionOffer/entities/ContactEntity";
 import { EstablishmentEntityV2 } from "../domain/immersionOffer/entities/EstablishmentEntity";
@@ -176,7 +177,7 @@ export const expectContactInPersonInstructions = (
       businessName: establishment.name,
       contactFirstName: contact.firstName,
       contactLastName: contact.lastName,
-      businessAddress: establishment.address,
+      businessAddress: addressDtoToString(establishment.address),
       potentialBeneficiaryFirstName: payload.potentialBeneficiaryFirstName,
       potentialBeneficiaryLastName: payload.potentialBeneficiaryLastName,
     },

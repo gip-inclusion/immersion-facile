@@ -76,22 +76,25 @@ export class UpdateEstablishmentsFromSireneAPI extends TransactionalUseCase<void
     );
     const nafDto = sireneEstablishment.nafAndNomenclature;
     const numberEmployeesRange = sireneEstablishment.numberEmployeesRange;
-    const address = sireneEstablishment.formatedAddress;
+    const formatedAddress = sireneEstablishment.formatedAddress;
 
-    const position = await this.addressAPI.getPositionFromAddress(address);
-    if (!position) {
+    const positionAndAddress =
+      await this.addressAPI.getAddressAndPositionFromString(formatedAddress);
+
+    if (!positionAndAddress) {
       logger.warn(
-        { siret, address },
+        { siret, formatedAddress },
         "Unable to retrieve position from API Address",
       );
     }
+
     await uow.establishmentAggregateRepository.updateEstablishment({
       siret,
       updatedAt: this.clock.now(),
       nafDto,
       numberEmployeesRange,
-      address: position ? address : undefined,
-      position,
+      address: positionAndAddress?.address,
+      position: positionAndAddress?.position,
     });
   }
 }

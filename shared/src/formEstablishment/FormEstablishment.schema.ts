@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { nafSchema } from "../naf";
-import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret";
 import { NotEmptyArray, phoneRegExp } from "../utils";
@@ -18,6 +17,7 @@ import {
   ContactMethod,
   FormEstablishmentDto,
 } from "./FormEstablishment.dto";
+import { addressWithPostalCodeSchema } from "../utils/postalCode";
 
 // prettier-ignore
 export const immersionContactInEstablishmentIdSchema: z.ZodSchema<ImmersionContactInEstablishmentId> =
@@ -49,10 +49,10 @@ const formEstablishmentSources: NotEmptyArray<FormEstablishmentSource> = [
   "testConsumer",
   "passeEmploi",
 ];
-
+export const formEstablishmentSourceSchema = z.enum(formEstablishmentSources);
 export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z.object(
   {
-    source: z.enum(formEstablishmentSources),
+    source: formEstablishmentSourceSchema,
     siret: siretSchema,
     businessName: zTrimmedString,
     businessNameCustomized: zTrimmedString.optional(),
