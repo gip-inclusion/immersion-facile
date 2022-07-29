@@ -13,7 +13,7 @@ import {
   AgencyPublicDisplayDto,
   allAgencyStatuses,
   CreateAgencyDto,
-  ListAgenciesWithPositionRequestDto,
+  ListAgenciesWithDepartmentCodeRequestDto,
   PrivateListAgenciesRequestDto,
   UpdateAgencyRequestDto,
   WithAgencyId,
@@ -30,18 +30,18 @@ export const agencyIdResponseSchema: z.ZodSchema<AgencyIdResponse> = z.union([
   z.object({ success: z.boolean() }),
 ]);
 
-export const agencyWithPositionSchema: z.ZodSchema<AgencyIdAndName> = z.object({
+export const agencyIdAndNameSchema: z.ZodSchema<AgencyIdAndName> = z.object({
   id: agencyIdSchema,
   name: z.string(),
-  position: latLonSchema,
 });
 
-export const agenciesWithPositionSchema: z.ZodSchema<AgencyIdAndName[]> =
-  z.array(agencyWithPositionSchema);
+export const agenciesIdAndNameSchema: z.ZodSchema<AgencyIdAndName[]> = z.array(
+  agencyIdAndNameSchema,
+);
 
 const agencyKindSchema: z.ZodSchema<AgencyKind> = z.enum(agencyKindList);
 
-export const listAgenciesRequestSchema: z.ZodSchema<ListAgenciesWithPositionRequestDto> =
+export const listAgenciesWithDepartmentCodeRequestSchema: z.ZodSchema<ListAgenciesWithDepartmentCodeRequestDto> =
   z.object({
     departmentCode: z.string(),
     filter: z.enum(["peOnly", "peExcluded"]).optional(),

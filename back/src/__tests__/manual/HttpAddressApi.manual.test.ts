@@ -44,7 +44,7 @@ const resultFromApiAddress = {
   limit: 1,
 };
 
-describe("HttpLaBonneBoiteAPI", () => {
+describe("HttpAddressAPI", () => {
   it("Should return expected address DTO when providing accurate position.", async () => {
     const adapter = new HttpAddressAPI(
       createManagedAxiosInstance({ baseURL: apiAddressBaseUrl }),

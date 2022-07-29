@@ -108,7 +108,7 @@ export class PgAgencyRepository implements AgencyRepository {
       "CAST(counsellor_emails AS text) ILIKE '%' || $1 || '%'";
 
     const pgResult = await this.client.query(
-      `SELECT id, name, status, kind, legacy_address, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, logo_url, ${positionAsCoordinates}, agency_siret, code_safir,
+      `SELECT id, name, status, kind, counsellor_emails, validator_emails, admin_emails, questionnaire_url, email_signature, logo_url, ${positionAsCoordinates}, agency_siret, code_safir,
         street_number_and_address, post_code, city, department_code
        FROM public.agencies
        WHERE ${validatorEmailsIncludesProvidedEmail} OR ${councellorEmailsIncludesProvidedEmail}`,
@@ -123,7 +123,7 @@ export class PgAgencyRepository implements AgencyRepository {
 
   public async getById(id: AgencyId): Promise<AgencyDto | undefined> {
     const pgResult = await this.client.query(
-      "SELECT id, name, status, kind, legacy_address, counsellor_emails, validator_emails, \
+      "SELECT id, name, status, kind, counsellor_emails, validator_emails, \
         admin_emails, questionnaire_url, email_signature, logo_url, ST_AsGeoJSON(position) AS position, \
         street_number_and_address, post_code, city, department_code \
       FROM public.agencies\
@@ -139,10 +139,10 @@ export class PgAgencyRepository implements AgencyRepository {
 
   public async insert(agency: AgencyDto): Promise<AgencyId | undefined> {
     const query = `INSERT INTO public.agencies(
-      id, name, status, kind, legacy_address, counsellor_emails, validator_emails, admin_emails, 
+      id, name, status, kind, counsellor_emails, validator_emails, admin_emails, 
       questionnaire_url, email_signature, logo_url, position, agency_siret, code_safir,
       street_number_and_address, post_code, city, department_code
-    ) VALUES (%L, %L, %L, %L, %L, %L, %L, %L, %L, %L, %L, %s, %L, %L, %L, %L, %L, %L)`;
+    ) VALUES (%L, %L, %L, %L, %L, %L, %L, %L, %L, %L, %s, %L, %L, %L, %L, %L, %L)`;
     try {
       await this.client.query(format(query, ...entityToPgArray(agency)));
     } catch (error: any) {
@@ -162,20 +162,19 @@ export class PgAgencyRepository implements AgencyRepository {
       name = COALESCE(%2$L, name),
       status = COALESCE(%3$L, status),
       kind= COALESCE(%4$L, kind),
-      legacy_address= COALESCE(%5$L, legacy_address),
-      counsellor_emails= COALESCE(%6$L, counsellor_emails),
-      validator_emails= COALESCE(%7$L, validator_emails),
-      admin_emails= COALESCE(%8$L, admin_emails),
-      questionnaire_url= COALESCE(%9$L, questionnaire_url),
-      email_signature = COALESCE(%10$L, email_signature),
-      logo_url = COALESCE(%11$L, logo_url),
-      ${agency.position ? "position = ST_GeographyFromText(%12$L)," : ""}
-      agency_siret = COALESCE(%13$L, agency_siret),
-      code_safir = COALESCE(%14$L, code_safir),
-      street_number_and_address = COALESCE(%15$L, street_number_and_address),
-      post_code = COALESCE(%16$L, post_code),
-      city = COALESCE(%17$L, city),
-      department_code = COALESCE(%18$L, department_code),
+      counsellor_emails= COALESCE(%5$L, counsellor_emails),
+      validator_emails= COALESCE(%6$L, validator_emails),
+      admin_emails= COALESCE(%7$L, admin_emails),
+      questionnaire_url= COALESCE(%8$L, questionnaire_url),
+      email_signature = COALESCE(%9$L, email_signature),
+      logo_url = COALESCE(%10$L, logo_url),
+      ${agency.position ? "position = ST_GeographyFromText(%11$L)," : ""}
+      agency_siret = COALESCE(%12$L, agency_siret),
+      code_safir = COALESCE(%13$L, code_safir),
+      street_number_and_address = COALESCE(%14$L, street_number_and_address),
+      post_code = COALESCE(%15$L, post_code),
+      city = COALESCE(%16$L, city),
+      department_code = COALESCE(%17$L, department_code),
       updated_at = NOW()
     WHERE id = %1$L`;
 
@@ -205,7 +204,6 @@ const entityToPgArray = (agency: Partial<AgencyDto>): any[] => [
   agency.name,
   agency.status,
   agency.kind,
-  null,
   agency.counsellorEmails && JSON.stringify(agency.counsellorEmails),
   agency.validatorEmails && JSON.stringify(agency.validatorEmails),
   agency.adminEmails && JSON.stringify(agency.adminEmails),

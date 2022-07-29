@@ -1,15 +1,11 @@
-import {
-  isAddressIdentical,
-  noAddress,
-  unknownAddress,
-} from "shared/src/address/address.dto";
+import { AddressDto, isAddressIdentical } from "shared/src/address/address.dto";
 import { AgencyDto } from "shared/src/agency/agency.dto";
 import { ConventionId } from "shared/src/convention/convention.dto";
 import { z } from "zod";
 import { createLogger } from "../../../utils/logger";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { AddressAPI } from "../ports/AddressAPI";
+import { AddressAPI } from "../../immersionOffer/ports/AddressAPI";
 
 const logger = createLogger(__filename);
 
@@ -19,6 +15,19 @@ export type ImmersionAssessmentEmailParams = {
   mentorEmail: string;
   beneficiaryFirstName: string;
   beneficiaryLastName: string;
+};
+
+export const unknownAddress: AddressDto = {
+  city: "Inconnu",
+  departmentCode: "Inconnu",
+  postcode: "Inconnu",
+  streetNumberAndAddress: "Inconnu",
+};
+export const noAddress: AddressDto = {
+  city: "",
+  departmentCode: "",
+  postcode: "",
+  streetNumberAndAddress: "",
 };
 
 export class ApplyAgenciesAddressesFromPositions extends TransactionalUseCase<void> {
@@ -32,19 +41,12 @@ export class ApplyAgenciesAddressesFromPositions extends TransactionalUseCase<vo
   }
 
   protected async _execute(_: void, uow: UnitOfWork): Promise<void> {
-    // eslint-disable-next-line no-console
-
     const agenciesWithoutAddresses =
       await this.retrieveAgenciesWithoutAddresses(uow);
-
     const agenciesupdated = await Promise.all(
-      agenciesWithoutAddresses.map((agency) =>
-        this.updateAgencyAddress(agency),
-      ),
+      agenciesWithoutAddresses.map(this.updateAgencyAddress),
     );
-    await Promise.all(
-      agenciesupdated.map((agency) => uow.agencyRepository.update(agency)),
-    );
+    await Promise.all(agenciesupdated.map(uow.agencyRepository.update));
   }
 
   private async retrieveAgenciesWithoutAddresses(

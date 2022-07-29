@@ -10,6 +10,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     department_code: { type: "text", notNull: true, default: "" },
   });
 
+  // Add security if fields are not provided, without that the field will be set to ""
   pgm.alterColumn("agencies", "street_number_and_address", { default: null });
   pgm.alterColumn("agencies", "post_code", { default: null });
   pgm.alterColumn("agencies", "department_code", { default: null });
@@ -18,6 +19,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
   pgm.renameColumn("agencies", "legacy_address", "address");
+  pgm.alterColumn("agencies", "address", { notNull: true });
   pgm.dropColumns("agencies", [
     "street_number_and_address",
     "post_code",

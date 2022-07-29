@@ -37,14 +37,14 @@ const prepareSireneRepo = (
 describe("Update Establishment aggregate from form data", () => {
   let sireneRepo: InMemorySireneGateway;
   let establishmentAggregateRepo: InMemoryEstablishmentAggregateRepository;
-  let addresseAPI: InMemoryAddressAPI;
+  let addressAPI: InMemoryAddressAPI;
   let useCase: UpdateEstablishmentAggregateFromForm;
   let uuidGenerator: TestUuidGenerator;
 
   beforeEach(() => {
     sireneRepo = new InMemorySireneGateway();
     establishmentAggregateRepo = new InMemoryEstablishmentAggregateRepository();
-    addresseAPI = new InMemoryAddressAPI();
+    addressAPI = new InMemoryAddressAPI();
     uuidGenerator = new TestUuidGenerator();
 
     const uowPerformer = new InMemoryUowPerformer({
@@ -55,7 +55,7 @@ describe("Update Establishment aggregate from form data", () => {
     useCase = new UpdateEstablishmentAggregateFromForm(
       uowPerformer,
       sireneRepo,
-      addresseAPI,
+      addressAPI,
       uuidGenerator,
       new CustomClock(),
     );
@@ -70,7 +70,7 @@ describe("Update Establishment aggregate from form data", () => {
   it("Replaces establishment and offers with same siret", async () => {
     const siret = "12345678911234";
     prepareSireneRepo(sireneRepo, siret);
-    addresseAPI.setNextPosition({ lon: 1, lat: 2 });
+    addressAPI.setNextPosition({ lon: 1, lat: 2 });
     // Prepare : insert an establishment aggregate from LBB with siret
     const previousContact = new ContactEntityV2Builder()
       .withEmail("previous.contact@gmail.com")

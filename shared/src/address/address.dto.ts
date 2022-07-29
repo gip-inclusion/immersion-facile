@@ -19,15 +19,4 @@ export const isAddressIdentical = (
   address.streetNumberAndAddress === addressToCompare.streetNumberAndAddress &&
   address.departmentCode === addressToCompare.departmentCode;
 
-export const unknownAddress: AddressDto = {
-  city: "Inconnu",
-  departmentCode: "Inconnu",
-  postcode: "Inconnu",
-  streetNumberAndAddress: "Inconnu",
-};
-export const noAddress: AddressDto = {
-  city: "",
-  departmentCode: "",
-  postcode: "",
-  streetNumberAndAddress: "",
-};
+

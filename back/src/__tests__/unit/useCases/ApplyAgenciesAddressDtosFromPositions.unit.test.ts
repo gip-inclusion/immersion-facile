@@ -1,15 +1,15 @@
-import {
-  AddressDto,
-  noAddress,
-  unknownAddress,
-} from "shared/src/address/address.dto";
+import { AddressDto } from "shared/src/address/address.dto";
 import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
 import { LatLonDto } from "shared/src/latLon";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryAddressAPI } from "../../../adapters/secondary/immersionOffer/InMemoryAddressAPI";
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { ApplyAgenciesAddressesFromPositions } from "../../../domain/immersionOffer/useCases/ApplyAgenciesAddressesFromPositions";
+import {
+  ApplyAgenciesAddressesFromPositions,
+  noAddress,
+  unknownAddress,
+} from "../../../domain/convention/useCases/ApplyAgenciesAddressesFromPositions";
 import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
 
 const position: LatLonDto = {
@@ -59,13 +59,13 @@ describe("Apply agencies address DTOs from positions", () => {
     );
   });
 
-  it("Apply address on agency without addresse", async () => {
+  it("Apply address on agency without address", async () => {
     agencyRepository.setAgencies([agencyWithoutAddress]);
     httpAddressApi.setNextAddress(address);
     await useCase.execute();
     expectTypeToMatchAndEqual(agencyRepository.agencies, [agencyWithAddress]);
   });
-  it("Apply address on agency with empty addresse", async () => {
+  it("Apply address on agency with empty address", async () => {
     agencyRepository.setAgencies([agencyWithEmptyAddress]);
     httpAddressApi.setNextAddress(address);
     await useCase.execute();
