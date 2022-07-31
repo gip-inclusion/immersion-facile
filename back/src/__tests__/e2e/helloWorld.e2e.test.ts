@@ -1,13 +1,11 @@
-import supertest, { SuperTest, Test } from "supertest";
-import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
-import { createApp } from "../../adapters/primary/server";
+import { SuperTest, Test } from "supertest";
+import { buildTestApp } from "../../_testBuilders/buildTestApp";
 
 describe("Hello world route", () => {
   let request: SuperTest<Test>;
 
   beforeEach(async () => {
-    const { app } = await createApp(new AppConfigBuilder().build());
-    request = supertest(app);
+    ({ request } = await buildTestApp());
   });
 
   it("says hello", async () => {

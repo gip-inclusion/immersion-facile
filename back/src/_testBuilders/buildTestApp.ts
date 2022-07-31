@@ -75,6 +75,7 @@ export const buildTestApp = async (
     PE_CONNECT_GATEWAY: "IN_MEMORY",
     EVENT_CRAWLER_PERIOD_MS: "0", // will not crawl automatically
     REPORTING_GATEWAY: "EXCEL",
+    ADDRESS_API_GATEWAY: "IN_MEMORY",
     ...appConfigOverrides?.configParams,
   }).build();
 
