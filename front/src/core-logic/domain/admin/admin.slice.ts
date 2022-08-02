@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { EmailSentDto } from "shared/email";
+import { EmailSentDto } from "shared/src/email/email";
 import { AdminToken } from "shared/src/admin/admin.dto";
 
 interface AdminState {

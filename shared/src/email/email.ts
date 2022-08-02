@@ -1,4 +1,4 @@
-import { AppellationDto } from "./src/romeAndAppellationDtos/romeAndAppellation.dto";
+import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 
 export type GenericTemplatedEmail<
   T extends string,

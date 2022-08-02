@@ -1,4 +1,4 @@
-import { TemplatedEmail } from "shared/email";
+import { TemplatedEmail } from "shared/src/email/email";
 import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
 import { RenewMagicLinkRequestDto } from "shared/src/convention/convention.dto";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";

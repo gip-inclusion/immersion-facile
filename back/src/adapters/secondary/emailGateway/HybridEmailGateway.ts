@@ -1,4 +1,4 @@
-import { EmailSentDto, TemplatedEmail } from "shared/email";
+import { EmailSentDto, TemplatedEmail } from "shared/src/email/email";
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
 import { InMemoryEmailGateway } from "./InMemoryEmailGateway";
 import { SendinblueEmailGateway } from "./SendinblueEmailGateway";

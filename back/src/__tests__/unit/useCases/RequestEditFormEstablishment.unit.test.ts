@@ -1,4 +1,4 @@
-import { TemplatedEmail } from "shared/email";
+import { TemplatedEmail } from "shared/src/email/email";
 import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";

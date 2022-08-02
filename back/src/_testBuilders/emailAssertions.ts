@@ -1,4 +1,4 @@
-import { TemplatedEmail } from "shared/email";
+import { TemplatedEmail } from "shared/src/email/email";
 import { AgencyDto } from "shared/src/agency/agency.dto";
 import {
   ContactEstablishmentByMailDto,

@@ -1,5 +1,5 @@
 import { prop } from "ramda";
-import { EmailSentDto, TemplatedEmail } from "shared/email";
+import { EmailSentDto, TemplatedEmail } from "shared/src/email/email";
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
 import { Clock } from "../../../domain/core/ports/Clock";
 import { createLogger } from "../../../utils/logger";

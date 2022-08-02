@@ -1,10 +1,10 @@
 import { AxiosInstance } from "axios";
 import { from, map, Observable } from "rxjs";
-import { EmailSentDto } from "shared/email";
+import { EmailSentDto } from "shared/src/email/email";
+import { emailsSentSchema } from "shared/src/email/email.schema";
 import { AdminToken } from "shared/src/admin/admin.dto";
 import { emailRoute } from "shared/src/routes";
 import { SentEmailGateway } from "src/core-logic/ports/SentEmailGateway";
-import { emailsSentSchema } from "shared/email.schema";
 
 export class HttpSentEmailGateway implements SentEmailGateway {
   constructor(private readonly httpClient: AxiosInstance) {}
@@ -20,7 +20,7 @@ export class HttpSentEmailGateway implements SentEmailGateway {
     ).pipe(
       map(({ data }) => {
         // TODO emailsSentSchema doit avoir le schema DTO mais avec le rework email ça ne passe pas
-        const emailsSentDto = emailsSentSchema.parse(data) as EmailSentDto[];
+        const emailsSentDto: EmailSentDto[] = emailsSentSchema.parse(data);
         return emailsSentDto;
       }),
 

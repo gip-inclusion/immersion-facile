@@ -1,4 +1,4 @@
-import { EmailSentDto } from "shared/email";
+import { EmailSentDto } from "shared/src/email/email";
 import { AdminToken } from "shared/src/admin/admin.dto";
 import { expectToEqual } from "shared/src/expectToEqual";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";

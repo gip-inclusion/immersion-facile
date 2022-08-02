@@ -1,6 +1,6 @@
 import { addDays as dateFnsAddDays, format } from "date-fns";
 import { partition } from "ramda";
-import { EmailType, TemplatedEmail } from "shared/email";
+import { EmailType, TemplatedEmail } from "shared/src/email/email";
 import { ConventionId } from "shared/src/convention/convention.dto";
 import { Role } from "shared/src/tokens/MagicLinkPayload";
 import { GenerateConventionMagicLink } from "../adapters/primary/config/createGenerateConventionMagicLink";

@@ -1,6 +1,10 @@
 import promClient from "prom-client";
 import { keys } from "ramda";
-import { EmailSentDto, EmailType, TemplatedEmail } from "shared/email";
+import {
+  EmailSentDto,
+  EmailType,
+  TemplatedEmail,
+} from "shared/src/email/email";
 import {
   SendSmtpEmail,
   SendSmtpEmailCc,

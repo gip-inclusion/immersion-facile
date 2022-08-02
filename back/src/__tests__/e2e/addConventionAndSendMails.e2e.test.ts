@@ -1,4 +1,4 @@
-import { TemplatedEmail } from "shared/email";
+import { TemplatedEmail } from "shared/src/email/email";
 import {
   ConventionDto,
   UpdateConventionStatusRequestDto,
