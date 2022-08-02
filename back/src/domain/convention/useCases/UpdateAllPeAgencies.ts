@@ -1,6 +1,6 @@
 import { AddressDto } from "shared/src/address/address.dto";
 import { activeAgencyStatuses, AgencyDto } from "shared/src/agency/agency.dto";
-import { WithPosition } from "shared/src/latLon";
+import { WithGeoPosition } from "shared/src/geoPosition/geoPosition.dto";
 import { z } from "zod";
 import { AppLogger } from "../../core/ports/AppLogger";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
@@ -231,7 +231,7 @@ const updateEmails = ({
 
 const normalizePosition = ({
   adressePrincipale,
-}: PeAgencyFromReferenciel): WithPosition => ({
+}: PeAgencyFromReferenciel): WithGeoPosition => ({
   position: {
     lat: adressePrincipale.gpsLat,
     lon: adressePrincipale.gpsLon,

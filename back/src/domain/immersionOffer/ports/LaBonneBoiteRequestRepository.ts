@@ -1,4 +1,4 @@
-import { LatLonDto } from "shared/src/latLon";
+import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
 import { LaBonneBoiteRequestEntity } from "../entities/LaBonneBoiteRequestEntity";
 import { LaBonneBoiteRequestParams } from "./LaBonneBoiteAPI";
 
@@ -9,7 +9,7 @@ export interface LaBonneBoiteRequestRepository {
 
   getClosestRequestParamsWithThisRomeSince(props: {
     rome: string;
-    position: LatLonDto;
+    position: GeoPositionDto;
     since: Date;
   }): Promise<{
     params: LaBonneBoiteRequestParams;

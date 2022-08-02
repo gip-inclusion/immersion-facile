@@ -1,5 +1,5 @@
 import { Pool, PoolClient } from "pg";
-import { LatLonDto } from "shared/src/latLon";
+import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { PgLaBonneBoiteRequestRepository } from "../../adapters/secondary/pg/PgLaBonneBoiteRequestRepository";
 import { LaBonneBoiteRequestEntity } from "../../domain/immersionOffer/entities/LaBonneBoiteRequestEntity";
@@ -52,17 +52,17 @@ describe("PgLaBonneBoiteRequestRepository", () => {
   // Paris17 <-> Paris10 ~= 6km
   // Paris17 <-> Evry ~= 31km
 
-  const paris10: LatLonDto = {
+  const paris10: GeoPositionDto = {
     lat: 48.8841446, // 169 Bd de la Villette, 75010 Paris
     lon: 2.3651789,
   };
 
-  const paris17: LatLonDto = {
+  const paris17: GeoPositionDto = {
     lat: 48.862725, // 7 rue guillaume Tell, 75017 Paris
     lon: 2.287592,
   };
 
-  const evry: LatLonDto = {
+  const evry: GeoPositionDto = {
     lat: 48.5961, // Ikea Evry
     lon: 2.4406,
   };
@@ -119,7 +119,7 @@ describe("PgLaBonneBoiteRequestRepository", () => {
 
   const insertEntity = async (
     requestedAt: Date,
-    position: LatLonDto,
+    position: GeoPositionDto,
     rome: string,
     distanceKm = 10,
   ) => {

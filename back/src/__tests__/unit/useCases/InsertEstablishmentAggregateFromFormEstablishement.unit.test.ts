@@ -1,5 +1,5 @@
 import { FormEstablishmentDtoBuilder } from "shared/src/formEstablishment/FormEstablishmentDtoBuilder";
-import { LatLonDto } from "shared/src/latLon";
+import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
 import { NafDto } from "shared/src/naf";
 import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
@@ -27,7 +27,7 @@ import {
 } from "../../../_testBuilders/addressDtos";
 
 const fakeSiret = "90040893100013";
-const fakePosition: LatLonDto = { lat: 49.119146, lon: 6.17602 };
+const fakePosition: GeoPositionDto = { lat: 49.119146, lon: 6.17602 };
 const fakeAddress = avenueChampsElyseesDto;
 const fakeCityCode = 75;
 const fakeBusinessContact = new ContactEntityV2Builder().build();

@@ -4,7 +4,7 @@ import {
   ContactMethod,
   FormEstablishmentSource,
 } from "shared/src/formEstablishment/FormEstablishment.dto";
-import { LatLonDto } from "shared/src/latLon";
+import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
 import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
 import { ContactEntityV2Builder } from "../../_testBuilders/ContactEntityV2Builder";
@@ -91,7 +91,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     const insertActiveEstablishmentAndOfferAndEventuallyContact = async (
       siret: string,
       rome: string,
-      establishmentPosition: LatLonDto,
+      establishmentPosition: GeoPositionDto,
       appellationCode?: string,
       offerContactUid?: string,
       dataSource: DataSource = "form",
@@ -1625,7 +1625,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     address?: AddressDto;
     dataSource?: DataSource;
     sourceProvider?: FormEstablishmentSource;
-    position?: LatLonDto;
+    position?: GeoPositionDto;
   }) => {
     const defaultPosition = { lon: 12.2, lat: 2.1 };
     const position = props.position ?? defaultPosition;

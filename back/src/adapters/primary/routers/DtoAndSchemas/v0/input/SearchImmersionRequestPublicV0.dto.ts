@@ -1,10 +1,10 @@
-import { LatLonDto } from "shared/src/latLon";
+import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
 import { RomeCode } from "shared/src/rome";
 import { SearchImmersionQueryParamsDto } from "shared/src/searchImmersion/SearchImmersionQueryParams.dto";
 
 export type SearchImmersionRequestPublicV0 = {
   rome?: RomeCode;
-  location: LatLonDto;
+  location: GeoPositionDto;
   distance_km: number;
 };
 

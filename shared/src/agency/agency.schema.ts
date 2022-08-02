@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { addressSchema } from "../address/address.schema";
-import { latLonSchema } from "../latLon";
+import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { zEmail, zString, zTrimmedString } from "../zodUtils";
 import {
   AgencyDto,
@@ -52,7 +52,7 @@ const createAgencyShape = {
   name: zString,
   kind: agencyKindSchema,
   address: addressSchema,
-  position: latLonSchema,
+  position: geoPositionSchema,
   counsellorEmails: z.array(zEmail),
   validatorEmails: z.array(zEmail).min(1),
   questionnaireUrl: z.string().optional(),
@@ -92,6 +92,6 @@ export const agencyPublicDisplaySchema: z.ZodSchema<AgencyPublicDisplayDto> =
     id: agencyIdSchema,
     name: zString,
     address: addressSchema,
-    position: latLonSchema,
+    position: geoPositionSchema,
     logoUrl: absoluteUrlSchema.optional(),
   });

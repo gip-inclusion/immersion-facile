@@ -1,4 +1,4 @@
-import { latLonSchema } from "shared/src/latLon";
+import { geoPositionSchema } from "shared/src/geoPosition/geoPosition.schema";
 import { romeCodeSchema } from "shared/src/rome";
 import { appellationDtoSchema } from "shared/src/romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "shared/src/siret";
@@ -31,7 +31,7 @@ export const searchImmersionResultPublicV0Schema: z.Schema<SearchImmersionResult
     siret: siretSchema,
     name: z.string(),
     voluntaryToImmersion: z.boolean(),
-    location: latLonSchema,
+    location: geoPositionSchema,
     address: z.string(),
     city: z.string(),
     contactMode: z.enum(["EMAIL", "PHONE", "IN_PERSON"]).optional(),

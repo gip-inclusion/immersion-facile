@@ -1,6 +1,6 @@
 import { addressDtoToString } from "shared/src/utils/address";
 import { ImmersionContactInEstablishmentId } from "shared/src/formEstablishment/FormEstablishment.dto";
-import { LatLonDto } from "shared/src/latLon";
+import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
 import { RomeCode } from "shared/src/rome";
 import {
   SearchContactDto,
@@ -27,7 +27,7 @@ export type SearchImmersionResultPublicV0 = {
   siret: SiretDto;
   name: string;
   voluntaryToImmersion: boolean;
-  location: LatLonDto;
+  location: GeoPositionDto;
   address: string;
   city: string;
   contactMode?: "EMAIL" | "PHONE" | "IN_PERSON";

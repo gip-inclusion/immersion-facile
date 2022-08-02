@@ -1,7 +1,7 @@
 import { AxiosResponse } from "axios";
 import { secondsToMilliseconds } from "date-fns";
 import { AddressDto } from "shared/src/address/address.dto";
-import { LatLonDto } from "shared/src/latLon";
+import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
 import {
   ManagedAxios,
   TargetUrlsMapper,
@@ -71,7 +71,7 @@ export class HttpAddressAPI implements AddressAPI {
   ) {}
 
   public async getAddressFromPosition(
-    latLongDto: LatLonDto,
+    latLongDto: GeoPositionDto,
   ): Promise<AddressDto | undefined> {
     logger.debug({ latLongDto }, "getAddressFromPosition");
     return this.retryStrategy.apply(async () => {
@@ -124,7 +124,7 @@ export class HttpAddressAPI implements AddressAPI {
   }
 
   public async getCityCodeFromPosition(
-    position: LatLonDto,
+    position: GeoPositionDto,
   ): Promise<number | undefined> {
     logger.debug({ position }, "getCityCodeFromPosition");
     return this.retryStrategy.apply(async () => {
@@ -164,7 +164,7 @@ type ValidFeature = {
 const featureToAddressAndPosition = (
   feature: ValidFeature,
 ): AddressAndPosition | undefined => {
-  const position: LatLonDto = {
+  const position: GeoPositionDto = {
     lat: feature.geometry.coordinates[1],
     lon: feature.geometry.coordinates[0],
   };

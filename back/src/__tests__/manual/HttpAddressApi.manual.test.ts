@@ -1,5 +1,5 @@
 import { AddressDto } from "shared/src/address/address.dto";
-import { LatLonDto } from "shared/src/latLon";
+import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
 import { RealClock } from "../../adapters/secondary/core/ClockImplementations";
 import {
   apiAddressRateLimiter,
@@ -71,7 +71,7 @@ describe("HttpAddressAPI", () => {
       noRetries,
     );
 
-    const coordinates: LatLonDto[] = [];
+    const coordinates: GeoPositionDto[] = [];
     const expectedResults: AddressDto[] = [];
 
     for (let index = 0; index < parallelCalls; index++) {

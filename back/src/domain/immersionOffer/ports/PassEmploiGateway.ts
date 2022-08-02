@@ -1,8 +1,8 @@
-import { LatLonDto } from "shared/src/latLon";
+import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
 import { RomeCode } from "shared/src/rome";
 
 export type PassEmploiNotificationParams = {
-  immersions: { siret: string; rome: RomeCode; location: LatLonDto }[];
+  immersions: { siret: string; rome: RomeCode; location: GeoPositionDto }[];
 };
 
 export interface PassEmploiGateway {

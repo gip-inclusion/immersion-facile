@@ -1,5 +1,5 @@
 import { PoolClient } from "pg";
-import { LatLonDto } from "shared/src/latLon";
+import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
 import { LaBonneBoiteRequestEntity } from "../../../domain/immersionOffer/entities/LaBonneBoiteRequestEntity";
 import { LaBonneBoiteRequestParams } from "../../../domain/immersionOffer/ports/LaBonneBoiteAPI";
 import { LaBonneBoiteRequestRepository } from "../../../domain/immersionOffer/ports/LaBonneBoiteRequestRepository";
@@ -33,7 +33,7 @@ export class PgLaBonneBoiteRequestRepository
     since,
   }: {
     rome: string;
-    position: LatLonDto;
+    position: GeoPositionDto;
     since: Date;
   }): Promise<null | {
     params: LaBonneBoiteRequestParams;

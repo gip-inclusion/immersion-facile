@@ -1,7 +1,7 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
 import R from "ramda";
-import { LatLonDto } from "shared/src/latLon";
+import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
 import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
 import { SiretDto } from "shared/src/siret";
@@ -690,7 +690,7 @@ export class PgEstablishmentAggregateRepository
   }
 }
 
-const convertPositionToStGeography = ({ lat, lon }: LatLonDto) =>
+const convertPositionToStGeography = ({ lat, lon }: GeoPositionDto) =>
   `ST_GeographyFromText('POINT(${lon} ${lat})')`;
 
 const reStGeographyFromText =

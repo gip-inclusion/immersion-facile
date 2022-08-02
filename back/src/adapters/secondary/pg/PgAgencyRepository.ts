@@ -10,7 +10,7 @@ import {
   GetAgenciesFilter,
   PartialAgencyDto,
 } from "shared/src/agency/agency.dto";
-import { LatLonDto } from "shared/src/latLon";
+import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
 import { AgencyRepository } from "../../../domain/convention/ports/AgencyRepository";
 import { createLogger } from "../../../utils/logger";
 import { optional } from "./pgUtils";
@@ -205,7 +205,7 @@ export class PgAgencyRepository implements AgencyRepository {
   }
 }
 
-const STPointStringFromPosition = (position: LatLonDto) =>
+const STPointStringFromPosition = (position: GeoPositionDto) =>
   `ST_GeographyFromText('POINT(${position.lon} ${position.lat})')`;
 
 const entityToPgArray = (agency: Partial<AgencyDto>): any[] => [
@@ -250,7 +250,7 @@ const pgToEntity = (params: AgencyPgRow): AgencyDto => ({
   validatorEmails: params.validator_emails,
 });
 
-export const parseGeoJson = (raw: string): LatLonDto => {
+export const parseGeoJson = (raw: string): GeoPositionDto => {
   const json = JSON.parse(raw);
   return {
     lat: json.coordinates[1],

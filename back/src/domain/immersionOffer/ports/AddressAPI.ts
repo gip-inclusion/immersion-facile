@@ -1,14 +1,18 @@
 import { AddressDto } from "shared/src/address/address.dto";
-import { LatLonDto } from "shared/src/latLon";
+import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
 
 export type AddressAndPosition = {
-  position: LatLonDto;
+  position: GeoPositionDto;
   address: AddressDto;
 };
 export interface AddressAPI {
   getAddressAndPositionFromString: (
     address: string,
   ) => Promise<AddressAndPosition | undefined>;
-  getCityCodeFromPosition: (position: LatLonDto) => Promise<number | undefined>;
-  getAddressFromPosition(position: LatLonDto): Promise<AddressDto | undefined>;
+  getCityCodeFromPosition: (
+    position: GeoPositionDto,
+  ) => Promise<number | undefined>;
+  getAddressFromPosition(
+    position: GeoPositionDto,
+  ): Promise<AddressDto | undefined>;
 }

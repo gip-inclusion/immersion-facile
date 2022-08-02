@@ -1,6 +1,6 @@
 import { AddressDto } from "shared/src/address/address.dto";
 import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
-import { LatLonDto } from "shared/src/latLon";
+import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryAddressAPI } from "../../../adapters/secondary/immersionOffer/InMemoryAddressAPI";
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
@@ -12,7 +12,7 @@ import {
 } from "../../../domain/convention/useCases/ApplyAgenciesAddressesFromPositions";
 import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
 
-const position: LatLonDto = {
+const position: GeoPositionDto = {
   lat: 0.722573,
   lon: 45.1851381,
 };

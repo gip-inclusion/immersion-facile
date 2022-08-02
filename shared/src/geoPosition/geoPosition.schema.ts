@@ -1,7 +1,7 @@
 import { z } from "zod";
+import { GeoPositionDto } from "./geoPosition.dto";
 
-export type LatLonDto = z.infer<typeof latLonSchema>;
-export const latLonSchema = z.object({
+export const geoPositionSchema: z.Schema<GeoPositionDto> = z.object({
   lat: z
     .number()
     .gte(-90, "'lat' doit être >= -90.0")
@@ -11,7 +11,3 @@ export const latLonSchema = z.object({
     .gte(-180, "'lon' doit être >= 180.0")
     .lte(180, "'lon' doit être <= 180.0"),
 });
-
-export type WithPosition = {
-  position: LatLonDto;
-};

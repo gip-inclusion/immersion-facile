@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { addressSchema } from "../address/address.schema";
-import { latLonSchema } from "../latLon";
+import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { romeCodeSchema } from "../rome";
 import { siretSchema } from "../siret";
 import { zStringPossiblyEmpty } from "../zodUtils";
@@ -29,7 +29,7 @@ export const searchImmersionResultSchema: z.Schema<SearchImmersionResultDto> =
     name: z.string(),
     customizedName: z.string().optional(),
     voluntaryToImmersion: z.boolean(),
-    position: latLonSchema,
+    position: geoPositionSchema,
     address: addressSchema,
     contactMode: z.enum(["EMAIL", "PHONE", "IN_PERSON"]).optional(),
     distance_m: z.number().optional(),

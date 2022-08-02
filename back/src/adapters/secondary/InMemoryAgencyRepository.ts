@@ -10,7 +10,10 @@ import {
   GetAgenciesFilter as GetAgenciesFilters,
   PartialAgencyDto,
 } from "shared/src/agency/agency.dto";
-import { LatLonDto, WithPosition } from "shared/src/latLon";
+import {
+  GeoPositionDto,
+  WithGeoPosition,
+} from "shared/src/geoPosition/geoPosition.dto";
 import { AgencyRepository } from "../../domain/convention/ports/AgencyRepository";
 import { distanceBetweenCoordinatesInMeters } from "../../utils/distanceBetweenCoordinatesInMeters";
 import { createLogger } from "../../utils/logger";
@@ -188,8 +191,11 @@ const isAgencyPE = (agency: AgencyDto) => agency.kind === "pole-emploi";
 const isAgencyNotPE = (agency: AgencyDto) => agency.kind !== "pole-emploi";
 
 const sortByNearestFrom =
-  (position: LatLonDto) =>
-  (a: AgencyIdAndName & WithPosition, b: AgencyIdAndName & WithPosition) =>
+  (position: GeoPositionDto) =>
+  (
+    a: AgencyIdAndName & WithGeoPosition,
+    b: AgencyIdAndName & WithGeoPosition,
+  ) =>
     distanceBetweenCoordinatesInMeters(
       a.position.lat,
       a.position.lon,

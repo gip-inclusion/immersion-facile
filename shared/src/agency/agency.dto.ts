@@ -1,6 +1,6 @@
 import { AbsoluteUrl } from "../AbsoluteUrl";
 import { AddressDto, DepartmentCode } from "../address/address.dto";
-import { LatLonDto } from "../latLon";
+import { GeoPositionDto } from "../geoPosition/geoPosition.dto";
 import { Flavor } from "../typeFlavors";
 import { NotEmptyArray, RequireField } from "../utils";
 
@@ -64,7 +64,7 @@ export const activeAgencyStatuses: AgencyStatus[] = ["active", "from-api-PE"];
 export type AgencyKindFilter = "peOnly" | "peExcluded";
 
 export type AgencyPositionFilter = {
-  position: LatLonDto;
+  position: GeoPositionDto;
   distance_km: number;
 };
 
@@ -99,7 +99,7 @@ export type CreateAgencyDto = {
   kind: AgencyKind;
   name: string;
   address: AddressDto;
-  position: LatLonDto;
+  position: GeoPositionDto;
   counsellorEmails: string[];
   validatorEmails: string[];
   // adminEmails: string[];

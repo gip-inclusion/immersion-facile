@@ -1,4 +1,4 @@
-import { LatLonDto } from "shared/src/latLon";
+import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
 import { LaBonneBoiteRequestEntity } from "../../../domain/immersionOffer/entities/LaBonneBoiteRequestEntity";
 import { LaBonneBoiteRequestParams } from "../../../domain/immersionOffer/ports/LaBonneBoiteAPI";
 import { LaBonneBoiteRequestRepository } from "../../../domain/immersionOffer/ports/LaBonneBoiteRequestRepository";
@@ -54,7 +54,7 @@ export class InMemoryLaBonneBoiteRequestRepository
 
 const findGeographicalyClosestRequestParams = (
   requests: LaBonneBoiteRequestEntity[],
-  toPotision: LatLonDto,
+  toPotision: GeoPositionDto,
 ): { params: LaBonneBoiteRequestParams; distanceToPositionKm: number } =>
   requests
     .map((request) => ({

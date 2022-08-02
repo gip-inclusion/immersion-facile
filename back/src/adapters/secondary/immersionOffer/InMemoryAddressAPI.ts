@@ -1,5 +1,5 @@
 import { AddressDto } from "shared/src/address/address.dto";
-import { LatLonDto } from "shared/src/latLon";
+import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
 import {
   AddressAPI,
   AddressAndPosition,
@@ -7,13 +7,13 @@ import {
 
 export class InMemoryAddressAPI implements AddressAPI {
   constructor(
-    private _position?: LatLonDto,
+    private _position?: GeoPositionDto,
     private _cityCode?: number,
     private _address?: AddressDto,
   ) {}
 
   public async getAddressFromPosition(
-    _position: LatLonDto,
+    _position: GeoPositionDto,
   ): Promise<AddressDto | undefined> {
     return this._address;
   }
@@ -34,7 +34,7 @@ export class InMemoryAddressAPI implements AddressAPI {
     this._address = address;
   }
 
-  public setNextPosition(position: LatLonDto | undefined) {
+  public setNextPosition(position: GeoPositionDto | undefined) {
     this._position = position;
   }
 

@@ -1,7 +1,7 @@
 import { AddressDto } from "shared/src/address/address.dto";
 import { Builder } from "shared/src/Builder";
 import { FormEstablishmentSource } from "shared/src/formEstablishment/FormEstablishment.dto";
-import { LatLonDto } from "shared/src/latLon";
+import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
 import { NafDto } from "shared/src/naf";
 import {
   DataSource,
@@ -46,7 +46,7 @@ export class EstablishmentEntityV2Builder
   withWebsite(website: string) {
     return new EstablishmentEntityV2Builder({ ...this.entity, website });
   }
-  withPosition(position: LatLonDto) {
+  withPosition(position: GeoPositionDto) {
     return new EstablishmentEntityV2Builder({ ...this.entity, position });
   }
   withName(name: string) {

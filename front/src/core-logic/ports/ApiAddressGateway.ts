@@ -1,5 +1,5 @@
 import { DepartmentCode, Postcode } from "shared/src/address/address.dto";
-import { LatLonDto } from "shared/src/latLon";
+import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
 
 export type AddressWithCoordinates = {
   label: string;
@@ -7,7 +7,7 @@ export type AddressWithCoordinates = {
   postcode: Postcode;
   departmentCode: DepartmentCode;
   city: string;
-  coordinates: LatLonDto;
+  coordinates: GeoPositionDto;
 };
 
 export interface ApiAddressGateway {
