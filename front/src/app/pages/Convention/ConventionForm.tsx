@@ -21,6 +21,7 @@ import { useExistingSiret } from "src/hooks/siret.hooks";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { Title } from "react-design-system/immersionFacile";
 import { ConventionFormFields } from "./ConventionFields/ConventionFormFields";
+import { Notification } from "react-design-system/immersionFacile";
 
 type ConventionFormProps = {
   properties: ConventionPresentation;
@@ -73,18 +74,6 @@ export const ConventionForm = ({
             professionnelle (PMSMP)
           </Title>
         </div>
-
-        <div className="fr-text">
-          <span className="font-bold">
-            Attention, le formulaire de demande de convention est en cours de
-            test dans quelques départements ou villes.
-          </span>
-          <br />
-          Il ne peut être utilisé que si votre conseiller ou votre
-          agence/mission locale/espace solidarité apparaît dans la liste. Si ce
-          n'est pas le cas, contactez votre conseiller. Il établira la
-          convention avec vous et l'entreprise qui va vous accueillir.
-        </div>
         <div className="fr-text">
           Bravo ! <br />
           Vous avez trouvé une entreprise pour vous accueillir en immersion.{" "}
@@ -94,9 +83,21 @@ export const ConventionForm = ({
           En quelques minutes, complétez ce formulaire avec l'entreprise qui
           vous accueillera. <br />
           <p className="fr-text--xs">
-            Ce formulaire vaut équivalence du CERFA 13912 * 04
+            Ce formulaire vise à recueillir les données nécessaires à
+            l’établissement de la convention d’immersion professionnelle en
+            conformité avec le cerfa 13912 * 04.
           </p>
         </div>
+        <Notification
+          type="info"
+          title="Attention, le formulaire de demande de convention n'est pas encore déployé partout en France."
+        >
+          Si votre conseiller emploi ou votre structure d'accompagnement
+          apparaît, vous pouvez l'utiliser.
+          <br />
+          Si ce n'est pas le cas, contactez directement votre conseiller pour
+          établir une convention papier.
+        </Notification>
 
         <Formik
           enableReinitialize={true}

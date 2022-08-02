@@ -52,7 +52,7 @@ export const ConventionFormFields = ({
         <ConventionSignOnlyMessage isAlreadySigned={alreadySigned ?? false} />
       )}
       <input type="hidden" name="federatedIdentity" />
-      <FormSectionTitle>1. Coordonnées du bénéficiaire</FormSectionTitle>
+      <FormSectionTitle>Pour commencer nous avons besoin de</FormSectionTitle>
       {isFrozen ? (
         <AgencyDisplay
           label="Votre structure d'accompagnement *"
@@ -66,6 +66,9 @@ export const ConventionFormFields = ({
           shouldListAll={!enablePeConnectApi}
         />
       )}
+      <FormSectionTitle>
+        1. Coordonnées du candidat (bénéficiaire)
+      </FormSectionTitle>
       <BeneficiaryCommonFields disabled={isFrozen} />
       <FormSectionTitle>
         2. Coordonnées de l'entreprise
