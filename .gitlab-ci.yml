@@ -11,7 +11,7 @@ variables:
 image: node:16.15-buster
 
 stages:
-#  - build
+  #  - build
   - test
   - deploy
 
@@ -123,7 +123,8 @@ deploy_on_dev:
       exit \$retVal;
       fi;
 
-      sleep 60;
+      echo \"Waiting 1m30 ...\";
+      sleep 90;
       echo \"Checking server health...\";
       curl --fail --output /dev/null http://localhost:80/api/"
 
@@ -169,7 +170,8 @@ deploy_on_staging:
       exit \$retVal;
       fi;
 
-      sleep 60;
+      echo \"Waiting 1m30 ...\";
+      sleep 90;
       echo \"Checking server health...\";
       curl --fail --output /dev/null http://localhost:3000/api/"
 
@@ -215,7 +217,8 @@ deploy_on_prod:
       exit \$retVal;
       fi;
 
-      sleep 60;
+      echo \"Waiting 1m30 ...\";
+      sleep 90;
       echo \"Checking server health...\";
       curl --fail --output /dev/null http://localhost:80/api/"
 
