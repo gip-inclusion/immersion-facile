@@ -39,7 +39,7 @@ export const SearchPage = () => {
             }}
             onSubmit={searchUseCase}
           >
-            {({ setFieldValue }) => (
+            {({ setFieldValue, values }) => (
               <Form>
                 <div className="gap-5 flex flex-col">
                   <div>
@@ -89,7 +89,9 @@ export const SearchPage = () => {
                     dark
                     disabled={
                       searchStatus === "initialFetch" ||
-                      searchStatus === "extraFetch"
+                      searchStatus === "extraFetch" ||
+                      values.lon === 0 ||
+                      values.lat === 0
                     }
                     type="submit"
                   >
