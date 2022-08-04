@@ -7,6 +7,7 @@ import { PgEstablishmentAggregateRepository } from "../../adapters/secondary/pg/
 import { EstablishmentAggregate } from "../../domain/immersionOffer/entities/EstablishmentEntity";
 import { PgExportQueries } from "../../adapters/secondary/pg/PgExportQueries";
 import { expectObjectsToMatch } from "../../_testBuilders/test.helpers";
+import { rueJacquardDto } from "../../_testBuilders/addressDtos";
 
 describe("PgExportQueries", () => {
   let pool: Pool;
@@ -55,7 +56,8 @@ describe("PgExportQueries", () => {
           Siret: "79158476600012",
           "Raison Sociale": "ARTUS INTERIM LA ROCHE SUR YON",
           Enseigne: null,
-          Adresse: "9 PL DE LA VENDEE 85000 LA ROCHE-SUR-YON",
+          Adresse: "9 PL DE LA VENDEE",
+          Ville: "LA ROCHE-SUR-YON",
           "Code Postal": "85000",
           Département: "Vendée",
           Région: "Pays de la Loire",
@@ -120,7 +122,12 @@ describe("PgExportQueries", () => {
 const establishmentAggregateArtusInterim = (): EstablishmentAggregate => ({
   establishment: new EstablishmentEntityV2Builder()
     .withSiret("79158476600012")
-    .withAddress("9 PL DE LA VENDEE 85000 LA ROCHE-SUR-YON")
+    .withAddress({
+      streetNumberAndAddress: "9 PL DE LA VENDEE",
+      city: "LA ROCHE-SUR-YON",
+      postcode: "85000",
+      departmentCode: "85",
+    })
     .withName("ARTUS INTERIM LA ROCHE SUR YON")
     .withDataSource("form")
     .withSourceProvider("immersion-facile")
@@ -150,7 +157,7 @@ const establishmentAggregateArtusInterim = (): EstablishmentAggregate => ({
 const establishmentAggregateMiniWorldLyon = (): EstablishmentAggregate => ({
   establishment: new EstablishmentEntityV2Builder()
     .withSiret("79341726200037")
-    .withAddress("2 RUE JACQUARD 69120 VAULX-EN-VELIN")
+    .withAddress(rueJacquardDto)
     .withName("MINI WORLD LYON")
     .withDataSource("form")
     .withSourceProvider("cci")

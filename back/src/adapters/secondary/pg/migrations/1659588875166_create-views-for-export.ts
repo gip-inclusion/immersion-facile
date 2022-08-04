@@ -5,23 +5,9 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     "view_siret_with_department_region",
     {},
     `
-    WITH 
-          left_digits_code_department_region AS (
-              SELECT DISTINCT 
-              postal_code_department_region.department,
-              postal_code_department_region.region,
-              left(postal_code_department_region.postal_code, 3) AS department_code
-              FROM postal_code_department_region
-              ),
-          siret_postal_code AS (
-              SELECT siret, (regexp_match(address, '\\d{5}'))[1] AS postal_code 
-              FROM establishments 
-              WHERE data_source = 'form'
-              )
-      SELECT  e.siret, postal_code, department, region
+      SELECT e.siret, department_name, region_name
       FROM establishments AS e
-      LEFT JOIN siret_postal_code spc ON spc.siret = e.siret
-      LEFT JOIN left_digits_code_department_region ldcdr ON ldcdr.department_code = left(spc.postal_code, 3)`,
+      LEFT JOIN public_department_region pdr ON pdr.department_code = e.department_code`,
   );
 
   pgm.createView(
@@ -41,8 +27,8 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     SELECT 
       o.*,
       prd.code_rome AS "Code métier",
-      e.department AS "Département", 
-      e.region AS "Région"
+      e.department_name AS "Département", 
+      e.region_name AS "Région"
     FROM 
       outbox_contact_requests AS o
       LEFT JOIN public_romes_data prd ON prd.libelle_rome = o."Métier"
@@ -69,11 +55,11 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
       e.siret AS "Siret", 
       name AS "Raison Sociale",
       customized_name AS "Enseigne", 
-      address AS "Adresse",
-      postal_code AS "Code Postal",
-      --(regexp_matches(address, '\\d{5}\\s(.)$'))[1] AS "Ville", TODO ! 
-      sdr.department AS "Département",
-      sdr.region AS "Région",
+      street_number_and_address AS "Adresse",
+      post_code AS "Code Postal",
+      city AS "Ville",
+      sdr.department_name AS "Département",
+      sdr.region_name AS "Région",
       naf_code AS "NAF",
       pnc.class_label AS "Division NAF",
       number_employees AS "Nombre d’employés",
@@ -106,7 +92,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
           FROM view_establishments_with_flatten_offers 
           GROUP BY "Siret")
       SELECT DISTINCT "Date de référencement", "Date de mise à jour", aggregated."Siret", "Raison Sociale", 
-        "Enseigne", "Adresse",  "Code Postal",	"Département",	"Région",	"NAF",	"Division NAF",
+        "Enseigne", "Adresse",  "Code Postal",	"Ville", "Département",	"Région",	"NAF",	"Division NAF",
         "Nombre d’employés", "Mode de contact",	"Appartenance Réseau « Les entreprises s’engagent »",
         "Visible",	"Origine", aggregated."Codes Métier", aggregated."Métiers"
       FROM aggregated LEFT JOIN view_establishments_with_flatten_offers AS f ON f."Siret" = aggregated."Siret"
@@ -116,40 +102,20 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.createView(
     "view_agencies",
     {},
-    `WITH left_digits_code_department_region AS (
-             SELECT DISTINCT postal_code_department_region.department,
-                postal_code_department_region.region,
-                "left"((postal_code_department_region.postal_code)::text, 3) AS department_code
-               FROM postal_code_department_region
-            ), code_matches AS (
-             SELECT agencies.id,
-                regexp_matches((agencies.address)::text, '\\d{5}'::text, 'ig'::text) AS code_matches
-               FROM agencies
-            ), agg_code_matches AS (
-             SELECT code_matches.id,
-                array_agg(code_matches.code_matches[1]) AS code_matches
-               FROM code_matches
-              GROUP BY code_matches.id
-            ), code_by_agency_id AS (
-             SELECT agg_code_matches.id,
-                agg_code_matches.code_matches[array_length(agg_code_matches.code_matches, 1)] AS postal_code
-               FROM agg_code_matches
-            )
-     SELECT 
-        a.id,
-        a.name AS "Nom",
-        a.code_safir AS "Code Safir",
-        a.kind AS "Type",
-        a.status AS "Statut",
-        to_char(a.created_at, 'DD/MM/YYYY'::text) AS "Date de créationt",
-        a.address AS "Adresse",
-        c.postal_code AS "Code Postal",
-        ldcdr.department AS "Département",
-        ldcdr.region AS "Région"
-       FROM ((agencies a
-         LEFT JOIN code_by_agency_id c ON ((c.id = a.id)))
-         LEFT JOIN left_digits_code_department_region ldcdr ON ((ldcdr.department_code = left(c.postal_code, 3))))
-      ORDER BY ldcdr.department;
+    `SELECT 
+      a.id,
+      a.name AS "Nom",
+      a.code_safir AS "Code Safir",
+      a.kind AS "Type",
+      a.status AS "Statut",
+      to_char(a.created_at, 'DD/MM/YYYY'::text) AS "Date de création",
+      a.street_number_and_address AS "Adresse",
+      a.post_code AS "Code Postal",
+      pdr.department_name AS "Département",
+      pdr.region_name AS "Région"
+    FROM agencies a
+      LEFT JOIN public_department_region pdr ON pdr.department_code = a.department_code
+    ORDER BY pdr.department_name;
     `,
   );
 
