@@ -1,7 +1,9 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
 import { groupBy, keys, prop } from "ramda";
-import { GetExportableParams } from "shared/src/exportable";
+import { ExportableName, GetExportableParams } from "shared/src/exportable";
+import { ComplexScheduleDto } from "shared/src/schedule/Schedule.dto";
+import { calculateTotalImmersionHoursFromComplexSchedule } from "shared/src/schedule/ScheduleUtils";
 import {
   ExportedRow,
   ExportQueries,
@@ -25,12 +27,30 @@ export class PgExportQueries implements ExportQueries {
       `SELECT * FROM view_${exportable.name}
        ${whereClause}`,
     );
+
+    const postProcessors = postProcessing[exportable.name];
+
+    const processedRows = postProcessors
+      ? queryResult.rows.map((row) => ({ ...row, ...postProcessors(row) }))
+      : queryResult.rows;
+
     if (!exportable.keyToGroupBy)
       return {
-        [exportable.name]: queryResult.rows,
+        [exportable.name]: processedRows,
       };
     else {
-      return groupBy(prop(exportable.keyToGroupBy), queryResult.rows); // TODO : filter out groupby column.
+      return groupBy(prop(exportable.keyToGroupBy), processedRows);
     }
   }
 }
+
+const postProcessing: Partial<
+  Record<ExportableName, (row: ExportedRow) => ExportedRow>
+> = {
+  conventions: (row: ExportedRow) => ({
+    ...row,
+    "Durée de l'immersion": calculateTotalImmersionHoursFromComplexSchedule(
+      row["Programme"] as ComplexScheduleDto,
+    ),
+  }),
+};

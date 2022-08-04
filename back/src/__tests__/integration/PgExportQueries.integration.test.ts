@@ -204,6 +204,7 @@ describe("PgExportQueries", () => {
           "Accepté par l'entreprise": true,
           "Date de début": "06/01/2021",
           "Date de fin": "15/01/2021",
+          "Durée de l'immersion": 70,
           "Objectif de l'immersion": conventionInRepo.immersionObjective,
           "Métier observé": "Pilote de machines d'abattage",
           "Conditions de travail particulières":

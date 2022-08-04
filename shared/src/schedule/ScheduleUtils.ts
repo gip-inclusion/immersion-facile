@@ -1,4 +1,5 @@
 import { addDays, format, getDay, parseISO } from "date-fns";
+import { prop } from "ramda";
 
 import {
   ComplexScheduleDto,
@@ -73,6 +74,19 @@ export const calculateTotalImmersionHoursBetweenDate = ({
     complexSchedule: schedule.complexSchedule,
     ...dates,
   });
+
+export const calculateTotalImmersionHoursFromComplexSchedule = (
+  complexSchedule: ComplexScheduleDto,
+): number => {
+  const dates = complexSchedule.map(prop("date"));
+  const dateStart = dates.sort()[0];
+  const dateEnd = dates.reverse()[0];
+  return calculateTotalImmersionHoursBetweenDateComplex({
+    complexSchedule,
+    dateStart,
+    dateEnd,
+  });
+};
 
 export const prettyPrintSchedule = (schedule: ScheduleDto): string =>
   prettyPrintComplexSchedule(schedule.complexSchedule);
