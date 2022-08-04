@@ -7,13 +7,28 @@ import { PgEstablishmentAggregateRepository } from "../../adapters/secondary/pg/
 import { EstablishmentAggregate } from "../../domain/immersionOffer/entities/EstablishmentEntity";
 import { PgExportQueries } from "../../adapters/secondary/pg/PgExportQueries";
 import { expectObjectsToMatch } from "../../_testBuilders/test.helpers";
-import { rueJacquardDto } from "../../_testBuilders/addressDtos";
+import {
+  avenueChampsElyseesDto,
+  rueBitcheDto,
+  rueJacquardDto,
+} from "../../_testBuilders/addressDtos";
+import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
+import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
+import { PgConventionRepository } from "../../adapters/secondary/pg/PgConventionRepository";
+import { PgOutboxRepository } from "../../adapters/secondary/pg/PgOutboxRepository";
+import { DomainEvent } from "../../domain/core/eventBus/events";
+import { EstablishmentAggregateBuilder } from "../../_testBuilders/EstablishmentAggregateBuilder";
+import { UuidV4Generator } from "../../adapters/secondary/core/UuidGeneratorImplementations";
 
 describe("PgExportQueries", () => {
   let pool: Pool;
   let client: PoolClient;
   let establishmentAggregateRepository: PgEstablishmentAggregateRepository;
+  let agencyRepository: PgAgencyRepository;
   let exportQueries: PgExportQueries;
+  let conventionRepository: PgConventionRepository;
+  let outboxRepository: PgOutboxRepository;
 
   beforeAll(async () => {
     pool = getTestPgPool();
@@ -21,13 +36,19 @@ describe("PgExportQueries", () => {
   });
 
   beforeEach(async () => {
+    await client.query("DELETE FROM outbox");
+    await client.query("DELETE FROM conventions");
+    await client.query("DELETE FROM agencies");
     await client.query("DELETE FROM establishments");
     await client.query("DELETE FROM immersion_contacts");
 
     establishmentAggregateRepository = new PgEstablishmentAggregateRepository(
       client,
     );
+    agencyRepository = new PgAgencyRepository(client);
     exportQueries = new PgExportQueries(client);
+    conventionRepository = new PgConventionRepository(client);
+    outboxRepository = new PgOutboxRepository(client);
   });
 
   afterAll(async () => {
@@ -114,6 +135,166 @@ describe("PgExportQueries", () => {
             (row) => row["Origine"],
           ),
         ).toEqual(["immersion-facile", "immersion-facile"]);
+      });
+    });
+  });
+
+  describe("Export view_agencies", () => {
+    describe("No filter specified", () => {
+      it("Retrieves all agencies exports", async () => {
+        // Prepare
+        const agencyInRepo = new AgencyDtoBuilder()
+          .withName("Agence de Jacquard")
+          .withAddress(rueJacquardDto)
+          .build();
+        await agencyRepository.insert(agencyInRepo);
+
+        // Act
+        const exportables = await exportQueries.getFromExportable({
+          name: "agencies",
+          filters: {},
+        });
+
+        // Assert
+        const expectedExportedRow = {
+          id: agencyInRepo.id,
+          Nom: "Agence de Jacquard",
+          "Code Safir": null,
+          Type: "autre",
+          Statut: "active",
+          Adresse: "2 RUE JACQUARD",
+          "Code Postal": "69120",
+          Département: "Rhône",
+          Région: "Auvergne-Rhône-Alpes",
+        };
+        expect(exportables["agencies"]).toHaveLength(1);
+        expectObjectsToMatch(exportables["agencies"][0], expectedExportedRow);
+      });
+    });
+  });
+  describe("Export conventions", () => {
+    describe("No filter specified", () => {
+      it("Retrieves all conventions exports", async () => {
+        // Prepare
+        const conventionInRepo = new ConventionDtoBuilder().build();
+        const conventionAgency = new AgencyDtoBuilder()
+          .withId(conventionInRepo.agencyId)
+          .withName("La super agence sur les champs")
+          .withAddress(avenueChampsElyseesDto)
+          .build();
+        await agencyRepository.insert(conventionAgency);
+        await conventionRepository.save(conventionInRepo);
+
+        // Act
+        const exportables = await exportQueries.getFromExportable({
+          name: "conventions",
+          filters: {},
+        });
+
+        // Assert
+        const expectedExportedRow = {
+          "id convention": conventionInRepo.id,
+          Structure: "La super agence sur les champs",
+          "Type de structure": conventionAgency.kind,
+          "Département de la structure": "Paris",
+          "Région de la structure": "Île-de-France",
+          "Date de validation": null,
+          Statut: conventionInRepo.status,
+          "Accepté par le bénéficiaire": true,
+          "Accepté par l'entreprise": true,
+          "Date de début": "06/01/2021",
+          "Date de fin": "15/01/2021",
+          "Objectif de l'immersion": conventionInRepo.immersionObjective,
+          "Métier observé": "Pilote de machines d'abattage",
+          "Conditions de travail particulières":
+            conventionInRepo.workConditions ?? null,
+          Activités: conventionInRepo.immersionActivities,
+          "Compétences développées":
+            "Utilisation des pneus optimale, gestion de carburant",
+          Programme: conventionInRepo.schedule.complexSchedule,
+          "Nom bénéficiaire": conventionInRepo.lastName,
+          "Prénom bénéficiaire": conventionInRepo.firstName,
+          "Code Postal": "75010",
+          "Email bénéficiaire": conventionInRepo.email,
+          "Téléphone bénéficiaire": conventionInRepo.phone,
+          "Contact d'urgence": conventionInRepo.emergencyContact,
+          "Téléphone du contact d'urgence":
+            conventionInRepo.emergencyContactPhone,
+          "Protection individuelle": conventionInRepo.individualProtection,
+          "Prévention sanitaire": conventionInRepo.sanitaryPrevention,
+          "Descriptif des préventions sanitaires":
+            conventionInRepo.sanitaryPreventionDescription,
+          "Identifiant Externe Pole Emploi":
+            conventionInRepo.federatedIdentity ?? null,
+          Siret: conventionInRepo.siret,
+          "Référencement IF": false,
+          Entreprise: conventionInRepo.businessName,
+          Tuteur: conventionInRepo.mentor,
+          "Téléphone du tuteur": conventionInRepo.mentorPhone,
+          "Email du tuteur": conventionInRepo.mentorEmail,
+        };
+        expect(exportables["conventions"]).toHaveLength(1);
+        expectObjectsToMatch(
+          exportables["conventions"][0],
+          expectedExportedRow,
+        );
+      });
+    });
+  });
+  describe("Export view_contact_requests", () => {
+    describe("No filter specified", () => {
+      it("Retrieves all agencies exports", async () => {
+        // Prepare
+        const establishmentAggregate = new EstablishmentAggregateBuilder()
+          .withEstablishment(
+            new EstablishmentEntityV2Builder()
+              .withAddress(rueBitcheDto)
+              .build(),
+          )
+          .build();
+        const contactEvent: DomainEvent = {
+          id: new UuidV4Generator().new(),
+          occurredAt: "2022-01-01T12:00:00.000Z",
+          topic: "ContactRequestedByBeneficiary",
+          payload: {
+            contactMode: "EMAIL",
+            message: "Hello!",
+            potentialBeneficiaryEmail: "tom@cruise.com",
+            potentialBeneficiaryFirstName: "Tom",
+            potentialBeneficiaryLastName: "Cruise",
+            romeLabel: "Stylisme",
+            siret: establishmentAggregate.establishment.siret,
+          },
+          publications: [],
+          wasQuarantined: false,
+        };
+        await establishmentAggregateRepository.insertEstablishmentAggregates([
+          establishmentAggregate,
+        ]);
+        await outboxRepository.save(contactEvent);
+
+        // Act
+        const exportables = await exportQueries.getFromExportable({
+          name: "contact_requests",
+          filters: {},
+        });
+
+        // Assert
+        const expectedExportedRow = {
+          "Date de la mise en relation": "01/01/2022",
+          "Type de mise en relation": "EMAIL",
+          Email: "tom@cruise.com",
+          Siret: "78000403200019",
+          Métier: "Stylisme",
+          "Code métier": "B1805",
+          Département: "Loire-Atlantique",
+          Région: "Pays de la Loire",
+        };
+        expect(exportables["contact_requests"]).toHaveLength(1);
+        expectObjectsToMatch(
+          exportables["contact_requests"][0],
+          expectedExportedRow,
+        );
       });
     });
   });
