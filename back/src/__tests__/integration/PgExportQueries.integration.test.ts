@@ -87,7 +87,7 @@ describe("PgExportQueries", () => {
           "Nombre d’employés": "250-499",
           "Mode de contact": "Téléphone",
           "Appartenance Réseau « Les entreprises s’engagent »": "Oui",
-          Visible: true,
+          Visible: "Oui",
           Origine: "immersion-facile",
           "Code Métier": "M1502",
           Métier: "Développement des ressources humaines",
@@ -164,6 +164,8 @@ describe("PgExportQueries", () => {
           Statut: "active",
           Adresse: "2 RUE JACQUARD",
           "Code Postal": "69120",
+          "Emails des conseillers": agencyInRepo.counsellorEmails,
+          "Emails des valideurs": agencyInRepo.validatorEmails,
           Département: "Rhône",
           Région: "Auvergne-Rhône-Alpes",
         };
@@ -200,8 +202,8 @@ describe("PgExportQueries", () => {
           "Région de la structure": "Île-de-France",
           "Date de validation": null,
           Statut: conventionInRepo.status,
-          "Accepté par le bénéficiaire": true,
-          "Accepté par l'entreprise": true,
+          "Accepté par le bénéficiaire": "Oui",
+          "Accepté par l'entreprise": "Oui",
           "Date de début": "06/01/2021",
           "Date de fin": "15/01/2021",
           "Durée de l'immersion": 70,
@@ -212,9 +214,25 @@ describe("PgExportQueries", () => {
           Activités: conventionInRepo.immersionActivities,
           "Compétences développées":
             "Utilisation des pneus optimale, gestion de carburant",
-          Programme: conventionInRepo.schedule.complexSchedule,
-          "Nom bénéficiaire": conventionInRepo.lastName,
-          "Prénom bénéficiaire": conventionInRepo.firstName,
+          Programme:
+            "Heures de travail hebdomadaires : 35\n" +
+            "lundi : libre\n" +
+            "mardi : libre\n" +
+            "mercredi : 08:00-12:00, 13:00-16:00\n" +
+            "jeudi : 08:00-12:00, 13:00-16:00\n" +
+            "vendredi : 08:00-12:00, 13:00-16:00\n" +
+            "samedi : 08:00-12:00, 13:00-16:00\n" +
+            "dimanche : 08:00-12:00, 13:00-16:00\n" +
+            "Heures de travail hebdomadaires : 35\n" +
+            "lundi : 08:00-12:00, 13:00-16:00\n" +
+            "mardi : 08:00-12:00, 13:00-16:00\n" +
+            "mercredi : 08:00-12:00, 13:00-16:00\n" +
+            "jeudi : 08:00-12:00, 13:00-16:00\n" +
+            "vendredi : 08:00-12:00, 13:00-16:00\n" +
+            "samedi : libre\n" +
+            "dimanche : libre",
+          Bénéficiaire:
+            conventionInRepo.firstName + " " + conventionInRepo.lastName,
           "Code Postal": "75010",
           "Email bénéficiaire": conventionInRepo.email,
           "Téléphone bénéficiaire": conventionInRepo.phone,
@@ -228,7 +246,7 @@ describe("PgExportQueries", () => {
           "Identifiant Externe Pole Emploi":
             conventionInRepo.federatedIdentity ?? null,
           Siret: conventionInRepo.siret,
-          "Référencement IF": false,
+          "Référencement IF": "Non",
           Entreprise: conventionInRepo.businessName,
           Tuteur: conventionInRepo.mentor,
           "Téléphone du tuteur": conventionInRepo.mentorPhone,
@@ -244,7 +262,7 @@ describe("PgExportQueries", () => {
   });
   describe("Export view_contact_requests", () => {
     describe("No filter specified", () => {
-      it("Retrieves all agencies exports", async () => {
+      it("Retrieves all contact requests exports", async () => {
         // Prepare
         const establishmentAggregate = new EstablishmentAggregateBuilder()
           .withEstablishment(

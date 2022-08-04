@@ -62,7 +62,7 @@ const Email = ({ email }: { email: EmailSentDto }) => {
         contents={
           <ul className="text-xs">
             {Object.entries(email.templatedEmail.params).map(([key, value]) => (
-              <li>
+              <li key={key}>
                 {" "}
                 <span className="font-normal">{key} :</span>{" "}
                 <span

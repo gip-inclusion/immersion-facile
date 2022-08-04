@@ -1,4 +1,4 @@
-import { Checkbox } from "@mui/material";
+import { Checkbox, CircularProgress } from "@mui/material";
 import React, { useState } from "react";
 import {
   ArrayDropdown,
@@ -87,8 +87,9 @@ const ExportEntreprises = () => {
             defaultSelectedOption={undefined}
           />
           <ImmersionTextField
-            label="Filtre par division"
-            name="Filter par division"
+            label="Filtre par activité"
+            name="Filter par activité"
+            placeholder="Ex: Culture"
             className="flex justify-between"
             onChange={(event) => {
               setExportableParams({
@@ -149,7 +150,7 @@ const ExportConventions = () => {
         <div className="w-2/3">
           <ArrayDropdown
             label="Groupement"
-            options={["Région", "Département", "Structure"]}
+            options={["Structure"]}
             allowEmpty={true}
             onSelect={(selectedGroupKey) => {
               if (selectedGroupKey) {
@@ -185,16 +186,56 @@ const ExportConventions = () => {
             allowEmpty={true}
             defaultSelectedOption={undefined}
           />
+          <ArrayDropdown
+            label="Type de structure"
+            options={[
+              "kind",
+              "structure-IAE",
+              "cap-emploi",
+              "mission-locale",
+              "pole-emploi",
+              "autre",
+              "prepa-apprentissage",
+              "conseil-departemental",
+            ]}
+            onSelect={(selectedStatut) => {
+              setExportableParams({
+                ...exportableParams,
+                filters: {
+                  ...exportableParams.filters,
+                  "Type de structure": selectedStatut,
+                },
+              });
+            }}
+            allowEmpty={true}
+            defaultSelectedOption={undefined}
+          />
           <ImmersionTextField
-            label="Filtre par type de structure"
-            name="Filter par type de structure"
+            label="Filtre par département"
+            name="Filter par département"
+            placeholder="Ex: Mayotte"
             className="flex justify-between"
             onChange={(event) => {
               setExportableParams({
                 ...exportableParams,
                 filters: {
                   ...exportableParams.filters,
-                  "Type de structure": event.target.value,
+                  "Département de la structure": event.target.value,
+                },
+              });
+            }}
+          />
+          <ImmersionTextField
+            label="Filtre par Région"
+            name="Filter par Région"
+            placeholder="Ex: La Réunion"
+            className="flex justify-between"
+            onChange={(event) => {
+              setExportableParams({
+                ...exportableParams,
+                filters: {
+                  ...exportableParams.filters,
+                  "Région de la structure": event.target.value,
                 },
               });
             }}
@@ -321,18 +362,34 @@ const ExportContactRequests = () => {
   );
 };
 
-const DownloadButton = ({ onClick }: { onClick: () => void }) => (
-  <button
-    className="fr-btn"
-    onClick={(_e) => {
-      onClick();
-    }}
-  >
-    {" "}
-    <DownloadIcon />
-    Télécharger
-  </button>
-);
+const DownloadButton = ({ onClick }: { onClick: () => Promise<void> }) => {
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [error, setError] = useState<string | undefined>(undefined);
+  return (
+    <>
+      <button
+        disabled={isDownloading}
+        className="fr-btn"
+        onClick={(_e) => {
+          setError(undefined);
+          setIsDownloading(true);
+          return onClick()
+            .then(() => setIsDownloading(false))
+            .catch((_) => {
+              setIsDownloading(false);
+              setError("Rien à exporter...");
+            });
+        }}
+      >
+        {" "}
+        {!isDownloading && <DownloadIcon />}
+        {isDownloading && <CircularProgress size={20} />}
+        Télécharger
+      </button>
+      {error && <div className="text-red-500 italic mt-2">{error}</div>}
+    </>
+  );
+};
 
 const LabeledCheckbox = ({
   label,

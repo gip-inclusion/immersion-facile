@@ -12,7 +12,7 @@ export class HttpExcelExportGateway implements ExcelExportGateway {
     exportDataDto: ExportDataDto,
   ) {
     const response = await this.httpClient.post(
-      `/api/admin/${exportRoute}`,
+      `/admin/${exportRoute}`,
       exportDataDto,
       {
         headers: { authorization: adminToken },

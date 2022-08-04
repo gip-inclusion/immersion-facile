@@ -31,7 +31,11 @@ export type AgenciesExportableParams = GenericExportable<
 
 export type ConventionsExportableParams = GenericExportable<
   "conventions",
-  "Département" | "Région" | "Statut" | "Structure" | "Type de structure"
+  | "Département de la structure"
+  | "Région de la structure"
+  | "Statut"
+  | "Structure"
+  | "Type de structure"
 >;
 
 export type ContactRequestsExportableParams = GenericExportable<

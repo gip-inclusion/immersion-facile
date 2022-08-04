@@ -19,7 +19,7 @@ export class ExcelExportGateway implements ExportGateway {
     const path = await makeTemporaryStorageFile(`${fileName}.zip`);
     const createdFilenames = await Promise.all(
       keys(exportables).map((sheetName) =>
-        toWorkbook(sheetName, exportables[sheetName]).toXlsx(
+        toWorkbook(sheetName.replace("/", " "), exportables[sheetName]).toXlsx(
           retrieveParentDirectory(path),
         ),
       ),
@@ -75,7 +75,7 @@ const toWorkbook = (workbookTitle: string, rows: ExportedRow[]): WorkbookV2 =>
     .withPayload(rows);
 
 const MIN_WIDTH = 15;
-const MAX_WIDTH = 500;
+const MAX_WIDTH = 300;
 
 const inferWidthFromRows = (rows: ExportedRow[], fieldName: string): number => {
   const cellValues = rows.map((row) =>
@@ -85,6 +85,10 @@ const inferWidthFromRows = (rows: ExportedRow[], fieldName: string): number => {
   );
   return Math.min(
     MAX_WIDTH,
-    Math.max(MIN_WIDTH, ...cellValues.map((cellValue) => cellValue.length)),
+    Math.max(
+      MIN_WIDTH,
+      fieldName.length,
+      ...cellValues.map((cellValue) => cellValue.length),
+    ),
   );
 };

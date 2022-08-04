@@ -24,8 +24,7 @@ export const ArrayDropdown = <T extends string>({
     const index = event.currentTarget.selectedIndex;
     const option = displayOptions.at(index);
     setSelectedOption(option ?? "");
-    if (option) return onSelect(option ? option : undefined);
-    throw new Error(`No label at index ${index}`);
+    return onSelect(option ? option : undefined);
   };
   return (
     <div className="flex gap-4 items-center font-medium justify-between">

@@ -5,6 +5,7 @@ import { ExportDataDto, GetExportableParams } from "shared/src/exportable";
 
 import { ExportGateway } from "../ports/ExportGateway";
 import { keys } from "ramda";
+import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 
 const exportableSchema: z.ZodSchema<GetExportableParams> = z.any();
 
@@ -27,7 +28,8 @@ export class ExportData extends TransactionalUseCase<ExportDataDto, string> {
   ): Promise<string> {
     const dataToExport = await uow.exportQueries.getFromExportable(exportable);
 
-    if (keys(dataToExport).length === 0) throw new Error("No data to export");
+    if (keys(dataToExport).length === 0)
+      throw new NotFoundError("No data to export");
 
     const archivePath = await this.exportGateway.save(dataToExport, fileName);
     return archivePath;

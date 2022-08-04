@@ -245,7 +245,7 @@ const prettyPrintDaySchedule = (timePeriods: TimePeriodDto[]): string => {
 // lundi: libre
 // mardi: 08:00-12:00, 14:00-17:00
 // ...
-const prettyPrintComplexSchedule = (
+export const prettyPrintComplexSchedule = (
   complexSchedule: ComplexScheduleDto,
 ): string => {
   const lines: string[] = [];

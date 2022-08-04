@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { createLogger } from "../../../utils/logger";
+import { handleHttpJsonResponseError } from "./handleHttpJsonResponseError";
 
 const logger = createLogger(__filename);
 
@@ -51,17 +52,6 @@ const handleZipResponseError = (
     stack,
   });
 
-  res.status(500);
-
-  return res.json({ errors: toValidJSONObjectOrString(error) });
-};
-
-const toValidJSONObjectOrString = (
-  error: any,
-): string | { [key: string]: string } => {
-  try {
-    return JSON.parse(error.message);
-  } catch (_) {
-    return error.message;
-  }
+  res.status(error.status ?? 500);
+  return handleHttpJsonResponseError(req, res, error);
 };
