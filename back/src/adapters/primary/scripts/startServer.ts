@@ -1,3 +1,6 @@
+// <<< --- Tracing SDK should be the first thing to run - KEEP IT FIRST in import list !
+import { tracingSdk } from "./tracing";
+// Tracing SDK should be the first thing to run --->>>
 import { createLogger } from "../../../utils/logger";
 import { AppConfig } from "../config/appConfig";
 import { createApp } from "../server";
@@ -8,14 +11,17 @@ const port = 1234;
 
 const appConfig = AppConfig.createFromEnv();
 
-createApp(appConfig).then(
-  ({ app }) => {
-    app.listen(port, () => {
-      logger.info(`server started at http://localhost:${port}`);
-    });
-  },
-  (error: any) => {
-    logger.error(error, `Server start failed`);
-    process.exit(1);
-  },
-);
+tracingSdk
+  .start()
+  .then(() => createApp(appConfig))
+  .then(
+    ({ app }) => {
+      app.listen(port, () => {
+        logger.info(`server started at http://localhost:${port}`);
+      });
+    },
+    (error: any) => {
+      logger.error(error, `Server start failed`);
+      process.exit(1);
+    },
+  );
