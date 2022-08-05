@@ -3,6 +3,8 @@ version: "3"
 x-logging-config:
   &logging-config
   logging:
+    # A docker plugin is necessary for loki to work correctly (if not done you get : plugin "loki" not found):
+    # $ docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions
     driver: loki
     options:
       loki-url: http://${LOKI_HOST:-localhost:9092}/loki/api/v1/push
