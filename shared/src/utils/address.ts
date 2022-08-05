@@ -1,4 +1,4 @@
-import { trim } from "ramda";
+import { keys, trim } from "ramda";
 import { AddressDto } from "../address/address.dto";
 export interface CaptureAddressGroupsResult {
   validAddress: boolean;
@@ -14,7 +14,7 @@ export const captureAddressGroups = (
   fullAddressString: string,
 ): CaptureAddressGroupsResult => {
   const captureAddressGroupsRegex =
-    /(?<address>^.+) (?<postalCode>[0-9]{5}) (?<city>.+$)/u;
+    /(?<address>^.*)(?<postalCode>[0-9]{5}) (?<city>.+$)/u;
   const capture = captureAddressGroupsRegex.exec(fullAddressString);
   const address = capture?.groups?.["address"];
   const postalCode = capture?.groups?.["postalCode"];
@@ -29,10 +29,22 @@ export const captureAddressGroups = (
 };
 const dropLastComma = (text: string) => text.replace(/,(?=[^,]*$)/, "");
 
-const DEPARTMENT_CODES_WITH_3_CHARS = ["971", "972", "973", "974", "976"];
+const DEPARTMENT_CODES_FROM_3_CHARS: Record<string, string> = {
+  "971": "971",
+  "972": "972",
+  "973": "973",
+  "974": "974",
+  "975": "975",
+  "976": "976",
+  "200": "2A",
+  "201": "2A",
+  "202": "2B",
+  "206": "2B",
+};
+
 export const inferDepartmentCode = (postcode: string): string => {
-  if (DEPARTMENT_CODES_WITH_3_CHARS.includes(postcode.slice(0, 3))) {
-    return postcode.slice(0, 3);
+  if (keys(DEPARTMENT_CODES_FROM_3_CHARS).includes(postcode.slice(0, 3))) {
+    return DEPARTMENT_CODES_FROM_3_CHARS[postcode.slice(0, 3)];
   }
   return postcode.slice(0, 2);
 };

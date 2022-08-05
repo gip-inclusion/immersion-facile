@@ -1,6 +1,6 @@
 import { MigrationBuilder } from "node-pg-migrate";
 import format from "pg-format";
-import { trim } from "ramda";
+import { keys, trim } from "ramda";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   await pgm.renameColumn("establishments", "address", "legacy_address");
@@ -47,7 +47,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
       city = c.city
     FROM (VALUES %L) 
     AS c(siret, street_number_and_address, post_code, city, department_code)
-    WHERE c.siret = e.siret;
+    WHERE trim(c.siret) = trim(e.siret);
     `,
     establishmentsAddressDtos,
   );
@@ -65,10 +65,9 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
     "city",
   ]);
 }
-
 export const captureAddressGroups = (fullAddressString: string) => {
   const captureAddressGroupsRegex =
-    /(?<address>^.+) (?<postalCode>[0-9]{5}) (?<city>.+$)/u;
+    /(?<address>^.*)(?<postalCode>[0-9]{5}) (?<city>.+$)/u;
   const capture = captureAddressGroupsRegex.exec(fullAddressString);
   const address = capture?.groups?.["address"];
   const postalCode = capture?.groups?.["postalCode"];
@@ -82,10 +81,22 @@ export const captureAddressGroups = (fullAddressString: string) => {
   };
 };
 
-const DEPARTMENT_CODES_WITH_3_CHARS = ["971", "972", "973", "974", "976"];
+const DEPARTMENT_CODES_FROM_3_CHARS: Record<string, string> = {
+  "971": "971",
+  "972": "972",
+  "973": "973",
+  "974": "974",
+  "975": "975",
+  "976": "976",
+  "200": "2A",
+  "201": "2A",
+  "202": "2B",
+  "206": "2B",
+};
+
 export const inferDepartmentCode = (postcode: string): string => {
-  if (DEPARTMENT_CODES_WITH_3_CHARS.includes(postcode.slice(0, 3))) {
-    return postcode.slice(0, 3);
+  if (keys(DEPARTMENT_CODES_FROM_3_CHARS).includes(postcode.slice(0, 3))) {
+    return DEPARTMENT_CODES_FROM_3_CHARS[postcode.slice(0, 3)];
   }
   return postcode.slice(0, 2);
 };
