@@ -14,6 +14,7 @@ import {
 import { Clock, DateStr } from "../../../domain/core/ports/Clock";
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
+import { tracer } from "../../primary/scripts/tracing";
 
 const logger = createLogger(__filename);
 
@@ -142,7 +143,22 @@ const subscriptionCallbackToExecute =
     );
 
     try {
-      await cb(event);
+      await tracer.startActiveSpan(
+        `Publish topic: ${event.topic} for usecase ${subscriptionId}`,
+        (span) => {
+          span.setAttributes({
+            topic: event.topic,
+            payload: JSON.stringify(event.payload),
+            subscriptionId,
+          });
+          return cb(event)
+            .catch((error) => {
+              span.setAttribute("error", JSON.stringify(error));
+              throw error;
+            })
+            .finally(() => span.end());
+        },
+      );
     } catch (error: any) {
       monitorErrorInCallback(error, event);
       return { subscriptionId, errorMessage: error.message };

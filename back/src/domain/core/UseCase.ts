@@ -1,9 +1,11 @@
+import type { Span } from "@opentelemetry/api";
 import { ConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { z } from "zod";
 import {
   BadRequestError,
   validateAndParseZodSchema,
 } from "../../adapters/primary/helpers/httpErrors";
+import { tracer } from "../../adapters/primary/scripts/tracing";
 import { UnitOfWork, UnitOfWorkPerformer } from "./ports/UnitOfWork";
 
 export abstract class UseCase<
@@ -24,8 +26,14 @@ export abstract class UseCase<
     } catch (e) {
       throw new BadRequestError(e);
     }
-
-    return this._execute(validParams, jwtPayload);
+    return tracer.startActiveSpan(
+      `Use Case`,
+      traceUseCaseWithContext(() => this._execute(validParams, jwtPayload), {
+        useCaseName: this.constructor.name,
+        input: validParams,
+        jwtPayload,
+      }),
+    );
   }
 
   // this method is guaranteed to only receive validated params
@@ -49,9 +57,19 @@ export abstract class TransactionalUseCase<
     jwtPayload?: JWTPayload,
   ): Promise<Output> {
     const validParams = validateAndParseZodSchema(this.inputSchema, params);
-
-    return this.uowPerformer.perform((uow) =>
-      this._execute(validParams, uow, jwtPayload),
+    return tracer.startActiveSpan(
+      `Transactional Use Case`,
+      traceUseCaseWithContext(
+        () =>
+          this.uowPerformer.perform((uow) =>
+            this._execute(validParams, uow, jwtPayload),
+          ),
+        {
+          useCaseName: this.constructor.name,
+          input: validParams,
+          jwtPayload,
+        },
+      ),
     );
   }
 
@@ -61,3 +79,27 @@ export abstract class TransactionalUseCase<
     jwtPayload?: JWTPayload,
   ): Promise<Output>;
 }
+
+const traceUseCaseWithContext =
+  <Input, JWTPayload, Output>(
+    cb: () => Promise<Output>,
+    context: { useCaseName: string; input: Input; jwtPayload: JWTPayload },
+  ) =>
+  async (span: Span) => {
+    span.setAttributes({
+      _useCaseName: context.useCaseName,
+      input: JSON.stringify(context.input),
+      jwtPayload: JSON.stringify(context.jwtPayload),
+    });
+
+    return cb()
+      .then((output) => {
+        span.setAttribute("output", JSON.stringify(output));
+        return output;
+      })
+      .catch((error) => {
+        span.setAttribute("error", JSON.stringify(error));
+        throw error;
+      })
+      .finally(() => span.end());
+  };
