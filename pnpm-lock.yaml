@@ -13,6 +13,7 @@ importers:
       '@opentelemetry/api': ^1.1.0
       '@opentelemetry/auto-instrumentations-node': ^0.31.0
       '@opentelemetry/exporter-trace-otlp-http': ^0.31.0
+      '@opentelemetry/exporter-zipkin': ^1.5.0
       '@opentelemetry/sdk-node': ^0.31.0
       '@types/archiver': ^5.3.1
       '@types/body-parser': ^1.19.2
@@ -74,6 +75,7 @@ importers:
       '@opentelemetry/api': 1.1.0
       '@opentelemetry/auto-instrumentations-node': 0.31.0_@opentelemetry+api@1.1.0
       '@opentelemetry/exporter-trace-otlp-http': 0.31.0_@opentelemetry+api@1.1.0
+      '@opentelemetry/exporter-zipkin': 1.5.0_@opentelemetry+api@1.1.0
       '@opentelemetry/sdk-node': 0.31.0_@opentelemetry+api@1.1.0
       archiver: 5.3.1
       axios: 0.26.1
@@ -4049,6 +4051,19 @@ packages:
       '@opentelemetry/otlp-transformer': 0.31.0_@opentelemetry+api@1.1.0
       '@opentelemetry/resources': 1.5.0_@opentelemetry+api@1.1.0
       '@opentelemetry/sdk-trace-base': 1.5.0_@opentelemetry+api@1.1.0
+    dev: false
+
+  /@opentelemetry/exporter-zipkin/1.5.0_@opentelemetry+api@1.1.0:
+    resolution: {integrity: sha512-7PRffGKejxjJGeRNC3DTFnq2seMDmaJ4wHer8/wUs2Vy61BCLd7OEw7xU2mX7Uj++6zwAwDTlv0csgImkFOu8Q==}
+    engines: {node: '>=14'}
+    peerDependencies:
+      '@opentelemetry/api': ^1.0.0
+    dependencies:
+      '@opentelemetry/api': 1.1.0
+      '@opentelemetry/core': 1.5.0_@opentelemetry+api@1.1.0
+      '@opentelemetry/resources': 1.5.0_@opentelemetry+api@1.1.0
+      '@opentelemetry/sdk-trace-base': 1.5.0_@opentelemetry+api@1.1.0
+      '@opentelemetry/semantic-conventions': 1.5.0
     dev: false
 
   /@opentelemetry/instrumentation-amqplib/0.30.0_@opentelemetry+api@1.1.0:
