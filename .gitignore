@@ -6,3 +6,4 @@ docker-data
 nginx/etc/letsencrypt
 backup/**/*.bz2
 .pnpm-debug.log
+dumps
