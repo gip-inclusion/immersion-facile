@@ -13,8 +13,9 @@ export class InMemoryAddressAPI implements AddressAPI {
   ) {}
 
   public async getAddressFromPosition(
-    _position: GeoPositionDto,
+    position: GeoPositionDto,
   ): Promise<AddressDto | undefined> {
+    if (position.lat === 1111 && position.lon === 1111) throw new Error();
     return this._address;
   }
 

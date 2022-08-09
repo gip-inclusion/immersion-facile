@@ -24,7 +24,7 @@ const geoJsonFeatureProperties: z.Schema<GeoJsonFeatureApiAddressProperties> =
     id: z.string(),
     type: z.string(),
     name: z.string(),
-    postcode: z.string(),
+    postcode: z.string().optional(),
     citycode: z.string(),
     x: z.number(),
     y: z.number(),

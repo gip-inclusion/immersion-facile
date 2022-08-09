@@ -1,5 +1,6 @@
 import { AddressDto } from "shared/src/address/address.dto";
 import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
+import { unknownAddress } from "shared/src/apiAdresse/apiAddress.dto";
 import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryAddressAPI } from "../../../adapters/secondary/immersionOffer/InMemoryAddressAPI";
@@ -8,7 +9,6 @@ import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPer
 import {
   ApplyAgenciesAddressesFromPositions,
   noAddress,
-  unknownAddress,
 } from "../../../domain/convention/useCases/ApplyAgenciesAddressesFromPositions";
 import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
 
@@ -41,6 +41,15 @@ const agencyWithEmptyAddress = new AgencyDtoBuilder()
 const agencyWithUnknownAddress = new AgencyDtoBuilder()
   .withId("1")
   .withPosition(position.lat, position.lon)
+  .withAddress(unknownAddress)
+  .build();
+const agencyWithErrorPosition = new AgencyDtoBuilder()
+  .withId("1")
+  .withPosition(1111, 1111)
+  .build();
+const agencyWithErrorPositionAndUnknownAddress = new AgencyDtoBuilder()
+  .withId("1")
+  .withPosition(1111, 1111)
   .withAddress(unknownAddress)
   .build();
 
@@ -76,6 +85,14 @@ describe("Apply agencies address DTOs from positions", () => {
     await useCase.execute();
     expectTypeToMatchAndEqual(agencyRepository.agencies, [
       agencyWithUnknownAddress,
+    ]);
+  });
+  it("Apply unknown address on API Address Error", async () => {
+    agencyRepository.setAgencies([agencyWithErrorPosition]);
+    httpAddressApi.setNextAddress(address);
+    await useCase.execute();
+    expectTypeToMatchAndEqual(agencyRepository.agencies, [
+      agencyWithErrorPositionAndUnknownAddress,
     ]);
   });
   it("Don't apply address when agency already have it", async () => {

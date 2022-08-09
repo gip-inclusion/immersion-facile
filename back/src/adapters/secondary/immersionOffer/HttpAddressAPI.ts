@@ -89,6 +89,7 @@ export class HttpAddressAPI implements AddressAPI {
       } catch (error: any) {
         if (isRetryableError(logger, error)) throw new RetryableError(error);
         if (isAxiosError(error)) return;
+        logger.error({ error, latLongDto }, "getAddressFromPosition");
         throw error;
       }
     });

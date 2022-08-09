@@ -1,5 +1,6 @@
 import { AddressDto, isAddressIdentical } from "shared/src/address/address.dto";
 import { AgencyDto } from "shared/src/agency/agency.dto";
+import { unknownAddress } from "shared/src/apiAdresse/apiAddress.dto";
 import { ConventionId } from "shared/src/convention/convention.dto";
 import { z } from "zod";
 import { createLogger } from "../../../utils/logger";
@@ -17,12 +18,6 @@ export type ImmersionAssessmentEmailParams = {
   beneficiaryLastName: string;
 };
 
-export const unknownAddress: AddressDto = {
-  city: "Inconnu",
-  departmentCode: "Inconnu",
-  postcode: "Inconnu",
-  streetNumberAndAddress: "Inconnu",
-};
 export const noAddress: AddressDto = {
   city: "",
   departmentCode: "",
@@ -41,22 +36,8 @@ export class ApplyAgenciesAddressesFromPositions extends TransactionalUseCase<vo
   }
 
   protected async _execute(_: void, uow: UnitOfWork): Promise<void> {
-    const agenciesupdated: AgencyDto[] = [];
     for (const agency of await this.retrieveAgenciesWithoutAddresses(uow))
-      agenciesupdated.push(await this.updateAgencyAddress(agency));
-    await this.updateAgencies(agenciesupdated, uow);
-  }
-
-  private async updateAgencies(
-    agenciesupdated: AgencyDto[],
-    uow: UnitOfWork,
-  ): Promise<void> {
-    logger.info(
-      `Update ${agenciesupdated.length} agencies with their addresses.`,
-    );
-    await Promise.all(
-      agenciesupdated.map((agency) => uow.agencyRepository.update(agency)),
-    );
+      await uow.agencyRepository.update(await this.updateAgencyAddress(agency));
   }
 
   private async retrieveAgenciesWithoutAddresses(
@@ -73,19 +54,27 @@ export class ApplyAgenciesAddressesFromPositions extends TransactionalUseCase<vo
   }
 
   private async updateAgencyAddress(agency: AgencyDto): Promise<AgencyDto> {
-    const address = await this.addressApi.getAddressFromPosition(
-      agency.position,
-    );
-    if (!address)
-      logger.warn(
-        `No address found for agency [${agency.id} - ${
-          agency.name
-        }] at position ${JSON.stringify(agency.position)}`,
+    try {
+      const address = await this.addressApi.getAddressFromPosition(
+        agency.position,
       );
-    return {
-      ...agency,
-      address: address || unknownAddress,
-    };
+      if (!address)
+        logger.warn(
+          `No address found for agency [${agency.id} - ${
+            agency.name
+          }] at position ${JSON.stringify(agency.position)}`,
+        );
+      return {
+        ...agency,
+        address: address || unknownAddress,
+      };
+    } catch (error) {
+      logger.error({ error, agency }, "updateAgencyAddress");
+      return {
+        ...agency,
+        address: unknownAddress,
+      };
+    }
   }
 }
 

@@ -20,7 +20,7 @@ export type GeoJsonFeatureApiAddressProperties = {
   id: string;
   type: string;
   name: string;
-  postcode: string;
+  postcode?: string;
   citycode: string;
   x: number;
   y: number;
@@ -30,9 +30,18 @@ export type GeoJsonFeatureApiAddressProperties = {
   street?: string;
 };
 
-export const featureToAddressDto = (feature: GeoJsonFeature): AddressDto => ({
-  streetNumberAndAddress: feature.properties.name,
-  city: feature.properties.city,
-  departmentCode: feature.properties.context.split(", ")[0],
-  postcode: feature.properties.postcode,
-});
+export const featureToAddressDto = (feature: GeoJsonFeature): AddressDto =>
+  feature.properties.postcode
+    ? {
+        streetNumberAndAddress: feature.properties.name,
+        city: feature.properties.city,
+        departmentCode: feature.properties.context.split(", ")[0],
+        postcode: feature.properties.postcode,
+      }
+    : unknownAddress;
+export const unknownAddress: AddressDto = {
+  city: "Inconnu",
+  departmentCode: "Inconnu",
+  postcode: "Inconnu",
+  streetNumberAndAddress: "Inconnu",
+};

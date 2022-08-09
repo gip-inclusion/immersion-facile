@@ -6,6 +6,7 @@ import { RealClock } from "../../secondary/core/ClockImplementations";
 import { AppConfig } from "../config/appConfig";
 import { createGateways } from "../config/createGateways";
 import { createUowPerformer } from "../config/uowConfig";
+import { tracingSdk } from "./tracing";
 
 const applyAgenciesAddressDtosFromPositions = async () => {
   const config = AppConfig.createFromEnv();
@@ -25,7 +26,9 @@ const applyAgenciesAddressDtosFromPositions = async () => {
 
 const logger = createLogger(__filename);
 logger.info("Starting...");
-applyAgenciesAddressDtosFromPositions()
+tracingSdk
+  .start()
+  .then(() => applyAgenciesAddressDtosFromPositions())
   .then(() => {
     logger.info("Finished successfully");
     process.exit(0);
