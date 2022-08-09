@@ -34,7 +34,7 @@ const setUpOpenTelemetryTracing = (zipkinHost: string): TracingUtils => {
   });
 
   const tracingSdk = new opentelemetry.NodeSDK({
-    serviceName: "back",
+    serviceName: `back-${process.env.ENV_TYPE}`,
     traceExporter: exporter,
     // spanProcessor,
     instrumentations: [
@@ -58,30 +58,28 @@ const setUpOpenTelemetryTracing = (zipkinHost: string): TracingUtils => {
   };
 };
 
-const noTracer = (): TracingUtils => {
-  return {
-    tracer: {
-      startActiveSpan: (_name, cb) => {
-        const fakeSpan: AppSpan = {
-          setAttributes: (_attributes: Record<string, AttributeValue>) =>
-            fakeSpan,
-          setAttribute: (_name: string, _attributeValue: AttributeValue) =>
-            fakeSpan,
-          end: async () => {
-            /*Nothing to do*/
-          },
-        };
+const noTracer = (): TracingUtils => ({
+  tracer: {
+    startActiveSpan: (_name, cb) => {
+      const fakeSpan: AppSpan = {
+        setAttributes: (_attributes: Record<string, AttributeValue>) =>
+          fakeSpan,
+        setAttribute: (_name: string, _attributeValue: AttributeValue) =>
+          fakeSpan,
+        end: async () => {
+          /*Nothing to do*/
+        },
+      };
 
-        return cb(fakeSpan);
-      },
+      return cb(fakeSpan);
     },
-    tracingSdk: {
-      start: async () => {
-        /* Nothing to do */
-      },
+  },
+  tracingSdk: {
+    start: async () => {
+      /* Nothing to do */
     },
-  };
-};
+  },
+});
 
 export const { tracer, tracingSdk } = process.env.ZIPKIN_HOST
   ? setUpOpenTelemetryTracing(process.env.ZIPKIN_HOST)
