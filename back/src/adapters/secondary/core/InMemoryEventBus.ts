@@ -33,6 +33,16 @@ export class InMemoryEventBus implements EventBus {
   public async publish(event: DomainEvent) {
     const publishedAt = this.clock.now().toISOString();
     const publishedEvent = await this._publish(event, publishedAt);
+    logger.info(
+      {
+        eventId: publishedEvent.id,
+        topic: publishedEvent.topic,
+        occurredAt: publishedEvent.occurredAt,
+        publicationsBefore: event.publications,
+        publicationsAfter: publishedEvent.publications,
+      },
+      "Saving published event",
+    );
     await this.afterPublish(publishedEvent);
   }
 
@@ -73,18 +83,15 @@ export class InMemoryEventBus implements EventBus {
     const topic = event.topic;
     counterPublishedEventsTotal.inc({ topic });
 
-    const callbacksByIdOrUndefined: SubscriptionsForTopic | undefined =
+    const callbacksById: SubscriptionsForTopic | undefined =
       this.subscriptions[topic];
 
-    if (noSubscribersToEvent(callbacksByIdOrUndefined))
+    if (isUndefined(callbacksById))
       return publishEventWithNoCallbacks(event, publishedAt);
-
-    //eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const callbacksById: SubscriptionsForTopic = callbacksByIdOrUndefined!;
 
     const failuresOrUndefined: (EventFailure | void)[] = await Promise.all(
       getSubscriptionsIdToPublish(event, callbacksById).map(
-        subscriptionCallbackToExecute(event, callbacksById),
+        makeExecuteCbMatchingSubscriptionId(event, callbacksById),
       ),
     );
 
@@ -121,19 +128,23 @@ export class InMemoryEventBus implements EventBus {
   }
 }
 
-const noSubscribersToEvent = (
+const isUndefined = (
   callbacksById: SubscriptionsForTopic | undefined,
-) => callbacksById === undefined;
+): callbacksById is undefined => callbacksById === undefined;
 
 const publishEventWithNoCallbacks = (
   event: DomainEvent,
   publishedAt: DateStr,
 ): DomainEvent => {
   monitorAbsenceOfCallback(event);
-  return addNewPublicationWithoutFailureToEvent(event, publishedAt);
+
+  return {
+    ...event,
+    publications: [...event.publications, { publishedAt, failures: [] }],
+  };
 };
 
-const subscriptionCallbackToExecute =
+const makeExecuteCbMatchingSubscriptionId =
   (event: DomainEvent, callbacksById: SubscriptionsForTopic) =>
   async (subscriptionId: SubscriptionId): Promise<void | EventFailure> => {
     const cb = callbacksById[subscriptionId];
@@ -144,16 +155,20 @@ const subscriptionCallbackToExecute =
 
     try {
       await tracer.startActiveSpan(
-        `Publish topic: ${event.topic} for usecase ${subscriptionId}`,
+        `Publish topic: ${event.topic} for UC ${subscriptionId}`,
         (span) => {
           span.setAttributes({
-            topic: event.topic,
+            _topic: event.topic,
+            _useCase: subscriptionId,
             payload: JSON.stringify(event.payload),
-            subscriptionId,
           });
+
           return cb(event)
             .catch((error) => {
-              span.setAttribute("error", JSON.stringify(error));
+              span.setAttributes({
+                eventExecutionFailed: true,
+                error: JSON.stringify(error),
+              });
               throw error;
             })
             .finally(() => span.end());
@@ -169,19 +184,11 @@ const isEventFailure = (
   failure: EventFailure | void,
 ): failure is EventFailure => !!failure;
 
-const addNewPublicationWithoutFailureToEvent = (
-  event: DomainEvent,
-  publishedAt: DateStr,
-): DomainEvent => ({
-  ...event,
-  publications: [...event.publications, { publishedAt, failures: [] }],
-});
-
 const getSubscriptionsIdToPublish = (
   event: DomainEvent,
   callbacksById: SubscriptionsForTopic,
 ): SubscriptionId[] => {
-  const lastPublication = event.publications[event.publications.length - 1];
+  const lastPublication = event.publications.at(-1);
   if (!lastPublication) return keys(callbacksById);
   return lastPublication.failures.map(prop("subscriptionId"));
 };

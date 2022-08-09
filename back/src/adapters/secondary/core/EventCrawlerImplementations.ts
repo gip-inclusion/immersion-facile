@@ -23,7 +23,9 @@ export class BasicEventCrawler implements EventCrawler {
 
   public async processNewEvents(): Promise<void> {
     const events = await this.retrieveEvents("unpublished");
-    logger.info({ events: eventsToDebugInfo(events) }, "processNewEvents");
+    if (events.length) {
+      logger.info({ events: eventsToDebugInfo(events) }, "processNewEvents");
+    }
     await Promise.all(events.map((event) => this.eventBus.publish(event)));
   }
 

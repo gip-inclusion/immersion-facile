@@ -1,11 +1,10 @@
-import type { Span } from "@opentelemetry/api";
 import { ConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { z } from "zod";
 import {
   BadRequestError,
   validateAndParseZodSchema,
 } from "../../adapters/primary/helpers/httpErrors";
-import { tracer } from "../../adapters/primary/scripts/tracing";
+import { AppSpan, tracer } from "../../adapters/primary/scripts/tracing";
 import { UnitOfWork, UnitOfWorkPerformer } from "./ports/UnitOfWork";
 
 export abstract class UseCase<
@@ -85,7 +84,7 @@ const traceUseCaseWithContext =
     cb: () => Promise<Output>,
     context: { useCaseName: string; input: Input; jwtPayload: JWTPayload },
   ) =>
-  async (span: Span) => {
+  async (span: AppSpan) => {
     span.setAttributes({
       _useCaseName: context.useCaseName,
       input: JSON.stringify(context.input),
