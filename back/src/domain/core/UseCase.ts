@@ -7,7 +7,6 @@ import {
 import { AppSpan, tracer } from "../../adapters/primary/scripts/tracing";
 import { createLogger } from "../../utils/logger";
 import { UnitOfWork, UnitOfWorkPerformer } from "./ports/UnitOfWork";
-import { v4 as uuidV4 } from "uuid";
 
 const logger = createLogger(__filename);
 
@@ -24,8 +23,7 @@ export abstract class UseCase<
     jwtPayload?: JWTPayload,
   ): Promise<Output> {
     const useCaseName = this.constructor.name;
-    const followId = uuidV4();
-    logger.info(`UseCase execution start - ${useCaseName} - ${followId}`);
+    logger.info(`UseCase execution start - ${useCaseName}`);
     let validParams: Input;
     try {
       validParams = validateAndParseZodSchema(this.inputSchema, params);
@@ -41,7 +39,7 @@ export abstract class UseCase<
       }),
     );
 
-    logger.info(`UseCase execution Finished - ${useCaseName} - ${followId}`);
+    logger.info(`UseCase execution Finished - ${useCaseName}`);
     return result;
   }
 
@@ -66,8 +64,7 @@ export abstract class TransactionalUseCase<
     jwtPayload?: JWTPayload,
   ): Promise<Output> {
     const useCaseName = this.constructor.name;
-    const followId = uuidV4();
-    logger.info(`UseCase execution start - ${useCaseName} - ${followId}`);
+    logger.info(`UseCase execution start - ${useCaseName}`);
     const validParams = validateAndParseZodSchema(this.inputSchema, params);
     const result = await tracer.startActiveSpan(
       `Transactional Use Case`,
@@ -84,7 +81,7 @@ export abstract class TransactionalUseCase<
       ),
     );
 
-    logger.info(`UseCase execution Finished - ${useCaseName} - ${followId}`);
+    logger.info(`UseCase execution Finished - ${useCaseName}`);
     return result;
   }
 

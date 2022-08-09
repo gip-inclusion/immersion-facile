@@ -31,12 +31,12 @@ type TracingUtils = {
   tracingSdk: TracingSdk;
 };
 
-const setUpOpenTelemetryTracing = (): TracingUtils => {
+const setUpOpenTelemetryTracing = (zipkinHost: string): TracingUtils => {
   // For troubleshooting, set the log level to DiagLogLevel.DEBUG
   diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.INFO);
 
   const exporter = new ZipkinExporter({
-    url: "http://192.168.1.26:9411/api/v2/spans",
+    url: `http://${zipkinHost}/api/v2/spans`,
   });
 
   const tracingSdk = new opentelemetry.NodeSDK({
@@ -97,7 +97,6 @@ const noTracer = (): TracingUtils => ({
   },
 });
 
-export const { tracer, tracingSdk } =
-  process.env.TRACING?.toLowerCase() === "true"
-    ? setUpOpenTelemetryTracing()
-    : noTracer();
+export const { tracer, tracingSdk } = process.env.ZIPKIN_HOST
+  ? setUpOpenTelemetryTracing(process.env.ZIPKIN_HOST)
+  : noTracer();

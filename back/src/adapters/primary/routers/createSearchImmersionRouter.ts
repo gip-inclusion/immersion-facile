@@ -3,7 +3,6 @@ import { immersionOffersRoute } from "shared/src/routes";
 import { createLogger } from "../../../utils/logger";
 import type { AppDependencies } from "../config/createAppDependencies";
 import { sendHttpResponse } from "../helpers/sendHttpResponse";
-import { v4 as uuidV4 } from "uuid";
 
 const logger = createLogger(__filename);
 
@@ -13,7 +12,7 @@ export const createSearchImmersionRouter = (deps: AppDependencies) => {
   searchImmersionRouter
     .route(`/${immersionOffersRoute}`)
     .get(async (req, res) => {
-      const followString = `Search Immersion ${uuidV4()} -`;
+      const followString = `Search Immersion ${req.query.rome} -`;
       logger.info({ query: req.query }, followString);
       return sendHttpResponse(req, res, async () => {
         logger.info(`${followString} Calling LBB and updating if needed`);
