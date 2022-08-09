@@ -88,7 +88,7 @@ export class HttpAddressAPI implements AddressAPI {
           : undefined;
       } catch (error: any) {
         if (isRetryableError(logger, error)) throw new RetryableError(error);
-        if (isAxiosError(error)) return undefined;
+        if (isAxiosError(error)) return;
         throw error;
       }
     });

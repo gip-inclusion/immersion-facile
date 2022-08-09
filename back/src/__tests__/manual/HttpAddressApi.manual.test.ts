@@ -68,7 +68,7 @@ describe("HttpAddressAPI", () => {
     });
   }, 5000);
 
-  it("BugFix - should return expected address DTO when providing a position that don't have geoJson street and house number", async () => {
+  it("should return expected address DTO when providing a position that don't have geoJson street and house number", async () => {
     const result = await adapter.getAddressFromPosition({
       lat: 43.791521,
       lon: 7.500604,
