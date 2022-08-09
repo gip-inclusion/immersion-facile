@@ -5,7 +5,11 @@ import {
   validateAndParseZodSchema,
 } from "../../adapters/primary/helpers/httpErrors";
 import { AppSpan, tracer } from "../../adapters/primary/scripts/tracing";
+import { createLogger } from "../../utils/logger";
 import { UnitOfWork, UnitOfWorkPerformer } from "./ports/UnitOfWork";
+import { v4 as uuidV4 } from "uuid";
+
+const logger = createLogger(__filename);
 
 export abstract class UseCase<
   Input,
@@ -19,20 +23,26 @@ export abstract class UseCase<
     params: Input,
     jwtPayload?: JWTPayload,
   ): Promise<Output> {
+    const useCaseName = this.constructor.name;
+    const followId = uuidV4();
+    logger.info(`UseCase execution start - ${useCaseName} - ${followId}`);
     let validParams: Input;
     try {
       validParams = validateAndParseZodSchema(this.inputSchema, params);
     } catch (e) {
       throw new BadRequestError(e);
     }
-    return tracer.startActiveSpan(
+    const result = await tracer.startActiveSpan(
       `Use Case`,
       traceUseCaseWithContext(() => this._execute(validParams, jwtPayload), {
-        useCaseName: this.constructor.name,
+        useCaseName,
         input: validParams,
         jwtPayload,
       }),
     );
+
+    logger.info(`UseCase execution Finished - ${useCaseName} - ${followId}`);
+    return result;
   }
 
   // this method is guaranteed to only receive validated params
@@ -55,8 +65,11 @@ export abstract class TransactionalUseCase<
     params: Input,
     jwtPayload?: JWTPayload,
   ): Promise<Output> {
+    const useCaseName = this.constructor.name;
+    const followId = uuidV4();
+    logger.info(`UseCase execution start - ${useCaseName} - ${followId}`);
     const validParams = validateAndParseZodSchema(this.inputSchema, params);
-    return tracer.startActiveSpan(
+    const result = await tracer.startActiveSpan(
       `Transactional Use Case`,
       traceUseCaseWithContext(
         () =>
@@ -70,6 +83,9 @@ export abstract class TransactionalUseCase<
         },
       ),
     );
+
+    logger.info(`UseCase execution Finished - ${useCaseName} - ${followId}`);
+    return result;
   }
 
   protected abstract _execute(
