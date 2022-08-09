@@ -31,7 +31,9 @@ export class BasicEventCrawler implements EventCrawler {
 
   public async retryFailedEvents(): Promise<void> {
     const events = await this.retrieveEvents("failed");
-    logger.info({ events: eventsToDebugInfo(events) }, "retryFailedEvents");
+    if (events.length) {
+      logger.info({ events: eventsToDebugInfo(events) }, "retryFailedEvents");
+    }
     await Promise.all(events.map((event) => this.eventBus.publish(event)));
   }
 
