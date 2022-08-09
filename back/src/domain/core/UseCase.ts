@@ -4,7 +4,7 @@ import {
   BadRequestError,
   validateAndParseZodSchema,
 } from "../../adapters/primary/helpers/httpErrors";
-import { AppSpan, trace } from "../../adapters/primary/scripts/tracing";
+import { AppSpan, tracer } from "../../adapters/primary/scripts/tracing";
 import { createLogger } from "../../utils/logger";
 import { UnitOfWork, UnitOfWorkPerformer } from "./ports/UnitOfWork";
 
@@ -30,7 +30,7 @@ export abstract class UseCase<
     } catch (e) {
       throw new BadRequestError(e);
     }
-    const result = await trace.getTracer("UseCase Tracer").startActiveSpan(
+    const result = await tracer.startActiveSpan(
       `Use Case`,
       traceUseCaseWithContext(() => this._execute(validParams, jwtPayload), {
         useCaseName,
@@ -66,22 +66,20 @@ export abstract class TransactionalUseCase<
     const useCaseName = this.constructor.name;
     logger.info(`UseCase execution start - ${useCaseName}`);
     const validParams = validateAndParseZodSchema(this.inputSchema, params);
-    const result = await trace
-      .getTracer("Transactional UseCase Tracer")
-      .startActiveSpan(
-        `Transactional Use Case`,
-        traceUseCaseWithContext(
-          () =>
-            this.uowPerformer.perform((uow) =>
-              this._execute(validParams, uow, jwtPayload),
-            ),
-          {
-            useCaseName: this.constructor.name,
-            input: validParams,
-            jwtPayload,
-          },
-        ),
-      );
+    const result = await tracer.startActiveSpan(
+      `Transactional Use Case`,
+      traceUseCaseWithContext(
+        () =>
+          this.uowPerformer.perform((uow) =>
+            this._execute(validParams, uow, jwtPayload),
+          ),
+        {
+          useCaseName: this.constructor.name,
+          input: validParams,
+          jwtPayload,
+        },
+      ),
+    );
 
     logger.info(`UseCase execution Finished - ${useCaseName}`);
     return result;

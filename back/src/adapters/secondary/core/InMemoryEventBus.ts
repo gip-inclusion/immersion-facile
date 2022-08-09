@@ -14,7 +14,7 @@ import {
 import { Clock, DateStr } from "../../../domain/core/ports/Clock";
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
-import { trace } from "../../primary/scripts/tracing";
+import { tracer } from "../../primary/scripts/tracing";
 
 const logger = createLogger(__filename);
 
@@ -154,28 +154,26 @@ const makeExecuteCbMatchingSubscriptionId =
     );
 
     try {
-      await trace
-        .getTracer("EventBus tracer")
-        .startActiveSpan(
-          `Publish topic: ${event.topic} for UC ${subscriptionId}`,
-          (span) => {
-            span.setAttributes({
-              _topic: event.topic,
-              _useCase: subscriptionId,
-              payload: JSON.stringify(event.payload),
-            });
+      await tracer.startActiveSpan(
+        `Publish topic: ${event.topic} for UC ${subscriptionId}`,
+        (span) => {
+          span.setAttributes({
+            _topic: event.topic,
+            _useCase: subscriptionId,
+            payload: JSON.stringify(event.payload),
+          });
 
-            return cb(event)
-              .catch((error) => {
-                span.setAttributes({
-                  eventExecutionFailed: true,
-                  error: JSON.stringify(error),
-                });
-                throw error;
-              })
-              .finally(() => span.end());
-          },
-        );
+          return cb(event)
+            .catch((error) => {
+              span.setAttributes({
+                eventExecutionFailed: true,
+                error: JSON.stringify(error),
+              });
+              throw error;
+            })
+            .finally(() => span.end());
+        },
+      );
     } catch (error: any) {
       monitorErrorInCallback(error, event);
       return { subscriptionId, errorMessage: error.message };

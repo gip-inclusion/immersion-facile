@@ -1,14 +1,8 @@
 import * as opentelemetry from "@opentelemetry/sdk-node";
 import { getNodeAutoInstrumentations } from "@opentelemetry/auto-instrumentations-node";
 import { diag, DiagConsoleLogger, DiagLogLevel } from "@opentelemetry/api";
-import {
-  BasicTracerProvider,
-  SimpleSpanProcessor,
-} from "@opentelemetry/sdk-trace-base";
-import { Resource } from "@opentelemetry/resources";
-import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
 import { ZipkinExporter } from "@opentelemetry/exporter-zipkin";
-import { trace as openTelemetryTrace } from "@opentelemetry/api";
+import { trace as opentelemetryTrace } from "@opentelemetry/api";
 
 type AttributeValue = string | number | boolean;
 
@@ -27,7 +21,7 @@ interface TracingSdk {
 }
 
 type TracingUtils = {
-  trace: { getTracer: (name: string) => Tracer };
+  tracer: Tracer;
   tracingSdk: TracingSdk;
 };
 
@@ -40,7 +34,9 @@ const setUpOpenTelemetryTracing = (zipkinHost: string): TracingUtils => {
   });
 
   const tracingSdk = new opentelemetry.NodeSDK({
+    serviceName: "back",
     traceExporter: exporter,
+    // spanProcessor,
     instrumentations: [
       getNodeAutoInstrumentations({
         "@opentelemetry/instrumentation-express": {
@@ -56,23 +52,15 @@ const setUpOpenTelemetryTracing = (zipkinHost: string): TracingUtils => {
     ],
   });
 
-  const provider = new BasicTracerProvider({
-    resource: new Resource({
-      [SemanticResourceAttributes.SERVICE_NAME]: "back",
-    }),
-  });
-  provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
-  provider.register();
-
   return {
-    trace: provider,
+    tracer: opentelemetryTrace.getTracer("immersion-back"),
     tracingSdk,
   };
 };
 
-const noTracer = (): TracingUtils => ({
-  trace: {
-    getTracer: () => ({
+const noTracer = (): TracingUtils => {
+  return {
+    tracer: {
       startActiveSpan: (_name, cb) => {
         const fakeSpan: AppSpan = {
           setAttributes: (_attributes: Record<string, AttributeValue>) =>
@@ -86,15 +74,15 @@ const noTracer = (): TracingUtils => ({
 
         return cb(fakeSpan);
       },
-    }),
-  },
-  tracingSdk: {
-    start: async () => {
-      /* Nothing to do */
     },
-  },
-});
+    tracingSdk: {
+      start: async () => {
+        /* Nothing to do */
+      },
+    },
+  };
+};
 
-export const { trace, tracingSdk } = process.env.ZIPKIN_HOST
+export const { tracer, tracingSdk } = process.env.ZIPKIN_HOST
   ? setUpOpenTelemetryTracing(process.env.ZIPKIN_HOST)
   : noTracer();
