@@ -8,7 +8,7 @@ import {
 import { Resource } from "@opentelemetry/resources";
 import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
 import { ZipkinExporter } from "@opentelemetry/exporter-zipkin";
-import { trace } from "@opentelemetry/api";
+import { trace as openTelemetryTrace } from "@opentelemetry/api";
 
 type AttributeValue = string | number | boolean;
 
@@ -27,7 +27,7 @@ interface TracingSdk {
 }
 
 type TracingUtils = {
-  tracer: Tracer;
+  trace: { getTracer: (name: string) => Tracer };
   tracingSdk: TracingSdk;
 };
 
@@ -64,31 +64,29 @@ const setUpOpenTelemetryTracing = (zipkinHost: string): TracingUtils => {
   provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
   provider.register();
 
-  trace.setGlobalTracerProvider(provider);
-
-  const tracer = trace.getTracer("immersion-back");
-
   return {
-    tracer,
+    trace: provider,
     tracingSdk,
   };
 };
 
 const noTracer = (): TracingUtils => ({
-  tracer: {
-    startActiveSpan: (_name, cb) => {
-      const fakeSpan: AppSpan = {
-        setAttributes: (_attributes: Record<string, AttributeValue>) =>
-          fakeSpan,
-        setAttribute: (_name: string, _attributeValue: AttributeValue) =>
-          fakeSpan,
-        end: async () => {
-          /*Nothing to do*/
-        },
-      };
+  trace: {
+    getTracer: () => ({
+      startActiveSpan: (_name, cb) => {
+        const fakeSpan: AppSpan = {
+          setAttributes: (_attributes: Record<string, AttributeValue>) =>
+            fakeSpan,
+          setAttribute: (_name: string, _attributeValue: AttributeValue) =>
+            fakeSpan,
+          end: async () => {
+            /*Nothing to do*/
+          },
+        };
 
-      return cb(fakeSpan);
-    },
+        return cb(fakeSpan);
+      },
+    }),
   },
   tracingSdk: {
     start: async () => {
@@ -97,6 +95,6 @@ const noTracer = (): TracingUtils => ({
   },
 });
 
-export const { tracer, tracingSdk } = process.env.ZIPKIN_HOST
+export const { trace, tracingSdk } = process.env.ZIPKIN_HOST
   ? setUpOpenTelemetryTracing(process.env.ZIPKIN_HOST)
   : noTracer();
