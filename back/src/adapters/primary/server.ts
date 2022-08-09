@@ -46,7 +46,14 @@ export const createApp = async (
 }> => {
   const app = express();
   const router = Router();
-  app.use(PinoHttp({ logger }));
+  app.use(
+    PinoHttp({
+      logger,
+      autoLogging: {
+        ignore: (req) => req.url?.includes("__metrics") ?? false,
+      },
+    }),
+  );
   app.use(metrics);
   app.use(bodyParser.json());
 
