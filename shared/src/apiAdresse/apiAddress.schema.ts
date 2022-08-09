@@ -20,7 +20,7 @@ const geoJsonFeatureProperties: z.Schema<GeoJsonFeatureApiAddressProperties> =
   z.object({
     label: z.string(),
     score: z.number(),
-    housenumber: z.string(),
+    housenumber: z.string().optional(),
     id: z.string(),
     type: z.string(),
     name: z.string(),
@@ -31,7 +31,7 @@ const geoJsonFeatureProperties: z.Schema<GeoJsonFeatureApiAddressProperties> =
     city: z.string(),
     context: z.string(),
     importance: z.number(),
-    street: z.string(),
+    street: z.string().optional(),
   });
 export const geoJsonFeatureSchema: z.Schema<GeoJsonFeature> = z.object({
   type: z.literal("Feature"),

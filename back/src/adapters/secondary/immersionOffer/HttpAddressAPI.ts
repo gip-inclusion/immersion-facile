@@ -1,6 +1,8 @@
-import { AxiosResponse } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import { secondsToMilliseconds } from "date-fns";
 import { AddressDto } from "shared/src/address/address.dto";
+import { featureToAddressDto } from "shared/src/apiAdresse/apiAddress.dto";
+import { toFeatureCollection } from "shared/src/apiAdresse/apiAddress.schema";
 import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
 import {
   ManagedAxios,
@@ -13,8 +15,8 @@ import {
   RetryStrategy,
 } from "../../../domain/core/ports/RetryStrategy";
 import {
+  AddressAndPosition,
   AddressAPI,
-  AddressAndPosition as AddressAndPosition,
 } from "../../../domain/immersionOffer/ports/AddressAPI";
 import {
   createAxiosInstance,
@@ -24,8 +26,6 @@ import {
 import { createLogger } from "../../../utils/logger";
 import { RealClock } from "../core/ClockImplementations";
 import { QpsRateLimiter } from "../core/QpsRateLimiter";
-import { toFeatureCollection } from "shared/src/apiAdresse/apiAddress.schema";
-import { featureToAddressDto } from "shared/src/apiAdresse/apiAddress.dto";
 
 const logger = createLogger(__filename);
 
@@ -88,8 +88,8 @@ export class HttpAddressAPI implements AddressAPI {
           : undefined;
       } catch (error: any) {
         if (isRetryableError(logger, error)) throw new RetryableError(error);
-        logAxiosError(logger, error);
-        return undefined;
+        if (isAxiosError(error)) return undefined;
+        throw error;
       }
     });
   }
@@ -181,3 +181,7 @@ const getDepartmentCodeFromFeature = (feature: ValidFeature) => {
   const context = feature.properties.context;
   return context.split(", ")[0];
 };
+
+const isAxiosError = <T>(
+  error: Error | AxiosError<T>,
+): error is AxiosError<T> => "isAxiosError" in error && error.isAxiosError;

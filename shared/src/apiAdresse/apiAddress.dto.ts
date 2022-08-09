@@ -16,7 +16,7 @@ export type GeoJsonFeature = {
 export type GeoJsonFeatureApiAddressProperties = {
   label: string;
   score: number;
-  housenumber: string;
+  housenumber?: string;
   id: string;
   type: string;
   name: string;
@@ -27,7 +27,7 @@ export type GeoJsonFeatureApiAddressProperties = {
   city: string;
   context: string;
   importance: number;
-  street: string;
+  street?: string;
 };
 
 export const featureToAddressDto = (feature: GeoJsonFeature): AddressDto => ({

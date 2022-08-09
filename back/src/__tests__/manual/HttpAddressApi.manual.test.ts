@@ -44,13 +44,17 @@ const resultFromApiAddress = {
 };
 
 describe("HttpAddressAPI", () => {
-  it("Should return expected address DTO when providing accurate position.", async () => {
-    const adapter = new HttpAddressAPI(
+  let adapter: HttpAddressAPI;
+
+  beforeEach(() => {
+    adapter = new HttpAddressAPI(
       httpAddressApiClient,
       apiAddressRateLimiter(new RealClock()),
       noRetries,
     );
+  });
 
+  it("Should return expected address DTO when providing accurate position.", async () => {
     const result = await adapter.getAddressFromPosition({
       lat: resultFromApiAddress.features[0].geometry.coordinates[1],
       lon: resultFromApiAddress.features[0].geometry.coordinates[0],
@@ -62,15 +66,24 @@ describe("HttpAddressAPI", () => {
       departmentCode: "67",
       postcode: "67120",
     });
-  });
+  }, 5000);
+
+  it("BugFix - should return expected address DTO when providing a position that don't have geoJson street and house number", async () => {
+    const result = await adapter.getAddressFromPosition({
+      lat: 43.791521,
+      lon: 7.500604,
+    });
+
+    expectTypeToMatchAndEqual(result, {
+      streetNumberAndAddress: "Menton",
+      city: "Menton",
+      departmentCode: "06",
+      postcode: "06500",
+    });
+  }, 5000);
+
   const parallelCalls = 200;
   it(`Should support ${parallelCalls} of parallel calls`, async () => {
-    const adapter = new HttpAddressAPI(
-      httpAddressApiClient,
-      apiAddressRateLimiter(new RealClock()),
-      noRetries,
-    );
-
     const coordinates: GeoPositionDto[] = [];
     const expectedResults: AddressDto[] = [];
 
@@ -87,9 +100,9 @@ describe("HttpAddressAPI", () => {
       });
     }
     const results: (AddressDto | undefined)[] = [];
-    for (const coordinate of coordinates) {
+    for (const coordinate of coordinates)
       results.push(await adapter.getAddressFromPosition(coordinate));
-    }
+
     expectTypeToMatchAndEqual(results, expectedResults);
   }, 30000);
 });
