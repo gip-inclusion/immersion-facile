@@ -1,3 +1,4 @@
+import { splitEvery } from "ramda";
 import { EventBus } from "../../../domain/core/eventBus/EventBus";
 import { EventCrawler } from "../../../domain/core/eventBus/EventCrawler";
 import {
@@ -23,18 +24,34 @@ export class BasicEventCrawler implements EventCrawler {
 
   public async processNewEvents(): Promise<void> {
     const events = await this.retrieveEvents("unpublished");
+
     if (events.length) {
-      logger.info({ events: eventsToDebugInfo(events) }, "processNewEvents");
+      logger.info(
+        { events: eventsToDebugInfo(events) },
+        `processNewEvents | ${events.length} events to process`,
+      );
     }
-    await Promise.all(events.map((event) => this.eventBus.publish(event)));
+    await this.publishEvents(events);
   }
 
   public async retryFailedEvents(): Promise<void> {
     const events = await this.retrieveEvents("failed");
     if (events.length) {
-      logger.info({ events: eventsToDebugInfo(events) }, "retryFailedEvents");
+      logger.warn(
+        { events: eventsToDebugInfo(events) },
+        `retryFailedEvents | ${events.length} events to process`,
+      );
     }
-    await Promise.all(events.map((event) => this.eventBus.publish(event)));
+    await this.publishEvents(events);
+  }
+
+  private async publishEvents(events: DomainEvent[]) {
+    const eventGroups = splitEvery(10, events);
+    for (const eventGroup of eventGroups) {
+      await Promise.all(
+        eventGroup.map((event) => this.eventBus.publish(event)),
+      );
+    }
   }
 
   private async retrieveEvents(
