@@ -67,6 +67,7 @@ const validConvention: ConventionDto = {
   immersionSkills: "Utilisation des pneus optimale, gestion de carburant",
   beneficiaryAccepted: true,
   enterpriseAccepted: true,
+  internshipKind: "immersion",
 };
 
 export class ConventionDtoBuilder implements Builder<ConventionDto> {

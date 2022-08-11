@@ -92,6 +92,7 @@ const conventionWithoutExternalIdZObject = z.object({
   beneficiaryAccepted: zBoolean,
   enterpriseAccepted: zBoolean,
   federatedIdentity: peConnectPrefixSchema.optional(),
+  internshipKind: z.enum(["immersion", "mini-stage-cci"]),
 });
 
 export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExternalId> =

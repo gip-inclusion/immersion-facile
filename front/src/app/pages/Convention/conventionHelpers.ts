@@ -3,6 +3,7 @@ import {
   ConventionDto,
   ConventionStatus,
   ImmersionObjective,
+  InternshipKind,
 } from "shared/src/convention/convention.dto";
 import { FederatedIdentity } from "shared/src/federatedIdentities/federatedIdentity.dto";
 import { toDateString } from "shared/src/utils/date";
@@ -43,6 +44,8 @@ export const undefinedIfEmptyString = (text?: string): string | undefined =>
 export const conventionInitialValuesFromUrl = (
   route: ConventionPageRoute | ConventionUkrainePageRoute,
 ): ConventionPresentation => {
+  const internshipKind: InternshipKind = "immersion"; // This will depend on the route
+
   const dataFromDevice = deviceRepository.get("partialConvention") ?? {};
 
   const params = mergeObjectsExceptFalsyValues(
@@ -107,6 +110,9 @@ export const conventionInitialValuesFromUrl = (
     // Signatures
     beneficiaryAccepted: false,
     enterpriseAccepted: false,
+
+    // Kind
+    internshipKind,
   };
 
   if (frontEnvType === "DEV" && ENV.PREFILLED_FORMS)

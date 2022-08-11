@@ -86,4 +86,5 @@ export const IMMERSION_APPLICATION_TEMPLATE: ConventionDto = {
   immersionSkills: "Utilisation des pneus optimale, gestion de carburant",
   beneficiaryAccepted: true,
   enterpriseAccepted: true,
+  internshipKind: "immersion",
 };

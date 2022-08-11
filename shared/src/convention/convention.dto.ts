@@ -33,6 +33,7 @@ export const conventionObjectiveOptions = [
 ] as const;
 
 export type ImmersionObjective = typeof conventionObjectiveOptions[number];
+export type InternshipKind = "immersion" | "mini-stage-cci"; 
 
 export type ConventionDtoWithoutExternalId = {
   id: ConventionId;
@@ -68,6 +69,7 @@ export type ConventionDtoWithoutExternalId = {
   beneficiaryAccepted: boolean;
   enterpriseAccepted: boolean;
   federatedIdentity?: FederatedIdentity;
+  internshipKind:  InternshipKind
 };
 
 export type ConventionDto = ConventionDtoWithoutExternalId & {

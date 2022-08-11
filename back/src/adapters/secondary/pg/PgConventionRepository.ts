@@ -43,17 +43,17 @@ export class PgConventionRepository implements ConventionRepository {
     convention: ConventionDtoWithoutExternalId,
   ): Promise<ConventionExternalId> {
     // prettier-ignore
-    const { id, status, email, firstName, lastName, phone, emergencyContact, emergencyContactPhone, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, mentor, mentorPhone, mentorEmail, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation, immersionActivities, immersionSkills, beneficiaryAccepted, enterpriseAccepted, postalCode, workConditions } =
+    const { id, status, email, firstName, lastName, phone, emergencyContact, emergencyContactPhone, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, mentor, mentorPhone, mentorEmail, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation, immersionActivities, immersionSkills, beneficiaryAccepted, enterpriseAccepted, postalCode, workConditions, internshipKind } =
       convention
 
     try {
       const query_insert_application = `INSERT INTO conventions(
           id, status, email, first_name, last_name, phone, emergency_contact, emergency_contact_phone, agency_id, date_submission, date_start, date_end, date_validation, siret, business_name, mentor, mentor_phone, mentor_email, schedule, individual_protection,
-          sanitary_prevention, sanitary_prevention_description, immersion_address, immersion_objective, immersion_appellation, immersion_activities, immersion_skills, beneficiary_accepted, enterprise_accepted, postal_code, work_conditions
-        ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31)`;
+          sanitary_prevention, sanitary_prevention_description, immersion_address, immersion_objective, immersion_appellation, immersion_activities, immersion_skills, beneficiary_accepted, enterprise_accepted, postal_code, work_conditions, internship_kind
+        ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32)`;
 
       // prettier-ignore
-      await this.client.query(query_insert_application, [id, status, email, firstName, lastName, phone, emergencyContact, emergencyContactPhone, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, mentor, mentorPhone, mentorEmail, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation.appellationCode, immersionActivities, immersionSkills, beneficiaryAccepted, enterpriseAccepted, postalCode, workConditions]);
+      await this.client.query(query_insert_application, [id, status, email, firstName, lastName, phone, emergencyContact, emergencyContactPhone, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, mentor, mentorPhone, mentorEmail, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation.appellationCode, immersionActivities, immersionSkills, beneficiaryAccepted, enterpriseAccepted, postalCode, workConditions, internshipKind]);
     } catch (error: any) {
       notifyDiscord(
         `Erreur lors de la sauvegarde de la convention  suivante : ${JSON.stringify(
@@ -145,6 +145,7 @@ export const pgConventionRowToDto = (
   immersionSkills: optional(params.immersion_skills),
   beneficiaryAccepted: params.beneficiary_accepted,
   enterpriseAccepted: params.enterprise_accepted,
+  internshipKind: params.internship_kind,
   ...(params.user_pe_external_id && {
     federatedIdentity: `peConnect:${params.user_pe_external_id}`,
   }),
