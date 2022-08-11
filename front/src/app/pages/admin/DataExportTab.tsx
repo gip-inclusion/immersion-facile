@@ -51,7 +51,7 @@ const ExportEntreprises = () => {
       <WithBackground>
         <div className="w-2/3">
           <ArrayDropdown
-            label="Groupement"
+            label="Périmètre"
             options={["Région", "Département"]}
             allowEmpty={true}
             onSelect={(selectedGroupKey) => {
@@ -149,7 +149,7 @@ const ExportConventions = () => {
       <WithBackground>
         <div className="w-2/3">
           <ArrayDropdown
-            label="Groupement"
+            label="Périmètre"
             options={["Structure"]}
             allowEmpty={true}
             onSelect={(selectedGroupKey) => {
@@ -272,7 +272,7 @@ const ExportAgencies = () => {
       <WithBackground>
         <div className="w-2/3">
           <ArrayDropdown
-            label="Groupement"
+            label="Périmètre"
             options={["Région", "Département", "Type"]}
             allowEmpty={true}
             onSelect={(selectedGroupKey) => {
@@ -332,7 +332,7 @@ const ExportContactRequests = () => {
       <WithBackground>
         <div className="w-2/3">
           <ArrayDropdown
-            label="Groupement"
+            label="Périmètre"
             options={["Région", "Département"]}
             allowEmpty={true}
             onSelect={(selectedGroupKey) => {
