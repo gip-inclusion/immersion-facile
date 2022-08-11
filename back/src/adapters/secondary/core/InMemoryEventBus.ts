@@ -12,6 +12,7 @@ import {
   SubscriptionId,
 } from "../../../domain/core/eventBus/events";
 import { Clock, DateStr } from "../../../domain/core/ports/Clock";
+import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { tracer } from "../../primary/scripts/tracing";
@@ -23,10 +24,7 @@ type SubscriptionsForTopic = Record<string, EventCallback<DomainTopic>>;
 export class InMemoryEventBus implements EventBus {
   public subscriptions: Partial<Record<DomainTopic, SubscriptionsForTopic>>;
 
-  constructor(
-    private clock: Clock,
-    private afterPublish: (event: DomainEvent) => Promise<void>,
-  ) {
+  constructor(private clock: Clock, private uowPerformer: UnitOfWorkPerformer) {
     this.subscriptions = {};
   }
 
@@ -43,7 +41,9 @@ export class InMemoryEventBus implements EventBus {
       },
       "Saving published event",
     );
-    await this.afterPublish(publishedEvent);
+    await this.uowPerformer.perform((uow) =>
+      uow.outboxRepository.save(publishedEvent),
+    );
   }
 
   public subscribe<T extends DomainTopic>(
@@ -90,7 +90,7 @@ export class InMemoryEventBus implements EventBus {
       return publishEventWithNoCallbacks(event, publishedAt);
 
     const failuresOrUndefined: (EventFailure | void)[] = await Promise.all(
-      getSubscriptionsIdToPublish(event, callbacksById).map(
+      getSubscriptionIdsToPublish(event, callbacksById).map(
         makeExecuteCbMatchingSubscriptionId(event, callbacksById),
       ),
     );
@@ -184,13 +184,14 @@ const isEventFailure = (
   failure: EventFailure | void,
 ): failure is EventFailure => !!failure;
 
-const getSubscriptionsIdToPublish = (
+const getSubscriptionIdsToPublish = (
   event: DomainEvent,
   callbacksById: SubscriptionsForTopic,
 ): SubscriptionId[] => {
   const lastPublication = event.publications.at(-1);
-  if (!lastPublication) return keys(callbacksById);
-  return lastPublication.failures.map(prop("subscriptionId"));
+  return lastPublication
+    ? lastPublication.failures.map(prop("subscriptionId"))
+    : keys(callbacksById);
 };
 
 const monitorAbsenceOfCallback = (event: DomainEvent) => {

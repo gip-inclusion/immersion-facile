@@ -10,6 +10,9 @@ import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 
 const logger = createLogger(__filename);
+
+const maxEventsProcessedInParallel = 5;
+
 export class BasicEventCrawler implements EventCrawler {
   constructor(
     private uowPerformer: UnitOfWorkPerformer,
@@ -46,7 +49,7 @@ export class BasicEventCrawler implements EventCrawler {
   }
 
   private async publishEvents(events: DomainEvent[]) {
-    const eventGroups = splitEvery(10, events);
+    const eventGroups = splitEvery(maxEventsProcessedInParallel, events);
     for (const eventGroup of eventGroups) {
       await Promise.all(
         eventGroup.map((event) => this.eventBus.publish(event)),

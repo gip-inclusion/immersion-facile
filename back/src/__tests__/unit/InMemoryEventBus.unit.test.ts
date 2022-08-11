@@ -4,8 +4,11 @@ import {
   expectTypeToMatchAndEqual,
   spyOnTopic,
 } from "../../_testBuilders/test.helpers";
+import { createInMemoryUow } from "../../adapters/primary/config/uowConfig";
 import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
 import { InMemoryEventBus } from "../../adapters/secondary/core/InMemoryEventBus";
+import { InMemoryOutboxRepository } from "../../adapters/secondary/core/InMemoryOutboxRepository";
+import { InMemoryUowPerformer } from "../../adapters/secondary/InMemoryUowPerformer";
 import type {
   DomainEvent,
   EventFailure,
@@ -21,16 +24,16 @@ const domainEvt: DomainEvent = {
 };
 
 describe("InMemoryEventBus", () => {
-  let eventsAfterPublish: DomainEvent[];
   let anEventBus: InMemoryEventBus;
   let clock: CustomClock;
+  let outboxRepository: InMemoryOutboxRepository;
 
   beforeEach(() => {
-    eventsAfterPublish = [];
     clock = new CustomClock();
-    anEventBus = new InMemoryEventBus(clock, async (event) => {
-      eventsAfterPublish.push(event);
-    });
+    const uow = createInMemoryUow();
+    outboxRepository = uow.outboxRepository;
+    const uowPerformer = new InMemoryUowPerformer(uow);
+    anEventBus = new InMemoryEventBus(clock, uowPerformer);
   });
 
   describe("Publish to an existing topic", () => {
@@ -43,9 +46,9 @@ describe("InMemoryEventBus", () => {
       await anEventBus.publish(domainEvt);
 
       // Assert
-      expect(eventsAfterPublish).toHaveLength(1);
+      expect(outboxRepository.events).toHaveLength(1);
 
-      expectObjectsToMatch(eventsAfterPublish[0], {
+      expectObjectsToMatch(outboxRepository.events[0], {
         ...domainEvt,
         wasQuarantined: false,
         publications: [
@@ -70,9 +73,9 @@ describe("InMemoryEventBus", () => {
       // Assert
       expect(publishedEvents).toHaveLength(1);
       expectObjectsToMatch(publishedEvents[0], domainEvt);
-      expect(eventsAfterPublish).toHaveLength(1);
+      expect(outboxRepository.events).toHaveLength(1);
 
-      expectObjectsToMatch(eventsAfterPublish[0], {
+      expectObjectsToMatch(outboxRepository.events[0], {
         ...domainEvt,
         wasQuarantined: false,
         publications: [
@@ -106,7 +109,7 @@ describe("InMemoryEventBus", () => {
     expect(eventsOnSecondHandler).toHaveLength(1);
     expect(eventsOnSecondHandler[0]).toEqual(domainEvt);
 
-    expectTypeToMatchAndEqual(eventsAfterPublish[0], {
+    expectTypeToMatchAndEqual(outboxRepository.events[0], {
       ...domainEvt,
       wasQuarantined: false,
       publications: [{ publishedAt: publishDate.toISOString(), failures: [] }],
@@ -144,7 +147,7 @@ describe("InMemoryEventBus", () => {
 
       expectTypeToMatchAndEqual(eventsOnFirstHandler, [expectedEvent]);
 
-      expectObjectsToMatch(eventsAfterPublish[0], {
+      expectObjectsToMatch(outboxRepository.events[0], {
         ...expectedEvent,
         publications: [
           {
@@ -213,7 +216,7 @@ describe("InMemoryEventBus", () => {
 
       expect(eventsOnInitiallyFailedHandler).toHaveLength(1);
       expectObjectsToMatch(eventsOnInitiallyFailedHandler[0], eventToRePublish);
-      expectObjectsToMatch(eventsAfterPublish[0], expectedEvent);
+      expectObjectsToMatch(outboxRepository.events[0], expectedEvent);
     });
 
     it("only re-executes the subscriptions that failed", async () => {
@@ -247,7 +250,7 @@ describe("InMemoryEventBus", () => {
       expect(eventsOnFirstHandler).toHaveLength(0);
       expect(eventsOnInitiallyFailedHandler).toHaveLength(1);
       expectObjectsToMatch(eventsOnInitiallyFailedHandler[0], eventToRePublish);
-      expectObjectsToMatch(eventsAfterPublish[0], expectedEvent);
+      expectObjectsToMatch(outboxRepository.events[0], expectedEvent);
     });
 
     it("puts the event in quarantine if it fails at the 4th try", async () => {
@@ -307,8 +310,8 @@ describe("InMemoryEventBus", () => {
         ],
       };
 
-      expect(eventsAfterPublish).toHaveLength(1);
-      expectObjectsToMatch(eventsAfterPublish[0], expectedEvent);
+      expect(outboxRepository.events).toHaveLength(1);
+      expectObjectsToMatch(outboxRepository.events[0], expectedEvent);
     });
   });
 });

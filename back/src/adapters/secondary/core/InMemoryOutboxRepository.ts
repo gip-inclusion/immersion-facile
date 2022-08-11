@@ -6,7 +6,7 @@ import { createLogger } from "../../../utils/logger";
 const logger = createLogger(__filename);
 
 export class InMemoryOutboxRepository implements OutboxRepository {
-  constructor(public readonly _events: Record<string, DomainEvent> = {}) {}
+  constructor(private readonly _events: Record<string, DomainEvent> = {}) {}
 
   public async save(event: DomainEvent): Promise<void> {
     this._events[event.id] = event;

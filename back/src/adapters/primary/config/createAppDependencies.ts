@@ -1,11 +1,9 @@
-import promClient from "prom-client";
 import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 import { frontRoutes } from "shared/src/routes";
 import {
   makeGenerateJwtES256,
   makeGenerateJwtHS256,
 } from "../../../domain/auth/jwt";
-import { DomainEvent } from "../../../domain/core/eventBus/events";
 import { RealClock } from "../../secondary/core/ClockImplementations";
 import { InMemoryEventBus } from "../../secondary/core/InMemoryEventBus";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
@@ -26,12 +24,6 @@ import { createGenerateConventionMagicLink } from "./createGenerateConventionMag
 import { createUseCases } from "./createUseCases";
 import { createUowPerformer } from "./uowConfig";
 
-const counterEventsMarkedAsPublished = new promClient.Counter({
-  name: "pg_outbox_repository_events_marked_as_published",
-  help: "The total count of events marked as published by PgOutboxRepository.",
-  labelNames: ["topic"],
-});
-
 const clock = new RealClock();
 const uuidGenerator = new UuidV4Generator();
 
@@ -47,13 +39,7 @@ export const createAppDependencies = async (config: AppConfig) => {
 
   const { uowPerformer, inMemoryUow } = createUowPerformer(config, getPgPoolFn);
 
-  const saveEvent = (event: DomainEvent) =>
-    uowPerformer.perform((uow) => uow.outboxRepository.save(event));
-
-  const eventBus = new InMemoryEventBus(clock, (event) => {
-    counterEventsMarkedAsPublished.inc({ topic: event.topic });
-    return saveEvent(event);
-  });
+  const eventBus = new InMemoryEventBus(clock, uowPerformer);
   const generateApiJwt = makeGenerateJwtES256(config.apiJwtPrivateKey);
   const generateMagicLinkJwt = makeGenerateJwtES256(
     config.magicLinkJwtPrivateKey,

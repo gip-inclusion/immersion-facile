@@ -1,4 +1,3 @@
-import { values } from "ramda";
 import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
 import {
   DomainEvent,
@@ -11,10 +10,10 @@ import { InMemoryOutboxRepository } from "./InMemoryOutboxRepository";
 const logger = createLogger(__filename);
 
 export class InMemoryOutboxQueries implements OutboxQueries {
-  constructor(private readonly repository: InMemoryOutboxRepository) {}
+  constructor(private readonly outboxRepository: InMemoryOutboxRepository) {}
 
   public async getAllUnpublishedEvents() {
-    const allEvents = values(this.repository._events);
+    const allEvents = this.outboxRepository.events;
     logger.debug(
       { allEvents: eventsToDebugInfo(allEvents) },
       "getAllUnpublishedEvents",
@@ -33,7 +32,7 @@ export class InMemoryOutboxQueries implements OutboxQueries {
   }
 
   public async getAllFailedEvents(): Promise<DomainEvent[]> {
-    const allEvents = values(this.repository._events);
+    const allEvents = this.outboxRepository.events;
     logger.debug(
       { allEvents: eventsToDebugInfo(allEvents) },
       "getAllFailedEvents",
@@ -48,7 +47,7 @@ export class InMemoryOutboxQueries implements OutboxQueries {
   public async getLastPayloadOfFormEstablishmentEditLinkSentWithSiret(
     siret: string,
   ): Promise<EstablishmentJwtPayload | undefined> {
-    return values(this.repository._events).find((event) => {
+    return this.outboxRepository.events.find((event) => {
       if (event.topic !== "FormEstablishmentEditLinkSent") return false;
       const payload = event.payload as EstablishmentJwtPayload;
       return payload.siret === siret;

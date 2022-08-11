@@ -51,10 +51,11 @@ export class InMemoryConventionQueries implements ConventionQueries {
     dateEnd: Date,
   ): Promise<ImmersionAssessmentEmailParams[]> {
     const immersionIdsThatAlreadyGotAnEmail = this.outboxRepository
-      ? Object.values(this.outboxRepository._events)
+      ? this.outboxRepository.events
           .filter(propEq("topic", "EmailWithLinkToCreateAssessmentSent"))
           .map((event) => (event.payload as WithConventionId).id)
       : [];
+
     return Object.values(this.conventionRepository._conventions)
       .filter(
         (convention) =>

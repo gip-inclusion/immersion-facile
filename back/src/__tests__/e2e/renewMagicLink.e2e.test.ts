@@ -1,7 +1,7 @@
-import { TemplatedEmail } from "shared/src/email/email";
 import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
 import { RenewMagicLinkRequestDto } from "shared/src/convention/convention.dto";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
+import { TemplatedEmail } from "shared/src/email/email";
 import { createConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 import { expectEmailOfType } from "../../_testBuilders/test.helpers";
@@ -10,7 +10,6 @@ import { createInMemoryUow } from "../../adapters/primary/config/uowConfig";
 import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
 import { BasicEventCrawler } from "../../adapters/secondary/core/EventCrawlerImplementations";
 import { InMemoryEventBus } from "../../adapters/secondary/core/InMemoryEventBus";
-import { InMemoryOutboxRepository } from "../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryEmailGateway } from "../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryConventionRepository } from "../../adapters/secondary/InMemoryConventionRepository";
@@ -41,7 +40,6 @@ const agency = AgencyDtoBuilder.create(validConvention.agencyId)
 
 describe("Magic link renewal flow", () => {
   let conventionRepository: InMemoryConventionRepository;
-  let outboxRepository: InMemoryOutboxRepository;
   let clock: CustomClock;
   let uuidGenerator: TestUuidGenerator;
   let createNewEvent: CreateNewEvent;
@@ -60,14 +58,13 @@ describe("Magic link renewal flow", () => {
     const agencyRepository = uow.agencyRepository;
     agencyRepository.setAgencies([agency]);
     conventionRepository = uow.conventionRepository;
-    outboxRepository = uow.outboxRepository;
     clock = new CustomClock();
     clock.setNextDate(new Date());
     uuidGenerator = new TestUuidGenerator();
     createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
     const uowPerformer = new InMemoryUowPerformer(uow);
     emailGw = new InMemoryEmailGateway(clock);
-    eventBus = new InMemoryEventBus(clock, (e) => outboxRepository.save(e));
+    eventBus = new InMemoryEventBus(clock, uowPerformer);
     eventCrawler = new BasicEventCrawler(uowPerformer, eventBus);
 
     config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
