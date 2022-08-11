@@ -82,7 +82,7 @@ describe("HttpAddressAPI", () => {
     });
   }, 5000);
 
-  const parallelCalls = 200;
+  const parallelCalls = 10;
   it(`Should support ${parallelCalls} of parallel calls`, async () => {
     const coordinates: GeoPositionDto[] = [];
     const expectedResults: AddressDto[] = [];
@@ -104,5 +104,5 @@ describe("HttpAddressAPI", () => {
       results.push(await adapter.getAddressFromPosition(coordinate));
 
     expectTypeToMatchAndEqual(results, expectedResults);
-  }, 30000);
+  }, 5000);
 });
