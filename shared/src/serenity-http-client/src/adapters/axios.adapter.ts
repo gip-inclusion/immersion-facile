@@ -102,7 +102,16 @@ export class ManagedAxios<TargetUrls extends string> implements HttpClient {
       targetConfig.target,
       this.targetsUrls,
     ) as TargetUrls;
-    const mergedConfigs = { ...this.defaultRequestConfig, ...targetConfig };
+
+    const mergedConfigs: AxiosRequestConfig = {
+      ...this.defaultRequestConfig,
+      ...targetConfig,
+      headers: {
+        ...this.defaultRequestConfig.headers,
+        ...targetConfig.adapterConfig.headers,
+      },
+    };
+
     const context = {
       config: mergedConfigs,
       target,
