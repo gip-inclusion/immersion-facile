@@ -1,6 +1,6 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
-import R from "ramda";
+import { equals } from "ramda";
 import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
 import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
@@ -31,7 +31,7 @@ const offersEqual = (a: ImmersionOfferEntityV2, b: ImmersionOfferEntityV2) =>
   a.romeCode === b.romeCode && a.appellationCode == b.appellationCode;
 
 const objectsDeepEqual = <T>(a: T, b: T) =>
-  R.equals(JSON.parse(JSON.stringify(a)), JSON.parse(JSON.stringify(b)));
+  equals(JSON.parse(JSON.stringify(a)), JSON.parse(JSON.stringify(b)));
 
 const establishmentsEqual = (
   a: EstablishmentEntityV2,

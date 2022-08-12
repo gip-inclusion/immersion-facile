@@ -16,7 +16,7 @@ export const queryParamsAsString = <Q extends QueryParams<RawQueryParams>>(
     reduce<keyof Q, string[]>(
       (acc: string[], param) => [
         ...acc,
-        ...(queryParams[param]
+        ...(typeof queryParams[param] !== "undefined"
           ? [`${param.toString()}=${encodeURI(queryParams[param].toString())}`]
           : []),
       ],

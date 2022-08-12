@@ -95,9 +95,17 @@ export class EstablishmentEntityV2Builder
     });
   }
 
+  withAdditionalInformation(additionalInformation: string) {
+    return new EstablishmentEntityV2Builder({
+      ...this.entity,
+      additionalInformation,
+    });
+  }
+
   withUpdatedAt(updatedAt: Date) {
     return new EstablishmentEntityV2Builder({ ...this.entity, updatedAt });
   }
+
   build() {
     return this.entity;
   }

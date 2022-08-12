@@ -116,14 +116,8 @@ export const EstablishmentFormikForm = ({
                     descriptionLink=""
                     disabled={false}
                   />
-                  <TextInput
-                    label="URL vers votre site internet"
-                    name="website"
-                  />
-                  <TextInput
-                    label="Informations complémentaires"
-                    name="additionnalInformation"
-                  />
+                  <TextInput {...getLabelAndName("website")} />
+                  <TextInput {...getLabelAndName("additionalInformation")} />
                 </div>
                 <AppellationList
                   name="appellations"
