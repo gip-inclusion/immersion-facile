@@ -9,6 +9,19 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    # healthcheck:
+    #   test:
+    #     [
+    #       "CMD",
+    #       "curl",
+    #       "--fail",
+    #       "--output /dev/null",
+    #       "http://localhost:3000/api/",  NEED DYNAMIC PORT FOR HEALTHCHECK
+    #     ]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 6
+    #   start_period: 10s
     restart: unless-stopped
 
   front:
@@ -36,8 +49,11 @@ services:
   nginx:
     restart: unless-stopped
     depends_on:
-      - front
-      - back
+      back:
+        # condition: service_healthy NEED BACK DYNAMIC PORT FOR HEALTHCHECK
+        condition: service_started
+      front:
+        condition: service_started
     build:
       context: ./nginx
       dockerfile: Dockerfile.nginx

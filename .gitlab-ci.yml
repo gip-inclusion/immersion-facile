@@ -170,8 +170,9 @@ deploy_on_staging:
       exit \$retVal;
       fi;
 
-      echo \"Waiting 1m ...\";
-      sleep 60;
+      # KEEP WAITING TIME INSTEAD OF DOCKER COMPOSE BACK HEALTHCHECK
+      echo \"Waiting 1m30 ...\";
+      sleep 90;
       echo \"Checking server health...\";
       curl --fail --output /dev/null http://localhost:3000/api/"
 
