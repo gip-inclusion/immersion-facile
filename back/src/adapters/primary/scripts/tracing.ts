@@ -25,13 +25,12 @@ type TracingUtils = {
   tracer: Tracer;
   tracingSdk: TracingSdk;
 };
-const logguer = createLogger(__filename);
+
 const zipkinOpenTelemetry = (zipkinHost: string): TracingUtils => {
   // For troubleshooting, set the log level to DiagLogLevel.DEBUG
   diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.INFO);
 
   const zipkinUrl = `http://${zipkinHost}/api/v2/spans`;
-  logguer.info(`Open Telemetry with Zipkin URL: ${zipkinUrl}`);
 
   const tracingSdk = new opentelemetry.NodeSDK({
     serviceName: `back-${process.env.ENV_TYPE}`,
@@ -52,7 +51,8 @@ const zipkinOpenTelemetry = (zipkinHost: string): TracingUtils => {
       }),
     ],
   });
-
+  const logger = createLogger(__filename);
+  logger.info(`Open Telemetry with Zipkin URL: ${zipkinUrl}`);
   return {
     tracer: opentelemetryTrace.getTracer("immersion-back"),
     tracingSdk,
@@ -60,7 +60,8 @@ const zipkinOpenTelemetry = (zipkinHost: string): TracingUtils => {
 };
 
 const noOpenTelemetry = (): TracingUtils => {
-  logguer.info(`No Open Telemetry.`);
+  const logger = createLogger(__filename);
+  logger.info(`No Open Telemetry.`);
   return {
     tracer: {
       startActiveSpan: (_name, cb) => {
