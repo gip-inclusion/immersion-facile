@@ -14,7 +14,7 @@ const appConfig = AppConfig.createFromEnv();
 tracingSdk
   .start()
   .then(() => {
-    logger.info("Tracing SDK started with exporter URL:", tracerExporterUrl);
+    logger.info(`Tracing SDK started with exporter URL: ${tracerExporterUrl}`);
     return createApp(appConfig);
   })
   .then(
