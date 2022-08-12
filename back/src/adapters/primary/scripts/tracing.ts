@@ -3,6 +3,7 @@ import { getNodeAutoInstrumentations } from "@opentelemetry/auto-instrumentation
 import { diag, DiagConsoleLogger, DiagLogLevel } from "@opentelemetry/api";
 import { ZipkinExporter } from "@opentelemetry/exporter-zipkin";
 import { trace as opentelemetryTrace } from "@opentelemetry/api";
+import { createLogger } from "../../../utils/logger";
 
 type AttributeValue = string | number | boolean;
 
@@ -24,19 +25,19 @@ type TracingUtils = {
   tracer: Tracer;
   tracingSdk: TracingSdk;
 };
-
-const setUpOpenTelemetryTracing = (zipkinHost: string): TracingUtils => {
+const logguer = createLogger(__filename);
+const zipkinOpenTelemetry = (zipkinHost: string): TracingUtils => {
   // For troubleshooting, set the log level to DiagLogLevel.DEBUG
   diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.INFO);
 
-  const exporter = new ZipkinExporter({
-    url: `http://${zipkinHost}/api/v2/spans`,
-  });
+  const zipkinUrl = `http://${zipkinHost}/api/v2/spans`;
+  logguer.info(`Open Telemetry with Zipkin URL: ${zipkinUrl}`);
 
   const tracingSdk = new opentelemetry.NodeSDK({
     serviceName: `back-${process.env.ENV_TYPE}`,
-    traceExporter: exporter,
-    // spanProcessor,
+    traceExporter: new ZipkinExporter({
+      url: zipkinUrl,
+    }),
     instrumentations: [
       getNodeAutoInstrumentations({
         "@opentelemetry/instrumentation-express": {
@@ -58,29 +59,32 @@ const setUpOpenTelemetryTracing = (zipkinHost: string): TracingUtils => {
   };
 };
 
-const noTracer = (): TracingUtils => ({
-  tracer: {
-    startActiveSpan: (_name, cb) => {
-      const fakeSpan: AppSpan = {
-        setAttributes: (_attributes: Record<string, AttributeValue>) =>
-          fakeSpan,
-        setAttribute: (_name: string, _attributeValue: AttributeValue) =>
-          fakeSpan,
-        end: async () => {
-          /*Nothing to do*/
-        },
-      };
+const noOpenTelemetry = (): TracingUtils => {
+  logguer.info(`No Open Telemetry.`);
+  return {
+    tracer: {
+      startActiveSpan: (_name, cb) => {
+        const fakeSpan: AppSpan = {
+          setAttributes: (_attributes: Record<string, AttributeValue>) =>
+            fakeSpan,
+          setAttribute: (_name: string, _attributeValue: AttributeValue) =>
+            fakeSpan,
+          end: async () => {
+            /*Nothing to do*/
+          },
+        };
 
-      return cb(fakeSpan);
+        return cb(fakeSpan);
+      },
     },
-  },
-  tracingSdk: {
-    start: async () => {
-      /* Nothing to do */
+    tracingSdk: {
+      start: async () => {
+        /* Nothing to do */
+      },
     },
-  },
-});
+  };
+};
 
 export const { tracer, tracingSdk } = process.env.ZIPKIN_HOST
-  ? setUpOpenTelemetryTracing(process.env.ZIPKIN_HOST)
-  : noTracer();
+  ? zipkinOpenTelemetry(process.env.ZIPKIN_HOST)
+  : noOpenTelemetry();
