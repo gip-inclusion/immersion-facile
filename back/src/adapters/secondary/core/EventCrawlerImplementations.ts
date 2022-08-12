@@ -104,12 +104,30 @@ export class RealEventCrawler
       { crawlingPeriodMs: this.crawlingPeriodMs },
       "RealEventCrawler.startCrawler: processing events at regular intervals",
     );
-    setInterval(async () => {
-      await this.processNewEvents();
-    }, this.crawlingPeriodMs);
 
-    setInterval(async () => {
-      await this.retryFailedEvents();
-    }, retryErrorsPeriodMs);
+    // old version :
+    // setInterval(async () => {
+    //   await this.processNewEvents();
+    // }, this.crawlingPeriodMs);
+    const processNewEvents = () =>
+      setTimeout(async () => {
+        await this.processNewEvents();
+        processNewEvents();
+      }, this.crawlingPeriodMs);
+
+    processNewEvents();
+
+    // old version :
+    // setInterval(async () => {
+    //   await this.retryFailedEvents();
+    // }, retryErrorsPeriodMs);
+
+    const retryFailedEvents = () =>
+      setTimeout(async () => {
+        await this.retryFailedEvents();
+        retryFailedEvents();
+      }, retryErrorsPeriodMs);
+
+    retryFailedEvents();
   }
 }
