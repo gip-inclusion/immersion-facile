@@ -11,7 +11,7 @@ Instead, you need to create a new migration with the new changes.
 
    ```sh
    NODE_ENV=local
-   REPOSTIORIES=PG
+   REPOSITORIES=PG
    PG_URL="postgresql://immersion:pg_password@postgres:5432/immersion-db"
    # following is needed by node-pg-migrate (but it is the same as PG_URL)
    DATABASE_URL="postgresql://immersion:pg_password@postgres:5432/immersion-db"
@@ -38,7 +38,7 @@ Instead, you need to create a new migration with the new changes.
 
    ```sh
    NODE_ENV=local
-   REPOSTIORIES=PG
+   REPOSITORIES=PG
    PG_URL="postgresql://immersion:pg_password@postgres:5432/immersion-db"
    # following is needed by node-pg-migrate (but it is the same as PG_URL)
    DATABASE_URL="postgresql://immersion:pg_password@postgres:5432/immersion-db"
