@@ -7,7 +7,8 @@ services:
     env_file:
       - .env
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
 
   front:
@@ -58,6 +59,11 @@ services:
       POSTGRES_DB: immersion-db
       POSTGRES_USER: immersion
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pg_password}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
       - ./docker-data/postgresql:/var/lib/postgresql/data
     ports:
@@ -66,7 +72,6 @@ services:
 
   adminer:
     image: adminer
-
 #  backup:
 #    restart: always
 #    hostname: backup
