@@ -170,7 +170,6 @@ deploy_on_staging:
       exit \$retVal;
       fi;
 
-      # KEEP WAITING TIME INSTEAD OF DOCKER COMPOSE BACK HEALTHCHECK
       echo \"Waiting 1m30 ...\";
       sleep 90;
       echo \"Checking server health...\";
