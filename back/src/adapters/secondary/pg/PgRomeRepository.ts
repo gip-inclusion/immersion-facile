@@ -40,6 +40,7 @@ export class PgRomeRepository implements RomeRepository {
   }
 
   public async searchRome(query: string): Promise<RomeDto[]> {
+    logger.info({ query }, "searchRome query ");
     const [queryBeginning, lastWord] = prepareQueryParams(query);
     return this.client
       .query(
@@ -61,21 +62,24 @@ export class PgRomeRepository implements RomeRepository {
         FROM matching_rome LEFT JOIN public_romes_data ON matching_rome.code_rome = public_romes_data.code_rome`,
         [toTsQuery(queryBeginning), `%${queryBeginning}%`, `%${lastWord}%`],
       )
-      .then((res) =>
-        res.rows.map(
+      .then((res) => {
+        const romes = res.rows.map(
           (row): RomeDto => ({
             romeCode: row.code_rome,
             romeLabel: row.libelle_rome,
           }),
-        ),
-      )
-      .catch((e) => {
-        logger.error(e);
+        );
+        logger.info({ romes, query }, "searchRome query result");
+        return romes;
+      })
+      .catch((error) => {
+        logger.error({ error, query }, "searchRome error");
         return [];
       });
   }
 
   public async searchAppellation(query: string): Promise<AppellationDto[]> {
+    logger.info({ query }, "searchAppellation query ");
     const [queryBeginning, lastWord] = prepareQueryParams(query);
 
     return this.client
@@ -89,18 +93,20 @@ export class PgRomeRepository implements RomeRepository {
         LIMIT 80`,
         [toTsQuery(queryBeginning), `%${queryBeginning}%`, `%${lastWord}%`],
       )
-      .then((res) =>
-        res.rows.map(
+      .then((res) => {
+        const appelations = res.rows.map(
           (row): AppellationDto => ({
             appellationCode: row.ogr_appellation.toString(),
             romeCode: row.code_rome,
             appellationLabel: row.libelle_appellation_long,
             romeLabel: row.libelle_rome,
           }),
-        ),
-      )
-      .catch((e) => {
-        logger.error(e);
+        );
+        logger.info({ appelations, query }, "searchAppellation query result");
+        return appelations;
+      })
+      .catch((error) => {
+        logger.error({ error, query }, "searchAppellation error");
         return [];
       });
   }

@@ -18,7 +18,7 @@ export const createFormCompletionRouter = (deps: AppDependencies) => {
 
   formCompletionRouter.route(`/${appellationRoute}`).get(async (req, res) =>
     sendHttpResponse(req, res, async () => {
-      logger.info(req);
+      logger.info(req, "GET /appellation");
       return deps.useCases.appellationSearch.execute(
         req.query.searchText as any,
       );
