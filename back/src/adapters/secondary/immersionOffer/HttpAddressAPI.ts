@@ -1,6 +1,7 @@
 import { AxiosError, AxiosResponse } from "axios";
 import { secondsToMilliseconds } from "date-fns";
 import { AddressDto } from "shared/src/address/address.dto";
+import { AddressAndPosition } from "shared/src/apiAdresse/AddressAPI";
 import { featureToAddressDto } from "shared/src/apiAdresse/apiAddress.dto";
 import { toFeatureCollection } from "shared/src/apiAdresse/apiAddress.schema";
 import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
@@ -14,10 +15,7 @@ import {
   RetryableError,
   RetryStrategy,
 } from "../../../domain/core/ports/RetryStrategy";
-import {
-  AddressAndPosition,
-  AddressAPI,
-} from "../../../domain/immersionOffer/ports/AddressAPI";
+import { AddressAPI } from "../../../domain/immersionOffer/ports/AddressAPI";
 import {
   createAxiosInstance,
   isRetryableError,

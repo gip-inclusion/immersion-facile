@@ -16,6 +16,7 @@ export const frontRoutes = {
 export const addEstablishmentFormRouteWithApiKey__v0 = "add-establishment-form"; // Becomes POST /v1/form-establishments
 export const adminLogin = "login";
 export const agenciesRoute = "agencies";
+export const addressRoute = "address";
 export const agencyImmersionFacileIdRoute = "immersion-facile-agency-id";
 export const agencyPublicInfoByIdRoute = "agency-public-info-by-id";
 export const appellationRoute = "appellation";

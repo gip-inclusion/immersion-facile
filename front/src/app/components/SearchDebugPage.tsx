@@ -84,9 +84,9 @@ export const SearchDebugPage = () => {
             <Field id="radius" name="radius" type="number" placeholder="30" />
             <AddressAutocomplete
               label="Rechercher un endroit (ou saisir lat/lon ci-dessus)"
-              setFormValue={({ coordinates }) => {
-                setFieldValue("lat", coordinates.lat);
-                setFieldValue("lon", coordinates.lon);
+              setFormValue={({ position }) => {
+                setFieldValue("lat", position.lat);
+                setFieldValue("lon", position.lon);
               }}
             />
             <br />

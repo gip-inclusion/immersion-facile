@@ -1,12 +1,12 @@
 import React from "react";
+import { AddressAndPosition } from "src/../../shared/src/apiAdresse/AddressAPI";
 import { apiAddressGateway } from "src/app/config/dependencies";
-import { AddressWithCoordinates } from "src/core-logic/ports/ApiAddressGateway";
 
 export const getAddressesFromApi = async (
   term: string,
-  setOptions: React.Dispatch<React.SetStateAction<AddressWithCoordinates[]>>,
+  setOptions: React.Dispatch<React.SetStateAction<AddressAndPosition[]>>,
   setIsSearching: React.Dispatch<React.SetStateAction<boolean>>,
-): Promise<AddressWithCoordinates[]> => {
+): Promise<AddressAndPosition[]> => {
   const sanitizedTerm = term.trim();
   if (!sanitizedTerm) return [];
   try {

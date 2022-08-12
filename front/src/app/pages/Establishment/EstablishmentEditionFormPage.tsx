@@ -1,6 +1,7 @@
 import { useField } from "formik";
 import React from "react";
 import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
+import { addressDtoToString } from "src/../../shared/src/utils/address";
 import { establishmentGateway } from "src/app/config/dependencies";
 import { routes } from "src/app/routing/routes";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
@@ -78,7 +79,9 @@ const EditionSiretRelatedInputs = ({
       <AddressAutocomplete
         initialSearchTerm={businessAddress}
         label={businessLabelAndName.label}
-        setFormValue={(address) => setAddressValue(address.label)}
+        setFormValue={({ address }) =>
+          setAddressValue(addressDtoToString(address))
+        }
       />
     </>
   );

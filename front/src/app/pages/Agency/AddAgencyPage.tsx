@@ -107,8 +107,8 @@ export const AddAgencyPage = () => {
                   />
                   <AddressAutocomplete
                     label="Adresse de la structure"
-                    setFormValue={({ coordinates, label, ...address }) => {
-                      typedSetField("position")(coordinates);
+                    setFormValue={({ position, address }) => {
+                      typedSetField("position")(position);
                       typedSetField("address")(address);
                     }}
                   />

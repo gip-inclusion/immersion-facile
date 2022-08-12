@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import Autocomplete from "@mui/material/Autocomplete";
 import { useDebounce } from "src/app/utils/useDebounce";
-import { AddressWithCoordinates } from "src/core-logic/ports/ApiAddressGateway";
 import { getAddressesFromApi } from "./getAddressesFromApi";
 import { AutocompleteInput } from "react-design-system/immersionFacile";
+import { AddressAndPosition } from "src/../../shared/src/apiAdresse/AddressAPI";
+import { addressDtoToString } from "src/../../shared/src/utils/address";
 
 export type AddressAutocompleteProps = {
   label: string;
@@ -11,7 +12,7 @@ export type AddressAutocompleteProps = {
   disabled?: boolean;
   headerClassName?: string;
   inputStyle?: React.CSSProperties;
-  setFormValue: (p: AddressWithCoordinates) => void;
+  setFormValue: (p: AddressAndPosition) => void;
 };
 
 export const AddressAutocomplete = ({
@@ -23,9 +24,9 @@ export const AddressAutocomplete = ({
   initialSearchTerm = "",
 }: AddressAutocompleteProps) => {
   const [selectedOption, setSelectedOption] =
-    useState<AddressWithCoordinates | null>(null);
+    useState<AddressAndPosition | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>(initialSearchTerm);
-  const [options, setOptions] = useState<AddressWithCoordinates[]>([]);
+  const [options, setOptions] = useState<AddressAndPosition[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const debounceSearchTerm = useDebounce(searchTerm, 400);
 
@@ -82,25 +83,26 @@ const onAutocompleteInput =
 const onAutocompleteChange =
   (
     setSelectedOption: React.Dispatch<
-      React.SetStateAction<AddressWithCoordinates | null>
+      React.SetStateAction<AddressAndPosition | null>
     >,
-    setFormValue: (p: AddressWithCoordinates) => void,
+    setFormValue: (p: AddressAndPosition) => void,
   ) =>
   (
     _: React.SyntheticEvent<Element, Event>,
-    selectedOption: AddressWithCoordinates | null,
+    selectedOption: AddressAndPosition | null,
   ) => {
     setSelectedOption(selectedOption ?? null);
     setFormValue(
       selectedOption
         ? selectedOption
         : {
-            label: "",
-            streetNumberAndAddress: "",
-            postcode: "",
-            city: "",
-            departmentCode: "",
-            coordinates: { lat: 0, lon: 0 },
+            address: {
+              streetNumberAndAddress: "",
+              postcode: "",
+              city: "",
+              departmentCode: "",
+            },
+            position: { lat: 0, lon: 0 },
           },
     );
   };
@@ -108,28 +110,30 @@ const onAutocompleteChange =
 const useEffectDebounceSearchTerm = (
   debounceSearchTerm: string,
   initialSearchTerm: string,
-  selectedOption: AddressWithCoordinates | null,
-  setOptions: React.Dispatch<React.SetStateAction<AddressWithCoordinates[]>>,
+  selectedOption: AddressAndPosition | null,
+  setOptions: React.Dispatch<React.SetStateAction<AddressAndPosition[]>>,
   setIsSearching: React.Dispatch<React.SetStateAction<boolean>>,
 ): void => {
   if (
     debounceSearchTerm &&
-    ![initialSearchTerm, selectedOption?.label].includes(debounceSearchTerm)
+    initialSearchTerm !== debounceSearchTerm &&
+    selectedOption?.address &&
+    addressDtoToString(selectedOption.address) !== debounceSearchTerm
   ) {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     getAddressesFromApi(debounceSearchTerm, setOptions, setIsSearching);
   }
 };
 
-function useEffectInitialSearchTerm(
+const useEffectInitialSearchTerm = (
   initialSearchTerm: string,
-  selectedOption: AddressWithCoordinates | null,
-  setOptions: React.Dispatch<React.SetStateAction<AddressWithCoordinates[]>>,
+  selectedOption: AddressAndPosition | null,
+  setOptions: React.Dispatch<React.SetStateAction<AddressAndPosition[]>>,
   setIsSearching: React.Dispatch<React.SetStateAction<boolean>>,
   setSelectedOption: React.Dispatch<
-    React.SetStateAction<AddressWithCoordinates | null>
+    React.SetStateAction<AddressAndPosition | null>
   >,
-): void {
+): void => {
   if (initialSearchTerm && initialSearchTerm !== selectedOption?.label) {
     getAddressesFromApi(initialSearchTerm, setOptions, setIsSearching)
       .then((addresses) => setSelectedOption(addresses?.[0] ?? null))
@@ -138,4 +142,4 @@ function useEffectInitialSearchTerm(
         console.error("getAddressesFromApi", error);
       });
   }
-}
+};

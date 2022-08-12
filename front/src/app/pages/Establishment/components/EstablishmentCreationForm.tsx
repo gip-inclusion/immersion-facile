@@ -27,6 +27,7 @@ import {
   getMandatoryLabelAndName,
 } from "./EstablishmentFormikForm";
 import { AddressAutocomplete } from "src/uiComponents/autocomplete/AddressAutocomplete";
+import { addressDtoToString } from "src/../../shared/src/utils/address";
 
 type EstablishmentCreationFormProps = {
   source: FormEstablishmentSource;
@@ -142,7 +143,9 @@ const CreationSiretRelatedInputs = () => {
       <AddressAutocomplete
         initialSearchTerm={establishmentInfos?.businessAddress}
         label={businessLabelAndName.label}
-        setFormValue={(address) => setAddressValue(address.label)}
+        setFormValue={({ address }) =>
+          setAddressValue(addressDtoToString(address))
+        }
         disabled={isFetchingSiret}
       />
     </>

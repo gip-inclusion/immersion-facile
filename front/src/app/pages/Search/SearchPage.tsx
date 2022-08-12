@@ -60,9 +60,9 @@ export const SearchPage = () => {
                         paddingLeft: "48px",
                         background: `white url(${locationSearchIcon}) no-repeat scroll 11px 8px`,
                       }}
-                      setFormValue={({ coordinates }) => {
-                        setFieldValue("lat", coordinates.lat);
-                        setFieldValue("lon", coordinates.lon);
+                      setFormValue={({ position }) => {
+                        setFieldValue("lat", position.lat);
+                        setFieldValue("lon", position.lon);
                       }}
                     />
                   </div>

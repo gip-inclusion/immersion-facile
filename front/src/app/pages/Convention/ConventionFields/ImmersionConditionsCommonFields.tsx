@@ -8,6 +8,7 @@ import {
   emptySchedule,
   reasonableSchedule,
 } from "shared/src/schedule/ScheduleUtils";
+import { addressDtoToString } from "src/../../shared/src/utils/address";
 import {
   BoolRadioGroup,
   RadioGroupForField,
@@ -94,7 +95,9 @@ export const ImmersionConditionsCommonFields = ({
           values.immersionAddress ?? establishmentInfos?.businessAddress
         }
         label="Adresse du lieu où se fera l'immersion * "
-        setFormValue={({ label }) => setFieldValue("immersionAddress", label)}
+        setFormValue={({ address }) =>
+          setFieldValue("immersionAddress", addressDtoToString(address))
+        }
         disabled={disabled || isFetchingSiret}
       />
       <br />

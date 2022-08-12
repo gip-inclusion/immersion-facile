@@ -1,16 +1,7 @@
-import { DepartmentCode, Postcode } from "shared/src/address/address.dto";
-import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
-
-export type AddressWithCoordinates = {
-  label: string;
-  streetNumberAndAddress: string;
-  postcode: Postcode;
-  departmentCode: DepartmentCode;
-  city: string;
-  coordinates: GeoPositionDto;
-};
+import { DepartmentCode } from "shared/src/address/address.dto";
+import { AddressAndPosition } from "shared/src/apiAdresse/AddressAPI";
 
 export interface ApiAddressGateway {
-  lookupStreetAddress(query: string): Promise<AddressWithCoordinates[]>;
+  lookupStreetAddress(query: string): Promise<AddressAndPosition[]>;
   findDepartmentCodeFromPostCode(query: string): Promise<DepartmentCode | null>;
 }
