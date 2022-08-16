@@ -16,10 +16,7 @@ import {
   toUnhandledError,
   UnhandledError,
 } from "shared/src/serenity-http-client";
-import axios, {
-  AxiosError,
-  AxiosResponse,
-} from "../../../../node_modules/axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import {
   ManagedRedirectError,

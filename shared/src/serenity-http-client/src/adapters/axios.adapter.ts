@@ -3,10 +3,11 @@ import axios, {
   AxiosInstance,
   AxiosRequestConfig,
   AxiosResponse,
-} from "../../../../node_modules/axios";
+} from "axios";
 
 import {
   AbsoluteUrl,
+  AdapterConfig,
   ErrorMapper,
   getTargetFromPredicate,
   HttpClient,
@@ -103,14 +104,10 @@ export class ManagedAxios<TargetUrls extends string> implements HttpClient {
       this.targetsUrls,
     ) as TargetUrls;
 
-    const mergedConfigs: AxiosRequestConfig<unknown> = {
-      ...this.defaultRequestConfig,
-      ...targetConfig,
-      headers: {
-        ...this.defaultRequestConfig?.headers,
-        ...targetConfig.adapterConfig?.headers,
-      },
-    };
+    const mergedConfigs = shallowMergeConfigs(
+      this.defaultRequestConfig,
+      targetConfig,
+    );
 
     const context = {
       config: mergedConfigs,
@@ -130,3 +127,8 @@ export class ManagedAxios<TargetUrls extends string> implements HttpClient {
     };
   };
 }
+
+const shallowMergeConfigs = (
+  initialConfig: AdapterConfig,
+  additionalConfig: HttpClientGetConfig,
+): AdapterConfig => ({ ...initialConfig, ...additionalConfig.adapterConfig });

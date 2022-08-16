@@ -1,4 +1,4 @@
-import "../node_modules/@gouvfr/dsfr/dist/dsfr.main.min.css";
+import "@gouvfr/dsfr/dist/dsfr.main.min.css";
 
 export const parameters = {
   actions: { argTypesRegex: "^on[A-Z].*" },

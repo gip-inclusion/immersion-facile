@@ -1,7 +1,7 @@
 import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 import { frontRoutes } from "shared/src/routes";
 import { queryParamsAsString } from "shared/src/utils/queryParams";
-import { z } from "../../../../node_modules/zod";
+import { z } from "zod";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import {

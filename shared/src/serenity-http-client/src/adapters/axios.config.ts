@@ -1,7 +1,4 @@
-import axios, {
-  AxiosError,
-  AxiosResponse,
-} from "../../../../node_modules/axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import { ErrorMapper, isHttpError } from "../httpClient";
 import { toMappedErrorMaker, toUnhandledError } from "../httpClient.mappers";
 import { AxiosErrorWithResponse } from "./axios.adapter";

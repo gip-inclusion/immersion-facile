@@ -133,4 +133,57 @@ describe("httpClient with axios concrete adapter", () => {
 
     await expect(responsePromise).rejects.toThrow(CustomError);
   });
+
+  it("Error log should contain enough info to help debug", async () => {
+    type TargetUrls = "ADDRESS_API_SEARCH_ENDPOINT";
+
+    const targetToInvalidSearchUrl = (rawQueryString: string): AbsoluteUrl =>
+      `https://api-adresse.data.gouv.fr/search/?d=${rawQueryString}&limit=1`;
+
+    const targetUrls: TargetUrlsMapper<TargetUrls> = {
+      ADDRESS_API_SEARCH_ENDPOINT: targetToInvalidSearchUrl,
+    };
+
+    const httpClient: HttpClient = new ManagedAxios(targetUrls);
+
+    const expectedMessage = {
+      _response: {
+        data: {
+          title: "Missing query",
+          description: "Missing query",
+        },
+        status: 400,
+        headers: {
+          server: expect.any(String),
+          date: expect.any(String),
+          "content-type": "application/json; charset=UTF-8",
+          "content-length": "58",
+          connection: "close",
+          vary: "Accept",
+        },
+      },
+      requestConfig: {
+        url: "https://api-adresse.data.gouv.fr/search/?d=18 avenue des Canuts 69120&limit=1",
+        headers: {
+          Accept: "application/json, text/plain, */*",
+          "User-Agent": "axios/0.26.1",
+        },
+        method: "get",
+        timeout: 0,
+      },
+      request: expect.any(Object),
+    };
+
+    try {
+      await httpClient.get({
+        target: targetUrls.ADDRESS_API_SEARCH_ENDPOINT,
+        targetParams: "18 avenue des Canuts 69120",
+      });
+      fail("should have thrown HttpCLientError");
+    } catch (error) {
+      expect(JSON.parse(error.message)).toMatchObject(
+        expect.objectContaining(expectedMessage),
+      );
+    }
+  });
 });

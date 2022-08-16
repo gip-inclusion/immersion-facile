@@ -2,7 +2,7 @@ import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 import { HttpResponse, ManagedAxios } from "shared/src/serenity-http-client";
 import { stringToMd5 } from "shared/src/tokens/MagicLinkPayload";
 import { queryParamsAsString } from "shared/src/utils/queryParams";
-import { AxiosResponse } from "../../../../node_modules/axios";
+import { AxiosResponse } from "axios";
 import {
   AccessTokenDto,
   ExternalAccessToken,

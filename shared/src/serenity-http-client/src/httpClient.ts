@@ -1,3 +1,4 @@
+import { AxiosRequestConfig } from "axios";
 import { ConfigurationError } from "./errors";
 import { HttpClientError } from "./errors";
 import { HttpServerError } from "./errors";
@@ -53,7 +54,7 @@ export interface HttpResponse {
   status: number;
   statusText: string;
   headers: any;
-  config: any;
+  config: AdapterConfig;
   request?: any;
 }
 
@@ -61,11 +62,14 @@ export type HttpClientPostConfig = {
   target: (params: any) => AbsoluteUrl;
   targetParams?: any;
   data?: string | undefined;
-  adapterConfig?: any;
+  adapterConfig?: AdapterConfig;
 };
 
 export type HttpClientGetConfig = {
   target: (params: any) => AbsoluteUrl;
   targetParams?: any;
-  adapterConfig?: any;
+  adapterConfig?: AdapterConfig;
 };
+
+// Equivalent to axios AxiosRequestConfig for now but port may change over time
+export type AdapterConfig = AxiosRequestConfig;
