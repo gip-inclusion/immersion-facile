@@ -110,9 +110,12 @@ export class RealEventCrawler
     //   await this.processNewEvents();
     // }, this.crawlingPeriodMs);
     const processNewEvents = () =>
-      setTimeout(async () => {
-        await this.processNewEvents();
-        processNewEvents();
+      setTimeout(() => {
+        this.processNewEvents()
+          .catch((error) => {
+            logger.error({ error }, "RealEventCrawler.processNewEvents failed");
+          })
+          .finally(() => processNewEvents());
       }, this.crawlingPeriodMs);
 
     processNewEvents();
@@ -123,9 +126,15 @@ export class RealEventCrawler
     // }, retryErrorsPeriodMs);
 
     const retryFailedEvents = () =>
-      setTimeout(async () => {
-        await this.retryFailedEvents();
-        retryFailedEvents();
+      setTimeout(() => {
+        this.retryFailedEvents()
+          .catch((error) => {
+            logger.error(
+              { error },
+              "RealEventCrawler.retryFailedEvents failed",
+            );
+          })
+          .finally(() => retryFailedEvents());
       }, retryErrorsPeriodMs);
 
     retryFailedEvents();
