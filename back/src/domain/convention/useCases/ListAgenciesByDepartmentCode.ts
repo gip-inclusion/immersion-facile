@@ -4,24 +4,24 @@ import {
   AgencyDto,
   AgencyKindFilter,
   AgencyIdAndName,
-  ListAgenciesWithDepartmentCodeRequestDto,
+  ListAgenciesByDepartmentCodeRequestDto,
 } from "shared/src/agency/agency.dto";
-import { listAgenciesWithDepartmentCodeRequestSchema } from "shared/src/agency/agency.schema";
+import { ListAgenciesByDepartmentCodeRequestSchema } from "shared/src/agency/agency.schema";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
-export class ListAgenciesWithDepartmentCode extends TransactionalUseCase<
-  ListAgenciesWithDepartmentCodeRequestDto,
+export class ListAgenciesByDepartmentCode extends TransactionalUseCase<
+  ListAgenciesByDepartmentCodeRequestDto,
   AgencyIdAndName[]
 > {
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);
   }
 
-  inputSchema = listAgenciesWithDepartmentCodeRequestSchema;
+  inputSchema = ListAgenciesByDepartmentCodeRequestSchema;
 
   public async _execute(
-    { departmentCode, filter }: ListAgenciesWithDepartmentCodeRequestDto,
+    { departmentCode, filter }: ListAgenciesByDepartmentCodeRequestDto,
     uow: UnitOfWork,
   ): Promise<AgencyIdAndName[]> {
     const agencies = await getActiveAgencies(uow, departmentCode, filter);
@@ -40,7 +40,6 @@ const getActiveAgencies = (
       kind: agencyKindFilter,
       status: activeAgencyStatuses,
     },
-    limit: 20,
   });
 
 const agencyToAgencyWithPositionDto = (config: AgencyDto): AgencyIdAndName => ({

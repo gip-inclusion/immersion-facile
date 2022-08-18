@@ -75,7 +75,7 @@ export type GetAgenciesFilter = {
   status?: AgencyStatus[];
 };
 
-export type ListAgenciesWithDepartmentCodeRequestDto = {
+export type ListAgenciesByDepartmentCodeRequestDto = {
   departmentCode: DepartmentCode;
   filter?: AgencyKindFilter;
 };

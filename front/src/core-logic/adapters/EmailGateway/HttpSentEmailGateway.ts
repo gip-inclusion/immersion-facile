@@ -9,6 +9,7 @@ import { SentEmailGateway } from "src/core-logic/ports/SentEmailGateway";
 export class HttpSentEmailGateway implements SentEmailGateway {
   constructor(private readonly httpClient: AxiosInstance) {}
 
+  // TODO Mieux identifier l'admin
   public getLatest(adminToken: AdminToken): Observable<EmailSentDto[]> {
     return from(
       this.httpClient.get<unknown>(`/admin/${emailRoute}`, {

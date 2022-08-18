@@ -73,7 +73,7 @@ export class InMemoryAgencyGateway implements AgencyGateway {
     };
   }
 
-  async listAllAgenciesWithPosition(
+  async listAgencies(
     _departmentCode: DepartmentCode,
   ): Promise<AgencyIdAndName[]> {
     return values(this._agencies);

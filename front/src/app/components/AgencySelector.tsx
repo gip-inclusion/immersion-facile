@@ -140,11 +140,10 @@ const agenciesRetriever = ({
   shouldListAll: boolean;
   connectedWith: FederatedIdentity | null;
 }) => {
-  if (shouldListAll)
-    return agencyGateway.listAllAgenciesWithPosition(departmentCode);
+  if (shouldListAll) return agencyGateway.listAgencies(departmentCode);
   return connectedWith && isPeConnectIdentity(connectedWith)
     ? agencyGateway.listPeAgencies(departmentCode)
-    : agencyGateway.listAllAgenciesWithPosition(departmentCode);
+    : agencyGateway.listAgencies(departmentCode);
   // : agencyGateway.listNonPeAgencies(position);
   // -> for easy revert when new page is ready
 };

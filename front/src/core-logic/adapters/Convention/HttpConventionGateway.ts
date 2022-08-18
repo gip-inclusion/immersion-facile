@@ -65,6 +65,7 @@ export class HttpConventionGateway implements ConventionGateway {
     return conventionReadDto;
   }
 
+  // TODO Mieux identifier l'admin
   public async getAll(
     adminToken: AdminToken,
     agency?: AgencyId,
@@ -135,6 +136,7 @@ export class HttpConventionGateway implements ConventionGateway {
     return withConventionIdDto;
   }
 
+  // TODO Mieux identifier l'admin
   public async generateMagicLink(
     adminToken: AdminToken,
     applicationId: ConventionId,

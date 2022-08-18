@@ -13,7 +13,7 @@ import { GenerateMagicLink } from "../../../domain/convention/useCases/GenerateM
 import { GetAgencyPublicInfoById } from "../../../domain/convention/useCases/GetAgencyPublicInfoById";
 import { GetConvention } from "../../../domain/convention/useCases/GetConvention";
 import { ListAdminConventions } from "../../../domain/convention/useCases/ListAdminConventions";
-import { ListAgenciesWithDepartmentCode } from "../../../domain/convention/useCases/ListAgenciesWithDepartmentCode";
+import { ListAgenciesByDepartmentCode } from "../../../domain/convention/useCases/ListAgenciesByDepartmentCode";
 import { ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/convention/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature";
 import { ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/convention/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature";
 import { DeliverRenewedMagicLink } from "../../../domain/convention/useCases/notifications/DeliverRenewedMagicLink";
@@ -221,7 +221,7 @@ export const createUseCases = (
     romeSearch: new RomeSearch(uowPerformer),
 
     // agencies
-    listAgenciesWithDepartmentCode: new ListAgenciesWithDepartmentCode(
+    listAgenciesByDepartmentCode: new ListAgenciesByDepartmentCode(
       uowPerformer,
     ),
     privateListAgencies: new PrivateListAgencies(uowPerformer),

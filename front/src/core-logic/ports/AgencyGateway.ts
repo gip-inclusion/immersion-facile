@@ -13,9 +13,7 @@ import { DepartmentCode } from "shared/src/address/address.dto";
 export interface AgencyGateway {
   addAgency(agency: CreateAgencyDto): Promise<void>;
 
-  listAllAgenciesWithPosition(
-    departmentCode: DepartmentCode,
-  ): Promise<AgencyIdAndName[]>;
+  listAgencies(departmentCode: DepartmentCode): Promise<AgencyIdAndName[]>;
   listNonPeAgencies(departmentCode: DepartmentCode): Promise<AgencyIdAndName[]>;
   listPeAgencies(departmentCode: DepartmentCode): Promise<AgencyIdAndName[]>;
   listAgenciesNeedingReview(adminToken: AdminToken): Promise<AgencyDto[]>;

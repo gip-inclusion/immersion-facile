@@ -3,7 +3,7 @@ import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { ListAgenciesWithDepartmentCode } from "../../../domain/convention/useCases/ListAgenciesWithDepartmentCode";
+import { ListAgenciesByDepartmentCode } from "../../../domain/convention/useCases/ListAgenciesByDepartmentCode";
 import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
 
 const defaultAdress: AddressDto = {
@@ -44,19 +44,21 @@ const agencyAddedFromPeReferencial = AgencyDtoBuilder.empty()
 
 describe("ListAgencies", () => {
   let agencyRepository: InMemoryAgencyRepository;
-  let listAgencies: ListAgenciesWithDepartmentCode;
+  let listAgenciesByDepartmentCode: ListAgenciesByDepartmentCode;
 
   beforeEach(() => {
     const uow = createInMemoryUow();
     agencyRepository = uow.agencyRepository;
-    listAgencies = new ListAgenciesWithDepartmentCode(
+    listAgenciesByDepartmentCode = new ListAgenciesByDepartmentCode(
       new InMemoryUowPerformer(uow),
     );
   });
 
   it("returns empty list when the repository is empty", async () => {
     agencyRepository.setAgencies([]);
-    const agencies = await listAgencies.execute({ departmentCode: "75" });
+    const agencies = await listAgenciesByDepartmentCode.execute({
+      departmentCode: "75",
+    });
     expect(agencies).toEqual([]);
   });
 
@@ -68,7 +70,9 @@ describe("ListAgencies", () => {
       agencyAddedFromPeReferencial,
     ]);
 
-    const agencies = await listAgencies.execute({ departmentCode: "64" });
+    const agencies = await listAgenciesByDepartmentCode.execute({
+      departmentCode: "64",
+    });
     expect(agencies).toHaveLength(3);
     expect(agencies).toEqual([
       {
@@ -108,7 +112,7 @@ describe("ListAgencies", () => {
 
     agencyRepository.setAgencies([agency75, agency20]);
 
-    const agenciesOf75 = await listAgencies.execute({
+    const agenciesOf75 = await listAgenciesByDepartmentCode.execute({
       departmentCode: "75",
     });
     expectTypeToMatchAndEqual(agenciesOf75, [
@@ -116,9 +120,10 @@ describe("ListAgencies", () => {
     ]);
   });
 
-  it("returns 20 nearest agencies", async () => {
+  it("returns all agencies that match department code", async () => {
+    const agenciesNumber = 100;
     const agencies = [];
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < agenciesNumber; i++) {
       agencies.push(
         AgencyDtoBuilder.empty()
           .withId(i.toString())
@@ -136,10 +141,10 @@ describe("ListAgencies", () => {
 
     agencyRepository.setAgencies(agencies);
 
-    const agenciesOf75 = await listAgencies.execute({
+    const agenciesOf75 = await listAgenciesByDepartmentCode.execute({
       departmentCode: "75",
     });
-    expect(agenciesOf75).toHaveLength(20);
+    expect(agenciesOf75).toHaveLength(agenciesNumber);
     expect(agenciesOf75[0].id).toBe("0");
   });
 });

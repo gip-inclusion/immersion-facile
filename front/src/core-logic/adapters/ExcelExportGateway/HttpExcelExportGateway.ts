@@ -7,6 +7,7 @@ import { ExcelExportGateway } from "src/core-logic/ports/ExcelExportGateway";
 
 export class HttpExcelExportGateway implements ExcelExportGateway {
   constructor(private readonly httpClient: AxiosInstance) {}
+
   public async exportData(
     adminToken: AdminToken,
     exportDataDto: ExportDataDto,

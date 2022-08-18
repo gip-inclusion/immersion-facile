@@ -9,7 +9,7 @@ import {
   AgencyPublicDisplayDto,
   AgencyStatus,
   CreateAgencyDto,
-  ListAgenciesWithDepartmentCodeRequestDto,
+  ListAgenciesByDepartmentCodeRequestDto,
   UpdateAgencyRequestDto,
   WithAgencyId,
 } from "shared/src/agency/agency.dto";
@@ -60,10 +60,10 @@ export class HttpAgencyGateway implements AgencyGateway {
     return agencyPublicDisplayDto;
   }
 
-  public listAllAgenciesWithPosition(
+  public listAgencies(
     departmentCode: DepartmentCode,
   ): Promise<AgencyIdAndName[]> {
-    const request: ListAgenciesWithDepartmentCodeRequestDto = {
+    const request: ListAgenciesByDepartmentCodeRequestDto = {
       departmentCode,
     };
     return this.getAgencies(request);
@@ -72,7 +72,7 @@ export class HttpAgencyGateway implements AgencyGateway {
   public listPeAgencies(
     departmentCode: DepartmentCode,
   ): Promise<AgencyIdAndName[]> {
-    const request: ListAgenciesWithDepartmentCodeRequestDto = {
+    const request: ListAgenciesByDepartmentCodeRequestDto = {
       departmentCode,
       filter: "peOnly",
     };
@@ -82,13 +82,14 @@ export class HttpAgencyGateway implements AgencyGateway {
   public listNonPeAgencies(
     departmentCode: DepartmentCode,
   ): Promise<AgencyIdAndName[]> {
-    const request: ListAgenciesWithDepartmentCodeRequestDto = {
+    const request: ListAgenciesByDepartmentCodeRequestDto = {
       departmentCode,
       filter: "peExcluded",
     };
     return this.getAgencies(request);
   }
 
+  // TODO Mieux identifier l'admin
   public async listAgenciesNeedingReview(
     adminToken: AdminToken,
   ): Promise<AgencyDto[]> {
@@ -104,6 +105,7 @@ export class HttpAgencyGateway implements AgencyGateway {
     return agenciesDto;
   }
 
+  // TODO Mieux identifier l'admin
   public async validateAgency(
     adminToken: AdminToken,
     agencyId: AgencyId,
@@ -120,7 +122,7 @@ export class HttpAgencyGateway implements AgencyGateway {
   }
 
   private async getAgencies(
-    request: ListAgenciesWithDepartmentCodeRequestDto,
+    request: ListAgenciesByDepartmentCodeRequestDto,
   ): Promise<AgencyIdAndName[]> {
     const response = await this.httpClient.get<unknown>(`/${agenciesRoute}`, {
       params: request,
