@@ -6,7 +6,7 @@ import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { SireneGateway } from "../../sirene/ports/SireneGateway";
-import { AddressAPI } from "../ports/AddressAPI";
+import { AddressGateway } from "../ports/AddressGateway";
 
 export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
   FormEstablishmentDto,
@@ -15,7 +15,7 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly sireneGateway: SireneGateway,
-    private readonly addressAPI: AddressAPI,
+    private readonly addressAPI: AddressGateway,
     private readonly uuidGenerator: UuidGenerator,
     private readonly clock: Clock,
   ) {

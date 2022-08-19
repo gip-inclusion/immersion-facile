@@ -1,8 +1,14 @@
-import { AxiosError, AxiosResponse } from "axios";
+import { AxiosError } from "axios";
 import { secondsToMilliseconds } from "date-fns";
-import { AddressDto } from "shared/src/address/address.dto";
-import { AddressAndPosition } from "shared/src/apiAdresse/AddressAPI";
-import { featureToAddressDto } from "shared/src/apiAdresse/apiAddress.dto";
+import {
+  AddressAndPosition,
+  AddressDto,
+  DepartmentCode,
+} from "shared/src/address/address.dto";
+import {
+  featureToAddressDto,
+  GeoJsonFeature,
+} from "shared/src/apiAdresse/apiAddress.dto";
 import { toFeatureCollection } from "shared/src/apiAdresse/apiAddress.schema";
 import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
 import {
@@ -15,7 +21,7 @@ import {
   RetryableError,
   RetryStrategy,
 } from "../../../domain/core/ports/RetryStrategy";
-import { AddressAPI } from "../../../domain/immersionOffer/ports/AddressAPI";
+import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
 import {
   createAxiosInstance,
   isRetryableError,
@@ -42,31 +48,57 @@ export const apiRoutes = {
   search: `/search`,
   reverse: `/reverse`,
 };
-export const targetUrlsMapper: TargetUrlsMapper<TargetUrl> = {
+type TargetUrls = "apiAddressReverse" | "apiAddressSearchPlainText";
+
+export const targetUrlsReverseMapper: TargetUrlsMapper<TargetUrls> = {
   apiAddressReverse: (param: { lat: string; lon: string }) =>
     `${apiAddressBaseUrl}${apiRoutes.reverse}?lon=${param.lon}&lat=${param.lat}`,
+  apiAddressSearchPlainText: (param: { text: string }) =>
+    `${apiAddressBaseUrl}${apiRoutes.search}?q=${param.text}&type=municipality`,
 };
 
-const onFulfilledResponseInterceptorMaker: () => (
-  response: AxiosResponse,
-) => AxiosResponse = () => (response) => response;
+export const httpAddressApiClient = new ManagedAxios(targetUrlsReverseMapper);
 
-export const httpAddressApiClient = new ManagedAxios(
-  targetUrlsMapper,
-  undefined,
-  undefined,
-  onFulfilledResponseInterceptorMaker,
-  undefined,
-);
-
-type TargetUrl = "apiAddressReverse";
-
-export class HttpAddressAPI implements AddressAPI {
+export class HttpAddressGateway implements AddressGateway {
   public constructor(
-    private readonly httpClient: ManagedAxios<TargetUrl>,
+    private readonly httpClient: ManagedAxios<TargetUrls>,
     private readonly rateLimiter: RateLimiter,
     private readonly retryStrategy: RetryStrategy,
   ) {}
+
+  public async lookupStreetAddress(
+    query: string,
+  ): Promise<AddressAndPosition[]> {
+    const { data } = await this.httpClient.get({
+      target: this.httpClient.targetsUrls.apiAddressSearchPlainText,
+      targetParams: {
+        text: query,
+      },
+    });
+    return toFeatureCollection(data)
+      .features.map(featureToAddressWithPosition)
+      .filter((feature): feature is AddressAndPosition => !!feature);
+  }
+  async findDepartmentCodeFromPostCode(
+    query: string,
+  ): Promise<DepartmentCode | null> {
+    //TODO Remove catch to differentiate between http & domain errors
+    try {
+      const { data } = await this.httpClient.get({
+        target: this.httpClient.targetsUrls.apiAddressSearchPlainText,
+        targetParams: {
+          text: query,
+        },
+      });
+      const features = toFeatureCollection(data).features;
+      return features.length
+        ? featureToAddressDto(features[0]).departmentCode
+        : null;
+    } catch (error) {
+      logger.error("Api Adresse Search Error", error);
+      return null;
+    }
+  }
 
   public async getAddressFromPosition(
     latLongDto: GeoPositionDto,
@@ -101,19 +133,17 @@ export class HttpAddressAPI implements AddressAPI {
     return this.retryStrategy.apply(async () => {
       try {
         const axios = createAxiosInstance(logger);
-        const response = await this.rateLimiter.whenReady(() =>
-          axios.get("https://api-adresse.data.gouv.fr/search/", {
+        const { data } = await this.rateLimiter.whenReady(() =>
+          axios.get<unknown>("https://api-adresse.data.gouv.fr/search/", {
             timeout: secondsToMilliseconds(10),
             params: {
               q: address,
             },
           }),
         );
-
-        if (!response.data.features || response.data.features.length == 0)
-          return;
-        const feature = response.data.features[0];
-        return featureToAddressAndPosition(feature);
+        const features = toFeatureCollection(data).features;
+        if (features.length === 0) return;
+        return featureToAddressWithPosition(features[0]);
       } catch (error: any) {
         if (isRetryableError(logger, error)) throw new RetryableError(error);
         logAxiosError(logger, error);
@@ -145,40 +175,19 @@ export class HttpAddressAPI implements AddressAPI {
   }
 }
 
-type ValidFeature = {
-  properties: {
-    type: string;
-    label: string;
-    name: string;
-    city: string;
-    postcode: string;
-    context: string;
-  };
-  geometry: {
-    type: "Point";
-    coordinates: [number, number];
-  };
-};
-
-const featureToAddressAndPosition = (
-  feature: ValidFeature,
+const featureToAddressWithPosition = (
+  feature: GeoJsonFeature,
 ): AddressAndPosition | undefined => {
-  const position: GeoPositionDto = {
-    lat: feature.geometry.coordinates[1],
-    lon: feature.geometry.coordinates[0],
-  };
-  const address: AddressDto = {
-    streetNumberAndAddress: feature.properties.name,
-    postcode: feature.properties.postcode,
-    city: feature.properties.city,
-    departmentCode: getDepartmentCodeFromFeature(feature),
-  };
-  return { address, position };
-};
-
-const getDepartmentCodeFromFeature = (feature: ValidFeature) => {
-  const context = feature.properties.context;
-  return context.split(", ")[0];
+  const address = featureToAddressDto(feature);
+  return Array.isArray(feature.geometry.coordinates)
+    ? {
+        address,
+        position: {
+          lat: feature.geometry.coordinates[1],
+          lon: feature.geometry.coordinates[0],
+        },
+      }
+    : undefined;
 };
 
 const isAxiosError = <T>(

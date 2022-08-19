@@ -1,13 +1,8 @@
 import { FormEstablishmentDtoBuilder } from "shared/src/formEstablishment/FormEstablishmentDtoBuilder";
-import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
-import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
-import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
-import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
-import { expectPromiseToFailWith } from "../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
+import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryAddressAPI } from "../../../adapters/secondary/immersionOffer/InMemoryAddressAPI";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemorySireneGateway } from "../../../adapters/secondary/InMemorySireneGateway";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
@@ -18,6 +13,11 @@ import {
   SireneEstablishmentVO,
 } from "../../../domain/sirene/valueObjects/SireneEstablishmentVO";
 import { rueGuillaumeTellDto } from "../../../_testBuilders/addressDtos";
+import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
+import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
+import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
+import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { expectPromiseToFailWith } from "../../../_testBuilders/test.helpers";
 
 const prepareSireneRepo = (
   sireneRepo: InMemorySireneGateway,
@@ -38,14 +38,14 @@ const prepareSireneRepo = (
 describe("Update Establishment aggregate from form data", () => {
   let sireneRepo: InMemorySireneGateway;
   let establishmentAggregateRepo: InMemoryEstablishmentAggregateRepository;
-  let addressAPI: InMemoryAddressAPI;
+  let addressAPI: InMemoryAddressGateway;
   let useCase: UpdateEstablishmentAggregateFromForm;
   let uuidGenerator: TestUuidGenerator;
 
   beforeEach(() => {
     sireneRepo = new InMemorySireneGateway();
     establishmentAggregateRepo = new InMemoryEstablishmentAggregateRepository();
-    addressAPI = new InMemoryAddressAPI();
+    addressAPI = new InMemoryAddressGateway();
     uuidGenerator = new TestUuidGenerator();
 
     const uowPerformer = new InMemoryUowPerformer({

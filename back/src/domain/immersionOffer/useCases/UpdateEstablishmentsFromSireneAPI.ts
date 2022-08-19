@@ -6,7 +6,7 @@ import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { SireneGateway } from "../../sirene/ports/SireneGateway";
 import { SireneEstablishmentVO } from "../../sirene/valueObjects/SireneEstablishmentVO";
-import { AddressAPI } from "../ports/AddressAPI";
+import { AddressGateway } from "../ports/AddressGateway";
 
 const SIRENE_NB_DAYS_BEFORE_REFRESH = 7;
 
@@ -16,7 +16,7 @@ export class UpdateEstablishmentsFromSireneAPI extends TransactionalUseCase<void
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly sireneGateway: SireneGateway,
-    private readonly addressAPI: AddressAPI,
+    private readonly addressAPI: AddressGateway,
     private readonly clock: Clock,
   ) {
     super(uowPerformer);

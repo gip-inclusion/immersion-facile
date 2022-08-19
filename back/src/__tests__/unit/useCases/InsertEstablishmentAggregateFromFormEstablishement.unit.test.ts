@@ -2,15 +2,11 @@ import { FormEstablishmentDtoBuilder } from "shared/src/formEstablishment/FormEs
 import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
 import { NafDto } from "shared/src/naf";
 import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
-import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
-import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
-import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
-import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
+import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryAddressAPI } from "../../../adapters/secondary/immersionOffer/InMemoryAddressAPI";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemorySireneGateway } from "../../../adapters/secondary/InMemorySireneGateway";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
@@ -25,6 +21,10 @@ import {
   avenueChampsElyseesDto,
   rueGuillaumeTellDto,
 } from "../../../_testBuilders/addressDtos";
+import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
+import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
+import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
+import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 
 const fakeSiret = "90040893100013";
 const fakePosition: GeoPositionDto = { lat: 49.119146, lon: 6.17602 };
@@ -55,7 +55,7 @@ describe("Insert Establishment aggregate from form data", () => {
   let sireneRepo: InMemorySireneGateway;
   let establishmentAggregateRepo: InMemoryEstablishmentAggregateRepository;
   let outboxRepo: InMemoryOutboxRepository;
-  let addressAPI: InMemoryAddressAPI;
+  let addressAPI: InMemoryAddressGateway;
   let useCase: InsertEstablishmentAggregateFromForm;
   let uuidGenerator: TestUuidGenerator;
 
@@ -64,7 +64,7 @@ describe("Insert Establishment aggregate from form data", () => {
     establishmentAggregateRepo = new InMemoryEstablishmentAggregateRepository();
     outboxRepo = new InMemoryOutboxRepository();
 
-    addressAPI = new InMemoryAddressAPI(
+    addressAPI = new InMemoryAddressGateway(
       fakePosition,
       fakeCityCode,
       fakeAddress,

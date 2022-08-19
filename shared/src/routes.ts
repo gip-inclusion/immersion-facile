@@ -45,3 +45,5 @@ export const signConventionRoute = "sign-application";
 export const siretRoute = "siret";
 export const updateConventionStatusRoute = "update-application-status";
 export const uploadFileRoute = "upload-file";
+export const lookupStreetAddressRoute = `/${addressRoute}/lookupStreetAddress`;
+export const departmentCodeFromPostcodeRoute = `/${addressRoute}/findDepartmentCodeFromPostCode`;

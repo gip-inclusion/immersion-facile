@@ -3,6 +3,11 @@ import { random, sleep } from "shared/src/utils";
 import { UpdateEstablishmentsFromSireneAPI } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentsFromSireneAPI";
 import { createLogger } from "../../../utils/logger";
 import { PipelineStats } from "../../../utils/pipelineStats";
+import {
+  apiAddressRateLimiter,
+  httpAddressApiClient,
+  HttpAddressGateway,
+} from "../../secondary/addressGateway/HttpAddressGateway";
 import { RealClock } from "../../secondary/core/ClockImplementations";
 import {
   defaultMaxBackoffPeriodMs,
@@ -11,11 +16,6 @@ import {
 } from "../../secondary/core/ExponentialBackoffRetryStrategy";
 import { QpsRateLimiter } from "../../secondary/core/QpsRateLimiter";
 import { HttpsSireneGateway } from "../../secondary/HttpsSireneGateway";
-import {
-  apiAddressRateLimiter,
-  HttpAddressAPI,
-  httpAddressApiClient,
-} from "../../secondary/immersionOffer/HttpAddressAPI";
 import { AppConfig } from "../config/appConfig";
 import { createUowPerformer } from "../config/uowConfig";
 
@@ -53,7 +53,7 @@ const main = async () => {
     retryStrategy,
   );
 
-  const addressAPI = new HttpAddressAPI(
+  const addressAPI = new HttpAddressGateway(
     httpAddressApiClient,
     apiAddressRateLimiter(clock),
     retryStrategy,

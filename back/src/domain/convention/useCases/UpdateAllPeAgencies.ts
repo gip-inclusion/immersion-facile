@@ -6,7 +6,7 @@ import { AppLogger } from "../../core/ports/AppLogger";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { AddressAPI } from "../../immersionOffer/ports/AddressAPI";
+import { AddressGateway } from "../../immersionOffer/ports/AddressGateway";
 import {
   PeAgenciesReferential,
   PeAgencyFromReferenciel,
@@ -28,7 +28,7 @@ export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private referencielAgencesPe: PeAgenciesReferential,
-    private adresseAPI: AddressAPI,
+    private adresseAPI: AddressGateway,
     private defaultAdminEmail: string,
     private uuid: UuidGenerator,
     private logger: AppLogger,

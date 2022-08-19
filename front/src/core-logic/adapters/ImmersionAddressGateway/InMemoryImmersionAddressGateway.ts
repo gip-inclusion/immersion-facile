@@ -1,21 +1,24 @@
-import { DepartmentCode } from "shared/src/address/address.dto";
-import { ApiAddressGateway } from "src/core-logic/ports/ApiAddressGateway";
-
+import {
+  AddressAndPosition,
+  DepartmentCode,
+} from "shared/src/address/address.dto";
 import { sleep } from "shared/src/utils";
-import { AddressAndPosition } from "src/../../shared/src/apiAdresse/AddressAPI";
+import { ImmersionAddressGateway } from "src/core-logic/ports/ImmersionAddressGateway";
 
-const SIMULATED_LATENCY_MS = 150;
+export class InMemoryImmersionAddressGateway
+  implements ImmersionAddressGateway
+{
+  constructor(private simulatedLatencyMs: number | undefined = undefined) {}
 
-export class InMemoryApiAddressGateway implements ApiAddressGateway {
   public async lookupStreetAddress(
-    query: string,
+    lookup: string,
   ): Promise<AddressAndPosition[]> {
     //eslint-disable-next-line no-console
-    console.log("InMemoryApiAddresseGateway.lookupStreetAddress", query);
-    await sleep(SIMULATED_LATENCY_MS);
+    console.log("InMemoryApiAddresseGateway.lookupStreetAddress", lookup);
+    if (this.simulatedLatencyMs) await sleep(this.simulatedLatencyMs);
 
-    if (query === "givemeanemptylistplease") return [];
-    if (query === "givemeanerrorplease") throw new Error("418 I'm a teapot");
+    if (lookup === "givemeanemptylistplease") return [];
+    if (lookup === "givemeanerrorplease") throw new Error("418 I'm a teapot");
 
     return [
       {
@@ -62,7 +65,7 @@ export class InMemoryApiAddressGateway implements ApiAddressGateway {
   ): Promise<DepartmentCode | null> {
     //eslint-disable-next-line no-console
     console.log("InMemoryApiAddresseGateway.lookupPostCode", query);
-    await sleep(SIMULATED_LATENCY_MS);
+    if (this.simulatedLatencyMs) await sleep(this.simulatedLatencyMs);
 
     if (query === "00000") return null;
     if (query === "99999") throw new Error("418 I'm a teapot");

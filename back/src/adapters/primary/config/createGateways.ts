@@ -9,21 +9,21 @@ import { Clock } from "../../../domain/core/ports/Clock";
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { createLogger } from "../../../utils/logger";
+import {
+  apiAddressRateLimiter,
+  httpAddressApiClient,
+  HttpAddressGateway,
+} from "../../secondary/addressGateway/HttpAddressGateway";
+import { InMemoryAddressGateway } from "../../secondary/addressGateway/InMemoryAddressGateway";
 import { CachingAccessTokenGateway } from "../../secondary/core/CachingAccessTokenGateway";
 import { HybridEmailGateway } from "../../secondary/emailGateway/HybridEmailGateway";
 import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmailGateway";
 import { SendinblueEmailGateway } from "../../secondary/emailGateway/SendinblueEmailGateway";
 import { HttpsSireneGateway } from "../../secondary/HttpsSireneGateway";
-import {
-  apiAddressRateLimiter,
-  HttpAddressAPI,
-  httpAddressApiClient,
-} from "../../secondary/immersionOffer/HttpAddressAPI";
 import { HttpLaBonneBoiteAPI } from "../../secondary/immersionOffer/HttpLaBonneBoiteAPI";
 import { HttpPassEmploiGateway } from "../../secondary/immersionOffer/HttpPassEmploiGateway";
 import { HttpPoleEmploiGateway } from "../../secondary/immersionOffer/HttpPoleEmploiGateway";
 import { InMemoryAccessTokenGateway } from "../../secondary/immersionOffer/InMemoryAccessTokenGateway";
-import { InMemoryAddressAPI } from "../../secondary/immersionOffer/InMemoryAddressAPI";
 import { InMemoryLaBonneBoiteAPI } from "../../secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
 import { InMemoryPassEmploiGateway } from "../../secondary/immersionOffer/InMemoryPassEmploiGateway";
 import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
@@ -41,9 +41,9 @@ import {
   peConnectApiErrorsToDomainErrors,
 } from "../../secondary/PeConnectGateway/HttpPeConnectGateway.config";
 import { InMemoryPeConnectGateway } from "../../secondary/PeConnectGateway/InMemoryPeConnectGateway";
-import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
 import { ExcelExportGateway } from "../../secondary/reporting/ExcelExportGateway";
 import { InMemoryExportGateway } from "../../secondary/reporting/InMemoryExportGateway";
+import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
 
 const logger = createLogger(__filename);
 
@@ -103,12 +103,12 @@ export const createGateways = async (config: AppConfig, clock: Clock) => {
   return {
     addressApi:
       config.apiAddress === "HTTPS"
-        ? new HttpAddressAPI(
+        ? new HttpAddressGateway(
             httpAddressApiClient,
             apiAddressRateLimiter(clock),
             noRetries,
           )
-        : new InMemoryAddressAPI(),
+        : new InMemoryAddressGateway(),
     documentGateway:
       config.documentGateway === "MINIO"
         ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

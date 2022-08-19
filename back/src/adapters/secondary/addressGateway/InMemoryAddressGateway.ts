@@ -1,16 +1,29 @@
-import { AddressDto } from "shared/src/address/address.dto";
-import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
 import {
-  AddressAPI,
   AddressAndPosition,
-} from "../../../domain/immersionOffer/ports/AddressAPI";
+  AddressDto,
+  DepartmentCode,
+} from "shared/src/address/address.dto";
+import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
+import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
 
-export class InMemoryAddressAPI implements AddressAPI {
+export class InMemoryAddressGateway implements AddressGateway {
   constructor(
     private _position?: GeoPositionDto,
     private _cityCode?: number,
     private _address?: AddressDto,
   ) {}
+
+  public async lookupStreetAddress(
+    _query: string,
+  ): Promise<AddressAndPosition[]> {
+    return this.streetAndAddresses;
+  }
+
+  public async findDepartmentCodeFromPostCode(
+    _query: string,
+  ): Promise<DepartmentCode | null> {
+    return this.departmentCode;
+  }
 
   public async getAddressFromPosition(
     position: GeoPositionDto,
@@ -42,4 +55,14 @@ export class InMemoryAddressAPI implements AddressAPI {
   public setNextCityCode(cityCode: number | undefined) {
     this._cityCode = cityCode;
   }
+
+  public setAddressAndPosition(streetAndAddresses: AddressAndPosition[]) {
+    this.streetAndAddresses = streetAndAddresses;
+  }
+  public setDepartmentCode(departmentCode: DepartmentCode) {
+    this.departmentCode = departmentCode;
+  }
+
+  private streetAndAddresses: AddressAndPosition[] = [];
+  private departmentCode: DepartmentCode = "";
 }

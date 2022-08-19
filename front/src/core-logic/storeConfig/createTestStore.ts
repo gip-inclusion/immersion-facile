@@ -13,15 +13,15 @@ import { TestTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/T
 import { DeviceRepository } from "src/core-logic/ports/DeviceRepository";
 import { createStore, RootState } from "src/core-logic/storeConfig/store";
 import { TestImmersionAssessmentGateway } from "../adapters/AssessmentGateway/TestImmersionAssessmentGateway";
+import { InMemoryImmersionAddressGateway } from "../adapters/ImmersionAddressGateway/InMemoryImmersionAddressGateway";
 import { TestSiretGatewayThroughBack } from "../adapters/SiretGatewayThroughBack/TestSiretGatewayThroughBack";
-import { InMemoryApiAddressGateway } from "../adapters/ApiAddress/InMemoryApiAddressGateway";
 
 export interface TestDependencies {
   adminGateway: TestAdminGateway;
   immersionAssessmentGateway: TestImmersionAssessmentGateway;
   siretGatewayThroughBack: TestSiretGatewayThroughBack;
   agencyGateway: InMemoryAgencyGateway;
-  apiAddressGateway: InMemoryApiAddressGateway;
+  immersionAddressGateway: InMemoryImmersionAddressGateway;
   technicalGateway: TestTechnicalGateway;
   establishmentGateway: InMemoryEstablishmentGateway;
   conventionGateway: InMemoryConventionGateway;
@@ -45,7 +45,7 @@ export const createTestStore = (
     immersionSearchGateway: new InMemoryImmersionSearchGateway(),
     establishmentGateway: new InMemoryEstablishmentGateway(),
     conventionGateway: new InMemoryConventionGateway(),
-    apiAddressGateway: new InMemoryApiAddressGateway(),
+    immersionAddressGateway: new InMemoryImmersionAddressGateway(),
     technicalGateway: new TestTechnicalGateway(),
     agencyGateway: new InMemoryAgencyGateway(),
     romeAutocompleteGateway: new InMemoryRomeAutocompleteGateway(),

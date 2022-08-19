@@ -1,7 +1,8 @@
 import { z } from "zod";
-import { AddressAndPosition } from "../apiAdresse/AddressAPI";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
-import { AddressDto } from "./address.dto";
+import { AddressAndPosition, AddressDto, DepartmentCode } from "./address.dto";
+
+export const departmentCodeSchema: z.Schema<DepartmentCode> = z.string();
 
 export const addressSchema: z.Schema<AddressDto> = z.object({
   streetNumberAndAddress: z.string(),

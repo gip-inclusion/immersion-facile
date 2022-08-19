@@ -8,7 +8,7 @@ import {
   EstablishmentEntityV2,
 } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import { ImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
-import { AddressAPI } from "../domain/immersionOffer/ports/AddressAPI";
+import { AddressGateway } from "../domain/immersionOffer/ports/AddressGateway";
 import { SireneGateway } from "../domain/sirene/ports/SireneGateway";
 import { SireneEstablishmentVO } from "../domain/sirene/valueObjects/SireneEstablishmentVO";
 import { notifyAndThrowErrorDiscord } from "./notifyDiscord";
@@ -32,7 +32,7 @@ export const makeFormEstablishmentToEstablishmentAggregate = ({
 }: {
   uuidGenerator: UuidGenerator;
   clock: Clock;
-  addressAPI: AddressAPI;
+  addressAPI: AddressGateway;
   sireneGateway: SireneGateway;
 }) => {
   const formEstablishmentToEstablishmentAggregate = async (

@@ -1,5 +1,7 @@
 import { SiretDto } from "shared/src/siret";
 import { sleep } from "shared/src/utils";
+import { DepartmentCodeFromPostcode } from "../../../domain/address/useCases/DepartmentCodeFromPostCode";
+import { LookupStreetAddress } from "../../../domain/address/useCases/LookupStreetAddress";
 import {
   GenerateAdminJwt,
   GenerateMagicLinkJwt,
@@ -64,9 +66,9 @@ import { GetSiret } from "../../../domain/sirene/useCases/GetSiret";
 import { GetSiretIfNotAlreadySaved } from "../../../domain/sirene/useCases/GetSiretIfNotAlreadySaved";
 import {
   apiAddressRateLimiter,
-  HttpAddressAPI,
   httpAddressApiClient,
-} from "../../secondary/immersionOffer/HttpAddressAPI";
+  HttpAddressGateway,
+} from "../../secondary/addressGateway/HttpAddressGateway";
 import { AppConfig } from "./appConfig";
 import { Gateways } from "./createGateways";
 import { GenerateConventionMagicLink } from "./createGenerateConventionMagicLink";
@@ -90,7 +92,7 @@ export const createUseCases = (
     quarantinedTopics: config.quarantinedTopics,
   });
   const getSiret = new GetSiret(gateways.sirene);
-  const addressAPI = new HttpAddressAPI(
+  const addressAPI = new HttpAddressGateway(
     httpAddressApiClient,
     apiAddressRateLimiter(clock),
     noRetries,
@@ -100,6 +102,10 @@ export const createUseCases = (
     associatePeConnectFederatedIdentity:
       new AssociatePeConnectFederatedIdentity(uowPerformer, createNewEvent),
     uploadFile: new UploadFile(uowPerformer, gateways.documentGateway),
+
+    // Address
+    lookupStreetAddress: new LookupStreetAddress(addressAPI),
+    departmentCodeFromPostcode: new DepartmentCodeFromPostcode(addressAPI),
 
     // Admin
     adminLogin: new AdminLogin(

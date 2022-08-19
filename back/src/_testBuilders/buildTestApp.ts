@@ -5,15 +5,15 @@ import { AppConfig } from "../adapters/primary/config/appConfig";
 import { Gateways } from "../adapters/primary/config/createGateways";
 import { InMemoryUnitOfWork } from "../adapters/primary/config/uowConfig";
 import { createApp } from "../adapters/primary/server";
+import { InMemoryAddressGateway } from "../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { BasicEventCrawler } from "../adapters/secondary/core/EventCrawlerImplementations";
 import type { InMemoryEmailGateway } from "../adapters/secondary/emailGateway/InMemoryEmailGateway";
-import { InMemoryAddressAPI } from "../adapters/secondary/immersionOffer/InMemoryAddressAPI";
 import { InMemoryLaBonneBoiteAPI } from "../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
 import { InMemoryPassEmploiGateway } from "../adapters/secondary/immersionOffer/InMemoryPassEmploiGateway";
 import { InMemoryDocumentGateway } from "../adapters/secondary/InMemoryDocumentGateway";
-import { InMemoryPeConnectGateway } from "../adapters/secondary/PeConnectGateway/InMemoryPeConnectGateway";
 import { InMemoryPoleEmploiGateway } from "../adapters/secondary/InMemoryPoleEmploiGateway";
 import { InMemorySireneGateway } from "../adapters/secondary/InMemorySireneGateway";
+import { InMemoryPeConnectGateway } from "../adapters/secondary/PeConnectGateway/InMemoryPeConnectGateway";
 import { InMemoryExportGateway } from "../adapters/secondary/reporting/InMemoryExportGateway";
 import {
   GenerateApiConsumerJtw,
@@ -32,7 +32,7 @@ export type InMemoryGateways = {
   poleEmploiGateway: InMemoryPoleEmploiGateway;
   getFeatureFlags: GetFeatureFlags;
   documentGateway: InMemoryDocumentGateway;
-  addressApi: InMemoryAddressAPI;
+  addressApi: InMemoryAddressGateway;
   exportGateway: InMemoryExportGateway;
 };
 

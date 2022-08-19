@@ -1,9 +1,9 @@
 import { AddressDto } from "shared/src/address/address.dto";
 import { AgencyDto } from "shared/src/agency/agency.dto";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
+import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { ConsoleAppLogger } from "../../../adapters/secondary/core/ConsoleAppLogger";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryAddressAPI } from "../../../adapters/secondary/immersionOffer/InMemoryAddressAPI";
 import { InMemoryPeAgenciesReferential } from "../../../adapters/secondary/immersionOffer/InMemoryPeAgenciesReferential";
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
@@ -26,14 +26,14 @@ describe("UpdateAllPeAgencies use case", () => {
   let peAgenciesReferential: InMemoryPeAgenciesReferential;
   let agencyRepository: InMemoryAgencyRepository;
   let uuid: TestUuidGenerator;
-  let addressApi: InMemoryAddressAPI;
+  let addressApi: InMemoryAddressGateway;
 
   beforeEach(() => {
     const uow = createInMemoryUow();
     peAgenciesReferential = new InMemoryPeAgenciesReferential();
     agencyRepository = uow.agencyRepository;
     uuid = new TestUuidGenerator();
-    addressApi = new InMemoryAddressAPI();
+    addressApi = new InMemoryAddressGateway();
     updateAllPeAgencies = new UpdateAllPeAgencies(
       new InMemoryUowPerformer(uow),
       peAgenciesReferential,

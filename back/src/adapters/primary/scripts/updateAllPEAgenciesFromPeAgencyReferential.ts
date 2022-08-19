@@ -3,6 +3,11 @@ import { random, sleep } from "shared/src/utils";
 import { UpdateAllPeAgencies } from "../../../domain/convention/useCases/UpdateAllPeAgencies";
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
+import {
+  apiAddressRateLimiter,
+  httpAddressApiClient,
+  HttpAddressGateway,
+} from "../../secondary/addressGateway/HttpAddressGateway";
 import { RealClock } from "../../secondary/core/ClockImplementations";
 import { ConsoleAppLogger } from "../../secondary/core/ConsoleAppLogger";
 import {
@@ -11,11 +16,6 @@ import {
   ExponentialBackoffRetryStrategy,
 } from "../../secondary/core/ExponentialBackoffRetryStrategy";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
-import {
-  apiAddressRateLimiter,
-  HttpAddressAPI,
-  httpAddressApiClient,
-} from "../../secondary/immersionOffer/HttpAddressAPI";
 import { HttpPeAgenciesReferential } from "../../secondary/immersionOffer/HttpPeAgenciesReferential";
 import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { AppConfig } from "../config/appConfig";
@@ -37,7 +37,7 @@ const updateAllPeAgenciesScript = async () => {
 
   const clock = new RealClock();
 
-  const adressAPI = new HttpAddressAPI(
+  const adressAPI = new HttpAddressGateway(
     httpAddressApiClient,
     apiAddressRateLimiter(clock),
     new ExponentialBackoffRetryStrategy(

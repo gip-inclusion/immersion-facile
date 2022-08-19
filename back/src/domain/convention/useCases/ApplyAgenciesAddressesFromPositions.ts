@@ -6,7 +6,7 @@ import { z } from "zod";
 import { createLogger } from "../../../utils/logger";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { AddressAPI } from "../../immersionOffer/ports/AddressAPI";
+import { AddressGateway } from "../../immersionOffer/ports/AddressGateway";
 
 const logger = createLogger(__filename);
 
@@ -30,7 +30,7 @@ export class ApplyAgenciesAddressesFromPositions extends TransactionalUseCase<vo
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private addressApi: AddressAPI,
+    private addressApi: AddressGateway,
   ) {
     super(uowPerformer);
   }

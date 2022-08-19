@@ -13,6 +13,7 @@ import { AppConfig } from "./config/appConfig";
 import { createAppDependencies } from "./config/createAppDependencies";
 import { Gateways } from "./config/createGateways";
 import { InMemoryUnitOfWork } from "./config/uowConfig";
+import { createAddressRouter } from "./routers/address/createAddressRouter";
 import { createAdminRouter } from "./routers/admin/createAdminRouter";
 import { createAgenciesRouter } from "./routers/createAgenciesRouter";
 import { createApiKeyAuthRouter } from "./routers/createApiKeyAuthRouter";
@@ -72,6 +73,7 @@ export const createApp = async (
   // ----
   app.use(createFormCompletionRouter(deps));
   app.use(createTechnicalRouter(deps));
+  app.use(createAddressRouter(deps));
   app.use(createConventionRouter(deps));
   app.use(createAgenciesRouter(deps));
   app.use(createPeConnectRouter(deps));

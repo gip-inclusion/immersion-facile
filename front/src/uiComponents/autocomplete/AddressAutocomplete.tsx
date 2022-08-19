@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
 import Autocomplete from "@mui/material/Autocomplete";
+import React, { useEffect, useState } from "react";
+import { AutocompleteInput } from "react-design-system/immersionFacile";
+import { AddressAndPosition } from "shared/src/address/address.dto";
+import { addressDtoToString } from "shared/src/utils/address";
 import { useDebounce } from "src/app/utils/useDebounce";
 import { getAddressesFromApi } from "./getAddressesFromApi";
-import { AutocompleteInput } from "react-design-system/immersionFacile";
-import { AddressAndPosition } from "src/../../shared/src/apiAdresse/AddressAPI";
-import { addressDtoToString } from "src/../../shared/src/utils/address";
 
 export type AddressAutocompleteProps = {
   label: string;
@@ -55,14 +55,17 @@ export const AddressAutocomplete = ({
   );
 
   const noOptionText =
-    isSearching || !debounceSearchTerm ? "..." : "Aucune adresse trouvée";
+    isSearching || !debounceSearchTerm ? "..." : "Aucune adresse trouvée.";
 
   return (
     <Autocomplete
+      loading={isSearching}
+      loadingText="Recherche d'adresse en cours... 🔎"
       disablePortal
-      noOptionsText={searchTerm ? noOptionText : "Saisissez une adresse"}
+      noOptionsText={searchTerm ? noOptionText : "Saisissez une adresse."}
       options={options}
       value={selectedOption}
+      getOptionLabel={(option) => addressDtoToString(option.address)}
       onChange={onAutocompleteChange(setSelectedOption, setFormValue)}
       onInputChange={onAutocompleteInput(setSearchTerm)}
       renderInput={AutocompleteInput(
@@ -115,14 +118,14 @@ const useEffectDebounceSearchTerm = (
   setIsSearching: React.Dispatch<React.SetStateAction<boolean>>,
 ): void => {
   if (
-    debounceSearchTerm &&
-    initialSearchTerm !== debounceSearchTerm &&
-    selectedOption?.address &&
-    addressDtoToString(selectedOption.address) !== debounceSearchTerm
-  ) {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    getAddressesFromApi(debounceSearchTerm, setOptions, setIsSearching);
-  }
+    !debounceSearchTerm ||
+    initialSearchTerm === debounceSearchTerm ||
+    (selectedOption &&
+      addressDtoToString(selectedOption.address) === debounceSearchTerm)
+  )
+    return;
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
+  getAddressesFromApi(debounceSearchTerm, setOptions, setIsSearching);
 };
 
 const useEffectInitialSearchTerm = (
@@ -134,12 +137,15 @@ const useEffectInitialSearchTerm = (
     React.SetStateAction<AddressAndPosition | null>
   >,
 ): void => {
-  if (initialSearchTerm && initialSearchTerm !== selectedOption?.label) {
+  if (
+    initialSearchTerm &&
+    selectedOption &&
+    initialSearchTerm !== addressDtoToString(selectedOption.address)
+  )
     getAddressesFromApi(initialSearchTerm, setOptions, setIsSearching)
       .then((addresses) => setSelectedOption(addresses?.[0] ?? null))
       .catch((error: any) => {
         // eslint-disable-next-line no-console
         console.error("getAddressesFromApi", error);
       });
-  }
 };

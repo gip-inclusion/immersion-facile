@@ -3,7 +3,7 @@ import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
 import { unknownAddress } from "shared/src/apiAdresse/apiAddress.dto";
 import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
-import { InMemoryAddressAPI } from "../../../adapters/secondary/immersionOffer/InMemoryAddressAPI";
+import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import {
@@ -55,13 +55,13 @@ const agencyWithErrorPositionAndUnknownAddress = new AgencyDtoBuilder()
 
 describe("Apply agencies address DTOs from positions", () => {
   let agencyRepository: InMemoryAgencyRepository;
-  let httpAddressApi: InMemoryAddressAPI;
+  let httpAddressApi: InMemoryAddressGateway;
   let useCase: ApplyAgenciesAddressesFromPositions;
 
   beforeEach(() => {
     const uow = createInMemoryUow();
     agencyRepository = uow.agencyRepository;
-    httpAddressApi = new InMemoryAddressAPI();
+    httpAddressApi = new InMemoryAddressGateway();
     useCase = new ApplyAgenciesAddressesFromPositions(
       new InMemoryUowPerformer(uow),
       httpAddressApi,

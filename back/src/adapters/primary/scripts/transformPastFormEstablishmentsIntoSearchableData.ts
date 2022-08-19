@@ -7,6 +7,11 @@ import { InsertEstablishmentAggregateFromForm } from "../../../domain/immersionO
 import { createLogger } from "../../../utils/logger";
 import { notifyDiscord } from "../../../utils/notifyDiscord";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
+import {
+  apiAddressRateLimiter,
+  httpAddressApiClient,
+  HttpAddressGateway,
+} from "../../secondary/addressGateway/HttpAddressGateway";
 import { RealClock } from "../../secondary/core/ClockImplementations";
 import {
   defaultMaxBackoffPeriodMs,
@@ -16,11 +21,6 @@ import {
 import { QpsRateLimiter } from "../../secondary/core/QpsRateLimiter";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { HttpsSireneGateway } from "../../secondary/HttpsSireneGateway";
-import {
-  apiAddressRateLimiter,
-  HttpAddressAPI,
-  httpAddressApiClient,
-} from "../../secondary/immersionOffer/HttpAddressAPI";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { AppConfig } from "../config/appConfig";
 import { createPgUow } from "../config/uowConfig";
@@ -50,7 +50,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
     connectionString: destinationPgConnectionString,
   });
   const clientDestination = await poolDestination.connect();
-  const addressAPI = new HttpAddressAPI(
+  const addressAPI = new HttpAddressGateway(
     httpAddressApiClient,
     apiAddressRateLimiter(clock),
     new ExponentialBackoffRetryStrategy(
