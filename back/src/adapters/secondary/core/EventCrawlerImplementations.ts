@@ -34,6 +34,7 @@ export class BasicEventCrawler implements EventCrawler {
         `processNewEvents | ${events.length} events to process`,
       );
     }
+
     await this.publishEvents(events);
   }
 

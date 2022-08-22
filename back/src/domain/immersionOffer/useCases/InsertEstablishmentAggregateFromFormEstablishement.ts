@@ -1,5 +1,6 @@
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { formEstablishmentSchema } from "shared/src/formEstablishment/FormEstablishment.schema";
+import { createLogger } from "../../../utils/logger";
 import { makeFormEstablishmentToEstablishmentAggregate } from "../../../utils/makeFormEstablishmentToEstablishmentAggregate";
 import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
@@ -9,6 +10,12 @@ import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { SireneGateway } from "../../sirene/ports/SireneGateway";
 import { AddressAPI } from "../ports/AddressAPI";
+
+const logger = createLogger(__filename);
+
+// prettier-ignore
+const makeLog = (siret: string) => (message: string) =>
+  logger.info(`${new Date().toISOString()} - InsertEstablishmentAggregateFromForm - ${siret} - ${message}`);
 
 export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
   FormEstablishmentDto,
@@ -31,10 +38,14 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
     formEstablishment: FormEstablishmentDto,
     uow: UnitOfWork,
   ): Promise<void> {
+    const log = makeLog(formEstablishment.siret);
+
+    log("Start");
     // Remove existing aggregate that could have been inserted by another process (eg. La Bonne Boite)
     await uow.establishmentAggregateRepository.removeEstablishmentAndOffersAndContactWithSiret(
       formEstablishment.siret,
     );
+    log("Cleared existing Aggregate");
 
     const establishmentAggregate =
       await makeFormEstablishmentToEstablishmentAggregate({
@@ -44,7 +55,13 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
         clock: this.clock,
       })(formEstablishment);
 
+    log(
+      establishmentAggregate ? "Aggregate Ready" : "Could not create aggregate",
+    );
+
     if (!establishmentAggregate) return;
+
+    log("About to save : " + JSON.stringify(establishmentAggregate, null, 2));
 
     await uow.establishmentAggregateRepository
       .insertEstablishmentAggregates([establishmentAggregate])
@@ -56,10 +73,14 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
         );
       });
 
+    log("Saved");
+
     const event = this.createNewEvent({
       topic: "NewEstablishmentAggregateInsertedFromForm",
       payload: establishmentAggregate,
     });
+    log("About to save event " + event.id);
     await uow.outboxRepository.save(event);
+    log("Event saved");
   }
 }

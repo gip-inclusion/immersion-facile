@@ -66,23 +66,30 @@ export abstract class TransactionalUseCase<
     const useCaseName = this.constructor.name;
     logger.info(`UseCase execution start - ${useCaseName}`);
     const validParams = validateAndParseZodSchema(this.inputSchema, params);
-    const result = await tracer.startActiveSpan(
-      `Transactional Use Case`,
-      traceUseCaseWithContext(
-        () =>
-          this.uowPerformer.perform((uow) =>
-            this._execute(validParams, uow, jwtPayload),
-          ),
-        {
-          useCaseName: this.constructor.name,
-          input: validParams,
-          jwtPayload,
-        },
-      ),
-    );
-
-    logger.info(`UseCase execution Finished - ${useCaseName}`);
-    return result;
+    return tracer
+      .startActiveSpan(
+        `Transactional Use Case`,
+        traceUseCaseWithContext(
+          () =>
+            this.uowPerformer.perform((uow) =>
+              this._execute(validParams, uow, jwtPayload),
+            ),
+          {
+            useCaseName: this.constructor.name,
+            input: validParams,
+            jwtPayload,
+          },
+        ),
+      )
+      .catch((error) => {
+        logger.error(
+          `UseCase execution Errored - ${useCaseName} : ${error.message}`,
+        );
+        throw error;
+      })
+      .finally(() => {
+        logger.info(`UseCase execution Finished - ${useCaseName}`);
+      });
   }
 
   protected abstract _execute(

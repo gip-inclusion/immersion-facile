@@ -99,8 +99,8 @@ export class PgRomeRepository implements RomeRepository {
           }),
         ),
       )
-      .catch((e) => {
-        logger.error(e);
+      .catch((error) => {
+        logger.error({ error, query }, "searchAppellation error");
         return [];
       });
   }
