@@ -98,7 +98,6 @@
     "querystring": "^0.2.1",
     "ramda": "^0.28.0",
     "shared": "workspace:*",
-    "sib-api-v3-typescript": "^2.2.2",
     "slugify": "^1.6.5",
     "ts-node": "^10.7.0",
     "uuid": "^8.3.2",

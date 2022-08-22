@@ -1,3 +1,4 @@
+import axios from "axios";
 import { AppConfig } from "../../adapters/primary/config/appConfig";
 import { makeGenerateEditFormEstablishmentUrl } from "../../adapters/primary/config/makeGenerateEditFormEstablishmentUrl";
 import { RealClock } from "../../adapters/secondary/core/ClockImplementations";
@@ -48,9 +49,10 @@ describe("RequestEditFormEstablishment", () => {
     } as UnitOfWork;
 
     const uowPerformer = new InMemoryUowPerformer(unitOfWork);
-    const emailGateway: SendinblueEmailGateway = SendinblueEmailGateway.create(
-      config.sendinblueApiKey,
+    const emailGateway = new SendinblueEmailGateway(
+      axios,
       (_) => true,
+      config.sendinblueApiKey,
     );
     const generateEditFormEstablishmentUrl =
       makeGenerateEditFormEstablishmentUrl(config);

@@ -1,3 +1,4 @@
+import axios from "axios";
 import { Pool } from "pg";
 import {
   ManagedAxios,
@@ -159,12 +160,13 @@ const createEmailGateway = (config: AppConfig, clock: Clock): EmailGateway => {
   if (config.emailGateway === "IN_MEMORY")
     return new InMemoryEmailGateway(clock);
 
-  const sendInBlueEmailGateway = SendinblueEmailGateway.create(
-    config.sendinblueApiKey,
+  const sendInBlueEmailGateway = new SendinblueEmailGateway(
+    axios,
     makeEmailAllowListPredicate({
       skipEmailAllowList: config.skipEmailAllowlist,
       emailAllowList: config.emailAllowList,
     }),
+    config.sendinblueApiKey,
   );
 
   if (config.emailGateway === "SENDINBLUE") return sendInBlueEmailGateway;

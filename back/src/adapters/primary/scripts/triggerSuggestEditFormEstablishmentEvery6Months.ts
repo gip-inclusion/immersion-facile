@@ -1,3 +1,4 @@
+import axios from "axios";
 import { addMonths } from "date-fns";
 import { Pool } from "pg";
 import { SiretDto } from "shared/src/siret";
@@ -61,12 +62,13 @@ const triggerSuggestEditFormEstablishmentEvery6Months = async () => {
 
   const emailGateway =
     config.emailGateway === "SENDINBLUE"
-      ? SendinblueEmailGateway.create(
-          config.sendinblueApiKey,
+      ? new SendinblueEmailGateway(
+          axios,
           makeEmailAllowListPredicate({
             skipEmailAllowList: config.skipEmailAllowlist,
             emailAllowList: config.emailAllowList,
           }),
+          config.sendinblueApiKey,
         )
       : new InMemoryEmailGateway(clock);
 

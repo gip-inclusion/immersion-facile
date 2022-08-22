@@ -1,3 +1,4 @@
+import axios from "axios";
 import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { AppConfig } from "../../adapters/primary/config/appConfig";
@@ -27,9 +28,10 @@ const counsellorEmail = "jean-francois.macresy@beta.gouv.fr";
 describe("NotifyApplicationRejectedToBeneficiaryAndEnterprise", () => {
   it("Sends rejection email", async () => {
     const config = AppConfig.createFromEnv();
-    const emailGw = SendinblueEmailGateway.create(
-      config.sendinblueApiKey,
+    const emailGw = new SendinblueEmailGateway(
+      axios,
       (_) => true,
+      config.sendinblueApiKey,
     );
     const uow = createInMemoryUow();
     uow.agencyRepository.setAgencies([

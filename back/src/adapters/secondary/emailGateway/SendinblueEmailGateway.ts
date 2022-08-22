@@ -1,3 +1,4 @@
+import type { AxiosInstance } from "axios";
 import promClient from "prom-client";
 import { keys } from "ramda";
 import {
@@ -5,13 +6,6 @@ import {
   EmailType,
   TemplatedEmail,
 } from "shared/src/email/email";
-import {
-  SendSmtpEmail,
-  SendSmtpEmailCc,
-  SendSmtpEmailTo,
-  TransactionalEmailsApi,
-  TransactionalEmailsApiApiKeys,
-} from "sib-api-v3-typescript";
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
@@ -19,21 +13,24 @@ import { BadRequestError } from "../../primary/helpers/httpErrors";
 
 const logger = createLogger(__filename);
 
+type Recipient = {
+  name?: string;
+  email: string;
+};
+
+export type EmailData = {
+  templateId: number;
+  to: Recipient[];
+  cc: Recipient[];
+  params: Record<string, unknown>;
+};
+
 export class SendinblueEmailGateway implements EmailGateway {
-  private constructor(
-    private readonly apiInstance: TransactionalEmailsApi,
-    private readonly emailAllowListPredicate: (recipient: string) => boolean,
+  constructor(
+    private axiosInstance: AxiosInstance,
+    private emailAllowListPredicate: (recipient: string) => boolean,
+    private apiKey: string,
   ) {}
-
-  public static create(
-    apiKey: string,
-    emailAllowListPredicate: (recipient: string) => boolean,
-    apiInstance: TransactionalEmailsApi = new TransactionalEmailsApi(),
-  ): SendinblueEmailGateway {
-    apiInstance.setApiKey(TransactionalEmailsApiApiKeys.apiKey, apiKey);
-
-    return new SendinblueEmailGateway(apiInstance, emailAllowListPredicate);
-  }
 
   public getLastSentEmailDtos(): EmailSentDto[] {
     throw new BadRequestError(
@@ -41,34 +38,31 @@ export class SendinblueEmailGateway implements EmailGateway {
     );
   }
 
-  public async sendEmail(email: TemplatedEmail) {
-    const { recipients, type: emailType } = email;
-    const filteredRecipients = recipients
+  private filterAllowListAndConvertToRecipients(
+    emails: string[] = [],
+  ): Recipient[] {
+    return emails
       .filter(this.emailAllowListPredicate)
-      .map((email): SendSmtpEmailTo => ({ email }));
-    if (filteredRecipients.length === 0) return;
+      .map((email) => ({ email }));
+  }
 
-    const filteredCarbonCopy: string[] = (email.cc ?? []).filter(
-      this.emailAllowListPredicate,
-    );
-
-    const templateId = emailTypeToTemplateId[emailType];
-    const baseEmailConfig: SendSmtpEmail = {
-      templateId,
-      to: filteredRecipients,
+  public async sendEmail(email: TemplatedEmail) {
+    const emailData: EmailData = {
+      templateId: emailTypeToTemplateId[email.type],
+      to: this.filterAllowListAndConvertToRecipients(email.recipients),
+      cc: this.filterAllowListAndConvertToRecipients(email.cc),
       params: convertToSendInBlueParams(email.params),
     };
 
-    const fullEmailConfig = addCarbonCopyFieldIfNeeded(
-      baseEmailConfig,
-      filteredCarbonCopy,
-    );
+    if (emailData.to.length === 0 && emailData.cc?.length === 0) return;
+
+    const emailType = email.type;
 
     try {
       counterSendTransactEmailTotal.inc({ emailType });
-      logger.info({ fullEmailConfig }, "Sending email");
+      logger.info({ emailData }, "Sending email");
 
-      const data = await this.apiInstance.sendTransacEmail(fullEmailConfig);
+      const data = await this.sendTransacEmail(emailData);
 
       counterSendTransactEmailSuccess.inc({ emailType });
       logger.info(data, "Email sending succeeded");
@@ -77,7 +71,7 @@ export class SendinblueEmailGateway implements EmailGateway {
       logger.error(error, "Email sending failed");
       notifyObjectDiscord({
         _message: `Email ${emailType} sending failed`,
-        recipients: recipients.join("; "),
+        recipients: email.recipients.join("; "),
         body: JSON.stringify(error?.body, null, 2),
         response: JSON.stringify(
           {
@@ -91,7 +85,30 @@ export class SendinblueEmailGateway implements EmailGateway {
       throw error;
     }
   }
+
+  public async sendTransacEmail(emailData: EmailData) {
+    const headers = {
+      accept: "application/json",
+      "content-type": "application/json",
+      "api-key": this.apiKey,
+    };
+
+    await this.axiosInstance.post(
+      "https://api.sendinblue.com/v3/smtp/email",
+      emailData,
+      { headers },
+    );
+  }
 }
+
+const convertToSendInBlueParams = (params: TemplatedEmail["params"]) =>
+  keys(params).reduce(
+    (acc, key) => ({
+      ...acc,
+      [sendInBlueKeyByEmailVariables[key]]: params[key],
+    }),
+    {},
+  );
 
 const counterSendTransactEmailTotal = new promClient.Counter({
   name: "sendinblue_send_transac_email_total",
@@ -182,32 +199,9 @@ const emailTypeToTemplateId: Record<EmailType, number> = {
   AGENCY_WAS_ACTIVATED: 48,
 };
 
-const addCarbonCopyFieldIfNeeded = (
-  baseEmailConfig: SendSmtpEmail,
-  carbonCopy: string[],
-): SendSmtpEmail => {
-  if (carbonCopy.length === 0) return baseEmailConfig;
-
-  return {
-    ...baseEmailConfig,
-    cc: carbonCopy.map((email): SendSmtpEmailCc => ({ email })),
-  };
-};
-
-const convertToSendInBlueParams = (params: TemplatedEmail["params"]) =>
-  keys(params).reduce(
-    (acc, key) => ({
-      ...acc,
-      [sendInBlueKeyByEmailVariables[key]]: params[key],
-    }),
-    {},
-  );
-
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 // https://stackoverflow.com/questions/49401866/all-possible-keys-of-an-union-type
-
 type EmailVariables = KeysOfUnion<TemplatedEmail["params"]>;
-
 // keys are from our domain, values are SendInBlue keys in the templates :
 const sendInBlueKeyByEmailVariables: Record<EmailVariables, string> = {
   additionalDetails: "ADDITIONAL_DETAILS",

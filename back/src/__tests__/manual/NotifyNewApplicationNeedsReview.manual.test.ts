@@ -1,3 +1,4 @@
+import axios from "axios";
 import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
 import { ConventionDto } from "shared/src/convention/convention.dto";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
@@ -30,9 +31,10 @@ describe("Notify To 2 Counsellors that an application is available", () => {
 
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
-    emailGw = SendinblueEmailGateway.create(
-      config.sendinblueApiKey,
+    emailGw = new SendinblueEmailGateway(
+      axios,
       (_) => true,
+      config.sendinblueApiKey,
     );
     generateMagicLinkFn = createGenerateConventionMagicLink(config);
   });

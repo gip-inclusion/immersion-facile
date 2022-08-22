@@ -1,4 +1,4 @@
-import { AxiosInstance } from "axios";
+import type { AxiosInstance } from "axios";
 import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 import { AccessTokenGateway } from "../../../domain/core/ports/AccessTokenGateway";
 import {

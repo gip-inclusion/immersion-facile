@@ -1,3 +1,4 @@
+import axios from "axios";
 import { Pool } from "pg";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { SendEmailsWithAssessmentCreationLink } from "../../../domain/immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
@@ -20,12 +21,13 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
 
   const emailGateway =
     config.emailGateway === "SENDINBLUE"
-      ? SendinblueEmailGateway.create(
-          config.sendinblueApiKey,
+      ? new SendinblueEmailGateway(
+          axios,
           makeEmailAllowListPredicate({
             skipEmailAllowList: config.skipEmailAllowlist,
             emailAllowList: config.emailAllowList,
           }),
+          config.sendinblueApiKey,
         )
       : new InMemoryEmailGateway(clock);
 

@@ -1,36 +1,29 @@
-import { IncomingMessage } from "http";
-import type {
-  CreateSmtpEmail,
-  SendSmtpEmail,
-  TransactionalEmailsApi,
-} from "sib-api-v3-typescript";
+import type { AxiosInstance } from "axios";
 import { makeEmailAllowListPredicate } from "../../adapters/primary/config/appConfig";
 
-import { SendinblueEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueEmailGateway";
+import {
+  EmailData,
+  SendinblueEmailGateway,
+} from "../../adapters/secondary/emailGateway/SendinblueEmailGateway";
 
 describe("SendingBlueEmailGateway", () => {
-  type SendTransacEmailResponse = {
-    response: IncomingMessage;
-    body: CreateSmtpEmail;
-  };
-
-  let mockedApi: TransactionalEmailsApi;
+  let fakeAxiosInstance: AxiosInstance;
   let allowListPredicate;
   let sibGateway: SendinblueEmailGateway;
-  let sentEmails: SendSmtpEmail[];
+  let sentEmails: EmailData[];
 
   beforeEach(() => {
     sentEmails = [];
 
-    mockedApi = {
-      // eslint-disable-next-line @typescript-eslint/require-await
-      sendTransacEmail: async (receivedEmailData: SendSmtpEmail) => {
-        sentEmails.push(receivedEmailData);
-        return {} as unknown as SendTransacEmailResponse;
+    fakeAxiosInstance = {
+      post(
+        _url: string,
+        emailData: EmailData,
+        _config?: { headers: Record<string, string> },
+      ) {
+        sentEmails.push(emailData);
       },
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      setApiKey: (): void => {},
-    } as unknown as TransactionalEmailsApi;
+    } as unknown as AxiosInstance;
 
     allowListPredicate = makeEmailAllowListPredicate({
       emailAllowList: [
@@ -42,14 +35,13 @@ describe("SendingBlueEmailGateway", () => {
       skipEmailAllowList: false,
     });
 
-    sibGateway = SendinblueEmailGateway.create(
-      "plop",
+    sibGateway = new SendinblueEmailGateway(
+      fakeAxiosInstance,
       allowListPredicate,
-      mockedApi,
+      "fake-api-key",
     );
   });
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   it("should filter emails according to predicate", async () => {
     await sibGateway.sendEmail({
       type: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
