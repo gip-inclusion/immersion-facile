@@ -21,7 +21,7 @@ type Recipient = {
 export type EmailData = {
   templateId: number;
   to: Recipient[];
-  cc: Recipient[];
+  cc?: Recipient[];
   params: Record<string, unknown>;
 };
 
@@ -47,10 +47,12 @@ export class SendinblueEmailGateway implements EmailGateway {
   }
 
   public async sendEmail(email: TemplatedEmail) {
+    const cc = this.filterAllowListAndConvertToRecipients(email.cc);
+
     const emailData: EmailData = {
       templateId: emailTypeToTemplateId[email.type],
       to: this.filterAllowListAndConvertToRecipients(email.recipients),
-      cc: this.filterAllowListAndConvertToRecipients(email.cc),
+      ...(cc.length ? { cc } : {}),
       params: convertToSendInBlueParams(email.params),
     };
 
@@ -68,15 +70,19 @@ export class SendinblueEmailGateway implements EmailGateway {
       logger.info(data, "Email sending succeeded");
     } catch (error: any) {
       counterSendTransactEmailError.inc({ emailType });
-      logger.error(error, "Email sending failed");
+      logger.error(
+        { errorMessage: error.message, errorBody: error?.response?.data },
+        "Email sending failed",
+      );
       notifyObjectDiscord({
         _message: `Email ${emailType} sending failed`,
         recipients: email.recipients.join("; "),
-        body: JSON.stringify(error?.body, null, 2),
+        body: JSON.stringify(error?.response?.data ?? error?.message, null, 2),
         response: JSON.stringify(
           {
             statusCode: error?.response?.statusCode,
-            body: error?.response?.body,
+            errorMessage: error?.message,
+            body: error?.response?.data,
           },
           null,
           2,

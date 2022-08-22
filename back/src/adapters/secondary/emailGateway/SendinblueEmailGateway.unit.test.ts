@@ -1,12 +1,9 @@
 import type { AxiosInstance } from "axios";
-import { makeEmailAllowListPredicate } from "../../adapters/primary/config/appConfig";
+import { makeEmailAllowListPredicate } from "../../primary/config/appConfig";
 
-import {
-  EmailData,
-  SendinblueEmailGateway,
-} from "../../adapters/secondary/emailGateway/SendinblueEmailGateway";
+import { EmailData, SendinblueEmailGateway } from "./SendinblueEmailGateway";
 
-describe("SendingBlueEmailGateway", () => {
+describe("SendingBlueEmailGateway unit", () => {
   let fakeAxiosInstance: AxiosInstance;
   let allowListPredicate;
   let sibGateway: SendinblueEmailGateway;

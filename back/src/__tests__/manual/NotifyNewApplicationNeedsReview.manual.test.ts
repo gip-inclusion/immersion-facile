@@ -20,6 +20,7 @@ import { NotifyNewApplicationNeedsReview } from "../../domain/convention/useCase
 // - SENDINBLUE_API_KEY
 
 const validConvention: ConventionDto = new ConventionDtoBuilder()
+  .withStatus("IN_REVIEW")
   .withEmail("jean-francois.macresy@beta.gouv.fr")
   .withMentorEmail("jean-francois.macresy+mentor@beta.gouv.fr")
   .build();
@@ -42,8 +43,8 @@ describe("Notify To 2 Counsellors that an application is available", () => {
   //eslint-disable-next-line jest/expect-expect
   it("Sends notification mails to check Immersion Application eligibility", async () => {
     const counsellorEmails = [
-      "jeanfrancois.macresy@gmail.com",
-      "jeanfrancois.macresy+beneficiary@gmail.com",
+      "recette+test-counsellor1@immersion-facile.beta.gouv.fr",
+      "recette+test-counsellor2@immersion-facile.beta.gouv.fr",
     ];
 
     agency = AgencyDtoBuilder.create(validConvention.agencyId)
@@ -66,8 +67,8 @@ describe("Notify To 2 Counsellors that an application is available", () => {
   //eslint-disable-next-line jest/expect-expect
   it("Sends notification mails to check Immersion Application eligibility with a real working immersion", async () => {
     const counsellorEmails = [
-      "jeanfrancois.macresy@gmail.com",
-      "jean-francois.macresy@beta.gouv.fr",
+      "recette+test-counsellor1@immersion-facile.beta.gouv.fr",
+      "recette+test-counsellor2@immersion-facile.beta.gouv.fr",
     ];
 
     agency = AgencyDtoBuilder.create(validConvention.agencyId)
@@ -90,8 +91,8 @@ describe("Notify To 2 Counsellors that an application is available", () => {
   //eslint-disable-next-line jest/no-conditional-expect, jest/expect-expect
   it("Sends notification mails to check Immersion Application validation  with a real working immersion", async () => {
     const validationEmails = [
-      "jeanfrancois.macresy@gmail.com",
-      "jean-francois.macresy@beta.gouv.fr",
+      "recette+test-validatior1@immersion-facile.beta.gouv.fr",
+      "recette+test-validatior2@immersion-facile.beta.gouv.fr",
     ];
 
     agency = AgencyDtoBuilder.create(validConvention.agencyId)

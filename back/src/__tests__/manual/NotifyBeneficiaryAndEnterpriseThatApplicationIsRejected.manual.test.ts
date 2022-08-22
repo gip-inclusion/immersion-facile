@@ -19,8 +19,8 @@ const rejectionJustification = "Risque d'emploi de main d'oeuvre gratuite";
 const rejectedConvention = new ConventionDtoBuilder()
   .withStatus("REJECTED")
   .withRejectionJustification(rejectionJustification)
-  .withMentorEmail("jeanfrancois.macresy@gmail.com")
-  .withEmail("jeanfrancois.macresy+beneficiary@gmail.com")
+  .withMentorEmail("recette+test-mentor@immersion-facile.beta.gouv.fr")
+  .withEmail("recette+test-beneficiary@immersion-facile.beta.gouv.fr")
   .build();
 
 const counsellorEmail = "jean-francois.macresy@beta.gouv.fr";
