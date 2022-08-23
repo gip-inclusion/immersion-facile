@@ -11,12 +11,10 @@ import {
 import { toFeatureCollection } from "shared/src/apiAdresse/apiAddress.schema";
 import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
 import {
-  HttpServerError,
   ManagedAxios,
   TargetUrlsMapper,
 } from "shared/src/serenity-http-client";
 import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
-import { logAxiosError } from "../../../utils/axiosUtils";
 import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);
@@ -51,7 +49,17 @@ export const httpAddressApiClient = new ManagedAxios(
 );
 
 export class HttpAddressGateway implements AddressGateway {
-  public constructor(private readonly httpClient: ManagedAxios<TargetUrls>) {}
+  private limiter: Bottleneck;
+  public constructor(
+    private readonly httpClient: ManagedAxios<TargetUrls>,
+    maxQueryPerSeconds: number = apiAddressMaxQueryPerSeconds,
+  ) {
+    this.limiter = new Bottleneck({
+      reservoir: maxQueryPerSeconds,
+      reservoirIncreaseInterval: 1000,
+      reservoirIncreaseAmount: maxQueryPerSeconds,
+    });
+  }
 
   public async lookupStreetAddress(
     query: string,
@@ -70,9 +78,7 @@ export class HttpAddressGateway implements AddressGateway {
         .features.map(featureToAddressWithPosition)
         .filter((feature): feature is AddressAndPosition => !!feature);
     } catch (error) {
-      if (error instanceof HttpServerError && error.httpStatusCode === 503)
-        return this.lookupStreetAddress(query);
-      logger.error("Api Adresse lookupStreetAddress", error);
+      logger.error({ error }, "HttpAddressGateway lookupStreetAddress");
       throw error;
     }
   }
@@ -81,7 +87,7 @@ export class HttpAddressGateway implements AddressGateway {
     query: string,
   ): Promise<DepartmentCode | null> {
     try {
-      const { data } = await this.limiter.schedule(() =>
+      const { data } = await this.limiter.schedule({}, () =>
         this.httpClient.get({
           target:
             this.httpClient.targetsUrls.apiAddressSearchMunicipalityPlainText,
@@ -95,9 +101,10 @@ export class HttpAddressGateway implements AddressGateway {
         ? featureToAddressDto(features[0]).departmentCode
         : null;
     } catch (error) {
-      if (error instanceof HttpServerError && error.httpStatusCode === 503)
-        return this.findDepartmentCodeFromPostCode(query);
-      logger.error("Api Adresse Search Error", error);
+      logger.error(
+        { error },
+        "HttpAddressGateway findDepartmentCodeFromPostCode",
+      );
       return null;
     }
   }
@@ -116,9 +123,7 @@ export class HttpAddressGateway implements AddressGateway {
       const features = toFeatureCollection(data).features;
       return features.length > 0 ? featureToAddressDto(features[0]) : undefined;
     } catch (error: any) {
-      if (error instanceof HttpServerError && error.httpStatusCode === 503)
-        return this.getAddressFromPosition(latLongDto);
-      logger.error({ error, latLongDto }, "getAddressFromPosition");
+      logger.error({ error }, "HttpAddressGateway getAddressFromPosition");
       throw error;
     }
   }
@@ -140,18 +145,13 @@ export class HttpAddressGateway implements AddressGateway {
       if (features.length === 0) return;
       return featureToAddressWithPosition(features[0]);
     } catch (error: any) {
-      if (error instanceof HttpServerError && error.httpStatusCode === 503)
-        return this.getAddressAndPositionFromString(address);
-      logAxiosError(logger, error);
+      logger.error(
+        { error },
+        "HttpAddressGateway getAddressAndPositionFromString",
+      );
       return;
     }
   }
-
-  private limiter = new Bottleneck({
-    reservoir: apiAddressMaxQueryPerSeconds,
-    reservoirIncreaseInterval: 1000,
-    reservoirIncreaseAmount: apiAddressMaxQueryPerSeconds,
-  });
 }
 
 const featureToAddressWithPosition = (

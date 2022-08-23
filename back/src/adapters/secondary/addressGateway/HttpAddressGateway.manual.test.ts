@@ -42,15 +42,15 @@ const resultFromApiAddress = {
 };
 
 describe("HttpAddressGateway", () => {
-  let adapter: HttpAddressGateway;
+  let httpAddressGateway: HttpAddressGateway;
 
   beforeEach(() => {
-    adapter = new HttpAddressGateway(httpAddressApiClient);
+    httpAddressGateway = new HttpAddressGateway(httpAddressApiClient, 2);
   });
 
   describe("getAddressFromPosition", () => {
     it("Should return expected address DTO when providing accurate position.", async () => {
-      const result = await adapter.getAddressFromPosition({
+      const result = await httpAddressGateway.getAddressFromPosition({
         lat: resultFromApiAddress.features[0].geometry.coordinates[1],
         lon: resultFromApiAddress.features[0].geometry.coordinates[0],
       });
@@ -64,7 +64,7 @@ describe("HttpAddressGateway", () => {
     }, 5000);
 
     it("should return expected address DTO when providing a position that don't have geoJson street and house number", async () => {
-      const result = await adapter.getAddressFromPosition({
+      const result = await httpAddressGateway.getAddressFromPosition({
         lat: 43.791521,
         lon: 7.500604,
       });
@@ -77,7 +77,7 @@ describe("HttpAddressGateway", () => {
       });
     }, 5000);
 
-    const parallelCalls = 200;
+    const parallelCalls = 10;
     it(`Should support ${parallelCalls} of parallel calls`, async () => {
       const coordinates: GeoPositionDto[] = [];
       const expectedResults: AddressDto[] = [];
@@ -96,7 +96,7 @@ describe("HttpAddressGateway", () => {
       }
       const results: (AddressDto | undefined)[] = await Promise.all(
         coordinates.map((coordinate) =>
-          adapter.getAddressFromPosition(coordinate),
+          httpAddressGateway.getAddressFromPosition(coordinate),
         ),
       );
 
@@ -106,24 +106,32 @@ describe("HttpAddressGateway", () => {
 
   describe("lookupStreetAddress", () => {
     it("should return empty list of addresses & positions from bad lookup string", async () => {
-      const result = await adapter.lookupStreetAddress("unsupported");
+      const result = await httpAddressGateway.lookupStreetAddress(
+        "unsupported",
+      );
       expectTypeToMatchAndEqual(result, []);
     }, 5000);
 
     it("should return list of addresses & positions from lookup string with expected results", async () => {
-      const result = await adapter.lookupStreetAddress(query8bdduportLookup);
+      const result = await httpAddressGateway.lookupStreetAddress(
+        query8bdduportLookup,
+      );
       expectTypeToMatchAndEqual(result, expected8bdduportAddressAndPositions);
     }, 5000);
   });
 
   describe("findDepartmentCodeFromPostCode", () => {
     it("findDepartmentCodeFromPostCode : should return department code from existing postcode", async () => {
-      const result = await adapter.findDepartmentCodeFromPostCode("06500");
+      const result = await httpAddressGateway.findDepartmentCodeFromPostCode(
+        "06500",
+      );
       expectTypeToMatchAndEqual(result, "06");
     }, 5000);
 
     it("findDepartmentCodeFromPostCode : should return null from unxisting postcode", async () => {
-      const result = await adapter.findDepartmentCodeFromPostCode("99555");
+      const result = await httpAddressGateway.findDepartmentCodeFromPostCode(
+        "99555",
+      );
       expectTypeToMatchAndEqual(result, null);
     }, 5000);
   });
