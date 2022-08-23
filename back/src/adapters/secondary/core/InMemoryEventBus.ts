@@ -195,11 +195,7 @@ const getSubscriptionIdsToPublish = (
 };
 
 const monitorAbsenceOfCallback = (event: DomainEvent) => {
-  logger.info({ eventTopic: event.topic }, "No Callbacks exist for topic.");
-  counterPublishedEventsError.inc({
-    topic: event.topic,
-    errorType: "no_callback_found",
-  });
+  logger.warn({ eventTopic: event.topic }, "No Callbacks exist for topic.");
 };
 
 const monitorErrorInCallback = (error: any, event: DomainEvent) => {
