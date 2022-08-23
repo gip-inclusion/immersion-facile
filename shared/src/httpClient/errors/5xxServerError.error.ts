@@ -6,7 +6,7 @@ export class HttpServerError extends Error {
     public readonly httpStatusCode: number,
   ) {
     super();
-    Error.captureStackTrace(this, this.constructor);
+    // Error.captureStackTrace(this, this.constructor);
     this.name = this.constructor.name;
     this.message = message;
   }

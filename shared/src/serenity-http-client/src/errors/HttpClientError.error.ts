@@ -6,7 +6,7 @@ export class HttpClientError extends Error {
     public readonly httpStatusCode: number,
   ) {
     super();
-    Error.captureStackTrace(this, this.constructor);
+    // Error.captureStackTrace(this, this.constructor);
     this.name = "HttpClientError";
     this.message = message;
   }
@@ -18,7 +18,7 @@ export class HttpClientForbiddenError extends HttpClientError {
     public override readonly cause: Error, //TODO Restrict to valid HttpStatusCodeError
   ) {
     super(message, cause, 401);
-    Error.captureStackTrace(this, this.constructor);
+    // Error.captureStackTrace(this, this.constructor);
     this.name = "HttpClientForbiddenError";
     this.message = message;
   }

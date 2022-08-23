@@ -29,7 +29,7 @@ export abstract class InfrastructureError extends Error {
     public readonly code: TCPWrapperErrorCodes | AxiosInfrastructureErrorCodes,
   ) {
     super();
-    Error.captureStackTrace(this, this.constructor);
+    // Error.captureStackTrace(this, this.constructor);
     this.name = "InfrastructureError";
     this.message = message;
   }

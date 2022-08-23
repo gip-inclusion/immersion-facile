@@ -4,7 +4,7 @@ export class ConnectionRefusedError extends Error {
     public override readonly cause?: Error,
   ) {
     super();
-    Error.captureStackTrace(this, this.constructor);
+    // Error.captureStackTrace(this, this.constructor);
     this.name = this.constructor.name;
     this.message = message;
   }

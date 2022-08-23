@@ -4,7 +4,7 @@ export class ConfigurationError extends Error {
     public override readonly cause?: Error,
   ) {
     super();
-    Error.captureStackTrace(this, this.constructor);
+    // Error.captureStackTrace(this, this.constructor);
     this.name = "ConfigurationError";
     this.message = message;
   }

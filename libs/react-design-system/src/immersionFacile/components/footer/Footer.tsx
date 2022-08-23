@@ -42,7 +42,7 @@ export const Footer = ({
       <div className="fr-footer__body">
         {ministereLogo}
         {partnersLogos &&
-          partnersLogos.map((logo) => <LogoPartner>{logo}</LogoPartner>)}
+          partnersLogos.map((logo, i) => <LogoPartner key={i}>{logo}</LogoPartner>)}
 
         <div className="fr-footer__content">
           {links && links.length > 0 && (

@@ -4,7 +4,7 @@ export class UnhandledError extends Error {
     public override readonly cause: Error,
   ) {
     super();
-    Error.captureStackTrace(this, this.constructor);
+    // Error.captureStackTrace(this, this.constructor);
     this.name = "UnhandledError";
     this.message = message;
   }
