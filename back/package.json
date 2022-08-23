@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "NODE_ENV=local ts-node-dev src/adapters/primary/scripts/startServer.ts",
     "start": "NODE_ENV=local node -r ts-node/register --max-old-space-size=1536 src/adapters/primary/scripts/startServer.ts",
-    "start-prod": "NODE_ENV=production node -r ts-node/register --max-old-space-size=1536 ts-node src/adapters/primary/scripts/startServer.ts",
+    "start-prod": "NODE_ENV=production node -r ts-node/register --max-old-space-size=1536 src/adapters/primary/scripts/startServer.ts",
     "start-update-establishments-from-sirene": "ts-node src/adapters/primary/scripts/startUpdateEstablishmentsFromSirene.ts",
     "update-agencies-from-PE-referential": "ts-node src/adapters/primary/scripts/updateAllPEAgenciesFromPeAgencyReferential.ts",
     "free-quarantined-form-establishments-with-correct-siret": "ts-node src/adapters/primary/scripts/freeQuarantinedFormEstablishmentsWithCorrectSiret.ts",
