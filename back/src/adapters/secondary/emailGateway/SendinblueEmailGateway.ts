@@ -47,20 +47,23 @@ export class SendinblueEmailGateway implements EmailGateway {
   }
 
   public async sendEmail(email: TemplatedEmail) {
-    const cc = this.filterAllowListAndConvertToRecipients(email.cc);
-
-    const emailData: EmailData = {
-      templateId: emailTypeToTemplateId[email.type],
-      to: this.filterAllowListAndConvertToRecipients(email.recipients),
-      ...(cc.length ? { cc } : {}),
-      params: convertToSendInBlueParams(email.params),
-    };
-
-    if (emailData.to.length === 0 && emailData.cc?.length === 0) return;
-
     const emailType = email.type;
-
     try {
+      if (email.recipients.length === 0) {
+        logger.error({ email }, "No recipient for provided email");
+        throw new BadRequestError("No recipient for provided email");
+      }
+      const cc = this.filterAllowListAndConvertToRecipients(email.cc);
+
+      const emailData: EmailData = {
+        templateId: emailTypeToTemplateId[email.type],
+        to: this.filterAllowListAndConvertToRecipients(email.recipients),
+        ...(cc.length ? { cc } : {}),
+        params: convertToSendInBlueParams(email.params),
+      };
+
+      if (emailData.to.length === 0) return;
+
       counterSendTransactEmailTotal.inc({ emailType });
       logger.info({ emailData }, "Sending email");
 

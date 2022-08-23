@@ -1,5 +1,7 @@
 import type { AxiosInstance } from "axios";
+import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import { makeEmailAllowListPredicate } from "../../primary/config/appConfig";
+import { BadRequestError } from "../../primary/helpers/httpErrors";
 
 import { EmailData, SendinblueEmailGateway } from "./SendinblueEmailGateway";
 
@@ -37,6 +39,34 @@ describe("SendingBlueEmailGateway unit", () => {
       allowListPredicate,
       "fake-api-key",
     );
+  });
+
+  it("should throw if no recipient is provided", async () => {
+    const triggerSendEmail = () =>
+      sibGateway.sendEmail({
+        type: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+        recipients: [],
+        params: {
+          scheduleText: "",
+        } as any,
+      });
+
+    await expectPromiseToFailWithError(
+      triggerSendEmail(),
+      new BadRequestError("No recipient for provided email"),
+    );
+  });
+
+  it("should not send email if recipient are not in white list", async () => {
+    await sibGateway.sendEmail({
+      type: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+      recipients: ["i-am-not-allowed@mail.net"],
+      params: {
+        scheduleText: "",
+      } as any,
+    });
+
+    expect(sentEmails).toHaveLength(0);
   });
 
   it("should filter emails according to predicate", async () => {
