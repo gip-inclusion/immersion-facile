@@ -10,7 +10,6 @@ import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { createLogger } from "../../../utils/logger";
 import {
-  apiAddressRateLimiter,
   httpAddressApiClient,
   HttpAddressGateway,
 } from "../../secondary/addressGateway/HttpAddressGateway";
@@ -103,11 +102,7 @@ export const createGateways = async (config: AppConfig, clock: Clock) => {
   return {
     addressApi:
       config.apiAddress === "HTTPS"
-        ? new HttpAddressGateway(
-            httpAddressApiClient,
-            apiAddressRateLimiter(clock),
-            noRetries,
-          )
+        ? new HttpAddressGateway(httpAddressApiClient)
         : new InMemoryAddressGateway(),
     documentGateway:
       config.documentGateway === "MINIO"

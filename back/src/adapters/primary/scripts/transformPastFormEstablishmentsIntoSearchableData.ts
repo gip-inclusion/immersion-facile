@@ -8,7 +8,6 @@ import { createLogger } from "../../../utils/logger";
 import { notifyDiscord } from "../../../utils/notifyDiscord";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import {
-  apiAddressRateLimiter,
   httpAddressApiClient,
   HttpAddressGateway,
 } from "../../secondary/addressGateway/HttpAddressGateway";
@@ -50,17 +49,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
     connectionString: destinationPgConnectionString,
   });
   const clientDestination = await poolDestination.connect();
-  const addressAPI = new HttpAddressGateway(
-    httpAddressApiClient,
-    apiAddressRateLimiter(clock),
-    new ExponentialBackoffRetryStrategy(
-      defaultMaxBackoffPeriodMs,
-      defaultRetryDeadlineMs,
-      clock,
-      sleep,
-      random,
-    ),
-  );
+  const addressAPI = new HttpAddressGateway(httpAddressApiClient);
   const sireneGateway = new HttpsSireneGateway(
     config.sireneHttpsConfig,
     clock,

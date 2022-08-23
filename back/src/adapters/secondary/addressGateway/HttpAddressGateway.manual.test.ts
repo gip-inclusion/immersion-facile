@@ -1,13 +1,7 @@
 import { AddressDto } from "shared/src/address/address.dto";
 import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
-import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
-import { RealClock } from "../core/ClockImplementations";
-import {
-  apiAddressRateLimiter,
-  httpAddressApiClient,
-  HttpAddressGateway,
-} from "./HttpAddressGateway";
+import { httpAddressApiClient, HttpAddressGateway } from "./HttpAddressGateway";
 import {
   expected8bdduportAddressAndPositions,
   query8bdduportLookup,
@@ -51,11 +45,7 @@ describe("HttpAddressGateway", () => {
   let adapter: HttpAddressGateway;
 
   beforeEach(() => {
-    adapter = new HttpAddressGateway(
-      httpAddressApiClient,
-      apiAddressRateLimiter(new RealClock()),
-      noRetries,
-    );
+    adapter = new HttpAddressGateway(httpAddressApiClient);
   });
 
   describe("getAddressFromPosition", () => {
@@ -86,7 +76,8 @@ describe("HttpAddressGateway", () => {
         postcode: "06500",
       });
     }, 5000);
-    const parallelCalls = 10;
+
+    const parallelCalls = 200;
     it(`Should support ${parallelCalls} of parallel calls`, async () => {
       const coordinates: GeoPositionDto[] = [];
       const expectedResults: AddressDto[] = [];
@@ -103,13 +94,16 @@ describe("HttpAddressGateway", () => {
           postcode: "67120",
         });
       }
-      const results: (AddressDto | undefined)[] = [];
-      for (const coordinate of coordinates)
-        results.push(await adapter.getAddressFromPosition(coordinate));
+      const results: (AddressDto | undefined)[] = await Promise.all(
+        coordinates.map((coordinate) =>
+          adapter.getAddressFromPosition(coordinate),
+        ),
+      );
 
       expectTypeToMatchAndEqual(results, expectedResults);
-    }, 5000);
+    }, 15000);
   });
+
   describe("lookupStreetAddress", () => {
     it("should return empty list of addresses & positions from bad lookup string", async () => {
       const result = await adapter.lookupStreetAddress("unsupported");
@@ -127,6 +121,7 @@ describe("HttpAddressGateway", () => {
       const result = await adapter.findDepartmentCodeFromPostCode("06500");
       expectTypeToMatchAndEqual(result, "06");
     }, 5000);
+
     it("findDepartmentCodeFromPostCode : should return null from unxisting postcode", async () => {
       const result = await adapter.findDepartmentCodeFromPostCode("99555");
       expectTypeToMatchAndEqual(result, null);

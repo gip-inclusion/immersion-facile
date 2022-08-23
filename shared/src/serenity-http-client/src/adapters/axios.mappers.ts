@@ -1,17 +1,19 @@
-import { AxiosError } from "axios";
-import { HttpClientError, HttpClientForbiddenError } from "../errors";
-import { HttpServerError } from "../errors";
-import { isHttpClientError } from "../httpClient";
+import {
+  HttpClientError,
+  HttpClientForbiddenError,
+  HttpServerError,
+} from "../errors";
+import { isHttpClientError, isHttpServerError } from "../httpClient";
 import { AxiosErrorWithResponse } from "./axios.adapter";
 import {
+  AxiosInfrastructureError,
+  AxiosInfrastructureErrorCodes,
   ConnectionRefusedError,
   ConnectionResetError,
-  AxiosInfrastructureError,
+  InfrastructureError,
   isAxiosInfrastructureError,
   isTCPWrapperConnectionRefusedError,
   isTCPWrapperConnectionResetError,
-  InfrastructureError,
-  AxiosInfrastructureErrorCodes,
 } from "./errors";
 
 export const toHttpError = (
@@ -28,7 +30,7 @@ export const toHttpError = (
     );
   }
 
-  if (isHttpClientError(error.response.status)) {
+  if (isHttpServerError(error.response.status)) {
     return new HttpServerError(
       `${JSON.stringify(toSerializableAxiosHttpError(error), null, 2)}`,
       error,

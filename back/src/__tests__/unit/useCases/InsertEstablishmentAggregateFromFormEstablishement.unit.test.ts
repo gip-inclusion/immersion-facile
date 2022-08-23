@@ -29,7 +29,6 @@ import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionO
 const fakeSiret = "90040893100013";
 const fakePosition: GeoPositionDto = { lat: 49.119146, lon: 6.17602 };
 const fakeAddress = avenueChampsElyseesDto;
-const fakeCityCode = 75;
 const fakeBusinessContact = new ContactEntityV2Builder().build();
 
 const expectedNafDto: NafDto = { code: "8559A", nomenclature: "nomencl" };
@@ -64,11 +63,7 @@ describe("Insert Establishment aggregate from form data", () => {
     establishmentAggregateRepo = new InMemoryEstablishmentAggregateRepository();
     outboxRepo = new InMemoryOutboxRepository();
 
-    addressAPI = new InMemoryAddressGateway(
-      fakePosition,
-      fakeCityCode,
-      fakeAddress,
-    );
+    addressAPI = new InMemoryAddressGateway(fakePosition, fakeAddress);
     uuidGenerator = new TestUuidGenerator();
 
     const uowPerformer = new InMemoryUowPerformer({

@@ -64,7 +64,7 @@ export const onRejectDefaultResponseInterceptorMaker = <
 export const isValidErrorResponse = (
   response: AxiosResponse | undefined,
 ): response is AxiosResponse =>
-  !!response && typeof response.status === "number" && !!response.data;
+  !!response && typeof response.status === "number";
 
 // TODO Do we want to restrict statuses to a union of HttpCodes ?
 

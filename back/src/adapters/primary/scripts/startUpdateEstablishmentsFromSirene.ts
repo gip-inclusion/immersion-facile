@@ -4,7 +4,6 @@ import { UpdateEstablishmentsFromSireneAPI } from "../../../domain/immersionOffe
 import { createLogger } from "../../../utils/logger";
 import { PipelineStats } from "../../../utils/pipelineStats";
 import {
-  apiAddressRateLimiter,
   httpAddressApiClient,
   HttpAddressGateway,
 } from "../../secondary/addressGateway/HttpAddressGateway";
@@ -53,11 +52,7 @@ const main = async () => {
     retryStrategy,
   );
 
-  const addressAPI = new HttpAddressGateway(
-    httpAddressApiClient,
-    apiAddressRateLimiter(clock),
-    retryStrategy,
-  );
+  const addressAPI = new HttpAddressGateway(httpAddressApiClient);
 
   const pool = new Pool({
     connectionString: config.pgImmersionDbUrl,

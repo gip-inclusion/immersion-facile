@@ -9,7 +9,6 @@ import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGate
 export class InMemoryAddressGateway implements AddressGateway {
   constructor(
     private _position?: GeoPositionDto,
-    private _cityCode?: number,
     private _address?: AddressDto,
   ) {}
 
@@ -39,10 +38,6 @@ export class InMemoryAddressGateway implements AddressGateway {
     return { position: this._position, address: this._address };
   }
 
-  public async getCityCodeFromPosition(): Promise<number | undefined> {
-    return this._cityCode;
-  }
-
   // for test purposes only
   public setNextAddress(address: AddressDto | undefined) {
     this._address = address;
@@ -50,10 +45,6 @@ export class InMemoryAddressGateway implements AddressGateway {
 
   public setNextPosition(position: GeoPositionDto | undefined) {
     this._position = position;
-  }
-
-  public setNextCityCode(cityCode: number | undefined) {
-    this._cityCode = cityCode;
   }
 
   public setAddressAndPosition(streetAndAddresses: AddressAndPosition[]) {

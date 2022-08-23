@@ -35,7 +35,6 @@ import { UpdateImmersionApplication } from "../../../domain/convention/useCases/
 import { UpdateImmersionApplicationStatus } from "../../../domain/convention/useCases/UpdateImmersionApplicationStatus";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { Clock } from "../../../domain/core/ports/Clock";
-import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { UuidGenerator } from "../../../domain/core/ports/UuidGenerator";
 import { ApiConsumerId } from "../../../domain/core/valueObjects/ApiConsumer";
@@ -65,7 +64,6 @@ import { RomeSearch } from "../../../domain/rome/useCases/RomeSearch";
 import { GetSiret } from "../../../domain/sirene/useCases/GetSiret";
 import { GetSiretIfNotAlreadySaved } from "../../../domain/sirene/useCases/GetSiretIfNotAlreadySaved";
 import {
-  apiAddressRateLimiter,
   httpAddressApiClient,
   HttpAddressGateway,
 } from "../../secondary/addressGateway/HttpAddressGateway";
@@ -92,11 +90,7 @@ export const createUseCases = (
     quarantinedTopics: config.quarantinedTopics,
   });
   const getSiret = new GetSiret(gateways.sirene);
-  const addressAPI = new HttpAddressGateway(
-    httpAddressApiClient,
-    apiAddressRateLimiter(clock),
-    noRetries,
-  );
+  const addressAPI = new HttpAddressGateway(httpAddressApiClient);
 
   return {
     associatePeConnectFederatedIdentity:

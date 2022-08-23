@@ -1,20 +1,12 @@
 import { Pool } from "pg";
-import { random, sleep } from "shared/src/utils";
 import { UpdateAllPeAgencies } from "../../../domain/convention/useCases/UpdateAllPeAgencies";
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import {
-  apiAddressRateLimiter,
   httpAddressApiClient,
   HttpAddressGateway,
 } from "../../secondary/addressGateway/HttpAddressGateway";
-import { RealClock } from "../../secondary/core/ClockImplementations";
 import { ConsoleAppLogger } from "../../secondary/core/ConsoleAppLogger";
-import {
-  defaultMaxBackoffPeriodMs,
-  defaultRetryDeadlineMs,
-  ExponentialBackoffRetryStrategy,
-} from "../../secondary/core/ExponentialBackoffRetryStrategy";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { HttpPeAgenciesReferential } from "../../secondary/immersionOffer/HttpPeAgenciesReferential";
 import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
@@ -35,19 +27,7 @@ const updateAllPeAgenciesScript = async () => {
     config.poleEmploiClientId,
   );
 
-  const clock = new RealClock();
-
-  const adressAPI = new HttpAddressGateway(
-    httpAddressApiClient,
-    apiAddressRateLimiter(clock),
-    new ExponentialBackoffRetryStrategy(
-      defaultMaxBackoffPeriodMs,
-      defaultRetryDeadlineMs,
-      clock,
-      sleep,
-      random,
-    ),
-  );
+  const adressAPI = new HttpAddressGateway(httpAddressApiClient);
 
   const dbUrl = config.pgImmersionDbUrl;
   const pool = new Pool({
