@@ -12,9 +12,9 @@ import {
 import { DateStr } from "../../../domain/core/ports/Clock";
 import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
 
-const counterEventsSaved = new promClient.Counter({
-  name: "pg_outbox_repository_events_saved",
-  help: "The total count of events saved by PgOutboxRepository.",
+const counterEventsSavedBeforePublish = new promClient.Counter({
+  name: "pg_outbox_repository_events_saved_before_publish",
+  help: "The total count of events saved by PgOutboxRepository with no publication.",
   labelNames: ["topic", "wasQuarantined"],
 });
 
@@ -49,10 +49,11 @@ export class PgOutboxRepository implements OutboxRepository {
       ),
     );
 
-    counterEventsSaved.inc({
-      topic: event.topic,
-      wasQuarantined: event.wasQuarantined.toString(),
-    });
+    if (event.publications.length === 0)
+      counterEventsSavedBeforePublish.inc({
+        topic: event.topic,
+        wasQuarantined: event.wasQuarantined.toString(),
+      });
   }
 
   private async storeEventInOutboxOrRecoverItIfAlreadyThere(
