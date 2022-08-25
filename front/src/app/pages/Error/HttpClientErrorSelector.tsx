@@ -1,5 +1,5 @@
 import React from "react";
-import { HttpClientError } from "src/../../shared/src/httpClient/errors/4xxClientError.error";
+import { HttpClientError } from "shared/src/httpClient/errors/4xxClientError.error";
 import { RenewExpiredLinkContent } from "src/helpers/RenewExpiredLinkPage";
 import { ManagedErrorSelector } from "./ManagedErrors";
 

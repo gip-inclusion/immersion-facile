@@ -1,5 +1,5 @@
 import React from "react";
-import { HttpClientError } from "src/../../shared/src/httpClient/errors/4xxClientError.error";
+import { HttpClientError } from "shared/src/httpClient/errors/4xxClientError.error";
 import { ErrorPage } from "./ErrorPage";
 import { HttpClientErrorSelector } from "./HttpClientErrorSelector";
 import { ManagedErrorSelector } from "./ManagedErrors";

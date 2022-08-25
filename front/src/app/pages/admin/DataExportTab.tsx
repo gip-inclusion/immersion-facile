@@ -11,7 +11,7 @@ import {
   ConventionsExportableParams,
   EstablishmentsWithAggregatedOffersExportableParams,
   EstablishmentsWithFlattenOffersExportableParams,
-} from "src/../../shared/src/exportable";
+} from "shared/src/exportable";
 import { useAdminToken } from "src/hooks/useAdminToken";
 import { WithBackground } from "src/uiComponents/admin/WithBackground";
 import "./Admin.css";

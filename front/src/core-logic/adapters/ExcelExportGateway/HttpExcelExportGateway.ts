@@ -1,7 +1,7 @@
 import { AxiosInstance } from "axios";
 import { AdminToken } from "shared/src/admin/admin.dto";
 import { ExportDataDto } from "shared/src/exportable";
-import { exportRoute } from "src/../../shared/src/routes";
+import { exportRoute } from "shared/src/routes";
 
 import { ExcelExportGateway } from "src/core-logic/ports/ExcelExportGateway";
 
