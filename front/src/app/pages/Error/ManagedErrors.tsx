@@ -4,8 +4,8 @@ import {
   HttpClientInvalidToken,
   HttpClientNotFoundError,
   HttpUnknownClientError,
-  UnknownError,
-} from "./HttpUnknownClientError";
+} from "./HttpClientErrors";
+import { UnknownError } from "./UnknownError";
 import { PEConnectAdvisorForbiddenAccess } from "./PEConnectAdvisorForbiddenAccess";
 import { PEConnectInvalidGrantError } from "./PEConnectInvalidGrantError";
 import { PEConnectNoAuthorisation } from "./PEConnectNoAuthorisation";

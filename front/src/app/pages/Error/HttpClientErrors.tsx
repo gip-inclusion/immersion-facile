@@ -20,7 +20,3 @@ export const HttpClientNotFoundError = (): JSX.Element => (
 export const HttpClientInvalidToken = (): JSX.Element => (
   <ErrorNotification title="Votre token n'est pas valide." />
 );
-
-export const UnknownError = (): JSX.Element => (
-  <ErrorNotification title="Erreur inconnue" />
-);
