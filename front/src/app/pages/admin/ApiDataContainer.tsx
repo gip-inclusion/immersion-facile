@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { Notification } from "src/../../libs/react-design-system";
+import { HttpClientError } from "src/../../shared/src/httpClient/errors/4xxClientError.error";
 import { RenewExpiredLinkContent } from "src/helpers/RenewExpiredLinkPage";
 
 // Inspired by https://itnext.io/centralizing-api-error-handling-in-react-apps-810b2be1d39d
@@ -7,7 +9,7 @@ interface UseApiCallProps<T> {
 }
 
 function useApiCall<T>({ callApi }: UseApiCallProps<T>) {
-  const [error, setError] = useState<any | null>(null);
+  const [error, setError] = useState<Error | null>(null);
   const [apiData, setApiData] = useState<T | null>(null);
 
   useEffect(() => {
@@ -35,28 +37,35 @@ export function ApiDataContainer<T>({
   jwt,
 }: ApiDataContainerProps<T>): React.ReactElement {
   const { data, error } = useApiCall({ callApi });
-
-  if (error) {
-    if (error.response) {
-      if (error.response.status === 403) {
-        if (jwt && error.response.data.needsNewMagicLink) {
-          const originalURL = location.href.replaceAll(jwt, "%jwt%");
-          return (
-            <RenewExpiredLinkContent
-              expiredJwt={jwt}
-              originalURL={originalURL}
-            />
-          );
-        }
-        return <h1>403 Accès refusé</h1>;
-      }
-
-      if (error.response?.status === 404) {
-        return <h1>404 Page non trouvé</h1>;
-      }
-    }
-    return <h1>{JSON.stringify(error)}</h1>;
-  }
-
-  return children(data);
+  return error ? onError(error, jwt) : children(data);
 }
+
+const onError = (error: Error, jwt: string | undefined): JSX.Element =>
+  error instanceof HttpClientError
+    ? onHttpClientError(error, jwt)
+    : showErrorNotification("Erreur inconnue", JSON.stringify(error));
+
+const onHttpClientError = (
+  error: HttpClientError,
+  jwt: string | undefined,
+): JSX.Element => {
+  if (error.httpStatusCode === 403 && jwt && error.data.needsNewMagicLink)
+    return (
+      <RenewExpiredLinkContent
+        expiredJwt={jwt}
+        originalURL={location.href.replaceAll(jwt, "%jwt%")}
+      />
+    );
+  if (error.httpStatusCode === 401)
+    return showErrorNotification("Votre token n'est pas valide.");
+  if (error.httpStatusCode === 404)
+    return showErrorNotification("404 Page non trouvé.");
+  return showErrorNotification("Erreur client inconnue", JSON.stringify(error));
+};
+
+const showErrorNotification = (
+  title: string,
+  children?: string,
+): JSX.Element => (
+  <Notification title={title} type="error" children={children} />
+);

@@ -4,12 +4,12 @@ import { conventionGateway } from "src/app/config/dependencies";
 import { routes } from "src/app/routing/routes";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 
-import { Route } from "type-route";
 import {
   Button,
-  Notification,
   LinkHome,
+  Notification,
 } from "react-design-system/immersionFacile";
+import { Route } from "type-route";
 
 interface RenewExpiredLinkProps {
   route: Route<typeof routes.renewConventionMagicLink>;
@@ -59,11 +59,13 @@ export const RenewExpiredLinkContent = ({
 
   if (!jwtPayload.applicationId)
     return (
-      <div>
-        Votre lien est périmé, veuillez renouveler votre demande si vous
-        souhaitez éditer votre établissement.
-        <LinkHome>Page d'accueil</LinkHome>
-      </div>
+      <>
+        <div>
+          Votre lien est périmé, veuillez renouveler votre demande si vous
+          souhaitez éditer votre établissement.
+        </div>
+        <LinkHome {...routes.home().link}>Page d'accueil</LinkHome>
+      </>
     );
 
   return (

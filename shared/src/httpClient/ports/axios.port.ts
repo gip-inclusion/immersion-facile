@@ -81,6 +81,7 @@ const throwClientError = (error: AxiosErrorWithResponse): never => {
     `4XX Status Code ${toAxiosHttpErrorString(error)}`,
     error,
     error.response.status,
+    error.response.data,
   );
 };
 
