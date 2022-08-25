@@ -13,6 +13,7 @@ export type NavWrapper = {
   id: string;
   className?: string;
   ariaLabel: string;
+  style: React.CSSProperties;
 };
 
 const TabLink = ({ href, onClick, active, label }: NavLink) => (
@@ -40,6 +41,7 @@ export const TabLinks = ({
     id={navWrapper.id}
     role={navWrapper.role}
     aria-label={navWrapper.ariaLabel}
+    style={navWrapper.style}
   >
     <ul className="fr-nav__list">
       {navLinks.map((link, index) => (

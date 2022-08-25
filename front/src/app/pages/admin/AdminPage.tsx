@@ -53,6 +53,9 @@ export const AdminPage = ({
                 id: "menu-admin",
                 className: "fr-nav fr-nav--admin",
                 ariaLabel: "Menu admin",
+                style: {
+                  marginBottom: "1.5rem",
+                },
               }}
             />
             <div className="fr-tab-content">
