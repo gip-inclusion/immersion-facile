@@ -1,6 +1,6 @@
 import { Form, Formik } from "formik";
 import React, { useState } from "react";
-import { ButtonHome, Notification } from "react-design-system/immersionFacile";
+import { Notification } from "react-design-system/immersionFacile";
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { formEstablishmentSchema } from "shared/src/formEstablishment/FormEstablishment.schema";
 import { SiretDto } from "shared/src/siret";
@@ -126,14 +126,33 @@ export const EstablishmentFormikForm = ({
                 <BusinessContact />
               </div>
               {isEditing && (
-                <BoolCheckboxGroup
-                  name="isSearchable"
-                  label={`L'entreprise est-elle recherchable par les utilisateurs ? ${
-                    values.isSearchable
-                      ? "(décochez la case si vous ne  voulez pas être visible sur la recherche)"
-                      : "(cochez la case si vous voulez être visible sur la recherche)"
-                  }`}
-                />
+                <>
+                  <BoolCheckboxGroup
+                    name="isSearchable"
+                    label={`L'entreprise est-elle recherchable par les utilisateurs ? ${
+                      values.isSearchable
+                        ? "(décochez la case si vous ne  voulez pas être visible sur la recherche)."
+                        : "(cochez la case si vous voulez être visible sur la recherche)."
+                    } Vous pourrez réactiver la visibilité à tout moment`}
+                  />
+                  <p>
+                    Vous pouvez demander la suppression définitive de votre
+                    entreprise{" "}
+                    <a
+                      href={"#"}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        window.open(mailtoHref(initialValues.siret));
+                      }}
+                    >
+                      en cliquant ici
+                    </a>
+                  </p>
+                  <p>
+                    Si vous avez besoin d'aide, envoyez-nous un email: <br />
+                    contact@immersion-facile.beta.gouv.fr
+                  </p>
+                </>
               )}
 
               {submitCount !== 0 && Object.values(errors).length > 0 && (
@@ -181,23 +200,6 @@ export const EstablishmentFormikForm = ({
             </Form>
             <br />
             <br />
-            {isEditing === true && (
-              <>
-                <ButtonHome
-                  onClick={(_) => {
-                    window.open(mailtoHref(initialValues.siret));
-                  }}
-                  type="error"
-                  width={null}
-                >
-                  Supprimer votre entreprise
-                </ButtonHome>
-                <p>
-                  Si vous avez besoin d'aide, envoyez-nous un email: <br />
-                  contact@immersion-facile.beta.gouv.fr
-                </p>
-              </>
-            )}
           </div>
         )}
       </Formik>
