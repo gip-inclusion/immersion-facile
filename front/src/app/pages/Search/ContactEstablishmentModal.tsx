@@ -1,4 +1,8 @@
-import { Modal, ModalClose, ModalContent } from "@dataesr/react-dsfr";
+import {
+  ModalDialog,
+  ModalClose,
+  ModalContent,
+} from "react-design-system/immersionFacile";
 import React, { ReactNode, useReducer } from "react";
 import { ContactMethod } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { RomeCode } from "shared/src/rome";
@@ -90,7 +94,7 @@ export const ContactEstablishmentModal = ({
   };
 
   return (
-    <Modal isOpen={modalState.isOpen} hide={hide}>
+    <ModalDialog isOpen={modalState.isOpen} hide={hide}>
       <ModalClose hide={hide} title="Close the modal window" />
       <ModalContent>
         <ModalContactContent
@@ -98,7 +102,7 @@ export const ContactEstablishmentModal = ({
           onSuccess={hideAndShowSuccess}
         />
       </ModalContent>
-    </Modal>
+    </ModalDialog>
   );
 };
 

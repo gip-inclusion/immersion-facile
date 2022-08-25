@@ -22,7 +22,7 @@ export const UploadFile = ({
       onChange={async (e) => {
         const file = e.target.files[0];
 
-        if (file.size > 1_000_000 * maxSize_Mo) {
+        if (file && file.size > 1_000_000 * maxSize_Mo) {
           setError(`Le fichier ne peut pas faire plus de ${maxSize_Mo} Mo`);
           return;
         } else {
