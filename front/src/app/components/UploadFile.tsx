@@ -1,4 +1,4 @@
-import { File } from "@dataesr/react-dsfr";
+import { File } from "react-design-system/immersionFacile";
 import * as React from "react";
 import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 import { technicalGateway } from "src/app/config/dependencies";
