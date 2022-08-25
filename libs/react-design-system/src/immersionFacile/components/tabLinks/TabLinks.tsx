@@ -13,7 +13,7 @@ export type NavWrapper = {
   id: string;
   className?: string;
   ariaLabel: string;
-  style: React.CSSProperties;
+  style?: React.CSSProperties;
 };
 
 const TabLink = ({ href, onClick, active, label }: NavLink) => (
