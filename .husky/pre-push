@@ -2,7 +2,5 @@
 . "$(dirname -- "$0")/_/husky.sh"
 
 echo 'Pre-push hook'
-pnpm prettier:check
-#pnpm lint
-pnpm test
+pnpm fullcheck
 

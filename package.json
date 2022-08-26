@@ -22,9 +22,14 @@
     "lint:libs": "eslint libs/ --fix",
     "lint": "eslint ./**/src/ --fix",
     "lint-staged": "lint-staged --config=./.tooling/.lintstaged/.lintstagedrc",
-    "test": "pnpm back test && pnpm front test && pnpm shared test"
+    "test-back": "pnpm back test",
+    "test-front": "pnpm front test",
+    "test-shared": "pnpm shared test",
+    "tests": "concurrently --kill-others-on-fail \"pnpm:test-*\"",
+    "fullcheck": "concurrently --kill-others-on-fail \"pnpm:tests\" \"pnpm:prettier:check\""
   },
   "devDependencies": {
+    "concurrently": "^7.3.0",
     "husky": "^8.0.1",
     "lint-staged": "^13.0.3",
     "prettier": "^2.6.0"
