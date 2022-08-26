@@ -12,7 +12,6 @@ Il y pour cela plusieurs axes de travail :
 Pour démarrer le projet il vous faut `git`, `docker` et `node` (version > 12 )installée sur la machine.
 Nous utilions également `pnpm` comme gestionnaire de paquets (pour l'installer : `npm install -g pnpm`).
 
-
 ### Démarrer le projet
 
 Il faut demander d'être ajouté au projet sur le gitlab de pole-emploi. L'url du projet est la suivante :
@@ -28,17 +27,17 @@ ssh-keygen -t ed25519 -C "your_email@example.com"
 ```
 
 #### Cloner le projet :
+
 ```sh
 git clone ssh://git@git.beta.pole-emploi.fr:23/jburkard/immersion-facile.git immersion-facile;
 cd immersion-facile;
 ```
 
 #### Installer les dépendances nodes
+
 ```shell
 pnpm install
 ```
-
-
 
 #### Faire une copie du `.env.sample` qui devra s'appeler `.env`:
 
@@ -84,13 +83,19 @@ Pour le frontend se référer ensuite ici:
 #### CLI
 
 ##### Husky
+
 Husky sert à automatiser des executions de commandes projet avant les commits et les push (format, lint, test... )
 La configuration husky est présente ici [.husky](.husky)  
-Documentation locale  [.husky.md](.husky/husky.md)  
+Documentation locale [.husky.md](.husky/husky.md)  
 [Documentation officielle](https://typicode.github.io/husky/#/)
 
 ##### Lint-staged
+
 Lint stage permet de ne jouer le lint et le prettier que sur les fichiers qui ont été stage dans Git
 La configuration lint-stage est présente ici [.tooling/.lint-staged/.lintstagedrc](.tooling/.lint-staged/.lintstagedrc)
 [Documentation officielle](https://github.com/okonet/lint-staged)
 
+##### Concurrently
+
+Concurrently permet de parraléliser des tâches de maintenance sur le projet (format, lint, test... )
+[Documentation officielle](https://github.com/open-cli-tools/concurrently)
