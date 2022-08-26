@@ -1,4 +1,7 @@
-import { Accordion, AccordionItem } from "@dataesr/react-dsfr";
+import {
+  AccordionDSFR,
+  AccordionDSFRItem,
+} from "react-design-system/designSystemFrance";
 import React from "react";
 import { Title, SubTitle } from "react-design-system/immersionFacile";
 
@@ -10,8 +13,8 @@ export const OurAdvises = () => (
       entreprises signalées comme “entreprises accueillantes”. Pour les autres,
       voici nos conseils :
     </p>
-    <Accordion keepOpen={true} className="w-full max-w-3xl ">
-      <AccordionItem
+    <AccordionDSFR keepOpen={true} className="w-full max-w-3xl ">
+      <AccordionDSFRItem
         title={
           <SubTitle>
             Comment contacter un employeur pour faire une immersion ?
@@ -32,8 +35,8 @@ export const OurAdvises = () => (
             information, le nombre de salariés de l’entreprise
           </li>
         </ul>
-      </AccordionItem>
-      <AccordionItem
+      </AccordionDSFRItem>
+      <AccordionDSFRItem
         title={
           <SubTitle>Comment expliquer l'immersion à un employeur ?</SubTitle>
         }>
@@ -56,7 +59,7 @@ export const OurAdvises = () => (
             collègue absent.
           </li>
         </ul>
-      </AccordionItem>
-    </Accordion>
+      </AccordionDSFRItem>
+    </AccordionDSFR>
   </div>
 );
