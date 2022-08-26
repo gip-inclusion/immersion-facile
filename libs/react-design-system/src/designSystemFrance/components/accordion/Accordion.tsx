@@ -46,8 +46,8 @@ export const AccordionDSFR = ({
   color,
 }: AccordionProperties) => {
   const HtmlTag: ElementType = Tag;
-  const HtmlComponent: FC<ComponentProps> = ({ children }) => (
-    <HtmlTag>{children}</HtmlTag>
+  const HtmlComponent: FC<ComponentProps> = ({ children, ...rest }) => (
+    <HtmlTag {...rest}>{children}</HtmlTag>
   );
   const [expandedItems, setExpandedItems] = useState([]);
 
