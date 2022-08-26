@@ -146,7 +146,7 @@ describe("httpClient with axios concrete adapter", () => {
 
     const httpClient: HttpClient = new ManagedAxios(targetUrls);
 
-    const expectedMessage = {
+    const expectedMessage: Record<string, unknown> = {
       _response: {
         data: {
           title: "Missing query",
@@ -174,17 +174,13 @@ describe("httpClient with axios concrete adapter", () => {
       request: expect.any(Object),
     };
 
-    try {
-      await httpClient.get({
-        target: targetUrls.ADDRESS_API_SEARCH_ENDPOINT,
-        targetParams: "18 avenue des Canuts 69120",
-      });
-      throw new Error("should have thrown HttpCLientError");
-    } catch (error) {
-      // eslint-disable-next-line jest/no-conditional-expect
-      expect(JSON.parse((error as Error).message)).toMatchObject(
-        expect.objectContaining(expectedMessage),
-      );
-    }
+    const promise = httpClient.get({
+      target: targetUrls.ADDRESS_API_SEARCH_ENDPOINT,
+      targetParams: "18 avenue des Canuts 69120",
+    });
+
+    await expect(promise).rejects.toThrow();
+    /* eslint-disable-next-line jest/no-conditional-expect */
+    await promise.catch((e) => expect(e).toMatchObject(expectedMessage));
   });
 });
