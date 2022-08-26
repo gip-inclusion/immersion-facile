@@ -22,7 +22,8 @@
     "lint:libs": "eslint libs/ --fix",
     "lint": "eslint ./**/src/ --fix",
     "lint-staged": "lint-staged --config=./.tooling/.lintstaged/.lintstagedrc",
-    "pre-commit": "pnpm --dir back format"
+    "pre-commit": "pnpm --dir back format",
+    "test": "pnpm back test && pnpm front test && pnpm shared test"
   },
   "devDependencies": {
     "husky": "^8.0.1",
