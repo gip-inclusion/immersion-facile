@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-echo 'Pre-push hook'
+echo 'Pre-commit hook'
 pnpm lint-staged

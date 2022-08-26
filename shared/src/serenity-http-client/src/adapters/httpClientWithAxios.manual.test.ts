@@ -179,9 +179,10 @@ describe("httpClient with axios concrete adapter", () => {
         target: targetUrls.ADDRESS_API_SEARCH_ENDPOINT,
         targetParams: "18 avenue des Canuts 69120",
       });
-      fail("should have thrown HttpCLientError");
+      throw new Error("should have thrown HttpCLientError");
     } catch (error) {
-      expect(JSON.parse(error.message)).toMatchObject(
+      // eslint-disable-next-line jest/no-conditional-expect
+      expect(JSON.parse((error as Error).message)).toMatchObject(
         expect.objectContaining(expectedMessage),
       );
     }
