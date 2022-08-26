@@ -39,8 +39,7 @@ const ImmersionHowTo = ({ videoUrl, videoImage }: ImmersionHowToProps) => (
       </div>
       <div
         className="pl-4 flex flex-col items-center"
-        style={{ width: "480px" }}
-      >
+        style={{ width: "480px" }}>
         <SubTitle red>L'immersion professionnelle, mode d'emploi</SubTitle>
         <div className="border-blue-200 border border-solid">
           <a href={videoUrl} target="_blank">

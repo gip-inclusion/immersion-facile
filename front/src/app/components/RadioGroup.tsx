@@ -82,12 +82,10 @@ export const RadioGroup = <T extends string | number | string[] | boolean>({
         aria-labelledby={
           error ? "radio-error-legend radio-error-desc-error" : ""
         }
-        role="group"
-      >
+        role="group">
         <legend
           className="fr-fieldset__legend fr-text--regular"
-          id={error ? "radio-error-legend" : "radio-legend"}
-        >
+          id={error ? "radio-error-legend" : "radio-legend"}>
           {groupLabel}
         </legend>
         <div className="fr-fieldset__content">

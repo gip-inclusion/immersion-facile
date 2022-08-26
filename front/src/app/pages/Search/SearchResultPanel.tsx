@@ -87,8 +87,7 @@ export const SearchResultPanel = () => {
           handleClose={() => {
             setSuccessfulValidatedMessage(null);
             setSuccessfullyValidated(false);
-          }}
-        >
+          }}>
           {successfulValidationMessage}
         </SuccessFeedback>
       )}

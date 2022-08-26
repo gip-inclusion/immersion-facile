@@ -21,8 +21,9 @@ export const SimpleSelect = ({
   return (
     <FormControl fullWidth error={hasError}>
       <div
-        className={`fr-input-group ${hasError ? " fr-input-group--error" : ""}`}
-      >
+        className={`fr-input-group ${
+          hasError ? " fr-input-group--error" : ""
+        }`}>
         <label className="fr-label" htmlFor={id}>
           {label}
         </label>
@@ -36,8 +37,7 @@ export const SimpleSelect = ({
               className={`fr-input ${hasError ? "fr-input--error" : ""}`}
               placeholder="Rouen"
             />
-          }
-        >
+          }>
           {options.map(({ value, label }) => (
             <MenuItem key={value} value={value}>
               {label}

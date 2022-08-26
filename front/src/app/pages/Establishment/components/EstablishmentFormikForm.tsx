@@ -50,8 +50,7 @@ export const EstablishmentFormikForm = ({
   return (
     <div
       className="fr-grid-row fr-grid-row--center fr-grid-row--gutters"
-      style={{ marginTop: "25px" }}
-    >
+      style={{ marginTop: "25px" }}>
       <Formik
         enableReinitialize={true}
         initialValues={initialValues}
@@ -75,13 +74,11 @@ export const EstablishmentFormikForm = ({
           } finally {
             setSubmitting(false);
           }
-        }}
-      >
+        }}>
         {({ isSubmitting, submitCount, errors, values }) => (
           <div
             style={{ margin: "5px 12px", maxWidth: "600px" }}
-            className="flex flex-col  gap-1"
-          >
+            className="flex flex-col  gap-1">
             <p>
               Bienvenue sur l'espace de référencement des entreprises
               volontaires pour l'accueil des immersions professionnelles.
@@ -91,8 +88,7 @@ export const EstablishmentFormikForm = ({
               En référençant votre entreprise, vous rejoignez la communauté{" "}
               <a
                 href={"https://lesentreprises-sengagent.gouv.fr/"}
-                target={"_blank"}
-              >
+                target={"_blank"}>
                 « Les entreprises s'engagent »
               </a>
               .
@@ -143,8 +139,7 @@ export const EstablishmentFormikForm = ({
                       onClick={(event) => {
                         event.preventDefault();
                         window.open(mailtoHref(initialValues.siret));
-                      }}
-                    >
+                      }}>
                       en cliquant ici
                     </a>
                   </p>
@@ -175,8 +170,7 @@ export const EstablishmentFormikForm = ({
                 <>
                   <Notification
                     type="error"
-                    title="Veuillez nous excuser. Un problème est survenu qui a compromis l'enregistrement de vos informations. "
-                  >
+                    title="Veuillez nous excuser. Un problème est survenu qui a compromis l'enregistrement de vos informations. ">
                     {errorMessage}
                   </Notification>
                   <br />
@@ -192,8 +186,7 @@ export const EstablishmentFormikForm = ({
                 <button
                   className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"
                   type="submit"
-                  disabled={isSubmitting}
-                >
+                  disabled={isSubmitting}>
                   Enregistrer mes informations
                 </button>
               )}

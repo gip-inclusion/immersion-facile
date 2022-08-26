@@ -37,8 +37,7 @@ const LoginForm = () => {
           validationSchema={toFormikValidationSchema(userAndPasswordSchema)}
           onSubmit={(values) => {
             dispatch(adminSlice.actions.loginRequested(values));
-          }}
-        >
+          }}>
           {() => (
             <Form>
               <SubTitle>Veuillez vous connectez</SubTitle>

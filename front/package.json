@@ -10,8 +10,8 @@
     "serve": "vite preview",
     "typecheck": "tsc --noEmit",
     "includecheck": "./check_includes.sh",
-    "format": "prettier --write src",
-    "format:check": "prettier --check src",
+    "format": "pnpm -w prettier:glob --write ./front/src",
+    "format:check": "pnpm -w prettier:glob --check ./front/src",
     "fullcheck": "npm run includecheck && npm run format && npm run test && npm run typecheck && npm run lint",
     "lint": "pnpm -w run lint:front"
   },

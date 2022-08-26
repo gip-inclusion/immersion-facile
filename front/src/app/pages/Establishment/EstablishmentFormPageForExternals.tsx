@@ -30,8 +30,7 @@ export const EstablishmentFormPageForExternals = ({
       <HeaderFooterLayout>
         <div
           role="alert"
-          className="fr-alert fr-alert--info w-5/6 m-auto mt-10"
-        >
+          className="fr-alert fr-alert--info w-5/6 m-auto mt-10">
           <p className="fr-alert__title">
             La source '{consumer}' n'est pas référencée. Êtes vous certain
             d’avoir la bonne url ?

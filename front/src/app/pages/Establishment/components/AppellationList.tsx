@@ -47,8 +47,7 @@ export const AppellationList = ({ name, title }: AppellationListProps) => {
               appellationLabel: "",
             },
           ])
-        }
-      >
+        }>
         Ajouter un métier
       </ButtonAdd>
 

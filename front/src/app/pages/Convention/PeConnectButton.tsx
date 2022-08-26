@@ -11,8 +11,7 @@ export const PeConnectButton = ({
       onClick={onClick}
       href={`/api/${loginPeConnect}`}
       className="button-pe-connect"
-      title=""
-    >
+      title="">
       <img
         className="icon-pe-connect"
         src="/pe-connect-barre-nav-b.svg"

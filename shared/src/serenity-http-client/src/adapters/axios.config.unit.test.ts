@@ -19,7 +19,7 @@ describe("Error Response format standart", () => {
         data: "",
         status: 400,
       },
-      false,
+      true,
     ],
     [
       {

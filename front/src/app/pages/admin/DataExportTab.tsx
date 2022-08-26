@@ -379,8 +379,7 @@ const DownloadButton = ({ onClick }: { onClick: () => Promise<void> }) => {
               setIsDownloading(false);
               setError("Rien à exporter...");
             });
-        }}
-      >
+        }}>
         {" "}
         {!isDownloading && <DownloadIcon />}
         {isDownloading && <CircularProgress size={20} />}

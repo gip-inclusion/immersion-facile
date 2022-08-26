@@ -30,8 +30,7 @@ export const HomePage = () => (
       <section className="flex flex-col items-center">
         <div
           className="flex flex-wrap justify-center "
-          style={{ minWidth: "420px" }}
-        >
+          style={{ minWidth: "420px" }}>
           <div>
             <FindImmersionHomeMenu />
             <InitiateConventionCard />

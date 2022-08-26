@@ -10,8 +10,7 @@ export const WithBackground = ({
     className="p-5"
     style={{
       backgroundColor: "#E5E5F4",
-    }}
-  >
+    }}>
     {" "}
     {children}
   </div>

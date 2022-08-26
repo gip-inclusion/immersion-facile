@@ -20,8 +20,7 @@ export const BoolRadioPicker = (props: BoolRadioPickerProps) => {
         <fieldset
           className="fr-fieldset"
           role="group"
-          disabled={props.disabled}
-        >
+          disabled={props.disabled}>
           <legend className="fr-fieldset__legend fr-text--regular">
             {props.label}
           </legend>
@@ -42,8 +41,7 @@ export const BoolRadioPicker = (props: BoolRadioPickerProps) => {
               <label
                 className="fr-label"
                 htmlFor={props.name + "radio_yes"}
-                onClick={setFieldAsTrue}
-              >
+                onClick={setFieldAsTrue}>
                 {props.yesLabel}
               </label>
             </div>
@@ -58,8 +56,7 @@ export const BoolRadioPicker = (props: BoolRadioPickerProps) => {
               <label
                 className="fr-label"
                 htmlFor={props.name + "radio_no"}
-                onClick={setFieldAsFalse}
-              >
+                onClick={setFieldAsFalse}>
                 {props.noLabel}
               </label>
             </div>

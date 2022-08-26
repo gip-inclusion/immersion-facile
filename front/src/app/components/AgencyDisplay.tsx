@@ -71,8 +71,7 @@ export const AgencyDisplay = ({
 
   return (
     <div
-      className={`fr-input-group${showError ? " fr-input-group--error" : ""}`}
-    >
+      className={`fr-input-group${showError ? " fr-input-group--error" : ""}`}>
       <PostcodeAutocomplete onFound={setDepartmentCode} disabled={true} />
       <label className="fr-label pt-4" htmlFor={name}>
         {label}
@@ -98,8 +97,7 @@ export const AgencyDisplay = ({
           }}
           onBlur={onBlur}
           aria-describedby={`agency-code-{name}-error-desc-error`}
-          disabled={true}
-        >
+          disabled={true}>
           <Agencies agencies={agencies} />
         </select>
       </div>

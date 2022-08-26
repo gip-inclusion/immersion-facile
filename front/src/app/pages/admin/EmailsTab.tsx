@@ -49,8 +49,7 @@ const Email = ({ email }: { email: EmailSentDto }) => {
         email.templatedEmail.type
       } envoyé le ${sentAtDate.toLocaleDateString(
         "fr",
-      )} à ${sentAtDate.toLocaleTimeString("fr")}`}
-    >
+      )} à ${sentAtDate.toLocaleTimeString("fr")}`}>
       <TextCell title="Type" contents={email.templatedEmail.type} />
       <TextCell
         title="Destinataires"
@@ -67,8 +66,7 @@ const Email = ({ email }: { email: EmailSentDto }) => {
                 <span className="font-normal">{key} :</span>{" "}
                 <span
                   style={{ width: "500px" }}
-                  className="font-thin inline-block break-words"
-                >
+                  className="font-thin inline-block break-words">
                   {key === "magicLink" ? (
                     <a href={value as string}>Magic link</a>
                   ) : (

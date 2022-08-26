@@ -22,8 +22,7 @@ export const DayCircle = ({
           className={`numberCircle `}
           style={{ backgroundColor: "#B8FEC9" }}
           onClick={onClick}
-          disabled={disabled}
-        >
+          disabled={disabled}>
           <div>{name}</div>
         </button>
         <div className="absolute -top-2 right-0">
@@ -41,8 +40,7 @@ export const DayCircle = ({
         }`}
         //className={`w-11 h-11 `}
         onClick={onClick}
-        disabled={disabled}
-      >
+        disabled={disabled}>
         {name}
       </button>
     </div>

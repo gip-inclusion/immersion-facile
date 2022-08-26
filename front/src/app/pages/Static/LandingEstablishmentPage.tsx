@@ -32,8 +32,7 @@ export const LandingEstablishmentPage = () => (
       </div>
       <a
         {...routes.formEstablishment().link}
-        className="no-underline shadow-none bg-white py-3 px-8 rounded-md text-immersionBlue-dark"
-      >
+        className="no-underline shadow-none bg-white py-3 px-8 rounded-md text-immersionBlue-dark">
         Référencer votre entreprise
       </a>
     </section>
@@ -67,8 +66,7 @@ export const LandingEstablishmentPage = () => (
       </Title>
       <div
         className="flex flex-wrap justify-center"
-        style={{ minWidth: "420px" }}
-      >
+        style={{ minWidth: "420px" }}>
         <Card
           imageUrl={checked}
           boldText="Faire connaître vos métiers"
@@ -92,8 +90,7 @@ export const LandingEstablishmentPage = () => (
       </div>
       <a
         {...routes.formEstablishment().link}
-        className="no-underline shadow-none bg-immersionBlue py-3 px-8 rounded-md text-white font-semibold my-3"
-      >
+        className="no-underline shadow-none bg-immersionBlue py-3 px-8 rounded-md text-white font-semibold my-3">
         Référencer votre entreprise
       </a>
     </section>

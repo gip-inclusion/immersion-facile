@@ -58,8 +58,7 @@ export const SearchDebugPage = () => {
                 setSubmitting(false);
               });
           }
-        }
-      >
+        }>
         {({ setFieldValue }) => (
           <Form>
             <label htmlFor="rome">Rome</label>

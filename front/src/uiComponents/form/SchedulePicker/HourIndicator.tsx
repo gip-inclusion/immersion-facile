@@ -11,8 +11,7 @@ export const HourIndicator = ({
     <span
       style={{
         color: hours <= maxPermittedHoursPerWeek ? normalColor : badColor,
-      }}
-    >
+      }}>
       {formatHoursString(hours)}
     </span>
   );

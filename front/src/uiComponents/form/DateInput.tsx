@@ -15,8 +15,7 @@ export const DateInput = (props: DateInputProps) => {
       <div
         className={`fr-input-group${
           meta.touched && meta.error ? " fr-input-group--error" : ""
-        }`}
-      >
+        }`}>
         <label className="fr-label" htmlFor="text-input-calendar">
           {props.label}
         </label>

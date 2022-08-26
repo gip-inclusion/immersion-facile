@@ -25,8 +25,7 @@ export const ShareLinkByEmail = () => {
       <ElementModalContainer
         modalState={modalState}
         dispatch={dispatch}
-        title={shareLinkByEmail}
-      >
+        title={shareLinkByEmail}>
         <ShareForm
           onSuccess={() => {
             dispatch({ type: "CLICKED_CLOSE" });
@@ -42,12 +41,10 @@ export const ShareLinkByEmail = () => {
         <Snackbar
           open={true}
           autoHideDuration={4000}
-          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-        >
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}>
           <Alert
             severity={emailSent ? "success" : "error"}
-            sx={{ width: "100%" }}
-          >
+            sx={{ width: "100%" }}>
             {emailSent
               ? "Cette demande de Convention a bien été partagée par mail."
               : "Erreur lors de l'envoi de l'email"}

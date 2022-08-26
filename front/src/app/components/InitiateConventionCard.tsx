@@ -50,8 +50,7 @@ export const InitiateConventionCard = () => {
             <a
               className="small mt-1"
               href="https://candidat.pole-emploi.fr/compte/identifiant/choixcontact"
-              target="_blank"
-            >
+              target="_blank">
               Je ne connais pas mes identifiants
             </a>
             <span className="pt-4">ou bien</span>
@@ -63,8 +62,7 @@ export const InitiateConventionCard = () => {
         {/*TODO : change HomeButton to take 'candidate' and 'establishment' as type params ('error' is very confusing here...)*/}
         <ButtonHome
           type="error"
-          onClick={redirectToConventionWithoutIdentityProvider}
-        >
+          onClick={redirectToConventionWithoutIdentityProvider}>
           Je demande une convention
         </ButtonHome>
       </div>

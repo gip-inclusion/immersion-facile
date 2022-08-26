@@ -29,8 +29,7 @@ export const WeekdayDropdown = ({
       name={name}
       value={selected}
       onChange={onChangeHandler}
-      disabled={disabled}
-    >
+      disabled={disabled}>
       {weekdays
         .filter((_, index) => index >= minDay && index <= maxDay)
         .map((day, index) => (

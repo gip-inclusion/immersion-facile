@@ -16,8 +16,7 @@ export const EstablishmentTitle = ({
       type === "establishment"
         ? "text-immersionBlue-dark"
         : "text-immersionRed-dark"
-    }  text-center font-semibold py-2 tracking-widest`}
-  >
+    }  text-center font-semibold py-2 tracking-widest`}>
     {text}
   </div>
 );

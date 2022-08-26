@@ -68,8 +68,7 @@ export const VerificationActionButton = (
       level={props.newStatus === "REJECTED" ? "secondary" : "primary"}
       disable={!props.convention || props.disabled}
       onSubmit={() => onSubmit(props)}
-      className={className}
-    >
+      className={className}>
       {props.children}
     </Button>
   );

@@ -81,8 +81,7 @@ const FormikApplicationForm = ({
         setSubmitFeedback(e);
       }
       setSubmitting(false);
-    }}
-  >
+    }}>
     {(props: FormikProps<FormikValues>) => (
       <div>
         <form onReset={props.handleReset} onSubmit={props.handleSubmit}>

@@ -42,8 +42,7 @@ export const ConventionValidatePage = ({ route }: VerificationPageProps) => {
   return (
     <ApiDataContainer
       callApi={() => conventionGateway.getMagicLink(jwt)}
-      jwt={jwt}
-    >
+      jwt={jwt}>
       {(convention) => {
         if (!convention) {
           return <p>"Chargement en cours"</p>;
@@ -66,16 +65,14 @@ export const ConventionValidatePage = ({ route }: VerificationPageProps) => {
               display: "flex",
               alignItems: "center",
               flexDirection: "column",
-            }}
-          >
+            }}>
             <ConventionFormAccordion convention={convention} />
             <div>
               {isAllowedTransition(status, "REJECTED", role) && (
                 <VerificationActionButton
                   {...buttonProps}
                   newStatus="REJECTED"
-                  messageToShowOnSuccess="Succès. La décision de refuser cette immersion est bien enregistrée. Cette décision va être communiquée par mail au bénéficiaire et à l'entreprise."
-                >
+                  messageToShowOnSuccess="Succès. La décision de refuser cette immersion est bien enregistrée. Cette décision va être communiquée par mail au bénéficiaire et à l'entreprise.">
                   Refuser l'immersion ...
                 </VerificationActionButton>
               )}
@@ -86,8 +83,7 @@ export const ConventionValidatePage = ({ route }: VerificationPageProps) => {
                   newStatus="DRAFT"
                   messageToShowOnSuccess={
                     "Succès. Cette demande de modification va être communiquée par mail au bénéficiaire et à l'entreprise"
-                  }
-                >
+                  }>
                   Renvoyer au bénéficiaire pour modification
                 </VerificationActionButton>
               )}
@@ -98,8 +94,7 @@ export const ConventionValidatePage = ({ route }: VerificationPageProps) => {
                   messageToShowOnSuccess={
                     "Succès. L'éligibilité de cette demande est bien enregistrée. Une notification est envoyée au responsable des validations pour qu'elle/il confirme ou non la validation de cette demande et initie la Convention."
                   }
-                  disabled={!!successMessage || currentStatus != "IN_REVIEW"}
-                >
+                  disabled={!!successMessage || currentStatus != "IN_REVIEW"}>
                   {currentStatus === "ACCEPTED_BY_COUNSELLOR"
                     ? "Demande déjà validée."
                     : "Marquer la demande comme éligible"}
@@ -116,8 +111,7 @@ export const ConventionValidatePage = ({ route }: VerificationPageProps) => {
                     !!successMessage ||
                     (currentStatus != "IN_REVIEW" &&
                       currentStatus != "ACCEPTED_BY_COUNSELLOR")
-                  }
-                >
+                  }>
                   {currentStatus === "ACCEPTED_BY_VALIDATOR"
                     ? "Demande déjà validée"
                     : "Valider la demande"}
@@ -126,8 +120,7 @@ export const ConventionValidatePage = ({ route }: VerificationPageProps) => {
               {errorMessage && (
                 <Notification
                   type="error"
-                  title="Veuillez nous excuser. Un problème est survenu qui a compromis l'enregistrement de vos informations. Veuillez réessayer ultérieurement"
-                >
+                  title="Veuillez nous excuser. Un problème est survenu qui a compromis l'enregistrement de vos informations. Veuillez réessayer ultérieurement">
                   {errorMessage}
                 </Notification>
               )}

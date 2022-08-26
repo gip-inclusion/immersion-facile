@@ -80,8 +80,7 @@ export const ConventionSignPage = ({ route }: SignFormProps) => {
 
       <ApiDataContainer
         callApi={() => conventionGateway.getMagicLink(route.params.jwt)}
-        jwt={route.params.jwt}
-      >
+        jwt={route.params.jwt}>
         {(convention) => (
           <SignFormSpecific convention={convention} jwt={route.params.jwt} />
         )}
@@ -182,8 +181,7 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
               } finally {
                 setSubmitting(false);
               }
-            }}
-          >
+            }}>
             {(props) => {
               const rejectWithMessageForm = async (): Promise<void> => {
                 const justification = prompt(
@@ -211,8 +209,7 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
                 <div>
                   <form
                     onReset={props.handleReset}
-                    onSubmit={props.handleSubmit}
-                  >
+                    onSubmit={props.handleSubmit}>
                     <ConventionFormFields
                       isFrozen={true}
                       isSignOnly={true}
@@ -240,8 +237,7 @@ const ConventionRejectedMessage = () => (
     <br />
     <Notification
       type="error"
-      title="Désolé : votre demande d'immersion a été refusée"
-    >
+      title="Désolé : votre demande d'immersion a été refusée">
       Votre demande d'immersion a été refusée. Vous avez reçu un mail vous en
       donnant les raisons.
       <p>Veuillez contacter votre conseiller pour plus d'informations.</p>
@@ -254,8 +250,7 @@ const ConventionNeedsModificationMessage = (props: { jwt: string }) => (
     <br />
     <Notification
       type="info"
-      title="Des modifications ont été demandées sur votre demande"
-    >
+      title="Des modifications ont été demandées sur votre demande">
       Vous ne pouvez pas encore signer votre demande d'immersion car des
       modifications ont été réclamées par votre conseiller (Vous avez reçu un
       mail précisant les changements à effectuer).

@@ -16,8 +16,7 @@ export const OurAdvises = () => (
           <SubTitle>
             Comment contacter un employeur pour faire une immersion ?
           </SubTitle>
-        }
-      >
+        }>
         <ul className="p-1">
           <li>
             Pour une petite entreprise, un artisan, un commerce, rendez-vous sur
@@ -37,8 +36,7 @@ export const OurAdvises = () => (
       <AccordionItem
         title={
           <SubTitle>Comment expliquer l'immersion à un employeur ?</SubTitle>
-        }
-      >
+        }>
         <ul className="p-1">
           <li>
             C’est un stage d’observation, strictement encadré d’un point de vue

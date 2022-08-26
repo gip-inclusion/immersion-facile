@@ -100,8 +100,7 @@ export const HourPicker = ({
           style={{
             marginTop: "10px",
           }}
-          onClick={() => add()}
-        >
+          onClick={() => add()}>
           Ajouter des horaires
         </ButtonAdd>
       )}

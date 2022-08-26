@@ -50,8 +50,7 @@ export const EstablishmentCreationForm = ({
       initialValues={creationInitialValues}
       saveForm={async (data) => {
         await establishmentGateway.addFormEstablishment(data);
-      }}
-    >
+      }}>
       <CreationSiretRelatedInputs />
     </EstablishmentFormikForm>
   );
@@ -108,8 +107,7 @@ const CreationSiretRelatedInputs = () => {
                   .catch((err) => {
                     setRequestEmailToEditFormError(err.response.data.errors);
                   });
-              }}
-            >
+              }}>
               Demande de modification du formulaire de référencement
             </Button>
           </div>
@@ -124,8 +122,7 @@ const CreationSiretRelatedInputs = () => {
         <>
           <Notification
             type="info"
-            title="La demande de modification n'a pas aboutie."
-          >
+            title="La demande de modification n'a pas aboutie.">
             {requestEmailToEditFormError}
           </Notification>
           <br />

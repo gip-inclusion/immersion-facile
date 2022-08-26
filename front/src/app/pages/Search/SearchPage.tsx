@@ -37,8 +37,7 @@ export const SearchPage = () => {
               lon: 0,
               radiusKm: 10,
             }}
-            onSubmit={searchUseCase}
-          >
+            onSubmit={searchUseCase}>
             {({ setFieldValue, values }) => (
               <Form>
                 <div className="gap-5 flex flex-col">
@@ -93,8 +92,7 @@ export const SearchPage = () => {
                       values.lon === 0 ||
                       values.lat === 0
                     }
-                    type="submit"
-                  >
+                    type="submit">
                     <div>
                       <SearchIcon />
                       Rechercher
