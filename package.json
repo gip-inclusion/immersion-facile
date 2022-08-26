@@ -9,6 +9,9 @@
   ],
   "scripts": {
     "prepare": "husky install && chmod a+x .husky/pre-commit && chmod a+x .husky/pre-push",
+    "prettier": "pnpm prettier:glob --write ./**/src/",
+    "prettier:check": "pnpm prettier:glob --check ./**/src/",
+    "prettier:glob": "prettier --config=./.tooling/.prettier/.prettierrc.json",
     "back": "pnpm --dir back",
     "front": "pnpm --dir front",
     "shared": "pnpm --dir shared",
@@ -18,9 +21,12 @@
     "lint:shared": "eslint shared/src --fix",
     "lint:libs": "eslint libs/ --fix",
     "lint": "eslint ./**/src/ --fix",
+    "lint-staged": "lint-staged --config=./.tooling/.lintstaged/.lintstagedrc",
     "pre-commit": "pnpm --dir back format"
   },
   "devDependencies": {
-    "husky": "^8.0.1"
+    "husky": "^8.0.1",
+    "lint-staged": "^13.0.3",
+    "prettier": "^2.6.0"
   }
 }

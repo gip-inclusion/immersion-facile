@@ -84,7 +84,13 @@ Pour le frontend se référer ensuite ici:
 #### CLI
 
 ##### Husky
+Husky sert à automatiser des executions de commandes projet avant les commits et les push (format, lint, test... )
 La configuration husky est présente ici [.husky](.husky)  
 Documentation locale  [.husky.md](.husky/husky.md)  
 [Documentation officielle](https://typicode.github.io/husky/#/)
+
+##### Lint-staged
+Lint stage permet de ne jouer le lint et le prettier que sur les fichiers qui ont été stage dans Git
+La configuration lint-stage est présente ici [.tooling/.lint-staged/.lintstagedrc](.tooling/.lint-staged/.lintstagedrc)
+[Documentation officielle](https://github.com/okonet/lint-staged)
 

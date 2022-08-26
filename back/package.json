@@ -62,7 +62,6 @@
     "eslint-plugin-jest": "^26.1.2",
     "extract-zip": "^2.0.1",
     "jest": "^27.5.1",
-    "prettier": "^2.6.0",
     "supertest": "^6.2.2",
     "ts-node-dev": "^1.1.8",
     "typescript": "^4.6.2"
