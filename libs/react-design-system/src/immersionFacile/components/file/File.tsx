@@ -1,8 +1,6 @@
 import React from "react";
 import classNames from "classnames";
 
-import "@gouvfr/dsfr/dist/component/link/link.css";
-
 export type FileProperties = {
   className?: string | object | [];
   label: string;

@@ -10,8 +10,6 @@ import ReactDOM from "react-dom";
 import classNames from "classnames";
 import { ModalClose } from "./ModalClose";
 
-import "@gouvfr/dsfr/dist/component/modal/modal.css";
-
 /**
  *
  * @visibleName Modale -- Modal
@@ -42,9 +40,9 @@ const useFocusTrap = (ref: React.MutableRefObject<null>) => {
     const filtered: HTMLElement[] = [];
     const arrayElements = Array.from(
       element.querySelectorAll(
-        'a, button, input, textarea, select, details, [tabindex]:not([tabindex="-1"])'
+        'a, button, input, textarea, select, details, [tabindex]:not([tabindex="-1"])',
       ),
-      (e) => e
+      (e) => e,
     );
 
     arrayElements.forEach((el: Element) => {
@@ -64,7 +62,7 @@ const useFocusTrap = (ref: React.MutableRefObject<null>) => {
       setFocus((currentFocus) =>
         currentFocus - 1 < 0 && focusableElements
           ? focusableElements.length - 1
-          : currentFocus - 1
+          : currentFocus - 1,
       );
     }
   };
@@ -98,32 +96,32 @@ export const ModalDialog = ({
     {
       "fr-modal--opened": openedModal,
     },
-    className
+    className,
   );
   const focusBackTo = document.activeElement;
   const handleTabulation = useFocusTrap(modalRef);
   const title = Children.toArray(children).filter(
     (child) =>
-      React.isValidElement(child) && child.props.__TYPE === "ModalTitle"
+      React.isValidElement(child) && child.props.__TYPE === "ModalTitle",
   );
   const content = Children.toArray(children).filter(
     (child) =>
-      React.isValidElement(child) && child.props.__TYPE === "ModalContent"
+      React.isValidElement(child) && child.props.__TYPE === "ModalContent",
   );
   const footer = Children.toArray(children).filter(
     (child) =>
-      React.isValidElement(child) && child.props.__TYPE === "ModalFooter"
+      React.isValidElement(child) && child.props.__TYPE === "ModalFooter",
   );
   const close = Children.toArray(children).filter(
     (child) =>
-      React.isValidElement(child) && child.props.__TYPE === "ModalClose"
+      React.isValidElement(child) && child.props.__TYPE === "ModalClose",
   );
 
   useEffect(
     () => () => {
       document.body.style.overflow = "";
     },
-    []
+    [],
   );
 
   const handleModal = (open: boolean) => {
@@ -186,8 +184,7 @@ export const ModalDialog = ({
       className={_className}
       ref={modalRef}
       onKeyDown={(e) => handleAllKeyDown(e)}
-      onClick={(e) => handleOverlayClick(e)}
-    >
+      onClick={(e) => handleOverlayClick(e)}>
       <div className="fr-container fr-container--fluid fr-container-md">
         <div className="fr-grid-row fr-grid-row--center closing-overlay">
           <div className={`fr-col-12 fr-col-md-${colSize}`}>
@@ -222,8 +219,7 @@ const Modal = ({
       className={className}
       size={size}
       hide={hide}
-      canClose={canClose}
-    >
+      canClose={canClose}>
       {children}
     </ModalDialog>
   );

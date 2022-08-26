@@ -10,8 +10,6 @@ import React, {
 
 import classNames from "classnames";
 
-import "@gouvfr/dsfr/dist/component/accordion/accordion.css";
-
 export type AccordionProperties = {
   className?: string | object | [];
   children: React.ReactNode;
