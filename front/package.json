@@ -13,7 +13,7 @@
     "format": "pnpm -w prettier:glob --write ./front/src",
     "format:check": "pnpm -w prettier:glob --check ./front/src",
     "fullcheck": "npm run includecheck && npm run format && npm run test && npm run typecheck && npm run lint",
-    "lint": "pnpm -w run lint:front"
+    "lint": "pnpm -w lintconfig:glob ./front/src"
   },
   "dependencies": {
     "@emotion/react": "^11.8.2",

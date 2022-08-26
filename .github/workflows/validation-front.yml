@@ -116,7 +116,7 @@ jobs:
 
       - name: eslint
         working-directory: front
-        run: pnpm run lint
+        run: pnpm lints
 
   prettier:
     runs-on: ubuntu-latest

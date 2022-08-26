@@ -5,7 +5,7 @@
     "includecheck": "./check_includes.sh",
     "typecheck": "tsc --noEmit",
     "fullcheck": "pnpm run includecheck && pnpm run test && pnpm run typecheck && pnpm run lint",
-    "lint": "pnpm -w run lint:shared"
+    "lint": "pnpm -w lintconfig:glob ./shared/src"
   },
   "devDependencies": {
     "@types/ramda": "^0.28.1",

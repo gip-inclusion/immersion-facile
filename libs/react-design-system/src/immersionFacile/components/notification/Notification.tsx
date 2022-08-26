@@ -11,6 +11,8 @@ interface SuccessMessageProps {
   title: string;
   children: React.ReactNode;
 }
+// TODO Delete if past october and not used
+/* eslint-disable @typescript-eslint/no-unused-vars */
 const ErrorMessage = ({ title, children }: ErrorMessageProps) => (
   <>
     <div role="alert" className="fr-alert fr-alert--error">
@@ -19,6 +21,9 @@ const ErrorMessage = ({ title, children }: ErrorMessageProps) => (
     </div>
   </>
 );
+
+// TODO Delete if past october and not used
+/* eslint-disable @typescript-eslint/no-unused-vars */
 const InfoMessage = ({ children, title }: InfoMessageProps) => (
   <>
     <div role="alert" className="fr-alert fr-alert--info">
@@ -27,6 +32,9 @@ const InfoMessage = ({ children, title }: InfoMessageProps) => (
     </div>
   </>
 );
+
+// TODO Delete if past october and not used
+/* eslint-disable @typescript-eslint/no-unused-vars */
 const SuccessMessage = ({ title, children }: SuccessMessageProps) => (
   <div role="alert" className="fr-alert fr-alert--success">
     <p className="fr-alert__title">{title}</p>
