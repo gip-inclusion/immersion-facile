@@ -28,7 +28,7 @@
     "test:front": "pnpm front test",
     "test:shared": "pnpm shared test",
     "tests": "concurrently --kill-others-on-fail \"pnpm:test:*\"",
-    "fullcheck": "concurrently --kill-others-on-fail \"pnpm:tests\" \"pnpm:prettier:check\""
+    "fullcheck": "concurrently --kill-others-on-fail \"pnpm:tests\" \"pnpm:prettier:check\" \"pnpm:lints\""
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.35.1",
