@@ -69,6 +69,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<v
       assessmentEmailParamsOfImmersionEndingTomorrow.length,
     );
   }
+
   private async _sendOneEmailWithImmersionAssessmentCreationLink(
     uow: UnitOfWork,
     immersionAssessmentEmailParams: ImmersionAssessmentEmailParams,

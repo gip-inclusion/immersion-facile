@@ -12,6 +12,7 @@ Il y pour cela plusieurs axes de travail :
 Pour démarrer le projet il vous faut `git`, `docker` et `node` (version > 12 )installée sur la machine.
 Nous utilions également `pnpm` comme gestionnaire de paquets (pour l'installer : `npm install -g pnpm`).
 
+
 ### Démarrer le projet
 
 Il faut demander d'être ajouté au projet sur le gitlab de pole-emploi. L'url du projet est la suivante :
@@ -27,11 +28,17 @@ ssh-keygen -t ed25519 -C "your_email@example.com"
 ```
 
 #### Cloner le projet :
-
 ```sh
 git clone ssh://git@git.beta.pole-emploi.fr:23/jburkard/immersion-facile.git immersion-facile;
 cd immersion-facile;
 ```
+
+#### Installer les dépendances nodes
+```shell
+pnpm install
+```
+
+
 
 #### Faire une copie du `.env.sample` qui devra s'appeler `.env`:
 
@@ -71,3 +78,13 @@ Pour le frontend se référer ensuite ici:
 [Documentation frontend](./front/README.md)
 
 -
+
+### Outillage
+
+#### CLI
+
+##### Husky
+La configuration husky est présente ici [.husky](.husky)  
+Documentation locale  [.husky.md](.husky/husky.md)  
+[Documentation officielle](https://typicode.github.io/husky/#/)
+
