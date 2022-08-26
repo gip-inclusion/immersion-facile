@@ -20,8 +20,10 @@ export const UploadFile = ({
   return (
     <File
       onChange={async (e) => {
-        const file = e.target.files[0];
-
+        let file = null;
+        if (e.target.files?.length) {
+          file = e.target.files[0];
+        }
         if (file && file.size > 1_000_000 * maxSize_Mo) {
           setError(`Le fichier ne peut pas faire plus de ${maxSize_Mo} Mo`);
           return;
