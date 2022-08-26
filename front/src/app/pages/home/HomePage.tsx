@@ -10,13 +10,23 @@ import { MainWrapper } from "react-design-system/immersionFacile";
 
 const { frontEnvType } = ENV;
 const DebugInfo = () => (
-  <div>
-    <br />
-    Env variables are:
-    <br />
+  <div
+    style={{
+      position: "fixed",
+      top: "1rem",
+      right: "1rem",
+      backgroundColor: "rgba(255,255,255,.8)",
+      borderRadius: "5px",
+      boxShadow: "0 2px 5px rgba(0,0,0,.1)",
+      zIndex: 10,
+      padding: "1rem",
+      fontSize: ".75rem",
+    }}>
+    <h3>Env variables are:</h3>
+
     {Object.entries(ENV).map(([envName, envValue]) => (
-      <div key={envName} style={{ width: "400px" }}>
-        {envName}: {JSON.stringify(envValue, null, 2)}
+      <div key={envName}>
+        {envName}: <strong>{JSON.stringify(envValue, null, 2)}</strong>
       </div>
     ))}
   </div>
