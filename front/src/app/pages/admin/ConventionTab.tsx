@@ -14,7 +14,6 @@ import { conventionGateway } from "src/app/config/dependencies";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { ConventionFormAccordion } from "src/uiComponents/admin/ConventionFormAccordion";
-import { FormMagicLinks } from "src/uiComponents/admin/FormMagicLinks";
 import { WithBackground } from "src/uiComponents/admin/WithBackground";
 import "./Admin.css";
 
@@ -28,9 +27,16 @@ export const ConventionTab = () => {
 
   const [agencyFilter, setAgencyFilter] = useState<AgencyId | undefined>();
 
-  const filterChanged = (selectedConventionStatus?: ConventionStatus) => {
+  const filterChanged = (
+    selectedConventionStatus?: ConventionStatus | "Tous les statuts",
+  ) => {
     setConventions([]);
-    if (selectedConventionStatus) setStatusFilter(selectedConventionStatus);
+    if (!selectedConventionStatus) return;
+    if (selectedConventionStatus === "Tous les statuts") {
+      setStatusFilter(undefined);
+      return;
+    }
+    setStatusFilter(selectedConventionStatus);
   };
 
   useEffect(() => {
@@ -55,7 +61,7 @@ export const ConventionTab = () => {
             <div className="w-2/3">
               <ArrayDropdown
                 label="Sélectionner un statut"
-                options={[...allConventionStatuses]}
+                options={["Tous les statuts", ...allConventionStatuses]}
                 onSelect={filterChanged}
                 allowEmpty={false}
                 defaultSelectedOption={"IN_REVIEW"}
@@ -75,7 +81,7 @@ export const ConventionTab = () => {
             {conventions.map((item) => (
               <li key={item.id}>
                 <ConventionFormAccordion convention={item} />
-                <FormMagicLinks convention={item} />
+                {/*<FormMagicLinks convention={item} />*/}
                 <hr />
               </li>
             ))}
