@@ -21,7 +21,7 @@
     "lint:front": "pnpm front lint",
     "lint:shared": "pnpm shared lint",
     "lint:react-design-system": "pnpm react-design-system lint",
-    "lintconfig:glob": "eslint",
+    "lintconfig:glob": "eslint --config=.eslintrc.js",
     "lint-staged": "lint-staged --config=./.tooling/.lintstaged/.lintstagedrc",
     "lints": "concurrently --kill-others-on-fail \"pnpm:lint:*\" ",
     "test:back": "pnpm back test",

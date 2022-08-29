@@ -15,7 +15,6 @@ import { Clock, DateStr } from "../../../domain/core/ports/Clock";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
-import { tracer } from "../../primary/scripts/tracing";
 
 const logger = createLogger(__filename);
 
@@ -116,7 +115,7 @@ export class InMemoryEventBus implements EventBus {
     // Some subscribers have failed :
     const wasQuarantined = event.publications.length >= 3;
     if (wasQuarantined) {
-      logger.error({ event }, "Failed to many times, event is Quarantined");
+      logger.error({ event }, "Failed too many times, event is Quarantined");
       notifyObjectDiscord(event);
     }
 
@@ -154,26 +153,7 @@ const makeExecuteCbMatchingSubscriptionId =
     );
 
     try {
-      await tracer.startActiveSpan(
-        `Publish topic: ${event.topic} for UC ${subscriptionId}`,
-        (span) => {
-          span.setAttributes({
-            _topic: event.topic,
-            _useCase: subscriptionId,
-            payload: JSON.stringify(event.payload),
-          });
-
-          return cb(event)
-            .catch((error) => {
-              span.setAttributes({
-                eventExecutionFailed: true,
-                error: JSON.stringify(error),
-              });
-              throw error;
-            })
-            .finally(() => span.end());
-        },
-      );
+      await cb(event);
     } catch (error: any) {
       monitorErrorInCallback(error, event);
       return { subscriptionId, errorMessage: error.message };
