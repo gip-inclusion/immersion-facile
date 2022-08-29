@@ -52,6 +52,7 @@ const contactsEqual = (a: ContactEntityV2, b: ContactEntityV2) => {
   const { id: _unusedIdB, ...contactBWithoutId } = b;
   return objectsDeepEqual(contactAWithoutId, contactBWithoutId);
 };
+
 export class PgEstablishmentAggregateRepository
   implements EstablishmentAggregateRepository
 {
@@ -77,6 +78,7 @@ export class PgEstablishmentAggregateRepository
 
     return;
   }
+
   public async updateEstablishmentAggregate(
     updatedAggregate: EstablishmentAggregate,
     updatedAt: Date,
@@ -176,6 +178,7 @@ export class PgEstablishmentAggregateRepository
           establishmentFields,
         ),
       );
+
       await this.client.query(query);
     } catch (e: any) {
       logger.error(e, "Error inserting establishments");
@@ -409,9 +412,16 @@ export class PgEstablishmentAggregateRepository
   public async removeEstablishmentAndOffersAndContactWithSiret(
     siret: string,
   ): Promise<void> {
-    const query = `
-      DELETE FROM establishments WHERE siret = $1;`;
-    await this.client.query(query, [siret]);
+    try {
+      logger.info(`About to delete establishment with siret : ${siret}`);
+      const query = `DELETE FROM establishments WHERE siret = $1;`;
+      await this.client.query(query, [siret]);
+      logger.info(`Deleted establishment successfully`);
+    } catch (error: any) {
+      logger.info(`Error when deleting establishment : ${error.message}`);
+      logger.info({ error }, "Full Error");
+      throw error;
+    }
   }
 
   public async updateEstablishment(
@@ -593,6 +603,7 @@ export class PgEstablishmentAggregateRepository
     );
     await this.client.query(query);
   }
+
   private async selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
     selectedOffersSubQuery: string,
     selectedOffersSubQueryParams: any[],
@@ -619,6 +630,7 @@ export class PgEstablishmentAggregateRepository
       ),
     }));
   }
+
   async getEstablishmentAggregateBySiret(
     siret: SiretDto,
   ): Promise<EstablishmentAggregate | undefined> {
