@@ -34,6 +34,8 @@ describe("admin login", () => {
       user: "user",
       password: "password",
     });
+    // eslint-disable-next-line no-console
+    console.log("flaky ? response body : ", JSON.stringify(response.body));
     expect(typeof response.body).toBe("string");
     expect(response.status).toBe(200);
   });

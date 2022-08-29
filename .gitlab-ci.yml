@@ -6,41 +6,15 @@ variables:
   POSTGRES_PORT: 5432
   POSTGRES_HOST_AUTH_METHOD: trust
   PG_TEST_URL: postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:$POSTGRES_PORT/$POSTGRES_DB
-  STORAGE_ROOT: /storage
+  STORAGE_ROOT_RELATIVE: /back/storage
 
 image: node:16.15-buster
 
 stages:
-  #  - build
   - test
   - deploy
 
-#build:
-#  stage: build
-#  before_script:
-#    - curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm
-#    - pnpm config set store-dir .pnpm-store
-#  script:
-#    - pnpm install --frozen-lockfile
-
-front:
-  stage: test
-  before_script:
-    - curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm
-    - pnpm config set store-dir .pnpm-store
-  script:
-    - pnpm install --frozen-lockfile
-    - cd shared
-    - pnpm includecheck
-    - cd ../front
-    - pnpm includecheck
-    - pnpm format:check
-    - pnpm lint
-    - pnpm test
-    - pnpm typecheck
-    - pnpm build
-
-back:
+validations:
   stage: test
   before_script:
     - curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm
@@ -49,17 +23,15 @@ back:
     - name: postgis/postgis:13-master
       alias: postgres
   script:
-    - pnpm install --frozen-lockfile
-    - cd back
-    - PWD=$(pwd)
-    - STORAGE_FULL_PATH=$PWD$STORAGE_ROOT
+    - pnpm install --frozen-lockfile --ignore-scripts
+    - STORAGE_FULL_PATH=$(pwd)$STORAGE_ROOT_RELATIVE
     - mkdir -p $STORAGE_FULL_PATH/tmp/
-    - pnpm format:check
-    - pnpm lint
-    - pnpm includecheck
-    - pnpm typecheck
-    - NODE_ENV=test DATABASE_URL=$PG_TEST_URL npm run migrate up
-    - PG_URL=$PG_TEST_URL STORAGE_ROOT=$STORAGE_FULL_PATH pnpm run test:all
+    - NODE_ENV=test DATABASE_URL=$PG_TEST_URL pnpm back migrate up
+    - PG_URL=$PG_TEST_URL STORAGE_ROOT=$STORAGE_FULL_PATH pnpm back test:integration
+    - pnpm shared includecheck
+    - pnpm back includecheck
+    - pnpm front includecheck
+    - STORAGE_ROOT=$STORAGE_FULL_PATH pnpm fullcheck
 
 #sonarqube-check:
 #  stage: test
