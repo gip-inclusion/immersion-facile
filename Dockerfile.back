@@ -8,7 +8,7 @@ COPY back/package.json /app/back/
 
 WORKDIR /app
 
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 COPY ./shared/ /app/shared
 
