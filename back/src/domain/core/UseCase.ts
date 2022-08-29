@@ -67,17 +67,31 @@ export abstract class TransactionalUseCase<
     logger.info(`UseCase execution start - ${useCaseName}`);
     const validParams = validateAndParseZodSchema(this.inputSchema, params);
 
-    return this.uowPerformer
-      .perform((uow) => this._execute(validParams, uow, jwtPayload))
-      .catch((error) => {
-        logger.error(
-          `UseCase execution Errored - ${useCaseName} : ${error.message}`,
-        );
-        throw error;
-      })
-      .finally(() => {
-        logger.info(`UseCase execution Finished - ${useCaseName}`);
-      });
+    try {
+      return await this.uowPerformer.perform((uow) =>
+        this._execute(validParams, uow, jwtPayload),
+      );
+    } catch (error: any) {
+      logger.error(
+        `UseCase execution Errored - ${useCaseName} : ${error.message}`,
+      );
+      throw error;
+    } finally {
+      logger.info(`UseCase execution Finished - ${useCaseName}`);
+    }
+
+    // Old version :
+    // return this.uowPerformer
+    //   .perform((uow) => this._execute(validParams, uow, jwtPayload))
+    //   .catch((error) => {
+    //     logger.error(
+    //       `UseCase execution Errored - ${useCaseName} : ${error.message}`,
+    //     );
+    //     throw error;
+    //   })
+    //   .finally(() => {
+    //     logger.info(`UseCase execution Finished - ${useCaseName}`);
+    //   });
   }
 
   protected abstract _execute(
