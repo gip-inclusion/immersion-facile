@@ -73,7 +73,7 @@ describe("Siret validation and fetching", () => {
   const establishmentFetched = {
     siret: "11110000111100",
     businessName: "Existing open business on Sirene Corp.",
-    businessAddress: "",
+    businessAddress: "2 avenue Karl Marx, 75018 Paris",
     isOpen: true,
   };
 

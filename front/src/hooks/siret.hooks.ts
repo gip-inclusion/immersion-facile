@@ -58,8 +58,9 @@ export const useSiretFetcher = ({
     isFetchingSiret: isFetching,
     siretErrorToDisplay: siretErrorToDisplay ?? undefined,
     siretRawError,
-    updateSiret: (newSiret: string) =>
-      dispatch(siretSlice.actions.siretModified(newSiret)),
+    updateSiret: (newSiret: string) => {
+      dispatch(siretSlice.actions.siretModified(newSiret));
+    },
   };
 };
 

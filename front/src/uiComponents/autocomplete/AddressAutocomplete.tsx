@@ -29,7 +29,6 @@ export const AddressAutocomplete = ({
   const [options, setOptions] = useState<AddressAndPosition[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const debounceSearchTerm = useDebounce(searchTerm, 400);
-
   useEffect(
     () =>
       useEffectInitialSearchTerm(
@@ -139,8 +138,8 @@ const useEffectInitialSearchTerm = (
 ): void => {
   if (
     initialSearchTerm &&
-    selectedOption &&
-    initialSearchTerm !== addressDtoToString(selectedOption.address)
+    (!selectedOption ||
+      initialSearchTerm !== addressDtoToString(selectedOption.address))
   )
     getAddressesFromApi(initialSearchTerm, setOptions, setIsSearching)
       .then((addresses) => setSelectedOption(addresses?.[0] ?? null))

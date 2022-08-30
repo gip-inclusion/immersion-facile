@@ -1,5 +1,5 @@
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Section } from "src/app/components/Section";
 import {
@@ -16,6 +16,7 @@ import { EstablishmentSubTitle } from "../pages/home/components/EstablishmentSub
 import { EstablishmentTitle } from "../pages/home/components/EstablishmentTitle";
 import { routes } from "../routing/routes";
 import { useAppSelector } from "../utils/reduxHooks";
+
 export const EstablishmentHomeMenu = () => {
   const { currentSiret, updateSiret, siretErrorToDisplay } = useSiretFetcher({
     shouldFetchEvenIfAlreadySaved: false,
@@ -31,7 +32,9 @@ export const EstablishmentHomeMenu = () => {
   const isReadyForRequestOrRedirection = useAppSelector(
     establishmentSelectors.isReadyForLinkRequestOrRedirection,
   );
+  const clearSiret = () => updateSiret("");
 
+  useEffect(clearSiret, []);
   const styleType = "establishment";
 
   return (
