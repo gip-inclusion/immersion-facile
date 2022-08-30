@@ -3,9 +3,8 @@
   "editor.insertSpaces": true,
   "editor.detectIndentation": false,
   "editor.formatOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "terminal.integrated.scrollback": 100000,
   "[typescript]": {
-    "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
 }

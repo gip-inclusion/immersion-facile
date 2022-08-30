@@ -3,6 +3,7 @@ import React from "react";
 import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
 import { addressDtoToString } from "src/../../shared/src/utils/address";
 import { establishmentGateway } from "src/app/config/dependencies";
+import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { routes } from "src/app/routing/routes";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
@@ -21,37 +22,39 @@ export const EstablishmentEditionFormPage = ({
 }: {
   route: Route<typeof routes.editFormEstablishment>;
 }) => (
-  <ApiDataContainer
-    callApi={() =>
-      establishmentGateway.getFormEstablishmentFromJwt(
-        decodeJwt<EstablishmentJwtPayload>(route.params.jwt).siret,
-        route.params.jwt,
-      )
-    }
-    jwt={route.params.jwt}>
-    {(formEstablishment) => {
-      if (!formEstablishment)
-        return <p>Données de formulaire d'établissement indisponibles</p>;
-      if (!route.params.jwt) {
-        return <p>Lien non valide</p>;
+  <HeaderFooterLayout>
+    <ApiDataContainer
+      callApi={() =>
+        establishmentGateway.getFormEstablishmentFromJwt(
+          decodeJwt<EstablishmentJwtPayload>(route.params.jwt).siret,
+          route.params.jwt,
+        )
       }
-      return (
-        <EstablishmentFormikForm
-          initialValues={formEstablishment}
-          saveForm={(data) =>
-            establishmentGateway.updateFormEstablishment(
-              { ...data },
-              route.params.jwt,
-            )
-          }
-          isEditing>
-          <EditionSiretRelatedInputs
-            businessAddress={formEstablishment.businessAddress}
-          />
-        </EstablishmentFormikForm>
-      );
-    }}
-  </ApiDataContainer>
+      jwt={route.params.jwt}>
+      {(formEstablishment) => {
+        if (!formEstablishment)
+          return <p>Données de formulaire d'établissement indisponibles</p>;
+        if (!route.params.jwt) {
+          return <p>Lien non valide</p>;
+        }
+        return (
+          <EstablishmentFormikForm
+            initialValues={formEstablishment}
+            saveForm={(data) =>
+              establishmentGateway.updateFormEstablishment(
+                { ...data },
+                route.params.jwt,
+              )
+            }
+            isEditing>
+            <EditionSiretRelatedInputs
+              businessAddress={formEstablishment.businessAddress}
+            />
+          </EstablishmentFormikForm>
+        );
+      }}
+    </ApiDataContainer>
+  </HeaderFooterLayout>
 );
 
 const EditionSiretRelatedInputs = ({

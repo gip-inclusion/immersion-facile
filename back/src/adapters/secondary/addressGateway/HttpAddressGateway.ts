@@ -32,7 +32,7 @@ const targetUrlsReverseMapper: TargetUrlsMapper<TargetUrls> = {
   apiAddressReverse: (param: { lat: string; lon: string }) =>
     `${apiAddressBaseUrl}${apiRoutes.reverse}?lon=${param.lon}&lat=${param.lat}`,
   apiAddressSearchPlainText: (param: { text: string }) =>
-    `${apiAddressBaseUrl}${apiRoutes.search}?q=${param.text}`,
+    `${apiAddressBaseUrl}${apiRoutes.search}?q=${encodeURI(param.text)}`,
 };
 
 export const httpAddressApiClient = new ManagedAxios(

@@ -112,6 +112,75 @@ describe("HttpAddressGateway", () => {
       expectTypeToMatchAndEqual(result, []);
     }, 5000);
 
+    it("Should return expected address DTO when providing address with special caracters.", async () => {
+      const result = await httpAddressGateway.lookupStreetAddress(
+        "Route d’Huez 38750 Huez",
+      );
+
+      expectTypeToMatchAndEqual(result, [
+        {
+          address: {
+            streetNumberAndAddress: "Route d’Huez",
+            city: "Huez",
+            departmentCode: "38",
+            postcode: "38750",
+          },
+          position: {
+            lat: 45.091381,
+            lon: 6.060871,
+          },
+        },
+        {
+          address: {
+            streetNumberAndAddress: "Route des Lacs",
+            city: "Huez",
+            departmentCode: "38",
+            postcode: "38750",
+          },
+          position: {
+            lat: 45.104832,
+            lon: 6.07367,
+          },
+        },
+        {
+          address: {
+            streetNumberAndAddress: "Route du Signal",
+            city: "Huez",
+            departmentCode: "38",
+            postcode: "38750",
+          },
+          position: {
+            lat: 45.092855,
+            lon: 6.065358,
+          },
+        },
+        {
+          address: {
+            streetNumberAndAddress: "Route du Coulet",
+            city: "Huez",
+            departmentCode: "38",
+            postcode: "38750",
+          },
+          position: {
+            lat: 45.091878,
+            lon: 6.064942,
+          },
+        },
+        {
+          address: {
+            streetNumberAndAddress: "Rue du Poutat",
+            city: "Huez",
+            departmentCode: "38",
+            postcode: "38750",
+          },
+          position: {
+            lat: 45.093347,
+            lon: 6.06971,
+          },
+        },
+      ]);
+    }, 5000);
+
     it("should return list of addresses & positions from lookup string with expected results", async () => {
       const result = await httpAddressGateway.lookupStreetAddress(
         query8bdduportLookup,
