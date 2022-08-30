@@ -225,7 +225,7 @@ const AdvisesForContact = () => (
 
     <SubTitle>Quelle est la durée d’une immersion ?</SubTitle>
     <Paragraph>
-      Les immersions se font le plus souvent pendant une semaine ou deux.
+      Les immersions se font le plus souvent pendant une semaine ou deux.{" "}
       <Bold>Il n’est pas possible de dépasser un mois</Bold>. Il est possible de
       faire une immersion de seulement un ou deux jours mais vous ne découvrirez
       pas parfaitement un métier.
