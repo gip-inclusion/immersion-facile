@@ -3,62 +3,62 @@ export const query8bdduportLookup = "8+bd+du+port";
 export const expected8bdduportAddressAndPositions: AddressAndPosition[] = [
   {
     address: {
-      city: "La Porte du Der",
-      departmentCode: "52",
-      postcode: "52220",
-      streetNumberAndAddress: "La Porte du Der",
+      city: "Amiens",
+      departmentCode: "80",
+      postcode: "80000",
+      streetNumberAndAddress: "8 Boulevard du Port",
     },
     position: {
-      lat: 48.473662,
-      lon: 4.785348,
+      lat: 49.897442,
+      lon: 2.290084,
     },
   },
   {
     address: {
-      city: "Porte du Ried",
-      departmentCode: "68",
-      postcode: "68320",
-      streetNumberAndAddress: "Porte du Ried",
+      city: "Cergy",
+      departmentCode: "95",
+      postcode: "95000",
+      streetNumberAndAddress: "8 Boulevard du Port",
     },
     position: {
-      lat: 48.112947,
-      lon: 7.428206,
+      lat: 49.0317,
+      lon: 2.062794,
     },
   },
   {
     address: {
-      city: "Le Port",
-      departmentCode: "974",
-      postcode: "97420",
-      streetNumberAndAddress: "Le Port",
+      city: "Mèze",
+      departmentCode: "34",
+      postcode: "34140",
+      streetNumberAndAddress: "8 Boulevard du Port",
     },
     position: {
-      lat: -20.946205,
-      lon: 55.304585,
+      lat: 43.425225,
+      lon: 3.605884,
     },
   },
   {
     address: {
-      city: "Porte-du-Quercy",
-      departmentCode: "46",
-      postcode: "46800",
-      streetNumberAndAddress: "Porte-du-Quercy",
+      city: "Le Barcarès",
+      departmentCode: "66",
+      postcode: "66420",
+      streetNumberAndAddress: "8 Boulevard du Port",
     },
     position: {
-      lat: 44.411145,
-      lon: 1.144793,
+      lat: 42.79091,
+      lon: 3.036731,
     },
   },
   {
     address: {
-      city: "Port-de-Bouc",
-      departmentCode: "13",
-      postcode: "13110",
-      streetNumberAndAddress: "Port-de-Bouc",
+      city: "Pornichet",
+      departmentCode: "44",
+      postcode: "44380",
+      streetNumberAndAddress: "8 Boulevard du Port",
     },
     position: {
-      lat: 43.414073,
-      lon: 4.989098,
+      lat: 47.258811,
+      lon: -2.340983,
     },
   },
 ];

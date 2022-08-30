@@ -26,16 +26,11 @@ const apiRoutes = {
   search: `/search`,
   reverse: `/reverse`,
 };
-type TargetUrls =
-  | "apiAddressReverse"
-  | "apiAddressSearchMunicipalityPlainText"
-  | "apiAddressSearchPlainText";
+type TargetUrls = "apiAddressReverse" | "apiAddressSearchPlainText";
 
 const targetUrlsReverseMapper: TargetUrlsMapper<TargetUrls> = {
   apiAddressReverse: (param: { lat: string; lon: string }) =>
     `${apiAddressBaseUrl}${apiRoutes.reverse}?lon=${param.lon}&lat=${param.lat}`,
-  apiAddressSearchMunicipalityPlainText: (param: { text: string }) =>
-    `${apiAddressBaseUrl}${apiRoutes.search}?q=${param.text}&type=municipality`,
   apiAddressSearchPlainText: (param: { text: string }) =>
     `${apiAddressBaseUrl}${apiRoutes.search}?q=${param.text}`,
 };
@@ -44,7 +39,7 @@ export const httpAddressApiClient = new ManagedAxios(
   targetUrlsReverseMapper,
   undefined,
   {
-    timeout: 10000,
+    timeout: 20000,
   },
 );
 
@@ -67,8 +62,7 @@ export class HttpAddressGateway implements AddressGateway {
     try {
       const { data } = await this.limiter.schedule(() =>
         this.httpClient.get({
-          target:
-            this.httpClient.targetsUrls.apiAddressSearchMunicipalityPlainText,
+          target: this.httpClient.targetsUrls.apiAddressSearchPlainText,
           targetParams: {
             text: query,
           },
@@ -89,8 +83,7 @@ export class HttpAddressGateway implements AddressGateway {
     try {
       const { data } = await this.limiter.schedule({}, () =>
         this.httpClient.get({
-          target:
-            this.httpClient.targetsUrls.apiAddressSearchMunicipalityPlainText,
+          target: this.httpClient.targetsUrls.apiAddressSearchPlainText,
           targetParams: {
             text: query,
           },
