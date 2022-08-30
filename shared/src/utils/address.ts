@@ -50,7 +50,9 @@ export const inferDepartmentCode = (postcode: string): string => {
 };
 
 export const addressDtoToString = (address: AddressDto): string =>
-  `${address.streetNumberAndAddress} ${address.postcode} ${address.city}`;
+  address.streetNumberAndAddress === address.city
+    ? `${address.postcode} ${address.city}`
+    : `${address.streetNumberAndAddress} ${address.postcode} ${address.city}`;
 
 export const addressStringToDto = (address: string): AddressDto => {
   const addressGroups = captureAddressGroups(address);

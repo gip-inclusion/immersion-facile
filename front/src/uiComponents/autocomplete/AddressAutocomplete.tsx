@@ -29,6 +29,7 @@ export const AddressAutocomplete = ({
   const [options, setOptions] = useState<AddressAndPosition[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const debounceSearchTerm = useDebounce(searchTerm, 400);
+
   useEffect(
     () =>
       useEffectInitialSearchTerm(
@@ -67,6 +68,7 @@ export const AddressAutocomplete = ({
       getOptionLabel={(option) => addressDtoToString(option.address)}
       onChange={onAutocompleteChange(setSelectedOption, setFormValue)}
       onInputChange={onAutocompleteInput(setSearchTerm)}
+      filterOptions={(option) => option} // https://mui.com/material-ui/react-autocomplete/#search-as-you-type
       renderInput={AutocompleteInput(
         headerClassName,
         label,
