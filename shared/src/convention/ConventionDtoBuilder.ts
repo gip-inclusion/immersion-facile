@@ -183,10 +183,12 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     });
   }
 
-  public withSchedule(schedule: (interval: DateIntervalDto) => ScheduleDto) {
+  public withSchedule(
+    scheduleMaker: (interval: DateIntervalDto) => ScheduleDto,
+  ) {
     return new ConventionDtoBuilder({
       ...this.dto,
-      schedule: schedule({
+      schedule: scheduleMaker({
         start: new Date(this.dto.dateStart),
         end: new Date(this.dto.dateEnd),
       }),

@@ -2,13 +2,20 @@ import {
   allConventionStatuses,
   ConventionDto,
   ConventionStatus,
+  immersionMaximumCalendarDays,
+  immersionMaximumWorkingDays,
 } from "shared/src/convention/convention.dto";
-import { conventionSchema } from "shared/src/convention/convention.schema";
+import {
+  conventionSchema,
+  conventionWithoutExternalIdSchema,
+} from "shared/src/convention/convention.schema";
 import {
   ConventionDtoBuilder,
   DATE_START,
-  DATE_SUBMISSION,
 } from "shared/src/convention/ConventionDtoBuilder";
+import { DailyScheduleDto } from "shared/src/schedule/Schedule.dto";
+
+import { ZodError } from "zod";
 import {
   addDays,
   splitCasesBetweenPassingAndFailing,
@@ -16,7 +23,6 @@ import {
 
 describe("conventionDtoSchema", () => {
   it("accepts valid Convention", () => {
-    /**/
     const convention = new ConventionDtoBuilder().build();
     expectConventionDtoToBeValid(convention);
   });
@@ -64,74 +70,107 @@ describe("conventionDtoSchema", () => {
     expectConventionDtoToBeInvalid(convention);
   });
 
-  it("rejects misformatted submission dates", () => {
-    const convention = new ConventionDtoBuilder()
-      .withDateSubmission("not-a-date")
-      .build();
+  describe("constraint on dates", () => {
+    it("rejects misformatted submission dates", () => {
+      const convention = new ConventionDtoBuilder()
+        .withDateSubmission("not-a-date")
+        .build();
 
-    expectConventionDtoToBeInvalid(convention);
-  });
+      expectConventionDtoToBeInvalid(convention);
+    });
 
-  it("rejects misformatted start dates", () => {
-    const convention = new ConventionDtoBuilder()
-      .withDateStart("not-a-date")
-      .build();
+    it("rejects misformatted start dates", () => {
+      const convention = new ConventionDtoBuilder()
+        .withDateStart("not-a-date")
+        .build();
 
-    expectConventionDtoToBeInvalid(convention);
-  });
+      expectConventionDtoToBeInvalid(convention);
+    });
 
-  it("rejects misformatted end dates", () => {
-    const convention = new ConventionDtoBuilder()
-      .withDateEnd("not-a-date")
-      .build();
+    it("rejects misformatted end dates", () => {
+      const convention = new ConventionDtoBuilder()
+        .withDateEnd("not-a-date")
+        .build();
 
-    expectConventionDtoToBeInvalid(convention);
-  });
+      expectConventionDtoToBeInvalid(convention);
+    });
 
-  it("rejects start dates that are after the end date", () => {
-    const convention = new ConventionDtoBuilder()
-      .withDateStart("2021-01-10")
-      .withDateEnd("2021-01-03")
-      .build();
+    it("rejects start dates that are after the end date", () => {
+      const convention = new ConventionDtoBuilder()
+        .withDateStart("2021-01-10")
+        .withDateEnd("2021-01-03")
+        .build();
 
-    expectConventionDtoToBeInvalid(convention);
-  });
+      expectConventionDtoToBeInvalid(convention);
+    });
 
-  it("accept start dates that are tuesday if submiting on previous friday", () => {
-    const convention = new ConventionDtoBuilder()
-      .withDateSubmission("2021-10-15") // which is a friday
-      .withDateStart("2021-10-19") // which is the following tuesday
-      .withDateEnd("2021-10-30")
-      .build();
+    it("accept start dates that are tuesday if submitting on previous friday", () => {
+      const convention = new ConventionDtoBuilder()
+        .withDateSubmission("2021-10-15") // which is a friday
+        .withDateStart("2021-10-19") // which is the following tuesday
+        .withDateEnd("2021-10-30")
+        .build();
 
-    expectConventionDtoToBeValid(convention);
-  });
+      expectConventionDtoToBeValid(convention);
+    });
 
-  it("rejects end dates that are more than 28 days after the start date", () => {
-    const convention = new ConventionDtoBuilder()
-      .withDateStart(DATE_START)
-      .withDateEnd(addDays(DATE_START, 29))
-      .build();
+    it(`rejects end dates that are more than ${immersionMaximumCalendarDays} calendar days after the start date`, () => {
+      const convention = new ConventionDtoBuilder()
+        .withDateStart(DATE_START)
+        .withDateEnd(addDays(DATE_START, immersionMaximumCalendarDays + 1))
+        .build();
 
-    expectConventionDtoToBeInvalid(convention);
-  });
+      expectConventionDtoToBeInvalid(convention);
+    });
 
-  it("accepts end dates that are <= 28 days after the start date", () => {
-    const convention = new ConventionDtoBuilder()
-      .withDateStart(DATE_START)
-      .withDateEnd(addDays(DATE_START, 28))
-      .build();
+    it(`accepts end dates that are < ${immersionMaximumCalendarDays} calendar days after the start date`, () => {
+      const dateStart = DATE_START;
+      const dateEnd = addDays(DATE_START, immersionMaximumCalendarDays - 1);
+      const convention = new ConventionDtoBuilder()
+        .withDateStart(dateStart)
+        .withDateEnd(dateEnd)
+        .build();
 
-    expectConventionDtoToBeValid(convention);
-  });
+      expectConventionDtoToBeValid(convention);
+    });
 
-  it("accepts start dates that are >= 2 days after the submission date", () => {
-    const convention = new ConventionDtoBuilder()
-      .withDateSubmission(DATE_SUBMISSION)
-      .withDateStart(addDays(DATE_SUBMISSION, 2))
-      .build();
+    it(`Schedules may have up to ${immersionMaximumWorkingDays} working days, should be valid`, () => {
+      const convention = new ConventionDtoBuilder()
+        .withDateStart(DATE_START)
+        .withDateEnd(addDays(DATE_START, immersionMaximumWorkingDays))
+        .withSchedule(() => ({
+          isSimple: false,
+          selectedIndex: 0,
+          complexSchedule: scheduleWithXDaysArray(
+            new Date(DATE_START),
+            immersionMaximumWorkingDays,
+          ),
+        }))
+        .build();
 
-    expectConventionDtoToBeValid(convention);
+      expectConventionDtoToBeValid(convention);
+    });
+
+    it(`Schedules may have up to ${immersionMaximumWorkingDays} working days, adding one more day should fail`, () => {
+      const conventionWithTooManyWorkingDays = new ConventionDtoBuilder()
+        .withDateStart(DATE_START)
+        .withDateEnd(addDays(DATE_START, immersionMaximumWorkingDays))
+        .withSchedule(() => ({
+          isSimple: false,
+          selectedIndex: 0,
+          complexSchedule: scheduleWithXDaysArray(
+            new Date(DATE_START),
+            immersionMaximumWorkingDays + 1,
+          ),
+        }))
+        .build();
+
+      expect(() => {
+        conventionWithoutExternalIdSchema.parse(
+          conventionWithTooManyWorkingDays,
+        );
+      }).toThrow(ZodError);
+    });
   });
 
   describe("status that are available without signatures", () => {
@@ -165,10 +204,31 @@ describe("conventionDtoSchema", () => {
   });
 });
 
-const expectConventionDtoToBeValid = (validConvention: ConventionDto) => {
+const expectConventionDtoToBeValid = (validConvention: ConventionDto): void => {
   expect(() => conventionSchema.parse(validConvention)).not.toThrow();
   expect(conventionSchema.parse(validConvention)).toBeTruthy();
 };
 
 const expectConventionDtoToBeInvalid = (conventionDto: ConventionDto) =>
   expect(() => conventionSchema.parse(conventionDto)).toThrow();
+
+const scheduleWithXDaysArray = (
+  initialDate: Date,
+  numberOfDays: number,
+): DailyScheduleDto[] => {
+  const daysArray: DailyScheduleDto[] = [];
+  for (let i = 0; i < numberOfDays; i++) {
+    daysArray.push(
+      dailyScheduleWithFixedPeriods(addDays(initialDate.toISOString(), i)),
+    );
+  }
+
+  return [...daysArray];
+};
+
+const dailyScheduleWithFixedPeriods = (
+  dateIsoString: string,
+): DailyScheduleDto => ({
+  date: dateIsoString,
+  timePeriods: [{ start: "08:00", end: "16:00" }],
+});

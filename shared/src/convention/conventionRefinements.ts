@@ -1,4 +1,8 @@
-import { ConventionStatus } from "./convention.dto";
+import differenceInDays from "date-fns/differenceInDays";
+import {
+  ConventionStatus,
+  immersionMaximumCalendarDays,
+} from "./convention.dto";
 
 type DatesInConvention = {
   dateStart: string;
@@ -11,18 +15,20 @@ export const startDateIsBeforeEndDate = ({
   dateEnd,
 }: DatesInConvention) => new Date(dateEnd) >= new Date(dateStart);
 
-export const underMaxDuration = ({ dateStart, dateEnd }: DatesInConvention) => {
-  const startDate = new Date(dateStart);
-  const endDate = new Date(dateEnd);
-  const maxEndDate = new Date(startDate);
-  maxEndDate.setDate(maxEndDate.getDate() + 28);
-  return endDate <= maxEndDate;
-};
+export const underMaxCalendarDuration = ({
+  dateStart,
+  dateEnd,
+}: {
+  dateStart: string;
+  dateEnd: string;
+}): boolean =>
+  differenceInDays(new Date(dateEnd), new Date(dateStart)) <
+  immersionMaximumCalendarDays;
 
 export const emailAndMentorEmailAreDifferent = (params: {
   email: string;
   mentorEmail: string;
-}) => params.email !== params.mentorEmail;
+}): boolean => params.email !== params.mentorEmail;
 
 const statusesAllowedWithoutSign: ConventionStatus[] = [
   "DRAFT",
@@ -35,13 +41,13 @@ const statusesAllowedWithoutSign: ConventionStatus[] = [
 export const mustBeSignedByBeneficiary = (params: {
   beneficiaryAccepted: boolean;
   status: ConventionStatus;
-}) =>
+}): boolean =>
   statusesAllowedWithoutSign.includes(params.status) ||
   params.beneficiaryAccepted;
 
 export const mustBeSignedByEstablishment = (params: {
   enterpriseAccepted: boolean;
   status: ConventionStatus;
-}) =>
+}): boolean =>
   statusesAllowedWithoutSign.includes(params.status) ||
   params.enterpriseAccepted;

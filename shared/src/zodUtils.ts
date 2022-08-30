@@ -1,4 +1,5 @@
 import { preprocess, z } from "zod";
+import { timeHHmmRegExp } from "./utils/date";
 
 export const zString = z
   .string({
@@ -14,6 +15,13 @@ export const zStringPossiblyEmpty = zString
 export const zTrimmedString = zString
   .transform((s) => s.trim())
   .refine((s) => s.length > 0, "Obligatoire");
+
+export const zTimeString = z
+  .string({
+    required_error: "Obligatoire",
+    invalid_type_error: "Une chaine de caractères est attendue",
+  })
+  .regex(timeHHmmRegExp, "Le format de l'heure est invalide");
 
 export const makezTrimmedString = (message: string) =>
   zString.transform((s) => s.trim()).refine((s) => s.length > 0, message);

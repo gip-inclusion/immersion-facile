@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { zTrimmedString } from "../zodUtils";
+import { immersionMaximumWorkingDays } from "../convention/convention.dto";
+import { zTimeString } from "../zodUtils";
 import {
-  ComplexScheduleDto,
   DailyScheduleDto,
   DayPeriodsDto,
   ScheduleDto,
@@ -12,10 +12,12 @@ import {
 } from "./Schedule.dto";
 
 // Time period within a day.
+// TODO We could refine by checking that start < end
 export const timePeriodSchema: z.Schema<TimePeriodDto> = z.object({
-  start: zTrimmedString,
-  end: zTrimmedString,
+  start: zTimeString,
+  end: zTimeString,
 });
+
 export const timePeriodsSchema: z.Schema<TimePeriodsDto> =
   z.array(timePeriodSchema);
 
@@ -32,8 +34,12 @@ export const dailyScheduleSchema: z.Schema<DailyScheduleDto> = z.object({
 // Each element represents one weekday, starting with Monday.
 //export const complexScheduleSchema_V0 = z.array(z.array(timePeriodSchema));
 
-export const complexScheduleSchema: z.Schema<ComplexScheduleDto> =
-  z.array(dailyScheduleSchema);
+export const immersionDaysScheduleSchema: z.Schema<DailyScheduleDto[]> = z
+  .array(dailyScheduleSchema)
+  .max(
+    immersionMaximumWorkingDays,
+    `L'immersion présente trop de jours de présence, le maximum est de ${immersionMaximumWorkingDays}`,
+  );
 
 export const weekDaySchema = z
   .number()
@@ -54,5 +60,5 @@ export const dayPeriodsSchema: z.Schema<DayPeriodsDto> =
 export const scheduleSchema: z.Schema<ScheduleDto> = z.object({
   isSimple: z.boolean(),
   selectedIndex: z.number(),
-  complexSchedule: complexScheduleSchema,
+  complexSchedule: immersionDaysScheduleSchema,
 });

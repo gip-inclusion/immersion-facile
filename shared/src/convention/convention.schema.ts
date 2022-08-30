@@ -14,7 +14,7 @@ import {
   mustBeSignedByBeneficiary,
   mustBeSignedByEstablishment,
   startDateIsBeforeEndDate,
-  underMaxDuration,
+  underMaxCalendarDuration,
 } from "./conventionRefinements";
 import {
   GenerateMagicLinkRequestDto,
@@ -31,6 +31,7 @@ import {
   ConventionDtoWithoutExternalId,
   conventionObjectiveOptions,
   ConventionReadDto,
+  immersionMaximumCalendarDays,
 } from "./convention.dto";
 
 import { dateRegExp } from "../utils/date";
@@ -101,8 +102,8 @@ export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExt
       message: "La date de fin doit être après la date de début.",
       path: ["dateEnd"],
     })
-    .refine(underMaxDuration, {
-      message: "La durée maximale d'immersion est de 28 jours.",
+    .refine(underMaxCalendarDuration, {
+      message: `La durée maximale calendaire d'une immersion est de ${immersionMaximumCalendarDays} jours.`,
       path: ["dateEnd"],
     })
     .refine(emailAndMentorEmailAreDifferent, {
@@ -125,8 +126,8 @@ export const conventionSchema: z.Schema<ConventionDto> =
       message: "La date de fin doit être après la date de début.",
       path: ["dateEnd"],
     })
-    .refine(underMaxDuration, {
-      message: "La durée maximale d'immersion est de 28 jours.",
+    .refine(underMaxCalendarDuration, {
+      message: `La durée maximale calendaire d'une immersion est de ${immersionMaximumCalendarDays} jours.`,
       path: ["dateEnd"],
     })
     .refine(emailAndMentorEmailAreDifferent, {
@@ -154,8 +155,8 @@ export const conventionReadSchema: z.Schema<ConventionReadDto> =
       message: "La date de fin doit être après la date de début.",
       path: ["dateEnd"],
     })
-    .refine(underMaxDuration, {
-      message: "La durée maximale d'immersion est de 28 jours.",
+    .refine(underMaxCalendarDuration, {
+      message: `La durée maximale calendaire d'une immersion est de ${immersionMaximumCalendarDays} jours.`,
       path: ["dateEnd"],
     })
     .refine(emailAndMentorEmailAreDifferent, {
