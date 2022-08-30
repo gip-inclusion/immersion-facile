@@ -19,10 +19,10 @@ export interface HideCallback {
 }
 
 export type ModalDialogProperties = {
-  children?: React.ReactNode | React.ReactNode[];
   hide: HideCallback;
+  isOpen: boolean;
+  children?: React.ReactNode | React.ReactNode[];
   id?: string;
-  isOpen?: boolean;
   size?: "sm" | "md" | "lg";
   className?: string | object | [];
   canClose?: boolean;
@@ -55,10 +55,10 @@ const useFocusTrap = (ref: React.MutableRefObject<null>) => {
 
   const handleTabulation = (e: React.KeyboardEvent) => {
     e.preventDefault();
-    if (e.keyCode === 9 && !e.shiftKey && focusableElements) {
+    if (e.key === "Tab" && !e.shiftKey && focusableElements) {
       setFocus((currentFocus) => (currentFocus + 1) % focusableElements.length);
     }
-    if (e.keyCode === 9 && e.shiftKey) {
+    if (e.key === "Tab" && e.shiftKey) {
       setFocus((currentFocus) =>
         currentFocus - 1 < 0 && focusableElements
           ? focusableElements.length - 1
@@ -88,13 +88,13 @@ export const ModalDialog = ({
   canClose,
 }: ModalDialogProperties) => {
   const modalRef = useRef(null);
-  const [openedModal, setOpenedModal] = useState(() => isOpen);
+  // const [openedModal, setOpenedModal] = useState(isOpen);
   const colSizes = { sm: 4, lg: 8, md: 6 };
   const colSize = size ? colSizes[size] : null;
   const _className = classNames(
     "fr-modal",
     {
-      "fr-modal--opened": openedModal,
+      "fr-modal--opened": isOpen,
     },
     className,
   );
@@ -124,15 +124,15 @@ export const ModalDialog = ({
     [],
   );
 
-  const handleModal = (open: boolean) => {
-    if (modalRef.current) {
-      setOpenedModal(open);
-      document.body.style.overflow = open ? "hidden" : "";
-    }
-  };
+  // const handleModal = (open: boolean) => {
+  //   if (modalRef.current) {
+  //     setOpenedModal(open);
+  //     document.body.style.overflow = open ? "hidden" : "";
+  //   }
+  // };
 
   const handleAnimatedUnmount = () => {
-    handleModal(false);
+    // handleModal(false);
     setTimeout(() => {
       if (focusBackTo) (focusBackTo as HTMLElement).focus();
       hide();
@@ -153,16 +153,16 @@ export const ModalDialog = ({
     }
   };
 
-  useEffect(() => {
-    handleModal(true);
-  }, []);
+  // useEffect(() => {
+  //   handleModal(true);
+  // }, []);
 
   const handleAllKeyDown = (e: React.KeyboardEvent) => {
-    if (e.keyCode === 27) {
+    if (e.key === "Escape") {
       hide();
       e.preventDefault();
     }
-    if (e.keyCode === 9) {
+    if (e.key === "Tab") {
       handleTabulation(e);
     }
   };
@@ -202,32 +202,4 @@ export const ModalDialog = ({
     </dialog>
   );
   return ReactDOM.createPortal(component, document.body);
-};
-
-const Modal = ({
-  id,
-  size,
-  hide,
-  children,
-  isOpen,
-  className,
-  canClose,
-}: ModalDialogProperties) =>
-  isOpen && (
-    <ModalDialog
-      id={id}
-      className={className}
-      size={size}
-      hide={hide}
-      canClose={canClose}>
-      {children}
-    </ModalDialog>
-  );
-
-Modal.defaultProps = {
-  id: undefined,
-  isOpen: false,
-  size: "md",
-  className: "",
-  canClose: true,
 };
