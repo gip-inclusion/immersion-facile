@@ -3,6 +3,9 @@ import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../domain/core/ports/UnitOfWork";
+import { createLogger } from "../../../utils/logger";
+
+const logger = createLogger(__filename);
 
 export class PgUowPerformer implements UnitOfWorkPerformer {
   constructor(
@@ -19,9 +22,10 @@ export class PgUowPerformer implements UnitOfWorkPerformer {
       const result = await cb(uow);
       await client.query("COMMIT");
       return result;
-    } catch (e) {
+    } catch (error: any) {
+      logger.error({ error }, `Error in transaction: ${error.message}`);
       await client.query("ROLLBACK");
-      throw e;
+      throw error;
     } finally {
       client.release();
     }
