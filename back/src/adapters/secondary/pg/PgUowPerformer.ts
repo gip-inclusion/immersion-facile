@@ -23,7 +23,14 @@ export class PgUowPerformer implements UnitOfWorkPerformer {
       await client.query("COMMIT");
       return result;
     } catch (error: any) {
-      logger.error({ error }, `Error in transaction: ${error.message}`);
+      if (error instanceof Error) {
+        logger.error({ error }, `Error in transaction: ${error.message}`);
+      } else {
+        logger.error(
+          { unknownError: JSON.stringify(error) },
+          `Unknown Error in transaction`,
+        );
+      }
       await client.query("ROLLBACK");
       throw error;
     } finally {

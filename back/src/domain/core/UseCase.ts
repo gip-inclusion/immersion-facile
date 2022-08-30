@@ -73,7 +73,7 @@ export abstract class TransactionalUseCase<
       );
     } catch (error: any) {
       logger.error(
-        `UseCase execution Errored - ${useCaseName} : ${error.message}`,
+        `UseCase execution Errored - ${useCaseName} : ${error?.message}`,
       );
       throw error;
     } finally {
