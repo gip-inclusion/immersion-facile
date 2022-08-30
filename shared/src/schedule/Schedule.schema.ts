@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { immersionMaximumWorkingDays } from "../convention/convention.dto";
 import { zTimeString } from "../zodUtils";
 import {
   DailyScheduleDto,
@@ -34,12 +33,8 @@ export const dailyScheduleSchema: z.Schema<DailyScheduleDto> = z.object({
 // Each element represents one weekday, starting with Monday.
 //export const complexScheduleSchema_V0 = z.array(z.array(timePeriodSchema));
 
-export const immersionDaysScheduleSchema: z.Schema<DailyScheduleDto[]> = z
-  .array(dailyScheduleSchema)
-  .max(
-    immersionMaximumWorkingDays,
-    `L'immersion présente trop de jours de présence, le maximum est de ${immersionMaximumWorkingDays}`,
-  );
+export const immersionDaysScheduleSchema: z.Schema<DailyScheduleDto[]> =
+  z.array(dailyScheduleSchema);
 
 export const weekDaySchema = z
   .number()

@@ -3,19 +3,12 @@ import {
   ConventionDto,
   ConventionStatus,
   immersionMaximumCalendarDays,
-  immersionMaximumWorkingDays,
 } from "shared/src/convention/convention.dto";
-import {
-  conventionSchema,
-  conventionWithoutExternalIdSchema,
-} from "shared/src/convention/convention.schema";
+import { conventionSchema } from "shared/src/convention/convention.schema";
 import {
   ConventionDtoBuilder,
   DATE_START,
 } from "shared/src/convention/ConventionDtoBuilder";
-import { DailyScheduleDto } from "shared/src/schedule/Schedule.dto";
-
-import { ZodError } from "zod";
 import {
   addDays,
   splitCasesBetweenPassingAndFailing,
@@ -134,73 +127,41 @@ describe("conventionDtoSchema", () => {
       expectConventionDtoToBeValid(convention);
     });
 
-    it(`Schedules may have up to ${immersionMaximumWorkingDays} working days, should be valid`, () => {
-      const convention = new ConventionDtoBuilder()
-        .withDateStart(DATE_START)
-        .withDateEnd(addDays(DATE_START, immersionMaximumWorkingDays))
-        .withSchedule(() => ({
-          isSimple: false,
-          selectedIndex: 0,
-          complexSchedule: scheduleWithXDaysArray(
-            new Date(DATE_START),
-            immersionMaximumWorkingDays,
-          ),
-        }))
-        .build();
-
-      expectConventionDtoToBeValid(convention);
-    });
-
-    it(`Schedules may have up to ${immersionMaximumWorkingDays} working days, adding one more day should fail`, () => {
-      const conventionWithTooManyWorkingDays = new ConventionDtoBuilder()
-        .withDateStart(DATE_START)
-        .withDateEnd(addDays(DATE_START, immersionMaximumWorkingDays))
-        .withSchedule(() => ({
-          isSimple: false,
-          selectedIndex: 0,
-          complexSchedule: scheduleWithXDaysArray(
-            new Date(DATE_START),
-            immersionMaximumWorkingDays + 1,
-          ),
-        }))
-        .build();
-
-      expect(() => {
-        conventionWithoutExternalIdSchema.parse(
-          conventionWithTooManyWorkingDays,
+    describe("status that are available without signatures", () => {
+      const [allowWithoutSignature, failingWithoutSignature] =
+        splitCasesBetweenPassingAndFailing<ConventionStatus>(
+          allConventionStatuses,
+          [
+            "DRAFT",
+            "READY_TO_SIGN",
+            "PARTIALLY_SIGNED",
+            "REJECTED",
+            "CANCELLED",
+          ],
         );
-      }).toThrow(ZodError);
-    });
-  });
 
-  describe("status that are available without signatures", () => {
-    const [allowWithoutSignature, failingWithoutSignature] =
-      splitCasesBetweenPassingAndFailing<ConventionStatus>(
-        allConventionStatuses,
-        ["DRAFT", "READY_TO_SIGN", "PARTIALLY_SIGNED", "REJECTED", "CANCELLED"],
+      it.each(allowWithoutSignature.map((status) => ({ status })))(
+        "WITHOUT signatures, a Convention CAN be $status",
+        ({ status }) => {
+          const convention = new ConventionDtoBuilder()
+            .withStatus(status)
+            .notSigned()
+            .build();
+          expectConventionDtoToBeValid(convention);
+        },
       );
 
-    it.each(allowWithoutSignature.map((status) => ({ status })))(
-      "WITHOUT signatures, a Convention CAN be $status",
-      ({ status }) => {
-        const convention = new ConventionDtoBuilder()
-          .withStatus(status)
-          .notSigned()
-          .build();
-        expectConventionDtoToBeValid(convention);
-      },
-    );
-
-    it.each(failingWithoutSignature.map((status) => ({ status })))(
-      "WITHOUT signatures, a Convention CANNOT be $status",
-      ({ status }) => {
-        const convention = new ConventionDtoBuilder()
-          .withStatus(status)
-          .notSigned()
-          .build();
-        expectConventionDtoToBeInvalid(convention);
-      },
-    );
+      it.each(failingWithoutSignature.map((status) => ({ status })))(
+        "WITHOUT signatures, a Convention CANNOT be $status",
+        ({ status }) => {
+          const convention = new ConventionDtoBuilder()
+            .withStatus(status)
+            .notSigned()
+            .build();
+          expectConventionDtoToBeInvalid(convention);
+        },
+      );
+    });
   });
 });
 
@@ -211,24 +172,3 @@ const expectConventionDtoToBeValid = (validConvention: ConventionDto): void => {
 
 const expectConventionDtoToBeInvalid = (conventionDto: ConventionDto) =>
   expect(() => conventionSchema.parse(conventionDto)).toThrow();
-
-const scheduleWithXDaysArray = (
-  initialDate: Date,
-  numberOfDays: number,
-): DailyScheduleDto[] => {
-  const daysArray: DailyScheduleDto[] = [];
-  for (let i = 0; i < numberOfDays; i++) {
-    daysArray.push(
-      dailyScheduleWithFixedPeriods(addDays(initialDate.toISOString(), i)),
-    );
-  }
-
-  return [...daysArray];
-};
-
-const dailyScheduleWithFixedPeriods = (
-  dateIsoString: string,
-): DailyScheduleDto => ({
-  date: dateIsoString,
-  timePeriods: [{ start: "08:00", end: "16:00" }],
-});

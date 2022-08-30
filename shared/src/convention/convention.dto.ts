@@ -20,7 +20,6 @@ export const allConventionStatuses = [
 ] as const;
 
 export const immersionMaximumCalendarDays = 30;
-export const immersionMaximumWorkingDays = 28;
 
 export const validatedConventionStatuses: ConventionStatus[] = [
   "ACCEPTED_BY_VALIDATOR",
