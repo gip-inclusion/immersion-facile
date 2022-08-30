@@ -179,7 +179,7 @@ const isPeriodsOverlap = (
 const periodToHumanReadableString = (period: TimePeriodDto): string =>
   "(" + period.start + " - " + period.end + ")";
 
-export const isScheduleValid = (schedule: ScheduleDto): string | undefined => {
+export const validateSchedule = (schedule: ScheduleDto): string | undefined => {
   const totalWeeksHours = calculateWeeklyHoursFromSchedule(schedule);
   for (const [totalHoursIndex, totalHours] of totalWeeksHours.entries()) {
     if (totalHours > maxPermittedHoursPerWeek)

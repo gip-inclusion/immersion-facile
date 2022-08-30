@@ -5,12 +5,12 @@ import { DateIntervalDto, ScheduleDto } from "shared/src/schedule/Schedule.dto";
 import {
   reasonableSchedule,
   emptySchedule,
+  validateSchedule,
 } from "shared/src/schedule/ScheduleUtils";
 import { BoolRadioPicker } from "./BoolRadioPicker";
 import { ComplexSchedulePicker } from "./ComplexSchedulePicker";
 import { RegularSchedulePicker } from "./RegularSchedulePicker";
 import "./SchedulePicker.css";
-import { scheduleValidator } from "./utils/scheduleValidator";
 
 type SchedulePickerProps = {
   disabled?: boolean;
@@ -21,7 +21,7 @@ export const SchedulePicker = (props: SchedulePickerProps): JSX.Element => {
   const name: keyof ConventionDto = "schedule";
   const [field, meta, { setValue, setError }] = useField<ScheduleDto>({ name });
   useEffect(() => {
-    setError(scheduleValidator(field.value));
+    setError(validateSchedule(field.value));
   }, [field.value, meta.error]);
 
   const onBoolRadioPickerChange = (isSimple: boolean): void =>
@@ -52,7 +52,7 @@ export const SchedulePicker = (props: SchedulePickerProps): JSX.Element => {
 
       {meta.error && (
         <div id={name + "-error-description"} className="fr-error-text">
-          {meta.error}
+          {(meta.error as any)?.complexSchedule ?? meta.error}
         </div>
       )}
 
