@@ -29,7 +29,7 @@ import { PrivateListAgencies } from "../../../domain/convention/useCases/Private
 import { RenewConventionMagicLink } from "../../../domain/convention/useCases/RenewConventionMagicLink";
 import { SendEmailWhenAgencyIsActivated } from "../../../domain/convention/useCases/SendEmailWhenAgencyIsActivated";
 import { ShareApplicationLinkByEmail } from "../../../domain/convention/useCases/ShareApplicationLinkByEmail";
-import { SignImmersionApplication } from "../../../domain/convention/useCases/SignImmersionApplication";
+import { SignConvention } from "../../../domain/convention/useCases/SignConvention";
 import { UpdateAgency } from "../../../domain/convention/useCases/UpdateAgency";
 import { UpdateImmersionApplication } from "../../../domain/convention/useCases/UpdateImmersionApplication";
 import { UpdateImmersionApplicationStatus } from "../../../domain/convention/useCases/UpdateImmersionApplicationStatus";
@@ -139,7 +139,7 @@ export const createUseCases = (
       createNewEvent,
       clock,
     ),
-    signConvention: new SignImmersionApplication(uowPerformer, createNewEvent),
+    signConvention: new SignConvention(uowPerformer, createNewEvent),
     generateMagicLink: new GenerateMagicLink(generateJwtFn),
     renewConventionMagicLink: new RenewConventionMagicLink(
       uowPerformer,

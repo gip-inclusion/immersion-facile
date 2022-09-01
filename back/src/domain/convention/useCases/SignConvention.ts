@@ -29,7 +29,7 @@ const domainTopicByTargetStatusMap: Partial<
 
 const roleAllowToSign: Role[] = ["establishment", "beneficiary"];
 
-export class SignImmersionApplication extends TransactionalUseCase<
+export class SignConvention extends TransactionalUseCase<
   void,
   WithConventionId
 > {
