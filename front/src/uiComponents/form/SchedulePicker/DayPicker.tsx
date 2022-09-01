@@ -27,10 +27,10 @@ export const DayPicker = ({
           disabled={true}
         />
       ))}
-      <div className="flex justify-center items-center text-center">
-        Total
-        <br />
-        H/sem
+      <div
+        className="flex justify-center items-center text-center font-bold fr-text--xs"
+        style={{ maxWidth: "46px" }}>
+        total t/sem
       </div>
     </div>
     {makeImmersionTimetable(complexSchedule).map((weeklyCalendar, index) => (

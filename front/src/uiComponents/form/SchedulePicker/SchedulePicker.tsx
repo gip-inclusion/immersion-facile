@@ -19,18 +19,20 @@ type SchedulePickerProps = {
 
 export const SchedulePicker = (props: SchedulePickerProps): JSX.Element => {
   const name: keyof ConventionDto = "schedule";
-  const [field, meta, { setValue, setError }] = useField<ScheduleDto>({ name });
+  const [field, meta, { setValue, setError, setTouched }] =
+    useField<ScheduleDto>({ name });
   useEffect(() => {
     setError(validateSchedule(field.value));
   }, [field.value, meta.error]);
 
-  const onBoolRadioPickerChange = (isSimple: boolean): void =>
+  const onBoolRadioPickerChange = (isSimple: boolean): void => {
     setValue(
       isSimple
         ? reasonableSchedule(props.interval)
         : emptySchedule(props.interval),
     );
-
+    setTouched(true);
+  };
   return (
     <>
       <BoolRadioPicker
@@ -50,11 +52,11 @@ export const SchedulePicker = (props: SchedulePickerProps): JSX.Element => {
           : "Sélectionnez les horaires de travail jour par jour *"}
       </h4>
       {!field.value.isSimple && (
-        <div className="fr-highlight">
-          <p>Les horaires hebdomadaires ne doivent pas dépasser 35h.</p>
-        </div>
+        <p className="fr-hint-text">
+          Les horaires hebdomadaires ne doivent pas dépasser 35h.
+        </p>
       )}
-      {meta.error && (
+      {meta.error && meta.touched && (
         <div id={name + "-error-description"} className="fr-error-text">
           {(meta.error as any)?.complexSchedule ?? meta.error}
         </div>
