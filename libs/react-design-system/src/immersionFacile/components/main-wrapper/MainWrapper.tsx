@@ -8,7 +8,7 @@ type MainWrapperProps = {
 };
 
 export const MainWrapper = ({
-  vSpacing = 12,
+  vSpacing = 8,
   hSpacing = 0,
   className,
   children,
@@ -16,8 +16,7 @@ export const MainWrapper = ({
   <main
     className={`fr-main-wrapper ${className} ${
       vSpacing ? `fr-py-${vSpacing}w` : ""
-    } ${hSpacing ? `fr-px-${hSpacing}w` : ""}`}
-  >
+    } ${hSpacing ? `fr-px-${hSpacing}w` : ""}`}>
     {children}
   </main>
 );

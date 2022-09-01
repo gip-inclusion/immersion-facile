@@ -17,7 +17,7 @@ export const HourPicker = ({
 }: HourPickerProps) => {
   const add = () => {
     let start = "09:00";
-    let end = "09:00";
+    let end = "12:00";
     if (timePeriods.length > 0) {
       // Autofill next period as end of current period + 1h,
       // w/ duration of 1h.

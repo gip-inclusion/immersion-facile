@@ -24,13 +24,14 @@ export const SchedulePicker = (props: SchedulePickerProps): JSX.Element => {
   useEffect(() => {
     setError(validateSchedule(field.value));
   }, [field.value, meta.error]);
-
   const onBoolRadioPickerChange = (isSimple: boolean): void => {
     setValue(
       isSimple
         ? reasonableSchedule(props.interval)
         : emptySchedule(props.interval),
     );
+  };
+  const onComplexScheduleChange = (): void => {
     setTouched(true);
   };
   return (
@@ -65,6 +66,7 @@ export const SchedulePicker = (props: SchedulePickerProps): JSX.Element => {
       {!field.value.isSimple && (
         <ComplexSchedulePicker
           selectedIndex={field.value.selectedIndex}
+          onChange={onComplexScheduleChange}
           {...props}
         />
       )}

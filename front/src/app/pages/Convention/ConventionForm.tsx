@@ -67,7 +67,7 @@ export const ConventionForm = ({
 
   return (
     <div className="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
-      <div className="fr-col-lg-8 fr-p-2w">
+      <div className="fr-col-lg-7 fr-px-2w">
         <div className="flex justify-center">
           <Title red>
             Formulaire pour conventionner une période de mise en situation

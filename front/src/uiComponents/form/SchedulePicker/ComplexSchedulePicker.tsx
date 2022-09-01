@@ -7,6 +7,7 @@ import { HourPicker } from "./HourPicker";
 
 type ComplexSchedulePickerProps = {
   selectedIndex: number;
+  onChange: () => void;
   disabled?: boolean;
   interval: DateIntervalDto;
 };
@@ -24,6 +25,7 @@ export const ComplexSchedulePicker = (props: ComplexSchedulePickerProps) => {
           const schedule = field.value;
           schedule.selectedIndex = lastClickedIndex;
           setValue(schedule);
+          props.onChange();
         }}
       />
 
@@ -39,6 +41,7 @@ export const ComplexSchedulePicker = (props: ComplexSchedulePickerProps) => {
           schedule.complexSchedule[schedule.selectedIndex].timePeriods =
             newHours;
           setValue(schedule);
+          props.onChange();
         }}
         disabled={props.disabled}
       />
