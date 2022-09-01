@@ -52,7 +52,7 @@ describe("RequestEditFormEstablishment", () => {
     const emailGateway = new SendinblueEmailGateway(
       axios,
       (_) => true,
-      config.sendinblueApiKey,
+      config.apiKeySendinblue,
     );
     const generateEditFormEstablishmentUrl =
       makeGenerateEditFormEstablishmentUrl(config);

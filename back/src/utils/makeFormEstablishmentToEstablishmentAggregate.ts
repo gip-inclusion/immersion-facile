@@ -38,9 +38,11 @@ export const makeFormEstablishmentToEstablishmentAggregate = ({
   const formEstablishmentToEstablishmentAggregate = async (
     formEstablishment: FormEstablishmentDto,
   ): Promise<EstablishmentAggregate | undefined> => {
-    const positionAndAddress = await addressAPI.getAddressAndPositionFromString(
-      formEstablishment.businessAddress,
-    );
+    const positionAndAddress = (
+      await addressAPI.lookupStreetAddress(formEstablishment.businessAddress)
+    ).at(0);
+
+    // TODO This is often problematic with the InMemoryAddressApi, what can be done ?
     if (!positionAndAddress) {
       notifyAndThrowErrorDiscord(
         new Error(

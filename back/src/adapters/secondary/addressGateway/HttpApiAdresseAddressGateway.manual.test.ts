@@ -1,7 +1,10 @@
 import { AddressDto } from "shared/src/address/address.dto";
 import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
 import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
-import { httpAddressApiClient, HttpAddressGateway } from "./HttpAddressGateway";
+import {
+  httpAdresseApiClient,
+  HttpApiAdresseAddressGateway,
+} from "./HttpApiAdresseAddressGateway";
 import {
   expected8bdduportAddressAndPositions,
   query8bdduportLookup,
@@ -42,10 +45,13 @@ const resultFromApiAddress = {
 };
 
 describe("HttpAddressGateway", () => {
-  let httpAddressGateway: HttpAddressGateway;
+  let httpAddressGateway: HttpApiAdresseAddressGateway;
 
   beforeEach(() => {
-    httpAddressGateway = new HttpAddressGateway(httpAddressApiClient, 2);
+    httpAddressGateway = new HttpApiAdresseAddressGateway(
+      httpAdresseApiClient,
+      2,
+    );
   });
 
   describe("getAddressFromPosition", () => {

@@ -3,11 +3,9 @@ import {
   AddressAndPosition,
   AddressDto,
   DepartmentCode,
+  featureToAddressWithPosition,
 } from "shared/src/address/address.dto";
-import {
-  featureToAddressDto,
-  GeoJsonFeature,
-} from "shared/src/apiAdresse/apiAddress.dto";
+import { featureToAddressDto } from "shared/src/apiAdresse/apiAddress.dto";
 import { toFeatureCollection } from "shared/src/apiAdresse/apiAddress.schema";
 import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
 import {
@@ -28,22 +26,22 @@ const apiRoutes = {
 };
 type TargetUrls = "apiAddressReverse" | "apiAddressSearchPlainText";
 
-const targetUrlsReverseMapper: TargetUrlsMapper<TargetUrls> = {
+const adresseApiTargetUrlsMapper: TargetUrlsMapper<TargetUrls> = {
   apiAddressReverse: (param: { lat: string; lon: string }) =>
     `${apiAddressBaseUrl}${apiRoutes.reverse}?lon=${param.lon}&lat=${param.lat}`,
   apiAddressSearchPlainText: (param: { text: string }) =>
     `${apiAddressBaseUrl}${apiRoutes.search}?q=${encodeURI(param.text)}`,
 };
 
-export const httpAddressApiClient = new ManagedAxios(
-  targetUrlsReverseMapper,
+export const httpAdresseApiClient = new ManagedAxios(
+  adresseApiTargetUrlsMapper,
   undefined,
   {
     timeout: 20000,
   },
 );
 
-export class HttpAddressGateway implements AddressGateway {
+export class HttpApiAdresseAddressGateway implements AddressGateway {
   private limiter: Bottleneck;
   public constructor(
     private readonly httpClient: ManagedAxios<TargetUrls>,
@@ -146,16 +144,3 @@ export class HttpAddressGateway implements AddressGateway {
     }
   }
 }
-
-const featureToAddressWithPosition = (
-  feature: GeoJsonFeature,
-): AddressAndPosition | undefined =>
-  Array.isArray(feature.geometry.coordinates)
-    ? {
-        address: featureToAddressDto(feature),
-        position: {
-          lat: feature.geometry.coordinates[1],
-          lon: feature.geometry.coordinates[0],
-        },
-      }
-    : undefined;

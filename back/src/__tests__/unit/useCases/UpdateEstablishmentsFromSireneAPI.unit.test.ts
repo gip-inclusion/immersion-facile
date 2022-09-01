@@ -149,7 +149,8 @@ describe("Update establishments from Sirene API", () => {
   });
 
   describe("Should update establishment address and position based on sirene and address API", () => {
-    it("If address API succeeds, it should update address and coordinates", async () => {
+    /* eslint-disable-next-line  jest/no-disabled-tests */
+    it.skip("If address API succeeds, it should update address and coordinates", async () => {
       // Prepare
       const {
         clock,

@@ -11,7 +11,7 @@ describe("SendingBlueEmailGateway manual", () => {
     sibGateway = new SendinblueEmailGateway(
       axios,
       (_) => true,
-      config.sendinblueApiKey,
+      config.apiKeySendinblue,
     );
   });
 

@@ -152,6 +152,11 @@ export class AppConfig {
     });
   }
 
+  // == Email gateway provider api keys ==
+  public get apiKeySendinblue() {
+    return this.throwIfNotDefined("SENDINBLUE_API_KEY");
+  }
+
   // == PE Connect gateway ==
   public get peConnectGateway() {
     return throwIfNotInArray({
@@ -162,17 +167,19 @@ export class AppConfig {
     });
   }
 
-  // == Address Api gateway ==
+  // == Address Api gateway choice between 2 providers ==
+  // https://adresse.data.gouv.fr/
+  // https://opencagedata.com/
   public get apiAddress() {
     return throwIfNotInArray({
       processEnv: this.env,
       variableName: "ADDRESS_API_GATEWAY",
-      authorizedValues: ["IN_MEMORY", "HTTPS"],
+      authorizedValues: ["IN_MEMORY", "ADRESSE_API", "OPEN_CAGE_DATA"],
     });
   }
 
-  public get sendinblueApiKey() {
-    return this.throwIfNotDefined("SENDINBLUE_API_KEY");
+  public get apiKeyOpenCageData() {
+    return this.throwIfNotDefined("API_KEY_OPEN_CAGE_DATA");
   }
 
   // == Rome gateway ==

@@ -1,3 +1,7 @@
+import {
+  featureToAddressDto,
+  GeoJsonFeature,
+} from "../apiAdresse/apiAddress.dto";
 import { GeoPositionDto } from "../geoPosition/geoPosition.dto";
 import { Flavor } from "../typeFlavors";
 
@@ -25,3 +29,16 @@ export const isAddressIdentical = (
   address.postcode === addressToCompare.postcode &&
   address.streetNumberAndAddress === addressToCompare.streetNumberAndAddress &&
   address.departmentCode === addressToCompare.departmentCode;
+
+export const featureToAddressWithPosition = (
+  feature: GeoJsonFeature,
+): AddressAndPosition | undefined =>
+  Array.isArray(feature.geometry.coordinates)
+    ? {
+        address: featureToAddressDto(feature),
+        position: {
+          lat: feature.geometry.coordinates[1],
+          lon: feature.geometry.coordinates[0],
+        },
+      }
+    : undefined;

@@ -3,9 +3,9 @@ import { UpdateAllPeAgencies } from "../../../domain/convention/useCases/UpdateA
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import {
-  httpAddressApiClient,
-  HttpAddressGateway,
-} from "../../secondary/addressGateway/HttpAddressGateway";
+  httpAdresseApiClient,
+  HttpApiAdresseAddressGateway,
+} from "../../secondary/addressGateway/HttpApiAdresseAddressGateway";
 import { ConsoleAppLogger } from "../../secondary/core/ConsoleAppLogger";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { HttpPeAgenciesReferential } from "../../secondary/immersionOffer/HttpPeAgenciesReferential";
@@ -27,7 +27,7 @@ const updateAllPeAgenciesScript = async () => {
     config.poleEmploiClientId,
   );
 
-  const adressAPI = new HttpAddressGateway(httpAddressApiClient);
+  const adressAPI = new HttpApiAdresseAddressGateway(httpAdresseApiClient);
 
   const dbUrl = config.pgImmersionDbUrl;
   const pool = new Pool({

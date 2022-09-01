@@ -31,7 +31,7 @@ describe("NotifyApplicationRejectedToBeneficiaryAndEnterprise", () => {
     const emailGw = new SendinblueEmailGateway(
       axios,
       (_) => true,
-      config.sendinblueApiKey,
+      config.apiKeySendinblue,
     );
     const uow = createInMemoryUow();
     uow.agencyRepository.setAgencies([

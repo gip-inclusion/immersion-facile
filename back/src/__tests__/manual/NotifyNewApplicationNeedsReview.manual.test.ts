@@ -35,7 +35,7 @@ describe("Notify To 2 Counsellors that an application is available", () => {
     emailGw = new SendinblueEmailGateway(
       axios,
       (_) => true,
-      config.sendinblueApiKey,
+      config.apiKeySendinblue,
     );
     generateMagicLinkFn = createGenerateConventionMagicLink(config);
   });

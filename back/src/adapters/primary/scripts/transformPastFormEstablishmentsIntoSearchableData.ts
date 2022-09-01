@@ -8,9 +8,9 @@ import { createLogger } from "../../../utils/logger";
 import { notifyDiscord } from "../../../utils/notifyDiscord";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import {
-  httpAddressApiClient,
-  HttpAddressGateway,
-} from "../../secondary/addressGateway/HttpAddressGateway";
+  httpAdresseApiClient,
+  HttpApiAdresseAddressGateway,
+} from "../../secondary/addressGateway/HttpApiAdresseAddressGateway";
 import { RealClock } from "../../secondary/core/ClockImplementations";
 import {
   defaultMaxBackoffPeriodMs,
@@ -49,7 +49,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
     connectionString: destinationPgConnectionString,
   });
   const clientDestination = await poolDestination.connect();
-  const addressAPI = new HttpAddressGateway(httpAddressApiClient);
+  const addressAPI = new HttpApiAdresseAddressGateway(httpAdresseApiClient);
   const sireneGateway = new HttpsSireneGateway(
     config.sireneHttpsConfig,
     clock,

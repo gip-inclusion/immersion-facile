@@ -4,9 +4,9 @@ import { UpdateEstablishmentsFromSireneAPI } from "../../../domain/immersionOffe
 import { createLogger } from "../../../utils/logger";
 import { PipelineStats } from "../../../utils/pipelineStats";
 import {
-  httpAddressApiClient,
-  HttpAddressGateway,
-} from "../../secondary/addressGateway/HttpAddressGateway";
+  httpAdresseApiClient,
+  HttpApiAdresseAddressGateway,
+} from "../../secondary/addressGateway/HttpApiAdresseAddressGateway";
 import { RealClock } from "../../secondary/core/ClockImplementations";
 import {
   defaultMaxBackoffPeriodMs,
@@ -52,7 +52,7 @@ const main = async () => {
     retryStrategy,
   );
 
-  const addressAPI = new HttpAddressGateway(httpAddressApiClient);
+  const addressAPI = new HttpApiAdresseAddressGateway(httpAdresseApiClient);
 
   const pool = new Pool({
     connectionString: config.pgImmersionDbUrl,

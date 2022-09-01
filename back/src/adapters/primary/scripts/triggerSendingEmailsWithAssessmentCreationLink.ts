@@ -27,7 +27,7 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
             skipEmailAllowList: config.skipEmailAllowlist,
             emailAllowList: config.emailAllowList,
           }),
-          config.sendinblueApiKey,
+          config.apiKeySendinblue,
         )
       : new InMemoryEmailGateway(clock);
 

@@ -78,8 +78,9 @@ export class UpdateEstablishmentsFromSireneAPI extends TransactionalUseCase<void
     const numberEmployeesRange = sireneEstablishment.numberEmployeesRange;
     const formatedAddress = sireneEstablishment.formatedAddress;
 
-    const positionAndAddress =
-      await this.addressAPI.getAddressAndPositionFromString(formatedAddress);
+    const positionAndAddress = (
+      await this.addressAPI.lookupStreetAddress(formatedAddress)
+    ).at(0);
 
     if (!positionAndAddress) {
       logger.warn(

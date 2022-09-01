@@ -4,15 +4,21 @@ import {
   ManagedAxios,
   onFullfilledDefaultResponseInterceptorMaker,
 } from "shared/src/serenity-http-client";
+
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
 import { Clock } from "../../../domain/core/ports/Clock";
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { createLogger } from "../../../utils/logger";
 import {
-  httpAddressApiClient,
-  HttpAddressGateway,
-} from "../../secondary/addressGateway/HttpAddressGateway";
+  httpAdresseApiClient,
+  HttpApiAdresseAddressGateway,
+} from "../../secondary/addressGateway/HttpApiAdresseAddressGateway";
+import {
+  HttpOpenCageDataAddressGateway,
+  OpenCageDataTargetUrls,
+  openCageDataTargetUrlsMapperMaker,
+} from "../../secondary/addressGateway/HttpOpenCageDataAddressGateway";
 import { InMemoryAddressGateway } from "../../secondary/addressGateway/InMemoryAddressGateway";
 import { CachingAccessTokenGateway } from "../../secondary/core/CachingAccessTokenGateway";
 import { HybridEmailGateway } from "../../secondary/emailGateway/HybridEmailGateway";
@@ -103,10 +109,7 @@ export const createGateways = async (config: AppConfig, clock: Clock) => {
     : new InMemoryAccessTokenGateway();
 
   return {
-    addressApi:
-      config.apiAddress === "HTTPS"
-        ? new HttpAddressGateway(httpAddressApiClient)
-        : new InMemoryAddressGateway(),
+    addressApi: createAddressGateway(config),
     documentGateway:
       config.documentGateway === "MINIO"
         ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -164,7 +167,7 @@ const createEmailGateway = (config: AppConfig, clock: Clock): EmailGateway => {
       skipEmailAllowList: config.skipEmailAllowlist,
       emailAllowList: config.emailAllowList,
     }),
-    config.sendinblueApiKey,
+    config.apiKeySendinblue,
   );
 
   if (config.emailGateway === "SENDINBLUE") return sendInBlueEmailGateway;
@@ -197,3 +200,19 @@ const createPoleEmploiConnectGateway = (config: AppConfig) =>
         ),
       )
     : new InMemoryPeConnectGateway(config.immersionFacileBaseUrl);
+
+const createAddressGateway = (config: AppConfig) => {
+  if (config.apiAddress === "IN_MEMORY") return new InMemoryAddressGateway();
+
+  return config.apiAddress === "OPEN_CAGE_DATA"
+    ? new HttpOpenCageDataAddressGateway(
+        new ManagedAxios<OpenCageDataTargetUrls>(
+          openCageDataTargetUrlsMapperMaker(config.apiKeyOpenCageData),
+          undefined,
+          {
+            timeout: AXIOS_TIMEOUT_FIVE_SECOND,
+          },
+        ),
+      )
+    : new HttpApiAdresseAddressGateway(httpAdresseApiClient);
+};

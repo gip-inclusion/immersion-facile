@@ -83,6 +83,10 @@ export class FormEstablishmentDtoBuilder
     return new FormEstablishmentDtoBuilder(emptyFormEstablishment);
   }
 
+  public withBusinessAddress(businessAddress: string) {
+    return new FormEstablishmentDtoBuilder({ ...this.dto, businessAddress });
+  }
+
   public withMail(email: string) {
     return new FormEstablishmentDtoBuilder({
       ...this.dto,
