@@ -36,7 +36,7 @@ export const AppellationList = ({ name, title }: AppellationListProps) => {
         </div>
       </div>
       <ButtonAdd
-        style={{ margin: "1rem 0" }}
+        className="fr-my-4v"
         onClick={() =>
           setValue([
             ...field.value,

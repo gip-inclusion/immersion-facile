@@ -185,9 +185,7 @@ export const ModalDialog = ({
       ref={modalRef}
       onKeyDown={(e) => handleAllKeyDown(e)}
       onClick={(e) => handleOverlayClick(e)}>
-      <div
-        className="fr-container fr-container--fluid fr-container-md"
-        style={{ maxWidth: "640px" }}>
+      <div className="fr-container fr-container--fluid fr-container-md fr-col-md-6">
         <div className="fr-grid-row fr-grid-row--center closing-overlay">
           <div className={`fr-col-12 fr-col-md-${colSize}`}>
             <div className="fr-modal__body">
