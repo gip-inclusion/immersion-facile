@@ -17,6 +17,7 @@ import {
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,
+  ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
@@ -61,8 +62,8 @@ describe("Sign convention", () => {
         triggerSignature({
           role,
         } as ConventionMagicLinkPayload),
-        new BadRequestError(
-          "Forbidden : Only Beneficiary or Mentor are allowed to sign convention",
+        new ForbiddenError(
+          "Only Beneficiary or Mentor are allowed to sign convention",
         ),
       );
     },
@@ -82,7 +83,7 @@ describe("Sign convention", () => {
   const [allowedInitialStatuses, forbiddenInitialStatuses] =
     splitCasesBetweenPassingAndFailing<ConventionStatus>(
       allConventionStatuses,
-      ["DRAFT", "READY_TO_SIGN", "PARTIALLY_SIGNED"],
+      ["READY_TO_SIGN", "PARTIALLY_SIGNED"],
     );
 
   it.each(forbiddenInitialStatuses.map((initialStatus) => ({ initialStatus })))(
@@ -98,7 +99,9 @@ describe("Sign convention", () => {
           role: allowedRole,
           applicationId: conventionInDb.id,
         } as ConventionMagicLinkPayload),
-        new Error("Incorrect initial application status: " + initialStatus),
+        new BadRequestError(
+          `Cannot go from status '${initialStatus}' to 'PARTIALLY_SIGNED'`,
+        ),
       );
     },
   );
@@ -125,93 +128,64 @@ describe("Sign convention", () => {
     },
   );
 
-  describe("On signature", () => {
-    it("goes from status DRAFT to PARTIALLY_SIGNED, and saves corresponding event", async () => {
-      expectAllowedInitialStatus("DRAFT");
-      const initialConvention = prepareConventionWithStatus("DRAFT");
-      conventionRepository.setConventions({
-        [initialConvention.id]: initialConvention,
-      });
-
-      await triggerSignature({
-        role: "beneficiary",
-        applicationId: initialConvention.id,
-      } as ConventionMagicLinkPayload);
-
-      const expectedConvention: ConventionDto = {
-        ...initialConvention,
-        status: "PARTIALLY_SIGNED",
-        beneficiaryAccepted: true,
-        enterpriseAccepted: false,
-      };
-      expectConventionInDbToEqual(expectedConvention);
-      expectEventsInOutbox([
-        {
-          topic: "ImmersionApplicationPartiallySigned",
-          payload: expectedConvention,
-        },
-      ]);
+  it("goes from status READY_TO_SIGN to PARTIALLY_SIGNED, and saves corresponding event", async () => {
+    expectAllowedInitialStatus("READY_TO_SIGN");
+    const initialConvention = prepareConventionWithStatus("READY_TO_SIGN");
+    conventionRepository.setConventions({
+      [initialConvention.id]: initialConvention,
     });
 
-    it("goes from status READY_TO_SIGN to PARTIALLY_SIGNED, and saves corresponding event", async () => {
-      expectAllowedInitialStatus("READY_TO_SIGN");
-      const initialConvention = prepareConventionWithStatus("READY_TO_SIGN");
-      conventionRepository.setConventions({
-        [initialConvention.id]: initialConvention,
-      });
+    await triggerSignature({
+      role: "establishment",
+      applicationId: initialConvention.id,
+    } as ConventionMagicLinkPayload);
 
-      await triggerSignature({
-        role: "establishment",
-        applicationId: initialConvention.id,
-      } as ConventionMagicLinkPayload);
+    const expectedConvention: ConventionDto = {
+      ...initialConvention,
+      status: "PARTIALLY_SIGNED",
+      beneficiaryAccepted: false,
+      enterpriseAccepted: true,
+    };
+    expectConventionInDbToEqual(expectedConvention);
+    expectEventsInOutbox([
+      {
+        topic: "ImmersionApplicationPartiallySigned",
+        payload: expectedConvention,
+      },
+    ]);
+  });
 
-      const expectedConvention: ConventionDto = {
-        ...initialConvention,
-        status: "PARTIALLY_SIGNED",
-        beneficiaryAccepted: false,
-        enterpriseAccepted: true,
-      };
-      expectConventionInDbToEqual(expectedConvention);
-      expectEventsInOutbox([
-        {
-          topic: "ImmersionApplicationPartiallySigned",
-          payload: expectedConvention,
-        },
-      ]);
+  it("goes from status PARTIALLY_SIGNED to IN_REVIEW, and saves corresponding event", async () => {
+    expectAllowedInitialStatus("PARTIALLY_SIGNED");
+    const initialConvention = new ConventionDtoBuilder()
+      .withId("my-convention-id")
+      .withStatus("PARTIALLY_SIGNED")
+      .notSigned()
+      .signedByBeneficiary()
+      .build();
+
+    conventionRepository.setConventions({
+      [initialConvention.id]: initialConvention,
     });
 
-    it("goes from status PARTIALLY_SIGNED to IN_REVIEW, and saves corresponding event", async () => {
-      expectAllowedInitialStatus("PARTIALLY_SIGNED");
-      const initialConvention = new ConventionDtoBuilder()
-        .withId("my-convention-id")
-        .withStatus("PARTIALLY_SIGNED")
-        .notSigned()
-        .signedByBeneficiary()
-        .build();
+    await triggerSignature({
+      role: "establishment",
+      applicationId: initialConvention.id,
+    } as ConventionMagicLinkPayload);
 
-      conventionRepository.setConventions({
-        [initialConvention.id]: initialConvention,
-      });
-
-      await triggerSignature({
-        role: "establishment",
-        applicationId: initialConvention.id,
-      } as ConventionMagicLinkPayload);
-
-      const expectedConvention: ConventionDto = {
-        ...initialConvention,
-        status: "IN_REVIEW",
-        beneficiaryAccepted: true,
-        enterpriseAccepted: true,
-      };
-      expectConventionInDbToEqual(expectedConvention);
-      expectEventsInOutbox([
-        {
-          topic: "ImmersionApplicationFullySigned",
-          payload: expectedConvention,
-        },
-      ]);
-    });
+    const expectedConvention: ConventionDto = {
+      ...initialConvention,
+      status: "IN_REVIEW",
+      beneficiaryAccepted: true,
+      enterpriseAccepted: true,
+    };
+    expectConventionInDbToEqual(expectedConvention);
+    expectEventsInOutbox([
+      {
+        topic: "ImmersionApplicationFullySigned",
+        payload: expectedConvention,
+      },
+    ]);
   });
 
   const triggerSignature = (jwtPayload: ConventionMagicLinkPayload) =>

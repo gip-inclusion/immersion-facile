@@ -17,6 +17,7 @@ import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainTopic } from "../../core/eventBus/events";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { throwIfTransitionNotAllowed } from "../entities/Convention";
 
 const logger = createLogger(__filename);
 
@@ -48,14 +49,23 @@ export class SignConvention extends TransactionalUseCase<
     { applicationId, role }: ConventionMagicLinkPayload,
   ): Promise<WithConventionId> {
     logger.debug({ applicationId, role });
+
     if (!roleAllowToSign.includes(role))
       throw new ForbiddenError(
         "Only Beneficiary or Mentor are allowed to sign convention",
       );
 
-    const conventionDto = await uow.conventionRepository.getById(applicationId);
-    if (!conventionDto) throw new NotFoundError(applicationId);
-    const signedConvention = signConventionDtoWithRole(conventionDto, role);
+    const initialConvention = await uow.conventionRepository.getById(
+      applicationId,
+    );
+    if (!initialConvention) throw new NotFoundError(applicationId);
+    const signedConvention = signConventionDtoWithRole(initialConvention, role);
+
+    throwIfTransitionNotAllowed({
+      role,
+      targetStatus: signedConvention.status,
+      initialStatus: initialConvention.status,
+    });
 
     const signedId = await uow.conventionRepository.update(signedConvention);
     if (!signedId) throw new NotFoundError(signedId);

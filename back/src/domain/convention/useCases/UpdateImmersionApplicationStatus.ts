@@ -1,28 +1,20 @@
 import {
   ConventionDto,
-  ConventionId,
   ConventionStatus,
   UpdateConventionStatusRequestDto,
   validatedConventionStatuses,
   WithConventionId,
 } from "shared/src/convention/convention.dto";
 import { updateConventionStatusRequestSchema } from "shared/src/convention/convention.schema";
-import { statusTransitionConfigs } from "shared/src/convention/conventionStatusTransitions";
-import {
-  ConventionMagicLinkPayload,
-  Role,
-} from "shared/src/tokens/MagicLinkPayload";
-import {
-  BadRequestError,
-  ForbiddenError,
-  NotFoundError,
-} from "../../../adapters/primary/helpers/httpErrors";
+import { ConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
+import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainEvent, DomainTopic } from "../../core/eventBus/events";
 import { Clock } from "../../core/ports/Clock";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { makeGetStoredConventionOrThrowIfNotAllowed } from "../entities/Convention";
 
 const logger = createLogger(__filename);
 
@@ -60,8 +52,11 @@ export class UpdateImmersionApplicationStatus extends TransactionalUseCase<
     { applicationId, role }: ConventionMagicLinkPayload,
   ): Promise<WithConventionId> {
     logger.debug({ status, applicationId, role });
-    const storedDto = await this.getStoredConventionOrThrowIfNotAllowed(
-      uow,
+
+    const getStoredConventionOrThrowIfNotAllowed =
+      makeGetStoredConventionOrThrowIfNotAllowed(uow.conventionRepository);
+
+    const storedDto = await getStoredConventionOrThrowIfNotAllowed(
       status,
       role,
       applicationId,
@@ -114,29 +109,5 @@ export class UpdateImmersionApplicationStatus extends TransactionalUseCase<
       topic: domainTopic,
       payload: updatedDto,
     });
-  }
-
-  private async getStoredConventionOrThrowIfNotAllowed(
-    uow: UnitOfWork,
-    status: ConventionStatus,
-    role: Role,
-    applicationId: ConventionId,
-  ): Promise<ConventionDto> {
-    const statusTransitionConfig = statusTransitionConfigs[status];
-
-    if (!statusTransitionConfig.validRoles.includes(role))
-      throw new ForbiddenError();
-
-    const convention = await uow.conventionRepository.getById(applicationId);
-    if (!convention) throw new NotFoundError(applicationId);
-
-    if (
-      !statusTransitionConfig.validInitialStatuses.includes(convention.status)
-    )
-      throw new BadRequestError(
-        `Cannot go from status '${convention.status}' to '${status}'`,
-      );
-
-    return convention;
   }
 }

@@ -20,14 +20,6 @@ export const signConventionDtoWithRole = (
   application: ConventionDto,
   role: Role,
 ): ConventionDto => {
-  if (
-    !["DRAFT", "READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(application.status)
-  ) {
-    throw new Error(
-      "Incorrect initial application status: " + application.status,
-    );
-  }
-
   const enterpriseAccepted =
     role === "establishment" ? true : application.enterpriseAccepted;
   const beneficiaryAccepted =

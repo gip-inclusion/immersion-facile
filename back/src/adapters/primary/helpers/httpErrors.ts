@@ -19,7 +19,7 @@ export class UnauthorizedError extends HttpError {
 }
 
 const makeForbiddenMessage = (reason?: string): string =>
-  reason ? `Forbidden : ${reason}` : "Accès refusé";
+  reason ?? "Accès refusé";
 
 export class ForbiddenError extends HttpError {
   httpCode = 403;

@@ -309,7 +309,9 @@ export const testForAllRolesAndInitialStatusCases = ({
         testRejectsStatusUpdate({
           role,
           initialStatus: someValidInitialStatus,
-          expectedError: new ForbiddenError(),
+          expectedError: new ForbiddenError(
+            `${role} is not allowed to go to status ${targetStatus}`,
+          ),
         }),
     );
   }
