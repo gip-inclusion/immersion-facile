@@ -22,7 +22,7 @@ const DebugInfo = () => (
       padding: "1rem",
       fontSize: ".75rem",
     }}>
-    <h3>Env variables are:</h3>
+    <h6>Env variables are:</h6>
 
     {Object.entries(ENV).map(([envName, envValue]) => (
       <div key={envName}>
