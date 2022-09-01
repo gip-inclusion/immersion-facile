@@ -10,7 +10,7 @@ export const MinistereLogo = () => (
       <br />
       du travail,
       <br />
-      de l'emploi
+      du plein emploi
       <br />
       et de l'insertion
     </p>
