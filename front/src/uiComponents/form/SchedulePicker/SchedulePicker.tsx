@@ -58,7 +58,7 @@ export const SchedulePicker = (props: SchedulePickerProps): JSX.Element => {
       )}
       {meta.error && meta.touched && (
         <div id={name + "-error-description"} className="fr-error-text">
-          {(meta.error as any)?.complexSchedule ?? meta.error}
+          {JSON.stringify((meta.error as any)?.complexSchedule) ?? meta.error}
         </div>
       )}
 
