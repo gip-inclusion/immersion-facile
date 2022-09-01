@@ -49,7 +49,11 @@ export const SchedulePicker = (props: SchedulePickerProps): JSX.Element => {
           ? "Sélectionnez la période des jours *"
           : "Sélectionnez les horaires de travail jour par jour *"}
       </h4>
-
+      {!field.value.isSimple && (
+        <div className="fr-highlight">
+          <p>Les horaires hebdomadaires ne doivent pas dépasser 35h.</p>
+        </div>
+      )}
       {meta.error && (
         <div id={name + "-error-description"} className="fr-error-text">
           {(meta.error as any)?.complexSchedule ?? meta.error}
