@@ -21,7 +21,8 @@ export const ModalClose = ({
     onClick={hide}
     title={title}
     aria-controls="fr-modal"
-  >
+    tabIndex={0}
+    autoFocus>
     {children}
   </button>
 );

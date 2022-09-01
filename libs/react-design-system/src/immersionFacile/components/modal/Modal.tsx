@@ -1,15 +1,9 @@
-import React, {
-  cloneElement,
-  Children,
-  useRef,
-  useEffect,
-  useState,
-} from "react";
+import React, { cloneElement, Children, useEffect } from "react";
 
 import ReactDOM from "react-dom";
 import classNames from "classnames";
+import { useFocusTrap } from "./hooks/useFocusTrap";
 import { ModalClose } from "./ModalClose";
-
 /**
  *
  * @visibleName Modale -- Modal
@@ -30,55 +24,6 @@ export type ModalDialogProperties = {
 
 const MODAL_ANIMATION_TIME = 300;
 
-const useFocusTrap = (ref: React.MutableRefObject<null>) => {
-  const [focus, setFocus] = useState(0);
-  const [focusableElements, setFocusableElements] = useState<
-    HTMLElement[] | null
-  >(null);
-
-  const getKeyboardFocusableElements = (element: HTMLElement) => {
-    const filtered: HTMLElement[] = [];
-    const arrayElements = Array.from(
-      element.querySelectorAll(
-        'a, button, input, textarea, select, details, [tabindex]:not([tabindex="-1"])',
-      ),
-      (e) => e,
-    );
-
-    arrayElements.forEach((el: Element) => {
-      if (el && !el.hasAttribute("disabled")) {
-        filtered.push(el as HTMLElement);
-      }
-    });
-    return filtered;
-  };
-
-  const handleTabulation = (e: React.KeyboardEvent) => {
-    e.preventDefault();
-    if (e.key === "Tab" && !e.shiftKey && focusableElements) {
-      setFocus((currentFocus) => (currentFocus + 1) % focusableElements.length);
-    }
-    if (e.key === "Tab" && e.shiftKey) {
-      setFocus((currentFocus) =>
-        currentFocus - 1 < 0 && focusableElements
-          ? focusableElements.length - 1
-          : currentFocus - 1,
-      );
-    }
-  };
-
-  useEffect(() => {
-    if (!focusableElements) {
-      const elements = ref.current && getKeyboardFocusableElements(ref.current);
-      setFocusableElements(elements);
-    } else {
-      focusableElements[focus].focus();
-    }
-  }, [focus, focusableElements, ref]);
-
-  return handleTabulation;
-};
-
 export const ModalDialog = ({
   children,
   hide,
@@ -87,7 +32,7 @@ export const ModalDialog = ({
   isOpen,
   canClose,
 }: ModalDialogProperties) => {
-  const modalRef = useRef(null);
+  const [modalRef] = useFocusTrap();
   // const [openedModal, setOpenedModal] = useState(isOpen);
   const colSizes = { sm: 4, lg: 8, md: 6 };
   const colSize = size ? colSizes[size] : null;
@@ -99,7 +44,6 @@ export const ModalDialog = ({
     className,
   );
   const focusBackTo = document.activeElement;
-  const handleTabulation = useFocusTrap(modalRef);
   const title = Children.toArray(children).filter(
     (child) =>
       React.isValidElement(child) && child.props.__TYPE === "ModalTitle",
@@ -124,13 +68,6 @@ export const ModalDialog = ({
     [],
   );
 
-  // const handleModal = (open: boolean) => {
-  //   if (modalRef.current) {
-  //     setOpenedModal(open);
-  //     document.body.style.overflow = open ? "hidden" : "";
-  //   }
-  // };
-
   const handleAnimatedUnmount = () => {
     // handleModal(false);
     setTimeout(() => {
@@ -152,18 +89,17 @@ export const ModalDialog = ({
       handleAnimatedUnmount();
     }
   };
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener("keydown", handleAllKeyDown);
+      return () => document.removeEventListener("keydown", handleAllKeyDown);
+    }
+  }, [isOpen]);
 
-  // useEffect(() => {
-  //   handleModal(true);
-  // }, []);
-
-  const handleAllKeyDown = (e: React.KeyboardEvent) => {
+  const handleAllKeyDown = (e: KeyboardEvent | React.KeyboardEvent) => {
     if (e.key === "Escape") {
       hide();
       e.preventDefault();
-    }
-    if (e.key === "Tab") {
-      handleTabulation(e);
     }
   };
 
@@ -178,12 +114,11 @@ export const ModalDialog = ({
     ) : null;
   }
   const component = (
-    // eslint-disable-next-line
     <dialog
       aria-labelledby="fr-modal-title-modal"
       className={_className}
       ref={modalRef}
-      onKeyDown={(e) => handleAllKeyDown(e)}
+      //onKeyDown={(e) => handleAllKeyDown(e)}
       onClick={(e) => handleOverlayClick(e)}>
       <div className="fr-container fr-container--fluid fr-container-md fr-col-md-6">
         <div className="fr-grid-row fr-grid-row--center closing-overlay">
