@@ -416,9 +416,11 @@ export class PgEstablishmentAggregateRepository
       logger.info(`About to delete establishment with siret : ${siret}`);
       const query = `DELETE FROM establishments WHERE siret = $1;`;
       await this.client.query(query, [siret]);
-      logger.info(`Deleted establishment successfully`);
+      logger.info(`Deleted establishment successfully. Siret was : ${siret}`);
     } catch (error: any) {
-      logger.info(`Error when deleting establishment : ${error.message}`);
+      logger.info(
+        `Error when deleting establishment with siret ${siret} : ${error.message}`,
+      );
       logger.info({ error }, "Full Error");
       throw error;
     }
