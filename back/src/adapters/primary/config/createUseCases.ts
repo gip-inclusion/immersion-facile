@@ -62,10 +62,6 @@ import { AppellationSearch } from "../../../domain/rome/useCases/AppellationSear
 import { RomeSearch } from "../../../domain/rome/useCases/RomeSearch";
 import { GetSiret } from "../../../domain/sirene/useCases/GetSiret";
 import { GetSiretIfNotAlreadySaved } from "../../../domain/sirene/useCases/GetSiretIfNotAlreadySaved";
-import {
-  httpAddressApiClient,
-  HttpAddressGateway,
-} from "../../secondary/addressGateway/HttpAddressGateway";
 import { AppConfig } from "./appConfig";
 import { Gateways } from "./createGateways";
 import { GenerateConventionMagicLink } from "./createGenerateConventionMagicLink";
@@ -89,7 +85,6 @@ export const createUseCases = (
     quarantinedTopics: config.quarantinedTopics,
   });
   const getSiret = new GetSiret(gateways.sirene);
-  const addressAPI = new HttpAddressGateway(httpAddressApiClient);
 
   return {
     associatePeConnectFederatedIdentity:
@@ -97,8 +92,10 @@ export const createUseCases = (
     uploadFile: new UploadFile(uowPerformer, gateways.documentGateway),
 
     // Address
-    lookupStreetAddress: new LookupStreetAddress(addressAPI),
-    departmentCodeFromPostcode: new DepartmentCodeFromPostcode(addressAPI),
+    lookupStreetAddress: new LookupStreetAddress(gateways.addressApi),
+    departmentCodeFromPostcode: new DepartmentCodeFromPostcode(
+      gateways.addressApi,
+    ),
 
     // Admin
     adminLogin: new AdminLogin(
@@ -171,7 +168,7 @@ export const createUseCases = (
       new UpdateEstablishmentAggregateFromForm(
         uowPerformer,
         gateways.sirene,
-        addressAPI,
+        gateways.addressApi,
         uuidGenerator,
         clock,
       ),
@@ -179,7 +176,7 @@ export const createUseCases = (
       new InsertEstablishmentAggregateFromForm(
         uowPerformer,
         gateways.sirene,
-        addressAPI,
+        gateways.addressApi,
         uuidGenerator,
         clock,
         createNewEvent,

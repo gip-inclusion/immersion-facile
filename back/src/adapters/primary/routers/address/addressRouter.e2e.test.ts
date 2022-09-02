@@ -8,20 +8,27 @@ import {
 } from "shared/src/routes";
 import { SuperTest, Test } from "supertest";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
+import { InMemoryAddressGateway } from "../../../secondary/addressGateway/InMemoryAddressGateway";
 import {
   expected8bdduportAddressAndPositions,
   query8bdduportLookup,
 } from "../../../secondary/addressGateway/testUtils";
 
 describe("addressRouter", () => {
+  let request: SuperTest<Test>;
+  let addressGateway: InMemoryAddressGateway;
+
+  beforeEach(async () => {
+    const testAppAndDeps = await buildTestApp();
+    request = testAppAndDeps.request;
+    addressGateway = testAppAndDeps.gateways.addressApi;
+  });
+
   describe(`${lookupStreetAddressRoute} route`, () => {
-    let request: SuperTest<Test>;
-
-    beforeEach(async () => {
-      ({ request } = await buildTestApp());
-    });
-
     it(`GET ${lookupStreetAddressUrl(query8bdduportLookup)}`, async () => {
+      addressGateway.setAddressAndPosition(
+        expected8bdduportAddressAndPositions,
+      );
       const response = await request.get(
         lookupStreetAddressUrl(query8bdduportLookup),
       );
@@ -31,13 +38,8 @@ describe("addressRouter", () => {
   });
 
   describe(`${departmentCodeFromPostcodeRoute} route`, () => {
-    let request: SuperTest<Test>;
-
-    beforeEach(async () => {
-      ({ request } = await buildTestApp());
-    });
-
     it(`GET ${departmentCodeFromPostcodeUrl("75001")}`, async () => {
+      addressGateway.setDepartmentCode("75");
       const response = await request.get(
         departmentCodeFromPostcodeUrl("75001"),
       );
