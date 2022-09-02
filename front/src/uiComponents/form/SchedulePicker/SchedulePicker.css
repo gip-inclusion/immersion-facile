@@ -63,4 +63,5 @@
 
 .schedule-picker__total-cell {
   max-width: 50px; /* This will force one word per line */
+  margin-bottom: 0.5rem !important; /* @TODO: Temp fix, should be removed when CSS imports are properly reorder */
 }
