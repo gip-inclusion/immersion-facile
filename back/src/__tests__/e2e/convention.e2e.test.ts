@@ -1,4 +1,5 @@
 import { AdminToken } from "shared/src/admin/admin.dto";
+import { ConventionDto } from "shared/src/convention/convention.dto";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import {
   conventionsRoute,
@@ -121,7 +122,7 @@ describe("convention e2e", () => {
           const payload = {
             applicationId: convention.id,
             role: "beneficiary" as Role,
-            emailHash: stringToMd5(convention.email),
+            emailHash: stringToMd5(convention.signatories.beneficiary.email),
             iat: Math.round(Date.now() / 1000),
             exp: Math.round(Date.now() / 1000) + 31 * 24 * 3600,
             version: currentJwtVersions.application,
@@ -142,7 +143,7 @@ describe("convention e2e", () => {
           const payload = createConventionMagicLinkPayload(
             convention.id,
             "beneficiary",
-            convention.email,
+            convention.signatories.beneficiary.email,
             1,
             undefined,
             undefined,
@@ -172,9 +173,15 @@ describe("convention e2e", () => {
           .expect(200, { id: convention.id });
 
         // POSTing an updated application to the same id succeeds.
-        const updatedConvention = {
+        const updatedConvention: ConventionDto = {
           ...convention,
-          email: "new@email.fr",
+          signatories: {
+            beneficiary: {
+              ...convention.signatories.beneficiary,
+              email: "new@email.fr",
+            },
+            mentor: convention.signatories.mentor,
+          },
           status: "READY_TO_SIGN",
         };
 
@@ -182,7 +189,7 @@ describe("convention e2e", () => {
           createConventionMagicLinkPayload(
             convention.id,
             "beneficiary",
-            convention.email,
+            convention.signatories.beneficiary.email,
           ),
         );
 
@@ -193,13 +200,15 @@ describe("convention e2e", () => {
           .expect(200);
 
         // GETting the updated application succeeds.
-        await request
+        const result = await request
           .get(`/admin/${conventionsRoute}/${convention.id}`)
-          .set("Authorization", adminToken)
-          .expect(200, {
-            ...updatedConvention,
-            agencyName: TEST_AGENCY_NAME,
-          });
+          .set("Authorization", adminToken);
+
+        expect(result.body).toEqual({
+          ...updatedConvention,
+          agencyName: TEST_AGENCY_NAME,
+        });
+        expect(result.status).toBe(200);
       });
 
       it("Fetching unknown application IDs fails with 404 Not Found", async () => {
@@ -309,7 +318,7 @@ describe("convention e2e", () => {
         createConventionMagicLinkPayload(
           conventionId,
           "establishment",
-          convention.mentorEmail,
+          convention.signatories.mentor.email,
         ),
       );
       await request

@@ -7,6 +7,8 @@ import {
   ConventionId,
   ConventionExternalId,
   ImmersionObjective,
+  Beneficiary,
+  Mentor,
 } from "./convention.dto";
 import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { FederatedIdentity } from "../federatedIdentities/federatedIdentity.dto";
@@ -21,6 +23,8 @@ export const VALID_EMAILS = [
 export const DATE_SUBMISSION = "2021-01-04";
 export const DATE_START = "2021-01-06";
 export const DATE_END = "2021-01-15";
+export const DATE_SIGNATURE = "2021-01-04";
+
 export const VALID_PHONES = [
   "+33012345678",
   "0601010101",
@@ -28,27 +32,39 @@ export const VALID_PHONES = [
   "+41800001853",
 ];
 
+const beneficiary: Beneficiary = {
+  role: "beneficiary",
+  email: VALID_EMAILS[0],
+  phone: VALID_PHONES[0],
+  firstName: "Esteban",
+  lastName: "Ocon",
+  signedAt: DATE_SIGNATURE,
+  emergencyContact: "Clariss Ocon",
+  emergencyContactPhone: "0663567896",
+};
+
+const mentor: Mentor = {
+  role: "establishment",
+  email: VALID_EMAILS[1],
+  phone: VALID_PHONES[1],
+  firstName: "Alain",
+  lastName: "Prost",
+  signedAt: DATE_SIGNATURE,
+  job: "Big Boss",
+};
+
 const validConvention: ConventionDto = {
   id: DEMANDE_IMMERSION_ID,
   externalId: CONVENTION_EXTERNAL_ID,
   status: "DRAFT",
   postalCode: "75001",
   agencyId: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
-  email: VALID_EMAILS[0],
-  phone: VALID_PHONES[0],
-  firstName: "Esteban",
-  lastName: "Ocon",
   immersionAddress: "169 boulevard de la villette, 75010 Paris",
-  emergencyContact: "Clariss Ocon",
-  emergencyContactPhone: "0663567896",
   dateSubmission: DATE_SUBMISSION,
   dateStart: DATE_START,
   dateEnd: DATE_END,
   businessName: "Beta.gouv.fr",
   siret: "12345678901234",
-  mentor: "Alain Prost",
-  mentorPhone: VALID_PHONES[1],
-  mentorEmail: VALID_EMAILS[1],
   schedule: reasonableSchedule({
     start: new Date(DATE_START),
     end: new Date(DATE_END),
@@ -65,9 +81,8 @@ const validConvention: ConventionDto = {
   },
   immersionActivities: "Piloter un automobile",
   immersionSkills: "Utilisation des pneus optimale, gestion de carburant",
-  beneficiaryAccepted: true,
-  enterpriseAccepted: true,
   internshipKind: "immersion",
+  signatories: { beneficiary, mentor },
 };
 
 export class ConventionDtoBuilder implements Builder<ConventionDto> {
@@ -77,35 +92,56 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     return new ConventionDtoBuilder({ ...this.dto, businessName });
   }
 
-  public withEmail(email: string): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({ ...this.dto, email });
-  }
-
-  public withFirstName(firstName: string): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({ ...this.dto, firstName });
-  }
-
-  public withLastName(lastName: string): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({ ...this.dto, lastName });
-  }
-
-  public withPhone(phone: string): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({ ...this.dto, phone });
-  }
-
-  public withMentor(mentor: string): ConventionDtoBuilder {
+  public withBeneficiary(beneficiary: Beneficiary): ConventionDtoBuilder {
     return new ConventionDtoBuilder({
       ...this.dto,
-      mentor,
+      signatories: { beneficiary, mentor: this.mentor },
     });
   }
 
-  public withMentorPhone(mentorPhone: string): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({ ...this.dto, mentorPhone });
+  public withBeneficiaryEmail(email: string): ConventionDtoBuilder {
+    return this.withBeneficiary({ ...this.beneficiary, email });
   }
 
-  public withMentorEmail(mentorEmail: string): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({ ...this.dto, mentorEmail });
+  public withBeneficiaryFirstName(firstName: string): ConventionDtoBuilder {
+    return this.withBeneficiary({
+      ...this.beneficiary,
+      firstName,
+    });
+  }
+
+  public withBeneficiaryLastName(lastName: string): ConventionDtoBuilder {
+    return this.withBeneficiary({
+      ...this.beneficiary,
+      lastName,
+    });
+  }
+
+  public withBeneficiaryPhone(phone: string): ConventionDtoBuilder {
+    return this.withBeneficiary({ ...this.beneficiary, phone });
+  }
+
+  public withMentor(mentor: Mentor): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({
+      ...this.dto,
+      signatories: { ...this.dto.signatories, mentor },
+    });
+  }
+
+  public withMentorFirstName(firstName: string): ConventionDtoBuilder {
+    return this.withMentor({ ...this.mentor, firstName });
+  }
+
+  public withMentorLastName(lastName: string): ConventionDtoBuilder {
+    return this.withMentor({ ...this.mentor, lastName });
+  }
+
+  public withMentorPhone(phone: string): ConventionDtoBuilder {
+    return this.withMentor({ ...this.mentor, phone });
+  }
+
+  public withMentorEmail(email: string): ConventionDtoBuilder {
+    return this.withMentor({ ...this.mentor, email });
   }
 
   public withDateSubmission(dateSubmission: string): ConventionDtoBuilder {
@@ -221,36 +257,44 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
   withFederatedIdentity(
     federatedIdentity: FederatedIdentity,
   ): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({
-      ...this.dto,
+    return this.withBeneficiary({
+      ...this.beneficiary,
       federatedIdentity,
     });
   }
   withoutFederatedIdentity(): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({
-      ...this.dto,
+    return this.withBeneficiary({
+      ...this.beneficiary,
       federatedIdentity: undefined,
     });
   }
   public notSigned() {
     return new ConventionDtoBuilder({
       ...this.dto,
-      beneficiaryAccepted: false,
-      enterpriseAccepted: false,
+      signatories: {
+        beneficiary: { ...this.beneficiary, signedAt: null },
+        mentor: { ...this.mentor, signedAt: null },
+      },
     });
   }
 
-  public signedByBeneficiary() {
+  public signedByBeneficiary(signedAt: string) {
     return new ConventionDtoBuilder({
       ...this.dto,
-      beneficiaryAccepted: true,
+      signatories: {
+        ...this.dto.signatories,
+        beneficiary: { ...this.beneficiary, signedAt },
+      },
     });
   }
 
-  public signedByEnterprise() {
+  public signedByEnterprise(signedAt: string) {
     return new ConventionDtoBuilder({
       ...this.dto,
-      enterpriseAccepted: true,
+      signatories: {
+        ...this.dto.signatories,
+        mentor: { ...this.mentor, signedAt },
+      },
     });
   }
 
@@ -261,6 +305,14 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
       ...this.dto,
       immersionObjective,
     });
+  }
+
+  public get mentor(): Mentor {
+    return this.dto.signatories.mentor;
+  }
+
+  public get beneficiary(): Beneficiary {
+    return this.dto.signatories.beneficiary;
   }
 
   public build() {

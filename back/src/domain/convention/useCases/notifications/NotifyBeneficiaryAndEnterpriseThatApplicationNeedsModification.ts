@@ -1,3 +1,4 @@
+import { Beneficiary, Mentor } from "shared/src/convention/convention.dto";
 import { conventionSchema } from "shared/src/convention/convention.schema";
 import { frontRoutes } from "shared/src/routes";
 import { allRoles } from "shared/src/tokens/MagicLinkPayload";
@@ -47,13 +48,15 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
         `Unable to send mail. No agency config found for ${convention.agencyId}`,
       );
     }
+    const beneficiary: Beneficiary = convention.signatories.beneficiary;
+    const mentor: Mentor = convention.signatories.mentor;
 
     for (const role of roles) {
       let email: string | undefined = undefined;
       if (role === "beneficiary") {
-        email = convention.email;
+        email = beneficiary.email;
       } else if (role === "establishment") {
-        email = convention.mentorEmail;
+        email = mentor.email;
       }
 
       if (!email) {
@@ -67,8 +70,8 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
         type: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
         recipients: [email],
         params: {
-          beneficiaryFirstName: convention.firstName,
-          beneficiaryLastName: convention.lastName,
+          beneficiaryFirstName: beneficiary.firstName,
+          beneficiaryLastName: beneficiary.lastName,
           businessName: convention.businessName,
           reason,
           signature: agency.signature,

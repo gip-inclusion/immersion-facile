@@ -21,7 +21,7 @@ import { NotifyNewApplicationNeedsReview } from "../../domain/convention/useCase
 
 const validConvention: ConventionDto = new ConventionDtoBuilder()
   .withStatus("IN_REVIEW")
-  .withEmail("jean-francois.macresy@beta.gouv.fr")
+  .withBeneficiaryEmail("jean-francois.macresy@beta.gouv.fr")
   .withMentorEmail("jean-francois.macresy+mentor@beta.gouv.fr")
   .build();
 

@@ -1,4 +1,8 @@
-import { ConventionDto } from "shared/src/convention/convention.dto";
+import {
+  Beneficiary,
+  ConventionDto,
+  Mentor,
+} from "shared/src/convention/convention.dto";
 import { conventionSchema } from "shared/src/convention/convention.schema";
 import {
   UnitOfWork,
@@ -24,14 +28,20 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected extends Tra
         `Unable to send mail. No agency config found for ${dto.agencyId}`,
       );
     }
+    const beneficiary: Beneficiary = dto.signatories.beneficiary;
+    const mentor: Mentor = dto.signatories.mentor;
 
-    const recipients = [dto.email, dto.mentorEmail, ...agency.counsellorEmails];
+    const recipients = [
+      beneficiary.email,
+      mentor.email,
+      ...agency.counsellorEmails,
+    ];
     await this.emailGateway.sendEmail({
       type: "REJECTED_CONVENTION_NOTIFICATION",
       recipients,
       params: {
-        beneficiaryFirstName: dto.firstName,
-        beneficiaryLastName: dto.lastName,
+        beneficiaryFirstName: beneficiary.firstName,
+        beneficiaryLastName: beneficiary.lastName,
         businessName: dto.businessName,
         rejectionReason: dto.rejectionJustification || "",
         signature: agency.signature,

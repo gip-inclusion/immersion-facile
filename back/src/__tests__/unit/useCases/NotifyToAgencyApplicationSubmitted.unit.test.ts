@@ -66,8 +66,8 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
       dateEnd: validConvention.dateEnd,
       dateStart: validConvention.dateStart,
       demandeId: validConvention.id,
-      firstName: validConvention.firstName,
-      lastName: validConvention.lastName,
+      firstName: validConvention.signatories.beneficiary.firstName,
+      lastName: validConvention.signatories.beneficiary.lastName,
     };
 
     expectTypeToMatchAndEqual(sentEmails, [
@@ -115,8 +115,8 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
       dateEnd: validConvention.dateEnd,
       dateStart: validConvention.dateStart,
       demandeId: validConvention.id,
-      firstName: validConvention.firstName,
-      lastName: validConvention.lastName,
+      firstName: validConvention.signatories.beneficiary.firstName,
+      lastName: validConvention.signatories.beneficiary.lastName,
     };
 
     expectTypeToMatchAndEqual(sentEmails, [

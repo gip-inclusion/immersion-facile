@@ -61,8 +61,8 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   const sentEmails = gateways.email.getSentEmails();
   expect(sentEmails).toHaveLength(2);
   expect(sentEmails.map((e) => e.recipients)).toEqual([
-    [createConventionParams.email],
-    [createConventionParams.mentorEmail],
+    [createConventionParams.signatories.beneficiary.email],
+    [createConventionParams.signatories.mentor.email],
   ]);
 
   const beneficiarySignEmail = expectEmailOfType(

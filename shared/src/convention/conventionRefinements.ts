@@ -2,6 +2,7 @@ import differenceInDays from "date-fns/differenceInDays";
 import {
   ConventionStatus,
   immersionMaximumCalendarDays,
+  Signatories,
 } from "./convention.dto";
 
 type DatesInConvention = {
@@ -26,9 +27,9 @@ export const underMaxCalendarDuration = ({
   immersionMaximumCalendarDays;
 
 export const emailAndMentorEmailAreDifferent = (params: {
-  email: string;
-  mentorEmail: string;
-}): boolean => params.email !== params.mentorEmail;
+  signatories: Signatories;
+}): boolean =>
+  params.signatories.mentor.email !== params.signatories.beneficiary.email;
 
 const statusesAllowedWithoutSign: ConventionStatus[] = [
   "DRAFT",
@@ -39,15 +40,15 @@ const statusesAllowedWithoutSign: ConventionStatus[] = [
 ];
 
 export const mustBeSignedByBeneficiary = (params: {
-  beneficiaryAccepted: boolean;
+  signatories: Signatories;
   status: ConventionStatus;
 }): boolean =>
   statusesAllowedWithoutSign.includes(params.status) ||
-  params.beneficiaryAccepted;
+  !!params.signatories.beneficiary.signedAt;
 
 export const mustBeSignedByEstablishment = (params: {
-  enterpriseAccepted: boolean;
+  signatories: Signatories;
   status: ConventionStatus;
 }): boolean =>
   statusesAllowedWithoutSign.includes(params.status) ||
-  params.enterpriseAccepted;
+  !!params.signatories.mentor.signedAt;

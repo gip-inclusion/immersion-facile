@@ -26,23 +26,23 @@ export class ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature ex
       return;
     }
 
-    const { id, mentorEmail, firstName, lastName, businessName, mentor } =
-      convention;
+    const { id, businessName } = convention;
+    const { mentor, beneficiary } = convention.signatories;
 
     await this.emailGateway.sendEmail({
       type: "NEW_CONVENTION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE",
-      recipients: [mentorEmail],
+      recipients: [mentor.email],
       params: {
-        beneficiaryFirstName: firstName,
-        beneficiaryLastName: lastName,
+        beneficiaryFirstName: beneficiary.firstName,
+        beneficiaryLastName: beneficiary.lastName,
         magicLink: this.generateMagicLinkFn({
           id,
           role: "establishment",
           targetRoute: frontRoutes.conventionToSign,
-          email: mentorEmail,
+          email: mentor.email,
         }),
         businessName,
-        mentorName: mentor,
+        mentorName: `${mentor.firstName} ${mentor.lastName}`,
       },
     });
   }

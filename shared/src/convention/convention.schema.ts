@@ -1,4 +1,7 @@
 import { z } from "zod";
+import { agencyIdSchema } from "../agency/agency.schema";
+import { siretSchema } from "../siret";
+import { phoneRegExp, stringOfNumbers } from "../utils";
 import {
   zBoolean,
   zEmail,
@@ -6,9 +9,25 @@ import {
   zStringPossiblyEmpty,
   zTrimmedString,
 } from "../zodUtils";
-import { phoneRegExp, stringOfNumbers } from "../utils";
-import { agencyIdSchema } from "../agency/agency.schema";
-import { siretSchema } from "../siret";
+import {
+  allConventionStatuses,
+  Beneficiary,
+  ConventionDto,
+  ConventionDtoWithoutExternalId,
+  ConventionExternalId,
+  ConventionId,
+  conventionObjectiveOptions,
+  ConventionReadDto,
+  GenerateMagicLinkRequestDto,
+  GenerateMagicLinkResponseDto,
+  immersionMaximumCalendarDays,
+  ListConventionsRequestDto,
+  Mentor,
+  RenewMagicLinkRequestDto,
+  UpdateConventionRequestDto,
+  UpdateConventionStatusRequestDto,
+  WithConventionId,
+} from "./convention.dto";
 import {
   emailAndMentorEmailAreDifferent,
   mustBeSignedByBeneficiary,
@@ -16,55 +35,58 @@ import {
   startDateIsBeforeEndDate,
   underMaxCalendarDuration,
 } from "./conventionRefinements";
-import {
-  GenerateMagicLinkRequestDto,
-  GenerateMagicLinkResponseDto,
-  ConventionDto,
-  ConventionId,
-  ListConventionsRequestDto,
-  RenewMagicLinkRequestDto,
-  UpdateConventionRequestDto,
-  UpdateConventionStatusRequestDto,
-  allConventionStatuses,
-  WithConventionId,
-  ConventionExternalId,
-  ConventionDtoWithoutExternalId,
-  conventionObjectiveOptions,
-  ConventionReadDto,
-  immersionMaximumCalendarDays,
-} from "./convention.dto";
 
-import { dateRegExp } from "../utils/date";
-import { allRoles } from "../tokens/MagicLinkPayload";
-import { addressWithPostalCodeSchema } from "../utils/postalCode";
-import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { peConnectPrefixSchema } from "../federatedIdentities/federatedIdentity.schema";
+import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { scheduleSchema } from "../schedule/Schedule.schema";
+import { allRoles } from "../tokens/MagicLinkPayload";
+import { dateRegExp } from "../utils/date";
+import { addressWithPostalCodeSchema } from "../utils/postalCode";
 
 export const conventionIdSchema: z.ZodSchema<ConventionId> = zTrimmedString;
 export const externalConventionIdSchema: z.ZodSchema<ConventionExternalId> =
   zTrimmedString;
+
+const roleSchema = z.enum(allRoles);
+const phoneSchema = z
+  .string()
+  .regex(phoneRegExp, "Numéro de téléphone incorrect");
+
+const signatorySchema = z.object({
+  role: roleSchema,
+  email: zEmail,
+  phone: phoneSchema,
+  firstName: zTrimmedString,
+  lastName: zTrimmedString,
+  signedAt: zString.regex(dateRegExp).or(z.null()),
+});
+
+const beneficiarySchema: z.Schema<Beneficiary> = signatorySchema.merge(
+  z.object({
+    role: z.enum(["beneficiary"]),
+    emergencyContact: zStringPossiblyEmpty,
+    emergencyContactPhone: phoneSchema.optional().or(z.literal("")),
+    federatedIdentity: peConnectPrefixSchema.optional(),
+  }),
+);
+
+const mentorSchema: z.Schema<Mentor> = signatorySchema.merge(
+  z.object({
+    role: z.enum(["establishment"]),
+    job: zStringPossiblyEmpty,
+  }),
+);
 
 const conventionWithoutExternalIdZObject = z.object({
   id: conventionIdSchema,
   externalId: externalConventionIdSchema.optional(),
   status: z.enum(allConventionStatuses),
   rejectionJustification: z.string().optional(),
-  email: zEmail,
-  firstName: zTrimmedString,
-  lastName: zTrimmedString,
-  phone: z.string().regex(phoneRegExp, "Numéro de téléphone incorrect"),
   postalCode: z
     .string()
     .regex(stringOfNumbers)
     .length(5, "5 chiffres sont nécessaires pour le code postal")
     .optional(),
-  emergencyContact: z.string().optional(),
-  emergencyContactPhone: z
-    .string()
-    .regex(phoneRegExp, "Numero de téléphone incorrect")
-    .optional()
-    .or(z.literal("")),
   agencyId: agencyIdSchema,
   dateSubmission: zString.regex(dateRegExp, "La date de saisie est invalide."),
   dateStart: zString.regex(dateRegExp, "La date de démarrage est invalide."),
@@ -74,12 +96,6 @@ const conventionWithoutExternalIdZObject = z.object({
     .optional(),
   siret: siretSchema,
   businessName: zTrimmedString,
-  mentor: zTrimmedString,
-  mentorPhone: zString.regex(
-    phoneRegExp,
-    "Numero de téléphone de tuteur incorrect",
-  ),
-  mentorEmail: zEmail,
   schedule: scheduleSchema,
   workConditions: z.string().optional(),
   individualProtection: zBoolean,
@@ -90,10 +106,11 @@ const conventionWithoutExternalIdZObject = z.object({
   immersionAppellation: appellationDtoSchema,
   immersionActivities: zTrimmedString,
   immersionSkills: zStringPossiblyEmpty,
-  beneficiaryAccepted: zBoolean,
-  enterpriseAccepted: zBoolean,
-  federatedIdentity: peConnectPrefixSchema.optional(),
   internshipKind: z.enum(["immersion", "mini-stage-cci"]),
+  signatories: z.object({
+    beneficiary: beneficiarySchema,
+    mentor: mentorSchema,
+  }),
 });
 
 export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExternalId> =

@@ -1,5 +1,6 @@
 import { AgencyDto } from "shared/src/agency/agency.dto";
 import {
+  Beneficiary,
   ConventionDto,
   ConventionStatus,
 } from "shared/src/convention/convention.dto";
@@ -64,7 +65,7 @@ export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<Conven
       },
       "Sending Mail to review an immersion",
     );
-
+    const beneficiary: Beneficiary = conventionDto.signatories.beneficiary;
     await Promise.all(
       recipients.emails.map((email) =>
         this.emailGateway.sendEmail({
@@ -78,8 +79,8 @@ export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<Conven
               targetRoute: frontRoutes.conventionToValidate,
               email,
             }),
-            beneficiaryFirstName: conventionDto.firstName,
-            beneficiaryLastName: conventionDto.lastName,
+            beneficiaryFirstName: beneficiary.firstName,
+            beneficiaryLastName: beneficiary.lastName,
             possibleRoleAction:
               recipients.role === "counsellor"
                 ? "en vérifier l'éligibilité"

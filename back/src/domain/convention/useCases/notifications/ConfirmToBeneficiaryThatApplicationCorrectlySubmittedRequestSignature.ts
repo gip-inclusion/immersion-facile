@@ -26,19 +26,23 @@ export class ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignatu
       return;
     }
 
-    const { id, email, firstName, lastName, businessName } = convention;
+    const {
+      id,
+      businessName,
+      signatories: { beneficiary },
+    } = convention;
 
     await this.emailGateway.sendEmail({
       type: "NEW_CONVENTION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
-      recipients: [email],
+      recipients: [beneficiary.email],
       params: {
-        beneficiaryFirstName: firstName,
-        beneficiaryLastName: lastName,
+        beneficiaryFirstName: beneficiary.firstName,
+        beneficiaryLastName: beneficiary.lastName,
         magicLink: this.generateMagicLinkFn({
           id,
           role: "beneficiary",
           targetRoute: frontRoutes.conventionToSign,
-          email,
+          email: beneficiary.email,
         }),
         businessName,
       },

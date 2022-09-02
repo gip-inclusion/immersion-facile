@@ -9,13 +9,13 @@ import {
   testForAllRolesAndInitialStatusCases,
 } from "./UpdateImmersionApplicationStatus.testHelpers";
 
-describe("UpdateImmersionApplicationStatus", () => {
+describe("UpdateConventionStatus", () => {
   describe("* -> DRAFT transition", () => {
     testForAllRolesAndInitialStatusCases({
       targetStatus: "DRAFT",
       expectedDomainTopic: "ImmersionApplicationRequiresModification",
       justification: "test justification",
-      updatedFields: { enterpriseAccepted: false, beneficiaryAccepted: false },
+      updatedFields: { mentorSignedAt: null, beneficiarySignedAt: null },
       allowedRoles: [
         "beneficiary",
         "establishment",

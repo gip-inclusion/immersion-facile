@@ -41,6 +41,8 @@ export class NotifyPoleEmploiUserAdvisorOnConventionAssociation extends Transact
         "There is no open pole emploi advisor entity linked to this user conventionId",
       );
 
+    const beneficiary = convention.signatories.beneficiary;
+
     await this.emailGateway.sendEmail({
       type: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_ASSOCIATION",
       recipients: [conventionUserAdvisor.email],
@@ -50,9 +52,9 @@ export class NotifyPoleEmploiUserAdvisorOnConventionAssociation extends Transact
         businessName: convention.businessName,
         dateEnd: convention.dateEnd,
         dateStart: convention.dateStart,
-        beneficiaryFirstName: convention.firstName,
-        beneficiaryLastName: convention.lastName,
-        beneficiaryEmail: convention.email,
+        beneficiaryFirstName: beneficiary.firstName,
+        beneficiaryLastName: beneficiary.lastName,
+        beneficiaryEmail: beneficiary.email,
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         immersionAddress: convention.immersionAddress!,
         magicLink: this.generateMagicLinkFn({

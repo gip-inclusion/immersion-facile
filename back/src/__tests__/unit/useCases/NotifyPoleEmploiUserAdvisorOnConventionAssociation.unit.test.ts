@@ -90,9 +90,9 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionAssociation", () => {
   it("should send email with the correct params", async () => {
     const conventionDto = new ConventionDtoBuilder()
       .withId(conventionId)
-      .withFirstName("John")
-      .withLastName("Doe")
-      .withEmail("john.doe@plop.fr")
+      .withBeneficiaryFirstName("John")
+      .withBeneficiaryLastName("Doe")
+      .withBeneficiaryEmail("john.doe@plop.fr")
       .withImmersionAddress("127 Avenue de la République 94800 Villejuif")
       .withDateStart("2022-07-06")
       .withDateEnd("2022-07-30")
@@ -125,9 +125,9 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionAssociation", () => {
       advisorFirstName: conventionPoleEmploiAdvisor.firstName,
       advisorLastName: conventionPoleEmploiAdvisor.lastName,
       immersionAddress: conventionDto.immersionAddress!,
-      beneficiaryFirstName: conventionDto.firstName,
-      beneficiaryLastName: conventionDto.lastName,
-      beneficiaryEmail: conventionDto.email,
+      beneficiaryFirstName: conventionDto.signatories.beneficiary.firstName,
+      beneficiaryLastName: conventionDto.signatories.beneficiary.lastName,
+      beneficiaryEmail: conventionDto.signatories.beneficiary.email,
       dateStart: conventionDto.dateStart,
       dateEnd: conventionDto.dateEnd,
       businessName: conventionDto.businessName,

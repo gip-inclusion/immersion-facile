@@ -1,4 +1,7 @@
-import { ConventionDto } from "shared/src/convention/convention.dto";
+import {
+  Beneficiary,
+  ConventionDto,
+} from "shared/src/convention/convention.dto";
 import { conventionSchema } from "shared/src/convention/convention.schema";
 import { frontRoutes } from "shared/src/routes";
 import { Role } from "shared/src/tokens/MagicLinkPayload";
@@ -65,6 +68,7 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
     agencyName: string;
     role: Role;
   }) {
+    const beneficiary: Beneficiary = convention.signatories.beneficiary;
     await Promise.all(
       recipients.map((counsellorEmail) =>
         this.emailGateway.sendEmail({
@@ -76,8 +80,8 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
             dateEnd: convention.dateEnd,
             dateStart: convention.dateStart,
             demandeId: convention.id,
-            firstName: convention.firstName,
-            lastName: convention.lastName,
+            firstName: beneficiary.firstName,
+            lastName: beneficiary.lastName,
             magicLink: this.generateMagicLinkFn({
               id: convention.id,
               role,

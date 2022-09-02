@@ -115,6 +115,8 @@ describe("Pg implementation of ConventionQueries", () => {
         .withId("aaaaac14-9c0a-aaaa-aa6d-6aa9ad38aaaa")
         .validated()
         .withDateEnd("2022-05-14")
+        .withMentorFirstName("Romain")
+        .withMentorLastName("Grandjean")
         .build();
       const validatedImmersionEndingThe15thThatAlreadyReceivedAnEmail =
         new ConventionDtoBuilder()
@@ -163,10 +165,12 @@ describe("Pg implementation of ConventionQueries", () => {
       expect(queryResults).toHaveLength(1);
       const expectedResult: ImmersionAssessmentEmailParams = {
         immersionId: validatedImmersionEndingThe15th.id,
-        mentorEmail: validatedImmersionEndingThe15th.mentorEmail,
-        mentorName: validatedImmersionEndingThe15th.mentor,
-        beneficiaryFirstName: validatedImmersionEndingThe15th.firstName,
-        beneficiaryLastName: validatedImmersionEndingThe15th.lastName,
+        mentorEmail: validatedImmersionEndingThe15th.signatories.mentor.email,
+        mentorName: "Romain Grandjean",
+        beneficiaryFirstName:
+          validatedImmersionEndingThe15th.signatories.beneficiary.firstName,
+        beneficiaryLastName:
+          validatedImmersionEndingThe15th.signatories.beneficiary.lastName,
       };
       expect(queryResults[0]).toEqual(expectedResult);
     });

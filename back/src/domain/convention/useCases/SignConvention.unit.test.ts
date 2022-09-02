@@ -2,6 +2,7 @@ import {
   allConventionStatuses,
   ConventionDto,
   ConventionStatus,
+  Signatories,
 } from "shared/src/convention/convention.dto";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { expectToEqual } from "shared/src/expectToEqual";
@@ -33,19 +34,21 @@ describe("Sign convention", () => {
   let conventionRepository: InMemoryConventionRepository;
   let outboxRepository: InMemoryOutboxRepository;
   let signConvention: SignConvention;
+  let clock: CustomClock;
 
   beforeEach(() => {
     const uow = createInMemoryUow();
     conventionRepository = uow.conventionRepository;
     outboxRepository = uow.outboxRepository;
 
-    const clock = new CustomClock();
+    clock = new CustomClock();
     const uuidGenerator = new TestUuidGenerator();
     const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
 
     signConvention = new SignConvention(
       new InMemoryUowPerformer(uow),
       createNewEvent,
+      clock,
     );
   });
 
@@ -113,6 +116,8 @@ describe("Sign convention", () => {
       conventionRepository.setConventions({
         [conventionInDb.id]: conventionInDb,
       });
+      const signedAt = new Date("2022-01-01");
+      clock.setNextDate(signedAt);
 
       await triggerSignature({
         role,
@@ -122,8 +127,12 @@ describe("Sign convention", () => {
       expectConventionInDbToEqual({
         ...conventionInDb,
         status: "PARTIALLY_SIGNED",
-        beneficiaryAccepted: role === "beneficiary",
-        enterpriseAccepted: role === "establishment",
+        signatories: makeSignatories(conventionInDb, {
+          mentorSignedAt:
+            role === "establishment" ? signedAt.toISOString() : undefined,
+          beneficiarySignedAt:
+            role === "beneficiary" ? signedAt.toISOString() : undefined,
+        }),
       });
     },
   );
@@ -134,6 +143,8 @@ describe("Sign convention", () => {
     conventionRepository.setConventions({
       [initialConvention.id]: initialConvention,
     });
+    const signedAt = new Date("2022-01-01");
+    clock.setNextDate(signedAt);
 
     await triggerSignature({
       role: "establishment",
@@ -143,8 +154,9 @@ describe("Sign convention", () => {
     const expectedConvention: ConventionDto = {
       ...initialConvention,
       status: "PARTIALLY_SIGNED",
-      beneficiaryAccepted: false,
-      enterpriseAccepted: true,
+      signatories: makeSignatories(initialConvention, {
+        mentorSignedAt: signedAt.toISOString(),
+      }),
     };
     expectConventionInDbToEqual(expectedConvention);
     expectEventsInOutbox([
@@ -157,16 +169,20 @@ describe("Sign convention", () => {
 
   it("goes from status PARTIALLY_SIGNED to IN_REVIEW, and saves corresponding event", async () => {
     expectAllowedInitialStatus("PARTIALLY_SIGNED");
+    const beneficiarySignedAt = new Date("2022-01-02");
     const initialConvention = new ConventionDtoBuilder()
       .withId("my-convention-id")
       .withStatus("PARTIALLY_SIGNED")
       .notSigned()
-      .signedByBeneficiary()
+      .signedByBeneficiary(beneficiarySignedAt.toISOString())
       .build();
 
     conventionRepository.setConventions({
       [initialConvention.id]: initialConvention,
     });
+
+    const mentorSignedAt = new Date("2022-01-01");
+    clock.setNextDate(mentorSignedAt);
 
     await triggerSignature({
       role: "establishment",
@@ -176,8 +192,10 @@ describe("Sign convention", () => {
     const expectedConvention: ConventionDto = {
       ...initialConvention,
       status: "IN_REVIEW",
-      beneficiaryAccepted: true,
-      enterpriseAccepted: true,
+      signatories: makeSignatories(initialConvention, {
+        beneficiarySignedAt: beneficiarySignedAt.toISOString(),
+        mentorSignedAt: mentorSignedAt.toISOString(),
+      }),
     };
     expectConventionInDbToEqual(expectedConvention);
     expectEventsInOutbox([
@@ -211,4 +229,21 @@ describe("Sign convention", () => {
   const expectEventsInOutbox = (events: Partial<DomainEvent>[]) => {
     expect(outboxRepository.events).toMatchObject(events);
   };
+});
+
+const makeSignatories = (
+  convention: ConventionDto,
+  {
+    mentorSignedAt = null,
+    beneficiarySignedAt = null,
+  }: {
+    mentorSignedAt?: string | null;
+    beneficiarySignedAt?: string | null;
+  },
+): Signatories => ({
+  beneficiary: {
+    ...convention.signatories.beneficiary,
+    signedAt: beneficiarySignedAt,
+  },
+  mentor: { ...convention.signatories.mentor, signedAt: mentorSignedAt },
 });

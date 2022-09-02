@@ -8,7 +8,7 @@ import {
 } from "../../../domain/auth/jwt";
 import { ExportData } from "../../../domain/backoffice/useCases/ExportData";
 import { AddAgency } from "../../../domain/convention/useCases/AddAgency";
-import { AddImmersionApplication } from "../../../domain/convention/useCases/AddImmersionApplication";
+import { AddConvention } from "../../../domain/convention/useCases/AddConvention";
 import { BroadcastToPoleEmploiOnConventionUpdates } from "../../../domain/convention/useCases/broadcast/BroadcastToPoleEmploiOnConventionUpdates";
 import { CreateImmersionAssessment } from "../../../domain/convention/useCases/CreateImmersionAssessment";
 import { GenerateMagicLink } from "../../../domain/convention/useCases/GenerateMagicLink";
@@ -30,8 +30,8 @@ import { SendEmailWhenAgencyIsActivated } from "../../../domain/convention/useCa
 import { ShareApplicationLinkByEmail } from "../../../domain/convention/useCases/ShareApplicationLinkByEmail";
 import { SignConvention } from "../../../domain/convention/useCases/SignConvention";
 import { UpdateAgency } from "../../../domain/convention/useCases/UpdateAgency";
-import { UpdateImmersionApplication } from "../../../domain/convention/useCases/UpdateImmersionApplication";
-import { UpdateImmersionApplicationStatus } from "../../../domain/convention/useCases/UpdateImmersionApplicationStatus";
+import { UpdateConvention } from "../../../domain/convention/useCases/UpdateConvention";
+import { UpdateConventionStatus } from "../../../domain/convention/useCases/UpdateConventionStatus";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { Clock } from "../../../domain/core/ports/Clock";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
@@ -112,11 +112,7 @@ export const createUseCases = (
       uowPerformer,
       createNewEvent,
     ),
-    addConvention: new AddImmersionApplication(
-      uowPerformer,
-      createNewEvent,
-      getSiret,
-    ),
+    addConvention: new AddConvention(uowPerformer, createNewEvent, getSiret),
     getConvention: new GetConvention(uowPerformer),
     linkPoleEmploiAdvisorAndRedirectToConvention:
       new LinkPoleEmploiAdvisorAndRedirectToConvention(
@@ -126,16 +122,13 @@ export const createUseCases = (
       ),
     listAdminConventions: new ListAdminConventions(uowPerformer),
 
-    updateConvention: new UpdateImmersionApplication(
-      uowPerformer,
-      createNewEvent,
-    ),
-    updateConventionStatus: new UpdateImmersionApplicationStatus(
+    updateConvention: new UpdateConvention(uowPerformer, createNewEvent),
+    updateConventionStatus: new UpdateConventionStatus(
       uowPerformer,
       createNewEvent,
       clock,
     ),
-    signConvention: new SignConvention(uowPerformer, createNewEvent),
+    signConvention: new SignConvention(uowPerformer, createNewEvent, clock),
     generateMagicLink: new GenerateMagicLink(generateJwtFn),
     renewConventionMagicLink: new RenewConventionMagicLink(
       uowPerformer,

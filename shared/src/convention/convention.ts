@@ -1,6 +1,12 @@
 import { reasonableSchedule } from "../schedule/ScheduleUtils";
 import { Role } from "../tokens/MagicLinkPayload";
-import { ConventionStatus, ConventionDto } from "./convention.dto";
+import { ExtractFromExisting } from "../utils";
+import {
+  ConventionStatus,
+  ConventionDto,
+  Beneficiary,
+  Mentor,
+} from "./convention.dto";
 
 const getNewStatus = (
   enterpriseAccepted: boolean,
@@ -17,22 +23,49 @@ const getNewStatus = (
 
 // Returns an application signed by provided roles.
 export const signConventionDtoWithRole = (
-  application: ConventionDto,
-  role: Role,
+  convention: ConventionDto,
+  role: ExtractFromExisting<Role, "beneficiary" | "establishment">,
+  signedAt: string,
 ): ConventionDto => {
-  const enterpriseAccepted =
-    role === "establishment" ? true : application.enterpriseAccepted;
-  const beneficiaryAccepted =
-    role === "beneficiary" ? true : application.beneficiaryAccepted;
+  const beneficiary =
+    role === "beneficiary"
+      ? { ...convention.signatories.beneficiary, signedAt }
+      : convention.signatories.beneficiary;
+  const mentor =
+    role === "establishment"
+      ? { ...convention.signatories.mentor, signedAt }
+      : convention.signatories.mentor;
 
+  const enterpriseAccepted = !!mentor.signedAt;
+  const beneficiaryAccepted = !!beneficiary.signedAt;
   const status = getNewStatus(enterpriseAccepted, beneficiaryAccepted);
 
   return {
-    ...application,
-    beneficiaryAccepted,
-    enterpriseAccepted,
+    ...convention,
+    signatories: { beneficiary, mentor },
     status,
   };
+};
+
+const beneficiary: Beneficiary = {
+  role: "beneficiary",
+  email: "esteban@ocon.fr",
+  phone: "+33012345678",
+  firstName: "Esteban",
+  lastName: "Ocon",
+  signedAt: "2022-01-05T12:00:00.000000",
+  emergencyContact: "Camille Dumaître",
+  emergencyContactPhone: "0601020202",
+};
+
+const mentor: Mentor = {
+  role: "establishment",
+  email: "alain@prost.fr",
+  phone: "0601010101",
+  firstName: "Alain",
+  lastName: "Prost",
+  signedAt: "2022-01-05T12:00:00.000000",
+  job: "Big Boss",
 };
 
 // USED IN FRONT DO NOT DELETE !
@@ -41,13 +74,7 @@ export const IMMERSION_APPLICATION_TEMPLATE: ConventionDto = {
   id: "fake-test-id",
   externalId: "00000000001",
   status: "DRAFT",
-  email: "esteban@ocon.fr",
-  phone: "+33012345678",
-  firstName: "Esteban",
-  lastName: "Ocon",
   postalCode: "75000",
-  emergencyContact: "Camille Dumaître",
-  emergencyContactPhone: "0601020202",
   agencyId: "fake-agency-id",
   dateSubmission: "2021-07-01",
   dateStart: "2021-08-01",
@@ -55,9 +82,6 @@ export const IMMERSION_APPLICATION_TEMPLATE: ConventionDto = {
   dateValidation: "2021-08-05",
   businessName: "Beta.gouv.fr",
   siret: "12345678901234",
-  mentor: "Alain Prost",
-  mentorPhone: "0601010101",
-  mentorEmail: "alain@prost.fr",
   schedule: reasonableSchedule({
     start: new Date("2021-08-01"),
     end: new Date("2021-08-31"),
@@ -76,7 +100,6 @@ export const IMMERSION_APPLICATION_TEMPLATE: ConventionDto = {
   },
   immersionActivities: "Piloter une cisaille",
   immersionSkills: "Utilisation des pneus optimale, gestion de carburant",
-  beneficiaryAccepted: true,
-  enterpriseAccepted: true,
   internshipKind: "immersion",
+  signatories: { beneficiary, mentor },
 };

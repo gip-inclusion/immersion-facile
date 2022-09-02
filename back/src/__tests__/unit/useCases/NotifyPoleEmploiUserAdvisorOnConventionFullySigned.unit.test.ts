@@ -56,9 +56,9 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
     const conventionDtoFromEvent = new ConventionDtoBuilder()
       .withId(conventionId)
       .withFederatedIdentity(`peConnect:${userPeExternalId}`)
-      .withFirstName("John")
-      .withLastName("Doe")
-      .withEmail("john.doe@plop.fr")
+      .withBeneficiaryFirstName("John")
+      .withBeneficiaryLastName("Doe")
+      .withBeneficiaryEmail("john.doe@plop.fr")
       .withImmersionAddress("127 Avenue de la République 94800 Villejuif")
       .withDateStart("2022-07-06")
       .withDateEnd("2022-07-30")
@@ -90,9 +90,11 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
       advisorFirstName: conventionPoleEmploiAdvisor.firstName,
       advisorLastName: conventionPoleEmploiAdvisor.lastName,
       immersionAddress: conventionDtoFromEvent.immersionAddress!,
-      beneficiaryFirstName: conventionDtoFromEvent.firstName,
-      beneficiaryLastName: conventionDtoFromEvent.lastName,
-      beneficiaryEmail: conventionDtoFromEvent.email,
+      beneficiaryFirstName:
+        conventionDtoFromEvent.signatories.beneficiary.firstName,
+      beneficiaryLastName:
+        conventionDtoFromEvent.signatories.beneficiary.lastName,
+      beneficiaryEmail: conventionDtoFromEvent.signatories.beneficiary.email,
       dateStart: conventionDtoFromEvent.dateStart,
       dateEnd: conventionDtoFromEvent.dateEnd,
       businessName: conventionDtoFromEvent.businessName,

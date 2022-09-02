@@ -27,7 +27,7 @@ import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGenerato
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { ConventionRequiresModificationPayload } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
-import { UpdateImmersionApplicationStatus } from "../../../domain/convention/useCases/UpdateImmersionApplicationStatus";
+import { UpdateConventionStatus } from "../../../domain/convention/useCases/UpdateConventionStatus";
 import {
   makeCreateNewEvent,
   NarrowEvent,
@@ -56,12 +56,12 @@ export const setupInitialState = async ({
   initialStatus,
   alreadySigned = true,
 }: SetupInitialStateParams) => {
-  const immersionBuilder = new ConventionDtoBuilder()
+  const conventionBuilder = new ConventionDtoBuilder()
     .withStatus(initialStatus)
     .withoutDateValidation();
   const originalConvention = alreadySigned
-    ? immersionBuilder.build()
-    : immersionBuilder.notSigned().build();
+    ? conventionBuilder.build()
+    : conventionBuilder.notSigned().build();
 
   const uow = createInMemoryUow();
   const conventionRepository = uow.conventionRepository;
@@ -72,7 +72,7 @@ export const setupInitialState = async ({
     uuidGenerator: new TestUuidGenerator(),
   });
 
-  const updateConventionStatus = new UpdateImmersionApplicationStatus(
+  const updateConventionStatus = new UpdateConventionStatus(
     new InMemoryUowPerformer(uow),
     createNewEvent,
     clock,
@@ -94,7 +94,7 @@ type ExecuteUseCaseParams = {
   email: string;
   targetStatus: ConventionStatus;
   justification?: string;
-  updateConventionStatus: UpdateImmersionApplicationStatus;
+  updateConventionStatus: UpdateConventionStatus;
   conventionRepository: InMemoryConventionRepository;
 };
 
@@ -133,10 +133,17 @@ type TestAcceptNewStatusParams = {
   initialStatus: ConventionStatus;
 };
 
+export type UpdatedFields = Partial<
+  ConventionDto & {
+    mentorSignedAt: string | null;
+    beneficiarySignedAt: string | null;
+  }
+>;
+
 type TestAcceptExpectation = {
   targetStatus: ConventionStatus;
   expectedDomainTopic: ConventionDomainTopic;
-  updatedFields?: Partial<ConventionDto>;
+  updatedFields?: UpdatedFields;
   justification?: string;
   nextDate?: Date;
 };
@@ -172,10 +179,28 @@ const makeTestAcceptsStatusUpdate =
       conventionRepository,
     });
 
+    const { beneficiary, mentor } = originalConvention.signatories;
+
+    const { beneficiarySignedAt, mentorSignedAt, ...restOfUpdatedFields } =
+      updatedFields;
     const expectedConvention: ConventionDto = {
       ...originalConvention,
       status: targetStatus,
-      ...updatedFields,
+      ...restOfUpdatedFields,
+      ...(beneficiarySignedAt !== undefined || mentorSignedAt !== undefined
+        ? {
+            signatories: {
+              beneficiary: {
+                ...beneficiary,
+                signedAt: beneficiarySignedAt ?? null,
+              },
+              mentor: {
+                ...mentor,
+                signedAt: mentorSignedAt ?? null,
+              },
+            },
+          }
+        : {}),
     };
     expect(storedConvention).toEqual(expectedConvention);
 
@@ -243,7 +268,7 @@ const makeTestRejectsStatusUpdate =
 interface TestAllCaseProps {
   targetStatus: ConventionStatus;
   expectedDomainTopic: ConventionDomainTopic;
-  updatedFields?: Partial<ConventionDto>;
+  updatedFields?: UpdatedFields;
   justification?: string;
   allowedRoles: Role[];
   allowedInitialStatuses: ConventionStatus[];

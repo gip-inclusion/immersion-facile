@@ -38,6 +38,8 @@ export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends Transact
       return;
     }
 
+    const beneficiary = conventionFromEvent.signatories.beneficiary;
+
     await this.emailGateway.sendEmail({
       type: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED",
       recipients: [conventionUserAdvisor.email],
@@ -47,9 +49,9 @@ export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends Transact
         businessName: conventionFromEvent.businessName,
         dateEnd: conventionFromEvent.dateEnd,
         dateStart: conventionFromEvent.dateStart,
-        beneficiaryFirstName: conventionFromEvent.firstName,
-        beneficiaryLastName: conventionFromEvent.lastName,
-        beneficiaryEmail: conventionFromEvent.email,
+        beneficiaryFirstName: beneficiary.firstName,
+        beneficiaryLastName: beneficiary.lastName,
+        beneficiaryEmail: beneficiary.email,
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         immersionAddress: conventionFromEvent.immersionAddress!,
         magicLink: this.generateMagicLinkFn({

@@ -93,7 +93,7 @@ describe("Magic link renewal flow", () => {
     const payload = createConventionMagicLinkPayload(
       validConvention.id,
       "beneficiary",
-      validConvention.email,
+      validConvention.signatories.beneficiary.email,
     );
 
     const request: RenewMagicLinkRequestDto = {
@@ -110,7 +110,9 @@ describe("Magic link renewal flow", () => {
 
     const email = expectEmailOfType(sentEmails[0], "MAGIC_LINK_RENEWAL");
 
-    expect(email.recipients).toEqual([validConvention.email]);
+    expect(email.recipients).toEqual([
+      validConvention.signatories.beneficiary.email,
+    ]);
 
     const ml = email.params.magicLink as string;
     expect(ml.startsWith("immersionfacile.fr/")).toBeTruthy();

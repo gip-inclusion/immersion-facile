@@ -17,7 +17,7 @@ import { TransactionalUseCase } from "../../core/UseCase";
 // should receive a convention with draft status
 // for now the frontend send a status with READY_TO_SIGN, it will be inverted after refacto
 // https://trello.com/c/siRQLkeU
-export class UpdateImmersionApplication extends TransactionalUseCase<
+export class UpdateConvention extends TransactionalUseCase<
   UpdateConventionRequestDto,
   WithConventionId
 > {

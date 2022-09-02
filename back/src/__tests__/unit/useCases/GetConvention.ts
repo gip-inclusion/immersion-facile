@@ -5,6 +5,7 @@ import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { GetConvention } from "../../../domain/convention/useCases/GetConvention";
+import { expectToEqual } from "shared/src/expectToEqual";
 
 describe("Get Convention", () => {
   let getConvention: GetConvention;
@@ -33,7 +34,7 @@ describe("Get Convention", () => {
       const convention = await getConvention.execute({
         id: entity.id,
       });
-      expect(convention).toEqual(entity);
+      expectToEqual(convention, entity);
     });
   });
 });

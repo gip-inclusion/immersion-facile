@@ -1,12 +1,13 @@
-import { TemplatedEmail } from "shared/src/email/email";
 import {
   ConventionDto,
+  Signatories,
   UpdateConventionStatusRequestDto,
 } from "shared/src/convention/convention.dto";
 import {
   ConventionDtoBuilder,
   VALID_EMAILS,
 } from "shared/src/convention/ConventionDtoBuilder";
+import { TemplatedEmail } from "shared/src/email/email";
 import {
   conventionsRoute,
   signConventionRoute,
@@ -24,6 +25,8 @@ import { InMemoryEmailGateway } from "../../adapters/secondary/emailGateway/InMe
 import { DomainEvent } from "../../domain/core/eventBus/events";
 
 const validatorEmail = "validator@mail.com";
+const beneficiarySignDate = new Date("2022-09-08");
+const mentorSignDate = new Date("2022-09-10");
 
 describe("Add Convention Notifications, then checks the mails are sent (trigerred by events)", () => {
   it("saves valid app in repository with full express app", async () => {
@@ -53,11 +56,11 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
     expectSentEmails(gateways.email, [
       {
         type: "NEW_CONVENTION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
-        recipients: [validConvention.email],
+        recipients: [validConvention.signatories.beneficiary.email],
       },
       {
         type: "NEW_CONVENTION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE",
-        recipients: [validConvention.mentorEmail],
+        recipients: [validConvention.signatories.mentor.email],
       },
     ]);
   });
@@ -180,10 +183,12 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
 };
 
 const beneficiarySignsApplication = async (
-  { request, gateways, eventCrawler, inMemoryUow }: TestAppAndDeps,
+  { request, gateways, eventCrawler, inMemoryUow, clock }: TestAppAndDeps,
   beneficiarySignJwt: string,
   initialConvention: ConventionDto,
 ) => {
+  clock.now = () => beneficiarySignDate;
+
   const response = await request
     .post(`/auth/${signConventionRoute}/${initialConvention.id}`)
     .set("Authorization", beneficiarySignJwt);
@@ -195,8 +200,9 @@ const beneficiarySignsApplication = async (
     {
       ...initialConvention,
       status: "PARTIALLY_SIGNED",
-      beneficiaryAccepted: true,
-      enterpriseAccepted: false,
+      signatories: makeSignatories(initialConvention, {
+        beneficiarySignedAt: beneficiarySignDate.toISOString(),
+      }),
     },
   );
 
@@ -207,10 +213,12 @@ const beneficiarySignsApplication = async (
 };
 
 const establishmentSignsApplication = async (
-  { request, gateways, eventCrawler, inMemoryUow }: TestAppAndDeps,
+  { request, gateways, eventCrawler, inMemoryUow, clock }: TestAppAndDeps,
   establishmentSignJwt: string,
   initialConvention: ConventionDto,
 ) => {
+  clock.now = () => mentorSignDate;
+
   await request
     .post(`/auth/${signConventionRoute}/${initialConvention.id}`)
     .set("Authorization", establishmentSignJwt)
@@ -221,8 +229,10 @@ const establishmentSignsApplication = async (
     {
       ...initialConvention,
       status: "IN_REVIEW",
-      beneficiaryAccepted: true,
-      enterpriseAccepted: true,
+      signatories: makeSignatories(initialConvention, {
+        beneficiarySignedAt: beneficiarySignDate.toISOString(),
+        mentorSignedAt: mentorSignDate.toISOString(),
+      }),
     },
   );
 
@@ -266,8 +276,10 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
       ...initialConvention,
       status: "ACCEPTED_BY_VALIDATOR",
       dateValidation: validationDate.toISOString(),
-      beneficiaryAccepted: true,
-      enterpriseAccepted: true,
+      signatories: makeSignatories(initialConvention, {
+        beneficiarySignedAt: beneficiarySignDate.toISOString(),
+        mentorSignedAt: mentorSignDate.toISOString(),
+      }),
       rejectionJustification: undefined,
     },
   );
@@ -286,3 +298,20 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
     validatorEmail,
   ]);
 };
+
+const makeSignatories = (
+  convention: ConventionDto,
+  {
+    mentorSignedAt = null,
+    beneficiarySignedAt = null,
+  }: {
+    mentorSignedAt?: string | null;
+    beneficiarySignedAt?: string | null;
+  },
+): Signatories => ({
+  beneficiary: {
+    ...convention.signatories.beneficiary,
+    signedAt: beneficiarySignedAt,
+  },
+  mentor: { ...convention.signatories.mentor, signedAt: mentorSignedAt },
+});

@@ -14,7 +14,7 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import { rejectsSiretIfNotAnOpenCompany } from "../../sirene/rejectsSiretIfNotAnOpenCompany";
 import { GetSiretUseCase } from "../../sirene/useCases/GetSiret";
 
-export class AddImmersionApplication extends TransactionalUseCase<
+export class AddConvention extends TransactionalUseCase<
   ConventionDtoWithoutExternalId,
   WithConventionId
 > {

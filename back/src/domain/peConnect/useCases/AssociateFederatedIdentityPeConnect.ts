@@ -24,7 +24,11 @@ export class AssociatePeConnectFederatedIdentity extends TransactionalUseCase<Co
     convention: ConventionDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    if (!isPeConnectIdentity(convention?.federatedIdentity)) {
+    if (
+      !isPeConnectIdentity(
+        convention?.signatories.beneficiary.federatedIdentity,
+      )
+    ) {
       logger.info(
         `Convention ${convention.id} federated identity is not of format peConnect, aborting AssociatePeConnectFederatedIdentity use case`,
       );
@@ -34,7 +38,7 @@ export class AssociatePeConnectFederatedIdentity extends TransactionalUseCase<Co
     const conventionAndPeExternalIds: ConventionAndPeExternalIds =
       await uow.conventionPoleEmploiAdvisorRepository.associateConventionAndUserAdvisor(
         convention.id,
-        toPeExternalId(convention.federatedIdentity),
+        toPeExternalId(convention.signatories.beneficiary.federatedIdentity),
       );
 
     const event = this.createNewEvent({

@@ -32,7 +32,7 @@ const domainTopicByTargetStatusMap: Record<
   DRAFT: "ImmersionApplicationRequiresModification",
 };
 
-export class UpdateImmersionApplicationStatus extends TransactionalUseCase<
+export class UpdateConventionStatus extends TransactionalUseCase<
   UpdateConventionStatusRequestDto,
   WithConventionId
 > {
@@ -67,8 +67,10 @@ export class UpdateImmersionApplicationStatus extends TransactionalUseCase<
       ...storedDto,
       ...(status === "REJECTED" && { rejectionJustification: justification }),
       ...(status === "DRAFT" && {
-        enterpriseAccepted: false,
-        beneficiaryAccepted: false,
+        signatories: {
+          beneficiary: { ...storedDto.signatories.beneficiary, signedAt: null },
+          mentor: { ...storedDto.signatories.mentor, signedAt: null },
+        },
       }),
       status,
       dateValidation: validatedConventionStatuses.includes(status)

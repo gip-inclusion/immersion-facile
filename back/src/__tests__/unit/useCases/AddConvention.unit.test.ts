@@ -14,7 +14,7 @@ import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMem
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { AddImmersionApplication } from "../../../domain/convention/useCases/AddImmersionApplication";
+import { AddConvention } from "../../../domain/convention/useCases/AddConvention";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
@@ -23,7 +23,7 @@ import { DomainEvent } from "../../../domain/core/eventBus/events";
 import { GetFeatureFlags } from "../../../domain/core/ports/GetFeatureFlags";
 
 describe("Add Convention", () => {
-  let addConvention: AddImmersionApplication;
+  let addConvention: AddConvention;
   let conventionRepository: InMemoryConventionRepository;
   let clock: CustomClock;
   let uuidGenerator: TestUuidGenerator;
@@ -53,7 +53,7 @@ describe("Add Convention", () => {
       conventionRepository,
       getFeatureFlags,
     });
-    addConvention = new AddImmersionApplication(
+    addConvention = new AddConvention(
       uowPerformer,
       createNewEvent,
       stubGetSiret,

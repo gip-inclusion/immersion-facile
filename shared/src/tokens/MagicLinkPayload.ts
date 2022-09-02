@@ -1,7 +1,6 @@
-import { NotEmptyArray } from "../utils";
 import * as crypto from "crypto";
-import { SiretDto } from "../siret";
 import { ConventionId } from "../convention/convention.dto";
+import { SiretDto } from "../siret";
 
 export type JwtPayloads = {
   application?: ConventionMagicLinkPayload;
@@ -20,20 +19,15 @@ export const currentJwtVersions: Record<PayloadKey, number> = {
   admin: 1,
 };
 
-export type Role =
-  | "beneficiary"
-  | "establishment"
-  | "counsellor"
-  | "validator"
-  | "admin";
-
-export const allRoles: NotEmptyArray<Role> = [
+export type Role = typeof allRoles[number];
+export const allRoles = [
   "beneficiary",
   "establishment",
+  "legal-representative",
   "counsellor",
   "validator",
   "admin",
-];
+] as const;
 
 export type ConventionMagicLinkPayload = {
   version: number; //< Positive integer.

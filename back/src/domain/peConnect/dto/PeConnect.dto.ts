@@ -1,4 +1,4 @@
-import { ConventionDto } from "shared/src/convention/convention.dto";
+import { Beneficiary } from "shared/src/convention/convention.dto";
 import { ExcludeFromExisting, NotEmptyArray } from "shared/src/utils";
 import { EntityFromDto } from "../../core/EntityFromDto";
 
@@ -44,7 +44,7 @@ export type PeConnectAdvisorEntity = EntityFromDto<
 >;
 
 export type ConventionPeConnectFields = Pick<
-  ConventionDto,
+  Beneficiary,
   "email" | "firstName" | "lastName" | "federatedIdentity"
 >;
 

@@ -20,7 +20,9 @@ const rejectedConvention = new ConventionDtoBuilder()
   .withStatus("REJECTED")
   .withRejectionJustification(rejectionJustification)
   .withMentorEmail("recette+test-mentor@immersion-facile.beta.gouv.fr")
-  .withEmail("recette+test-beneficiary@immersion-facile.beta.gouv.fr")
+  .withBeneficiaryEmail(
+    "recette+test-beneficiary@immersion-facile.beta.gouv.fr",
+  )
   .build();
 
 const counsellorEmail = "jean-francois.macresy@beta.gouv.fr";

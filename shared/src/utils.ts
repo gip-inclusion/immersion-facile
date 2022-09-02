@@ -25,6 +25,8 @@ export type NotEmptyArray<T> = [T, ...T[]];
 
 export type ExcludeFromExisting<T extends string, K extends T> = Exclude<T, K>;
 
+export type ExtractFromExisting<T, K extends T> = Extract<T, K>;
+
 export type OmitFromExistingKeys<
   T extends Record<string, unknown>,
   K extends keyof T,

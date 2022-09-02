@@ -154,7 +154,7 @@ describe("RenewConventionMagicLink use case", () => {
     const expiredPayload = createConventionMagicLinkPayload(
       validConvention.id,
       "beneficiary",
-      validConvention.email,
+      validConvention.signatories.beneficiary.email,
     );
 
     const request: RenewMagicLinkRequestDto = {
@@ -168,7 +168,9 @@ describe("RenewConventionMagicLink use case", () => {
     const renewalEvent = outboxRepository.events[0];
     expect(renewalEvent.topic).toBe("MagicLinkRenewalRequested");
     const dispatchedPayload = renewalEvent.payload as RenewMagicLinkPayload;
-    expect(dispatchedPayload["emails"]).toEqual([validConvention.email]);
+    expect(dispatchedPayload["emails"]).toEqual([
+      validConvention.signatories.beneficiary.email,
+    ]);
     const ml = dispatchedPayload.magicLink;
     expect(ml.startsWith("immersionfacile.fr/")).toBeTruthy();
     const jwt = ml.replace("immersionfacile.fr/", "");

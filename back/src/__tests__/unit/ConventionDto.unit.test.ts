@@ -22,15 +22,17 @@ describe("conventionDtoSchema", () => {
 
   it("ignores accents on emails", () => {
     const convention = new ConventionDtoBuilder()
-      .withEmail("Jérôme_Truc@associés.fr")
+      .withBeneficiaryEmail("Jérôme_Truc@associés.fr")
       .build();
     const parsedConvention = conventionSchema.parse(convention);
-    expect(parsedConvention.email).toBe("Jerome_Truc@associes.fr");
+    expect(parsedConvention.signatories.beneficiary.email).toBe(
+      "Jerome_Truc@associes.fr",
+    );
   });
 
   it("rejects equal applicant and mentor emails", () => {
     const convention = new ConventionDtoBuilder()
-      .withEmail("demandeur@mail.fr")
+      .withBeneficiaryEmail("demandeur@mail.fr")
       .withMentorEmail("demandeur@mail.fr")
       .build();
 
@@ -44,12 +46,14 @@ describe("conventionDtoSchema", () => {
   });
 
   it("rejects when phone is not a valid number", () => {
-    const convention = new ConventionDtoBuilder().withPhone("wrong").build();
+    const convention = new ConventionDtoBuilder()
+      .withBeneficiaryPhone("wrong")
+      .build();
 
     expectConventionDtoToBeInvalid(convention);
 
     const convention2 = new ConventionDtoBuilder()
-      .withPhone("0203stillWrong")
+      .withBeneficiaryPhone("0203stillWrong")
       .build();
 
     expectConventionDtoToBeInvalid(convention2);

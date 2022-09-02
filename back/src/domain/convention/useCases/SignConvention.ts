@@ -7,6 +7,7 @@ import {
   ConventionMagicLinkPayload,
   Role,
 } from "shared/src/tokens/MagicLinkPayload";
+import { ExtractFromExisting } from "shared/src/utils";
 import { z } from "zod";
 import {
   ForbiddenError,
@@ -15,6 +16,7 @@ import {
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainTopic } from "../../core/eventBus/events";
+import { Clock } from "../../core/ports/Clock";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { throwIfTransitionNotAllowed } from "../entities/Convention";
@@ -29,6 +31,10 @@ const domainTopicByTargetStatusMap: Partial<
 };
 
 const roleAllowToSign: Role[] = ["establishment", "beneficiary"];
+const isAllowedToSign = (
+  role: Role,
+): role is ExtractFromExisting<Role, "beneficiary" | "establishment"> =>
+  roleAllowToSign.includes(role);
 
 export class SignConvention extends TransactionalUseCase<
   void,
@@ -37,6 +43,7 @@ export class SignConvention extends TransactionalUseCase<
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly createNewEvent: CreateNewEvent,
+    private clock: Clock,
   ) {
     super(uowPerformer);
   }
@@ -50,7 +57,7 @@ export class SignConvention extends TransactionalUseCase<
   ): Promise<WithConventionId> {
     logger.debug({ applicationId, role });
 
-    if (!roleAllowToSign.includes(role))
+    if (!isAllowedToSign(role))
       throw new ForbiddenError(
         "Only Beneficiary or Mentor are allowed to sign convention",
       );
@@ -59,7 +66,11 @@ export class SignConvention extends TransactionalUseCase<
       applicationId,
     );
     if (!initialConvention) throw new NotFoundError(applicationId);
-    const signedConvention = signConventionDtoWithRole(initialConvention, role);
+    const signedConvention = signConventionDtoWithRole(
+      initialConvention,
+      role,
+      this.clock.now().toISOString(),
+    );
 
     throwIfTransitionNotAllowed({
       role,

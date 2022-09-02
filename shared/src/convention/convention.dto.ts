@@ -41,13 +41,7 @@ export type ConventionDtoWithoutExternalId = {
   id: ConventionId;
   status: ConventionStatus;
   rejectionJustification?: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  phone: string;
   postalCode?: string;
-  emergencyContact?: string;
-  emergencyContactPhone?: string;
   agencyId: AgencyId;
   dateSubmission: string; // Date iso string
   dateStart: string; // Date iso string
@@ -55,9 +49,6 @@ export type ConventionDtoWithoutExternalId = {
   dateValidation?: string; // Date iso string (undefined until the convention is validated)
   siret: SiretDto;
   businessName: string;
-  mentor: string;
-  mentorPhone: string;
-  mentorEmail: string;
   schedule: ScheduleDto;
   workConditions?: string;
   individualProtection: boolean;
@@ -68,11 +59,32 @@ export type ConventionDtoWithoutExternalId = {
   immersionAppellation: AppellationDto;
   immersionActivities: string;
   immersionSkills: string;
-  beneficiaryAccepted: boolean;
-  enterpriseAccepted: boolean;
-  federatedIdentity?: FederatedIdentity;
   internshipKind: InternshipKind;
+  signatories: Signatories;
 };
+
+export type Signatories = { beneficiary: Beneficiary; mentor: Mentor }; // legalRepresentative?: LegalRepresentative
+
+export type Signatory<R extends Role> = {
+  role: R;
+  email: string;
+  phone: string;
+  firstName: string;
+  lastName: string;
+  signedAt: string | null; // Date iso string
+};
+
+export type Beneficiary = Signatory<"beneficiary"> & {
+  emergencyContact?: string;
+  emergencyContactPhone?: string;
+  federatedIdentity?: FederatedIdentity;
+};
+
+export type Mentor = Signatory<"establishment"> & {
+  job: string;
+};
+
+// type LegalRepresentative = Signatory<"legal-representative">;
 
 export type ConventionDto = ConventionDtoWithoutExternalId & {
   externalId: ConventionExternalId;

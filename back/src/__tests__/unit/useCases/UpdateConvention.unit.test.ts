@@ -20,7 +20,7 @@ import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMem
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { UpdateImmersionApplication } from "../../../domain/convention/useCases/UpdateImmersionApplication";
+import { UpdateConvention } from "../../../domain/convention/useCases/UpdateConvention";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
@@ -28,7 +28,7 @@ import {
 import { GetFeatureFlags } from "../../../domain/core/ports/GetFeatureFlags";
 
 describe("Update Convention", () => {
-  let updateConvention: UpdateImmersionApplication;
+  let updateConvention: UpdateConvention;
   let conventionRepository: InMemoryConventionRepository;
   let outboxRepo: InMemoryOutboxRepository;
   let createNewEvent: CreateNewEvent;
@@ -54,10 +54,7 @@ describe("Update Convention", () => {
       getFeatureFlags,
     });
 
-    updateConvention = new UpdateImmersionApplication(
-      uowPerformer,
-      createNewEvent,
-    );
+    updateConvention = new UpdateConvention(uowPerformer, createNewEvent);
   });
 
   describe("When the Convention is valid", () => {
@@ -69,7 +66,7 @@ describe("Update Convention", () => {
 
       const updatedConvention = new ConventionDtoBuilder()
         .withStatus("READY_TO_SIGN")
-        .withEmail("new@email.fr")
+        .withBeneficiaryEmail("new@email.fr")
         .build();
 
       const { id } = await updateConvention.execute({

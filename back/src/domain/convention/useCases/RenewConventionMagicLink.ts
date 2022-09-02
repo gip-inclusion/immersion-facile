@@ -1,6 +1,8 @@
 import jwt, { TokenExpiredError } from "jsonwebtoken";
 import {
+  Beneficiary,
   ConventionId,
+  Mentor,
   RenewMagicLinkRequestDto,
 } from "shared/src/convention/convention.dto";
 import { renewMagicLinkRequestSchema } from "shared/src/convention/convention.schema";
@@ -126,12 +128,15 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
       throw new BadRequestError(linkFormat);
     }
 
+    const beneficiary: Beneficiary = conventionDto.signatories.beneficiary;
+    const mentor: Mentor = conventionDto.signatories.mentor;
+
     let emails: string[] = [];
     switch (role) {
       case "admin":
         throw new BadRequestError("L'admin n'a pas de liens magiques.");
       case "beneficiary":
-        emails = [conventionDto.email];
+        emails = [beneficiary.email];
         break;
       case "counsellor":
         emails = agency.counsellorEmails;
@@ -140,7 +145,7 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
         emails = agency.validatorEmails;
         break;
       case "establishment":
-        emails = [conventionDto.mentorEmail];
+        emails = [mentor.email];
         break;
     }
 

@@ -43,8 +43,28 @@ export class PgConventionRepository implements ConventionRepository {
     convention: ConventionDtoWithoutExternalId,
   ): Promise<ConventionExternalId> {
     // prettier-ignore
-    const { id, status, email, firstName, lastName, phone, emergencyContact, emergencyContactPhone, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, mentor, mentorPhone, mentorEmail, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation, immersionActivities, immersionSkills, beneficiaryAccepted, enterpriseAccepted, postalCode, workConditions, internshipKind } =
+    const { signatories: { beneficiary, mentor }, id, status, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation, immersionActivities, immersionSkills, postalCode, workConditions, internshipKind } =
       convention
+
+    const {
+      phone: mentorPhone,
+      email: mentorEmail,
+      signedAt: mentorSignedAt,
+    } = mentor;
+    const mentorNameAndFunction = `${mentor.firstName} ${mentor.lastName} ${mentor.job}`;
+
+    const {
+      email,
+      firstName,
+      lastName,
+      phone,
+      emergencyContact,
+      emergencyContactPhone,
+      signedAt: beneficiarySignedAt,
+    } = beneficiary;
+
+    const beneficiaryAccepted = !!beneficiarySignedAt;
+    const enterpriseAccepted = !!mentorSignedAt;
 
     try {
       const query_insert_application = `INSERT INTO conventions(
@@ -53,7 +73,7 @@ export class PgConventionRepository implements ConventionRepository {
         ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32)`;
 
       // prettier-ignore
-      await this.client.query(query_insert_application, [id, status, email, firstName, lastName, phone, emergencyContact, emergencyContactPhone, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, mentor, mentorPhone, mentorEmail, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation.appellationCode, immersionActivities, immersionSkills, beneficiaryAccepted, enterpriseAccepted, postalCode, workConditions, internshipKind]);
+      await this.client.query(query_insert_application, [id, status, email, firstName, lastName, phone, emergencyContact, emergencyContactPhone, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, mentorNameAndFunction, mentorPhone, mentorEmail, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation.appellationCode, immersionActivities, immersionSkills, beneficiaryAccepted, enterpriseAccepted, postalCode, workConditions, internshipKind]);
     } catch (error: any) {
       notifyDiscord(
         `Erreur lors de la sauvegarde de la convention  suivante : ${JSON.stringify(
@@ -85,8 +105,28 @@ export class PgConventionRepository implements ConventionRepository {
     convention: ConventionDto,
   ): Promise<ConventionId | undefined> {
     // prettier-ignore
-    const { id, status, email, firstName, lastName, phone, emergencyContact, emergencyContactPhone, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, mentor, mentorPhone, mentorEmail, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation, immersionActivities, immersionSkills, beneficiaryAccepted, enterpriseAccepted, workConditions } =
+    const { signatories: { beneficiary, mentor }, id, status, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation, immersionActivities, immersionSkills, workConditions } =
       convention
+
+    const {
+      phone: mentorPhone,
+      email: mentorEmail,
+      signedAt: mentorSignedAt,
+    } = mentor;
+    const mentorNameAndFunction = `${mentor.firstName} ${mentor.lastName} ${mentor.job}`;
+
+    const {
+      email,
+      firstName,
+      lastName,
+      phone,
+      emergencyContact,
+      emergencyContactPhone,
+      signedAt: beneficiarySignedAt,
+    } = beneficiary;
+
+    const beneficiaryAccepted = !!beneficiarySignedAt;
+    const enterpriseAccepted = !!mentorSignedAt;
 
     const query = `UPDATE conventions
       SET status=$2,  email=$3,  first_name=$4,  last_name=$5,  phone=$6,  emergency_contact=$7, emergency_contact_phone=$8, 
@@ -97,7 +137,7 @@ export class PgConventionRepository implements ConventionRepository {
       WHERE id=$1`;
 
     // prettier-ignore
-    await this.client.query(query, [id, status, email, firstName, lastName, phone, emergencyContact, emergencyContactPhone, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, mentor, mentorPhone, mentorEmail, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation.appellationCode, immersionActivities, immersionSkills, beneficiaryAccepted, enterpriseAccepted, workConditions]);
+    await this.client.query(query, [id, status, email, firstName, lastName, phone, emergencyContact, emergencyContactPhone, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, mentorNameAndFunction, mentorPhone, mentorEmail, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation.appellationCode, immersionActivities, immersionSkills, beneficiaryAccepted, enterpriseAccepted, workConditions]);
     return convention.id;
   }
 }

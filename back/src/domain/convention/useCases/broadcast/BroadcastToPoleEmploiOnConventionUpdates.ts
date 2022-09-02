@@ -61,8 +61,10 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
     uow: UnitOfWork,
   ): Promise<void> {
     const { enablePeConventionBroadcast } = await uow.getFeatureFlags();
+    const { mentor, beneficiary } = convention.signatories;
+
     if (!enablePeConventionBroadcast) return;
-    if (!convention.federatedIdentity) return;
+    if (!beneficiary.federatedIdentity) return;
 
     const totalHours = calculateTotalImmersionHoursBetweenDate({
       schedule: convention.schedule,
@@ -75,21 +77,21 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
         ? convention.externalId.padStart(11, "0")
         : "no-external-id",
       originalId: convention.id,
-      peConnectId: convention.federatedIdentity.replace("peConnect:", ""),
+      peConnectId: beneficiary.federatedIdentity.replace("peConnect:", ""),
       status: conventionStatusToPoleEmploiStatus[convention.status],
-      email: convention.email,
-      telephone: convention.phone,
-      prenom: convention.firstName,
-      nom: convention.lastName,
+      email: beneficiary.email,
+      telephone: beneficiary.phone,
+      prenom: beneficiary.firstName,
+      nom: beneficiary.lastName,
       dateDemande: new Date(convention.dateSubmission).toISOString(),
       dateDebut: new Date(convention.dateStart).toISOString(),
       dateFin: new Date(convention.dateEnd).toISOString(),
       dureeImmersion: totalHours.toString(),
       raisonSociale: convention.businessName,
       siret: convention.siret,
-      nomPrenomFonctionTuteur: convention.mentor,
-      telephoneTuteur: convention.mentorPhone,
-      emailTuteur: convention.mentorEmail,
+      nomPrenomFonctionTuteur: `${mentor.firstName} ${mentor.lastName} ${mentor.job}`,
+      telephoneTuteur: mentor.phone,
+      emailTuteur: mentor.email,
       adresseImmersion: convention.immersionAddress,
       protectionIndividuelle: convention.individualProtection,
       preventionSanitaire: convention.sanitaryPrevention,
@@ -103,8 +105,8 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
       ),
       activitesObservees: convention.immersionActivities,
       competencesObservees: convention.immersionSkills,
-      signatureBeneficiaire: convention.beneficiaryAccepted,
-      signatureEntreprise: convention.enterpriseAccepted,
+      signatureBeneficiaire: !!beneficiary.signedAt,
+      signatureEntreprise: !!mentor.signedAt,
 
       descriptionProtectionIndividuelle: "",
       enseigne: "", // TODO : decide whether to remove this field, to add agency name to our conventionDTO, or make a request to retrieve it here.

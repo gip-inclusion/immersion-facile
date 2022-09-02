@@ -193,6 +193,8 @@ describe("PgExportQueries", () => {
           filters: {},
         });
 
+        const { beneficiary, mentor } = conventionInRepo.signatories;
+
         // Assert
         const expectedExportedRow = {
           "id convention": conventionInRepo.id,
@@ -231,26 +233,24 @@ describe("PgExportQueries", () => {
             "vendredi : 08:00-12:00, 13:00-16:00\n" +
             "samedi : libre\n" +
             "dimanche : libre",
-          Bénéficiaire:
-            conventionInRepo.firstName + " " + conventionInRepo.lastName,
+          Bénéficiaire: beneficiary.firstName + " " + beneficiary.lastName,
           "Code Postal": "75010",
-          "Email bénéficiaire": conventionInRepo.email,
-          "Téléphone bénéficiaire": conventionInRepo.phone,
-          "Contact d'urgence": conventionInRepo.emergencyContact,
-          "Téléphone du contact d'urgence":
-            conventionInRepo.emergencyContactPhone,
+          "Email bénéficiaire": beneficiary.email,
+          "Téléphone bénéficiaire": beneficiary.phone,
+          "Contact d'urgence": beneficiary.emergencyContact,
+          "Téléphone du contact d'urgence": beneficiary.emergencyContactPhone,
           "Protection individuelle": conventionInRepo.individualProtection,
           "Prévention sanitaire": conventionInRepo.sanitaryPrevention,
           "Descriptif des préventions sanitaires":
             conventionInRepo.sanitaryPreventionDescription,
           "Identifiant Externe Pole Emploi":
-            conventionInRepo.federatedIdentity ?? null,
+            beneficiary.federatedIdentity ?? null,
           Siret: conventionInRepo.siret,
           "Référencement IF": "Non",
           Entreprise: conventionInRepo.businessName,
-          Tuteur: conventionInRepo.mentor,
-          "Téléphone du tuteur": conventionInRepo.mentorPhone,
-          "Email du tuteur": conventionInRepo.mentorEmail,
+          Tuteur: `${mentor.firstName} ${mentor.lastName} ${mentor.job}`,
+          "Téléphone du tuteur": mentor.phone,
+          "Email du tuteur": mentor.email,
         };
         expect(exportables["conventions"]).toHaveLength(1);
         expectObjectsToMatch(

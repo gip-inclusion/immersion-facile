@@ -64,7 +64,11 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
 
     expect(sentEmails).toHaveLength(1);
     expectEmailFinalValidationConfirmationMatchingConvention(
-      [validConvention.email, validConvention.mentorEmail, counsellorEmail],
+      [
+        validConvention.signatories.beneficiary.email,
+        validConvention.signatories.mentor.email,
+        counsellorEmail,
+      ],
       sentEmails[0],
       agency,
       validConvention,
@@ -105,8 +109,8 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
     expect(sentEmails).toHaveLength(1);
     expectEmailFinalValidationConfirmationMatchingConvention(
       [
-        validConvention.email,
-        validConvention.mentorEmail,
+        validConvention.signatories.beneficiary.email,
+        validConvention.signatories.mentor.email,
         counsellorEmail,
         userConventionAdvisor.email,
       ],
@@ -136,13 +140,14 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
       getValidatedApplicationFinalConfirmationParams(agency, application),
       {
         totalHours: 70,
-        beneficiaryFirstName: application.firstName,
-        beneficiaryLastName: application.lastName,
-        emergencyContact: application.emergencyContact,
-        emergencyContactPhone: application.emergencyContactPhone,
+        beneficiaryFirstName: application.signatories.beneficiary.firstName,
+        beneficiaryLastName: application.signatories.beneficiary.lastName,
+        emergencyContact: application.signatories.beneficiary.emergencyContact,
+        emergencyContactPhone:
+          application.signatories.beneficiary.emergencyContactPhone,
         dateStart: parseISO(application.dateStart).toLocaleDateString("fr"),
         dateEnd: parseISO(application.dateEnd).toLocaleDateString("fr"),
-        mentorName: application.mentor,
+        mentorName: `${application.signatories.mentor.firstName} ${application.signatories.mentor.lastName}`,
         scheduleText: prettyPrintSchedule(application.schedule).split("\n"),
         businessName: application.businessName,
         immersionAddress: "immersionAddress",

@@ -78,7 +78,7 @@ describe("PgConventionRepository", () => {
       .withId(idA)
       .withExternalId(externalId)
       .withStatus("ACCEPTED_BY_VALIDATOR")
-      .withEmail("someUpdated@email.com")
+      .withBeneficiaryEmail("someUpdated@email.com")
       .withDateEnd("2021-01-20")
       .build();
 

@@ -20,19 +20,20 @@ import {
 
 export const expectEmailBeneficiaryConfirmationSignatureRequestMatchingConvention =
   (templatedEmail: TemplatedEmail, convention: ConventionDto) => {
-    const { email, id, firstName, lastName, businessName } = convention;
+    const { id, businessName } = convention;
+    const { beneficiary } = convention.signatories;
 
     expectTypeToMatchAndEqual(templatedEmail, {
       type: "NEW_CONVENTION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
-      recipients: [email],
+      recipients: [beneficiary.email],
       params: {
-        beneficiaryFirstName: firstName,
-        beneficiaryLastName: lastName,
+        beneficiaryFirstName: beneficiary.firstName,
+        beneficiaryLastName: beneficiary.lastName,
         magicLink: fakeGenerateMagicLinkUrlFn({
           id,
           role: "beneficiary",
           targetRoute: frontRoutes.conventionToSign,
-          email,
+          email: beneficiary.email,
         }),
         businessName,
       },
@@ -86,8 +87,8 @@ export const expectedEmailConventionReviewMatchingConvention = (
     type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
     recipients: [recipient],
     params: {
-      beneficiaryFirstName: convention.firstName,
-      beneficiaryLastName: convention.lastName,
+      beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+      beneficiaryLastName: convention.signatories.beneficiary.lastName,
       businessName: convention.businessName,
       magicLink,
       possibleRoleAction,
@@ -105,8 +106,8 @@ export const expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected = (
     type: "REJECTED_CONVENTION_NOTIFICATION",
     recipients,
     params: {
-      beneficiaryFirstName: dto.firstName,
-      beneficiaryLastName: dto.lastName,
+      beneficiaryFirstName: dto.signatories.beneficiary.firstName,
+      beneficiaryLastName: dto.signatories.beneficiary.lastName,
       businessName: dto.businessName,
       rejectionReason: dto.rejectionJustification || "",
       signature: agency.signature,

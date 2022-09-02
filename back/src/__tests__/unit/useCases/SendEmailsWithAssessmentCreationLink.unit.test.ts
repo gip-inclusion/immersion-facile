@@ -67,6 +67,8 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
       .withDateStart("2021-05-13T10:00:00.000Z")
       .withDateEnd("2021-05-16T10:00:00.000Z")
       .withId("immersion-ending-tommorow-id")
+      .withMentorFirstName("Tom")
+      .withMentorLastName("Cruise")
       .validated()
       .build();
 
@@ -86,14 +88,16 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
     expect(sentEmails).toHaveLength(1);
     expect(sentEmails[0].type).toBe("CREATE_IMMERSION_ASSESSMENT");
     expect(sentEmails[0].recipients).toEqual([
-      immersionApplicationEndingTomorrow.mentorEmail,
+      immersionApplicationEndingTomorrow.signatories.mentor.email,
     ]);
 
     expect(sentEmails[0].params).toEqual({
       immersionAssessmentCreationLink: `www.immersion-facile.fr/bilan-immersion?jwt=jwtOfImmersion[immersion-ending-tommorow-id]`,
-      mentorName: immersionApplicationEndingTomorrow.mentor,
-      beneficiaryFirstName: immersionApplicationEndingTomorrow.firstName,
-      beneficiaryLastName: immersionApplicationEndingTomorrow.lastName,
+      mentorName: "Tom Cruise",
+      beneficiaryFirstName:
+        immersionApplicationEndingTomorrow.signatories.beneficiary.firstName,
+      beneficiaryLastName:
+        immersionApplicationEndingTomorrow.signatories.beneficiary.lastName,
     });
     expect(outboxRepository.events).toHaveLength(1);
     expect(outboxRepository.events[0].payload).toMatchObject({

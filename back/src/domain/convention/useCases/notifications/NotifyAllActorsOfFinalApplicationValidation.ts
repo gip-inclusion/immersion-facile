@@ -1,6 +1,10 @@
 import { parseISO } from "date-fns";
 import { AgencyDto } from "shared/src/agency/agency.dto";
-import { ConventionDto } from "shared/src/convention/convention.dto";
+import {
+  Beneficiary,
+  ConventionDto,
+  Mentor,
+} from "shared/src/convention/convention.dto";
 import { conventionSchema } from "shared/src/convention/convention.schema";
 import {
   calculateTotalImmersionHoursBetweenDate,
@@ -43,8 +47,8 @@ export class NotifyAllActorsOfFinalApplicationValidation extends TransactionalUs
       );
 
     const recipients = [
-      convention.email,
-      convention.mentorEmail,
+      convention.signatories.beneficiary.email,
+      convention.signatories.mentor.email,
       ...agency.counsellorEmails,
       ...agency.validatorEmails,
       ...getPeAdvisorEmailIfExist(peUserAdvisorOrUndefined),
@@ -65,34 +69,39 @@ export class NotifyAllActorsOfFinalApplicationValidation extends TransactionalUs
 export const getValidatedApplicationFinalConfirmationParams = (
   agency: AgencyDto,
   dto: ConventionDto,
-) => ({
-  totalHours: calculateTotalImmersionHoursBetweenDate({
-    dateStart: dto.dateStart,
-    dateEnd: dto.dateEnd,
-    schedule: dto.schedule,
-  }),
-  beneficiaryFirstName: dto.firstName,
-  beneficiaryLastName: dto.lastName,
-  emergencyContact: dto.emergencyContact,
-  emergencyContactPhone: dto.emergencyContactPhone,
-  dateStart: parseISO(dto.dateStart).toLocaleDateString("fr"),
-  dateEnd: parseISO(dto.dateEnd).toLocaleDateString("fr"),
-  mentorName: dto.mentor,
-  scheduleText: prettyPrintSchedule(dto.schedule).split("\n"),
-  businessName: dto.businessName,
-  immersionAddress: dto.immersionAddress || "",
-  immersionAppellationLabel: dto.immersionAppellation.appellationLabel,
-  immersionActivities: dto.immersionActivities,
-  immersionSkills: dto.immersionSkills ?? "Non renseigné",
-  sanitaryPrevention:
-    dto.sanitaryPrevention && dto.sanitaryPreventionDescription
-      ? dto.sanitaryPreventionDescription
-      : "non",
-  individualProtection: dto.individualProtection ? "oui" : "non",
-  questionnaireUrl: agency.questionnaireUrl,
-  signature: agency.signature,
-  workConditions: dto.workConditions,
-});
+) => {
+  const beneficiary: Beneficiary = dto.signatories.beneficiary;
+  const mentor: Mentor = dto.signatories.mentor;
+
+  return {
+    totalHours: calculateTotalImmersionHoursBetweenDate({
+      dateStart: dto.dateStart,
+      dateEnd: dto.dateEnd,
+      schedule: dto.schedule,
+    }),
+    beneficiaryFirstName: beneficiary.firstName,
+    beneficiaryLastName: beneficiary.lastName,
+    emergencyContact: beneficiary.emergencyContact,
+    emergencyContactPhone: beneficiary.emergencyContactPhone,
+    dateStart: parseISO(dto.dateStart).toLocaleDateString("fr"),
+    dateEnd: parseISO(dto.dateEnd).toLocaleDateString("fr"),
+    mentorName: `${mentor.firstName} ${mentor.lastName}`,
+    scheduleText: prettyPrintSchedule(dto.schedule).split("\n"),
+    businessName: dto.businessName,
+    immersionAddress: dto.immersionAddress || "",
+    immersionAppellationLabel: dto.immersionAppellation.appellationLabel,
+    immersionActivities: dto.immersionActivities,
+    immersionSkills: dto.immersionSkills ?? "Non renseigné",
+    sanitaryPrevention:
+      dto.sanitaryPrevention && dto.sanitaryPreventionDescription
+        ? dto.sanitaryPreventionDescription
+        : "non",
+    individualProtection: dto.individualProtection ? "oui" : "non",
+    questionnaireUrl: agency.questionnaireUrl,
+    signature: agency.signature,
+    workConditions: dto.workConditions,
+  };
+};
 
 const getPeAdvisorEmailIfExist = (
   advisor: ConventionPoleEmploiUserAdvisorEntity | undefined,
