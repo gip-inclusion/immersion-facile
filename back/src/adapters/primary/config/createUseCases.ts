@@ -62,10 +62,6 @@ import { AppellationSearch } from "../../../domain/rome/useCases/AppellationSear
 import { RomeSearch } from "../../../domain/rome/useCases/RomeSearch";
 import { GetSiret } from "../../../domain/sirene/useCases/GetSiret";
 import { GetSiretIfNotAlreadySaved } from "../../../domain/sirene/useCases/GetSiretIfNotAlreadySaved";
-import {
-  httpAdresseApiClient,
-  HttpApiAdresseAddressGateway,
-} from "../../secondary/addressGateway/HttpApiAdresseAddressGateway";
 import { AppConfig } from "./appConfig";
 import { Gateways } from "./createGateways";
 import { GenerateConventionMagicLink } from "./createGenerateConventionMagicLink";
@@ -89,7 +85,6 @@ export const createUseCases = (
     quarantinedTopics: config.quarantinedTopics,
   });
   const getSiret = new GetSiret(gateways.sirene);
-  const addressAPI = new HttpApiAdresseAddressGateway(httpAdresseApiClient);
 
   return {
     associatePeConnectFederatedIdentity:

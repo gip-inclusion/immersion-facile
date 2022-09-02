@@ -342,3 +342,44 @@ describe("HttpOpenCageDataAddressGateway", () => {
     }, 5000);
   });
 });
+
+describe("HttpOpenCageDataAddressGateway check parrarel call", () => {
+  const parallelCalls = 10;
+  it(`Should support ${parallelCalls} of parallel calls`, async () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const httpAddressGateway: AddressGateway =
+      new HttpOpenCageDataAddressGateway(
+        new ManagedAxios<OpenCageDataTargetUrls>(
+          openCageDataTargetUrlsMapperMaker(
+            AppConfig.createFromEnv().apiKeyOpenCageData,
+          ),
+          {},
+          {},
+          () => (request) => request,
+        ),
+      );
+
+    const coordinates: GeoPositionDto[] = [];
+    const expectedResults: AddressDto[] = [];
+
+    for (let index = 0; index < parallelCalls; index++) {
+      coordinates.push({
+        lat: resultFromApiAddress.features[0].geometry.coordinates[1],
+        lon: resultFromApiAddress.features[0].geometry.coordinates[0],
+      });
+      expectedResults.push({
+        streetNumberAndAddress: "Rue Gaston Romazzotti",
+        city: "Molsheim",
+        departmentCode: "67",
+        postcode: "67120",
+      });
+    }
+    const results: (AddressDto | undefined)[] = await Promise.all(
+      coordinates.map((coordinate) =>
+        httpAddressGateway.getAddressFromPosition(coordinate),
+      ),
+    );
+
+    expectTypeToMatchAndEqual(results, expectedResults);
+  }, 15000);
+});
