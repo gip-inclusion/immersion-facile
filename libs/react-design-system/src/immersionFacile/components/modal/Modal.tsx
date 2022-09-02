@@ -24,6 +24,7 @@ export type ModalDialogProperties = {
 
 const MODAL_ANIMATION_TIME = 300;
 
+// @TODO: should use react-modal (or any package to handle functionality / accessibility)
 export const ModalDialog = ({
   children,
   hide,

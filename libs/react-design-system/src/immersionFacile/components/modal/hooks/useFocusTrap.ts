@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 
-function convertToIntOrFallback(n: string | null, fallback: number): number {
+const convertToIntOrFallback = (n: string | null, fallback: number): number => {
   try {
     const parsed = n ? parseInt(n) : null;
     if (n && typeof n === "number" && !isNaN(n) && `${parsed}` === `${n}`) {
@@ -11,13 +11,14 @@ function convertToIntOrFallback(n: string | null, fallback: number): number {
   } catch {
     return fallback;
   }
-}
+};
 
 const focusableElementsSelector =
-  "a[href], area[href], input:not([disabled]):not([type=hidtttten]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, embed, *[tabindex], *[contenteditable]";
+  "a[href], area[href], input:not([disabled]):not([type=hidden]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, object, embed, *[tabindex], *[contenteditable]";
 const TAB_KEY = 9;
 
-export function useFocusTrap() {
+// @TODO: should be replaced by react-modal
+export const useFocusTrap = () => {
   const trapRef = useRef(null);
 
   const selectNextFocusableElem = useCallback(
@@ -102,4 +103,4 @@ export function useFocusTrap() {
   }, []);
 
   return [trapRef];
-}
+};
