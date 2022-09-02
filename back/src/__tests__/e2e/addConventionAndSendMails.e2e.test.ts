@@ -203,13 +203,7 @@ const beneficiarySignsApplication = async (
   await eventCrawler.processNewEvents();
 
   const sentEmails = gateways.email.getSentEmails();
-  expect(sentEmails).toHaveLength(4);
-  const needsReviewEmail = sentEmails[sentEmails.length - 1];
-  expect(needsReviewEmail.recipients).toEqual(["establishment@example.com"]);
-  expectTypeToMatchAndEqual(
-    needsReviewEmail.type,
-    "BENEFICIARY_OR_MENTOR_ALREADY_SIGNED_NOTIFICATION",
-  );
+  expect(sentEmails).toHaveLength(3);
 };
 
 const establishmentSignsApplication = async (
@@ -235,7 +229,7 @@ const establishmentSignsApplication = async (
   await eventCrawler.processNewEvents();
 
   const sentEmails = gateways.email.getSentEmails();
-  expect(sentEmails).toHaveLength(5);
+  expect(sentEmails).toHaveLength(4);
   const needsReviewEmail = expectEmailOfType(
     sentEmails[sentEmails.length - 1],
     "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
@@ -280,7 +274,7 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
 
   await eventCrawler.processNewEvents();
   const sentEmails = gateways.email.getSentEmails();
-  expect(sentEmails).toHaveLength(6);
+  expect(sentEmails).toHaveLength(5);
   const needsToTriggerConventionSentEmail = sentEmails[sentEmails.length - 1];
   expectTypeToMatchAndEqual(
     needsToTriggerConventionSentEmail.type,

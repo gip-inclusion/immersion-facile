@@ -22,7 +22,6 @@ import { DeliverRenewedMagicLink } from "../../../domain/convention/useCases/not
 import { NotifyAllActorsOfFinalApplicationValidation } from "../../../domain/convention/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
-import { NotifyImmersionApplicationWasSignedByOtherParty } from "../../../domain/convention/useCases/notifications/NotifyImmersionApplicationWasSignedByOtherParty";
 import { NotifyNewApplicationNeedsReview } from "../../../domain/convention/useCases/notifications/NotifyNewApplicationNeedsReview";
 import { NotifyToAgencyApplicationSubmitted } from "../../../domain/convention/useCases/notifications/NotifyToAgencyApplicationSubmitted";
 import { PrivateListAgencies } from "../../../domain/convention/useCases/PrivateListAgencies";
@@ -273,11 +272,6 @@ export const createUseCases = (
       uowPerformer,
       gateways.email,
     ),
-    notifyBeneficiaryOrEnterpriseThatConventionWasSignedByOtherParty:
-      new NotifyImmersionApplicationWasSignedByOtherParty(
-        gateways.email,
-        generateMagicLinkFn,
-      ),
     notifyPoleEmploiUserAdvisorOnAssociation:
       new NotifyPoleEmploiUserAdvisorOnConventionAssociation(
         uowPerformer,

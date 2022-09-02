@@ -34,7 +34,6 @@ const getUseCasesByTopics = (
     useCases.broadcastToPoleEmploiOnConventionUpdates,
   ],
   ImmersionApplicationPartiallySigned: [
-    useCases.notifyBeneficiaryOrEnterpriseThatConventionWasSignedByOtherParty,
     useCases.broadcastToPoleEmploiOnConventionUpdates,
   ],
   ImmersionApplicationFullySigned: [
