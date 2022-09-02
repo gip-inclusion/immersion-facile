@@ -73,16 +73,18 @@ describe("Update Establishment aggregate from form data", () => {
     );
   });
 
-  // TODO This test is very fragile due to the implementation of the InMemoryAddressApi
-  /* eslint-disable-next-line  jest/no-disabled-tests */
-  it.skip("Replaces establishment and offers with same siret", async () => {
+  it("Replaces establishment and offers with same siret", async () => {
     const siret = "12345678911234";
     const newPosition = { lon: 1, lat: 2 };
     const newAddress = rueGuillaumeTellDto;
     prepareSireneRepo(sireneRepo, siret);
 
-    addressAPI.setNextPosition(newPosition);
-    addressAPI.setNextAddress(newAddress);
+    addressAPI.setAddressAndPosition([
+      {
+        address: newAddress,
+        position: newPosition,
+      },
+    ]);
 
     // Prepare : insert an establishment aggregate from LBB with siret
     const previousContact = new ContactEntityV2Builder()

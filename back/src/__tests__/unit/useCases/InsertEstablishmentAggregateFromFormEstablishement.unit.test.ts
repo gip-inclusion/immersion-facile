@@ -62,8 +62,13 @@ describe("Insert Establishment aggregate from form data", () => {
     sireneRepo = new InMemorySireneGateway();
     establishmentAggregateRepo = new InMemoryEstablishmentAggregateRepository();
     outboxRepo = new InMemoryOutboxRepository();
-
-    addressAPI = new InMemoryAddressGateway(fakePosition, fakeAddress);
+    addressAPI = new InMemoryAddressGateway();
+    addressAPI.setAddressAndPosition([
+      {
+        address: fakeAddress,
+        position: fakePosition,
+      },
+    ]);
     uuidGenerator = new TestUuidGenerator();
 
     const uowPerformer = new InMemoryUowPerformer({
@@ -83,8 +88,7 @@ describe("Insert Establishment aggregate from form data", () => {
     );
   });
 
-  /* eslint-disable-next-line  jest/no-disabled-tests */
-  it.skip("Converts Form Establishment in search format", async () => {
+  it("Converts Form Establishment in search format", async () => {
     // Prepare
     const professions: AppellationDto[] = [
       {
@@ -160,7 +164,7 @@ describe("Insert Establishment aggregate from form data", () => {
   };
 
   /* eslint-disable-next-line  jest/no-disabled-tests */
-  it.skip("Correctly converts establishment with a 'tranche d'effectif salarié' of 00", async () => {
+  it("Correctly converts establishment with a 'tranche d'effectif salarié' of 00", async () => {
     const formEstablishment = FormEstablishmentDtoBuilder.valid()
       .withSiret(fakeSiret)
       .build();
@@ -179,7 +183,7 @@ describe("Insert Establishment aggregate from form data", () => {
   });
 
   /* eslint-disable-next-line  jest/no-disabled-tests */
-  it.skip("Removes (and replaces) establishment and offers with same siret if exists", async () => {
+  it("Removes (and replaces) establishment and offers with same siret if exists", async () => {
     const siret = "12345678911234";
     // Prepare : insert an establishment aggregate from LBB with siret
     const previousContact = new ContactEntityV2Builder()
@@ -217,7 +221,15 @@ describe("Insert Establishment aggregate from form data", () => {
       .build();
 
     prepareSireneRepo(sireneRepo, siret);
-    addressAPI.setNextAddress(rueGuillaumeTellDto);
+
+    //addressAPI.setNextAddress(rueGuillaumeTellDto);
+
+    addressAPI.setAddressAndPosition([
+      {
+        address: rueGuillaumeTellDto,
+        position: { lat: 1, lon: 1 },
+      },
+    ]);
     // Act : execute use-case with same siret
     await useCase.execute(formEstablishment);
 
@@ -253,7 +265,7 @@ describe("Insert Establishment aggregate from form data", () => {
   });
 
   /* eslint-disable-next-line  jest/no-disabled-tests */
-  it.skip("Publishes an event with the new establishment aggregate as payload", async () => {
+  it("Publishes an event with the new establishment aggregate as payload", async () => {
     const formEstablishment = FormEstablishmentDtoBuilder.valid()
       .withSiret(fakeSiret)
       .build();

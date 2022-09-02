@@ -7,10 +7,10 @@ import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
 import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
 
 export class InMemoryAddressGateway implements AddressGateway {
-  constructor(
-    private _position?: GeoPositionDto,
-    private _address?: AddressDto,
-  ) {}
+  private streetAndAddresses: AddressAndPosition[] = [];
+  private departmentCode: DepartmentCode = "";
+  private _address?: AddressDto;
+  private _position?: GeoPositionDto;
 
   public async lookupStreetAddress(
     _query: string,
@@ -31,13 +31,6 @@ export class InMemoryAddressGateway implements AddressGateway {
     return this._address;
   }
 
-  public async getAddressAndPositionFromString(): Promise<
-    AddressAndPosition | undefined
-  > {
-    if (!this._position || !this._address) return;
-    return { position: this._position, address: this._address };
-  }
-
   // for test purposes only
   public setNextAddress(address: AddressDto | undefined) {
     this._address = address;
@@ -53,7 +46,4 @@ export class InMemoryAddressGateway implements AddressGateway {
   public setDepartmentCode(departmentCode: DepartmentCode) {
     this.departmentCode = departmentCode;
   }
-
-  private streetAndAddresses: AddressAndPosition[] = [];
-  private departmentCode: DepartmentCode = "";
 }
