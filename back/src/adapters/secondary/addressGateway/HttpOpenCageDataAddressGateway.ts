@@ -139,7 +139,6 @@ export class HttpOpenCageDataAddressGateway implements AddressGateway {
     public readonly httpClient: ManagedAxios<OpenCageDataTargetUrls>,
   ) {}
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   public async findDepartmentCodeFromPostCode(
     query: string,
   ): Promise<DepartmentCode | null> {
@@ -162,7 +161,6 @@ export class HttpOpenCageDataAddressGateway implements AddressGateway {
     return departmentNameToDepartmentCode[department];
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   public async getAddressFromPosition(
     position: GeoPositionDto,
   ): Promise<AddressDto | undefined> {
@@ -176,7 +174,6 @@ export class HttpOpenCageDataAddressGateway implements AddressGateway {
     return toAddress(feature);
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   public async lookupStreetAddress(
     query: string,
   ): Promise<AddressAndPosition[]> {
