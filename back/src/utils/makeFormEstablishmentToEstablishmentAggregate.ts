@@ -42,7 +42,6 @@ export const makeFormEstablishmentToEstablishmentAggregate = ({
       await addressAPI.lookupStreetAddress(formEstablishment.businessAddress)
     ).at(0);
 
-    // TODO This is often problematic with the InMemoryAddressApi, what can be done ?
     if (!positionAndAddress) {
       notifyAndThrowErrorDiscord(
         new Error(

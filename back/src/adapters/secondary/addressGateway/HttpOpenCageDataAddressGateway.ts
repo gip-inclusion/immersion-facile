@@ -19,7 +19,7 @@ export type OpenCageDataTargetUrls =
   | "ReverseGeocoding";
 
 // https://github.com/OpenCageData/opencagedata-misc-docs/blob/master/countrycode.md
-// On prends la france et toutes ses territoires dépendant.
+// On prends la france et toutes ses territoires dépendants.
 export const openCageDataTargetUrlsMapperMaker = (
   apiKey: string,
 ): TargetUrlsMapper<OpenCageDataTargetUrls> => ({
@@ -119,8 +119,10 @@ const toAddress = (
   }
   const departmentCode = departmentNameToDepartmentCode[department];
   if (!departmentCode) return undefined;
+
   return {
     streetNumberAndAddress: `${
+      // TODO Better House Number management
       components.house_number ?? ""
     } ${streetname}`.trim(),
     postcode: components.postcode,

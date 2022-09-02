@@ -41,7 +41,6 @@ const resultFromApiAddress = {
 };
 
 describe("HttpOpenCageDataAddressGateway", () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let httpAddressGateway: AddressGateway;
 
   const apiKey = AppConfig.createFromEnv().apiKeyOpenCageData;
@@ -346,7 +345,6 @@ describe("HttpOpenCageDataAddressGateway", () => {
 describe("HttpOpenCageDataAddressGateway check parrarel call", () => {
   const parallelCalls = 10;
   it(`Should support ${parallelCalls} of parallel calls`, async () => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const httpAddressGateway: AddressGateway =
       new HttpOpenCageDataAddressGateway(
         new ManagedAxios<OpenCageDataTargetUrls>(

@@ -163,7 +163,6 @@ describe("Insert Establishment aggregate from form data", () => {
     );
   };
 
-  /* eslint-disable-next-line  jest/no-disabled-tests */
   it("Correctly converts establishment with a 'tranche d'effectif salarié' of 00", async () => {
     const formEstablishment = FormEstablishmentDtoBuilder.valid()
       .withSiret(fakeSiret)
@@ -182,7 +181,6 @@ describe("Insert Establishment aggregate from form data", () => {
     expect(establishmentAggregate.establishment.numberEmployeesRange).toBe("0");
   });
 
-  /* eslint-disable-next-line  jest/no-disabled-tests */
   it("Removes (and replaces) establishment and offers with same siret if exists", async () => {
     const siret = "12345678911234";
     // Prepare : insert an establishment aggregate from LBB with siret
@@ -222,14 +220,13 @@ describe("Insert Establishment aggregate from form data", () => {
 
     prepareSireneRepo(sireneRepo, siret);
 
-    //addressAPI.setNextAddress(rueGuillaumeTellDto);
-
     addressAPI.setAddressAndPosition([
       {
         address: rueGuillaumeTellDto,
         position: { lat: 1, lon: 1 },
       },
     ]);
+
     // Act : execute use-case with same siret
     await useCase.execute(formEstablishment);
 
@@ -264,7 +261,6 @@ describe("Insert Establishment aggregate from form data", () => {
     ).toBe("new.contact@gmail.com");
   });
 
-  /* eslint-disable-next-line  jest/no-disabled-tests */
   it("Publishes an event with the new establishment aggregate as payload", async () => {
     const formEstablishment = FormEstablishmentDtoBuilder.valid()
       .withSiret(fakeSiret)
