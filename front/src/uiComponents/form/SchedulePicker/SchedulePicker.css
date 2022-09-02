@@ -60,3 +60,7 @@
   width: 100%;
   max-width: 330px;
 }
+
+.schedule-picker__total-cell {
+  max-width: 50px; /* This will force one word per line */
+}

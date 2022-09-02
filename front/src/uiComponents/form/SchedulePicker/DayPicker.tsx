@@ -27,9 +27,7 @@ export const DayPicker = ({
           disabled={true}
         />
       ))}
-      <div
-        className="flex justify-center items-center text-center font-bold fr-text--xs"
-        style={{ maxWidth: "46px" }}>
+      <div className="flex justify-center items-center text-center font-bold fr-text--xs schedule-picker__total-cell">
         total t/sem
       </div>
     </div>
