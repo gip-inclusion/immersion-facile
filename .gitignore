@@ -2,6 +2,7 @@
 .idea
 node_modules
 .env
+.env.local
 docker-data
 nginx/etc/letsencrypt
 backup/**/*.bz2
