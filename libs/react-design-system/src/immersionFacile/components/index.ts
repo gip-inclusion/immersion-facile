@@ -17,3 +17,4 @@ export * from "./footer";
 export * from "./main-wrapper";
 export * from "./file";
 export * from "./modal";
+export * from "./crisp-chat";
