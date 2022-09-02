@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { MainWrapper } from "src/../../libs/react-design-system";
+import { MainWrapper } from "react-design-system/immersionFacile";
 
 type ConventionFormContainerLayoutProps = {
   children: ReactNode;
