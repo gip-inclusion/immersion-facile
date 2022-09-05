@@ -8,7 +8,7 @@ module.exports = {
   quoteProps: "as-needed",
   trailingComma: "all",
   bracketSpacing: true,
-  bracketSameLine: true,
+  bracketSameLine: false,
   arrowParens: "always",
   requirePragma: false,
   insertPragma: false,
