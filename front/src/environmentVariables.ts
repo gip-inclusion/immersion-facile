@@ -5,6 +5,7 @@ const originalEnvVariables = {
   VITE_PREFILLED_FORMS: import.meta.env.VITE_PREFILLED_FORMS as
     | undefined
     | string,
+  VITE_CRISP_WEBSITE_ID: import.meta.env.VITE_CRISP_WEBSITE_ID,
 };
 
 export const ENV = {
@@ -14,6 +15,9 @@ export const ENV = {
     originalEnvVariables.VITE_GATEWAY === "IN_MEMORY" ? "IN_MEMORY" : "HTTP",
   PREFILLED_FORMS:
     originalEnvVariables.VITE_PREFILLED_FORMS?.toLowerCase() === "true",
+  crispWebSiteId:
+    originalEnvVariables.VITE_CRISP_WEBSITE_ID ??
+    "Crisp website id not provided",
 };
 
 Object.entries(ENV).forEach(([key, value]) =>
