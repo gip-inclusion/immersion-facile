@@ -10,7 +10,7 @@ import { BasicEventCrawler } from "../adapters/secondary/core/EventCrawlerImplem
 import type { InMemoryEmailGateway } from "../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryLaBonneBoiteAPI } from "../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
 import { InMemoryPassEmploiGateway } from "../adapters/secondary/immersionOffer/InMemoryPassEmploiGateway";
-import { InMemoryDocumentGateway } from "../adapters/secondary/InMemoryDocumentGateway";
+import { NotImplementedDocumentGateway } from "../adapters/secondary/NotImplementedDocumentGateway";
 import { InMemoryPoleEmploiGateway } from "../adapters/secondary/InMemoryPoleEmploiGateway";
 import { InMemorySireneGateway } from "../adapters/secondary/InMemorySireneGateway";
 import { InMemoryPeConnectGateway } from "../adapters/secondary/PeConnectGateway/InMemoryPeConnectGateway";
@@ -31,7 +31,7 @@ export type InMemoryGateways = {
   passEmploiGateway: InMemoryPassEmploiGateway;
   poleEmploiGateway: InMemoryPoleEmploiGateway;
   getFeatureFlags: GetFeatureFlags;
-  documentGateway: InMemoryDocumentGateway;
+  documentGateway: NotImplementedDocumentGateway;
   addressApi: InMemoryAddressGateway;
   exportGateway: InMemoryExportGateway;
 };

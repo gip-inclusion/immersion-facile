@@ -32,7 +32,7 @@ import { InMemoryAccessTokenGateway } from "../../secondary/immersionOffer/InMem
 import { InMemoryLaBonneBoiteAPI } from "../../secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
 import { InMemoryPassEmploiGateway } from "../../secondary/immersionOffer/InMemoryPassEmploiGateway";
 import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
-import { InMemoryDocumentGateway } from "../../secondary/InMemoryDocumentGateway";
+import { NotImplementedDocumentGateway } from "../../secondary/NotImplementedDocumentGateway";
 import { InMemoryPoleEmploiGateway } from "../../secondary/InMemoryPoleEmploiGateway";
 import { InMemorySireneGateway } from "../../secondary/InMemorySireneGateway";
 import { MinioDocumentGateway } from "../../secondary/MinioDocumentGateway";
@@ -114,7 +114,7 @@ export const createGateways = async (config: AppConfig, clock: Clock) => {
       config.documentGateway === "MINIO"
         ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           new MinioDocumentGateway(config.minioParams!)
-        : new InMemoryDocumentGateway(),
+        : new NotImplementedDocumentGateway(),
     email: createEmailGateway(config, clock),
     laBonneBoiteAPI:
       config.laBonneBoiteGateway === "HTTPS"

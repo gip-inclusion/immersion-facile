@@ -67,6 +67,7 @@ export const createAppDependencies = async (config: AppConfig) => {
   );
 
   return {
+    config,
     useCases,
     gateways,
     applicationMagicLinkAuthMiddleware: makeMagicLinkAuthMiddleware(

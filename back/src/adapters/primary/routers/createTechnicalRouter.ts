@@ -1,4 +1,5 @@
 import { Router } from "express";
+import * as path from "path";
 import multer from "multer";
 import {
   getFeatureFlags,
@@ -25,18 +26,16 @@ export const createTechnicalRouter = (deps: AppDependencies) => {
       sendHttpResponse(req, res, deps.useCases.getFeatureFlags),
     );
 
-  const upload = multer({ dest: "storage/tmp" });
+  const upload = multer({ dest: path.join(deps.config.storageRoot, "tmp") });
 
   technicalRouter
     .route(`/${uploadFileRoute}`)
     .post(upload.single(uploadFileRoute), (req, res) =>
       sendHttpResponse(req, res, async () => {
-        const { enableLogoUpload } = await deps.useCases.getFeatureFlags();
-        if (!enableLogoUpload) {
-          throw new FeatureDisabledError("Upload Logo");
-        }
+        await rejectIfFeatureFlagNotActive(deps);
 
         if (!req.file) throw new Error("No file uploaded");
+
         return deps.useCases.uploadFile.execute({
           name: req.file.originalname,
           encoding: req.file.encoding,
@@ -47,4 +46,13 @@ export const createTechnicalRouter = (deps: AppDependencies) => {
     );
 
   return technicalRouter;
+};
+
+const rejectIfFeatureFlagNotActive = async (
+  deps: AppDependencies,
+): Promise<void> | never => {
+  const { enableLogoUpload } = await deps.useCases.getFeatureFlags();
+  if (!enableLogoUpload) {
+    throw new FeatureDisabledError("Upload Logo");
+  }
 };

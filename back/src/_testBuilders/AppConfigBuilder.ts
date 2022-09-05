@@ -24,6 +24,7 @@ const defaultConfigParams = {
   BACKOFFICE_PASSWORD: "e2e",
   ADMIN_EMAIL: "myAdmin@mail.com",
   REPORTING_GATEWAY: "EXCEL",
+  STORAGE_ROOT: "NOT PROVIDED",
 };
 
 // See "Working with AppConfig" in back/README.md for more details.
