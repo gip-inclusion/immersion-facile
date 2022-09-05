@@ -64,6 +64,9 @@ export const createGetPgPoolFn = (config: AppConfig): GetPgPoolFn => {
         connectionString: config.pgImmersionDbUrl,
         application_name: "Immersion Backend",
         max: 25,
+        statement_timeout: 30_000,
+        // statement_timeout is important as it avoids never ending queries.
+        // We have had problems with eventBus not triggered due to never ending PG queries
       });
     }
     return pgPool;
