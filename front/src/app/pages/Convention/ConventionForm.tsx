@@ -90,7 +90,8 @@ export const ConventionForm = ({
         </div>
         <Notification
           type="info"
-          title="Attention, le formulaire de demande de convention n'est pas encore déployé partout en France.">
+          title="Attention, le formulaire de demande de convention n'est pas encore déployé partout en France."
+        >
           Si votre conseiller emploi ou votre structure d'accompagnement
           apparaît, vous pouvez l'utiliser.
           <br />
@@ -124,7 +125,8 @@ export const ConventionForm = ({
               setSubmitFeedback(e);
             }
             setSubmitting(false);
-          }}>
+          }}
+        >
           {(props) => (
             <div>
               <form onReset={props.handleReset} onSubmit={props.handleSubmit}>

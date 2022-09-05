@@ -56,7 +56,8 @@ export const ShareForm = ({ onSuccess, onError }: ShareFormProps) => {
         link: window.location.href,
       })}
       validationSchema={toFormikValidationSchema(shareLinkByEmailSchema)}
-      onSubmit={submit}>
+      onSubmit={submit}
+    >
       {() => (
         <Form>
           <input type="hidden" name={getName("conventionLink")} />

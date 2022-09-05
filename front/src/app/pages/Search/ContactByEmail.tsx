@@ -56,7 +56,8 @@ export const ContactByEmail = ({
         await immersionSearchGateway.contactEstablishment(values);
         setIsSubmitting(false);
         onSuccess();
-      }}>
+      }}
+    >
       {({ errors, submitCount }) => (
         <Form>
           <p className="pb-6">

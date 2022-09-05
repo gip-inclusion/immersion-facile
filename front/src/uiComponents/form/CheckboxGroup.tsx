@@ -24,10 +24,12 @@ export const BoolCheckboxGroup = (props: BoolCheckboxGroupProps) => {
               ? " checkboxes-error-desc-error"
               : ""
           }
-          role="group">
+          role="group"
+        >
           <legend
             className="fr-fieldset__legend fr-text--regular"
-            id="checkboxes-error-legend">
+            id="checkboxes-error-legend"
+          >
             {props.label}
           </legend>
           {props.description && (
@@ -40,7 +42,8 @@ export const BoolCheckboxGroup = (props: BoolCheckboxGroupProps) => {
           <div className="fr-fieldset__content">
             <div
               className="fr-checkbox-group"
-              key={htmlName + props.name + "_oui"}>
+              key={htmlName + props.name + "_oui"}
+            >
               <input
                 {...field}
                 value={""}
@@ -52,7 +55,8 @@ export const BoolCheckboxGroup = (props: BoolCheckboxGroupProps) => {
               <label
                 className="fr-label"
                 htmlFor={htmlName + "oui"}
-                onClick={() => setValue(!field.value)}>
+                onClick={() => setValue(!field.value)}
+              >
                 oui
               </label>
             </div>
@@ -94,10 +98,12 @@ export const CheckboxGroup = ({
               ? " checkboxes-error-desc-error"
               : ""
           }
-          role="group">
+          role="group"
+        >
           <legend
             className="fr-fieldset__legend fr-text--regular"
-            id="checkboxes-error-legend">
+            id="checkboxes-error-legend"
+          >
             {groupLabel}
           </legend>
           <div className="fr-fieldset__content">

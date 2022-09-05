@@ -83,7 +83,8 @@ export const AddAgencyPage = () => {
                 console.log("AddAgencyPage", e);
                 setSubmitFeedback(e);
               })
-          }>
+          }
+        >
           {({ isSubmitting, setFieldValue, values, errors, submitCount }) => {
             const typedSetField = makeTypedSetField(setFieldValue);
             const [validationSteps, setValidationSteps] = useState<
@@ -178,7 +179,8 @@ export const AddAgencyPage = () => {
                 <br />
                 <Button
                   type="submit"
-                  disable={isSubmitting || submitFeedback !== null}>
+                  disable={isSubmitting || submitFeedback !== null}
+                >
                   Soumettre
                 </Button>
                 <SubmitFeedback submitFeedback={submitFeedback} />

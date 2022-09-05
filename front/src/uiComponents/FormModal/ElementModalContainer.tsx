@@ -55,7 +55,8 @@ export const ElementModalContainer = ({
         <ModalTitle
           className={
             "h-6 top-0 text-immersionBlue-dark font-semibold text-lg z-10"
-          }>
+          }
+        >
           {title}
         </ModalTitle>
       )}

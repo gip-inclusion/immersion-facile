@@ -88,7 +88,8 @@ export const RenewExpiredLinkContent = ({
       {errorMessage && (
         <Notification
           type="error"
-          title="Désolé : nous n'avons pas été en mesure d'enregistrer vos informations. Veuillez réessayer ultérieurement.">
+          title="Désolé : nous n'avons pas été en mesure d'enregistrer vos informations. Veuillez réessayer ultérieurement."
+        >
           {errorMessage}
         </Notification>
       )}

@@ -45,7 +45,8 @@ export const ContactInPerson = ({
         await immersionSearchGateway.contactEstablishment(values);
         setIsSubmitting(false);
         onSuccess();
-      }}>
+      }}
+    >
       {({ errors, submitCount }) => (
         <Form>
           <p>

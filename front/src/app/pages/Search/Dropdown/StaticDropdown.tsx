@@ -28,7 +28,8 @@ export const StaticDropdown = ({
         style={{ position: "relative" }}
         onClick={() => {
           setIsOpen(!isOpen);
-        }}>
+        }}
+      >
         <input
           disabled
           id="search"
@@ -50,7 +51,8 @@ export const StaticDropdown = ({
                 onSelection(option, index);
                 setSelectedIndex(index);
                 setIsOpen(!isOpen);
-              }}>
+              }}
+            >
               {option}
             </div>
           ))}

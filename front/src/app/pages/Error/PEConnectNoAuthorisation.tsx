@@ -15,7 +15,8 @@ export const PEConnectNoAuthorisation = () => (
       className="text-immersionBlue-dark font-sans"
       onClick={() => {
         routes.home().push();
-      }}>
+      }}
+    >
       {" "}
       Revenir à la page d'accueil.{" "}
     </button>

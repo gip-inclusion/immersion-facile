@@ -75,7 +75,8 @@ export const ImmersionAssessmentPage = ({
       {convention && !canCreateAssessment && (
         <Notification
           type="error"
-          title="Votre convention n'est pas prête à recevoir un bilan">
+          title="Votre convention n'est pas prête à recevoir un bilan"
+        >
           Seule une convention entièrement validée peut recevoir un bilan
         </Notification>
       )}
@@ -91,7 +92,8 @@ export const ImmersionAssessmentPage = ({
             validationSchema={toFormikValidationSchema(
               immersionAssessmentSchema,
             )}
-            onSubmit={createAssessment}>
+            onSubmit={createAssessment}
+          >
             {() => (
               <Form>
                 <div className="flex flex-col">
@@ -115,7 +117,8 @@ export const ImmersionAssessmentPage = ({
                     type="submit"
                     disable={
                       assessmentStatus !== "Idle" || assessmentError !== null
-                    }>
+                    }
+                  >
                     Envoyer
                   </Button>
                   {assessmentError && (

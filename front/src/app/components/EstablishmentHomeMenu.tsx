@@ -54,14 +54,16 @@ export const EstablishmentHomeMenu = () => {
             <ButtonHome
               onClick={() => {
                 dispatch(establishmentSlice.actions.gotReady());
-              }}>
+              }}
+            >
               Référencer votre entreprise
             </ButtonHome>
             <ButtonHome
               type="secondary"
               onClick={() => {
                 dispatch(establishmentSlice.actions.gotReady());
-              }}>
+              }}
+            >
               Modifier votre entreprise
             </ButtonHome>
           </>

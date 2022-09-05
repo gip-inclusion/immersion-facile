@@ -51,7 +51,8 @@ export const FormMagicLinks = ({
             name="select"
             key="roles-dropdown"
             onChange={handleRolesDropdownChange}
-            style={{ width: "190px" }}>
+            style={{ width: "190px" }}
+          >
             {allRoles.map((role) => (
               <option value={role} key={role}>
                 {role}
@@ -65,7 +66,8 @@ export const FormMagicLinks = ({
             name="select"
             key="routes-dropdown"
             onChange={handleRouteDropdownChange}
-            style={{ width: "330px" }}>
+            style={{ width: "330px" }}
+          >
             {Object.keys(frontRoutes).map((route) => (
               <option value={route} key={route}>
                 {route}

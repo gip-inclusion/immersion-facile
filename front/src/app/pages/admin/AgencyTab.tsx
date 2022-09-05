@@ -111,13 +111,15 @@ export const AgencyTab = () => {
           <button
             disabled={activationButtonDisabled}
             className="fr-btn flex"
-            onClick={() => selectedAgency && validateAgency(selectedAgency)}>
+            onClick={() => selectedAgency && validateAgency(selectedAgency)}
+          >
             Activer cette agence
           </button>
           {activationResult && (
             <Notification
               type={activationResult.status}
-              title={activationResult.text}>
+              title={activationResult.text}
+            >
               {activationResult.message}
             </Notification>
           )}

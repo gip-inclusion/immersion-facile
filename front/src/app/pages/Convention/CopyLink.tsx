@@ -14,7 +14,8 @@ export const CopyLink = () => {
         onClick={async () => {
           await navigator.clipboard.writeText(window.location.href);
           setTooltipText("Lien copié !");
-        }}>
+        }}
+      >
         <ShareIcon sx={{ color: iconColor }} />
       </IconButton>
     </Tooltip>

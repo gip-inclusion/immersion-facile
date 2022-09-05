@@ -13,7 +13,8 @@ export const FormSectionTitle = ({ children }: FormSectionTitleProps) => {
       <div
         className={
           "sticky top-0 text-immersionBlue-dark font-semibold p-2 mb-1 bg-white border-b text-lg z-10 flex justify-between"
-        }>
+        }
+      >
         <div>{title}</div>
         {actions.length !== 0 && <div>{actions}</div>}
       </div>

@@ -16,7 +16,8 @@ export const PEConnectUserForbiddenAccess = () => {
       <br />
       <button
         className="text-immersionBlue-dark font-sans text-center"
-        onClick={redirectToConventionWithoutIdentityProvider}>
+        onClick={redirectToConventionWithoutIdentityProvider}
+      >
         {" "}
         Vous pouvez quand même remplir votre demande de convention en indiquant
         l'agence Pole Emploi à laquelle vous êtes rattaché ici.{" "}
