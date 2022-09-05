@@ -19,7 +19,7 @@ export const App = () => {
   return (
     <>
       <Router />
-      <CrispChat crispWebsiteId={ENV.crispWebSiteId} />
+      {ENV.crispWebSiteId && <CrispChat crispWebsiteId={ENV.crispWebSiteId} />}
     </>
   );
 };
