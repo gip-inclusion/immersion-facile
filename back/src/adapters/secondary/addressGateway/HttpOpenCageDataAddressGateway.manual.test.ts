@@ -1,8 +1,8 @@
 import { AddressDto } from "shared/src/address/address.dto";
 import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
 import { ManagedAxios } from "shared/src/serenity-http-client";
-import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
 import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
+import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
 import { AppConfig } from "../../primary/config/appConfig";
 
 import {
@@ -64,7 +64,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
       });
 
       expectTypeToMatchAndEqual(result, {
-        streetNumberAndAddress: "14 Rue Gaston Romazzotti",
+        streetNumberAndAddress: "Rue Gaston Romazzotti",
         city: "Molsheim",
         departmentCode: "67",
         postcode: "67120",
@@ -78,7 +78,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
       });
 
       expectTypeToMatchAndEqual(result, {
-        streetNumberAndAddress: "Menton",
+        streetNumberAndAddress: "Route de Castellar",
         city: "Menton",
         departmentCode: "06",
         postcode: "06500",
@@ -96,7 +96,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
           lon: resultFromApiAddress.features[0].geometry.coordinates[0],
         });
         expectedResults.push({
-          streetNumberAndAddress: "14 Rue Gaston Romazzotti",
+          streetNumberAndAddress: "Rue Gaston Romazzotti",
           city: "Molsheim",
           departmentCode: "67",
           postcode: "67120",
@@ -166,49 +166,41 @@ describe("HttpOpenCageDataAddressGateway", () => {
       ]);
     });
 
-    it("Should return expected address DTO when providing an address outside of metropolitan france", async () => {
+    it("Should return at least the right street in address DTO when providing an address outside of metropolitan france", async () => {
       const resultDomTom = await httpAddressGateway.lookupStreetAddress(
-        "Rue des manguiers st denis",
+        "49 Rue Mazagran St Denis 97400",
       );
 
-      expect(resultDomTom).toBe([
-        {
-          address: {
-            city: "Saint-Denis",
-            departmentCode: "974",
-            postcode: "97490",
-            streetNumberAndAddress: "Lotissement des Manguiers",
-          },
-          position: {
-            lat: -20.88783,
-            lon: 55.420151,
-          },
-        },
-        {
-          address: {
-            city: "Saint-Denis",
-            departmentCode: "974",
-            postcode: "97400",
-            streetNumberAndAddress: "Rond-Point des Manguiers",
-          },
-          position: {
-            lat: -20.89549,
-            lon: 55.465338,
-          },
-        },
-        {
-          address: {
-            city: "Saint-Denis",
-            departmentCode: "974",
-            postcode: "97417",
-            streetNumberAndAddress: "Chemin des Manguiers La Mtagn",
-          },
-          position: {
-            lat: -20.887859,
-            lon: 55.420338,
-          },
-        },
-      ]);
+      const expectedAddress = {
+        city: "Saint-Denis",
+        departmentCode: "974",
+        postcode: "97400",
+        streetNumberAndAddress: "49 Rue Mazagran",
+      };
+
+      const firstResult = resultDomTom.at(0);
+      expect(firstResult?.address).toEqual(expectedAddress);
+      expect(firstResult?.position.lat).toBeCloseTo(-20.88957, 4);
+      expect(firstResult?.position.lon).toBeCloseTo(55.45512, 4);
+    });
+
+    it("Should return address DTO when providing an address inside of metropolitan france", async () => {
+      const resultMetropolitanFrance =
+        await httpAddressGateway.lookupStreetAddress(
+          "18 Avenue des Canuts, 69120",
+        );
+
+      const expectedAddress = {
+        city: "Vaulx-en-Velin",
+        departmentCode: "69",
+        postcode: "69120",
+        streetNumberAndAddress: "Avenue des Canuts",
+      };
+
+      const firstResult = resultMetropolitanFrance.at(0);
+      expect(firstResult?.address).toEqual(expectedAddress);
+      expect(firstResult?.position.lat).toBeCloseTo(45.7618, 4);
+      expect(firstResult?.position.lon).toBeCloseTo(4.92566, 4);
     });
   });
 

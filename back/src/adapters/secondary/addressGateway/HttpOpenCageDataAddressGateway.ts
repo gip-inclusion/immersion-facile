@@ -31,110 +31,35 @@ export const openCageDataTargetUrlsMapperMaker = (
     `https://api.opencagedata.com/geocode/v1/geojson?q=${encodeURI(
       postcode as string,
     )}&key=${apiKey}&language=fr&countrycode=fr,bl,gf,gp,mf,mq,nc,pf,pm,re,tf,wf,yt&limit=1`,
-  ReverseGeocoding: ({ lat, lon }: { lat: number; lon: number }): AbsoluteUrl =>
-    `https://api.opencagedata.com/geocode/v1/geojson?q=${lat}+${lon}&key=${apiKey}&language=fr&countrycode=fr,bl,gf,gp,mf,mq,nc,pf,pm,re,tf,wf,yt&limit=1`,
+  ReverseGeocoding: ({ lat, lon }: GeoPositionDto): AbsoluteUrl =>
+    `https://api.opencagedata.com/geocode/v1/geojson?q=${lat}+${lon}&key=${apiKey}&language=fr&countrycode=fr,bl,gf,gp,mf,mq,nc,pf,pm,re,tf,wf,yt`,
 });
 
-type OpenCageDataProperties = {
-  components: OpenCageDataPropertiesComponents;
-};
-
-type OpenCageDataPropertiesComponents = {
-  city?: string;
-  town?: string;
-  township?: string;
-  village?: string;
-  county?: string;
-  county_code?: string;
-  department?: string;
-  house_number?: string;
-  postcode: string;
-  region: string;
-  state?: string;
-  road?: string;
-  footway?: string;
-  street?: string;
-  street_name?: string;
-  residential?: string;
-  path?: string;
-  pedestrian?: string;
-  road_reference?: string;
-  road_reference_intl?: string;
-  square?: string;
-  place?: string;
-  state_district?: string;
-};
-
-const getDepartmentFromAliasesInComponent = (
-  components: OpenCageDataPropertiesComponents,
-) =>
-  components.county ??
-  components.county_code ??
-  components.department ??
-  components.state_district ??
-  components.state;
-
-const toAddressAndPosition = (
-  feature: GeoJSON.Feature<Point, OpenCageDataProperties>,
-): AddressAndPosition | undefined => {
-  const address = toAddress(feature);
-  if (!address) return undefined;
-
-  return {
-    position: {
-      lat: feature.geometry.coordinates[1],
-      lon: feature.geometry.coordinates[0],
-    },
-    address,
-  };
-};
-
-const toAddress = (
+const featureToAddress = (
   feature: GeoJSON.Feature<Point, OpenCageDataProperties>,
 ): AddressDto | undefined => {
   const components = feature.properties.components;
-  const department = getDepartmentFromAliasesInComponent(components);
+  const department: string | undefined = getDepartmentFromAliases(components);
+  const city: string | undefined = getCityFromAliases(components);
+  const streetName: string | undefined = getStreetNameFromAliases(components);
+  const streetNumber: string | undefined =
+    getStreetNumberFromAliases(components);
 
-  const city =
-    components.city ??
-    components.town ??
-    components.township ??
-    components.village;
+  if (!(city && streetName && department)) return undefined;
 
-  const streetname =
-    components.road ??
-    components.footway ??
-    components.street ??
-    components.street_name ??
-    components.residential ??
-    components.path ??
-    components.pedestrian ??
-    components.road_reference ??
-    components.road_reference_intl ??
-    components.square ??
-    components.place;
-
-  if (!(city && streetname && department)) {
-    return undefined;
-  }
+  // OpenCageData gives the department name but not the code.
   const departmentCode = departmentNameToDepartmentCode[department];
   if (!departmentCode) return undefined;
 
+  const streetNumberAndAddress = `${streetNumber ?? ""} ${streetName}`.trim();
+
   return {
-    streetNumberAndAddress: `${
-      // TODO Better House Number management
-      components.house_number ?? ""
-    } ${streetname}`.trim(),
+    streetNumberAndAddress,
     postcode: components.postcode,
     departmentCode,
     city,
   };
 };
-
-type OpenCageDataFeatureCollection = GeoJSON.FeatureCollection<
-  Point,
-  OpenCageDataProperties
->;
 
 export class HttpOpenCageDataAddressGateway implements AddressGateway {
   constructor(
@@ -152,9 +77,7 @@ export class HttpOpenCageDataAddressGateway implements AddressGateway {
     const feature = (data as OpenCageDataFeatureCollection).features.at(0);
     if (!feature) return null;
 
-    const department = getDepartmentFromAliasesInComponent(
-      feature.properties.components,
-    );
+    const department = getDepartmentFromAliases(feature.properties.components);
 
     if (!department) {
       return null;
@@ -173,7 +96,7 @@ export class HttpOpenCageDataAddressGateway implements AddressGateway {
 
     const feature = (data as OpenCageDataFeatureCollection).features.at(0);
     if (!feature) return undefined;
-    return toAddress(feature);
+    return featureToAddress(feature);
   }
 
   public async lookupStreetAddress(
@@ -184,10 +107,108 @@ export class HttpOpenCageDataAddressGateway implements AddressGateway {
       targetParams: query,
     });
     return (data as OpenCageDataFeatureCollection).features
+      .sort(sortByConfidence)
       .map(toAddressAndPosition)
       .filter((feature): feature is AddressAndPosition => !!feature);
   }
 }
+
+// Using the GeoJson standard: https://geojson.org/
+type OpenCageDataFeatureCollection = GeoJSON.FeatureCollection<
+  Point,
+  OpenCageDataProperties
+>;
+
+type OpenCageDataProperties = {
+  components: OpenCageDataAddressComponents; // The address component
+  confidence: number; // 10 is the best match inferior is less good
+};
+
+//Aliases Reference : https://github.com/OpenCageData/address-formatting/blob/master/conf/components.yaml
+type OpenCageDataAddressComponents = {
+  city?: string;
+  county?: string;
+  county_code?: string;
+  department?: string;
+  footway?: string;
+  house_number?: string;
+  housenumber?: string;
+  path?: string;
+  pedestrian?: string;
+  place?: string;
+  postcode: string;
+  region: string;
+  residential?: string;
+  road?: string;
+  road_reference?: string;
+  road_reference_intl?: string;
+  square?: string;
+  state?: string;
+  state_district?: string;
+  street?: string;
+  street_name?: string;
+  street_number?: string;
+  town?: string;
+  township?: string;
+  village?: string;
+};
+
+type FeatureWithConfidence = GeoJSON.Feature<Point, { confidence: number }>;
+const sortByConfidence = (
+  featureA: FeatureWithConfidence,
+  featureB: FeatureWithConfidence,
+) => featureB.properties.confidence - featureA.properties.confidence;
+
+const getStreetNumberFromAliases = (
+  components: OpenCageDataAddressComponents,
+): string | undefined =>
+  components.house_number ?? components.housenumber ?? components.street_number;
+
+const getStreetNameFromAliases = (
+  components: OpenCageDataAddressComponents,
+): string | undefined =>
+  components.road ??
+  components.footway ??
+  components.street ??
+  components.street_name ??
+  components.residential ??
+  components.path ??
+  components.pedestrian ??
+  components.road_reference ??
+  components.road_reference_intl ??
+  components.square ??
+  components.place;
+
+const getCityFromAliases = (
+  components: OpenCageDataAddressComponents,
+): string | undefined =>
+  components.city ??
+  components.town ??
+  components.township ??
+  components.village;
+
+// We have the best results for department when merging 'county' and 'state' related keys
+const getDepartmentFromAliases = (components: OpenCageDataAddressComponents) =>
+  components.county ??
+  components.county_code ??
+  components.department ??
+  components.state_district ??
+  components.state;
+
+const toAddressAndPosition = (
+  feature: GeoJSON.Feature<Point, OpenCageDataProperties>,
+): AddressAndPosition | undefined => {
+  const address = featureToAddress(feature);
+  if (!address) return undefined;
+
+  return {
+    position: {
+      lat: feature.geometry.coordinates[1],
+      lon: feature.geometry.coordinates[0],
+    },
+    address,
+  };
+};
 
 const departmentNameToDepartmentCode: Record<string, string> = {
   Ain: "01",
