@@ -22,8 +22,7 @@ const TabLink = ({ href, onClick, active, label }: NavLink) => (
       className="fr-nav__link"
       href={href}
       onClick={onClick}
-      aria-current={active ? "page" : undefined}
-    >
+      aria-current={active ? "page" : undefined}>
       {label}
     </a>
   </li>
@@ -41,8 +40,7 @@ export const TabLinks = ({
     id={navWrapper.id}
     role={navWrapper.role}
     aria-label={navWrapper.ariaLabel}
-    style={navWrapper.style}
-  >
+    style={navWrapper.style}>
     <ul className="fr-nav__list">
       {navLinks.map((link, index) => (
         <TabLink {...link} key={index} />
