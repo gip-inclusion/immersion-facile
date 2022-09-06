@@ -45,6 +45,12 @@ pnpm install
 cp .env.sample .env
 ```
 
+#### Jouer le script pour créer les variables d'env du front :
+
+```sh
+pnpm generate-front-envfile
+```
+
 Le `.env` permet de configurer le mode de fonctionnement de l'application.
 Par défaut tous les services sont IN_MEMORY.
 On peut lancer avec une base de données postgres simplement en mettant `REPOSITORIES="PG"`.
