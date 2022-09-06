@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "prepare": "if [[ -z $CI ]]; then husky install && chmod a+x .husky/pre-commit && chmod a+x .husky/pre-push; fi;",
+    "generate-front-envfile": "grep 'VITE_' .env > ./front/.env",
     "prettier": "pnpm prettier:glob --write ./**/src/",
     "prettier:check": "pnpm prettier:glob --check ./**/src/",
     "prettier:glob": "prettier",

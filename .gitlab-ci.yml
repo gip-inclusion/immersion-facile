@@ -83,6 +83,7 @@ deploy_on_dev:
       touch .env &&
       chmod 600 .env &&
       cat .env.variables <(echo) .env.secrets <(echo) > .env &&
+      grep 'VITE_' .env > ./front/.env &&
       rm -f .env.variables .env.secrets;
 
       docker-compose build &&
@@ -130,6 +131,7 @@ deploy_on_staging:
       touch .env &&
       chmod 600 .env &&
       cat .env.variables <(echo) .env.secrets <(echo) > .env &&
+      grep 'VITE_' .env > ./front/.env &&
       rm -f .env.variables .env.secrets;
 
       docker-compose build &&
@@ -177,6 +179,7 @@ deploy_on_prod:
       touch .env &&
       chmod 600 .env &&
       cat .env.variables <(echo) .env.secrets <(echo) > .env &&
+      grep 'VITE_' .env > ./front/.env &&
       rm -f .env.variables .env.secrets;
 
       docker-compose build &&
