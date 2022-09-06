@@ -36,7 +36,7 @@ export const findMatchRanges = (
 ): MatchRangeDto[] => {
   const strNorm = normalize(str);
   return normalize(searchTerms)
-    .split(" ")
+    .split(/\s+/)
     .filter((el) => !!el)
     .map((searchTerm) => findMatchRangesInternal(searchTerm, strNorm))
     .reduce((acc, lst) => [...acc, ...lst], []);

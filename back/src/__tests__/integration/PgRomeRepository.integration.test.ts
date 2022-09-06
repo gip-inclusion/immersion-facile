@@ -52,6 +52,17 @@ describe("Postgres implementation of Rome Gateway", () => {
         },
       ]);
     });
+
+    it("Correctly handles when two spaces are typed", async () => {
+      expect(
+        await pgRomeRepository.searchRome("recherche en sciences  humaines"),
+      ).toEqual([
+        {
+          romeCode: "K2401",
+          romeLabel: "Recherche en sciences de l'homme et de la société",
+        },
+      ]);
+    });
   });
 
   describe("searchAppellation", () => {

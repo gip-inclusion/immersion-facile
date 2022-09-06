@@ -109,7 +109,7 @@ export class PgRomeRepository implements RomeRepository {
 const toTsQuery = (query: string): string => query.split(/\s+/).join(" & ");
 
 const prepareQueryParams = (query: string): [string, string] => {
-  const queryWords = query.split(" ");
+  const queryWords = query.split(/\s+/);
   const lastWord = removeAccentAndParentheses(
     queryWords[queryWords.length - 1],
   );
