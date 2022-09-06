@@ -75,17 +75,19 @@ const featureToAddress = (
   const streetNumber: string | undefined =
     getStreetNumberFromAliases(components);
 
-  if (!(city && streetName && department)) return undefined;
+  if (!(city && department)) return undefined;
 
   // OpenCageData gives the department name but not the code.
   const departmentCode = departmentNameToDepartmentCode[department];
   if (!departmentCode) return undefined;
 
-  const streetNumberAndAddress = `${streetNumber ?? ""} ${streetName}`.trim();
+  const streetNumberAndAddress = `${streetNumber ?? ""} ${
+    streetName ?? ""
+  }`.trim();
 
   return {
     streetNumberAndAddress,
-    postcode: components.postcode,
+    postcode: components.postcode ?? "",
     departmentCode,
     city,
   };
@@ -137,7 +139,6 @@ export class HttpOpenCageDataAddressGateway implements AddressGateway {
       targetParams: query,
     });
     return (data as OpenCageDataFeatureCollection).features
-      .sort(sortByConfidence)
       .map(toAddressAndPosition)
       .filter((feature): feature is AddressAndPosition => !!feature);
   }
@@ -182,12 +183,6 @@ type OpenCageDataAddressComponents = {
   township?: string;
   village?: string;
 };
-
-type FeatureWithConfidence = GeoJSON.Feature<Point, { confidence: number }>;
-const sortByConfidence = (
-  featureA: FeatureWithConfidence,
-  featureB: FeatureWithConfidence,
-) => featureB.properties.confidence - featureA.properties.confidence;
 
 const getStreetNumberFromAliases = (
   components: OpenCageDataAddressComponents,

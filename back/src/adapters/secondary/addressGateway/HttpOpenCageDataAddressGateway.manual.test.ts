@@ -1,4 +1,4 @@
-import { AddressDto } from "shared/src/address/address.dto";
+import { AddressAndPosition, AddressDto } from "shared/src/address/address.dto";
 import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
 import { ManagedAxios } from "shared/src/serenity-http-client";
 import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
@@ -56,151 +56,116 @@ describe("HttpOpenCageDataAddressGateway", () => {
     );
   });
 
-  describe("getAddressFromPosition", () => {
-    it("Should return expected address DTO when providing accurate position.", async () => {
-      const result = await httpAddressGateway.getAddressFromPosition({
-        lat: resultFromApiAddress.features[0].geometry.coordinates[1],
-        lon: resultFromApiAddress.features[0].geometry.coordinates[0],
-      });
-
-      expectTypeToMatchAndEqual(result, {
-        streetNumberAndAddress: "Rue Gaston Romazzotti",
-        city: "Molsheim",
-        departmentCode: "67",
-        postcode: "67120",
-      });
-    }, 5000);
-
-    it("should return expected address DTO when providing a position that don't have geoJson street and house number", async () => {
-      const result = await httpAddressGateway.getAddressFromPosition({
-        lat: 43.791521,
-        lon: 7.500604,
-      });
-
-      expectTypeToMatchAndEqual(result, {
-        streetNumberAndAddress: "Route de Castellar",
-        city: "Menton",
-        departmentCode: "06",
-        postcode: "06500",
-      });
-    }, 5000);
-
-    const parallelCalls = 10;
-    it(`Should support ${parallelCalls} of parallel calls`, async () => {
-      const coordinates: GeoPositionDto[] = [];
-      const expectedResults: AddressDto[] = [];
-
-      for (let index = 0; index < parallelCalls; index++) {
-        coordinates.push({
-          lat: resultFromApiAddress.features[0].geometry.coordinates[1],
-          lon: resultFromApiAddress.features[0].geometry.coordinates[0],
-        });
-        expectedResults.push({
-          streetNumberAndAddress: "Rue Gaston Romazzotti",
-          city: "Molsheim",
-          departmentCode: "67",
-          postcode: "67120",
-        });
-      }
-      const results: (AddressDto | undefined)[] = await Promise.all(
-        coordinates.map((coordinate) =>
-          httpAddressGateway.getAddressFromPosition(coordinate),
-        ),
-      );
-
-      expectTypeToMatchAndEqual(results, expectedResults);
-    }, 15000);
-  });
-
   describe("lookupStreetAddress", () => {
-    it("should return empty list of addresses & positions from bad lookup string", async () => {
-      const result = await httpAddressGateway.lookupStreetAddress(
-        "unsupported",
-      );
-      expectTypeToMatchAndEqual(result, []);
-    }, 5000);
+    it.each([
+      {
+        candidateQuery: "111 Meinglazou 29260 Lesneven",
+        expectedAddress: {
+          city: "Lesneven",
+          departmentCode: "29",
+          postcode: "29260",
+          streetNumberAndAddress: "",
+        },
+      },
+      {
+        candidateQuery:
+          "2 rue des Anciens Combattants d'Afrique du Nord, 54200 Toul",
+        expectedAddress: {
+          city: "Toul",
+          departmentCode: "54",
+          postcode: "54200",
+          streetNumberAndAddress:
+            "2 Rue des Anciens Combattants d'Afrique du Nord",
+        },
+      },
+      {
+        candidateQuery: "17 place Sainte Luce 06800 Cagnes sur Mer",
+        expectedAddress: {
+          city: "Cagnes-sur-Mer",
+          departmentCode: "06",
+          postcode: "06800",
+          streetNumberAndAddress: "Place Sainte-Luce",
+        },
+      },
+      {
+        candidateQuery: "49 Rue Mazagran St Denis 97400",
+        expectedAddress: {
+          city: "Saint-Denis",
+          departmentCode: "974",
+          postcode: "97400",
+          streetNumberAndAddress: "49 Rue Mazagran",
+        },
+      },
+      {
+        candidateQuery: "69120",
+        expectedAddress: {
+          city: "Vaulx-en-Velin",
+          departmentCode: "69",
+          postcode: "69120",
+          streetNumberAndAddress: "",
+        },
+      },
+      {
+        candidateQuery: "75016",
+        expectedAddress: {
+          city: "Paris",
+          departmentCode: "75",
+          postcode: "75016",
+          streetNumberAndAddress: "",
+        },
+      },
+      {
+        candidateQuery: "Paris",
+        expectedAddress: {
+          city: "Paris",
+          departmentCode: "75",
+          postcode: "",
+          streetNumberAndAddress: "",
+        },
+      },
+      {
+        candidateQuery: "Carcassonne",
+        expectedAddress: {
+          city: "Carcassonne",
+          departmentCode: "11",
+          postcode: "11000",
+          streetNumberAndAddress: "",
+        },
+      },
+    ])(
+      "should work if searching for $candidateQuery postcode expect $expectedAddress",
+      async ({
+        candidateQuery,
+        expectedAddress,
+      }: {
+        candidateQuery: string;
+        expectedAddress: AddressDto;
+      }) => {
+        const resultMetropolitanFrance =
+          await httpAddressGateway.lookupStreetAddress(candidateQuery);
+
+        const firstResult: AddressAndPosition | undefined =
+          resultMetropolitanFrance.at(0);
+        expect(firstResult?.address).toEqual(expectedAddress);
+      },
+    );
 
     it("Should return expected address DTO when providing address with special characters.", async () => {
       const resultPreviousNotFoundWithAddresseAPI =
-        await httpAddressGateway.lookupStreetAddress(
-          "17 place Saint Luce 06800 Cagnes sur mer",
-        );
+        await httpAddressGateway.lookupStreetAddress("Route d’Huez 38750 Huez");
 
-      expectTypeToMatchAndEqual(resultPreviousNotFoundWithAddresseAPI, [
-        {
-          address: {
-            city: "Cagnes-sur-Mer",
-            departmentCode: "06",
-            postcode: "06800",
-            streetNumberAndAddress: "Place Sainte-Luce",
-          },
-          position: {
-            lat: 43.665026,
-            lon: 7.149109,
-          },
+      expectTypeToMatchAndEqual(resultPreviousNotFoundWithAddresseAPI.at(0), {
+        address: {
+          city: "L'Alpe d'Huez",
+          departmentCode: "38",
+          postcode: "38750",
+          streetNumberAndAddress: "Route d'Huez",
         },
-        {
-          address: {
-            city: "Cagnes-sur-Mer",
-            departmentCode: "06",
-            postcode: "06800",
-            streetNumberAndAddress: "Montée Sainte-Luce",
-          },
-          position: {
-            lat: 43.664234,
-            lon: 7.148787,
-          },
+        position: {
+          lat: 45.0907535,
+          lon: 6.0631237,
         },
-        {
-          address: {
-            city: "Cagnes-sur-Mer",
-            departmentCode: "06",
-            postcode: "06800",
-            streetNumberAndAddress: "Traverse Sainte-Luce",
-          },
-          position: {
-            lat: 43.66419,
-            lon: 7.148873,
-          },
-        },
-      ]);
-    });
-
-    it("Should return at least the right street in address DTO when providing an address outside of metropolitan france", async () => {
-      const resultDomTom = await httpAddressGateway.lookupStreetAddress(
-        "49 Rue Mazagran St Denis 97400",
-      );
-
-      const expectedAddress = {
-        city: "Saint-Denis",
-        departmentCode: "974",
-        postcode: "97400",
-        streetNumberAndAddress: "49 Rue Mazagran",
-      };
-
-      const firstResult = resultDomTom.at(0);
-      expect(firstResult?.address).toEqual(expectedAddress);
-      expect(firstResult?.position.lat).toBeCloseTo(-20.88957, 4);
-      expect(firstResult?.position.lon).toBeCloseTo(55.45512, 4);
-    });
-
-    it("Should return address DTO when providing an address inside of metropolitan france", async () => {
-      const resultMetropolitanFrance =
-        await httpAddressGateway.lookupStreetAddress(
-          "18 Avenue des Canuts, 69120",
-        );
-
-      const expectedAddress = {
-        city: "Vaulx-en-Velin",
-        departmentCode: "69",
-        postcode: "69120",
-        streetNumberAndAddress: "Avenue des Canuts",
-      };
-
-      const firstResult = resultMetropolitanFrance.at(0);
-      expect(firstResult?.address).toEqual(expectedAddress);
-      expect(firstResult?.position.lat).toBeCloseTo(45.7618, 4);
-      expect(firstResult?.position.lon).toBeCloseTo(4.92566, 4);
+      });
     });
   });
 
