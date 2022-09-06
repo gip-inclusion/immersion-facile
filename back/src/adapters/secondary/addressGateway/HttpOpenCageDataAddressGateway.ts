@@ -11,6 +11,7 @@ import {
   ManagedAxios,
   TargetUrlsMapper,
 } from "shared/src/serenity-http-client";
+import { queryParamsAsString } from "shared/src/utils/queryParams";
 import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
 
 export type OpenCageDataTargetUrls =
@@ -18,21 +19,50 @@ export type OpenCageDataTargetUrls =
   | "ForwardGeocodePostCode"
   | "ReverseGeocoding";
 
+type QueryParams = {
+  q: string;
+  key: string;
+  language?: string;
+  countrycode?: string;
+  limit?: string;
+};
+
+const baseUrl: AbsoluteUrl = "https://api.opencagedata.com/geocode/v1/geojson";
 // https://github.com/OpenCageData/opencagedata-misc-docs/blob/master/countrycode.md
 // On prends la france et toutes ses territoires dépendants.
+const franceAndAttachedTerritoryCountryCodes =
+  "fr,bl,gf,gp,mf,mq,nc,pf,pm,re,tf,wf,yt";
+const language = "fr";
+
+const buildUrl = (queryParams: QueryParams): AbsoluteUrl =>
+  `${baseUrl}?${queryParamsAsString<QueryParams>(queryParams)}`;
+
 export const openCageDataTargetUrlsMapperMaker = (
   apiKey: string,
 ): TargetUrlsMapper<OpenCageDataTargetUrls> => ({
   ForwardGeocoding: (queryString: string): AbsoluteUrl =>
-    `https://api.opencagedata.com/geocode/v1/geojson?q=${encodeURI(
-      queryString as string,
-    )}&key=${apiKey}&language=fr&countrycode=fr,bl,gf,gp,mf,mq,nc,pf,pm,re,tf,wf,yt`,
+    buildUrl({
+      q: queryString,
+      key: apiKey,
+      language,
+      countrycode: franceAndAttachedTerritoryCountryCodes,
+    }),
   ForwardGeocodePostCode: (postcode: string): AbsoluteUrl =>
-    `https://api.opencagedata.com/geocode/v1/geojson?q=${encodeURI(
-      postcode as string,
-    )}&key=${apiKey}&language=fr&countrycode=fr,bl,gf,gp,mf,mq,nc,pf,pm,re,tf,wf,yt&limit=1`,
+    buildUrl({
+      q: postcode,
+      key: apiKey,
+      language,
+      countrycode: franceAndAttachedTerritoryCountryCodes,
+      limit: "1",
+    }),
   ReverseGeocoding: ({ lat, lon }: GeoPositionDto): AbsoluteUrl =>
-    `https://api.opencagedata.com/geocode/v1/geojson?q=${lat}+${lon}&key=${apiKey}&language=fr&countrycode=fr,bl,gf,gp,mf,mq,nc,pf,pm,re,tf,wf,yt`,
+    buildUrl({
+      q: `${lat}+${lon}`,
+      key: apiKey,
+      language,
+      countrycode: franceAndAttachedTerritoryCountryCodes,
+      limit: "1",
+    }),
 });
 
 const featureToAddress = (
