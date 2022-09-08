@@ -3,7 +3,7 @@ import React, { cloneElement, Children } from "react";
 import ReactDOM from "react-dom";
 import classNames from "classnames";
 import Modal from "react-modal";
-
+import "./Modal.css";
 import { ModalClose } from "./ModalClose";
 /**
  *
