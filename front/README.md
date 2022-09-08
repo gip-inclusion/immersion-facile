@@ -53,71 +53,75 @@ At the root of the project run :
 pnpm cypress
 ```
 
-## Ajouter une nouvelle slice dans le store
+## Ajouter une nouvelle slice ObjetMetier dans le store
 
 Nous nous basons sur [redux-toolkit](https://redux-toolkit.js.org/)
 
 ### Créer notre test
 
-```
-describe("feature flag slice", () => {
+Etat minimal avec les dépendances techniques pour redux toolkit.
+
+```typescript
+describe("my store slice", () => {
   let store: ReduxStore;
   let dependencies: TestDependencies;
 
   beforeEach(() => {
     ({ store, dependencies } = createTestStore());
-  });
-
-  it("action should", () => {
-    expectFeatureFlagsStateToEqual({
-      ...defaultFeatureFlags,
-      areFeatureFlagsLoading: true, // feature flags are loading by default
-    });
-    store.dispatch(featureFlagsSlice.actions.retrieveFeatureFlagsRequested());
-    expectFeatureFlagsStateToEqual({
-      ...defaultFeatureFlags,
-      areFeatureFlagsLoading: true,
-    });
-    dependencies.technicalGateway.featureFlags$.next(flagsFromApi);
-    expectFeatureFlagsStateToEqual({
-      ...flagsFromApi,
-      areFeatureFlagsLoading: false,
-    });
   });
 });
 ```
 
 - Etude du store pour savoir ou rajouter la slice
-- 0. Créer une slice vide
+
+## Prérequis pour avoir un état testable.
+
+- 1. Créer une slice vide
+
+Les trois notions qui nous intéressent sont :
+
+- la description de la nature l'état (type)
+- l'état initial
+- une tranche minimale.AgencyState
 
 ```typescript
 import { createSlice } from "@reduxjs/toolkit";
 
-type AgencyState = {
-  agencies: AgencyDto[];
-  isLoading: boolean;
+type ObjetMetier = {
+  propriete: any;
 };
 
-const initialState: AgencyState = {
-  agencies: [],
+// Au besoin on peut avoir un état complexe avec plusieurs notions.
+type ObjetMetierState = {
+  objects: ObjetMetier[];
+  isLoading: boolean;
+  errors: Error[];
+};
+
+const initialState: ObjetMetierState = {
+  objects: [],
   isLoading: false,
 };
 
-export const agenciesSlice = createSlice({
-  name: "agencies",
+export const objetMetierSlice = createSlice({
+  name: "objectMetierName",
   initialState,
   reducers: {},
 });
 ```
 
-- 0.1 : Déclarer la slice dans le rootReducer dans [front/src/core-logic/storeConfig/store.ts](front/src/core-logic/storeConfig/store.ts)
+- 2. : Déclarer la slice dans le rootReducer dans [front/src/core-logic/storeConfig/store.ts](front/src/core-logic/storeConfig/store.ts)
 
-- 1. Créer test initial de la slice
-
+```typescript
+const rootReducer = combineReducers({
+  [objetMetierSlice.name]: objetMetierSlice.reducer,
+});
 ```
-const defaultAgencies: AgencyIdAndName[] = [];
 
-describe("Agencies in store", () => {
+- 3. Créer test qui vérifie l'état initial de la slice
+
+```typescript
+describe("ObjetMetier in store", () => {
   let store: ReduxStore;
   let dependencies: TestDependencies;
 
@@ -125,33 +129,41 @@ describe("Agencies in store", () => {
     ({ store, dependencies } = createTestStore());
   });
 
-  it("agencies list should be empty at start", () => {
+  it("object state should be initial state at start", () => {
     // add check not loading
-    const expected: AgencyDto[] = [];
-    expectToEqual(agenciesSelector(store.getState()), expected);
+    const expected = {
+      objects: [],
+      isLoading: false,
+    };
+    expectToEqual(store.getState().objetMetierName, expected);
   });
 });
-
 ```
+
+## On itère sur les test pour rajouter du comportement avec des actions
 
 - 1. Créer test de l'action
 
-```
-  it("can start to fetch agencies", () => {
-    store.dispatch(agenciesSlice.actions.monActions)
-  })
+```typescript
+it("action should do something", () => {
+  store.dispatch(objetMetierSlice.actions.myActionStartFetch());
+});
 ```
 
 Le nom des actions disponibles dans la slice correspond aux clefs présentes dans les reducers.
 
-- 2. Il faut donc rajouter l'action dans le reducer.
+- 2. Déclarer l'action
+     Pour déclarer une action, on ajoute l'action en suivant le pattern [actionName]: (currentState, previousActionIfDefined) => ({ newState });
 
-On ajoute l'action en rajoutant [actionName]: (state) => ({ newState })
-
-```shell
-sudo apt-get update && sudo apt-get install libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
+```typescript
+export const objetMetierSlice = createSlice({
+  name: "objectMetierName",
+  initialState,
+  reducers: {
+    myActionStartFetch: (state) => ({
+      ...state,
+      isLoading: true,
+    }),
+  },
+});
 ```
-
-### Open the app
-
-At the root of the project run :

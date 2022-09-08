@@ -15,8 +15,12 @@ const getConventionEpic: ConventionEpic = (
   _state$,
   { conventionGateway },
 ) =>
-  action$.pipe(
     filter(conventionSlice.actions.conventionRequested.match),
+    switchMap(({ payload }) => conventionGateway.retrieveFromToken(payload)),
+    map(conventionSlice.actions.conventionSucceeded),
+    catchEpicError((error: Error) =>
+      conventionSlice.actions.conventionFailed(error.message),
+    ),    filter(conventionSlice.actions.conventionRequested.match),
     switchMap(({ payload }) => conventionGateway.retrieveFromToken(payload)),
     map(conventionSlice.actions.conventionSucceeded),
     catchEpicError((error: Error) =>

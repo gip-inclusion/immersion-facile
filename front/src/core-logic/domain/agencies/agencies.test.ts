@@ -4,8 +4,8 @@ import {
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 import { expectToEqual } from "shared/src/expectToEqual";
-import { agenciesSelectors } from "./agencies.selector";
-import { AgencyDto, AgencyIdAndName } from "shared/src/agency/agency.dto";
+import { agenciesSelector } from "./agencies.selector";
+import { AgencyIdAndName } from "shared/src/agency/agency.dto";
 
 import { agenciesSlice } from "./agencies.slice";
 
@@ -13,26 +13,15 @@ import { agenciesSlice } from "./agencies.slice";
 
 describe("Agencies in store", () => {
   let store: ReduxStore;
-  let _dependencies: TestDependencies;
+  let dependencies: TestDependencies;
 
   beforeEach(() => {
-    ({ store } = createTestStore());
+    ({ store, dependencies } = createTestStore());
   });
 
-  it("agencies list should be empty at start", () => {
-    const expected: AgencyDto[] = [];
-    expectToEqual(agenciesSelectors.agencies(store.getState()), expected);
-    expectToEqual(agenciesSelectors.isLoading(store.getState()), false);
-  });
-
-  it("shows that fetch agencies has started", () => {
-    store.dispatch(agenciesSlice.actions.fetchAgenciesRequested());
-    expectToEqual(agenciesSelectors.isLoading(store.getState()), true);
-  });
-
-  it("loads agencies from gateway", () => {
-    store.dispatch(agenciesSlice.actions.fetchAgenciesRequested());
-    expectToEqual(agenciesSelectors.isLoading(store.getState()), true);
+  it("agencies list should be initialState at start", () => {
+    const expected: AgencyIdAndName[] = [];
+    expectToEqual(store.getState().agencies, expected);
   });
 
   it("should return agencies list in Ain department", () => {
@@ -48,18 +37,17 @@ describe("Agencies in store", () => {
       },
     ];
 
-    // dependencies = {
-    //   agencyGateway: {
-    //     listAgencies: () => agencies,
-    //   },
-    // } as TestDependencies;
+    dependencies = {
+      agencyGateway: {
+        listAgencies: () => agencies,
+      },
+    } as unknown as TestDependencies;
 
     const expected = agencies;
 
     // Execute
-    //store.dispatch();
-
+    store.dispatch(agenciesSlice.actions.fetchAgenciesRequested());
     // Expect
-    expectToEqual(agenciesSelectors.agencies(store.getState()), expected);
+    expectToEqual(agenciesSelector(store.getState()), expected);
   });
 });
