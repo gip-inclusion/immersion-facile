@@ -2,7 +2,8 @@ import React, { cloneElement, Children, useEffect } from "react";
 
 import ReactDOM from "react-dom";
 import classNames from "classnames";
-import { useFocusTrap } from "./hooks/useFocusTrap";
+import Modal from "react-modal";
+
 import { ModalClose } from "./ModalClose";
 /**
  *
@@ -33,12 +34,12 @@ export const ModalDialog = ({
   isOpen,
   canClose,
 }: ModalDialogProperties) => {
-  const [modalRef] = useFocusTrap();
   // const [openedModal, setOpenedModal] = useState(isOpen);
   const colSizes = { sm: 4, lg: 8, md: 6 };
-  const colSize = size ? colSizes[size] : null;
+  const _colSize = size ? colSizes[size] : null;
   const _className = classNames(
-    "fr-modal",
+    "fr-modal fr-container--fluid fr-container-md",
+
     {
       "fr-modal--opened": isOpen,
     },
@@ -77,19 +78,6 @@ export const ModalDialog = ({
     }, MODAL_ANIMATION_TIME);
   };
 
-  const handleOverlayClick = (e: React.MouseEvent) => {
-    if (!canClose) {
-      return;
-    }
-
-    if (
-      !modalRef.current ||
-      modalRef.current === e.target ||
-      (e.target as HTMLButtonElement).className.indexOf("closing-overlay") > -1
-    ) {
-      handleAnimatedUnmount();
-    }
-  };
   useEffect(() => {
     if (isOpen) {
       document.addEventListener("keydown", handleAllKeyDown);
@@ -115,27 +103,37 @@ export const ModalDialog = ({
     ) : null;
   }
   const component = (
-    <dialog
+    <Modal
       aria-labelledby="fr-modal-title-modal"
       className={_className}
-      ref={modalRef}
-      //onKeyDown={(e) => handleAllKeyDown(e)}
-      onClick={(e) => handleOverlayClick(e)}>
-      <div className="fr-container fr-container--fluid fr-container-md fr-col-md-6">
-        <div className="fr-grid-row fr-grid-row--center closing-overlay">
-          <div className={`fr-col-12 fr-col-md-${colSize}`}>
-            <div className="fr-modal__body">
-              <div className="fr-modal__header">{closeComponent}</div>
-              <div className="fr-modal__content">
-                {title}
-                {content}
-              </div>
-              {footer}
-            </div>
+      overlayClassName={"fr-container-md"}
+      isOpen={isOpen}
+    >
+      <div className="fr-grid-row fr-grid-row--center">
+        <div className="fr-modal__body fr-col-md-6">
+          <div className="fr-modal__header">{closeComponent}</div>
+          <div className="fr-modal__content">
+            {title}
+            {content}
           </div>
+          {footer}
         </div>
       </div>
-    </dialog>
+    </Modal>
+    // <div className="fr-container fr-container--fluid fr-container-md fr-col-md-6">
+    //   <div className="fr-grid-row fr-grid-row--center closing-overlay">
+    //     <div className={`fr-col-12 fr-col-md-${colSize}`}>
+    //       <div className="fr-modal__body">
+    //         <div className="fr-modal__header">{closeComponent}</div>
+    //         <div className="fr-modal__content">
+    //           {title}
+    //           {content}
+    //         </div>
+    //         {footer}
+    //       </div>
+    //     </div>
+    //   </div>
+    // </div>
   );
   return ReactDOM.createPortal(component, document.body);
 };
