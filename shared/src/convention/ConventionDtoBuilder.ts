@@ -20,10 +20,10 @@ export const VALID_EMAILS = [
   "beneficiary@email.fr",
   "establishment@example.com",
 ];
-export const DATE_SUBMISSION = "2021-01-04";
-export const DATE_START = "2021-01-06";
-export const DATE_END = "2021-01-15";
-export const DATE_SIGNATURE = "2021-01-04";
+export const DATE_SUBMISSION = new Date("2021-01-04").toISOString();
+export const DATE_START = new Date("2021-01-06").toISOString();
+export const DATE_END = new Date("2021-01-15").toISOString();
+export const DATE_SIGNATURE = new Date("2021-01-04").toISOString();
 
 export const VALID_PHONES = [
   "+33012345678",

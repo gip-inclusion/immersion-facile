@@ -8,7 +8,10 @@ import {
 } from "shared/src/convention/convention.dto";
 import { ConventionQueries } from "../../../domain/convention/ports/ConventionQueries";
 import { ImmersionAssessmentEmailParams } from "../../../domain/immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
-import { pgConventionRowToDto } from "./PgConventionRepository";
+import {
+  getReadConventionById,
+  selectAllConventionDtosById,
+} from "./pgConventionSql";
 
 export class PgConventionQueries implements ConventionQueries {
   constructor(private client: PoolClient) {}
@@ -18,8 +21,8 @@ export class PgConventionQueries implements ConventionQueries {
     agencyId,
   }: ListConventionsRequestDto): Promise<ConventionReadDto[]> {
     const filtersSQL = [
-      status && format("c.status = %1$L", status),
-      agencyId && format("c.agency_id::text = %1$L", agencyId),
+      status && format("conventions.status = %1$L", status),
+      agencyId && format("conventions.agency_id::text = %1$L", agencyId),
     ].filter((clause) => !!clause);
 
     const whereClause =
@@ -32,9 +35,7 @@ export class PgConventionQueries implements ConventionQueries {
   public async getConventionById(
     id: ConventionId,
   ): Promise<ConventionReadDto | undefined> {
-    return (
-      await this.getConventionsWhere(format("WHERE c.id::text = %1$L", id))
-    ).at(0);
+    return getReadConventionById(this.client, id);
   }
 
   public async getAllImmersionAssessmentEmailParamsForThoseEndingThatDidntReceivedAssessmentLink(
@@ -42,13 +43,19 @@ export class PgConventionQueries implements ConventionQueries {
   ): Promise<ImmersionAssessmentEmailParams[]> {
     const pgResult = await this.client.query(
       format(
-        `SELECT JSON_BUILD_OBJECT(
+        `
+        WITH mentors AS (SELECT * from signatories WHERE role = 'establishment'),
+             beneficiaries AS (SELECT * from signatories WHERE role = 'beneficiary')
+        
+        SELECT JSON_BUILD_OBJECT(
               'immersionId', id, 
-              'beneficiaryFirstName', first_name, 
-              'beneficiaryLastName', last_name,
-              'mentorName', mentor, 
-              'mentorEmail', mentor_email) AS params
+              'beneficiaryFirstName', beneficiaries.first_name, 
+              'beneficiaryLastName', beneficiaries.last_name,
+              'mentorName', CONCAT(mentors.first_name, ' ', mentors.last_name), 
+              'mentorEmail', mentors.email) AS params
        FROM conventions 
+       LEFT JOIN beneficiaries ON beneficiaries.convention_id = conventions.id
+       LEFT JOIN mentors ON mentors.convention_id = conventions.id
        WHERE date_end::date = $1
        AND status IN (%1$L)
        AND id NOT IN (SELECT (payload ->> 'id')::uuid FROM outbox where topic = 'EmailWithLinkToCreateAssessmentSent' )`,
@@ -63,23 +70,13 @@ export class PgConventionQueries implements ConventionQueries {
     whereClause: string,
     orderByCause?: string,
     limit?: number,
-  ) {
+  ): Promise<ConventionReadDto[]> {
     const query = `
-    SELECT 
-      c.*, vad.*, cei.external_id,
-      agencies.name AS agency_name
-      FROM conventions AS c 
-      LEFT JOIN convention_external_ids AS cei ON cei.convention_id = c.id
-      LEFT JOIN agencies ON agencies.id = c.agency_id
-      LEFT JOIN view_appellations_dto AS vad ON vad.appellation_code = c.immersion_appellation
-      LEFT JOIN partners_pe_connect AS partners ON partners.convention_id = c.id
+    ${selectAllConventionDtosById}
     ${whereClause}
     ${orderByCause ?? ""}
     ${limit ? "LIMIT " + limit : ""}`;
     const pgResult = await this.client.query(query);
-    return pgResult.rows.map((row) => ({
-      ...pgConventionRowToDto(row),
-      agencyName: row.agency_name,
-    }));
+    return pgResult.rows.map((row) => row.dto);
   }
 }

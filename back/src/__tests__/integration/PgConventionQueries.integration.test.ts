@@ -115,8 +115,6 @@ describe("Pg implementation of ConventionQueries", () => {
         .withId("aaaaac14-9c0a-aaaa-aa6d-6aa9ad38aaaa")
         .validated()
         .withDateEnd("2022-05-14")
-        .withMentorFirstName("Romain")
-        .withMentorLastName("Grandjean")
         .build();
       const validatedImmersionEndingThe15thThatAlreadyReceivedAnEmail =
         new ConventionDtoBuilder()
@@ -128,6 +126,8 @@ describe("Pg implementation of ConventionQueries", () => {
         .withId("bbbbbc15-9c0a-aaaa-aa6d-6aa9ad38aaaa")
         .validated()
         .withDateEnd("2022-05-15")
+        .withMentorFirstName("Romain")
+        .withMentorLastName("Grandjean")
         .build();
       const ongoingImmersionEndingThe15th = new ConventionDtoBuilder()
         .withId("cccccc15-9c0a-aaaa-aa6d-6aa9ad38aaaa")
