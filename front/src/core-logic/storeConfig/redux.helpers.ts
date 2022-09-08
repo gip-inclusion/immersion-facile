@@ -4,6 +4,7 @@ import { Dependencies } from "src/app/config/dependencies";
 import { RootState } from "src/core-logic/storeConfig/store";
 
 type ValueOf<T> = T[keyof T];
+
 export type ActionOfSlice<S extends Slice> = ReturnType<ValueOf<S["actions"]>>;
 
 export type AppEpic<Input extends Action, Output extends Input = Input> = Epic<
