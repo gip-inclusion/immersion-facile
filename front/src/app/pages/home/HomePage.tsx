@@ -39,10 +39,7 @@ export const HomePage = () => (
     <ImmersionMarianneHeader />
     <MainWrapper className="bg-gradient-to-b from--100 from-gray-100 via-gray-50 to-white pt-14">
       <section className="flex flex-col items-center">
-        <div
-          className="flex flex-wrap justify-center "
-          style={{ minWidth: "420px" }}
-        >
+        <div className="flex flex-wrap">
           <div>
             <FindImmersionHomeMenu />
             <InitiateConventionCard />

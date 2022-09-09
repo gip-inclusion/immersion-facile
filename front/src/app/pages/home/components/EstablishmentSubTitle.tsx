@@ -4,21 +4,21 @@ import React from "react";
 
 export interface EstablishmentSubTitleContract {
   text: string;
-  type: "establishment" | "candidate";
+  type: "establishment" | "candidate" | "candidateForm";
 }
 
 export const EstablishmentSubTitle = ({
   text,
   type,
 }: EstablishmentSubTitleContract) => (
-  <div
+  <p
     className={`${
       type === "establishment"
-        ? "text-immersionBlue-dark"
-        : "text-immersionRed-dark"
-    }  text-center`}
+        ? "text-immersionBlue-dark fr-mt-2w fr-mb-1v"
+        : "text-immersionRed-dark fr-my-2w"
+    } ${type === "candidateForm" ? "font-bold" : ""} text-center`}
     style={{ maxWidth: "18rem" }}
   >
     {text}
-  </div>
+  </p>
 );

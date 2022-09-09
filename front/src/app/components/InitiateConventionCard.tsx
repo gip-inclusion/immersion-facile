@@ -11,6 +11,13 @@ import { useRoute } from "src/app/routing/routes";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { useRedirectToConventionWithoutIdentityProvider } from "src/hooks/redirections.hooks";
 
+type InitiateConventionCardProps = {
+  title?: string;
+  peConnectNotice?: string;
+  showFormButtonLabel?: string;
+  otherCaseNotice?: string;
+};
+
 const storeConventionRouteParamsOnDevice = (
   routeParams: ConventionPageRoute["params"],
 ) => {
@@ -23,7 +30,12 @@ const storeConventionRouteParamsOnDevice = (
   }
 };
 
-export const InitiateConventionCard = () => {
+export const InitiateConventionCard = ({
+  title,
+  peConnectNotice,
+  showFormButtonLabel,
+  otherCaseNotice,
+}: InitiateConventionCardProps) => {
   const { enablePeConnectApi } = useFeatureFlags();
   const currentRoute = useRoute();
   const redirectToConventionWithoutIdentityProvider =
@@ -32,14 +44,18 @@ export const InitiateConventionCard = () => {
   return (
     <Section type="candidate">
       <EstablishmentSubTitle
-        type={"candidate"}
-        text="J'ai trouvé mon entreprise et je veux initier ma demande de convention"
+        type={"candidateForm"}
+        text={
+          title ||
+          "J'ai trouvé mon entreprise et je veux initier ma demande de convention"
+        }
       />
       <div className="flex flex-col w-full h-full items-center justify-center">
         {enablePeConnectApi && (
           <>
-            <p className="text-center text-sm py-3">
-              Je suis inscrit à Pôle Emploi, je demande une convention avec :
+            <p className="text-center text-sm fr-mb-2w">
+              {peConnectNotice ||
+                "Je suis inscrit à Pôle Emploi, je demande une convention avec :"}
             </p>
             <PeConnectButton
               onClick={() => {
@@ -54,9 +70,10 @@ export const InitiateConventionCard = () => {
             >
               Je ne connais pas mes identifiants
             </a>
-            <span className="pt-4">ou bien</span>
-            <p className="text-center text-sm py-3">
-              Je suis accompagné par une autre structure :
+            <strong className="pt-4">ou bien</strong>
+            <p className="text-center text-sm fr-my-2w">
+              {otherCaseNotice ||
+                "Je suis accompagné par une autre structure :"}
             </p>
           </>
         )}
@@ -65,7 +82,7 @@ export const InitiateConventionCard = () => {
           type="error"
           onClick={redirectToConventionWithoutIdentityProvider}
         >
-          Je demande une convention
+          {showFormButtonLabel || "Je demande une convention"}
         </ButtonHome>
       </div>
     </Section>
