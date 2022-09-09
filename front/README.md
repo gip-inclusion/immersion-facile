@@ -53,12 +53,32 @@ At the root of the project run :
 pnpm cypress
 ```
 
+## Ajouter un nouveau comportement métier
+(useCase back = epic front ) Nous nous basons sur [redux-toolkit](https://redux-toolkit.js.org/)
+
+Dans le domaine, nous allons rajouter un epic utilisateur. 'Récupérer mes objets métiers'.
+
+1. Créer un dossier dans [domain](front/src/core-logic/domain) 
+
+2. Un épique peut être résumé à une succession de changements d'état mais l'execution
+
+```typescript
+
+
+const getObjectMetierUseCase = (
+  action$,
+  _state$,
+  { conventionGateway },
+) =>
+  action$.pipe(
+    filter(conventionSlice.actions.conventionRequested.match),
+  );
+```
+
+
+
 ## Ajouter une nouvelle slice ObjetMetier dans le store
-
-Nous nous basons sur [redux-toolkit](https://redux-toolkit.js.org/)
-
 ### Créer notre test
-
 Etat minimal avec les dépendances techniques pour redux toolkit.
 
 ```typescript
@@ -147,6 +167,7 @@ describe("ObjetMetier in store", () => {
 ```typescript
 it("action should do something", () => {
   store.dispatch(objetMetierSlice.actions.myActionStartFetch());
+  expect(agenciesSelector(store.getState())).toEqual(expected);
 });
 ```
 
