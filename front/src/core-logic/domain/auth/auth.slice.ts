@@ -19,5 +19,6 @@ export const authSlice = createSlice({
     ) => {
       state.connectedWith = action.payload;
     },
+    federedIdentityStoredInDevice: (state) => state,
   },
 });

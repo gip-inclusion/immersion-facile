@@ -1,3 +1,4 @@
+import { FederatedIdentity } from "shared/src/federatedIdentities/federatedIdentity.dto";
 import { ConventionPresentation } from "src/app/pages/Convention/ConventionPage";
 
 type GenericPair<K extends string, Payload> = {
@@ -7,7 +8,8 @@ type GenericPair<K extends string, Payload> = {
 
 type StoredPair =
   | GenericPair<"partialConvention", Partial<ConventionPresentation>>
-  | GenericPair<"adminToken", string>;
+  | GenericPair<"adminToken", string>
+  | GenericPair<"federatedIdentity", FederatedIdentity>;
 
 export type KeyInDevice = StoredPair["key"];
 

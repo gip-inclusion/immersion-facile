@@ -19,9 +19,11 @@ import { immersionAssessmentEpics } from "../domain/immersionAssessment/immersio
 import { immersionAssessmentSlice } from "../domain/immersionAssessment/immersionAssessment.slice";
 import { conventionEpics } from "../domain/convention/convention.epics";
 import { conventionSlice } from "../domain/convention/convention.slice";
+import { authEpics } from "../domain/auth/auth.epics";
 
 const allEpics: any[] = [
   ...adminEpics,
+  ...authEpics,
   ...establishmentEpics,
   ...searchEpics,
   ...siretEpics,
