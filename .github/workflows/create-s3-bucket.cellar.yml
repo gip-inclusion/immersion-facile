@@ -1,0 +1,40 @@
+name: Setup - Cellar - Add a bucket with public read rights
+
+#Warning, if used in 'workflow_dispatch' (manual) mode secret name must match exactly
+# CELLAR_ADDON_HOST
+# CELLAR_ADDON_KEY_ID
+# CELLAR_ADDON_KEY_SECRET
+
+on:
+  workflow_dispatch:
+    inputs:
+      bucket-name:
+        description: "Nom du bucket dans cellar"
+        required: true
+        type: string
+  workflow_call:
+    inputs:
+      addon-name:
+        required: true
+        type: string
+
+    secrets:
+      CELLAR_ADDON_HOST:
+        required: true
+      CELLAR_ADDON_KEY_ID:
+        required: true
+      CELLAR_ADDON_KEY_SECRET:
+        required: true
+
+jobs:
+  create-bucket:
+    runs-on: ubuntu-latest
+    container:
+      image: amazon/aws-cli
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.CELLAR_ADDON_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.CELLAR_ADDON_KEY_SECRET }}
+
+    steps:
+      - name: Create a bucket with public read access
+        run: aws s3api create-bucket --bucket ${{ inputs.bucket-name }} --acl public-read --endpoint-url ${{ CELLAR_ADDON_HOST }}

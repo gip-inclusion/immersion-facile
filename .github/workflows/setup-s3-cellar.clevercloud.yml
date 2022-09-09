@@ -1,0 +1,40 @@
+name: Setup - Cellar - Add Addon On Clevercloud
+
+on:
+  workflow_dispatch:
+    inputs:
+      addon-name:
+        description: "Nom de l'addon sur la console clevercloud"
+        required: true
+        type: string
+  workflow_call:
+    inputs:
+      addon-name:
+        required: true
+        type: string
+
+    secrets:
+      CLEVER_TOKEN:
+        required: true
+      CLEVER_SECRET:
+        required: true
+      CLEVER_ORG_ID:
+        required: false
+
+jobs:
+  deploy-cellar-addon:
+    runs-on: ubuntu-latest
+    container:
+      image: clevercloud/clever-tools
+      env:
+        CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
+        CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
+
+    steps:
+      - name: "[Personnal] Create cellar addon"
+        if: secrets.CLEVER_ORG_ID == ''
+        run: clever addon create cellar-addon ${{ inputs.addon-name }} --plan S
+
+      - name: "[Organisation] Create cellar addon"
+        if: secrets.CLEVER_ORG_ID != ''
+        run: clever addon create cellar-addon ${{ inputs.addon-name }} --plan S --org ${{ secrets.CLEVER_ORG_ID }}
