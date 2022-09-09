@@ -3,7 +3,7 @@ import {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
-import { AppIsReadyAction } from "../commonActions";
+import { appIsReadyAction } from "../actions";
 import { authSlice } from "./auth.slice";
 
 type AuthAction = ActionOfSlice<typeof authSlice>;
@@ -48,7 +48,7 @@ const checkConnectedWithFederatedIdentity: AuthEpic = (
   { deviceRepository },
 ) =>
   action$.pipe(
-    filter(AppIsReadyAction.match),
+    filter(appIsReadyAction.match),
     map(() => {
       const federatedIdentity = deviceRepository.get("federatedIdentity");
       if (federatedIdentity)

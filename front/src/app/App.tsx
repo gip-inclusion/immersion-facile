@@ -4,18 +4,18 @@ import { useFetchFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { ENV } from "src/environmentVariables";
 import { Router } from "./routing/Router";
 import { CrispChat } from "react-design-system/immersionFacile";
-import { AppIsReadyAction } from "src/core-logic/domain/commonActions";
+import { appIsReadyAction } from "src/core-logic/domain/actions";
 
-const useAppLoaded = () => {
+const useAppIsReady = () => {
   const dispatch = useDispatch();
   useLayoutEffect(() => {
-    dispatch(AppIsReadyAction());
+    dispatch(appIsReadyAction());
   }, []);
 };
 
 export const App = () => {
   useFetchFeatureFlags();
-  useAppLoaded();
+  useAppIsReady();
 
   return (
     <>

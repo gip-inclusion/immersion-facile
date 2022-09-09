@@ -5,7 +5,7 @@ import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { createTestStore } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
-import { AppIsReadyAction } from "../commonActions";
+import { appIsReadyAction } from "../actions";
 
 describe("Auth slice", () => {
   let store: ReduxStore;
@@ -49,7 +49,7 @@ describe("Auth slice", () => {
     expectFederatedIdentityToEqual(null);
     const identity: FederatedIdentity = "peConnect:123";
     dependencies.deviceRepository.set("federatedIdentity", identity);
-    store.dispatch(AppIsReadyAction());
+    store.dispatch(appIsReadyAction());
     expectFederatedIdentityToEqual(identity);
     expectFederatedIdentityInDevice(identity);
   });
@@ -57,7 +57,7 @@ describe("Auth slice", () => {
   it("shouldn't be logged in if no federatedIdentity stored in device", () => {
     expectFederatedIdentityToEqual(null);
     dependencies.deviceRepository.delete("federatedIdentity");
-    store.dispatch(AppIsReadyAction());
+    store.dispatch(appIsReadyAction());
     expectFederatedIdentityToEqual(null);
     expectFederatedIdentityInDevice(undefined);
   });

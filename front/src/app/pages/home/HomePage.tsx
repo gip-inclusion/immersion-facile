@@ -42,7 +42,12 @@ export const HomePage = () => (
         <div className="flex flex-wrap justify-center">
           <div>
             <FindImmersionHomeMenu />
-            <InitiateConventionCard />
+            <InitiateConventionCard
+              title="J'ai trouvé mon entreprise et je veux initier ma demande de convention"
+              peConnectNotice="Je suis inscrit à Pôle Emploi, je demande une convention avec :"
+              otherCaseNotice="Je suis accompagné par une autre structure :"
+              showFormButtonLabel="Je demande une convention"
+            />
           </div>
           <EstablishmentHomeMenu />
         </div>

@@ -11,13 +11,6 @@ import { useRoute } from "src/app/routing/routes";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { useRedirectToConventionWithoutIdentityProvider } from "src/hooks/redirections.hooks";
 
-type InitiateConventionCardProps = {
-  title?: string;
-  peConnectNotice?: string;
-  showFormButtonLabel?: string;
-  otherCaseNotice?: string;
-};
-
 const storeConventionRouteParamsOnDevice = (
   routeParams: ConventionPageRoute["params"],
 ) => {
@@ -28,6 +21,13 @@ const storeConventionRouteParamsOnDevice = (
       partialConvention as Partial<ConventionDto>,
     );
   }
+};
+
+type InitiateConventionCardProps = {
+  title: string;
+  peConnectNotice: string;
+  showFormButtonLabel: string;
+  otherCaseNotice: string;
 };
 
 export const InitiateConventionCard = ({
@@ -43,20 +43,11 @@ export const InitiateConventionCard = ({
 
   return (
     <Section type="candidate">
-      <EstablishmentSubTitle
-        type={"candidateForm"}
-        text={
-          title ||
-          "J'ai trouvé mon entreprise et je veux initier ma demande de convention"
-        }
-      />
+      <EstablishmentSubTitle type={"candidateForm"} text={title} />
       <div className="flex flex-col w-full h-full items-center justify-center">
         {enablePeConnectApi && (
           <>
-            <p className="text-center text-sm fr-mb-2w">
-              {peConnectNotice ||
-                "Je suis inscrit à Pôle Emploi, je demande une convention avec :"}
-            </p>
+            <p className="text-center text-sm fr-mb-2w">{peConnectNotice}</p>
             <PeConnectButton
               onClick={() => {
                 if (currentRoute.name === "convention")
@@ -71,10 +62,7 @@ export const InitiateConventionCard = ({
               Je ne connais pas mes identifiants
             </a>
             <strong className="pt-4">ou bien</strong>
-            <p className="text-center text-sm fr-my-2w">
-              {otherCaseNotice ||
-                "Je suis accompagné par une autre structure :"}
-            </p>
+            <p className="text-center text-sm fr-my-2w">{otherCaseNotice}</p>
           </>
         )}
         {/*TODO : change HomeButton to take 'candidate' and 'establishment' as type params ('error' is very confusing here...)*/}
@@ -82,7 +70,7 @@ export const InitiateConventionCard = ({
           type="error"
           onClick={redirectToConventionWithoutIdentityProvider}
         >
-          {showFormButtonLabel || "Je demande une convention"}
+          {showFormButtonLabel}
         </ButtonHome>
       </div>
     </Section>
