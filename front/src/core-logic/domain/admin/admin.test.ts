@@ -8,6 +8,7 @@ import {
   TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
+import { AppIsReadyAction } from "../commonActions";
 
 const userAndPassword = { user: "yo", password: "lala" };
 
@@ -48,14 +49,14 @@ describe("admin slice", () => {
   describe("check if already logged in", () => {
     it("appears as logged in if a token is already in device", () => {
       dependencies.deviceRepository.set("adminToken", "already-there-token");
-      store.dispatch(adminSlice.actions.checkIfLoggedInRequested());
+      store.dispatch(AppIsReadyAction());
       expectIsAuthenticatedToBe(true);
       expectTokenToBe("already-there-token");
     });
 
     it("appears as NOT logged in if a NO token in device", () => {
       dependencies.deviceRepository.delete("adminToken");
-      store.dispatch(adminSlice.actions.checkIfLoggedInRequested());
+      store.dispatch(AppIsReadyAction());
       expectIsAuthenticatedToBe(false);
       expectTokenToBe(null);
     });

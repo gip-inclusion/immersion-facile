@@ -36,7 +36,6 @@ export const adminSlice = createSlice({
       state.isLoading = false;
     },
     adminTokenStoredInDevice: (state) => state,
-    checkIfLoggedInRequested: (state) => state,
     tokenFoundInDevice: (state, action: PayloadAction<AdminToken>) => {
       state.adminToken = action.payload;
     },

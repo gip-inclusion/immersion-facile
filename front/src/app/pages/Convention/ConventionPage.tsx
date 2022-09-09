@@ -53,6 +53,15 @@ const PageContent = ({ route }: ConventionPageProps) => {
       );
   }, [route.params.federatedIdentity]);
 
+  useEffect(() => {
+    dispatch(authSlice.actions.federatedIdentityInDeviceDeletionTriggered());
+    const onWindowUnload = () => {
+      dispatch(authSlice.actions.federatedIdentityInDeviceStorageTriggered());
+    };
+    window.addEventListener("beforeunload", onWindowUnload);
+    return () => window.removeEventListener("beforeunload", onWindowUnload);
+  }, []);
+
   if (areFeatureFlagsLoading) return <CircularProgress />;
 
   if (route.params.jwt)

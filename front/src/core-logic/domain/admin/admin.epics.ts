@@ -5,6 +5,7 @@ import {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
+import { AppIsReadyAction } from "../commonActions";
 
 type AdminAction = ActionOfSlice<typeof adminSlice>;
 type AdminEpic = AppEpic<AdminAction>;
@@ -26,7 +27,7 @@ const storeTokenInDevice: AdminEpic = (action$, _, { deviceRepository }) =>
 
 const checkIfAdminLoggedIn: AdminEpic = (action$, _, { deviceRepository }) =>
   action$.pipe(
-    filter(adminSlice.actions.checkIfLoggedInRequested.match),
+    filter(AppIsReadyAction.match),
     map(() => {
       const token = deviceRepository.get("adminToken");
       if (token) return adminSlice.actions.tokenFoundInDevice(token);

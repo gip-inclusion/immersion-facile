@@ -9,16 +9,26 @@ const initialState: AuthState = {
   connectedWith: null,
 };
 
+const onFederatedIdentityReceived = (
+  state: AuthState,
+  action: PayloadAction<FederatedIdentity>,
+) => {
+  state.connectedWith = action.payload;
+};
+
 export const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    federatedIdentityProvided: (
-      state,
-      action: PayloadAction<FederatedIdentity>,
-    ) => {
-      state.connectedWith = action.payload;
-    },
-    federedIdentityStoredInDevice: (state) => state,
+    federatedIdentityProvided: onFederatedIdentityReceived,
+
+    federatedIdentityInDeviceStorageTriggered: (state) => state,
+    federatedIdentityInDeviceStorageSucceeded: (state) => state,
+
+    federatedIdentityFoundInDevice: onFederatedIdentityReceived,
+    federatedIdentityNotFoundInDevice: (state) => state,
+
+    federatedIdentityInDeviceDeletionTriggered: (state) => state,
+    federatedIdentityInDeviceDeletionSucceeded: (state) => state,
   },
 });

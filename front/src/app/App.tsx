@@ -1,21 +1,22 @@
-import React, { useEffect } from "react";
+import React, { useLayoutEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useFetchFeatureFlags } from "src/app/utils/useFeatureFlags";
-import { adminSlice } from "src/core-logic/domain/admin/admin.slice";
 import { ENV } from "src/environmentVariables";
 import { Router } from "./routing/Router";
 import { CrispChat } from "react-design-system/immersionFacile";
+import { AppIsReadyAction } from "src/core-logic/domain/commonActions";
 
-const useCheckIfUserIsAdmin = () => {
+const useAppLoaded = () => {
   const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(adminSlice.actions.checkIfLoggedInRequested());
+  useLayoutEffect(() => {
+    dispatch(AppIsReadyAction());
   }, []);
 };
 
 export const App = () => {
   useFetchFeatureFlags();
-  useCheckIfUserIsAdmin();
+  useAppLoaded();
+
   return (
     <>
       <Router />
