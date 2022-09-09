@@ -43,15 +43,12 @@ describe("Establishment", () => {
   });
 
   it("triggers navigation when siret is requested if status is 'READY_FOR_LINK_REQUEST_OR_REDIRECTION'", () => {
-    ({ store, dependencies } = createTestStore(
-      {
-        establishment: {
-          status: "READY_FOR_LINK_REQUEST_OR_REDIRECTION",
-          isLoading: false,
-        },
+    ({ store, dependencies } = createTestStore({
+      establishment: {
+        status: "READY_FOR_LINK_REQUEST_OR_REDIRECTION",
+        isLoading: false,
       },
-      "skip",
-    ));
+    }));
     store.dispatch(siretSlice.actions.siretModified("10002000300040"));
     dependencies.siretGatewayThroughBack.siretInfo$.next(establishmentFetched);
     expectNavigationToEstablishmentFormPageToHaveBeenTriggered(
@@ -60,19 +57,16 @@ describe("Establishment", () => {
   });
 
   it("triggers navigation when siret is requested if status is 'READY_FOR_LINK_REQUEST_OR_REDIRECTION', event if insee feature flag is OFF", () => {
-    ({ store, dependencies } = createTestStore(
-      {
-        establishment: {
-          status: "READY_FOR_LINK_REQUEST_OR_REDIRECTION",
-          isLoading: false,
-        },
-        featureFlags: {
-          ...makeStubFeatureFlags({ enableInseeApi: false }),
-          areFeatureFlagsLoading: false,
-        },
+    ({ store, dependencies } = createTestStore({
+      establishment: {
+        status: "READY_FOR_LINK_REQUEST_OR_REDIRECTION",
+        isLoading: false,
       },
-      "skip",
-    ));
+      featureFlags: {
+        ...makeStubFeatureFlags({ enableInseeApi: false }),
+        areFeatureFlagsLoading: false,
+      },
+    }));
     store.dispatch(siretSlice.actions.siretModified("10002000300040"));
     dependencies.siretGatewayThroughBack.isSiretInDb$.next(false);
     expectNavigationToEstablishmentFormPageToHaveBeenTriggered(

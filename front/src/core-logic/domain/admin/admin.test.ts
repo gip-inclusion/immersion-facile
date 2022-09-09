@@ -66,12 +66,9 @@ describe("admin slice", () => {
     it("disconnects the admin user", () => {
       const adminToken = "a-token";
 
-      ({ store, dependencies } = createTestStore(
-        {
-          admin: { isLoading: false, adminToken, error: null, sentEmails: [] },
-        },
-        "skip",
-      ));
+      ({ store, dependencies } = createTestStore({
+        admin: { isLoading: false, adminToken, error: null, sentEmails: [] },
+      }));
 
       dependencies.deviceRepository.set("adminToken", adminToken);
       store.dispatch(adminSlice.actions.logoutRequested());

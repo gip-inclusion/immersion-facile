@@ -23,10 +23,14 @@ describe("Auth slice", () => {
   });
 
   it("stores to device storage the federated identity when asked for", () => {
-    expectFederatedIdentityToEqual(null);
     const identity: FederatedIdentity = "peConnect:123";
+    ({ store, dependencies } = createTestStore({
+      auth: {
+        connectedWith: identity,
+      },
+    }));
     store.dispatch(
-      authSlice.actions.federatedIdentityInDeviceStorageTriggered(),
+      authSlice.actions.federatedIdentityFromStoreToDeviceStorageTriggered(),
     );
     expectFederatedIdentityInDevice(identity);
   });

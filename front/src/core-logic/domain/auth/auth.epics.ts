@@ -15,7 +15,10 @@ const storeFederatedIdentityInDevice: AuthEpic = (
   { deviceRepository },
 ) =>
   action$.pipe(
-    filter(authSlice.actions.federatedIdentityInDeviceStorageTriggered.match),
+    filter(
+      authSlice.actions.federatedIdentityFromStoreToDeviceStorageTriggered
+        .match,
+    ),
     tap(() => {
       if (state$.value.auth.connectedWith)
         deviceRepository.set(
@@ -23,7 +26,9 @@ const storeFederatedIdentityInDevice: AuthEpic = (
           state$.value.auth.connectedWith,
         );
     }),
-    map(() => authSlice.actions.federatedIdentityInDeviceStorageSucceeded()),
+    map(() =>
+      authSlice.actions.federatedIdentityFromStoreToDeviceStorageSucceeded(),
+    ),
   );
 
 const deleteFederatedIdentityFromDevice: AuthEpic = (

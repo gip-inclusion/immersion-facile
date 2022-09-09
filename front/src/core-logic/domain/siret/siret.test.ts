@@ -131,15 +131,12 @@ describe("Siret validation and fetching", () => {
 
   describe("When enableInseeApi feature flag is OFF", () => {
     beforeEach(() => {
-      ({ store, dependencies } = createTestStore(
-        {
-          featureFlags: {
-            ...makeStubFeatureFlags({ enableInseeApi: false }),
-            areFeatureFlagsLoading: false,
-          },
+      ({ store, dependencies } = createTestStore({
+        featureFlags: {
+          ...makeStubFeatureFlags({ enableInseeApi: false }),
+          areFeatureFlagsLoading: false,
         },
-        "skip",
-      ));
+      }));
     });
 
     it("when it is already in db, displays accordingly", () => {
@@ -212,14 +209,11 @@ describe("Siret validation and fetching", () => {
   };
 
   const setStoreWithInitialSiretState = (siretState: Partial<SiretState>) => {
-    ({ store, dependencies } = createTestStore(
-      {
-        siret: {
-          ...siretSlice.getInitialState(),
-          ...siretState,
-        },
+    ({ store, dependencies } = createTestStore({
+      siret: {
+        ...siretSlice.getInitialState(),
+        ...siretState,
       },
-      "skip",
-    ));
+    }));
   };
 });

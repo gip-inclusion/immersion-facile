@@ -56,7 +56,9 @@ const PageContent = ({ route }: ConventionPageProps) => {
   useEffect(() => {
     dispatch(authSlice.actions.federatedIdentityInDeviceDeletionTriggered());
     const onWindowUnload = () => {
-      dispatch(authSlice.actions.federatedIdentityInDeviceStorageTriggered());
+      dispatch(
+        authSlice.actions.federatedIdentityFromStoreToDeviceStorageTriggered(),
+      );
     };
     window.addEventListener("beforeunload", onWindowUnload);
     return () => window.removeEventListener("beforeunload", onWindowUnload);

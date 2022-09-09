@@ -19,20 +19,17 @@ import { createTestStore } from "src/core-logic/storeConfig/createTestStore";
 
 describe("Rome Autocomplete", () => {
   describe("select one of the romeOptions", () => {
-    const appAndDeps = createTestStore(
-      {
-        romeAutocomplete: {
-          selectedRome: null,
-          romeOptions: [
-            { romeCode: "A1000", romeLabel: "Job A" },
-            { romeCode: "B1000", romeLabel: "Job B" },
-          ],
-          romeSearchText: "job",
-          isSearching: false,
-        },
+    const appAndDeps = createTestStore({
+      romeAutocomplete: {
+        selectedRome: null,
+        romeOptions: [
+          { romeCode: "A1000", romeLabel: "Job A" },
+          { romeCode: "B1000", romeLabel: "Job B" },
+        ],
+        romeSearchText: "job",
+        isSearching: false,
       },
-      "Given there are 2 rome options Job A and Job B",
-    );
+    });
 
     triggerTests(appAndDeps, [
       whenRomeOptionIsSelected({ romeCode: "B1000", romeLabel: "Job B" }),
@@ -55,20 +52,17 @@ describe("Rome Autocomplete", () => {
   });
 
   describe("A rome was already selected", () => {
-    const appAndDeps = createTestStore(
-      {
-        romeAutocomplete: {
-          selectedRome: "A1000",
-          romeOptions: [
-            { romeCode: "A1000", romeLabel: "Job A" },
-            { romeCode: "B1000", romeLabel: "Job B" },
-          ],
-          romeSearchText: "A1000",
-          isSearching: false,
-        },
+    const appAndDeps = createTestStore({
+      romeAutocomplete: {
+        selectedRome: "A1000",
+        romeOptions: [
+          { romeCode: "A1000", romeLabel: "Job A" },
+          { romeCode: "B1000", romeLabel: "Job B" },
+        ],
+        romeSearchText: "A1000",
+        isSearching: false,
       },
-      "Given code rome A1000 is selected",
-    );
+    });
 
     triggerTests(appAndDeps, [
       whenSearchTextIsProvided("b"),

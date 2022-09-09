@@ -34,10 +34,7 @@ export interface TestDependencies {
   minSearchResultsToPreventRefetch: number;
 }
 
-export const createTestStore = (
-  preloadedState?: Partial<RootState>,
-  message?: "skip" | string,
-) => {
+export const createTestStore = (preloadedState?: Partial<RootState>) => {
   const dependencies: TestDependencies = {
     adminGateway: new TestAdminGateway(),
     immersionAssessmentGateway: new TestImmersionAssessmentGateway(),
@@ -55,19 +52,7 @@ export const createTestStore = (
     scheduler: new VirtualTimeScheduler(),
     minSearchResultsToPreventRefetch: 2,
   };
-
-  preloadedState &&
-    message !== "skip" &&
-    it(createMessage(preloadedState, message), () => {
-      /* do nothing */
-    });
-
   return { store: createStore({ dependencies, preloadedState }), dependencies };
-};
-
-const createMessage = (obj: object, message?: string) => {
-  if (message) return message;
-  return "creates store with initial values : " + JSON.stringify(obj, null, 2);
 };
 
 export type StoreAndDeps = ReturnType<typeof createTestStore>;

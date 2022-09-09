@@ -61,9 +61,7 @@ export const Header = ({
               )}
             </div>
             <div className="fr-header__service">
-              <a href="/" title={`Accueil - Immersion Facilitée`}>
-                <p className="fr-header__service-title">Immersion Facilitée</p>
-              </a>
+              <p className="fr-header__service-title">Immersion Facilitée</p>
               <p className="fr-header__service-tagline">
                 Faciliter la réalisation des immersions professionnelles
               </p>
