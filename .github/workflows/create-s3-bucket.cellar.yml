@@ -14,7 +14,7 @@ on:
         type: string
   workflow_call:
     inputs:
-      addon-name:
+      bucket-name:
         required: true
         type: string
 
