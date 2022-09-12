@@ -32,7 +32,7 @@ export const UploadFile = ({
         }
         if (!file) return;
 
-        const fileUrl = await technicalGateway.uploadFile(file);
+        const fileUrl = await technicalGateway.uploadLogo(file);
         setFileUrl(fileUrl);
       }}
       label={label}

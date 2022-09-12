@@ -38,7 +38,7 @@ import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { UuidGenerator } from "../../../domain/core/ports/UuidGenerator";
 import { ApiConsumerId } from "../../../domain/core/valueObjects/ApiConsumer";
 import { AdminLogin } from "../../../domain/generic/authentication/useCases/AdminLogin";
-import { UploadFile } from "../../../domain/generic/fileManagement/useCases/UploadFile";
+import { UploadLogo } from "../../../domain/generic/fileManagement/useCases/UploadLogo";
 import { GetSentEmails } from "../../../domain/generic/notifications/useCases/GetSentEmails";
 import { AddFormEstablishment } from "../../../domain/immersionOffer/useCases/AddFormEstablishment";
 import { CallLaBonneBoiteAndUpdateRepositories } from "../../../domain/immersionOffer/useCases/CallLaBonneBoiteAndUpdateRepositories";
@@ -89,7 +89,11 @@ export const createUseCases = (
   return {
     associatePeConnectFederatedIdentity:
       new AssociatePeConnectFederatedIdentity(uowPerformer, createNewEvent),
-    uploadFile: new UploadFile(uowPerformer, gateways.documentGateway),
+    uploadLogo: new UploadLogo(
+      uowPerformer,
+      gateways.documentGateway,
+      uuidGenerator,
+    ),
 
     // Address
     lookupStreetAddress: new LookupStreetAddress(gateways.addressApi),

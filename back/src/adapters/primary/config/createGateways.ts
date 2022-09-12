@@ -9,6 +9,7 @@ import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
 import { Clock } from "../../../domain/core/ports/Clock";
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
+import { DocumentGateway } from "../../../domain/generic/fileManagement/port/DocumentGateway";
 import { createLogger } from "../../../utils/logger";
 import {
   httpAdresseApiClient,
@@ -48,6 +49,7 @@ import {
 import { InMemoryPeConnectGateway } from "../../secondary/PeConnectGateway/InMemoryPeConnectGateway";
 import { ExcelExportGateway } from "../../secondary/reporting/ExcelExportGateway";
 import { InMemoryExportGateway } from "../../secondary/reporting/InMemoryExportGateway";
+import { S3DocumentGateway } from "../../secondary/S3DocumentGateway";
 import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
 
 const logger = createLogger(__filename);
@@ -110,11 +112,7 @@ export const createGateways = async (config: AppConfig, clock: Clock) => {
 
   return {
     addressApi: createAddressGateway(config),
-    documentGateway:
-      config.documentGateway === "MINIO"
-        ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          new MinioDocumentGateway(config.minioParams!)
-        : new NotImplementedDocumentGateway(),
+    documentGateway: createDocumentGateway(config),
     email: createEmailGateway(config, clock),
     laBonneBoiteAPI:
       config.laBonneBoiteGateway === "HTTPS"
@@ -215,4 +213,24 @@ const createAddressGateway = (config: AppConfig) => {
         ),
       )
     : new HttpApiAdresseAddressGateway(httpAdresseApiClient);
+};
+
+const createDocumentGateway = (config: AppConfig): DocumentGateway => {
+  switch (config.documentGateway) {
+    case "S3":
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return new S3DocumentGateway(config.cellarS3Params!);
+    case "MINIO":
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return new MinioDocumentGateway(config.minioParams!);
+    case "NONE":
+      return new NotImplementedDocumentGateway();
+    default: {
+      const exhaustiveCheck: never = config.documentGateway;
+      logger.error(
+        "Should not have been reached (Document Gateway declaration)",
+      );
+      return exhaustiveCheck;
+    }
+  }
 };

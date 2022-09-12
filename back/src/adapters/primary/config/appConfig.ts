@@ -10,6 +10,7 @@ import {
 } from "shared/src/envHelpers";
 import { DomainTopic } from "../../../domain/core/eventBus/events";
 import type { MinioParams } from "../../secondary/MinioDocumentGateway";
+import { S3Params } from "../../secondary/S3DocumentGateway";
 
 export type AccessTokenConfig = {
   immersionFacileBaseUrl: AbsoluteUrl;
@@ -313,10 +314,21 @@ export class AppConfig {
   public get documentGateway() {
     return throwIfNotInArray({
       processEnv: this.env,
-      authorizedValues: ["NONE", "MINIO"],
+      authorizedValues: ["NONE", "MINIO", "S3"],
       variableName: "DOCUMENT_GATEWAY",
       defaultValue: "NONE",
     });
+  }
+
+  public get cellarS3Params(): S3Params | undefined {
+    if (this.documentGateway === "S3") {
+      return {
+        endPoint: this.throwIfNotDefined("CELLAR_ADDON_HOST"),
+        accessKeyId: this.throwIfNotDefined("CELLAR_ADDON_KEY_ID"),
+        secretAccessKey: this.throwIfNotDefined("CELLAR_ADDON_KEY_SECRET"),
+        bucketName: this.throwIfNotDefined("MINIO_BUCKET"),
+      };
+    }
   }
 
   public get minioParams(): MinioParams | undefined {

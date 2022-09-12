@@ -11,8 +11,8 @@ export class NotImplementedDocumentGateway implements DocumentGateway {
     logger.warn("Not implemented");
   }
 
-  getFileUrl(name: string): string {
+  getFileUrl(file: StoredFile): string {
     logger.warn("Not implemented");
-    return name;
+    return file.id;
   }
 }

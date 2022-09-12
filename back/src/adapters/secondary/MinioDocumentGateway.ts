@@ -35,7 +35,7 @@ export class MinioDocumentGateway implements DocumentGateway {
     return new Promise((resolve, reject) => {
       this.minioClient.fPutObject(
         this.bucketName,
-        file.name,
+        file.id,
         file.path,
         file,
         (err) => {
@@ -49,7 +49,7 @@ export class MinioDocumentGateway implements DocumentGateway {
     });
   }
 
-  getFileUrl(name: string): string {
-    return `${this.baseUrl}/${name}`;
+  getFileUrl(file: StoredFile): string {
+    return `${this.baseUrl}/${file.id}`;
   }
 }

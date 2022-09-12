@@ -7,7 +7,7 @@ import {
   uploadFileRoute,
 } from "shared/src/routes";
 import type { AppDependencies } from "../config/createAppDependencies";
-import { FeatureDisabledError } from "../helpers/httpErrors";
+import { BadRequestError, FeatureDisabledError } from "../helpers/httpErrors";
 import { sendHttpResponse } from "../helpers/sendHttpResponse";
 
 export const createTechnicalRouter = (deps: AppDependencies) => {
@@ -34,14 +34,9 @@ export const createTechnicalRouter = (deps: AppDependencies) => {
       sendHttpResponse(req, res, async () => {
         await rejectIfFeatureFlagNotActive(deps);
 
-        if (!req.file) throw new Error("No file uploaded");
+        if (!req.file) throw new BadRequestError("No file provided");
 
-        return deps.useCases.uploadFile.execute({
-          name: req.file.originalname,
-          encoding: req.file.encoding,
-          size: req.file.size,
-          path: req.file.path,
-        });
+        return deps.useCases.uploadLogo.execute(req.file);
       }),
     );
 
