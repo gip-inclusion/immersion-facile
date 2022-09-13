@@ -9,7 +9,7 @@ export class TestTechnicalGateway implements TechnicalGateway {
   getAllFeatureFlags = () => this._featureFlags$;
 
   // eslint-disable-next-line @typescript-eslint/require-await
-  uploadFile = async (file: File): Promise<AbsoluteUrl> => {
+  uploadLogo = async (file: File): Promise<AbsoluteUrl> => {
     // eslint-disable-next-line no-console
     console.log("file uploaded : ", file);
     return `http://${file.name}-url`;

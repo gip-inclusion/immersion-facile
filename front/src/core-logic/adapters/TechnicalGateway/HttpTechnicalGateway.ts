@@ -7,7 +7,7 @@ import { from, map, Observable } from "rxjs";
 export class HttpTechnicalGateway implements TechnicalGateway {
   constructor(private readonly httpClient: AxiosInstance) {}
 
-  async uploadFile(file: File): Promise<AbsoluteUrl> {
+  async uploadLogo(file: File): Promise<AbsoluteUrl> {
     const formData = new FormData();
     formData.append(uploadFileRoute, file);
     const { data } = await this.httpClient.post(

@@ -326,7 +326,7 @@ export class AppConfig {
         endPoint: this.throwIfNotDefined("CELLAR_ADDON_HOST"),
         accessKeyId: this.throwIfNotDefined("CELLAR_ADDON_KEY_ID"),
         secretAccessKey: this.throwIfNotDefined("CELLAR_ADDON_KEY_SECRET"),
-        bucketName: this.throwIfNotDefined("MINIO_BUCKET"),
+        bucketName: this.throwIfNotDefined("CELLAR_BUCKET"),
       };
     }
   }

@@ -15,7 +15,7 @@ import {
   SubmitFeedback,
   SuccessFeedbackKind,
 } from "src/app/components/SubmitFeedback";
-import { UploadFile } from "src/app/components/UploadFile";
+import { UploadLogo } from "src/app/components/UploadLogo";
 import { agencyGateway } from "src/app/config/dependencies";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
@@ -160,7 +160,7 @@ export const AddAgencyPage = () => {
                   />
                   {enableLogoUpload && (
                     <>
-                      <UploadFile
+                      <UploadLogo
                         setFileUrl={typedSetField("logoUrl")}
                         maxSize_Mo={2}
                         label="Vous pouvez également télécharger votre logo."

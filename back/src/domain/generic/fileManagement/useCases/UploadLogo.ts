@@ -24,8 +24,10 @@ export class UploadLogo extends TransactionalUseCase<MulterFile, string> {
   inputSchema = z.any();
 
   protected async _execute(multerFile: MulterFile): Promise<string> {
+    const extension = multerFile.originalname.split(".").at(-1);
+
     const file: StoredFile = {
-      id: this.uuidGenerator.new(),
+      id: `${this.uuidGenerator.new()}.${extension}`,
       name: multerFile.originalname,
       encoding: multerFile.encoding,
       size: multerFile.size,

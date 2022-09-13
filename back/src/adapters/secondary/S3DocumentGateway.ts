@@ -2,6 +2,7 @@ import { StoredFile } from "../../domain/generic/fileManagement/entity/StoredFil
 import { DocumentGateway } from "../../domain/generic/fileManagement/port/DocumentGateway";
 import { createLogger } from "../../utils/logger";
 import * as AWS from "aws-sdk";
+import * as fse from "fs-extra";
 
 const logger = createLogger(__filename);
 
@@ -33,10 +34,13 @@ export class S3DocumentGateway implements DocumentGateway {
         {
           Key: file.id,
           Bucket: this.bucketName,
-          Body: file.path,
+          Body: fse.readFileSync(file.path),
+          ACL: "public-read",
         },
         (err) => {
-          if (err) return reject(err);
+          if (err) {
+            return reject(err);
+          }
 
           logger.info(
             `File uploaded successfully in bucket ${this.bucketName}, file id : ${file.id}, file name: ${file.name}`,

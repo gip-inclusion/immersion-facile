@@ -10,7 +10,7 @@ interface UploadFileProps {
   setFileUrl: (fileUrl: AbsoluteUrl) => void;
 }
 
-export const UploadFile = ({
+export const UploadLogo = ({
   maxSize_Mo,
   setFileUrl,
   label,
