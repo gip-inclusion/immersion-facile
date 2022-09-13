@@ -21,6 +21,7 @@ import {
 import { ConventionUkrainePageRoute } from "src/app/pages/Convention/ConventionPageForUkraine";
 import { ENV } from "src/environmentVariables";
 import { v4 as uuidV4 } from "uuid";
+import { ConventionInUrl } from "src/app/routing/route-params";
 
 const { frontEnvType } = ENV;
 
@@ -47,11 +48,11 @@ export const conventionInitialValuesFromUrl = (
 ): ConventionPresentation => {
   const internshipKind: InternshipKind = "immersion"; // This will depend on the route
 
-  const dataFromDevice = deviceRepository.get("partialConvention") ?? {};
+  const dataFromDevice = deviceRepository.get("partialConventionInUrl") ?? {};
 
   const params = mergeObjectsExceptFalsyValues(
     dataFromDevice,
-    route.params as Partial<ConventionPresentation>,
+    route.params as Partial<ConventionInUrl>,
   );
 
   const dateStart =
@@ -64,29 +65,32 @@ export const conventionInitialValuesFromUrl = (
     status: "DRAFT" as ConventionStatus,
     dateSubmission: toDateString(startOfToday()),
 
-    //Federated Identity
     signatories: {
-      beneficiary:
-        {
-           federatedIdentity: params.federatedIdentity as FederatedIdentity| undefined,
-           signedAt: null
-        },
+      beneficiary: {
+        role: "beneficiary",
+        firstName: params.firstName ?? "",
+        lastName: params.lastName ?? "",
+        email: params.email ?? "",
+        phone: params.phone ?? "",
+        emergencyContact: params.emergencyContact ?? "",
+        emergencyContactPhone: params.emergencyContactPhone ?? "",
+        federatedIdentity: params.federatedIdentity as
+          | FederatedIdentity
+          | undefined,
+        signedAt: null,
+      },
       mentor: {
-        firstName: params.mentor
-        mentor: params.mentor ?? "",
-        mentorPhone: params.mentorPhone ?? "",
-        mentorEmail: params.mentorEmail ?? "",
-      }
-    }
+        role: "establishment",
+        firstName: params.mentorFirstName ?? "",
+        lastName: params.mentorLastName ?? "",
+        email: params.mentorEmail ?? "",
+        phone: params.mentorPhone ?? "",
+        job: params.mentorJob ?? "",
+        signedAt: null,
+      },
+    },
 
-    // Participant
-    email: params.email ?? "",
-    firstName: params.firstName ?? "",
-    lastName: params.lastName ?? "",
-    phone: params.phone ?? "",
     postalCode: params.postalCode ?? "",
-    emergencyContact: params.emergencyContact ?? "",
-    emergencyContactPhone: params.emergencyContactPhone ?? "",
 
     dateStart,
     dateEnd,
@@ -94,9 +98,6 @@ export const conventionInitialValuesFromUrl = (
     // Enterprise
     siret: params.siret ?? "",
     businessName: params.businessName ?? "",
-    mentor: params.mentor ?? "",
-    mentorPhone: params.mentorPhone ?? "",
-    mentorEmail: params.mentorEmail ?? "",
     schedule:
       params.schedule ??
       reasonableSchedule({
@@ -120,10 +121,6 @@ export const conventionInitialValuesFromUrl = (
     immersionActivities: params.immersionActivities ?? "",
     immersionSkills: params.immersionSkills ?? "",
 
-    // Signatures
-    beneficiaryAccepted: false,
-    enterpriseAccepted: false,
-
     // Kind
     internshipKind,
   };
@@ -136,47 +133,62 @@ export const conventionInitialValuesFromUrl = (
 
 const devPrefilledValues = (
   emptyForm: ConventionPresentation,
-): ConventionPresentation => ({
-  ...emptyForm,
+): ConventionPresentation => {
+  const { beneficiary, mentor } = emptyForm.signatories;
 
-  // Participant
-  email: emptyForm.email || "sylvanie@monemail.fr",
-  firstName: emptyForm.firstName || "Sylvanie",
-  lastName: emptyForm.lastName || "Durand",
-  phone: emptyForm.phone || "0612345678",
-  postalCode: emptyForm.postalCode || "75001",
-  emergencyContact: emptyForm.emergencyContact || "Éric Durand",
-  emergencyContactPhone: emptyForm.emergencyContactPhone || "0662552607",
+  return {
+    ...emptyForm,
 
-  // Enterprise
-  siret: emptyForm.siret || "1234567890123",
-  businessName: emptyForm.businessName || "Futuroscope",
-  mentor: emptyForm.mentor || "Le Mentor du futur",
-  mentorPhone: emptyForm.mentorPhone || "0101100110",
-  mentorEmail: emptyForm.mentorEmail || "mentor@supermentor.fr",
-  immersionAddress:
-    emptyForm.immersionAddress ||
-    "Societe Du Parc Du Futuroscope PARC DU FUTUROSCOPE 86130 JAUNAY-MARIGNY",
-  agencyId: emptyForm.agencyId || "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+    signatories: {
+      beneficiary: {
+        role: "beneficiary",
+        firstName: beneficiary.firstName || "Sylvanie",
+        lastName: beneficiary.lastName || "Durand",
+        email: beneficiary.email || "sylvanie@monemail.fr",
+        phone: beneficiary.phone || "0612345678",
+        emergencyContact: beneficiary.emergencyContact || "Éric Durand",
+        emergencyContactPhone:
+          beneficiary.emergencyContactPhone || "0662552607",
+        federatedIdentity: beneficiary.federatedIdentity,
+        signedAt: null,
+      },
+      mentor: {
+        role: "establishment",
+        firstName: mentor.firstName || "Joe",
+        lastName: mentor.lastName || "Le mentor",
+        phone: mentor.phone || "0101100110",
+        email: mentor.email || "mentor@supermentor.fr",
+        job: mentor.job,
+        signedAt: null,
+      },
+    },
 
-  // Covid
-  individualProtection: emptyForm.individualProtection ?? true,
-  sanitaryPrevention: emptyForm.sanitaryPrevention ?? true,
-  sanitaryPreventionDescription:
-    emptyForm.sanitaryPreventionDescription || "Aucunes",
+    // Participant
+    postalCode: emptyForm.postalCode || "75001",
 
-  // Immersion
-  immersionObjective: emptyForm.immersionObjective,
-  immersionAppellation: emptyForm.immersionAppellation || {
-    romeLabel: "Boulanger / Boulangère",
-    appellationLabel: "Boulangerie",
-    romeCode: "D1502",
-    appellationCode: "12278",
-  },
-  immersionActivities: emptyForm.immersionActivities || "Superviser",
-  immersionSkills: emptyForm.immersionSkills || "Attention au détail",
+    // Enterprise
+    siret: emptyForm.siret || "1234567890123",
+    businessName: emptyForm.businessName || "Futuroscope",
+    immersionAddress:
+      emptyForm.immersionAddress ||
+      "Societe Du Parc Du Futuroscope PARC DU FUTUROSCOPE 86130 JAUNAY-MARIGNY",
+    agencyId: emptyForm.agencyId || "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
 
-  // Signatures
-  beneficiaryAccepted: false,
-  enterpriseAccepted: false,
-});
+    // Covid
+    individualProtection: emptyForm.individualProtection ?? true,
+    sanitaryPrevention: emptyForm.sanitaryPrevention ?? true,
+    sanitaryPreventionDescription:
+      emptyForm.sanitaryPreventionDescription || "Aucunes",
+
+    // Immersion
+    immersionObjective: emptyForm.immersionObjective,
+    immersionAppellation: emptyForm.immersionAppellation || {
+      romeLabel: "Boulanger / Boulangère",
+      appellationLabel: "Boulangerie",
+      romeCode: "D1502",
+      appellationCode: "12278",
+    },
+    immersionActivities: emptyForm.immersionActivities || "Superviser",
+    immersionSkills: emptyForm.immersionSkills || "Attention au détail",
+  };
+};

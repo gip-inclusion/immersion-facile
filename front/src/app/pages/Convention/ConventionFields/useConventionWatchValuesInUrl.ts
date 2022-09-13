@@ -1,9 +1,9 @@
 import { useEffect } from "react";
-import { ConventionDto } from "shared/src/convention/convention.dto";
+import { ConventionInUrl } from "src/app/routing/route-params";
 import { routes, useRoute } from "src/app/routing/routes";
 
 export const useConventionWatchValuesInUrl = (
-  watchedValues: Partial<ConventionDto>,
+  watchedValues: ConventionInUrl,
 ) => {
   const {
     schedule,

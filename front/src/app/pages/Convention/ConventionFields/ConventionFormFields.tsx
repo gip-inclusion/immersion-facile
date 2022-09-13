@@ -37,7 +37,7 @@ export const ConventionFormFields = ({
   onRejectForm = async () => {},
 }: ConventionFieldsProps) => {
   useEffect(() => {
-    deviceRepository.delete("partialConvention");
+    deviceRepository.delete("partialConventionInUrl");
   }, []);
 
   const { errors, submitCount, isSubmitting, submitForm, values } =

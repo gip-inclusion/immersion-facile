@@ -1,5 +1,8 @@
 import { ConventionDto } from "shared/src/convention/convention.dto";
-import { ConventionFormKeysInUrl } from "src/app/routing/route-params";
+import {
+  ConventionFormKeysInUrl,
+  ConventionInUrl,
+} from "src/app/routing/route-params";
 
 const commonKeysToWatch: ConventionFormKeysInUrl[] = [
   "email",
@@ -12,7 +15,9 @@ const commonKeysToWatch: ConventionFormKeysInUrl[] = [
   "dateEnd",
   "siret",
   "businessName",
-  "mentor",
+  "mentorFirstName",
+  "mentorLastName",
+  "mentorJob",
   "mentorEmail",
   "mentorPhone",
   "agencyId",
@@ -28,20 +33,56 @@ const commonKeysToWatch: ConventionFormKeysInUrl[] = [
   "immersionAppellation",
 ];
 
-export const makeValuesToWatchInUrl = (values: ConventionDto) => {
+const convertToConventionInUrl = (
+  conventionDto: ConventionDto,
+): ConventionInUrl => {
+  const {
+    signatories: { beneficiary, mentor },
+    ...flatValues
+  } = conventionDto;
+
+  return {
+    ...flatValues,
+    mentorFirstName: mentor.firstName,
+    mentorLastName: mentor.lastName,
+    mentorPhone: mentor.phone,
+    mentorEmail: mentor.email,
+    mentorJob: mentor.job,
+    firstName: beneficiary.firstName,
+    lastName: beneficiary.lastName,
+    email: beneficiary.email,
+    phone: beneficiary.phone,
+    emergencyContact: beneficiary.emergencyContact,
+    emergencyContactPhone: beneficiary.emergencyContactPhone,
+    federatedIdentity: beneficiary.federatedIdentity,
+  };
+};
+
+export const makeValuesToWatchInUrl = (conventionDto: ConventionDto) => {
+  const conventionInUrl = convertToConventionInUrl(conventionDto);
   const keysToWatch: ConventionFormKeysInUrl[] = [
     ...commonKeysToWatch,
     "postalCode",
   ];
 
   return keysToWatch.reduce(
-    (acc, watchedKey) => ({ ...acc, [watchedKey]: values[watchedKey] }),
-    {} as Partial<ConventionDto>,
+    (acc, watchedKey) => ({
+      ...acc,
+      [watchedKey]: conventionInUrl[watchedKey],
+    }),
+    {} as ConventionInUrl,
   );
 };
 
-export const makeValuesToWatchInUrlForUkraine = (values: ConventionDto) =>
-  commonKeysToWatch.reduce(
-    (acc, watchedKey) => ({ ...acc, [watchedKey]: values[watchedKey] }),
-    {} as Partial<ConventionDto>,
+export const makeValuesToWatchInUrlForUkraine = (
+  conventionDto: ConventionDto,
+) => {
+  const conventionInUrl = convertToConventionInUrl(conventionDto);
+  return commonKeysToWatch.reduce(
+    (acc, watchedKey) => ({
+      ...acc,
+      [watchedKey]: conventionInUrl[watchedKey],
+    }),
+    {} as ConventionInUrl,
   );
+};

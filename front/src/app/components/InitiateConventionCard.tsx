@@ -1,7 +1,6 @@
 import { keys } from "ramda";
 import React from "react";
 import { ButtonHome } from "react-design-system";
-import { ConventionDto } from "shared/src/convention/convention.dto";
 import { Section } from "src/app/components/Section";
 import { deviceRepository } from "src/app/config/dependencies";
 import { ConventionPageRoute } from "src/app/pages/Convention/ConventionPage";
@@ -14,12 +13,9 @@ import { useRedirectToConventionWithoutIdentityProvider } from "src/hooks/redire
 const storeConventionRouteParamsOnDevice = (
   routeParams: ConventionPageRoute["params"],
 ) => {
-  const { federatedIdentity, ...partialConvention } = routeParams;
+  const { federatedIdentity, jwt, ...partialConvention } = routeParams;
   if (keys(partialConvention).length) {
-    deviceRepository.set(
-      "partialConvention",
-      partialConvention as Partial<ConventionDto>,
-    );
+    deviceRepository.set("partialConventionInUrl", partialConvention);
   }
 };
 

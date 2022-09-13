@@ -1,5 +1,5 @@
 import { FederatedIdentity } from "shared/src/federatedIdentities/federatedIdentity.dto";
-import { ConventionPresentation } from "src/app/pages/Convention/ConventionPage";
+import { ConventionInUrl } from "src/app/routing/route-params";
 
 type GenericPair<K extends string, Payload> = {
   key: K;
@@ -7,7 +7,7 @@ type GenericPair<K extends string, Payload> = {
 };
 
 type StoredPair =
-  | GenericPair<"partialConvention", Partial<ConventionPresentation>>
+  | GenericPair<"partialConventionInUrl", Partial<ConventionInUrl>>
   | GenericPair<"adminToken", string>
   | GenericPair<"federatedIdentity", FederatedIdentity>;
 

@@ -23,7 +23,16 @@ const appellationDtoSerializer: ValueSerializer<AppellationDto> = {
   stringify: (appellationDto) => JSON.stringify(appellationDto),
 };
 
-export type ConventionFormKeysInUrl = keyof typeof conventionValuesFromUrl;
+export type ConventionInUrl = Partial<{
+  [K in keyof ConventionQueryParams]: ConventionQueryParams[K]["~internal"]["valueSerializer"] extends ValueSerializer<
+    infer T
+  >
+    ? T
+    : never;
+}>;
+
+export type ConventionFormKeysInUrl = keyof ConventionQueryParams;
+type ConventionQueryParams = typeof conventionValuesFromUrl;
 
 export const conventionValuesFromUrl = {
   federatedIdentity: param.query.optional.string,
@@ -37,7 +46,9 @@ export const conventionValuesFromUrl = {
   postalCode: param.query.optional.string,
   siret: param.query.optional.string,
   businessName: param.query.optional.string,
-  mentor: param.query.optional.string,
+  mentorFirstName: param.query.optional.string,
+  mentorLastName: param.query.optional.string,
+  mentorJob: param.query.optional.string,
   mentorPhone: param.query.optional.string,
   mentorEmail: param.query.optional.string,
   immersionAddress: param.query.optional.string,
