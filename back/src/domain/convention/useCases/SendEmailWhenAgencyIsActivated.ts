@@ -19,6 +19,7 @@ export class SendEmailWhenAgencyIsActivated extends UseCase<WithAgency> {
       recipients: agency.validatorEmails,
       params: {
         agencyName: agency.name,
+        agencyLogoUrl: agency.logoUrl,
       },
     });
   }

@@ -217,6 +217,7 @@ const sendInBlueKeyByEmailVariables: Record<EmailVariables, string> = {
   advisorFirstName: "ADVISOR_FIRST_NAME",
   advisorLastName: "ADVISOR_LAST_NAME",
   agency: "AGENCY",
+  agencyLogoUrl: "AGENCY_LOGO_URL",
   agencyName: "AGENCY_NAME",
   beneficiaryEmail: "BENEFICIARY_EMAIL",
   beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
@@ -246,6 +247,7 @@ const sendInBlueKeyByEmailVariables: Record<EmailVariables, string> = {
   individualProtection: "INDIVIDUAL_PROTECTION",
   jobLabel: "JOB_LABEL",
   lastName: "LAST_NAME",
+
   magicLink: "MAGIC_LINK",
   mentor: "MENTOR",
   mentorName: "MENTOR_NAME",

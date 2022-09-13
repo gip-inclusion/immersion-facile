@@ -262,6 +262,7 @@ type AgencyWasActivatedEmail = GenericTemplatedEmail<
   "AGENCY_WAS_ACTIVATED",
   {
     agencyName: string;
+    agencyLogoUrl?: string;
   }
 >;
 
