@@ -29,7 +29,12 @@
     "test:front": "pnpm front test",
     "test:shared": "pnpm shared test",
     "tests": "concurrently --kill-others-on-fail \"pnpm:test:*\"",
-    "fullcheck": "concurrently --kill-others-on-fail \"pnpm:tests\" \"pnpm:prettier:check\" \"pnpm:lints\""
+    "typecheck:back": "pnpm back typecheck",
+    "typecheck:front": "pnpm front typecheck",
+    "typecheck:shared": "pnpm shared typecheck",
+    "typecheck:react-design-system": "pnpm react-design-system typecheck",
+    "typechecks": "concurrently --kill-others-on-fail \"pnpm:typecheck:*\"",
+    "fullcheck": "concurrently --kill-others-on-fail \"pnpm:tests\" \"pnpm:prettier:check\" \"pnpm:lints\"  \"pnpm:typechecks\""
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.35.1",
