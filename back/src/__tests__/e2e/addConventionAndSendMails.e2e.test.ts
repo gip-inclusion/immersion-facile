@@ -134,6 +134,8 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
   };
 });
 
+const numberOfEmailInitialySent = 2;
+
 const beneficiarySubmitsApplicationForTheFirstTime = async (
   { request, gateways, eventCrawler, inMemoryUow }: TestAppAndDeps,
   convention: ConventionDto,
@@ -153,11 +155,10 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   await eventCrawler.processNewEvents();
 
   const sentEmails = gateways.email.getSentEmails();
-  expect(sentEmails).toHaveLength(3);
+  expect(sentEmails).toHaveLength(numberOfEmailInitialySent);
   expect(sentEmails.map((e) => e.recipients)).toEqual([
     [VALID_EMAILS[0]],
     [VALID_EMAILS[1]],
-    ["validator@mail.com"],
   ]);
 
   const beneficiarySignEmail = expectEmailOfType(
@@ -209,7 +210,7 @@ const beneficiarySignsApplication = async (
   await eventCrawler.processNewEvents();
 
   const sentEmails = gateways.email.getSentEmails();
-  expect(sentEmails).toHaveLength(3);
+  expect(sentEmails).toHaveLength(numberOfEmailInitialySent);
 };
 
 const establishmentSignsApplication = async (
@@ -239,7 +240,7 @@ const establishmentSignsApplication = async (
   await eventCrawler.processNewEvents();
 
   const sentEmails = gateways.email.getSentEmails();
-  expect(sentEmails).toHaveLength(4);
+  expect(sentEmails).toHaveLength(numberOfEmailInitialySent + 1);
   const needsReviewEmail = expectEmailOfType(
     sentEmails[sentEmails.length - 1],
     "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
@@ -286,7 +287,7 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
 
   await eventCrawler.processNewEvents();
   const sentEmails = gateways.email.getSentEmails();
-  expect(sentEmails).toHaveLength(5);
+  expect(sentEmails).toHaveLength(numberOfEmailInitialySent + 2);
   const needsToTriggerConventionSentEmail = sentEmails[sentEmails.length - 1];
   expectTypeToMatchAndEqual(
     needsToTriggerConventionSentEmail.type,
