@@ -3,6 +3,9 @@ import { DocumentGateway } from "../../domain/generic/fileManagement/port/Docume
 import { createLogger } from "../../utils/logger";
 import * as AWS from "aws-sdk";
 import * as fse from "fs-extra";
+import { promisify } from "util";
+
+const readFile = promisify<string, Buffer>(fse.readFile);
 
 const logger = createLogger(__filename);
 
@@ -28,13 +31,14 @@ export class S3DocumentGateway implements DocumentGateway {
     this.s3 = new AWS.S3({ endpoint: params.endPoint });
   }
 
-  put(file: StoredFile): Promise<void> {
+  async put(file: StoredFile): Promise<void> {
+    const body = await readFile(file.path);
     return new Promise((resolve, reject) => {
       this.s3.putObject(
         {
           Key: file.id,
           Bucket: this.bucketName,
-          Body: fse.readFileSync(file.path),
+          Body: body,
           ACL: "public-read",
         },
         (err) => {
