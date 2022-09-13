@@ -1,7 +1,7 @@
 import React from "react";
 
 export type NavLink = {
-  onClick?: () => void;
+  onClick?: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void;
   label: string;
   href: string;
   active?: boolean;

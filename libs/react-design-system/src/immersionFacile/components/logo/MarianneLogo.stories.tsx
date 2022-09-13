@@ -1,6 +1,6 @@
 import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
 import React from "react";
-import { ButtonProperties } from "src/designSystemFrance/button/Button";
+import { ButtonProperties } from "src/designSystemFrance/components/button/Button";
 import { logoPrefix } from ".";
 import { MarianneLogo } from "./MarianneLogo";
 

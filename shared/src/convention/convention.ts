@@ -49,9 +49,8 @@ export const signConventionDtoWithRole = (
   };
 };
 
-export const isSignatory = (role: Role): role is SignatoryRole => {
-  return signatoryRoles.includes(role as SignatoryRole);
-};
+export const isSignatory = (role: Role): role is SignatoryRole =>
+  signatoryRoles.includes(role as SignatoryRole);
 
 const beneficiary: Beneficiary = {
   role: "beneficiary",

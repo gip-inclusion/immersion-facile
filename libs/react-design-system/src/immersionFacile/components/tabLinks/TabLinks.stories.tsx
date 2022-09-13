@@ -15,35 +15,30 @@ export default {
 const navLinks: NavLink[] = [
   {
     label: "My first tab",
-    link: {
-      href: "#1",
-      onClick: (e) => {
-        e.preventDefault();
-        // eslint-disable-next-line no-console
-        console.log("clicked firstTab");
-      },
+    href: "#1",
+    onClick: (e) => {
+      e.preventDefault();
+      // eslint-disable-next-line no-console
+      console.log("clicked firstTab");
     },
   },
   {
     label: "My second tab",
-    link: {
-      href: "#2",
-      onClick: (e) => {
-        e.preventDefault();
-        // eslint-disable-next-line no-console
-        console.log("clicked second Tab");
-      },
+    href: "#2",
+    onClick: (e) => {
+      e.preventDefault();
+      // eslint-disable-next-line no-console
+      console.log("clicked second Tab");
     },
   },
   {
     label: "My third tab",
-    link: {
-      href: "#3",
-      onClick: (e) => {
-        e.preventDefault();
-        // eslint-disable-next-line no-console
-        console.log("clicked third Tab");
-      },
+
+    href: "#3",
+    onClick: (e) => {
+      e.preventDefault();
+      // eslint-disable-next-line no-console
+      console.log("clicked third Tab");
     },
   },
 ];
