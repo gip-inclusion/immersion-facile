@@ -1,12 +1,22 @@
 import { Formik } from "formik";
 import React, { useEffect, useState } from "react";
-import { ConventionReadDto } from "shared/src/convention/convention.dto";
+import {
+  getConventionField,
+  isSignatory,
+} from "shared/src/convention/convention";
+import {
+  ConventionReadDto,
+  Signatory,
+  SignatoryRole,
+  signatoryRoles,
+} from "shared/src/convention/convention.dto";
 import { conventionSchema } from "shared/src/convention/convention.schema";
 import {
   ConventionMagicLinkPayload,
   Role,
 } from "shared/src/tokens/MagicLinkPayload";
 import { Notification } from "react-design-system/immersionFacile";
+import { exhaustiveCheck } from "shared/src/utils";
 import { ImmersionMarianneHeader } from "src/app/components/ImmersionMarianneHeader";
 import {
   SubmitFeedback,
@@ -28,16 +38,34 @@ interface SignFormProps {
   route: SignFormRoute;
 }
 
+const toDisplayedName = (signatory: Signatory<any>) =>
+  `${signatory.lastName.toUpperCase()} ${signatory.firstName}`;
+
+const getNameFromRole = (
+  convention: ConventionReadDto,
+  role: SignatoryRole,
+): string => {
+  switch (role) {
+    case "beneficiary":
+      return toDisplayedName(convention.signatories.beneficiary);
+    case "establishment":
+      return toDisplayedName(convention.signatories.mentor);
+    default:
+      return exhaustiveCheck(role);
+  }
+};
+
 const extractRoleAndName = (
   jwt: string,
   convention: ConventionReadDto,
-): [Role, string] => {
+): [SignatoryRole, string] => {
   const payload = decodeJwt<ConventionMagicLinkPayload>(jwt);
   const role = payload.role;
-  const name =
-    role === "beneficiary"
-      ? `${convention.lastName.toUpperCase()} ${convention.firstName}`
-      : `${convention.mentor}`;
+  if (!isSignatory(role))
+    throw new Error(
+      `Only ${signatoryRoles.join(", ")} are allow to sign, received ${role}`,
+    );
+  const name = getNameFromRole(convention, role);
   return [role, name];
 };
 
@@ -100,7 +128,7 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
   const [initialValues, setInitialValues] =
     useState<Partial<ConventionReadDto> | null>(null);
   const [signeeName, setSigneeName] = useState<string | undefined>();
-  const [signeeRole, setSigneeRole] = useState<Role | undefined>();
+  const [signeeRole, setSigneeRole] = useState<SignatoryRole | undefined>();
   const [alreadySigned, setAlreadySigned] = useState(false);
 
   const [submitFeedback, setSubmitFeedback] = useState<
@@ -114,9 +142,9 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
     setSigneeRole(role);
     // Uncheck the checkbox.
     if (role === "beneficiary") {
-      setAlreadySigned(convention.beneficiaryAccepted);
+      setAlreadySigned(!!convention.signatories.beneficiary.signedAt);
     } else if (role === "establishment") {
-      setAlreadySigned(convention.enterpriseAccepted);
+      setAlreadySigned(!!convention.signatories.mentor.signedAt);
     }
     setInitialValues(convention);
   }, [!!convention]);
@@ -153,17 +181,18 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
                 // Confirm checkbox
                 const conditionsAccepted =
                   signeeRole === "beneficiary"
-                    ? values.beneficiaryAccepted
-                    : values.enterpriseAccepted;
+                    ? !!values?.signatories?.beneficiary?.signedAt
+                    : !!values?.signatories?.mentor?.signedAt;
+
                 if (!conditionsAccepted) {
                   setErrors({
-                    beneficiaryAccepted:
+                    [getConventionField("signatories.beneficiary.signedAt")]:
                       signeeRole === "beneficiary"
-                        ? "Engagement est obligatoire"
+                        ? "La signature est obligatoire"
                         : undefined,
-                    enterpriseAccepted:
+                    [getConventionField("signatories.beneficiary.signedAt")]:
                       signeeRole === "establishment"
-                        ? "Engagement est obligatoire"
+                        ? "La signature est obligatoire"
                         : undefined,
                   });
                   setSubmitting(false);

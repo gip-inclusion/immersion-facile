@@ -51,3 +51,25 @@ export const replaceArrayElement = <T>(
   replaceBy,
   ...original.slice(replaceAt + 1),
 ];
+
+export const exhaustiveCheck = (shouldBeNever: never) => {
+  // eslint-disable-next-line no-console
+  console.error("Should not have been reached (Document Gateway declaration)");
+  return shouldBeNever;
+};
+
+export type ValueOf<T> = T[keyof T];
+
+type DotPrefix<T extends string> = T extends "" ? "" : `.${T}`;
+
+export type DotNestedKeys<T> = (
+  T extends object
+    ? {
+        [K in Exclude<keyof T, symbol>]: `${K}${DotPrefix<
+          DotNestedKeys<T[K]>
+        >}`;
+      }[Exclude<keyof T, symbol>]
+    : ""
+) extends infer D
+  ? Extract<D, string>
+  : never;

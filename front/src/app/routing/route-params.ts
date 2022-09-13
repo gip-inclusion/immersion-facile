@@ -31,10 +31,10 @@ export const conventionValuesFromUrl = {
   firstName: param.query.optional.string,
   lastName: param.query.optional.string,
   phone: param.query.optional.string,
-  postalCode: param.query.optional.string,
   emergencyContact: param.query.optional.string,
   emergencyContactPhone: param.query.optional.string,
 
+  postalCode: param.query.optional.string,
   siret: param.query.optional.string,
   businessName: param.query.optional.string,
   mentor: param.query.optional.string,

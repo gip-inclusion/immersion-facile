@@ -35,9 +35,18 @@ export const ConventionForm = ({
   const federatedIdentity = useAppSelector(authSelectors.connectedWith);
   const [initialValues, setInitialValues] = useState<ConventionPresentation>({
     ...properties,
-    federatedIdentity:
-      properties.federatedIdentity ?? federatedIdentity ?? undefined,
+    signatories: {
+      ...properties.signatories,
+      beneficiary: {
+        ...properties.signatories.beneficiary,
+        federatedIdentity:
+          properties.signatories.beneficiary.federatedIdentity ??
+          federatedIdentity ??
+          undefined,
+      },
+    },
   });
+
   useExistingSiret(initialValues.siret);
   const [submitFeedback, setSubmitFeedback] = useState<
     SuccessFeedbackKind | Error | null

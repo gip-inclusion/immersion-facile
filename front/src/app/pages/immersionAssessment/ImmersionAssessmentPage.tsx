@@ -68,7 +68,9 @@ export const ImmersionAssessmentPage = ({
     <HeaderFooterLayout>
       <Title>
         Bilan de l'immersion{" "}
-        {convention ? `de ${convention.firstName} ${convention.lastName}` : ""}
+        {convention
+          ? `de ${convention.signatories.beneficiary.firstName} ${convention.signatories.beneficiary.lastName}`
+          : ""}
       </Title>
       {isLoading && <CircularProgress />}
       {conventionFetchError && <div>{conventionFetchError}</div>}
@@ -149,7 +151,8 @@ const ImmersionDescription = ({
   <p>
     L'immersion de{" "}
     <Bold>
-      {convention.firstName} {convention.lastName}
+      {convention.signatories.beneficiary.firstName}{" "}
+      {convention.signatories.beneficiary.lastName}
     </Bold>{" "}
     auprès de l'établissement <Bold>{convention.businessName}</Bold> qui a eu
     lieu du <Bold>{toDisplayedDate(new Date(convention.dateStart))} </Bold>au{" "}

@@ -49,8 +49,7 @@ export const ConventionFormAccordion = ({
 }: ConventionFormAccordionProps) => {
   const {
     status,
-    lastName,
-    firstName,
+    signatories: { beneficiary },
     businessName,
     dateStart,
     dateEnd: _,
@@ -58,7 +57,9 @@ export const ConventionFormAccordion = ({
 
   const title =
     `${getPrefix(status)} ` +
-    `${lastName.toUpperCase()} ${firstName} chez ${businessName} ` +
+    `${beneficiary.lastName.toUpperCase()} ${
+      beneficiary.firstName
+    } chez ${businessName} ` +
     `${beforeAfterString(dateStart)}`;
 
   return (

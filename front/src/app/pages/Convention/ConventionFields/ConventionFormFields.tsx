@@ -1,5 +1,6 @@
 import { useFormikContext } from "formik";
 import React, { useEffect } from "react";
+import { getConventionField } from "shared/src/convention/convention";
 import type { ConventionDto } from "shared/src/convention/convention.dto";
 import { AgencyDisplay } from "src/app/components/AgencyDisplay";
 import { AgencySelector } from "src/app/components/AgencySelector";
@@ -51,7 +52,10 @@ export const ConventionFormFields = ({
       {isFrozen && isSignatureMode && (
         <ConventionSignOnlyMessage isAlreadySigned={alreadySigned ?? false} />
       )}
-      <input type="hidden" name="federatedIdentity" />
+      <input
+        type="hidden"
+        name={getConventionField("signatories.beneficiary.federatedIdentity")}
+      />
       <FormSectionTitle>Pour commencer nous avons besoin de</FormSectionTitle>
       {isFrozen ? (
         <AgencyDisplay
@@ -74,7 +78,7 @@ export const ConventionFormFields = ({
         2. Coordonnées de l'entreprise
         <ShareActions
           isFrozen={isFrozen}
-          federatedIdentity={values.federatedIdentity}
+          federatedIdentity={values.signatories.beneficiary.federatedIdentity}
         />
       </FormSectionTitle>
       <h4>
@@ -86,7 +90,7 @@ export const ConventionFormFields = ({
         3. Conditions d’accueil de l’immersion professionnelle
         <ShareActions
           isFrozen={isFrozen}
-          federatedIdentity={values.federatedIdentity}
+          federatedIdentity={values.signatories.beneficiary.federatedIdentity}
         />
       </FormSectionTitle>
       <ImmersionConditionsCommonFields disabled={isFrozen} />

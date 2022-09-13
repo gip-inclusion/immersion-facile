@@ -64,6 +64,9 @@ export type ConventionDtoWithoutExternalId = {
 };
 
 export type Signatories = { beneficiary: Beneficiary; mentor: Mentor }; // legalRepresentative?: LegalRepresentative
+export type SignatoryRole = Signatories[keyof Signatories]["role"];
+
+export const signatoryRoles: SignatoryRole[] = ["beneficiary", "establishment"];
 
 export type Signatory<R extends Role> = {
   role: R;

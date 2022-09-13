@@ -4,6 +4,7 @@ import {
   ManagedAxios,
   onFullfilledDefaultResponseInterceptorMaker,
 } from "shared/src/serenity-http-client";
+import { exhaustiveCheck } from "shared/src/utils";
 
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
 import { Clock } from "../../../domain/core/ports/Clock";
@@ -216,3 +217,22 @@ const createAddressGateway = (config: AppConfig) => {
       )
     : new HttpApiAdresseAddressGateway(httpAdresseApiClient);
 };
+<<<<<<< Updated upstream
+=======
+
+const createDocumentGateway = (config: AppConfig): DocumentGateway => {
+  switch (config.documentGateway) {
+    case "S3":
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return new S3DocumentGateway(config.cellarS3Params!);
+    case "MINIO":
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return new MinioDocumentGateway(config.minioParams!);
+    case "NONE":
+      return new NotImplementedDocumentGateway();
+    default: {
+      return exhaustiveCheck(config.documentGateway);
+    }
+  }
+};
+>>>>>>> Stashed changes

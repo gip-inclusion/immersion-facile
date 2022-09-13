@@ -1,6 +1,10 @@
 import { CircularProgress } from "@mui/material";
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
+import {
+  ConventionDto,
+  Signatories,
+} from "shared/src/convention/convention.dto";
 import { FederatedIdentity } from "shared/src/federatedIdentities/federatedIdentity.dto";
 import { OmitFromExistingKeys } from "shared/src/utils";
 import { InitiateConventionCard } from "src/app/components/InitiateConventionCard";
@@ -10,7 +14,6 @@ import { ConventionFormContainerLayout } from "src/app/pages/Convention/Conventi
 import { conventionInitialValuesFromUrl } from "src/app/pages/Convention/conventionHelpers";
 
 import { routes } from "src/app/routing/routes";
-import { ConventionDto } from "shared/src/convention/convention.dto";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
@@ -23,13 +26,19 @@ interface ConventionPageProps {
   route: ConventionPageRoute;
 }
 
+type WithSignatures = {
+  signatories: {
+    [K in keyof Signatories]:
+      | Partial<Signatories[K]>
+      | Pick<Signatories[K], "signedAt">;
+  };
+};
+
 export type ConventionPresentation = OmitFromExistingKeys<
   Partial<ConventionDto>,
   "id" | "rejectionJustification"
-> & {
-  beneficiaryAccepted: boolean;
-  enterpriseAccepted: boolean;
-};
+> &
+  WithSignatures;
 
 export const ConventionPage = ({ route }: ConventionPageProps) => (
   <HeaderFooterLayout>

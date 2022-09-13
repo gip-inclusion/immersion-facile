@@ -10,6 +10,7 @@ import {
   UpdateConventionStatusRequestDto,
   WithConventionId,
   ConventionReadDto,
+  SignatoryRole,
 } from "shared/src/convention/convention.dto";
 import { ShareLinkByEmailDto } from "shared/src/ShareLinkByEmailDto";
 import {
@@ -118,10 +119,11 @@ export class InMemoryConventionGateway implements ConventionGateway {
   public async signApplication(jwt: string): Promise<WithConventionId> {
     this.simulatedLatency && (await sleep(this.simulatedLatency));
     const payload = decodeJwt<ConventionMagicLinkPayload>(jwt);
-    const application = this._conventions[payload.applicationId];
+    const convention = this._conventions[payload.applicationId];
     this._conventions[payload.applicationId] = signConventionDtoWithRole(
-      application,
-      payload.role,
+      convention,
+      payload.role as SignatoryRole,
+      new Date().toISOString(),
     );
     return { id: payload.applicationId };
   }

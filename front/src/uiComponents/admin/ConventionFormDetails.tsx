@@ -1,5 +1,11 @@
 import React, { ReactNode } from "react";
-import { ConventionReadDto } from "shared/src/convention/convention.dto";
+import { Accordion } from "react-design-system/immersionFacile";
+import {
+  Beneficiary,
+  ConventionReadDto,
+  Mentor,
+} from "shared/src/convention/convention.dto";
+import { path } from "shared/src/ramdaExtensions/path";
 import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
 import {
   calculateTotalImmersionHoursBetweenDate,
@@ -7,11 +13,14 @@ import {
   prettyPrintSchedule,
 } from "shared/src/schedule/ScheduleUtils";
 import { keys } from "shared/src/utils";
-import { Accordion } from "react-design-system/immersionFacile";
 import { ConventionFormAccordionProps } from "./ConventionFormAccordion";
 import { TextCell } from "./TextCell";
 
-type ConventionField = keyof ConventionReadDto;
+type ConventionField =
+  | keyof ConventionReadDto
+  | `signatories.beneficiary.${keyof Beneficiary}`
+  | `signatories.mentor.${keyof Mentor}`;
+
 type FieldsToLabel = Partial<Record<ConventionField, string>>;
 
 const enterpriseFields: FieldsToLabel = {
@@ -26,20 +35,21 @@ const agencyFields: FieldsToLabel = {
 };
 
 const mentorFields: FieldsToLabel = {
-  mentor: "Tuteur",
-  mentorPhone: "Numéro de téléphone du tuteur",
-  mentorEmail: "Mail du tuteur",
-  enterpriseAccepted: "Signé",
+  "signatories.mentor.firstName": "Tuteur",
+  "signatories.mentor.phone": "Numéro de téléphone du tuteur",
+  "signatories.mentor.email": "Mail du tuteur",
+  "signatories.mentor.signedAt": "Signé",
 };
 
 const candidateFields: FieldsToLabel = {
-  email: "Mail de demandeur",
-  lastName: "Nom",
-  firstName: "Prénom",
-  phone: "Numéro de téléphone",
-  beneficiaryAccepted: "Signé",
-  emergencyContact: "Contact d'urgence",
-  emergencyContactPhone: "Numéro du contact d'urgence",
+  "signatories.beneficiary.email": "Mail de demandeur",
+  "signatories.beneficiary.lastName": "Nom",
+  "signatories.beneficiary.firstName": "Prénom",
+  "signatories.beneficiary.phone": "Numéro de téléphone",
+  "signatories.beneficiary.signedAt": "Signé",
+  "signatories.beneficiary.emergencyContact": "Contact d'urgence",
+  "signatories.beneficiary.emergencyContactPhone":
+    "Numéro du contact d'urgence",
 };
 
 const immersionFields: FieldsToLabel = {
@@ -74,7 +84,7 @@ export const ConnventionFormDetails = ({
   convention,
 }: ConventionFormAccordionProps) => {
   const buildContent = (field: ConventionField): ReactNode => {
-    const value = convention[field];
+    const value = path(field, convention);
     if (field === "schedule")
       return (
         <div style={{ whiteSpace: "pre" }}>
@@ -97,7 +107,7 @@ export const ConnventionFormDetails = ({
         <Accordion title={listTitle} key={listTitle}>
           {keys(fields).map(
             (field) =>
-              convention[field] && (
+              path(field, convention) && (
                 <TextCell
                   title={
                     /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */

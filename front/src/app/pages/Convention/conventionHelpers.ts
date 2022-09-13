@@ -1,6 +1,7 @@
 import { addDays, startOfToday } from "date-fns";
 import {
   ConventionDto,
+  ConventionId,
   ConventionStatus,
   ImmersionObjective,
   InternshipKind,
@@ -56,15 +57,27 @@ export const conventionInitialValuesFromUrl = (
   const dateStart =
     params.dateStart ?? toDateString(addDays(startOfToday(), 2));
   const dateEnd = params.dateEnd ?? toDateString(addDays(startOfToday(), 3));
-  const initialFormWithStoredAndUrlParams = {
+  const initialFormWithStoredAndUrlParams: ConventionPresentation & {
+    id: ConventionId;
+  } = {
     id: uuidV4(),
     status: "DRAFT" as ConventionStatus,
     dateSubmission: toDateString(startOfToday()),
 
     //Federated Identity
-    federatedIdentity: params.federatedIdentity as
-      | FederatedIdentity
-      | undefined,
+    signatories: {
+      beneficiary:
+        {
+           federatedIdentity: params.federatedIdentity as FederatedIdentity| undefined,
+           signedAt: null
+        },
+      mentor: {
+        firstName: params.mentor
+        mentor: params.mentor ?? "",
+        mentorPhone: params.mentorPhone ?? "",
+        mentorEmail: params.mentorEmail ?? "",
+      }
+    }
 
     // Participant
     email: params.email ?? "",

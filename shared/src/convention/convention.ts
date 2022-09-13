@@ -1,11 +1,13 @@
 import { reasonableSchedule } from "../schedule/ScheduleUtils";
 import { Role } from "../tokens/MagicLinkPayload";
-import { ExtractFromExisting } from "../utils";
+import { DotNestedKeys, ExtractFromExisting } from "../utils";
 import {
-  ConventionStatus,
-  ConventionDto,
   Beneficiary,
+  ConventionDto,
+  ConventionStatus,
   Mentor,
+  SignatoryRole,
+  signatoryRoles,
 } from "./convention.dto";
 
 const getNewStatus = (
@@ -45,6 +47,10 @@ export const signConventionDtoWithRole = (
     signatories: { beneficiary, mentor },
     status,
   };
+};
+
+export const isSignatory = (role: Role): role is SignatoryRole => {
+  return signatoryRoles.includes(role as SignatoryRole);
 };
 
 const beneficiary: Beneficiary = {
@@ -103,3 +109,4 @@ export const IMMERSION_APPLICATION_TEMPLATE: ConventionDto = {
   internshipKind: "immersion",
   signatories: { beneficiary, mentor },
 };
+export const getConventionField = (name: DotNestedKeys<ConventionDto>) => name;

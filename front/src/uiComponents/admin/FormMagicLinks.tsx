@@ -11,7 +11,7 @@ export const FormMagicLinks = ({
   convention,
 }: ConventionFormAccordionProps) => {
   const adminToken = useAdminToken();
-  const [role, setRole] = useState(allRoles[0]);
+  const [role, setRole] = useState<Role>(allRoles[0]);
   const [route, setRoute] = useState(
     Object.keys(frontRoutes)[0] as keyof typeof frontRoutes,
   );
