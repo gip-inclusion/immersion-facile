@@ -1,6 +1,6 @@
 import { useFormikContext } from "formik";
 import React, { useEffect } from "react";
-import { getConventionField } from "shared/src/convention/convention";
+import { getConventionFieldName } from "shared/src/convention/convention";
 import type { ConventionDto } from "shared/src/convention/convention.dto";
 import { AgencyDisplay } from "src/app/components/AgencyDisplay";
 import { AgencySelector } from "src/app/components/AgencySelector";
@@ -54,7 +54,9 @@ export const ConventionFormFields = ({
       )}
       <input
         type="hidden"
-        name={getConventionField("signatories.beneficiary.federatedIdentity")}
+        name={getConventionFieldName(
+          "signatories.beneficiary.federatedIdentity",
+        )}
       />
       <FormSectionTitle>Pour commencer nous avons besoin de</FormSectionTitle>
       {isFrozen ? (

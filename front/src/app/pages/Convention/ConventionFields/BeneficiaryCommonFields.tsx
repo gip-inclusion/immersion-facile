@@ -1,4 +1,5 @@
 import React from "react";
+import { getConventionFieldName } from "shared/src/convention/convention";
 import { TextInput } from "src/uiComponents/form/TextInput";
 
 export const BeneficiaryCommonFields = ({
@@ -9,7 +10,7 @@ export const BeneficiaryCommonFields = ({
   <>
     <TextInput
       label="Prénom *"
-      name="firstName"
+      name={getConventionFieldName("signatories.beneficiary.firstName")}
       type="text"
       placeholder=""
       description=""
@@ -17,7 +18,7 @@ export const BeneficiaryCommonFields = ({
     />
     <TextInput
       label="Nom de famille *"
-      name="lastName"
+      name={getConventionFieldName("signatories.beneficiary.lastName")}
       type="text"
       placeholder=""
       description=""
@@ -25,7 +26,7 @@ export const BeneficiaryCommonFields = ({
     />
     <TextInput
       label="E-mail *"
-      name="email"
+      name={getConventionFieldName("signatories.beneficiary.email")}
       type="email"
       placeholder="nom@exemple.com"
       description="cela nous permet de vous transmettre la validation de la convention"
@@ -33,7 +34,7 @@ export const BeneficiaryCommonFields = ({
     />
     <TextInput
       label="Téléphone"
-      name="phone"
+      name={getConventionFieldName("signatories.beneficiary.phone")}
       type="tel"
       placeholder="0606060607"
       description="pour qu’on puisse vous contacter à propos de l’immersion"
@@ -41,7 +42,7 @@ export const BeneficiaryCommonFields = ({
     />
     <TextInput
       label="Prénom et nom de la personne à prévenir en cas d'urgence"
-      name="emergencyContact"
+      name={getConventionFieldName("signatories.beneficiary.emergencyContact")}
       type="text"
       placeholder=""
       description=""
@@ -49,7 +50,9 @@ export const BeneficiaryCommonFields = ({
     />
     <TextInput
       label="Téléphone de la personne à prévenir en cas d'urgence"
-      name="emergencyContactPhone"
+      name={getConventionFieldName(
+        "signatories.beneficiary.emergencyContactPhone",
+      )}
       type="tel"
       placeholder="0606060607"
       description=""

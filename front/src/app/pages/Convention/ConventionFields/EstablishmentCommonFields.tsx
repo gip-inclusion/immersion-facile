@@ -1,5 +1,6 @@
 import { useField } from "formik";
 import React from "react";
+import { getConventionFieldName } from "shared/src/convention/convention";
 import { ConventionStatus } from "shared/src/convention/convention.dto";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { useSiretFetcher, useSiretRelatedField } from "src/hooks/siret.hooks";
@@ -38,23 +39,39 @@ export const EstablishmentCommonFields = ({
       />
       <TextInput
         label="Indiquez le nom (raison sociale) de l'établissement d'accueil *"
-        name="businessName"
+        name={getConventionFieldName("businessName")}
         type="text"
         placeholder=""
         description=""
         disabled={enableInseeApi}
       />
       <TextInput
-        label="Indiquez le prénom, nom et fonction du tuteur *"
-        name="mentor"
+        label="Indiquez le prénom du tuteur *"
+        name={getConventionFieldName("signatories.mentor.firstName")}
         type="text"
         placeholder=""
-        description="Ex : Alain Prost, pilote automobile"
+        description="Ex : Alain"
+        disabled={disabled || isFetchingSiret}
+      />
+      <TextInput
+        label="Indiquez le nom du tuteur *"
+        name={getConventionFieldName("signatories.mentor.lastName")}
+        type="text"
+        placeholder=""
+        description="Ex : Prost"
+        disabled={disabled || isFetchingSiret}
+      />
+      <TextInput
+        label="Indiquez la fonction du tuteur *"
+        name={getConventionFieldName("signatories.mentor.job")}
+        type="text"
+        placeholder=""
+        description="Ex : Pilote automobile"
         disabled={disabled || isFetchingSiret}
       />
       <TextInput
         label="Indiquez le numéro de téléphone du tuteur ou de la structure d'accueil *"
-        name="mentorPhone"
+        name={getConventionFieldName("signatories.mentor.phone")}
         type="tel"
         placeholder="0606060707"
         description="pour que l'on puisse le contacter à propos de l’immersion"
@@ -62,7 +79,7 @@ export const EstablishmentCommonFields = ({
       />
       <TextInput
         label="Indiquez l'e-mail du tuteur *"
-        name="mentorEmail"
+        name={getConventionFieldName("signatories.mentor.email")}
         type="email"
         placeholder="nom@exemple.com"
         description="pour envoyer la validation de la convention"

@@ -108,4 +108,5 @@ export const IMMERSION_APPLICATION_TEMPLATE: ConventionDto = {
   internshipKind: "immersion",
   signatories: { beneficiary, mentor },
 };
-export const getConventionField = (name: DotNestedKeys<ConventionDto>) => name;
+export const getConventionFieldName = (name: DotNestedKeys<ConventionDto>) =>
+  name;

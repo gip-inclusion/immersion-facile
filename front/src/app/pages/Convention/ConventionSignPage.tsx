@@ -1,7 +1,7 @@
 import { Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import {
-  getConventionField,
+  getConventionFieldName,
   isSignatory,
 } from "shared/src/convention/convention";
 import {
@@ -186,11 +186,15 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
 
                 if (!conditionsAccepted) {
                   setErrors({
-                    [getConventionField("signatories.beneficiary.signedAt")]:
+                    [getConventionFieldName(
+                      "signatories.beneficiary.signedAt",
+                    )]:
                       signeeRole === "beneficiary"
                         ? "La signature est obligatoire"
                         : undefined,
-                    [getConventionField("signatories.beneficiary.signedAt")]:
+                    [getConventionFieldName(
+                      "signatories.beneficiary.signedAt",
+                    )]:
                       signeeRole === "establishment"
                         ? "La signature est obligatoire"
                         : undefined,

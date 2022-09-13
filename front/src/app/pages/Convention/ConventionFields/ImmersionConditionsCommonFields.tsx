@@ -1,5 +1,6 @@
 import { useFormikContext } from "formik";
 import React from "react";
+import { getConventionFieldName } from "shared/src/convention/convention";
 import {
   ConventionDto,
   conventionObjectiveOptions,
@@ -55,7 +56,7 @@ export const ImmersionConditionsCommonFields = ({
     <>
       <DateInput
         label="Date de début de l'immersion *"
-        name="dateStart"
+        name={getConventionFieldName("dateStart")}
         type="date"
         disabled={disabled}
         onDateChange={(dateStart) => {
@@ -66,7 +67,7 @@ export const ImmersionConditionsCommonFields = ({
       <br />
       <DateInput
         label="Date de fin de l'immersion *"
-        name="dateEnd"
+        name={getConventionFieldName("dateEnd")}
         type="date"
         disabled={disabled}
         onDateChange={(dateEnd) => {
@@ -85,7 +86,7 @@ export const ImmersionConditionsCommonFields = ({
       <br />
       <TextInput
         label="Conditions de travail, propres  au métier observé pendant l’immersion. "
-        name="workConditions"
+        name={getConventionFieldName("workConditions")}
         description="Ex : transport de marchandises longue distance - pas de retour au domicile pendant 2 jours"
         disabled={disabled}
       />
@@ -102,25 +103,25 @@ export const ImmersionConditionsCommonFields = ({
       />
       <br />
       <BoolRadioGroup
-        name="individualProtection"
+        name={getConventionFieldName("individualProtection")}
         label="Un équipement de protection individuelle est-il fourni pour l’immersion ? *"
         disabled={disabled}
       />
       <BoolRadioGroup
-        name="sanitaryPrevention"
+        name={getConventionFieldName("sanitaryPrevention")}
         label="Des mesures de prévention sanitaire sont-elles prévues pour l’immersion ? *"
         disabled={disabled}
       />
       <TextInput
         label="Si oui, précisez-les"
-        name="sanitaryPreventionDescription"
+        name={getConventionFieldName("sanitaryPreventionDescription")}
         type="text"
         placeholder=""
         description="Ex : fourniture de gel, de masques"
         disabled={disabled}
       />
       <RadioGroupForField
-        name="immersionObjective"
+        name={getConventionFieldName("immersionObjective")}
         label="Objet de la période de mise en situation en milieu professionnel *"
         options={conventionObjectiveOptions.map((value) => ({
           value,
@@ -135,7 +136,7 @@ export const ImmersionConditionsCommonFields = ({
       />
       <TextInput
         label="Activités observées / pratiquées pendant l'immersion *"
-        name="immersionActivities"
+        name={getConventionFieldName("immersionActivities")}
         type="text"
         placeholder=""
         description="Ex : mise en rayon, accueil et aide à la clientèle"
@@ -143,7 +144,7 @@ export const ImmersionConditionsCommonFields = ({
       />
       <TextInput
         label="Compétences/aptitudes observées / évaluées pendant l'immersion"
-        name="immersionSkills"
+        name={getConventionFieldName("immersionSkills")}
         type="text"
         placeholder=""
         description="Ex : communiquer à l'oral, résoudre des problèmes, travailler en équipe"
