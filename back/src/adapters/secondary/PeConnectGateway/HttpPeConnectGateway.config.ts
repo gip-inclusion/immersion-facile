@@ -17,12 +17,15 @@ import {
   UnhandledError,
 } from "shared/src/serenity-http-client";
 import axios, { AxiosError, AxiosResponse } from "axios";
+import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import {
   ManagedRedirectError,
   RawRedirectError,
 } from "../../primary/helpers/redirectErrors";
 import { PeConnectUrlTargets } from "./HttpPeConnectGateway";
+
+const logger = createLogger(__filename);
 
 export const httpPeConnectGatewayTargetMapperMaker = (config: {
   peAuthCandidatUrl: AbsoluteUrl;
@@ -205,8 +208,14 @@ const handleHttpError = (
 };
 
 const isInvalidGrantError = (error: HttpClientError) => {
-  notifyObjectDiscord({ debug: "test invalid grant", ...error });
-  return (error.cause as AxiosError).response?.data.error === "invalid_grant";
+  const isInvalidGrant =
+    (error.cause as AxiosError).response?.data.error === "invalid_grant";
+  if (isInvalidGrant) {
+    logger.error({ debug: "pe_invalid_grant", ...error });
+    notifyObjectDiscord({ debug: "pe_invalid_grant" });
+  }
+
+  return isInvalidGrant;
 };
 
 const isValidPeErrorResponse = (
