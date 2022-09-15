@@ -22,7 +22,7 @@ export const ManagedErrorSelector = ({
   kind,
   children,
 }: ManagedErrorSelectorProperties) => {
-  const ManagedError = ManagedErrors[kind];
+  const ManagedError = managedErrors[kind];
   return <ManagedError>{children}</ManagedError>;
 };
 
@@ -30,7 +30,7 @@ type ManagedErrorProperties = {
   children?: React.ReactNode;
 };
 
-const ManagedErrors: Record<
+const managedErrors: Record<
   ManagedErrorKinds,
   (props: ManagedErrorProperties) => JSX.Element
 > = {

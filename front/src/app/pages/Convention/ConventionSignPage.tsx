@@ -1,5 +1,6 @@
 import { Formik } from "formik";
 import React, { useEffect, useState } from "react";
+import { Notification } from "react-design-system/immersionFacile";
 import {
   getConventionFieldName,
   isSignatory,
@@ -15,9 +16,7 @@ import {
   ConventionMagicLinkPayload,
   Role,
 } from "shared/src/tokens/MagicLinkPayload";
-import { Notification } from "react-design-system/immersionFacile";
 import { exhaustiveCheck } from "shared/src/utils";
-import { ImmersionMarianneHeader } from "src/app/components/ImmersionMarianneHeader";
 import {
   SubmitFeedback,
   SuccessFeedbackKind,
@@ -103,9 +102,7 @@ export const ConventionSignPage = ({ route }: SignFormProps) => {
     );
 
   return (
-    <>
-      <ImmersionMarianneHeader />
-
+    <HeaderFooterLayout>
       <ApiDataContainer
         callApi={() => conventionGateway.getMagicLink(route.params.jwt)}
         jwt={route.params.jwt}
@@ -114,7 +111,7 @@ export const ConventionSignPage = ({ route }: SignFormProps) => {
           <SignFormSpecific convention={convention} jwt={route.params.jwt} />
         )}
       </ApiDataContainer>
-    </>
+    </HeaderFooterLayout>
   );
 };
 
@@ -154,6 +151,7 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
   if (convention.status === "REJECTED") return <ConventionRejectedMessage />;
   if (convention.status === "DRAFT")
     return <ConventionNeedsModificationMessage jwt={jwt} />;
+
   return (
     <SignPageLayout>
       <h2>
