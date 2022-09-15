@@ -31,6 +31,8 @@ function useApiCall<T>({ callApi }: UseApiCallProps<T>) {
         setApiData(apiData);
       })
       .catch((e) => {
+        // eslint-disable-next-line no-console
+        console.error("ERROR in api data container : ", e);
         setError(e);
       });
   }, []);
