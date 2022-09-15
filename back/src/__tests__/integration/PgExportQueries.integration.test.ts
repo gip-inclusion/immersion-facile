@@ -65,6 +65,8 @@ describe("PgExportQueries", () => {
           establishmentAggregateMiniWorldLyon(),
         ]);
 
+        await refreshAllMaterializedViews(client);
+
         // Act
         const exportables = await exportQueries.getFromExportable({
           name: "establishments_with_flatten_offers",
@@ -119,6 +121,7 @@ describe("PgExportQueries", () => {
           establishmentAggregateArtusInterim(),
           establishmentAggregateMiniWorldLyon(),
         ]);
+        await refreshAllMaterializedViews(client);
 
         // Act
         const exportables = await exportQueries.getFromExportable({
@@ -291,6 +294,7 @@ describe("PgExportQueries", () => {
           establishmentAggregate,
         ]);
         await outboxRepository.save(contactEvent);
+        await refreshAllMaterializedViews(client);
 
         // Act
         const exportables = await exportQueries.getFromExportable({
@@ -392,3 +396,16 @@ const establishmentAggregateMiniWorldLyon = (): EstablishmentAggregate => ({
     .withContactMethod("EMAIL")
     .build(),
 });
+
+const refreshAllMaterializedViews = async (client: PoolClient) => {
+  const materializedViews = [
+    "view_siret_with_department_region",
+    "view_contact_requests",
+    "view_establishments",
+    "view_establishments_with_flatten_offers",
+    "view_establishments_with_aggregated_offers",
+  ];
+  for (const materializedView of materializedViews) {
+    await client.query(`REFRESH MATERIALIZED VIEW ${materializedView};`);
+  }
+};

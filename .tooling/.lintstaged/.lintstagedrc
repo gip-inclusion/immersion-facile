@@ -1,4 +1,4 @@
 {
   "*.(ts|js|tsx)": "pnpm lintconfig:glob",
-  "*.(md|json|yml|xml|html|css|scss|js|ts|sh|tsx)": "pnpm prettier:glob --write",
+  "*.(md|json|yml|xml|html|css|scss|js|ts|sh|tsx)": "pnpm prettier:glob --write --ignore-unknown"
 }

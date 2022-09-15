@@ -25,6 +25,10 @@ echo "Running $0 $@ (pwd: $(pwd))"
 #  pipeline in cron format. Default: daily at 23h53
 : "${EMAIL_WITH_ASSESSMENT_CREATION_LINK:=53 23 * * *}"
 
+#  REFRESH_MATERIALIZED_VIEWS (optional).
+#  pipeline in cron format. Default: daily at 01h12
+: "${REFRESH_MATERIALIZED_VIEWS:=12 01 * * *}"
+
 # Create logdir if it doesn't already exist.
 if [[ ! -d $LOGDIR ]]; then
   mkdir -p $LOGDIR && chmod 755 $LOGDIR
@@ -44,6 +48,9 @@ $ESTABLISHMENT_SUGGEST_FORM_EDITION cd /app/back && pnpm trigger-suggest-edit-fo
 
 # Pipeline: trigger-sending-emails-with-assessment-creation-link
 $EMAIL_WITH_ASSESSMENT_CREATION_LINK cd /app/back && pnpm trigger-sending-emails-with-assessment-creation-link >> $LOGDIR/trigger-sending-emails-with-assessment-creation-link.log 2>&1
+
+# Pipeline: trigger-refresh-materialized-views
+$REFRESH_MATERIALIZED_VIEWS cd /app/back && pnpm trigger-refresh-materialized-views >> $LOGDIR/trigger-refresh-materialized-views.log 2>&1
 
 EOT
 
