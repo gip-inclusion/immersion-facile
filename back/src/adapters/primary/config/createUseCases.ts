@@ -164,7 +164,6 @@ export const createUseCases = (
     updateEstablishmentAggregateFromForm:
       new UpdateEstablishmentAggregateFromForm(
         uowPerformer,
-        gateways.sirene,
         gateways.addressApi,
         uuidGenerator,
         clock,

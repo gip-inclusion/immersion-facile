@@ -1,11 +1,10 @@
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { formEstablishmentSchema } from "shared/src/formEstablishment/FormEstablishment.schema";
-import { makeFormEstablishmentToEstablishmentAggregate } from "../../../utils/makeFormEstablishmentToEstablishmentAggregate";
+import { makeUpdateEstablishmentAggregateFromFormEstablishment } from "../../../utils/makeFormEstablishmentToEstablishmentAggregate";
 import { Clock } from "../../core/ports/Clock";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { SireneGateway } from "../../sirene/ports/SireneGateway";
 import { AddressGateway } from "../ports/AddressGateway";
 
 export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
@@ -14,7 +13,6 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
 > {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly sireneGateway: SireneGateway,
     private readonly addressAPI: AddressGateway,
     private readonly uuidGenerator: UuidGenerator,
     private readonly clock: Clock,
@@ -28,24 +26,23 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
     formEstablishment: FormEstablishmentDto,
     uow: UnitOfWork,
   ): Promise<void> {
+    const initialEstablishementAggregate =
+      await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
+        formEstablishment.siret,
+      );
     const establishmentAlreadyExists =
-      (
-        await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
-          formEstablishment.siret,
-        )
-      )?.establishment?.dataSource === "form";
+      initialEstablishementAggregate?.establishment?.dataSource === "form";
     if (!establishmentAlreadyExists)
       throw new Error(
         "Cannot update establishment from form that does not exist.",
       );
 
     const establishmentAggregate =
-      await makeFormEstablishmentToEstablishmentAggregate({
-        sireneGateway: this.sireneGateway,
-        addressAPI: this.addressAPI,
+      await makeUpdateEstablishmentAggregateFromFormEstablishment({
+        addressGateway: this.addressAPI,
         uuidGenerator: this.uuidGenerator,
         clock: this.clock,
-      })(formEstablishment);
+      })(initialEstablishementAggregate, formEstablishment);
 
     if (!establishmentAggregate) return;
 

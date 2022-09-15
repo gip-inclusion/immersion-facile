@@ -50,7 +50,7 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
     const establishmentAggregate =
       await makeFormEstablishmentToEstablishmentAggregate({
         sireneGateway: this.sireneGateway,
-        addressAPI: this.addressAPI,
+        addressGateway: this.addressAPI,
         uuidGenerator: this.uuidGenerator,
         clock: this.clock,
       })(formEstablishment);

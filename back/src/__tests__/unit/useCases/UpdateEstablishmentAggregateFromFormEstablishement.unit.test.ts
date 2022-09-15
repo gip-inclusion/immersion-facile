@@ -57,7 +57,6 @@ describe("Update Establishment aggregate from form data", () => {
     updateEstablishmentAggregateFromFormUseCase =
       new UpdateEstablishmentAggregateFromForm(
         uowPerformer,
-        sireneRepo,
         addressAPI,
         uuidGenerator,
         new CustomClock(),
