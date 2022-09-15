@@ -16,7 +16,11 @@ export class InMemoryEmailGateway implements EmailGateway {
   private readonly sentEmails: EmailSentDto[] = [];
 
   public getLastSentEmailDtos() {
-    return this.sentEmails.reverse();
+    return this.sentEmails.sort((mailA, mailB) =>
+      new Date(mailB.sentAt).getTime() - new Date(mailA.sentAt).getTime() >= 0
+        ? 1
+        : -1,
+    );
   }
 
   public async sendEmail(email: TemplatedEmail) {
