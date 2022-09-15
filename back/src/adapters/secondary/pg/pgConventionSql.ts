@@ -13,17 +13,17 @@ WITH
     b.convention_id,
     JSON_BUILD_OBJECT(
     'beneficiary' , 
-      JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
+      JSON_BUILD_OBJECT(
           'role', 'beneficiary',
           'firstName', b.first_name,
           'lastName', b.last_name,
           'email', b.email,
           'phone', b.phone,
-          'signedAt', date_to_iso(m.signed_at),
+          'signedAt', date_to_iso(b.signed_at),
           'emergencyContact', b.extra_fields ->> 'emergencyContact',
           'emergencyContactPhone', b.extra_fields ->> 'emergencyContactPhone',
           'federatedIdentity', CASE WHEN  (p.user_pe_external_id IS NOT NULL) THEN CONCAT('peConnect:', p.user_pe_external_id) ELSE NULL END 
-          )),
+          ),
     'mentor' , 
       JSON_BUILD_OBJECT(
         'role', 'establishment',

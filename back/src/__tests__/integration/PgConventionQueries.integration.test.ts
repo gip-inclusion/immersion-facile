@@ -22,6 +22,8 @@ import { ImmersionAssessmentEmailParams } from "../../domain/immersionOffer/useC
 const idA: ConventionId = "aaaaac99-9c0b-aaaa-aa6d-6bb9bd38aaaa";
 const idB: ConventionId = "bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb";
 
+const beneficiarySignedDate = new Date("2021-01-04").toISOString();
+
 describe("Pg implementation of ConventionQueries", () => {
   let pool: Pool;
   let client: PoolClient;
@@ -188,7 +190,10 @@ describe("Pg implementation of ConventionQueries", () => {
     const convention = new ConventionDtoBuilder()
       .withAgencyId(agencyId)
       .withId(conventionId)
+      .notSigned()
+      .signedByBeneficiary(beneficiarySignedDate)
       .build();
+
     await agencyRepo.insert(agency);
     const externalId = await conventionRepository.save(convention);
     return { ...convention, externalId, agencyName };

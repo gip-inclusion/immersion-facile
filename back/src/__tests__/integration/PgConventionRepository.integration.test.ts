@@ -49,20 +49,16 @@ describe("PgConventionRepository", () => {
     expect(typeof savedExternalId).toBe("string");
   });
 
-  it("Adds a new convention with field workConditions undefined", async () => {
-    // const peConnectId = "bbbbac99-9c0b-bbbb-bb6d-6bb9bd38bbbb";
+  it("Adds a new convention with field workConditions undefined and no signatories", async () => {
     const convention = new ConventionDtoBuilder()
       .withoutWorkCondition()
+      .notSigned()
       .build();
-
-    // await client.query(
-    //   `INSERT INTO partners_pe_connect(user_pe_external_id, convention_id, firstname, lastname, email, type)
-    // VALUES('${peConnectId}', '${convention.id}', 'John', 'Doe', 'john@mail.com', 'PLACEMENT')`,
-    // );
 
     const externalId = await conventionRepository.save(convention);
 
-    expect(await conventionRepository.getById(convention.id)).toEqual({
+    const fetchedConvention = await conventionRepository.getById(convention.id);
+    expect(fetchedConvention).toEqual({
       ...convention,
       externalId,
     });

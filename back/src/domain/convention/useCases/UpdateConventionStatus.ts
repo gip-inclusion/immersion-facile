@@ -68,8 +68,11 @@ export class UpdateConventionStatus extends TransactionalUseCase<
       ...(status === "REJECTED" && { rejectionJustification: justification }),
       ...(status === "DRAFT" && {
         signatories: {
-          beneficiary: { ...storedDto.signatories.beneficiary, signedAt: null },
-          mentor: { ...storedDto.signatories.mentor, signedAt: null },
+          beneficiary: {
+            ...storedDto.signatories.beneficiary,
+            signedAt: undefined,
+          },
+          mentor: { ...storedDto.signatories.mentor, signedAt: undefined },
         },
       }),
       status,

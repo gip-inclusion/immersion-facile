@@ -77,7 +77,6 @@ export const conventionInitialValuesFromUrl = (
         federatedIdentity: params.federatedIdentity as
           | FederatedIdentity
           | undefined,
-        signedAt: null,
       },
       mentor: {
         role: "establishment",
@@ -86,7 +85,6 @@ export const conventionInitialValuesFromUrl = (
         email: params.mentorEmail ?? "",
         phone: params.mentorPhone ?? "",
         job: params.mentorJob ?? "",
-        signedAt: null,
       },
     },
 
@@ -150,7 +148,6 @@ const devPrefilledValues = (
         emergencyContactPhone:
           beneficiary.emergencyContactPhone || "0662552607",
         federatedIdentity: beneficiary.federatedIdentity,
-        signedAt: null,
       },
       mentor: {
         role: "establishment",
@@ -159,7 +156,6 @@ const devPrefilledValues = (
         phone: mentor.phone || "0101100110",
         email: mentor.email || "mentor@supermentor.fr",
         job: mentor.job,
-        signedAt: null,
       },
     },
 

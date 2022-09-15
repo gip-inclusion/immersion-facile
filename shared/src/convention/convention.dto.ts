@@ -74,7 +74,7 @@ export type Signatory<R extends Role> = {
   phone: string;
   firstName: string;
   lastName: string;
-  signedAt: string | null; // Date iso string
+  signedAt?: string; // Date iso string
 };
 
 export type Beneficiary = Signatory<"beneficiary"> & {

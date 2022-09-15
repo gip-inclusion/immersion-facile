@@ -1,9 +1,10 @@
 import React from "react";
+import { getConventionFieldName } from "shared/src/convention/convention";
 import {
   RequestModificationButton,
   SignButton,
 } from "src/app/pages/Convention/ConventionFields/SubmitButtons";
-import { BoolCheckboxGroup } from "src/uiComponents/form/CheckboxGroup";
+import { DateCheckboxGroup } from "src/uiComponents/form/CheckboxGroup";
 
 export const SignatureActions = (props: {
   isSignatureEnterprise?: boolean;
@@ -13,12 +14,12 @@ export const SignatureActions = (props: {
   onRejectForm: () => Promise<void>;
 }) => (
   <>
-    <BoolCheckboxGroup
-      name={
+    <DateCheckboxGroup
+      name={getConventionFieldName(
         props.isSignatureEnterprise
-          ? "enterpriseAccepted"
-          : "beneficiaryAccepted"
-      }
+          ? "signatories.mentor.signedAt"
+          : "signatories.beneficiary.signedAt",
+      )}
       label={`Je, soussigné ${props.signeeName} (${
         props.isSignatureEnterprise
           ? "représentant de la structure d'accueil"

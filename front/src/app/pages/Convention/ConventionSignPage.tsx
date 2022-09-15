@@ -216,6 +216,11 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
             }}
           >
             {(props) => {
+              if (Object.values(props.errors).length > 0) {
+                // eslint-disable-next-line no-console
+                console.log("Erros in form : ", props.errors);
+              }
+
               const rejectWithMessageForm = async (): Promise<void> => {
                 const justification = prompt(
                   "Précisez la raison et la modification nécessaire *",
@@ -252,6 +257,11 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
                       alreadySigned={alreadySigned}
                       onRejectForm={rejectWithMessageForm}
                     />
+                    {Object.values(props.errors).length > 0 && (
+                      <div style={{ color: "red" }}>
+                        Veuillez corriger les champs erronés
+                      </div>
+                    )}
 
                     <SubmitFeedback submitFeedback={submitFeedback} />
                   </form>

@@ -234,11 +234,11 @@ describe("Sign convention", () => {
 const makeSignatories = (
   convention: ConventionDto,
   {
-    mentorSignedAt = null,
-    beneficiarySignedAt = null,
+    mentorSignedAt,
+    beneficiarySignedAt,
   }: {
-    mentorSignedAt?: string | null;
-    beneficiarySignedAt?: string | null;
+    mentorSignedAt?: string;
+    beneficiarySignedAt?: string;
   },
 ): Signatories => ({
   beneficiary: {

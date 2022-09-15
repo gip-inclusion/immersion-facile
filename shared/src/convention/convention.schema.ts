@@ -58,7 +58,7 @@ const signatorySchema = z.object({
   phone: phoneSchema,
   firstName: zTrimmedString,
   lastName: zTrimmedString,
-  signedAt: zString.regex(dateRegExp).or(z.null()),
+  signedAt: zString.regex(dateRegExp).optional(),
 });
 
 const beneficiarySchema: z.Schema<Beneficiary> = signatorySchema.merge(

@@ -7,7 +7,7 @@ import {
   executeUpdateConventionStatusUseCase,
   setupInitialState,
   testForAllRolesAndInitialStatusCases,
-} from "./UpdateImmersionApplicationStatus.testHelpers";
+} from "./UpdateConventionStatus.testHelpers";
 
 describe("UpdateConventionStatus", () => {
   describe("* -> DRAFT transition", () => {
@@ -15,7 +15,10 @@ describe("UpdateConventionStatus", () => {
       targetStatus: "DRAFT",
       expectedDomainTopic: "ImmersionApplicationRequiresModification",
       justification: "test justification",
-      updatedFields: { mentorSignedAt: null, beneficiarySignedAt: null },
+      updatedFields: {
+        mentorSignedAt: undefined,
+        beneficiarySignedAt: undefined,
+      },
       allowedRoles: [
         "beneficiary",
         "establishment",

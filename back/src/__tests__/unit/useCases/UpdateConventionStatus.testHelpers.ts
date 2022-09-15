@@ -135,8 +135,8 @@ type TestAcceptNewStatusParams = {
 
 export type UpdatedFields = Partial<
   ConventionDto & {
-    mentorSignedAt: string | null;
-    beneficiarySignedAt: string | null;
+    mentorSignedAt: string | undefined;
+    beneficiarySignedAt: string | undefined;
   }
 >;
 
@@ -183,20 +183,25 @@ const makeTestAcceptsStatusUpdate =
 
     const { beneficiarySignedAt, mentorSignedAt, ...restOfUpdatedFields } =
       updatedFields;
+
+    const hasSignedProperty =
+      Object.hasOwn(updatedFields, "beneficiarySignedAt") ||
+      Object.hasOwn(updatedFields, "mentorSignedAt");
+
     const expectedConvention: ConventionDto = {
       ...originalConvention,
       status: targetStatus,
       ...restOfUpdatedFields,
-      ...(beneficiarySignedAt !== undefined || mentorSignedAt !== undefined
+      ...(hasSignedProperty
         ? {
             signatories: {
               beneficiary: {
                 ...beneficiary,
-                signedAt: beneficiarySignedAt ?? null,
+                signedAt: beneficiarySignedAt,
               },
               mentor: {
                 ...mentor,
-                signedAt: mentorSignedAt ?? null,
+                signedAt: mentorSignedAt,
               },
             },
           }

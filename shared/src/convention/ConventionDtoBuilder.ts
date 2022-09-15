@@ -272,8 +272,8 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     return new ConventionDtoBuilder({
       ...this.dto,
       signatories: {
-        beneficiary: { ...this.beneficiary, signedAt: null },
-        mentor: { ...this.mentor, signedAt: null },
+        beneficiary: { ...this.beneficiary, signedAt: undefined },
+        mentor: { ...this.mentor, signedAt: undefined },
       },
     });
   }
