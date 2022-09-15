@@ -5,6 +5,7 @@ export type ButtonAddProps = {
   children: string;
   style?: React.CSSProperties;
   className?: string;
+  disabled?: boolean;
 };
 
 export const ButtonAdd = ({
@@ -12,6 +13,7 @@ export const ButtonAdd = ({
   children,
   style,
   className,
+  disabled,
 }: ButtonAddProps) => (
   <button
     style={style}
@@ -20,6 +22,7 @@ export const ButtonAdd = ({
     className={`fr-btn fr-fi-add-line fr-btn--icon-left fr-btn--secondary ${
       className ? className : ""
     }`}
+    disabled={disabled}
   >
     {children}
   </button>

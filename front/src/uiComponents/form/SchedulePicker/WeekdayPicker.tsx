@@ -6,6 +6,7 @@ import {
   ScheduleDto,
   WeekdayNumber,
   WeekDayRangeSchemaDTO,
+  DateIntervalDto,
 } from "shared/src/schedule/Schedule.dto";
 import { WeekdayDropdown } from "./WeekdayDropdown";
 
@@ -13,6 +14,7 @@ type WeekdayPickerProps = {
   dayPeriods: DayPeriodsDto;
   onValueChange: (dayPeriods: DayPeriodsDto) => void;
   disabled?: boolean;
+  interval: DateIntervalDto;
 } & FieldHookConfig<ScheduleDto>;
 
 export const WeekdayPicker = ({
@@ -20,15 +22,22 @@ export const WeekdayPicker = ({
   dayPeriods,
   onValueChange,
   disabled,
+  interval,
 }: WeekdayPickerProps) => {
+  const canAddNewPeriod = (): WeekDayRangeSchemaDTO | false => {
+    const lastPeriod = dayPeriods[dayPeriods.length - 1];
+    const lastPeriodEnd = lastPeriod[1];
+    return lastPeriodEnd < 5 ? lastPeriod : false;
+  };
+
   const add = () => {
     let start = 0;
     let end = 5;
     if (dayPeriods.length > 0) {
       // Autofill next period as one day after the current period,
       // with duration of 1 day.
-      const last = dayPeriods[dayPeriods.length - 1];
-      if (last[1] < 5) {
+      const last = canAddNewPeriod();
+      if (last) {
         start = last[1] + 2;
         end = last[1] + 2;
       }
@@ -36,6 +45,13 @@ export const WeekdayPicker = ({
     dayPeriods.push([start, end] as WeekDayRangeSchemaDTO);
     onValueChange(dayPeriods);
   };
+
+  const isPeriodButtonActive = () => {
+    const endWeekDay = new Date(interval.end).getDay() - 1;
+    const maxPeriodWeekDay = Math.max(...dayPeriods.flat());
+    return !disabled && !!canAddNewPeriod() && maxPeriodWeekDay < endWeekDay;
+  };
+
   return (
     <>
       <div className="col"></div>
@@ -94,9 +110,13 @@ export const WeekdayPicker = ({
             </div>
           );
         })}
-      {!disabled && (
-        <ButtonAdd onClick={() => add()}>Ajouter une période</ButtonAdd>
-      )}
+      <ButtonAdd
+        className="fr-my-2w"
+        disabled={!isPeriodButtonActive()}
+        onClick={() => add()}
+      >
+        Ajouter une période
+      </ButtonAdd>
     </>
   );
 };

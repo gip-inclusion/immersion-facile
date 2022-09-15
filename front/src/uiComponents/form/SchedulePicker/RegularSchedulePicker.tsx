@@ -44,6 +44,7 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
               .build();
             setValue(field.value);
           }}
+          interval={props.interval}
           disabled={props.disabled}
         />
 
