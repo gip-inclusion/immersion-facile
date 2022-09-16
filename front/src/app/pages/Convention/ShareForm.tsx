@@ -1,6 +1,7 @@
 import { Button } from "@mui/material";
 import { Form, Formik, useField } from "formik";
 import React from "react";
+import { getConventionFieldName } from "shared/src/convention/convention";
 import { conventionGateway } from "src/app/config/dependencies";
 import {
   ShareLinkByEmailDto,
@@ -43,9 +44,15 @@ export const ShareForm = ({ onSuccess, onError }: ShareFormProps) => {
     result ? onSuccess() : onError();
   };
 
-  const [mentorEmail] = useField<string>({ name: "mentorEmail" });
-  const [firstName] = useField<string>({ name: "firstName" });
-  const [lastName] = useField<string>({ name: "lastName" });
+  const [mentorEmail] = useField<string>({
+    name: getConventionFieldName("signatories.mentor.email"),
+  });
+  const [firstName] = useField<string>({
+    name: getConventionFieldName("signatories.beneficiary.firstName"),
+  });
+  const [lastName] = useField<string>({
+    name: getConventionFieldName("signatories.beneficiary.lastName"),
+  });
 
   return (
     <Formik
