@@ -7,6 +7,7 @@ export const AutocompleteInput =
     label: string,
     inputStyle: React.CSSProperties | undefined,
     disabled: boolean | undefined,
+    placeholder: string | undefined,
   ) =>
   (params: AutocompleteRenderInputParams): JSX.Element =>
     (
@@ -22,7 +23,7 @@ export const AutocompleteInput =
           style={inputStyle}
           disabled={disabled}
           className={"fr-input"}
-          placeholder="Rouen"
+          placeholder={placeholder}
         />
       </div>
     );

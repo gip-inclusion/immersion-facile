@@ -12,7 +12,7 @@ import { HomeImmersionHowTo } from "src/uiComponents/ImmersionHowTo";
 import { StaticDropdown } from "./Dropdown/StaticDropdown";
 import { OurAdvises } from "./OurAdvises";
 import { SearchResultPanel } from "./SearchResultPanel";
-import { ButtonSearch } from "react-design-system/immersionFacile";
+import { ButtonSearch, MainWrapper } from "react-design-system/immersionFacile";
 import { AddressAutocomplete } from "src/uiComponents/autocomplete/AddressAutocomplete";
 
 const radiusOptions = [1, 2, 5, 10, 20, 50, 100];
@@ -24,95 +24,99 @@ export const SearchPage = () => {
 
   return (
     <HeaderFooterLayout>
-      <div className="sm:flex sm:items-center bg-gradient-to-b from-immersionRed-dark to-immersionRed-light">
-        <div className="h-[672px] flex-1 flex flex-col items-center p-10">
-          <h1 className="text-2xl text-white text-center font-bold">
-            Trouvez une entreprise accueillante pour réaliser une immersion
-            facile
-          </h1>
-          <span style={{ height: "30px" }} />
-          <Formik<SearchInput>
-            initialValues={{
-              lat: 0,
-              lon: 0,
-              radiusKm: 10,
-            }}
-            onSubmit={searchUseCase}
-          >
-            {({ setFieldValue, values }) => (
-              <Form>
-                <div className="gap-5 flex flex-col">
-                  <div>
-                    <RomeAutocomplete
-                      title="Métier recherché"
-                      setFormValue={(newValue) =>
-                        setFieldValue("rome", newValue.romeCode)
-                      }
-                      className="searchdropdown-header inputLabel"
-                    />
-                  </div>
-
-                  <div>
-                    <AddressAutocomplete
-                      label="Lieu"
-                      headerClassName="searchdropdown-header inputLabel"
-                      inputStyle={{
-                        paddingLeft: "48px",
-                        background: `white url(${locationSearchIcon}) no-repeat scroll 11px 8px`,
-                      }}
-                      setFormValue={({ position }) => {
-                        setFieldValue("lat", position.lat);
-                        setFieldValue("lon", position.lon);
-                      }}
-                    />
-                  </div>
-
-                  <div>
-                    <StaticDropdown
-                      inputStyle={{
-                        paddingLeft: "48px",
-                        background: `white url(${distanceSearchIcon}) no-repeat scroll 11px 8px`,
-                      }}
-                      title="Rayon"
-                      onSelection={(
-                        _newValue: string,
-                        selectedIndex: number,
-                      ) => {
-                        setFieldValue("radiusKm", radiusOptions[selectedIndex]);
-                      }}
-                      defaultSelectedIndex={initiallySelectedIndex}
-                      options={radiusOptions.map((n) => `${n} km`)}
-                    />
-                  </div>
-                  <ButtonSearch
-                    className="mt-12"
-                    dark
-                    disabled={
-                      searchStatus === "initialFetch" ||
-                      searchStatus === "extraFetch" ||
-                      values.lon === 0 ||
-                      values.lat === 0
-                    }
-                    type="submit"
-                  >
+      <MainWrapper vSpacing={0}>
+        <div className="sm:flex sm:items-center bg-gradient-to-b from-immersionRed-dark to-immersionRed-light">
+          <div className="h-[672px] flex-1 flex flex-col items-center fr-p-2w fr-px-6w">
+            <h1 className="text-2xl text-white text-center font-bold fr-my-4w">
+              Je trouve une entreprise pour réaliser mon immersion
+              professionnelle
+            </h1>
+            <Formik<SearchInput>
+              initialValues={{
+                lat: 0,
+                lon: 0,
+                radiusKm: 10,
+              }}
+              onSubmit={searchUseCase}
+            >
+              {({ setFieldValue, values }) => (
+                <Form>
+                  <div className="gap-5 flex flex-col">
                     <div>
-                      <SearchIcon />
-                      Rechercher
+                      <RomeAutocomplete
+                        title="Je recherche un métier"
+                        setFormValue={(newValue) =>
+                          setFieldValue("rome", newValue.romeCode)
+                        }
+                        placeholder={"Ex: boulangère, infirmier"}
+                        className="searchdropdown-header inputLabel"
+                        tooltip="Je laisse ce champ vide si je veux voir toutes les entreprises autour de moi"
+                      />
                     </div>
-                  </ButtonSearch>
-                </div>
-              </Form>
-            )}
-          </Formik>
+
+                    <div>
+                      <AddressAutocomplete
+                        label="Mon périmètre de recherche"
+                        headerClassName="searchdropdown-header inputLabel"
+                        inputStyle={{
+                          paddingLeft: "48px",
+                          background: `white url(${locationSearchIcon}) no-repeat scroll 11px 8px`,
+                        }}
+                        setFormValue={({ position }) => {
+                          setFieldValue("lat", position.lat);
+                          setFieldValue("lon", position.lon);
+                        }}
+                        placeholder={"Ex: Bordeaux 33000"}
+                      />
+                      <StaticDropdown
+                        inputStyle={{
+                          paddingLeft: "48px",
+                          background: `white url(${distanceSearchIcon}) no-repeat scroll 11px 8px`,
+                        }}
+                        title=""
+                        onSelection={(
+                          _newValue: string,
+                          selectedIndex: number,
+                        ) => {
+                          setFieldValue(
+                            "radiusKm",
+                            radiusOptions[selectedIndex],
+                          );
+                        }}
+                        defaultSelectedIndex={initiallySelectedIndex}
+                        options={radiusOptions.map((n) => `${n} km`)}
+                      />
+                    </div>
+                    <ButtonSearch
+                      className="mt-12"
+                      dark
+                      disabled={
+                        searchStatus === "initialFetch" ||
+                        searchStatus === "extraFetch" ||
+                        values.lon === 0 ||
+                        values.lat === 0
+                      }
+                      type="submit"
+                    >
+                      <div>
+                        <SearchIcon />
+                        Rechercher
+                      </div>
+                    </ButtonSearch>
+                  </div>
+                </Form>
+              )}
+            </Formik>
+          </div>
+          <div className="flex flex-col items-center sm:h-[670px] sm:flex-1 sm:overflow-y-scroll">
+            <SearchResultPanel />
+          </div>
         </div>
-        <div className="flex flex-col items-center sm:h-[670px] sm:flex-1 sm:overflow-y-scroll">
-          <SearchResultPanel />
+        <div>
+          <OurAdvises />
+          <HomeImmersionHowTo />
         </div>
-      </div>
-      <div>
-        <OurAdvises />
-        <HomeImmersionHowTo />
-      </div>
+      </MainWrapper>
     </HeaderFooterLayout>
   );
 };

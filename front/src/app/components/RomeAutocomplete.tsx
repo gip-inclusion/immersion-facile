@@ -5,12 +5,16 @@ import { RomeDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dt
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { useRomeAutocompleteUseCase } from "src/hooks/romeAutocomplete.hook";
 import { romeAutocompleteSelector } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.selectors";
+import { Tooltip } from "@mui/material";
+import InfoRoundedIcon from "@mui/icons-material/InfoRounded";
 
 type RomeAutocompleteProps = {
   title: string;
   initialValue?: RomeDto | undefined;
   setFormValue: (p: RomeDto) => void;
   className?: string;
+  placeholder?: string;
+  tooltip?: string;
 };
 
 const isOneOfTheOptionsLabel = (options: RomeDto[], searchTerm: string) =>
@@ -20,6 +24,8 @@ export const RomeAutocomplete = ({
   setFormValue,
   title,
   className,
+  placeholder = "Saisissez un métier",
+  tooltip,
 }: RomeAutocompleteProps): JSX.Element => {
   const { romeSearchText, isSearching, selectedRomeDto, romeOptions } =
     useAppSelector(romeAutocompleteSelector);
@@ -53,14 +59,19 @@ export const RomeAutocomplete = ({
           }
         }}
         renderInput={(params) => (
-          <div ref={params.InputProps.ref}>
+          <div ref={params.InputProps.ref} className="if-autocomplete-search">
             <label className={`fr-label ${className ?? ""}`} htmlFor={"search"}>
               {title}
+              {tooltip && tooltip.length > 0 && (
+                <Tooltip title={tooltip} className={"fr-ml-1w"}>
+                  <InfoRoundedIcon />
+                </Tooltip>
+              )}
             </label>
             <input
               {...params.inputProps}
               className={"fr-input"}
-              placeholder="Prêt à porter"
+              placeholder={placeholder}
             />
           </div>
         )}

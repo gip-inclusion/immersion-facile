@@ -13,6 +13,7 @@ export type AddressAutocompleteProps = {
   headerClassName?: string;
   inputStyle?: React.CSSProperties;
   setFormValue: (p: AddressAndPosition) => void;
+  placeholder?: string;
 };
 
 export const AddressAutocomplete = ({
@@ -22,6 +23,7 @@ export const AddressAutocomplete = ({
   headerClassName,
   inputStyle,
   initialSearchTerm = "",
+  placeholder = "",
 }: AddressAutocompleteProps) => {
   const [selectedOption, setSelectedOption] =
     useState<AddressAndPosition | null>(null);
@@ -74,6 +76,7 @@ export const AddressAutocomplete = ({
         label,
         inputStyle,
         disabled,
+        placeholder,
       )}
     />
   );
