@@ -73,7 +73,14 @@ export const ImmersionMarianneHeader = () => {
         currentRoute.name === routes.adminTab({ tab: "conventions" }).name,
       ...routes.adminTab({ tab: "conventions" }).link,
     },
+    {
+      label: "Emails",
+      display: isAdminConnected && featureFlags.enableAdminUi,
+      active: false,
+      ...routes.adminTab({ tab: "emails" }).link,
+    },
   ];
+
   const linksFiltered = links.filter((link) => link.display);
   return (
     <Header
