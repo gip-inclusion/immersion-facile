@@ -1,14 +1,16 @@
-import { FieldHookConfig, useField } from "formik";
+import { format } from "date-fns";
+import { useField } from "formik";
 import React from "react";
 
 type DateInputProps = {
+  name: string;
   label: string;
   disabled?: boolean;
   onDateChange: (value: string) => void;
-} & FieldHookConfig<string>;
+};
 
 export const DateInput = (props: DateInputProps) => {
-  const [field, meta] = useField(props);
+  const [field, meta] = useField(props.name);
 
   return (
     <>
@@ -26,7 +28,7 @@ export const DateInput = (props: DateInputProps) => {
               meta.touched && meta.error ? " fr-input--error" : ""
             }`}
             {...field}
-            value={field.value}
+            value={format(new Date(field.value), "yyyy-MM-dd")}
             type="date"
             disabled={props.disabled}
             onChange={(event) => props.onDateChange(event.target.value)}

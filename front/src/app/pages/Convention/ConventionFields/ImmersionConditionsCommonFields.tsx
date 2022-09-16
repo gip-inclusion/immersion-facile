@@ -57,7 +57,6 @@ export const ImmersionConditionsCommonFields = ({
       <DateInput
         label="Date de début de l'immersion *"
         name={getConventionFieldName("dateStart")}
-        type="date"
         disabled={disabled}
         onDateChange={(dateStart) => {
           resetSchedule(dateStart, values.dateEnd);
@@ -68,7 +67,6 @@ export const ImmersionConditionsCommonFields = ({
       <DateInput
         label="Date de fin de l'immersion *"
         name={getConventionFieldName("dateEnd")}
-        type="date"
         disabled={disabled}
         onDateChange={(dateEnd) => {
           resetSchedule(values.dateStart, dateEnd);
