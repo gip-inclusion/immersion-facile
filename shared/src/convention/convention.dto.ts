@@ -65,10 +65,11 @@ export type ConventionDtoWithoutExternalId = {
 
 export type Signatories = { beneficiary: Beneficiary; mentor: Mentor }; // legalRepresentative?: LegalRepresentative
 export type SignatoryRole = Signatories[keyof Signatories]["role"];
+export type Signatory = GenericSignatory<SignatoryRole>;
 
 export const signatoryRoles: SignatoryRole[] = ["beneficiary", "establishment"];
 
-export type Signatory<R extends Role> = {
+type GenericSignatory<R extends Role> = {
   role: R;
   email: string;
   phone: string;
@@ -77,13 +78,13 @@ export type Signatory<R extends Role> = {
   signedAt?: string; // Date iso string
 };
 
-export type Beneficiary = Signatory<"beneficiary"> & {
+export type Beneficiary = GenericSignatory<"beneficiary"> & {
   emergencyContact?: string;
   emergencyContactPhone?: string;
   federatedIdentity?: FederatedIdentity;
 };
 
-export type Mentor = Signatory<"establishment"> & {
+export type Mentor = GenericSignatory<"establishment"> & {
   job: string;
 };
 

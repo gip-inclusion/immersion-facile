@@ -1,11 +1,14 @@
 import { Formik } from "formik";
+import { mergeDeepRight } from "ramda";
 import React, { useEffect, useState } from "react";
 import { Notification } from "react-design-system/immersionFacile";
 import {
+  ConventionField,
   getConventionFieldName,
   isSignatory,
 } from "shared/src/convention/convention";
 import {
+  ConventionDto,
   ConventionReadDto,
   Signatory,
   SignatoryRole,
@@ -37,35 +40,48 @@ interface SignFormProps {
   route: SignFormRoute;
 }
 
-const toDisplayedName = (signatory: Signatory<any>) =>
+const toDisplayedName = (signatory: Signatory) =>
   `${signatory.lastName.toUpperCase()} ${signatory.firstName}`;
 
-const getNameFromRole = (
-  convention: ConventionReadDto,
-  role: SignatoryRole,
-): string => {
-  switch (role) {
+const fromSignatoryRole = (
+  convention: ConventionDto,
+  signatoryRole: SignatoryRole,
+): {
+  displayedName: string;
+  signatory: Signatory;
+  signedAtFieldName: ConventionField;
+  signedAt: string | undefined;
+} => {
+  switch (signatoryRole) {
     case "beneficiary":
-      return toDisplayedName(convention.signatories.beneficiary);
+      return {
+        displayedName: toDisplayedName(convention.signatories.beneficiary),
+        signatory: convention.signatories.beneficiary,
+        signedAtFieldName: getConventionFieldName(
+          "signatories.beneficiary.signedAt",
+        ),
+        signedAt: convention.signatories.beneficiary.signedAt,
+      };
     case "establishment":
-      return toDisplayedName(convention.signatories.mentor);
+      return {
+        displayedName: toDisplayedName(convention.signatories.mentor),
+        signatory: convention.signatories.mentor,
+        signedAtFieldName: getConventionFieldName("signatories.mentor.email"),
+        signedAt: convention.signatories.mentor.signedAt,
+      };
     default:
-      return exhaustiveCheck(role);
+      return exhaustiveCheck(signatoryRole);
   }
 };
 
-const extractRoleAndName = (
-  jwt: string,
-  convention: ConventionReadDto,
-): [SignatoryRole, string] => {
+const extractRole = (jwt: string): SignatoryRole => {
   const payload = decodeJwt<ConventionMagicLinkPayload>(jwt);
   const role = payload.role;
   if (!isSignatory(role))
     throw new Error(
       `Only ${signatoryRoles.join(", ")} are allow to sign, received ${role}`,
     );
-  const name = getNameFromRole(convention, role);
-  return [role, name];
+  return role;
 };
 
 const signeeAllowRoles: Role[] = ["beneficiary", "establishment"];
@@ -124,8 +140,10 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
   useExistingSiret(convention?.siret);
   const [initialValues, setInitialValues] =
     useState<Partial<ConventionReadDto> | null>(null);
-  const [signeeName, setSigneeName] = useState<string | undefined>();
-  const [signeeRole, setSigneeRole] = useState<SignatoryRole | undefined>();
+  const [signatory, setSignatory] = useState<Signatory | undefined>();
+  const [currentSignatoryRole, setCurrentSignatoryRole] = useState<
+    SignatoryRole | undefined
+  >();
   const [alreadySigned, setAlreadySigned] = useState(false);
 
   const [submitFeedback, setSubmitFeedback] = useState<
@@ -134,15 +152,10 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
 
   useEffect(() => {
     if (!convention) return;
-    const [role, name] = extractRoleAndName(jwt, convention);
-    setSigneeName(name);
-    setSigneeRole(role);
-    // Uncheck the checkbox.
-    if (role === "beneficiary") {
-      setAlreadySigned(!!convention.signatories.beneficiary.signedAt);
-    } else if (role === "establishment") {
-      setAlreadySigned(!!convention.signatories.mentor.signedAt);
-    }
+    const role = extractRole(jwt);
+    setCurrentSignatoryRole(role);
+    const { signatory } = fromSignatoryRole(convention, role);
+    setSignatory(signatory);
     setInitialValues(convention);
   }, [!!convention]);
 
@@ -177,25 +190,17 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
             onSubmit={async (values, { setSubmitting, setErrors }) => {
               try {
                 // Confirm checkbox
-                const conditionsAccepted =
-                  signeeRole === "beneficiary"
-                    ? !!values?.signatories?.beneficiary?.signedAt
-                    : !!values?.signatories?.mentor?.signedAt;
+                const { signedAtFieldName, signedAt } = fromSignatoryRole(
+                  mergeDeepRight(convention, values) as ConventionDto,
+                  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                  currentSignatoryRole!,
+                );
+
+                const conditionsAccepted = !!signedAt;
 
                 if (!conditionsAccepted) {
                   setErrors({
-                    [getConventionFieldName(
-                      "signatories.beneficiary.signedAt",
-                    )]:
-                      signeeRole === "beneficiary"
-                        ? "La signature est obligatoire"
-                        : undefined,
-                    [getConventionFieldName(
-                      "signatories.beneficiary.signedAt",
-                    )]:
-                      signeeRole === "establishment"
-                        ? "La signature est obligatoire"
-                        : undefined,
+                    [signedAtFieldName]: "La signature est obligatoire",
                   });
                   setSubmitting(false);
                   return;
@@ -249,14 +254,15 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
                     onReset={props.handleReset}
                     onSubmit={props.handleSubmit}
                   >
-                    <ConventionFormFields
-                      isFrozen={true}
-                      isSignOnly={true}
-                      isSignatureEnterprise={signeeRole === "establishment"}
-                      signeeName={signeeName}
-                      alreadySigned={alreadySigned}
-                      onRejectForm={rejectWithMessageForm}
-                    />
+                    {signatory && (
+                      <ConventionFormFields
+                        isFrozen={true}
+                        isSignOnly={true}
+                        signatory={signatory}
+                        alreadySigned={alreadySigned}
+                        onRejectForm={rejectWithMessageForm}
+                      />
+                    )}
                     {Object.values(props.errors).length > 0 && (
                       <div style={{ color: "red" }}>
                         Veuillez corriger les champs erronés

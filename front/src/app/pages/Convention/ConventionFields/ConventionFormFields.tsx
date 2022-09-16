@@ -1,7 +1,10 @@
 import { useFormikContext } from "formik";
 import React, { useEffect } from "react";
 import { getConventionFieldName } from "shared/src/convention/convention";
-import type { ConventionDto } from "shared/src/convention/convention.dto";
+import type {
+  ConventionDto,
+  Signatory,
+} from "shared/src/convention/convention.dto";
 import { AgencyDisplay } from "src/app/components/AgencyDisplay";
 import { AgencySelector } from "src/app/components/AgencySelector";
 import { deviceRepository } from "src/app/config/dependencies";
@@ -20,18 +23,17 @@ import { FormSectionTitle } from "src/uiComponents/FormSectionTitle";
 
 type ConventionFieldsProps = {
   isFrozen?: boolean;
-  isSignOnly?: boolean;
-  isSignatureEnterprise?: boolean; //< Ignored if !isSignOnly. Determines who's signing (enterprise or beneficiary)
-  signeeName?: string; //< Ignored if !isSignOnly. Name of the person signing.
   alreadySigned?: boolean;
   onRejectForm?: () => Promise<void>; //< called when the form is sent back for modifications in signature mode
-};
+} & (
+  | { isSignOnly: true; signatory: Signatory }
+  | { isSignOnly?: false; signatory?: undefined }
+);
 
 export const ConventionFormFields = ({
   isFrozen,
   isSignOnly: isSignatureMode,
-  isSignatureEnterprise,
-  signeeName,
+  signatory,
   alreadySigned,
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   onRejectForm = async () => {},
@@ -121,8 +123,7 @@ export const ConventionFormFields = ({
             <p>Vous avez signé la convention.</p>
           ) : (
             <SignatureActions
-              isSignatureEnterprise={isSignatureEnterprise}
-              signeeName={signeeName}
+              signatory={signatory}
               isSubmitting={isSubmitting}
               onSubmit={submitForm}
               onRejectForm={onRejectForm}
