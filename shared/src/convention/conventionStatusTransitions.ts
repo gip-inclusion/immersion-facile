@@ -12,17 +12,17 @@ export const statusTransitionConfigs: Record<
 > = {
   READY_TO_SIGN: {
     validInitialStatuses: ["DRAFT"],
-    validRoles: ["beneficiary", "establishment"],
+    validRoles: ["beneficiary", "establishment", "legal-representative"],
   },
 
   PARTIALLY_SIGNED: {
-    validInitialStatuses: ["READY_TO_SIGN"],
-    validRoles: ["beneficiary", "establishment"],
+    validInitialStatuses: ["READY_TO_SIGN", "PARTIALLY_SIGNED"],
+    validRoles: ["beneficiary", "establishment", "legal-representative"],
   },
 
   IN_REVIEW: {
     validInitialStatuses: ["PARTIALLY_SIGNED"],
-    validRoles: ["beneficiary", "establishment"],
+    validRoles: ["beneficiary", "establishment", "legal-representative"],
   },
 
   ACCEPTED_BY_COUNSELLOR: {
@@ -73,6 +73,7 @@ export const statusTransitionConfigs: Record<
       "admin",
       "beneficiary",
       "establishment",
+      "legal-representative",
     ],
   },
 };

@@ -23,6 +23,7 @@ import {
   immersionMaximumCalendarDays,
   ListConventionsRequestDto,
   Mentor,
+  LegalRepresentative,
   RenewMagicLinkRequestDto,
   UpdateConventionRequestDto,
   UpdateConventionStatusRequestDto,
@@ -30,8 +31,7 @@ import {
 } from "./convention.dto";
 import {
   emailAndMentorEmailAreDifferent,
-  mustBeSignedByBeneficiary,
-  mustBeSignedByEstablishment,
+  mustBeSignedByEveryone,
   startDateIsBeforeEndDate,
   underMaxCalendarDuration,
 } from "./conventionRefinements";
@@ -42,6 +42,7 @@ import { scheduleSchema } from "../schedule/Schedule.schema";
 import { allRoles } from "../tokens/MagicLinkPayload";
 import { dateRegExp } from "../utils/date";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
+import { getConventionFieldName } from "./convention";
 
 export const conventionIdSchema: z.ZodSchema<ConventionId> = zTrimmedString;
 export const externalConventionIdSchema: z.ZodSchema<ConventionExternalId> =
@@ -76,6 +77,13 @@ const mentorSchema: z.Schema<Mentor> = signatorySchema.merge(
     job: zStringPossiblyEmpty,
   }),
 );
+const legalRepresentativeSchema: z.Schema<LegalRepresentative> =
+  signatorySchema.merge(
+    z.object({
+      role: z.enum(["legal-representative"]),
+      job: zStringPossiblyEmpty,
+    }),
+  );
 
 const conventionWithoutExternalIdZObject = z.object({
   id: conventionIdSchema,
@@ -110,6 +118,7 @@ const conventionWithoutExternalIdZObject = z.object({
   signatories: z.object({
     beneficiary: beneficiarySchema,
     mentor: mentorSchema,
+    legalRepresentative: legalRepresentativeSchema.optional(),
   }),
 });
 
@@ -117,23 +126,22 @@ export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExt
   conventionWithoutExternalIdZObject
     .refine(startDateIsBeforeEndDate, {
       message: "La date de fin doit être après la date de début.",
-      path: ["dateEnd"],
+      path: [getConventionFieldName("dateEnd")],
     })
     .refine(underMaxCalendarDuration, {
       message: `La durée maximale calendaire d'une immersion est de ${immersionMaximumCalendarDays} jours.`,
-      path: ["dateEnd"],
+      path: [getConventionFieldName("dateEnd")],
     })
     .refine(emailAndMentorEmailAreDifferent, {
       message: "Votre adresse e-mail doit être différente de celle du tuteur",
-      path: ["mentorEmail"],
+      path: [
+        getConventionFieldName("signatories.mentor.email"),
+        getConventionFieldName("signatories.beneficiary.email"),
+      ],
     })
-    .refine(mustBeSignedByBeneficiary, {
+    .refine(mustBeSignedByEveryone, {
       message: "La confirmation de votre accord est obligatoire.",
-      path: ["beneficiaryAccepted"],
-    })
-    .refine(mustBeSignedByEstablishment, {
-      message: "La confirmation de votre accord est obligatoire.",
-      path: ["enterpriseAccepted"],
+      path: [getConventionFieldName("status")],
     });
 
 export const conventionSchema: z.Schema<ConventionDto> =
@@ -141,23 +149,22 @@ export const conventionSchema: z.Schema<ConventionDto> =
     .merge(z.object({ externalId: externalConventionIdSchema }))
     .refine(startDateIsBeforeEndDate, {
       message: "La date de fin doit être après la date de début.",
-      path: ["dateEnd"],
+      path: [getConventionFieldName("dateEnd")],
     })
     .refine(underMaxCalendarDuration, {
       message: `La durée maximale calendaire d'une immersion est de ${immersionMaximumCalendarDays} jours.`,
-      path: ["dateEnd"],
+      path: [getConventionFieldName("dateEnd")],
     })
     .refine(emailAndMentorEmailAreDifferent, {
       message: "Votre adresse e-mail doit être différente de celle du tuteur",
-      path: ["mentorEmail"],
+      path: [
+        getConventionFieldName("signatories.mentor.email"),
+        getConventionFieldName("signatories.beneficiary.email"),
+      ],
     })
-    .refine(mustBeSignedByBeneficiary, {
+    .refine(mustBeSignedByEveryone, {
       message: "La confirmation de votre accord est obligatoire.",
-      path: ["beneficiaryAccepted"],
-    })
-    .refine(mustBeSignedByEstablishment, {
-      message: "La confirmation de votre accord est obligatoire.",
-      path: ["enterpriseAccepted"],
+      path: [getConventionFieldName("status")],
     });
 
 export const conventionReadSchema: z.Schema<ConventionReadDto> =
@@ -170,23 +177,22 @@ export const conventionReadSchema: z.Schema<ConventionReadDto> =
     )
     .refine(startDateIsBeforeEndDate, {
       message: "La date de fin doit être après la date de début.",
-      path: ["dateEnd"],
+      path: [getConventionFieldName("dateEnd")],
     })
     .refine(underMaxCalendarDuration, {
       message: `La durée maximale calendaire d'une immersion est de ${immersionMaximumCalendarDays} jours.`,
-      path: ["dateEnd"],
+      path: [getConventionFieldName("dateEnd")],
     })
     .refine(emailAndMentorEmailAreDifferent, {
       message: "Votre adresse e-mail doit être différente de celle du tuteur",
-      path: ["mentorEmail"],
+      path: [
+        getConventionFieldName("signatories.mentor.email"),
+        getConventionFieldName("signatories.beneficiary.email"),
+      ],
     })
-    .refine(mustBeSignedByBeneficiary, {
+    .refine(mustBeSignedByEveryone, {
       message: "La confirmation de votre accord est obligatoire.",
-      path: ["beneficiaryAccepted"],
-    })
-    .refine(mustBeSignedByEstablishment, {
-      message: "La confirmation de votre accord est obligatoire.",
-      path: ["enterpriseAccepted"],
+      path: [getConventionFieldName("status")],
     });
 
 export const conventionReadsSchema: z.Schema<Array<ConventionReadDto>> =

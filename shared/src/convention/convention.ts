@@ -1,50 +1,73 @@
+import { keys, values } from "ramda";
 import { reasonableSchedule } from "../schedule/ScheduleUtils";
 import { Role } from "../tokens/MagicLinkPayload";
-import { DotNestedKeys, ExtractFromExisting } from "../utils";
+import { DotNestedKeys } from "../utils";
 import {
   Beneficiary,
   ConventionDto,
   ConventionStatus,
   Mentor,
+  Signatories,
   SignatoryRole,
   signatoryRoles,
 } from "./convention.dto";
 
-const getNewStatus = (
-  enterpriseAccepted: boolean,
-  beneficiaryAccepted: boolean,
-): ConventionStatus => {
-  if (enterpriseAccepted && beneficiaryAccepted) return "IN_REVIEW";
-  if (
-    (enterpriseAccepted && !beneficiaryAccepted) ||
-    (!enterpriseAccepted && beneficiaryAccepted)
-  )
-    return "PARTIALLY_SIGNED";
-  return "READY_TO_SIGN";
+export const allSignatoriesSigned = (signatories: Signatories) =>
+  values(signatories).every((signatory) => !signatory || !!signatory?.signedAt);
+
+const getNewStatus = (signatories: Signatories): ConventionStatus => {
+  if (allSignatoriesSigned(signatories)) return "IN_REVIEW";
+  return "PARTIALLY_SIGNED";
+};
+
+const updateSignatoriesOnSignature = (
+  signatories: Signatories,
+  role: SignatoryRole,
+  signedAt: string,
+): Signatories => {
+  switch (role) {
+    case "beneficiary":
+      return {
+        ...signatories,
+        beneficiary: { ...signatories.beneficiary, signedAt },
+      };
+    case "establishment":
+      return {
+        ...signatories,
+        mentor: { ...signatories.mentor, signedAt },
+      };
+    default: {
+      const keyOfRole = keys(signatories).find(
+        (signatoryKey) => signatories[signatoryKey]?.role === role,
+      );
+      if (!keyOfRole) return signatories; // ToDo : throw Forbidden Error
+      return {
+        ...signatories,
+        beneficiary: signatories.beneficiary,
+        mentor: signatories.mentor,
+        [keyOfRole]: { ...signatories[keyOfRole], signedAt },
+      };
+    }
+  }
 };
 
 // Returns an application signed by provided roles.
 export const signConventionDtoWithRole = (
   convention: ConventionDto,
-  role: ExtractFromExisting<Role, "beneficiary" | "establishment">,
+  role: SignatoryRole,
   signedAt: string,
 ): ConventionDto => {
-  const beneficiary =
-    role === "beneficiary"
-      ? { ...convention.signatories.beneficiary, signedAt }
-      : convention.signatories.beneficiary;
-  const mentor =
-    role === "establishment"
-      ? { ...convention.signatories.mentor, signedAt }
-      : convention.signatories.mentor;
+  const updatedSignatories = updateSignatoriesOnSignature(
+    convention.signatories,
+    role,
+    signedAt,
+  );
 
-  const enterpriseAccepted = !!mentor.signedAt;
-  const beneficiaryAccepted = !!beneficiary.signedAt;
-  const status = getNewStatus(enterpriseAccepted, beneficiaryAccepted);
+  const status = getNewStatus(updatedSignatories);
 
   return {
     ...convention,
-    signatories: { beneficiary, mentor },
+    signatories: updatedSignatories,
     status,
   };
 };

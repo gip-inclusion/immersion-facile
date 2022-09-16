@@ -22,6 +22,7 @@ describe("UpdateConventionStatus", () => {
       allowedRoles: [
         "beneficiary",
         "establishment",
+        "legal-representative",
         "counsellor",
         "validator",
         "admin",
@@ -39,7 +40,7 @@ describe("UpdateConventionStatus", () => {
     testForAllRolesAndInitialStatusCases({
       targetStatus: "READY_TO_SIGN",
       expectedDomainTopic: null,
-      allowedRoles: ["beneficiary", "establishment"],
+      allowedRoles: ["beneficiary", "establishment", "legal-representative"],
       allowedInitialStatuses: ["DRAFT"],
     });
   });
@@ -48,8 +49,8 @@ describe("UpdateConventionStatus", () => {
     testForAllRolesAndInitialStatusCases({
       targetStatus: "PARTIALLY_SIGNED",
       expectedDomainTopic: "ImmersionApplicationPartiallySigned",
-      allowedRoles: ["beneficiary", "establishment"],
-      allowedInitialStatuses: ["READY_TO_SIGN"],
+      allowedRoles: ["beneficiary", "establishment", "legal-representative"],
+      allowedInitialStatuses: ["READY_TO_SIGN", "PARTIALLY_SIGNED"],
     });
   });
 
@@ -57,7 +58,7 @@ describe("UpdateConventionStatus", () => {
     testForAllRolesAndInitialStatusCases({
       targetStatus: "IN_REVIEW",
       expectedDomainTopic: "ImmersionApplicationFullySigned",
-      allowedRoles: ["beneficiary", "establishment"],
+      allowedRoles: ["beneficiary", "establishment", "legal-representative"],
       allowedInitialStatuses: ["PARTIALLY_SIGNED"],
     });
   });

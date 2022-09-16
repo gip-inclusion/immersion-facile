@@ -63,11 +63,20 @@ export type ConventionDtoWithoutExternalId = {
   signatories: Signatories;
 };
 
-export type Signatories = { beneficiary: Beneficiary; mentor: Mentor }; // legalRepresentative?: LegalRepresentative
-export type SignatoryRole = Signatories[keyof Signatories]["role"];
+export type Signatories = {
+  beneficiary: Beneficiary;
+  mentor: Mentor;
+  legalRepresentative?: LegalRepresentative;
+};
+export type SignatoryRole =
+  Required<Signatories>[keyof Required<Signatories>]["role"];
 export type Signatory = GenericSignatory<SignatoryRole>;
 
-export const signatoryRoles: SignatoryRole[] = ["beneficiary", "establishment"];
+export const signatoryRoles: SignatoryRole[] = [
+  "beneficiary",
+  "establishment",
+  "legal-representative",
+];
 
 type GenericSignatory<R extends Role> = {
   role: R;
@@ -88,7 +97,7 @@ export type Mentor = GenericSignatory<"establishment"> & {
   job: string;
 };
 
-// type LegalRepresentative = Signatory<"legal-representative">;
+export type LegalRepresentative = GenericSignatory<"legal-representative">;
 
 export type ConventionDto = ConventionDtoWithoutExternalId & {
   externalId: ConventionExternalId;

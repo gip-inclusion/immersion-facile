@@ -1,4 +1,5 @@
 import differenceInDays from "date-fns/differenceInDays";
+import { allSignatoriesSigned } from "./convention";
 import {
   ConventionStatus,
   immersionMaximumCalendarDays,
@@ -39,16 +40,9 @@ const statusesAllowedWithoutSign: ConventionStatus[] = [
   "CANCELLED",
 ];
 
-export const mustBeSignedByBeneficiary = (params: {
+export const mustBeSignedByEveryone = (params: {
   signatories: Signatories;
   status: ConventionStatus;
 }): boolean =>
   statusesAllowedWithoutSign.includes(params.status) ||
-  !!params.signatories.beneficiary.signedAt;
-
-export const mustBeSignedByEstablishment = (params: {
-  signatories: Signatories;
-  status: ConventionStatus;
-}): boolean =>
-  statusesAllowedWithoutSign.includes(params.status) ||
-  !!params.signatories.mentor.signedAt;
+  allSignatoriesSigned(params.signatories);

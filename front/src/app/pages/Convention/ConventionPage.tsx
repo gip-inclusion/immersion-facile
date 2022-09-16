@@ -28,9 +28,7 @@ interface ConventionPageProps {
 
 type WithSignatures = {
   signatories: {
-    [K in keyof Signatories]:
-      | Partial<Signatories[K]>
-      | Pick<Signatories[K], "signedAt">;
+    [K in keyof Signatories]: Partial<Signatories[K]>;
   };
 };
 

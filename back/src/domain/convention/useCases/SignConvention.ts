@@ -30,11 +30,17 @@ const domainTopicByTargetStatusMap: Partial<
   IN_REVIEW: "ImmersionApplicationFullySigned",
 };
 
-const roleAllowToSign: Role[] = ["establishment", "beneficiary"];
+const roleAllowToSign: Role[] = [
+  "establishment",
+  "beneficiary",
+  "legal-representative",
+];
 const isAllowedToSign = (
   role: Role,
-): role is ExtractFromExisting<Role, "beneficiary" | "establishment"> =>
-  roleAllowToSign.includes(role);
+): role is ExtractFromExisting<
+  Role,
+  "beneficiary" | "establishment" | "legal-representative"
+> => roleAllowToSign.includes(role);
 
 export class SignConvention extends TransactionalUseCase<
   void,
@@ -59,7 +65,7 @@ export class SignConvention extends TransactionalUseCase<
 
     if (!isAllowedToSign(role))
       throw new ForbiddenError(
-        "Only Beneficiary or Mentor are allowed to sign convention",
+        "Only Beneficiary, Mentor or Legal representative are allowed to sign convention",
       );
 
     const initialConvention = await uow.conventionRepository.getById(

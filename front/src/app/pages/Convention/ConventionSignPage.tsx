@@ -69,6 +69,19 @@ const fromSignatoryRole = (
         signedAtFieldName: getConventionFieldName("signatories.mentor.email"),
         signedAt: convention.signatories.mentor.signedAt,
       };
+    case "legal-representative":
+      if (!convention.signatories.legalRepresentative)
+        throw new Error("No legal representative for this convention. ");
+      return {
+        displayedName: toDisplayedName(
+          convention.signatories.legalRepresentative,
+        ),
+        signatory: convention.signatories.legalRepresentative,
+        signedAtFieldName: getConventionFieldName(
+          "signatories.legalRepresentative.email",
+        ),
+        signedAt: convention.signatories.legalRepresentative.signedAt,
+      };
     default:
       return exhaustiveCheck(signatoryRole);
   }

@@ -1,3 +1,4 @@
+import { mapObjIndexed } from "ramda";
 import {
   ConventionDto,
   ConventionStatus,
@@ -63,18 +64,27 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     );
 
     const conventionUpdatedAt = this.clock.now().toISOString();
+    const { beneficiary, mentor, ...otherSignatories } = storedDto.signatories;
     const updatedDto: ConventionDto = {
       ...storedDto,
       ...(status === "REJECTED" && { rejectionJustification: justification }),
       ...(status === "DRAFT" && {
         signatories: {
+          ...mapObjIndexed(
+            (signatory) => ({ ...signatory, signedAt: undefined }),
+            otherSignatories,
+          ),
           beneficiary: {
-            ...storedDto.signatories.beneficiary,
+            ...beneficiary,
             signedAt: undefined,
           },
-          mentor: { ...storedDto.signatories.mentor, signedAt: undefined },
+          mentor: {
+            ...mentor,
+            signedAt: undefined,
+          },
         },
       }),
+
       status,
       dateValidation: validatedConventionStatuses.includes(status)
         ? conventionUpdatedAt

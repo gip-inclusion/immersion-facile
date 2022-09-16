@@ -25,6 +25,12 @@ const processedDataBySignatoryRole: Record<
     fieldName: getConventionFieldName("signatories.mentor.signedAt"),
     signatoryFunction: "représentant de la structure d'accueil",
   },
+  "legal-representative": {
+    fieldName: getConventionFieldName(
+      "signatories.legalRepresentative.signedAt",
+    ),
+    signatoryFunction: "représentant légal du bénéficiaire",
+  },
 };
 
 const getSignatoryProcessedData = (

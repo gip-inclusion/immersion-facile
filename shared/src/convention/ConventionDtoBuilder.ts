@@ -9,6 +9,7 @@ import {
   ImmersionObjective,
   Beneficiary,
   Mentor,
+  LegalRepresentative,
 } from "./convention.dto";
 import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { FederatedIdentity } from "../federatedIdentities/federatedIdentity.dto";
@@ -96,6 +97,19 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     return new ConventionDtoBuilder({
       ...this.dto,
       signatories: { beneficiary, mentor: this.mentor },
+    });
+  }
+
+  public withLegalRepresentative(
+    legalRepresentative: LegalRepresentative,
+  ): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({
+      ...this.dto,
+      signatories: {
+        beneficiary: this.beneficiary,
+        mentor: this.mentor,
+        legalRepresentative,
+      },
     });
   }
 
@@ -274,6 +288,10 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
       signatories: {
         beneficiary: { ...this.beneficiary, signedAt: undefined },
         mentor: { ...this.mentor, signedAt: undefined },
+        legalRepresentative: this.legalRepresentative && {
+          ...this.legalRepresentative,
+          signedAt: undefined,
+        },
       },
     });
   }
@@ -307,12 +325,16 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     });
   }
 
-  public get mentor(): Mentor {
+  private get mentor(): Mentor {
     return this.dto.signatories.mentor;
   }
 
-  public get beneficiary(): Beneficiary {
+  private get beneficiary(): Beneficiary {
     return this.dto.signatories.beneficiary;
+  }
+
+  private get legalRepresentative(): LegalRepresentative | undefined {
+    return this.dto.signatories.legalRepresentative;
   }
 
   public build() {
