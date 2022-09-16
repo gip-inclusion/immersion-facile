@@ -18,6 +18,10 @@ export type EmailSentDto = {
   error?: string;
 };
 
+type KeysOfUnion<T> = T extends T ? keyof T : never;
+// https://stackoverflow.com/questions/49401866/all-possible-keys-of-an-union-type
+export type EmailVariables = KeysOfUnion<TemplatedEmail["params"]>;
+
 export type TemplatedEmail =
   | NewConventionBeneficiaryConfirmationEmail
   | NewConventionMentorConfirmationEmail

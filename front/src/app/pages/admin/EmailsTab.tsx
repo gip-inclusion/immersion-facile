@@ -1,3 +1,4 @@
+import { keys } from "ramda";
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import {
@@ -5,7 +6,7 @@ import {
   DsfrTitle,
   Notification,
 } from "react-design-system/immersionFacile";
-import { EmailSentDto } from "shared/src/email/email";
+import { EmailSentDto, EmailVariables } from "shared/src/email/email";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { adminSlice } from "src/core-logic/domain/admin/admin.slice";
@@ -61,22 +62,34 @@ const Email = ({ email }: { email: EmailSentDto }) => {
         title="Paramètres"
         contents={
           <ul className="text-xs">
-            {Object.entries(email.templatedEmail.params).map(([key, value]) => (
-              <li key={key}>
-                {" "}
-                <span className="font-normal">{key} :</span>{" "}
-                <span
-                  style={{ width: "500px" }}
-                  className="font-thin inline-block break-words"
-                >
-                  {key === "magicLink" ? (
-                    <a href={value as string}>Magic link</a>
-                  ) : (
-                    JSON.stringify(value, undefined, 2)
-                  )}
-                </span>
-              </li>
-            ))}
+            {keys(email.templatedEmail.params).map((key: EmailVariables) => {
+              const value = (
+                email.templatedEmail.params as Record<EmailVariables, string>
+              )[key];
+
+              const links: EmailVariables[] = [
+                "magicLink",
+                "conventionFormUrl",
+                "editFrontUrl",
+              ];
+
+              return (
+                <li key={key}>
+                  {" "}
+                  <span className="font-normal">{key} :</span>{" "}
+                  <span
+                    style={{ width: "500px" }}
+                    className="font-thin inline-block break-words"
+                  >
+                    {links.includes(key) ? (
+                      <a href={value as string}>Liens vers la page</a>
+                    ) : (
+                      JSON.stringify(value, undefined, 2)
+                    )}
+                  </span>
+                </li>
+              );
+            })}
           </ul>
         }
       />

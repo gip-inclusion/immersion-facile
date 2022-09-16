@@ -4,6 +4,7 @@ import { keys } from "ramda";
 import {
   EmailSentDto,
   EmailType,
+  EmailVariables,
   TemplatedEmail,
 } from "shared/src/email/email";
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
@@ -208,9 +209,6 @@ const emailTypeToTemplateId: Record<EmailType, number> = {
   AGENCY_WAS_ACTIVATED: 48,
 };
 
-type KeysOfUnion<T> = T extends T ? keyof T : never;
-// https://stackoverflow.com/questions/49401866/all-possible-keys-of-an-union-type
-type EmailVariables = KeysOfUnion<TemplatedEmail["params"]>;
 // keys are from our domain, values are SendInBlue keys in the templates :
 const sendInBlueKeyByEmailVariables: Record<EmailVariables, string> = {
   additionalDetails: "ADDITIONAL_DETAILS",
