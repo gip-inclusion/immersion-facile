@@ -1,6 +1,5 @@
 import { VirtualTimeScheduler } from "rxjs";
 import { TestAdminGateway } from "src/core-logic/adapters/AdminGateway/TestAdminGateway";
-import { TestAgencyGateway } from "src/core-logic/adapters/AgencyGateway/TestAgencyGateway";
 import { createTestDeviceRepository } from "src/core-logic/adapters/DeviceRepository/createTestDeviceRepository";
 import { TestSentEmailGateway } from "src/core-logic/adapters/EmailGateway/TestSentEmailGateway";
 
@@ -15,13 +14,14 @@ import { createStore, RootState } from "src/core-logic/storeConfig/store";
 import { TestImmersionAssessmentGateway } from "../adapters/AssessmentGateway/TestImmersionAssessmentGateway";
 import { InMemoryAddressGateway } from "../adapters/AddressGateway/InMemoryAddressGateway";
 import { TestSiretGatewayThroughBack } from "../adapters/SiretGatewayThroughBack/TestSiretGatewayThroughBack";
+import { TestAgencyGateway } from "../adapters/AgencyGateway/TestAgencyGateway";
 
 export interface TestDependencies {
   adminGateway: TestAdminGateway;
   immersionAssessmentGateway: TestImmersionAssessmentGateway;
   siretGatewayThroughBack: TestSiretGatewayThroughBack;
   agencyGateway: TestAgencyGateway;
-  immersionAddressGateway: InMemoryAddressGateway;
+  addressGateway: InMemoryAddressGateway;
   technicalGateway: TestTechnicalGateway;
   establishmentGateway: InMemoryEstablishmentGateway;
   conventionGateway: InMemoryConventionGateway;
@@ -42,7 +42,7 @@ export const createTestStore = (preloadedState?: Partial<RootState>) => {
     immersionSearchGateway: new InMemoryImmersionSearchGateway(),
     establishmentGateway: new InMemoryEstablishmentGateway(),
     conventionGateway: new InMemoryConventionGateway(),
-    immersionAddressGateway: new InMemoryAddressGateway(),
+    addressGateway: new InMemoryAddressGateway(),
     technicalGateway: new TestTechnicalGateway(),
     agencyGateway: new TestAgencyGateway(),
     romeAutocompleteGateway: new InMemoryRomeAutocompleteGateway(),

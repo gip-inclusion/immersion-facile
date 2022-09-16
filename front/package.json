@@ -2,7 +2,6 @@
   "version": "0.0.0",
   "scripts": {
     "test": "jest --passWithNoTests --verbose --testRegex='^((?!(integration|manual)).)*.test.ts$'",
-    "testa": "jest --passWithNoTests --verbose --testRegex='agencies.test.ts' --watch",
     "test:manual": "jest --runInBand --watchAll --testRegex=.manual.test.ts",
     "dev": "VITE_GATEWAY=IN_MEMORY vite",
     "dev-http": "vite",
