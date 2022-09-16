@@ -55,7 +55,7 @@ describe("Agencies in store", () => {
 });
 ```
 
-⚠️ En executant le test on voit que l'epic est déclenché en boucle car il réagit à toutes les actions du store.
+⚠️ En exécutant le test on voit que l'epic est déclenché en boucle car il réagit à toutes les actions du store.
 
 ![capture_console.png](capture_console.png)
 
@@ -234,8 +234,21 @@ Il est possible maintenant de déclencher un epic depuis (par exemple) un compos
 
 eg: // TODO Mettre l'exemple une fois qu'on aura travaillé sur le composant
 
-// TODO
+## Typage & Mise à jour de l'état
 
-- On veut rajouter un peu d'explication sur le typage
-- On veut rajouter l'explication d'une action avec un payload
-- On veut expliquer l'affectation du payload au state et ou l'action car c'est transverse.
+⚠️ Le type du payload de l'action reste transverse au cours de l'epic. Il sera inféré tout au long de la chaine du pipe().
+
+```typescript
+action$.pipe(
+  filter(objetMetierSlice.actions.myActionStartFetch.match),
+  switchMap(
+    (
+      action, // action.payload récupère le type transmis par filter (ex: ObjetMetierType)
+    ) => dependance.recupererMesObjetsDansUnObservable$(),
+  ),
+  map(objetMetierSlice.actions.recupererObjectsMetiersSucceeded),
+);
+```
+
+⚠️ Le 'switchMap' va remplacer le flux (initié par l'observable sur l'action) par un autre observable (retour de recupererMesObjectDansUnObserable$());
+⚠️ On va stocker le retour de ce flux dans le state dans l'action recupererObjectsMetiersSucceeded

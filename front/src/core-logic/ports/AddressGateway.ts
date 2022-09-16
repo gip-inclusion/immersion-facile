@@ -5,7 +5,7 @@ import {
   Postcode,
 } from "shared/src/address/address.dto";
 
-export interface ImmersionAddressGateway {
+export interface AddressGateway {
   lookupStreetAddress(lookup: LookupAddress): Promise<AddressAndPosition[]>;
   findDepartmentCodeFromPostCode(
     postcode: Postcode,

@@ -13,9 +13,9 @@ import {
   departmentCodeFromPostcodeRoute,
   lookupStreetAddressRoute,
 } from "shared/src/routes";
-import { ImmersionAddressGateway } from "src/core-logic/ports/ImmersionAddressGateway";
+import { AddressGateway } from "src/core-logic/ports/AddressGateway";
 
-export class HttpImmersionAddressGateway implements ImmersionAddressGateway {
+export class HttpAddressGateway implements AddressGateway {
   constructor(private readonly httpClient: AxiosInstance) {}
 
   public async lookupStreetAddress(

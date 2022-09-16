@@ -9,7 +9,6 @@ import {
   AgencyId,
   AgencyIdAndName,
   AgencyPublicDisplayDto,
-  ConventionViewAgencyDto,
   CreateAgencyDto,
   WithAgencyId,
 } from "shared/src/agency/agency.dto";
@@ -17,18 +16,26 @@ import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
 import { propEq, propNotEq } from "shared/src/ramdaExtensions/propEq";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
-export class TestAgencyGateway implements AgencyGateway {
-  public agencies$ = new Subject<ConventionViewAgencyDto[]>();
+type TestAgency = AgencyIdAndName & {
+  departmentCode: DepartmentCode;
+};
 
-  listAgencies$(
-    departmentCode: DepartmentCode,
-  ): Observable<ConventionViewAgencyDto[]> {
+const toAgencyIdAndName = (testAgency: TestAgency): AgencyIdAndName => ({
+  id: testAgency.id,
+  name: testAgency.name,
+});
+
+export class TestAgencyGateway implements AgencyGateway {
+  public agencies$ = new Subject<TestAgency[]>();
+
+  listAgencies$(departmentCode: DepartmentCode): Observable<AgencyIdAndName[]> {
     return this.agencies$.pipe(
-      map((agencies: ConventionViewAgencyDto[]) =>
-        agencies.filter(
-          (agency: ConventionViewAgencyDto) =>
-            agency.address.departmentCode === departmentCode,
-        ),
+      map((agencies: TestAgency[]) =>
+        agencies
+          .filter(
+            (agency: TestAgency) => agency.departmentCode === departmentCode,
+          )
+          .map(toAgencyIdAndName),
       ),
     );
   }

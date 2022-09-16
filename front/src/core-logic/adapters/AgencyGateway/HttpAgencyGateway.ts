@@ -75,6 +75,7 @@ export class HttpAgencyGateway implements AgencyGateway {
     const request: ListAgenciesByDepartmentCodeRequestDto = {
       departmentCode,
     };
+
     return from(this.getAgencies(request));
   }
 

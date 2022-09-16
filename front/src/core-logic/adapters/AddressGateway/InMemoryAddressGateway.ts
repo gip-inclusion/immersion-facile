@@ -3,11 +3,9 @@ import {
   DepartmentCode,
 } from "shared/src/address/address.dto";
 import { sleep } from "shared/src/utils";
-import { ImmersionAddressGateway } from "src/core-logic/ports/ImmersionAddressGateway";
+import { AddressGateway } from "src/core-logic/ports/AddressGateway";
 
-export class InMemoryImmersionAddressGateway
-  implements ImmersionAddressGateway
-{
+export class InMemoryAddressGateway implements AddressGateway {
   constructor(private simulatedLatencyMs: number | undefined = undefined) {}
 
   public async lookupStreetAddress(

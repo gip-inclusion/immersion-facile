@@ -21,7 +21,6 @@ export interface AgencyGateway {
   getAgencyPublicInfoById(
     agencyId: WithAgencyId,
   ): Promise<AgencyPublicDisplayDto>;
-
   listAgencies$(
     departmentCode: DepartmentCode,
   ): Observable<ConventionViewAgencyDto[]>;

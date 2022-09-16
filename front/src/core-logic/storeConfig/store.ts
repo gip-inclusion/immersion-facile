@@ -26,7 +26,6 @@ import { conventionSlice } from "../domain/convention/convention.slice";
 import { authEpics } from "../domain/auth/auth.epics";
 import { agenciesEpics } from "../domain/agencies/agencies.epics";
 import { agenciesSlice } from "../domain/agencies/agencies.slice";
-//import { agenciesSlice } from "../domain/agencies/agencies.slice";
 
 const allEpics: any[] = [
   ...dashboardUrlsEpics,
@@ -42,15 +41,6 @@ const allEpics: any[] = [
   ...conventionEpics,
   ...immersionAssessmentEpics,
 ];
-
-const rootEpic: Epic = (action$, store$, dependencies) =>
-  combineEpics(...allEpics)(action$, store$, dependencies).pipe(
-    catchError((error, source) => {
-      //eslint-disable-next-line no-console
-      console.error("combineEpic", error);
-      return source;
-    }),
-  );
 
 const rootReducer = combineReducers({
   [agenciesSlice.name]: agenciesSlice.reducer,
@@ -68,6 +58,15 @@ const rootReducer = combineReducers({
     [sentEmailsSlice.name]: sentEmailsSlice.reducer,
   }),
 });
+
+const rootEpic: Epic = (action$, store$, dependencies) =>
+  combineEpics(...allEpics)(action$, store$, dependencies).pipe(
+    catchError((error, source) => {
+      //eslint-disable-next-line no-console
+      console.error("combineEpic", error);
+      return source;
+    }),
+  );
 
 export type StoreProps = {
   dependencies: Dependencies;
@@ -93,5 +92,4 @@ export const createRootSelector = <T>(selector: (state: RootState) => T) =>
   selector;
 
 export type ReduxStore = ReturnType<typeof createStore>;
-// export type RootState2 = ReturnType<Store["getState"]>;
 export type AppDispatch = ReduxStore["dispatch"];

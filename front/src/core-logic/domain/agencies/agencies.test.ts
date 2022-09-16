@@ -1,5 +1,5 @@
-import { ConventionViewAgencyDto } from "shared/src/agency/agency.dto";
 import { expectToEqual } from "shared/src/expectToEqual";
+import { AgencyIdAndName } from "src/../../shared/src/agency/agency.dto";
 import {
   createTestStore,
   TestDependencies,
@@ -18,13 +18,18 @@ describe("Agencies in store", () => {
   });
 
   it("agencies list should be initialState at start", () => {
-    const expected: ConventionViewAgencyDto[] = [];
+    const expected: AgencyIdAndName[] = [];
     expectToEqual(store.getState().agencies, expected);
   });
 
   it("should return filtered agencies list in Ain department using department code", () => {
     // Arrange
-    const expected: ConventionViewAgencyDto[] = [conventionAgencies[0]];
+    const expected: AgencyIdAndName[] = [
+      {
+        id: "0",
+        name: "Agence de Bougoin",
+      },
+    ];
 
     const departementCode = "11";
 
@@ -37,43 +42,17 @@ describe("Agencies in store", () => {
     // Expect
     expectToEqual(agenciesSelector(store.getState()), expected);
   });
-
-  it("should return filtered agencies list in Ain department using postcode", () => {
-    // Arrange
-    const expected: ConventionViewAgencyDto[] = [conventionAgencies[0]];
-
-    const postCode = "11000";
-
-    // Execute
-    store.dispatch(agenciesSlice.actions.fetchAgenciesRequested(postCode));
-    dependencies.agencyGateway.agencies$.next(conventionAgencies);
-
-    // Expect
-    expectToEqual(agenciesSelector(store.getState()), expected);
-  });
 });
 
-const conventionAgencies: ConventionViewAgencyDto[] = [
+const conventionAgencies: (AgencyIdAndName & { departmentCode: string })[] = [
   {
     id: "0",
-    kind: "pole-emploi",
     name: "Agence de Bougoin",
-    address: {
-      streetNumberAndAddress: "17 rue du Chat",
-      postcode: "11000",
-      departmentCode: "11",
-      city: "Carcassonne",
-    },
+    departmentCode: "11",
   },
   {
     id: "1",
-    kind: "pole-emploi",
     name: "Agence de Vaulx",
-    address: {
-      streetNumberAndAddress: "21 rue du Chien",
-      postcode: "69120",
-      departmentCode: "69",
-      city: "Vaulx-en-Velin",
-    },
+    departmentCode: "69",
   },
 ];

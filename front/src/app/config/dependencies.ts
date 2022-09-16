@@ -13,8 +13,8 @@ import { HttpSentEmailGateway } from "src/core-logic/adapters/EmailGateway/HttpS
 import { StubSentEmailGateway } from "src/core-logic/adapters/EmailGateway/StubSentEmailGateway";
 import { HttpEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/HttpEstablishmentGateway";
 import { InMemoryEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/InMemoryEstablishmentGateway";
-import { HttpImmersionAddressGateway } from "src/core-logic/adapters/ImmersionAddressGateway/HttpImmersionAddressGateway";
-import { InMemoryImmersionAddressGateway } from "src/core-logic/adapters/ImmersionAddressGateway/InMemoryImmersionAddressGateway";
+import { HttpAddressGateway } from "src/core-logic/adapters/AddressGateway/HttpAddressGateway";
+import { InMemoryAddressGateway } from "src/core-logic/adapters/AddressGateway/InMemoryAddressGateway";
 
 import { HttpImmersionSearchGateway } from "src/core-logic/adapters/ImmersionSearchGateway/HttpImmersionSearchGateway";
 import {
@@ -36,7 +36,7 @@ import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 import { DeviceRepository } from "src/core-logic/ports/DeviceRepository";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
-import { ImmersionAddressGateway } from "src/core-logic/ports/ImmersionAddressGateway";
+import { AddressGateway } from "src/core-logic/ports/AddressGateway";
 import { ImmersionAssessmentGateway } from "src/core-logic/ports/ImmersionAssessmentGateway";
 import { ImmersionSearchGateway } from "src/core-logic/ports/ImmersionSearchGateway";
 import { NavigationGateway } from "src/core-logic/ports/NavigationGateway";
@@ -112,12 +112,10 @@ export const immersionSearchGateway: ImmersionSearchGateway =
       );
 
 const IMMERSION_API_ADDRESS_SIMULATED_LATENCY_MS = 150;
-export const apiAddressGateway: ImmersionAddressGateway =
+export const apiAddressGateway: AddressGateway =
   ENV.gateway === "IN_MEMORY"
-    ? new InMemoryImmersionAddressGateway(
-        IMMERSION_API_ADDRESS_SIMULATED_LATENCY_MS,
-      )
-    : new HttpImmersionAddressGateway(createManagedAxiosInstance());
+    ? new InMemoryAddressGateway(IMMERSION_API_ADDRESS_SIMULATED_LATENCY_MS)
+    : new HttpAddressGateway(createManagedAxiosInstance());
 
 export const technicalGateway: TechnicalGateway =
   ENV.gateway === "IN_MEMORY"
@@ -155,7 +153,7 @@ export type Dependencies = {
   immersionAssessmentGateway: ImmersionAssessmentGateway;
   siretGatewayThroughBack: SiretGatewayThroughBack;
   agencyGateway: AgencyGateway;
-  immersionAddressGateway: ImmersionAddressGateway;
+  addressGateway: AddressGateway;
   technicalGateway: TechnicalGateway;
   establishmentGateway: EstablishmentGateway;
   conventionGateway: ConventionGateway;
@@ -173,7 +171,7 @@ export const store = createStore({
     adminGateway,
     siretGatewayThroughBack,
     agencyGateway,
-    immersionAddressGateway: apiAddressGateway,
+    addressGateway: apiAddressGateway,
     technicalGateway,
     establishmentGateway,
     conventionGateway,
