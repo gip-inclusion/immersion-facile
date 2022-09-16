@@ -25,6 +25,7 @@ export const WeekdayPicker = ({
   interval,
 }: WeekdayPickerProps) => {
   const canAddNewPeriod = (): WeekDayRangeSchemaDTO | false => {
+    if (dayPeriods.length === 0) return false;
     const lastPeriod = dayPeriods[dayPeriods.length - 1];
     const lastPeriodEnd = lastPeriod[1];
     return lastPeriodEnd < 5 ? lastPeriod : false;
@@ -33,14 +34,12 @@ export const WeekdayPicker = ({
   const add = () => {
     let start = 0;
     let end = 5;
-    if (dayPeriods.length > 0) {
-      // Autofill next period as one day after the current period,
-      // with duration of 1 day.
-      const last = canAddNewPeriod();
-      if (last) {
-        start = last[1] + 2;
-        end = last[1] + 2;
-      }
+    // Autofill next period as one day after the current period,
+    // with duration of 1 day.
+    const last = canAddNewPeriod();
+    if (last) {
+      start = last[1] + 2;
+      end = last[1] + 2;
     }
     dayPeriods.push([start, end] as WeekDayRangeSchemaDTO);
     onValueChange(dayPeriods);
