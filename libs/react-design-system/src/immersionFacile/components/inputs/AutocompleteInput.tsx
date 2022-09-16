@@ -1,5 +1,6 @@
 import React from "react";
 import { AutocompleteRenderInputParams } from "@mui/material/Autocomplete";
+import "./AutocompleteInput.css";
 
 export const AutocompleteInput =
   (
@@ -11,19 +12,22 @@ export const AutocompleteInput =
   ) =>
   (params: AutocompleteRenderInputParams): JSX.Element =>
     (
-      <div ref={params.InputProps.ref}>
-        <label
-          className={`fr-label ${headerClassName ?? ""}`}
-          htmlFor={"search"}
-        >
-          {label}
-        </label>
-        <input
-          {...params.inputProps}
-          style={inputStyle}
-          disabled={disabled}
-          className={"fr-input"}
-          placeholder={placeholder}
-        />
+      <div ref={params.InputProps.ref} className="if-autocomplete-input">
+        <div className="if-autocomplete-input__wrapper">
+          <label
+            className={`fr-label ${headerClassName ?? ""}`}
+            htmlFor={"search"}
+          >
+            {label}
+          </label>
+
+          <input
+            {...params.inputProps}
+            style={inputStyle}
+            disabled={disabled}
+            className={"fr-input"}
+            placeholder={placeholder}
+          />
+        </div>
       </div>
     );

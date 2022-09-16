@@ -16,7 +16,7 @@ import { ButtonSearch, MainWrapper } from "react-design-system/immersionFacile";
 import { AddressAutocomplete } from "src/uiComponents/autocomplete/AddressAutocomplete";
 
 const radiusOptions = [1, 2, 5, 10, 20, 50, 100];
-const initiallySelectedIndex = 3; // to get 10 km radius by default
+const initiallySelectedIndex = -1; // don't select anything initially
 
 export const SearchPage = () => {
   const searchStatus = useAppSelector(searchSelectors.searchStatus);
@@ -67,6 +67,7 @@ export const SearchPage = () => {
                           setFieldValue("lon", position.lon);
                         }}
                         placeholder={"Ex: Bordeaux 33000"}
+                        notice={"Saisissez un code postal et/ou une ville"}
                       />
                       <StaticDropdown
                         inputStyle={{
@@ -85,6 +86,7 @@ export const SearchPage = () => {
                         }}
                         defaultSelectedIndex={initiallySelectedIndex}
                         options={radiusOptions.map((n) => `${n} km`)}
+                        placeholder={"Votre distance (de 1 à 100km)"}
                       />
                     </div>
                     <ButtonSearch

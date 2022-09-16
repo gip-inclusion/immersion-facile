@@ -13,7 +13,8 @@ export type AddressAutocompleteProps = {
   headerClassName?: string;
   inputStyle?: React.CSSProperties;
   setFormValue: (p: AddressAndPosition) => void;
-  placeholder?: string;
+  placeholder: string;
+  notice?: string;
 };
 
 export const AddressAutocomplete = ({
@@ -23,7 +24,8 @@ export const AddressAutocomplete = ({
   headerClassName,
   inputStyle,
   initialSearchTerm = "",
-  placeholder = "",
+  placeholder = "Ex: Bordeaux 33000",
+  notice,
 }: AddressAutocompleteProps) => {
   const [selectedOption, setSelectedOption] =
     useState<AddressAndPosition | null>(null);
@@ -60,25 +62,30 @@ export const AddressAutocomplete = ({
     isSearching || !debounceSearchTerm ? "..." : "Aucune adresse trouvée.";
 
   return (
-    <Autocomplete
-      loading={isSearching}
-      loadingText="Recherche d'adresse en cours... 🔎"
-      disablePortal
-      noOptionsText={searchTerm ? noOptionText : "Saisissez une adresse."}
-      options={options}
-      value={selectedOption}
-      getOptionLabel={(option) => addressDtoToString(option.address)}
-      onChange={onAutocompleteChange(setSelectedOption, setFormValue)}
-      onInputChange={onAutocompleteInput(setSearchTerm)}
-      filterOptions={(option) => option} // https://mui.com/material-ui/react-autocomplete/#search-as-you-type
-      renderInput={AutocompleteInput(
-        headerClassName,
-        label,
-        inputStyle,
-        disabled,
-        placeholder,
+    <>
+      <Autocomplete
+        loading={isSearching}
+        loadingText="Recherche d'adresse en cours... 🔎"
+        disablePortal
+        noOptionsText={searchTerm ? noOptionText : "Saisissez une adresse."}
+        options={options}
+        value={selectedOption}
+        getOptionLabel={(option) => addressDtoToString(option.address)}
+        onChange={onAutocompleteChange(setSelectedOption, setFormValue)}
+        onInputChange={onAutocompleteInput(setSearchTerm)}
+        filterOptions={(option) => option} // https://mui.com/material-ui/react-autocomplete/#search-as-you-type
+        renderInput={AutocompleteInput(
+          headerClassName,
+          label,
+          inputStyle,
+          disabled,
+          placeholder,
+        )}
+      />
+      {notice && (
+        <span className="if-autocomplete-input__notice">{notice}</span>
       )}
-    />
+    </>
   );
 };
 

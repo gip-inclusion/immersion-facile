@@ -7,6 +7,7 @@ type StaticDropdownProps = {
   inputStyle?: any;
   options: string[];
   defaultSelectedIndex?: number;
+  placeholder: string;
 };
 
 export const StaticDropdown = ({
@@ -15,6 +16,7 @@ export const StaticDropdown = ({
   inputStyle,
   options,
   defaultSelectedIndex = 0,
+  placeholder,
 }: StaticDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(defaultSelectedIndex);
@@ -24,22 +26,26 @@ export const StaticDropdown = ({
       <label className="inputLabel searchdropdown-header" htmlFor={"search"}>
         {title}
       </label>
-      <span
-        style={{ position: "relative" }}
-        onClick={() => {
-          setIsOpen(!isOpen);
-        }}
-      >
+
+      <div style={{ position: "relative" }}>
+        <button
+          type={"button"}
+          className={"searchdropdown__toggler"}
+          onClick={() => {
+            setIsOpen(!isOpen);
+          }}
+        ></button>
         <input
-          disabled
+          readOnly
           id="search"
           type="text"
-          className="autocomplete-input"
+          className="fr-input autocomplete-input"
           autoComplete="off"
-          value={options[selectedIndex]}
+          value={selectedIndex > -1 ? options[selectedIndex] : ""}
           style={{ cursor: "pointer", ...inputStyle }}
+          placeholder={placeholder}
         />
-      </span>
+      </div>
 
       {isOpen && (
         <div className="autocomplete-items">

@@ -1,0 +1,9 @@
+.if-autocomplete-input__notice {
+  text-align: center;
+  color: #fff;
+  display: block;
+  font-size: 0.75rem;
+}
+.if-autocomplete-input__wrapper {
+  position: relative;
+}

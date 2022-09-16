@@ -13,7 +13,7 @@ type RomeAutocompleteProps = {
   initialValue?: RomeDto | undefined;
   setFormValue: (p: RomeDto) => void;
   className?: string;
-  placeholder?: string;
+  placeholder: string;
   tooltip?: string;
 };
 
@@ -24,7 +24,7 @@ export const RomeAutocomplete = ({
   setFormValue,
   title,
   className,
-  placeholder = "Saisissez un métier",
+  placeholder = "Ex: boulangère, infirmier",
   tooltip,
 }: RomeAutocompleteProps): JSX.Element => {
   const { romeSearchText, isSearching, selectedRomeDto, romeOptions } =
@@ -72,6 +72,7 @@ export const RomeAutocomplete = ({
               {...params.inputProps}
               className={"fr-input"}
               placeholder={placeholder}
+              style={{ backgroundColor: "#fff" }}
             />
           </div>
         )}
