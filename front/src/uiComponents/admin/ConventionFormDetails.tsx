@@ -96,6 +96,11 @@ export const ConnventionFormDetails = ({
     }
     if (field === "immersionAppellation")
       return (value as AppellationDto).appellationLabel;
+    if (
+      field === "signatories.beneficiary.signedAt" ||
+      field === "signatories.mentor.signedAt"
+    )
+      return value ? "✅" : "❌";
     if (typeof value === "string") return value;
     if (typeof value === "boolean") return value ? "✅" : "❌";
     return JSON.stringify(value);
