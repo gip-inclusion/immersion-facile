@@ -2,32 +2,32 @@ import { addDays } from "date-fns";
 import { z } from "zod";
 import { createLogger } from "../../../utils/logger";
 import { Clock } from "../../core/ports/Clock";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
-import { TransactionalUseCase } from "../../core/UseCase";
+import { UseCase } from "../../core/UseCase";
 import { SireneGateway } from "../../sirene/ports/SireneGateway";
 import { SireneEstablishmentVO } from "../../sirene/valueObjects/SireneEstablishmentVO";
 import { AddressGateway } from "../ports/AddressGateway";
+import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
 
 const SIRENE_NB_DAYS_BEFORE_REFRESH = 7;
 
 const logger = createLogger(__filename);
 
-export class UpdateEstablishmentsFromSireneAPI extends TransactionalUseCase<void> {
+export class UpdateEstablishmentsFromSireneApiScript extends UseCase<void> {
   constructor(
-    uowPerformer: UnitOfWorkPerformer,
+    private readonly establishmentAggregateRepository: EstablishmentAggregateRepository,
     private readonly sireneGateway: SireneGateway,
     private readonly addressAPI: AddressGateway,
     private readonly clock: Clock,
   ) {
-    super(uowPerformer);
+    super();
   }
 
   inputSchema = z.void();
 
-  public async _execute(_: void, uow: UnitOfWork) {
+  public async _execute() {
     const since = addDays(this.clock.now(), -SIRENE_NB_DAYS_BEFORE_REFRESH);
     const establishmentSiretsToUpdate =
-      await uow.establishmentAggregateRepository.getActiveEstablishmentSiretsFromLaBonneBoiteNotUpdatedSince(
+      await this.establishmentAggregateRepository.getActiveEstablishmentSiretsFromLaBonneBoiteNotUpdatedSince(
         since,
       );
 
@@ -43,7 +43,7 @@ export class UpdateEstablishmentsFromSireneAPI extends TransactionalUseCase<void
     for (const siret of establishmentSiretsToUpdate) {
       try {
         logger.info(`Updating establishment with siret ${siret}...`);
-        await this.updateEstablishmentWithSiret(uow, siret);
+        await this.updateEstablishmentWithSiret(siret);
         logger.info(`Successfuly updated establishment with siret ${siret} !`);
       } catch (error) {
         logger.warn(
@@ -54,7 +54,8 @@ export class UpdateEstablishmentsFromSireneAPI extends TransactionalUseCase<void
       }
     }
   }
-  private async updateEstablishmentWithSiret(uow: UnitOfWork, siret: string) {
+
+  private async updateEstablishmentWithSiret(siret: string) {
     const includeClosedEstablishments = false;
     const sireneAnswer = await this.sireneGateway.get(
       siret,
@@ -62,7 +63,7 @@ export class UpdateEstablishmentsFromSireneAPI extends TransactionalUseCase<void
     );
 
     if (!sireneAnswer || sireneAnswer.etablissements.length === 0) {
-      await uow.establishmentAggregateRepository.updateEstablishment({
+      await this.establishmentAggregateRepository.updateEstablishment({
         siret,
         updatedAt: this.clock.now(),
         isActive: false,
@@ -89,7 +90,7 @@ export class UpdateEstablishmentsFromSireneAPI extends TransactionalUseCase<void
       );
     }
 
-    await uow.establishmentAggregateRepository.updateEstablishment({
+    await this.establishmentAggregateRepository.updateEstablishment({
       siret,
       updatedAt: this.clock.now(),
       nafDto,

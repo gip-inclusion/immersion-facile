@@ -1,6 +1,6 @@
 import { Pool } from "pg";
 import { random, sleep } from "shared/src/utils";
-import { UpdateEstablishmentsFromSireneAPI } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentsFromSireneAPI";
+import { UpdateEstablishmentsFromSireneApiScript } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentsFromSireneApiScript";
 import { createLogger } from "../../../utils/logger";
 import { PipelineStats } from "../../../utils/pipelineStats";
 import {
@@ -15,8 +15,8 @@ import {
 } from "../../secondary/core/ExponentialBackoffRetryStrategy";
 import { QpsRateLimiter } from "../../secondary/core/QpsRateLimiter";
 import { HttpsSireneGateway } from "../../secondary/HttpsSireneGateway";
+import { PgEstablishmentAggregateRepository } from "../../secondary/pg/PgEstablishmentAggregateRepository";
 import { AppConfig } from "../config/appConfig";
-import { createUowPerformer } from "../config/uowConfig";
 
 const logger = createLogger(__filename);
 const MAX_QPS_SIRENE__AND_ADDRESS_API = 0.49;
@@ -57,12 +57,14 @@ const main = async () => {
   const pool = new Pool({
     connectionString: config.pgImmersionDbUrl,
   });
+  const client = await pool.connect();
 
-  const { uowPerformer } = createUowPerformer(config, () => pool);
+  const establishmentAggregateRepository =
+    new PgEstablishmentAggregateRepository(client);
 
   const updateEstablishmentsFromSireneAPI =
-    new UpdateEstablishmentsFromSireneAPI(
-      uowPerformer,
+    new UpdateEstablishmentsFromSireneApiScript(
+      establishmentAggregateRepository,
       sireneGateway,
       addressAPI,
       new RealClock(),
@@ -78,7 +80,7 @@ const main = async () => {
     errorCode = 1;
   }
   stats.stopTimer("total_runtime");
-
+  client.release();
   process.exit(errorCode);
 };
 
