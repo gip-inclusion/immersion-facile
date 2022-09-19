@@ -379,7 +379,7 @@ const establishmentAggregateMiniWorldLyon = (): EstablishmentAggregate => ({
       .build(),
     new ImmersionOfferEntityV2Builder()
       .withRomeCode("G1205")
-      .withAppellationCode("10705")
+      .withAppellationCode("11027")
       .build(),
     new ImmersionOfferEntityV2Builder()
       .withRomeCode("I1304")
