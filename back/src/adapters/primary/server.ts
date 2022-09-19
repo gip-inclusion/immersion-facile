@@ -18,7 +18,7 @@ import { createAdminRouter } from "./routers/admin/createAdminRouter";
 import { createAgenciesRouter } from "./routers/createAgenciesRouter";
 import { createApiKeyAuthRouter } from "./routers/createApiKeyAuthRouter";
 import { createApiKeyAuthRouterV1 } from "./routers/createApiKeyAuthRouter.v1";
-import { createConventionRouter } from "./routers/createConventionRouter";
+import { createConventionRouter } from "./routers/convention/createConventionRouter";
 import { createEstablishmentRouter } from "./routers/createEstablishmentRouter";
 import { createFormCompletionRouter } from "./routers/createFormCompletionRouter";
 import { createMagicLinkRouter } from "./routers/createMagicLinkRouter";

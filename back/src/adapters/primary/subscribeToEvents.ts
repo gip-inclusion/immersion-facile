@@ -1,16 +1,16 @@
 import { keys } from "shared/src/utils";
-import { z } from "zod";
 import { NarrowEvent } from "../../domain/core/eventBus/EventBus";
 import { DomainTopic } from "../../domain/core/eventBus/events";
 import type { AppDependencies } from "./config/createAppDependencies";
-import { UseCases } from "./config/createUseCases";
+import { InstantiatedUseCase, UseCases } from "./config/createUseCases";
 
 type DomainUseCase = UseCases[keyof UseCases];
 
-type ExtractUseCasesMatchingTopic<Topic extends DomainTopic> = Extract<
-  DomainUseCase,
-  { inputSchema: z.ZodSchema<NarrowEvent<Topic>["payload"]> }
->;
+type ExtractUseCasesMatchingTopic<Topic extends DomainTopic> = Parameters<
+  DomainUseCase["execute"]
+>[0] extends NarrowEvent<Topic>["payload"]
+  ? InstantiatedUseCase<NarrowEvent<Topic>["payload"], void, any>
+  : never;
 
 type UseCaseSubscriptionsByTopics = {
   [K in DomainTopic]: ExtractUseCasesMatchingTopic<K>[];
@@ -53,7 +53,11 @@ const getUseCasesByTopics = (
   // Edge cases for immersion application.
   ImmersionApplicationRequiresModification: [
     useCases.notifyBeneficiaryAndEnterpriseThatConventionNeedsModifications,
-    useCases.broadcastToPoleEmploiOnConventionUpdates,
+    {
+      useCaseName: "BroadcastToPoleEmploi",
+      execute: ({ convention }) =>
+        useCases.broadcastToPoleEmploiOnConventionUpdates.execute(convention),
+    },
   ],
   ImmersionApplicationRejected: [
     useCases.notifyBeneficiaryAndEnterpriseThatConventionIsRejected,
@@ -101,7 +105,7 @@ export const subscribeToEvents = (deps: AppDependencies) => {
 
     useCases.forEach((useCase) => {
       // the provided key for each use case is needed in order to follow the acknowledgments
-      const subscriptionId = useCase.constructor.name; // careful this is fragile, because the subscription id is stored in DB when failing
+      const subscriptionId = useCase.useCaseName; // careful this is fragile, because the subscription id is stored in DB when failing
       deps.eventBus.subscribe(topic, subscriptionId, async (event) => {
         await useCase.execute(event.payload as any);
       });

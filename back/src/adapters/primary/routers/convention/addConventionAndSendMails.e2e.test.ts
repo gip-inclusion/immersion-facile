@@ -14,15 +14,19 @@ import {
   updateConventionStatusRoute,
 } from "shared/src/routes";
 import supertest from "supertest";
-import { buildTestApp, TestAppAndDeps } from "../../_testBuilders/buildTestApp";
+import {
+  buildTestApp,
+  TestAppAndDeps,
+} from "../../../../_testBuilders/buildTestApp";
 import {
   expectEmailOfType,
   expectJwtInMagicLinkAndGetIt,
   expectTypeToMatchAndEqual,
-} from "../../_testBuilders/test.helpers";
-import { InMemoryOutboxRepository } from "../../adapters/secondary/core/InMemoryOutboxRepository";
-import { InMemoryEmailGateway } from "../../adapters/secondary/emailGateway/InMemoryEmailGateway";
-import { DomainEvent } from "../../domain/core/eventBus/events";
+} from "../../../../_testBuilders/test.helpers";
+import { InMemoryOutboxRepository } from "../../../secondary/core/InMemoryOutboxRepository";
+import { InMemoryEmailGateway } from "../../../secondary/emailGateway/InMemoryEmailGateway";
+import { DomainEvent } from "../../../../domain/core/eventBus/events";
+import { expectToEqual } from "shared/src/expectToEqual";
 
 const validatorEmail = "validator@mail.com";
 const beneficiarySignDate = new Date("2022-09-08");
@@ -71,6 +75,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       .notSigned()
       .withStatus("READY_TO_SIGN")
       .withoutDateValidation()
+      .withFederatedIdentity("peConnect:fake")
       .build();
 
     const appAndDeps = await buildTestApp();
@@ -154,6 +159,11 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
 
   await eventCrawler.processNewEvents();
 
+  const peNotification = gateways.poleEmploiGateway.notifications[0];
+  expect(peNotification.id).toBe("00000000001");
+  expectToEqual(peNotification.status, "A_SIGNER");
+  expect(peNotification.originalId).toBe(convention.id);
+  expect(peNotification.email).toBe(convention.signatories.beneficiary.email);
   const sentEmails = gateways.email.getSentEmails();
   expect(sentEmails).toHaveLength(numberOfEmailInitialySent);
   expect(sentEmails.map((e) => e.recipients)).toEqual([

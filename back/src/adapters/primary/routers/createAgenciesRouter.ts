@@ -27,7 +27,7 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
     .route(`/${agencyImmersionFacileIdRoute}`)
     .get(async (req, res) =>
       sendHttpResponse(req, res, async () =>
-        deps.useCases.getImmersionFacileAgencyIdByKind(),
+        deps.useCases.getImmersionFacileAgencyIdByKind.execute(),
       ),
     );
 

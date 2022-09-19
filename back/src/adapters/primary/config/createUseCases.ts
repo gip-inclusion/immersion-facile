@@ -1,3 +1,4 @@
+import { keys } from "ramda";
 import { SiretDto } from "shared/src/siret";
 import { sleep } from "shared/src/utils";
 import { DepartmentCodeFromPostcode } from "../../../domain/address/useCases/DepartmentCodeFromPostCode";
@@ -36,6 +37,7 @@ import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { Clock } from "../../../domain/core/ports/Clock";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { UuidGenerator } from "../../../domain/core/ports/UuidGenerator";
+import { TransactionalUseCase, UseCase } from "../../../domain/core/UseCase";
 import { ApiConsumerId } from "../../../domain/core/valueObjects/ApiConsumer";
 import { AdminLogin } from "../../../domain/generic/authentication/useCases/AdminLogin";
 import { UploadLogo } from "../../../domain/generic/fileManagement/useCases/UploadLogo";
@@ -67,8 +69,6 @@ import { Gateways } from "./createGateways";
 import { GenerateConventionMagicLink } from "./createGenerateConventionMagicLink";
 import { makeGenerateEditFormEstablishmentUrl } from "./makeGenerateEditFormEstablishmentUrl";
 
-export type UseCases = ReturnType<typeof createUseCases>;
-
 export const createUseCases = (
   config: AppConfig,
   gateways: Gateways,
@@ -87,220 +87,302 @@ export const createUseCases = (
   const getSiret = new GetSiret(gateways.sirene);
 
   return {
-    associatePeConnectFederatedIdentity:
-      new AssociatePeConnectFederatedIdentity(uowPerformer, createNewEvent),
-    uploadLogo: new UploadLogo(
-      uowPerformer,
-      gateways.documentGateway,
-      uuidGenerator,
-    ),
-
-    // Address
-    lookupStreetAddress: new LookupStreetAddress(gateways.addressApi),
-    departmentCodeFromPostcode: new DepartmentCodeFromPostcode(
-      gateways.addressApi,
-    ),
-
-    // Admin
-    adminLogin: new AdminLogin(
-      config.backofficeUsername,
-      config.backofficePassword,
-      generateAdminJwt,
-      () => sleep(config.nodeEnv !== "test" ? 500 : 0),
-    ),
-    getSentEmails: new GetSentEmails(gateways.email),
-    exportData: new ExportData(uowPerformer, gateways.exportGateway),
-
-    // Conventions
-    createImmersionAssessment: new CreateImmersionAssessment(
-      uowPerformer,
-      createNewEvent,
-    ),
-    addConvention: new AddConvention(uowPerformer, createNewEvent, getSiret),
-    getConvention: new GetConvention(uowPerformer),
-    linkPoleEmploiAdvisorAndRedirectToConvention:
-      new LinkPoleEmploiAdvisorAndRedirectToConvention(
+    ...instantiatedUseCasesFromClasses({
+      associatePeConnectFederatedIdentity:
+        new AssociatePeConnectFederatedIdentity(uowPerformer, createNewEvent),
+      uploadLogo: new UploadLogo(
         uowPerformer,
-        gateways.peConnectGateway,
-        config.immersionFacileBaseUrl,
-      ),
-    listAdminConventions: new ListAdminConventions(uowPerformer),
-
-    updateConvention: new UpdateConvention(uowPerformer, createNewEvent),
-    updateConventionStatus: new UpdateConventionStatus(
-      uowPerformer,
-      createNewEvent,
-      clock,
-    ),
-    signConvention: new SignConvention(uowPerformer, createNewEvent, clock),
-    generateMagicLink: new GenerateMagicLink(generateJwtFn),
-    renewConventionMagicLink: new RenewConventionMagicLink(
-      uowPerformer,
-      createNewEvent,
-      generateJwtFn,
-      config,
-      clock,
-    ),
-
-    // immersionOffer
-    searchImmersion: new SearchImmersion(uowPerformer, uuidGenerator),
-    getImmersionOfferById: new GetImmersionOfferById(uowPerformer),
-    getImmersionOfferBySiretAndRome: new GetImmersionOfferBySiretAndRome(
-      uowPerformer,
-    ),
-
-    addFormEstablishment: new AddFormEstablishment(
-      uowPerformer,
-      createNewEvent,
-      getSiret,
-    ),
-
-    editFormEstablishment: new EditFormEstablishment(
-      uowPerformer,
-      createNewEvent,
-    ),
-    retrieveFormEstablishmentFromAggregates:
-      new RetrieveFormEstablishmentFromAggregates(uowPerformer),
-    updateEstablishmentAggregateFromForm:
-      new UpdateEstablishmentAggregateFromForm(
-        uowPerformer,
-        gateways.addressApi,
+        gateways.documentGateway,
         uuidGenerator,
-        clock,
       ),
-    insertEstablishmentAggregateFromForm:
-      new InsertEstablishmentAggregateFromForm(
-        uowPerformer,
-        gateways.sirene,
+
+      // Address
+      lookupStreetAddress: new LookupStreetAddress(gateways.addressApi),
+      departmentCodeFromPostcode: new DepartmentCodeFromPostcode(
         gateways.addressApi,
-        uuidGenerator,
-        clock,
+      ),
+
+      // Admin
+      adminLogin: new AdminLogin(
+        config.backofficeUsername,
+        config.backofficePassword,
+        generateAdminJwt,
+        () => sleep(config.nodeEnv !== "test" ? 500 : 0),
+      ),
+      getSentEmails: new GetSentEmails(gateways.email),
+      exportData: new ExportData(uowPerformer, gateways.exportGateway),
+
+      // Conventions
+      createImmersionAssessment: new CreateImmersionAssessment(
+        uowPerformer,
         createNewEvent,
       ),
-    contactEstablishment: new ContactEstablishment(
-      uowPerformer,
-      createNewEvent,
-    ),
+      addConvention: new AddConvention(uowPerformer, createNewEvent, getSiret),
+      getConvention: new GetConvention(uowPerformer),
+      linkPoleEmploiAdvisorAndRedirectToConvention:
+        new LinkPoleEmploiAdvisorAndRedirectToConvention(
+          uowPerformer,
+          gateways.peConnectGateway,
+          config.immersionFacileBaseUrl,
+        ),
+      listAdminConventions: new ListAdminConventions(uowPerformer),
 
-    callLaBonneBoiteAndUpdateRepositories:
-      new CallLaBonneBoiteAndUpdateRepositories(
+      updateConvention: new UpdateConvention(uowPerformer, createNewEvent),
+      updateConventionStatus: new UpdateConventionStatus(
         uowPerformer,
-        gateways.laBonneBoiteAPI,
+        createNewEvent,
         clock,
       ),
-    requestEditFormEstablishment: new RequestEditFormEstablishment(
-      uowPerformer,
-      gateways.email,
-      clock,
-      makeGenerateEditFormEstablishmentUrl(config),
-      createNewEvent,
-    ),
-
-    notifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm:
-      new NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm(
-        gateways.passEmploiGateway,
+      signConvention: new SignConvention(uowPerformer, createNewEvent, clock),
+      generateMagicLink: new GenerateMagicLink(generateJwtFn),
+      renewConventionMagicLink: new RenewConventionMagicLink(
+        uowPerformer,
+        createNewEvent,
+        generateJwtFn,
+        config,
+        clock,
       ),
 
-    // siret
-    getSiret,
-    getSiretIfNotAlreadySaved: new GetSiretIfNotAlreadySaved(
-      uowPerformer,
-      gateways.sirene,
-    ),
+      // immersionOffer
+      searchImmersion: new SearchImmersion(uowPerformer, uuidGenerator),
+      getImmersionOfferById: new GetImmersionOfferById(uowPerformer),
+      getImmersionOfferBySiretAndRome: new GetImmersionOfferBySiretAndRome(
+        uowPerformer,
+      ),
 
-    // romes
-    appellationSearch: new AppellationSearch(uowPerformer),
-    romeSearch: new RomeSearch(uowPerformer),
+      addFormEstablishment: new AddFormEstablishment(
+        uowPerformer,
+        createNewEvent,
+        getSiret,
+      ),
 
-    // agencies
-    listAgenciesByDepartmentCode: new ListAgenciesByDepartmentCode(
-      uowPerformer,
-    ),
-    privateListAgencies: new PrivateListAgencies(uowPerformer),
-    getAgencyPublicInfoById: new GetAgencyPublicInfoById(uowPerformer),
-    sendEmailWhenAgencyIsActivated: new SendEmailWhenAgencyIsActivated(
-      gateways.email,
-    ),
-    // notifications
-    confirmToBeneficiaryThatConventionCorrectlySubmittedRequestSignature:
-      new ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature(
-        gateways.email,
-        generateMagicLinkFn,
-      ),
-    confirmToMentorThatConventionCorrectlySubmittedRequestSignature:
-      new ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature(
-        gateways.email,
-        generateMagicLinkFn,
-      ),
-    notifyAllActorsOfFinalConventionValidation:
-      new NotifyAllActorsOfFinalApplicationValidation(
+      editFormEstablishment: new EditFormEstablishment(
         uowPerformer,
-        gateways.email,
+        createNewEvent,
       ),
-    notifyNewConventionNeedsReview: new NotifyNewApplicationNeedsReview(
-      uowPerformer,
-      gateways.email,
-      generateMagicLinkFn,
-    ),
-    notifyToAgencyConventionSubmitted: new NotifyToAgencyApplicationSubmitted(
-      uowPerformer,
-      gateways.email,
-      generateMagicLinkFn,
-    ),
-    notifyBeneficiaryAndEnterpriseThatConventionIsRejected:
-      new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
-        uowPerformer,
-        gateways.email,
-      ),
-    notifyBeneficiaryAndEnterpriseThatConventionNeedsModifications:
-      new NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification(
-        uowPerformer,
-        gateways.email,
-        generateMagicLinkFn,
-      ),
-    deliverRenewedMagicLink: new DeliverRenewedMagicLink(gateways.email),
-    notifyConfirmationEstablishmentCreated:
-      new NotifyConfirmationEstablishmentCreated(gateways.email),
-    notifyContactRequest: new NotifyContactRequest(
-      uowPerformer,
-      gateways.email,
-    ),
-    notifyPoleEmploiUserAdvisorOnAssociation:
-      new NotifyPoleEmploiUserAdvisorOnConventionAssociation(
-        uowPerformer,
-        gateways.email,
-        generateMagicLinkFn,
-      ),
-    notifyPoleEmploiUserAdvisorOnConventionFullySigned:
-      new NotifyPoleEmploiUserAdvisorOnConventionFullySigned(
-        uowPerformer,
-        gateways.email,
-        generateMagicLinkFn,
-      ),
-    broadcastToPoleEmploiOnConventionUpdates:
-      new BroadcastToPoleEmploiOnConventionUpdates(
-        uowPerformer,
-        gateways.poleEmploiGateway,
-      ),
-    shareConventionByEmail: new ShareApplicationLinkByEmail(gateways.email),
-    addAgency: new AddAgency(
-      uowPerformer,
-      createNewEvent,
-      config.defaultAdminEmail,
-    ),
-    updateAgency: new UpdateAgency(uowPerformer, createNewEvent),
-    getFeatureFlags: () => uowPerformer.perform((uow) => uow.getFeatureFlags()),
-    getApiConsumerById: (id: ApiConsumerId) =>
-      uowPerformer.perform((uow) => uow.getApiConsumersById(id)),
-    isFormEstablishmentWithSiretAlreadySaved: (siret: SiretDto) =>
-      uowPerformer.perform((uow) =>
-        uow.establishmentAggregateRepository.hasEstablishmentFromFormWithSiret(
-          siret,
+      retrieveFormEstablishmentFromAggregates:
+        new RetrieveFormEstablishmentFromAggregates(uowPerformer),
+      updateEstablishmentAggregateFromForm:
+        new UpdateEstablishmentAggregateFromForm(
+          uowPerformer,
+          gateways.addressApi,
+          uuidGenerator,
+          clock,
         ),
+      insertEstablishmentAggregateFromForm:
+        new InsertEstablishmentAggregateFromForm(
+          uowPerformer,
+          gateways.sirene,
+          gateways.addressApi,
+          uuidGenerator,
+          clock,
+          createNewEvent,
+        ),
+      contactEstablishment: new ContactEstablishment(
+        uowPerformer,
+        createNewEvent,
       ),
-    getImmersionFacileAgencyIdByKind: () =>
-      uowPerformer.perform((uow) =>
-        uow.agencyRepository.getImmersionFacileAgencyId(),
+
+      callLaBonneBoiteAndUpdateRepositories:
+        new CallLaBonneBoiteAndUpdateRepositories(
+          uowPerformer,
+          gateways.laBonneBoiteAPI,
+          clock,
+        ),
+      requestEditFormEstablishment: new RequestEditFormEstablishment(
+        uowPerformer,
+        gateways.email,
+        clock,
+        makeGenerateEditFormEstablishmentUrl(config),
+        createNewEvent,
       ),
+
+      notifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm:
+        new NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm(
+          gateways.passEmploiGateway,
+        ),
+
+      // siret
+      getSiret,
+      getSiretIfNotAlreadySaved: new GetSiretIfNotAlreadySaved(
+        uowPerformer,
+        gateways.sirene,
+      ),
+
+      // romes
+      appellationSearch: new AppellationSearch(uowPerformer),
+      romeSearch: new RomeSearch(uowPerformer),
+
+      // agencies
+      listAgenciesByDepartmentCode: new ListAgenciesByDepartmentCode(
+        uowPerformer,
+      ),
+      privateListAgencies: new PrivateListAgencies(uowPerformer),
+      getAgencyPublicInfoById: new GetAgencyPublicInfoById(uowPerformer),
+      sendEmailWhenAgencyIsActivated: new SendEmailWhenAgencyIsActivated(
+        gateways.email,
+      ),
+      // notifications
+      confirmToBeneficiaryThatConventionCorrectlySubmittedRequestSignature:
+        new ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature(
+          gateways.email,
+          generateMagicLinkFn,
+        ),
+      confirmToMentorThatConventionCorrectlySubmittedRequestSignature:
+        new ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature(
+          gateways.email,
+          generateMagicLinkFn,
+        ),
+      notifyAllActorsOfFinalConventionValidation:
+        new NotifyAllActorsOfFinalApplicationValidation(
+          uowPerformer,
+          gateways.email,
+        ),
+      notifyNewConventionNeedsReview: new NotifyNewApplicationNeedsReview(
+        uowPerformer,
+        gateways.email,
+        generateMagicLinkFn,
+      ),
+      notifyToAgencyConventionSubmitted: new NotifyToAgencyApplicationSubmitted(
+        uowPerformer,
+        gateways.email,
+        generateMagicLinkFn,
+      ),
+      notifyBeneficiaryAndEnterpriseThatConventionIsRejected:
+        new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
+          uowPerformer,
+          gateways.email,
+        ),
+      notifyBeneficiaryAndEnterpriseThatConventionNeedsModifications:
+        new NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification(
+          uowPerformer,
+          gateways.email,
+          generateMagicLinkFn,
+        ),
+      deliverRenewedMagicLink: new DeliverRenewedMagicLink(gateways.email),
+      notifyConfirmationEstablishmentCreated:
+        new NotifyConfirmationEstablishmentCreated(gateways.email),
+      notifyContactRequest: new NotifyContactRequest(
+        uowPerformer,
+        gateways.email,
+      ),
+      notifyPoleEmploiUserAdvisorOnAssociation:
+        new NotifyPoleEmploiUserAdvisorOnConventionAssociation(
+          uowPerformer,
+          gateways.email,
+          generateMagicLinkFn,
+        ),
+      notifyPoleEmploiUserAdvisorOnConventionFullySigned:
+        new NotifyPoleEmploiUserAdvisorOnConventionFullySigned(
+          uowPerformer,
+          gateways.email,
+          generateMagicLinkFn,
+        ),
+      broadcastToPoleEmploiOnConventionUpdates:
+        new BroadcastToPoleEmploiOnConventionUpdates(
+          uowPerformer,
+          gateways.poleEmploiGateway,
+        ),
+      shareConventionByEmail: new ShareApplicationLinkByEmail(gateways.email),
+      addAgency: new AddAgency(
+        uowPerformer,
+        createNewEvent,
+        config.defaultAdminEmail,
+      ),
+      updateAgency: new UpdateAgency(uowPerformer, createNewEvent),
+    }),
+    ...instantiatedUseCasesFromFunctions({
+      getFeatureFlags: (_: void) =>
+        uowPerformer.perform((uow) => uow.getFeatureFlags()),
+      getApiConsumerById: (id: ApiConsumerId) =>
+        uowPerformer.perform((uow) => uow.getApiConsumersById(id)),
+      isFormEstablishmentWithSiretAlreadySaved: (siret: SiretDto) =>
+        uowPerformer.perform((uow) =>
+          uow.establishmentAggregateRepository.hasEstablishmentFromFormWithSiret(
+            siret,
+          ),
+        ),
+      getImmersionFacileAgencyIdByKind: (_: void) =>
+        uowPerformer.perform((uow) =>
+          uow.agencyRepository.getImmersionFacileAgencyId(),
+        ),
+    }),
   };
 };
+
+export type UseCases = ReturnType<typeof createUseCases>;
+
+// for type validation
+// if this does not compile, make sure all useCase in createUseCases are assignable to InstantiatedUseCase :
+const _isAssignable = (
+  useCases: UseCases,
+): Record<string, InstantiatedUseCase<any, any, any>> => useCases;
+
+export type InstantiatedUseCase<
+  Input = void,
+  Output = void,
+  JwtPayload = void,
+> = {
+  useCaseName: string;
+  execute: (param: Input, jwtPayload?: JwtPayload) => Promise<Output>;
+};
+
+const instantiatedUseCaseFromClass = <Input, Output, JwtPayload>(
+  useCase:
+    | TransactionalUseCase<Input, Output, JwtPayload>
+    | UseCase<Input, Output, JwtPayload>,
+): InstantiatedUseCase<Input, Output, JwtPayload> => ({
+  execute: (p, jwtPayload) => useCase.execute(p, jwtPayload),
+  useCaseName: useCase.constructor.name,
+});
+
+const createInstantiatedUseCase = <Input = void, Output = void>(params: {
+  useCaseName: string;
+  execute: (params: Input) => Promise<Output>;
+}): InstantiatedUseCase<Input, Output, unknown> => params;
+
+const instantiatedUseCasesFromFunctions = <
+  T extends Record<string, (params: any) => Promise<unknown>>,
+>(
+  lamdas: T,
+): {
+  [K in keyof T]: T[K] extends (p: infer Input) => Promise<infer Output>
+    ? InstantiatedUseCase<Input, Output, any>
+    : never;
+} =>
+  keys(lamdas).reduce(
+    (acc, key) => ({
+      ...acc,
+      [key]: createInstantiatedUseCase({
+        useCaseName: key as string,
+        execute: lamdas[key],
+      }),
+    }),
+    {} as any,
+  );
+
+const instantiatedUseCasesFromClasses = <
+  T extends Record<
+    string,
+    TransactionalUseCase<any, any, any> | UseCase<any, any, any>
+  >,
+>(
+  useCases: T,
+): {
+  [K in keyof T]: T[K] extends TransactionalUseCase<
+    infer Input,
+    infer Output,
+    infer JwtPayload
+  >
+    ? InstantiatedUseCase<Input, Output, JwtPayload>
+    : T[K] extends UseCase<infer Input2, infer Output2, infer JwtPayload2>
+    ? InstantiatedUseCase<Input2, Output2, JwtPayload2>
+    : never;
+} =>
+  keys(useCases).reduce(
+    (acc, useCaseKey) => ({
+      ...acc,
+      [useCaseKey]: instantiatedUseCaseFromClass(useCases[useCaseKey]),
+    }),
+    {} as any,
+  );

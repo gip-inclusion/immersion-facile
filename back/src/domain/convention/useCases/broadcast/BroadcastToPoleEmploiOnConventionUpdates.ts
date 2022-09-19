@@ -47,7 +47,7 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
   ConventionDto,
   void
 > {
-  inputSchema = z.any(); // No need of a validation schema here since this use-case is only called from the our domain
+  inputSchema: z.Schema<ConventionDto> = z.any(); // No need of a validation schema here since this use-case is only called from the our domain
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
@@ -55,7 +55,7 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
   ) {
     super(uowPerformer);
   }
-
+  //
   public async _execute(
     convention: ConventionDto,
     uow: UnitOfWork,

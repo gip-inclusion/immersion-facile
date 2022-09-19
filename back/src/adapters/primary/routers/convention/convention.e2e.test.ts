@@ -12,16 +12,16 @@ import {
   stringToMd5,
 } from "shared/src/tokens/MagicLinkPayload";
 import { SuperTest, Test } from "supertest";
-import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
+import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import {
   buildTestApp,
   InMemoryGateways,
-} from "../../_testBuilders/buildTestApp";
-import { AppConfig } from "../../adapters/primary/config/appConfig";
-import { InMemoryUnitOfWork } from "../../adapters/primary/config/uowConfig";
-import { BasicEventCrawler } from "../../adapters/secondary/core/EventCrawlerImplementations";
-import { TEST_AGENCY_NAME } from "../../adapters/secondary/InMemoryConventionQueries";
-import { GenerateMagicLinkJwt } from "../../domain/auth/jwt";
+} from "../../../../_testBuilders/buildTestApp";
+import { AppConfig } from "../../config/appConfig";
+import { InMemoryUnitOfWork } from "../../config/uowConfig";
+import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
+import { TEST_AGENCY_NAME } from "../../../secondary/InMemoryConventionQueries";
+import { GenerateMagicLinkJwt } from "../../../../domain/auth/jwt";
 
 let request: SuperTest<Test>;
 let generateMagicLinkJwt: GenerateMagicLinkJwt;

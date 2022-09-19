@@ -80,12 +80,12 @@ export const createAppDependencies = async (config: AppConfig) => {
       "establishment",
     ),
     apiKeyAuthMiddlewareV0: createApiKeyAuthMiddlewareV0(
-      useCases.getApiConsumerById,
+      useCases.getApiConsumerById.execute,
       clock,
       config,
     ),
     apiKeyAuthMiddleware: makeApiKeyAuthMiddlewareV1(
-      useCases.getApiConsumerById,
+      useCases.getApiConsumerById.execute,
       clock,
       config,
     ),
