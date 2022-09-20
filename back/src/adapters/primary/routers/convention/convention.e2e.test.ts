@@ -22,6 +22,7 @@ import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
 import { TEST_AGENCY_NAME } from "../../../secondary/InMemoryConventionQueries";
 import { GenerateMagicLinkJwt } from "../../../../domain/auth/jwt";
+import { expectToEqual } from "shared/src/expectToEqual";
 
 let request: SuperTest<Test>;
 let generateMagicLinkJwt: GenerateMagicLinkJwt;
@@ -76,12 +77,7 @@ describe("convention e2e", () => {
       it("Creating a valid application succeeds", async () => {
         const convention = new ConventionDtoBuilder().build();
         const { externalId, ...createConventionParams } = convention;
-
-        // GET /demandes-immersion returns an empty list.
-        await request
-          .get(`/admin/${conventionsRoute}`)
-          .set("Authorization", adminToken)
-          .expect(200, []);
+        expectToEqual(inMemoryUow.conventionRepository.conventions, []);
 
         // POSTing a valid application succeeds.
         await request
@@ -106,10 +102,7 @@ describe("convention e2e", () => {
 
         beforeEach(async () => {
           // GET /demandes-immersion returns an empty list.
-          await request
-            .get(`/admin/${conventionsRoute}`)
-            .set("Authorization", adminToken)
-            .expect(200, []);
+          expectToEqual(inMemoryUow.conventionRepository.conventions, []);
 
           // POSTing a valid application succeeds.
           await request

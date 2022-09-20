@@ -43,7 +43,8 @@ describe("/admin router", () => {
       expect(response.status).toBe(401);
     });
 
-    it("Lists the conventions if the token is valid", async () => {
+    it.skip("Lists the conventions if the token is valid", async () => {
+      // test stays for demo purpose, but now .get(`/admin/${conventionsRoute}`) returns the iframe url from metabase
       const response = await request
         .get(`/admin/${conventionsRoute}`)
         .set("authorization", token);
