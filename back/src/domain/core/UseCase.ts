@@ -4,7 +4,6 @@ import {
   BadRequestError,
   validateAndParseZodSchema,
 } from "../../adapters/primary/helpers/httpErrors";
-import { AppSpan, tracer } from "../../adapters/primary/scripts/tracing";
 import { createLogger } from "../../utils/logger";
 import { UnitOfWork, UnitOfWorkPerformer } from "./ports/UnitOfWork";
 
@@ -30,14 +29,7 @@ export abstract class UseCase<
     } catch (e) {
       throw new BadRequestError(e);
     }
-    const result = await tracer.startActiveSpan(
-      `Use Case`,
-      traceUseCaseWithContext(() => this._execute(validParams, jwtPayload), {
-        useCaseName,
-        input: validParams,
-        jwtPayload,
-      }),
-    );
+    const result = this._execute(validParams, jwtPayload);
 
     logger.info(`UseCase execution Finished - ${useCaseName}`);
     return result;
@@ -79,19 +71,6 @@ export abstract class TransactionalUseCase<
     } finally {
       logger.info(`UseCase execution Finished - ${useCaseName}`);
     }
-
-    // Old version :
-    // return this.uowPerformer
-    //   .perform((uow) => this._execute(validParams, uow, jwtPayload))
-    //   .catch((error) => {
-    //     logger.error(
-    //       `UseCase execution Errored - ${useCaseName} : ${error.message}`,
-    //     );
-    //     throw error;
-    //   })
-    //   .finally(() => {
-    //     logger.info(`UseCase execution Finished - ${useCaseName}`);
-    //   });
   }
 
   protected abstract _execute(
@@ -100,27 +79,3 @@ export abstract class TransactionalUseCase<
     jwtPayload?: JWTPayload,
   ): Promise<Output>;
 }
-
-const traceUseCaseWithContext =
-  <Input, JWTPayload, Output>(
-    cb: () => Promise<Output>,
-    context: { useCaseName: string; input: Input; jwtPayload: JWTPayload },
-  ) =>
-  async (span: AppSpan) => {
-    span.setAttributes({
-      _useCaseName: context.useCaseName,
-      input: JSON.stringify(context.input),
-      jwtPayload: JSON.stringify(context.jwtPayload),
-    });
-
-    return cb()
-      .then((output) => {
-        span.setAttribute("output", JSON.stringify(output));
-        return output;
-      })
-      .catch((error) => {
-        span.setAttribute("error", JSON.stringify(error));
-        throw error;
-      })
-      .finally(() => span.end());
-  };
