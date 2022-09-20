@@ -1,5 +1,6 @@
 import { Observable, of, throwError } from "rxjs";
 import { AdminToken, UserAndPassword } from "shared/src/admin/admin.dto";
+import { AbsoluteUrl } from "src/../../shared/src/AbsoluteUrl";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
 export class SimulatedAdminGateway implements AdminGateway {
@@ -10,5 +11,13 @@ export class SimulatedAdminGateway implements AdminGateway {
           new Error("Impossible de vous authentifier (SimulatedAdminGateway)"),
       );
     return of("some-token");
+  }
+
+  public metabaseAgencyEmbed(_: AdminToken): Observable<AbsoluteUrl> {
+    return of(`http://plop`);
+  }
+
+  public dashboardConvention(_token: AdminToken): Observable<AbsoluteUrl> {
+    return of(`http://plop`);
   }
 }

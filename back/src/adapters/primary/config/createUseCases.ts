@@ -56,6 +56,7 @@ import { RequestEditFormEstablishment } from "../../../domain/immersionOffer/use
 import { RetrieveFormEstablishmentFromAggregates } from "../../../domain/immersionOffer/useCases/RetrieveFormEstablishmentFromAggregates";
 import { SearchImmersion } from "../../../domain/immersionOffer/useCases/SearchImmersion";
 import { UpdateEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentAggregateFromFormEstablishement";
+import { AgencyDashboard } from "../../../domain/dashboard/useCases/AgencyDashboard";
 import { AssociatePeConnectFederatedIdentity } from "../../../domain/peConnect/useCases/AssociateFederatedIdentityPeConnect";
 import { LinkPoleEmploiAdvisorAndRedirectToConvention } from "../../../domain/peConnect/useCases/LinkPoleEmploiAdvisorAndRedirectToConvention";
 import { NotifyPoleEmploiUserAdvisorOnConventionAssociation } from "../../../domain/peConnect/useCases/NotifyPoleEmploiUserAdvisorOnConventionAssociation";
@@ -68,6 +69,8 @@ import { AppConfig } from "./appConfig";
 import { Gateways } from "./createGateways";
 import { GenerateConventionMagicLink } from "./createGenerateConventionMagicLink";
 import { makeGenerateEditFormEstablishmentUrl } from "./makeGenerateEditFormEstablishmentUrl";
+import { ConventionDashboard } from "../../../domain/dashboard/useCases/ConventionDashboard";
+import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
 
 export const createUseCases = (
   config: AppConfig,
@@ -222,6 +225,8 @@ export const createUseCases = (
       sendEmailWhenAgencyIsActivated: new SendEmailWhenAgencyIsActivated(
         gateways.email,
       ),
+      // METABASE
+      ...dashboardUseCases(gateways.dashboardGateway),
       // notifications
       confirmToBeneficiaryThatConventionCorrectlySubmittedRequestSignature:
         new ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature(
@@ -309,6 +314,11 @@ export const createUseCases = (
     }),
   };
 };
+
+const dashboardUseCases = (gateway: DashboardGateway) => ({
+  dashboardAgence: new AgencyDashboard(gateway),
+  dashboardConvention: new ConventionDashboard(gateway),
+});
 
 export type UseCases = ReturnType<typeof createUseCases>;
 

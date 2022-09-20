@@ -6,7 +6,8 @@ export type AdminTab =
   | "conventions"
   | "agency-validation"
   | "exports"
-  | "emails";
+  | "emails"
+  | "metabase";
 
 export const adminTabSerializer: ValueSerializer<AdminTab> = {
   parse: (raw) => raw as AdminTab,

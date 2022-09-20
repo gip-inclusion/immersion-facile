@@ -2,6 +2,7 @@ import { Router } from "express";
 import { AgencyDto, AgencyId } from "shared/src/agency/agency.dto";
 import {
   adminLogin,
+  adminMetabaseAgencyEmbed,
   agenciesRoute,
   conventionsRoute,
   emailRoute,
@@ -66,16 +67,14 @@ export const createAdminRouter = (deps: AppDependencies) => {
   adminRouter
     .route(`/${conventionsRoute}`)
     .get(async (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.listAdminConventions.execute(req.query),
-      ),
+      sendHttpResponse(req, res, deps.useCases.dashboardConvention.execute),
     );
 
   // GET admin/emails
   adminRouter
     .route(`/${emailRoute}`)
     .get(async (req, res) =>
-      sendHttpResponse(req, res, () => deps.useCases.getSentEmails.execute()),
+      sendHttpResponse(req, res, deps.useCases.getSentEmails.execute),
     );
 
   adminRouter.route(`/${exportRoute}`).post(async (req, res) =>
@@ -86,6 +85,18 @@ export const createAdminRouter = (deps: AppDependencies) => {
       );
       return archivePath;
     }),
+  );
+
+  // GET admin/metabase
+  adminRouter.route(`/${adminMetabaseAgencyEmbed}`).get(async (req, res) =>
+    sendHttpResponse(
+      req,
+      res,
+      () =>
+        deps.useCases.dashboardAgence.execute(
+          "046ce2ed-cc09-47c1-a446-1d1a0d7a6b4a",
+        ), //TODO On identifira l'agence via son token inclusion connect
+    ),
   );
 
   return adminRouter;

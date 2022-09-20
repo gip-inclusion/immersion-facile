@@ -225,6 +225,23 @@ export class AppConfig {
     };
   }
 
+  // == Metabase
+  public get dashboard() {
+    return throwIfNotInArray({
+      processEnv: this.env,
+      variableName: "DASHBOARD_GATEWAY",
+      authorizedValues: ["METABASE", "NONE"],
+      defaultValue: "NONE",
+    });
+  }
+
+  public get metabase() {
+    return {
+      metabaseUrl: this.throwIfNotDefined("METABASE_URL") as AbsoluteUrl,
+      metabaseApiKey: this.throwIfNotDefined("METABASE_API_KEY"),
+    };
+  }
+
   // == Magic links ==
 
   public get immersionFacileBaseUrl(): AbsoluteUrl {

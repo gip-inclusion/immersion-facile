@@ -9,6 +9,7 @@ import { AdminTab } from "src/app/routing/route-params";
 import { routes } from "src/app/routing/routes";
 import { Route } from "type-route";
 import "./Admin.css";
+import { MetabaseTab } from "./MetabaseTab";
 
 const getNavLinks = (currentTab: AdminTab): NavLink[] => [
   {
@@ -30,6 +31,11 @@ const getNavLinks = (currentTab: AdminTab): NavLink[] => [
     label: "Emails",
     active: currentTab === "emails",
     ...routes.adminTab({ tab: "emails" }).link,
+  },
+  {
+    label: "Metabase Mock Agence",
+    active: currentTab === "emails",
+    ...routes.adminTab({ tab: "metabase" }).link,
   },
 ];
 
@@ -63,6 +69,7 @@ export const AdminPage = ({
               {currentTab === "agency-validation" && <AgencyTab />}
               {currentTab === "exports" && <DataExportTab />}
               {currentTab === "emails" && <EmailsTab />}
+              {currentTab === "metabase" && <MetabaseTab />}
             </div>
           </div>
         </div>

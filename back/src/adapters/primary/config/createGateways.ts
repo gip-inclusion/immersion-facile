@@ -51,6 +51,9 @@ import { ExcelExportGateway } from "../../secondary/reporting/ExcelExportGateway
 import { InMemoryExportGateway } from "../../secondary/reporting/InMemoryExportGateway";
 import { S3DocumentGateway } from "../../secondary/S3DocumentGateway";
 import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
+import { MetabaseDashboardGateway } from "../../secondary/dashboardGateway/MetabaseDashboardGateway";
+import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
+import { NotImplementedDashboardGateway } from "../../secondary/dashboardGateway/NotImplementedDashboardGateway";
 
 const logger = createLogger(__filename);
 
@@ -112,6 +115,7 @@ export const createGateways = async (config: AppConfig, clock: Clock) => {
 
   return {
     addressApi: createAddressGateway(config),
+    dashboardGateway: createDashboardGateway(config),
     documentGateway: createDocumentGateway(config),
     email: createEmailGateway(config, clock),
     laBonneBoiteAPI:
@@ -234,3 +238,11 @@ const createDocumentGateway = (config: AppConfig): DocumentGateway => {
     }
   }
 };
+
+const createDashboardGateway = (config: AppConfig): DashboardGateway =>
+  config.dashboard === "METABASE"
+    ? new MetabaseDashboardGateway(
+        config.metabase.metabaseUrl,
+        config.metabase.metabaseApiKey,
+      )
+    : new NotImplementedDashboardGateway();
