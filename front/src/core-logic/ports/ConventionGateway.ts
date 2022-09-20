@@ -1,13 +1,11 @@
 import { Observable } from "rxjs";
 import { AdminToken } from "shared/src/admin/admin.dto";
-import { AgencyId } from "shared/src/agency/agency.dto";
 import {
-  ConventionStatus,
   ConventionDto,
   ConventionId,
+  ConventionReadDto,
   UpdateConventionStatusRequestDto,
   WithConventionId,
-  ConventionReadDto,
 } from "shared/src/convention/convention.dto";
 import { ShareLinkByEmailDto } from "shared/src/ShareLinkByEmailDto";
 import { Role } from "shared/src/tokens/MagicLinkPayload";
@@ -29,12 +27,6 @@ export interface ConventionGateway {
   ): Promise<WithConventionId>;
 
   signApplication(jwt: string): Promise<WithConventionId>;
-
-  getAll(
-    adminToken: AdminToken,
-    agency?: AgencyId,
-    status?: ConventionStatus,
-  ): Promise<Array<ConventionReadDto>>;
 
   generateMagicLink(
     adminToken: AdminToken,

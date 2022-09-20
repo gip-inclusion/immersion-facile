@@ -4,7 +4,7 @@ import { AdminToken, UserAndPassword } from "shared/src/admin/admin.dto";
 import { adminTokenSchema } from "shared/src/admin/admin.schema";
 import {
   adminLogin,
-  adminMetabaseAgencyEmbed,
+  dashboardAgency,
   conventionsRoute,
 } from "shared/src/routes";
 import { AbsoluteUrl, absoluteUrlSchema } from "shared/src/AbsoluteUrl";
@@ -22,7 +22,7 @@ export class HttpAdminGateway implements AdminGateway {
   // TODO Do we want to create a specific adapter ?
   public metabaseAgencyEmbed(token: AdminToken): Observable<AbsoluteUrl> {
     return from(
-      this.httpClient.get<unknown>(`/admin/${adminMetabaseAgencyEmbed}`, {
+      this.httpClient.get<unknown>(`/admin/${dashboardAgency}`, {
         headers: {
           authorization: token,
         },

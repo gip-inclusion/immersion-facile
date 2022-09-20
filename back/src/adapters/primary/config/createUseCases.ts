@@ -15,7 +15,6 @@ import { CreateImmersionAssessment } from "../../../domain/convention/useCases/C
 import { GenerateMagicLink } from "../../../domain/convention/useCases/GenerateMagicLink";
 import { GetAgencyPublicInfoById } from "../../../domain/convention/useCases/GetAgencyPublicInfoById";
 import { GetConvention } from "../../../domain/convention/useCases/GetConvention";
-import { ListAdminConventions } from "../../../domain/convention/useCases/ListAdminConventions";
 import { ListAgenciesByDepartmentCode } from "../../../domain/convention/useCases/ListAgenciesByDepartmentCode";
 import { ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/convention/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature";
 import { ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/convention/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature";
@@ -128,7 +127,6 @@ export const createUseCases = (
           gateways.peConnectGateway,
           config.immersionFacileBaseUrl,
         ),
-      listAdminConventions: new ListAdminConventions(uowPerformer),
 
       updateConvention: new UpdateConvention(uowPerformer, createNewEvent),
       updateConventionStatus: new UpdateConventionStatus(
@@ -316,7 +314,7 @@ export const createUseCases = (
 };
 
 const dashboardUseCases = (gateway: DashboardGateway) => ({
-  dashboardAgence: new AgencyDashboard(gateway),
+  dashboardAgency: new AgencyDashboard(gateway),
   dashboardConvention: new ConventionDashboard(gateway),
 });
 

@@ -1,25 +1,24 @@
+import { from, Observable, Subject } from "rxjs";
 import { AdminToken } from "shared/src/admin/admin.dto";
-import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
-import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
-import { AgencyId, AgencyIdAndName } from "shared/src/agency/agency.dto";
+import { AgencyIdAndName } from "shared/src/agency/agency.dto";
 import { signConventionDtoWithRole } from "shared/src/convention/convention";
 import {
-  ConventionStatus,
   ConventionDto,
   ConventionId,
-  UpdateConventionStatusRequestDto,
-  WithConventionId,
   ConventionReadDto,
   SignatoryRole,
+  UpdateConventionStatusRequestDto,
+  WithConventionId,
 } from "shared/src/convention/convention.dto";
+import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { ShareLinkByEmailDto } from "shared/src/ShareLinkByEmailDto";
 import {
   ConventionMagicLinkPayload,
   Role,
 } from "shared/src/tokens/MagicLinkPayload";
 import { sleep } from "shared/src/utils";
-import { Observable, Subject, from } from "rxjs";
-import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
+import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
+import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 
 const CONVENTION_DRAFT_TEST = new ConventionDtoBuilder()
   .withStatus("DRAFT")
@@ -64,26 +63,6 @@ export class InMemoryConventionGateway implements ConventionGateway {
     return this.inferConventionReadDto(
       this._conventions[payload.applicationId],
     );
-  }
-
-  public async getAll(
-    _adminToken: AdminToken,
-    agency?: AgencyId,
-    status?: ConventionStatus,
-  ): Promise<Array<ConventionReadDto>> {
-    this.simulatedLatency && (await sleep(this.simulatedLatency));
-
-    return Object.values(this._conventions)
-      .filter((convention) => !agency || convention.agencyId === agency)
-      .filter((convention) => !status || convention.status === status)
-      .map((conventionDto) => ({
-        ...conventionDto,
-        dateValidation:
-          conventionDto.status === "ACCEPTED_BY_VALIDATOR"
-            ? conventionDto.dateSubmission
-            : undefined,
-        agencyName: `Agency name of ${conventionDto.agencyId}`,
-      }));
   }
 
   public async update(convention: ConventionDto): Promise<ConventionId> {

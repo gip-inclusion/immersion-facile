@@ -1,18 +1,15 @@
 import { AxiosInstance } from "axios";
 import { from, Observable } from "rxjs";
 import { AdminToken } from "shared/src/admin/admin.dto";
-import { AgencyId } from "shared/src/agency/agency.dto";
 import {
   ConventionDto,
   ConventionId,
   ConventionReadDto,
-  ConventionStatus,
   UpdateConventionStatusRequestDto,
   WithConventionId,
 } from "shared/src/convention/convention.dto";
 import {
   conventionReadSchema,
-  conventionReadsSchema,
   withConventionIdSchema,
 } from "shared/src/convention/convention.schema";
 import {
@@ -63,29 +60,6 @@ export class HttpConventionGateway implements ConventionGateway {
     );
     const conventionReadDto = conventionReadSchema.parse(data);
     return conventionReadDto;
-  }
-
-  // TODO Mieux identifier l'admin
-  public async getAll(
-    adminToken: AdminToken,
-    agency?: AgencyId,
-    status?: ConventionStatus,
-  ): Promise<Array<ConventionReadDto>> {
-    const { data } = await this.httpClient.get<unknown>(
-      `/admin/${conventionsRoute}`,
-      {
-        params: {
-          agency,
-          status,
-        },
-        headers: {
-          authorization: adminToken,
-        },
-      },
-    );
-
-    const conventionReadDtos = conventionReadsSchema.parse(data);
-    return conventionReadDtos;
   }
 
   public async update(conventionDto: ConventionDto): Promise<string> {
