@@ -1,4 +1,3 @@
-import { makeStubFeatureFlags } from "shared/src/featureFlags";
 import {
   GetSiretInfo,
   GetSiretResponseDto,
@@ -9,6 +8,7 @@ import {
   siretSlice,
   SiretState,
 } from "src/core-logic/domain/siret/siret.slice";
+import { makeStubFeatureFlags } from "src/core-logic/domain/testHelpers/test.helpers";
 
 import {
   createTestStore,

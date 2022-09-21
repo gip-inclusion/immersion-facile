@@ -296,7 +296,7 @@ export const createUseCases = (
     }),
     ...instantiatedUseCasesFromFunctions({
       getFeatureFlags: (_: void) =>
-        uowPerformer.perform((uow) => uow.getFeatureFlags()),
+        uowPerformer.perform((uow) => uow.featureFlagRepository.getAll()),
       getApiConsumerById: (id: ApiConsumerId) =>
         uowPerformer.perform((uow) => uow.getApiConsumersById(id)),
       isFormEstablishmentWithSiretAlreadySaved: (siret: SiretDto) =>

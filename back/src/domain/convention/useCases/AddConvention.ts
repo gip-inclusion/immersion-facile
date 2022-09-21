@@ -41,7 +41,7 @@ export class AddConvention extends TransactionalUseCase<
       throw new ForbiddenError();
     }
 
-    const featureFlags = await uow.getFeatureFlags();
+    const featureFlags = await uow.featureFlagRepository.getAll();
     if (featureFlags.enableInseeApi) {
       await rejectsSiretIfNotAnOpenCompany(
         this.getSiret,

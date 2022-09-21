@@ -1,9 +1,9 @@
 import { ConventionId } from "shared/src/convention/convention.dto";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
-import { makeStubGetFeatureFlags } from "shared/src/featureFlags";
 import { reasonableSchedule } from "shared/src/schedule/ScheduleUtils";
 import { expectObjectsToMatch } from "../../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
+import { InMemoryFeatureFlagRepository } from "../../../../adapters/secondary/InMemoryFeatureFlagRepository";
 import { InMemoryPoleEmploiGateway } from "../../../../adapters/secondary/InMemoryPoleEmploiGateway";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { BroadcastToPoleEmploiOnConventionUpdates } from "./BroadcastToPoleEmploiOnConventionUpdates";
@@ -15,7 +15,7 @@ const prepareUseCase = ({
 }) => {
   const poleEmploiGateWay = new InMemoryPoleEmploiGateway();
   const uow = createInMemoryUow();
-  uow.getFeatureFlags = makeStubGetFeatureFlags({
+  uow.featureFlagRepository = new InMemoryFeatureFlagRepository({
     enablePeConventionBroadcast,
   });
   const useCase = new BroadcastToPoleEmploiOnConventionUpdates(

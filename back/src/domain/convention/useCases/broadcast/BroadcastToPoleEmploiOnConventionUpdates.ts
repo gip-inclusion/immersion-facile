@@ -60,7 +60,8 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
     convention: ConventionDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    const { enablePeConventionBroadcast } = await uow.getFeatureFlags();
+    const { enablePeConventionBroadcast } =
+      await uow.featureFlagRepository.getAll();
     const { mentor, beneficiary } = convention.signatories;
 
     if (!enablePeConventionBroadcast) return;

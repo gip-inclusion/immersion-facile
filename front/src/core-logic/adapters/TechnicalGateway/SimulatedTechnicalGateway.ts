@@ -1,6 +1,7 @@
 import { Observable, of } from "rxjs";
 import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
-import { FeatureFlags, makeStubFeatureFlags } from "shared/src/featureFlags";
+import { FeatureFlags } from "shared/src/featureFlags";
+import { makeStubFeatureFlags } from "src/core-logic/domain/testHelpers/test.helpers";
 import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 
 export class SimulatedTechnicalGateway implements TechnicalGateway {

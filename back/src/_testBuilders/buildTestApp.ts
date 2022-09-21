@@ -20,7 +20,6 @@ import {
   GenerateMagicLinkJwt,
 } from "../domain/auth/jwt";
 import { Clock } from "../domain/core/ports/Clock";
-import { GetFeatureFlags } from "../domain/core/ports/GetFeatureFlags";
 import { AppConfigBuilder } from "./AppConfigBuilder";
 import { NotImplementedDashboardGateway } from "../adapters/secondary/dashboardGateway/NotImplementedDashboardGateway";
 
@@ -31,7 +30,6 @@ export type InMemoryGateways = {
   laBonneBoiteAPI: InMemoryLaBonneBoiteAPI;
   passEmploiGateway: InMemoryPassEmploiGateway;
   poleEmploiGateway: InMemoryPoleEmploiGateway;
-  getFeatureFlags: GetFeatureFlags;
   documentGateway: NotImplementedDocumentGateway;
   dashboardGateway: NotImplementedDashboardGateway;
   addressApi: InMemoryAddressGateway;

@@ -1,24 +1,24 @@
 import { Pool, PoolClient } from "pg";
 import { keys } from "ramda";
 import { FeatureFlags } from "shared/src/featureFlags";
-import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
-import { expectTypeToMatchAndEqual } from "../../_testBuilders/test.helpers";
-import { makePgGetFeatureFlags } from "../../adapters/secondary/pg/makePgGetFeatureFlags";
-import { GetFeatureFlags } from "../../domain/core/ports/GetFeatureFlags";
+import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
+import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
+import { FeatureFlagRepository } from "../../../domain/core/ports/FeatureFlagRepository";
+import { PgFeatureFlagRepository } from "./PgFeatureFlagRepository";
 
 describe("PG getFeatureFlags", () => {
   let pool: Pool;
   let client: PoolClient;
-  let getFeatureFlags: GetFeatureFlags;
+  let featureFlagRepository: FeatureFlagRepository;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     pool = getTestPgPool();
     client = await pool.connect();
     await client.query("DELETE FROM feature_flags");
-    getFeatureFlags = makePgGetFeatureFlags(client);
+    featureFlagRepository = new PgFeatureFlagRepository(client);
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     client.release();
     await pool.end();
   });
@@ -34,7 +34,7 @@ describe("PG getFeatureFlags", () => {
 
     await insertFeatureFlagsInTable(expectedFeatureFlags);
 
-    const featureFlags = await getFeatureFlags();
+    const featureFlags = await featureFlagRepository.getAll();
 
     expectTypeToMatchAndEqual(featureFlags, {
       enableInseeApi: true,
@@ -42,6 +42,33 @@ describe("PG getFeatureFlags", () => {
       enablePeConnectApi: true,
       enableLogoUpload: false,
       enablePeConventionBroadcast: true,
+    });
+  });
+
+  it("sets a Feature Flag to the given value", async () => {
+    const initialFeatureFlags: FeatureFlags = {
+      enableInseeApi: true,
+      enableAdminUi: true,
+      enablePeConnectApi: true,
+      enablePeConventionBroadcast: true,
+      enableLogoUpload: false,
+    };
+
+    await insertFeatureFlagsInTable(initialFeatureFlags);
+
+    await featureFlagRepository.set({
+      flagName: "enableLogoUpload",
+      value: true,
+    });
+
+    const featureFlags = await featureFlagRepository.getAll();
+
+    expectTypeToMatchAndEqual(featureFlags, {
+      enableInseeApi: true,
+      enableAdminUi: true,
+      enablePeConnectApi: true,
+      enablePeConventionBroadcast: true,
+      enableLogoUpload: true,
     });
   });
 

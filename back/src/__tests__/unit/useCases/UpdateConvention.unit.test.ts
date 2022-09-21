@@ -4,7 +4,6 @@ import {
   ConventionId,
 } from "shared/src/convention/convention.dto";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
-import { makeStubGetFeatureFlags } from "shared/src/featureFlags";
 import {
   expectPromiseToFailWithError,
   expectTypeToMatchAndEqual,
@@ -19,40 +18,36 @@ import { CustomClock } from "../../../adapters/secondary/core/ClockImplementatio
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
+import { InMemoryFeatureFlagRepository } from "../../../adapters/secondary/InMemoryFeatureFlagRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { UpdateConvention } from "../../../domain/convention/useCases/UpdateConvention";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
 } from "../../../domain/core/eventBus/EventBus";
-import { GetFeatureFlags } from "../../../domain/core/ports/GetFeatureFlags";
 
 describe("Update Convention", () => {
   let updateConvention: UpdateConvention;
   let conventionRepository: InMemoryConventionRepository;
   let outboxRepo: InMemoryOutboxRepository;
   let createNewEvent: CreateNewEvent;
-  let getFeatureFlags: GetFeatureFlags;
   let uowPerformer: InMemoryUowPerformer;
 
   beforeEach(() => {
     const uow = createInMemoryUow();
     conventionRepository = uow.conventionRepository;
     outboxRepo = uow.outboxRepository;
+    uow.featureFlagRepository = new InMemoryFeatureFlagRepository({
+      enableAdminUi: false,
+      enableInseeApi: true,
+    });
 
     createNewEvent = makeCreateNewEvent({
       clock: new CustomClock(),
       uuidGenerator: new TestUuidGenerator(),
     });
-    getFeatureFlags = makeStubGetFeatureFlags({
-      enableAdminUi: false,
-      enableInseeApi: true,
-    });
 
-    uowPerformer = new InMemoryUowPerformer({
-      ...uow,
-      getFeatureFlags,
-    });
+    uowPerformer = new InMemoryUowPerformer(uow);
 
     updateConvention = new UpdateConvention(uowPerformer, createNewEvent);
   });

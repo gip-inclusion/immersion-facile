@@ -1,3 +1,4 @@
+import { FeatureFlags } from "shared/src/featureFlags";
 import { StoreAndDeps } from "src/core-logic/storeConfig/createTestStore";
 
 type ScenarioUnitTest = (storeAndDeps: StoreAndDeps) => void;
@@ -21,3 +22,15 @@ export const fastForwardObservables = createScenarioUnitTest<string>(
       });
     },
 );
+
+const defaultFlagsInFront: FeatureFlags = {
+  enableAdminUi: true,
+  enableInseeApi: true,
+  enablePeConnectApi: true,
+  enableLogoUpload: false,
+  enablePeConventionBroadcast: true,
+};
+
+export const makeStubFeatureFlags = (
+  flags: Partial<FeatureFlags> = {},
+): FeatureFlags => ({ ...defaultFlagsInFront, ...flags });

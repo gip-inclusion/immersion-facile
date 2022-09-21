@@ -1,4 +1,3 @@
-import { makeStubGetFeatureFlags } from "shared/src/featureFlags";
 import { FormEstablishmentDtoBuilder } from "shared/src/formEstablishment/FormEstablishmentDtoBuilder";
 import { StubGetSiret } from "../../../_testBuilders/StubGetSiret";
 import {
@@ -13,10 +12,10 @@ import {
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
+import { InMemoryFeatureFlagRepository } from "../../../adapters/secondary/InMemoryFeatureFlagRepository";
 import { InMemoryFormEstablishmentRepository } from "../../../adapters/secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
-import { GetFeatureFlags } from "../../../domain/core/ports/GetFeatureFlags";
 import { AddFormEstablishment } from "../../../domain/immersionOffer/useCases/AddFormEstablishment";
 
 describe("Add FormEstablishment", () => {
@@ -25,23 +24,18 @@ describe("Add FormEstablishment", () => {
   let outboxRepo: InMemoryOutboxRepository;
   let stubGetSiret: StubGetSiret;
   let uowPerformer: InMemoryUowPerformer;
-  let getFeatureFlags: GetFeatureFlags;
 
   beforeEach(() => {
     stubGetSiret = new StubGetSiret();
-    formEstablishmentRepo = new InMemoryFormEstablishmentRepository();
-    outboxRepo = new InMemoryOutboxRepository();
-    getFeatureFlags = makeStubGetFeatureFlags({
+    const uow = createInMemoryUow();
+    formEstablishmentRepo = uow.formEstablishmentRepository;
+    outboxRepo = uow.outboxRepository;
+    uow.featureFlagRepository = new InMemoryFeatureFlagRepository({
       enableAdminUi: false,
       enableInseeApi: true,
     });
 
-    uowPerformer = new InMemoryUowPerformer({
-      ...createInMemoryUow(),
-      outboxRepository: outboxRepo,
-      formEstablishmentRepository: formEstablishmentRepo,
-      getFeatureFlags,
-    });
+    uowPerformer = new InMemoryUowPerformer(uow);
 
     const clock = new CustomClock();
     const uuidGenerator = new TestUuidGenerator();
@@ -112,12 +106,12 @@ describe("Add FormEstablishment", () => {
 
     describe("when feature flag to do siret validation is OFF", () => {
       it("accepts formEstablishment with SIRETs that don't correspond to active businesses and quarantines events", async () => {
-        const getFeatureFlagsWithInseeByPass = makeStubGetFeatureFlags({
+        const featureFlagRepository = new InMemoryFeatureFlagRepository({
           enableAdminUi: false,
           enableInseeApi: false,
         });
         uowPerformer.setUow({
-          getFeatureFlags: getFeatureFlagsWithInseeByPass,
+          featureFlagRepository,
         });
         stubGetSiret.setNextResponse({
           siret: formEstablishment.siret,

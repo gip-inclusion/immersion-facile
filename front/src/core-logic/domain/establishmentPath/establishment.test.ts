@@ -1,8 +1,8 @@
 import { expectObjectsToMatch } from "shared/src/expectToEqual";
-import { makeStubFeatureFlags } from "shared/src/featureFlags";
 import { GetSiretResponseDto, SiretDto } from "shared/src/siret";
 import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
+import { makeStubFeatureFlags } from "src/core-logic/domain/testHelpers/test.helpers";
 import {
   createTestStore,
   TestDependencies,

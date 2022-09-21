@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/require-await */
 import { AxiosResponse } from "axios";
 import secondsToMilliseconds from "date-fns/secondsToMilliseconds";
-import { FeatureFlags } from "shared/src/featureFlags";
 import {
   HttpResponse,
   ManagedAxios,
@@ -13,6 +12,7 @@ import supertest, { SuperTest, Test } from "supertest";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 import { ManagedRedirectError } from "../../adapters/primary/helpers/redirectErrors";
 import { createApp } from "../../adapters/primary/server";
+import { InMemoryFeatureFlagRepository } from "../../adapters/secondary/InMemoryFeatureFlagRepository";
 import {
   HttpPeConnectGateway,
   peConnectheadersWithBearerAuthToken,
@@ -92,8 +92,9 @@ const prepareAppWithMockedPeConnect = async (
   const { app, gateways, inMemoryUow } = await createAppWithMockedGateway();
 
   // eslint-disable-next-line @typescript-eslint/require-await
-  inMemoryUow!.getFeatureFlags = async (): Promise<FeatureFlags> =>
-    ({ enablePeConnectApi: true } as FeatureFlags);
+  inMemoryUow!.featureFlagRepository = new InMemoryFeatureFlagRepository({
+    enablePeConnectApi: true,
+  });
 
   gateways.peConnectGateway = {
     ...gateways.peConnectGateway,

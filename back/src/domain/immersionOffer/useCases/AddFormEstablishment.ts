@@ -26,7 +26,7 @@ export class AddFormEstablishment extends TransactionalUseCase<
     dto: FormEstablishmentDto,
     uow: UnitOfWork,
   ): Promise<SiretDto> {
-    const featureFlags = await uow.getFeatureFlags();
+    const featureFlags = await uow.featureFlagRepository.getAll();
 
     const existingFormEstablishment =
       await uow.formEstablishmentRepository.getBySiret(dto.siret);

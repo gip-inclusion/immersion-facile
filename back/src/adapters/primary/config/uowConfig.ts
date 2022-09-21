@@ -1,5 +1,4 @@
 import { PoolClient } from "pg";
-import { makeStubGetFeatureFlags } from "shared/src/featureFlags";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
@@ -15,19 +14,20 @@ import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../secondary/I
 import { InMemoryConventionQueries } from "../../secondary/InMemoryConventionQueries";
 import { InMemoryConventionRepository } from "../../secondary/InMemoryConventionRepository";
 import { InMemoryExportQueries } from "../../secondary/InMemoryExportQueries";
+import { InMemoryFeatureFlagRepository } from "../../secondary/InMemoryFeatureFlagRepository";
 import { InMemoryFormEstablishmentRepository } from "../../secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryImmersionAssessmentRepository } from "../../secondary/InMemoryImmersionAssessmentRepository";
 import { InMemoryRomeRepository } from "../../secondary/InMemoryRomeRepository";
 import { InMemoryUowPerformer } from "../../secondary/InMemoryUowPerformer";
 import { makeStubGetApiConsumerById } from "../../secondary/makeStubGetApiConsumerById";
 import { makePgGetApiConsumerById } from "../../secondary/pg/makePgGetApiConsumerById";
-import { makePgGetFeatureFlags } from "../../secondary/pg/makePgGetFeatureFlags";
 import { PgAgencyRepository } from "../../secondary/pg/PgAgencyRepository";
 import { PgConventionPoleEmploiAdvisorRepository } from "../../secondary/pg/PgConventionPoleEmploiAdvisorRepository";
 import { PgConventionQueries } from "../../secondary/pg/PgConventionQueries";
 import { PgConventionRepository } from "../../secondary/pg/PgConventionRepository";
 import { PgEstablishmentAggregateRepository } from "../../secondary/pg/PgEstablishmentAggregateRepository";
 import { PgExportQueries } from "../../secondary/pg/PgExportQueries";
+import { PgFeatureFlagRepository } from "../../secondary/pg/PgFeatureFlagRepository";
 import { PgFormEstablishmentRepository } from "../../secondary/pg/PgFormEstablishmentRepository";
 import { PgImmersionAssessmentRepository } from "../../secondary/pg/PgImmersionAssessmentRepository";
 import { PgLaBonneBoiteRequestRepository } from "../../secondary/pg/PgLaBonneBoiteRequestRepository";
@@ -63,7 +63,7 @@ export const createInMemoryUow = () => {
       outboxRepository,
     ),
     postalCodeDepartmentRegionQueries: stubPostalCodeDepartmentRegionQueries,
-    getFeatureFlags: makeStubGetFeatureFlags(),
+    featureFlagRepository: new InMemoryFeatureFlagRepository(),
     agencyRepository: new InMemoryAgencyRepository(),
     laBonneBoiteRequestRepository: new InMemoryLaBonneBoiteRequestRepository(),
     searchMadeRepository: new InMemorySearchMadeRepository(),
@@ -93,7 +93,7 @@ export const createPgUow = (client: PoolClient): UnitOfWork => ({
   postalCodeDepartmentRegionQueries: new PgPostalCodeDepartmentRegionQueries(
     client,
   ),
-  getFeatureFlags: makePgGetFeatureFlags(client),
+  featureFlagRepository: new PgFeatureFlagRepository(client),
   laBonneBoiteRequestRepository: new PgLaBonneBoiteRequestRepository(client),
   searchMadeRepository: new PgSearchMadeRepository(client),
   getApiConsumersById: makePgGetApiConsumerById(client),

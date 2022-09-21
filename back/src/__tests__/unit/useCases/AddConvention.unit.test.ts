@@ -1,6 +1,5 @@
 import { allConventionStatuses } from "shared/src/convention/convention.dto";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
-import { makeStubGetFeatureFlags } from "shared/src/featureFlags";
 import { StubGetSiret } from "../../../_testBuilders/StubGetSiret";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
@@ -13,6 +12,7 @@ import { CustomClock } from "../../../adapters/secondary/core/ClockImplementatio
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
+import { InMemoryFeatureFlagRepository } from "../../../adapters/secondary/InMemoryFeatureFlagRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { AddConvention } from "../../../domain/convention/useCases/AddConvention";
 import {
@@ -20,7 +20,6 @@ import {
   makeCreateNewEvent,
 } from "../../../domain/core/eventBus/EventBus";
 import { DomainEvent } from "../../../domain/core/eventBus/events";
-import { GetFeatureFlags } from "../../../domain/core/ports/GetFeatureFlags";
 
 describe("Add Convention", () => {
   let addConvention: AddConvention;
@@ -33,26 +32,21 @@ describe("Add Convention", () => {
   const { externalId, ...validConventionParams } = validConvention;
 
   let stubGetSiret: StubGetSiret;
-  let getFeatureFlags: GetFeatureFlags;
   let uowPerformer: InMemoryUowPerformer;
 
   beforeEach(() => {
-    getFeatureFlags = makeStubGetFeatureFlags({
+    const uow = createInMemoryUow();
+    conventionRepository = uow.conventionRepository;
+    outboxRepository = uow.outboxRepository;
+    uow.featureFlagRepository = new InMemoryFeatureFlagRepository({
       enableAdminUi: false,
       enableInseeApi: true,
     });
-    conventionRepository = new InMemoryConventionRepository();
-    outboxRepository = new InMemoryOutboxRepository();
     clock = new CustomClock();
     uuidGenerator = new TestUuidGenerator();
     createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
     stubGetSiret = new StubGetSiret();
-    uowPerformer = new InMemoryUowPerformer({
-      ...createInMemoryUow(),
-      outboxRepository,
-      conventionRepository,
-      getFeatureFlags,
-    });
+    uowPerformer = new InMemoryUowPerformer(uow);
     addConvention = new AddConvention(
       uowPerformer,
       createNewEvent,
@@ -133,12 +127,11 @@ describe("Add Convention", () => {
   describe("SIRET validation", () => {
     describe("if feature flag to do siret validation is OFF", () => {
       it("accepts applications with SIRETs that don't correspond to active businesses", async () => {
-        const getFeatureFlagsWithInseeByPass = makeStubGetFeatureFlags({
-          enableAdminUi: false,
-          enableInseeApi: false,
-        });
         uowPerformer.setUow({
-          getFeatureFlags: getFeatureFlagsWithInseeByPass,
+          featureFlagRepository: new InMemoryFeatureFlagRepository({
+            enableAdminUi: false,
+            enableInseeApi: false,
+          }),
         });
         stubGetSiret.setNextResponse({
           siret: validConventionParams.siret,
