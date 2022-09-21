@@ -31,7 +31,7 @@ export class HttpAdminGateway implements AdminGateway {
   }
 
   // TODO Do we want to create a specific adapter ?
-  public dashboardConvention(token: AdminToken): Observable<AbsoluteUrl> {
+  public getDashboardConventionUrl(token: AdminToken): Observable<AbsoluteUrl> {
     return from(
       this.httpClient.get<unknown>(`/admin/${conventionsRoute}`, {
         headers: {

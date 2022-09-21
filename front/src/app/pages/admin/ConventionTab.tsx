@@ -1,22 +1,27 @@
-import React, { useEffect, useState } from "react";
-import "./Admin.css";
+import React, { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { MetabaseView } from "src/app/components/MetabaseView";
-import { adminGateway } from "src/app/config/dependencies";
-import { useAdminToken } from "src/hooks/useAdminToken";
-import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
+import { useAppSelector } from "src/app/utils/reduxHooks";
+import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
+import { adminSlice } from "src/core-logic/domain/admin/admin.slice";
+import "./Admin.css";
+
+const useConventionDashboard = () => {
+  const conventionDashboardUrl = useAppSelector(
+    adminSelectors.conventionsDashboardUrl,
+  );
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(adminSlice.actions.conventionsDashboardUrlRequested());
+  }, []);
+
+  return conventionDashboardUrl ?? undefined;
+};
 
 export const ConventionTab = () => {
-  const [url, setUrl] = useState<AbsoluteUrl | undefined>();
-  const adminToken = useAdminToken();
-
-  useEffect(() => {
-    adminGateway.dashboardConvention(adminToken).subscribe(setUrl);
-  });
+  const conventionDashboardUrl = useConventionDashboard();
 
   return (
-    <>
-      currentUrl: {url}
-      <MetabaseView title="Gérer les conventions" url={url} />
-    </>
+    <MetabaseView title="Gérer les conventions" url={conventionDashboardUrl} />
   );
 };

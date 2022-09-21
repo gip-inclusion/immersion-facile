@@ -12,9 +12,12 @@ export class TestAdminGateway implements AdminGateway {
     return of(`http://plop`);
   }
 
-  public dashboardConvention(_token: AdminToken): Observable<AbsoluteUrl> {
-    return of(`http://plop`);
+  public getDashboardConventionUrl(
+    _token: AdminToken,
+  ): Observable<AbsoluteUrl> {
+    return this.conventionDashboardUrl$;
   }
 
   public token$ = new Subject<string>();
+  public conventionDashboardUrl$ = new Subject<AbsoluteUrl>();
 }

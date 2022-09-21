@@ -54,10 +54,26 @@ const getSentEmail: AdminEpic = (action$, state$, { sentEmailGateway }) =>
     ),
   );
 
+const getConventionDashboardUrl: AdminEpic = (
+  action$,
+  state$,
+  { adminGateway },
+) =>
+  action$.pipe(
+    filter(adminSlice.actions.conventionsDashboardUrlRequested.match),
+    switchMap(() =>
+      adminGateway.getDashboardConventionUrl(
+        state$.value.admin.adminToken || "",
+      ),
+    ),
+    map(adminSlice.actions.conventionsDashboardUrlSucceeded),
+  );
+
 export const adminEpics = [
   callLoginEpic,
   storeTokenInDevice,
   checkIfAdminLoggedIn,
   logout,
   getSentEmail,
+  getConventionDashboardUrl,
 ];

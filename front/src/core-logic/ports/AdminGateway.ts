@@ -5,5 +5,5 @@ import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 export interface AdminGateway {
   login: (params: UserAndPassword) => Observable<AdminToken>;
   metabaseAgencyEmbed: (token: AdminToken) => Observable<AbsoluteUrl>;
-  dashboardConvention: (token: AdminToken) => Observable<AbsoluteUrl>;
+  getDashboardConventionUrl: (token: AdminToken) => Observable<AbsoluteUrl>;
 }

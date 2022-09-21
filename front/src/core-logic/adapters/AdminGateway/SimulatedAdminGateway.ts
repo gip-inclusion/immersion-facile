@@ -17,7 +17,9 @@ export class SimulatedAdminGateway implements AdminGateway {
     return of(`http://plop`);
   }
 
-  public dashboardConvention(_token: AdminToken): Observable<AbsoluteUrl> {
+  public getDashboardConventionUrl(
+    _token: AdminToken,
+  ): Observable<AbsoluteUrl> {
     return of(`http://plop`);
   }
 }

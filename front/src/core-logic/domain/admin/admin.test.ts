@@ -2,15 +2,29 @@ import { EmailSentDto } from "shared/src/email/email";
 import { AdminToken } from "shared/src/admin/admin.dto";
 import { expectToEqual } from "shared/src/expectToEqual";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
-import { adminSlice } from "src/core-logic/domain/admin/admin.slice";
+import {
+  adminSlice,
+  AdminState,
+} from "src/core-logic/domain/admin/admin.slice";
 import {
   createTestStore,
   TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 import { appIsReadyAction } from "../actions";
+import { AbsoluteUrl } from "src/../../shared/src/AbsoluteUrl";
 
 const userAndPassword = { user: "yo", password: "lala" };
+
+const initialAdminState: AdminState = {
+  isLoading: false,
+  adminToken: null,
+  error: null,
+  sentEmails: [],
+  dashboardUrls: {
+    conventions: null,
+  },
+};
 
 describe("admin slice", () => {
   let store: ReduxStore;
@@ -67,7 +81,7 @@ describe("admin slice", () => {
       const adminToken = "a-token";
 
       ({ store, dependencies } = createTestStore({
-        admin: { isLoading: false, adminToken, error: null, sentEmails: [] },
+        admin: { ...initialAdminState, adminToken },
       }));
 
       dependencies.deviceRepository.set("adminToken", adminToken);
@@ -103,6 +117,22 @@ describe("admin slice", () => {
       feedSentEmailGatewayWithError(new Error("Something went wrong"));
       expectError("Something went wrong");
       expectIsLoadingToBe(false);
+    });
+  });
+
+  describe("get convention url for dashboard", () => {
+    it("should return an AbsoluteUrl when requesting dashboard", () => {
+      const initialDashboardUrl = adminSelectors.conventionsDashboardUrl(
+        store.getState(),
+      );
+      expectToEqual(initialDashboardUrl, null);
+
+      store.dispatch(adminSlice.actions.conventionsDashboardUrlRequested());
+
+      const valueFromApi: AbsoluteUrl = "https://plop2";
+      dependencies.adminGateway.conventionDashboardUrl$.next(valueFromApi);
+      const result = adminSelectors.conventionsDashboardUrl(store.getState());
+      expectToEqual(result, valueFromApi);
     });
   });
 

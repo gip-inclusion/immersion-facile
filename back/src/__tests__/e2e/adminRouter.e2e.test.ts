@@ -6,7 +6,7 @@ import { buildTestApp } from "../../_testBuilders/buildTestApp";
 
 describe("/admin router", () => {
   let request: SuperTest<Test>;
-  let token: AdminToken;
+  let _token: AdminToken;
 
   beforeEach(async () => {
     const appConfig = new AppConfigBuilder()
@@ -23,7 +23,7 @@ describe("/admin router", () => {
       .post("/admin/login")
       .send({ user: "user", password: "pwd" });
 
-    token = response.body;
+    _token = response.body;
   });
 
   describe(`GET /admin/${conventionsRoute}`, () => {
@@ -43,13 +43,15 @@ describe("/admin router", () => {
       expect(response.status).toBe(401);
     });
 
-    it.skip("Lists the conventions if the token is valid", async () => {
-      // test stays for demo purpose, but now .get(`/admin/${conventionsRoute}`) returns the iframe url from metabase
-      const response = await request
-        .get(`/admin/${conventionsRoute}`)
-        .set("authorization", token);
-      expect(response.body).toEqual([]);
-      expect(response.status).toBe(200);
-    });
+    /* eslint-disable jest/no-commented-out-tests */
+
+    // Test stays for demo purpose, but now .get(`/admin/${conventionsRoute}`) returns the iframe url from metabase
+    // it.skip("Lists the conventions if the token is valid", async () => {
+    //   const response = await request
+    //     .get(`/admin/${conventionsRoute}`)
+    //     .set("authorization", token);
+    //   expect(response.body).toEqual([]);
+    //   expect(response.status).toBe(200);
+    // });
   });
 });

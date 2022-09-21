@@ -1,19 +1,26 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { EmailSentDto } from "shared/src/email/email";
 import { AdminToken } from "shared/src/admin/admin.dto";
+import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
 
-interface AdminState {
+export type AdminState = {
   adminToken: AdminToken | null;
   isLoading: boolean;
   sentEmails: EmailSentDto[];
   error: string | null;
-}
+  dashboardUrls: {
+    conventions: AbsoluteUrl | null;
+  };
+};
 
 const initialState: AdminState = {
   adminToken: null,
   isLoading: false,
   sentEmails: [],
   error: null,
+  dashboardUrls: {
+    conventions: null,
+  },
 };
 
 export const adminSlice = createSlice({
@@ -57,6 +64,13 @@ export const adminSlice = createSlice({
     lastSentEmailsFailed: (state, action: PayloadAction<string>) => {
       state.error = action.payload;
       state.isLoading = false;
+    },
+    conventionsDashboardUrlRequested: (state) => state,
+    conventionsDashboardUrlSucceeded: (
+      state,
+      action: PayloadAction<AbsoluteUrl>,
+    ) => {
+      state.dashboardUrls.conventions = action.payload;
     },
   },
 });
