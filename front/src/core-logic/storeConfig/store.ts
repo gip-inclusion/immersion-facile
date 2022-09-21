@@ -2,8 +2,12 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { combineEpics, createEpicMiddleware, Epic } from "redux-observable";
 import { catchError } from "rxjs";
 import type { Dependencies } from "src/app/config/dependencies";
-import { adminEpics } from "src/core-logic/domain/admin/admin.epics";
-import { adminSlice } from "src/core-logic/domain/admin/admin.slice";
+import { adminAuthEpics } from "src/core-logic/domain/admin/adminAuth/adminAuth.epics";
+import { adminAuthSlice } from "src/core-logic/domain/admin/adminAuth/adminAuth.slice";
+import { dashboardUrlsEpics } from "src/core-logic/domain/admin/dashboardUrls/dashboardUrls.epics";
+import { dashboardUrlsSlice } from "src/core-logic/domain/admin/dashboardUrls/dashboardUrls.slice";
+import { sentEmailsEpics } from "src/core-logic/domain/admin/sentEmails/sentEmails.epics";
+import { sentEmailsSlice } from "src/core-logic/domain/admin/sentEmails/sentEmails.slice";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { establishmentEpics } from "src/core-logic/domain/establishmentPath/establishment.epics";
 import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFlags.slice";
@@ -22,7 +26,9 @@ import { conventionSlice } from "../domain/convention/convention.slice";
 import { authEpics } from "../domain/auth/auth.epics";
 
 const allEpics: any[] = [
-  ...adminEpics,
+  ...dashboardUrlsEpics,
+  ...sentEmailsEpics,
+  ...adminAuthEpics,
   ...authEpics,
   ...establishmentEpics,
   ...searchEpics,
@@ -51,7 +57,11 @@ const rootReducer = combineReducers({
   [conventionSlice.name]: conventionSlice.reducer,
   [immersionAssessmentSlice.name]: immersionAssessmentSlice.reducer,
   [authSlice.name]: authSlice.reducer,
-  [adminSlice.name]: adminSlice.reducer,
+  admin: combineReducers({
+    [adminAuthSlice.name]: adminAuthSlice.reducer,
+    [dashboardUrlsSlice.name]: dashboardUrlsSlice.reducer,
+    [sentEmailsSlice.name]: sentEmailsSlice.reducer,
+  }),
 });
 
 export type StoreProps = {

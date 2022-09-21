@@ -8,7 +8,7 @@ import { ContainerLayout } from "src/app/layouts/ContainerLayout";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
-import { adminSlice } from "src/core-logic/domain/admin/admin.slice";
+import { adminAuthSlice } from "src/core-logic/domain/admin/adminAuth/adminAuth.slice";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 
@@ -17,7 +17,7 @@ export const PrivateRoute = ({
 }: {
   children: React.ReactElement;
 }) => {
-  const isAuthenticated = useAppSelector(adminSelectors.isAuthenticated);
+  const isAuthenticated = useAppSelector(adminSelectors.auth.isAuthenticated);
 
   if (!isAuthenticated) return <LoginForm />;
   return children;
@@ -25,8 +25,8 @@ export const PrivateRoute = ({
 
 const LoginForm = () => {
   const dispatch = useDispatch();
-  const error = useAppSelector(adminSelectors.error);
-  const isLoading = useAppSelector(adminSelectors.isLoading);
+  const error = useAppSelector(adminSelectors.auth.error);
+  const isLoading = useAppSelector(adminSelectors.auth.isLoading);
   const initialValues: UserAndPassword = { user: "", password: "" };
 
   return (
@@ -36,7 +36,7 @@ const LoginForm = () => {
           initialValues={initialValues}
           validationSchema={toFormikValidationSchema(userAndPasswordSchema)}
           onSubmit={(values) => {
-            dispatch(adminSlice.actions.loginRequested(values));
+            dispatch(adminAuthSlice.actions.loginRequested(values));
           }}
         >
           {() => (

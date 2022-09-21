@@ -9,17 +9,17 @@ import {
 import { EmailSentDto, EmailVariables } from "shared/src/email/email";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
-import { adminSlice } from "src/core-logic/domain/admin/admin.slice";
+import { sentEmailsSlice } from "src/core-logic/domain/admin/sentEmails/sentEmails.slice";
 import { TextCell } from "src/uiComponents/admin/TextCell";
 import "./Admin.css";
 
 export const EmailsTab = () => {
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(adminSlice.actions.lastSentEmailsRequested());
+    dispatch(sentEmailsSlice.actions.lastSentEmailsRequested());
   }, []);
-  const latestEmails = useAppSelector(adminSelectors.sentEmails);
-  const errorMessage = useAppSelector(adminSelectors.error);
+  const latestEmails = useAppSelector(adminSelectors.sentEmails.sentEmails);
+  const errorMessage = useAppSelector(adminSelectors.sentEmails.error);
 
   return (
     <div>

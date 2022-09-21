@@ -1,31 +1,31 @@
+import immersionFacileLogo from "/Logo-immersion-facilitee-01-RVB-reflets-crop.svg";
 import React from "react";
+import {
+  Header,
+  ImmersionLogo,
+  LinkHome,
+  MarianneLogo,
+  NavLink,
+  Tool,
+} from "react-design-system/immersionFacile";
 import { useDispatch } from "react-redux";
 import { routes, useRoute } from "src/app/routing/routes";
 import { useAppSelector } from "src/app/utils/reduxHooks";
-import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
-import { adminSlice } from "src/core-logic/domain/admin/admin.slice";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
-import {
-  LinkHome,
-  Header,
-  MarianneLogo,
-  ImmersionLogo,
-  Tool,
-  NavLink,
-} from "react-design-system/immersionFacile";
-import immersionFacileLogo from "/Logo-immersion-facilitee-01-RVB-reflets-crop.svg";
+import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
+import { adminAuthSlice } from "src/core-logic/domain/admin/adminAuth/adminAuth.slice";
 
 export const ImmersionMarianneHeader = () => {
   const featureFlags = useFeatureFlags();
   const dispatch = useDispatch();
   const currentRoute = useRoute();
-  const isAdminConnected = useAppSelector(adminSelectors.isAuthenticated);
+  const isAdminConnected = useAppSelector(adminSelectors.auth.isAuthenticated);
   const tools: Tool[] = [];
   if (isAdminConnected) {
     tools.push({
       iconClassName: "fr-link fr-fi-lock-line",
       label: "Se déconnecter",
-      callback: () => dispatch(adminSlice.actions.logoutRequested()),
+      callback: () => dispatch(adminAuthSlice.actions.logoutRequested()),
     });
   }
 
