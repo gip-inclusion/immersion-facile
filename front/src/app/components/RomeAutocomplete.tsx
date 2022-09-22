@@ -62,7 +62,7 @@ export const RomeAutocomplete = ({
           <div ref={params.InputProps.ref} className="if-autocomplete-search">
             <label className={`fr-label ${className ?? ""}`} htmlFor={"search"}>
               {title}
-              {tooltip && tooltip.length > 0 && (
+              {tooltip && tooltip !== "" && (
                 <Tooltip title={tooltip} className={"fr-ml-1w"}>
                   <InfoRoundedIcon />
                 </Tooltip>
