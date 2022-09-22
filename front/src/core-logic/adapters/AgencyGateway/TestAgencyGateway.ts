@@ -12,7 +12,6 @@ import {
   CreateAgencyDto,
   WithAgencyId,
 } from "shared/src/agency/agency.dto";
-import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
 import { propEq, propNotEq } from "shared/src/ramdaExtensions/propEq";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
@@ -44,12 +43,7 @@ export class TestAgencyGateway implements AgencyGateway {
     return of("agency-id-with-immersion-facile-kind");
   }
 
-  private _agencies: Record<string, AgencyDto> = {
-    [MISSION_LOCAL_AGENCY_ACTIVE.id]: MISSION_LOCAL_AGENCY_ACTIVE,
-    [PE_AGENCY_ACTIVE.id]: PE_AGENCY_ACTIVE,
-    [AGENCY_3_NEEDING_REVIEW.id]: AGENCY_3_NEEDING_REVIEW,
-    [AGENCY_4_NEEDING_REVIEW.id]: AGENCY_4_NEEDING_REVIEW,
-  };
+  private _agencies: Record<string, AgencyDto> = {};
 
   async addAgency(createAgencyDto: CreateAgencyDto) {
     this._agencies[createAgencyDto.id] = {
@@ -94,44 +88,3 @@ export class TestAgencyGateway implements AgencyGateway {
     throw new Error(`Missing agency with id ${withAgencyId.id}.`);
   }
 }
-
-const MISSION_LOCAL_AGENCY_ACTIVE = new AgencyDtoBuilder()
-  .withId("test-agency-1-front")
-  .withName("Test Agency 1 (front)")
-  .withAddress({
-    streetNumberAndAddress: "Agency 1",
-    postcode: "75001",
-    city: "Paris",
-    departmentCode: "75",
-  })
-  .withQuestionnaireUrl("www.questionnaireMissionLocale.com")
-  .withKind("mission-locale")
-  .withStatus("active")
-  .build();
-
-const PE_AGENCY_ACTIVE = new AgencyDtoBuilder()
-  .withId("PE-test-agency-2-front")
-  .withName("Test Agency 2 PE (front)")
-  .withAddress({
-    streetNumberAndAddress: "Agency 2",
-    postcode: "75001",
-    city: "Paris",
-    departmentCode: "75",
-  })
-  .withQuestionnaireUrl("www.PE.com")
-  .withKind("pole-emploi")
-  .withSignature("Mon agence PE")
-  .withStatus("active")
-  .build();
-
-const AGENCY_3_NEEDING_REVIEW = new AgencyDtoBuilder()
-  .withId("PE-test-agency-3-front")
-  .withName("Test Agency 3 (front)")
-  .withStatus("needsReview")
-  .build();
-
-const AGENCY_4_NEEDING_REVIEW = new AgencyDtoBuilder()
-  .withId("PE-test-agency-4-front")
-  .withName("Test Agency 4 (front)")
-  .withStatus("needsReview")
-  .build();

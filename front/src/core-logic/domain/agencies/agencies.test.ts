@@ -19,7 +19,7 @@ describe("Agencies in store", () => {
 
   it("agencies list should be initialState at start", () => {
     const expected: AgencyIdAndName[] = [];
-    expectToEqual(store.getState().agencies, expected);
+    expectToEqual(agenciesSelector(store.getState()), expected);
   });
 
   it("should return filtered agencies list in Ain department using department code", () => {

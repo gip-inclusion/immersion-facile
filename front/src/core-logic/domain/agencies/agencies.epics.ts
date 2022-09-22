@@ -1,16 +1,18 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { filter, Observable } from "rxjs";
+import { filter } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
-import { Dependencies } from "src/app/config/dependencies";
-import { ActionOfSlice } from "src/core-logic/storeConfig/redux.helpers";
-import { agenciesSlice, AgencyState } from "./agencies.slice";
+import {
+  ActionOfSlice,
+  AppEpic,
+} from "src/core-logic/storeConfig/redux.helpers";
+import { agenciesSlice } from "./agencies.slice";
 
 type AgencyAction = ActionOfSlice<typeof agenciesSlice>;
 
-const getAgenciesUseCase = (
-  action$: Observable<AgencyAction>,
-  _state$: Observable<AgencyState>,
-  dependencies: Dependencies,
+const getAgenciesUseCase: AppEpic<AgencyAction> = (
+  action$,
+  _state$,
+  dependencies,
 ) =>
   action$.pipe(
     filter(agenciesSlice.actions.fetchAgenciesRequested.match),

@@ -5,7 +5,7 @@
 ```typescript
 const getAgenciesUseCase = (
   action$: Observable<AgencyAction>,
-  _state$: Observable<AgencyState>,
+  _state$: Observable<RootState>,
   dependencies: Dependencies,
 ) =>
   action$.pipe(
@@ -17,6 +17,12 @@ const getAgenciesUseCase = (
   );
 
 export const agenciesEpics = [getAgenciesUseCase];
+```
+
+On peut également utiliser les types construits exprès pour l'application (pour plus de simplicité) :
+
+```typescript
+const getAgenciesUseCase: AppEpic<AgencyAction> = (action$, state$, dependencies) => {...}
 ```
 
 ## Slice

@@ -1,10 +1,10 @@
 import { firstValueFrom, Observable } from "rxjs";
-import { TestAgencyGateway } from "src/core-logic/adapters/AgencyGateway/TestAgencyGateway";
+import { InMemoryAgencyGateway } from "src/core-logic/adapters/AgencyGateway/InMemoryAgencyGateway";
 import { AgencyId } from "shared/src/agency/agency.dto";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
 const adapters: AgencyGateway[] = [
-  new TestAgencyGateway(),
+  new InMemoryAgencyGateway(),
   // TODO Propose default configuration to target local / docker backend when running integration tests
   // front/jest.config.js =>  testEnvironment: "node" => "jsdom" ? ref: https://stackoverflow.com/questions/51957139/jest-tests-run-in-bash-but-generate-referenceerror-xmlhttprequest-is-not-defin
   //new HttpAgencyGateway()
