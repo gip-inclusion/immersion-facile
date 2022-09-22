@@ -31,7 +31,7 @@ validations:
     - pnpm shared includecheck
     - pnpm back includecheck
     - pnpm front includecheck
-    - STORAGE_ROOT=$STORAGE_FULL_PATH pnpm fullcheck
+    - STORAGE_ROOT=$STORAGE_FULL_PATH pnpm fullcheck-ci
 
 #sonarqube-check:
 #  stage: test
