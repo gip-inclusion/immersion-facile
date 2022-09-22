@@ -1,6 +1,6 @@
 /* eslint-disable  @typescript-eslint/require-await */
 import { values } from "ramda";
-import { map, Observable, of, Subject } from "rxjs";
+import { Observable, of, Subject } from "rxjs";
 import { DepartmentCode } from "shared/src/address/address.dto";
 import { AdminToken } from "shared/src/admin/admin.dto";
 import { toAgencyPublicDisplayDto } from "shared/src/agency/agency";
@@ -15,28 +15,13 @@ import {
 import { propEq, propNotEq } from "shared/src/ramdaExtensions/propEq";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
-type TestAgency = AgencyIdAndName & {
-  departmentCode: DepartmentCode;
-};
-
-const toAgencyIdAndName = (testAgency: TestAgency): AgencyIdAndName => ({
-  id: testAgency.id,
-  name: testAgency.name,
-});
-
 export class TestAgencyGateway implements AgencyGateway {
-  public agencies$ = new Subject<TestAgency[]>();
+  public agencies$ = new Subject<AgencyIdAndName[]>();
 
-  listAgencies$(departmentCode: DepartmentCode): Observable<AgencyIdAndName[]> {
-    return this.agencies$.pipe(
-      map((agencies: TestAgency[]) =>
-        agencies
-          .filter(
-            (agency: TestAgency) => agency.departmentCode === departmentCode,
-          )
-          .map(toAgencyIdAndName),
-      ),
-    );
+  listAgencies$(
+    _departmentCode: DepartmentCode,
+  ): Observable<AgencyIdAndName[]> {
+    return this.agencies$;
   }
 
   getImmersionFacileAgencyId$(): Observable<AgencyId> {

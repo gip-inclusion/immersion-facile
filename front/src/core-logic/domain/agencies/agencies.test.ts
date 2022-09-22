@@ -22,9 +22,9 @@ describe("Agencies in store", () => {
     expectToEqual(agenciesSelector(store.getState()), expected);
   });
 
-  it("should return filtered agencies list in Ain department using department code", () => {
+  it("retrieves agencies from API and store in state", () => {
     // Arrange
-    const expected: AgencyIdAndName[] = [
+    const agenciesFromApi: AgencyIdAndName[] = [
       {
         id: "0",
         name: "Agence de Bougoin",
@@ -37,22 +37,9 @@ describe("Agencies in store", () => {
     store.dispatch(
       agenciesSlice.actions.fetchAgenciesRequested(departementCode),
     );
-    dependencies.agencyGateway.agencies$.next(conventionAgencies);
+    dependencies.agencyGateway.agencies$.next(agenciesFromApi);
 
     // Expect
-    expectToEqual(agenciesSelector(store.getState()), expected);
+    expectToEqual(agenciesSelector(store.getState()), agenciesFromApi);
   });
 });
-
-const conventionAgencies: (AgencyIdAndName & { departmentCode: string })[] = [
-  {
-    id: "0",
-    name: "Agence de Bougoin",
-    departmentCode: "11",
-  },
-  {
-    id: "1",
-    name: "Agence de Vaulx",
-    departmentCode: "69",
-  },
-];
