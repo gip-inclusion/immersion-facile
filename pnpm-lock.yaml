@@ -258,6 +258,7 @@ importers:
       '@storybook/testing-library': ^0.0.11
       '@types/react': '*'
       '@types/react-dom': ^18.0.5
+      '@types/react-modal': ^3.13.1
       babel-loader: ^8.2.5
       classnames: ^2.3.1
       node-typescript: ^0.1.3
@@ -287,6 +288,7 @@ importers:
       '@storybook/testing-library': 0.0.11_sfoxds7t5ydpegc3knd667wn6m
       '@types/react': 17.0.45
       '@types/react-dom': 18.0.5
+      '@types/react-modal': 3.13.1
       babel-loader: 8.2.5_dzrarqmejens5o5lr5bdn3kdtu
       classnames: 2.3.1
       node-typescript: 0.1.3
@@ -5604,6 +5606,12 @@ packages:
     resolution: {integrity: sha512-aBTIWg1emtu95bLTLx0cpkxwGW3ueZv71nE2YFBpL8k/z5czEW8yYpOo8Dp+UUAFAtKwNaOsh/ioSeQnWlZcfw==}
     dependencies:
       '@types/react': 17.0.45
+
+  /@types/react-modal/3.13.1:
+    resolution: {integrity: sha512-iY/gPvTDIy6Z+37l+ibmrY+GTV4KQTHcCyR5FIytm182RQS69G5ps4PH2FxtC7bAQ2QRHXMevsBgck7IQruHNg==}
+    dependencies:
+      '@types/react': 17.0.45
+    dev: true
 
   /@types/react-redux/7.1.24:
     resolution: {integrity: sha512-7FkurKcS1k0FHZEtdbbgN8Oc6b+stGSfZYjQGicofJ0j4U0qIn/jaSvnP2pLwZKiai3/17xqqxkkrxTgN8UNbQ==}
