@@ -31,11 +31,6 @@ const getNavLinks = (currentTab: AdminTab): NavLink[] => [
     active: currentTab === "emails",
     ...routes.adminTab({ tab: "emails" }).link,
   },
-  {
-    label: "Metabase Mock Agence",
-    active: currentTab === "emails",
-    ...routes.adminTab({ tab: "metabase" }).link,
-  },
 ];
 
 export const AdminPage = ({
@@ -50,7 +45,7 @@ export const AdminPage = ({
       <ImmersionMarianneHeader />
       <div className="fr-container">
         <div className="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
-          <div className="fr-col-lg-8 fr-p-2w mt-4">
+          <div className="fr-col fr-p-2w mt-4">
             <TabLinks
               navLinks={getNavLinks(currentTab)}
               navWrapper={{

@@ -12,7 +12,7 @@ export const MetabaseView = ({
   url ? (
     <div>
       <DsfrTitle level={5} text={title} />
-      <iframe src={url} frameBorder="0" width="1220" height="800"></iframe>
+      <iframe src={url} frameBorder="0" width="100%" height="800"></iframe>
     </div>
   ) : (
     <p>Chargement...</p>
