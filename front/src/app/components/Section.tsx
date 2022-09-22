@@ -14,7 +14,7 @@ export const Section = ({ children, className, type }: CardProps) => {
 
   return (
     <div
-      className={`${className} ${colorClasses} border-2 flex flex-col items-center rounded justify-between px-4 p-1 m-2 w-[400px]`}
+      className={`${className} ${colorClasses} border-2 flex flex-col items-center rounded justify-between fr-px-4v fr-p-1v fr-pb-4v  fr-m-2v w-[400px]`}
     >
       {children}
     </div>

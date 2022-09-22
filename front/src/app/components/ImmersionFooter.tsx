@@ -4,7 +4,7 @@ import lesEntrepriseSengagent from "/les-entreprises-s-engagent.svg";
 import poleEmploiLogo from "/pole-emploi-logo.svg";
 
 export const MinistereLogo = () => (
-  <div className="fr-footer__brand fr-enlarge-link fr-footer__partners-main">
+  <div className="fr-footer__brand fr-enlarge-link">
     <p className="fr-logo">
       Ministère
       <br />

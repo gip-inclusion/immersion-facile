@@ -63,7 +63,7 @@ export const InitiateConventionCard = ({
         )}
         {/*TODO : change HomeButton to take 'candidate' and 'establishment' as type params ('error' is very confusing here...)*/}
         <ButtonHome
-          type="error"
+          type="candidate"
           onClick={redirectToConventionWithoutIdentityProvider}
         >
           {showFormButtonLabel}

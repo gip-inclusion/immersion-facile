@@ -91,8 +91,6 @@ export const SearchPage = () => {
                       />
                     </div>
                     <ButtonSearch
-                      className="mt-12"
-                      dark
                       disabled={
                         searchStatus === "initialFetch" ||
                         searchStatus === "extraFetch" ||

@@ -50,23 +50,27 @@ export const EstablishmentHomeMenu = () => {
       </div>
       <div className="flex flex-col w-full h-full items-center justify-center">
         {!isReadyForRequestOrRedirection ? (
-          <>
-            <ButtonHome
-              onClick={() => {
-                dispatch(establishmentSlice.actions.gotReady());
-              }}
-            >
-              Référencer votre entreprise
-            </ButtonHome>
-            <ButtonHome
-              type="secondary"
-              onClick={() => {
-                dispatch(establishmentSlice.actions.gotReady());
-              }}
-            >
-              Modifier votre entreprise
-            </ButtonHome>
-          </>
+          <ul className="fr-btns-group">
+            <li>
+              <ButtonHome
+                onClick={() => {
+                  dispatch(establishmentSlice.actions.gotReady());
+                }}
+              >
+                Référencer votre entreprise
+              </ButtonHome>
+            </li>
+            <li>
+              <ButtonHome
+                type="establishment-secondary"
+                onClick={() => {
+                  dispatch(establishmentSlice.actions.gotReady());
+                }}
+              >
+                Modifier votre entreprise
+              </ButtonHome>
+            </li>
+          </ul>
         ) : (
           <>
             <ImmersionTextField

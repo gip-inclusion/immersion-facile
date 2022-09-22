@@ -16,3 +16,43 @@ code {
 .hidden {
   visibility: hidden;
 }
+
+/* Temp fix DSFR 1.7.x */
+[href]:not(.fr-btn) {
+  background-image: none !important;
+  text-decoration: underline;
+}
+[href]:not(.fr-btn):hover {
+  text-decoration: none;
+}
+body .w-full {
+  width: 100%;
+}
+.fr-btn.w-full {
+  justify-content: center;
+}
+.fr-btn--candidate:hover,
+.fr-btn--establishment:hover,
+.fr-btn--establishment-secondary:hover {
+  opacity: 0.9;
+}
+.fr-btn--candidate {
+  background-color: #be5449 !important;
+}
+.fr-btn--candidate-secondary {
+  background-color: #823434 !important;
+}
+.fr-btn--establishment {
+  background-color: #0079c1 !important;
+}
+.fr-btn--establishment-secondary {
+  background-color: #fff !important;
+  color: #0079c1 !important;
+  border: 1px solid #0079c1;
+}
+/* .bg-immersionRed:hover {
+  background-color: rgb(190 84 73 / var(--tw-bg-opacity));
+}
+.bg-immersionBlue:hover {
+  background-color: rgb(190 84 73 / var(--tw-bg-opacity));
+} */

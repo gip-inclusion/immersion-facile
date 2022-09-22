@@ -32,7 +32,7 @@ export const LandingEstablishmentPage = () => (
       </div>
       <a
         {...routes.formEstablishment().link}
-        className="no-underline shadow-none bg-white py-3 px-8 rounded-md text-immersionBlue-dark"
+        className="fr-btn fr-btn--establishment-secondary"
       >
         Référencer votre entreprise
       </a>
@@ -92,7 +92,7 @@ export const LandingEstablishmentPage = () => (
       </div>
       <a
         {...routes.formEstablishment().link}
-        className="no-underline shadow-none bg-immersionBlue py-3 px-8 rounded-md text-white font-semibold my-3"
+        className="fr-btn fr-btn--establishment fr-my-3w"
       >
         Référencer votre entreprise
       </a>

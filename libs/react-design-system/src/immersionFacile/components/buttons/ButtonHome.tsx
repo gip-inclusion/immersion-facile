@@ -1,6 +1,11 @@
 import React, { ReactNode } from "react";
 
-type HomeButtonTypes = "primary" | "secondary" | "error";
+type HomeButtonTypes =
+  | "candidate"
+  | "establishment"
+  | "candidate-secondary"
+  | "establishment-secondary"
+  | "error";
 
 export type HomeButtonProps = {
   disable?: boolean;
@@ -14,8 +19,11 @@ export type HomeButtonProps = {
 };
 
 export const buttonClassnames: Record<HomeButtonTypes, string> = {
-  primary: "bg-immersionBlue text-white shadow-none mt-1 mb-2",
-  secondary: "bg-white text-immersionBlue border-2 border-blue-200",
+  candidate: "bg-immersionRed text-white shadow-none mt-1 mb-2",
+  "candidate-secondary": "bg-white text-immersionRed border-2 border-blue-200",
+  establishment: "bg-immersionBlue text-white shadow-none mt-1 mb-2",
+  "establishment-secondary":
+    "bg-white text-immersionBlue border-2 border-blue-200",
   error: "bg-immersionRed text-white shadow-none mt-1 mb-2",
 };
 
@@ -24,18 +32,15 @@ export const ButtonHome = ({
   disable,
   children,
   className,
-  type = "primary",
+  type = "establishment",
   width = "w-full",
 }: HomeButtonProps) => (
   <button
     className={
       className
         ? className
-        : `rounded-md${width ? ` ${width} ` : " "}h-15 py-3 px-2 no-underline ${
-            buttonClassnames[type]
-          } font-semibold text-center text-sm`
+        : `fr-btn ${width ? ` ${width} ` : " "}h-15 fr-btn--${type}`
     }
-    style={type === "secondary" ? { border: "2px solid" } : {}}
     onClick={onClick}
     disabled={disable}
   >

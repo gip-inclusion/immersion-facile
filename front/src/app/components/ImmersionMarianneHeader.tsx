@@ -23,7 +23,7 @@ export const ImmersionMarianneHeader = () => {
   const tools: Tool[] = [];
   if (isAdminConnected) {
     tools.push({
-      iconClassName: "fr-link fr-fi-lock-line",
+      iconClassName: "fr-btn fr-icon-lock-line",
       label: "Se déconnecter",
       callback: () => dispatch(adminAuthSlice.actions.logoutRequested()),
     });

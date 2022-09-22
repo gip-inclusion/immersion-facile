@@ -8,6 +8,7 @@
   border-radius: 100px;
   text-decoration: none;
   display: inline-block;
+  background-image: none;
 }
 .pe-connect .button-pe-connect .icon-pe-connect-hover {
   display: none;
