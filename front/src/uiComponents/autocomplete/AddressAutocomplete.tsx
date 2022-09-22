@@ -13,7 +13,7 @@ export type AddressAutocompleteProps = {
   headerClassName?: string;
   inputStyle?: React.CSSProperties;
   setFormValue: (p: AddressAndPosition) => void;
-  placeholder: string;
+  placeholder?: string;
   notice?: string;
 };
 
