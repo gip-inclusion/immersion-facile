@@ -1,10 +1,10 @@
 import { firstValueFrom, Observable } from "rxjs";
-import { InMemoryAgencyGateway } from "src/core-logic/adapters/AgencyGateway/InMemoryAgencyGateway";
+import { TestAgencyGateway } from "src/core-logic/adapters/AgencyGateway/TestAgencyGateway";
 import { AgencyId } from "shared/src/agency/agency.dto";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
 const adapters: AgencyGateway[] = [
-  new InMemoryAgencyGateway(),
+  new TestAgencyGateway(),
   // TODO Propose default configuration to target local / docker backend when running integration tests
   // front/jest.config.js =>  testEnvironment: "node" => "jsdom" ? ref: https://stackoverflow.com/questions/51957139/jest-tests-run-in-bash-but-generate-referenceerror-xmlhttprequest-is-not-defin
   //new HttpAgencyGateway()
@@ -16,7 +16,7 @@ describe("Agency Gateway - integration tests", () => {
     describe(`immersionFacileAgency ${adapter.constructor.name}`, () => {
       it("retreive the id as observable from the gateway", async () => {
         const immersionId$: Observable<AgencyId | false> =
-          adapter.getImmersionFacileAgencyId();
+          adapter.getImmersionFacileAgencyId$();
 
         const immersionId = await firstValueFrom<AgencyId | false>(
           immersionId$,

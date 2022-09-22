@@ -1,6 +1,6 @@
 import { VirtualTimeScheduler } from "rxjs";
 import { TestAdminGateway } from "src/core-logic/adapters/AdminGateway/TestAdminGateway";
-import { InMemoryAgencyGateway } from "src/core-logic/adapters/AgencyGateway/InMemoryAgencyGateway";
+import { TestAgencyGateway } from "src/core-logic/adapters/AgencyGateway/TestAgencyGateway";
 import { createTestDeviceRepository } from "src/core-logic/adapters/DeviceRepository/createTestDeviceRepository";
 import { TestSentEmailGateway } from "src/core-logic/adapters/EmailGateway/TestSentEmailGateway";
 
@@ -20,7 +20,7 @@ export interface TestDependencies {
   adminGateway: TestAdminGateway;
   immersionAssessmentGateway: TestImmersionAssessmentGateway;
   siretGatewayThroughBack: TestSiretGatewayThroughBack;
-  agencyGateway: InMemoryAgencyGateway;
+  agencyGateway: TestAgencyGateway;
   immersionAddressGateway: InMemoryImmersionAddressGateway;
   technicalGateway: TestTechnicalGateway;
   establishmentGateway: InMemoryEstablishmentGateway;
@@ -44,7 +44,7 @@ export const createTestStore = (preloadedState?: Partial<RootState>) => {
     conventionGateway: new InMemoryConventionGateway(),
     immersionAddressGateway: new InMemoryImmersionAddressGateway(),
     technicalGateway: new TestTechnicalGateway(),
-    agencyGateway: new InMemoryAgencyGateway(),
+    agencyGateway: new TestAgencyGateway(),
     romeAutocompleteGateway: new InMemoryRomeAutocompleteGateway(),
     deviceRepository: createTestDeviceRepository(),
     navigationGateway: new InMemoryNavigationGateway(),

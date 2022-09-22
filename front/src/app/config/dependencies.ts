@@ -3,7 +3,7 @@ import { createManagedAxiosInstance } from "shared/src/httpClient/ports/axios.po
 import { HttpAdminGateway } from "src/core-logic/adapters/AdminGateway/HttpAdminGateway";
 import { SimulatedAdminGateway } from "src/core-logic/adapters/AdminGateway/SimulatedAdminGateway";
 import { HttpAgencyGateway } from "src/core-logic/adapters/AgencyGateway/HttpAgencyGateway";
-import { InMemoryAgencyGateway } from "src/core-logic/adapters/AgencyGateway/InMemoryAgencyGateway";
+import { TestAgencyGateway } from "src/core-logic/adapters/AgencyGateway/TestAgencyGateway";
 import { HttpImmersionAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/HttpImmersionAssessmentGateway";
 import { SimulatedImmersionAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/SimulatedImmersionAssessmentGateway";
 import { HttpConventionGateway } from "src/core-logic/adapters/Convention/HttpConventionGateway";
@@ -126,7 +126,7 @@ export const technicalGateway: TechnicalGateway =
 
 export const agencyGateway: AgencyGateway =
   ENV.gateway === "IN_MEMORY"
-    ? new InMemoryAgencyGateway()
+    ? new TestAgencyGateway()
     : new HttpAgencyGateway(createManagedAxiosInstance({ baseURL: "/api" }));
 
 export const romeAutocompleteGateway: RomeAutocompleteGateway =

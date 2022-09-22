@@ -1,5 +1,6 @@
+/* eslint-disable  @typescript-eslint/require-await */
 import { values } from "ramda";
-import { Observable, of } from "rxjs";
+import { map, Observable, of, Subject } from "rxjs";
 import { DepartmentCode } from "shared/src/address/address.dto";
 import { AdminToken } from "shared/src/admin/admin.dto";
 import { toAgencyPublicDisplayDto } from "shared/src/agency/agency";
@@ -8,6 +9,7 @@ import {
   AgencyId,
   AgencyIdAndName,
   AgencyPublicDisplayDto,
+  ConventionViewAgencyDto,
   CreateAgencyDto,
   WithAgencyId,
 } from "shared/src/agency/agency.dto";
@@ -15,48 +17,26 @@ import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
 import { propEq, propNotEq } from "shared/src/ramdaExtensions/propEq";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
-const MISSION_LOCAL_AGENCY_ACTIVE = new AgencyDtoBuilder()
-  .withId("test-agency-1-front")
-  .withName("Test Agency 1 (front)")
-  .withAddress({
-    streetNumberAndAddress: "Agency 1",
-    postcode: "75001",
-    city: "Paris",
-    departmentCode: "75",
-  })
-  .withQuestionnaireUrl("www.questionnaireMissionLocale.com")
-  .withKind("mission-locale")
-  .withStatus("active")
-  .build();
+export class TestAgencyGateway implements AgencyGateway {
+  public agencies$ = new Subject<ConventionViewAgencyDto[]>();
 
-const PE_AGENCY_ACTIVE = new AgencyDtoBuilder()
-  .withId("PE-test-agency-2-front")
-  .withName("Test Agency 2 PE (front)")
-  .withAddress({
-    streetNumberAndAddress: "Agency 2",
-    postcode: "75001",
-    city: "Paris",
-    departmentCode: "75",
-  })
-  .withQuestionnaireUrl("www.PE.com")
-  .withKind("pole-emploi")
-  .withSignature("Mon agence PE")
-  .withStatus("active")
-  .build();
+  listAgencies$(
+    departmentCode: DepartmentCode,
+  ): Observable<ConventionViewAgencyDto[]> {
+    return this.agencies$.pipe(
+      map((agencies: ConventionViewAgencyDto[]) =>
+        agencies.filter(
+          (agency: ConventionViewAgencyDto) =>
+            agency.address.departmentCode === departmentCode,
+        ),
+      ),
+    );
+  }
 
-const AGENCY_3_NEEDING_REVIEW = new AgencyDtoBuilder()
-  .withId("PE-test-agency-3-front")
-  .withName("Test Agency 3 (front)")
-  .withStatus("needsReview")
-  .build();
+  getImmersionFacileAgencyId$(): Observable<AgencyId> {
+    return of("agency-id-with-immersion-facile-kind");
+  }
 
-const AGENCY_4_NEEDING_REVIEW = new AgencyDtoBuilder()
-  .withId("PE-test-agency-4-front")
-  .withName("Test Agency 4 (front)")
-  .withStatus("needsReview")
-  .build();
-
-export class InMemoryAgencyGateway implements AgencyGateway {
   private _agencies: Record<string, AgencyDto> = {
     [MISSION_LOCAL_AGENCY_ACTIVE.id]: MISSION_LOCAL_AGENCY_ACTIVE,
     [PE_AGENCY_ACTIVE.id]: PE_AGENCY_ACTIVE,
@@ -106,8 +86,45 @@ export class InMemoryAgencyGateway implements AgencyGateway {
     if (agency) return toAgencyPublicDisplayDto(agency);
     throw new Error(`Missing agency with id ${withAgencyId.id}.`);
   }
-
-  getImmersionFacileAgencyId(): Observable<AgencyId> {
-    return of("agency-id-with-immersion-facile-kind");
-  }
 }
+
+const MISSION_LOCAL_AGENCY_ACTIVE = new AgencyDtoBuilder()
+  .withId("test-agency-1-front")
+  .withName("Test Agency 1 (front)")
+  .withAddress({
+    streetNumberAndAddress: "Agency 1",
+    postcode: "75001",
+    city: "Paris",
+    departmentCode: "75",
+  })
+  .withQuestionnaireUrl("www.questionnaireMissionLocale.com")
+  .withKind("mission-locale")
+  .withStatus("active")
+  .build();
+
+const PE_AGENCY_ACTIVE = new AgencyDtoBuilder()
+  .withId("PE-test-agency-2-front")
+  .withName("Test Agency 2 PE (front)")
+  .withAddress({
+    streetNumberAndAddress: "Agency 2",
+    postcode: "75001",
+    city: "Paris",
+    departmentCode: "75",
+  })
+  .withQuestionnaireUrl("www.PE.com")
+  .withKind("pole-emploi")
+  .withSignature("Mon agence PE")
+  .withStatus("active")
+  .build();
+
+const AGENCY_3_NEEDING_REVIEW = new AgencyDtoBuilder()
+  .withId("PE-test-agency-3-front")
+  .withName("Test Agency 3 (front)")
+  .withStatus("needsReview")
+  .build();
+
+const AGENCY_4_NEEDING_REVIEW = new AgencyDtoBuilder()
+  .withId("PE-test-agency-4-front")
+  .withName("Test Agency 4 (front)")
+  .withStatus("needsReview")
+  .build();

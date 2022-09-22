@@ -29,7 +29,7 @@ import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 export class HttpAgencyGateway implements AgencyGateway {
   constructor(private readonly httpClient: AxiosInstance) {}
 
-  getImmersionFacileAgencyId(): Observable<AgencyId | false> {
+  getImmersionFacileAgencyId$(): Observable<AgencyId | false> {
     return from(
       this.httpClient.get<unknown>(`/${agencyImmersionFacileIdRoute}`),
     ).pipe(
@@ -67,6 +67,15 @@ export class HttpAgencyGateway implements AgencyGateway {
       departmentCode,
     };
     return this.getAgencies(request);
+  }
+
+  public listAgencies$(
+    departmentCode: DepartmentCode,
+  ): Observable<AgencyIdAndName[]> {
+    const request: ListAgenciesByDepartmentCodeRequestDto = {
+      departmentCode,
+    };
+    return from(this.getAgencies(request));
   }
 
   public listPeAgencies(

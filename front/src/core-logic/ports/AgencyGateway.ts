@@ -5,6 +5,7 @@ import {
   AgencyId,
   AgencyIdAndName,
   AgencyPublicDisplayDto,
+  ConventionViewAgencyDto,
   CreateAgencyDto,
   WithAgencyId,
 } from "shared/src/agency/agency.dto";
@@ -12,7 +13,6 @@ import { DepartmentCode } from "shared/src/address/address.dto";
 
 export interface AgencyGateway {
   addAgency(agency: CreateAgencyDto): Promise<void>;
-
   listAgencies(departmentCode: DepartmentCode): Promise<AgencyIdAndName[]>;
   listNonPeAgencies(departmentCode: DepartmentCode): Promise<AgencyIdAndName[]>;
   listPeAgencies(departmentCode: DepartmentCode): Promise<AgencyIdAndName[]>;
@@ -22,5 +22,8 @@ export interface AgencyGateway {
     agencyId: WithAgencyId,
   ): Promise<AgencyPublicDisplayDto>;
 
-  getImmersionFacileAgencyId(): Observable<AgencyId | false>;
+  listAgencies$(
+    departmentCode: DepartmentCode,
+  ): Observable<ConventionViewAgencyDto[]>;
+  getImmersionFacileAgencyId$(): Observable<AgencyId | false>;
 }

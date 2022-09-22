@@ -107,3 +107,11 @@ export type CreateAgencyDto = {
   logoUrl?: AbsoluteUrl;
   signature: string;
 };
+
+export type ConventionViewAgencyDto = {
+  id: AgencyId;
+  kind: AgencyKind;
+  name: string;
+  address: AddressDto;
+  logoUrl?: AbsoluteUrl;
+};

@@ -24,12 +24,15 @@ import { immersionAssessmentSlice } from "../domain/immersionAssessment/immersio
 import { conventionEpics } from "../domain/convention/convention.epics";
 import { conventionSlice } from "../domain/convention/convention.slice";
 import { authEpics } from "../domain/auth/auth.epics";
+import { agenciesEpics } from "../domain/agencies/agencies.epics";
 import { agenciesSlice } from "../domain/agencies/agencies.slice";
+//import { agenciesSlice } from "../domain/agencies/agencies.slice";
 
 const allEpics: any[] = [
   ...dashboardUrlsEpics,
   ...sentEmailsEpics,
   ...adminAuthEpics,
+  ...agenciesEpics,
   ...authEpics,
   ...establishmentEpics,
   ...searchEpics,
@@ -50,7 +53,7 @@ const rootEpic: Epic = (action$, store$, dependencies) =>
   );
 
 const rootReducer = combineReducers({
-  [adminSlice.name]: adminSlice.reducer,
+  [agenciesSlice.name]: agenciesSlice.reducer,
   [searchSlice.name]: searchSlice.reducer,
   [featureFlagsSlice.name]: featureFlagsSlice.reducer,
   [romeAutocompleteSlice.name]: romeAutocompleteSlice.reducer,
