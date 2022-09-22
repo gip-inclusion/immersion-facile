@@ -23,7 +23,6 @@ import { FormSectionTitle } from "src/uiComponents/FormSectionTitle";
 
 type ConventionFieldsProps = {
   isFrozen?: boolean;
-  alreadySigned?: boolean;
   onRejectForm?: () => Promise<void>; //< called when the form is sent back for modifications in signature mode
 } & (
   | { isSignOnly: true; signatory: Signatory }
@@ -34,13 +33,14 @@ export const ConventionFormFields = ({
   isFrozen,
   isSignOnly: isSignatureMode,
   signatory,
-  alreadySigned,
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   onRejectForm = async () => {},
 }: ConventionFieldsProps) => {
   useEffect(() => {
     deviceRepository.delete("partialConventionInUrl");
   }, []);
+
+  const alreadySigned = !!signatory?.signedAt;
 
   const { errors, submitCount, isSubmitting, submitForm, values } =
     useFormikContext<ConventionDto>();

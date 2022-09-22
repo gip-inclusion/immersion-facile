@@ -144,7 +144,6 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
   const [currentSignatoryRole, setCurrentSignatoryRole] = useState<
     SignatoryRole | undefined
   >();
-  const [alreadySigned, setAlreadySigned] = useState(false);
 
   const [submitFeedback, setSubmitFeedback] = useState<
     SuccessFeedbackKind | Error | null
@@ -190,11 +189,12 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
             onSubmit={async (values, { setSubmitting, setErrors }) => {
               try {
                 // Confirm checkbox
-                const { signedAtFieldName, signedAt } = fromSignatoryRole(
-                  mergeDeepRight(convention, values) as ConventionDto,
-                  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                  currentSignatoryRole!,
-                );
+                const { signedAtFieldName, signedAt, signatory } =
+                  fromSignatoryRole(
+                    mergeDeepRight(convention, values) as ConventionDto,
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    currentSignatoryRole!,
+                  );
 
                 const conditionsAccepted = !!signedAt;
 
@@ -208,9 +208,8 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
 
                 await conventionGateway.signApplication(jwt);
 
+                setSignatory(signatory);
                 setSubmitFeedback("signedSuccessfully");
-
-                setAlreadySigned(true);
               } catch (e: any) {
                 //eslint-disable-next-line no-console
                 console.log("onSubmitError", e);
@@ -259,7 +258,6 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
                         isFrozen={true}
                         isSignOnly={true}
                         signatory={signatory}
-                        alreadySigned={alreadySigned}
                         onRejectForm={rejectWithMessageForm}
                       />
                     )}
