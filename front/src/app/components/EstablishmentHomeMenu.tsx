@@ -127,7 +127,7 @@ const ModifyEstablishmentRequestForMailUpdate = ({
     <span className="text-immersionBlue-dark  text-center text-xs pb-2">
       Nous avons bien trouvé votre établissement dans notre base de donnée.
     </span>
-    <ButtonHome type="secondary" onClick={onClick}>
+    <ButtonHome type="establishment-secondary" onClick={onClick}>
       Recevoir le mail de modification
     </ButtonHome>
   </>
