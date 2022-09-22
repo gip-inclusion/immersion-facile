@@ -49,6 +49,9 @@ export class NotifyAllActorsOfFinalApplicationValidation extends TransactionalUs
     const recipients = [
       convention.signatories.beneficiary.email,
       convention.signatories.mentor.email,
+      ...(convention.signatories.legalRepresentative
+        ? [convention.signatories.legalRepresentative.email]
+        : []),
       ...agency.counsellorEmails,
       ...agency.validatorEmails,
       ...getPeAdvisorEmailIfExist(peUserAdvisorOrUndefined),

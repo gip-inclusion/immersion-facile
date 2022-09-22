@@ -75,6 +75,46 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
     );
   });
 
+  it("With a legal representative", async () => {
+    const conventionWithLegalRepresentative = new ConventionDtoBuilder()
+      .withLegalRepresentative({
+        firstName: "Tom",
+        lastName: "Cruise",
+        phone: "0665454271",
+        role: "legal-representative",
+        email: "legal@representative.fr",
+      })
+      .build();
+
+    agency = new AgencyDtoBuilder(defaultAgency)
+      .withCounsellorEmails([counsellorEmail])
+      .build();
+
+    (uow.agencyRepository as InMemoryAgencyRepository).setAgencies([agency]);
+
+    unitOfWorkPerformer = new InMemoryUowPerformer(uow);
+
+    await new NotifyAllActorsOfFinalApplicationValidation(
+      unitOfWorkPerformer,
+      emailGw,
+    ).execute(conventionWithLegalRepresentative);
+
+    const sentEmails = emailGw.getSentEmails();
+
+    expect(sentEmails).toHaveLength(1);
+    expectEmailFinalValidationConfirmationMatchingConvention(
+      [
+        conventionWithLegalRepresentative.signatories.beneficiary.email,
+        conventionWithLegalRepresentative.signatories.mentor.email,
+        conventionWithLegalRepresentative.signatories.legalRepresentative!
+          .email,
+        counsellorEmail,
+      ],
+      sentEmails[0],
+      agency,
+      conventionWithLegalRepresentative,
+    );
+  });
   it("With PeConnect Federated identity: beneficiary, mentor, agency counsellor, and dedicated advisor", async () => {
     const userPeExternalId: PeConnectIdentity = `peConnect:i-am-an-external-id`;
     const userConventionAdvisor: ConventionPoleEmploiUserAdvisorEntity = {
