@@ -1,9 +1,12 @@
 import { PoolClient } from "pg";
 import {
+  Beneficiary,
   ConventionDto,
   ConventionDtoWithoutExternalId,
   ConventionExternalId,
   ConventionId,
+  LegalRepresentative,
+  Mentor,
 } from "shared/src/convention/convention.dto";
 import { ConventionRepository } from "../../../domain/convention/ports/ConventionRepository";
 import {
@@ -28,7 +31,7 @@ export class PgConventionRepository implements ConventionRepository {
     convention: ConventionDtoWithoutExternalId,
   ): Promise<ConventionExternalId> {
     // prettier-ignore
-    const { signatories: { beneficiary, mentor }, id, status, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation, immersionActivities, immersionSkills, postalCode, workConditions, internshipKind } =
+    const { signatories: { beneficiary, mentor, legalRepresentative }, id: conventionId, status, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation, immersionActivities, immersionSkills, postalCode, workConditions, internshipKind } =
       convention
 
     try {
@@ -38,21 +41,13 @@ export class PgConventionRepository implements ConventionRepository {
         ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)`;
 
       // prettier-ignore
-      await this.client.query(query_insert_convention, [id, status, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation.appellationCode, immersionActivities, immersionSkills, postalCode, workConditions, internshipKind]);
+      await this.client.query(query_insert_convention, [conventionId, status, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation.appellationCode, immersionActivities, immersionSkills, postalCode, workConditions, internshipKind]);
 
-      const query_insert_beneficiary = `INSERT into signatories(
-        convention_id, role, first_name, last_name, email, phone, signed_at, extra_fields)
-        VALUES($1, 'beneficiary', $2, $3, $4, $5, $6, JSON_BUILD_OBJECT('emergencyContact', $7::text, 'emergencyContactPhone', $8::text))
-      `;
-      // prettier-ignore
-      await this.client.query(query_insert_beneficiary, [id, beneficiary.firstName, beneficiary.lastName, beneficiary.email, beneficiary.phone, beneficiary.signedAt, beneficiary.emergencyContact, beneficiary.emergencyContactPhone]);
-
-      const query_insert_mentor = `INSERT into signatories(
-        convention_id, role, first_name, last_name, email, phone, signed_at, extra_fields)
-        VALUES($1, 'establishment', $2, $3, $4, $5, $6, JSON_BUILD_OBJECT('job', $7::text))
-      `;
-      // prettier-ignore
-      await this.client.query(query_insert_mentor, [id, mentor.firstName, mentor.lastName, mentor.email, mentor.phone, mentor.signedAt, mentor.job]);
+      await this.insertBeneficiary(beneficiary, conventionId);
+      await this.insertMentor(mentor, conventionId);
+      if (legalRepresentative) {
+        await this.insertLegalRepresentative(legalRepresentative, conventionId);
+      }
     } catch (error: any) {
       notifyDiscord(
         `Erreur lors de la sauvegarde de la convention  suivante : ${JSON.stringify(
@@ -65,7 +60,7 @@ export class PgConventionRepository implements ConventionRepository {
       const query_insert_external_id = `INSERT INTO convention_external_ids(convention_id) VALUES($1) RETURNING external_id;`;
       const convention_external_id = await this.client.query(
         query_insert_external_id,
-        [id],
+        [conventionId],
       );
       return convention_external_id.rows[0]?.external_id?.toString();
     } catch (error: any) {
@@ -83,7 +78,7 @@ export class PgConventionRepository implements ConventionRepository {
     convention: ConventionDto,
   ): Promise<ConventionId | undefined> {
     // prettier-ignore
-    const { signatories: { beneficiary, mentor }, id, status, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation, immersionActivities, immersionSkills, workConditions } =
+    const { signatories: { beneficiary, mentor, legalRepresentative }, id, status, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation, immersionActivities, immersionSkills, workConditions } =
       convention
 
     const updateConventionQuery = `  
@@ -116,6 +111,48 @@ export class PgConventionRepository implements ConventionRepository {
     // prettier-ignore
     await this.client.query(updateMentorQuery, [id, mentor.firstName, mentor.lastName, mentor.email, mentor.phone, mentor.signedAt, mentor.job]);
 
+    if (legalRepresentative) {
+      const updateLegalRepresentativeQuery = `  
+        UPDATE signatories
+          SET first_name=$2,  last_name=$3, email=$4, phone=$5, signed_at=$6
+        WHERE convention_id=$1 AND role = 'legal-representative'`;
+      // prettier-ignore
+      await this.client.query(updateLegalRepresentativeQuery, [id, legalRepresentative.firstName, legalRepresentative.lastName, legalRepresentative.email, legalRepresentative.phone, legalRepresentative.signedAt]);
+    }
+
     return convention.id;
+  }
+
+  private async insertBeneficiary(
+    beneficiary: Beneficiary,
+    conventionId: ConventionId,
+  ) {
+    const query_insert_beneficiary = `INSERT into signatories(
+        convention_id, role, first_name, last_name, email, phone, signed_at, extra_fields)
+        VALUES($1, 'beneficiary', $2, $3, $4, $5, $6, JSON_BUILD_OBJECT('emergencyContact', $7::text, 'emergencyContactPhone', $8::text))
+      `;
+    // prettier-ignore
+    await this.client.query(query_insert_beneficiary, [conventionId, beneficiary.firstName, beneficiary.lastName, beneficiary.email, beneficiary.phone, beneficiary.signedAt, beneficiary.emergencyContact, beneficiary.emergencyContactPhone]);
+  }
+
+  private async insertMentor(mentor: Mentor, conventionId: ConventionId) {
+    const query_insert_mentor = `INSERT into signatories(
+        convention_id, role, first_name, last_name, email, phone, signed_at, extra_fields)
+        VALUES($1, 'establishment', $2, $3, $4, $5, $6, JSON_BUILD_OBJECT('job', $7::text))
+      `;
+    // prettier-ignore
+    await this.client.query(query_insert_mentor, [conventionId, mentor.firstName, mentor.lastName, mentor.email, mentor.phone, mentor.signedAt, mentor.job]);
+  }
+
+  private async insertLegalRepresentative(
+    legalRepresentative: LegalRepresentative,
+    conventionId: ConventionId,
+  ) {
+    const query_insert_legal_representative = `INSERT into signatories(
+        convention_id, role, first_name, last_name, email, phone, signed_at)
+        VALUES($1, 'legal-representative', $2, $3, $4, $5, $6)
+      `;
+    // prettier-ignore
+    await this.client.query(query_insert_legal_representative, [conventionId, legalRepresentative.firstName, legalRepresentative.lastName, legalRepresentative.email, legalRepresentative.phone, legalRepresentative.signedAt]);
   }
 }

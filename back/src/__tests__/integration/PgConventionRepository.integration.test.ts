@@ -1,10 +1,21 @@
 import { Pool, PoolClient } from "pg";
 import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
-import { ConventionId } from "shared/src/convention/convention.dto";
+import {
+  ConventionId,
+  LegalRepresentative,
+} from "shared/src/convention/convention.dto";
 import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
 import { PgConventionRepository } from "../../adapters/secondary/pg/PgConventionRepository";
+
+const legalRepresentative: LegalRepresentative = {
+  role: "legal-representative",
+  email: "legal@representative.com",
+  firstName: "The",
+  lastName: "Representative",
+  phone: "1234567",
+};
 
 describe("PgConventionRepository", () => {
   let pool: Pool;
@@ -93,6 +104,49 @@ describe("PgConventionRepository", () => {
       .withExternalId(externalId)
       .withStatus("ACCEPTED_BY_VALIDATOR")
       .withBeneficiaryEmail("someUpdated@email.com")
+      .withDateEnd(new Date("2021-01-20").toISOString())
+      .build();
+
+    await conventionRepository.update(updatedConvention);
+
+    expect(await conventionRepository.getById(idA)).toEqual(updatedConvention);
+  });
+
+  it("Adds a new convention with a legal representative", async () => {
+    const convention = new ConventionDtoBuilder()
+      .withId("aaaaac99-9c0b-bbbb-bb6d-6bb9bd38aaaa")
+      .withLegalRepresentative(legalRepresentative)
+      .build();
+
+    const { externalId, ...createConventionParams } = convention;
+
+    const savedExternalId = await conventionRepository.save(
+      createConventionParams,
+    );
+    expect(await conventionRepository.getById(convention.id)).toEqual({
+      ...convention,
+      externalId: savedExternalId,
+    });
+    expect(typeof savedExternalId).toBe("string");
+  });
+
+  it("Updates an already saved immersion with a legal representative", async () => {
+    const idA: ConventionId = "aaaaac99-9c0b-aaaa-aa6d-6bb9bd38aaaa";
+    const convention = new ConventionDtoBuilder()
+      .withId(idA)
+      .withLegalRepresentative(legalRepresentative)
+      .build();
+    const externalId = await conventionRepository.save(convention);
+
+    const updatedConvention = new ConventionDtoBuilder()
+      .withId(idA)
+      .withExternalId(externalId)
+      .withStatus("ACCEPTED_BY_VALIDATOR")
+      .withBeneficiaryEmail("someUpdated@email.com")
+      .withLegalRepresentative({
+        ...legalRepresentative,
+        email: "some@new-representative.com",
+      })
       .withDateEnd(new Date("2021-01-20").toISOString())
       .build();
 

@@ -8,6 +8,7 @@ export const selectAllConventionDtosById = `
 WITH 
   beneficiaries as (SELECT * from signatories where role = 'beneficiary'),
   mentors as (SELECT * from signatories where role = 'establishment'),
+  legal_representatives as (SELECT * from signatories where role = 'legal-representative'),
   formated_signatories AS (
     SELECT 
     b.convention_id,
@@ -33,10 +34,20 @@ WITH
         'phone', m.phone,
         'signedAt', date_to_iso(m.signed_at),
         'job', m.extra_fields ->> 'job'
-      ) 
+      ),
+    'legalRepresentative' , CASE WHEN lr IS NULL THEN NULL ELSE
+      JSON_BUILD_OBJECT(
+        'role', 'legal-representative',
+        'firstName', lr.first_name,
+        'lastName', lr.last_name,
+        'email', lr.email,
+        'phone', lr.phone,
+        'signedAt', date_to_iso(lr.signed_at)
+      ) END
     ) AS signatories
     FROM beneficiaries AS b
     LEFT JOIN mentors as m ON b.convention_id = m.convention_id
+    LEFT JOIN legal_representatives as lr ON b.convention_id = lr.convention_id
     LEFT JOIN partners_pe_connect AS p ON p.convention_id = b.convention_id)
 
 SELECT 
