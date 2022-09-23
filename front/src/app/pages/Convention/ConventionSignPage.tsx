@@ -15,10 +15,7 @@ import {
   signatoryRoles,
 } from "shared/src/convention/convention.dto";
 import { conventionSchema } from "shared/src/convention/convention.schema";
-import {
-  ConventionMagicLinkPayload,
-  Role,
-} from "shared/src/tokens/MagicLinkPayload";
+import { ConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { exhaustiveCheck } from "shared/src/utils";
 import {
   SubmitFeedback,
@@ -97,8 +94,6 @@ const extractRole = (jwt: string): SignatoryRole => {
   return role;
 };
 
-const signeeAllowRoles: Role[] = ["beneficiary", "establishment"];
-
 export const ConventionSignPage = ({ route }: SignFormProps) => {
   if (!route.params.jwt) {
     return (
@@ -110,7 +105,7 @@ export const ConventionSignPage = ({ route }: SignFormProps) => {
 
   const payload = decodeJwt<ConventionMagicLinkPayload>(route.params.jwt);
 
-  if (!signeeAllowRoles.includes(payload.role))
+  if (!signatoryRoles.includes(payload.role as SignatoryRole))
     return (
       <HeaderFooterLayout>
         <div className="p-5">

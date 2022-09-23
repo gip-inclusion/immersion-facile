@@ -3,6 +3,7 @@ import { Accordion } from "react-design-system/immersionFacile";
 import {
   Beneficiary,
   ConventionReadDto,
+  LegalRepresentative,
   Mentor,
 } from "shared/src/convention/convention.dto";
 import { path } from "shared/src/ramdaExtensions/path";
@@ -19,7 +20,8 @@ import { TextCell } from "./TextCell";
 type ConventionField =
   | keyof ConventionReadDto
   | `signatories.beneficiary.${keyof Beneficiary}`
-  | `signatories.mentor.${keyof Mentor}`;
+  | `signatories.mentor.${keyof Mentor}`
+  | `signatories.legalRepresentative.${keyof LegalRepresentative}`;
 
 type FieldsToLabel = Partial<Record<ConventionField, string>>;
 
@@ -35,21 +37,31 @@ const agencyFields: FieldsToLabel = {
 };
 
 const mentorFields: FieldsToLabel = {
-  "signatories.mentor.firstName": "Tuteur",
-  "signatories.mentor.phone": "Numéro de téléphone du tuteur",
-  "signatories.mentor.email": "Mail du tuteur",
   "signatories.mentor.signedAt": "Signé",
+  "signatories.mentor.email": "Mail du tuteur",
+  "signatories.mentor.phone": "Numéro de téléphone du tuteur",
+  "signatories.mentor.firstName": "Prénom",
+  "signatories.mentor.lastName": "Nom",
+  "signatories.mentor.job": "Poste",
 };
 
 const candidateFields: FieldsToLabel = {
-  "signatories.beneficiary.email": "Mail de demandeur",
-  "signatories.beneficiary.lastName": "Nom",
-  "signatories.beneficiary.firstName": "Prénom",
-  "signatories.beneficiary.phone": "Numéro de téléphone",
   "signatories.beneficiary.signedAt": "Signé",
+  "signatories.beneficiary.email": "Mail de demandeur",
+  "signatories.beneficiary.phone": "Numéro de téléphone",
+  "signatories.beneficiary.firstName": "Prénom",
+  "signatories.beneficiary.lastName": "Nom",
   "signatories.beneficiary.emergencyContact": "Contact d'urgence",
   "signatories.beneficiary.emergencyContactPhone":
     "Numéro du contact d'urgence",
+};
+
+const legalRepresentantFields: FieldsToLabel = {
+  "signatories.legalRepresentative.signedAt": "Signé",
+  "signatories.legalRepresentative.email": "Mail du réprésentant",
+  "signatories.legalRepresentative.phone": "Numéro de téléphone",
+  "signatories.legalRepresentative.firstName": "Prénom",
+  "signatories.legalRepresentative.lastName": "Nom",
 };
 
 const immersionFields: FieldsToLabel = {
@@ -73,10 +85,11 @@ type FieldsAndTitle = {
 };
 
 const allFields: FieldsAndTitle[] = [
-  { listTitle: "Immersion", fields: immersionFields },
   { listTitle: "Bénéficiaire", fields: candidateFields },
-  { listTitle: "Entreprise", fields: enterpriseFields },
+  { listTitle: "Représentant légal", fields: legalRepresentantFields },
   { listTitle: "Tuteur", fields: mentorFields },
+  { listTitle: "Entreprise", fields: enterpriseFields },
+  { listTitle: "Immersion", fields: immersionFields },
   { listTitle: "Agence", fields: agencyFields },
 ];
 
@@ -98,7 +111,8 @@ export const ConnventionFormDetails = ({
       return (value as AppellationDto).appellationLabel;
     if (
       field === "signatories.beneficiary.signedAt" ||
-      field === "signatories.mentor.signedAt"
+      field === "signatories.mentor.signedAt" ||
+      field === "signatories.legalRepresentative.signedAt"
     )
       return value ? "✅" : "❌";
     if (typeof value === "string") return value;
