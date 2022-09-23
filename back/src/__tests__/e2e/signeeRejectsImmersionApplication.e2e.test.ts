@@ -67,11 +67,11 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
 
   const beneficiarySignEmail = expectEmailOfType(
     sentEmails[0],
-    "NEW_CONVENTION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
+    "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
   );
   const establishmentSignEmail = expectEmailOfType(
     sentEmails[1],
-    "NEW_CONVENTION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE",
+    "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
   );
 
   const beneficiaryJwt = expectJwtInMagicLinkAndGetIt(

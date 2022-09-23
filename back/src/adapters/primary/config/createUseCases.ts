@@ -17,8 +17,7 @@ import { GenerateMagicLink } from "../../../domain/convention/useCases/GenerateM
 import { GetAgencyPublicInfoById } from "../../../domain/convention/useCases/GetAgencyPublicInfoById";
 import { GetConvention } from "../../../domain/convention/useCases/GetConvention";
 import { ListAgenciesByDepartmentCode } from "../../../domain/convention/useCases/ListAgenciesByDepartmentCode";
-import { ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/convention/useCases/notifications/ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature";
-import { ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/convention/useCases/notifications/ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature";
+import { ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/convention/useCases/notifications/ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature";
 import { DeliverRenewedMagicLink } from "../../../domain/convention/useCases/notifications/DeliverRenewedMagicLink";
 import { NotifyAllActorsOfFinalApplicationValidation } from "../../../domain/convention/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
@@ -227,13 +226,8 @@ export const createUseCases = (
       // METABASE
       ...dashboardUseCases(gateways.dashboardGateway),
       // notifications
-      confirmToBeneficiaryThatConventionCorrectlySubmittedRequestSignature:
-        new ConfirmToBeneficiaryThatApplicationCorrectlySubmittedRequestSignature(
-          gateways.email,
-          generateMagicLinkFn,
-        ),
-      confirmToMentorThatConventionCorrectlySubmittedRequestSignature:
-        new ConfirmToMentorThatApplicationCorrectlySubmittedRequestSignature(
+      confirmToSignatoriesThatConventionCorrectlySubmittedRequestSignature:
+        new ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature(
           gateways.email,
           generateMagicLinkFn,
         ),

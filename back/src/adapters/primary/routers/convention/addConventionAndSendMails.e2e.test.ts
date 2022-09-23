@@ -59,11 +59,11 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
 
     expectSentEmails(gateways.email, [
       {
-        type: "NEW_CONVENTION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
+        type: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
         recipients: [validConvention.signatories.beneficiary.email],
       },
       {
-        type: "NEW_CONVENTION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE",
+        type: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
         recipients: [validConvention.signatories.mentor.email],
       },
     ]);
@@ -173,11 +173,11 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
 
   const beneficiarySignEmail = expectEmailOfType(
     sentEmails[0],
-    "NEW_CONVENTION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
+    "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
   );
   const establishmentSignEmail = expectEmailOfType(
     sentEmails[1],
-    "NEW_CONVENTION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE",
+    "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
   );
 
   const beneficiarySignJwt = expectJwtInMagicLinkAndGetIt(

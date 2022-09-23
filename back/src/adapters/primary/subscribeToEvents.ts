@@ -22,15 +22,13 @@ const getUseCasesByTopics = (
   // "Happy case" for immersion application.
   ImmersionApplicationSubmittedByBeneficiary: [
     // useCases.notifyToAgencyConventionSubmitted,
-    useCases.confirmToBeneficiaryThatConventionCorrectlySubmittedRequestSignature,
-    useCases.confirmToMentorThatConventionCorrectlySubmittedRequestSignature,
+    useCases.confirmToSignatoriesThatConventionCorrectlySubmittedRequestSignature,
     useCases.associatePeConnectFederatedIdentity,
     useCases.broadcastToPoleEmploiOnConventionUpdates,
   ],
   ConventionSubmittedAfterModification: [
     // useCases.notifyToAgencyConventionSubmitted,
-    useCases.confirmToBeneficiaryThatConventionCorrectlySubmittedRequestSignature,
-    useCases.confirmToMentorThatConventionCorrectlySubmittedRequestSignature,
+    useCases.confirmToSignatoriesThatConventionCorrectlySubmittedRequestSignature,
     useCases.broadcastToPoleEmploiOnConventionUpdates,
   ],
   ImmersionApplicationPartiallySigned: [

@@ -34,8 +34,7 @@ export type TemplatedEmail =
   | NewConventionReviewForEligibilityOrValidationEmail
   | SendRenewedMagicLinkEmail
   | SignedByOtherPartyNotificationEmail
-  | BeneficiarySignatureRequestNotificationEmail
-  | EnterpriseSignatureRequestNotificationEmail
+  | SignatorySignatureRequestNotificationEmail
   | ContactByEmailRequestEmail
   | ContactByPhoneInstructionsEmail
   | ContactInPersonInstructionsEmail
@@ -195,22 +194,13 @@ type SignedByOtherPartyNotificationEmail = GenericTemplatedEmail<
   }
 >;
 
-type BeneficiarySignatureRequestNotificationEmail = GenericTemplatedEmail<
-  "NEW_CONVENTION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
+type SignatorySignatureRequestNotificationEmail = GenericTemplatedEmail<
+  "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
   {
-    beneficiaryFirstName: string; //< FIRST_NAME
-    beneficiaryLastName: string; //< LAST_NAME
-    magicLink: string; //< MAGIC_LINK
-    businessName: string; //< COMPANY_NAME
-  }
->;
-
-type EnterpriseSignatureRequestNotificationEmail = GenericTemplatedEmail<
-  "NEW_CONVENTION_MENTOR_CONFIRMATION_REQUEST_SIGNATURE",
-  {
-    beneficiaryFirstName: string; //< FIRST_NAME
-    beneficiaryLastName: string; //< LAST_NAME
+    beneficiaryName: string; //< BENEFICIARY_NAME
     mentorName: string; //< MENTOR_NAME
+    signatoryName: string; //< SIGNATORY_NAME
+    legalRepresentativeName?: string; //< LEGAL_REPRESENTATIVE_NAME
     magicLink: string; //< MAGIC_LINK
     businessName: string; //< COMPANY_NAME
   }

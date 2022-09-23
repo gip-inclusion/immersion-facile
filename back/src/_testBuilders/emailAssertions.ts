@@ -5,7 +5,7 @@ import {
   ContactEstablishmentByPhoneDto,
   ContactEstablishmentInPersonDto,
 } from "shared/src/contactEstablishment";
-import { ConventionDto } from "shared/src/convention/convention.dto";
+import { ConventionDto, Signatory } from "shared/src/convention/convention.dto";
 import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
 import { frontRoutes } from "shared/src/routes";
 import { addressDtoToString } from "shared/src/utils/address";
@@ -18,20 +18,34 @@ import {
   fakeGenerateMagicLinkUrlFn,
 } from "./test.helpers";
 
-export const expectEmailBeneficiaryConfirmationSignatureRequestMatchingConvention =
-  (templatedEmail: TemplatedEmail, convention: ConventionDto) => {
+export const expectEmaiSignatoryConfirmationSignatureRequestMatchingConvention =
+  ({
+    templatedEmail,
+    convention,
+    signatory,
+    recipient,
+  }: {
+    templatedEmail: TemplatedEmail;
+    convention: ConventionDto;
+    signatory: Signatory;
+    recipient: string;
+  }) => {
     const { id, businessName } = convention;
-    const { beneficiary } = convention.signatories;
+    const { beneficiary, mentor, legalRepresentative } = convention.signatories;
 
     expectTypeToMatchAndEqual(templatedEmail, {
-      type: "NEW_CONVENTION_BENEFICIARY_CONFIRMATION_REQUEST_SIGNATURE",
-      recipients: [beneficiary.email],
+      type: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+      recipients: [recipient],
       params: {
-        beneficiaryFirstName: beneficiary.firstName,
-        beneficiaryLastName: beneficiary.lastName,
+        signatoryName: `${signatory.firstName} ${signatory.lastName}`,
+        beneficiaryName: `${beneficiary.firstName} ${beneficiary.lastName}`,
+        mentorName: `${mentor.firstName} ${mentor.lastName}`,
+        legalRepresentativeName:
+          legalRepresentative &&
+          `${legalRepresentative.firstName} ${legalRepresentative.lastName}`,
         magicLink: fakeGenerateMagicLinkUrlFn({
           id,
-          role: "beneficiary",
+          role: signatory.role,
           targetRoute: frontRoutes.conventionToSign,
           email: beneficiary.email,
         }),
