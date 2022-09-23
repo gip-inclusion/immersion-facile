@@ -7,11 +7,13 @@ import { ButtonDelete } from "react-design-system/immersionFacile";
 type ProfessionProps = {
   name: string;
   onDelete: () => void;
+  selectedAppellations: AppellationDto[];
 };
 
 export const FormEstablishmentAppellation = ({
   name,
   onDelete,
+  selectedAppellations,
 }: ProfessionProps) => {
   const [{ value }, _, { setValue }] = useField<AppellationDto>(name);
 
@@ -22,6 +24,7 @@ export const FormEstablishmentAppellation = ({
           title="Rechercher un métier *"
           initialValue={value}
           setFormValue={setValue}
+          selectedAppellations={selectedAppellations}
         />
       </div>
       <div>

@@ -14,6 +14,7 @@ import { OurAdvises } from "./OurAdvises";
 import { SearchResultPanel } from "./SearchResultPanel";
 import { ButtonSearch, MainWrapper } from "react-design-system/immersionFacile";
 import { AddressAutocomplete } from "src/uiComponents/autocomplete/AddressAutocomplete";
+import "./SearchPage.css";
 
 const radiusOptions = [1, 2, 5, 10, 20, 50, 100];
 const initiallySelectedIndex = -1; // don't select anything initially
@@ -26,8 +27,8 @@ export const SearchPage = () => {
     <HeaderFooterLayout>
       <MainWrapper vSpacing={0}>
         <div className="sm:flex sm:items-center bg-gradient-to-b from-immersionRed-dark to-immersionRed-light">
-          <div className="h-[672px] flex-1 flex flex-col items-center fr-p-2w fr-px-6w">
-            <h1 className="text-2xl text-white text-center font-bold fr-my-4w">
+          <div className="h-[672px] flex-1 flex flex-col items-center fr-p-2w fr-px-2w">
+            <h1 className="text-2xl text-white text-center font-bold fr-my-4w fr-px-6w">
               Je trouve une entreprise pour réaliser mon immersion
               professionnelle
             </h1>
@@ -40,7 +41,7 @@ export const SearchPage = () => {
               onSubmit={searchUseCase}
             >
               {({ setFieldValue, values }) => (
-                <Form>
+                <Form className={"search-page__form"}>
                   <div className="gap-5 flex flex-col">
                     <div>
                       <RomeAutocomplete

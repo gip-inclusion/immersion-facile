@@ -63,7 +63,7 @@ export const RomeAutocomplete = ({
             <label className={`fr-label ${className ?? ""}`} htmlFor={"search"}>
               {title}
               {tooltip && tooltip !== "" && (
-                <Tooltip title={tooltip} className={"fr-ml-1w"}>
+                <Tooltip title={tooltip} className={"fr-ml-1w"} placement="top">
                   <InfoRoundedIcon />
                 </Tooltip>
               )}

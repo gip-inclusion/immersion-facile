@@ -65,7 +65,7 @@ export const SearchDebugPage = () => {
             <label htmlFor="rome">Rome</label>
             <Field id="rome" name="rome" placeholder="M1607" />
             <AppellationAutocomplete
-              title="Rechercher un métier (ou saissir son code ci-dessus)"
+              title="Rechercher un métier (ou saisir son code ci-dessus)"
               setFormValue={(newValue: AppellationDto) => {
                 setFieldValue("rome", newValue.romeCode);
               }}

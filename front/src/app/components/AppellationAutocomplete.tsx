@@ -23,6 +23,7 @@ type AppellationAutocompleteProps = {
   initialValue?: AppellationDto | undefined;
   setFormValue: (p: AppellationDto) => void;
   className?: string;
+  selectedAppellations?: AppellationDto[];
 };
 
 type Option = Proposal<AppellationDto>;
@@ -32,6 +33,7 @@ export const AppellationAutocomplete = ({
   setFormValue,
   title,
   className,
+  selectedAppellations = [],
 }: AppellationAutocompleteProps) => {
   const initialOption: Option | null = initialValue
     ? {
@@ -62,7 +64,16 @@ export const AppellationAutocomplete = ({
           await romeAutocompleteGateway.getAppellationDtoMatching(
             sanitizedTerm,
           );
-        setOptions(romeOptions.map(romeSearchMatchToProposal));
+        setOptions(
+          romeOptions
+            .filter(
+              (romeOption) =>
+                !selectedAppellations
+                  .map((selected) => selected.appellationCode)
+                  .includes(romeOption.appellation.appellationCode),
+            )
+            .map(romeSearchMatchToProposal),
+        );
       } catch (e: any) {
         //eslint-disable-next-line no-console
         console.log("AppellationAutocomplete", e);

@@ -16,7 +16,8 @@ body {
 .autocomplete {
   position: relative;
   display: inline-block;
-  width: 400px;
+  width: 100%;
+  max-width: 400px;
 }
 
 .autocomplete-input {

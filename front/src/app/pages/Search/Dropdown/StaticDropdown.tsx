@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import "./searchdropdown.css";
 
 type StaticDropdownProps = {
@@ -20,7 +20,21 @@ export const StaticDropdown = ({
 }: StaticDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(defaultSelectedIndex);
-
+  const toggler = useRef(null);
+  useEffect(() => {
+    function handleClickOutsideToggler(event: MouseEvent) {
+      if (
+        toggler.current &&
+        !(toggler.current as Element).contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("click", handleClickOutsideToggler);
+    return () => {
+      document.removeEventListener("click", handleClickOutsideToggler);
+    };
+  }, [toggler]);
   return (
     <div className="autocomplete">
       <label className="inputLabel searchdropdown-header" htmlFor={"search"}>
@@ -31,6 +45,7 @@ export const StaticDropdown = ({
         <button
           type={"button"}
           className={"searchdropdown__toggler"}
+          ref={toggler}
           onClick={() => {
             setIsOpen(!isOpen);
           }}

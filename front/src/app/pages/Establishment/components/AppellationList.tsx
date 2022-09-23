@@ -15,10 +15,10 @@ export const AppellationList = ({ name, title }: AppellationListProps) => {
     name,
   });
 
-  const professions = field.value;
+  const appellations = field.value;
 
   const onDelete = (index: number) => {
-    setValue(removeAtIndex(professions, index));
+    setValue(removeAtIndex(appellations, index));
   };
 
   return (
@@ -26,11 +26,12 @@ export const AppellationList = ({ name, title }: AppellationListProps) => {
       <div className="w-full">
         {title && <h5 className="text-lg font-semibold">{title}</h5>}
         <div className="flex flex-col gap-5">
-          {professions.map(({ appellationCode }, index) => (
+          {appellations.map(({ appellationCode }, index) => (
             <FormEstablishmentAppellation
               name={`${name}[${index}]`}
               onDelete={() => onDelete(index)}
-              key={appellationCode}
+              key={`${appellationCode}-${index}`}
+              selectedAppellations={appellations}
             />
           ))}
         </div>

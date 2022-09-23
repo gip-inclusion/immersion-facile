@@ -7,6 +7,7 @@ type DateInputProps = {
   label: string;
   disabled?: boolean;
   onDateChange: (value: string) => void;
+  max?: string;
 };
 
 export const DateInput = (props: DateInputProps) => {
@@ -31,6 +32,9 @@ export const DateInput = (props: DateInputProps) => {
             value={format(new Date(field.value), "yyyy-MM-dd")}
             type="date"
             disabled={props.disabled}
+            max={
+              props.max ? format(new Date(props.max), "yyyy-MM-dd") : undefined
+            }
             onChange={(event) => props.onDateChange(event.target.value)}
           />
         </div>

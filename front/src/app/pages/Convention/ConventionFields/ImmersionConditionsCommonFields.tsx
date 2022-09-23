@@ -1,5 +1,6 @@
+import { addMonths } from "date-fns";
 import { useFormikContext } from "formik";
-import React from "react";
+import React, { useState } from "react";
 import { getConventionFieldName } from "shared/src/convention/convention";
 import {
   ConventionDto,
@@ -32,6 +33,9 @@ export const ImmersionConditionsCommonFields = ({
   const establishmentInfos = useAppSelector(siretSelectors.establishmentInfos);
   const isFetchingSiret = useAppSelector(siretSelectors.isFetching);
   const isSiretFetcherDisabled = values.status !== "DRAFT";
+  const [dateMax, setDateMax] = useState(
+    addMonths(new Date(values.dateStart), 1).toISOString(),
+  );
   useSiretRelatedField("businessName", {
     disabled: isSiretFetcherDisabled,
   });
@@ -61,6 +65,7 @@ export const ImmersionConditionsCommonFields = ({
         onDateChange={(dateStart) => {
           resetSchedule(dateStart, values.dateEnd);
           setFieldValue("dateStart", dateStart);
+          setDateMax(addMonths(new Date(dateStart), 1).toISOString());
         }}
       />
       <br />
@@ -68,6 +73,7 @@ export const ImmersionConditionsCommonFields = ({
         label="Date de fin de l'immersion *"
         name={getConventionFieldName("dateEnd")}
         disabled={disabled}
+        max={dateMax}
         onDateChange={(dateEnd) => {
           resetSchedule(values.dateStart, dateEnd);
           setFieldValue("dateEnd", dateEnd);
