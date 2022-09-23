@@ -48,7 +48,7 @@ export const SearchPage = () => {
                         setFormValue={(newValue) =>
                           setFieldValue("rome", newValue.romeCode)
                         }
-                        placeholder={"Ex: boulangère, infirmier"}
+                        placeholder={"Ex : boulangère, infirmier"}
                         className="searchdropdown-header inputLabel"
                         tooltip="Je laisse ce champ vide si je veux voir toutes les entreprises autour de moi"
                       />
@@ -66,7 +66,7 @@ export const SearchPage = () => {
                           setFieldValue("lat", position.lat);
                           setFieldValue("lon", position.lon);
                         }}
-                        placeholder={"Ex: Bordeaux 33000"}
+                        placeholder={"Ex : Bordeaux 33000"}
                         notice={"Saisissez un code postal et/ou une ville"}
                       />
                       <StaticDropdown

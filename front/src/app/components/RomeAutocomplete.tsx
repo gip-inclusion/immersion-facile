@@ -24,7 +24,7 @@ export const RomeAutocomplete = ({
   setFormValue,
   title,
   className,
-  placeholder = "Ex: boulangère, infirmier",
+  placeholder = "Ex : boulangère, infirmier",
   tooltip,
 }: RomeAutocompleteProps): JSX.Element => {
   const { romeSearchText, isSearching, selectedRomeDto, romeOptions } =

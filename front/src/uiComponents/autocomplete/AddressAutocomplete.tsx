@@ -24,7 +24,7 @@ export const AddressAutocomplete = ({
   headerClassName,
   inputStyle,
   initialSearchTerm = "",
-  placeholder = "Ex: Bordeaux 33000",
+  placeholder = "Ex : Bordeaux 33000",
   notice,
 }: AddressAutocompleteProps) => {
   const [selectedOption, setSelectedOption] =

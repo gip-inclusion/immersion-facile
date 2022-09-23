@@ -89,7 +89,7 @@ const ExportEntreprises = () => {
           <ImmersionTextField
             label="Filtre par activité"
             name="Filter par activité"
-            placeholder="Ex: Culture"
+            placeholder="Ex : Culture"
             className="flex justify-between"
             onChange={(event) => {
               setExportableParams({
@@ -213,7 +213,7 @@ const ExportConventions = () => {
           <ImmersionTextField
             label="Filtre par département"
             name="Filter par département"
-            placeholder="Ex: Mayotte"
+            placeholder="Ex : Mayotte"
             className="flex justify-between"
             onChange={(event) => {
               setExportableParams({
@@ -228,7 +228,7 @@ const ExportConventions = () => {
           <ImmersionTextField
             label="Filtre par Région"
             name="Filter par Région"
-            placeholder="Ex: La Réunion"
+            placeholder="Ex : La Réunion"
             className="flex justify-between"
             onChange={(event) => {
               setExportableParams({
