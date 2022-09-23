@@ -8,6 +8,7 @@ import {
   emailRoute,
   exportRoute,
   generateMagicLinkRoute,
+  featureFlagsRoute,
 } from "shared/src/routes";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
@@ -98,6 +99,15 @@ export const createAdminRouter = (deps: AppDependencies) => {
         ), //TODO On identifira l'agence via son token inclusion connect
     ),
   );
+
+  // POST admin/feature-flags
+  adminRouter
+    .route(`/${featureFlagsRoute}`)
+    .post(async (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.setFeatureFlag.execute(req.body),
+      ),
+    );
 
   return adminRouter;
 };

@@ -1,12 +1,13 @@
 import { AdminToken } from "shared/src/admin/admin.dto";
-import { conventionsRoute } from "shared/src/routes";
+import { SetFeatureFlagParams } from "shared/src/featureFlags";
+import { conventionsRoute, featureFlagsRoute } from "shared/src/routes";
 import { SuperTest, Test } from "supertest";
-import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
-import { buildTestApp } from "../../_testBuilders/buildTestApp";
+import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
+import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 
 describe("/admin router", () => {
   let request: SuperTest<Test>;
-  let _token: AdminToken;
+  let token: AdminToken;
 
   beforeEach(async () => {
     const appConfig = new AppConfigBuilder()
@@ -23,7 +24,7 @@ describe("/admin router", () => {
       .post("/admin/login")
       .send({ user: "user", password: "pwd" });
 
-    _token = response.body;
+    token = response.body;
   });
 
   describe(`GET /admin/${conventionsRoute}`, () => {
@@ -53,5 +54,40 @@ describe("/admin router", () => {
     //   expect(response.body).toEqual([]);
     //   expect(response.status).toBe(200);
     // });
+  });
+
+  describe(`set feature flags route`, () => {
+    it("fails with 401 without admin token", async () => {
+      const response = await request
+        .post(`/admin/${featureFlagsRoute}`)
+        .set("authorization", "wrong-tokend");
+      expect(response.body).toEqual({ error: "Provided token is invalid" });
+      expect(response.status).toBe(401);
+    });
+
+    it("sets the feature flag to given value if token is valid", async () => {
+      const initialFeatureFlagsResponse = await request.get(
+        `/${featureFlagsRoute}`,
+      );
+      expect(initialFeatureFlagsResponse.body.enableLogoUpload).toBe(false);
+
+      const params: SetFeatureFlagParams = {
+        flagName: "enableLogoUpload",
+        value: true,
+      };
+
+      const response = await request
+        .post(`/admin/${featureFlagsRoute}`)
+        .send(params)
+        .set("authorization", token);
+
+      expect(response.body).toEqual({ success: true });
+      expect(response.status).toBe(200);
+
+      const updatedFeatureFlagsResponse = await request.get(
+        `/${featureFlagsRoute}`,
+      );
+      expect(updatedFeatureFlagsResponse.body.enableLogoUpload).toBe(true);
+    });
   });
 });

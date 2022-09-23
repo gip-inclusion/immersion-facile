@@ -2,7 +2,7 @@ import { Router } from "express";
 import * as path from "path";
 import multer from "multer";
 import {
-  getFeatureFlags,
+  featureFlagsRoute,
   renewMagicLinkRoute,
   uploadFileRoute,
 } from "shared/src/routes";
@@ -21,7 +21,7 @@ export const createTechnicalRouter = (deps: AppDependencies) => {
     );
 
   technicalRouter
-    .route(`/${getFeatureFlags}`)
+    .route(`/${featureFlagsRoute}`)
     .get(async (req, res) =>
       sendHttpResponse(req, res, deps.useCases.getFeatureFlags.execute),
     );

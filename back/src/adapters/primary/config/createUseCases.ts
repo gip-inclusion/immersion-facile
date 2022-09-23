@@ -8,6 +8,7 @@ import {
   GenerateMagicLinkJwt,
 } from "../../../domain/auth/jwt";
 import { ExportData } from "../../../domain/backoffice/useCases/ExportData";
+import { SetFeatureFlag } from "../../../domain/backoffice/useCases/SetFeatureFlag";
 import { AddAgency } from "../../../domain/convention/useCases/AddAgency";
 import { AddConvention } from "../../../domain/convention/useCases/AddConvention";
 import { BroadcastToPoleEmploiOnConventionUpdates } from "../../../domain/convention/useCases/broadcast/BroadcastToPoleEmploiOnConventionUpdates";
@@ -38,6 +39,9 @@ import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { UuidGenerator } from "../../../domain/core/ports/UuidGenerator";
 import { TransactionalUseCase, UseCase } from "../../../domain/core/UseCase";
 import { ApiConsumerId } from "../../../domain/core/valueObjects/ApiConsumer";
+import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
+import { AgencyDashboard } from "../../../domain/dashboard/useCases/AgencyDashboard";
+import { ConventionDashboard } from "../../../domain/dashboard/useCases/ConventionDashboard";
 import { AdminLogin } from "../../../domain/generic/authentication/useCases/AdminLogin";
 import { UploadLogo } from "../../../domain/generic/fileManagement/useCases/UploadLogo";
 import { GetSentEmails } from "../../../domain/generic/notifications/useCases/GetSentEmails";
@@ -55,7 +59,6 @@ import { RequestEditFormEstablishment } from "../../../domain/immersionOffer/use
 import { RetrieveFormEstablishmentFromAggregates } from "../../../domain/immersionOffer/useCases/RetrieveFormEstablishmentFromAggregates";
 import { SearchImmersion } from "../../../domain/immersionOffer/useCases/SearchImmersion";
 import { UpdateEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentAggregateFromFormEstablishement";
-import { AgencyDashboard } from "../../../domain/dashboard/useCases/AgencyDashboard";
 import { AssociatePeConnectFederatedIdentity } from "../../../domain/peConnect/useCases/AssociateFederatedIdentityPeConnect";
 import { LinkPoleEmploiAdvisorAndRedirectToConvention } from "../../../domain/peConnect/useCases/LinkPoleEmploiAdvisorAndRedirectToConvention";
 import { NotifyPoleEmploiUserAdvisorOnConventionAssociation } from "../../../domain/peConnect/useCases/NotifyPoleEmploiUserAdvisorOnConventionAssociation";
@@ -68,8 +71,6 @@ import { AppConfig } from "./appConfig";
 import { Gateways } from "./createGateways";
 import { GenerateConventionMagicLink } from "./createGenerateConventionMagicLink";
 import { makeGenerateEditFormEstablishmentUrl } from "./makeGenerateEditFormEstablishmentUrl";
-import { ConventionDashboard } from "../../../domain/dashboard/useCases/ConventionDashboard";
-import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
 
 export const createUseCases = (
   config: AppConfig,
@@ -293,6 +294,7 @@ export const createUseCases = (
         config.defaultAdminEmail,
       ),
       updateAgency: new UpdateAgency(uowPerformer, createNewEvent),
+      setFeatureFlag: new SetFeatureFlag(uowPerformer),
     }),
     ...instantiatedUseCasesFromFunctions({
       getFeatureFlags: (_: void) =>

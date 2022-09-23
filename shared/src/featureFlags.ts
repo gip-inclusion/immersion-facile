@@ -1,11 +1,13 @@
 import { z } from "zod";
 
-export type FeatureFlag =
-  | "enableAdminUi"
-  | "enableInseeApi"
-  | "enablePeConnectApi"
-  | "enableLogoUpload"
-  | "enablePeConventionBroadcast";
+export type FeatureFlag = typeof featureFlags[number];
+const featureFlags = [
+  "enableAdminUi",
+  "enableInseeApi",
+  "enablePeConnectApi",
+  "enableLogoUpload",
+  "enablePeConventionBroadcast",
+] as const;
 
 export type FeatureFlags = Record<FeatureFlag, boolean>;
 
@@ -15,4 +17,11 @@ export const featureFlagsSchema: z.Schema<FeatureFlags> = z.object({
   enablePeConnectApi: z.boolean(),
   enableLogoUpload: z.boolean(),
   enablePeConventionBroadcast: z.boolean(),
+});
+
+export type SetFeatureFlagParams = { flagName: FeatureFlag; value: boolean };
+
+export const setFeatureFlagSchema: z.Schema<SetFeatureFlagParams> = z.object({
+  flagName: z.enum(featureFlags),
+  value: z.boolean(),
 });
