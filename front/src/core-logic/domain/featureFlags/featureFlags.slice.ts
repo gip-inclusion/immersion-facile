@@ -1,17 +1,17 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { FeatureFlags } from "shared/src/featureFlags";
+import { FeatureFlag, FeatureFlags } from "shared/src/featureFlags";
 
-export type FeatureFlagState = FeatureFlags & {
-  areFeatureFlagsLoading: boolean;
+export type FeatureFlagsState = FeatureFlags & {
+  isLoading: boolean;
 };
 
-const initialState: FeatureFlagState = {
+const initialState: FeatureFlagsState = {
   enableAdminUi: false,
   enableInseeApi: true,
   enablePeConnectApi: false,
   enableLogoUpload: false,
   enablePeConventionBroadcast: false,
-  areFeatureFlagsLoading: true,
+  isLoading: true,
 };
 
 export const featureFlagsSlice = createSlice({
@@ -22,9 +22,21 @@ export const featureFlagsSlice = createSlice({
     retrieveFeatureFlagsSucceeded: (
       _,
       action: PayloadAction<FeatureFlags>,
-    ) => ({
+    ): FeatureFlagsState => ({
       ...action.payload,
-      areFeatureFlagsLoading: false,
+      isLoading: false,
+    }),
+    setFeatureFlagRequested: (
+      state,
+      action: PayloadAction<FeatureFlag>,
+    ): FeatureFlagsState => ({
+      ...state,
+      isLoading: true,
+      [action.payload]: !state[action.payload],
+    }),
+    setFeatureFlagSucceeded: (state): FeatureFlagsState => ({
+      ...state,
+      isLoading: false,
     }),
   },
 });

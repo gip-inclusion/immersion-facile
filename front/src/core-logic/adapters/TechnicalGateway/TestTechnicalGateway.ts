@@ -1,12 +1,15 @@
 import { Subject } from "rxjs";
 import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
+import { AdminToken } from "shared/src/admin/admin.dto";
 import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
-import { FeatureFlags } from "shared/src/featureFlags";
+import { FeatureFlags, SetFeatureFlagParams } from "shared/src/featureFlags";
 
 export class TestTechnicalGateway implements TechnicalGateway {
-  private _featureFlags$ = new Subject<FeatureFlags>();
-
-  getAllFeatureFlags = () => this._featureFlags$;
+  getAllFeatureFlags = () => this.featureFlags$;
+  setFeatureFlag = (params: SetFeatureFlagParams, _adminToken: AdminToken) => {
+    this.setFeatureFlagLastCalledWith = params;
+    return this.setFeatureFlagResponse$;
+  };
 
   // eslint-disable-next-line @typescript-eslint/require-await
   uploadLogo = async (file: File): Promise<AbsoluteUrl> => {
@@ -16,7 +19,8 @@ export class TestTechnicalGateway implements TechnicalGateway {
   };
 
   // test purposes only
-  get featureFlags$() {
-    return this._featureFlags$;
-  }
+  public featureFlags$ = new Subject<FeatureFlags>();
+  public setFeatureFlagResponse$ = new Subject<void>();
+  public setFeatureFlagLastCalledWith: SetFeatureFlagParams | undefined =
+    undefined;
 }

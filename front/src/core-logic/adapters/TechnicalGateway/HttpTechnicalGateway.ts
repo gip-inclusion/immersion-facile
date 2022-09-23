@@ -1,7 +1,12 @@
 import { AxiosInstance, AxiosResponse } from "axios";
 import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
+import { AdminToken } from "shared/src/admin/admin.dto";
 import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
-import { FeatureFlags, featureFlagsSchema } from "shared/src/featureFlags";
+import {
+  FeatureFlags,
+  featureFlagsSchema,
+  SetFeatureFlagParams,
+} from "shared/src/featureFlags";
 import { featureFlagsRoute, uploadFileRoute } from "shared/src/routes";
 import { from, map, Observable } from "rxjs";
 export class HttpTechnicalGateway implements TechnicalGateway {
@@ -21,6 +26,16 @@ export class HttpTechnicalGateway implements TechnicalGateway {
     from(this.httpClient.get<unknown>(`/${featureFlagsRoute}`)).pipe(
       map(validateFeatureFlags),
     );
+
+  setFeatureFlag = (
+    params: SetFeatureFlagParams,
+    token: AdminToken,
+  ): Observable<void> =>
+    from(
+      this.httpClient.post(`/admin/${featureFlagsRoute}`, params, {
+        headers: { authorization: token },
+      }),
+    ).pipe(map(() => undefined));
 }
 const validateFeatureFlags = ({ data }: AxiosResponse<unknown>): FeatureFlags =>
   featureFlagsSchema.parse(data);

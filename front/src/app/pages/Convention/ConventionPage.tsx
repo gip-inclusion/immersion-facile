@@ -49,7 +49,7 @@ export const ConventionPage = ({ route }: ConventionPageProps) => (
 );
 
 const PageContent = ({ route }: ConventionPageProps) => {
-  const { enablePeConnectApi, areFeatureFlagsLoading } = useFeatureFlags();
+  const { enablePeConnectApi, isLoading } = useFeatureFlags();
   const connectedWith = useAppSelector(authSelectors.connectedWith);
   const dispatch = useDispatch();
 
@@ -73,7 +73,7 @@ const PageContent = ({ route }: ConventionPageProps) => {
     return () => window.removeEventListener("beforeunload", onWindowUnload);
   }, []);
 
-  if (areFeatureFlagsLoading) return <CircularProgress />;
+  if (isLoading) return <CircularProgress />;
 
   if (route.params.jwt)
     return (

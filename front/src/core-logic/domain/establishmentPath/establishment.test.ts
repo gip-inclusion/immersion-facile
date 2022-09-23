@@ -64,7 +64,7 @@ describe("Establishment", () => {
       },
       featureFlags: {
         ...makeStubFeatureFlags({ enableInseeApi: false }),
-        areFeatureFlagsLoading: false,
+        isLoading: false,
       },
     }));
     store.dispatch(siretSlice.actions.siretModified("10002000300040"));

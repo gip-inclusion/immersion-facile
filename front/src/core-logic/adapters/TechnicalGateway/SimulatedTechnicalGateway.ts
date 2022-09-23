@@ -8,6 +8,8 @@ export class SimulatedTechnicalGateway implements TechnicalGateway {
   getAllFeatureFlags = (): Observable<FeatureFlags> =>
     of(makeStubFeatureFlags());
 
+  setFeatureFlag = (): Observable<void> => of(undefined);
+
   // eslint-disable-next-line @typescript-eslint/require-await
   uploadLogo = async (file: File): Promise<AbsoluteUrl> => {
     // eslint-disable-next-line no-console

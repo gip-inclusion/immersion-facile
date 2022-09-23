@@ -11,7 +11,7 @@ import { sentEmailsSlice } from "src/core-logic/domain/admin/sentEmails/sentEmai
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { establishmentEpics } from "src/core-logic/domain/establishmentPath/establishment.epics";
 import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFlags.slice";
-import { fetchFeatureFlagsEpic } from "src/core-logic/domain/featureFlags/featureFlags.epics";
+import { featureFlagEpics } from "src/core-logic/domain/featureFlags/featureFlags.epics";
 import { romeAutocompleteEpic } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.epics";
 import { romeAutocompleteSlice } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.slice";
 import { searchEpics } from "src/core-logic/domain/search/search.epics";
@@ -36,7 +36,7 @@ const allEpics: any[] = [
   ...establishmentEpics,
   ...searchEpics,
   ...siretEpics,
-  fetchFeatureFlagsEpic,
+  ...featureFlagEpics,
   romeAutocompleteEpic,
   ...conventionEpics,
   ...immersionAssessmentEpics,

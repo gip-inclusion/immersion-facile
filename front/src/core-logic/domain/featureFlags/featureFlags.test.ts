@@ -3,7 +3,7 @@ import { FeatureFlags } from "shared/src/featureFlags";
 import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import {
   featureFlagsSlice,
-  FeatureFlagState,
+  FeatureFlagsState,
 } from "src/core-logic/domain/featureFlags/featureFlags.slice";
 import {
   createTestStore,
@@ -38,21 +38,49 @@ describe("feature flag slice", () => {
   it("fetches feature flags and shows when loading", () => {
     expectFeatureFlagsStateToEqual({
       ...defaultFeatureFlags,
-      areFeatureFlagsLoading: true, // feature flags are loading by default
+      isLoading: true, // feature flags are loading by default
     });
     store.dispatch(featureFlagsSlice.actions.retrieveFeatureFlagsRequested());
     expectFeatureFlagsStateToEqual({
       ...defaultFeatureFlags,
-      areFeatureFlagsLoading: true,
+      isLoading: true,
     });
     dependencies.technicalGateway.featureFlags$.next(flagsFromApi);
     expectFeatureFlagsStateToEqual({
       ...flagsFromApi,
-      areFeatureFlagsLoading: false,
+      isLoading: false,
     });
   });
 
-  const expectFeatureFlagsStateToEqual = (expected: FeatureFlagState) => {
+  it("sets feature flag to given value", () => {
+    ({ store, dependencies } = createTestStore({
+      featureFlags: {
+        ...defaultFeatureFlags,
+        enableLogoUpload: false,
+        isLoading: false,
+      },
+    }));
+    store.dispatch(
+      featureFlagsSlice.actions.setFeatureFlagRequested("enableLogoUpload"),
+    );
+    expectFeatureFlagsStateToEqual({
+      ...defaultFeatureFlags,
+      enableLogoUpload: true,
+      isLoading: true,
+    });
+    dependencies.technicalGateway.setFeatureFlagResponse$.next(undefined);
+    expectToEqual(dependencies.technicalGateway.setFeatureFlagLastCalledWith, {
+      flagName: "enableLogoUpload",
+      value: true,
+    });
+    expectFeatureFlagsStateToEqual({
+      ...defaultFeatureFlags,
+      enableLogoUpload: true,
+      isLoading: false,
+    });
+  });
+
+  const expectFeatureFlagsStateToEqual = (expected: FeatureFlagsState) => {
     expectToEqual(featureFlagsSelector(store.getState()), expected);
   };
 });

@@ -5,6 +5,7 @@ import { AgencyTab } from "src/app/pages/admin/AgencyTab";
 import { ConventionTab } from "src/app/pages/admin/ConventionTab";
 import { DataExportTab } from "src/app/pages/admin/DataExportTab";
 import { EmailsTab } from "src/app/pages/admin/EmailsTab";
+import { TechnicalOptions } from "src/app/pages/admin/TechnicalOptions";
 import { AdminTab } from "src/app/routing/route-params";
 import { routes } from "src/app/routing/routes";
 import { Route } from "type-route";
@@ -25,6 +26,11 @@ const getNavLinks = (currentTab: AdminTab): NavLink[] => [
     label: "Export de données",
     active: currentTab === "exports",
     ...routes.adminTab({ tab: "exports" }).link,
+  },
+  {
+    label: "Options techniques",
+    active: currentTab === "technical-options",
+    ...routes.adminTab({ tab: "technical-options" }).link,
   },
   {
     label: "Emails",
@@ -62,6 +68,7 @@ export const AdminPage = ({
               {currentTab === "conventions" && <ConventionTab />}
               {currentTab === "agency-validation" && <AgencyTab />}
               {currentTab === "exports" && <DataExportTab />}
+              {currentTab === "technical-options" && <TechnicalOptions />}
               {currentTab === "emails" && <EmailsTab />}
             </div>
           </div>

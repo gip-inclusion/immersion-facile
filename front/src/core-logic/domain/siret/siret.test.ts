@@ -134,7 +134,7 @@ describe("Siret validation and fetching", () => {
       ({ store, dependencies } = createTestStore({
         featureFlags: {
           ...makeStubFeatureFlags({ enableInseeApi: false }),
-          areFeatureFlagsLoading: false,
+          isLoading: false,
         },
       }));
     });
