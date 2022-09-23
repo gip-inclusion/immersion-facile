@@ -22,7 +22,7 @@ input {
   font-family: "Marianne", Arial, sans-serif;
   font-size: 1rem;
 }
-[href]:not(.fr-btn) {
+[href]:not(.fr-btn, .fr-nav__link) {
   background-image: none !important;
   text-decoration: underline;
 }

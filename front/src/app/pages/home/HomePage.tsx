@@ -18,12 +18,20 @@ const DebugInfo = () => (
       backgroundColor: "rgba(255,255,255,.8)",
       borderRadius: "5px",
       boxShadow: "0 2px 5px rgba(0,0,0,.1)",
-      zIndex: 10,
+      zIndex: 1000,
       padding: "1rem",
       fontSize: ".75rem",
+      maxWidth: 300,
     }}
   >
-    <h6>Env variables are:</h6>
+    <span
+      style={{
+        fontWeight: "bold",
+        fontSize: "1rem",
+      }}
+    >
+      Env variables are:
+    </span>
 
     {Object.entries(ENV).map(([envName, envValue]) => (
       <div key={envName}>
