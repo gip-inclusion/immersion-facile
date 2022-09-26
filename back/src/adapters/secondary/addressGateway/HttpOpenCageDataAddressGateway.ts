@@ -108,7 +108,6 @@ export class HttpOpenCageDataAddressGateway implements AddressGateway {
 
     const feature = (data as OpenCageDataFeatureCollection).features.at(0);
     if (!feature) return null;
-
     const department = getDepartmentFromAliases(feature.properties.components);
 
     if (!department) {
@@ -274,6 +273,7 @@ const departmentNameToDepartmentCode: Record<string, string> = {
   "Ille-et-Vilaine": "35",
   Indre: "36",
   "Indre-et-Loire": "37",
+  "Île-de-France": "75",
   Isère: "38",
   Jura: "39",
   Landes: "40",
