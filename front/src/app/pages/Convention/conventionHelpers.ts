@@ -58,6 +58,14 @@ export const conventionInitialValuesFromUrl = (
   const dateStart =
     params.dateStart ?? toDateString(addDays(startOfToday(), 2));
   const dateEnd = params.dateEnd ?? toDateString(addDays(startOfToday(), 3));
+
+  const areLegalRepresentativeFieldPresent = !!(
+    params.lrEmail ||
+    params.lrPhone ||
+    params.lrFirstName ||
+    params.lrLastName
+  );
+
   const initialFormWithStoredAndUrlParams: ConventionPresentation & {
     id: ConventionId;
   } = {
@@ -86,6 +94,15 @@ export const conventionInitialValuesFromUrl = (
         phone: params.mentorPhone ?? "",
         job: params.mentorJob ?? "",
       },
+      legalRepresentative: areLegalRepresentativeFieldPresent
+        ? {
+            role: "legal-representative",
+            firstName: params.lrFirstName ?? "",
+            lastName: params.lrLastName ?? "",
+            email: params.lrEmail ?? "",
+            phone: params.lrPhone ?? "",
+          }
+        : undefined,
     },
 
     postalCode: params.postalCode ?? "",
@@ -132,7 +149,7 @@ export const conventionInitialValuesFromUrl = (
 const devPrefilledValues = (
   emptyForm: ConventionPresentation,
 ): ConventionPresentation => {
-  const { beneficiary, mentor } = emptyForm.signatories;
+  const { beneficiary, mentor, legalRepresentative } = emptyForm.signatories;
 
   return {
     ...emptyForm,
@@ -157,6 +174,7 @@ const devPrefilledValues = (
         email: mentor.email || "mentor@supermentor.fr",
         job: mentor.job,
       },
+      legalRepresentative,
     },
 
     // Participant

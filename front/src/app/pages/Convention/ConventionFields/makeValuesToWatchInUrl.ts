@@ -20,6 +20,10 @@ const commonKeysToWatch: ConventionFormKeysInUrl[] = [
   "mentorJob",
   "mentorEmail",
   "mentorPhone",
+  "lrFirstName",
+  "lrLastName",
+  "lrEmail",
+  "lrPhone",
   "agencyId",
   "immersionAddress",
   "sanitaryPrevention",
@@ -37,12 +41,18 @@ const convertToConventionInUrl = (
   conventionDto: ConventionDto,
 ): ConventionInUrl => {
   const {
-    signatories: { beneficiary, mentor },
+    signatories: { beneficiary, mentor, legalRepresentative },
     ...flatValues
   } = conventionDto;
 
   return {
     ...flatValues,
+    ...(legalRepresentative && {
+      lrFirstName: legalRepresentative.firstName,
+      lrLastName: legalRepresentative.lastName,
+      lrPhone: legalRepresentative.phone,
+      lrEmail: legalRepresentative.email,
+    }),
     mentorFirstName: mentor.firstName,
     mentorLastName: mentor.lastName,
     mentorPhone: mentor.phone,

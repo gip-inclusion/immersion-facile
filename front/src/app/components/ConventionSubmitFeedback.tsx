@@ -45,14 +45,14 @@ export const createConventionFeedbackMessageByKind = (
 ): Record<SuccessFeedbackKindConvention, React.ReactNode> => ({
   justSubmitted: (
     <InitialSubmitSuccessMessageBase>
-      {(values(signatories) as Signatory[]).map(
-        ({ role, firstName, lastName }) => (
+      {(values(signatories) as Signatory[])
+        .filter((v) => !!v)
+        .map(({ role, firstName, lastName }) => (
           <li key={role}>
             {labelByRole[role]}, {firstName} {lastName} doit confirmer et signer
             cette demande (un mail avec lien de confirmation a été envoyé).
           </li>
-        ),
-      )}
+        ))}
     </InitialSubmitSuccessMessageBase>
   ),
   modificationsAsked: "Vous avez renvoyé la demande pour modification.",

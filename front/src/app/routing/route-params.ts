@@ -44,6 +44,11 @@ export const conventionValuesFromUrl = {
   emergencyContact: param.query.optional.string,
   emergencyContactPhone: param.query.optional.string,
 
+  lrEmail: param.query.optional.string,
+  lrFirstName: param.query.optional.string,
+  lrLastName: param.query.optional.string,
+  lrPhone: param.query.optional.string,
+
   postalCode: param.query.optional.string,
   siret: param.query.optional.string,
   businessName: param.query.optional.string,
