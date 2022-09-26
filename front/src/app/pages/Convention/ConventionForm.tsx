@@ -2,9 +2,9 @@ import { startOfToday } from "date-fns";
 import { Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import {
-  SubmitFeedback,
-  SuccessFeedbackKind,
-} from "src/app/components/SubmitFeedback";
+  ConventionSubmitFeedback,
+  SuccessFeedbackKindConvention,
+} from "src/app/components/ConventionSubmitFeedback";
 import { conventionGateway } from "src/app/config/dependencies";
 import {
   createOrUpdateConvention,
@@ -49,7 +49,7 @@ export const ConventionForm = ({
 
   useExistingSiret(initialValues.siret);
   const [submitFeedback, setSubmitFeedback] = useState<
-    SuccessFeedbackKind | Error | null
+    SuccessFeedbackKindConvention | Error | null
   >(null);
 
   useEffect(() => {
@@ -140,7 +140,10 @@ export const ConventionForm = ({
             <div>
               <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
                 <ConventionFormFields isFrozen={isFrozen} />
-                <SubmitFeedback submitFeedback={submitFeedback} />
+                <ConventionSubmitFeedback
+                  submitFeedback={submitFeedback}
+                  signatories={props.values.signatories}
+                />
               </form>
             </div>
           )}

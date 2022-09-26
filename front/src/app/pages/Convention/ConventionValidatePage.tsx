@@ -110,7 +110,7 @@ export const ConventionValidatePage = ({ route }: VerificationPageProps) => {
                   {...buttonProps}
                   newStatus="ACCEPTED_BY_VALIDATOR"
                   messageToShowOnSuccess={
-                    "Succès. La validation de cette demande est bien enregistrée. La confirmation de cette validation va être communiquée par mail au bénéficiaire et à l'entreprise."
+                    "Succès. La validation de cette demande est bien enregistrée. La confirmation de cette validation va être communiquée par mail à chacun des signataires."
                   }
                   disabled={
                     !!successMessage ||

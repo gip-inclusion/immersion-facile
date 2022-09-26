@@ -1,17 +1,17 @@
 import React from "react";
 import { Notification } from "react-design-system/immersionFacile";
 
-export type SuccessFeedbackKind =
-  | "justSubmitted"
-  | "signedSuccessfully"
-  | "modificationsAsked"
-  | "agencyAdded";
+export type SubmitFeedBackKind<T> = T | Error | null;
 
-type SubmitFeedbackProps = {
-  submitFeedback: SuccessFeedbackKind | Error | null;
+export type SubmitFeedbackProps<T extends string> = {
+  submitFeedback: SubmitFeedBackKind<T>;
+  messageByKind: Record<T, React.ReactNode>;
 };
 
-export const SubmitFeedback = ({ submitFeedback }: SubmitFeedbackProps) => {
+export const SubmitFeedback = <T extends string>({
+  submitFeedback,
+  messageByKind,
+}: SubmitFeedbackProps<T>) => {
   if (submitFeedback === null) return null;
 
   return (
@@ -30,46 +30,6 @@ export const SubmitFeedback = ({ submitFeedback }: SubmitFeedbackProps) => {
       )}
     </>
   );
-};
-
-const InitialSubmitSuccessMessage = () => (
-  <>
-    Merci d'avoir complété cette demande de convention.
-    <br />
-    <br />
-    <ul>
-      <li>
-        Vous devez maintenant confirmer et signer cette demande (un mail avec
-        lien de confirmation vous a été envoyé).
-      </li>
-      <li>
-        Votre tuteur doit confirmer et signer cette demande (un mail avec lien
-        de confirmation lui a été envoyé).
-      </li>
-    </ul>
-    <br />
-    <i>
-      N'hésitez pas à prévenir et relancer votre tuteur, sans votre signature et
-      celle de l'entreprise, la demande ne peut pas être étudiée par votre
-      conseiller.
-    </i>
-    <br />
-    <br />
-    Pensez à vérifier votre boîte mail et vos spams.
-    <br /> Si vous ne recevez rien, alertez nous:{" "}
-    <a href="mailto:contact@immersion-facile.beta.gouv.fr">
-      contact@immersion-facile.beta.gouv.fr
-    </a>
-  </>
-);
-
-const messageByKind: Record<SuccessFeedbackKind, React.ReactNode> = {
-  justSubmitted: <InitialSubmitSuccessMessage />,
-  modificationsAsked: "Vous avez renvoyé la demande pour modification.",
-  signedSuccessfully: "Votre accord a été enregistré.",
-  agencyAdded:
-    "L'agence a été ajoutée avec succès. Vous devez attendre qu'elle soit validée " +
-    "avant qu'elle ne soit effectivement disponible pour conventionner des immersions",
 };
 
 const getErrorMessage = (submitError: Error) =>

@@ -10,11 +10,12 @@ import {
 } from "shared/src/agency/agency.dto";
 import { createAgencySchema } from "shared/src/agency/agency.schema";
 import { zEmail } from "shared/src/zodUtils";
-import { RadioGroup } from "src/app/components/RadioGroup";
 import {
-  SubmitFeedback,
-  SuccessFeedbackKind,
-} from "src/app/components/SubmitFeedback";
+  agencySubmitMessageByKind,
+  SuccessFeedbackKindAgency,
+} from "src/app/components/AgencySubmitFeedback";
+import { RadioGroup } from "src/app/components/RadioGroup";
+import { SubmitFeedback } from "src/app/components/SubmitFeedback";
 import { UploadLogo } from "src/app/components/UploadLogo";
 import { agencyGateway } from "src/app/config/dependencies";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
@@ -59,7 +60,7 @@ const makeTypedSetField: MakeTypedSetField =
 
 export const AddAgencyPage = () => {
   const [submitFeedback, setSubmitFeedback] = useState<
-    SuccessFeedbackKind | Error | null
+    SuccessFeedbackKindAgency | Error | null
   >(null);
   const { enableLogoUpload } = useFeatureFlags();
 
@@ -183,7 +184,10 @@ export const AddAgencyPage = () => {
                 >
                   Soumettre
                 </Button>
-                <SubmitFeedback submitFeedback={submitFeedback} />
+                <SubmitFeedback
+                  submitFeedback={submitFeedback}
+                  messageByKind={agencySubmitMessageByKind}
+                />
 
                 {submitCount !== 0 && Object.values(errors).length > 0 && (
                   <div style={{ color: "red" }}>

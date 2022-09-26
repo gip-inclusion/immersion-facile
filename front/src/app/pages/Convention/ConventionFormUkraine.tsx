@@ -1,9 +1,9 @@
 import { Formik, FormikProps, FormikValues } from "formik";
 import React, { Dispatch, SetStateAction, useState } from "react";
 import {
-  SubmitFeedback,
-  SuccessFeedbackKind,
-} from "src/app/components/SubmitFeedback";
+  ConventionSubmitFeedback,
+  SuccessFeedbackKindConvention,
+} from "src/app/components/ConventionSubmitFeedback";
 import { conventionGateway } from "src/app/config/dependencies";
 import { ConventionFormFieldsUkraine } from "src/app/pages/Convention/ConventionFields/ConventionFormFieldsUkraine";
 import { ConventionPresentation } from "src/app/pages/Convention/ConventionPage";
@@ -18,7 +18,7 @@ type ConventionFormProps = {
 export const ConventionFormUkraine = ({ properties }: ConventionFormProps) => {
   const [initialValues, setInitialValues] = useState(properties);
   const [submitFeedback, setSubmitFeedback] = useState<
-    SuccessFeedbackKind | Error | null
+    SuccessFeedbackKindConvention | Error | null
   >(null);
 
   return (
@@ -60,9 +60,9 @@ const FormikApplicationForm = ({
   initialValues: ConventionPresentation;
   setInitialValues: Dispatch<SetStateAction<ConventionPresentation>>;
   setSubmitFeedback: Dispatch<
-    SetStateAction<SuccessFeedbackKind | Error | null>
+    SetStateAction<SuccessFeedbackKindConvention | Error | null>
   >;
-  submitFeedback: SuccessFeedbackKind | Error | null;
+  submitFeedback: SuccessFeedbackKindConvention | Error | null;
 }) => (
   <Formik
     enableReinitialize={true}
@@ -87,7 +87,10 @@ const FormikApplicationForm = ({
       <div>
         <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
           <ConventionFormFieldsUkraine />
-          <SubmitFeedback submitFeedback={submitFeedback} />
+          <ConventionSubmitFeedback
+            submitFeedback={submitFeedback}
+            signatories={props.values.signatories}
+          />
         </form>
       </div>
     )}

@@ -18,9 +18,9 @@ import { conventionSchema } from "shared/src/convention/convention.schema";
 import { ConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
 import { exhaustiveCheck } from "shared/src/utils";
 import {
-  SubmitFeedback,
-  SuccessFeedbackKind,
-} from "src/app/components/SubmitFeedback";
+  ConventionSubmitFeedback,
+  SuccessFeedbackKindConvention,
+} from "src/app/components/ConventionSubmitFeedback";
 import { conventionGateway } from "src/app/config/dependencies";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { ApiDataContainer } from "src/app/pages/admin/ApiDataContainer";
@@ -146,15 +146,16 @@ type SignFormSpecificProps = {
 
 const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
   useExistingSiret(convention?.siret);
-  const [initialValues, setInitialValues] =
-    useState<Partial<ConventionReadDto> | null>(null);
+  const [initialValues, setInitialValues] = useState<ConventionReadDto | null>(
+    null,
+  );
   const [signatory, setSignatory] = useState<Signatory | undefined>();
   const [currentSignatoryRole, setCurrentSignatoryRole] = useState<
     SignatoryRole | undefined
   >();
 
   const [submitFeedback, setSubmitFeedback] = useState<
-    SuccessFeedbackKind | Error | null
+    SuccessFeedbackKindConvention | Error | null
   >(null);
 
   useEffect(() => {
@@ -199,7 +200,10 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
                 // Confirm checkbox
                 const { signedAtFieldName, signedAt, signatory } =
                   fromSignatoryRole(
-                    mergeDeepRight(convention, values) as ConventionDto,
+                    mergeDeepRight(
+                      convention as ConventionDto,
+                      values as ConventionDto,
+                    ) as ConventionDto,
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                     currentSignatoryRole!,
                   );
@@ -275,7 +279,10 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
                       </div>
                     )}
 
-                    <SubmitFeedback submitFeedback={submitFeedback} />
+                    <ConventionSubmitFeedback
+                      submitFeedback={submitFeedback}
+                      signatories={props.values.signatories}
+                    />
                   </form>
                 </div>
               );
