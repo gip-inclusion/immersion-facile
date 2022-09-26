@@ -120,9 +120,9 @@ describe("conventionDtoSchema", () => {
       expectConventionDtoToBeInvalid(convention);
     });
 
-    it(`accepts end dates that are < ${immersionMaximumCalendarDays} calendar days after the start date`, () => {
+    it(`accepts end dates that are <= ${immersionMaximumCalendarDays} calendar days after the start date`, () => {
       const dateStart = DATE_START;
-      const dateEnd = addDays(DATE_START, immersionMaximumCalendarDays - 1);
+      const dateEnd = addDays(DATE_START, immersionMaximumCalendarDays);
       const convention = new ConventionDtoBuilder()
         .withDateStart(dateStart)
         .withDateEnd(dateEnd)

@@ -24,7 +24,7 @@ export const underMaxCalendarDuration = ({
   dateStart: string;
   dateEnd: string;
 }): boolean =>
-  differenceInDays(new Date(dateEnd), new Date(dateStart)) <
+  differenceInDays(new Date(dateEnd), new Date(dateStart)) <=
   immersionMaximumCalendarDays;
 
 export const emailAndMentorEmailAreDifferent = (params: {
