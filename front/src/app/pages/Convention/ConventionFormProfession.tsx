@@ -1,5 +1,6 @@
 import { useField } from "formik";
 import React from "react";
+import { TextInputError } from "react-design-system";
 import { AppellationAutocomplete } from "src/app/components/AppellationAutocomplete";
 import { ConventionDto } from "shared/src/convention/convention.dto";
 import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
@@ -20,9 +21,12 @@ export const ConventionFormProfession = ({
 }: ConventionFormProfessionProps) => {
   const name: keyof ConventionDto = "immersionAppellation";
 
-  const [{ value }, _, { setValue }] = useField<
+  const [{ value }, meta, { setValue }] = useField<
     ConventionDto["immersionAppellation"] | undefined
   >(name);
+
+  const error =
+    meta.touched && (meta.error as Partial<AppellationDto>)?.appellationLabel;
 
   if (disabled)
     return (
@@ -50,6 +54,7 @@ export const ConventionFormProfession = ({
           initialValue={initialFieldValue}
           setFormValue={setValue}
         />
+        {error && <TextInputError errorMessage={error} />}
       </div>
     </>
   );
