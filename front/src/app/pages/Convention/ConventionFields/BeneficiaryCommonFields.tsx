@@ -1,15 +1,32 @@
-import React, { useState } from "react";
+import { useField } from "formik";
+import React, { useState, useEffect } from "react";
 import { getConventionFieldName } from "shared/src/convention/convention";
 import { RadioGroup } from "src/app/components/RadioGroup";
 import { LegalRepresentativeFields } from "src/app/pages/Convention/ConventionFields/LegalRepresentativeFields";
 import { TextInput } from "src/uiComponents/form/TextInput";
+
+const useIsMinor = () => {
+  const [isMinor, setIsMinor] = useState<boolean>(false);
+
+  const [{ value: legalRepresentative }] = useField(
+    getConventionFieldName("signatories.legalRepresentative"),
+  );
+
+  const isMinorFromData = !!legalRepresentative;
+
+  useEffect(() => {
+    if (isMinorFromData) setIsMinor(true);
+  }, [isMinorFromData]);
+
+  return { isMinor, setIsMinor };
+};
 
 export const BeneficiaryCommonFields = ({
   disabled,
 }: {
   disabled?: boolean;
 }) => {
-  const [isMinor, setIsMinor] = useState(false);
+  const { isMinor, setIsMinor } = useIsMinor();
 
   return (
     <>
@@ -58,7 +75,7 @@ export const BeneficiaryCommonFields = ({
       />
 
       {isMinor ? (
-        <LegalRepresentativeFields />
+        <LegalRepresentativeFields disabled={disabled} />
       ) : (
         <>
           <TextInput
