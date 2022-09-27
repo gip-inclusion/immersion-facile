@@ -96,8 +96,8 @@ deploy_on_dev:
       exit \$retVal;
       fi;
 
-      echo \"Waiting 1m ...\";
-      sleep 60;
+      echo \"Waiting 1m30 ...\";
+      sleep 90;
       echo \"Checking server health...\";
       curl --fail --output /dev/null http://localhost:80/api/"
 
@@ -192,8 +192,8 @@ deploy_on_prod:
       exit \$retVal;
       fi;
 
-      echo \"Waiting 1m ...\";
-      sleep 60;
+      echo \"Waiting 1m30 ...\";
+      sleep 90;
       echo \"Checking server health...\";
       curl --fail --output /dev/null http://localhost:80/api/"
 
