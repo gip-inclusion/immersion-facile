@@ -33,7 +33,7 @@ export const Button = ({
       emphasis,
       size,
       classNameOveride,
-      additionnalClassName
+      additionnalClassName,
     )}
     style={defineStyle(styleOveride)}
     type={type}
@@ -50,14 +50,14 @@ const defineClassName = (
   emphasis: Emphasis,
   size: Size,
   additionnalClassName?: ClassName,
-  classNameOveride?: ClassName
+  classNameOveride?: ClassName,
 ): ClassName =>
   classNameOveride || defaultClassName(emphasis, size, additionnalClassName);
 
 const defaultClassName = (
   emphasis: Emphasis,
   size: Size,
-  additionnalClassName?: ClassName
+  additionnalClassName?: ClassName,
 ) =>
   `fr-btn ${defineEmphasis(emphasis)}${defineSize(size)}${
     additionnalClassName ? ` ${additionnalClassName}` : ""

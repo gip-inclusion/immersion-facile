@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "format": "pnpm -w prettier:glob --write ./libs/react-design-system/src/",
-    "format:check": "pnpm -w prettier:glob --check ./libs/react-design-system",
+    "format:check": "pnpm -w prettier:glob --check ./libs/react-design-system/src/",
     "typecheck": "tsc --noEmit",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",

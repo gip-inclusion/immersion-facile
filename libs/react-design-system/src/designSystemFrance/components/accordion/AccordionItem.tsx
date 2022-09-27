@@ -25,7 +25,7 @@ type AccordionItemProps = {
   onClick?: (
     trullyExpanded: boolean,
     event: React.MouseEvent,
-    id: number
+    id: number,
   ) => void;
   children?: React.ReactNode;
   className?: string | object | [];
@@ -38,7 +38,7 @@ type AccordionItemProps = {
 export default function useCollapse(
   id: string,
   isExpanded: boolean | undefined,
-  className?: string
+  className?: string,
 ) {
   const expandedItem: Cases = {
     false: {
@@ -144,7 +144,7 @@ export const AccordionDSFRItem = forwardRef(
         </section>
       </li>
     );
-  }
+  },
 );
 
 AccordionDSFRItem.defaultProps = {

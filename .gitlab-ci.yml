@@ -28,10 +28,7 @@ validations:
     - mkdir -p $STORAGE_FULL_PATH/tmp/
     - NODE_ENV=test DATABASE_URL=$PG_TEST_URL pnpm back migrate up
     - PG_URL=$PG_TEST_URL STORAGE_ROOT=$STORAGE_FULL_PATH pnpm back test:integration
-    - pnpm shared includecheck
-    - pnpm back includecheck
-    - pnpm front includecheck
-    - STORAGE_ROOT=$STORAGE_FULL_PATH pnpm fullcheck-ci
+    - STORAGE_ROOT=$STORAGE_FULL_PATH pnpm fullcheck --concurrency=2
 
 #sonarqube-check:
 #  stage: test

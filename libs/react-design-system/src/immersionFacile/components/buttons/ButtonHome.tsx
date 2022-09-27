@@ -5,7 +5,7 @@ type HomeButtonTypes = "primary" | "secondary" | "error";
 export type HomeButtonProps = {
   disable?: boolean;
   onClick?: (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => void | Promise<void>;
   children: ReactNode;
   className?: string;

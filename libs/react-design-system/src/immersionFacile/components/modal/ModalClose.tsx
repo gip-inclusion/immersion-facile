@@ -22,7 +22,8 @@ export const ModalClose = ({
     title={title}
     aria-controls="fr-modal"
     tabIndex={0}
-    autoFocus>
+    autoFocus
+  >
     {children}
   </button>
 );

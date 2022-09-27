@@ -18,7 +18,7 @@ export const ArrayDropdown = <T extends string>({
   const displayOptions: (T | "")[] = allowEmpty ? ["", ...options] : options;
 
   const [selectedOption, setSelectedOption] = useState<T | "">(
-    defaultSelectedOption ?? ""
+    defaultSelectedOption ?? "",
   );
   const onChange: React.ChangeEventHandler<HTMLSelectElement> = (event) => {
     const index = event.currentTarget.selectedIndex;

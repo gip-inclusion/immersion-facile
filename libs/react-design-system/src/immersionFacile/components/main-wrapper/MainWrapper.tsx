@@ -16,7 +16,8 @@ export const MainWrapper = ({
   <main
     className={`fr-main-wrapper ${className} ${
       vSpacing ? `fr-py-${vSpacing}w` : ""
-    } ${hSpacing ? `fr-px-${hSpacing}w` : ""}`}>
+    } ${hSpacing ? `fr-px-${hSpacing}w` : ""}`}
+  >
     {children}
   </main>
 );
