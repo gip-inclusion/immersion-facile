@@ -23,12 +23,11 @@
     "test:all": "jest --runInBand --testRegex='^((?!manual).)*.test.ts$'",
     "format": "pnpm -w prettier:glob --write ./back/src",
     "format:check": "pnpm -w prettier:glob --check ./back/src",
-    "typecheck": "tsc --noEmit",
     "includecheck": "./check_includes.sh",
-    "fullcheck": "npm run includecheck && npm run format && npm run lint && npm run test && npm run typecheck",
-    "fullcheck-with-integration": "npm run format && npm run test:all && npm run typecheck",
+    "lint": "pnpm -w lintconfig:glob ./back/src",
+    "typecheck": "tsc --noEmit",
     "migrate": "ts-node node_modules/node-pg-migrate/bin/node-pg-migrate -j ts -m src/adapters/secondary/pg/migrations",
-    "lint": "pnpm -w lintconfig:glob ./back/src"
+    "fullcheck": "pnpm -w fullcheck --filter=back*"
   },
   "keywords": [],
   "author": "",

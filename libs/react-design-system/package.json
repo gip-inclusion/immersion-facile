@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "pnpm -w prettier:glob --write ./libs/react-design-system/src/",
+    "format:check": "pnpm -w prettier:glob --check ./libs/react-design-system",
     "typecheck": "tsc --noEmit",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",

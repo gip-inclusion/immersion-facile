@@ -18,26 +18,10 @@
     "shared": "pnpm --dir shared",
     "react-design-system": "pnpm --dir libs/react-design-system",
     "cypress": "pnpm --dir cypress cypress:open",
-    "lint:back": "pnpm back lint",
-    "lint:front": "pnpm front lint",
-    "lint:shared": "pnpm shared lint",
-    "lint:react-design-system": "pnpm react-design-system lint",
     "lintconfig:glob": "eslint --config=.eslintrc.js",
     "lint-staged": "lint-staged --config=./.tooling/.lintstaged/.lintstagedrc",
-    "lints": "concurrently --kill-others-on-fail \"pnpm:lint:*\" ",
-    "lints-ci": "concurrently -m 2 --kill-others-on-fail \"pnpm:lint:*\" ",
-    "test:back": "pnpm back test",
-    "test:front": "pnpm front test",
-    "test:shared": "pnpm shared test",
-    "tests": "concurrently --kill-others-on-fail \"pnpm:test:*\"",
-    "typecheck:back": "pnpm back typecheck",
-    "typecheck:front": "pnpm front typecheck",
-    "typecheck:shared": "pnpm shared typecheck",
-    "typecheck:react-design-system": "pnpm react-design-system typecheck",
-    "typechecks": "concurrently --kill-others-on-fail \"pnpm:typecheck:*\"",
-    "typechecks-ci": "concurrently -m 2 --kill-others-on-fail \"pnpm:typecheck:*\"",
-    "fullcheck": "concurrently --kill-others-on-fail \"pnpm:tests\" \"pnpm:prettier:check\" \"pnpm:lints\"  \"pnpm:typechecks\"",
-    "fullcheck-ci": "concurrently --max-processes 1 --kill-others-on-fail \"pnpm:tests\" \"pnpm:prettier:check\" \"pnpm:lints-ci\"  \"pnpm:typechecks-ci\""
+    "fullcheck-old": "concurrently --kill-others-on-fail \"pnpm:tests\" \"pnpm:prettier:check\" \"pnpm:lints\"  \"pnpm:typechecks\"",
+    "fullcheck": "turbo run includecheck format:check lint typecheck test"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.35.1",
@@ -49,6 +33,7 @@
     "husky": "^8.0.1",
     "lint-staged": "^13.0.3",
     "prettier": "^2.6.0",
+    "turbo": "1.4.6",
     "typescript": "^4.8.2"
   }
 }

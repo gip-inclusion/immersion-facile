@@ -1,11 +1,12 @@
 {
   "name": "shared",
   "scripts": {
-    "test": "jest --testRegex=.unit.test.ts",
     "includecheck": "./check_includes.sh",
+    "format:check": "pnpm -w prettier:glob --check ./shared/src",
+    "lint": "pnpm -w lintconfig:glob ./shared/src",
     "typecheck": "tsc --noEmit",
-    "fullcheck": "pnpm run includecheck && pnpm run test && pnpm run typecheck && pnpm run lint",
-    "lint": "pnpm -w lintconfig:glob ./shared/src"
+    "test": "jest --testRegex=.unit.test.ts",
+    "fullcheck": "pnpm -w fullcheck --filter=shared*"
   },
   "devDependencies": {
     "@babel/core": "^7.17.9",

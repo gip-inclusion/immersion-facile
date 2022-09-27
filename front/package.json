@@ -1,7 +1,8 @@
 {
+  "name": "front",
   "version": "0.0.0",
   "scripts": {
-    "test": "jest --passWithNoTests --verbose --testRegex='^((?!(integration|manual)).)*.test.ts$'",
+    "test": "jest --verbose --testRegex='^((?!(integration|manual)).)*.test.ts$'",
     "test:manual": "jest --runInBand --watchAll --testRegex=.manual.test.ts",
     "dev": "VITE_GATEWAY=IN_MEMORY vite",
     "dev-http": "vite",
@@ -12,8 +13,8 @@
     "includecheck": "./check_includes.sh",
     "format": "pnpm -w prettier:glob --write ./front/src",
     "format:check": "pnpm -w prettier:glob --check ./front/src",
-    "fullcheck": "npm run includecheck && npm run format && npm run test && npm run typecheck && npm run lint",
-    "lint": "pnpm -w lintconfig:glob ./front/src"
+    "lint": "pnpm -w lintconfig:glob ./front/src",
+    "fullcheck": "pnpm -w fullcheck --filter=front*"
   },
   "dependencies": {
     "@emotion/react": "^11.8.2",
