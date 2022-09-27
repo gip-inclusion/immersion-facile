@@ -85,7 +85,7 @@ export const ConventionFormFields = ({
           federatedIdentity={values.signatories.beneficiary.federatedIdentity}
         />
       </FormSectionTitle>
-      <h4>{t.sectionIntertext}</h4>
+      <h4>{t.establishment.subtitle}</h4>
       <EstablishmentCommonFields disabled={isFrozen} />
       <FormSectionTitle>
         {t.sectionTitles.conditionsToHost}

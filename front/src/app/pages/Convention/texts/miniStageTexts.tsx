@@ -19,6 +19,7 @@ export const miniStageTexts: Texts = mergeDeepRight(immersionTexts, {
   sectionTitles: {
     conditionsToHost: "3. Conditions d’accueil du stage",
   },
+
   conventionTitle: "Formulaire pour conventionner un mini stage",
   notDeployedEveryWhere:
     "Attention, le formulaire de demande de mini stage n'est pas encore déployé partout en France.",
@@ -29,6 +30,7 @@ export const miniStageTexts: Texts = mergeDeepRight(immersionTexts, {
     phone: {
       description: "pour qu’on puisse vous contacter à propos du stage",
     },
+    isMinorLabel: "La personne qui va faire le stage est-elle mineure ?",
   },
   legalRepresentative: {
     phone: {
@@ -36,6 +38,8 @@ export const miniStageTexts: Texts = mergeDeepRight(immersionTexts, {
     },
   },
   establishment: {
+    subtitle:
+      "Les questions suivantes doivent être complétées avec la personne qui vous accueillera pendant votre stage",
     siret: {
       description: "la structure d'accueil, où vous allez faire votre stage",
     },
@@ -52,10 +56,15 @@ export const miniStageTexts: Texts = mergeDeepRight(immersionTexts, {
     },
     immersionAddressLabel: "Adresse du lieu où se fera le stage",
     individualProtectionLabel:
-      "Un équipement de protection individuelle est-il fourni pur le stage",
+      "Un équipement de protection individuelle est-il fourni pour le stage",
     immersionActivities: {
       label: "Activités observées / pratiquées pendant le stage",
     },
+    profession: {
+      label: "Intitulé du poste / métier observé pendant le stage",
+    },
+    sanitaryPreventionLabel:
+      "Des mesures de prévention sanitaire sont-elles prévues pour le stage ?",
     immersionSkills: {
       label: "Compétences/aptitudes observées / évaluées pendant le stage",
     },

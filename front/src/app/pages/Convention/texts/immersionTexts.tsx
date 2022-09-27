@@ -38,8 +38,6 @@ export const immersionTexts = {
     validationText:
       "Une fois le formulaire envoyé, vous allez recevoir une demande de validation par mail et l'entreprise également",
   },
-  sectionIntertext:
-    "Les questions suivantes doivent être complétées avec la personne qui vous accueillera pendant votre immersion",
   conventionTitle:
     "Formulaire pour conventionner une période de mise en situation professionnelle (PMSMP)",
   notDeployedEveryWhere:
@@ -75,6 +73,8 @@ export const immersionTexts = {
       description:
         "la structure d'accueil, c'est l'entreprise, le commerce, l'association ... où vous allez faire votre immersion",
     },
+    subtitle:
+      "Les questions suivantes doivent être complétées avec la personne qui vous accueillera pendant votre immersion",
     businessNameLabel:
       "Indiquez le nom (raison sociale) de l'établissement d'accueil",
     firstName: {
