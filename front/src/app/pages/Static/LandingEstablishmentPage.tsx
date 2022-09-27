@@ -124,7 +124,10 @@ export const LandingEstablishmentPage = () => (
             Le bénéficiaire <Colored>conserve son statut initial</Colored> et
             est couvert par un prescripteur (Pôle emploi, Cap Emploi, Mission
             Locale, etc) grâce à la{" "}
-            <a {...routes.convention().link}>signature d'une convention</a>.
+            <a {...routes.conventionImmersion().link}>
+              signature d'une convention
+            </a>
+            .
           </BulletPointArrow>
         </div>
       </div>

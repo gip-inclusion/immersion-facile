@@ -39,8 +39,8 @@ export const ImmersionMarianneHeader = () => {
     {
       label: "Demande immersion",
       display: isAdminConnected,
-      active: currentRoute.name === routes.convention().name,
-      ...routes.convention().link,
+      active: currentRoute.name === routes.conventionImmersion().name,
+      ...routes.conventionImmersion().link,
     },
     {
       label: "Formulaire Entreprise",

@@ -5,23 +5,23 @@ import {
   ConventionStatus,
   ImmersionObjective,
   InternshipKind,
+  Signatories,
 } from "shared/src/convention/convention.dto";
 import { FederatedIdentity } from "shared/src/federatedIdentities/federatedIdentity.dto";
+import { reasonableSchedule } from "shared/src/schedule/ScheduleUtils";
+import { OmitFromExistingKeys } from "shared/src/utils";
 import { toDateString } from "shared/src/utils/date";
 import { mergeObjectsExceptFalsyValues } from "shared/src/utils/mergeObjectsExpectFalsyValues";
-import { reasonableSchedule } from "shared/src/schedule/ScheduleUtils";
 import {
   conventionGateway,
   deviceRepository,
 } from "src/app/config/dependencies";
-import {
-  ConventionPageRoute,
-  ConventionPresentation,
-} from "src/app/pages/Convention/ConventionPage";
+import { ConventionImmersionPageRoute } from "src/app/pages/Convention/ConventionImmersionPage";
+import { ConventionMiniStagePageRoute } from "src/app/pages/Convention/ConventionMiniStagePage";
 import { ConventionUkrainePageRoute } from "src/app/pages/Convention/ConventionPageForUkraine";
+import { ConventionInUrl } from "src/app/routing/route-params";
 import { ENV } from "src/environmentVariables";
 import { v4 as uuidV4 } from "uuid";
-import { ConventionInUrl } from "src/app/routing/route-params";
 
 const { frontEnvType } = ENV;
 
@@ -43,11 +43,33 @@ export const isConventionFrozen = (
 export const undefinedIfEmptyString = (text?: string): string | undefined =>
   text || undefined;
 
-export const conventionInitialValuesFromUrl = (
-  route: ConventionPageRoute | ConventionUkrainePageRoute,
-): ConventionPresentation => {
-  const internshipKind: InternshipKind = "immersion"; // This will depend on the route
+type WithSignatures = {
+  signatories: {
+    [K in keyof Signatories]: Partial<Signatories[K]>;
+  };
+};
 
+type WithIntershipKind = {
+  internshipKind: InternshipKind;
+};
+
+export type ConventionPresentation = OmitFromExistingKeys<
+  Partial<ConventionDto>,
+  "id" | "rejectionJustification"
+> &
+  WithSignatures &
+  WithIntershipKind;
+
+export const conventionInitialValuesFromUrl = ({
+  route,
+  internshipKind,
+}: {
+  route:
+    | ConventionMiniStagePageRoute
+    | ConventionImmersionPageRoute
+    | ConventionUkrainePageRoute;
+  internshipKind: InternshipKind;
+}): ConventionPresentation => {
   const dataFromDevice = deviceRepository.get("partialConventionInUrl") ?? {};
 
   const params = mergeObjectsExceptFalsyValues(

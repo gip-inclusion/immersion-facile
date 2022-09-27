@@ -80,7 +80,7 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
           magicLink: this.generateMagicLinkFn({
             id: convention.id,
             role,
-            targetRoute: frontRoutes.conventionRoute,
+            targetRoute: frontRoutes.conventionImmersionRoute,
             email,
           }),
         },

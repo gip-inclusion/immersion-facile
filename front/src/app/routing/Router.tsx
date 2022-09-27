@@ -2,7 +2,8 @@ import React from "react";
 import { SearchDebugPage } from "src/app/components/SearchDebugPage";
 import { AdminPage } from "src/app/pages/admin/AdminPage";
 import { AddAgencyPage } from "src/app/pages/Agency/AddAgencyPage";
-import { ConventionPage } from "src/app/pages/Convention/ConventionPage";
+import { ConventionImmersionPage } from "src/app/pages/Convention/ConventionImmersionPage";
+import { ConventionMiniStagePage } from "src/app/pages/Convention/ConventionMiniStagePage";
 import { ConventionPageForUkraine } from "src/app/pages/Convention/ConventionPageForUkraine";
 import { ConventionSignPage } from "src/app/pages/Convention/ConventionSignPage";
 import { ConventionValidatePage } from "src/app/pages/Convention/ConventionValidatePage";
@@ -50,7 +51,12 @@ export const Router = () => {
       {route.name === "home" && <HomePage />}
 
       {route.name === "landingEstablishment" && <LandingEstablishmentPage />}
-      {route.name === "convention" && <ConventionPage route={route} />}
+      {route.name === "conventionImmersion" && (
+        <ConventionImmersionPage route={route} />
+      )}
+      {route.name === "conventionMiniStage" && (
+        <ConventionMiniStagePage route={route} />
+      )}
       {route.name === "conventionForUkraine" && (
         <ConventionPageForUkraine route={route} />
       )}

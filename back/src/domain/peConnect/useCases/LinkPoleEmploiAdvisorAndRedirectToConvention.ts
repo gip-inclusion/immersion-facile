@@ -52,6 +52,6 @@ export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalU
       toPartialConventionDtoWithPeIdentity(user),
     );
 
-    return `${this.baseUrlForRedirect}/${frontRoutes.conventionRoute}?${peQueryParams}`;
+    return `${this.baseUrlForRedirect}/${frontRoutes.conventionImmersionRoute}?${peQueryParams}`;
   }
 }

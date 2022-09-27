@@ -320,7 +320,7 @@ const ConventionNeedsModificationMessage = (props: { jwt: string }) => (
       modifications ont été réclamées par votre conseiller (Vous avez reçu un
       mail précisant les changements à effectuer).
       <span className="block">
-        <a {...routes.convention({ jwt: props.jwt }).link}>
+        <a {...routes.conventionImmersion({ jwt: props.jwt }).link}>
           Cliquez ici pour aller à la page d'édition
         </a>
       </span>

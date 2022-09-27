@@ -1,13 +1,7 @@
 import { CircularProgress } from "@mui/material";
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import {
-  ConventionDto,
-  InternshipKind,
-  Signatories,
-} from "shared/src/convention/convention.dto";
 import { FederatedIdentity } from "shared/src/federatedIdentities/federatedIdentity.dto";
-import { OmitFromExistingKeys } from "shared/src/utils";
 import { InitiateConventionCard } from "src/app/components/InitiateConventionCard";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { ConventionForm } from "src/app/pages/Convention/ConventionForm";
@@ -21,30 +15,17 @@ import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { Route } from "type-route";
 
-export type ConventionPageRoute = Route<typeof routes.convention>;
+export type ConventionImmersionPageRoute = Route<
+  typeof routes.conventionImmersion
+>;
 
-interface ConventionPageProps {
-  route: ConventionPageRoute;
+interface ConventionImmersionPageProps {
+  route: ConventionImmersionPageRoute;
 }
 
-type WithSignatures = {
-  signatories: {
-    [K in keyof Signatories]: Partial<Signatories[K]>;
-  };
-};
-
-type WithIntershipKind = {
-  internshipKind: InternshipKind;
-};
-
-export type ConventionPresentation = OmitFromExistingKeys<
-  Partial<ConventionDto>,
-  "id" | "rejectionJustification"
-> &
-  WithSignatures &
-  WithIntershipKind;
-
-export const ConventionPage = ({ route }: ConventionPageProps) => (
+export const ConventionImmersionPage = ({
+  route,
+}: ConventionImmersionPageProps) => (
   <HeaderFooterLayout>
     <ConventionFormContainerLayout>
       <PageContent route={route} />
@@ -52,37 +33,22 @@ export const ConventionPage = ({ route }: ConventionPageProps) => (
   </HeaderFooterLayout>
 );
 
-const PageContent = ({ route }: ConventionPageProps) => {
+const PageContent = ({ route }: ConventionImmersionPageProps) => {
   const { enablePeConnectApi, isLoading } = useFeatureFlags();
   const connectedWith = useAppSelector(authSelectors.connectedWith);
-  const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (route.params.federatedIdentity)
-      dispatch(
-        authSlice.actions.federatedIdentityProvided(
-          route.params.federatedIdentity as FederatedIdentity,
-        ),
-      );
-  }, [route.params.federatedIdentity]);
-
-  useEffect(() => {
-    dispatch(authSlice.actions.federatedIdentityInDeviceDeletionTriggered());
-    const onWindowUnload = () => {
-      dispatch(
-        authSlice.actions.federatedIdentityFromStoreToDeviceStorageTriggered(),
-      );
-    };
-    window.addEventListener("beforeunload", onWindowUnload);
-    return () => window.removeEventListener("beforeunload", onWindowUnload);
-  }, []);
+  useFederatedIdentity(route);
+  useFederatedIdentityOnReload();
 
   if (isLoading) return <CircularProgress />;
 
   if (route.params.jwt)
     return (
       <ConventionForm
-        properties={conventionInitialValuesFromUrl(route)}
+        properties={conventionInitialValuesFromUrl({
+          route,
+          internshipKind: "immersion",
+        })}
         routeParams={route.params}
       />
     );
@@ -101,8 +67,39 @@ const PageContent = ({ route }: ConventionPageProps) => {
 
   return (
     <ConventionForm
-      properties={conventionInitialValuesFromUrl(route)}
+      properties={conventionInitialValuesFromUrl({
+        route,
+        internshipKind: "immersion",
+      })}
       routeParams={route.params}
     />
   );
+};
+
+const useFederatedIdentity = (route: ConventionImmersionPageRoute) => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (route.params.federatedIdentity)
+      dispatch(
+        authSlice.actions.federatedIdentityProvided(
+          route.params.federatedIdentity as FederatedIdentity,
+        ),
+      );
+  }, [route.params.federatedIdentity]);
+};
+
+const useFederatedIdentityOnReload = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(authSlice.actions.federatedIdentityInDeviceDeletionTriggered());
+    const onWindowUnload = () => {
+      dispatch(
+        authSlice.actions.federatedIdentityFromStoreToDeviceStorageTriggered(),
+      );
+    };
+    window.addEventListener("beforeunload", onWindowUnload);
+    return () => window.removeEventListener("beforeunload", onWindowUnload);
+  }, []);
 };

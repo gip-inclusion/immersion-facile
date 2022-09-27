@@ -34,9 +34,13 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     (params) => `/etablissement/${params.consumer}`,
   ),
   home: defineRoute("/"),
-  convention: defineRoute(
+  conventionImmersion: defineRoute(
     { jwt: param.query.optional.string, ...conventionValuesFromUrl },
-    () => `/${frontRoutes.conventionRoute}`,
+    () => `/${frontRoutes.conventionImmersionRoute}`,
+  ),
+  conventionMiniStage: defineRoute(
+    { jwt: param.query.optional.string, ...conventionValuesFromUrl },
+    () => `/${frontRoutes.conventionMiniStageRoute}`,
   ),
   conventionForUkraine: defineRoute(
     {

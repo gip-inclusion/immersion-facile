@@ -11,11 +11,11 @@ import {
 } from "src/app/components/ConventionSubmitFeedback";
 import { conventionGateway } from "src/app/config/dependencies";
 import {
+  ConventionPresentation,
   createOrUpdateConvention,
   isConventionFrozen,
   undefinedIfEmptyString,
 } from "src/app/pages/Convention/conventionHelpers";
-import { ConventionPresentation } from "src/app/pages/Convention/ConventionPage";
 import { useConventionTexts } from "src/app/pages/Convention/texts/textSetup";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";

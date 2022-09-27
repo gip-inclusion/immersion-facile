@@ -31,7 +31,10 @@ export const ConventionPageForUkraine = ({
       {agencyId ? (
         <ConventionFormUkraine
           properties={{
-            ...conventionInitialValuesFromUrl(route),
+            ...conventionInitialValuesFromUrl({
+              route,
+              internshipKind: "immersion",
+            }),
             agencyId,
           }}
         />
