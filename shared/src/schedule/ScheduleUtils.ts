@@ -2,7 +2,6 @@ import { addDays, format, getDay, parseISO } from "date-fns";
 import { prop } from "ramda";
 
 import {
-  ComplexScheduleDto,
   DailyScheduleDto,
   DateIntervalDto,
   DayPeriodsDto,
@@ -76,7 +75,7 @@ export const calculateTotalImmersionHoursBetweenDate = ({
   });
 
 export const calculateTotalImmersionHoursFromComplexSchedule = (
-  complexSchedule: ComplexScheduleDto,
+  complexSchedule: DailyScheduleDto[],
 ): number => {
   const dates = complexSchedule.map(prop("date"));
   const dateStart = dates.sort()[0];
@@ -246,7 +245,7 @@ const prettyPrintDaySchedule = (timePeriods: TimePeriodDto[]): string => {
 // mardi: 08:00-12:00, 14:00-17:00
 // ...
 export const prettyPrintComplexSchedule = (
-  complexSchedule: ComplexScheduleDto,
+  complexSchedule: DailyScheduleDto[],
 ): string => {
   const lines: string[] = [];
   makeImmersionTimetable(complexSchedule).forEach((week) => {
@@ -267,7 +266,7 @@ export const prettyPrintComplexSchedule = (
 };
 
 export const prettyPrintComplexScheduleSummary = (
-  complexSchedule: ComplexScheduleDto,
+  complexSchedule: DailyScheduleDto[],
 ): string => {
   const lines: string[] = [];
   makeImmersionTimetable(complexSchedule).forEach((week) => {
@@ -290,7 +289,7 @@ const calculateTotalImmersionHoursBetweenDateComplex = ({
   dateStart,
   dateEnd,
   complexSchedule,
-}: DatesOfImmersion & { complexSchedule: ComplexScheduleDto }): number => {
+}: DatesOfImmersion & { complexSchedule: DailyScheduleDto[] }): number => {
   const start = parseISO(dateStart);
   const end = parseISO(dateEnd);
   let totalOfMinutes = 0;
@@ -312,7 +311,7 @@ const calculateTotalImmersionHoursBetweenDateComplex = ({
 };
 
 export const dayPeriodsFromComplexSchedule = (
-  complexSchedule: ComplexScheduleDto,
+  complexSchedule: DailyScheduleDto[],
 ): DayPeriodsDto => {
   const manageTimePeriodOnDay = (frenchDay: number) => {
     const isSameFrenchDay = (day: DailyScheduleDto, frenchDay: number) =>
@@ -357,7 +356,7 @@ export const dayPeriodsFromComplexSchedule = (
 };
 
 export const makeImmersionTimetable = (
-  complexSchedule: ComplexScheduleDto,
+  complexSchedule: DailyScheduleDto[],
 ): ImmersionTimeTable => {
   const calendar: WeeklyImmersionTimetableDto[] = [];
   const lastDayOfTheWeekIndex = 6;
@@ -385,7 +384,7 @@ const applyDaysWithoutScheduleOnTimetable = (
 };
 
 const applyDaysWithScheduleOnTimetable = (
-  complexSchedule: ComplexScheduleDto,
+  complexSchedule: DailyScheduleDto[],
   calendar: WeeklyImmersionTimetableDto[],
 ) => {
   let currentWeekIndex = 0;
@@ -440,8 +439,8 @@ export const makeDailySchedule = (
 export const makeComplexSchedule = (
   { start, end }: DateIntervalDto,
   timePeriods: TimePeriodsDto,
-): ComplexScheduleDto => {
-  const complexSchedules: ComplexScheduleDto = [];
+): DailyScheduleDto[] => {
+  const complexSchedules: DailyScheduleDto[] = [];
   for (
     let currentDate = start;
     currentDate <= end;

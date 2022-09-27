@@ -1,5 +1,8 @@
 import { DayPeriodsDto, weekdays } from "shared/src/schedule/Schedule.dto";
-import { isoStringSchema } from "shared/src/schedule/Schedule.schema";
+import {
+  isoStringSchema,
+  scheduleSchema,
+} from "shared/src/schedule/Schedule.schema";
 import { ScheduleDtoBuilder } from "shared/src/schedule/ScheduleDtoBuilder";
 import {
   calculateTotalImmersionHoursBetweenDate,
@@ -458,6 +461,16 @@ describe("ScheduleUtils", () => {
         expect(dayPeriodsFromComplexSchedule(schedule.complexSchedule)).toEqual(
           [],
         );
+      });
+      it("should not validate schema without any timeperiod", () => {
+        const emptySchedule = new ScheduleDtoBuilder()
+          .withRegularSchedule({
+            dayPeriods: [],
+            timePeriods: [],
+          })
+          .build();
+
+        expect(() => scheduleSchema.parse(emptySchedule)).toThrow();
       });
     });
 

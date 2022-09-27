@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { Builder } from "../Builder";
 import {
-  ComplexScheduleDto,
   ScheduleDto,
   DateIntervalDto,
   DailyScheduleDto,
@@ -16,9 +15,9 @@ const emptyRegularSchedule: RegularScheduleDto = {
 };
 
 const complexScheduleFromRegularSchedule = (
-  complexSchedule: ComplexScheduleDto,
+  complexSchedule: DailyScheduleDto[],
   regularSchedule: RegularScheduleDto,
-): ComplexScheduleDto => {
+): DailyScheduleDto[] => {
   const isDailyScheduleOnRegularDayPeriod = (
     dailySchedule: DailyScheduleDto,
     regularDayPeriods: DayPeriodsDto,
@@ -90,7 +89,7 @@ export class ScheduleDtoBuilder implements Builder<ScheduleDto> {
   }
 
   public withComplexSchedule(
-    complexSchedule: ComplexScheduleDto,
+    complexSchedule: DailyScheduleDto[],
   ): ScheduleDtoBuilder {
     return new ScheduleDtoBuilder({
       ...this.dto,

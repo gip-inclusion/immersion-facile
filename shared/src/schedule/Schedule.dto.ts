@@ -11,11 +11,11 @@ export type Weekday =
 export type ScheduleDto = {
   isSimple: boolean;
   selectedIndex: number; // TODO this is a view constraint and should be removed from shared
-  complexSchedule: ComplexScheduleDto;
+  complexSchedule: DailyScheduleDto[];
 };
 export type TimePeriodDto = { start: string; end: string }; //TODO Type better ? Format ISO ISO 8601 "HH-mm"
 export type TimePeriodsDto = TimePeriodDto[];
-export type ComplexScheduleDto = DailyScheduleDto[];
+
 export type DailyScheduleDto = {
   date: string; //TODO Type better ? Format ISO 8601 "YYYY-MM-DDT00:00:00.000Z"
   timePeriods: TimePeriodsDto;

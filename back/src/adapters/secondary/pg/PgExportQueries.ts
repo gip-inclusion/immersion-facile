@@ -2,7 +2,7 @@ import { PoolClient } from "pg";
 import format from "pg-format";
 import { groupBy, keys, prop } from "ramda";
 import { ExportableName, GetExportableParams } from "shared/src/exportable";
-import { ComplexScheduleDto } from "shared/src/schedule/Schedule.dto";
+import { DailyScheduleDto } from "shared/src/schedule/Schedule.dto";
 import {
   calculateTotalImmersionHoursFromComplexSchedule,
   prettyPrintComplexSchedule,
@@ -55,10 +55,10 @@ const postProcessing: Partial<
   conventions: (row: ExportedRow) => ({
     ...row,
     Programme: prettyPrintComplexSchedule(
-      row["Programme"] as ComplexScheduleDto,
+      row["Programme"] as DailyScheduleDto[],
     ),
     "Durée de l'immersion": calculateTotalImmersionHoursFromComplexSchedule(
-      row["Programme"] as ComplexScheduleDto,
+      row["Programme"] as DailyScheduleDto[],
     ),
   }),
 };

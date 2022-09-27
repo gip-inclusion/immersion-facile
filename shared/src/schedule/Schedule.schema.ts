@@ -9,6 +9,7 @@ import {
   WeekdayNumber,
   WeekDayRangeSchemaDTO,
 } from "./Schedule.dto";
+import { calculateTotalImmersionHoursFromComplexSchedule } from "./ScheduleUtils";
 
 // Time period within a day.
 // TODO We could refine by checking that start < end
@@ -33,8 +34,12 @@ export const dailyScheduleSchema: z.Schema<DailyScheduleDto> = z.object({
 // Each element represents one weekday, starting with Monday.
 //export const complexScheduleSchema_V0 = z.array(z.array(timePeriodSchema));
 
-export const immersionDaysScheduleSchema: z.Schema<DailyScheduleDto[]> =
-  z.array(dailyScheduleSchema);
+export const immersionDaysScheduleSchema: z.Schema<DailyScheduleDto[]> = z
+  .array(dailyScheduleSchema)
+  .refine((days) => {
+    const numberOfHours = calculateTotalImmersionHoursFromComplexSchedule(days);
+    return numberOfHours !== 0;
+  });
 
 export const weekDaySchema = z
   .number()

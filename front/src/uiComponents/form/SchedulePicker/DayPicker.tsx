@@ -1,11 +1,11 @@
 import React from "react";
-import { ComplexScheduleDto } from "shared/src/schedule/Schedule.dto";
+import { DailyScheduleDto } from "shared/src/schedule/Schedule.dto";
 import { makeImmersionTimetable } from "shared/src/schedule/ScheduleUtils";
 import { DayCircle } from "./DayCircle";
 import { WeeklyRow } from "./WeeklyRow";
 
 type DayPickerProps = {
-  complexSchedule: ComplexScheduleDto;
+  complexSchedule: DailyScheduleDto[];
   selectedIndex: number;
   onChange: (index: number) => void;
   disabled?: boolean;
