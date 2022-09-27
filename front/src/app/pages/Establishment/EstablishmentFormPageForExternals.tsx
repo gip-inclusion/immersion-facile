@@ -15,6 +15,7 @@ const externalConsumers: Partial<
   cci: { isIframe: false },
   cma: { isIframe: false },
   "lesentreprises-sengagent": { isIframe: true },
+  unJeuneUneSolution: { isIframe: true },
 };
 
 export const EstablishmentFormPageForExternals = ({
