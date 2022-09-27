@@ -19,7 +19,13 @@ export const allConventionStatuses = [
   "CANCELLED",
 ] as const;
 
-export const immersionMaximumCalendarDays = 30;
+export const maximumCalendarDayByInternshipKind: Record<
+  InternshipKind,
+  number
+> = {
+  immersion: 30,
+  "mini-stage-cci": 5,
+};
 
 export const validatedConventionStatuses: ConventionStatus[] = [
   "ACCEPTED_BY_VALIDATOR",

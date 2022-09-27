@@ -10,6 +10,7 @@ import {
   Beneficiary,
   Mentor,
   LegalRepresentative,
+  InternshipKind,
 } from "./convention.dto";
 import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { FederatedIdentity } from "../federatedIdentities/federatedIdentity.dto";
@@ -91,6 +92,12 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
 
   public withBusinessName(businessName: string): ConventionDtoBuilder {
     return new ConventionDtoBuilder({ ...this.dto, businessName });
+  }
+
+  public withInternshipKind(
+    internshipKind: InternshipKind,
+  ): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({ ...this.dto, internshipKind });
   }
 
   public withBeneficiary(beneficiary: Beneficiary): ConventionDtoBuilder {

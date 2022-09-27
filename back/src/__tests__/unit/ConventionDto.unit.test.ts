@@ -1,8 +1,9 @@
+import { keys } from "ramda";
 import {
   allConventionStatuses,
   ConventionDto,
   ConventionStatus,
-  immersionMaximumCalendarDays,
+  maximumCalendarDayByInternshipKind,
 } from "shared/src/convention/convention.dto";
 import { conventionSchema } from "shared/src/convention/convention.schema";
 import {
@@ -111,24 +112,41 @@ describe("conventionDtoSchema", () => {
       expectConventionDtoToBeValid(convention);
     });
 
-    it(`rejects end dates that are more than ${immersionMaximumCalendarDays} calendar days after the start date`, () => {
-      const convention = new ConventionDtoBuilder()
-        .withDateStart(DATE_START)
-        .withDateEnd(addDays(DATE_START, immersionMaximumCalendarDays + 1))
-        .build();
+    describe("Correctly handles max authorized number of days", () => {
+      const calendarDayAndInternShips = keys(
+        maximumCalendarDayByInternshipKind,
+      ).map((intershipKind) => ({
+        intershipKind,
+        maxCalendarDays: maximumCalendarDayByInternshipKind[intershipKind],
+      }));
 
-      expectConventionDtoToBeInvalid(convention);
-    });
+      it.each(calendarDayAndInternShips)(
+        "for $intershipKind rejects when it is more than $maxCalendarDays",
+        ({ intershipKind, maxCalendarDays }) => {
+          const convention = new ConventionDtoBuilder()
+            .withInternshipKind(intershipKind)
+            .withDateStart(DATE_START)
+            .withDateEnd(addDays(DATE_START, maxCalendarDays + 1))
+            .build();
 
-    it(`accepts end dates that are <= ${immersionMaximumCalendarDays} calendar days after the start date`, () => {
-      const dateStart = DATE_START;
-      const dateEnd = addDays(DATE_START, immersionMaximumCalendarDays);
-      const convention = new ConventionDtoBuilder()
-        .withDateStart(dateStart)
-        .withDateEnd(dateEnd)
-        .build();
+          expectConventionDtoToBeInvalid(convention);
+        },
+      );
 
-      expectConventionDtoToBeValid(convention);
+      it.each(calendarDayAndInternShips)(
+        "for $intershipKind accepts end date that are <= $maxCalendarDays calendar days after the start date",
+        ({ intershipKind, maxCalendarDays }) => {
+          const dateStart = DATE_START;
+          const dateEnd = addDays(DATE_START, maxCalendarDays);
+          const convention = new ConventionDtoBuilder()
+            .withInternshipKind(intershipKind)
+            .withDateStart(dateStart)
+            .withDateEnd(dateEnd)
+            .build();
+
+          expectConventionDtoToBeValid(convention);
+        },
+      );
     });
 
     describe("status that are available without signatures", () => {

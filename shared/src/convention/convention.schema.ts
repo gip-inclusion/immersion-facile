@@ -20,7 +20,7 @@ import {
   ConventionReadDto,
   GenerateMagicLinkRequestDto,
   GenerateMagicLinkResponseDto,
-  immersionMaximumCalendarDays,
+  maximumCalendarDayByInternshipKind,
   ListConventionsRequestDto,
   Mentor,
   LegalRepresentative,
@@ -129,7 +129,7 @@ export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExt
       path: [getConventionFieldName("dateEnd")],
     })
     .refine(underMaxCalendarDuration, {
-      message: `La durée maximale calendaire d'une immersion est de ${immersionMaximumCalendarDays} jours.`,
+      message: `La durée maximale calendaire d'une immersion est de ${maximumCalendarDayByInternshipKind} jours.`,
       path: [getConventionFieldName("dateEnd")],
     })
     .refine(emailAndMentorEmailAreDifferent, {
@@ -152,7 +152,7 @@ export const conventionSchema: z.Schema<ConventionDto> =
       path: [getConventionFieldName("dateEnd")],
     })
     .refine(underMaxCalendarDuration, {
-      message: `La durée maximale calendaire d'une immersion est de ${immersionMaximumCalendarDays} jours.`,
+      message: `La durée maximale calendaire d'une immersion est de ${maximumCalendarDayByInternshipKind} jours.`,
       path: [getConventionFieldName("dateEnd")],
     })
     .refine(emailAndMentorEmailAreDifferent, {
@@ -180,7 +180,7 @@ export const conventionReadSchema: z.Schema<ConventionReadDto> =
       path: [getConventionFieldName("dateEnd")],
     })
     .refine(underMaxCalendarDuration, {
-      message: `La durée maximale calendaire d'une immersion est de ${immersionMaximumCalendarDays} jours.`,
+      message: `La durée maximale calendaire d'une immersion est de ${maximumCalendarDayByInternshipKind} jours.`,
       path: [getConventionFieldName("dateEnd")],
     })
     .refine(emailAndMentorEmailAreDifferent, {

@@ -2,7 +2,8 @@ import differenceInDays from "date-fns/differenceInDays";
 import { allSignatoriesSigned } from "./convention";
 import {
   ConventionStatus,
-  immersionMaximumCalendarDays,
+  InternshipKind,
+  maximumCalendarDayByInternshipKind,
   Signatories,
 } from "./convention.dto";
 
@@ -20,12 +21,14 @@ export const startDateIsBeforeEndDate = ({
 export const underMaxCalendarDuration = ({
   dateStart,
   dateEnd,
+  internshipKind,
 }: {
   dateStart: string;
   dateEnd: string;
+  internshipKind: InternshipKind;
 }): boolean =>
   differenceInDays(new Date(dateEnd), new Date(dateStart)) <=
-  immersionMaximumCalendarDays;
+  maximumCalendarDayByInternshipKind[internshipKind];
 
 export const emailAndMentorEmailAreDifferent = (params: {
   signatories: Signatories;
