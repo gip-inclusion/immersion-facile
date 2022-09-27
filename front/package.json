@@ -14,7 +14,7 @@
     "format": "pnpm -w prettier:glob --write ./front/src",
     "format:check": "pnpm -w prettier:glob --check ./front/src",
     "lint": "pnpm -w lintconfig:glob ./front/src",
-    "fullcheck": "pnpm -w fullcheck --filter=front*"
+    "fullcheck": "pnpm -w fullcheck --filter=front"
   },
   "dependencies": {
     "@emotion/react": "^11.8.2",

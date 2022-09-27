@@ -6,7 +6,7 @@
     "lint": "pnpm -w lintconfig:glob ./shared/src",
     "typecheck": "tsc --noEmit",
     "test": "jest --testRegex=.unit.test.ts",
-    "fullcheck": "pnpm -w fullcheck --filter=shared*"
+    "fullcheck": "pnpm -w fullcheck --filter=shared"
   },
   "devDependencies": {
     "@babel/core": "^7.17.9",

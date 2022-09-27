@@ -1,10 +1,22 @@
 {
   "$schema": "https://turborepo.org/schema.json",
   "pipeline": {
-    "includecheck": {},
-    "format:check": {},
-    "lint": {},
-    "typecheck": {},
-    "test": {}
+    "includecheck": {
+      "outputs": []
+    },
+    "format:check": {
+      "outputs": []
+    },
+    "lint": {
+      "outputs": []
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck"],
+      "outputs": []
+    },
+    "test": {
+      "dependsOn": ["typecheck"],
+      "outputs": []
+    }
   }
 }
