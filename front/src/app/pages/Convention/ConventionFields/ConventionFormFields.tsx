@@ -18,6 +18,7 @@ import { SubmitButton } from "src/app/pages/Convention/ConventionFields/SubmitBu
 import { useConventionWatchValuesInUrl } from "src/app/pages/Convention/ConventionFields/useConventionWatchValuesInUrl";
 import { ConventionFrozenMessage } from "src/app/pages/Convention/ConventionFrozenMessage";
 import { ConventionSignOnlyMessage } from "src/app/pages/Convention/ConventionSignOnlyMessage";
+import { useConventionTextsFromFormikContext } from "src/app/pages/Convention/texts/textSetup";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { FormSectionTitle } from "src/uiComponents/FormSectionTitle";
 
@@ -47,6 +48,7 @@ export const ConventionFormFields = ({
   const { enablePeConnectApi } = useFeatureFlags();
   const watchedValues = makeValuesToWatchInUrl(values);
   useConventionWatchValuesInUrl(watchedValues);
+  const t = useConventionTextsFromFormikContext();
 
   return (
     <>
@@ -60,38 +62,33 @@ export const ConventionFormFields = ({
           "signatories.beneficiary.federatedIdentity",
         )}
       />
-      <FormSectionTitle>Pour commencer nous avons besoin de</FormSectionTitle>
+      <FormSectionTitle>{t.forStartWeNeed}</FormSectionTitle>
       {isFrozen ? (
         <AgencyDisplay
-          label="Votre structure d'accompagnement *"
+          label={`${t.yourAgencyLabel} *`}
           agencyId={values.agencyId}
         />
       ) : (
         <AgencySelector
-          label="Votre structure d'accompagnement *"
+          label={`${t.yourAgencyLabel} *`}
           disabled={isFrozen}
           defaultAgencyId={values.agencyId}
           shouldListAll={!enablePeConnectApi}
         />
       )}
-      <FormSectionTitle>
-        1. Coordonnées du candidat (bénéficiaire)
-      </FormSectionTitle>
+      <FormSectionTitle>{t.sectionTitles.beneficiary}</FormSectionTitle>
       <BeneficiaryCommonFields disabled={isFrozen} />
       <FormSectionTitle>
-        2. Coordonnées de l'entreprise
+        {t.sectionTitles.establishment}
         <ShareActions
           isFrozen={isFrozen}
           federatedIdentity={values.signatories.beneficiary.federatedIdentity}
         />
       </FormSectionTitle>
-      <h4>
-        Les questions suivantes doivent être complétées avec la personne qui
-        vous accueillera pendant votre immersion
-      </h4>
+      <h4>{t.sectionIntertext}</h4>
       <EstablishmentCommonFields disabled={isFrozen} />
       <FormSectionTitle>
-        3. Conditions d’accueil de l’immersion professionnelle
+        {t.sectionTitles.conditionsToHost}
         <ShareActions
           isFrozen={isFrozen}
           federatedIdentity={values.signatories.beneficiary.federatedIdentity}
@@ -103,16 +100,9 @@ export const ConventionFormFields = ({
       {!isSignatureMode &&
         submitCount !== 0 &&
         Object.values(errors).length > 0 && (
-          <div style={{ color: "red" }}>
-            Veuillez corriger les champs erronés
-          </div>
+          <div style={{ color: "red" }}>{t.signatures.fixErrors}</div>
         )}
-      {!isFrozen && (
-        <p className="font-bold">
-          Une fois le formulaire envoyé, vous allez recevoir une demande de
-          validation par mail et l'entreprise également.
-        </p>
-      )}
+      {!isFrozen && <p className="font-bold">{t.signatures.validationText}</p>}
       <br />
       {!isFrozen && !isSignatureMode && (
         <SubmitButton isSubmitting={isSubmitting} onSubmit={submitForm} />
@@ -120,7 +110,7 @@ export const ConventionFormFields = ({
       {isSignatureMode && (
         <>
           {alreadySigned ? (
-            <p>Vous avez signé la convention.</p>
+            <p>{t.conventionAlreadySigned}</p>
           ) : (
             <SignatureActions
               signatory={signatory}

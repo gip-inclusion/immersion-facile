@@ -1,4 +1,5 @@
 import React from "react";
+import { useConventionTextsFromFormikContext } from "src/app/pages/Convention/texts/textSetup";
 
 type SignOnlyMessageProps = {
   isAlreadySigned: boolean;
@@ -6,21 +7,25 @@ type SignOnlyMessageProps = {
 
 export const ConventionSignOnlyMessage = ({
   isAlreadySigned,
-}: SignOnlyMessageProps) => (
-  <>
-    <div role="alert" className="fr-alert fr-alert--info">
-      <p className="fr-alert__title">
-        {isAlreadySigned
-          ? "Vous avez déjà signé cette demande d'immersion."
-          : "Cette demande d'immersion est prête à être signée."}
-      </p>
-      <p>
-        {"Cette demande d'immersion n'est plus modifiable. " +
-          (isAlreadySigned
-            ? "Vous avez déjà signé cette demande d'immersion."
-            : "Veuillez la signer ou la renvoyer pour modification.")}
-      </p>
-    </div>
-    <br />
-  </>
-);
+}: SignOnlyMessageProps) => {
+  const t = useConventionTextsFromFormikContext();
+
+  return (
+    <>
+      <div role="alert" className="fr-alert fr-alert--info">
+        <p className="fr-alert__title">
+          {isAlreadySigned
+            ? t.conventionAlreadySigned
+            : t.conventionReadyToBeSigned}
+        </p>
+        <p>
+          {`${t.conventionNotEditable} ` +
+            (isAlreadySigned
+              ? t.conventionAlreadySigned
+              : t.conventionToSignOrAskForChanges)}
+        </p>
+      </div>
+      <br />
+    </>
+  );
+};

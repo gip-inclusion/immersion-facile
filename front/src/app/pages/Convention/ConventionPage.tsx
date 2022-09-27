@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import {
   ConventionDto,
+  InternshipKind,
   Signatories,
 } from "shared/src/convention/convention.dto";
 import { FederatedIdentity } from "shared/src/federatedIdentities/federatedIdentity.dto";
@@ -32,11 +33,16 @@ type WithSignatures = {
   };
 };
 
+type WithIntershipKind = {
+  internshipKind: InternshipKind;
+};
+
 export type ConventionPresentation = OmitFromExistingKeys<
   Partial<ConventionDto>,
   "id" | "rejectionJustification"
 > &
-  WithSignatures;
+  WithSignatures &
+  WithIntershipKind;
 
 export const ConventionPage = ({ route }: ConventionPageProps) => (
   <HeaderFooterLayout>

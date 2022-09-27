@@ -3,6 +3,7 @@ import { IconButton, Tooltip } from "@mui/material";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 import React, { useState } from "react";
+import { useConventionTextsFromFormikContext } from "src/app/pages/Convention/texts/textSetup";
 import {
   ElementModalContainer,
   useElementContainerModal,
@@ -12,9 +13,11 @@ import { ShareForm } from "./ShareForm";
 const iconColor = "#3458a2";
 
 export const ShareLinkByEmail = () => {
+  const t = useConventionTextsFromFormikContext();
   const { modalState, dispatch } = useElementContainerModal();
   const [emailSent, setEmailSent] = useState<boolean | null>(null);
-  const shareLinkByEmail = "Partagez cette demande de Convention par e-mail";
+  const shareLinkByEmail = t.shareLinkByMail.share;
+
   return (
     <>
       <Tooltip title={shareLinkByEmail}>
@@ -49,8 +52,8 @@ export const ShareLinkByEmail = () => {
             sx={{ width: "100%" }}
           >
             {emailSent
-              ? "Cette demande de Convention a bien été partagée par mail."
-              : "Erreur lors de l'envoi de l'email"}
+              ? t.shareLinkByMail.sharedSuccessfully
+              : t.shareLinkByMail.errorWhileSharing}
           </Alert>
         </Snackbar>
       )}

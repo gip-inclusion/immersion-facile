@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { getConventionFieldName } from "shared/src/convention/convention";
 import { RadioGroup } from "src/app/components/RadioGroup";
 import { LegalRepresentativeFields } from "src/app/pages/Convention/ConventionFields/LegalRepresentativeFields";
+import { useConventionTextsFromFormikContext } from "src/app/pages/Convention/texts/textSetup";
 import { TextInput } from "src/uiComponents/form/TextInput";
 
 const useIsMinor = () => {
@@ -27,11 +28,12 @@ export const BeneficiaryCommonFields = ({
   disabled?: boolean;
 }) => {
   const { isMinor, setIsMinor } = useIsMinor();
+  const t = useConventionTextsFromFormikContext();
 
   return (
     <>
       <TextInput
-        label="Prénom *"
+        label={`${t.beneficiary.firstNameLabel} *`}
         name={getConventionFieldName("signatories.beneficiary.firstName")}
         type="text"
         placeholder=""
@@ -39,7 +41,7 @@ export const BeneficiaryCommonFields = ({
         disabled={disabled}
       />
       <TextInput
-        label="Nom de famille *"
+        label={`${t.beneficiary.lastNameLabel} *`}
         name={getConventionFieldName("signatories.beneficiary.lastName")}
         type="text"
         placeholder=""
@@ -47,19 +49,19 @@ export const BeneficiaryCommonFields = ({
         disabled={disabled}
       />
       <TextInput
-        label="E-mail *"
+        label={`${t.beneficiary.email.label} *`}
         name={getConventionFieldName("signatories.beneficiary.email")}
         type="email"
-        placeholder="nom@exemple.com"
-        description="cela nous permet de vous transmettre la validation de la convention"
+        placeholder={t.beneficiary.email.placeholder}
+        description={t.beneficiary.email.description}
         disabled={disabled}
       />
       <TextInput
-        label="Téléphone *"
+        label={`${t.beneficiary.phone.label} *`}
         name={getConventionFieldName("signatories.beneficiary.phone")}
         type="tel"
-        placeholder="0606060607"
-        description="pour qu’on puisse vous contacter à propos de l’immersion"
+        placeholder={t.beneficiary.phone.placeholder}
+        description={t.beneficiary.phone.description}
         disabled={disabled}
       />
       <RadioGroup
@@ -67,10 +69,10 @@ export const BeneficiaryCommonFields = ({
         disabled={disabled}
         currentValue={isMinor}
         setCurrentValue={() => setIsMinor(!isMinor)}
-        groupLabel="La personne qui va faire l'immersion est-elle mineure ? *"
+        groupLabel={`${t.beneficiary.isMinorLabel} *`}
         options={[
-          { label: "Oui", value: true },
-          { label: "Non", value: false },
+          { label: t.yes, value: true },
+          { label: t.no, value: false },
         ]}
       />
 
@@ -79,7 +81,7 @@ export const BeneficiaryCommonFields = ({
       ) : (
         <>
           <TextInput
-            label="Prénom et nom de la personne à prévenir en cas d'urgence"
+            label={t.emergencyContact.nameLabel}
             name={getConventionFieldName(
               "signatories.beneficiary.emergencyContact",
             )}
@@ -89,12 +91,12 @@ export const BeneficiaryCommonFields = ({
             disabled={disabled}
           />
           <TextInput
-            label="Téléphone de la personne à prévenir en cas d'urgence"
+            label={t.emergencyContact.phone.label}
             name={getConventionFieldName(
               "signatories.beneficiary.emergencyContactPhone",
             )}
             type="tel"
-            placeholder="0606060607"
+            placeholder={t.emergencyContact.phone.placeholder}
             description=""
             disabled={disabled}
           />

@@ -2,6 +2,7 @@ import { useField } from "formik";
 import React from "react";
 import { getConventionFieldName } from "shared/src/convention/convention";
 import { ConventionStatus } from "shared/src/convention/convention.dto";
+import { useConventionTextsFromFormikContext } from "src/app/pages/Convention/texts/textSetup";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { useSiretFetcher, useSiretRelatedField } from "src/hooks/siret.hooks";
 import {
@@ -14,6 +15,7 @@ export const EstablishmentCommonFields = ({
 }: {
   disabled: undefined | boolean;
 }) => {
+  const t = useConventionTextsFromFormikContext();
   const { enableInseeApi } = useFeatureFlags();
   const { updateSiret, currentSiret, siretErrorToDisplay, isFetchingSiret } =
     useSiretFetcher({
@@ -31,14 +33,14 @@ export const EstablishmentCommonFields = ({
         value={currentSiret}
         setValue={updateSiret}
         error={siretErrorToDisplay}
-        label="Indiquez le SIRET de la structure d'accueil *"
+        label={`${t.establishment.siret.label} *`}
         name="siret"
-        placeholder="362 521 879 00034"
-        description="la structure d'accueil, c'est l'entreprise, le commerce, l'association ... où vous allez faire votre immersion"
+        placeholder={t.establishment.siret.placeholder}
+        description={t.establishment.siret.description}
         disabled={disabled}
       />
       <TextInput
-        label="Indiquez le nom (raison sociale) de l'établissement d'accueil *"
+        label={`${t.establishment.businessNameLabel} *`}
         name={getConventionFieldName("businessName")}
         type="text"
         placeholder=""
@@ -46,43 +48,43 @@ export const EstablishmentCommonFields = ({
         disabled={enableInseeApi}
       />
       <TextInput
-        label="Indiquez le prénom du tuteur *"
+        label={`${t.establishment.firstName.label} *`}
         name={getConventionFieldName("signatories.mentor.firstName")}
         type="text"
         placeholder=""
-        description="Ex : Alain"
+        description={t.establishment.firstName.description}
         disabled={disabled || isFetchingSiret}
       />
       <TextInput
-        label="Indiquez le nom du tuteur *"
+        label={`${t.establishment.lastName.label} *`}
         name={getConventionFieldName("signatories.mentor.lastName")}
         type="text"
         placeholder=""
-        description="Ex : Prost"
+        description={t.establishment.lastName.description}
         disabled={disabled || isFetchingSiret}
       />
       <TextInput
-        label="Indiquez la fonction du tuteur *"
+        label={`${t.establishment.job.label} *`}
         name={getConventionFieldName("signatories.mentor.job")}
         type="text"
         placeholder=""
-        description="Ex : Pilote automobile"
+        description={t.establishment.job.description}
         disabled={disabled || isFetchingSiret}
       />
       <TextInput
-        label="Indiquez le numéro de téléphone du tuteur ou de la structure d'accueil *"
+        label={`${t.establishment.phone.label} *`}
         name={getConventionFieldName("signatories.mentor.phone")}
         type="tel"
-        placeholder="0606060707"
-        description="pour que l'on puisse le contacter à propos de l’immersion"
+        placeholder={t.establishment.phone.placeholder}
+        description={t.establishment.phone.description}
         disabled={disabled}
       />
       <TextInput
-        label="Indiquez l'e-mail du tuteur *"
+        label={`${t.establishment.email.label} *`}
         name={getConventionFieldName("signatories.mentor.email")}
         type="email"
-        placeholder="nom@exemple.com"
-        description="pour envoyer la validation de la convention"
+        placeholder={t.establishment.email.placeholder}
+        description={t.establishment.email.description}
         disabled={disabled}
         className="!mb-1"
       />

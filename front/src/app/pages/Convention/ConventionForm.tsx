@@ -1,6 +1,10 @@
 import { startOfToday } from "date-fns";
 import { Formik } from "formik";
 import React, { useEffect, useState } from "react";
+import { Notification, Title } from "react-design-system/immersionFacile";
+import { ConventionDto } from "shared/src/convention/convention.dto";
+import { conventionWithoutExternalIdSchema } from "shared/src/convention/convention.schema";
+import { toDateString } from "shared/src/utils/date";
 import {
   ConventionSubmitFeedback,
   SuccessFeedbackKindConvention,
@@ -12,16 +16,12 @@ import {
   undefinedIfEmptyString,
 } from "src/app/pages/Convention/conventionHelpers";
 import { ConventionPresentation } from "src/app/pages/Convention/ConventionPage";
-import { ConventionDto } from "shared/src/convention/convention.dto";
-import { conventionWithoutExternalIdSchema } from "shared/src/convention/convention.schema";
-import { toDateString } from "shared/src/utils/date";
+import { useConventionTexts } from "src/app/pages/Convention/texts/textSetup";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { useExistingSiret } from "src/hooks/siret.hooks";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
-import { Title } from "react-design-system/immersionFacile";
 import { ConventionFormFields } from "./ConventionFields/ConventionFormFields";
-import { Notification } from "react-design-system/immersionFacile";
 
 type ConventionFormProps = {
   properties: ConventionPresentation;
@@ -72,31 +72,17 @@ export const ConventionForm = ({
       });
   }, []);
 
+  const t = useConventionTexts(initialValues.internshipKind);
+
   const isFrozen = isConventionFrozen(initialValues);
 
   return (
     <div className="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
       <div className="fr-col-lg-7 fr-px-2w">
         <div className="flex justify-center">
-          <Title red>
-            Formulaire pour conventionner une période de mise en situation
-            professionnelle (PMSMP)
-          </Title>
+          <Title red>{t.conventionTitle}</Title>
         </div>
-        <div className="fr-text">
-          Bravo ! <br />
-          Vous avez trouvé une entreprise pour vous accueillir en immersion.{" "}
-          <br />
-          Avant tout, vous devez faire établir une convention pour cette
-          immersion et c'est ici que ça se passe. <br />
-          En quelques minutes, complétez ce formulaire avec l'entreprise qui
-          vous accueillera. <br />
-          <p className="fr-text--xs">
-            Ce formulaire vise à recueillir les données nécessaires à
-            l’établissement de la convention d’immersion professionnelle en
-            conformité avec le cerfa 13912 * 04.
-          </p>
-        </div>
+        <div className="fr-text">{t.welcome}</div>
         <Notification
           type="info"
           title="Attention, le formulaire de demande de convention n'est pas encore déployé partout en France."

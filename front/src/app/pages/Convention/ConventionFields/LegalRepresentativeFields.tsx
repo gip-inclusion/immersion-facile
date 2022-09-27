@@ -5,6 +5,7 @@ import {
   getConventionFieldName,
 } from "shared/src/convention/convention";
 import { Role } from "shared/src/tokens/MagicLinkPayload";
+import { useConventionTextsFromFormikContext } from "src/app/pages/Convention/texts/textSetup";
 import { TextInput } from "src/uiComponents/form/TextInput";
 
 type LegalRepresentativeFieldsProps = { disabled?: boolean };
@@ -14,11 +15,12 @@ export const LegalRepresentativeFields = ({
 }: LegalRepresentativeFieldsProps) => {
   useLegalRepresentativeAsEmergencyContact();
   useLegalRepresentativeRole();
+  const t = useConventionTextsFromFormikContext();
 
   return (
     <div>
       <TextInput
-        label="Prénom du représentant légal *"
+        label={`${t.legalRepresentative.lastNameLabel} *`}
         name={getConventionFieldName(
           "signatories.legalRepresentative.firstName",
         )}
@@ -28,7 +30,7 @@ export const LegalRepresentativeFields = ({
         disabled={disabled}
       />
       <TextInput
-        label="Nom de famille du représentant légal *"
+        label={`${t.legalRepresentative.lastNameLabel} *`}
         name={getConventionFieldName(
           "signatories.legalRepresentative.lastName",
         )}
@@ -38,19 +40,19 @@ export const LegalRepresentativeFields = ({
         disabled={disabled}
       />
       <TextInput
-        label="E-mail *"
+        label={`${t.legalRepresentative.email.label} *`}
         name={getConventionFieldName("signatories.legalRepresentative.email")}
         type="email"
-        placeholder="nom@exemple.com"
-        description="cela nous permet de vous transmettre la validation de la convention"
+        placeholder={t.legalRepresentative.email.placeholder}
+        description={t.legalRepresentative.email.description}
         disabled={disabled}
       />
       <TextInput
-        label="Téléphone *"
+        label={`${t.legalRepresentative.phone.label} *`}
         name={getConventionFieldName("signatories.legalRepresentative.phone")}
         type="tel"
-        placeholder="0606060607"
-        description="pour qu’on puisse vous contacter à propos de l’immersion"
+        placeholder={t.legalRepresentative.phone.placeholder}
+        description={t.legalRepresentative.phone.description}
         disabled={disabled}
       />
     </div>

@@ -16,6 +16,7 @@ import {
   RadioGroupForField,
 } from "src/app/components/RadioGroup";
 import { ConventionFormProfession } from "src/app/pages/Convention/ConventionFormProfession";
+import { useConventionTextsFromFormikContext } from "src/app/pages/Convention/texts/textSetup";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import { useSiretRelatedField } from "src/hooks/siret.hooks";
@@ -29,6 +30,7 @@ export const ImmersionConditionsCommonFields = ({
 }: {
   disabled?: boolean;
 }) => {
+  const t = useConventionTextsFromFormikContext();
   const { setFieldValue, values } = useFormikContext<ConventionDto>();
   const establishmentInfos = useAppSelector(siretSelectors.establishmentInfos);
   const isFetchingSiret = useAppSelector(siretSelectors.isFetching);
@@ -59,7 +61,7 @@ export const ImmersionConditionsCommonFields = ({
   return (
     <>
       <DateInput
-        label="Date de début de l'immersion *"
+        label={`${t.immersionConditionsCommonFields.dateStartLabel} *`}
         name={getConventionFieldName("dateStart")}
         disabled={disabled}
         onDateChange={(dateStart) => {
@@ -70,7 +72,7 @@ export const ImmersionConditionsCommonFields = ({
       />
       <br />
       <DateInput
-        label="Date de fin de l'immersion *"
+        label={`${t.immersionConditionsCommonFields.dateEndLabel} *`}
         name={getConventionFieldName("dateEnd")}
         disabled={disabled}
         max={dateMax}
@@ -89,9 +91,11 @@ export const ImmersionConditionsCommonFields = ({
       />
       <br />
       <TextInput
-        label="Conditions de travail, propres  au métier observé pendant l’immersion. "
+        label={t.immersionConditionsCommonFields.workConditions.label}
         name={getConventionFieldName("workConditions")}
-        description="Ex : transport de marchandises longue distance - pas de retour au domicile pendant 2 jours"
+        description={
+          t.immersionConditionsCommonFields.workConditions.description
+        }
         disabled={disabled}
       />
       <br />
@@ -99,7 +103,7 @@ export const ImmersionConditionsCommonFields = ({
         initialSearchTerm={
           values.immersionAddress ?? establishmentInfos?.businessAddress
         }
-        label="Adresse du lieu où se fera l'immersion * "
+        label={`${t.immersionConditionsCommonFields.immersionAddressLabel} *`}
         setFormValue={({ address }) =>
           setFieldValue("immersionAddress", addressDtoToString(address))
         }
@@ -108,50 +112,59 @@ export const ImmersionConditionsCommonFields = ({
       <br />
       <BoolRadioGroup
         name={getConventionFieldName("individualProtection")}
-        label="Un équipement de protection individuelle est-il fourni pour l’immersion ? *"
+        label={`${t.immersionConditionsCommonFields.individualProtectionLabel} *`}
         disabled={disabled}
       />
       <BoolRadioGroup
         name={getConventionFieldName("sanitaryPrevention")}
-        label="Des mesures de prévention sanitaire sont-elles prévues pour l’immersion ? *"
+        label={`${t.immersionConditionsCommonFields.sanitaryPreventionLabel} *`}
         disabled={disabled}
       />
       <TextInput
-        label="Si oui, précisez-les"
+        label={
+          t.immersionConditionsCommonFields.sanitaryPreventionDetails.label
+        }
         name={getConventionFieldName("sanitaryPreventionDescription")}
         type="text"
         placeholder=""
-        description="Ex : fourniture de gel, de masques"
+        description={
+          t.immersionConditionsCommonFields.sanitaryPreventionDetails
+            .description
+        }
         disabled={disabled}
       />
       <RadioGroupForField
         name={getConventionFieldName("immersionObjective")}
-        label="Objet de la période de mise en situation en milieu professionnel *"
+        label={`${t.immersionConditionsCommonFields.immersionObjectiveLabel} *`}
         options={conventionObjectiveOptions.map((value) => ({
           value,
         }))}
         disabled={disabled}
       />
       <ConventionFormProfession
-        label="Intitulé du poste / métier observé pendant l'immersion *"
-        description="Ex : employé libre service, web développeur, boulanger …"
+        label={`${t.immersionConditionsCommonFields.profession.label} *`}
+        description={t.immersionConditionsCommonFields.profession.description}
         disabled={disabled}
         initialFieldValue={values.immersionAppellation}
       />
       <TextInput
-        label="Activités observées / pratiquées pendant l'immersion *"
+        label={`${t.immersionConditionsCommonFields.immersionActivities.label} *`}
         name={getConventionFieldName("immersionActivities")}
         type="text"
         placeholder=""
-        description="Ex : mise en rayon, accueil et aide à la clientèle"
+        description={
+          t.immersionConditionsCommonFields.immersionActivities.description
+        }
         disabled={disabled}
       />
       <TextInput
-        label="Compétences/aptitudes observées / évaluées pendant l'immersion"
+        label={`${t.immersionConditionsCommonFields.immersionSkills.label}`}
         name={getConventionFieldName("immersionSkills")}
         type="text"
         placeholder=""
-        description="Ex : communiquer à l'oral, résoudre des problèmes, travailler en équipe"
+        description={
+          t.immersionConditionsCommonFields.immersionSkills.description
+        }
         disabled={disabled}
       />
     </>
