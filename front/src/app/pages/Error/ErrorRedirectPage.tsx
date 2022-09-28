@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { isManagedError } from "shared/src/errors/managedErrors";
+import { isManagedError } from "shared";
 import { ContainerLayout } from "src/app/layouts/ContainerLayout";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { routes } from "src/app/routing/routes";

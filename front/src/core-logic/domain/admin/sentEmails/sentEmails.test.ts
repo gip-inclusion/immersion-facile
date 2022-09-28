@@ -1,5 +1,5 @@
-import { EmailSentDto } from "shared/src/email/email";
-import { expectToEqual } from "shared/src/expectToEqual";
+import { EmailSentDto } from "shared";
+import { expectToEqual } from "shared";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { sentEmailsSlice } from "src/core-logic/domain/admin/sentEmails/sentEmails.slice";
 import {

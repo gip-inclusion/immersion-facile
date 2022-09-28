@@ -1,5 +1,5 @@
 import { filter, iif, map, Observable, of, switchMap } from "rxjs";
-import { GetSiretInfo, SiretDto, siretSchema } from "shared/src/siret";
+import { GetSiretInfo, SiretDto, siretSchema } from "shared";
 import {
   SiretAction,
   siretSlice,

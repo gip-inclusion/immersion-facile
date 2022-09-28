@@ -1,4 +1,4 @@
-import { pathEq } from "shared/src/ramdaExtensions/path";
+import { pathEq } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";

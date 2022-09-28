@@ -1,15 +1,9 @@
 import { addMonths } from "date-fns";
 import { useFormikContext } from "formik";
 import React, { useState } from "react";
-import { getConventionFieldName } from "shared/src/convention/convention";
-import {
-  ConventionDto,
-  conventionObjectiveOptions,
-} from "shared/src/convention/convention.dto";
-import {
-  emptySchedule,
-  reasonableSchedule,
-} from "shared/src/schedule/ScheduleUtils";
+import { getConventionFieldName } from "shared";
+import { ConventionDto, conventionObjectiveOptions } from "shared";
+import { emptySchedule, reasonableSchedule } from "shared";
 import { addressDtoToString } from "src/../../shared/src/utils/address";
 import {
   BoolRadioGroup,

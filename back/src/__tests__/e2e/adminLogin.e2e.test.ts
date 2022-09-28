@@ -1,4 +1,4 @@
-import { adminLogin } from "shared/src/routes";
+import { adminLogin } from "shared";
 import { SuperTest, Test } from "supertest";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 import { buildTestApp } from "../../_testBuilders/buildTestApp";

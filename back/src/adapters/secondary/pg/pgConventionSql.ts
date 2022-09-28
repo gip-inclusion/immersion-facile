@@ -1,8 +1,5 @@
 import { PoolClient } from "pg";
-import {
-  ConventionId,
-  ConventionReadDto,
-} from "shared/src/convention/convention.dto";
+import { ConventionId, ConventionReadDto } from "shared";
 
 export const selectAllConventionDtosById = `
 WITH 

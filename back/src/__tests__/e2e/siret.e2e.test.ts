@@ -1,4 +1,4 @@
-import { getSiretIfNotSavedRoute } from "shared/src/routes";
+import { getSiretIfNotSavedRoute } from "shared";
 import { SuperTest, Test } from "supertest";
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../_testBuilders/EstablishmentAggregateBuilder";

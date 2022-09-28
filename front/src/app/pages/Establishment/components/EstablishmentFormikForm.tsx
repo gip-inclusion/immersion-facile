@@ -1,9 +1,9 @@
 import { Form, Formik } from "formik";
 import React, { useState } from "react";
 import { Notification } from "react-design-system/immersionFacile";
-import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
-import { formEstablishmentSchema } from "shared/src/formEstablishment/FormEstablishment.schema";
-import { SiretDto } from "shared/src/siret";
+import { FormEstablishmentDto } from "shared";
+import { formEstablishmentSchema } from "shared";
+import { SiretDto } from "shared";
 import { BoolCheckboxGroup } from "src/uiComponents/form/CheckboxGroup";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { conventionShareRoute, conventionsRoute } from "shared/src/routes";
+import { conventionShareRoute, conventionsRoute } from "shared";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 

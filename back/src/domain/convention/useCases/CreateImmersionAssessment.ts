@@ -1,6 +1,6 @@
-import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
-import { immersionAssessmentSchema } from "shared/src/immersionAssessment/immersionAssessmentSchema";
-import { ConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
+import { ImmersionAssessmentDto } from "shared";
+import { immersionAssessmentSchema } from "shared";
+import { ConventionMagicLinkPayload } from "shared";
 import {
   ConflictError,
   ForbiddenError,

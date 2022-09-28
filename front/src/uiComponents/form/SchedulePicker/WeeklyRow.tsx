@@ -1,9 +1,6 @@
 import { parseISO } from "date-fns";
 import React from "react";
-import {
-  calculateWeeklyHours,
-  WeeklyImmersionTimetableDto,
-} from "shared/src/schedule/ScheduleUtils";
+import { calculateWeeklyHours, WeeklyImmersionTimetableDto } from "shared";
 import { DayCircle } from "./DayCircle";
 import { HourIndicator } from "./HourIndicator";
 import { getDayStatus } from "./utils/getDayStatus";

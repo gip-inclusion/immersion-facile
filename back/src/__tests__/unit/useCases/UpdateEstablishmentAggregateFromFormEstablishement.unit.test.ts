@@ -1,5 +1,5 @@
-import { FormEstablishmentDtoBuilder } from "shared/src/formEstablishment/FormEstablishmentDtoBuilder";
-import { addressDtoToString } from "shared/src/utils/address";
+import { FormEstablishmentDtoBuilder } from "shared";
+import { addressDtoToString } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";

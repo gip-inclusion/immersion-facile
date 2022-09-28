@@ -1,7 +1,7 @@
 import { useField } from "formik";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { GetSiretResponseDto, SiretDto } from "shared/src/siret";
+import { GetSiretResponseDto, SiretDto } from "shared";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";

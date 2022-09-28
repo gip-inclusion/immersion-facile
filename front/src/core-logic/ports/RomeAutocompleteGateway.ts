@@ -1,8 +1,5 @@
 import { Observable } from "rxjs";
-import {
-  AppellationMatchDto,
-  RomeDto,
-} from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
+import { AppellationMatchDto, RomeDto } from "shared";
 
 export interface RomeAutocompleteGateway {
   getRomeDtoMatching: (searchText: string) => Observable<RomeDto[]>;

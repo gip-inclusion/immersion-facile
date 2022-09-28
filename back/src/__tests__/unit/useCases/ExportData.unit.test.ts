@@ -1,4 +1,4 @@
-import { GetExportableParams } from "shared/src/exportable";
+import { GetExportableParams } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemoryExportGateway } from "../../../adapters/secondary/reporting/InMemoryExportGateway";

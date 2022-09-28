@@ -1,7 +1,7 @@
 import { Observable } from "rxjs";
-import { ContactEstablishmentRequestDto } from "shared/src/contactEstablishment";
-import { SearchImmersionQueryParamsDto } from "shared/src/searchImmersion/SearchImmersionQueryParams.dto";
-import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
+import { ContactEstablishmentRequestDto } from "shared";
+import { SearchImmersionQueryParamsDto } from "shared";
+import { SearchImmersionResultDto } from "shared";
 
 export interface ImmersionSearchGateway {
   search(

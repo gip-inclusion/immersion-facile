@@ -1,6 +1,6 @@
-import { ConventionDto } from "shared/src/convention/convention.dto";
-import { conventionSchema } from "shared/src/convention/convention.schema";
-import { frontRoutes } from "shared/src/routes";
+import { ConventionDto } from "shared";
+import { conventionSchema } from "shared";
+import { frontRoutes } from "shared";
 import { GenerateConventionMagicLink } from "../../../adapters/primary/config/createGenerateConventionMagicLink";
 import { createLogger } from "../../../utils/logger";
 import { EmailGateway } from "../../convention/ports/EmailGateway";

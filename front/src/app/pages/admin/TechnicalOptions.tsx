@@ -2,7 +2,7 @@ import { keys } from "ramda";
 import React from "react";
 import { Switch } from "react-design-system/src/designSystemFrance/components/Switch";
 import { useDispatch } from "react-redux";
-import { FeatureFlag } from "shared/src/featureFlags";
+import { FeatureFlag } from "shared";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFlags.slice";
 

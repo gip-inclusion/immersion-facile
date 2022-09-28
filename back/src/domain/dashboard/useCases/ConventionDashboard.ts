@@ -1,4 +1,4 @@
-import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
+import { AbsoluteUrl } from "shared";
 import { z } from "zod";
 import { UseCase } from "../../core/UseCase";
 import { DashboardGateway } from "../port/DashboardGateway";

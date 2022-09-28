@@ -1,8 +1,5 @@
 import jwt from "jsonwebtoken";
-import {
-  EstablishmentJwtPayload,
-  PayloadOption,
-} from "shared/src/tokens/MagicLinkPayload";
+import { EstablishmentJwtPayload, PayloadOption } from "shared";
 import { WithApiConsumerId } from "../core/valueObjects/ApiConsumer";
 
 type AnyObject = Record<string, unknown>;

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { SiretDto } from "shared/src/siret";
+import { SiretDto } from "shared";
 
 type EstablishmentUiStatus =
   | "IDLE"

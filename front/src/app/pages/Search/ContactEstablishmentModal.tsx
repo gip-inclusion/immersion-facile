@@ -4,9 +4,9 @@ import {
   ModalContent,
 } from "react-design-system/immersionFacile";
 import React, { ReactNode, useReducer } from "react";
-import { ContactMethod } from "shared/src/formEstablishment/FormEstablishment.dto";
-import { RomeCode } from "shared/src/rome";
-import { SiretDto } from "shared/src/siret";
+import { ContactMethod } from "shared";
+import { RomeCode } from "shared";
+import { SiretDto } from "shared";
 import { Title, SubTitle } from "react-design-system/immersionFacile";
 import { ContactByEmail } from "./ContactByEmail";
 import { ContactByPhone } from "./ContactByPhone";

@@ -1,9 +1,9 @@
-import { AdminToken } from "shared/src/admin/admin.dto";
+import { AdminToken } from "shared";
 import { SuperTest, Test } from "supertest";
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
 import { AppConfig } from "../../adapters/primary/config/appConfig";
-import { ExportDataDto } from "shared/src/exportable";
-import { exportRoute } from "shared/src/routes";
+import { ExportDataDto } from "shared";
+import { exportRoute } from "shared";
 
 describe("/export", () => {
   let adminToken: AdminToken;

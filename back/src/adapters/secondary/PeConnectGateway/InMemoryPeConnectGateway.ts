@@ -1,6 +1,6 @@
-import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
-import { peConnect } from "shared/src/routes";
-import { queryParamsAsString } from "shared/src/utils/queryParams";
+import { AbsoluteUrl } from "shared";
+import { peConnect } from "shared";
+import { queryParamsAsString } from "shared";
 import { AccessTokenDto } from "../../../domain/peConnect/dto/AccessToken.dto";
 import {
   ExternalPeConnectAdvisor,

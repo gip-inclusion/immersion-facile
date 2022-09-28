@@ -1,5 +1,5 @@
-import { expectToEqual } from "shared/src/expectToEqual";
-import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
+import { expectToEqual } from "shared";
+import { SearchImmersionResultDto } from "shared";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import {
   searchSlice,

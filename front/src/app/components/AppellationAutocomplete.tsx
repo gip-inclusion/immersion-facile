@@ -2,10 +2,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import React, { useEffect, useState } from "react";
 import { romeAutocompleteGateway } from "src/app/config/dependencies";
 import { useDebounce } from "src/app/utils/useDebounce";
-import {
-  AppellationDto,
-  AppellationMatchDto,
-} from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
+import { AppellationDto, AppellationMatchDto } from "shared";
 import { Proposal } from "../pages/Establishment/components/Proposal";
 import { StringWithHighlights } from "../pages/Establishment/components/StringWithHighlights";
 

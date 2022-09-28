@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { AgencyDto, AgencyId } from "shared/src/agency/agency.dto";
+import { AgencyDto, AgencyId } from "shared";
 import {
   adminLogin,
   dashboardAgency,
@@ -9,11 +9,11 @@ import {
   exportRoute,
   generateMagicLinkRoute,
   featureFlagsRoute,
-} from "shared/src/routes";
+} from "shared";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 import { sendZipResponse } from "../../helpers/sendZipResponse";
-import { ExportDataDto } from "shared/src/exportable";
+import { ExportDataDto } from "shared";
 
 export const createAdminRouter = (deps: AppDependencies) => {
   const adminRouter = Router({ mergeParams: true });

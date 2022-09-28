@@ -1,4 +1,4 @@
-import { ConventionDto } from "shared/src/convention/convention.dto";
+import { ConventionDto } from "shared";
 import {
   ConventionFormKeysInUrl,
   ConventionInUrl,

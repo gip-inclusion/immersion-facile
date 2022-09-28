@@ -1,5 +1,5 @@
 import React from "react";
-import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
+import { AbsoluteUrl } from "shared";
 import { DsfrTitle } from "react-design-system";
 
 export const MetabaseView = ({

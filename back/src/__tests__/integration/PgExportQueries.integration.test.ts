@@ -13,8 +13,8 @@ import {
   rueJacquardDto,
 } from "../../_testBuilders/addressDtos";
 import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
-import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
-import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
+import { AgencyDtoBuilder } from "shared";
+import { ConventionDtoBuilder } from "shared";
 import { PgConventionRepository } from "../../adapters/secondary/pg/PgConventionRepository";
 import { PgOutboxRepository } from "../../adapters/secondary/pg/PgOutboxRepository";
 import { DomainEvent } from "../../domain/core/eventBus/events";

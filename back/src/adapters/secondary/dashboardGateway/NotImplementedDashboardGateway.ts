@@ -1,4 +1,4 @@
-import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
+import { AbsoluteUrl } from "shared";
 import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
 import { createLogger } from "../../../utils/logger";
 

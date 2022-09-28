@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { AppJwtPayload } from "shared/src/tokens/MagicLinkPayload";
+import { AppJwtPayload } from "shared";
 import { makeVerifyJwtHS256 } from "../../domain/auth/jwt";
 import { Clock } from "../../domain/core/ports/Clock";
 import { createLogger } from "../../utils/logger";

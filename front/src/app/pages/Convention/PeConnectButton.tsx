@@ -1,5 +1,5 @@
 import React from "react";
-import { loginPeConnect } from "shared/src/routes";
+import { loginPeConnect } from "shared";
 
 export const PeConnectButton = ({
   onClick,

@@ -1,9 +1,9 @@
-import { geoPositionSchema } from "shared/src/geoPosition/geoPosition.schema";
-import { romeCodeSchema } from "shared/src/rome";
-import { appellationDtoSchema } from "shared/src/romeAndAppellationDtos/romeAndAppellation.schema";
-import { siretSchema } from "shared/src/siret";
-import { phoneRegExp } from "shared/src/utils";
-import { zEmail, zString, zTrimmedString } from "shared/src/zodUtils";
+import { geoPositionSchema } from "shared";
+import { romeCodeSchema } from "shared";
+import { appellationDtoSchema } from "shared";
+import { siretSchema } from "shared";
+import { phoneRegExp } from "shared";
+import { zEmail, zString, zTrimmedString } from "shared";
 import { z } from "zod";
 import { SearchImmersionResultPublicV0 } from "./SearchImmersionResultPublicV0.dto";
 

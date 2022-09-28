@@ -1,5 +1,5 @@
 import { Pool, PoolClient } from "pg";
-import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
+import { ConventionDtoBuilder } from "shared";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { expectArraysToEqualIgnoringOrder } from "../../_testBuilders/test.helpers";
 import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";

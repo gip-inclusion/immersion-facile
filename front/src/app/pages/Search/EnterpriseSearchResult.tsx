@@ -5,10 +5,10 @@ import SentimentSatisfiedAltIcon from "@mui/icons-material/SentimentSatisfiedAlt
 import React, { ReactNode } from "react";
 import { DistanceIcon } from "src/icons/DistanceIcon";
 import { TrefleIcon } from "src/icons/TrefleIcon";
-import { ContactMethod } from "shared/src/formEstablishment/FormEstablishment.dto";
-import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
+import { ContactMethod } from "shared";
+import { SearchImmersionResultDto } from "shared";
 import { ButtonSearch } from "react-design-system/immersionFacile";
-import { addressDtoToString } from "shared/src/utils/address";
+import { addressDtoToString } from "shared";
 
 type EnterpriseSearchResultProps = {
   searchResult: SearchImmersionResultDto;

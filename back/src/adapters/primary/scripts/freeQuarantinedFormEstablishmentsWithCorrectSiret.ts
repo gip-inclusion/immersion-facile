@@ -1,5 +1,5 @@
 import { Pool } from "pg";
-import { random, sleep } from "shared/src/utils";
+import { random, sleep } from "shared";
 import { createLogger } from "../../../utils/logger";
 import { RealClock } from "../../secondary/core/ClockImplementations";
 import {

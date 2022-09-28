@@ -1,16 +1,13 @@
-import { AdminToken } from "shared/src/admin/admin.dto";
-import { ConventionDto } from "shared/src/convention/convention.dto";
-import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
-import {
-  conventionsRoute,
-  updateConventionStatusRoute,
-} from "shared/src/routes";
+import { AdminToken } from "shared";
+import { ConventionDto } from "shared";
+import { ConventionDtoBuilder } from "shared";
+import { conventionsRoute, updateConventionStatusRoute } from "shared";
 import {
   createConventionMagicLinkPayload,
   currentJwtVersions,
   Role,
   stringToMd5,
-} from "shared/src/tokens/MagicLinkPayload";
+} from "shared";
 import { SuperTest, Test } from "supertest";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import {
@@ -22,7 +19,7 @@ import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
 import { TEST_AGENCY_NAME } from "../../../secondary/InMemoryConventionQueries";
 import { GenerateMagicLinkJwt } from "../../../../domain/auth/jwt";
-import { expectToEqual } from "shared/src/expectToEqual";
+import { expectToEqual } from "shared";
 
 let request: SuperTest<Test>;
 let generateMagicLinkJwt: GenerateMagicLinkJwt;

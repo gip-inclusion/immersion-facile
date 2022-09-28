@@ -1,7 +1,7 @@
 import { Observable } from "rxjs";
-import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
-import { AdminToken } from "shared/src/admin/admin.dto";
-import { FeatureFlags, SetFeatureFlagParams } from "shared/src/featureFlags";
+import { AbsoluteUrl } from "shared";
+import { AdminToken } from "shared";
+import { FeatureFlags, SetFeatureFlagParams } from "shared";
 
 export interface TechnicalGateway {
   setFeatureFlag: (

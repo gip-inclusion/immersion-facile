@@ -1,7 +1,7 @@
-import { AddressDto, isAddressIdentical } from "shared/src/address/address.dto";
-import { AgencyDto } from "shared/src/agency/agency.dto";
-import { unknownAddress } from "shared/src/apiAdresse/apiAddress.dto";
-import { ConventionId } from "shared/src/convention/convention.dto";
+import { AddressDto, isAddressIdentical } from "shared";
+import { AgencyDto } from "shared";
+import { unknownAddress } from "shared";
+import { ConventionId } from "shared";
 import { z } from "zod";
 import { createLogger } from "../../../utils/logger";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";

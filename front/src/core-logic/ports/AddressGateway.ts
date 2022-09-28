@@ -3,7 +3,7 @@ import {
   DepartmentCode,
   LookupAddress,
   Postcode,
-} from "shared/src/address/address.dto";
+} from "shared";
 
 export interface AddressGateway {
   lookupStreetAddress(lookup: LookupAddress): Promise<AddressAndPosition[]>;

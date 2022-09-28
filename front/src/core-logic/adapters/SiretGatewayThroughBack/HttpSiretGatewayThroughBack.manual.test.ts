@@ -4,12 +4,12 @@ import {
   conflictErrorSiret,
   GetSiretInfoError,
   tooManySirenRequestsSiret,
-} from "shared/src/siret";
-import { expectToEqual } from "shared/src/expectToEqual";
+} from "shared";
+import { expectToEqual } from "shared";
 import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
 import { SimulatedSiretGatewayThroughBack } from "./SimulatedSiretGatewayThroughBack";
 import { HttpSiretGatewayThroughBack } from "./HttpSiretGatewayThroughBack";
-import { createManagedAxiosInstance } from "shared/src/httpClient/ports/axios.port";
+import { createManagedAxiosInstance } from "shared";
 
 const simulated = new SimulatedSiretGatewayThroughBack(0, {
   "12345678901234": {

@@ -3,7 +3,7 @@ import {
   agenciesRoute,
   agencyImmersionFacileIdRoute,
   agencyPublicInfoByIdRoute,
-} from "shared/src/routes";
+} from "shared";
 import type { AppDependencies } from "../config/createAppDependencies";
 import { sendHttpResponse } from "../helpers/sendHttpResponse";
 

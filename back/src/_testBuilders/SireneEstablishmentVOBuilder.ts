@@ -1,4 +1,4 @@
-import { Builder } from "shared/src/Builder";
+import { Builder } from "shared";
 import {
   SireneEstablishmentProps,
   SireneEstablishmentVO,

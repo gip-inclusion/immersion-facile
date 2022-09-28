@@ -1,5 +1,5 @@
 import React from "react";
-import { maxPermittedHoursPerWeek } from "shared/src/schedule/ScheduleUtils";
+import { maxPermittedHoursPerWeek } from "shared";
 import { formatHoursString } from "./TotaWeeklylHoursIndicator";
 
 export const HourIndicator = ({

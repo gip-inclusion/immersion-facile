@@ -1,7 +1,7 @@
 import React from "react";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { routes } from "src/app/routing/routes";
-import { FormEstablishmentSource } from "shared/src/formEstablishment/FormEstablishment.dto";
+import { FormEstablishmentSource } from "shared";
 import { Route } from "type-route";
 import { EstablishmentCreationForm } from "./components/EstablishmentCreationForm";
 

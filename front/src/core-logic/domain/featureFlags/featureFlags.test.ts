@@ -1,5 +1,5 @@
-import { expectToEqual } from "shared/src/expectToEqual";
-import { FeatureFlags } from "shared/src/featureFlags";
+import { expectToEqual } from "shared";
+import { FeatureFlags } from "shared";
 import { featureFlagsSelector } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import {
   featureFlagsSlice,

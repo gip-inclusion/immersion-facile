@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AdminToken } from "shared/src/admin/admin.dto";
+import { AdminToken } from "shared";
 
 export type AdminAuthState = {
   adminToken: AdminToken | null;

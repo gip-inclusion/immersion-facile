@@ -1,9 +1,6 @@
 import React from "react";
 import { conventionGateway } from "src/app/config/dependencies";
-import {
-  ConventionStatus,
-  ConventionReadDto,
-} from "shared/src/convention/convention.dto";
+import { ConventionStatus, ConventionReadDto } from "shared";
 import { Button } from "react-design-system/immersionFacile";
 
 export type VerificationActionButtonProps = {

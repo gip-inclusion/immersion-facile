@@ -41,7 +41,7 @@ export const agenciesIdAndNameSchema: z.ZodSchema<AgencyIdAndName[]> = z.array(
 
 const agencyKindSchema: z.ZodSchema<AgencyKind> = z.enum(agencyKindList);
 
-export const ListAgenciesByDepartmentCodeRequestSchema: z.ZodSchema<ListAgenciesByDepartmentCodeRequestDto> =
+export const listAgenciesByDepartmentCodeRequestSchema: z.ZodSchema<ListAgenciesByDepartmentCodeRequestDto> =
   z.object({
     departmentCode: z.string(),
     filter: z.enum(["peOnly", "peExcluded"]).optional(),

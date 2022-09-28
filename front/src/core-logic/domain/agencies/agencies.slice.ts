@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AgencyIdAndName } from "shared/src/agency/agency.dto";
+import { AgencyIdAndName } from "shared";
 
 export type AgencyState = AgencyIdAndName[];
 

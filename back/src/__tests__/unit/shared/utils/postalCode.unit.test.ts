@@ -1,4 +1,4 @@
-import { addressWithPostalCodeSchema } from "shared/src/utils/postalCode";
+import { addressWithPostalCodeSchema } from "shared";
 
 describe("postalCode", () => {
   describe("addressWithPostalCodeSchema", () => {

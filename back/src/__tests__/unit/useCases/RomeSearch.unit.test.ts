@@ -1,4 +1,4 @@
-import { RomeDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
+import { RomeDto } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryRomeRepository } from "../../../adapters/secondary/InMemoryRomeRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";

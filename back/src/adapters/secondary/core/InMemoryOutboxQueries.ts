@@ -1,4 +1,4 @@
-import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
+import { EstablishmentJwtPayload } from "shared";
 import {
   DomainEvent,
   eventsToDebugInfo,

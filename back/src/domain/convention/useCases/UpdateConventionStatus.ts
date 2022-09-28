@@ -5,9 +5,9 @@ import {
   UpdateConventionStatusRequestDto,
   validatedConventionStatuses,
   WithConventionId,
-} from "shared/src/convention/convention.dto";
-import { updateConventionStatusRequestSchema } from "shared/src/convention/convention.schema";
-import { ConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
+} from "shared";
+import { updateConventionStatusRequestSchema } from "shared";
+import { ConventionMagicLinkPayload } from "shared";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";

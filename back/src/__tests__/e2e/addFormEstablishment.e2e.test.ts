@@ -1,6 +1,6 @@
-import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
-import { FormEstablishmentDtoBuilder } from "shared/src/formEstablishment/FormEstablishmentDtoBuilder";
-import { formEstablishmentsRoute } from "shared/src/routes";
+import { FormEstablishmentDto } from "shared";
+import { FormEstablishmentDtoBuilder } from "shared";
+import { formEstablishmentsRoute } from "shared";
 import { buildTestApp, TestAppAndDeps } from "../../_testBuilders/buildTestApp";
 import { FormEstablishmentDtoPublicV0 } from "../../adapters/primary/routers/DtoAndSchemas/v0/input/FormEstablishmentPublicV0.dto";
 import { FormEstablishmentDtoPublicV1 } from "../../adapters/primary/routers/DtoAndSchemas/v1/input/FormEstablishmentPublicV1.dto";

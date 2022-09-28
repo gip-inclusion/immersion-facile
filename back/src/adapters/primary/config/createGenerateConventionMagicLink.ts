@@ -1,8 +1,5 @@
-import { ConventionId } from "shared/src/convention/convention.dto";
-import {
-  createConventionMagicLinkPayload,
-  Role,
-} from "shared/src/tokens/MagicLinkPayload";
+import { ConventionId } from "shared";
+import { createConventionMagicLinkPayload, Role } from "shared";
 import { makeGenerateJwtES256 } from "../../../domain/auth/jwt";
 import { AppConfig } from "./appConfig";
 

@@ -1,12 +1,12 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
 import { groupBy, keys, prop } from "ramda";
-import { ExportableName, GetExportableParams } from "shared/src/exportable";
-import { DailyScheduleDto } from "shared/src/schedule/Schedule.dto";
+import { ExportableName, GetExportableParams } from "shared";
+import { DailyScheduleDto } from "shared";
 import {
   calculateTotalImmersionHoursFromComplexSchedule,
   prettyPrintComplexSchedule,
-} from "shared/src/schedule/ScheduleUtils";
+} from "shared";
 import {
   ExportedRow,
   ExportQueries,

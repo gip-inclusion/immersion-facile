@@ -1,7 +1,7 @@
 import { CircularProgress } from "@mui/material";
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { FederatedIdentity } from "shared/src/federatedIdentities/federatedIdentity.dto";
+import { FederatedIdentity } from "shared";
 import { InitiateConventionCard } from "src/app/components/InitiateConventionCard";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { ConventionForm } from "src/app/pages/Convention/ConventionForm";

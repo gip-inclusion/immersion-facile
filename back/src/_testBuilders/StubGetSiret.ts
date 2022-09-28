@@ -2,7 +2,7 @@ import {
   GetSiretRequestDto,
   getSiretRequestSchema,
   GetSiretResponseDto,
-} from "shared/src/siret";
+} from "shared";
 import { UseCase } from "../domain/core/UseCase";
 
 const initialResponse: GetSiretResponseDto = {

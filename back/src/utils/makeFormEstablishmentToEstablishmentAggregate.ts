@@ -1,8 +1,8 @@
-import { AddressDto } from "shared/src/address/address.dto";
-import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
-import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
-import { NafDto } from "shared/src/naf";
-import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
+import { AddressDto } from "shared";
+import { FormEstablishmentDto } from "shared";
+import { GeoPositionDto } from "shared";
+import { NafDto } from "shared";
+import { AppellationDto } from "shared";
 import { Clock } from "../domain/core/ports/Clock";
 import { UuidGenerator } from "../domain/core/ports/UuidGenerator";
 import { ContactEntityV2 } from "../domain/immersionOffer/entities/ContactEntity";

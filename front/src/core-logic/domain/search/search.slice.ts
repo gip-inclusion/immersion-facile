@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { SearchImmersionQueryParamsDto } from "shared/src/searchImmersion/SearchImmersionQueryParams.dto";
-import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
-import { OmitFromExistingKeys } from "shared/src/utils";
+import { SearchImmersionQueryParamsDto } from "shared";
+import { SearchImmersionResultDto } from "shared";
+import { OmitFromExistingKeys } from "shared";
 
 export type SearchParams = OmitFromExistingKeys<
   SearchImmersionQueryParamsDto,

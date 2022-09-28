@@ -1,16 +1,9 @@
-import {
-  businessContactSchema,
-  formEstablishmentSourceSchema,
-} from "shared/src/formEstablishment/FormEstablishment.schema";
-import { nafSchema } from "shared/src/naf";
-import { appellationDtoSchema } from "shared/src/romeAndAppellationDtos/romeAndAppellation.schema";
-import { siretSchema } from "shared/src/siret";
-import { addressWithPostalCodeSchema } from "shared/src/utils/postalCode";
-import {
-  zBoolean,
-  zStringPossiblyEmpty,
-  zTrimmedString,
-} from "shared/src/zodUtils";
+import { businessContactSchema, formEstablishmentSourceSchema } from "shared";
+import { nafSchema } from "shared";
+import { appellationDtoSchema } from "shared";
+import { siretSchema } from "shared";
+import { addressWithPostalCodeSchema } from "shared";
+import { zBoolean, zStringPossiblyEmpty, zTrimmedString } from "shared";
 import { z } from "zod";
 import { FormEstablishmentDtoPublicV1 } from "./FormEstablishmentPublicV1.dto";
 

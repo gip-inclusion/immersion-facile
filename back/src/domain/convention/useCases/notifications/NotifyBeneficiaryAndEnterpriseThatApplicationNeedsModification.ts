@@ -1,8 +1,8 @@
-import { Beneficiary, Mentor } from "shared/src/convention/convention.dto";
-import { conventionSchema } from "shared/src/convention/convention.schema";
-import { frontRoutes } from "shared/src/routes";
-import { allRoles } from "shared/src/tokens/MagicLinkPayload";
-import { zTrimmedString } from "shared/src/zodUtils";
+import { Beneficiary, Mentor } from "shared";
+import { conventionSchema } from "shared";
+import { frontRoutes } from "shared";
+import { allRoles } from "shared";
+import { zTrimmedString } from "shared";
 import { z } from "zod";
 import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
 import {

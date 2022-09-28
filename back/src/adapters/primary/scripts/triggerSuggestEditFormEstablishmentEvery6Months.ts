@@ -1,7 +1,7 @@
 import axios from "axios";
 import { addMonths } from "date-fns";
 import { Pool } from "pg";
-import { SiretDto } from "shared/src/siret";
+import { SiretDto } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { SuggestEditFormEstablishment } from "../../../domain/immersionOffer/useCases/SuggestEditFormEstablishment";

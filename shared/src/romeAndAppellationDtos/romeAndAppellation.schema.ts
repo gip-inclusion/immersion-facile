@@ -1,7 +1,7 @@
 // Details: https://www.pole-emploi.fr/employeur/vos-recrutements/le-rome-et-les-fiches-metiers.html
 import { z } from "zod";
 import { zTrimmedString } from "../zodUtils";
-import { RomeDto, RomeSearchInput } from "./romeAndAppellation.dto";
+import type { RomeDto, RomeSearchInput } from "./romeAndAppellation.dto";
 import type {
   AppellationDto,
   AppellationMatchDto,
@@ -52,7 +52,7 @@ const matchRangeSchema: z.Schema<MatchRangeDto> = z.object({
     .int(),
 });
 
-export const AppellationMatchSchema: z.Schema<AppellationMatchDto> = z.object(
+export const appellationMatchSchema: z.Schema<AppellationMatchDto> = z.object(
   {
     appellation: appellationDtoSchema,
     matchRanges: z.array(matchRangeSchema),
@@ -61,6 +61,6 @@ export const AppellationMatchSchema: z.Schema<AppellationMatchDto> = z.object(
 );
 
 export const appellationSearchResponseSchema: z.Schema<AppellationMatchDto[]> =
-  z.array(AppellationMatchSchema, {
+  z.array(appellationMatchSchema, {
     required_error: "Veuillez saisir un métier",
   });

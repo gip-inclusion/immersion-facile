@@ -1,5 +1,5 @@
 import { Observable, of, Subject } from "rxjs";
-import { AdminToken } from "shared/src/admin/admin.dto";
+import { AdminToken } from "shared";
 import { AbsoluteUrl } from "src/../../shared/src/AbsoluteUrl";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 

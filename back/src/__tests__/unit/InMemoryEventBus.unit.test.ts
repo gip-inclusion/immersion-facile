@@ -1,4 +1,4 @@
-import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
+import { ConventionDtoBuilder } from "shared";
 import {
   expectObjectsToMatch,
   expectTypeToMatchAndEqual,

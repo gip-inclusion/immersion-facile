@@ -1,7 +1,7 @@
 import promClient from "prom-client";
-import { SearchImmersionQueryParamsDto } from "shared/src/searchImmersion/SearchImmersionQueryParams.dto";
-import { searchImmersionQueryParamsSchema } from "shared/src/searchImmersion/SearchImmersionQueryParams.schema";
-import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
+import { SearchImmersionQueryParamsDto } from "shared";
+import { searchImmersionQueryParamsSchema } from "shared";
+import { SearchImmersionResultDto } from "shared";
 import { createLogger } from "../../../utils/logger";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";

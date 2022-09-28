@@ -1,4 +1,4 @@
-import { MatchRangeDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
+import { MatchRangeDto } from "shared";
 
 export const normalize = (s: string): string =>
   s

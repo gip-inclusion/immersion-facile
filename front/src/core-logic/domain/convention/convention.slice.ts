@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ConventionReadDto } from "shared/src/convention/convention.dto";
+import { ConventionReadDto } from "shared";
 
 export interface ConventionState {
   isLoading: boolean;

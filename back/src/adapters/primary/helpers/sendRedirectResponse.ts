@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
+import { AbsoluteUrl } from "shared";
 import { createLogger } from "../../../utils/logger";
 import { handleHttpJsonResponseError } from "./handleHttpJsonResponseError";
 import { ManagedRedirectError, RawRedirectError } from "./redirectErrors";

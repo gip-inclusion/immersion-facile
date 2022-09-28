@@ -1,5 +1,5 @@
 import { Observable } from "rxjs";
-import { SiretDto, GetSiretInfo } from "shared/src/siret";
+import { SiretDto, GetSiretInfo } from "shared";
 
 export interface SiretGatewayThroughBack {
   isSiretAlreadyInSaved(siret: SiretDto): Observable<boolean>;

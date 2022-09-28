@@ -4,14 +4,11 @@ import {
   AddressDto,
   DepartmentCode,
   featureToAddressWithPosition,
-} from "shared/src/address/address.dto";
-import { featureToAddressDto } from "shared/src/apiAdresse/apiAddress.dto";
-import { toFeatureCollection } from "shared/src/apiAdresse/apiAddress.schema";
-import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
-import {
-  ManagedAxios,
-  TargetUrlsMapper,
-} from "shared/src/serenity-http-client";
+} from "shared";
+import { featureToAddressDto } from "shared";
+import { toFeatureCollection } from "shared";
+import { GeoPositionDto } from "shared";
+import { ManagedAxios, TargetUrlsMapper } from "shared";
 import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
 import { createLogger } from "../../../utils/logger";
 

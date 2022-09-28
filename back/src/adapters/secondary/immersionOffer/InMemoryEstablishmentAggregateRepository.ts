@@ -1,10 +1,10 @@
 import { groupBy } from "ramda";
-import { path, pathEq, pathNotEq } from "shared/src/ramdaExtensions/path";
-import { propEq } from "shared/src/ramdaExtensions/propEq";
-import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
-import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
-import { conflictErrorSiret, SiretDto } from "shared/src/siret";
-import { replaceArrayElement } from "shared/src/utils";
+import { path, pathEq, pathNotEq } from "shared";
+import { propEq } from "shared";
+import { AppellationDto } from "shared";
+import { SearchImmersionResultDto } from "shared";
+import { conflictErrorSiret, SiretDto } from "shared";
+import { replaceArrayElement } from "shared";
 import { ContactEntityV2 } from "../../../domain/immersionOffer/entities/ContactEntity";
 import {
   DataSource,

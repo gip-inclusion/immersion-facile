@@ -1,4 +1,4 @@
-import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
+import { GeoPositionDto } from "shared";
 import { LaBonneBoiteRequestEntity } from "../entities/LaBonneBoiteRequestEntity";
 import { LaBonneBoiteRequestParams } from "./LaBonneBoiteAPI";
 

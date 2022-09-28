@@ -1,4 +1,4 @@
-import { expectToEqual } from "shared/src/expectToEqual";
+import { expectToEqual } from "shared";
 import { AgencyIdAndName } from "src/../../shared/src/agency/agency.dto";
 import {
   createTestStore,

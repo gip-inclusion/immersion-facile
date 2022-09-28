@@ -1,6 +1,6 @@
 import { useField } from "formik";
-import { getConventionFieldName } from "shared/src/convention/convention";
-import { InternshipKind } from "shared/src/convention/convention.dto";
+import { getConventionFieldName } from "shared";
+import { InternshipKind } from "shared";
 import {
   immersionTexts,
   Texts,

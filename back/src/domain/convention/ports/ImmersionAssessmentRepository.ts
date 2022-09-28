@@ -1,4 +1,4 @@
-import { ConventionId } from "shared/src/convention/convention.dto";
+import { ConventionId } from "shared";
 import { ImmersionAssessmentEntity } from "../entities/ImmersionAssessmentEntity";
 
 export interface ImmersionAssessmentRepository {

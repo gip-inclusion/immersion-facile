@@ -1,6 +1,6 @@
-import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
-import { SiretAndRomeDto } from "shared/src/siretAndRome/SiretAndRome.dto";
-import { siretAndRomeSchema } from "shared/src/siretAndRome/SiretAndRome.schema";
+import { SearchImmersionResultDto } from "shared";
+import { SiretAndRomeDto } from "shared";
+import { siretAndRomeSchema } from "shared";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";

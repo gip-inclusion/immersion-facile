@@ -1,5 +1,5 @@
 import { Pool } from "pg";
-import { random, sleep } from "shared/src/utils";
+import { random, sleep } from "shared";
 import { UpdateEstablishmentsFromSireneApiScript } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentsFromSireneApiScript";
 import { createLogger } from "../../../utils/logger";
 import { PipelineStats } from "../../../utils/pipelineStats";

@@ -1,5 +1,5 @@
 import { Pool, PoolClient } from "pg";
-import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
+import { GeoPositionDto } from "shared";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { PgLaBonneBoiteRequestRepository } from "../../adapters/secondary/pg/PgLaBonneBoiteRequestRepository";
 import { LaBonneBoiteRequestEntity } from "../../domain/immersionOffer/entities/LaBonneBoiteRequestEntity";

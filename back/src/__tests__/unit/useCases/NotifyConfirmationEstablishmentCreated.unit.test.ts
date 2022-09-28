@@ -1,4 +1,4 @@
-import { FormEstablishmentDtoBuilder } from "shared/src/formEstablishment/FormEstablishmentDtoBuilder";
+import { FormEstablishmentDtoBuilder } from "shared";
 import { expectedEmailEstablishmentCreatedReviewMatchingEstablisment } from "../../../_testBuilders/emailAssertions";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { NotifyConfirmationEstablishmentCreated as NotifyConfirmationEstablishmentCreated } from "../../../domain/immersionOffer/useCases/notifications/NotifyConfirmationEstablishmentCreated";

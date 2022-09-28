@@ -1,4 +1,4 @@
-import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
+import { AgencyDtoBuilder } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";

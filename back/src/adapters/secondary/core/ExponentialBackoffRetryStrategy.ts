@@ -3,7 +3,7 @@ import {
   minutesToMilliseconds,
   secondsToMilliseconds,
 } from "date-fns";
-import { RandomFn, SleepFn } from "shared/src/utils";
+import { RandomFn, SleepFn } from "shared";
 import { Clock } from "../../../domain/core/ports/Clock";
 import {
   RetryableError,

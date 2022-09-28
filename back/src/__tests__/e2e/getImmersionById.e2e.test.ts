@@ -1,4 +1,4 @@
-import { getImmersionOfferByIdRoute__v0 } from "shared/src/routes";
+import { getImmersionOfferByIdRoute__v0 } from "shared";
 import { SuperTest, Test } from "supertest";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 import { buildTestApp } from "../../_testBuilders/buildTestApp";

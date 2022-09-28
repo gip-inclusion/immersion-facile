@@ -12,7 +12,7 @@ import {
   siretSchema,
   tooManiSirenRequestsSiretErrorMessage,
   tooManySirenRequestsSiret,
-} from "shared/src/siret";
+} from "shared";
 import { SiretGatewayThroughBack } from "../../ports/SiretGatewayThroughBack";
 
 export class SimulatedSiretGatewayThroughBack

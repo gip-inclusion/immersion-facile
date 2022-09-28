@@ -1,7 +1,4 @@
-import {
-  FederatedIdentity,
-  PeConnectIdentity,
-} from "shared/src/federatedIdentities/federatedIdentity.dto";
+import { FederatedIdentity, PeConnectIdentity } from "shared";
 import { ManagedRedirectError } from "../../../adapters/primary/helpers/redirectErrors";
 import {
   ConventionPoleEmploiUserAdvisorEntity,

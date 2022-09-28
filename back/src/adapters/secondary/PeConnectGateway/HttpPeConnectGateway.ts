@@ -1,7 +1,7 @@
-import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
-import { HttpResponse, ManagedAxios } from "shared/src/serenity-http-client";
-import { stringToMd5 } from "shared/src/tokens/MagicLinkPayload";
-import { queryParamsAsString } from "shared/src/utils/queryParams";
+import { AbsoluteUrl } from "shared";
+import { HttpResponse, ManagedAxios } from "shared";
+import { stringToMd5 } from "shared";
+import { queryParamsAsString } from "shared";
 import { AxiosResponse } from "axios";
 import {
   AccessTokenDto,

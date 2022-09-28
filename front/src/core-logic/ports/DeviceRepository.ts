@@ -1,4 +1,4 @@
-import { FederatedIdentity } from "shared/src/federatedIdentities/federatedIdentity.dto";
+import { FederatedIdentity } from "shared";
 import { ConventionInUrl } from "src/app/routing/route-params";
 
 type GenericPair<K extends string, Payload> = {

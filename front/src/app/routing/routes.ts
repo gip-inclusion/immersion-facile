@@ -1,4 +1,4 @@
-import { frontRoutes } from "shared/src/routes";
+import { frontRoutes } from "shared";
 import { createRouter, defineRoute, param } from "type-route";
 import { adminTabSerializer, conventionValuesFromUrl } from "./route-params";
 

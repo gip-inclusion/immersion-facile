@@ -1,15 +1,11 @@
 import { parseISO } from "date-fns";
-import { AgencyDto } from "shared/src/agency/agency.dto";
-import {
-  Beneficiary,
-  ConventionDto,
-  Mentor,
-} from "shared/src/convention/convention.dto";
-import { conventionSchema } from "shared/src/convention/convention.schema";
+import { AgencyDto } from "shared";
+import { Beneficiary, ConventionDto, Mentor } from "shared";
+import { conventionSchema } from "shared";
 import {
   calculateTotalImmersionHoursBetweenDate,
   prettyPrintSchedule,
-} from "shared/src/schedule/ScheduleUtils";
+} from "shared";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
 
 import {

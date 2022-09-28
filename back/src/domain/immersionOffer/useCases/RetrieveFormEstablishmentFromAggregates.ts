@@ -1,7 +1,7 @@
-import { addressDtoToString } from "shared/src/utils/address";
-import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
-import { SiretDto, siretSchema } from "shared/src/siret";
-import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
+import { addressDtoToString } from "shared";
+import { FormEstablishmentDto } from "shared";
+import { SiretDto, siretSchema } from "shared";
+import { EstablishmentJwtPayload } from "shared";
 import {
   BadRequestError,
   ForbiddenError,

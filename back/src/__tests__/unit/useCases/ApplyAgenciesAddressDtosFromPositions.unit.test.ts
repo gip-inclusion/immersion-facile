@@ -1,7 +1,7 @@
-import { AddressDto } from "shared/src/address/address.dto";
-import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
-import { unknownAddress } from "shared/src/apiAdresse/apiAddress.dto";
-import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
+import { AddressDto } from "shared";
+import { AgencyDtoBuilder } from "shared";
+import { unknownAddress } from "shared";
+import { GeoPositionDto } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";

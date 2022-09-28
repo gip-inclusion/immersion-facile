@@ -1,5 +1,5 @@
-import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
-import { ScheduleDto } from "shared/src/schedule/Schedule.dto";
+import { AppellationDto } from "shared";
+import { ScheduleDto } from "shared";
 import { param, ValueSerializer } from "type-route";
 
 export type AdminTab =

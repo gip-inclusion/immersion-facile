@@ -6,7 +6,7 @@ import {
   DsfrTitle,
   Notification,
 } from "react-design-system/immersionFacile";
-import { EmailSentDto, EmailVariables } from "shared/src/email/email";
+import { EmailSentDto, EmailVariables } from "shared";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { sentEmailsSlice } from "src/core-logic/domain/admin/sentEmails/sentEmails.slice";

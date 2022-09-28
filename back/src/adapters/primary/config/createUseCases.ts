@@ -1,6 +1,6 @@
 import { keys } from "ramda";
-import { SiretDto } from "shared/src/siret";
-import { sleep } from "shared/src/utils";
+import { SiretDto } from "shared";
+import { sleep } from "shared";
 import { DepartmentCodeFromPostcode } from "../../../domain/address/useCases/DepartmentCodeFromPostCode";
 import { LookupStreetAddress } from "../../../domain/address/useCases/LookupStreetAddress";
 import {

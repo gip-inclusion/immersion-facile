@@ -5,15 +5,15 @@ import {
   ConventionReadDto,
   LegalRepresentative,
   Mentor,
-} from "shared/src/convention/convention.dto";
-import { path } from "shared/src/ramdaExtensions/path";
-import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
+} from "shared";
+import { path } from "shared";
+import { AppellationDto } from "shared";
 import {
   calculateTotalImmersionHoursBetweenDate,
   calculateWeeklyHoursFromSchedule,
   prettyPrintSchedule,
-} from "shared/src/schedule/ScheduleUtils";
-import { keys } from "shared/src/utils";
+} from "shared";
+import { keys } from "shared";
 import { ConventionFormAccordionProps } from "./ConventionFormAccordion";
 import { TextCell } from "./TextCell";
 

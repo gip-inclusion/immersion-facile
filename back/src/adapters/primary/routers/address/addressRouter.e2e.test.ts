@@ -1,11 +1,8 @@
-import {
-  departmentCodeFromPostcodeUrl,
-  lookupStreetAddressUrl,
-} from "shared/src/address/address.query";
+import { departmentCodeFromPostcodeUrl, lookupStreetAddressUrl } from "shared";
 import {
   departmentCodeFromPostcodeRoute,
   lookupStreetAddressRoute,
-} from "shared/src/routes";
+} from "shared";
 import { SuperTest, Test } from "supertest";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { InMemoryAddressGateway } from "../../../secondary/addressGateway/InMemoryAddressGateway";

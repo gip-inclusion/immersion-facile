@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { ConventionReadDto } from "shared/src/convention/convention.dto";
+import { ConventionReadDto } from "shared";
 import {
   conventionsRoute,
   immersionAssessmentRoute,
   signConventionRoute,
   updateConventionStatusRoute,
-} from "shared/src/routes";
+} from "shared";
 import type { AppDependencies } from "../config/createAppDependencies";
 import { UnauthorizedError } from "../helpers/httpErrors";
 import { sendHttpResponse } from "../helpers/sendHttpResponse";

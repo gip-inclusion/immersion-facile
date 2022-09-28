@@ -5,7 +5,7 @@ import {
   ListConventionsRequestDto,
   validatedConventionStatuses,
   WithConventionId,
-} from "shared/src/convention/convention.dto";
+} from "shared";
 import { ConventionQueries } from "../../domain/convention/ports/ConventionQueries";
 import { ImmersionAssessmentEmailParams } from "../../domain/immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
 import { createLogger } from "../../utils/logger";

@@ -7,7 +7,7 @@ import {
   EstablishmentJwtPayload,
   PayloadKey,
   PayloadOption,
-} from "shared/src/tokens/MagicLinkPayload";
+} from "shared";
 import { makeVerifyJwtES256 } from "../../domain/auth/jwt";
 import { Clock } from "../../domain/core/ports/Clock";
 import { GetApiConsumerById } from "../../domain/core/ports/GetApiConsumerById";

@@ -1,4 +1,4 @@
-import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
+import { AbsoluteUrl } from "shared";
 import {
   AxiosErrorWithResponse,
   AxiosInfrastructureError,
@@ -15,7 +15,7 @@ import {
   toMappedErrorMaker,
   toUnhandledError,
   UnhandledError,
-} from "shared/src/serenity-http-client";
+} from "shared";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";

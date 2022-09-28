@@ -1,5 +1,5 @@
-import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
-import { formEstablishmentSchema } from "shared/src/formEstablishment/FormEstablishment.schema";
+import { FormEstablishmentDto } from "shared";
+import { formEstablishmentSchema } from "shared";
 import { createLogger } from "../../../utils/logger";
 import { makeFormEstablishmentToEstablishmentAggregate } from "../../../utils/makeFormEstablishmentToEstablishmentAggregate";
 import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";

@@ -1,8 +1,5 @@
-import {
-  ConventionDto,
-  ConventionStatus,
-} from "shared/src/convention/convention.dto";
-import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
+import { ConventionDto, ConventionStatus } from "shared";
+import { ImmersionAssessmentDto } from "shared";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { EntityFromDto } from "../../core/EntityFromDto";
 

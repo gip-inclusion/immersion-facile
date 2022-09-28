@@ -2,7 +2,7 @@ import {
   captureAddressGroups,
   CaptureAddressGroupsResult,
   inferDepartmentCode,
-} from "shared/src/utils/address";
+} from "shared";
 
 describe("address", () => {
   it("captureAddressGroups should match address postalCode and city groups", () => {

@@ -6,7 +6,7 @@ import {
   EmailType,
   EmailVariables,
   TemplatedEmail,
-} from "shared/src/email/email";
+} from "shared";
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";

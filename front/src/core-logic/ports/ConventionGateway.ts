@@ -1,14 +1,14 @@
 import { Observable } from "rxjs";
-import { AdminToken } from "shared/src/admin/admin.dto";
+import { AdminToken } from "shared";
 import {
   ConventionDto,
   ConventionId,
   ConventionReadDto,
   UpdateConventionStatusRequestDto,
   WithConventionId,
-} from "shared/src/convention/convention.dto";
-import { ShareLinkByEmailDto } from "shared/src/ShareLinkByEmailDto";
-import { Role } from "shared/src/tokens/MagicLinkPayload";
+} from "shared";
+import { ShareLinkByEmailDto } from "shared";
+import { Role } from "shared";
 
 export interface ConventionGateway {
   retrieveFromToken(payload: string): Observable<ConventionReadDto | undefined>;

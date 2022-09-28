@@ -12,14 +12,14 @@
     "moduleResolution": "Node",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "noImplicitOverride": true,
     "noEmit": true,
     "jsx": "react",
     "baseUrl": "./src",
     "paths": {
       "src/*": ["./*"],
-      "shared/*": ["./../../shared/*"]
+      "shared": ["../../shared/src/index.ts"],
     },
-    "noImplicitOverride": true
   },
   "include": ["./src"]
 }

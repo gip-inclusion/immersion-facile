@@ -1,4 +1,4 @@
-import { makezTrimmedString, zTrimmedString } from "shared/src/zodUtils";
+import { makezTrimmedString, zTrimmedString } from "shared";
 import { z } from "zod";
 import {
   conventionPoleEmploiAdvisors,

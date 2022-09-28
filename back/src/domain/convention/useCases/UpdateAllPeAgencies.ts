@@ -1,6 +1,6 @@
-import { AddressDto } from "shared/src/address/address.dto";
-import { activeAgencyStatuses, AgencyDto } from "shared/src/agency/agency.dto";
-import { WithGeoPosition } from "shared/src/geoPosition/geoPosition.dto";
+import { AddressDto } from "shared";
+import { activeAgencyStatuses, AgencyDto } from "shared";
+import { WithGeoPosition } from "shared";
 import { z } from "zod";
 import { AppLogger } from "../../core/ports/AppLogger";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";

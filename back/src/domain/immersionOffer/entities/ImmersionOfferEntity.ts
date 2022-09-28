@@ -1,4 +1,4 @@
-import { RomeCode } from "shared/src/rome";
+import { RomeCode } from "shared";
 
 export type ImmersionOfferEntityV2 = {
   romeCode: RomeCode;

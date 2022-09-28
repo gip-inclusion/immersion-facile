@@ -1,9 +1,9 @@
 /* eslint-disable  @typescript-eslint/require-await */
 import { values } from "ramda";
 import { Observable, of } from "rxjs";
-import { DepartmentCode } from "shared/src/address/address.dto";
-import { AdminToken } from "shared/src/admin/admin.dto";
-import { toAgencyPublicDisplayDto } from "shared/src/agency/agency";
+import { DepartmentCode } from "shared";
+import { AdminToken } from "shared";
+import { toAgencyPublicDisplayDto } from "shared";
 import {
   AgencyDto,
   AgencyId,
@@ -11,9 +11,9 @@ import {
   AgencyPublicDisplayDto,
   CreateAgencyDto,
   WithAgencyId,
-} from "shared/src/agency/agency.dto";
-import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
-import { propEq, propNotEq } from "shared/src/ramdaExtensions/propEq";
+} from "shared";
+import { AgencyDtoBuilder } from "shared";
+import { propEq, propNotEq } from "shared";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
 const MISSION_LOCAL_AGENCY_ACTIVE = new AgencyDtoBuilder()

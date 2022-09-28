@@ -1,6 +1,6 @@
 import { useFormikContext } from "formik";
 import React from "react";
-import type { ConventionDto } from "shared/src/convention/convention.dto";
+import type { ConventionDto } from "shared";
 import { BeneficiaryCommonFields } from "src/app/pages/Convention/ConventionFields/BeneficiaryCommonFields";
 import { EstablishmentCommonFields } from "src/app/pages/Convention/ConventionFields/EstablishmentCommonFields";
 import { ImmersionConditionsCommonFields } from "src/app/pages/Convention/ConventionFields/ImmersionConditionsCommonFields";

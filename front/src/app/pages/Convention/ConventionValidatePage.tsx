@@ -2,12 +2,9 @@ import React, { useState } from "react";
 import { conventionGateway } from "src/app/config/dependencies";
 import { routes } from "src/app/routing/routes";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
-import { ConventionStatus } from "shared/src/convention/convention.dto";
-import { statusTransitionConfigs } from "shared/src/convention/conventionStatusTransitions";
-import {
-  ConventionMagicLinkPayload,
-  Role,
-} from "shared/src/tokens/MagicLinkPayload";
+import { ConventionStatus } from "shared";
+import { statusTransitionConfigs } from "shared";
+import { ConventionMagicLinkPayload, Role } from "shared";
 import { ConventionFormAccordion } from "src/uiComponents/admin/ConventionFormAccordion";
 import { Route } from "type-route";
 import { ApiDataContainer } from "../admin/ApiDataContainer";

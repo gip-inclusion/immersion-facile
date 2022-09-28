@@ -1,5 +1,5 @@
 import { Observable } from "rxjs";
-import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
+import { ImmersionAssessmentDto } from "shared";
 
 export type AssessmentAndJwt = {
   assessment: ImmersionAssessmentDto;

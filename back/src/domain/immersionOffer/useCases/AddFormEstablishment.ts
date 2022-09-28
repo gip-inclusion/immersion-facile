@@ -1,6 +1,6 @@
-import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
-import { formEstablishmentSchema } from "shared/src/formEstablishment/FormEstablishment.schema";
-import { SiretDto } from "shared/src/siret";
+import { FormEstablishmentDto } from "shared";
+import { formEstablishmentSchema } from "shared";
+import { SiretDto } from "shared";
 import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";

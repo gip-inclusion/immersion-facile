@@ -1,4 +1,4 @@
-import { ContactEstablishmentRequestDto } from "shared/src/contactEstablishment";
+import { ContactEstablishmentRequestDto } from "shared";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import {
   expectContactByEmailRequest,

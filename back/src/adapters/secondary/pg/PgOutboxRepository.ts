@@ -1,8 +1,8 @@
 import { PoolClient } from "pg";
 import promClient from "prom-client";
 import { differenceWith } from "ramda";
-import { propEq } from "shared/src/ramdaExtensions/propEq";
-import { replaceArrayElement } from "shared/src/utils";
+import { propEq } from "shared";
+import { replaceArrayElement } from "shared";
 import {
   DomainEvent,
   DomainTopic,

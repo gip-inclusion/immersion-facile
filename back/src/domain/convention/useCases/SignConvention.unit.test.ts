@@ -4,14 +4,10 @@ import {
   ConventionStatus,
   Signatories,
   LegalRepresentative,
-} from "shared/src/convention/convention.dto";
-import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
-import { expectToEqual } from "shared/src/expectToEqual";
-import {
-  allRoles,
-  ConventionMagicLinkPayload,
-  Role,
-} from "shared/src/tokens/MagicLinkPayload";
+} from "shared";
+import { ConventionDtoBuilder } from "shared";
+import { expectToEqual } from "shared";
+import { allRoles, ConventionMagicLinkPayload, Role } from "shared";
 import {
   expectPromiseToFailWithError,
   splitCasesBetweenPassingAndFailing,

@@ -1,7 +1,7 @@
 import { AxiosInstance } from "axios";
 import { from, map, Observable } from "rxjs";
-import { DepartmentCode } from "shared/src/address/address.dto";
-import { AdminToken } from "shared/src/admin/admin.dto";
+import { DepartmentCode } from "shared";
+import { AdminToken } from "shared";
 import {
   AgencyDto,
   AgencyId,
@@ -12,18 +12,18 @@ import {
   ListAgenciesByDepartmentCodeRequestDto,
   UpdateAgencyRequestDto,
   WithAgencyId,
-} from "shared/src/agency/agency.dto";
+} from "shared";
 import {
   agenciesIdAndNameSchema,
   agenciesSchema,
   agencyIdResponseSchema,
   agencyPublicDisplaySchema,
-} from "shared/src/agency/agency.schema";
+} from "shared";
 import {
   agenciesRoute,
   agencyImmersionFacileIdRoute,
   agencyPublicInfoByIdRoute,
-} from "shared/src/routes";
+} from "shared";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
 export class HttpAgencyGateway implements AgencyGateway {

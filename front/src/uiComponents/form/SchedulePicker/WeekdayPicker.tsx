@@ -7,7 +7,7 @@ import {
   WeekdayNumber,
   WeekDayRangeSchemaDTO,
   DateIntervalDto,
-} from "shared/src/schedule/Schedule.dto";
+} from "shared";
 import { WeekdayDropdown } from "./WeekdayDropdown";
 
 type WeekdayPickerProps = {

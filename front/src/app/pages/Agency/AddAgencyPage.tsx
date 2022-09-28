@@ -3,13 +3,9 @@ import { keys } from "ramda";
 import * as React from "react";
 import { useState } from "react";
 import { Button, Title } from "react-design-system/immersionFacile";
-import {
-  AgencyKind,
-  agencyKindList,
-  CreateAgencyDto,
-} from "shared/src/agency/agency.dto";
-import { createAgencySchema } from "shared/src/agency/agency.schema";
-import { zEmail } from "shared/src/zodUtils";
+import { AgencyKind, agencyKindList, CreateAgencyDto } from "shared";
+import { createAgencySchema } from "shared";
+import { zEmail } from "shared";
 import {
   agencySubmitMessageByKind,
   SuccessFeedbackKindAgency,

@@ -1,9 +1,9 @@
 import { CircularProgress } from "@mui/material";
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
-import { DepartmentCode } from "shared/src/address/address.dto";
-import { AgencyId, AgencyIdAndName } from "shared/src/agency/agency.dto";
-import type { ConventionDto } from "shared/src/convention/convention.dto";
+import { DepartmentCode } from "shared";
+import { AgencyId, AgencyIdAndName } from "shared";
+import type { ConventionDto } from "shared";
 import { agencyGateway } from "src/app/config/dependencies";
 import { PostcodeAutocomplete } from "src/uiComponents/form/PostcodeAutocomplete";
 import { Agencies } from "./Agency";

@@ -1,12 +1,12 @@
-import { DepartmentCode } from "shared/src/address/address.dto";
+import { DepartmentCode } from "shared";
 import {
   activeAgencyStatuses,
   AgencyDto,
   AgencyKindFilter,
   AgencyIdAndName,
   ListAgenciesByDepartmentCodeRequestDto,
-} from "shared/src/agency/agency.dto";
-import { ListAgenciesByDepartmentCodeRequestSchema } from "shared/src/agency/agency.schema";
+} from "shared";
+import { listAgenciesByDepartmentCodeRequestSchema } from "shared";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
@@ -18,7 +18,7 @@ export class ListAgenciesByDepartmentCode extends TransactionalUseCase<
     super(uowPerformer);
   }
 
-  inputSchema = ListAgenciesByDepartmentCodeRequestSchema;
+  inputSchema = listAgenciesByDepartmentCodeRequestSchema;
 
   public async _execute(
     { departmentCode, filter }: ListAgenciesByDepartmentCodeRequestDto,

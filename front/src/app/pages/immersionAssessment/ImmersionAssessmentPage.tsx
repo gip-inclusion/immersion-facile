@@ -2,14 +2,14 @@ import { CircularProgress } from "@mui/material";
 import { Form, Formik } from "formik";
 import { identity } from "ramda";
 import React from "react";
-import { ConventionReadDto } from "shared/src/convention/convention.dto";
+import { ConventionReadDto } from "shared";
 import {
   AssessmentStatus,
   assessmentStatuses,
   ImmersionAssessmentDto,
-} from "shared/src/immersionAssessment/ImmersionAssessmentDto";
-import { immersionAssessmentSchema } from "shared/src/immersionAssessment/immersionAssessmentSchema";
-import { ConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
+} from "shared";
+import { immersionAssessmentSchema } from "shared";
+import { ConventionMagicLinkPayload } from "shared";
 import { RadioGroupForField } from "src/app/components/RadioGroup";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { routes } from "src/app/routing/routes";
@@ -30,7 +30,7 @@ import {
   Title,
   Notification,
 } from "react-design-system/immersionFacile";
-import { toDisplayedDate } from "shared/src/utils/date";
+import { toDisplayedDate } from "shared";
 
 type ImmersionAssessmentRoute = Route<typeof routes.immersionAssessment>;
 

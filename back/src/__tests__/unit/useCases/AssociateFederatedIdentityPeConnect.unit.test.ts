@@ -1,5 +1,5 @@
-import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
-import { PeConnectIdentity } from "shared/src/federatedIdentities/federatedIdentity.dto";
+import { ConventionDtoBuilder } from "shared";
+import { PeConnectIdentity } from "shared";
 import { expectObjectsToMatch } from "../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";

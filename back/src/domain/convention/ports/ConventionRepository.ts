@@ -3,7 +3,7 @@ import {
   ConventionDtoWithoutExternalId,
   ConventionExternalId,
   ConventionId,
-} from "shared/src/convention/convention.dto";
+} from "shared";
 
 export interface ConventionRepository {
   save: (

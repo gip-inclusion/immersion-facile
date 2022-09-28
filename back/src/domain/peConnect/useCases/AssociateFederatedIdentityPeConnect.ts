@@ -1,6 +1,6 @@
-import { ConventionDto } from "shared/src/convention/convention.dto";
-import { conventionSchema } from "shared/src/convention/convention.schema";
-import { toPeExternalId } from "shared/src/federatedIdentities/federatedIdentity.dto";
+import { ConventionDto } from "shared";
+import { conventionSchema } from "shared";
+import { toPeExternalId } from "shared";
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";

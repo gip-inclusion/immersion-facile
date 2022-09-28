@@ -1,7 +1,7 @@
 import { from, Observable, Subject } from "rxjs";
-import { AdminToken } from "shared/src/admin/admin.dto";
-import { AgencyIdAndName } from "shared/src/agency/agency.dto";
-import { signConventionDtoWithRole } from "shared/src/convention/convention";
+import { AdminToken } from "shared";
+import { AgencyIdAndName } from "shared";
+import { signConventionDtoWithRole } from "shared";
 import {
   ConventionDto,
   ConventionId,
@@ -9,14 +9,11 @@ import {
   SignatoryRole,
   UpdateConventionStatusRequestDto,
   WithConventionId,
-} from "shared/src/convention/convention.dto";
-import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
-import { ShareLinkByEmailDto } from "shared/src/ShareLinkByEmailDto";
-import {
-  ConventionMagicLinkPayload,
-  Role,
-} from "shared/src/tokens/MagicLinkPayload";
-import { sleep } from "shared/src/utils";
+} from "shared";
+import { ConventionDtoBuilder } from "shared";
+import { ShareLinkByEmailDto } from "shared";
+import { ConventionMagicLinkPayload, Role } from "shared";
+import { sleep } from "shared";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 

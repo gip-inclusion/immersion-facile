@@ -1,5 +1,5 @@
-import { AddressDto } from "shared/src/address/address.dto";
-import { AgencyDto } from "shared/src/agency/agency.dto";
+import { AddressDto } from "shared";
+import { AgencyDto } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { ConsoleAppLogger } from "../../../adapters/secondary/core/ConsoleAppLogger";

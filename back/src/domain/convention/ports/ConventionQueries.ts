@@ -2,7 +2,7 @@ import {
   ConventionId,
   ConventionReadDto,
   ListConventionsRequestDto,
-} from "shared/src/convention/convention.dto";
+} from "shared";
 import { ImmersionAssessmentEmailParams } from "../../immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
 
 export interface ConventionQueries {

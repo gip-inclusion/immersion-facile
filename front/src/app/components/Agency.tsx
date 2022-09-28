@@ -1,5 +1,5 @@
 import React from "react";
-import { AgencyIdAndName } from "shared/src/agency/agency.dto";
+import { AgencyIdAndName } from "shared";
 
 export type AgenciesProps = {
   agencies: AgencyIdAndName[];

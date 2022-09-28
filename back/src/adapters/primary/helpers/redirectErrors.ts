@@ -1,4 +1,4 @@
-import { ManagedErrorKinds } from "shared/src/errors/managedErrors";
+import { ManagedErrorKinds } from "shared";
 
 export abstract class RedirectError extends Error {
   constructor(message: string, cause?: Error) {

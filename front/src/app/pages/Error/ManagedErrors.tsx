@@ -1,5 +1,5 @@
 import React from "react";
-import { ManagedErrorKinds } from "shared/src/errors/managedErrors";
+import { ManagedErrorKinds } from "shared";
 import {
   HttpClientInvalidToken,
   HttpClientNotFoundError,

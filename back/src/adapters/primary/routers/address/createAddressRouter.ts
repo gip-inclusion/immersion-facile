@@ -3,12 +3,12 @@ import {
   departmentCodeFromPostcodeQuerySchema,
   lookupAddressQueryParam,
   postCodeQueryParam,
-} from "shared/src/address/address.query";
-import { lookupAddressSchema } from "shared/src/address/lookupAddress.schema";
+} from "shared";
+import { lookupAddressSchema } from "shared";
 import {
   departmentCodeFromPostcodeRoute,
   lookupStreetAddressRoute,
-} from "shared/src/routes";
+} from "shared";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 

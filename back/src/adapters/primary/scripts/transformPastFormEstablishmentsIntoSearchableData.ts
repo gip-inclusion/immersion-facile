@@ -1,7 +1,7 @@
 import { Pool } from "pg";
-import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
+import { FormEstablishmentDto } from "shared";
 
-import { random, sleep } from "shared/src/utils";
+import { random, sleep } from "shared";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { InsertEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
 import { createLogger } from "../../../utils/logger";

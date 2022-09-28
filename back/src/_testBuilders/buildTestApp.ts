@@ -1,5 +1,5 @@
-import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
-import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
+import { AgencyDtoBuilder } from "shared";
+import { ConventionDtoBuilder } from "shared";
 import supertest from "supertest";
 import { AppConfig } from "../adapters/primary/config/appConfig";
 import { Gateways } from "../adapters/primary/config/createGateways";

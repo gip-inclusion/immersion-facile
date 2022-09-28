@@ -1,6 +1,6 @@
 import { useField } from "formik";
 import React from "react";
-import { ConventionStatus } from "shared/src/convention/convention.dto";
+import { ConventionStatus } from "shared";
 
 type SubmitButtonProps = {
   isSubmitting: boolean;

@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import { MatchRangeDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
+import { MatchRangeDto } from "shared";
 import { Proposal } from "./Proposal";
 
 type SliceOfString = {

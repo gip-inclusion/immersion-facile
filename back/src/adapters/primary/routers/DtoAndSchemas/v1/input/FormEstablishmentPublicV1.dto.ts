@@ -1,6 +1,6 @@
-import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
-import { Flavor } from "shared/src/typeFlavors";
-import { OmitFromExistingKeys } from "shared/src/utils";
+import { FormEstablishmentDto } from "shared";
+import { Flavor } from "shared";
+import { OmitFromExistingKeys } from "shared";
 
 // prettier-ignore
 export type ImmersionContactInEstablishmentId = Flavor<string, "ImmersionContactInEstablishmentId">;

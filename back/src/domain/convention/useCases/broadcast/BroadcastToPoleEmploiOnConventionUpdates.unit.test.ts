@@ -1,6 +1,6 @@
-import { ConventionId } from "shared/src/convention/convention.dto";
-import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
-import { reasonableSchedule } from "shared/src/schedule/ScheduleUtils";
+import { ConventionId } from "shared";
+import { ConventionDtoBuilder } from "shared";
+import { reasonableSchedule } from "shared";
 import { expectObjectsToMatch } from "../../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import { InMemoryFeatureFlagRepository } from "../../../../adapters/secondary/InMemoryFeatureFlagRepository";

@@ -1,7 +1,4 @@
-import {
-  ShareLinkByEmailDto,
-  shareLinkByEmailSchema,
-} from "shared/src/ShareLinkByEmailDto";
+import { ShareLinkByEmailDto, shareLinkByEmailSchema } from "shared";
 import { UseCase } from "../../core/UseCase";
 import { EmailGateway } from "../ports/EmailGateway";
 

@@ -1,7 +1,7 @@
 import { useField } from "formik";
 import React from "react";
-import { ConventionDto } from "shared/src/convention/convention.dto";
-import { DateIntervalDto, ScheduleDto } from "shared/src/schedule/Schedule.dto";
+import { ConventionDto } from "shared";
+import { DateIntervalDto, ScheduleDto } from "shared";
 import { DayPicker } from "./DayPicker";
 import { HourPicker } from "./HourPicker";
 

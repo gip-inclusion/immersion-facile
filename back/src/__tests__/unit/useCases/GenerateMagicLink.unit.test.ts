@@ -2,7 +2,7 @@ import {
   ConventionMagicLinkPayload,
   createConventionMagicLinkPayload,
   Role,
-} from "shared/src/tokens/MagicLinkPayload";
+} from "shared";
 import { GenerateMagicLinkJwt } from "../../../domain/auth/jwt";
 import { GenerateMagicLink } from "../../../domain/convention/useCases/GenerateMagicLink";
 

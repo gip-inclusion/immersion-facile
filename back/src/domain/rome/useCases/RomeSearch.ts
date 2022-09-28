@@ -1,5 +1,5 @@
-import { RomeDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
-import { zTrimmedString } from "shared/src/zodUtils";
+import { RomeDto } from "shared";
+import { zTrimmedString } from "shared";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 

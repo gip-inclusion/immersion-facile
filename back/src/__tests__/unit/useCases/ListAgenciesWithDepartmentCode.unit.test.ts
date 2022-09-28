@@ -1,5 +1,5 @@
-import { AddressDto } from "shared/src/address/address.dto";
-import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
+import { AddressDto } from "shared";
+import { AgencyDtoBuilder } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";

@@ -1,5 +1,5 @@
-import { ConventionId } from "shared/src/convention/convention.dto";
-import { PeExternalId } from "shared/src/federatedIdentities/federatedIdentity.dto";
+import { ConventionId } from "shared";
+import { PeExternalId } from "shared";
 import {
   ConventionPoleEmploiUserAdvisorEntity,
   PoleEmploiUserAdvisorDto,

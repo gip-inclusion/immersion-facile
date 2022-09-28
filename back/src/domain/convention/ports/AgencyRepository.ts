@@ -3,7 +3,7 @@ import {
   AgencyId,
   GetAgenciesFilter,
   PartialAgencyDto,
-} from "shared/src/agency/agency.dto";
+} from "shared";
 
 export interface AgencyRepository {
   insert: (config: AgencyDto) => Promise<AgencyId | undefined>;

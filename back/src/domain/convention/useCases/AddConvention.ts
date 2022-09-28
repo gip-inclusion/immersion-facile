@@ -2,8 +2,8 @@ import {
   ConventionDtoWithoutExternalId,
   ConventionStatus,
   WithConventionId,
-} from "shared/src/convention/convention.dto";
-import { conventionWithoutExternalIdSchema } from "shared/src/convention/convention.schema";
+} from "shared";
+import { conventionWithoutExternalIdSchema } from "shared";
 import {
   ConflictError,
   ForbiddenError,

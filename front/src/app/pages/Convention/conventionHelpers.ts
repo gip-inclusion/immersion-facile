@@ -6,12 +6,12 @@ import {
   ImmersionObjective,
   InternshipKind,
   Signatories,
-} from "shared/src/convention/convention.dto";
-import { FederatedIdentity } from "shared/src/federatedIdentities/federatedIdentity.dto";
-import { reasonableSchedule } from "shared/src/schedule/ScheduleUtils";
-import { OmitFromExistingKeys } from "shared/src/utils";
-import { toDateString } from "shared/src/utils/date";
-import { mergeObjectsExceptFalsyValues } from "shared/src/utils/mergeObjectsExpectFalsyValues";
+} from "shared";
+import { FederatedIdentity } from "shared";
+import { reasonableSchedule } from "shared";
+import { OmitFromExistingKeys } from "shared";
+import { toDateString } from "shared";
+import { mergeObjectsExceptFalsyValues } from "shared";
 import {
   conventionGateway,
   deviceRepository,

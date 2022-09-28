@@ -1,4 +1,4 @@
-import { CreateAgencyDto } from "shared/src/agency/agency.dto";
+import { CreateAgencyDto } from "shared";
 import {
   expectObjectsToMatch,
   expectTypeToMatchAndEqual,

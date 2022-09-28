@@ -1,8 +1,5 @@
-import {
-  AddressAndPosition,
-  DepartmentCode,
-} from "shared/src/address/address.dto";
-import { sleep } from "shared/src/utils";
+import { AddressAndPosition, DepartmentCode } from "shared";
+import { sleep } from "shared";
 import { AddressGateway } from "src/core-logic/ports/AddressGateway";
 
 export class InMemoryAddressGateway implements AddressGateway {

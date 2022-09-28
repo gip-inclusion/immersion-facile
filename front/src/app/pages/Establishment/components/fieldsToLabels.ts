@@ -1,4 +1,4 @@
-import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
+import { FormEstablishmentDto } from "shared";
 
 export type FieldsWithLabel = Exclude<
   keyof FormEstablishmentDto,

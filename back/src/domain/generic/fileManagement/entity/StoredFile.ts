@@ -1,4 +1,4 @@
-import { Flavor } from "shared/src/typeFlavors";
+import { Flavor } from "shared";
 
 type StoredFileId = Flavor<string, "StoredFileId">;
 

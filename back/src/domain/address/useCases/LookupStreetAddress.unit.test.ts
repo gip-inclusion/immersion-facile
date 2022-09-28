@@ -1,7 +1,4 @@
-import {
-  AddressAndPosition,
-  LookupAddress,
-} from "shared/src/address/address.dto";
+import { AddressAndPosition, LookupAddress } from "shared";
 import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { LookupStreetAddress } from "./LookupStreetAddress";
 

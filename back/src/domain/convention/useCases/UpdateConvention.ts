@@ -2,8 +2,8 @@ import {
   ConventionStatus,
   UpdateConventionRequestDto,
   WithConventionId,
-} from "shared/src/convention/convention.dto";
-import { updateConventionRequestSchema } from "shared/src/convention/convention.schema";
+} from "shared";
+import { updateConventionRequestSchema } from "shared";
 import {
   BadRequestError,
   ForbiddenError,

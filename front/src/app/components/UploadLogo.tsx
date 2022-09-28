@@ -1,6 +1,6 @@
 import { File } from "react-design-system/immersionFacile";
 import * as React from "react";
-import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
+import { AbsoluteUrl } from "shared";
 import { technicalGateway } from "src/app/config/dependencies";
 
 interface UploadFileProps {

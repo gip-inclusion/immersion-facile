@@ -1,6 +1,6 @@
 import { useField } from "formik";
 import React, { useState, useEffect } from "react";
-import { getConventionFieldName } from "shared/src/convention/convention";
+import { getConventionFieldName } from "shared";
 import { RadioGroup } from "src/app/components/RadioGroup";
 import { LegalRepresentativeFields } from "src/app/pages/Convention/ConventionFields/LegalRepresentativeFields";
 import { useConventionTextsFromFormikContext } from "src/app/pages/Convention/texts/textSetup";

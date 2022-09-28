@@ -1,8 +1,5 @@
-import {
-  AgencyDto,
-  PrivateListAgenciesRequestDto,
-} from "shared/src/agency/agency.dto";
-import { privateListAgenciesRequestSchema } from "shared/src/agency/agency.schema";
+import { AgencyDto, PrivateListAgenciesRequestDto } from "shared";
+import { privateListAgenciesRequestSchema } from "shared";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 

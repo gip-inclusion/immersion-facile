@@ -1,4 +1,4 @@
-import { Flavor } from "shared/src/typeFlavors";
+import { Flavor } from "shared";
 import { ApiConsumerName } from "../../core/valueObjects/ApiConsumer";
 
 export type SearchMadeId = Flavor<string, "SearchMadeId">;

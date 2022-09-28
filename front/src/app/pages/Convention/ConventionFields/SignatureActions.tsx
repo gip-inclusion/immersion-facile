@@ -1,9 +1,6 @@
 import React from "react";
-import {
-  ConventionField,
-  getConventionFieldName,
-} from "shared/src/convention/convention";
-import { Signatory, SignatoryRole } from "shared/src/convention/convention.dto";
+import { ConventionField, getConventionFieldName } from "shared";
+import { Signatory, SignatoryRole } from "shared";
 import {
   RequestModificationButton,
   SignButton,

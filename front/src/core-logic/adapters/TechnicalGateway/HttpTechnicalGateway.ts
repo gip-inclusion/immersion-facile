@@ -1,14 +1,16 @@
 import { AxiosInstance, AxiosResponse } from "axios";
-import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
-import { AdminToken } from "shared/src/admin/admin.dto";
-import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 import {
+  AbsoluteUrl,
+  AdminToken,
   FeatureFlags,
   featureFlagsSchema,
   SetFeatureFlagParams,
-} from "shared/src/featureFlags";
-import { featureFlagsRoute, uploadFileRoute } from "shared/src/routes";
+  featureFlagsRoute,
+  uploadFileRoute,
+} from "shared";
+import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 import { from, map, Observable } from "rxjs";
+
 export class HttpTechnicalGateway implements TechnicalGateway {
   constructor(private readonly httpClient: AxiosInstance) {}
 

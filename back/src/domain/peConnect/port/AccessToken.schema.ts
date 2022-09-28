@@ -1,4 +1,4 @@
-import { makezTrimmedString } from "shared/src/zodUtils";
+import { makezTrimmedString } from "shared";
 import { z } from "zod";
 import { ExternalAccessToken } from "../dto/AccessToken.dto";
 

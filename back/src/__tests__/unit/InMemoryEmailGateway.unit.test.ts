@@ -1,4 +1,4 @@
-import { TemplatedEmail } from "shared/src/email/email";
+import { TemplatedEmail } from "shared";
 import { expectArraysToMatch } from "../../_testBuilders/test.helpers";
 import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";
 import { InMemoryEmailGateway } from "../../adapters/secondary/emailGateway/InMemoryEmailGateway";

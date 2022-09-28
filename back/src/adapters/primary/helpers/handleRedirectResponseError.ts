@@ -1,6 +1,6 @@
 import { Response } from "express";
-import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
-import { queryParamsAsString } from "shared/src/utils/queryParams";
+import { AbsoluteUrl } from "shared";
+import { queryParamsAsString } from "shared";
 import { ManagedRedirectError, RawRedirectError } from "./redirectErrors";
 
 export type RedirectError = ManagedRedirectError | RawRedirectError;

@@ -1,4 +1,4 @@
-import { ConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
+import { ConventionMagicLinkPayload } from "shared";
 import { z } from "zod";
 import {
   BadRequestError,

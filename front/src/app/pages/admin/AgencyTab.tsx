@@ -5,8 +5,8 @@ import {
   DsfrTitle,
   Notification,
 } from "react-design-system/immersionFacile";
-import { AgencyDto } from "shared/src/agency/agency.dto";
-import { propEq } from "shared/src/ramdaExtensions/propEq";
+import { AgencyDto } from "shared";
+import { propEq } from "shared";
 import { agencyGateway } from "src/app/config/dependencies";
 import { useAdminToken } from "src/hooks/useAdminToken";
 import { AgencyDetails } from "src/uiComponents/admin/AgencyDetails";

@@ -1,5 +1,5 @@
-import { siretSchema } from "shared/src/siret";
-import { zTrimmedString } from "shared/src/zodUtils";
+import { siretSchema } from "shared";
+import { zTrimmedString } from "shared";
 
 describe("siretSchema", () => {
   it("accepts exactly 14 digits", () => {

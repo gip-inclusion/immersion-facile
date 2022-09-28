@@ -5,8 +5,8 @@ import {
   BusinessContactDto,
   ContactMethod,
   FormEstablishmentDto,
-} from "shared/src/formEstablishment/FormEstablishment.dto";
-import { zEmail } from "shared/src/zodUtils";
+} from "shared";
+import { zEmail } from "shared";
 import { FillableList } from "src/uiComponents/form/FillableList";
 import { TextInput } from "src/uiComponents/form/TextInput";
 

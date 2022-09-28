@@ -1,6 +1,6 @@
-import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
-import { expectObjectsToMatch } from "shared/src/expectToEqual";
-import { ConventionReadDto } from "shared/src/convention/convention.dto";
+import { ConventionDtoBuilder } from "shared";
+import { expectObjectsToMatch } from "shared";
+import { ConventionReadDto } from "shared";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {
   createTestStore,

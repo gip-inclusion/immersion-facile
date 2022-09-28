@@ -1,4 +1,4 @@
-import { ContactEstablishmentRequestDto } from "shared/src/contactEstablishment";
+import { ContactEstablishmentRequestDto } from "shared";
 import { SuperTest, Test } from "supertest";
 import {
   buildTestApp,

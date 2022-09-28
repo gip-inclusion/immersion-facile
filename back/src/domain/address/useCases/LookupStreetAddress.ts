@@ -1,9 +1,6 @@
-import {
-  AddressAndPosition,
-  LookupAddress,
-} from "shared/src/address/address.dto";
-import { lookupAddressSchema } from "shared/src/address/lookupAddress.schema";
-import { ConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
+import { AddressAndPosition, LookupAddress } from "shared";
+import { lookupAddressSchema } from "shared";
+import { ConventionMagicLinkPayload } from "shared";
 import { ZodType, ZodTypeDef } from "zod";
 import { UseCase } from "../../core/UseCase";
 import { AddressGateway } from "../../immersionOffer/ports/AddressGateway";

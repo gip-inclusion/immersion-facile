@@ -1,4 +1,4 @@
-import { AddressDto } from "shared/src/address/address.dto";
+import { AddressDto } from "shared";
 
 export const rueJacquardDto: AddressDto = {
   streetNumberAndAddress: "2 RUE JACQUARD",

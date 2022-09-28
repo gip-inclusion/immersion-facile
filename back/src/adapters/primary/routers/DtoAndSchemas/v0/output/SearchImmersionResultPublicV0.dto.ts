@@ -1,13 +1,10 @@
-import { addressDtoToString } from "shared/src/utils/address";
-import { ImmersionContactInEstablishmentId } from "shared/src/formEstablishment/FormEstablishment.dto";
-import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
-import { RomeCode } from "shared/src/rome";
-import {
-  SearchContactDto,
-  SearchImmersionResultDto,
-} from "shared/src/searchImmersion/SearchImmersionResult.dto";
+import { addressDtoToString } from "shared";
+import { ImmersionContactInEstablishmentId } from "shared";
+import { GeoPositionDto } from "shared";
+import { RomeCode } from "shared";
+import { SearchContactDto, SearchImmersionResultDto } from "shared";
 
-import { SiretDto } from "shared/src/siret";
+import { SiretDto } from "shared";
 
 export type ContactDetailsPublicV0 = {
   id: ImmersionContactInEstablishmentId;

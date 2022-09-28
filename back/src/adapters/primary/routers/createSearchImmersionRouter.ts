@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { immersionOffersRoute } from "shared/src/routes";
+import { immersionOffersRoute } from "shared";
 import type { AppDependencies } from "../config/createAppDependencies";
 import { sendHttpResponse } from "../helpers/sendHttpResponse";
 

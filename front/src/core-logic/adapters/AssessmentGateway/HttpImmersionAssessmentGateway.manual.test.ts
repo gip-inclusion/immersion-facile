@@ -1,6 +1,6 @@
 import { firstValueFrom } from "rxjs";
-import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
-import { createManagedAxiosInstance } from "shared/src/httpClient/ports/axios.port";
+import { ImmersionAssessmentDto } from "shared";
+import { createManagedAxiosInstance } from "shared";
 import { ImmersionAssessmentGateway } from "src/core-logic/ports/ImmersionAssessmentGateway";
 import { HttpImmersionAssessmentGateway } from "./HttpImmersionAssessmentGateway";
 import {

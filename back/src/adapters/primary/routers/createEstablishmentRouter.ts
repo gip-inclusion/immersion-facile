@@ -4,7 +4,7 @@ import {
   formAlreadyExistsRoute,
   formEstablishmentsRoute,
   requestEmailToUpdateFormRoute,
-} from "shared/src/routes";
+} from "shared";
 import type { AppDependencies } from "../config/createAppDependencies";
 import { sendHttpResponse } from "../helpers/sendHttpResponse";
 

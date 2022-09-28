@@ -1,4 +1,4 @@
-import { ImmersionContactInEstablishmentId } from "shared/src/formEstablishment/FormEstablishment.dto";
+import { ImmersionContactInEstablishmentId } from "shared";
 
 export type ContactMethod = "EMAIL" | "PHONE" | "IN_PERSON";
 

@@ -1,8 +1,8 @@
-import { AddressDto } from "shared/src/address/address.dto";
-import { Builder } from "shared/src/Builder";
-import { FormEstablishmentSource } from "shared/src/formEstablishment/FormEstablishment.dto";
-import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
-import { NafDto } from "shared/src/naf";
+import { AddressDto } from "shared";
+import { Builder } from "shared";
+import { FormEstablishmentSource } from "shared";
+import { GeoPositionDto } from "shared";
+import { NafDto } from "shared";
 import {
   DataSource,
   EstablishmentEntityV2,

@@ -1,8 +1,5 @@
 import { PoolClient } from "pg";
-import {
-  AppellationDto,
-  RomeDto,
-} from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
+import { AppellationDto, RomeDto } from "shared";
 import { RomeRepository } from "../../../domain/rome/ports/RomeRepository";
 import { createLogger } from "../../../utils/logger";
 

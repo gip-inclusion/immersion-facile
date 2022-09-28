@@ -1,5 +1,5 @@
 import { Observable, of, throwError } from "rxjs";
-import { AdminToken, UserAndPassword } from "shared/src/admin/admin.dto";
+import { AdminToken, UserAndPassword } from "shared";
 import { AbsoluteUrl } from "src/../../shared/src/AbsoluteUrl";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 

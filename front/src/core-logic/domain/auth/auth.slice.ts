@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { FederatedIdentity } from "shared/src/federatedIdentities/federatedIdentity.dto";
+import { FederatedIdentity } from "shared";
 
 interface AuthState {
   connectedWith: FederatedIdentity | null;

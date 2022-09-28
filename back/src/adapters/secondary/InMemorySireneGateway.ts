@@ -3,7 +3,7 @@ import {
   apiSirenUnexpectedError,
   SiretDto,
   tooManySirenRequestsSiret,
-} from "shared/src/siret";
+} from "shared";
 import {
   SireneGateway,
   SireneGatewayAnswer,

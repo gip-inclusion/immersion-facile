@@ -3,8 +3,7 @@ import { Pool } from "pg";
 import {
   ManagedAxios,
   onFullfilledDefaultResponseInterceptorMaker,
-} from "shared/src/serenity-http-client";
-
+} from "shared";
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
 import { Clock } from "../../../domain/core/ports/Clock";
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
@@ -181,7 +180,7 @@ const createEmailGateway = (config: AppConfig, clock: Clock): EmailGateway => {
     );
 
   const _notReached: never = config.emailGateway;
-  throw new Error("Unknown email gateway kind");
+  throw new Error(`Unknown email gateway kind : ${config.emailGateway}`);
 };
 
 const createPoleEmploiConnectGateway = (config: AppConfig) =>

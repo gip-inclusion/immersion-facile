@@ -1,5 +1,5 @@
-import { AdminToken } from "shared/src/admin/admin.dto";
-import { ExportDataDto } from "shared/src/exportable";
+import { AdminToken } from "shared";
+import { ExportDataDto } from "shared";
 
 export interface ExcelExportGateway {
   exportData: (adminToken: AdminToken, exportDataDto: ExportDataDto) => void;

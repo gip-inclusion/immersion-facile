@@ -1,13 +1,12 @@
 import * as dotenv from "dotenv";
 import { trim } from "ramda";
-import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
+import { AbsoluteUrl, ProcessEnv } from "shared";
 import {
   makeGetBooleanVariable,
   makeThrowIfNotAbsoluteUrl,
   makeThrowIfNotDefined,
-  ProcessEnv,
   throwIfNotInArray,
-} from "shared/src/envHelpers";
+} from "shared";
 import { DomainTopic } from "../../../domain/core/eventBus/events";
 import type { MinioParams } from "../../secondary/MinioDocumentGateway";
 import { S3Params } from "../../secondary/S3DocumentGateway";
@@ -27,6 +26,7 @@ export type AxiosConfig = {
 };
 
 // See "Working with AppConfig" in back/README.md for more details.
+
 export class AppConfig {
   private readonly throwIfNotDefined;
   private readonly throwIfNotAbsoluteUrl;
@@ -143,14 +143,14 @@ export class AppConfig {
   }
 
   // == Email gateway ==
-
   public get emailGateway() {
-    return throwIfNotInArray({
+    const emailGateway = throwIfNotInArray({
       processEnv: this.env,
       variableName: "EMAIL_GATEWAY",
       authorizedValues: ["IN_MEMORY", "HYBRID", "SENDINBLUE"],
       defaultValue: "IN_MEMORY",
     });
+    return emailGateway;
   }
 
   // == Email gateway provider api keys ==

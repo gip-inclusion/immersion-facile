@@ -1,4 +1,4 @@
-import { Builder } from "shared/src/Builder";
+import { Builder } from "shared";
 import { UuidV4Generator } from "../adapters/secondary/core/UuidGeneratorImplementations";
 import { ContactEntityV2 } from "../domain/immersionOffer/entities/ContactEntity";
 import {

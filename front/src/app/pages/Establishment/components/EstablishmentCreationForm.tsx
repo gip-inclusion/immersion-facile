@@ -1,11 +1,8 @@
 import { useField } from "formik";
 import React, { useState } from "react";
-import {
-  FormEstablishmentDto,
-  FormEstablishmentSource,
-} from "shared/src/formEstablishment/FormEstablishment.dto";
-import { SiretDto } from "shared/src/siret";
-import { OmitFromExistingKeys } from "shared/src/utils";
+import { FormEstablishmentDto, FormEstablishmentSource } from "shared";
+import { SiretDto } from "shared";
+import { OmitFromExistingKeys } from "shared";
 import { establishmentGateway } from "src/app/config/dependencies";
 import {
   useInitialSiret,

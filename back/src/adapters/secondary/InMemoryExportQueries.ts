@@ -1,4 +1,4 @@
-import { GetExportableParams } from "shared/src/exportable";
+import { GetExportableParams } from "shared";
 import {
   ExportedRow,
   ExportQueries,

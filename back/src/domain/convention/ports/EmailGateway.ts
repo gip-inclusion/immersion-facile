@@ -1,4 +1,4 @@
-import { EmailSentDto, TemplatedEmail } from "shared/src/email/email";
+import { EmailSentDto, TemplatedEmail } from "shared";
 
 export interface EmailGateway {
   getLastSentEmailDtos: () => EmailSentDto[];

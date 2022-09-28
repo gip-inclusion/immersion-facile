@@ -1,5 +1,5 @@
 import { formatISO, secondsToMilliseconds } from "date-fns";
-import { SiretDto } from "shared/src/siret";
+import { SiretDto } from "shared";
 import { Clock } from "../../domain/core/ports/Clock";
 import { RateLimiter } from "../../domain/core/ports/RateLimiter";
 import {

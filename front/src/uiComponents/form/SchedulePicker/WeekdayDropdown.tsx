@@ -1,5 +1,5 @@
 import React, { ChangeEvent } from "react";
-import { weekdays } from "shared/src/schedule/Schedule.dto";
+import { weekdays } from "shared";
 
 type WeekdayDropdownProps = {
   name: string;

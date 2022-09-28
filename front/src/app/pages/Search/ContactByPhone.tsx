@@ -4,8 +4,8 @@ import { immersionSearchGateway } from "src/app/config/dependencies";
 import {
   ContactEstablishmentByPhoneDto,
   contactEstablishmentByPhoneSchema,
-} from "shared/src/contactEstablishment";
-import { SiretDto } from "shared/src/siret";
+} from "shared";
+import { SiretDto } from "shared";
 import { Button } from "react-design-system/immersionFacile";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";

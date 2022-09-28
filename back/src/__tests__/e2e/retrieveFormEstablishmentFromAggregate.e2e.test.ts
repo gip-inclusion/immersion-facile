@@ -1,5 +1,5 @@
-import { formEstablishmentsRoute } from "shared/src/routes";
-import { createEstablishmentMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
+import { formEstablishmentsRoute } from "shared";
+import { createEstablishmentMagicLinkPayload } from "shared";
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentEntityV2Builder";

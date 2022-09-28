@@ -4,12 +4,9 @@ import {
   ConventionDto,
   ConventionStatus,
   maximumCalendarDayByInternshipKind,
-} from "shared/src/convention/convention.dto";
-import { conventionSchema } from "shared/src/convention/convention.schema";
-import {
-  ConventionDtoBuilder,
-  DATE_START,
-} from "shared/src/convention/ConventionDtoBuilder";
+} from "shared";
+import { conventionSchema } from "shared";
+import { ConventionDtoBuilder, DATE_START } from "shared";
 import {
   addDays,
   splitCasesBetweenPassingAndFailing,

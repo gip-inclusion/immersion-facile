@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { loginPeConnect, peConnect } from "shared/src/routes";
+import { loginPeConnect, peConnect } from "shared";
 import type { AppDependencies } from "../config/createAppDependencies";
 import { FeatureDisabledError } from "../helpers/httpErrors";
 import { ManagedRedirectError } from "../helpers/redirectErrors";

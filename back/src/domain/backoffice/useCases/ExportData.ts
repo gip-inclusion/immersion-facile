@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { ExportDataDto, GetExportableParams } from "shared/src/exportable";
+import { ExportDataDto, GetExportableParams } from "shared";
 
 import { ExportGateway } from "../ports/ExportGateway";
 import { keys } from "ramda";

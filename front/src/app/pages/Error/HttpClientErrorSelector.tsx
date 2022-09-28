@@ -1,10 +1,10 @@
 import React from "react";
-import { HttpClientError } from "shared/src/httpClient/errors/4xxClientError.error";
+import { LegacyHttpClientError } from "shared";
 import { RenewExpiredLinkContent } from "src/helpers/RenewExpiredLinkPage";
 import { ManagedErrorSelector } from "./ManagedErrors";
 
 type HttpClientErrorProperties = {
-  error: HttpClientError;
+  error: LegacyHttpClientError;
   jwt: string | undefined;
 };
 

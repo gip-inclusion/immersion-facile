@@ -1,11 +1,8 @@
 import { Router } from "express";
 import promClient from "prom-client";
-import { pipeWithValue } from "shared/src/pipeWithValue";
-import {
-  formEstablishmentsRoute,
-  immersionOffersRoute,
-} from "shared/src/routes";
-import { SiretAndRomeDto } from "shared/src/siretAndRome/SiretAndRome.dto";
+import { pipeWithValue } from "shared";
+import { formEstablishmentsRoute, immersionOffersRoute } from "shared";
+import { SiretAndRomeDto } from "shared";
 import type { AppDependencies } from "../config/createAppDependencies";
 import {
   ForbiddenError,

@@ -1,5 +1,5 @@
-import { Builder } from "shared/src/Builder";
-import { RomeCode } from "shared/src/rome";
+import { Builder } from "shared";
+import { RomeCode } from "shared";
 import { ImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
 
 const validImmersionOfferEntityV2: ImmersionOfferEntityV2 = {

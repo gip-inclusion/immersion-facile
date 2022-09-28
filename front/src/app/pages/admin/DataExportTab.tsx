@@ -11,11 +11,11 @@ import {
   ConventionsExportableParams,
   EstablishmentsWithAggregatedOffersExportableParams,
   EstablishmentsWithFlattenOffersExportableParams,
-} from "shared/src/exportable";
+} from "shared";
 import { useAdminToken } from "src/hooks/useAdminToken";
 import { WithBackground } from "src/uiComponents/admin/WithBackground";
 import "./Admin.css";
-import { createManagedAxiosInstance } from "shared/src/httpClient/ports/axios.port";
+import { createManagedAxiosInstance } from "shared";
 import DownloadIcon from "@mui/icons-material/Download";
 import { HttpExcelExportGateway } from "src/core-logic/adapters/ExcelExportGateway/HttpExcelExportGateway";
 

@@ -5,7 +5,7 @@ import {
   featureFlagsRoute,
   renewMagicLinkRoute,
   uploadFileRoute,
-} from "shared/src/routes";
+} from "shared";
 import type { AppDependencies } from "../config/createAppDependencies";
 import { BadRequestError, FeatureDisabledError } from "../helpers/httpErrors";
 import { sendHttpResponse } from "../helpers/sendHttpResponse";

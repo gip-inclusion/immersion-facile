@@ -1,5 +1,5 @@
-import { AgencyDto, CreateAgencyDto } from "shared/src/agency/agency.dto";
-import { createAgencySchema } from "shared/src/agency/agency.schema";
+import { AgencyDto, CreateAgencyDto } from "shared";
+import { createAgencySchema } from "shared";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";

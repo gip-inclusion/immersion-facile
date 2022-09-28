@@ -1,4 +1,4 @@
-import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
+import { EstablishmentJwtPayload } from "shared";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";

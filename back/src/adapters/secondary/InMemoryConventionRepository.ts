@@ -3,7 +3,7 @@ import {
   ConventionDtoWithoutExternalId,
   ConventionExternalId,
   ConventionId,
-} from "shared/src/convention/convention.dto";
+} from "shared";
 import { ConventionRepository } from "../../domain/convention/ports/ConventionRepository";
 import { createLogger } from "../../utils/logger";
 

@@ -1,7 +1,7 @@
 import {
   ContactEstablishmentRequestDto,
   contactEstablishmentRequestSchema,
-} from "shared/src/contactEstablishment";
+} from "shared";
 import {
   BadRequestError,
   NotFoundError,

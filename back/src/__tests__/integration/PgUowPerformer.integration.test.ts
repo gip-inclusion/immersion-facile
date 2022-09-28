@@ -1,5 +1,5 @@
 import { Pool, PoolClient } from "pg";
-import { FormEstablishmentDtoBuilder } from "shared/src/formEstablishment/FormEstablishmentDtoBuilder";
+import { FormEstablishmentDtoBuilder } from "shared";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { createPgUow } from "../../adapters/primary/config/uowConfig";
 import { CustomClock } from "../../adapters/secondary/core/ClockImplementations";

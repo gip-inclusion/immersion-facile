@@ -1,7 +1,7 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { conventionGateway } from "src/app/config/dependencies";
-import { frontRoutes } from "shared/src/routes";
-import { allRoles, Role } from "shared/src/tokens/MagicLinkPayload";
+import { frontRoutes } from "shared";
+import { allRoles, Role } from "shared";
 import { useAdminToken } from "src/hooks/useAdminToken";
 import { ConventionFormAccordionProps } from "./ConventionFormAccordion";
 import { WithBackground } from "src/uiComponents/admin/WithBackground";

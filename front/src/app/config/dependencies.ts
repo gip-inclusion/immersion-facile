@@ -1,5 +1,5 @@
 import { asyncScheduler, SchedulerLike } from "rxjs";
-import { createManagedAxiosInstance } from "shared/src/httpClient/ports/axios.port";
+import { createManagedAxiosInstance } from "shared";
 import { HttpAdminGateway } from "src/core-logic/adapters/AdminGateway/HttpAdminGateway";
 import { SimulatedAdminGateway } from "src/core-logic/adapters/AdminGateway/SimulatedAdminGateway";
 import { HttpAgencyGateway } from "src/core-logic/adapters/AgencyGateway/HttpAgencyGateway";

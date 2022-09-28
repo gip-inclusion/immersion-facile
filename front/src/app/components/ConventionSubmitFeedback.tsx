@@ -1,9 +1,5 @@
 import { values } from "ramda";
-import {
-  Signatories,
-  Signatory,
-  SignatoryRole,
-} from "shared/src/convention/convention.dto";
+import { Signatories, Signatory, SignatoryRole } from "shared";
 import React from "react";
 import {
   SubmitFeedback,

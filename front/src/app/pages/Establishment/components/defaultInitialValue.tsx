@@ -1,6 +1,6 @@
-import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
-import { SiretDto } from "shared/src/siret";
-import { OmitFromExistingKeys } from "shared/src/utils";
+import { FormEstablishmentDto } from "shared";
+import { SiretDto } from "shared";
+import { OmitFromExistingKeys } from "shared";
 
 export const defaultInitialValue = (
   siret?: SiretDto,

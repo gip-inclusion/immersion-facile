@@ -1,4 +1,4 @@
-import { RomeCode } from "../rome";
+import { RomeCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 
 export type SearchImmersionQueryParamsDto = {
   longitude: number;

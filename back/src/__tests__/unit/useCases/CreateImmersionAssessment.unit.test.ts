@@ -1,10 +1,7 @@
-import {
-  allConventionStatuses,
-  ConventionStatus,
-} from "shared/src/convention/convention.dto";
-import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
-import { ImmersionAssessmentDto } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
-import { ConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
+import { allConventionStatuses, ConventionStatus } from "shared";
+import { ConventionDtoBuilder } from "shared";
+import { ImmersionAssessmentDto } from "shared";
+import { ConventionMagicLinkPayload } from "shared";
 import {
   expectArraysToEqual,
   expectObjectsToMatch,

@@ -1,10 +1,7 @@
 import { useField } from "formik";
 import React, { useEffect } from "react";
-import {
-  ConventionField,
-  getConventionFieldName,
-} from "shared/src/convention/convention";
-import { Role } from "shared/src/tokens/MagicLinkPayload";
+import { ConventionField, getConventionFieldName } from "shared";
+import { Role } from "shared";
 import { useConventionTextsFromFormikContext } from "src/app/pages/Convention/texts/textSetup";
 import { TextInput } from "src/uiComponents/form/TextInput";
 

@@ -1,7 +1,7 @@
-import { FormEstablishmentDtoBuilder } from "shared/src/formEstablishment/FormEstablishmentDtoBuilder";
-import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
-import { NafDto } from "shared/src/naf";
-import { AppellationDto } from "shared/src/romeAndAppellationDtos/romeAndAppellation.dto";
+import { FormEstablishmentDtoBuilder } from "shared";
+import { GeoPositionDto } from "shared";
+import { NafDto } from "shared";
+import { AppellationDto } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";

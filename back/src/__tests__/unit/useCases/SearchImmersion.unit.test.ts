@@ -1,5 +1,5 @@
-import { SearchImmersionQueryParamsDto } from "shared/src/searchImmersion/SearchImmersionQueryParams.dto";
-import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
+import { SearchImmersionQueryParamsDto } from "shared";
+import { SearchImmersionResultDto } from "shared";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
@@ -17,7 +17,7 @@ import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPer
 import { ApiConsumer } from "../../../domain/core/valueObjects/ApiConsumer";
 import { SearchMadeEntity } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { SearchImmersion } from "../../../domain/immersionOffer/useCases/SearchImmersion";
-import { AddressDto } from "shared/src/address/address.dto";
+import { AddressDto } from "shared";
 
 const secretariatRome = "M1607";
 const boulangerRome = "D1102";

@@ -1,6 +1,6 @@
-import { AddressAndPosition, AddressDto } from "shared/src/address/address.dto";
-import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
-import { ManagedAxios } from "shared/src/serenity-http-client";
+import { AddressAndPosition, AddressDto } from "shared";
+import { GeoPositionDto } from "shared";
+import { ManagedAxios } from "shared";
 import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
 import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
 import { AppConfig } from "../../primary/config/appConfig";

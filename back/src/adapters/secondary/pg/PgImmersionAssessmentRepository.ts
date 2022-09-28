@@ -1,7 +1,7 @@
 import { PoolClient } from "pg";
-import { ConventionId } from "shared/src/convention/convention.dto";
-import { AssessmentStatus } from "shared/src/immersionAssessment/ImmersionAssessmentDto";
-import { immersionAssessmentSchema } from "shared/src/immersionAssessment/immersionAssessmentSchema";
+import { ConventionId } from "shared";
+import { AssessmentStatus } from "shared";
+import { immersionAssessmentSchema } from "shared";
 import { ImmersionAssessmentEntity } from "../../../domain/convention/entities/ImmersionAssessmentEntity";
 import { ImmersionAssessmentRepository } from "../../../domain/convention/ports/ImmersionAssessmentRepository";
 

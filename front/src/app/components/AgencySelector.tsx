@@ -1,13 +1,10 @@
 import { CircularProgress } from "@mui/material";
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
-import { DepartmentCode } from "shared/src/address/address.dto";
-import { AgencyId, AgencyIdAndName } from "shared/src/agency/agency.dto";
-import type { ConventionDto } from "shared/src/convention/convention.dto";
-import {
-  FederatedIdentity,
-  isPeConnectIdentity,
-} from "shared/src/federatedIdentities/federatedIdentity.dto";
+import { DepartmentCode } from "shared";
+import { AgencyId, AgencyIdAndName } from "shared";
+import type { ConventionDto } from "shared";
+import { FederatedIdentity, isPeConnectIdentity } from "shared";
 import { Agencies } from "src/app/components/Agency";
 import { agencyGateway } from "src/app/config/dependencies";
 import { useConnectedWith } from "src/hooks/connectedWith";

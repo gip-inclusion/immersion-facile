@@ -1,7 +1,7 @@
 import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
 import jwt from "jsonwebtoken";
-import { AgencyId } from "shared/src/agency/agency.dto";
-import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
+import { AgencyId } from "shared";
+import { AbsoluteUrl } from "shared";
 
 // These are t
 const dashboardIds = {

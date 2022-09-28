@@ -1,4 +1,4 @@
-import { path, pathEq } from "shared/src/ramdaExtensions/path";
+import { path, pathEq } from "shared";
 import { expectTypeToMatchAndEqual } from "../../_testBuilders/test.helpers";
 
 type Address = {

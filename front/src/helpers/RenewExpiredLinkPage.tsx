@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ConventionMagicLinkPayload } from "shared/src/tokens/MagicLinkPayload";
+import { ConventionMagicLinkPayload } from "shared";
 import { conventionGateway } from "src/app/config/dependencies";
 import { routes } from "src/app/routing/routes";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";

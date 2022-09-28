@@ -1,5 +1,5 @@
-import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
-import { expectToEqual } from "shared/src/expectToEqual";
+import { AbsoluteUrl } from "shared";
+import { expectToEqual } from "shared";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { dashboardUrlsSlice } from "src/core-logic/domain/admin/dashboardUrls/dashboardUrls.slice";
 import {

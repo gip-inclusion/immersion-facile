@@ -1,4 +1,4 @@
-import { SiretDto } from "shared/src/siret";
+import { SiretDto } from "shared";
 
 export interface NavigationGateway {
   navigateToEstablishmentForm(siret: SiretDto): void;

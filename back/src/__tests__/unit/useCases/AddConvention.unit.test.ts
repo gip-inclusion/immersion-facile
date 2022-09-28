@@ -1,5 +1,5 @@
-import { allConventionStatuses } from "shared/src/convention/convention.dto";
-import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
+import { allConventionStatuses } from "shared";
+import { ConventionDtoBuilder } from "shared";
 import { StubGetSiret } from "../../../_testBuilders/StubGetSiret";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";

@@ -1,4 +1,4 @@
-import { EmailSentDto } from "shared/src/email/email";
+import { EmailSentDto } from "shared";
 import { z } from "zod";
 import { EmailGateway } from "../../../convention/ports/EmailGateway";
 import { UseCase } from "../../../core/UseCase";

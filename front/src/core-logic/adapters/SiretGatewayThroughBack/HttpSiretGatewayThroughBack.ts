@@ -4,7 +4,7 @@ import {
   formAlreadyExistsRoute,
   getSiretIfNotSavedRoute,
   siretRoute,
-} from "shared/src/routes";
+} from "shared";
 import {
   GetSiretInfo,
   GetSiretInfoError,
@@ -14,9 +14,9 @@ import {
   sirenApiUnavailableSiretErrorMessage,
   SiretDto,
   tooManiSirenRequestsSiretErrorMessage,
-} from "shared/src/siret";
-import { HttpClientError } from "shared/src/httpClient/errors/4xxClientError.error";
-import { HttpServerError } from "shared/src/httpClient/errors/5xxServerError.error";
+} from "shared";
+import { HttpClientError } from "shared";
+import { HttpServerError } from "shared";
 import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
 
 export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {

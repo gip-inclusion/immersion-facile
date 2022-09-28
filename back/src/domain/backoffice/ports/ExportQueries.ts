@@ -1,5 +1,5 @@
-import { GetExportableParams } from "shared/src/exportable";
-import { Flavor } from "shared/src/typeFlavors";
+import { GetExportableParams } from "shared";
+import { Flavor } from "shared";
 
 export type ExportedRow = Record<string, unknown>;
 export type SheetName = Flavor<string, "SheetName">;

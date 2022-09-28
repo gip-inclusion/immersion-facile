@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { EmailSentDto } from "shared/src/email/email";
+import { EmailSentDto } from "shared";
 
 export type SentEmailsState = {
   isLoading: boolean;

@@ -1,6 +1,6 @@
 import { Observable } from "rxjs";
-import { AdminToken, UserAndPassword } from "shared/src/admin/admin.dto";
-import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
+import { AdminToken, UserAndPassword } from "shared";
+import { AbsoluteUrl } from "shared";
 
 export interface AdminGateway {
   login: (params: UserAndPassword) => Observable<AdminToken>;

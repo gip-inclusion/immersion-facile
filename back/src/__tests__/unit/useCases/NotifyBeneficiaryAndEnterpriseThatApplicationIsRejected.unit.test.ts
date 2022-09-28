@@ -1,6 +1,6 @@
-import { AgencyDto } from "shared/src/agency/agency.dto";
-import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
-import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
+import { AgencyDto } from "shared";
+import { AgencyDtoBuilder } from "shared";
+import { ConventionDtoBuilder } from "shared";
 import { expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../../_testBuilders/emailAssertions";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";

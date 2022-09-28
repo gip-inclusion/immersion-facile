@@ -1,7 +1,7 @@
-import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
-import { ConventionDto } from "shared/src/convention/convention.dto";
-import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
-import { frontRoutes } from "shared/src/routes";
+import { AgencyDtoBuilder } from "shared";
+import { ConventionDto } from "shared";
+import { ConventionDtoBuilder } from "shared";
+import { frontRoutes } from "shared";
 import { expectedEmailConventionReviewMatchingConvention } from "../../../_testBuilders/emailAssertions";
 import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";

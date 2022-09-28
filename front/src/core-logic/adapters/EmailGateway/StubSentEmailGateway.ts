@@ -1,6 +1,6 @@
 import { Observable, of } from "rxjs";
-import { EmailSentDto } from "shared/src/email/email";
-import { AdminToken } from "shared/src/admin/admin.dto";
+import { EmailSentDto } from "shared";
+import { AdminToken } from "shared";
 
 export class StubSentEmailGateway implements StubSentEmailGateway {
   public getLatest(_adminToken: AdminToken): Observable<EmailSentDto[]> {

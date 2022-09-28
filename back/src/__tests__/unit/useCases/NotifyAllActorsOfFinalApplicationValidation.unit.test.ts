@@ -1,13 +1,10 @@
 import { parseISO } from "date-fns";
-import { AgencyDto } from "shared/src/agency/agency.dto";
-import { AgencyDtoBuilder } from "shared/src/agency/AgencyDtoBuilder";
-import { ConventionDto } from "shared/src/convention/convention.dto";
-import { ConventionDtoBuilder } from "shared/src/convention/ConventionDtoBuilder";
-import { PeConnectIdentity } from "shared/src/federatedIdentities/federatedIdentity.dto";
-import {
-  prettyPrintSchedule,
-  reasonableSchedule,
-} from "shared/src/schedule/ScheduleUtils";
+import { AgencyDto } from "shared";
+import { AgencyDtoBuilder } from "shared";
+import { ConventionDto } from "shared";
+import { ConventionDtoBuilder } from "shared";
+import { PeConnectIdentity } from "shared";
+import { prettyPrintSchedule, reasonableSchedule } from "shared";
 import { expectEmailFinalValidationConfirmationMatchingConvention } from "../../../_testBuilders/emailAssertions";
 import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";

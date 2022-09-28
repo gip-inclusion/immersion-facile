@@ -1,5 +1,5 @@
 import React from "react";
-import { FederatedIdentity } from "shared/src/federatedIdentities/federatedIdentity.dto";
+import { FederatedIdentity } from "shared";
 import { CopyLink } from "src/app/pages/Convention/CopyLink";
 import { ShareLinkByEmail } from "src/app/pages/Convention/ShareLinkByEmail";
 

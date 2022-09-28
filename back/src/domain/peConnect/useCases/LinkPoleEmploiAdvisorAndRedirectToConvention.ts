@@ -1,6 +1,6 @@
-import { AbsoluteUrl } from "shared/src/AbsoluteUrl";
-import { frontRoutes } from "shared/src/routes";
-import { queryParamsAsString } from "shared/src/utils/queryParams";
+import { AbsoluteUrl } from "shared";
+import { frontRoutes } from "shared";
+import { queryParamsAsString } from "shared";
 import { z } from "zod";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";

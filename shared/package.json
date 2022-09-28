@@ -1,5 +1,7 @@
 {
   "name": "shared",
+  "types": "src/index.ts",
+  "main": "src/index.ts",
   "scripts": {
     "includecheck": "./check_includes.sh",
     "format:check": "pnpm -w prettier:glob --check ./shared/src",

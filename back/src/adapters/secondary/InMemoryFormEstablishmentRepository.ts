@@ -1,6 +1,6 @@
-import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
-import { propEq } from "shared/src/ramdaExtensions/propEq";
-import { SiretDto } from "shared/src/siret";
+import { FormEstablishmentDto } from "shared";
+import { propEq } from "shared";
+import { SiretDto } from "shared";
 import { FormEstablishmentRepository } from "../../domain/immersionOffer/ports/FormEstablishmentRepository";
 import { createLogger } from "../../utils/logger";
 import { ConflictError } from "../primary/helpers/httpErrors";

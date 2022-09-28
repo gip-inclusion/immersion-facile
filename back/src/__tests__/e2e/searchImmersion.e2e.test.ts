@@ -7,7 +7,7 @@ import { SearchImmersionResultPublicV0 } from "../../adapters/primary/routers/Dt
 import { SearchImmersionResultPublicV1 } from "../../adapters/primary/routers/DtoAndSchemas/v1/output/SearchImmersionResultPublicV1.dto";
 import { InMemoryEstablishmentAggregateRepository } from "../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { GenerateApiConsumerJtw } from "../../domain/auth/jwt";
-import { SearchImmersionResultDto } from "shared/src/searchImmersion/SearchImmersionResult.dto";
+import { SearchImmersionResultDto } from "shared";
 import {
   avenueChampsElysees,
   avenueChampsElyseesDto,

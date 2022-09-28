@@ -6,7 +6,7 @@ import { ConventionFormUkraine } from "src/app/pages/Convention/ConventionFormUk
 import { conventionInitialValuesFromUrl } from "src/app/pages/Convention/conventionHelpers";
 import { ImmersionFacileAgencyNotActive } from "src/app/pages/Convention/ImmersionFacileAgencyNotActive";
 import { routes } from "src/app/routing/routes";
-import { AgencyId } from "shared/src/agency/agency.dto";
+import { AgencyId } from "shared";
 import { useObservable } from "src/useObservable";
 import { Route } from "type-route";
 

@@ -1,6 +1,6 @@
-import { AdminToken } from "shared/src/admin/admin.dto";
-import { SetFeatureFlagParams } from "shared/src/featureFlags";
-import { conventionsRoute, featureFlagsRoute } from "shared/src/routes";
+import { AdminToken } from "shared";
+import { SetFeatureFlagParams } from "shared";
+import { conventionsRoute, featureFlagsRoute } from "shared";
 import { SuperTest, Test } from "supertest";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";

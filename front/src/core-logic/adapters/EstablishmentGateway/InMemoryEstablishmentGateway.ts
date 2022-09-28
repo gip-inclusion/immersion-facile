@@ -1,7 +1,7 @@
 import { Observable, of, Subject } from "rxjs";
-import { FormEstablishmentDto } from "shared/src/formEstablishment/FormEstablishment.dto";
-import { SiretDto } from "shared/src/siret";
-import { sleep } from "shared/src/utils";
+import { FormEstablishmentDto } from "shared";
+import { SiretDto } from "shared";
+import { sleep } from "shared";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
 
 export class InMemoryEstablishmentGateway implements EstablishmentGateway {

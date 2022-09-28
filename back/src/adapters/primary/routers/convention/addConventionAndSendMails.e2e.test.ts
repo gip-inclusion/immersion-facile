@@ -2,17 +2,14 @@ import {
   ConventionDto,
   Signatories,
   UpdateConventionStatusRequestDto,
-} from "shared/src/convention/convention.dto";
-import {
-  ConventionDtoBuilder,
-  VALID_EMAILS,
-} from "shared/src/convention/ConventionDtoBuilder";
-import { TemplatedEmail } from "shared/src/email/email";
+} from "shared";
+import { ConventionDtoBuilder, VALID_EMAILS } from "shared";
+import { TemplatedEmail } from "shared";
 import {
   conventionsRoute,
   signConventionRoute,
   updateConventionStatusRoute,
-} from "shared/src/routes";
+} from "shared";
 import supertest from "supertest";
 import {
   buildTestApp,
@@ -26,7 +23,7 @@ import {
 import { InMemoryOutboxRepository } from "../../../secondary/core/InMemoryOutboxRepository";
 import { InMemoryEmailGateway } from "../../../secondary/emailGateway/InMemoryEmailGateway";
 import { DomainEvent } from "../../../../domain/core/eventBus/events";
-import { expectToEqual } from "shared/src/expectToEqual";
+import { expectToEqual } from "shared";
 
 const validatorEmail = "validator@mail.com";
 const beneficiarySignDate = new Date("2022-09-08");

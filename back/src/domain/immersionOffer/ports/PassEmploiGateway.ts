@@ -1,5 +1,5 @@
-import { GeoPositionDto } from "shared/src/geoPosition/geoPosition.dto";
-import { RomeCode } from "shared/src/rome";
+import { GeoPositionDto } from "shared";
+import { RomeCode } from "shared";
 
 export type PassEmploiNotificationParams = {
   immersions: { siret: string; rome: RomeCode; location: GeoPositionDto }[];

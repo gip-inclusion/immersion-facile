@@ -1,4 +1,4 @@
-import { expectToEqual } from "shared/src/expectToEqual";
+import { expectToEqual } from "shared";
 import {
   createTestStore,
   TestDependencies,

@@ -1,12 +1,8 @@
 import { useField } from "formik";
 import React, { useEffect } from "react";
-import { ConventionDto } from "shared/src/convention/convention.dto";
-import { DateIntervalDto, ScheduleDto } from "shared/src/schedule/Schedule.dto";
-import {
-  reasonableSchedule,
-  emptySchedule,
-  validateSchedule,
-} from "shared/src/schedule/ScheduleUtils";
+import { ConventionDto } from "shared";
+import { DateIntervalDto, ScheduleDto } from "shared";
+import { reasonableSchedule, emptySchedule, validateSchedule } from "shared";
 import { BoolRadioPicker } from "./BoolRadioPicker";
 import { ComplexSchedulePicker } from "./ComplexSchedulePicker";
 import { RegularSchedulePicker } from "./RegularSchedulePicker";

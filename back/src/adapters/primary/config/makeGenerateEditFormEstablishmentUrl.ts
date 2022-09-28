@@ -1,5 +1,5 @@
-import { frontRoutes } from "shared/src/routes";
-import { EstablishmentJwtPayload } from "shared/src/tokens/MagicLinkPayload";
+import { frontRoutes } from "shared";
+import { EstablishmentJwtPayload } from "shared";
 import {
   GenerateEditFormEstablishmentUrl,
   makeGenerateJwtES256,
