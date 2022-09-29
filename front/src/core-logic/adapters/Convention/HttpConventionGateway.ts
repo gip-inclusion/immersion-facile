@@ -58,15 +58,6 @@ export class HttpConventionGateway implements ConventionGateway {
     return conventionReadDto;
   }
 
-  public async update(conventionDto: ConventionDto): Promise<string> {
-    const { data } = await this.httpClient.post(
-      `/${conventionsRoute}/${conventionDto.id}`,
-      conventionDto,
-    );
-    const withConventionId = withConventionIdSchema.parse(data);
-    return withConventionId.id;
-  }
-
   public async updateMagicLink(
     conventionDto: ConventionDto,
     jwt: string,

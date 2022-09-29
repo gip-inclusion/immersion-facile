@@ -63,12 +63,6 @@ export class InMemoryConventionGateway implements ConventionGateway {
     );
   }
 
-  public async update(convention: ConventionDto): Promise<ConventionId> {
-    this.simulatedLatency && (await sleep(this.simulatedLatency));
-    this._conventions[convention.id] = convention;
-    return convention.id;
-  }
-
   public async updateMagicLink(
     convention: ConventionDto,
     jwt: string,

@@ -17,8 +17,6 @@ export interface ConventionGateway {
   // Get an immersion application through backoffice, password-protected route.
   getById(id: ConventionId): Promise<ConventionReadDto>;
   getMagicLink(jwt: string): Promise<ConventionReadDto>;
-
-  update(conventionDto: ConventionDto): Promise<string>;
   updateMagicLink(conventionDto: ConventionDto, jwt: string): Promise<string>;
 
   updateStatus(

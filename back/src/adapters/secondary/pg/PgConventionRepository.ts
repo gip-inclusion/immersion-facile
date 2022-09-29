@@ -9,10 +9,7 @@ import {
   Mentor,
 } from "shared";
 import { ConventionRepository } from "../../../domain/convention/ports/ConventionRepository";
-import {
-  notifyAndThrowErrorDiscord,
-  notifyDiscord,
-} from "../../../utils/notifyDiscord";
+import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
 import { getReadConventionById } from "./pgConventionSql";
 
 export class PgConventionRepository implements ConventionRepository {
@@ -34,28 +31,20 @@ export class PgConventionRepository implements ConventionRepository {
     const { signatories: { beneficiary, mentor, legalRepresentative }, id: conventionId, status, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation, immersionActivities, immersionSkills, postalCode, workConditions, internshipKind } =
       convention
 
-    try {
-      const query_insert_convention = `INSERT INTO conventions(
+    const query_insert_convention = `INSERT INTO conventions(
           id, status, agency_id, date_submission, date_start, date_end, date_validation, siret, business_name, schedule, individual_protection,
           sanitary_prevention, sanitary_prevention_description, immersion_address, immersion_objective, immersion_appellation, immersion_activities, immersion_skills, postal_code, work_conditions, internship_kind
         ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)`;
 
-      // prettier-ignore
-      await this.client.query(query_insert_convention, [conventionId, status, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation.appellationCode, immersionActivities, immersionSkills, postalCode, workConditions, internshipKind]);
+    // prettier-ignore
+    await this.client.query(query_insert_convention, [conventionId, status, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation.appellationCode, immersionActivities, immersionSkills, postalCode, workConditions, internshipKind]);
 
-      await this.insertBeneficiary(beneficiary, conventionId);
-      await this.insertMentor(mentor, conventionId);
-      if (legalRepresentative) {
-        await this.insertLegalRepresentative(legalRepresentative, conventionId);
-      }
-    } catch (error: any) {
-      notifyDiscord(
-        `Erreur lors de la sauvegarde de la convention  suivante : ${JSON.stringify(
-          convention,
-        )}`,
-      );
-      notifyAndThrowErrorDiscord(error);
+    await this.insertBeneficiary(beneficiary, conventionId);
+    await this.insertMentor(mentor, conventionId);
+    if (legalRepresentative) {
+      await this.insertLegalRepresentative(legalRepresentative, conventionId);
     }
+
     try {
       const query_insert_external_id = `INSERT INTO convention_external_ids(convention_id) VALUES($1) RETURNING external_id;`;
       const convention_external_id = await this.client.query(
@@ -64,11 +53,6 @@ export class PgConventionRepository implements ConventionRepository {
       );
       return convention_external_id.rows[0]?.external_id?.toString();
     } catch (error: any) {
-      notifyDiscord(
-        `Erreur lors de la sauvegarde de l'id externe de la convention suivante : ${JSON.stringify(
-          convention,
-        )}`,
-      );
       notifyAndThrowErrorDiscord(error);
       return "";
     }

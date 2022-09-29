@@ -20,8 +20,9 @@ export const SubmitButton = ({ onSubmit, isSubmitting }: SubmitButtonProps) => {
       className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"
       type="button"
       onClick={makeInReviewAndSubmit}
+      disabled={isSubmitting}
     >
-      {isSubmitting ? "Éxecution" : "Envoyer la demande"}
+      Envoyer la demande
     </button>
   );
 };
@@ -31,8 +32,9 @@ export const SignButton = ({ onSubmit, isSubmitting }: SubmitButtonProps) => (
     className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"
     type="button"
     onClick={onSubmit}
+    disabled={isSubmitting}
   >
-    {isSubmitting ? "Éxecution" : "Confirmer et signer"}
+    Confirmer et signer
   </button>
 );
 
@@ -44,9 +46,8 @@ export const RequestModificationButton = ({
     className="fr-btn fr-fi-edit-fill fr-btn--icon-left fr-btn--secondary"
     type="button"
     onClick={onSubmit}
+    disabled={isSubmitting}
   >
-    {isSubmitting
-      ? "Éxecution"
-      : "Annuler les signatures et demander des modifications"}
+    Annuler les signatures et demander des modifications
   </button>
 );
