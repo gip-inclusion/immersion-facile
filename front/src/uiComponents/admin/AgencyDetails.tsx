@@ -18,6 +18,7 @@ const agencyFieldToLabel: FieldsToLabel = {
   signature: "Signature",
   agencySiret: "Siret",
   codeSafir: "Code Safir",
+  logoUrl: "Url du logo",
 };
 
 const formatAgencyStatus = (status: AgencyStatus) => {
@@ -58,6 +59,7 @@ export const AgencyDetails = ({ agency }: { agency: AgencyDto }) => {
             />
           ),
       )}
+      {agency.logoUrl && <img src={agency.logoUrl} alt="logo" width="100px" />}
     </div>
   );
 };
