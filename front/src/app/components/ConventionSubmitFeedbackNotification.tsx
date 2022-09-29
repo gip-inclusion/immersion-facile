@@ -5,21 +5,17 @@ import {
   SubmitFeedback,
   SubmitFeedBackKind,
 } from "src/app/components/SubmitFeedback";
+import { ConventionSuccessFeedbackKind } from "src/core-logic/domain/convention/convention.slice";
 
-export type SuccessFeedbackKindConvention =
-  | "justSubmitted"
-  | "signedSuccessfully"
-  | "modificationsAsked";
-
-type ConventionSubmitFeedbackProps = {
-  submitFeedback: SubmitFeedBackKind<SuccessFeedbackKindConvention>;
+type ConventionSubmitFeedbackNotificationProps = {
+  submitFeedback: SubmitFeedBackKind<ConventionSuccessFeedbackKind>;
   signatories: Signatories;
 };
 
-export const ConventionSubmitFeedback = ({
+export const ConventionSubmitFeedbackNotification = ({
   submitFeedback,
   signatories,
-}: ConventionSubmitFeedbackProps) => {
+}: ConventionSubmitFeedbackNotificationProps) => {
   const messageByKind = createConventionFeedbackMessageByKind(signatories);
 
   return (
@@ -38,7 +34,7 @@ const labelByRole: Record<SignatoryRole, string> = {
 
 export const createConventionFeedbackMessageByKind = (
   signatories: Signatories,
-): Record<SuccessFeedbackKindConvention, React.ReactNode> => ({
+): Record<ConventionSuccessFeedbackKind, React.ReactNode> => ({
   justSubmitted: (
     <InitialSubmitSuccessMessageBase>
       {(values(signatories) as Signatory[])

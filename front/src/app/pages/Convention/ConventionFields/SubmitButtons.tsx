@@ -5,6 +5,7 @@ import { ConventionStatus } from "shared";
 type SubmitButtonProps = {
   isSubmitting: boolean;
   onSubmit: () => Promise<void>;
+  disabled?: boolean;
 };
 
 export const SubmitButton = ({ onSubmit, isSubmitting }: SubmitButtonProps) => {
@@ -27,12 +28,16 @@ export const SubmitButton = ({ onSubmit, isSubmitting }: SubmitButtonProps) => {
   );
 };
 
-export const SignButton = ({ onSubmit, isSubmitting }: SubmitButtonProps) => (
+export const SignButton = ({
+  onSubmit,
+  isSubmitting,
+  disabled,
+}: SubmitButtonProps) => (
   <button
     className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"
     type="button"
     onClick={onSubmit}
-    disabled={isSubmitting}
+    disabled={isSubmitting || disabled}
   >
     Confirmer et signer
   </button>
@@ -41,12 +46,13 @@ export const SignButton = ({ onSubmit, isSubmitting }: SubmitButtonProps) => (
 export const RequestModificationButton = ({
   onSubmit,
   isSubmitting,
+  disabled,
 }: SubmitButtonProps) => (
   <button
     className="fr-btn fr-fi-edit-fill fr-btn--icon-left fr-btn--secondary"
     type="button"
     onClick={onSubmit}
-    disabled={isSubmitting}
+    disabled={isSubmitting || disabled}
   >
     Annuler les signatures et demander des modifications
   </button>

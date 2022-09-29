@@ -7,10 +7,7 @@ import {
   conventionWithoutExternalIdSchema,
   toDateString,
 } from "shared";
-import {
-  ConventionSubmitFeedback,
-  SuccessFeedbackKindConvention,
-} from "src/app/components/ConventionSubmitFeedback";
+import { ConventionSubmitFeedbackNotification } from "src/app/components/ConventionSubmitFeedbackNotification";
 import { conventionGateway } from "src/app/config/dependencies";
 import {
   ConventionPresentation,
@@ -19,6 +16,7 @@ import {
   undefinedIfEmptyString,
 } from "src/app/pages/Convention/conventionHelpers";
 import { useConventionTexts } from "src/app/pages/Convention/texts/textSetup";
+import { useConventionSubmitFeedback } from "src/app/pages/Convention/useConventionSubmitFeedback";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { useExistingSiret } from "src/hooks/siret.hooks";
@@ -50,9 +48,7 @@ export const ConventionForm = ({
   });
 
   useExistingSiret(initialValues.siret);
-  const [submitFeedback, setSubmitFeedback] = useState<
-    SuccessFeedbackKindConvention | Error | null
-  >(null);
+  const { submitFeedback, setSubmitFeedback } = useConventionSubmitFeedback();
 
   useEffect(() => {
     if (!("demandeId" in routeParams) && !("jwt" in routeParams)) return;
@@ -128,7 +124,7 @@ export const ConventionForm = ({
             <div>
               <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
                 <ConventionFormFields isFrozen={isFrozen} />
-                <ConventionSubmitFeedback
+                <ConventionSubmitFeedbackNotification
                   submitFeedback={submitFeedback}
                   signatories={props.values.signatories}
                 />

@@ -9,7 +9,6 @@ import {
   Mentor,
 } from "shared";
 import { ConventionRepository } from "../../../domain/convention/ports/ConventionRepository";
-import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
 import { getReadConventionById } from "./pgConventionSql";
 
 export class PgConventionRepository implements ConventionRepository {
@@ -45,17 +44,12 @@ export class PgConventionRepository implements ConventionRepository {
       await this.insertLegalRepresentative(legalRepresentative, conventionId);
     }
 
-    try {
-      const query_insert_external_id = `INSERT INTO convention_external_ids(convention_id) VALUES($1) RETURNING external_id;`;
-      const convention_external_id = await this.client.query(
-        query_insert_external_id,
-        [conventionId],
-      );
-      return convention_external_id.rows[0]?.external_id?.toString();
-    } catch (error: any) {
-      notifyAndThrowErrorDiscord(error);
-      return "";
-    }
+    const query_insert_external_id = `INSERT INTO convention_external_ids(convention_id) VALUES($1) RETURNING external_id;`;
+    const convention_external_id = await this.client.query(
+      query_insert_external_id,
+      [conventionId],
+    );
+    return convention_external_id.rows[0]?.external_id?.toString();
   }
 
   public async update(

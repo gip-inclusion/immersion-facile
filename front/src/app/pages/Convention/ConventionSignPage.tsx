@@ -15,19 +15,17 @@ import {
   SignatoryRole,
   signatoryRoles,
 } from "shared";
-import {
-  ConventionSubmitFeedback,
-  SuccessFeedbackKindConvention,
-} from "src/app/components/ConventionSubmitFeedback";
-import { conventionGateway } from "src/app/config/dependencies";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { ApiDataContainer } from "src/app/pages/admin/ApiDataContainer";
 import { routes } from "src/app/routing/routes";
-import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import { useExistingSiret } from "src/hooks/siret.hooks";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { Route } from "type-route";
 import { ConventionFormFields } from "./ConventionFields/ConventionFormFields";
+import { conventionGateway } from "src/app/config/dependencies";
+import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
+import { ConventionSubmitFeedbackNotification } from "src/app/components/ConventionSubmitFeedbackNotification";
+import { useConventionSubmitFeedback } from "src/app/pages/Convention/useConventionSubmitFeedback";
 
 type SignFormRoute = Route<typeof routes.conventionToSign>;
 
@@ -143,6 +141,8 @@ type SignFormSpecificProps = {
 };
 
 const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
+  const { submitFeedback, setSubmitFeedback } = useConventionSubmitFeedback();
+
   useExistingSiret(convention?.siret);
   const [initialValues, setInitialValues] = useState<ConventionReadDto | null>(
     null,
@@ -151,10 +151,6 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
   const [currentSignatoryRole, setCurrentSignatoryRole] = useState<
     SignatoryRole | undefined
   >();
-
-  const [submitFeedback, setSubmitFeedback] = useState<
-    SuccessFeedbackKindConvention | Error | null
-  >(null);
 
   useEffect(() => {
     if (!convention) return;
@@ -220,10 +216,10 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
 
                 setSignatory(signatory);
                 setSubmitFeedback("signedSuccessfully");
-              } catch (e: any) {
+              } catch (error: any) {
                 //eslint-disable-next-line no-console
-                console.log("onSubmitError", e);
-                setSubmitFeedback(e);
+                console.log("onSubmitError", error);
+                setSubmitFeedback(error);
               } finally {
                 setSubmitting(false);
               }
@@ -277,7 +273,7 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
                       </div>
                     )}
 
-                    <ConventionSubmitFeedback
+                    <ConventionSubmitFeedbackNotification
                       submitFeedback={submitFeedback}
                       signatories={props.values.signatories}
                     />

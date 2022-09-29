@@ -9,6 +9,8 @@ import {
   RequestModificationButton,
   SignButton,
 } from "src/app/pages/Convention/ConventionFields/SubmitButtons";
+import { useAppSelector } from "src/app/utils/reduxHooks";
+import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { DateCheckboxGroup } from "src/uiComponents/form/CheckboxGroup";
 
 const processedDataBySignatoryRole: Record<
@@ -51,6 +53,7 @@ export const SignatureActions = (props: {
   onSubmit: () => Promise<void>;
   onRejectForm: () => Promise<void>;
 }) => {
+  const submitFeedback = useAppSelector(conventionSelectors.feedback);
   const { fieldName, signatoryFullName, signatoryFunction } =
     getSignatoryProcessedData(props.signatory);
 
@@ -68,11 +71,13 @@ export const SignatureActions = (props: {
         <SignButton
           isSubmitting={props.isSubmitting}
           onSubmit={props.onSubmit}
+          disabled={submitFeedback !== null}
         />
 
         <RequestModificationButton
           onSubmit={props.onRejectForm}
           isSubmitting={props.isSubmitting}
+          disabled={submitFeedback !== null}
         />
       </p>
     </>
