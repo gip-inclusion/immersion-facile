@@ -1,5 +1,5 @@
 import differenceInDays from "date-fns/differenceInDays";
-import { allSignatoriesSigned } from "./convention";
+import { allSignatoriesSigned, getConventionFieldName } from "./convention";
 import {
   ConventionStatus,
   InternshipKind,
@@ -13,6 +13,12 @@ type DatesInConvention = {
   dateSubmission: string;
 };
 
+type DatesAndInternshipKing = {
+  dateStart: string;
+  dateEnd: string;
+  internshipKind: InternshipKind;
+};
+
 export const startDateIsBeforeEndDate = ({
   dateStart,
   dateEnd,
@@ -22,13 +28,16 @@ export const underMaxCalendarDuration = ({
   dateStart,
   dateEnd,
   internshipKind,
-}: {
-  dateStart: string;
-  dateEnd: string;
-  internshipKind: InternshipKind;
-}): boolean =>
+}: DatesAndInternshipKing): boolean =>
   differenceInDays(new Date(dateEnd), new Date(dateStart)) <=
   maximumCalendarDayByInternshipKind[internshipKind];
+
+export const getConventionTooLongMessageAndPath = ({
+  internshipKind,
+}: DatesAndInternshipKing) => ({
+  message: `La durée maximale calendaire d'une immersion est de ${maximumCalendarDayByInternshipKind[internshipKind]} jours.`,
+  path: [getConventionFieldName("dateEnd")],
+});
 
 export const emailAndMentorEmailAreDifferent = (params: {
   signatories: Signatories;

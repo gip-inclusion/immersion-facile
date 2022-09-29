@@ -20,7 +20,6 @@ import {
   ConventionReadDto,
   GenerateMagicLinkRequestDto,
   GenerateMagicLinkResponseDto,
-  maximumCalendarDayByInternshipKind,
   ListConventionsRequestDto,
   Mentor,
   LegalRepresentative,
@@ -31,6 +30,7 @@ import {
 } from "./convention.dto";
 import {
   emailAndMentorEmailAreDifferent,
+  getConventionTooLongMessageAndPath,
   mustBeSignedByEveryone,
   startDateIsBeforeEndDate,
   underMaxCalendarDuration,
@@ -128,10 +128,7 @@ export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExt
       message: "La date de fin doit être après la date de début.",
       path: [getConventionFieldName("dateEnd")],
     })
-    .refine(underMaxCalendarDuration, {
-      message: `La durée maximale calendaire d'une immersion est de ${maximumCalendarDayByInternshipKind.immersion} jours.`,
-      path: [getConventionFieldName("dateEnd")],
-    })
+    .refine(underMaxCalendarDuration, getConventionTooLongMessageAndPath)
     .refine(emailAndMentorEmailAreDifferent, {
       message: "Votre adresse e-mail doit être différente de celle du tuteur",
       path: [
@@ -151,10 +148,7 @@ export const conventionSchema: z.Schema<ConventionDto> =
       message: "La date de fin doit être après la date de début.",
       path: [getConventionFieldName("dateEnd")],
     })
-    .refine(underMaxCalendarDuration, {
-      message: `La durée maximale calendaire d'une immersion est de ${maximumCalendarDayByInternshipKind.immersion} jours.`,
-      path: [getConventionFieldName("dateEnd")],
-    })
+    .refine(underMaxCalendarDuration, getConventionTooLongMessageAndPath)
     .refine(emailAndMentorEmailAreDifferent, {
       message: "Votre adresse e-mail doit être différente de celle du tuteur",
       path: [
@@ -179,10 +173,7 @@ export const conventionReadSchema: z.Schema<ConventionReadDto> =
       message: "La date de fin doit être après la date de début.",
       path: [getConventionFieldName("dateEnd")],
     })
-    .refine(underMaxCalendarDuration, {
-      message: `La durée maximale calendaire d'une immersion est de ${maximumCalendarDayByInternshipKind.immersion} jours.`,
-      path: [getConventionFieldName("dateEnd")],
-    })
+    .refine(underMaxCalendarDuration, getConventionTooLongMessageAndPath)
     .refine(emailAndMentorEmailAreDifferent, {
       message: "Votre adresse e-mail doit être différente de celle du tuteur",
       path: [
