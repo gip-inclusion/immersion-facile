@@ -1,8 +1,10 @@
-import { AddressDto } from "shared";
-import { FormEstablishmentDto } from "shared";
-import { GeoPositionDto } from "shared";
-import { NafDto } from "shared";
-import { AppellationDto } from "shared";
+import {
+  AddressDto,
+  AppellationDto,
+  FormEstablishmentDto,
+  GeoPositionDto,
+  NafDto,
+} from "shared";
 import { Clock } from "../domain/core/ports/Clock";
 import { UuidGenerator } from "../domain/core/ports/UuidGenerator";
 import { ContactEntityV2 } from "../domain/immersionOffer/entities/ContactEntity";

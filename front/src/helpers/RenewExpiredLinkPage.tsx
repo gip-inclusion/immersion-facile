@@ -1,14 +1,14 @@
 import React, { useState } from "react";
-import { ConventionMagicLinkPayload } from "shared";
-import { conventionGateway } from "src/app/config/dependencies";
-import { routes } from "src/app/routing/routes";
-import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 
 import {
   Button,
   LinkHome,
   Notification,
 } from "react-design-system/immersionFacile";
+import { ConventionMagicLinkPayload } from "shared";
+import { conventionGateway } from "src/app/config/dependencies";
+import { routes } from "src/app/routing/routes";
+import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import { Route } from "type-route";
 
 interface RenewExpiredLinkProps {

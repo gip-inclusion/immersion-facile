@@ -1,9 +1,9 @@
+import React, { useReducer } from "react";
 import {
-  ModalDialog,
   ModalClose,
   ModalContent,
+  ModalDialog,
 } from "react-design-system/immersionFacile";
-import React, { useReducer } from "react";
 import ModalTitle from "src/app/pages/Convention/ModalTitleOverride";
 
 type ModalState = {

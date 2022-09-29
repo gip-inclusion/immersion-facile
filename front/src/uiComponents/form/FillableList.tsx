@@ -2,9 +2,8 @@ import MuiChip from "@mui/material/Chip";
 import { styled } from "@mui/material/styles";
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { notEqual } from "shared";
-import { OmitFromExistingKeys } from "shared";
 import { Button } from "react-design-system/immersionFacile";
+import { notEqual, OmitFromExistingKeys } from "shared";
 import { z } from "zod";
 
 const immersionBlue = "#3458a2";

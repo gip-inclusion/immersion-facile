@@ -1,8 +1,11 @@
 import { Subject } from "rxjs";
-import { AbsoluteUrl } from "shared";
-import { AdminToken } from "shared";
+import {
+  AbsoluteUrl,
+  AdminToken,
+  FeatureFlags,
+  SetFeatureFlagParams,
+} from "shared";
 import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
-import { FeatureFlags, SetFeatureFlagParams } from "shared";
 
 export class TestTechnicalGateway implements TechnicalGateway {
   getAllFeatureFlags = () => this.featureFlags$;

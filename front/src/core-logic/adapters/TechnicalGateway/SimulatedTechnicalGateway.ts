@@ -1,6 +1,5 @@
 import { Observable, of } from "rxjs";
-import { AbsoluteUrl } from "shared";
-import { FeatureFlags } from "shared";
+import { AbsoluteUrl, FeatureFlags } from "shared";
 import { makeStubFeatureFlags } from "src/core-logic/domain/testHelpers/test.helpers";
 import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 

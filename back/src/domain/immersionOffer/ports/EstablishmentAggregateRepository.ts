@@ -1,6 +1,4 @@
-import { AppellationDto } from "shared";
-import { SearchImmersionResultDto } from "shared";
-import { SiretDto } from "shared";
+import { AppellationDto, SearchImmersionResultDto, SiretDto } from "shared";
 import {
   DataSource,
   EstablishmentAggregate,

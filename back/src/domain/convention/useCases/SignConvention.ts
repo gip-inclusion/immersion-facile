@@ -1,7 +1,11 @@
-import { signConventionDtoWithRole } from "shared";
-import { ConventionStatus, WithConventionId } from "shared";
-import { ConventionMagicLinkPayload, Role } from "shared";
-import { ExtractFromExisting } from "shared";
+import {
+  ConventionMagicLinkPayload,
+  ConventionStatus,
+  ExtractFromExisting,
+  Role,
+  signConventionDtoWithRole,
+  WithConventionId,
+} from "shared";
 import { z } from "zod";
 import {
   ForbiddenError,

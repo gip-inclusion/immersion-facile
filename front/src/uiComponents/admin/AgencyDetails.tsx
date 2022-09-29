@@ -1,6 +1,5 @@
 import React, { ReactNode } from "react";
-import { keys } from "shared";
-import { AgencyDto, AgencyStatus } from "shared";
+import { AgencyDto, AgencyStatus, keys } from "shared";
 import { TextCell } from "./TextCell";
 
 type AgencyField = keyof AgencyDto;

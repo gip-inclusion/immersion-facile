@@ -1,20 +1,20 @@
 import { AgencyId } from "../agency/agency.dto";
-import { DateIntervalDto, ScheduleDto } from "../schedule/Schedule.dto";
 import { Builder } from "../Builder";
-import {
-  ConventionStatus,
-  ConventionDto,
-  ConventionId,
-  ConventionExternalId,
-  ImmersionObjective,
-  Beneficiary,
-  Mentor,
-  LegalRepresentative,
-  InternshipKind,
-} from "./convention.dto";
-import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { FederatedIdentity } from "../federatedIdentities/federatedIdentity.dto";
+import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
+import { DateIntervalDto, ScheduleDto } from "../schedule/Schedule.dto";
 import { reasonableSchedule } from "../schedule/ScheduleUtils";
+import {
+  Beneficiary,
+  ConventionDto,
+  ConventionExternalId,
+  ConventionId,
+  ConventionStatus,
+  ImmersionObjective,
+  InternshipKind,
+  LegalRepresentative,
+  Mentor,
+} from "./convention.dto";
 
 export const DEMANDE_IMMERSION_ID = "40400404-9c0b-bbbb-bb6d-6bb9bd38bbbb";
 export const CONVENTION_EXTERNAL_ID = "00000000001";

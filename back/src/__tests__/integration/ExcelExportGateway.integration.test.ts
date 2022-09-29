@@ -1,9 +1,9 @@
-import { ExcelExportGateway } from "../../adapters/secondary/reporting/ExcelExportGateway";
-import fs from "fs";
 import { Workbook } from "exceljs";
-import { makeTemporaryStorageFolder } from "../../utils/filesystemUtils";
 import extract from "extract-zip";
+import fs from "fs";
 import * as path from "path";
+import { ExcelExportGateway } from "../../adapters/secondary/reporting/ExcelExportGateway";
+import { makeTemporaryStorageFolder } from "../../utils/filesystemUtils";
 
 describe("ExcelExportGateway", () => {
   it("Saves a record of multiple sheets into an ZIP file", async () => {

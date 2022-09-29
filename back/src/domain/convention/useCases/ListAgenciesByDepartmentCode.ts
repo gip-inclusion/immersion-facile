@@ -1,12 +1,12 @@
-import { DepartmentCode } from "shared";
 import {
   activeAgencyStatuses,
   AgencyDto,
-  AgencyKindFilter,
   AgencyIdAndName,
+  AgencyKindFilter,
+  DepartmentCode,
   ListAgenciesByDepartmentCodeRequestDto,
+  listAgenciesByDepartmentCodeRequestSchema,
 } from "shared";
-import { listAgenciesByDepartmentCodeRequestSchema } from "shared";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 

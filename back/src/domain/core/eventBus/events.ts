@@ -1,10 +1,13 @@
-import { AgencyDto } from "shared";
-import { ContactEstablishmentRequestDto } from "shared";
-import { ConventionDto, WithConventionId } from "shared";
-import { FormEstablishmentDto } from "shared";
-import { ImmersionAssessmentDto } from "shared";
-import { EstablishmentJwtPayload } from "shared";
-import { Flavor } from "shared";
+import {
+  AgencyDto,
+  ContactEstablishmentRequestDto,
+  ConventionDto,
+  EstablishmentJwtPayload,
+  Flavor,
+  FormEstablishmentDto,
+  ImmersionAssessmentDto,
+  WithConventionId,
+} from "shared";
 import {
   ConventionRequiresModificationPayload,
   RenewMagicLinkPayload,

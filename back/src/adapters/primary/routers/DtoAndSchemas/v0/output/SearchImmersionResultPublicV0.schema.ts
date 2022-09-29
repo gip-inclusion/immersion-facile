@@ -1,9 +1,13 @@
-import { geoPositionSchema } from "shared";
-import { romeCodeSchema } from "shared";
-import { appellationDtoSchema } from "shared";
-import { siretSchema } from "shared";
-import { phoneRegExp } from "shared";
-import { zEmail, zString, zTrimmedString } from "shared";
+import {
+  appellationDtoSchema,
+  geoPositionSchema,
+  phoneRegExp,
+  romeCodeSchema,
+  siretSchema,
+  zEmail,
+  zString,
+  zTrimmedString,
+} from "shared";
 import { z } from "zod";
 import { SearchImmersionResultPublicV0 } from "./SearchImmersionResultPublicV0.dto";
 

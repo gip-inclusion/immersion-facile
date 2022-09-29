@@ -1,19 +1,19 @@
 import bubbles from "/bulles.svg";
 import checked from "/checked.svg";
+import arrow from "/fleche.svg";
 import greatings from "/greatings.png";
 import tandem from "/tandem.png";
 import React from "react";
-import arrow from "/fleche.svg";
+import {
+  BulletPointArrow,
+  Card,
+  Colored,
+  Title,
+} from "react-design-system/immersionFacile";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { routes } from "src/app/routing/routes";
 import { EstablishmentImmersionHowTo } from "src/uiComponents/ImmersionHowTo";
 import { Statistic } from "src/uiComponents/Statistic";
-import {
-  Title,
-  Card,
-  Colored,
-  BulletPointArrow,
-} from "react-design-system/immersionFacile";
 
 export const LandingEstablishmentPage = () => (
   <HeaderFooterLayout>

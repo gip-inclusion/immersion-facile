@@ -1,7 +1,10 @@
-import { AddressDto } from "shared";
-import { AgencyDtoBuilder } from "shared";
-import { unknownAddress } from "shared";
-import { GeoPositionDto } from "shared";
+import {
+  AddressDto,
+  AgencyDtoBuilder,
+  GeoPositionDto,
+  unknownAddress,
+} from "shared";
+import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
@@ -10,7 +13,6 @@ import {
   ApplyAgenciesAddressesFromPositions,
   noAddress,
 } from "../../../domain/convention/useCases/ApplyAgenciesAddressesFromPositions";
-import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
 
 const position: GeoPositionDto = {
   lat: 0.722573,

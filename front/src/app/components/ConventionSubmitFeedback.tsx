@@ -1,6 +1,6 @@
 import { values } from "ramda";
-import { Signatories, Signatory, SignatoryRole } from "shared";
 import React from "react";
+import { Signatories, Signatory, SignatoryRole } from "shared";
 import {
   SubmitFeedback,
   SubmitFeedBackKind,

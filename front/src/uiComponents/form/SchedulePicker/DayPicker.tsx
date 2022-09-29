@@ -1,6 +1,5 @@
 import React from "react";
-import { DailyScheduleDto } from "shared";
-import { makeImmersionTimetable } from "shared";
+import { DailyScheduleDto, makeImmersionTimetable } from "shared";
 import { DayCircle } from "./DayCircle";
 import { WeeklyRow } from "./WeeklyRow";
 

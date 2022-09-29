@@ -1,4 +1,4 @@
-import type { FeatureFlags, FeatureFlag } from "shared";
+import type { FeatureFlag, FeatureFlags } from "shared";
 
 export interface FeatureFlagRepository {
   getAll: () => Promise<FeatureFlags>;

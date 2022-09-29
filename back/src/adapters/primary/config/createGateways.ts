@@ -8,6 +8,7 @@ import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
 import { Clock } from "../../../domain/core/ports/Clock";
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
+import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
 import { DocumentGateway } from "../../../domain/generic/fileManagement/port/DocumentGateway";
 import { createLogger } from "../../../utils/logger";
 import {
@@ -21,6 +22,8 @@ import {
 } from "../../secondary/addressGateway/HttpOpenCageDataAddressGateway";
 import { InMemoryAddressGateway } from "../../secondary/addressGateway/InMemoryAddressGateway";
 import { CachingAccessTokenGateway } from "../../secondary/core/CachingAccessTokenGateway";
+import { MetabaseDashboardGateway } from "../../secondary/dashboardGateway/MetabaseDashboardGateway";
+import { NotImplementedDashboardGateway } from "../../secondary/dashboardGateway/NotImplementedDashboardGateway";
 import { HybridEmailGateway } from "../../secondary/emailGateway/HybridEmailGateway";
 import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmailGateway";
 import { SendinblueEmailGateway } from "../../secondary/emailGateway/SendinblueEmailGateway";
@@ -32,10 +35,10 @@ import { InMemoryAccessTokenGateway } from "../../secondary/immersionOffer/InMem
 import { InMemoryLaBonneBoiteAPI } from "../../secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
 import { InMemoryPassEmploiGateway } from "../../secondary/immersionOffer/InMemoryPassEmploiGateway";
 import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
-import { NotImplementedDocumentGateway } from "../../secondary/NotImplementedDocumentGateway";
 import { InMemoryPoleEmploiGateway } from "../../secondary/InMemoryPoleEmploiGateway";
 import { InMemorySireneGateway } from "../../secondary/InMemorySireneGateway";
 import { MinioDocumentGateway } from "../../secondary/MinioDocumentGateway";
+import { NotImplementedDocumentGateway } from "../../secondary/NotImplementedDocumentGateway";
 import {
   HttpPeConnectGateway,
   PeConnectUrlTargets,
@@ -50,9 +53,6 @@ import { ExcelExportGateway } from "../../secondary/reporting/ExcelExportGateway
 import { InMemoryExportGateway } from "../../secondary/reporting/InMemoryExportGateway";
 import { S3DocumentGateway } from "../../secondary/S3DocumentGateway";
 import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
-import { MetabaseDashboardGateway } from "../../secondary/dashboardGateway/MetabaseDashboardGateway";
-import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
-import { NotImplementedDashboardGateway } from "../../secondary/dashboardGateway/NotImplementedDashboardGateway";
 
 const logger = createLogger(__filename);
 

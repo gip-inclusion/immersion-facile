@@ -1,5 +1,4 @@
-import { AbsoluteUrl } from "shared";
-import { frontRoutes } from "shared";
+import { AbsoluteUrl, frontRoutes } from "shared";
 import {
   makeGenerateJwtES256,
   makeGenerateJwtHS256,

@@ -3,6 +3,7 @@ import { nafSchema } from "../naf";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret";
 import { NotEmptyArray, phoneRegExp } from "../utils";
+import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import {
   zBoolean,
   zEmail,
@@ -12,12 +13,11 @@ import {
 } from "../zodUtils";
 import {
   BusinessContactDto,
-  FormEstablishmentSource,
-  ImmersionContactInEstablishmentId,
   ContactMethod,
   FormEstablishmentDto,
+  FormEstablishmentSource,
+  ImmersionContactInEstablishmentId,
 } from "./FormEstablishment.dto";
-import { addressWithPostalCodeSchema } from "../utils/postalCode";
 
 // prettier-ignore
 export const immersionContactInEstablishmentIdSchema: z.ZodSchema<ImmersionContactInEstablishmentId> =

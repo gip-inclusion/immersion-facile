@@ -1,13 +1,13 @@
+import classNames from "classnames";
 import React, {
+  ElementType,
+  FC,
   forwardRef,
   useCallback,
   useEffect,
   useRef,
   useState,
-  FC,
-  ElementType,
 } from "react";
-import classNames from "classnames";
 import { ComponentProps } from "./Accordion";
 
 type Case = {

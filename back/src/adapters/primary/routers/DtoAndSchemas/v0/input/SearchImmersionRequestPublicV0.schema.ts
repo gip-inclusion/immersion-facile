@@ -1,5 +1,4 @@
-import { geoPositionSchema } from "shared";
-import { romeCodeSchema } from "shared";
+import { geoPositionSchema, romeCodeSchema } from "shared";
 import { z } from "zod";
 import { SearchImmersionRequestPublicV0 } from "./SearchImmersionRequestPublicV0.dto";
 

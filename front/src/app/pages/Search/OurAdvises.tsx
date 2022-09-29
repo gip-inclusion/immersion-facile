@@ -1,9 +1,9 @@
+import React from "react";
 import {
   AccordionDSFR,
   AccordionDSFRItem,
 } from "react-design-system/designSystemFrance";
-import React from "react";
-import { Title, SubTitle } from "react-design-system/immersionFacile";
+import { SubTitle, Title } from "react-design-system/immersionFacile";
 
 export const OurAdvises = () => (
   <div className="flex justify-center items-center flex-col">

@@ -1,17 +1,22 @@
 import { useField } from "formik";
 import React, { useState } from "react";
-import { FormEstablishmentDto, FormEstablishmentSource } from "shared";
-import { SiretDto } from "shared";
-import { OmitFromExistingKeys } from "shared";
+import { Button, Notification } from "react-design-system/immersionFacile";
+import {
+  addressDtoToString,
+  FormEstablishmentDto,
+  FormEstablishmentSource,
+  OmitFromExistingKeys,
+  SiretDto,
+} from "shared";
 import { establishmentGateway } from "src/app/config/dependencies";
+import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
+import { ENV } from "src/environmentVariables";
 import {
   useInitialSiret,
   useSiretFetcher,
   useSiretRelatedField,
 } from "src/hooks/siret.hooks";
-import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
-import { ENV } from "src/environmentVariables";
-import { Button, Notification } from "react-design-system/immersionFacile";
+import { AddressAutocomplete } from "src/uiComponents/autocomplete/AddressAutocomplete";
 
 import {
   TextInput,
@@ -23,8 +28,6 @@ import {
   getLabelAndName,
   getMandatoryLabelAndName,
 } from "./EstablishmentFormikForm";
-import { AddressAutocomplete } from "src/uiComponents/autocomplete/AddressAutocomplete";
-import { addressDtoToString } from "shared";
 
 type EstablishmentCreationFormProps = {
   source: FormEstablishmentSource;

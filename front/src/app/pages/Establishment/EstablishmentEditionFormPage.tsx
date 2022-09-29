@@ -1,7 +1,6 @@
 import { useField } from "formik";
 import React from "react";
-import { EstablishmentJwtPayload } from "shared";
-import { addressDtoToString } from "shared";
+import { addressDtoToString, EstablishmentJwtPayload } from "shared";
 import { establishmentGateway } from "src/app/config/dependencies";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { routes } from "src/app/routing/routes";

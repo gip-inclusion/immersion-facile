@@ -1,6 +1,9 @@
 import jwt from "jsonwebtoken";
-import { EstablishmentJwtPayload, PayloadOption } from "shared";
-import { WithApiConsumerId } from "shared";
+import {
+  EstablishmentJwtPayload,
+  PayloadOption,
+  WithApiConsumerId,
+} from "shared";
 
 type AnyObject = Record<string, unknown>;
 

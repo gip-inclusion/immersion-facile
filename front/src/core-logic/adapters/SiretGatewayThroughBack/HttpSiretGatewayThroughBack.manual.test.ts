@@ -2,14 +2,14 @@ import { firstValueFrom } from "rxjs";
 import {
   apiSirenNotAvailableSiret,
   conflictErrorSiret,
+  createManagedAxiosInstance,
+  expectToEqual,
   GetSiretInfoError,
   tooManySirenRequestsSiret,
 } from "shared";
-import { expectToEqual } from "shared";
 import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
-import { SimulatedSiretGatewayThroughBack } from "./SimulatedSiretGatewayThroughBack";
 import { HttpSiretGatewayThroughBack } from "./HttpSiretGatewayThroughBack";
-import { createManagedAxiosInstance } from "shared";
+import { SimulatedSiretGatewayThroughBack } from "./SimulatedSiretGatewayThroughBack";
 
 const simulated = new SimulatedSiretGatewayThroughBack(0, {
   "12345678901234": {

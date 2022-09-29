@@ -1,10 +1,12 @@
-import { SearchImmersionResultDto } from "shared";
-import { SiretAndRomeDto } from "shared";
-import { siretAndRomeSchema } from "shared";
+import {
+  ApiConsumer,
+  SearchImmersionResultDto,
+  SiretAndRomeDto,
+  siretAndRomeSchema,
+} from "shared";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { ApiConsumer } from "shared";
 
 export class GetImmersionOfferBySiretAndRome extends TransactionalUseCase<
   SiretAndRomeDto,

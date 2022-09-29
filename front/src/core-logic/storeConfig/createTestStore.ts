@@ -1,9 +1,9 @@
 import { VirtualTimeScheduler } from "rxjs";
 import { TestAdminGateway } from "src/core-logic/adapters/AdminGateway/TestAdminGateway";
-import { createTestDeviceRepository } from "src/core-logic/adapters/DeviceRepository/createTestDeviceRepository";
-import { TestSentEmailGateway } from "src/core-logic/adapters/EmailGateway/TestSentEmailGateway";
 
 import { InMemoryConventionGateway } from "src/core-logic/adapters/Convention/InMemoryConventionGateway";
+import { createTestDeviceRepository } from "src/core-logic/adapters/DeviceRepository/createTestDeviceRepository";
+import { TestSentEmailGateway } from "src/core-logic/adapters/EmailGateway/TestSentEmailGateway";
 import { InMemoryEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/InMemoryEstablishmentGateway";
 import { InMemoryImmersionSearchGateway } from "src/core-logic/adapters/ImmersionSearchGateway/InMemoryImmersionSearchGateway";
 import { InMemoryNavigationGateway } from "src/core-logic/adapters/NavigationGateway/InMemoryNavigationGateway";
@@ -11,10 +11,10 @@ import { InMemoryRomeAutocompleteGateway } from "src/core-logic/adapters/RomeAut
 import { TestTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/TestTechnicalGateway";
 import { DeviceRepository } from "src/core-logic/ports/DeviceRepository";
 import { createStore, RootState } from "src/core-logic/storeConfig/store";
-import { TestImmersionAssessmentGateway } from "../adapters/AssessmentGateway/TestImmersionAssessmentGateway";
 import { InMemoryAddressGateway } from "../adapters/AddressGateway/InMemoryAddressGateway";
-import { TestSiretGatewayThroughBack } from "../adapters/SiretGatewayThroughBack/TestSiretGatewayThroughBack";
 import { TestAgencyGateway } from "../adapters/AgencyGateway/TestAgencyGateway";
+import { TestImmersionAssessmentGateway } from "../adapters/AssessmentGateway/TestImmersionAssessmentGateway";
+import { TestSiretGatewayThroughBack } from "../adapters/SiretGatewayThroughBack/TestSiretGatewayThroughBack";
 
 export interface TestDependencies {
   adminGateway: TestAdminGateway;

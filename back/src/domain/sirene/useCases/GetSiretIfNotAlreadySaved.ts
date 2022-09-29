@@ -1,8 +1,8 @@
-import { pipeWithValue } from "shared";
 import {
   GetSiretRequestDto,
   getSiretRequestSchema,
   GetSiretResponseDto,
+  pipeWithValue,
 } from "shared";
 import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";

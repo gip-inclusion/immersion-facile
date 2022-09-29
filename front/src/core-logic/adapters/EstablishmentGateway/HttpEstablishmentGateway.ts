@@ -1,13 +1,15 @@
 import { AxiosInstance } from "axios";
 import { from, Observable } from "rxjs";
-import { FormEstablishmentDto } from "shared";
-import { formEstablishmentSchema } from "shared";
 import {
   formAlreadyExistsRoute,
+  FormEstablishmentDto,
+  formEstablishmentSchema,
   formEstablishmentsRoute,
+  isSiretExistResponseSchema,
   requestEmailToUpdateFormRoute,
+  SiretDto,
+  siretSchema,
 } from "shared";
-import { isSiretExistResponseSchema, SiretDto, siretSchema } from "shared";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
 
 export class HttpEstablishmentGateway implements EstablishmentGateway {

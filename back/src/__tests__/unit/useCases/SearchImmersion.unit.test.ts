@@ -1,5 +1,9 @@
-import { SearchImmersionQueryParamsDto } from "shared";
-import { SearchImmersionResultDto } from "shared";
+import {
+  AddressDto,
+  ApiConsumer,
+  SearchImmersionQueryParamsDto,
+  SearchImmersionResultDto,
+} from "shared";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
@@ -14,10 +18,8 @@ import {
   TEST_ROME_LABEL,
 } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { ApiConsumer } from "shared";
 import { SearchMadeEntity } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { SearchImmersion } from "../../../domain/immersionOffer/useCases/SearchImmersion";
-import { AddressDto } from "shared";
 
 const secretariatRome = "M1607";
 const boulangerRome = "D1102";

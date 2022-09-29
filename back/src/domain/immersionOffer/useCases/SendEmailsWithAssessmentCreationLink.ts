@@ -1,6 +1,5 @@
 import { addDays } from "date-fns";
-import { ConventionId } from "shared";
-import { frontRoutes } from "shared";
+import { ConventionId, frontRoutes } from "shared";
 import { z } from "zod";
 import { GenerateConventionMagicLink } from "../../../adapters/primary/config/createGenerateConventionMagicLink";
 import { createLogger } from "../../../utils/logger";

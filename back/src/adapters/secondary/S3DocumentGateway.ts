@@ -1,9 +1,9 @@
-import { StoredFile } from "../../domain/generic/fileManagement/entity/StoredFile";
-import { DocumentGateway } from "../../domain/generic/fileManagement/port/DocumentGateway";
-import { createLogger } from "../../utils/logger";
 import * as AWS from "aws-sdk";
 import * as fse from "fs-extra";
 import { promisify } from "util";
+import { StoredFile } from "../../domain/generic/fileManagement/entity/StoredFile";
+import { DocumentGateway } from "../../domain/generic/fileManagement/port/DocumentGateway";
+import { createLogger } from "../../utils/logger";
 
 const readFile = promisify<string, Buffer>(fse.readFile);
 

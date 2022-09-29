@@ -1,13 +1,14 @@
 // Details: https://www.pole-emploi.fr/employeur/vos-recrutements/le-rome-et-les-fiches-metiers.html
 import { z } from "zod";
 import { zTrimmedString } from "../zodUtils";
-import type { RomeDto, RomeSearchInput } from "./romeAndAppellation.dto";
 import type {
+  AppellationCode,
   AppellationDto,
   AppellationMatchDto,
-  AppellationCode,
-  RomeCode,
   MatchRangeDto,
+  RomeCode,
+  RomeDto,
+  RomeSearchInput,
 } from "./romeAndAppellation.dto";
 
 const codeRomeRegex = /^[A-N]\d{4}$/;

@@ -1,6 +1,4 @@
-import { ConventionId } from "shared";
-import { ConventionDtoBuilder } from "shared";
-import { Role } from "shared";
+import { ConventionDtoBuilder, ConventionId, Role } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { UuidV4Generator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";

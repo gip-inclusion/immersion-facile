@@ -1,14 +1,16 @@
 import { AxiosInstance, AxiosResponse } from "axios";
 import { from, map, Observable } from "rxjs";
+import {
+  ContactEstablishmentRequestDto,
+  contactEstablishmentRoute,
+  immersionOffersRoute,
+  queryParamsAsString,
+  SearchImmersionQueryParamsDto,
+  SearchImmersionResultDto,
+  searchImmersionsSchema,
+} from "shared";
 
 import { ImmersionSearchGateway } from "src/core-logic/ports/ImmersionSearchGateway";
-import { ContactEstablishmentRequestDto } from "shared";
-import { contactEstablishmentRoute, immersionOffersRoute } from "shared";
-import { SearchImmersionQueryParamsDto } from "shared";
-import { SearchImmersionResultDto } from "shared";
-import { queryParamsAsString } from "shared";
-
-import { searchImmersionsSchema } from "shared";
 
 export class HttpImmersionSearchGateway implements ImmersionSearchGateway {
   constructor(private readonly httpClient: AxiosInstance) {}

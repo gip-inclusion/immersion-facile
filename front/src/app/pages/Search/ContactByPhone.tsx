@@ -1,12 +1,12 @@
 import { Form, Formik } from "formik";
 import React, { useState } from "react";
-import { immersionSearchGateway } from "src/app/config/dependencies";
+import { Button } from "react-design-system/immersionFacile";
 import {
   ContactEstablishmentByPhoneDto,
   contactEstablishmentByPhoneSchema,
+  SiretDto,
 } from "shared";
-import { SiretDto } from "shared";
-import { Button } from "react-design-system/immersionFacile";
+import { immersionSearchGateway } from "src/app/config/dependencies";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 

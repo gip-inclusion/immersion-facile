@@ -1,5 +1,4 @@
-import { AppellationDto } from "shared";
-import { ScheduleDto } from "shared";
+import { AppellationDto, ScheduleDto } from "shared";
 import { param, ValueSerializer } from "type-route";
 
 export type AdminTab =

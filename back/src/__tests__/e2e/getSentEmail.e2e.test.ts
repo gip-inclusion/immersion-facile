@@ -1,6 +1,4 @@
-import { EmailSentDto } from "shared";
-import { AdminToken } from "shared";
-import { emailRoute } from "shared";
+import { AdminToken, emailRoute, EmailSentDto } from "shared";
 import { SuperTest, Test } from "supertest";
 import {
   buildTestApp,

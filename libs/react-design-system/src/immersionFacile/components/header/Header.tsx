@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink, TabLinks, NavWrapper } from "../tabLinks";
+import { NavLink, NavWrapper, TabLinks } from "../tabLinks";
 
 export type Tool = {
   iconClassName: string;

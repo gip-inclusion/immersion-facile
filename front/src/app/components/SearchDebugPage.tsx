@@ -1,11 +1,10 @@
 import { Field, Form, Formik, FormikHelpers } from "formik";
 import React, { useState } from "react";
 import { firstValueFrom } from "rxjs";
+import { AppellationDto, SearchImmersionResultDto } from "shared";
 import { immersionSearchGateway } from "src/app/config/dependencies";
-import { AppellationDto } from "shared";
-import { SearchImmersionResultDto } from "shared";
-import { AppellationAutocomplete } from "./AppellationAutocomplete";
 import { AddressAutocomplete } from "src/uiComponents/autocomplete/AddressAutocomplete";
+import { AppellationAutocomplete } from "./AppellationAutocomplete";
 
 interface Values {
   rome: string;

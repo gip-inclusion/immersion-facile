@@ -10,22 +10,22 @@ import { sentEmailsEpics } from "src/core-logic/domain/admin/sentEmails/sentEmai
 import { sentEmailsSlice } from "src/core-logic/domain/admin/sentEmails/sentEmails.slice";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { establishmentEpics } from "src/core-logic/domain/establishmentPath/establishment.epics";
-import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFlags.slice";
 import { featureFlagEpics } from "src/core-logic/domain/featureFlags/featureFlags.epics";
+import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFlags.slice";
 import { romeAutocompleteEpic } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.epics";
 import { romeAutocompleteSlice } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.slice";
 import { searchEpics } from "src/core-logic/domain/search/search.epics";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import { siretEpics } from "src/core-logic/domain/siret/siret.epics";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
+import { agenciesEpics } from "../domain/agencies/agencies.epics";
+import { agenciesSlice } from "../domain/agencies/agencies.slice";
+import { authEpics } from "../domain/auth/auth.epics";
+import { conventionEpics } from "../domain/convention/convention.epics";
+import { conventionSlice } from "../domain/convention/convention.slice";
 import { establishmentSlice } from "../domain/establishmentPath/establishment.slice";
 import { immersionAssessmentEpics } from "../domain/immersionAssessment/immersionAssessment.epics";
 import { immersionAssessmentSlice } from "../domain/immersionAssessment/immersionAssessment.slice";
-import { conventionEpics } from "../domain/convention/convention.epics";
-import { conventionSlice } from "../domain/convention/convention.slice";
-import { authEpics } from "../domain/auth/auth.epics";
-import { agenciesEpics } from "../domain/agencies/agencies.epics";
-import { agenciesSlice } from "../domain/agencies/agencies.slice";
 
 const allEpics: any[] = [
   ...dashboardUrlsEpics,

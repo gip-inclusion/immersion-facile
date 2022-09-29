@@ -1,12 +1,12 @@
 import { useFormikContext } from "formik";
 import React from "react";
-import { RadioGroupForField } from "src/app/components/RadioGroup";
 import {
   BusinessContactDto,
   ContactMethod,
   FormEstablishmentDto,
+  zEmail,
 } from "shared";
-import { zEmail } from "shared";
+import { RadioGroupForField } from "src/app/components/RadioGroup";
 import { FillableList } from "src/uiComponents/form/FillableList";
 import { TextInput } from "src/uiComponents/form/TextInput";
 

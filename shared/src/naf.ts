@@ -1,5 +1,5 @@
-import { keys } from "./utils";
 import { z } from "zod";
+import { keys } from "./utils";
 
 export type NafSectorCode = keyof typeof nafSectorLabels;
 export const nafSectorLabels = {

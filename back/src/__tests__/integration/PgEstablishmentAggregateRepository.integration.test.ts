@@ -1,9 +1,18 @@
 import { Pool, PoolClient } from "pg";
 import { prop, sortBy } from "ramda";
-import { ContactMethod, FormEstablishmentSource } from "shared";
-import { GeoPositionDto } from "shared";
-import { AppellationDto } from "shared";
-import { SearchImmersionResultDto } from "shared";
+import {
+  AddressDto,
+  AppellationDto,
+  ContactMethod,
+  FormEstablishmentSource,
+  GeoPositionDto,
+  SearchImmersionResultDto,
+} from "shared";
+import {
+  rueBitcheDto,
+  rueGuillaumeTellDto,
+  rueJacquardDto,
+} from "../../_testBuilders/addressDtos";
 import { ContactEntityV2Builder } from "../../_testBuilders/ContactEntityV2Builder";
 import { EstablishmentAggregateBuilder } from "../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentEntityV2Builder";
@@ -22,12 +31,6 @@ import {
   NumberEmployeesRange,
 } from "../../domain/immersionOffer/entities/EstablishmentEntity";
 import { SearchMade } from "../../domain/immersionOffer/entities/SearchMadeEntity";
-import {
-  rueBitcheDto,
-  rueGuillaumeTellDto,
-  rueJacquardDto,
-} from "../../_testBuilders/addressDtos";
-import { AddressDto } from "shared";
 
 const testUid1 = "11111111-a2a5-430a-b558-ed3e2f03512d";
 const testUid2 = "22222222-a2a5-430a-b558-ed3e2f03512d";

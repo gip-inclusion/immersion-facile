@@ -1,9 +1,16 @@
-import { nafSchema } from "shared";
-import { appellationSchema, romeCodeSchema } from "shared";
-import { siretSchema } from "shared";
-import { NotEmptyArray, phoneRegExp } from "shared";
-import { addressWithPostalCodeSchema } from "shared";
-import { zBoolean, zEmail, zString, zTrimmedString } from "shared";
+import {
+  addressWithPostalCodeSchema,
+  appellationSchema,
+  nafSchema,
+  NotEmptyArray,
+  phoneRegExp,
+  romeCodeSchema,
+  siretSchema,
+  zBoolean,
+  zEmail,
+  zString,
+  zTrimmedString,
+} from "shared";
 import { z } from "zod";
 import {
   BusinessContactDtoPublicV0,

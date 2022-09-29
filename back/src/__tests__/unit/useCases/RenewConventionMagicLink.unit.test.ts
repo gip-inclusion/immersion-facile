@@ -1,7 +1,10 @@
-import { AgencyDtoBuilder } from "shared";
-import { ConventionDto, RenewMagicLinkRequestDto } from "shared";
-import { ConventionDtoBuilder } from "shared";
-import { createConventionMagicLinkPayload } from "shared";
+import {
+  AgencyDtoBuilder,
+  ConventionDto,
+  ConventionDtoBuilder,
+  createConventionMagicLinkPayload,
+  RenewMagicLinkRequestDto,
+} from "shared";
 import { AppConfigBuilder } from "../../../_testBuilders/AppConfigBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import { AppConfig } from "../../../adapters/primary/config/appConfig";

@@ -1,5 +1,4 @@
-import { frontRoutes } from "shared";
-import { EstablishmentJwtPayload } from "shared";
+import { EstablishmentJwtPayload, frontRoutes } from "shared";
 import {
   GenerateEditFormEstablishmentUrl,
   makeGenerateJwtES256,

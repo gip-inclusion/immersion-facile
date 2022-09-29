@@ -1,7 +1,7 @@
 import { ErrorMessage } from "formik";
 import React from "react";
+import { ButtonAdd, ButtonDelete } from "react-design-system/immersionFacile";
 import { TimePeriodDto } from "shared";
-import { ButtonDelete, ButtonAdd } from "react-design-system/immersionFacile";
 
 type HourPickerProps = {
   name: string;

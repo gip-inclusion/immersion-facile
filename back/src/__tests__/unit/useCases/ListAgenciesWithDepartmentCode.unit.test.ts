@@ -1,10 +1,9 @@
-import { AddressDto } from "shared";
-import { AgencyDtoBuilder } from "shared";
+import { AddressDto, AgencyDtoBuilder } from "shared";
+import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { ListAgenciesByDepartmentCode } from "../../../domain/convention/useCases/ListAgenciesByDepartmentCode";
-import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
 
 const defaultAdress: AddressDto = {
   city: "",

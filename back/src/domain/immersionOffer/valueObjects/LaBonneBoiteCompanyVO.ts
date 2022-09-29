@@ -1,6 +1,4 @@
-import { NafDto } from "shared";
-import { SiretDto } from "shared";
-import { addressStringToDto } from "shared";
+import { addressStringToDto, NafDto, SiretDto } from "shared";
 import { createLogger } from "../../../utils/logger";
 import { Clock } from "../../core/ports/Clock";
 import {

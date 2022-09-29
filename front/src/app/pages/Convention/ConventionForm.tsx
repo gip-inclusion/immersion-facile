@@ -2,9 +2,11 @@ import { startOfToday } from "date-fns";
 import { Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { Notification, Title } from "react-design-system/immersionFacile";
-import { ConventionDto } from "shared";
-import { conventionWithoutExternalIdSchema } from "shared";
-import { toDateString } from "shared";
+import {
+  ConventionDto,
+  conventionWithoutExternalIdSchema,
+  toDateString,
+} from "shared";
 import {
   ConventionSubmitFeedback,
   SuccessFeedbackKindConvention,

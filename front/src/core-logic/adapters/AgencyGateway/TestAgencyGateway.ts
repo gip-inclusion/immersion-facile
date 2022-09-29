@@ -1,18 +1,19 @@
 /* eslint-disable  @typescript-eslint/require-await */
 import { values } from "ramda";
 import { Observable, of, Subject } from "rxjs";
-import { DepartmentCode } from "shared";
-import { AdminToken } from "shared";
-import { toAgencyPublicDisplayDto } from "shared";
 import {
+  AdminToken,
   AgencyDto,
   AgencyId,
   AgencyIdAndName,
   AgencyPublicDisplayDto,
   CreateAgencyDto,
+  DepartmentCode,
+  propEq,
+  propNotEq,
+  toAgencyPublicDisplayDto,
   WithAgencyId,
 } from "shared";
-import { propEq, propNotEq } from "shared";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
 export class TestAgencyGateway implements AgencyGateway {

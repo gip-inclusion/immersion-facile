@@ -1,5 +1,4 @@
-import { ConventionId } from "shared";
-import { createConventionMagicLinkPayload, Role } from "shared";
+import { ConventionId, createConventionMagicLinkPayload, Role } from "shared";
 import { makeGenerateJwtES256 } from "../../../domain/auth/jwt";
 import { AppConfig } from "./appConfig";
 

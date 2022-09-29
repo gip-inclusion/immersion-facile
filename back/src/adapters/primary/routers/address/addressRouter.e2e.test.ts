@@ -1,7 +1,8 @@
-import { departmentCodeFromPostcodeUrl, lookupStreetAddressUrl } from "shared";
 import {
   departmentCodeFromPostcodeRoute,
+  departmentCodeFromPostcodeUrl,
   lookupStreetAddressRoute,
+  lookupStreetAddressUrl,
 } from "shared";
 import { SuperTest, Test } from "supertest";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";

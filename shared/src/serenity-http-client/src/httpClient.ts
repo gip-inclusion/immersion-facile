@@ -1,7 +1,5 @@
 import { AxiosRequestConfig } from "axios";
-import { ConfigurationError } from "./errors";
-import { HttpClientError } from "./errors";
-import { HttpServerError } from "./errors";
+import { ConfigurationError, HttpClientError, HttpServerError } from "./errors";
 
 export interface HttpClient {
   get: (config: HttpClientGetConfig) => Promise<HttpResponse>;

@@ -1,10 +1,16 @@
 import { AxiosInstance, AxiosResponse } from "axios";
 import { from, map, Observable } from "rxjs";
+import {
+  AppellationMatchDto,
+  appellationRoute,
+  appellationSearchResponseSchema,
+  queryParamsAsString,
+  RomeDto,
+  romeListSchema,
+  romeRoute,
+  RomeSearchInput,
+} from "shared";
 import { RomeAutocompleteGateway } from "src/core-logic/ports/RomeAutocompleteGateway";
-import { AppellationMatchDto, RomeDto, RomeSearchInput } from "shared";
-import { appellationRoute, romeRoute } from "shared";
-import { queryParamsAsString } from "shared";
-import { appellationSearchResponseSchema, romeListSchema } from "shared";
 
 export class HttpRomeAutocompleteGateway implements RomeAutocompleteGateway {
   constructor(private readonly httpClient: AxiosInstance) {}

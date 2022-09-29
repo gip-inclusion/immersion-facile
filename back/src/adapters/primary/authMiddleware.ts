@@ -2,16 +2,17 @@ import { NextFunction, Request, Response } from "express";
 import jwt, { TokenExpiredError } from "jsonwebtoken";
 import promClient from "prom-client";
 import {
+  ApiConsumerName,
   ConventionMagicLinkPayload,
   currentJwtVersions,
   EstablishmentJwtPayload,
   PayloadKey,
   PayloadOption,
+  WithApiConsumerId,
 } from "shared";
 import { makeVerifyJwtES256 } from "../../domain/auth/jwt";
 import { Clock } from "../../domain/core/ports/Clock";
 import { GetApiConsumerById } from "../../domain/core/ports/GetApiConsumerById";
-import { ApiConsumerName, WithApiConsumerId } from "shared";
 import { createLogger } from "../../utils/logger";
 import { AppConfig } from "./config/appConfig";
 

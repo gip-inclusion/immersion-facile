@@ -1,5 +1,4 @@
-import { Beneficiary } from "shared";
-import { ExcludeFromExisting, NotEmptyArray } from "shared";
+import { Beneficiary, ExcludeFromExisting, NotEmptyArray } from "shared";
 import { EntityFromDto } from "../../core/EntityFromDto";
 
 export type PoleEmploiUserAdvisorDto = {

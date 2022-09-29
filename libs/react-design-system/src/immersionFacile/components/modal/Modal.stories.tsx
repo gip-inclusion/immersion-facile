@@ -2,9 +2,9 @@ import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
 import React from "react";
 import { modalPrefix } from ".";
 import { ModalDialog, ModalDialogProperties } from "./Modal";
-import { ModalTitle } from "./ModalTitle";
 import { ModalContent } from "./ModalContent";
 import { ModalFooter } from "./ModalFooter";
+import { ModalTitle } from "./ModalTitle";
 
 const Component = ModalDialog;
 const argTypes: Partial<ArgTypes<ModalDialogProperties>> | undefined = {};

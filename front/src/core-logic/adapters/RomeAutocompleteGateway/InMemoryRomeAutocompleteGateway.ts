@@ -1,7 +1,6 @@
 import { BehaviorSubject, delay, Observable, of, Subject } from "rxjs";
+import { AppellationMatchDto, RomeDto, sleep } from "shared";
 import { RomeAutocompleteGateway } from "src/core-logic/ports/RomeAutocompleteGateway";
-import { AppellationMatchDto, RomeDto } from "shared";
-import { sleep } from "shared";
 
 export class InMemoryRomeAutocompleteGateway
   implements RomeAutocompleteGateway

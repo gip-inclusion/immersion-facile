@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { ConventionReadDto } from "shared";
 import {
+  ConventionReadDto,
   conventionsRoute,
   immersionAssessmentRoute,
   signConventionRoute,

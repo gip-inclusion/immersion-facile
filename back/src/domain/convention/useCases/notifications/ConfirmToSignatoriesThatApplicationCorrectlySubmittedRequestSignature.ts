@@ -1,7 +1,5 @@
 import { values } from "ramda";
-import { ConventionDto } from "shared";
-import { conventionSchema } from "shared";
-import { frontRoutes } from "shared";
+import { ConventionDto, conventionSchema, frontRoutes } from "shared";
 import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
 import { createLogger } from "../../../../utils/logger";
 import { UseCase } from "../../../core/UseCase";

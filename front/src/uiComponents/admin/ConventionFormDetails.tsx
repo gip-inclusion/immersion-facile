@@ -1,19 +1,17 @@
 import React, { ReactNode } from "react";
 import { Accordion } from "react-design-system/immersionFacile";
 import {
+  AppellationDto,
   Beneficiary,
-  ConventionReadDto,
-  LegalRepresentative,
-  Mentor,
-} from "shared";
-import { path } from "shared";
-import { AppellationDto } from "shared";
-import {
   calculateTotalImmersionHoursBetweenDate,
   calculateWeeklyHoursFromSchedule,
+  ConventionReadDto,
+  keys,
+  LegalRepresentative,
+  Mentor,
+  path,
   prettyPrintSchedule,
 } from "shared";
-import { keys } from "shared";
 import { ConventionFormAccordionProps } from "./ConventionFormAccordion";
 import { TextCell } from "./TextCell";
 

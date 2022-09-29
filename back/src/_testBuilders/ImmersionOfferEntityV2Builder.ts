@@ -1,5 +1,4 @@
-import { Builder } from "shared";
-import { RomeCode } from "shared";
+import { Builder, RomeCode } from "shared";
 import { ImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
 
 const validImmersionOfferEntityV2: ImmersionOfferEntityV2 = {

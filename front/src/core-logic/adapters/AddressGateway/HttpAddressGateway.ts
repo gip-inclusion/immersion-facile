@@ -1,11 +1,13 @@
 import { AxiosInstance } from "axios";
-import { AddressAndPosition, DepartmentCode } from "shared";
-import { lookupAddressQueryParam, postCodeQueryParam } from "shared";
-import { findDepartmentCodeFromPostcodeResponseSchema } from "shared";
-import { addressAndPositionListSchema } from "shared";
 import {
+  AddressAndPosition,
+  addressAndPositionListSchema,
+  DepartmentCode,
   departmentCodeFromPostcodeRoute,
+  findDepartmentCodeFromPostcodeResponseSchema,
+  lookupAddressQueryParam,
   lookupStreetAddressRoute,
+  postCodeQueryParam,
 } from "shared";
 import { AddressGateway } from "src/core-logic/ports/AddressGateway";
 

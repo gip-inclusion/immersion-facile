@@ -1,15 +1,18 @@
 import React, { useState } from "react";
+import { Notification } from "react-design-system/immersionFacile";
+import {
+  ConventionMagicLinkPayload,
+  ConventionStatus,
+  Role,
+  statusTransitionConfigs,
+} from "shared";
 import { conventionGateway } from "src/app/config/dependencies";
 import { routes } from "src/app/routing/routes";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
-import { ConventionStatus } from "shared";
-import { statusTransitionConfigs } from "shared";
-import { ConventionMagicLinkPayload, Role } from "shared";
 import { ConventionFormAccordion } from "src/uiComponents/admin/ConventionFormAccordion";
 import { Route } from "type-route";
 import { ApiDataContainer } from "../admin/ApiDataContainer";
 import { VerificationActionButton } from "./VerificationActionButton";
-import { Notification } from "react-design-system/immersionFacile";
 
 type VerificationPageProps = {
   route: Route<typeof routes.conventionToValidate>;

@@ -1,9 +1,9 @@
 import {
+  ConventionMagicLinkPayload,
   DepartmentCodeFromPostcodeQuery,
   departmentCodeFromPostcodeQuerySchema,
+  FindDepartmentCodeFromPostcodeResponse,
 } from "shared";
-import { FindDepartmentCodeFromPostcodeResponse } from "shared";
-import { ConventionMagicLinkPayload } from "shared";
 import { ZodType, ZodTypeDef } from "zod";
 import { UseCase } from "../../core/UseCase";
 import { AddressGateway } from "../../immersionOffer/ports/AddressGateway";

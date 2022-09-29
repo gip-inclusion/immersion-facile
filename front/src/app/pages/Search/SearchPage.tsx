@@ -3,18 +3,18 @@ import locationSearchIcon from "/location-search-icon.svg";
 import SearchIcon from "@mui/icons-material/Search";
 import { Form, Formik } from "formik";
 import React from "react";
+import { ButtonSearch, MainWrapper } from "react-design-system/immersionFacile";
 import { RomeAutocomplete } from "src/app/components/RomeAutocomplete";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
-import { SearchInput, useSearchUseCase } from "src/hooks/search.hooks";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
+import { SearchInput, useSearchUseCase } from "src/hooks/search.hooks";
+import { AddressAutocomplete } from "src/uiComponents/autocomplete/AddressAutocomplete";
 import { HomeImmersionHowTo } from "src/uiComponents/ImmersionHowTo";
 import { StaticDropdown } from "./Dropdown/StaticDropdown";
 import { OurAdvises } from "./OurAdvises";
-import { SearchResultPanel } from "./SearchResultPanel";
-import { ButtonSearch, MainWrapper } from "react-design-system/immersionFacile";
-import { AddressAutocomplete } from "src/uiComponents/autocomplete/AddressAutocomplete";
 import "./SearchPage.css";
+import { SearchResultPanel } from "./SearchResultPanel";
 
 const radiusOptions = [1, 2, 5, 10, 20, 50, 100];
 const initiallySelectedIndex = -1; // don't select anything initially

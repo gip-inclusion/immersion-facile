@@ -1,5 +1,4 @@
-import { FormEstablishmentDto } from "shared";
-import { SiretDto } from "shared";
+import { FormEstablishmentDto, SiretDto } from "shared";
 
 export interface FormEstablishmentRepository {
   create: (formEstablishmentDto: FormEstablishmentDto) => Promise<void>;

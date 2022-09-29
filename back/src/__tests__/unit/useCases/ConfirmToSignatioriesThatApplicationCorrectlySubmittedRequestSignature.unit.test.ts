@@ -1,5 +1,4 @@
-import { ConventionDto } from "shared";
-import { ConventionDtoBuilder } from "shared";
+import { ConventionDto, ConventionDtoBuilder } from "shared";
 import { expectEmaiSignatoryConfirmationSignatureRequestMatchingConvention } from "../../../_testBuilders/emailAssertions";
 import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/test.helpers";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";

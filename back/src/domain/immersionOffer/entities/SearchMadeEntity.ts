@@ -1,5 +1,4 @@
-import { Flavor } from "shared";
-import { ApiConsumerName } from "shared";
+import { ApiConsumerName, Flavor } from "shared";
 
 export type SearchMadeId = Flavor<string, "SearchMadeId">;
 

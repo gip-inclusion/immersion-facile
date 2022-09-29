@@ -1,25 +1,24 @@
 import { AxiosInstance } from "axios";
 import { from, Observable } from "rxjs";
-import { AdminToken } from "shared";
 import {
+  AdminToken,
   ConventionDto,
   ConventionId,
   ConventionReadDto,
-  UpdateConventionStatusRequestDto,
-  WithConventionId,
-} from "shared";
-import { conventionReadSchema, withConventionIdSchema } from "shared";
-import {
+  conventionReadSchema,
   conventionShareRoute,
   conventionsRoute,
   generateMagicLinkRoute,
+  jwtSchema,
   renewMagicLinkRoute,
+  Role,
+  ShareLinkByEmailDto,
   signConventionRoute,
+  UpdateConventionStatusRequestDto,
   updateConventionStatusRoute,
+  WithConventionId,
+  withConventionIdSchema,
 } from "shared";
-import { ShareLinkByEmailDto } from "shared";
-import { jwtSchema } from "shared";
-import { Role } from "shared";
 import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 
 export class HttpConventionGateway implements ConventionGateway {

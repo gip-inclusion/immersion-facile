@@ -1,11 +1,11 @@
 import { AgencyId } from "../agency/agency.dto";
+import { FederatedIdentity } from "../federatedIdentities/federatedIdentity.dto";
+import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { ScheduleDto } from "../schedule/Schedule.dto";
 import { SiretDto } from "../siret";
-import { Flavor } from "../typeFlavors";
 
 import { Role } from "../tokens/MagicLinkPayload";
-import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
-import { FederatedIdentity } from "../federatedIdentities/federatedIdentity.dto";
+import { Flavor } from "../typeFlavors";
 
 export type ConventionStatus = typeof allConventionStatuses[number];
 export const allConventionStatuses = [

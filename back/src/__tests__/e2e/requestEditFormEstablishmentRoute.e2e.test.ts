@@ -1,12 +1,11 @@
 import { addHours } from "date-fns";
-import { EstablishmentJwtPayload } from "shared";
+import { EstablishmentJwtPayload, requestEmailToUpdateFormRoute } from "shared";
 import { SuperTest, Test } from "supertest";
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
 import { ContactEntityV2Builder } from "../../_testBuilders/ContactEntityV2Builder";
 import { EstablishmentAggregateBuilder } from "../../_testBuilders/EstablishmentAggregateBuilder";
 import { InMemoryUnitOfWork } from "../../adapters/primary/config/uowConfig";
 import { DomainEvent } from "../../domain/core/eventBus/events";
-import { requestEmailToUpdateFormRoute } from "shared";
 
 describe("Route to generate an establishment edition link", () => {
   let request: SuperTest<Test>;

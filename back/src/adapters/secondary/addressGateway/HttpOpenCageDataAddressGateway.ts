@@ -1,13 +1,15 @@
 import { Point } from "geojson";
-import { AddressAndPosition, AddressDto, DepartmentCode } from "shared";
-import { GeoPositionDto } from "shared";
 import {
   AbsoluteUrl,
+  AddressAndPosition,
+  AddressDto,
+  DepartmentCode,
+  GeoPositionDto,
   HttpResponse,
   ManagedAxios,
+  queryParamsAsString,
   TargetUrlsMapper,
 } from "shared";
-import { queryParamsAsString } from "shared";
 import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
 
 export type OpenCageDataTargetUrls =

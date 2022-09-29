@@ -1,5 +1,4 @@
-import { TemplatedEmail } from "shared";
-import { EstablishmentJwtPayload } from "shared";
+import { EstablishmentJwtPayload, TemplatedEmail } from "shared";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";

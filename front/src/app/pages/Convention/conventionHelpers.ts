@@ -3,15 +3,15 @@ import {
   ConventionDto,
   ConventionId,
   ConventionStatus,
+  FederatedIdentity,
   ImmersionObjective,
   InternshipKind,
+  mergeObjectsExceptFalsyValues,
+  OmitFromExistingKeys,
+  reasonableSchedule,
   Signatories,
+  toDateString,
 } from "shared";
-import { FederatedIdentity } from "shared";
-import { reasonableSchedule } from "shared";
-import { OmitFromExistingKeys } from "shared";
-import { toDateString } from "shared";
-import { mergeObjectsExceptFalsyValues } from "shared";
 import {
   conventionGateway,
   deviceRepository,

@@ -1,13 +1,13 @@
 import { mapObjIndexed } from "ramda";
 import {
   ConventionDto,
+  ConventionMagicLinkPayload,
   ConventionStatus,
   UpdateConventionStatusRequestDto,
+  updateConventionStatusRequestSchema,
   validatedConventionStatuses,
   WithConventionId,
 } from "shared";
-import { updateConventionStatusRequestSchema } from "shared";
-import { ConventionMagicLinkPayload } from "shared";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";

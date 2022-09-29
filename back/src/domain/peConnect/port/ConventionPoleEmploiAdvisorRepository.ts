@@ -1,5 +1,4 @@
-import { ConventionId } from "shared";
-import { PeExternalId } from "shared";
+import { ConventionId, PeExternalId } from "shared";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../dto/PeConnect.dto";
 
 export type ConventionAndPeExternalIds = {

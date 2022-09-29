@@ -1,4 +1,5 @@
 import { NotEmptyArray } from "../utils";
+
 export type Weekday =
   | "lundi"
   | "mardi"

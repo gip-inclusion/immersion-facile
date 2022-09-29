@@ -1,5 +1,6 @@
-import { AbsoluteUrl } from "shared";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import {
+  AbsoluteUrl,
   AxiosErrorWithResponse,
   AxiosInfrastructureError,
   ConnectionRefusedError,
@@ -16,7 +17,6 @@ import {
   toUnhandledError,
   UnhandledError,
 } from "shared";
-import axios, { AxiosError, AxiosResponse } from "axios";
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import {

@@ -3,12 +3,13 @@ import {
   AddressAndPosition,
   AddressDto,
   DepartmentCode,
+  featureToAddressDto,
   featureToAddressWithPosition,
+  GeoPositionDto,
+  ManagedAxios,
+  TargetUrlsMapper,
+  toFeatureCollection,
 } from "shared";
-import { featureToAddressDto } from "shared";
-import { toFeatureCollection } from "shared";
-import { GeoPositionDto } from "shared";
-import { ManagedAxios, TargetUrlsMapper } from "shared";
 import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
 import { createLogger } from "../../../utils/logger";
 

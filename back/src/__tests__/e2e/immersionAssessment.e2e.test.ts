@@ -1,7 +1,9 @@
-import { ConventionDtoBuilder } from "shared";
-import { ImmersionAssessmentDto } from "shared";
-import { immersionAssessmentRoute } from "shared";
-import { createConventionMagicLinkPayload } from "shared";
+import {
+  ConventionDtoBuilder,
+  createConventionMagicLinkPayload,
+  ImmersionAssessmentDto,
+  immersionAssessmentRoute,
+} from "shared";
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
 
 const conventionId = "my-Convention-id";

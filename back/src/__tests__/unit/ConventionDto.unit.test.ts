@@ -2,11 +2,12 @@ import { keys } from "ramda";
 import {
   allConventionStatuses,
   ConventionDto,
+  ConventionDtoBuilder,
+  conventionSchema,
   ConventionStatus,
+  DATE_START,
   maximumCalendarDayByInternshipKind,
 } from "shared";
-import { conventionSchema } from "shared";
-import { ConventionDtoBuilder, DATE_START } from "shared";
 import {
   addDays,
   splitCasesBetweenPassingAndFailing,

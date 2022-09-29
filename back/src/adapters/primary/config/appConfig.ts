@@ -1,10 +1,11 @@
 import * as dotenv from "dotenv";
 import { trim } from "ramda";
-import { AbsoluteUrl, ProcessEnv } from "shared";
 import {
+  AbsoluteUrl,
   makeGetBooleanVariable,
   makeThrowIfNotAbsoluteUrl,
   makeThrowIfNotDefined,
+  ProcessEnv,
   throwIfNotInArray,
 } from "shared";
 import { DomainTopic } from "../../../domain/core/eventBus/events";

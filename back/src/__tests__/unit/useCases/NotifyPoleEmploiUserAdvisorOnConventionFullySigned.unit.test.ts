@@ -1,6 +1,4 @@
-import { ConventionDto } from "shared";
-import { ConventionDtoBuilder } from "shared";
-import { frontRoutes } from "shared";
+import { ConventionDto, ConventionDtoBuilder, frontRoutes } from "shared";
 import {
   expectTypeToMatchAndEqual,
   fakeGenerateMagicLinkUrlFn,

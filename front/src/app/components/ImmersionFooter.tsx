@@ -1,7 +1,7 @@
-import React from "react";
-import { NavLink, Footer } from "react-design-system";
 import lesEntrepriseSengagent from "/les-entreprises-s-engagent.svg";
 import poleEmploiLogo from "/pole-emploi-logo.svg";
+import React from "react";
+import { Footer, NavLink } from "react-design-system";
 
 export const MinistereLogo = () => (
   <div className="fr-footer__brand fr-enlarge-link">

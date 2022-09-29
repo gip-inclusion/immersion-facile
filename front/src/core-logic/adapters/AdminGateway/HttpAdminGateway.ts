@@ -1,9 +1,15 @@
 import { AxiosInstance } from "axios";
 import { from, map, Observable } from "rxjs";
-import { AdminToken, UserAndPassword } from "shared";
-import { adminTokenSchema } from "shared";
-import { adminLogin, dashboardAgency, conventionsRoute } from "shared";
-import { AbsoluteUrl, absoluteUrlSchema } from "shared";
+import {
+  AbsoluteUrl,
+  absoluteUrlSchema,
+  adminLogin,
+  AdminToken,
+  adminTokenSchema,
+  conventionsRoute,
+  dashboardAgency,
+  UserAndPassword,
+} from "shared";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
 export class HttpAdminGateway implements AdminGateway {

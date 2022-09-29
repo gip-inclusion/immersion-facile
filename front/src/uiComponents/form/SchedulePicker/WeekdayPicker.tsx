@@ -2,11 +2,11 @@ import { FieldHookConfig } from "formik";
 import React from "react";
 import { ButtonAdd, ButtonDelete } from "react-design-system/immersionFacile";
 import {
+  DateIntervalDto,
   DayPeriodsDto,
   ScheduleDto,
   WeekdayNumber,
   WeekDayRangeSchemaDTO,
-  DateIntervalDto,
 } from "shared";
 import { WeekdayDropdown } from "./WeekdayDropdown";
 

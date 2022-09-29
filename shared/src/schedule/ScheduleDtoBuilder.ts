@@ -1,10 +1,10 @@
 import { z } from "zod";
 import { Builder } from "../Builder";
 import {
-  ScheduleDto,
-  DateIntervalDto,
   DailyScheduleDto,
+  DateIntervalDto,
   DayPeriodsDto,
+  ScheduleDto,
 } from "./Schedule.dto";
 import { dayPeriodsSchema, timePeriodsSchema } from "./Schedule.schema";
 import { emptySchedule, frenchDayMapping } from "./ScheduleUtils";

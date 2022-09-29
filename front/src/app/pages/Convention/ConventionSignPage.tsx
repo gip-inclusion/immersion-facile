@@ -2,17 +2,19 @@ import { Formik } from "formik";
 import { mergeDeepRight } from "ramda";
 import React, { useEffect, useState } from "react";
 import { Notification } from "react-design-system/immersionFacile";
-import { ConventionField, getConventionFieldName, isSignatory } from "shared";
 import {
   ConventionDto,
+  ConventionField,
+  ConventionMagicLinkPayload,
   ConventionReadDto,
+  conventionSchema,
+  exhaustiveCheck,
+  getConventionFieldName,
+  isSignatory,
   Signatory,
   SignatoryRole,
   signatoryRoles,
 } from "shared";
-import { conventionSchema } from "shared";
-import { ConventionMagicLinkPayload } from "shared";
-import { exhaustiveCheck } from "shared";
 import {
   ConventionSubmitFeedback,
   SuccessFeedbackKindConvention,

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { zString, zEmail } from "./zodUtils";
+import { zEmail, zString } from "./zodUtils";
 
 export type ShareLinkByEmailDto = {
   conventionLink: string;

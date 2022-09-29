@@ -1,5 +1,7 @@
 import { Formik, FormikProps, FormikValues } from "formik";
 import React, { Dispatch, SetStateAction, useState } from "react";
+import { Title } from "react-design-system/immersionFacile";
+import { conventionUkraineSchema } from "shared";
 import {
   ConventionSubmitFeedback,
   SuccessFeedbackKindConvention,
@@ -7,9 +9,7 @@ import {
 import { conventionGateway } from "src/app/config/dependencies";
 import { ConventionFormFieldsUkraine } from "src/app/pages/Convention/ConventionFields/ConventionFormFieldsUkraine";
 import { ConventionPresentation } from "src/app/pages/Convention/conventionHelpers";
-import { conventionUkraineSchema } from "shared";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
-import { Title } from "react-design-system/immersionFacile";
 
 type ConventionFormProps = {
   properties: ConventionPresentation;

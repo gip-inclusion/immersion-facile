@@ -1,11 +1,11 @@
+import { Builder } from "../Builder";
+import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
+import { SiretDto } from "../siret";
 import {
   BusinessContactDto,
   FormEstablishmentDto,
   FormEstablishmentSource,
 } from "./FormEstablishment.dto";
-import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
-import { SiretDto } from "../siret";
-import { Builder } from "../Builder";
 
 const validFormEstablishment: FormEstablishmentDto = {
   source: "immersion-facile",

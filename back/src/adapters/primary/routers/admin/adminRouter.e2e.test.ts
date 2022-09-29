@@ -1,6 +1,9 @@
-import { AdminToken } from "shared";
-import { SetFeatureFlagParams } from "shared";
-import { conventionsRoute, featureFlagsRoute } from "shared";
+import {
+  AdminToken,
+  conventionsRoute,
+  featureFlagsRoute,
+  SetFeatureFlagParams,
+} from "shared";
 import { SuperTest, Test } from "supertest";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";

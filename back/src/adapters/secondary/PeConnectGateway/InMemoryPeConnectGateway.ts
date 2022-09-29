@@ -1,6 +1,4 @@
-import { AbsoluteUrl } from "shared";
-import { peConnect } from "shared";
-import { queryParamsAsString } from "shared";
+import { AbsoluteUrl, peConnect, queryParamsAsString } from "shared";
 import { AccessTokenDto } from "../../../domain/peConnect/dto/AccessToken.dto";
 import {
   ExternalPeConnectAdvisor,

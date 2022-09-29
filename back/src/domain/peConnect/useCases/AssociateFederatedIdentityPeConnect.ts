@@ -1,6 +1,4 @@
-import { ConventionDto } from "shared";
-import { conventionSchema } from "shared";
-import { toPeExternalId } from "shared";
+import { ConventionDto, conventionSchema, toPeExternalId } from "shared";
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";

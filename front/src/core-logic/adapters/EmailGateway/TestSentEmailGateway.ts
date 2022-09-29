@@ -1,6 +1,5 @@
 import { Observable, Subject } from "rxjs";
-import { EmailSentDto } from "shared";
-import { AdminToken } from "shared";
+import { AdminToken, EmailSentDto } from "shared";
 import { SentEmailGateway } from "src/core-logic/ports/SentEmailGateway";
 
 export class TestSentEmailGateway implements SentEmailGateway {

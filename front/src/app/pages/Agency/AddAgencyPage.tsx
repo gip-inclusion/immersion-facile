@@ -3,9 +3,13 @@ import { keys } from "ramda";
 import * as React from "react";
 import { useState } from "react";
 import { Button, Title } from "react-design-system/immersionFacile";
-import { AgencyKind, agencyKindList, CreateAgencyDto } from "shared";
-import { createAgencySchema } from "shared";
-import { zEmail } from "shared";
+import {
+  AgencyKind,
+  agencyKindList,
+  CreateAgencyDto,
+  createAgencySchema,
+  zEmail,
+} from "shared";
 import {
   agencySubmitMessageByKind,
   SuccessFeedbackKindAgency,

@@ -1,11 +1,13 @@
 import { filter as ramdaFilter } from "ramda";
 import { BehaviorSubject, delay, map, Observable, Subject } from "rxjs";
+import {
+  AddressDto,
+  ContactEstablishmentRequestDto,
+  SearchImmersionQueryParamsDto,
+  SearchImmersionResultDto,
+  sleep,
+} from "shared";
 import { ImmersionSearchGateway } from "src/core-logic/ports/ImmersionSearchGateway";
-import { ContactEstablishmentRequestDto } from "shared";
-import { SearchImmersionQueryParamsDto } from "shared";
-import { SearchImmersionResultDto } from "shared";
-import { sleep } from "shared";
-import { AddressDto } from "shared";
 
 export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
   private readonly _results$: Subject<SearchImmersionResultDto[]>;

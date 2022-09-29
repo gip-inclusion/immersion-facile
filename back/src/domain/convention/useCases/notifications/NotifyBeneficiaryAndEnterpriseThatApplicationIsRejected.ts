@@ -1,5 +1,4 @@
-import { Beneficiary, ConventionDto, Mentor } from "shared";
-import { conventionSchema } from "shared";
+import { Beneficiary, ConventionDto, conventionSchema, Mentor } from "shared";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,

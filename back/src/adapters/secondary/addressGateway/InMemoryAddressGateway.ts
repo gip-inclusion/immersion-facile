@@ -1,5 +1,9 @@
-import { AddressAndPosition, AddressDto, DepartmentCode } from "shared";
-import { GeoPositionDto } from "shared";
+import {
+  AddressAndPosition,
+  AddressDto,
+  DepartmentCode,
+  GeoPositionDto,
+} from "shared";
 import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
 
 export class InMemoryAddressGateway implements AddressGateway {

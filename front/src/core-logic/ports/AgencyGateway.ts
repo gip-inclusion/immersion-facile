@@ -1,14 +1,14 @@
 import { Observable } from "rxjs";
-import { AdminToken } from "shared";
 import {
+  AdminToken,
   AgencyDto,
   AgencyId,
   AgencyIdAndName,
   AgencyPublicDisplayDto,
   CreateAgencyDto,
+  DepartmentCode,
   WithAgencyId,
 } from "shared";
-import { DepartmentCode } from "shared";
 
 export interface AgencyGateway {
   addAgency(agency: CreateAgencyDto): Promise<void>;

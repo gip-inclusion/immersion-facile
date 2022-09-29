@@ -1,7 +1,10 @@
-import { Beneficiary, ConventionDto } from "shared";
-import { conventionSchema } from "shared";
-import { frontRoutes } from "shared";
-import { Role } from "shared";
+import {
+  Beneficiary,
+  ConventionDto,
+  conventionSchema,
+  frontRoutes,
+  Role,
+} from "shared";
 import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
 import {

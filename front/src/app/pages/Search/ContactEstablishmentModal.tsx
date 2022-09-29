@@ -1,13 +1,12 @@
+import React, { ReactNode, useReducer } from "react";
 import {
-  ModalDialog,
   ModalClose,
   ModalContent,
+  ModalDialog,
+  SubTitle,
+  Title,
 } from "react-design-system/immersionFacile";
-import React, { ReactNode, useReducer } from "react";
-import { ContactMethod } from "shared";
-import { RomeCode } from "shared";
-import { SiretDto } from "shared";
-import { Title, SubTitle } from "react-design-system/immersionFacile";
+import { ContactMethod, RomeCode, SiretDto } from "shared";
 import { ContactByEmail } from "./ContactByEmail";
 import { ContactByPhone } from "./ContactByPhone";
 import { ContactInPerson } from "./ContactInPerson";

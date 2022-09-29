@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RomeCode } from "shared";
-import { RomeDto } from "shared";
+import { RomeCode, RomeDto } from "shared";
 
 interface RomeAutocompleteState {
   romeSearchText: string;

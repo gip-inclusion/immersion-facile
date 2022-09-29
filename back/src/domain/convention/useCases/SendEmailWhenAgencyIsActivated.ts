@@ -1,5 +1,4 @@
-import { AgencyDto } from "shared";
-import { agencySchema } from "shared";
+import { AgencyDto, agencySchema } from "shared";
 import { z } from "zod";
 import { UseCase } from "../../core/UseCase";
 import { EmailGateway } from "../ports/EmailGateway";

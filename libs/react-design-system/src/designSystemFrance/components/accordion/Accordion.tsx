@@ -1,14 +1,13 @@
+import classNames from "classnames";
 import React, {
-  useState,
   Children,
   cloneElement,
-  ReactElement,
   ElementType,
-  HTMLAttributes,
   FC,
+  HTMLAttributes,
+  ReactElement,
+  useState,
 } from "react";
-
-import classNames from "classnames";
 
 export type AccordionProperties = {
   className?: string | object | [];

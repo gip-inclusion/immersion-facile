@@ -1,6 +1,9 @@
-import { NafDto } from "shared";
-import { propEq } from "shared";
-import { GetSiretRequestDto, GetSiretResponseDto } from "shared";
+import {
+  GetSiretRequestDto,
+  GetSiretResponseDto,
+  NafDto,
+  propEq,
+} from "shared";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { NumberEmployeesRange } from "../../immersionOffer/entities/EstablishmentEntity";
 import { GetSiretCall } from "../ports/SireneGateway";

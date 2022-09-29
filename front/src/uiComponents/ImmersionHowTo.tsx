@@ -2,10 +2,10 @@ import establishmentVideoImage from "/establishment_video_image.png";
 import homeVideoImage from "/home_video_image.jpg";
 import React from "react";
 import {
-  Title,
-  SubTitle,
-  Colored,
   BulletPointNumber,
+  Colored,
+  SubTitle,
+  Title,
 } from "react-design-system/immersionFacile";
 
 type ImmersionHowToProps = {

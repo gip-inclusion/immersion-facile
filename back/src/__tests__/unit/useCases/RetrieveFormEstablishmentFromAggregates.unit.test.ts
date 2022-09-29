@@ -1,5 +1,8 @@
-import { FormEstablishmentDto } from "shared";
-import { EstablishmentJwtPayload } from "shared";
+import {
+  addressDtoToString,
+  EstablishmentJwtPayload,
+  FormEstablishmentDto,
+} from "shared";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
@@ -9,7 +12,6 @@ import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { RetrieveFormEstablishmentFromAggregates } from "../../../domain/immersionOffer/useCases/RetrieveFormEstablishmentFromAggregates";
-import { addressDtoToString } from "shared";
 
 const prepareUseCase = () => {
   const uow = createInMemoryUow();

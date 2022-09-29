@@ -2,35 +2,35 @@ import { CircularProgress } from "@mui/material";
 import { Form, Formik } from "formik";
 import { identity } from "ramda";
 import React from "react";
-import { ConventionReadDto } from "shared";
+import {
+  Button,
+  Notification,
+  Title,
+} from "react-design-system/immersionFacile";
 import {
   AssessmentStatus,
   assessmentStatuses,
+  ConventionMagicLinkPayload,
+  ConventionReadDto,
   ImmersionAssessmentDto,
+  immersionAssessmentSchema,
+  toDisplayedDate,
 } from "shared";
-import { immersionAssessmentSchema } from "shared";
-import { ConventionMagicLinkPayload } from "shared";
 import { RadioGroupForField } from "src/app/components/RadioGroup";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { routes } from "src/app/routing/routes";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
+import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {
   immersionAssessmentErrorSelector,
   immersionAssessmentStatusSelector,
 } from "src/core-logic/domain/immersionAssessment/immersionAssessment.selectors";
-import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
+import { useConvention } from "src/hooks/convention";
+import { useImmersionAssessment } from "src/hooks/immersionAssessment";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { Route } from "type-route";
-import { useConvention } from "src/hooks/convention";
-import { useImmersionAssessment } from "src/hooks/immersionAssessment";
-import {
-  Button,
-  Title,
-  Notification,
-} from "react-design-system/immersionFacile";
-import { toDisplayedDate } from "shared";
 
 type ImmersionAssessmentRoute = Route<typeof routes.immersionAssessment>;
 

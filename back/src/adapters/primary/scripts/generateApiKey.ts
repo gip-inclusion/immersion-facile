@@ -1,11 +1,11 @@
 import { addYears } from "date-fns";
-import { makeGenerateJwtES256 } from "../../../domain/auth/jwt";
 import {
   ApiConsumer,
   ApiConsumerName,
   authorisedNames,
   WithApiConsumerId,
 } from "shared";
+import { makeGenerateJwtES256 } from "../../../domain/auth/jwt";
 import { createLogger } from "../../../utils/logger";
 import { RealClock } from "../../secondary/core/ClockImplementations";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";

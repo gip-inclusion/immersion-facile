@@ -1,7 +1,7 @@
 import { useFormikContext } from "formik";
 import React, { useEffect } from "react";
-import { getConventionFieldName } from "shared";
 import type { ConventionDto, Signatory } from "shared";
+import { getConventionFieldName } from "shared";
 import { AgencyDisplay } from "src/app/components/AgencyDisplay";
 import { AgencySelector } from "src/app/components/AgencySelector";
 import { deviceRepository } from "src/app/config/dependencies";

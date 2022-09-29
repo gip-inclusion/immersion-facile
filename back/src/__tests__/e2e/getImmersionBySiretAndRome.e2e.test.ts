@@ -1,4 +1,8 @@
 import { SuperTest, Test } from "supertest";
+import {
+  rueSaintHonore,
+  rueSaintHonoreDto,
+} from "../../_testBuilders/addressDtos";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
 import { ContactEntityV2Builder } from "../../_testBuilders/ContactEntityV2Builder";
@@ -17,10 +21,6 @@ import {
   GenerateApiConsumerJtw,
   makeGenerateJwtES256,
 } from "../../domain/auth/jwt";
-import {
-  rueSaintHonore,
-  rueSaintHonoreDto,
-} from "../../_testBuilders/addressDtos";
 
 const authorizedApiKeyId = "my-authorized-id";
 const immersionOfferRome = "B1805";

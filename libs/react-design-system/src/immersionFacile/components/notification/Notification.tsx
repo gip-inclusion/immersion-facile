@@ -1,4 +1,5 @@
 import React, { ReactNode } from "react";
+
 interface InfoMessageProps {
   title: string;
   children: React.ReactNode;

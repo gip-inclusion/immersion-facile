@@ -1,9 +1,9 @@
+import { mergeDeepRight } from "ramda";
+import React from "react";
 import {
   immersionTexts,
   Texts,
 } from "src/app/pages/Convention/texts/immersionTexts";
-import React from "react";
-import { mergeDeepRight } from "ramda";
 
 export const miniStageTexts: Texts = mergeDeepRight(immersionTexts, {
   welcome: (

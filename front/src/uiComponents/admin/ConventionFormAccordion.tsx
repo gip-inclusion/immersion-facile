@@ -1,7 +1,7 @@
 import { formatDistance } from "date-fns";
 import { fr } from "date-fns/locale";
 import React from "react";
-import type { ConventionStatus, ConventionReadDto } from "shared";
+import type { ConventionReadDto, ConventionStatus } from "shared";
 import { ConnventionFormDetails as ConventionFormDetails } from "./ConventionFormDetails";
 
 const beforeAfterString = (date: string) => {

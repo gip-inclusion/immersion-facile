@@ -1,19 +1,20 @@
 import { from, Observable, Subject } from "rxjs";
-import { AdminToken } from "shared";
-import { AgencyIdAndName } from "shared";
-import { signConventionDtoWithRole } from "shared";
 import {
+  AdminToken,
+  AgencyIdAndName,
   ConventionDto,
+  ConventionDtoBuilder,
   ConventionId,
+  ConventionMagicLinkPayload,
   ConventionReadDto,
+  Role,
+  ShareLinkByEmailDto,
   SignatoryRole,
+  signConventionDtoWithRole,
+  sleep,
   UpdateConventionStatusRequestDto,
   WithConventionId,
 } from "shared";
-import { ConventionDtoBuilder } from "shared";
-import { ShareLinkByEmailDto } from "shared";
-import { ConventionMagicLinkPayload, Role } from "shared";
-import { sleep } from "shared";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 

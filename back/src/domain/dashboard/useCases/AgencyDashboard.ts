@@ -1,8 +1,7 @@
-import { AbsoluteUrl } from "shared";
+import { AbsoluteUrl, AgencyId } from "shared";
 import { z } from "zod";
 import { UseCase } from "../../core/UseCase";
 import { DashboardGateway } from "../port/DashboardGateway";
-import { AgencyId } from "shared";
 
 export class AgencyDashboard extends UseCase<AgencyId, AbsoluteUrl> {
   constructor(private dashboardGateway: DashboardGateway) {

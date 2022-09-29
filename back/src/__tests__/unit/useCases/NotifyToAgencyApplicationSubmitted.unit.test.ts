@@ -1,6 +1,4 @@
-import { AgencyDtoBuilder } from "shared";
-import { ConventionDtoBuilder } from "shared";
-import { frontRoutes } from "shared";
+import { AgencyDtoBuilder, ConventionDtoBuilder, frontRoutes } from "shared";
 import {
   expectTypeToMatchAndEqual,
   fakeGenerateMagicLinkUrlFn,

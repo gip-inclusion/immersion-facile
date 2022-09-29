@@ -1,5 +1,4 @@
-import { AdminToken, UserAndPassword } from "shared";
-import { userAndPasswordSchema } from "shared";
+import { AdminToken, UserAndPassword, userAndPasswordSchema } from "shared";
 import { ForbiddenError } from "../../../../adapters/primary/helpers/httpErrors";
 import { GenerateAdminJwt } from "../../../auth/jwt";
 import { UseCase } from "../../../core/UseCase";

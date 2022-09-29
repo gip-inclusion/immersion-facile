@@ -1,10 +1,12 @@
-import { addressDtoToString } from "shared";
-import { ImmersionContactInEstablishmentId } from "shared";
-import { GeoPositionDto } from "shared";
-import { RomeCode } from "shared";
-import { SearchContactDto, SearchImmersionResultDto } from "shared";
-
-import { SiretDto } from "shared";
+import {
+  addressDtoToString,
+  GeoPositionDto,
+  ImmersionContactInEstablishmentId,
+  RomeCode,
+  SearchContactDto,
+  SearchImmersionResultDto,
+  SiretDto,
+} from "shared";
 
 export type ContactDetailsPublicV0 = {
   id: ImmersionContactInEstablishmentId;

@@ -1,9 +1,14 @@
-import { businessContactSchema, formEstablishmentSourceSchema } from "shared";
-import { nafSchema } from "shared";
-import { appellationDtoSchema } from "shared";
-import { siretSchema } from "shared";
-import { addressWithPostalCodeSchema } from "shared";
-import { zBoolean, zStringPossiblyEmpty, zTrimmedString } from "shared";
+import {
+  addressWithPostalCodeSchema,
+  appellationDtoSchema,
+  businessContactSchema,
+  formEstablishmentSourceSchema,
+  nafSchema,
+  siretSchema,
+  zBoolean,
+  zStringPossiblyEmpty,
+  zTrimmedString,
+} from "shared";
 import { z } from "zod";
 import { FormEstablishmentDtoPublicV1 } from "./FormEstablishmentPublicV1.dto";
 

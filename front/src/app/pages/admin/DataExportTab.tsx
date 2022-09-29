@@ -1,3 +1,4 @@
+import DownloadIcon from "@mui/icons-material/Download";
 import { Checkbox, CircularProgress } from "@mui/material";
 import React, { useState } from "react";
 import {
@@ -9,15 +10,14 @@ import {
   AgenciesExportableParams,
   ContactRequestsExportableParams,
   ConventionsExportableParams,
+  createManagedAxiosInstance,
   EstablishmentsWithAggregatedOffersExportableParams,
   EstablishmentsWithFlattenOffersExportableParams,
 } from "shared";
+import { HttpExcelExportGateway } from "src/core-logic/adapters/ExcelExportGateway/HttpExcelExportGateway";
 import { useAdminToken } from "src/hooks/useAdminToken";
 import { WithBackground } from "src/uiComponents/admin/WithBackground";
 import "./Admin.css";
-import { createManagedAxiosInstance } from "shared";
-import DownloadIcon from "@mui/icons-material/Download";
-import { HttpExcelExportGateway } from "src/core-logic/adapters/ExcelExportGateway/HttpExcelExportGateway";
 
 // TODO Mettre dans les dépendances ?
 export const excelExportGateway = new HttpExcelExportGateway(

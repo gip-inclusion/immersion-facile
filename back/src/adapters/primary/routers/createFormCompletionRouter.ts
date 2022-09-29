@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { romeAutocompleteInputSchema } from "shared";
 import {
   appellationRoute,
   getSiretIfNotSavedRoute,
+  romeAutocompleteInputSchema,
   romeRoute,
   siretRoute,
 } from "shared";

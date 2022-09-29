@@ -1,9 +1,6 @@
 import { AxiosInstance } from "axios";
 import { from, map, Observable } from "rxjs";
-import { EmailSentDto } from "shared";
-import { emailsSentSchema } from "shared";
-import { AdminToken } from "shared";
-import { emailRoute } from "shared";
+import { AdminToken, emailRoute, EmailSentDto, emailsSentSchema } from "shared";
 import { SentEmailGateway } from "src/core-logic/ports/SentEmailGateway";
 
 export class HttpSentEmailGateway implements SentEmailGateway {

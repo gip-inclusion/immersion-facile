@@ -1,5 +1,10 @@
-import { FormEstablishmentDtoBuilder } from "shared";
-import { addressDtoToString } from "shared";
+import { addressDtoToString, FormEstablishmentDtoBuilder } from "shared";
+import { rueGuillaumeTellDto } from "../../../_testBuilders/addressDtos";
+import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
+import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
+import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
+import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { expectPromiseToFailWith } from "../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
@@ -13,12 +18,6 @@ import {
   SireneEstablishmentProps,
   SireneEstablishmentVO,
 } from "../../../domain/sirene/valueObjects/SireneEstablishmentVO";
-import { rueGuillaumeTellDto } from "../../../_testBuilders/addressDtos";
-import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
-import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
-import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
-import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
-import { expectPromiseToFailWith } from "../../../_testBuilders/test.helpers";
 
 const prepareSireneRepo = (
   sireneRepo: InMemorySireneGateway,

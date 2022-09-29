@@ -5,13 +5,13 @@ import {
   HttpClientNotFoundError,
   HttpUnknownClientError,
 } from "./HttpClientErrors";
-import { UnknownError } from "./UnknownError";
 import { PEConnectAdvisorForbiddenAccess } from "./PEConnectAdvisorForbiddenAccess";
 import { PEConnectInvalidGrantError } from "./PEConnectInvalidGrantError";
 import { PEConnectNoAuthorisation } from "./PEConnectNoAuthorisation";
 import { PEConnectNoValidAdvisor } from "./PEConnectNoValidAdvisor";
 import { PEConnectNoValidUser } from "./PEConnectNoValidUser";
 import { PEConnectUserForbiddenAccess } from "./PEConnectUserForbiddenAccess";
+import { UnknownError } from "./UnknownError";
 
 type ManagedErrorSelectorProperties = {
   kind: ManagedErrorKinds;

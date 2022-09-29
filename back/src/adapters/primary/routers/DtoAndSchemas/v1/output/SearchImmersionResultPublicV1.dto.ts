@@ -1,9 +1,10 @@
-import { addressDtoToString } from "shared";
-import { GeoPositionDto } from "shared";
-import { RomeCode } from "shared";
-import { SearchImmersionResultDto } from "shared";
-
-import { SiretDto } from "shared";
+import {
+  addressDtoToString,
+  GeoPositionDto,
+  RomeCode,
+  SearchImmersionResultDto,
+  SiretDto,
+} from "shared";
 import { ContactMethod } from "../../../../../../domain/immersionOffer/entities/ContactEntity";
 
 export type SearchContactDto = {

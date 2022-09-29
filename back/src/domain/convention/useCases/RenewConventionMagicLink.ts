@@ -2,13 +2,11 @@ import jwt, { TokenExpiredError } from "jsonwebtoken";
 import {
   Beneficiary,
   ConventionId,
-  Mentor,
-  RenewMagicLinkRequestDto,
-} from "shared";
-import { renewMagicLinkRequestSchema } from "shared";
-import {
   ConventionMagicLinkPayload,
   createConventionMagicLinkPayload,
+  Mentor,
+  RenewMagicLinkRequestDto,
+  renewMagicLinkRequestSchema,
   Role,
   stringToMd5,
 } from "shared";

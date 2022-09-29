@@ -1,12 +1,12 @@
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { Section } from "src/app/components/Section";
 import {
   ButtonHome,
-  Link,
   ImmersionTextField,
+  Link,
 } from "react-design-system/immersionFacile";
+import { useDispatch } from "react-redux";
+import { Section } from "src/app/components/Section";
 import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";

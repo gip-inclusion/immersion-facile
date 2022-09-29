@@ -1,12 +1,12 @@
+import InfoRoundedIcon from "@mui/icons-material/InfoRounded";
+import { Tooltip } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import { prop } from "ramda";
 import React from "react";
 import { RomeDto } from "shared";
 import { useAppSelector } from "src/app/utils/reduxHooks";
-import { useRomeAutocompleteUseCase } from "src/hooks/romeAutocomplete.hook";
 import { romeAutocompleteSelector } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.selectors";
-import { Tooltip } from "@mui/material";
-import InfoRoundedIcon from "@mui/icons-material/InfoRounded";
+import { useRomeAutocompleteUseCase } from "src/hooks/romeAutocomplete.hook";
 
 type RomeAutocompleteProps = {
   title: string;

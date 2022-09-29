@@ -5,8 +5,8 @@ import {
   HttpResponse,
   ManagedAxios,
   onFullfilledDefaultResponseInterceptorMaker,
+  queryParamsAsString,
 } from "shared";
-import { queryParamsAsString } from "shared";
 import supertest, { SuperTest, Test } from "supertest";
 // Those are mocked test because real calls to pole emploi api can only be made thought production domain registered with pole emploi
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";

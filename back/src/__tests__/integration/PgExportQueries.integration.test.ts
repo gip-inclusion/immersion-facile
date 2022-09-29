@@ -1,25 +1,24 @@
 import { Pool, PoolClient } from "pg";
-import { ContactEntityV2Builder } from "../../_testBuilders/ContactEntityV2Builder";
-import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentEntityV2Builder";
-import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
-import { ImmersionOfferEntityV2Builder } from "../../_testBuilders/ImmersionOfferEntityV2Builder";
-import { PgEstablishmentAggregateRepository } from "../../adapters/secondary/pg/PgEstablishmentAggregateRepository";
-import { EstablishmentAggregate } from "../../domain/immersionOffer/entities/EstablishmentEntity";
-import { PgExportQueries } from "../../adapters/secondary/pg/PgExportQueries";
-import { expectObjectsToMatch } from "../../_testBuilders/test.helpers";
+import { AgencyDtoBuilder, ConventionDtoBuilder } from "shared";
 import {
   avenueChampsElyseesDto,
   rueBitcheDto,
   rueJacquardDto,
 } from "../../_testBuilders/addressDtos";
+import { ContactEntityV2Builder } from "../../_testBuilders/ContactEntityV2Builder";
+import { EstablishmentAggregateBuilder } from "../../_testBuilders/EstablishmentAggregateBuilder";
+import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentEntityV2Builder";
+import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
+import { ImmersionOfferEntityV2Builder } from "../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { expectObjectsToMatch } from "../../_testBuilders/test.helpers";
+import { UuidV4Generator } from "../../adapters/secondary/core/UuidGeneratorImplementations";
 import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
-import { AgencyDtoBuilder } from "shared";
-import { ConventionDtoBuilder } from "shared";
 import { PgConventionRepository } from "../../adapters/secondary/pg/PgConventionRepository";
+import { PgEstablishmentAggregateRepository } from "../../adapters/secondary/pg/PgEstablishmentAggregateRepository";
+import { PgExportQueries } from "../../adapters/secondary/pg/PgExportQueries";
 import { PgOutboxRepository } from "../../adapters/secondary/pg/PgOutboxRepository";
 import { DomainEvent } from "../../domain/core/eventBus/events";
-import { EstablishmentAggregateBuilder } from "../../_testBuilders/EstablishmentAggregateBuilder";
-import { UuidV4Generator } from "../../adapters/secondary/core/UuidGeneratorImplementations";
+import { EstablishmentAggregate } from "../../domain/immersionOffer/entities/EstablishmentEntity";
 
 describe("PgExportQueries", () => {
   let pool: Pool;

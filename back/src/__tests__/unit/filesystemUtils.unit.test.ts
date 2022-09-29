@@ -2,8 +2,8 @@ import * as fse from "fs-extra";
 import path from "path";
 import {
   deleteFileAndParentFolder,
-  retrieveParentDirectory,
   makeTemporaryStorageFile,
+  retrieveParentDirectory,
 } from "../../utils/filesystemUtils";
 
 describe("Filesystem utils", () => {

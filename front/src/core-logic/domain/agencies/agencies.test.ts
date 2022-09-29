@@ -1,5 +1,4 @@
-import { expectToEqual } from "shared";
-import { AgencyIdAndName } from "shared";
+import { AgencyIdAndName, expectToEqual } from "shared";
 import {
   createTestStore,
   TestDependencies,

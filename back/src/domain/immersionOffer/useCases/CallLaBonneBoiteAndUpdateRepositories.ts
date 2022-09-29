@@ -1,8 +1,10 @@
 import { addDays } from "date-fns";
 import promClient from "prom-client";
 import { prop, propEq } from "ramda";
-import { SearchImmersionQueryParamsDto } from "shared";
-import { searchImmersionQueryParamsSchema } from "shared";
+import {
+  SearchImmersionQueryParamsDto,
+  searchImmersionQueryParamsSchema,
+} from "shared";
 import { createLogger } from "../../../utils/logger";
 import { Clock } from "../../core/ports/Clock";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";

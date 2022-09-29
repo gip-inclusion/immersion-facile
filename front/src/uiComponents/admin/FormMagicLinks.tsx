@@ -1,10 +1,9 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
+import { allRoles, frontRoutes, Role } from "shared";
 import { conventionGateway } from "src/app/config/dependencies";
-import { frontRoutes } from "shared";
-import { allRoles, Role } from "shared";
 import { useAdminToken } from "src/hooks/useAdminToken";
-import { ConventionFormAccordionProps } from "./ConventionFormAccordion";
 import { WithBackground } from "src/uiComponents/admin/WithBackground";
+import { ConventionFormAccordionProps } from "./ConventionFormAccordion";
 
 // Component to show the magic links picker
 export const FormMagicLinks = ({

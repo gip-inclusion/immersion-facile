@@ -1,5 +1,5 @@
-import React from "react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import React from "react";
 import { DayStatus } from "./utils/getDayStatus";
 
 type DayCircleProps = {

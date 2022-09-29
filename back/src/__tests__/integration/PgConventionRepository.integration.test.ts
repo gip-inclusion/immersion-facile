@@ -1,7 +1,10 @@
 import { Pool, PoolClient } from "pg";
-import { AgencyDtoBuilder } from "shared";
-import { ConventionId, LegalRepresentative } from "shared";
-import { ConventionDtoBuilder } from "shared";
+import {
+  AgencyDtoBuilder,
+  ConventionDtoBuilder,
+  ConventionId,
+  LegalRepresentative,
+} from "shared";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
 import { PgConventionRepository } from "../../adapters/secondary/pg/PgConventionRepository";

@@ -1,5 +1,5 @@
 import React from "react";
-import { InputGroup, TextArea, Input, TextInputError } from "../inputs";
+import { Input, InputGroup, TextArea, TextInputError } from "../inputs";
 import { Label } from "../label";
 import { FieldDescription } from "./FieldDescription";
 

@@ -1,14 +1,14 @@
 import { Observable } from "rxjs";
-import { AdminToken } from "shared";
 import {
+  AdminToken,
   ConventionDto,
   ConventionId,
   ConventionReadDto,
+  Role,
+  ShareLinkByEmailDto,
   UpdateConventionStatusRequestDto,
   WithConventionId,
 } from "shared";
-import { ShareLinkByEmailDto } from "shared";
-import { Role } from "shared";
 
 export interface ConventionGateway {
   retrieveFromToken(payload: string): Observable<ConventionReadDto | undefined>;

@@ -1,7 +1,7 @@
 import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
 import React from "react";
 import { NavLink, tabLinksPrefix } from ".";
-import { TabLinks, NavWrapper } from "./TabLinks";
+import { NavWrapper, TabLinks } from "./TabLinks";
 
 const Component = TabLinks;
 const argTypes: Partial<ArgTypes> | undefined = {}; // <TabsProperties>

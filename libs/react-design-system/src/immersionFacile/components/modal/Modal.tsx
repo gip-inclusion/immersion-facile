@@ -1,10 +1,11 @@
-import React, { cloneElement, Children } from "react";
+import classNames from "classnames";
+import React, { Children, cloneElement } from "react";
 
 import ReactDOM from "react-dom";
-import classNames from "classnames";
 import Modal from "react-modal";
 import "./Modal.css";
 import { ModalClose } from "./ModalClose";
+
 /**
  *
  * @visibleName Modale -- Modal

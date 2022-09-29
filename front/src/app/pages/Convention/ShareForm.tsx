@@ -1,9 +1,12 @@
 import { Button } from "@mui/material";
 import { Form, Formik, useField } from "formik";
 import React from "react";
-import { getConventionFieldName } from "shared";
+import {
+  getConventionFieldName,
+  ShareLinkByEmailDto,
+  shareLinkByEmailSchema,
+} from "shared";
 import { conventionGateway } from "src/app/config/dependencies";
-import { ShareLinkByEmailDto, shareLinkByEmailSchema } from "shared";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 

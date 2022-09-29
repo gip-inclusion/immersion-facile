@@ -1,11 +1,11 @@
 import { keys } from "ramda";
 import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
 import {
   Accordion,
   DsfrTitle,
   Notification,
 } from "react-design-system/immersionFacile";
+import { useDispatch } from "react-redux";
 import { EmailSentDto, EmailVariables } from "shared";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";

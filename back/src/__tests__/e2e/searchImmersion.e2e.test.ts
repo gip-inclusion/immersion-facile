@@ -1,4 +1,9 @@
+import { SearchImmersionResultDto } from "shared";
 import { SuperTest, Test } from "supertest";
+import {
+  avenueChampsElysees,
+  avenueChampsElyseesDto,
+} from "../../_testBuilders/addressDtos";
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../_testBuilders/EstablishmentEntityV2Builder";
@@ -7,11 +12,6 @@ import { SearchImmersionResultPublicV0 } from "../../adapters/primary/routers/Dt
 import { SearchImmersionResultPublicV1 } from "../../adapters/primary/routers/DtoAndSchemas/v1/output/SearchImmersionResultPublicV1.dto";
 import { InMemoryEstablishmentAggregateRepository } from "../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { GenerateApiConsumerJtw } from "../../domain/auth/jwt";
-import { SearchImmersionResultDto } from "shared";
-import {
-  avenueChampsElysees,
-  avenueChampsElyseesDto,
-} from "../../_testBuilders/addressDtos";
 
 describe("search-immersion route", () => {
   let request: SuperTest<Test>;

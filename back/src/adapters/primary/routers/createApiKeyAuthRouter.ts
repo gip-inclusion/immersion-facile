@@ -1,9 +1,9 @@
 import { Router } from "express";
 import promClient from "prom-client";
-import { pipeWithValue } from "shared";
 import {
   getImmersionOfferByIdRoute__v0,
   immersionOffersApiAuthRoute__v0,
+  pipeWithValue,
   searchImmersionRoute__v0,
 } from "shared";
 import type { AppDependencies } from "../config/createAppDependencies";

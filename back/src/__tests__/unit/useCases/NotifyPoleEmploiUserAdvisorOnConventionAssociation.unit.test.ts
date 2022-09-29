@@ -1,5 +1,4 @@
-import { ConventionDtoBuilder } from "shared";
-import { frontRoutes } from "shared";
+import { ConventionDtoBuilder, frontRoutes } from "shared";
 import {
   expectPromiseToFailWithError,
   expectTypeToMatchAndEqual,

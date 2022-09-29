@@ -1,9 +1,9 @@
 import {
   ConventionStatus,
   UpdateConventionRequestDto,
+  updateConventionRequestSchema,
   WithConventionId,
 } from "shared";
-import { updateConventionRequestSchema } from "shared";
 import {
   BadRequestError,
   ForbiddenError,

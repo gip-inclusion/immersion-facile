@@ -1,6 +1,10 @@
-import { ConventionDto, ConventionId, ConventionStatus } from "shared";
-import { statusTransitionConfigs } from "shared";
-import { Role } from "shared";
+import {
+  ConventionDto,
+  ConventionId,
+  ConventionStatus,
+  Role,
+  statusTransitionConfigs,
+} from "shared";
 import {
   BadRequestError,
   ForbiddenError,

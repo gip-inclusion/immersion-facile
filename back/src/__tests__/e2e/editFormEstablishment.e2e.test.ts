@@ -1,7 +1,9 @@
 import { subYears } from "date-fns";
-import { FormEstablishmentDtoBuilder } from "shared";
-import { formEstablishmentsRoute } from "shared";
-import { createEstablishmentMagicLinkPayload } from "shared";
+import {
+  createEstablishmentMagicLinkPayload,
+  FormEstablishmentDtoBuilder,
+  formEstablishmentsRoute,
+} from "shared";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
 import { TEST_ESTABLISHMENT1_SIRET } from "../../adapters/secondary/InMemorySireneGateway";

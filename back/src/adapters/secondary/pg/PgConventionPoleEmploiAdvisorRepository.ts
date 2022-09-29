@@ -1,6 +1,5 @@
 import { PoolClient } from "pg";
-import { ConventionId } from "shared";
-import { PeExternalId } from "shared";
+import { ConventionId, PeExternalId } from "shared";
 import {
   ConventionPoleEmploiUserAdvisorDto,
   ConventionPoleEmploiUserAdvisorEntity,

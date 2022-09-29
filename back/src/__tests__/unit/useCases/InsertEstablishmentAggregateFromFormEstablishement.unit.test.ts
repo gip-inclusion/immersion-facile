@@ -1,7 +1,17 @@
-import { FormEstablishmentDtoBuilder } from "shared";
-import { GeoPositionDto } from "shared";
-import { NafDto } from "shared";
-import { AppellationDto } from "shared";
+import {
+  AppellationDto,
+  FormEstablishmentDtoBuilder,
+  GeoPositionDto,
+  NafDto,
+} from "shared";
+import {
+  avenueChampsElyseesDto,
+  rueGuillaumeTellDto,
+} from "../../../_testBuilders/addressDtos";
+import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
+import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
+import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
+import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
@@ -17,14 +27,6 @@ import {
   SireneEstablishmentProps,
   SireneEstablishmentVO,
 } from "../../../domain/sirene/valueObjects/SireneEstablishmentVO";
-import {
-  avenueChampsElyseesDto,
-  rueGuillaumeTellDto,
-} from "../../../_testBuilders/addressDtos";
-import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
-import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
-import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
-import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 
 const fakeSiret = "90040893100013";
 const fakePosition: GeoPositionDto = { lat: 49.119146, lon: 6.17602 };

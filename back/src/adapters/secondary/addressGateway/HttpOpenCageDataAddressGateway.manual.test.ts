@@ -1,6 +1,9 @@
-import { AddressAndPosition, AddressDto } from "shared";
-import { GeoPositionDto } from "shared";
-import { ManagedAxios } from "shared";
+import {
+  AddressAndPosition,
+  AddressDto,
+  GeoPositionDto,
+  ManagedAxios,
+} from "shared";
 import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
 import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
 import { AppConfig } from "../../primary/config/appConfig";

@@ -1,9 +1,9 @@
 import {
+  createConventionMagicLinkPayload,
   GenerateMagicLinkRequestDto,
+  generateMagicLinkRequestSchema,
   GenerateMagicLinkResponseDto,
 } from "shared";
-import { generateMagicLinkRequestSchema } from "shared";
-import { createConventionMagicLinkPayload } from "shared";
 import { GenerateMagicLinkJwt } from "../../auth/jwt";
 import { UseCase } from "../../core/UseCase";
 

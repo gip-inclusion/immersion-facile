@@ -1,4 +1,5 @@
 import { AddressAndPosition } from "shared";
+
 export const query8bdduportLookup = "8+bd+du+port";
 export const expected8bdduportAddressAndPositions: AddressAndPosition[] = [
   {

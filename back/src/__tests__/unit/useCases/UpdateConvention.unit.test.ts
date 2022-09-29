@@ -1,5 +1,9 @@
-import { allConventionStatuses, ConventionDto, ConventionId } from "shared";
-import { ConventionDtoBuilder } from "shared";
+import {
+  allConventionStatuses,
+  ConventionDto,
+  ConventionDtoBuilder,
+  ConventionId,
+} from "shared";
 import {
   expectPromiseToFailWithError,
   expectTypeToMatchAndEqual,

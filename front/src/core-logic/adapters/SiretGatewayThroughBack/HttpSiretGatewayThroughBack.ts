@@ -3,20 +3,18 @@ import { from, Observable } from "rxjs";
 import {
   formAlreadyExistsRoute,
   getSiretIfNotSavedRoute,
-  siretRoute,
-} from "shared";
-import {
   GetSiretInfo,
   GetSiretInfoError,
   getSiretInfoSchema,
+  HttpClientError,
+  HttpServerError,
   isSiretExistResponseSchema,
   sirenApiMissingEstablishmentMessage,
   sirenApiUnavailableSiretErrorMessage,
   SiretDto,
+  siretRoute,
   tooManiSirenRequestsSiretErrorMessage,
 } from "shared";
-import { HttpClientError } from "shared";
-import { HttpServerError } from "shared";
 import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
 
 export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {

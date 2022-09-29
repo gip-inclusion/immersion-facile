@@ -1,6 +1,5 @@
 import { keys } from "ramda";
-import { SiretDto } from "shared";
-import { sleep } from "shared";
+import { ApiConsumerId, SiretDto, sleep } from "shared";
 import { DepartmentCodeFromPostcode } from "../../../domain/address/useCases/DepartmentCodeFromPostCode";
 import { LookupStreetAddress } from "../../../domain/address/useCases/LookupStreetAddress";
 import {
@@ -37,7 +36,6 @@ import { Clock } from "../../../domain/core/ports/Clock";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { UuidGenerator } from "../../../domain/core/ports/UuidGenerator";
 import { TransactionalUseCase, UseCase } from "../../../domain/core/UseCase";
-import { ApiConsumerId } from "shared";
 import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
 import { AgencyDashboard } from "../../../domain/dashboard/useCases/AgencyDashboard";
 import { ConventionDashboard } from "../../../domain/dashboard/useCases/ConventionDashboard";

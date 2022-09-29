@@ -3,6 +3,7 @@ import React from "react";
 import { accordionDSFRPrefix } from ".";
 import { AccordionDSFR, AccordionProperties } from "./Accordion";
 import { AccordionDSFRItem } from "./AccordionItem";
+
 const Component = AccordionDSFR;
 const argTypes: Partial<ArgTypes<AccordionProperties>> | undefined = {};
 

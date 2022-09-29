@@ -1,7 +1,14 @@
 import { z } from "zod";
 import { agencyIdSchema } from "../agency/agency.schema";
+
+import { peConnectPrefixSchema } from "../federatedIdentities/federatedIdentity.schema";
+import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
+import { scheduleSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret";
+import { allRoles } from "../tokens/MagicLinkPayload";
 import { phoneRegExp, stringOfNumbers } from "../utils";
+import { dateRegExp } from "../utils/date";
+import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import {
   zBoolean,
   zEmail,
@@ -9,6 +16,7 @@ import {
   zStringPossiblyEmpty,
   zTrimmedString,
 } from "../zodUtils";
+import { getConventionFieldName } from "./convention";
 import {
   allConventionStatuses,
   Beneficiary,
@@ -20,9 +28,9 @@ import {
   ConventionReadDto,
   GenerateMagicLinkRequestDto,
   GenerateMagicLinkResponseDto,
+  LegalRepresentative,
   ListConventionsRequestDto,
   Mentor,
-  LegalRepresentative,
   RenewMagicLinkRequestDto,
   UpdateConventionRequestDto,
   UpdateConventionStatusRequestDto,
@@ -35,14 +43,6 @@ import {
   startDateIsBeforeEndDate,
   underMaxCalendarDuration,
 } from "./conventionRefinements";
-
-import { peConnectPrefixSchema } from "../federatedIdentities/federatedIdentity.schema";
-import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
-import { scheduleSchema } from "../schedule/Schedule.schema";
-import { allRoles } from "../tokens/MagicLinkPayload";
-import { dateRegExp } from "../utils/date";
-import { addressWithPostalCodeSchema } from "../utils/postalCode";
-import { getConventionFieldName } from "./convention";
 
 export const conventionIdSchema: z.ZodSchema<ConventionId> = zTrimmedString;
 export const externalConventionIdSchema: z.ZodSchema<ConventionExternalId> =

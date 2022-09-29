@@ -1,6 +1,8 @@
-import { FormEstablishmentDto } from "shared";
-import { FormEstablishmentDtoBuilder } from "shared";
-import { EstablishmentJwtPayload } from "shared";
+import {
+  EstablishmentJwtPayload,
+  FormEstablishmentDto,
+  FormEstablishmentDtoBuilder,
+} from "shared";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {

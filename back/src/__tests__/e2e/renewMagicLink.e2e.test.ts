@@ -1,8 +1,10 @@
-import { AgencyDtoBuilder } from "shared";
-import { RenewMagicLinkRequestDto } from "shared";
-import { ConventionDtoBuilder } from "shared";
-import { TemplatedEmail } from "shared";
-import { createConventionMagicLinkPayload } from "shared";
+import {
+  AgencyDtoBuilder,
+  ConventionDtoBuilder,
+  createConventionMagicLinkPayload,
+  RenewMagicLinkRequestDto,
+  TemplatedEmail,
+} from "shared";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 import { expectEmailOfType } from "../../_testBuilders/test.helpers";
 import { AppConfig } from "../../adapters/primary/config/appConfig";

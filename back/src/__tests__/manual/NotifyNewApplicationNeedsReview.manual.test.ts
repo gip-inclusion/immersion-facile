@@ -1,7 +1,5 @@
 import axios from "axios";
-import { AgencyDtoBuilder } from "shared";
-import { ConventionDto } from "shared";
-import { ConventionDtoBuilder } from "shared";
+import { AgencyDtoBuilder, ConventionDto, ConventionDtoBuilder } from "shared";
 import { AppConfig } from "../../adapters/primary/config/appConfig";
 import {
   createGenerateConventionMagicLink,

@@ -1,8 +1,7 @@
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
-import { DepartmentCode } from "shared";
+import { ConventionDto, DepartmentCode } from "shared";
 import { apiAddressGateway } from "src/app/config/dependencies";
-import { ConventionDto } from "shared";
 import { TextInput } from "src/uiComponents/form/TextInput";
 
 export type PostcodeAutocompleteProps = {

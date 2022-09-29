@@ -1,14 +1,14 @@
 import {
   ConventionDto,
-  Signatories,
-  UpdateConventionStatusRequestDto,
-} from "shared";
-import { ConventionDtoBuilder, VALID_EMAILS } from "shared";
-import { TemplatedEmail } from "shared";
-import {
+  ConventionDtoBuilder,
   conventionsRoute,
+  expectToEqual,
+  Signatories,
   signConventionRoute,
+  TemplatedEmail,
+  UpdateConventionStatusRequestDto,
   updateConventionStatusRoute,
+  VALID_EMAILS,
 } from "shared";
 import supertest from "supertest";
 import {
@@ -20,10 +20,9 @@ import {
   expectJwtInMagicLinkAndGetIt,
   expectTypeToMatchAndEqual,
 } from "../../../../_testBuilders/test.helpers";
+import { DomainEvent } from "../../../../domain/core/eventBus/events";
 import { InMemoryOutboxRepository } from "../../../secondary/core/InMemoryOutboxRepository";
 import { InMemoryEmailGateway } from "../../../secondary/emailGateway/InMemoryEmailGateway";
-import { DomainEvent } from "../../../../domain/core/eventBus/events";
-import { expectToEqual } from "shared";
 
 const validatorEmail = "validator@mail.com";
 const beneficiarySignDate = new Date("2022-09-08");

@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { siretSchema } from "../siret";
 import { romeCodeSchema } from "../rome";
+import { siretSchema } from "../siret";
 import { SiretAndRomeDto } from "./SiretAndRome.dto";
 
 export const siretAndRomeSchema: z.Schema<SiretAndRomeDto> = z.object({

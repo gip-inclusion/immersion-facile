@@ -1,4 +1,4 @@
-import { ConventionDtoBuilder } from "shared";
+import { ConventionDtoBuilder, expectToEqual } from "shared";
 import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
@@ -6,7 +6,6 @@ import { TEST_AGENCY_NAME } from "../../../adapters/secondary/InMemoryConvention
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { GetConvention } from "../../../domain/convention/useCases/GetConvention";
-import { expectToEqual } from "shared";
 
 describe("Get Convention", () => {
   let getConvention: GetConvention;

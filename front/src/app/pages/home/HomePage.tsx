@@ -1,12 +1,12 @@
 import React from "react";
+import { MainWrapper } from "react-design-system/immersionFacile";
 import { EstablishmentHomeMenu } from "src/app/components/EstablishmentHomeMenu";
-import { ImmersionFooter } from "src/app/components/ImmersionFooter";
 import { FindImmersionHomeMenu } from "src/app/components/FindImmersionHomeMenu";
+import { ImmersionFooter } from "src/app/components/ImmersionFooter";
 import { ImmersionMarianneHeader } from "src/app/components/ImmersionMarianneHeader";
 import { InitiateConventionCard } from "src/app/components/InitiateConventionCard";
 import { ENV } from "src/environmentVariables";
 import { HomeImmersionHowTo } from "src/uiComponents/ImmersionHowTo";
-import { MainWrapper } from "react-design-system/immersionFacile";
 
 const { frontEnvType } = ENV;
 const DebugInfo = () => (

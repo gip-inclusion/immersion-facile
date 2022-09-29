@@ -1,6 +1,10 @@
 import React from "react";
-import { ConventionField, getConventionFieldName } from "shared";
-import { Signatory, SignatoryRole } from "shared";
+import {
+  ConventionField,
+  getConventionFieldName,
+  Signatory,
+  SignatoryRole,
+} from "shared";
 import {
   RequestModificationButton,
   SignButton,

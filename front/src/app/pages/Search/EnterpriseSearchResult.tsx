@@ -1,14 +1,16 @@
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import LaunchIcon from "@mui/icons-material/Launch";
 import CommentIcon from "@mui/icons-material/Comment";
+import LaunchIcon from "@mui/icons-material/Launch";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
 import SentimentSatisfiedAltIcon from "@mui/icons-material/SentimentSatisfiedAlt";
 import React, { ReactNode } from "react";
+import { ButtonSearch } from "react-design-system/immersionFacile";
+import {
+  addressDtoToString,
+  ContactMethod,
+  SearchImmersionResultDto,
+} from "shared";
 import { DistanceIcon } from "src/icons/DistanceIcon";
 import { TrefleIcon } from "src/icons/TrefleIcon";
-import { ContactMethod } from "shared";
-import { SearchImmersionResultDto } from "shared";
-import { ButtonSearch } from "react-design-system/immersionFacile";
-import { addressDtoToString } from "shared";
 
 type EnterpriseSearchResultProps = {
   searchResult: SearchImmersionResultDto;

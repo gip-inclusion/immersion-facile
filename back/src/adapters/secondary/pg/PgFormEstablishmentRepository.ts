@@ -1,6 +1,5 @@
 import { PoolClient } from "pg";
-import { FormEstablishmentDto } from "shared";
-import { SiretDto } from "shared";
+import { FormEstablishmentDto, SiretDto } from "shared";
 import { FormEstablishmentRepository } from "../../../domain/immersionOffer/ports/FormEstablishmentRepository";
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";

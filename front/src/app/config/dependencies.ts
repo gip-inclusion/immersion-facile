@@ -1,5 +1,7 @@
 import { asyncScheduler, SchedulerLike } from "rxjs";
 import { createManagedAxiosInstance } from "shared";
+import { HttpAddressGateway } from "src/core-logic/adapters/AddressGateway/HttpAddressGateway";
+import { InMemoryAddressGateway } from "src/core-logic/adapters/AddressGateway/InMemoryAddressGateway";
 import { HttpAdminGateway } from "src/core-logic/adapters/AdminGateway/HttpAdminGateway";
 import { SimulatedAdminGateway } from "src/core-logic/adapters/AdminGateway/SimulatedAdminGateway";
 import { HttpAgencyGateway } from "src/core-logic/adapters/AgencyGateway/HttpAgencyGateway";
@@ -13,8 +15,6 @@ import { HttpSentEmailGateway } from "src/core-logic/adapters/EmailGateway/HttpS
 import { StubSentEmailGateway } from "src/core-logic/adapters/EmailGateway/StubSentEmailGateway";
 import { HttpEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/HttpEstablishmentGateway";
 import { InMemoryEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/InMemoryEstablishmentGateway";
-import { HttpAddressGateway } from "src/core-logic/adapters/AddressGateway/HttpAddressGateway";
-import { InMemoryAddressGateway } from "src/core-logic/adapters/AddressGateway/InMemoryAddressGateway";
 
 import { HttpImmersionSearchGateway } from "src/core-logic/adapters/ImmersionSearchGateway/HttpImmersionSearchGateway";
 import {
@@ -31,12 +31,12 @@ import { HttpSiretGatewayThroughBack } from "src/core-logic/adapters/SiretGatewa
 import { SimulatedSiretGatewayThroughBack } from "src/core-logic/adapters/SiretGatewayThroughBack/SimulatedSiretGatewayThroughBack";
 import { HttpTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/HttpTechnicalGateway";
 import { SimulatedTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/SimulatedTechnicalGateway";
+import { AddressGateway } from "src/core-logic/ports/AddressGateway";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 import { DeviceRepository } from "src/core-logic/ports/DeviceRepository";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
-import { AddressGateway } from "src/core-logic/ports/AddressGateway";
 import { ImmersionAssessmentGateway } from "src/core-logic/ports/ImmersionAssessmentGateway";
 import { ImmersionSearchGateway } from "src/core-logic/ports/ImmersionSearchGateway";
 import { NavigationGateway } from "src/core-logic/ports/NavigationGateway";

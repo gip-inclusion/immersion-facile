@@ -1,6 +1,6 @@
 import { firstValueFrom } from "rxjs";
-import { HttpAdminGateway } from "src/core-logic/adapters/AdminGateway/HttpAdminGateway";
 import { createManagedAxiosInstance } from "shared";
+import { HttpAdminGateway } from "src/core-logic/adapters/AdminGateway/HttpAdminGateway";
 
 describe("HttpAdminGateway", () => {
   let adminGateway: HttpAdminGateway;

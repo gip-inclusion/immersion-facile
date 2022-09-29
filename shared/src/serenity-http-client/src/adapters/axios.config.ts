@@ -2,7 +2,7 @@ import axios, { AxiosError, AxiosResponse } from "axios";
 import { ErrorMapper, isHttpError } from "../httpClient";
 import { toMappedErrorMaker, toUnhandledError } from "../httpClient.mappers";
 import { AxiosErrorWithResponse } from "./axios.adapter";
-import { toInfrastructureError, toHttpError } from "./axios.mappers";
+import { toHttpError, toInfrastructureError } from "./axios.mappers";
 import { InfrastructureErrorKinds } from "./errors";
 
 export const onFullfilledDefaultResponseInterceptorMaker =

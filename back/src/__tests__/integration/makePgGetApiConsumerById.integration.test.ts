@@ -1,9 +1,9 @@
 import { Pool, PoolClient } from "pg";
+import { ApiConsumer } from "shared";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { expectTypeToMatchAndEqual } from "../../_testBuilders/test.helpers";
 import { makePgGetApiConsumerById } from "../../adapters/secondary/pg/makePgGetApiConsumerById";
 import { GetApiConsumerById } from "../../domain/core/ports/GetApiConsumerById";
-import { ApiConsumer } from "shared";
 
 describe("PG GetApiConsumerById", () => {
   let pool: Pool;

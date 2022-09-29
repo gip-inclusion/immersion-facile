@@ -1,9 +1,9 @@
-import React, { ReactNode, CSSProperties } from "react";
+import React, { CSSProperties, ReactNode } from "react";
+import { ClassName } from "../../../dom/ClassName";
+import { OnClickCallback } from "../../../ux/Actions";
 import { ButtonType } from "../../../ux/ButtonType";
 import { Emphasis } from "../../../ux/Emphasis";
-import { OnClickCallback } from "../../../ux/Actions";
 import { Size } from "../../../ux/Size";
-import { ClassName } from "../../../dom/ClassName";
 
 export type ButtonProperties = {
   additionnalClassName?: ClassName;

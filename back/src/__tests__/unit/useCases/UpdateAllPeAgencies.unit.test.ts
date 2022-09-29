@@ -1,5 +1,5 @@
-import { AddressDto } from "shared";
-import { AgencyDto } from "shared";
+import { AddressDto, AgencyDto } from "shared";
+import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { ConsoleAppLogger } from "../../../adapters/secondary/core/ConsoleAppLogger";
@@ -10,7 +10,6 @@ import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPer
 import { defaultQuestionnaireUrl } from "../../../domain/convention/useCases/AddAgency";
 import { UpdateAllPeAgencies } from "../../../domain/convention/useCases/UpdateAllPeAgencies";
 import { PeAgencyFromReferenciel } from "../../../domain/immersionOffer/ports/PeAgenciesReferential";
-import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
 
 const adminMail = "admin@mail.com";
 

@@ -5,4 +5,5 @@ export * from "./ButtonSearch";
 export * from "./ButtonAdd";
 export * from "./ButtonDelete";
 import { storybookPrefix } from "../../storyPrefixes";
+
 export const buttonPrefix = storybookPrefix("Button");

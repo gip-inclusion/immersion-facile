@@ -1,8 +1,7 @@
 import { useField } from "formik";
 import React from "react";
-import { AppellationDto } from "shared";
-import { removeAtIndex } from "shared";
 import { ButtonAdd } from "react-design-system/immersionFacile";
+import { AppellationDto, removeAtIndex } from "shared";
 import { FormEstablishmentAppellation } from "./FormEstablishmentAppellation";
 
 type AppellationListProps = {

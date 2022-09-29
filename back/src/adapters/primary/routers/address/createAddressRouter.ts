@@ -1,13 +1,11 @@
 import { Router } from "express";
 import {
   departmentCodeFromPostcodeQuerySchema,
-  lookupAddressQueryParam,
-  postCodeQueryParam,
-} from "shared";
-import { lookupAddressSchema } from "shared";
-import {
   departmentCodeFromPostcodeRoute,
+  lookupAddressQueryParam,
+  lookupAddressSchema,
   lookupStreetAddressRoute,
+  postCodeQueryParam,
 } from "shared";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
