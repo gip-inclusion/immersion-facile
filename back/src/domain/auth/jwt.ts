@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { EstablishmentJwtPayload, PayloadOption } from "shared";
-import { WithApiConsumerId } from "../core/valueObjects/ApiConsumer";
+import { WithApiConsumerId } from "shared";
 
 type AnyObject = Record<string, unknown>;
 

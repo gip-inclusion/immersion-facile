@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { getConventionFieldName } from "shared";
 import { ConventionDto, conventionObjectiveOptions } from "shared";
 import { emptySchedule, reasonableSchedule } from "shared";
-import { addressDtoToString } from "src/../../shared/src/utils/address";
+import { addressDtoToString } from "shared";
 import {
   BoolRadioGroup,
   RadioGroupForField,

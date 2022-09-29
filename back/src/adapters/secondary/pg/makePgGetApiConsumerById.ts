@@ -1,9 +1,6 @@
 import { PoolClient } from "pg";
 import { GetApiConsumerById } from "../../../domain/core/ports/GetApiConsumerById";
-import {
-  ApiConsumer,
-  ApiConsumerId,
-} from "../../../domain/core/valueObjects/ApiConsumer";
+import { ApiConsumer, ApiConsumerId } from "shared";
 import { optional } from "./pgUtils";
 
 const rawPgToApiConsumer = (raw: any): ApiConsumer => ({

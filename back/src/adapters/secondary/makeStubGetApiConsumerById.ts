@@ -22,7 +22,7 @@ export const makeStubGetApiConsumerById =
       case authorizedId:
         return {
           id: authorizedId,
-          consumer: "testConsumer",
+          consumer: "passeEmploi",
           createdAt: clock.now(),
           expirationDate: addYears(clock.now(), 1),
           isAuthorized: true,
@@ -31,7 +31,7 @@ export const makeStubGetApiConsumerById =
       case unauthorizedId:
         return {
           id: authorizedId,
-          consumer: "testConsumer",
+          consumer: "passeEmploi",
           createdAt: clock.now(),
           expirationDate: addYears(clock.now(), 1),
           isAuthorized: false,
@@ -40,7 +40,7 @@ export const makeStubGetApiConsumerById =
       case outdatedId:
         return {
           id: authorizedId,
-          consumer: "testConsumer",
+          consumer: "passeEmploi",
           createdAt: clock.now(),
           expirationDate: subYears(clock.now(), 1),
           isAuthorized: true,

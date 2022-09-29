@@ -6,7 +6,7 @@ import { createLogger } from "../../../utils/logger";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { ApiConsumer } from "../../core/valueObjects/ApiConsumer";
+import { ApiConsumer } from "shared";
 import { SearchMade, SearchMadeEntity } from "../entities/SearchMadeEntity";
 
 const logger = createLogger(__filename);

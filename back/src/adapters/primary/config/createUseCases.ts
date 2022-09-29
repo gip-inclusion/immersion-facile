@@ -37,7 +37,7 @@ import { Clock } from "../../../domain/core/ports/Clock";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { UuidGenerator } from "../../../domain/core/ports/UuidGenerator";
 import { TransactionalUseCase, UseCase } from "../../../domain/core/UseCase";
-import { ApiConsumerId } from "../../../domain/core/valueObjects/ApiConsumer";
+import { ApiConsumerId } from "shared";
 import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
 import { AgencyDashboard } from "../../../domain/dashboard/useCases/AgencyDashboard";
 import { ConventionDashboard } from "../../../domain/dashboard/useCases/ConventionDashboard";

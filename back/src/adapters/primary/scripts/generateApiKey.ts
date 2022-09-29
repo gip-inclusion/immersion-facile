@@ -3,8 +3,9 @@ import { makeGenerateJwtES256 } from "../../../domain/auth/jwt";
 import {
   ApiConsumer,
   ApiConsumerName,
+  authorisedNames,
   WithApiConsumerId,
-} from "../../../domain/core/valueObjects/ApiConsumer";
+} from "shared";
 import { createLogger } from "../../../utils/logger";
 import { RealClock } from "../../secondary/core/ClockImplementations";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
@@ -22,12 +23,6 @@ const generateApiKeyJwt = makeGenerateJwtES256<WithApiConsumerId>(
 const createdAt = clock.now();
 const expirationDate = addYears(createdAt, 2);
 
-const authorisedNames: ApiConsumerName[] = [
-  "passeEmploi",
-  "unJeuneUneSolution",
-  "diagoriente",
-];
-
 const getNameOrThrow = (name: string): ApiConsumerName => {
   if (!name)
     throw new Error(
@@ -35,8 +30,9 @@ const getNameOrThrow = (name: string): ApiConsumerName => {
         " | ",
       )}`,
     );
-  const consumerName = name as ApiConsumerName;
-  if (authorisedNames.includes(consumerName)) return consumerName;
+
+  if (authorisedNames.includes(name as ApiConsumerName)) return consumerName;
+
   throw new Error(
     `Name must be one of ${authorisedNames.join(", ")}, got : ${consumerName}`,
   );

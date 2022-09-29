@@ -1,3 +1,4 @@
+import { ApiConsumerName } from "../apiConsumer/ApiConsumer";
 import { NafDto } from "../naf";
 import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret";
@@ -22,18 +23,11 @@ export type FormEstablishmentSourceInUrl =
   | "cci"
   | "cma"
   | "lesentreprises-sengagent"
-  | "unJeuneUneSolution"
-  | "testConsumer";
-
-export type FormEstablishmentSourceFromApi =
-  | "unJeuneUneSolution"
-  | "passeEmploi"
-  | "diagoriente"
-  | "testConsumer";
+  | "unJeuneUneSolution";
 
 export type FormEstablishmentSource =
   | FormEstablishmentSourceInUrl
-  | FormEstablishmentSourceFromApi;
+  | ApiConsumerName;
 
 export type FormEstablishmentDto = {
   source: FormEstablishmentSource;

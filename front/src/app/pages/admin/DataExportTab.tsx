@@ -72,7 +72,6 @@ const ExportEntreprises = () => {
               "cma",
               "lesentreprises-sengagent",
               "unJeuneUneSolution",
-              "testConsumer",
             ]}
             onSelect={(selectedSourceProvider) => {
               setExportableParams({

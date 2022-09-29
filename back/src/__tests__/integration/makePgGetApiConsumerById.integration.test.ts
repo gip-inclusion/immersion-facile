@@ -3,7 +3,7 @@ import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { expectTypeToMatchAndEqual } from "../../_testBuilders/test.helpers";
 import { makePgGetApiConsumerById } from "../../adapters/secondary/pg/makePgGetApiConsumerById";
 import { GetApiConsumerById } from "../../domain/core/ports/GetApiConsumerById";
-import { ApiConsumer } from "../../domain/core/valueObjects/ApiConsumer";
+import { ApiConsumer } from "shared";
 
 describe("PG GetApiConsumerById", () => {
   let pool: Pool;
@@ -25,7 +25,7 @@ describe("PG GetApiConsumerById", () => {
   it("gets the ApiConsumer from it's ID", async () => {
     const apiConsumer: ApiConsumer = {
       id: "11111111-1111-1111-1111-111111111111",
-      consumer: "testConsumer",
+      consumer: "passeEmploi",
       description: "my description",
       createdAt: new Date(),
       expirationDate: new Date(),

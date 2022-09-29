@@ -1,6 +1,6 @@
 import { Observable, of, Subject } from "rxjs";
 import { AdminToken } from "shared";
-import { AbsoluteUrl } from "src/../../shared/src/AbsoluteUrl";
+import { AbsoluteUrl } from "shared";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
 export class TestAdminGateway implements AdminGateway {

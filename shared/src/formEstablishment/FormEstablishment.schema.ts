@@ -46,7 +46,6 @@ const formEstablishmentSources: NotEmptyArray<FormEstablishmentSource> = [
   "cma",
   "lesentreprises-sengagent",
   "unJeuneUneSolution",
-  "testConsumer",
   "passeEmploi",
 ];
 export const formEstablishmentSourceSchema = z.enum(formEstablishmentSources);

@@ -16,17 +16,18 @@
     "back": "pnpm --dir back",
     "front": "pnpm --dir front",
     "shared": "pnpm --dir shared",
+    "cypress": "pnpm --dir cypress",
     "react-design-system": "pnpm --dir libs/react-design-system",
-    "cypress": "pnpm --dir cypress cypress:open",
     "lintconfig:glob": "eslint --config=.eslintrc.js",
     "lint-staged": "lint-staged --config=./.tooling/.lintstaged/.lintstagedrc",
-    "fullcheck-old": "concurrently --kill-others-on-fail \"pnpm:tests\" \"pnpm:prettier:check\" \"pnpm:lints\"  \"pnpm:typechecks\"",
-    "fullcheck": "turbo run includecheck format:check lint typecheck test"
+    "includecheck": "turbo run includecheck",
+    "format:check": "turbo run format:check",
+    "fullcheck": "turbo run includecheck format:check lint typecheck test",
+    "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.35.1",
     "@typescript-eslint/parser": "^5.35.1",
-    "concurrently": "^7.3.0",
     "eslint": "^8.22.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-jest": "^26.8.7",

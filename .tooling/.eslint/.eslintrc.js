@@ -3,6 +3,7 @@ const projects = [
   "./../../back/tsconfig.json",
   "./../../shared/tsconfig.json",
   "./../../libs/react-design-system/tsconfig.json",
+  "./../../cypress/tsconfig.json",
 ];
 
 module.exports = {

@@ -11,10 +11,7 @@ import {
 import { makeVerifyJwtES256 } from "../../domain/auth/jwt";
 import { Clock } from "../../domain/core/ports/Clock";
 import { GetApiConsumerById } from "../../domain/core/ports/GetApiConsumerById";
-import {
-  ApiConsumerName,
-  WithApiConsumerId,
-} from "../../domain/core/valueObjects/ApiConsumer";
+import { ApiConsumerName, WithApiConsumerId } from "shared";
 import { createLogger } from "../../utils/logger";
 import { AppConfig } from "./config/appConfig";
 

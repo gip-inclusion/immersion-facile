@@ -1,4 +1,4 @@
-import { frontRoutes } from "shared/src/routes";
+import { frontRoutes } from "shared";
 
 describe("Simple navigation", () => {
   it("Go to admin and log in", () => {
@@ -8,14 +8,14 @@ describe("Simple navigation", () => {
     cy.contains("Se connecter").click();
   });
 
-  it("Go to home page", async () => {
+  it("Go to home page", () => {
     goToTab({ tabLabel: "Home", expectedRoute: "/" });
   });
 
   it("Goes to convention page", () => {
     goToTab({
       tabLabel: "Demande immersion",
-      expectedRoute: `/${frontRoutes.conventionRoute}`,
+      expectedRoute: `/${frontRoutes.conventionImmersionRoute}`,
     });
   });
 
@@ -61,7 +61,7 @@ describe("Simple navigation", () => {
 
   it("Click on 'Je demande une convention'", () => {
     cy.contains("Je demande une convention").click();
-    expectLocationToBe(`/${frontRoutes.conventionRoute}`);
+    expectLocationToBe(`/${frontRoutes.conventionImmersionRoute}`);
   });
 
   const goToTab = ({

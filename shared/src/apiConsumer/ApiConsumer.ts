@@ -1,4 +1,4 @@
-import { Flavor } from "shared";
+import { Flavor } from "../typeFlavors";
 
 export type ApiConsumerId = Flavor<string, "ApiConsumerId">;
 
@@ -6,11 +6,14 @@ export type WithApiConsumerId = {
   id: ApiConsumerId;
 };
 
-export type ApiConsumerName =
-  | "passeEmploi"
-  | "unJeuneUneSolution"
-  | "diagoriente"
-  | "testConsumer";
+export type ApiConsumerName = typeof authorisedNames[number];
+
+export const authorisedNames = [
+  "passeEmploi",
+  "unJeuneUneSolution",
+  "diagoriente",
+  "bimBamJob",
+] as const;
 
 export type ApiConsumer = {
   id: ApiConsumerId;

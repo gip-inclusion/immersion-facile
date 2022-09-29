@@ -1,5 +1,5 @@
 import { Flavor } from "shared";
-import { ApiConsumerName } from "../../core/valueObjects/ApiConsumer";
+import { ApiConsumerName } from "shared";
 
 export type SearchMadeId = Flavor<string, "SearchMadeId">;
 

@@ -101,7 +101,6 @@ Lint stage permet de ne jouer le lint et le prettier que sur les fichiers qui on
 La configuration lint-stage est présente ici [.tooling/.lint-staged/.lintstagedrc](.tooling/.lint-staged/.lintstagedrc)
 [Documentation officielle](https://github.com/okonet/lint-staged)
 
-##### Concurrently
+#### Turbo
 
-Concurrently permet de parraléliser des tâches de maintenance sur le projet (format, lint, test... )
-[Documentation officielle](https://github.com/open-cli-tools/concurrently)
+TODO DOC

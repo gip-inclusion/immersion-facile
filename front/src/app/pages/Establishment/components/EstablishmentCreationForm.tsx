@@ -24,7 +24,7 @@ import {
   getMandatoryLabelAndName,
 } from "./EstablishmentFormikForm";
 import { AddressAutocomplete } from "src/uiComponents/autocomplete/AddressAutocomplete";
-import { addressDtoToString } from "src/../../shared/src/utils/address";
+import { addressDtoToString } from "shared";
 
 type EstablishmentCreationFormProps = {
   source: FormEstablishmentSource;

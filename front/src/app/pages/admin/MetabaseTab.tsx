@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { AbsoluteUrl } from "src/../../shared/src/AbsoluteUrl";
+import { AbsoluteUrl } from "shared";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { adminGateway } from "src/app/config/dependencies";
 import { useAdminToken } from "src/hooks/useAdminToken";
