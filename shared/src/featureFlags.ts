@@ -7,6 +7,7 @@ const featureFlags = [
   "enablePeConnectApi",
   "enableLogoUpload",
   "enablePeConventionBroadcast",
+  "enableTemporaryOperation",
 ] as const;
 
 export type FeatureFlags = Record<FeatureFlag, boolean>;
@@ -17,6 +18,7 @@ export const featureFlagsSchema: z.Schema<FeatureFlags> = z.object({
   enablePeConnectApi: z.boolean(),
   enableLogoUpload: z.boolean(),
   enablePeConventionBroadcast: z.boolean(),
+  enableTemporaryOperation: z.boolean(),
 });
 
 export type SetFeatureFlagParams = { flagName: FeatureFlag; value: boolean };

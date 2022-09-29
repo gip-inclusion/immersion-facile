@@ -7,6 +7,7 @@ const defaultFlags: FeatureFlags = {
   enablePeConnectApi: true,
   enableLogoUpload: false,
   enablePeConventionBroadcast: true,
+  enableTemporaryOperation: false,
 };
 
 export class InMemoryFeatureFlagRepository implements FeatureFlagRepository {

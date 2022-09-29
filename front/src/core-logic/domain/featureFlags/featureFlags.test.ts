@@ -16,6 +16,7 @@ const defaultFeatureFlags: FeatureFlags = {
   enablePeConnectApi: false,
   enableLogoUpload: false,
   enablePeConventionBroadcast: false,
+  enableTemporaryOperation: false,
 };
 
 const flagsFromApi: FeatureFlags = {
@@ -24,6 +25,7 @@ const flagsFromApi: FeatureFlags = {
   enablePeConnectApi: true,
   enableLogoUpload: false,
   enablePeConventionBroadcast: true,
+  enableTemporaryOperation: false,
 };
 
 describe("feature flag slice", () => {

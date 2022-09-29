@@ -12,6 +12,7 @@ const labelsByFeatureFlag: Record<FeatureFlag, string> = {
   enableLogoUpload: "Upload de logos (pour agences)",
   enablePeConnectApi: "PE Connect",
   enablePeConventionBroadcast: "Diffusion des Conventions à Pole Emploi",
+  enableTemporaryOperation: "Activer l'offre temporaire",
 };
 
 export const TechnicalOptions = () => {

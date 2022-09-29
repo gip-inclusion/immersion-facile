@@ -29,6 +29,7 @@ const defaultFlagsInFront: FeatureFlags = {
   enablePeConnectApi: true,
   enableLogoUpload: false,
   enablePeConventionBroadcast: true,
+  enableTemporaryOperation: false,
 };
 
 export const makeStubFeatureFlags = (

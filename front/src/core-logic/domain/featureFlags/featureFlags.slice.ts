@@ -11,6 +11,7 @@ const initialState: FeatureFlagsState = {
   enablePeConnectApi: false,
   enableLogoUpload: false,
   enablePeConventionBroadcast: false,
+  enableTemporaryOperation: false,
   isLoading: true,
 };
 
