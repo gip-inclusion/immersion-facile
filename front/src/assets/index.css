@@ -17,7 +17,13 @@ code {
   visibility: hidden;
 }
 
-/* Temp fix DSFR 1.7.x */
+/* 
+
+Temp fix DSFR 1.7.x
+TODO remove all of this asap
+
+*/
+
 input {
   font-family: "Marianne", Arial, sans-serif;
   font-size: 1rem;
