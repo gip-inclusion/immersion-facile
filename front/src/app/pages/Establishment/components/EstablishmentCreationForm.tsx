@@ -1,5 +1,5 @@
 import { useField } from "formik";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Notification } from "react-design-system/immersionFacile";
 import {
   addressDtoToString,
@@ -44,7 +44,6 @@ export const EstablishmentCreationForm = ({
     source,
     isSearchable: true,
   };
-
   return (
     <EstablishmentFormikForm
       initialValues={creationInitialValues}
@@ -82,7 +81,7 @@ const CreationSiretRelatedInputs = () => {
   const [_, __, { setValue: setAddressValue }] = useField<string>(
     businessLabelAndName.name,
   );
-
+  useEffect(() => () => updateSiret(""), []);
   return (
     <>
       <TextInputControlled

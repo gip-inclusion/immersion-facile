@@ -1,24 +1,32 @@
 import bubbles from "/bulles.svg";
 import checked from "/checked.svg";
-import arrow from "/fleche.svg";
 import greatings from "/greatings.png";
 import tandem from "/tandem.png";
-import React from "react";
+import React, { useEffect } from "react";
+
 import {
   BulletPointArrow,
   Card,
   Colored,
   Title,
 } from "react-design-system/immersionFacile";
+import arrow from "/fleche.svg";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { routes } from "src/app/routing/routes";
 import { EstablishmentImmersionHowTo } from "src/uiComponents/ImmersionHowTo";
 import { Statistic } from "src/uiComponents/Statistic";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import logoLeMoisLesEntreprises from "../../../assets/logo-le-mois-les-entreprises.svg";
+import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
+import { useDispatch } from "react-redux";
+import { SiretFetcherInput } from "src/app/components/SiretFetcherInput";
 
 export const LandingEstablishmentPage = () => {
   const featureFlags = useFeatureFlags();
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(establishmentSlice.actions.gotReady());
+  }, []);
   return (
     <HeaderFooterLayout>
       <section className="flex flex-col items-center w-full py-10 bg-gradient-to-b from-immersionBlue-dark via-immersionBlue to-immersionBlue-light relative">
@@ -30,8 +38,8 @@ export const LandingEstablishmentPage = () => {
             filter: "blur(4px)",
           }}
         />
-        <h1 className="text-4xl text-center text-white font-bold max-w-x-lg py-6">
-          Ouvrez vos entreprises aux immersions professionnelles !
+        <h1 className="text-4xl text-center text-white font-bold max-w-x-lg fr-p-3w">
+          Ouvrez vos entreprises aux immersions professionnelles&nbsp;!
         </h1>
         {!featureFlags.enableTemporaryOperation && (
           <a
@@ -42,10 +50,10 @@ export const LandingEstablishmentPage = () => {
           </a>
         )}
       </section>
-      {!featureFlags.enableTemporaryOperation && (
+      {featureFlags.enableTemporaryOperation && (
         <div className="fr-container fr-pt-4w fr-text--light">
           <div className="fr-grid-row fr-grid-row--center">
-            <div className="fr-col-lg-4 fr-col-8 fr-col-md-6 fr-p-6w fr-pb-1v fr-pb-sm-6w">
+            <div className="fr-col-lg-4 fr-col-8 fr-col-md-6 fr-pt-6w fr-pl-6w fr-pr-6w fr-pb-1v fr-pb-sm-6w">
               <div className="logo-le-mois">
                 <img
                   src={logoLeMoisLesEntreprises}
@@ -63,7 +71,7 @@ export const LandingEstablishmentPage = () => {
                 </p>
               </div>
             </div>
-            <div className="fr-col-lg-8 fr-col-12 fr-p-6w">
+            <div className="fr-col-lg-8 fr-col-12 fr-p-2w fr-pt-4w">
               <h2 className="fr-mb-1w text-immersionBlue-dark">
                 <strong>Rendez-vous</strong>
                 <br />
@@ -74,14 +82,10 @@ export const LandingEstablishmentPage = () => {
                 s’engagent ».
               </p>
               <div className="fr-grid-row">
-                <a
-                  className="fr-btn fr-btn--establishment"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                  href="https://forms.diffusion.social.gouv.fr/5a5873edb85b530da84d23f7/B8Cql-1kQ9unOadnha1jRw/6FSZsl4DSwatKepw0jv3hg/form.html"
-                >
-                  Je reste informé
-                </a>
+                <SiretFetcherInput
+                  label={"Entrez votre SIRET pour référencer votre entreprise"}
+                  placeholder={"Ex: 123 456 789 01238"}
+                />
               </div>
             </div>
           </div>

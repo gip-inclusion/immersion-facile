@@ -68,7 +68,7 @@ export const HomePage = () => {
 
       <ImmersionFooter />
       {frontEnvType === "DEV" && <DebugInfo />}
-      {!featureFlags.enableTemporaryOperation && (
+      {featureFlags.enableTemporaryOperation && (
         <FixedStamp
           image={
             <img

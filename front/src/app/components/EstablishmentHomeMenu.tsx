@@ -1,38 +1,21 @@
-import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import React, { useEffect } from "react";
-import {
-  ButtonHome,
-  ImmersionTextField,
-  Link,
-} from "react-design-system/immersionFacile";
+
+import { ButtonHome, Link } from "react-design-system/immersionFacile";
 import { useDispatch } from "react-redux";
 import { Section } from "src/app/components/Section";
-import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
-import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
-import { useSendModifyEstablishmentLink } from "src/hooks/establishment.hooks";
-import { useSiretFetcher } from "src/hooks/siret.hooks";
 import { EstablishmentSubTitle } from "../pages/home/components/EstablishmentSubTitle";
 import { EstablishmentTitle } from "../pages/home/components/EstablishmentTitle";
 import { routes } from "../routing/routes";
-import { useAppSelector } from "../utils/reduxHooks";
+import { useEstablishmentSiret } from "src/hooks/siret.hooks";
+import { SiretFetcherInput } from "src/app/components/SiretFetcherInput";
 
 export const EstablishmentHomeMenu = () => {
-  const { currentSiret, updateSiret, siretErrorToDisplay } = useSiretFetcher({
-    shouldFetchEvenIfAlreadySaved: false,
-  });
-  const { sendModifyEstablishmentLink } = useSendModifyEstablishmentLink();
+  const { isReadyForRequestOrRedirection, clearSiret, modifyLinkWasSent } =
+    useEstablishmentSiret({
+      shouldFetchEvenIfAlreadySaved: true,
+    });
   const dispatch = useDispatch();
-  const isSiretAlreadySaved = useAppSelector(
-    siretSelectors.isSiretAlreadySaved,
-  );
-  const modifyLinkWasSent = useAppSelector(
-    establishmentSelectors.wasModifyLinkSent,
-  );
-  const isReadyForRequestOrRedirection = useAppSelector(
-    establishmentSelectors.isReadyForLinkRequestOrRedirection,
-  );
-  const clearSiret = () => updateSiret("");
 
   useEffect(clearSiret, []);
   const styleType = "establishment";
@@ -72,22 +55,7 @@ export const EstablishmentHomeMenu = () => {
             </li>
           </ul>
         ) : (
-          <>
-            <ImmersionTextField
-              className="w-2/3"
-              name="siret"
-              value={currentSiret}
-              placeholder="SIRET de votre entreprise"
-              error={isSiretAlreadySaved ? "" : siretErrorToDisplay}
-              onChange={(e) => updateSiret(e.target.value)}
-            />
-            {isSiretAlreadySaved && !modifyLinkWasSent && (
-              <ModifyEstablishmentRequestForMailUpdate
-                onClick={() => sendModifyEstablishmentLink(currentSiret)}
-              />
-            )}
-            {modifyLinkWasSent && <ModifyEstablishmentRequestNotification />}
-          </>
+          <SiretFetcherInput placeholder={"SIRET de votre entreprise"} />
         )}
       </div>
       {!modifyLinkWasSent && (
@@ -101,34 +69,3 @@ export const EstablishmentHomeMenu = () => {
     </Section>
   );
 };
-
-const ModifyEstablishmentRequestNotification = () => (
-  <>
-    <SendRoundedIcon
-      className="py-1"
-      sx={{ color: "#3458a2", fontSize: "xx-large" }}
-    />
-    <EstablishmentSubTitle type="establishment" text="Demande envoyée" />
-    <p className="text-immersionBlue-dark  text-center text-xs py-2">
-      Un e-mail a été envoyé au référent de cet établissement avec un lien
-      permettant la mise à jour des informations. Le lien est valable 24h.
-    </p>
-  </>
-);
-
-type ModifyEstablishmentRequestForMailUpdateProps = {
-  onClick: () => void;
-};
-
-const ModifyEstablishmentRequestForMailUpdate = ({
-  onClick,
-}: ModifyEstablishmentRequestForMailUpdateProps) => (
-  <>
-    <span className="text-immersionBlue-dark  text-center text-xs pb-2">
-      Nous avons bien trouvé votre établissement dans notre base de donnée.
-    </span>
-    <ButtonHome type="establishment-secondary" onClick={onClick}>
-      Recevoir le mail de modification
-    </ButtonHome>
-  </>
-);

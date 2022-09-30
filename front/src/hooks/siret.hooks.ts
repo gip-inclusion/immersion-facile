@@ -5,6 +5,8 @@ import { GetSiretResponseDto, SiretDto } from "shared";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
+import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
+import { useSendModifyEstablishmentLink } from "src/hooks/establishment.hooks";
 
 export const useSiretRelatedField = <K extends keyof GetSiretResponseDto>(
   fieldFromInfo: K,
@@ -81,4 +83,33 @@ export const useExistingSiret = (siret?: SiretDto | null) => {
   useEffect(() => {
     if (siret) dispatch(siretSlice.actions.siretModified(siret));
   }, [siret]);
+};
+
+export const useEstablishmentSiret = (
+  siretFetcherOptions: SiretFetcherOptions,
+) => {
+  const { currentSiret, updateSiret, siretErrorToDisplay } =
+    useSiretFetcher(siretFetcherOptions);
+  const isSiretAlreadySaved = useAppSelector(
+    siretSelectors.isSiretAlreadySaved,
+  );
+  const isReadyForRequestOrRedirection = useAppSelector(
+    establishmentSelectors.isReadyForLinkRequestOrRedirection,
+  );
+  const clearSiret = () => updateSiret("");
+  const { sendModifyEstablishmentLink } = useSendModifyEstablishmentLink();
+
+  const modifyLinkWasSent = useAppSelector(
+    establishmentSelectors.wasModifyLinkSent,
+  );
+  return {
+    currentSiret,
+    siretErrorToDisplay,
+    isSiretAlreadySaved,
+    isReadyForRequestOrRedirection,
+    clearSiret,
+    updateSiret,
+    sendModifyEstablishmentLink,
+    modifyLinkWasSent,
+  };
 };
