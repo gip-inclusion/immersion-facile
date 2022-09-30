@@ -43,17 +43,27 @@ export const LandingEstablishmentPage = () => {
         )}
       </section>
       {!featureFlags.enableTemporaryOperation && (
-        <div className="fr-container ">
-          <div className="fr-grid-row">
-            <div className="fr-col-lg-5 fr-col-12 fr-py-2w fr-pr-md-9w fr-pt-10w fr-pb-md-10w">
+        <div className="fr-container fr-pt-4w fr-text--light">
+          <div className="fr-grid-row fr-grid-row--center">
+            <div className="fr-col-lg-4 fr-col-8 fr-col-md-6 fr-p-6w fr-pb-1v fr-pb-sm-6w">
               <div className="logo-le-mois">
                 <img
                   src={logoLeMoisLesEntreprises}
                   alt="Le mois - Les entreprises s'engagent"
                 />
+                <p className={"text-center fr-text--sm fr-pt-2w"}>
+                  En savoir plus sur{" "}
+                  <a
+                    href={"#"}
+                    className={"text-immersionBlue-dark"}
+                    target={"_blank"}
+                  >
+                    #LeMois2022
+                  </a>
+                </p>
               </div>
             </div>
-            <div className="fr-col-lg-7 fr-col-12 fr-pb-10w fr-pt-md-10w fr-pt-3w">
+            <div className="fr-col-lg-8 fr-col-12 fr-p-6w">
               <h2 className="fr-mb-1w text-immersionBlue-dark">
                 <strong>Rendez-vous</strong>
                 <br />
@@ -65,7 +75,7 @@ export const LandingEstablishmentPage = () => {
               </p>
               <div className="fr-grid-row">
                 <a
-                  className="Linkstyled-sc-19kb81q-0 jdQrar fr-btn fr-btn--secondaryColor"
+                  className="fr-btn fr-btn--establishment"
                   rel="noopener noreferrer"
                   target="_blank"
                   href="https://forms.diffusion.social.gouv.fr/5a5873edb85b530da84d23f7/B8Cql-1kQ9unOadnha1jRw/6FSZsl4DSwatKepw0jv3hg/form.html"
@@ -107,7 +117,7 @@ export const LandingEstablishmentPage = () => {
             text="au sein des équipes"
           />
         </div>
-        <section className="flex flex-col items-center mx-3 sm:mx-20">
+        <section className="flex flex-col items-center fr-mt-4w mx-3 sm:mx-20">
           <Title>Ce que l'immersion facilitée tente de résoudre ...</Title>
           <div className="flex justify-center sm:justify-between flex-wrap">
             <Statistic
