@@ -44,11 +44,10 @@ export class PgConventionQueries implements ConventionQueries {
     const pgResult = await this.client.query(
       format(
         `
-        WITH mentors AS (SELECT * from signatories WHERE role = 'establishment'),
-             beneficiaries AS (SELECT * from signatories WHERE role = 'beneficiary')
-        
+        WITH beneficiaries AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = beneficiary_id),
+             mentors AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = mentor_id)
         SELECT JSON_BUILD_OBJECT(
-              'immersionId', id, 
+              'immersionId', conventions.id, 
               'beneficiaryFirstName', beneficiaries.first_name, 
               'beneficiaryLastName', beneficiaries.last_name,
               'mentorName', CONCAT(mentors.first_name, ' ', mentors.last_name), 
@@ -58,7 +57,7 @@ export class PgConventionQueries implements ConventionQueries {
        LEFT JOIN mentors ON mentors.convention_id = conventions.id
        WHERE date_end::date = $1
        AND status IN (%1$L)
-       AND id NOT IN (SELECT (payload ->> 'id')::uuid FROM outbox where topic = 'EmailWithLinkToCreateAssessmentSent' )`,
+       AND conventions.id NOT IN (SELECT (payload ->> 'id')::uuid FROM outbox where topic = 'EmailWithLinkToCreateAssessmentSent' )`,
         validatedConventionStatuses,
       ),
       [dateEnd],

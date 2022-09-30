@@ -3,9 +3,9 @@ import { ConventionId, ConventionReadDto } from "shared";
 
 export const selectAllConventionDtosById = `
 WITH 
-  beneficiaries as (SELECT * from signatories where role = 'beneficiary'),
-  mentors as (SELECT * from signatories where role = 'establishment'),
-  legal_representatives as (SELECT * from signatories where role = 'legal-representative'),
+  beneficiaries AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = beneficiary_id),
+  mentors AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = mentor_id),
+  legal_representatives AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = beneficiary_representative_id),
   formated_signatories AS (
     SELECT 
     b.convention_id,
