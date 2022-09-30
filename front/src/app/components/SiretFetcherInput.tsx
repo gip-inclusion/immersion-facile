@@ -7,11 +7,13 @@ import { EstablishmentSubTitle } from "src/app/pages/home/components/Establishme
 type SiretFetcherInputProps = {
   placeholder: string;
   label?: string;
+  shouldFetchEvenIfAlreadySaved: boolean;
 };
 
 export const SiretFetcherInput = ({
   placeholder,
   label,
+  shouldFetchEvenIfAlreadySaved,
 }: SiretFetcherInputProps) => {
   const {
     currentSiret,
@@ -21,7 +23,7 @@ export const SiretFetcherInput = ({
     modifyLinkWasSent,
     sendModifyEstablishmentLink,
   } = useEstablishmentSiret({
-    shouldFetchEvenIfAlreadySaved: true,
+    shouldFetchEvenIfAlreadySaved,
   });
   const shouldShowInputError = !isSiretAlreadySaved && currentSiret !== "";
   return (

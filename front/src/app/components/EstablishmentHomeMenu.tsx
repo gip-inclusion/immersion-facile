@@ -11,9 +11,10 @@ import { useEstablishmentSiret } from "src/hooks/siret.hooks";
 import { SiretFetcherInput } from "src/app/components/SiretFetcherInput";
 
 export const EstablishmentHomeMenu = () => {
+  const shouldFetchEvenIfAlreadySaved = false;
   const { isReadyForRequestOrRedirection, clearSiret, modifyLinkWasSent } =
     useEstablishmentSiret({
-      shouldFetchEvenIfAlreadySaved: true,
+      shouldFetchEvenIfAlreadySaved,
     });
   const dispatch = useDispatch();
 
@@ -55,7 +56,10 @@ export const EstablishmentHomeMenu = () => {
             </li>
           </ul>
         ) : (
-          <SiretFetcherInput placeholder={"SIRET de votre entreprise"} />
+          <SiretFetcherInput
+            shouldFetchEvenIfAlreadySaved={shouldFetchEvenIfAlreadySaved}
+            placeholder={"SIRET de votre entreprise"}
+          />
         )}
       </div>
       {!modifyLinkWasSent && (

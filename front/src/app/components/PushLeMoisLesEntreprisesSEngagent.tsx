@@ -36,6 +36,7 @@ export const PushLeMoisLesEntreprisesSEngagent = () => (
           <SiretFetcherInput
             label={"Entrez votre SIRET pour référencer votre entreprise"}
             placeholder={"Ex: 123 456 789 01238"}
+            shouldFetchEvenIfAlreadySaved={false}
           />
         </div>
       </div>

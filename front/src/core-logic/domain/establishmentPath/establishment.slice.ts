@@ -23,7 +23,7 @@ export const establishmentSlice = createSlice({
     gotReady: (state) => {
       state.status = "READY_FOR_LINK_REQUEST_OR_REDIRECTION";
     },
-    navigatedAwayFromHome: (state) => {
+    backToIdle: (state) => {
       state.status = "IDLE";
     },
     sendModificationLinkRequested: (

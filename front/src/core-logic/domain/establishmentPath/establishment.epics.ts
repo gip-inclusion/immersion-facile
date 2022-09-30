@@ -45,7 +45,7 @@ const redirectToEstablishmentFormPageEpic: AppEpic<
         state$.value.siret.currentSiret,
       ),
     ),
-    map(() => establishmentSlice.actions.navigatedAwayFromHome()),
+    map(() => establishmentSlice.actions.backToIdle()),
   );
 
 export const establishmentEpics = [

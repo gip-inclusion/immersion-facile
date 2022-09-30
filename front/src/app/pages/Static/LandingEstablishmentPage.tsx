@@ -25,6 +25,9 @@ export const LandingEstablishmentPage = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(establishmentSlice.actions.gotReady());
+    return () => {
+      dispatch(establishmentSlice.actions.backToIdle());
+    };
   }, []);
   return (
     <HeaderFooterLayout>
