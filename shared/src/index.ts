@@ -72,3 +72,4 @@ export * from "./utils/queryParams";
 export * from "./zodUtils";
 export { absoluteUrlSchema } from "./AbsoluteUrl";
 export { HttpClientError as LegacyHttpClientError } from "./httpClient/errors/4xxClientError.error";
+export { HttpServerError as LegacyHttpServerError } from "./httpClient/errors/5xxServerError.error";

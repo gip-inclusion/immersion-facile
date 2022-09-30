@@ -6,9 +6,9 @@ import {
   GetSiretInfo,
   GetSiretInfoError,
   getSiretInfoSchema,
-  HttpClientError,
-  HttpServerError,
   isSiretExistResponseSchema,
+  LegacyHttpClientError,
+  LegacyHttpServerError,
   sirenApiMissingEstablishmentMessage,
   sirenApiUnavailableSiretErrorMessage,
   SiretDto,
@@ -43,8 +43,8 @@ export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
         })
         .catch((error) => {
           if (
-            error instanceof HttpClientError ||
-            error instanceof HttpServerError
+            error instanceof LegacyHttpClientError ||
+            error instanceof LegacyHttpServerError
           ) {
             //TODO Changer le contract de HttpClientError/HttpServerError pour avoir le status en public sur l'instance directement
             // (l'info doit être porté par le domaine et forcément définie)
@@ -75,8 +75,8 @@ export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
         })
         .catch((error) => {
           if (
-            error instanceof HttpClientError ||
-            error instanceof HttpServerError
+            error instanceof LegacyHttpClientError ||
+            error instanceof LegacyHttpServerError
           ) {
             //TODO Changer le contract de HttpClientError/HttpServerError pour avoir le status en public sur l'instance directement
             // (l'info doit être porté par le domaine et forcément définie)
