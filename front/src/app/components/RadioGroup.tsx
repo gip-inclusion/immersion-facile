@@ -93,7 +93,7 @@ export const RadioGroup = <T extends string | number | string[] | boolean>({
         <div className="fr-fieldset__content">
           {options.map(({ value, label }) => {
             const inputValue = getInputValue(value);
-            const optionId = id + makeOptionId(value);
+            const optionId = makeOptionId(value, id);
 
             return (
               <div className="fr-radio-group" key={optionId}>
@@ -122,12 +122,15 @@ export const RadioGroup = <T extends string | number | string[] | boolean>({
   </>
 );
 
-const makeOptionId = (value: string | boolean | number | string[]): string => {
+const makeOptionId = (
+  value: string | boolean | number | string[],
+  id: string,
+): string => {
   let optionId = value.toString();
   if (value instanceof Array) {
     optionId = value[0].toString();
   }
-  return cleanStringToHTMLAttribute(optionId);
+  return cleanStringToHTMLAttribute(`${id}${optionId}`);
 };
 
 const getInputValue = (

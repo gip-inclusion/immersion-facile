@@ -20,6 +20,18 @@ describe("String cleaner utils", () => {
       "-super",
       "input-mille-sabords-capitaine--super",
     ],
+    [
+      "Mille sabords,   capitaine 21",
+      "input",
+      "-super",
+      "input-mille-sabords-capitaine-21--super",
+    ],
+    [
+      "Mille sabords... capitaine 21",
+      "input",
+      "-super",
+      "input-mille-sabords-capitaine-21--super",
+    ],
   ])(
     "should clean strings to HTML attribute value",
     (input, prefix, suffix, expected) => {

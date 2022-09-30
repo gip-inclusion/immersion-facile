@@ -145,6 +145,7 @@ const CreationSiretRelatedInputs = () => {
         setFormValue={({ address }) =>
           setAddressValue(addressDtoToString(address))
         }
+        id="autocomplete-address-creation-establishment-form"
         disabled={isFetchingSiret}
       />
     </>

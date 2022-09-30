@@ -1,6 +1,10 @@
 import Autocomplete from "@mui/material/Autocomplete";
 import React, { useEffect, useState } from "react";
-import { AppellationDto, AppellationMatchDto } from "shared";
+import {
+  AppellationDto,
+  AppellationMatchDto,
+  cleanStringToHTMLAttribute,
+} from "shared";
 import { romeAutocompleteGateway } from "src/app/config/dependencies";
 import { useDebounce } from "src/app/utils/useDebounce";
 import { Proposal } from "../pages/Establishment/components/Proposal";
@@ -116,18 +120,27 @@ export const AppellationAutocomplete = ({
         onInputChange={(_, newSearchTerm) => {
           setSearchTerm(newSearchTerm);
         }}
-        renderInput={(params) => (
-          <div ref={params.InputProps.ref}>
-            <label className={`fr-label ${className ?? ""}`} htmlFor={"search"}>
-              {title}
-            </label>
-            <input
-              {...params.inputProps}
-              className={"fr-input"}
-              placeholder="Prêt à porter"
-            />
-          </div>
-        )}
+        renderInput={(params) => {
+          const { id } = params;
+          const inputId = cleanStringToHTMLAttribute(title, null, id);
+
+          return (
+            <div ref={params.InputProps.ref}>
+              <label
+                className={`fr-label ${className ?? ""}`}
+                htmlFor={inputId}
+              >
+                {title}
+              </label>
+              <input
+                {...params.inputProps}
+                id={inputId}
+                className={"fr-input"}
+                placeholder="Prêt à porter"
+              />
+            </div>
+          );
+        }}
       />
     </>
   );

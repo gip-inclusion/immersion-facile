@@ -14,6 +14,7 @@ export type AddressAutocompleteProps = {
   setFormValue: (p: AddressAndPosition) => void;
   placeholder?: string;
   notice?: string;
+  id?: string;
 };
 
 export const AddressAutocomplete = ({
@@ -25,6 +26,7 @@ export const AddressAutocomplete = ({
   initialSearchTerm = "",
   placeholder = "Ex : Bordeaux 33000",
   notice,
+  id,
 }: AddressAutocompleteProps) => {
   const [selectedOption, setSelectedOption] =
     useState<AddressAndPosition | null>(null);
@@ -59,7 +61,6 @@ export const AddressAutocomplete = ({
 
   const noOptionText =
     isSearching || !debounceSearchTerm ? "..." : "Aucune adresse trouvée.";
-
   return (
     <>
       <Autocomplete
@@ -79,6 +80,7 @@ export const AddressAutocomplete = ({
           inputStyle,
           disabled,
           placeholder,
+          id,
         )}
       />
       {notice && (

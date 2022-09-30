@@ -9,10 +9,10 @@ export const cleanStringToHTMLAttribute = (
   const cleanedString = string
     .normalize("NFD")
     .toLowerCase()
-    .replace(/[^\w ]/g, "")
-    .replaceAll("  ", " ")
+    .replace(/[^\w .]/g, "")
+    .replace(/\s\s+/g, " ")
     .trim()
-    .replaceAll(" ", "-");
+    .replaceAll(/[ .]/g, "-");
   let result = cleanedString;
   if (prefix) {
     result = `${prefix}-${cleanedString}`;
