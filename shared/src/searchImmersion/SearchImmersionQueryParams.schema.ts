@@ -11,7 +11,7 @@ export const searchImmersionQueryParamsSchema: z.Schema<SearchImmersionQueryPara
     latitude: zPreprocessedNumber(),
     longitude: zPreprocessedNumber(),
     distance_km: zPreprocessedNumber(
-      z.number().positive("'distance_km' doit être > 0"),
+      z.number().positive("'distance_km' doit être > 0").max(100),
     ),
     voluntaryToImmersion: zPreprocessedBoolean().optional(),
     sortedBy: z.enum(["distance", "date"]),
