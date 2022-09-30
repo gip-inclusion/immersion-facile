@@ -18,3 +18,4 @@ export * from "./main-wrapper";
 export * from "./file";
 export * from "./modal";
 export * from "./crisp-chat";
+export * from "./fixed-stamp";
