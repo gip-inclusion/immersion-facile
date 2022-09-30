@@ -14,7 +14,7 @@ export const PushLeMoisLesEntreprisesSEngagent = () => (
           <p className={"text-center fr-text--sm fr-pt-2w"}>
             En savoir plus sur{" "}
             <a
-              href={"#"}
+              href={"https://lesentreprises-sengagent.gouv.fr/le-mois"}
               className={"text-immersionBlue-dark"}
               target={"_blank"}
             >

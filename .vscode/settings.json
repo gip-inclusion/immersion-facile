@@ -4,6 +4,7 @@
   "editor.detectIndentation": false,
   "editor.formatOnSave": true,
   "terminal.integrated.scrollback": 100000,
+  "jest.autoRun": "off",
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
