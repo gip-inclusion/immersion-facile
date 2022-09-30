@@ -69,6 +69,7 @@ export * from "./utils/date";
 export * from "./utils/mergeObjectsExpectFalsyValues";
 export * from "./utils/postalCode";
 export * from "./utils/queryParams";
+export * from "./utils/string";
 export * from "./zodUtils";
 export { absoluteUrlSchema } from "./AbsoluteUrl";
 export { HttpClientError as LegacyHttpClientError } from "./httpClient/errors/4xxClientError.error";

@@ -1,7 +1,7 @@
 import { useField } from "formik";
 import React from "react";
 import { CheckboxGroupProps } from "src/uiComponents/form/CheckboxGroup";
-
+import { cleanStringToHTMLAttribute } from "shared";
 type BoolRadioProps = {
   name: string;
   label: string;
@@ -123,8 +123,11 @@ export const RadioGroup = <T extends string | number | string[] | boolean>({
 );
 
 const makeOptionId = (value: string | boolean | number | string[]): string => {
-  if (value instanceof Array) return value[0].toString();
-  return value.toString();
+  let optionId = value.toString();
+  if (value instanceof Array) {
+    optionId = value[0].toString();
+  }
+  return cleanStringToHTMLAttribute(optionId);
 };
 
 const getInputValue = (
