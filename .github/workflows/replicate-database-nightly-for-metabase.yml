@@ -1,0 +1,170 @@
+name: Cron - Réplique BDD sur scalingo et maj des identifiants liés sur le metabase
+
+on:
+  # Every night around 1AM
+  schedule:
+    - cron: "58 0 * * *"
+
+  workflow_dispatch:
+    inputs:
+      application-name:
+        description: "The application which host the database on scalingo. Must be unique, cannot contain 'scalingo', 47 characters maximum"
+        required: true
+        type: string
+      addon-plan-postgresql:
+        required: true
+        description: "Database plan"
+        type: choice
+        options:
+          - "postgresql-sandbox"
+          - "postgresql-starter-512"
+          - "postgresql-starter-1024"
+          - "postgresql-starter-2048"
+          - "postgresql-starter-4096"
+          - "postgresql-starter-8192"
+          - "postgresql-business-512"
+          - "postgresql-business-1024"
+          - "postgresql-business-2048"
+          - "postgresql-business-4096"
+          - "postgresql-business-8192"
+
+env:
+  metabase-application-name: "immersion-facile"
+  scalingo-domain: ".osc-fr1.scalingo.io"
+  metabase-database-id: "4"
+
+jobs:
+  # view-source : https://github.com/romain-cambonie/serenity-workflow-dev/blob/master/.github/workflows/replicate-remote-db-standalone.use-case.yml
+  replicate-db:
+    # TODO Change target workflow to
+    # romain-cambonie/serenity-workflows/.github/workflows/replicate-db.use-case.yml@master
+    # when ready
+    uses: romain-cambonie/serenity-workflow-dev/.github/workflows/replicate-remote-db-standalone.use-case.yml@master
+    with:
+      application-name: ${{ inputs.application-name || 'database-nightly' }}
+      addon-plan-postgresql: ${{ inputs.addon-plan-postgresql || 'postgresql-starter-2048' }}
+      extensions: "postgis"
+    secrets:
+      SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
+      REMOTE_DATABASE_URL: ${{ secrets.REMOTE_DATABASE_URL }}
+
+  refresh-materialized-views:
+    needs:
+      - replicate-db
+    uses: romain-cambonie/serenity-workflow-dev/.github/workflows/_refresh-materialized-views.postgresql.scalingo.reusable.yml@master
+    with:
+      application-name: ${{ inputs.application-name || 'database-nightly' }}
+      views-as-comma-separated-string: "view_siret_with_department_region,view_contact_requests,view_establishments,view_establishments_with_flatten_offers,view_establishments_with_aggregated_offers"
+    secrets:
+      SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
+
+  encrypted-database-credentials:
+    needs:
+      - refresh-materialized-views
+    uses: romain-cambonie/serenity-workflow-dev/.github/workflows/_encrypted-database-credentials.postgresql.scalingo.reusable.yml@master
+    with:
+      application-name: ${{ inputs.application-name || 'database-nightly' }}
+    secrets:
+      SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
+      GPG_SECRET_SIGNING_PASSPHRASE: ${{ secrets.GPG_SECRET_SIGNING_PASSPHRASE }}
+
+  # TODO Externalise to set-metabase-datasource.metabase.scalingo.reusable.yml
+  set-metabase-datasource:
+    needs:
+      - encrypted-database-credentials
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get session token
+        id: session-token
+        run: >-
+          (jq -r '.' <<< '
+          {
+            "username": "${{ secrets.METABASE_AUTOMATION_USER }}",
+            "password": "${{ secrets.METABASE_AUTOMATION_PASSWORD }}"
+          }'
+          ) > payload
+
+          TOKEN=$(
+          curl 
+          --header "Content-Type: application/json"
+          --request POST
+          --data @payload
+          https://${{ env.metabase-application-name }}${{ env.scalingo-domain }}/api/session
+          )
+
+          echo "::set-output name=metabase-token::$(echo $TOKEN | jq '.id')"
+
+      - name: Set datasource
+        run: >-
+          DECRYPTED_USER=$(
+          gpg --decrypt --quiet --batch
+          --passphrase "${{ secrets.GPG_SECRET_SIGNING_PASSPHRASE }}"
+          --output - <(echo "${{ needs.encrypted-database-credentials.outputs.user }}" | base64 --decode)
+          )
+
+          DECRYPTED_PASSWORD=$(
+          gpg --decrypt --quiet --batch
+          --passphrase "${{ secrets.GPG_SECRET_SIGNING_PASSPHRASE }}"
+          --output - <(echo "${{ needs.encrypted-database-credentials.outputs.password }}" | base64 --decode)
+          )
+
+          DECRYPTED_HOST=$(
+          gpg --decrypt --quiet --batch
+          --passphrase "${{ secrets.GPG_SECRET_SIGNING_PASSPHRASE }}"
+          --output - <(echo "${{ needs.encrypted-database-credentials.outputs.host }}" | base64 --decode)
+          )
+
+          DECRYPTED_PORT=$(
+          gpg --decrypt --quiet --batch
+          --passphrase "${{ secrets.GPG_SECRET_SIGNING_PASSPHRASE }}"
+          --output - <(echo "${{ needs.encrypted-database-credentials.outputs.port }}" | base64 --decode)
+          )
+
+          DECRYPTED_DATABASE=$(
+          gpg --decrypt --quiet --batch
+          --passphrase "${{ secrets.GPG_SECRET_SIGNING_PASSPHRASE }}"
+          --output - <(echo "${{ needs.encrypted-database-credentials.outputs.database }}" | base64 --decode)
+          )
+
+          (jq -r '.' <<< "
+          {
+            \"engine\": \"postgres\",
+            \"name\": \"immersion-db-nightly\",
+            \"details\": {
+              \"host\": \"$DECRYPTED_HOST\",
+              \"port\": \"$DECRYPTED_PORT\",
+              \"dbname\": \"$DECRYPTED_DATABASE\",
+              \"user\": \"$DECRYPTED_USER\",
+              \"password\": \"$DECRYPTED_PASSWORD\"
+            }
+          }") > payload
+
+          curl 
+          --header "Content-Type: application/json"
+          --header "X-Metabase-Session: ${{ steps.session-token.outputs.metabase-token }}"
+          --request PUT
+          --data @payload
+          https://${{ env.metabase-application-name }}${{ env.scalingo-domain }}/api/database/${{ env.metabase-database-id }}
+
+  notify-discord:
+    needs:
+      - set-metabase-datasource
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prepare payload
+        run: >-
+          (jq -r '.' <<< '
+          {
+            "username": "Immerbot",
+            "content": "Réplication de la base effectuée avec succès"
+          }'
+          ) > payload
+
+      - name: Send notification
+        run: >-
+          curl
+          --header "Content-Type:application/json"
+          --request POST
+          --data @payload
+          ${{ secrets.DISCORD_NOTIFY_HOOK_URL }}

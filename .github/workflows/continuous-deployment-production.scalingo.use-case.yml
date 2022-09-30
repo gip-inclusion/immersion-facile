@@ -12,9 +12,9 @@ on:
 #      - master
 
 env:
-  application-name: 'immersion-facile'
-  node-version: '16.15.0'
-  addon-plan-postgresql: 'postgresql-sandbox'
+  application-name: "immersion-facile"
+  node-version: "16.15.0"
+  addon-plan-postgresql: "postgresql-sandbox"
 
 jobs:
   dynamic-variables:
@@ -45,7 +45,7 @@ jobs:
         id: addon-plan-postgresql
         run: |
           POSTGRESQL_PLAN=$(echo ${{ env.addon-plan-postgresql }})
-          echo "::set-output name=value::$POSTGRESQL_PLAN"          
+          echo "::set-output name=value::$POSTGRESQL_PLAN"
 
       - name: Has a discord webhook for notification been defined
         id: is-discord-hooked
@@ -58,7 +58,6 @@ jobs:
         run: |
           DEPLOYED_DOMAIN=${{ env.application-name }}.osc-fr1.scalingo.io
           echo "::set-output name=value::$DEPLOYED_DOMAIN"
-
 
   dependencies:
     needs:
@@ -95,8 +94,8 @@ jobs:
     uses: ./.github/workflows/_deploy-application.scalingo.reusable.yml
     with:
       application-full-name: ${{ needs.dynamic-variables.outputs.application-name }}
-      scalingo-remote-domain-url: 'git@ssh.osc-fr1.scalingo.com'
-      scalingo-ssh-host-domain: 'ssh.osc-fr1.scalingo.com'
+      scalingo-remote-domain-url: "git@ssh.osc-fr1.scalingo.com"
+      scalingo-ssh-host-domain: "ssh.osc-fr1.scalingo.com"
     secrets:
       SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
 
@@ -108,7 +107,7 @@ jobs:
     with:
       application-full-name: ${{ needs.dynamic-variables.outputs.application-name }}
       reference-application-name: ${{ needs.dynamic-variables.outputs.application-name }}
-      addon-plan-postgresql : ${{ needs.dynamic-variables.outputs.addon-plan-postgresql }}
+      addon-plan-postgresql: ${{ needs.dynamic-variables.outputs.addon-plan-postgresql }}
     secrets:
       SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
 
