@@ -11,6 +11,7 @@ export type TextAreaProperties = {
   error?: string;
   placeholder?: string;
   disabled?: boolean;
+  id?: string;
 };
 export const TextArea = ({
   name,
@@ -21,9 +22,10 @@ export const TextArea = ({
   error,
   placeholder,
   disabled,
+  id,
 }: TextAreaProperties): JSX.Element => (
   <textarea
-    id={name}
+    id={id}
     value={value}
     name={name}
     onKeyPress={onKeyPress}

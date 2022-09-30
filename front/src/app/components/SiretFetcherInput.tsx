@@ -30,6 +30,7 @@ export const SiretFetcherInput = ({
     <>
       <ImmersionTextField
         className="w-3/4"
+        id="siret-fetcher-input"
         name="siret"
         label={label}
         value={currentSiret}

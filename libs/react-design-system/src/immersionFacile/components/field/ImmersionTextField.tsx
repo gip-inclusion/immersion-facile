@@ -19,6 +19,7 @@ export interface ImmersionTextFieldProps {
   multiline?: boolean;
   disabled?: boolean;
   type?: string;
+  id?: string;
 }
 
 export const ImmersionTextField = ({
@@ -35,9 +36,10 @@ export const ImmersionTextField = ({
   multiline,
   disabled,
   name,
+  id,
 }: ImmersionTextFieldProps) => (
   <InputGroup className={className} error={error}>
-    <Label name={name} label={label} />
+    <Label label={label} htmlFor={id} />
     {description && FieldDescription({ description })}
     {multiline ? (
       <TextArea
@@ -50,6 +52,7 @@ export const ImmersionTextField = ({
           error,
           placeholder,
           disabled,
+          id,
         }}
       />
     ) : (
@@ -64,6 +67,7 @@ export const ImmersionTextField = ({
           error,
           placeholder,
           disabled,
+          id,
         }}
       />
     )}

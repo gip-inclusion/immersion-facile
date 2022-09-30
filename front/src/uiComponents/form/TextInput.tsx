@@ -1,6 +1,7 @@
 import { useField } from "formik";
 import React, { useEffect } from "react";
 import { ImmersionTextField } from "react-design-system/immersionFacile";
+import { cleanStringToHTMLAttribute } from "shared";
 
 type TextInputProps = {
   label: string;
@@ -23,6 +24,7 @@ export const TextInput = (props: TextInputProps) => {
       {...props}
       {...field}
       {...(value && value !== "" && { value })}
+      id={cleanStringToHTMLAttribute(props.name)}
       error={meta.touched ? meta.error : undefined}
     />
   );
@@ -53,6 +55,7 @@ export const TextInputControlled = (
         props.setValue(e.target.value);
         field.onChange(e.target.value);
       }}
+      id={cleanStringToHTMLAttribute(props.name)}
       {...(value && value !== "" && { value })}
       error={meta.touched ? props.error : undefined}
     />

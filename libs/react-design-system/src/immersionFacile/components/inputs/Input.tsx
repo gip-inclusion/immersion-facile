@@ -12,6 +12,7 @@ export type InputProperties = {
   error?: string;
   placeholder?: string;
   disabled?: boolean;
+  id?: string;
 };
 export const Input = ({
   name,
@@ -23,9 +24,10 @@ export const Input = ({
   error,
   placeholder,
   disabled,
+  id,
 }: InputProperties): JSX.Element => (
   <input
-    id={name}
+    id={id}
     value={value}
     type={type}
     name={name}

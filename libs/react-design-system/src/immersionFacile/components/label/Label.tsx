@@ -1,11 +1,11 @@
 import React from "react";
 
 export type LabelProperties = {
-  name: string;
   label?: string;
+  htmlFor?: string;
 };
-export const Label = ({ name, label }: LabelProperties) => (
-  <label className="fr-label" htmlFor={name}>
+export const Label = ({ label, htmlFor }: LabelProperties) => (
+  <label className="fr-label" htmlFor={htmlFor}>
     {label}
   </label>
 );

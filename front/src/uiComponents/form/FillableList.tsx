@@ -3,7 +3,11 @@ import { styled } from "@mui/material/styles";
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { Button } from "react-design-system/immersionFacile";
-import { notEqual, OmitFromExistingKeys } from "shared";
+import {
+  cleanStringToHTMLAttribute,
+  notEqual,
+  OmitFromExistingKeys,
+} from "shared";
 import { z } from "zod";
 
 const immersionBlue = "#3458a2";
@@ -104,7 +108,7 @@ const AddToList = ({
         )}
         <div className="flex items-center justify-center w-full">
           <input
-            id={name}
+            id={cleanStringToHTMLAttribute(name)}
             value={inputValue}
             type="text"
             name={name}
