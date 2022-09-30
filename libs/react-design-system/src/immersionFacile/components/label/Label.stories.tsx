@@ -17,4 +17,4 @@ const componentStory: ComponentStory<typeof Component> = (args) => (
 );
 
 export const Default = componentStory.bind({});
-Default.args = { name: "Default", label: "Default" };
+Default.args = { htmlFor: "default", label: "Default" };
