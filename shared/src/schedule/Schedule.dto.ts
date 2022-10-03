@@ -11,7 +11,7 @@ export type Weekday =
 
 export type ScheduleDto = {
   isSimple: boolean;
-  selectedIndex: number; // TODO this is a view constraint and should be removed from shared
+  selectedIndex: number; // TODO this is a view constraint and should be removed
   complexSchedule: DailyScheduleDto[];
 };
 export type TimePeriodDto = { start: string; end: string }; //TODO Type better ? Format ISO ISO 8601 "HH-mm"
