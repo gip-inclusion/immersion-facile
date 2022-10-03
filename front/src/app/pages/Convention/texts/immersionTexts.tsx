@@ -144,7 +144,7 @@ export const immersionTexts = {
   },
   legalRepresentative: {
     firstNameLabel: "Prénom du représentant légal",
-    lastNameLabel: "Nom de famille du représentant légal *",
+    lastNameLabel: "Nom de famille du représentant légal",
     email: {
       label: "E-mail",
       placeholder: "nom@exemple.com",

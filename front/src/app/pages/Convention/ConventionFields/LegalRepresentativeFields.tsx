@@ -16,7 +16,7 @@ export const LegalRepresentativeFields = ({
   return (
     <div>
       <TextInput
-        label={`${t.legalRepresentative.lastNameLabel} *`}
+        label={`${t.legalRepresentative.firstNameLabel} *`}
         name={getConventionFieldName(
           "signatories.legalRepresentative.firstName",
         )}
