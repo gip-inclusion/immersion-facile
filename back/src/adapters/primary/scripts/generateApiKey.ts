@@ -31,10 +31,11 @@ const getNameOrThrow = (name: string): ApiConsumerName => {
       )}`,
     );
 
-  if (authorisedNames.includes(name as ApiConsumerName)) return consumerName;
+  if (authorisedNames.includes(name as ApiConsumerName))
+    return name as ApiConsumerName;
 
   throw new Error(
-    `Name must be one of ${authorisedNames.join(", ")}, got : ${consumerName}`,
+    `Name must be one of ${authorisedNames.join(", ")}, got : ${name}`,
   );
 };
 
