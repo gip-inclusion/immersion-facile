@@ -23,7 +23,8 @@
     "includecheck": "turbo run includecheck",
     "format:check": "turbo run format:check",
     "fullcheck": "turbo run includecheck format:check lint typecheck test",
-    "typecheck": "turbo run typecheck"
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.35.1",
