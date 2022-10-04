@@ -5,6 +5,7 @@ const selectedRoutes = [
   `${frontRoutes.conventionImmersionRoute}?jwt=bypass-share-screen`,
   frontRoutes.search,
   frontRoutes.landingEstablishment,
+  frontRoutes.establishment,
 ];
 describe("Validate HTML on main pages", () => {
   selectedRoutes.forEach((url) => {
