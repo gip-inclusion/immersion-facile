@@ -6,6 +6,7 @@ import {
 } from "../../adapters/primary/helpers/httpErrors";
 import { createLogger } from "../../utils/logger";
 import { UnitOfWork, UnitOfWorkPerformer } from "./ports/UnitOfWork";
+import tracer from "dd-trace";
 
 const logger = createLogger(__filename);
 
@@ -61,7 +62,12 @@ export abstract class TransactionalUseCase<
 
     try {
       return await this.uowPerformer.perform((uow) =>
-        this._execute(validParams, uow, jwtPayload),
+        tracer.trace(`TransactionalUseCase - ${useCaseName}`, async (span) => {
+          span?.setTag("input", JSON.stringify(params));
+          const output = await this._execute(validParams, uow, jwtPayload);
+          span?.setTag("output", JSON.stringify(output));
+          return output;
+        }),
       );
     } catch (error: any) {
       logger.error(

@@ -83,21 +83,21 @@ services:
     volumes:
       - ./docker-data/postgresql:/var/lib/postgresql/data
     ports:
-      #- "${PG_EXPOSED_PORT:-127.0.0.1:5432}:5432"
       - "${PG_EXPOSED_PORT:-5432}:5432"
 
   adminer:
     image: adminer
-#  backup:
-#    restart: always
-#    hostname: backup
-#    build:
-#      context: "./backup"
-#      dockerfile: Dockerfile.backup
-#      args:
-#        - ENV_TYPE=${ENV_TYPE:-develop}
-#        - TIMEZONE=${TIMEZONE:-Europe/Paris}
-#    volumes:
-#      - ./backup/script:/home/script
-#      - ./:/home/docker
-#      - ${MNT:-/mnt}:/mnt
+
+  datadog:
+    image: gcr.io/datadoghq/agent:7
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /proc/:/host/proc/:ro
+      - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+    environment:
+      DD_API_KEY: ${DD_API_KEY}
+      DD_SITE: ${DD_SITE}
+      DD_APM_ENABLED: true
+      DD_APM_NON_LOCAL_TRAFFIC: true
+    env_file:
+      - .env
