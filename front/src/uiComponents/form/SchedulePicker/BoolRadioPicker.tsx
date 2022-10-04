@@ -1,6 +1,6 @@
 import { FieldHookConfig } from "formik";
 import React from "react";
-import { cleanStringToHTMLAttribute } from "src/../../shared/src";
+import { cleanStringToHTMLAttribute } from "shared";
 
 type BoolRadioPickerProps = {
   label: string;
