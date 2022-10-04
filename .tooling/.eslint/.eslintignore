@@ -1,7 +1,0 @@
-dist/
-node_modules/
-.eslintrc.js
-.idea/
-.git/
-vite.config.ts
-cypress
