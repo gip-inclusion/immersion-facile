@@ -25,12 +25,10 @@ export const PushLeMoisLesEntreprisesSEngagent = () => (
       </div>
       <div className="fr-col-lg-8 fr-col-12 fr-p-2w fr-pt-4w">
         <h2 className="fr-mb-1w text-immersionBlue-dark">
-          <strong>Rendez-vous</strong>
-          <br />
-          le mardi 4 octobre 2022
+          Devenez entreprise accueillante
         </h2>
         <p className="fr-text--lg fr-mb-5w">
-          pour l’événement de lancement du MOIS « Les entreprises s’engagent ».
+          Ouvrez vos portes aux talents de demain
         </p>
         <div className="fr-grid-row">
           <SiretFetcherInput
