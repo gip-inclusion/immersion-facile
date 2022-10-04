@@ -12,7 +12,6 @@ export const CrispChat = ({ crispWebsiteId }: CrispChatProperties) => {
     (window as any).CRISP_WEBSITE_ID = crispWebsiteId;
     const d = document;
     const s = d.createElement("script");
-    s.type = "text/javascript";
     s.src = "https://client.crisp.chat/l.js";
     s.async = true;
     d.getElementsByTagName("head")[0].appendChild(s);

@@ -84,10 +84,7 @@ export const RadioGroup = <T extends string | number | string[] | boolean>({
         }
         role="group"
       >
-        <legend
-          className="fr-fieldset__legend fr-text--regular"
-          id={error ? "radio-error-legend" : "radio-legend"}
-        >
+        <legend className="fr-fieldset__legend fr-text--regular">
           {groupLabel}
         </legend>
         <div className="fr-fieldset__content">

@@ -1,7 +1,8 @@
-import { frontRoutes } from "shared";
+import { frontRoutes } from "../../shared";
 const selectedRoutes = [
   "/",
   frontRoutes.addAgency,
+  `${frontRoutes.conventionImmersionRoute}?jwt=bypass-share-screen`,
   frontRoutes.search,
   frontRoutes.landingEstablishment,
 ];

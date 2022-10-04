@@ -26,6 +26,7 @@ export const AutocompleteInput =
             disabled={disabled}
             className={"fr-input"}
             placeholder={placeholder}
+            type="text"
           />
         </div>
       </div>

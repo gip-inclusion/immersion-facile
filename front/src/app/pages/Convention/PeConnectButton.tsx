@@ -27,6 +27,7 @@ export const PeConnectButton = ({
         width="300"
         height="75"
       />
+      Connexion avec PE Connect
     </a>
   </div>
 );

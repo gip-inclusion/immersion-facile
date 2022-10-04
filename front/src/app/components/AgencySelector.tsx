@@ -88,11 +88,7 @@ export const AgencySelector = ({
       <label className="fr-label pt-4" htmlFor={name}>
         {label}
       </label>
-      {description && (
-        <span className="fr-hint-text" id="select-hint-desc-hint">
-          {description}
-        </span>
-      )}
+      {description && <span className="fr-hint-text">{description}</span>}
       <div className="flex">
         {isLoading && (
           <div className="flex justify-center items-center pr-2">

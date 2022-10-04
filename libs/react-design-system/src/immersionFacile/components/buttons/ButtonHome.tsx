@@ -43,6 +43,7 @@ export const ButtonHome = ({
     }
     onClick={onClick}
     disabled={disable}
+    type="button"
   >
     {children}
   </button>

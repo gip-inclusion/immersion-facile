@@ -3,6 +3,7 @@
 =============================================*/
 .pe-connect {
   clear: both;
+  text-indent: -999rem;
 }
 .pe-connect .button-pe-connect {
   border-radius: 100px;

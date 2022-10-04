@@ -1,5 +1,6 @@
 import { FieldHookConfig } from "formik";
 import React from "react";
+import { cleanStringToHTMLAttribute } from "src/../../shared/src";
 
 type BoolRadioPickerProps = {
   label: string;
@@ -26,14 +27,12 @@ export const BoolRadioPicker = (props: BoolRadioPickerProps) => {
             {props.label}
           </legend>
           {props.description && (
-            <span className="fr-hint-text" id="select-hint-desc-hint">
-              {props.description}
-            </span>
+            <span className="fr-hint-text">{props.description}</span>
           )}
           <div className="fr-fieldset__content">
             <div className="fr-radio-group" key={props.name + "_oui"}>
               <input
-                id={props.name + "radio_yes"}
+                id={cleanStringToHTMLAttribute(props.name + "radio_yes")}
                 type="radio"
                 checked={props.checked}
                 onChange={setFieldAsTrue}
@@ -49,7 +48,7 @@ export const BoolRadioPicker = (props: BoolRadioPickerProps) => {
             </div>
             <div className="fr-radio-group" key={props.name + "_non"}>
               <input
-                id={props.name + "radio_no"}
+                id={cleanStringToHTMLAttribute(props.name + "radio_no")}
                 type="radio"
                 checked={!props.checked}
                 onChange={setFieldAsFalse}

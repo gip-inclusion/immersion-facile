@@ -33,7 +33,7 @@ export const BoolCheckboxGroup = (props: BoolCheckboxGroupProps) => {
             {props.label}
           </legend>
           {props.description && (
-            <span className="fr-hint-text" id="select-hint-desc-hint">
+            <span className="fr-hint-text">
               <a href={props.descriptionLink} target="_blank">
                 {props.description}
               </a>
@@ -106,7 +106,7 @@ export const DateCheckboxGroup = (props: DateCheckboxGroupProps) => {
             {props.label}
           </legend>
           {props.description && (
-            <span className="fr-hint-text" id="select-hint-desc-hint">
+            <span className="fr-hint-text">
               <a href={props.descriptionLink} target="_blank">
                 {props.description}
               </a>

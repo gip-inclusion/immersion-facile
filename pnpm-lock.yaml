@@ -147,13 +147,13 @@ importers:
 
   cypress:
     specifiers:
-      cypress: 10.6.0
+      cypress: 10.9.0
       cypress-html-validate: ^5.0.5
       html-validate: ^7.5.0
       typescript: ^4.6.2
     devDependencies:
-      cypress: 10.6.0
-      cypress-html-validate: 5.0.5_snare5piqu4hidg66sujfsqeri
+      cypress: 10.9.0
+      cypress-html-validate: 5.0.5_b433phfjkbgzhah6t3pzkxhddq
       html-validate: 7.5.0
       typescript: 4.6.4
 
@@ -7967,6 +7967,7 @@ packages:
 
   /colorette/2.0.16:
     resolution: {integrity: sha512-hUewv7oMjCp+wkBv5Rm0v87eJhq4woh5rSR+42YSQJKecCqgIqNkZ6lAlQms/BwHPJA5NKMRlpxPRv0n8HQW6g==}
+    dev: false
 
   /colorette/2.0.19:
     resolution: {integrity: sha512-3tlv/dIP7FWvj3BsbHrGLJ6l/oKh1O3TcgBqMn+yyCagOxc23fyzDS6HypQbgxWbkpDnf52p1LuR4eWDQ/K9WQ==}
@@ -8056,7 +8057,7 @@ packages:
     dev: true
 
   /concat-map/0.0.1:
-    resolution: {integrity: sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=}
+    resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
 
   /concat-stream/1.6.2:
     resolution: {integrity: sha512-27HBghJxjiZtIk3Ycvn/4kbJk/1uZuJFfuPEns6LaEvpvG1f0hTea8lilrouyo9mVc2GWdcEZ8OLoGmSADlrCw==}
@@ -8343,19 +8344,19 @@ packages:
     resolution: {integrity: sha512-NJGVKPS81XejHcLhaLJS7plab0fK3slPh11mESeeDq2W4ZI5kUKK/LRRdVDvjJseojbPB7ZwjnyOybg3Igea/A==}
     dev: true
 
-  /cypress-html-validate/5.0.5_snare5piqu4hidg66sujfsqeri:
+  /cypress-html-validate/5.0.5_b433phfjkbgzhah6t3pzkxhddq:
     resolution: {integrity: sha512-f4mrFzhJ1EbjRzIr8N8ea7EBQ9oYP6I7PfNKyAfD2BC9HpGhPG9z2e8pMzZ2Qv0d7X5JMwqjJc0DcRYWjWRGpQ==}
     engines: {node: '>= 14.19'}
     peerDependencies:
       cypress: ^7.0.1 || ^8 || ^9 || ^10
       html-validate: ^2.17 || ^3 || ^4 || ^5 || ^6 || ^7
     dependencies:
-      cypress: 10.6.0
+      cypress: 10.9.0
       html-validate: 7.5.0
     dev: true
 
-  /cypress/10.6.0:
-    resolution: {integrity: sha512-6sOpHjostp8gcLO34p6r/Ci342lBs8S5z9/eb3ZCQ22w2cIhMWGUoGKkosabPBfKcvRS9BE4UxybBtlIs8gTQA==}
+  /cypress/10.9.0:
+    resolution: {integrity: sha512-MjIWrRpc+bQM9U4kSSdATZWZ2hUqHGFEQTF7dfeZRa4MnalMtc88FIE49USWP2ZVtfy5WPBcgfBX+YorFqGElA==}
     engines: {node: '>=12.0.0'}
     hasBin: true
     requiresBuild: true
@@ -8379,7 +8380,7 @@ packages:
       dayjs: 1.11.2
       debug: 4.3.4_supports-color@8.1.1
       enquirer: 2.3.6
-      eventemitter2: 6.4.6
+      eventemitter2: 6.4.7
       execa: 4.1.0
       executable: 4.1.1
       extract-zip: 2.0.1_supports-color@8.1.1
@@ -9545,8 +9546,8 @@ packages:
     resolution: {integrity: sha512-aIL5Fx7mawVa300al2BnEE4iNvo1qETxLrPI/o05L7z6go7fCw1J6EQmbK4FmJ2AS7kgVF/KEZWufBfdClMcPg==}
     engines: {node: '>= 0.6'}
 
-  /eventemitter2/6.4.6:
-    resolution: {integrity: sha512-OHqo4wbHX5VbvlbB6o6eDwhYmiTjrpWACjF8Pmof/GTD6rdBNdZFNck3xlhqOiQFGCOoq3uzHvA0cQpFHIGVAQ==}
+  /eventemitter2/6.4.7:
+    resolution: {integrity: sha512-tYUSVOGeQPKt/eC1ABfhHy5Xd96N3oIijJvN3O9+TsC28T5V9yX9oEfEK5faP0EFSNVOG97qtAS68GBrQB2hDg==}
     dev: true
 
   /events/1.1.1:
@@ -12418,7 +12419,7 @@ packages:
         optional: true
     dependencies:
       cli-truncate: 2.1.0
-      colorette: 2.0.16
+      colorette: 2.0.19
       enquirer: 2.3.6
       log-update: 4.0.0
       p-map: 4.0.0

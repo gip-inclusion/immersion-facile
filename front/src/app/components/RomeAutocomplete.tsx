@@ -73,6 +73,7 @@ export const RomeAutocomplete = ({
               className={"fr-input"}
               placeholder={placeholder}
               style={{ backgroundColor: "#fff" }}
+              type="text"
             />
           </div>
         )}

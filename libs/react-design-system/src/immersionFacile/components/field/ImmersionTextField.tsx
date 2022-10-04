@@ -24,7 +24,7 @@ export interface ImmersionTextFieldProps {
 
 export const ImmersionTextField = ({
   value,
-  type,
+  type = "text",
   onBlur,
   onChange,
   onKeyPress,

@@ -45,11 +45,7 @@ export const Header = ({
   navLinks,
   sticky,
 }: ImmersionPureHeaderProps) => (
-  <header
-    role="banner"
-    className={`fr-header`}
-    style={sticky ? getStickyStyles() : {}}
-  >
+  <header className={`fr-header`} style={sticky ? getStickyStyles() : {}}>
     <div className="fr-header__body">
       <div className="fr-container">
         <div className="fr-header__body-row">

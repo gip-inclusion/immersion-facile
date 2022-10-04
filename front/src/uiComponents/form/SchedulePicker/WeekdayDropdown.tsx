@@ -8,6 +8,7 @@ type WeekdayDropdownProps = {
   selected: number;
   onValueChange: (pickedDay: number) => void;
   disabled?: boolean;
+  id: string;
 };
 export const WeekdayDropdown = ({
   name,
@@ -16,6 +17,7 @@ export const WeekdayDropdown = ({
   selected,
   onValueChange,
   disabled,
+  id,
 }: WeekdayDropdownProps) => {
   const onChangeHandler = (evt: ChangeEvent) => {
     const target = evt.currentTarget as HTMLSelectElement;
@@ -25,7 +27,7 @@ export const WeekdayDropdown = ({
   return (
     <select
       className="fr-select"
-      id={name}
+      id={id}
       name={name}
       value={selected}
       onChange={onChangeHandler}

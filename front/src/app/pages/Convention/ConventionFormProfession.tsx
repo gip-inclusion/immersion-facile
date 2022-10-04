@@ -43,11 +43,7 @@ export const ConventionFormProfession = ({
         <label className="fr-label" htmlFor={name}>
           {label}
         </label>
-        {description && (
-          <span className="fr-hint-text" id="select-hint-desc-hint">
-            {description}
-          </span>
-        )}
+        {description && <span className="fr-hint-text">{description}</span>}
         <AppellationAutocomplete
           title=""
           initialValue={initialFieldValue}

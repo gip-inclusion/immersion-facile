@@ -102,7 +102,11 @@ export const ConventionFormFields = ({
       {!isFrozen && <p className="font-bold">{t.signatures.validationText}</p>}
       <br />
       {!isFrozen && !isSignatureMode && (
-        <SubmitButton isSubmitting={isSubmitting} onSubmit={submitForm} />
+        <SubmitButton
+          isSubmitting={isSubmitting}
+          disabled={isFrozen || isSignatureMode}
+          onSubmit={submitForm}
+        />
       )}
       {isSignatureMode && (
         <>

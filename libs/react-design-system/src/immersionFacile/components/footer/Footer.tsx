@@ -37,7 +37,7 @@ export const Footer = ({
   ministereLogo,
   partnersLogos,
 }: FooterProps) => (
-  <footer className="fr-footer fr-mt-10w" role="contentinfo" id="main-footer">
+  <footer className="fr-footer fr-mt-10w" id="main-footer">
     <div className="fr-container">
       <div className="fr-footer__body">
         {ministereLogo}

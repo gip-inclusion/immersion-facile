@@ -32,7 +32,7 @@ type Option = Proposal<AppellationDto>;
 export const AppellationAutocomplete = ({
   initialValue,
   setFormValue,
-  title,
+  title = "appellation-autocomplete",
   className,
   selectedAppellations = [],
 }: AppellationAutocompleteProps) => {

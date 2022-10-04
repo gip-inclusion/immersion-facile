@@ -99,10 +99,10 @@ export const SearchPage = () => {
                       }
                       type="submit"
                     >
-                      <div>
+                      <span>
                         <SearchIcon />
                         Rechercher
-                      </div>
+                      </span>
                     </ButtonSearch>
                   </div>
                 </Form>
