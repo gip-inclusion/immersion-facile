@@ -148,9 +148,13 @@ importers:
   cypress:
     specifiers:
       cypress: 10.6.0
+      cypress-html-validate: ^5.0.5
+      html-validate: ^7.5.0
       typescript: ^4.6.2
     devDependencies:
       cypress: 10.6.0
+      cypress-html-validate: 5.0.5_snare5piqu4hidg66sujfsqeri
+      html-validate: 7.5.0
       typescript: 4.6.4
 
   front:
@@ -3225,6 +3229,13 @@ packages:
     engines: {node: '>=14.18.0'}
     dev: false
 
+  /@html-validate/stylish/3.0.1:
+    resolution: {integrity: sha512-jQNDrSnWvJEPSlqC1tFqcbmVuJy2x61UwqFsXHxYT2sgCXFW4AVhsoIcHkECCmUHtQ8hpHU6yOBGA+rMLZhS7A==}
+    engines: {node: '>= 14.0'}
+    dependencies:
+      kleur: 4.1.5
+    dev: true
+
   /@humanwhocodes/config-array/0.10.4:
     resolution: {integrity: sha512-mXAIHxZT3Vcpg83opl1wGlVZ9xydbfZO3r5YfRSH6Gpp2J/PfdBP0wbDa2sO6/qRbcalpoevVyW6A/fI6LfeMw==}
     engines: {node: '>=10.10.0'}
@@ -4045,6 +4056,17 @@ packages:
     dependencies:
       estree-walker: 2.0.2
       picomatch: 2.3.1
+    dev: true
+
+  /@sidvind/better-ajv-errors/2.1.0_ajv@8.11.0:
+    resolution: {integrity: sha512-JuIb009FhHuL9priFBho2kv7QmZOydj0LgYvj+h1t0mMCmhM/YmQNRlJR5wVtBZya6wrVFK5Hi5TIbv5BKEx7w==}
+    engines: {node: '>= 14.0.0'}
+    peerDependencies:
+      ajv: 4.11.8 - 8
+    dependencies:
+      '@babel/code-frame': 7.16.7
+      ajv: 8.11.0
+      chalk: 4.1.2
     dev: true
 
   /@sinonjs/commons/1.8.3:
@@ -6502,6 +6524,15 @@ packages:
       json-schema-traverse: 0.4.1
       uri-js: 4.4.1
 
+  /ajv/8.11.0:
+    resolution: {integrity: sha512-wGgprdCvMalC0BztXvitD2hC04YffAvtsUn93JbGXYLAtCUO4xd17mCCZQxUOItiBwZvJScWo8NIvQMQ71rdpg==}
+    dependencies:
+      fast-deep-equal: 3.1.3
+      json-schema-traverse: 1.0.0
+      require-from-string: 2.0.2
+      uri-js: 4.4.1
+    dev: true
+
   /ansi-align/3.0.1:
     resolution: {integrity: sha512-IOfwwBF5iczOjp/WeY4YxyjqAFMQoZufdQWDd19SEExbVLNXqvpzSJ/M7Za4/sCPmQ0+GRquoA7bGcINcxew6w==}
     dependencies:
@@ -7361,6 +7392,12 @@ packages:
     dependencies:
       balanced-match: 1.0.2
       concat-map: 0.0.1
+
+  /brace-expansion/2.0.1:
+    resolution: {integrity: sha512-XnAIvQ8eM+kC6aULx6wuQiwVsnzsi9d3WxzV3FpWTGA19F621kwdbsAcFKXgKUHZWsy+mY6iL1sHTxWEFCytDA==}
+    dependencies:
+      balanced-match: 1.0.2
+    dev: true
 
   /braces/2.3.2:
     resolution: {integrity: sha512-aNdbnj9P8PjdXU4ybaWLK2IF3jc/EoDYbC7AazW6to3TRsfXxscC9UXOB5iDiEQrkyIbWp2SLQda4+QAa7nc3w==}
@@ -8304,6 +8341,17 @@ packages:
 
   /cyclist/1.0.1:
     resolution: {integrity: sha512-NJGVKPS81XejHcLhaLJS7plab0fK3slPh11mESeeDq2W4ZI5kUKK/LRRdVDvjJseojbPB7ZwjnyOybg3Igea/A==}
+    dev: true
+
+  /cypress-html-validate/5.0.5_snare5piqu4hidg66sujfsqeri:
+    resolution: {integrity: sha512-f4mrFzhJ1EbjRzIr8N8ea7EBQ9oYP6I7PfNKyAfD2BC9HpGhPG9z2e8pMzZ2Qv0d7X5JMwqjJc0DcRYWjWRGpQ==}
+    engines: {node: '>= 14.19'}
+    peerDependencies:
+      cypress: ^7.0.1 || ^8 || ^9 || ^10
+      html-validate: ^2.17 || ^3 || ^4 || ^5 || ^6 || ^7
+    dependencies:
+      cypress: 10.6.0
+      html-validate: 7.5.0
     dev: true
 
   /cypress/10.6.0:
@@ -10411,6 +10459,17 @@ packages:
       once: 1.4.0
       path-is-absolute: 1.0.1
 
+  /glob/8.0.3:
+    resolution: {integrity: sha512-ull455NHSHI/Y1FqGaaYFaLGkNMMJbavMrEGFXG/PGrg6y7sutWHUHrz6gy6WEBH6akM1M414dWKCNs+IhKdiQ==}
+    engines: {node: '>=12'}
+    dependencies:
+      fs.realpath: 1.0.0
+      inflight: 1.0.6
+      inherits: 2.0.4
+      minimatch: 5.1.0
+      once: 1.4.0
+    dev: true
+
   /global-dirs/3.0.0:
     resolution: {integrity: sha512-v8ho2DS5RiCjftj1nD9NmnfaOzTdud7RRnVd9kFNOjqZbISlx5DQ+OrTkywgd0dIt7oFCvKetZSHoHcP3sDdiA==}
     engines: {node: '>=10'}
@@ -10704,6 +10763,37 @@ packages:
   /html-tags/3.2.0:
     resolution: {integrity: sha512-vy7ClnArOZwCnqZgvv+ddgHgJiAFXe3Ge9ML5/mBctVJoUoYPCdxVucOywjDARn6CVoh3dRSFdPHy2sX80L0Wg==}
     engines: {node: '>=8'}
+    dev: true
+
+  /html-validate/7.5.0:
+    resolution: {integrity: sha512-eNcIQBlTv0+L+V+K5On+WuBdOVsqhPVPOK5Si4JpLLIgjBffEjw/5Wz4+UB8yPeBIvOzAnmZYnRxr4GBmNK6UQ==}
+    engines: {node: '>= 14.0'}
+    hasBin: true
+    peerDependencies:
+      jest: ^25.1 || ^26 || ^27.1 || ^28.1.3 || ^29.0.3
+      jest-diff: ^25.1 || ^26 || ^27.1 || ^28.1.3 || ^29.0.3
+      jest-snapshot: ^25.1 || ^26 || ^27.1 || ^28.1.3 || ^29.0.3
+    peerDependenciesMeta:
+      jest:
+        optional: true
+      jest-diff:
+        optional: true
+      jest-snapshot:
+        optional: true
+    dependencies:
+      '@babel/code-frame': 7.16.7
+      '@html-validate/stylish': 3.0.1
+      '@sidvind/better-ajv-errors': 2.1.0_ajv@8.11.0
+      acorn-walk: 8.2.0
+      ajv: 8.11.0
+      deepmerge: 4.2.2
+      espree: 9.3.3
+      glob: 8.0.3
+      ignore: 5.2.0
+      kleur: 4.1.5
+      minimist: 1.2.6
+      prompts: 2.4.2
+      semver: 7.3.7
     dev: true
 
   /html-void-elements/1.0.5:
@@ -12091,6 +12181,10 @@ packages:
   /json-schema-traverse/0.4.1:
     resolution: {integrity: sha512-xbbCH5dCYU5T8LcEhhuh7HJ88HXuW3qsI3Y0zOZFKfZEHcpWiHU/Jxzk629Brsab/mMiHQti9wMP+845RPe3Vg==}
 
+  /json-schema-traverse/1.0.0:
+    resolution: {integrity: sha512-NM8/P9n3XjXhIZn1lLhkFaACTOURQXjWhV4BA/RnOv8xvgqtqpAX9IO4mRQxSx1Rlo4tqzeqb0sOlruaOy3dug==}
+    dev: true
+
   /json-schema/0.4.0:
     resolution: {integrity: sha512-es94M3nTIfsEPisRafak+HDLfHXnKBhV3vU5eqPcS3flIWqcxJWgXHXiey3YrpaNsanY5ei1VoYEbOzijuq9BA==}
     dev: true
@@ -12207,6 +12301,11 @@ packages:
   /kleur/3.0.3:
     resolution: {integrity: sha512-eTIzlVOSUR+JxdDFepEYcBMtZ9Qqdef+rnzWdRZuMbOywu5tO2w2N7rqjoANZ5k9vywhL6Br1VRjUIgTQx4E8w==}
     engines: {node: '>=6'}
+
+  /kleur/4.1.5:
+    resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
+    engines: {node: '>=6'}
+    dev: true
 
   /klona/2.0.5:
     resolution: {integrity: sha512-pJiBpiXMbt7dkzXe8Ghj/u4FfXOOa98fPW+bihOJ4SjnoijweJrNThJfd3ifXpXhREjpoF2mZVH1GfS9LV3kHQ==}
@@ -12818,6 +12917,13 @@ packages:
     resolution: {integrity: sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==}
     dependencies:
       brace-expansion: 1.1.11
+
+  /minimatch/5.1.0:
+    resolution: {integrity: sha512-9TPBGGak4nHfGZsPBohm9AWg6NoT7QTCehS3BIJABslyZbzxfV78QM2Y6+i741OPZIafFAaiiEMh5OyIrJPgtg==}
+    engines: {node: '>=10'}
+    dependencies:
+      brace-expansion: 2.0.1
+    dev: true
 
   /minimist/1.2.6:
     resolution: {integrity: sha512-Jsjnk4bw3YJqYzbdyBiNsPWHPfO++UGG749Cxs6peCu5Xg4nrena6OVxOYxrQTqww0Jmwt+Ref8rggumkTLz9Q==}
