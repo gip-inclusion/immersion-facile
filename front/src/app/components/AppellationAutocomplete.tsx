@@ -32,7 +32,7 @@ type Option = Proposal<AppellationDto>;
 export const AppellationAutocomplete = ({
   initialValue,
   setFormValue,
-  title = "appellation-autocomplete",
+  title,
   className,
   selectedAppellations = [],
 }: AppellationAutocompleteProps) => {
@@ -122,7 +122,11 @@ export const AppellationAutocomplete = ({
         }}
         renderInput={(params) => {
           const { id } = params;
-          const inputId = cleanStringToHTMLAttribute(title, null, id);
+          const inputId = cleanStringToHTMLAttribute(
+            "appellation-autocomplete",
+            null,
+            id,
+          );
 
           return (
             <div ref={params.InputProps.ref}>

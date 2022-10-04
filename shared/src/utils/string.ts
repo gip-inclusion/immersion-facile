@@ -9,7 +9,7 @@ export const cleanStringToHTMLAttribute = (
   const cleanedString = string
     .normalize("NFD")
     .toLowerCase()
-    .replace(/[^\w .]/g, "")
+    .replace(/[^\w .-]/g, "")
     .replace(/\s\s+/g, " ")
     .trim()
     .replaceAll(/[ .]/g, "-");

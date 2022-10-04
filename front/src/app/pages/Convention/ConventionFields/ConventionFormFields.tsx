@@ -96,9 +96,15 @@ export const ConventionFormFields = ({
       {!isSignatureMode &&
         submitCount !== 0 &&
         Object.values(errors).length > 0 && (
-          <div style={{ color: "red" }}>{t.signatures.fixErrors}</div>
+          <div className="fr-alert fr-alert--error">
+            <p>{t.signatures.fixErrors}</p>
+          </div>
         )}
-      {!isFrozen && <p className="font-bold">{t.signatures.validationText}</p>}
+      {!isFrozen && (
+        <p className="fr-mt-2w">
+          <strong>{t.signatures.validationText}</strong>
+        </p>
+      )}
       {!isFrozen && !isSignatureMode && (
         <SubmitButton
           isSubmitting={isSubmitting}

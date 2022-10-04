@@ -26,7 +26,7 @@ export const AddressAutocomplete = ({
   initialSearchTerm = "",
   placeholder = "Ex : Bordeaux 33000",
   notice,
-  id,
+  id = "address-autocomplete",
 }: AddressAutocompleteProps) => {
   const [selectedOption, setSelectedOption] =
     useState<AddressAndPosition | null>(null);
