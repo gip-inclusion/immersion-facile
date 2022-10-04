@@ -133,7 +133,7 @@ type TestAcceptNewStatusParams = {
 
 export type UpdatedFields = Partial<
   ConventionDto & {
-    mentorSignedAt: string | undefined;
+    establishmentRepresentativeSignedAt: string | undefined;
     beneficiarySignedAt: string | undefined;
   }
 >;
@@ -177,10 +177,14 @@ const makeTestAcceptsStatusUpdate =
       conventionRepository,
     });
 
-    const { beneficiary, mentor } = originalConvention.signatories;
+    const { beneficiary, establishmentRepresentative } =
+      originalConvention.signatories;
 
-    const { beneficiarySignedAt, mentorSignedAt, ...restOfUpdatedFields } =
-      updatedFields;
+    const {
+      beneficiarySignedAt,
+      establishmentRepresentativeSignedAt,
+      ...restOfUpdatedFields
+    } = updatedFields;
 
     const hasSignedProperty =
       Object.hasOwn(updatedFields, "beneficiarySignedAt") ||
@@ -197,9 +201,9 @@ const makeTestAcceptsStatusUpdate =
                 ...beneficiary,
                 signedAt: beneficiarySignedAt,
               },
-              mentor: {
-                ...mentor,
-                signedAt: mentorSignedAt,
+              establishmentRepresentative: {
+                ...establishmentRepresentative,
+                signedAt: establishmentRepresentativeSignedAt,
               },
             },
           }
@@ -211,7 +215,7 @@ const makeTestAcceptsStatusUpdate =
       const payload: ConventionRequiresModificationPayload = {
         convention: expectedConvention,
         reason: justification ?? "was not provided",
-        roles: ["beneficiary", "establishment"],
+        roles: ["beneficiary", "establishment2"],
       };
 
       await expectNewEvent(

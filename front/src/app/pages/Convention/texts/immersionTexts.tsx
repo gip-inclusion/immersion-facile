@@ -135,7 +135,7 @@ export const immersionTexts = {
       placeholder: "0606060607",
     },
   },
-  legalRepresentative: {
+  beneficiaryRepresentative: {
     firstNameLabel: "Prénom du représentant légal",
     lastNameLabel: "Nom de famille du représentant légal",
     email: {

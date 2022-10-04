@@ -32,7 +32,11 @@ export const expectEmaiSignatoryConfirmationSignatureRequestMatchingConvention =
     recipient: string;
   }) => {
     const { id, businessName } = convention;
-    const { beneficiary, mentor, legalRepresentative } = convention.signatories;
+    const {
+      beneficiary,
+      establishmentRepresentative,
+      beneficiaryRepresentative,
+    } = convention.signatories;
 
     expectTypeToMatchAndEqual(templatedEmail, {
       type: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
@@ -40,10 +44,10 @@ export const expectEmaiSignatoryConfirmationSignatureRequestMatchingConvention =
       params: {
         signatoryName: `${signatory.firstName} ${signatory.lastName}`,
         beneficiaryName: `${beneficiary.firstName} ${beneficiary.lastName}`,
-        mentorName: `${mentor.firstName} ${mentor.lastName}`,
-        legalRepresentativeName:
-          legalRepresentative &&
-          `${legalRepresentative.firstName} ${legalRepresentative.lastName}`,
+        establishmentRepresentativeName: `${establishmentRepresentative.firstName} ${establishmentRepresentative.lastName}`,
+        beneficiaryRepresentativeName:
+          beneficiaryRepresentative &&
+          `${beneficiaryRepresentative.firstName} ${beneficiaryRepresentative.lastName}`,
         magicLink: fakeGenerateMagicLinkUrlFn({
           id,
           role: signatory.role,

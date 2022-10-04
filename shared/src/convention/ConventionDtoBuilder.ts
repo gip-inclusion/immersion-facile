@@ -12,8 +12,9 @@ import {
   ConventionStatus,
   ImmersionObjective,
   InternshipKind,
-  LegalRepresentative,
+  BeneficiaryRepresentative,
   Mentor,
+  EstablishmentRepresentative,
 } from "./convention.dto";
 
 export const DEMANDE_IMMERSION_ID = "40400404-9c0b-bbbb-bb6d-6bb9bd38bbbb";
@@ -46,13 +47,22 @@ const beneficiary: Beneficiary = {
 };
 
 const mentor: Mentor = {
-  role: "establishment",
+  role: "establishment-mentor",
   email: VALID_EMAILS[1],
   phone: VALID_PHONES[1],
   firstName: "Alain",
   lastName: "Prost",
   signedAt: DATE_SIGNATURE,
   job: "Big Boss",
+};
+
+const establishmentRepresentative: EstablishmentRepresentative = {
+  email: "establishment@example.com",
+  firstName: "Billy",
+  lastName: "Idol",
+  phone: "0602010203",
+  role: "establishment-representative",
+  signedAt: DATE_SIGNATURE,
 };
 
 const validConvention: ConventionDto = {
@@ -84,7 +94,8 @@ const validConvention: ConventionDto = {
   immersionActivities: "Piloter un automobile",
   immersionSkills: "Utilisation des pneus optimale, gestion de carburant",
   internshipKind: "immersion",
-  signatories: { beneficiary, mentor },
+  signatories: { beneficiary, establishmentRepresentative },
+  mentor,
 };
 
 export class ConventionDtoBuilder implements Builder<ConventionDto> {
@@ -103,19 +114,35 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
   public withBeneficiary(beneficiary: Beneficiary): ConventionDtoBuilder {
     return new ConventionDtoBuilder({
       ...this.dto,
-      signatories: { beneficiary, mentor: this.mentor },
+      signatories: {
+        beneficiary,
+        establishmentRepresentative: this.establishmentRepresentative,
+      },
     });
   }
 
-  public withLegalRepresentative(
-    legalRepresentative: LegalRepresentative,
+  public withBeneficiaryRepresentative(
+    beneficiaryRepresentative: BeneficiaryRepresentative,
   ): ConventionDtoBuilder {
     return new ConventionDtoBuilder({
       ...this.dto,
       signatories: {
         beneficiary: this.beneficiary,
-        mentor: this.mentor,
-        legalRepresentative,
+        establishmentRepresentative: this.establishmentRepresentative,
+        beneficiaryRepresentative,
+      },
+    });
+  }
+
+  withEstablishmentRepresentative(
+    establishmentRepresentative: EstablishmentRepresentative,
+  ) {
+    return new ConventionDtoBuilder({
+      ...this.dto,
+      signatories: {
+        beneficiary: this.beneficiary,
+        beneficiaryRepresentative: this.beneficiaryRepresentative,
+        establishmentRepresentative,
       },
     });
   }
@@ -145,7 +172,7 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
   public withMentor(mentor: Mentor): ConventionDtoBuilder {
     return new ConventionDtoBuilder({
       ...this.dto,
-      signatories: { ...this.dto.signatories, mentor },
+      mentor,
     });
   }
 
@@ -294,9 +321,12 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
       ...this.dto,
       signatories: {
         beneficiary: { ...this.beneficiary, signedAt: undefined },
-        mentor: { ...this.mentor, signedAt: undefined },
-        legalRepresentative: this.legalRepresentative && {
-          ...this.legalRepresentative,
+        establishmentRepresentative: {
+          ...this.establishmentRepresentative,
+          signedAt: undefined,
+        },
+        beneficiaryRepresentative: this.beneficiaryRepresentative && {
+          ...this.beneficiaryRepresentative,
           signedAt: undefined,
         },
       },
@@ -313,12 +343,15 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     });
   }
 
-  public signedByEnterprise(signedAt: string) {
+  public signedByEstablishmentRepresentative(signedAt: string) {
     return new ConventionDtoBuilder({
       ...this.dto,
       signatories: {
         ...this.dto.signatories,
-        mentor: { ...this.mentor, signedAt },
+        establishmentRepresentative: {
+          ...this.establishmentRepresentative,
+          signedAt,
+        },
       },
     });
   }
@@ -333,15 +366,21 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
   }
 
   private get mentor(): Mentor {
-    return this.dto.signatories.mentor;
+    return this.dto.mentor;
+  }
+
+  private get establishmentRepresentative(): EstablishmentRepresentative {
+    return this.dto.signatories.establishmentRepresentative;
   }
 
   private get beneficiary(): Beneficiary {
     return this.dto.signatories.beneficiary;
   }
 
-  private get legalRepresentative(): LegalRepresentative | undefined {
-    return this.dto.signatories.legalRepresentative;
+  private get beneficiaryRepresentative():
+    | BeneficiaryRepresentative
+    | undefined {
+    return this.dto.signatories.beneficiaryRepresentative;
   }
 
   public build() {

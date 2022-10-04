@@ -66,7 +66,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
     expectEmailFinalValidationConfirmationMatchingConvention(
       [
         validConvention.signatories.beneficiary.email,
-        validConvention.signatories.mentor.email,
+        validConvention.signatories.establishmentRepresentative.email,
         counsellorEmail,
       ],
       sentEmails[0],
@@ -77,12 +77,12 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
 
   it("With a legal representative", async () => {
     const conventionWithLegalRepresentative = new ConventionDtoBuilder()
-      .withLegalRepresentative({
+      .withBeneficiaryRepresentative({
         firstName: "Tom",
         lastName: "Cruise",
         phone: "0665454271",
-        role: "legal-representative",
-        email: "legal@representative.fr",
+        role: "beneficiary-representative",
+        email: "beneficiary@representative.fr",
       })
       .build();
 
@@ -105,8 +105,9 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
     expectEmailFinalValidationConfirmationMatchingConvention(
       [
         conventionWithLegalRepresentative.signatories.beneficiary.email,
-        conventionWithLegalRepresentative.signatories.mentor.email,
-        conventionWithLegalRepresentative.signatories.legalRepresentative!
+        conventionWithLegalRepresentative.signatories
+          .establishmentRepresentative.email,
+        conventionWithLegalRepresentative.signatories.beneficiaryRepresentative!
           .email,
         counsellorEmail,
       ],
@@ -150,7 +151,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
     expectEmailFinalValidationConfirmationMatchingConvention(
       [
         validConvention.signatories.beneficiary.email,
-        validConvention.signatories.mentor.email,
+        validConvention.signatories.establishmentRepresentative.email,
         counsellorEmail,
         userConventionAdvisor.email,
       ],
@@ -187,7 +188,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
           application.signatories.beneficiary.emergencyContactPhone,
         dateStart: parseISO(application.dateStart).toLocaleDateString("fr"),
         dateEnd: parseISO(application.dateEnd).toLocaleDateString("fr"),
-        mentorName: `${application.signatories.mentor.firstName} ${application.signatories.mentor.lastName}`,
+        establishmentRepresentativeName: `${application.signatories.establishmentRepresentative.firstName} ${application.signatories.establishmentRepresentative.lastName}`,
         scheduleText: prettyPrintSchedule(application.schedule).split("\n"),
         businessName: application.businessName,
         immersionAddress: "immersionAddress",

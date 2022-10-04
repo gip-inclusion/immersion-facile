@@ -35,11 +35,11 @@ const peConvention: PoleEmploiConvention = {
   descriptionProtectionIndividuelle: "",
   dureeImmersion: "80.50",
   email: "jean.profite@erole.com",
-  emailTuteur: "john.doe@disney.com",
+  emailMentor: "john.doe@disney.com",
   enseigne: "AgenceDeGlace",
   id: "12345678910",
   nom: "Profite",
-  nomPrenomFonctionTuteur: "John Doe Directeur d'agence",
+  nomPrenomFonctionMentor: "John Doe Directeur d'agence",
   objectifDeImmersion: 1,
   peConnectId: "d4de66c2-42c0-4359-bf5d-137fc428355b",
   prenom: "Jean",
@@ -51,7 +51,7 @@ const peConvention: PoleEmploiConvention = {
   siret: "49840645800012",
   status: "DEMANDE_VALIDÉE",
   telephone: "0611335577",
-  telephoneTuteur: "0622446688",
+  telephoneMentor: "0622446688",
 };
 
 describe("HttpPoleEmploiGateway", () => {

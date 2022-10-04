@@ -3,11 +3,12 @@ import { Accordion } from "react-design-system/immersionFacile";
 import {
   AppellationDto,
   Beneficiary,
+  BeneficiaryRepresentative,
   calculateTotalImmersionHoursBetweenDate,
   calculateWeeklyHoursFromSchedule,
   ConventionReadDto,
+  EstablishmentRepresentative,
   keys,
-  LegalRepresentative,
   Mentor,
   path,
   prettyPrintSchedule,
@@ -17,9 +18,10 @@ import { TextCell } from "./TextCell";
 
 type ConventionField =
   | keyof ConventionReadDto
+  | `mentor.${keyof Mentor}`
   | `signatories.beneficiary.${keyof Beneficiary}`
-  | `signatories.mentor.${keyof Mentor}`
-  | `signatories.legalRepresentative.${keyof LegalRepresentative}`;
+  | `signatories.beneficiaryRepresentative.${keyof BeneficiaryRepresentative}`
+  | `signatories.establishmentRepresentative.${keyof EstablishmentRepresentative}`;
 
 type FieldsToLabel = Partial<Record<ConventionField, string>>;
 
@@ -35,12 +37,12 @@ const agencyFields: FieldsToLabel = {
 };
 
 const mentorFields: FieldsToLabel = {
-  "signatories.mentor.signedAt": "Signé",
-  "signatories.mentor.email": "Mail du tuteur",
-  "signatories.mentor.phone": "Numéro de téléphone du tuteur",
-  "signatories.mentor.firstName": "Prénom",
-  "signatories.mentor.lastName": "Nom",
-  "signatories.mentor.job": "Poste",
+  "mentor.signedAt": "Signé",
+  "mentor.email": "Mail du tuteur",
+  "mentor.phone": "Numéro de téléphone du tuteur",
+  "mentor.firstName": "Prénom",
+  "mentor.lastName": "Nom",
+  "mentor.job": "Poste",
 };
 
 const candidateFields: FieldsToLabel = {
@@ -54,12 +56,12 @@ const candidateFields: FieldsToLabel = {
     "Numéro du contact d'urgence",
 };
 
-const legalRepresentantFields: FieldsToLabel = {
-  "signatories.legalRepresentative.signedAt": "Signé",
-  "signatories.legalRepresentative.email": "Mail du réprésentant",
-  "signatories.legalRepresentative.phone": "Numéro de téléphone",
-  "signatories.legalRepresentative.firstName": "Prénom",
-  "signatories.legalRepresentative.lastName": "Nom",
+const beneficiaryRepresentativeFields: FieldsToLabel = {
+  "signatories.beneficiaryRepresentative.signedAt": "Signé",
+  "signatories.beneficiaryRepresentative.email": "Mail du réprésentant",
+  "signatories.beneficiaryRepresentative.phone": "Numéro de téléphone",
+  "signatories.beneficiaryRepresentative.firstName": "Prénom",
+  "signatories.beneficiaryRepresentative.lastName": "Nom",
 };
 
 const immersionFields: FieldsToLabel = {
@@ -84,7 +86,7 @@ type FieldsAndTitle = {
 
 const allFields: FieldsAndTitle[] = [
   { listTitle: "Bénéficiaire", fields: candidateFields },
-  { listTitle: "Représentant légal", fields: legalRepresentantFields },
+  { listTitle: "Représentant légal", fields: beneficiaryRepresentativeFields },
   { listTitle: "Tuteur", fields: mentorFields },
   { listTitle: "Entreprise", fields: enterpriseFields },
   { listTitle: "Immersion", fields: immersionFields },
@@ -109,8 +111,8 @@ export const ConnventionFormDetails = ({
       return (value as AppellationDto).appellationLabel;
     if (
       field === "signatories.beneficiary.signedAt" ||
-      field === "signatories.mentor.signedAt" ||
-      field === "signatories.legalRepresentative.signedAt"
+      field === "signatories.establishmentRepresentative.signedAt" ||
+      field === "signatories.beneficiaryRepresentative.signedAt"
     )
       return value ? "✅" : "❌";
     if (typeof value === "string") return value;

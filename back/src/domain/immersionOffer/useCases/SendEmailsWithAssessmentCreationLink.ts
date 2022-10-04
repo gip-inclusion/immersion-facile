@@ -76,7 +76,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<v
     const immersionAssessmentCreationLink = this.generateConventionMagicLink({
       id: immersionAssessmentEmailParams.immersionId,
       email: immersionAssessmentEmailParams.mentorEmail,
-      role: "establishment",
+      role: "establishment2",
       targetRoute: frontRoutes.immersionAssessment,
     });
 

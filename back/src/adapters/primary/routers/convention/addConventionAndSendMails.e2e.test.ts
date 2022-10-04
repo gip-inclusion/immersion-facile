@@ -26,7 +26,7 @@ import { InMemoryEmailGateway } from "../../../secondary/emailGateway/InMemoryEm
 
 const validatorEmail = "validator@mail.com";
 const beneficiarySignDate = new Date("2022-09-08");
-const mentorSignDate = new Date("2022-09-10");
+const establishmentRepresentativeSignDate = new Date("2022-09-10");
 
 describe("Add Convention Notifications, then checks the mails are sent (trigerred by events)", () => {
   it("saves valid app in repository with full express app", async () => {
@@ -60,7 +60,9 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       },
       {
         type: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
-        recipients: [validConvention.signatories.mentor.email],
+        recipients: [
+          validConvention.signatories.establishmentRepresentative.email,
+        ],
       },
     ]);
   });
@@ -224,7 +226,7 @@ const establishmentSignsApplication = async (
   establishmentSignJwt: string,
   initialConvention: ConventionDto,
 ) => {
-  clock.now = () => mentorSignDate;
+  clock.now = () => establishmentRepresentativeSignDate;
 
   await request
     .post(`/auth/${signConventionRoute}/${initialConvention.id}`)
@@ -238,7 +240,8 @@ const establishmentSignsApplication = async (
       status: "IN_REVIEW",
       signatories: makeSignatories(initialConvention, {
         beneficiarySignedAt: beneficiarySignDate.toISOString(),
-        mentorSignedAt: mentorSignDate.toISOString(),
+        establishmentRepresentativeSignedAt:
+          establishmentRepresentativeSignDate.toISOString(),
       }),
     },
   );
@@ -285,7 +288,8 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
       dateValidation: validationDate.toISOString(),
       signatories: makeSignatories(initialConvention, {
         beneficiarySignedAt: beneficiarySignDate.toISOString(),
-        mentorSignedAt: mentorSignDate.toISOString(),
+        establishmentRepresentativeSignedAt:
+          establishmentRepresentativeSignDate.toISOString(),
       }),
       rejectionJustification: undefined,
     },
@@ -309,10 +313,10 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
 const makeSignatories = (
   convention: ConventionDto,
   {
-    mentorSignedAt,
+    establishmentRepresentativeSignedAt,
     beneficiarySignedAt,
   }: {
-    mentorSignedAt?: string;
+    establishmentRepresentativeSignedAt?: string;
     beneficiarySignedAt?: string;
   },
 ): Signatories => ({
@@ -320,5 +324,8 @@ const makeSignatories = (
     ...convention.signatories.beneficiary,
     signedAt: beneficiarySignedAt,
   },
-  mentor: { ...convention.signatories.mentor, signedAt: mentorSignedAt },
+  establishmentRepresentative: {
+    ...convention.signatories.establishmentRepresentative,
+    signedAt: establishmentRepresentativeSignedAt,
+  },
 });

@@ -5,8 +5,9 @@ import {
   calculateTotalImmersionHoursBetweenDate,
   ConventionDto,
   conventionSchema,
-  Mentor,
+  EstablishmentRepresentative,
   prettyPrintSchedule,
+  ValidatedConventionFinalConfirmationEmail,
 } from "shared";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
 
@@ -46,9 +47,9 @@ export class NotifyAllActorsOfFinalApplicationValidation extends TransactionalUs
 
     const recipients = [
       convention.signatories.beneficiary.email,
-      convention.signatories.mentor.email,
-      ...(convention.signatories.legalRepresentative
-        ? [convention.signatories.legalRepresentative.email]
+      convention.signatories.establishmentRepresentative.email,
+      ...(convention.signatories.beneficiaryRepresentative
+        ? [convention.signatories.beneficiaryRepresentative.email]
         : []),
       ...agency.counsellorEmails,
       ...agency.validatorEmails,
@@ -70,9 +71,10 @@ export class NotifyAllActorsOfFinalApplicationValidation extends TransactionalUs
 export const getValidatedApplicationFinalConfirmationParams = (
   agency: AgencyDto,
   dto: ConventionDto,
-) => {
+): ValidatedConventionFinalConfirmationEmail["params"] => {
   const beneficiary: Beneficiary = dto.signatories.beneficiary;
-  const mentor: Mentor = dto.signatories.mentor;
+  const establishmentRepresentative: EstablishmentRepresentative =
+    dto.signatories.establishmentRepresentative;
 
   return {
     totalHours: calculateTotalImmersionHoursBetweenDate({
@@ -86,7 +88,7 @@ export const getValidatedApplicationFinalConfirmationParams = (
     emergencyContactPhone: beneficiary.emergencyContactPhone,
     dateStart: parseISO(dto.dateStart).toLocaleDateString("fr"),
     dateEnd: parseISO(dto.dateEnd).toLocaleDateString("fr"),
-    mentorName: `${mentor.firstName} ${mentor.lastName}`,
+    establishmentRepresentativeName: `${establishmentRepresentative.firstName} ${establishmentRepresentative.lastName}`,
     scheduleText: prettyPrintSchedule(dto.schedule).split("\n"),
     businessName: dto.businessName,
     immersionAddress: dto.immersionAddress || "",

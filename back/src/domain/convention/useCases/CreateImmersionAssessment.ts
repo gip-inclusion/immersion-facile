@@ -77,7 +77,7 @@ const throwForbiddenIfNotAllow = (
   magicLinkPayload: ConventionMagicLinkPayload,
 ) => {
   if (!magicLinkPayload) throw new ForbiddenError("No magic link provided");
-  if (magicLinkPayload.role !== "establishment")
+  if (magicLinkPayload.role !== "establishment2")
     throw new ForbiddenError("Only an establishment can create an assessment");
   if (dto.conventionId !== magicLinkPayload.applicationId)
     throw new ForbiddenError(

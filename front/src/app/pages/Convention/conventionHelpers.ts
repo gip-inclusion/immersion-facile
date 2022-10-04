@@ -94,7 +94,14 @@ export const conventionInitialValuesFromUrl = ({
     id: uuidV4(),
     status: "DRAFT" as ConventionStatus,
     dateSubmission: toDateString(startOfToday()),
-
+    mentor: {
+      role: "establishment-mentor",
+      firstName: params.mentorFirstName ?? "",
+      lastName: params.mentorLastName ?? "",
+      email: params.mentorEmail ?? "",
+      phone: params.mentorPhone ?? "",
+      job: params.mentorJob ?? "",
+    },
     signatories: {
       beneficiary: {
         role: "beneficiary",
@@ -108,17 +115,16 @@ export const conventionInitialValuesFromUrl = ({
           | FederatedIdentity
           | undefined,
       },
-      mentor: {
-        role: "establishment",
+      establishmentRepresentative: {
+        role: "establishment2",
         firstName: params.mentorFirstName ?? "",
         lastName: params.mentorLastName ?? "",
         email: params.mentorEmail ?? "",
         phone: params.mentorPhone ?? "",
-        job: params.mentorJob ?? "",
       },
-      legalRepresentative: areLegalRepresentativeFieldPresent
+      beneficiaryRepresentative: areLegalRepresentativeFieldPresent
         ? {
-            role: "legal-representative",
+            role: "legal-representative2",
             firstName: params.lrFirstName ?? "",
             lastName: params.lrLastName ?? "",
             email: params.lrEmail ?? "",
@@ -171,11 +177,14 @@ export const conventionInitialValuesFromUrl = ({
 const devPrefilledValues = (
   emptyForm: ConventionPresentation,
 ): ConventionPresentation => {
-  const { beneficiary, mentor, legalRepresentative } = emptyForm.signatories;
+  const {
+    beneficiary,
+    beneficiaryRepresentative,
+    establishmentRepresentative,
+  } = emptyForm.signatories;
 
   return {
     ...emptyForm,
-
     signatories: {
       beneficiary: {
         role: "beneficiary",
@@ -188,15 +197,14 @@ const devPrefilledValues = (
           beneficiary.emergencyContactPhone || "0662552607",
         federatedIdentity: beneficiary.federatedIdentity,
       },
-      mentor: {
-        role: "establishment",
-        firstName: mentor.firstName || "Joe",
-        lastName: mentor.lastName || "Le mentor",
-        phone: mentor.phone || "0101100110",
-        email: mentor.email || "mentor@supermentor.fr",
-        job: mentor.job,
+      establishmentRepresentative: {
+        role: "establishment2",
+        firstName: establishmentRepresentative.firstName || "Joe",
+        lastName: establishmentRepresentative.lastName || "Le mentor",
+        phone: establishmentRepresentative.phone || "0101100110",
+        email: establishmentRepresentative.email || "mentor@supermentor.fr",
       },
-      legalRepresentative,
+      beneficiaryRepresentative,
     },
 
     // Participant

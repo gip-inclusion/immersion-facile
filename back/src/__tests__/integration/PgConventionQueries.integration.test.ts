@@ -167,7 +167,9 @@ describe("Pg implementation of ConventionQueries", () => {
       expect(queryResults).toHaveLength(1);
       const expectedResult: ImmersionAssessmentEmailParams = {
         immersionId: validatedImmersionEndingThe15th.id,
-        mentorEmail: validatedImmersionEndingThe15th.signatories.mentor.email,
+        mentorEmail:
+          validatedImmersionEndingThe15th.signatories
+            .establishmentRepresentative.email,
         mentorName: "Romain Grandjean",
         beneficiaryFirstName:
           validatedImmersionEndingThe15th.signatories.beneficiary.firstName,

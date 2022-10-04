@@ -40,7 +40,7 @@ const ConventionDtoBuilderWithId = new ConventionDtoBuilder().withId(
 
 const validPayload = {
   applicationId: conventionId,
-  role: "establishment",
+  role: "establishment2",
 } as ConventionMagicLinkPayload;
 
 describe("CreateImmersionAssessment", () => {
@@ -82,7 +82,7 @@ describe("CreateImmersionAssessment", () => {
     await expectPromiseToFailWithError(
       createImmersionAssessment.execute(immersionAssessment, {
         applicationId: "otherId",
-        role: "establishment",
+        role: "establishment2",
       } as ConventionMagicLinkPayload),
       new ForbiddenError(
         "Convention provided in DTO is not the same as application linked to it",

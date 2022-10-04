@@ -64,12 +64,12 @@ export class InMemoryConventionQueries implements ConventionQueries {
           !immersionIdsThatAlreadyGotAnEmail.includes(convention.id),
       )
       .map((convention) => {
-        const { mentor, beneficiary } = convention.signatories;
+        const { beneficiary } = convention.signatories;
 
         return {
           immersionId: convention.id,
-          mentorName: `${mentor.firstName} ${mentor.lastName}`,
-          mentorEmail: mentor.email,
+          mentorName: `${convention.mentor.firstName} ${convention.mentor.lastName}`,
+          mentorEmail: convention.mentor.email,
           beneficiaryFirstName: beneficiary.firstName,
           beneficiaryLastName: beneficiary.lastName,
         };

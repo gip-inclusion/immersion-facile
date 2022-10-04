@@ -6,9 +6,10 @@ import {
   ConventionMagicLinkPayload,
   ConventionStatus,
   expectToEqual,
-  LegalRepresentative,
+  BeneficiaryRepresentative,
   Role,
   Signatories,
+  EstablishmentRepresentative,
 } from "shared";
 import {
   expectPromiseToFailWithError,
@@ -29,12 +30,20 @@ import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainEvent } from "../../core/eventBus/events";
 import { SignConvention } from "./SignConvention";
 
-const legalRepresentative: LegalRepresentative = {
-  role: "legal-representative",
+const beneficiaryRepresentative: BeneficiaryRepresentative = {
+  role: "legal-representative2",
   email: "bob@email.com",
   phone: "0665565432",
   firstName: "Bob",
   lastName: "L'éponge",
+};
+
+const establishmentRepresentative: EstablishmentRepresentative = {
+  role: "establishment2",
+  email: "patron@email.com",
+  phone: "0665565432",
+  firstName: "Pa",
+  lastName: "Tron",
 };
 
 describe("Sign convention", () => {
@@ -62,8 +71,10 @@ describe("Sign convention", () => {
   const [allowedToSignRoles, forbiddenToSignRoles] =
     splitCasesBetweenPassingAndFailing<Role>(allRoles, [
       "beneficiary",
-      "establishment",
-      "legal-representative",
+      "establishment-representative",
+      "establishment2",
+      "legal-representative2",
+      "beneficiary-representative",
     ]);
 
   it.each(forbiddenToSignRoles.map((role) => ({ role })))(
@@ -74,7 +85,7 @@ describe("Sign convention", () => {
           role,
         } as ConventionMagicLinkPayload),
         new ForbiddenError(
-          "Only Beneficiary, Mentor or Legal representative are allowed to sign convention",
+          "Only Beneficiary, it's legal representative or the establishment representative are allowed to sign convention",
         ),
       );
     },
@@ -136,12 +147,15 @@ describe("Sign convention", () => {
         ...conventionInDb,
         status: "PARTIALLY_SIGNED",
         signatories: makeSignatories(conventionInDb, {
-          mentorSignedAt:
-            role === "establishment" ? signedAt.toISOString() : undefined,
+          establishmentRepresentativeSignedAt:
+            role === "establishment-representative" || role === "establishment2"
+              ? signedAt.toISOString()
+              : undefined,
           beneficiarySignedAt:
             role === "beneficiary" ? signedAt.toISOString() : undefined,
           legalRepresentativeSignedAt:
-            role === "legal-representative"
+            role === "beneficiary-representative" ||
+            role === "legal-representative2"
               ? signedAt.toISOString()
               : undefined,
         }),
@@ -159,7 +173,7 @@ describe("Sign convention", () => {
     clock.setNextDate(signedAt);
 
     await triggerSignature({
-      role: "establishment",
+      role: "establishment2",
       applicationId: initialConvention.id,
     } as ConventionMagicLinkPayload);
 
@@ -167,7 +181,7 @@ describe("Sign convention", () => {
       ...initialConvention,
       status: "PARTIALLY_SIGNED",
       signatories: makeSignatories(initialConvention, {
-        mentorSignedAt: signedAt.toISOString(),
+        establishmentRepresentativeSignedAt: signedAt.toISOString(),
       }),
     };
     expectConventionInDbToEqual(expectedConvention);
@@ -185,7 +199,7 @@ describe("Sign convention", () => {
     const initialConvention = new ConventionDtoBuilder()
       .withId("my-convention-id")
       .withStatus("PARTIALLY_SIGNED")
-      .withLegalRepresentative(legalRepresentative)
+      .withBeneficiaryRepresentative(beneficiaryRepresentative)
       .notSigned()
       .signedByBeneficiary(beneficiarySignedAt.toISOString())
       .build();
@@ -194,24 +208,27 @@ describe("Sign convention", () => {
       [initialConvention.id]: initialConvention,
     });
 
-    const mentorSignedAt = new Date("2022-01-01");
-    clock.setNextDate(mentorSignedAt);
+    const establishmentRepresentativeSignedAt = new Date("2022-01-01");
+    clock.setNextDate(establishmentRepresentativeSignedAt);
 
     await triggerSignature({
-      role: "establishment",
+      role: "establishment2",
       applicationId: initialConvention.id,
     } as ConventionMagicLinkPayload);
+
     const expectedConvention: ConventionDto = {
       ...initialConvention,
       status: "PARTIALLY_SIGNED",
       signatories: makeSignatories(initialConvention, {
         beneficiarySignedAt: beneficiarySignedAt.toISOString(),
-        mentorSignedAt: mentorSignedAt.toISOString(),
+        establishmentRepresentativeSignedAt:
+          establishmentRepresentativeSignedAt.toISOString(),
       }),
     };
+
     expectToEqual(
-      expectedConvention.signatories.legalRepresentative,
-      legalRepresentative,
+      expectedConvention.signatories.beneficiaryRepresentative,
+      beneficiaryRepresentative,
     );
     expectConventionInDbToEqual(expectedConvention);
     expectEventsInOutbox([
@@ -236,11 +253,11 @@ describe("Sign convention", () => {
       [initialConvention.id]: initialConvention,
     });
 
-    const mentorSignedAt = new Date("2022-01-01");
-    clock.setNextDate(mentorSignedAt);
+    const establishmentRepresentativeSignedAt = new Date("2022-01-01");
+    clock.setNextDate(establishmentRepresentativeSignedAt);
 
     await triggerSignature({
-      role: "establishment",
+      role: "establishment2",
       applicationId: initialConvention.id,
     } as ConventionMagicLinkPayload);
 
@@ -249,7 +266,8 @@ describe("Sign convention", () => {
       status: "IN_REVIEW",
       signatories: makeSignatories(initialConvention, {
         beneficiarySignedAt: beneficiarySignedAt.toISOString(),
-        mentorSignedAt: mentorSignedAt.toISOString(),
+        establishmentRepresentativeSignedAt:
+          establishmentRepresentativeSignedAt.toISOString(),
       }),
     };
     expectConventionInDbToEqual(expectedConvention);
@@ -269,7 +287,8 @@ describe("Sign convention", () => {
     return new ConventionDtoBuilder()
       .withId(conventionId)
       .withStatus(status)
-      .withLegalRepresentative(legalRepresentative)
+      .withBeneficiaryRepresentative(beneficiaryRepresentative)
+      .withEstablishmentRepresentative(establishmentRepresentative)
       .notSigned()
       .build();
   };
@@ -290,11 +309,11 @@ describe("Sign convention", () => {
 const makeSignatories = (
   convention: ConventionDto,
   {
-    mentorSignedAt,
+    establishmentRepresentativeSignedAt,
     beneficiarySignedAt,
     legalRepresentativeSignedAt,
   }: {
-    mentorSignedAt?: string;
+    establishmentRepresentativeSignedAt?: string;
     beneficiarySignedAt?: string;
     legalRepresentativeSignedAt?: string;
   },
@@ -304,12 +323,16 @@ const makeSignatories = (
     ...convention.signatories.beneficiary,
     signedAt: beneficiarySignedAt,
   },
-  mentor: { ...convention.signatories.mentor, signedAt: mentorSignedAt },
-  legalRepresentative:
-    legalRepresentativeSignedAt && convention.signatories.legalRepresentative
+  beneficiaryRepresentative:
+    legalRepresentativeSignedAt &&
+    convention.signatories.beneficiaryRepresentative
       ? {
-          ...convention.signatories.legalRepresentative,
+          ...convention.signatories.beneficiaryRepresentative,
           signedAt: legalRepresentativeSignedAt,
         }
-      : convention.signatories.legalRepresentative,
+      : convention.signatories.beneficiaryRepresentative,
+  establishmentRepresentative: {
+    ...convention.signatories.establishmentRepresentative,
+    signedAt: establishmentRepresentativeSignedAt,
+  },
 });

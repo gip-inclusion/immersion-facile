@@ -15,9 +15,9 @@ export type PoleEmploiConvention = {
   dureeImmersion: string; // Ex : 20.75 (pour 20h45min) -> should be number but until PE is ready we convert it to string
   raisonSociale: string;
   siret: string;
-  nomPrenomFonctionTuteur: string;
-  telephoneTuteur: string;
-  emailTuteur: string;
+  nomPrenomFonctionMentor: string;
+  telephoneMentor: string;
+  emailMentor: string;
   adresseImmersion: string;
   protectionIndividuelle: boolean;
   preventionSanitaire: boolean;

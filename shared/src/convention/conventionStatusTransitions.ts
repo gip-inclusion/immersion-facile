@@ -6,23 +6,31 @@ export type StatusTransitionConfig = {
   validRoles: Role[];
 };
 
+const validSignatoryRoles: Role[] = [
+  "beneficiary",
+  "establishment2",
+  "beneficiary-representative",
+  "establishment-representative",
+  "legal-representative2",
+];
+
 export const statusTransitionConfigs: Record<
   ConventionStatus,
   StatusTransitionConfig
 > = {
   READY_TO_SIGN: {
     validInitialStatuses: ["DRAFT"],
-    validRoles: ["beneficiary", "establishment", "legal-representative"],
+    validRoles: validSignatoryRoles,
   },
 
   PARTIALLY_SIGNED: {
     validInitialStatuses: ["READY_TO_SIGN", "PARTIALLY_SIGNED"],
-    validRoles: ["beneficiary", "establishment", "legal-representative"],
+    validRoles: validSignatoryRoles,
   },
 
   IN_REVIEW: {
     validInitialStatuses: ["PARTIALLY_SIGNED"],
-    validRoles: ["beneficiary", "establishment", "legal-representative"],
+    validRoles: validSignatoryRoles,
   },
 
   ACCEPTED_BY_COUNSELLOR: {
@@ -67,13 +75,6 @@ export const statusTransitionConfigs: Record<
       "IN_REVIEW",
       "ACCEPTED_BY_COUNSELLOR",
     ],
-    validRoles: [
-      "counsellor",
-      "validator",
-      "admin",
-      "beneficiary",
-      "establishment",
-      "legal-representative",
-    ],
+    validRoles: ["counsellor", "validator", "admin", ...validSignatoryRoles],
   },
 };

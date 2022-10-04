@@ -1,9 +1,12 @@
 import differenceInDays from "date-fns/differenceInDays";
+import { uniq } from "ramda";
 import { allSignatoriesSigned, getConventionFieldName } from "./convention";
 import {
+  ConventionDtoWithoutExternalId,
   ConventionStatus,
   InternshipKind,
   maximumCalendarDayByInternshipKind,
+  Mentor,
   Signatories,
 } from "./convention.dto";
 
@@ -39,10 +42,38 @@ export const getConventionTooLongMessageAndPath = ({
   path: [getConventionFieldName("dateEnd")],
 });
 
-export const emailAndMentorEmailAreDifferent = (params: {
-  signatories: Signatories;
-}): boolean =>
-  params.signatories.mentor.email !== params.signatories.beneficiary.email;
+const isMentorEmailUsedByBeneficiaryOrItsRepresentative = (
+  signatories: Signatories,
+  mentor: Mentor,
+): boolean => {
+  if (signatories.beneficiary.email === mentor.email) return false;
+  if (
+    signatories.beneficiaryRepresentative &&
+    signatories.beneficiaryRepresentative.email === mentor.email
+  )
+    return false;
+  return true;
+};
+
+const areSignatoryEmailsUniq = (signatories: Signatories): boolean => {
+  const emails = [
+    signatories.establishmentRepresentative.email,
+    signatories.beneficiary.email,
+    signatories.beneficiaryRepresentative?.email,
+  ];
+
+  return uniq(emails).length === emails.length;
+};
+
+export const conventionEmailCheck = (
+  convention: ConventionDtoWithoutExternalId,
+): boolean =>
+  areSignatoryEmailsUniq(convention.signatories)
+    ? isMentorEmailUsedByBeneficiaryOrItsRepresentative(
+        convention.signatories,
+        convention.mentor,
+      )
+    : false;
 
 const statusesAllowedWithoutSign: ConventionStatus[] = [
   "DRAFT",
@@ -52,9 +83,8 @@ const statusesAllowedWithoutSign: ConventionStatus[] = [
   "CANCELLED",
 ];
 
-export const mustBeSignedByEveryone = (params: {
-  signatories: Signatories;
-  status: ConventionStatus;
-}): boolean =>
+export const mustBeSignedByEveryone = (
+  params: ConventionDtoWithoutExternalId,
+): boolean =>
   statusesAllowedWithoutSign.includes(params.status) ||
   allSignatoriesSigned(params.signatories);

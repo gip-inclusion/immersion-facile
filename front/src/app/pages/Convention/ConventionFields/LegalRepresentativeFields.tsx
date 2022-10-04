@@ -16,9 +16,9 @@ export const LegalRepresentativeFields = ({
   return (
     <div>
       <TextInput
-        label={`${t.legalRepresentative.firstNameLabel} *`}
+        label={`${t.beneficiaryRepresentative.firstNameLabel} *`}
         name={getConventionFieldName(
-          "signatories.legalRepresentative.firstName",
+          "signatories.beneficiaryRepresentative.firstName",
         )}
         type="text"
         placeholder=""
@@ -26,9 +26,9 @@ export const LegalRepresentativeFields = ({
         disabled={disabled}
       />
       <TextInput
-        label={`${t.legalRepresentative.lastNameLabel} *`}
+        label={`${t.beneficiaryRepresentative.lastNameLabel} *`}
         name={getConventionFieldName(
-          "signatories.legalRepresentative.lastName",
+          "signatories.beneficiaryRepresentative.lastName",
         )}
         type="text"
         placeholder=""
@@ -36,19 +36,23 @@ export const LegalRepresentativeFields = ({
         disabled={disabled}
       />
       <TextInput
-        label={`${t.legalRepresentative.email.label} *`}
-        name={getConventionFieldName("signatories.legalRepresentative.email")}
+        label={`${t.beneficiaryRepresentative.email.label} *`}
+        name={getConventionFieldName(
+          "signatories.beneficiaryRepresentative.email",
+        )}
         type="email"
-        placeholder={t.legalRepresentative.email.placeholder}
-        description={t.legalRepresentative.email.description}
+        placeholder={t.beneficiaryRepresentative.email.placeholder}
+        description={t.beneficiaryRepresentative.email.description}
         disabled={disabled}
       />
       <TextInput
-        label={`${t.legalRepresentative.phone.label} *`}
-        name={getConventionFieldName("signatories.legalRepresentative.phone")}
+        label={`${t.beneficiaryRepresentative.phone.label} *`}
+        name={getConventionFieldName(
+          "signatories.beneficiaryRepresentative.phone",
+        )}
         type="tel"
-        placeholder={t.legalRepresentative.phone.placeholder}
-        description={t.legalRepresentative.phone.description}
+        placeholder={t.beneficiaryRepresentative.phone.placeholder}
+        description={t.beneficiaryRepresentative.phone.description}
         disabled={disabled}
       />
     </div>
@@ -71,26 +75,26 @@ const useFieldValueStringSetter = (fieldName: ConventionField) => {
 
 const useLegalRepresentativeRole = () => {
   const [, , { setValue: setLegalRepresentative }] = useField(
-    getConventionFieldName("signatories.legalRepresentative"),
+    getConventionFieldName("signatories.beneficiaryRepresentative"),
   );
   const [, , { setValue: setRole }] = useField<Role>(
-    getConventionFieldName("signatories.legalRepresentative.role"),
+    getConventionFieldName("signatories.beneficiaryRepresentative.role"),
   );
   useEffect(() => {
-    setRole("legal-representative");
+    setRole("legal-representative2");
     return () => setLegalRepresentative(undefined);
   }, []);
 };
 
 const useLegalRepresentativeAsEmergencyContact = () => {
   const legalRepresentativeFirstName = useFieldValueString(
-    "signatories.legalRepresentative.firstName",
+    "signatories.beneficiaryRepresentative.firstName",
   );
   const legalRepresentativeLastName = useFieldValueString(
-    "signatories.legalRepresentative.lastName",
+    "signatories.beneficiaryRepresentative.lastName",
   );
   const legalRepresentativePhone = useFieldValueString(
-    "signatories.legalRepresentative.phone",
+    "signatories.beneficiaryRepresentative.phone",
   );
 
   const setEmergencyContact = useFieldValueStringSetter(

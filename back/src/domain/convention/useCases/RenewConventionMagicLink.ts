@@ -4,7 +4,7 @@ import {
   ConventionId,
   ConventionMagicLinkPayload,
   createConventionMagicLinkPayload,
-  Mentor,
+  EstablishmentRepresentative,
   RenewMagicLinkRequestDto,
   renewMagicLinkRequestSchema,
   Role,
@@ -127,7 +127,8 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
     }
 
     const beneficiary: Beneficiary = conventionDto.signatories.beneficiary;
-    const mentor: Mentor = conventionDto.signatories.mentor;
+    const establishmentRepresentative: EstablishmentRepresentative =
+      conventionDto.signatories.establishmentRepresentative;
 
     let emails: string[] = [];
     switch (role) {
@@ -142,8 +143,8 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
       case "validator":
         emails = agency.validatorEmails;
         break;
-      case "establishment":
-        emails = [mentor.email];
+      case "establishment2":
+        emails = [establishmentRepresentative.email];
         break;
     }
 

@@ -1,9 +1,7 @@
 import {
   allRoles,
-  Beneficiary,
   conventionSchema,
   frontRoutes,
-  Mentor,
   zTrimmedString,
 } from "shared";
 import { z } from "zod";
@@ -51,23 +49,23 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
         `Unable to send mail. No agency config found for ${convention.agencyId}`,
       );
     }
-    const beneficiary: Beneficiary = convention.signatories.beneficiary;
-    const mentor: Mentor = convention.signatories.mentor;
+    const beneficiary = convention.signatories.beneficiary;
+    const establishmentRepresentative =
+      convention.signatories.establishmentRepresentative;
 
     for (const role of roles) {
       let email: string | undefined = undefined;
       if (role === "beneficiary") {
         email = beneficiary.email;
-      } else if (role === "establishment") {
-        email = mentor.email;
+      } else if (role === "establishment2") {
+        email = establishmentRepresentative.email;
       }
 
-      if (!email) {
+      if (!email)
         throw new Error(
           "unexpected role for beneficiary/enterprise modification request notification: " +
             role,
         );
-      }
 
       await this.emailGateway.sendEmail({
         type: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",

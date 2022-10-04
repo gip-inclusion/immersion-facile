@@ -1,11 +1,11 @@
 import { PoolClient } from "pg";
 import {
   Beneficiary,
+  BeneficiaryRepresentative,
   ConventionDto,
   ConventionDtoWithoutExternalId,
   ConventionExternalId,
   ConventionId,
-  LegalRepresentative,
   Mentor,
 } from "shared";
 import { ConventionRepository } from "../../../domain/convention/ports/ConventionRepository";
@@ -27,7 +27,7 @@ export class PgConventionRepository implements ConventionRepository {
     convention: ConventionDtoWithoutExternalId,
   ): Promise<ConventionExternalId> {
     // prettier-ignore
-    const { signatories: { beneficiary, mentor, legalRepresentative }, id: conventionId, status, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation, immersionActivities, immersionSkills, postalCode, workConditions, internshipKind } =
+    const { signatories: { beneficiary, beneficiaryRepresentative: legalRepresentative }, id: conventionId, status, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation, immersionActivities, immersionSkills, postalCode, workConditions, internshipKind,mentor } =
         convention
 
     // Insert signatories and remember their id
@@ -62,7 +62,7 @@ export class PgConventionRepository implements ConventionRepository {
     convention: ConventionDto,
   ): Promise<ConventionId | undefined> {
     // prettier-ignore
-    const { signatories: { beneficiary, mentor, legalRepresentative }, id, status, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation, immersionActivities, immersionSkills, workConditions } =
+    const { signatories: { beneficiary, beneficiaryRepresentative: legalRepresentative }, id, status, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation, immersionActivities, immersionSkills, workConditions,mentor } =
       convention
 
     const updateConventionQuery = `  
@@ -135,7 +135,7 @@ export class PgConventionRepository implements ConventionRepository {
   }
 
   private async insertLegalRepresentative(
-    legalRepresentative: LegalRepresentative,
+    beneficiaryRepresentative: BeneficiaryRepresentative,
   ) {
     const query_insert_legal_representative = `
         INSERT into actors(
@@ -144,7 +144,7 @@ export class PgConventionRepository implements ConventionRepository {
         RETURNING id;
       `;
     // prettier-ignore
-    const insertReturn = await this.client.query(query_insert_legal_representative, [legalRepresentative.firstName, legalRepresentative.lastName, legalRepresentative.email, legalRepresentative.phone, legalRepresentative.signedAt]);
+    const insertReturn = await this.client.query(query_insert_legal_representative, [beneficiaryRepresentative.firstName, beneficiaryRepresentative.lastName, beneficiaryRepresentative.email, beneficiaryRepresentative.phone, beneficiaryRepresentative.signedAt]);
     return insertReturn.rows[0]?.id;
   }
 }

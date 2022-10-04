@@ -26,7 +26,11 @@ export class ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignatu
     }
 
     const { id, businessName } = convention;
-    const { mentor, beneficiary, legalRepresentative } = convention.signatories;
+    const {
+      beneficiary,
+      beneficiaryRepresentative,
+      establishmentRepresentative,
+    } = convention.signatories;
 
     await Promise.all(
       values(convention.signatories).map(
@@ -38,15 +42,15 @@ export class ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignatu
             params: {
               signatoryName: `${signatory.firstName} ${signatory.lastName}`,
               beneficiaryName: `${beneficiary.firstName} ${beneficiary.lastName}`,
-              mentorName: `${mentor.firstName} ${mentor.lastName}`,
-              legalRepresentativeName:
-                legalRepresentative &&
-                `${legalRepresentative.firstName} ${legalRepresentative.lastName}`,
+              establishmentRepresentativeName: `${establishmentRepresentative.firstName} ${establishmentRepresentative.lastName}`,
+              beneficiaryRepresentativeName:
+                beneficiaryRepresentative &&
+                `${beneficiaryRepresentative.firstName} ${beneficiaryRepresentative.lastName}`,
               magicLink: this.generateMagicLinkFn({
                 id,
                 role: signatory.role,
                 targetRoute: frontRoutes.conventionToSign,
-                email: mentor.email,
+                email: signatory.email,
               }),
               businessName,
             },

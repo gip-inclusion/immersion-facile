@@ -46,7 +46,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
       sentEmails[0],
       [
         rejectedConvention.signatories.beneficiary.email,
-        rejectedConvention.signatories.mentor.email,
+        rejectedConvention.signatories.establishmentRepresentative.email,
         ...counsellorEmails,
       ],
       rejectedConvention,

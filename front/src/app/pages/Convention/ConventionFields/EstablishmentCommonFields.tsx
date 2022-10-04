@@ -14,7 +14,7 @@ export const EstablishmentCommonFields = ({
 }: {
   disabled: undefined | boolean;
 }) => {
-  const t = useConventionTextsFromFormikContext();
+  const conventionTextFields = useConventionTextsFromFormikContext();
   const { enableInseeApi } = useFeatureFlags();
   const { updateSiret, currentSiret, siretErrorToDisplay, isFetchingSiret } =
     useSiretFetcher({
@@ -32,14 +32,14 @@ export const EstablishmentCommonFields = ({
         value={currentSiret}
         setValue={updateSiret}
         error={siretErrorToDisplay}
-        label={`${t.establishment.siret.label} *`}
+        label={`${conventionTextFields.establishment.siret.label} *`}
         name="siret"
-        placeholder={t.establishment.siret.placeholder}
-        description={t.establishment.siret.description}
+        placeholder={conventionTextFields.establishment.siret.placeholder}
+        description={conventionTextFields.establishment.siret.description}
         disabled={disabled}
       />
       <TextInput
-        label={`${t.establishment.businessNameLabel} *`}
+        label={`${conventionTextFields.establishment.businessNameLabel} *`}
         name={getConventionFieldName("businessName")}
         type="text"
         placeholder=""
@@ -47,43 +47,43 @@ export const EstablishmentCommonFields = ({
         disabled={enableInseeApi}
       />
       <TextInput
-        label={`${t.establishment.firstName.label} *`}
-        name={getConventionFieldName("signatories.mentor.firstName")}
+        label={`${conventionTextFields.establishment.firstName.label} *`}
+        name={getConventionFieldName("mentor.firstName")}
         type="text"
         placeholder=""
-        description={t.establishment.firstName.description}
+        description={conventionTextFields.establishment.firstName.description}
         disabled={disabled || isFetchingSiret}
       />
       <TextInput
-        label={`${t.establishment.lastName.label} *`}
-        name={getConventionFieldName("signatories.mentor.lastName")}
+        label={`${conventionTextFields.establishment.lastName.label} *`}
+        name={getConventionFieldName("mentor.lastName")}
         type="text"
         placeholder=""
-        description={t.establishment.lastName.description}
+        description={conventionTextFields.establishment.lastName.description}
         disabled={disabled || isFetchingSiret}
       />
       <TextInput
-        label={`${t.establishment.job.label} *`}
-        name={getConventionFieldName("signatories.mentor.job")}
+        label={`${conventionTextFields.establishment.job.label} *`}
+        name={getConventionFieldName("mentor.job")}
         type="text"
         placeholder=""
-        description={t.establishment.job.description}
+        description={conventionTextFields.establishment.job.description}
         disabled={disabled || isFetchingSiret}
       />
       <TextInput
-        label={`${t.establishment.phone.label} *`}
-        name={getConventionFieldName("signatories.mentor.phone")}
+        label={`${conventionTextFields.establishment.phone.label} *`}
+        name={getConventionFieldName("mentor.phone")}
         type="tel"
-        placeholder={t.establishment.phone.placeholder}
-        description={t.establishment.phone.description}
+        placeholder={conventionTextFields.establishment.phone.placeholder}
+        description={conventionTextFields.establishment.phone.description}
         disabled={disabled}
       />
       <TextInput
-        label={`${t.establishment.email.label} *`}
-        name={getConventionFieldName("signatories.mentor.email")}
+        label={`${conventionTextFields.establishment.email.label} *`}
+        name={getConventionFieldName("mentor.email")}
         type="email"
-        placeholder={t.establishment.email.placeholder}
-        description={t.establishment.email.description}
+        placeholder={conventionTextFields.establishment.email.placeholder}
+        description={conventionTextFields.establishment.email.description}
         disabled={disabled}
         className="!mb-1"
       />

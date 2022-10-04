@@ -41,23 +41,23 @@ const convertToConventionInUrl = (
   conventionDto: ConventionDto,
 ): ConventionInUrl => {
   const {
-    signatories: { beneficiary, mentor, legalRepresentative },
+    signatories: { beneficiary, beneficiaryRepresentative },
     ...flatValues
   } = conventionDto;
 
   return {
     ...flatValues,
-    ...(legalRepresentative && {
-      lrFirstName: legalRepresentative.firstName,
-      lrLastName: legalRepresentative.lastName,
-      lrPhone: legalRepresentative.phone,
-      lrEmail: legalRepresentative.email,
+    ...(beneficiaryRepresentative && {
+      lrFirstName: beneficiaryRepresentative.firstName,
+      lrLastName: beneficiaryRepresentative.lastName,
+      lrPhone: beneficiaryRepresentative.phone,
+      lrEmail: beneficiaryRepresentative.email,
     }),
-    mentorFirstName: mentor.firstName,
-    mentorLastName: mentor.lastName,
-    mentorPhone: mentor.phone,
-    mentorEmail: mentor.email,
-    mentorJob: mentor.job,
+    mentorFirstName: conventionDto.mentor.firstName,
+    mentorLastName: conventionDto.mentor.lastName,
+    mentorPhone: conventionDto.mentor.phone,
+    mentorEmail: conventionDto.mentor.email,
+    mentorJob: conventionDto.mentor.job,
     firstName: beneficiary.firstName,
     lastName: beneficiary.lastName,
     email: beneficiary.email,

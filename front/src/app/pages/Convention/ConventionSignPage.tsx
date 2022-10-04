@@ -55,25 +55,31 @@ const fromSignatoryRole = (
         ),
         signedAt: convention.signatories.beneficiary.signedAt,
       };
-    case "establishment":
+    case "establishment2":
+    case "establishment-representative":
       return {
-        displayedName: toDisplayedName(convention.signatories.mentor),
-        signatory: convention.signatories.mentor,
-        signedAtFieldName: getConventionFieldName("signatories.mentor.email"),
-        signedAt: convention.signatories.mentor.signedAt,
+        displayedName: toDisplayedName(
+          convention.signatories.establishmentRepresentative,
+        ),
+        signatory: convention.signatories.establishmentRepresentative,
+        signedAtFieldName: getConventionFieldName(
+          "signatories.establishmentRepresentative.email",
+        ),
+        signedAt: convention.signatories.establishmentRepresentative.signedAt,
       };
-    case "legal-representative":
-      if (!convention.signatories.legalRepresentative)
+    case "legal-representative2":
+    case "beneficiary-representative":
+      if (!convention.signatories.beneficiaryRepresentative)
         throw new Error("No legal representative for this convention. ");
       return {
         displayedName: toDisplayedName(
-          convention.signatories.legalRepresentative,
+          convention.signatories.beneficiaryRepresentative,
         ),
-        signatory: convention.signatories.legalRepresentative,
+        signatory: convention.signatories.beneficiaryRepresentative,
         signedAtFieldName: getConventionFieldName(
-          "signatories.legalRepresentative.email",
+          "signatories.beneficiaryRepresentative.email",
         ),
-        signedAt: convention.signatories.legalRepresentative.signedAt,
+        signedAt: convention.signatories.beneficiaryRepresentative.signedAt,
       };
     default:
       return exhaustiveCheck(signatoryRole);

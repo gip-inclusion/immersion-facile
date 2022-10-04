@@ -67,21 +67,25 @@ export type ConventionDtoWithoutExternalId = {
   immersionSkills: string;
   internshipKind: InternshipKind;
   signatories: Signatories;
+  mentor: Mentor;
 };
 
 export type Signatories = {
   beneficiary: Beneficiary;
-  mentor: Mentor;
-  legalRepresentative?: LegalRepresentative;
+  establishmentRepresentative: EstablishmentRepresentative;
+  beneficiaryRepresentative?: BeneficiaryRepresentative;
 };
+
 export type SignatoryRole =
   Required<Signatories>[keyof Required<Signatories>]["role"];
 export type Signatory = GenericSignatory<SignatoryRole>;
 
 export const signatoryRoles: SignatoryRole[] = [
   "beneficiary",
-  "establishment",
-  "legal-representative",
+  "beneficiary-representative",
+  "legal-representative2", // legacy, now named : beneficiary-representative
+  "establishment2", // legacy, now named : establishment-representative
+  "establishment-representative",
 ];
 
 type GenericSignatory<R extends Role> = {
@@ -99,11 +103,19 @@ export type Beneficiary = GenericSignatory<"beneficiary"> & {
   federatedIdentity?: FederatedIdentity;
 };
 
-export type Mentor = GenericSignatory<"establishment"> & {
+export type EstablishmentRepresentative = GenericSignatory<
+  "establishment2" | "establishment-representative"
+>;
+
+export type Mentor = GenericSignatory<
+  "establishment2" | "establishment-mentor"
+> & {
   job: string;
 };
 
-export type LegalRepresentative = GenericSignatory<"legal-representative">;
+export type BeneficiaryRepresentative = GenericSignatory<
+  "beneficiary-representative" | "legal-representative2"
+>;
 
 export type ConventionDto = ConventionDtoWithoutExternalId & {
   externalId: ConventionExternalId;

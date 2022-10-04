@@ -62,7 +62,7 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
   ): Promise<void> {
     const { enablePeConventionBroadcast } =
       await uow.featureFlagRepository.getAll();
-    const { mentor, beneficiary } = convention.signatories;
+    const { beneficiary, establishmentRepresentative } = convention.signatories;
 
     if (!enablePeConventionBroadcast) return;
     if (!beneficiary.federatedIdentity) return;
@@ -90,9 +90,9 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
       dureeImmersion: totalHours.toString(),
       raisonSociale: convention.businessName,
       siret: convention.siret,
-      nomPrenomFonctionTuteur: `${mentor.firstName} ${mentor.lastName} ${mentor.job}`,
-      telephoneTuteur: mentor.phone,
-      emailTuteur: mentor.email,
+      nomPrenomFonctionMentor: `${convention.mentor.firstName} ${convention.mentor.lastName} ${convention.mentor.job}`,
+      telephoneMentor: convention.mentor.phone,
+      emailMentor: convention.mentor.email,
       adresseImmersion: convention.immersionAddress,
       protectionIndividuelle: convention.individualProtection,
       preventionSanitaire: convention.sanitaryPrevention,
@@ -107,7 +107,7 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
       activitesObservees: convention.immersionActivities,
       competencesObservees: convention.immersionSkills,
       signatureBeneficiaire: !!beneficiary.signedAt,
-      signatureEntreprise: !!mentor.signedAt,
+      signatureEntreprise: !!establishmentRepresentative.signedAt,
 
       descriptionProtectionIndividuelle: "",
       enseigne: "", // TODO : decide whether to remove this field, to add agency name to our conventionDTO, or make a request to retrieve it here.

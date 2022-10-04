@@ -171,7 +171,8 @@ describe("convention e2e", () => {
               ...convention.signatories.beneficiary,
               email: "new@email.fr",
             },
-            mentor: convention.signatories.mentor,
+            establishmentRepresentative:
+              convention.signatories.establishmentRepresentative,
           },
           status: "READY_TO_SIGN",
         };
@@ -308,8 +309,8 @@ describe("convention e2e", () => {
       const tutorJwt = generateMagicLinkJwt(
         createConventionMagicLinkPayload(
           conventionId,
-          "establishment",
-          convention.signatories.mentor.email,
+          "establishment2",
+          convention.signatories.establishmentRepresentative.email,
         ),
       );
       await request

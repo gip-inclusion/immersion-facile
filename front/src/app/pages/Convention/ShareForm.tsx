@@ -18,15 +18,15 @@ type ShareFormProps = {
 const makeInitialValues = ({
   firstName,
   lastName,
-  mentorEmail,
+  establishmentRepresentativeEmail,
   link,
 }: {
   firstName: string;
   lastName: string;
-  mentorEmail: string;
+  establishmentRepresentativeEmail: string;
   link: string;
 }): Required<ShareLinkByEmailDto> => ({
-  email: mentorEmail,
+  email: establishmentRepresentativeEmail,
   conventionLink: link,
   details: `${firstName || "Prénom"} ${
     lastName || "Nom"
@@ -44,8 +44,10 @@ export const ShareForm = ({ onSuccess, onError }: ShareFormProps) => {
     result ? onSuccess() : onError();
   };
 
-  const [mentorEmail] = useField<string>({
-    name: getConventionFieldName("signatories.mentor.email"),
+  const [establishmentRepresentativeEmail] = useField<string>({
+    name: getConventionFieldName(
+      "signatories.establishmentRepresentative.email",
+    ),
   });
   const [firstName] = useField<string>({
     name: getConventionFieldName("signatories.beneficiary.firstName"),
@@ -57,7 +59,8 @@ export const ShareForm = ({ onSuccess, onError }: ShareFormProps) => {
   return (
     <Formik
       initialValues={makeInitialValues({
-        mentorEmail: mentorEmail.value,
+        establishmentRepresentativeEmail:
+          establishmentRepresentativeEmail.value,
         firstName: firstName.value,
         lastName: lastName.value,
         link: window.location.href,

@@ -5,12 +5,12 @@ import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/I
 import { ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/convention/useCases/notifications/ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature";
 
 const validConvention: ConventionDto = new ConventionDtoBuilder()
-  .withLegalRepresentative({
+  .withBeneficiaryRepresentative({
     firstName: "Tom",
     lastName: "Cruise",
     phone: "0665454271",
-    role: "legal-representative",
-    email: "legal@representative.fr",
+    role: "beneficiary-representative",
+    email: "beneficiary@representative.fr",
   })
   .build();
 
@@ -42,14 +42,14 @@ describe("Add Convention Notifications", () => {
     expectEmaiSignatoryConfirmationSignatureRequestMatchingConvention({
       templatedEmail: sentEmails[1],
       convention: validConvention,
-      signatory: validConvention.signatories.mentor,
-      recipient: validConvention.signatories.mentor.email,
+      signatory: validConvention.signatories.establishmentRepresentative,
+      recipient: validConvention.signatories.establishmentRepresentative.email,
     });
     expectEmaiSignatoryConfirmationSignatureRequestMatchingConvention({
       templatedEmail: sentEmails[2],
       convention: validConvention,
-      signatory: validConvention.signatories.legalRepresentative!,
-      recipient: validConvention.signatories.legalRepresentative!.email,
+      signatory: validConvention.signatories.beneficiaryRepresentative!,
+      recipient: validConvention.signatories.beneficiaryRepresentative!.email,
     });
   });
 });

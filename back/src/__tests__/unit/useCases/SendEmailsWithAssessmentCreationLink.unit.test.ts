@@ -86,7 +86,8 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
     expect(sentEmails).toHaveLength(1);
     expect(sentEmails[0].type).toBe("CREATE_IMMERSION_ASSESSMENT");
     expect(sentEmails[0].recipients).toEqual([
-      immersionApplicationEndingTomorrow.signatories.mentor.email,
+      immersionApplicationEndingTomorrow.signatories.establishmentRepresentative
+        .email,
     ]);
 
     expect(sentEmails[0].params).toEqual({

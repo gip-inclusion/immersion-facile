@@ -78,7 +78,7 @@ type NewConventionMentorConfirmationEmail = GenericTemplatedEmail<
   }
 >;
 
-type ValidatedConventionFinalConfirmationEmail = GenericTemplatedEmail<
+export type ValidatedConventionFinalConfirmationEmail = GenericTemplatedEmail<
   "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
   {
     totalHours: number;
@@ -88,7 +88,7 @@ type ValidatedConventionFinalConfirmationEmail = GenericTemplatedEmail<
     emergencyContactPhone?: string;
     dateStart: string;
     dateEnd: string;
-    mentorName: string;
+    establishmentRepresentativeName: string;
     scheduleText: string[];
     businessName: string;
     immersionAddress: string;
@@ -198,9 +198,9 @@ type SignatorySignatureRequestNotificationEmail = GenericTemplatedEmail<
   "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
   {
     beneficiaryName: string; //< BENEFICIARY_NAME
-    mentorName: string; //< MENTOR_NAME
+    establishmentRepresentativeName: string; //< MENTOR_NAME
+    beneficiaryRepresentativeName?: string; //< LEGAL_REPRESENTATIVE_NAME
     signatoryName: string; //< SIGNATORY_NAME
-    legalRepresentativeName?: string; //< LEGAL_REPRESENTATIVE_NAME
     magicLink: string; //< MAGIC_LINK
     businessName: string; //< COMPANY_NAME
   }

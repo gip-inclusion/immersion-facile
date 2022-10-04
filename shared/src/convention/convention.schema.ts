@@ -28,16 +28,17 @@ import {
   ConventionReadDto,
   GenerateMagicLinkRequestDto,
   GenerateMagicLinkResponseDto,
-  LegalRepresentative,
+  BeneficiaryRepresentative,
   ListConventionsRequestDto,
   Mentor,
   RenewMagicLinkRequestDto,
   UpdateConventionRequestDto,
   UpdateConventionStatusRequestDto,
   WithConventionId,
+  EstablishmentRepresentative,
 } from "./convention.dto";
 import {
-  emailAndMentorEmailAreDifferent,
+  conventionEmailCheck,
   getConventionTooLongMessageAndPath,
   mustBeSignedByEveryone,
   startDateIsBeforeEndDate,
@@ -73,14 +74,23 @@ const beneficiarySchema: z.Schema<Beneficiary> = signatorySchema.merge(
 
 const mentorSchema: z.Schema<Mentor> = signatorySchema.merge(
   z.object({
-    role: z.enum(["establishment"]),
+    role: z.enum(["establishment-mentor", "establishment2"]),
     job: zStringPossiblyEmpty,
   }),
 );
-const legalRepresentativeSchema: z.Schema<LegalRepresentative> =
+
+const establishmentRepresentativeSchema: z.Schema<EstablishmentRepresentative> =
   signatorySchema.merge(
     z.object({
-      role: z.enum(["legal-representative"]),
+      role: z.enum(["establishment-representative", "establishment2"]),
+      job: zStringPossiblyEmpty,
+    }),
+  );
+
+const beneficiaryRepresentativeSchema: z.Schema<BeneficiaryRepresentative> =
+  signatorySchema.merge(
+    z.object({
+      role: z.enum(["legal-representative2", "beneficiary-representative"]),
       job: zStringPossiblyEmpty,
     }),
   );
@@ -117,9 +127,10 @@ const conventionWithoutExternalIdZObject = z.object({
   internshipKind: z.enum(["immersion", "mini-stage-cci"]),
   signatories: z.object({
     beneficiary: beneficiarySchema,
-    mentor: mentorSchema,
-    legalRepresentative: legalRepresentativeSchema.optional(),
+    establishmentRepresentative: establishmentRepresentativeSchema,
+    beneficiaryRepresentative: beneficiaryRepresentativeSchema.optional(),
   }),
+  mentor: mentorSchema,
 });
 
 export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExternalId> =
@@ -129,10 +140,10 @@ export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExt
       path: [getConventionFieldName("dateEnd")],
     })
     .refine(underMaxCalendarDuration, getConventionTooLongMessageAndPath)
-    .refine(emailAndMentorEmailAreDifferent, {
+    .refine(conventionEmailCheck, {
       message: "Votre adresse e-mail doit être différente de celle du tuteur",
       path: [
-        getConventionFieldName("signatories.mentor.email"),
+        getConventionFieldName("mentor.email"),
         getConventionFieldName("signatories.beneficiary.email"),
       ],
     })
@@ -149,11 +160,13 @@ export const conventionSchema: z.Schema<ConventionDto> =
       path: [getConventionFieldName("dateEnd")],
     })
     .refine(underMaxCalendarDuration, getConventionTooLongMessageAndPath)
-    .refine(emailAndMentorEmailAreDifferent, {
-      message: "Votre adresse e-mail doit être différente de celle du tuteur",
+    .refine(conventionEmailCheck, {
+      message: "Les emails doivent être différents.",
       path: [
-        getConventionFieldName("signatories.mentor.email"),
+        getConventionFieldName("mentor.email"),
+        getConventionFieldName("signatories.beneficiaryRepresentative.email"),
         getConventionFieldName("signatories.beneficiary.email"),
+        getConventionFieldName("signatories.establishmentRepresentative.email"),
       ],
     })
     .refine(mustBeSignedByEveryone, {
@@ -174,11 +187,13 @@ export const conventionReadSchema: z.Schema<ConventionReadDto> =
       path: [getConventionFieldName("dateEnd")],
     })
     .refine(underMaxCalendarDuration, getConventionTooLongMessageAndPath)
-    .refine(emailAndMentorEmailAreDifferent, {
-      message: "Votre adresse e-mail doit être différente de celle du tuteur",
+    .refine(conventionEmailCheck, {
+      message: "Les emails doivent être différents.",
       path: [
-        getConventionFieldName("signatories.mentor.email"),
+        getConventionFieldName("mentor.email"),
+        getConventionFieldName("signatories.beneficiaryRepresentative.email"),
         getConventionFieldName("signatories.beneficiary.email"),
+        getConventionFieldName("signatories.establishmentRepresentative.email"),
       ],
     })
     .refine(mustBeSignedByEveryone, {

@@ -29,15 +29,21 @@ const domainTopicByTargetStatusMap: Partial<
 };
 
 const roleAllowToSign: Role[] = [
-  "establishment",
   "beneficiary",
-  "legal-representative",
+  "establishment2",
+  "establishment-representative",
+  "legal-representative2",
+  "beneficiary-representative",
 ];
 const isAllowedToSign = (
   role: Role,
 ): role is ExtractFromExisting<
   Role,
-  "beneficiary" | "establishment" | "legal-representative"
+  | "beneficiary"
+  | "establishment2"
+  | "establishment-representative"
+  | "legal-representative2"
+  | "beneficiary-representative"
 > => roleAllowToSign.includes(role);
 
 export class SignConvention extends TransactionalUseCase<
@@ -63,7 +69,7 @@ export class SignConvention extends TransactionalUseCase<
 
     if (!isAllowedToSign(role))
       throw new ForbiddenError(
-        "Only Beneficiary, Mentor or Legal representative are allowed to sign convention",
+        "Only Beneficiary, it's legal representative or the establishment representative are allowed to sign convention",
       );
 
     const initialConvention = await uow.conventionRepository.getById(

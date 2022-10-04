@@ -9,11 +9,11 @@ import { TextInput } from "src/uiComponents/form/TextInput";
 const useIsMinor = () => {
   const [isMinor, setIsMinor] = useState<boolean>(false);
 
-  const [{ value: legalRepresentative }] = useField(
-    getConventionFieldName("signatories.legalRepresentative"),
+  const [{ value: beneficiaryRepresentative }] = useField(
+    getConventionFieldName("signatories.beneficiaryRepresentative"),
   );
 
-  const isMinorFromData = !!legalRepresentative;
+  const isMinorFromData = !!beneficiaryRepresentative;
 
   useEffect(() => {
     if (isMinorFromData) setIsMinor(true);

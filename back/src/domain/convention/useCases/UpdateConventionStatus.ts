@@ -64,7 +64,8 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     );
 
     const conventionUpdatedAt = this.clock.now().toISOString();
-    const { beneficiary, mentor, ...otherSignatories } = storedDto.signatories;
+    const { beneficiary, establishmentRepresentative, ...otherSignatories } =
+      storedDto.signatories;
     const updatedDto: ConventionDto = {
       ...storedDto,
       ...(status === "REJECTED" && { rejectionJustification: justification }),
@@ -78,8 +79,8 @@ export class UpdateConventionStatus extends TransactionalUseCase<
             ...beneficiary,
             signedAt: undefined,
           },
-          mentor: {
-            ...mentor,
+          establishmentRepresentative: {
+            ...establishmentRepresentative,
             signedAt: undefined,
           },
         },
@@ -116,7 +117,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
         payload: {
           convention: updatedDto,
           reason: justification ?? "",
-          roles: ["beneficiary", "establishment"],
+          roles: ["beneficiary", "establishment2"],
         },
       });
 

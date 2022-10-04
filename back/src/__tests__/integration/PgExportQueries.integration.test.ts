@@ -195,7 +195,8 @@ describe("PgExportQueries", () => {
           filters: {},
         });
 
-        const { beneficiary, mentor } = conventionInRepo.signatories;
+        const mentor = conventionInRepo.mentor;
+        const { beneficiary } = conventionInRepo.signatories;
 
         // Assert
         const expectedExportedRow = {
