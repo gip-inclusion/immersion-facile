@@ -7,17 +7,10 @@ export const immersionTexts = {
   no: "Non",
   welcome: (
     <>
-      Bravo ! <br />
-      Vous avez trouvé une entreprise pour vous accueillir en immersion. <br />
-      Avant tout, vous devez faire établir une convention pour cette immersion
-      et c'est ici que ça se passe. <br />
-      En quelques minutes, complétez ce formulaire avec l'entreprise qui vous
-      accueillera. <br />
-      <p className="fr-text--xs">
-        Ce formulaire vise à recueillir les données nécessaires à
-        l’établissement de la convention d’immersion professionnelle en
-        conformité avec le cerfa 13912 * 04.
-      </p>
+      <strong>Bravo !</strong> Vous avez trouvé votre entreprise accueillante.
+      Complétez ce formulaire avec votre entreprise accueillante et initier une
+      convention pour réaliser votre immersion professionnelle. Ce formulaire
+      vaut équivalence du CERFA 13912 * 04
     </>
   ),
   copyLinkTooltip: "Copier le lien pour partager le formulaire",
@@ -29,7 +22,7 @@ export const immersionTexts = {
     errorWhileSharing: "Erreur lors de l'envoi de l'email",
   },
   sectionTitles: {
-    beneficiary: "1. Coordonnées du candidat (bénéficiaire)",
+    beneficiary: "1. Informations du candidat",
     establishment: "2. Coordonnées de l'entreprise",
     conditionsToHost: "3. Conditions d’accueil de l’immersion professionnelle",
   },

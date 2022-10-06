@@ -54,10 +54,10 @@ export const HomePage = () => {
             <div>
               <FindImmersionHomeMenu />
               <InitiateConventionCard
-                title="J'ai trouvé mon entreprise et je veux initier ma demande de convention"
+                title="J’ai trouvé mon entreprise accueillante"
                 peConnectNotice="Je suis inscrit à Pôle Emploi, je demande une convention avec :"
                 otherCaseNotice="Je suis accompagné par une autre structure :"
-                showFormButtonLabel="Je demande une convention"
+                showFormButtonLabel="Initier ma demande de convention"
               />
             </div>
             <EstablishmentHomeMenu />

@@ -28,7 +28,7 @@ export const EstablishmentHomeMenu = () => {
         {!modifyLinkWasSent && (
           <EstablishmentSubTitle
             type={styleType}
-            text="Vos équipes souhaitent accueillir en immersion professionnelle ?"
+            text="Vous souhaitez accueillir un candidat"
           />
         )}
       </div>
@@ -41,7 +41,7 @@ export const EstablishmentHomeMenu = () => {
                   dispatch(establishmentSlice.actions.gotReady());
                 }}
               >
-                Référencer votre entreprise
+                Devenez entreprise accueillante
               </ButtonHome>
             </li>
             <li>
@@ -51,7 +51,7 @@ export const EstablishmentHomeMenu = () => {
                   dispatch(establishmentSlice.actions.gotReady());
                 }}
               >
-                Modifier votre entreprise
+                Modifier vos informations
               </ButtonHome>
             </li>
           </ul>

@@ -56,7 +56,7 @@ export const Notification = ({
   children,
 }: NotificationProperties) => (
   <div role="alert" className={`fr-alert fr-alert--${type}`}>
-    <p className="fr-alert__title">{title}</p>
+    {title !== "" && <p className="fr-alert__title">{title}</p>}
     {children}
   </div>
 );

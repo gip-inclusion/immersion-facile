@@ -80,16 +80,11 @@ export const ConventionForm = ({
         <div className="flex justify-center">
           <Title red>{t.conventionTitle}</Title>
         </div>
-        <div className="fr-text">{t.welcome}</div>
-        <Notification
-          type="info"
-          title="Attention, le formulaire de demande de convention n'est pas encore déployé partout en France."
-        >
-          Si votre conseiller emploi ou votre structure d'accompagnement
-          apparaît, vous pouvez l'utiliser.
-          <br />
-          Si ce n'est pas le cas, contactez directement votre conseiller pour
-          établir une convention papier.
+        <p className="fr-text">{t.welcome}</p>
+        <Notification type="info" title="">
+          Vérifiez que votre structure d’accompagnement est disponible dans la
+          liste ci-dessous.{" "}
+          <strong>Si ce n’est pas le cas, contactez votre conseiller.</strong>
         </Notification>
 
         <Formik

@@ -11,15 +11,15 @@ const styleType = "candidate";
 export const FindImmersionHomeMenu = () => (
   <Section type={styleType}>
     <div className="flex flex-col">
-      <EstablishmentTitle type={styleType} text="CANDIDAT À UNE IMMERSION" />
+      <EstablishmentTitle type={styleType} text="CANDIDAT" />
       <EstablishmentSubTitle
         type={styleType}
-        text="Vous voulez essayer un métier en conditions réelles ?"
+        text="Je souhaite découvrir un métier en conditions réelles"
       />
     </div>
     <div className="flex flex-col w-full h-full items-center justify-center">
       <LinkWithButtonStyle {...routes.search().link}>
-        Trouver une entreprise accueillante <SearchIcon />
+        Rechercher une entreprise <SearchIcon />
       </LinkWithButtonStyle>
     </div>
   </Section>
