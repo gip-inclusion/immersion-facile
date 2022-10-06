@@ -183,13 +183,20 @@ describe("search-immersion route", () => {
         ];
         const response = await request
           .get(
-            `/v1/immersion-offers?rome=A1000&distance_km=30&longitude=2.34999&latitude=48.8531&sortedBy=distance`,
+            `/v1/immersion-offers?rome=A1000&distance_km=30&longitude=2.34999&latitude=48.8531&sortedBy=distance&address=5%20rue%20des%20champs%20elysees%2044000%20Nantes`,
           )
           .set("Authorization", generateApiJwt({ id: "my-authorized-id" }));
         expect(response.body).toEqual(expectedResult);
         expect(response.status).toBe(200);
       });
-
+      it("rejects invalid address", async () => {
+        await request
+          .get(
+            `/v1/immersion-offers?rome=A1000&distance_km=30&longitude=2.34999&latitude=48.8531&sortedBy=distance&address=Lyon`,
+          )
+          .set("Authorization", generateApiJwt({ id: "my-authorized-id" }))
+          .expect(400, /Address incorrect/);
+      });
       it("with no specified rome", async () => {
         await request
           .get(

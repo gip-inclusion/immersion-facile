@@ -47,6 +47,7 @@ export class SearchImmersion extends TransactionalUseCase<
       distance_km: params.distance_km,
       sortedBy: params.sortedBy,
       voluntaryToImmersion: params.voluntaryToImmersion,
+      address: params.address,
     };
 
     const searchMadeEntity: SearchMadeEntity = {

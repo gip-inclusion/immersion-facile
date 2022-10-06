@@ -8,6 +8,7 @@ export type SearchImmersionRequestPublicV1 = {
   distance_km: number;
   sortedBy: "distance" | "date";
   voluntaryOnly?: boolean;
+  address?: string;
 };
 
 export const SearchImmersionRequestPublicV1ToDomain = (

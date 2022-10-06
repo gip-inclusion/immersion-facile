@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { romeCodeSchema } from "../rome";
 import { siretSchema } from "../siret";
+import { captureAddressGroups } from "../utils/address";
 import { zPreprocessedBoolean, zPreprocessedNumber } from "../zodUtils";
 import { SearchImmersionQueryParamsDto } from "./SearchImmersionQueryParams.dto";
 
@@ -15,4 +16,11 @@ export const searchImmersionQueryParamsSchema: z.Schema<SearchImmersionQueryPara
     ),
     voluntaryToImmersion: zPreprocessedBoolean().optional(),
     sortedBy: z.enum(["distance", "date"]),
+    address: z
+      .string()
+      .refine((address) => {
+        const dto = captureAddressGroups(address);
+        return dto.validAddress;
+      }, "Address incorrect")
+      .optional(),
   });

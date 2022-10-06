@@ -7,6 +7,7 @@ export interface SearchInput {
   lat: number;
   lon: number;
   radiusKm: number;
+  address: string;
 }
 
 export const useSearchUseCase = () => {
@@ -20,6 +21,7 @@ export const useSearchUseCase = () => {
         longitude: values.lon,
         distance_km: values.radiusKm,
         sortedBy: "distance",
+        address: values.address,
       }),
     );
   };

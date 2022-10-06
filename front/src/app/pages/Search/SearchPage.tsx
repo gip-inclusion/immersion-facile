@@ -15,6 +15,7 @@ import { StaticDropdown } from "./Dropdown/StaticDropdown";
 import { OurAdvises } from "./OurAdvises";
 import "./SearchPage.css";
 import { SearchResultPanel } from "./SearchResultPanel";
+import { addressDtoToString } from "shared";
 
 const radiusOptions = [1, 2, 5, 10, 20, 50, 100];
 const initiallySelectedIndex = -1; // don't select anything initially
@@ -37,6 +38,7 @@ export const SearchPage = () => {
                 lat: 0,
                 lon: 0,
                 radiusKm: 10,
+                address: "",
               }}
               onSubmit={searchUseCase}
             >
@@ -63,9 +65,10 @@ export const SearchPage = () => {
                           paddingLeft: "48px",
                           background: `white url(${locationSearchIcon}) no-repeat scroll 11px 8px`,
                         }}
-                        setFormValue={({ position }) => {
+                        setFormValue={({ position, address }) => {
                           setFieldValue("lat", position.lat);
                           setFieldValue("lon", position.lon);
+                          setFieldValue("address", addressDtoToString(address));
                         }}
                         placeholder={"Ex : Bordeaux 33000"}
                         notice={"Saisissez un code postal et/ou une ville"}

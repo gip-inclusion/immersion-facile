@@ -9,6 +9,7 @@ export type SearchMade = {
   lon: number;
   sortedBy: "distance" | "date";
   voluntaryToImmersion?: boolean;
+  address?: string;
 };
 
 export type SearchMadeEntity = {

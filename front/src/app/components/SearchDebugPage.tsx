@@ -42,6 +42,7 @@ export const SearchDebugPage = () => {
                 longitude: values.lon,
                 distance_km: values.radius,
                 sortedBy: "distance",
+                address: "8 rue de la plage 29730 Guilvinec",
               }),
             )
               .then((response) => {

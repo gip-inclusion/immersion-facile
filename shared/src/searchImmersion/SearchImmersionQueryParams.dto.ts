@@ -7,4 +7,5 @@ export type SearchImmersionQueryParamsDto = {
   distance_km: number;
   sortedBy: "distance" | "date";
   voluntaryToImmersion?: boolean;
+  address?: string;
 };

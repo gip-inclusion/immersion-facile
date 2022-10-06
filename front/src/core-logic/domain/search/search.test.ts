@@ -37,6 +37,7 @@ describe("search epic", () => {
           latitude: 0,
           rome: "A1000",
           sortedBy: "distance",
+          address: "23 rue lunaire, 44000 Nantes",
         }),
       );
       expectStatus("initialFetch");
@@ -59,6 +60,7 @@ describe("search epic", () => {
           latitude: 0,
           rome: "A1000",
           sortedBy: "distance",
+          address: "4 rue dessange, 44000 Nantes",
         }),
       );
       expectStatus("initialFetch");
@@ -76,6 +78,7 @@ describe("search epic", () => {
           latitude: 0,
           rome: "A1000",
           sortedBy: "distance",
+          address: "9 rue pruneaux, 44000 Nantes",
         }),
       );
 

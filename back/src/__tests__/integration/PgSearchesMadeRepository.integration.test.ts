@@ -2,10 +2,7 @@ import { Pool, PoolClient } from "pg";
 import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { SearchMadeEntityBuilder } from "../../_testBuilders/SearchMadeEntityBuilder";
 import { PgSearchMadeRepository } from "../../adapters/secondary/pg/PgSearchMadeRepository";
-import {
-  SearchMade,
-  SearchMadeEntity,
-} from "../../domain/immersionOffer/entities/SearchMadeEntity";
+import { SearchMadeEntity } from "../../domain/immersionOffer/entities/SearchMadeEntity";
 
 describe("PgSearchesMadeRepository", () => {
   let pool: Pool;
@@ -28,19 +25,20 @@ describe("PgSearchesMadeRepository", () => {
   });
 
   it("Insert search", async () => {
-    await populateWithImmersionSearches();
-
-    expect(
-      (
-        await lookupSearcheMade({
-          rome: "M1607",
-          distance_km: 30,
-          lat: 49.119146,
-          lon: 6.17602,
-          sortedBy: "date",
-        })
-      )[0].rome,
-    ).toBe("M1607");
+    const searchMade: SearchMadeEntity = {
+      id: "9f6dad2c-6f02-11ec-90d6-0242ac120003",
+      rome: "M1607",
+      distance_km: 30,
+      lat: 48.119146,
+      lon: 4.17602,
+      needsToBeSearched: true,
+      sortedBy: "distance",
+      address: "7 rue de la Noé 44000 Nantes",
+      voluntaryToImmersion: true,
+    };
+    await pgSearchesMadeRepository.insertSearchMade(searchMade);
+    const retrievedSearchMade = await getSearchMadeById(searchMade.id);
+    expect(retrievedSearchMade).toEqual(searchMade);
   });
   it("Retrieve pending searches", async () => {
     // Prepare : insert two entities : one already processed, the other not yet processed
@@ -52,8 +50,8 @@ describe("PgSearchesMadeRepository", () => {
       .withId("ed2ca622-6f06-11ec-90d6-0242ac120006")
       .build();
 
-    await insertEntity(entityNeedingToBeProcessed);
-    await insertEntity(entityAlreadyProcessed);
+    await pgSearchesMadeRepository.insertSearchMade(entityNeedingToBeProcessed);
+    await pgSearchesMadeRepository.insertSearchMade(entityAlreadyProcessed);
 
     // Act : Retrieve unprocessed entities
     const retrievedSearches =
@@ -71,7 +69,7 @@ describe("PgSearchesMadeRepository", () => {
       .withId(searchMadeId)
       .withNeedsToBeSearch()
       .build();
-    await insertEntity(searchMade);
+    await pgSearchesMadeRepository.insertSearchMade(searchMade);
     // Act : call method
     await pgSearchesMadeRepository.markSearchAsProcessed(searchMadeId);
     // Assert flag has been set to False
@@ -81,97 +79,23 @@ describe("PgSearchesMadeRepository", () => {
     expect(result.rows[0]).toEqual({ needstobesearched: false });
   });
 
-  const populateWithImmersionSearches = async () => {
-    await pgSearchesMadeRepository.insertSearchMade({
-      id: "9f6da868-6f02-11ec-90d6-0242ac120003",
-      rome: "M1607",
-      distance_km: 30,
-      lat: 49.119146,
-      lon: 6.17602,
-      needsToBeSearched: true,
-      sortedBy: "date",
-      voluntaryToImmersion: true,
-      apiConsumerName: "passeEmploi",
-    });
-    await pgSearchesMadeRepository.insertSearchMade({
-      id: "9f6daac0-6f02-11ec-90d6-0242ac120003",
-      rome: "M1607",
-      distance_km: 30,
-      lat: 48.119146,
-      lon: 6.17602,
-      needsToBeSearched: true,
-      sortedBy: "distance",
-    });
-    await pgSearchesMadeRepository.insertSearchMade({
-      id: "9f6dac00-6f02-11ec-90d6-0242ac120003",
-      rome: "M1607",
-      distance_km: 30,
-      lat: 48.119146,
-      lon: 5.17602,
-      needsToBeSearched: true,
-      sortedBy: "distance",
-    });
-    await pgSearchesMadeRepository.insertSearchMade({
-      id: "9f6dad2c-6f02-11ec-90d6-0242ac120003",
-      rome: "M1607",
-      distance_km: 30,
-      lat: 48.119146,
-      lon: 4.17602,
-      needsToBeSearched: true,
-      sortedBy: "distance",
-    });
-    await pgSearchesMadeRepository.insertSearchMade({
-      id: "9f6dae4e-6f02-11ec-90d6-0242ac120003",
-      rome: "M1607",
-      distance_km: 30,
-      lat: 48.129146,
-      lon: 4.17602,
-      needsToBeSearched: true,
-      sortedBy: "distance",
-    });
-    await pgSearchesMadeRepository.insertSearchMade({
-      id: "bee68ce6-6f02-11ec-90d6-0242ac120003",
-      rome: "M1608",
-      distance_km: 30,
-      lat: 48.129146,
-      lon: 4.17602,
-      needsToBeSearched: true,
-      sortedBy: "distance",
-    });
-    // Search made without rome !
-    await pgSearchesMadeRepository.insertSearchMade({
-      id: "daa68ce6-6f02-11ec-90d6-0242ac120003",
-      distance_km: 30,
-      lat: 48.129146,
-      lon: 4.17602,
-      needsToBeSearched: true,
-      sortedBy: "distance",
-    });
-  };
-
-  const lookupSearcheMade = async (searchMade: SearchMade) => {
-    const res = await client.query(
-      "SELECT * FROM searches_made WHERE rome=$1 AND lat=$2 AND lon=$3 AND distance=$4",
-      [searchMade.rome, searchMade.lat, searchMade.lon, searchMade.distance_km],
-    );
-    return res.rows;
-  };
-
-  const insertEntity = async (searchMadeEntity: SearchMadeEntity) => {
-    await client.query(
-      `INSERT INTO searches_made (
-       id, ROME, lat, lon, distance, needsToBeSearched, gps, voluntary_to_immersion
-     ) VALUES ($1, $2, $3, $4, $5, $6, ST_GeographyFromText($7), $8);`,
-      [
-        searchMadeEntity.id,
-        searchMadeEntity.rome,
-        searchMadeEntity.lat,
-        searchMadeEntity.lon,
-        searchMadeEntity.distance_km,
-        searchMadeEntity.needsToBeSearched,
-        `POINT(${searchMadeEntity.lon} ${searchMadeEntity.lat})`,
-        searchMadeEntity.voluntaryToImmersion,
-      ],
-    );
+  const getSearchMadeById = async (
+    id: string,
+  ): Promise<SearchMadeEntity | undefined> => {
+    const res = await client.query("SELECT * FROM searches_made WHERE id=$1", [
+      id,
+    ]);
+    if (res.rows.length === 0) return;
+    return {
+      id: res.rows[0].id,
+      rome: res.rows[0].rome,
+      distance_km: res.rows[0].distance,
+      lat: res.rows[0].lat,
+      lon: res.rows[0].lon,
+      sortedBy: res.rows[0].sorted_by,
+      voluntaryToImmersion: res.rows[0].voluntary_to_immersion,
+      address: res.rows[0].address,
+      needsToBeSearched: res.rows[0].needstobesearched,
+    };
   };
 });
