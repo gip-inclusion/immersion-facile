@@ -1,51 +1,118 @@
-import { frontRoutes } from "../../shared";
-import { cypressDoIfElementExists } from "../utils/conditional";
+import {
+  frontRoutes,
+  getConventionFieldName,
+  cleanStringToHTMLAttribute,
+  ConventionDto,
+  DotNestedKeys,
+  agenciesRoute,
+  lookupStreetAddressRoute,
+  conventionsRoute,
+  featureFlagsRoute,
+  appellationRoute,
+} from "shared";
+import { cypressDoIfElementExists, fillSelectRandomly } from "../utils";
+
+const getIdFromConventionDTO = (field: DotNestedKeys<ConventionDto>) =>
+  `#${cleanStringToHTMLAttribute(getConventionFieldName(field))}`;
 
 describe("Convention Form", () => {
   const conventionFormUrl = `${frontRoutes.conventionImmersionRoute}`;
+  const baseApiRoute = "/api/";
   it("can submit form with basic infos", () => {
-    cy.intercept("/**").as("xhr-requests");
+    cy.intercept("GET", `${baseApiRoute}${featureFlagsRoute}`).as(
+      "featureFlagsRequest",
+    );
+    cy.intercept("GET", `${baseApiRoute}${agenciesRoute}?**`).as(
+      "agenciesRequest",
+    );
+    cy.intercept("GET", `${baseApiRoute}${lookupStreetAddressRoute}?**`).as(
+      "autocompleteAddressRequest",
+    );
+    cy.intercept("GET", `${baseApiRoute}${appellationRoute}?**`).as(
+      "autocompleteAppellationRequest",
+    );
+    cy.intercept("POST", `${baseApiRoute}${conventionsRoute}`).as(
+      "conventionAddRequest",
+    );
+
     cy.visit(conventionFormUrl);
+    cy.wait("@featureFlagsRequest");
     cypressDoIfElementExists(".fr-btn--candidate", () => {
       cy.get(".fr-btn--candidate").click();
     });
     cy.get("#postalcode").clear().type("86000");
-    cy.wait(200);
+    cy.wait("@agenciesRequest");
     fillSelectRandomly({ element: "#agencyId" });
-    cy.get("#signatories-beneficiary-firstname").clear().type("Archibald");
-    cy.get("#signatories-beneficiary-lastname").clear().type("Haddock");
-    cy.get("#signatories-beneficiary-email")
+    cy.get(getIdFromConventionDTO("signatories.beneficiary.firstName"))
+      .clear()
+      .type("Archibald");
+    cy.get(getIdFromConventionDTO("signatories.beneficiary.lastName"))
+      .clear()
+      .type("Haddock");
+    cy.get(getIdFromConventionDTO("signatories.beneficiary.email"))
       .clear()
       .type("ahaddock@moulinsart.be");
-    cy.get("#siret").clear().type("12345678901238");
-    cy.get("body").then(($body) => {
-      if ($body.find("#businessname:not([disabled])").length) {
-        cy.get("#businessname:not([disabled])").type("Entreprise de test");
-      }
-    });
-    cy.get("#signatories-mentor-firstname").clear().type("Jean");
-    cy.get("#signatories-mentor-lastname").clear().type("Bono");
-    cy.get("#signatories-mentor-job").clear().type("Développeur web");
-    cy.get("#signatories-mentor-phone").clear().type("0836656565");
-    cy.get("#signatories-mentor-email").clear().type("mentor@example.com");
-    cy.get("[name='dateStart']").clear().type("2022-09-22");
-    cy.get("[name='dateEnd']").clear().type("2022-10-22");
+    cy.get(getIdFromConventionDTO("signatories.beneficiary.phone"))
+      .clear()
+      .type("0585968574");
+    cy.get("#siret").clear().type("78886997200026");
+    cypressDoIfElementExists(
+      getIdFromConventionDTO("businessName") + ":not([disabled])",
+      () => {
+        cy.get(
+          getIdFromConventionDTO("businessName") + ":not([disabled])",
+        ).type("Entreprise de test");
+      },
+    );
+    cy.get(getIdFromConventionDTO("signatories.mentor.firstName"))
+      .clear()
+      .type("Jean");
+    cy.get(getIdFromConventionDTO("signatories.mentor.lastName"))
+      .clear()
+      .type("Bono");
+    cy.get(getIdFromConventionDTO("signatories.mentor.job"))
+      .clear()
+      .type("Développeur web");
+    cy.get(getIdFromConventionDTO("signatories.mentor.phone"))
+      .clear()
+      .type("0836656565");
+    cy.get(getIdFromConventionDTO("signatories.mentor.email"))
+      .clear()
+      .type("mentor@example.com");
+    cy.get(getIdFromConventionDTO("dateStart")).clear().type("2022-09-22");
+    cy.get(getIdFromConventionDTO("dateEnd")).clear().type("2022-10-22");
     cy.get("#address-autocomplete")
       .clear()
-      .type("71 Bd Saint-Michel 75005 Paris")
-      .then(($element) => {
-        const listboxId = $element.attr("aria-controls");
-        cy.get(`#${listboxId} .MuiAutocomplete-option`).eq(1).trigger("click");
+      .type("71 Bd Saint-Michel 75005 Paris");
+    cy.wait("@autocompleteAddressRequest");
+    cy.get("#address-autocomplete").then(($element) => {
+      const listboxId = $element.attr("aria-controls");
+      cy.get(`#${listboxId} .MuiAutocomplete-option`).then((options) => {
+        options.eq(0).trigger("click");
       });
-
+    });
+    cy.get("#individualprotectiontrue").check({
+      force: true,
+    });
+    cy.get("#sanitarypreventionfalse").check({
+      force: true,
+    });
     cy.get("[value='Confirmer un projet professionnel']").check({
       force: true, // DSFR, label:before is covering the input
     });
-    cy.get("[id^=appellation-autocomplete]").type("Boulangerie").blur();
-    cy.get("#immersionactivities").clear().type("Regarder le pain");
+    cy.get("[id^=appellation-autocomplete]").type("Boulangerie");
+    cy.wait("@autocompleteAppellationRequest");
+    cy.get("[id^=appellation-autocomplete]").then(($element) => {
+      const listboxId = $element.attr("aria-controls");
+      cy.get(`#${listboxId} .MuiAutocomplete-option`).then((options) => {
+        options.eq(0).trigger("click");
+      });
+    });
+    cy.get(getIdFromConventionDTO("immersionActivities"))
+      .clear()
+      .type("Regarder le pain");
     cy.get("button[type=submit]").click();
-    cy.wait(1000)
-      .wait("@xhr-requests")
+    cy.wait("@conventionAddRequest")
       .its("response.statusCode")
       .should("eq", 200)
       .then(() => {
@@ -56,18 +123,4 @@ describe("Convention Form", () => {
   // it("can submit form with a complex schedule", () => {});
   // it("can edit multiple jobs dropdown", () => {});
   // it("can edit input date with null / 0 value", () => {});
-  const randomNumber = (min, max) =>
-    Math.floor(Math.random() * (max - min + 1)) + min;
-  const fillSelectRandomly = ({ element }: { element: string }) => {
-    const selector = element;
-    const selectorOptions = `${selector} > option`;
-    cy.get(selectorOptions).then(($options) => {
-      cy.get(selectorOptions)
-        .eq(randomNumber(1, $options.length - 1))
-        .then(($select) => {
-          const label = $select.text();
-          cy.get(selector).select(label);
-        });
-    });
-  };
 });

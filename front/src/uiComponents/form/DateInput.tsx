@@ -1,6 +1,7 @@
 import { format } from "date-fns";
 import { useField } from "formik";
 import React from "react";
+import { cleanStringToHTMLAttribute } from "src/../../shared/src";
 
 type DateInputProps = {
   name: string;
@@ -37,6 +38,7 @@ export const DateInput = (props: DateInputProps) => {
             type="date"
             disabled={props.disabled}
             onKeyDown={(e) => e.preventDefault()}
+            id={cleanStringToHTMLAttribute(props.name)}
             max={
               props.max ? format(new Date(props.max), "yyyy-MM-dd") : undefined
             }
