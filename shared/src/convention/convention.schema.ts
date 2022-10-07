@@ -74,7 +74,7 @@ const beneficiarySchema: z.Schema<Beneficiary> = signatorySchema.merge(
 
 const mentorSchema: z.Schema<Mentor> = signatorySchema.merge(
   z.object({
-    role: z.enum(["establishment-mentor", "establishment2"]),
+    role: z.enum(["establishment-mentor", "establishment"]),
     job: zStringPossiblyEmpty,
   }),
 );
@@ -82,7 +82,7 @@ const mentorSchema: z.Schema<Mentor> = signatorySchema.merge(
 const establishmentRepresentativeSchema: z.Schema<EstablishmentRepresentative> =
   signatorySchema.merge(
     z.object({
-      role: z.enum(["establishment-representative", "establishment2"]),
+      role: z.enum(["establishment-representative", "establishment"]),
       job: zStringPossiblyEmpty,
     }),
   );
@@ -90,7 +90,7 @@ const establishmentRepresentativeSchema: z.Schema<EstablishmentRepresentative> =
 const beneficiaryRepresentativeSchema: z.Schema<BeneficiaryRepresentative> =
   signatorySchema.merge(
     z.object({
-      role: z.enum(["legal-representative2", "beneficiary-representative"]),
+      role: z.enum(["legal-representative", "beneficiary-representative"]),
       job: zStringPossiblyEmpty,
     }),
   );

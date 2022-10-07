@@ -2,7 +2,7 @@ import { useField } from "formik";
 import React, { useEffect, useState } from "react";
 import { getConventionFieldName } from "shared";
 import { RadioGroup } from "src/app/components/RadioGroup";
-import { LegalRepresentativeFields } from "src/app/pages/Convention/ConventionFields/LegalRepresentativeFields";
+import { BeneficiaryRepresentativeFields } from "src/app/pages/Convention/ConventionFields/BeneficiaryRepresentativeFields";
 import { useConventionTextsFromFormikContext } from "src/app/pages/Convention/texts/textSetup";
 import { TextInput } from "src/uiComponents/form/TextInput";
 
@@ -77,7 +77,7 @@ export const BeneficiaryCommonFields = ({
       />
 
       {isMinor ? (
-        <LegalRepresentativeFields disabled={disabled} />
+        <BeneficiaryRepresentativeFields disabled={disabled} />
       ) : (
         <>
           <TextInput

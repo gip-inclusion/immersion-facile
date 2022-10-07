@@ -57,7 +57,7 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
       let email: string | undefined = undefined;
       if (role === "beneficiary") {
         email = beneficiary.email;
-      } else if (role === "establishment2") {
+      } else if (role === "establishment") {
         email = establishmentRepresentative.email;
       }
 

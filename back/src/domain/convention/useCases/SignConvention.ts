@@ -30,9 +30,9 @@ const domainTopicByTargetStatusMap: Partial<
 
 const roleAllowToSign: Role[] = [
   "beneficiary",
-  "establishment2",
+  "establishment",
   "establishment-representative",
-  "legal-representative2",
+  "legal-representative",
   "beneficiary-representative",
 ];
 const isAllowedToSign = (
@@ -40,9 +40,9 @@ const isAllowedToSign = (
 ): role is ExtractFromExisting<
   Role,
   | "beneficiary"
-  | "establishment2"
+  | "establishment"
   | "establishment-representative"
-  | "legal-representative2"
+  | "legal-representative"
   | "beneficiary-representative"
 > => roleAllowToSign.includes(role);
 

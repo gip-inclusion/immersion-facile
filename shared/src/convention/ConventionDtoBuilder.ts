@@ -60,7 +60,7 @@ const establishmentRepresentative: EstablishmentRepresentative = {
   firstName: "Billy",
   lastName: "Idol",
   phone: "0602010203",
-  role: "establishment2",
+  role: "establishment",
   signedAt: DATE_SIGNATURE,
 };
 

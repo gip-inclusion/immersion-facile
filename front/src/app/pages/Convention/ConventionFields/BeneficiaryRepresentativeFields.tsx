@@ -4,13 +4,13 @@ import { ConventionField, getConventionFieldName, Role } from "shared";
 import { useConventionTextsFromFormikContext } from "src/app/pages/Convention/texts/textSetup";
 import { TextInput } from "src/uiComponents/form/TextInput";
 
-type LegalRepresentativeFieldsProps = { disabled?: boolean };
+type BeneficiaryRepresentativeFieldsProps = { disabled?: boolean };
 
-export const LegalRepresentativeFields = ({
+export const BeneficiaryRepresentativeFields = ({
   disabled,
-}: LegalRepresentativeFieldsProps) => {
-  useLegalRepresentativeAsEmergencyContact();
-  useLegalRepresentativeRole();
+}: BeneficiaryRepresentativeFieldsProps) => {
+  useBeneficiaryRepresentativeAsEmergencyContact();
+  useBeneficiaryRepresentativeRole();
   const t = useConventionTextsFromFormikContext();
 
   return (
@@ -73,27 +73,27 @@ const useFieldValueStringSetter = (fieldName: ConventionField) => {
   return setValue;
 };
 
-const useLegalRepresentativeRole = () => {
-  const [, , { setValue: setLegalRepresentative }] = useField(
+const useBeneficiaryRepresentativeRole = () => {
+  const [, , { setValue: setBeneficiaryRepresentative }] = useField(
     getConventionFieldName("signatories.beneficiaryRepresentative"),
   );
   const [, , { setValue: setRole }] = useField<Role>(
     getConventionFieldName("signatories.beneficiaryRepresentative.role"),
   );
   useEffect(() => {
-    setRole("legal-representative2");
-    return () => setLegalRepresentative(undefined);
+    setRole("beneficiary-representative");
+    return () => setBeneficiaryRepresentative(undefined);
   }, []);
 };
 
-const useLegalRepresentativeAsEmergencyContact = () => {
-  const legalRepresentativeFirstName = useFieldValueString(
+const useBeneficiaryRepresentativeAsEmergencyContact = () => {
+  const beneficiaryRepresentativeFirstName = useFieldValueString(
     "signatories.beneficiaryRepresentative.firstName",
   );
-  const legalRepresentativeLastName = useFieldValueString(
+  const beneficiaryRepresentativeLastName = useFieldValueString(
     "signatories.beneficiaryRepresentative.lastName",
   );
-  const legalRepresentativePhone = useFieldValueString(
+  const beneficiaryRepresentativePhone = useFieldValueString(
     "signatories.beneficiaryRepresentative.phone",
   );
 
@@ -106,13 +106,13 @@ const useLegalRepresentativeAsEmergencyContact = () => {
 
   useEffect(() => {
     setEmergencyContact(
-      [legalRepresentativeFirstName, legalRepresentativeLastName]
+      [beneficiaryRepresentativeFirstName, beneficiaryRepresentativeLastName]
         .filter((v) => !!v)
         .join(" ") || undefined,
     );
-  }, [legalRepresentativeFirstName, legalRepresentativeLastName]);
+  }, [beneficiaryRepresentativeFirstName, beneficiaryRepresentativeLastName]);
 
   useEffect(() => {
-    setEmergencyContactPhone(legalRepresentativePhone);
-  }, [legalRepresentativePhone]);
+    setEmergencyContactPhone(beneficiaryRepresentativePhone);
+  }, [beneficiaryRepresentativePhone]);
 };

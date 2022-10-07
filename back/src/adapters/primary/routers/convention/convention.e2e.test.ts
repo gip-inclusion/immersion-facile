@@ -309,7 +309,7 @@ describe("convention e2e", () => {
       const tutorJwt = generateMagicLinkJwt(
         createConventionMagicLinkPayload(
           conventionId,
-          "establishment2",
+          "establishment",
           convention.signatories.establishmentRepresentative.email,
         ),
       );

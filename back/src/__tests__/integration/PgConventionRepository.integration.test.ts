@@ -10,7 +10,7 @@ import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyReposito
 import { PgConventionRepository } from "../../adapters/secondary/pg/PgConventionRepository";
 
 const beneficiaryRepresentative: BeneficiaryRepresentative = {
-  role: "legal-representative2",
+  role: "legal-representative",
   email: "legal@representative.com",
   firstName: "The",
   lastName: "Representative",
@@ -112,7 +112,7 @@ describe("PgConventionRepository", () => {
     expect(await conventionRepository.getById(idA)).toEqual(updatedConvention);
   });
 
-  it("Adds a new convention with a legal representative", async () => {
+  it("Adds a new convention with a beneficiary representative", async () => {
     const convention = new ConventionDtoBuilder()
       .withId("aaaaac99-9c0b-bbbb-bb6d-6bb9bd38aaaa")
       .withBeneficiaryRepresentative(beneficiaryRepresentative)
@@ -130,7 +130,7 @@ describe("PgConventionRepository", () => {
     expect(typeof savedExternalId).toBe("string");
   });
 
-  it("Updates an already saved immersion with a legal representative", async () => {
+  it("Updates an already saved immersion with a beneficiary representative", async () => {
     const idA: ConventionId = "aaaaac99-9c0b-aaaa-aa6d-6bb9bd38aaaa";
     const convention = new ConventionDtoBuilder()
       .withId(idA)

@@ -52,7 +52,7 @@ export const ImmersionAssessmentPage = ({
   const assessmentError = useAppSelector(immersionAssessmentErrorSelector);
   const assessmentStatus = useAppSelector(immersionAssessmentStatusSelector);
 
-  if (role !== "establishment2" && role !== "establishment-representative") {
+  if (role !== "establishment" && role !== "establishment-representative") {
     return (
       <div className="pt-4 flex items-center justify-center">
         <p className="text-2xl">

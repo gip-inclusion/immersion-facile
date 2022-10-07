@@ -32,7 +32,7 @@ export const miniStageTexts: Texts = mergeDeepRight(immersionTexts, {
     },
     isMinorLabel: "La personne qui va faire le stage est-elle mineure ?",
   },
-  legalRepresentative: {
+  beneficiaryRepresentative: {
     phone: {
       description: "pour qu’on puisse vous contacter à propos du stage",
     },

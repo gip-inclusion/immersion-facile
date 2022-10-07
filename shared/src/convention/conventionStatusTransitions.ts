@@ -8,10 +8,10 @@ export type StatusTransitionConfig = {
 
 const validSignatoryRoles: Role[] = [
   "beneficiary",
-  "establishment2",
+  "establishment",
   "beneficiary-representative",
   "establishment-representative",
-  "legal-representative2",
+  "legal-representative",
 ];
 
 export const statusTransitionConfigs: Record<

@@ -83,8 +83,8 @@ export type Signatory = GenericSignatory<SignatoryRole>;
 export const signatoryRoles: SignatoryRole[] = [
   "beneficiary",
   "beneficiary-representative",
-  "legal-representative2", // legacy, now named : beneficiary-representative
-  "establishment2", // legacy, now named : establishment-representative
+  "legal-representative", // legacy, now named : beneficiary-representative
+  "establishment", // legacy, now named : establishment-representative
   "establishment-representative",
 ];
 
@@ -107,15 +107,15 @@ export type Beneficiary = GenericSignatory<"beneficiary"> & {
 };
 
 export type EstablishmentRepresentative = GenericSignatory<
-  "establishment2" | "establishment-representative"
+  "establishment" | "establishment-representative"
 >;
 
-export type Mentor = GenericActor<"establishment2" | "establishment-mentor"> & {
+export type Mentor = GenericActor<"establishment" | "establishment-mentor"> & {
   job: string;
 };
 
 export type BeneficiaryRepresentative = GenericSignatory<
-  "beneficiary-representative" | "legal-representative2"
+  "beneficiary-representative" | "legal-representative"
 >;
 
 export type ConventionDto = ConventionDtoWithoutExternalId & {

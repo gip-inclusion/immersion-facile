@@ -38,7 +38,7 @@ export class PgConventionRepository implements ConventionRepository {
       await this.insertEstablishmentRepresentative(establishmentRepresentative);
     const beneficiaryRepresentativeId =
       beneficiaryRepresentative &&
-      (await this.insertLegalRepresentative(beneficiaryRepresentative));
+      (await this.insertBeneficiaryRepresentative(beneficiaryRepresentative));
 
     const query_insert_convention = `INSERT INTO conventions(
           id, status, agency_id, date_submission, date_start, date_end, date_validation, siret, business_name, schedule, individual_protection,
@@ -113,12 +113,12 @@ export class PgConventionRepository implements ConventionRepository {
     ]);
 
     if (beneficiaryRepresentative) {
-      const updateLegalRepresentativeQuery = `  
+      const updateBeneficiaryRepresentativeQuery = `  
         UPDATE actors
           SET first_name=$2,  last_name=$3, email=$4, phone=$5, signed_at=$6
         FROM conventions 
         WHERE conventions.id=$1 AND actors.id = conventions.beneficiary_representative_id`;
-      await this.client.query(updateLegalRepresentativeQuery, [
+      await this.client.query(updateBeneficiaryRepresentativeQuery, [
         id,
         beneficiaryRepresentative.firstName,
         beneficiaryRepresentative.lastName,
@@ -179,17 +179,25 @@ export class PgConventionRepository implements ConventionRepository {
     return insertReturn.rows[0]?.id;
   }
 
-  private async insertLegalRepresentative(
+  private async insertBeneficiaryRepresentative(
     beneficiaryRepresentative: BeneficiaryRepresentative,
   ): Promise<number> {
-    const query_insert_legal_representative = `
+    const query_insert_beneficiary_representative = `
         INSERT into actors(
         first_name, last_name, email, phone, signed_at)
         VALUES($1, $2, $3, $4, $5)
         RETURNING id;
       `;
-    // prettier-ignore
-    const insertReturn = await this.client.query(query_insert_legal_representative, [beneficiaryRepresentative.firstName, beneficiaryRepresentative.lastName, beneficiaryRepresentative.email, beneficiaryRepresentative.phone, beneficiaryRepresentative.signedAt]);
+    const insertReturn = await this.client.query(
+      query_insert_beneficiary_representative,
+      [
+        beneficiaryRepresentative.firstName,
+        beneficiaryRepresentative.lastName,
+        beneficiaryRepresentative.email,
+        beneficiaryRepresentative.phone,
+        beneficiaryRepresentative.signedAt,
+      ],
+    );
     return insertReturn.rows[0]?.id;
   }
 }

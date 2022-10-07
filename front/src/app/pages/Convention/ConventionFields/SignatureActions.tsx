@@ -24,7 +24,7 @@ const processedDataBySignatoryRole: Record<
     fieldName: getConventionFieldName("signatories.beneficiary.signedAt"),
     signatoryFunction: "bénéficiaire de l'immersion",
   },
-  establishment2: {
+  establishment: {
     fieldName: getConventionFieldName(
       "signatories.establishmentRepresentative.signedAt",
     ),
@@ -42,7 +42,7 @@ const processedDataBySignatoryRole: Record<
     ),
     signatoryFunction: "représentant légal du bénéficiaire",
   },
-  "legal-representative2": {
+  "legal-representative": {
     fieldName: getConventionFieldName(
       "signatories.beneficiaryRepresentative.signedAt",
     ),

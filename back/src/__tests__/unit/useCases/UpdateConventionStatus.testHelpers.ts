@@ -215,7 +215,7 @@ const makeTestAcceptsStatusUpdate =
       const payload: ConventionRequiresModificationPayload = {
         convention: expectedConvention,
         reason: justification ?? "was not provided",
-        roles: ["beneficiary", "establishment2"],
+        roles: ["beneficiary", "establishment"],
       };
 
       await expectNewEvent(

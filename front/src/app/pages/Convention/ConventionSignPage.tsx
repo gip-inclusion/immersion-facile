@@ -55,7 +55,7 @@ const fromSignatoryRole = (
         ),
         signedAt: convention.signatories.beneficiary.signedAt,
       };
-    case "establishment2":
+    case "establishment":
     case "establishment-representative":
       return {
         displayedName: toDisplayedName(
@@ -67,10 +67,10 @@ const fromSignatoryRole = (
         ),
         signedAt: convention.signatories.establishmentRepresentative.signedAt,
       };
-    case "legal-representative2":
+    case "legal-representative":
     case "beneficiary-representative":
       if (!convention.signatories.beneficiaryRepresentative)
-        throw new Error("No legal representative for this convention. ");
+        throw new Error("No beneficiary representative for this convention. ");
       return {
         displayedName: toDisplayedName(
           convention.signatories.beneficiaryRepresentative,

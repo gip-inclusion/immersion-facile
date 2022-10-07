@@ -31,7 +31,7 @@ import { DomainEvent } from "../../core/eventBus/events";
 import { SignConvention } from "./SignConvention";
 
 const beneficiaryRepresentative: BeneficiaryRepresentative = {
-  role: "legal-representative2",
+  role: "legal-representative",
   email: "bob@email.com",
   phone: "0665565432",
   firstName: "Bob",
@@ -39,7 +39,7 @@ const beneficiaryRepresentative: BeneficiaryRepresentative = {
 };
 
 const establishmentRepresentative: EstablishmentRepresentative = {
-  role: "establishment2",
+  role: "establishment",
   email: "patron@email.com",
   phone: "0665565432",
   firstName: "Pa",
@@ -72,8 +72,8 @@ describe("Sign convention", () => {
     splitCasesBetweenPassingAndFailing<Role>(allRoles, [
       "beneficiary",
       "establishment-representative",
-      "establishment2",
-      "legal-representative2",
+      "establishment",
+      "legal-representative",
       "beneficiary-representative",
     ]);
 
@@ -148,14 +148,14 @@ describe("Sign convention", () => {
         status: "PARTIALLY_SIGNED",
         signatories: makeSignatories(conventionInDb, {
           establishmentRepresentativeSignedAt:
-            role === "establishment-representative" || role === "establishment2"
+            role === "establishment-representative" || role === "establishment"
               ? signedAt.toISOString()
               : undefined,
           beneficiarySignedAt:
             role === "beneficiary" ? signedAt.toISOString() : undefined,
-          legalRepresentativeSignedAt:
+          beneficiaryRepresentativeSignedAt:
             role === "beneficiary-representative" ||
-            role === "legal-representative2"
+            role === "legal-representative"
               ? signedAt.toISOString()
               : undefined,
         }),
@@ -173,7 +173,7 @@ describe("Sign convention", () => {
     clock.setNextDate(signedAt);
 
     await triggerSignature({
-      role: "establishment2",
+      role: "establishment",
       applicationId: initialConvention.id,
     } as ConventionMagicLinkPayload);
 
@@ -212,7 +212,7 @@ describe("Sign convention", () => {
     clock.setNextDate(establishmentRepresentativeSignedAt);
 
     await triggerSignature({
-      role: "establishment2",
+      role: "establishment",
       applicationId: initialConvention.id,
     } as ConventionMagicLinkPayload);
 
@@ -257,7 +257,7 @@ describe("Sign convention", () => {
     clock.setNextDate(establishmentRepresentativeSignedAt);
 
     await triggerSignature({
-      role: "establishment2",
+      role: "establishment",
       applicationId: initialConvention.id,
     } as ConventionMagicLinkPayload);
 
@@ -311,11 +311,11 @@ const makeSignatories = (
   {
     establishmentRepresentativeSignedAt,
     beneficiarySignedAt,
-    legalRepresentativeSignedAt,
+    beneficiaryRepresentativeSignedAt,
   }: {
     establishmentRepresentativeSignedAt?: string;
     beneficiarySignedAt?: string;
-    legalRepresentativeSignedAt?: string;
+    beneficiaryRepresentativeSignedAt?: string;
   },
 ): Signatories => ({
   ...convention.signatories,
@@ -324,11 +324,11 @@ const makeSignatories = (
     signedAt: beneficiarySignedAt,
   },
   beneficiaryRepresentative:
-    legalRepresentativeSignedAt &&
+    beneficiaryRepresentativeSignedAt &&
     convention.signatories.beneficiaryRepresentative
       ? {
           ...convention.signatories.beneficiaryRepresentative,
-          signedAt: legalRepresentativeSignedAt,
+          signedAt: beneficiaryRepresentativeSignedAt,
         }
       : convention.signatories.beneficiaryRepresentative,
   establishmentRepresentative: {

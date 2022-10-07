@@ -114,7 +114,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
   });
 
   it("With a legal representative", async () => {
-    const conventionWithLegalRepresentative = new ConventionDtoBuilder()
+    const conventionWithBeneficiaryRepresentative = new ConventionDtoBuilder()
       .withBeneficiaryRepresentative({
         firstName: "Tom",
         lastName: "Cruise",
@@ -135,23 +135,23 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
     await new NotifyAllActorsOfFinalApplicationValidation(
       unitOfWorkPerformer,
       emailGw,
-    ).execute(conventionWithLegalRepresentative);
+    ).execute(conventionWithBeneficiaryRepresentative);
 
     const sentEmails = emailGw.getSentEmails();
 
     expect(sentEmails).toHaveLength(1);
     expectEmailFinalValidationConfirmationMatchingConvention(
       [
-        conventionWithLegalRepresentative.signatories.beneficiary.email,
-        conventionWithLegalRepresentative.signatories
+        conventionWithBeneficiaryRepresentative.signatories.beneficiary.email,
+        conventionWithBeneficiaryRepresentative.signatories
           .establishmentRepresentative.email,
-        conventionWithLegalRepresentative.signatories.beneficiaryRepresentative!
-          .email,
+        conventionWithBeneficiaryRepresentative.signatories
+          .beneficiaryRepresentative!.email,
         counsellorEmail,
       ],
       sentEmails[0],
       agency,
-      conventionWithLegalRepresentative,
+      conventionWithBeneficiaryRepresentative,
     );
   });
   it("With PeConnect Federated identity: beneficiary, mentor, agency counsellor, and dedicated advisor", async () => {

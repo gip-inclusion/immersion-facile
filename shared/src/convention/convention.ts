@@ -29,7 +29,7 @@ const updateSignatoriesOnSignature = (
         beneficiary: { ...signatories.beneficiary, signedAt },
       };
 
-    case "legal-representative2":
+    case "legal-representative":
     case "beneficiary-representative":
       if (!signatories.beneficiaryRepresentative)
         throw new Error(
@@ -42,7 +42,7 @@ const updateSignatoriesOnSignature = (
           signedAt,
         },
       };
-    case "establishment2":
+    case "establishment":
     case "establishment-representative":
       return {
         ...signatories,

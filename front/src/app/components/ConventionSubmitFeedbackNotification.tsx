@@ -29,8 +29,8 @@ export const ConventionSubmitFeedbackNotification = ({
 const labelByRole: Record<SignatoryRole, string> = {
   beneficiary: "Le bénéficiaire",
   "beneficiary-representative": "Le représentant légal",
-  "legal-representative2": "Le représentant légal",
-  establishment2: "Le responsable de l'entreprise",
+  "legal-representative": "Le représentant légal",
+  establishment: "Le responsable de l'entreprise",
   "establishment-representative": "Le responsable de l'entreprise",
 };
 

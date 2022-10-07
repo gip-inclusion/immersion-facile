@@ -117,7 +117,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
         payload: {
           convention: updatedDto,
           reason: justification ?? "",
-          roles: ["beneficiary", "establishment2"],
+          roles: ["beneficiary", "establishment"],
         },
       });
 

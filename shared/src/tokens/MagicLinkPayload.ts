@@ -22,9 +22,9 @@ export const currentJwtVersions: Record<PayloadKey, number> = {
 export type Role = typeof allRoles[number];
 export const allRoles = [
   "beneficiary",
-  "legal-representative2",
+  "legal-representative",
   "beneficiary-representative",
-  "establishment2",
+  "establishment",
   "establishment-representative",
   "establishment-mentor",
   "counsellor",

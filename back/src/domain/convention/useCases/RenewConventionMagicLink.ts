@@ -143,7 +143,7 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
       case "validator":
         emails = agency.validatorEmails;
         break;
-      case "establishment2":
+      case "establishment":
         emails = [establishmentRepresentative.email];
         break;
     }

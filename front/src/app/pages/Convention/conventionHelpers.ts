@@ -81,7 +81,7 @@ export const conventionInitialValuesFromUrl = ({
     params.dateStart ?? toDateString(addDays(startOfToday(), 2));
   const dateEnd = params.dateEnd ?? toDateString(addDays(startOfToday(), 3));
 
-  const areLegalRepresentativeFieldPresent = !!(
+  const areBeneficiaryRepresentativeFieldPresent = !!(
     params.lrEmail ||
     params.lrPhone ||
     params.lrFirstName ||
@@ -116,15 +116,15 @@ export const conventionInitialValuesFromUrl = ({
           | undefined,
       },
       establishmentRepresentative: {
-        role: "establishment2",
+        role: "establishment",
         firstName: params.mentorFirstName ?? "",
         lastName: params.mentorLastName ?? "",
         email: params.mentorEmail ?? "",
         phone: params.mentorPhone ?? "",
       },
-      beneficiaryRepresentative: areLegalRepresentativeFieldPresent
+      beneficiaryRepresentative: areBeneficiaryRepresentativeFieldPresent
         ? {
-            role: "legal-representative2",
+            role: "beneficiary-representative",
             firstName: params.lrFirstName ?? "",
             lastName: params.lrLastName ?? "",
             email: params.lrEmail ?? "",
@@ -198,7 +198,7 @@ const devPrefilledValues = (
         federatedIdentity: beneficiary.federatedIdentity,
       },
       establishmentRepresentative: {
-        role: "establishment2",
+        role: "establishment",
         firstName: establishmentRepresentative.firstName || "Joe",
         lastName: establishmentRepresentative.lastName || "Le mentor",
         phone: establishmentRepresentative.phone || "0101100110",
