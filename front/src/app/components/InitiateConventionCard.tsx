@@ -52,7 +52,7 @@ export const InitiateConventionCard = ({
             />
             <a
               className="small mt-1"
-              href="https://candidat.pole-emploi.fr/compte/identifiant/choixcontact"
+              href="https://candidat.pole-emploi.fr/compte/identifiant/saisieinformations"
               target="_blank"
             >
               Je ne connais pas mes identifiants
