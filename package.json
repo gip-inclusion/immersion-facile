@@ -24,6 +24,7 @@
     "format:check": "turbo run format:check",
     "fullcheck": "turbo run includecheck format:check lint typecheck test",
     "typecheck": "turbo run typecheck",
+    "lint": "turbo run lint",
     "test": "turbo run test"
   },
   "devDependencies": {
