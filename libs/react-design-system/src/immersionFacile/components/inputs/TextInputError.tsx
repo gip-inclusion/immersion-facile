@@ -8,6 +8,6 @@ export const TextInputError = ({
   errorMessage,
 }: TextInputErrorProperties): JSX.Element => (
   <p id="text-input-email-error-desc-error" className="fr-error-text">
-    {errorMessage}
+    {JSON.stringify(errorMessage)}
   </p>
 );
