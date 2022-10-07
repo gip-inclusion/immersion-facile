@@ -10,9 +10,10 @@ export const PEConnectNoValidAdvisor = () => {
       <p className="fr-alert__title">
         Impossible d'identifier votre conseiller référent
       </p>
-      Les données retournées par Pôle Emploi ne permettent pas d'identifier le
-      conseiller référent qui vous est dédié.
-      <br />
+      <p className="fr-my-2w">
+        Les données retournées par Pôle Emploi ne permettent pas d'identifier le
+        conseiller référent qui vous est dédié.
+      </p>
       <button
         className="text-immersionBlue-dark font-sans text-center"
         onClick={redirectToConventionWithoutIdentityProvider}
@@ -21,13 +22,12 @@ export const PEConnectNoValidAdvisor = () => {
         Vous pouvez quand même remplir votre demande de convention en indiquant
         l'agence Pole Emploi à laquelle vous êtes rattaché ici.{" "}
       </button>
-      <br />
-      <br />
-      En cas de questionnement, n'hésitez pas à nous contacter par email sur
-      <br />
-      <a href="mailto:contact@immersion-facile.com">
-        contact@immersion-facile.com
-      </a>
+      <p className="fr-my-2w">
+        En cas de questionnement, n'hésitez pas à nous contacter par email sur
+        <a href="mailto:contact@immersion-facile.com">
+          contact@immersion-facile.com
+        </a>
+      </p>
     </div>
   );
 };

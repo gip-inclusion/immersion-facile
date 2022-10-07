@@ -92,15 +92,13 @@ export const ConventionFormFields = ({
         />
       </FormSectionTitle>
       <ImmersionConditionsCommonFields disabled={isFrozen} />
-      <p />
-      <p />
+
       {!isSignatureMode &&
         submitCount !== 0 &&
         Object.values(errors).length > 0 && (
           <div style={{ color: "red" }}>{t.signatures.fixErrors}</div>
         )}
       {!isFrozen && <p className="font-bold">{t.signatures.validationText}</p>}
-      <br />
       {!isFrozen && !isSignatureMode && (
         <SubmitButton
           isSubmitting={isSubmitting}

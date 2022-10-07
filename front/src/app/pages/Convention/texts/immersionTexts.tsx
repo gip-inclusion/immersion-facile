@@ -7,10 +7,15 @@ export const immersionTexts = {
   no: "Non",
   welcome: (
     <>
-      <strong>Bravo !</strong> Vous avez trouvé votre entreprise accueillante.
-      Complétez ce formulaire avec votre entreprise accueillante et initier une
-      convention pour réaliser votre immersion professionnelle. Ce formulaire
-      vaut équivalence du CERFA 13912 * 04
+      <strong>Bravo !</strong>
+      <p className="fr-text">
+        Vous avez trouvé votre entreprise accueillante. Complétez ce formulaire
+        avec votre entreprise accueillante et initier une convention pour
+        réaliser votre immersion professionnelle.
+      </p>
+      <p className="fr-text--xs fr-mt-1w">
+        Ce formulaire vaut équivalence du CERFA 13912 * 04
+      </p>
     </>
   ),
   copyLinkTooltip: "Copier le lien pour partager le formulaire",

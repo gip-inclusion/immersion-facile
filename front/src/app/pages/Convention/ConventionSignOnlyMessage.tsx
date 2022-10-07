@@ -11,21 +11,18 @@ export const ConventionSignOnlyMessage = ({
   const t = useConventionTextsFromFormikContext();
 
   return (
-    <>
-      <div role="alert" className="fr-alert fr-alert--info">
-        <p className="fr-alert__title">
-          {isAlreadySigned
+    <div role="alert" className="fr-alert fr-alert--info">
+      <p className="fr-alert__title">
+        {isAlreadySigned
+          ? t.conventionAlreadySigned
+          : t.conventionReadyToBeSigned}
+      </p>
+      <p>
+        {`${t.conventionNotEditable} ` +
+          (isAlreadySigned
             ? t.conventionAlreadySigned
-            : t.conventionReadyToBeSigned}
-        </p>
-        <p>
-          {`${t.conventionNotEditable} ` +
-            (isAlreadySigned
-              ? t.conventionAlreadySigned
-              : t.conventionToSignOrAskForChanges)}
-        </p>
-      </div>
-      <br />
-    </>
+            : t.conventionToSignOrAskForChanges)}
+      </p>
+    </div>
   );
 };

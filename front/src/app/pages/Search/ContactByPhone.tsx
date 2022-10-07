@@ -49,22 +49,19 @@ export const ContactByPhone = ({
     >
       {({ errors, submitCount }) => (
         <Form>
-          <p>
+          <p className={"fr-my-2w"}>
             Cette entreprise souhaite être contactée par téléphone. Merci de
             nous indiquer vos coordonnées.
           </p>
-          <br />
-          <p>
+          <p className={"fr-my-2w"}>
             Nous allons vous transmettre par e-mail le nom de la personne à
             contacter, son numéro de téléphone ainsi que des conseils pour
             présenter votre demande d’immersion.
           </p>
-          <br />
-          <p>
+          <p className={"fr-my-2w"}>
             Ces informations sont personnelles et confidentielles. Elles ne
             peuvent pas être communiquées à d’autres personnes. Merci !
           </p>
-          <br />
           <TextInput
             label="Votre email *"
             name={getName("potentialBeneficiaryEmail")}

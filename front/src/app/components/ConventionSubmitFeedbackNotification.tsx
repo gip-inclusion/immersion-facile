@@ -58,23 +58,22 @@ const InitialSubmitSuccessMessageBase = ({
 }: {
   children: React.ReactNode;
 }) => (
-  <>
+  <div className={"fr-mt-2w"}>
     Merci d'avoir complété cette demande de convention.
-    <br />
-    <br />
-    <ul>{children}</ul>
-    <br />
-    <i>
+    <ul className={"fr-my-2w"}>{children}</ul>
+    <p className="fr-text fr-my-2w">
       N'hésitez pas à prévenir et relancer votre tuteur, sans votre signature et
       celle de l'entreprise, la demande ne peut pas être étudiée par votre
       conseiller.
-    </i>
-    <br />
-    <br />
-    Pensez à vérifier votre boîte mail et vos spams.
-    <br /> Si vous ne recevez rien, alertez nous:{" "}
-    <a href="mailto:contact@immersion-facile.beta.gouv.fr">
-      contact@immersion-facile.beta.gouv.fr
-    </a>
-  </>
+    </p>
+    <p className="fr-text fr-my-2w">
+      Pensez à vérifier votre boîte mail et vos spams.
+    </p>
+    <p className="fr-text fr-my-2w">
+      Si vous ne recevez rien, alertez nous:&nbsp;
+      <a href="mailto:contact@immersion-facile.beta.gouv.fr">
+        contact@immersion-facile.beta.gouv.fr
+      </a>
+    </p>
+  </div>
 );

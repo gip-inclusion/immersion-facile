@@ -9,11 +9,11 @@ export const PEConnectUserForbiddenAccess = () => {
       <p className="fr-alert__title">
         Pôle Emploi Connect refuse la connection
       </p>
-      Vous êtes bien authentifiés mais le service Pôle Emploi Connect refuse la
-      récupération de vos informations. Nous travaillons activement à la
-      résolution de ce problème avec le service technique Pôle Emploi.
-      <br />
-      <br />
+      <p className="fr-my-2w">
+        Vous êtes bien authentifiés mais le service Pôle Emploi Connect refuse
+        la récupération de vos informations. Nous travaillons activement à la
+        résolution de ce problème avec le service technique Pôle Emploi.
+      </p>
       <button
         className="text-immersionBlue-dark font-sans text-center"
         onClick={redirectToConventionWithoutIdentityProvider}
@@ -22,13 +22,12 @@ export const PEConnectUserForbiddenAccess = () => {
         Vous pouvez quand même remplir votre demande de convention en indiquant
         l'agence Pole Emploi à laquelle vous êtes rattaché ici.{" "}
       </button>
-      <br />
-      <br />
-      En cas de questionnement, n'hésitez pas à nous contacter par email sur
-      <br />
-      <a href="mailto:contact@immersion-facile.com">
-        contact@immersion-facile.com
-      </a>
+      <p className="fr-my-2w">
+        En cas de questionnement, n'hésitez pas à nous contacter par email sur
+        <a href="mailto:contact@immersion-facile.com">
+          contact@immersion-facile.com
+        </a>
+      </p>
     </div>
   );
 };

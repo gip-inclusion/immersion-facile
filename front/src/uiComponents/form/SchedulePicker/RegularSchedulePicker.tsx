@@ -46,7 +46,7 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
           disabled={props.disabled}
         />
 
-        <h4>Sélectionnez les horaires</h4>
+        <h5>Sélectionnez les horaires</h5>
 
         <HourPicker
           name={name}

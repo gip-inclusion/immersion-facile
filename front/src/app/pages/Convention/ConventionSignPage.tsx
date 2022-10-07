@@ -112,16 +112,18 @@ export const ConventionSignPage = ({ route }: SignFormProps) => {
       <HeaderFooterLayout>
         <div className="p-5">
           <Notification title="Utilisateur incorrect" type="error">
-            Seul le bénéficiaire ou le mentor peuvent signer la convention. Le
-            lien que vous avez utilisé n'est destiné ni à un bénéficiaire ni à
-            un tuteur.
-            <br />
-            <br />
-            N'hésitez pas à nous contacter pour nous signaler comment ce lien
-            vous est parvenu :{" "}
-            <a href="mailto:contact@immersion-facile.beta.gouv.fr">
-              contact@immersion-facile.beta.gouv.fr
-            </a>
+            <p>
+              Seul le bénéficiaire ou le mentor peuvent signer la convention. Le
+              lien que vous avez utilisé n'est destiné ni à un bénéficiaire ni à
+              un tuteur.
+            </p>
+            <p>
+              N'hésitez pas à nous contacter pour nous signaler comment ce lien
+              vous est parvenu :{" "}
+              <a href="mailto:contact@immersion-facile.beta.gouv.fr">
+                contact@immersion-facile.beta.gouv.fr
+              </a>
+            </p>
           </Notification>
         </div>
       </HeaderFooterLayout>
@@ -183,8 +185,8 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
       <div className="fr-text">
         Voici la demande de convention que vous venez de compléter. <br />
         Relisez la bien et si cela vous convient, signez la avec le bouton "je
-        signe cette demande" <br />
-        <p className="fr-text--xs">
+        signe cette demande"
+        <p className="fr-text--xs fr-mt-1w">
           Ce formulaire vaut équivalence du CERFA 13912 * 04
         </p>
       </div>
@@ -297,13 +299,14 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
 
 const ConventionRejectedMessage = () => (
   <SignPageLayout>
-    <br />
     <Notification
       type="error"
       title="Désolé : votre demande d'immersion a été refusée"
     >
-      Votre demande d'immersion a été refusée. Vous avez reçu un mail vous en
-      donnant les raisons.
+      <p className="fr-mt-1w">
+        Votre demande d'immersion a été refusée. Vous avez reçu un mail vous en
+        donnant les raisons.
+      </p>
       <p>Veuillez contacter votre conseiller pour plus d'informations.</p>
     </Notification>
   </SignPageLayout>
@@ -311,14 +314,16 @@ const ConventionRejectedMessage = () => (
 
 const ConventionNeedsModificationMessage = (props: { jwt: string }) => (
   <SignPageLayout>
-    <br />
     <Notification
       type="info"
       title="Des modifications ont été demandées sur votre demande"
     >
-      Vous ne pouvez pas encore signer votre demande d'immersion car des
-      modifications ont été réclamées par votre conseiller (Vous avez reçu un
-      mail précisant les changements à effectuer).
+      <p className="fr-mt-1w">
+        Vous ne pouvez pas encore signer votre demande d'immersion car des
+        modifications ont été réclamées par votre conseiller (Vous avez reçu un
+        mail précisant les changements à effectuer).
+      </p>
+
       <span className="block">
         <a {...routes.conventionImmersion({ jwt: props.jwt }).link}>
           Cliquez ici pour aller à la page d'édition

@@ -127,7 +127,6 @@ const CreationSiretRelatedInputs = () => {
           >
             {requestEmailToEditFormError}
           </Notification>
-          <br />
         </>
       )}
 

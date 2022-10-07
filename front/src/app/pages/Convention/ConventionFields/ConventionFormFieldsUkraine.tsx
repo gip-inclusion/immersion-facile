@@ -47,8 +47,7 @@ export const ConventionFormFieldsUkraine = ({
         3. Conditions d’accueil de l’immersion professionnelle
       </FormSectionTitle>
       <ImmersionConditionsCommonFields disabled={isFrozen} />
-      <p />
-      <p />
+
       {!isSignatureMode &&
         submitCount !== 0 &&
         Object.values(errors).length > 0 && (
@@ -62,9 +61,10 @@ export const ConventionFormFieldsUkraine = ({
           validation par mail et l'entreprise également.
         </p>
       )}
-      <br />
       {!isFrozen && !isSignatureMode && (
-        <SubmitButton isSubmitting={isSubmitting} onSubmit={submitForm} />
+        <div className="fr-mt-1w">
+          <SubmitButton isSubmitting={isSubmitting} onSubmit={submitForm} />
+        </div>
       )}
     </>
   );

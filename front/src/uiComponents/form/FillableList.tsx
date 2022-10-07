@@ -35,12 +35,14 @@ export const FillableList = (
           setValues([...valuesInList, inputValue]);
         }}
       />
-      <ListOfChip
-        values={valuesInList}
-        onDelete={(valueToDelete) => {
-          setValues(valuesInList.filter(notEqual(valueToDelete)));
-        }}
-      />
+      {valuesInList.length > 0 && (
+        <ListOfChip
+          values={valuesInList}
+          onDelete={(valueToDelete) => {
+            setValues(valuesInList.filter(notEqual(valueToDelete)));
+          }}
+        />
+      )}
     </>
   );
 };
@@ -96,39 +98,37 @@ const AddToList = ({
   };
 
   return (
-    <div>
-      <div className={`fr-input-group${error ? " fr-input-group--error" : ""}`}>
-        <label className="fr-label" htmlFor={name}>
-          {label}
-        </label>
-        {description && <span className="fr-hint-text">{description}</span>}
-        <div className="flex items-center justify-center w-full">
-          <input
-            id={cleanStringToHTMLAttribute(name)}
-            value={inputValue}
-            type="text"
-            name={name}
-            onKeyPress={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                onAddClick();
-              }
-            }}
-            onChange={(e) => setInputValue(e.target.value)}
-            className={`fr-input${error ? " fr-input--error" : ""}`}
-            placeholder={placeholder || ""}
-            aria-describedby="text-input-error-desc-error"
-          />
-          <Button type="button" className="h-10" onSubmit={onAddClick}>
-            Ajouter
-          </Button>
-        </div>
-        {error && (
-          <p id="text-input-email-error-desc-error" className="fr-error-text">
-            {error}
-          </p>
-        )}
+    <div className={`fr-input-group${error ? " fr-input-group--error" : ""}`}>
+      <label className="fr-label" htmlFor={name}>
+        {label}
+      </label>
+      {description && <span className="fr-hint-text">{description}</span>}
+      <div className="flex items-center justify-center w-full">
+        <input
+          id={cleanStringToHTMLAttribute(name)}
+          value={inputValue}
+          type="text"
+          name={name}
+          onKeyPress={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              onAddClick();
+            }
+          }}
+          onChange={(e) => setInputValue(e.target.value)}
+          className={`fr-input${error ? " fr-input--error" : ""}`}
+          placeholder={placeholder || ""}
+          aria-describedby="text-input-error-desc-error"
+        />
+        <Button type="button" className="h-10" onSubmit={onAddClick}>
+          Ajouter
+        </Button>
       </div>
+      {error && (
+        <p id="text-input-email-error-desc-error" className="fr-error-text">
+          {error}
+        </p>
+      )}
     </div>
   );
 };

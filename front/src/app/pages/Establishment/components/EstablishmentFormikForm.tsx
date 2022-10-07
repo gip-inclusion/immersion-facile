@@ -175,7 +175,6 @@ export const EstablishmentFormikForm = ({
                     </ul>
                   </div>
                 )}
-                <br />
                 {submitError && (
                   <>
                     <Notification
@@ -184,7 +183,6 @@ export const EstablishmentFormikForm = ({
                     >
                       {errorMessage}
                     </Notification>
-                    <br />
                   </>
                 )}
                 {isSuccess && (
@@ -203,8 +201,6 @@ export const EstablishmentFormikForm = ({
                   </button>
                 )}
               </Form>
-              <br />
-              <br />
             </div>
           )}
         </Formik>

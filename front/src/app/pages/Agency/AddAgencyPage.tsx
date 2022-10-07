@@ -121,9 +121,6 @@ export const AddAgencyPage = () => {
                     groupLabel="Combien d'étapes de validation des immersions y a-t-il ? *"
                     options={numberOfStepsOptions}
                   />
-
-                  <br />
-
                   {validationSteps === "twoSteps" && (
                     <FillableList
                       name="counsellor-emails"
@@ -177,13 +174,15 @@ export const AddAgencyPage = () => {
                     </>
                   )}
                 </div>
-                <br />
-                <Button
-                  type="submit"
-                  disable={isSubmitting || submitFeedback !== null}
-                >
-                  Soumettre
-                </Button>
+                <div className="fr-mt-4w">
+                  <Button
+                    type="submit"
+                    disable={isSubmitting || submitFeedback !== null}
+                  >
+                    Soumettre
+                  </Button>
+                </div>
+
                 <SubmitFeedback
                   submitFeedback={submitFeedback}
                   messageByKind={agencySubmitMessageByKind}

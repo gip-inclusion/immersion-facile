@@ -49,21 +49,18 @@ export const ContactInPerson = ({
     >
       {({ errors, submitCount }) => (
         <Form>
-          <p>
+          <p className={"fr-my-2w"}>
             Cette entreprise souhaite que vous vous présentiez directement pour
             candidater.
           </p>
-          <br />
-          <p>
+          <p className={"fr-my-2w"}>
             Merci de nous indiquer vos coordonnées. Vous recevrez par e-mail le
             nom de la personne à contacter ainsi que des conseils pour présenter
             votre demande d’immersion. Ces informations sont personnelles et
             confidentielles. Elles ne peuvent pas être communiquées à d’autres
             personnes.
           </p>
-          <br />
-          <p>Merci !</p>
-          <br />
+          <p className={"fr-my-2w"}>Merci !</p>
           <TextInput
             label="Votre email *"
             name={getName("potentialBeneficiaryEmail")}

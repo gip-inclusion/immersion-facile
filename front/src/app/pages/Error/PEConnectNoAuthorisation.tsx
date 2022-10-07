@@ -7,10 +7,10 @@ export const PEConnectNoAuthorisation = () => (
       Vous n'avez pas accordé les autorisations nécessaires à Pôle Emploi
       Connect.
     </p>
-    Vous avez refusé d'accorder les autorisations nécessaires sur l'interface
-    Pôle Emploi Connect.
-    <br />
-    <br />
+    <p className="fr-my-2w">
+      Vous avez refusé d'accorder les autorisations nécessaires sur l'interface
+      Pôle Emploi Connect.
+    </p>
     <button
       className="text-immersionBlue-dark font-sans"
       onClick={() => {
@@ -20,12 +20,11 @@ export const PEConnectNoAuthorisation = () => (
       {" "}
       Revenir à la page d'accueil.{" "}
     </button>
-    <br />
-    <br />
-    En cas de questionnement, n'hésitez pas à nous contacter par email sur
-    <br />
-    <a href="mailto:contact@immersion-facile.com">
-      contact@immersion-facile.com
-    </a>
+    <p className="fr-my-2w">
+      En cas de questionnement, n'hésitez pas à nous contacter par email sur
+      <a href="mailto:contact@immersion-facile.com">
+        contact@immersion-facile.com
+      </a>
+    </p>
   </div>
 );

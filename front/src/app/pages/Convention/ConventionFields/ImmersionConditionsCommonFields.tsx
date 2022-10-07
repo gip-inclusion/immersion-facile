@@ -68,7 +68,6 @@ export const ImmersionConditionsCommonFields = ({
           setDateMax(addMonths(new Date(dateStart), 1).toISOString());
         }}
       />
-      <br />
       <DateInput
         label={`${t.immersionConditionsCommonFields.dateEndLabel} *`}
         name={getConventionFieldName("dateEnd")}
@@ -79,7 +78,6 @@ export const ImmersionConditionsCommonFields = ({
           setFieldValue("dateEnd", dateEnd);
         }}
       />
-      <br />
       <SchedulePicker
         disabled={disabled}
         interval={{
@@ -87,7 +85,6 @@ export const ImmersionConditionsCommonFields = ({
           end: new Date(values.dateEnd),
         }}
       />
-      <br />
       <TextInput
         label={t.immersionConditionsCommonFields.workConditions.label}
         name={getConventionFieldName("workConditions")}
@@ -96,7 +93,6 @@ export const ImmersionConditionsCommonFields = ({
         }
         disabled={disabled}
       />
-      <br />
       <AddressAutocomplete
         initialSearchTerm={
           values.immersionAddress ?? establishmentInfos?.businessAddress
@@ -107,7 +103,6 @@ export const ImmersionConditionsCommonFields = ({
         }
         disabled={disabled || isFetchingSiret}
       />
-      <br />
       <BoolRadioGroup
         name={getConventionFieldName("individualProtection")}
         label={`${t.immersionConditionsCommonFields.individualProtectionLabel} *`}
