@@ -69,8 +69,9 @@ export const StaticDropdown = ({
               key={option}
               className="dropdown-proposal"
               onClick={() => {
-                onSelection(option, index);
-                setSelectedIndex(index);
+                const newIndex = index === selectedIndex ? -1 : index; // Unselect if index already selected
+                onSelection(options[newIndex], newIndex);
+                setSelectedIndex(newIndex);
                 setIsOpen(!isOpen);
               }}
             >

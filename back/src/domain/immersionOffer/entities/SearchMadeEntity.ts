@@ -1,4 +1,4 @@
-import { ApiConsumerName, Flavor } from "shared";
+import { ApiConsumerName, Flavor, SearchSortedBy } from "shared";
 
 export type SearchMadeId = Flavor<string, "SearchMadeId">;
 
@@ -7,7 +7,7 @@ export type SearchMade = {
   distance_km: number;
   lat: number;
   lon: number;
-  sortedBy: "distance" | "date";
+  sortedBy?: SearchSortedBy;
   voluntaryToImmersion?: boolean;
   address?: string;
 };

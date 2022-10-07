@@ -488,6 +488,51 @@ describe("Postgres implementation of immersion offer repository", () => {
         contactUidOfOfferMatchingSearch,
       );
     });
+    it("if sorted is not given, returns establishments from form in first (in random order)", async () => {
+      // Prepare : establishment
+      const fromFormSiret = "99000403200029";
+      const fromLBBSiret = "11000403200029";
+
+      await Promise.all([
+        insertEstablishment({
+          position: searchedPosition,
+          siret: fromFormSiret,
+          dataSource: "form",
+        }),
+        insertEstablishment({
+          position: searchedPosition,
+          siret: fromLBBSiret,
+          dataSource: "api_labonneboite",
+        }),
+      ]);
+
+      await Promise.all([
+        insertImmersionOffer({
+          romeCode: searchMadeWithRome.rome!,
+          siret: fromFormSiret,
+        }),
+        await insertImmersionOffer({
+          romeCode: searchMadeWithRome.rome!,
+          siret: fromLBBSiret,
+        }),
+      ]);
+      // Act
+      const searchResult =
+        await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoFromSearchMade(
+          {
+            searchMade: {
+              ...searchMadeWithRome,
+              sortedBy: "distance",
+              voluntaryToImmersion: undefined,
+            },
+            maxResults: 2,
+          },
+        );
+      // Assert
+      expect(searchResult).toHaveLength(2);
+      expect(searchResult[0].siret).toEqual(fromFormSiret);
+      expect(searchResult[1].siret).toEqual(fromLBBSiret);
+    });
     it("returns only form establishments if voluntaryOnly is true", async () => {
       // Prepare : establishment in geographical area but not active
       const formSiret = "11000403200029";

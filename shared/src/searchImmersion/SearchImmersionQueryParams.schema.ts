@@ -15,7 +15,6 @@ export const searchImmersionQueryParamsSchema: z.Schema<SearchImmersionQueryPara
       z.number().positive("'distance_km' doit être > 0").max(100),
     ),
     voluntaryToImmersion: zPreprocessedBoolean().optional(),
-    sortedBy: z.enum(["distance", "date"]),
     address: z
       .string()
       .refine((address) => {
@@ -23,4 +22,5 @@ export const searchImmersionQueryParamsSchema: z.Schema<SearchImmersionQueryPara
         return dto.validAddress;
       }, "Address incorrect")
       .optional(),
+    sortedBy: z.enum(["distance", "date"]).optional(),
   });

@@ -1,4 +1,5 @@
 import { useDispatch } from "react-redux";
+import { SearchSortedBy } from "shared";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
 
 export interface SearchInput {
@@ -8,6 +9,7 @@ export interface SearchInput {
   lon: number;
   radiusKm: number;
   address: string;
+  sortedBy?: SearchSortedBy;
 }
 
 export const useSearchUseCase = () => {
@@ -20,8 +22,8 @@ export const useSearchUseCase = () => {
         latitude: values.lat,
         longitude: values.lon,
         distance_km: values.radiusKm,
-        sortedBy: "distance",
         address: values.address,
+        sortedBy: values.sortedBy,
       }),
     );
   };

@@ -1,5 +1,6 @@
 import distanceSearchIcon from "/img/distance-search-icon.svg";
 import locationSearchIcon from "/img/location-search-icon.svg";
+import sortSearchIcon from "/sort-search-icon.svg";
 import SearchIcon from "@mui/icons-material/Search";
 import { Form, Formik } from "formik";
 import React from "react";
@@ -16,8 +17,14 @@ import { OurAdvises } from "./OurAdvises";
 import "./SearchPage.css";
 import { SearchResultPanel } from "./SearchResultPanel";
 import { addressDtoToString } from "shared";
+import { prop } from "ramda";
+import { SearchSortedBy } from "shared";
 
 const radiusOptions = [1, 2, 5, 10, 20, 50, 100];
+const sortedByOptions: { value: SearchSortedBy; label: string }[] = [
+  { value: "distance", label: "Par proximité" },
+  { value: "date", label: "Par date de publication" },
+];
 const initiallySelectedIndex = -1; // don't select anything initially
 
 export const SearchPage = () => {
@@ -39,6 +46,7 @@ export const SearchPage = () => {
                 lon: 0,
                 radiusKm: 10,
                 address: "",
+                sortedBy: undefined,
               }}
               onSubmit={searchUseCase}
             >
@@ -91,6 +99,26 @@ export const SearchPage = () => {
                         defaultSelectedIndex={initiallySelectedIndex}
                         options={radiusOptions.map((n) => `${n} km`)}
                         placeholder={"Votre distance (de 1 à 100km)"}
+                      />
+                      <StaticDropdown
+                        inputStyle={{
+                          paddingLeft: "48px",
+                          background: `white url(${sortSearchIcon}) no-repeat scroll 11px 8px`,
+                          backgroundSize: "22px auto",
+                        }}
+                        title="Mon critère de tri"
+                        placeholder={`Ex : ${sortedByOptions[0].label}`}
+                        onSelection={(
+                          _newValue: string,
+                          selectedIndex: number,
+                        ) => {
+                          setFieldValue(
+                            "sortedBy",
+                            sortedByOptions[selectedIndex]?.value,
+                          );
+                        }}
+                        defaultSelectedIndex={initiallySelectedIndex}
+                        options={sortedByOptions.map(prop("label"))}
                       />
                     </div>
                     <ButtonSearch

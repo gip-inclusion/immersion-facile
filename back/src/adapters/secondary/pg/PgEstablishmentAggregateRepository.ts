@@ -5,6 +5,7 @@ import {
   AppellationDto,
   GeoPositionDto,
   SearchImmersionResultDto,
+  SearchSortedBy,
   SiretDto,
 } from "shared";
 import { ContactEntityV2 } from "../../../domain/immersionOffer/entities/ContactEntity";
@@ -344,10 +345,7 @@ export class PgEstablishmentAggregateRepository
     withContactDetails?: boolean;
     maxResults?: number;
   }): Promise<SearchImmersionResultDto[]> {
-    const sortExpression =
-      searchMade.sortedBy === "distance"
-        ? "ORDER BY voluntary_to_immersion DESC, distance_m ASC, max_created_at DESC"
-        : "ORDER BY voluntary_to_immersion DESC, max_created_at DESC, distance_m ASC";
+    const sortExpression = makeOrderByStatement(searchMade.sortedBy);
 
     const selectedOffersSubQuery = format(
       `WITH active_establishments_within_area AS 
@@ -372,7 +370,6 @@ export class PgEstablishmentAggregateRepository
         LIMIT $3`,
       searchMade.rome,
     ); // Formats optional litterals %1$L
-
     const immersionSearchResultDtos =
       await this.selectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery(
         selectedOffersSubQuery,
@@ -724,7 +721,16 @@ const filterOnVoluntaryToImmersion = (voluntaryToImmersion?: boolean) => {
     ? "AND data_source = 'form'"
     : "AND data_source != 'form'";
 };
-
+const makeOrderByStatement = (sortedBy?: SearchSortedBy): string => {
+  switch (sortedBy) {
+    case "distance":
+      return "ORDER BY voluntary_to_immersion DESC, distance_m ASC, RANDOM()";
+    case "date":
+      return "ORDER BY voluntary_to_immersion DESC, max_created_at DESC, RANDOM()";
+    default: // undefined
+      return "ORDER BY voluntary_to_immersion DESC, RANDOM()";
+  }
+};
 const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
   selectedOffersSubQuery: string, // Query should return a view with required columns siret, rome_code, rome_label, appellation_labels and distance_m
 ) => `

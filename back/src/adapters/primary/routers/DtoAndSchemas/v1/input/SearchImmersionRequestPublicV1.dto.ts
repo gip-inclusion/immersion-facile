@@ -1,4 +1,8 @@
-import { RomeCode, SearchImmersionQueryParamsDto } from "shared";
+import {
+  RomeCode,
+  SearchImmersionQueryParamsDto,
+  SearchSortedBy,
+} from "shared";
 
 export type SearchImmersionRequestPublicV1 = {
   rome?: RomeCode;
@@ -6,7 +10,7 @@ export type SearchImmersionRequestPublicV1 = {
   longitude: number;
   latitude: number;
   distance_km: number;
-  sortedBy: "distance" | "date";
+  sortedBy: SearchSortedBy;
   voluntaryOnly?: boolean;
   address?: string;
 };
