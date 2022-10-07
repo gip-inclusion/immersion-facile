@@ -88,6 +88,7 @@ export type ValidatedConventionFinalConfirmationEmail = GenericTemplatedEmail<
     emergencyContactPhone?: string;
     dateStart: string;
     dateEnd: string;
+    mentorName: string;
     establishmentRepresentativeName: string;
     scheduleText: string[];
     businessName: string;

@@ -221,7 +221,6 @@ const sendInBlueKeyByEmailVariables: Record<EmailVariables, string> = {
   businessAddress: "BUSINESS_ADDRESS",
   businessName: "BUSINESS_NAME",
   signatoryName: "SIGNATORY_NAME",
-  // businessName: "COMPANY_NAME",
   contactFirstName: "CONTACT_FIRSTNAME",
   contactLastName: "CONTACT_LASTNAME",
   contactPhone: "CONTACT_PHONE",
@@ -244,12 +243,10 @@ const sendInBlueKeyByEmailVariables: Record<EmailVariables, string> = {
   individualProtection: "INDIVIDUAL_PROTECTION",
   jobLabel: "JOB_LABEL",
   lastName: "LAST_NAME",
-
   magicLink: "MAGIC_LINK",
   mentor: "MENTOR",
   mentorName: "MENTOR_NAME",
   beneficiaryRepresentativeName: "LEGAL_REPRESENTATIVE_NAME",
-  establishmentRepresentativeName: "",
   message: "MESSAGE",
   possibleRoleAction: "POSSIBLE_ROLE_ACTION",
   potentialBeneficiaryEmail: "POTENTIAL_BENEFICIARY_EMAIL",
@@ -263,4 +260,5 @@ const sendInBlueKeyByEmailVariables: Record<EmailVariables, string> = {
   signature: "SIGNATURE",
   totalHours: "TOTAL_HOURS",
   workConditions: "WORK_CONDITIONS",
+  establishmentRepresentativeName: "ESTABLISHMENT_REPRESENTATIVE_NAME",
 };

@@ -93,6 +93,7 @@ export const getValidatedApplicationFinalConfirmationParams = (
     emergencyContactPhone: beneficiary.emergencyContactPhone,
     dateStart: parseISO(dto.dateStart).toLocaleDateString("fr"),
     dateEnd: parseISO(dto.dateEnd).toLocaleDateString("fr"),
+    mentorName: `${dto.mentor.firstName} ${dto.mentor.lastName}`,
     establishmentRepresentativeName: `${establishmentRepresentative.firstName} ${establishmentRepresentative.lastName}`,
     scheduleText: prettyPrintSchedule(dto.schedule).split("\n"),
     businessName: dto.businessName,

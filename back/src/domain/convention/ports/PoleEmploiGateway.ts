@@ -1,5 +1,8 @@
 import { DateStr } from "../../core/ports/Clock";
 
+// This is an interface contract with Pole Emploi (conventions broadcast).
+// ⚠️ Beware of NOT breaking contract ! ⚠️
+
 export type PoleEmploiConvention = {
   id: string; // id numérique sur 11 caratères
   originalId: string; // exemple: 31bd445d-54fa-4b53-8875-0ada1673fe3c
@@ -15,9 +18,9 @@ export type PoleEmploiConvention = {
   dureeImmersion: string; // Ex : 20.75 (pour 20h45min) -> should be number but until PE is ready we convert it to string
   raisonSociale: string;
   siret: string;
-  nomPrenomFonctionMentor: string;
-  telephoneMentor: string;
-  emailMentor: string;
+  nomPrenomFonctionTuteur: string;
+  telephoneTuteur: string;
+  emailTuteur: string;
   adresseImmersion: string;
   protectionIndividuelle: boolean;
   preventionSanitaire: boolean;
