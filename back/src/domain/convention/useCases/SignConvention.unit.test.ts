@@ -85,7 +85,7 @@ describe("Sign convention", () => {
           role,
         } as ConventionMagicLinkPayload),
         new ForbiddenError(
-          "Only Beneficiary, it's legal representative or the establishment representative are allowed to sign convention",
+          "Only Beneficiary, his legal representative or the establishment representative are allowed to sign convention",
         ),
       );
     },

@@ -52,7 +52,6 @@ const mentor: Mentor = {
   phone: VALID_PHONES[1],
   firstName: "Alain",
   lastName: "Prost",
-  signedAt: DATE_SIGNATURE,
   job: "Big Boss",
 };
 
@@ -61,7 +60,7 @@ const establishmentRepresentative: EstablishmentRepresentative = {
   firstName: "Billy",
   lastName: "Idol",
   phone: "0602010203",
-  role: "establishment-representative",
+  role: "establishment2",
   signedAt: DATE_SIGNATURE,
 };
 
@@ -134,7 +133,7 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     });
   }
 
-  withEstablishmentRepresentative(
+  public withEstablishmentRepresentative(
     establishmentRepresentative: EstablishmentRepresentative,
   ) {
     return new ConventionDtoBuilder({
@@ -144,6 +143,13 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
         beneficiaryRepresentative: this.beneficiaryRepresentative,
         establishmentRepresentative,
       },
+    });
+  }
+
+  public withEstablishmentRepresentativeEmail(email: string) {
+    return this.withEstablishmentRepresentative({
+      ...this.establishmentRepresentative,
+      email,
     });
   }
 
@@ -341,6 +347,22 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
         beneficiary: { ...this.beneficiary, signedAt },
       },
     });
+  }
+
+  signedByBeneficiaryRepresentative(signedAt: string) {
+    const beneficiaryRepresentative =
+      this.dto.signatories.beneficiaryRepresentative;
+    if (beneficiaryRepresentative)
+      return new ConventionDtoBuilder({
+        ...this.dto,
+        signatories: {
+          ...this.dto.signatories,
+          beneficiaryRepresentative: { ...beneficiaryRepresentative, signedAt },
+        },
+      });
+    throw new Error(
+      "Can't sign convention as beneficiary representative beacause there is no beneficiary representative on convention.",
+    );
   }
 
   public signedByEstablishmentRepresentative(signedAt: string) {

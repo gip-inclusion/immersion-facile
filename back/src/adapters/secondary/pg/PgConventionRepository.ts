@@ -6,6 +6,7 @@ import {
   ConventionDtoWithoutExternalId,
   ConventionExternalId,
   ConventionId,
+  EstablishmentRepresentative,
   Mentor,
 } from "shared";
 import { ConventionRepository } from "../../../domain/convention/ports/ConventionRepository";
@@ -27,17 +28,17 @@ export class PgConventionRepository implements ConventionRepository {
     convention: ConventionDtoWithoutExternalId,
   ): Promise<ConventionExternalId> {
     // prettier-ignore
-    const { signatories: { beneficiary, beneficiaryRepresentative: legalRepresentative }, id: conventionId, status, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation, immersionActivities, immersionSkills, postalCode, workConditions, internshipKind,mentor } =
+    const { signatories: { beneficiary, beneficiaryRepresentative, establishmentRepresentative }, id: conventionId, status, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation, immersionActivities, immersionSkills, postalCode, workConditions, internshipKind,mentor } =
         convention
 
     // Insert signatories and remember their id
     const beneficiaryId = await this.insertBeneficiary(beneficiary);
     const mentorId = await this.insertMentor(mentor);
-    const legalRepresentativeId =
-      legalRepresentative &&
-      (await this.insertLegalRepresentative(legalRepresentative));
-
-    const establishmentRepresentativeId = mentorId;
+    const establishmentRepresentativeId =
+      await this.insertEstablishmentRepresentative(establishmentRepresentative);
+    const beneficiaryRepresentativeId =
+      beneficiaryRepresentative &&
+      (await this.insertLegalRepresentative(beneficiaryRepresentative));
 
     const query_insert_convention = `INSERT INTO conventions(
           id, status, agency_id, date_submission, date_start, date_end, date_validation, siret, business_name, schedule, individual_protection,
@@ -47,7 +48,7 @@ export class PgConventionRepository implements ConventionRepository {
 
     // prettier-ignore
     await this.client.query(query_insert_convention, [conventionId, status, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation.appellationCode, immersionActivities, immersionSkills, postalCode, workConditions, internshipKind,
-                                                      beneficiaryId, mentorId, establishmentRepresentativeId, legalRepresentativeId
+                                                      beneficiaryId, mentorId, establishmentRepresentativeId, beneficiaryRepresentativeId
     ]);
 
     const query_insert_external_id = `INSERT INTO convention_external_ids(convention_id) VALUES($1) RETURNING external_id;`;
@@ -62,7 +63,7 @@ export class PgConventionRepository implements ConventionRepository {
     convention: ConventionDto,
   ): Promise<ConventionId | undefined> {
     // prettier-ignore
-    const { signatories: { beneficiary, beneficiaryRepresentative: legalRepresentative }, id, status, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation, immersionActivities, immersionSkills, workConditions,mentor } =
+    const { signatories: { beneficiary, beneficiaryRepresentative,establishmentRepresentative }, id, status, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation, immersionActivities, immersionSkills, workConditions,mentor } =
       convention
 
     const updateConventionQuery = `  
@@ -90,30 +91,49 @@ export class PgConventionRepository implements ConventionRepository {
 
     const updateMentorQuery = `  
     UPDATE actors
-      SET first_name=$2,  last_name=$3, email=$4, phone=$5, signed_at=$6,
-          extra_fields=JSON_STRIP_NULLS(JSON_BUILD_OBJECT('job', $7::text))
+      SET first_name=$2,  last_name=$3, email=$4, phone=$5,
+        extra_fields=JSON_STRIP_NULLS(JSON_BUILD_OBJECT('job', $6::text))
       FROM conventions 
       WHERE conventions.id=$1 AND actors.id = conventions.mentor_id`;
     // prettier-ignore
-    await this.client.query(updateMentorQuery, [id, mentor.firstName, mentor.lastName, mentor.email, mentor.phone, mentor.signedAt, mentor.job]);
+    await this.client.query(updateMentorQuery, [id, mentor.firstName, mentor.lastName, mentor.email, mentor.phone, mentor.job]);
 
-    if (legalRepresentative) {
+    const updateEstablishmentRepresentativeQuery = `  
+    UPDATE actors
+      SET first_name=$2, last_name=$3, email=$4, phone=$5, signed_at=$6
+      FROM conventions 
+      WHERE conventions.id=$1 AND actors.id = conventions.establishment_representative_id`;
+    await this.client.query(updateEstablishmentRepresentativeQuery, [
+      id,
+      establishmentRepresentative.firstName,
+      establishmentRepresentative.lastName,
+      establishmentRepresentative.email,
+      establishmentRepresentative.phone,
+      establishmentRepresentative.signedAt,
+    ]);
+
+    if (beneficiaryRepresentative) {
       const updateLegalRepresentativeQuery = `  
         UPDATE actors
           SET first_name=$2,  last_name=$3, email=$4, phone=$5, signed_at=$6
         FROM conventions 
         WHERE conventions.id=$1 AND actors.id = conventions.beneficiary_representative_id`;
-      // prettier-ignore
-      await this.client.query(updateLegalRepresentativeQuery, [id, legalRepresentative.firstName, legalRepresentative.lastName, legalRepresentative.email, legalRepresentative.phone, legalRepresentative.signedAt]);
+      await this.client.query(updateLegalRepresentativeQuery, [
+        id,
+        beneficiaryRepresentative.firstName,
+        beneficiaryRepresentative.lastName,
+        beneficiaryRepresentative.email,
+        beneficiaryRepresentative.phone,
+        beneficiaryRepresentative.signedAt,
+      ]);
     }
 
     return convention.id;
   }
 
-  private async insertBeneficiary(beneficiary: Beneficiary) {
+  private async insertBeneficiary(beneficiary: Beneficiary): Promise<number> {
     const query_insert_beneficiary = `
-        INSERT into actors(
-        first_name, last_name, email, phone, signed_at, extra_fields)
+        INSERT into actors(first_name, last_name, email, phone, signed_at, extra_fields)
         VALUES($1, $2, $3, $4, $5, JSON_BUILD_OBJECT('emergencyContact', $6::text, 'emergencyContactPhone', $7::text))
         RETURNING id;
       `;
@@ -122,21 +142,46 @@ export class PgConventionRepository implements ConventionRepository {
     return insertReturn.rows[0]?.id;
   }
 
-  private async insertMentor(mentor: Mentor) {
+  private async insertMentor(mentor: Mentor): Promise<number> {
     const query_insert_mentor = `
-        INSERT into actors(
-        first_name, last_name, email, phone, signed_at, extra_fields)
-        VALUES($1, $2, $3, $4, $5, JSON_BUILD_OBJECT('job', $6::text))
+        INSERT into actors(first_name, last_name, email, phone, extra_fields)
+        VALUES($1, $2, $3, $4, JSON_BUILD_OBJECT('job', $5::text))
         RETURNING id;
       `;
-    // prettier-ignore
-    const insertReturn = await this.client.query(query_insert_mentor, [mentor.firstName, mentor.lastName, mentor.email, mentor.phone, mentor.signedAt, mentor.job]);
+    const insertReturn = await this.client.query(query_insert_mentor, [
+      mentor.firstName,
+      mentor.lastName,
+      mentor.email,
+      mentor.phone,
+      mentor.job,
+    ]);
+    return insertReturn.rows[0]?.id;
+  }
+
+  private async insertEstablishmentRepresentative(
+    establishmentRepresentative: EstablishmentRepresentative,
+  ): Promise<number> {
+    const query_insert_establishment_representative = `
+        INSERT into actors(first_name, last_name, email, phone, signed_at)
+        VALUES($1, $2, $3, $4, $5)
+        RETURNING id;
+      `;
+    const insertReturn = await this.client.query(
+      query_insert_establishment_representative,
+      [
+        establishmentRepresentative.firstName,
+        establishmentRepresentative.lastName,
+        establishmentRepresentative.email,
+        establishmentRepresentative.phone,
+        establishmentRepresentative.signedAt,
+      ],
+    );
     return insertReturn.rows[0]?.id;
   }
 
   private async insertLegalRepresentative(
     beneficiaryRepresentative: BeneficiaryRepresentative,
-  ) {
+  ): Promise<number> {
     const query_insert_legal_representative = `
         INSERT into actors(
         first_name, last_name, email, phone, signed_at)

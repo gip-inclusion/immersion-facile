@@ -88,12 +88,15 @@ export const signatoryRoles: SignatoryRole[] = [
   "establishment-representative",
 ];
 
-type GenericSignatory<R extends Role> = {
+type GenericActor<R extends Role> = {
   role: R;
   email: string;
   phone: string;
   firstName: string;
   lastName: string;
+};
+
+type GenericSignatory<R extends Role> = GenericActor<R> & {
   signedAt?: string; // Date iso string
 };
 
@@ -107,9 +110,7 @@ export type EstablishmentRepresentative = GenericSignatory<
   "establishment2" | "establishment-representative"
 >;
 
-export type Mentor = GenericSignatory<
-  "establishment2" | "establishment-mentor"
-> & {
+export type Mentor = GenericActor<"establishment2" | "establishment-mentor"> & {
   job: string;
 };
 

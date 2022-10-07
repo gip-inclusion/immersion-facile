@@ -180,7 +180,9 @@ describe("PgExportQueries", () => {
     describe("No filter specified", () => {
       it("Retrieves all conventions exports", async () => {
         // Prepare
-        const conventionInRepo = new ConventionDtoBuilder().build();
+        const conventionInRepo = new ConventionDtoBuilder()
+          .signedByEstablishmentRepresentative(new Date().toISOString())
+          .build();
         const conventionAgency = new AgencyDtoBuilder()
           .withId(conventionInRepo.agencyId)
           .withName("La super agence sur les champs")
@@ -251,9 +253,9 @@ describe("PgExportQueries", () => {
           Siret: conventionInRepo.siret,
           "Référencement IF": "Non",
           Entreprise: conventionInRepo.businessName,
-          Tuteur: `${mentor.firstName} ${mentor.lastName} ${mentor.job}`,
-          "Téléphone du tuteur": mentor.phone,
-          "Email du tuteur": mentor.email,
+          Mentor: `${mentor.firstName} ${mentor.lastName} ${mentor.job}`,
+          "Téléphone du mentor": mentor.phone,
+          "Email du mentor": mentor.email,
         };
         expect(exportables["conventions"]).toHaveLength(1);
         expectObjectsToMatch(

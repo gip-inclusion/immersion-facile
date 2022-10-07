@@ -3,6 +3,7 @@ import format from "pg-format";
 import {
   ConventionId,
   ConventionReadDto,
+  conventionReadSchema,
   ListConventionsRequestDto,
   validatedConventionStatuses,
 } from "shared";
@@ -75,7 +76,7 @@ export class PgConventionQueries implements ConventionQueries {
     ${whereClause}
     ${orderByCause ?? ""}
     ${limit ? "LIMIT " + limit : ""}`;
-    const pgResult = await this.client.query(query);
-    return pgResult.rows.map((row) => row.dto);
+    const pgResult = await this.client.query<{ dto: unknown }>(query);
+    return pgResult.rows.map((row) => conventionReadSchema.parse(row.dto));
   }
 }

@@ -9,7 +9,7 @@ import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
 import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
 import { PgConventionRepository } from "../../adapters/secondary/pg/PgConventionRepository";
 
-const legalRepresentative: BeneficiaryRepresentative = {
+const beneficiaryRepresentative: BeneficiaryRepresentative = {
   role: "legal-representative2",
   email: "legal@representative.com",
   firstName: "The",
@@ -115,7 +115,7 @@ describe("PgConventionRepository", () => {
   it("Adds a new convention with a legal representative", async () => {
     const convention = new ConventionDtoBuilder()
       .withId("aaaaac99-9c0b-bbbb-bb6d-6bb9bd38aaaa")
-      .withBeneficiaryRepresentative(legalRepresentative)
+      .withBeneficiaryRepresentative(beneficiaryRepresentative)
       .build();
 
     const { externalId, ...createConventionParams } = convention;
@@ -134,7 +134,7 @@ describe("PgConventionRepository", () => {
     const idA: ConventionId = "aaaaac99-9c0b-aaaa-aa6d-6bb9bd38aaaa";
     const convention = new ConventionDtoBuilder()
       .withId(idA)
-      .withBeneficiaryRepresentative(legalRepresentative)
+      .withBeneficiaryRepresentative(beneficiaryRepresentative)
       .build();
     const externalId = await conventionRepository.save(convention);
 
@@ -144,9 +144,12 @@ describe("PgConventionRepository", () => {
       .withStatus("ACCEPTED_BY_VALIDATOR")
       .withBeneficiaryEmail("someUpdated@email.com")
       .withBeneficiaryRepresentative({
-        ...legalRepresentative,
+        ...beneficiaryRepresentative,
         email: "some@new-representative.com",
       })
+      .signedByBeneficiary(new Date().toISOString())
+      .signedByEstablishmentRepresentative(new Date().toISOString())
+      .signedByBeneficiaryRepresentative(new Date().toISOString())
       .withDateEnd(new Date("2021-01-20").toISOString())
       .build();
 

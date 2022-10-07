@@ -37,7 +37,6 @@ const agencyFields: FieldsToLabel = {
 };
 
 const mentorFields: FieldsToLabel = {
-  "mentor.signedAt": "Signé",
   "mentor.email": "Mail du tuteur",
   "mentor.phone": "Numéro de téléphone du tuteur",
   "mentor.firstName": "Prénom",

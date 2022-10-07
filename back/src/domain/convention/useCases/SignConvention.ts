@@ -69,7 +69,7 @@ export class SignConvention extends TransactionalUseCase<
 
     if (!isAllowedToSign(role))
       throw new ForbiddenError(
-        "Only Beneficiary, it's legal representative or the establishment representative are allowed to sign convention",
+        "Only Beneficiary, his legal representative or the establishment representative are allowed to sign convention",
       );
 
     const initialConvention = await uow.conventionRepository.getById(

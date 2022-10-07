@@ -25,7 +25,11 @@ import {
 } from "../../../domain/core/ports/UnitOfWork";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../domain/peConnect/dto/PeConnect.dto";
 
-const validConvention: ConventionDto = new ConventionDtoBuilder().build();
+const mentorEmail = "boss@mail.com";
+const validConvention: ConventionDto = new ConventionDtoBuilder()
+  .withMentorEmail(mentorEmail)
+  .withEstablishmentRepresentativeEmail(mentorEmail)
+  .build();
 
 const counsellorEmail = "counsellor@email.fr";
 
@@ -68,6 +72,40 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
         validConvention.signatories.beneficiary.email,
         validConvention.signatories.establishmentRepresentative.email,
         counsellorEmail,
+      ],
+      sentEmails[0],
+      agency,
+      validConvention,
+    );
+  });
+
+  it("With different mentor and establishment representative", async () => {
+    agency = new AgencyDtoBuilder(defaultAgency)
+      .withCounsellorEmails([counsellorEmail])
+      .build();
+
+    (uow.agencyRepository as InMemoryAgencyRepository).setAgencies([agency]);
+
+    unitOfWorkPerformer = new InMemoryUowPerformer(uow);
+
+    const conventionWithSpecificEstablishementEmail = new ConventionDtoBuilder()
+      .withMentorEmail(mentorEmail)
+      .build();
+    await new NotifyAllActorsOfFinalApplicationValidation(
+      unitOfWorkPerformer,
+      emailGw,
+    ).execute(conventionWithSpecificEstablishementEmail);
+
+    const sentEmails = emailGw.getSentEmails();
+
+    expect(sentEmails).toHaveLength(1);
+    expectEmailFinalValidationConfirmationMatchingConvention(
+      [
+        conventionWithSpecificEstablishementEmail.signatories.beneficiary.email,
+        conventionWithSpecificEstablishementEmail.signatories
+          .establishmentRepresentative.email,
+        counsellorEmail,
+        conventionWithSpecificEstablishementEmail.mentor.email,
       ],
       sentEmails[0],
       agency,

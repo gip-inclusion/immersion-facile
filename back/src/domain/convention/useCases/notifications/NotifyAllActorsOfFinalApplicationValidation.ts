@@ -55,6 +55,11 @@ export class NotifyAllActorsOfFinalApplicationValidation extends TransactionalUs
       ...agency.validatorEmails,
       ...getPeAdvisorEmailIfExist(peUserAdvisorOrUndefined),
     ];
+    if (
+      convention.signatories.establishmentRepresentative.email !==
+      convention.mentor.email
+    )
+      recipients.push(convention.mentor.email);
 
     await this.emailGateway.sendEmail({
       type: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",

@@ -1,50 +1,47 @@
 import { PoolClient } from "pg";
-import { ConventionId, ConventionReadDto } from "shared";
+import { ConventionId, ConventionReadDto, conventionReadSchema } from "shared";
 
 export const selectAllConventionDtosById = `
 WITH 
   beneficiaries AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = beneficiary_id),
   mentors AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = mentor_id),
-  legal_representatives AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = beneficiary_representative_id),
+  beneficiaryRepresentative AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = beneficiary_representative_id),
+  establishmentRepresentative AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = establishment_representative_id),
   formated_signatories AS (
     SELECT 
     b.convention_id,
     JSON_BUILD_OBJECT(
-    'beneficiary' , 
-      JSON_BUILD_OBJECT(
-          'role', 'beneficiary',
-          'firstName', b.first_name,
-          'lastName', b.last_name,
-          'email', b.email,
-          'phone', b.phone,
-          'signedAt', date_to_iso(b.signed_at),
-          'emergencyContact', b.extra_fields ->> 'emergencyContact',
-          'emergencyContactPhone', b.extra_fields ->> 'emergencyContactPhone',
-          'federatedIdentity', CASE WHEN  (p.user_pe_external_id IS NOT NULL) THEN CONCAT('peConnect:', p.user_pe_external_id) ELSE NULL END 
-          ),
-    'mentor' , 
-      JSON_BUILD_OBJECT(
-        'role', 'establishment',
-        'firstName', m.first_name,
-        'lastName', m.last_name,
-        'email', m.email,
-        'phone', m.phone,
-        'signedAt', date_to_iso(m.signed_at),
-        'job', m.extra_fields ->> 'job'
+      'beneficiary' , JSON_BUILD_OBJECT(
+        'role', 'beneficiary',
+        'firstName', b.first_name,
+        'lastName', b.last_name,
+        'email', b.email,
+        'phone', b.phone,
+        'signedAt', date_to_iso(b.signed_at),
+        'emergencyContact', b.extra_fields ->> 'emergencyContact',
+        'emergencyContactPhone', b.extra_fields ->> 'emergencyContactPhone',
+        'federatedIdentity', CASE WHEN  (p.user_pe_external_id IS NOT NULL) THEN CONCAT('peConnect:', p.user_pe_external_id) ELSE NULL END 
       ),
-    'legalRepresentative' , CASE WHEN lr IS NULL THEN NULL ELSE
-      JSON_BUILD_OBJECT(
-        'role', 'legal-representative',
-        'firstName', lr.first_name,
-        'lastName', lr.last_name,
-        'email', lr.email,
-        'phone', lr.phone,
-        'signedAt', date_to_iso(lr.signed_at)
+      'establishmentRepresentative' , JSON_BUILD_OBJECT(
+        'role', 'establishment2',
+        'firstName', er.first_name,
+        'lastName', er.last_name,
+        'email', er.email,
+        'phone', er.phone,
+        'signedAt', date_to_iso(er.signed_at)
+      ),
+      'beneficiaryRepresentative' , CASE WHEN br IS NULL THEN NULL ELSE JSON_BUILD_OBJECT(
+        'role', 'legal-representative2',
+        'firstName', br.first_name,
+        'lastName', br.last_name,
+        'email', br.email,
+        'phone', br.phone,
+        'signedAt', date_to_iso(br.signed_at)
       ) END
     ) AS signatories
     FROM beneficiaries AS b
-    LEFT JOIN mentors as m ON b.convention_id = m.convention_id
-    LEFT JOIN legal_representatives as lr ON b.convention_id = lr.convention_id
+    LEFT JOIN beneficiaryRepresentative as br ON b.convention_id = br.convention_id
+    LEFT JOIN establishmentRepresentative as er ON b.convention_id = er.convention_id
     LEFT JOIN partners_pe_connect AS p ON p.convention_id = b.convention_id)
 
 SELECT 
@@ -79,26 +76,39 @@ SELECT
       ),
       'immersionActivities', immersion_activities,
       'immersionSkills', immersion_skills,
-      'internshipKind', internship_kind
-)) AS dto
+      'internshipKind', internship_kind,
+      'mentor' , JSON_BUILD_OBJECT(
+        'role', 'establishment-mentor',
+        'firstName', m.first_name,
+        'lastName', m.last_name,
+        'email', m.email,
+        'phone', m.phone,
+        'signedAt', date_to_iso(m.signed_at),
+        'job', m.extra_fields ->> 'job'
+      )
+    )
+  ) AS dto
 
 FROM 
 conventions LEFT JOIN formated_signatories ON formated_signatories.convention_id = conventions.id
+LEFT JOIN mentors as m ON conventions.id = m.convention_id
 LEFT JOIN view_appellations_dto AS vad ON vad.appellation_code = conventions.immersion_appellation
 LEFT JOIN convention_external_ids AS cei ON cei.convention_id = conventions.id
 LEFT JOIN agencies ON agencies.id = conventions.agency_id
 `;
 
+const getReadConventionByIdQuery = `
+WITH convention_dtos AS (${selectAllConventionDtosById})
+SELECT * FROM convention_dtos WHERE id = $1`;
+
 export const getReadConventionById = async (
   client: PoolClient,
   conventionId: ConventionId,
 ): Promise<ConventionReadDto | undefined> => {
-  const pgResult = await client.query(
-    `WITH convention_dtos AS (${selectAllConventionDtosById})
-     SELECT * FROM convention_dtos WHERE id = $1`,
+  const pgResult = await client.query<{ dto: unknown }>(
+    getReadConventionByIdQuery,
     [conventionId],
   );
-
-  const pgConvention = pgResult.rows[0];
-  if (pgConvention) return pgConvention.dto;
+  const pgConvention = pgResult.rows.at(0);
+  return pgConvention && conventionReadSchema.parse(pgConvention.dto);
 };
