@@ -52,9 +52,7 @@ export const ConventionForm = ({
 
   useEffect(() => {
     if (!("demandeId" in routeParams) && !("jwt" in routeParams)) return;
-    if (!("jwt" in routeParams) || routeParams.jwt === undefined) {
-      return;
-    }
+    if (!("jwt" in routeParams) || routeParams.jwt === undefined) return;
     conventionGateway
       .getMagicLink(routeParams.jwt)
       .then((response) => {

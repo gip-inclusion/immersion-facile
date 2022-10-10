@@ -1,6 +1,6 @@
 import { keys, values } from "ramda";
 import { Role } from "../tokens/MagicLinkPayload";
-import { DotNestedKeys } from "../utils";
+import { DotNestedKeys, ExtractFromExisting } from "../utils";
 import {
   ConventionDto,
   ConventionStatus,
@@ -92,3 +92,9 @@ export type ConventionField = DotNestedKeys<ConventionDto>;
 
 export const getConventionFieldName = (name: DotNestedKeys<ConventionDto>) =>
   name;
+
+type SignatoryField = ExtractFromExisting<keyof ConventionDto, "signatories">;
+
+export const getSignatoryKey = (
+  v: `${SignatoryField}.${keyof ConventionDto["signatories"]}`,
+) => v;

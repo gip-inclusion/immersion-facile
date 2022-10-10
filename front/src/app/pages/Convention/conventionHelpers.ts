@@ -116,7 +116,7 @@ export const conventionInitialValuesFromUrl = ({
           | undefined,
       },
       establishmentRepresentative: {
-        role: "establishment",
+        role: "establishment-representative",
         firstName: params.mentorFirstName ?? "",
         lastName: params.mentorLastName ?? "",
         email: params.mentorEmail ?? "",

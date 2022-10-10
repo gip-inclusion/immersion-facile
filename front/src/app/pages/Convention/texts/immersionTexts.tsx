@@ -75,28 +75,53 @@ export const immersionTexts = {
       "Les questions suivantes doivent être complétées avec la personne qui vous accueillera pendant votre immersion",
     businessNameLabel:
       "Indiquez le nom (raison sociale) de l'établissement d'accueil",
-    firstName: {
-      label: "Indiquez le prénom du tuteur",
-      description: "Ex : Alain",
+    mentor: {
+      firstName: {
+        label: "Indiquez le prénom du tuteur",
+        description: "Ex : Alain",
+      },
+      lastName: {
+        label: "Indiquez le nom du tuteur",
+        description: "Ex : Prost",
+      },
+      job: {
+        label: "Indiquez la fonction du tuteur",
+        description: "Ex : Pilote automobile",
+      },
+      email: {
+        label: "Indiquez l'e-mail du tuteur",
+        placeholder: "nom@exemple.com",
+        description: "pour envoyer la validation de la convention",
+      },
+      phone: {
+        label:
+          "Indiquez le numéro de téléphone du tuteur ou de la structure d'accueil",
+        placeholder: "0606060607",
+        description: "pour qu’on puisse vous contacter à propos de l’immersion",
+      },
     },
-    lastName: {
-      label: "Indiquez le nom du tuteur",
-      description: "Ex : Prost",
-    },
-    job: {
-      label: "Indiquez la fonction du tuteur",
-      description: "Ex : Pilote automobile",
-    },
-    email: {
-      label: "Indiquez l'e-mail du tuteur",
-      placeholder: "nom@exemple.com",
-      description: "pour envoyer la validation de la convention",
-    },
-    phone: {
-      label:
-        "Indiquez le numéro de téléphone du tuteur ou de la structure d'accueil",
-      placeholder: "0606060607",
-      description: "pour qu’on puisse vous contacter à propos de l’immersion",
+    isMentorIsEstablishmentRepresentative:
+      "Est-ce que le mentor est le représentant de l'entreprise?",
+    establishmentRepresentative: {
+      firstName: {
+        label: "Indiquez le prénom du représentant de l'entreprise",
+        description: "Ex : Alain",
+      },
+      lastName: {
+        label: "Indiquez le nom du représentant de l'entreprise",
+        description: "Ex : Prost",
+      },
+      email: {
+        label: "Indiquez l'e-mail du représentant de l'entreprise",
+        placeholder: "nom@exemple.com",
+        description: "pour envoyer la validation de la convention",
+      },
+      phone: {
+        label:
+          "Indiquez le numéro de téléphone du représentant de l'entreprise",
+        placeholder: "0606060607",
+        description: "pour qu’on puisse vous contacter à propos de l’immersion",
+      },
     },
   },
   immersionConditionsCommonFields: {
