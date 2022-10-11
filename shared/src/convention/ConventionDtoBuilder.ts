@@ -13,7 +13,7 @@ import {
   ImmersionObjective,
   InternshipKind,
   BeneficiaryRepresentative,
-  Mentor,
+  EstablishmentTutor,
   EstablishmentRepresentative,
 } from "./convention.dto";
 
@@ -46,8 +46,8 @@ const beneficiary: Beneficiary = {
   emergencyContactPhone: "0663567896",
 };
 
-const mentor: Mentor = {
-  role: "establishment-mentor",
+const establishmentTutor: EstablishmentTutor = {
+  role: "establishment-tutor",
   email: VALID_EMAILS[1],
   phone: VALID_PHONES[1],
   firstName: "Alain",
@@ -94,7 +94,7 @@ const validConvention: ConventionDto = {
   immersionSkills: "Utilisation des pneus optimale, gestion de carburant",
   internshipKind: "immersion",
   signatories: { beneficiary, establishmentRepresentative },
-  mentor,
+  establishmentTutor,
 };
 
 export class ConventionDtoBuilder implements Builder<ConventionDto> {
@@ -175,27 +175,39 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     return this.withBeneficiary({ ...this.beneficiary, phone });
   }
 
-  public withMentor(mentor: Mentor): ConventionDtoBuilder {
+  public withEstablishmentTutor(
+    establishmentTutor: EstablishmentTutor,
+  ): ConventionDtoBuilder {
     return new ConventionDtoBuilder({
       ...this.dto,
-      mentor,
+      establishmentTutor,
     });
   }
 
-  public withMentorFirstName(firstName: string): ConventionDtoBuilder {
-    return this.withMentor({ ...this.mentor, firstName });
+  public withEstablishmentTutorFirstName(
+    firstName: string,
+  ): ConventionDtoBuilder {
+    return this.withEstablishmentTutor({
+      ...this.establishmentTutor,
+      firstName,
+    });
   }
 
-  public withMentorLastName(lastName: string): ConventionDtoBuilder {
-    return this.withMentor({ ...this.mentor, lastName });
+  public withEstablishmentTutorLastName(
+    lastName: string,
+  ): ConventionDtoBuilder {
+    return this.withEstablishmentTutor({
+      ...this.establishmentTutor,
+      lastName,
+    });
   }
 
-  public withMentorPhone(phone: string): ConventionDtoBuilder {
-    return this.withMentor({ ...this.mentor, phone });
+  public withEstablishementTutorPhone(phone: string): ConventionDtoBuilder {
+    return this.withEstablishmentTutor({ ...this.establishmentTutor, phone });
   }
 
-  public withMentorEmail(email: string): ConventionDtoBuilder {
-    return this.withMentor({ ...this.mentor, email });
+  public withEstablishmentTutorEmail(email: string): ConventionDtoBuilder {
+    return this.withEstablishmentTutor({ ...this.establishmentTutor, email });
   }
 
   public withDateSubmission(dateSubmission: string): ConventionDtoBuilder {
@@ -387,8 +399,8 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     });
   }
 
-  private get mentor(): Mentor {
-    return this.dto.mentor;
+  private get establishmentTutor(): EstablishmentTutor {
+    return this.dto.establishmentTutor;
   }
 
   private get establishmentRepresentative(): EstablishmentRepresentative {

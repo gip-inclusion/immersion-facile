@@ -197,7 +197,7 @@ describe("PgExportQueries", () => {
           filters: {},
         });
 
-        const mentor = conventionInRepo.mentor;
+        const establishmentTutor = conventionInRepo.establishmentTutor;
         const { beneficiary } = conventionInRepo.signatories;
 
         // Assert
@@ -253,9 +253,9 @@ describe("PgExportQueries", () => {
           Siret: conventionInRepo.siret,
           "Référencement IF": "Non",
           Entreprise: conventionInRepo.businessName,
-          Mentor: `${mentor.firstName} ${mentor.lastName} ${mentor.job}`,
-          "Téléphone du mentor": mentor.phone,
-          "Email du mentor": mentor.email,
+          "Tuteur de l'entreprise": `${establishmentTutor.firstName} ${establishmentTutor.lastName} ${establishmentTutor.job}`,
+          "Téléphone du tuteur de l'entreprise": establishmentTutor.phone,
+          "Email du tuteur de l'entreprise": establishmentTutor.email,
         };
         expect(exportables["conventions"]).toHaveLength(1);
         expectObjectsToMatch(

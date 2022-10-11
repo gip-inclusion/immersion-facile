@@ -3,7 +3,7 @@ import { FederatedIdentity } from "shared";
 import { ShareActions } from "src/app/pages/Convention/ConventionFields/ShareActions";
 import { FormSectionTitle } from "src/uiComponents/FormSectionTitle";
 import { useConventionTextsFromFormikContext } from "../../../texts/textSetup";
-import { EstablishementMentorFields } from "./EstablishementMentorFields";
+import { EstablishementTutorFields } from "./EstablishementTutorFields";
 import { EstablishmentBusinessFields } from "./EstablishmentBusinessFields";
 import { EstablishmentRepresentativeFields } from "./EstablishmentRepresentativeFields";
 
@@ -28,7 +28,7 @@ export const EstablishmentFormSection = ({
       </FormSectionTitle>
       <h4>{t.establishment.subtitle}</h4>
       <EstablishmentBusinessFields disabled={isFrozen} />
-      <EstablishementMentorFields disabled={isFrozen} />
+      <EstablishementTutorFields disabled={isFrozen} />
       <EstablishmentRepresentativeFields disabled={isFrozen} />
     </>
   );

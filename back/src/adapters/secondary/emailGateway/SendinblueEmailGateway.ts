@@ -149,7 +149,7 @@ const emailTypeToTemplateId: Record<EmailType, number> = {
   NEW_CONVENTION_BENEFICIARY_CONFIRMATION: 4, // v1
 
   // https://my.sendinblue.com/camp/template/5/message-setup
-  NEW_CONVENTION_MENTOR_CONFIRMATION: 5, // v1
+  NEW_CONVENTION_ESTABLISHMENT_TUTOR_CONFIRMATION: 5, // v1
 
   // https://my.sendinblue.com/camp/template/6/message-setup
   VALIDATED_CONVENTION_FINAL_CONFIRMATION: 6,
@@ -170,7 +170,7 @@ const emailTypeToTemplateId: Record<EmailType, number> = {
   NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION: 15,
 
   // https://my.sendinblue.com/camp/template/16/message-setup
-  BENEFICIARY_OR_MENTOR_ALREADY_SIGNED_NOTIFICATION: 16, // EXISTING_SIGNATURE_NAME, MISSING_SIGNATURE_NAME
+  BENEFICIARY_OR_ESTABLISHMENT_REPRESENTATIVE_ALREADY_SIGNED_NOTIFICATION: 16, // EXISTING_SIGNATURE_NAME, MISSING_SIGNATURE_NAME
 
   // https://my.sendinblue.com/camp/template/20/message-setup
   CONTACT_BY_EMAIL_REQUEST: 20,
@@ -244,8 +244,8 @@ const sendInBlueKeyByEmailVariables: Record<EmailVariables, string> = {
   jobLabel: "JOB_LABEL",
   lastName: "LAST_NAME",
   magicLink: "MAGIC_LINK",
-  mentor: "MENTOR",
-  mentorName: "MENTOR_NAME",
+  establishmentRepresentative: "MENTOR",
+  establishmentTutorName: "MENTOR_NAME",
   beneficiaryRepresentativeName: "LEGAL_REPRESENTATIVE_NAME",
   message: "MESSAGE",
   possibleRoleAction: "POSSIBLE_ROLE_ACTION",

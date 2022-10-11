@@ -15,13 +15,13 @@ export const useConvention = (jwt: string) => {
   }, []);
 };
 
-export const isMentorIsEstablishmentRepresentativeHook = () => {
+export const isEstablishmentTutorIsEstablishmentRepresentativeHook = () => {
   const [
-    isMentorIsEstablishmentRepresentative,
-    setIsMentorIsEstablishmentRepresentative,
+    isEstablishmentTutorIsEstablishmentRepresentative,
+    setIsEstablishmentTutorIsEstablishmentRepresentative,
   ] = useState<boolean>(true);
   const { values, setFieldValue } = useFormikContext<ConventionDto>();
-  const { firstName, lastName, email, phone } = values.mentor;
+  const { firstName, lastName, email, phone } = values.establishmentTutor;
   const setEstablishmentRepresentative = (
     establishmentRepresentative: EstablishmentRepresentative,
   ) => {
@@ -33,7 +33,7 @@ export const isMentorIsEstablishmentRepresentativeHook = () => {
 
   useEffect(() => {
     setEstablishmentRepresentative(
-      isMentorIsEstablishmentRepresentative
+      isEstablishmentTutorIsEstablishmentRepresentative
         ? {
             role: "establishment-representative",
             firstName,
@@ -50,7 +50,7 @@ export const isMentorIsEstablishmentRepresentativeHook = () => {
           },
     );
   }, [
-    isMentorIsEstablishmentRepresentative,
+    isEstablishmentTutorIsEstablishmentRepresentative,
     firstName,
     lastName,
     email,
@@ -58,7 +58,7 @@ export const isMentorIsEstablishmentRepresentativeHook = () => {
   ]);
 
   return {
-    isMentorIsEstablishmentRepresentative,
-    setIsMentorIsEstablishmentRepresentative,
+    isEstablishmentTutorIsEstablishmentRepresentative,
+    setIsEstablishmentTutorIsEstablishmentRepresentative,
   };
 };

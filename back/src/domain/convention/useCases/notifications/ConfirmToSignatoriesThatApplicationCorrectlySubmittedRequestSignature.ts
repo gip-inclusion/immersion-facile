@@ -20,7 +20,7 @@ export class ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignatu
   public async _execute(convention: ConventionDto): Promise<void> {
     if (convention.status === "PARTIALLY_SIGNED") {
       logger.info(
-        `Skipping sending signature-requiring mentor confirmation as application is already partially signed`,
+        `Skipping sending signature-requiring establishment representative confirmation as convention is already partially signed`,
       );
       return;
     }

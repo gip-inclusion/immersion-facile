@@ -25,10 +25,10 @@ import {
 } from "../../../domain/core/ports/UnitOfWork";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../domain/peConnect/dto/PeConnect.dto";
 
-const mentorEmail = "boss@mail.com";
+const establishmentTutorEmail = "boss@mail.com";
 const validConvention: ConventionDto = new ConventionDtoBuilder()
-  .withMentorEmail(mentorEmail)
-  .withEstablishmentRepresentativeEmail(mentorEmail)
+  .withEstablishmentTutorEmail(establishmentTutorEmail)
+  .withEstablishmentRepresentativeEmail(establishmentTutorEmail)
   .build();
 
 const counsellorEmail = "counsellor@email.fr";
@@ -50,7 +50,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
     unitOfWorkPerformer = new InMemoryUowPerformer(uow);
   });
 
-  it("Default actors: beneficiary, mentor, agency counsellor", async () => {
+  it("Default actors: beneficiary, establishement tutor, agency counsellor", async () => {
     agency = new AgencyDtoBuilder(defaultAgency)
       .withCounsellorEmails([counsellorEmail])
       .build();
@@ -79,7 +79,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
     );
   });
 
-  it("With different mentor and establishment representative", async () => {
+  it("With different establishment tutor and establishment representative", async () => {
     agency = new AgencyDtoBuilder(defaultAgency)
       .withCounsellorEmails([counsellorEmail])
       .build();
@@ -89,7 +89,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
     unitOfWorkPerformer = new InMemoryUowPerformer(uow);
 
     const conventionWithSpecificEstablishementEmail = new ConventionDtoBuilder()
-      .withMentorEmail(mentorEmail)
+      .withEstablishmentTutorEmail(establishmentTutorEmail)
       .build();
     await new NotifyAllActorsOfFinalApplicationValidation(
       unitOfWorkPerformer,
@@ -105,7 +105,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
         conventionWithSpecificEstablishementEmail.signatories
           .establishmentRepresentative.email,
         counsellorEmail,
-        conventionWithSpecificEstablishementEmail.mentor.email,
+        conventionWithSpecificEstablishementEmail.establishmentTutor.email,
       ],
       sentEmails[0],
       agency,
@@ -154,7 +154,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
       conventionWithBeneficiaryRepresentative,
     );
   });
-  it("With PeConnect Federated identity: beneficiary, mentor, agency counsellor, and dedicated advisor", async () => {
+  it("With PeConnect Federated identity: beneficiary, establishment tutor, agency counsellor, and dedicated advisor", async () => {
     const userPeExternalId: PeConnectIdentity = `peConnect:i-am-an-external-id`;
     const userConventionAdvisor: ConventionPoleEmploiUserAdvisorEntity = {
       _entityName: "ConventionPoleEmploiAdvisor",
@@ -226,7 +226,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
           application.signatories.beneficiary.emergencyContactPhone,
         dateStart: parseISO(application.dateStart).toLocaleDateString("fr"),
         dateEnd: parseISO(application.dateEnd).toLocaleDateString("fr"),
-        mentorName: `${application.mentor.firstName} ${application.mentor.lastName}`,
+        establishmentTutorName: `${application.establishmentTutor.firstName} ${application.establishmentTutor.lastName}`,
         scheduleText: prettyPrintSchedule(application.schedule).split("\n"),
         businessName: application.businessName,
         immersionAddress: "immersionAddress",

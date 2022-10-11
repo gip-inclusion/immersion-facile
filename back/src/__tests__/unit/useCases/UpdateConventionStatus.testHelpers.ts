@@ -188,7 +188,7 @@ const makeTestAcceptsStatusUpdate =
 
     const hasSignedProperty =
       Object.hasOwn(updatedFields, "beneficiarySignedAt") ||
-      Object.hasOwn(updatedFields, "mentorSignedAt");
+      Object.hasOwn(updatedFields, "establishementRepresentativeSignedAt");
 
     const expectedConvention: ConventionDto = {
       ...originalConvention,

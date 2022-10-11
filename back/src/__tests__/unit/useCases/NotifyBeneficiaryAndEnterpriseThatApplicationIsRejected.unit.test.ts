@@ -36,7 +36,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
     );
   };
 
-  it("Sends rejection email to beneficiary, mentor, and counsellor", async () => {
+  it("Sends rejection email to beneficiary, establishment tutor, and counsellor", async () => {
     await createUseCase().execute(rejectedConvention);
 
     const sentEmails = emailGw.getSentEmails();

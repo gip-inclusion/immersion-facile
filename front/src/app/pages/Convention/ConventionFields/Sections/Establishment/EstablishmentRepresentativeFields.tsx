@@ -1,7 +1,7 @@
 import React from "react";
 import { getConventionFieldName } from "shared";
 import { RadioGroup } from "src/app/components/RadioGroup";
-import { isMentorIsEstablishmentRepresentativeHook } from "src/hooks/convention";
+import { isEstablishmentTutorIsEstablishmentRepresentativeHook } from "src/hooks/convention";
 import { useSiretFetcher } from "src/hooks/siret.hooks";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { useConventionTextsFromFormikContext } from "../../../texts/textSetup";
@@ -17,24 +17,24 @@ export const EstablishmentRepresentativeFields = ({
     shouldFetchEvenIfAlreadySaved: true,
   });
   const {
-    isMentorIsEstablishmentRepresentative,
-    setIsMentorIsEstablishmentRepresentative,
-  } = isMentorIsEstablishmentRepresentativeHook();
+    isEstablishmentTutorIsEstablishmentRepresentative,
+    setIsEstablishmentTutorIsEstablishmentRepresentative,
+  } = isEstablishmentTutorIsEstablishmentRepresentativeHook();
   const t = useConventionTextsFromFormikContext();
   return (
     <>
       <RadioGroup
         id="is-establishmentRepresentative"
         disabled={disabled}
-        currentValue={isMentorIsEstablishmentRepresentative}
-        setCurrentValue={setIsMentorIsEstablishmentRepresentative}
-        groupLabel={`${t.establishment.isMentorIsEstablishmentRepresentative} *`}
+        currentValue={isEstablishmentTutorIsEstablishmentRepresentative}
+        setCurrentValue={setIsEstablishmentTutorIsEstablishmentRepresentative}
+        groupLabel={`${t.establishment.isEstablishmentTutorIsEstablishmentRepresentative} *`}
         options={[
           { label: t.yes, value: true },
           { label: t.no, value: false },
         ]}
       />
-      {!isMentorIsEstablishmentRepresentative && (
+      {!isEstablishmentTutorIsEstablishmentRepresentative && (
         <>
           <TextInput
             label={`${t.establishment.establishmentRepresentative.firstName.label} *`}

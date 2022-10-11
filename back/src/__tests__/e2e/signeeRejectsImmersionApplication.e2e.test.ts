@@ -98,7 +98,7 @@ const expectEstablishmentRequiresChanges = async (
 
   await eventCrawler.processNewEvents();
 
-  // Expect two emails sent (to beneficiary and to mentor)
+  // Expect two emails sent (to beneficiary and to establishment tutor)
   const sentEmails = gateways.email.getSentEmails();
   expect(sentEmails).toHaveLength(4);
   expect(sentEmails.slice(2, 4).map((e) => e.recipients)).toEqual([

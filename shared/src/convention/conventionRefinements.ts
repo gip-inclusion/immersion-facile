@@ -6,7 +6,7 @@ import {
   ConventionStatus,
   InternshipKind,
   maximumCalendarDayByInternshipKind,
-  Mentor,
+  EstablishmentTutor,
   Signatories,
 } from "./convention.dto";
 
@@ -42,14 +42,14 @@ export const getConventionTooLongMessageAndPath = ({
   path: [getConventionFieldName("dateEnd")],
 });
 
-const isMentorEmailUsedByBeneficiaryOrItsRepresentative = (
+const isEstablishmentTutorEmailUsedByBeneficiaryOrItsRepresentative = (
   signatories: Signatories,
-  mentor: Mentor,
+  establishmentTutor: EstablishmentTutor,
 ): boolean => {
-  if (signatories.beneficiary.email === mentor.email) return false;
+  if (signatories.beneficiary.email === establishmentTutor.email) return false;
   if (
     signatories.beneficiaryRepresentative &&
-    signatories.beneficiaryRepresentative.email === mentor.email
+    signatories.beneficiaryRepresentative.email === establishmentTutor.email
   )
     return false;
   return true;
@@ -69,9 +69,9 @@ export const conventionEmailCheck = (
   convention: ConventionDtoWithoutExternalId,
 ): boolean =>
   areSignatoryEmailsUniq(convention.signatories)
-    ? isMentorEmailUsedByBeneficiaryOrItsRepresentative(
+    ? isEstablishmentTutorEmailUsedByBeneficiaryOrItsRepresentative(
         convention.signatories,
-        convention.mentor,
+        convention.establishmentTutor,
       )
     : false;
 

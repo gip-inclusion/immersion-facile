@@ -15,8 +15,8 @@ const logger = createLogger(__filename);
 
 export type ImmersionAssessmentEmailParams = {
   immersionId: ConventionId;
-  mentorName: string;
-  mentorEmail: string;
+  establishmentTutorName: string;
+  establishmentTutorEmail: string;
   beneficiaryFirstName: string;
   beneficiaryLastName: string;
 };

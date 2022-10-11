@@ -14,8 +14,8 @@ const logger = createLogger(__filename);
 
 export type ImmersionAssessmentEmailParams = {
   immersionId: ConventionId;
-  mentorName: string;
-  mentorEmail: string;
+  establishmentTutorName: string;
+  establishmentTutorEmail: string;
   beneficiaryFirstName: string;
   beneficiaryLastName: string;
 };
@@ -75,17 +75,18 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<v
   ) {
     const immersionAssessmentCreationLink = this.generateConventionMagicLink({
       id: immersionAssessmentEmailParams.immersionId,
-      email: immersionAssessmentEmailParams.mentorEmail,
+      email: immersionAssessmentEmailParams.establishmentTutorEmail,
       role: "establishment",
       targetRoute: frontRoutes.immersionAssessment,
     });
 
     await this.emailGateway.sendEmail({
       type: "CREATE_IMMERSION_ASSESSMENT",
-      recipients: [immersionAssessmentEmailParams.mentorEmail],
+      recipients: [immersionAssessmentEmailParams.establishmentTutorEmail],
       params: {
         immersionAssessmentCreationLink,
-        mentorName: immersionAssessmentEmailParams.mentorName,
+        establishmentTutorName:
+          immersionAssessmentEmailParams.establishmentTutorName,
         beneficiaryFirstName:
           immersionAssessmentEmailParams.beneficiaryFirstName,
         beneficiaryLastName: immersionAssessmentEmailParams.beneficiaryLastName,

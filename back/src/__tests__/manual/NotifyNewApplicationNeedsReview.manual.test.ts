@@ -20,7 +20,9 @@ import { NotifyNewApplicationNeedsReview } from "../../domain/convention/useCase
 const validConvention: ConventionDto = new ConventionDtoBuilder()
   .withStatus("IN_REVIEW")
   .withBeneficiaryEmail("jean-francois.macresy@beta.gouv.fr")
-  .withMentorEmail("jean-francois.macresy+mentor@beta.gouv.fr")
+  .withEstablishmentTutorEmail(
+    "jean-francois.macresy+establishmentTutor@beta.gouv.fr",
+  )
   .build();
 
 describe("Notify To 2 Counsellors that an application is available", () => {

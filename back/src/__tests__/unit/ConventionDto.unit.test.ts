@@ -29,10 +29,10 @@ describe("conventionDtoSchema", () => {
     );
   });
 
-  it("rejects equal applicant and mentor emails", () => {
+  it("rejects equal applicant and establishment tutor emails", () => {
     const convention = new ConventionDtoBuilder()
       .withBeneficiaryEmail("demandeur@mail.fr")
-      .withMentorEmail("demandeur@mail.fr")
+      .withEstablishmentTutorEmail("demandeur@mail.fr")
       .build();
 
     expectConventionDtoToBeInvalid(convention);
@@ -58,9 +58,9 @@ describe("conventionDtoSchema", () => {
     expectConventionDtoToBeInvalid(convention2);
   });
 
-  it("rejects when mentorPhone is not a valid number", () => {
+  it("rejects when establishmentTutorPhone is not a valid number", () => {
     const convention = new ConventionDtoBuilder()
-      .withMentorPhone("wrong")
+      .withEstablishementTutorPhone("wrong")
       .build();
 
     expectConventionDtoToBeInvalid(convention);

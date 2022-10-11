@@ -24,7 +24,7 @@ export type EmailVariables = KeysOfUnion<TemplatedEmail["params"]>;
 
 export type TemplatedEmail =
   | NewConventionBeneficiaryConfirmationEmail
-  | NewConventionMentorConfirmationEmail
+  | NewConventionEstablishmentTutorConfirmationEmail
   | NewConventionAgencyNotificationEmail
   | ValidatedConventionFinalConfirmationEmail
   | PoleEmploiAdvisorOnConventionFullySignedEmail
@@ -68,11 +68,11 @@ type NewConventionAgencyNotificationEmail = GenericTemplatedEmail<
   }
 >;
 
-type NewConventionMentorConfirmationEmail = GenericTemplatedEmail<
-  "NEW_CONVENTION_MENTOR_CONFIRMATION",
+type NewConventionEstablishmentTutorConfirmationEmail = GenericTemplatedEmail<
+  "NEW_CONVENTION_ESTABLISHMENT_TUTOR_CONFIRMATION",
   {
     demandeId: string;
-    mentorName: string;
+    establishmentTutorName: string;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
   }
@@ -88,7 +88,7 @@ export type ValidatedConventionFinalConfirmationEmail = GenericTemplatedEmail<
     emergencyContactPhone?: string;
     dateStart: string;
     dateEnd: string;
-    mentorName: string;
+    establishmentTutorName: string;
     establishmentRepresentativeName: string;
     scheduleText: string[];
     businessName: string;
@@ -183,7 +183,7 @@ type SendRenewedMagicLinkEmail = GenericTemplatedEmail<
 >;
 
 type SignedByOtherPartyNotificationEmail = GenericTemplatedEmail<
-  "BENEFICIARY_OR_MENTOR_ALREADY_SIGNED_NOTIFICATION",
+  "BENEFICIARY_OR_ESTABLISHMENT_REPRESENTATIVE_ALREADY_SIGNED_NOTIFICATION",
   {
     magicLink: string;
     existingSignatureName: string;
@@ -191,7 +191,7 @@ type SignedByOtherPartyNotificationEmail = GenericTemplatedEmail<
     beneficiaryLastName: string;
     immersionProfession: string;
     businessName: string;
-    mentor: string;
+    establishmentRepresentative: string;
   }
 >;
 
@@ -285,7 +285,7 @@ type CreatImmersionAssessmentEmail = GenericTemplatedEmail<
   {
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
-    mentorName: string;
+    establishmentTutorName: string;
     immersionAssessmentCreationLink: string;
   }
 >;

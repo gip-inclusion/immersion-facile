@@ -64,21 +64,21 @@ describe("Convention Form", () => {
         ).type("Entreprise de test");
       },
     );
-    cy.get(getIdFromConventionDTO("signatories.mentor.firstName"))
+    cy.get(getIdFromConventionDTO("establishmentTutor.firstName"))
       .clear()
       .type("Jean");
-    cy.get(getIdFromConventionDTO("signatories.mentor.lastName"))
+    cy.get(getIdFromConventionDTO("establishmentTutor.lastName"))
       .clear()
       .type("Bono");
-    cy.get(getIdFromConventionDTO("signatories.mentor.job"))
+    cy.get(getIdFromConventionDTO("establishmentTutor.job"))
       .clear()
       .type("Développeur web");
-    cy.get(getIdFromConventionDTO("signatories.mentor.phone"))
+    cy.get(getIdFromConventionDTO("establishmentTutor.phone"))
       .clear()
       .type("0836656565");
-    cy.get(getIdFromConventionDTO("signatories.mentor.email"))
+    cy.get(getIdFromConventionDTO("establishmentTutor.email"))
       .clear()
-      .type("mentor@example.com");
+      .type("establishmentTutor@example.com");
     cy.get(getIdFromConventionDTO("dateStart")).clear().type("2022-09-22");
     cy.get(getIdFromConventionDTO("dateEnd")).clear().type("2022-10-22");
     cy.get("#address-autocomplete")

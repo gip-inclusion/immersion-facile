@@ -68,8 +68,8 @@ export class InMemoryConventionQueries implements ConventionQueries {
 
         return {
           immersionId: convention.id,
-          mentorName: `${convention.mentor.firstName} ${convention.mentor.lastName}`,
-          mentorEmail: convention.mentor.email,
+          establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
+          establishmentTutorEmail: convention.establishmentTutor.email,
           beneficiaryFirstName: beneficiary.firstName,
           beneficiaryLastName: beneficiary.lastName,
         };

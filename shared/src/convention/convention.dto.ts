@@ -67,7 +67,7 @@ export type ConventionDtoWithoutExternalId = {
   immersionSkills: string;
   internshipKind: InternshipKind;
   signatories: Signatories;
-  mentor: Mentor;
+  establishmentTutor: EstablishmentTutor;
 };
 
 export type Signatories = {
@@ -110,7 +110,9 @@ export type EstablishmentRepresentative = GenericSignatory<
   "establishment" | "establishment-representative"
 >;
 
-export type Mentor = GenericActor<"establishment" | "establishment-mentor"> & {
+export type EstablishmentTutor = GenericActor<
+  "establishment" | "establishment-tutor"
+> & {
   job: string;
 };
 

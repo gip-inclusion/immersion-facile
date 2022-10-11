@@ -4,7 +4,7 @@ import { ConventionId, ConventionReadDto, conventionReadSchema } from "shared";
 export const selectAllConventionDtosById = `
 WITH 
   beneficiaries AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = beneficiary_id),
-  mentors AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = mentor_id),
+  establishmentTutors AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = establishment_tutor_id),
   beneficiaryRepresentative AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = beneficiary_representative_id),
   establishmentRepresentative AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = establishment_representative_id),
   formated_signatories AS (
@@ -77,21 +77,20 @@ SELECT
       'immersionActivities', immersion_activities,
       'immersionSkills', immersion_skills,
       'internshipKind', internship_kind,
-      'mentor' , JSON_BUILD_OBJECT(
-        'role', 'establishment-mentor',
-        'firstName', m.first_name,
-        'lastName', m.last_name,
-        'email', m.email,
-        'phone', m.phone,
-        'signedAt', date_to_iso(m.signed_at),
-        'job', m.extra_fields ->> 'job'
+      'establishmentTutor' , JSON_BUILD_OBJECT(
+        'role', 'establishment-tutor',
+        'firstName', et.first_name,
+        'lastName', et.last_name,
+        'email', et.email,
+        'phone', et.phone,
+        'job', et.extra_fields ->> 'job'
       )
     )
   ) AS dto
 
 FROM 
 conventions LEFT JOIN formated_signatories ON formated_signatories.convention_id = conventions.id
-LEFT JOIN mentors as m ON conventions.id = m.convention_id
+LEFT JOIN establishmentTutors as et ON conventions.id = et.convention_id
 LEFT JOIN view_appellations_dto AS vad ON vad.appellation_code = conventions.immersion_appellation
 LEFT JOIN convention_external_ids AS cei ON cei.convention_id = conventions.id
 LEFT JOIN agencies ON agencies.id = conventions.agency_id

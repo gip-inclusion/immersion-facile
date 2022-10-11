@@ -75,7 +75,7 @@ export const immersionTexts = {
       "Les questions suivantes doivent être complétées avec la personne qui vous accueillera pendant votre immersion",
     businessNameLabel:
       "Indiquez le nom (raison sociale) de l'établissement d'accueil",
-    mentor: {
+    establishmentTutor: {
       firstName: {
         label: "Indiquez le prénom du tuteur",
         description: "Ex : Alain",
@@ -100,8 +100,8 @@ export const immersionTexts = {
         description: "pour qu’on puisse vous contacter à propos de l’immersion",
       },
     },
-    isMentorIsEstablishmentRepresentative:
-      "Est-ce que le mentor est le représentant de l'entreprise?",
+    isEstablishmentTutorIsEstablishmentRepresentative:
+      "Est-ce que le tuteur de l'entreprise est le représentant de l'entreprise?",
     establishmentRepresentative: {
       firstName: {
         label: "Indiquez le prénom du représentant de l'entreprise",

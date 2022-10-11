@@ -9,7 +9,7 @@ import {
   ConventionReadDto,
   EstablishmentRepresentative,
   keys,
-  Mentor,
+  EstablishmentTutor,
   path,
   prettyPrintSchedule,
 } from "shared";
@@ -18,7 +18,7 @@ import { TextCell } from "./TextCell";
 
 type ConventionField =
   | keyof ConventionReadDto
-  | `mentor.${keyof Mentor}`
+  | `establishmentTutor.${keyof EstablishmentTutor}`
   | `signatories.beneficiary.${keyof Beneficiary}`
   | `signatories.beneficiaryRepresentative.${keyof BeneficiaryRepresentative}`
   | `signatories.establishmentRepresentative.${keyof EstablishmentRepresentative}`;
@@ -36,12 +36,12 @@ const agencyFields: FieldsToLabel = {
   dateValidation: "Date de validation",
 };
 
-const mentorFields: FieldsToLabel = {
-  "mentor.email": "Mail du tuteur",
-  "mentor.phone": "Numéro de téléphone du tuteur",
-  "mentor.firstName": "Prénom",
-  "mentor.lastName": "Nom",
-  "mentor.job": "Poste",
+const establishmentTutorFields: FieldsToLabel = {
+  "establishmentTutor.email": "Mail du tuteur",
+  "establishmentTutor.phone": "Numéro de téléphone du tuteur",
+  "establishmentTutor.firstName": "Prénom",
+  "establishmentTutor.lastName": "Nom",
+  "establishmentTutor.job": "Poste",
 };
 
 const candidateFields: FieldsToLabel = {
@@ -86,7 +86,7 @@ type FieldsAndTitle = {
 const allFields: FieldsAndTitle[] = [
   { listTitle: "Bénéficiaire", fields: candidateFields },
   { listTitle: "Représentant légal", fields: beneficiaryRepresentativeFields },
-  { listTitle: "Tuteur", fields: mentorFields },
+  { listTitle: "Tuteur", fields: establishmentTutorFields },
   { listTitle: "Entreprise", fields: enterpriseFields },
   { listTitle: "Immersion", fields: immersionFields },
   { listTitle: "Agence", fields: agencyFields },

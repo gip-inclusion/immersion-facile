@@ -57,9 +57,9 @@ export class NotifyAllActorsOfFinalApplicationValidation extends TransactionalUs
     ];
     if (
       convention.signatories.establishmentRepresentative.email !==
-      convention.mentor.email
+      convention.establishmentTutor.email
     )
-      recipients.push(convention.mentor.email);
+      recipients.push(convention.establishmentTutor.email);
 
     await this.emailGateway.sendEmail({
       type: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
@@ -93,7 +93,7 @@ export const getValidatedApplicationFinalConfirmationParams = (
     emergencyContactPhone: beneficiary.emergencyContactPhone,
     dateStart: parseISO(dto.dateStart).toLocaleDateString("fr"),
     dateEnd: parseISO(dto.dateEnd).toLocaleDateString("fr"),
-    mentorName: `${dto.mentor.firstName} ${dto.mentor.lastName}`,
+    establishmentTutorName: `${dto.establishmentTutor.firstName} ${dto.establishmentTutor.lastName}`,
     establishmentRepresentativeName: `${establishmentRepresentative.firstName} ${establishmentRepresentative.lastName}`,
     scheduleText: prettyPrintSchedule(dto.schedule).split("\n"),
     businessName: dto.businessName,

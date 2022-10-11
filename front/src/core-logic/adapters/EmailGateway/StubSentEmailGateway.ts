@@ -30,7 +30,7 @@ export class StubSentEmailGateway implements StubSentEmailGateway {
           params: {
             beneficiaryFirstName: "Charlotte",
             beneficiaryLastName: "Grondin",
-            mentorName: "Erika Grandjean",
+            establishmentTutorName: "Erika Grandjean",
             immersionAssessmentCreationLink: "http://immersion/dsndjedfdj",
           },
         },

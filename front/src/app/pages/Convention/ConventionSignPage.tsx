@@ -113,9 +113,9 @@ export const ConventionSignPage = ({ route }: SignFormProps) => {
         <div className="p-5">
           <Notification title="Utilisateur incorrect" type="error">
             <p>
-              Seul le bénéficiaire ou le mentor peuvent signer la convention. Le
-              lien que vous avez utilisé n'est destiné ni à un bénéficiaire ni à
-              un tuteur.
+              Seul le bénéficiaire ou le responsable d'entreprise peuvent signer
+              la convention. Le lien que vous avez utilisé n'est destiné ni à un
+              bénéficiaire ni à un tuteur.
             </p>
             <p>
               N'hésitez pas à nous contacter pour nous signaler comment ce lien

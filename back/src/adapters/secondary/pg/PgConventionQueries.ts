@@ -46,16 +46,16 @@ export class PgConventionQueries implements ConventionQueries {
       format(
         `
         WITH beneficiaries AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = beneficiary_id),
-             mentors AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = mentor_id)
+          establishmentTutors AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = establishment_tutor_id)
         SELECT JSON_BUILD_OBJECT(
               'immersionId', conventions.id, 
               'beneficiaryFirstName', beneficiaries.first_name, 
               'beneficiaryLastName', beneficiaries.last_name,
-              'mentorName', CONCAT(mentors.first_name, ' ', mentors.last_name), 
-              'mentorEmail', mentors.email) AS params
+              'establishmentTutorName', CONCAT(establishmentTutors.first_name, ' ', establishmentTutors.last_name), 
+              'establishmentTutorEmail', establishmentTutors.email) AS params
        FROM conventions 
        LEFT JOIN beneficiaries ON beneficiaries.convention_id = conventions.id
-       LEFT JOIN mentors ON mentors.convention_id = conventions.id
+       LEFT JOIN establishmentTutors ON establishmentTutors.convention_id = conventions.id
        WHERE date_end::date = $1
        AND status IN (%1$L)
        AND conventions.id NOT IN (SELECT (payload ->> 'id')::uuid FROM outbox where topic = 'EmailWithLinkToCreateAssessmentSent' )`,

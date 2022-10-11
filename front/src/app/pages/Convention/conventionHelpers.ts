@@ -94,13 +94,13 @@ export const conventionInitialValuesFromUrl = ({
     id: uuidV4(),
     status: "DRAFT" as ConventionStatus,
     dateSubmission: toDateString(startOfToday()),
-    mentor: {
-      role: "establishment-mentor",
-      firstName: params.mentorFirstName ?? "",
-      lastName: params.mentorLastName ?? "",
-      email: params.mentorEmail ?? "",
-      phone: params.mentorPhone ?? "",
-      job: params.mentorJob ?? "",
+    establishmentTutor: {
+      role: "establishment-tutor",
+      firstName: params.establishmentTutorFirstName ?? "",
+      lastName: params.establishmentTutorLastName ?? "",
+      email: params.establishmentTutorEmail ?? "",
+      phone: params.establishmentTutorPhone ?? "",
+      job: params.establishmentTutorJob ?? "",
     },
     signatories: {
       beneficiary: {
@@ -117,10 +117,10 @@ export const conventionInitialValuesFromUrl = ({
       },
       establishmentRepresentative: {
         role: "establishment-representative",
-        firstName: params.mentorFirstName ?? "",
-        lastName: params.mentorLastName ?? "",
-        email: params.mentorEmail ?? "",
-        phone: params.mentorPhone ?? "",
+        firstName: params.establishmentRepresentativeFirstName ?? "",
+        lastName: params.establishmentRepresentativeLastName ?? "",
+        email: params.establishmentRepresentativeEmail ?? "",
+        phone: params.establishmentRepresentativePhone ?? "",
       },
       beneficiaryRepresentative: areBeneficiaryRepresentativeFieldPresent
         ? {
@@ -200,9 +200,13 @@ const devPrefilledValues = (
       establishmentRepresentative: {
         role: "establishment",
         firstName: establishmentRepresentative.firstName || "Joe",
-        lastName: establishmentRepresentative.lastName || "Le mentor",
+        lastName:
+          establishmentRepresentative.lastName ||
+          "Le représentant de l'entreprise",
         phone: establishmentRepresentative.phone || "0101100110",
-        email: establishmentRepresentative.email || "mentor@supermentor.fr",
+        email:
+          establishmentRepresentative.email ||
+          "establishmentRepresentative@superbusiness.fr",
       },
       beneficiaryRepresentative,
     },

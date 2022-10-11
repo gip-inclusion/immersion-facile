@@ -30,7 +30,7 @@ import {
   GenerateMagicLinkResponseDto,
   BeneficiaryRepresentative,
   ListConventionsRequestDto,
-  Mentor,
+  EstablishmentTutor,
   RenewMagicLinkRequestDto,
   UpdateConventionRequestDto,
   UpdateConventionStatusRequestDto,
@@ -72,12 +72,13 @@ const beneficiarySchema: z.Schema<Beneficiary> = signatorySchema.merge(
   }),
 );
 
-const mentorSchema: z.Schema<Mentor> = signatorySchema.merge(
-  z.object({
-    role: z.enum(["establishment-mentor", "establishment"]),
-    job: zStringPossiblyEmpty,
-  }),
-);
+const establishmentTutorSchema: z.Schema<EstablishmentTutor> =
+  signatorySchema.merge(
+    z.object({
+      role: z.enum(["establishment-tutor", "establishment"]),
+      job: zStringPossiblyEmpty,
+    }),
+  );
 
 const establishmentRepresentativeSchema: z.Schema<EstablishmentRepresentative> =
   signatorySchema.merge(
@@ -130,7 +131,7 @@ const conventionWithoutExternalIdZObject = z.object({
     establishmentRepresentative: establishmentRepresentativeSchema,
     beneficiaryRepresentative: beneficiaryRepresentativeSchema.optional(),
   }),
-  mentor: mentorSchema,
+  establishmentTutor: establishmentTutorSchema,
 });
 
 export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExternalId> =
@@ -143,7 +144,7 @@ export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExt
     .refine(conventionEmailCheck, {
       message: "Votre adresse e-mail doit être différente de celle du tuteur",
       path: [
-        getConventionFieldName("mentor.email"),
+        getConventionFieldName("establishmentTutor.email"),
         getConventionFieldName("signatories.beneficiary.email"),
       ],
     })
@@ -163,7 +164,7 @@ export const conventionSchema: z.Schema<ConventionDto> =
     .refine(conventionEmailCheck, {
       message: "Les emails doivent être différents.",
       path: [
-        getConventionFieldName("mentor.email"),
+        getConventionFieldName("establishmentTutor.email"),
         getConventionFieldName("signatories.beneficiaryRepresentative.email"),
         getConventionFieldName("signatories.beneficiary.email"),
         getConventionFieldName("signatories.establishmentRepresentative.email"),
@@ -190,7 +191,7 @@ export const conventionReadSchema: z.Schema<ConventionReadDto> =
     .refine(conventionEmailCheck, {
       message: "Les emails doivent être différents.",
       path: [
-        getConventionFieldName("mentor.email"),
+        getConventionFieldName("establishmentTutor.email"),
         getConventionFieldName("signatories.beneficiaryRepresentative.email"),
         getConventionFieldName("signatories.beneficiary.email"),
         getConventionFieldName("signatories.establishmentRepresentative.email"),
