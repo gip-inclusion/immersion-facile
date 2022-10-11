@@ -11,7 +11,7 @@
     "serve": "vite preview",
     "typecheck": "tsc --noEmit",
     "includecheck": "./check_includes.sh",
-    "format": "pnpm -w prettier:glob --write ./front/src",
+    "prettier": "pnpm -w prettier:glob --write ./front/src",
     "format:check": "pnpm -w prettier:glob --check ./front/src",
     "lint": "pnpm -w lintconfig:glob ./front/src",
     "fullcheck": "pnpm -w fullcheck --filter=front"

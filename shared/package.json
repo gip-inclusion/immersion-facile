@@ -6,6 +6,7 @@
     "includecheck": "./check_includes.sh",
     "format:check": "pnpm -w prettier:glob --check ./shared/src",
     "lint": "pnpm -w lintconfig:glob ./shared/src",
+    "prettier": "pnpm -w prettier:glob --write ./front/src",
     "typecheck": "tsc --noEmit",
     "test": "jest --testRegex=.unit.test.ts",
     "fullcheck": "pnpm -w fullcheck --filter=shared"
