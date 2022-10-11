@@ -1,6 +1,6 @@
 import React from "react";
-import { AgencyDisplay } from "src/app/components/AgencyDisplay";
-import { AgencySelector } from "src/app/components/AgencySelector";
+import { AgencyDisplay } from "src/app/components/agency/AgencyDisplay";
+import { AgencySelector } from "src/app/components/agency/AgencySelector";
 import { FormSectionTitle } from "src/uiComponents/FormSectionTitle";
 import { useConventionTextsFromFormikContext } from "../../texts/textSetup";
 

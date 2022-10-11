@@ -17,7 +17,7 @@ import {
 import { HttpExcelExportGateway } from "src/core-logic/adapters/ExcelExportGateway/HttpExcelExportGateway";
 import { useAdminToken } from "src/hooks/useAdminToken";
 import { WithBackground } from "src/uiComponents/admin/WithBackground";
-import "./Admin.css";
+import "./admin.css";
 
 // TODO Mettre dans les dépendances ?
 export const excelExportGateway = new HttpExcelExportGateway(

@@ -97,6 +97,8 @@ describe("PgAgencyRepository", () => {
   });
 
   describe("getAgencies", () => {
+    // TODO Casser le découplage
+
     const agency1PE = agency1builder.withKind("pole-emploi").build();
     const agency2MissionLocale = agency2builder
       .withKind("mission-locale")
@@ -107,10 +109,26 @@ describe("PgAgencyRepository", () => {
       .withStatus("from-api-PE")
       .build();
 
+    const agenciesByName = [
+      AgencyDtoBuilder.empty()
+        .withId("22222222-2222-2222-2222-222222222222")
+        .withName("Agence Pôle emploi VITRY‐SUR‐SEINE")
+        .build(),
+      AgencyDtoBuilder.empty()
+        .withId("33333333-3333-3333-3333-333333333333")
+        .withName("Agence Pôle emploi VITRY-LE-FRANCOIS")
+        .build(),
+      AgencyDtoBuilder.empty()
+        .withId("44444444-4444-4444-4444-444444444444")
+        .withName("Agence Pôle emploi VITROLLES")
+        .build(),
+    ];
+
     it("returns empty list for empty table", async () => {
       const agencies = await agencyRepository.getAgencies({});
       expect(agencies).toEqual([]);
     });
+
     it("returns all agencies filtered on statuses", async () => {
       await Promise.all([
         agencyRepository.insert(agency1PE),
@@ -155,6 +173,21 @@ describe("PgAgencyRepository", () => {
         filters: { kind: "peOnly" },
       });
       expect(sortById(agencies)).toEqual([agency1PE]);
+    });
+
+    it("returns all agencies filtered by name", async () => {
+      await Promise.all([
+        agencyRepository.insert(agenciesByName[0]),
+        agencyRepository.insert(agenciesByName[1]),
+        agencyRepository.insert(agenciesByName[2]),
+      ]);
+      const agencies = await agencyRepository.getAgencies({
+        filters: { name: "Vitry" },
+      });
+      expect(sortById(agencies)).toEqual([
+        agenciesByName[0],
+        agenciesByName[1],
+      ]);
     });
   });
 

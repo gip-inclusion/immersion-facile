@@ -9,8 +9,11 @@ export const agenciesSlice = createSlice({
   name: "agencies",
   initialState,
   reducers: {
-    fetchAgenciesRequested: (state, _action: PayloadAction<string>) => state,
-    fetchAgenciesSucceeded: (
+    fetchAgenciesByDepartmentCodeRequested: (
+      state,
+      _action: PayloadAction<string>,
+    ) => state,
+    fetchAgenciesByDepartmentCodeSucceeded: (
       _state,
       action: PayloadAction<AgencyIdAndName[]>,
     ) => action.payload,

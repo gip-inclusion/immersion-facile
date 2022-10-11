@@ -1,4 +1,7 @@
 import React from "react";
+import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
+
+export type AgencySubmitFeedback = SubmitFeedBack<SuccessFeedbackKindAgency>;
 
 export type SuccessFeedbackKindAgency = "agencyAdded";
 

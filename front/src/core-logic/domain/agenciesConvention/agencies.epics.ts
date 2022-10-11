@@ -9,17 +9,19 @@ import { agenciesSlice } from "./agencies.slice";
 
 type AgencyAction = ActionOfSlice<typeof agenciesSlice>;
 
-const getAgenciesUseCase: AppEpic<AgencyAction> = (
+const getAgenciesByDepartmentCodeEpic: AppEpic<AgencyAction> = (
   action$,
   _state$,
   dependencies,
 ) =>
   action$.pipe(
-    filter(agenciesSlice.actions.fetchAgenciesRequested.match),
+    filter(agenciesSlice.actions.fetchAgenciesByDepartmentCodeRequested.match),
     switchMap((action: PayloadAction<string>) =>
-      dependencies.agencyGateway.listAgencies$(action.payload),
+      dependencies.agencyGateway.listAgenciesByFilter$({
+        departmentCode: action.payload,
+      }),
     ),
-    map(agenciesSlice.actions.fetchAgenciesSucceeded),
+    map(agenciesSlice.actions.fetchAgenciesByDepartmentCodeSucceeded),
   );
 
-export const agenciesEpics = [getAgenciesUseCase];
+export const agenciesEpics = [getAgenciesByDepartmentCodeEpic];

@@ -3,7 +3,7 @@ import { AbsoluteUrl } from "shared";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { adminGateway } from "src/app/config/dependencies";
 import { useAdminToken } from "src/hooks/useAdminToken";
-import "./Admin.css";
+import "./admin.css";
 
 export const MetabaseTab = () => {
   const [iframeUrl, setIFrameUrl] = useState<AbsoluteUrl>("https://plip");

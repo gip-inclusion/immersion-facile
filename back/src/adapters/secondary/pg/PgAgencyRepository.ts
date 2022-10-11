@@ -17,6 +17,8 @@ import { optional } from "./pgUtils";
 
 const logger = createLogger(__filename);
 
+const MAX_AGENCIES_RETURNED = 100;
+
 type AgencyColumns =
   | "admin_emails"
   | "agency_siret"
@@ -47,6 +49,11 @@ const makeAgencyKindFiterSQL = (
     : "kind != 'pole-emploi'";
 };
 
+const makeNameFilterSQL = (name?: string): string | undefined => {
+  if (!name) return;
+  return format("name ILIKE '%' || %1$L || '%'", name);
+};
+
 const makeDepartmentCodeFilterSQL = (
   departmentCode?: DepartmentCode,
 ): string | undefined => {
@@ -65,7 +72,7 @@ const makePositionFiterSQL = (
   )}, position) <= ${positionFilter.distance_km * 1000}`;
 };
 
-const makeStatusFiterSQL = (
+const makeStatusFilterSQL = (
   statusFilter?: AgencyStatus[],
 ): string | undefined => {
   if (!statusFilter) return;
@@ -84,14 +91,18 @@ export class PgAgencyRepository implements AgencyRepository {
   }): Promise<AgencyDto[]> {
     const filtersSQL = [
       makeDepartmentCodeFilterSQL(filters.departmentCode),
+      makeNameFilterSQL(filters.name),
       makeAgencyKindFiterSQL(filters.kind),
       makePositionFiterSQL(filters.position),
-      makeStatusFiterSQL(filters.status),
+      makeStatusFilterSQL(filters.status),
     ].filter((clause) => !!clause);
 
     const whereClause =
       filtersSQL.length > 0 ? `WHERE ${filtersSQL.join(" AND ")}` : "";
-    const limitClause = limit ? `LIMIT ${limit}` : "";
+    const limitClause = `LIMIT ${Math.min(
+      limit ?? MAX_AGENCIES_RETURNED,
+      MAX_AGENCIES_RETURNED,
+    )}`;
     const sortClause = filters.position
       ? `ORDER BY ST_Distance(${STPointStringFromPosition(
           filters.position.position,

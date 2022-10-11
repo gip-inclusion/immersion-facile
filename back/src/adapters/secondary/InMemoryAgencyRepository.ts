@@ -131,6 +131,7 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     const filterPredicate = (agency: AgencyDto) =>
       ![
         agencyHasDepartmentCode(agency, filters?.departmentCode),
+        agencyHasName(agency, filters?.name),
         agencyIsOfKind(agency, filters?.kind),
         agencyIsOfPosition(agency, filters?.position),
         agencyIsOfStatus(agency, filters?.status),
@@ -231,6 +232,11 @@ const agencyHasDepartmentCode = (
 ): boolean => {
   if (!departmentCode) return true;
   return departmentCode === agency.address.departmentCode;
+};
+
+const agencyHasName = (agency: AgencyDto, name?: string): boolean => {
+  if (!name) return true;
+  return agency.name.toLowerCase().includes(name.toLowerCase());
 };
 
 const agencyIsOfPosition = (

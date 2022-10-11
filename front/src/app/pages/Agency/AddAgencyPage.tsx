@@ -15,16 +15,15 @@ import {
   zEmail,
 } from "shared";
 import {
+  AgencySubmitFeedback,
   agencySubmitMessageByKind,
-  SuccessFeedbackKindAgency,
-} from "src/app/components/AgencySubmitFeedback";
+} from "src/app/components/agency/AgencySubmitFeedback";
 import { RadioGroup } from "src/app/components/RadioGroup";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { UploadLogo } from "src/app/components/UploadLogo";
 import { agencyGateway } from "src/app/config/dependencies";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
-import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
 import { AddressAutocomplete } from "src/uiComponents/autocomplete/AddressAutocomplete";
 import { FillableList } from "src/uiComponents/form/FillableList";
 import { SimpleSelect } from "src/uiComponents/form/SimpleSelect";
@@ -62,8 +61,6 @@ type MakeTypedSetField = (setFieldValue: FormikHelpers<CreateAgencyDto>["setFiel
 const makeTypedSetField: MakeTypedSetField =
   (setFieldValue) => (fieldName) => (fieldValue) =>
     setFieldValue(fieldName, fieldValue);
-
-type AgencySubmitFeedback = SubmitFeedBack<SuccessFeedbackKindAgency>;
 
 export const AddAgencyPage = () => {
   const [submitFeedback, setSubmitFeedback] = useState<AgencySubmitFeedback>({

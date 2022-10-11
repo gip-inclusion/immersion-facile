@@ -13,10 +13,11 @@ import {
   AgencyPublicDisplayDto,
   agencyPublicDisplaySchema,
   agencyPublicInfoByIdRoute,
+  agencySchema,
   AgencyStatus,
   CreateAgencyDto,
   DepartmentCode,
-  ListAgenciesByDepartmentCodeRequestDto,
+  ListAgenciesRequestDto,
   UpdateAgencyRequestDto,
   WithAgencyId,
 } from "shared";
@@ -34,6 +35,26 @@ export class HttpAgencyGateway implements AgencyGateway {
         return typeof agencyIdResponse === "string" ? agencyIdResponse : false;
       }),
     );
+  }
+
+  public getAgencyAdminById$(
+    agencyId: AgencyId,
+    adminToken: AdminToken,
+  ): Observable<AgencyDto> {
+    return from(this.getAdminAgencyById(agencyId, adminToken));
+  }
+
+  private async getAdminAgencyById(
+    agencyId: AgencyId,
+    adminToken: AdminToken,
+  ): Promise<AgencyDto> {
+    const response = await this.httpClient.get<unknown>(
+      `/admin/${agenciesRoute}/${agencyId}`,
+      {
+        headers: { authorization: adminToken },
+      },
+    );
+    return agencySchema.parse(response.data);
   }
 
   public async addAgency(createAgencyParams: CreateAgencyDto): Promise<void> {
@@ -56,43 +77,39 @@ export class HttpAgencyGateway implements AgencyGateway {
     return agencyPublicDisplayDto;
   }
 
-  public listAgencies(
+  public listAgenciesByDepartmentCode(
     departmentCode: DepartmentCode,
   ): Promise<AgencyIdAndName[]> {
-    const request: ListAgenciesByDepartmentCodeRequestDto = {
+    const request: ListAgenciesRequestDto = {
       departmentCode,
     };
-    return this.getAgencies(request);
+    return this.getFilteredAgencies(request);
   }
 
-  public listAgencies$(
-    departmentCode: DepartmentCode,
+  public listAgenciesByFilter$(
+    filter: ListAgenciesRequestDto,
   ): Observable<AgencyIdAndName[]> {
-    const request: ListAgenciesByDepartmentCodeRequestDto = {
-      departmentCode,
-    };
-
-    return from(this.getAgencies(request));
+    return from(this.getFilteredAgencies(filter));
   }
 
   public listPeAgencies(
     departmentCode: DepartmentCode,
   ): Promise<AgencyIdAndName[]> {
-    const request: ListAgenciesByDepartmentCodeRequestDto = {
+    const request: ListAgenciesRequestDto = {
       departmentCode,
       filter: "peOnly",
     };
-    return this.getAgencies(request);
+    return this.getFilteredAgencies(request);
   }
 
   public listNonPeAgencies(
     departmentCode: DepartmentCode,
   ): Promise<AgencyIdAndName[]> {
-    const request: ListAgenciesByDepartmentCodeRequestDto = {
+    const request: ListAgenciesRequestDto = {
       departmentCode,
       filter: "peExcluded",
     };
-    return this.getAgencies(request);
+    return this.getFilteredAgencies(request);
   }
 
   // TODO Mieux identifier l'admin
@@ -127,8 +144,8 @@ export class HttpAgencyGateway implements AgencyGateway {
     );
   }
 
-  private async getAgencies(
-    request: ListAgenciesByDepartmentCodeRequestDto,
+  private async getFilteredAgencies(
+    request: ListAgenciesRequestDto,
   ): Promise<AgencyIdAndName[]> {
     const response = await this.httpClient.get<unknown>(`/${agenciesRoute}`, {
       params: request,

@@ -11,7 +11,7 @@ const getAgenciesUseCase = (
   action$.pipe(
     filter(agenciesSlice.actions.fetchAgenciesRequested.match),
     switchMap((action: PayloadAction<string>) =>
-      dependencies.agencyGateway.listAgencies$(action.payload),
+      dependencies.agencyGateway.listAgenciesByDepartmentCode$(action.payload),
     ),
     map(agenciesSlice.actions.fetchAgenciesSucceeded),
   );
@@ -36,8 +36,11 @@ export const agenciesSlice = createSlice({
   name: "agencies",
   initialState,
   reducers: {
-    fetchAgenciesRequested: (state, _action: PayloadAction<string>) => state,
-    fetchAgenciesSucceeded: (
+    fetchAgenciesByDepartmentCodeRequested: (
+      state,
+      _action: PayloadAction<string>,
+    ) => state,
+    fetchAgenciesByDepartmentCodeSucceeded: (
       _state,
       action: PayloadAction<AgencyIdAndName[]>,
     ) => action.payload,

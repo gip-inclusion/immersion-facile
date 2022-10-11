@@ -1,5 +1,5 @@
 import { keys } from "ramda";
-import { ApiConsumerId, SiretDto, sleep } from "shared";
+import { AgencyId, ApiConsumerId, SiretDto, sleep } from "shared";
 import { DepartmentCodeFromPostcode } from "../../../domain/address/useCases/DepartmentCodeFromPostCode";
 import { LookupStreetAddress } from "../../../domain/address/useCases/LookupStreetAddress";
 import {
@@ -10,7 +10,6 @@ import { ExportData } from "../../../domain/backoffice/useCases/ExportData";
 import { SetFeatureFlag } from "../../../domain/backoffice/useCases/SetFeatureFlag";
 import { AddConvention } from "../../../domain/convention/useCases/AddConvention";
 import { AddAgency } from "../../../domain/convention/useCases/agencies/AddAgency";
-import { ListAgenciesByDepartmentCode } from "../../../domain/convention/useCases/agencies/ListAgenciesByDepartmentCode";
 import { PrivateListAgencies } from "../../../domain/convention/useCases/agencies/PrivateListAgencies";
 import { UpdateAgency } from "../../../domain/convention/useCases/agencies/UpdateAgency";
 import { BroadcastToPoleEmploiOnConventionUpdates } from "../../../domain/convention/useCases/broadcast/BroadcastToPoleEmploiOnConventionUpdates";
@@ -18,6 +17,7 @@ import { CreateImmersionAssessment } from "../../../domain/convention/useCases/C
 import { GenerateMagicLink } from "../../../domain/convention/useCases/GenerateMagicLink";
 import { GetAgencyPublicInfoById } from "../../../domain/convention/useCases/GetAgencyPublicInfoById";
 import { GetConvention } from "../../../domain/convention/useCases/GetConvention";
+import { ListAgenciesByFilter } from "../../../domain/convention/useCases/ListAgenciesByFilter";
 
 import { ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/convention/useCases/notifications/ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature";
 import { DeliverRenewedMagicLink } from "../../../domain/convention/useCases/notifications/DeliverRenewedMagicLink";
@@ -222,9 +222,7 @@ export const createUseCases = (
       romeSearch: new RomeSearch(uowPerformer),
 
       // agencies
-      listAgenciesByDepartmentCode: new ListAgenciesByDepartmentCode(
-        uowPerformer,
-      ),
+      listAgenciesByFilter: new ListAgenciesByFilter(uowPerformer),
       privateListAgencies: new PrivateListAgencies(uowPerformer),
       getAgencyPublicInfoById: new GetAgencyPublicInfoById(uowPerformer),
       sendEmailWhenAgencyIsActivated: new SendEmailWhenAgencyIsActivated(
@@ -302,6 +300,8 @@ export const createUseCases = (
         uowPerformer.perform((uow) => uow.featureFlagRepository.getAll()),
       getApiConsumerById: (id: ApiConsumerId) =>
         uowPerformer.perform((uow) => uow.getApiConsumersById(id)),
+      getAgencyById: (id: AgencyId) =>
+        uowPerformer.perform((uow) => uow.agencyRepository.getById(id)),
       isFormEstablishmentWithSiretAlreadySaved: (siret: SiretDto) =>
         uowPerformer.perform((uow) =>
           uow.establishmentAggregateRepository.hasEstablishmentFromFormWithSiret(

@@ -21,7 +21,7 @@ describe("Agencies in store", () => {
     expectToEqual(agenciesSelector(store.getState()), expected);
   });
 
-  it("retrieves agencies from API and store in state", () => {
+  it("retrieves agencies from API by department code and store in state", () => {
     // Arrange
     const agenciesFromApi: AgencyIdAndName[] = [
       {
@@ -34,7 +34,9 @@ describe("Agencies in store", () => {
 
     // Execute
     store.dispatch(
-      agenciesSlice.actions.fetchAgenciesRequested(departementCode),
+      agenciesSlice.actions.fetchAgenciesByDepartmentCodeRequested(
+        departementCode,
+      ),
     );
     dependencies.agencyGateway.agencies$.next(agenciesFromApi);
 

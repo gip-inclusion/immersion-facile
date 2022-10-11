@@ -13,7 +13,7 @@ import {
   AgencyPublicDisplayDto,
   allAgencyStatuses,
   CreateAgencyDto,
-  ListAgenciesByDepartmentCodeRequestDto,
+  ListAgenciesRequestDto,
   PrivateListAgenciesRequestDto,
   UpdateAgencyRequestDto,
   WithAgencyId,
@@ -41,9 +41,10 @@ export const agenciesIdAndNameSchema: z.ZodSchema<AgencyIdAndName[]> = z.array(
 
 const agencyKindSchema: z.ZodSchema<AgencyKind> = z.enum(agencyKindList);
 
-export const listAgenciesByDepartmentCodeRequestSchema: z.ZodSchema<ListAgenciesByDepartmentCodeRequestDto> =
+export const listAgenciesByDepartmentCodeRequestSchema: z.ZodSchema<ListAgenciesRequestDto> =
   z.object({
-    departmentCode: z.string(),
+    departmentCode: z.string().optional(),
+    name: z.string().optional(),
     filter: z.enum(["peOnly", "peExcluded"]).optional(),
   });
 

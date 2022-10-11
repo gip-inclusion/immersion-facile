@@ -9,6 +9,7 @@ import {
   AgencyPublicDisplayDto,
   CreateAgencyDto,
   DepartmentCode,
+  ListAgenciesRequestDto,
   propEq,
   propNotEq,
   toAgencyPublicDisplayDto,
@@ -19,8 +20,8 @@ import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 export class TestAgencyGateway implements AgencyGateway {
   public agencies$ = new Subject<AgencyIdAndName[]>();
 
-  listAgencies$(
-    _departmentCode: DepartmentCode,
+  listAgenciesByFilter$(
+    _filter: ListAgenciesRequestDto,
   ): Observable<AgencyIdAndName[]> {
     return this.agencies$;
   }
@@ -40,7 +41,7 @@ export class TestAgencyGateway implements AgencyGateway {
     };
   }
 
-  async listAgencies(
+  async listAgenciesByDepartmentCode(
     _departmentCode: DepartmentCode,
   ): Promise<AgencyIdAndName[]> {
     return values(this._agencies);
@@ -72,5 +73,12 @@ export class TestAgencyGateway implements AgencyGateway {
     const agency = this._agencies[withAgencyId.id];
     if (agency) return toAgencyPublicDisplayDto(agency);
     throw new Error(`Missing agency with id ${withAgencyId.id}.`);
+  }
+
+  getAgencyAdminById$(
+    _agencyId: AgencyId,
+    _adminToken: AdminToken,
+  ): Observable<AgencyDto> {
+    return undefined as unknown as Observable<AgencyDto>;
   }
 }

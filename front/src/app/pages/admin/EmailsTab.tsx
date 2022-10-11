@@ -11,7 +11,7 @@ import { useAppSelector } from "src/app/utils/reduxHooks";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { sentEmailsSlice } from "src/core-logic/domain/admin/sentEmails/sentEmails.slice";
 import { TextCell } from "src/uiComponents/admin/TextCell";
-import "./Admin.css";
+import "./admin.css";
 
 export const EmailsTab = () => {
   const dispatch = useDispatch();

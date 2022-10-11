@@ -21,6 +21,7 @@ export const agenciesRoute = "agencies";
 export const addressRoute = "address";
 export const agencyImmersionFacileIdRoute = "immersion-facile-agency-id";
 export const agencyPublicInfoByIdRoute = "agency-public-info-by-id";
+export const agencyByIdRoute = "agency-by-id";
 export const appellationRoute = "appellation";
 export const contactEstablishmentRoute = "contact-establishment";
 export const conventionShareRoute = "share-immersion-demand";
