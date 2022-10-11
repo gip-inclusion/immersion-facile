@@ -27,7 +27,6 @@ export const allRoles = [
   "establishment",
   "establishment-representative",
   "establishment-tutor",
-  "establishment-tutor",
   "counsellor",
   "validator",
   "admin",
