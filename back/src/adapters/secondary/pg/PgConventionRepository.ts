@@ -36,8 +36,17 @@ export class PgConventionRepository implements ConventionRepository {
     const establishmentTutorId = await this.insertEstablishmentTutor(
       establishmentTutor,
     );
+
     const establishmentRepresentativeId =
-      await this.insertEstablishmentRepresentative(establishmentRepresentative);
+      this.isEstablishmentTutorIsEstablishmentRepresentative(
+        establishmentTutor,
+        establishmentRepresentative,
+      )
+        ? establishmentTutorId
+        : await this.insertEstablishmentRepresentative(
+            establishmentRepresentative,
+          );
+
     const beneficiaryRepresentativeId =
       beneficiaryRepresentative &&
       (await this.insertBeneficiaryRepresentative(beneficiaryRepresentative));
@@ -206,5 +215,17 @@ export class PgConventionRepository implements ConventionRepository {
       ],
     );
     return insertReturn.rows[0]?.id;
+  }
+
+  private isEstablishmentTutorIsEstablishmentRepresentative(
+    establishmentTutor: EstablishmentTutor,
+    establishmentRepresentative: EstablishmentRepresentative,
+  ) {
+    return (
+      establishmentTutor.firstName === establishmentRepresentative.firstName &&
+      establishmentTutor.lastName === establishmentRepresentative.lastName &&
+      establishmentTutor.email === establishmentRepresentative.email &&
+      establishmentTutor.phone === establishmentRepresentative.phone
+    );
   }
 }

@@ -4,10 +4,11 @@ import {
   ConventionDtoBuilder,
   ConventionId,
   BeneficiaryRepresentative,
+  EstablishmentTutor,
 } from "shared";
-import { getTestPgPool } from "../../_testBuilders/getTestPgPool";
-import { PgAgencyRepository } from "../../adapters/secondary/pg/PgAgencyRepository";
-import { PgConventionRepository } from "../../adapters/secondary/pg/PgConventionRepository";
+import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
+import { PgAgencyRepository } from "./PgAgencyRepository";
+import { PgConventionRepository } from "./PgConventionRepository";
 
 const beneficiaryRepresentative: BeneficiaryRepresentative = {
   role: "legal-representative",
@@ -37,6 +38,7 @@ describe("PgConventionRepository", () => {
   beforeEach(async () => {
     await client.query("DELETE FROM partners_pe_connect");
     await client.query("DELETE FROM conventions");
+    await client.query("DELETE FROM actors");
     await client.query(
       "TRUNCATE TABLE convention_external_ids RESTART IDENTITY;",
     );
@@ -73,6 +75,37 @@ describe("PgConventionRepository", () => {
       ...convention,
       externalId,
     });
+  });
+
+  it("Only one actor when the convention has same establisment tutor and representative", async () => {
+    const email = "tutor123w@mail.com";
+    const tutor: EstablishmentTutor = {
+      firstName: "Joe",
+      lastName: "Doe",
+      job: "Chef",
+      email,
+      phone: "0111223344",
+      role: "establishment-tutor",
+    };
+
+    const convention = new ConventionDtoBuilder()
+      .withEstablishmentTutor(tutor)
+      .withEstablishmentRepresentative({
+        ...tutor,
+        role: "establishment-representative",
+      })
+      .build();
+    const { rows } = await client.query(
+      `SELECT * FROM actors WHERE email = '${email}'`,
+    );
+    expect(rows).toHaveLength(0);
+
+    await conventionRepository.save(convention);
+
+    const { rows: actors } = await client.query(
+      `SELECT * FROM actors WHERE email = '${email}'`,
+    );
+    expect(actors).toHaveLength(1);
   });
 
   it("Retrieves federated identity if exists", async () => {
