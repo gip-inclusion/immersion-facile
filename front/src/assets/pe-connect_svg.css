@@ -10,6 +10,8 @@
   text-decoration: none;
   display: inline-block;
   background-image: none;
+  font-size: 0;
+  line-height: 0;
 }
 .pe-connect .button-pe-connect .icon-pe-connect-hover {
   display: none;
