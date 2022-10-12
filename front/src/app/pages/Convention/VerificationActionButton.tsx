@@ -1,29 +1,20 @@
 import React from "react";
 import { Button } from "react-design-system/immersionFacile";
-import { ConventionReadDto, ConventionStatus } from "shared";
-import { conventionGateway } from "src/app/config/dependencies";
+import { ConventionStatus } from "shared";
 
 export type VerificationActionButtonProps = {
-  convention?: ConventionReadDto;
-  jwt: string;
+  onSubmit: (params: {
+    newStatus: ConventionStatus;
+    justification?: string;
+  }) => void;
   disabled?: boolean;
-  messageToShowOnSuccess: string;
-  onSuccess: (message: string) => void;
-  onError: (message: string) => void;
   newStatus: ConventionStatus;
   children: string;
 };
 
-const onSubmit = async ({
-  convention,
-  jwt,
-  onSuccess,
-  onError,
-  newStatus,
-  messageToShowOnSuccess,
-}: VerificationActionButtonProps) => {
-  if (!convention) return;
-
+const promptForMessageIfNeeded = (
+  newStatus: ConventionStatus,
+): string | undefined => {
   let justification: string | undefined = undefined;
   if (newStatus === "REJECTED") {
     justification =
@@ -35,17 +26,17 @@ const onSubmit = async ({
     if (!justification) return; // case when cancel button is clicked or field is empty
   }
 
-  return conventionGateway
-    .updateStatus({ status: newStatus, justification }, jwt)
-    .then(() => onSuccess(messageToShowOnSuccess))
-    .catch((e) => onError(e.message));
+  return justification;
 };
 
-export const VerificationActionButton = (
-  props: VerificationActionButtonProps,
-) => {
+export const VerificationActionButton = ({
+  newStatus,
+  disabled,
+  children,
+  onSubmit,
+}: VerificationActionButtonProps) => {
   let className = "fr-btn";
-  switch (props.newStatus) {
+  switch (newStatus) {
     case "REJECTED":
       // cross icon
       className += " fr-fi-close-circle-line fr-btn--icon-left";
@@ -62,12 +53,15 @@ export const VerificationActionButton = (
 
   return (
     <Button
-      level={props.newStatus === "REJECTED" ? "secondary" : "primary"}
-      disable={!props.convention || props.disabled}
-      onSubmit={() => onSubmit(props)}
+      level={newStatus === "REJECTED" ? "secondary" : "primary"}
+      disable={disabled}
+      onSubmit={() => {
+        const justification = promptForMessageIfNeeded(newStatus);
+        onSubmit({ newStatus, justification });
+      }}
       className={className}
     >
-      {props.children}
+      {children}
     </Button>
   );
 };

@@ -4,7 +4,7 @@ import { Signatories, Signatory, SignatoryRole } from "shared";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import {
   ConventionSubmitFeedback,
-  ConventionSuccessFeedbackKind,
+  ConventionFeedbackKind,
 } from "src/core-logic/domain/convention/convention.slice";
 
 type ConventionSubmitFeedbackNotificationProps = {
@@ -12,7 +12,7 @@ type ConventionSubmitFeedbackNotificationProps = {
   signatories: Signatories;
 };
 
-export const ConventionSubmitFeedbackNotification = ({
+export const ConventionFeedbackNotification = ({
   submitFeedback,
   signatories,
 }: ConventionSubmitFeedbackNotificationProps) => {
@@ -36,7 +36,18 @@ const labelByRole: Record<SignatoryRole, string> = {
 
 export const createConventionFeedbackMessageByKind = (
   signatories: Signatories,
-): Record<ConventionSuccessFeedbackKind, React.ReactNode> => ({
+): Record<ConventionFeedbackKind, React.ReactNode> => ({
+  modificationsAskedFromSignatory:
+    "Vous avez renvoyé la demande pour modification.",
+  signedSuccessfully: "Votre accord a été enregistré.",
+  rejected:
+    "Succès. La décision de refuser cette immersion est bien enregistrée. Cette décision va être communiquée par mail au bénéficiaire et à l'entreprise.",
+  modificationAskedFromCounsellorOrValidator:
+    "Succès. Cette demande de modification va être communiquée par mail au bénéficiaire et à l'entreprise",
+  markedAsEligible:
+    "Succès. L'éligibilité de cette demande est bien enregistrée. Une notification est envoyée au responsable des validations pour qu'elle/il confirme ou non la validation de cette demande et initie la Convention.",
+  markedAsValidated:
+    "Succès. La validation de cette demande est bien enregistrée. La confirmation de cette validation va être communiquée par mail à chacun des signataires.",
   justSubmitted: (
     <InitialSubmitSuccessMessageBase>
       {(values(signatories) as Signatory[])
@@ -49,8 +60,6 @@ export const createConventionFeedbackMessageByKind = (
         ))}
     </InitialSubmitSuccessMessageBase>
   ),
-  modificationsAsked: "Vous avez renvoyé la demande pour modification.",
-  signedSuccessfully: "Votre accord a été enregistré.",
 });
 
 const InitialSubmitSuccessMessageBase = ({

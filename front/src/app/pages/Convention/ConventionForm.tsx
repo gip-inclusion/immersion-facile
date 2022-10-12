@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { Notification, Title } from "react-design-system/immersionFacile";
 import { useDispatch } from "react-redux";
 import { ConventionDto, conventionWithoutExternalIdSchema } from "shared";
-import { ConventionSubmitFeedbackNotification } from "src/app/components/ConventionSubmitFeedbackNotification";
+import { ConventionFeedbackNotification } from "src/app/components/ConventionFeedbackNotification";
 import {
   ConventionPresentation,
   isConventionFrozen,
@@ -92,7 +92,7 @@ export const ConventionForm = ({
             <div>
               <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
                 <ConventionFormFields isFrozen={isFrozen} />
-                <ConventionSubmitFeedbackNotification
+                <ConventionFeedbackNotification
                   submitFeedback={submitFeedback}
                   signatories={props.values.signatories}
                 />

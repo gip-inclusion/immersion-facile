@@ -11,7 +11,7 @@ import {
   SignatoryRole,
   signatoryRoles,
 } from "shared";
-import { ConventionSubmitFeedbackNotification } from "src/app/components/ConventionSubmitFeedbackNotification";
+import { ConventionFeedbackNotification } from "src/app/components/ConventionFeedbackNotification";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { routes } from "src/app/routing/routes";
 import { useAppSelector } from "src/app/utils/reduxHooks";
@@ -77,12 +77,6 @@ export const ConventionSignPage = ({ route }: SignFormProps) => {
   return (
     <HeaderFooterLayout>
       <SignFormSpecific jwt={route.params.jwt} />
-      {/*<ApiDataContainer*/}
-      {/*  callApi={() => conventionGateway.getMagicLink(route.params.jwt)}*/}
-      {/*  jwt={route.params.jwt}*/}
-      {/*>*/}
-      {/*  {(convention) => <SignFormSpecific jwt={route.params.jwt} />}*/}
-      {/*</ApiDataContainer>*/}
     </HeaderFooterLayout>
   );
 };
@@ -115,16 +109,18 @@ const SignFormSpecific = ({ jwt }: SignFormSpecificProps) => {
   if (convention.status === "DRAFT")
     return <ConventionNeedsModificationMessage jwt={jwt} />;
 
-  const rejectWithMessageForm = async (): Promise<void> => {
+  const askFormModificationWithMessageForm = async (): Promise<void> => {
     const justification = prompt(
       "Précisez la raison et la modification nécessaire *",
     )?.trim();
 
     if (justification === null || justification === undefined) return;
-    if (justification === "") return rejectWithMessageForm();
+    if (justification === "") return askFormModificationWithMessageForm();
 
     dispatch(
-      conventionSlice.actions.modificationRequested({
+      conventionSlice.actions.statusChangeRequested({
+        newStatus: "REJECTED",
+        feedbackKind: "rejected",
         justification,
         jwt,
       }),
@@ -198,7 +194,9 @@ const SignFormSpecific = ({ jwt }: SignFormSpecificProps) => {
                         isFrozen={true}
                         isSignOnly={true}
                         signatory={currentSignatory}
-                        onRejectForm={rejectWithMessageForm}
+                        onModificationsRequired={
+                          askFormModificationWithMessageForm
+                        }
                       />
                     )}
                     {Object.values(props.errors).length > 0 && (
@@ -207,7 +205,7 @@ const SignFormSpecific = ({ jwt }: SignFormSpecificProps) => {
                       </div>
                     )}
 
-                    <ConventionSubmitFeedbackNotification
+                    <ConventionFeedbackNotification
                       submitFeedback={submitFeedback}
                       signatories={props.values.signatories}
                     />

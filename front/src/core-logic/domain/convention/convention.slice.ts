@@ -1,14 +1,28 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ConventionDto, ConventionReadDto, SignatoryRole } from "shared";
+import {
+  ConventionDto,
+  ConventionReadDto,
+  ConventionStatus,
+  SignatoryRole,
+} from "shared";
 import { SubmitFeedBack } from "../SubmitFeedback";
 
-export type ConventionSuccessFeedbackKind =
+type ConventionValidationFeedbackKind =
+  | "rejected"
+  | "modificationAskedFromCounsellorOrValidator"
+  | "markedAsEligible"
+  | "markedAsValidated";
+
+type ConventionSignatoryFeedbackKind =
   | "justSubmitted"
   | "signedSuccessfully"
-  | "modificationsAsked";
+  | "modificationsAskedFromSignatory";
 
-export type ConventionSubmitFeedback =
-  SubmitFeedBack<ConventionSuccessFeedbackKind>;
+export type ConventionFeedbackKind =
+  | ConventionSignatoryFeedbackKind
+  | ConventionValidationFeedbackKind;
+
+export type ConventionSubmitFeedback = SubmitFeedBack<ConventionFeedbackKind>;
 
 export interface ConventionState {
   jwt: string | null;
@@ -26,6 +40,13 @@ const initialState: ConventionState = {
   error: null,
   feedback: { kind: "idle" },
   currentSignatoryRole: null,
+};
+
+type StatusChangePayload = {
+  newStatus: ConventionStatus;
+  feedbackKind: ConventionFeedbackKind;
+  jwt: string;
+  justification?: string;
 };
 
 export const conventionSlice = createSlice({
@@ -75,17 +96,20 @@ export const conventionSlice = createSlice({
     },
 
     // Modification requested
-    modificationRequested: (
+    statusChangeRequested: (
       state,
-      _action: PayloadAction<{ justification: string; jwt: string }>,
+      _action: PayloadAction<StatusChangePayload>,
     ) => {
       state.isLoading = true;
     },
-    modificationSucceeded: (state) => {
+    statusChangeSucceeded: (
+      state,
+      action: PayloadAction<ConventionFeedbackKind>,
+    ) => {
       state.isLoading = false;
-      state.feedback = { kind: "modificationsAsked" };
+      state.feedback = { kind: action.payload };
     },
-    modificationFailed: (state, action: PayloadAction<string>) => {
+    statusChangeFailed: (state, action: PayloadAction<string>) => {
       state.isLoading = false;
       state.feedback = { kind: "errored", errorMessage: action.payload };
     },

@@ -21,10 +21,6 @@ export interface ConventionGateway {
 
   update$(conventionDto: ConventionDto, jwt: string): Observable<void>;
 
-  updateStatus(
-    params: UpdateConventionStatusRequestDto,
-    jwt: string,
-  ): Promise<WithConventionId>;
   updateStatus$(
     params: UpdateConventionStatusRequestDto,
     jwt: string,

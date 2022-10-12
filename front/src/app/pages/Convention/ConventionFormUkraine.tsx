@@ -3,7 +3,7 @@ import React from "react";
 import { Title } from "react-design-system/immersionFacile";
 import { useDispatch } from "react-redux";
 import { conventionUkraineSchema } from "shared";
-import { ConventionSubmitFeedbackNotification } from "src/app/components/ConventionSubmitFeedbackNotification";
+import { ConventionFeedbackNotification } from "src/app/components/ConventionFeedbackNotification";
 import { ConventionFormFieldsUkraine } from "src/app/pages/Convention/ConventionFields/ConventionFormFieldsUkraine";
 import { ConventionPresentation } from "src/app/pages/Convention/conventionHelpers";
 import { useAppSelector } from "src/app/utils/reduxHooks";
@@ -35,7 +35,7 @@ export const ConventionFormUkraine = ({ properties }: ConventionFormProps) => {
           <div>
             <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
               <ConventionFormFieldsUkraine />
-              <ConventionSubmitFeedbackNotification
+              <ConventionFeedbackNotification
                 submitFeedback={submitFeedback}
                 signatories={props.values.signatories}
               />

@@ -82,7 +82,7 @@ export class HttpConventionGateway implements ConventionGateway {
     );
   }
 
-  public async updateStatus(
+  private async updateStatus(
     params: UpdateConventionStatusRequestDto,
     jwt: string,
   ): Promise<WithConventionId> {

@@ -96,7 +96,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
     return this.updateConventionResult$;
   }
 
-  public async updateStatus(
+  private async updateStatus(
     { status, justification: _ }: UpdateConventionStatusRequestDto,
     jwt: string,
   ): Promise<WithConventionId> {

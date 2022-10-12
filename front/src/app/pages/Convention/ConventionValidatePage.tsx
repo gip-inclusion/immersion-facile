@@ -1,17 +1,22 @@
-import React, { useState } from "react";
-import { Notification } from "react-design-system/immersionFacile";
+import React, { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import {
   ConventionMagicLinkPayload,
   ConventionStatus,
   Role,
   statusTransitionConfigs,
 } from "shared";
-import { conventionGateway } from "src/app/config/dependencies";
+import { ConventionFeedbackNotification } from "src/app/components/ConventionFeedbackNotification";
 import { routes } from "src/app/routing/routes";
+import { useAppSelector } from "src/app/utils/reduxHooks";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
+import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
+import {
+  ConventionFeedbackKind,
+  conventionSlice,
+} from "src/core-logic/domain/convention/convention.slice";
 import { ConventionFormAccordion } from "src/uiComponents/admin/ConventionFormAccordion";
 import { Route } from "type-route";
-import { ApiDataContainer } from "../admin/ApiDataContainer";
 import { VerificationActionButton } from "./VerificationActionButton";
 
 type VerificationPageProps = {
@@ -34,113 +39,98 @@ const isAllowedTransition = (
 export const ConventionValidatePage = ({ route }: VerificationPageProps) => {
   const jwt = route.params.jwt;
   const { role } = decodeJwt<ConventionMagicLinkPayload>(jwt);
+  const convention = useAppSelector(conventionSelectors.convention);
+  const submitFeedback = useAppSelector(conventionSelectors.feedback);
 
-  const [successMessage, setSuccessMessage] = useState<string>();
-  const [errorMessage, setErrorMessage] = useState<string>();
-  const disabled = !!successMessage;
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(conventionSlice.actions.conventionRequested(jwt));
+  }, []);
+
+  if (!convention) {
+    return <p>"Chargement en cours..."</p>;
+  }
+
+  const disabled = submitFeedback.kind !== "idle";
+  const currentStatus = convention.status;
+
+  const createOnSubmitWithFeedbackKind =
+    (feedbackKind: ConventionFeedbackKind) =>
+    (params: { justification?: string; newStatus: ConventionStatus }) =>
+      dispatch(
+        conventionSlice.actions.statusChangeRequested({
+          jwt,
+          feedbackKind,
+          ...params,
+        }),
+      );
 
   return (
-    <ApiDataContainer
-      callApi={() => conventionGateway.getMagicLink(jwt)}
-      jwt={jwt}
-    >
-      {(convention) => {
-        if (!convention) {
-          return <p>"Chargement en cours"</p>;
-        }
-
-        const currentStatus = convention.status;
-
-        const buttonProps = {
-          disabled,
-          convention,
-          jwt,
-          onSuccess: setSuccessMessage,
-          onError: setErrorMessage,
-        };
-        const { status } = convention;
-
-        return (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              flexDirection: "column",
-            }}
-          >
-            <ConventionFormAccordion convention={convention} />
-            <div>
-              {isAllowedTransition(status, "REJECTED", role) && (
-                <VerificationActionButton
-                  {...buttonProps}
-                  newStatus="REJECTED"
-                  messageToShowOnSuccess="Succès. La décision de refuser cette immersion est bien enregistrée. Cette décision va être communiquée par mail au bénéficiaire et à l'entreprise."
-                >
-                  Refuser l'immersion ...
-                </VerificationActionButton>
-              )}
-
-              {isAllowedTransition(status, "DRAFT", role) && (
-                <VerificationActionButton
-                  {...buttonProps}
-                  newStatus="DRAFT"
-                  messageToShowOnSuccess={
-                    "Succès. Cette demande de modification va être communiquée par mail au bénéficiaire et à l'entreprise"
-                  }
-                >
-                  Renvoyer au bénéficiaire pour modification
-                </VerificationActionButton>
-              )}
-              {isAllowedTransition(status, "ACCEPTED_BY_COUNSELLOR", role) && (
-                <VerificationActionButton
-                  {...buttonProps}
-                  newStatus="ACCEPTED_BY_COUNSELLOR"
-                  messageToShowOnSuccess={
-                    "Succès. L'éligibilité de cette demande est bien enregistrée. Une notification est envoyée au responsable des validations pour qu'elle/il confirme ou non la validation de cette demande et initie la Convention."
-                  }
-                  disabled={!!successMessage || currentStatus != "IN_REVIEW"}
-                >
-                  {currentStatus === "ACCEPTED_BY_COUNSELLOR"
-                    ? "Demande déjà validée."
-                    : "Marquer la demande comme éligible"}
-                </VerificationActionButton>
-              )}
-              {isAllowedTransition(status, "ACCEPTED_BY_VALIDATOR", role) && (
-                <VerificationActionButton
-                  {...buttonProps}
-                  newStatus="ACCEPTED_BY_VALIDATOR"
-                  messageToShowOnSuccess={
-                    "Succès. La validation de cette demande est bien enregistrée. La confirmation de cette validation va être communiquée par mail à chacun des signataires."
-                  }
-                  disabled={
-                    !!successMessage ||
-                    (currentStatus != "IN_REVIEW" &&
-                      currentStatus != "ACCEPTED_BY_COUNSELLOR")
-                  }
-                >
-                  {currentStatus === "ACCEPTED_BY_VALIDATOR"
-                    ? "Demande déjà validée"
-                    : "Valider la demande"}
-                </VerificationActionButton>
-              )}
-              {errorMessage && (
-                <Notification
-                  type="error"
-                  title="Veuillez nous excuser. Un problème est survenu qui a compromis l'enregistrement de vos informations. Veuillez réessayer ultérieurement"
-                >
-                  {errorMessage}
-                </Notification>
-              )}
-
-              {successMessage && (
-                <Notification type="success" title="Succès">
-                  {successMessage}
-                </Notification>
-              )}
-            </div>
-          </div>
-        );
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        flexDirection: "column",
       }}
-    </ApiDataContainer>
+    >
+      <ConventionFormAccordion convention={convention} />
+      <div>
+        {isAllowedTransition(currentStatus, "REJECTED", role) && (
+          <VerificationActionButton
+            disabled={disabled}
+            newStatus="REJECTED"
+            onSubmit={createOnSubmitWithFeedbackKind("rejected")}
+          >
+            Refuser l'immersion ...
+          </VerificationActionButton>
+        )}
+
+        {isAllowedTransition(currentStatus, "DRAFT", role) && (
+          <VerificationActionButton
+            disabled={disabled}
+            newStatus="DRAFT"
+            onSubmit={createOnSubmitWithFeedbackKind(
+              "modificationAskedFromCounsellorOrValidator",
+            )}
+          >
+            Renvoyer au bénéficiaire pour modification
+          </VerificationActionButton>
+        )}
+
+        {isAllowedTransition(currentStatus, "ACCEPTED_BY_COUNSELLOR", role) && (
+          <VerificationActionButton
+            newStatus="ACCEPTED_BY_COUNSELLOR"
+            onSubmit={createOnSubmitWithFeedbackKind("markedAsEligible")}
+            disabled={disabled || currentStatus != "IN_REVIEW"}
+          >
+            {currentStatus === "ACCEPTED_BY_COUNSELLOR"
+              ? "Demande déjà validée."
+              : "Marquer la demande comme éligible"}
+          </VerificationActionButton>
+        )}
+
+        {isAllowedTransition(currentStatus, "ACCEPTED_BY_VALIDATOR", role) && (
+          <VerificationActionButton
+            newStatus="ACCEPTED_BY_VALIDATOR"
+            onSubmit={createOnSubmitWithFeedbackKind("markedAsEligible")}
+            disabled={
+              disabled ||
+              (currentStatus != "IN_REVIEW" &&
+                currentStatus != "ACCEPTED_BY_COUNSELLOR")
+            }
+          >
+            {currentStatus === "ACCEPTED_BY_VALIDATOR"
+              ? "Demande déjà validée"
+              : "Valider la demande"}
+          </VerificationActionButton>
+        )}
+
+        <ConventionFeedbackNotification
+          submitFeedback={submitFeedback}
+          signatories={convention.signatories}
+        />
+      </div>
+    </div>
   );
 };

@@ -231,11 +231,13 @@ describe("Convention slice", () => {
     });
   });
 
-  describe("Convention ask for modification", () => {
+  describe("Convention status change", () => {
     it("sends modification request with provided justification", () => {
       const jwt = "some-correct-jwt";
       store.dispatch(
-        conventionSlice.actions.modificationRequested({
+        conventionSlice.actions.statusChangeRequested({
+          newStatus: "DRAFT",
+          feedbackKind: "modificationsAskedFromSignatory",
           justification: "There is a mistake in my last name",
           jwt,
         }),
@@ -246,14 +248,16 @@ describe("Convention slice", () => {
       feedGatewayWithModificationSuccess();
       expectConventionState({
         isLoading: false,
-        feedback: { kind: "modificationsAsked" },
+        feedback: { kind: "modificationsAskedFromSignatory" },
       });
     });
 
     it("gets error message when modification fails", () => {
       const jwt = "some-correct-jwt";
       store.dispatch(
-        conventionSlice.actions.modificationRequested({
+        conventionSlice.actions.statusChangeRequested({
+          newStatus: "DRAFT",
+          feedbackKind: "modificationsAskedFromSignatory",
           justification: "There is a mistake in my last name",
           jwt,
         }),

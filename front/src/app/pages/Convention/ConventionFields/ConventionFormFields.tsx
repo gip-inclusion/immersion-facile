@@ -18,7 +18,7 @@ import { ImmersionConditionFormSection } from "./Sections/ImmersionConditionForm
 
 type ConventionFieldsProps = {
   isFrozen?: boolean;
-  onRejectForm?: () => Promise<void>; //< called when the form is sent back for modifications in signature mode
+  onModificationsRequired?: () => Promise<void>; //< called when the form is sent back for modifications in signature mode
 } & (
   | { isSignOnly: true; signatory: Signatory }
   | { isSignOnly?: false; signatory?: undefined }
@@ -29,7 +29,7 @@ export const ConventionFormFields = ({
   isSignOnly: isSignatureMode,
   signatory,
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  onRejectForm = async () => {},
+  onModificationsRequired = async () => {},
 }: ConventionFieldsProps): JSX.Element => {
   useEffect(() => {
     deviceRepository.delete("partialConventionInUrl");
@@ -102,7 +102,7 @@ export const ConventionFormFields = ({
               signatory={signatory}
               isSubmitting={isSubmitting}
               onSubmit={submitForm}
-              onRejectForm={onRejectForm}
+              onRejectForm={onModificationsRequired}
             />
           )}
         </>

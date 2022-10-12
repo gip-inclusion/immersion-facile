@@ -56,25 +56,31 @@ const signConventionEpic: ConventionEpic = (
     ),
   );
 
-const askModificationConventionEpic: ConventionEpic = (
+const conventionStatusChangeEpic: ConventionEpic = (
   action$,
   _,
   { conventionGateway },
 ) =>
   action$.pipe(
-    filter(conventionSlice.actions.modificationRequested.match),
+    filter(conventionSlice.actions.statusChangeRequested.match),
     switchMap(({ payload }) =>
-      conventionGateway.updateStatus$(
-        {
-          status: "DRAFT",
-          justification: payload.justification,
-        },
-        payload.jwt,
-      ),
+      conventionGateway
+        .updateStatus$(
+          {
+            status: payload.newStatus,
+            justification: payload.justification,
+          },
+          payload.jwt,
+        )
+        .pipe(
+          map(() =>
+            conventionSlice.actions.statusChangeSucceeded(payload.feedbackKind),
+          ),
+        ),
     ),
-    map(conventionSlice.actions.modificationSucceeded),
+    // map(conventionSlice.actions.statusChangeSucceeded),
     catchEpicError((error: Error) =>
-      conventionSlice.actions.modificationFailed(error.message),
+      conventionSlice.actions.statusChangeFailed(error.message),
     ),
   );
 
@@ -82,5 +88,5 @@ export const conventionEpics = [
   saveConventionEpic,
   getConventionEpic,
   signConventionEpic,
-  askModificationConventionEpic,
+  conventionStatusChangeEpic,
 ];

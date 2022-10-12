@@ -26,7 +26,7 @@ export const SubmitFeedbackNotification = <T extends string>({
           {submitFeedback.errorMessage}
         </Notification>
       ) : (
-        <Notification type="success" title="Succès de l'envoi">
+        <Notification type="success" title="Succès">
           {messageByKind[submitFeedback.kind]}
         </Notification>
       )}
