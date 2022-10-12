@@ -13,7 +13,6 @@ import {
 } from "shared";
 import { ConventionSubmitFeedbackNotification } from "src/app/components/ConventionSubmitFeedbackNotification";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
-import { useConventionSubmitFeedback } from "src/app/pages/Convention/useConventionSubmitFeedback";
 import { routes } from "src/app/routing/routes";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
@@ -93,7 +92,7 @@ type SignFormSpecificProps = {
 };
 
 const SignFormSpecific = ({ jwt }: SignFormSpecificProps) => {
-  const { submitFeedback } = useConventionSubmitFeedback();
+  const submitFeedback = useAppSelector(conventionSelectors.feedback);
   const convention = useAppSelector(conventionSelectors.convention);
   const { signatory: currentSignatory } = useAppSelector(
     conventionSelectors.signatoryData,
@@ -112,10 +111,25 @@ const SignFormSpecific = ({ jwt }: SignFormSpecificProps) => {
   useExistingSiret(convention?.siret);
 
   if (!convention) return <p>Chargement en cours...</p>;
-
   if (convention.status === "REJECTED") return <ConventionRejectedMessage />;
   if (convention.status === "DRAFT")
     return <ConventionNeedsModificationMessage jwt={jwt} />;
+
+  const rejectWithMessageForm = async (): Promise<void> => {
+    const justification = prompt(
+      "Précisez la raison et la modification nécessaire *",
+    )?.trim();
+
+    if (justification === null || justification === undefined) return;
+    if (justification === "") return rejectWithMessageForm();
+
+    dispatch(
+      conventionSlice.actions.modificationRequested({
+        justification,
+        jwt,
+      }),
+    );
+  };
 
   return (
     <SignPageLayout>
@@ -172,23 +186,6 @@ const SignFormSpecific = ({ jwt }: SignFormSpecificProps) => {
                 // eslint-disable-next-line no-console
                 console.log("Erros in form : ", props.errors);
               }
-
-              const rejectWithMessageForm = async (): Promise<void> => {
-                const justification = prompt(
-                  "Précisez la raison et la modification nécessaire *",
-                )?.trim();
-
-                if (justification === null || justification === undefined)
-                  return;
-                if (justification === "") return rejectWithMessageForm();
-
-                dispatch(
-                  conventionSlice.actions.modificationRequested({
-                    justification,
-                    jwt,
-                  }),
-                );
-              };
 
               return (
                 <div>

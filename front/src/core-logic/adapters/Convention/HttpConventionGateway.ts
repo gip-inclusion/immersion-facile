@@ -31,13 +31,17 @@ export class HttpConventionGateway implements ConventionGateway {
     return from(this.getMagicLink(payload));
   }
 
-  public async add(conventionDto: ConventionDto): Promise<string> {
+  private async add(conventionDto: ConventionDto): Promise<string> {
     const { data } = await this.httpClient.post<unknown>(
       `/${conventionsRoute}`,
       conventionDto,
     );
     const withConventionId = withConventionIdSchema.parse(data);
     return withConventionId.id;
+  }
+
+  public add$(conventionDto: ConventionDto): Observable<void> {
+    return fromPromise(this.add(conventionDto).then(() => undefined));
   }
 
   public async getById(id: string): Promise<ConventionReadDto> {
@@ -59,7 +63,7 @@ export class HttpConventionGateway implements ConventionGateway {
     return conventionReadDto;
   }
 
-  public async updateMagicLink(
+  private async updateMagicLink(
     conventionDto: ConventionDto,
     jwt: string,
   ): Promise<string> {
@@ -70,6 +74,12 @@ export class HttpConventionGateway implements ConventionGateway {
     );
     const withConventionId = withConventionIdSchema.parse(data);
     return withConventionId.id;
+  }
+
+  public update$(conventionDto: ConventionDto, jwt: string): Observable<void> {
+    return fromPromise(
+      this.updateMagicLink(conventionDto, jwt).then(() => undefined),
+    );
   }
 
   public async updateStatus(

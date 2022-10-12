@@ -12,10 +12,7 @@ import {
   Signatories,
   toDateString,
 } from "shared";
-import {
-  conventionGateway,
-  deviceRepository,
-} from "src/app/config/dependencies";
+import { deviceRepository } from "src/app/config/dependencies";
 import { ConventionImmersionPageRoute } from "src/app/pages/Convention/ConventionImmersionPage";
 import { ConventionMiniStagePageRoute } from "src/app/pages/Convention/ConventionMiniStagePage";
 import { ConventionUkrainePageRoute } from "src/app/pages/Convention/ConventionPageForUkraine";
@@ -24,17 +21,6 @@ import { ENV } from "src/environmentVariables";
 import { v4 as uuidV4 } from "uuid";
 
 const { frontEnvType } = ENV;
-
-export const createOrUpdateConvention = async (
-  properties: { jwt?: string; demandeId?: string },
-  convention: ConventionDto,
-): Promise<void> => {
-  const currentJWT = properties.jwt ?? "";
-
-  currentJWT.length > 0
-    ? await conventionGateway.updateMagicLink(convention, currentJWT)
-    : await conventionGateway.add(convention);
-};
 
 export const isConventionFrozen = (
   convention: Partial<ConventionDto>,

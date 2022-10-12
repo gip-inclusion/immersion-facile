@@ -1,13 +1,14 @@
 import { Formik, FormikProps, FormikValues } from "formik";
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React from "react";
 import { Title } from "react-design-system/immersionFacile";
+import { useDispatch } from "react-redux";
 import { conventionUkraineSchema } from "shared";
 import { ConventionSubmitFeedbackNotification } from "src/app/components/ConventionSubmitFeedbackNotification";
-import { conventionGateway } from "src/app/config/dependencies";
 import { ConventionFormFieldsUkraine } from "src/app/pages/Convention/ConventionFields/ConventionFormFieldsUkraine";
 import { ConventionPresentation } from "src/app/pages/Convention/conventionHelpers";
-import { useConventionSubmitFeedback } from "src/app/pages/Convention/useConventionSubmitFeedback";
-import { ConventionSubmitFeedback } from "src/core-logic/domain/convention/convention.slice";
+import { useAppSelector } from "src/app/utils/reduxHooks";
+import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
+import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 
 type ConventionFormProps = {
@@ -15,18 +16,33 @@ type ConventionFormProps = {
 };
 
 export const ConventionFormUkraine = ({ properties }: ConventionFormProps) => {
-  const [initialValues, setInitialValues] = useState(properties);
-  const { submitFeedback, setSubmitFeedback } = useConventionSubmitFeedback();
+  const dispatch = useDispatch();
+  const submitFeedback = useAppSelector(conventionSelectors.feedback);
 
   return (
     <>
       <StaticText />
-      <FormikConventionForm
-        initialValues={initialValues}
-        setInitialValues={setInitialValues}
-        setSubmitFeedback={setSubmitFeedback}
-        submitFeedback={submitFeedback}
-      />
+      <Formik
+        enableReinitialize={true}
+        initialValues={properties}
+        validationSchema={toFormikValidationSchema(conventionUkraineSchema)}
+        onSubmit={(values) => {
+          const convention = conventionUkraineSchema.parse(values);
+          dispatch(conventionSlice.actions.saveConventionRequested(convention));
+        }}
+      >
+        {(props: FormikProps<FormikValues>) => (
+          <div>
+            <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
+              <ConventionFormFieldsUkraine />
+              <ConventionSubmitFeedbackNotification
+                submitFeedback={submitFeedback}
+                signatories={props.values.signatories}
+              />
+            </form>
+          </div>
+        )}
+      </Formik>
     </>
   );
 };
@@ -46,48 +62,4 @@ const StaticText = () => (
       </p>
     </div>
   </>
-);
-
-const FormikConventionForm = ({
-  initialValues,
-  setInitialValues,
-  setSubmitFeedback,
-  submitFeedback,
-}: {
-  initialValues: ConventionPresentation;
-  setInitialValues: Dispatch<SetStateAction<ConventionPresentation>>;
-  setSubmitFeedback: (feedback: ConventionSubmitFeedback) => void;
-  submitFeedback: ConventionSubmitFeedback;
-}) => (
-  <Formik
-    enableReinitialize={true}
-    initialValues={initialValues}
-    validationSchema={toFormikValidationSchema(conventionUkraineSchema)}
-    onSubmit={async (values, { setSubmitting }) => {
-      try {
-        const convention = conventionUkraineSchema.parse(values);
-
-        await conventionGateway.add(convention);
-        setInitialValues(convention);
-        setSubmitFeedback({ kind: "justSubmitted" });
-      } catch (e: any) {
-        //eslint-disable-next-line no-console
-        console.log("onSubmit", e);
-        setSubmitFeedback(e);
-      }
-      setSubmitting(false);
-    }}
-  >
-    {(props: FormikProps<FormikValues>) => (
-      <div>
-        <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
-          <ConventionFormFieldsUkraine />
-          <ConventionSubmitFeedbackNotification
-            submitFeedback={submitFeedback}
-            signatories={props.values.signatories}
-          />
-        </form>
-      </div>
-    )}
-  </Formik>
 );

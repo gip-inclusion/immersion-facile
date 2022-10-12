@@ -34,10 +34,13 @@ export class InMemoryConventionGateway implements ConventionGateway {
   private _agencies: { [id: string]: AgencyIdAndName } = {};
 
   public convention$ = new Subject<ConventionReadDto | undefined>();
-
   public conventionSignedResult$ = new Subject<void>();
-
   public conventionModificationResult$ = new Subject<void>();
+  public addConventionResult$ = new Subject<void>();
+  public updateConventionResult$ = new Subject<void>();
+
+  public addConventionCallCount = 0;
+  public updateConventionCallCount = 0;
 
   public constructor(private simulatedLatency?: number) {}
 
@@ -47,10 +50,16 @@ export class InMemoryConventionGateway implements ConventionGateway {
       : this.convention$;
   }
 
-  public async add(convention: ConventionDto): Promise<ConventionId> {
+  // not used anymore, kept for inspiration for a simulated gateway
+  private async add(convention: ConventionDto): Promise<ConventionId> {
     this.simulatedLatency && (await sleep(this.simulatedLatency));
     this._conventions[convention.id] = convention;
     return convention.id;
+  }
+
+  public add$(_convention: ConventionDto): Observable<void> {
+    this.addConventionCallCount++;
+    return this.addConventionResult$;
   }
 
   public async getById(id: ConventionId): Promise<ConventionReadDto> {
@@ -67,7 +76,8 @@ export class InMemoryConventionGateway implements ConventionGateway {
     );
   }
 
-  public async updateMagicLink(
+  // not used anymore, kept for inspiration for a simulated gateway
+  private async updateMagicLink(
     convention: ConventionDto,
     jwt: string,
   ): Promise<string> {
@@ -76,6 +86,14 @@ export class InMemoryConventionGateway implements ConventionGateway {
     this.simulatedLatency && (await sleep(this.simulatedLatency));
     this._conventions[payload.applicationId] = convention;
     return convention.id;
+  }
+
+  public update$(
+    _conventionDto: ConventionDto,
+    _jwt: string,
+  ): Observable<void> {
+    this.updateConventionCallCount++;
+    return this.updateConventionResult$;
   }
 
   public async updateStatus(

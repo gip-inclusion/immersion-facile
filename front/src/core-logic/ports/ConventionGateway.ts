@@ -12,12 +12,14 @@ import {
 
 export interface ConventionGateway {
   retrieveFromToken$(jwt: string): Observable<ConventionReadDto | undefined>;
-  add(conventionDto: ConventionDto): Promise<string>;
+  add$(conventionDto: ConventionDto): Observable<void>;
 
   // Get an immersion application through backoffice, password-protected route.
   getById(id: ConventionId): Promise<ConventionReadDto>;
+
   getMagicLink(jwt: string): Promise<ConventionReadDto>;
-  updateMagicLink(conventionDto: ConventionDto, jwt: string): Promise<string>;
+
+  update$(conventionDto: ConventionDto, jwt: string): Observable<void>;
 
   updateStatus(
     params: UpdateConventionStatusRequestDto,
@@ -28,6 +30,7 @@ export interface ConventionGateway {
     jwt: string,
   ): Observable<void>;
 
+  signApplication(jwt: string): Promise<WithConventionId>;
   signConvention$(jwt: string): Observable<void>;
 
   generateMagicLink(

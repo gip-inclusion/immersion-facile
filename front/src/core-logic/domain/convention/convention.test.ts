@@ -22,8 +22,76 @@ describe("Convention slice", () => {
     ({ store, dependencies } = createTestStore());
   });
 
+  it("sets JWT in store", () => {
+    const jwt = "some-jwt";
+    store.dispatch(conventionSlice.actions.jwtProvided(jwt));
+    expectConventionState({ jwt });
+  });
+
+  describe("Save convention", () => {
+    it("saves a new convention", () => {
+      const convention = new ConventionDtoBuilder().build();
+      store.dispatch(
+        conventionSlice.actions.saveConventionRequested(convention),
+      );
+      expectConventionState({
+        isLoading: true,
+      });
+      feedGatewayWithAddConventionSuccess();
+      expectConventionState({
+        isLoading: false,
+        feedback: { kind: "justSubmitted" },
+      });
+      expectAddConventionToHaveBeenCalled(1);
+      expectUpdateConventionToHaveBeenCalled(0);
+    });
+
+    it("saves an already existing convention base (base on presence of JWT)", () => {
+      ({ store, dependencies } = createTestStore({
+        convention: {
+          jwt: "some-correct-jwt",
+          convention: null,
+          isLoading: false,
+          error: null,
+          feedback: { kind: "idle" },
+          currentSignatoryRole: null,
+        },
+      }));
+      const convention = new ConventionDtoBuilder().build();
+      store.dispatch(
+        conventionSlice.actions.saveConventionRequested(convention),
+      );
+      expectConventionState({
+        isLoading: true,
+      });
+      feedGatewayWithUpdateConventionSuccess();
+      expectConventionState({
+        isLoading: false,
+        feedback: { kind: "justSubmitted" },
+      });
+      expectUpdateConventionToHaveBeenCalled(1);
+      expectAddConventionToHaveBeenCalled(0);
+    });
+
+    it("shows message when something goes wrong when saving", () => {
+      const convention = new ConventionDtoBuilder().build();
+      store.dispatch(
+        conventionSlice.actions.saveConventionRequested(convention),
+      );
+      expectConventionState({
+        isLoading: true,
+      });
+      const errorMessage = "Une erreur lors de la sauvegarde ! ";
+      feedGatewayWithAddConventionError(new Error(errorMessage));
+      expectConventionState({
+        isLoading: false,
+        feedback: { kind: "errored", errorMessage },
+      });
+    });
+  });
+
   describe("Get convention", () => {
-    it("stores null as Convention without an immersion application matching in backend", () => {
+    it("stores null as Convention without a convention matching in backend", () => {
       expectConventionState({
         isLoading: false,
         convention: null,
@@ -86,6 +154,7 @@ describe("Convention slice", () => {
       };
       ({ store, dependencies } = createTestStore({
         convention: {
+          jwt: null,
           error: null,
           isLoading: false,
           feedback: { kind: "idle" },
@@ -115,6 +184,7 @@ describe("Convention slice", () => {
 
       ({ store, dependencies } = createTestStore({
         convention: {
+          jwt: null,
           error: null,
           isLoading: false,
           feedback: { kind: "idle" },
@@ -213,6 +283,34 @@ describe("Convention slice", () => {
     expectObjectsToMatch(
       conventionSelectors.conventionState(store.getState()),
       conventionState,
+    );
+  };
+
+  const feedGatewayWithAddConventionSuccess = () => {
+    dependencies.conventionGateway.addConventionResult$.next(undefined);
+  };
+
+  const feedGatewayWithAddConventionError = (error: Error) => {
+    dependencies.conventionGateway.addConventionResult$.error(error);
+  };
+
+  const feedGatewayWithUpdateConventionSuccess = () => {
+    dependencies.conventionGateway.updateConventionResult$.next(undefined);
+  };
+
+  // const feedGatewayWithUpdateConventionError = (error: Error) => {
+  //   dependencies.conventionGateway.updateConventionResult$.error(error);
+  // };
+
+  const expectAddConventionToHaveBeenCalled = (numberOfCalls: number) => {
+    expect(dependencies.conventionGateway.addConventionCallCount).toBe(
+      numberOfCalls,
+    );
+  };
+
+  const expectUpdateConventionToHaveBeenCalled = (numberOfCalls: number) => {
+    expect(dependencies.conventionGateway.updateConventionCallCount).toBe(
+      numberOfCalls,
     );
   };
 

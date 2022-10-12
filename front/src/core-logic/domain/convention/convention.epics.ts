@@ -10,6 +10,24 @@ type ConventionAction = ActionOfSlice<typeof conventionSlice>;
 
 type ConventionEpic = AppEpic<ConventionAction>;
 
+const saveConventionEpic: ConventionEpic = (
+  action$,
+  state$,
+  { conventionGateway },
+) =>
+  action$.pipe(
+    filter(conventionSlice.actions.saveConventionRequested.match),
+    switchMap(({ payload }) => {
+      const { jwt } = state$.value.convention;
+      if (jwt) return conventionGateway.update$(payload, jwt);
+      return conventionGateway.add$(payload);
+    }),
+    map(conventionSlice.actions.saveConventionSucceeded),
+    catchEpicError((error: Error) =>
+      conventionSlice.actions.saveConventionFailed(error.message),
+    ),
+  );
+
 const getConventionEpic: ConventionEpic = (
   action$,
   _state$,
@@ -61,6 +79,7 @@ const askModificationConventionEpic: ConventionEpic = (
   );
 
 export const conventionEpics = [
+  saveConventionEpic,
   getConventionEpic,
   signConventionEpic,
   askModificationConventionEpic,
