@@ -82,7 +82,10 @@ const fromSignatoryRole = (
         signedAt: convention.signatories.beneficiaryRepresentative.signedAt,
       };
     default:
-      return exhaustiveCheck(signatoryRole);
+      return exhaustiveCheck(signatoryRole, {
+        variableName: "signatoryRole",
+        throwIfReached: false,
+      });
   }
 };
 

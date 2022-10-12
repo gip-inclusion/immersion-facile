@@ -1,6 +1,7 @@
 import axios from "axios";
 import { Pool } from "pg";
 import {
+  exhaustiveCheck,
   ManagedAxios,
   onFullfilledDefaultResponseInterceptorMaker,
 } from "shared";
@@ -179,8 +180,10 @@ const createEmailGateway = (config: AppConfig, clock: Clock): EmailGateway => {
       new InMemoryEmailGateway(clock, 15),
     );
 
-  const _notReached: never = config.emailGateway;
-  throw new Error(`Unknown email gateway kind : ${config.emailGateway}`);
+  return exhaustiveCheck(config.emailGateway, {
+    variableName: "config.emailGateway",
+    throwIfReached: true,
+  });
 };
 
 const createPoleEmploiConnectGateway = (config: AppConfig) =>

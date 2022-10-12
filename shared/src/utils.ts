@@ -52,9 +52,19 @@ export const replaceArrayElement = <T>(
   ...original.slice(replaceAt + 1),
 ];
 
-export const exhaustiveCheck = (shouldBeNever: never) => {
+export const exhaustiveCheck = (
+  shouldBeNever: never,
+  options: { variableName?: string; throwIfReached: boolean },
+): never => {
+  const unexpectedDataAsString = JSON.stringify({
+    ...(options.variableName ? { variableName: options.variableName } : {}),
+    value: shouldBeNever,
+  });
+  const errorMessage = `Should not have been reached, but was reached with : ${unexpectedDataAsString}`;
   // eslint-disable-next-line no-console
-  console.error("Should not have been reached (Document Gateway declaration)");
+  console.error(errorMessage);
+
+  if (options.throwIfReached) throw new Error(errorMessage);
   return shouldBeNever;
 };
 
