@@ -1,5 +1,6 @@
 import { AxiosInstance } from "axios";
 import { from, Observable } from "rxjs";
+import { fromPromise } from "rxjs/internal/observable/innerFrom";
 import {
   AdminToken,
   ConventionDto,
@@ -24,7 +25,7 @@ import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 export class HttpConventionGateway implements ConventionGateway {
   constructor(private readonly httpClient: AxiosInstance) {}
 
-  retrieveFromToken(
+  retrieveFromToken$(
     payload: string,
   ): Observable<ConventionReadDto | undefined> {
     return from(this.getMagicLink(payload));
@@ -86,6 +87,13 @@ export class HttpConventionGateway implements ConventionGateway {
     return withConventionId;
   }
 
+  public updateStatus$(
+    params: UpdateConventionStatusRequestDto,
+    jwt: string,
+  ): Observable<void> {
+    return fromPromise(this.updateStatus(params, jwt).then(() => undefined));
+  }
+
   public async signApplication(jwt: string): Promise<WithConventionId> {
     const { data } = await this.httpClient.post<unknown>(
       `/auth/${signConventionRoute}/${jwt}`,
@@ -95,6 +103,10 @@ export class HttpConventionGateway implements ConventionGateway {
 
     const withConventionIdDto = withConventionIdSchema.parse(data);
     return withConventionIdDto;
+  }
+
+  public signConvention$(jwt: string): Observable<void> {
+    return fromPromise(this.signApplication(jwt).then(() => undefined));
   }
 
   // TODO Mieux identifier l'admin

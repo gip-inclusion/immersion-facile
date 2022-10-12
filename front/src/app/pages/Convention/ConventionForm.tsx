@@ -104,7 +104,7 @@ export const ConventionForm = ({
 
               await createOrUpdateConvention(routeParams, convention);
               setInitialValues(convention);
-              setSubmitFeedback("justSubmitted");
+              setSubmitFeedback({ kind: "justSubmitted" });
             } catch (e: any) {
               //eslint-disable-next-line no-console
               console.log("onSubmit error", e);

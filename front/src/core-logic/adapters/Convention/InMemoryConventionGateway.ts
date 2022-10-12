@@ -35,9 +35,13 @@ export class InMemoryConventionGateway implements ConventionGateway {
 
   public convention$ = new Subject<ConventionReadDto | undefined>();
 
+  public conventionSignedResult$ = new Subject<void>();
+
+  public conventionModificationResult$ = new Subject<void>();
+
   public constructor(private simulatedLatency?: number) {}
 
-  retrieveFromToken(jwt: string): Observable<ConventionReadDto | undefined> {
+  retrieveFromToken$(jwt: string): Observable<ConventionReadDto | undefined> {
     return this.simulatedLatency
       ? from(this.getMagicLink(jwt))
       : this.convention$;
@@ -85,6 +89,17 @@ export class InMemoryConventionGateway implements ConventionGateway {
       status,
     };
     return { id: payload.applicationId };
+  }
+
+  public updateStatus$(
+    _params: UpdateConventionStatusRequestDto,
+    _jwt: string,
+  ): Observable<void> {
+    return this.conventionModificationResult$;
+  }
+
+  public signConvention$(_jwt: string): Observable<void> {
+    return this.conventionSignedResult$;
   }
 
   public async signApplication(jwt: string): Promise<WithConventionId> {

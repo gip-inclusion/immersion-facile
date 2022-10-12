@@ -1,7 +1,10 @@
 import {
+  Beneficiary,
   ConventionDtoBuilder,
   ConventionReadDto,
   expectObjectsToMatch,
+  expectToEqual,
+  SignatoryRole,
 } from "shared";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {
@@ -19,50 +22,191 @@ describe("Convention slice", () => {
     ({ store, dependencies } = createTestStore());
   });
 
-  it("stores null as Convention without an immersion application matching in backend", () => {
-    expectConventionState({
-      isLoading: false,
-      convention: null,
+  describe("Get convention", () => {
+    it("stores null as Convention without an immersion application matching in backend", () => {
+      expectConventionState({
+        isLoading: false,
+        convention: null,
+      });
+      store.dispatch(conventionSlice.actions.conventionRequested("my-jwt"));
+      expectConventionState({ isLoading: true });
+      feedGatewayWithConvention(undefined);
+      expectConventionState({
+        convention: null,
+        isLoading: false,
+      });
     });
-    store.dispatch(conventionSlice.actions.conventionRequested("my-jwt"));
-    expectConventionState({ isLoading: true });
-    feedGatewayWithConvention(undefined);
-    expectConventionState({
-      convention: null,
-      isLoading: false,
+
+    it("stores the Convention if one matches in backend", () => {
+      const convention = new ConventionDtoBuilder().build();
+      const conventionRead = { ...convention, agencyName: "agency" };
+      expectConventionState({
+        isLoading: false,
+        convention: null,
+      });
+      store.dispatch(conventionSlice.actions.conventionRequested("my-jwt"));
+      expectConventionState({ isLoading: true });
+      feedGatewayWithConvention(conventionRead);
+      expectConventionState({
+        convention: conventionRead,
+        isLoading: false,
+      });
+    });
+
+    it("stores error if failure during fetch", () => {
+      expectConventionState({
+        isLoading: false,
+        convention: null,
+        error: null,
+      });
+      store.dispatch(conventionSlice.actions.conventionRequested("my-jwt"));
+      expectConventionState({ isLoading: true });
+      feedGatewayWithErrorOnConventionFetch(new Error("I failed !"));
+      expectConventionState({
+        convention: null,
+        isLoading: false,
+        error: "I failed !",
+      });
     });
   });
 
-  it("stores the Convention if one matches in backend", () => {
-    const convention = new ConventionDtoBuilder().build();
-    const conventionRead = { ...convention, agencyName: "agency" };
-    expectConventionState({
-      isLoading: false,
-      convention: null,
+  describe("Signatory data from convention selector", () => {
+    it("returns null values when there is no convention", () => {
+      const signatoryData = conventionSelectors.signatoryData(store.getState());
+      expectToEqual(signatoryData, {
+        signatory: null,
+        signedAtFieldName: null,
+      });
     });
-    store.dispatch(conventionSlice.actions.conventionRequested("my-jwt"));
-    expectConventionState({ isLoading: true });
-    feedGatewayWithConvention(conventionRead);
-    expectConventionState({
-      convention: conventionRead,
-      isLoading: false,
+
+    it("returns null values when no there is no current signatory", () => {
+      const convention = {
+        ...new ConventionDtoBuilder().build(),
+        agencyName: "My agency",
+      };
+      ({ store, dependencies } = createTestStore({
+        convention: {
+          error: null,
+          isLoading: false,
+          feedback: { kind: "idle" },
+          convention,
+          currentSignatoryRole: null,
+        },
+      }));
+      const signatoryData = conventionSelectors.signatoryData(store.getState());
+      expectToEqual(signatoryData, {
+        signatory: null,
+        signedAtFieldName: null,
+      });
+    });
+
+    it("selects signatory data in convention when there is convention and currentSignatoryRole", () => {
+      const beneficiary: Beneficiary = {
+        email: "benef@mail.com",
+        role: "beneficiary",
+        phone: "0614000000",
+        firstName: "John",
+        lastName: "Doe",
+      };
+      const convention = {
+        ...new ConventionDtoBuilder().withBeneficiary(beneficiary).build(),
+        agencyName: "My agency",
+      };
+
+      ({ store, dependencies } = createTestStore({
+        convention: {
+          error: null,
+          isLoading: false,
+          feedback: { kind: "idle" },
+          convention,
+          currentSignatoryRole: "beneficiary",
+        },
+      }));
+
+      const signatoryData = conventionSelectors.signatoryData(store.getState());
+
+      expectToEqual(signatoryData, {
+        signatory: beneficiary,
+        signedAtFieldName: "signatories.beneficiary.signedAt",
+      });
     });
   });
 
-  it("stores error if failure during fetch", () => {
-    expectConventionState({
-      isLoading: false,
-      convention: null,
-      error: null,
+  describe("Convention signature", () => {
+    it("signs the conventions with role from jwt", () => {
+      const jwt = "some-correct-jwt";
+      store.dispatch(conventionSlice.actions.signConventionRequested(jwt));
+      expectConventionState({
+        isLoading: true,
+      });
+      feedGatewayWithSignSuccess();
+      expectConventionState({
+        isLoading: false,
+        feedback: { kind: "signedSuccessfully" },
+      });
     });
-    store.dispatch(conventionSlice.actions.conventionRequested("my-jwt"));
-    expectConventionState({ isLoading: true });
-    feedGatewayWithError(new Error("I failed !"));
-    expectConventionState({
-      convention: null,
-      isLoading: false,
-      error: "I failed !",
+
+    it("gets error message when signature fails", () => {
+      const jwt = "some-correct-jwt";
+      store.dispatch(conventionSlice.actions.signConventionRequested(jwt));
+      expectConventionState({
+        isLoading: true,
+      });
+      const errorMessage = "You are not allowed to sign";
+      feedGatewayWithSignError(new Error(errorMessage));
+      expectConventionState({
+        isLoading: false,
+        feedback: { kind: "errored", errorMessage },
+      });
     });
+  });
+
+  describe("Convention ask for modification", () => {
+    it("sends modification request with provided justification", () => {
+      const jwt = "some-correct-jwt";
+      store.dispatch(
+        conventionSlice.actions.modificationRequested({
+          justification: "There is a mistake in my last name",
+          jwt,
+        }),
+      );
+      expectConventionState({
+        isLoading: true,
+      });
+      feedGatewayWithModificationSuccess();
+      expectConventionState({
+        isLoading: false,
+        feedback: { kind: "modificationsAsked" },
+      });
+    });
+
+    it("gets error message when modification fails", () => {
+      const jwt = "some-correct-jwt";
+      store.dispatch(
+        conventionSlice.actions.modificationRequested({
+          justification: "There is a mistake in my last name",
+          jwt,
+        }),
+      );
+      expectConventionState({
+        isLoading: true,
+      });
+      const errorMessage = "You are not allowed to ask for modifications";
+      feedGatewayWithModificationFailure(new Error(errorMessage));
+      expectConventionState({
+        isLoading: false,
+        feedback: { kind: "errored", errorMessage },
+      });
+    });
+  });
+
+  it("stores the current signatory role", () => {
+    expectConventionState({ currentSignatoryRole: null });
+    const newRole: SignatoryRole = "beneficiary";
+    store.dispatch(
+      conventionSlice.actions.currentSignatoryRoleChanged(newRole),
+    );
+    expectConventionState({ currentSignatoryRole: newRole });
   });
 
   const expectConventionState = (conventionState: Partial<ConventionState>) => {
@@ -72,7 +216,7 @@ describe("Convention slice", () => {
     );
   };
 
-  const feedGatewayWithError = (error: Error) => {
+  const feedGatewayWithErrorOnConventionFetch = (error: Error) => {
     dependencies.conventionGateway.convention$.error(error);
   };
 
@@ -80,5 +224,23 @@ describe("Convention slice", () => {
     convention: ConventionReadDto | undefined,
   ) => {
     dependencies.conventionGateway.convention$.next(convention);
+  };
+
+  const feedGatewayWithSignSuccess = () => {
+    dependencies.conventionGateway.conventionSignedResult$.next(undefined);
+  };
+
+  const feedGatewayWithSignError = (error: Error) => {
+    dependencies.conventionGateway.conventionSignedResult$.error(error);
+  };
+
+  const feedGatewayWithModificationSuccess = () => {
+    dependencies.conventionGateway.conventionModificationResult$.next(
+      undefined,
+    );
+  };
+
+  const feedGatewayWithModificationFailure = (error: Error) => {
+    dependencies.conventionGateway.conventionModificationResult$.error(error);
   };
 });

@@ -1,36 +1,35 @@
 import React from "react";
 import { Notification } from "react-design-system/immersionFacile";
-
-export type SubmitFeedBackKind<T> = T | Error | null;
+import {
+  SubmitFeedBack,
+  isFeedbackError,
+} from "src/core-logic/domain/SubmitFeedback";
 
 export type SubmitFeedbackProps<T extends string> = {
-  submitFeedback: SubmitFeedBackKind<T>;
+  submitFeedback: SubmitFeedBack<T>;
   messageByKind: Record<T, React.ReactNode>;
 };
 
-export const SubmitFeedback = <T extends string>({
+export const SubmitFeedbackNotification = <T extends string>({
   submitFeedback,
   messageByKind,
 }: SubmitFeedbackProps<T>) => {
-  if (submitFeedback === null) return null;
+  if (submitFeedback.kind === "idle") return null;
 
   return (
     <>
-      {submitFeedback instanceof Error ? (
+      {isFeedbackError(submitFeedback) ? (
         <Notification
           type="error"
           title="Désolé : nous n'avons pas été en mesure d'enregistrer vos informations. Veuillez réessayer ultérieurement"
         >
-          {getErrorMessage(submitFeedback)}
+          {submitFeedback.errorMessage}
         </Notification>
       ) : (
         <Notification type="success" title="Succès de l'envoi">
-          {messageByKind[submitFeedback]}
+          {messageByKind[submitFeedback.kind]}
         </Notification>
       )}
     </>
   );
 };
-
-const getErrorMessage = (submitError: Error) =>
-  (submitError as any)?.response?.data?.errors ?? submitError?.message;

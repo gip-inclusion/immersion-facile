@@ -11,7 +11,7 @@ import {
 } from "shared";
 
 export interface ConventionGateway {
-  retrieveFromToken(payload: string): Observable<ConventionReadDto | undefined>;
+  retrieveFromToken$(jwt: string): Observable<ConventionReadDto | undefined>;
   add(conventionDto: ConventionDto): Promise<string>;
 
   // Get an immersion application through backoffice, password-protected route.
@@ -23,8 +23,12 @@ export interface ConventionGateway {
     params: UpdateConventionStatusRequestDto,
     jwt: string,
   ): Promise<WithConventionId>;
+  updateStatus$(
+    params: UpdateConventionStatusRequestDto,
+    jwt: string,
+  ): Observable<void>;
 
-  signApplication(jwt: string): Promise<WithConventionId>;
+  signConvention$(jwt: string): Observable<void>;
 
   generateMagicLink(
     adminToken: AdminToken,

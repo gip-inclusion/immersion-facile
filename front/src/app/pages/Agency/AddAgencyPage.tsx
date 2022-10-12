@@ -15,11 +15,12 @@ import {
   SuccessFeedbackKindAgency,
 } from "src/app/components/AgencySubmitFeedback";
 import { RadioGroup } from "src/app/components/RadioGroup";
-import { SubmitFeedback } from "src/app/components/SubmitFeedback";
+import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { UploadLogo } from "src/app/components/UploadLogo";
 import { agencyGateway } from "src/app/config/dependencies";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
+import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
 import { AddressAutocomplete } from "src/uiComponents/autocomplete/AddressAutocomplete";
 import { FillableList } from "src/uiComponents/form/FillableList";
 import { SimpleSelect } from "src/uiComponents/form/SimpleSelect";
@@ -58,10 +59,12 @@ const makeTypedSetField: MakeTypedSetField =
   (setFieldValue) => (fieldName) => (fieldValue) =>
     setFieldValue(fieldName, fieldValue);
 
+type AgencySubmitFeedback = SubmitFeedBack<SuccessFeedbackKindAgency>;
+
 export const AddAgencyPage = () => {
-  const [submitFeedback, setSubmitFeedback] = useState<
-    SuccessFeedbackKindAgency | Error | null
-  >(null);
+  const [submitFeedback, setSubmitFeedback] = useState<AgencySubmitFeedback>({
+    kind: "idle",
+  });
   const { enableLogoUpload } = useFeatureFlags();
 
   return (
@@ -78,7 +81,7 @@ export const AddAgencyPage = () => {
                 questionnaireUrl:
                   values.kind === "pole-emploi" ? "" : values.questionnaireUrl,
               })
-              .then(() => setSubmitFeedback("agencyAdded"))
+              .then(() => setSubmitFeedback({ kind: "agencyAdded" }))
               .catch((e) => {
                 //eslint-disable-next-line  no-console
                 console.log("AddAgencyPage", e);
@@ -183,7 +186,7 @@ export const AddAgencyPage = () => {
                   </Button>
                 </div>
 
-                <SubmitFeedback
+                <SubmitFeedbackNotification
                   submitFeedback={submitFeedback}
                   messageByKind={agencySubmitMessageByKind}
                 />

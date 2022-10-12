@@ -1,14 +1,14 @@
 import { values } from "ramda";
 import React from "react";
 import { Signatories, Signatory, SignatoryRole } from "shared";
+import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import {
-  SubmitFeedback,
-  SubmitFeedBackKind,
-} from "src/app/components/SubmitFeedback";
-import { ConventionSuccessFeedbackKind } from "src/core-logic/domain/convention/convention.slice";
+  ConventionSubmitFeedback,
+  ConventionSuccessFeedbackKind,
+} from "src/core-logic/domain/convention/convention.slice";
 
 type ConventionSubmitFeedbackNotificationProps = {
-  submitFeedback: SubmitFeedBackKind<ConventionSuccessFeedbackKind>;
+  submitFeedback: ConventionSubmitFeedback;
   signatories: Signatories;
 };
 
@@ -19,7 +19,7 @@ export const ConventionSubmitFeedbackNotification = ({
   const messageByKind = createConventionFeedbackMessageByKind(signatories);
 
   return (
-    <SubmitFeedback
+    <SubmitFeedbackNotification
       submitFeedback={submitFeedback}
       messageByKind={messageByKind}
     />

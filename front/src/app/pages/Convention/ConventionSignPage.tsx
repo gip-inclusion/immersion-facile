@@ -1,93 +1,37 @@
 import { Formik } from "formik";
 import { mergeDeepRight } from "ramda";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Notification } from "react-design-system/immersionFacile";
+import { useDispatch } from "react-redux";
 import {
   ConventionDto,
-  ConventionField,
   ConventionMagicLinkPayload,
-  ConventionReadDto,
   conventionSchema,
-  exhaustiveCheck,
-  getConventionFieldName,
   isSignatory,
-  Signatory,
   SignatoryRole,
   signatoryRoles,
 } from "shared";
+import { ConventionSubmitFeedbackNotification } from "src/app/components/ConventionSubmitFeedbackNotification";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
-import { ApiDataContainer } from "src/app/pages/admin/ApiDataContainer";
+import { useConventionSubmitFeedback } from "src/app/pages/Convention/useConventionSubmitFeedback";
 import { routes } from "src/app/routing/routes";
+import { useAppSelector } from "src/app/utils/reduxHooks";
+import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
+import {
+  conventionSelectors,
+  signatoryDataFromConvention,
+} from "src/core-logic/domain/convention/convention.selectors";
+import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { useExistingSiret } from "src/hooks/siret.hooks";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { Route } from "type-route";
 import { ConventionFormFields } from "./ConventionFields/ConventionFormFields";
-import { conventionGateway } from "src/app/config/dependencies";
-import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
-import { ConventionSubmitFeedbackNotification } from "src/app/components/ConventionSubmitFeedbackNotification";
-import { useConventionSubmitFeedback } from "src/app/pages/Convention/useConventionSubmitFeedback";
 
 type SignFormRoute = Route<typeof routes.conventionToSign>;
 
 interface SignFormProps {
   route: SignFormRoute;
 }
-
-const toDisplayedName = (signatory: Signatory) =>
-  `${signatory.lastName.toUpperCase()} ${signatory.firstName}`;
-
-const fromSignatoryRole = (
-  convention: ConventionDto,
-  signatoryRole: SignatoryRole,
-): {
-  displayedName: string;
-  signatory: Signatory;
-  signedAtFieldName: ConventionField;
-  signedAt: string | undefined;
-} => {
-  switch (signatoryRole) {
-    case "beneficiary":
-      return {
-        displayedName: toDisplayedName(convention.signatories.beneficiary),
-        signatory: convention.signatories.beneficiary,
-        signedAtFieldName: getConventionFieldName(
-          "signatories.beneficiary.signedAt",
-        ),
-        signedAt: convention.signatories.beneficiary.signedAt,
-      };
-    case "establishment":
-    case "establishment-representative":
-      return {
-        displayedName: toDisplayedName(
-          convention.signatories.establishmentRepresentative,
-        ),
-        signatory: convention.signatories.establishmentRepresentative,
-        signedAtFieldName: getConventionFieldName(
-          "signatories.establishmentRepresentative.email",
-        ),
-        signedAt: convention.signatories.establishmentRepresentative.signedAt,
-      };
-    case "legal-representative":
-    case "beneficiary-representative":
-      if (!convention.signatories.beneficiaryRepresentative)
-        throw new Error("No beneficiary representative for this convention. ");
-      return {
-        displayedName: toDisplayedName(
-          convention.signatories.beneficiaryRepresentative,
-        ),
-        signatory: convention.signatories.beneficiaryRepresentative,
-        signedAtFieldName: getConventionFieldName(
-          "signatories.beneficiaryRepresentative.email",
-        ),
-        signedAt: convention.signatories.beneficiaryRepresentative.signedAt,
-      };
-    default:
-      return exhaustiveCheck(signatoryRole, {
-        variableName: "signatoryRole",
-        throwIfReached: false,
-      });
-  }
-};
 
 const extractRole = (jwt: string): SignatoryRole => {
   const payload = decodeJwt<ConventionMagicLinkPayload>(jwt);
@@ -133,43 +77,39 @@ export const ConventionSignPage = ({ route }: SignFormProps) => {
 
   return (
     <HeaderFooterLayout>
-      <ApiDataContainer
-        callApi={() => conventionGateway.getMagicLink(route.params.jwt)}
-        jwt={route.params.jwt}
-      >
-        {(convention) => (
-          <SignFormSpecific convention={convention} jwt={route.params.jwt} />
-        )}
-      </ApiDataContainer>
+      <SignFormSpecific jwt={route.params.jwt} />
+      {/*<ApiDataContainer*/}
+      {/*  callApi={() => conventionGateway.getMagicLink(route.params.jwt)}*/}
+      {/*  jwt={route.params.jwt}*/}
+      {/*>*/}
+      {/*  {(convention) => <SignFormSpecific jwt={route.params.jwt} />}*/}
+      {/*</ApiDataContainer>*/}
     </HeaderFooterLayout>
   );
 };
 
 type SignFormSpecificProps = {
-  convention: ConventionReadDto | null;
   jwt: string;
 };
 
-const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
-  const { submitFeedback, setSubmitFeedback } = useConventionSubmitFeedback();
-
-  useExistingSiret(convention?.siret);
-  const [initialValues, setInitialValues] = useState<ConventionReadDto | null>(
-    null,
+const SignFormSpecific = ({ jwt }: SignFormSpecificProps) => {
+  const { submitFeedback } = useConventionSubmitFeedback();
+  const convention = useAppSelector(conventionSelectors.convention);
+  const { signatory: currentSignatory } = useAppSelector(
+    conventionSelectors.signatoryData,
   );
-  const [signatory, setSignatory] = useState<Signatory | undefined>();
-  const [currentSignatoryRole, setCurrentSignatoryRole] = useState<
-    SignatoryRole | undefined
-  >();
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    if (!convention) return;
+    dispatch(conventionSlice.actions.conventionRequested(jwt));
+  }, []);
+
+  useEffect(() => {
     const role = extractRole(jwt);
-    setCurrentSignatoryRole(role);
-    const { signatory } = fromSignatoryRole(convention, role);
-    setSignatory(signatory);
-    setInitialValues(convention);
-  }, [!!convention]);
+    dispatch(conventionSlice.actions.currentSignatoryRoleChanged(role));
+  }, [jwt]);
+
+  useExistingSiret(convention?.siret);
 
   if (!convention) return <p>Chargement en cours...</p>;
 
@@ -193,46 +133,38 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
         </p>
       </div>
 
-      {initialValues && (
+      {!convention ? (
+        <p>Loading...</p>
+      ) : (
         <>
           <Formik
             enableReinitialize={true}
-            initialValues={initialValues}
+            initialValues={convention}
             validationSchema={toFormikValidationSchema(conventionSchema)}
-            onSubmit={async (values, { setSubmitting, setErrors }) => {
-              try {
-                // Confirm checkbox
-                const { signedAtFieldName, signedAt, signatory } =
-                  fromSignatoryRole(
-                    mergeDeepRight(
-                      convention as ConventionDto,
-                      values as ConventionDto,
-                    ) as ConventionDto,
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    currentSignatoryRole!,
-                  );
+            onSubmit={(values, { setErrors }) => {
+              if (!currentSignatory) return;
 
-                const conditionsAccepted = !!signedAt;
+              // Confirm checkbox
+              const { signedAtFieldName, signatory } =
+                signatoryDataFromConvention(
+                  mergeDeepRight(
+                    convention as ConventionDto,
+                    values as ConventionDto,
+                  ) as ConventionDto,
+                  currentSignatory.role,
+                );
 
-                if (!conditionsAccepted) {
-                  setErrors({
-                    [signedAtFieldName]: "La signature est obligatoire",
-                  });
-                  setSubmitting(false);
-                  return;
-                }
+              const conditionsAccepted = !!signatory?.signedAt;
 
-                await conventionGateway.signApplication(jwt);
-
-                setSignatory(signatory);
-                setSubmitFeedback("signedSuccessfully");
-              } catch (error: any) {
-                //eslint-disable-next-line no-console
-                console.log("onSubmitError", error);
-                setSubmitFeedback(error);
-              } finally {
-                setSubmitting(false);
+              if (!conditionsAccepted) {
+                setErrors({
+                  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                  [signedAtFieldName!]: "La signature est obligatoire",
+                });
+                return;
               }
+
+              dispatch(conventionSlice.actions.signConventionRequested(jwt));
             }}
           >
             {(props) => {
@@ -250,17 +182,12 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
                   return;
                 if (justification === "") return rejectWithMessageForm();
 
-                try {
-                  await conventionGateway.updateStatus(
-                    { status: "DRAFT", justification },
+                dispatch(
+                  conventionSlice.actions.modificationRequested({
+                    justification,
                     jwt,
-                  );
-                  setSubmitFeedback("modificationsAsked");
-                } catch (e: any) {
-                  //eslint-disable-next-line no-console
-                  console.log("updateStatus Error", e);
-                  setSubmitFeedback(e);
-                }
+                  }),
+                );
               };
 
               return (
@@ -269,11 +196,11 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
                     onReset={props.handleReset}
                     onSubmit={props.handleSubmit}
                   >
-                    {signatory && (
+                    {currentSignatory && (
                       <ConventionFormFields
                         isFrozen={true}
                         isSignOnly={true}
-                        signatory={signatory}
+                        signatory={currentSignatory}
                         onRejectForm={rejectWithMessageForm}
                       />
                     )}
@@ -294,7 +221,6 @@ const SignFormSpecific = ({ convention, jwt }: SignFormSpecificProps) => {
           </Formik>
         </>
       )}
-      {!initialValues && <p>Loading</p>}
     </SignPageLayout>
   );
 };
