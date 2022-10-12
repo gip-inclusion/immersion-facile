@@ -52,7 +52,7 @@ export class HttpConventionGateway implements ConventionGateway {
     return conventionReadDto;
   }
 
-  public async getMagicLink(jwt: string): Promise<ConventionReadDto> {
+  private async getMagicLink(jwt: string): Promise<ConventionReadDto> {
     const { data } = await this.httpClient.get<unknown>(
       `/auth/${conventionsRoute}/id`,
       {
@@ -104,7 +104,7 @@ export class HttpConventionGateway implements ConventionGateway {
     return fromPromise(this.updateStatus(params, jwt).then(() => undefined));
   }
 
-  public async signApplication(jwt: string): Promise<WithConventionId> {
+  private async signApplication(jwt: string): Promise<WithConventionId> {
     const { data } = await this.httpClient.post<unknown>(
       `/auth/${signConventionRoute}/${jwt}`,
       undefined,

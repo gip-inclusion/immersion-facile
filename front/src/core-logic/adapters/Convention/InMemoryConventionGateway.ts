@@ -68,7 +68,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
   }
 
   // Same as GET above, but using a magic link
-  public async getMagicLink(jwt: string): Promise<ConventionReadDto> {
+  private async getMagicLink(jwt: string): Promise<ConventionReadDto> {
     this.simulatedLatency && (await sleep(this.simulatedLatency));
     const payload = decodeJwt<ConventionMagicLinkPayload>(jwt);
     return this.inferConventionReadDto(
@@ -96,6 +96,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
     return this.updateConventionResult$;
   }
 
+  // not used anymore, kept for inspiration for a simulated gateway
   private async updateStatus(
     { status, justification: _ }: UpdateConventionStatusRequestDto,
     jwt: string,
@@ -120,6 +121,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
     return this.conventionSignedResult$;
   }
 
+  // not used anymore, kept for inspiration for a simulated gateway
   public async signApplication(jwt: string): Promise<WithConventionId> {
     this.simulatedLatency && (await sleep(this.simulatedLatency));
     const payload = decodeJwt<ConventionMagicLinkPayload>(jwt);

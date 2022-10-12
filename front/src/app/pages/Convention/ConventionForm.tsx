@@ -1,5 +1,5 @@
 import { Formik } from "formik";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Notification, Title } from "react-design-system/immersionFacile";
 import { useDispatch } from "react-redux";
 import { ConventionDto, conventionWithoutExternalIdSchema } from "shared";
@@ -28,7 +28,7 @@ export const ConventionForm = ({
   routeParams = {},
 }: ConventionFormProps) => {
   const federatedIdentity = useAppSelector(authSelectors.connectedWith);
-  const initialValues: ConventionPresentation = {
+  const [initialValues] = useState<ConventionPresentation>({
     ...properties,
     signatories: {
       ...properties.signatories,
@@ -40,7 +40,7 @@ export const ConventionForm = ({
           undefined,
       },
     },
-  };
+  });
 
   useExistingSiret(initialValues.siret);
   const submitFeedback = useAppSelector(conventionSelectors.feedback);

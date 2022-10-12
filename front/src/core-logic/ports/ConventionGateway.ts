@@ -7,7 +7,6 @@ import {
   Role,
   ShareLinkByEmailDto,
   UpdateConventionStatusRequestDto,
-  WithConventionId,
 } from "shared";
 
 export interface ConventionGateway {
@@ -17,8 +16,6 @@ export interface ConventionGateway {
   // Get an immersion application through backoffice, password-protected route.
   getById(id: ConventionId): Promise<ConventionReadDto>;
 
-  getMagicLink(jwt: string): Promise<ConventionReadDto>;
-
   update$(conventionDto: ConventionDto, jwt: string): Observable<void>;
 
   updateStatus$(
@@ -26,7 +23,6 @@ export interface ConventionGateway {
     jwt: string,
   ): Observable<void>;
 
-  signApplication(jwt: string): Promise<WithConventionId>;
   signConvention$(jwt: string): Observable<void>;
 
   generateMagicLink(
