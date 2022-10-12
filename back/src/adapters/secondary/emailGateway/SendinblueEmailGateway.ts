@@ -9,7 +9,6 @@ import {
 } from "shared";
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
 import { createLogger } from "../../../utils/logger";
-import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { BadRequestError } from "../../primary/helpers/httpErrors";
 
 const logger = createLogger(__filename);
@@ -78,20 +77,6 @@ export class SendinblueEmailGateway implements EmailGateway {
         { errorMessage: error.message, errorBody: error?.response?.data },
         "Email sending failed",
       );
-      notifyObjectDiscord({
-        _message: `Email ${emailType} sending failed`,
-        recipients: email.recipients.join("; "),
-        body: JSON.stringify(error?.response?.data ?? error?.message, null, 2),
-        response: JSON.stringify(
-          {
-            statusCode: error?.response?.statusCode,
-            errorMessage: error?.message,
-            body: error?.response?.data,
-          },
-          null,
-          2,
-        ),
-      });
       throw error;
     }
   }
