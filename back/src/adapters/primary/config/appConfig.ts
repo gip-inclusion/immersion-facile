@@ -145,13 +145,17 @@ export class AppConfig {
 
   // == Email gateway ==
   public get emailGateway() {
-    const emailGateway = throwIfNotInArray({
+    return throwIfNotInArray({
       processEnv: this.env,
       variableName: "EMAIL_GATEWAY",
-      authorizedValues: ["IN_MEMORY", "HYBRID", "SENDINBLUE"],
+      authorizedValues: [
+        "IN_MEMORY",
+        "HYBRID",
+        "SENDINBLUE",
+        "SENDINBLUE_HTML",
+      ],
       defaultValue: "IN_MEMORY",
     });
-    return emailGateway;
   }
 
   // == Email gateway provider api keys ==

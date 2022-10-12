@@ -28,6 +28,7 @@ import { NotImplementedDashboardGateway } from "../../secondary/dashboardGateway
 import { HybridEmailGateway } from "../../secondary/emailGateway/HybridEmailGateway";
 import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmailGateway";
 import { SendinblueEmailGateway } from "../../secondary/emailGateway/SendinblueEmailGateway";
+import { SendinblueHtmlEmailGateway } from "../../secondary/emailGateway/SendinblueHtmlEmailGateway";
 import { HttpsSireneGateway } from "../../secondary/HttpsSireneGateway";
 import { HttpLaBonneBoiteAPI } from "../../secondary/immersionOffer/HttpLaBonneBoiteAPI";
 import { HttpPassEmploiGateway } from "../../secondary/immersionOffer/HttpPassEmploiGateway";
@@ -162,6 +163,23 @@ export const createGateways = async (config: AppConfig, clock: Clock) => {
 const createEmailGateway = (config: AppConfig, clock: Clock): EmailGateway => {
   if (config.emailGateway === "IN_MEMORY")
     return new InMemoryEmailGateway(clock);
+
+  if (config.emailGateway === "SENDINBLUE_HTML") {
+    const sendinblueHtmlEmailGateway = new SendinblueHtmlEmailGateway(
+      axios,
+      makeEmailAllowListPredicate({
+        skipEmailAllowList: config.skipEmailAllowlist,
+        emailAllowList: config.emailAllowList,
+      }),
+      config.apiKeySendinblue,
+      {
+        name: "Immersion Facilitée",
+        email: "contact@immersion-facile.beta.gouv.fr",
+      },
+    );
+
+    return sendinblueHtmlEmailGateway;
+  }
 
   const sendInBlueEmailGateway = new SendinblueEmailGateway(
     axios,
