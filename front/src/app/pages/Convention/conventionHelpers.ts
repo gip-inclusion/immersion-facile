@@ -3,6 +3,7 @@ import {
   ConventionDto,
   ConventionId,
   ConventionStatus,
+  EstablishmentTutor,
   FederatedIdentity,
   ImmersionObjective,
   InternshipKind,
@@ -35,6 +36,10 @@ type WithSignatures = {
   };
 };
 
+type WithEstablishmentTutor = {
+  establishmentTutor: EstablishmentTutor;
+};
+
 type WithIntershipKind = {
   internshipKind: InternshipKind;
 };
@@ -44,6 +49,7 @@ export type ConventionPresentation = OmitFromExistingKeys<
   "id" | "rejectionJustification"
 > &
   WithSignatures &
+  WithEstablishmentTutor &
   WithIntershipKind;
 
 export const conventionInitialValuesFromUrl = ({
@@ -163,15 +169,14 @@ export const conventionInitialValuesFromUrl = ({
 const devPrefilledValues = (
   emptyForm: ConventionPresentation,
 ): ConventionPresentation => {
-  const {
-    beneficiary,
-    beneficiaryRepresentative,
-    establishmentRepresentative,
-  } = emptyForm.signatories;
+  const { beneficiary, beneficiaryRepresentative } = emptyForm.signatories;
+
+  const tutor = emptyForm.establishmentTutor;
 
   return {
     ...emptyForm,
     signatories: {
+      ...emptyForm.signatories,
       beneficiary: {
         role: "beneficiary",
         firstName: beneficiary.firstName || "Sylvanie",
@@ -183,18 +188,15 @@ const devPrefilledValues = (
           beneficiary.emergencyContactPhone || "0662552607",
         federatedIdentity: beneficiary.federatedIdentity,
       },
-      establishmentRepresentative: {
-        role: "establishment",
-        firstName: establishmentRepresentative.firstName || "Joe",
-        lastName:
-          establishmentRepresentative.lastName ||
-          "Le représentant de l'entreprise",
-        phone: establishmentRepresentative.phone || "0101100110",
-        email:
-          establishmentRepresentative.email ||
-          "establishmentRepresentative@superbusiness.fr",
-      },
       beneficiaryRepresentative,
+    },
+    establishmentTutor: {
+      role: "establishment-tutor",
+      firstName: tutor.firstName || "Joe",
+      lastName: tutor.lastName || "Le tuteur",
+      phone: tutor.phone || "0101100110",
+      email: tutor.email || "establishmentRepresentative@superbusiness.fr",
+      job: tutor.job || "Le job du tuteur",
     },
 
     // Participant
