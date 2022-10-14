@@ -131,13 +131,21 @@ export class HttpOpenCageDataAddressGateway implements AddressGateway {
   public async lookupStreetAddress(
     query: string,
   ): Promise<AddressAndPosition[]> {
-    const { data }: HttpResponse = await this.httpClient.get({
-      target: this.httpClient.targetsUrls.ForwardGeocoding,
-      targetParams: query,
-    });
-    return (data as OpenCageDataFeatureCollection).features
-      .map(toAddressAndPosition)
-      .filter((feature): feature is AddressAndPosition => !!feature);
+    // eslint-disable-next-line no-console
+    console.time(`lookupStreetAddress Duration - ${query}`);
+    try {
+      const { data }: HttpResponse = await this.httpClient.get({
+        target: this.httpClient.targetsUrls.ForwardGeocoding,
+        targetParams: query,
+      });
+
+      return (data as OpenCageDataFeatureCollection).features
+        .map(toAddressAndPosition)
+        .filter((feature): feature is AddressAndPosition => !!feature);
+    } finally {
+      // eslint-disable-next-line no-console
+      console.timeEnd(`lookupStreetAddress Duration - ${query}`);
+    }
   }
 }
 

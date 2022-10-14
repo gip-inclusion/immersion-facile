@@ -58,7 +58,7 @@ import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
 
 const logger = createLogger(__filename);
 
-const AXIOS_TIMEOUT_FIVE_SECOND = 5000;
+const AXIOS_TIMEOUT_MS = 10_000;
 
 export type GetPgPoolFn = () => Pool;
 export const createGetPgPoolFn = (config: AppConfig): GetPgPoolFn => {
@@ -215,7 +215,7 @@ const createPoleEmploiConnectGateway = (config: AppConfig) =>
           httpPeConnectGatewayTargetMapperMaker(config),
           peConnectApiErrorsToDomainErrors,
           {
-            timeout: AXIOS_TIMEOUT_FIVE_SECOND,
+            timeout: AXIOS_TIMEOUT_MS,
           },
           onFullfilledDefaultResponseInterceptorMaker,
           onRejectPeSpecificResponseInterceptorMaker,
@@ -232,7 +232,7 @@ const createAddressGateway = (config: AppConfig) => {
           openCageDataTargetUrlsMapperMaker(config.apiKeyOpenCageData),
           undefined,
           {
-            timeout: AXIOS_TIMEOUT_FIVE_SECOND,
+            timeout: AXIOS_TIMEOUT_MS,
           },
         ),
       )
