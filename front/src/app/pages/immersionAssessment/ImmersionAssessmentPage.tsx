@@ -21,12 +21,11 @@ import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { routes } from "src/app/routing/routes";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
-import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {
   immersionAssessmentErrorSelector,
   immersionAssessmentStatusSelector,
 } from "src/core-logic/domain/immersionAssessment/immersionAssessment.selectors";
-import { useConvention } from "src/hooks/convention";
+import { useConvention } from "src/hooks/convention.hooks";
 import { useImmersionAssessment } from "src/hooks/immersionAssessment";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
@@ -41,12 +40,11 @@ interface ImmersionAssessmentProps {
 export const ImmersionAssessmentPage = ({
   route,
 }: ImmersionAssessmentProps) => {
-  useConvention(route.params.jwt);
+  const { convention, fetchConventionError, isLoading } = useConvention(
+    route.params.jwt,
+  );
   const { role } = decodeJwt<ConventionMagicLinkPayload>(route.params.jwt);
   const { createAssessment } = useImmersionAssessment(route.params.jwt);
-  const convention = useAppSelector(conventionSelectors.convention);
-  const conventionFetchError = useAppSelector(conventionSelectors.fetchError);
-  const isLoading = useAppSelector(conventionSelectors.isLoading);
   const assessmentError = useAppSelector(immersionAssessmentErrorSelector);
   const assessmentStatus = useAppSelector(immersionAssessmentStatusSelector);
 
@@ -71,7 +69,7 @@ export const ImmersionAssessmentPage = ({
           : ""}
       </Title>
       {isLoading && <CircularProgress />}
-      {conventionFetchError && <div>{conventionFetchError}</div>}
+      {fetchConventionError && <div>{fetchConventionError}</div>}
       {convention && !canCreateAssessment && (
         <Notification
           type="error"

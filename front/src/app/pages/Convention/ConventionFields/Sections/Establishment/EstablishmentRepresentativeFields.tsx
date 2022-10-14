@@ -1,7 +1,7 @@
 import React from "react";
 import { getConventionFieldName } from "shared";
 import { RadioGroup } from "src/app/components/RadioGroup";
-import { isEstablishmentTutorIsEstablishmentRepresentativeHook } from "src/hooks/convention";
+import { isEstablishmentTutorIsEstablishmentRepresentativeHook } from "src/hooks/convention.hooks";
 import { useSiretFetcher } from "src/hooks/siret.hooks";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { useConventionTextsFromFormikContext } from "../../../texts/textSetup";

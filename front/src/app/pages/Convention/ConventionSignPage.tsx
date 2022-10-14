@@ -21,6 +21,7 @@ import {
   signatoryDataFromConvention,
 } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
+import { useConvention } from "src/hooks/convention.hooks";
 import { useExistingSiret } from "src/hooks/siret.hooks";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { Route } from "type-route";
@@ -86,18 +87,13 @@ type SignFormSpecificProps = {
 };
 
 const SignFormSpecific = ({ jwt }: SignFormSpecificProps) => {
-  const submitFeedback = useAppSelector(conventionSelectors.feedback);
-  const convention = useAppSelector(conventionSelectors.convention);
-  const fetchConventionError = useAppSelector(conventionSelectors.fetchError);
+  const { convention, fetchConventionError, submitFeedback, isLoading } =
+    useConvention(jwt);
 
   const { signatory: currentSignatory } = useAppSelector(
     conventionSelectors.signatoryData,
   );
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(conventionSlice.actions.conventionRequested(jwt));
-  }, []);
 
   useEffect(() => {
     const role = extractRole(jwt);
@@ -106,7 +102,8 @@ const SignFormSpecific = ({ jwt }: SignFormSpecificProps) => {
 
   useExistingSiret(convention?.siret);
 
-  if (!convention) return <p>Chargement en cours...</p>;
+  if (!isLoading) return <p>Chargement en cours...</p>;
+  if (!convention) return <p>Pas de convention correspondante trouvée...</p>;
   if (convention.status === "REJECTED") return <ConventionRejectedMessage />;
   if (convention.status === "DRAFT")
     return <ConventionNeedsModificationMessage jwt={jwt} />;

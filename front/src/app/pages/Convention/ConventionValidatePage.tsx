@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Notification } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
@@ -9,13 +9,12 @@ import {
 } from "shared";
 import { ConventionFeedbackNotification } from "src/app/components/ConventionFeedbackNotification";
 import { routes } from "src/app/routing/routes";
-import { useAppSelector } from "src/app/utils/reduxHooks";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
-import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {
   ConventionFeedbackKind,
   conventionSlice,
 } from "src/core-logic/domain/convention/convention.slice";
+import { useConvention } from "src/hooks/convention.hooks";
 import { ConventionFormAccordion } from "src/uiComponents/admin/ConventionFormAccordion";
 import { Route } from "type-route";
 import { VerificationActionButton } from "./VerificationActionButton";
@@ -40,15 +39,10 @@ const isAllowedTransition = (
 export const ConventionValidatePage = ({ route }: VerificationPageProps) => {
   const jwt = route.params.jwt;
   const { role } = decodeJwt<ConventionMagicLinkPayload>(jwt);
-  const convention = useAppSelector(conventionSelectors.convention);
-  const fetchConventionError = useAppSelector(conventionSelectors.fetchError);
-  const submitFeedback = useAppSelector(conventionSelectors.feedback);
+  const { convention, fetchConventionError, submitFeedback, isLoading } =
+    useConvention(jwt);
 
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(conventionSlice.actions.conventionRequested(jwt));
-  }, []);
 
   if (fetchConventionError)
     return (
@@ -60,9 +54,8 @@ export const ConventionValidatePage = ({ route }: VerificationPageProps) => {
       </Notification>
     );
 
-  if (!convention) {
-    return <p>Chargement en cours...</p>;
-  }
+  if (isLoading) return <p>Chargement en cours...</p>;
+  if (!convention) return <p>Pas de conventions correspondante trouvée</p>;
 
   const disabled = submitFeedback.kind !== "idle";
   const currentStatus = convention.status;

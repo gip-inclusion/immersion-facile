@@ -6,13 +6,22 @@ import {
   EstablishmentRepresentative,
   getSignatoryKey,
 } from "shared";
+import { useAppSelector } from "src/app/utils/reduxHooks";
+import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 
 export const useConvention = (jwt: string) => {
+  const convention = useAppSelector(conventionSelectors.convention);
+  const submitFeedback = useAppSelector(conventionSelectors.feedback);
+  const fetchConventionError = useAppSelector(conventionSelectors.fetchError);
+  const isLoading = useAppSelector(conventionSelectors.isLoading);
+
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(conventionSlice.actions.conventionRequested(jwt));
   }, []);
+
+  return { convention, submitFeedback, fetchConventionError, isLoading };
 };
 
 export const isEstablishmentTutorIsEstablishmentRepresentativeHook = () => {
