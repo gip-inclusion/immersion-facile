@@ -82,8 +82,21 @@
   display: block;
   width: 100%;
 }
+.searchdropdown__inner {
+  position: relative;
+}
+
+.searchdropdown__button-clear {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.7;
+}
 
 .searchdropdown__toggler:hover,
-.searchdropdown__toggler:active {
+.searchdropdown__toggler:active,
+.searchdropdown__button-clear:hover,
+.searchdropdown__button-clear:active {
   background: transparent !important; /* Prevent DSFR hover background */
 }

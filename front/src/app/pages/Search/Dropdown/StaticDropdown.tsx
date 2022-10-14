@@ -21,6 +21,7 @@ export const StaticDropdown = ({
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(defaultSelectedIndex);
   const toggler = useRef(null);
+  const buttonClear = useRef(null);
   useEffect(() => {
     function handleClickOutsideToggler(event: MouseEvent) {
       if (
@@ -35,13 +36,17 @@ export const StaticDropdown = ({
       document.removeEventListener("click", handleClickOutsideToggler);
     };
   }, [toggler]);
+  const onClearButtonClick = () => {
+    setSelectedIndex(-1);
+    onSelection("", -1);
+  };
   return (
     <div className="autocomplete">
       <label className="inputLabel searchdropdown-header" htmlFor={"search"}>
         {title}
       </label>
 
-      <div style={{ position: "relative" }}>
+      <div className={"searchdropdown__inner"}>
         <button
           type={"button"}
           className={"searchdropdown__toggler"}
@@ -50,6 +55,15 @@ export const StaticDropdown = ({
             setIsOpen(!isOpen);
           }}
         ></button>
+        {selectedIndex > -1 && (
+          <button
+            type={"button"}
+            className={"searchdropdown__button-clear fr-icon-close-circle-line"}
+            ref={buttonClear}
+            onClick={onClearButtonClick}
+          ></button>
+        )}
+
         <input
           readOnly
           id="search"
