@@ -7,6 +7,7 @@ type SimpleSelectProps = {
   id: string;
   name: string;
   options: Array<{ value: string; label: string }>;
+  className?: string;
 };
 
 export const SimpleSelect = ({
@@ -14,6 +15,7 @@ export const SimpleSelect = ({
   label,
   name,
   options,
+  className,
 }: SimpleSelectProps) => {
   const [field, meta] = useField<string>({ name });
   const hasError = meta.touched && !!meta.error;
@@ -21,7 +23,9 @@ export const SimpleSelect = ({
   return (
     <FormControl fullWidth error={hasError}>
       <div
-        className={`fr-input-group ${hasError ? " fr-input-group--error" : ""}`}
+        className={`fr-input-group ${
+          hasError ? " fr-input-group--error" : ""
+        } ${className ? className : ""}`}
       >
         <label className="fr-label" htmlFor={id}>
           {label}
