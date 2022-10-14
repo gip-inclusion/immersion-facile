@@ -1,3 +1,4 @@
+export type ManagedErrorKind = typeof managedErrorKinds[number];
 const managedErrorKinds = [
   "peConnectInvalidGrant",
   "peConnectNoAuthorisation",
@@ -11,9 +12,7 @@ const managedErrorKinds = [
   "unknownError",
 ] as const;
 
-export type ManagedErrorKinds = typeof managedErrorKinds[number];
-
 export const isManagedError = (
   kind: string | undefined,
-): kind is ManagedErrorKinds =>
-  kind ? managedErrorKinds.includes(kind as ManagedErrorKinds) : false;
+): kind is ManagedErrorKind =>
+  kind ? managedErrorKinds.includes(kind as ManagedErrorKind) : false;

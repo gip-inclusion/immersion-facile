@@ -17,7 +17,12 @@ const convention = createSelector(
   ({ convention }) => convention,
 );
 
-const error = createSelector(conventionState, ({ error }) => error);
+const fetchError = createSelector(
+  conventionState,
+  ({ fetchError }) => fetchError,
+);
+
+const isLoading = createSelector(conventionState, ({ isLoading }) => isLoading);
 
 type SignatoryData = {
   signatory: Signatory | null;
@@ -34,11 +39,11 @@ const signatoryData = createSelector(
 );
 
 export const conventionSelectors = {
-  conventionState,
   convention,
-  error,
+  fetchError,
   feedback,
   signatoryData,
+  isLoading,
 };
 
 export const signatoryDataFromConvention = (

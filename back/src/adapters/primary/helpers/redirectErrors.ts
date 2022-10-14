@@ -1,4 +1,4 @@
-import { ManagedErrorKinds } from "shared";
+import { ManagedErrorKind } from "shared";
 
 export abstract class RedirectError extends Error {
   constructor(message: string, cause?: Error) {
@@ -7,7 +7,7 @@ export abstract class RedirectError extends Error {
 }
 
 export class ManagedRedirectError extends RedirectError {
-  constructor(public readonly kind: ManagedErrorKinds, cause?: Error) {
+  constructor(public readonly kind: ManagedErrorKind, cause?: Error) {
     super(`A managed redirect error of type ${kind} has been thrown`, cause);
   }
 }

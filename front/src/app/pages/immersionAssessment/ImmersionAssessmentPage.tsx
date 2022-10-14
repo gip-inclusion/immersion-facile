@@ -44,11 +44,9 @@ export const ImmersionAssessmentPage = ({
   useConvention(route.params.jwt);
   const { role } = decodeJwt<ConventionMagicLinkPayload>(route.params.jwt);
   const { createAssessment } = useImmersionAssessment(route.params.jwt);
-  const {
-    convention,
-    isLoading,
-    error: conventionFetchError,
-  } = useAppSelector(conventionSelectors.conventionState);
+  const convention = useAppSelector(conventionSelectors.convention);
+  const conventionFetchError = useAppSelector(conventionSelectors.fetchError);
+  const isLoading = useAppSelector(conventionSelectors.isLoading);
   const assessmentError = useAppSelector(immersionAssessmentErrorSelector);
   const assessmentStatus = useAppSelector(immersionAssessmentStatusSelector);
 

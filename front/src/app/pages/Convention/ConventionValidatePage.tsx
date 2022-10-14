@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { Notification } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   ConventionMagicLinkPayload,
@@ -40,6 +41,7 @@ export const ConventionValidatePage = ({ route }: VerificationPageProps) => {
   const jwt = route.params.jwt;
   const { role } = decodeJwt<ConventionMagicLinkPayload>(jwt);
   const convention = useAppSelector(conventionSelectors.convention);
+  const fetchConventionError = useAppSelector(conventionSelectors.fetchError);
   const submitFeedback = useAppSelector(conventionSelectors.feedback);
 
   const dispatch = useDispatch();
@@ -48,8 +50,18 @@ export const ConventionValidatePage = ({ route }: VerificationPageProps) => {
     dispatch(conventionSlice.actions.conventionRequested(jwt));
   }, []);
 
+  if (fetchConventionError)
+    return (
+      <Notification
+        title="Erreur lors de la récupération de la convention"
+        type="error"
+      >
+        {fetchConventionError}
+      </Notification>
+    );
+
   if (!convention) {
-    return <p>"Chargement en cours..."</p>;
+    return <p>Chargement en cours...</p>;
   }
 
   const disabled = submitFeedback.kind !== "idle";

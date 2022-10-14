@@ -1,5 +1,5 @@
 import React from "react";
-import { ManagedErrorKinds } from "shared";
+import { ManagedErrorKind } from "shared";
 import {
   HttpClientInvalidToken,
   HttpClientNotFoundError,
@@ -14,7 +14,7 @@ import { PEConnectUserForbiddenAccess } from "./PEConnectUserForbiddenAccess";
 import { UnknownError } from "./UnknownError";
 
 type ManagedErrorSelectorProperties = {
-  kind: ManagedErrorKinds;
+  kind: ManagedErrorKind;
   children?: React.ReactNode;
 };
 
@@ -31,7 +31,7 @@ type ManagedErrorProperties = {
 };
 
 const managedErrors: Record<
-  ManagedErrorKinds,
+  ManagedErrorKind,
   (props: ManagedErrorProperties) => JSX.Element
 > = {
   peConnectNoAuthorisation: PEConnectNoAuthorisation,

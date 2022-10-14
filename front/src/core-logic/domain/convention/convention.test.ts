@@ -52,7 +52,7 @@ describe("Convention slice", () => {
           jwt: "some-correct-jwt",
           convention: null,
           isLoading: false,
-          error: null,
+          fetchError: null,
           feedback: { kind: "idle" },
           currentSignatoryRole: null,
         },
@@ -125,7 +125,7 @@ describe("Convention slice", () => {
       expectConventionState({
         isLoading: false,
         convention: null,
-        error: null,
+        fetchError: null,
       });
       store.dispatch(conventionSlice.actions.conventionRequested("my-jwt"));
       expectConventionState({ isLoading: true });
@@ -133,7 +133,7 @@ describe("Convention slice", () => {
       expectConventionState({
         convention: null,
         isLoading: false,
-        error: "I failed !",
+        fetchError: "I failed !",
       });
     });
   });
@@ -155,7 +155,7 @@ describe("Convention slice", () => {
       ({ store, dependencies } = createTestStore({
         convention: {
           jwt: null,
-          error: null,
+          fetchError: null,
           isLoading: false,
           feedback: { kind: "idle" },
           convention,
@@ -185,7 +185,7 @@ describe("Convention slice", () => {
       ({ store, dependencies } = createTestStore({
         convention: {
           jwt: null,
-          error: null,
+          fetchError: null,
           isLoading: false,
           feedback: { kind: "idle" },
           convention,
@@ -284,10 +284,7 @@ describe("Convention slice", () => {
   });
 
   const expectConventionState = (conventionState: Partial<ConventionState>) => {
-    expectObjectsToMatch(
-      conventionSelectors.conventionState(store.getState()),
-      conventionState,
-    );
+    expectObjectsToMatch(store.getState().convention, conventionState);
   };
 
   const feedGatewayWithAddConventionSuccess = () => {

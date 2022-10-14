@@ -88,6 +88,8 @@ type SignFormSpecificProps = {
 const SignFormSpecific = ({ jwt }: SignFormSpecificProps) => {
   const submitFeedback = useAppSelector(conventionSelectors.feedback);
   const convention = useAppSelector(conventionSelectors.convention);
+  const fetchConventionError = useAppSelector(conventionSelectors.fetchError);
+
   const { signatory: currentSignatory } = useAppSelector(
     conventionSelectors.signatoryData,
   );
@@ -127,6 +129,18 @@ const SignFormSpecific = ({ jwt }: SignFormSpecificProps) => {
     );
   };
 
+  if (fetchConventionError)
+    return (
+      <SignPageLayout>
+        <Notification
+          title="Erreur lors de la récupération de la convention"
+          type="error"
+        >
+          {fetchConventionError}
+        </Notification>
+      </SignPageLayout>
+    );
+
   return (
     <SignPageLayout>
       <h2>
@@ -144,7 +158,7 @@ const SignFormSpecific = ({ jwt }: SignFormSpecificProps) => {
       </div>
 
       {!convention ? (
-        <p>Loading...</p>
+        <p>Chargement en cours...</p>
       ) : (
         <>
           <Formik

@@ -28,7 +28,7 @@ export interface ConventionState {
   jwt: string | null;
   isLoading: boolean;
   convention: ConventionReadDto | null;
-  error: string | null;
+  fetchError: string | null;
   feedback: ConventionSubmitFeedback;
   currentSignatoryRole: SignatoryRole | null;
 }
@@ -37,7 +37,7 @@ const initialState: ConventionState = {
   jwt: null,
   convention: null,
   isLoading: false,
-  error: null,
+  fetchError: null,
   feedback: { kind: "idle" },
   currentSignatoryRole: null,
 };
@@ -78,7 +78,7 @@ export const conventionSlice = createSlice({
       state.isLoading = false;
     },
     conventionFailed: (state, action: PayloadAction<string>) => {
-      state.error = action.payload;
+      state.fetchError = action.payload;
       state.isLoading = false;
     },
 
@@ -116,13 +116,6 @@ export const conventionSlice = createSlice({
 
     jwtProvided: (state, action: PayloadAction<string>) => {
       state.jwt = action.payload;
-    },
-
-    conventionSubmitFeedbackChanged: (
-      state,
-      action: PayloadAction<ConventionSubmitFeedback>,
-    ) => {
-      state.feedback = action.payload;
     },
 
     currentSignatoryRoleChanged: (
