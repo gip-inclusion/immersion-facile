@@ -1,4 +1,4 @@
-import immersionFacileLogo from "/Logo-immersion-facilitee-01-RVB-reflets-crop.svg";
+import immersionFacileLogo from "/img/Logo-immersion-facilitee-01-RVB-reflets-crop.svg";
 import React from "react";
 import {
   Header,

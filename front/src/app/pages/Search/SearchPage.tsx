@@ -1,5 +1,5 @@
-import distanceSearchIcon from "/distance-search-icon.svg";
-import locationSearchIcon from "/location-search-icon.svg";
+import distanceSearchIcon from "/img/distance-search-icon.svg";
+import locationSearchIcon from "/img/location-search-icon.svg";
 import SearchIcon from "@mui/icons-material/Search";
 import { Form, Formik } from "formik";
 import React from "react";

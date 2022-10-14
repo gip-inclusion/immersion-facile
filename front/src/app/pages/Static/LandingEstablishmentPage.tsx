@@ -1,7 +1,7 @@
-import bubbles from "/bulles.svg";
-import checked from "/checked.svg";
-import greatings from "/greatings.png";
-import tandem from "/tandem.png";
+import bubbles from "/img/bulles.svg";
+import checked from "/img/checked.svg";
+import greatings from "/img/greatings.png";
+import tandem from "/img/tandem.png";
 import React, { useEffect } from "react";
 
 import {
@@ -10,7 +10,7 @@ import {
   Colored,
   Title,
 } from "react-design-system/immersionFacile";
-import arrow from "/fleche.svg";
+import arrow from "/img/fleche.svg";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { routes } from "src/app/routing/routes";
 import { EstablishmentImmersionHowTo } from "src/uiComponents/ImmersionHowTo";

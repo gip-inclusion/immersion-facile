@@ -1,4 +1,4 @@
-import logoLeMoisLesEntreprises from "src/assets/logo-le-mois-les-entreprises.svg";
+import logoLeMoisLesEntreprises from "src/assets/img/logo-le-mois-les-entreprises.svg";
 import { SiretFetcherInput } from "src/app/components/SiretFetcherInput";
 import React from "react";
 

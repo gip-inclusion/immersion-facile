@@ -1,5 +1,5 @@
-import lesEntrepriseSengagent from "/les-entreprises-s-engagent.svg";
-import poleEmploiLogo from "/pole-emploi-logo.svg";
+import lesEntrepriseSengagent from "/img/les-entreprises-s-engagent.svg";
+import poleEmploiLogo from "/img/pole-emploi-logo.svg";
 import React from "react";
 import { Footer, NavLink } from "react-design-system";
 

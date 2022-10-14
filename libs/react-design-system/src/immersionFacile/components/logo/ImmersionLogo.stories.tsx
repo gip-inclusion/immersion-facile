@@ -19,5 +19,5 @@ const template: ComponentStory<typeof Component> = (args) => (
 
 export const Default = template.bind({});
 Default.args = {
-  url: "https://immersion-facile.beta.gouv.fr/Logo-immersion-facilitee-01-RVB-reflets-crop.svg",
+  url: "https://immersion-facile.beta.gouv.fr/img/Logo-immersion-facilitee-01-RVB-reflets-crop.svg",
 };

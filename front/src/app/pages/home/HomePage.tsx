@@ -9,7 +9,7 @@ import { HomeImmersionHowTo } from "src/uiComponents/ImmersionHowTo";
 import { FixedStamp, MainWrapper } from "react-design-system/immersionFacile";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { routes } from "src/app/routing/routes";
-import logoLeMoisLesEntreprises from "../../../assets/logo-le-mois-les-entreprises.svg";
+import logoLeMoisLesEntreprises from "../../../assets/img/logo-le-mois-les-entreprises.svg";
 const { frontEnvType } = ENV;
 const DebugInfo = () => (
   <div

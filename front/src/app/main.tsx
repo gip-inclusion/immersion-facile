@@ -1,4 +1,4 @@
-import "src/assets/index.css";
+import "src/assets/css/index.css";
 import "@gouvfr/dsfr/dist/dsfr/dsfr.css";
 import "@gouvfr/dsfr/dist/utility/utility.css";
 

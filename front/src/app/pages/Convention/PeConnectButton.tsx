@@ -1,5 +1,6 @@
 import React from "react";
 import { loginPeConnect } from "shared";
+import "./PeConnectButton.css";
 
 export const PeConnectButton = ({
   onClick,
@@ -15,14 +16,14 @@ export const PeConnectButton = ({
     >
       <img
         className="icon-pe-connect"
-        src="/pe-connect-barre-nav-b.svg"
+        src="/img/pe-connect-barre-nav-b.svg"
         alt=""
         width="300"
         height="75"
       />
       <img
         className="icon-pe-connect-hover"
-        src="/pe-connect-barre-nav-b-o.svg"
+        src="/img/pe-connect-barre-nav-b-o.svg"
         alt=""
         width="300"
         height="75"
