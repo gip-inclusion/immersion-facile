@@ -19,6 +19,9 @@ export const useConvention = (jwt: string) => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(conventionSlice.actions.conventionRequested(jwt));
+    return () => {
+      dispatch(conventionSlice.actions.clearFeedbackTriggered());
+    };
   }, []);
 
   return { convention, submitFeedback, fetchConventionError, isLoading };

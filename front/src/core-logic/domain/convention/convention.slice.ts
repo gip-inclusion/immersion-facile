@@ -114,6 +114,10 @@ export const conventionSlice = createSlice({
       state.feedback = { kind: "errored", errorMessage: action.payload };
     },
 
+    clearFeedbackTriggered: (state) => {
+      state.feedback = { kind: "idle" };
+    },
+
     jwtProvided: (state, action: PayloadAction<string>) => {
       state.jwt = action.payload;
     },

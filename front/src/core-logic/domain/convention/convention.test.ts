@@ -283,6 +283,21 @@ describe("Convention slice", () => {
     expectConventionState({ currentSignatoryRole: newRole });
   });
 
+  it("changes the feedback to idle when asked", () => {
+    ({ store } = createTestStore({
+      convention: {
+        jwt: null,
+        convention: null,
+        feedback: { kind: "modificationsAskedFromSignatory" },
+        isLoading: false,
+        fetchError: null,
+        currentSignatoryRole: null,
+      },
+    }));
+    store.dispatch(conventionSlice.actions.clearFeedbackTriggered());
+    expectConventionState({ feedback: { kind: "idle" } });
+  });
+
   const expectConventionState = (conventionState: Partial<ConventionState>) => {
     expectObjectsToMatch(store.getState().convention, conventionState);
   };

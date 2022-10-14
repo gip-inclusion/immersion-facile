@@ -18,6 +18,16 @@ import { useExistingSiret } from "src/hooks/siret.hooks";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { ConventionFormFields } from "./ConventionFields/ConventionFormFields";
 
+const useClearConventionSubmitFeedbackOnUnmount = () => {
+  const dispatch = useDispatch();
+  useEffect(
+    () => () => {
+      dispatch(conventionSlice.actions.clearFeedbackTriggered());
+    },
+    [],
+  );
+};
+
 type ConventionFormProps = {
   properties: ConventionPresentation;
   routeParams?: { jwt?: string; demandeId?: string };
@@ -53,6 +63,8 @@ export const ConventionForm = ({
     dispatch(conventionSlice.actions.jwtProvided(routeParams.jwt));
     dispatch(conventionSlice.actions.conventionRequested(routeParams.jwt));
   }, []);
+
+  useClearConventionSubmitFeedbackOnUnmount();
 
   const t = useConventionTexts(initialValues.internshipKind);
 
