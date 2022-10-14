@@ -18,7 +18,7 @@ export const useConvention = (jwt: string) => {
 
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(conventionSlice.actions.conventionRequested(jwt));
+    dispatch(conventionSlice.actions.fetchConventionRequested(jwt));
     return () => {
       dispatch(conventionSlice.actions.clearFeedbackTriggered());
     };

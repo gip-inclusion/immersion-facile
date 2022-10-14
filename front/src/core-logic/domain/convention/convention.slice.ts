@@ -67,17 +67,18 @@ export const conventionSlice = createSlice({
     },
 
     // Get convention from token
-    conventionRequested: (state, _action: PayloadAction<string>) => {
+    fetchConventionRequested: (state, _action: PayloadAction<string>) => {
       state.isLoading = true;
+      state.feedback = { kind: "idle" };
     },
-    conventionSucceeded: (
+    fetchConventionSucceeded: (
       state,
       action: PayloadAction<ConventionReadDto | undefined>,
     ) => {
       state.convention = action.payload ?? null;
       state.isLoading = false;
     },
-    conventionFailed: (state, action: PayloadAction<string>) => {
+    fetchConventionFailed: (state, action: PayloadAction<string>) => {
       state.fetchError = action.payload;
       state.isLoading = false;
     },

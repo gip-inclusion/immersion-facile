@@ -61,7 +61,7 @@ export const ConventionForm = ({
     if (!("demandeId" in routeParams) && !("jwt" in routeParams)) return;
     if (!("jwt" in routeParams) || routeParams.jwt === undefined) return;
     dispatch(conventionSlice.actions.jwtProvided(routeParams.jwt));
-    dispatch(conventionSlice.actions.conventionRequested(routeParams.jwt));
+    dispatch(conventionSlice.actions.fetchConventionRequested(routeParams.jwt));
   }, []);
 
   useClearConventionSubmitFeedbackOnUnmount();

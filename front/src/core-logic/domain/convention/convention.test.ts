@@ -96,7 +96,9 @@ describe("Convention slice", () => {
         isLoading: false,
         convention: null,
       });
-      store.dispatch(conventionSlice.actions.conventionRequested("my-jwt"));
+      store.dispatch(
+        conventionSlice.actions.fetchConventionRequested("my-jwt"),
+      );
       expectConventionState({ isLoading: true });
       feedGatewayWithConvention(undefined);
       expectConventionState({
@@ -112,7 +114,9 @@ describe("Convention slice", () => {
         isLoading: false,
         convention: null,
       });
-      store.dispatch(conventionSlice.actions.conventionRequested("my-jwt"));
+      store.dispatch(
+        conventionSlice.actions.fetchConventionRequested("my-jwt"),
+      );
       expectConventionState({ isLoading: true });
       feedGatewayWithConvention(conventionRead);
       expectConventionState({
@@ -127,7 +131,9 @@ describe("Convention slice", () => {
         convention: null,
         fetchError: null,
       });
-      store.dispatch(conventionSlice.actions.conventionRequested("my-jwt"));
+      store.dispatch(
+        conventionSlice.actions.fetchConventionRequested("my-jwt"),
+      );
       expectConventionState({ isLoading: true });
       feedGatewayWithErrorOnConventionFetch(new Error("I failed !"));
       expectConventionState({
@@ -135,6 +141,28 @@ describe("Convention slice", () => {
         isLoading: false,
         fetchError: "I failed !",
       });
+    });
+
+    it("clears initial submit feedback kind if it was not idle when it started to fetch", () => {
+      expectConventionState({
+        isLoading: false,
+        convention: null,
+        fetchError: null,
+      });
+      ({ store } = createTestStore({
+        convention: {
+          feedback: { kind: "justSubmitted" },
+          isLoading: false,
+          convention: null,
+          fetchError: null,
+          jwt: null,
+          currentSignatoryRole: null,
+        },
+      }));
+      store.dispatch(
+        conventionSlice.actions.fetchConventionRequested("my-jwt"),
+      );
+      expectConventionState({ isLoading: true, feedback: { kind: "idle" } });
     });
   });
 
