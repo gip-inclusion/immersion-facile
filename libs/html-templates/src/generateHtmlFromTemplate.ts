@@ -11,9 +11,15 @@ export const generateHtmlFromTemplate = <N extends keyof TemplateByName>(
 ): { subject: string; htmlContent: string; tags?: string[] } => {
   const { subject, createEmailVariables } = templateByName[templateName];
 
-  const { greetings, content, agencyLogoUrl } = createEmailVariables(
-    params as any,
-  );
+  const {
+    agencyLogoUrl,
+    greetings,
+    content,
+    button,
+    highlight,
+    subContent,
+    legals,
+  } = createEmailVariables(params as any);
 
   return {
     subject,
@@ -24,6 +30,10 @@ export const generateHtmlFromTemplate = <N extends keyof TemplateByName>(
               header(agencyLogoUrl),
               greetings,
               formatContent(content),
+              formatButton(button),
+              highlight,
+              subContent,
+              legals,
               footer(),
             ]
               .filter(Boolean)
@@ -43,7 +53,7 @@ const footer = () => `<p>Mon footer</p>`;
 
 const formatContent = (content: string | undefined): string | undefined => {
   if (!content) return;
-  const formattedContent = content.split("\n").join("<br/>");
+  const formattedContent = ignoreTabs(content).split("\n").join("<br/>");
 
   return `<table>
     <tr>
@@ -52,6 +62,11 @@ const formatContent = (content: string | undefined): string | undefined => {
 </table>`;
 };
 
+const formatButton = (params?: {
+  url: string;
+  label: string;
+}): string | undefined =>
+  params && `<a href="${params.url}">${params.label}</a>>`;
 // The following comes from : http://htmlemailboilerplate.com/
 
 const doctype =

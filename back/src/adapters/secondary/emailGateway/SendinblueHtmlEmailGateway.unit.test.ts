@@ -128,7 +128,7 @@ describe("SendingBlueHtmlEmailGateway unit", () => {
             <p>Mon header www.mylogo.com</p>
             <table>
               <tr>
-                <td><strong>Votre structure prescriptrice d'immersion est activée !</strong> <br/><br/>        Nous avons bien activé l'accès à la demande de convention dématérialisée pour des immersions professionnelles pour: My agency.<br/><br/>        Merci à vous !</td>
+                <td><strong>Votre structure prescriptrice d'immersion est activée !</strong> <br/><br/>Nous avons bien activé l'accès à la demande de convention dématérialisée pour des immersions professionnelles pour: My agency. <br/><br/>Merci à vous !</td>
               </tr>
             </table>
             <p>Mon footer</p>

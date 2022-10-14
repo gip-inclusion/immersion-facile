@@ -1,13 +1,17 @@
 import { EmailType, TemplatedEmail } from "shared";
 
 type CreateEmailVariable<P> = (params: P) => {
-  content?: string;
   greetings?: string;
+  content?: string;
+  highlight?: string;
+  subContent?: string;
+  legals?: string;
   agencyLogoUrl?: string;
+  button?: {
+    url: string;
+    label: string;
+  };
 };
-
-const ifExists = (str: string | undefined, cb: (str: string) => string) =>
-  str ? cb(str) : "";
 
 export const templateByName: {
   [K in EmailType]: {
@@ -23,8 +27,8 @@ export const templateByName: {
     createEmailVariables: ({ agencyName, agencyLogoUrl }) => ({
       content: `<strong>Votre structure prescriptrice d'immersion est activée !</strong> 
 
-        Nous avons bien activé l'accès à la demande de convention dématérialisée pour des immersions professionnelles pour: ${agencyName}.
-
+        Nous avons bien activé l'accès à la demande de convention dématérialisée pour des immersions professionnelles pour: ${agencyName}. 
+        
         Merci à vous !`,
       agencyLogoUrl,
     }),
@@ -110,26 +114,24 @@ export const templateByName: {
       content: `Une demande de convention d'immersion vient d'être enregistrée. Vous devez maintenant la confirmer.
         
         Pour rappel, cette demande concerne : 
-           - Le bénéficiaire ${beneficiaryName}${ifExists(
-        beneficiaryRepresentativeName,
-        (str) => `\n- ${str}`,
-      )}
+           - Le bénéficiaire ${beneficiaryName}${
+        beneficiaryRepresentativeName
+          ? `\n- ${beneficiaryRepresentativeName}`
+          : ""
+      }
            - L'entreprise ${businessName}
            - Le tuteur dans l'entreprise ${establishmentRepresentativeName}
         
         Votre confirmation est indispensable pour permettre la validation définitive de la convention par un conseiller.  
         
-        <strong>Vous devez maintenant confirmer votre demande. 
-        
-        <a href="${magicLink}">Pour la confirmer, cliquez ici</a>. 
-        
-        Votre confirmation est obligatoire</strong> pour permettre à votre conseiller de valider la convention. Merci  !
+        Vous devez maintenant confirmer votre demande.`,
+      button: { url: magicLink, label: "Pour la confirmer, cliquez ici" },
+      highlight: `<strong>Votre confirmation est obligatoire</strong> pour permettre à votre conseiller de valider la convention. Merci  !
         
         La décision de votre conseiller vous sera transmise par mail.
         
-        Attention, ne démarrez pas votre immersion tant que vous n'avez pas reçu cette validation ! Vous n'auriez pas de couverture en cas d'accident.  
-        
-        Bonne journée !
+        Attention, ne démarrez pas votre immersion tant que vous n'avez pas reçu cette validation ! Vous n'auriez pas de couverture en cas d'accident.`,
+      subContent: `Bonne journée !
         
         L'équipe de l'Immersion Facilitée`,
     }),
