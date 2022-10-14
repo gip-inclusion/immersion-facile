@@ -3,6 +3,7 @@ RUN curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml /app/
 COPY shared/package.json /app/shared/
+COPY libs/html-templates/package.json /app/libs/html-templates/
 COPY front/package.json /app/front/
 COPY back/package.json /app/back/
 
@@ -11,6 +12,7 @@ WORKDIR /app
 RUN pnpm install --frozen-lockfile --ignore-scripts
 
 COPY ./shared/ /app/shared
+COPY ./libs/html-templates /app/libs/html-templates
 
 # back only
 FROM builder
@@ -21,8 +23,4 @@ WORKDIR /app/back
 
 CMD pnpm migrate up && pnpm start-prod
 
-
-#COPY ./back/ /app/back
-#WORKDIR /app/back
-#CMD npm run migrate up && npm run start-prod
 
