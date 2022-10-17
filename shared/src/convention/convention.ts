@@ -3,6 +3,7 @@ import { Role } from "../tokens/MagicLinkPayload";
 import { DotNestedKeys, ExtractFromExisting } from "../utils";
 import {
   ConventionDto,
+  ConventionDtoWithoutExternalId,
   ConventionStatus,
   Signatories,
   SignatoryRole,
@@ -98,3 +99,17 @@ type SignatoryField = ExtractFromExisting<keyof ConventionDto, "signatories">;
 export const getSignatoryKey = (
   v: `${SignatoryField}.${keyof ConventionDto["signatories"]}`,
 ) => v;
+
+export const isEstablishmentTutorIsEstablishmentRepresentative = (
+  convention: ConventionDtoWithoutExternalId,
+): boolean => {
+  const establishmentTutor = convention.establishmentTutor;
+  const establishmentRepresentative =
+    convention.signatories.establishmentRepresentative;
+  return (
+    establishmentTutor.firstName === establishmentRepresentative.firstName &&
+    establishmentTutor.lastName === establishmentRepresentative.lastName &&
+    establishmentTutor.email === establishmentRepresentative.email &&
+    establishmentTutor.phone === establishmentRepresentative.phone
+  );
+};

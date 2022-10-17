@@ -17,7 +17,7 @@ export const EstablishmentRepresentativeFields = ({
     shouldFetchEvenIfAlreadySaved: true,
   });
   const {
-    isEstablishmentTutorIsEstablishmentRepresentative,
+    isEstablishmentTutorIsEstablishmentRepresentativeValue,
     setIsEstablishmentTutorIsEstablishmentRepresentative,
   } = isEstablishmentTutorIsEstablishmentRepresentativeHook();
   const t = useConventionTextsFromFormikContext();
@@ -26,7 +26,7 @@ export const EstablishmentRepresentativeFields = ({
       <RadioGroup
         id="is-establishmentRepresentative"
         disabled={disabled}
-        currentValue={isEstablishmentTutorIsEstablishmentRepresentative}
+        currentValue={isEstablishmentTutorIsEstablishmentRepresentativeValue}
         setCurrentValue={setIsEstablishmentTutorIsEstablishmentRepresentative}
         groupLabel={`${t.establishment.isEstablishmentTutorIsEstablishmentRepresentative} *`}
         options={[
@@ -34,7 +34,7 @@ export const EstablishmentRepresentativeFields = ({
           { label: t.no, value: false },
         ]}
       />
-      {!isEstablishmentTutorIsEstablishmentRepresentative && (
+      {!isEstablishmentTutorIsEstablishmentRepresentativeValue && (
         <>
           <TextInput
             label={`${t.establishment.establishmentRepresentative.firstName.label} *`}

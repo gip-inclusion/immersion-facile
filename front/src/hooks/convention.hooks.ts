@@ -5,6 +5,7 @@ import {
   ConventionDto,
   EstablishmentRepresentative,
   getSignatoryKey,
+  isEstablishmentTutorIsEstablishmentRepresentative,
 } from "shared";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
@@ -28,10 +29,6 @@ export const useConvention = (jwt: string) => {
 };
 
 export const isEstablishmentTutorIsEstablishmentRepresentativeHook = () => {
-  const [
-    isEstablishmentTutorIsEstablishmentRepresentative,
-    setIsEstablishmentTutorIsEstablishmentRepresentative,
-  ] = useState<boolean>(true);
   const { values, setFieldValue } = useFormikContext<ConventionDto>();
   const { firstName, lastName, email, phone } = values.establishmentTutor;
   const setEstablishmentRepresentative = (
@@ -43,26 +40,39 @@ export const isEstablishmentTutorIsEstablishmentRepresentativeHook = () => {
     );
   };
 
+  const [
+    isEstablishmentTutorIsEstablishmentRepresentativeValue,
+    setIsEstablishmentTutorIsEstablishmentRepresentative,
+  ] = useState<boolean>(
+    isEstablishmentTutorIsEstablishmentRepresentative(values),
+  );
+
+  const [previousIsSame, setPreviousIsSame] = useState<boolean>(
+    isEstablishmentTutorIsEstablishmentRepresentative(values),
+  );
+
   useEffect(() => {
-    setEstablishmentRepresentative(
-      isEstablishmentTutorIsEstablishmentRepresentative
-        ? {
-            role: "establishment-representative",
-            firstName,
-            lastName,
-            phone,
-            email,
-          }
-        : {
-            role: "establishment-representative",
-            firstName: "",
-            lastName: "",
-            phone: "",
-            email: "",
-          },
-    );
+    if (isEstablishmentTutorIsEstablishmentRepresentativeValue) {
+      setEstablishmentRepresentative({
+        role: "establishment-representative",
+        firstName,
+        lastName,
+        phone,
+        email,
+      });
+    } else if (previousIsSame) {
+      setEstablishmentRepresentative({
+        role: "establishment-representative",
+        firstName: "",
+        lastName: "",
+        phone: "",
+        email: "",
+      });
+    }
+
+    setPreviousIsSame(isEstablishmentTutorIsEstablishmentRepresentativeValue);
   }, [
-    isEstablishmentTutorIsEstablishmentRepresentative,
+    isEstablishmentTutorIsEstablishmentRepresentativeValue,
     firstName,
     lastName,
     email,
@@ -70,7 +80,7 @@ export const isEstablishmentTutorIsEstablishmentRepresentativeHook = () => {
   ]);
 
   return {
-    isEstablishmentTutorIsEstablishmentRepresentative,
+    isEstablishmentTutorIsEstablishmentRepresentativeValue,
     setIsEstablishmentTutorIsEstablishmentRepresentative,
   };
 };

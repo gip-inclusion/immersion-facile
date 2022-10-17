@@ -8,6 +8,7 @@ import {
   ConventionId,
   EstablishmentRepresentative,
   EstablishmentTutor,
+  isEstablishmentTutorIsEstablishmentRepresentative,
 } from "shared";
 import { ConventionRepository } from "../../../domain/convention/ports/ConventionRepository";
 import { getReadConventionById } from "./pgConventionSql";
@@ -38,10 +39,7 @@ export class PgConventionRepository implements ConventionRepository {
     );
 
     const establishmentRepresentativeId =
-      this.isEstablishmentTutorIsEstablishmentRepresentative(
-        establishmentTutor,
-        establishmentRepresentative,
-      )
+      isEstablishmentTutorIsEstablishmentRepresentative(convention)
         ? establishmentTutorId
         : await this.insertEstablishmentRepresentative(
             establishmentRepresentative,
@@ -215,17 +213,5 @@ export class PgConventionRepository implements ConventionRepository {
       ],
     );
     return insertReturn.rows[0]?.id;
-  }
-
-  private isEstablishmentTutorIsEstablishmentRepresentative(
-    establishmentTutor: EstablishmentTutor,
-    establishmentRepresentative: EstablishmentRepresentative,
-  ) {
-    return (
-      establishmentTutor.firstName === establishmentRepresentative.firstName &&
-      establishmentTutor.lastName === establishmentRepresentative.lastName &&
-      establishmentTutor.email === establishmentRepresentative.email &&
-      establishmentTutor.phone === establishmentRepresentative.phone
-    );
   }
 }
