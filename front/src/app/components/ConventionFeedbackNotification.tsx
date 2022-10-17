@@ -71,7 +71,7 @@ const InitialSubmitSuccessMessageBase = ({
     Merci d'avoir complété cette demande de convention.
     <ul className={"fr-my-2w"}>{children}</ul>
     <p className="fr-text fr-my-2w">
-      N'hésitez pas à prévenir et relancer votre tuteur, sans votre signature et
+      N'hésitez pas à prévenir et relancer votre tuteur. Sans votre signature et
       celle de l'entreprise, la demande ne peut pas être étudiée par votre
       conseiller.
     </p>

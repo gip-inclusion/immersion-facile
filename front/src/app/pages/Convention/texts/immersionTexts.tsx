@@ -10,7 +10,7 @@ export const immersionTexts = {
       <strong>Bravo !</strong>
       <p className="fr-text">
         Vous avez trouvé votre entreprise accueillante. Complétez ce formulaire
-        avec votre entreprise accueillante et initier une convention pour
+        avec votre entreprise accueillante et initiez une convention pour
         réaliser votre immersion professionnelle.
       </p>
       <p className="fr-text--xs fr-mt-1w">
@@ -34,7 +34,7 @@ export const immersionTexts = {
   signatures: {
     fixErrors: "Veuillez corriger les champs erronés",
     validationText:
-      "Une fois le formulaire envoyé, vous allez recevoir une demande de validation par mail et l'entreprise également",
+      "Une fois le formulaire envoyé, vous allez recevoir une demande de confirmation par mail et l'entreprise également",
   },
   conventionTitle:
     "Formulaire pour conventionner une période de mise en situation professionnelle (PMSMP)",
@@ -101,7 +101,7 @@ export const immersionTexts = {
       },
     },
     isEstablishmentTutorIsEstablishmentRepresentative:
-      "Est-ce que le tuteur de l'entreprise est le représentant de l'entreprise?",
+      "Est-ce que le tuteur de l'entreprise est le représentant de l'entreprise, signataire de la convention ?",
     establishmentRepresentative: {
       firstName: {
         label: "Indiquez le prénom du représentant de l'entreprise",

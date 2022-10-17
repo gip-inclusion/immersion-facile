@@ -146,7 +146,7 @@ const SignFormSpecific = ({ jwt }: SignFormSpecificProps) => {
       </h2>
 
       <div className="fr-text">
-        Voici la demande de convention que vous venez de compléter. <br />
+        Voici la demande de convention qui vient d'être complétée. <br />
         Relisez la bien et si cela vous convient, signez la avec le bouton "je
         signe cette demande"
         <p className="fr-text--xs fr-mt-1w">
