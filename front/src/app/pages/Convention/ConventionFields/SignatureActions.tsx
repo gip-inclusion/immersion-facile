@@ -85,13 +85,13 @@ export const SignatureActions = (props: {
         <SignButton
           isSubmitting={props.isSubmitting}
           onSubmit={props.onSubmit}
-          disabled={submitFeedback !== null}
+          disabled={submitFeedback.kind !== "idle"}
         />
 
         <RequestModificationButton
           onSubmit={props.onRejectForm}
           isSubmitting={props.isSubmitting}
-          disabled={submitFeedback !== null}
+          disabled={submitFeedback.kind !== "idle"}
         />
       </p>
     </>
