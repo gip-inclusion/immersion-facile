@@ -102,7 +102,7 @@ const SignFormSpecific = ({ jwt }: SignFormSpecificProps) => {
 
   useExistingSiret(convention?.siret);
 
-  if (!isLoading) return <p>Chargement en cours...</p>;
+  if (isLoading) return <p>Chargement en cours...</p>;
   if (!convention) return <p>Pas de convention correspondante trouvée...</p>;
   if (convention.status === "REJECTED") return <ConventionRejectedMessage />;
   if (convention.status === "DRAFT")
@@ -153,80 +153,67 @@ const SignFormSpecific = ({ jwt }: SignFormSpecificProps) => {
           Ce formulaire vaut équivalence du CERFA 13912 * 04
         </p>
       </div>
+      <Formik
+        enableReinitialize={true}
+        initialValues={convention}
+        validationSchema={toFormikValidationSchema(conventionSchema)}
+        onSubmit={(values, { setErrors }) => {
+          if (!currentSignatory) return;
 
-      {!convention ? (
-        <p>Chargement en cours...</p>
-      ) : (
-        <>
-          <Formik
-            enableReinitialize={true}
-            initialValues={convention}
-            validationSchema={toFormikValidationSchema(conventionSchema)}
-            onSubmit={(values, { setErrors }) => {
-              if (!currentSignatory) return;
+          // Confirm checkbox
+          const { signedAtFieldName, signatory } = signatoryDataFromConvention(
+            mergeDeepRight(
+              convention as ConventionDto,
+              values as ConventionDto,
+            ) as ConventionDto,
+            currentSignatory.role,
+          );
 
-              // Confirm checkbox
-              const { signedAtFieldName, signatory } =
-                signatoryDataFromConvention(
-                  mergeDeepRight(
-                    convention as ConventionDto,
-                    values as ConventionDto,
-                  ) as ConventionDto,
-                  currentSignatory.role,
-                );
+          const conditionsAccepted = !!signatory?.signedAt;
 
-              const conditionsAccepted = !!signatory?.signedAt;
+          if (!conditionsAccepted) {
+            setErrors({
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              [signedAtFieldName!]: "La signature est obligatoire",
+            });
+            return;
+          }
 
-              if (!conditionsAccepted) {
-                setErrors({
-                  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                  [signedAtFieldName!]: "La signature est obligatoire",
-                });
-                return;
-              }
+          dispatch(conventionSlice.actions.signConventionRequested(jwt));
+        }}
+      >
+        {(props) => {
+          if (Object.values(props.errors).length > 0) {
+            // eslint-disable-next-line no-console
+            console.log("Erros in form : ", props.errors);
+          }
 
-              dispatch(conventionSlice.actions.signConventionRequested(jwt));
-            }}
-          >
-            {(props) => {
-              if (Object.values(props.errors).length > 0) {
-                // eslint-disable-next-line no-console
-                console.log("Erros in form : ", props.errors);
-              }
+          return (
+            <div>
+              <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
+                {currentSignatory && (
+                  <ConventionFormFields
+                    isFrozen={true}
+                    isSignOnly={true}
+                    signatory={currentSignatory}
+                    onModificationsRequired={askFormModificationWithMessageForm}
+                  />
+                )}
+                {Object.values(props.errors).length > 0 && (
+                  <div style={{ color: "red" }}>
+                    Veuillez corriger les champs erronés
+                  </div>
+                )}
 
-              return (
-                <div>
-                  <form
-                    onReset={props.handleReset}
-                    onSubmit={props.handleSubmit}
-                  >
-                    {currentSignatory && (
-                      <ConventionFormFields
-                        isFrozen={true}
-                        isSignOnly={true}
-                        signatory={currentSignatory}
-                        onModificationsRequired={
-                          askFormModificationWithMessageForm
-                        }
-                      />
-                    )}
-                    {Object.values(props.errors).length > 0 && (
-                      <div style={{ color: "red" }}>
-                        Veuillez corriger les champs erronés
-                      </div>
-                    )}
-
-                    <ConventionFeedbackNotification
-                      submitFeedback={submitFeedback}
-                      signatories={props.values.signatories}
-                    />
-                  </form>
-                </div>
-              );
-            }}
-          </Formik>
-        </>
-      )}
+                <ConventionFeedbackNotification
+                  submitFeedback={submitFeedback}
+                  signatories={props.values.signatories}
+                />
+              </form>
+            </div>
+          );
+        }}
+      </Formik>
     </SignPageLayout>
   );
 };
