@@ -180,7 +180,7 @@ export const AddAgencyPage = () => {
                 <div className="fr-mt-4w">
                   <Button
                     type="submit"
-                    disable={isSubmitting || submitFeedback !== null}
+                    disable={isSubmitting || submitFeedback.kind !== "idle"}
                   >
                     Soumettre
                   </Button>
