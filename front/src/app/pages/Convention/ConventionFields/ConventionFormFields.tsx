@@ -102,7 +102,7 @@ export const ConventionFormFields = ({
               signatory={signatory}
               isSubmitting={isSubmitting}
               onSubmit={submitForm}
-              onRejectForm={onModificationsRequired}
+              onModificationRequired={onModificationsRequired}
             />
           )}
         </>

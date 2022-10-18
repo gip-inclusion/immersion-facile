@@ -1,4 +1,5 @@
-import { filter, map, switchMap } from "rxjs";
+import { concatMap, filter, map, switchMap } from "rxjs";
+import { isEstablishmentTutorIsEstablishmentRepresentative } from "shared";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
   ActionOfSlice,
@@ -18,7 +19,18 @@ const saveConventionEpic: ConventionEpic = (
   action$.pipe(
     filter(conventionSlice.actions.saveConventionRequested.match),
     switchMap(({ payload }) => {
-      const { jwt } = state$.value.convention;
+      const conventionState = state$.value.convention;
+      // const { formUi } = conventionState;
+
+      // if (formUi.isTutorEstablishmentRepresentative === true) {
+      //   const { job, role, ...rest } = payload.establishmentTutor;
+      //   payload.signatories.establishmentRepresentative = {
+      //     role: "establishment-representative",
+      //     ...rest,
+      //   };
+      // }
+
+      const { jwt } = conventionState;
       if (jwt) return conventionGateway.update$(payload, jwt);
       return conventionGateway.add$(payload);
     }),
@@ -40,6 +52,23 @@ const getConventionEpic: ConventionEpic = (
     catchEpicError((error: Error) =>
       conventionSlice.actions.fetchConventionFailed(error.message),
     ),
+  );
+
+const reflectFetchedConventionOnFormUi: ConventionEpic = (action$, state$) =>
+  action$.pipe(
+    filter(conventionSlice.actions.fetchConventionSucceeded.match),
+    concatMap((action) => [
+      conventionSlice.actions.isTutorEstablishmentRepresentativeChanged(
+        action.payload
+          ? isEstablishmentTutorIsEstablishmentRepresentative(action.payload)
+          : state$.value.convention.formUi.isTutorEstablishmentRepresentative,
+      ),
+      conventionSlice.actions.isMinorChanged(
+        action.payload
+          ? !!action.payload.signatories.beneficiaryRepresentative
+          : state$.value.convention.formUi.isMinor,
+      ),
+    ]),
   );
 
 const signConventionEpic: ConventionEpic = (
@@ -89,4 +118,5 @@ export const conventionEpics = [
   getConventionEpic,
   signConventionEpic,
   conventionStatusChangeEpic,
+  reflectFetchedConventionOnFormUi,
 ];

@@ -118,8 +118,8 @@ const SignFormSpecific = ({ jwt }: SignFormSpecificProps) => {
 
     dispatch(
       conventionSlice.actions.statusChangeRequested({
-        newStatus: "REJECTED",
-        feedbackKind: "rejected",
+        newStatus: "DRAFT",
+        feedbackKind: "modificationsAskedFromSignatory",
         justification,
         jwt,
       }),
@@ -157,7 +157,7 @@ const SignFormSpecific = ({ jwt }: SignFormSpecificProps) => {
         enableReinitialize={true}
         initialValues={convention}
         validationSchema={toFormikValidationSchema(conventionSchema)}
-        onSubmit={(values, { setErrors }) => {
+        onSubmit={(values, { setErrors, setSubmitting }) => {
           if (!currentSignatory) return;
 
           // Confirm checkbox
@@ -176,6 +176,8 @@ const SignFormSpecific = ({ jwt }: SignFormSpecificProps) => {
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               [signedAtFieldName!]: "La signature est obligatoire",
             });
+
+            setSubmitting(false);
             return;
           }
 

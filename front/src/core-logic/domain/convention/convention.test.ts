@@ -49,6 +49,7 @@ describe("Convention slice", () => {
     it("saves an already existing convention base (base on presence of JWT)", () => {
       ({ store, dependencies } = createTestStore({
         convention: {
+          formUi: { isMinor: false, isTutorEstablishmentRepresentative: true },
           jwt: "some-correct-jwt",
           convention: null,
           isLoading: false,
@@ -151,6 +152,7 @@ describe("Convention slice", () => {
       });
       ({ store } = createTestStore({
         convention: {
+          formUi: { isMinor: false, isTutorEstablishmentRepresentative: true },
           feedback: { kind: "justSubmitted" },
           isLoading: false,
           convention: null,
@@ -163,6 +165,54 @@ describe("Convention slice", () => {
         conventionSlice.actions.fetchConventionRequested("my-jwt"),
       );
       expectConventionState({ isLoading: true, feedback: { kind: "idle" } });
+    });
+
+    it("reflects formUi when get convention with tutor different from establishment representative", () => {
+      const convention = new ConventionDtoBuilder()
+        .withEstablishmentRepresentativeEmail("a-different@email.com")
+        .build();
+      const conventionRead = { ...convention, agencyName: "agency" };
+      expectConventionState({
+        isLoading: false,
+        convention: null,
+      });
+      store.dispatch(
+        conventionSlice.actions.fetchConventionRequested("my-jwt"),
+      );
+      expectConventionState({ isLoading: true });
+      feedGatewayWithConvention(conventionRead);
+      expectConventionState({
+        convention: conventionRead,
+        isLoading: false,
+        formUi: { isMinor: false, isTutorEstablishmentRepresentative: false },
+      });
+    });
+
+    it("reflects formUi when get convention with minor", () => {
+      const convention = new ConventionDtoBuilder()
+        .withBeneficiaryRepresentative({
+          email: "benef-rep@rep.com",
+          phone: "0102",
+          firstName: "yo",
+          lastName: "lo",
+          role: "beneficiary-representative",
+        })
+        .build();
+      const conventionRead = { ...convention, agencyName: "agency" };
+      expectConventionState({
+        isLoading: false,
+        convention: null,
+      });
+      store.dispatch(
+        conventionSlice.actions.fetchConventionRequested("my-jwt"),
+      );
+      expectConventionState({ isLoading: true });
+      feedGatewayWithConvention(conventionRead);
+      expectConventionState({
+        convention: conventionRead,
+        isLoading: false,
+        formUi: { isMinor: true, isTutorEstablishmentRepresentative: false },
+      });
     });
   });
 
@@ -182,6 +232,7 @@ describe("Convention slice", () => {
       };
       ({ store, dependencies } = createTestStore({
         convention: {
+          formUi: { isMinor: false, isTutorEstablishmentRepresentative: true },
           jwt: null,
           fetchError: null,
           isLoading: false,
@@ -212,6 +263,7 @@ describe("Convention slice", () => {
 
       ({ store, dependencies } = createTestStore({
         convention: {
+          formUi: { isMinor: false, isTutorEstablishmentRepresentative: true },
           jwt: null,
           fetchError: null,
           isLoading: false,
@@ -314,6 +366,7 @@ describe("Convention slice", () => {
   it("changes the feedback to idle when asked", () => {
     ({ store } = createTestStore({
       convention: {
+        formUi: { isMinor: false, isTutorEstablishmentRepresentative: true },
         jwt: null,
         convention: null,
         feedback: { kind: "modificationsAskedFromSignatory" },
@@ -324,6 +377,28 @@ describe("Convention slice", () => {
     }));
     store.dispatch(conventionSlice.actions.clearFeedbackTriggered());
     expectConventionState({ feedback: { kind: "idle" } });
+  });
+
+  it("Toggle is minor", () => {
+    expectIsMinorToBe(false);
+
+    store.dispatch(conventionSlice.actions.isMinorChanged(true));
+    expectIsMinorToBe(true);
+
+    store.dispatch(conventionSlice.actions.isMinorChanged(false));
+    expectIsMinorToBe(false);
+  });
+
+  it("Toggle is tutor establishment representative", () => {
+    expectIsTutorEstablishmentRepresentativeToBe(true);
+    store.dispatch(
+      conventionSlice.actions.isTutorEstablishmentRepresentativeChanged(false),
+    );
+    expectIsTutorEstablishmentRepresentativeToBe(false);
+    store.dispatch(
+      conventionSlice.actions.isTutorEstablishmentRepresentativeChanged(true),
+    );
+    expectIsTutorEstablishmentRepresentativeToBe(true);
   });
 
   const expectConventionState = (conventionState: Partial<ConventionState>) => {
@@ -384,5 +459,16 @@ describe("Convention slice", () => {
 
   const feedGatewayWithModificationFailure = (error: Error) => {
     dependencies.conventionGateway.conventionModificationResult$.error(error);
+  };
+
+  const expectIsMinorToBe = (expected: boolean) => {
+    expectToEqual(conventionSelectors.isMinor(store.getState()), expected);
+  };
+
+  const expectIsTutorEstablishmentRepresentativeToBe = (expected: boolean) => {
+    expectToEqual(
+      conventionSelectors.isTutorEstablishmentRepresentative(store.getState()),
+      expected,
+    );
   };
 });

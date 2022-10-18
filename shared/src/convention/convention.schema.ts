@@ -50,9 +50,7 @@ export const externalConventionIdSchema: z.ZodSchema<ConventionExternalId> =
   zTrimmedString;
 
 const roleSchema = z.enum(allRoles);
-const phoneSchema = z
-  .string()
-  .regex(phoneRegExp, "Numéro de téléphone incorrect");
+const phoneSchema = zString.regex(phoneRegExp, "Numéro de téléphone incorrect");
 
 const signatorySchema = z.object({
   role: roleSchema,

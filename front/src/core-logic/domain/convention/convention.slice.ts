@@ -25,6 +25,7 @@ export type ConventionFeedbackKind =
 export type ConventionSubmitFeedback = SubmitFeedBack<ConventionFeedbackKind>;
 
 export interface ConventionState {
+  formUi: { isMinor: boolean; isTutorEstablishmentRepresentative: boolean };
   jwt: string | null;
   isLoading: boolean;
   convention: ConventionReadDto | null;
@@ -34,6 +35,7 @@ export interface ConventionState {
 }
 
 const initialState: ConventionState = {
+  formUi: { isMinor: false, isTutorEstablishmentRepresentative: true },
   jwt: null,
   convention: null,
   isLoading: false,
@@ -113,6 +115,17 @@ export const conventionSlice = createSlice({
     statusChangeFailed: (state, action: PayloadAction<string>) => {
       state.isLoading = false;
       state.feedback = { kind: "errored", errorMessage: action.payload };
+    },
+
+    isMinorChanged: (state, action: PayloadAction<boolean>) => {
+      state.formUi.isMinor = action.payload;
+    },
+
+    isTutorEstablishmentRepresentativeChanged: (
+      state,
+      action: PayloadAction<boolean>,
+    ) => {
+      state.formUi.isTutorEstablishmentRepresentative = action.payload;
     },
 
     clearFeedbackTriggered: (state) => {

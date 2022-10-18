@@ -1,8 +1,12 @@
 import React from "react";
+import { useDispatch } from "react-redux";
 import { FederatedIdentity } from "shared";
 import { RadioGroup } from "src/app/components/RadioGroup";
 import { ShareActions } from "src/app/pages/Convention/ConventionFields/ShareActions";
-import { isEstablishmentTutorIsEstablishmentRepresentativeHook } from "src/hooks/convention.hooks";
+import { useAppSelector } from "src/app/utils/reduxHooks";
+import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
+import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
+import { useTutorIsEstablishmentRepresentative } from "src/hooks/convention.hooks";
 import { useSiretFetcher } from "src/hooks/siret.hooks";
 import { FormSectionTitle } from "src/uiComponents/FormSectionTitle";
 import { useConventionTextsFromFormikContext } from "../../../texts/textSetup";
@@ -19,14 +23,19 @@ export const EstablishmentFormSection = ({
   isFrozen,
   federatedIdentity,
 }: EstablishmentFormSectionParams): JSX.Element => {
+  useTutorIsEstablishmentRepresentative();
+
+  const dispatch = useDispatch();
+  const isTutorEstablishmentRepresentative = useAppSelector(
+    conventionSelectors.isTutorEstablishmentRepresentative,
+  );
+
   const t = useConventionTextsFromFormikContext();
-  const {
-    isEstablishmentTutorIsEstablishmentRepresentativeValue,
-    setIsEstablishmentTutorIsEstablishmentRepresentative,
-  } = isEstablishmentTutorIsEstablishmentRepresentativeHook();
+
   const { isFetchingSiret } = useSiretFetcher({
     shouldFetchEvenIfAlreadySaved: true,
   });
+
   return (
     <>
       <FormSectionTitle>
@@ -41,8 +50,14 @@ export const EstablishmentFormSection = ({
       <RadioGroup
         id="is-establishmentRepresentative"
         disabled={isFrozen || isFetchingSiret}
-        currentValue={isEstablishmentTutorIsEstablishmentRepresentativeValue}
-        setCurrentValue={setIsEstablishmentTutorIsEstablishmentRepresentative}
+        currentValue={isTutorEstablishmentRepresentative}
+        setCurrentValue={(value) => {
+          dispatch(
+            conventionSlice.actions.isTutorEstablishmentRepresentativeChanged(
+              value,
+            ),
+          );
+        }}
         groupLabel={`${t.establishment.isEstablishmentTutorIsEstablishmentRepresentative} *`}
         options={[
           { label: t.yes, value: true },
@@ -50,7 +65,7 @@ export const EstablishmentFormSection = ({
         ]}
       />
       <EstablishementTutorFields disabled={isFrozen} />
-      {!isEstablishmentTutorIsEstablishmentRepresentativeValue && (
+      {!isTutorEstablishmentRepresentative && (
         <EstablishmentRepresentativeFields
           disabled={isFrozen || isFetchingSiret}
         />

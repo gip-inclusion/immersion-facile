@@ -1,5 +1,5 @@
 import { useFormikContext } from "formik";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import {
   ConventionDto,
@@ -28,31 +28,24 @@ export const useConvention = (jwt: string) => {
   return { convention, submitFeedback, fetchConventionError, isLoading };
 };
 
-export const isEstablishmentTutorIsEstablishmentRepresentativeHook = () => {
+export const useTutorIsEstablishmentRepresentative = () => {
+  const isTutorEstablismentRepresentative = useAppSelector(
+    conventionSelectors.isTutorEstablishmentRepresentative,
+  );
+  const convention = useAppSelector(conventionSelectors.convention);
   const { values, setFieldValue } = useFormikContext<ConventionDto>();
-  const { firstName, lastName, email, phone } = values.establishmentTutor;
   const setEstablishmentRepresentative = (
     establishmentRepresentative: EstablishmentRepresentative,
-  ) => {
+  ) =>
     setFieldValue(
       getSignatoryKey("signatories.establishmentRepresentative"),
       establishmentRepresentative,
     );
-  };
 
-  const [
-    isEstablishmentTutorIsEstablishmentRepresentativeValue,
-    setIsEstablishmentTutorIsEstablishmentRepresentative,
-  ] = useState<boolean>(
-    isEstablishmentTutorIsEstablishmentRepresentative(values),
-  );
-
-  const [previousIsSame, setPreviousIsSame] = useState<boolean>(
-    isEstablishmentTutorIsEstablishmentRepresentative(values),
-  );
+  const { firstName, lastName, email, phone } = values.establishmentTutor;
 
   useEffect(() => {
-    if (isEstablishmentTutorIsEstablishmentRepresentativeValue) {
+    if (isTutorEstablismentRepresentative) {
       setEstablishmentRepresentative({
         role: "establishment-representative",
         firstName,
@@ -60,27 +53,25 @@ export const isEstablishmentTutorIsEstablishmentRepresentativeHook = () => {
         phone,
         email,
       });
-    } else if (previousIsSame) {
+      return;
+    }
+
+    if (!convention) {
       setEstablishmentRepresentative({
         role: "establishment-representative",
         firstName: "",
         lastName: "",
-        phone: "",
         email: "",
+        phone: "",
       });
+      return;
     }
 
-    setPreviousIsSame(isEstablishmentTutorIsEstablishmentRepresentativeValue);
-  }, [
-    isEstablishmentTutorIsEstablishmentRepresentativeValue,
-    firstName,
-    lastName,
-    email,
-    phone,
-  ]);
+    if (!isEstablishmentTutorIsEstablishmentRepresentative(convention))
+      setEstablishmentRepresentative(
+        convention.signatories.establishmentRepresentative,
+      );
+  }, [isTutorEstablismentRepresentative, firstName, lastName, email, phone]);
 
-  return {
-    isEstablishmentTutorIsEstablishmentRepresentativeValue,
-    setIsEstablishmentTutorIsEstablishmentRepresentative,
-  };
+  return setEstablishmentRepresentative;
 };

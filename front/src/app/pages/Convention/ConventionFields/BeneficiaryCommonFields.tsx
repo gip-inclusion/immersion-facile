@@ -1,33 +1,21 @@
-import { useField } from "formik";
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useDispatch } from "react-redux";
 import { getConventionFieldName } from "shared";
 import { RadioGroup } from "src/app/components/RadioGroup";
 import { BeneficiaryRepresentativeFields } from "src/app/pages/Convention/ConventionFields/BeneficiaryRepresentativeFields";
 import { useConventionTextsFromFormikContext } from "src/app/pages/Convention/texts/textSetup";
+import { useAppSelector } from "src/app/utils/reduxHooks";
+import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
+import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { TextInput } from "src/uiComponents/form/TextInput";
-
-const useIsMinor = () => {
-  const [isMinor, setIsMinor] = useState<boolean>(false);
-
-  const [{ value: beneficiaryRepresentative }] = useField(
-    getConventionFieldName("signatories.beneficiaryRepresentative"),
-  );
-
-  const isMinorFromData = !!beneficiaryRepresentative;
-
-  useEffect(() => {
-    if (isMinorFromData) setIsMinor(true);
-  }, [isMinorFromData]);
-
-  return { isMinor, setIsMinor };
-};
 
 export const BeneficiaryCommonFields = ({
   disabled,
 }: {
   disabled?: boolean;
 }) => {
-  const { isMinor, setIsMinor } = useIsMinor();
+  const isMinor = useAppSelector(conventionSelectors.isMinor);
+  const dispatch = useDispatch();
   const t = useConventionTextsFromFormikContext();
 
   return (
@@ -68,7 +56,9 @@ export const BeneficiaryCommonFields = ({
         id="is-minor"
         disabled={disabled}
         currentValue={isMinor}
-        setCurrentValue={() => setIsMinor(!isMinor)}
+        setCurrentValue={(value) =>
+          dispatch(conventionSlice.actions.isMinorChanged(value))
+        }
         groupLabel={`${t.beneficiary.isMinorLabel} *`}
         options={[
           { label: t.yes, value: true },

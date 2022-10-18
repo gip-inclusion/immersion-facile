@@ -24,6 +24,12 @@ const fetchError = createSelector(
 
 const isLoading = createSelector(conventionState, ({ isLoading }) => isLoading);
 
+const isMinor = createSelector(conventionState, ({ formUi }) => formUi.isMinor);
+const isTutorEstablishmentRepresentative = createSelector(
+  conventionState,
+  ({ formUi }) => formUi.isTutorEstablishmentRepresentative,
+);
+
 type SignatoryData = {
   signatory: Signatory | null;
   signedAtFieldName: ConventionField | null;
@@ -44,6 +50,8 @@ export const conventionSelectors = {
   feedback,
   signatoryData,
   isLoading,
+  isMinor,
+  isTutorEstablishmentRepresentative,
 };
 
 export const signatoryDataFromConvention = (

@@ -65,12 +65,11 @@ export const SignatureActions = (props: {
   signatory: Signatory;
   isSubmitting: boolean;
   onSubmit: () => Promise<void>;
-  onRejectForm: () => Promise<void>;
+  onModificationRequired: () => Promise<void>;
 }) => {
   const submitFeedback = useAppSelector(conventionSelectors.feedback);
   const { fieldName, signatoryFullName, signatoryFunction } =
     getSignatoryProcessedData(props.signatory);
-
   return (
     <>
       <DateCheckboxGroup
@@ -89,7 +88,7 @@ export const SignatureActions = (props: {
         />
 
         <RequestModificationButton
-          onSubmit={props.onRejectForm}
+          onSubmit={props.onModificationRequired}
           isSubmitting={props.isSubmitting}
           disabled={submitFeedback.kind !== "idle"}
         />
