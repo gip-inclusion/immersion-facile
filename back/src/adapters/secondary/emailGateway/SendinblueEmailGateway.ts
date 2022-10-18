@@ -189,6 +189,8 @@ const emailTypeToTemplateId: Record<EmailType, number> = {
 
   // https://my.sendinblue.com/camp/template/59/message-setup
   NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE: 59,
+
+  FULL_PREVIEW_EMAIL: -1,
 };
 
 // keys are from our domain, values are SendInBlue keys in the templates :
