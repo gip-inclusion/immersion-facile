@@ -16,6 +16,7 @@ type CreateEmailVariable<P> = (params: P) => {
 export const templateByName: {
   [K in EmailType]: {
     subject: string;
+    niceName: string;
     createEmailVariables: CreateEmailVariable<
       Extract<TemplatedEmail, { type: K }>["params"]
     >;
@@ -24,6 +25,7 @@ export const templateByName: {
 } = {
   AGENCY_WAS_ACTIVATED: {
     subject: "Votre agence a été activée",
+    niceName: "AGENCY_WAS_ACTIVATED",
     createEmailVariables: ({ agencyName, agencyLogoUrl }) => ({
       content: `<strong>Votre structure prescriptrice d'immersion est activée !</strong> 
 
@@ -35,6 +37,7 @@ export const templateByName: {
   },
   NEW_CONVENTION_BENEFICIARY_CONFIRMATION: {
     subject: "TODO",
+    niceName: "NEW_CONVENTION_BENEFICIARY_CONFIRMATION",
     createEmailVariables: () => ({
       content: "TODO",
     }),
@@ -42,66 +45,78 @@ export const templateByName: {
   },
   NEW_CONVENTION_ESTABLISHMENT_TUTOR_CONFIRMATION: {
     subject: "TODO",
+    niceName: "NEW_CONVENTION_ESTABLISHMENT_TUTOR_CONFIRMATION",
     createEmailVariables: () => ({
       content: "TODO",
     }),
   },
   NEW_CONVENTION_AGENCY_NOTIFICATION: {
     subject: "TODO",
+    niceName: "NEW_CONVENTION_AGENCY_NOTIFICATION",
     createEmailVariables: () => ({
       content: "TODO",
     }),
   },
   VALIDATED_CONVENTION_FINAL_CONFIRMATION: {
     subject: "TODO",
+    niceName: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
     createEmailVariables: () => ({
       content: "TODO",
     }),
   },
   POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED: {
     subject: "TODO",
+    niceName: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED",
     createEmailVariables: () => ({
       content: "TODO",
     }),
   },
   POLE_EMPLOI_ADVISOR_ON_CONVENTION_ASSOCIATION: {
     subject: "TODO",
+    niceName: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_ASSOCIATION",
     createEmailVariables: () => ({
       content: "TODO",
     }),
   },
   REJECTED_CONVENTION_NOTIFICATION: {
     subject: "TODO",
+    niceName: "REJECTED_CONVENTION_NOTIFICATION",
     createEmailVariables: () => ({
       content: "TODO",
     }),
   },
   CONVENTION_MODIFICATION_REQUEST_NOTIFICATION: {
     subject: "TODO",
+    niceName: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
     createEmailVariables: () => ({
       content: "TODO",
     }),
   },
   NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION: {
     subject: "TODO",
+    niceName: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
     createEmailVariables: () => ({
       content: "TODO",
     }),
   },
   MAGIC_LINK_RENEWAL: {
     subject: "TODO",
+    niceName: "MAGIC_LINK_RENEWAL",
     createEmailVariables: () => ({
       content: "TODO",
     }),
   },
   BENEFICIARY_OR_ESTABLISHMENT_REPRESENTATIVE_ALREADY_SIGNED_NOTIFICATION: {
     subject: "TODO",
+    niceName:
+      "BENEFICIARY_OR_ESTABLISHMENT_REPRESENTATIVE_ALREADY_SIGNED_NOTIFICATION",
     createEmailVariables: () => ({
       content: "TODO",
     }),
   },
   NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE: {
     subject: "Confirmez une demande d'immersion",
+    niceName: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
     createEmailVariables: ({
       signatoryName,
       beneficiaryName,
@@ -138,54 +153,63 @@ export const templateByName: {
   },
   CONTACT_BY_EMAIL_REQUEST: {
     subject: "TODO",
+    niceName: "CONTACT_BY_EMAIL_REQUEST",
     createEmailVariables: () => ({
       content: "TODO",
     }),
   },
   CONTACT_BY_PHONE_INSTRUCTIONS: {
     subject: "TODO",
+    niceName: "CONTACT_BY_PHONE_INSTRUCTIONS",
     createEmailVariables: () => ({
       content: "TODO",
     }),
   },
   CONTACT_IN_PERSON_INSTRUCTIONS: {
     subject: "TODO",
+    niceName: "CONTACT_IN_PERSON_INSTRUCTIONS",
     createEmailVariables: () => ({
       content: "TODO",
     }),
   },
   SHARE_DRAFT_CONVENTION_BY_LINK: {
     subject: "TODO",
+    niceName: "SHARE_DRAFT_CONVENTION_BY_LINK",
     createEmailVariables: () => ({
       content: "TODO",
     }),
   },
   SUGGEST_EDIT_FORM_ESTABLISHMENT: {
     subject: "TODO",
+    niceName: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
     createEmailVariables: () => ({
       content: "TODO",
     }),
   },
   EDIT_FORM_ESTABLISHMENT_LINK: {
     subject: "TODO",
+    niceName: "EDIT_FORM_ESTABLISHMENT_LINK",
     createEmailVariables: () => ({
       content: "TODO",
     }),
   },
   NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION: {
     subject: "TODO",
+    niceName: "NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION",
     createEmailVariables: () => ({
       content: "TODO",
     }),
   },
   CREATE_IMMERSION_ASSESSMENT: {
     subject: "TODO",
+    niceName: "CREATE_IMMERSION_ASSESSMENT",
     createEmailVariables: () => ({
       content: "TODO",
     }),
   },
   FULL_PREVIEW_EMAIL: {
     subject: "Test contenant toutes les blocs email",
+    niceName: "Preview email complet (tous les blocs)",
     createEmailVariables: ({ beneficiaryName }) => ({
       greetings: `Bonjour ${beneficiaryName}`,
       content: `Merci d'avoir confirmé votre demande d'immersion. Elle va être transmise à votre conseiller référent.
