@@ -20,16 +20,6 @@ const saveConventionEpic: ConventionEpic = (
     filter(conventionSlice.actions.saveConventionRequested.match),
     switchMap(({ payload }) => {
       const conventionState = state$.value.convention;
-      // const { formUi } = conventionState;
-
-      // if (formUi.isTutorEstablishmentRepresentative === true) {
-      //   const { job, role, ...rest } = payload.establishmentTutor;
-      //   payload.signatories.establishmentRepresentative = {
-      //     role: "establishment-representative",
-      //     ...rest,
-      //   };
-      // }
-
       const { jwt } = conventionState;
       if (jwt) return conventionGateway.update$(payload, jwt);
       return conventionGateway.add$(payload);
