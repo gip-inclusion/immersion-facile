@@ -35,7 +35,7 @@ export const VerificationActionButton = ({
   children,
   onSubmit,
 }: VerificationActionButtonProps) => {
-  let className = "fr-btn";
+  let className = "fr-btn fr-m-1w";
   switch (newStatus) {
     case "REJECTED":
       // cross icon
