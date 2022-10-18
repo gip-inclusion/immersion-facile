@@ -10,3 +10,8 @@
   justify-content: space-between;
   align-items: center;
 }
+
+.admin-tab__email-preview-wrapper {
+  border: 1px solid var(--background-active-blue-france);
+  font-family: Arial, Helvetica, sans-serif;
+}

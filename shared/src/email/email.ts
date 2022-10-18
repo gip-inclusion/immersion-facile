@@ -43,7 +43,8 @@ export type TemplatedEmail =
   | FormEstablishmentEditionSuggestionEmail
   | EditFormEstablishmentLinkEmail
   | NewEstablishmentCreatedContactConfirmationEmail
-  | CreatImmersionAssessmentEmail;
+  | CreatImmersionAssessmentEmail
+  | FullPreviewEmail;
 
 type NewConventionBeneficiaryConfirmationEmail = GenericTemplatedEmail<
   "NEW_CONVENTION_BENEFICIARY_CONFIRMATION",
@@ -288,5 +289,17 @@ type CreatImmersionAssessmentEmail = GenericTemplatedEmail<
     beneficiaryLastName: string;
     establishmentTutorName: string;
     immersionAssessmentCreationLink: string;
+  }
+>;
+
+type FullPreviewEmail = GenericTemplatedEmail<
+  "FULL_PREVIEW_EMAIL",
+  {
+    beneficiaryName: string; //< BENEFICIARY_NAME
+    establishmentRepresentativeName: string; //< MENTOR_NAME
+    beneficiaryRepresentativeName?: string; //< LEGAL_REPRESENTATIVE_NAME
+    signatoryName: string; //< SIGNATORY_NAME
+    magicLink: string; //< MAGIC_LINK
+    businessName: string; //< COMPANY_NAME
   }
 >;

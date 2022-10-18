@@ -3,6 +3,7 @@ const projects = [
   "./../../back/tsconfig.json",
   "./../../shared/tsconfig.json",
   "./../../libs/react-design-system/tsconfig.json",
+  "./../../libs/html-templates/tsconfig.json",
   "./../../cypress/tsconfig.json",
 ];
 

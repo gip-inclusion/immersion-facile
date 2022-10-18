@@ -5,6 +5,8 @@ import { AgencyTab } from "src/app/pages/admin/AgencyTab";
 import { ConventionTab } from "src/app/pages/admin/ConventionTab";
 import { DataExportTab } from "src/app/pages/admin/DataExportTab";
 import { EmailsTab } from "src/app/pages/admin/EmailsTab";
+import { EmailPreviewTab } from "src/app/pages/admin/EmailPreviewTab";
+
 import { TechnicalOptions } from "src/app/pages/admin/TechnicalOptions";
 import { AdminTab } from "src/app/routing/route-params";
 import { routes } from "src/app/routing/routes";
@@ -36,6 +38,11 @@ const getNavLinks = (currentTab: AdminTab): NavLink[] => [
     label: "Emails",
     active: currentTab === "emails",
     ...routes.adminTab({ tab: "emails" }).link,
+  },
+  {
+    label: "Aperçu email",
+    active: currentTab === "email-preview",
+    ...routes.adminTab({ tab: "email-preview" }).link,
   },
 ];
 
@@ -70,6 +77,7 @@ export const AdminPage = ({
               {currentTab === "exports" && <DataExportTab />}
               {currentTab === "technical-options" && <TechnicalOptions />}
               {currentTab === "emails" && <EmailsTab />}
+              {currentTab === "email-preview" && <EmailPreviewTab />}
             </div>
           </div>
         </div>
