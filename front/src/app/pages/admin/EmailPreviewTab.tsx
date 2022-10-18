@@ -15,6 +15,9 @@ export const EmailPreviewTab = () => {
   const fakeContent = generateHtmlFromTemplate(
     currentTemplate,
     defaultValueByVariableName,
+    {
+      skipHead: true,
+    },
   );
 
   return (
