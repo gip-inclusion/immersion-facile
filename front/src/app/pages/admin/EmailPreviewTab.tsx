@@ -34,13 +34,6 @@ export const EmailPreviewTab = () => {
             </option>
           ))}
         </select>
-        {keys(templateByName).map((templateName) => (
-          <>
-            {templateName}: {templateByName[templateName].niceName}
-            <br />
-            <br />
-          </>
-        ))}
       </div>
       <div
         className="admin-tab__email-preview-wrapper"
