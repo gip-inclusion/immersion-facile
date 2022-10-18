@@ -1,4 +1,5 @@
-export const ignoreTabs = (str: string): string => str.replace(/\n  +/g, "\n");
+export const ignoreTabs = (str: string): string =>
+  str.replace(/\n  +/g, "\n").trim();
 
 export const wrapElements = (children: string) =>
   `
@@ -9,4 +10,4 @@ export const wrapElements = (children: string) =>
       </td>
     </tr>
   </table>
-  `;
+`;

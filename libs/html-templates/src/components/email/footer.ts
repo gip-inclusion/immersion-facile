@@ -1,5 +1,3 @@
-import bannerPartners from "./../../../assets/emailing/banner-partners.png";
-
 export const renderFooter = (emailRecipient: string) => `<table>
 <tr>
 <td height="30"></td>
@@ -17,7 +15,7 @@ export const renderFooter = (emailRecipient: string) => `<table>
 </tr>
 <tr>
   <td align="center" style="padding: 20px;">
-    <img src="${bannerPartners}" alt="" width="290" />
+    <img src="https://immersion.cellar-c2.services.clever-cloud.com/d0cfdb84-881a-40d5-b228-7e14c185fb68.png" alt="" width="290" />
   </td>
 </tr>
 </table>`;

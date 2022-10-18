@@ -1,12 +1,10 @@
-import mainLogo from "./../../../assets/emailing/logo-rf-if.png";
-
 export const renderHeader = (agencyLogoUrl: string | undefined): string => {
   let html = `
     <table width="600">
       <tr>
         <td width="35%">
           <a href="https://immersion-facile.beta.gouv.fr/">
-            <img src="${mainLogo}" width="223" height="108" alt="Immersion Facilitée - République Française"/>
+            <img src="https://immersion.cellar-c2.services.clever-cloud.com/ac685d94-401a-4f93-b288-1100a8d96297.png" width="223" height="108" alt="Immersion Facilitée - République Française"/>
           </a>
         </td>`;
   if (agencyLogoUrl && agencyLogoUrl !== "") {
