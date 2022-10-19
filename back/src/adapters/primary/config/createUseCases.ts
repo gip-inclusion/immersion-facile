@@ -8,14 +8,17 @@ import {
 } from "../../../domain/auth/jwt";
 import { ExportData } from "../../../domain/backoffice/useCases/ExportData";
 import { SetFeatureFlag } from "../../../domain/backoffice/useCases/SetFeatureFlag";
-import { AddAgency } from "../../../domain/convention/useCases/AddAgency";
 import { AddConvention } from "../../../domain/convention/useCases/AddConvention";
+import { AddAgency } from "../../../domain/convention/useCases/agencies/AddAgency";
+import { ListAgenciesByDepartmentCode } from "../../../domain/convention/useCases/agencies/ListAgenciesByDepartmentCode";
+import { PrivateListAgencies } from "../../../domain/convention/useCases/agencies/PrivateListAgencies";
+import { UpdateAgency } from "../../../domain/convention/useCases/agencies/UpdateAgency";
 import { BroadcastToPoleEmploiOnConventionUpdates } from "../../../domain/convention/useCases/broadcast/BroadcastToPoleEmploiOnConventionUpdates";
 import { CreateImmersionAssessment } from "../../../domain/convention/useCases/CreateImmersionAssessment";
 import { GenerateMagicLink } from "../../../domain/convention/useCases/GenerateMagicLink";
 import { GetAgencyPublicInfoById } from "../../../domain/convention/useCases/GetAgencyPublicInfoById";
 import { GetConvention } from "../../../domain/convention/useCases/GetConvention";
-import { ListAgenciesByDepartmentCode } from "../../../domain/convention/useCases/ListAgenciesByDepartmentCode";
+
 import { ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/convention/useCases/notifications/ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature";
 import { DeliverRenewedMagicLink } from "../../../domain/convention/useCases/notifications/DeliverRenewedMagicLink";
 import { NotifyAllActorsOfFinalConventionValidation } from "../../../domain/convention/useCases/notifications/NotifyAllActorsOfFinalConventionValidation";
@@ -23,12 +26,12 @@ import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../.
 import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 import { NotifyNewApplicationNeedsReview } from "../../../domain/convention/useCases/notifications/NotifyNewApplicationNeedsReview";
 import { NotifyToAgencyApplicationSubmitted } from "../../../domain/convention/useCases/notifications/NotifyToAgencyApplicationSubmitted";
-import { PrivateListAgencies } from "../../../domain/convention/useCases/PrivateListAgencies";
+
 import { RenewConventionMagicLink } from "../../../domain/convention/useCases/RenewConventionMagicLink";
 import { SendEmailWhenAgencyIsActivated } from "../../../domain/convention/useCases/SendEmailWhenAgencyIsActivated";
 import { ShareApplicationLinkByEmail } from "../../../domain/convention/useCases/ShareApplicationLinkByEmail";
 import { SignConvention } from "../../../domain/convention/useCases/SignConvention";
-import { UpdateAgency } from "../../../domain/convention/useCases/UpdateAgency";
+
 import { UpdateConvention } from "../../../domain/convention/useCases/UpdateConvention";
 import { UpdateConventionStatus } from "../../../domain/convention/useCases/UpdateConventionStatus";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";

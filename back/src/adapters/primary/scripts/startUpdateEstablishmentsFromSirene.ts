@@ -14,8 +14,8 @@ import {
   ExponentialBackoffRetryStrategy,
 } from "../../secondary/core/ExponentialBackoffRetryStrategy";
 import { QpsRateLimiter } from "../../secondary/core/QpsRateLimiter";
-import { HttpsSireneGateway } from "../../secondary/HttpsSireneGateway";
 import { PgEstablishmentAggregateRepository } from "../../secondary/pg/PgEstablishmentAggregateRepository";
+import { HttpsSireneGateway } from "../../secondary/sirene/HttpsSireneGateway";
 import { AppConfig } from "../config/appConfig";
 
 const logger = createLogger(__filename);

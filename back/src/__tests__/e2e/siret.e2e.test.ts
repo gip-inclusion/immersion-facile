@@ -4,7 +4,7 @@ import { buildTestApp } from "../../_testBuilders/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../_testBuilders/EstablishmentAggregateBuilder";
 import { InMemoryUnitOfWork } from "../../adapters/primary/config/uowConfig";
 import { InMemoryEstablishmentAggregateRepository } from "../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
-import { TEST_ESTABLISHMENT1 } from "../../adapters/secondary/InMemorySireneGateway";
+import { TEST_ESTABLISHMENT1 } from "../../adapters/secondary/sirene/InMemorySireneGateway";
 
 describe("/siret route", () => {
   let request: SuperTest<Test>;

@@ -29,18 +29,13 @@ import { HybridEmailGateway } from "../../secondary/emailGateway/HybridEmailGate
 import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmailGateway";
 import { SendinblueEmailGateway } from "../../secondary/emailGateway/SendinblueEmailGateway";
 import { SendinblueHtmlEmailGateway } from "../../secondary/emailGateway/SendinblueHtmlEmailGateway";
-import { HttpsSireneGateway } from "../../secondary/HttpsSireneGateway";
-import { HttpLaBonneBoiteAPI } from "../../secondary/immersionOffer/HttpLaBonneBoiteAPI";
-import { HttpPassEmploiGateway } from "../../secondary/immersionOffer/HttpPassEmploiGateway";
-import { HttpPoleEmploiGateway } from "../../secondary/immersionOffer/HttpPoleEmploiGateway";
-import { InMemoryAccessTokenGateway } from "../../secondary/immersionOffer/InMemoryAccessTokenGateway";
-import { InMemoryLaBonneBoiteAPI } from "../../secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
-import { InMemoryPassEmploiGateway } from "../../secondary/immersionOffer/InMemoryPassEmploiGateway";
+import { HttpLaBonneBoiteAPI } from "../../secondary/immersionOffer/laBonneBoite/HttpLaBonneBoiteAPI";
+import { InMemoryLaBonneBoiteAPI } from "../../secondary/immersionOffer/laBonneBoite/InMemoryLaBonneBoiteAPI";
 import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
-import { InMemoryPoleEmploiGateway } from "../../secondary/InMemoryPoleEmploiGateway";
-import { InMemorySireneGateway } from "../../secondary/InMemorySireneGateway";
+import { InMemoryPoleEmploiGateway } from "../../secondary/immersionOffer/poleEmploi/InMemoryPoleEmploiGateway";
 import { MinioDocumentGateway } from "../../secondary/MinioDocumentGateway";
 import { NotImplementedDocumentGateway } from "../../secondary/NotImplementedDocumentGateway";
+
 import {
   HttpPeConnectGateway,
   PeConnectUrlTargets,
@@ -54,7 +49,13 @@ import { InMemoryPeConnectGateway } from "../../secondary/PeConnectGateway/InMem
 import { ExcelExportGateway } from "../../secondary/reporting/ExcelExportGateway";
 import { InMemoryExportGateway } from "../../secondary/reporting/InMemoryExportGateway";
 import { S3DocumentGateway } from "../../secondary/S3DocumentGateway";
+import { HttpsSireneGateway } from "../../secondary/sirene/HttpsSireneGateway";
+import { InMemorySireneGateway } from "../../secondary/sirene/InMemorySireneGateway";
 import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
+import { InMemoryAccessTokenGateway } from "../../secondary/immersionOffer/InMemoryAccessTokenGateway";
+import { HttpPassEmploiGateway } from "../../secondary/immersionOffer/passEmploi/HttpPassEmploiGateway";
+import { InMemoryPassEmploiGateway } from "../../secondary/immersionOffer/passEmploi/InMemoryPassEmploiGateway";
+import { HttpPoleEmploiGateway } from "../../secondary/immersionOffer/poleEmploi/HttpPoleEmploiGateway";
 
 const logger = createLogger(__filename);
 

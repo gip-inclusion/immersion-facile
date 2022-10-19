@@ -2,7 +2,7 @@ import { ConventionDtoBuilder, ConventionId, reasonableSchedule } from "shared";
 import { expectObjectsToMatch } from "../../../../_testBuilders/test.helpers";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import { InMemoryFeatureFlagRepository } from "../../../../adapters/secondary/InMemoryFeatureFlagRepository";
-import { InMemoryPoleEmploiGateway } from "../../../../adapters/secondary/InMemoryPoleEmploiGateway";
+import { InMemoryPoleEmploiGateway } from "../../../../adapters/secondary/immersionOffer/poleEmploi/InMemoryPoleEmploiGateway";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { BroadcastToPoleEmploiOnConventionUpdates } from "./BroadcastToPoleEmploiOnConventionUpdates";
 

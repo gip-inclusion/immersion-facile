@@ -1,5 +1,5 @@
 import { Pool } from "pg";
-import { ApplyAgenciesAddressesFromPositions } from "../../../domain/convention/useCases/ApplyAgenciesAddressesFromPositions";
+import { ApplyAgenciesAddressesFromPositions } from "../../../domain/convention/useCases/agencies/ApplyAgenciesAddressesFromPositions";
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { RealClock } from "../../secondary/core/ClockImplementations";

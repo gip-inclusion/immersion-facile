@@ -17,10 +17,10 @@ import {
 } from "../../secondary/core/ExponentialBackoffRetryStrategy";
 import { QpsRateLimiter } from "../../secondary/core/QpsRateLimiter";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
-import { HttpsSireneGateway } from "../../secondary/HttpsSireneGateway";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { AppConfig } from "../config/appConfig";
 import { createPgUow } from "../config/uowConfig";
+import { HttpsSireneGateway } from "../../secondary/sirene/HttpsSireneGateway";
 
 const maxQpsSireneApi = 0.25;
 

@@ -2,9 +2,7 @@ import { addDays as dateFnsAddDays, format } from "date-fns";
 import { partition } from "ramda";
 import { ConventionId, EmailType, Role, TemplatedEmail } from "shared";
 import { GenerateConventionMagicLink } from "../adapters/primary/config/createGenerateConventionMagicLink";
-import { CustomClock } from "../adapters/secondary/core/ClockImplementations";
-import { TestUuidGenerator } from "../adapters/secondary/core/UuidGeneratorImplementations";
-import { EventBus, makeCreateNewEvent } from "../domain/core/eventBus/EventBus";
+import { EventBus } from "../domain/core/eventBus/EventBus";
 import { DomainEvent, DomainTopic } from "../domain/core/eventBus/events";
 
 export const expectPromiseToFailWith = async (
@@ -56,12 +54,6 @@ export const fakeGenerateMagicLinkUrlFn: GenerateConventionMagicLink = ({
   role: Role;
   targetRoute: string;
 }) => `http://fake-magic-link/${id}/${targetRoute}/${role}`;
-
-export const makeTestCreateNewEvent = () => {
-  const clock = new CustomClock();
-  const uuidGenerator = new TestUuidGenerator();
-  return makeCreateNewEvent({ clock, uuidGenerator });
-};
 
 export const expectArraysToMatch = <T>(actual: T[], expected: Partial<T>[]) => {
   expect(actual).toMatchObject(expected);

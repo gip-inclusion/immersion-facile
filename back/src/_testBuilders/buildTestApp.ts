@@ -8,13 +8,13 @@ import { InMemoryAddressGateway } from "../adapters/secondary/addressGateway/InM
 import { BasicEventCrawler } from "../adapters/secondary/core/EventCrawlerImplementations";
 import { NotImplementedDashboardGateway } from "../adapters/secondary/dashboardGateway/NotImplementedDashboardGateway";
 import type { InMemoryEmailGateway } from "../adapters/secondary/emailGateway/InMemoryEmailGateway";
-import { InMemoryLaBonneBoiteAPI } from "../adapters/secondary/immersionOffer/InMemoryLaBonneBoiteAPI";
-import { InMemoryPassEmploiGateway } from "../adapters/secondary/immersionOffer/InMemoryPassEmploiGateway";
-import { InMemoryPoleEmploiGateway } from "../adapters/secondary/InMemoryPoleEmploiGateway";
-import { InMemorySireneGateway } from "../adapters/secondary/InMemorySireneGateway";
+import { InMemoryLaBonneBoiteAPI } from "../adapters/secondary/immersionOffer/laBonneBoite/InMemoryLaBonneBoiteAPI";
+import { InMemoryPassEmploiGateway } from "../adapters/secondary/immersionOffer/passEmploi/InMemoryPassEmploiGateway";
+import { InMemoryPoleEmploiGateway } from "../adapters/secondary/immersionOffer/poleEmploi/InMemoryPoleEmploiGateway";
 import { NotImplementedDocumentGateway } from "../adapters/secondary/NotImplementedDocumentGateway";
 import { InMemoryPeConnectGateway } from "../adapters/secondary/PeConnectGateway/InMemoryPeConnectGateway";
 import { InMemoryExportGateway } from "../adapters/secondary/reporting/InMemoryExportGateway";
+import { InMemorySireneGateway } from "../adapters/secondary/sirene/InMemorySireneGateway";
 import {
   GenerateApiConsumerJtw,
   GenerateMagicLinkJwt,

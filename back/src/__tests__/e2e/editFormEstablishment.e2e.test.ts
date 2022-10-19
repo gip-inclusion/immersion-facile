@@ -6,8 +6,9 @@ import {
 } from "shared";
 import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 import { buildTestApp } from "../../_testBuilders/buildTestApp";
-import { TEST_ESTABLISHMENT1_SIRET } from "../../adapters/secondary/InMemorySireneGateway";
+
 import { makeGenerateJwtES256 } from "../../domain/auth/jwt";
+import { TEST_ESTABLISHMENT1_SIRET } from "../../adapters/secondary/sirene/InMemorySireneGateway";
 
 describe("Route to post edited form establishments", () => {
   it("Throws 401 if not authenticated", async () => {
