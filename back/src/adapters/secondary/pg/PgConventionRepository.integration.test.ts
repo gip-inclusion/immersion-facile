@@ -1,9 +1,9 @@
 import { Pool, PoolClient } from "pg";
 import {
   AgencyDtoBuilder,
+  BeneficiaryRepresentative,
   ConventionDtoBuilder,
   ConventionId,
-  BeneficiaryRepresentative,
   EstablishmentTutor,
 } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
@@ -106,6 +106,68 @@ describe("PgConventionRepository", () => {
       `SELECT * FROM actors WHERE email = '${email}'`,
     );
     expect(actors).toHaveLength(1);
+  });
+
+  it("Update convention with different tutor and establishment rep", async () => {
+    const tutorIdAndRepIdFromConventionId = (conventionId: string) =>
+      client.query<{
+        establishment_tutor_id: number;
+        establishment_representative_id: number;
+      }>(
+        `SELECT establishment_tutor_id,establishment_representative_id  FROM conventions WHERE id = '${conventionId}'`,
+      );
+    const tutor: EstablishmentTutor = {
+      firstName: "Joe",
+      lastName: "Doe",
+      job: "Tutor",
+      email: "tutor123w@mail.com",
+      phone: "0111223344",
+      role: "establishment-tutor",
+    };
+    const conventionId = "40400404-0000-0000-0000-6bb9bd38bbbb";
+    const conventionWithSameTutorAndRep = new ConventionDtoBuilder()
+      .withId(conventionId)
+      .withEstablishmentTutor(tutor)
+      .withEstablishmentRepresentative({
+        ...tutor,
+        role: "establishment-representative",
+      })
+      .build();
+    const conventionWithDiffTutorAndRep = new ConventionDtoBuilder(
+      conventionWithSameTutorAndRep,
+    )
+      .withEstablishmentRepresentative({
+        role: "establishment-representative",
+        firstName: "Rep",
+        lastName: "Rep",
+        email: "Rep@rep.com",
+        phone: "rep",
+      })
+      .build();
+
+    //SAVE CONVENTION WITH SAME TUTOR & REP
+    await conventionRepository.save(conventionWithSameTutorAndRep);
+    const result1 = await tutorIdAndRepIdFromConventionId(conventionId);
+    expect(
+      result1.rows[0].establishment_representative_id ===
+        result1.rows[0].establishment_tutor_id,
+    ).toBeTruthy();
+
+    //UPDATE CONVENTION WITH DIFFERENT TUTOR & REP"
+    await conventionRepository.update(conventionWithDiffTutorAndRep);
+    const result2 = await tutorIdAndRepIdFromConventionId(conventionId);
+    expect(
+      result2.rows[0].establishment_representative_id ===
+        result2.rows[0].establishment_tutor_id,
+    ).toBeFalsy();
+
+    //UPDATE CONVENTION WITH SAME TUTOR & REP
+    await conventionRepository.update(conventionWithSameTutorAndRep);
+    const result3 = await tutorIdAndRepIdFromConventionId(conventionId);
+    expect(
+      result3.rows[0].establishment_representative_id ===
+        result3.rows[0].establishment_tutor_id,
+    ).toBeTruthy();
   });
 
   it("Retrieves federated identity if exists", async () => {

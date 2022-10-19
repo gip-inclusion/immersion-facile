@@ -3,6 +3,7 @@ import {
   ConventionDto,
   ConventionDtoBuilder,
   ConventionId,
+  EstablishmentTutor,
 } from "shared";
 import {
   expectPromiseToFailWithError,
@@ -116,6 +117,49 @@ describe("Update Convention", () => {
           `Convention ${storedConvention.id} cannot be modified as it has status PARTIALLY_SIGNED`,
         ),
       );
+    });
+  });
+
+  describe("Update cases", () => {
+    it("With tutor different of establishment representative", async () => {
+      const tutor: EstablishmentTutor = {
+        role: "establishment-tutor",
+        firstName: "Bob",
+        lastName: "Harrys",
+        email: "bob.harry@mail.com",
+        phone: "0011223344",
+        job: "tutor",
+      };
+      const storedConvention = new ConventionDtoBuilder()
+        .withStatus("DRAFT")
+        .withEstablishmentTutor(tutor)
+        .withEstablishmentRepresentative({
+          ...tutor,
+          role: "establishment-representative",
+        })
+        .build();
+
+      conventionRepository.setConventions({
+        [storedConvention.id]: storedConvention,
+      });
+
+      //we would expect READY_TO_SIGN to be the most frequent case of previous state that we want to prevent here. Not testing all the possible statuses.
+      const updatedConvention = new ConventionDtoBuilder(storedConvention)
+        .withStatus("READY_TO_SIGN")
+        .withEstablishmentRepresentative({
+          role: "establishment-representative",
+          firstName: "Martin",
+          lastName: "Hills",
+          email: "martin.hills@mail.com",
+          phone: "0011223344",
+        })
+        .build();
+
+      await updateConvention.execute({
+        id: updatedConvention.id,
+        convention: updatedConvention,
+      });
+      expect(conventionRepository.conventions).toEqual([updatedConvention]);
     });
   });
 
