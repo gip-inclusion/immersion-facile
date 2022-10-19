@@ -10,7 +10,7 @@ import {
   Signatory,
   TemplatedEmail,
 } from "shared";
-import { getValidatedApplicationFinalConfirmationParams } from "../domain/convention/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
+import { getValidatedConventionFinalConfirmationParams } from "../domain/convention/useCases/notifications/NotifyAllActorsOfFinalConventionValidation";
 import { ContactEntityV2 } from "../domain/immersionOffer/entities/ContactEntity";
 import { EstablishmentEntityV2 } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import { AnnotatedImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
@@ -71,7 +71,7 @@ export const expectEmailFinalValidationConfirmationMatchingConvention = (
   expectTypeToMatchAndEqual(templatedEmail, {
     type: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
     recipients,
-    params: getValidatedApplicationFinalConfirmationParams(agency, convention),
+    params: getValidatedConventionFinalConfirmationParams(agency, convention),
   });
 };
 

@@ -1,11 +1,9 @@
 import { parseISO } from "date-fns";
 import {
   AgencyDto,
-  Beneficiary,
   calculateTotalImmersionHoursBetweenDate,
   ConventionDto,
   conventionSchema,
-  EstablishmentRepresentative,
   prettyPrintSchedule,
   ValidatedConventionFinalConfirmationEmail,
 } from "shared";
@@ -19,7 +17,7 @@ import { TransactionalUseCase } from "../../../core/UseCase";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../peConnect/dto/PeConnect.dto";
 import { EmailGateway } from "../../ports/EmailGateway";
 
-export class NotifyAllActorsOfFinalApplicationValidation extends TransactionalUseCase<ConventionDto> {
+export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUseCase<ConventionDto> {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly emailGateway: EmailGateway,
@@ -64,51 +62,53 @@ export class NotifyAllActorsOfFinalApplicationValidation extends TransactionalUs
     await this.emailGateway.sendEmail({
       type: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
       recipients,
-      params: getValidatedApplicationFinalConfirmationParams(
-        agency,
-        convention,
-      ),
+      params: getValidatedConventionFinalConfirmationParams(agency, convention),
     });
   }
 }
 
 // Visible for testing.
-export const getValidatedApplicationFinalConfirmationParams = (
+export const getValidatedConventionFinalConfirmationParams = (
   agency: AgencyDto,
-  dto: ConventionDto,
+  convention: ConventionDto,
 ): ValidatedConventionFinalConfirmationEmail["params"] => {
-  const beneficiary: Beneficiary = dto.signatories.beneficiary;
-  const establishmentRepresentative: EstablishmentRepresentative =
-    dto.signatories.establishmentRepresentative;
+  const {
+    beneficiary,
+    establishmentRepresentative,
+    beneficiaryRepresentative,
+  } = convention.signatories;
 
   return {
     totalHours: calculateTotalImmersionHoursBetweenDate({
-      dateStart: dto.dateStart,
-      dateEnd: dto.dateEnd,
-      schedule: dto.schedule,
+      dateStart: convention.dateStart,
+      dateEnd: convention.dateEnd,
+      schedule: convention.schedule,
     }),
     beneficiaryFirstName: beneficiary.firstName,
     beneficiaryLastName: beneficiary.lastName,
     emergencyContact: beneficiary.emergencyContact,
     emergencyContactPhone: beneficiary.emergencyContactPhone,
-    dateStart: parseISO(dto.dateStart).toLocaleDateString("fr"),
-    dateEnd: parseISO(dto.dateEnd).toLocaleDateString("fr"),
-    establishmentTutorName: `${dto.establishmentTutor.firstName} ${dto.establishmentTutor.lastName}`,
+    dateStart: parseISO(convention.dateStart).toLocaleDateString("fr"),
+    dateEnd: parseISO(convention.dateEnd).toLocaleDateString("fr"),
+    establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
     establishmentRepresentativeName: `${establishmentRepresentative.firstName} ${establishmentRepresentative.lastName}`,
-    scheduleText: prettyPrintSchedule(dto.schedule).split("\n"),
-    businessName: dto.businessName,
-    immersionAddress: dto.immersionAddress || "",
-    immersionAppellationLabel: dto.immersionAppellation.appellationLabel,
-    immersionActivities: dto.immersionActivities,
-    immersionSkills: dto.immersionSkills ?? "Non renseigné",
+    scheduleText: prettyPrintSchedule(convention.schedule).split("\n"),
+    businessName: convention.businessName,
+    immersionAddress: convention.immersionAddress || "",
+    immersionAppellationLabel: convention.immersionAppellation.appellationLabel,
+    immersionActivities: convention.immersionActivities,
+    immersionSkills: convention.immersionSkills ?? "Non renseigné",
     sanitaryPrevention:
-      dto.sanitaryPrevention && dto.sanitaryPreventionDescription
-        ? dto.sanitaryPreventionDescription
+      convention.sanitaryPrevention && convention.sanitaryPreventionDescription
+        ? convention.sanitaryPreventionDescription
         : "non",
-    individualProtection: dto.individualProtection ? "oui" : "non",
+    individualProtection: convention.individualProtection ? "oui" : "non",
     questionnaireUrl: agency.questionnaireUrl,
     signature: agency.signature,
-    workConditions: dto.workConditions,
+    workConditions: convention.workConditions,
+    beneficiaryRepresentativeName: beneficiaryRepresentative
+      ? `${beneficiaryRepresentative.firstName} ${beneficiaryRepresentative.lastName}`
+      : "",
   };
 };
 

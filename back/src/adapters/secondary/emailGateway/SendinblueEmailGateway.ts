@@ -229,7 +229,7 @@ const sendInBlueKeyByEmailVariables: Record<EmailVariables, string> = {
   jobLabel: "JOB_LABEL",
   lastName: "LAST_NAME",
   magicLink: "MAGIC_LINK",
-  establishmentRepresentative: "MENTOR",
+  establishmentRepresentativeName: "ESTABLISHMENT_REPRESENTATIVE_NAME",
   establishmentTutorName: "MENTOR_NAME",
   beneficiaryRepresentativeName: "LEGAL_REPRESENTATIVE_NAME",
   message: "MESSAGE",
@@ -245,5 +245,4 @@ const sendInBlueKeyByEmailVariables: Record<EmailVariables, string> = {
   signature: "SIGNATURE",
   totalHours: "TOTAL_HOURS",
   workConditions: "WORK_CONDITIONS",
-  establishmentRepresentativeName: "ESTABLISHMENT_REPRESENTATIVE_NAME",
 };

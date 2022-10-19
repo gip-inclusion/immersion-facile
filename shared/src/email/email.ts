@@ -90,6 +90,7 @@ export type ValidatedConventionFinalConfirmationEmail = GenericTemplatedEmail<
     dateEnd: string;
     establishmentTutorName: string;
     establishmentRepresentativeName: string;
+    beneficiaryRepresentativeName: string;
     scheduleText: string[];
     businessName: string;
     immersionAddress: string;
@@ -191,7 +192,7 @@ type SignedByOtherPartyNotificationEmail = GenericTemplatedEmail<
     beneficiaryLastName: string;
     immersionProfession: string;
     businessName: string;
-    establishmentRepresentative: string;
+    establishmentRepresentativeName: string;
   }
 >;
 

@@ -16,9 +16,9 @@ import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAg
 import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../../adapters/secondary/InMemoryConventionPoleEmploiAdvisorRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import {
-  getValidatedApplicationFinalConfirmationParams,
-  NotifyAllActorsOfFinalApplicationValidation,
-} from "../../../domain/convention/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
+  getValidatedConventionFinalConfirmationParams,
+  NotifyAllActorsOfFinalConventionValidation,
+} from "../../../domain/convention/useCases/notifications/NotifyAllActorsOfFinalConventionValidation";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
@@ -59,7 +59,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
 
     unitOfWorkPerformer = new InMemoryUowPerformer(uow);
 
-    await new NotifyAllActorsOfFinalApplicationValidation(
+    await new NotifyAllActorsOfFinalConventionValidation(
       unitOfWorkPerformer,
       emailGw,
     ).execute(validConvention);
@@ -91,7 +91,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
     const conventionWithSpecificEstablishementEmail = new ConventionDtoBuilder()
       .withEstablishmentTutorEmail(establishmentTutorEmail)
       .build();
-    await new NotifyAllActorsOfFinalApplicationValidation(
+    await new NotifyAllActorsOfFinalConventionValidation(
       unitOfWorkPerformer,
       emailGw,
     ).execute(conventionWithSpecificEstablishementEmail);
@@ -132,7 +132,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
 
     unitOfWorkPerformer = new InMemoryUowPerformer(uow);
 
-    await new NotifyAllActorsOfFinalApplicationValidation(
+    await new NotifyAllActorsOfFinalConventionValidation(
       unitOfWorkPerformer,
       emailGw,
     ).execute(conventionWithBeneficiaryRepresentative);
@@ -178,7 +178,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
 
     unitOfWorkPerformer = new InMemoryUowPerformer(uow);
 
-    await new NotifyAllActorsOfFinalApplicationValidation(
+    await new NotifyAllActorsOfFinalConventionValidation(
       unitOfWorkPerformer,
       emailGw,
     ).execute(validConvention);
@@ -206,8 +206,8 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
     .withSignature("testSignature")
     .build();
 
-  it("simple application", () => {
-    const application = new ConventionDtoBuilder()
+  it("simple convention", () => {
+    const convention = new ConventionDtoBuilder()
       .withImmersionAddress("immersionAddress")
       .withSanitaryPrevention(true)
       .withSanitaryPreventionDescription("sanitaryPreventionDescription")
@@ -216,57 +216,106 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
       .build();
 
     expectTypeToMatchAndEqual(
-      getValidatedApplicationFinalConfirmationParams(agency, application),
+      getValidatedConventionFinalConfirmationParams(agency, convention),
       {
         totalHours: 70,
-        beneficiaryFirstName: application.signatories.beneficiary.firstName,
-        beneficiaryLastName: application.signatories.beneficiary.lastName,
-        emergencyContact: application.signatories.beneficiary.emergencyContact,
+        beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+        beneficiaryLastName: convention.signatories.beneficiary.lastName,
+        emergencyContact: convention.signatories.beneficiary.emergencyContact,
         emergencyContactPhone:
-          application.signatories.beneficiary.emergencyContactPhone,
-        dateStart: parseISO(application.dateStart).toLocaleDateString("fr"),
-        dateEnd: parseISO(application.dateEnd).toLocaleDateString("fr"),
-        establishmentTutorName: `${application.establishmentTutor.firstName} ${application.establishmentTutor.lastName}`,
-        scheduleText: prettyPrintSchedule(application.schedule).split("\n"),
-        businessName: application.businessName,
+          convention.signatories.beneficiary.emergencyContactPhone,
+        dateStart: parseISO(convention.dateStart).toLocaleDateString("fr"),
+        dateEnd: parseISO(convention.dateEnd).toLocaleDateString("fr"),
+        establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
+        scheduleText: prettyPrintSchedule(convention.schedule).split("\n"),
+        businessName: convention.businessName,
         immersionAddress: "immersionAddress",
         immersionAppellationLabel:
-          application.immersionAppellation.appellationLabel,
-        immersionActivities: application.immersionActivities,
-        immersionSkills: application.immersionSkills ?? "Non renseigné",
-        establishmentRepresentativeName: `${application.signatories.establishmentRepresentative.firstName} ${application.signatories.establishmentRepresentative.lastName}`,
+          convention.immersionAppellation.appellationLabel,
+        immersionActivities: convention.immersionActivities,
+        immersionSkills: convention.immersionSkills ?? "Non renseigné",
+        establishmentRepresentativeName: `${convention.signatories.establishmentRepresentative.firstName} ${convention.signatories.establishmentRepresentative.lastName}`,
         sanitaryPrevention: "sanitaryPreventionDescription",
         individualProtection: "oui",
         questionnaireUrl: agency.questionnaireUrl,
         signature: agency.signature,
-        workConditions: application.workConditions,
+        workConditions: convention.workConditions,
+        beneficiaryRepresentativeName: "",
       },
     );
   });
 
   it("prints correct sanitaryPreventionMessage when missing", () => {
-    const application = new ConventionDtoBuilder()
+    const convention = new ConventionDtoBuilder()
       .withSanitaryPrevention(false)
       .build();
 
-    const actualParms = getValidatedApplicationFinalConfirmationParams(
+    const actualParms = getValidatedConventionFinalConfirmationParams(
       agency,
-      application,
+      convention,
     );
 
     expect(actualParms.sanitaryPrevention).toBe("non");
   });
 
   it("prints correct individualProtection when missing", () => {
-    const application = new ConventionDtoBuilder()
+    const convention = new ConventionDtoBuilder()
       .withIndividualProtection(false)
       .build();
 
-    const actualParms = getValidatedApplicationFinalConfirmationParams(
+    const actualParms = getValidatedConventionFinalConfirmationParams(
       agency,
-      application,
+      convention,
     );
 
     expect(actualParms.individualProtection).toBe("non");
+  });
+
+  it("with beneficiary representative", () => {
+    const convention = new ConventionDtoBuilder()
+      .withImmersionAddress("immersionAddress")
+      .withSanitaryPrevention(true)
+      .withSanitaryPreventionDescription("sanitaryPreventionDescription")
+      .withIndividualProtection(true)
+      .withSchedule(reasonableSchedule)
+      .withBeneficiaryRepresentative({
+        role: "beneficiary-representative",
+        firstName: "beneficiary",
+        lastName: "representative",
+        email: "rep@rep.com",
+        phone: "0011223344",
+      })
+      .build();
+
+    expectTypeToMatchAndEqual(
+      getValidatedConventionFinalConfirmationParams(agency, convention),
+      {
+        totalHours: 70,
+        beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+        beneficiaryLastName: convention.signatories.beneficiary.lastName,
+        emergencyContact: convention.signatories.beneficiary.emergencyContact,
+        emergencyContactPhone:
+          convention.signatories.beneficiary.emergencyContactPhone,
+        dateStart: parseISO(convention.dateStart).toLocaleDateString("fr"),
+        dateEnd: parseISO(convention.dateEnd).toLocaleDateString("fr"),
+        establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
+        scheduleText: prettyPrintSchedule(convention.schedule).split("\n"),
+        businessName: convention.businessName,
+        immersionAddress: "immersionAddress",
+        immersionAppellationLabel:
+          convention.immersionAppellation.appellationLabel,
+        immersionActivities: convention.immersionActivities,
+        immersionSkills: convention.immersionSkills ?? "Non renseigné",
+        establishmentRepresentativeName: `${convention.signatories.establishmentRepresentative.firstName} ${convention.signatories.establishmentRepresentative.lastName}`,
+        sanitaryPrevention: "sanitaryPreventionDescription",
+        individualProtection: "oui",
+        questionnaireUrl: agency.questionnaireUrl,
+        signature: agency.signature,
+        workConditions: convention.workConditions,
+        beneficiaryRepresentativeName: `${
+          convention.signatories.beneficiaryRepresentative!.firstName
+        } ${convention.signatories.beneficiaryRepresentative!.lastName}`,
+      },
+    );
   });
 });

@@ -18,7 +18,7 @@ import { GetConvention } from "../../../domain/convention/useCases/GetConvention
 import { ListAgenciesByDepartmentCode } from "../../../domain/convention/useCases/ListAgenciesByDepartmentCode";
 import { ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/convention/useCases/notifications/ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature";
 import { DeliverRenewedMagicLink } from "../../../domain/convention/useCases/notifications/DeliverRenewedMagicLink";
-import { NotifyAllActorsOfFinalApplicationValidation } from "../../../domain/convention/useCases/notifications/NotifyAllActorsOfFinalApplicationValidation";
+import { NotifyAllActorsOfFinalConventionValidation } from "../../../domain/convention/useCases/notifications/NotifyAllActorsOfFinalConventionValidation";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 import { NotifyNewApplicationNeedsReview } from "../../../domain/convention/useCases/notifications/NotifyNewApplicationNeedsReview";
@@ -230,7 +230,7 @@ export const createUseCases = (
           generateMagicLinkFn,
         ),
       notifyAllActorsOfFinalConventionValidation:
-        new NotifyAllActorsOfFinalApplicationValidation(
+        new NotifyAllActorsOfFinalConventionValidation(
           uowPerformer,
           gateways.email,
         ),
