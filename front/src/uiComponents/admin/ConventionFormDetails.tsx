@@ -44,6 +44,14 @@ const establishmentTutorFields: FieldsToLabel = {
   "establishmentTutor.job": "Poste",
 };
 
+const establishmentRepresentativeFields: FieldsToLabel = {
+  "signatories.beneficiary.signedAt": "Signé",
+  "signatories.beneficiary.email": "Mail de représentant",
+  "signatories.beneficiary.phone": "Numéro de téléphone du représentant",
+  "signatories.beneficiary.firstName": "Prénom",
+  "signatories.beneficiary.lastName": "Nom",
+};
+
 const candidateFields: FieldsToLabel = {
   "signatories.beneficiary.signedAt": "Signé",
   "signatories.beneficiary.email": "Mail de demandeur",
@@ -86,7 +94,11 @@ type FieldsAndTitle = {
 const allFields: FieldsAndTitle[] = [
   { listTitle: "Bénéficiaire", fields: candidateFields },
   { listTitle: "Représentant légal", fields: beneficiaryRepresentativeFields },
-  { listTitle: "Tuteur", fields: establishmentTutorFields },
+  {
+    listTitle: "Réprésentant de l'entreprise",
+    fields: establishmentRepresentativeFields,
+  },
+  { listTitle: "Tuteur de l'entreprise", fields: establishmentTutorFields },
   { listTitle: "Entreprise", fields: enterpriseFields },
   { listTitle: "Immersion", fields: immersionFields },
   { listTitle: "Agence", fields: agencyFields },
