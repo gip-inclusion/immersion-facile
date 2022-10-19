@@ -118,7 +118,7 @@ export const ConventionValidatePage = ({ route }: VerificationPageProps) => {
         {isAllowedTransition(currentStatus, "ACCEPTED_BY_VALIDATOR", role) && (
           <VerificationActionButton
             newStatus="ACCEPTED_BY_VALIDATOR"
-            onSubmit={createOnSubmitWithFeedbackKind("markedAsEligible")}
+            onSubmit={createOnSubmitWithFeedbackKind("markedAsValidated")}
             disabled={
               disabled ||
               (currentStatus != "IN_REVIEW" &&
