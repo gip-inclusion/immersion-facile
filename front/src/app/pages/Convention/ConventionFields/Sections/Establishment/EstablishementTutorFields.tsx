@@ -56,7 +56,6 @@ export const EstablishementTutorFields = ({
         placeholder={t.establishment.establishmentTutor.email.placeholder}
         description={t.establishment.establishmentTutor.email.description}
         disabled={disabled}
-        className="!mb-1"
       />
     </>
   );

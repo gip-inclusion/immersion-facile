@@ -64,7 +64,6 @@ export const EstablishmentRepresentativeFields = ({
           t.establishment.establishmentRepresentative.email.description
         }
         disabled={disabled}
-        className="!mb-1"
       />
     </>
   );
