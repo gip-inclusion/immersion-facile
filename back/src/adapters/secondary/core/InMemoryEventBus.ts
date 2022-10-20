@@ -115,8 +115,17 @@ export class InMemoryEventBus implements EventBus {
     // Some subscribers have failed :
     const wasQuarantined = event.publications.length >= 3;
     if (wasQuarantined) {
-      logger.error({ event }, "Failed too many times, event is Quarantined");
-      notifyObjectDiscord(event);
+      const message = "Failed too many times, event will be Quarantined";
+      logger.error({ event }, message);
+      notifyObjectDiscord({
+        event: {
+          ...event,
+          lastPublication: JSON.stringify(event.publications.at(-1), null, 2),
+          payload: JSON.stringify(event.payload, null, 2),
+        },
+        message,
+        wasQuarantined,
+      });
     }
 
     return {
