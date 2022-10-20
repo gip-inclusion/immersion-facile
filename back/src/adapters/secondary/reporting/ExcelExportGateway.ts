@@ -9,7 +9,7 @@ import {
   makeTemporaryStorageFile,
   retrieveParentDirectory,
 } from "../../../utils/filesystemUtils";
-import { WorkbookV2 } from "../../../utils/Workbook";
+import { Workbook } from "../../../utils/Workbook";
 
 export class ExcelExportGateway implements ExportGateway {
   async save(
@@ -30,8 +30,8 @@ export class ExcelExportGateway implements ExportGateway {
   }
 }
 
-const toWorkbook = (workbookTitle: string, rows: ExportedRow[]): WorkbookV2 =>
-  new WorkbookV2()
+const toWorkbook = (workbookTitle: string, rows: ExportedRow[]): Workbook =>
+  new Workbook()
     .withTitle(workbookTitle)
     .withSheet()
     .withConditionalFormatting("main", {

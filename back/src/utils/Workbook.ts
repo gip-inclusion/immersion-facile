@@ -15,61 +15,10 @@ const configs: Record<string, Partial<AddWorksheetOptions>> = {
 };
 
 // prettier-ignore
-export class Workbook<T extends Record<string, unknown>> extends excel.Workbook {
+export class Workbook extends excel.Workbook {
   public withCustomFieldsHeaders(
     customColumns: Partial<Column>[],
-  ): Workbook<T> {
-    this.getWorksheet("main").columns = customColumns;
-    return this;
-  }
-
-  public withPayload(payload: T[]) {
-    const worksheet = this.getWorksheet("main");
-    payload.map((entity: T) => {
-      worksheet.addRow({ ...entity });
-    });
-
-    return this;
-  }
-
-  public withSheet(): Workbook<T> {
-    this.addWorksheet(
-      "main",
-      configs[WorksheetOptionsConfigurations.RowAsHeaderDisplay],
-    );
-    return this;
-  }
-
-  public withConditionalFormatting(
-    sheet: string,
-    options: excel.ConditionalFormattingOptions,
-  ): Workbook<T> {
-    const worksheet: Worksheet = this.getWorksheet(sheet);
-    worksheet.addConditionalFormatting(options);
-
-    return this;
-  }
-
-  public withTitle(title: string): Workbook<T> {
-    this.title = title;
-    return this;
-  }
-
-  public async toXlsx(path?: string): Promise<string> {
-    const fileName = `${this.title}.xlsx`;
-    const directoryPath: string = path ? path : `./`;
-    const xlsFilePath = `${directoryPath}/${fileName}`;
-    const stream = fse.createWriteStream(xlsFilePath);
-    await this.xlsx.write(stream);
-    return xlsFilePath;
-  }
-}
-
-// prettier-ignore
-export class WorkbookV2 extends excel.Workbook {
-  public withCustomFieldsHeaders(
-    customColumns: Partial<Column>[],
-  ): WorkbookV2 {
+  ): Workbook {
     this.getWorksheet("main").columns = customColumns;
     return this;
   }
@@ -83,7 +32,7 @@ export class WorkbookV2 extends excel.Workbook {
     return this;
   }
 
-  public withSheet(): WorkbookV2 {
+  public withSheet(): Workbook {
     this.addWorksheet(
       "main",
       configs[WorksheetOptionsConfigurations.RowAsHeaderDisplay],
@@ -94,14 +43,14 @@ export class WorkbookV2 extends excel.Workbook {
   public withConditionalFormatting(
     sheet: string,
     options: excel.ConditionalFormattingOptions,
-  ): WorkbookV2 {
+  ): Workbook {
     const worksheet: Worksheet = this.getWorksheet(sheet);
     worksheet.addConditionalFormatting(options);
 
     return this;
   }
 
-  public withTitle(title: string): WorkbookV2 {
+  public withTitle(title: string): Workbook {
     this.title = title;
     return this;
   }
