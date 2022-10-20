@@ -19,7 +19,7 @@ export const SubmitButton = ({ onSubmit, isSubmitting }: SubmitButtonProps) => {
   return (
     <button
       className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"
-      type="submit"
+      type="button"
       onClick={makeInReviewAndSubmit}
       disabled={isSubmitting}
     >
