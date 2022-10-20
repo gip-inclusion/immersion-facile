@@ -1,7 +1,10 @@
 import { Pool, PoolClient } from "pg";
-import { FormEstablishmentDtoBuilder } from "shared";
+import {
+  expectArraysToEqualIgnoringOrder,
+  FormEstablishmentDtoBuilder,
+} from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
-import { expectArraysToEqualIgnoringOrder } from "../../../_testBuilders/test.helpers";
+
 import { PgFormEstablishmentRepository } from "./PgFormEstablishmentRepository";
 
 describe("PgFormEstablishmentRepository", () => {

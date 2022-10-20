@@ -3,14 +3,12 @@ import {
   ConventionDtoBuilder,
   ConventionMagicLinkPayload,
   ConventionStatus,
-  ImmersionAssessmentDto,
-} from "shared";
-import {
-  expectArraysToEqual,
   expectObjectsToMatch,
+  ImmersionAssessmentDto,
+  expectArraysToEqual,
   expectPromiseToFailWithError,
   splitCasesBetweenPassingAndFailing,
-} from "../../../_testBuilders/test.helpers";
+} from "shared";
 import { makeTestCreateNewEvent } from "../../../_testBuilders/makeTestCreateNewEvent";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {

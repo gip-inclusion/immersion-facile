@@ -1,5 +1,4 @@
-import { TemplatedEmail } from "shared";
-import { expectArraysToMatch } from "../../../_testBuilders/test.helpers";
+import { TemplatedEmail, expectArraysToMatch } from "shared";
 import { CustomClock } from "../core/ClockImplementations";
 import { InMemoryEmailGateway } from "./InMemoryEmailGateway";
 

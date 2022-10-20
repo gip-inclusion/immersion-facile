@@ -1,12 +1,14 @@
-import { AgencyDtoBuilder, ConventionDtoBuilder, frontRoutes } from "shared";
+import {
+  AgencyDtoBuilder,
+  ConventionDtoBuilder,
+  frontRoutes,
+  expectTypeToMatchAndEqual,
+} from "shared";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryAgencyRepository } from "../../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import {
-  fakeGenerateMagicLinkUrlFn,
-  expectTypeToMatchAndEqual,
-} from "../../../../_testBuilders/test.helpers";
+import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/fakeGenerateMagicLinkUrlFn";
 import { NotifyToAgencyApplicationSubmitted } from "./NotifyToAgencyApplicationSubmitted";
 
 const councellorEmail = "councellor@email.fr";

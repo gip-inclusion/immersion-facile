@@ -7,9 +7,10 @@ import {
   PeConnectIdentity,
   prettyPrintSchedule,
   reasonableSchedule,
+  expectTypeToMatchAndEqual,
 } from "shared";
 import { expectEmailFinalValidationConfirmationMatchingConvention } from "../../../../_testBuilders/emailAssertions";
-import { expectTypeToMatchAndEqual } from "../../../../_testBuilders/test.helpers";
+
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryAgencyRepository } from "../../../../adapters/secondary/InMemoryAgencyRepository";

@@ -8,6 +8,9 @@ import {
   FormEstablishmentSource,
   GeoPositionDto,
   SearchImmersionResultDto,
+  expectArraysToEqualIgnoringOrder,
+  expectTypeToMatchAndEqual,
+  expectPromiseToFailWith,
 } from "shared";
 import {
   NumberEmployeesRange,
@@ -25,11 +28,6 @@ import { EstablishmentAggregateBuilder } from "../../../_testBuilders/Establishm
 import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
-import {
-  expectArraysToEqualIgnoringOrder,
-  expectTypeToMatchAndEqual,
-  expectPromiseToFailWith,
-} from "../../../_testBuilders/test.helpers";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 
 const testUid1 = "11111111-a2a5-430a-b558-ed3e2f03512d";

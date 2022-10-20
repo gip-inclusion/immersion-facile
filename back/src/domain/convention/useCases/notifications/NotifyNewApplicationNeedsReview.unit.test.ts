@@ -9,7 +9,7 @@ import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGatewa
 import { InMemoryAgencyRepository } from "../../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { expectedEmailConventionReviewMatchingConvention } from "../../../../_testBuilders/emailAssertions";
-import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/test.helpers";
+import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/fakeGenerateMagicLinkUrlFn";
 import { NotifyNewApplicationNeedsReview } from "./NotifyNewApplicationNeedsReview";
 
 const defaultConvention = new ConventionDtoBuilder().build();

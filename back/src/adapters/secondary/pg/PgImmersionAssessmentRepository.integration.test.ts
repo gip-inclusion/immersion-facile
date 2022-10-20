@@ -3,13 +3,11 @@ import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   expectObjectsToMatch,
+  expectPromiseToFailWithError,
+  expectTypeToMatchAndEqual,
 } from "shared";
 import { ImmersionAssessmentEntity } from "../../../domain/convention/entities/ImmersionAssessmentEntity";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
-import {
-  expectPromiseToFailWithError,
-  expectTypeToMatchAndEqual,
-} from "../../../_testBuilders/test.helpers";
 import { PgAgencyRepository } from "./PgAgencyRepository";
 import { PgConventionRepository } from "./PgConventionRepository";
 import { PgImmersionAssessmentRepository } from "./PgImmersionAssessmentRepository";

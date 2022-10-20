@@ -3,10 +3,11 @@ import {
   ConventionDto,
   ConventionDtoBuilder,
   createConventionMagicLinkPayload,
+  expectPromiseToFailWithError,
   RenewMagicLinkRequestDto,
 } from "shared";
 import { AppConfigBuilder } from "../../../_testBuilders/AppConfigBuilder";
-import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
+
 import { AppConfig } from "../../../adapters/primary/config/appConfig";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {

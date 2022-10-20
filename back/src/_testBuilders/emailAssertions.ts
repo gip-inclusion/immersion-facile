@@ -9,15 +9,13 @@ import {
   frontRoutes,
   Signatory,
   TemplatedEmail,
+  expectTypeToMatchAndEqual,
 } from "shared";
 import { getValidatedConventionFinalConfirmationParams } from "../domain/convention/useCases/notifications/NotifyAllActorsOfFinalConventionValidation";
 import { ContactEntityV2 } from "../domain/immersionOffer/entities/ContactEntity";
 import { EstablishmentEntityV2 } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import { AnnotatedImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
-import {
-  expectTypeToMatchAndEqual,
-  fakeGenerateMagicLinkUrlFn,
-} from "./test.helpers";
+import { fakeGenerateMagicLinkUrlFn } from "./fakeGenerateMagicLinkUrlFn";
 
 export const expectEmaiSignatoryConfirmationSignatureRequestMatchingConvention =
   ({

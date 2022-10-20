@@ -1,4 +1,3 @@
-import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import {
   NotFoundError,
   TooManyRequestApiError,
@@ -6,6 +5,7 @@ import {
 import { GetSiret } from "../../../domain/sirene/useCases/GetSiret";
 import { SireneEstablishmentVO } from "../../../domain/sirene/valueObjects/SireneEstablishmentVO";
 import { InMemorySireneGateway } from "../../../adapters/secondary/sirene/InMemorySireneGateway";
+import { expectPromiseToFailWithError } from "shared";
 
 const validEstablishment = new SireneEstablishmentVO({
   siret: "12345678901234",

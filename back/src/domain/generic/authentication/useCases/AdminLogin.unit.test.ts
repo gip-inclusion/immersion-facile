@@ -1,4 +1,4 @@
-import { expectPromiseToFailWithError } from "../../../../_testBuilders/test.helpers";
+import { expectPromiseToFailWithError } from "shared";
 import { ForbiddenError } from "../../../../adapters/primary/helpers/httpErrors";
 import { AdminLogin } from "./AdminLogin";
 

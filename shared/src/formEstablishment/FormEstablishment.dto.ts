@@ -1,7 +1,7 @@
 import { ApiConsumerName } from "../apiConsumer/ApiConsumer";
 import { NafDto } from "../naf";
 import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
-import { SiretDto } from "../siret";
+import { SiretDto } from "../siret/siret";
 import { Flavor } from "../typeFlavors";
 
 // prettier-ignore

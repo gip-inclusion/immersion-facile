@@ -4,7 +4,7 @@ import { agencyIdSchema } from "../agency/agency.schema";
 import { peConnectPrefixSchema } from "../federatedIdentities/federatedIdentity.schema";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { scheduleSchema } from "../schedule/Schedule.schema";
-import { siretSchema } from "../siret";
+import { siretSchema } from "../siret/siret";
 import { allRoles } from "../tokens/MagicLinkPayload";
 import { phoneRegExp, stringOfNumbers } from "../utils";
 import { dateRegExp } from "../utils/date";

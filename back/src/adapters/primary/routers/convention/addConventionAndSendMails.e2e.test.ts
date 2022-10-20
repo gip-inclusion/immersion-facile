@@ -2,7 +2,10 @@ import {
   ConventionDto,
   ConventionDtoBuilder,
   conventionsRoute,
+  expectEmailOfType,
+  expectJwtInMagicLinkAndGetIt,
   expectToEqual,
+  expectTypeToMatchAndEqual,
   Signatories,
   signConventionRoute,
   TemplatedEmail,
@@ -15,11 +18,7 @@ import {
   buildTestApp,
   TestAppAndDeps,
 } from "../../../../_testBuilders/buildTestApp";
-import {
-  expectEmailOfType,
-  expectJwtInMagicLinkAndGetIt,
-  expectTypeToMatchAndEqual,
-} from "../../../../_testBuilders/test.helpers";
+
 import { DomainEvent } from "../../../../domain/core/eventBus/events";
 import { InMemoryOutboxRepository } from "../../../secondary/core/InMemoryOutboxRepository";
 import { InMemoryEmailGateway } from "../../../secondary/emailGateway/InMemoryEmailGateway";

@@ -1,8 +1,8 @@
 import { Pool, PoolClient } from "pg";
 import { keys } from "ramda";
-import { FeatureFlags } from "shared";
+import { expectTypeToMatchAndEqual, FeatureFlags } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
-import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
+
 import { FeatureFlagRepository } from "../../../domain/core/ports/FeatureFlagRepository";
 import { PgFeatureFlagRepository } from "./PgFeatureFlagRepository";
 

@@ -4,14 +4,12 @@ import {
   ConventionDtoBuilder,
   ConventionId,
   ConventionReadDto,
+  expectTypeToMatchAndEqual,
+  expectArraysToEqualIgnoringOrder,
 } from "shared";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { ImmersionAssessmentEmailParams } from "../../../domain/immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
-import {
-  expectTypeToMatchAndEqual,
-  expectArraysToEqualIgnoringOrder,
-} from "../../../_testBuilders/test.helpers";
 import { RealClock } from "../core/ClockImplementations";
 import { UuidV4Generator } from "../core/UuidGeneratorImplementations";
 import { PgAgencyRepository } from "./PgAgencyRepository";

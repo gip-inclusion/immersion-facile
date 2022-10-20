@@ -1,5 +1,5 @@
-import { AddressDto, GeoPositionDto } from "shared";
-import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
+import { AddressDto, expectTypeToMatchAndEqual, GeoPositionDto } from "shared";
+
 import {
   httpAdresseApiClient,
   HttpApiAdresseAddressGateway,

@@ -1,9 +1,8 @@
-import { ConventionDtoBuilder } from "shared";
 import {
+  ConventionDtoBuilder,
   expectObjectsToMatch,
   expectTypeToMatchAndEqual,
-  spyOnTopic,
-} from "../../../_testBuilders/test.helpers";
+} from "shared";
 import { createInMemoryUow } from "../../primary/config/uowConfig";
 import { CustomClock } from "./ClockImplementations";
 import { InMemoryEventBus } from "./InMemoryEventBus";
@@ -13,6 +12,7 @@ import type {
   DomainEvent,
   EventFailure,
 } from "../../../domain/core/eventBus/events";
+import { spyOnTopic } from "../../../_testBuilders/spyOnTopic";
 
 const domainEvt: DomainEvent = {
   id: "anId",

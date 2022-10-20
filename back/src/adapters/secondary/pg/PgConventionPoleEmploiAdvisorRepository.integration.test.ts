@@ -1,7 +1,10 @@
 import { Pool, PoolClient } from "pg";
-import { AgencyDtoBuilder, ConventionDtoBuilder } from "shared";
+import {
+  AgencyDtoBuilder,
+  ConventionDtoBuilder,
+  expectObjectsToMatch,
+} from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
-import { expectObjectsToMatch } from "../../../_testBuilders/test.helpers";
 import { PgAgencyRepository } from "./PgAgencyRepository";
 import { PgConventionPoleEmploiAdvisorRepository } from "./PgConventionPoleEmploiAdvisorRepository";
 import { PgConventionRepository } from "./PgConventionRepository";

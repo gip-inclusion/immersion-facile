@@ -4,9 +4,10 @@ import {
   AgencyDto,
   AgencyDtoBuilder,
   GeoPositionDto,
+  expectTypeToMatchAndEqual,
 } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
-import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
+
 import { PgAgencyRepository } from "./PgAgencyRepository";
 
 const agency1builder = AgencyDtoBuilder.create(

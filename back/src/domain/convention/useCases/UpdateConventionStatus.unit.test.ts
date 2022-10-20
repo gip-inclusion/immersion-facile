@@ -1,7 +1,7 @@
 /* eslint-disable jest/require-top-level-describe */
 /* eslint-disable jest/consistent-test-it */
 
-import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
+import { expectPromiseToFailWithError } from "shared";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import {
   executeUpdateConventionStatusUseCase,

@@ -1,4 +1,4 @@
-import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
+import { expectTypeToMatchAndEqual } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../../adapters/secondary/InMemoryConventionPoleEmploiAdvisorRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";

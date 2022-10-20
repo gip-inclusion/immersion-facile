@@ -1,6 +1,6 @@
-import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
 import { ExponentialBackoffRetryStrategy } from "./ExponentialBackoffRetryStrategy";
 import { RetryableError } from "../../../domain/core/ports/RetryStrategy";
+import { expectPromiseToFailWithError } from "shared";
 
 const dummyCallbackResult = { some: "value" };
 const throwRetryableError = () => {

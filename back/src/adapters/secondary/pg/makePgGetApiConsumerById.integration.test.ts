@@ -1,7 +1,7 @@
 import { Pool, PoolClient } from "pg";
-import { ApiConsumer } from "shared";
+import { ApiConsumer, expectTypeToMatchAndEqual } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
-import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
+
 import { makePgGetApiConsumerById } from "./makePgGetApiConsumerById";
 import { GetApiConsumerById } from "../../../domain/core/ports/GetApiConsumerById";
 

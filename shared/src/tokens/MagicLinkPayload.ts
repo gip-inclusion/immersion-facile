@@ -1,6 +1,6 @@
 import * as crypto from "crypto";
 import { ConventionId } from "../convention/convention.dto";
-import { SiretDto } from "../siret";
+import { SiretDto } from "../siret/siret";
 
 export type JwtPayloads = {
   application?: ConventionMagicLinkPayload;

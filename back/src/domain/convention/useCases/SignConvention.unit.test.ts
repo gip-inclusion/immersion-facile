@@ -10,11 +10,9 @@ import {
   Role,
   Signatories,
   EstablishmentRepresentative,
-} from "shared";
-import {
   expectPromiseToFailWithError,
   splitCasesBetweenPassingAndFailing,
-} from "../../../_testBuilders/test.helpers";
+} from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,

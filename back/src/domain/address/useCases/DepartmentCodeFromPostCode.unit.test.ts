@@ -1,5 +1,8 @@
-import { DepartmentCodeFromPostcodeQuery } from "shared";
-import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
+import {
+  DepartmentCodeFromPostcodeQuery,
+  expectTypeToMatchAndEqual,
+} from "shared";
+
 import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { DepartmentCodeFromPostcode } from "./DepartmentCodeFromPostCode";
 

@@ -1,6 +1,7 @@
 import { Pool, PoolClient } from "pg";
+import { expectTypeToMatchAndEqual } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
-import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
+
 import { PgRomeRepository } from "./PgRomeRepository";
 
 describe("Postgres implementation of Rome Gateway", () => {

@@ -3,7 +3,7 @@ import { SireneEstablishmentVOBuilder } from "../../../_testBuilders/SireneEstab
 import {
   expectPromiseToFailWithError,
   expectTypeToMatchAndEqual,
-} from "../../../_testBuilders/test.helpers";
+} from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";

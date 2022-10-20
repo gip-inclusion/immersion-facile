@@ -1,5 +1,6 @@
 import type { AxiosInstance } from "axios";
-import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
+import { expectPromiseToFailWithError } from "shared";
+
 import { makeEmailAllowListPredicate } from "../../primary/config/appConfig";
 import { BadRequestError } from "../../primary/helpers/httpErrors";
 

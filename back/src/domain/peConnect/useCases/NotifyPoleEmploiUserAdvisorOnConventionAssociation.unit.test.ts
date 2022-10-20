@@ -1,9 +1,9 @@
-import { ConventionDtoBuilder, frontRoutes } from "shared";
 import {
+  ConventionDtoBuilder,
+  frontRoutes,
   expectPromiseToFailWithError,
   expectTypeToMatchAndEqual,
-  fakeGenerateMagicLinkUrlFn,
-} from "../../../_testBuilders/test.helpers";
+} from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
@@ -15,6 +15,7 @@ import {
   PoleEmploiUserAdvisorDto,
 } from "../../../domain/peConnect/dto/PeConnect.dto";
 import { NotifyPoleEmploiUserAdvisorOnConventionAssociation } from "../../../domain/peConnect/useCases/NotifyPoleEmploiUserAdvisorOnConventionAssociation";
+import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/fakeGenerateMagicLinkUrlFn";
 
 describe("NotifyPoleEmploiUserAdvisorOnConventionAssociation", () => {
   let emailGateway: InMemoryEmailGateway;

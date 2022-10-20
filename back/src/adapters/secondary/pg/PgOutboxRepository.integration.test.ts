@@ -1,9 +1,9 @@
 import { Pool, PoolClient } from "pg";
-import { ConventionDtoBuilder } from "shared";
+import { ConventionDtoBuilder, expectArraysToEqualIgnoringOrder } from "shared";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { DomainTopic, DomainEvent } from "../../../domain/core/eventBus/events";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
-import { expectArraysToEqualIgnoringOrder } from "../../../_testBuilders/test.helpers";
+
 import { CustomClock } from "../core/ClockImplementations";
 import { TestUuidGenerator } from "../core/UuidGeneratorImplementations";
 import { PgOutboxRepository, StoredEventRow } from "./PgOutboxRepository";

@@ -1,6 +1,7 @@
 import {
   AddressDto,
   AgencyDtoBuilder,
+  expectTypeToMatchAndEqual,
   GeoPositionDto,
   unknownAddress,
 } from "shared";
@@ -8,7 +9,7 @@ import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig
 import { InMemoryAddressGateway } from "../../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { InMemoryAgencyRepository } from "../../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { expectTypeToMatchAndEqual } from "../../../../_testBuilders/test.helpers";
+
 import {
   noAddress,
   ApplyAgenciesAddressesFromPositions,

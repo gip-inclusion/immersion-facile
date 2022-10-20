@@ -1,7 +1,7 @@
-import { EstablishmentJwtPayload } from "shared";
+import { EstablishmentJwtPayload, expectPromiseToFailWithError } from "shared";
 import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
-import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
+
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { UuidV4Generator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";

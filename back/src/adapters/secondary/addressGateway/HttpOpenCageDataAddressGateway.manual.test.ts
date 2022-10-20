@@ -1,10 +1,11 @@
 import {
   AddressAndPosition,
   AddressDto,
+  expectTypeToMatchAndEqual,
   GeoPositionDto,
   ManagedAxios,
 } from "shared";
-import { expectTypeToMatchAndEqual } from "../../../_testBuilders/test.helpers";
+
 import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
 import { AppConfig } from "../../primary/config/appConfig";
 

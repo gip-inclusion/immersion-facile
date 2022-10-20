@@ -1,7 +1,7 @@
 import { ConventionDto, ConventionDtoBuilder } from "shared";
 import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { expectEmaiSignatoryConfirmationSignatureRequestMatchingConvention } from "../../../../_testBuilders/emailAssertions";
-import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/test.helpers";
+import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/fakeGenerateMagicLinkUrlFn";
 import { ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature } from "./ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature";
 
 const validConvention: ConventionDto = new ConventionDtoBuilder()

@@ -2,7 +2,7 @@ import { AddressDto } from "../address/address.dto";
 import { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
 import { GeoPositionDto } from "../geoPosition/geoPosition.dto";
 import { RomeCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
-import { SiretDto } from "../siret";
+import { SiretDto } from "../siret/siret";
 
 export type SearchContactDto = {
   id: string;

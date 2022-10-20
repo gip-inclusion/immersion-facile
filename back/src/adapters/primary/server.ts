@@ -15,16 +15,17 @@ import { Gateways } from "./config/createGateways";
 import { InMemoryUnitOfWork } from "./config/uowConfig";
 import { createAddressRouter } from "./routers/address/createAddressRouter";
 import { createAdminRouter } from "./routers/admin/createAdminRouter";
+import { createAgenciesRouter } from "./routers/agencies/createAgenciesRouter";
+import { createApiKeyAuthRouter } from "./routers/apiKeyAuthRouter/createApiKeyAuthRouter";
+import { createApiKeyAuthRouterV1 } from "./routers/apiKeyAuthRouter/createApiKeyAuthRouter.v1";
 import { createConventionRouter } from "./routers/convention/createConventionRouter";
-import { createAgenciesRouter } from "./routers/createAgenciesRouter";
-import { createApiKeyAuthRouter } from "./routers/createApiKeyAuthRouter";
-import { createApiKeyAuthRouterV1 } from "./routers/createApiKeyAuthRouter.v1";
-import { createEstablishmentRouter } from "./routers/createEstablishmentRouter";
-import { createFormCompletionRouter } from "./routers/createFormCompletionRouter";
-import { createMagicLinkRouter } from "./routers/createMagicLinkRouter";
-import { createPeConnectRouter } from "./routers/createPeConnectRouter";
-import { createSearchImmersionRouter } from "./routers/createSearchImmersionRouter";
-import { createTechnicalRouter } from "./routers/createTechnicalRouter";
+import { createEstablishmentRouter } from "./routers/createEstablishment/createEstablishmentRouter";
+import { createSearchImmersionRouter } from "./routers/apiKeyAuthRouter/createSearchImmersionRouter";
+import { createTechnicalRouter } from "./routers/technical/createTechnicalRouter";
+import { createFormCompletionRouter } from "./routers/formCompletion/createFormCompletionRouter";
+import { createHelloWorldRouter } from "./routers/helloWorld/createHelloWorldRouter";
+import { createMagicLinkRouter } from "./routers/magicLink/createMagicLinkRouter";
+import { createPeConnectRouter } from "./routers/peConnect/createPeConnectRouter";
 import { subscribeToEvents } from "./subscribeToEvents";
 
 const logger = createLogger(__filename);
@@ -58,8 +59,6 @@ export const createApp = async (
   app.use(metrics);
   app.use(bodyParser.json());
 
-  router.route("/").get((_req, res) => res.json({ message: "Hello World !" }));
-
   const deps = await createAppDependencies(config);
 
   app.use(router);
@@ -67,6 +66,7 @@ export const createApp = async (
   app.use(createSearchImmersionRouter(deps));
 
   // Those routes must be defined BEFORE the others
+  app.use(createHelloWorldRouter());
   app.use("/auth", createMagicLinkRouter(deps));
   app.use("/admin", createAdminRouter(deps));
   app.use("/v1", createApiKeyAuthRouterV1(deps));

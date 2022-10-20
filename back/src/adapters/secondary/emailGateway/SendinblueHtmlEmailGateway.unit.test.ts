@@ -1,7 +1,7 @@
 import type { AxiosInstance } from "axios";
 import { ignoreTabs } from "html-templates";
-import { expectToEqual } from "shared";
-import { expectPromiseToFailWithError } from "../../../_testBuilders/test.helpers";
+import { expectPromiseToFailWithError, expectToEqual } from "shared";
+
 import { makeEmailAllowListPredicate } from "../../primary/config/appConfig";
 import { BadRequestError } from "../../primary/helpers/httpErrors";
 

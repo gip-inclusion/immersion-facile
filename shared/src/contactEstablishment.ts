@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { siretSchema } from "./siret";
+import { siretSchema } from "./siret/siret";
 
 import { zEmail, zString, zTrimmedString } from "./zodUtils";
 
