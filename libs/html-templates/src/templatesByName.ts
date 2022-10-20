@@ -116,7 +116,6 @@ export const templateByName: {
         Merci à vous !`,
       agencyLogoUrl,
     }),
-    tags: ["exemples", "de", "tags"],
   },
   NEW_CONVENTION_BENEFICIARY_CONFIRMATION: {
     subject: () =>

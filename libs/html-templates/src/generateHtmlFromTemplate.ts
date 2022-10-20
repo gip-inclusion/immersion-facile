@@ -46,9 +46,12 @@ export const generateHtmlFromTemplate = <N extends keyof TemplateByName>(
   const formattedSubject = subject(params as any);
   const doctype =
     '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
-  return {
+  const templateData: {
+    subject: string;
+    htmlContent: string;
+    tags?: string[];
+  } = {
     subject: formattedSubject,
-    tags,
     htmlContent: ignoreTabs(`${options.skipHead ? "" : doctype}
         <html lang="fr">${options.skipHead ? "" : renderHead(formattedSubject)}
           <body>
@@ -71,4 +74,8 @@ export const generateHtmlFromTemplate = <N extends keyof TemplateByName>(
         </html>
       `),
   };
+  if (tags) {
+    templateData.tags = tags;
+  }
+  return templateData;
 };
