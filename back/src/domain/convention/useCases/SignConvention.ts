@@ -81,7 +81,6 @@ export class SignConvention extends TransactionalUseCase<
       role,
       this.clock.now().toISOString(),
     );
-
     throwIfTransitionNotAllowed({
       role,
       targetStatus: signedConvention.status,

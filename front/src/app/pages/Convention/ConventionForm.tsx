@@ -94,7 +94,6 @@ export const ConventionForm = ({
               ...values,
               workConditions: undefinedIfEmptyString(values.workConditions),
             } as ConventionDto;
-
             dispatch(
               conventionSlice.actions.saveConventionRequested(conventionToSave),
             );

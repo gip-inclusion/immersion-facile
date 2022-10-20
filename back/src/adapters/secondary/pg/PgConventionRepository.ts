@@ -72,7 +72,7 @@ export class PgConventionRepository implements ConventionRepository {
     convention: ConventionDto,
   ): Promise<ConventionId | undefined> {
     // prettier-ignore
-    const { signatories: { beneficiary, beneficiaryRepresentative,establishmentRepresentative }, id, establishmentTutor } =
+    const { signatories: { beneficiary, beneficiaryRepresentative }, id, establishmentTutor } =
       convention
 
     const establishment_tutor_id = await this.updateEstablishmentTutor(
@@ -82,27 +82,59 @@ export class PgConventionRepository implements ConventionRepository {
 
     await this.updateBeneficiary(id, beneficiary);
 
-    await this.updateConvention(
+    await this.updateConvention({
       convention,
       establishment_tutor_id,
-      isEstablishmentTutorIsEstablishmentRepresentative(convention)
-        ? establishment_tutor_id
-        : (await this.isSameEstablishmentTutorAndRepresentative(id))
-        ? await this.insertEstablishmentRepresentative(
-            establishmentRepresentative,
-          )
-        : await this.updateEstablishmentRepresentative(
-            id,
-            establishmentRepresentative,
-          ),
-    );
+      establishment_representative_id:
+        await this.getEstablishmentRepresentativeId({
+          convention,
+          establishment_tutor_id,
+        }),
+    });
 
     if (beneficiaryRepresentative)
       await this.updateBeneficiaryRepresentative(id, beneficiaryRepresentative);
-
     return convention.id;
   }
-  private async isSameEstablishmentTutorAndRepresentative(
+
+  private async getEstablishmentRepresentativeId({
+    convention,
+    establishment_tutor_id,
+  }: {
+    convention: ConventionDto;
+    establishment_tutor_id: number;
+  }) {
+    const {
+      id,
+      signatories: { establishmentRepresentative },
+      establishmentTutor,
+    } = convention;
+
+    if (
+      // Tutor and establishment representative are same person (but may have different IDs)
+      isEstablishmentTutorIsEstablishmentRepresentative(convention)
+    )
+      return establishmentRepresentative.signedAt
+        ? this.updateEstablishmentTutor(
+            id,
+            establishmentTutor,
+            establishmentRepresentative.signedAt,
+          )
+        : establishment_tutor_id;
+
+    if (await this.establishmentTutorAndRepresentativeHaveSameId(id)) {
+      return this.insertEstablishmentRepresentative(
+        establishmentRepresentative,
+      );
+    }
+
+    return this.updateEstablishmentRepresentative(
+      id,
+      establishmentRepresentative,
+    );
+  }
+
+  private async establishmentTutorAndRepresentativeHaveSameId(
     id: ConventionId,
   ): Promise<boolean> {
     const getConventionEstablishmentTutorAndRepresentativeQuery = `
@@ -121,11 +153,15 @@ export class PgConventionRepository implements ConventionRepository {
     throw new Error(`No convention with id '${id}'.`);
   }
 
-  private async updateConvention(
-    convention: ConventionDto,
-    establishment_tutor_id: number,
-    establishment_representative_id: number,
-  ) {
+  private async updateConvention({
+    convention,
+    establishment_tutor_id,
+    establishment_representative_id,
+  }: {
+    convention: ConventionDto;
+    establishment_tutor_id: number;
+    establishment_representative_id: number;
+  }) {
     const updateConventionQuery = `  
       UPDATE conventions
         SET status=$2,  
@@ -176,17 +212,18 @@ export class PgConventionRepository implements ConventionRepository {
   private async updateEstablishmentTutor(
     id: ConventionId,
     establishmentTutor: EstablishmentTutor,
+    signedAt?: string,
   ): Promise<number> {
     const updateEstablishmentTutorQuery = `  
       UPDATE actors
-        SET first_name=$2,  last_name=$3, email=$4, phone=$5,
+        SET first_name=$2,  last_name=$3, email=$4, phone=$5, signed_at=$7,
           extra_fields=JSON_STRIP_NULLS(JSON_BUILD_OBJECT('job', $6::text))
         FROM conventions 
         WHERE conventions.id=$1 AND actors.id = conventions.establishment_tutor_id
         RETURNING actors.id
     `;
     // prettier-ignore
-    const updateReturn = await this.client.query<{ id: number }>( updateEstablishmentTutorQuery,[ id, establishmentTutor.firstName, establishmentTutor.lastName, establishmentTutor.email, establishmentTutor.phone, establishmentTutor.job, ]);
+    const updateReturn = await this.client.query<{ id: number }>( updateEstablishmentTutorQuery,[ id, establishmentTutor.firstName, establishmentTutor.lastName, establishmentTutor.email, establishmentTutor.phone, establishmentTutor.job, signedAt]);
     const result = updateReturn.rows.at(0);
     if (result) return result.id;
     throw new Error(missingReturningRowError(updateReturn));

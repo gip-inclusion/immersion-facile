@@ -23,7 +23,7 @@ WITH
         'federatedIdentity', CASE WHEN  (p.user_pe_external_id IS NOT NULL) THEN CONCAT('peConnect:', p.user_pe_external_id) ELSE NULL END 
       ),
       'establishmentRepresentative' , JSON_BUILD_OBJECT(
-        'role', 'establishment',
+        'role', 'establishment-representative',
         'firstName', er.first_name,
         'lastName', er.last_name,
         'email', er.email,
