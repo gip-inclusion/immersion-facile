@@ -13,7 +13,6 @@ describe("address", () => {
       address: "91 RUE DE LA REPUBLIQUE",
       postalCode: "97438",
       city: "SAINTE-MARIE",
-      validAddress: true,
     });
   });
   it("infers the department code", () => {
@@ -33,7 +32,6 @@ const expectedGroups: Record<string, CaptureAddressGroupsResult> = {
     address: "",
     postalCode: "97438",
     city: "SAINTE-MARIE",
-    validAddress: true,
   },
 
   "Service des ressources humaines, 33 BOULEVARD DE L EUROPE, 13127 VITROLLES":
@@ -41,6 +39,5 @@ const expectedGroups: Record<string, CaptureAddressGroupsResult> = {
       address: "Service des ressources humaines, 33 BOULEVARD DE L EUROPE",
       postalCode: "13127",
       city: "VITROLLES",
-      validAddress: true,
     },
 };

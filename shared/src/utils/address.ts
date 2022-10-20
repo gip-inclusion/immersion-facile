@@ -2,7 +2,6 @@ import { keys, trim } from "ramda";
 import { AddressDto } from "../address/address.dto";
 
 export interface CaptureAddressGroupsResult {
-  validAddress: boolean;
   address: string;
   postalCode: string;
   city: string;
@@ -25,9 +24,9 @@ export const captureAddressGroups = (
     address: dropLastComma(trim(address ?? "")),
     postalCode: trim(postalCode ?? ""),
     city: trim(city ?? ""),
-    validAddress: address != null && postalCode != null && city != null,
   };
 };
+
 const dropLastComma = (text: string) => text.replace(/,(?=[^,]*$)/, "");
 
 const DEPARTMENT_CODES_FROM_3_CHARS: Record<string, string> = {

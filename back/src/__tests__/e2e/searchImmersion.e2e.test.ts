@@ -189,13 +189,13 @@ describe("search-immersion route", () => {
         expect(response.body).toEqual(expectedResult);
         expect(response.status).toBe(200);
       });
-      it("rejects invalid address", async () => {
-        await request
+      it("accept address with only city", async () => {
+        const response = await request
           .get(
             `/v1/immersion-offers?rome=A1000&distance_km=30&longitude=2.34999&latitude=48.8531&sortedBy=distance&address=Lyon`,
           )
-          .set("Authorization", generateApiJwt({ id: "my-authorized-id" }))
-          .expect(400, /Address incorrect/);
+          .set("Authorization", generateApiJwt({ id: "my-authorized-id" }));
+        expect(response.status).toBe(200);
       });
       it("with no specified rome", async () => {
         await request
