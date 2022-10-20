@@ -3,7 +3,6 @@ import { Role } from "../tokens/MagicLinkPayload";
 import { DotNestedKeys, ExtractFromExisting } from "../utils";
 import {
   ConventionDto,
-  ConventionDtoWithoutExternalId,
   ConventionStatus,
   Signatories,
   SignatoryRole,
@@ -101,11 +100,12 @@ export const getSignatoryKey = (
 ) => v;
 
 export const isEstablishmentTutorIsEstablishmentRepresentative = (
-  convention: ConventionDtoWithoutExternalId,
+  convention: Pick<ConventionDto, "signatories" | "establishmentTutor">,
 ): boolean => {
   const establishmentTutor = convention.establishmentTutor;
   const establishmentRepresentative =
     convention.signatories.establishmentRepresentative;
+
   return (
     establishmentTutor.firstName === establishmentRepresentative.firstName &&
     establishmentTutor.lastName === establishmentRepresentative.lastName &&
@@ -113,3 +113,7 @@ export const isEstablishmentTutorIsEstablishmentRepresentative = (
     establishmentTutor.phone === establishmentRepresentative.phone
   );
 };
+
+export const isBeneficiaryMinor = (
+  convention: Pick<ConventionDto, "signatories">,
+): boolean => !!convention.signatories.beneficiaryRepresentative;

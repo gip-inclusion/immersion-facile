@@ -46,7 +46,7 @@ type WithIntershipKind = {
 
 export type ConventionPresentation = OmitFromExistingKeys<
   Partial<ConventionDto>,
-  "id" | "rejectionJustification"
+  "rejectionJustification"
 > &
   WithSignatures &
   WithEstablishmentTutor &
@@ -169,7 +169,19 @@ export const conventionInitialValuesFromUrl = ({
 const devPrefilledValues = (
   emptyForm: ConventionPresentation,
 ): ConventionPresentation => {
-  const { beneficiary, beneficiaryRepresentative } = emptyForm.signatories;
+  const {
+    beneficiary,
+    beneficiaryRepresentative,
+    establishmentRepresentative,
+  } = emptyForm.signatories;
+
+  const defaultTutor = {
+    firstName: "Joe",
+    lastName: "Le tuteur",
+    phone: "0101100110",
+    email: "establishmentRepresentative@superbusiness.fr",
+    job: "Le job du tuteur",
+  };
 
   const tutor = emptyForm.establishmentTutor;
 
@@ -189,14 +201,22 @@ const devPrefilledValues = (
         federatedIdentity: beneficiary.federatedIdentity,
       },
       beneficiaryRepresentative,
+      establishmentRepresentative: {
+        role: "establishment-representative",
+        firstName:
+          establishmentRepresentative.firstName || defaultTutor.firstName,
+        lastName: establishmentRepresentative.lastName || defaultTutor.lastName,
+        phone: establishmentRepresentative.phone || defaultTutor.phone,
+        email: establishmentRepresentative.email || defaultTutor.email,
+      },
     },
     establishmentTutor: {
       role: "establishment-tutor",
-      firstName: tutor.firstName || "Joe",
-      lastName: tutor.lastName || "Le tuteur",
-      phone: tutor.phone || "0101100110",
-      email: tutor.email || "establishmentRepresentative@superbusiness.fr",
-      job: tutor.job || "Le job du tuteur",
+      firstName: tutor.firstName || defaultTutor.firstName,
+      lastName: tutor.lastName || defaultTutor.lastName,
+      phone: tutor.phone || defaultTutor.phone,
+      email: tutor.email || defaultTutor.email,
+      job: tutor.job || defaultTutor.job,
     },
 
     // Participant

@@ -56,16 +56,7 @@ export const useTutorIsEstablishmentRepresentative = () => {
       return;
     }
 
-    if (!convention) {
-      setEstablishmentRepresentative({
-        role: "establishment-representative",
-        firstName: "",
-        lastName: "",
-        email: "",
-        phone: "",
-      });
-      return;
-    }
+    if (!convention) return;
 
     if (!isEstablishmentTutorIsEstablishmentRepresentative(convention))
       setEstablishmentRepresentative(

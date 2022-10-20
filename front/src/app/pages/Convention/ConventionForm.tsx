@@ -2,7 +2,12 @@ import { Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { Notification, Title } from "react-design-system/immersionFacile";
 import { useDispatch } from "react-redux";
-import { ConventionDto, conventionWithoutExternalIdSchema } from "shared";
+import {
+  ConventionDto,
+  conventionWithoutExternalIdSchema,
+  isBeneficiaryMinor,
+  isEstablishmentTutorIsEstablishmentRepresentative,
+} from "shared";
 import { ConventionFeedbackNotification } from "src/app/components/ConventionFeedbackNotification";
 import {
   ConventionPresentation,
@@ -26,6 +31,27 @@ const useClearConventionSubmitFeedbackOnUnmount = () => {
     },
     [],
   );
+};
+
+const useWaitForReduxFormUiReadyBeforeFormikInitialisation = (
+  initialValues: ConventionPresentation,
+) => {
+  const [reduxFormUiReady, setReduxFormUiReady] = useState<boolean>(false);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(
+      conventionSlice.actions.isMinorChanged(isBeneficiaryMinor(initialValues)),
+    );
+    dispatch(
+      conventionSlice.actions.isTutorEstablishmentRepresentativeChanged(
+        isEstablishmentTutorIsEstablishmentRepresentative(initialValues),
+      ),
+    );
+    setReduxFormUiReady(true);
+  }, []);
+
+  return reduxFormUiReady;
 };
 
 type ConventionFormProps = {
@@ -64,11 +90,16 @@ export const ConventionForm = ({
     dispatch(conventionSlice.actions.fetchConventionRequested(routeParams.jwt));
   }, []);
 
+  const reduxFormUiReady =
+    useWaitForReduxFormUiReadyBeforeFormikInitialisation(initialValues);
+
   useClearConventionSubmitFeedbackOnUnmount();
 
   const t = useConventionTexts(initialValues.internshipKind);
 
   const isFrozen = isConventionFrozen(initialValues);
+
+  if (!reduxFormUiReady) return null;
 
   return (
     <div className="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
