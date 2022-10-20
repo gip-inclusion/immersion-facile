@@ -45,5 +45,8 @@ export const notifyAndThrowErrorDiscord = <T extends Error>(error: T) => {
 const toPropertiesAsString = <T>(obj: T): string =>
   Object.getOwnPropertyNames(obj)
     .sort()
-    .map((property: string) => `${property}: ${obj[property as keyof T]}`)
+    .map(
+      (property: string) =>
+        `${property}: ${JSON.stringify(obj[property as keyof T], null, 2)}`,
+    )
     .join("\n");
