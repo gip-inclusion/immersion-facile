@@ -120,8 +120,7 @@ export class InMemoryEventBus implements EventBus {
       notifyObjectDiscord({
         event: {
           ...event,
-          lastPublication: JSON.stringify(event.publications.at(-1), null, 2),
-          payload: JSON.stringify(event.payload, null, 2),
+          lastPublication: event.publications.at(-1),
         },
         message,
         wasQuarantined,
