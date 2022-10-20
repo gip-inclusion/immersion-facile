@@ -19,29 +19,57 @@ export const EmailPreviewTab = () => {
       skipHead: true,
     },
   );
-
   return (
     <div className="admin-tab__email-preview">
       <DsfrTitle level={5} text="Aperçu de template email" />
+
       <div>
-        <select
-          name="templateName"
-          className="fr-select"
-          onChange={(event) =>
-            setCurrentTemplate(event.currentTarget.value as TemplateName)
-          }
-        >
-          {keys(templateByName).map((templateName) => (
-            <option key={templateName} value={templateName}>
-              {templateByName[templateName].niceName}
-            </option>
-          ))}
-        </select>
+        <div className="fr-grid-row fr-grid-row--gutters">
+          <aside className="fr-col-12 fr-col-lg-4">
+            <div className="fr-select-group">
+              <label className="fr-label" htmlFor="select">
+                Liste de templates email :
+              </label>
+              <select
+                className="fr-select"
+                id="selectTemplateName"
+                name="templateName"
+                onChange={(event) =>
+                  setCurrentTemplate(event.currentTarget.value as TemplateName)
+                }
+              >
+                {keys(templateByName).map((templateName) => (
+                  <option key={templateName} value={templateName}>
+                    {templateByName[templateName].niceName}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <h6>Métadonnées</h6>
+            <ul className="fr-badge-group">
+              <li>
+                <span className="fr-badge fr-badge--green-menthe">Sujet</span>
+              </li>
+              <li>{fakeContent.subject}</li>
+            </ul>
+            {fakeContent.tags && fakeContent.tags.length > -1 && (
+              <ul className="fr-badge-group fr-mt-2w">
+                <li>
+                  <span className="fr-badge fr-badge--blue-ecume">Tags</span>
+                </li>
+                <li>{fakeContent.tags.join(", ")}</li>
+              </ul>
+            )}
+          </aside>
+          <section className="fr-col-12 fr-col-lg-8">
+            <div
+              className="admin-tab__email-preview-wrapper"
+              dangerouslySetInnerHTML={{ __html: fakeContent.htmlContent }}
+            ></div>
+          </section>
+        </div>
       </div>
-      <div
-        className="admin-tab__email-preview-wrapper"
-        dangerouslySetInnerHTML={{ __html: fakeContent.htmlContent }}
-      ></div>
     </div>
   );
 };
@@ -83,7 +111,6 @@ const defaultValueByVariableName: Record<EmailVariables, string> = {
   jobLabel: "JOB_LABEL",
   lastName: "LAST_NAME",
   magicLink: "MAGIC_LINK",
-  establishmentRepresentative: "MENTOR",
   establishmentTutorName: "MENTOR_NAME",
   beneficiaryRepresentativeName: "LEGAL_REPRESENTATIVE_NAME",
   message: "MESSAGE",
