@@ -6,7 +6,7 @@ import {
   SubTitle,
   Title,
 } from "react-design-system/immersionFacile";
-import { ContactMethod, RomeCode, SiretDto } from "shared";
+import { ContactMethod, RomeCode, RomeDto, SiretDto } from "shared";
 import { ContactByEmail } from "./ContactByEmail";
 import { ContactByPhone } from "./ContactByPhone";
 import { ContactInPerson } from "./ContactInPerson";
@@ -15,7 +15,7 @@ type ModalState = {
   isOpen: boolean;
   isValidating: boolean;
   siret: SiretDto;
-  romeLabel: string;
+  offer: RomeDto;
   contactMethod?: ContactMethod;
 };
 
@@ -26,7 +26,7 @@ type ModalAction =
         immersionOfferRome: RomeCode;
         immersionOfferSiret: SiretDto;
         siret: SiretDto;
-        romeLabel: string;
+        offer: RomeDto;
         contactMethod?: ContactMethod;
       };
     }
@@ -40,7 +40,7 @@ const modalReducer = (state: ModalState, action: ModalAction): ModalState => {
       return { ...state, isOpen: true, ...action.payload };
     case "CLICKED_CLOSE":
       return {
-        romeLabel: "",
+        offer: { romeCode: "", romeLabel: "" },
         siret: "",
         isOpen: false,
         isValidating: false,
@@ -49,7 +49,7 @@ const modalReducer = (state: ModalState, action: ModalAction): ModalState => {
       return { ...state, isOpen: false, isValidating: true };
     case "VALIDATION_HANDLED":
       return {
-        romeLabel: "",
+        offer: { romeCode: "", romeLabel: "" },
         siret: "",
         isOpen: false,
         isValidating: false,
@@ -63,7 +63,7 @@ const modalReducer = (state: ModalState, action: ModalAction): ModalState => {
 
 export const useContactEstablishmentModal = () => {
   const initialModalState: ModalState = {
-    romeLabel: "",
+    offer: { romeCode: "", romeLabel: "" },
     siret: "",
     isOpen: false,
     isValidating: false,
@@ -119,7 +119,7 @@ const ModalContactContent = ({
       return (
         <ContactByEmail
           siret={modalState.siret}
-          romeLabel={modalState.romeLabel}
+          offer={modalState.offer}
           onSuccess={onSuccess}
         />
       );
@@ -127,7 +127,7 @@ const ModalContactContent = ({
       return (
         <ContactByPhone
           siret={modalState.siret}
-          romeLabel={modalState.romeLabel}
+          offer={modalState.offer}
           onSuccess={onSuccess}
         />
       );
@@ -135,7 +135,7 @@ const ModalContactContent = ({
       return (
         <ContactInPerson
           siret={modalState.siret}
-          romeLabel={modalState.romeLabel}
+          offer={modalState.offer}
           onSuccess={onSuccess}
         />
       );

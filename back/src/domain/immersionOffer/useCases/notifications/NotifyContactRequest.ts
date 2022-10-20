@@ -24,7 +24,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
     payload: ContactEstablishmentRequestDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    const { siret, romeLabel } = payload;
+    const { siret, offer: rome } = payload;
 
     const establishmentAggregate =
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
@@ -54,7 +54,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
             businessName: establishmentAggregate.establishment.name,
             contactFirstName: contact.firstName,
             contactLastName: contact.lastName,
-            jobLabel: romeLabel,
+            jobLabel: rome.romeLabel,
             potentialBeneficiaryFirstName:
               payload.potentialBeneficiaryFirstName,
             potentialBeneficiaryLastName: payload.potentialBeneficiaryLastName,

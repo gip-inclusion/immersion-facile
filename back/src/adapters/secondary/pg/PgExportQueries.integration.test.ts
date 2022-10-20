@@ -41,6 +41,7 @@ describe("PgExportQueries", () => {
     await client.query("DELETE FROM outbox");
     await client.query("DELETE FROM conventions");
     await client.query("DELETE FROM agencies");
+    await client.query("DELETE FROM immersion_offers");
     await client.query("DELETE FROM establishments");
     await client.query("DELETE FROM immersion_contacts");
 
@@ -289,7 +290,7 @@ describe("PgExportQueries", () => {
             potentialBeneficiaryEmail: "tom@cruise.com",
             potentialBeneficiaryFirstName: "Tom",
             potentialBeneficiaryLastName: "Cruise",
-            romeLabel: "Stylisme",
+            offer: { romeCode: "B1805", romeLabel: "Stylisme" },
             siret: establishmentAggregate.establishment.siret,
           },
           publications: [],

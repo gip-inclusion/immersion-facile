@@ -4,6 +4,7 @@ import { Button } from "react-design-system/immersionFacile";
 import {
   ContactEstablishmentByMailDto,
   contactEstablishmentByMailSchema,
+  RomeDto,
   SiretDto,
 } from "shared";
 import { immersionSearchGateway } from "src/app/config/dependencies";
@@ -12,7 +13,7 @@ import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 
 type ContactByEmailProps = {
   siret: SiretDto;
-  romeLabel: string;
+  offer: RomeDto;
   onSuccess: () => void;
 };
 
@@ -30,12 +31,12 @@ const initialMessage =
 
 export const ContactByEmail = ({
   siret,
-  romeLabel,
+  offer,
   onSuccess,
 }: ContactByEmailProps) => {
   const initialValues: ContactEstablishmentByMailDto = {
     siret,
-    romeLabel,
+    offer,
     contactMode: "EMAIL",
     potentialBeneficiaryFirstName: "",
     potentialBeneficiaryLastName: "",

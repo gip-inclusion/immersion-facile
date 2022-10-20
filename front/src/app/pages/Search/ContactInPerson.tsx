@@ -4,6 +4,7 @@ import { Button } from "react-design-system/immersionFacile";
 import {
   ContactEstablishmentInPersonDto,
   contactEstablishmentInPersonSchema,
+  RomeDto,
   SiretDto,
 } from "shared";
 import { immersionSearchGateway } from "src/app/config/dependencies";
@@ -12,7 +13,7 @@ import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 
 type ContactInPersonProps = {
   siret: SiretDto;
-  romeLabel: string;
+  offer: RomeDto;
   onSuccess: () => void;
 };
 
@@ -20,12 +21,12 @@ const getName = (v: keyof ContactEstablishmentInPersonDto) => v;
 
 export const ContactInPerson = ({
   siret,
-  romeLabel,
+  offer,
   onSuccess,
 }: ContactInPersonProps) => {
   const initialValues: ContactEstablishmentInPersonDto = {
     siret,
-    romeLabel,
+    offer,
     contactMode: "IN_PERSON",
     potentialBeneficiaryFirstName: "",
     potentialBeneficiaryLastName: "",

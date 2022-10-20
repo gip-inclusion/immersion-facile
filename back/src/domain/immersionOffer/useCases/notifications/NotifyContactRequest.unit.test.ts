@@ -21,10 +21,11 @@ const immersionOffer = new ImmersionOfferEntityV2Builder().build();
 
 const siret = "11112222333344";
 const contactId = "theContactId";
+const TEST_ROME_CODE = "B9112";
 
 const payload: ContactEstablishmentRequestDto = {
   siret,
-  romeLabel: TEST_ROME_LABEL,
+  offer: { romeCode: TEST_ROME_CODE, romeLabel: TEST_ROME_LABEL },
   contactMode: "PHONE",
   potentialBeneficiaryFirstName: "potential_beneficiary_name",
   potentialBeneficiaryLastName: "potential_beneficiary_last_name",

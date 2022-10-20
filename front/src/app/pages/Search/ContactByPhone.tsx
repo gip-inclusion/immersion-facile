@@ -4,6 +4,7 @@ import { Button } from "react-design-system/immersionFacile";
 import {
   ContactEstablishmentByPhoneDto,
   contactEstablishmentByPhoneSchema,
+  RomeDto,
   SiretDto,
 } from "shared";
 import { immersionSearchGateway } from "src/app/config/dependencies";
@@ -12,7 +13,7 @@ import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 
 type ContactByPhoneProps = {
   siret: SiretDto;
-  romeLabel: string;
+  offer: RomeDto;
   onSuccess: () => void;
 };
 
@@ -20,12 +21,12 @@ const getName = (v: keyof ContactEstablishmentByPhoneDto) => v;
 
 export const ContactByPhone = ({
   siret,
-  romeLabel,
+  offer,
   onSuccess,
 }: ContactByPhoneProps) => {
   const initialValues: ContactEstablishmentByPhoneDto = {
     siret,
-    romeLabel,
+    offer,
     contactMode: "PHONE",
     potentialBeneficiaryFirstName: "",
     potentialBeneficiaryLastName: "",

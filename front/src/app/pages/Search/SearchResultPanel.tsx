@@ -55,7 +55,10 @@ export const SearchResultPanel = () => {
                 immersionOfferRome: searchResult.rome,
                 immersionOfferSiret: searchResult.siret,
                 siret: searchResult.siret,
-                romeLabel: searchResult.romeLabel,
+                offer: {
+                  romeCode: searchResult.rome,
+                  romeLabel: searchResult.romeLabel,
+                },
                 contactMethod: searchResult.contactMode,
               },
             })
