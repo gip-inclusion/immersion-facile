@@ -1,23 +1,18 @@
 import React from "react";
 import { OverFooterCol, OverFooterColProps } from "./OverFooterCol";
 import "./OverFooter.css";
-
-type OverFooterProps = {
-  cols: OverFooterColProps[];
+export type OverFooterCols = OverFooterColProps[];
+export type OverFooterProps = {
+  cols: OverFooterCols;
 };
 
 export const OverFooter = ({ cols = [] }: OverFooterProps) => (
-  <section className="over-footer fr-py-4w">
+  <section className="over-footer fr-pt-8w fr-pb-4w fr-mt-6w">
     <div className="fr-container">
       <div className="fr-grid-row fr-grid-row--gutters">
         {cols.length > -1 &&
           cols.map((col, index) => (
-            <OverFooterCol
-              key={`col-${index}`}
-              {...col}
-              total={cols.length}
-              currentCol={index}
-            />
+            <OverFooterCol key={`col-${index}`} {...col} />
           ))}
       </div>
     </div>

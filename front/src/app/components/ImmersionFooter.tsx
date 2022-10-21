@@ -2,6 +2,10 @@ import lesEntrepriseSengagent from "/img/les-entreprises-s-engagent.svg";
 import poleEmploiLogo from "/img/pole-emploi-logo.svg";
 import React from "react";
 import { Footer, NavLink } from "react-design-system";
+import {
+  OverFooter,
+  OverFooterCols,
+} from "react-design-system/immersionFacile";
 
 export const MinistereLogo = () => (
   <div className="fr-footer__brand fr-enlarge-link">
@@ -25,6 +29,37 @@ const EntreprisesLogo = () => (
 );
 
 export const ImmersionFooter = () => {
+  const overFooterCols: OverFooterCols = [
+    {
+      title: "Besoin d'aide ?",
+      subtitle: "L’équipe Immersion Facilitée est là pour vous aider.",
+      iconTitle: "fr-icon-account-fill",
+      link: {
+        label: "Contactez l'équipe",
+        url: "mailto:contact@immersion-facile.beta.gouv.fr",
+      },
+    },
+    {
+      title: "Rejoignez la communauté",
+      subtitle:
+        "Rejoignez la communauté d'Immersion Facilitée et suivez nos actualités",
+      iconTitle: "fr-icon-links-fill",
+      link: {
+        label: "Rejoignez-nous sur Linkedin",
+        url: "https://www.linkedin.com/company/l-immersion-facilitee/",
+      },
+    },
+    {
+      title: "Le centre de support",
+      subtitle:
+        "Consultez notre centre d'aide (FAQ) pour trouver les réponses aux principales questions demandées",
+      iconTitle: "fr-icon-questionnaire-fill",
+      link: {
+        label: "Accéder à notre FAQ",
+        url: "https://aide.immersion-facile.beta.gouv.fr/fr/",
+      },
+    },
+  ];
   const links: NavLink[] = [
     {
       label: "gouvernement.fr",
@@ -62,11 +97,14 @@ export const ImmersionFooter = () => {
     },
   ];
   return (
-    <Footer
-      links={links}
-      ministereLogo={<MinistereLogo />}
-      partnersLogos={[<PoleEmploiLogo />, <EntreprisesLogo />]}
-      bottomLinks={bottomsLinks}
-    />
+    <>
+      <OverFooter cols={overFooterCols} />
+      <Footer
+        links={links}
+        ministereLogo={<MinistereLogo />}
+        partnersLogos={[<PoleEmploiLogo />, <EntreprisesLogo />]}
+        bottomLinks={bottomsLinks}
+      />
+    </>
   );
 };
