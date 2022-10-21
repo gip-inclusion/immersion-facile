@@ -22,12 +22,11 @@ export const EmailPreviewTab = () => {
   return (
     <div className="admin-tab__email-preview">
       <DsfrTitle level={5} text="Aperçu de template email" />
-
       <div>
         <div className="fr-grid-row fr-grid-row--gutters">
           <aside className="fr-col-12 fr-col-lg-4">
             <div className="fr-select-group">
-              <label className="fr-label" htmlFor="select">
+              <label className="fr-label" htmlFor="selectTemplateName">
                 Liste de templates email :
               </label>
               <select
@@ -79,7 +78,7 @@ const defaultValueByVariableName: Record<EmailVariables, string> = {
   advisorFirstName: "ADVISOR_FIRST_NAME",
   advisorLastName: "ADVISOR_LAST_NAME",
   agency: "AGENCY",
-  agencyLogoUrl: "AGENCY_LOGO_URL",
+  agencyLogoUrl: "https://beta.gouv.fr/img/logo_twitter_image-2019.jpg",
   agencyName: "AGENCY_NAME",
   beneficiaryEmail: "BENEFICIARY_EMAIL",
   beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",

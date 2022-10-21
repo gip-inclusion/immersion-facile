@@ -22,9 +22,11 @@ export const renderHead = (subject: string) => `
     h1 a:visited, h2 a:visited,  h3 a:visited, h4 a:visited, h5 a:visited, h6 a:visited {
       color: #000091 !important;
     }
+    ul {margin: 0;}
+    ul li {margin: 0;}
     table td {border-collapse: collapse;}
     table { border-collapse:collapse; mso-table-lspace:0pt; mso-table-rspace:0pt; }
-    a {color: orange;}
+    a {color: #000091;}
     @media only screen and (max-device-width: 480px) {
       a[href^="tel"], a[href^="sms"] {
             text-decoration: none;
