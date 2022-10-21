@@ -133,5 +133,6 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     romeLabel: "Giga métier",
     appellationLabels: [],
     nafLabel: "",
+    website: "https://www.example.com",
   },
 ];

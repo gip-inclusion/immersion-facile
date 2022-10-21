@@ -60,6 +60,7 @@ export const SearchResultPanel = () => {
                   romeLabel: searchResult.romeLabel,
                 },
                 contactMethod: searchResult.contactMode,
+                searchResultData: searchResult,
               },
             })
           }

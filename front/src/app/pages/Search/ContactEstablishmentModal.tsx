@@ -6,7 +6,13 @@ import {
   SubTitle,
   Title,
 } from "react-design-system/immersionFacile";
-import { ContactMethod, RomeCode, RomeDto, SiretDto } from "shared";
+import {
+  ContactMethod,
+  RomeCode,
+  RomeDto,
+  SearchImmersionResultDto,
+  SiretDto,
+} from "shared";
 import { ContactByEmail } from "./ContactByEmail";
 import { ContactByPhone } from "./ContactByPhone";
 import { ContactInPerson } from "./ContactInPerson";
@@ -17,6 +23,7 @@ type ModalState = {
   siret: SiretDto;
   offer: RomeDto;
   contactMethod?: ContactMethod;
+  searchResultData?: SearchImmersionResultDto;
 };
 
 type ModalAction =
@@ -28,6 +35,7 @@ type ModalAction =
         siret: SiretDto;
         offer: RomeDto;
         contactMethod?: ContactMethod;
+        searchResultData?: SearchImmersionResultDto;
       };
     }
   | { type: "CLICKED_CLOSE" }
@@ -91,7 +99,6 @@ export const ContactEstablishmentModal = ({
     hide();
     onSuccess();
   };
-
   return (
     <ModalDialog isOpen={modalState.isOpen} hide={hide}>
       <ModalClose hide={hide} title="Close the modal window" />
@@ -140,26 +147,62 @@ const ModalContactContent = ({
         />
       );
     default:
-      return <AdvisesForContact />;
+      return <AdvisesForContact data={modalState.searchResultData} />;
   }
 };
 
 const Paragraph = ({ children }: { children: ReactNode }) => (
-  <p className="mb-3">{children}</p>
+  <p className="fr-mb-2w">{children}</p>
 );
 
 const Bold = ({ children }: { children: string }) => (
-  <span className="font-bold">{children}</span>
+  <strong>{children}</strong>
 );
 
-const AdvisesForContact = () => (
+const getMapsLink = (
+  searchResultData: SearchImmersionResultDto | undefined,
+) => {
+  if (!searchResultData) return;
+  const { address, name } = searchResultData;
+  const queryString = `${address.streetNumberAndAddress} ${address.postcode} ${address.city} ${name}`;
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURI(
+    queryString,
+  )}`;
+};
+
+const AdvisesForContact = ({
+  data,
+}: {
+  data: SearchImmersionResultDto | undefined;
+}) => (
   <div>
     <Title red>Tentez votre chance</Title>
     <Paragraph>
       Cette entreprise peut recruter sur ce métier et être intéressée pour vous
       recevoir en immersion. Tentez votre chance en la contactant !
     </Paragraph>
-
+    <ul className="fr-btns-group fr-mt-3w">
+      <li>
+        {data?.website && (
+          <a
+            className="fr-btn fr-btn--secondary"
+            href={data?.website}
+            target="_blank"
+          >
+            Aller sur le site de l'entreprise
+          </a>
+        )}
+      </li>
+      <li>
+        <a
+          className="fr-btn fr-btn--secondary"
+          href={getMapsLink(data)}
+          target="_blank"
+        >
+          Localiser l'entreprise et trouver son contact
+        </a>
+      </li>
+    </ul>
     <Title>Nos conseils pour cette première prise de contact ! </Title>
 
     <SubTitle>Comment présenter votre demande ? </SubTitle>
