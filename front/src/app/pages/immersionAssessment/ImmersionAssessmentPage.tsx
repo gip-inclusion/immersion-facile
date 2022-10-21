@@ -10,7 +10,7 @@ import {
 import {
   AssessmentStatus,
   assessmentStatuses,
-  ConventionMagicLinkPayload,
+  ConventionDtoBuilder,
   ConventionReadDto,
   ImmersionAssessmentDto,
   immersionAssessmentSchema,
@@ -20,13 +20,10 @@ import { RadioGroupForField } from "src/app/components/RadioGroup";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { routes } from "src/app/routing/routes";
 import { useAppSelector } from "src/app/utils/reduxHooks";
-import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import {
   immersionAssessmentErrorSelector,
   immersionAssessmentStatusSelector,
 } from "src/core-logic/domain/immersionAssessment/immersionAssessment.selectors";
-import { useConvention } from "src/hooks/convention.hooks";
-import { useImmersionAssessment } from "src/hooks/immersionAssessment";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { Route } from "type-route";
@@ -38,16 +35,25 @@ interface ImmersionAssessmentProps {
 }
 
 export const ImmersionAssessmentPage = ({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   route,
 }: ImmersionAssessmentProps) => {
-  const { convention, fetchConventionError, isLoading } = useConvention(
-    route.params.jwt,
-  );
-  const { role } = decodeJwt<ConventionMagicLinkPayload>(route.params.jwt);
-  const { createAssessment } = useImmersionAssessment(route.params.jwt);
+  // const { convention, fetchConventionError, isLoading } = useConvention(
+  //   route.params.jwt,
+  // );
+  const convention: ConventionReadDto = {
+    ...new ConventionDtoBuilder().withStatus("ACCEPTED_BY_VALIDATOR").build(),
+    agencyName: "dkjdsflkj",
+  };
+  const isLoading = false;
+  const fetchConventionError = null;
+  // const { role } = decodeJwt<ConventionMagicLinkPayload>(route.params.jwt);
+  //const { createAssessment } = useImmersionAssessment(route.params.jwt);
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  const createAssessment = () => {};
   const assessmentError = useAppSelector(immersionAssessmentErrorSelector);
   const assessmentStatus = useAppSelector(immersionAssessmentStatusSelector);
-
+  const role = "establishment";
   if (role !== "establishment" && role !== "establishment-representative") {
     return (
       <div className="pt-4 flex items-center justify-center">
@@ -103,7 +109,13 @@ export const ImmersionAssessmentPage = ({
                       label: labels[value],
                     }))}
                   />
-                  <div style={{ minWidth: "20rem", maxWidth: "34rem" }}>
+                  <div
+                    style={{
+                      minWidth: "20rem",
+                      maxWidth: "34rem",
+                      paddingBottom: "0.5rem",
+                    }}
+                  >
                     <TextInput
                       multiline={true}
                       label="Comment s'est passée l'immersion ?"
@@ -135,6 +147,24 @@ export const ImmersionAssessmentPage = ({
           </Formik>
         </div>
       )}
+      {
+        //assessmentStatus !== "Idle" ||
+        //assessmentError !== null &&
+        <div className="px-2 pt-1 md:pl-20">
+          <Button
+            className=""
+            type="button"
+            onSubmit={() => {
+              window.open(
+                "https://immersion.cellar-c2.services.clever-cloud.com/bilan-immersion-professionnelle-inscriptible.pdf",
+                "_blank",
+              );
+            }}
+          >
+            Télécharger le bilan détaillé en PDF
+          </Button>
+        </div>
+      }
     </HeaderFooterLayout>
   );
 };
