@@ -16,6 +16,7 @@ export type HomeButtonProps = {
   className?: string;
   type?: HomeButtonTypes;
   width?: "w-full" | null;
+  buttonType?: "button" | "submit";
 };
 
 export const buttonClassnames: Record<HomeButtonTypes, string> = {
@@ -34,6 +35,7 @@ export const ButtonHome = ({
   className,
   type = "establishment",
   width = "w-full",
+  buttonType = "button",
 }: HomeButtonProps) => (
   <button
     className={
@@ -43,7 +45,7 @@ export const ButtonHome = ({
     }
     onClick={onClick}
     disabled={disable}
-    type="button"
+    type={buttonType}
   >
     {children}
   </button>

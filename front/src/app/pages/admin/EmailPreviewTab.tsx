@@ -19,6 +19,7 @@ export const EmailPreviewTab = () => {
       skipHead: true,
     },
   );
+  //console.log(fakeContent.htmlContent);
   return (
     <div className="admin-tab__email-preview">
       <DsfrTitle level={5} text="Aperçu de template email" />

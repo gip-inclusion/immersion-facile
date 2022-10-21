@@ -43,7 +43,9 @@ const LoginForm = () => {
               <SubTitle>Veuillez vous connectez</SubTitle>
               <TextInput label="Utilisateur" name="user" />
               <TextInput label="Mot de passe" name="password" type="password" />
-              <ButtonHome disable={isLoading}>Se connecter</ButtonHome>
+              <ButtonHome disable={isLoading} buttonType="submit">
+                Se connecter
+              </ButtonHome>
               {error && (
                 <Notification title="Une erreur est survenue" type="error">
                   {error}

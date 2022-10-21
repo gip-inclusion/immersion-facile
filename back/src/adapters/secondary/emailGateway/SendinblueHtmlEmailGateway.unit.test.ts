@@ -107,7 +107,10 @@ describe("SendingBlueHtmlEmailGateway unit", () => {
       type: "AGENCY_WAS_ACTIVATED",
       recipients: ["establishment-ceo@gmail.com"],
       cc: carbonCopy,
-      params: { agencyName: "My agency", agencyLogoUrl: "www.mylogo.com" },
+      params: {
+        agencyName: "AGENCY_NAME",
+        agencyLogoUrl: "https://beta.gouv.fr/img/logo_twitter_image-2019.jpg",
+      },
     });
 
     expectToEqual(sentEmails[0], {
@@ -121,7 +124,7 @@ describe("SendingBlueHtmlEmailGateway unit", () => {
           email: "establishment-ceo@gmail.com",
         },
       ],
-      subject: "Immersion Facilitée : Votre agence a été activée",
+      subject: "Immersion Facilitée : Votre structure a été activée",
       htmlContent: ignoreTabs(`
       <html lang="fr">
       <body>
@@ -138,7 +141,7 @@ describe("SendingBlueHtmlEmailGateway unit", () => {
       </a>
       </td>
       <td width="60%" align="right">
-      <img src="www.mylogo.com" alt="" style="max-width: 150px; max-height: 120px; height: auto; margin-left: 20px;"/>
+      <img src="https://beta.gouv.fr/img/logo_twitter_image-2019.jpg" alt="" style="max-width: 150px; max-height: 120px; height: auto; margin-left: 20px;"/>
       </td>
 
       </tr>
@@ -157,11 +160,31 @@ describe("SendingBlueHtmlEmailGateway unit", () => {
 
       <tr>
       <td>
+      <p>Bonjour,</p>
+      </td>
+      </tr>
+
+      <tr>
+      <td>
 
       <table width="600">
       <tr>
       <td>
-      <p><strong>Votre structure prescriptrice d'immersion est activée !</strong> <br/><br/>Nous avons bien activé l'accès à la demande de convention dématérialisée pour des immersions professionnelles pour: My agency. <br/><br/>Merci à vous !</p>
+      <p><strong>Votre structure prescriptrice d'immersion est activée !</strong> <br/><br/>Nous avons bien activé l'accès à la demande de convention dématérialisée pour des immersions professionnelles pour: AGENCY_NAME. <br/><br/>Merci à vous !</p>
+      </td>
+      </tr>
+      </table>
+
+      </td>
+      </tr>
+
+      <tr>
+      <td>
+
+      <table width="600">
+      <tr>
+      <td>
+      <p>Bonne journée,<br/>L'équipe Immersion Facilitée</p>
       </td>
       </tr>
       </table>
