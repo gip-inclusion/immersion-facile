@@ -117,13 +117,13 @@ export class InMemoryEventBus implements EventBus {
     if (wasQuarantined) {
       const message = "Failed too many times, event will be Quarantined";
       logger.error({ event }, message);
+      const { payload, ...restEvent } = event;
       notifyObjectDiscord({
         event: {
-          ...event,
-          lastPublication: event.publications.at(-1),
+          ...restEvent,
+          lastPublication: restEvent.publications.at(-1),
         },
         message,
-        wasQuarantined,
       });
     }
 
