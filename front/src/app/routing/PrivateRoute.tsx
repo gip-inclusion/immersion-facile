@@ -1,6 +1,6 @@
 import { Form, Formik } from "formik";
 import React from "react";
-import { ButtonHome, Notification, SubTitle } from "react-design-system";
+import { Button, Notification, SubTitle } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { UserAndPassword, userAndPasswordSchema } from "shared";
 import { ContainerLayout } from "src/app/layouts/ContainerLayout";
@@ -43,9 +43,9 @@ const LoginForm = () => {
               <SubTitle>Veuillez vous connectez</SubTitle>
               <TextInput label="Utilisateur" name="user" />
               <TextInput label="Mot de passe" name="password" type="password" />
-              <ButtonHome disable={isLoading} buttonType="submit">
+              <Button disable={isLoading} type="submit">
                 Se connecter
-              </ButtonHome>
+              </Button>
               {error && (
                 <Notification title="Une erreur est survenue" type="error">
                   {error}
