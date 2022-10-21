@@ -4,7 +4,7 @@ import {
   ConventionDtoBuilder,
   expectObjectsToMatch,
 } from "shared";
-import { DomainEvent } from "../../../domain/core/eventBus/events";
+import { DiscussionAggregate } from "../../../domain/immersionOffer/entities/DiscussionAggregate";
 import { EstablishmentAggregate } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import {
   rueJacquardDto,
@@ -19,9 +19,9 @@ import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionO
 import { UuidV4Generator } from "../core/UuidGeneratorImplementations";
 import { PgAgencyRepository } from "./PgAgencyRepository";
 import { PgConventionRepository } from "./PgConventionRepository";
+import { PgDiscussionAggregateRepository } from "./PgDiscussionAggregateRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 import { PgExportQueries } from "./PgExportQueries";
-import { PgOutboxRepository } from "./PgOutboxRepository";
 
 describe("PgExportQueries", () => {
   let pool: Pool;
@@ -30,7 +30,7 @@ describe("PgExportQueries", () => {
   let agencyRepository: PgAgencyRepository;
   let exportQueries: PgExportQueries;
   let conventionRepository: PgConventionRepository;
-  let outboxRepository: PgOutboxRepository;
+  let discussionRepository: PgDiscussionAggregateRepository;
 
   beforeAll(async () => {
     pool = getTestPgPool();
@@ -38,10 +38,13 @@ describe("PgExportQueries", () => {
   });
 
   beforeEach(async () => {
+    await client.query("DELETE FROM outbox_publications");
     await client.query("DELETE FROM outbox");
     await client.query("DELETE FROM conventions");
     await client.query("DELETE FROM agencies");
     await client.query("DELETE FROM immersion_offers");
+    await client.query("DELETE FROM exchanges");
+    await client.query("DELETE FROM discussions");
     await client.query("DELETE FROM establishments");
     await client.query("DELETE FROM immersion_contacts");
 
@@ -51,7 +54,7 @@ describe("PgExportQueries", () => {
     agencyRepository = new PgAgencyRepository(client);
     exportQueries = new PgExportQueries(client);
     conventionRepository = new PgConventionRepository(client);
-    outboxRepository = new PgOutboxRepository(client);
+    discussionRepository = new PgDiscussionAggregateRepository(client);
   });
 
   afterAll(async () => {
@@ -63,10 +66,13 @@ describe("PgExportQueries", () => {
     describe("No filter specified", () => {
       it("Retrieves all establishments exports where data_source = form", async () => {
         // Prepare
-        await establishmentAggregateRepository.insertEstablishmentAggregates([
+        const aggregates = [
           establishmentAggregateArtusInterim(),
           establishmentAggregateMiniWorldLyon(),
-        ]);
+        ];
+        await establishmentAggregateRepository.insertEstablishmentAggregates(
+          aggregates,
+        );
 
         await refreshAllMaterializedViews(client);
 
@@ -78,7 +84,6 @@ describe("PgExportQueries", () => {
 
         // Assert
         const expectedExportedRowWithSiret = {
-          "Date de mise à jour": "05/01/2022",
           Siret: "79158476600012",
           "Raison Sociale": "ARTUS INTERIM LA ROCHE SUR YON",
           Enseigne: null,
@@ -280,26 +285,29 @@ describe("PgExportQueries", () => {
               .build(),
           )
           .build();
-        const contactEvent: DomainEvent = {
+
+        const discussion: DiscussionAggregate = {
           id: new UuidV4Generator().new(),
-          occurredAt: "2022-01-01T12:00:00.000Z",
-          topic: "ContactRequestedByBeneficiary",
-          payload: {
-            contactMode: "EMAIL",
-            message: "Hello!",
-            potentialBeneficiaryEmail: "tom@cruise.com",
-            potentialBeneficiaryFirstName: "Tom",
-            potentialBeneficiaryLastName: "Cruise",
-            offer: { romeCode: "B1805", romeLabel: "Stylisme" },
-            siret: establishmentAggregate.establishment.siret,
-          },
-          publications: [],
-          wasQuarantined: false,
+          potentialBeneficiaryEmail: "tom@cruise.com",
+          potentialBeneficiaryFirstName: "Tom",
+          potentialBeneficiaryLastName: "Cruise",
+          romeCode: "B1805",
+          siret: establishmentAggregate.establishment.siret,
+          contactMode: "EMAIL",
+          createdAt: new Date("2022-01-01T12:00:00.000Z"),
+          exchanges: [
+            {
+              sentAt: new Date("2022-01-01T12:00:00.000Z"),
+              message: "Hello!",
+              recipient: "establishment",
+              sender: "potentialBeneficiary",
+            },
+          ],
         };
         await establishmentAggregateRepository.insertEstablishmentAggregates([
           establishmentAggregate,
         ]);
-        await outboxRepository.save(contactEvent);
+        await discussionRepository.insertDiscussionAggregate(discussion);
         await refreshAllMaterializedViews(client);
 
         // Act
@@ -310,7 +318,6 @@ describe("PgExportQueries", () => {
 
         // Assert
         const expectedExportedRow = {
-          "Date de la mise en relation": "01/01/2022",
           "Type de mise en relation": "EMAIL",
           Email: "tom@cruise.com",
           Siret: "78000403200019",

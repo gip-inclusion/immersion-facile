@@ -82,7 +82,10 @@ const getUseCasesByTopics = (
   ],
 
   // Search related
-  ContactRequestedByBeneficiary: [useCases.notifyContactRequest],
+  ContactRequestedByBeneficiary: [
+    useCases.notifyContactRequest,
+    useCases.insertDiscussionAggregateFromContactRequest,
+  ],
 
   // Magic link renewal.
   MagicLinkRenewalRequested: [useCases.deliverRenewedMagicLink],

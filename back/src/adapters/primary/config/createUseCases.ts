@@ -51,6 +51,7 @@ import { ContactEstablishment } from "../../../domain/immersionOffer/useCases/Co
 import { EditFormEstablishment } from "../../../domain/immersionOffer/useCases/EditFormEstablishment";
 import { GetImmersionOfferById } from "../../../domain/immersionOffer/useCases/GetImmersionOfferById";
 import { GetImmersionOfferBySiretAndRome } from "../../../domain/immersionOffer/useCases/GetImmersionOfferBySiretAndRome";
+import { InsertDiscussionAggregateFromContactRequest } from "../../../domain/immersionOffer/useCases/InsertDiscussionAggregateFromContactRequest";
 import { InsertEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
 import { NotifyConfirmationEstablishmentCreated } from "../../../domain/immersionOffer/useCases/notifications/NotifyConfirmationEstablishmentCreated";
 import { NotifyContactRequest } from "../../../domain/immersionOffer/useCases/notifications/NotifyContactRequest";
@@ -184,7 +185,12 @@ export const createUseCases = (
         uowPerformer,
         createNewEvent,
       ),
-
+      insertDiscussionAggregateFromContactRequest:
+        new InsertDiscussionAggregateFromContactRequest(
+          uowPerformer,
+          clock,
+          uuidGenerator,
+        ),
       callLaBonneBoiteAndUpdateRepositories:
         new CallLaBonneBoiteAndUpdateRepositories(
           uowPerformer,

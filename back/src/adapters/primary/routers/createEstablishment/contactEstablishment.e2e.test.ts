@@ -38,7 +38,7 @@ describe(`/${contactEstablishmentRoute} route`, () => {
     ({ request, gateways, eventCrawler, inMemoryUow } = await buildTestApp());
   });
 
-  it("sends email for valid request", async () => {
+  it("sends email for valid request and save the discussion", async () => {
     const establishment = new EstablishmentEntityV2Builder()
       .withSiret(siret)
       .build();
@@ -75,6 +75,10 @@ describe(`/${contactEstablishmentRoute} route`, () => {
     expect(gateways.email.getSentEmails()[0].type).toBe(
       "CONTACT_BY_EMAIL_REQUEST",
     );
+
+    expect(
+      inMemoryUow.discussionAggregateRepository.discussionAggregates,
+    ).toHaveLength(1);
   });
 
   it("fails with 404 for unknown siret", async () => {

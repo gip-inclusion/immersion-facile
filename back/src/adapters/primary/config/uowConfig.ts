@@ -6,6 +6,7 @@ import {
 import { RealClock } from "../../secondary/core/ClockImplementations";
 import { InMemoryOutboxQueries } from "../../secondary/core/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../secondary/core/InMemoryOutboxRepository";
+import { InMemoryDiscussionAggregateRepository } from "../../secondary/immersionOffer/InMemoryDiscussionAggregateRepository";
 import { InMemoryEstablishmentAggregateRepository } from "../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryLaBonneBoiteRequestRepository } from "../../secondary/immersionOffer/InMemoryLaBonneBoiteRequestRepository";
 import { InMemorySearchMadeRepository } from "../../secondary/immersionOffer/InMemorySearchMadeRepository";
@@ -25,6 +26,7 @@ import { PgAgencyRepository } from "../../secondary/pg/PgAgencyRepository";
 import { PgConventionPoleEmploiAdvisorRepository } from "../../secondary/pg/PgConventionPoleEmploiAdvisorRepository";
 import { PgConventionQueries } from "../../secondary/pg/PgConventionQueries";
 import { PgConventionRepository } from "../../secondary/pg/PgConventionRepository";
+import { PgDiscussionAggregateRepository } from "../../secondary/pg/PgDiscussionAggregateRepository";
 import { PgEstablishmentAggregateRepository } from "../../secondary/pg/PgEstablishmentAggregateRepository";
 import { PgExportQueries } from "../../secondary/pg/PgExportQueries";
 import { PgFeatureFlagRepository } from "../../secondary/pg/PgFeatureFlagRepository";
@@ -62,6 +64,7 @@ export const createInMemoryUow = () => {
       conventionRepository,
       outboxRepository,
     ),
+    discussionAggregateRepository: new InMemoryDiscussionAggregateRepository(),
     postalCodeDepartmentRegionQueries: stubPostalCodeDepartmentRegionQueries,
     featureFlagRepository: new InMemoryFeatureFlagRepository(),
     agencyRepository: new InMemoryAgencyRepository(),
@@ -93,6 +96,7 @@ export const createPgUow = (client: PoolClient): UnitOfWork => ({
   postalCodeDepartmentRegionQueries: new PgPostalCodeDepartmentRegionQueries(
     client,
   ),
+  discussionAggregateRepository: new PgDiscussionAggregateRepository(client),
   featureFlagRepository: new PgFeatureFlagRepository(client),
   laBonneBoiteRequestRepository: new PgLaBonneBoiteRequestRepository(client),
   searchMadeRepository: new PgSearchMadeRepository(client),

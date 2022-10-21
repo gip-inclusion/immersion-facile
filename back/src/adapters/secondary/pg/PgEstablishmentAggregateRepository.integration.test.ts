@@ -45,6 +45,7 @@ describe("Postgres implementation of immersion offer repository", () => {
 
   beforeEach(async () => {
     await client.query("DELETE FROM immersion_contacts");
+    await client.query("DELETE FROM discussions");
     await client.query("DELETE FROM establishments");
 
     pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
