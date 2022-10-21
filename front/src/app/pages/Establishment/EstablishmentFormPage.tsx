@@ -11,15 +11,11 @@ export const EstablishmentFormPage = ({
   route: Route<typeof routes.formEstablishment>;
 }) => (
   <HeaderFooterLayout>
-    <MainWrapper className="fr-container fr-grid--center">
-      <div className="fr-grid-row fr-grid-row--center">
-        <div className="fr-col-lg-7 fr-px-2w">
-          <EstablishmentCreationForm
-            source="immersion-facile"
-            siret={route.params.siret}
-          />
-        </div>
-      </div>
+    <MainWrapper layout="boxed">
+      <EstablishmentCreationForm
+        source="immersion-facile"
+        siret={route.params.siret}
+      />
     </MainWrapper>
   </HeaderFooterLayout>
 );

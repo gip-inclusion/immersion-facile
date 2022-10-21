@@ -9,6 +9,6 @@ export const ConventionFormContainerLayout = ({
   children,
 }: ConventionFormContainerLayoutProps) => (
   <>
-    <MainWrapper className="fr-container">{children}</MainWrapper>
+    <MainWrapper layout={"default"}>{children}</MainWrapper>
   </>
 );

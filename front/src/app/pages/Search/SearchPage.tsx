@@ -33,7 +33,7 @@ export const SearchPage = () => {
 
   return (
     <HeaderFooterLayout>
-      <MainWrapper vSpacing={0}>
+      <MainWrapper vSpacing={0} layout="fullscreen">
         <div className="sm:flex sm:items-center bg-gradient-to-b from-immersionRed-dark to-immersionRed-light">
           <div className="h-[672px] flex-1 flex flex-col items-center fr-p-2w fr-px-2w">
             <h1 className="text-2xl text-white text-center font-bold fr-my-4w fr-px-6w">

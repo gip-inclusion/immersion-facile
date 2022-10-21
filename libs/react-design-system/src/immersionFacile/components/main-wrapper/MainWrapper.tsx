@@ -5,6 +5,7 @@ type MainWrapperProps = {
   hSpacing?: number;
   children: React.ReactNode;
   className?: string;
+  layout: "default" | "boxed" | "fullscreen";
 };
 
 export const MainWrapper = ({
@@ -12,12 +13,23 @@ export const MainWrapper = ({
   hSpacing = 0,
   className,
   children,
-}: MainWrapperProps) => (
-  <main
-    className={`fr-main-wrapper ${className} ${
-      vSpacing ? `fr-py-${vSpacing}w` : ""
-    } ${hSpacing ? `fr-px-${hSpacing}w` : ""}`}
-  >
-    {children}
-  </main>
-);
+  layout,
+}: MainWrapperProps) => {
+  const spacing = `${vSpacing ? `fr-py-${vSpacing}w` : ""} ${
+    hSpacing ? `fr-px-${hSpacing}w` : ""
+  }`;
+  const classNameValue =
+    layout === "fullscreen"
+      ? `${className} ${spacing}`
+      : `fr-main-wrapper fr-container fr-grid--center ${className}`;
+  return (
+    <main className={classNameValue}>
+      {layout === "boxed" && (
+        <div className="fr-grid-row fr-grid-row--center">
+          <div className="fr-col-lg-7 fr-px-2w">{children}</div>
+        </div>
+      )}
+      {layout !== "boxed" && children}
+    </main>
+  );
+};

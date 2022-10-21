@@ -48,7 +48,10 @@ export const HomePage = () => {
   return (
     <div>
       <ImmersionMarianneHeader />
-      <MainWrapper className="bg-gradient-to-b from--100 from-gray-100 via-gray-50 to-white pt-14">
+      <MainWrapper
+        layout="fullscreen"
+        className="bg-gradient-to-b from--100 from-gray-100 via-gray-50 to-white "
+      >
         <section className="flex flex-col items-center">
           <div className="flex flex-wrap justify-center">
             <div>
