@@ -49,13 +49,18 @@ export type NotificationProperties = {
   title: string;
   type: NotificationType;
   children: ReactNode;
+  className?: string;
 };
 export const Notification = ({
   title,
   type,
   children,
+  className,
 }: NotificationProperties) => (
-  <div role="alert" className={`fr-alert fr-alert--${type}`}>
+  <div
+    role="alert"
+    className={`fr-alert fr-alert--${type} ${className ? className : ""}`}
+  >
     {title !== "" && <p className="fr-alert__title">{title}</p>}
     {children}
   </div>

@@ -4,6 +4,7 @@ import { identity } from "ramda";
 import React from "react";
 import {
   Button,
+  MainWrapper,
   Notification,
   Title,
 } from "react-design-system/immersionFacile";
@@ -68,103 +69,110 @@ export const ImmersionAssessmentPage = ({
 
   return (
     <HeaderFooterLayout>
-      <Title>
-        Bilan de l'immersion{" "}
-        {convention
-          ? `de ${convention.signatories.beneficiary.firstName} ${convention.signatories.beneficiary.lastName}`
-          : ""}
-      </Title>
-      {isLoading && <CircularProgress />}
-      {fetchConventionError && <div>{fetchConventionError}</div>}
-      {convention && !canCreateAssessment && (
-        <Notification
-          type="error"
-          title="Votre convention n'est pas prête à recevoir un bilan"
-        >
-          Seule une convention entièrement validée peut recevoir un bilan
-        </Notification>
-      )}
-      {canCreateAssessment && (
-        <div className="px-2 md:pl-20">
-          <ImmersionDescription convention={convention} />
-          <Formik
-            initialValues={identity<ImmersionAssessmentDto>({
-              conventionId: convention.id,
-              status: null as unknown as AssessmentStatus,
-              establishmentFeedback: "",
-            })}
-            validationSchema={toFormikValidationSchema(
-              immersionAssessmentSchema,
+      <MainWrapper className="fr-container fr-grid--center">
+        <div className="fr-grid-row fr-grid-row--center">
+          <div className="fr-col-lg-7 fr-px-2w">
+            <Title>
+              Bilan de l'immersion{" "}
+              {convention
+                ? `de ${convention.signatories.beneficiary.firstName} ${convention.signatories.beneficiary.lastName}`
+                : ""}
+            </Title>
+            {isLoading && <CircularProgress />}
+            {fetchConventionError && <div>{fetchConventionError}</div>}
+            {convention && !canCreateAssessment && (
+              <Notification
+                type="error"
+                title="Votre convention n'est pas prête à recevoir un bilan"
+              >
+                Seule une convention entièrement validée peut recevoir un bilan
+              </Notification>
             )}
-            onSubmit={createAssessment}
-          >
-            {() => (
-              <Form>
-                <div className="flex flex-col">
-                  <RadioGroupForField
-                    label=""
-                    name={getName("status")}
-                    options={assessmentStatuses.map((value) => ({
-                      value,
-                      label: labels[value],
-                    }))}
-                  />
-                  <div
-                    style={{
-                      minWidth: "20rem",
-                      maxWidth: "34rem",
-                      paddingBottom: "0.5rem",
-                    }}
-                  >
-                    <TextInput
-                      multiline={true}
-                      label="Comment s'est passée l'immersion ?"
-                      name={getName("establishmentFeedback")}
-                    />
-                  </div>
-                  <Button
-                    className="w-28"
-                    type="submit"
-                    disable={
-                      assessmentStatus !== "Idle" || assessmentError !== null
-                    }
-                  >
-                    Envoyer
-                  </Button>
-                  {assessmentError && (
-                    <Notification type="error" title="Erreur">
-                      {assessmentError}
-                    </Notification>
+            {canCreateAssessment && (
+              <>
+                <ImmersionDescription convention={convention} />
+                <Formik
+                  initialValues={identity<ImmersionAssessmentDto>({
+                    conventionId: convention.id,
+                    status: null as unknown as AssessmentStatus,
+                    establishmentFeedback: "",
+                  })}
+                  validationSchema={toFormikValidationSchema(
+                    immersionAssessmentSchema,
                   )}
-                  {assessmentStatus === "Success" && (
-                    <Notification type="success" title={"Bilan envoyé"}>
-                      Le bilan a bien été envoyé au conseiller
-                    </Notification>
+                  onSubmit={createAssessment}
+                >
+                  {() => (
+                    <Form>
+                      <RadioGroupForField
+                        label=""
+                        name={getName("status")}
+                        options={assessmentStatuses.map((value) => ({
+                          value,
+                          label: labels[value],
+                        }))}
+                      />
+                      <TextInput
+                        multiline={true}
+                        label="Comment s'est passée l'immersion ?"
+                        name={getName("establishmentFeedback")}
+                      />
+                      <ul className="fr-btns-group">
+                        <li>
+                          <Button
+                            type="submit"
+                            disable={
+                              assessmentStatus !== "Idle" ||
+                              assessmentError !== null
+                            }
+                          >
+                            Envoyer
+                          </Button>
+                          {assessmentError && (
+                            <Notification
+                              type="error"
+                              title="Erreur"
+                              className="fr-mx-1w fr-mb-4w"
+                            >
+                              {assessmentError}
+                            </Notification>
+                          )}
+                          {assessmentStatus === "Success" && (
+                            <Notification
+                              type="success"
+                              title={"Bilan envoyé"}
+                              className="fr-mx-1w fr-mb-4w"
+                            >
+                              Le bilan a bien été envoyé au conseiller
+                            </Notification>
+                          )}
+                        </li>
+                        {(assessmentStatus !== "Idle" ||
+                          assessmentError !== null) && (
+                          <li>
+                            <Button
+                              level="secondary"
+                              type="button"
+                              onSubmit={() => {
+                                window.open(
+                                  "https://immersion.cellar-c2.services.clever-cloud.com/bilan-immersion-professionnelle-inscriptible.pdf",
+                                  "_blank",
+                                );
+                              }}
+                            >
+                              Télécharger le bilan détaillé en PDF
+                            </Button>
+                          </li>
+                        )}
+                      </ul>
+                    </Form>
                   )}
-                </div>
-              </Form>
+                </Formik>
+              </>
             )}
-          </Formik>
+          </div>
         </div>
-      )}
-      {
-        //assessmentStatus !== "Idle" ||
-        //assessmentError !== null &&
-        <div className="px-2 pt-1 md:pl-20">
-          <Button
-            className=""
-            type="button"
-            onSubmit={() => {
-              window.open(
-                "https://immersion.cellar-c2.services.clever-cloud.com/bilan-immersion-professionnelle-inscriptible.pdf",
-                "_blank",
-              );
-            }}
-          >
-            Télécharger le bilan détaillé en PDF
-          </Button>
-        </div>
-      }
+      </MainWrapper>
     </HeaderFooterLayout>
   );
 };
@@ -176,20 +184,21 @@ const ImmersionDescription = ({
 }) => (
   <p>
     L'immersion de{" "}
-    <Bold>
+    <strong>
       {convention.signatories.beneficiary.firstName}{" "}
       {convention.signatories.beneficiary.lastName}
-    </Bold>{" "}
-    auprès de l'établissement <Bold>{convention.businessName}</Bold> qui a eu
-    lieu du <Bold>{toDisplayedDate(new Date(convention.dateStart))} </Bold>au{" "}
-    <Bold>{toDisplayedDate(new Date(convention.dateEnd))}</Bold> touche à sa
+    </strong>{" "}
+    auprès de l'établissement <strong>{convention.businessName}</strong> qui a
+    eu lieu du{" "}
+    <strong>{toDisplayedDate(new Date(convention.dateStart))} </strong>au{" "}
+    <strong>{toDisplayedDate(new Date(convention.dateEnd))}</strong> touche à sa
     fin.
   </p>
 );
 
-const Bold: React.FC = ({ children }) => (
-  <span className="font-bold">{children}</span>
-);
+// const Bold: React.FC = ({ children }) => (
+//   <span className="font-bold">{children}</span>
+// );
 
 const getName = (name: keyof ImmersionAssessmentDto) => name;
 const labels: Record<AssessmentStatus, string> = {
