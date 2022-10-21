@@ -1,5 +1,6 @@
 import {
   Beneficiary,
+  ConventionDto,
   ConventionDtoBuilder,
   ConventionReadDto,
   expectObjectsToMatch,
@@ -285,7 +286,13 @@ describe("Convention slice", () => {
   describe("Convention signature", () => {
     it("signs the conventions with role from jwt", () => {
       const jwt = "some-correct-jwt";
-      store.dispatch(conventionSlice.actions.signConventionRequested(jwt));
+      store.dispatch(
+        conventionSlice.actions.signConventionRequested({
+          jwt,
+          role: "beneficiary",
+          signedAt: new Date().toISOString(),
+        }),
+      );
       expectConventionState({
         isLoading: true,
       });
@@ -296,9 +303,58 @@ describe("Convention slice", () => {
       });
     });
 
+    it("updates the convention with the new signature if convention exists in store", () => {
+      const signedAt = "2022-10-10T12:00:00.000Z";
+      const conventionBuilder = new ConventionDtoBuilder().notSigned();
+      const addAgencyName = (convention: ConventionDto): ConventionReadDto => ({
+        agencyName: "My agency",
+        ...convention,
+      });
+
+      const conventionNotSigned = addAgencyName(conventionBuilder.build());
+      const conventionSignedByBeneficiary = addAgencyName(
+        conventionBuilder.signedByBeneficiary(signedAt).build(),
+      );
+
+      const jwt = "some-correct-jwt";
+      ({ store, dependencies } = createTestStore({
+        convention: {
+          formUi: { isMinor: false, isTutorEstablishmentRepresentative: true },
+          jwt: null,
+          convention: conventionNotSigned,
+          feedback: { kind: "modificationsAskedFromSignatory" },
+          isLoading: false,
+          fetchError: null,
+          currentSignatoryRole: null,
+        },
+      }));
+      store.dispatch(
+        conventionSlice.actions.signConventionRequested({
+          jwt,
+          role: "beneficiary",
+          signedAt,
+        }),
+      );
+      expectConventionState({
+        isLoading: true,
+      });
+      feedGatewayWithSignSuccess();
+      expectConventionState({
+        isLoading: false,
+        feedback: { kind: "signedSuccessfully" },
+        convention: conventionSignedByBeneficiary,
+      });
+    });
+
     it("gets error message when signature fails", () => {
       const jwt = "some-correct-jwt";
-      store.dispatch(conventionSlice.actions.signConventionRequested(jwt));
+      store.dispatch(
+        conventionSlice.actions.signConventionRequested({
+          jwt,
+          role: "beneficiary",
+          signedAt: new Date().toISOString(),
+        }),
+      );
       expectConventionState({
         isLoading: true,
       });

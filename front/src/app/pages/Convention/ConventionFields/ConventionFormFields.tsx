@@ -99,6 +99,7 @@ export const ConventionFormFields = ({
             <p>{t.conventionAlreadySigned}</p>
           ) : (
             <SignatureActions
+              alreadySigned={alreadySigned}
               signatory={signatory}
               isSubmitting={isSubmitting}
               onSubmit={submitForm}

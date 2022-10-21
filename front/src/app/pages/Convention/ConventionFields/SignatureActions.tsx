@@ -63,6 +63,7 @@ const getSignatoryProcessedData = (
 
 export const SignatureActions = (props: {
   signatory: Signatory;
+  alreadySigned: boolean;
   isSubmitting: boolean;
   onSubmit: () => Promise<void>;
   onModificationRequired: () => Promise<void>;
@@ -78,7 +79,7 @@ export const SignatureActions = (props: {
          m'engage à avoir pris connaissance des dispositions réglementaires de la PMSMP et à les respecter *`}
         description="Avant de répondre, consultez ces dispositions ici"
         descriptionLink="https://docs.google.com/document/d/1siwGSE4fQB5hGWoppXLMoUYX42r9N-mGZbM_Gz_iS7c/edit?usp=sharing"
-        disabled={false}
+        disabled={props.alreadySigned}
       />
       <p style={{ display: "flex", gap: "50px" }}>
         <SignButton

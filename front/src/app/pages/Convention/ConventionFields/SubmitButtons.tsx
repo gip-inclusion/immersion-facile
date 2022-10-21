@@ -35,7 +35,7 @@ export const SignButton = ({
 }: SubmitButtonProps) => (
   <button
     className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"
-    type="submit"
+    type="button"
     onClick={onSubmit}
     disabled={isSubmitting || disabled}
   >
@@ -50,7 +50,7 @@ export const RequestModificationButton = ({
 }: SubmitButtonProps) => (
   <button
     className="fr-btn fr-fi-edit-fill fr-btn--icon-left fr-btn--secondary"
-    type="submit"
+    type="button"
     onClick={onSubmit}
     disabled={isSubmitting || disabled}
   >

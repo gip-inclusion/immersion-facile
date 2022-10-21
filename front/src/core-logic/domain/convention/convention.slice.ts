@@ -3,6 +3,7 @@ import {
   ConventionDto,
   ConventionReadDto,
   ConventionStatus,
+  Signatories,
   SignatoryRole,
 } from "shared";
 import { SubmitFeedBack } from "../SubmitFeedback";
@@ -51,6 +52,9 @@ type StatusChangePayload = {
   justification?: string;
 };
 
+type Jwt = string;
+type DateIsoStr = string;
+
 export const conventionSlice = createSlice({
   name: "convention",
   initialState,
@@ -63,13 +67,13 @@ export const conventionSlice = createSlice({
       state.isLoading = false;
       state.feedback = { kind: "justSubmitted" };
     },
-    saveConventionFailed: (state, action: PayloadAction<string>) => {
+    saveConventionFailed: (state, action: PayloadAction<Jwt>) => {
       state.isLoading = false;
       state.feedback = { kind: "errored", errorMessage: action.payload };
     },
 
     // Get convention from token
-    fetchConventionRequested: (state, _action: PayloadAction<string>) => {
+    fetchConventionRequested: (state, _action: PayloadAction<Jwt>) => {
       state.isLoading = true;
       state.feedback = { kind: "idle" };
     },
@@ -86,12 +90,29 @@ export const conventionSlice = createSlice({
     },
 
     // Sign convention
-    signConventionRequested: (state, _action: PayloadAction<string>) => {
+    signConventionRequested: (
+      state,
+      _action: PayloadAction<{
+        jwt: Jwt;
+        role: SignatoryRole;
+        signedAt: DateIsoStr;
+      }>,
+    ) => {
       state.isLoading = true;
     },
-    signConventionSucceeded: (state) => {
+    signConventionSucceeded: (
+      state,
+      action: PayloadAction<{ role: SignatoryRole; signedAt: DateIsoStr }>,
+    ) => {
       state.isLoading = false;
       state.feedback = { kind: "signedSuccessfully" };
+      if (state.convention) {
+        const signatoryKey = signatoryRoleToKey[action.payload.role];
+        const signatory = state.convention.signatories[signatoryKey];
+        if (signatory) {
+          signatory.signedAt = action.payload.signedAt;
+        }
+      }
     },
     signConventionFailed: (state, action: PayloadAction<string>) => {
       state.isLoading = false;
@@ -144,3 +165,11 @@ export const conventionSlice = createSlice({
     },
   },
 });
+
+const signatoryRoleToKey: Record<SignatoryRole, keyof Signatories> = {
+  "establishment-representative": "establishmentRepresentative",
+  beneficiary: "beneficiary",
+  establishment: "establishmentRepresentative",
+  "legal-representative": "beneficiaryRepresentative",
+  "beneficiary-representative": "beneficiaryRepresentative",
+};

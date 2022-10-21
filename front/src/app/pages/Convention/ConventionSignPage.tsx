@@ -181,7 +181,13 @@ const SignFormSpecific = ({ jwt }: SignFormSpecificProps) => {
             return;
           }
 
-          dispatch(conventionSlice.actions.signConventionRequested(jwt));
+          dispatch(
+            conventionSlice.actions.signConventionRequested({
+              jwt,
+              role: signatory.role,
+              signedAt: new Date().toISOString(),
+            }),
+          );
         }}
       >
         {(props) => {

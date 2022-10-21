@@ -107,7 +107,7 @@ export const ConventionForm = ({
         <div className="flex justify-center">
           <Title red>{t.conventionTitle}</Title>
         </div>
-        <p className="fr-text">{t.welcome}</p>
+        <div className="fr-text">{t.welcome}</div>
         <Notification type="info" title="">
           Vérifiez que votre structure d’accompagnement est disponible dans la
           liste ci-dessous.{" "}
