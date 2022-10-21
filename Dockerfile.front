@@ -4,6 +4,7 @@ RUN curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml /app/
 COPY shared/package.json /app/shared/
 COPY libs/react-design-system/package.json /app/libs/react-design-system/
+COPY libs/html-templates/package.json /app/libs/html-templates/
 COPY front/package.json /app/front/
 COPY back/package.json /app/back/
 
@@ -13,6 +14,7 @@ RUN pnpm install --frozen-lockfile --ignore-scripts
 
 COPY ./shared/ /app/shared
 COPY ./libs/react-design-system/ /app/libs/react-design-system
+COPY ./libs/html-templates/ /app/libs/html-templates
 
 # front only
 FROM builder
