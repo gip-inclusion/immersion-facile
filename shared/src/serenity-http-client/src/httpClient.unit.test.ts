@@ -17,7 +17,7 @@ describe("Http Client Errors", () => {
     [500, false],
     [502, false],
   ])(
-    "isHttpClientErrorStatus should detect HttpClient 4XX errors, expect: (%i to be %s)",
+    "isHttpClientErrorStatus should detect CreateHttpClient 4XX errors, expect: (%i to be %s)",
     (httpStatusCode: number, expected: boolean) => {
       expect(isHttpClientError(httpStatusCode)).toBe(expected);
     },

@@ -19,6 +19,7 @@
     "cypress": "pnpm --dir cypress",
     "react-design-system": "pnpm --dir libs/react-design-system",
     "html-templates": "pnpm --dir libs/html-templates",
+    "http-client": "pnpm --dir libs/http-client",
     "lintconfig:glob": "eslint --config=.eslintrc.js",
     "lint-staged": "lint-staged --config=./.tooling/.lintstaged/.lintstagedrc",
     "includecheck": "turbo run includecheck",
