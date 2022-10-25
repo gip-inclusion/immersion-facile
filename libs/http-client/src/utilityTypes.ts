@@ -20,7 +20,7 @@ type GetRouteParameter<S extends string> = RemoveTail<
 >;
 
 // prettier-ignore
-export type UtilityTypes<Route extends string> = string extends Route
+export type PathParameters<Route extends string> = string extends Route
   ? ParamsDictionary
   : RemoveDomain<Route> extends `${string}:${infer Rest}`
     ? (
@@ -31,6 +31,6 @@ export type UtilityTypes<Route extends string> = string extends Route
         : { [P in GetRouteParameter<Rest>]: string }
     ) &
     (Rest extends `${GetRouteParameter<Rest>}${infer Next}`
-      ? UtilityTypes<Next> : unknown)
+      ? PathParameters<Next> : unknown)
     // eslint-disable-next-line @typescript-eslint/ban-types
     : {};

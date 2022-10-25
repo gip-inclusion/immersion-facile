@@ -3,22 +3,20 @@ import { createAxiosHandlerCreator } from "./adapters/createAxiosHandlerCreator"
 import { CreateTargets, createHttpClient, Target } from "./createHttpClient";
 
 type AddressApiTargets = CreateTargets<{
-  forwardGeocoding: Target<
-    FeatureCollection,
-    void,
-    { q: string; limit: number }
-  >;
+  // prettier-ignore
+  forwardGeocoding: Target<FeatureCollection, void, { q: string; limit: number }>;
 }>;
 
-const axiosHandlerCreator = createAxiosHandlerCreator(axios);
-const httpClient = createHttpClient<AddressApiTargets>(axiosHandlerCreator, {
-  forwardGeocoding: {
-    url: "https://api-adresse.data.gouv.fr/search/",
-    method: "GET",
-  },
-});
-
 describe("Manual - Call an actual api endpoint", () => {
+  const axiosHandlerCreator = createAxiosHandlerCreator(axios);
+  const httpClient = createHttpClient<AddressApiTargets>(axiosHandlerCreator, {
+    forwardGeocoding: {
+      url: "https://api-adresse.data.gouv.fr/search/",
+      method: "GET",
+      validateResponseBody: isFeatureCollection,
+    },
+  });
+
   it("calls correctly the endpoint", async () => {
     const response = await httpClient.forwardGeocoding({
       queryParams: { q: "18 avenue des Canuts 69120", limit: 1 },
@@ -69,4 +67,28 @@ const expectedData: FeatureCollection = {
     },
   ],
   type: "FeatureCollection",
+};
+
+const isFeatureCollection = (data: unknown): FeatureCollection => {
+  if (
+    data != null &&
+    typeof data === "object" &&
+    "city" in data &&
+    "citycode" in data &&
+    "context" in data &&
+    "housenumber" in data &&
+    "id" in data &&
+    "importance" in data &&
+    "label" in data &&
+    "name" in data &&
+    "postcode" in data &&
+    "score" in data &&
+    "street" in data &&
+    "type" in data &&
+    "x" in data &&
+    "y" in data
+  ) {
+    return data as FeatureCollection;
+  }
+  throw new Error("Wrong");
 };

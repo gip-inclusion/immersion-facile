@@ -18,6 +18,13 @@ type MyBookEndpoints = CreateTargets<{
   >;
 }>;
 
+const isBook = (book: any): Book | never => {
+  if (typeof book?.name !== "string") {
+    throw new Error("Is not a book");
+  }
+  return book;
+};
+
 describe("http-client", () => {
   let httpClient: HttpClient<MyBookEndpoints>;
   let inMemory: ReturnType<typeof createInMemoryHandlerCreator>;
@@ -26,9 +33,24 @@ describe("http-client", () => {
     inMemory = createInMemoryHandlerCreator();
 
     httpClient = createHttpClient<MyBookEndpoints>(inMemory.handlerCreator, {
-      addBook: { method: "POST", url: "https://www.truc.com" },
-      getBooks: { method: "GET", url: "https://www.truc.com" },
-      getBook: { method: "GET", url: "https://www.truc.com/book/:bookId" },
+      addBook: {
+        method: "POST",
+        url: "https://www.truc.com",
+      },
+      getBooks: {
+        method: "GET",
+        url: "https://www.truc.com",
+        validateResponseBody: (responseBody): Book[] => {
+          if (!(responseBody instanceof Array) || !responseBody.every(isBook))
+            throw new Error("Not a list of Book");
+          return responseBody;
+        },
+      },
+      getBook: {
+        method: "GET",
+        url: "https://www.truc.com/book/:bookId",
+        validateResponseBody: isBook,
+      },
     });
   });
 
@@ -68,11 +90,32 @@ describe("http-client", () => {
   });
 
   it("works with route with params", async () => {
+    const book: Book = { name: "my name" };
+    inMemory.setResponse({
+      status: 200,
+      responseBody: book,
+    });
     await httpClient.getBook({
-      params: { bookId: "yolo" },
+      urlParams: { bookId: "yolo" },
     });
 
-    expect("Type is compiling").toBeTruthy();
+    expect(inMemory.calls).toHaveLength(1);
+    expectToEqual(inMemory.calls[0], {
+      targetName: "GET https://www.truc.com/book/yolo",
+      callParams: {
+        urlParams: { bookId: "yolo" },
+      },
+    });
+  });
+
+  it("throws error if validation was not fine", async () => {
+    inMemory.setResponse({
+      status: 200,
+      responseBody: [{ message: "This is not the same" }],
+    });
+    const promise = httpClient.getBooks({ queryParams: {} });
+
+    await expect(promise).rejects.toThrow(new Error("Is not a book"));
   });
 });
 
