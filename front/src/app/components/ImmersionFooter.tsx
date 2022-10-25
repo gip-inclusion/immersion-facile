@@ -51,7 +51,7 @@ const overFooterCols: OverFooterCols = [
   {
     title: "Le centre de support",
     subtitle:
-      "Consultez notre centre d'aide (FAQ) pour trouver les réponses aux principales questions demandées",
+      "Consultez notre FAQ et trouver les réponses aux questions les plus fréquentes",
     iconTitle: "fr-icon-questionnaire-fill",
     link: {
       label: "Accéder à notre FAQ",
