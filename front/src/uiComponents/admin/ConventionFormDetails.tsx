@@ -31,7 +31,7 @@ const enterpriseFields: FieldsToLabel = {
 };
 
 const agencyFields: FieldsToLabel = {
-  id: "Id de l'agence",
+  id: "Id de la convention",
   agencyName: "Nom de la structure",
   dateValidation: "Date de validation",
 };
@@ -45,11 +45,12 @@ const establishmentTutorFields: FieldsToLabel = {
 };
 
 const establishmentRepresentativeFields: FieldsToLabel = {
-  "signatories.beneficiary.signedAt": "Signé",
-  "signatories.beneficiary.email": "Mail de représentant",
-  "signatories.beneficiary.phone": "Numéro de téléphone du représentant",
-  "signatories.beneficiary.firstName": "Prénom",
-  "signatories.beneficiary.lastName": "Nom",
+  "signatories.establishmentRepresentative.signedAt": "Signé",
+  "signatories.establishmentRepresentative.email": "Mail de représentant",
+  "signatories.establishmentRepresentative.phone":
+    "Numéro de téléphone du représentant",
+  "signatories.establishmentRepresentative.firstName": "Prénom",
+  "signatories.establishmentRepresentative.lastName": "Nom",
 };
 
 const candidateFields: FieldsToLabel = {

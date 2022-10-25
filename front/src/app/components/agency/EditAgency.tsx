@@ -54,13 +54,17 @@ export const EditAgency = () => {
     </>
   );
 };
+
 type KeysExceptId = Exclude<keyof AgencyDto, "id">;
+
 const getName = (name: keyof AgencyDto) => name;
+
 type MakeTypedSetField = (
   setFieldValue: FormikHelpers<AgencyDto>["setFieldValue"],
 ) => <K extends KeysExceptId>(
   fieldName: K,
 ) => (fieldValue: AgencyDto[K]) => void;
+
 const makeTypedSetField: MakeTypedSetField =
   (setFieldValue) => (fieldName) => (fieldValue) =>
     setFieldValue(fieldName, fieldValue);

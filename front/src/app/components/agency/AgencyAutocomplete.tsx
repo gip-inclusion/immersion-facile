@@ -43,7 +43,7 @@ export const AgencyAutocomplete = ({
         noOptionsText={agencySearchText ? noOptionText : "Saisissez un métier"}
         getOptionLabel={(option: AgencyId) => option}
         renderOption={(props, option) => (
-          <li {...props}>{agencyOptions.find(propEq("id", option))}</li>
+          <li {...props}>{agencyOptions.find(propEq("id", option))?.name}</li>
         )}
         onChange={(_, selectedAgencyId: AgencyId | null) => {
           if (!selectedAgencyId) return;
