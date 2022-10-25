@@ -28,83 +28,82 @@ const EntreprisesLogo = () => (
   <img src={lesEntrepriseSengagent} alt="Les entreprises s'engagent" />
 );
 
-export const ImmersionFooter = () => {
-  const overFooterCols: OverFooterCols = [
-    {
-      title: "Besoin d'aide ?",
-      subtitle: "L’équipe Immersion Facilitée est là pour vous aider.",
-      iconTitle: "fr-icon-account-fill",
-      link: {
-        label: "Contactez l'équipe",
-        url: "mailto:contact@immersion-facile.beta.gouv.fr",
-      },
+const overFooterCols: OverFooterCols = [
+  {
+    title: "Besoin d'aide ?",
+    subtitle: "L’équipe Immersion Facilitée est là pour vous aider.",
+    iconTitle: "fr-icon-account-fill",
+    link: {
+      label: "Contactez l'équipe",
+      url: "mailto:contact@immersion-facile.beta.gouv.fr",
     },
-    {
-      title: "Rejoignez la communauté",
-      subtitle:
-        "Rejoignez la communauté d'Immersion Facilitée et suivez nos actualités",
-      iconTitle: "fr-icon-links-fill",
-      link: {
-        label: "Rejoignez-nous sur Linkedin",
-        url: "https://www.linkedin.com/company/l-immersion-facilitee/",
-      },
+  },
+  {
+    title: "Rejoignez la communauté",
+    subtitle:
+      "Rejoignez la communauté d'Immersion Facilitée et suivez nos actualités",
+    iconTitle: "fr-icon-links-fill",
+    link: {
+      label: "Rejoignez-nous sur Linkedin",
+      url: "https://www.linkedin.com/company/l-immersion-facilitee/",
     },
-    {
-      title: "Le centre de support",
-      subtitle:
-        "Consultez notre centre d'aide (FAQ) pour trouver les réponses aux principales questions demandées",
-      iconTitle: "fr-icon-questionnaire-fill",
-      link: {
-        label: "Accéder à notre FAQ",
-        url: "https://aide.immersion-facile.beta.gouv.fr/fr/",
-      },
+  },
+  {
+    title: "Le centre de support",
+    subtitle:
+      "Consultez notre centre d'aide (FAQ) pour trouver les réponses aux principales questions demandées",
+    iconTitle: "fr-icon-questionnaire-fill",
+    link: {
+      label: "Accéder à notre FAQ",
+      url: "https://aide.immersion-facile.beta.gouv.fr/fr/",
     },
-  ];
-  const links: NavLink[] = [
-    {
-      label: "gouvernement.fr",
-      href: "https://www.gouvernement.fr/",
-    },
-    {
-      label: "service-public.fr",
-      href: "https://www.service-public.fr/",
-    },
-  ];
-  const bottomsLinks: NavLink[] = [
-    {
-      label: "Mentions légales",
-      href: "https://immersion-facile-1.gitbook.io/mentions-legales/",
-      target: "_blank",
-    },
-    {
-      label: "Politique de confidentialité",
-      href: "https://immersion-facile-1.gitbook.io/mentions-legales/politique-de-confidentialite",
-      target: "_blank",
-    },
-    {
-      label: "Conditions générales d'utilisation",
-      href: "https://immersion-facile-1.gitbook.io/mentions-legales/conditions-generales-dutilisation",
-      target: "_blank",
-    },
-    {
-      label: "Nous contacter",
-      href: "mailto:contact@immersion-facile.beta.gouv.fr",
-    },
-    {
-      label: "Statistiques",
-      href: "https://immersion-facile-1.gitbook.io/la-page-stats-de-immersion-facilitee/mXyCG0khRml5mCWUU0Pe/la-mesure-de-limpact-dimmersion-facilitee",
-      target: "_blank",
-    },
-  ];
-  return (
-    <>
-      <OverFooter cols={overFooterCols} />
-      <Footer
-        links={links}
-        ministereLogo={<MinistereLogo />}
-        partnersLogos={[<PoleEmploiLogo />, <EntreprisesLogo />]}
-        bottomLinks={bottomsLinks}
-      />
-    </>
-  );
-};
+  },
+];
+const links: NavLink[] = [
+  {
+    label: "gouvernement.fr",
+    href: "https://www.gouvernement.fr/",
+  },
+  {
+    label: "service-public.fr",
+    href: "https://www.service-public.fr/",
+  },
+];
+const bottomsLinks: NavLink[] = [
+  {
+    label: "Mentions légales",
+    href: "https://immersion-facile-1.gitbook.io/mentions-legales/",
+    target: "_blank",
+  },
+  {
+    label: "Politique de confidentialité",
+    href: "https://immersion-facile-1.gitbook.io/mentions-legales/politique-de-confidentialite",
+    target: "_blank",
+  },
+  {
+    label: "Conditions générales d'utilisation",
+    href: "https://immersion-facile-1.gitbook.io/mentions-legales/conditions-generales-dutilisation",
+    target: "_blank",
+  },
+  {
+    label: "Nous contacter",
+    href: "mailto:contact@immersion-facile.beta.gouv.fr",
+  },
+  {
+    label: "Statistiques",
+    href: "https://immersion-facile-1.gitbook.io/la-page-stats-de-immersion-facilitee/mXyCG0khRml5mCWUU0Pe/la-mesure-de-limpact-dimmersion-facilitee",
+    target: "_blank",
+  },
+];
+
+export const ImmersionFooter = () => (
+  <>
+    <OverFooter cols={overFooterCols} />
+    <Footer
+      links={links}
+      ministereLogo={<MinistereLogo />}
+      partnersLogos={[<PoleEmploiLogo />, <EntreprisesLogo />]}
+      bottomLinks={bottomsLinks}
+    />
+  </>
+);
