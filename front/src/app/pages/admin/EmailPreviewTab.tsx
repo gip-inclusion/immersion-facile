@@ -1,18 +1,29 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { generateHtmlFromTemplate, templateByName } from "html-templates";
 import { keys } from "ramda";
-import { EmailVariables } from "shared";
-import { DsfrTitle } from "react-design-system";
+import { DsfrTitle, ImmersionTextField } from "react-design-system";
 
-type TemplateName = keyof typeof templateByName;
+type TemplateByName = typeof templateByName;
+type TemplateName = keyof TemplateByName;
 
 export const EmailPreviewTab = () => {
   const [currentTemplate, setCurrentTemplate] = useState<TemplateName>(
     "AGENCY_WAS_ACTIVATED",
   );
+
+  const defaultEmailVariableForTemplate =
+    defaultEmailValueByEmailKind[currentTemplate];
+  const [emailVariables, setEmailVariables] = useState(
+    defaultEmailVariableForTemplate,
+  );
+
+  useEffect(() => {
+    setEmailVariables(defaultEmailVariableForTemplate);
+  }, [currentTemplate]);
+
   const fakeContent = generateHtmlFromTemplate(
     currentTemplate,
-    defaultValueByVariableName,
+    emailVariables,
     {
       skipHead: true,
     },
@@ -59,6 +70,39 @@ export const EmailPreviewTab = () => {
                 <li>{fakeContent.tags.join(", ")}</li>
               </ul>
             )}
+            <ul className="fr-badge-group">
+              {Object.keys(emailVariables).map((variableName) => {
+                const variableValue: any =
+                  emailVariables[variableName as keyof typeof emailVariables];
+
+                return (
+                  <li key={variableName}>
+                    <span className="fr-badge fr-badge--green-menthe">
+                      {variableName} :
+                    </span>
+
+                    {["string", "number", "undefined"].includes(
+                      typeof variableValue,
+                    ) ? (
+                      <>
+                        <ImmersionTextField
+                          name={variableName}
+                          value={variableValue ?? ""}
+                          onChange={(e) =>
+                            setEmailVariables({
+                              ...emailVariables,
+                              [variableName]: e.target.value,
+                            })
+                          }
+                        />
+                      </>
+                    ) : (
+                      JSON.stringify(variableValue)
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
           </aside>
           <section className="fr-col-12 fr-col-lg-8">
             <div
@@ -72,57 +116,185 @@ export const EmailPreviewTab = () => {
   );
 };
 
-const defaultValueByVariableName: Record<EmailVariables, string> = {
-  additionalDetails: "ADDITIONAL_DETAILS",
-  advisorFirstName: "ADVISOR_FIRST_NAME",
-  advisorLastName: "ADVISOR_LAST_NAME",
-  agency: "AGENCY",
-  agencyLogoUrl: "https://beta.gouv.fr/img/logo_twitter_image-2019.jpg",
-  agencyName: "AGENCY_NAME",
-  beneficiaryEmail: "BENEFICIARY_EMAIL",
-  beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
-  beneficiaryLastName: "BENEFICIARY_LAST_NAME",
-  beneficiaryName: "BENEFICIARY_NAME",
-  businessAddress: "BUSINESS_ADDRESS",
-  businessName: "BUSINESS_NAME",
-  signatoryName: "SIGNATORY_NAME",
-  contactFirstName: "CONTACT_FIRSTNAME",
-  contactLastName: "CONTACT_LASTNAME",
-  contactPhone: "CONTACT_PHONE",
-  conventionFormUrl: "APPLICATION_FORM_LINK",
-  dateEnd: "DATE_END",
-  dateStart: "DATE_START",
-  demandeId: "DEMANDE_ID",
-  editFrontUrl: "EDIT_FRONT_LINK",
-  emergencyContact: "EMERGENCY_CONTACT",
-  emergencyContactPhone: "EMERGENCY_CONTACT_PHONE",
-  existingSignatureName: "EXISTING_SIGNATURE_NAME",
-  firstName: "FIRST_NAME",
-  immersionActivities: "IMMERSION_ACTIVITIES",
-  immersionAddress: "IMMERSION_ADDRESS",
-  immersionAppellation: "IMMERSION_PROFESSION",
-  immersionAppellationLabel: "IMMERSION_PROFESSION",
-  immersionAssessmentCreationLink: "IMMERSION_ASSESSMENT_CREATION_LINK",
-  immersionProfession: "IMMERSION_PROFESSION",
-  immersionSkills: "IMMERSION_SKILLS",
-  individualProtection: "INDIVIDUAL_PROTECTION",
-  jobLabel: "JOB_LABEL",
-  lastName: "LAST_NAME",
-  magicLink: "MAGIC_LINK",
-  establishmentTutorName: "MENTOR_NAME",
-  beneficiaryRepresentativeName: "LEGAL_REPRESENTATIVE_NAME",
-  message: "MESSAGE",
-  possibleRoleAction: "POSSIBLE_ROLE_ACTION",
-  potentialBeneficiaryEmail: "POTENTIAL_BENEFICIARY_EMAIL",
-  potentialBeneficiaryFirstName: "POTENTIAL_BENEFICIARY_FIRSTNAME",
-  potentialBeneficiaryLastName: "POTENTIAL_BENEFICIARY_LASTNAME",
-  questionnaireUrl: "QUESTIONNAIRE_URL",
-  reason: "REASON",
-  rejectionReason: "REASON",
-  sanitaryPrevention: "SANITARY_PREVENTION_DESCRIPTION",
-  scheduleText: "SCHEDULE_LINES",
-  signature: "SIGNATURE",
-  totalHours: "TOTAL_HOURS",
-  workConditions: "WORK_CONDITIONS",
-  establishmentRepresentativeName: "ESTABLISHMENT_REPRESENTATIVE_NAME",
+export const defaultEmailValueByEmailKind: {
+  [K in TemplateName]: Parameters<TemplateByName[K]["createEmailVariables"]>[0];
+} = {
+  NEW_CONVENTION_BENEFICIARY_CONFIRMATION: {
+    demandeId: "DEMANDE_ID",
+    firstName: "FIRST_NAME",
+    lastName: "LAST_NAME",
+  },
+  NEW_CONVENTION_ESTABLISHMENT_TUTOR_CONFIRMATION: {
+    demandeId: "DEMANDE_ID",
+    establishmentTutorName: "ESTABLISHMENT_TUTOR_NAME",
+    beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
+    beneficiaryLastName: "BENEFICIARY_LAST_NAME",
+  },
+  NEW_CONVENTION_AGENCY_NOTIFICATION: {
+    demandeId: "DEMANDE_ID",
+    firstName: "FIRST_NAME",
+    lastName: "LAST_NAME",
+    dateStart: "DATE_START",
+    dateEnd: "DATE_END",
+    businessName: "BUSINESS_NAME",
+    agencyName: "AGENCY_NAME",
+    magicLink: "MAGIC_LINK",
+  },
+  VALIDATED_CONVENTION_FINAL_CONFIRMATION: {
+    totalHours: 0,
+    beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
+    beneficiaryLastName: "BENEFICIARY_LAST_NAME",
+    emergencyContact: undefined,
+    emergencyContactPhone: undefined,
+    dateStart: "DATE_START",
+    dateEnd: "DATE_END",
+    establishmentTutorName: "ESTABLISHMENT_TUTOR_NAME",
+    establishmentRepresentativeName: "ESTABLISHMENT_REPRESENTATIVE_NAME",
+    beneficiaryRepresentativeName: "BENEFICIARY_REPRESENTATIVE_NAME",
+    scheduleText: [],
+    businessName: "BUSINESS_NAME",
+    immersionAddress: "IMMERSION_ADDRESS",
+    immersionAppellationLabel: "IMMERSION_APPELLATION_LABEL",
+    immersionActivities: "IMMERSION_ACTIVITIES",
+    immersionSkills: "IMMERSION_SKILLS",
+    sanitaryPrevention: "SANITARY_PREVENTION",
+    individualProtection: "INDIVIDUAL_PROTECTION",
+    questionnaireUrl: "QUESTIONNAIRE_URL",
+    signature: "SIGNATURE",
+    workConditions: undefined,
+  },
+  POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED: {
+    advisorFirstName: "ADVISOR_FIRST_NAME",
+    advisorLastName: "ADVISOR_LAST_NAME",
+    immersionAddress: "IMMERSION_ADDRESS",
+    beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
+    beneficiaryLastName: "BENEFICIARY_LAST_NAME",
+    beneficiaryEmail: "BENEFICIARY_EMAIL",
+    dateStart: "DATE_START",
+    dateEnd: "DATE_END",
+    businessName: "BUSINESS_NAME",
+    magicLink: "MAGIC_LINK",
+  },
+  POLE_EMPLOI_ADVISOR_ON_CONVENTION_ASSOCIATION: {
+    advisorFirstName: "ADVISOR_FIRST_NAME",
+    advisorLastName: "ADVISOR_LAST_NAME",
+    immersionAddress: "IMMERSION_ADDRESS",
+    beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
+    beneficiaryLastName: "BENEFICIARY_LAST_NAME",
+    beneficiaryEmail: "BENEFICIARY_EMAIL",
+    dateStart: "DATE_START",
+    dateEnd: "DATE_END",
+    businessName: "BUSINESS_NAME",
+    magicLink: "MAGIC_LINK",
+  },
+  REJECTED_CONVENTION_NOTIFICATION: {
+    beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
+    beneficiaryLastName: "BENEFICIARY_LAST_NAME",
+    rejectionReason: "REJECTION_REASON",
+    businessName: "BUSINESS_NAME",
+    signature: "SIGNATURE",
+    immersionProfession: "IMMERSION_PROFESSION",
+    agency: "AGENCY",
+  },
+  CONVENTION_MODIFICATION_REQUEST_NOTIFICATION: {
+    beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
+    beneficiaryLastName: "BENEFICIARY_LAST_NAME",
+    reason: "REASON",
+    businessName: "BUSINESS_NAME",
+    signature: "SIGNATURE",
+    immersionAppellation: {
+      appellationCode: "A1111",
+      appellationLabel: "MON LABEL APPELATION",
+      romeCode: "R1111",
+      romeLabel: "MON LABEL ROME",
+    },
+    agency: "AGENCY",
+    magicLink: "MAGIC_LINK",
+  },
+  NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION: {
+    beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
+    beneficiaryLastName: "BENEFICIARY_LAST_NAME",
+    businessName: "BUSINESS_NAME",
+    magicLink: "MAGIC_LINK",
+    possibleRoleAction: "POSSIBLE_ROLE_ACTION",
+  },
+  MAGIC_LINK_RENEWAL: {
+    magicLink: "MAGIC_LINK",
+  },
+  BENEFICIARY_OR_ESTABLISHMENT_REPRESENTATIVE_ALREADY_SIGNED_NOTIFICATION: {
+    magicLink: "MAGIC_LINK",
+    existingSignatureName: "EXISTING_SIGNATURE_NAME",
+    beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
+    beneficiaryLastName: "BENEFICIARY_LAST_NAME",
+    immersionProfession: "IMMERSION_PROFESSION",
+    businessName: "BUSINESS_NAME",
+    establishmentRepresentativeName: "ESTABLISHMENT_REPRESENTATIVE_NAME",
+  },
+  NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE: {
+    beneficiaryName: "BENEFICIARY_NAME",
+    establishmentRepresentativeName: "ESTABLISHMENT_REPRESENTATIVE_NAME",
+    beneficiaryRepresentativeName: undefined,
+    signatoryName: "SIGNATORY_NAME",
+    magicLink: "MAGIC_LINK",
+    businessName: "BUSINESS_NAME",
+  },
+  CONTACT_BY_EMAIL_REQUEST: {
+    businessName: "BUSINESS_NAME",
+    contactFirstName: "CONTACT_FIRST_NAME",
+    contactLastName: "CONTACT_LAST_NAME",
+    jobLabel: "JOB_LABEL",
+    potentialBeneficiaryFirstName: "POTENTIAL_BENEFICIARY_FIRST_NAME",
+    potentialBeneficiaryLastName: "POTENTIAL_BENEFICIARY_LAST_NAME",
+    potentialBeneficiaryEmail: "POTENTIAL_BENEFICIARY_EMAIL",
+    message: "MESSAGE",
+  },
+  CONTACT_BY_PHONE_INSTRUCTIONS: {
+    businessName: "BUSINESS_NAME",
+    contactFirstName: "CONTACT_FIRST_NAME",
+    contactLastName: "CONTACT_LAST_NAME",
+    contactPhone: "CONTACT_PHONE",
+    potentialBeneficiaryFirstName: "POTENTIAL_BENEFICIARY_FIRST_NAME",
+    potentialBeneficiaryLastName: "POTENTIAL_BENEFICIARY_LAST_NAME",
+  },
+  CONTACT_IN_PERSON_INSTRUCTIONS: {
+    businessName: "BUSINESS_NAME",
+    contactFirstName: "CONTACT_FIRST_NAME",
+    contactLastName: "CONTACT_LAST_NAME",
+    businessAddress: "BUSINESS_ADDRESS",
+    potentialBeneficiaryFirstName: "POTENTIAL_BENEFICIARY_FIRST_NAME",
+    potentialBeneficiaryLastName: "POTENTIAL_BENEFICIARY_LAST_NAME",
+  },
+  SHARE_DRAFT_CONVENTION_BY_LINK: {
+    additionalDetails: "ADDITIONAL_DETAILS",
+    conventionFormUrl: "CONVENTION_FORM_URL",
+  },
+  AGENCY_WAS_ACTIVATED: {
+    agencyName: "AGENCY_NAME",
+    agencyLogoUrl: undefined,
+  },
+  SUGGEST_EDIT_FORM_ESTABLISHMENT: {
+    editFrontUrl: "EDIT_FRONT_URL",
+  },
+  EDIT_FORM_ESTABLISHMENT_LINK: {
+    editFrontUrl: "EDIT_FRONT_URL",
+  },
+  NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION: {
+    contactFirstName: "CONTACT_FIRST_NAME",
+    contactLastName: "CONTACT_LAST_NAME",
+    businessName: "BUSINESS_NAME",
+  },
+  CREATE_IMMERSION_ASSESSMENT: {
+    beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
+    beneficiaryLastName: "BENEFICIARY_LAST_NAME",
+    establishmentTutorName: "ESTABLISHMENT_TUTOR_NAME",
+    immersionAssessmentCreationLink: "IMMERSION_ASSESSMENT_CREATION_LINK",
+  },
+  FULL_PREVIEW_EMAIL: {
+    beneficiaryName: "BENEFICIARY_NAME",
+    establishmentRepresentativeName: "ESTABLISHMENT_REPRESENTATIVE_NAME",
+    beneficiaryRepresentativeName: undefined,
+    signatoryName: "SIGNATORY_NAME",
+    magicLink: "MAGIC_LINK",
+    businessName: "BUSINESS_NAME",
+  },
 };
