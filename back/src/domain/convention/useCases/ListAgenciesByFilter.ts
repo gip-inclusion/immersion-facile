@@ -1,7 +1,7 @@
 import {
   activeAgencyStatuses,
   AgencyDto,
-  AgencyIdAndName,
+  AgencyOption,
   ListAgenciesRequestDto,
   listAgenciesByDepartmentCodeRequestSchema,
 } from "shared";
@@ -10,7 +10,7 @@ import { TransactionalUseCase } from "../../core/UseCase";
 
 export class ListAgenciesByFilter extends TransactionalUseCase<
   ListAgenciesRequestDto,
-  AgencyIdAndName[]
+  AgencyOption[]
 > {
   constructor(uowPerformer: UnitOfWorkPerformer) {
     super(uowPerformer);
@@ -21,7 +21,7 @@ export class ListAgenciesByFilter extends TransactionalUseCase<
   public async _execute(
     { departmentCode, name, filter }: ListAgenciesRequestDto,
     uow: UnitOfWork,
-  ): Promise<AgencyIdAndName[]> {
+  ): Promise<AgencyOption[]> {
     const agencies = await uow.agencyRepository.getAgencies({
       filters: {
         name,
@@ -35,7 +35,7 @@ export class ListAgenciesByFilter extends TransactionalUseCase<
   }
 }
 
-const agencyToAgencyWithPositionDto = (config: AgencyDto): AgencyIdAndName => ({
+const agencyToAgencyWithPositionDto = (config: AgencyDto): AgencyOption => ({
   id: config.id,
   name: config.name,
 });

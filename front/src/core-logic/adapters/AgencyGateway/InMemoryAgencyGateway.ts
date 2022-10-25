@@ -6,7 +6,7 @@ import {
   AgencyDto,
   AgencyDtoBuilder,
   AgencyId,
-  AgencyIdAndName,
+  AgencyOption,
   AgencyPublicDisplayDto,
   CreateAgencyDto,
   DepartmentCode,
@@ -78,19 +78,19 @@ export class InMemoryAgencyGateway implements AgencyGateway {
 
   async listAgenciesByDepartmentCode(
     _departmentCode: DepartmentCode,
-  ): Promise<AgencyIdAndName[]> {
+  ): Promise<AgencyOption[]> {
     return values(this._agencies);
   }
 
   async listPeAgencies(
     _departmentCode: DepartmentCode,
-  ): Promise<AgencyIdAndName[]> {
+  ): Promise<AgencyOption[]> {
     return values(this._agencies).filter(propEq("kind", "pole-emploi"));
   }
 
   async listNonPeAgencies(
     _departmentCode: DepartmentCode,
-  ): Promise<AgencyIdAndName[]> {
+  ): Promise<AgencyOption[]> {
     return values(this._agencies).filter(propNotEq("kind", "pole-emploi"));
   }
 
@@ -116,7 +116,7 @@ export class InMemoryAgencyGateway implements AgencyGateway {
 
   listAgenciesByFilter$(
     _filter: ListAgenciesRequestDto,
-  ): Observable<AgencyIdAndName[]> {
+  ): Observable<AgencyOption[]> {
     return of([
       {
         id: "2",

@@ -1,7 +1,7 @@
 import { from, Observable, Subject } from "rxjs";
 import {
   AdminToken,
-  AgencyIdAndName,
+  AgencyOption,
   ConventionDto,
   ConventionDtoBuilder,
   ConventionId,
@@ -31,7 +31,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
     [CONVENTION_DRAFT_TEST.id]: CONVENTION_DRAFT_TEST,
     [CONVENTION_VALIDATED_TEST.id]: CONVENTION_VALIDATED_TEST,
   };
-  private _agencies: { [id: string]: AgencyIdAndName } = {};
+  private _agencies: { [id: string]: AgencyOption } = {};
 
   public convention$ = new Subject<ConventionReadDto | undefined>();
   public conventionSignedResult$ = new Subject<void>();

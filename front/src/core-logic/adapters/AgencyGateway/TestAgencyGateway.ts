@@ -5,7 +5,7 @@ import {
   AdminToken,
   AgencyDto,
   AgencyId,
-  AgencyIdAndName,
+  AgencyOption,
   AgencyPublicDisplayDto,
   CreateAgencyDto,
   DepartmentCode,
@@ -18,12 +18,20 @@ import {
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
 export class TestAgencyGateway implements AgencyGateway {
-  public agencies$ = new Subject<AgencyIdAndName[]>();
+  public agencies$ = new Subject<AgencyOption[]>();
+  public fetchedAgency$ = new Subject<AgencyDto | undefined>();
 
   listAgenciesByFilter$(
     _filter: ListAgenciesRequestDto,
-  ): Observable<AgencyIdAndName[]> {
+  ): Observable<AgencyOption[]> {
     return this.agencies$;
+  }
+
+  getAgencyAdminById$(
+    _agencyId: AgencyId,
+    _adminToken: AdminToken,
+  ): Observable<AgencyDto | undefined> {
+    return this.fetchedAgency$;
   }
 
   getImmersionFacileAgencyId$(): Observable<AgencyId> {
@@ -43,19 +51,19 @@ export class TestAgencyGateway implements AgencyGateway {
 
   async listAgenciesByDepartmentCode(
     _departmentCode: DepartmentCode,
-  ): Promise<AgencyIdAndName[]> {
+  ): Promise<AgencyOption[]> {
     return values(this._agencies);
   }
 
   async listPeAgencies(
     _departmentCode: DepartmentCode,
-  ): Promise<AgencyIdAndName[]> {
+  ): Promise<AgencyOption[]> {
     return values(this._agencies).filter(propEq("kind", "pole-emploi"));
   }
 
   async listNonPeAgencies(
     _departmentCode: DepartmentCode,
-  ): Promise<AgencyIdAndName[]> {
+  ): Promise<AgencyOption[]> {
     return values(this._agencies).filter(propNotEq("kind", "pole-emploi"));
   }
 
@@ -73,12 +81,5 @@ export class TestAgencyGateway implements AgencyGateway {
     const agency = this._agencies[withAgencyId.id];
     if (agency) return toAgencyPublicDisplayDto(agency);
     throw new Error(`Missing agency with id ${withAgencyId.id}.`);
-  }
-
-  getAgencyAdminById$(
-    _agencyId: AgencyId,
-    _adminToken: AdminToken,
-  ): Observable<AgencyDto> {
-    return undefined as unknown as Observable<AgencyDto>;
   }
 }

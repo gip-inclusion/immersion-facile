@@ -21,7 +21,7 @@ import { UploadLogo } from "src/app/components/UploadLogo";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import "src/assets/admin.css";
-import { agencyAdminDetailsSelector } from "src/core-logic/domain/agenciesAdmin/agencyAdminSelector";
+import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
 import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
 import { AddressAutocomplete } from "src/uiComponents/autocomplete/AddressAutocomplete";
 import { FillableList } from "src/uiComponents/form/FillableList";
@@ -32,8 +32,9 @@ import { AgencyAutocomplete } from "./AgencyAutocomplete";
 
 export const EditAgency = () => {
   const selectedAgency: AgencyDto | null = useAppSelector(
-    agencyAdminDetailsSelector,
+    agencyAdminSelectors.agency,
   );
+
   return (
     <>
       <DsfrTitle level={5} text="Editer une agence" />

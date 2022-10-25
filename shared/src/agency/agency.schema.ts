@@ -6,7 +6,7 @@ import { zEmail, zString, zTrimmedString } from "../zodUtils";
 import {
   AgencyDto,
   AgencyId,
-  AgencyIdAndName,
+  AgencyOption,
   AgencyIdResponse,
   AgencyKind,
   agencyKindList,
@@ -30,12 +30,12 @@ export const agencyIdResponseSchema: z.ZodSchema<AgencyIdResponse> = z.union([
   z.object({ success: z.boolean() }),
 ]);
 
-export const agencyIdAndNameSchema: z.ZodSchema<AgencyIdAndName> = z.object({
+export const agencyIdAndNameSchema: z.ZodSchema<AgencyOption> = z.object({
   id: agencyIdSchema,
   name: z.string(),
 });
 
-export const agenciesIdAndNameSchema: z.ZodSchema<AgencyIdAndName[]> = z.array(
+export const agenciesIdAndNameSchema: z.ZodSchema<AgencyOption[]> = z.array(
   agencyIdAndNameSchema,
 );
 

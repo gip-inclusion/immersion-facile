@@ -3,7 +3,7 @@ import {
   AdminToken,
   AgencyDto,
   AgencyId,
-  AgencyIdAndName,
+  AgencyOption,
   AgencyPublicDisplayDto,
   CreateAgencyDto,
   DepartmentCode,
@@ -15,16 +15,16 @@ export interface AgencyGateway {
   addAgency(agency: CreateAgencyDto): Promise<void>;
   listAgenciesByDepartmentCode(
     departmentCode: DepartmentCode,
-  ): Promise<AgencyIdAndName[]>;
-  listNonPeAgencies(departmentCode: DepartmentCode): Promise<AgencyIdAndName[]>;
-  listPeAgencies(departmentCode: DepartmentCode): Promise<AgencyIdAndName[]>;
+  ): Promise<AgencyOption[]>;
+  listNonPeAgencies(departmentCode: DepartmentCode): Promise<AgencyOption[]>;
+  listPeAgencies(departmentCode: DepartmentCode): Promise<AgencyOption[]>;
   listAgenciesNeedingReview(adminToken: AdminToken): Promise<AgencyDto[]>;
   validateAgency(adminToken: AdminToken, agencyId: AgencyId): Promise<void>;
 
   getAgencyAdminById$(
     agencyId: AgencyId,
     adminToken: AdminToken,
-  ): Observable<AgencyDto>;
+  ): Observable<AgencyDto | undefined>;
 
   getAgencyPublicInfoById(
     agencyId: WithAgencyId,
@@ -32,6 +32,6 @@ export interface AgencyGateway {
 
   listAgenciesByFilter$(
     filter: ListAgenciesRequestDto,
-  ): Observable<AgencyIdAndName[]>;
+  ): Observable<AgencyOption[]>;
   getImmersionFacileAgencyId$(): Observable<AgencyId | false>;
 }

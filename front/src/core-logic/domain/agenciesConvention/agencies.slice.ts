@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AgencyIdAndName } from "shared";
+import { AgencyOption } from "shared";
 
-export type AgencyState = AgencyIdAndName[];
+export type AgencyState = AgencyOption[];
 
 const initialState: AgencyState = [];
 
@@ -15,7 +15,7 @@ export const agenciesSlice = createSlice({
     ) => state,
     fetchAgenciesByDepartmentCodeSucceeded: (
       _state,
-      action: PayloadAction<AgencyIdAndName[]>,
+      action: PayloadAction<AgencyOption[]>,
     ) => action.payload,
   },
 });

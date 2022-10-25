@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import type { ConventionDto } from "shared";
 import {
   AgencyId,
-  AgencyIdAndName,
+  AgencyOption,
   DepartmentCode,
   FederatedIdentity,
   isPeConnectIdentity,
@@ -125,7 +125,7 @@ export const AgencySelector = ({
 const isDefaultAgencyOnAgenciesAndEnabled = (
   disabled: boolean | undefined,
   defaultAgencyId: string,
-  agencies: AgencyIdAndName[],
+  agencies: AgencyOption[],
 ) => !disabled && agencies.map((agency) => agency.id).includes(defaultAgencyId);
 
 const agenciesRetriever = ({
@@ -146,12 +146,12 @@ const agenciesRetriever = ({
   // -> for easy revert when new page is ready
 };
 
-const placeholderAgency: AgencyIdAndName = {
+const placeholderAgency: AgencyOption = {
   id: "",
   name: "Veuillez indiquer un code postal",
 };
 
-const emptyAgency: AgencyIdAndName = {
+const emptyAgency: AgencyOption = {
   id: "",
   name: "",
 };

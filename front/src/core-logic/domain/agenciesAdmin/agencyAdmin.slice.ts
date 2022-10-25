@@ -1,23 +1,22 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AgencyDto, AgencyIdAndName } from "shared";
-import { AgencySubmitFeedback } from "src/app/components/agency/AgencySubmitFeedback";
+import { AgencyDto, AgencyId, AgencyOption } from "shared";
 
-interface AgencyAutocompleteState {
+export interface AgencyAdminState {
   agencySearchText: string;
-  agencyOptions: AgencyIdAndName[];
-  selectedAgency: AgencyIdAndName | null;
+  agencyOptions: AgencyOption[];
+  selectedAgencyId: AgencyId | null;
   agency: AgencyDto | null;
   isSearching: boolean;
-  feedback: AgencySubmitFeedback;
+  error: string | null;
 }
 
-const initialState: AgencyAutocompleteState = {
+const initialState: AgencyAdminState = {
   agencySearchText: "",
   agencyOptions: [],
-  selectedAgency: null,
+  selectedAgencyId: null,
   agency: null,
   isSearching: false,
-  feedback: { kind: "idle" },
+  error: null,
 };
 
 export const agencyAdminSlice = createSlice({
@@ -26,17 +25,14 @@ export const agencyAdminSlice = createSlice({
   reducers: {
     setAgencySearchText: (state, action: PayloadAction<string>) => {
       state.agencySearchText = action.payload;
-      state.selectedAgency = null;
-    },
-    searchStarted: (state) => {
       state.isSearching = true;
     },
-    setAgencyOptions: (state, action: PayloadAction<AgencyIdAndName[]>) => {
+    setAgencyOptions: (state, action: PayloadAction<AgencyOption[]>) => {
       state.agencyOptions = action.payload;
       state.isSearching = false;
     },
-    setSelectedAgency: (state, action: PayloadAction<AgencyIdAndName>) => {
-      state.selectedAgency = action.payload;
+    setSelectedAgencyId: (state, action: PayloadAction<AgencyId>) => {
+      state.selectedAgencyId = action.payload;
     },
     setAgency: (state, action: PayloadAction<AgencyDto | null>) => {
       state.agency = action.payload ?? null;

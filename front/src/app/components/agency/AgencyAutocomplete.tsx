@@ -3,23 +3,21 @@ import { Tooltip } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import { prop } from "ramda";
 import React from "react";
-import { AgencyIdAndName } from "shared";
+import { AgencyId, AgencyOption, propEq } from "shared";
 import { useAppSelector } from "src/app/utils/reduxHooks";
-import { agencyAdminSelector } from "src/core-logic/domain/agenciesAdmin/agencyAdminSelector";
+import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
 import { useAgencyAdminAutocompleteEpic } from "src/hooks/agenciesAdmin.hook";
 
 type AgencyAutocompleteProps = {
   title: string;
-  initialValue?: AgencyIdAndName | undefined;
+  initialValue?: AgencyOption | undefined;
   className?: string;
   placeholder: string;
   tooltip?: string;
 };
 
-const isOneOfTheOptionsLabel = (
-  options: AgencyIdAndName[],
-  searchTerm: string,
-) => options.map(prop("name")).includes(searchTerm);
+const isOneOfTheOptionsLabel = (options: AgencyOption[], searchTerm: string) =>
+  options.map(prop("name")).includes(searchTerm);
 
 export const AgencyAutocomplete = ({
   title,
@@ -28,8 +26,8 @@ export const AgencyAutocomplete = ({
   tooltip,
 }: AgencyAutocompleteProps): JSX.Element => {
   // TODO Mutualiser juste l'autocomplete avec les conventions ? Ou passer le selecteur en param du composant
-  const { agencySearchText, isSearching, selectedAgency, agencyOptions } =
-    useAppSelector(agencyAdminSelector);
+  const { agencySearchText, isSearching, selectedAgencyId, agencyOptions } =
+    useAppSelector(agencyAdminSelectors.agencyState);
   const { updateSearchTerm, selectOption } = useAgencyAdminAutocompleteEpic();
 
   const noOptionText =
@@ -40,14 +38,16 @@ export const AgencyAutocomplete = ({
       <Autocomplete
         disablePortal
         filterOptions={(x) => x}
-        options={agencyOptions}
-        value={selectedAgency}
+        options={agencyOptions.map(prop("id"))}
+        value={selectedAgencyId}
         noOptionsText={agencySearchText ? noOptionText : "Saisissez un métier"}
-        getOptionLabel={(option: AgencyIdAndName) => option.name}
-        renderOption={(props, option) => <li {...props}>{option.name}</li>}
-        onChange={(_, selectedAgency: AgencyIdAndName | null) => {
-          if (!selectedAgency) return;
-          selectOption(selectedAgency);
+        getOptionLabel={(option: AgencyId) => option}
+        renderOption={(props, option) => (
+          <li {...props}>{agencyOptions.find(propEq("id", option))}</li>
+        )}
+        onChange={(_, selectedAgencyId: AgencyId | null) => {
+          if (!selectedAgencyId) return;
+          selectOption(selectedAgencyId);
         }}
         onInputChange={(_, newSearchTerm) => {
           if (!isOneOfTheOptionsLabel(agencyOptions, newSearchTerm)) {

@@ -2,7 +2,7 @@ import { values } from "ramda";
 import {
   AgencyDto,
   AgencyId,
-  AgencyIdAndName,
+  AgencyOption,
   AgencyKindFilter,
   AgencyPositionFilter,
   AgencyStatus,
@@ -191,10 +191,7 @@ const isAgencyNotPE = (agency: AgencyDto) => agency.kind !== "pole-emploi";
 
 const sortByNearestFrom =
   (position: GeoPositionDto) =>
-  (
-    a: AgencyIdAndName & WithGeoPosition,
-    b: AgencyIdAndName & WithGeoPosition,
-  ) =>
+  (a: AgencyOption & WithGeoPosition, b: AgencyOption & WithGeoPosition) =>
     distanceBetweenCoordinatesInMeters(
       a.position.lat,
       a.position.lon,

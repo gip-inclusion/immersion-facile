@@ -1,8 +1,8 @@
 import React from "react";
-import { AgencyIdAndName } from "shared";
+import { AgencyOption } from "shared";
 
 export type AgenciesProps = {
-  agencies: AgencyIdAndName[];
+  agencies: AgencyOption[];
 };
 
 export const Agencies = ({ agencies }: AgenciesProps) => (

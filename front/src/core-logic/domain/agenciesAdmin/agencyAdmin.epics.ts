@@ -1,7 +1,7 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { filter, Observable } from "rxjs";
+import { filter } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
-import { AgencyDto, AgencyIdAndName } from "shared";
+import { AgencyId } from "shared";
 import {
   ActionOfSlice,
   AppEpic,
@@ -31,15 +31,14 @@ export const agencyAdminGetDetailsEpic: AppEpic<AgencyAction> = (
   dependencies,
 ) =>
   action$.pipe(
-    filter(agencyAdminSlice.actions.setSelectedAgency.match),
-    switchMap(
-      (action: PayloadAction<AgencyIdAndName>): Observable<AgencyDto> =>
-        dependencies.agencyGateway.getAgencyAdminById$(
-          action.payload.id,
-          state$.value.admin.adminAuth.adminToken ?? "",
-        ),
+    filter(agencyAdminSlice.actions.setSelectedAgencyId.match),
+    switchMap((action: PayloadAction<AgencyId>) =>
+      dependencies.agencyGateway.getAgencyAdminById$(
+        action.payload,
+        state$.value.admin.adminAuth.adminToken ?? "",
+      ),
     ),
-    map(agencyAdminSlice.actions.setAgency),
+    map((agency) => agencyAdminSlice.actions.setAgency(agency ?? null)),
   );
 
 export const agenciesAdminEpics = [

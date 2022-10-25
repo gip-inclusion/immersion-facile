@@ -1,4 +1,4 @@
-import { AgencyIdAndName, expectToEqual } from "shared";
+import { AgencyOption, expectToEqual } from "shared";
 import {
   createTestStore,
   TestDependencies,
@@ -17,13 +17,13 @@ describe("Agencies in store", () => {
   });
 
   it("agencies list should be initialState at start", () => {
-    const expected: AgencyIdAndName[] = [];
+    const expected: AgencyOption[] = [];
     expectToEqual(agenciesSelector(store.getState()), expected);
   });
 
   it("retrieves agencies from API by department code and store in state", () => {
     // Arrange
-    const agenciesFromApi: AgencyIdAndName[] = [
+    const agenciesFromApi: AgencyOption[] = [
       {
         id: "0",
         name: "Agence de Bougoin",

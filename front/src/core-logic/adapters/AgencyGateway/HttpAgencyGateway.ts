@@ -7,7 +7,7 @@ import {
   agenciesSchema,
   AgencyDto,
   AgencyId,
-  AgencyIdAndName,
+  AgencyOption,
   agencyIdResponseSchema,
   agencyImmersionFacileIdRoute,
   AgencyPublicDisplayDto,
@@ -79,7 +79,7 @@ export class HttpAgencyGateway implements AgencyGateway {
 
   public listAgenciesByDepartmentCode(
     departmentCode: DepartmentCode,
-  ): Promise<AgencyIdAndName[]> {
+  ): Promise<AgencyOption[]> {
     const request: ListAgenciesRequestDto = {
       departmentCode,
     };
@@ -88,13 +88,13 @@ export class HttpAgencyGateway implements AgencyGateway {
 
   public listAgenciesByFilter$(
     filter: ListAgenciesRequestDto,
-  ): Observable<AgencyIdAndName[]> {
+  ): Observable<AgencyOption[]> {
     return from(this.getFilteredAgencies(filter));
   }
 
   public listPeAgencies(
     departmentCode: DepartmentCode,
-  ): Promise<AgencyIdAndName[]> {
+  ): Promise<AgencyOption[]> {
     const request: ListAgenciesRequestDto = {
       departmentCode,
       filter: "peOnly",
@@ -104,7 +104,7 @@ export class HttpAgencyGateway implements AgencyGateway {
 
   public listNonPeAgencies(
     departmentCode: DepartmentCode,
-  ): Promise<AgencyIdAndName[]> {
+  ): Promise<AgencyOption[]> {
     const request: ListAgenciesRequestDto = {
       departmentCode,
       filter: "peExcluded",
@@ -146,7 +146,7 @@ export class HttpAgencyGateway implements AgencyGateway {
 
   private async getFilteredAgencies(
     request: ListAgenciesRequestDto,
-  ): Promise<AgencyIdAndName[]> {
+  ): Promise<AgencyOption[]> {
     const response = await this.httpClient.get<unknown>(`/${agenciesRoute}`, {
       params: request,
     });

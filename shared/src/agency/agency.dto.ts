@@ -44,7 +44,7 @@ export const agencyKindList: NotEmptyArray<
   "autre",
 ];
 
-export type AgencyIdAndName = {
+export type AgencyOption = {
   id: AgencyId;
   name: string;
 };

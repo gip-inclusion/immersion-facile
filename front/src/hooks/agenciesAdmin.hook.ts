@@ -1,5 +1,5 @@
 import { useDispatch } from "react-redux";
-import { AgencyIdAndName } from "shared";
+import { AgencyId } from "shared";
 import { agencyAdminSlice } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
 
 export const useAgencyAdminAutocompleteEpic = () => {
@@ -8,7 +8,7 @@ export const useAgencyAdminAutocompleteEpic = () => {
   return {
     updateSearchTerm: (searchTerm: string) =>
       dispatch(agencyAdminSlice.actions.setAgencySearchText(searchTerm)),
-    selectOption: (agencyIdAndName: AgencyIdAndName) =>
-      dispatch(agencyAdminSlice.actions.setSelectedAgency(agencyIdAndName)),
+    selectOption: (agencyId: AgencyId) =>
+      dispatch(agencyAdminSlice.actions.setSelectedAgencyId(agencyId)),
   };
 };
