@@ -73,7 +73,7 @@ export const createHttpClient = <Targets extends Record<string, UnknownTarget>>(
     const handler: Handler = async (handlerParams) => {
       const handler = handlerCreator({
         ...target,
-        url: replacePathWithParams(target.url, handlerParams.urlParams),
+        url: replaceParamsInUrl(target.url, handlerParams.urlParams),
       });
       const { status, responseBody } = await handler(handlerParams);
       return {
@@ -90,7 +90,7 @@ export const createHttpClient = <Targets extends Record<string, UnknownTarget>>(
     };
   }, {} as HttpClient<Targets>);
 
-export const replacePathWithParams = <Path extends string>(
+export const replaceParamsInUrl = <Path extends string>(
   path: Path,
   params: PathParameters<Path> = {} as PathParameters<Path>,
 ): string => {
