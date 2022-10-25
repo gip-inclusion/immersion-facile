@@ -30,8 +30,9 @@ const EntreprisesLogo = () => (
 
 const overFooterCols: OverFooterCols = [
   {
-    title: "Besoin d'aide ?",
-    subtitle: "L’équipe Immersion Facilitée est là pour vous aider.",
+    title: "Contactez-nous",
+    subtitle:
+      "L'équipe Immersion Facilitée vous accompagne pour toute demande spécifique.",
     iconTitle: "fr-icon-account-fill",
     link: {
       label: "Contactez l'équipe",
@@ -41,7 +42,7 @@ const overFooterCols: OverFooterCols = [
   {
     title: "Rejoignez la communauté",
     subtitle:
-      "Rejoignez la communauté d'Immersion Facilitée et suivez nos actualités",
+      "Rejoignez la communauté d'Immersion Facilitée et suivez nos actualités.",
     iconTitle: "fr-icon-links-fill",
     link: {
       label: "Rejoignez-nous sur Linkedin",
@@ -49,9 +50,9 @@ const overFooterCols: OverFooterCols = [
     },
   },
   {
-    title: "Le centre de support",
+    title: "Le centre d'aide'",
     subtitle:
-      "Consultez notre FAQ et trouver les réponses aux questions les plus fréquentes",
+      "Consultez notre FAQ et trouver les réponses aux questions les plus fréquentes.",
     iconTitle: "fr-icon-questionnaire-fill",
     link: {
       label: "Accéder à notre FAQ",
