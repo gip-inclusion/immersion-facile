@@ -20,3 +20,4 @@ export * from "./modal";
 export * from "./crisp-chat";
 export * from "./fixed-stamp";
 export * from "./over-footer";
+export * from "./pe-connect-button";

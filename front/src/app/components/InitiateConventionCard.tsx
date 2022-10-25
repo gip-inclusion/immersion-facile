@@ -4,11 +4,12 @@ import { ButtonHome } from "react-design-system";
 import { Section } from "src/app/components/Section";
 import { deviceRepository } from "src/app/config/dependencies";
 import { ConventionImmersionPageRoute } from "src/app/pages/Convention/ConventionImmersionPage";
-import { PeConnectButton } from "src/app/pages/Convention/PeConnectButton";
+import { PeConnectButton } from "react-design-system/immersionFacile";
 import { EstablishmentSubTitle } from "src/app/pages/home/components/EstablishmentSubTitle";
 import { useRoute } from "src/app/routing/routes";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { useRedirectToConventionWithoutIdentityProvider } from "src/hooks/redirections.hooks";
+import { loginPeConnect } from "shared";
 
 const storeConventionRouteParamsOnDevice = (
   routeParams: ConventionImmersionPageRoute["params"],
@@ -49,6 +50,7 @@ export const InitiateConventionCard = ({
                 if (currentRoute.name === "conventionImmersion")
                   storeConventionRouteParamsOnDevice(currentRoute.params);
               }}
+              peConnectEndpoint={loginPeConnect}
             />
             <a
               className="small mt-1"

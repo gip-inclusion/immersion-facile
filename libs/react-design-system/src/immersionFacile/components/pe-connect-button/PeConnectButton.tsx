@@ -1,20 +1,23 @@
 import React from "react";
-import { loginPeConnect } from "shared";
 import "./PeConnectButton.css";
+
+export type PeConnectButtonProps = {
+  onClick: (e: React.MouseEvent<HTMLAnchorElement>) => void;
+  peConnectEndpoint: string;
+};
 
 export const PeConnectButton = ({
   onClick,
-}: {
-  onClick: (e: React.MouseEvent<HTMLAnchorElement>) => void;
-}) => (
-  <div className="pe-connect flex justify-center">
+  peConnectEndpoint,
+}: PeConnectButtonProps) => (
+  <div className="pe-connect">
     <a
       onClick={onClick}
-      href={`/api/${loginPeConnect}`}
-      className="button-pe-connect"
-      title=""
+      href={`/api/${peConnectEndpoint}`}
+      className="pe-connect__button"
+      title="Connexion avec PE Connect"
     >
-      <img
+      {/* <img
         className="icon-pe-connect"
         src="/img/pe-connect-barre-nav-b.svg"
         alt=""
@@ -27,7 +30,7 @@ export const PeConnectButton = ({
         alt=""
         width="300"
         height="75"
-      />
+      /> */}
       Connexion avec PE Connect
     </a>
   </div>
