@@ -17,20 +17,6 @@ export const PeConnectButton = ({
       className="pe-connect__button"
       title="Connexion avec PE Connect"
     >
-      {/* <img
-        className="icon-pe-connect"
-        src="/img/pe-connect-barre-nav-b.svg"
-        alt=""
-        width="300"
-        height="75"
-      />
-      <img
-        className="icon-pe-connect-hover"
-        src="/img/pe-connect-barre-nav-b-o.svg"
-        alt=""
-        width="300"
-        height="75"
-      /> */}
       Connexion avec PE Connect
     </a>
   </div>
