@@ -32,49 +32,44 @@ export const ImmersionAssessmentPage = ({
     role === "establishment" || role === "establishment-representative";
   return (
     <HeaderFooterLayout>
-      <MainWrapper className="fr-container fr-grid--center">
-        <div className="fr-grid-row fr-grid-row--center">
-          <div className="fr-col-lg-7 fr-px-2w">
-            {!hasRight ? (
+      <MainWrapper layout="boxed">
+        {!hasRight ? (
+          <Notification type="error" title="Erreur">
+            Vous n'êtes pas autorisé a accéder à cette page
+          </Notification>
+        ) : (
+          <>
+            {fetchConventionError && (
               <Notification type="error" title="Erreur">
-                Vous n'êtes pas autorisé a accéder à cette page
+                {fetchConventionError}
               </Notification>
-            ) : (
+            )}
+            {convention && !canCreateAssessment && (
+              <Notification
+                type="error"
+                title="Votre convention n'est pas prête à recevoir un bilan"
+              >
+                Seule une convention entièrement validée peut recevoir un bilan
+              </Notification>
+            )}
+            <Title>
+              Bilan de l'immersion
+              {convention
+                ? ` de ${convention.signatories.beneficiary.firstName} ${convention.signatories.beneficiary.lastName}`
+                : ""}
+            </Title>
+            {canCreateAssessment && (
               <>
-                {fetchConventionError && (
-                  <Notification type="error" title="Erreur">
-                    {fetchConventionError}
-                  </Notification>
-                )}
-                {convention && !canCreateAssessment && (
-                  <Notification
-                    type="error"
-                    title="Votre convention n'est pas prête à recevoir un bilan"
-                  >
-                    Seule une convention entièrement validée peut recevoir un
-                    bilan
-                  </Notification>
-                )}
-                <Title>
-                  Bilan de l'immersion
-                  {convention
-                    ? ` de ${convention.signatories.beneficiary.firstName} ${convention.signatories.beneficiary.lastName}`
-                    : ""}
-                </Title>
-                {canCreateAssessment && (
-                  <>
-                    <ImmersionDescription convention={convention} />
-                    <ImmersionAssessmentForm
-                      convention={convention}
-                      jwt={route.params.jwt}
-                    />
-                  </>
-                )}
+                <ImmersionDescription convention={convention} />
+                <ImmersionAssessmentForm
+                  convention={convention}
+                  jwt={route.params.jwt}
+                />
               </>
             )}
-            {isLoading && <CircularProgress />}
-          </div>
-        </div>
+          </>
+        )}
+        {isLoading && <CircularProgress />}
       </MainWrapper>
     </HeaderFooterLayout>
   );
