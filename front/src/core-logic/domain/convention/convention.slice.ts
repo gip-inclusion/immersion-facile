@@ -169,6 +169,7 @@ export const conventionSlice = createSlice({
 const signatoryRoleToKey: Record<SignatoryRole, keyof Signatories> = {
   "establishment-representative": "establishmentRepresentative",
   beneficiary: "beneficiary",
+  "beneficiary-current-employer": "beneficiaryCurrentEmployer",
   establishment: "establishmentRepresentative",
   "legal-representative": "beneficiaryRepresentative",
   "beneficiary-representative": "beneficiaryRepresentative",

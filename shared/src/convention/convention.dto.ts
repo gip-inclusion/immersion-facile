@@ -3,7 +3,6 @@ import { FederatedIdentity } from "../federatedIdentities/federatedIdentity.dto"
 import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { ScheduleDto } from "../schedule/Schedule.dto";
 import { SiretDto } from "../siret/siret";
-
 import { Role } from "../tokens/MagicLinkPayload";
 import { Flavor } from "../typeFlavors";
 
@@ -74,6 +73,7 @@ export type Signatories = {
   beneficiary: Beneficiary;
   establishmentRepresentative: EstablishmentRepresentative;
   beneficiaryRepresentative?: BeneficiaryRepresentative;
+  beneficiaryCurrentEmployer?: BeneficiaryCurrentEmployer;
 };
 
 export type SignatoryRole =
@@ -83,6 +83,7 @@ export type Signatory = GenericSignatory<SignatoryRole>;
 export const signatoryRoles: SignatoryRole[] = [
   "beneficiary",
   "beneficiary-representative",
+  "beneficiary-current-employer",
   "legal-representative", // legacy, now named : beneficiary-representative
   "establishment", // legacy, now named : establishment-representative
   "establishment-representative",
@@ -106,6 +107,13 @@ export type Beneficiary = GenericSignatory<"beneficiary"> & {
   federatedIdentity?: FederatedIdentity;
 };
 
+export type BeneficiaryRepresentative = GenericSignatory<
+  "beneficiary-representative" | "legal-representative"
+>;
+
+export type BeneficiaryCurrentEmployer =
+  GenericSignatory<"beneficiary-current-employer">;
+
 export type EstablishmentRepresentative = GenericSignatory<
   "establishment" | "establishment-representative"
 >;
@@ -115,10 +123,6 @@ export type EstablishmentTutor = GenericActor<
 > & {
   job: string;
 };
-
-export type BeneficiaryRepresentative = GenericSignatory<
-  "beneficiary-representative" | "legal-representative"
->;
 
 export type ConventionDto = ConventionDtoWithoutExternalId & {
   externalId: ConventionExternalId;

@@ -31,38 +31,34 @@ export class UpdateConvention extends TransactionalUseCase<
   inputSchema = updateConventionRequestSchema;
 
   public async _execute(
-    params: UpdateConventionRequestDto,
+    { id, convention }: UpdateConventionRequestDto,
     uow: UnitOfWork,
   ): Promise<WithConventionId> {
     const minimalValidStatus: ConventionStatus = "READY_TO_SIGN";
 
-    if (
-      // params.convention.status != "DRAFT" &&
-      params.convention.status != minimalValidStatus
-    ) {
+    if (convention.status !== minimalValidStatus)
       throw new ForbiddenError(
-        `Convention ${params.convention.id} with modifications should have status READY_TO_SIGN`,
+        `Convention ${convention.id} with modifications should have status ${minimalValidStatus}`,
       );
-    }
 
-    const conventionFromRepo = await uow.conventionRepository.getById(
-      params.id,
-    );
+    const conventionFromRepo = await uow.conventionRepository.getById(id);
+
     if (!conventionFromRepo)
-      throw new NotFoundError(`Convention with id ${params.id} was not found`);
-
+      throw new NotFoundError(`Convention with id ${id} was not found`);
     if (conventionFromRepo.status != "DRAFT") {
       throw new BadRequestError(
         `Convention ${conventionFromRepo.id} cannot be modified as it has status ${conventionFromRepo.status}`,
       );
     }
 
+    // console.log(convention.signatories);
+
     await Promise.all([
-      uow.conventionRepository.update(params.convention),
+      uow.conventionRepository.update(convention),
       uow.outboxRepository.save(
         this.createNewEvent({
           topic: "ConventionSubmittedAfterModification",
-          payload: params.convention,
+          payload: convention,
         }),
       ),
     ]);

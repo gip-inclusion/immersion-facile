@@ -36,6 +36,7 @@ import {
   UpdateConventionStatusRequestDto,
   WithConventionId,
   EstablishmentRepresentative,
+  BeneficiaryCurrentEmployer,
 } from "./convention.dto";
 import {
   conventionEmailCheck,
@@ -94,6 +95,13 @@ const beneficiaryRepresentativeSchema: z.Schema<BeneficiaryRepresentative> =
     }),
   );
 
+const beneficiaryCurrentEmployerSchema: z.Schema<BeneficiaryCurrentEmployer> =
+  signatorySchema.merge(
+    z.object({
+      role: z.enum(["beneficiary-current-employer"]),
+    }),
+  );
+
 const conventionWithoutExternalIdZObject = z.object({
   id: conventionIdSchema,
   externalId: externalConventionIdSchema.optional(),
@@ -128,6 +136,7 @@ const conventionWithoutExternalIdZObject = z.object({
     beneficiary: beneficiarySchema,
     establishmentRepresentative: establishmentRepresentativeSchema,
     beneficiaryRepresentative: beneficiaryRepresentativeSchema.optional(),
+    beneficiaryCurrentEmployer: beneficiaryCurrentEmployerSchema.optional(),
   }),
   establishmentTutor: establishmentTutorSchema,
 });

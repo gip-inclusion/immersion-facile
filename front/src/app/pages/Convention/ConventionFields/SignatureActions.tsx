@@ -24,6 +24,12 @@ const processedDataBySignatoryRole: Record<
     fieldName: getConventionFieldName("signatories.beneficiary.signedAt"),
     signatoryFunction: "bénéficiaire de l'immersion",
   },
+  "beneficiary-current-employer": {
+    fieldName: getConventionFieldName(
+      "signatories.beneficiaryCurrentEmployer.signedAt",
+    ),
+    signatoryFunction: "employeur actuel du bénéficiaire",
+  },
   establishment: {
     fieldName: getConventionFieldName(
       "signatories.establishmentRepresentative.signedAt",

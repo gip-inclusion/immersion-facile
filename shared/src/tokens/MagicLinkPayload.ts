@@ -24,6 +24,7 @@ export const allRoles = [
   "beneficiary",
   "legal-representative",
   "beneficiary-representative",
+  "beneficiary-current-employer",
   "establishment",
   "establishment-representative",
   "establishment-tutor",

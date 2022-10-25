@@ -15,6 +15,7 @@ import {
   BeneficiaryRepresentative,
   EstablishmentTutor,
   EstablishmentRepresentative,
+  BeneficiaryCurrentEmployer,
 } from "./convention.dto";
 
 export const DEMANDE_IMMERSION_ID = "40400404-9c0b-bbbb-bb6d-6bb9bd38bbbb";
@@ -114,8 +115,8 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     return new ConventionDtoBuilder({
       ...this.dto,
       signatories: {
+        ...this.dto.signatories,
         beneficiary,
-        establishmentRepresentative: this.establishmentRepresentative,
       },
     });
   }
@@ -126,11 +127,22 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     return new ConventionDtoBuilder({
       ...this.dto,
       signatories: {
-        beneficiary: this.beneficiary,
-        establishmentRepresentative: this.establishmentRepresentative,
+        ...this.dto.signatories,
         beneficiaryRepresentative,
       },
     });
+  }
+  public withBeneficiaryCurentEmployer(
+    beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer,
+  ): ConventionDtoBuilder {
+    const dtoBuilder = new ConventionDtoBuilder({
+      ...this.dto,
+      signatories: {
+        ...this.dto.signatories,
+        beneficiaryCurrentEmployer,
+      },
+    });
+    return dtoBuilder;
   }
 
   public withEstablishmentRepresentative(
@@ -139,8 +151,7 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     return new ConventionDtoBuilder({
       ...this.dto,
       signatories: {
-        beneficiary: this.beneficiary,
-        beneficiaryRepresentative: this.beneficiaryRepresentative,
+        ...this.dto.signatories,
         establishmentRepresentative,
       },
     });
@@ -339,6 +350,10 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
       ...this.dto,
       signatories: {
         beneficiary: { ...this.beneficiary, signedAt: undefined },
+        beneficiaryCurrentEmployer: this.beneficiaryCurrentEmployer && {
+          ...this.beneficiaryCurrentEmployer,
+          signedAt: undefined,
+        },
         establishmentRepresentative: {
           ...this.establishmentRepresentative,
           signedAt: undefined,
@@ -415,6 +430,12 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     | BeneficiaryRepresentative
     | undefined {
     return this.dto.signatories.beneficiaryRepresentative;
+  }
+
+  private get beneficiaryCurrentEmployer():
+    | BeneficiaryCurrentEmployer
+    | undefined {
+    return this.dto.signatories.beneficiaryCurrentEmployer;
   }
 
   public build() {

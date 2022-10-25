@@ -72,16 +72,25 @@ export const signatoryDataFromConvention = (
     ),
   };
 
-  const getBeneficiaryRepresentative = (): SignatoryData => {
-    if (!convention.signatories.beneficiaryRepresentative)
-      return { signatory: null, signedAtFieldName: null };
-    return {
-      signatory: convention.signatories.beneficiaryRepresentative,
-      signedAtFieldName: getConventionFieldName(
-        "signatories.beneficiaryRepresentative.signedAt",
-      ),
-    };
-  };
+  const getBeneficiaryCurrentEmployer = (): SignatoryData =>
+    convention.signatories.beneficiaryCurrentEmployer
+      ? {
+          signatory: convention.signatories.beneficiaryCurrentEmployer,
+          signedAtFieldName: getConventionFieldName(
+            "signatories.beneficiaryCurrentEmployer.signedAt",
+          ),
+        }
+      : { signatory: null, signedAtFieldName: null };
+
+  const getBeneficiaryRepresentative = (): SignatoryData =>
+    convention.signatories.beneficiaryRepresentative
+      ? {
+          signatory: convention.signatories.beneficiaryRepresentative,
+          signedAtFieldName: getConventionFieldName(
+            "signatories.beneficiaryRepresentative.signedAt",
+          ),
+        }
+      : { signatory: null, signedAtFieldName: null };
 
   const dataByRole: Record<
     SignatoryRole,
@@ -91,6 +100,7 @@ export const signatoryDataFromConvention = (
     }
   > = {
     beneficiary,
+    "beneficiary-current-employer": getBeneficiaryCurrentEmployer(),
     "beneficiary-representative": getBeneficiaryRepresentative(),
     "legal-representative": getBeneficiaryRepresentative(),
     establishment: establishmentRepresentative,

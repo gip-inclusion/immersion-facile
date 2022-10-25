@@ -159,6 +159,33 @@ describe("Update Convention", () => {
       });
       expect(conventionRepository.conventions).toEqual([updatedConvention]);
     });
+    it("With beneficiary current employer", async () => {
+      const storedConvention = new ConventionDtoBuilder()
+        .withStatus("DRAFT")
+        .build();
+
+      conventionRepository.setConventions({
+        [storedConvention.id]: storedConvention,
+      });
+
+      //we would expect READY_TO_SIGN to be the most frequent case of previous state that we want to prevent here. Not testing all the possible statuses.
+      const updatedConvention = new ConventionDtoBuilder(storedConvention)
+        .withStatus("READY_TO_SIGN")
+        .withBeneficiaryCurentEmployer({
+          role: "beneficiary-current-employer",
+          firstName: "Danny",
+          lastName: "Clover",
+          email: "danny@mail.com",
+          phone: "0011223344",
+        })
+        .build();
+
+      await updateConvention.execute({
+        id: updatedConvention.id,
+        convention: updatedConvention,
+      });
+      expect(conventionRepository.conventions).toEqual([updatedConvention]);
+    });
   });
 
   describe("Status validation", () => {
