@@ -1,8 +1,9 @@
 import { EmailType, TemplatedEmail } from "shared";
 import { advices } from "./components/email/advices";
-import { defaultConventionFinalLegals } from "./components/email/legals";
+import { defaultConventionFinalLegals } from "./components/email";
 
 type CreateEmailVariable<P> = (params: P) => {
+  subject: string;
   greetings?: string;
   content?: string;
   highlight?: string;
@@ -15,8 +16,6 @@ type CreateEmailVariable<P> = (params: P) => {
   };
 };
 
-type CreateEmailSubject<P> = (params: P) => string;
-
 const defaultSignature = `
     Bonne journée,
     L'équipe Immersion Facilitée
@@ -24,7 +23,6 @@ const defaultSignature = `
 
 export const templateByName: {
   [K in EmailType]: {
-    subject: CreateEmailSubject<Extract<TemplatedEmail, { type: K }>["params"]>;
     niceName: string;
     createEmailVariables: CreateEmailVariable<
       Extract<TemplatedEmail, { type: K }>["params"]
@@ -33,9 +31,9 @@ export const templateByName: {
   };
 } = {
   AGENCY_WAS_ACTIVATED: {
-    subject: () => `Immersion Facilitée : Votre structure a été activée`,
     niceName: "Activation agence",
     createEmailVariables: ({ agencyName, agencyLogoUrl }) => ({
+      subject: `Immersion Facilitée : Votre structure a été activée`,
       greetings: "Bonjour,",
       content: `<strong>Votre structure prescriptrice d'immersion est activée !</strong> 
 
@@ -47,10 +45,10 @@ export const templateByName: {
     }),
   },
   NEW_CONVENTION_BENEFICIARY_CONFIRMATION: {
-    subject: () =>
-      "Immersion Facilitée : votre confirmation pour votre demande d'immersion est enregistrée",
     niceName: "Confirmation bénéficiaire nouvelle convention",
     createEmailVariables: ({ firstName, lastName }) => ({
+      subject:
+        "Immersion Facilitée : votre confirmation pour votre demande d'immersion est enregistrée",
       greetings: `Bonjour ${firstName} ${lastName},`,
       content: `
         Merci d'avoir confirmé votre demande d'immersion. Elle va être transmise à votre conseiller référent. 
@@ -62,14 +60,14 @@ export const templateByName: {
     tags: ["lala"],
   },
   NEW_CONVENTION_ESTABLISHMENT_TUTOR_CONFIRMATION: {
-    subject: () =>
-      "Immersion Facilitée : Demande d'immersion professionnelle confirmée",
     niceName: "Confirmation tuteur nouvelle convention",
     createEmailVariables: ({
       establishmentTutorName,
       beneficiaryFirstName,
       beneficiaryLastName,
     }) => ({
+      subject:
+        "Immersion Facilitée : Demande d'immersion professionnelle confirmée",
       greetings: `Bonjour ${establishmentTutorName},`,
       content: `
       Vous venez de confirmer la demande d'immersion professionnelle pour ${beneficiaryFirstName} ${beneficiaryLastName}  au sein de votre entreprise.      
@@ -83,8 +81,6 @@ export const templateByName: {
     }),
   },
   NEW_CONVENTION_AGENCY_NOTIFICATION: {
-    subject: ({ businessName, firstName, lastName, agencyName }) =>
-      `Immersion Facilitée : une demande de convention d'immersion est déposée : ${firstName}, ${lastName} - ${businessName} - ${agencyName}.`,
     niceName: "Notification agence nouvelle convention",
     createEmailVariables: ({
       magicLink,
@@ -95,6 +91,7 @@ export const templateByName: {
       businessName,
       agencyName,
     }) => ({
+      subject: `Immersion Facilitée : une demande de convention d'immersion est déposée : ${firstName}, ${lastName} - ${businessName} - ${agencyName}.`,
       greetings: "Bonjour,",
       content: `
       <strong>Une nouvelle demande d'immersion a été enregistrée.</strong>      ­
@@ -122,8 +119,6 @@ export const templateByName: {
     }),
   },
   VALIDATED_CONVENTION_FINAL_CONFIRMATION: {
-    subject: ({ immersionAppellationLabel, businessName }) =>
-      `Immersion facilitée : Validation et convention de l'immersion pour observer l'activité de ${immersionAppellationLabel} au sein de ${businessName}`,
     niceName: "Convention finale validée",
     createEmailVariables: ({
       beneficiaryFirstName,
@@ -144,6 +139,7 @@ export const templateByName: {
       sanitaryPrevention,
       individualProtection,
     }) => ({
+      subject: `Immersion facilitée : Validation et convention de l'immersion pour observer l'activité de ${immersionAppellationLabel} au sein de ${businessName}`,
       greetings: "Bonjour,",
       content: `
       Bonne nouvelle ! 
@@ -197,8 +193,6 @@ export const templateByName: {
     }),
   },
   POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED: {
-    subject: ({ beneficiaryFirstName, beneficiaryLastName }) =>
-      `Immersion Facilitée : la demande de convention d'immersion envoyée par ${beneficiaryFirstName} ${beneficiaryLastName} est totalement signée. A vous de la valider !`,
     niceName: "Notification de convention signée au conseiller pole-emploi lié",
     createEmailVariables: ({
       beneficiaryEmail,
@@ -212,6 +206,7 @@ export const templateByName: {
       dateStart,
       immersionAddress,
     }) => ({
+      subject: `Immersion Facilitée : la demande de convention d'immersion envoyée par ${beneficiaryFirstName} ${beneficiaryLastName} est totalement signée. A vous de la valider !`,
       greetings: `Bonjour ${advisorFirstName} ${advisorLastName},`,
       content: `
       <strong>La demande d'immersion de ${beneficiaryFirstName} ${beneficiaryLastName} est signée. 
@@ -238,8 +233,6 @@ export const templateByName: {
     }),
   },
   POLE_EMPLOI_ADVISOR_ON_CONVENTION_ASSOCIATION: {
-    subject: ({ beneficiaryFirstName, beneficiaryLastName }) =>
-      `Immersion Facilitée : une demande de convention d'immersion vous est directement adressée par: ${beneficiaryFirstName} ${beneficiaryLastName}`,
     niceName:
       "Notification de nouvelle convention au conseiller pole-emploi lié",
     createEmailVariables: ({
@@ -254,6 +247,7 @@ export const templateByName: {
       businessName,
       immersionAddress,
     }) => ({
+      subject: `Immersion Facilitée : une demande de convention d'immersion vous est directement adressée par: ${beneficiaryFirstName} ${beneficiaryLastName}`,
       greetings: `Bonjour ${advisorFirstName} ${advisorLastName},`,
       content: `
       <strong>Une nouvelle demande d'immersion a été enregistrée.</strong>
@@ -297,10 +291,9 @@ export const templateByName: {
     }),
   },
   REJECTED_CONVENTION_NOTIFICATION: {
-    subject: ({ immersionProfession, businessName }) =>
-      `Refus de la demande d'immersion pour observer l'activité de ${immersionProfession} au sein de ${businessName}`,
     niceName: "Notification de convention rejetée",
     createEmailVariables: ({
+      immersionProfession,
       beneficiaryFirstName,
       beneficiaryLastName,
       rejectionReason,
@@ -308,6 +301,7 @@ export const templateByName: {
       businessName,
       signature,
     }) => ({
+      subject: `Refus de la demande d'immersion pour observer l'activité de ${immersionProfession} au sein de ${businessName}`,
       greetings: "Bonjour,",
       content: `
       Nous vous informons que la demande d'immersion professionnelle de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName} a été refusée par ${agency}.
@@ -322,8 +316,6 @@ export const templateByName: {
     }),
   },
   CONVENTION_MODIFICATION_REQUEST_NOTIFICATION: {
-    subject: () =>
-      "Immersion Facilitée : veuillez modifier cette demande d'immersion",
     niceName: "Requête demande de modification de convention",
     createEmailVariables: ({
       agency,
@@ -334,6 +326,8 @@ export const templateByName: {
       magicLink,
       signature,
     }) => ({
+      subject:
+        "Immersion Facilitée : veuillez modifier cette demande d'immersion",
       greetings: "Bonjour,",
       content: `${agency} vous informe que la demande d'immersion de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName} nécessite d'être modifiée pour la raison suivante :
       ${reason}`,
@@ -352,8 +346,6 @@ export const templateByName: {
     }),
   },
   NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION: {
-    subject: ({ beneficiaryFirstName, beneficiaryLastName, businessName }) =>
-      `Demande d'immersion à étudier: ${beneficiaryFirstName} ${beneficiaryLastName} - ${businessName}`,
     niceName: "Examen de la convention",
     createEmailVariables: ({
       beneficiaryFirstName,
@@ -362,6 +354,7 @@ export const templateByName: {
       businessName,
       magicLink,
     }) => ({
+      subject: `Demande d'immersion à étudier: ${beneficiaryFirstName} ${beneficiaryLastName} - ${businessName}`,
       greetings: "Bonjour,",
       content: `
       <strong>Une nouvelle demande d'immersion a été enregistrée.</strong>
@@ -378,10 +371,10 @@ export const templateByName: {
     }),
   },
   MAGIC_LINK_RENEWAL: {
-    subject: () =>
-      "Immersion Facilitée : voici votre nouveau lien magique pour accéder à la demande d'immersion",
     niceName: "Renouvellement de lien magique",
     createEmailVariables: ({ magicLink }) => ({
+      subject:
+        "Immersion Facilitée : voici votre nouveau lien magique pour accéder à la demande d'immersion",
       greetings: "Bonjour,",
       content: `
       Vous venez de demander le renouvellement d'un lien pour accéder à une demande d'immersion. Veuillez le trouver ci-dessous :
@@ -396,8 +389,6 @@ export const templateByName: {
     }),
   },
   BENEFICIARY_OR_ESTABLISHMENT_REPRESENTATIVE_ALREADY_SIGNED_NOTIFICATION: {
-    subject: () =>
-      "Immersion Facilitée : à vous de confirmer votre demande de convention",
     niceName: "Notification de signature de l'autre signataire",
     createEmailVariables: ({
       beneficiaryFirstName,
@@ -408,6 +399,8 @@ export const templateByName: {
       existingSignatureName,
       magicLink,
     }) => ({
+      subject:
+        "Immersion Facilitée : à vous de confirmer votre demande de convention",
       greetings: "Bonjour,",
       content: `
       La demande de convention pour l'immersion de ${beneficiaryFirstName} ${beneficiaryLastName} pour le métier de ${immersionProfession} dans l'entreprise ${businessName} encadré par ${establishmentRepresentativeName} vient d'être signée par ${existingSignatureName}.
@@ -428,7 +421,6 @@ export const templateByName: {
     }),
   },
   NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE: {
-    subject: () => "Immersion Facilitée : Confirmez une demande d'immersion",
     niceName: "Demande de signature pour confirmation de convention",
     createEmailVariables: ({
       signatoryName,
@@ -438,6 +430,7 @@ export const templateByName: {
       beneficiaryRepresentativeName,
       magicLink,
     }) => ({
+      subject: "Immersion Facilitée : Confirmez une demande d'immersion",
       greetings: `Bonjour ${signatoryName},`,
       content: `Une demande de convention d'immersion vient d'être enregistrée. Vous devez maintenant la confirmer.
         
@@ -463,8 +456,6 @@ export const templateByName: {
     }),
   },
   CONTACT_BY_EMAIL_REQUEST: {
-    subject: ({ jobLabel }) =>
-      `Immersion Facilitée : un candidat vous contacte pour une demande d'immersion pour le métier de ${jobLabel}`,
     niceName: "Mise en relation par mail",
     createEmailVariables: ({
       contactFirstName,
@@ -476,6 +467,7 @@ export const templateByName: {
       businessName,
       message,
     }) => ({
+      subject: `Immersion Facilitée : un candidat vous contacte pour une demande d'immersion pour le métier de ${jobLabel}`,
       greetings: `Bonjour ${contactFirstName} ${contactLastName},`,
       content: `
       ${potentialBeneficiaryFirstName} ${potentialBeneficiaryLastName} cherche à vous contacter pour une demande d'immersion. 
@@ -506,8 +498,6 @@ export const templateByName: {
     }),
   },
   CONTACT_BY_PHONE_INSTRUCTIONS: {
-    subject: () =>
-      `Immersion Facilitée : coordonnées téléphoniques pour faire votre demande d'immersion`,
     niceName: "Instructions de mise en contact par téléphone",
     createEmailVariables: ({
       businessName,
@@ -517,6 +507,7 @@ export const templateByName: {
       potentialBeneficiaryFirstName,
       potentialBeneficiaryLastName,
     }) => ({
+      subject: `Immersion Facilitée : coordonnées téléphoniques pour faire votre demande d'immersion`,
       greetings: `Bonjour ${potentialBeneficiaryFirstName} ${potentialBeneficiaryLastName},`,
       content: `
       Vous avez manifesté de l’intérêt pour réaliser une immersion professionnelle au sein de l’entreprise ${businessName}.
@@ -534,8 +525,6 @@ export const templateByName: {
     }),
   },
   CONTACT_IN_PERSON_INSTRUCTIONS: {
-    subject: () =>
-      "Immersion Facilitée : coordonnées de l'entreprise pour faire votre demande d'immersion",
     niceName: "Instructions de mise en contact en personne",
     createEmailVariables: ({
       potentialBeneficiaryFirstName,
@@ -545,6 +534,8 @@ export const templateByName: {
       businessAddress,
       businessName,
     }) => ({
+      subject:
+        "Immersion Facilitée : coordonnées de l'entreprise pour faire votre demande d'immersion",
       greetings: `Bonjour ${potentialBeneficiaryFirstName} ${potentialBeneficiaryLastName},`,
       content: `Vous avez manifesté de l’intérêt pour réaliser une immersion professionnelle au sein de l’entreprise ${businessName}.
 
@@ -560,10 +551,10 @@ export const templateByName: {
     }),
   },
   SHARE_DRAFT_CONVENTION_BY_LINK: {
-    subject: () =>
-      "Immersion Facilitée : Une demande de convention préremplie vous est transmise pour que vous la complétiez",
     niceName: "Partager le formulaire de convention par lien",
     createEmailVariables: ({ additionalDetails, conventionFormUrl }) => ({
+      subject:
+        "Immersion Facilitée : Une demande de convention préremplie vous est transmise pour que vous la complétiez",
       greetings: "Bonjour,",
       content: `
         <strong>Une demande de convention d'immersion doit être complétée :</strong>
@@ -577,17 +568,17 @@ export const templateByName: {
     }),
   },
   SUGGEST_EDIT_FORM_ESTABLISHMENT: {
-    subject: () => "TODO",
     niceName: "[KO] Suggestion de mise à jour d'etablissement",
     createEmailVariables: () => ({
+      subject: "TODO",
       content: "TODO",
     }),
   },
   EDIT_FORM_ESTABLISHMENT_LINK: {
-    subject: () =>
-      "Immersion Facilitée : Modification de la fiche de votre entreprise",
     niceName: "Lien d'édition du formulaire d'établissement",
     createEmailVariables: ({ editFrontUrl }) => ({
+      subject:
+        "Immersion Facilitée : Modification de la fiche de votre entreprise",
       greetings: "Bonjour,",
       content: `
       Vous avez demandé à modifier les informations concernant votre entreprise. 
@@ -603,14 +594,13 @@ export const templateByName: {
     }),
   },
   NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION: {
-    subject: ({ businessName }) =>
-      `Confirmation de création de votre établissement ${businessName} pour accueillir des immersions`,
     niceName: "Contact enregistré de création d'un nouveau établissement",
     createEmailVariables: ({
       businessName,
       contactFirstName,
       contactLastName,
     }) => ({
+      subject: `Confirmation de création de votre établissement ${businessName} pour accueillir des immersions`,
       greetings: "Bonjour,",
       content: `
       <strong>Félicitations !</strong>
@@ -633,7 +623,6 @@ export const templateByName: {
     }),
   },
   CREATE_IMMERSION_ASSESSMENT: {
-    subject: () => "Immersion Facilitée : Comment s'est déroulée l'immersion ?",
     niceName: "Lien de creation du bilan",
     createEmailVariables: ({
       establishmentTutorName,
@@ -641,6 +630,7 @@ export const templateByName: {
       beneficiaryLastName,
       immersionAssessmentCreationLink,
     }) => ({
+      subject: "Immersion Facilitée : Comment s'est déroulée l'immersion ?",
       greetings: `Bonjour ${establishmentTutorName},`,
       content: `
       L'immersion  professionnelle de {{params.BENEFICIARY_FIRST_NAME}} {{params.BENEFICIARY_LAST_NAME}} au sein de votre entreprise est en passe de s'achever. 
@@ -663,9 +653,9 @@ export const templateByName: {
     }),
   },
   FULL_PREVIEW_EMAIL: {
-    subject: () => "Test contenant toutes les blocs email",
     niceName: "Preview email complet (tous les blocs)",
     createEmailVariables: ({ beneficiaryName }) => ({
+      subject: "Test contenant toutes les blocs email",
       greetings: `Bonjour ${beneficiaryName}`,
       content: `Merci d'avoir confirmé votre demande d'immersion. Elle va être transmise à votre conseiller référent.
       

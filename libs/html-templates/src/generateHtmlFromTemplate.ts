@@ -32,9 +32,10 @@ export const generateHtmlFromTemplate = <N extends keyof TemplateByName>(
   params: Parameters<TemplateByName[N]["createEmailVariables"]>[0],
   options: GenerateHtmlOptions = {},
 ): { subject: string; htmlContent: string; tags?: string[] } => {
-  const { subject, createEmailVariables, tags } = templateByName[templateName];
+  const { createEmailVariables, tags } = templateByName[templateName];
   const emailRecipient = "test@test.com";
   const {
+    subject,
     agencyLogoUrl,
     greetings,
     content,
@@ -43,7 +44,7 @@ export const generateHtmlFromTemplate = <N extends keyof TemplateByName>(
     subContent,
     legals,
   } = createEmailVariables(params as any);
-  const formattedSubject = subject(params as any);
+
   const doctype =
     '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
   const templateData: {
@@ -51,9 +52,9 @@ export const generateHtmlFromTemplate = <N extends keyof TemplateByName>(
     htmlContent: string;
     tags?: string[];
   } = {
-    subject: formattedSubject,
+    subject,
     htmlContent: ignoreTabs(`${options.skipHead ? "" : doctype}
-        <html lang="fr">${options.skipHead ? "" : renderHead(formattedSubject)}
+        <html lang="fr">${options.skipHead ? "" : renderHead(subject)}
           <body>
             <table width="600" align="center" style="margin-top: 20px">
               ${[
@@ -69,7 +70,6 @@ export const generateHtmlFromTemplate = <N extends keyof TemplateByName>(
                 .map((chunk) => renderHTMLRow(chunk))
                 .join("")}       
             </table>
-            
           </body>
         </html>
       `),

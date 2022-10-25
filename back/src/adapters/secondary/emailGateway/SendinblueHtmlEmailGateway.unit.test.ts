@@ -217,9 +217,8 @@ describe("SendingBlueHtmlEmailGateway unit", () => {
       </table>
       </td>
       </tr>
-
+      
       </table>
-
       </body>
       </html>
       `),
