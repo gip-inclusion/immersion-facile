@@ -50,7 +50,7 @@ const overFooterCols: OverFooterCols = [
     },
   },
   {
-    title: "Le centre d'aide'",
+    title: "Le centre d'aide",
     subtitle:
       "Consultez notre FAQ et trouver les réponses aux questions les plus fréquentes.",
     iconTitle: "fr-icon-questionnaire-fill",
