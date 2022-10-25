@@ -23,7 +23,7 @@ export const MainWrapper = ({
       ? `${className} ${spacing}`
       : `fr-main-wrapper fr-container fr-grid--center ${className}`;
   return (
-    <main className={classNameValue}>
+    <main className={classNameValue} id="main-content">
       {layout === "boxed" && (
         <div className="fr-grid-row fr-grid-row--center">
           <div className="fr-col-lg-7 fr-px-2w">{children}</div>
