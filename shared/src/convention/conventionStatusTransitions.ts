@@ -10,6 +10,7 @@ const validSignatoryRoles: Role[] = [
   "beneficiary",
   "establishment",
   "beneficiary-representative",
+  "beneficiary-current-employer",
   "establishment-representative",
   "legal-representative",
 ];

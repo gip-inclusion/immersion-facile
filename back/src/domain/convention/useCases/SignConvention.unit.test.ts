@@ -69,6 +69,7 @@ describe("Sign convention", () => {
   const [allowedToSignRoles, forbiddenToSignRoles] =
     splitCasesBetweenPassingAndFailing<Role>(allRoles, [
       "beneficiary",
+      "beneficiary-current-employer",
       "establishment-representative",
       "establishment",
       "legal-representative",
@@ -83,7 +84,7 @@ describe("Sign convention", () => {
           role,
         } as ConventionMagicLinkPayload),
         new ForbiddenError(
-          "Only Beneficiary, his legal representative or the establishment representative are allowed to sign convention",
+          "Only Beneficiary, his current employer, his legal representative or the establishment representative are allowed to sign convention",
         ),
       );
     },
@@ -151,6 +152,10 @@ describe("Sign convention", () => {
               : undefined,
           beneficiarySignedAt:
             role === "beneficiary" ? signedAt.toISOString() : undefined,
+          beneficiaryCurrentEmployerSignedAt:
+            role === "beneficiary-current-employer"
+              ? signedAt.toISOString()
+              : undefined,
           beneficiaryRepresentativeSignedAt:
             role === "beneficiary-representative" ||
             role === "legal-representative"
@@ -310,10 +315,12 @@ const makeSignatories = (
     establishmentRepresentativeSignedAt,
     beneficiarySignedAt,
     beneficiaryRepresentativeSignedAt,
+    beneficiaryCurrentEmployerSignedAt,
   }: {
     establishmentRepresentativeSignedAt?: string;
     beneficiarySignedAt?: string;
     beneficiaryRepresentativeSignedAt?: string;
+    beneficiaryCurrentEmployerSignedAt?: string;
   },
 ): Signatories => ({
   ...convention.signatories,
@@ -329,6 +336,12 @@ const makeSignatories = (
           signedAt: beneficiaryRepresentativeSignedAt,
         }
       : convention.signatories.beneficiaryRepresentative,
+  beneficiaryCurrentEmployer: convention.signatories.beneficiaryCurrentEmployer
+    ? {
+        ...convention.signatories.beneficiaryCurrentEmployer,
+        signedAt: beneficiaryCurrentEmployerSignedAt,
+      }
+    : convention.signatories.beneficiaryCurrentEmployer,
   establishmentRepresentative: {
     ...convention.signatories.establishmentRepresentative,
     signedAt: establishmentRepresentativeSignedAt,

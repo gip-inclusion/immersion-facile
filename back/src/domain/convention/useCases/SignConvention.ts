@@ -34,12 +34,14 @@ const roleAllowToSign: Role[] = [
   "establishment-representative",
   "legal-representative",
   "beneficiary-representative",
+  "beneficiary-current-employer",
 ];
 const isAllowedToSign = (
   role: Role,
 ): role is ExtractFromExisting<
   Role,
   | "beneficiary"
+  | "beneficiary-current-employer"
   | "establishment"
   | "establishment-representative"
   | "legal-representative"
@@ -69,7 +71,7 @@ export class SignConvention extends TransactionalUseCase<
 
     if (!isAllowedToSign(role))
       throw new ForbiddenError(
-        "Only Beneficiary, his legal representative or the establishment representative are allowed to sign convention",
+        "Only Beneficiary, his current employer, his legal representative or the establishment representative are allowed to sign convention",
       );
 
     const initialConvention = await uow.conventionRepository.getById(

@@ -25,6 +25,7 @@ describe("UpdateConventionStatus", () => {
         "establishment-representative",
         "legal-representative",
         "beneficiary-representative",
+        "beneficiary-current-employer",
         "counsellor",
         "validator",
         "admin",
@@ -48,6 +49,7 @@ describe("UpdateConventionStatus", () => {
         "establishment-representative",
         "legal-representative",
         "beneficiary-representative",
+        "beneficiary-current-employer",
       ],
       allowedInitialStatuses: ["DRAFT"],
     });
@@ -63,6 +65,7 @@ describe("UpdateConventionStatus", () => {
         "establishment-representative",
         "legal-representative",
         "beneficiary-representative",
+        "beneficiary-current-employer",
       ],
       allowedInitialStatuses: ["READY_TO_SIGN", "PARTIALLY_SIGNED"],
     });
@@ -78,6 +81,7 @@ describe("UpdateConventionStatus", () => {
         "establishment-representative",
         "legal-representative",
         "beneficiary-representative",
+        "beneficiary-current-employer",
       ],
       allowedInitialStatuses: ["PARTIALLY_SIGNED"],
     });
