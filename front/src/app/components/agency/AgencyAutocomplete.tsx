@@ -33,6 +33,11 @@ export const AgencyAutocomplete = ({
   const noOptionText =
     isSearching || !agencySearchText ? "..." : "Aucune agence trouvée";
 
+  const getNameFromAgencyId = (agencyId?: AgencyId) => {
+    if (!agencyId) return;
+    return agencyOptions.find(propEq("id", agencyId))?.name;
+  };
+
   return (
     <>
       <Autocomplete
@@ -43,7 +48,7 @@ export const AgencyAutocomplete = ({
         noOptionsText={agencySearchText ? noOptionText : "Saisissez un métier"}
         getOptionLabel={(option: AgencyId) => option}
         renderOption={(props, option) => (
-          <li {...props}>{agencyOptions.find(propEq("id", option))?.name}</li>
+          <li {...props}>{getNameFromAgencyId(option)}</li>
         )}
         onChange={(_, selectedAgencyId: AgencyId | null) => {
           if (!selectedAgencyId) return;
@@ -66,6 +71,7 @@ export const AgencyAutocomplete = ({
             </label>
             <input
               {...params.inputProps}
+              value={getNameFromAgencyId(params.inputProps.value?.toString())}
               className={"fr-input"}
               placeholder={placeholder}
               style={{ backgroundColor: "#fff" }}

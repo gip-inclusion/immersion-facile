@@ -3,6 +3,7 @@ import { keys } from "ramda";
 import React, { useState } from "react";
 import { Button, DsfrTitle } from "react-design-system/immersionFacile";
 import {
+  addressDtoToString,
   AgencyDto,
   AgencyKind,
   agencyKindList,
@@ -158,6 +159,7 @@ const EditAgencyForm = ({ agency }: { agency: AgencyDto }) => {
                   placeholder="Agence de Boulogne-Billancourt"
                 />
                 <AddressAutocomplete
+                  initialSearchTerm={addressDtoToString(agency.address)}
                   label="Adresse de la structure"
                   setFormValue={({ position, address }) => {
                     typedSetField("position")(position);
