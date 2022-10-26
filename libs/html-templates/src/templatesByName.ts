@@ -130,6 +130,7 @@ export const templateByName: {
       signature,
       beneficiaryRepresentativeName,
       establishmentRepresentativeName,
+      beneficiaryCurrentEmployerName,
       immersionAddress,
       scheduleText,
       immersionActivities,
@@ -158,6 +159,7 @@ export const templateByName: {
       subContent: `Cette convention est établie entre :
       - ${beneficiaryFirstName} ${beneficiaryLastName}
       - ${beneficiaryRepresentativeName}
+      - ${beneficiaryCurrentEmployerName}
       - ${establishmentRepresentativeName}
       - ${signature}
       
@@ -433,6 +435,7 @@ export const templateByName: {
       businessName,
       establishmentRepresentativeName,
       beneficiaryRepresentativeName,
+      beneficiaryCurrentEmployerName,
       magicLink,
     }) => ({
       subject: "Immersion Facilitée : Confirmez une demande d'immersion",
@@ -443,6 +446,10 @@ export const templateByName: {
            - Le bénéficiaire ${beneficiaryName}${
         beneficiaryRepresentativeName
           ? `\n- ${beneficiaryRepresentativeName}`
+          : ""
+      }${
+        beneficiaryCurrentEmployerName
+          ? `\n- L'employeur actuel du bénéficiare ${beneficiaryCurrentEmployerName}`
           : ""
       }
            - L'entreprise ${businessName}

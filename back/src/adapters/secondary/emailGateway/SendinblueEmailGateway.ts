@@ -205,6 +205,7 @@ const sendInBlueKeyByEmailVariables: Record<EmailVariables, string> = {
   beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
   beneficiaryLastName: "BENEFICIARY_LAST_NAME",
   beneficiaryName: "BENEFICIARY_NAME",
+  beneficiaryCurrentEmployerName: "BENEFICIARY_CURRENT_EMPLOYER_NAME",
   businessAddress: "BUSINESS_ADDRESS",
   businessName: "BUSINESS_NAME",
   signatoryName: "SIGNATORY_NAME",

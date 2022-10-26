@@ -92,6 +92,7 @@ export type ValidatedConventionFinalConfirmationEmail = GenericTemplatedEmail<
     establishmentTutorName: string;
     establishmentRepresentativeName: string;
     beneficiaryRepresentativeName: string;
+    beneficiaryCurrentEmployerName?: string;
     scheduleText: string[];
     businessName: string;
     immersionAddress: string;
@@ -203,6 +204,7 @@ type SignatorySignatureRequestNotificationEmail = GenericTemplatedEmail<
     beneficiaryName: string; //< BENEFICIARY_NAME
     establishmentRepresentativeName: string; //< MENTOR_NAME
     beneficiaryRepresentativeName?: string; //< LEGAL_REPRESENTATIVE_NAME
+    beneficiaryCurrentEmployerName?: string;
     signatoryName: string; //< SIGNATORY_NAME
     magicLink: string; //< MAGIC_LINK
     businessName: string; //< COMPANY_NAME
@@ -298,6 +300,7 @@ type FullPreviewEmail = GenericTemplatedEmail<
     beneficiaryName: string; //< BENEFICIARY_NAME
     establishmentRepresentativeName: string; //< MENTOR_NAME
     beneficiaryRepresentativeName?: string; //< LEGAL_REPRESENTATIVE_NAME
+    beneficiaryCurrentEmployerName?: string;
     signatoryName: string; //< SIGNATORY_NAME
     magicLink: string; //< MAGIC_LINK
     businessName: string; //< COMPANY_NAME

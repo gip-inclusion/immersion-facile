@@ -34,6 +34,7 @@ export const expectEmaiSignatoryConfirmationSignatureRequestMatchingConvention =
       beneficiary,
       establishmentRepresentative,
       beneficiaryRepresentative,
+      beneficiaryCurrentEmployer,
     } = convention.signatories;
 
     expectTypeToMatchAndEqual(templatedEmail, {
@@ -46,6 +47,9 @@ export const expectEmaiSignatoryConfirmationSignatureRequestMatchingConvention =
         beneficiaryRepresentativeName:
           beneficiaryRepresentative &&
           `${beneficiaryRepresentative.firstName} ${beneficiaryRepresentative.lastName}`,
+        beneficiaryCurrentEmployerName:
+          beneficiaryCurrentEmployer &&
+          `${beneficiaryCurrentEmployer.firstName} ${beneficiaryCurrentEmployer.lastName}`,
         magicLink: fakeGenerateMagicLinkUrlFn({
           id,
           role: signatory.role,

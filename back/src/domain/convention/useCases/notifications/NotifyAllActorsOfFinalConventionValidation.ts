@@ -76,6 +76,7 @@ export const getValidatedConventionFinalConfirmationParams = (
     beneficiary,
     establishmentRepresentative,
     beneficiaryRepresentative,
+    beneficiaryCurrentEmployer,
   } = convention.signatories;
 
   return {
@@ -86,6 +87,9 @@ export const getValidatedConventionFinalConfirmationParams = (
     }),
     beneficiaryFirstName: beneficiary.firstName,
     beneficiaryLastName: beneficiary.lastName,
+    beneficiaryCurrentEmployerName:
+      beneficiaryCurrentEmployer &&
+      `${beneficiaryCurrentEmployer.firstName} ${beneficiaryCurrentEmployer.lastName}`,
     emergencyContact: beneficiary.emergencyContact,
     emergencyContactPhone: beneficiary.emergencyContactPhone,
     dateStart: parseISO(convention.dateStart).toLocaleDateString("fr"),
