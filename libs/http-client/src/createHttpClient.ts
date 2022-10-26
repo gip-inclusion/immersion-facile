@@ -25,9 +25,15 @@ export type HttpResponse<ResponseBody> = {
 
 export type UnknownTarget = Target<unknown, unknown, unknown, unknown>;
 
-type RuntimeTarget<ResponseBody = void> = ResponseBody extends void
-  ? Pick<Target<ResponseBody>, "method" | "url">
-  : Pick<Target<ResponseBody>, "method" | "url" | "validateResponseBody">;
+type RuntimeTarget<
+  UrlWithParam = Url,
+  ResponseBody = void,
+> = ResponseBody extends void
+  ? Pick<Target<ResponseBody, void, void, void, UrlWithParam>, "method" | "url">
+  : Pick<
+      Target<ResponseBody, void, void, void, UrlWithParam>,
+      "method" | "url" | "validateResponseBody"
+    >;
 
 export type CreateTargets<T extends Record<string, UnknownTarget>> = T;
 
@@ -63,6 +69,7 @@ export const createHttpClient = <Targets extends Record<string, UnknownTarget>>(
   handlerCreator: (target: RuntimeTarget) => Handler,
   targets: {
     [TargetName in keyof Targets]: RuntimeTarget<
+      Targets[TargetName]["url"],
       Targets[TargetName]["responseBody"]
     >;
   },
