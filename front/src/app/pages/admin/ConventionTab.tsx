@@ -4,7 +4,6 @@ import { MetabaseView } from "src/app/components/MetabaseView";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { dashboardUrlsSlice } from "src/core-logic/domain/admin/dashboardUrls/dashboardUrls.slice";
-import "./admin.css";
 
 const useConventionDashboard = () => {
   const conventionDashboardUrl = useAppSelector(

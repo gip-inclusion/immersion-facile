@@ -6,12 +6,10 @@ import { ConventionTab } from "src/app/pages/admin/ConventionTab";
 import { DataExportTab } from "src/app/pages/admin/DataExportTab";
 import { EmailsTab } from "src/app/pages/admin/EmailsTab";
 import { EmailPreviewTab } from "src/app/pages/admin/EmailPreviewTab";
-
 import { TechnicalOptions } from "src/app/pages/admin/TechnicalOptions";
 import { AdminTab } from "src/app/routing/route-params";
 import { routes } from "src/app/routing/routes";
 import { Route } from "type-route";
-import "./admin.css";
 
 const getNavLinks = (currentTab: AdminTab): NavLink[] => [
   {

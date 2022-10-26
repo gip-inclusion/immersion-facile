@@ -4,8 +4,6 @@ import { keys } from "ramda";
 import { EmailVariables } from "shared";
 import { DsfrTitle } from "react-design-system";
 
-import "./Admin.css";
-
 type TemplateName = keyof typeof templateByName;
 
 export const EmailPreviewTab = () => {
