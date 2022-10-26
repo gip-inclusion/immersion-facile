@@ -1,6 +1,11 @@
 import { useField } from "formik";
 import React from "react";
-import { addressDtoToString, EstablishmentJwtPayload } from "shared";
+import {
+  addressDtoToString,
+  EstablishmentJwtPayload,
+  FormEstablishmentDto,
+} from "shared";
+import { MainWrapper } from "react-design-system";
 import { establishmentGateway } from "src/app/config/dependencies";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { routes } from "src/app/routing/routes";
@@ -20,43 +25,50 @@ export const EstablishmentEditionFormPage = ({
   route,
 }: {
   route: Route<typeof routes.editFormEstablishment>;
-}) => (
-  <HeaderFooterLayout>
-    <ApiDataContainer
-      callApi={() =>
-        establishmentGateway.getFormEstablishmentFromJwt(
-          decodeJwt<EstablishmentJwtPayload>(route.params.jwt).siret,
-          route.params.jwt,
-        )
-      }
-      jwt={route.params.jwt}
-    >
-      {(formEstablishment) => {
-        if (!formEstablishment)
-          return <p>Données de formulaire d'établissement indisponibles</p>;
-        if (!route.params.jwt) {
-          return <p>Lien non valide</p>;
-        }
-        return (
-          <EstablishmentFormikForm
-            initialValues={formEstablishment}
-            saveForm={(data) =>
-              establishmentGateway.updateFormEstablishment(
-                { ...data },
-                route.params.jwt,
-              )
-            }
-            isEditing
-          >
-            <EditionSiretRelatedInputs
-              businessAddress={formEstablishment.businessAddress}
-            />
-          </EstablishmentFormikForm>
-        );
-      }}
-    </ApiDataContainer>
-  </HeaderFooterLayout>
-);
+}) => {
+  const onSaveForm =
+    (
+      route: Route<typeof routes.editFormEstablishment>,
+    ): ((establishment: FormEstablishmentDto) => Promise<void>) =>
+    (data) =>
+      establishmentGateway.updateFormEstablishment(
+        { ...data },
+        route.params.jwt,
+      );
+  return (
+    <HeaderFooterLayout>
+      <MainWrapper layout="boxed">
+        <ApiDataContainer
+          callApi={() =>
+            establishmentGateway.getFormEstablishmentFromJwt(
+              decodeJwt<EstablishmentJwtPayload>(route.params.jwt).siret,
+              route.params.jwt,
+            )
+          }
+          jwt={route.params.jwt}
+        >
+          {(formEstablishment) =>
+            !formEstablishment ? (
+              <p>Données de formulaire d'établissement indisponibles</p>
+            ) : !route.params.jwt ? (
+              <p>Lien non valide</p>
+            ) : (
+              <EstablishmentFormikForm
+                initialValues={formEstablishment}
+                saveForm={onSaveForm(route)}
+                isEditing
+              >
+                <EditionSiretRelatedInputs
+                  businessAddress={formEstablishment.businessAddress}
+                />
+              </EstablishmentFormikForm>
+            )
+          }
+        </ApiDataContainer>
+      </MainWrapper>
+    </HeaderFooterLayout>
+  );
+};
 
 const EditionSiretRelatedInputs = ({
   businessAddress,
@@ -72,7 +84,6 @@ const EditionSiretRelatedInputs = ({
   return (
     <>
       <TextInput {...getMandatoryLabelAndName("siret")} disabled={true} />
-
       <TextInput
         {...getMandatoryLabelAndName("businessName")}
         disabled={featureFlags.enableInseeApi}
