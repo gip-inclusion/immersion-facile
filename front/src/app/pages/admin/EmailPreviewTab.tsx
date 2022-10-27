@@ -28,6 +28,7 @@ export const EmailPreviewTab = () => {
       skipHead: true,
     },
   );
+  //console.log(fakeContent.htmlContent);
   return (
     <div className="admin-tab__email-preview">
       <DsfrTitle level={5} text="Aperçu de template email" />
@@ -79,23 +80,31 @@ export const EmailPreviewTab = () => {
                     emailVariables[variableName as keyof typeof emailVariables];
                   return (
                     <li key={variableName}>
-                      <ImmersionTextField
-                        label={variableName}
-                        name={variableName}
-                        value={variableValue ?? ""}
-                        className={"fr-mb-2w"}
-                        readOnly={
-                          !["string", "number", "undefined"].includes(
-                            typeof variableValue,
-                          )
-                        }
-                        onChange={(e) =>
-                          setEmailVariables({
-                            ...emailVariables,
-                            [variableName]: e.target.value,
-                          })
-                        }
-                      />
+                      {["string", "number", "undefined"].includes(
+                        typeof variableValue,
+                      ) ? (
+                        <ImmersionTextField
+                          label={variableName}
+                          name={variableName}
+                          value={variableValue ?? ""}
+                          className={"fr-mb-2w"}
+                          onChange={(e) =>
+                            setEmailVariables({
+                              ...emailVariables,
+                              [variableName]: e.target.value,
+                            })
+                          }
+                        />
+                      ) : (
+                        <div className="fr-input-group fr-mb-2w">
+                          <label className="fr-label">{variableName}</label>
+                          <pre className={"fr-text--xs fr-m-auto"}>
+                            <code>
+                              {JSON.stringify(variableValue, null, 2)}
+                            </code>
+                          </pre>
+                        </div>
+                      )}
                     </li>
                   );
                 })}

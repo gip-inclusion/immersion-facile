@@ -178,7 +178,12 @@ export const templateByName: {
       
       Cette immersion se déroulera dans les conditions réelles d'exercice de ce métier. 
       
-      Il peut y avoir des conditions particulières d'exercice du métier. S'il y en a, ce sont ${workConditions}
+      ${
+        workConditions
+          ? `Les conditions particulières d'exercice du métier sont : ${workConditions}`
+          : ""
+      }
+      
       
       Encadrement : ${beneficiaryFirstName} ${beneficiaryLastName} sera encadré(e) par ${establishmentTutorName}.
 

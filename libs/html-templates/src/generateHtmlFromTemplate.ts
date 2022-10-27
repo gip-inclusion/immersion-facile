@@ -44,10 +44,7 @@ export const generateHtmlFromTemplate = <N extends keyof TemplateByName>(
     subContent,
     legals,
   } = createEmailVariables(params as any);
-  const formatEmailBlock = (block: string | undefined) => {
-    const cleanedBlock = block?.replace("undefined", "");
-    return renderHTMLRow(cleanedBlock);
-  };
+
   const doctype =
     '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
   const templateData: {
@@ -70,7 +67,7 @@ export const generateHtmlFromTemplate = <N extends keyof TemplateByName>(
                 renderLegals(legals),
                 renderFooter(emailRecipient),
               ]
-                .map(formatEmailBlock)
+                .map(renderHTMLRow)
                 .join("")}       
             </table>
           </body>
