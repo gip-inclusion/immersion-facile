@@ -43,11 +43,12 @@ export type HttpClient<Targets extends Record<string, UnknownTarget>> = {
      * else return the generic parameter defined for the target
      */
     // prettier-ignore
-    params:
-      (PathParameters<Targets[TargetName]["url"]> extends EmptyObj ? AnyObj : { urlParams: PathParameters<Targets[TargetName]["url"]> })
+    ...params: { target: Targets[TargetName], urlParams: PathParameters<Targets[TargetName]["url"]> } extends { target: Target<unknown, void, void, void, unknown>, urlParams: EmptyObj }
+      ? []
+      : [(PathParameters<Targets[TargetName]["url"]> extends EmptyObj ? AnyObj : { urlParams: PathParameters<Targets[TargetName]["url"]> })
       & (Targets[TargetName]["body"] extends void ? AnyObj : { body: Targets[TargetName]["body"];})
       & (Targets[TargetName]["queryParams"] extends void ? AnyObj : { queryParams: Targets[TargetName]["queryParams"]; })
-      & (Targets[TargetName]["headers"] extends void ? AnyObj : { headers: Targets[TargetName]["headers"]; }),
+      & (Targets[TargetName]["headers"] extends void ? AnyObj : { headers: Targets[TargetName]["headers"]; })]
   ) => Promise<HttpResponse<Targets[TargetName]["responseBody"]>>;
 };
 
@@ -61,7 +62,7 @@ export type HandlerParams = Partial<
   >
 >;
 
-type Handler = (params: HandlerParams) => Promise<HttpResponse<any>>;
+type Handler = (params?: HandlerParams) => Promise<HttpResponse<any>>;
 
 export type HandlerCreator = (target: RuntimeTarget) => Handler;
 
@@ -80,7 +81,7 @@ export const createHttpClient = <Targets extends Record<string, UnknownTarget>>(
     const handler: Handler = async (handlerParams) => {
       const handler = handlerCreator({
         ...target,
-        url: replaceParamsInUrl(target.url, handlerParams.urlParams),
+        url: replaceParamsInUrl(target.url, handlerParams?.urlParams),
       });
       const { status, responseBody } = await handler(handlerParams);
       return {

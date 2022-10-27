@@ -4,7 +4,7 @@ import { HandlerCreator } from "../createHttpClient";
 export const createAxiosHandlerCreator =
   (axios: AxiosInstance): HandlerCreator =>
   (target) =>
-  async (params) => {
+  async (params = {}) => {
     const response = await axios.request({
       method: target.method,
       url: target.url,

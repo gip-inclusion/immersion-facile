@@ -21,6 +21,7 @@ type MyBookEndpoints = CreateTargets<{
     "https://www.truc.com/book/:bookId"
   >;
   getCar: Target<Car | undefined, void, void, void, "/car/:carId">;
+  getSomethingWithNoParams: Target<string>;
 }>;
 
 const isBook = (book: any): Book | never => {
@@ -67,6 +68,11 @@ describe("http-client", () => {
         method: "GET",
         url: "/car/:carId",
         validateResponseBody: isCar,
+      },
+      getSomethingWithNoParams: {
+        method: "GET",
+        url: "/yolo",
+        validateResponseBody: (v) => v as string,
       },
     });
   });
@@ -152,6 +158,13 @@ describe("http-client", () => {
     const promise = httpClient.getBooks({ queryParams: {} });
 
     await expect(promise).rejects.toThrow(new Error("Is not a book"));
+  });
+
+  it("gets something without params", async () => {
+    const givenResponse = { responseBody: "worked", status: 200 };
+    inMemory.setResponse(givenResponse);
+    const response = await httpClient.getSomethingWithNoParams();
+    expectToEqual(response, givenResponse);
   });
 });
 
