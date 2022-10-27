@@ -207,9 +207,7 @@ const AdvisesForContact = ({
 
     <SubTitle>Comment présenter votre demande ? </SubTitle>
     <Paragraph>
-      Soyez <Bold>direct, concret et courtois</Bold>. Présentez-vous, indiquez
-      que vous avez eu le nom et le numéro de téléphone de votre interlocutrice
-      ou interlocuteur grâce à <Bold>Immersion Facilitée</Bold> puis présentez
+      Soyez <Bold>direct, concret et courtois</Bold>. Présentez-vous, présentez
       simplement votre projet et l’objectif que vous recherchez en effectuant
       une immersion.
     </Paragraph>
