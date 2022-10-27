@@ -1,6 +1,6 @@
 import { Form, Formik } from "formik";
 import React, { useState } from "react";
-import { Notification } from "react-design-system/immersionFacile";
+import { Notification } from "react-design-system";
 import {
   FormEstablishmentDto,
   formEstablishmentSchema,
@@ -112,7 +112,10 @@ export const EstablishmentFormikForm = ({
                   disabled={false}
                 />
                 <TextInput {...getLabelAndName("website")} />
-                <TextInput {...getLabelAndName("additionalInformation")} />
+                <TextInput
+                  {...getLabelAndName("additionalInformation")}
+                  multiline={true}
+                />
               </div>
               <AppellationList
                 name="appellations"
