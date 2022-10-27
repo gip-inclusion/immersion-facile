@@ -633,7 +633,7 @@ export const templateByName: {
       subject: "Immersion Facilitée : Comment s'est déroulée l'immersion ?",
       greetings: `Bonjour ${establishmentTutorName},`,
       content: `
-      L'immersion  professionnelle de {{params.BENEFICIARY_FIRST_NAME}} {{params.BENEFICIARY_LAST_NAME}} au sein de votre entreprise est en passe de s'achever. 
+      L'immersion  professionnelle de ${beneficiaryFirstName} ${beneficiaryLastName} au sein de votre entreprise est en passe de s'achever. 
 
       Nous vous remercions de votre accueil. 
 
