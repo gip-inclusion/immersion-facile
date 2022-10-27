@@ -6,6 +6,10 @@ type Book = {
   name: string;
 };
 
+type Car = {
+  horsePower: number;
+};
+
 type MyBookEndpoints = CreateTargets<{
   addBook: Target<void, Book, void, { authorization: string }>;
   getBooks: Target<Book[], void, { max?: number }>;
@@ -16,6 +20,7 @@ type MyBookEndpoints = CreateTargets<{
     void,
     "https://www.truc.com/book/:bookId"
   >;
+  getCar: Target<Car | undefined, void, void, void, "/car/:carId">;
 }>;
 
 const isBook = (book: any): Book | never => {
@@ -23,6 +28,13 @@ const isBook = (book: any): Book | never => {
     throw new Error("Is not a book");
   }
   return book;
+};
+
+const isCar = (car: any): Car | never => {
+  if (typeof car?.horsePower !== "number") {
+    throw new Error("Is not a car");
+  }
+  return car;
 };
 
 describe("http-client", () => {
@@ -50,6 +62,11 @@ describe("http-client", () => {
         method: "GET",
         url: "https://www.truc.com/book/:bookId",
         validateResponseBody: isBook,
+      },
+      getCar: {
+        method: "GET",
+        url: "/car/:carId",
+        validateResponseBody: isCar,
       },
     });
   });
@@ -104,6 +121,25 @@ describe("http-client", () => {
       targetName: "GET https://www.truc.com/book/yolo",
       callParams: {
         urlParams: { bookId: "yolo" },
+      },
+    });
+  });
+
+  it("works with route with params and not an Absolute Url", async () => {
+    const car: Car = { horsePower: 200 };
+    const responseGiven = {
+      status: 200,
+      responseBody: car,
+    };
+    inMemory.setResponse(responseGiven);
+    const response = await httpClient.getCar({ urlParams: { carId: "123" } });
+
+    expectToEqual(response, responseGiven);
+    expect(inMemory.calls).toHaveLength(1);
+    expectToEqual(inMemory.calls[0], {
+      targetName: "GET /car/123",
+      callParams: {
+        urlParams: { carId: "123" },
       },
     });
   });

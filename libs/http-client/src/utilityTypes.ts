@@ -1,6 +1,8 @@
 // mostly from https://github.com/DefinitelyTyped/DefinitelyTyped/blob/ef87ee53bc501c0f0e79797add156fd8fa904ede/types/express-serve-static-core/index.d.ts#L98-L121
 type Http = "http://" | "https://";
-export type Url = `${Http}${string}`;
+type AbsoluteUrl = `${Http}${string}`;
+type Path = `/${string}`;
+export type Url = AbsoluteUrl | Path;
 export type AnyObj = Record<string, unknown>;
 export type EmptyObj = Record<string, never>;
 
@@ -8,8 +10,12 @@ interface ParamsDictionary {
   [key: string]: string;
 }
 
-type RemoveDomain<S extends string> =
-  S extends `${Http}${string}${"/"}${infer P}` ? `/${P}` : "/";
+// prettier-ignore
+type RemoveDomain<S extends string> = S extends Path
+  ? S
+  : S extends `${Http}${string}${"/"}${infer P}`
+    ? `/${P}`
+    : "/";
 
 // prettier-ignore
 type RemoveTail<S extends string, Tail extends string> = S extends `${infer P}${Tail}` ? P : S;
