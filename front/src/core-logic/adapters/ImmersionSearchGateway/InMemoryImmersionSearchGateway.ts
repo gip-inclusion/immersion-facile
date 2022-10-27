@@ -108,6 +108,32 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
       "Un texte super long qui donne des tonnes d'informations complémentaires sur l'immersion, les métiers proposés, tout ça... ",
   },
   {
+    rome: "A0003",
+    naf: defaultNaf,
+    siret: "12345678901234",
+    name: "Coolitude .Inc",
+    customizedName: "Tu peux pas test",
+    voluntaryToImmersion: false,
+    position: { lat: 48.8666, lon: 2.3333 },
+    address: defaultAddress,
+    contactMode: "PHONE",
+    romeLabel:
+      "Méga métier, avec un texte très long pour le décrire, et qui va peut-être aller à la ligne",
+    appellationLabels: [],
+    nafLabel: "Accueil et Restauration",
+    numberOfEmployeeRange: "200-1000",
+    website: "www.coolitude-inc.com/job",
+    additionalInformation: `Un texte
+     sur plusieurs lignes:
+     - tiret 1
+     - tiret 2
+     - tiret 3
+     - 7 de pique bonne journée
+     
+     Bisous.
+     L'entreprise cool avec une description sur plusieurs lignes.`,
+  },
+  {
     rome: "A0002",
     naf: defaultNaf,
     siret: "12345678901234",

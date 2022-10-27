@@ -26,7 +26,12 @@ type SearchResultInfoProps = {
 const SearchResultInfo = ({ children, icon }: SearchResultInfoProps) => (
   <div className="flex">
     {icon}
-    <div className="pl-2 w-full text-justify">{children}</div>
+    <div
+      className="pl-2 w-full text-justify"
+      style={{ whiteSpace: "pre-line" }}
+    >
+      {children}
+    </div>
   </div>
 );
 
