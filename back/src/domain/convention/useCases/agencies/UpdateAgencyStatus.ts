@@ -6,7 +6,7 @@ import {
 } from "../../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../../core/UseCase";
 
-export class UpdateAgency extends TransactionalUseCase<
+export class UpdateAgencyStatus extends TransactionalUseCase<
   UpdateAgencyRequestDto,
   void
 > {

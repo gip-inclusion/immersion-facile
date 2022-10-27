@@ -128,14 +128,15 @@ const EditAgencyForm = ({ agency }: { agency: AgencyDto }) => {
     kind: "idle",
   });
   const { enableLogoUpload } = useFeatureFlags();
+
   return (
     <div>
       <Formik
         initialValues={agency}
         validationSchema={toFormikValidationSchema(agencySchema)}
-        onSubmit={(values) => {
-          // eslint-disable-next-line no-console
-          console.log(values);
+        onSubmit={(_values) => {
+          // TODO
+          //dispatch(agencyAdminSlice.actions.editAgencyRequested(values));
         }}
       >
         {({ isSubmitting, setFieldValue, values, errors, submitCount }) => {

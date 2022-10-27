@@ -5,7 +5,7 @@ import { TestUuidGenerator } from "../../../../adapters/secondary/core/UuidGener
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 
 import { makeCreateNewEvent } from "../../../core/eventBus/EventBus";
-import { UpdateAgency } from "./UpdateAgency";
+import { UpdateAgencyStatus } from "./UpdateAgencyStatus";
 
 const nextDate = new Date("2022-01-01T10:00:00.000");
 const nextUuid = "event-uuid";
@@ -22,7 +22,7 @@ const prepareUseCase = () => {
     clock,
   });
 
-  const useCase = new UpdateAgency(
+  const useCase = new UpdateAgencyStatus(
     new InMemoryUowPerformer(uow),
     createNewEvent,
   );

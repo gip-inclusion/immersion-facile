@@ -8,10 +8,11 @@ import {
 } from "../../../domain/auth/jwt";
 import { ExportData } from "../../../domain/backoffice/useCases/ExportData";
 import { SetFeatureFlag } from "../../../domain/backoffice/useCases/SetFeatureFlag";
+import { UpdateAgencyAdmin } from "../../../domain/backoffice/useCases/UpdateAgencyAdmin";
 import { AddConvention } from "../../../domain/convention/useCases/AddConvention";
 import { AddAgency } from "../../../domain/convention/useCases/agencies/AddAgency";
 import { PrivateListAgencies } from "../../../domain/convention/useCases/agencies/PrivateListAgencies";
-import { UpdateAgency } from "../../../domain/convention/useCases/agencies/UpdateAgency";
+import { UpdateAgencyStatus } from "../../../domain/convention/useCases/agencies/UpdateAgencyStatus";
 import { BroadcastToPoleEmploiOnConventionUpdates } from "../../../domain/convention/useCases/broadcast/BroadcastToPoleEmploiOnConventionUpdates";
 import { CreateImmersionAssessment } from "../../../domain/convention/useCases/CreateImmersionAssessment";
 import { GenerateMagicLink } from "../../../domain/convention/useCases/GenerateMagicLink";
@@ -292,7 +293,8 @@ export const createUseCases = (
         createNewEvent,
         config.defaultAdminEmail,
       ),
-      updateAgency: new UpdateAgency(uowPerformer, createNewEvent),
+      updateAgencyStatus: new UpdateAgencyStatus(uowPerformer, createNewEvent),
+      updateAgencyAdmin: new UpdateAgencyAdmin(uowPerformer, createNewEvent),
       setFeatureFlag: new SetFeatureFlag(uowPerformer),
     }),
     ...instantiatedUseCasesFromFunctions({
