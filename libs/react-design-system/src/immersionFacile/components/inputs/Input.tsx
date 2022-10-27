@@ -13,6 +13,7 @@ export type InputProperties = {
   placeholder?: string;
   disabled?: boolean;
   id?: string;
+  readOnly?: boolean;
 };
 export const Input = ({
   name,
@@ -25,6 +26,7 @@ export const Input = ({
   placeholder,
   disabled,
   id,
+  readOnly,
 }: InputProperties): JSX.Element => (
   <input
     id={id}
@@ -38,5 +40,6 @@ export const Input = ({
     placeholder={placeholder || ""}
     aria-describedby="text-input-error-desc-error"
     disabled={disabled}
+    readOnly={readOnly}
   />
 );

@@ -28,7 +28,6 @@ export const EmailPreviewTab = () => {
       skipHead: true,
     },
   );
-  //console.log(fakeContent.htmlContent);
   return (
     <div className="admin-tab__email-preview">
       <DsfrTitle level={5} text="Aperçu de template email" />
@@ -70,38 +69,36 @@ export const EmailPreviewTab = () => {
                 <li>{fakeContent.tags.join(", ")}</li>
               </ul>
             )}
+
+            <h6 className="fr-mt-4w">Données de prévisualisation</h6>
             <ul className="fr-badge-group">
-              {Object.keys(emailVariables).map((variableName) => {
-                const variableValue: any =
-                  emailVariables[variableName as keyof typeof emailVariables];
-
-                return (
-                  <li key={variableName}>
-                    <span className="fr-badge fr-badge--green-menthe">
-                      {variableName} :
-                    </span>
-
-                    {["string", "number", "undefined"].includes(
-                      typeof variableValue,
-                    ) ? (
-                      <>
-                        <ImmersionTextField
-                          name={variableName}
-                          value={variableValue ?? ""}
-                          onChange={(e) =>
-                            setEmailVariables({
-                              ...emailVariables,
-                              [variableName]: e.target.value,
-                            })
-                          }
-                        />
-                      </>
-                    ) : (
-                      JSON.stringify(variableValue)
-                    )}
-                  </li>
-                );
-              })}
+              {Object.keys(emailVariables)
+                .sort()
+                .map((variableName) => {
+                  const variableValue: any =
+                    emailVariables[variableName as keyof typeof emailVariables];
+                  return (
+                    <li key={variableName}>
+                      <ImmersionTextField
+                        label={variableName}
+                        name={variableName}
+                        value={variableValue ?? ""}
+                        className={"fr-mb-2w"}
+                        readOnly={
+                          !["string", "number", "undefined"].includes(
+                            typeof variableValue,
+                          )
+                        }
+                        onChange={(e) =>
+                          setEmailVariables({
+                            ...emailVariables,
+                            [variableName]: e.target.value,
+                          })
+                        }
+                      />
+                    </li>
+                  );
+                })}
             </ul>
           </aside>
           <section className="fr-col-12 fr-col-lg-8">
@@ -151,7 +148,7 @@ export const defaultEmailValueByEmailKind: {
     establishmentTutorName: "ESTABLISHMENT_TUTOR_NAME",
     establishmentRepresentativeName: "ESTABLISHMENT_REPRESENTATIVE_NAME",
     beneficiaryRepresentativeName: "BENEFICIARY_REPRESENTATIVE_NAME",
-    scheduleText: [],
+    scheduleText: ["HOUR1", "HOUR2"],
     businessName: "BUSINESS_NAME",
     immersionAddress: "IMMERSION_ADDRESS",
     immersionAppellationLabel: "IMMERSION_APPELLATION_LABEL",

@@ -12,6 +12,7 @@ export type TextAreaProperties = {
   placeholder?: string;
   disabled?: boolean;
   id?: string;
+  readOnly?: boolean;
 };
 export const TextArea = ({
   name,
@@ -23,6 +24,7 @@ export const TextArea = ({
   placeholder,
   disabled,
   id,
+  readOnly,
 }: TextAreaProperties): JSX.Element => (
   <textarea
     id={id}
@@ -36,5 +38,6 @@ export const TextArea = ({
     aria-describedby="text-input-error-desc-error"
     disabled={disabled}
     rows={4}
+    readOnly={readOnly}
   />
 );

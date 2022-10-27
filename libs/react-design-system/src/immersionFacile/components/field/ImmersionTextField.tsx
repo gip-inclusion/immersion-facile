@@ -20,6 +20,7 @@ export interface ImmersionTextFieldProps {
   disabled?: boolean;
   type?: string;
   id?: string;
+  readOnly?: boolean;
 }
 
 export const ImmersionTextField = ({
@@ -37,6 +38,7 @@ export const ImmersionTextField = ({
   disabled,
   name,
   id,
+  readOnly,
 }: ImmersionTextFieldProps) => (
   <InputGroup className={className} error={error}>
     <Label label={label} htmlFor={id} />
@@ -53,6 +55,7 @@ export const ImmersionTextField = ({
           placeholder,
           disabled,
           id,
+          readOnly,
         }}
       />
     ) : (
@@ -68,6 +71,7 @@ export const ImmersionTextField = ({
           placeholder,
           disabled,
           id,
+          readOnly,
         }}
       />
     )}
