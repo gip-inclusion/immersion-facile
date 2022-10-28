@@ -8,7 +8,7 @@ import {
 } from "../../../domain/auth/jwt";
 import { ExportData } from "../../../domain/backoffice/useCases/ExportData";
 import { SetFeatureFlag } from "../../../domain/backoffice/useCases/SetFeatureFlag";
-import { UpdateAgencyAdmin } from "../../../domain/backoffice/useCases/UpdateAgencyAdmin";
+import { UpdateAgency } from "../../../domain/convention/useCases/agencies/UpdateAgency";
 import { AddConvention } from "../../../domain/convention/useCases/AddConvention";
 import { AddAgency } from "../../../domain/convention/useCases/agencies/AddAgency";
 import { PrivateListAgencies } from "../../../domain/convention/useCases/agencies/PrivateListAgencies";
@@ -294,7 +294,7 @@ export const createUseCases = (
         config.defaultAdminEmail,
       ),
       updateAgencyStatus: new UpdateAgencyStatus(uowPerformer, createNewEvent),
-      updateAgencyAdmin: new UpdateAgencyAdmin(uowPerformer, createNewEvent),
+      updateAgencyAdmin: new UpdateAgency(uowPerformer, createNewEvent),
       setFeatureFlag: new SetFeatureFlag(uowPerformer),
     }),
     ...instantiatedUseCasesFromFunctions({

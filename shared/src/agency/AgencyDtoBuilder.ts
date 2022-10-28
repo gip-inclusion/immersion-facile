@@ -10,13 +10,15 @@ const emptyAddress: AddressDto = {
   postcode: "",
 };
 
+const defaultValidatorEmail = "validator@mail.com";
+
 const emptyAgency: AgencyDto = {
   id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
   name: "empty-name",
   status: "active",
   kind: "autre",
   counsellorEmails: [],
-  validatorEmails: [],
+  validatorEmails: [defaultValidatorEmail],
   adminEmails: [],
   questionnaireUrl: "empty-questionnaire-url",
   signature: "empty-signature",
