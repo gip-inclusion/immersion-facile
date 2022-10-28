@@ -1,6 +1,10 @@
 import axios from "axios";
 import { createAxiosHandlerCreator } from "./adapters/createAxiosHandlerCreator";
-import { CreateTargets, createHttpClient, Target } from "./createHttpClient";
+import {
+  CreateTargets,
+  configureHttpClient,
+  Target,
+} from "./configureHttpClient";
 
 type AddressApiTargets = CreateTargets<{
   // prettier-ignore
@@ -9,7 +13,9 @@ type AddressApiTargets = CreateTargets<{
 
 describe("Manual - Call an actual api endpoint", () => {
   const axiosHandlerCreator = createAxiosHandlerCreator(axios);
-  const httpClient = createHttpClient<AddressApiTargets>(axiosHandlerCreator, {
+  const createHttpClient = configureHttpClient(axiosHandlerCreator);
+
+  const httpClient = createHttpClient<AddressApiTargets>({
     forwardGeocoding: {
       url: "https://api-adresse.data.gouv.fr/search/",
       method: "GET",

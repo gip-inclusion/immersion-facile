@@ -1,5 +1,5 @@
 import type { AxiosInstance } from "axios";
-import { HandlerCreator } from "../createHttpClient";
+import { HandlerCreator } from "../configureHttpClient";
 
 export const createAxiosHandlerCreator =
   (axios: AxiosInstance): HandlerCreator =>

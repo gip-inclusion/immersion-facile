@@ -2,7 +2,7 @@ import type {
   HandlerCreator,
   HandlerParams,
   HttpResponse,
-} from "../createHttpClient";
+} from "../configureHttpClient";
 
 type Call = {
   targetName: string;

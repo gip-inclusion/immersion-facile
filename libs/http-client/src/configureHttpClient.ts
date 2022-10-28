@@ -67,28 +67,27 @@ export const createTargets = <
   [TargetName in keyof Targets]: RuntimeTarget<Targets[TargetName]["url"]>;
 }) => targets;
 
-export const createHttpClient = <Targets extends Record<string, UnknownTarget>>(
-  handlerCreator: HandlerCreator,
-  targets: {
+export const configureHttpClient =
+  (handlerCreator: HandlerCreator) =>
+  <Targets extends Record<string, UnknownTarget>>(targets: {
     [TargetName in keyof Targets]: RuntimeTarget<Targets[TargetName]["url"]>;
-  },
-): HttpClient<Targets> =>
-  Object.keys(targets).reduce((acc, targetName: keyof typeof targets) => {
-    const target = targets[targetName];
+  }): HttpClient<Targets> =>
+    Object.keys(targets).reduce((acc, targetName: keyof typeof targets) => {
+      const target = targets[targetName];
 
-    const handler: Handler = async (handlerParams) => {
-      const handler = handlerCreator({
-        ...target,
-        url: replaceParamsInUrl(target.url, handlerParams?.urlParams),
-      });
-      return handler(handlerParams);
-    };
+      const handler: Handler = async (handlerParams) => {
+        const handler = handlerCreator({
+          ...target,
+          url: replaceParamsInUrl(target.url, handlerParams?.urlParams),
+        });
+        return handler(handlerParams);
+      };
 
-    return {
-      ...acc,
-      [targetName]: handler,
-    };
-  }, {} as HttpClient<Targets>);
+      return {
+        ...acc,
+        [targetName]: handler,
+      };
+    }, {} as HttpClient<Targets>);
 
 export const replaceParamsInUrl = <UrlToReplace extends Url>(
   path: UrlToReplace,

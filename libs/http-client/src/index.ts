@@ -1,8 +1,8 @@
-export { createHttpClient, createTargets } from "./createHttpClient";
+export { configureHttpClient, createTargets } from "./configureHttpClient";
 export type {
   HttpClient,
   HttpResponse,
   HandlerCreator,
   Target,
   CreateTargets,
-} from "./createHttpClient";
+} from "./configureHttpClient";

@@ -1,6 +1,6 @@
 import { createInMemoryHandlerCreator } from "./adapters/createInMemoryHandlerCreator";
-import type { CreateTargets, HttpClient, Target } from "./createHttpClient";
-import { createHttpClient } from "./createHttpClient";
+import type { CreateTargets, HttpClient, Target } from "./configureHttpClient";
+import { configureHttpClient } from "./configureHttpClient";
 
 type Book = {
   name: string;
@@ -38,8 +38,9 @@ describe("http-client", () => {
 
   beforeEach(() => {
     inMemory = createInMemoryHandlerCreator();
+    const createHttpClient = configureHttpClient(inMemory.handlerCreator);
 
-    httpClient = createHttpClient<MyBookEndpoints>(inMemory.handlerCreator, {
+    httpClient = createHttpClient<MyBookEndpoints>({
       addBook: {
         method: "POST",
         url: "https://www.truc.com",
