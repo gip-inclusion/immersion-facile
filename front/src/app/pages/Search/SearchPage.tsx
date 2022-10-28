@@ -3,7 +3,7 @@ import locationSearchIcon from "/img/location-search-icon.svg";
 import sortSearchIcon from "/sort-search-icon.svg";
 import SearchIcon from "@mui/icons-material/Search";
 import { Form, Formik } from "formik";
-import React from "react";
+import React, { useState } from "react";
 import { ButtonSearch, MainWrapper } from "react-design-system/immersionFacile";
 import { RomeAutocomplete } from "src/app/components/RomeAutocomplete";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
@@ -17,20 +17,65 @@ import { OurAdvises } from "./OurAdvises";
 import "./SearchPage.css";
 import { SearchResultPanel } from "./SearchResultPanel";
 import { addressDtoToString } from "shared";
-import { prop } from "ramda";
+import { keys, prop } from "ramda";
 import { SearchSortedBy } from "shared";
+import { useSearchWatchValuesInUrl } from "./useSearchWatchInUrl";
+import { SearchParams } from "src/core-logic/domain/search/search.slice";
 
 const radiusOptions = [1, 2, 5, 10, 20, 50, 100];
 const sortedByOptions: { value: SearchSortedBy; label: string }[] = [
   { value: "distance", label: "Par proximité" },
   { value: "date", label: "Par date de publication" },
 ];
-const initiallySelectedIndex = -1; // don't select anything initially
+const initiallySelectedIndex = -1;
+type SearchFormValues = {
+  lat: number;
+  lon: number;
+  radiusKm: number;
+  address: string;
+  sortedBy?: string;
+};
 
 export const SearchPage = () => {
   const searchStatus = useAppSelector(searchSelectors.searchStatus);
   const searchUseCase = useSearchUseCase();
-
+  const [formikValues, setFormikValues] = useState({});
+  const initialValues = {
+    lat: 0,
+    lon: 0,
+    radiusKm: 10,
+    address: "",
+    sortedBy: undefined,
+  };
+  const mapValuesToSearchParams = (
+    formValues: SearchFormValues,
+  ): SearchParams => {
+    const matching = [
+      {
+        lat: "latitude",
+        radiusKm: "distance_km",
+        lon: "longitude",
+        address: "address",
+        rome: "rome",
+        sortedBy: "sortedBy",
+      },
+    ];
+    return keys(formValues).reduce(
+      (acc, currentKey: string) => ({
+        ...acc,
+        [matching[currentKey]]: formValues[currentKey],
+      }),
+      {
+        latitude: 0,
+        longitude: 0,
+        distance_km: 10,
+        rome: "",
+        sortedBy: "distance",
+      },
+    );
+  };
+  const watchedValues: SearchParams = mapValuesToSearchParams(formikValues);
+  useSearchWatchValuesInUrl(watchedValues);
   return (
     <HeaderFooterLayout>
       <MainWrapper vSpacing={0} layout="fullscreen">
@@ -41,13 +86,7 @@ export const SearchPage = () => {
               professionnelle
             </h1>
             <Formik<SearchInput>
-              initialValues={{
-                lat: 0,
-                lon: 0,
-                radiusKm: 10,
-                address: "",
-                sortedBy: undefined,
-              }}
+              initialValues={initialValues}
               onSubmit={searchUseCase}
             >
               {({ setFieldValue, values }) => (
@@ -56,9 +95,10 @@ export const SearchPage = () => {
                     <div>
                       <RomeAutocomplete
                         title="Je recherche un métier"
-                        setFormValue={(newValue) =>
-                          setFieldValue("rome", newValue.romeCode)
-                        }
+                        setFormValue={(newValue) => {
+                          setFieldValue("rome", newValue.romeCode);
+                          setFormikValues(values);
+                        }}
                         placeholder={"Ex : boulangère, infirmier"}
                         className="searchdropdown-header inputLabel"
                         tooltip="Je laisse ce champ vide si je veux voir toutes les entreprises autour de moi"
@@ -77,6 +117,7 @@ export const SearchPage = () => {
                           setFieldValue("lat", position.lat);
                           setFieldValue("lon", position.lon);
                           setFieldValue("address", addressDtoToString(address));
+                          setFormikValues(values);
                         }}
                         placeholder={"Ex : Bordeaux 33000"}
                         notice={"Saisissez un code postal et/ou une ville"}
@@ -95,6 +136,7 @@ export const SearchPage = () => {
                             "radiusKm",
                             radiusOptions[selectedIndex],
                           );
+                          setFormikValues(values);
                         }}
                         defaultSelectedIndex={initiallySelectedIndex}
                         options={radiusOptions.map((n) => `${n} km`)}
