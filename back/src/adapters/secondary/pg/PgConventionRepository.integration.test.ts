@@ -1,6 +1,7 @@
 import { Pool, PoolClient } from "pg";
 import {
   AgencyDtoBuilder,
+  BeneficiaryCurrentEmployer,
   BeneficiaryRepresentative,
   ConventionDto,
   ConventionDtoBuilder,
@@ -11,7 +12,10 @@ import {
 } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { PgAgencyRepository } from "./PgAgencyRepository";
-import { PgConventionRepository } from "./PgConventionRepository";
+import {
+  beneficiaryCurrentEmployerIdColumnName,
+  PgConventionRepository,
+} from "./PgConventionRepository";
 
 const beneficiaryRepresentative: BeneficiaryRepresentative = {
   role: "legal-representative",
@@ -208,6 +212,52 @@ describe("PgConventionRepository", () => {
     await expectTutorAndRepToHaveSameId(conventionId);
   });
 
+  it("Update convention with beneficiary current employer", async () => {
+    const beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer = {
+      firstName: "Current",
+      lastName: "Employer",
+      email: "current.employer@mail.com",
+      phone: "8888888888",
+      role: "beneficiary-current-employer",
+    };
+
+    const conventionId = "40400404-0000-0000-0000-6bb9bd38aaaa";
+
+    const conventionWithoutBeneficiaryCurrentEmployer =
+      new ConventionDtoBuilder().withId(conventionId).build();
+
+    const conventionWithBeneficiaryCurrentEmployer = new ConventionDtoBuilder(
+      conventionWithoutBeneficiaryCurrentEmployer,
+    )
+      .withBeneficiaryCurentEmployer(beneficiaryCurrentEmployer)
+      .build();
+
+    //SAVE CONVENTION WITHOUT BENEFICIARY CURRENT EMPLOYER
+    await conventionRepository.save(
+      conventionWithoutBeneficiaryCurrentEmployer,
+    );
+    await expectConventionHaveBeneficiaryCurrentEmployer(
+      conventionId,
+      undefined,
+    );
+
+    //SAVE CONVENTION WITH BENEFICIARY CURRENT EMPLOYER
+    await conventionRepository.update(conventionWithBeneficiaryCurrentEmployer);
+    await expectConventionHaveBeneficiaryCurrentEmployer(
+      conventionId,
+      beneficiaryCurrentEmployer,
+    );
+
+    //SAVE CONVENTION WITHOUT BENEFICIARY CURRENT EMPLOYER
+    await conventionRepository.update(
+      conventionWithoutBeneficiaryCurrentEmployer,
+    );
+    await expectConventionHaveBeneficiaryCurrentEmployer(
+      conventionId,
+      undefined,
+    );
+  });
+
   it("Retrieves federated identity if exists", async () => {
     const peConnectId = "bbbbac99-9c0b-bbbb-bb6d-6bb9bd38bbbb";
     const convention = new ConventionDtoBuilder()
@@ -303,6 +353,44 @@ describe("PgConventionRepository", () => {
     const { rows } = await tutorIdAndRepIdFromConventionId(conventionId);
     const { establishment_tutor_id, establishment_representative_id } = rows[0];
     expect(establishment_representative_id).toBe(establishment_tutor_id);
+  };
+
+  const expectConventionHaveBeneficiaryCurrentEmployer = async (
+    conventionId: ConventionId,
+    expectedBeneficiaryCurrentEmployer: BeneficiaryCurrentEmployer | undefined,
+  ) => {
+    type requeryresult = {
+      phone: string | null;
+      first_name: string | null;
+      last_name: string | null;
+      id: number;
+      signed_at: string | null;
+      role: string;
+      email: string | null;
+    };
+    const { rows } = await client.query<requeryresult>(
+      `
+      SELECT actors.*
+      FROM actors 
+      LEFT JOIN conventions ON actors.id = conventions.${beneficiaryCurrentEmployerIdColumnName} 
+      WHERE conventions.id = '${conventionId}'
+      `,
+    );
+    const result = rows.at(0);
+    const beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer | undefined =
+      result
+        ? {
+            firstName: result.first_name !== null ? result.first_name : "",
+            lastName: result.last_name !== null ? result.last_name : "",
+            role: "beneficiary-current-employer",
+            email: result.email !== null ? result.email : "",
+            phone: result.phone !== null ? result.phone : "",
+          }
+        : undefined;
+    expectToEqual(
+      beneficiaryCurrentEmployer,
+      expectedBeneficiaryCurrentEmployer,
+    );
   };
 
   const expectTutorAndRepToHaveDifferentIds = async (
