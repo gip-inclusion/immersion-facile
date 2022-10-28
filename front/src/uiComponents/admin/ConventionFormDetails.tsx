@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useRef, useState } from "react";
 import { toDisplayedDate } from "shared";
 import {
   AppellationDto,
@@ -149,7 +149,7 @@ const sections: FieldsAndTitle[] = [
         },
       },
     ],
-    additionalClasses: "fr-table--layout-fixed fr-table--blue-cumulus",
+    additionalClasses: " fr-table--blue-cumulus",
   },
   {
     listTitle: "Structure",
@@ -186,6 +186,7 @@ const cellStyles = {
 export const ConventionFormDetails = ({
   convention,
 }: ConventionFormAccordionProps) => {
+  const copyButton = useRef<HTMLButtonElement>(null);
   const renderTables = (lists: FieldsAndTitle[]) =>
     lists.map((list: FieldsAndTitle, index) => (
       <ConventionValidationSection
@@ -194,12 +195,26 @@ export const ConventionFormDetails = ({
         index={index}
       />
     ));
-
+  const onCopyButtonClick = () => {
+    navigator.clipboard
+      .writeText(convention.id)
+      .then(() => {
+        alert("ID de convention copié avec succès");
+      })
+      .catch((error) => error);
+  };
   return (
     <>
       <h4>
         Convention{" "}
-        <span className="fr-badge fr-badge--success">#{convention.id}</span>
+        <span className="fr-badge fr-badge--success">{convention.id}</span>
+        <button
+          ref={copyButton}
+          onClick={onCopyButtonClick}
+          className="fr-btn fr-btn--sm fr-fi-checkbox-circle-line fr-btn--tertiary-no-outline fr-btn--icon-left fr-ml-1w"
+        >
+          Copier cet ID
+        </button>
       </h4>
       {renderTables(sections)}
     </>
@@ -238,7 +253,11 @@ const ConventionValidationSection = ({
     )
       return value ? "✅" : "❌";
     if (field.includes("email")) {
-      return <a href={`mailto:${value}`}>{value}</a>;
+      return (
+        <a href={`mailto:${value}`} title={value as string}>
+          {value}
+        </a>
+      );
     }
     if (isStringDate(value as string)) {
       return toDisplayedDate(new Date(value as string));
@@ -285,9 +304,7 @@ const ConventionValidationSection = ({
   };
   return (
     <div
-      className={`fr-table fr-table--bordered ${
-        list.additionalClasses ?? ""
-      } fr-mb-1v`}
+      className={`fr-table fr-table--bordered ${list.additionalClasses ?? ""}`}
       key={list.listTitle}
     >
       <table>
