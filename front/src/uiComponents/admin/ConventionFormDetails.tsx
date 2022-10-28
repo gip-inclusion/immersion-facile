@@ -1,20 +1,18 @@
 import React, { ReactNode } from "react";
-import { Accordion } from "react-design-system/immersionFacile";
+import { toDisplayedDate } from "shared";
 import {
   AppellationDto,
   Beneficiary,
   BeneficiaryRepresentative,
-  calculateTotalImmersionHoursBetweenDate,
-  calculateWeeklyHoursFromSchedule,
   ConventionReadDto,
   EstablishmentRepresentative,
   keys,
   EstablishmentTutor,
   path,
   prettyPrintSchedule,
+  isStringDate,
 } from "shared";
 import { ConventionFormAccordionProps } from "./ConventionFormAccordion";
-import { TextCell } from "./TextCell";
 
 type ConventionField =
   | keyof ConventionReadDto
@@ -25,13 +23,17 @@ type ConventionField =
 
 type FieldsToLabel = Partial<Record<ConventionField, string>>;
 
+type RowFields = {
+  title?: string;
+  fields: FieldsToLabel;
+};
+
 const enterpriseFields: FieldsToLabel = {
   businessName: "Entreprise",
   siret: "Siret",
 };
 
 const agencyFields: FieldsToLabel = {
-  id: "Id de la convention",
   agencyName: "Nom de la structure",
   dateValidation: "Date de validation",
 };
@@ -72,16 +74,19 @@ const beneficiaryRepresentativeFields: FieldsToLabel = {
   "signatories.beneficiaryRepresentative.lastName": "Nom",
 };
 
-const immersionFields: FieldsToLabel = {
+const immersionPlaceDateFields: FieldsToLabel = {
   dateSubmission: "Date de soumission",
   dateStart: "Début",
   dateEnd: "Fin",
   immersionAddress: "Adresse d'immersion",
+  schedule: "Horaires",
+};
+const immersionJobFields: FieldsToLabel = {
   immersionAppellation: "Métier observé",
   immersionActivities: "Activités",
   immersionSkills: "Compétences évaluées",
   immersionObjective: "Objectif",
-  schedule: "Horaires",
+
   individualProtection: "Protection individuelle",
   sanitaryPrevention: "Mesures de prévention sanitaire",
   workConditions: "Conditions de travail particulières",
@@ -89,33 +94,108 @@ const immersionFields: FieldsToLabel = {
 
 type FieldsAndTitle = {
   listTitle: string;
-  fields: FieldsToLabel;
+  cols?: string[];
+  rowFields: RowFields[];
+  accent?: string;
 };
 
 const allFields: FieldsAndTitle[] = [
-  { listTitle: "Bénéficiaire", fields: candidateFields },
-  { listTitle: "Représentant légal", fields: beneficiaryRepresentativeFields },
   {
-    listTitle: "Réprésentant de l'entreprise",
-    fields: establishmentRepresentativeFields,
+    listTitle: "Signataires",
+    cols: [
+      "",
+      "Convention signée ?",
+      "Email",
+      "Téléphone",
+      "Nom",
+      "Prénom",
+      "Contact d'urgence",
+      "Tel. contact d'urgence",
+    ],
+    rowFields: [
+      {
+        title: "Bénéficiaire",
+        fields: candidateFields,
+      },
+      {
+        title: "Rep. légal bénéficiaire",
+        fields: beneficiaryRepresentativeFields,
+      },
+      {
+        title: "Rep. légal de l'entreprise",
+        fields: establishmentRepresentativeFields,
+      },
+    ],
+    accent: "fr-table--green-emeraude",
   },
-  { listTitle: "Tuteur de l'entreprise", fields: establishmentTutorFields },
-  { listTitle: "Entreprise", fields: enterpriseFields },
-  { listTitle: "Immersion", fields: immersionFields },
-  { listTitle: "Agence", fields: agencyFields },
+  {
+    listTitle: "Entreprise",
+    cols: [
+      "",
+      "Entreprise",
+      "Siret",
+      "Email tuteur",
+      "Téléphone tuteur",
+      "Nom",
+      "Prénom",
+      "Poste",
+    ],
+    rowFields: [
+      {
+        title: "Entreprise",
+        fields: {
+          ...enterpriseFields,
+          ...establishmentTutorFields,
+        },
+      },
+    ],
+    accent: "fr-table--blue-cumulus",
+  },
+  {
+    listTitle: "Structure",
+    rowFields: [
+      {
+        fields: agencyFields,
+      },
+    ],
+    accent: "fr-table--blue-ecume",
+  },
+  {
+    listTitle: "Infos sur l'immersion - date et lieu",
+    rowFields: [
+      {
+        fields: immersionPlaceDateFields,
+      },
+    ],
+    accent: "fr-table--green-archipel",
+  },
+  {
+    listTitle: "Infos sur l'immersion - métier",
+    rowFields: [
+      {
+        fields: immersionJobFields,
+      },
+    ],
+    accent: "fr-table--green-archipel",
+  },
 ];
-
-export const ConnventionFormDetails = ({
+const cellStyles = {
+  overflow: "hidden",
+  whitespace: "nowrap",
+};
+export const ConventionFormDetails = ({
   convention,
 }: ConventionFormAccordionProps) => {
   const buildContent = (field: ConventionField): ReactNode => {
     const value = path(field, convention);
-    if (field === "schedule")
+    if (typeof value === "boolean") return value ? "✅" : "❌";
+    if (field === "schedule") {
       return (
         <div style={{ whiteSpace: "pre" }}>
           {prettyPrintSchedule(convention.schedule)}
         </div>
       );
+    }
     if (field === "sanitaryPrevention") {
       return value ? convention.sanitaryPreventionDescription ?? "✅" : "❌";
     }
@@ -127,50 +207,87 @@ export const ConnventionFormDetails = ({
       field === "signatories.beneficiaryRepresentative.signedAt"
     )
       return value ? "✅" : "❌";
+    if (field.includes("email")) {
+      return `<a href="mailto:${value}">${value}</a>`;
+    }
+    if (isStringDate(value as string)) {
+      return toDisplayedDate(new Date(value as string));
+    }
     if (typeof value === "string") return value;
-    if (typeof value === "boolean") return value ? "✅" : "❌";
+
     return JSON.stringify(value);
   };
+  const renderTables = (lists: FieldsAndTitle[]) =>
+    lists.map((list: FieldsAndTitle) => (
+      <div
+        className={`fr-table fr-table--bordered fr-table--layout-fixed ${
+          list.accent ?? ""
+        }`}
+        key={list.listTitle}
+      >
+        <table>
+          <caption>{list.listTitle}</caption>
+          <thead>
+            <tr>
+              {list.cols && list.cols?.map((col) => <th scope="col">{col}</th>)}
+              {!list.cols &&
+                list.rowFields[0] &&
+                keys(list.rowFields[0].fields).map((key) => (
+                  <th scope="col">{list.rowFields[0].fields[key]}</th>
+                ))}
+            </tr>
+          </thead>
+          <tbody>{renderRows(list.rowFields)}</tbody>
+        </table>
+      </div>
+    ));
+  const renderRows = (rowFields: RowFields[]) => {
+    const maxColsNumber = Math.max(
+      ...rowFields.map((row) => keys(row.fields).length),
+    );
+    return rowFields
+      .filter((row) => row.fields)
+      .map((row) => {
+        const formattedRows = Array.from(Array(maxColsNumber).keys()).map(
+          (_slot, index) => keys(row.fields)[index] ?? null,
+        );
+        const hasRowData = !!formattedRows
+          .map((field) => field && path(field, convention))
+          .filter((field) => field).length;
+        return (
+          hasRowData && (
+            <tr key={row.title}>
+              {row.title && (
+                <td style={cellStyles}>
+                  <strong>{row.title}</strong>
+                </td>
+              )}
 
+              {formattedRows.map((field) =>
+                field && path(field, convention) ? (
+                  <td
+                    key={field}
+                    dangerouslySetInnerHTML={{
+                      __html: buildContent(field) as string,
+                    }}
+                    style={cellStyles}
+                  ></td>
+                ) : (
+                  <td></td>
+                ),
+              )}
+            </tr>
+          )
+        );
+      });
+  };
   return (
-    <div className="static-application-container">
-      {allFields.map(({ listTitle, fields }) => (
-        <Accordion title={listTitle} key={listTitle}>
-          {keys(fields).map(
-            (field) =>
-              path(field, convention) && (
-                <TextCell
-                  title={
-                    /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
-                    fields[field]!
-                  }
-                  contents={buildContent(field)}
-                  key={field}
-                />
-              ),
-          )}
-          {listTitle === "Immersion" && (
-            <>
-              <TextCell
-                title="Heures hebdomadaires"
-                contents={calculateWeeklyHoursFromSchedule(
-                  convention.schedule,
-                ).join(", ")}
-                key="weeklyHours"
-              />
-              <TextCell
-                title="Nombre total d'heures"
-                contents={calculateTotalImmersionHoursBetweenDate({
-                  dateStart: convention.dateStart,
-                  dateEnd: convention.dateEnd,
-                  schedule: convention.schedule,
-                })}
-                key="totalHours"
-              />
-            </>
-          )}
-        </Accordion>
-      ))}
+    <div>
+      <h4>
+        Convention{" "}
+        <span className="fr-badge fr-badge--success">#{convention.id}</span>
+      </h4>
+      {renderTables(allFields)}
     </div>
   );
 };

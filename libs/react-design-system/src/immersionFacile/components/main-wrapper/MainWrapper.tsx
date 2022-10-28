@@ -21,7 +21,7 @@ export const MainWrapper = ({
   const classNameValue =
     layout === "fullscreen"
       ? `${className} ${spacing}`
-      : `fr-main-wrapper fr-container fr-grid--center ${className}`;
+      : `fr-main-wrapper fr-container fr-grid--center ${className} ${spacing}`;
   return (
     <main className={classNameValue} id="main-content">
       {layout === "boxed" && (

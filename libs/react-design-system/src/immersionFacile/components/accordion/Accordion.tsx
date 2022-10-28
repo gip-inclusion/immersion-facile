@@ -14,11 +14,11 @@ export const Accordion = ({ title, children }: AccordionProps) => {
     : "fr-collapse";
 
   return (
-    <section className="fr-accordion" style={{ flex: 1, minWidth: 320 }}>
+    <section className="fr-accordion" style={{ flex: 1, minWidth: "100%" }}>
       <h3 className="fr-accordion__title">
         <button
           className="fr-accordion__btn"
-          aria-expanded="false"
+          aria-expanded={expanded}
           aria-controls={id}
           onClick={() => setExpanded(!expanded)}
         >

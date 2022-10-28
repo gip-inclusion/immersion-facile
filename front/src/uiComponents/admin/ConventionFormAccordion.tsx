@@ -2,7 +2,7 @@ import { formatDistance } from "date-fns";
 import { fr } from "date-fns/locale";
 import React from "react";
 import type { ConventionReadDto, ConventionStatus } from "shared";
-import { ConnventionFormDetails as ConventionFormDetails } from "./ConventionFormDetails";
+import { ConventionFormDetails } from "./ConventionFormDetails";
 
 const beforeAfterString = (date: string) => {
   const eventDate = new Date(date);
@@ -60,9 +60,9 @@ export const ConventionFormAccordion = ({
     `${beforeAfterString(dateStart)}`;
 
   return (
-    <div style={{ padding: "0.5rem" }}>
-      <h5 style={{ margin: "2rem 4rem" }}>{title}</h5>
+    <>
+      <h3>{title}</h3>
       <ConventionFormDetails convention={convention} />
-    </div>
+    </>
   );
 };
