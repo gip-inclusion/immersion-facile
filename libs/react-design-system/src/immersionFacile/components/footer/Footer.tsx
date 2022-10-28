@@ -1,5 +1,6 @@
 import React from "react";
 import { NavLink } from "../tabLinks";
+import "./Footer.css";
 
 export type FooterProps = {
   links?: NavLink[];
@@ -28,7 +29,9 @@ const BottomLink = ({ link }: { link: NavLink }) => (
 );
 
 const LogoPartner = ({ children }: { children: React.ReactNode }) => (
-  <div className="fr-footer__partners-link">{children}</div>
+  <div className="fr-footer__partners-link im-footer__partner-link">
+    {children}
+  </div>
 );
 
 export const Footer = ({
@@ -37,7 +40,7 @@ export const Footer = ({
   ministereLogo,
   partnersLogos,
 }: FooterProps) => (
-  <footer className="fr-footer" id="main-footer">
+  <footer className="fr-footer im-footer" id="main-footer">
     <div className="fr-container">
       <div className="fr-footer__body">
         {ministereLogo}
@@ -46,7 +49,7 @@ export const Footer = ({
             <LogoPartner key={i}>{logo}</LogoPartner>
           ))}
 
-        <div className="fr-footer__content">
+        <div className="fr-footer__content im-footer__content">
           {links && links.length > 0 && (
             <ul className="fr-footer__content-list">
               {links.map((link, index) => (

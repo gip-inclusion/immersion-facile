@@ -1,5 +1,6 @@
 import lesEntrepriseSengagent from "/img/les-entreprises-s-engagent.svg";
 import poleEmploiLogo from "/img/pole-emploi-logo.svg";
+import plateformeLogo from "/img/plateforme-inclusion-logo.svg";
 import React from "react";
 import { Footer, NavLink } from "react-design-system";
 import {
@@ -26,6 +27,10 @@ const PoleEmploiLogo = () => (
 );
 const EntreprisesLogo = () => (
   <img src={lesEntrepriseSengagent} alt="Les entreprises s'engagent" />
+);
+
+const PlateformeLogo = () => (
+  <img src={plateformeLogo} alt="Plateforme de l'Inclusion" />
 );
 
 const overFooterCols: OverFooterCols = [
@@ -103,7 +108,11 @@ export const ImmersionFooter = () => (
     <Footer
       links={links}
       ministereLogo={<MinistereLogo />}
-      partnersLogos={[<PoleEmploiLogo />, <EntreprisesLogo />]}
+      partnersLogos={[
+        <PoleEmploiLogo />,
+        <EntreprisesLogo />,
+        <PlateformeLogo />,
+      ]}
       bottomLinks={bottomsLinks}
     />
   </>

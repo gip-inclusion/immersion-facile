@@ -1,0 +1,14 @@
+.im-footer {
+}
+.im-footer__content {
+  flex: 1 1 33%;
+  margin-left: 3%;
+}
+.im-footer__partner-link {
+  margin: 0 0.5rem;
+}
+.im-footer__partner-link img {
+  max-width: 160px;
+  max-height: 90px;
+  height: auto;
+}
