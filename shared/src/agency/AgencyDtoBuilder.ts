@@ -10,7 +10,7 @@ const emptyAddress: AddressDto = {
   postcode: "",
 };
 
-const defaultValidatorEmail = "validator@mail.com";
+export const defaultValidatorEmail = "validator@mail.com";
 
 const emptyAgency: AgencyDto = {
   id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",

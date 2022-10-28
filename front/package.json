@@ -39,6 +39,7 @@
     "rxjs": "^7.5.5",
     "shared": "workspace:*",
     "html-templates": "workspace:*",
+    "http-client": "workspace:*",
     "type-route": "^0.6.0",
     "uuid": "^8.3.2",
     "zod": "^3.14.2"

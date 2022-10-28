@@ -13,9 +13,10 @@ import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/fakeGenera
 import { NotifyNewApplicationNeedsReview } from "./NotifyNewApplicationNeedsReview";
 
 const defaultConvention = new ConventionDtoBuilder().build();
-const defaultAgency = AgencyDtoBuilder.create(
-  defaultConvention.agencyId,
-).build();
+const validatorEmail = "myValidator@bob.yolo";
+const defaultAgency = AgencyDtoBuilder.create(defaultConvention.agencyId)
+  .withValidatorEmails([validatorEmail])
+  .build();
 
 describe("NotifyImmersionApplicationNeedsReview", () => {
   let validConvention: ConventionDto;
@@ -113,18 +114,6 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(0);
     });
-
-    it("No counsellors available, neither validators, still we got admins => ensure no mail is sent", async () => {
-      const adminEmail = ["aValidator@unmail.com"];
-      const agency = new AgencyDtoBuilder(defaultAgency)
-        .withAdminEmails(adminEmail)
-        .build();
-      agencyRepository.setAgencies([agency]);
-      await notifyNewConventionNeedsReview.execute(validConvention);
-
-      const sentEmails = emailGw.getSentEmails();
-      expect(sentEmails).toHaveLength(0);
-    });
   });
 
   describe("When application status is ACCEPTED_BY_COUNSELLOR", () => {
@@ -168,18 +157,6 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
 
     it("No validators available => ensure no mail is sent", async () => {
       await notifyNewConventionNeedsReview.execute(validConvention);
-      const sentEmails = emailGw.getSentEmails();
-      expect(sentEmails).toHaveLength(0);
-    });
-
-    it("No validators available, still we got admins => ensure no mail is sent", async () => {
-      const adminEmail = ["anAdmin@unmail.com"];
-      const agency = new AgencyDtoBuilder(defaultAgency)
-        .withAdminEmails(adminEmail)
-        .build();
-      agencyRepository.setAgencies([agency]);
-      await notifyNewConventionNeedsReview.execute(validConvention);
-
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(0);
     });

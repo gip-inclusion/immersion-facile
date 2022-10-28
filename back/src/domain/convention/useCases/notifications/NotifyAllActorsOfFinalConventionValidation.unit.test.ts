@@ -33,8 +33,10 @@ const validConvention: ConventionDto = new ConventionDtoBuilder()
   .build();
 
 const counsellorEmail = "counsellor@email.fr";
-
-const defaultAgency = AgencyDtoBuilder.create(validConvention.agencyId).build();
+const validatorEmail = "myValidator@mail.com";
+const defaultAgency = AgencyDtoBuilder.create(validConvention.agencyId)
+  .withValidatorEmails([validatorEmail])
+  .build();
 
 describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email to all actors", () => {
   let uow: UnitOfWork;
@@ -73,6 +75,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
         validConvention.signatories.beneficiary.email,
         validConvention.signatories.establishmentRepresentative.email,
         counsellorEmail,
+        validatorEmail,
       ],
       sentEmails[0],
       agency,
@@ -106,6 +109,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
         conventionWithSpecificEstablishementEmail.signatories
           .establishmentRepresentative.email,
         counsellorEmail,
+        validatorEmail,
         conventionWithSpecificEstablishementEmail.establishmentTutor.email,
       ],
       sentEmails[0],
@@ -149,6 +153,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
         conventionWithBeneficiaryRepresentative.signatories
           .beneficiaryRepresentative!.email,
         counsellorEmail,
+        validatorEmail,
       ],
       sentEmails[0],
       agency,
@@ -192,6 +197,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
         validConvention.signatories.beneficiary.email,
         validConvention.signatories.establishmentRepresentative.email,
         counsellorEmail,
+        validatorEmail,
         userConventionAdvisor.email,
       ],
       sentEmails[0],

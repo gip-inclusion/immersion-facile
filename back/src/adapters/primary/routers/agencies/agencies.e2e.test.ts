@@ -3,6 +3,7 @@ import {
   AdminToken,
   agenciesRoute,
   AgencyDtoBuilder,
+  expectToEqual,
 } from "shared";
 import { SuperTest, Test } from "supertest";
 import {
@@ -115,8 +116,8 @@ describe(`/${agenciesRoute} route`, () => {
     });
   });
 
-  describe("private route to update an agency", () => {
-    it("Updates the agency, sends an email to validators and returns code 200", async () => {
+  describe("private route to update an agency status", () => {
+    it("Updates the agency status, sends an email to validators and returns code 200", async () => {
       // Prepare
       await inMemoryUow.agencyRepository.insert(agency4NeedsReview);
 
@@ -134,6 +135,40 @@ describe(`/${agenciesRoute} route`, () => {
 
       await eventCrawler.processNewEvents();
       expect(gateways.email.getSentEmails()).toHaveLength(1);
+    });
+  });
+  describe("private route to update an agency data", () => {
+    it("fails if provided token is not valid", async () => {
+      await request
+        .put(`/admin/${agenciesRoute}/test-agency-4`)
+        .set("Authorization", "wrong-token")
+        .send({})
+        .expect(401);
+    });
+
+    it("Updates the agency and returns code 200", async () => {
+      // Prepare
+      await inMemoryUow.agencyRepository.insert(agency4NeedsReview);
+
+      const updatedAgency = new AgencyDtoBuilder()
+        .withId(agency4NeedsReview.id)
+        .withValidatorEmails(["this-is-a-new-validator@mail.com"])
+        .withCodeSafir("1234")
+        .build();
+
+      // Act and assert
+      await request
+        .put(`/admin/${agenciesRoute}/test-agency-4`)
+        .set("Authorization", adminToken)
+        .send(updatedAgency)
+        .expect(200);
+
+      expectToEqual(
+        await inMemoryUow.agencyRepository.getById("test-agency-4"),
+        updatedAgency,
+      );
+
+      expect(inMemoryUow.outboxRepository.events).toHaveLength(1);
     });
   });
 });
