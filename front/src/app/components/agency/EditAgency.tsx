@@ -12,10 +12,7 @@ import {
   allAgencyStatuses,
   zEmail,
 } from "shared";
-import {
-  agencySubmitMessageByKind,
-  SuccessFeedbackKindAgency,
-} from "src/app/components/agency/AgencySubmitFeedback";
+import { agencySubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
 import { RadioGroup } from "src/app/components/RadioGroup";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { UploadLogo } from "src/app/components/UploadLogo";
@@ -23,7 +20,6 @@ import { useAppSelector } from "src/app/utils/reduxHooks";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import "src/assets/admin.css";
 import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
-import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
 import { AddressAutocomplete } from "src/uiComponents/autocomplete/AddressAutocomplete";
 import { FillableList } from "src/uiComponents/form/FillableList";
 import { SimpleSelect } from "src/uiComponents/form/SimpleSelect";
@@ -122,11 +118,7 @@ const descriptionByValidationSteps: Record<ValidationSteps, string> = {
 };
 
 const EditAgencyForm = ({ agency }: { agency: AgencyDto }) => {
-  const [submitFeedback, _setSubmitFeedback] = useState<
-    SubmitFeedBack<SuccessFeedbackKindAgency>
-  >({
-    kind: "idle",
-  });
+  const feedback = useAppSelector(agencyAdminSelectors.feedback);
   const { enableLogoUpload } = useFeatureFlags();
 
   return (
@@ -261,16 +253,14 @@ const EditAgencyForm = ({ agency }: { agency: AgencyDto }) => {
               <div className="fr-mt-4w">
                 <Button
                   type="submit"
-                  disable={
-                    true && (isSubmitting || submitFeedback.kind !== "idle")
-                  }
+                  disable={true && (isSubmitting || feedback.kind !== "idle")}
                 >
                   Editer
                 </Button>
               </div>
 
               <SubmitFeedbackNotification
-                submitFeedback={submitFeedback}
+                submitFeedback={feedback}
                 messageByKind={agencySubmitMessageByKind}
               />
 

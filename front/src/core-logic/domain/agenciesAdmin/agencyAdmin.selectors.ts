@@ -1,12 +1,10 @@
-import { AgencyDto } from "shared";
+import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "src/core-logic/storeConfig/store";
 
-const agencyState = ({ agencyAdmin }: RootState) => agencyAdmin;
-
-const agency = ({ agencyAdmin }: RootState): AgencyDto | null =>
-  agencyAdmin.agency;
+const agencyState = ({ admin }: RootState) => admin.agencyAdmin;
 
 export const agencyAdminSelectors = {
-  agency,
   agencyState,
+  agency: createSelector(agencyState, ({ agency }) => agency),
+  feedback: createSelector(agencyState, ({ feedback }) => feedback),
 };

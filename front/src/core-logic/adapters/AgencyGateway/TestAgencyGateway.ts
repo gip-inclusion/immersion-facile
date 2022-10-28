@@ -20,6 +20,14 @@ import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 export class TestAgencyGateway implements AgencyGateway {
   public agencies$ = new Subject<AgencyOption[]>();
   public fetchedAgency$ = new Subject<AgencyDto | undefined>();
+  public updateAgencyResponse$ = new Subject<undefined>();
+
+  public updateAgency$(
+    _agencyDto: AgencyDto,
+    _adminToken: AdminToken,
+  ): Observable<void> {
+    return this.updateAgencyResponse$;
+  }
 
   listAgenciesByFilter$(
     _filter: ListAgenciesRequestDto,

@@ -1,12 +1,8 @@
 import React from "react";
-import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
-
-export type AgencySubmitFeedback = SubmitFeedBack<SuccessFeedbackKindAgency>;
-
-export type SuccessFeedbackKindAgency = "agencyAdded" | "agencyUpdated";
+import { AgencySuccessFeedbackKind } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
 
 export const agencySubmitMessageByKind: Record<
-  SuccessFeedbackKindAgency,
+  AgencySuccessFeedbackKind,
   React.ReactNode
 > = {
   agencyAdded:

@@ -7,7 +7,7 @@ export type AdminAuthState = {
   error: string | null;
 };
 
-const initialState: AdminAuthState = {
+export const adminAuthInitialState: AdminAuthState = {
   adminToken: null,
   isLoading: false,
   error: null,
@@ -15,7 +15,7 @@ const initialState: AdminAuthState = {
 
 export const adminAuthSlice = createSlice({
   name: "adminAuth",
-  initialState,
+  initialState: adminAuthInitialState,
   reducers: {
     loginRequested: (
       state,

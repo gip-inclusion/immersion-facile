@@ -5,13 +5,13 @@ export type DashboardsState = {
   conventions: AbsoluteUrl | null;
 };
 
-const initialState: DashboardsState = {
+export const dashboardInitialState: DashboardsState = {
   conventions: null,
 };
 
 export const dashboardUrlsSlice = createSlice({
   name: "dashboardUrls",
-  initialState,
+  initialState: dashboardInitialState,
   reducers: {
     conventionsDashboardUrlRequested: (state) => state,
     conventionsDashboardUrlSucceeded: (

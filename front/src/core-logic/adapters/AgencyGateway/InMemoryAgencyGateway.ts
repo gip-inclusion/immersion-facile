@@ -67,6 +67,10 @@ export class InMemoryAgencyGateway implements AgencyGateway {
     [AGENCY_4_NEEDING_REVIEW.id]: AGENCY_4_NEEDING_REVIEW,
   };
 
+  updateAgency$(): Observable<void> {
+    return of(undefined);
+  }
+
   async addAgency(createAgencyDto: CreateAgencyDto) {
     this._agencies[createAgencyDto.id] = {
       ...createAgencyDto,

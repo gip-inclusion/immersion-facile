@@ -14,16 +14,14 @@ import {
   createAgencySchema,
   zEmail,
 } from "shared";
-import {
-  AgencySubmitFeedback,
-  agencySubmitMessageByKind,
-} from "src/app/components/agency/AgencySubmitFeedback";
+import { agencySubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
 import { RadioGroup } from "src/app/components/RadioGroup";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { UploadLogo } from "src/app/components/UploadLogo";
 import { agencyGateway } from "src/app/config/dependencies";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
+import { AgencySubmitFeedback } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
 import { AddressAutocomplete } from "src/uiComponents/autocomplete/AddressAutocomplete";
 import { FillableList } from "src/uiComponents/form/FillableList";
 import { SimpleSelect } from "src/uiComponents/form/SimpleSelect";

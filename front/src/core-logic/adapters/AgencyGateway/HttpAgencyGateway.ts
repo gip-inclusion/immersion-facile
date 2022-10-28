@@ -26,33 +26,47 @@ type WithAuthorization = { authorization: string };
 type WithAgencyStatus = { status: AgencyStatus };
 
 export type AgencyTargets = CreateTargets<{
-  getImmersionFacileAgencyId: Target;
   getAgencyAdminById: Target<
     void,
     void,
     WithAuthorization,
     `/admin/${typeof agenciesRoute}/:agencyId`
   >;
-  addAgency: Target<CreateAgencyDto>;
-  getAgencyPublicInfoById: Target<void, WithAgencyId>;
-  listAgenciesNeedingReview: Target<void, WithAgencyStatus, WithAuthorization>;
   updateAgencyStatus: Target<
     WithAgencyStatus,
     void,
     WithAuthorization,
     `/admin/${typeof agenciesRoute}/:agencyId`
   >;
+  updateAgency: Target<
+    AgencyDto,
+    void,
+    WithAuthorization,
+    `/admin/${typeof agenciesRoute}/:agencyId`
+  >;
+  getImmersionFacileAgencyId: Target;
+  addAgency: Target<CreateAgencyDto>;
+  getAgencyPublicInfoById: Target<void, WithAgencyId>;
+  listAgenciesNeedingReview: Target<void, WithAgencyStatus, WithAuthorization>;
   getFilteredAgencies: Target<void, ListAgenciesRequestDto>;
 }>;
 
 export const agencyTargets = createTargets<AgencyTargets>({
-  getImmersionFacileAgencyId: {
-    method: "GET",
-    url: `/${agencyImmersionFacileIdRoute}`,
-  },
   getAgencyAdminById: {
     method: "GET",
     url: `/admin/${agenciesRoute}/:agencyId`,
+  },
+  updateAgencyStatus: {
+    method: "PATCH",
+    url: `/admin/${agenciesRoute}/:agencyId`,
+  },
+  updateAgency: {
+    method: "PUT",
+    url: `/admin/${agenciesRoute}/:agencyId`,
+  },
+  getImmersionFacileAgencyId: {
+    method: "GET",
+    url: `/${agencyImmersionFacileIdRoute}`,
   },
   addAgency: {
     method: "POST",
@@ -65,10 +79,6 @@ export const agencyTargets = createTargets<AgencyTargets>({
   listAgenciesNeedingReview: {
     method: "GET",
     url: `/admin/${agenciesRoute}`,
-  },
-  updateAgencyStatus: {
-    method: "PATCH",
-    url: `/admin/${agenciesRoute}/:agencyId`,
   },
   getFilteredAgencies: {
     method: "GET",
@@ -93,6 +103,23 @@ export class HttpAgencyGateway implements AgencyGateway {
     adminToken: AdminToken,
   ): Observable<AgencyDto> {
     return from(this.getAdminAgencyById(agencyId, adminToken));
+  }
+
+  public updateAgency$(
+    agencyDto: AgencyDto,
+    adminToken: AdminToken,
+  ): Observable<void> {
+    return from(
+      this.httpClient
+        .updateAgency({
+          body: agencyDto,
+          headers: { authorization: adminToken },
+          urlParams: { agencyId: agencyDto.id },
+        })
+        .then(() => {
+          /* void if success */
+        }),
+    );
   }
 
   private getAdminAgencyById(

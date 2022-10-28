@@ -2,6 +2,7 @@ import { PayloadAction } from "@reduxjs/toolkit";
 import { filter } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
 import { AgencyId } from "shared";
+import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
   ActionOfSlice,
   AppEpic,
@@ -41,7 +42,27 @@ export const agencyAdminGetDetailsEpic: AppEpic<AgencyAction> = (
     map((agency) => agencyAdminSlice.actions.setAgency(agency ?? null)),
   );
 
+export const updateAgencyEpic: AppEpic<AgencyAction> = (
+  action$,
+  state$,
+  { agencyGateway },
+) =>
+  action$.pipe(
+    filter(agencyAdminSlice.actions.updateAgencyRequested.match),
+    switchMap(({ payload }) =>
+      agencyGateway.updateAgency$(
+        payload,
+        state$.value.admin.adminAuth.adminToken || "",
+      ),
+    ),
+    map(agencyAdminSlice.actions.updateAgencySucceeded),
+    catchEpicError((error: Error) =>
+      agencyAdminSlice.actions.updateAgencyFailed(error.message),
+    ),
+  );
+
 export const agenciesAdminEpics = [
   agencyAdminGetByNameEpic,
   agencyAdminGetDetailsEpic,
+  updateAgencyEpic,
 ];

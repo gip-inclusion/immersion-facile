@@ -7,7 +7,7 @@ export type SentEmailsState = {
   sentEmails: EmailSentDto[];
 };
 
-const initialState: SentEmailsState = {
+export const sentEmailInitialState: SentEmailsState = {
   isLoading: false,
   sentEmails: [],
   error: null,
@@ -15,7 +15,7 @@ const initialState: SentEmailsState = {
 
 export const sentEmailsSlice = createSlice({
   name: "sentEmails",
-  initialState,
+  initialState: sentEmailInitialState,
   reducers: {
     lastSentEmailsRequested: (state) => {
       state.isLoading = true;

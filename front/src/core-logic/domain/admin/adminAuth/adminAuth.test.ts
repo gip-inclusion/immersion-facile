@@ -4,6 +4,7 @@ import {
   adminAuthSlice,
   AdminAuthState,
 } from "src/core-logic/domain/admin/adminAuth/adminAuth.slice";
+import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
 import {
   createTestStore,
   TestDependencies,
@@ -74,11 +75,9 @@ describe("adminAuth slice", () => {
       const adminToken = "a-token";
 
       ({ store, dependencies } = createTestStore({
-        admin: {
-          sentEmails: { sentEmails: [], isLoading: false, error: null },
-          dashboardUrls: { conventions: null },
+        admin: adminPreloadedState({
           adminAuth: { ...initialAdminState, adminToken },
-        },
+        }),
       }));
 
       dependencies.deviceRepository.set("adminToken", adminToken);

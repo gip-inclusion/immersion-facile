@@ -50,7 +50,6 @@ const rootReducer = combineReducers({
   [searchSlice.name]: searchSlice.reducer,
   [featureFlagsSlice.name]: featureFlagsSlice.reducer,
   [romeAutocompleteSlice.name]: romeAutocompleteSlice.reducer,
-  [agencyAdminSlice.name]: agencyAdminSlice.reducer,
   [siretSlice.name]: siretSlice.reducer,
   [establishmentSlice.name]: establishmentSlice.reducer,
   [conventionSlice.name]: conventionSlice.reducer,
@@ -60,6 +59,7 @@ const rootReducer = combineReducers({
     [adminAuthSlice.name]: adminAuthSlice.reducer,
     [dashboardUrlsSlice.name]: dashboardUrlsSlice.reducer,
     [sentEmailsSlice.name]: sentEmailsSlice.reducer,
+    [agencyAdminSlice.name]: agencyAdminSlice.reducer,
   }),
 });
 

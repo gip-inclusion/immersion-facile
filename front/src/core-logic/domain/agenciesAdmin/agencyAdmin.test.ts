@@ -4,8 +4,10 @@ import {
   AgencyOption,
   expectObjectsToMatch,
 } from "shared";
+import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
 import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
 import {
+  agencyAdminInitialState,
   agencyAdminSlice,
   AgencyAdminState,
 } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
@@ -60,15 +62,20 @@ describe("agencyAdmin", () => {
         { id: agencyDto.id, name: agencyDto.name },
         { id: "456", name: "My other agency" },
       ];
+
       ({ store, dependencies } = createTestStore({
-        agencyAdmin: {
-          agencyOptions,
-          agencySearchText: "My ",
-          agency: null,
-          selectedAgencyId: null,
-          isSearching: false,
-          error: null,
-        },
+        admin: adminPreloadedState({
+          agencyAdmin: {
+            agencyOptions,
+            agencySearchText: "My ",
+            agency: null,
+            selectedAgencyId: null,
+            isSearching: false,
+            isUpdating: false,
+            feedback: { kind: "idle" },
+            error: null,
+          },
+        }),
       }));
 
       store.dispatch(
@@ -87,6 +94,52 @@ describe("agencyAdmin", () => {
     });
   });
 
+  describe("Agency update", () => {
+    const agencyDto = new AgencyDtoBuilder().build();
+
+    it("shows when update is ongoing", () => {
+      store.dispatch(agencyAdminSlice.actions.updateAgencyRequested(agencyDto));
+      expectAgencyAdminStateToMatch({
+        isUpdating: true,
+      });
+    });
+
+    it("reset feedback to idle when updating an agency", () => {
+      ({ store, dependencies } = createTestStore({
+        admin: adminPreloadedState({
+          agencyAdmin: {
+            ...agencyAdminInitialState,
+            feedback: { kind: "errored", errorMessage: "something wrong" },
+          },
+        }),
+      }));
+      store.dispatch(agencyAdminSlice.actions.updateAgencyRequested(agencyDto));
+      expectAgencyAdminStateToMatch({
+        isUpdating: true,
+        feedback: { kind: "idle" },
+      });
+    });
+
+    it("send request to update agency and shows feedback", () => {
+      store.dispatch(agencyAdminSlice.actions.updateAgencyRequested(agencyDto));
+
+      feedWithUpdateResponse();
+      expectAgencyAdminStateToMatch({
+        isUpdating: false,
+        feedback: { kind: "agencyUpdated" },
+      });
+    });
+
+    it("when something goes wrong, showes error", () => {
+      store.dispatch(agencyAdminSlice.actions.updateAgencyRequested(agencyDto));
+      feedWithUpdateError("Something went wrong !");
+      expectAgencyAdminStateToMatch({
+        isUpdating: false,
+        feedback: { kind: "errored", errorMessage: "Something went wrong !" },
+      });
+    });
+  });
+
   const expectAgencyAdminStateToMatch = (params: Partial<AgencyAdminState>) => {
     expectObjectsToMatch(
       agencyAdminSelectors.agencyState(store.getState()),
@@ -100,5 +153,13 @@ describe("agencyAdmin", () => {
 
   const feedWithFetchedAgency = (agencyDto: AgencyDto) => {
     dependencies.agencyGateway.fetchedAgency$.next(agencyDto);
+  };
+
+  const feedWithUpdateResponse = () => {
+    dependencies.agencyGateway.updateAgencyResponse$.next(undefined);
+  };
+
+  const feedWithUpdateError = (msg: string) => {
+    dependencies.agencyGateway.updateAgencyResponse$.error(new Error(msg));
   };
 });

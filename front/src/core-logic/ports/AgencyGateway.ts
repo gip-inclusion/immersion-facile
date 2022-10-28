@@ -34,4 +34,5 @@ export interface AgencyGateway {
     filter: ListAgenciesRequestDto,
   ): Observable<AgencyOption[]>;
   getImmersionFacileAgencyId$(): Observable<AgencyId | false>;
+  updateAgency$(agencyDto: AgencyDto, adminToken: AdminToken): Observable<void>;
 }
