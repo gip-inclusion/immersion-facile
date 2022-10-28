@@ -153,7 +153,7 @@ describe("agencyAdmin", () => {
       });
     });
 
-    it("when something goes wrong, showes error", () => {
+    it("when something goes wrong, shows error", () => {
       store.dispatch(agencyAdminSlice.actions.updateAgencyRequested(agencyDto));
       feedWithUpdateError("Something went wrong !");
       expectAgencyAdminStateToMatch({

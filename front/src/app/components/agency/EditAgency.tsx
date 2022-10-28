@@ -2,6 +2,7 @@ import { Form, Formik, FormikHelpers } from "formik";
 import { keys } from "ramda";
 import React, { useState } from "react";
 import { Button, DsfrTitle } from "react-design-system/immersionFacile";
+import { useDispatch } from "react-redux";
 import {
   addressDtoToString,
   AgencyDto,
@@ -20,6 +21,7 @@ import { useAppSelector } from "src/app/utils/reduxHooks";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import "src/assets/admin.css";
 import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
+import { agencyAdminSlice } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
 import { AddressAutocomplete } from "src/uiComponents/autocomplete/AddressAutocomplete";
 import { FillableList } from "src/uiComponents/form/FillableList";
 import { SimpleSelect } from "src/uiComponents/form/SimpleSelect";
@@ -27,30 +29,24 @@ import { TextInput } from "src/uiComponents/form/TextInput";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { AgencyAutocomplete } from "./AgencyAutocomplete";
 
-export const EditAgency = () => {
-  const selectedAgency: AgencyDto | null = useAppSelector(
-    agencyAdminSelectors.agency,
-  );
-
-  return (
-    <>
-      <DsfrTitle level={5} text="Editer une agence" />
-      <div
-        className="w-2/3 p-5"
-        style={{
-          backgroundColor: "#E5E5F4",
-        }}
-      >
-        <AgencyAutocomplete
-          title="Je sélectionne une agence"
-          placeholder={"Ex : Agence de Berry"}
-          className="searchdropdown-header inputLabel"
-        />
-      </div>
-      {selectedAgency && <EditAgencyForm agency={selectedAgency} />}
-    </>
-  );
-};
+export const EditAgency = () => (
+  <>
+    <DsfrTitle level={5} text="Editer une agence" />
+    <div
+      className="w-2/3 p-5"
+      style={{
+        backgroundColor: "#E5E5F4",
+      }}
+    >
+      <AgencyAutocomplete
+        title="Je sélectionne une agence"
+        placeholder={"Ex : Agence de Berry"}
+        className="searchdropdown-header inputLabel"
+      />
+    </div>
+    <EditAgencyForm />
+  </>
+);
 
 type KeysExceptId = Exclude<keyof AgencyDto, "id">;
 
@@ -117,18 +113,23 @@ const descriptionByValidationSteps: Record<ValidationSteps, string> = {
     "Les personnes ou emails génériques suivants valideront les conventions préalablement examinées.",
 };
 
-const EditAgencyForm = ({ agency }: { agency: AgencyDto }) => {
+const EditAgencyForm = () => {
+  const dispatch = useDispatch();
   const feedback = useAppSelector(agencyAdminSelectors.feedback);
+  const agency = useAppSelector(agencyAdminSelectors.agency);
+
   const { enableLogoUpload } = useFeatureFlags();
+
+  if (!agency) return null;
 
   return (
     <div>
       <Formik
         initialValues={agency}
         validationSchema={toFormikValidationSchema(agencySchema)}
-        onSubmit={(_values) => {
-          // TODO
-          //dispatch(agencyAdminSlice.actions.editAgencyRequested(values));
+        onSubmit={(values, { setSubmitting }) => {
+          dispatch(agencyAdminSlice.actions.updateAgencyRequested(values));
+          setSubmitting(false);
         }}
       >
         {({ isSubmitting, setFieldValue, values, errors, submitCount }) => {
@@ -253,9 +254,9 @@ const EditAgencyForm = ({ agency }: { agency: AgencyDto }) => {
               <div className="fr-mt-4w">
                 <Button
                   type="submit"
-                  disable={true && (isSubmitting || feedback.kind !== "idle")}
+                  disable={isSubmitting || feedback.kind !== "idle"}
                 >
-                  Editer
+                  Mettre à jour
                 </Button>
               </div>
 

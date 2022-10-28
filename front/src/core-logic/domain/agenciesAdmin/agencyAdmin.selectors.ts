@@ -7,4 +7,8 @@ export const agencyAdminSelectors = {
   agencyState,
   agency: createSelector(agencyState, ({ agency }) => agency),
   feedback: createSelector(agencyState, ({ feedback }) => feedback),
+  selectedAgencyId: createSelector(
+    agencyState,
+    ({ selectedAgencyId }) => selectedAgencyId,
+  ),
 };
