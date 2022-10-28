@@ -36,8 +36,8 @@ const prepareUseCase = () => {
   };
 };
 
-describe("Update agency", () => {
-  it("Updates an agency in repository and publishes an event to notify if status becomes active", async () => {
+describe("Update agency status", () => {
+  it("Updates an agency status in repository and publishes an event to notify if status becomes active", async () => {
     // Prepare
     const { useCase, agencyRepository, outboxRepository } = prepareUseCase();
     const existingAgency = AgencyDtoBuilder.create("agency-123")
