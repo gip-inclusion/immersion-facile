@@ -11,32 +11,26 @@ type Car = {
 };
 
 type MyBookEndpoints = CreateTargets<{
-  addBook: Target<void, Book, void, { authorization: string }>;
-  getBooks: Target<Book[], void, { max?: number }>;
-  getBook: Target<
-    Book | undefined,
-    void,
-    void,
-    void,
-    "https://www.truc.com/book/:bookId"
-  >;
-  getCar: Target<Car | undefined, void, void, void, "/car/:carId">;
-  getSomethingWithNoParams: Target<string>;
+  addBook: Target<Book, void, { authorization: string }>;
+  getBooks: Target<void, { max?: number }>;
+  getBook: Target<void, void, void, "https://www.truc.com/book/:bookId">;
+  getCar: Target<void, void, void, "/car/:carId">;
+  getSomethingWithNoParams: Target;
 }>;
 
-const isBook = (book: any): Book | never => {
-  if (typeof book?.name !== "string") {
-    throw new Error("Is not a book");
-  }
-  return book;
-};
-
-const isCar = (car: any): Car | never => {
-  if (typeof car?.horsePower !== "number") {
-    throw new Error("Is not a car");
-  }
-  return car;
-};
+// const isBook = (book: any): Book | never => {
+//   if (typeof book?.name !== "string") {
+//     throw new Error("Is not a book");
+//   }
+//   return book;
+// };
+//
+// const isCar = (car: any): Car | never => {
+//   if (typeof car?.horsePower !== "number") {
+//     throw new Error("Is not a car");
+//   }
+//   return car;
+// };
 
 describe("http-client", () => {
   let httpClient: HttpClient<MyBookEndpoints>;
@@ -53,26 +47,18 @@ describe("http-client", () => {
       getBooks: {
         method: "GET",
         url: "https://www.truc.com",
-        validateResponseBody: (responseBody): Book[] => {
-          if (!(responseBody instanceof Array) || !responseBody.every(isBook))
-            throw new Error("Not a list of Book");
-          return responseBody;
-        },
       },
       getBook: {
         method: "GET",
         url: "https://www.truc.com/book/:bookId",
-        validateResponseBody: isBook,
       },
       getCar: {
         method: "GET",
         url: "/car/:carId",
-        validateResponseBody: isCar,
       },
       getSomethingWithNoParams: {
         method: "GET",
         url: "/yolo",
-        validateResponseBody: (v) => v as string,
       },
     });
   });
@@ -148,16 +134,6 @@ describe("http-client", () => {
         urlParams: { carId: "123" },
       },
     });
-  });
-
-  it("throws error if validation was not fine", async () => {
-    inMemory.setResponse({
-      status: 200,
-      responseBody: [{ message: "This is not the same" }],
-    });
-    const promise = httpClient.getBooks({ queryParams: {} });
-
-    await expect(promise).rejects.toThrow(new Error("Is not a book"));
   });
 
   it("gets something without params", async () => {

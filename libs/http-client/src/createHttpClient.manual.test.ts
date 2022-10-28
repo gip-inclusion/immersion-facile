@@ -4,7 +4,7 @@ import { CreateTargets, createHttpClient, Target } from "./createHttpClient";
 
 type AddressApiTargets = CreateTargets<{
   // prettier-ignore
-  forwardGeocoding: Target<FeatureCollection, void, { q: string; limit: number }>;
+  forwardGeocoding: Target<void, { q: string; limit: number }>;
 }>;
 
 describe("Manual - Call an actual api endpoint", () => {
@@ -13,7 +13,6 @@ describe("Manual - Call an actual api endpoint", () => {
     forwardGeocoding: {
       url: "https://api-adresse.data.gouv.fr/search/",
       method: "GET",
-      validateResponseBody: isFeatureCollection,
     },
   });
 
@@ -69,26 +68,26 @@ const expectedData: FeatureCollection = {
   type: "FeatureCollection",
 };
 
-const isFeatureCollection = (data: unknown): FeatureCollection => {
-  if (
-    data != null &&
-    typeof data === "object" &&
-    "city" in data &&
-    "citycode" in data &&
-    "context" in data &&
-    "housenumber" in data &&
-    "id" in data &&
-    "importance" in data &&
-    "label" in data &&
-    "name" in data &&
-    "postcode" in data &&
-    "score" in data &&
-    "street" in data &&
-    "type" in data &&
-    "x" in data &&
-    "y" in data
-  ) {
-    return data as FeatureCollection;
-  }
-  throw new Error("Wrong");
-};
+// const isFeatureCollection = (data: unknown): FeatureCollection => {
+//   if (
+//     data != null &&
+//     typeof data === "object" &&
+//     "city" in data &&
+//     "citycode" in data &&
+//     "context" in data &&
+//     "housenumber" in data &&
+//     "id" in data &&
+//     "importance" in data &&
+//     "label" in data &&
+//     "name" in data &&
+//     "postcode" in data &&
+//     "score" in data &&
+//     "street" in data &&
+//     "type" in data &&
+//     "x" in data &&
+//     "y" in data
+//   ) {
+//     return data as FeatureCollection;
+//   }
+//   throw new Error("Wrong");
+// };
