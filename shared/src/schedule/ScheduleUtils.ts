@@ -87,8 +87,11 @@ export const calculateTotalImmersionHoursFromComplexSchedule = (
   });
 };
 
-export const prettyPrintSchedule = (schedule: ScheduleDto): string =>
-  prettyPrintComplexSchedule(schedule.complexSchedule);
+export const prettyPrintSchedule = (
+  schedule: ScheduleDto,
+  displayFreeDays = true,
+): string =>
+  prettyPrintComplexSchedule(schedule.complexSchedule, displayFreeDays);
 
 // Extract all weekday names for which there is at least one
 export const convertToFrenchNamedDays = (schedule: ScheduleDto): Weekday[] => {
@@ -246,21 +249,22 @@ const prettyPrintDaySchedule = (timePeriods: TimePeriodDto[]): string => {
 // ...
 export const prettyPrintComplexSchedule = (
   complexSchedule: DailyScheduleDto[],
+  displayFreeDays = true,
 ): string => {
   const lines: string[] = [];
   makeImmersionTimetable(complexSchedule).forEach((week) => {
     lines.push(
       `Heures de travail hebdomadaires : ${calculateWeeklyHours(week)}`,
     );
-    week.forEach((day, index) =>
-      lines.push(
-        day.dailySchedule
-          ? `${
-              frenchDayMapping(day.dailySchedule.date).frenchDayName
-            } : ${prettyPrintDaySchedule(day.dailySchedule.timePeriods)}`
-          : `${weekdays[index]} : libre`,
-      ),
-    );
+    week.forEach((day, index) => {
+      const freeDay = displayFreeDays ? `${weekdays[index]} : libre` : "";
+      const dayToPush = day.dailySchedule
+        ? `${
+            frenchDayMapping(day.dailySchedule.date).frenchDayName
+          } : ${prettyPrintDaySchedule(day.dailySchedule.timePeriods)}`
+        : freeDay;
+      return dayToPush !== "" && lines.push(dayToPush);
+    });
   });
   return lines.join("\n");
 };

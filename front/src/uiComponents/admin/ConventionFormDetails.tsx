@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState } from "react";
 import { toDisplayedDate } from "shared";
 import {
   AppellationDto,
@@ -96,10 +96,10 @@ type FieldsAndTitle = {
   listTitle: string;
   cols?: string[];
   rowFields: RowFields[];
-  accent?: string;
+  additionalClasses?: string;
 };
 
-const allFields: FieldsAndTitle[] = [
+const sections: FieldsAndTitle[] = [
   {
     listTitle: "Signataires",
     cols: [
@@ -126,7 +126,7 @@ const allFields: FieldsAndTitle[] = [
         fields: establishmentRepresentativeFields,
       },
     ],
-    accent: "fr-table--green-emeraude",
+    additionalClasses: "fr-table--green-emeraude",
   },
   {
     listTitle: "Entreprise",
@@ -149,7 +149,7 @@ const allFields: FieldsAndTitle[] = [
         },
       },
     ],
-    accent: "fr-table--blue-cumulus",
+    additionalClasses: "fr-table--layout-fixed fr-table--blue-cumulus",
   },
   {
     listTitle: "Structure",
@@ -158,7 +158,7 @@ const allFields: FieldsAndTitle[] = [
         fields: agencyFields,
       },
     ],
-    accent: "fr-table--blue-ecume",
+    additionalClasses: "fr-table--layout-fixed fr-table--blue-ecume",
   },
   {
     listTitle: "Infos sur l'immersion - date et lieu",
@@ -167,7 +167,7 @@ const allFields: FieldsAndTitle[] = [
         fields: immersionPlaceDateFields,
       },
     ],
-    accent: "fr-table--green-archipel",
+    additionalClasses: "fr-table--green-archipel",
   },
   {
     listTitle: "Infos sur l'immersion - métier",
@@ -176,7 +176,7 @@ const allFields: FieldsAndTitle[] = [
         fields: immersionJobFields,
       },
     ],
-    accent: "fr-table--green-archipel",
+    additionalClasses: "fr-table--green-archipel",
   },
 ];
 const cellStyles = {
@@ -186,13 +186,43 @@ const cellStyles = {
 export const ConventionFormDetails = ({
   convention,
 }: ConventionFormAccordionProps) => {
+  const renderTables = (lists: FieldsAndTitle[]) =>
+    lists.map((list: FieldsAndTitle, index) => (
+      <ConventionValidationSection
+        convention={convention}
+        list={list}
+        index={index}
+      />
+    ));
+
+  return (
+    <>
+      <h4>
+        Convention{" "}
+        <span className="fr-badge fr-badge--success">#{convention.id}</span>
+      </h4>
+      {renderTables(sections)}
+    </>
+  );
+};
+
+const ConventionValidationSection = ({
+  convention,
+  list,
+  index,
+}: {
+  convention: ConventionReadDto;
+  list: FieldsAndTitle;
+  index: number;
+}) => {
+  const [markedAsRead, setMarkedAsRead] = useState<boolean>(false);
   const buildContent = (field: ConventionField): ReactNode => {
     const value = path(field, convention);
     if (typeof value === "boolean") return value ? "✅" : "❌";
     if (field === "schedule") {
       return (
         <div style={{ whiteSpace: "pre" }}>
-          {prettyPrintSchedule(convention.schedule)}
+          {prettyPrintSchedule(convention.schedule, false)}
         </div>
       );
     }
@@ -208,7 +238,7 @@ export const ConventionFormDetails = ({
     )
       return value ? "✅" : "❌";
     if (field.includes("email")) {
-      return `<a href="mailto:${value}">${value}</a>`;
+      return <a href={`mailto:${value}`}>{value}</a>;
     }
     if (isStringDate(value as string)) {
       return toDisplayedDate(new Date(value as string));
@@ -217,30 +247,6 @@ export const ConventionFormDetails = ({
 
     return JSON.stringify(value);
   };
-  const renderTables = (lists: FieldsAndTitle[]) =>
-    lists.map((list: FieldsAndTitle) => (
-      <div
-        className={`fr-table fr-table--bordered fr-table--layout-fixed ${
-          list.accent ?? ""
-        }`}
-        key={list.listTitle}
-      >
-        <table>
-          <caption>{list.listTitle}</caption>
-          <thead>
-            <tr>
-              {list.cols && list.cols?.map((col) => <th scope="col">{col}</th>)}
-              {!list.cols &&
-                list.rowFields[0] &&
-                keys(list.rowFields[0].fields).map((key) => (
-                  <th scope="col">{list.rowFields[0].fields[key]}</th>
-                ))}
-            </tr>
-          </thead>
-          <tbody>{renderRows(list.rowFields)}</tbody>
-        </table>
-      </div>
-    ));
   const renderRows = (rowFields: RowFields[]) => {
     const maxColsNumber = Math.max(
       ...rowFields.map((row) => keys(row.fields).length),
@@ -265,13 +271,9 @@ export const ConventionFormDetails = ({
 
               {formattedRows.map((field) =>
                 field && path(field, convention) ? (
-                  <td
-                    key={field}
-                    dangerouslySetInnerHTML={{
-                      __html: buildContent(field) as string,
-                    }}
-                    style={cellStyles}
-                  ></td>
+                  <td key={field} style={cellStyles}>
+                    {buildContent(field)}
+                  </td>
                 ) : (
                   <td></td>
                 ),
@@ -282,12 +284,55 @@ export const ConventionFormDetails = ({
       });
   };
   return (
-    <div>
-      <h4>
-        Convention{" "}
-        <span className="fr-badge fr-badge--success">#{convention.id}</span>
-      </h4>
-      {renderTables(allFields)}
+    <div
+      className={`fr-table fr-table--bordered ${
+        list.additionalClasses ?? ""
+      } fr-mb-1v`}
+      key={list.listTitle}
+    >
+      <table>
+        <caption
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            width: "100%",
+          }}
+        >
+          {list.listTitle}
+          <div className="fr-toggle">
+            <input
+              type="checkbox"
+              onChange={() => setMarkedAsRead((read) => !read)}
+              className="fr-toggle__input"
+              id={`fr-toggle__input-${index}`}
+              checked={markedAsRead}
+            />
+            <label
+              className="fr-toggle__label"
+              htmlFor={`fr-toggle__input-${index}`}
+            >
+              {markedAsRead ? "Vérifier à nouveau" : "Marquer comme vu"}
+            </label>
+          </div>
+        </caption>
+
+        {!markedAsRead && (
+          <>
+            <thead>
+              <tr>
+                {list.cols &&
+                  list.cols?.map((col) => <th scope="col">{col}</th>)}
+                {!list.cols &&
+                  list.rowFields[0] &&
+                  keys(list.rowFields[0].fields).map((key) => (
+                    <th scope="col">{list.rowFields[0].fields[key]}</th>
+                  ))}
+              </tr>
+            </thead>
+            <tbody>{renderRows(list.rowFields)}</tbody>
+          </>
+        )}
+      </table>
     </div>
   );
 };

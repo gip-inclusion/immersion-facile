@@ -76,7 +76,18 @@ export const ConventionValidatePage = ({ route }: VerificationPageProps) => {
     <HeaderFooterLayout>
       <MainWrapper layout="default" vSpacing={8}>
         <ConventionFormAccordion convention={convention} />
-        <div>
+        <div
+          style={{
+            position: "fixed",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            background: "rgba(255,255,255,.7)",
+            padding: ".3rem",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
           {isAllowedTransition(currentStatus, "REJECTED", role) && (
             <VerificationActionButton
               disabled={disabled}
