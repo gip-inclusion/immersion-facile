@@ -1,5 +1,5 @@
-import { AxiosInstance } from "axios";
-import { from, map, Observable } from "rxjs";
+import { createTargets, CreateTargets, HttpClient, Target } from "http-client";
+import { from, Observable } from "rxjs";
 import {
   AdminToken,
   agenciesIdAndNameSchema,
@@ -7,9 +7,9 @@ import {
   agenciesSchema,
   AgencyDto,
   AgencyId,
-  AgencyOption,
   agencyIdResponseSchema,
   agencyImmersionFacileIdRoute,
+  AgencyOption,
   AgencyPublicDisplayDto,
   agencyPublicDisplaySchema,
   agencyPublicInfoByIdRoute,
@@ -18,20 +18,71 @@ import {
   CreateAgencyDto,
   DepartmentCode,
   ListAgenciesRequestDto,
-  UpdateAgencyRequestDto,
   WithAgencyId,
 } from "shared";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
+type WithAuthorization = { authorization: string };
+type WithAgencyStatus = { status: AgencyStatus };
+
+export type AgencyTargets = CreateTargets<{
+  getImmersionFacileAgencyId: Target;
+  getAgencyAdminById: Target<
+    void,
+    void,
+    WithAuthorization,
+    `/admin/${typeof agenciesRoute}/:agencyId`
+  >;
+  addAgency: Target<CreateAgencyDto>;
+  getAgencyPublicInfoById: Target<void, WithAgencyId>;
+  listAgenciesNeedingReview: Target<void, WithAgencyStatus, WithAuthorization>;
+  updateAgencyStatus: Target<
+    WithAgencyStatus,
+    void,
+    WithAuthorization,
+    `/admin/${typeof agenciesRoute}/:agencyId`
+  >;
+  getFilteredAgencies: Target<void, ListAgenciesRequestDto>;
+}>;
+
+export const agencyTargets = createTargets<AgencyTargets>({
+  getImmersionFacileAgencyId: {
+    method: "GET",
+    url: `/${agencyImmersionFacileIdRoute}`,
+  },
+  getAgencyAdminById: {
+    method: "GET",
+    url: `/admin/${agenciesRoute}/:agencyId`,
+  },
+  addAgency: {
+    method: "POST",
+    url: `/${agenciesRoute}`,
+  },
+  getAgencyPublicInfoById: {
+    method: "GET",
+    url: `/${agencyPublicInfoByIdRoute}`,
+  },
+  listAgenciesNeedingReview: {
+    method: "GET",
+    url: `/admin/${agenciesRoute}`,
+  },
+  updateAgencyStatus: {
+    method: "PATCH",
+    url: `/admin/${agenciesRoute}/:agencyId`,
+  },
+  getFilteredAgencies: {
+    method: "GET",
+    url: `/${agenciesRoute}`,
+  },
+});
+
 export class HttpAgencyGateway implements AgencyGateway {
-  constructor(private readonly httpClient: AxiosInstance) {}
+  constructor(private readonly httpClient: HttpClient<AgencyTargets>) {}
 
   getImmersionFacileAgencyId$(): Observable<AgencyId | false> {
     return from(
-      this.httpClient.get<unknown>(`/${agencyImmersionFacileIdRoute}`),
-    ).pipe(
-      map(({ data }) => {
-        const agencyIdResponse = agencyIdResponseSchema.parse(data);
+      this.httpClient.getImmersionFacileAgencyId().then(({ responseBody }) => {
+        const agencyIdResponse = agencyIdResponseSchema.parse(responseBody);
         return typeof agencyIdResponse === "string" ? agencyIdResponse : false;
       }),
     );
@@ -48,33 +99,26 @@ export class HttpAgencyGateway implements AgencyGateway {
     agencyId: AgencyId,
     adminToken: AdminToken,
   ): Promise<AgencyDto> {
-    const response = await this.httpClient.get<unknown>(
-      `/admin/${agenciesRoute}/${agencyId}`,
-      {
+    return this.httpClient
+      .getAgencyAdminById({
+        urlParams: { agencyId },
         headers: { authorization: adminToken },
-      },
-    );
-    return agencySchema.parse(response.data);
+      })
+      .then(({ responseBody }) => agencySchema.parse(responseBody));
   }
 
   public async addAgency(createAgencyParams: CreateAgencyDto): Promise<void> {
-    await this.httpClient.post<unknown>(
-      `/${agenciesRoute}`,
-      createAgencyParams,
-    );
+    await this.httpClient.addAgency({ body: createAgencyParams });
   }
 
   public async getAgencyPublicInfoById(
-    agencyId: WithAgencyId,
+    withAgencyId: WithAgencyId,
   ): Promise<AgencyPublicDisplayDto> {
-    const { data } = await this.httpClient.get<unknown>(
-      `/${agencyPublicInfoByIdRoute}`,
-      {
-        params: agencyId,
-      },
-    );
-    const agencyPublicDisplayDto = agencyPublicDisplaySchema.parse(data);
-    return agencyPublicDisplayDto;
+    return this.httpClient
+      .getAgencyPublicInfoById({ queryParams: withAgencyId })
+      .then(({ responseBody }) =>
+        agencyPublicDisplaySchema.parse(responseBody),
+      );
   }
 
   public listAgenciesByDepartmentCode(
@@ -116,16 +160,12 @@ export class HttpAgencyGateway implements AgencyGateway {
   public async listAgenciesNeedingReview(
     adminToken: AdminToken,
   ): Promise<AgencyDto[]> {
-    const needsReviewStatus: AgencyStatus = "needsReview";
-    const { data } = await this.httpClient.get<unknown>(
-      `/admin/${agenciesRoute}`,
-      {
-        params: { status: needsReviewStatus },
+    return this.httpClient
+      .listAgenciesNeedingReview({
+        queryParams: { status: "needsReview" },
         headers: { authorization: adminToken },
-      },
-    );
-    const agenciesDto = agenciesSchema.parse(data);
-    return agenciesDto;
+      })
+      .then(({ responseBody }) => agenciesSchema.parse(responseBody));
   }
 
   // TODO Mieux identifier l'admin
@@ -133,24 +173,18 @@ export class HttpAgencyGateway implements AgencyGateway {
     adminToken: AdminToken,
     agencyId: AgencyId,
   ): Promise<void> {
-    const { id, ...validateAgencyParams }: UpdateAgencyRequestDto = {
-      id: agencyId,
-      status: "active",
-    };
-    await this.httpClient.patch<unknown>(
-      `/admin/${agenciesRoute}/${agencyId}`,
-      validateAgencyParams,
-      { headers: { authorization: adminToken } },
-    );
+    await this.httpClient.updateAgencyStatus({
+      body: { status: "active" },
+      headers: { authorization: adminToken },
+      urlParams: { agencyId },
+    });
   }
 
   private async getFilteredAgencies(
     request: ListAgenciesRequestDto,
   ): Promise<AgencyOption[]> {
-    const response = await this.httpClient.get<unknown>(`/${agenciesRoute}`, {
-      params: request,
-    });
-    const agencies = agenciesIdAndNameSchema.parse(response.data);
-    return agencies;
+    return this.httpClient
+      .getFilteredAgencies({ queryParams: request })
+      .then(({ responseBody }) => agenciesIdAndNameSchema.parse(responseBody));
   }
 }
