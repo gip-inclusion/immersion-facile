@@ -244,6 +244,7 @@ const ConventionValidationSection = ({
     if (field === "sanitaryPrevention") {
       return value ? convention.sanitaryPreventionDescription ?? "✅" : "❌";
     }
+
     if (field === "immersionAppellation")
       return (value as AppellationDto).appellationLabel;
     if (
@@ -252,6 +253,17 @@ const ConventionValidationSection = ({
       field === "signatories.beneficiaryRepresentative.signedAt"
     )
       return value ? "✅" : "❌";
+    if (field.includes("siret")) {
+      return (
+        <a
+          href={`https://annuaire-entreprises.data.gouv.fr/etablissement/${value}`}
+          title={"Voir sur l'annuaire des entreprises"}
+          target="_blank"
+        >
+          {value}
+        </a>
+      );
+    }
     if (field.includes("email")) {
       return (
         <a href={`mailto:${value}`} title={value as string}>
