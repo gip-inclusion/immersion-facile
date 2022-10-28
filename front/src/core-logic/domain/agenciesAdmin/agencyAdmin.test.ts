@@ -94,6 +94,29 @@ describe("agencyAdmin", () => {
     });
   });
 
+  it("clears feedback and agency on agency selection", () => {
+    const agencyDto1 = new AgencyDtoBuilder().withId("1").build();
+    const agencyOptions: AgencyOption[] = [
+      { id: agencyDto1.id, name: agencyDto1.name },
+    ];
+    ({ store, dependencies } = createTestStore({
+      admin: adminPreloadedState({
+        agencyAdmin: {
+          ...agencyAdminInitialState,
+          feedback: { kind: "agencyUpdated" },
+          agencyOptions,
+          selectedAgencyId: "456",
+          agency: agencyDto1,
+        },
+      }),
+    }));
+    store.dispatch(agencyAdminSlice.actions.setSelectedAgencyId("anything"));
+    expectAgencyAdminStateToMatch({
+      feedback: { kind: "idle" },
+      agency: null,
+    });
+  });
+
   describe("Agency update", () => {
     const agencyDto = new AgencyDtoBuilder().build();
 

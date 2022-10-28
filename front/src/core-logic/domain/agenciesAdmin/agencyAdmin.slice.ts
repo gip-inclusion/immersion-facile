@@ -41,6 +41,8 @@ export const agencyAdminSlice = createSlice({
     },
     setSelectedAgencyId: (state, action: PayloadAction<AgencyId>) => {
       state.selectedAgencyId = action.payload;
+      state.feedback = { kind: "idle" };
+      state.agency = null;
     },
     setAgency: (state, action: PayloadAction<AgencyDto | null>) => {
       state.agency = action.payload ?? null;
