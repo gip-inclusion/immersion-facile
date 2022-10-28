@@ -1,4 +1,4 @@
-export { createHttpClient } from "./createHttpClient";
+export { createHttpClient, createTargets } from "./createHttpClient";
 export type {
   HttpClient,
   HttpResponse,

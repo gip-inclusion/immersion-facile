@@ -66,8 +66,17 @@ type Handler = (params?: HandlerParams) => Promise<HttpResponse<any>>;
 
 export type HandlerCreator = (target: RuntimeTarget) => Handler;
 
+export const createTargets = <
+  Targets extends Record<string, UnknownTarget>,
+>(targets: {
+  [TargetName in keyof Targets]: RuntimeTarget<
+    Targets[TargetName]["url"],
+    Targets[TargetName]["responseBody"]
+  >;
+}) => targets;
+
 export const createHttpClient = <Targets extends Record<string, UnknownTarget>>(
-  handlerCreator: (target: RuntimeTarget) => Handler,
+  handlerCreator: HandlerCreator,
   targets: {
     [TargetName in keyof Targets]: RuntimeTarget<
       Targets[TargetName]["url"],
@@ -98,10 +107,10 @@ export const createHttpClient = <Targets extends Record<string, UnknownTarget>>(
     };
   }, {} as HttpClient<Targets>);
 
-export const replaceParamsInUrl = <Path extends string>(
-  path: Path,
-  params: PathParameters<Path> = {} as PathParameters<Path>,
-): string => {
+export const replaceParamsInUrl = <UrlToReplace extends Url>(
+  path: UrlToReplace,
+  params: PathParameters<UrlToReplace> = {} as PathParameters<UrlToReplace>,
+): Url => {
   const paramNames = Object.keys(params) as (keyof typeof params)[];
   if (paramNames.length === 0) return path;
   return paramNames.reduce(
