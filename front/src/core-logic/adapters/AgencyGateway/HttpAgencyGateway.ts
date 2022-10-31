@@ -95,7 +95,7 @@ export class HttpAgencyGateway implements AgencyGateway {
     return from(this.getAdminAgencyById(agencyId, adminToken));
   }
 
-  private async getAdminAgencyById(
+  private getAdminAgencyById(
     agencyId: AgencyId,
     adminToken: AdminToken,
   ): Promise<AgencyDto> {
@@ -111,7 +111,7 @@ export class HttpAgencyGateway implements AgencyGateway {
     await this.httpClient.addAgency({ body: createAgencyParams });
   }
 
-  public async getAgencyPublicInfoById(
+  public getAgencyPublicInfoById(
     withAgencyId: WithAgencyId,
   ): Promise<AgencyPublicDisplayDto> {
     return this.httpClient
@@ -157,7 +157,7 @@ export class HttpAgencyGateway implements AgencyGateway {
   }
 
   // TODO Mieux identifier l'admin
-  public async listAgenciesNeedingReview(
+  public listAgenciesNeedingReview(
     adminToken: AdminToken,
   ): Promise<AgencyDto[]> {
     return this.httpClient
@@ -180,7 +180,7 @@ export class HttpAgencyGateway implements AgencyGateway {
     });
   }
 
-  private async getFilteredAgencies(
+  private getFilteredAgencies(
     request: ListAgenciesRequestDto,
   ): Promise<AgencyOption[]> {
     return this.httpClient
