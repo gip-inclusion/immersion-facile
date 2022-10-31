@@ -15,6 +15,7 @@ RUN pnpm install --frozen-lockfile --ignore-scripts
 COPY ./shared/ /app/shared
 COPY ./libs/react-design-system/ /app/libs/react-design-system
 COPY ./libs/html-templates/ /app/libs/html-templates
+COPY ./libs/http-client/ /app/libs/http-client
 
 # front only
 FROM builder
