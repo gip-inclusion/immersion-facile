@@ -187,36 +187,42 @@ export const ConventionFormDetails = ({
   convention,
 }: ConventionFormAccordionProps) => {
   const copyButton = useRef<HTMLButtonElement>(null);
-  const renderTables = (lists: FieldsAndTitle[]) =>
-    lists.map((list: FieldsAndTitle, index) => (
-      <ConventionValidationSection
-        convention={convention}
-        list={list}
-        index={index}
-      />
-    ));
+  const [isCopied, setIsCopied] = useState(false);
+
   const onCopyButtonClick = () => {
     navigator.clipboard
       .writeText(convention.id)
       .then(() => {
-        alert("ID de convention copié avec succès");
+        setIsCopied(true);
+        setTimeout(() => {
+          setIsCopied(false);
+        }, 3_000);
       })
-      .catch((error) => error);
+      // eslint-disable-next-line no-console
+      .catch((error) => console.error(error));
   };
+
   return (
     <>
       <h4>
         Convention{" "}
         <span className="fr-badge fr-badge--success">{convention.id}</span>
         <button
+          disabled={isCopied}
           ref={copyButton}
           onClick={onCopyButtonClick}
-          className="fr-btn fr-btn--sm fr-fi-checkbox-circle-line fr-btn--tertiary-no-outline fr-btn--icon-left fr-ml-1w"
+          className="fr-btn fr-btn--sm fr-icon-clipboard-fill fr-btn--tertiary-no-outline fr-btn--icon-left fr-ml-1w"
         >
-          Copier cet ID
+          {isCopied ? "Copié !" : "Copier cet ID"}
         </button>
       </h4>
-      {renderTables(sections)}
+      {sections.map((list, index) => (
+        <ConventionValidationSection
+          convention={convention}
+          list={list}
+          index={index}
+        />
+      ))}
     </>
   );
 };
