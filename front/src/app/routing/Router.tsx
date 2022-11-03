@@ -48,7 +48,9 @@ export const Router = () => {
         <EstablishmentFormPageForExternals route={route} />
       )}
       {route.name === "home" && <HomePage />}
-
+      {route.name === "homeCandidates" && <HomePage />}
+      {route.name === "homeEstablishments" && <HomePage />}
+      {route.name === "homeAgencies" && <HomePage />}
       {route.name === "landingEstablishment" && <LandingEstablishmentPage />}
       {route.name === "conventionImmersion" && (
         <ConventionImmersionPage route={route} />

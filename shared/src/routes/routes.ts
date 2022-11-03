@@ -12,6 +12,9 @@ export const frontRoutes = {
   landingEstablishment: "accueil-etablissement",
   magicLinkRenewal: "refraichir-lien",
   search: "recherche",
+  homeCandidates: "accueil-beneficiaires",
+  homeEstablishments: "accueil-entreprises",
+  homeAgencies: "accueil-prescripteurs",
 };
 
 export const addEstablishmentFormRouteWithApiKey__v0 = "add-establishment-form"; // Becomes POST /v1/form-establishments

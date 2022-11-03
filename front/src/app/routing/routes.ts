@@ -34,6 +34,9 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     (params) => `/etablissement/${params.consumer}`,
   ),
   home: defineRoute("/"),
+  homeCandidates: defineRoute(`/${frontRoutes.homeCandidates}`),
+  homeEstablishments: defineRoute(`/${frontRoutes.homeEstablishments}`),
+  homeAgencies: defineRoute(`/${frontRoutes.homeAgencies}`),
   conventionImmersion: defineRoute(
     { jwt: param.query.optional.string, ...conventionValuesFromUrl },
     () => `/${frontRoutes.conventionImmersionRoute}`,
