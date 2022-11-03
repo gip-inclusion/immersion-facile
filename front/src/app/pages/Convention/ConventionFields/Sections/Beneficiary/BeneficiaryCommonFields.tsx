@@ -2,12 +2,13 @@ import React from "react";
 import { useDispatch } from "react-redux";
 import { getConventionFieldName } from "shared";
 import { RadioGroup } from "src/app/components/RadioGroup";
-import { BeneficiaryRepresentativeFields } from "src/app/pages/Convention/ConventionFields/BeneficiaryRepresentativeFields";
+import { BeneficiaryRepresentativeFields } from "src/app/pages/Convention/ConventionFields/Sections/Beneficiary/BeneficiaryRepresentativeFields";
 import { useConventionTextsFromFormikContext } from "src/app/pages/Convention/texts/textSetup";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { TextInput } from "src/uiComponents/form/TextInput";
+import { BeneficiaryCurrentEmployerFields } from "./BeneficiaryCurrentEmployerFields";
 
 export const BeneficiaryCommonFields = ({
   disabled,
@@ -15,6 +16,9 @@ export const BeneficiaryCommonFields = ({
   disabled?: boolean;
 }) => {
   const isMinor = useAppSelector(conventionSelectors.isMinor);
+  const hasCurrentEmployer = useAppSelector(
+    conventionSelectors.hasCurrentEmployer,
+  );
   const dispatch = useDispatch();
   const t = useConventionTextsFromFormikContext();
 
@@ -91,6 +95,23 @@ export const BeneficiaryCommonFields = ({
             disabled={disabled}
           />
         </>
+      )}
+
+      <RadioGroup
+        id="is-current-employer"
+        disabled={disabled}
+        currentValue={hasCurrentEmployer}
+        setCurrentValue={(value) =>
+          dispatch(conventionSlice.actions.isCurrentEmployerChanged(value))
+        }
+        groupLabel={`${t.beneficiaryCurrentEmployer.hasCurrentEmployerLabel} *`}
+        options={[
+          { label: t.yes, value: true },
+          { label: t.no, value: false },
+        ]}
+      />
+      {hasCurrentEmployer && (
+        <BeneficiaryCurrentEmployerFields disabled={disabled} />
       )}
     </>
   );

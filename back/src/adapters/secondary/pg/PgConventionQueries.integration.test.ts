@@ -20,8 +20,6 @@ import { PgOutboxRepository } from "./PgOutboxRepository";
 const idA: ConventionId = "aaaaac99-9c0b-aaaa-aa6d-6bb9bd38aaaa";
 const idB: ConventionId = "bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb";
 
-const beneficiarySignedDate = new Date("2021-01-04").toISOString();
-
 describe("Pg implementation of ConventionQueries", () => {
   let pool: Pool;
   let client: PoolClient;
@@ -191,7 +189,43 @@ describe("Pg implementation of ConventionQueries", () => {
       .withAgencyId(agencyId)
       .withId(conventionId)
       .notSigned()
-      .signedByBeneficiary(beneficiarySignedDate)
+      .withBeneficiary({
+        firstName: "benef",
+        lastName: "beneficiary",
+        email: "benef@r.com",
+        phone: "0011223344",
+        role: "beneficiary",
+        emergencyContact: "Billy",
+        emergencyContactPhone: "0011223344",
+        signedAt: new Date().toISOString(),
+      })
+      .withBeneficiaryCurentEmployer({
+        firstName: "a",
+        lastName: "a",
+        businessName: "business",
+        businessSiret: "01234567890123",
+        email: "a@a.com",
+        job: "job",
+        phone: "0011223344",
+        role: "beneficiary-current-employer",
+        signedAt: new Date().toISOString(),
+      })
+      .withBeneficiaryRepresentative({
+        email: "rep@rep.com",
+        firstName: "beneficiary",
+        lastName: "Rep",
+        phone: "0011223344",
+        role: "beneficiary-representative",
+        signedAt: new Date().toISOString(),
+      })
+      .withEstablishmentRepresentative({
+        email: "est@rep.com",
+        firstName: "Establishment",
+        lastName: "Rep",
+        phone: "0011223344",
+        role: "establishment-representative",
+        signedAt: new Date().toISOString(),
+      })
       .build();
 
     await agencyRepo.insert(agency);

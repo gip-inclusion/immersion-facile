@@ -112,7 +112,11 @@ export type BeneficiaryRepresentative = GenericSignatory<
 >;
 
 export type BeneficiaryCurrentEmployer =
-  GenericSignatory<"beneficiary-current-employer">;
+  GenericSignatory<"beneficiary-current-employer"> & {
+    job: string;
+    businessSiret: string;
+    businessName: string;
+  };
 
 export type EstablishmentRepresentative = GenericSignatory<
   "establishment" | "establishment-representative"

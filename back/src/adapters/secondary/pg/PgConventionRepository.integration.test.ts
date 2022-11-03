@@ -18,7 +18,7 @@ import {
 } from "./PgConventionRepository";
 
 const beneficiaryRepresentative: BeneficiaryRepresentative = {
-  role: "legal-representative",
+  role: "beneficiary-representative",
   email: "legal@representative.com",
   firstName: "The",
   lastName: "Representative",
@@ -219,6 +219,9 @@ describe("PgConventionRepository", () => {
       email: "current.employer@mail.com",
       phone: "8888888888",
       role: "beneficiary-current-employer",
+      businessName: "Entreprise .Inc",
+      businessSiret: "01234567891234",
+      job: "Boss",
     };
 
     const conventionId = "40400404-0000-0000-0000-6bb9bd38aaaa";
@@ -246,6 +249,27 @@ describe("PgConventionRepository", () => {
     await expectConventionHaveBeneficiaryCurrentEmployer(
       conventionId,
       beneficiaryCurrentEmployer,
+    );
+
+    //SAVE CONVENTION WITH BENEFICIARY CURRENT EMPLOYER UPDATED
+    const newBeneficiaryCurrentEmployer: BeneficiaryCurrentEmployer = {
+      businessName: "NEW EMPLOYER .INC",
+      businessSiret: "00112233445566",
+      email: "boss@employer.com",
+      firstName: "NEW",
+      lastName: "BOSS",
+      job: "Boss",
+      phone: "0011223344",
+      role: "beneficiary-current-employer",
+    };
+    await conventionRepository.update(
+      new ConventionDtoBuilder(conventionWithBeneficiaryCurrentEmployer)
+        .withBeneficiaryCurentEmployer(newBeneficiaryCurrentEmployer)
+        .build(),
+    );
+    await expectConventionHaveBeneficiaryCurrentEmployer(
+      conventionId,
+      newBeneficiaryCurrentEmployer,
     );
 
     //SAVE CONVENTION WITHOUT BENEFICIARY CURRENT EMPLOYER
@@ -360,6 +384,11 @@ describe("PgConventionRepository", () => {
     expectedBeneficiaryCurrentEmployer: BeneficiaryCurrentEmployer | undefined,
   ) => {
     type requeryresult = {
+      extra_fields: {
+        job: string | null;
+        businessSiret: string | null;
+        businessName: string | null;
+      };
       phone: string | null;
       first_name: string | null;
       last_name: string | null;
@@ -385,6 +414,17 @@ describe("PgConventionRepository", () => {
             role: "beneficiary-current-employer",
             email: result.email !== null ? result.email : "",
             phone: result.phone !== null ? result.phone : "",
+            businessName:
+              result.extra_fields.businessName !== null
+                ? result.extra_fields.businessName
+                : "",
+            businessSiret:
+              result.extra_fields.businessSiret !== null
+                ? result.extra_fields.businessSiret
+                : "",
+            job:
+              result.extra_fields.job !== null ? result.extra_fields.job : "",
+            signedAt: result.signed_at !== null ? result.signed_at : undefined,
           }
         : undefined;
     expectToEqual(

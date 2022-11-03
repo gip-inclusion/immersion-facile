@@ -99,6 +99,9 @@ const beneficiaryCurrentEmployerSchema: z.Schema<BeneficiaryCurrentEmployer> =
   signatorySchema.merge(
     z.object({
       role: z.enum(["beneficiary-current-employer"]),
+      job: zStringPossiblyEmpty,
+      businessSiret: siretSchema,
+      businessName: zTrimmedString,
     }),
   );
 

@@ -55,9 +55,7 @@ export class PgConventionRepository implements ConventionRepository {
 
     const beneficiaryCurrentEmployerId =
       beneficiaryCurrentEmployer &&
-      (await this.insertBbeneficiaryCurrentEmployer(
-        beneficiaryCurrentEmployer,
-      ));
+      (await this.insertBeneficiaryCurrentEmployer(beneficiaryCurrentEmployer));
 
     const query_insert_convention = `INSERT INTO conventions(
           id, status, agency_id, date_submission, date_start, date_end, date_validation, siret, business_name, schedule, individual_protection,
@@ -82,7 +80,7 @@ export class PgConventionRepository implements ConventionRepository {
     convention: ConventionDto,
   ): Promise<ConventionId | undefined> {
     // prettier-ignore
-    const { signatories: { beneficiary, beneficiaryRepresentative,beneficiaryCurrentEmployer }, id, establishmentTutor } =
+    const { signatories: { beneficiary, beneficiaryRepresentative, beneficiaryCurrentEmployer }, id, establishmentTutor } =
       convention
 
     const establishment_tutor_id = await this.updateEstablishmentTutor(
@@ -91,7 +89,7 @@ export class PgConventionRepository implements ConventionRepository {
     );
     const beneficiaryCurrentEmployerId = beneficiaryCurrentEmployer
       ? (await this.getBeneficiaryCurrentEmployerId(id)) === null
-        ? await this.insertBbeneficiaryCurrentEmployer(
+        ? await this.insertBeneficiaryCurrentEmployer(
             beneficiaryCurrentEmployer,
           )
         : await this.updateBeneficiaryCurrentEmployer(
@@ -101,7 +99,6 @@ export class PgConventionRepository implements ConventionRepository {
       : null;
 
     await this.updateBeneficiary(id, beneficiary);
-
     await this.updateConvention({
       convention,
       establishment_tutor_id,
@@ -232,24 +229,6 @@ export class PgConventionRepository implements ConventionRepository {
     await this.client.query(updateBeneficiaryRepresentativeQuery, [ id, beneficiaryRepresentative.firstName, beneficiaryRepresentative.lastName, beneficiaryRepresentative.email, beneficiaryRepresentative.phone, beneficiaryRepresentative.signedAt, ]);
   }
 
-  private async updateBeneficiaryCurrentEmployer(
-    id: ConventionId,
-    beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer,
-  ): Promise<number> {
-    const updateBeneficiaryCurrentEmployerQuery = `  
-        UPDATE actors
-          SET first_name=$2,  last_name=$3, email=$4, phone=$5, signed_at=$6
-        FROM conventions 
-        WHERE conventions.id=$1 AND actors.id = conventions.${beneficiaryCurrentEmployerIdColumnName}
-        RETURNING actors.id
-        `;
-    // prettier-ignore
-    const updateReturn = await this.client.query(updateBeneficiaryCurrentEmployerQuery, [ id, beneficiaryCurrentEmployer.firstName, beneficiaryCurrentEmployer.lastName, beneficiaryCurrentEmployer.email, beneficiaryCurrentEmployer.phone, beneficiaryCurrentEmployer.signedAt, ]);
-    const result = updateReturn.rows.at(0);
-    if (result) return result.id;
-    throw new Error(missingReturningRowError(updateReturn));
-  }
-
   private async updateEstablishmentRepresentative(
     id: ConventionId,
     establishmentRepresentative: EstablishmentRepresentative,
@@ -357,19 +336,59 @@ export class PgConventionRepository implements ConventionRepository {
     throw new Error(missingReturningRowError(insertReturn));
   }
 
-  private async insertBbeneficiaryCurrentEmployer(
+  private async insertBeneficiaryCurrentEmployer(
     beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer,
   ) {
     const query_insert_beneficiary_current_employer = `
-        INSERT into actors (first_name, last_name, email, phone, signed_at)
-        VALUES($1, $2, $3, $4, $5)
+        INSERT into actors (first_name, last_name, email, phone, signed_at, extra_fields)
+        VALUES($1, $2, $3, $4, $5, JSON_BUILD_OBJECT('businessName', $6::text,'businessSiret', $7::text,'job', $8::text))
         RETURNING id;
       `;
-    // prettier-ignore
-    const insertReturn = await this.client.query<{ id: number }>( query_insert_beneficiary_current_employer, [ beneficiaryCurrentEmployer.firstName, beneficiaryCurrentEmployer.lastName, beneficiaryCurrentEmployer.email, beneficiaryCurrentEmployer.phone, beneficiaryCurrentEmployer.signedAt, ]);
+    const insertReturn = await this.client.query<{ id: number }>(
+      query_insert_beneficiary_current_employer,
+      [
+        beneficiaryCurrentEmployer.firstName,
+        beneficiaryCurrentEmployer.lastName,
+        beneficiaryCurrentEmployer.email,
+        beneficiaryCurrentEmployer.phone,
+        beneficiaryCurrentEmployer.signedAt,
+        beneficiaryCurrentEmployer.businessName,
+        beneficiaryCurrentEmployer.businessSiret,
+        beneficiaryCurrentEmployer.job,
+      ],
+    );
     const result = insertReturn.rows.at(0);
     if (result) return result.id;
     throw new Error(missingReturningRowError(insertReturn));
+  }
+  private async updateBeneficiaryCurrentEmployer(
+    id: ConventionId,
+    beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer,
+  ): Promise<number> {
+    const updateBeneficiaryCurrentEmployerQuery = `  
+        UPDATE actors
+          SET first_name=$2,  last_name=$3, email=$4, phone=$5, signed_at=$6, extra_fields=JSON_BUILD_OBJECT('businessName', $7::text,'businessSiret', $8::text,'job', $9::text)
+        FROM conventions 
+        WHERE conventions.id=$1 AND actors.id = conventions.${beneficiaryCurrentEmployerIdColumnName}
+        RETURNING actors.id
+        `;
+    const updateReturn = await this.client.query(
+      updateBeneficiaryCurrentEmployerQuery,
+      [
+        id,
+        beneficiaryCurrentEmployer.firstName,
+        beneficiaryCurrentEmployer.lastName,
+        beneficiaryCurrentEmployer.email,
+        beneficiaryCurrentEmployer.phone,
+        beneficiaryCurrentEmployer.signedAt,
+        beneficiaryCurrentEmployer.businessName,
+        beneficiaryCurrentEmployer.businessSiret,
+        beneficiaryCurrentEmployer.job,
+      ],
+    );
+    const result = updateReturn.rows.at(0);
+    if (result) return result.id;
+    throw new Error(missingReturningRowError(updateReturn));
   }
 }
 const missingReturningRowError = (updateReturn: QueryResult<any>): string =>

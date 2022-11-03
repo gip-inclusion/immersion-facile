@@ -1,7 +1,6 @@
 import { useFormikContext } from "formik";
 import React from "react";
 import type { ConventionDto } from "shared";
-import { BeneficiaryCommonFields } from "src/app/pages/Convention/ConventionFields/BeneficiaryCommonFields";
 import { ImmersionConditionsCommonFields } from "src/app/pages/Convention/ConventionFields/ImmersionConditionsCommonFields";
 import { makeValuesToWatchInUrlForUkraine } from "src/app/pages/Convention/ConventionFields/makeValuesToWatchInUrl";
 import { SubmitButton } from "src/app/pages/Convention/ConventionFields/SubmitButtons";
@@ -9,6 +8,7 @@ import { useConventionWatchValuesInUrl } from "src/app/pages/Convention/Conventi
 import { ConventionFrozenMessage } from "src/app/pages/Convention/ConventionFrozenMessage";
 import { ConventionSignOnlyMessage } from "src/app/pages/Convention/ConventionSignOnlyMessage";
 import { FormSectionTitle } from "src/uiComponents/FormSectionTitle";
+import { BeneficiaryCommonFields } from "./Sections/Beneficiary/BeneficiaryCommonFields";
 import { EstablishmentFormSection } from "./Sections/Establishment/EstablishmentFormSection";
 
 type ConventionFieldsProps = {

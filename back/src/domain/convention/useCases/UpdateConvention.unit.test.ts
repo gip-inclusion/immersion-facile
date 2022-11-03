@@ -177,6 +177,9 @@ describe("Update Convention", () => {
           lastName: "Clover",
           email: "danny@mail.com",
           phone: "0011223344",
+          businessName: "business",
+          businessSiret: "01234567891234",
+          job: "Boss",
         })
         .build();
 

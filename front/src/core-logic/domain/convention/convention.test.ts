@@ -50,7 +50,11 @@ describe("Convention slice", () => {
     it("saves an already existing convention base (base on presence of JWT)", () => {
       ({ store, dependencies } = createTestStore({
         convention: {
-          formUi: { isMinor: false, isTutorEstablishmentRepresentative: true },
+          formUi: {
+            isMinor: false,
+            isTutorEstablishmentRepresentative: true,
+            hasCurrentEmployer: false,
+          },
           jwt: "some-correct-jwt",
           convention: null,
           isLoading: false,
@@ -153,7 +157,11 @@ describe("Convention slice", () => {
       });
       ({ store } = createTestStore({
         convention: {
-          formUi: { isMinor: false, isTutorEstablishmentRepresentative: true },
+          formUi: {
+            isMinor: false,
+            isTutorEstablishmentRepresentative: true,
+            hasCurrentEmployer: false,
+          },
           feedback: { kind: "justSubmitted" },
           isLoading: false,
           convention: null,
@@ -185,7 +193,11 @@ describe("Convention slice", () => {
       expectConventionState({
         convention: conventionRead,
         isLoading: false,
-        formUi: { isMinor: false, isTutorEstablishmentRepresentative: false },
+        formUi: {
+          isMinor: false,
+          isTutorEstablishmentRepresentative: false,
+          hasCurrentEmployer: false,
+        },
       });
     });
 
@@ -212,7 +224,11 @@ describe("Convention slice", () => {
       expectConventionState({
         convention: conventionRead,
         isLoading: false,
-        formUi: { isMinor: true, isTutorEstablishmentRepresentative: false },
+        formUi: {
+          isMinor: true,
+          isTutorEstablishmentRepresentative: false,
+          hasCurrentEmployer: false,
+        },
       });
     });
   });
@@ -233,7 +249,11 @@ describe("Convention slice", () => {
       };
       ({ store, dependencies } = createTestStore({
         convention: {
-          formUi: { isMinor: false, isTutorEstablishmentRepresentative: true },
+          formUi: {
+            isMinor: false,
+            isTutorEstablishmentRepresentative: true,
+            hasCurrentEmployer: false,
+          },
           jwt: null,
           fetchError: null,
           isLoading: false,
@@ -264,7 +284,11 @@ describe("Convention slice", () => {
 
       ({ store, dependencies } = createTestStore({
         convention: {
-          formUi: { isMinor: false, isTutorEstablishmentRepresentative: true },
+          formUi: {
+            isMinor: false,
+            isTutorEstablishmentRepresentative: true,
+            hasCurrentEmployer: false,
+          },
           jwt: null,
           fetchError: null,
           isLoading: false,
@@ -319,7 +343,11 @@ describe("Convention slice", () => {
       const jwt = "some-correct-jwt";
       ({ store, dependencies } = createTestStore({
         convention: {
-          formUi: { isMinor: false, isTutorEstablishmentRepresentative: true },
+          formUi: {
+            isMinor: false,
+            isTutorEstablishmentRepresentative: true,
+            hasCurrentEmployer: false,
+          },
           jwt: null,
           convention: conventionNotSigned,
           feedback: { kind: "modificationsAskedFromSignatory" },
@@ -422,7 +450,11 @@ describe("Convention slice", () => {
   it("changes the feedback to idle when asked", () => {
     ({ store } = createTestStore({
       convention: {
-        formUi: { isMinor: false, isTutorEstablishmentRepresentative: true },
+        formUi: {
+          isMinor: false,
+          isTutorEstablishmentRepresentative: true,
+          hasCurrentEmployer: false,
+        },
         jwt: null,
         convention: null,
         feedback: { kind: "modificationsAskedFromSignatory" },

@@ -4,8 +4,9 @@ import { ConventionId, ConventionReadDto, conventionReadSchema } from "shared";
 export const selectAllConventionDtosById = `
 WITH 
   beneficiaries AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = beneficiary_id),
-  establishmentTutors AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = establishment_tutor_id),
   beneficiaryRepresentative AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = beneficiary_representative_id),
+  beneficiariesCurrentEmployer AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = beneficiary_current_employer_id),
+  establishmentTutors AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = establishment_tutor_id),
   establishmentRepresentative AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = establishment_representative_id),
   formated_signatories AS (
     SELECT 
@@ -22,6 +23,17 @@ WITH
         'emergencyContactPhone', b.extra_fields ->> 'emergencyContactPhone',
         'federatedIdentity', CASE WHEN  (p.user_pe_external_id IS NOT NULL) THEN CONCAT('peConnect:', p.user_pe_external_id) ELSE NULL END 
       ),
+      'beneficiaryCurrentEmployer' , CASE WHEN bce IS NULL THEN NULL ELSE JSON_BUILD_OBJECT(
+        'role', 'beneficiary-current-employer',
+        'firstName', bce.first_name,
+        'lastName', bce.last_name,
+        'email', bce.email,
+        'phone', bce.phone,
+        'job', bce.extra_fields ->> 'job',
+        'businessSiret', bce.extra_fields ->> 'businessSiret',
+        'businessName', bce.extra_fields ->> 'businessName',
+        'signedAt', date_to_iso(bce.signed_at)
+      ) END,
       'establishmentRepresentative' , JSON_BUILD_OBJECT(
         'role', 'establishment-representative',
         'firstName', er.first_name,
@@ -31,7 +43,7 @@ WITH
         'signedAt', date_to_iso(er.signed_at)
       ),
       'beneficiaryRepresentative' , CASE WHEN br IS NULL THEN NULL ELSE JSON_BUILD_OBJECT(
-        'role', 'legal-representative',
+        'role', 'beneficiary-representative',
         'firstName', br.first_name,
         'lastName', br.last_name,
         'email', br.email,
@@ -41,6 +53,7 @@ WITH
     ) AS signatories
     FROM beneficiaries AS b
     LEFT JOIN beneficiaryRepresentative as br ON b.convention_id = br.convention_id
+    LEFT JOIN beneficiariesCurrentEmployer as bce ON b.convention_id = bce.convention_id
     LEFT JOIN establishmentRepresentative as er ON b.convention_id = er.convention_id
     LEFT JOIN partners_pe_connect AS p ON p.convention_id = b.convention_id)
 

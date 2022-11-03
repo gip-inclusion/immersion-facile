@@ -45,8 +45,8 @@ export class PgConventionQueries implements ConventionQueries {
     const pgResult = await this.client.query(
       format(
         `
-        WITH beneficiaries AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = beneficiary_id),
-          establishmentTutors AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = establishment_tutor_id)
+        WITH beneficiaries AS               (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = beneficiary_id),
+          establishmentTutors AS            (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = establishment_tutor_id)
         SELECT JSON_BUILD_OBJECT(
               'immersionId', conventions.id, 
               'beneficiaryFirstName', beneficiaries.first_name, 

@@ -12,7 +12,7 @@ import { ConventionSignOnlyMessage } from "src/app/pages/Convention/ConventionSi
 import { useConventionTextsFromFormikContext } from "src/app/pages/Convention/texts/textSetup";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { AgencyFormSection } from "./Sections/AgencyFormSection";
-import { BeneficiaryFormSection } from "./Sections/BeneficiaryFormSection";
+import { BeneficiaryFormSection } from "./Sections/Beneficiary/BeneficiaryFormSection";
 import { EstablishmentFormSection } from "./Sections/Establishment/EstablishmentFormSection";
 import { ImmersionConditionFormSection } from "./Sections/ImmersionConditionFormSection";
 

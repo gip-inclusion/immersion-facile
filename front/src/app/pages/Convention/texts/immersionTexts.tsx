@@ -180,4 +180,15 @@ export const immersionTexts = {
       description: "pour qu’on puisse vous contacter à propos de l’immersion",
     },
   },
+  beneficiaryCurrentEmployer: {
+    firstNameLabel: "Prénom",
+    lastNameLabel: "Nom",
+    emailLabel: "E-mail",
+    jobLabel: "Fonction",
+    phoneLabel: "Téléphone",
+    businessNameLabel: "Raison sociale de l'entreprise",
+    businessSiretLabel: "Siret",
+    hasCurrentEmployerLabel:
+      "Le bénéficiaire de l’immersion est-il actuellement salarié(e) d’une autre entreprise (que celle où l’immersion va avoir lieu) ?",
+  },
 };

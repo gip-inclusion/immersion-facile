@@ -1,7 +1,7 @@
 import React from "react";
 import { FormSectionTitle } from "src/uiComponents/FormSectionTitle";
-import { useConventionTextsFromFormikContext } from "../../texts/textSetup";
-import { BeneficiaryCommonFields } from "../BeneficiaryCommonFields";
+import { useConventionTextsFromFormikContext } from "../../../texts/textSetup";
+import { BeneficiaryCommonFields } from "./BeneficiaryCommonFields";
 
 type beneficiaryFormSectionProperties = {
   isFrozen: boolean | undefined;
