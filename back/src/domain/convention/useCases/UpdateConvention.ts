@@ -51,8 +51,6 @@ export class UpdateConvention extends TransactionalUseCase<
       );
     }
 
-    // console.log(convention.signatories);
-
     await Promise.all([
       uow.conventionRepository.update(convention),
       uow.outboxRepository.save(

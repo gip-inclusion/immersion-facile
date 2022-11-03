@@ -383,7 +383,7 @@ describe("PgConventionRepository", () => {
     conventionId: ConventionId,
     expectedBeneficiaryCurrentEmployer: BeneficiaryCurrentEmployer | undefined,
   ) => {
-    type requeryresult = {
+    const { rows } = await client.query<{
       extra_fields: {
         job: string | null;
         businessSiret: string | null;
@@ -396,8 +396,7 @@ describe("PgConventionRepository", () => {
       signed_at: string | null;
       role: string;
       email: string | null;
-    };
-    const { rows } = await client.query<requeryresult>(
+    }>(
       `
       SELECT actors.*
       FROM actors 
