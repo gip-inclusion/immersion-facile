@@ -12,6 +12,7 @@ import { EstablishmentEditionFormPage } from "src/app/pages/Establishment/Establ
 import { EstablishmentFormPageForExternals } from "src/app/pages/Establishment/EstablishmentFormPageForExternals";
 import { SearchPage } from "src/app/pages/Search/SearchPage";
 import { LandingEstablishmentPage } from "src/app/pages/Static/LandingEstablishmentPage";
+import { StatsPage } from "src/app/pages/StatsPage";
 import { PrivateRoute } from "src/app/routing/PrivateRoute";
 import { ENV } from "src/environmentVariables";
 import { RenewExpiredLinkPage } from "src/helpers/RenewExpiredLinkPage";
@@ -73,6 +74,7 @@ export const Router = () => {
         <RenewExpiredLinkPage route={route} />
       )}
       {route.name === "search" && <SearchPage />}
+      {route.name === "stats" && <StatsPage />}
       {frontEnvType === "DEV" && route.name === "searchDebug" && (
         <SearchDebugPage />
       )}

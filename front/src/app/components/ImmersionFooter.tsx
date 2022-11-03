@@ -97,7 +97,7 @@ const bottomsLinks: NavLink[] = [
   },
   {
     label: "Statistiques",
-    href: "https://immersion-facile.osc-fr1.scalingo.io/public/dashboard/b226a68a-72a2-4d85-bb17-774a5d6e6480",
+    href: "/stats",
     target: "_blank",
   },
 ];
