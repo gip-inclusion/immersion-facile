@@ -33,13 +33,12 @@ type SearchFormValues = {
   lon: number;
   radiusKm: number;
   address: string;
-  sortedBy?: string;
+  sortedBy?: SearchSortedBy;
 };
 
 export const SearchPage = () => {
   const searchStatus = useAppSelector(searchSelectors.searchStatus);
   const searchUseCase = useSearchUseCase();
-  const [formikValues, setFormikValues] = useState({});
   const initialValues = {
     lat: 0,
     lon: 0,
@@ -47,6 +46,9 @@ export const SearchPage = () => {
     address: "",
     sortedBy: undefined,
   };
+  const [formikValues, setFormikValues] =
+    useState<SearchFormValues>(initialValues);
+
   const mapValuesToSearchParams = (
     formValues: SearchFormValues,
   ): SearchParams => {
@@ -86,7 +88,7 @@ export const SearchPage = () => {
               professionnelle
             </h1>
             <Formik<SearchInput>
-              initialValues={initialValues}
+              initialValues={formikValues}
               onSubmit={searchUseCase}
             >
               {({ setFieldValue, values }) => (
