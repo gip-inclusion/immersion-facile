@@ -74,10 +74,20 @@ export const conventionInitialValuesFromUrl = ({
   const dateEnd = params.dateEnd ?? toDateString(addDays(startOfToday(), 3));
 
   const areBeneficiaryRepresentativeFieldPresent = !!(
-    params.lrEmail ||
-    params.lrPhone ||
-    params.lrFirstName ||
-    params.lrLastName
+    params.brEmail ||
+    params.brPhone ||
+    params.brFirstName ||
+    params.brLastName
+  );
+
+  const areBeneficiaryCurrentEmployerFieldPresent = !!(
+    params.bceBusinessName ||
+    params.bceSiret ||
+    params.bceFirstName ||
+    params.bceLastName ||
+    params.bceEmail ||
+    params.bcePhone ||
+    params.bceJob
   );
 
   const initialFormWithStoredAndUrlParams: ConventionPresentation & {
@@ -88,11 +98,11 @@ export const conventionInitialValuesFromUrl = ({
     dateSubmission: toDateString(startOfToday()),
     establishmentTutor: {
       role: "establishment-tutor",
-      firstName: params.establishmentTutorFirstName ?? "",
-      lastName: params.establishmentTutorLastName ?? "",
-      email: params.establishmentTutorEmail ?? "",
-      phone: params.establishmentTutorPhone ?? "",
-      job: params.establishmentTutorJob ?? "",
+      firstName: params.etFirstName ?? "",
+      lastName: params.etLastName ?? "",
+      email: params.etEmail ?? "",
+      phone: params.etPhone ?? "",
+      job: params.etJob ?? "",
     },
     signatories: {
       beneficiary: {
@@ -109,18 +119,30 @@ export const conventionInitialValuesFromUrl = ({
       },
       establishmentRepresentative: {
         role: "establishment-representative",
-        firstName: params.establishmentRepresentativeFirstName ?? "",
-        lastName: params.establishmentRepresentativeLastName ?? "",
-        email: params.establishmentRepresentativeEmail ?? "",
-        phone: params.establishmentRepresentativePhone ?? "",
+        firstName: params.erFirstName ?? "",
+        lastName: params.erLastName ?? "",
+        email: params.erEmail ?? "",
+        phone: params.erPhone ?? "",
       },
       beneficiaryRepresentative: areBeneficiaryRepresentativeFieldPresent
         ? {
             role: "beneficiary-representative",
-            firstName: params.lrFirstName ?? "",
-            lastName: params.lrLastName ?? "",
-            email: params.lrEmail ?? "",
-            phone: params.lrPhone ?? "",
+            firstName: params.brFirstName ?? "",
+            lastName: params.brLastName ?? "",
+            email: params.brEmail ?? "",
+            phone: params.brPhone ?? "",
+          }
+        : undefined,
+      beneficiaryCurrentEmployer: areBeneficiaryCurrentEmployerFieldPresent
+        ? {
+            businessSiret: params.bceSiret ?? "",
+            businessName: params.bceBusinessName ?? "",
+            firstName: params.bceFirstName ?? "",
+            lastName: params.bceLastName ?? "",
+            email: params.bceEmail ?? "",
+            phone: params.bcePhone ?? "",
+            job: params.bceJob ?? "",
+            role: "beneficiary-current-employer",
           }
         : undefined,
     },
