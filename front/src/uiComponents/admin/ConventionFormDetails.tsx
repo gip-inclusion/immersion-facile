@@ -1,5 +1,5 @@
 import React, { ReactNode, useRef, useState } from "react";
-import { toDisplayedDate } from "shared";
+import { BeneficiaryCurrentEmployer, toDisplayedDate } from "shared";
 import {
   AppellationDto,
   Beneficiary,
@@ -19,6 +19,7 @@ type ConventionField =
   | `establishmentTutor.${keyof EstablishmentTutor}`
   | `signatories.beneficiary.${keyof Beneficiary}`
   | `signatories.beneficiaryRepresentative.${keyof BeneficiaryRepresentative}`
+  | `signatories.beneficiaryCurrentEmployer.${keyof BeneficiaryCurrentEmployer}`
   | `signatories.establishmentRepresentative.${keyof EstablishmentRepresentative}`;
 
 type FieldsToLabel = Partial<Record<ConventionField, string>>;
@@ -74,6 +75,17 @@ const beneficiaryRepresentativeFields: FieldsToLabel = {
   "signatories.beneficiaryRepresentative.lastName": "Nom",
 };
 
+const beneficiaryCurrentEmployerFields: FieldsToLabel = {
+  "signatories.beneficiaryCurrentEmployer.signedAt": "Signé",
+  "signatories.beneficiaryCurrentEmployer.email": "Mail de l'employeur",
+  "signatories.beneficiaryCurrentEmployer.phone": "Numéro de téléphone",
+  "signatories.beneficiaryCurrentEmployer.firstName": "Prénom",
+  "signatories.beneficiaryCurrentEmployer.lastName": "Nom",
+  "signatories.beneficiaryCurrentEmployer.businessSiret": "Siret",
+  "signatories.beneficiaryCurrentEmployer.businessName": "Raison sociale",
+  "signatories.beneficiaryCurrentEmployer.job": "Nom",
+};
+
 const immersionPlaceDateFields: FieldsToLabel = {
   dateSubmission: "Date de soumission",
   dateStart: "Début",
@@ -120,6 +132,10 @@ const sections: FieldsAndTitle[] = [
       {
         title: "Rep. légal bénéficiaire",
         fields: beneficiaryRepresentativeFields,
+      },
+      {
+        title: "Employeur actuel bénéficiaire",
+        fields: beneficiaryCurrentEmployerFields,
       },
       {
         title: "Rep. légal de l'entreprise",
