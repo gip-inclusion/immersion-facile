@@ -7,7 +7,7 @@ type SectionTextEmbedProps = {
 const componentName = "im-section-text-embed";
 
 export const SectionTextEmbed = ({ videoUrl }: SectionTextEmbedProps) => (
-  <section className={`fr-container ${componentName} fr-py-8w`}>
+  <section className={`fr-container ${componentName} fr-pt-8w fr-pb-10w`}>
     <div className={`${componentName}__header fr-mb-4w`}>
       <h3 className={`${componentName}__title`}>
         Qu’est-ce qu’une immersion professionnelle ?

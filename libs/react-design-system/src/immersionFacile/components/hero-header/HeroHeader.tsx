@@ -44,7 +44,9 @@ export const HeroHeader = ({
     return window.removeEventListener("scroll", () => onWindowScroll());
   }, []);
   return (
-    <section className={`${componentName} ${componentName}--${type} fr-pt-8w `}>
+    <section
+      className={`${componentName} ${componentName}--${type} fr-pt-8w fr-mb-8w`}
+    >
       <div className={`fr-container ${componentName}__container`}>
         <div className={`${componentName}__text-wrapper`}>
           <h1 className={`${componentName}__title fr-display--xs`}>{title}</h1>
@@ -92,7 +94,7 @@ export const HeroHeader = ({
 };
 
 const NavCard = ({ title, icon, overtitle, url, type }: HeroHeaderNavCard) => (
-  <div className={"fr-col-12 fr-col-lg-4"}>
+  <div className={`${componentName}__nav-card-wrapper fr-col-12 fr-col-lg-4`}>
     <article
       className={`${componentName}__nav-card ${componentName}__nav-card--${type}`}
     >

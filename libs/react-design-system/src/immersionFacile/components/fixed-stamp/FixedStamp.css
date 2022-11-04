@@ -12,6 +12,7 @@
   text-align: center;
   line-height: 1.2;
   transition: right 0.5s ease;
+  z-index: 500;
 }
 .fixed-stamp:hover {
   right: 0;
