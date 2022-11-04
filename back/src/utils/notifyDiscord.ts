@@ -1,5 +1,8 @@
 import axios from "axios";
 import { AppConfig } from "../adapters/primary/config/appConfig";
+import { createLogger } from "./logger";
+
+const logger = createLogger(__filename);
 
 const discordSizeLimit = 1950;
 
@@ -15,20 +18,28 @@ export const notifyDiscord = (
   if (!discordWebhookUrl) return;
 
   const content = rawContent.slice(0, discordSizeLimit);
+
   // This is intentionaly not awaited following a fire and forget logic.
   //eslint-disable-next-line @typescript-eslint/no-floating-promises
-  axios.post(
-    discordWebhookUrl,
-    {
-      username: "Immersion Facile Bot",
-      content: options.skipCodeFormatting ? content : format(content),
-    },
-    {
-      headers: {
-        "Content-Type": "application/json;charset=UTF-8",
+  axios
+    .post(
+      discordWebhookUrl,
+      {
+        username: "Immersion Facile Bot",
+        content: options.skipCodeFormatting ? content : format(content),
       },
-    },
-  );
+      {
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8",
+        },
+      },
+    )
+    .catch((error) => {
+      logger.error(
+        `An error occurred when trying to send notification to discord : ${error.message}`,
+      );
+      logger.error(error);
+    });
 };
 
 const format = (content: string) => `\`\`\`${content}\`\`\``;
