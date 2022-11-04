@@ -1,5 +1,5 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { filter } from "rxjs";
+import { debounceTime, distinctUntilChanged, filter } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
 import { AgencyId } from "shared";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
@@ -14,14 +14,14 @@ type AgencyAction = ActionOfSlice<typeof agencyAdminSlice>;
 export const agencyAdminGetByNameEpic: AppEpic<AgencyAction> = (
   action$,
   _state$,
-  dependencies,
+  { agencyGateway, scheduler },
 ) =>
   action$.pipe(
     filter(agencyAdminSlice.actions.setAgencySearchText.match),
+    debounceTime(400, scheduler),
+    distinctUntilChanged(),
     switchMap((action: PayloadAction<string>) =>
-      dependencies.agencyGateway.listAgenciesByFilter$({
-        name: action.payload,
-      }),
+      agencyGateway.listAgenciesByFilter$({ name: action.payload }),
     ),
     map(agencyAdminSlice.actions.setAgencyOptions),
   );

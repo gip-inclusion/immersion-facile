@@ -37,19 +37,14 @@ describe("agencyAdmin", () => {
       });
     });
 
-    it("returns searched results", () => {
+    it("does not trigger call api before debounce time is reached, then triggers search and gets results", () => {
       const searchedText = "agen";
-      store.dispatch(
-        agencyAdminSlice.actions.setAgencySearchText(searchedText),
-      );
-      const agencies: AgencyOption[] = [
-        {
-          id: "123",
-          name: "My agency",
-        },
-      ];
+      whenSearchTextIsProvided(searchedText);
+      expectIsSearchingToBe(true);
+      fastForwardObservables();
+      expectIsSearchingToBe(true);
+      const agencies: AgencyOption[] = [{ id: "123", name: "My agency" }];
       feedWithAgencyOptions(agencies);
-
       expectAgencyAdminStateToMatch({
         isSearching: false,
         agencyOptions: agencies,
@@ -170,6 +165,11 @@ describe("agencyAdmin", () => {
     );
   };
 
+  const expectIsSearchingToBe = (isSearching: boolean) =>
+    expectAgencyAdminStateToMatch({ isSearching });
+
+  const fastForwardObservables = () => dependencies.scheduler.flush();
+
   const feedWithAgencyOptions = (agencyOptions: AgencyOption[]) => {
     dependencies.agencyGateway.agencies$.next(agencyOptions);
   };
@@ -184,5 +184,9 @@ describe("agencyAdmin", () => {
 
   const feedWithUpdateError = (msg: string) => {
     dependencies.agencyGateway.updateAgencyResponse$.error(new Error(msg));
+  };
+
+  const whenSearchTextIsProvided = (searchedText: string) => {
+    store.dispatch(agencyAdminSlice.actions.setAgencySearchText(searchedText));
   };
 });
