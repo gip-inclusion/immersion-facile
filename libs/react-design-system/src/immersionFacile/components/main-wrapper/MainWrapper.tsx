@@ -7,7 +7,7 @@ type MainWrapperProps = {
   children: React.ReactNode;
   className?: string;
   layout: "default" | "boxed" | "fullscreen";
-  useBackground: boolean;
+  useBackground?: boolean;
 };
 
 export const MainWrapper = ({
