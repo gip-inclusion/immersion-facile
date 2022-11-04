@@ -489,6 +489,31 @@ describe("Convention slice", () => {
     expectIsTutorEstablishmentRepresentativeToBe(true);
   });
 
+  it("Clear fetched convention", () => {
+    const convention = {
+      ...new ConventionDtoBuilder().build(),
+      agencyName: "agency",
+    };
+    ({ store } = createTestStore({
+      convention: {
+        formUi: {
+          isMinor: false,
+          isTutorEstablishmentRepresentative: true,
+          hasCurrentEmployer: false,
+        },
+        jwt: null,
+        convention,
+        feedback: { kind: "modificationsAskedFromSignatory" },
+        isLoading: false,
+        fetchError: null,
+        currentSignatoryRole: null,
+      },
+    }));
+    expectConventionState({ convention });
+    store.dispatch(conventionSlice.actions.clearFetchedConvention());
+    expectConventionState({ convention: null });
+  });
+
   const expectConventionState = (conventionState: Partial<ConventionState>) => {
     expectObjectsToMatch(store.getState().convention, conventionState);
   };

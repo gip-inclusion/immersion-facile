@@ -84,8 +84,14 @@ export const ConventionForm = ({
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (!("demandeId" in routeParams) && !("jwt" in routeParams)) return;
-    if (!("jwt" in routeParams) || routeParams.jwt === undefined) return;
+    if (
+      (!("demandeId" in routeParams) && !("jwt" in routeParams)) ||
+      !("jwt" in routeParams) ||
+      routeParams.jwt === undefined
+    ) {
+      dispatch(conventionSlice.actions.clearFetchedConvention());
+      return;
+    }
     dispatch(conventionSlice.actions.jwtProvided(routeParams.jwt));
     dispatch(conventionSlice.actions.fetchConventionRequested(routeParams.jwt));
   }, []);
@@ -97,7 +103,7 @@ export const ConventionForm = ({
 
   const t = useConventionTexts(initialValues.internshipKind);
 
-  const isFrozen = isConventionFrozen(initialValues);
+  const isFrozen = isConventionFrozen(fetchedConvention ?? initialValues);
 
   if (!reduxFormUiReady) return null;
 

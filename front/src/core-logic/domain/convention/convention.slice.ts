@@ -164,6 +164,10 @@ export const conventionSlice = createSlice({
       state.feedback = { kind: "idle" };
     },
 
+    clearFetchedConvention: (state) => {
+      state.convention = null;
+    },
+
     jwtProvided: (state, action: PayloadAction<string>) => {
       state.jwt = action.payload;
     },
