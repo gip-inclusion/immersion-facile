@@ -10,12 +10,16 @@ import {
   SectionFaq,
   SectionStats,
   SectionTextEmbed,
-  Stat,
 } from "react-design-system/immersionFacile";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { routes } from "src/app/routing/routes";
 import heroHeaderIllustration from "/src/assets/img/illustration-hero.webp";
-import logoLeMoisLesEntreprises from "../../../assets/img/logo-le-mois-les-entreprises.svg";
+import logoLeMoisLesEntreprises from "/src/assets/img/logo-le-mois-les-entreprises.svg";
+import {
+  heroHeaderNavCards,
+  sectionFaqData,
+  sectionStatsData,
+} from "./data/content";
 
 const DebugInfo = () => (
   <div
@@ -48,140 +52,8 @@ const DebugInfo = () => (
     ))}
   </div>
 );
-const heroHeaderNavCards = {
-  default: [
-    {
-      overtitle: "Candidat",
-      title: "Vous êtes candidat pour une immersion",
-      icon: "fr-icon-user-line",
-      type: "candidate",
-      url: "/accueil-beneficiaires",
-    },
-    {
-      overtitle: "Entreprise",
-      title: "Vous êtes candidat pour une immersion",
-      icon: "fr-icon-user-line",
-      type: "establishment",
-      url: "/accueil-beneficiaires",
-    },
-    {
-      overtitle: "Prescripteur",
-      title: "Vous êtes candidat pour une immersion",
-      icon: "fr-icon-user-line",
-      type: "agency",
-      url: "/accueil-beneficiaires",
-    },
-  ],
-  candidate: [
-    {
-      overtitle: "Candidat",
-      title: "Vous êtes candidat pour une immersion",
-      icon: "fr-icon-user-line",
-      type: "candidate",
-      url: "/accueil-beneficiaires",
-    },
-    {
-      overtitle: "Entreprise",
-      title: "Vous êtes candidat pour une immersion",
-      icon: "fr-icon-user-line",
-      type: "establishment",
-      url: "/accueil-beneficiaires",
-    },
-    {
-      overtitle: "Prescripteur",
-      title: "Vous êtes candidat pour une immersion",
-      icon: "fr-icon-user-line",
-      type: "agency",
-      url: "/accueil-beneficiaires",
-    },
-  ],
-  establishment: [
-    {
-      overtitle: "Candidat",
-      title: "Vous êtes candidat pour une immersion",
-      icon: "fr-icon-user-line",
-      type: "candidate",
-      url: "/accueil-beneficiaires",
-    },
-    {
-      overtitle: "Entreprise",
-      title: "Vous êtes candidat pour une immersion",
-      icon: "fr-icon-user-line",
-      type: "establishment",
-      url: "/accueil-beneficiaires",
-    },
-    {
-      overtitle: "Prescripteur",
-      title: "Vous êtes candidat pour une immersion",
-      icon: "fr-icon-user-line",
-      type: "agency",
-      url: "/accueil-beneficiaires",
-    },
-  ],
-  agency: [
-    {
-      overtitle: "Candidat",
-      title: "Vous êtes candidat pour une immersion",
-      icon: "fr-icon-user-line",
-      type: "candidate",
-      url: "/accueil-beneficiaires",
-    },
-    {
-      overtitle: "Entreprise",
-      title: "Vous êtes candidat pour une immersion",
-      icon: "fr-icon-user-line",
-      type: "establishment",
-      url: "/accueil-beneficiaires",
-    },
-    {
-      overtitle: "Prescripteur",
-      title: "Vous êtes candidat pour une immersion",
-      icon: "fr-icon-user-line",
-      type: "agency",
-      url: "/accueil-beneficiaires",
-    },
-  ],
-};
-const sectionStatsData: Stat[] = [
-  {
-    badgeLabel: "Découverte",
-    value: "1",
-    subtitle: "mois maximum",
-    description:
-      "L’immersion professionnelle est une période courte et non rémunérée de découverte en entreprise.",
-  },
-  {
-    badgeLabel: "Découverte",
-    value: "100%",
-    subtitle: "démarche dématérialisée",
-  },
-  {
-    badgeLabel: "Découverte",
-    value: "7",
-    subtitle: "demandeurs d’emploi sur 10",
-    description: "trouvent un emploi dans les mois qui suivent leur immersion.",
-  },
-];
 
-const sectionFaqData = [
-  {
-    title: "Comment contacter une entreprise pour demander une immersion ?",
-    description: `Si une entreprise a le label "entreprise accueillante", pour lui demander une une immersion, vous devez cliquer sur "contacter l'entreprise" et compléter le formulaire qui s'affiche puis cliquer sur "envoyer".`,
-    url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-contacter-une-entreprise-pour-demander-une-immersion-8dqotx/",
-  },
-  {
-    title: "Comment contacter une entreprise pour demander une immersion ?",
-    description: `Si une entreprise a le label "entreprise accueillante", pour lui demander une une immersion, vous devez cliquer sur "contacter l'entreprise" et compléter le formulaire qui s'affiche puis cliquer sur "envoyer".`,
-    url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-contacter-une-entreprise-pour-demander-une-immersion-8dqotx/",
-  },
-  {
-    title: "Comment contacter une entreprise pour demander une immersion ?",
-    description: `Si une entreprise a le label "entreprise accueillante", pour lui demander une une immersion, vous devez cliquer sur "contacter l'entreprise" et compléter le formulaire qui s'affiche puis cliquer sur "envoyer".`,
-    url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-contacter-une-entreprise-pour-demander-une-immersion-8dqotx/",
-  },
-];
-
-type UserType = "default" | "candidate" | "establishment" | "agency";
+export type UserType = "default" | "candidate" | "establishment" | "agency";
 
 type HomePageProps = {
   type: UserType;
@@ -197,7 +69,7 @@ export const HomePage = ({ type }: HomePageProps) => {
           title="La meilleure façon de faire émerger de nouveaux talents"
           description="Avec Immersion Facilitée, trouvez un métier à tester, entrez en relation immédiatement avec une entreprise accueillante, remplissez une demande de convention et obtenez une réponse en temps record !"
           illustration={heroHeaderIllustration}
-          type="default"
+          type={type}
           patterns
           navCards={heroHeaderNavCards[type] as HeroHeaderNavCard[]}
           parallax

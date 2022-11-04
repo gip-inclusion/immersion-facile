@@ -23,6 +23,11 @@ module.exports = {
           dark: "darkgrey",
           DEFAULT: "grey",
         },
+        immersionGreen: {
+          light: "#00BBC3",
+          dark: "#006A6F",
+          DEFAULT: "#009FA7",
+        },
       },
     },
   },

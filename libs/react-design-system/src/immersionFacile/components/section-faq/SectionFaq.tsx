@@ -31,13 +31,13 @@ export const SectionFaq = ({ articles }: SectionFaqProps) => (
   </section>
 );
 
-type Card = {
+export type FaqCardProps = {
   title: string;
   description: string;
   url: string;
 };
 
-const FaqCard = ({ title, description, url }: Card) => (
+const FaqCard = ({ title, description, url }: FaqCardProps) => (
   <div className="fr-col-12 fr-col-lg-4">
     <div className="fr-card fr-enlarge-link">
       <div className="fr-card__body">

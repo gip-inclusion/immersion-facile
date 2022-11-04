@@ -156,4 +156,19 @@ $typesTints: (
       }
     }
   }
+  &--candidate {
+    &:after {
+      background: var(--green-archipel-main-557);
+    }
+  }
+  &--establishment {
+    &:after {
+      background: var(--blue-cumulus-main-526);
+    }
+  }
+  &--agency {
+    &:after {
+      background: var(--purple-glycine-main-494);
+    }
+  }
 }

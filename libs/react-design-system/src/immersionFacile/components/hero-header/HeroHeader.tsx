@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "type-route";
 import "./HeroHeader.scss";
 
 type UserType = "default" | "candidate" | "establishment" | "agency";
@@ -17,7 +18,7 @@ export type HeroHeaderNavCard = {
   icon?: string;
   overtitle?: string;
   type: UserType;
-  url: string;
+  link: Link;
 };
 
 const componentName = "im-hero-header";
@@ -93,12 +94,12 @@ export const HeroHeader = ({
   );
 };
 
-const NavCard = ({ title, icon, overtitle, url, type }: HeroHeaderNavCard) => (
+const NavCard = ({ title, icon, overtitle, link, type }: HeroHeaderNavCard) => (
   <div className={`${componentName}__nav-card-wrapper fr-col-12 fr-col-lg-4`}>
     <article
       className={`${componentName}__nav-card ${componentName}__nav-card--${type}`}
     >
-      <a href={url} className={`${componentName}__nav-card-link`}></a>
+      <a {...link} className={`${componentName}__nav-card-link`}></a>
       <span className={`${componentName}__nav-card-overtitle`}>
         {overtitle}
       </span>
