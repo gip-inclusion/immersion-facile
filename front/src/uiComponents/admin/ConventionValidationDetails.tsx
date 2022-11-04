@@ -54,6 +54,7 @@ const establishmentRepresentativeFields: FieldsToLabel = {
     "Numéro de téléphone du représentant",
   "signatories.establishmentRepresentative.firstName": "Prénom",
   "signatories.establishmentRepresentative.lastName": "Nom",
+  siret: "Siret",
 };
 
 const candidateFields: FieldsToLabel = {
@@ -62,9 +63,6 @@ const candidateFields: FieldsToLabel = {
   "signatories.beneficiary.phone": "Numéro de téléphone",
   "signatories.beneficiary.firstName": "Prénom",
   "signatories.beneficiary.lastName": "Nom",
-  "signatories.beneficiary.emergencyContact": "Contact d'urgence",
-  "signatories.beneficiary.emergencyContactPhone":
-    "Numéro du contact d'urgence",
 };
 
 const beneficiaryRepresentativeFields: FieldsToLabel = {
@@ -82,7 +80,6 @@ const beneficiaryCurrentEmployerFields: FieldsToLabel = {
   "signatories.beneficiaryCurrentEmployer.firstName": "Prénom",
   "signatories.beneficiaryCurrentEmployer.lastName": "Nom",
   "signatories.beneficiaryCurrentEmployer.businessSiret": "Siret",
-  "signatories.beneficiaryCurrentEmployer.businessName": "Raison sociale",
   "signatories.beneficiaryCurrentEmployer.job": "Nom",
 };
 
@@ -121,8 +118,8 @@ const sections: FieldsAndTitle[] = [
       "Téléphone",
       "Nom",
       "Prénom",
-      "Contact d'urgence",
-      "Tel. contact d'urgence",
+      "Siret",
+      "Poste",
     ],
     rowFields: [
       {
@@ -255,6 +252,7 @@ const ConventionValidationSection = ({
   const [markedAsRead, setMarkedAsRead] = useState<boolean>(false);
   const buildContent = (field: ConventionField): ReactNode => {
     const value = path(field, convention);
+
     if (typeof value === "boolean") return value ? "✅" : "❌";
     if (field === "schedule") {
       return (
@@ -275,8 +273,10 @@ const ConventionValidationSection = ({
       field === "signatories.beneficiaryRepresentative.signedAt" ||
       field === "signatories.beneficiaryCurrentEmployer.signedAt"
     )
-      return value ? `✅ le ${value}` : "❌";
-    if (field.includes("siret")) {
+      return value
+        ? `✅ (${toDisplayedDate(new Date(value as string))})`
+        : "❌";
+    if (field.toLowerCase().includes("siret")) {
       return (
         <a
           href={`https://annuaire-entreprises.data.gouv.fr/etablissement/${value}`}
