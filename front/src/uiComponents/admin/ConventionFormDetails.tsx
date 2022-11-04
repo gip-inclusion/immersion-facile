@@ -12,7 +12,7 @@ import {
   prettyPrintSchedule,
   isStringDate,
 } from "shared";
-import { ConventionFormAccordionProps } from "./ConventionFormAccordion";
+import { ConventionValidationProps } from "./ConventionValidation";
 
 type ConventionField =
   | keyof ConventionReadDto
@@ -201,7 +201,7 @@ const cellStyles = {
 };
 export const ConventionFormDetails = ({
   convention,
-}: ConventionFormAccordionProps) => {
+}: ConventionValidationProps) => {
   const copyButton = useRef<HTMLButtonElement>(null);
   const [isCopied, setIsCopied] = useState(false);
 

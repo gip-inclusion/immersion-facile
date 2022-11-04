@@ -14,36 +14,24 @@ const beforeAfterString = (date: string) => {
   });
 };
 
-export interface ConventionFormAccordionProps {
+const labelByStatus: Record<ConventionStatus, string> = {
+  ACCEPTED_BY_COUNSELLOR: "[📗 DEMANDE ÉLIGIBLE]",
+  ACCEPTED_BY_VALIDATOR: "[✅ DEMANDE VALIDÉE]",
+  CANCELLED: "[🗑️ CONVENTION ANNULÉE PAR ADMIN]",
+  DRAFT: "[📕 BROUILLON]",
+  IN_REVIEW: "[📙 DEMANDE À ETUDIER]",
+  PARTIALLY_SIGNED: "[✍️ Partiellement signée]",
+  READY_TO_SIGN: "[📄 Prête à etre signée]",
+  REJECTED: "[❌ DEMANDE REJETÉE]",
+};
+
+export interface ConventionValidationProps {
   convention: ConventionReadDto;
 }
 
-const getPrefix = (status: ConventionStatus) => {
-  switch (status) {
-    case "DRAFT":
-      return "[📕 BROUILLON]";
-    case "READY_TO_SIGN":
-      return "[📄 Prête à etre signée]";
-    case "PARTIALLY_SIGNED":
-      return "[✍️ Partiellement signée]";
-    case "REJECTED":
-      return "[❌ DEMANDE REJETÉE]";
-    case "IN_REVIEW":
-      return "[📙 DEMANDE À ETUDIER]";
-    case "ACCEPTED_BY_COUNSELLOR":
-      return "[📗 DEMANDE ÉLIGIBLE]";
-    case "ACCEPTED_BY_VALIDATOR":
-      return "[✅ DEMANDE VALIDÉE]";
-    case "CANCELLED":
-      return "[🗑️ CONVENTION ANNULÉE PAR ADMIN]";
-  }
-
-  return "[⁉️ STATUS DE LA DEMANDE INDÉFINI]";
-};
-
-export const ConventionFormAccordion = ({
+export const ConventionValidation = ({
   convention,
-}: ConventionFormAccordionProps) => {
+}: ConventionValidationProps) => {
   const {
     status,
     signatories: { beneficiary },
@@ -53,7 +41,7 @@ export const ConventionFormAccordion = ({
   } = convention;
 
   const title =
-    `${getPrefix(status)} ` +
+    `${labelByStatus[status]} ` +
     `${beneficiary.lastName.toUpperCase()} ${
       beneficiary.firstName
     } chez ${businessName} ` +

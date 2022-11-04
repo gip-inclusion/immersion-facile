@@ -16,7 +16,7 @@ import {
   conventionSlice,
 } from "src/core-logic/domain/convention/convention.slice";
 import { useConvention } from "src/hooks/convention.hooks";
-import { ConventionFormAccordion } from "src/uiComponents/admin/ConventionFormAccordion";
+import { ConventionValidation } from "src/uiComponents/admin/ConventionValidation";
 import { Route } from "type-route";
 import { VerificationActionButton } from "./VerificationActionButton";
 
@@ -75,7 +75,7 @@ export const ConventionValidatePage = ({ route }: VerificationPageProps) => {
   return (
     <HeaderFooterLayout>
       <MainWrapper layout="default" vSpacing={8}>
-        <ConventionFormAccordion convention={convention} />
+        <ConventionValidation convention={convention} />
         <div
           style={{
             position: "fixed",

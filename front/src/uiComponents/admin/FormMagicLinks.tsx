@@ -3,12 +3,10 @@ import { allRoles, frontRoutes, Role } from "shared";
 import { conventionGateway } from "src/app/config/dependencies";
 import { useAdminToken } from "src/hooks/useAdminToken";
 import { WithBackground } from "src/uiComponents/admin/WithBackground";
-import { ConventionFormAccordionProps } from "./ConventionFormAccordion";
+import { ConventionValidationProps } from "./ConventionValidation";
 
 // Component to show the magic links picker
-export const FormMagicLinks = ({
-  convention,
-}: ConventionFormAccordionProps) => {
+export const FormMagicLinks = ({ convention }: ConventionValidationProps) => {
   const adminToken = useAdminToken();
   const [role, setRole] = useState<Role>(allRoles[0]);
   const [route, setRoute] = useState(
