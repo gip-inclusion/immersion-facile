@@ -1,14 +1,20 @@
 import React from "react";
-import { EstablishmentHomeMenu } from "src/app/components/EstablishmentHomeMenu";
-import { FindImmersionHomeMenu } from "src/app/components/FindImmersionHomeMenu";
 import { ImmersionFooter } from "src/app/components/ImmersionFooter";
 import { ImmersionMarianneHeader } from "src/app/components/ImmersionMarianneHeader";
-import { InitiateConventionCard } from "src/app/components/InitiateConventionCard";
 import { ENV } from "src/environmentVariables";
-import { HomeImmersionHowTo } from "src/uiComponents/ImmersionHowTo";
-import { FixedStamp, MainWrapper } from "react-design-system/immersionFacile";
+import {
+  FixedStamp,
+  HeroHeader,
+  HeroHeaderNavCard,
+  MainWrapper,
+  SectionFaq,
+  SectionStats,
+  SectionTextEmbed,
+  Stat,
+} from "react-design-system/immersionFacile";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { routes } from "src/app/routing/routes";
+import heroHeaderIllustration from "/src/assets/img/illustration-hero.webp";
 import logoLeMoisLesEntreprises from "../../../assets/img/logo-le-mois-les-entreprises.svg";
 
 const DebugInfo = () => (
@@ -42,35 +48,167 @@ const DebugInfo = () => (
     ))}
   </div>
 );
+const heroHeaderNavCards = {
+  default: [
+    {
+      overtitle: "Candidat",
+      title: "Vous êtes candidat pour une immersion",
+      icon: "fr-icon-user-line",
+      type: "candidate",
+      url: "/accueil-beneficiaires",
+    },
+    {
+      overtitle: "Entreprise",
+      title: "Vous êtes candidat pour une immersion",
+      icon: "fr-icon-user-line",
+      type: "establishment",
+      url: "/accueil-beneficiaires",
+    },
+    {
+      overtitle: "Prescripteur",
+      title: "Vous êtes candidat pour une immersion",
+      icon: "fr-icon-user-line",
+      type: "agency",
+      url: "/accueil-beneficiaires",
+    },
+  ],
+  candidate: [
+    {
+      overtitle: "Candidat",
+      title: "Vous êtes candidat pour une immersion",
+      icon: "fr-icon-user-line",
+      type: "candidate",
+      url: "/accueil-beneficiaires",
+    },
+    {
+      overtitle: "Entreprise",
+      title: "Vous êtes candidat pour une immersion",
+      icon: "fr-icon-user-line",
+      type: "establishment",
+      url: "/accueil-beneficiaires",
+    },
+    {
+      overtitle: "Prescripteur",
+      title: "Vous êtes candidat pour une immersion",
+      icon: "fr-icon-user-line",
+      type: "agency",
+      url: "/accueil-beneficiaires",
+    },
+  ],
+  establishment: [
+    {
+      overtitle: "Candidat",
+      title: "Vous êtes candidat pour une immersion",
+      icon: "fr-icon-user-line",
+      type: "candidate",
+      url: "/accueil-beneficiaires",
+    },
+    {
+      overtitle: "Entreprise",
+      title: "Vous êtes candidat pour une immersion",
+      icon: "fr-icon-user-line",
+      type: "establishment",
+      url: "/accueil-beneficiaires",
+    },
+    {
+      overtitle: "Prescripteur",
+      title: "Vous êtes candidat pour une immersion",
+      icon: "fr-icon-user-line",
+      type: "agency",
+      url: "/accueil-beneficiaires",
+    },
+  ],
+  agency: [
+    {
+      overtitle: "Candidat",
+      title: "Vous êtes candidat pour une immersion",
+      icon: "fr-icon-user-line",
+      type: "candidate",
+      url: "/accueil-beneficiaires",
+    },
+    {
+      overtitle: "Entreprise",
+      title: "Vous êtes candidat pour une immersion",
+      icon: "fr-icon-user-line",
+      type: "establishment",
+      url: "/accueil-beneficiaires",
+    },
+    {
+      overtitle: "Prescripteur",
+      title: "Vous êtes candidat pour une immersion",
+      icon: "fr-icon-user-line",
+      type: "agency",
+      url: "/accueil-beneficiaires",
+    },
+  ],
+};
+const sectionStatsData: Stat[] = [
+  {
+    badgeLabel: "Découverte",
+    value: "1",
+    subtitle: "mois maximum",
+    description:
+      "L’immersion professionnelle est une période courte et non rémunérée de découverte en entreprise.",
+  },
+  {
+    badgeLabel: "Découverte",
+    value: "100%",
+    subtitle: "démarche dématérialisée",
+  },
+  {
+    badgeLabel: "Découverte",
+    value: "7",
+    subtitle: "demandeurs d’emploi sur 10",
+    description: "trouvent un emploi dans les mois qui suivent leur immersion.",
+  },
+];
 
-export const HomePage = () => {
+const sectionFaqData = [
+  {
+    title: "Comment contacter une entreprise pour demander une immersion ?",
+    description: `Si une entreprise a le label "entreprise accueillante", pour lui demander une une immersion, vous devez cliquer sur "contacter l'entreprise" et compléter le formulaire qui s'affiche puis cliquer sur "envoyer".`,
+    url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-contacter-une-entreprise-pour-demander-une-immersion-8dqotx/",
+  },
+  {
+    title: "Comment contacter une entreprise pour demander une immersion ?",
+    description: `Si une entreprise a le label "entreprise accueillante", pour lui demander une une immersion, vous devez cliquer sur "contacter l'entreprise" et compléter le formulaire qui s'affiche puis cliquer sur "envoyer".`,
+    url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-contacter-une-entreprise-pour-demander-une-immersion-8dqotx/",
+  },
+  {
+    title: "Comment contacter une entreprise pour demander une immersion ?",
+    description: `Si une entreprise a le label "entreprise accueillante", pour lui demander une une immersion, vous devez cliquer sur "contacter l'entreprise" et compléter le formulaire qui s'affiche puis cliquer sur "envoyer".`,
+    url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-contacter-une-entreprise-pour-demander-une-immersion-8dqotx/",
+  },
+];
+
+type UserType = "default" | "candidate" | "establishment" | "agency";
+
+type HomePageProps = {
+  type: UserType;
+};
+
+export const HomePage = ({ type }: HomePageProps) => {
   const featureFlags = useFeatureFlags();
   return (
     <div>
       <ImmersionMarianneHeader />
-      <MainWrapper
-        layout="fullscreen"
-        className="bg-gradient-to-b from--100 from-gray-100 via-gray-50 to-white "
-      >
-        <section className="flex flex-col items-center">
-          <div className="flex flex-wrap justify-center">
-            <div>
-              <FindImmersionHomeMenu />
-              <InitiateConventionCard
-                title="J’ai trouvé mon entreprise accueillante"
-                peConnectNotice="Je suis inscrit à Pôle Emploi, je demande une convention avec :"
-                otherCaseNotice="Je suis accompagné par une autre structure :"
-                showFormButtonLabel="Initier ma demande de convention"
-              />
-            </div>
-            <EstablishmentHomeMenu />
-          </div>
-        </section>
-        <HomeImmersionHowTo />
+      <MainWrapper layout="fullscreen" vSpacing={0} useBackground>
+        <HeroHeader
+          title="La meilleure façon de faire émerger de nouveaux talents"
+          description="Avec Immersion Facilitée, trouvez un métier à tester, entrez en relation immédiatement avec une entreprise accueillante, remplissez une demande de convention et obtenez une réponse en temps record !"
+          illustration={heroHeaderIllustration}
+          type="default"
+          patterns
+          navCards={heroHeaderNavCards[type] as HeroHeaderNavCard[]}
+          parallax
+        />
+        <SectionStats stats={sectionStatsData} />
+        <SectionTextEmbed videoUrl="https://www.powtoon.com/embed/c8x7n7AR2XE/" />
+        <SectionFaq articles={sectionFaqData} />
       </MainWrapper>
 
       <ImmersionFooter />
-      {["local", "dev"].includes(ENV.envType) && <DebugInfo />}
+
       {featureFlags.enableTemporaryOperation && (
         <FixedStamp
           image={

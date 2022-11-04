@@ -19,7 +19,7 @@
   "dependencies": {
     "@emotion/react": "^11.8.2",
     "@emotion/styled": "^11.8.1",
-    "@gouvfr/dsfr": "1.7.2",
+    "@gouvfr/dsfr": "1.8.1",
     "@mui/icons-material": "^5.5.1",
     "@mui/material": "^5.5.2",
     "@reduxjs/toolkit": "^1.8.1",
@@ -29,6 +29,8 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-jest": "^26.1.2",
     "formik": "2.2.9",
+    "html-templates": "workspace:*",
+    "http-client": "workspace:*",
     "ramda": "^0.28.0",
     "react": "^17.0.2",
     "react-design-system": "workspace:*",
@@ -38,8 +40,6 @@
     "redux-observable": "^2.0.0",
     "rxjs": "^7.5.5",
     "shared": "workspace:*",
-    "html-templates": "workspace:*",
-    "http-client": "workspace:*",
     "type-route": "^0.6.0",
     "uuid": "^8.3.2",
     "zod": "^3.14.2"
@@ -60,6 +60,7 @@
     "babel-jest": "^27.5.1",
     "jest": "^27.5.1",
     "postcss": "^8.4.12",
+    "sass": "^1.55.0",
     "tailwindcss": "^3.0.23",
     "typescript": "^4.6.2",
     "vite": "^3.1.4"

@@ -47,10 +47,10 @@ export const Router = () => {
       {route.name === "formEstablishmentForExternals" && (
         <EstablishmentFormPageForExternals route={route} />
       )}
-      {route.name === "home" && <HomePage />}
-      {route.name === "homeCandidates" && <HomePage />}
-      {route.name === "homeEstablishments" && <HomePage />}
-      {route.name === "homeAgencies" && <HomePage />}
+      {route.name === "home" && <HomePage type="default" />}
+      {route.name === "homeCandidates" && <HomePage type="candidate" />}
+      {route.name === "homeEstablishments" && <HomePage type="establishment" />}
+      {route.name === "homeAgencies" && <HomePage type="agency" />}
       {route.name === "landingEstablishment" && <LandingEstablishmentPage />}
       {route.name === "conventionImmersion" && (
         <ConventionImmersionPage route={route} />

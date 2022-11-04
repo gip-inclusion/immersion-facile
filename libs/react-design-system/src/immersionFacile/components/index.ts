@@ -22,3 +22,7 @@ export * from "./fixed-stamp";
 export * from "./over-footer";
 export * from "./pe-connect-button";
 export * from "./button-group";
+export * from "./hero-header";
+export * from "./section-stats";
+export * from "./section-text-embed";
+export * from "./section-faq";

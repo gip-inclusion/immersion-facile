@@ -28,7 +28,7 @@ input {
   font-family: "Marianne", Arial, sans-serif;
   font-size: 1rem;
 }
-[href]:not(.fr-btn, .fr-nav__link) {
+[href]:not(.fr-btn, .fr-nav__link, .fr-card__title a, .fr-tag) {
   background-image: none !important;
   text-decoration: underline;
 }
@@ -66,3 +66,8 @@ body .w-full {
 .bg-immersionBlue:hover {
   background-color: rgb(190 84 73 / var(--tw-bg-opacity));
 } */
+body .im-badge {
+  /* to override dsfr specificity */
+  background: var(--grey-1000-100);
+  color: var(--blue-france-main-525);
+}

@@ -7,6 +7,7 @@ export type SubmitButtonProps = {
   className?: string;
   type?: "submit" | "button" | "reset";
   level?: "primary" | "secondary";
+  url?: string;
 };
 
 export const Button = ({
@@ -14,18 +15,25 @@ export const Button = ({
   disable,
   children,
   className,
+  url,
   type = "button",
   level = "primary",
 }: SubmitButtonProps) => {
+  const isLink = url && url !== "";
   const isSecondary = level === "secondary" ? "fr-btn--secondary" : "";
-  return (
-    <button
-      className={`fr-btn ${isSecondary} ${className}`}
-      type={type}
-      onClick={onSubmit}
-      disabled={disable}
-    >
-      {children}
-    </button>
-  );
+  const classes = `fr-btn ${isSecondary} ${className}`;
+  const Element = isLink ? "a" : "button";
+  const props = isLink
+    ? {
+        className: classes,
+        href: url,
+        disabled: disable,
+      }
+    : {
+        className: classes,
+        type,
+        onClick: onSubmit,
+        disabled: disable,
+      };
+  return <Element {...props}>{children}</Element>;
 };

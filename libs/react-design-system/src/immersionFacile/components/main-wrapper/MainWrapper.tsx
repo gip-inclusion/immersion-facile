@@ -1,4 +1,5 @@
 import React from "react";
+import "./MainWrapper.scss";
 
 type MainWrapperProps = {
   vSpacing?: number;
@@ -6,6 +7,7 @@ type MainWrapperProps = {
   children: React.ReactNode;
   className?: string;
   layout: "default" | "boxed" | "fullscreen";
+  useBackground: boolean;
 };
 
 export const MainWrapper = ({
@@ -14,14 +16,15 @@ export const MainWrapper = ({
   className,
   children,
   layout,
+  useBackground,
 }: MainWrapperProps) => {
   const spacing = `${vSpacing ? `fr-py-${vSpacing}w` : ""} ${
     hSpacing ? `fr-px-${hSpacing}w` : ""
   }`;
   const classNameValue =
     layout === "fullscreen"
-      ? `${className} ${spacing}`
-      : `fr-main-wrapper fr-container fr-grid--center ${className} ${spacing}`;
+      ? `im-main-wrapper ${className} ${spacing}`
+      : `im-main-wrapper fr-container fr-grid--center ${className} ${spacing}`;
   return (
     <main className={classNameValue} id="main-content">
       {layout === "boxed" && (
@@ -30,6 +33,9 @@ export const MainWrapper = ({
         </div>
       )}
       {layout !== "boxed" && children}
+      {useBackground && (
+        <div className={"im-main-wrapper__custom-background"}></div>
+      )}
     </main>
   );
 };
