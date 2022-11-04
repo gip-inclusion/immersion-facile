@@ -12,7 +12,7 @@ import {
   prettyPrintSchedule,
   isStringDate,
 } from "shared";
-import { ConventionValidationProps } from "./ConventionValidation";
+import type { ConventionValidationProps } from "./ConventionValidation";
 
 type ConventionField =
   | keyof ConventionReadDto
@@ -199,7 +199,7 @@ const cellStyles = {
   overflow: "hidden",
   whitespace: "nowrap",
 };
-export const ConventionFormDetails = ({
+export const ConventionValidationDetails = ({
   convention,
 }: ConventionValidationProps) => {
   const copyButton = useRef<HTMLButtonElement>(null);
@@ -272,9 +272,10 @@ const ConventionValidationSection = ({
     if (
       field === "signatories.beneficiary.signedAt" ||
       field === "signatories.establishmentRepresentative.signedAt" ||
-      field === "signatories.beneficiaryRepresentative.signedAt"
+      field === "signatories.beneficiaryRepresentative.signedAt" ||
+      field === "signatories.beneficiaryCurrentEmployer.signedAt"
     )
-      return value ? "✅" : "❌";
+      return value ? `✅ le ${value}` : "❌";
     if (field.includes("siret")) {
       return (
         <a

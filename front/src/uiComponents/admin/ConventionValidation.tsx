@@ -2,7 +2,7 @@ import { formatDistance } from "date-fns";
 import { fr } from "date-fns/locale";
 import React from "react";
 import type { ConventionReadDto, ConventionStatus } from "shared";
-import { ConventionFormDetails } from "./ConventionFormDetails";
+import { ConventionValidationDetails } from "./ConventionValidationDetails";
 
 const beforeAfterString = (date: string) => {
   const eventDate = new Date(date);
@@ -50,7 +50,7 @@ export const ConventionValidation = ({
   return (
     <>
       <h3>{title}</h3>
-      <ConventionFormDetails convention={convention} />
+      <ConventionValidationDetails convention={convention} />
     </>
   );
 };

@@ -95,7 +95,7 @@ const EditAgencyForm = () => {
 
                 <SimpleSelect
                   id="agency-status"
-                  label="⚠️Status de l'agence ⚠️"
+                  label="⚠️Statut de l'agence ⚠️"
                   name={getName("status")}
                   options={statusListOfOptions}
                 />
