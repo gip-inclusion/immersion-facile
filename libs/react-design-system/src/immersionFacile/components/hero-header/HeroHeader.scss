@@ -1,0 +1,159 @@
+$white: var(--grey-1000-100);
+$patternSizes: 80px, 160px, 130px;
+$typesTints: (
+  "default": (
+    "primary": var(--green-archipel-main-557),
+    "light": var(--green-archipel-975-75),
+  ),
+  "candidate": (
+    "primary": var(--green-archipel-main-557),
+    "light": var(--green-archipel-975-75),
+  ),
+  "establishment": (
+    "primary": var(--blue-cumulus-main-526),
+    "light": var(--blue-cumulus-925-125),
+  ),
+  "agency": (
+    "primary": var(--purple-glycine-main-494),
+    "light": var(--purple-glycine-925-125),
+  ),
+);
+
+.im-hero-header {
+  overflow: hidden;
+  position: relative;
+  &:after {
+    content: "";
+    display: block;
+    position: absolute;
+    left: 50%;
+    top: -10%;
+    transform: translateX(-50%);
+    background: var(--blue-france-sun-113-625);
+    width: 170%;
+    height: 700px;
+    border-radius: 100%;
+  }
+  &__container {
+    display: flex;
+    position: relative;
+    z-index: 10;
+  }
+  &__text-wrapper {
+    flex: 1 0 60%;
+  }
+  &__title {
+    color: $white;
+  }
+  &__description {
+    color: $white;
+    font-weight: normal;
+  }
+  &__illustration-wrapper {
+    margin-left: 5%;
+  }
+  &__illustration {
+    position: relative;
+    z-index: 10;
+  }
+  &__patterns {
+  }
+  &__pattern {
+    background: $white;
+    border-radius: 50%;
+    opacity: 0.4;
+    filter: blur(20px);
+    position: absolute;
+    @for $i from 0 to length($patternSizes) {
+      &--#{$i} {
+        width: #{nth($patternSizes, $i + 1)};
+        height: #{nth($patternSizes, $i + 1)};
+      }
+    }
+    &--0 {
+      top: 20px;
+      right: 20%;
+    }
+    &--1 {
+      top: 120px;
+      right: 50px;
+    }
+    &--2 {
+      top: 220px;
+      right: 30%;
+    }
+  }
+  &__nav-cards {
+    position: relative;
+    top: -10rem;
+    z-index: 20;
+    list-style-type: none;
+    margin-bottom: -10rem;
+  }
+  &__nav-card {
+    background: $white;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2.5rem;
+    text-align: center;
+    position: relative;
+    top: 0;
+    transition: all 1s ease;
+    &:after {
+      content: "";
+      display: block;
+      position: absolute;
+      bottom: 1rem;
+      width: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      height: 5px;
+      opacity: 0.5;
+      transition: all 0.6s ease;
+    }
+    @each $type, $colors in $typesTints {
+      $primary: map-get($colors, "primary");
+      $light: map-get($colors, "light");
+      &--#{$type} {
+        color: $primary;
+        .im-hero-header__nav-card-title {
+          color: $primary;
+        }
+        &:after {
+          background: $primary;
+        }
+        &:hover {
+          background: $light;
+        }
+      }
+    }
+    &-link {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1;
+    }
+    &-overtitle {
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+    &-icon {
+      &:before {
+        width: 65px;
+        height: 75px;
+        margin-bottom: 1rem;
+      }
+    }
+    &:hover {
+      top: -0.5rem;
+      &:after {
+        width: 90%;
+        opacity: 1;
+      }
+    }
+  }
+}
