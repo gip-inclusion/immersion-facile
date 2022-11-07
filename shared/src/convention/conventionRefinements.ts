@@ -60,8 +60,8 @@ const areSignatoryEmailsUniq = (signatories: Signatories): boolean => {
     signatories.establishmentRepresentative.email,
     signatories.beneficiary.email,
     signatories.beneficiaryRepresentative?.email,
-  ];
-
+    signatories.beneficiaryCurrentEmployer?.email,
+  ].filter((email) => email !== undefined);
   return uniq(emails).length === emails.length;
 };
 

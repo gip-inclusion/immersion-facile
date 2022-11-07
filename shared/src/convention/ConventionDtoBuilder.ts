@@ -132,6 +132,18 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
       },
     });
   }
+
+  public withBeneficiaryRepresentativeEmail(email: string) {
+    const beneficiaryRepresentative =
+      this.dto.signatories.beneficiaryRepresentative;
+    if (beneficiaryRepresentative)
+      return this.withBeneficiaryRepresentative({
+        ...beneficiaryRepresentative,
+        email,
+      });
+    throw new Error("beneficiaryRepresentative is undefined.");
+  }
+
   public withBeneficiaryCurentEmployer(
     beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer,
   ): ConventionDtoBuilder {

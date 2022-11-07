@@ -178,6 +178,7 @@ export const conventionSchema: z.Schema<ConventionDto> =
         getConventionFieldName("signatories.beneficiaryRepresentative.email"),
         getConventionFieldName("signatories.beneficiary.email"),
         getConventionFieldName("signatories.establishmentRepresentative.email"),
+        getConventionFieldName("signatories.beneficiaryCurrentEmployer.email"),
       ],
     })
     .refine(mustBeSignedByEveryone, {

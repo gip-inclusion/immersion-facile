@@ -6,9 +6,28 @@ import {
   ConventionStatus,
   allConventionStatuses,
   ConventionDto,
+  BeneficiaryRepresentative,
+  BeneficiaryCurrentEmployer,
 } from "./convention.dto";
 import { conventionSchema } from "./convention.schema";
 import { ConventionDtoBuilder, DATE_START } from "./ConventionDtoBuilder";
+const currentEmployer: BeneficiaryCurrentEmployer = {
+  role: "beneficiary-current-employer",
+  email: "email@email.com",
+  phone: "",
+  firstName: "",
+  lastName: "",
+  job: "",
+  businessSiret: "",
+  businessName: "",
+};
+const beneficiaryRepresentative: BeneficiaryRepresentative = {
+  role: "beneficiary-representative",
+  firstName: "",
+  lastName: "",
+  phone: "",
+  email: "demandeur@mail.fr",
+};
 
 describe("conventionDtoSchema", () => {
   it("accepts valid Convention", () => {
@@ -16,23 +35,75 @@ describe("conventionDtoSchema", () => {
     expectConventionDtoToBeValid(convention);
   });
 
-  it("ignores accents on emails", () => {
-    const convention = new ConventionDtoBuilder()
-      .withBeneficiaryEmail("Jérôme_Truc@associés.fr")
-      .build();
-    const parsedConvention = conventionSchema.parse(convention);
-    expect(parsedConvention.signatories.beneficiary.email).toBe(
-      "Jerome_Truc@associes.fr",
-    );
-  });
+  describe("email validations", () => {
+    it("ignores accents on emails", () => {
+      const convention = new ConventionDtoBuilder()
+        .withBeneficiaryEmail("Jérôme_Truc@associés.fr")
+        .build();
+      const parsedConvention = conventionSchema.parse(convention);
+      expect(parsedConvention.signatories.beneficiary.email).toBe(
+        "Jerome_Truc@associes.fr",
+      );
+    });
+    it("rejects equal beneficiary and establishment tutor emails", () => {
+      expectConventionDtoToBeInvalid(
+        new ConventionDtoBuilder()
+          .withBeneficiaryEmail("demandeur@mail.fr")
+          .withEstablishmentTutorEmail("demandeur@mail.fr")
+          .build(),
+      );
+    });
 
-  it("rejects equal applicant and establishment tutor emails", () => {
-    const convention = new ConventionDtoBuilder()
-      .withBeneficiaryEmail("demandeur@mail.fr")
-      .withEstablishmentTutorEmail("demandeur@mail.fr")
-      .build();
+    it("rejects equal beneficiary and establishment representative emails", () => {
+      expectConventionDtoToBeInvalid(
+        new ConventionDtoBuilder()
+          .withBeneficiaryEmail("demandeur@mail.fr")
+          .withEstablishmentRepresentativeEmail("demandeur@mail.fr")
+          .build(),
+      );
+    });
 
-    expectConventionDtoToBeInvalid(convention);
+    it("rejects equal beneficiary and beneficiary representative emails", () => {
+      expectConventionDtoToBeInvalid(
+        new ConventionDtoBuilder()
+          .withBeneficiaryEmail("demandeur@mail.fr")
+          .withBeneficiaryRepresentative(beneficiaryRepresentative)
+          .build(),
+      );
+    });
+
+    it("rejects equal beneficiary representative and establishment tutor emails", () => {
+      expectConventionDtoToBeInvalid(
+        new ConventionDtoBuilder()
+          .withEstablishmentTutorEmail(beneficiaryRepresentative.email)
+          .withBeneficiaryRepresentative(beneficiaryRepresentative)
+          .build(),
+      );
+    });
+
+    it("rejects equal beneficiary current employer and other signatories", () => {
+      const convention = new ConventionDtoBuilder()
+        .withBeneficiaryCurentEmployer(currentEmployer)
+        .build();
+      expectConventionDtoToBeInvalid(
+        new ConventionDtoBuilder(convention)
+          .withBeneficiaryEmail(currentEmployer.email)
+          .build(),
+      );
+      expectConventionDtoToBeInvalid(
+        new ConventionDtoBuilder(convention)
+          .withBeneficiaryRepresentative({
+            ...currentEmployer,
+            role: "beneficiary-representative",
+          })
+          .build(),
+      );
+      expectConventionDtoToBeInvalid(
+        new ConventionDtoBuilder(convention)
+          .withEstablishmentRepresentativeEmail(currentEmployer.email)
+          .build(),
+      );
+    });
   });
 
   it("rejects when string with spaces are provided", () => {
