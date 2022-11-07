@@ -27,7 +27,8 @@ const routerPrefix = "/admin";
 
 const removeRouterPrefix = <U extends RelativeUrl>(
   url: U,
-): RemovePrefix<U, typeof routerPrefix> => url.replace(routerPrefix, "") as any;
+): RemovePrefix<U, typeof routerPrefix> =>
+  url.replace(routerPrefix, "") as RemovePrefix<U, typeof routerPrefix>;
 
 export const createAdminRouter = (
   deps: AppDependencies,
