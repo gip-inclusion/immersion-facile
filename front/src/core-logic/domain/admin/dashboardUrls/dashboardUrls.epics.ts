@@ -14,13 +14,16 @@ const getConventionDashboardUrl: DashboardUrlsEpic = (
   { adminGateway },
 ) =>
   action$.pipe(
-    filter(dashboardUrlsSlice.actions.conventionsDashboardUrlRequested.match),
-    switchMap(() =>
-      adminGateway.getDashboardConventionUrl(
-        state$.value.admin.adminAuth.adminToken || "",
-      ),
+    filter(dashboardUrlsSlice.actions.dashboardUrlRequested.match),
+    switchMap((action) =>
+      adminGateway
+        .getDashboardUrl$(
+          action.payload,
+          state$.value.admin.adminAuth.adminToken || "",
+        )
+        .pipe(map((url) => ({ url, dashboardName: action.payload }))),
     ),
-    map(dashboardUrlsSlice.actions.conventionsDashboardUrlSucceeded),
+    map(dashboardUrlsSlice.actions.dashboardUrlSucceeded),
   );
 
 export const dashboardUrlsEpics = [getConventionDashboardUrl];

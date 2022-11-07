@@ -1,5 +1,5 @@
 import { Observable, of, Subject } from "rxjs";
-import { AbsoluteUrl, AdminToken } from "shared";
+import { AbsoluteUrl, AdminToken, DashboardName } from "shared";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
 export class TestAdminGateway implements AdminGateway {
@@ -11,12 +11,13 @@ export class TestAdminGateway implements AdminGateway {
     return of(`http://plop`);
   }
 
-  public getDashboardConventionUrl(
+  public getDashboardUrl$(
+    _dashboardName: DashboardName,
     _token: AdminToken,
   ): Observable<AbsoluteUrl> {
-    return this.conventionDashboardUrl$;
+    return this.dashboardUrl$;
   }
 
   public token$ = new Subject<string>();
-  public conventionDashboardUrl$ = new Subject<AbsoluteUrl>();
+  public dashboardUrl$ = new Subject<AbsoluteUrl>();
 }

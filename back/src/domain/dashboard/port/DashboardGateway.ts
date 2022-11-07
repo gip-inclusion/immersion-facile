@@ -1,6 +1,6 @@
-import { AbsoluteUrl, AgencyId } from "shared";
+import { AbsoluteUrl, AgencyId, DashboardName } from "shared";
 
 export interface DashboardGateway {
-  getConventionsUrl: () => AbsoluteUrl;
+  getDashboardUrl: (dashboardName: DashboardName) => AbsoluteUrl;
   getAgencyUrl: (id: AgencyId) => AbsoluteUrl;
 }

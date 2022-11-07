@@ -16,20 +16,33 @@ describe("dashboardUrls slice", () => {
   });
 
   describe("get convention url for dashboardUrls", () => {
-    it("should return an AbsoluteUrl when requesting dashboardUrls", () => {
-      const initialDashboardUrl = adminSelectors.dashboardUrls.conventions(
-        store.getState(),
-      );
-      expectToEqual(initialDashboardUrl, null);
+    it("should store AbsoluteUrl in convention when requesting conventions dashboard", () => {
+      const initialDashboards = adminSelectors.dashboardUrls(store.getState());
+      expectToEqual(initialDashboards.conventions, null);
 
       store.dispatch(
-        dashboardUrlsSlice.actions.conventionsDashboardUrlRequested(),
+        dashboardUrlsSlice.actions.dashboardUrlRequested("conventions"),
       );
 
-      const valueFromApi: AbsoluteUrl = "https://plop2";
-      dependencies.adminGateway.conventionDashboardUrl$.next(valueFromApi);
-      const result = adminSelectors.dashboardUrls.conventions(store.getState());
-      expectToEqual(result, valueFromApi);
+      const valueFromApi: AbsoluteUrl = "https://conventions.url";
+      dependencies.adminGateway.dashboardUrl$.next(valueFromApi);
+      const result = adminSelectors.dashboardUrls(store.getState());
+      expectToEqual(result.conventions, valueFromApi);
+    });
+
+    it("should store AbsoluteUrl in events when requesting events dashboard", () => {
+      const initialDashboards = adminSelectors.dashboardUrls(store.getState());
+      expectToEqual(initialDashboards.events, null);
+      initialDashboards.agency;
+
+      store.dispatch(
+        dashboardUrlsSlice.actions.dashboardUrlRequested("events"),
+      );
+
+      const valueFromApi: AbsoluteUrl = "https://events.url";
+      dependencies.adminGateway.dashboardUrl$.next(valueFromApi);
+      const result = adminSelectors.dashboardUrls(store.getState());
+      expectToEqual(result.events, valueFromApi);
     });
   });
 });

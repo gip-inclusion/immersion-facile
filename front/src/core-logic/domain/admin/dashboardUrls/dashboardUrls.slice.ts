@@ -1,24 +1,25 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AbsoluteUrl } from "shared";
+import { AbsoluteUrl, DashboardName } from "shared";
 
-export type DashboardsState = {
-  conventions: AbsoluteUrl | null;
-};
+export type DashboardsState = Record<DashboardName, AbsoluteUrl | null>;
 
 export const dashboardInitialState: DashboardsState = {
   conventions: null,
+  agency: null,
+  events: null,
 };
 
 export const dashboardUrlsSlice = createSlice({
   name: "dashboardUrls",
   initialState: dashboardInitialState,
   reducers: {
-    conventionsDashboardUrlRequested: (state) => state,
-    conventionsDashboardUrlSucceeded: (
+    dashboardUrlRequested: (state, _action: PayloadAction<DashboardName>) =>
       state,
-      action: PayloadAction<AbsoluteUrl>,
+    dashboardUrlSucceeded: (
+      state,
+      action: PayloadAction<{ dashboardName: DashboardName; url: AbsoluteUrl }>,
     ) => {
-      state.conventions = action.payload;
+      state[action.payload.dashboardName] = action.payload.url;
     },
   },
 });

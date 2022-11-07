@@ -1,6 +1,6 @@
 import {
+  adminTargets,
   AdminToken,
-  conventionsRoute,
   featureFlagsRoute,
   SetFeatureFlagParams,
 } from "shared";
@@ -30,9 +30,9 @@ describe("/admin router", () => {
     token = response.body;
   });
 
-  describe(`GET /admin/${conventionsRoute}`, () => {
+  describe(`GET ${adminTargets.getDashboardUrl.url}`, () => {
     it("Fails with 401 Unauthorized without admin token", async () => {
-      const response = await request.get(`/admin/${conventionsRoute}`);
+      const response = await request.get(adminTargets.getDashboardUrl.url);
       expect(response.body).toEqual({
         error: "You need to authenticate first",
       });
@@ -41,22 +41,21 @@ describe("/admin router", () => {
 
     it("Fails if token is not valid", async () => {
       const response = await request
-        .get(`/admin/${conventionsRoute}`)
+        .get(adminTargets.getDashboardUrl.url)
         .set("authorization", "wrong-tokend");
       expect(response.body).toEqual({ error: "Provided token is invalid" });
       expect(response.status).toBe(401);
     });
 
-    /* eslint-disable jest/no-commented-out-tests */
-
-    // Test stays for demo purpose, but now .get(`/admin/${conventionsRoute}`) returns the iframe url from metabase
-    // it.skip("Lists the conventions if the token is valid", async () => {
-    //   const response = await request
-    //     .get(`/admin/${conventionsRoute}`)
-    //     .set("authorization", token);
-    //   expect(response.body).toEqual([]);
-    //   expect(response.status).toBe(200);
-    // });
+    it("Gets the absolute Url of the dashboard", async () => {
+      const response = await request
+        .get(
+          adminTargets.getDashboardUrl.url.replace(":dashboardName", "events"),
+        )
+        .set("authorization", token);
+      expect(response.body).toBe("http://notImplementedDashboard/events");
+      expect(response.status).toBe(200);
+    });
   });
 
   describe(`set feature flags route`, () => {

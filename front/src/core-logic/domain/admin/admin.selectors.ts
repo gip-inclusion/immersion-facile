@@ -10,7 +10,7 @@ const sentEmailsStateSelector = createSelector(
   adminStateSelector,
   ({ sentEmails }) => sentEmails,
 );
-const dashboardsSelector = createSelector(
+const dashboardUrls = createSelector(
   adminStateSelector,
   ({ dashboardUrls }) => dashboardUrls,
 );
@@ -39,12 +39,7 @@ export const adminSelectors = {
       ({ sentEmails }) => sentEmails,
     ),
   },
-  dashboardUrls: {
-    conventions: createSelector(
-      dashboardsSelector,
-      ({ conventions }) => conventions,
-    ),
-  },
+  dashboardUrls,
 };
 
 const knownErrors: Record<string, string> = {

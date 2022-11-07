@@ -2,7 +2,7 @@ import React from "react";
 import { NavLink, TabLinks } from "react-design-system/immersionFacile";
 import { ImmersionMarianneHeader } from "src/app/components/ImmersionMarianneHeader";
 import { AgencyTab } from "src/app/pages/admin/AgencyTab";
-import { ConventionTab } from "src/app/pages/admin/ConventionTab";
+import { ConventionTab, EventsTab } from "src/app/pages/admin/DashboardTabs";
 import { DataExportTab } from "src/app/pages/admin/DataExportTab";
 import { EmailsTab } from "src/app/pages/admin/EmailsTab";
 import { EmailPreviewTab } from "src/app/pages/admin/EmailPreviewTab";
@@ -16,6 +16,11 @@ const getNavLinks = (currentTab: AdminTab): NavLink[] => [
     label: "Conventions",
     active: currentTab === "conventions",
     ...routes.adminTab({ tab: "conventions" }).link,
+  },
+  {
+    label: "Evénements",
+    active: currentTab === "events",
+    ...routes.adminTab({ tab: "events" }).link,
   },
   {
     label: "Agences",
@@ -71,6 +76,7 @@ export const AdminPage = ({
             />
             <div className="fr-tab-content">
               {currentTab === "conventions" && <ConventionTab />}
+              {currentTab === "events" && <EventsTab />}
               {currentTab === "agency-validation" && <AgencyTab />}
               {currentTab === "exports" && <DataExportTab />}
               {currentTab === "technical-options" && <TechnicalOptions />}

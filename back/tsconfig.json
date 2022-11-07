@@ -12,7 +12,8 @@
     "typeRoots": ["./src/types", "./node_modules/@types"],
     "paths": {
       "shared": ["../shared/src/index.ts"],
-      "html-templates": ["../libs/html-templates/src/index.ts"]
+      "html-templates": ["../libs/html-templates/src/index.ts"],
+      "http-client": ["../libs/http-client/src/index.ts"]
     }
   }
 }

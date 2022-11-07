@@ -1,11 +1,11 @@
 import jwt from "jsonwebtoken";
-import { AbsoluteUrl, AgencyId } from "shared";
+import { AbsoluteUrl, AgencyId, DashboardName } from "shared";
 import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
 
-// These are t
-const dashboardIds = {
-  agencyDashboardId: 4,
-  conventionsDashboardId: 5,
+const dashboardIdByName: Record<DashboardName, number> = {
+  agency: 4,
+  conventions: 5,
+  events: 28,
 };
 
 type MetabasePayload = {
@@ -24,17 +24,17 @@ export class MetabaseDashboardGateway implements DashboardGateway {
 
   public getAgencyUrl(id: AgencyId): AbsoluteUrl {
     const token = this.createToken({
-      dashboardId: dashboardIds.agencyDashboardId,
+      dashboardId: dashboardIdByName.agency,
       params: { filtrer_par_structure: [id] },
     });
     return `${this.metabaseUrl}/embed/dashboard/${token}#bordered=true&titled=true`;
   }
 
-  public getConventionsUrl(): AbsoluteUrl {
+  public getDashboardUrl(dashboardName: DashboardName): AbsoluteUrl {
     const token = this.createToken({
-      dashboardId: dashboardIds.conventionsDashboardId,
+      dashboardId: dashboardIdByName[dashboardName],
     });
-    return `${this.metabaseUrl}/embed/dashboard/${token}#bordered=true&titled=true?filter=true`;
+    return `${this.metabaseUrl}/embed/dashboard/${token}#bordered=true&titled=true`;
   }
 
   private createToken({

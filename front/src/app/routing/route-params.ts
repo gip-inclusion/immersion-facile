@@ -3,6 +3,7 @@ import { param, ValueSerializer } from "type-route";
 
 export type AdminTab =
   | "conventions"
+  | "events"
   | "agency-validation"
   | "exports"
   | "emails"

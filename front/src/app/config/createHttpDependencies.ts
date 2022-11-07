@@ -1,6 +1,6 @@
 import { configureHttpClient } from "http-client";
 import { createAxiosHandlerCreator } from "http-client/src/adapters/createAxiosHandlerCreator";
-import { createManagedAxiosInstance } from "shared";
+import { createManagedAxiosInstance, AdminTargets, adminTargets } from "shared";
 import { createCommonDependencies } from "src/app/config/createCommonDependencies";
 import type { Dependencies } from "src/app/config/dependencies";
 import { HttpAddressGateway } from "src/core-logic/adapters/AddressGateway/HttpAddressGateway";
@@ -26,7 +26,9 @@ export const createHttpDependencies = (): Dependencies => {
 
   return {
     addressGateway: new HttpAddressGateway(createManagedAxiosInstance()),
-    adminGateway: new HttpAdminGateway(axiosOnSlashApi),
+    adminGateway: new HttpAdminGateway(
+      createHttpClient<AdminTargets>(adminTargets),
+    ),
     agencyGateway: new HttpAgencyGateway(
       createHttpClient<AgencyTargets>(agencyTargets),
     ),

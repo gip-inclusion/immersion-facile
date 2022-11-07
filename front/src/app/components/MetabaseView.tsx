@@ -18,8 +18,9 @@ export const MetabaseView = ({
 }: {
   url?: AbsoluteUrl;
   title: string;
-}) =>
-  url ? (
+}) => {
+  if (!url) return <p>Chargement...</p>;
+  return (
     <div>
       <DsfrTitle
         level={5}
@@ -29,6 +30,5 @@ export const MetabaseView = ({
       />
       <iframe src={url} frameBorder="0" width="100%" height="800"></iframe>
     </div>
-  ) : (
-    <p>Chargement...</p>
   );
+};

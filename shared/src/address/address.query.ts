@@ -2,7 +2,7 @@ import { z } from "zod";
 import {
   departmentCodeFromPostcodeRoute,
   lookupStreetAddressRoute,
-} from "../routes";
+} from "../routes/routes";
 import { Flavor } from "../typeFlavors";
 import { LookupAddress, Postcode } from "./address.dto";
 

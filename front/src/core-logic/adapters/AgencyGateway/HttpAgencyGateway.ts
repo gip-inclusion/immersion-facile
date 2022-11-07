@@ -19,10 +19,10 @@ import {
   DepartmentCode,
   ListAgenciesRequestDto,
   WithAgencyId,
+  WithAuthorization,
 } from "shared";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
-type WithAuthorization = { authorization: string };
 type WithAgencyStatus = { status: AgencyStatus };
 
 export type AgencyTargets = CreateTargets<{

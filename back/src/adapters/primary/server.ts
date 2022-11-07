@@ -68,7 +68,7 @@ export const createApp = async (
   // Those routes must be defined BEFORE the others
   app.use(createHelloWorldRouter());
   app.use("/auth", createMagicLinkRouter(deps));
-  app.use("/admin", createAdminRouter(deps));
+  app.use(...createAdminRouter(deps));
   app.use("/v1", createApiKeyAuthRouterV1(deps));
   // ----
   app.use(createFormCompletionRouter(deps));

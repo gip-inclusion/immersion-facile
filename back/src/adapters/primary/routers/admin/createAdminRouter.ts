@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   adminLogin,
+  adminTargets,
   agenciesRoute,
   AgencyDto,
   AgencyId,
@@ -16,7 +17,21 @@ import type { AppDependencies } from "../../config/createAppDependencies";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 import { sendZipResponse } from "../../helpers/sendZipResponse";
 
-export const createAdminRouter = (deps: AppDependencies) => {
+type RelativeUrl = `/${string}`;
+type RemovePrefix<
+  U extends string,
+  Prefix extends string,
+> = U extends `${Prefix}/${infer V}` ? `/${V}` : never;
+
+const routerPrefix = "/admin";
+
+const removeRouterPrefix = <U extends RelativeUrl>(
+  url: U,
+): RemovePrefix<U, typeof routerPrefix> => url.replace(routerPrefix, "") as any;
+
+export const createAdminRouter = (
+  deps: AppDependencies,
+): [RelativeUrl, Router] => {
   const adminRouter = Router({ mergeParams: true });
 
   adminRouter
@@ -82,9 +97,11 @@ export const createAdminRouter = (deps: AppDependencies) => {
     );
 
   adminRouter
-    .route(`/${conventionsRoute}`)
+    .route(removeRouterPrefix(adminTargets.getDashboardUrl.url))
     .get(async (req, res) =>
-      sendHttpResponse(req, res, deps.useCases.dashboardConvention.execute),
+      sendHttpResponse(req, res, () =>
+        deps.useCases.getDashboard.execute(req.params.dashboardName as any),
+      ),
     );
 
   // GET admin/emails
@@ -125,5 +142,5 @@ export const createAdminRouter = (deps: AppDependencies) => {
       ),
     );
 
-  return adminRouter;
+  return [routerPrefix, adminRouter];
 };

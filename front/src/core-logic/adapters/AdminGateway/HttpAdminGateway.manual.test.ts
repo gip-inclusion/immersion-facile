@@ -1,5 +1,7 @@
+import { configureHttpClient } from "http-client";
+import { createAxiosHandlerCreator } from "http-client/src/adapters/createAxiosHandlerCreator";
 import { firstValueFrom } from "rxjs";
-import { createManagedAxiosInstance } from "shared";
+import { createManagedAxiosInstance, AdminTargets, adminTargets } from "shared";
 import { HttpAdminGateway } from "src/core-logic/adapters/AdminGateway/HttpAdminGateway";
 
 describe("HttpAdminGateway", () => {
@@ -8,7 +10,12 @@ describe("HttpAdminGateway", () => {
     const axiosInstance = createManagedAxiosInstance({
       baseURL: "http://localhost:1234",
     });
-    adminGateway = new HttpAdminGateway(axiosInstance);
+    const createHttpClient = configureHttpClient(
+      createAxiosHandlerCreator(axiosInstance),
+    );
+    adminGateway = new HttpAdminGateway(
+      createHttpClient<AdminTargets>(adminTargets),
+    );
   });
 
   it("fails when credential are wrong", async () => {
