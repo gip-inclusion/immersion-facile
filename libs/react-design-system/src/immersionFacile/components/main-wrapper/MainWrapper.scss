@@ -1,3 +1,5 @@
+@import "../../../config/responsive";
+
 .im-main-wrapper {
   position: relative;
   overflow: hidden;
@@ -7,19 +9,23 @@
     left: 0;
     right: 0;
     top: 48%;
-    background: var(--background-alt-blue-france);
     z-index: -1;
-    &:after {
-      content: "";
-      display: block;
-      width: 150%;
-      height: 40rem;
-      position: absolute;
+    @include for-screen($bp-lg) {
       background: var(--background-alt-blue-france);
-      top: -20%;
-      left: 50%;
-      transform: translateX(-50%);
-      border-radius: 100%;
+    }
+    &:after {
+      @include for-screen($bp-lg) {
+        content: "";
+        display: block;
+        width: 150%;
+        height: 40rem;
+        position: absolute;
+        background: var(--background-alt-blue-france);
+        top: -22%;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 100%;
+      }
     }
   }
 }

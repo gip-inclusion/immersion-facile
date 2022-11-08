@@ -43,7 +43,9 @@ const FaqCard = ({ title, description, url }: FaqCardProps) => (
       <div className="fr-card__body">
         <div className="fr-card__content">
           <h3 className="fr-card__title">
-            <a href={url}>{title}</a>
+            <a href={url} target="_blank">
+              {title}
+            </a>
           </h3>
           <p className="fr-card__desc">{description}</p>
         </div>

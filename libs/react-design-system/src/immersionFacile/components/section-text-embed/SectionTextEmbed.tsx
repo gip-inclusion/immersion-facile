@@ -17,8 +17,10 @@ export const SectionTextEmbed = ({ videoUrl }: SectionTextEmbedProps) => (
       </span>
     </div>
 
-    <div className={`${componentName}__content`}>
-      <ul className={`${componentName}__list`}>
+    <div
+      className={`${componentName}__content fr-grid-row fr-grid-row--gutters`}
+    >
+      <ul className={`${componentName}__list fr-col-12 fr-col-lg-6`}>
         <li className={`${componentName}__item`}>
           <strong>L’immersion est une période courte et non rémunérée</strong>{" "}
           en entreprise.
@@ -39,7 +41,7 @@ export const SectionTextEmbed = ({ videoUrl }: SectionTextEmbedProps) => (
           l’identifier.
         </li>
       </ul>
-      <div className={`${componentName}__embed-wrapper`}>
+      <div className={`${componentName}__embed-wrapper fr-col-12 fr-col-lg-5`}>
         <iframe src={videoUrl} className={`${componentName}__embed`}></iframe>
       </div>
     </div>

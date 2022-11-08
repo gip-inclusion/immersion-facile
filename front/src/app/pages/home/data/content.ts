@@ -1,12 +1,19 @@
+import { Dispatch } from "@reduxjs/toolkit";
 import {
   HeroHeaderNavCard,
   Stat,
   FaqCardProps,
 } from "react-design-system/immersionFacile";
 import { routes } from "src/app/routing/routes";
+import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
 import type { UserType } from "../HomePage";
-
-export const heroHeaderNavCards: Record<UserType, HeroHeaderNavCard[]> = {
+export const heroHeaderNavCards: (
+  storeDispatch: Dispatch,
+  modalDispatch: Dispatch,
+) => Record<UserType, HeroHeaderNavCard[]> = (
+  storeDispatch: Dispatch,
+  modalDispatch: Dispatch,
+) => ({
   default: [
     {
       overtitle: "Candidat",
@@ -17,15 +24,15 @@ export const heroHeaderNavCards: Record<UserType, HeroHeaderNavCard[]> = {
     },
     {
       overtitle: "Entreprise",
-      title: "Vous êtes candidat pour une immersion",
-      icon: "fr-icon-user-line",
+      title: "Vous représentez une entreprise",
+      icon: "fr-icon-building-line",
       type: "establishment",
       link: routes.homeEstablishments().link,
     },
     {
       overtitle: "Prescripteur",
-      title: "Vous êtes candidat pour une immersion",
-      icon: "fr-icon-user-line",
+      title: "Vous êtes prescripteur",
+      icon: "fr-icon-map-pin-user-line",
       type: "agency",
       link: routes.homeAgencies().link,
     },
@@ -43,25 +50,49 @@ export const heroHeaderNavCards: Record<UserType, HeroHeaderNavCard[]> = {
       type: "candidate",
       link: routes.conventionImmersion().link,
     },
-    {
-      title: "Conseils utiles pour l’immersion",
-      icon: "fr-icon-info-line",
-      type: "candidate",
-      link: "@TODO",
-    },
+    // {
+    //   title: "Conseils utiles pour l’immersion",
+    //   icon: "fr-icon-info-line",
+    //   type: "candidate",
+    //   link: "@TODO",
+    // },
   ],
   establishment: [
     {
       title: "Référencer mon entreprise",
       icon: "fr-icon-hotel-line",
       type: "establishment",
-      link: routes.formEstablishment().link,
+      link: {
+        href: "",
+        onClick: (event) => {
+          event.preventDefault();
+          modalDispatch({
+            type: "CLICKED_OPEN",
+            payload: {
+              mode: "register",
+            },
+          });
+          storeDispatch(establishmentSlice.actions.gotReady());
+        },
+      },
     },
     {
       title: "Modifier mes informations",
       icon: "fr-icon-edit-line",
       type: "establishment",
-      link: "",
+      link: {
+        href: "",
+        onClick: (event) => {
+          event.preventDefault();
+          modalDispatch({
+            type: "CLICKED_OPEN",
+            payload: {
+              mode: "edit",
+            },
+          });
+          storeDispatch(establishmentSlice.actions.gotReady());
+        },
+      },
     },
     {
       title: "Remplir la demande de convention",
@@ -75,13 +106,13 @@ export const heroHeaderNavCards: Record<UserType, HeroHeaderNavCard[]> = {
       title: "Référencer mon organisme",
       icon: "fr-icon-hotel-line",
       type: "agency",
-      link: "/ajouter-prescripteur",
+      link: routes.addAgency().link,
     },
     {
       title: "Modifier mes informations",
       icon: "fr-icon-edit-line",
       type: "agency",
-      link: "",
+      link: routes.addAgency().link,
     },
     {
       title: "Remplir la demande de convention",
@@ -90,7 +121,7 @@ export const heroHeaderNavCards: Record<UserType, HeroHeaderNavCard[]> = {
       link: routes.conventionImmersion().link,
     },
   ],
-};
+});
 export const sectionStatsData: Stat[] = [
   {
     badgeLabel: "Découverte",

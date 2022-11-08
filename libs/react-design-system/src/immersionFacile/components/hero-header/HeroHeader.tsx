@@ -12,13 +12,15 @@ export type HeroHeaderProps = {
   parallax?: boolean;
   patterns?: boolean;
   navCards?: HeroHeaderNavCard[];
+  isReadyForRequestOrRedirection?: boolean;
+  siretModal: JSX.Element;
 };
 export type HeroHeaderNavCard = {
   title: string;
   icon?: string;
   overtitle?: string;
   type: UserType;
-  link: Link;
+  link?: Link;
 };
 
 const componentName = "im-hero-header";
@@ -30,6 +32,7 @@ export const HeroHeader = ({
   patterns,
   navCards,
   parallax,
+  siretModal,
 }: HeroHeaderProps) => {
   const [windowScrollY, setWindowScrollY] = useState<number>(window.scrollY);
   const onWindowScroll = () => {
@@ -39,14 +42,15 @@ export const HeroHeader = ({
     top: `-${windowScrollY / coeff}px`,
   });
   useEffect(() => {
+    const parallaxListener = () => onWindowScroll();
     if (parallax) {
-      window.addEventListener("scroll", () => onWindowScroll());
+      window.addEventListener("scroll", parallaxListener);
     }
-    return window.removeEventListener("scroll", () => onWindowScroll());
+    return window.removeEventListener("scroll", () => parallaxListener);
   }, []);
   return (
     <section
-      className={`${componentName} ${componentName}--${type} fr-pt-8w fr-mb-8w`}
+      className={`${componentName} ${componentName}--${type} fr-pt-8w fr-pb-2w`}
     >
       <div className={`fr-container ${componentName}__container`}>
         <div className={`${componentName}__text-wrapper`}>
@@ -80,23 +84,28 @@ export const HeroHeader = ({
         )}
       </div>
       {navCards && navCards.length > 0 && (
-        <div className="fr-container">
+        <div className={`${componentName}__nav-cards-wrapper fr-container`}>
           <nav
             className={`${componentName}__nav-cards fr-grid-row fr-grid-row--gutters`}
+            aria-labelledby={`${componentName}__nav-cards-label`}
           >
+            <h3 id={`${componentName}__nav-cards-label`} className="fr-hidden">
+              Parcours utilisateur : candidat, entreprise, prescripteur
+            </h3>
             {navCards.map((card) => (
-              <NavCard {...card} />
+              <NavCard {...card} key={`${card.type}-${card.title}`} />
             ))}
           </nav>
         </div>
       )}
+      {siretModal}
     </section>
   );
 };
 
 const NavCard = ({ title, icon, overtitle, link, type }: HeroHeaderNavCard) => (
   <div className={`${componentName}__nav-card-wrapper fr-col-12 fr-col-lg-4`}>
-    <article
+    <div
       className={`${componentName}__nav-card ${componentName}__nav-card--${type}`}
     >
       <a {...link} className={`${componentName}__nav-card-link`}></a>
@@ -107,6 +116,6 @@ const NavCard = ({ title, icon, overtitle, link, type }: HeroHeaderNavCard) => (
         <span className={`${componentName}__nav-card-icon ${icon}`}></span>
       )}
       <h3 className={`${componentName}__nav-card-title`}>{title}</h3>
-    </article>
+    </div>
   </div>
 );

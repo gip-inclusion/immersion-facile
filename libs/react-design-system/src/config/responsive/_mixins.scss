@@ -1,0 +1,9 @@
+/*
+* Mixin for media queries, using _breakpoint.scss (bp-sm, bp-md, bp-lg)
+*/
+
+@mixin for-screen($size) {
+  @media (min-width: #{$size}) {
+    @content;
+  }
+}

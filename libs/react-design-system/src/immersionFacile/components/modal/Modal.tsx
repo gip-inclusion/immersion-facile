@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import React, { Children, cloneElement } from "react";
+import React, { Children, cloneElement, useEffect } from "react";
 
 import ReactDOM from "react-dom";
 import Modal from "react-modal";
@@ -63,7 +63,9 @@ export const ModalDialog = ({
     (child) =>
       React.isValidElement(child) && child.props.__TYPE === "ModalClose",
   );
-
+  useEffect(() => {
+    Modal.setAppElement("body");
+  }, []);
   const handleAnimatedUnmount = () => {
     // handleModal(false);
     setTimeout(() => {

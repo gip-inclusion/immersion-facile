@@ -20,6 +20,10 @@ import {
   sectionFaqData,
   sectionStatsData,
 } from "./data/content";
+import { useDispatch } from "react-redux";
+import { useEstablishmentSiret } from "src/hooks/siret.hooks";
+import { SiretModal, useSiretModal } from "src/app/components/SiretModal";
+import { AnyAction, Dispatch } from "@reduxjs/toolkit";
 
 const DebugInfo = () => (
   <div
@@ -61,6 +65,16 @@ type HomePageProps = {
 
 export const HomePage = ({ type }: HomePageProps) => {
   const featureFlags = useFeatureFlags();
+  const storeDispatch = useDispatch();
+  const shouldFetchEvenIfAlreadySaved = false;
+  const { isReadyForRequestOrRedirection } = useEstablishmentSiret({
+    shouldFetchEvenIfAlreadySaved,
+  });
+  const { modalState, dispatch: modalDispatch } = useSiretModal();
+  const heroHeaderNavCardsWithDispatch = heroHeaderNavCards(
+    storeDispatch,
+    modalDispatch as Dispatch<AnyAction>,
+  );
   return (
     <div>
       <ImmersionMarianneHeader />
@@ -71,8 +85,12 @@ export const HomePage = ({ type }: HomePageProps) => {
           illustration={heroHeaderIllustration}
           type={type}
           patterns
-          navCards={heroHeaderNavCards[type] as HeroHeaderNavCard[]}
+          navCards={heroHeaderNavCardsWithDispatch[type] as HeroHeaderNavCard[]}
           parallax
+          isReadyForRequestOrRedirection={isReadyForRequestOrRedirection}
+          siretModal={
+            <SiretModal modalState={modalState} dispatch={modalDispatch} />
+          }
         />
         <SectionStats stats={sectionStatsData} />
         <SectionTextEmbed videoUrl="https://www.powtoon.com/embed/c8x7n7AR2XE/" />

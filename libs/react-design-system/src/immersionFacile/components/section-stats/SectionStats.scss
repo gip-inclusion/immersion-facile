@@ -1,5 +1,16 @@
+@import "../../../config/responsive";
+
 .im-section-stats {
+  $section: &;
   &__items {
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    @include for-screen($bp-lg) {
+      max-width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+    }
   }
   &__stat {
     padding: 2rem;
@@ -24,6 +35,17 @@
     }
     &-description {
       font-size: 0.875rem;
+      margin-bottom: 0;
+    }
+    & + #{$section}__stat {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-default-grey);
+      @include for-screen($bp-lg) {
+        margin-top: 0;
+        padding-bottom: 0;
+        border-top: none;
+      }
     }
   }
 }

@@ -1,3 +1,5 @@
+@import "../../../config/responsive";
+
 $white: var(--grey-1000-100);
 $patternSizes: 80px, 160px, 130px;
 $typesTints: (
@@ -22,17 +24,24 @@ $typesTints: (
 .im-hero-header {
   overflow: hidden;
   position: relative;
+  background: var(--blue-france-sun-113-625);
+  @include for-screen($bp-lg) {
+    background: transparent;
+    margin-bottom: 8rem;
+  }
   &:after {
-    content: "";
-    display: block;
-    position: absolute;
-    left: 50%;
-    top: -10%;
-    transform: translateX(-50%);
-    background: var(--blue-france-sun-113-625);
-    width: 170%;
-    height: 700px;
-    border-radius: 100%;
+    @include for-screen($bp-lg) {
+      content: "";
+      display: block;
+      position: absolute;
+      left: 50%;
+      top: -7rem;
+      transform: translateX(-50%);
+      background: var(--blue-france-sun-113-625);
+      width: 170%;
+      height: 700px;
+      border-radius: 100%;
+    }
   }
   &__container {
     display: flex;
@@ -51,12 +60,21 @@ $typesTints: (
   }
   &__illustration-wrapper {
     margin-left: 5%;
+    margin-bottom: -10rem;
   }
   &__illustration {
-    position: relative;
-    z-index: 10;
+    display: none;
+    @include for-screen($bp-lg) {
+      position: relative;
+      z-index: 10;
+      display: block;
+    }
   }
   &__patterns {
+    display: none;
+    @include for-screen($bp-lg) {
+      display: block;
+    }
   }
   &__pattern {
     background: $white;
@@ -83,24 +101,34 @@ $typesTints: (
       right: 30%;
     }
   }
-  &__nav-cards {
+  &__nav-cards-wrapper {
     position: relative;
-    top: -10rem;
     z-index: 20;
     list-style-type: none;
-    margin-bottom: -10rem;
+    margin-bottom: 0;
+    @include for-screen($bp-lg) {
+      margin-bottom: -2rem;
+    }
+  }
+  &__nav-cards {
+    align-items: stretch;
+  }
+  &__nav-card-wrapper {
+    height: 100%;
   }
   &__nav-card {
     background: $white;
     border-radius: 16px;
     display: flex;
-    flex-direction: column;
     align-items: center;
     padding: 2.5rem;
     text-align: center;
     position: relative;
     top: 0;
     transition: all 1s ease;
+    @include for-screen($bp-lg) {
+      flex-direction: column;
+    }
     &:after {
       content: "";
       display: block;
@@ -129,6 +157,14 @@ $typesTints: (
         }
       }
     }
+    &-title {
+      margin-bottom: 0;
+      font-size: 1.125rem;
+      @include for-screen($bp-lg) {
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+      }
+    }
     &-link {
       position: absolute;
       top: 0;
@@ -136,20 +172,35 @@ $typesTints: (
       right: 0;
       bottom: 0;
       z-index: 1;
+      &:active {
+        background-color: transparent !important;
+      }
     }
     &-overtitle {
-      text-transform: uppercase;
-      margin-bottom: 1rem;
-    }
-    &-icon {
-      &:before {
-        width: 65px;
-        height: 75px;
+      display: none;
+      @include for-screen($bp-lg) {
+        display: block;
+        text-transform: uppercase;
         margin-bottom: 1rem;
       }
     }
+    &-icon {
+      &:before {
+        width: 35px;
+        height: 35px;
+        margin-right: 1rem;
+        @include for-screen($bp-lg) {
+          width: 65px;
+          height: 75px;
+          margin-bottom: 1rem;
+          margin-right: 0;
+        }
+      }
+    }
     &:hover {
-      top: -0.5rem;
+      @include for-screen($bp-lg) {
+        top: -0.5rem;
+      }
       &:after {
         width: 90%;
         opacity: 1;

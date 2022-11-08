@@ -1,5 +1,11 @@
+@import "../../../config/responsive";
+
 .im-section-faq {
+  background: var(--background-alt-blue-france);
   border-top: 1px solid var(--border-default-grey);
+  @include for-screen($bp-lg) {
+    background: transparent;
+  }
   &__title {
     text-align: center;
   }
