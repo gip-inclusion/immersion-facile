@@ -3,7 +3,7 @@ import { Button } from "../buttons";
 import "./SectionFaq.scss";
 
 export type SectionFaqProps = {
-  articles: Card[];
+  articles: FaqCardProps[];
 };
 
 const componentName = "im-section-faq";
