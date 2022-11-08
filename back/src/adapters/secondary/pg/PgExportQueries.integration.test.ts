@@ -211,7 +211,7 @@ describe("PgExportQueries", () => {
 
         // Assert
         const expectedExportedRow = {
-          "id convention": conventionInRepo.id,
+          id: conventionInRepo.id,
           Structure: "La super agence sur les champs",
           "Type de structure": conventionAgency.kind,
           "Département de la structure": "Paris",
