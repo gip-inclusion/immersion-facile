@@ -3,7 +3,7 @@ import React from "react";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 
 const statsPageUrl =
-  "http://immersion-facile.osc-fr1.scalingo.io/public/dashboard/93afb41e-949d-4677-aab3-95817f81223d";
+  "https://immersion-facile.osc-fr1.scalingo.io/public/dashboard/93afb41e-949d-4677-aab3-95817f81223d";
 
 export const StatsPage = () => (
   <HeaderFooterLayout>
