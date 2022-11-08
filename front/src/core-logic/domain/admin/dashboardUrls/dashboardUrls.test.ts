@@ -28,6 +28,7 @@ describe("dashboardUrls slice", () => {
       dependencies.adminGateway.dashboardUrl$.next(valueFromApi);
       const result = adminSelectors.dashboardUrls(store.getState());
       expectToEqual(result.conventions, valueFromApi);
+      expectToEqual(result.errorMessage, null);
     });
 
     it("should store AbsoluteUrl in events when requesting events dashboard", () => {
@@ -43,6 +44,22 @@ describe("dashboardUrls slice", () => {
       dependencies.adminGateway.dashboardUrl$.next(valueFromApi);
       const result = adminSelectors.dashboardUrls(store.getState());
       expectToEqual(result.events, valueFromApi);
+      expectToEqual(result.errorMessage, null);
+    });
+
+    it("should fails on requesting conventions dashboard with error", () => {
+      const initialDashboards = adminSelectors.dashboardUrls(store.getState());
+      expectToEqual(initialDashboards.conventions, null);
+
+      store.dispatch(
+        dashboardUrlsSlice.actions.dashboardUrlRequested("conventions"),
+      );
+
+      const errorMessage = "It Fails";
+      dependencies.adminGateway.dashboardUrl$.error(new Error(errorMessage));
+      const result = adminSelectors.dashboardUrls(store.getState());
+      expectToEqual(result.conventions, null);
+      expectToEqual(result.errorMessage, errorMessage);
     });
   });
 });

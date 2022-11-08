@@ -1,5 +1,5 @@
 import { filter, iif, map, Observable, of, switchMap } from "rxjs";
-import { GetSiretInfo, SiretDto, siretSchema } from "shared";
+import { GetSiretInfo, GetSiretInfoError, SiretDto, siretSchema } from "shared";
 import {
   SiretAction,
   siretSlice,
@@ -66,7 +66,7 @@ const getSiretEpic: SiretEpic = (
         : siretSlice.actions.siretInfoSucceeded(siretResult);
     }),
     catchEpicError((error) =>
-      siretSlice.actions.siretInfoFailed(error.message),
+      siretSlice.actions.siretInfoFailed(error.message as GetSiretInfoError),
     ),
   );
 };

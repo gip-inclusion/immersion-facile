@@ -1,5 +1,6 @@
 import { filter, map, switchMap } from "rxjs";
 import { dashboardUrlsSlice } from "src/core-logic/domain/admin/dashboardUrls/dashboardUrls.slice";
+import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
   ActionOfSlice,
   AppEpic,
@@ -24,6 +25,9 @@ const getConventionDashboardUrl: DashboardUrlsEpic = (
         .pipe(map((url) => ({ url, dashboardName: action.payload }))),
     ),
     map(dashboardUrlsSlice.actions.dashboardUrlSucceeded),
+    catchEpicError((error: Error) =>
+      dashboardUrlsSlice.actions.dashboardUrlFailed(error.message),
+    ),
   );
 
 export const dashboardUrlsEpics = [getConventionDashboardUrl];
