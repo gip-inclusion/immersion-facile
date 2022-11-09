@@ -8,8 +8,9 @@ import {
   ConventionDto,
   BeneficiaryRepresentative,
   BeneficiaryCurrentEmployer,
+  ConventionReadDto,
 } from "./convention.dto";
-import { conventionSchema } from "./convention.schema";
+import { conventionReadSchema, conventionSchema } from "./convention.schema";
 import { ConventionDtoBuilder, DATE_START } from "./ConventionDtoBuilder";
 const currentEmployer: BeneficiaryCurrentEmployer = {
   role: "beneficiary-current-employer",
@@ -103,6 +104,27 @@ describe("conventionDtoSchema", () => {
           .withEstablishmentRepresentativeEmail(currentEmployer.email)
           .build(),
       );
+    });
+
+    it("confirm convention read schema inherit convention controls", () => {
+      const validConventionRead: ConventionReadDto = {
+        ...new ConventionDtoBuilder().build(),
+        agencyName: "dsfsdfsdf",
+        externalId: "sdfsdff",
+      };
+      expect(() =>
+        conventionReadSchema.parse(validConventionRead),
+      ).not.toThrow();
+      expect(conventionReadSchema.parse(validConventionRead)).toBeTruthy();
+      const invalidConventionRead: ConventionReadDto = {
+        ...new ConventionDtoBuilder()
+          .withEstablishmentTutorEmail(beneficiaryRepresentative.email)
+          .withBeneficiaryRepresentative(beneficiaryRepresentative)
+          .build(),
+        agencyName: "dsfsdfsdf",
+        externalId: "sdfsdff",
+      };
+      expect(() => conventionReadSchema.parse(invalidConventionRead)).toThrow();
     });
   });
 

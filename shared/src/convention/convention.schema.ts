@@ -20,27 +20,28 @@ import { getConventionFieldName } from "./convention";
 import {
   allConventionStatuses,
   Beneficiary,
+  BeneficiaryCurrentEmployer,
+  BeneficiaryRepresentative,
   ConventionDto,
   ConventionDtoWithoutExternalId,
   ConventionExternalId,
   ConventionId,
   conventionObjectiveOptions,
   ConventionReadDto,
+  EstablishmentRepresentative,
+  EstablishmentTutor,
   GenerateMagicLinkRequestDto,
   GenerateMagicLinkResponseDto,
-  BeneficiaryRepresentative,
   ListConventionsRequestDto,
-  EstablishmentTutor,
   RenewMagicLinkRequestDto,
+  Signatories,
   UpdateConventionRequestDto,
   UpdateConventionStatusRequestDto,
   WithConventionId,
-  EstablishmentRepresentative,
-  BeneficiaryCurrentEmployer,
 } from "./convention.dto";
 import {
-  conventionEmailCheck,
   getConventionTooLongMessageAndPath,
+  isTutorEmailDifferentThanBeneficiaryRelatedEmails,
   mustBeSignedByEveryone,
   startDateIsBeforeEndDate,
   underMaxCalendarDuration,
@@ -151,12 +152,49 @@ export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExt
       path: [getConventionFieldName("dateEnd")],
     })
     .refine(underMaxCalendarDuration, getConventionTooLongMessageAndPath)
-    .refine(conventionEmailCheck, {
-      message: "Votre adresse e-mail doit être différente de celle du tuteur",
-      path: [
-        getConventionFieldName("establishmentTutor.email"),
-        getConventionFieldName("signatories.beneficiary.email"),
-      ],
+    .superRefine((convention, issueMaker) => {
+      const addIssue = (
+        issueMaker: z.RefinementCtx,
+        message: string,
+        path: string,
+      ) => {
+        issueMaker.addIssue({
+          code: z.ZodIssueCode.custom,
+          message,
+          path: [path],
+        });
+      };
+
+      const signatoriesWithEmail = Object.entries(convention.signatories)
+        .filter(([_, value]) => !!value)
+        .map(([key, value]) => ({
+          key: key as keyof Signatories,
+          email: value.email,
+        }));
+      signatoriesWithEmail.forEach((signatory) => {
+        if (
+          signatoriesWithEmail
+            .filter((otherSignatory) => otherSignatory.key !== signatory.key)
+            .some((otherSignatory) => otherSignatory.email === signatory.email)
+        )
+          addIssue(
+            issueMaker,
+            "Les emails des signataires doivent être différents.",
+            getConventionFieldName(`signatories.${signatory.key}.email`),
+          );
+      });
+
+      if (
+        !isTutorEmailDifferentThanBeneficiaryRelatedEmails(
+          convention.signatories,
+          convention.establishmentTutor,
+        )
+      )
+        addIssue(
+          issueMaker,
+          "Le mail du tuteur doit être différent des mails du bénéficiaire, de son représentant légal et de son employeur actuel.",
+          getConventionFieldName("establishmentTutor.email"),
+        );
     })
     .refine(mustBeSignedByEveryone, {
       message: "La confirmation de votre accord est obligatoire.",
@@ -164,54 +202,16 @@ export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExt
     });
 
 export const conventionSchema: z.Schema<ConventionDto> =
-  conventionWithoutExternalIdZObject
-    .merge(z.object({ externalId: externalConventionIdSchema }))
-    .refine(startDateIsBeforeEndDate, {
-      message: "La date de fin doit être après la date de début.",
-      path: [getConventionFieldName("dateEnd")],
-    })
-    .refine(underMaxCalendarDuration, getConventionTooLongMessageAndPath)
-    .refine(conventionEmailCheck, {
-      message: "Les emails doivent être différents.",
-      path: [
-        getConventionFieldName("establishmentTutor.email"),
-        getConventionFieldName("signatories.beneficiaryRepresentative.email"),
-        getConventionFieldName("signatories.beneficiary.email"),
-        getConventionFieldName("signatories.establishmentRepresentative.email"),
-        getConventionFieldName("signatories.beneficiaryCurrentEmployer.email"),
-      ],
-    })
-    .refine(mustBeSignedByEveryone, {
-      message: "La confirmation de votre accord est obligatoire.",
-      path: [getConventionFieldName("status")],
-    });
+  conventionWithoutExternalIdSchema.and(
+    z.object({ externalId: externalConventionIdSchema }),
+  );
 
 export const conventionReadSchema: z.Schema<ConventionReadDto> =
-  conventionWithoutExternalIdZObject
-    .merge(
-      z.object({
-        externalId: externalConventionIdSchema,
-        agencyName: z.string(),
-      }),
-    )
-    .refine(startDateIsBeforeEndDate, {
-      message: "La date de fin doit être après la date de début.",
-      path: [getConventionFieldName("dateEnd")],
-    })
-    .refine(underMaxCalendarDuration, getConventionTooLongMessageAndPath)
-    .refine(conventionEmailCheck, {
-      message: "Les emails doivent être différents.",
-      path: [
-        getConventionFieldName("establishmentTutor.email"),
-        getConventionFieldName("signatories.beneficiaryRepresentative.email"),
-        getConventionFieldName("signatories.beneficiary.email"),
-        getConventionFieldName("signatories.establishmentRepresentative.email"),
-      ],
-    })
-    .refine(mustBeSignedByEveryone, {
-      message: "La confirmation de votre accord est obligatoire.",
-      path: [getConventionFieldName("status")],
-    });
+  conventionSchema.and(
+    z.object({
+      agencyName: z.string(),
+    }),
+  );
 
 export const conventionReadsSchema: z.Schema<Array<ConventionReadDto>> =
   z.array(conventionReadSchema);
