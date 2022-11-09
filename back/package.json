@@ -60,6 +60,7 @@
     "ramda": "^0.28.0",
     "shared": "workspace:*",
     "html-templates": "workspace:*",
+    "http-client": "workspace:*",
     "slugify": "^1.6.5",
     "ts-node": "^10.7.0",
     "uuid": "^8.3.2",

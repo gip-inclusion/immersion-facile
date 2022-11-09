@@ -33,6 +33,8 @@ type RuntimeTarget<UrlWithParams = Url> = Pick<
 export type CreateTargets<T extends Record<string, UnknownTarget>> = T;
 
 export type HttpClient<Targets extends Record<string, UnknownTarget>> = {
+  tag: "http-client";
+} & {
   [TargetName in keyof Targets]: (
     /* If the body is not void return '{}' (required for union)
      * else return the generic parameter defined for the target
@@ -72,22 +74,25 @@ export const configureHttpClient =
   <Targets extends Record<string, UnknownTarget>>(targets: {
     [TargetName in keyof Targets]: RuntimeTarget<Targets[TargetName]["url"]>;
   }): HttpClient<Targets> =>
-    Object.keys(targets).reduce((acc, targetName: keyof typeof targets) => {
-      const target = targets[targetName];
+    Object.keys(targets).reduce(
+      (acc, targetName: keyof typeof targets) => {
+        const target = targets[targetName];
 
-      const handler: Handler = async (handlerParams) => {
-        const handler = handlerCreator({
-          ...target,
-          url: replaceParamsInUrl(target.url, handlerParams?.urlParams),
-        });
-        return handler(handlerParams);
-      };
+        const handler: Handler = async (handlerParams) => {
+          const handler = handlerCreator({
+            ...target,
+            url: replaceParamsInUrl(target.url, handlerParams?.urlParams),
+          });
+          return handler(handlerParams);
+        };
 
-      return {
-        ...acc,
-        [targetName]: handler,
-      };
-    }, {} as HttpClient<Targets>);
+        return {
+          ...acc,
+          [targetName]: handler,
+        };
+      },
+      { tag: "http-client" } as HttpClient<Targets>,
+    );
 
 export const replaceParamsInUrl = <UrlToReplace extends Url>(
   path: UrlToReplace,

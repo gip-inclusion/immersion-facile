@@ -3,16 +3,16 @@ import {
   AddressDto,
   expectTypeToMatchAndEqual,
   GeoPositionDto,
-  ManagedAxios,
 } from "shared";
 
 import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
 import { AppConfig } from "../../primary/config/appConfig";
 
 import {
+  createHttpOpenCageDataClient,
   HttpOpenCageDataAddressGateway,
-  OpenCageDataTargetUrls,
-  openCageDataTargetUrlsMapperMaker,
+  OpenCageDataTargets,
+  openCageDataTargets,
 } from "./HttpOpenCageDataAddressGateway";
 
 const resultFromApiAddress = {
@@ -44,19 +44,15 @@ const resultFromApiAddress = {
   ],
 };
 
+const apiKey = AppConfig.createFromEnv().apiKeyOpenCageData;
+
 describe("HttpOpenCageDataAddressGateway", () => {
   let httpAddressGateway: AddressGateway;
 
-  const apiKey = AppConfig.createFromEnv().apiKeyOpenCageData;
-
   beforeEach(() => {
     httpAddressGateway = new HttpOpenCageDataAddressGateway(
-      new ManagedAxios<OpenCageDataTargetUrls>(
-        openCageDataTargetUrlsMapperMaker(apiKey),
-        {},
-        {},
-        () => (request) => request,
-      ),
+      createHttpOpenCageDataClient<OpenCageDataTargets>(openCageDataTargets),
+      apiKey,
     );
   });
 
@@ -92,12 +88,12 @@ describe("HttpOpenCageDataAddressGateway", () => {
         },
       },
       {
-        candidateQuery: "49 Rue Mazagran St Denis 97400",
+        candidateQuery: "21 Rue Monthyon Saint-Denis 97400",
         expectedAddress: {
           city: "Saint-Denis",
           departmentCode: "974",
           postcode: "97400",
-          streetNumberAndAddress: "49 Rue Mazagran",
+          streetNumberAndAddress: "Rue Monthyon",
         },
       },
       {
@@ -152,6 +148,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
           resultMetropolitanFrance.at(0);
         expect(firstResult?.address).toEqual(expectedAddress);
       },
+      10000,
     );
 
     it("Should return expected address DTO when providing address with special characters.", async () => {
@@ -308,14 +305,8 @@ describe("HttpOpenCageDataAddressGateway check parrarel call", () => {
   it(`Should support ${parallelCalls} of parallel calls`, async () => {
     const httpAddressGateway: AddressGateway =
       new HttpOpenCageDataAddressGateway(
-        new ManagedAxios<OpenCageDataTargetUrls>(
-          openCageDataTargetUrlsMapperMaker(
-            AppConfig.createFromEnv().apiKeyOpenCageData,
-          ),
-          {},
-          {},
-          () => (request) => request,
-        ),
+        createHttpOpenCageDataClient<OpenCageDataTargets>(openCageDataTargets),
+        apiKey,
       );
 
     const coordinates: GeoPositionDto[] = [];

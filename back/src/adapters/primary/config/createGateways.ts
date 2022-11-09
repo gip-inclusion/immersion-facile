@@ -17,9 +17,10 @@ import {
   HttpApiAdresseAddressGateway,
 } from "../../secondary/addressGateway/HttpApiAdresseAddressGateway";
 import {
+  createHttpOpenCageDataClient,
   HttpOpenCageDataAddressGateway,
-  OpenCageDataTargetUrls,
-  openCageDataTargetUrlsMapperMaker,
+  OpenCageDataTargets,
+  openCageDataTargets,
 } from "../../secondary/addressGateway/HttpOpenCageDataAddressGateway";
 import { InMemoryAddressGateway } from "../../secondary/addressGateway/InMemoryAddressGateway";
 import { CachingAccessTokenGateway } from "../../secondary/core/CachingAccessTokenGateway";
@@ -31,11 +32,15 @@ import { SendinblueEmailGateway } from "../../secondary/emailGateway/SendinblueE
 import { SendinblueHtmlEmailGateway } from "../../secondary/emailGateway/SendinblueHtmlEmailGateway";
 import { HttpLaBonneBoiteAPI } from "../../secondary/immersionOffer/laBonneBoite/HttpLaBonneBoiteAPI";
 import { InMemoryLaBonneBoiteAPI } from "../../secondary/immersionOffer/laBonneBoite/InMemoryLaBonneBoiteAPI";
-import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { InMemoryPoleEmploiGateway } from "../../secondary/immersionOffer/poleEmploi/InMemoryPoleEmploiGateway";
+import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { MinioDocumentGateway } from "../../secondary/MinioDocumentGateway";
 import { NotImplementedDocumentGateway } from "../../secondary/NotImplementedDocumentGateway";
 
+import { InMemoryAccessTokenGateway } from "../../secondary/immersionOffer/InMemoryAccessTokenGateway";
+import { HttpPassEmploiGateway } from "../../secondary/immersionOffer/passEmploi/HttpPassEmploiGateway";
+import { InMemoryPassEmploiGateway } from "../../secondary/immersionOffer/passEmploi/InMemoryPassEmploiGateway";
+import { HttpPoleEmploiGateway } from "../../secondary/immersionOffer/poleEmploi/HttpPoleEmploiGateway";
 import {
   HttpPeConnectGateway,
   PeConnectUrlTargets,
@@ -52,10 +57,6 @@ import { S3DocumentGateway } from "../../secondary/S3DocumentGateway";
 import { HttpsSireneGateway } from "../../secondary/sirene/HttpsSireneGateway";
 import { InMemorySireneGateway } from "../../secondary/sirene/InMemorySireneGateway";
 import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
-import { InMemoryAccessTokenGateway } from "../../secondary/immersionOffer/InMemoryAccessTokenGateway";
-import { HttpPassEmploiGateway } from "../../secondary/immersionOffer/passEmploi/HttpPassEmploiGateway";
-import { InMemoryPassEmploiGateway } from "../../secondary/immersionOffer/passEmploi/InMemoryPassEmploiGateway";
-import { HttpPoleEmploiGateway } from "../../secondary/immersionOffer/poleEmploi/HttpPoleEmploiGateway";
 
 const logger = createLogger(__filename);
 
@@ -224,21 +225,15 @@ const createPoleEmploiConnectGateway = (config: AppConfig) =>
       )
     : new InMemoryPeConnectGateway(config.immersionFacileBaseUrl);
 
-const createAddressGateway = (config: AppConfig) => {
-  if (config.apiAddress === "IN_MEMORY") return new InMemoryAddressGateway();
-
-  return config.apiAddress === "OPEN_CAGE_DATA"
+const createAddressGateway = (config: AppConfig) =>
+  config.apiAddress === "IN_MEMORY"
+    ? new InMemoryAddressGateway()
+    : config.apiAddress === "OPEN_CAGE_DATA"
     ? new HttpOpenCageDataAddressGateway(
-        new ManagedAxios<OpenCageDataTargetUrls>(
-          openCageDataTargetUrlsMapperMaker(config.apiKeyOpenCageData),
-          undefined,
-          {
-            timeout: AXIOS_TIMEOUT_MS,
-          },
-        ),
+        createHttpOpenCageDataClient<OpenCageDataTargets>(openCageDataTargets),
+        config.apiKeyOpenCageData,
       )
     : new HttpApiAdresseAddressGateway(httpAdresseApiClient);
-};
 
 const createDocumentGateway = (config: AppConfig): DocumentGateway => {
   switch (config.documentGateway) {

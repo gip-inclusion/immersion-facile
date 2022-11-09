@@ -1,22 +1,28 @@
+import axios from "axios";
 import { Point } from "geojson";
 import {
-  AbsoluteUrl,
+  configureHttpClient,
+  createAxiosHandlerCreator,
+  createTargets,
+  CreateTargets,
+  HttpClient,
+  Target,
+} from "http-client";
+import {
   AddressAndPosition,
   AddressDto,
   DepartmentCode,
   GeoPositionDto,
-  HttpResponse,
-  ManagedAxios,
-  queryParamsAsString,
-  TargetUrlsMapper,
 } from "shared";
 import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
 
-export type OpenCageDataTargetUrls =
-  | "ForwardGeocoding"
-  | "ForwardGeocodePostCode"
-  | "ReverseGeocoding";
-
+// https://github.com/OpenCageData/opencagedata-misc-docs/blob/master/countrycode.md
+// On prends la france et toutes ses territoires dépendants.
+const baseUrl = "https://api.opencagedata.com/geocode/v1/geojson";
+type BaseUrl = typeof baseUrl;
+const franceAndAttachedTerritoryCountryCodes =
+  "fr,bl,gf,gp,mf,mq,nc,pf,pm,re,tf,wf,yt";
+const language = "fr";
 type QueryParams = {
   q: string;
   key: string;
@@ -25,107 +31,70 @@ type QueryParams = {
   limit?: string;
 };
 
-const baseUrl: AbsoluteUrl = "https://api.opencagedata.com/geocode/v1/geojson";
-// https://github.com/OpenCageData/opencagedata-misc-docs/blob/master/countrycode.md
-// On prends la france et toutes ses territoires dépendants.
-const franceAndAttachedTerritoryCountryCodes =
-  "fr,bl,gf,gp,mf,mq,nc,pf,pm,re,tf,wf,yt";
-const language = "fr";
+export type OpenCageDataTargets = CreateTargets<{
+  call: Target<void, QueryParams, void, BaseUrl>;
+}>;
 
-const buildUrl = (queryParams: QueryParams): AbsoluteUrl =>
-  `${baseUrl}?${queryParamsAsString<QueryParams>(queryParams)}`;
-
-export const openCageDataTargetUrlsMapperMaker = (
-  apiKey: string,
-): TargetUrlsMapper<OpenCageDataTargetUrls> => ({
-  ForwardGeocoding: (queryString: string): AbsoluteUrl =>
-    buildUrl({
-      q: queryString,
-      key: apiKey,
-      language,
-      countrycode: franceAndAttachedTerritoryCountryCodes,
-    }),
-  ForwardGeocodePostCode: (postcode: string): AbsoluteUrl =>
-    buildUrl({
-      q: postcode,
-      key: apiKey,
-      language,
-      countrycode: franceAndAttachedTerritoryCountryCodes,
-      limit: "1",
-    }),
-  ReverseGeocoding: ({ lat, lon }: GeoPositionDto): AbsoluteUrl =>
-    buildUrl({
-      q: `${lat}+${lon}`,
-      key: apiKey,
-      language,
-      countrycode: franceAndAttachedTerritoryCountryCodes,
-      limit: "1",
-    }),
+export const openCageDataTargets = createTargets<OpenCageDataTargets>({
+  call: {
+    method: "GET",
+    url: baseUrl,
+  },
 });
 
-const featureToAddress = (
-  feature: GeoJSON.Feature<Point, OpenCageDataProperties>,
-): AddressDto | undefined => {
-  const components = feature.properties.components;
-  const department: string | undefined = getDepartmentFromAliases(components);
-  const city: string | undefined = getCityFromAliases(components);
-  const streetName: string | undefined = getStreetNameFromAliases(components);
-  const streetNumber: string | undefined =
-    getStreetNumberFromAliases(components);
-
-  if (!(city && department)) return undefined;
-
-  // OpenCageData gives the department name but not the code.
-  const departmentCode = departmentNameToDepartmentCode[department];
-  if (!departmentCode) return undefined;
-
-  const streetNumberAndAddress = `${streetNumber ?? ""} ${
-    streetName ?? ""
-  }`.trim();
-
-  return {
-    streetNumberAndAddress,
-    postcode: components.postcode ?? "",
-    departmentCode,
-    city,
-  };
-};
+const AXIOS_TIMEOUT_MS = 10_000;
+export const createHttpOpenCageDataClient = configureHttpClient(
+  createAxiosHandlerCreator(axios.create({ timeout: AXIOS_TIMEOUT_MS })),
+);
 
 export class HttpOpenCageDataAddressGateway implements AddressGateway {
   constructor(
-    public readonly httpClient: ManagedAxios<OpenCageDataTargetUrls>,
+    private readonly httpClient: HttpClient<OpenCageDataTargets>,
+    private apiKey: string,
   ) {}
 
   public async findDepartmentCodeFromPostCode(
-    query: string,
+    postCode: string,
   ): Promise<DepartmentCode | null> {
-    const { data }: HttpResponse = await this.httpClient.get({
-      target: this.httpClient.targetsUrls.ForwardGeocodePostCode,
-      targetParams: query,
+    const { responseBody } = await this.httpClient.call({
+      queryParams: {
+        countrycode: franceAndAttachedTerritoryCountryCodes,
+        key: this.apiKey,
+        language,
+        limit: "1",
+        q: postCode,
+      },
     });
 
-    const feature = (data as OpenCageDataFeatureCollection).features.at(0);
-    if (!feature) return null;
-    const department = getDepartmentFromAliases(feature.properties.components);
-
-    if (!department) {
-      return null;
+    const feature = (responseBody as OpenCageDataFeatureCollection).features.at(
+      0,
+    );
+    if (feature) {
+      const department = getDepartmentFromAliases(
+        feature.properties.components,
+      );
+      if (department) return departmentNameToDepartmentCode[department];
     }
-
-    return departmentNameToDepartmentCode[department];
+    return null;
   }
 
   public async getAddressFromPosition(
     position: GeoPositionDto,
   ): Promise<AddressDto | undefined> {
-    const { data }: HttpResponse = await this.httpClient.get({
-      target: this.httpClient.targetsUrls.ReverseGeocoding,
-      targetParams: position,
+    const { responseBody } = await this.httpClient.call({
+      queryParams: {
+        countrycode: franceAndAttachedTerritoryCountryCodes,
+        key: this.apiKey,
+        language,
+        limit: "1",
+        q: `${position.lat}+${position.lon}`,
+      },
     });
 
-    const feature = (data as OpenCageDataFeatureCollection).features.at(0);
-    if (!feature) return undefined;
-    return featureToAddress(feature);
+    const feature = (responseBody as OpenCageDataFeatureCollection).features.at(
+      0,
+    );
+    return feature && this.featureToAddress(feature);
   }
 
   public async lookupStreetAddress(
@@ -134,18 +103,65 @@ export class HttpOpenCageDataAddressGateway implements AddressGateway {
     // eslint-disable-next-line no-console
     console.time(`lookupStreetAddress Duration - ${query}`);
     try {
-      const { data }: HttpResponse = await this.httpClient.get({
-        target: this.httpClient.targetsUrls.ForwardGeocoding,
-        targetParams: query,
+      const { responseBody } = await this.httpClient.call({
+        queryParams: {
+          countrycode: franceAndAttachedTerritoryCountryCodes,
+          key: this.apiKey,
+          language,
+          q: query,
+        },
       });
 
-      return (data as OpenCageDataFeatureCollection).features
-        .map(toAddressAndPosition)
+      return (responseBody as OpenCageDataFeatureCollection).features
+        .map((feature) => this.toAddressAndPosition(feature))
         .filter((feature): feature is AddressAndPosition => !!feature);
     } finally {
       // eslint-disable-next-line no-console
       console.timeEnd(`lookupStreetAddress Duration - ${query}`);
     }
+  }
+
+  private toAddressAndPosition(
+    feature: GeoJSON.Feature<Point, OpenCageDataProperties>,
+  ): AddressAndPosition | undefined {
+    const address = this.featureToAddress(feature);
+    return (
+      address && {
+        position: {
+          lat: feature.geometry.coordinates[1],
+          lon: feature.geometry.coordinates[0],
+        },
+        address,
+      }
+    );
+  }
+
+  private featureToAddress(
+    feature: GeoJSON.Feature<Point, OpenCageDataProperties>,
+  ): AddressDto | undefined {
+    const components = feature.properties.components;
+    const department: string | undefined = getDepartmentFromAliases(components);
+    const city: string | undefined = getCityFromAliases(components);
+    const streetName: string | undefined = getStreetNameFromAliases(components);
+    const streetNumber: string | undefined =
+      getStreetNumberFromAliases(components);
+
+    if (!(city && department)) return undefined;
+
+    // OpenCageData gives the department name but not the code.
+    const departmentCode = departmentNameToDepartmentCode[department];
+    if (!departmentCode) return undefined;
+
+    const streetNumberAndAddress = `${streetNumber ?? ""} ${
+      streetName ?? ""
+    }`.trim();
+
+    return {
+      streetNumberAndAddress,
+      postcode: components.postcode ?? "",
+      departmentCode,
+      city,
+    };
   }
 }
 
@@ -224,21 +240,6 @@ const getDepartmentFromAliases = (components: OpenCageDataAddressComponents) =>
   components.department ??
   components.state_district ??
   components.state;
-
-const toAddressAndPosition = (
-  feature: GeoJSON.Feature<Point, OpenCageDataProperties>,
-): AddressAndPosition | undefined => {
-  const address = featureToAddress(feature);
-  if (!address) return undefined;
-
-  return {
-    position: {
-      lat: feature.geometry.coordinates[1],
-      lon: feature.geometry.coordinates[0],
-    },
-    address,
-  };
-};
 
 const departmentNameToDepartmentCode: Record<string, string> = {
   Ain: "01",
