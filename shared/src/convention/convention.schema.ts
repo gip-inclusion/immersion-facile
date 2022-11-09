@@ -153,11 +153,7 @@ export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExt
     })
     .refine(underMaxCalendarDuration, getConventionTooLongMessageAndPath)
     .superRefine((convention, issueMaker) => {
-      const addIssue = (
-        issueMaker: z.RefinementCtx,
-        message: string,
-        path: string,
-      ) => {
+      const addIssue = (message: string, path: string) => {
         issueMaker.addIssue({
           code: z.ZodIssueCode.custom,
           message,
@@ -178,7 +174,6 @@ export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExt
             .some((otherSignatory) => otherSignatory.email === signatory.email)
         )
           addIssue(
-            issueMaker,
             "Les emails des signataires doivent être différents.",
             getConventionFieldName(`signatories.${signatory.key}.email`),
           );
@@ -191,7 +186,6 @@ export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExt
         )
       )
         addIssue(
-          issueMaker,
           "Le mail du tuteur doit être différent des mails du bénéficiaire, de son représentant légal et de son employeur actuel.",
           getConventionFieldName("establishmentTutor.email"),
         );
