@@ -1,5 +1,4 @@
-import { configureHttpClient } from "http-client";
-import { createAxiosHandlerCreator } from "http-client/src/adapters/createAxiosHandlerCreator";
+import { configureHttpClient, createAxiosHandlerCreator } from "http-client";
 import { createManagedAxiosInstance, AdminTargets, adminTargets } from "shared";
 import { createCommonDependencies } from "src/app/config/createCommonDependencies";
 import type { Dependencies } from "src/app/config/dependencies";
