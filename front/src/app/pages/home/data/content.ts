@@ -126,7 +126,7 @@ export const sectionStatsData: Stat[] = [
   {
     badgeLabel: "Découverte",
     value: "1",
-    subtitle: "mois maximum",
+    subtitle: "jour, 1 semaine ou 1 mois en entreprise",
     description:
       "L’immersion professionnelle est une période courte et non rémunérée de découverte en entreprise.",
   },
@@ -145,18 +145,18 @@ export const sectionStatsData: Stat[] = [
 
 export const sectionFaqData: FaqCardProps[] = [
   {
-    title: "Comment contacter une entreprise pour demander une immersion ?",
-    description: `Si une entreprise a le label "entreprise accueillante", pour lui demander une une immersion, vous devez cliquer sur "contacter l'entreprise" et compléter le formulaire qui s'affiche puis cliquer sur "envoyer".`,
-    url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-contacter-une-entreprise-pour-demander-une-immersion-8dqotx/",
+    title: "Comment trouver une entreprise accueillante ?",
+    description: `Si une entreprise a le label "entreprise accueillante", pour lui demander une une immersion, vous devez cliquer sur "contacter l'entreprise" et compléter le formulaire...`,
+    url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-trouver-une-entreprise-accueillante-ek1x8s/",
   },
   {
     title: "Comment contacter une entreprise pour demander une immersion ?",
-    description: `Si une entreprise a le label "entreprise accueillante", pour lui demander une une immersion, vous devez cliquer sur "contacter l'entreprise" et compléter le formulaire qui s'affiche puis cliquer sur "envoyer".`,
+    description: `A partir de la page d'accueil du service Immersion Facilitée, cliquez sur le bouton "Trouver une entreprise accueillante" ou rendez-vous directement...`,
     url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-contacter-une-entreprise-pour-demander-une-immersion-8dqotx/",
   },
   {
-    title: "Comment contacter une entreprise pour demander une immersion ?",
-    description: `Si une entreprise a le label "entreprise accueillante", pour lui demander une une immersion, vous devez cliquer sur "contacter l'entreprise" et compléter le formulaire qui s'affiche puis cliquer sur "envoyer".`,
-    url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-contacter-une-entreprise-pour-demander-une-immersion-8dqotx/",
+    title: `Que signifie le label "Tentez votre chance" dans les résultats de recherche ?`,
+    description: `Cliquez sur "rechercher" pour lancer la recherche. Quelques secondes peuvent être nécessaires pour afficher les résultats de recherche...`,
+    url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/que-signifie-le-label-tentez-votre-chance-dans-les-resultats-de-recherche-1c1zmkx/",
   },
 ];

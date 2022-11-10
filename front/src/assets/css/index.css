@@ -46,12 +46,7 @@ body .w-full {
 .fr-btn--establishment-secondary:hover {
   opacity: 0.9;
 }
-.fr-btn--candidate {
-  background-color: #be5449 !important;
-}
-.fr-btn--candidate-secondary {
-  background-color: #823434 !important;
-}
+
 .fr-btn--establishment {
   background-color: #0079c1 !important;
 }

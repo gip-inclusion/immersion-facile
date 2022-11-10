@@ -35,7 +35,7 @@ const SearchResultInfo = ({ children, icon }: SearchResultInfoProps) => (
   </div>
 );
 
-const iconColor = "#FF9575";
+const iconColor = "#00BBC3";
 
 export const EnterpriseSearchResult = ({
   onButtonClick,
@@ -61,7 +61,7 @@ export const EnterpriseSearchResult = ({
     <div className="flex flex-col items-stretch p-4 w-[80%] bg-white my-4 rounded border-solid border-gray-400 border gap-4">
       <div className="flex flex-wrap justify-between">
         <div className="pb-2">
-          <div className="font-bold text-xl leading-6 text-immersionRed-light pb-1">
+          <div className="font-bold text-xl leading-6 text-immersionGreen fr-pb-1w">
             {customizedName ?? name}
           </div>
           {nafLabel && <div className="font-bold">{nafLabel}</div>}

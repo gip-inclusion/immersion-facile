@@ -8,5 +8,5 @@ nginx/etc/letsencrypt
 backup/**/*.bz2
 .pnpm-debug.log
 dumps
-cypress/downloads
+cypress/cypress/downloads
 .turbo

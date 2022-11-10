@@ -18,7 +18,7 @@ export const ButtonSearch = ({
 }: ButtonSearchProps) => (
   <button
     onClick={onClick}
-    className={"fr-btn w-full fr-btn--candidate-secondary " + className}
+    className={"fr-btn w-full  " + className}
     disabled={disabled}
     type={type}
   >

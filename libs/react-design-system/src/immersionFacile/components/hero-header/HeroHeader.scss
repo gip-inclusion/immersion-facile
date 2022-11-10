@@ -25,6 +25,12 @@ $typesTints: (
   overflow: hidden;
   position: relative;
   background: var(--blue-france-sun-113-625);
+  @each $type, $colors in $typesTints {
+    $primary: map-get($colors, "primary");
+    &--#{$type} {
+      background: $primary;
+    }
+  }
   @include for-screen($bp-lg) {
     background: transparent;
     margin-bottom: 8rem;

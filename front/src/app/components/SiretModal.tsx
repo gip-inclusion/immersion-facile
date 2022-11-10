@@ -1,4 +1,4 @@
-import React, { useReducer } from "react";
+import React, { useEffect, useReducer } from "react";
 import {
   ModalClose,
   ModalContent,
@@ -6,6 +6,7 @@ import {
   SubTitle,
   Title,
 } from "react-design-system/immersionFacile";
+import { useEstablishmentSiret } from "src/hooks/siret.hooks";
 import { SiretFetcherInput } from "./SiretFetcherInput";
 
 type ActionOnEstablishment = "register" | "edit";
@@ -57,7 +58,16 @@ type SiretModalProps = {
 };
 
 export const SiretModal = ({ modalState, dispatch }: SiretModalProps) => {
-  const hide = () => dispatch({ type: "CLICKED_CLOSE" });
+  const { clearSiret } = useEstablishmentSiret({
+    shouldFetchEvenIfAlreadySaved: false,
+  });
+  const hide = () => {
+    clearSiret();
+    dispatch({ type: "CLICKED_CLOSE" });
+  };
+  useEffect(() => {
+    clearSiret();
+  }, []);
   const contents: Record<ActionOnEstablishment, Record<string, string>> = {
     edit: {
       title: "Editer mon entreprise",
