@@ -226,14 +226,15 @@ const createPoleEmploiConnectGateway = (config: AppConfig) =>
     : new InMemoryPeConnectGateway(config.immersionFacileBaseUrl);
 
 const createAddressGateway = (config: AppConfig) =>
-  config.apiAddress === "IN_MEMORY"
-    ? new InMemoryAddressGateway()
-    : config.apiAddress === "OPEN_CAGE_DATA"
-    ? new HttpOpenCageDataAddressGateway(
+  ({
+    IN_MEMORY: () => new InMemoryAddressGateway(),
+    OPEN_CAGE_DATA: () =>
+      new HttpOpenCageDataAddressGateway(
         createHttpOpenCageDataClient<OpenCageDataTargets>(openCageDataTargets),
         config.apiKeyOpenCageData,
-      )
-    : new HttpApiAdresseAddressGateway(httpAdresseApiClient);
+      ),
+    ADRESSE_API: () => new HttpApiAdresseAddressGateway(httpAdresseApiClient),
+  }[config.apiAddress]());
 
 const createDocumentGateway = (config: AppConfig): DocumentGateway => {
   switch (config.documentGateway) {

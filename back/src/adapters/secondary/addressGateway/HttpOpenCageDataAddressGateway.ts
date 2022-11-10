@@ -32,11 +32,11 @@ type QueryParams = {
 };
 
 export type OpenCageDataTargets = CreateTargets<{
-  call: Target<void, QueryParams, void, BaseUrl>;
+  geocoding: Target<void, QueryParams, void, BaseUrl>;
 }>;
 
 export const openCageDataTargets = createTargets<OpenCageDataTargets>({
-  call: {
+  geocoding: {
     method: "GET",
     url: baseUrl,
   },
@@ -56,7 +56,7 @@ export class HttpOpenCageDataAddressGateway implements AddressGateway {
   public async findDepartmentCodeFromPostCode(
     postCode: string,
   ): Promise<DepartmentCode | null> {
-    const { responseBody } = await this.httpClient.call({
+    const reponse = await this.httpClient.geocoding({
       queryParams: {
         countrycode: franceAndAttachedTerritoryCountryCodes,
         key: this.apiKey,
@@ -66,22 +66,20 @@ export class HttpOpenCageDataAddressGateway implements AddressGateway {
       },
     });
 
-    const feature = (responseBody as OpenCageDataFeatureCollection).features.at(
-      0,
-    );
-    if (feature) {
-      const department = getDepartmentFromAliases(
-        feature.properties.components,
-      );
-      if (department) return departmentNameToDepartmentCode[department];
-    }
-    return null;
+    const feature = (
+      reponse.responseBody as OpenCageDataFeatureCollection
+    ).features.at(0);
+
+    const department =
+      feature && getDepartmentFromAliases(feature.properties.components);
+
+    return department ? departmentNameToDepartmentCode[department] : null;
   }
 
   public async getAddressFromPosition(
     position: GeoPositionDto,
   ): Promise<AddressDto | undefined> {
-    const { responseBody } = await this.httpClient.call({
+    const { responseBody } = await this.httpClient.geocoding({
       queryParams: {
         countrycode: franceAndAttachedTerritoryCountryCodes,
         key: this.apiKey,
@@ -103,7 +101,7 @@ export class HttpOpenCageDataAddressGateway implements AddressGateway {
     // eslint-disable-next-line no-console
     console.time(`lookupStreetAddress Duration - ${query}`);
     try {
-      const { responseBody } = await this.httpClient.call({
+      const { responseBody } = await this.httpClient.geocoding({
         queryParams: {
           countrycode: franceAndAttachedTerritoryCountryCodes,
           key: this.apiKey,
