@@ -14,7 +14,6 @@ export type HeroHeaderProps = {
   parallax?: boolean;
   patterns?: boolean;
   navCards?: HeroHeaderNavCard[];
-  isReadyForRequestOrRedirection?: boolean;
   siretModal: JSX.Element;
 };
 export type HeroHeaderNavCard = {

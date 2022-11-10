@@ -21,7 +21,6 @@ import {
   sectionStatsData,
 } from "./data/content";
 import { useDispatch } from "react-redux";
-import { useEstablishmentSiret } from "src/hooks/siret.hooks";
 import { SiretModal, useSiretModal } from "src/app/components/SiretModal";
 import { AnyAction, Dispatch } from "@reduxjs/toolkit";
 
@@ -66,10 +65,6 @@ type HomePageProps = {
 export const HomePage = ({ type }: HomePageProps) => {
   const featureFlags = useFeatureFlags();
   const storeDispatch = useDispatch();
-  const shouldFetchEvenIfAlreadySaved = false;
-  const { isReadyForRequestOrRedirection } = useEstablishmentSiret({
-    shouldFetchEvenIfAlreadySaved,
-  });
   const { modalState, dispatch: modalDispatch } = useSiretModal();
   const heroHeaderNavCardsWithDispatch = heroHeaderNavCards(
     storeDispatch,
@@ -91,7 +86,6 @@ export const HomePage = ({ type }: HomePageProps) => {
           patterns
           navCards={heroHeaderNavCardsWithDispatch[type] as HeroHeaderNavCard[]}
           parallax
-          isReadyForRequestOrRedirection={isReadyForRequestOrRedirection}
           siretModal={
             <SiretModal modalState={modalState} dispatch={modalDispatch} />
           }
