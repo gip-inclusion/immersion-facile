@@ -8,6 +8,7 @@ export type SubmitButtonProps = {
   type?: "submit" | "button" | "reset";
   level?: "primary" | "secondary";
   url?: string;
+  target?: string;
 };
 
 export const Button = ({
@@ -18,6 +19,7 @@ export const Button = ({
   url,
   type = "button",
   level = "primary",
+  target,
 }: SubmitButtonProps) => {
   const isLink = url && url !== "";
   const isSecondary = level === "secondary" ? "fr-btn--secondary" : "";
@@ -28,6 +30,7 @@ export const Button = ({
         className: classes,
         href: url,
         disabled: disable,
+        target,
       }
     : {
         className: classes,

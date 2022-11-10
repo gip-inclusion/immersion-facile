@@ -7,6 +7,45 @@ import {
 import { routes } from "src/app/routing/routes";
 import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
 import type { UserType } from "../HomePage";
+
+type HeroHeaderInfos = {
+  displayName: string;
+  title: string;
+  subtitle: string;
+  icon: string;
+};
+
+export const heroHeaderContent: Record<UserType, HeroHeaderInfos> = {
+  default: {
+    title: "La meilleure façon de faire émerger de nouveaux talents",
+    displayName: "default",
+    icon: "",
+    subtitle:
+      "Avec Immersion Facilitée, trouvez un métier à tester, entrez en relation immédiatement avec une entreprise accueillante, remplissez une demande de convention et obtenez une réponse en temps record !",
+  },
+  candidate: {
+    title: "La meilleure façon de faire émerger de nouveaux talents",
+    displayName: "Candidat",
+    icon: "fr-icon-user-line",
+    subtitle:
+      "Avec Immersion Facilitée, trouvez un métier à tester, entrez en relation immédiatement avec une entreprise accueillante, remplissez une demande de convention et obtenez une réponse en temps record !",
+  },
+  establishment: {
+    title: "La meilleure façon de faire émerger de nouveaux talents",
+    displayName: "Entreprise",
+    icon: "fr-icon-building-line",
+    subtitle:
+      "Avec Immersion Facilitée, trouvez un métier à tester, entrez en relation immédiatement avec une entreprise accueillante, remplissez une demande de convention et obtenez une réponse en temps record !",
+  },
+  agency: {
+    title: "La meilleure façon de faire émerger de nouveaux talents",
+    displayName: "Prescripteur",
+    icon: "fr-icon-map-pin-user-line",
+    subtitle:
+      "Avec Immersion Facilitée, trouvez un métier à tester, entrez en relation immédiatement avec une entreprise accueillante, remplissez une demande de convention et obtenez une réponse en temps record !",
+  },
+};
+
 export const heroHeaderNavCards: (
   storeDispatch: Dispatch,
   modalDispatch: Dispatch,

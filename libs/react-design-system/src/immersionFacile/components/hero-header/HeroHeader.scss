@@ -57,6 +57,15 @@ $typesTints: (
   &__text-wrapper {
     flex: 1 0 60%;
   }
+  &__type-wrapper {
+    color: $white;
+    text-transform: uppercase;
+  }
+  &__type-label {
+    font-size: 1.125rem;
+    font-weight: bold;
+    margin-left: 0.5rem;
+  }
   &__title {
     color: $white;
   }

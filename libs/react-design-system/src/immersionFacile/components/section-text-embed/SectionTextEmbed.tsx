@@ -25,14 +25,15 @@ export const SectionTextEmbed = ({ videoUrl }: SectionTextEmbedProps) => (
           <strong>L’immersion est une période courte et non rémunérée</strong>{" "}
           en entreprise.
         </li>
+
+        <li className={`${componentName}__item`}>
+          <strong>Il est obligatoire d'avoir une convention validée</strong>{" "}
+          pour démarrer une immersion.
+        </li>
         <li className={`${componentName}__item`}>
           <strong>Vous conservez votre statut initial</strong> et restez couvert
           par un prescripteur (Pôle emploi, Cap Emploi, Mission Locale, etc.)
           grâce à la signature d’une convention.
-        </li>
-        <li className={`${componentName}__item`}>
-          <strong>Il est obligatoire d'avoir une convention validée</strong>{" "}
-          pour démarrer une immersion.
         </li>
         <li className={`${componentName}__item`}>
           <strong>Vous pouvez être accompagné</strong> à chacune de ces étapes

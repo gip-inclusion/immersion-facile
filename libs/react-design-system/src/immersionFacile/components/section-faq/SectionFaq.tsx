@@ -23,7 +23,10 @@ export const SectionFaq = ({ articles }: SectionFaqProps) => (
         </nav>
       )}
       <div className={`${componentName}__buttons-container fr-mt-4w`}>
-        <Button url="https://aide.immersion-facile.beta.gouv.fr/fr/">
+        <Button
+          url="https://aide.immersion-facile.beta.gouv.fr/fr/"
+          target="_blank"
+        >
           Voir toutes les questions fréquentes
         </Button>
       </div>

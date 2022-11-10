@@ -16,6 +16,7 @@ import { routes } from "src/app/routing/routes";
 import heroHeaderIllustration from "/src/assets/img/illustration-hero.webp";
 import logoLeMoisLesEntreprises from "/src/assets/img/logo-le-mois-les-entreprises.svg";
 import {
+  heroHeaderContent,
   heroHeaderNavCards,
   sectionFaqData,
   sectionStatsData,
@@ -75,15 +76,18 @@ export const HomePage = ({ type }: HomePageProps) => {
     storeDispatch,
     modalDispatch as Dispatch<AnyAction>,
   );
+  const { title, subtitle, displayName, icon } = heroHeaderContent[type];
   return (
     <div>
       <ImmersionMarianneHeader />
       <MainWrapper layout="fullscreen" vSpacing={0} useBackground>
         <HeroHeader
-          title="La meilleure façon de faire émerger de nouveaux talents"
-          description="Avec Immersion Facilitée, trouvez un métier à tester, entrez en relation immédiatement avec une entreprise accueillante, remplissez une demande de convention et obtenez une réponse en temps record !"
+          title={title}
+          description={subtitle}
           illustration={heroHeaderIllustration}
           type={type}
+          typeDisplayName={displayName}
+          icon={icon}
           patterns
           navCards={heroHeaderNavCardsWithDispatch[type] as HeroHeaderNavCard[]}
           parallax

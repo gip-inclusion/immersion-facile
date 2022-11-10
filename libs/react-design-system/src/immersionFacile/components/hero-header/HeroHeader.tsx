@@ -8,6 +8,8 @@ export type HeroHeaderProps = {
   title: string;
   description?: string;
   illustration?: string;
+  icon?: string;
+  typeDisplayName: string;
   type: UserType;
   parallax?: boolean;
   patterns?: boolean;
@@ -24,6 +26,7 @@ export type HeroHeaderNavCard = {
 };
 
 const componentName = "im-hero-header";
+
 export const HeroHeader = ({
   title,
   description,
@@ -33,6 +36,8 @@ export const HeroHeader = ({
   navCards,
   parallax,
   siretModal,
+  icon,
+  typeDisplayName,
 }: HeroHeaderProps) => {
   const [windowScrollY, setWindowScrollY] = useState<number>(window.scrollY);
   const onWindowScroll = () => {
@@ -54,6 +59,14 @@ export const HeroHeader = ({
     >
       <div className={`fr-container ${componentName}__container`}>
         <div className={`${componentName}__text-wrapper`}>
+          {type !== "default" && (
+            <div className={`${componentName}__type-wrapper fr-mb-2w`}>
+              <span className={`${componentName}__type-icon ${icon}`}></span>
+              <span className={`${componentName}__type-label`}>
+                {typeDisplayName}
+              </span>
+            </div>
+          )}
           <h1 className={`${componentName}__title fr-display--xs`}>{title}</h1>
           {description && (
             <h2 className={`${componentName}__description fr-text--xl`}>
