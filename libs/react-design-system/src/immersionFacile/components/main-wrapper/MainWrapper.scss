@@ -10,11 +10,11 @@
     right: 0;
     top: 48%;
     z-index: -1;
-    @include for-screen($bp-lg) {
+    @include for-screen-min($bp-lg) {
       background: var(--background-alt-blue-france);
     }
     &:after {
-      @include for-screen($bp-lg) {
+      @include for-screen-min($bp-lg) {
         content: "";
         display: block;
         width: 150%;

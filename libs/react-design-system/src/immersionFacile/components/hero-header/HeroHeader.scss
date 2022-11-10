@@ -31,12 +31,12 @@ $typesTints: (
       background: $primary;
     }
   }
-  @include for-screen($bp-lg) {
+  @include for-screen-min($bp-lg) {
     background: transparent;
     margin-bottom: 8rem;
   }
   &:after {
-    @include for-screen($bp-lg) {
+    @include for-screen-min($bp-lg) {
       content: "";
       display: block;
       position: absolute;
@@ -79,7 +79,7 @@ $typesTints: (
   }
   &__illustration {
     display: none;
-    @include for-screen($bp-lg) {
+    @include for-screen-min($bp-lg) {
       position: relative;
       z-index: 10;
       display: block;
@@ -87,7 +87,7 @@ $typesTints: (
   }
   &__patterns {
     display: none;
-    @include for-screen($bp-lg) {
+    @include for-screen-min($bp-lg) {
       display: block;
     }
   }
@@ -121,7 +121,7 @@ $typesTints: (
     z-index: 20;
     list-style-type: none;
     margin-bottom: 0;
-    @include for-screen($bp-lg) {
+    @include for-screen-min($bp-lg) {
       margin-bottom: -2rem;
     }
   }
@@ -141,7 +141,7 @@ $typesTints: (
     position: relative;
     top: 0;
     transition: all 1s ease;
-    @include for-screen($bp-lg) {
+    @include for-screen-min($bp-lg) {
       flex-direction: column;
     }
     &:after {
@@ -175,7 +175,7 @@ $typesTints: (
     &-title {
       margin-bottom: 0;
       font-size: 1.125rem;
-      @include for-screen($bp-lg) {
+      @include for-screen-min($bp-lg) {
         margin-bottom: 1.5rem;
         font-size: 1.5rem;
       }
@@ -193,7 +193,7 @@ $typesTints: (
     }
     &-overtitle {
       display: none;
-      @include for-screen($bp-lg) {
+      @include for-screen-min($bp-lg) {
         display: block;
         text-transform: uppercase;
         margin-bottom: 1rem;
@@ -204,7 +204,7 @@ $typesTints: (
         width: 35px;
         height: 35px;
         margin-right: 1rem;
-        @include for-screen($bp-lg) {
+        @include for-screen-min($bp-lg) {
           width: 65px;
           height: 75px;
           margin-bottom: 1rem;
@@ -213,7 +213,7 @@ $typesTints: (
       }
     }
     &:hover {
-      @include for-screen($bp-lg) {
+      @include for-screen-min($bp-lg) {
         top: -0.5rem;
       }
       &:after {

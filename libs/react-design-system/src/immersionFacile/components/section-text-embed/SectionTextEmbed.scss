@@ -2,7 +2,7 @@
 
 .im-section-text-embed {
   background: var(--background-alt-blue-france);
-  @include for-screen($bp-lg) {
+  @include for-screen-min($bp-lg) {
     background: transparent;
     border-top: 1px solid var(--border-default-grey);
   }
@@ -12,7 +12,7 @@
   &__list {
     list-style-type: none;
     order: 1;
-    @include for-screen($bp-lg) {
+    @include for-screen-min($bp-lg) {
       order: 0;
     }
   }

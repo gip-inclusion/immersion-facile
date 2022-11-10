@@ -6,7 +6,7 @@
     max-width: 600px;
     margin-left: auto;
     margin-right: auto;
-    @include for-screen($bp-lg) {
+    @include for-screen-min($bp-lg) {
       max-width: 100%;
       margin-left: auto;
       margin-right: auto;
@@ -41,7 +41,7 @@
       margin-top: 1rem;
       padding-top: 1rem;
       border-top: 1px solid var(--border-default-grey);
-      @include for-screen($bp-lg) {
+      @include for-screen-min($bp-lg) {
         margin-top: 0;
         padding-bottom: 0;
         border-top: none;
