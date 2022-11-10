@@ -32,6 +32,7 @@ export const templateByName: {
 } = {
   AGENCY_WAS_ACTIVATED: {
     niceName: "Activation agence",
+    tags: ["activation prescripteur"],
     createEmailVariables: ({ agencyName, agencyLogoUrl }) => ({
       subject: `Immersion Facilitée : Votre structure a été activée`,
       greetings: "Bonjour,",
@@ -46,6 +47,7 @@ export const templateByName: {
   },
   NEW_CONVENTION_BENEFICIARY_CONFIRMATION: {
     niceName: "Confirmation bénéficiaire nouvelle convention",
+    tags: ["demande signature bénéficiaire"],
     createEmailVariables: ({ firstName, lastName }) => ({
       subject:
         "Immersion Facilitée : votre confirmation pour votre demande d'immersion est enregistrée",
@@ -57,10 +59,10 @@ export const templateByName: {
       highlight: `Attention, ne démarrez pas cette immersion tant que vous n'avez pas reçu cette validation !`,
       subContent: defaultSignature,
     }),
-    tags: ["lala"],
   },
   NEW_CONVENTION_ESTABLISHMENT_TUTOR_CONFIRMATION: {
     niceName: "Confirmation tuteur nouvelle convention",
+    tags: ["confirmation tuteur enregistrée"],
     createEmailVariables: ({
       establishmentTutorName,
       beneficiaryFirstName,
@@ -82,6 +84,7 @@ export const templateByName: {
   },
   NEW_CONVENTION_AGENCY_NOTIFICATION: {
     niceName: "Notification agence nouvelle convention",
+    tags: ["notification conseiller création demande d’immersion"],
     createEmailVariables: ({
       magicLink,
       dateStart,
@@ -120,6 +123,7 @@ export const templateByName: {
   },
   VALIDATED_CONVENTION_FINAL_CONFIRMATION: {
     niceName: "Convention finale validée",
+    tags: ["envoi convention"],
     createEmailVariables: ({
       beneficiaryFirstName,
       beneficiaryLastName,
@@ -201,6 +205,7 @@ export const templateByName: {
   },
   POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED: {
     niceName: "Notification de convention signée au conseiller pole-emploi lié",
+    tags: ["immersion à étudier (mail conseiller)"],
     createEmailVariables: ({
       beneficiaryEmail,
       beneficiaryFirstName,
@@ -242,6 +247,7 @@ export const templateByName: {
   POLE_EMPLOI_ADVISOR_ON_CONVENTION_ASSOCIATION: {
     niceName:
       "Notification de nouvelle convention au conseiller pole-emploi lié",
+    tags: [],
     createEmailVariables: ({
       advisorFirstName,
       advisorLastName,
@@ -299,6 +305,7 @@ export const templateByName: {
   },
   REJECTED_CONVENTION_NOTIFICATION: {
     niceName: "Notification de convention rejetée",
+    tags: ["refus demande d'immersion"],
     createEmailVariables: ({
       immersionProfession,
       beneficiaryFirstName,
@@ -324,6 +331,7 @@ export const templateByName: {
   },
   CONVENTION_MODIFICATION_REQUEST_NOTIFICATION: {
     niceName: "Requête demande de modification de convention",
+    tags: ["demande de modifications"],
     createEmailVariables: ({
       agency,
       justification,
@@ -354,6 +362,7 @@ export const templateByName: {
   },
   NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION: {
     niceName: "Examen de la convention",
+    tags: ["notification conseiller demande d’immersion signée à valider"],
     createEmailVariables: ({
       beneficiaryFirstName,
       beneficiaryLastName,
@@ -379,6 +388,7 @@ export const templateByName: {
   },
   MAGIC_LINK_RENEWAL: {
     niceName: "Renouvellement de lien magique",
+    tags: ["renouvellement de lien"],
     createEmailVariables: ({ magicLink }) => ({
       subject:
         "Immersion Facilitée : voici votre nouveau lien magique pour accéder à la demande d'immersion",
@@ -397,6 +407,7 @@ export const templateByName: {
   },
   BENEFICIARY_OR_ESTABLISHMENT_REPRESENTATIVE_ALREADY_SIGNED_NOTIFICATION: {
     niceName: "Notification de signature de l'autre signataire",
+    tags: ["confirmation nécessaire après confirmation de l’autre partie"],
     createEmailVariables: ({
       beneficiaryFirstName,
       beneficiaryLastName,
@@ -429,6 +440,7 @@ export const templateByName: {
   },
   NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE: {
     niceName: "Demande de signature pour confirmation de convention",
+    tags: ["demande signature demande de convention"],
     createEmailVariables: ({
       signatoryName,
       beneficiaryName,
@@ -469,6 +481,7 @@ export const templateByName: {
   },
   CONTACT_BY_EMAIL_REQUEST: {
     niceName: "Mise en relation par mail",
+    tags: ["mise en relation mail"],
     createEmailVariables: ({
       contactFirstName,
       contactLastName,
@@ -511,6 +524,7 @@ export const templateByName: {
   },
   CONTACT_BY_PHONE_INSTRUCTIONS: {
     niceName: "Instructions de mise en contact par téléphone",
+    tags: ["mise en relation tel"],
     createEmailVariables: ({
       businessName,
       contactFirstName,
@@ -538,6 +552,7 @@ export const templateByName: {
   },
   CONTACT_IN_PERSON_INSTRUCTIONS: {
     niceName: "Instructions de mise en contact en personne",
+    tags: ["mise en relation en personne"],
     createEmailVariables: ({
       potentialBeneficiaryFirstName,
       potentialBeneficiaryLastName,
@@ -564,6 +579,7 @@ export const templateByName: {
   },
   SHARE_DRAFT_CONVENTION_BY_LINK: {
     niceName: "Partager le formulaire de convention par lien",
+    tags: ["partage de convention"],
     createEmailVariables: ({ additionalDetails, conventionFormUrl }) => ({
       subject:
         "Immersion Facilitée : Une demande de convention préremplie vous est transmise pour que vous la complétiez",
@@ -581,6 +597,7 @@ export const templateByName: {
   },
   SUGGEST_EDIT_FORM_ESTABLISHMENT: {
     niceName: "[KO] Suggestion de mise à jour d'etablissement",
+    tags: ["mise à jour fiche entreprise"],
     createEmailVariables: () => ({
       subject: "TODO",
       content: "TODO",
@@ -588,6 +605,7 @@ export const templateByName: {
   },
   EDIT_FORM_ESTABLISHMENT_LINK: {
     niceName: "Lien d'édition du formulaire d'établissement",
+    tags: ["modification établissement"],
     createEmailVariables: ({ editFrontUrl }) => ({
       subject:
         "Immersion Facilitée : Modification de la fiche de votre entreprise",
@@ -607,6 +625,7 @@ export const templateByName: {
   },
   NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION: {
     niceName: "Contact enregistré de création d'un nouveau établissement",
+    tags: ["confirmation enregistrement entreprise"],
     createEmailVariables: ({
       businessName,
       contactFirstName,
@@ -636,6 +655,7 @@ export const templateByName: {
   },
   CREATE_IMMERSION_ASSESSMENT: {
     niceName: "Lien de creation du bilan",
+    tags: ["notification entreprise fin de l’immersion"],
     createEmailVariables: ({
       establishmentTutorName,
       beneficiaryFirstName,
@@ -666,6 +686,7 @@ export const templateByName: {
   },
   FULL_PREVIEW_EMAIL: {
     niceName: "Preview email complet (tous les blocs)",
+    tags: ["aperçu pour tests"],
     createEmailVariables: ({ beneficiaryName }) => ({
       subject: "Test contenant toutes les blocs email",
       greetings: `Bonjour ${beneficiaryName}`,
