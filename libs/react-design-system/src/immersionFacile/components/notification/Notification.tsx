@@ -43,7 +43,7 @@ const SuccessMessage = ({ title, children }: SuccessMessageProps) => (
   </div>
 );
 
-type NotificationType = "success" | "info" | "error";
+type NotificationType = "success" | "info" | "error" | "warning";
 
 export type NotificationProperties = {
   title: string;

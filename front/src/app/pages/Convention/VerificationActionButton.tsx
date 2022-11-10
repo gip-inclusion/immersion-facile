@@ -1,32 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "react-design-system/immersionFacile";
-import { ConventionStatus } from "shared";
+import {
+  ConventionStatus,
+  doesStatusNeedsJustification,
+  UpdateConventionStatusRequestDto,
+} from "shared";
+import { JustificationModal } from "src/app/pages/Convention/JustificationModal";
 
 export type VerificationActionButtonProps = {
-  onSubmit: (params: {
-    newStatus: ConventionStatus;
-    justification?: string;
-  }) => void;
+  onSubmit: (params: UpdateConventionStatusRequestDto) => void;
   disabled?: boolean;
   newStatus: ConventionStatus;
   children: string;
-};
-
-const promptForMessageIfNeeded = (
-  newStatus: ConventionStatus,
-): string | undefined => {
-  let justification: string | undefined = undefined;
-  if (newStatus === "REJECTED") {
-    justification =
-      prompt("Pourquoi l'immersion est-elle refusée ?") ?? undefined;
-    if (!justification) return; // case when cancel button is clicked or field is empty
-  } else if (newStatus === "DRAFT") {
-    justification =
-      prompt("Precisez la raison et la modification nécessaire") ?? undefined;
-    if (!justification) return; // case when cancel button is clicked or field is empty
-  }
-
-  return justification;
 };
 
 export const VerificationActionButton = ({
@@ -50,18 +35,31 @@ export const VerificationActionButton = ({
       className += " fr-fi-checkbox-circle-line fr-btn--icon-left";
       break;
   }
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <Button
-      level={newStatus === "REJECTED" ? "secondary" : "primary"}
-      disable={disabled}
-      onSubmit={() => {
-        const justification = promptForMessageIfNeeded(newStatus);
-        if (justification) onSubmit({ newStatus, justification });
-      }}
-      className={className}
-    >
-      {children}
-    </Button>
+    <>
+      <Button
+        level={newStatus === "REJECTED" ? "secondary" : "primary"}
+        disable={disabled}
+        onSubmit={() => {
+          doesStatusNeedsJustification(newStatus)
+            ? setIsOpen(true)
+            : onSubmit({ status: newStatus });
+        }}
+        className={className}
+      >
+        {children}
+      </Button>
+      {doesStatusNeedsJustification(newStatus) && (
+        <JustificationModal
+          title={children}
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+          onSubmit={onSubmit}
+          newStatus={newStatus}
+        />
+      )}
+    </>
   );
 };

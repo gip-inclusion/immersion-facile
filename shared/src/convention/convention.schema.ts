@@ -38,6 +38,7 @@ import {
   WithConventionId,
   conventionStatusesWithJustification,
   conventionStatusesWithoutJustification,
+  WithJustification,
 } from "./convention.dto";
 import {
   getConventionTooLongMessageAndPath,
@@ -228,7 +229,10 @@ export const updateConventionRequestSchema: z.Schema<UpdateConventionRequestDto>
       "The ID in the URL path must match the ID in the request body.",
     );
 
-export const justificationSchema = zTrimmedString;
+const justificationSchema = zTrimmedString;
+export const withJustificationSchema: z.Schema<WithJustification> = z.object({
+  justification: justificationSchema,
+});
 
 export const updateConventionStatusRequestSchema: z.Schema<UpdateConventionStatusRequestDto> =
   z

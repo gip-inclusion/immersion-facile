@@ -231,6 +231,7 @@ export const ConventionValidationDetails = ({
       </h4>
       {sections.map((list, index) => (
         <ConventionValidationSection
+          key={index}
           convention={convention}
           list={list}
           index={index}
@@ -307,7 +308,7 @@ const ConventionValidationSection = ({
     );
     return rowFields
       .filter((row) => row.fields)
-      .map((row) => {
+      .map((row, index) => {
         const formattedRows = Array.from(Array(maxColsNumber).keys()).map(
           (_slot, index) => keys(row.fields)[index] ?? null,
         );
@@ -316,20 +317,20 @@ const ConventionValidationSection = ({
           .filter((field) => field).length;
         return (
           hasRowData && (
-            <tr key={row.title}>
+            <tr key={row.title ?? index}>
               {row.title && (
                 <td style={cellStyles}>
                   <strong>{row.title}</strong>
                 </td>
               )}
 
-              {formattedRows.map((field) =>
+              {formattedRows.map((field, index) =>
                 field && path(field, convention) ? (
                   <td key={field} style={cellStyles}>
                     {buildContent(field)}
                   </td>
                 ) : (
-                  <td></td>
+                  <td key={index}></td>
                 ),
               )}
             </tr>
@@ -373,11 +374,17 @@ const ConventionValidationSection = ({
             <thead>
               <tr>
                 {list.cols &&
-                  list.cols?.map((col) => <th scope="col">{col}</th>)}
+                  list.cols?.map((col, index) => (
+                    <th key={index} scope="col">
+                      {col}
+                    </th>
+                  ))}
                 {!list.cols &&
                   list.rowFields[0] &&
                   keys(list.rowFields[0].fields).map((key) => (
-                    <th scope="col">{list.rowFields[0].fields[key]}</th>
+                    <th key={key} scope="col">
+                      {list.rowFields[0].fields[key]}
+                    </th>
                   ))}
               </tr>
             </thead>

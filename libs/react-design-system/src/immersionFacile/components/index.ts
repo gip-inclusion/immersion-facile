@@ -21,3 +21,4 @@ export * from "./crisp-chat";
 export * from "./fixed-stamp";
 export * from "./over-footer";
 export * from "./pe-connect-button";
+export * from "./button-group";

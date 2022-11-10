@@ -74,7 +74,7 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
           beneficiaryFirstName: beneficiary.firstName,
           beneficiaryLastName: beneficiary.lastName,
           businessName: convention.businessName,
-          reason: justification,
+          justification,
           signature: agency.signature,
           agency: agency.name,
           immersionAppellation: convention.immersionAppellation,

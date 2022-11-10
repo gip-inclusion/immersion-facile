@@ -191,4 +191,12 @@ export const immersionTexts = {
     hasCurrentEmployerLabel:
       "Le bénéficiaire de l’immersion est-il actuellement salarié(e) d’une autre entreprise (que celle où l’immersion va avoir lieu) ?",
   },
+  verification: {
+    rejectConvention: "Refuser l'immersion ...",
+    modifyConvention: "Renvoyer au bénéficiaire pour modification",
+    conventionAlreadyMarkedAsEligible: "Demande déjà validée.",
+    markAsEligible: "Marquer la demande comme éligible",
+    conventionAlreadyValidated: "Demande déjà validée",
+    markAsValidated: "Valider la demande",
+  },
 };

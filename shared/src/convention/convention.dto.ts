@@ -27,7 +27,7 @@ export const doesStatusNeedsJustification = (
     status as ConventionStatusWithJustification,
   );
 
-type ConventionStatusWithJustification =
+export type ConventionStatusWithJustification =
   typeof conventionStatusesWithJustification[number];
 export const conventionStatusesWithJustification = [
   "REJECTED",
@@ -58,6 +58,8 @@ export const conventionObjectiveOptions = [
   "Découvrir un métier ou un secteur d'activité",
   "Initier une démarche de recrutement",
 ] as const;
+
+export type WithJustification = { justification: string };
 
 export type ImmersionObjective = typeof conventionObjectiveOptions[number];
 export type InternshipKind = "immersion" | "mini-stage-cci";

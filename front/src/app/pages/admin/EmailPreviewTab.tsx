@@ -205,7 +205,7 @@ export const defaultEmailValueByEmailKind: {
   CONVENTION_MODIFICATION_REQUEST_NOTIFICATION: {
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
-    reason: "REASON",
+    justification: "REASON",
     businessName: "BUSINESS_NAME",
     signature: "SIGNATURE",
     immersionAppellation: {

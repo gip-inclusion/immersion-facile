@@ -326,7 +326,7 @@ export const templateByName: {
     niceName: "Requête demande de modification de convention",
     createEmailVariables: ({
       agency,
-      reason,
+      justification,
       beneficiaryFirstName,
       beneficiaryLastName,
       businessName,
@@ -337,7 +337,7 @@ export const templateByName: {
         "Immersion Facilitée : veuillez modifier cette demande d'immersion",
       greetings: "Bonjour,",
       content: `${agency} vous informe que la demande d'immersion de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName} nécessite d'être modifiée pour la raison suivante :
-      ${reason}`,
+      ${justification}`,
       button: {
         url: magicLink,
         label: "Modifier votre demande",

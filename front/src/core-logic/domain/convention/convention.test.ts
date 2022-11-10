@@ -400,9 +400,11 @@ describe("Convention slice", () => {
       const jwt = "some-correct-jwt";
       store.dispatch(
         conventionSlice.actions.statusChangeRequested({
-          newStatus: "DRAFT",
+          updateStatusParams: {
+            status: "DRAFT",
+            justification: "There is a mistake in my last name",
+          },
           feedbackKind: "modificationsAskedFromSignatory",
-          justification: "There is a mistake in my last name",
           jwt,
         }),
       );
@@ -420,9 +422,11 @@ describe("Convention slice", () => {
       const jwt = "some-correct-jwt";
       store.dispatch(
         conventionSlice.actions.statusChangeRequested({
-          newStatus: "DRAFT",
+          updateStatusParams: {
+            status: "DRAFT",
+            justification: "There is a mistake in my last name",
+          },
           feedbackKind: "modificationsAskedFromSignatory",
-          justification: "There is a mistake in my last name",
           jwt,
         }),
       );

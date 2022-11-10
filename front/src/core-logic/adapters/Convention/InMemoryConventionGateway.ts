@@ -98,14 +98,14 @@ export class InMemoryConventionGateway implements ConventionGateway {
 
   // not used anymore, kept for inspiration for a simulated gateway
   private async updateStatus(
-    { status, justification: _ }: UpdateConventionStatusRequestDto,
+    updateStatusParams: UpdateConventionStatusRequestDto,
     jwt: string,
   ): Promise<WithConventionId> {
     const payload = decodeJwt<ConventionMagicLinkPayload>(jwt);
     this.simulatedLatency && (await sleep(this.simulatedLatency));
     this._conventions[payload.applicationId] = {
       ...this._conventions[payload.applicationId],
-      status,
+      status: updateStatusParams.status,
     };
     return { id: payload.applicationId };
   }

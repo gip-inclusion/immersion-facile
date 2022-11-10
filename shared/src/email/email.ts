@@ -158,7 +158,7 @@ type ConventionModificationRequestNotificationEmail = GenericTemplatedEmail<
   {
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
-    reason: string;
+    justification: string;
     businessName: string;
     signature: string;
     immersionAppellation: AppellationDto;

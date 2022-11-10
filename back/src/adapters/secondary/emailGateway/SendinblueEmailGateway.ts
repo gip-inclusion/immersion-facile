@@ -241,7 +241,7 @@ const sendInBlueKeyByEmailVariables: Record<EmailVariables, string> = {
   potentialBeneficiaryFirstName: "POTENTIAL_BENEFICIARY_FIRSTNAME",
   potentialBeneficiaryLastName: "POTENTIAL_BENEFICIARY_LASTNAME",
   questionnaireUrl: "QUESTIONNAIRE_URL",
-  reason: "REASON",
+  justification: "REASON",
   rejectionReason: "REASON",
   sanitaryPrevention: "SANITARY_PREVENTION_DESCRIPTION",
   scheduleText: "SCHEDULE_LINES",

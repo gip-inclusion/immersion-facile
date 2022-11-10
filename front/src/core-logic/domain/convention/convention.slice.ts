@@ -2,9 +2,9 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   ConventionDto,
   ConventionReadDto,
-  ConventionStatus,
   Signatories,
   SignatoryRole,
+  UpdateConventionStatusRequestDto,
 } from "shared";
 import { SubmitFeedBack } from "../SubmitFeedback";
 
@@ -54,10 +54,9 @@ const initialState: ConventionState = {
 };
 
 type StatusChangePayload = {
-  newStatus: ConventionStatus;
   feedbackKind: ConventionFeedbackKind;
   jwt: string;
-  justification?: string;
+  updateStatusParams: UpdateConventionStatusRequestDto;
 };
 
 type Jwt = string;

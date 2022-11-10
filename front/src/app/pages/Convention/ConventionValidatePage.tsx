@@ -6,9 +6,11 @@ import {
   ConventionStatus,
   Role,
   statusTransitionConfigs,
+  UpdateConventionStatusRequestDto,
 } from "shared";
 import { ConventionFeedbackNotification } from "src/app/components/ConventionFeedbackNotification";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
+import { useConventionTexts } from "src/app/pages/Convention/texts/textSetup";
 import { routes } from "src/app/routing/routes";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import {
@@ -42,6 +44,7 @@ export const ConventionValidatePage = ({ route }: VerificationPageProps) => {
   const { role } = decodeJwt<ConventionMagicLinkPayload>(jwt);
   const { convention, fetchConventionError, submitFeedback, isLoading } =
     useConvention(jwt);
+  const t = useConventionTexts(convention?.internshipKind ?? "immersion");
 
   const dispatch = useDispatch();
 
@@ -63,12 +66,12 @@ export const ConventionValidatePage = ({ route }: VerificationPageProps) => {
 
   const createOnSubmitWithFeedbackKind =
     (feedbackKind: ConventionFeedbackKind) =>
-    (params: { justification?: string; newStatus: ConventionStatus }) =>
+    (updateStatusParams: UpdateConventionStatusRequestDto) =>
       dispatch(
         conventionSlice.actions.statusChangeRequested({
           jwt,
           feedbackKind,
-          ...params,
+          updateStatusParams,
         }),
       );
 
@@ -94,7 +97,7 @@ export const ConventionValidatePage = ({ route }: VerificationPageProps) => {
               newStatus="REJECTED"
               onSubmit={createOnSubmitWithFeedbackKind("rejected")}
             >
-              Refuser l'immersion ...
+              {t.verification.rejectConvention}
             </VerificationActionButton>
           )}
 
@@ -106,7 +109,7 @@ export const ConventionValidatePage = ({ route }: VerificationPageProps) => {
                 "modificationAskedFromCounsellorOrValidator",
               )}
             >
-              Renvoyer au bénéficiaire pour modification
+              {t.verification.modifyConvention}
             </VerificationActionButton>
           )}
 
@@ -121,8 +124,8 @@ export const ConventionValidatePage = ({ route }: VerificationPageProps) => {
               disabled={disabled || currentStatus != "IN_REVIEW"}
             >
               {currentStatus === "ACCEPTED_BY_COUNSELLOR"
-                ? "Demande déjà validée."
-                : "Marquer la demande comme éligible"}
+                ? t.verification.conventionAlreadyMarkedAsEligible
+                : t.verification.markAsEligible}
             </VerificationActionButton>
           )}
 
@@ -141,8 +144,8 @@ export const ConventionValidatePage = ({ route }: VerificationPageProps) => {
               }
             >
               {currentStatus === "ACCEPTED_BY_VALIDATOR"
-                ? "Demande déjà validée"
-                : "Valider la demande"}
+                ? t.verification.conventionAlreadyValidated
+                : t.verification.markAsValidated}
             </VerificationActionButton>
           )}
 

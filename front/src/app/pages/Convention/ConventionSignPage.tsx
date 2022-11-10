@@ -118,9 +118,8 @@ const SignFormSpecific = ({ jwt }: SignFormSpecificProps) => {
 
     dispatch(
       conventionSlice.actions.statusChangeRequested({
-        newStatus: "DRAFT",
+        updateStatusParams: { status: "DRAFT", justification },
         feedbackKind: "modificationsAskedFromSignatory",
-        justification,
         jwt,
       }),
     );
