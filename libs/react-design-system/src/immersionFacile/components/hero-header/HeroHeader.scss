@@ -4,31 +4,36 @@ $white: var(--grey-1000-100);
 $patternSizes: 80px, 160px, 130px;
 $typesTints: (
   "default": (
+    "heroBackground": var(--blue-france-sun-113-625),
     "primary": var(--green-archipel-main-557),
     "light": var(--green-archipel-975-75),
   ),
   "candidate": (
+    "heroBackground": var(--green-archipel-sun-391-moon-716),
     "primary": var(--green-archipel-main-557),
     "light": var(--green-archipel-975-75),
   ),
   "establishment": (
+    "heroBackground": var(--blue-cumulus-sun-368-moon-732),
     "primary": var(--blue-cumulus-main-526),
     "light": var(--blue-cumulus-925-125),
   ),
   "agency": (
+    "heroBackground": var(--purple-glycine-sun-319-moon-630),
     "primary": var(--purple-glycine-main-494),
     "light": var(--purple-glycine-925-125),
   ),
 );
 
 .im-hero-header {
+  $hero-header: &;
   overflow: hidden;
   position: relative;
   background: var(--blue-france-sun-113-625);
   @each $type, $colors in $typesTints {
-    $primary: map-get($colors, "primary");
+    $heroBackground: map-get($colors, "heroBackground");
     &--#{$type} {
-      background: $primary;
+      background: $heroBackground;
     }
   }
   @include for-screen-min($bp-lg) {
@@ -159,6 +164,7 @@ $typesTints: (
     @each $type, $colors in $typesTints {
       $primary: map-get($colors, "primary");
       $light: map-get($colors, "light");
+      $heroBackground: map-get($colors, "heroBackground");
       &--#{$type} {
         color: $primary;
         .im-hero-header__nav-card-title {
@@ -222,19 +228,17 @@ $typesTints: (
       }
     }
   }
-  &--candidate {
-    &:after {
-      background: var(--green-archipel-main-557);
-    }
-  }
-  &--establishment {
-    &:after {
-      background: var(--blue-cumulus-main-526);
-    }
-  }
-  &--agency {
-    &:after {
-      background: var(--purple-glycine-main-494);
+  @each $type, $colors in $typesTints {
+    $heroBackground: map-get($colors, "heroBackground");
+    &--#{$type} {
+      &:after {
+        background: $heroBackground;
+      }
+      @if $type != "default" {
+        #{$hero-header}__illustration {
+          transform: scale(1.4);
+        }
+      }
     }
   }
 }
