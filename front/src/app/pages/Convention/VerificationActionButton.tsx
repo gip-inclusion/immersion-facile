@@ -57,7 +57,7 @@ export const VerificationActionButton = ({
       disable={disabled}
       onSubmit={() => {
         const justification = promptForMessageIfNeeded(newStatus);
-        onSubmit({ newStatus, justification });
+        if (justification) onSubmit({ newStatus, justification });
       }}
       className={className}
     >
