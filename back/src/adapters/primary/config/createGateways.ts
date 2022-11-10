@@ -166,22 +166,28 @@ const createEmailGateway = (config: AppConfig, clock: Clock): EmailGateway => {
   if (config.emailGateway === "IN_MEMORY")
     return new InMemoryEmailGateway(clock);
 
-  if (config.emailGateway === "SENDINBLUE_HTML") {
-    const sendinblueHtmlEmailGateway = new SendinblueHtmlEmailGateway(
-      axios,
-      makeEmailAllowListPredicate({
-        skipEmailAllowList: config.skipEmailAllowlist,
-        emailAllowList: config.emailAllowList,
-      }),
-      config.apiKeySendinblue,
-      {
-        name: "Immersion Facilitée",
-        email: "contact@immersion-facile.beta.gouv.fr",
-      },
-    );
+  const sendinblueHtmlEmailGateway = new SendinblueHtmlEmailGateway(
+    axios,
+    makeEmailAllowListPredicate({
+      skipEmailAllowList: config.skipEmailAllowlist,
+      emailAllowList: config.emailAllowList,
+    }),
+    config.apiKeySendinblue,
+    {
+      name: "Immersion Facilitée",
+      email: "contact@immersion-facile.beta.gouv.fr",
+    },
+  );
 
+  if (config.emailGateway === "SENDINBLUE_HTML") {
     return sendinblueHtmlEmailGateway;
   }
+
+  if (config.emailGateway === "HYBRID")
+    return new HybridEmailGateway(
+      sendinblueHtmlEmailGateway,
+      new InMemoryEmailGateway(clock, 15),
+    );
 
   const sendInBlueEmailGateway = new SendinblueEmailGateway(
     axios,
@@ -193,12 +199,6 @@ const createEmailGateway = (config: AppConfig, clock: Clock): EmailGateway => {
   );
 
   if (config.emailGateway === "SENDINBLUE") return sendInBlueEmailGateway;
-
-  if (config.emailGateway === "HYBRID")
-    return new HybridEmailGateway(
-      sendInBlueEmailGateway,
-      new InMemoryEmailGateway(clock, 15),
-    );
 
   return exhaustiveCheck(config.emailGateway, {
     variableName: "config.emailGateway",

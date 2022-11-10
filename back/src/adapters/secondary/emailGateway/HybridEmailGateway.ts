@@ -1,11 +1,10 @@
 import { EmailSentDto, TemplatedEmail } from "shared";
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
 import { InMemoryEmailGateway } from "./InMemoryEmailGateway";
-import { SendinblueEmailGateway } from "./SendinblueEmailGateway";
 
 export class HybridEmailGateway implements EmailGateway {
   constructor(
-    private sendinblue: SendinblueEmailGateway,
+    private sendinblue: EmailGateway,
     private inMemory: InMemoryEmailGateway,
   ) {}
 
