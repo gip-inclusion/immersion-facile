@@ -3,7 +3,7 @@ import { z } from "zod";
 import { UseCase } from "../../core/UseCase";
 import { DashboardGateway } from "../port/DashboardGateway";
 
-export class AgencyDashboard extends UseCase<AgencyId, AbsoluteUrl> {
+export class GetAgencyDashboard extends UseCase<AgencyId, AbsoluteUrl> {
   constructor(private dashboardGateway: DashboardGateway) {
     super();
   }

@@ -41,7 +41,7 @@ import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { UuidGenerator } from "../../../domain/core/ports/UuidGenerator";
 import { TransactionalUseCase, UseCase } from "../../../domain/core/UseCase";
 import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
-import { AgencyDashboard } from "../../../domain/dashboard/useCases/AgencyDashboard";
+import { GetAgencyDashboard } from "../../../domain/dashboard/useCases/GetAgencyDashboard";
 import { GetDashboardUrl } from "../../../domain/dashboard/useCases/GetDashboardUrl";
 import { AdminLogin } from "../../../domain/generic/authentication/useCases/AdminLogin";
 import { UploadLogo } from "../../../domain/generic/fileManagement/useCases/UploadLogo";
@@ -319,7 +319,7 @@ export const createUseCases = (
 };
 
 const dashboardUseCases = (gateway: DashboardGateway) => ({
-  dashboardAgency: new AgencyDashboard(gateway),
+  getAgencyDashboard: new GetAgencyDashboard(gateway),
   getDashboard: new GetDashboardUrl(gateway),
 });
 

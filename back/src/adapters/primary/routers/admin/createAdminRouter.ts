@@ -128,7 +128,7 @@ export const createAdminRouter = (
       req,
       res,
       () =>
-        deps.useCases.dashboardAgency.execute(
+        deps.useCases.getAgencyDashboard.execute(
           "046ce2ed-cc09-47c1-a446-1d1a0d7a6b4a",
         ), //TODO On identifira l'agence via son token inclusion connect
     ),
