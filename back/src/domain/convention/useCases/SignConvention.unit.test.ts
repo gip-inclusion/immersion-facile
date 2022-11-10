@@ -1,5 +1,5 @@
 import {
-  allConventionStatuses,
+  conventionStatuses,
   allRoles,
   ConventionDto,
   ConventionDtoBuilder,
@@ -102,10 +102,10 @@ describe("Sign convention", () => {
   });
 
   const [allowedInitialStatuses, forbiddenInitialStatuses] =
-    splitCasesBetweenPassingAndFailing<ConventionStatus>(
-      allConventionStatuses,
-      ["READY_TO_SIGN", "PARTIALLY_SIGNED"],
-    );
+    splitCasesBetweenPassingAndFailing<ConventionStatus>(conventionStatuses, [
+      "READY_TO_SIGN",
+      "PARTIALLY_SIGNED",
+    ]);
 
   it.each(forbiddenInitialStatuses.map((initialStatus) => ({ initialStatus })))(
     "$initialStatus initial status is not allowed",

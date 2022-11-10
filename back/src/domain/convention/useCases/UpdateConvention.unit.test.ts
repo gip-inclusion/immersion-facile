@@ -1,5 +1,5 @@
 import {
-  allConventionStatuses,
+  conventionStatuses,
   ConventionDto,
   ConventionDtoBuilder,
   ConventionId,
@@ -19,11 +19,11 @@ import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGenerato
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryFeatureFlagRepository } from "../../../adapters/secondary/InMemoryFeatureFlagRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { UpdateConvention } from "../../../domain/convention/useCases/UpdateConvention";
+import { UpdateConvention } from "./UpdateConvention";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
-} from "../../../domain/core/eventBus/EventBus";
+} from "../../core/eventBus/EventBus";
 
 describe("Update Convention", () => {
   let updateConvention: UpdateConvention;
@@ -218,7 +218,7 @@ describe("Update Convention", () => {
     });
 
     it("rejects applications if the status is not DRAFT or READY_TO_SIGN", async () => {
-      for (const status of allConventionStatuses) {
+      for (const status of conventionStatuses) {
         // eslint-disable-next-line jest/no-if
         if (status === "DRAFT" || status === "READY_TO_SIGN") {
           continue;

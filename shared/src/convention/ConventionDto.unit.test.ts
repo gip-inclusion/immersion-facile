@@ -4,7 +4,7 @@ import { splitCasesBetweenPassingAndFailing } from "../test.helpers";
 import {
   maximumCalendarDayByInternshipKind,
   ConventionStatus,
-  allConventionStatuses,
+  conventionStatuses,
   ConventionDto,
   BeneficiaryRepresentative,
   BeneficiaryCurrentEmployer,
@@ -240,7 +240,7 @@ describe("conventionDtoSchema", () => {
     describe("status that are available without signatures", () => {
       const [allowWithoutSignature, failingWithoutSignature] =
         splitCasesBetweenPassingAndFailing<ConventionStatus>(
-          allConventionStatuses,
+          conventionStatuses,
           [
             "DRAFT",
             "READY_TO_SIGN",

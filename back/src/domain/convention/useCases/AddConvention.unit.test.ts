@@ -1,5 +1,5 @@
 import {
-  allConventionStatuses,
+  conventionStatuses,
   ConventionDtoBuilder,
   expectPromiseToFailWithError,
 } from "shared";
@@ -111,7 +111,7 @@ describe("Add Convention", () => {
     });
 
     it("rejects applications if the status is not DRAFT or READY_TO_SIGN", async () => {
-      for (const status of allConventionStatuses) {
+      for (const status of conventionStatuses) {
         // eslint-disable-next-line jest/no-if
         if (status === "DRAFT" || status === "READY_TO_SIGN") {
           continue;

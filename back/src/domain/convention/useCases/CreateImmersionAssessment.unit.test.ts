@@ -1,5 +1,5 @@
 import {
-  allConventionStatuses,
+  conventionStatuses,
   ConventionDtoBuilder,
   ConventionMagicLinkPayload,
   ConventionStatus,
@@ -122,10 +122,9 @@ describe("CreateImmersionAssessment", () => {
   });
 
   const [passingStatuses, failingStatuses] =
-    splitCasesBetweenPassingAndFailing<ConventionStatus>(
-      allConventionStatuses,
-      ["ACCEPTED_BY_VALIDATOR"],
-    );
+    splitCasesBetweenPassingAndFailing<ConventionStatus>(conventionStatuses, [
+      "ACCEPTED_BY_VALIDATOR",
+    ]);
 
   it.each(failingStatuses.map((status) => ({ status })))(
     "throws bad request if the Convention status is $status",

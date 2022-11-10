@@ -48,10 +48,11 @@ export class UpdateConventionStatus extends TransactionalUseCase<
   inputSchema = updateConventionStatusRequestSchema;
 
   public async _execute(
-    { status, justification }: UpdateConventionStatusRequestDto,
+    params: UpdateConventionStatusRequestDto,
     uow: UnitOfWork,
     { applicationId, role }: ConventionMagicLinkPayload,
   ): Promise<WithConventionId> {
+    const { status } = params;
     logger.debug({ status, applicationId, role });
 
     const getStoredConventionOrThrowIfNotAllowed =
@@ -72,7 +73,9 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     } = storedDto.signatories;
     const updatedDto: ConventionDto = {
       ...storedDto,
-      ...(status === "REJECTED" && { rejectionJustification: justification }),
+      ...(params.status === "REJECTED" && {
+        rejectionJustification: params.justification,
+      }),
       ...(status === "DRAFT" && {
         signatories: {
           ...mapObjIndexed(
@@ -109,7 +112,13 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     if (!domainTopic) return { id: updatedId };
 
     const event: DomainEvent = {
-      ...this.createEvent(updatedDto, domainTopic, justification),
+      ...this.createEvent(
+        updatedDto,
+        domainTopic,
+        params.status === "REJECTED" || params.status === "DRAFT"
+          ? params.justification
+          : undefined,
+      ),
       occurredAt: conventionUpdatedAt,
     };
     await uow.outboxRepository.save(event);
@@ -126,7 +135,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
         topic: domainTopic,
         payload: {
           convention: updatedDto,
-          reason: justification ?? "",
+          justification: justification ?? "",
           roles: ["beneficiary", "establishment"],
         },
       });

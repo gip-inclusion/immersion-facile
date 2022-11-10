@@ -17,7 +17,7 @@ import { EmailGateway } from "../../ports/EmailGateway";
 export type ConventionRequiresModificationPayload = z.infer<typeof conventionRequiresModificationSchema>
 const conventionRequiresModificationSchema = z.object({
   convention: conventionSchema,
-  reason: zTrimmedString,
+  justification: zTrimmedString,
   roles: z.array(z.enum(allRoles)),
 });
 
@@ -40,7 +40,7 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
   inputSchema = conventionRequiresModificationSchema;
 
   public async _execute(
-    { convention, reason, roles }: ConventionRequiresModificationPayload,
+    { convention, justification, roles }: ConventionRequiresModificationPayload,
     uow: UnitOfWork,
   ): Promise<void> {
     const agency = await uow.agencyRepository.getById(convention.agencyId);
@@ -74,7 +74,7 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
           beneficiaryFirstName: beneficiary.firstName,
           beneficiaryLastName: beneficiary.lastName,
           businessName: convention.businessName,
-          reason,
+          reason: justification,
           signature: agency.signature,
           agency: agency.name,
           immersionAppellation: convention.immersionAppellation,

@@ -18,7 +18,7 @@ import {
 } from "../zodUtils";
 import { getConventionFieldName } from "./convention";
 import {
-  allConventionStatuses,
+  conventionStatuses,
   Beneficiary,
   BeneficiaryCurrentEmployer,
   BeneficiaryRepresentative,
@@ -31,13 +31,13 @@ import {
   EstablishmentRepresentative,
   EstablishmentTutor,
   GenerateMagicLinkRequestDto,
-  GenerateMagicLinkResponseDto,
-  ListConventionsRequestDto,
   RenewMagicLinkRequestDto,
   Signatories,
   UpdateConventionRequestDto,
   UpdateConventionStatusRequestDto,
   WithConventionId,
+  conventionStatusesWithJustification,
+  conventionStatusesWithoutJustification,
 } from "./convention.dto";
 import {
   getConventionTooLongMessageAndPath,
@@ -109,7 +109,7 @@ const beneficiaryCurrentEmployerSchema: z.Schema<BeneficiaryCurrentEmployer> =
 const conventionWithoutExternalIdZObject = z.object({
   id: conventionIdSchema,
   externalId: externalConventionIdSchema.optional(),
-  status: z.enum(allConventionStatuses),
+  status: z.enum(conventionStatuses),
   rejectionJustification: z.string().optional(),
   postalCode: z
     .string()
@@ -228,28 +228,25 @@ export const updateConventionRequestSchema: z.Schema<UpdateConventionRequestDto>
       "The ID in the URL path must match the ID in the request body.",
     );
 
-export const listConventionsRequestSchema: z.Schema<ListConventionsRequestDto> =
-  z.object({
-    agencyId: agencyIdSchema.optional(),
-    status: z.enum(allConventionStatuses).optional(),
-  });
+export const justificationSchema = zTrimmedString;
 
 export const updateConventionStatusRequestSchema: z.Schema<UpdateConventionStatusRequestDto> =
-  z.object({
-    status: z.enum(allConventionStatuses),
-    justification: z.string().optional(),
-  });
+  z
+    .object({
+      status: z.enum(conventionStatusesWithoutJustification),
+    })
+    .or(
+      z.object({
+        status: z.enum(conventionStatusesWithJustification),
+        justification: justificationSchema,
+      }),
+    );
 
 export const generateMagicLinkRequestSchema: z.Schema<GenerateMagicLinkRequestDto> =
   z.object({
     applicationId: conventionIdSchema,
     role: z.enum(allRoles),
     expired: z.boolean(), //< defaults to false
-  });
-
-export const generateMagicLinkResponseSchema: z.Schema<GenerateMagicLinkResponseDto> =
-  z.object({
-    jwt: z.string(),
   });
 
 export const renewMagicLinkRequestSchema: z.Schema<RenewMagicLinkRequestDto> =

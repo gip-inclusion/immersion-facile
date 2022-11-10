@@ -1,5 +1,5 @@
 import {
-  allConventionStatuses,
+  conventionStatuses,
   allRoles,
   ConventionDto,
   ConventionDtoBuilder,
@@ -9,6 +9,9 @@ import {
   Role,
   expectPromiseToFailWithError,
   splitCasesBetweenPassingAndFailing,
+  UpdateConventionStatusRequestDto,
+  expectToEqual,
+  doesStatusNeedsJustification,
 } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
@@ -88,8 +91,7 @@ type ExecuteUseCaseParams = {
   conventionId: ConventionId;
   role: Role;
   email: string;
-  targetStatus: ConventionStatus;
-  justification?: string;
+  updateStatusParams: UpdateConventionStatusRequestDto;
   updateConventionStatus: UpdateConventionStatus;
   conventionRepository: InMemoryConventionRepository;
 };
@@ -98,13 +100,12 @@ export const executeUpdateConventionStatusUseCase = async ({
   conventionId,
   role,
   email,
-  targetStatus,
-  justification,
+  updateStatusParams,
   updateConventionStatus,
   conventionRepository,
 }: ExecuteUseCaseParams): Promise<ConventionDto> => {
   const response = await updateConventionStatus.execute(
-    { status: targetStatus, justification },
+    updateStatusParams,
     createConventionMagicLinkPayload(conventionId, role, email),
   );
   expect(response.id).toEqual(conventionId);
@@ -137,19 +138,17 @@ export type UpdatedFields = Partial<
 >;
 
 type TestAcceptExpectation = {
-  targetStatus: ConventionStatus;
+  updateStatusParams: UpdateConventionStatusRequestDto;
   expectedDomainTopic: ConventionDomainTopic;
   updatedFields?: UpdatedFields;
-  justification?: string;
   nextDate?: Date;
 };
 
 const makeTestAcceptsStatusUpdate =
   ({
-    targetStatus,
+    updateStatusParams,
     expectedDomainTopic,
     updatedFields = {},
-    justification,
     nextDate,
   }: TestAcceptExpectation) =>
   async ({ role, initialStatus }: TestAcceptNewStatusParams) => {
@@ -169,8 +168,7 @@ const makeTestAcceptsStatusUpdate =
       conventionId: originalConvention.id,
       role,
       email: "test@test.fr",
-      targetStatus,
-      justification,
+      updateStatusParams,
       updateConventionStatus,
       conventionRepository,
     });
@@ -190,7 +188,10 @@ const makeTestAcceptsStatusUpdate =
 
     const expectedConvention: ConventionDto = {
       ...originalConvention,
-      status: targetStatus,
+      status: updateStatusParams.status,
+      ...(updateStatusParams.status === "REJECTED"
+        ? { rejectionJustification: updateStatusParams.justification }
+        : {}),
       ...restOfUpdatedFields,
       ...(hasSignedProperty
         ? {
@@ -207,12 +208,17 @@ const makeTestAcceptsStatusUpdate =
           }
         : {}),
     };
-    expect(storedConvention).toEqual(expectedConvention);
+
+    expectToEqual(storedConvention, expectedConvention);
 
     if (expectedDomainTopic === "ImmersionApplicationRequiresModification") {
       const payload: ConventionRequiresModificationPayload = {
         convention: expectedConvention,
-        reason: justification ?? "was not provided",
+        justification:
+          updateStatusParams.status === "REJECTED" ||
+          updateStatusParams.status === "DRAFT"
+            ? updateStatusParams.justification
+            : "was not provided",
         roles: ["beneficiary", "establishment"],
       };
 
@@ -261,7 +267,9 @@ const makeTestRejectsStatusUpdate =
       executeUpdateConventionStatusUseCase({
         conventionId: originalConvention.id,
         role,
-        targetStatus,
+        updateStatusParams: doesStatusNeedsJustification(targetStatus)
+          ? { status: targetStatus, justification: "fake justification" }
+          : { status: targetStatus },
         email: "test@test.fr",
         updateConventionStatus,
         conventionRepository,
@@ -271,10 +279,9 @@ const makeTestRejectsStatusUpdate =
   };
 
 interface TestAllCaseProps {
-  targetStatus: ConventionStatus;
+  updateStatusParams: UpdateConventionStatusRequestDto;
   expectedDomainTopic: ConventionDomainTopic;
   updatedFields?: UpdatedFields;
-  justification?: string;
   allowedRoles: Role[];
   allowedInitialStatuses: ConventionStatus[];
   nextDate?: Date;
@@ -283,19 +290,17 @@ interface TestAllCaseProps {
 export const testForAllRolesAndInitialStatusCases = ({
   allowedRoles,
   expectedDomainTopic,
-
   updatedFields = {},
-  justification,
   allowedInitialStatuses,
-  targetStatus,
   nextDate,
+  updateStatusParams,
 }: TestAllCaseProps) => {
   const [allowToRejectRoles, notAllowedToRejectRoles] =
     splitCasesBetweenPassingAndFailing<Role>(allRoles, allowedRoles);
 
   const [authorizedInitialStatuses, forbiddenInitalStatuses] =
     splitCasesBetweenPassingAndFailing<ConventionStatus>(
-      allConventionStatuses,
+      conventionStatuses,
       allowedInitialStatuses,
     );
 
@@ -303,15 +308,14 @@ export const testForAllRolesAndInitialStatusCases = ({
   const someValidRole = allowToRejectRoles[0];
 
   const testAcceptsStatusUpdate = makeTestAcceptsStatusUpdate({
-    targetStatus,
+    updateStatusParams,
     expectedDomainTopic,
     updatedFields,
-    justification,
     nextDate,
   });
 
   const testRejectsStatusUpdate = makeTestRejectsStatusUpdate({
-    targetStatus,
+    targetStatus: updateStatusParams.status,
   });
 
   it.each(allowedRoles.map((role) => ({ role })))(
@@ -340,7 +344,7 @@ export const testForAllRolesAndInitialStatusCases = ({
           role,
           initialStatus: someValidInitialStatus,
           expectedError: new ForbiddenError(
-            `${role} is not allowed to go to status ${targetStatus}`,
+            `${role} is not allowed to go to status ${updateStatusParams.status}`,
           ),
         }),
     );
@@ -353,7 +357,7 @@ export const testForAllRolesAndInitialStatusCases = ({
         role: someValidRole,
         initialStatus: status,
         expectedError: new BadRequestError(
-          `Cannot go from status '${status}' to '${targetStatus}'`,
+          `Cannot go from status '${status}' to '${updateStatusParams.status}'`,
         ),
       }),
   );

@@ -12,9 +12,11 @@ import {
 describe("UpdateConventionStatus", () => {
   describe("* -> DRAFT transition", () => {
     testForAllRolesAndInitialStatusCases({
-      targetStatus: "DRAFT",
+      updateStatusParams: {
+        status: "DRAFT",
+        justification: "test justification",
+      },
       expectedDomainTopic: "ImmersionApplicationRequiresModification",
-      justification: "test justification",
       updatedFields: {
         establishmentRepresentativeSignedAt: undefined,
         beneficiarySignedAt: undefined,
@@ -41,7 +43,9 @@ describe("UpdateConventionStatus", () => {
 
   describe("* -> READY_TO_SIGN transition", () => {
     testForAllRolesAndInitialStatusCases({
-      targetStatus: "READY_TO_SIGN",
+      updateStatusParams: {
+        status: "READY_TO_SIGN",
+      },
       expectedDomainTopic: null,
       allowedRoles: [
         "beneficiary",
@@ -57,7 +61,9 @@ describe("UpdateConventionStatus", () => {
 
   describe("* -> PARTIALLY_SIGNED transition", () => {
     testForAllRolesAndInitialStatusCases({
-      targetStatus: "PARTIALLY_SIGNED",
+      updateStatusParams: {
+        status: "PARTIALLY_SIGNED",
+      },
       expectedDomainTopic: "ImmersionApplicationPartiallySigned",
       allowedRoles: [
         "beneficiary",
@@ -73,7 +79,9 @@ describe("UpdateConventionStatus", () => {
 
   describe("* -> IN_REVIEW transition", () => {
     testForAllRolesAndInitialStatusCases({
-      targetStatus: "IN_REVIEW",
+      updateStatusParams: {
+        status: "IN_REVIEW",
+      },
       expectedDomainTopic: "ImmersionApplicationFullySigned",
       allowedRoles: [
         "beneficiary",
@@ -89,7 +97,9 @@ describe("UpdateConventionStatus", () => {
 
   describe("* -> ACCEPTED_BY_COUNSELLOR transition", () => {
     testForAllRolesAndInitialStatusCases({
-      targetStatus: "ACCEPTED_BY_COUNSELLOR",
+      updateStatusParams: {
+        status: "ACCEPTED_BY_COUNSELLOR",
+      },
       expectedDomainTopic: "ImmersionApplicationAcceptedByCounsellor",
       allowedRoles: ["counsellor"],
       allowedInitialStatuses: ["IN_REVIEW"],
@@ -99,7 +109,9 @@ describe("UpdateConventionStatus", () => {
   describe("* -> ACCEPTED_BY_VALIDATOR transition", () => {
     const validationDate = new Date("2022-01-01T12:00:00.000");
     testForAllRolesAndInitialStatusCases({
-      targetStatus: "ACCEPTED_BY_VALIDATOR",
+      updateStatusParams: {
+        status: "ACCEPTED_BY_VALIDATOR",
+      },
       expectedDomainTopic: "ImmersionApplicationAcceptedByValidator",
       allowedRoles: ["validator"],
       allowedInitialStatuses: ["IN_REVIEW", "ACCEPTED_BY_COUNSELLOR"],
@@ -110,9 +122,11 @@ describe("UpdateConventionStatus", () => {
 
   describe("* -> REJECTED transition", () => {
     testForAllRolesAndInitialStatusCases({
-      targetStatus: "REJECTED",
+      updateStatusParams: {
+        status: "REJECTED",
+        justification: "my rejection justification",
+      },
       expectedDomainTopic: "ImmersionApplicationRejected",
-      justification: "my rejection justification",
       updatedFields: { rejectionJustification: "my rejection justification" },
       allowedRoles: ["admin", "validator", "counsellor"],
       allowedInitialStatuses: [
@@ -126,7 +140,9 @@ describe("UpdateConventionStatus", () => {
 
   describe("* -> CANCELLED transition", () => {
     testForAllRolesAndInitialStatusCases({
-      targetStatus: "CANCELLED",
+      updateStatusParams: {
+        status: "CANCELLED",
+      },
       expectedDomainTopic: "ImmersionApplicationCancelled",
       allowedRoles: ["counsellor", "validator", "admin"],
       allowedInitialStatuses: [
@@ -148,7 +164,7 @@ describe("UpdateConventionStatus", () => {
         conventionId: "unknown_application_id",
         role: "validator",
         email: "test@test.fr",
-        targetStatus: "ACCEPTED_BY_VALIDATOR",
+        updateStatusParams: { status: "ACCEPTED_BY_VALIDATOR" },
         updateConventionStatus,
         conventionRepository,
       }),

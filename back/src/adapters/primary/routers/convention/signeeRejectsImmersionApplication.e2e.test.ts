@@ -91,12 +91,12 @@ const expectEstablishmentRequiresChanges = async (
   { request, gateways, eventCrawler, inMemoryUow }: TestAppAndDeps,
   establishmentJwt: string,
   immersionApplicationId: string,
-  { status, justification }: UpdateConventionStatusRequestDto,
+  params: UpdateConventionStatusRequestDto,
 ) => {
   await request
     .post(`/auth/${updateConventionStatusRoute}/${immersionApplicationId}`)
     .set("Authorization", establishmentJwt)
-    .send({ status, justification });
+    .send(params);
 
   await eventCrawler.processNewEvents();
 

@@ -6,16 +6,36 @@ import { SiretDto } from "../siret/siret";
 import { Role } from "../tokens/MagicLinkPayload";
 import { Flavor } from "../typeFlavors";
 
-export type ConventionStatus = typeof allConventionStatuses[number];
-export const allConventionStatuses = [
-  "DRAFT",
+export type ConventionStatus = typeof conventionStatuses[number];
+
+type ConventionStatusWithoutJustification =
+  typeof conventionStatusesWithoutJustification[number];
+
+export const conventionStatusesWithoutJustification = [
   "READY_TO_SIGN",
   "PARTIALLY_SIGNED",
   "IN_REVIEW",
   "ACCEPTED_BY_COUNSELLOR",
   "ACCEPTED_BY_VALIDATOR",
-  "REJECTED",
   "CANCELLED",
+] as const;
+
+export const doesStatusNeedsJustification = (
+  status: ConventionStatus,
+): status is ConventionStatusWithJustification =>
+  conventionStatusesWithJustification.includes(
+    status as ConventionStatusWithJustification,
+  );
+
+type ConventionStatusWithJustification =
+  typeof conventionStatusesWithJustification[number];
+export const conventionStatusesWithJustification = [
+  "REJECTED",
+  "DRAFT",
+] as const;
+export const conventionStatuses = [
+  ...conventionStatusesWithoutJustification,
+  ...conventionStatusesWithJustification,
 ] as const;
 
 export const maximumCalendarDayByInternshipKind: Record<
@@ -150,10 +170,12 @@ export type ListConventionsRequestDto = {
   status?: ConventionStatus;
 };
 
-export type UpdateConventionStatusRequestDto = {
-  status: ConventionStatus;
-  justification?: string;
-};
+export type UpdateConventionStatusRequestDto =
+  | { status: ConventionStatusWithoutJustification }
+  | { status: ConventionStatusWithJustification; justification: string };
+
+// prettier-ignore
+const _isAssignable = (isValid: UpdateConventionStatusRequestDto): { status: ConventionStatus } => isValid;
 
 export type GenerateMagicLinkRequestDto = {
   applicationId: ConventionId;
