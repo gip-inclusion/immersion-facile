@@ -7,18 +7,21 @@ import {
 import { routes } from "src/app/routing/routes";
 import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
 import type { UserType } from "../HomePage";
+import heroHeaderDefaultIllustration from "/src/assets/img/illustration-hero.webp";
 
 type HeroHeaderInfos = {
   displayName: string;
   title: string;
   subtitle: string;
   icon: string;
+  illustration: string;
 };
 
 export const heroHeaderContent: Record<UserType, HeroHeaderInfos> = {
   default: {
     title: "La meilleure façon de faire émerger de nouveaux talents",
     displayName: "default",
+    illustration: heroHeaderDefaultIllustration,
     icon: "",
     subtitle:
       "Avec Immersion Facilitée, trouvez un métier à tester, entrez en relation immédiatement avec une entreprise accueillante, remplissez une demande de convention et obtenez une réponse en temps record !",
@@ -26,6 +29,7 @@ export const heroHeaderContent: Record<UserType, HeroHeaderInfos> = {
   candidate: {
     title: "La meilleure façon de faire émerger de nouveaux talents",
     displayName: "Candidat",
+    illustration: heroHeaderDefaultIllustration,
     icon: "fr-icon-user-line",
     subtitle:
       "Avec Immersion Facilitée, trouvez un métier à tester, entrez en relation immédiatement avec une entreprise accueillante, remplissez une demande de convention et obtenez une réponse en temps record !",
@@ -33,6 +37,7 @@ export const heroHeaderContent: Record<UserType, HeroHeaderInfos> = {
   establishment: {
     title: "La meilleure façon de faire émerger de nouveaux talents",
     displayName: "Entreprise",
+    illustration: heroHeaderDefaultIllustration,
     icon: "fr-icon-building-line",
     subtitle:
       "Avec Immersion Facilitée, trouvez un métier à tester, entrez en relation immédiatement avec une entreprise accueillante, remplissez une demande de convention et obtenez une réponse en temps record !",
@@ -40,6 +45,7 @@ export const heroHeaderContent: Record<UserType, HeroHeaderInfos> = {
   agency: {
     title: "La meilleure façon de faire émerger de nouveaux talents",
     displayName: "Prescripteur",
+    illustration: heroHeaderDefaultIllustration,
     icon: "fr-icon-map-pin-user-line",
     subtitle:
       "Avec Immersion Facilitée, trouvez un métier à tester, entrez en relation immédiatement avec une entreprise accueillante, remplissez une demande de convention et obtenez une réponse en temps record !",

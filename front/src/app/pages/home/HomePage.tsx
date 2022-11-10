@@ -13,7 +13,6 @@ import {
 } from "react-design-system/immersionFacile";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { routes } from "src/app/routing/routes";
-import heroHeaderIllustration from "/src/assets/img/illustration-hero.webp";
 import logoLeMoisLesEntreprises from "/src/assets/img/logo-le-mois-les-entreprises.svg";
 import {
   heroHeaderContent,
@@ -76,7 +75,8 @@ export const HomePage = ({ type }: HomePageProps) => {
     storeDispatch,
     modalDispatch as Dispatch<AnyAction>,
   );
-  const { title, subtitle, displayName, icon } = heroHeaderContent[type];
+  const { title, subtitle, displayName, icon, illustration } =
+    heroHeaderContent[type];
   return (
     <div>
       <ImmersionMarianneHeader />
@@ -84,7 +84,7 @@ export const HomePage = ({ type }: HomePageProps) => {
         <HeroHeader
           title={title}
           description={subtitle}
-          illustration={heroHeaderIllustration}
+          illustration={illustration}
           type={type}
           typeDisplayName={displayName}
           icon={icon}
