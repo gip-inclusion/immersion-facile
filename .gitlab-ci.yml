@@ -204,7 +204,7 @@ notify-staging-deployed:
   before_script:
     - apk add --update curl && rm -rf /var/cache/apk/*
   script:
-    - curl --header "Content-Type:application/json" -d '{"username":"Gitlab deployer", "content":"La STAGING a été déployée https://immersion-staging.beta.pole-emploi.fr"}' $DISCORD_WEBHOOK_STAGING_DEPLOYED
+    - curl --header "Content-Type:application/json" -d '{"username":"Gitlab deployer", "content":"La STAGING a été déployée https://immersion-staging.beta.pole-emploi.fr. Est-ce que le CHANGELOG est à jour ? c'est là -> https://www.notion.so/gip-inclusion/CHANGELOG-3831ee7ed3ba48e6bd29aac47c0a7f78"}' $DISCORD_WEBHOOK_STAGING_DEPLOYED
 
 notify-prod-deployed:
   image: alpine:latest
@@ -216,4 +216,4 @@ notify-prod-deployed:
   before_script:
     - apk add --update curl && rm -rf /var/cache/apk/*
   script:
-    - curl --header "Content-Type:application/json" -d '{"username":"Gitlab deployer", "content":"La PRODUCTION a été déployée https://immersion-facile.beta.gouv.fr"}' $DISCORD_WEBHOOK_PROD_DEPLOYED
+    - curl --header "Content-Type:application/json" -d '{"username":"Gitlab deployer", "content":"La PRODUCTION a été déployée https://immersion-facile.beta.gouv.fr. Est-ce que le CHANGELOG est à jour ? c'est là -> https://www.notion.so/gip-inclusion/CHANGELOG-3831ee7ed3ba48e6bd29aac47c0a7f78"}' $DISCORD_WEBHOOK_PROD_DEPLOYED
