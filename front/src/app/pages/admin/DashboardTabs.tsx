@@ -5,6 +5,7 @@ import { useDashboard } from "src/app/pages/admin/useDashboard";
 
 export const ConventionTab = () => {
   const { url, error } = useDashboard({ name: "conventions" });
+
   return error ? (
     <Notification type="error" title="Erreur" children={error} />
   ) : (

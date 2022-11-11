@@ -14,6 +14,7 @@ import { useAppSelector } from "src/app/utils/reduxHooks";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { adminAuthSlice } from "src/core-logic/domain/admin/adminAuth/adminAuth.slice";
+import { ENV } from "src/environmentVariables";
 
 export const ImmersionMarianneHeader = () => {
   const featureFlags = useFeatureFlags();
@@ -73,12 +74,16 @@ export const ImmersionMarianneHeader = () => {
         currentRoute.name === routes.adminTab({ tab: "conventions" }).name,
       ...routes.adminTab({ tab: "conventions" }).link,
     },
-    {
-      label: "Emails",
-      display: isAdminConnected && featureFlags.enableAdminUi,
-      active: false,
-      ...routes.adminTab({ tab: "emails" }).link,
-    },
+    ...(ENV.envType !== "production"
+      ? [
+          {
+            label: "Emails",
+            display: isAdminConnected && featureFlags.enableAdminUi,
+            active: false,
+            ...routes.adminTab({ tab: "emails" }).link,
+          },
+        ]
+      : []),
   ];
 
   const linksFiltered = links.filter((link) => link.display);

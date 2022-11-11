@@ -10,7 +10,7 @@ import { FixedStamp, MainWrapper } from "react-design-system/immersionFacile";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { routes } from "src/app/routing/routes";
 import logoLeMoisLesEntreprises from "../../../assets/img/logo-le-mois-les-entreprises.svg";
-const { frontEnvType } = ENV;
+
 const DebugInfo = () => (
   <div
     style={{
@@ -70,7 +70,7 @@ export const HomePage = () => {
       </MainWrapper>
 
       <ImmersionFooter />
-      {frontEnvType === "DEV" && <DebugInfo />}
+      {["local", "dev"].includes(ENV.envType) && <DebugInfo />}
       {featureFlags.enableTemporaryOperation && (
         <FixedStamp
           image={

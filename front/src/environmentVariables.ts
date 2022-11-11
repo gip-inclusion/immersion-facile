@@ -1,23 +1,21 @@
-const originalEnvVariables = {
-  VITE_GATEWAY: import.meta.env.VITE_GATEWAY,
-  VITE_ENV_TYPE: import.meta.env.VITE_ENV_TYPE,
-  DEV: import.meta.env.DEV,
-  VITE_PREFILLED_FORMS: import.meta.env.VITE_PREFILLED_FORMS as
-    | undefined
-    | string,
-  VITE_CRISP_WEBSITE_ID: import.meta.env.VITE_CRISP_WEBSITE_ID as
-    | undefined
-    | string,
-};
+import { makeGetBooleanVariable, makeThrowIfNotInArray } from "shared";
+
+const throwIfNotInArray = makeThrowIfNotInArray(import.meta.env);
+const getBoolean = makeGetBooleanVariable(import.meta.env);
 
 export const ENV = {
-  dev: originalEnvVariables.DEV,
-  frontEnvType: String(originalEnvVariables.VITE_ENV_TYPE) || "PROD",
-  gateway:
-    originalEnvVariables.VITE_GATEWAY === "IN_MEMORY" ? "IN_MEMORY" : "HTTP",
-  PREFILLED_FORMS:
-    originalEnvVariables.VITE_PREFILLED_FORMS?.toLowerCase() === "true",
-  crispWebSiteId: originalEnvVariables.VITE_CRISP_WEBSITE_ID,
+  envType: throwIfNotInArray({
+    variableName: "VITE_ENV_TYPE",
+    authorizedValues: ["dev", "staging", "production", "local"],
+    defaultValue: "local",
+  }),
+  gateway: throwIfNotInArray({
+    variableName: "VITE_GATEWAY",
+    authorizedValues: ["IN_MEMORY", "HTTP"],
+    defaultValue: "HTTP",
+  }),
+  prefilledForms: getBoolean("VITE_PREFILLED_FORMS"),
+  crispWebSiteId: import.meta.env.VITE_CRISP_WEBSITE_ID,
 };
 
 Object.entries(ENV).forEach(([key, value]) =>

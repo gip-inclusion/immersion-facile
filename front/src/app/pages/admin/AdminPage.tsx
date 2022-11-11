@@ -4,11 +4,12 @@ import { ImmersionMarianneHeader } from "src/app/components/ImmersionMarianneHea
 import { AgencyTab } from "src/app/pages/admin/AgencyTab";
 import { ConventionTab, EventsTab } from "src/app/pages/admin/DashboardTabs";
 import { DataExportTab } from "src/app/pages/admin/DataExportTab";
-import { EmailsTab } from "src/app/pages/admin/EmailsTab";
 import { EmailPreviewTab } from "src/app/pages/admin/EmailPreviewTab";
+import { EmailsTab } from "src/app/pages/admin/EmailsTab";
 import { TechnicalOptions } from "src/app/pages/admin/TechnicalOptions";
 import { AdminTab } from "src/app/routing/route-params";
 import { routes } from "src/app/routing/routes";
+import { ENV } from "src/environmentVariables";
 import { Route } from "type-route";
 
 const getNavLinks = (currentTab: AdminTab): NavLink[] => [
@@ -37,11 +38,15 @@ const getNavLinks = (currentTab: AdminTab): NavLink[] => [
     active: currentTab === "technical-options",
     ...routes.adminTab({ tab: "technical-options" }).link,
   },
-  {
-    label: "Emails",
-    active: currentTab === "emails",
-    ...routes.adminTab({ tab: "emails" }).link,
-  },
+  ...(ENV.envType !== "production"
+    ? [
+        {
+          label: "Emails",
+          active: currentTab === "emails",
+          ...routes.adminTab({ tab: "emails" }).link,
+        },
+      ]
+    : []),
   {
     label: "Aperçu email",
     active: currentTab === "email-preview",
@@ -80,8 +85,8 @@ export const AdminPage = ({
               {currentTab === "agency-validation" && <AgencyTab />}
               {currentTab === "exports" && <DataExportTab />}
               {currentTab === "technical-options" && <TechnicalOptions />}
-              {currentTab === "emails" && <EmailsTab />}
               {currentTab === "email-preview" && <EmailPreviewTab />}
+              {currentTab === "emails" && <EmailsTab />}
             </div>
           </div>
         </div>

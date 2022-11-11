@@ -30,17 +30,9 @@ const AgencyDashboard = ({ agency }: { agency: AgencyDto }) => {
 
   if (!agency) return null;
 
-  return (
-    <>
-      <p style={{ fontWeight: "bold" }}>
-        Attention la vue metabase (ci-dessous) du dashboard d'agence n'est
-        disponible qu'en production (sinon c'est Erreur 400):
-      </p>
-      {error ? (
-        <Notification type="error" title="Erreur" children={error} />
-      ) : (
-        <MetabaseView title={agency.name} url={url} />
-      )}
-    </>
+  return error ? (
+    <Notification type="error" title="Erreur" children={error} />
+  ) : (
+    <MetabaseView title={agency.name} url={url} />
   );
 };

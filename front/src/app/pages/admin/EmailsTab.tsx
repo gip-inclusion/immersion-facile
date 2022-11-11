@@ -10,6 +10,7 @@ import { EmailSentDto, EmailVariables } from "shared";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { sentEmailsSlice } from "src/core-logic/domain/admin/sentEmails/sentEmails.slice";
+import { ENV } from "src/environmentVariables";
 import { TextCell } from "src/uiComponents/admin/TextCell";
 
 export const EmailsTab = () => {
@@ -19,6 +20,16 @@ export const EmailsTab = () => {
   }, []);
   const latestEmails = useAppSelector(adminSelectors.sentEmails.sentEmails);
   const errorMessage = useAppSelector(adminSelectors.sentEmails.error);
+
+  if (ENV.envType === "production")
+    return (
+      <div>
+        <DsfrTitle level={5} text="Derniers emails envoyés" />
+        <Notification title={"Non disponible en production"} type="warning">
+          La récupération des emails n'est pas disponible en production
+        </Notification>
+      </div>
+    );
 
   return (
     <div>

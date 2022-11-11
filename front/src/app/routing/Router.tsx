@@ -21,8 +21,6 @@ import { HomePage } from "../pages/home/HomePage";
 import { ImmersionAssessmentPage } from "../pages/immersionAssessment/ImmersionAssessmentPage";
 import { routes, useRoute } from "./routes";
 
-const { frontEnvType } = ENV;
-
 const NotAvailable = () => <div>Cette page n'est pas disponible.</div>;
 
 export const Router = () => {
@@ -75,7 +73,7 @@ export const Router = () => {
       )}
       {route.name === "search" && <SearchPage />}
       {route.name === "stats" && <StatsPage />}
-      {frontEnvType === "DEV" && route.name === "searchDebug" && (
+      {ENV.envType !== "production" && route.name === "searchDebug" && (
         <SearchDebugPage />
       )}
     </>

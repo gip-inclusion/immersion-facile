@@ -21,8 +21,6 @@ import { ConventionInUrl } from "src/app/routing/route-params";
 import { ENV } from "src/environmentVariables";
 import { v4 as uuidV4 } from "uuid";
 
-const { frontEnvType } = ENV;
-
 export const isConventionFrozen = (
   convention: Partial<ConventionDto>,
 ): boolean => !convention.status || convention.status !== "DRAFT";
@@ -182,7 +180,7 @@ export const conventionInitialValuesFromUrl = ({
     internshipKind,
   };
 
-  if (frontEnvType === "DEV" && ENV.PREFILLED_FORMS)
+  if (ENV.prefilledForms)
     return devPrefilledValues(initialFormWithStoredAndUrlParams);
 
   return initialFormWithStoredAndUrlParams;

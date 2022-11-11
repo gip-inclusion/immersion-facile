@@ -5,8 +5,8 @@ import {
   makeGetBooleanVariable,
   makeThrowIfNotAbsoluteUrl,
   makeThrowIfNotDefined,
+  makeThrowIfNotInArray,
   ProcessEnv,
-  throwIfNotInArray,
 } from "shared";
 import { DomainTopic } from "../../../domain/core/eventBus/events";
 import type { MinioParams } from "../../secondary/MinioDocumentGateway";
@@ -29,6 +29,7 @@ export type AxiosConfig = {
 // See "Working with AppConfig" in back/README.md for more details.
 
 export class AppConfig {
+  private readonly throwIfNotInArray;
   private readonly throwIfNotDefined;
   private readonly throwIfNotAbsoluteUrl;
   private readonly getBooleanVariable;
@@ -41,42 +42,39 @@ export class AppConfig {
     return new AppConfig(configParams);
   }
 
-  private constructor(private readonly env: ProcessEnv) {
+  private constructor(readonly env: ProcessEnv) {
+    this.throwIfNotInArray = makeThrowIfNotInArray(env);
     this.throwIfNotDefined = makeThrowIfNotDefined(env);
     this.throwIfNotAbsoluteUrl = makeThrowIfNotAbsoluteUrl(env);
     this.getBooleanVariable = makeGetBooleanVariable(env);
   }
 
   public get reporting() {
-    return throwIfNotInArray({
-      processEnv: this.env,
+    return this.throwIfNotInArray({
       variableName: "REPORTING_GATEWAY",
       authorizedValues: ["IN_MEMORY", "EXCEL"],
     });
   }
 
   public get nodeEnv() {
-    return throwIfNotInArray({
-      processEnv: this.env,
+    return this.throwIfNotInArray({
       variableName: "NODE_ENV",
       authorizedValues: ["test", "local", "production"],
     });
   }
 
   public get envType() {
-    return throwIfNotInArray({
-      processEnv: this.env,
+    return this.throwIfNotInArray({
       variableName: "ENV_TYPE",
-      authorizedValues: ["dev", "staging", "beta", "production", "none"],
-      defaultValue: "none",
+      authorizedValues: ["dev", "staging", "production", "local"],
+      defaultValue: "local",
     });
   }
 
   // == Data repositories ==
 
   public get repositories() {
-    return throwIfNotInArray({
-      processEnv: this.env,
+    return this.throwIfNotInArray({
       variableName: "REPOSITORIES",
       authorizedValues: ["IN_MEMORY", "PG"],
       defaultValue: "IN_MEMORY",
@@ -92,8 +90,7 @@ export class AppConfig {
   // == Sirene repository ==
 
   public get sireneGateway() {
-    return throwIfNotInArray({
-      processEnv: this.env,
+    return this.throwIfNotInArray({
       variableName: "SIRENE_REPOSITORY",
       authorizedValues: ["IN_MEMORY", "HTTPS"],
       defaultValue: "IN_MEMORY",
@@ -101,16 +98,14 @@ export class AppConfig {
   }
 
   public get laBonneBoiteGateway() {
-    return throwIfNotInArray({
-      processEnv: this.env,
+    return this.throwIfNotInArray({
       variableName: "LA_BONNE_BOITE_GATEWAY",
       authorizedValues: ["IN_MEMORY", "HTTPS"],
     });
   }
 
   public get passEmploiGateway() {
-    return throwIfNotInArray({
-      processEnv: this.env,
+    return this.throwIfNotInArray({
       variableName: "PASS_EMPLOI_GATEWAY",
       authorizedValues: ["IN_MEMORY", "HTTPS"],
     });
@@ -125,8 +120,7 @@ export class AppConfig {
   }
 
   public get poleEmploiGateway() {
-    return throwIfNotInArray({
-      processEnv: this.env,
+    return this.throwIfNotInArray({
       variableName: "POLE_EMPLOI_GATEWAY",
       authorizedValues: ["IN_MEMORY", "HTTPS"],
     });
@@ -145,8 +139,7 @@ export class AppConfig {
 
   // == Email gateway ==
   public get emailGateway() {
-    return throwIfNotInArray({
-      processEnv: this.env,
+    return this.throwIfNotInArray({
       variableName: "EMAIL_GATEWAY",
       authorizedValues: [
         "IN_MEMORY",
@@ -165,8 +158,7 @@ export class AppConfig {
 
   // == PE Connect gateway ==
   public get peConnectGateway() {
-    return throwIfNotInArray({
-      processEnv: this.env,
+    return this.throwIfNotInArray({
       variableName: "PE_CONNECT_GATEWAY",
       authorizedValues: ["IN_MEMORY", "HTTPS"],
       defaultValue: "IN_MEMORY",
@@ -177,8 +169,7 @@ export class AppConfig {
   // https://adresse.data.gouv.fr/
   // https://opencagedata.com/
   public get apiAddress() {
-    return throwIfNotInArray({
-      processEnv: this.env,
+    return this.throwIfNotInArray({
       variableName: "ADDRESS_API_GATEWAY",
       authorizedValues: ["IN_MEMORY", "ADRESSE_API", "OPEN_CAGE_DATA"],
     });
@@ -191,8 +182,7 @@ export class AppConfig {
   // == Rome gateway ==
 
   public get romeRepository() {
-    return throwIfNotInArray({
-      processEnv: this.env,
+    return this.throwIfNotInArray({
       variableName: "ROME_GATEWAY",
       authorizedValues: ["IN_MEMORY", "PG"],
       defaultValue: "IN_MEMORY",
@@ -232,8 +222,7 @@ export class AppConfig {
 
   // == Metabase
   public get dashboard() {
-    return throwIfNotInArray({
-      processEnv: this.env,
+    return this.throwIfNotInArray({
       variableName: "DASHBOARD_GATEWAY",
       authorizedValues: ["METABASE", "NONE"],
       defaultValue: "NONE",
@@ -334,8 +323,7 @@ export class AppConfig {
   }
 
   public get documentGateway() {
-    return throwIfNotInArray({
-      processEnv: this.env,
+    return this.throwIfNotInArray({
       authorizedValues: ["NONE", "MINIO", "S3"],
       variableName: "DOCUMENT_GATEWAY",
       defaultValue: "NONE",

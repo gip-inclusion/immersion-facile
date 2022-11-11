@@ -3,29 +3,29 @@ import { AbsoluteUrl, absoluteUrlSchema } from "./AbsoluteUrl";
 export type ProcessEnv = { [key: string]: string | undefined };
 
 type ThrowIfNotInArrayParams<T> = {
-  processEnv: ProcessEnv;
   authorizedValues: T[];
   variableName: string;
   defaultValue?: T;
 };
 
-export const throwIfNotInArray = <T extends string | undefined>({
-  processEnv,
-  authorizedValues,
-  variableName,
-  defaultValue,
-}: ThrowIfNotInArrayParams<T>): T => {
-  const envValue = processEnv[variableName]?.trim();
+export const makeThrowIfNotInArray =
+  (processEnv: ProcessEnv) =>
+  <T extends string | undefined>({
+    authorizedValues,
+    variableName,
+    defaultValue,
+  }: ThrowIfNotInArrayParams<T>): T => {
+    const envValue = processEnv[variableName]?.trim();
 
-  const value = (envValue || defaultValue) as T;
-  if (!authorizedValues.includes(value))
-    throw new Error(
-      `Expected ${variableName} to be one of : ` +
-        `${authorizedValues.join(" | ")}, ` +
-        `got : '${envValue}'`,
-    );
-  return value;
-};
+    const value = (envValue || defaultValue) as T;
+    if (!authorizedValues.includes(value))
+      throw new Error(
+        `Expected ${variableName} to be one of : ` +
+          `${authorizedValues.join(" | ")}, ` +
+          `got : '${envValue}'`,
+      );
+    return value;
+  };
 
 export const makeThrowIfNotDefined =
   (processEnv: ProcessEnv) => (variableName: string) => {

@@ -1,6 +1,7 @@
 import React from "react";
-import { DsfrTitle } from "react-design-system";
+import { DsfrTitle, Notification } from "react-design-system";
 import { AbsoluteUrl } from "shared";
+import { ENV } from "src/environmentVariables";
 
 const TitleButton = ({ url }: { url: AbsoluteUrl }) => (
   <a
@@ -28,7 +29,14 @@ export const MetabaseView = ({
         action={<TitleButton url={url} />}
         className={"flex"}
       />
-      <iframe src={url} frameBorder="0" width="100%" height="800"></iframe>
+      {ENV.envType === "production" ? (
+        <iframe src={url} frameBorder="0" width="100%" height="800"></iframe>
+      ) : (
+        <Notification title={"Non disponible hors production"} type="warning">
+          Cette fonctionnalité n'est disponible qu'en production (pas de
+          metabase en dehors de la production)
+        </Notification>
+      )}
     </div>
   );
 };
