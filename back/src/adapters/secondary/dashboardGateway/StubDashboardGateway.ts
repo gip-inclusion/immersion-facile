@@ -1,13 +1,13 @@
-import { AbsoluteUrl, DashboardName } from "shared";
+import { AbsoluteUrl, AgencyId, DashboardName } from "shared";
 import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
 import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);
 
-export class NotImplementedDashboardGateway implements DashboardGateway {
-  getAgencyUrl(): AbsoluteUrl {
+export class StubDashboardGateway implements DashboardGateway {
+  getAgencyUrl(id: AgencyId): AbsoluteUrl {
     logger.warn("Dashboard gateway not implemented, getAgencyUrl method");
-    return "http://notImplementedDashboard";
+    return `http://notImplementedAgencyDashboard/${id as string}`;
   }
 
   getDashboardUrl(dashboardName: DashboardName): AbsoluteUrl {

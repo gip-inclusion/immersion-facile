@@ -8,10 +8,10 @@ import {
 } from "../../../domain/auth/jwt";
 import { ExportData } from "../../../domain/backoffice/useCases/ExportData";
 import { SetFeatureFlag } from "../../../domain/backoffice/useCases/SetFeatureFlag";
-import { UpdateAgency } from "../../../domain/convention/useCases/agencies/UpdateAgency";
 import { AddConvention } from "../../../domain/convention/useCases/AddConvention";
 import { AddAgency } from "../../../domain/convention/useCases/agencies/AddAgency";
 import { PrivateListAgencies } from "../../../domain/convention/useCases/agencies/PrivateListAgencies";
+import { UpdateAgency } from "../../../domain/convention/useCases/agencies/UpdateAgency";
 import { UpdateAgencyStatus } from "../../../domain/convention/useCases/agencies/UpdateAgencyStatus";
 import { BroadcastToPoleEmploiOnConventionUpdates } from "../../../domain/convention/useCases/broadcast/BroadcastToPoleEmploiOnConventionUpdates";
 import { CreateImmersionAssessment } from "../../../domain/convention/useCases/CreateImmersionAssessment";
@@ -41,7 +41,6 @@ import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { UuidGenerator } from "../../../domain/core/ports/UuidGenerator";
 import { TransactionalUseCase, UseCase } from "../../../domain/core/UseCase";
 import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
-import { GetAgencyDashboard } from "../../../domain/dashboard/useCases/GetAgencyDashboard";
 import { GetDashboardUrl } from "../../../domain/dashboard/useCases/GetDashboardUrl";
 import { AdminLogin } from "../../../domain/generic/authentication/useCases/AdminLogin";
 import { UploadLogo } from "../../../domain/generic/fileManagement/useCases/UploadLogo";
@@ -319,7 +318,6 @@ export const createUseCases = (
 };
 
 const dashboardUseCases = (gateway: DashboardGateway) => ({
-  getAgencyDashboard: new GetAgencyDashboard(gateway),
   getDashboard: new GetDashboardUrl(gateway),
 });
 

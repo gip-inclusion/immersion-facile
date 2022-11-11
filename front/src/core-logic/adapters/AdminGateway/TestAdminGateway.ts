@@ -1,5 +1,5 @@
-import { Observable, of, Subject } from "rxjs";
-import { AbsoluteUrl, AdminToken, DashboardName } from "shared";
+import { Observable, Subject } from "rxjs";
+import { AbsoluteUrl, AdminToken } from "shared";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
 export class TestAdminGateway implements AdminGateway {
@@ -7,14 +7,7 @@ export class TestAdminGateway implements AdminGateway {
     return this.token$;
   }
 
-  public metabaseAgencyEmbed(_: AdminToken): Observable<AbsoluteUrl> {
-    return of(`http://plop`);
-  }
-
-  public getDashboardUrl$(
-    _dashboardName: DashboardName,
-    _token: AdminToken,
-  ): Observable<AbsoluteUrl> {
+  public getDashboardUrl$(): Observable<AbsoluteUrl> {
     return this.dashboardUrl$;
   }
 

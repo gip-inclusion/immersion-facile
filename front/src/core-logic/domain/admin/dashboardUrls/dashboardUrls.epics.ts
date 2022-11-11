@@ -22,7 +22,7 @@ const getConventionDashboardUrl: DashboardUrlsEpic = (
           action.payload,
           state$.value.admin.adminAuth.adminToken || "",
         )
-        .pipe(map((url) => ({ url, dashboardName: action.payload }))),
+        .pipe(map((url) => ({ url, dashboardName: action.payload.name }))),
     ),
     map(dashboardUrlsSlice.actions.dashboardUrlSucceeded),
     catchEpicError((error: Error) =>

@@ -1,27 +1,10 @@
-import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { DashboardName } from "shared";
+import React from "react";
 import { Notification } from "react-design-system";
 import { MetabaseView } from "src/app/components/MetabaseView";
-import { useAppSelector } from "src/app/utils/reduxHooks";
-import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
-import { dashboardUrlsSlice } from "src/core-logic/domain/admin/dashboardUrls/dashboardUrls.slice";
-
-const useDashboard = (dashboardName: DashboardName) => {
-  const dashboardState = useAppSelector(adminSelectors.dashboardUrls);
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(dashboardUrlsSlice.actions.dashboardUrlRequested(dashboardName));
-  }, []);
-
-  return {
-    url: dashboardState[dashboardName] ?? undefined,
-    errorMessage: dashboardState.errorMessage,
-  };
-};
+import { useDashboard } from "src/app/pages/admin/useDashboard";
 
 export const ConventionTab = () => {
-  const { url, errorMessage: error } = useDashboard("conventions");
+  const { url, error } = useDashboard({ name: "conventions" });
   return error ? (
     <Notification type="error" title="Erreur" children={error} />
   ) : (
@@ -30,7 +13,7 @@ export const ConventionTab = () => {
 };
 
 export const EventsTab = () => {
-  const { url, errorMessage: error } = useDashboard("events");
+  const { url, error } = useDashboard({ name: "events" });
   return error ? (
     <Notification type="error" title="Erreur" children={error} />
   ) : (

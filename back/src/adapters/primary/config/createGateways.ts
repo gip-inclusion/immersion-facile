@@ -25,7 +25,7 @@ import {
 import { InMemoryAddressGateway } from "../../secondary/addressGateway/InMemoryAddressGateway";
 import { CachingAccessTokenGateway } from "../../secondary/core/CachingAccessTokenGateway";
 import { MetabaseDashboardGateway } from "../../secondary/dashboardGateway/MetabaseDashboardGateway";
-import { NotImplementedDashboardGateway } from "../../secondary/dashboardGateway/NotImplementedDashboardGateway";
+import { StubDashboardGateway } from "../../secondary/dashboardGateway/StubDashboardGateway";
 import { HybridEmailGateway } from "../../secondary/emailGateway/HybridEmailGateway";
 import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmailGateway";
 import { SendinblueEmailGateway } from "../../secondary/emailGateway/SendinblueEmailGateway";
@@ -262,4 +262,4 @@ const createDashboardGateway = (config: AppConfig): DashboardGateway =>
         config.metabase.metabaseUrl,
         config.metabase.metabaseApiKey,
       )
-    : new NotImplementedDashboardGateway();
+    : new StubDashboardGateway();

@@ -19,7 +19,7 @@ export const MetabaseView = ({
   url?: AbsoluteUrl;
   title: string;
 }) => {
-  if (!url) return <p>Chargement...</p>;
+  if (!url) return <p>Chargement du dashboard en cours...</p>;
   return (
     <div>
       <DsfrTitle

@@ -6,7 +6,7 @@ import { InMemoryUnitOfWork } from "../adapters/primary/config/uowConfig";
 import { createApp } from "../adapters/primary/server";
 import { InMemoryAddressGateway } from "../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { BasicEventCrawler } from "../adapters/secondary/core/EventCrawlerImplementations";
-import { NotImplementedDashboardGateway } from "../adapters/secondary/dashboardGateway/NotImplementedDashboardGateway";
+import { StubDashboardGateway } from "../adapters/secondary/dashboardGateway/StubDashboardGateway";
 import type { InMemoryEmailGateway } from "../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryLaBonneBoiteAPI } from "../adapters/secondary/immersionOffer/laBonneBoite/InMemoryLaBonneBoiteAPI";
 import { InMemoryPassEmploiGateway } from "../adapters/secondary/immersionOffer/passEmploi/InMemoryPassEmploiGateway";
@@ -30,7 +30,7 @@ export type InMemoryGateways = {
   passEmploiGateway: InMemoryPassEmploiGateway;
   poleEmploiGateway: InMemoryPoleEmploiGateway;
   documentGateway: NotImplementedDocumentGateway;
-  dashboardGateway: NotImplementedDashboardGateway;
+  dashboardGateway: StubDashboardGateway;
   addressApi: InMemoryAddressGateway;
   exportGateway: InMemoryExportGateway;
 };

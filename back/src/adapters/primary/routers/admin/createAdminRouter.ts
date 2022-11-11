@@ -6,14 +6,15 @@ import {
   AgencyDto,
   AgencyId,
   conventionsRoute,
-  dashboardAgency,
   emailRoute,
   ExportDataDto,
   exportRoute,
   featureFlagsRoute,
   generateMagicLinkRoute,
+  GetDashboardParams,
 } from "shared";
 import type { AppDependencies } from "../../config/createAppDependencies";
+import { BadRequestError } from "../../helpers/httpErrors";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 import { sendZipResponse } from "../../helpers/sendZipResponse";
 
@@ -100,9 +101,20 @@ export const createAdminRouter = (
   adminRouter
     .route(removeRouterPrefix(adminTargets.getDashboardUrl.url))
     .get(async (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.getDashboard.execute(req.params.dashboardName as any),
-      ),
+      sendHttpResponse(req, res, () => {
+        if (req.params.dashboardName === "agency" && !req.query.agencyId)
+          throw new BadRequestError(
+            "You need to provide agency Id in query params : http://.../agency?agencyId=your-id",
+          );
+        const useCaseParams: GetDashboardParams = {
+          name: req.params.dashboardName as any,
+          ...((req.query.agencyId as string | undefined)
+            ? { agencyId: req.query.agencyId }
+            : {}),
+        };
+
+        return deps.useCases.getDashboard.execute(useCaseParams);
+      }),
     );
 
   // GET admin/emails
@@ -120,18 +132,6 @@ export const createAdminRouter = (
       );
       return archivePath;
     }),
-  );
-
-  // GET admin/metabase
-  adminRouter.route(`/${dashboardAgency}`).get(async (req, res) =>
-    sendHttpResponse(
-      req,
-      res,
-      () =>
-        deps.useCases.getAgencyDashboard.execute(
-          "046ce2ed-cc09-47c1-a446-1d1a0d7a6b4a",
-        ), //TODO On identifira l'agence via son token inclusion connect
-    ),
   );
 
   // POST admin/feature-flags

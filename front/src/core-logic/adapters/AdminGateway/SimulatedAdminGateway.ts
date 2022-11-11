@@ -2,7 +2,7 @@ import { Observable, of, throwError } from "rxjs";
 import {
   AbsoluteUrl,
   AdminToken,
-  DashboardName,
+  GetDashboardParams,
   UserAndPassword,
 } from "shared";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
@@ -17,15 +17,11 @@ export class SimulatedAdminGateway implements AdminGateway {
     return of("some-token");
   }
 
-  public metabaseAgencyEmbed(_: AdminToken): Observable<AbsoluteUrl> {
-    return of(`http://plop`);
-  }
-
   public getDashboardUrl$(
-    dashboardName: DashboardName,
+    { name }: GetDashboardParams,
     _token: AdminToken,
   ): Observable<AbsoluteUrl> {
-    const url: AbsoluteUrl = `http://${dashboardName}.com`;
+    const url: AbsoluteUrl = `http://${name}.com`;
     return of(url);
   }
 }

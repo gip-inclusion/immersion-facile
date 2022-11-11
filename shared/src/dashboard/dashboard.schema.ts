@@ -1,5 +1,12 @@
 import { z } from "zod";
-import { DashboardName, dashboardNames } from "./dashboard.dto";
+import { GetDashboardParams, simpleDashboardNames } from "./dashboard.dto";
 
-export const dashboardNameSchema: z.Schema<DashboardName> =
-  z.enum(dashboardNames);
+export const getDashboardParamsSchema: z.Schema<GetDashboardParams> = z.union([
+  z.object({
+    name: z.enum(simpleDashboardNames),
+  }),
+  z.object({
+    name: z.enum(["agency"]),
+    agencyId: z.string(),
+  }),
+]);

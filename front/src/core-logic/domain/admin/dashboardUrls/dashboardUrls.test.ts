@@ -1,6 +1,9 @@
-import { AbsoluteUrl, expectToEqual } from "shared";
+import { AbsoluteUrl, expectObjectsToMatch } from "shared";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
-import { dashboardUrlsSlice } from "src/core-logic/domain/admin/dashboardUrls/dashboardUrls.slice";
+import {
+  DashboardUrls,
+  dashboardUrlsSlice,
+} from "src/core-logic/domain/admin/dashboardUrls/dashboardUrls.slice";
 import {
   createTestStore,
   TestDependencies,
@@ -17,49 +20,60 @@ describe("dashboardUrls slice", () => {
 
   describe("get convention url for dashboardUrls", () => {
     it("should store AbsoluteUrl in convention when requesting conventions dashboard", () => {
-      const initialDashboards = adminSelectors.dashboardUrls(store.getState());
-      expectToEqual(initialDashboards.conventions, null);
+      expectUrlsToMatch({ conventions: null });
 
       store.dispatch(
-        dashboardUrlsSlice.actions.dashboardUrlRequested("conventions"),
+        dashboardUrlsSlice.actions.dashboardUrlRequested({
+          name: "conventions",
+        }),
       );
-
       const valueFromApi: AbsoluteUrl = "https://conventions.url";
       dependencies.adminGateway.dashboardUrl$.next(valueFromApi);
-      const result = adminSelectors.dashboardUrls(store.getState());
-      expectToEqual(result.conventions, valueFromApi);
-      expectToEqual(result.errorMessage, null);
+
+      expectUrlsToMatch({ conventions: valueFromApi });
+      expectDashboardError(null);
     });
 
     it("should store AbsoluteUrl in events when requesting events dashboard", () => {
-      const initialDashboards = adminSelectors.dashboardUrls(store.getState());
-      expectToEqual(initialDashboards.events, null);
-      initialDashboards.agency;
+      expectUrlsToMatch({ agency: null });
 
       store.dispatch(
-        dashboardUrlsSlice.actions.dashboardUrlRequested("events"),
+        dashboardUrlsSlice.actions.dashboardUrlRequested({
+          name: "agency",
+          agencyId: "my-agency-id",
+        }),
       );
-
-      const valueFromApi: AbsoluteUrl = "https://events.url";
+      const valueFromApi: AbsoluteUrl = "https://agency.url";
       dependencies.adminGateway.dashboardUrl$.next(valueFromApi);
-      const result = adminSelectors.dashboardUrls(store.getState());
-      expectToEqual(result.events, valueFromApi);
-      expectToEqual(result.errorMessage, null);
+
+      expectUrlsToMatch({ agency: valueFromApi });
+      expectDashboardError(null);
     });
 
     it("should fails on requesting conventions dashboard with error", () => {
-      const initialDashboards = adminSelectors.dashboardUrls(store.getState());
-      expectToEqual(initialDashboards.conventions, null);
+      expectUrlsToMatch({ conventions: null });
 
       store.dispatch(
-        dashboardUrlsSlice.actions.dashboardUrlRequested("conventions"),
+        dashboardUrlsSlice.actions.dashboardUrlRequested({
+          name: "conventions",
+        }),
       );
-
       const errorMessage = "It Fails";
       dependencies.adminGateway.dashboardUrl$.error(new Error(errorMessage));
-      const result = adminSelectors.dashboardUrls(store.getState());
-      expectToEqual(result.conventions, null);
-      expectToEqual(result.errorMessage, errorMessage);
+
+      expectUrlsToMatch({ conventions: null });
+      expectDashboardError(errorMessage);
     });
   });
+
+  const expectUrlsToMatch = (urls: Partial<DashboardUrls>) => {
+    expectObjectsToMatch(
+      adminSelectors.dashboardUrls.urls(store.getState()),
+      urls,
+    );
+  };
+
+  const expectDashboardError = (error: string | null) => {
+    expect(adminSelectors.dashboardUrls.error(store.getState())).toBe(error);
+  };
 });

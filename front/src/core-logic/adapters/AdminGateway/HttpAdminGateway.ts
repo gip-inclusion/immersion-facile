@@ -6,7 +6,7 @@ import {
   AdminTargets,
   AdminToken,
   adminTokenSchema,
-  DashboardName,
+  GetDashboardParams,
   UserAndPassword,
 } from "shared";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
@@ -22,24 +22,17 @@ export class HttpAdminGateway implements AdminGateway {
     );
   }
 
-  // TODO Do we want to create a specific adapter ?
-  public metabaseAgencyEmbed(token: AdminToken): Observable<AbsoluteUrl> {
-    return from(
-      this.httpClient
-        .metabaseAgency({ headers: { authorization: token } })
-        .then(({ responseBody }) => absoluteUrlSchema.parse(responseBody)),
-    );
-  }
-
-  // TODO Do we want to create a specific adapter ?
   public getDashboardUrl$(
-    dashboardName: DashboardName,
+    params: GetDashboardParams,
     token: AdminToken,
   ): Observable<AbsoluteUrl> {
     return from(
       this.httpClient
         .getDashboardUrl({
-          urlParams: { dashboardName },
+          urlParams: { dashboardName: params.name },
+          queryParams: {
+            ...(params.name === "agency" ? { agencyId: params.agencyId } : {}),
+          },
           headers: {
             authorization: token,
           },

@@ -56,6 +56,36 @@ describe("/admin router", () => {
       expect(response.body).toBe("http://notImplementedDashboard/events");
       expect(response.status).toBe(200);
     });
+
+    it("Gets the absolute Url of the agency dashboard", async () => {
+      const response = await request
+        .get(
+          `${adminTargets.getDashboardUrl.url.replace(
+            ":dashboardName",
+            "agency",
+          )}?agencyId=my-agency-id`,
+        )
+        .set("authorization", token);
+      expect(response.body).toBe(
+        "http://notImplementedAgencyDashboard/my-agency-id",
+      );
+      expect(response.status).toBe(200);
+    });
+    it("Fails to get the absolute Url of the agency dashboard when no agencyId is provided", async () => {
+      const response = await request
+        .get(
+          `${adminTargets.getDashboardUrl.url.replace(
+            ":dashboardName",
+            "agency",
+          )}`,
+        )
+        .set("authorization", token);
+      expect(response.body).toEqual({
+        errors:
+          "You need to provide agency Id in query params : http://.../agency?agencyId=your-id",
+      });
+      expect(response.status).toBe(400);
+    });
   });
 
   describe(`set feature flags route`, () => {

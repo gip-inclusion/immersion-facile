@@ -2,15 +2,14 @@ import { Observable } from "rxjs";
 import {
   AbsoluteUrl,
   AdminToken,
-  DashboardName,
+  GetDashboardParams,
   UserAndPassword,
 } from "shared";
 
 export interface AdminGateway {
   login: (params: UserAndPassword) => Observable<AdminToken>;
-  metabaseAgencyEmbed: (token: AdminToken) => Observable<AbsoluteUrl>;
   getDashboardUrl$: (
-    dashboardName: DashboardName,
+    params: GetDashboardParams,
     token: AdminToken,
   ) => Observable<AbsoluteUrl>;
 }
