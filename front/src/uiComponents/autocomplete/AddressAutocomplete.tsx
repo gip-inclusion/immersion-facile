@@ -37,7 +37,7 @@ export const AddressAutocomplete = ({
 
   useEffect(
     () =>
-      useEffectInitialSearchTerm(
+      effectInitialSearchTerm(
         initialSearchTerm,
         selectedOption,
         setOptions,
@@ -49,7 +49,7 @@ export const AddressAutocomplete = ({
 
   useEffect(
     () =>
-      useEffectDebounceSearchTerm(
+      effectDebounceSearchTerm(
         debounceSearchTerm,
         initialSearchTerm,
         selectedOption,
@@ -122,7 +122,7 @@ const onAutocompleteChange =
     );
   };
 
-const useEffectDebounceSearchTerm = (
+const effectDebounceSearchTerm = (
   debounceSearchTerm: string,
   initialSearchTerm: string,
   selectedOption: AddressAndPosition | null,
@@ -140,7 +140,7 @@ const useEffectDebounceSearchTerm = (
   getAddressesFromApi(debounceSearchTerm, setOptions, setIsSearching);
 };
 
-const useEffectInitialSearchTerm = (
+const effectInitialSearchTerm = (
   initialSearchTerm: string,
   selectedOption: AddressAndPosition | null,
   setOptions: React.Dispatch<React.SetStateAction<AddressAndPosition[]>>,

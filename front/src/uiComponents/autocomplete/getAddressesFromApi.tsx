@@ -8,7 +8,7 @@ export const getAddressesFromApi = async (
   setIsSearching: React.Dispatch<React.SetStateAction<boolean>>,
 ): Promise<AddressAndPosition[]> => {
   const sanitizedTerm = term.trim();
-  if (!sanitizedTerm) return [];
+  if (sanitizedTerm.length < 2) return [];
   try {
     setIsSearching(true);
 
