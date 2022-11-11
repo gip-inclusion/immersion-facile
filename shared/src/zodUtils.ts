@@ -12,9 +12,24 @@ export const zStringPossiblyEmpty = zString
   .optional()
   .or(z.literal("")) as z.Schema<string>;
 
+export const maxMessage = (max: number) =>
+  `Le maximum est de ${max} caractères`;
+
+export const zStringPossiblyEmptyWithMax = (max: number) =>
+  zString
+    .max(max, maxMessage(max))
+    .optional()
+    .or(z.literal("")) as z.Schema<string>;
+
 export const zTrimmedString = zString
   .transform((s) => s.trim())
   .refine((s) => s.length > 0, "Obligatoire");
+
+export const zTrimmedStringWithMax = (max: number) =>
+  zString
+    .max(max, maxMessage(max))
+    .transform((s) => s.trim())
+    .refine((s) => s.length > 0, "Obligatoire");
 
 export const zTimeString = z
   .string({

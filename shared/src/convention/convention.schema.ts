@@ -14,7 +14,9 @@ import {
   zEmail,
   zString,
   zStringPossiblyEmpty,
+  zStringPossiblyEmptyWithMax,
   zTrimmedString,
+  zTrimmedStringWithMax,
 } from "../zodUtils";
 import { getConventionFieldName } from "./convention";
 import {
@@ -48,6 +50,8 @@ import {
   underMaxCalendarDuration,
 } from "./conventionRefinements";
 
+const zTrimmedStringMax255 = zTrimmedStringWithMax(255);
+
 export const conventionIdSchema: z.ZodSchema<ConventionId> = zTrimmedString;
 export const externalConventionIdSchema: z.ZodSchema<ConventionExternalId> =
   zTrimmedString;
@@ -59,8 +63,8 @@ const signatorySchema = z.object({
   role: roleSchema,
   email: zEmail,
   phone: phoneSchema,
-  firstName: zTrimmedString,
-  lastName: zTrimmedString,
+  firstName: zTrimmedStringMax255,
+  lastName: zTrimmedStringMax255,
   signedAt: zString.regex(dateRegExp).optional(),
 });
 
@@ -103,7 +107,7 @@ const beneficiaryCurrentEmployerSchema: z.Schema<BeneficiaryCurrentEmployer> =
       role: z.enum(["beneficiary-current-employer"]),
       job: zStringPossiblyEmpty,
       businessSiret: siretSchema,
-      businessName: zTrimmedString,
+      businessName: zTrimmedStringMax255,
     }),
   );
 
@@ -130,12 +134,12 @@ const conventionWithoutExternalIdZObject = z.object({
   workConditions: z.string().optional(),
   individualProtection: zBoolean,
   sanitaryPrevention: zBoolean,
-  sanitaryPreventionDescription: zStringPossiblyEmpty,
+  sanitaryPreventionDescription: zStringPossiblyEmptyWithMax(255),
   immersionAddress: addressWithPostalCodeSchema,
   immersionObjective: z.enum(conventionObjectiveOptions),
   immersionAppellation: appellationDtoSchema,
-  immersionActivities: zTrimmedString,
-  immersionSkills: zStringPossiblyEmpty,
+  immersionActivities: zTrimmedStringWithMax(2000),
+  immersionSkills: zStringPossiblyEmptyWithMax(2000),
   internshipKind: z.enum(["immersion", "mini-stage-cci"]),
   signatories: z.object({
     beneficiary: beneficiarySchema,
