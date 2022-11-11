@@ -1,5 +1,6 @@
 import type { AxiosInstance } from "axios";
 import { generateHtmlFromTemplate, GenerateHtmlOptions } from "html-templates";
+import promClient from "prom-client";
 import { TemplatedEmail } from "shared";
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
 import { createLogger } from "../../../utils/logger";
@@ -70,11 +71,23 @@ export class SendinblueHtmlEmailGateway implements EmailGateway {
 
     if (emailData.to.length === 0) return;
 
+    const emailType = email.type;
+    counterSendTransactEmailTotal.inc({ emailType });
     logger.info({ emailData }, "Sending email");
 
-    const data = await this.sendTransacEmail(emailData);
-
-    logger.info(data, "Email sending succeeded");
+    return this.sendTransacEmail(emailData)
+      .then((data) => {
+        counterSendTransactEmailSuccess.inc({ emailType });
+        logger.info(data, "Email sending succeeded");
+      })
+      .catch((error) => {
+        counterSendTransactEmailError.inc({ emailType });
+        logger.error(
+          { errorMessage: error.message, errorBody: error?.response?.data },
+          "Email sending failed",
+        );
+        throw error;
+      });
   }
 
   public async sendTransacEmail(emailData: HtmlEmailData) {
@@ -91,3 +104,21 @@ export class SendinblueHtmlEmailGateway implements EmailGateway {
     );
   }
 }
+
+const counterSendTransactEmailTotal = new promClient.Counter({
+  name: "sendinblue_send_transac_email_total",
+  help: "The total count of sendTransacEmail requests, broken down by email type.",
+  labelNames: ["emailType"],
+});
+
+const counterSendTransactEmailSuccess = new promClient.Counter({
+  name: "sendinblue_send_transac_email_success",
+  help: "The success count of sendTransacEmail requests, broken down by email type.",
+  labelNames: ["emailType"],
+});
+
+const counterSendTransactEmailError = new promClient.Counter({
+  name: "sendinblue_send_transac_email_error",
+  help: "The error count of sendTransacEmail requests, broken down by email type.",
+  labelNames: ["emailType", "errorType"],
+});

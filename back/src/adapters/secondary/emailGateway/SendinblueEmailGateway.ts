@@ -1,5 +1,4 @@
 import type { AxiosInstance } from "axios";
-import promClient from "prom-client";
 import { keys } from "ramda";
 import {
   EmailSentDto,
@@ -47,7 +46,6 @@ export class SendinblueEmailGateway implements EmailGateway {
   }
 
   public async sendEmail(email: TemplatedEmail) {
-    const emailType = email.type;
     try {
       if (email.recipients.length === 0) {
         logger.error({ email }, "No recipient for provided email");
@@ -64,15 +62,12 @@ export class SendinblueEmailGateway implements EmailGateway {
 
       if (emailData.to.length === 0) return;
 
-      counterSendTransactEmailTotal.inc({ emailType });
       logger.info({ emailData }, "Sending email");
 
       const data = await this.sendTransacEmail(emailData);
 
-      counterSendTransactEmailSuccess.inc({ emailType });
       logger.info(data, "Email sending succeeded");
     } catch (error: any) {
-      counterSendTransactEmailError.inc({ emailType });
       logger.error(
         { errorMessage: error.message, errorBody: error?.response?.data },
         "Email sending failed",
@@ -104,24 +99,6 @@ const convertToSendInBlueParams = (params: TemplatedEmail["params"]) =>
     }),
     {},
   );
-
-const counterSendTransactEmailTotal = new promClient.Counter({
-  name: "sendinblue_send_transac_email_total",
-  help: "The total count of sendTransacEmail requests, broken down by email type.",
-  labelNames: ["emailType"],
-});
-
-const counterSendTransactEmailSuccess = new promClient.Counter({
-  name: "sendinblue_send_transac_email_success",
-  help: "The success count of sendTransacEmail requests, broken down by email type.",
-  labelNames: ["emailType"],
-});
-
-const counterSendTransactEmailError = new promClient.Counter({
-  name: "sendinblue_send_transac_email_error",
-  help: "The error count of sendTransacEmail requests, broken down by email type.",
-  labelNames: ["emailType", "errorType"],
-});
 
 const emailTypeToTemplateId: Record<EmailType, number> = {
   // https://my.sendinblue.com/camp/template/10/message-setup
