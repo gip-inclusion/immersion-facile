@@ -100,6 +100,7 @@ export type Signatories = {
 
 export type SignatoryRole =
   Required<Signatories>[keyof Required<Signatories>]["role"];
+
 export type Signatory = GenericSignatory<SignatoryRole>;
 
 export const signatoryRoles: SignatoryRole[] = [

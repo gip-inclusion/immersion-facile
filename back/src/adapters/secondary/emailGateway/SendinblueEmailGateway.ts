@@ -167,6 +167,9 @@ const emailTypeToTemplateId: Record<EmailType, number> = {
   // https://my.sendinblue.com/camp/template/59/message-setup
   NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE: 59,
 
+  // NOT IMPLEMENTED ON SIB
+  SIGNEE_HAS_SIGNED_CONVENTION: 99999999,
+
   FULL_PREVIEW_EMAIL: -1,
 };
 

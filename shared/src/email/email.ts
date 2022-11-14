@@ -44,7 +44,15 @@ export type TemplatedEmail =
   | EditFormEstablishmentLinkEmail
   | NewEstablishmentCreatedContactConfirmationEmail
   | CreatImmersionAssessmentEmail
-  | FullPreviewEmail;
+  | FullPreviewEmail
+  | SigneeHasSignedConvention;
+
+export type SigneeHasSignedConvention = GenericTemplatedEmail<
+  "SIGNEE_HAS_SIGNED_CONVENTION",
+  {
+    demandeId: string;
+  }
+>;
 
 type NewConventionBeneficiaryConfirmationEmail = GenericTemplatedEmail<
   "NEW_CONVENTION_BENEFICIARY_CONFIRMATION",

@@ -303,4 +303,7 @@ export const defaultEmailValueByEmailKind: {
     magicLink: "MAGIC_LINK",
     businessName: "BUSINESS_NAME",
   },
+  SIGNEE_HAS_SIGNED_CONVENTION: {
+    demandeId: "DEMANDE_ID",
+  },
 };

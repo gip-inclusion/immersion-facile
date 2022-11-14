@@ -139,7 +139,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
   };
 });
 
-const numberOfEmailInitialySent = 3;
+const numberOfEmailInitialySent = 4;
 
 const beneficiarySubmitsApplicationForTheFirstTime = async (
   { request, gateways, eventCrawler, inMemoryUow }: TestAppAndDeps,
@@ -165,7 +165,7 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   expect(peNotification.originalId).toBe(convention.id);
   expect(peNotification.email).toBe(convention.signatories.beneficiary.email);
   const sentEmails = gateways.email.getSentEmails();
-  expect(sentEmails).toHaveLength(numberOfEmailInitialySent);
+  expect(sentEmails).toHaveLength(numberOfEmailInitialySent - 1);
   expect(sentEmails.map((e) => e.recipients)).toEqual([
     [VALID_EMAILS[0]],
     [VALID_EMAILS[1]],

@@ -19,20 +19,18 @@ import { GenerateMagicLink } from "../../../domain/convention/useCases/GenerateM
 import { GetAgencyPublicInfoById } from "../../../domain/convention/useCases/GetAgencyPublicInfoById";
 import { GetConvention } from "../../../domain/convention/useCases/GetConvention";
 import { ListAgenciesByFilter } from "../../../domain/convention/useCases/ListAgenciesByFilter";
-
 import { ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/convention/useCases/notifications/ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature";
 import { DeliverRenewedMagicLink } from "../../../domain/convention/useCases/notifications/DeliverRenewedMagicLink";
 import { NotifyAllActorsOfFinalConventionValidation } from "../../../domain/convention/useCases/notifications/NotifyAllActorsOfFinalConventionValidation";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
+import { NotifyLastSigneeThatConventionHasBeenSigned } from "../../../domain/convention/useCases/notifications/NotifyLastSigneeThatConventionHasBeenSigned";
 import { NotifyNewApplicationNeedsReview } from "../../../domain/convention/useCases/notifications/NotifyNewApplicationNeedsReview";
 import { NotifyToAgencyApplicationSubmitted } from "../../../domain/convention/useCases/notifications/NotifyToAgencyApplicationSubmitted";
-
 import { RenewConventionMagicLink } from "../../../domain/convention/useCases/RenewConventionMagicLink";
 import { SendEmailWhenAgencyIsActivated } from "../../../domain/convention/useCases/SendEmailWhenAgencyIsActivated";
 import { ShareApplicationLinkByEmail } from "../../../domain/convention/useCases/ShareApplicationLinkByEmail";
 import { SignConvention } from "../../../domain/convention/useCases/SignConvention";
-
 import { UpdateConvention } from "../../../domain/convention/useCases/UpdateConvention";
 import { UpdateConventionStatus } from "../../../domain/convention/useCases/UpdateConventionStatus";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
@@ -235,6 +233,11 @@ export const createUseCases = (
         new ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature(
           gateways.email,
           generateMagicLinkFn,
+        ),
+      notifyLastSigneeThatConventionHasBeenSigned:
+        new NotifyLastSigneeThatConventionHasBeenSigned(
+          uowPerformer,
+          gateways.email,
         ),
       notifyAllActorsOfFinalConventionValidation:
         new NotifyAllActorsOfFinalConventionValidation(

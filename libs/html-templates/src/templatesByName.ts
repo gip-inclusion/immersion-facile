@@ -1,6 +1,6 @@
 import { EmailType, TemplatedEmail } from "shared";
-import { advices } from "./components/email/advices";
 import { defaultConventionFinalLegals } from "./components/email";
+import { advices } from "./components/email/advices";
 
 type CreateEmailVariable<P> = (params: P) => {
   subject: string;
@@ -706,5 +706,17 @@ export const templateByName: {
       highlight:
         "Attention, ne démarrez pas cette immersion tant que vous n'avez pas reçu cette validation !",
     }),
+  },
+  SIGNEE_HAS_SIGNED_CONVENTION: {
+    niceName: "Confirmation de signature de l'immersion",
+    createEmailVariables: ({ demandeId }) => ({
+      subject: `Confirmation de signature de l'immersion - ${demandeId}`,
+      greetings: `Bonjour,`,
+      content: `
+      Nous confirmons que vous avez signé la convention d'immersion professionnelle ${demandeId}
+      `,
+      subContent: defaultSignature,
+    }),
+    tags: undefined,
   },
 };

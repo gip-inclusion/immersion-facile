@@ -379,42 +379,30 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     });
   }
 
-  public signedByBeneficiary(signedAt: string) {
-    return new ConventionDtoBuilder({
-      ...this.dto,
-      signatories: {
-        ...this.dto.signatories,
-        beneficiary: { ...this.beneficiary, signedAt },
-      },
+  public signedByBeneficiary(signedAt: string | undefined) {
+    return this.withBeneficiary({
+      ...this.beneficiary,
+      signedAt,
     });
   }
 
-  signedByBeneficiaryRepresentative(signedAt: string) {
+  public signedByBeneficiaryRepresentative(signedAt: string | undefined) {
     const beneficiaryRepresentative =
       this.dto.signatories.beneficiaryRepresentative;
     if (beneficiaryRepresentative)
-      return new ConventionDtoBuilder({
-        ...this.dto,
-        signatories: {
-          ...this.dto.signatories,
-          beneficiaryRepresentative: { ...beneficiaryRepresentative, signedAt },
-        },
+      return this.withBeneficiaryRepresentative({
+        ...beneficiaryRepresentative,
+        signedAt,
       });
     throw new Error(
       "Can't sign convention as beneficiary representative beacause there is no beneficiary representative on convention.",
     );
   }
 
-  public signedByEstablishmentRepresentative(signedAt: string) {
-    return new ConventionDtoBuilder({
-      ...this.dto,
-      signatories: {
-        ...this.dto.signatories,
-        establishmentRepresentative: {
-          ...this.establishmentRepresentative,
-          signedAt,
-        },
-      },
+  public signedByEstablishmentRepresentative(signedAt: string | undefined) {
+    return this.withEstablishmentRepresentative({
+      ...this.establishmentRepresentative,
+      signedAt,
     });
   }
 

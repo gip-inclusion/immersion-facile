@@ -32,7 +32,7 @@ const getUseCasesByTopics = (
     useCases.broadcastToPoleEmploiOnConventionUpdates,
   ],
   ImmersionApplicationPartiallySigned: [
-    // confirmation de signature à envoyer à celui qui vient de signer (et c'est tout)
+    useCases.notifyLastSigneeThatConventionHasBeenSigned,
     useCases.broadcastToPoleEmploiOnConventionUpdates,
   ],
   ImmersionApplicationFullySigned: [
