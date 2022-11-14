@@ -63,6 +63,9 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
           validConvention.signatories.establishmentRepresentative.email,
         ],
       },
+      {
+        type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
+      },
     ]);
   });
 
@@ -136,7 +139,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
   };
 });
 
-const numberOfEmailInitialySent = 2;
+const numberOfEmailInitialySent = 3;
 
 const beneficiarySubmitsApplicationForTheFirstTime = async (
   { request, gateways, eventCrawler, inMemoryUow }: TestAppAndDeps,
@@ -166,6 +169,7 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   expect(sentEmails.map((e) => e.recipients)).toEqual([
     [VALID_EMAILS[0]],
     [VALID_EMAILS[1]],
+    [VALID_EMAILS[2]],
   ]);
 
   const beneficiarySignEmail = expectEmailOfType(

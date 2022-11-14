@@ -59,10 +59,11 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   await eventCrawler.processNewEvents();
 
   const sentEmails = gateways.email.getSentEmails();
-  expect(sentEmails).toHaveLength(2);
+  expect(sentEmails).toHaveLength(3);
   expect(sentEmails.map((e) => e.recipients)).toEqual([
     [createConventionParams.signatories.beneficiary.email],
     [createConventionParams.signatories.establishmentRepresentative.email],
+    ["validator@mail.com"],
   ]);
 
   const beneficiarySignEmail = expectEmailOfType(
@@ -102,8 +103,8 @@ const expectEstablishmentRequiresChanges = async (
 
   // Expect two emails sent (to beneficiary and to establishment tutor)
   const sentEmails = gateways.email.getSentEmails();
-  expect(sentEmails).toHaveLength(4);
-  expect(sentEmails.slice(2, 4).map((e) => e.recipients)).toEqual([
+  expect(sentEmails).toHaveLength(5);
+  expect(sentEmails.slice(3, 5).map((e) => e.recipients)).toEqual([
     ["beneficiary@email.fr"],
     ["establishment@example.com"],
   ]);
@@ -111,11 +112,11 @@ const expectEstablishmentRequiresChanges = async (
   expectStoreImmersionToHaveStatus(inMemoryUow.conventionRepository, "DRAFT");
 
   const beneficiaryEditEmail = expectEmailOfType(
-    sentEmails[2],
+    sentEmails[3],
     "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
   );
   const establishmentEditEmail = expectEmailOfType(
-    sentEmails[3],
+    sentEmails[4],
     "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
   );
 

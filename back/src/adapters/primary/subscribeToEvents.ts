@@ -21,7 +21,7 @@ const getUseCasesByTopics = (
 ): UseCaseSubscriptionsByTopics => ({
   // "Happy case" for immersion application.
   ImmersionApplicationSubmittedByBeneficiary: [
-    // useCases.notifyToAgencyConventionSubmitted,
+    useCases.notifyToAgencyConventionSubmitted,
     useCases.confirmToSignatoriesThatConventionCorrectlySubmittedRequestSignature,
     useCases.associatePeConnectFederatedIdentity,
     useCases.broadcastToPoleEmploiOnConventionUpdates,

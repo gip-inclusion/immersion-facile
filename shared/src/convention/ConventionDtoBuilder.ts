@@ -23,6 +23,7 @@ export const CONVENTION_EXTERNAL_ID = "00000000001";
 export const VALID_EMAILS = [
   "beneficiary@email.fr",
   "establishment@example.com",
+  "validator@mail.com",
 ];
 export const DATE_SUBMISSION = new Date("2021-01-04").toISOString();
 export const DATE_START = new Date("2021-01-06").toISOString();
