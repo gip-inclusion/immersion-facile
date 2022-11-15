@@ -731,6 +731,6 @@ export const templateByName: {
       `,
       subContent: defaultSignature,
     }),
-    tags: undefined,
+    tags: ["confirmation de signature de convention"],
   },
 };
