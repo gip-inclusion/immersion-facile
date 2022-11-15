@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "../buttons";
+import { ButtonsGroup } from "../buttons-group";
 import "./SectionFaq.scss";
 
 export type SectionFaqProps = {
@@ -22,14 +23,14 @@ export const SectionFaq = ({ articles }: SectionFaqProps) => (
           ))}
         </nav>
       )}
-      <div className={`${componentName}__buttons-container fr-mt-4w`}>
+      <ButtonsGroup className="fr-mt-4w fr-btns-group--center fr-btns-group--inline">
         <Button
           url="https://aide.immersion-facile.beta.gouv.fr/fr/"
           target="_blank"
         >
           Voir toutes les questions fréquentes
         </Button>
-      </div>
+      </ButtonsGroup>
     </div>
   </section>
 );

@@ -2,7 +2,7 @@ import { Form, Formik } from "formik";
 import React from "react";
 import {
   Button,
-  ButtonGroup,
+  ButtonsGroup,
   ModalClose,
   ModalContent,
   ModalDialog,
@@ -66,12 +66,12 @@ export const JustificationModal = ({
               label={inputLabelByStatus[newStatus]}
               name={name}
             />
-            <ButtonGroup className="fr-btns-group--inline-md fr-btns-group--center">
+            <ButtonsGroup className="fr-btns-group--inline-md fr-btns-group--center">
               <Button type="button" level={"secondary"} onSubmit={closeModal}>
                 Annuler
               </Button>
               <Button type="submit">Envoyer</Button>
-            </ButtonGroup>
+            </ButtonsGroup>
           </Form>
         </Formik>
       </ModalContent>

@@ -21,10 +21,10 @@ export const MainWrapper = ({
   const spacing = `${vSpacing ? `fr-py-${vSpacing}w` : ""} ${
     hSpacing ? `fr-px-${hSpacing}w` : ""
   }`;
-  const classNameValue =
-    layout === "fullscreen"
-      ? `im-main-wrapper ${className} ${spacing}`
-      : `im-main-wrapper fr-container fr-grid--center ${className} ${spacing}`;
+  let classNameValue = `im-main-wrapper ${className} ${spacing}`;
+  if (layout !== "fullscreen") {
+    classNameValue += "fr-container fr-grid--center";
+  }
   return (
     <main className={classNameValue} id="main-content">
       {layout === "boxed" && (

@@ -2,7 +2,7 @@ import classNames from "classnames";
 import React from "react";
 
 type ModalTitleProperties = {
-  children: JSX.Element | string;
+  children: React.ReactNode;
   className: string | object | [];
 };
 

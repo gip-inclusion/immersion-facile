@@ -21,7 +21,7 @@ export * from "./crisp-chat";
 export * from "./fixed-stamp";
 export * from "./over-footer";
 export * from "./pe-connect-button";
-export * from "./button-group";
+export * from "./buttons-group";
 export * from "./hero-header";
 export * from "./section-stats";
 export * from "./section-text-embed";

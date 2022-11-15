@@ -2,11 +2,11 @@ import React from "react";
 import "./SectionTextEmbed.scss";
 
 type SectionTextEmbedProps = {
-  videoUrl: string;
+  iframeUrl: string;
 };
 const componentName = "im-section-text-embed";
 
-export const SectionTextEmbed = ({ videoUrl }: SectionTextEmbedProps) => (
+export const SectionTextEmbed = ({ iframeUrl }: SectionTextEmbedProps) => (
   <section className={`fr-container ${componentName} fr-pt-8w fr-pb-10w`}>
     <div className={`${componentName}__header fr-mb-4w`}>
       <h3 className={`${componentName}__title`}>
@@ -43,7 +43,7 @@ export const SectionTextEmbed = ({ videoUrl }: SectionTextEmbedProps) => (
         </li>
       </ul>
       <div className={`${componentName}__embed-wrapper fr-col-12 fr-col-lg-5`}>
-        <iframe src={videoUrl} className={`${componentName}__embed`}></iframe>
+        <iframe src={iframeUrl} className={`${componentName}__embed`}></iframe>
       </div>
     </div>
   </section>

@@ -76,7 +76,7 @@ export const HomePage = ({ type }: HomePageProps) => {
           }
         />
         <SectionStats stats={sectionStatsData} />
-        <SectionTextEmbed videoUrl="https://www.powtoon.com/embed/c8x7n7AR2XE/" />
+        <SectionTextEmbed iframeUrl="https://www.powtoon.com/embed/c8x7n7AR2XE/" />
         <SectionFaq articles={sectionFaqData} />
       </MainWrapper>
 

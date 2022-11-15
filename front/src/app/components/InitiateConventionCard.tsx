@@ -4,7 +4,10 @@ import { ButtonHome } from "react-design-system";
 import { Section } from "src/app/components/Section";
 import { deviceRepository } from "src/app/config/dependencies";
 import { ConventionImmersionPageRoute } from "src/app/pages/Convention/ConventionImmersionPage";
-import { PeConnectButton } from "react-design-system/immersionFacile";
+import {
+  ButtonsGroup,
+  PeConnectButton,
+} from "react-design-system/immersionFacile";
 import { EstablishmentSubTitle } from "src/app/pages/home/components/EstablishmentSubTitle";
 import { useRoute } from "src/app/routing/routes";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
@@ -63,12 +66,14 @@ export const InitiateConventionCard = ({
         </>
       )}
       {/*TODO : change HomeButton to take 'candidate' and 'establishment' as type params ('error' is very confusing here...)*/}
-      <ButtonHome
-        type="candidate"
-        onClick={redirectToConventionWithoutIdentityProvider}
-      >
-        {showFormButtonLabel}
-      </ButtonHome>
+      <ButtonsGroup>
+        <ButtonHome
+          type="candidate"
+          onClick={redirectToConventionWithoutIdentityProvider}
+        >
+          {showFormButtonLabel}
+        </ButtonHome>
+      </ButtonsGroup>
     </div>
   );
   const section = (
