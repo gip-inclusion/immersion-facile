@@ -28,7 +28,6 @@ import { MetabaseDashboardGateway } from "../../secondary/dashboardGateway/Metab
 import { StubDashboardGateway } from "../../secondary/dashboardGateway/StubDashboardGateway";
 import { HybridEmailGateway } from "../../secondary/emailGateway/HybridEmailGateway";
 import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmailGateway";
-import { SendinblueEmailGateway } from "../../secondary/emailGateway/SendinblueEmailGateway";
 import { SendinblueHtmlEmailGateway } from "../../secondary/emailGateway/SendinblueHtmlEmailGateway";
 import { HttpLaBonneBoiteAPI } from "../../secondary/immersionOffer/laBonneBoite/HttpLaBonneBoiteAPI";
 import { InMemoryLaBonneBoiteAPI } from "../../secondary/immersionOffer/laBonneBoite/InMemoryLaBonneBoiteAPI";
@@ -189,16 +188,7 @@ const createEmailGateway = (config: AppConfig, clock: Clock): EmailGateway => {
       new InMemoryEmailGateway(clock, 15),
     );
 
-  const sendInBlueEmailGateway = new SendinblueEmailGateway(
-    axios,
-    makeEmailAllowListPredicate({
-      skipEmailAllowList: config.skipEmailAllowlist,
-      emailAllowList: config.emailAllowList,
-    }),
-    config.apiKeySendinblue,
-  );
-
-  if (config.emailGateway === "SENDINBLUE") return sendInBlueEmailGateway;
+  if (config.emailGateway === "SENDINBLUE") return sendinblueHtmlEmailGateway;
 
   return exhaustiveCheck(config.emailGateway, {
     variableName: "config.emailGateway",

@@ -5,7 +5,7 @@ import { SendEmailsWithAssessmentCreationLink } from "../../../domain/immersionO
 import { RealClock } from "../../secondary/core/ClockImplementations";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmailGateway";
-import { SendinblueEmailGateway } from "../../secondary/emailGateway/SendinblueEmailGateway";
+import { SendinblueHtmlEmailGateway } from "../../secondary/emailGateway/SendinblueHtmlEmailGateway";
 import { AppConfig, makeEmailAllowListPredicate } from "../config/appConfig";
 import { createGenerateConventionMagicLink } from "../config/createGenerateConventionMagicLink";
 import { createUowPerformer } from "../config/uowConfig";
@@ -21,13 +21,17 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
 
   const emailGateway =
     config.emailGateway === "SENDINBLUE"
-      ? new SendinblueEmailGateway(
+      ? new SendinblueHtmlEmailGateway(
           axios,
           makeEmailAllowListPredicate({
             skipEmailAllowList: config.skipEmailAllowlist,
             emailAllowList: config.emailAllowList,
           }),
           config.apiKeySendinblue,
+          {
+            name: "Immersion Facilitée",
+            email: "contact@immersion-facile.beta.gouv.fr",
+          },
         )
       : new InMemoryEmailGateway(clock);
 

@@ -709,11 +709,25 @@ export const templateByName: {
   },
   SIGNEE_HAS_SIGNED_CONVENTION: {
     niceName: "Confirmation de signature de l'immersion",
-    createEmailVariables: ({ demandeId }) => ({
+    createEmailVariables: ({ demandeId, signAt }) => ({
       subject: `Confirmation de signature de l'immersion - ${demandeId}`,
       greetings: `Bonjour,`,
       content: `
-      Nous confirmons que vous avez signé la convention d'immersion professionnelle ${demandeId}
+      Nous confirmons que vous avez signé la convention d'immersion professionnelle ${demandeId} le ${new Date(
+        signAt,
+      ).toLocaleDateString("fr", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })}.
+      `,
+      highlight: `
+      Attention. Votre convention est en cours d'examen.
+      Avant de débuter l'immersion, veuillez vous assurer que la convention a bien été validée par un conseiller.
+      Vous recevrez une notification lorsque ce sera fait.
       `,
       subContent: defaultSignature,
     }),

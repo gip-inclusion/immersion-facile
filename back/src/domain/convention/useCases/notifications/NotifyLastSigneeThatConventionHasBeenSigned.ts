@@ -53,7 +53,9 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
     throw new Error(noSignatoryMessage(repositoryConvention));
   }
 
-  private lastSigneeEmail(signatories: Signatory[]): string | undefined {
+  private lastSigneeEmail(
+    signatories: Signatory[],
+  ): { signAt: string; email: string } | undefined {
     const signatoryEmailsOrderedBySignedAt = signatories
       .filter(
         (
@@ -63,7 +65,10 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
         } => signatory.signedAt !== undefined,
       )
       .sort((a, b) => (a.signedAt < b.signedAt ? -1 : 0))
-      .map((signatory) => signatory.email);
+      .map((signatory) => ({
+        email: signatory.email,
+        signAt: signatory.signedAt,
+      }));
     return signatoryEmailsOrderedBySignedAt.at(
       signatoryEmailsOrderedBySignedAt.length - 1,
     );
@@ -72,11 +77,12 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
 
 const emailToSend = (
   convention: ConventionDto,
-  lastSigneeEmail: string,
+  lastSigneeEmail: { signAt: string; email: string },
 ): SigneeHasSignedConvention => ({
   type: "SIGNEE_HAS_SIGNED_CONVENTION",
   params: {
     demandeId: convention.id,
+    signAt: lastSigneeEmail.signAt,
   },
-  recipients: [lastSigneeEmail],
+  recipients: [lastSigneeEmail.email],
 });

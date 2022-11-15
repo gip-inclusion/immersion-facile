@@ -51,6 +51,7 @@ export type SigneeHasSignedConvention = GenericTemplatedEmail<
   "SIGNEE_HAS_SIGNED_CONVENTION",
   {
     demandeId: string;
+    signAt: string;
   }
 >;
 

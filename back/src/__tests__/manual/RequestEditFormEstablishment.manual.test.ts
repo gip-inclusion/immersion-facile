@@ -1,8 +1,11 @@
 import axios from "axios";
-import { AppConfig } from "../../adapters/primary/config/appConfig";
+import {
+  AppConfig,
+  makeEmailAllowListPredicate,
+} from "../../adapters/primary/config/appConfig";
 import { makeGenerateEditFormEstablishmentUrl } from "../../adapters/primary/config/makeGenerateEditFormEstablishmentUrl";
 import { RealClock } from "../../adapters/secondary/core/ClockImplementations";
-import { SendinblueEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueEmailGateway";
+import { SendinblueHtmlEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueHtmlEmailGateway";
 import { InMemoryUowPerformer } from "../../adapters/secondary/InMemoryUowPerformer";
 import { CreateNewEvent } from "../../domain/core/eventBus/EventBus";
 import { OutboxQueries } from "../../domain/core/ports/OutboxQueries";
@@ -49,10 +52,17 @@ describe("RequestEditFormEstablishment", () => {
     } as UnitOfWork;
 
     const uowPerformer = new InMemoryUowPerformer(unitOfWork);
-    const emailGateway = new SendinblueEmailGateway(
+    const emailGateway = new SendinblueHtmlEmailGateway(
       axios,
-      (_) => true,
+      makeEmailAllowListPredicate({
+        skipEmailAllowList: config.skipEmailAllowlist,
+        emailAllowList: config.emailAllowList,
+      }),
       config.apiKeySendinblue,
+      {
+        name: "Immersion Facilitée",
+        email: "contact@immersion-facile.beta.gouv.fr",
+      },
     );
     const generateEditFormEstablishmentUrl =
       makeGenerateEditFormEstablishmentUrl(config);

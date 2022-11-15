@@ -1,12 +1,15 @@
 import axios from "axios";
 import { AgencyDtoBuilder, ConventionDto, ConventionDtoBuilder } from "shared";
-import { AppConfig } from "../../adapters/primary/config/appConfig";
+import {
+  AppConfig,
+  makeEmailAllowListPredicate,
+} from "../../adapters/primary/config/appConfig";
 import {
   createGenerateConventionMagicLink,
   GenerateConventionMagicLink,
 } from "../../adapters/primary/config/createGenerateConventionMagicLink";
 import { createInMemoryUow } from "../../adapters/primary/config/uowConfig";
-import { SendinblueEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueEmailGateway";
+import { SendinblueHtmlEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueHtmlEmailGateway";
 import { InMemoryUowPerformer } from "../../adapters/secondary/InMemoryUowPerformer";
 import { NotifyNewApplicationNeedsReview } from "../../domain/convention/useCases/notifications/NotifyNewApplicationNeedsReview";
 
@@ -26,16 +29,23 @@ const validConvention: ConventionDto = new ConventionDtoBuilder()
   .build();
 
 describe("Notify To 2 Counsellors that an application is available", () => {
-  let emailGw: SendinblueEmailGateway;
+  let emailGw: SendinblueHtmlEmailGateway;
   let generateMagicLinkFn: GenerateConventionMagicLink;
   let agency;
 
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
-    emailGw = new SendinblueEmailGateway(
+    emailGw = new SendinblueHtmlEmailGateway(
       axios,
-      (_) => true,
+      makeEmailAllowListPredicate({
+        skipEmailAllowList: config.skipEmailAllowlist,
+        emailAllowList: config.emailAllowList,
+      }),
       config.apiKeySendinblue,
+      {
+        name: "Immersion Facilitée",
+        email: "contact@immersion-facile.beta.gouv.fr",
+      },
     );
     generateMagicLinkFn = createGenerateConventionMagicLink(config);
   });

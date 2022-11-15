@@ -6,16 +6,15 @@ import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { SuggestEditFormEstablishment } from "../../../domain/immersionOffer/useCases/SuggestEditFormEstablishment";
 import { createLogger } from "../../../utils/logger";
-
 import { notifyDiscord } from "../../../utils/notifyDiscord";
 import { RealClock } from "../../secondary/core/ClockImplementations";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmailGateway";
-import { SendinblueEmailGateway } from "../../secondary/emailGateway/SendinblueEmailGateway";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { AppConfig, makeEmailAllowListPredicate } from "../config/appConfig";
 import { makeGenerateEditFormEstablishmentUrl } from "../config/makeGenerateEditFormEstablishmentUrl";
 import { createPgUow } from "../config/uowConfig";
+import { SendinblueHtmlEmailGateway } from "../../secondary/emailGateway/SendinblueHtmlEmailGateway";
 
 const NB_MONTHS_BEFORE_SUGGEST = 6;
 
@@ -62,13 +61,17 @@ const triggerSuggestEditFormEstablishmentEvery6Months = async () => {
 
   const emailGateway =
     config.emailGateway === "SENDINBLUE"
-      ? new SendinblueEmailGateway(
+      ? new SendinblueHtmlEmailGateway(
           axios,
           makeEmailAllowListPredicate({
             skipEmailAllowList: config.skipEmailAllowlist,
             emailAllowList: config.emailAllowList,
           }),
           config.apiKeySendinblue,
+          {
+            name: "Immersion Facilitée",
+            email: "contact@immersion-facile.beta.gouv.fr",
+          },
         )
       : new InMemoryEmailGateway(clock);
 

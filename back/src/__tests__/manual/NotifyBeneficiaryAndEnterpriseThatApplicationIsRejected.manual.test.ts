@@ -2,7 +2,7 @@ import axios from "axios";
 import { AgencyDtoBuilder, ConventionDtoBuilder } from "shared";
 import { AppConfig } from "../../adapters/primary/config/appConfig";
 import { createInMemoryUow } from "../../adapters/primary/config/uowConfig";
-import { SendinblueEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueEmailGateway";
+import { SendinblueHtmlEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueHtmlEmailGateway";
 import { InMemoryUowPerformer } from "../../adapters/secondary/InMemoryUowPerformer";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
 
@@ -31,10 +31,14 @@ const counsellorEmail = "jean-francois.macresy@beta.gouv.fr";
 describe("NotifyApplicationRejectedToBeneficiaryAndEnterprise", () => {
   it("Sends rejection email", async () => {
     const config = AppConfig.createFromEnv();
-    const emailGw = new SendinblueEmailGateway(
+    const emailGw = new SendinblueHtmlEmailGateway(
       axios,
       (_) => true,
       config.apiKeySendinblue,
+      {
+        name: "Immersion Facilitée",
+        email: "contact@immersion-facile.beta.gouv.fr",
+      },
     );
     const uow = createInMemoryUow();
     uow.agencyRepository.setAgencies([
