@@ -7,7 +7,7 @@ export type OverFooterProps = {
 };
 
 export const OverFooter = ({ cols = [] }: OverFooterProps) => (
-  <section className="over-footer fr-pt-8w fr-pb-4w">
+  <aside id="over-footer" className="over-footer fr-pt-8w fr-pb-4w">
     <div className="fr-container">
       <div className="fr-grid-row fr-grid-row--gutters">
         {cols.length > -1 &&
@@ -16,5 +16,5 @@ export const OverFooter = ({ cols = [] }: OverFooterProps) => (
           ))}
       </div>
     </div>
-  </section>
+  </aside>
 );
