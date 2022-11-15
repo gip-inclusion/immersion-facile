@@ -99,7 +99,7 @@ $typesTints: (
   &__pattern {
     background: $white;
     border-radius: 50%;
-    opacity: 0.4;
+    opacity: 0.2;
     filter: blur(20px);
     position: absolute;
     @for $i from 0 to length($patternSizes) {
@@ -109,16 +109,16 @@ $typesTints: (
       }
     }
     &--0 {
-      top: 20px;
-      right: 20%;
+      top: -100px;
+      right: 0;
     }
     &--1 {
       top: 120px;
-      right: 50px;
+      right: -150px;
     }
     &--2 {
-      top: 220px;
-      right: 30%;
+      bottom: -220px;
+      right: -50px;
     }
   }
   &__nav-cards-wrapper {

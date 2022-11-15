@@ -57,6 +57,17 @@ type SiretModalProps = {
   dispatch: React.Dispatch<ModalAction>;
 };
 
+const contents: Record<ActionOnEstablishment, Record<string, string>> = {
+  edit: {
+    title: "Editer mon entreprise",
+    subtitle: "Pour éditer votre entreprise, veuillez entrer votre SIRET",
+  },
+  register: {
+    title: "Enregistrer mon entreprise",
+    subtitle: "Pour enregistrer votre entreprise, veuillez entrer votre SIRET",
+  },
+};
+
 export const SiretModal = ({ modalState, dispatch }: SiretModalProps) => {
   const { clearSiret } = useEstablishmentSiret({
     shouldFetchEvenIfAlreadySaved: false,
@@ -68,17 +79,7 @@ export const SiretModal = ({ modalState, dispatch }: SiretModalProps) => {
   useEffect(() => {
     clearSiret();
   }, []);
-  const contents: Record<ActionOnEstablishment, Record<string, string>> = {
-    edit: {
-      title: "Editer mon entreprise",
-      subtitle: "Pour éditer votre entreprise, veuillez entrer votre SIRET",
-    },
-    register: {
-      title: "Enregistrer mon entreprise",
-      subtitle:
-        "Pour enregistrer votre entreprise, veuillez entrer votre SIRET",
-    },
-  };
+
   const getModalContents = (mode: ActionOnEstablishment) => contents[mode];
   return (
     <ModalDialog isOpen={modalState.isOpen} hide={hide}>

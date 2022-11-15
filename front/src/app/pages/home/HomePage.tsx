@@ -1,7 +1,6 @@
 import React from "react";
 import { ImmersionFooter } from "src/app/components/ImmersionFooter";
 import { ImmersionMarianneHeader } from "src/app/components/ImmersionMarianneHeader";
-import { ENV } from "src/environmentVariables";
 import {
   FixedStamp,
   HeroHeader,
@@ -22,39 +21,12 @@ import {
 } from "./data/content";
 import { useDispatch } from "react-redux";
 import { SiretModal, useSiretModal } from "src/app/components/SiretModal";
+import {
+  PeConnectModal,
+  usePeConnectModal,
+} from "src/app/components/PeConnectModal";
+
 import { AnyAction, Dispatch } from "@reduxjs/toolkit";
-
-const DebugInfo = () => (
-  <div
-    style={{
-      position: "fixed",
-      top: "1rem",
-      right: "1rem",
-      backgroundColor: "rgba(255,255,255,.8)",
-      borderRadius: "5px",
-      boxShadow: "0 2px 5px rgba(0,0,0,.1)",
-      zIndex: 1000,
-      padding: "1rem",
-      fontSize: ".75rem",
-      maxWidth: 300,
-    }}
-  >
-    <span
-      style={{
-        fontWeight: "bold",
-        fontSize: "1rem",
-      }}
-    >
-      Env variables are:
-    </span>
-
-    {Object.entries(ENV).map(([envName, envValue]) => (
-      <div key={envName}>
-        {envName}: <strong>{JSON.stringify(envValue, null, 2)}</strong>
-      </div>
-    ))}
-  </div>
-);
 
 export type UserType = "default" | "candidate" | "establishment" | "agency";
 
@@ -65,10 +37,14 @@ type HomePageProps = {
 export const HomePage = ({ type }: HomePageProps) => {
   const featureFlags = useFeatureFlags();
   const storeDispatch = useDispatch();
-  const { modalState, dispatch: modalDispatch } = useSiretModal();
+  const { modalState: siretModalState, dispatch: siretModalDispatch } =
+    useSiretModal();
+  const { modalState: peConnectModalState, dispatch: peConnectModalDispatch } =
+    usePeConnectModal();
   const heroHeaderNavCardsWithDispatch = heroHeaderNavCards(
     storeDispatch,
-    modalDispatch as Dispatch<AnyAction>,
+    siretModalDispatch as Dispatch<AnyAction>,
+    peConnectModalDispatch as Dispatch<AnyAction>,
   );
   const { title, subtitle, displayName, icon, illustration } =
     heroHeaderContent[type];
@@ -87,7 +63,16 @@ export const HomePage = ({ type }: HomePageProps) => {
           navCards={heroHeaderNavCardsWithDispatch[type] as HeroHeaderNavCard[]}
           parallax
           siretModal={
-            <SiretModal modalState={modalState} dispatch={modalDispatch} />
+            <SiretModal
+              modalState={siretModalState}
+              dispatch={siretModalDispatch}
+            />
+          }
+          peConnectModal={
+            <PeConnectModal
+              modalState={peConnectModalState}
+              dispatch={peConnectModalDispatch}
+            />
           }
         />
         <SectionStats stats={sectionStatsData} />
@@ -96,7 +81,6 @@ export const HomePage = ({ type }: HomePageProps) => {
       </MainWrapper>
 
       <ImmersionFooter />
-
       {featureFlags.enableTemporaryOperation && (
         <FixedStamp
           image={

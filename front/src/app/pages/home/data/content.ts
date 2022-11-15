@@ -11,6 +11,7 @@ import heroHeaderDefaultIllustration from "/src/assets/img/illustration-default-
 import heroHeaderCandidateIllustration from "/src/assets/img/illustration-candidate-hero.webp";
 import heroHeaderEstablishmentIllustration from "/src/assets/img/illustration-establishment-hero.webp";
 import heroHeaderAgencyIllustration from "/src/assets/img/illustration-agency-hero.webp";
+import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 
 type HeroHeaderInfos = {
   displayName: string;
@@ -30,20 +31,20 @@ export const heroHeaderContent: Record<UserType, HeroHeaderInfos> = {
       "Avec Immersion Facilitée, trouvez un métier à tester, entrez en relation immédiatement avec une entreprise accueillante, remplissez une demande de convention et obtenez une réponse en temps record !",
   },
   candidate: {
-    title: "La meilleure façon de faire émerger de nouveaux talents",
+    title: "La meilleure façon de découvrir votre futur métier",
     displayName: "Candidat",
     illustration: heroHeaderCandidateIllustration,
     icon: "fr-icon-user-line",
     subtitle:
-      "Avec Immersion Facilitée, trouvez un métier à tester, entrez en relation immédiatement avec une entreprise accueillante, remplissez une demande de convention et obtenez une réponse en temps record !",
+      "Assurez le succès de votre projet professionnel en découvrant un métier en conditions réelles. Passez quelques jours en entreprise pour vérifier que ce métier vous plaît et vous convient. Profitez-en pour découvrir éventuellement votre futur employeur !",
   },
   establishment: {
-    title: "La meilleure façon de faire émerger de nouveaux talents",
+    title: "Rencontrer des candidats motivés ? C’est possible !",
     displayName: "Entreprise",
     illustration: heroHeaderEstablishmentIllustration,
     icon: "fr-icon-building-line",
     subtitle:
-      "Avec Immersion Facilitée, trouvez un métier à tester, entrez en relation immédiatement avec une entreprise accueillante, remplissez une demande de convention et obtenez une réponse en temps record !",
+      "Contribuez au succès de reconversions professionnelles en ouvrant vos entreprises. Permettez à des profils motivés de découvrir le métier de leur choix, en conditions réelles auprès des professionnels en activité et identifiez celui qui pourrait venir renforcer votre équipe.",
   },
   agency: {
     title: "La meilleure façon de faire émerger de nouveaux talents",
@@ -57,10 +58,12 @@ export const heroHeaderContent: Record<UserType, HeroHeaderInfos> = {
 
 export const heroHeaderNavCards: (
   storeDispatch: Dispatch,
-  modalDispatch: Dispatch,
+  siretModalDispatch: Dispatch,
+  peConnectModalDispatch: Dispatch,
 ) => Record<UserType, HeroHeaderNavCard[]> = (
   storeDispatch: Dispatch,
-  modalDispatch: Dispatch,
+  siretModalDispatch: Dispatch,
+  peConnectModalDispatch: Dispatch,
 ) => ({
   default: [
     {
@@ -96,7 +99,15 @@ export const heroHeaderNavCards: (
       title: "Remplir la demande de convention",
       icon: "fr-icon-file-line",
       type: "candidate",
-      link: routes.conventionImmersion().link,
+      link: {
+        href: "",
+        onClick: (event) => {
+          event.preventDefault();
+          peConnectModalDispatch({
+            type: "CLICKED_OPEN",
+          });
+        },
+      },
     },
     // {
     //   title: "Conseils utiles pour l’immersion",
@@ -114,7 +125,7 @@ export const heroHeaderNavCards: (
         href: "",
         onClick: (event) => {
           event.preventDefault();
-          modalDispatch({
+          siretModalDispatch({
             type: "CLICKED_OPEN",
             payload: {
               mode: "register",
@@ -132,7 +143,7 @@ export const heroHeaderNavCards: (
         href: "",
         onClick: (event) => {
           event.preventDefault();
-          modalDispatch({
+          siretModalDispatch({
             type: "CLICKED_OPEN",
             payload: {
               mode: "edit",
@@ -146,7 +157,16 @@ export const heroHeaderNavCards: (
       title: "Remplir la demande de convention",
       icon: "fr-icon-file-text-line",
       type: "establishment",
-      link: routes.conventionImmersion().link,
+      link: {
+        href: "",
+        onClick: (event) => {
+          event.preventDefault();
+          storeDispatch(
+            authSlice.actions.federatedIdentityProvided("noIdentityProvider"),
+          );
+          routes.conventionImmersion().push();
+        },
+      },
     },
   ],
   agency: [
@@ -157,16 +177,19 @@ export const heroHeaderNavCards: (
       link: routes.addAgency().link,
     },
     {
-      title: "Modifier mes informations",
-      icon: "fr-icon-edit-line",
-      type: "agency",
-      link: routes.addAgency().link,
-    },
-    {
       title: "Remplir la demande de convention",
       icon: "fr-icon-file-text-line",
       type: "agency",
-      link: routes.conventionImmersion().link,
+      link: {
+        href: "",
+        onClick: (event) => {
+          event.preventDefault();
+          storeDispatch(
+            authSlice.actions.federatedIdentityProvided("noIdentityProvider"),
+          );
+          routes.conventionImmersion().push();
+        },
+      },
     },
   ],
 });
@@ -176,7 +199,7 @@ export const sectionStatsData: Stat[] = [
     value: "1",
     subtitle: "jour, 1 semaine ou 1 mois en entreprise",
     description:
-      "L’immersion professionnelle est une période courte et non rémunérée de découverte en entreprise.",
+      "L’immersion professionnelle est une période courte, variable, adaptée à vos besoins et non rémunérée pour découvrir le métier de votre choix.",
   },
   {
     badgeLabel: "Découverte",

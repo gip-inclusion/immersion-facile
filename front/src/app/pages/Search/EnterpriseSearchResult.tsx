@@ -103,7 +103,11 @@ export const EnterpriseSearchResult = ({
         </SearchResultInfo>
       )}
       <hr className="pb-2" />
-      <ButtonSearch onClick={onButtonClick} disabled={disableButton}>
+      <ButtonSearch
+        className={"fr-btn--green-archipel"}
+        onClick={onButtonClick}
+        disabled={disableButton}
+      >
         {contactMode === "PHONE" ||
         contactMode === "EMAIL" ||
         contactMode === "IN_PERSON"

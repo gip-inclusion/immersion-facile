@@ -26,7 +26,7 @@ module.exports = {
         immersionGreen: {
           light: "#00BBC3",
           dark: "#006A6F",
-          DEFAULT: "#009FA7",
+          DEFAULT: "#009099",
         },
       },
     },

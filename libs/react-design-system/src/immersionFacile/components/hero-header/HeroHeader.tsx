@@ -15,6 +15,7 @@ export type HeroHeaderProps = {
   patterns?: boolean;
   navCards?: HeroHeaderNavCard[];
   siretModal: JSX.Element;
+  peConnectModal: JSX.Element;
 };
 export type HeroHeaderNavCard = {
   title: string;
@@ -22,6 +23,7 @@ export type HeroHeaderNavCard = {
   overtitle?: string;
   type: UserType;
   link?: Link;
+  total?: number;
 };
 
 const componentName = "im-hero-header";
@@ -35,6 +37,7 @@ export const HeroHeader = ({
   navCards,
   parallax,
   siretModal,
+  peConnectModal,
   icon,
   typeDisplayName,
 }: HeroHeaderProps) => {
@@ -105,18 +108,34 @@ export const HeroHeader = ({
               Parcours utilisateur : candidat, entreprise, prescripteur
             </h3>
             {navCards.map((card) => (
-              <NavCard {...card} key={`${card.type}-${card.title}`} />
+              <NavCard
+                {...card}
+                total={navCards.length}
+                key={`${card.type}-${card.title}`}
+              />
             ))}
           </nav>
         </div>
       )}
       {siretModal}
+      {peConnectModal}
     </section>
   );
 };
 
-const NavCard = ({ title, icon, overtitle, link, type }: HeroHeaderNavCard) => (
-  <div className={`${componentName}__nav-card-wrapper fr-col-12 fr-col-lg-4`}>
+const NavCard = ({
+  title,
+  icon,
+  overtitle,
+  link,
+  type,
+  total,
+}: HeroHeaderNavCard) => (
+  <div
+    className={`${componentName}__nav-card-wrapper fr-col-12 fr-col-lg-${
+      total ? 12 / total : 4
+    }`}
+  >
     <div
       className={`${componentName}__nav-card ${componentName}__nav-card--${type}`}
     >
