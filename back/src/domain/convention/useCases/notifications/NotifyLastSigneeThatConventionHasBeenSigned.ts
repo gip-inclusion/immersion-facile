@@ -55,7 +55,7 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
 
   private lastSigneeEmail(
     signatories: Signatory[],
-  ): { signAt: string; email: string } | undefined {
+  ): { signedAt: string; email: string } | undefined {
     const signatoryEmailsOrderedBySignedAt = signatories
       .filter(
         (
@@ -65,9 +65,9 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
         } => signatory.signedAt !== undefined,
       )
       .sort((a, b) => (a.signedAt < b.signedAt ? -1 : 0))
-      .map((signatory) => ({
-        email: signatory.email,
-        signAt: signatory.signedAt,
+      .map(({ email, signedAt }) => ({
+        email,
+        signedAt,
       }));
     return signatoryEmailsOrderedBySignedAt.at(
       signatoryEmailsOrderedBySignedAt.length - 1,
@@ -77,12 +77,12 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
 
 const emailToSend = (
   convention: ConventionDto,
-  lastSigneeEmail: { signAt: string; email: string },
+  lastSigneeEmail: { signedAt: string; email: string },
 ): SigneeHasSignedConvention => ({
   type: "SIGNEE_HAS_SIGNED_CONVENTION",
   params: {
     demandeId: convention.id,
-    signAt: lastSigneeEmail.signAt,
+    signedAt: lastSigneeEmail.signedAt,
   },
   recipients: [lastSigneeEmail.email],
 });

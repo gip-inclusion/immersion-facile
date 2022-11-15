@@ -304,7 +304,7 @@ export const defaultEmailValueByEmailKind: {
     businessName: "BUSINESS_NAME",
   },
   SIGNEE_HAS_SIGNED_CONVENTION: {
-    signAt: new Date().toISOString(),
+    signedAt: new Date().toISOString(),
     demandeId: "DEMANDE_ID",
   },
 };

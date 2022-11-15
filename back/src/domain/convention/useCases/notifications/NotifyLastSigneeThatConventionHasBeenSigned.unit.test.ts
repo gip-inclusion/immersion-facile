@@ -50,7 +50,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
       {
         params: {
           demandeId: signedConvention.id,
-          signAt: signedConvention.signatories.beneficiary.signedAt!,
+          signedAt: signedConvention.signatories.beneficiary.signedAt!,
         },
         recipients: [signedConvention.signatories.beneficiary.email],
         type: "SIGNEE_HAS_SIGNED_CONVENTION",
@@ -72,7 +72,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
     expectToEqual(emailGw.getSentEmails(), [
       {
         params: {
-          signAt:
+          signedAt:
             signedConvention.signatories.establishmentRepresentative.signedAt!,
           demandeId: signedConvention.id,
         },
