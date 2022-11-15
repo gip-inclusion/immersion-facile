@@ -29,7 +29,7 @@ import { AgencyAutocomplete } from "./AgencyAutocomplete";
 
 export const EditAgency = () => (
   <>
-    <DsfrTitle level={5} text="Editer une agence" />
+    <DsfrTitle level={5} text="Editer une agence" className="fr-mt-4w" />
     <div
       className="w-2/3 p-5"
       style={{
@@ -39,7 +39,6 @@ export const EditAgency = () => (
       <AgencyAutocomplete
         title="Je sélectionne une agence"
         placeholder={"Ex : Agence de Berry"}
-        className="searchdropdown-header inputLabel"
       />
     </div>
     <EditAgencyForm />

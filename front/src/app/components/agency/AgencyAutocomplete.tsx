@@ -45,7 +45,9 @@ export const AgencyAutocomplete = ({
         filterOptions={(x) => x}
         options={agencyOptions.map(prop("id"))}
         value={selectedAgencyId}
-        noOptionsText={agencySearchText ? noOptionText : "Saisissez un métier"}
+        noOptionsText={
+          agencySearchText ? noOptionText : "Saisissez le nom d'une agence"
+        }
         getOptionLabel={(option: AgencyId) => option}
         renderOption={(props, option) => (
           <li {...props}>{getNameFromAgencyId(option)}</li>
