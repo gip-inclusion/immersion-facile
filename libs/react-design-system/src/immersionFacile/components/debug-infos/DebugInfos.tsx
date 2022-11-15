@@ -3,12 +3,12 @@ import "./DebugInfo.scss";
 
 export const DebugInfo = (ENV: {
   dev: boolean;
-  frontEnvType: string;
+  envType: string;
   gateway: "IN_MEMORY" | "HTTP";
   PREFILLED_FORMS: boolean;
   crispWebSiteId: string;
 }) =>
-  ENV.frontEnvType === "DEV" && (
+  ["local", "dev"].includes(ENV.envType) && (
     <div className="im-debug-infos">
       <span className="im-debug-infos__title">Env variables are:</span>
 
