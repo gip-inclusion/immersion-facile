@@ -44,7 +44,7 @@ export const heroHeaderContent: Record<UserType, HeroHeaderInfos> = {
     illustration: heroHeaderEstablishmentIllustration,
     icon: "fr-icon-building-line",
     subtitle:
-      "Contribuez au succès de reconversions professionnelles en ouvrant vos entreprises. Permettez à des profils motivés de découvrir le métier de leur choix, en conditions réelles auprès des professionnels en activité et identifiez celui qui pourrait venir renforcer votre équipe.",
+      "Contribuez au succès de reconversions professionnelles en ouvrant vos entreprises. Permettez à des profils motivés de découvrir le métier de leur choix, en conditions réelles auprès des professionnels en activité et identifiez ceux qui pourraient venir renforcer votre équipe.",
   },
   agency: {
     title: "La meilleure façon de faire émerger de nouveaux talents",
@@ -202,12 +202,12 @@ export const sectionStatsData: Stat[] = [
       "L’immersion professionnelle est une période courte, variable, adaptée à vos besoins et non rémunérée pour découvrir le métier de votre choix.",
   },
   {
-    badgeLabel: "Découverte",
+    badgeLabel: "Simplicité",
     value: "100%",
     subtitle: "démarche dématérialisée",
   },
   {
-    badgeLabel: "Découverte",
+    badgeLabel: "Opportunité",
     value: "7",
     subtitle: "demandeurs d’emploi sur 10",
     description: "trouvent un emploi dans les mois qui suivent leur immersion.",
@@ -217,17 +217,17 @@ export const sectionStatsData: Stat[] = [
 export const sectionFaqData: FaqCardProps[] = [
   {
     title: "Comment trouver une entreprise accueillante ?",
-    description: `Si une entreprise a le label "entreprise accueillante", pour lui demander une une immersion, vous devez cliquer sur "contacter l'entreprise" et compléter le formulaire...`,
+    description: `A partir de la page d'accueil du service Immersion Facilitée, cliquez sur le bouton "Trouver une entreprise accueillante" ou rendez-vous directement sur la page...`,
     url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-trouver-une-entreprise-accueillante-ek1x8s/",
   },
   {
-    title: "Comment contacter une entreprise pour demander une immersion ?",
-    description: `A partir de la page d'accueil du service Immersion Facilitée, cliquez sur le bouton "Trouver une entreprise accueillante" ou rendez-vous directement...`,
-    url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-contacter-une-entreprise-pour-demander-une-immersion-8dqotx/",
+    title: "A quoi sert une immersion professionelle ?",
+    description: `Elle vous permet d’assurer le succès de votre projet professionnel en découvrant un métier en conditions réelles, de passer quelques jours en entreprise pour vérifier...`,
+    url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/a-quoi-sert-une-immersion-professionnelle-1yd6ije/",
   },
   {
-    title: `Que signifie le label "Tentez votre chance" dans les résultats de recherche ?`,
-    description: `Cliquez sur "rechercher" pour lancer la recherche. Quelques secondes peuvent être nécessaires pour afficher les résultats de recherche...`,
-    url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/que-signifie-le-label-tentez-votre-chance-dans-les-resultats-de-recherche-1c1zmkx/",
+    title: "Comment contacter une entreprise pour demander une immersion ?",
+    description: `SI une entreprise a le label "entreprise accueillante", pour lui demander une une immersion, vous devez cliquer sur "contacter l'entreprise" et compléter le formulaire...`,
+    url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-contacter-une-entreprise-pour-demander-une-immersion-8dqotx/",
   },
 ];

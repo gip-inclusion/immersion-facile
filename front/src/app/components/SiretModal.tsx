@@ -59,8 +59,8 @@ type SiretModalProps = {
 
 const contents: Record<ActionOnEstablishment, Record<string, string>> = {
   edit: {
-    title: "Editer mon entreprise",
-    subtitle: "Pour éditer votre entreprise, veuillez entrer votre SIRET",
+    title: "Modifier ma fiche entreprise",
+    subtitle: "Pour modifier votre fiche, veuillez entrer votre SIRET",
   },
   register: {
     title: "Enregistrer mon entreprise",
