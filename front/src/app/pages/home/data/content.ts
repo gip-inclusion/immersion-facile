@@ -217,7 +217,7 @@ export const sectionStatsData: Stat[] = [
 export const sectionFaqData: FaqCardProps[] = [
   {
     title: "Comment trouver une entreprise accueillante ?",
-    description: `A partir de la page d'accueil du service Immersion Facilitée, cliquez sur le bouton "Trouver une entreprise accueillante" ou rendez-vous directement sur la page...`,
+    description: `A partir de la page candidat du service Immersion Facilitée, cliquez sur le bouton "Trouver une entreprise accueillante" ou rendez-vous directement sur la page...`,
     url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-trouver-une-entreprise-accueillante-ek1x8s/",
   },
   {
