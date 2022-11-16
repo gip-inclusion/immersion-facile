@@ -3,6 +3,8 @@ import {
   ConventionDtoBuilder,
   frontRoutes,
   expectTypeToMatchAndEqual,
+  AgencyDto,
+  ConventionDto,
 } from "shared";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
@@ -11,23 +13,43 @@ import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUow
 import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/fakeGenerateMagicLinkUrlFn";
 import { NotifyToAgencyApplicationSubmitted } from "./NotifyToAgencyApplicationSubmitted";
 
-const councellorEmail = "councellor@email.fr";
-const councellorEmail2 = "councellor2@email.fr";
-const validatorEmail = "validator@mail.com";
-
-const agencyWithCounsellors = AgencyDtoBuilder.create("agency-with-councellors")
-  .withCounsellorEmails([councellorEmail, councellorEmail2])
-  .withName("test-agency-name")
-  .build();
-
-const agencyWithOnlyValidator = AgencyDtoBuilder.create(
-  "agency-with-only-validator",
-)
-  .withValidatorEmails([validatorEmail])
-  .withName("test-agency-name")
-  .build();
-
 describe("NotifyToAgencyApplicationSubmitted", () => {
+  const councellorEmail = "councellor@email.fr";
+  const councellorEmail2 = "councellor2@email.fr";
+  const validatorEmail = "validator@mail.com";
+
+  const agencyWithCounsellors = AgencyDtoBuilder.create(
+    "agency-with-councellors",
+  )
+    .withCounsellorEmails([councellorEmail, councellorEmail2])
+    .withName("test-agency-name")
+    .build();
+
+  const agencyWithOnlyValidator = AgencyDtoBuilder.create(
+    "agency-with-only-validator",
+  )
+    .withValidatorEmails([validatorEmail])
+    .withName("test-agency-name")
+    .build();
+
+  const agencyWithConsellorsAndValidator = AgencyDtoBuilder.create(
+    "agency-with-councellors-and-validator",
+  )
+    .withCounsellorEmails([councellorEmail, councellorEmail2])
+    .withValidatorEmails([validatorEmail])
+    .withName("test-agency-name")
+    .build();
+
+  const expectedParams = (agency: AgencyDto, convention: ConventionDto) => ({
+    agencyName: agency.name,
+    businessName: convention.businessName,
+    dateEnd: convention.dateEnd,
+    dateStart: convention.dateStart,
+    demandeId: convention.id,
+    firstName: convention.signatories.beneficiary.firstName,
+    lastName: convention.signatories.beneficiary.lastName,
+  });
+
   let emailGateway: InMemoryEmailGateway;
   let agencyRepository: InMemoryAgencyRepository;
   let notifyToAgencyApplicationSubmitted: NotifyToAgencyApplicationSubmitted;
@@ -38,6 +60,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
     agencyRepository.setAgencies([
       agencyWithCounsellors,
       agencyWithOnlyValidator,
+      agencyWithConsellorsAndValidator,
     ]);
 
     const uowPerformer = new InMemoryUowPerformer({
@@ -56,26 +79,15 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
     const validConvention = new ConventionDtoBuilder()
       .withAgencyId(agencyWithCounsellors.id)
       .build();
+
     await notifyToAgencyApplicationSubmitted.execute(validConvention);
 
-    const sentEmails = emailGateway.getSentEmails();
-
-    const expectedParams = {
-      agencyName: agencyWithCounsellors.name,
-      businessName: validConvention.businessName,
-      dateEnd: validConvention.dateEnd,
-      dateStart: validConvention.dateStart,
-      demandeId: validConvention.id,
-      firstName: validConvention.signatories.beneficiary.firstName,
-      lastName: validConvention.signatories.beneficiary.lastName,
-    };
-
-    expectTypeToMatchAndEqual(sentEmails, [
+    expectTypeToMatchAndEqual(emailGateway.getSentEmails(), [
       {
         type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
         recipients: [councellorEmail],
         params: {
-          ...expectedParams,
+          ...expectedParams(agencyWithCounsellors, validConvention),
           magicLink: fakeGenerateMagicLinkUrlFn({
             id: validConvention.id,
             role: "counsellor",
@@ -88,7 +100,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
         type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
         recipients: [councellorEmail2],
         params: {
-          ...expectedParams,
+          ...expectedParams(agencyWithCounsellors, validConvention),
           magicLink: fakeGenerateMagicLinkUrlFn({
             id: validConvention.id,
             role: "counsellor",
@@ -107,29 +119,56 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
 
     await notifyToAgencyApplicationSubmitted.execute(validConvention);
 
-    const sentEmails = emailGateway.getSentEmails();
-
-    const expectedParams = {
-      agencyName: agencyWithCounsellors.name,
-      businessName: validConvention.businessName,
-      dateEnd: validConvention.dateEnd,
-      dateStart: validConvention.dateStart,
-      demandeId: validConvention.id,
-      firstName: validConvention.signatories.beneficiary.firstName,
-      lastName: validConvention.signatories.beneficiary.lastName,
-    };
-
-    expectTypeToMatchAndEqual(sentEmails, [
+    expectTypeToMatchAndEqual(emailGateway.getSentEmails(), [
       {
         type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
         recipients: [validatorEmail],
         params: {
-          ...expectedParams,
+          ...expectedParams(agencyWithCounsellors, validConvention),
           magicLink: fakeGenerateMagicLinkUrlFn({
             id: validConvention.id,
             role: "validator",
             targetRoute: frontRoutes.conventionToValidate,
             email: validatorEmail,
+          }),
+        },
+      },
+    ]);
+  });
+
+  it("Sends notification email only counsellors with agency that have validators and counsellors", async () => {
+    const validConvention = new ConventionDtoBuilder()
+      .withAgencyId(agencyWithConsellorsAndValidator.id)
+      .build();
+
+    await notifyToAgencyApplicationSubmitted.execute(validConvention);
+
+    const sentEmails = emailGateway.getSentEmails();
+
+    expectTypeToMatchAndEqual(sentEmails, [
+      {
+        type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
+        recipients: [councellorEmail],
+        params: {
+          ...expectedParams(agencyWithConsellorsAndValidator, validConvention),
+          magicLink: fakeGenerateMagicLinkUrlFn({
+            id: validConvention.id,
+            role: "counsellor",
+            targetRoute: frontRoutes.conventionToValidate,
+            email: councellorEmail2,
+          }),
+        },
+      },
+      {
+        type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
+        recipients: [councellorEmail2],
+        params: {
+          ...expectedParams(agencyWithConsellorsAndValidator, validConvention),
+          magicLink: fakeGenerateMagicLinkUrlFn({
+            id: validConvention.id,
+            role: "counsellor",
+            targetRoute: frontRoutes.conventionToValidate,
+            email: councellorEmail2,
           }),
         },
       },
