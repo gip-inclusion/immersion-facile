@@ -37,31 +37,24 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
       throw new NotFoundError(
         `Unable to send mail. No agency config found for ${convention.agencyId}`,
       );
-
-    const peUserAdvisorOrUndefined =
-      await uow.conventionPoleEmploiAdvisorRepository.getByConventionId(
-        convention.id,
-      );
-
-    const recipients = [
-      convention.signatories.beneficiary.email,
-      convention.signatories.establishmentRepresentative.email,
-      ...(convention.signatories.beneficiaryRepresentative
-        ? [convention.signatories.beneficiaryRepresentative.email]
-        : []),
-      ...agency.counsellorEmails,
-      ...agency.validatorEmails,
-      ...getPeAdvisorEmailIfExist(peUserAdvisorOrUndefined),
-    ];
-    if (
-      convention.signatories.establishmentRepresentative.email !==
-      convention.establishmentTutor.email
-    )
-      recipients.push(convention.establishmentTutor.email);
-
     await this.emailGateway.sendEmail({
       type: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
-      recipients,
+      recipients: [
+        ...Object.values(convention.signatories).map(
+          (signatory) => signatory.email,
+        ),
+        ...agency.counsellorEmails,
+        ...agency.validatorEmails,
+        ...getPeAdvisorEmailIfExist(
+          await uow.conventionPoleEmploiAdvisorRepository.getByConventionId(
+            convention.id,
+          ),
+        ),
+        ...(convention.signatories.establishmentRepresentative.email !==
+        convention.establishmentTutor.email
+          ? [convention.establishmentTutor.email]
+          : []),
+      ],
       params: getValidatedConventionFinalConfirmationParams(agency, convention),
     });
   }

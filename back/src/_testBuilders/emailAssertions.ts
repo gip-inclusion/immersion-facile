@@ -63,24 +63,22 @@ export const expectEmaiSignatoryConfirmationSignatureRequestMatchingConvention =
 
 export const expectEmailFinalValidationConfirmationMatchingConvention = (
   recipients: string[],
-  templatedEmail: TemplatedEmail,
-  agency: AgencyDto | undefined,
+  templatedEmails: TemplatedEmail[],
+  agency: AgencyDto,
   convention: ConventionDto,
-) => {
-  if (!agency) {
-    fail("missing agency config");
-  }
-  expectTypeToMatchAndEqual(templatedEmail, {
-    type: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
-    recipients,
-    params: getValidatedConventionFinalConfirmationParams(agency, convention),
-  });
-};
+) =>
+  expectTypeToMatchAndEqual(templatedEmails, [
+    {
+      type: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+      recipients,
+      params: getValidatedConventionFinalConfirmationParams(agency, convention),
+    },
+  ]);
 
 export const expectedEmailEstablishmentCreatedReviewMatchingEstablisment = (
   templatedEmail: TemplatedEmail,
   establishmentDto: FormEstablishmentDto,
-) => {
+) =>
   expectTypeToMatchAndEqual(templatedEmail, {
     type: "NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION",
     recipients: [establishmentDto.businessContact.email],
@@ -91,19 +89,14 @@ export const expectedEmailEstablishmentCreatedReviewMatchingEstablisment = (
     },
     cc: establishmentDto.businessContact.copyEmails,
   });
-};
 
 export const expectedEmailConventionReviewMatchingConvention = (
   templatedEmail: TemplatedEmail,
   recipient: string,
-  agency: AgencyDto | undefined,
   convention: ConventionDto,
   magicLink: string,
   possibleRoleAction: string,
-) => {
-  if (!agency) {
-    fail("missing agency config");
-  }
+) =>
   expectTypeToMatchAndEqual(templatedEmail, {
     type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
     recipients: [recipient],
@@ -115,7 +108,6 @@ export const expectedEmailConventionReviewMatchingConvention = (
       possibleRoleAction,
     },
   });
-};
 
 export const expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected = (
   templatedEmail: TemplatedEmail,

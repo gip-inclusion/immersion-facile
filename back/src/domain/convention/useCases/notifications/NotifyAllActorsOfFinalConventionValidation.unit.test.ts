@@ -1,30 +1,26 @@
 import { parseISO } from "date-fns";
 import {
-  AgencyDto,
   AgencyDtoBuilder,
   ConventionDto,
   ConventionDtoBuilder,
+  expectTypeToMatchAndEqual,
   PeConnectIdentity,
   prettyPrintSchedule,
   reasonableSchedule,
-  expectTypeToMatchAndEqual,
 } from "shared";
 import { expectEmailFinalValidationConfirmationMatchingConvention } from "../../../../_testBuilders/emailAssertions";
 
-import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
+import {
+  createInMemoryUow,
+  InMemoryUnitOfWork,
+} from "../../../../adapters/primary/config/uowConfig";
 import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
-import { InMemoryAgencyRepository } from "../../../../adapters/secondary/InMemoryAgencyRepository";
-import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../../../adapters/secondary/InMemoryConventionPoleEmploiAdvisorRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+import { ConventionPoleEmploiUserAdvisorEntity } from "../../../peConnect/dto/PeConnect.dto";
 import {
   getValidatedConventionFinalConfirmationParams,
   NotifyAllActorsOfFinalConventionValidation,
 } from "./NotifyAllActorsOfFinalConventionValidation";
-import {
-  UnitOfWork,
-  UnitOfWorkPerformer,
-} from "../../../core/ports/UnitOfWork";
-import { ConventionPoleEmploiUserAdvisorEntity } from "../../../peConnect/dto/PeConnect.dto";
 
 const establishmentTutorEmail = "boss@mail.com";
 const validConvention: ConventionDto = new ConventionDtoBuilder()
@@ -39,37 +35,29 @@ const defaultAgency = AgencyDtoBuilder.create(validConvention.agencyId)
   .build();
 
 describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email to all actors", () => {
-  let uow: UnitOfWork;
+  let uow: InMemoryUnitOfWork;
   let emailGw: InMemoryEmailGateway;
-  let agency: AgencyDto;
-  let unitOfWorkPerformer: UnitOfWorkPerformer;
+  let notifyAllActorsOfFinalConventionValidation: NotifyAllActorsOfFinalConventionValidation;
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    agency = defaultAgency;
-    uow.agencyRepository = new InMemoryAgencyRepository([defaultAgency]);
     emailGw = new InMemoryEmailGateway();
-
-    unitOfWorkPerformer = new InMemoryUowPerformer(uow);
+    notifyAllActorsOfFinalConventionValidation =
+      new NotifyAllActorsOfFinalConventionValidation(
+        new InMemoryUowPerformer(uow),
+        emailGw,
+      );
   });
 
   it("Default actors: beneficiary, establishement tutor, agency counsellor", async () => {
-    agency = new AgencyDtoBuilder(defaultAgency)
+    const agency = new AgencyDtoBuilder(defaultAgency)
       .withCounsellorEmails([counsellorEmail])
       .build();
 
-    (uow.agencyRepository as InMemoryAgencyRepository).setAgencies([agency]);
+    uow.agencyRepository.setAgencies([agency]);
 
-    unitOfWorkPerformer = new InMemoryUowPerformer(uow);
+    await notifyAllActorsOfFinalConventionValidation.execute(validConvention);
 
-    await new NotifyAllActorsOfFinalConventionValidation(
-      unitOfWorkPerformer,
-      emailGw,
-    ).execute(validConvention);
-
-    const sentEmails = emailGw.getSentEmails();
-
-    expect(sentEmails).toHaveLength(1);
     expectEmailFinalValidationConfirmationMatchingConvention(
       [
         validConvention.signatories.beneficiary.email,
@@ -77,32 +65,69 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
         counsellorEmail,
         validatorEmail,
       ],
-      sentEmails[0],
+      emailGw.getSentEmails(),
       agency,
       validConvention,
     );
   });
 
-  it("With different establishment tutor and establishment representative", async () => {
-    agency = new AgencyDtoBuilder(defaultAgency)
+  it("With beneficiary current employer", async () => {
+    const agency = new AgencyDtoBuilder(defaultAgency)
       .withCounsellorEmails([counsellorEmail])
       .build();
 
-    (uow.agencyRepository as InMemoryAgencyRepository).setAgencies([agency]);
+    uow.agencyRepository.setAgencies([agency]);
 
-    unitOfWorkPerformer = new InMemoryUowPerformer(uow);
+    const conventionWithBeneficiaryCurrentEmployer = new ConventionDtoBuilder(
+      validConvention,
+    )
+      .withBeneficiaryCurentEmployer({
+        businessName: "boss",
+        role: "beneficiary-current-employer",
+        email: "current@employer.com",
+        phone: "001223344",
+        firstName: "Harry",
+        lastName: "Potter",
+        job: "Magician",
+        businessSiret: "01234567891234",
+      })
+      .build();
+
+    await notifyAllActorsOfFinalConventionValidation.execute(
+      conventionWithBeneficiaryCurrentEmployer,
+    );
+
+    expectEmailFinalValidationConfirmationMatchingConvention(
+      [
+        conventionWithBeneficiaryCurrentEmployer.signatories.beneficiary.email,
+        conventionWithBeneficiaryCurrentEmployer.signatories
+          .establishmentRepresentative.email,
+        conventionWithBeneficiaryCurrentEmployer.signatories
+          .beneficiaryCurrentEmployer!.email,
+        counsellorEmail,
+        validatorEmail,
+      ],
+      emailGw.getSentEmails(),
+      agency,
+      conventionWithBeneficiaryCurrentEmployer,
+    );
+  });
+
+  it("With different establishment tutor and establishment representative", async () => {
+    const agency = new AgencyDtoBuilder(defaultAgency)
+      .withCounsellorEmails([counsellorEmail])
+      .build();
+
+    uow.agencyRepository.setAgencies([agency]);
 
     const conventionWithSpecificEstablishementEmail = new ConventionDtoBuilder()
       .withEstablishmentTutorEmail(establishmentTutorEmail)
       .build();
-    await new NotifyAllActorsOfFinalConventionValidation(
-      unitOfWorkPerformer,
-      emailGw,
-    ).execute(conventionWithSpecificEstablishementEmail);
 
-    const sentEmails = emailGw.getSentEmails();
+    await notifyAllActorsOfFinalConventionValidation.execute(
+      conventionWithSpecificEstablishementEmail,
+    );
 
-    expect(sentEmails).toHaveLength(1);
     expectEmailFinalValidationConfirmationMatchingConvention(
       [
         conventionWithSpecificEstablishementEmail.signatories.beneficiary.email,
@@ -112,7 +137,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
         validatorEmail,
         conventionWithSpecificEstablishementEmail.establishmentTutor.email,
       ],
-      sentEmails[0],
+      emailGw.getSentEmails(),
       agency,
       validConvention,
     );
@@ -129,22 +154,16 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
       })
       .build();
 
-    agency = new AgencyDtoBuilder(defaultAgency)
+    const agency = new AgencyDtoBuilder(defaultAgency)
       .withCounsellorEmails([counsellorEmail])
       .build();
 
-    (uow.agencyRepository as InMemoryAgencyRepository).setAgencies([agency]);
+    uow.agencyRepository.setAgencies([agency]);
 
-    unitOfWorkPerformer = new InMemoryUowPerformer(uow);
+    await notifyAllActorsOfFinalConventionValidation.execute(
+      conventionWithBeneficiaryRepresentative,
+    );
 
-    await new NotifyAllActorsOfFinalConventionValidation(
-      unitOfWorkPerformer,
-      emailGw,
-    ).execute(conventionWithBeneficiaryRepresentative);
-
-    const sentEmails = emailGw.getSentEmails();
-
-    expect(sentEmails).toHaveLength(1);
     expectEmailFinalValidationConfirmationMatchingConvention(
       [
         conventionWithBeneficiaryRepresentative.signatories.beneficiary.email,
@@ -155,12 +174,12 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
         counsellorEmail,
         validatorEmail,
       ],
-      sentEmails[0],
+      emailGw.getSentEmails(),
       agency,
       conventionWithBeneficiaryRepresentative,
     );
   });
-  it("With PeConnect Federated identity: beneficiary, establishment tutor, agency counsellor, and dedicated advisor", async () => {
+  it("With PeConnect Federated identity: beneficiary, establishment tutor, agency counsellor & validator, and dedicated advisor", async () => {
     const userPeExternalId: PeConnectIdentity = `peConnect:i-am-an-external-id`;
     const userConventionAdvisor: ConventionPoleEmploiUserAdvisorEntity = {
       _entityName: "ConventionPoleEmploiAdvisor",
@@ -172,26 +191,18 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
       type: "CAPEMPLOI",
     };
 
-    (
-      uow.conventionPoleEmploiAdvisorRepository as InMemoryConventionPoleEmploiAdvisorRepository
-    ).setConventionPoleEmploiUsersAdvisor(userConventionAdvisor);
+    uow.conventionPoleEmploiAdvisorRepository.setConventionPoleEmploiUsersAdvisor(
+      userConventionAdvisor,
+    );
 
-    agency = new AgencyDtoBuilder(defaultAgency)
+    const agency = new AgencyDtoBuilder(defaultAgency)
       .withCounsellorEmails([counsellorEmail])
       .build();
 
-    uow.agencyRepository = new InMemoryAgencyRepository([agency]);
+    uow.agencyRepository.setAgencies([agency]);
 
-    unitOfWorkPerformer = new InMemoryUowPerformer(uow);
+    await notifyAllActorsOfFinalConventionValidation.execute(validConvention);
 
-    await new NotifyAllActorsOfFinalConventionValidation(
-      unitOfWorkPerformer,
-      emailGw,
-    ).execute(validConvention);
-
-    const sentEmails = emailGw.getSentEmails();
-
-    expect(sentEmails).toHaveLength(1);
     expectEmailFinalValidationConfirmationMatchingConvention(
       [
         validConvention.signatories.beneficiary.email,
@@ -200,7 +211,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
         validatorEmail,
         userConventionAdvisor.email,
       ],
-      sentEmails[0],
+      emailGw.getSentEmails(),
       agency,
       validConvention,
     );

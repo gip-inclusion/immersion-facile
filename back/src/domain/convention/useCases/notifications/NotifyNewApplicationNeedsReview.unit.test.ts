@@ -4,9 +4,11 @@ import {
   ConventionDtoBuilder,
   frontRoutes,
 } from "shared";
-import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
+import {
+  createInMemoryUow,
+  InMemoryUnitOfWork,
+} from "../../../../adapters/primary/config/uowConfig";
 import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
-import { InMemoryAgencyRepository } from "../../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { expectedEmailConventionReviewMatchingConvention } from "../../../../_testBuilders/emailAssertions";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/fakeGenerateMagicLinkUrlFn";
@@ -19,16 +21,13 @@ const defaultAgency = AgencyDtoBuilder.create(defaultConvention.agencyId)
   .build();
 
 describe("NotifyImmersionApplicationNeedsReview", () => {
-  let validConvention: ConventionDto;
+  let uow: InMemoryUnitOfWork;
   let emailGw: InMemoryEmailGateway;
-  let agencyRepository: InMemoryAgencyRepository;
   let notifyNewConventionNeedsReview: NotifyNewApplicationNeedsReview;
 
   beforeEach(() => {
     emailGw = new InMemoryEmailGateway();
-    validConvention = defaultConvention;
-    const uow = createInMemoryUow();
-    agencyRepository = uow.agencyRepository;
+    uow = createInMemoryUow();
     notifyNewConventionNeedsReview = new NotifyNewApplicationNeedsReview(
       new InMemoryUowPerformer(uow),
       emailGw,
@@ -37,8 +36,9 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
   });
 
   describe("When application status is IN_REVIEW", () => {
+    let conventionInReview: ConventionDto;
     beforeEach(() => {
-      validConvention = new ConventionDtoBuilder(defaultConvention)
+      conventionInReview = new ConventionDtoBuilder(defaultConvention)
         .withStatus("IN_REVIEW")
         .build();
     });
@@ -52,9 +52,9 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
         .withCounsellorEmails(counsellorEmails)
         .build();
 
-      agencyRepository.setAgencies([agency]);
+      uow.agencyRepository.setAgencies([agency]);
 
-      await notifyNewConventionNeedsReview.execute(validConvention);
+      await notifyNewConventionNeedsReview.execute(conventionInReview);
 
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(2);
@@ -64,10 +64,9 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
         expectedEmailConventionReviewMatchingConvention(
           sentEmails[i],
           email,
-          agency,
-          validConvention,
+          conventionInReview,
           fakeGenerateMagicLinkUrlFn({
-            id: validConvention.id,
+            id: conventionInReview.id,
             role: "counsellor",
             targetRoute: frontRoutes.conventionToValidate,
             email,
@@ -85,8 +84,8 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
       const agency = new AgencyDtoBuilder(defaultAgency)
         .withValidatorEmails(validatorEmails)
         .build();
-      agencyRepository.setAgencies([agency]);
-      await notifyNewConventionNeedsReview.execute(validConvention);
+      uow.agencyRepository.setAgencies([agency]);
+      await notifyNewConventionNeedsReview.execute(conventionInReview);
 
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(2);
@@ -96,10 +95,9 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
         expectedEmailConventionReviewMatchingConvention(
           sentEmails[i],
           email,
-          agency,
-          validConvention,
+          conventionInReview,
           fakeGenerateMagicLinkUrlFn({
-            id: validConvention.id,
+            id: conventionInReview.id,
             role: "validator",
             targetRoute: frontRoutes.conventionToValidate,
             email,
@@ -110,15 +108,18 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
     });
 
     it("No counsellors available, neither validators => ensure no mail is sent", async () => {
-      await notifyNewConventionNeedsReview.execute(validConvention);
+      await notifyNewConventionNeedsReview.execute(conventionInReview);
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(0);
     });
   });
 
   describe("When application status is ACCEPTED_BY_COUNSELLOR", () => {
+    let acceptedByCounsellorConvention: ConventionDto;
     beforeEach(() => {
-      validConvention = new ConventionDtoBuilder(defaultConvention)
+      acceptedByCounsellorConvention = new ConventionDtoBuilder(
+        defaultConvention,
+      )
         .withStatus("ACCEPTED_BY_COUNSELLOR")
         .build();
     });
@@ -131,8 +132,10 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
       const agency = new AgencyDtoBuilder(defaultAgency)
         .withValidatorEmails(validatorEmails)
         .build();
-      agencyRepository.setAgencies([agency]);
-      await notifyNewConventionNeedsReview.execute(validConvention);
+      uow.agencyRepository.setAgencies([agency]);
+      await notifyNewConventionNeedsReview.execute(
+        acceptedByCounsellorConvention,
+      );
 
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(2);
@@ -142,10 +145,9 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
         expectedEmailConventionReviewMatchingConvention(
           sentEmails[i],
           email,
-          agency,
-          validConvention,
+          acceptedByCounsellorConvention,
           fakeGenerateMagicLinkUrlFn({
-            id: validConvention.id,
+            id: acceptedByCounsellorConvention.id,
             role: "validator",
             targetRoute: frontRoutes.conventionToValidate,
             email,
@@ -156,15 +158,18 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
     });
 
     it("No validators available => ensure no mail is sent", async () => {
-      await notifyNewConventionNeedsReview.execute(validConvention);
+      await notifyNewConventionNeedsReview.execute(
+        acceptedByCounsellorConvention,
+      );
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(0);
     });
   });
 
   describe("When status is ACCEPTED_BY_VALIDATOR", () => {
+    let acceptedByValidatorConvention: ConventionDto;
     beforeEach(() => {
-      validConvention = new ConventionDtoBuilder()
+      acceptedByValidatorConvention = new ConventionDtoBuilder()
         .withStatus("ACCEPTED_BY_VALIDATOR")
         .build();
     });
@@ -174,9 +179,11 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
       const agency = new AgencyDtoBuilder(defaultAgency)
         .withAdminEmails([adminEmail])
         .build();
-      agencyRepository.setAgencies([agency]);
+      uow.agencyRepository.setAgencies([agency]);
 
-      await notifyNewConventionNeedsReview.execute(validConvention);
+      await notifyNewConventionNeedsReview.execute(
+        acceptedByValidatorConvention,
+      );
 
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(1);
@@ -184,10 +191,9 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
       expectedEmailConventionReviewMatchingConvention(
         sentEmails[0],
         adminEmail,
-        agency,
-        validConvention,
+        acceptedByValidatorConvention,
         fakeGenerateMagicLinkUrlFn({
-          id: validConvention.id,
+          id: acceptedByValidatorConvention.id,
           role: "admin",
           targetRoute: frontRoutes.conventionToValidate,
           email: adminEmail,
@@ -197,7 +203,9 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
     });
 
     it("No admin available => ensure no mail is sent", async () => {
-      await notifyNewConventionNeedsReview.execute(validConvention);
+      await notifyNewConventionNeedsReview.execute(
+        acceptedByValidatorConvention,
+      );
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(0);
     });

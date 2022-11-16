@@ -50,28 +50,28 @@ export const createInMemoryUow = () => {
   const conventionRepository = new InMemoryConventionRepository();
 
   return {
-    conventionPoleEmploiAdvisorRepository:
-      new InMemoryConventionPoleEmploiAdvisorRepository(),
-    immersionAssessmentRepository: new InMemoryImmersionAssessmentRepository(),
-    romeRepository: new InMemoryRomeRepository(),
-    outboxRepository,
-    outboxQueries,
-    formEstablishmentRepository: new InMemoryFormEstablishmentRepository(),
-    establishmentAggregateRepository:
-      new InMemoryEstablishmentAggregateRepository(),
-    conventionRepository,
+    agencyRepository: new InMemoryAgencyRepository(),
     conventionQueries: new InMemoryConventionQueries(
       conventionRepository,
       outboxRepository,
     ),
+    conventionRepository,
+    conventionPoleEmploiAdvisorRepository:
+      new InMemoryConventionPoleEmploiAdvisorRepository(),
     discussionAggregateRepository: new InMemoryDiscussionAggregateRepository(),
-    postalCodeDepartmentRegionQueries: stubPostalCodeDepartmentRegionQueries,
+    establishmentAggregateRepository:
+      new InMemoryEstablishmentAggregateRepository(),
+    exportQueries: new InMemoryExportQueries(),
     featureFlagRepository: new InMemoryFeatureFlagRepository(),
-    agencyRepository: new InMemoryAgencyRepository(),
+    formEstablishmentRepository: new InMemoryFormEstablishmentRepository(),
+    immersionAssessmentRepository: new InMemoryImmersionAssessmentRepository(),
     laBonneBoiteRequestRepository: new InMemoryLaBonneBoiteRequestRepository(),
+    outboxRepository,
+    outboxQueries,
+    postalCodeDepartmentRegionQueries: stubPostalCodeDepartmentRegionQueries,
+    romeRepository: new InMemoryRomeRepository(),
     searchMadeRepository: new InMemorySearchMadeRepository(),
     getApiConsumersById: makeStubGetApiConsumerById({ clock: new RealClock() }),
-    exportQueries: new InMemoryExportQueries(),
   };
 };
 
@@ -80,28 +80,28 @@ const _isAssignable = (inMemoryUow: InMemoryUnitOfWork): UnitOfWork =>
   inMemoryUow;
 
 export const createPgUow = (client: PoolClient): UnitOfWork => ({
+  agencyRepository: new PgAgencyRepository(client),
+  conventionRepository: new PgConventionRepository(client),
+  conventionQueries: new PgConventionQueries(client),
   conventionPoleEmploiAdvisorRepository:
     new PgConventionPoleEmploiAdvisorRepository(client),
-  immersionAssessmentRepository: new PgImmersionAssessmentRepository(client),
-  romeRepository: new PgRomeRepository(client),
-  outboxRepository: new PgOutboxRepository(client),
-  outboxQueries: new PgOutboxQueries(client),
-  agencyRepository: new PgAgencyRepository(client),
-  formEstablishmentRepository: new PgFormEstablishmentRepository(client),
+  discussionAggregateRepository: new PgDiscussionAggregateRepository(client),
   establishmentAggregateRepository: new PgEstablishmentAggregateRepository(
     client,
   ),
-  conventionRepository: new PgConventionRepository(client),
-  conventionQueries: new PgConventionQueries(client),
+  exportQueries: new PgExportQueries(client),
+  featureFlagRepository: new PgFeatureFlagRepository(client),
+  formEstablishmentRepository: new PgFormEstablishmentRepository(client),
+  immersionAssessmentRepository: new PgImmersionAssessmentRepository(client),
+  laBonneBoiteRequestRepository: new PgLaBonneBoiteRequestRepository(client),
+  outboxRepository: new PgOutboxRepository(client),
+  outboxQueries: new PgOutboxQueries(client),
   postalCodeDepartmentRegionQueries: new PgPostalCodeDepartmentRegionQueries(
     client,
   ),
-  discussionAggregateRepository: new PgDiscussionAggregateRepository(client),
-  featureFlagRepository: new PgFeatureFlagRepository(client),
-  laBonneBoiteRequestRepository: new PgLaBonneBoiteRequestRepository(client),
+  romeRepository: new PgRomeRepository(client),
   searchMadeRepository: new PgSearchMadeRepository(client),
   getApiConsumersById: makePgGetApiConsumerById(client),
-  exportQueries: new PgExportQueries(client),
 });
 
 export const createUowPerformer = (
@@ -110,12 +110,9 @@ export const createUowPerformer = (
 ): { uowPerformer: UnitOfWorkPerformer; inMemoryUow?: InMemoryUnitOfWork } =>
   config.repositories === "PG"
     ? { uowPerformer: new PgUowPerformer(getPgPoolFn(), createPgUow) }
-    : makeInMemoryUowPerformer();
+    : makeInMemoryUowPerformer(createInMemoryUow());
 
-const makeInMemoryUowPerformer = () => {
-  const inMemoryUow = createInMemoryUow();
-  return {
-    inMemoryUow,
-    uowPerformer: new InMemoryUowPerformer(inMemoryUow),
-  };
-};
+const makeInMemoryUowPerformer = (inMemoryUow: InMemoryUnitOfWork) => ({
+  inMemoryUow,
+  uowPerformer: new InMemoryUowPerformer(inMemoryUow),
+});
