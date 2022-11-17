@@ -1,6 +1,4 @@
 import React from "react";
-import { ImmersionFooter } from "src/app/components/ImmersionFooter";
-import { ImmersionMarianneHeader } from "src/app/components/ImmersionMarianneHeader";
 import {
   FixedStamp,
   HeroHeader,
@@ -27,6 +25,7 @@ import {
 } from "src/app/components/PeConnectModal";
 
 import { AnyAction, Dispatch } from "@reduxjs/toolkit";
+import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 
 export type UserType = "default" | "candidate" | "establishment" | "agency";
 
@@ -49,8 +48,7 @@ export const HomePage = ({ type }: HomePageProps) => {
   const { title, subtitle, displayName, icon, illustration } =
     heroHeaderContent[type];
   return (
-    <div>
-      <ImmersionMarianneHeader />
+    <HeaderFooterLayout>
       <MainWrapper layout="fullscreen" vSpacing={0} useBackground>
         <HeroHeader
           title={title}
@@ -79,8 +77,6 @@ export const HomePage = ({ type }: HomePageProps) => {
         <SectionTextEmbed iframeUrl="https://www.powtoon.com/embed/c8x7n7AR2XE/" />
         <SectionFaq articles={sectionFaqData} />
       </MainWrapper>
-
-      <ImmersionFooter />
       {featureFlags.enableTemporaryOperation && (
         <FixedStamp
           image={
@@ -95,6 +91,6 @@ export const HomePage = ({ type }: HomePageProps) => {
           link={routes.landingEstablishment().link}
         />
       )}
-    </div>
+    </HeaderFooterLayout>
   );
 };
