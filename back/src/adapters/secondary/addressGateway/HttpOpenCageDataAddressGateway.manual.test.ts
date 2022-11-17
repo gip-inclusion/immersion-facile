@@ -13,6 +13,7 @@ import {
   createHttpOpenCageDataClient,
   HttpOpenCageDataAddressGateway,
   minimumCharErrorMessage,
+  missingDepartmentOnFeatureForPostcode,
   OpenCageDataTargets,
   openCageDataTargets,
 } from "./HttpOpenCageDataAddressGateway";
@@ -321,6 +322,26 @@ describe("HttpOpenCageDataAddressGateway", () => {
         "06500",
       );
       expectTypeToMatchAndEqual(result, "06");
+    }, 5000);
+
+    it("findDepartmentCodeFromPostCode : BUG should return department code 29 from postcode 29120", async () => {
+      await expectPromiseToFailWithError(
+        httpAddressGateway.findDepartmentCodeFromPostCode("29120"),
+        new Error(
+          missingDepartmentOnFeatureForPostcode("29120", {
+            "ISO_3166-1_alpha-2": "FR",
+            "ISO_3166-1_alpha-3": "FRA",
+            _category: "postcode",
+            _type: "postcode",
+            continent: "Europe",
+            country: "France",
+            country_code: "fr",
+            political_union: "European Union",
+            postcode: "29120",
+            region: "France métropolitaine",
+          }),
+        ),
+      );
     }, 5000);
   });
 });

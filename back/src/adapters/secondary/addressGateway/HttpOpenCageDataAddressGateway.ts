@@ -72,11 +72,23 @@ export class HttpOpenCageDataAddressGateway implements AddressGateway {
     const feature = (
       reponse.responseBody as OpenCageDataFeatureCollection
     ).features.at(0);
+    if (!feature) throw new Error(missingFeatureForPostcode(postCode));
 
-    const department =
-      feature && getDepartmentFromAliases(feature.properties.components);
+    const department = getDepartmentFromAliases(feature.properties.components);
+    if (!department)
+      throw new Error(
+        missingDepartmentOnFeatureForPostcode(
+          postCode,
+          feature.properties.components,
+        ),
+      );
 
-    return department ? departmentNameToDepartmentCode[department] : null;
+    const departmentCode = departmentNameToDepartmentCode[department];
+    if (!departmentCode)
+      throw new Error(
+        `Department '${department}' not found on departmentNameToDepartmentCode mapping.`,
+      );
+    return departmentCode;
   }
 
   public async getAddressFromPosition(
@@ -244,7 +256,7 @@ const getDepartmentFromAliases = (components: OpenCageDataAddressComponents) =>
   components.state_district ??
   components.state;
 
-const departmentNameToDepartmentCode: Record<string, string> = {
+const departmentNameToDepartmentCode: Partial<Record<string, string>> = {
   Ain: "01",
   Aisne: "02",
   Allier: "03",
@@ -350,3 +362,12 @@ const departmentNameToDepartmentCode: Record<string, string> = {
   "La Réunion": "974",
   Mayotte: "976",
 };
+export const missingFeatureForPostcode = (postCode: string) =>
+  `No OCD feature found for postCode ${postCode}.`;
+export const missingDepartmentOnFeatureForPostcode = (
+  postCode: string,
+  components: any,
+) =>
+  `No department provided for postcode ${postCode}. OCD Components: ${JSON.stringify(
+    components,
+  )}`;
