@@ -2,6 +2,7 @@ version: "3"
 services:
   postgres:
     image: postgis/postgis:13-master
+    shm_size: 256m
     ports:
       - "5432:5432"
     environment:
