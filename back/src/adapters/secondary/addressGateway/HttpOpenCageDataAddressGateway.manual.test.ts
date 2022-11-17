@@ -1,6 +1,7 @@
 import {
   AddressAndPosition,
   AddressDto,
+  expectPromiseToFailWithError,
   expectTypeToMatchAndEqual,
   GeoPositionDto,
 } from "shared";
@@ -11,6 +12,7 @@ import { AppConfig } from "../../primary/config/appConfig";
 import {
   createHttpOpenCageDataClient,
   HttpOpenCageDataAddressGateway,
+  minimumCharErrorMessage,
   OpenCageDataTargets,
   openCageDataTargets,
 } from "./HttpOpenCageDataAddressGateway";
@@ -165,6 +167,29 @@ describe("HttpOpenCageDataAddressGateway", () => {
         position: {
           lat: 45.0907535,
           lon: 6.0631237,
+        },
+      });
+    });
+    it("Should not support lookup address with only one char.", async () => {
+      await expectPromiseToFailWithError(
+        httpAddressGateway.lookupStreetAddress("R"),
+        new Error(minimumCharErrorMessage(2)),
+      );
+    });
+    it("Should support lookup address with two char.", async () => {
+      const resultPreviousNotFoundWithAddresseAPI =
+        await httpAddressGateway.lookupStreetAddress("Ro");
+
+      expectTypeToMatchAndEqual(resultPreviousNotFoundWithAddresseAPI.at(0), {
+        address: {
+          city: "Rots",
+          departmentCode: "14",
+          postcode: "14980",
+          streetNumberAndAddress: "",
+        },
+        position: {
+          lat: 49.2062576,
+          lon: -0.4775068,
         },
       });
     });

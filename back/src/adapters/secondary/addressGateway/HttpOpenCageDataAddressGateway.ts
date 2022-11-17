@@ -46,6 +46,9 @@ const AXIOS_TIMEOUT_MS = 10_000;
 export const createHttpOpenCageDataClient = configureHttpClient(
   createAxiosHandlerCreator(axios.create({ timeout: AXIOS_TIMEOUT_MS })),
 );
+export const queryMinLength = 2;
+export const minimumCharErrorMessage = (minLength: number) =>
+  `Lookup street address require a minimum of ${minLength} char.`;
 
 export class HttpOpenCageDataAddressGateway implements AddressGateway {
   constructor(
@@ -101,6 +104,8 @@ export class HttpOpenCageDataAddressGateway implements AddressGateway {
     // eslint-disable-next-line no-console
     console.time(`lookupStreetAddress Duration - ${query}`);
     try {
+      if (query.length < queryMinLength)
+        throw new Error(minimumCharErrorMessage(queryMinLength));
       const { responseBody } = await this.httpClient.geocoding({
         queryParams: {
           countrycode: franceAndAttachedTerritoryCountryCodes,
