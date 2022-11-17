@@ -13,7 +13,7 @@ export const SectionTextEmbed = ({ iframeUrl }: SectionTextEmbedProps) => (
         Qu’est-ce qu’une immersion professionnelle ?
       </h3>
       <span className={`${componentName}__subtitle fr-badge im-badge fr-mb-2w`}>
-        PMSPM ou Période de mise en situation en milieu professionnel
+        PMSMP ou Période de mise en situation en milieu professionnel
       </span>
     </div>
 

@@ -221,7 +221,7 @@ export const sectionFaqData: FaqCardProps[] = [
     url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-trouver-une-entreprise-accueillante-ek1x8s/",
   },
   {
-    title: "A quoi sert une immersion professionelle ?",
+    title: "A quoi sert une immersion professionnelle ?",
     description: `Elle vous permet d’assurer le succès de votre projet professionnel en découvrant un métier en conditions réelles, de passer quelques jours en entreprise pour vérifier...`,
     url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/a-quoi-sert-une-immersion-professionnelle-1yd6ije/",
   },
