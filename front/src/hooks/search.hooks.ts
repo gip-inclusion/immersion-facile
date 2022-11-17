@@ -1,6 +1,10 @@
 import { useDispatch } from "react-redux";
 import { SearchSortedBy } from "shared";
-import { searchSlice } from "src/core-logic/domain/search/search.slice";
+import { routes } from "src/app/routing/routes";
+import {
+  SearchPageParams,
+  searchSlice,
+} from "src/core-logic/domain/search/search.slice";
 
 export interface SearchInput {
   rome?: string;
@@ -15,16 +19,8 @@ export interface SearchInput {
 export const useSearchUseCase = () => {
   const dispatch = useDispatch();
 
-  return (values: SearchInput) => {
-    dispatch(
-      searchSlice.actions.searchRequested({
-        rome: values.rome || undefined,
-        latitude: values.lat,
-        longitude: values.lon,
-        distance_km: values.radiusKm,
-        address: values.address,
-        sortedBy: values.sortedBy,
-      }),
-    );
+  return (values: SearchPageParams) => {
+    dispatch(searchSlice.actions.searchRequested(values));
+    routes.search(values).replace();
   };
 };

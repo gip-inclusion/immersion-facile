@@ -80,6 +80,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       longitude: param.query.optional.number,
       address: param.query.optional.string,
       rome: param.query.optional.string,
+      romeLabel: param.query.optional.string,
       sortedBy: param.query.optional.string,
     },
     () => `/${frontRoutes.search}`,

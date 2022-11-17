@@ -3,13 +3,13 @@ import locationSearchIcon from "/img/location-search-icon.svg";
 import sortSearchIcon from "/sort-search-icon.svg";
 import SearchIcon from "@mui/icons-material/Search";
 import { Form, Formik } from "formik";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ButtonSearch, MainWrapper } from "react-design-system/immersionFacile";
 import { RomeAutocomplete } from "src/app/components/RomeAutocomplete";
 import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
-import { SearchInput, useSearchUseCase } from "src/hooks/search.hooks";
+import { useSearchUseCase } from "src/hooks/search.hooks";
 import { AddressAutocomplete } from "src/uiComponents/autocomplete/AddressAutocomplete";
 import { HomeImmersionHowTo } from "src/uiComponents/ImmersionHowTo";
 import { StaticDropdown } from "./Dropdown/StaticDropdown";
@@ -17,10 +17,14 @@ import { OurAdvises } from "./OurAdvises";
 import "./SearchPage.css";
 import { SearchResultPanel } from "./SearchResultPanel";
 import { addressDtoToString } from "shared";
-import { keys, prop } from "ramda";
+import { prop } from "ramda";
 import { SearchSortedBy } from "shared";
-import { useSearchWatchValuesInUrl } from "./useSearchWatchInUrl";
-import { SearchParams } from "src/core-logic/domain/search/search.slice";
+import {
+  SearchPageParams,
+  SearchStatus,
+} from "src/core-logic/domain/search/search.slice";
+import { Route } from "type-route";
+import { routes } from "src/app/routing/routes";
 
 const radiusOptions = [1, 2, 5, 10, 20, 50, 100];
 const sortedByOptions: { value: SearchSortedBy; label: string }[] = [
@@ -28,56 +32,48 @@ const sortedByOptions: { value: SearchSortedBy; label: string }[] = [
   { value: "date", label: "Par date de publication" },
 ];
 const initiallySelectedIndex = -1;
-type SearchFormValues = {
-  lat: number;
-  lon: number;
-  radiusKm: number;
-  address: string;
-  sortedBy?: SearchSortedBy;
-};
 
-export const SearchPage = () => {
+export const SearchPage = ({
+  route,
+}: {
+  route: Route<typeof routes.search>;
+}) => {
   const searchStatus = useAppSelector(searchSelectors.searchStatus);
   const searchUseCase = useSearchUseCase();
   const initialValues = {
-    lat: 0,
-    lon: 0,
-    radiusKm: 10,
+    latitude: 0,
+    longitude: 0,
+    distance_km: 10,
     address: "",
     sortedBy: undefined,
   };
   const [formikValues, setFormikValues] =
-    useState<SearchFormValues>(initialValues);
+    useState<SearchPageParams>(initialValues);
 
-  const mapValuesToSearchParams = (
-    formValues: SearchFormValues,
-  ): SearchParams => {
-    const matching = [
-      {
-        lat: "latitude",
-        radiusKm: "distance_km",
-        lon: "longitude",
-        address: "address",
-        rome: "rome",
-        sortedBy: "sortedBy",
-      },
-    ];
-    return keys(formValues).reduce(
-      (acc, currentKey: string) => ({
-        ...acc,
-        [matching[currentKey]]: formValues[currentKey],
-      }),
-      {
-        latitude: 0,
-        longitude: 0,
-        distance_km: 10,
-        rome: "",
-        sortedBy: "distance",
-      },
-    );
+  const availableForSearchRequest = (
+    searchStatus: SearchStatus,
+    values: SearchPageParams,
+  ): boolean => {
+    const check =
+      searchStatus !== "initialFetch" &&
+      searchStatus !== "extraFetch" &&
+      values.longitude &&
+      values.latitude &&
+      values.longitude !== 0 &&
+      values.latitude !== 0;
+
+    return !!check;
   };
-  const watchedValues: SearchParams = mapValuesToSearchParams(formikValues);
-  useSearchWatchValuesInUrl(watchedValues);
+
+  useEffect(() => {
+    if (
+      route &&
+      availableForSearchRequest(searchStatus, route.params as SearchPageParams)
+    ) {
+      setFormikValues(route.params as SearchPageParams);
+      searchUseCase(route.params as SearchPageParams);
+    }
+  }, []);
   return (
     <HeaderFooterLayout>
       <MainWrapper vSpacing={0} layout="fullscreen">
@@ -87,9 +83,10 @@ export const SearchPage = () => {
               Je trouve une entreprise pour réaliser mon immersion
               professionnelle
             </h1>
-            <Formik<SearchInput>
+            <Formik<SearchPageParams>
               initialValues={formikValues}
               onSubmit={searchUseCase}
+              enableReinitialize
             >
               {({ setFieldValue, values }) => (
                 <Form className={"search-page__form"}>
@@ -98,8 +95,13 @@ export const SearchPage = () => {
                       <RomeAutocomplete
                         title="Je recherche un métier"
                         setFormValue={(newValue) => {
+                          setFieldValue("romeLabel", newValue.romeLabel);
                           setFieldValue("rome", newValue.romeCode);
                           setFormikValues(values);
+                        }}
+                        initialValue={{
+                          romeLabel: values.romeLabel ?? "",
+                          romeCode: values.rome ?? "",
                         }}
                         placeholder={"Ex : boulangère, infirmier"}
                         className="searchdropdown-header inputLabel"
@@ -115,9 +117,10 @@ export const SearchPage = () => {
                           paddingLeft: "48px",
                           background: `white url(${locationSearchIcon}) no-repeat scroll 11px 8px`,
                         }}
+                        initialSearchTerm={values.address}
                         setFormValue={({ position, address }) => {
-                          setFieldValue("lat", position.lat);
-                          setFieldValue("lon", position.lon);
+                          setFieldValue("latitude", position.lat);
+                          setFieldValue("longitude", position.lon);
                           setFieldValue("address", addressDtoToString(address));
                           setFormikValues(values);
                         }}
@@ -135,12 +138,16 @@ export const SearchPage = () => {
                           selectedIndex: number,
                         ) => {
                           setFieldValue(
-                            "radiusKm",
+                            "distance_km",
                             radiusOptions[selectedIndex],
                           );
                           setFormikValues(values);
                         }}
-                        defaultSelectedIndex={initiallySelectedIndex}
+                        defaultSelectedIndex={
+                          values.distance_km && values.distance_km > 0
+                            ? radiusOptions.indexOf(values.distance_km)
+                            : initiallySelectedIndex
+                        }
                         options={radiusOptions.map((n) => `${n} km`)}
                         placeholder={"Votre distance (de 1 à 100km)"}
                       />
@@ -161,16 +168,15 @@ export const SearchPage = () => {
                             sortedByOptions[selectedIndex]?.value,
                           );
                         }}
-                        defaultSelectedIndex={initiallySelectedIndex}
+                        defaultSelectedIndex={sortedByOptions.findIndex(
+                          (option) => option.value === values?.sortedBy,
+                        )}
                         options={sortedByOptions.map(prop("label"))}
                       />
                     </div>
                     <ButtonSearch
                       disabled={
-                        searchStatus === "initialFetch" ||
-                        searchStatus === "extraFetch" ||
-                        values.lon === 0 ||
-                        values.lat === 0
+                        !availableForSearchRequest(searchStatus, values)
                       }
                       type="submit"
                     >

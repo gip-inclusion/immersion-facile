@@ -10,6 +10,10 @@ export type SearchParams = OmitFromExistingKeys<
   "voluntaryToImmersion"
 >;
 
+export type SearchPageParams = SearchParams & {
+  romeLabel?: string;
+};
+
 export type SearchStatus =
   | "noSearchMade"
   | "ok"

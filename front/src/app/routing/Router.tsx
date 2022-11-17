@@ -73,7 +73,7 @@ export const Router = () => {
       {route.name === "renewConventionMagicLink" && (
         <RenewExpiredLinkPage route={route} />
       )}
-      {route.name === "search" && <SearchPage />}
+      {route.name === "search" && <SearchPage route={route} />}
       {route.name === "stats" && <StatsPage />}
       {ENV.envType !== "production" && route.name === "searchDebug" && (
         <SearchDebugPage />

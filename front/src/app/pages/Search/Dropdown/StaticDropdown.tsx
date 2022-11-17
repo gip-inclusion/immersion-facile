@@ -36,6 +36,9 @@ export const StaticDropdown = ({
       document.removeEventListener("click", handleClickOutsideToggler);
     };
   }, [toggler]);
+  useEffect(() => {
+    setSelectedIndex(defaultSelectedIndex);
+  }, [defaultSelectedIndex]);
   const onClearButtonClick = () => {
     setSelectedIndex(-1);
     onSelection("", -1);

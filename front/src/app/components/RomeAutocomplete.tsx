@@ -26,6 +26,7 @@ export const RomeAutocomplete = ({
   className,
   placeholder = "Ex : boulangère, infirmier",
   tooltip,
+  initialValue,
 }: RomeAutocompleteProps): JSX.Element => {
   const { romeSearchText, isSearching, selectedRomeDto, romeOptions } =
     useAppSelector(romeAutocompleteSelector);
@@ -40,7 +41,7 @@ export const RomeAutocomplete = ({
         disablePortal
         filterOptions={(x) => x}
         options={romeOptions}
-        value={selectedRomeDto}
+        value={selectedRomeDto ?? initialValue}
         noOptionsText={romeSearchText ? noOptionText : "Saisissez un métier"}
         getOptionLabel={(option: RomeDto) => option.romeLabel}
         renderOption={(props, option) => <li {...props}>{option.romeLabel}</li>}
