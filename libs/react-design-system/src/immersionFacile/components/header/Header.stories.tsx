@@ -28,27 +28,24 @@ Default.args = {
   navLinks: [
     {
       label: "Home",
-      display: true,
+
       href: "#item-1",
       onClick: () => false,
     },
     {
       label: "Item actif",
       href: "#item-2",
-      display: true,
       onClick: () => false,
       active: true,
     },
     {
       label: "Item",
       href: "#item-3",
-      display: true,
       onClick: () => false,
     },
     {
       label: "Dernier item",
       href: "#item-4",
-      display: true,
       onClick: () => false,
     },
   ],

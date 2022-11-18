@@ -15,6 +15,11 @@ import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { adminAuthSlice } from "src/core-logic/domain/admin/adminAuth/adminAuth.slice";
 
+type HeaderNavLinks = (NavLink & {
+  display: boolean;
+  children?: (NavLink & { display: boolean })[];
+})[];
+
 export const ImmersionMarianneHeader = () => {
   const featureFlags = useFeatureFlags();
   const dispatch = useDispatch();
@@ -37,7 +42,7 @@ export const ImmersionMarianneHeader = () => {
   const isAgencyRoute =
     currentRoute.name === routes.addAgency().name ||
     currentRoute.name === routes.homeAgencies().name;
-  const links: (NavLink & { display: boolean })[] = [
+  const links: HeaderNavLinks = [
     {
       label: "Accueil",
       display: true,
@@ -119,6 +124,18 @@ export const ImmersionMarianneHeader = () => {
         },
       ],
     },
+    // {
+    //   label: "Formulaire Entreprise",
+    //   display: isAdminConnected,
+    //   active: currentRoute.name === routes.formEstablishment().name,
+    //   ...routes.formEstablishment().link,
+    // },
+    // {
+    //   label: "Landing entreprise",
+    //   display: isAdminConnected,
+    //   active: currentRoute.name === routes.landingEstablishment().name,
+    //   ...routes.landingEstablishment().link,
+    // },
     {
       label: "Admin",
       display: isAdminConnected && featureFlags.enableAdminUi,

@@ -16,7 +16,6 @@ const navLinks: NavLink[] = [
   {
     label: "My first tab",
     href: "#1",
-    display: true,
     onClick: (e) => {
       e.preventDefault();
       // eslint-disable-next-line no-console
@@ -26,7 +25,6 @@ const navLinks: NavLink[] = [
   {
     label: "My second tab",
     href: "#2",
-    display: true,
     onClick: (e) => {
       e.preventDefault();
       // eslint-disable-next-line no-console
@@ -35,7 +33,7 @@ const navLinks: NavLink[] = [
   },
   {
     label: "My third tab",
-    display: true,
+
     href: "#3",
     onClick: (e) => {
       e.preventDefault();

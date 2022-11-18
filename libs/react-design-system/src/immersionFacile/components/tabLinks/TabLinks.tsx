@@ -6,7 +6,6 @@ export type NavLink = {
   href?: string;
   active?: boolean;
   target?: string;
-  display: boolean;
   children?: NavLink[];
   index?: number;
 };
