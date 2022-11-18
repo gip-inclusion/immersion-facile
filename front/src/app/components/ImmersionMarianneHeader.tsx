@@ -124,18 +124,6 @@ export const ImmersionMarianneHeader = () => {
         },
       ],
     },
-    // {
-    //   label: "Formulaire Entreprise",
-    //   display: isAdminConnected,
-    //   active: currentRoute.name === routes.formEstablishment().name,
-    //   ...routes.formEstablishment().link,
-    // },
-    // {
-    //   label: "Landing entreprise",
-    //   display: isAdminConnected,
-    //   active: currentRoute.name === routes.landingEstablishment().name,
-    //   ...routes.landingEstablishment().link,
-    // },
     {
       label: "Admin",
       display: isAdminConnected && featureFlags.enableAdminUi,
