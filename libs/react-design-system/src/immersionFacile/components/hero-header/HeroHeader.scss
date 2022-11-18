@@ -133,9 +133,6 @@ $typesTints: (
   &__nav-cards {
     align-items: stretch;
   }
-  &__nav-card-wrapper {
-    height: 100%;
-  }
   &__nav-card {
     background: $white;
     border-radius: 16px;
@@ -146,6 +143,7 @@ $typesTints: (
     position: relative;
     top: 0;
     transition: all 1s ease;
+    height: 100%;
     @include for-screen-min($bp-lg) {
       flex-direction: column;
     }
