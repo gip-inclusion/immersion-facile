@@ -5,9 +5,10 @@ import {
   addressDtoToString,
   ConventionDto,
   conventionObjectiveOptions,
-  emptySchedule,
+  DateIntervalDto,
   getConventionFieldName,
   reasonableSchedule,
+  scheduleWithFirstDayActivity,
 } from "shared";
 import {
   BoolRadioGroup,
@@ -44,16 +45,12 @@ export const ImmersionConditionsCommonFields = ({
     disabled: isSiretFetcherDisabled,
   });
 
-  const resetSchedule = (dateStart: string, dateEnd: string) => {
-    const interval = {
-      start: new Date(dateStart),
-      end: new Date(dateEnd),
-    };
+  const resetSchedule = (interval: DateIntervalDto) => {
     setFieldValue(
       "schedule",
       values.schedule.isSimple
         ? reasonableSchedule(interval)
-        : emptySchedule(interval),
+        : scheduleWithFirstDayActivity(interval),
     );
   };
   return (
@@ -63,7 +60,10 @@ export const ImmersionConditionsCommonFields = ({
         name={getConventionFieldName("dateStart")}
         disabled={disabled}
         onDateChange={(dateStart) => {
-          resetSchedule(dateStart, values.dateEnd);
+          resetSchedule({
+            start: new Date(dateStart),
+            end: new Date(values.dateEnd),
+          });
           setFieldValue("dateStart", dateStart);
           setDateMax(addMonths(new Date(dateStart), 1).toISOString());
         }}
@@ -74,7 +74,10 @@ export const ImmersionConditionsCommonFields = ({
         disabled={disabled}
         max={dateMax}
         onDateChange={(dateEnd) => {
-          resetSchedule(values.dateStart, dateEnd);
+          resetSchedule({
+            start: new Date(values.dateStart),
+            end: new Date(dateEnd),
+          });
           setFieldValue("dateEnd", dateEnd);
         }}
       />

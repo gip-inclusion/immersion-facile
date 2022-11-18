@@ -1,12 +1,11 @@
 import { useField } from "formik";
-import React, { useEffect } from "react";
+import React from "react";
 import {
   ConventionDto,
   DateIntervalDto,
-  emptySchedule,
   reasonableSchedule,
   ScheduleDto,
-  validateSchedule,
+  scheduleWithFirstDayActivity,
 } from "shared";
 import { BoolRadioPicker } from "./BoolRadioPicker";
 import { ComplexSchedulePicker } from "./ComplexSchedulePicker";
@@ -18,22 +17,19 @@ type SchedulePickerProps = {
   interval: DateIntervalDto;
 };
 
-export const SchedulePicker = (props: SchedulePickerProps): JSX.Element => {
+export const SchedulePicker = ({
+  interval,
+  disabled,
+}: SchedulePickerProps): JSX.Element => {
   const name: keyof ConventionDto = "schedule";
-  const [field, meta, { setValue, setError, setTouched }] =
-    useField<ScheduleDto>({ name });
-  useEffect(() => {
-    setError(validateSchedule(field.value));
-  }, [field.value, meta.error]);
+  const [field, meta, { setValue }] = useField<ScheduleDto>({ name });
+
   const onBoolRadioPickerChange = (isSimple: boolean): void => {
     setValue(
       isSimple
-        ? reasonableSchedule(props.interval)
-        : emptySchedule(props.interval),
+        ? reasonableSchedule(interval)
+        : scheduleWithFirstDayActivity(interval),
     );
-  };
-  const onComplexScheduleChange = (): void => {
-    setTouched(true);
   };
   return (
     <>
@@ -45,9 +41,8 @@ export const SchedulePicker = (props: SchedulePickerProps): JSX.Element => {
         noLabel="Non, irréguliers"
         checked={field.value.isSimple}
         setFieldValue={onBoolRadioPickerChange}
-        disabled={props.disabled}
+        disabled={disabled}
       />
-
       <h4>
         {field.value.isSimple
           ? "Sélectionnez la période des jours *"
@@ -58,20 +53,16 @@ export const SchedulePicker = (props: SchedulePickerProps): JSX.Element => {
           Les horaires hebdomadaires ne doivent pas dépasser 35h.
         </p>
       )}
-      {meta.error && meta.touched && (
+      {meta.error && (
         <div id={name + "-error-description"} className="fr-error-text">
-          {JSON.stringify((meta.error as any)?.complexSchedule) ?? meta.error}
+          {meta.error}
         </div>
       )}
-
-      {!field.value.isSimple && (
-        <ComplexSchedulePicker
-          selectedIndex={field.value.selectedIndex}
-          onChange={onComplexScheduleChange}
-          {...props}
-        />
+      {field.value.isSimple ? (
+        <RegularSchedulePicker interval={interval} disabled={disabled} />
+      ) : (
+        <ComplexSchedulePicker disabled={disabled} />
       )}
-      {field.value.isSimple && <RegularSchedulePicker {...props} />}
     </>
   );
 };

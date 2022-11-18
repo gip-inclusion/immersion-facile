@@ -432,6 +432,22 @@ export const emptySchedule = (
   complexSchedule: makeComplexSchedule(interval, []),
 });
 
+export const scheduleWithFirstDayActivity = (
+  interval: DateIntervalDto,
+): Readonly<ScheduleDto> => ({
+  isSimple: false,
+  selectedIndex: 0,
+  complexSchedule: makeComplexSchedule(interval, []).map((schedule) => {
+    if (schedule.date === interval.start.toISOString()) {
+      schedule.timePeriods = [
+        { start: "09:00", end: "12:00" },
+        { start: "13:00", end: "17:00" },
+      ];
+    }
+    return schedule;
+  }),
+});
+
 export const makeDailySchedule = (
   date: Date,
   schedules: TimePeriodsDto,

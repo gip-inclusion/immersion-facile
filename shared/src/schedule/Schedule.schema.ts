@@ -9,7 +9,7 @@ import {
   WeekdayNumber,
   WeekDayRangeSchemaDTO,
 } from "./Schedule.dto";
-import { calculateTotalImmersionHoursFromComplexSchedule } from "./ScheduleUtils";
+import { validateSchedule } from "./ScheduleUtils";
 
 // Time period within a day.
 // TODO We could refine by checking that start < end
@@ -34,12 +34,8 @@ export const dailyScheduleSchema: z.Schema<DailyScheduleDto> = z.object({
 // Each element represents one weekday, starting with Monday.
 //export const complexScheduleSchema_V0 = z.array(z.array(timePeriodSchema));
 
-export const immersionDaysScheduleSchema: z.Schema<DailyScheduleDto[]> = z
-  .array(dailyScheduleSchema)
-  .refine((days) => {
-    const numberOfHours = calculateTotalImmersionHoursFromComplexSchedule(days);
-    return numberOfHours !== 0;
-  });
+export const immersionDaysScheduleSchema: z.Schema<DailyScheduleDto[]> =
+  z.array(dailyScheduleSchema);
 
 export const weekDaySchema = z
   .number()
@@ -57,8 +53,18 @@ export const weekDayRangeSchema: z.Schema<WeekDayRangeSchemaDTO> = z.tuple([
 export const dayPeriodsSchema: z.Schema<DayPeriodsDto> =
   z.array(weekDayRangeSchema);
 
-export const scheduleSchema: z.Schema<ScheduleDto> = z.object({
-  isSimple: z.boolean(),
-  selectedIndex: z.number(),
-  complexSchedule: immersionDaysScheduleSchema,
-});
+export const scheduleSchema: z.Schema<ScheduleDto> = z
+  .object({
+    isSimple: z.boolean(),
+    selectedIndex: z.number(),
+    complexSchedule: immersionDaysScheduleSchema,
+  })
+  .superRefine((schedule, issueMaker) => {
+    const message = validateSchedule(schedule);
+    if (message)
+      issueMaker.addIssue({
+        code: z.ZodIssueCode.custom,
+        message,
+        path: [],
+      });
+  });

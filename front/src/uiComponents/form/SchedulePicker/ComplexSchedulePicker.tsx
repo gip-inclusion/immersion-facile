@@ -1,17 +1,16 @@
 import { useField } from "formik";
 import React from "react";
-import { ConventionDto, DateIntervalDto, ScheduleDto } from "shared";
+import { ConventionDto, ScheduleDto } from "shared";
 import { DayPicker } from "./DayPicker";
 import { HourPicker } from "./HourPicker";
 
 type ComplexSchedulePickerProps = {
-  selectedIndex: number;
-  onChange: () => void;
   disabled?: boolean;
-  interval: DateIntervalDto;
 };
 
-export const ComplexSchedulePicker = (props: ComplexSchedulePickerProps) => {
+export const ComplexSchedulePicker = ({
+  disabled,
+}: ComplexSchedulePickerProps) => {
   const name: keyof ConventionDto = "schedule";
   const [field, _, { setValue }] = useField<ScheduleDto>({ name });
 
@@ -24,10 +23,8 @@ export const ComplexSchedulePicker = (props: ComplexSchedulePickerProps) => {
           const schedule = field.value;
           schedule.selectedIndex = lastClickedIndex;
           setValue(schedule);
-          props.onChange();
         }}
       />
-
       <HourPicker
         name={name}
         timePeriods={
@@ -40,9 +37,8 @@ export const ComplexSchedulePicker = (props: ComplexSchedulePickerProps) => {
           schedule.complexSchedule[schedule.selectedIndex].timePeriods =
             newHours;
           setValue(schedule);
-          props.onChange();
         }}
-        disabled={props.disabled}
+        disabled={disabled}
       />
     </div>
   );
