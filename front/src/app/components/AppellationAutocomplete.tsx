@@ -44,16 +44,18 @@ export const AppellationAutocomplete = ({
       }
     : null;
 
-  const [selectedOption, setSelectedOption] = useState<Option | null>(
-    initialOption,
-  );
+  const [selectedOption, setSelectedOption] = useState<Option | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>(
     initialValue?.appellationLabel ?? "",
   );
   const [options, setOptions] = useState<Option[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const debounceSearchTerm = useDebounce(searchTerm, 300);
-
+  useEffect(() => {
+    if (initialOption && selectedOption === null) {
+      setSelectedOption(initialOption);
+    }
+  }, [initialOption]);
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     (async () => {
@@ -86,7 +88,6 @@ export const AppellationAutocomplete = ({
 
   const noOptionText =
     isSearching || !debounceSearchTerm ? "..." : "Aucun métier trouvé";
-
   return (
     <>
       <Autocomplete
