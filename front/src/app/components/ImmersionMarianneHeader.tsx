@@ -14,7 +14,6 @@ import { useAppSelector } from "src/app/utils/reduxHooks";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { adminAuthSlice } from "src/core-logic/domain/admin/adminAuth/adminAuth.slice";
-import { ENV } from "src/environmentVariables";
 
 export const ImmersionMarianneHeader = () => {
   const featureFlags = useFeatureFlags();
@@ -29,61 +28,117 @@ export const ImmersionMarianneHeader = () => {
       callback: () => dispatch(adminAuthSlice.actions.logoutRequested()),
     });
   }
-
+  const isCandidateRoute =
+    currentRoute.name === routes.search().name ||
+    currentRoute.name === routes.homeCandidates().name;
+  const isEstablishmentRoute =
+    currentRoute.name === routes.formEstablishment().name ||
+    currentRoute.name === routes.homeEstablishments().name;
+  const isAgencyRoute =
+    currentRoute.name === routes.addAgency().name ||
+    currentRoute.name === routes.homeAgencies().name;
   const links: (NavLink & { display: boolean })[] = [
     {
-      label: "Home",
-      display: isAdminConnected,
+      label: "Accueil",
+      display: true,
       active: currentRoute.name === routes.home().name,
       ...routes.home().link,
     },
     {
-      label: "Demande immersion",
-      display: isAdminConnected,
-      active: currentRoute.name === routes.conventionImmersion().name,
-      ...routes.conventionImmersion().link,
+      label: "Candidat",
+      display: true,
+      active: isCandidateRoute,
+      children: [
+        {
+          label: "Accueil candidat",
+          display: true,
+          active: currentRoute.name === routes.homeCandidates().name,
+          ...routes.homeCandidates().link,
+        },
+        {
+          label: "Trouver une entreprise accueillante",
+          display: true,
+          active: currentRoute.name === routes.search().name,
+          ...routes.search().link,
+        },
+        {
+          label: "Remplir la demande de convention",
+          display: true,
+          active: false,
+          ...routes.conventionImmersion().link,
+        },
+      ],
     },
     {
-      label: "Formulaire Entreprise",
-      display: isAdminConnected,
-      active: currentRoute.name === routes.formEstablishment().name,
-      ...routes.formEstablishment().link,
+      label: "Entreprise",
+      display: true,
+      active: isEstablishmentRoute,
+      children: [
+        {
+          label: "Accueil entreprise",
+          display: true,
+          active: currentRoute.name === routes.homeEstablishments().name,
+          ...routes.homeEstablishments().link,
+        },
+        {
+          label: "Référencer mon entreprise",
+          display: true,
+          active: currentRoute.name === routes.formEstablishment().name,
+          ...routes.formEstablishment().link,
+        },
+        {
+          label: "Remplir la demande de convention",
+          display: true,
+          active: false,
+          ...routes.conventionImmersion().link,
+        },
+      ],
     },
     {
-      label: "Landing entreprise",
-      display: isAdminConnected,
-      active: currentRoute.name === routes.landingEstablishment().name,
-      ...routes.landingEstablishment().link,
+      label: "Prescripteurs",
+      display: true,
+      active: isAgencyRoute,
+      children: [
+        {
+          label: "Accueil prescripteurs",
+          display: true,
+          active: currentRoute.name === routes.homeAgencies().name,
+          ...routes.homeAgencies().link,
+        },
+        {
+          label: "Référencer mon organisme",
+          display: true,
+          active: currentRoute.name === routes.addAgency().name,
+          ...routes.addAgency().link,
+        },
+        {
+          label: "Remplir la demande de convention",
+          display: true,
+          active: false,
+          ...routes.conventionImmersion().link,
+        },
+      ],
     },
     {
-      label: "Recherche",
-      display: isAdminConnected,
-      active: currentRoute.name === routes.search().name,
-      ...routes.search().link,
-    },
-    {
-      label: "Ajouter agence",
-      display: isAdminConnected,
-      active: currentRoute.name === routes.addAgency().name,
-      ...routes.addAgency().link,
-    },
-    {
-      label: "Backoffice",
+      label: "Admin",
       display: isAdminConnected && featureFlags.enableAdminUi,
       active:
         currentRoute.name === routes.adminTab({ tab: "conventions" }).name,
-      ...routes.adminTab({ tab: "conventions" }).link,
+      children: [
+        {
+          label: "Backoffice",
+          display: true,
+          active: false,
+          ...routes.adminTab({ tab: "conventions" }).link,
+        },
+        {
+          label: "Landing entreprise",
+          display: true,
+          active: false,
+          ...routes.landingEstablishment().link,
+        },
+      ],
     },
-    ...(ENV.envType !== "production"
-      ? [
-          {
-            label: "Emails",
-            display: isAdminConnected && featureFlags.enableAdminUi,
-            active: false,
-            ...routes.adminTab({ tab: "emails" }).link,
-          },
-        ]
-      : []),
   ];
 
   const linksFiltered = links.filter((link) => link.display);
