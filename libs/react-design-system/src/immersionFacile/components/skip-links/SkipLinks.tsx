@@ -15,7 +15,7 @@ export const SkipLinks = ({ links }: SkipLinksProps) => (
       <ul className="fr-skiplinks__list">
         {links &&
           links.map((link) => (
-            <li>
+            <li key={link.anchor}>
               <a className="fr-link" href={`#${link.anchor}`}>
                 {link.label}
               </a>
