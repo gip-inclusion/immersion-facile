@@ -44,7 +44,9 @@ export const AppellationAutocomplete = ({
       }
     : null;
 
-  const [selectedOption, setSelectedOption] = useState<Option | null>(null);
+  const [selectedOption, setSelectedOption] = useState<Option | null>(
+    initialOption,
+  );
   const [searchTerm, setSearchTerm] = useState<string>(
     initialValue?.appellationLabel ?? "",
   );
