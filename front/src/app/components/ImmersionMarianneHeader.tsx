@@ -50,7 +50,7 @@ export const ImmersionMarianneHeader = () => {
       ...routes.home().link,
     },
     {
-      label: "Candidat",
+      label: "Candidats",
       display: true,
       active: isCandidateRoute,
       children: [
@@ -75,7 +75,7 @@ export const ImmersionMarianneHeader = () => {
       ],
     },
     {
-      label: "Entreprise",
+      label: "Entreprises",
       display: true,
       active: isEstablishmentRoute,
       children: [
