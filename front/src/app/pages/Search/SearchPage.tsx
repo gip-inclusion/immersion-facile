@@ -61,7 +61,6 @@ export const SearchPage = ({
       values.latitude &&
       values.longitude !== 0 &&
       values.latitude !== 0;
-
     return !!check;
   };
 
@@ -86,7 +85,10 @@ export const SearchPage = ({
             <Formik<SearchPageParams>
               initialValues={formikValues}
               onSubmit={searchUseCase}
-              enableReinitialize
+              enableReinitialize={availableForSearchRequest(
+                searchStatus,
+                route.params as SearchPageParams,
+              )}
             >
               {({ setFieldValue, values }) => (
                 <Form className={"search-page__form"}>
