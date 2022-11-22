@@ -21,6 +21,7 @@ const navLinks: NavLink[] = [
       // eslint-disable-next-line no-console
       console.log("clicked firstTab");
     },
+    id: "im-tab-links__link-1",
   },
   {
     label: "My second tab",
@@ -30,6 +31,7 @@ const navLinks: NavLink[] = [
       // eslint-disable-next-line no-console
       console.log("clicked second Tab");
     },
+    id: "im-tab-links__link-2",
   },
   {
     label: "My third tab",
@@ -40,6 +42,7 @@ const navLinks: NavLink[] = [
       // eslint-disable-next-line no-console
       console.log("clicked third Tab");
     },
+    id: "im-tab-links__link-3",
   },
 ];
 

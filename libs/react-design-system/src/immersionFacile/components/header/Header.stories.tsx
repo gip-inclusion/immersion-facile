@@ -31,22 +31,26 @@ Default.args = {
 
       href: "#item-1",
       onClick: () => false,
+      id: "im-header__link-1",
     },
     {
       label: "Item actif",
       href: "#item-2",
       onClick: () => false,
       active: true,
+      id: "im-header__link-2",
     },
     {
       label: "Item",
       href: "#item-3",
       onClick: () => false,
+      id: "im-header__link-3",
     },
     {
       label: "Dernier item",
       href: "#item-4",
       onClick: () => false,
+      id: "im-header__link-4",
     },
   ],
 };

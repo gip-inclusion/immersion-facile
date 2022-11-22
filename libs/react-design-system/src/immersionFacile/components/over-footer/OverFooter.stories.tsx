@@ -28,6 +28,7 @@ OverFooterMock.args = {
         label: "Rejoignez-nous sur Linkedin",
         url: "https://www.linkedin.com/company/l-immersion-facilitee/",
       },
+      id: "im-over-footer__link-1",
     },
     {
       title: "Le centre de support",
@@ -38,6 +39,7 @@ OverFooterMock.args = {
         label: "Accéder à notre FAQ",
         url: "https://aide.immersion-facile.beta.gouv.fr/fr/",
       },
+      id: "im-over-footer__link-2",
     },
   ],
 };

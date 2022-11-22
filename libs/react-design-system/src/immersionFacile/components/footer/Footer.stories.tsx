@@ -22,10 +22,12 @@ Default.args = {
     {
       label: "Footer link 1",
       href: "#link-1",
+      id: "im-footer__link-1",
     },
     {
       label: "Footer link 2",
       href: "#link-2",
+      id: "im-footer__link-2",
     },
   ],
   bottomLinks: [
@@ -33,19 +35,23 @@ Default.args = {
       label: "Bottom link 1",
       href: "#link-1",
       target: "_blank",
+      id: "im-footer__link-3",
     },
     {
       label: "Bottom link 2",
       href: "#link-2",
+      id: "im-footer__link-4",
     },
     {
       label: "Bottom link 3",
       href: "#link-3",
       target: "_blank",
+      id: "im-footer__link-5",
     },
     {
       label: "Bottom link 4",
       href: "#link-4",
+      id: "im-footer__link-6",
     },
   ],
 };
