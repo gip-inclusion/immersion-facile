@@ -48,11 +48,6 @@ export const SchedulePicker = ({
           ? "Sélectionnez la période des jours *"
           : "Sélectionnez les horaires de travail jour par jour *"}
       </h4>
-      {!field.value.isSimple && (
-        <p className="fr-hint-text">
-          Les horaires hebdomadaires ne doivent pas dépasser 35h.
-        </p>
-      )}
       {meta.error && (
         <div id={name + "-error-description"} className="fr-error-text">
           {meta.error}
