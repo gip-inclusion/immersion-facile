@@ -31,7 +31,7 @@ export const SectionFaq = ({ articles }: SectionFaqProps) => (
         <Button
           url="https://aide.immersion-facile.beta.gouv.fr/fr/"
           target="_blank"
-          id={`section-faq__see-all-button`}
+          id={`im-section-faq__see-all-button`}
         >
           Voir toutes les questions fréquentes
         </Button>
@@ -53,7 +53,11 @@ const FaqCard = ({ title, description, url, index }: FaqCardProps) => (
       <div className="fr-card__body">
         <div className="fr-card__content">
           <h3 className="fr-card__title">
-            <a href={url} target="_blank" id={`section-faq__card-${index}`}>
+            <a
+              href={url}
+              target="_blank"
+              id={`im-section-faq__card-${index ? index + 1 : ""}`}
+            >
               {title}
             </a>
           </h3>
