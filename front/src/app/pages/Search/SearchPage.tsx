@@ -70,6 +70,7 @@ export const SearchPage = ({
       availableForSearchRequest(searchStatus, route.params as SearchPageParams)
     ) {
       setFormikValues(route.params as SearchPageParams);
+      searchUseCase(route.params as SearchPageParams);
     }
   }, []);
   return (
