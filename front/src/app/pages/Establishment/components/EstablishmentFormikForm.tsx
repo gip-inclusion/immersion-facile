@@ -77,7 +77,7 @@ export const EstablishmentFormikForm = ({
     >
       {({ isSubmitting, submitCount, errors, values }) => (
         <>
-          <Title>Référencer une entreprise</Title>
+          <Title>Référencer mon entreprise</Title>
           <p>
             Bienvenue sur l'espace de référencement des entreprises volontaires
             pour l'accueil des immersions professionnelles.
