@@ -70,7 +70,6 @@ export const SearchPage = ({
       availableForSearchRequest(searchStatus, route.params as SearchPageParams)
     ) {
       setFormikValues(route.params as SearchPageParams);
-      searchUseCase(route.params as SearchPageParams);
     }
   }, []);
   return (
@@ -99,7 +98,10 @@ export const SearchPage = ({
                         setFormValue={(newValue) => {
                           setFieldValue("romeLabel", newValue.romeLabel);
                           setFieldValue("rome", newValue.romeCode);
-                          setFormikValues(values);
+                          setFormikValues({
+                            ...values,
+                            ...newValue,
+                          });
                         }}
                         initialValue={{
                           romeLabel: values.romeLabel ?? "",
@@ -125,6 +127,12 @@ export const SearchPage = ({
                           setFieldValue("longitude", position.lon);
                           setFieldValue("address", addressDtoToString(address));
                           setFormikValues(values);
+                          setFormikValues({
+                            ...values,
+                            latitude: position.lat,
+                            longitude: position.lon,
+                            address: addressDtoToString(address),
+                          });
                         }}
                         placeholder={"Ex : Bordeaux 33000"}
                         notice={"Saisissez un code postal et/ou une ville"}
@@ -143,7 +151,10 @@ export const SearchPage = ({
                             "distance_km",
                             radiusOptions[selectedIndex],
                           );
-                          setFormikValues(values);
+                          setFormikValues({
+                            ...values,
+                            distance_km: radiusOptions[selectedIndex],
+                          });
                         }}
                         defaultSelectedIndex={
                           values.distance_km && values.distance_km > 0
@@ -169,6 +180,10 @@ export const SearchPage = ({
                             "sortedBy",
                             sortedByOptions[selectedIndex]?.value,
                           );
+                          setFormikValues({
+                            ...values,
+                            sortedBy: sortedByOptions[selectedIndex]?.value,
+                          });
                         }}
                         defaultSelectedIndex={sortedByOptions.findIndex(
                           (option) => option.value === values?.sortedBy,
