@@ -76,7 +76,7 @@ export const RadioGroup = <T extends string | number | string[] | boolean>({
   disabled,
 }: RadioGroupProps<T>) => (
   <>
-    <div className="fr-form-group fr-mt-2w">
+    <div className="fr-form-group fr-input-group">
       <fieldset
         className={error ? "fr-fieldset fr-fieldset--error" : "fr-fieldset"}
         aria-labelledby={

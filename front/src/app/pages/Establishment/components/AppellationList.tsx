@@ -21,9 +21,9 @@ export const AppellationList = ({ name, title }: AppellationListProps) => {
   };
 
   return (
-    <div className="flex flex-col items-center">
-      <div className="w-full">
-        {title && <h5 className="text-lg font-semibold">{title}</h5>}
+    <div className="im-appellation-autocomplete fr-input-group">
+      <>
+        {title && <h5>{title}</h5>}
         <div className="flex flex-col gap-5">
           {appellations.map(({ appellationCode }, index) => (
             <FormEstablishmentAppellation
@@ -34,7 +34,7 @@ export const AppellationList = ({ name, title }: AppellationListProps) => {
             />
           ))}
         </div>
-      </div>
+      </>
       <ButtonAdd
         className="fr-my-4v"
         onClick={() =>

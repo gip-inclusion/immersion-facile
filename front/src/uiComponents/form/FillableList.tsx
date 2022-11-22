@@ -18,7 +18,7 @@ const Chip = styled(MuiChip)({
   fontWeight: "bold",
   backgroundColor: "white",
 });
-
+const componentName = "im-fillable-list";
 export const FillableList = (
   props: OmitFromExistingKeys<AddToListProps, "onAdd"> & {
     valuesInList: string[];
@@ -28,7 +28,7 @@ export const FillableList = (
   const { valuesInList, setValues, ...addToListProps } = props;
 
   return (
-    <>
+    <div className={`fr-input-group ${componentName}`}>
       <AddToList
         {...addToListProps}
         onAdd={(inputValue) => {
@@ -43,7 +43,7 @@ export const FillableList = (
           }}
         />
       )}
-    </>
+    </div>
   );
 };
 
@@ -98,7 +98,11 @@ const AddToList = ({
   };
 
   return (
-    <div className={`fr-input-group${error ? " fr-input-group--error" : ""}`}>
+    <div
+      className={`fr-input-group${
+        error ? " fr-input-group--error" : ""
+      } ${componentName}__add-to-list-wrapper fr-mb-2w`}
+    >
       <label className="fr-label" htmlFor={name}>
         {label}
       </label>
@@ -139,9 +143,9 @@ type ListOfChipProps = {
 };
 
 const ListOfChip = ({ values, onDelete }: ListOfChipProps) => (
-  <div className="pt-2">
-    {values.map((value) => (
-      <span key={value} className="px-1">
+  <div className={`${componentName}__list-of-chip`}>
+    {values.map((value, index) => (
+      <span key={value} className={index ? "fr-px-1w" : ""}>
         <Chip
           variant="outlined"
           label={value}

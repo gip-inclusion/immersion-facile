@@ -1,6 +1,6 @@
 import { Form, Formik } from "formik";
 import React, { useState } from "react";
-import { Notification } from "react-design-system";
+import { Notification, Title } from "react-design-system";
 import {
   FormEstablishmentDto,
   formEstablishmentSchema,
@@ -77,6 +77,7 @@ export const EstablishmentFormikForm = ({
     >
       {({ isSubmitting, submitCount, errors, values }) => (
         <>
+          <Title>Référencer une entreprise</Title>
           <p>
             Bienvenue sur l'espace de référencement des entreprises volontaires
             pour l'accueil des immersions professionnelles.
@@ -99,30 +100,25 @@ export const EstablishmentFormikForm = ({
             pour chaque établissement (Siret différent).
           </p>
           <Form>
-            <div className="flex flex-col gap-10 mt-4">
-              <div>
-                <span className="flex-col gap-1 block text-lg font-semibold">
-                  Votre établissement
-                </span>
-                {children}
-                <BoolCheckboxGroup
-                  {...getLabelAndName("isEngagedEnterprise")}
-                  description=""
-                  descriptionLink=""
-                  disabled={false}
-                />
-                <TextInput {...getLabelAndName("website")} />
-                <TextInput
-                  {...getLabelAndName("additionalInformation")}
-                  multiline={true}
-                />
-              </div>
-              <AppellationList
-                name="appellations"
-                title={`${fieldsToLabel["appellations"]} *`}
-              />
-              <BusinessContact />
-            </div>
+            <h5 className="fr-text--lead fr-mb-2w">Votre établissement</h5>
+            {children}
+            <BoolCheckboxGroup
+              {...getLabelAndName("isEngagedEnterprise")}
+              description=""
+              descriptionLink=""
+              disabled={false}
+            />
+            <TextInput {...getLabelAndName("website")} />
+            <TextInput
+              {...getLabelAndName("additionalInformation")}
+              multiline={true}
+            />
+            <AppellationList
+              name="appellations"
+              title={`${fieldsToLabel["appellations"]} *`}
+            />
+            <BusinessContact />
+
             {isEditing && (
               <>
                 <BoolCheckboxGroup

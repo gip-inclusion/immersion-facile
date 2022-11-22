@@ -62,7 +62,7 @@ export const AddressAutocomplete = ({
   const noOptionText =
     isSearching || !debounceSearchTerm ? "..." : "Aucune adresse trouvée.";
   return (
-    <>
+    <div className="fr-input-group">
       <Autocomplete
         loading={isSearching}
         loadingText="Recherche d'adresse en cours... 🔎"
@@ -86,7 +86,7 @@ export const AddressAutocomplete = ({
       {notice && (
         <span className="if-autocomplete-input__notice">{notice}</span>
       )}
-    </>
+    </div>
   );
 };
 

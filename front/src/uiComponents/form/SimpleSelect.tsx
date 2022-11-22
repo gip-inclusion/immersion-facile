@@ -21,12 +21,12 @@ export const SimpleSelect = ({
   const hasError = meta.touched && !!meta.error;
 
   return (
-    <FormControl fullWidth error={hasError}>
-      <div
-        className={`fr-input-group ${
-          hasError ? " fr-input-group--error" : ""
-        } ${className ? className : ""}`}
-      >
+    <div
+      className={`fr-input-group ${hasError ? " fr-input-group--error" : ""} ${
+        className ? className : ""
+      }`}
+    >
+      <FormControl fullWidth error={hasError}>
         <label className="fr-label" htmlFor={id}>
           {label}
         </label>
@@ -53,7 +53,7 @@ export const SimpleSelect = ({
             {meta.error}
           </p>
         )}
-      </div>
-    </FormControl>
+      </FormControl>
+    </div>
   );
 };

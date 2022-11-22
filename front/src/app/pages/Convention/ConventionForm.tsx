@@ -137,15 +137,13 @@ export const ConventionForm = ({
           }}
         >
           {(props) => (
-            <div>
-              <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
-                <ConventionFormFields isFrozen={isFrozen} />
-                <ConventionFeedbackNotification
-                  submitFeedback={submitFeedback}
-                  signatories={props.values.signatories}
-                />
-              </form>
-            </div>
+            <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
+              <ConventionFormFields isFrozen={isFrozen} />
+              <ConventionFeedbackNotification
+                submitFeedback={submitFeedback}
+                signatories={props.values.signatories}
+              />
+            </form>
           )}
         </Formik>
       </div>

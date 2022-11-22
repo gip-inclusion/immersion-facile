@@ -69,11 +69,9 @@ export const AddAgencyPage = () => {
           }
         >
           {({ isSubmitting, errors, submitCount }) => (
-            <Form className="m-5 max-w-6xl">
-              <div>
-                <AgencyFormCommonFields />
-                <AgencyLogoUpload />
-              </div>
+            <Form>
+              <AgencyFormCommonFields />
+              <AgencyLogoUpload />
               <div className="fr-mt-4w">
                 <Button
                   type="submit"

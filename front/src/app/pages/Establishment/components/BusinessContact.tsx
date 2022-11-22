@@ -36,11 +36,9 @@ export const BusinessContact = () => {
     `${parentFieldName}.${name}`;
   const { values, setFieldValue } = useFormikContext<FormEstablishmentDto>();
   return (
-    <div>
+    <div className="fr-input-group">
       <div>
-        <h4 className="text-lg font-semibold m-0">
-          Détails du correspondant immersion :
-        </h4>
+        <h5>Détails du correspondant immersion :</h5>
         <p>Le correspondant reçoit les demandes et les traite.</p>
       </div>
       <TextInput label="Nom du référent *" name={makeName("lastName")} />
