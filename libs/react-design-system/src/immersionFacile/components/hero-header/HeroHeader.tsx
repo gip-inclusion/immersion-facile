@@ -24,6 +24,7 @@ export type HeroHeaderNavCard = {
   type: UserType;
   link?: Link;
   total?: number;
+  id: string;
 };
 
 const componentName = "im-hero-header";
@@ -130,6 +131,7 @@ const NavCard = ({
   link,
   type,
   total,
+  id,
 }: HeroHeaderNavCard) => (
   <div
     className={`${componentName}__nav-card-wrapper fr-col-12 fr-col-lg-${
@@ -139,7 +141,7 @@ const NavCard = ({
     <div
       className={`${componentName}__nav-card ${componentName}__nav-card--${type}`}
     >
-      <a {...link} className={`${componentName}__nav-card-link`}></a>
+      <a {...link} id={id} className={`${componentName}__nav-card-link`}></a>
       <span className={`${componentName}__nav-card-overtitle`}>
         {overtitle}
       </span>

@@ -43,7 +43,11 @@ const LoginForm = () => {
               <SubTitle>Veuillez vous connectez</SubTitle>
               <TextInput label="Utilisateur" name="user" />
               <TextInput label="Mot de passe" name="password" type="password" />
-              <Button disable={isLoading} type="submit">
+              <Button
+                disable={isLoading}
+                type="submit"
+                id="im-login__submit-button"
+              >
                 Se connecter
               </Button>
               {error && (

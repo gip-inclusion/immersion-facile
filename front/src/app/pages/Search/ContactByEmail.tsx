@@ -87,7 +87,12 @@ export const ContactByEmail = ({
             Object.values(errors).length > 0 &&
             //eslint-disable-next-line no-console
             console.log("onSubmit error", { errors })}
-          <Button level="secondary" type="submit" disable={isSubmitting}>
+          <Button
+            level="secondary"
+            type="submit"
+            disable={isSubmitting}
+            id="im-contact-establishment__contact-email-button"
+          >
             Envoyer
           </Button>
         </Form>

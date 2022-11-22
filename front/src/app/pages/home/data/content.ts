@@ -21,6 +21,8 @@ type HeroHeaderInfos = {
   illustration: string;
 };
 
+const getHeroHeaderId = (chunk: string) => `im-hero-header__${chunk}`;
+
 export const heroHeaderContent: Record<UserType, HeroHeaderInfos> = {
   default: {
     title: "La meilleure façon de faire émerger de nouveaux talents",
@@ -71,12 +73,14 @@ export const heroHeaderNavCards: (
       title: "Vous êtes candidat pour une immersion",
       icon: "fr-icon-user-line",
       type: "candidate",
+      id: getHeroHeaderId("home-candidate"),
       link: routes.homeCandidates().link,
     },
     {
       overtitle: "Entreprise",
       title: "Vous représentez une entreprise",
       icon: "fr-icon-building-line",
+      id: getHeroHeaderId("home-establishment"),
       type: "establishment",
       link: routes.homeEstablishments().link,
     },
@@ -84,6 +88,7 @@ export const heroHeaderNavCards: (
       overtitle: "Prescripteur",
       title: "Vous êtes prescripteur",
       icon: "fr-icon-map-pin-user-line",
+      id: getHeroHeaderId("home-agency"),
       type: "agency",
       link: routes.homeAgencies().link,
     },
@@ -93,12 +98,14 @@ export const heroHeaderNavCards: (
       title: "Rechercher une entreprise accueillante",
       icon: "fr-icon-search-line",
       type: "candidate",
+      id: getHeroHeaderId("candidate-search"),
       link: routes.search().link,
     },
     {
       title: "Remplir la demande de convention",
       icon: "fr-icon-file-line",
       type: "candidate",
+      id: getHeroHeaderId("candidate-form-convention"),
       link: {
         href: "",
         onClick: (event) => {
@@ -121,6 +128,7 @@ export const heroHeaderNavCards: (
       title: "Référencer mon entreprise",
       icon: "fr-icon-hotel-line",
       type: "establishment",
+      id: getHeroHeaderId("establishment-form-register"),
       link: {
         href: "",
         onClick: (event) => {
@@ -139,6 +147,7 @@ export const heroHeaderNavCards: (
       title: "Modifier mes informations",
       icon: "fr-icon-edit-line",
       type: "establishment",
+      id: getHeroHeaderId("establishment-form-edit"),
       link: {
         href: "",
         onClick: (event) => {
@@ -157,6 +166,7 @@ export const heroHeaderNavCards: (
       title: "Remplir la demande de convention",
       icon: "fr-icon-file-text-line",
       type: "establishment",
+      id: getHeroHeaderId("establishment-form-convention"),
       link: {
         href: "",
         onClick: (event) => {
@@ -174,11 +184,13 @@ export const heroHeaderNavCards: (
       title: "Référencer mon organisme",
       icon: "fr-icon-hotel-line",
       type: "agency",
+      id: getHeroHeaderId("establishment-form"),
       link: routes.addAgency().link,
     },
     {
       title: "Remplir la demande de convention",
       icon: "fr-icon-file-text-line",
+      id: getHeroHeaderId("establishment-form-convention"),
       type: "agency",
       link: {
         href: "",

@@ -8,6 +8,7 @@ export type NavLink = {
   target?: string;
   children?: NavLink[];
   index?: number;
+  id: string;
 };
 
 export type NavWrapper = {
@@ -17,7 +18,6 @@ export type NavWrapper = {
   ariaLabel: string;
   style?: React.CSSProperties;
 };
-
 const TabLink = ({
   href,
   onClick,
@@ -25,6 +25,7 @@ const TabLink = ({
   label,
   children,
   index,
+  id,
 }: NavLink) => {
   const hasChildren = children && children.length > 0;
   const subMenuId = `fr-nav__sub-menu-${index}`;
@@ -36,6 +37,7 @@ const TabLink = ({
           aria-expanded="false"
           aria-controls={subMenuId}
           aria-current={active ? "page" : undefined}
+          id={id}
         >
           {label}
         </button>
@@ -46,6 +48,7 @@ const TabLink = ({
           href={href}
           onClick={onClick}
           aria-current={active ? "page" : undefined}
+          id={id}
         >
           {label}
         </a>
@@ -54,7 +57,7 @@ const TabLink = ({
         <div className="fr-collapse fr-menu" id={subMenuId}>
           <ul className="fr-menu__list">
             {children.map((link, index) => (
-              <TabLink {...link} key={index} index={index} />
+              <TabLink {...link} key={index} index={index} id={link.id} />
             ))}
           </ul>
         </div>
@@ -79,7 +82,7 @@ export const TabLinks = ({
   >
     <ul className="fr-nav__list">
       {navLinks.map((link, index) => (
-        <TabLink {...link} key={index} index={index} />
+        <TabLink {...link} key={index} index={index} id={link.id} />
       ))}
     </ul>
   </nav>

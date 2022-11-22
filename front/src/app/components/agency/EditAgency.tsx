@@ -117,6 +117,7 @@ const EditAgencyForm = () => {
                 <Button
                   type="submit"
                   disable={isSubmitting || feedback.kind !== "idle"}
+                  id={`im-form-edit-agency__submit-button`}
                 >
                   Mettre à jour
                 </Button>

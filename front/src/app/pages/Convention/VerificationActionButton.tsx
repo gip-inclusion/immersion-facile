@@ -48,6 +48,7 @@ export const VerificationActionButton = ({
             : onSubmit({ status: newStatus });
         }}
         className={className}
+        id={`im-convention-validation__submit-button`}
       >
         {children}
       </Button>

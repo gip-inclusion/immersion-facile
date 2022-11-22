@@ -67,10 +67,17 @@ export const JustificationModal = ({
               name={name}
             />
             <ButtonsGroup className="fr-btns-group--inline-md fr-btns-group--center">
-              <Button type="button" level={"secondary"} onSubmit={closeModal}>
+              <Button
+                type="button"
+                level={"secondary"}
+                onSubmit={closeModal}
+                id={`im-justification-modal__cancel-button`}
+              >
                 Annuler
               </Button>
-              <Button type="submit">Envoyer</Button>
+              <Button id={`im-justification-modal__send-button`} type="submit">
+                Envoyer
+              </Button>
             </ButtonsGroup>
           </Form>
         </Formik>

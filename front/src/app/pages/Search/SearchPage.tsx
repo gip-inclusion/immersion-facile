@@ -197,6 +197,7 @@ export const SearchPage = ({
                         !availableForSearchRequest(searchStatus, values)
                       }
                       type="submit"
+                      id={"im-search__submit-search"}
                     >
                       <span>
                         <SearchIcon />

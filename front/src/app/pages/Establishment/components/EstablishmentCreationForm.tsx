@@ -98,6 +98,7 @@ const CreationSiretRelatedInputs = () => {
             Cette entreprise a déjà été référencée.
             <Button
               disable={requestEmailToEditFormSucceed}
+              id="im-form-add-establishment__edit-establishment-button"
               onSubmit={() => {
                 establishmentGateway
                   .requestEstablishmentModification(currentSiret)

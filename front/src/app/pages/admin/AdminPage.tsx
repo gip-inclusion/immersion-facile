@@ -12,31 +12,38 @@ import { routes } from "src/app/routing/routes";
 import { ENV } from "src/environmentVariables";
 import { Route } from "type-route";
 
+const getAdminNavLinkId = (chunk: string) => `im-admin-nav__${chunk}`;
+
 const getNavLinks = (currentTab: AdminTab): NavLink[] => [
   {
     label: "Conventions",
     active: currentTab === "conventions",
     ...routes.adminTab({ tab: "conventions" }).link,
+    id: getAdminNavLinkId("conventions"),
   },
   {
     label: "Evénements",
     active: currentTab === "events",
     ...routes.adminTab({ tab: "events" }).link,
+    id: getAdminNavLinkId("events"),
   },
   {
     label: "Agences",
     active: currentTab === "agency-validation",
     ...routes.adminTab({ tab: "agency-validation" }).link,
+    id: getAdminNavLinkId("agency-validation"),
   },
   {
     label: "Export de données",
     active: currentTab === "exports",
     ...routes.adminTab({ tab: "exports" }).link,
+    id: getAdminNavLinkId("exports"),
   },
   {
     label: "Options techniques",
     active: currentTab === "technical-options",
     ...routes.adminTab({ tab: "technical-options" }).link,
+    id: getAdminNavLinkId("technical-options"),
   },
   ...(ENV.envType !== "production"
     ? [
@@ -44,6 +51,7 @@ const getNavLinks = (currentTab: AdminTab): NavLink[] => [
           label: "Emails",
           active: currentTab === "emails",
           ...routes.adminTab({ tab: "emails" }).link,
+          id: getAdminNavLinkId("emails"),
         },
       ]
     : []),
@@ -51,6 +59,7 @@ const getNavLinks = (currentTab: AdminTab): NavLink[] => [
     label: "Aperçu email",
     active: currentTab === "email-preview",
     ...routes.adminTab({ tab: "email-preview" }).link,
+    id: getAdminNavLinkId("email-preview"),
   },
 ];
 

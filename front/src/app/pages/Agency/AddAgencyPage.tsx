@@ -78,6 +78,7 @@ export const AddAgencyPage = () => {
                 <Button
                   type="submit"
                   disable={isSubmitting || submitFeedback.kind !== "idle"}
+                  id={`im-form-add-agency__submit-button`}
                 >
                   Soumettre
                 </Button>

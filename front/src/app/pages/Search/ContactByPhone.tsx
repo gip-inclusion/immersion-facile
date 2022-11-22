@@ -79,7 +79,12 @@ export const ContactByPhone = ({
             Object.values(errors).length > 0 &&
             //eslint-disable-next-line no-console
             console.log("onSubmit Error", { errors })}
-          <Button level="secondary" type="submit" disable={isSubmitting}>
+          <Button
+            level="secondary"
+            type="submit"
+            disable={isSubmitting}
+            id="im-contact-establishment__contact-phone-button"
+          >
             Envoyer
           </Button>
         </Form>

@@ -74,7 +74,11 @@ export const RenewExpiredLinkContent = ({
         Votre lien a périmé. Voulez-vous recevoir un nouveau lien ?{" "}
       </div>
       {!requestSuccessful && (
-        <Button disable={requested} onSubmit={onClick}>
+        <Button
+          disable={requested}
+          onSubmit={onClick}
+          id="im-renew-page__renew-link-button"
+        >
           Demander un nouveau lien
         </Button>
       )}

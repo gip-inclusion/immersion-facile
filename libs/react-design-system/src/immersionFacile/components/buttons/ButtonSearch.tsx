@@ -7,6 +7,7 @@ export type ButtonSearchProps = {
   dark?: boolean;
   className?: string;
   type?: "submit" | "button" | "reset";
+  id: string;
 };
 
 export const ButtonSearch = ({
@@ -15,12 +16,14 @@ export const ButtonSearch = ({
   onClick,
   className,
   type = "button",
+  id,
 }: ButtonSearchProps) => (
   <button
     onClick={onClick}
     className={"fr-btn w-full  " + className}
     disabled={disabled}
     type={type}
+    id={id}
   >
     {children}
   </button>

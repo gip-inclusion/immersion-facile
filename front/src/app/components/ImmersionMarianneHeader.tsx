@@ -20,6 +20,8 @@ type HeaderNavLinks = (NavLink & {
   children?: (NavLink & { display: boolean })[];
 })[];
 
+const getHeaderNavLinkId = (chunk: string) => `im-header-nav__${chunk}`;
+
 export const ImmersionMarianneHeader = () => {
   const featureFlags = useFeatureFlags();
   const dispatch = useDispatch();
@@ -46,6 +48,7 @@ export const ImmersionMarianneHeader = () => {
     {
       label: "Accueil",
       display: true,
+      id: getHeaderNavLinkId("home"),
       active: currentRoute.name === routes.home().name,
       ...routes.home().link,
     },
@@ -53,22 +56,26 @@ export const ImmersionMarianneHeader = () => {
       label: "Candidats",
       display: true,
       active: isCandidateRoute,
+      id: getHeaderNavLinkId("candidate-subnav-toggle"),
       children: [
         {
           label: "Accueil candidat",
           display: true,
+          id: getHeaderNavLinkId("candidate-home"),
           active: currentRoute.name === routes.homeCandidates().name,
           ...routes.homeCandidates().link,
         },
         {
           label: "Trouver une entreprise accueillante",
           display: true,
+          id: getHeaderNavLinkId("candidate-search"),
           active: currentRoute.name === routes.search().name,
           ...routes.search().link,
         },
         {
           label: "Remplir la demande de convention",
           display: true,
+          id: getHeaderNavLinkId("candidate-form-convention"),
           active: false,
           ...routes.conventionImmersion().link,
         },
@@ -77,24 +84,28 @@ export const ImmersionMarianneHeader = () => {
     {
       label: "Entreprises",
       display: true,
+      id: getHeaderNavLinkId("establishment-subnav-toggle"),
       active: isEstablishmentRoute,
       children: [
         {
           label: "Accueil entreprise",
           display: true,
           active: currentRoute.name === routes.homeEstablishments().name,
+          id: getHeaderNavLinkId("establishment-home"),
           ...routes.homeEstablishments().link,
         },
         {
           label: "Référencer mon entreprise",
           display: true,
           active: currentRoute.name === routes.formEstablishment().name,
+          id: getHeaderNavLinkId("establishment-form"),
           ...routes.formEstablishment().link,
         },
         {
           label: "Remplir la demande de convention",
           display: true,
           active: false,
+          id: getHeaderNavLinkId("establishment-form-convention"),
           ...routes.conventionImmersion().link,
         },
       ],
@@ -102,24 +113,28 @@ export const ImmersionMarianneHeader = () => {
     {
       label: "Prescripteurs",
       display: true,
+      id: getHeaderNavLinkId("agency-subnav-toggle"),
       active: isAgencyRoute,
       children: [
         {
           label: "Accueil prescripteurs",
           display: true,
           active: currentRoute.name === routes.homeAgencies().name,
+          id: getHeaderNavLinkId("agency-home"),
           ...routes.homeAgencies().link,
         },
         {
           label: "Référencer mon organisme",
           display: true,
           active: currentRoute.name === routes.addAgency().name,
+          id: getHeaderNavLinkId("agency-form"),
           ...routes.addAgency().link,
         },
         {
           label: "Remplir la demande de convention",
           display: true,
           active: false,
+          id: getHeaderNavLinkId("agency-form-convention"),
           ...routes.conventionImmersion().link,
         },
       ],
@@ -129,17 +144,20 @@ export const ImmersionMarianneHeader = () => {
       display: isAdminConnected && featureFlags.enableAdminUi,
       active:
         currentRoute.name === routes.adminTab({ tab: "conventions" }).name,
+      id: getHeaderNavLinkId("admin-subnav-toggle"),
       children: [
         {
           label: "Backoffice",
           display: true,
           active: false,
+          id: getHeaderNavLinkId("admin-home"),
           ...routes.adminTab({ tab: "conventions" }).link,
         },
         {
           label: "Landing entreprise",
           display: true,
           active: false,
+          id: getHeaderNavLinkId("admin-landing-establishment"),
           ...routes.landingEstablishment().link,
         },
       ],

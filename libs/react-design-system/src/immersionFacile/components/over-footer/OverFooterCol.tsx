@@ -8,6 +8,7 @@ export type OverFooterColProps = {
     label: string;
     url: string;
   };
+  id: string;
 };
 
 export const OverFooterCol = ({

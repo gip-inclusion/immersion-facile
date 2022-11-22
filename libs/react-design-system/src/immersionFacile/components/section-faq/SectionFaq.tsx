@@ -19,7 +19,11 @@ export const SectionFaq = ({ articles }: SectionFaqProps) => (
           className={`${componentName}__items fr-grid-row fr-grid-row--gutters`}
         >
           {articles.map((article, index) => (
-            <FaqCard key={`section-faq-item-${index}`} {...article} />
+            <FaqCard
+              key={`section-faq-item-${index}`}
+              {...article}
+              index={index}
+            />
           ))}
         </nav>
       )}
@@ -27,6 +31,7 @@ export const SectionFaq = ({ articles }: SectionFaqProps) => (
         <Button
           url="https://aide.immersion-facile.beta.gouv.fr/fr/"
           target="_blank"
+          id={`section-faq__see-all-button`}
         >
           Voir toutes les questions fréquentes
         </Button>
@@ -39,15 +44,16 @@ export type FaqCardProps = {
   title: string;
   description: string;
   url: string;
+  index?: number;
 };
 
-const FaqCard = ({ title, description, url }: FaqCardProps) => (
+const FaqCard = ({ title, description, url, index }: FaqCardProps) => (
   <div className="fr-col-12 fr-col-lg-4">
     <div className="fr-card fr-enlarge-link">
       <div className="fr-card__body">
         <div className="fr-card__content">
           <h3 className="fr-card__title">
-            <a href={url} target="_blank">
+            <a href={url} target="_blank" id={`section-faq__card-${index}`}>
               {title}
             </a>
           </h3>

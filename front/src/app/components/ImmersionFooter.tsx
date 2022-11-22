@@ -8,6 +8,8 @@ import {
   OverFooterCols,
 } from "react-design-system/immersionFacile";
 
+const getFooterNavLinkId = (chunk: string) => `im-footer-nav__${chunk}`;
+
 export const MinistereLogo = () => (
   <div className="fr-footer__brand fr-enlarge-link">
     <p className="fr-logo">
@@ -43,6 +45,7 @@ const overFooterCols: OverFooterCols = [
       label: "Contactez l'équipe",
       url: "mailto:contact@immersion-facile.beta.gouv.fr",
     },
+    id: getFooterNavLinkId("over-contact"),
   },
   {
     title: "Rejoignez la communauté",
@@ -53,6 +56,7 @@ const overFooterCols: OverFooterCols = [
       label: "Rejoignez-nous sur Linkedin",
       url: "https://www.linkedin.com/company/l-immersion-facilitee/",
     },
+    id: getFooterNavLinkId("over-linkedin"),
   },
   {
     title: "Le centre d'aide",
@@ -63,16 +67,19 @@ const overFooterCols: OverFooterCols = [
       label: "Accéder à notre FAQ",
       url: "https://aide.immersion-facile.beta.gouv.fr/fr/",
     },
+    id: getFooterNavLinkId("over-faq"),
   },
 ];
 const links: NavLink[] = [
   {
     label: "gouvernement.fr",
     href: "https://www.gouvernement.fr/",
+    id: getFooterNavLinkId("gouv"),
   },
   {
     label: "service-public.fr",
     href: "https://www.service-public.fr/",
+    id: getFooterNavLinkId("service-public"),
   },
 ];
 const bottomsLinks: NavLink[] = [
@@ -80,25 +87,30 @@ const bottomsLinks: NavLink[] = [
     label: "Mentions légales",
     href: "https://immersion-facile-1.gitbook.io/mentions-legales/",
     target: "_blank",
+    id: getFooterNavLinkId("legals"),
   },
   {
     label: "Politique de confidentialité",
     href: "https://immersion-facile-1.gitbook.io/mentions-legales/politique-de-confidentialite",
     target: "_blank",
+    id: getFooterNavLinkId("privacy"),
   },
   {
     label: "Conditions générales d'utilisation",
     href: "https://immersion-facile-1.gitbook.io/mentions-legales/conditions-generales-dutilisation",
     target: "_blank",
+    id: getFooterNavLinkId("cgu"),
   },
   {
     label: "Nous contacter",
     href: "mailto:contact@immersion-facile.beta.gouv.fr",
+    id: getFooterNavLinkId("privacy"),
   },
   {
     label: "Statistiques",
     href: "/stats",
     target: "_blank",
+    id: getFooterNavLinkId("stats"),
   },
 ];
 

@@ -59,7 +59,11 @@ export const ImmersionAssessmentForm = ({
           />
           <ul className="fr-btns-group">
             <li>
-              <Button type="submit" disable={isDisabled}>
+              <Button
+                type="submit"
+                disable={isDisabled}
+                id={"im-assessment-form__submit-button"}
+              >
                 Envoyer
               </Button>
               {assessmentError && (
@@ -87,6 +91,7 @@ export const ImmersionAssessmentForm = ({
                   level="secondary"
                   type="button"
                   onSubmit={downloadFullImmersionAssessmentPdf}
+                  id="im-assessment-form__download-button"
                 >
                   Télécharger le bilan détaillé en PDF
                 </Button>

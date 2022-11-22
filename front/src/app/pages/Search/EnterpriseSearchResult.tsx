@@ -107,6 +107,7 @@ export const EnterpriseSearchResult = ({
         className={"fr-btn--green-archipel"}
         onClick={onButtonClick}
         disabled={disableButton}
+        id={"im-search__search-result-action"}
       >
         {contactMode === "PHONE" ||
         contactMode === "EMAIL" ||
