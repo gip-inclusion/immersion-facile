@@ -104,6 +104,7 @@ export const SearchPage = ({
                             ...newValue,
                           });
                         }}
+                        id={"im-search-page__rome-autocomplete"}
                         initialValue={{
                           romeLabel: values.romeLabel ?? "",
                           romeCode: values.rome ?? "",
@@ -135,6 +136,7 @@ export const SearchPage = ({
                             address: addressDtoToString(address),
                           });
                         }}
+                        id="im-search-page__address-autocomplete"
                         placeholder={"Ex : Bordeaux 33000"}
                         notice={"Saisissez un code postal et/ou une ville"}
                       />
@@ -164,6 +166,7 @@ export const SearchPage = ({
                         }
                         options={radiusOptions.map((n) => `${n} km`)}
                         placeholder={"Votre distance (de 1 à 100km)"}
+                        id="im-search-page__distance-dropdown"
                       />
                       <StaticDropdown
                         inputStyle={{
@@ -190,6 +193,7 @@ export const SearchPage = ({
                           (option) => option.value === values?.sortedBy,
                         )}
                         options={sortedByOptions.map(prop("label"))}
+                        id="im-search-page__sort-dropdown"
                       />
                     </div>
                     <ButtonSearch

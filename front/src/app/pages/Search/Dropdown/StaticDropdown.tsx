@@ -8,6 +8,7 @@ type StaticDropdownProps = {
   options: string[];
   defaultSelectedIndex?: number;
   placeholder: string;
+  id: string;
 };
 
 export const StaticDropdown = ({
@@ -17,6 +18,7 @@ export const StaticDropdown = ({
   options,
   defaultSelectedIndex = 0,
   placeholder,
+  id = "im-static-dropdown",
 }: StaticDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(defaultSelectedIndex);
@@ -69,7 +71,7 @@ export const StaticDropdown = ({
 
         <input
           readOnly
-          id="search"
+          id={id}
           type="text"
           className="fr-input autocomplete-input"
           autoComplete="off"

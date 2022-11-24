@@ -15,6 +15,7 @@ type RomeAutocompleteProps = {
   className?: string;
   placeholder: string;
   tooltip?: string;
+  id?: string;
 };
 
 const isOneOfTheOptionsLabel = (options: RomeDto[], searchTerm: string) =>
@@ -27,6 +28,7 @@ export const RomeAutocomplete = ({
   placeholder = "Ex : boulangère, infirmier",
   tooltip,
   initialValue,
+  id = "im-rome-autocomplete",
 }: RomeAutocompleteProps): JSX.Element => {
   const { romeSearchText, isSearching, selectedRomeDto, romeOptions } =
     useAppSelector(romeAutocompleteSelector);
@@ -41,6 +43,7 @@ export const RomeAutocomplete = ({
         disablePortal
         filterOptions={(x) => x}
         options={romeOptions}
+        id={id}
         value={selectedRomeDto ?? initialValue}
         noOptionsText={romeSearchText ? noOptionText : "Saisissez un métier"}
         getOptionLabel={(option: RomeDto) => option.romeLabel}
