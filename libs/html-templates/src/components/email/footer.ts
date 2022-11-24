@@ -1,4 +1,4 @@
-export const renderFooter = (emailRecipient: string) => `<table>
+export const renderFooter = `<table>
 <tr>
 <td height="30"></td>
 </tr>
@@ -8,8 +8,7 @@ export const renderFooter = (emailRecipient: string) => `<table>
     <p style="margin-bottom: .5rem; font-weight: bold; font-size: 18px;">L'immersion facilitée - Une startup d’Etat du Groupement d’Intérêt Public - La plateforme de l’inclusion
     </p>
     <p style="font-size: 18px; margin-top: 0;">20 avenue de Ségur, 75007, Paris</p>
-    <p style="font-size: 14px;">Cet email a été envoyé à ${emailRecipient}<br>
-    Vous l'avez reçu car vous avez indiqué cette adresse email  dans votre demande d'immersion.</p>
+    <p style="font-size: 14px;">Vous avez reçu cet email car vous l'avez renseigné lors de votre demande de convention d'immersion. Si vous n'êtes pas le destinataire de cette notification, merci de nous prévenir à <a href="mailto:contact@immersion-facile.beta.gouv.fr">contact@immersion-facile.beta.gouv.fr</a></p>
     
   </td>
 </tr>

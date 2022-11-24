@@ -109,6 +109,20 @@ export const EmailPreviewTab = () => {
                   );
                 })}
             </ul>
+            <h6 className="fr-mt-4w">Pièces jointes</h6>
+            {fakeContent.attachment ? (
+              <ul>
+                {fakeContent.attachment.map((att) => (
+                  <li>
+                    <a target={"_blank"} href={att.url}>
+                      {att.url}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>Ce template de mail n'a pas de pièces jointes.</p>
+            )}
           </aside>
           <section className="fr-col-12 fr-col-lg-8">
             <div

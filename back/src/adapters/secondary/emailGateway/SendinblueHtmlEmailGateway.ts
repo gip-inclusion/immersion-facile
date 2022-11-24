@@ -26,6 +26,7 @@ export type HtmlEmailData = {
   sender: RecipientOrSender;
   subject: string;
   tags?: string[];
+  attachment?: { url: string }[];
 };
 
 export class SendinblueHtmlEmailGateway implements EmailGateway {

@@ -33,6 +33,7 @@ export const templateByName: {
       Extract<TemplatedEmail, { type: K }>["params"]
     >;
     tags?: string[];
+    attachmentUrls?: string[];
   };
 } = {
   AGENCY_WAS_ACTIVATED: {
@@ -64,6 +65,9 @@ export const templateByName: {
       highlight: `Attention, ne démarrez pas cette immersion tant que vous n'avez pas reçu cette validation !`,
       subContent: defaultSignature,
     }),
+    attachmentUrls: [
+      "https://immersion.cellar-c2.services.clever-cloud.com/les_bons_conseils_beneficiaire.pdf",
+    ],
   },
   NEW_CONVENTION_ESTABLISHMENT_TUTOR_CONFIRMATION: {
     niceName: "Confirmation tuteur nouvelle convention",
@@ -125,6 +129,9 @@ export const templateByName: {
       `,
       subContent: defaultSignature,
     }),
+    attachmentUrls: [
+      "https://immersion.cellar-c2.services.clever-cloud.com/les_bons_conseils_prescripteur.pdf",
+    ],
   },
   VALIDATED_CONVENTION_FINAL_CONFIRMATION: {
     niceName: "Convention finale validée",
@@ -248,6 +255,9 @@ export const templateByName: {
       ${defaultSignature}
       `,
     }),
+    attachmentUrls: [
+      "https://immersion.cellar-c2.services.clever-cloud.com/les_bons_conseils_prescripteur_pole_emploi.pdf",
+    ],
   },
   POLE_EMPLOI_ADVISOR_ON_CONVENTION_ASSOCIATION: {
     niceName:
@@ -307,6 +317,9 @@ export const templateByName: {
       `,
       subContent: defaultSignature,
     }),
+    attachmentUrls: [
+      "https://immersion.cellar-c2.services.clever-cloud.com/les_bons_conseils_prescripteur_pole_emploi.pdf",
+    ],
   },
   REJECTED_CONVENTION_NOTIFICATION: {
     niceName: "Notification de convention rejetée",
@@ -390,6 +403,9 @@ export const templateByName: {
       },
       subContent: defaultSignature,
     }),
+    attachmentUrls: [
+      "https://immersion.cellar-c2.services.clever-cloud.com/les_bons_conseils_prescripteur.pdf",
+    ],
   },
   MAGIC_LINK_RENEWAL: {
     niceName: "Renouvellement de lien magique",
@@ -483,6 +499,9 @@ export const templateByName: {
         ${defaultSignature}
       `,
     }),
+    attachmentUrls: [
+      "https://immersion.cellar-c2.services.clever-cloud.com/les_etapes_de_votre_demande.pdf",
+    ],
   },
   CONTACT_BY_EMAIL_REQUEST: {
     niceName: "Mise en relation par mail",
@@ -521,7 +540,7 @@ export const templateByName: {
       Voici quelques conseils pour préparer ce premier échange :
       `,
       button: {
-        url: "https://immersion.cellar-c2.services.clever-cloud.com/e6d2a82b-2169-4a92-badc-8fc37c2c5a0e.pdf",
+        url: "https://immersion.cellar-c2.services.clever-cloud.com/les_bons_conseils_entreprise.pdf",
         label: "Nos bons conseils",
       },
       subContent: defaultSignature,
@@ -654,7 +673,7 @@ export const templateByName: {
       subContent: defaultSignature,
       button: {
         label: "Nos bons conseils",
-        url: "https://immersion.cellar-c2.services.clever-cloud.com/7cb16f64-d1cd-4faa-8642-bf99cc001e95.pdf",
+        url: "https://immersion.cellar-c2.services.clever-cloud.com/livret_accueil_entreprise.pdf",
       },
     }),
   },

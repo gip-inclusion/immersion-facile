@@ -31,9 +31,14 @@ export const generateHtmlFromTemplate = <N extends keyof TemplateByName>(
   templateName: N,
   params: Parameters<TemplateByName[N]["createEmailVariables"]>[0],
   options: GenerateHtmlOptions = {},
-): { subject: string; htmlContent: string; tags?: string[] } => {
-  const { createEmailVariables, tags } = templateByName[templateName];
-  const emailRecipient = "test@test.com";
+): {
+  subject: string;
+  htmlContent: string;
+  tags?: string[];
+  attachment?: { url: string }[];
+} => {
+  const { createEmailVariables, tags, attachmentUrls } =
+    templateByName[templateName];
   const {
     subject,
     agencyLogoUrl,
@@ -47,11 +52,8 @@ export const generateHtmlFromTemplate = <N extends keyof TemplateByName>(
 
   const doctype =
     '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
-  const templateData: {
-    subject: string;
-    htmlContent: string;
-    tags?: string[];
-  } = {
+
+  return {
     subject,
     htmlContent: ignoreTabs(`${options.skipHead ? "" : doctype}
         <html lang="fr">${options.skipHead ? "" : renderHead(subject)}
@@ -65,7 +67,7 @@ export const generateHtmlFromTemplate = <N extends keyof TemplateByName>(
                 renderHighlight(highlight),
                 renderContent(subContent),
                 renderLegals(legals),
-                renderFooter(emailRecipient),
+                renderFooter,
               ]
                 .map(renderHTMLRow)
                 .join("")}       
@@ -73,9 +75,13 @@ export const generateHtmlFromTemplate = <N extends keyof TemplateByName>(
           </body>
         </html>
       `),
+    ...(tags ? { tags } : {}),
+    ...(attachmentUrls
+      ? {
+          attachment: attachmentUrls.map((attachmentUrl) => ({
+            url: attachmentUrl,
+          })),
+        }
+      : {}),
   };
-  if (tags) {
-    templateData.tags = tags;
-  }
-  return templateData;
 };
