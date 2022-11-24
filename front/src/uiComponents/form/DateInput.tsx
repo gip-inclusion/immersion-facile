@@ -34,7 +34,7 @@ export const DateInput = (props: DateInputProps) => {
               borderBottom: "2px solid #161616",
               minWidth: "200px",
             }}
-            value={format(new Date(field.value), "yyyy-MM-dd")}
+            value={field.value && format(new Date(field.value), "yyyy-MM-dd")}
             type="date"
             disabled={props.disabled}
             onKeyDown={(e) => e.preventDefault()}

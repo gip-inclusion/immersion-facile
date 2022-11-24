@@ -128,6 +128,7 @@ export type Beneficiary = GenericSignatory<"beneficiary"> & {
   emergencyContact?: string;
   emergencyContactPhone?: string;
   federatedIdentity?: FederatedIdentity;
+  birthdate: string; // Date iso string
 };
 
 export type BeneficiaryRepresentative = GenericSignatory<

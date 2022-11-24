@@ -46,6 +46,7 @@ const beneficiary: Beneficiary = {
   signedAt: DATE_SIGNATURE,
   emergencyContact: "Clariss Ocon",
   emergencyContactPhone: "0663567896",
+  birthdate: "2002-10-05T14:48:00.000Z",
 };
 
 const establishmentTutor: EstablishmentTutor = {

@@ -74,6 +74,7 @@ const beneficiarySchema: z.Schema<Beneficiary> = signatorySchema.merge(
     emergencyContact: zStringPossiblyEmpty,
     emergencyContactPhone: phoneSchema.optional().or(z.literal("")),
     federatedIdentity: peConnectPrefixSchema.optional(),
+    birthdate: zString.regex(dateRegExp, "La date de saisie est invalide."),
   }),
 );
 

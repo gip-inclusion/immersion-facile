@@ -49,6 +49,7 @@ export const immersionTexts = {
   beneficiary: {
     firstNameLabel: "Prénom",
     lastNameLabel: "Nom de famille",
+    birthdate: "Date de naissance",
     email: {
       label: "E-mail",
       placeholder: "nom@exemple.com",

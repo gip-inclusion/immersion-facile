@@ -111,6 +111,7 @@ export const conventionInitialValuesFromUrl = ({
         phone: params.phone ?? "",
         emergencyContact: params.emergencyContact ?? "",
         emergencyContactPhone: params.emergencyContactPhone ?? "",
+        birthdate: params.birthdate ?? "",
         federatedIdentity: params.federatedIdentity as
           | FederatedIdentity
           | undefined,
@@ -215,6 +216,7 @@ const devPrefilledValues = (
         lastName: beneficiary.lastName || "Durand",
         email: beneficiary.email || "sylvanie@monemail.fr",
         phone: beneficiary.phone || "0612345678",
+        birthdate: beneficiary.birthdate || "1990-02-21T00:00:00.000Z",
         emergencyContact: beneficiary.emergencyContact || "Éric Durand",
         emergencyContactPhone:
           beneficiary.emergencyContactPhone || "0662552607",

@@ -1,6 +1,6 @@
+import { useFormikContext } from "formik";
 import React from "react";
 import { useDispatch } from "react-redux";
-import { useFormikContext } from "formik";
 import { ConventionDto, getConventionFieldName } from "shared";
 import { RadioGroup } from "src/app/components/RadioGroup";
 import { BeneficiaryRepresentativeFields } from "src/app/pages/Convention/ConventionFields/Sections/Beneficiary/BeneficiaryRepresentativeFields";
@@ -8,6 +8,7 @@ import { useConventionTextsFromFormikContext } from "src/app/pages/Convention/te
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
+import { DateInput } from "src/uiComponents/form/DateInput";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { BeneficiaryCurrentEmployerFields } from "./BeneficiaryCurrentEmployerFields";
 import { ConventionEmailWarning } from "../../../ConventionEmailWarning";
@@ -17,6 +18,7 @@ export const BeneficiaryCommonFields = ({
 }: {
   disabled?: boolean;
 }) => {
+  const { setFieldValue } = useFormikContext<ConventionDto>();
   const isMinor = useAppSelector(conventionSelectors.isMinor);
   const hasCurrentEmployer = useAppSelector(
     conventionSelectors.hasCurrentEmployer,
@@ -41,6 +43,17 @@ export const BeneficiaryCommonFields = ({
         placeholder=""
         description=""
         disabled={disabled}
+      />
+      <DateInput
+        label={`${t.beneficiary.birthdate} *`}
+        name={getConventionFieldName("signatories.beneficiary.birthdate")}
+        disabled={disabled}
+        onDateChange={(date) => {
+          setFieldValue(
+            "signatories.beneficiary.birthdate",
+            new Date(date).toISOString(),
+          );
+        }}
       />
       <TextInput
         label={`${t.beneficiary.email.label} *`}
