@@ -64,6 +64,7 @@ type RadioGroupProps<T> = {
   options: ValueAndLabel<T>[];
   error?: false | string;
   disabled?: boolean;
+  description?: string;
 };
 
 export const RadioGroup = <T extends string | number | string[] | boolean>({
@@ -74,6 +75,7 @@ export const RadioGroup = <T extends string | number | string[] | boolean>({
   options,
   error,
   disabled,
+  description,
 }: RadioGroupProps<T>) => (
   <>
     <div className="fr-form-group fr-input-group">
@@ -86,6 +88,7 @@ export const RadioGroup = <T extends string | number | string[] | boolean>({
       >
         <legend className="fr-fieldset__legend fr-text--regular">
           {groupLabel}
+          {description && <span className="fr-hint-text">{description}</span>}
         </legend>
         <div className="fr-fieldset__content">
           {options.map(({ value, label }) => {

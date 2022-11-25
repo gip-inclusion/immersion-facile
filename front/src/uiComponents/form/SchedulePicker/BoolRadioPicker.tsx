@@ -25,10 +25,11 @@ export const BoolRadioPicker = (props: BoolRadioPickerProps) => {
         >
           <legend className="fr-fieldset__legend fr-text--regular">
             {props.label}
+            {props.description && (
+              <span className="fr-hint-text">{props.description}</span>
+            )}
           </legend>
-          {props.description && (
-            <span className="fr-hint-text">{props.description}</span>
-          )}
+
           <div className="fr-fieldset__content">
             <div className="fr-radio-group" key={props.name + "_oui"}>
               <input

@@ -2,6 +2,7 @@ import { useFormikContext } from "formik";
 import React, { useEffect } from "react";
 import type { ConventionDto, Signatory } from "shared";
 import { getConventionFieldName } from "shared";
+import { Notification } from "react-design-system";
 import { deviceRepository } from "src/app/config/dependencies";
 import { makeValuesToWatchInUrl } from "src/app/pages/Convention/ConventionFields/makeValuesToWatchInUrl";
 import { SignatureActions } from "src/app/pages/Convention/ConventionFields/SignatureActions";
@@ -82,9 +83,9 @@ export const ConventionFormFields = ({
           </div>
         )}
       {!isFrozen && (
-        <p className="fr-mt-2w">
+        <Notification title={""} type={"info"} className="fr-my-2w">
           <strong>{t.signatures.validationText}</strong>
-        </p>
+        </Notification>
       )}
       {!isFrozen && !isSignatureMode && (
         <SubmitButton

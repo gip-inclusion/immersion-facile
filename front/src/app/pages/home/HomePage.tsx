@@ -47,6 +47,7 @@ export const HomePage = ({ type }: HomePageProps) => {
   );
   const { title, subtitle, displayName, icon, illustration } =
     heroHeaderContent[type];
+  const sectionStatsDataForType = sectionStatsData[type];
   return (
     <HeaderFooterLayout>
       <MainWrapper layout="fullscreen" vSpacing={0} useBackground>
@@ -73,7 +74,7 @@ export const HomePage = ({ type }: HomePageProps) => {
             />
           }
         />
-        <SectionStats stats={sectionStatsData} />
+        <SectionStats stats={sectionStatsDataForType} />
         <SectionTextEmbed iframeUrl="https://www.powtoon.com/embed/c8x7n7AR2XE/" />
         <SectionFaq articles={sectionFaqData} />
       </MainWrapper>

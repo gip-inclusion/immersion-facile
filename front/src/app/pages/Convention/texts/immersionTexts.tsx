@@ -34,7 +34,7 @@ export const immersionTexts = {
   signatures: {
     fixErrors: "Veuillez corriger les champs erronés",
     validationText:
-      "Une fois le formulaire envoyé, vous allez recevoir une demande de confirmation par mail et l'entreprise également",
+      "Une fois le formulaire envoyé, chaque signataire de la convention va recevoir un email. Pensez à vérifier votre boîte email et votre dossier de spams.",
   },
   conventionTitle:
     "Formulaire pour conventionner une période de mise en situation professionnelle (PMSMP)",
@@ -190,6 +190,8 @@ export const immersionTexts = {
     businessSiretLabel: "Siret",
     hasCurrentEmployerLabel:
       "Le bénéficiaire de l’immersion est-il actuellement salarié(e) d’une autre entreprise (que celle où l’immersion va avoir lieu) ?",
+    notNeededAgreement:
+      "Si votre immersion ne se fait pas sur des jours travaillés, vous n'avez pas besoin de l'accord de votre employeur actuel.",
   },
   verification: {
     rejectConvention: "Refuser l'immersion ...",

@@ -205,26 +205,92 @@ export const heroHeaderNavCards: (
     },
   ],
 });
-export const sectionStatsData: Stat[] = [
-  {
-    badgeLabel: "Découverte",
-    value: "1",
-    subtitle: "jour, 1 semaine ou 1 mois en entreprise",
-    description:
-      "L’immersion professionnelle est une période courte, variable, adaptée à vos besoins et non rémunérée pour découvrir le métier de votre choix.",
-  },
-  {
-    badgeLabel: "Simplicité",
-    value: "100%",
-    subtitle: "démarche dématérialisée",
-  },
-  {
-    badgeLabel: "Opportunité",
-    value: "7",
-    subtitle: "demandeurs d’emploi sur 10",
-    description: "trouvent un emploi dans les mois qui suivent leur immersion.",
-  },
-];
+export const sectionStatsData: Record<UserType, Stat[]> = {
+  default: [
+    {
+      badgeLabel: "Découverte",
+      value: "1",
+      subtitle: "jour, 1 semaine ou 1 mois en entreprise",
+      description:
+        "L’immersion professionnelle est une période courte, variable, adaptée à vos besoins et non rémunérée pour découvrir le métier de votre choix.",
+    },
+    {
+      badgeLabel: "Simplicité",
+      value: "100%",
+      subtitle: "démarche dématérialisée",
+    },
+    {
+      badgeLabel: "Opportunité",
+      value: "7",
+      subtitle: "demandeurs d’emploi sur 10",
+      description:
+        "trouvent un emploi dans les mois qui suivent leur immersion, selon une étude Pôle emploi en 2021.",
+    },
+  ],
+  candidate: [
+    {
+      badgeLabel: "Découverte",
+      value: "1",
+      subtitle: "jour, 1 semaine ou 1 mois en entreprise",
+      description:
+        "L’immersion professionnelle est une période courte, variable, adaptée à vos besoins et non rémunérée pour découvrir le métier de votre choix.",
+    },
+    {
+      badgeLabel: "Simplicité",
+      value: "100%",
+      subtitle: "démarche dématérialisée",
+    },
+    {
+      badgeLabel: "Opportunité",
+      value: "7",
+      subtitle: "demandeurs d’emploi sur 10",
+      description:
+        "trouvent un emploi dans les mois qui suivent leur immersion, selon une étude Pôle emploi en 2021.",
+    },
+  ],
+  establishment: [
+    {
+      badgeLabel: "Découverte",
+      value: "1",
+      subtitle: "jour, 1 semaine ou 1 mois en entreprise",
+      description:
+        "L’immersion professionnelle est une période courte, variable, adaptée à vos besoins et non rémunérée pour découvrir le métier de votre choix.",
+    },
+    {
+      badgeLabel: "Simplicité",
+      value: "100%",
+      subtitle: "démarche dématérialisée",
+    },
+    {
+      badgeLabel: "Opportunité",
+      value: "95%",
+      subtitle: "",
+      description:
+        "des entreprises qui bénéficient du dispositif le recommandent, selon une étude publiée en mars 2021 par Pôle emploi",
+    },
+  ],
+  agency: [
+    {
+      badgeLabel: "Découverte",
+      value: "1",
+      subtitle: "jour, 1 semaine ou 1 mois en entreprise",
+      description:
+        "L’immersion professionnelle est une période courte, variable, adaptée à vos besoins et non rémunérée pour découvrir le métier de votre choix.",
+    },
+    {
+      badgeLabel: "Simplicité",
+      value: "100%",
+      subtitle: "démarche dématérialisée",
+    },
+    {
+      badgeLabel: "Opportunité",
+      value: "7",
+      subtitle: "demandeurs d’emploi sur 10",
+      description:
+        "trouvent un emploi dans les mois qui suivent leur immersion, selon une étude Pôle emploi en 2021.",
+    },
+  ],
+};
 
 export const sectionFaqData: FaqCardProps[] = [
   {
