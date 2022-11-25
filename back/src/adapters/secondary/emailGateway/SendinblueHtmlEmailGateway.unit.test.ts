@@ -125,7 +125,7 @@ describe("SendingBlueHtmlEmailGateway unit", () => {
         },
       ],
       tags: ["activation prescripteur"],
-      subject: "Immersion Facilitée : Votre structure a été activée",
+      subject: "Immersion Facilitée - Votre structure a été activée",
       htmlContent: ignoreTabs(`
       <html lang="fr">
       <body>

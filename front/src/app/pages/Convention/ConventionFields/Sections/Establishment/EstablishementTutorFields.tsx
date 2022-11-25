@@ -1,8 +1,10 @@
+import { useFormikContext } from "formik";
 import React from "react";
-import { getConventionFieldName } from "shared";
+import { ConventionDto, getConventionFieldName } from "shared";
 import { useConventionTextsFromFormikContext } from "src/app/pages/Convention/texts/textSetup";
 import { useSiretFetcher } from "src/hooks/siret.hooks";
 import { TextInput } from "src/uiComponents/form/TextInput";
+import { ConventionEmailWarning } from "../../../ConventionEmailWarning";
 
 type EstablishementTutorFieldsProperties = {
   disabled: boolean | undefined;
@@ -15,6 +17,8 @@ export const EstablishementTutorFields = ({
     shouldFetchEvenIfAlreadySaved: true,
   });
   const t = useConventionTextsFromFormikContext();
+  const { values } = useFormikContext<ConventionDto>();
+
   return (
     <>
       <TextInput
@@ -57,6 +61,7 @@ export const EstablishementTutorFields = ({
         description={t.establishment.establishmentTutor.email.description}
         disabled={disabled}
       />
+      {values.establishmentTutor?.email && <ConventionEmailWarning />}
     </>
   );
 };

@@ -1,6 +1,7 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { getConventionFieldName } from "shared";
+import { useFormikContext } from "formik";
+import { ConventionDto, getConventionFieldName } from "shared";
 import { RadioGroup } from "src/app/components/RadioGroup";
 import { BeneficiaryRepresentativeFields } from "src/app/pages/Convention/ConventionFields/Sections/Beneficiary/BeneficiaryRepresentativeFields";
 import { useConventionTextsFromFormikContext } from "src/app/pages/Convention/texts/textSetup";
@@ -9,6 +10,7 @@ import { conventionSelectors } from "src/core-logic/domain/convention/convention
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { TextInput } from "src/uiComponents/form/TextInput";
 import { BeneficiaryCurrentEmployerFields } from "./BeneficiaryCurrentEmployerFields";
+import { ConventionEmailWarning } from "../../../ConventionEmailWarning";
 
 export const BeneficiaryCommonFields = ({
   disabled,
@@ -21,7 +23,7 @@ export const BeneficiaryCommonFields = ({
   );
   const dispatch = useDispatch();
   const t = useConventionTextsFromFormikContext();
-
+  const { values } = useFormikContext<ConventionDto>();
   return (
     <>
       <TextInput
@@ -48,6 +50,7 @@ export const BeneficiaryCommonFields = ({
         description={t.beneficiary.email.description}
         disabled={disabled}
       />
+      {values.signatories.beneficiary.email && <ConventionEmailWarning />}
       <TextInput
         label={`${t.beneficiary.phone.label} *`}
         name={getConventionFieldName("signatories.beneficiary.phone")}

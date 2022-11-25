@@ -1,8 +1,14 @@
-import { useField } from "formik";
+import { useField, useFormikContext } from "formik";
 import React, { useEffect } from "react";
-import { ConventionField, getConventionFieldName, Role } from "shared";
+import {
+  ConventionDto,
+  ConventionField,
+  getConventionFieldName,
+  Role,
+} from "shared";
 import { useConventionTextsFromFormikContext } from "src/app/pages/Convention/texts/textSetup";
 import { TextInput } from "src/uiComponents/form/TextInput";
+import { ConventionEmailWarning } from "../../../ConventionEmailWarning";
 
 type BeneficiaryRepresentativeFieldsProps = { disabled?: boolean };
 
@@ -12,6 +18,7 @@ export const BeneficiaryRepresentativeFields = ({
   useBeneficiaryRepresentativeAsEmergencyContact();
   useBeneficiaryRepresentativeRole();
   const t = useConventionTextsFromFormikContext();
+  const { values } = useFormikContext<ConventionDto>();
 
   return (
     <div>
@@ -45,6 +52,9 @@ export const BeneficiaryRepresentativeFields = ({
         description={t.beneficiaryRepresentative.email.description}
         disabled={disabled}
       />
+      {values.signatories.beneficiaryRepresentative?.email && (
+        <ConventionEmailWarning />
+      )}
       <TextInput
         label={`${t.beneficiaryRepresentative.phone.label} *`}
         name={getConventionFieldName(
