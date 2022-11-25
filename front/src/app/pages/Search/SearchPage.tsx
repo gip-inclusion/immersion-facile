@@ -101,7 +101,8 @@ export const SearchPage = ({
                           setFieldValue("rome", newValue.romeCode);
                           setFormikValues({
                             ...values,
-                            ...newValue,
+                            romeLabel: newValue.romeLabel,
+                            rome: newValue.romeCode,
                           });
                         }}
                         id={"im-search-page__rome-autocomplete"}
