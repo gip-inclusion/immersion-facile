@@ -21,7 +21,7 @@ export const BeneficiaryRepresentativeFields = ({
   const { values } = useFormikContext<ConventionDto>();
 
   return (
-    <div>
+    <>
       <TextInput
         label={`${t.beneficiaryRepresentative.firstNameLabel} *`}
         name={getConventionFieldName(
@@ -65,7 +65,7 @@ export const BeneficiaryRepresentativeFields = ({
         description={t.beneficiaryRepresentative.phone.description}
         disabled={disabled}
       />
-    </div>
+    </>
   );
 };
 
