@@ -9,8 +9,8 @@ export type SectionFaqProps = {
 
 const componentName = "im-section-faq";
 export const SectionFaq = ({ articles }: SectionFaqProps) => (
-  <section className={`${componentName} fr-py-8w `}>
-    <div className={`fr-container ${componentName}__container`}>
+  <section className={`${componentName} `}>
+    <div className={`fr-container ${componentName}__container fr-py-8w`}>
       <h3 className={`${componentName}__title fr-mb-6w`}>
         Questions fréquentes
       </h3>

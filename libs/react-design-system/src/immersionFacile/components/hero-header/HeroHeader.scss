@@ -135,7 +135,7 @@ $typesTints: (
   }
   &__nav-card {
     background: $white;
-    border-radius: 16px;
+    border-radius: 1rem;
     display: flex;
     align-items: center;
     padding: 2.5rem;
@@ -144,8 +144,28 @@ $typesTints: (
     top: 0;
     transition: all 1s ease;
     height: 100%;
+    box-shadow: inset 0 0 0 16px $white;
     @include for-screen-min($bp-lg) {
       flex-direction: column;
+    }
+    &:before {
+      content: "";
+      display: block;
+      position: absolute;
+      z-index: 0;
+      top: 0.5rem;
+      left: 0.5rem;
+      bottom: 0.5rem;
+      right: 0.5rem;
+      border-radius: 1rem;
+      background: transparent;
+      transition: background-color 0.6s ease;
+      @include for-screen-min($bp-lg) {
+        top: 1rem;
+        left: 1rem;
+        bottom: 1rem;
+        right: 1rem;
+      }
     }
     &:after {
       content: "";
@@ -172,13 +192,17 @@ $typesTints: (
           background: $primary;
         }
         &:hover {
-          background: $light;
+          &:before {
+            background: $light;
+          }
         }
       }
     }
     &-title {
       margin-bottom: 0;
       font-size: 1.125rem;
+      position: relative;
+      z-index: 1;
       @include for-screen-min($bp-lg) {
         margin-bottom: 1.5rem;
         font-size: 1.5rem;
@@ -190,13 +214,15 @@ $typesTints: (
       left: 0;
       right: 0;
       bottom: 0;
-      z-index: 1;
+      z-index: 10;
       &:active {
         background-color: transparent !important;
       }
     }
     &-overtitle {
       display: none;
+      position: relative;
+      z-index: 1;
       @include for-screen-min($bp-lg) {
         display: block;
         text-transform: uppercase;
@@ -204,6 +230,8 @@ $typesTints: (
       }
     }
     &-icon {
+      position: relative;
+      z-index: 1;
       &:before {
         width: 35px;
         height: 35px;

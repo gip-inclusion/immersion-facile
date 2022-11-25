@@ -29,7 +29,7 @@ export const SectionStats = ({ stats }: SectionStatsProps) => (
 );
 
 const StatCard = ({ badgeLabel, value, subtitle, description }: Stat) => (
-  <article className={`${componentName}__stat fr-col-lg-4`}>
+  <article className={`${componentName}__stat fr-col-lg-4 fr-px-2w`}>
     <span className={`${componentName}__nav-card-overtitle fr-badge im-badge`}>
       {badgeLabel}
     </span>

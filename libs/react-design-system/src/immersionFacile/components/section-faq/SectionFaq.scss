@@ -2,9 +2,12 @@
 
 .im-section-faq {
   background: var(--background-alt-blue-france);
-  border-top: 1px solid var(--border-default-grey);
+
   @include for-screen-min($bp-lg) {
     background: transparent;
+  }
+  &__container {
+    border-top: 1px solid var(--border-default-grey);
   }
   &__title {
     text-align: center;
