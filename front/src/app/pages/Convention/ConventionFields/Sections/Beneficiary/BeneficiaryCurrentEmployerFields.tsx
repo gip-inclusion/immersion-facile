@@ -25,11 +25,23 @@ export const BeneficiaryCurrentEmployerFields = ({
   }, []);
   return (
     <>
-      <Notification type="info" title="Accord de l'employeur obligatoire">
-        Le bénéficiaire peut effectuer son immersion sur son temps de travail.
-        Dans ce cas, l’accord de son employeur actuel est nécessaire. Le contrat
-        de travail n’est pas suspendu et l’employeur actuel couvre le risque
-        accident du travail pendant la durée de l’immersion.
+      <Notification
+        type="info"
+        title="Accord de l'employeur"
+        className="fr-mb-2w"
+      >
+        <p>
+          <strong>
+            Si l'immersion se fait en dehors du temps de travail, l'accord de
+            l'employeur n'est pas nécessaire.
+          </strong>
+        </p>
+        <p>
+          Le bénéficiaire peut effectuer son immersion sur son temps de travail.
+          Dans ce cas, l’accord de son employeur actuel est nécessaire. Le
+          contrat de travail n’est pas suspendu et l’employeur actuel couvre le
+          risque accident du travail pendant la durée de l’immersion.
+        </p>
       </Notification>
       <TextInput
         label={t.beneficiaryCurrentEmployer.businessSiretLabel}

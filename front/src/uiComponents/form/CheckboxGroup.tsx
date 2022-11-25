@@ -104,14 +104,15 @@ export const DateCheckboxGroup = (props: DateCheckboxGroupProps) => {
             id="checkboxes-error-legend"
           >
             {props.label}
+            {props.description && (
+              <span className="fr-hint-text">
+                <a href={props.descriptionLink} target="_blank">
+                  {props.description}
+                </a>
+              </span>
+            )}
           </legend>
-          {props.description && (
-            <span className="fr-hint-text">
-              <a href={props.descriptionLink} target="_blank">
-                {props.description}
-              </a>
-            </span>
-          )}
+
           <div className="fr-fieldset__content">
             <div
               className="fr-checkbox-group"

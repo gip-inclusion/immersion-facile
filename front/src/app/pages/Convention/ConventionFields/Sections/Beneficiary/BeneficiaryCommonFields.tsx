@@ -1,7 +1,6 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 import { getConventionFieldName } from "shared";
-import { Notification } from "react-design-system";
 import { RadioGroup } from "src/app/components/RadioGroup";
 import { BeneficiaryRepresentativeFields } from "src/app/pages/Convention/ConventionFields/Sections/Beneficiary/BeneficiaryRepresentativeFields";
 import { useConventionTextsFromFormikContext } from "src/app/pages/Convention/texts/textSetup";
@@ -111,9 +110,7 @@ export const BeneficiaryCommonFields = ({
           { label: t.no, value: false },
         ]}
       />
-      <Notification title={""} type={"info"} className="fr-my-2w">
-        <strong>{t.beneficiaryCurrentEmployer.notNeededAgreement}</strong>
-      </Notification>
+
       {hasCurrentEmployer && (
         <BeneficiaryCurrentEmployerFields disabled={disabled} />
       )}

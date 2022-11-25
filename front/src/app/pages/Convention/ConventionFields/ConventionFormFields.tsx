@@ -84,7 +84,20 @@ export const ConventionFormFields = ({
         )}
       {!isFrozen && (
         <Notification title={""} type={"info"} className="fr-my-2w">
-          <strong>{t.signatures.validationText}</strong>
+          <ol>
+            <li>
+              Une fois le formulaire envoyé, chaque signataire de la convention
+              va recevoir un email.
+            </li>
+            <li>
+              Pensez à vérifier votre boîte email et votre dossier de spams.
+            </li>
+            <li>
+              Pensez également à informer les autres signataires de la
+              convention qu'ils devront vérifier leur boîte email et leur
+              dossier de spams.
+            </li>
+          </ol>
         </Notification>
       )}
       {!isFrozen && !isSignatureMode && (
