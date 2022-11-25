@@ -70,6 +70,7 @@ export const AddressAutocomplete = ({
         noOptionsText={searchTerm ? noOptionText : "Saisissez une adresse."}
         options={options}
         value={selectedOption}
+        id={id}
         getOptionLabel={(option) => addressDtoToString(option.address)}
         onChange={onAutocompleteChange(setSelectedOption, setFormValue)}
         onInputChange={onAutocompleteInput(setSearchTerm)}

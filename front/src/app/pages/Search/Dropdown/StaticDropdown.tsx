@@ -93,6 +93,7 @@ export const StaticDropdown = ({
                 setSelectedIndex(newIndex);
                 setIsOpen(!isOpen);
               }}
+              id={`${id}-${index}`}
             >
               {option}
             </div>

@@ -46,7 +46,7 @@ export const InitiateConventionCard = ({
     <div className="flex flex-col w-full h-full items-center justify-center">
       {enablePeConnectApi && (
         <>
-          <p className="text-center text-sm fr-mb-2w">{peConnectNotice}</p>
+          <p className="text-center  fr-mb-2w">{peConnectNotice}</p>
           <PeConnectButton
             onClick={() => {
               if (currentRoute.name === "conventionImmersion")
@@ -62,7 +62,10 @@ export const InitiateConventionCard = ({
             Je ne connais pas mes identifiants
           </a>
           <strong className="pt-4">ou bien</strong>
-          <p className="text-center text-sm fr-my-2w">{otherCaseNotice}</p>
+          <p
+            className="text-center fr-my-2w"
+            dangerouslySetInnerHTML={{ __html: otherCaseNotice }}
+          ></p>
         </>
       )}
       {/*TODO : change HomeButton to take 'candidate' and 'establishment' as type params ('error' is very confusing here...)*/}

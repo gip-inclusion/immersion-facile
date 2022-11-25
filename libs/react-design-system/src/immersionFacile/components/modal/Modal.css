@@ -5,6 +5,11 @@
   will-change: transform, opacity;
 }
 
+.fr-modal__content-inner {
+  max-width: 400px;
+  margin: auto;
+}
+
 .ReactModal__Overlay--after-open .fr-modal__body {
   opacity: 1;
   transform: translateY(0);

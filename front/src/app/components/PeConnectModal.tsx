@@ -59,12 +59,12 @@ export const PeConnectModal = ({
   return (
     <ModalDialog isOpen={modalState.isOpen} hide={hide}>
       <ModalClose hide={hide} title="Fermer la fenêtre" />
-      <ModalContent>
+      <ModalContent className={"fr-modal__content-inner"}>
         <Title>Accès au formulaire de demande de convention</Title>
         <InitiateConventionCard
           title="Accès au formulaire de demande de convention"
           peConnectNotice="Je suis demandeur d’emploi et je connais mes identifiants à mon compte Pôle emploi. J'accède au formulaire ici :"
-          otherCaseNotice="Je suis dans une autre situation (candidat à une immersion sans identifiant Pôle emploi, entreprise ou conseiller emploi). J'accède au formulaire partagé ici :"
+          otherCaseNotice="<strong>Je suis dans une autre situation</strong><br/>(candidat à une immersion sans identifiant Pôle emploi, entreprise ou conseiller emploi).<br/>J'accède au formulaire partagé ici :"
           showFormButtonLabel="Ouvrir le formulaire"
           useSection={false}
         />
