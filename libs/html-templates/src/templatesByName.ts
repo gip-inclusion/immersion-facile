@@ -174,8 +174,7 @@ export const templateByName: {
       highlight: "Convention d'immersion professionnelle",
       subContent: `Cette convention est établie entre :
       - ${beneficiaryFirstName} ${beneficiaryLastName}
-      - ${beneficiaryRepresentativeName}
-      - ${beneficiaryCurrentEmployerName}
+      - ${beneficiaryRepresentativeName}${beneficiaryCurrentEmployerName ? `\n- ${beneficiaryCurrentEmployerName}` : ''}
       - ${establishmentRepresentativeName}
       - ${signature}
       
@@ -211,7 +210,8 @@ export const templateByName: {
       - un équipement de protection est fourni : ${individualProtection}.
       
       ${beneficiaryFirstName} ${beneficiaryLastName}, ${beneficiaryRepresentativeName} et ${establishmentRepresentativeName} en signant cette convention, s'engagent à respecter les obligations réglementaires de la Période de Mise en Situation Professionnelle, rappelées ci-après.
-      `,
+      
+      ${signature}`,
       legals: defaultConventionFinalLegals,
     }),
   },
