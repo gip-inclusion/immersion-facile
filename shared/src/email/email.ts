@@ -113,6 +113,7 @@ export type ValidatedConventionFinalConfirmationEmail = GenericTemplatedEmail<
     questionnaireUrl: string;
     signature: string;
     workConditions?: string;
+    agencyName: string;
   }
 >;
 

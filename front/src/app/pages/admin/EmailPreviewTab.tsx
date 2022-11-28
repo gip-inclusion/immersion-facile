@@ -182,6 +182,8 @@ export const defaultEmailValueByEmailKind: {
     questionnaireUrl: "QUESTIONNAIRE_URL",
     signature: "SIGNATURE",
     workConditions: undefined,
+    agencyName: "AGENCY_NAME",
+    beneficiaryCurrentEmployerName: "BENEFICIARY_CURRENT_EMPLOYER_NAME",
   },
   POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED: {
     advisorFirstName: "ADVISOR_FIRST_NAME",

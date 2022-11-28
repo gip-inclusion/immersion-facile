@@ -106,6 +106,7 @@ export const getValidatedConventionFinalConfirmationParams = (
     beneficiaryRepresentativeName: beneficiaryRepresentative
       ? `${beneficiaryRepresentative.firstName} ${beneficiaryRepresentative.lastName}`
       : "",
+    agencyName: agency.name,
   };
 };
 

@@ -259,6 +259,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
         signature: agency.signature,
         workConditions: convention.workConditions,
         beneficiaryRepresentativeName: "",
+        agencyName: agency.name,
       },
     );
   });
@@ -333,6 +334,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
         beneficiaryRepresentativeName: `${
           convention.signatories.beneficiaryRepresentative!.firstName
         } ${convention.signatories.beneficiaryRepresentative!.lastName}`,
+        agencyName: agency.name,
       },
     );
   });

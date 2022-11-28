@@ -155,6 +155,7 @@ export const templateByName: {
       workConditions,
       sanitaryPrevention,
       individualProtection,
+      agencyName,
     }) => ({
       subject: `Immersion Facilitée - Validation et convention de l'immersion pour observer l'activité de ${immersionAppellationLabel} au sein de ${businessName}`,
       greetings: "Bonjour,",
@@ -173,10 +174,17 @@ export const templateByName: {
       Vous trouverez ci-dessous la convention d'immersion :`,
       highlight: "Convention d'immersion professionnelle",
       subContent: `Cette convention est établie entre :
-      - ${beneficiaryFirstName} ${beneficiaryLastName}
-      - ${beneficiaryRepresentativeName}${beneficiaryCurrentEmployerName ? `\n- ${beneficiaryCurrentEmployerName}` : ''}
-      - ${establishmentRepresentativeName}
-      - ${signature}
+      ${[
+        `${beneficiaryFirstName} ${beneficiaryLastName}`,
+        beneficiaryRepresentativeName,
+        beneficiaryCurrentEmployerName,
+        establishmentRepresentativeName,
+        agencyName,
+      ]
+        .filter((str) => !!str)
+        .map((str) => `- ${str}`)
+        .join("\n")}
+      
       
       Toutes ces parties ont signé cette convention par le moyen d'une signature électronique, dans le cadre d'une téléprocédure créée par l'Etat. 
       
