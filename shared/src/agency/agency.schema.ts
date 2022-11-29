@@ -55,7 +55,9 @@ const createAgencyShape = {
   address: addressSchema,
   position: geoPositionSchema,
   counsellorEmails: z.array(zEmail),
-  validatorEmails: z.array(zEmail).min(1),
+  validatorEmails: z.array(zEmail).refine((emails) => emails.length > 0, {
+    message: "Vous devez renseigner au moins un email de validation",
+  }),
   questionnaireUrl: z.string().optional(),
   signature: zString,
   logoUrl: absoluteUrlSchema.optional(),

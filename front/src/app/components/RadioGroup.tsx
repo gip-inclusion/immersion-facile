@@ -61,7 +61,7 @@ type RadioGroupProps<T> = {
   currentValue: T;
   setCurrentValue: (newValue: T) => void;
   groupLabel: string;
-  options: ValueAndLabel<T>[];
+  options?: ValueAndLabel<T>[];
   error?: false | string;
   disabled?: boolean;
   description?: string;
@@ -91,26 +91,27 @@ export const RadioGroup = <T extends string | number | string[] | boolean>({
           {description && <span className="fr-hint-text">{description}</span>}
         </legend>
         <div className="fr-fieldset__content">
-          {options.map(({ value, label }) => {
-            const inputValue = getInputValue(value);
-            const optionId = makeOptionId(value, id);
+          {options &&
+            options.map(({ value, label }) => {
+              const inputValue = getInputValue(value);
+              const optionId = makeOptionId(value, id);
 
-            return (
-              <div className="fr-radio-group" key={optionId}>
-                <input
-                  id={optionId}
-                  type="radio"
-                  disabled={disabled}
-                  value={inputValue}
-                  checked={isEqual(value, currentValue)}
-                  onChange={() => setCurrentValue(value)}
-                />
-                <label className="fr-label" htmlFor={optionId}>
-                  {label ?? value}
-                </label>
-              </div>
-            );
-          })}
+              return (
+                <div className="fr-radio-group" key={optionId}>
+                  <input
+                    id={optionId}
+                    type="radio"
+                    disabled={disabled}
+                    value={inputValue}
+                    checked={isEqual(value, currentValue)}
+                    onChange={() => setCurrentValue(value)}
+                  />
+                  <label className="fr-label" htmlFor={optionId}>
+                    {label ?? value}
+                  </label>
+                </div>
+              );
+            })}
         </div>
         {error && (
           <p id="radio-error-desc-error" className="fr-error-text">

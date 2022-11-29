@@ -1,7 +1,10 @@
 import { Formik } from "formik";
 import { mergeDeepRight } from "ramda";
 import React, { useEffect } from "react";
-import { Notification } from "react-design-system/immersionFacile";
+import {
+  ErrorNotifications,
+  Notification,
+} from "react-design-system/immersionFacile";
 import { useDispatch } from "react-redux";
 import {
   ConventionDto,
@@ -206,11 +209,14 @@ const SignFormSpecific = ({ jwt }: SignFormSpecificProps) => {
                     onModificationsRequired={askFormModificationWithMessageForm}
                   />
                 )}
-                {Object.values(props.errors).length > 0 && (
-                  <div style={{ color: "red" }}>
-                    Veuillez corriger les champs erronés
-                  </div>
-                )}
+
+                <ErrorNotifications
+                  errors={props.errors as Record<string, string>}
+                  visible={
+                    props.submitCount !== 0 &&
+                    Object.values(props.errors).length > 0
+                  }
+                />
 
                 <ConventionFeedbackNotification
                   submitFeedback={submitFeedback}

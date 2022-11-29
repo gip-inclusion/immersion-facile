@@ -1,7 +1,10 @@
 import { Form, Formik } from "formik";
-import { keys } from "ramda";
 import React from "react";
-import { Button, DsfrTitle } from "react-design-system/immersionFacile";
+import {
+  Button,
+  DsfrTitle,
+  ErrorNotifications,
+} from "react-design-system/immersionFacile";
 import { useDispatch } from "react-redux";
 import {
   AgencyDto,
@@ -17,6 +20,7 @@ import {
 } from "src/app/components/agency/AgencyFormCommonFields";
 import { agencySubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
+import { formAgencyErrorLabels } from "src/app/pages/Agency/content/formAgency";
 import { useAppSelector } from "src/app/utils/reduxHooks";
 import "src/assets/admin.css";
 import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
@@ -113,6 +117,11 @@ const EditAgencyForm = () => {
 
                 <AgencyLogoUpload />
               </div>
+              <ErrorNotifications
+                labels={formAgencyErrorLabels}
+                errors={errors as Record<string, string>}
+                visible={submitCount !== 0 && Object.values(errors).length > 0}
+              />
               <div className="fr-mt-4w">
                 <Button
                   type="submit"
@@ -127,22 +136,6 @@ const EditAgencyForm = () => {
                 submitFeedback={feedback}
                 messageByKind={agencySubmitMessageByKind}
               />
-
-              {submitCount !== 0 && Object.values(errors).length > 0 && (
-                <div style={{ color: "red" }}>
-                  Veuillez corriger les champs erronés :
-                  <ul>
-                    {keys(errors).map((field) => {
-                      const err = errors[field];
-                      return typeof err === "string" ? (
-                        <li key={field}>
-                          {field}: {err}
-                        </li>
-                      ) : null;
-                    })}
-                  </ul>
-                </div>
-              )}
             </Form>
           );
         }}

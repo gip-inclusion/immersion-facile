@@ -1,9 +1,9 @@
 import { Form, Formik } from "formik";
-import { keys } from "ramda";
 import * as React from "react";
 import { useState } from "react";
 import {
   Button,
+  ErrorNotifications,
   MainWrapper,
   Title,
 } from "react-design-system/immersionFacile";
@@ -19,6 +19,7 @@ import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { AgencySubmitFeedback } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
 import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
 import { v4 as uuidV4 } from "uuid";
+import { formAgencyErrorLabels } from "./content/formAgency";
 
 const initialValues: CreateAgencyDto = {
   id: uuidV4(),
@@ -45,7 +46,6 @@ export const AddAgencyPage = () => {
   const [submitFeedback, setSubmitFeedback] = useState<AgencySubmitFeedback>({
     kind: "idle",
   });
-
   return (
     <HeaderFooterLayout>
       <MainWrapper layout="boxed">
@@ -72,6 +72,11 @@ export const AddAgencyPage = () => {
             <Form>
               <AgencyFormCommonFields />
               <AgencyLogoUpload />
+              <ErrorNotifications
+                labels={formAgencyErrorLabels}
+                errors={errors as Record<string, string>}
+                visible={submitCount !== 0 && Object.values(errors).length > 0}
+              />
               <div className="fr-mt-4w">
                 <Button
                   type="submit"
@@ -86,22 +91,6 @@ export const AddAgencyPage = () => {
                 submitFeedback={submitFeedback}
                 messageByKind={agencySubmitMessageByKind}
               />
-
-              {submitCount !== 0 && Object.values(errors).length > 0 && (
-                <div style={{ color: "red" }}>
-                  Veuillez corriger les champs erronés :
-                  <ul>
-                    {keys(errors).map((field) => {
-                      const err = errors[field];
-                      return typeof err === "string" ? (
-                        <li key={field}>
-                          {field}: {err}
-                        </li>
-                      ) : null;
-                    })}
-                  </ul>
-                </div>
-              )}
             </Form>
           )}
         </Formik>
