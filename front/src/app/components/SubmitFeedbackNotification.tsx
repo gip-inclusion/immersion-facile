@@ -17,7 +17,7 @@ export const SubmitFeedbackNotification = <T extends string>({
   if (submitFeedback.kind === "idle") return null;
 
   return (
-    <>
+    <div className="fr-mt-4w">
       {isFeedbackError(submitFeedback) ? (
         <Notification
           type="error"
@@ -30,6 +30,6 @@ export const SubmitFeedbackNotification = <T extends string>({
           {messageByKind[submitFeedback.kind]}
         </Notification>
       )}
-    </>
+    </div>
   );
 };

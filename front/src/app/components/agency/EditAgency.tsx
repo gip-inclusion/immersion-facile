@@ -122,6 +122,10 @@ const EditAgencyForm = () => {
                 errors={errors as Record<string, string>}
                 visible={submitCount !== 0 && Object.values(errors).length > 0}
               />
+              <SubmitFeedbackNotification
+                submitFeedback={feedback}
+                messageByKind={agencySubmitMessageByKind}
+              />
               <div className="fr-mt-4w">
                 <Button
                   type="submit"
@@ -131,11 +135,6 @@ const EditAgencyForm = () => {
                   Mettre à jour
                 </Button>
               </div>
-
-              <SubmitFeedbackNotification
-                submitFeedback={feedback}
-                messageByKind={agencySubmitMessageByKind}
-              />
             </Form>
           );
         }}

@@ -77,6 +77,10 @@ export const AddAgencyPage = () => {
                 errors={errors as Record<string, string>}
                 visible={submitCount !== 0 && Object.values(errors).length > 0}
               />
+              <SubmitFeedbackNotification
+                submitFeedback={submitFeedback}
+                messageByKind={agencySubmitMessageByKind}
+              />
               <div className="fr-mt-4w">
                 <Button
                   type="submit"
@@ -86,11 +90,6 @@ export const AddAgencyPage = () => {
                   Soumettre
                 </Button>
               </div>
-
-              <SubmitFeedbackNotification
-                submitFeedback={submitFeedback}
-                messageByKind={agencySubmitMessageByKind}
-              />
             </Form>
           )}
         </Formik>
