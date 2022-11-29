@@ -198,6 +198,7 @@ describe("Pg implementation of ConventionQueries", () => {
         birthdate: "1990-02-21T00:00:00.000Z",
         emergencyContact: "Billy",
         emergencyContactPhone: "0011223344",
+        emergencyContactEmail: "billy@emergencycontact.com",
         signedAt: new Date().toISOString(),
       })
       .withBeneficiaryCurentEmployer({

@@ -21,6 +21,7 @@ WITH
         'signedAt', date_to_iso(b.signed_at),
         'emergencyContact', b.extra_fields ->> 'emergencyContact',
         'emergencyContactPhone', b.extra_fields ->> 'emergencyContactPhone',
+        'emergencyContactEmail', b.extra_fields ->> 'emergencyContactEmail',
         'federatedIdentity', CASE WHEN  (p.user_pe_external_id IS NOT NULL) THEN CONCAT('peConnect:', p.user_pe_external_id) ELSE NULL END,
         'birthdate', CASE WHEN  (b.extra_fields ->> 'birthdate' IS NOT NULL) THEN b.extra_fields ->> 'birthdate' ELSE '1970-01-01T12:00:00.000Z' END
       ),

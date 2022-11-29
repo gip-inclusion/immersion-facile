@@ -33,6 +33,16 @@ export const BeneficiaryEmergencyContactFields = ({
         description=""
         disabled={disabled}
       />
+      <TextInput
+        label={t.beneficiarySection.emergencyContact.email.label}
+        name={getConventionFieldName(
+          "signatories.beneficiary.emergencyContactEmail",
+        )}
+        type="text"
+        placeholder={t.beneficiarySection.emergencyContact.email.placeholder}
+        description=""
+        disabled={disabled}
+      />
     </>
   );
 };

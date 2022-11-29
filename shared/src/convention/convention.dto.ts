@@ -127,6 +127,7 @@ type GenericSignatory<R extends Role> = GenericActor<R> & {
 export type Beneficiary = GenericSignatory<"beneficiary"> & {
   emergencyContact?: string;
   emergencyContactPhone?: string;
+  emergencyContactEmail?: string;
   federatedIdentity?: FederatedIdentity;
   birthdate: string; // Date iso string
 };

@@ -44,6 +44,7 @@ export const conventionValuesFromUrl = {
   phone: param.query.optional.string,
   emergencyContact: param.query.optional.string,
   emergencyContactPhone: param.query.optional.string,
+  emergencyContactEmail: param.query.optional.string,
   birthdate: param.query.optional.string,
 
   brEmail: param.query.optional.string,
