@@ -39,13 +39,13 @@ export const EstablishmentFormSection = ({
   return (
     <>
       <FormSectionTitle>
-        {t.sectionTitles.establishment}
+        {t.establishmentSection.title}
         <ShareActions
           isFrozen={isFrozen || isFetchingSiret}
           federatedIdentity={federatedIdentity}
         />
       </FormSectionTitle>
-      <h4>{t.establishment.subtitle}</h4>
+      <h4>{t.establishmentSection.subtitle}</h4>
       <EstablishmentBusinessFields disabled={isFrozen || isFetchingSiret} />
       <RadioGroup
         id="is-establishmentRepresentative"
@@ -58,7 +58,7 @@ export const EstablishmentFormSection = ({
             ),
           );
         }}
-        groupLabel={`${t.establishment.isEstablishmentTutorIsEstablishmentRepresentative} *`}
+        groupLabel={`${t.establishmentSection.isEstablishmentTutorIsEstablishmentRepresentative} *`}
         options={[
           { label: t.yes, value: true },
           { label: t.no, value: false },

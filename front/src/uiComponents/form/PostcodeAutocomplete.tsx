@@ -8,12 +8,14 @@ export type PostcodeAutocompleteProps = {
   initialSearchTerm?: string;
   disabled?: boolean;
   inputStyle?: React.CSSProperties;
+  label: string;
   onFound: (departmentCode: DepartmentCode) => void;
 };
 
 export const PostcodeAutocomplete = ({
   disabled,
   onFound,
+  label,
 }: PostcodeAutocompleteProps) => {
   const name: keyof ConventionDto = "postalCode";
   const [{ value }] = useField<string>({ name });
@@ -42,7 +44,7 @@ export const PostcodeAutocomplete = ({
 
   return (
     <>
-      <TextInput label="Votre code postal *" name={name} disabled={disabled} />
+      <TextInput label={`${label} *`} name={name} disabled={disabled} />
       {error && (
         <p id={`post-code-error-desc-error`} className="fr-error-text">
           {error}

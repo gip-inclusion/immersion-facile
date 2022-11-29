@@ -1,52 +1,53 @@
 import React from "react";
 
-export type Texts = typeof immersionTexts;
+export type ConventionTexts = typeof immersionTexts;
 
 export const immersionTexts = {
-  yes: "Oui",
-  no: "Non",
-  welcome: (
-    <>
-      <strong>Bravo !</strong>
-      <p className="fr-text">
-        Vous avez trouvé votre entreprise accueillante. Complétez ce formulaire
-        avec votre entreprise accueillante et initiez une convention pour
-        réaliser votre immersion professionnelle.
-      </p>
-      <p className="fr-text--xs fr-mt-1w">
-        Ce formulaire vaut équivalence du CERFA 13912 * 04
-      </p>
-    </>
-  ),
-  copyLinkTooltip: "Copier le lien pour partager le formulaire",
-  linkCopied: "Lien copié !",
-  shareLinkByMail: {
-    share: "Partagez cette demande de Convention par e-mail",
-    sharedSuccessfully:
-      "Cette demande de Convention a bien été partagée par mail.",
-    errorWhileSharing: "Erreur lors de l'envoi de l'email",
+  intro: {
+    conventionTitle:
+      "Formulaire pour conventionner une période de mise en situation professionnelle (PMSMP)",
+    welcome: (
+      <>
+        <strong>Bravo !</strong>
+        <p className="fr-text">
+          Vous avez trouvé votre entreprise accueillante. Complétez ce
+          formulaire avec votre entreprise accueillante et initiez une
+          convention pour réaliser votre immersion professionnelle.
+        </p>
+        <p className="fr-text--xs fr-mt-1w">
+          Ce formulaire vaut équivalence du CERFA 13912 * 04
+        </p>
+      </>
+    ),
+    conventionWelcomeNotification: (
+      <>
+        <p>
+          Vérifiez que votre structure d’accompagnement est disponible dans la
+          liste ci-dessous.{" "}
+          <strong>Si ce n’est pas le cas, contactez votre conseiller.</strong>
+        </p>
+        <p>
+          <strong>
+            Si vous n'avez pas de structure d'accompagnement, retrouvez{" "}
+            <a
+              href="https://aide.immersion-facile.beta.gouv.fr/fr/article/je-nai-pas-de-structure-daccompagnement-et-je-veux-faire-une-immersion-1x15rdp"
+              target="_blank"
+            >
+              nos conseils ici
+            </a>
+            .
+          </strong>
+        </p>
+      </>
+    ),
   },
-  sectionTitles: {
-    beneficiary: "1. Informations du candidat",
-    establishment: "2. Coordonnées de l'entreprise",
-    conditionsToHost: "3. Conditions d’accueil de l’immersion professionnelle",
+  agencySection: {
+    title: "Pour commencer nous avons besoin de",
+    yourAgencyLabel: "Votre structure d'accompagnement",
+    yourPostalcodeLabel: "Votre code postal *",
   },
-  signatures: {
-    fixErrors: "Veuillez corriger les champs erronés",
-  },
-  conventionTitle:
-    "Formulaire pour conventionner une période de mise en situation professionnelle (PMSMP)",
-  notDeployedEveryWhere:
-    "Attention, le formulaire de demande de convention n'est pas encore déployé partout en France.",
-  forStartWeNeed: "Pour commencer nous avons besoin de",
-  yourAgencyLabel: "Votre structure d'accompagnement",
-  conventionAlreadySigned: "Vous avez déjà signé cette convention.",
-  conventionReadyToBeSigned:
-    "Cette demande d'immersion est prête à être signée.",
-  conventionToSignOrAskForChanges:
-    "Veuillez la signer ou la renvoyer pour modification.",
-  conventionNotEditable: "Cette demande d'immersion n'est plus modifiable.",
-  beneficiary: {
+  beneficiarySection: {
+    title: "1. Informations du candidat",
     firstNameLabel: "Prénom",
     lastNameLabel: "Nom de famille",
     birthdate: "Date de naissance",
@@ -61,9 +62,43 @@ export const immersionTexts = {
       placeholder: "0606060607",
       description: "pour qu’on puisse vous contacter à propos de l’immersion",
     },
+    beneficiaryRepresentative: {
+      firstNameLabel: "Prénom du représentant légal",
+      lastNameLabel: "Nom de famille du représentant légal",
+      email: {
+        label: "E-mail",
+        placeholder: "nom@exemple.com",
+        description:
+          "cela nous permet de vous transmettre la validation de la convention",
+      },
+      phone: {
+        label: "Téléphone",
+        placeholder: "0606060607",
+        description: "pour qu’on puisse vous contacter à propos de l’immersion",
+      },
+    },
+    emergencyContact: {
+      nameLabel: "Prénom et nom de la personne à prévenir en cas d'urgence",
+      phone: {
+        label: "Téléphone de la personne à prévenir en cas d'urgence",
+        placeholder: "0606060607",
+      },
+    },
+    beneficiaryCurrentEmployer: {
+      firstNameLabel: "Prénom",
+      lastNameLabel: "Nom",
+      emailLabel: "E-mail",
+      jobLabel: "Fonction",
+      phoneLabel: "Téléphone",
+      businessNameLabel: "Raison sociale de l'entreprise",
+      businessSiretLabel: "Siret",
+      hasCurrentEmployerLabel:
+        "Le bénéficiaire de l’immersion est-il actuellement salarié(e) d’une autre entreprise (que celle où l’immersion va avoir lieu) ?",
+    },
     isMinorLabel: "La personne qui va faire l'immersion est-elle mineure ?",
   },
-  establishment: {
+  establishmentSection: {
+    title: "2. Coordonnées de l'entreprise",
     siret: {
       label: "Indiquez le SIRET de la structure d'accueil",
       placeholder: "362 521 879 00034",
@@ -123,7 +158,8 @@ export const immersionTexts = {
       },
     },
   },
-  immersionConditionsCommonFields: {
+  immersionConditionsSection: {
+    title: "3. Conditions d’accueil de l’immersion professionnelle",
     dateStartLabel: "Date de début de l'immersion",
     dateEndLabel: "Date de fin de l'immersion",
     workConditions: {
@@ -157,39 +193,31 @@ export const immersionTexts = {
         "Ex : communiquer à l'oral, résoudre des problèmes, travailler en équipe",
     },
   },
-  emergencyContact: {
-    nameLabel: "Prénom et nom de la personne à prévenir en cas d'urgence",
-    phone: {
-      label: "Téléphone de la personne à prévenir en cas d'urgence",
-      placeholder: "0606060607",
-    },
+
+  yes: "Oui",
+  no: "Non",
+  copyLinkTooltip: "Copier le lien pour partager le formulaire",
+  linkCopied: "Lien copié !",
+  shareLinkByMail: {
+    share: "Partagez cette demande de Convention par e-mail",
+    sharedSuccessfully:
+      "Cette demande de Convention a bien été partagée par mail.",
+    errorWhileSharing: "Erreur lors de l'envoi de l'email",
   },
-  beneficiaryRepresentative: {
-    firstNameLabel: "Prénom du représentant légal",
-    lastNameLabel: "Nom de famille du représentant légal",
-    email: {
-      label: "E-mail",
-      placeholder: "nom@exemple.com",
-      description:
-        "cela nous permet de vous transmettre la validation de la convention",
-    },
-    phone: {
-      label: "Téléphone",
-      placeholder: "0606060607",
-      description: "pour qu’on puisse vous contacter à propos de l’immersion",
-    },
+
+  signatures: {
+    fixErrors: "Veuillez corriger les champs erronés",
+    validationText:
+      "Une fois le formulaire envoyé, vous allez recevoir une demande de confirmation par mail et l'entreprise également",
   },
-  beneficiaryCurrentEmployer: {
-    firstNameLabel: "Prénom",
-    lastNameLabel: "Nom",
-    emailLabel: "E-mail",
-    jobLabel: "Fonction",
-    phoneLabel: "Téléphone",
-    businessNameLabel: "Raison sociale de l'entreprise",
-    businessSiretLabel: "Siret",
-    hasCurrentEmployerLabel:
-      "Le bénéficiaire de l’immersion est-il actuellement salarié(e) d’une autre entreprise (que celle où l’immersion va avoir lieu) ?",
-  },
+
+  conventionAlreadySigned: "Vous avez déjà signé cette convention.",
+  conventionReadyToBeSigned:
+    "Cette demande d'immersion est prête à être signée.",
+  conventionToSignOrAskForChanges:
+    "Veuillez la signer ou la renvoyer pour modification.",
+  conventionNotEditable: "Cette demande d'immersion n'est plus modifiable.",
+
   verification: {
     rejectConvention: "Refuser l'immersion ...",
     modifyConvention: "Renvoyer au bénéficiaire pour modification",

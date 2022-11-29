@@ -1,7 +1,7 @@
-import { CircularProgress } from "@mui/material";
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
 import type { ConventionDto } from "shared";
+import { InternshipKind } from "shared";
 import {
   AgencyId,
   AgencyOption,
@@ -9,26 +9,27 @@ import {
   FederatedIdentity,
   isPeConnectIdentity,
 } from "shared";
-import { Agencies } from "src/app/components/agency/Agency";
 import { agencyGateway } from "src/app/config/dependencies";
+import { useConventionTextsFromFormikContext } from "src/app/pages/Convention/texts/textSetup";
 import { useConnectedWith } from "src/hooks/connectedWith";
 import { PostcodeAutocomplete } from "src/uiComponents/form/PostcodeAutocomplete";
+import { AgencyDropdownListField } from "./AgencyDropdownListField";
+import { AgencyErrorText } from "./AgencyErrorText";
 
 type AgencySelectorProps = {
-  label: string;
-  description?: string;
+  internshipKind: InternshipKind;
   disabled?: boolean;
   defaultAgencyId?: string;
   shouldListAll: boolean;
 };
 
 export const AgencySelector = ({
-  label,
-  description,
+  internshipKind,
   disabled,
   defaultAgencyId,
   shouldListAll,
 }: AgencySelectorProps) => {
+  const t = useConventionTextsFromFormikContext();
   const name: keyof ConventionDto = "agencyId";
   const [{ value, onBlur }, { touched, error }, { setValue }] =
     useField<AgencyId>({ name });
@@ -39,7 +40,12 @@ export const AgencySelector = ({
   const [departmentCode, setDepartmentCode] = useState<DepartmentCode | null>(
     null,
   );
-  const [agencies, setAgencies] = useState([placeholderAgency]);
+  const [agencies, setAgencies] = useState([
+    {
+      id: "",
+      name: "Veuillez indiquer un code postal",
+    },
+  ]);
   const connectedWith = useConnectedWith();
 
   useEffect(() => {
@@ -47,12 +53,19 @@ export const AgencySelector = ({
 
     setIsLoading(true);
     agenciesRetriever({
+      internshipKind,
       shouldListAll,
       departmentCode,
       connectedWith,
     })
       .then((agencies: any) => {
-        setAgencies([emptyAgency, ...agencies]);
+        setAgencies([
+          {
+            id: "",
+            name: "",
+          },
+          ...agencies,
+        ]);
         if (
           defaultAgencyId &&
           isDefaultAgencyOnAgenciesAndEnabled(
@@ -84,39 +97,28 @@ export const AgencySelector = ({
     <div
       className={`fr-input-group${showError ? " fr-input-group--error" : ""}`}
     >
-      <PostcodeAutocomplete onFound={setDepartmentCode} disabled={disabled} />
-      <label className="fr-label pt-4" htmlFor={name}>
-        {label}
-      </label>
-      {description && <span className="fr-hint-text">{description}</span>}
-      <div className="flex">
-        {isLoading && (
-          <div className="flex justify-center items-center pr-2">
-            <CircularProgress size="20px" />{" "}
-          </div>
-        )}
-        <select
-          className="fr-select"
-          id={name}
-          name={name}
-          value={value}
-          onChange={(evt) => {
-            setValue(evt.currentTarget.value);
-          }}
-          onBlur={onBlur}
-          aria-describedby={`agency-code-{name}-error-desc-error`}
-          disabled={disabled || !loaded || !departmentCode}
-        >
-          <Agencies agencies={agencies} />
-        </select>
-      </div>
+      <PostcodeAutocomplete
+        label={t.agencySection.yourPostalcodeLabel}
+        onFound={setDepartmentCode}
+        disabled={disabled}
+      />
+      <AgencyDropdownListField
+        isLoading={isLoading}
+        loaded={loaded}
+        disabled={disabled}
+        name={name}
+        value={value}
+        onBlur={onBlur}
+        agencies={agencies}
+        departmentCode={departmentCode}
+        setValue={setValue}
+      />
       {showError && (
-        <p id={`agency-code-{name}-error-desc-error`} className="fr-error-text">
-          {loadingError
-            ? "Erreur de chargement de la liste. Veuillez réessayer plus tard."
-            : ""}
-          {userError ? error : ""}
-        </p>
+        <AgencyErrorText
+          loadingError={loadingError}
+          userError={userError}
+          error={error}
+        />
       )}
     </div>
   );
@@ -129,14 +131,18 @@ const isDefaultAgencyOnAgenciesAndEnabled = (
 ) => !disabled && agencies.map((agency) => agency.id).includes(defaultAgencyId);
 
 const agenciesRetriever = ({
+  internshipKind,
   departmentCode,
   shouldListAll,
   connectedWith,
 }: {
+  internshipKind: InternshipKind;
   departmentCode: DepartmentCode;
   shouldListAll: boolean;
   connectedWith: FederatedIdentity | null;
-}) => {
+}): Promise<AgencyOption[]> => {
+  if (internshipKind === "mini-stage-cci")
+    return agencyGateway.listCciAgencies(departmentCode);
   if (shouldListAll)
     return agencyGateway.listAgenciesByDepartmentCode(departmentCode);
   return connectedWith && isPeConnectIdentity(connectedWith)
@@ -144,14 +150,4 @@ const agenciesRetriever = ({
     : agencyGateway.listAgenciesByDepartmentCode(departmentCode);
   // : agencyGateway.listNonPeAgencies(position);
   // -> for easy revert when new page is ready
-};
-
-const placeholderAgency: AgencyOption = {
-  id: "",
-  name: "Veuillez indiquer un code postal",
-};
-
-const emptyAgency: AgencyOption = {
-  id: "",
-  name: "",
 };

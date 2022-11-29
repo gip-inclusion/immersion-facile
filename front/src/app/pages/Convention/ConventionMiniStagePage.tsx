@@ -1,5 +1,4 @@
 import React from "react";
-import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
 import { ConventionForm } from "src/app/pages/Convention/ConventionForm";
 import { ConventionFormContainerLayout } from "src/app/pages/Convention/ConventionFormContainerLayout";
 import { conventionInitialValuesFromUrl } from "src/app/pages/Convention/conventionHelpers";
@@ -17,15 +16,13 @@ interface ConventionMiniStagePageProps {
 export const ConventionMiniStagePage = ({
   route,
 }: ConventionMiniStagePageProps) => (
-  <HeaderFooterLayout>
-    <ConventionFormContainerLayout>
-      <ConventionForm
-        properties={conventionInitialValuesFromUrl({
-          route,
-          internshipKind: "mini-stage-cci",
-        })}
-        routeParams={route.params}
-      />
-    </ConventionFormContainerLayout>
-  </HeaderFooterLayout>
+  <ConventionFormContainerLayout>
+    <ConventionForm
+      properties={conventionInitialValuesFromUrl({
+        route,
+        internshipKind: "mini-stage-cci",
+      })}
+      routeParams={route.params}
+    />
+  </ConventionFormContainerLayout>
 );

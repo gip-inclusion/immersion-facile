@@ -88,6 +88,9 @@ export const agencyTargets = createTargets<AgencyTargets>({
 
 export class HttpAgencyGateway implements AgencyGateway {
   constructor(private readonly httpClient: HttpClient<AgencyTargets>) {}
+  listCciAgencies(_departmentCode: DepartmentCode): Promise<AgencyOption[]> {
+    throw new Error("Method not implemented.");
+  }
 
   getImmersionFacileAgencyId$(): Observable<AgencyId | false> {
     return from(

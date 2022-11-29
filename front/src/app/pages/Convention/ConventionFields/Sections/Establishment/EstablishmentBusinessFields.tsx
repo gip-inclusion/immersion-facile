@@ -29,14 +29,14 @@ export const EstablishmentBusinessFields = ({
         value={currentSiret}
         setValue={updateSiret}
         error={siretErrorToDisplay}
-        label={`${t.establishment.siret.label} *`}
+        label={`${t.establishmentSection.siret.label} *`}
         name="siret"
-        placeholder={t.establishment.siret.placeholder}
-        description={t.establishment.siret.description}
+        placeholder={t.establishmentSection.siret.placeholder}
+        description={t.establishmentSection.siret.description}
         disabled={disabled}
       />
       <TextInput
-        label={`${t.establishment.businessNameLabel} *`}
+        label={`${t.establishmentSection.businessNameLabel} *`}
         name={getConventionFieldName("businessName")}
         type="text"
         placeholder=""

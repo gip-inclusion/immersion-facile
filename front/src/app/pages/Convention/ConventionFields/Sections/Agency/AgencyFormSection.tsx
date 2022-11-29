@@ -1,16 +1,19 @@
 import React from "react";
-import { AgencyDisplay } from "src/app/components/agency/AgencyDisplay";
-import { AgencySelector } from "src/app/components/agency/AgencySelector";
+import { InternshipKind } from "shared";
 import { FormSectionTitle } from "src/uiComponents/FormSectionTitle";
-import { useConventionTextsFromFormikContext } from "../../texts/textSetup";
+import { useConventionTextsFromFormikContext } from "../../../texts/textSetup";
+import { AgencyDisplayReadOnly } from "./AgencyDisplayReadOnly";
+import { AgencySelector } from "./AgencySelector";
 
 type agencyFormSectionProperties = {
   agencyId: string;
   enablePeConnectApi: boolean;
+  internshipKind: InternshipKind;
   isFrozen: boolean | undefined;
 };
 
 export const AgencyFormSection = ({
+  internshipKind,
   agencyId,
   enablePeConnectApi,
   isFrozen,
@@ -18,12 +21,12 @@ export const AgencyFormSection = ({
   const t = useConventionTextsFromFormikContext();
   return (
     <>
-      <FormSectionTitle>{t.forStartWeNeed}</FormSectionTitle>
+      <FormSectionTitle>{t.agencySection.title}</FormSectionTitle>
       {isFrozen ? (
-        <AgencyDisplay label={`${t.yourAgencyLabel} *`} agencyId={agencyId} />
+        <AgencyDisplayReadOnly agencyId={agencyId} />
       ) : (
         <AgencySelector
-          label={`${t.yourAgencyLabel} *`}
+          internshipKind={internshipKind}
           disabled={isFrozen}
           defaultAgencyId={agencyId}
           shouldListAll={!enablePeConnectApi}

@@ -12,10 +12,10 @@ import { ConventionFrozenMessage } from "src/app/pages/Convention/ConventionFroz
 import { ConventionSignOnlyMessage } from "src/app/pages/Convention/ConventionSignOnlyMessage";
 import { useConventionTextsFromFormikContext } from "src/app/pages/Convention/texts/textSetup";
 import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
-import { AgencyFormSection } from "./Sections/AgencyFormSection";
+import { AgencyFormSection } from "./Sections/Agency/AgencyFormSection";
 import { BeneficiaryFormSection } from "./Sections/Beneficiary/BeneficiaryFormSection";
 import { EstablishmentFormSection } from "./Sections/Establishment/EstablishmentFormSection";
-import { ImmersionConditionFormSection } from "./Sections/ImmersionConditionFormSection";
+import { ImmersionConditionFormSection } from "./Sections/ImmersionCondition/ImmersionConditionFormSection";
 
 type ConventionFieldsProps = {
   isFrozen?: boolean;
@@ -37,10 +37,15 @@ export const ConventionFormFields = ({
   }, []);
 
   const alreadySigned = !!signatory?.signedAt;
-  const { errors, submitCount, isSubmitting, submitForm, values } =
-    useFormikContext<ConventionDto>();
+  const {
+    errors,
+    submitCount,
+    isSubmitting,
+    submitForm,
+    values: conventionValues,
+  } = useFormikContext<ConventionDto>();
   const { enablePeConnectApi } = useFeatureFlags();
-  const watchedValues = makeValuesToWatchInUrl(values);
+  const watchedValues = makeValuesToWatchInUrl(conventionValues);
   useConventionWatchValuesInUrl(watchedValues);
   const t = useConventionTextsFromFormikContext();
 
@@ -58,7 +63,8 @@ export const ConventionFormFields = ({
       />
 
       <AgencyFormSection
-        agencyId={values.agencyId}
+        internshipKind={conventionValues.internshipKind}
+        agencyId={conventionValues.agencyId}
         enablePeConnectApi={enablePeConnectApi}
         isFrozen={isFrozen}
       />
@@ -67,11 +73,15 @@ export const ConventionFormFields = ({
 
       <EstablishmentFormSection
         isFrozen={isFrozen}
-        federatedIdentity={values.signatories.beneficiary.federatedIdentity}
+        federatedIdentity={
+          conventionValues.signatories.beneficiary.federatedIdentity
+        }
       />
 
       <ImmersionConditionFormSection
-        federatedIdentity={values.signatories.beneficiary.federatedIdentity}
+        federatedIdentity={
+          conventionValues.signatories.beneficiary.federatedIdentity
+        }
         isFrozen={isFrozen}
       />
 

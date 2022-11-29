@@ -16,6 +16,8 @@ export interface AgencyGateway {
   listAgenciesByDepartmentCode(
     departmentCode: DepartmentCode,
   ): Promise<AgencyOption[]>;
+
+  listCciAgencies(departmentCode: DepartmentCode): Promise<AgencyOption[]>;
   listNonPeAgencies(departmentCode: DepartmentCode): Promise<AgencyOption[]>;
   listPeAgencies(departmentCode: DepartmentCode): Promise<AgencyOption[]>;
   listAgenciesNeedingReview(adminToken: AdminToken): Promise<AgencyDto[]>;

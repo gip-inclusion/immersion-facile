@@ -1,34 +1,29 @@
-import { CircularProgress } from "@mui/material";
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
 import type { ConventionDto } from "shared";
 import { AgencyId, AgencyOption, DepartmentCode } from "shared";
 import { agencyGateway } from "src/app/config/dependencies";
 import { PostcodeAutocomplete } from "src/uiComponents/form/PostcodeAutocomplete";
-import { Agencies } from "./Agency";
+import { useConventionTextsFromFormikContext } from "../../../texts/textSetup";
+import { AgencyDropdownListField } from "./AgencyDropdownListField";
+import { AgencyErrorText } from "./AgencyErrorText";
 
 const placeholderAgency: AgencyOption = {
   id: "",
   name: "Veuillez indiquer un code postal",
 };
-
 type AgencyDisplayProps = {
-  label: string;
-  description?: string;
   agencyId?: string;
 };
 
-export const AgencyDisplay = ({
-  label,
-  description,
-  agencyId,
-}: AgencyDisplayProps) => {
+export const AgencyDisplayReadOnly = ({ agencyId }: AgencyDisplayProps) => {
+  const t = useConventionTextsFromFormikContext();
   const name: keyof ConventionDto = "agencyId";
   const [{ value, onBlur }, { touched, error }, { setValue }] =
     useField<AgencyId>({ name });
 
   const [isLoading, setIsLoading] = useState(false);
-  const [_loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   const [loadingError, setLoadingError] = useState(false);
   const [departmentCode, setDepartmentCode] = useState<DepartmentCode | null>(
     null,
@@ -37,7 +32,6 @@ export const AgencyDisplay = ({
 
   useEffect(() => {
     if (!agencyId) return;
-
     agencyGateway
       .getAgencyPublicInfoById({ id: agencyId })
       .then((agency) => {
@@ -72,39 +66,28 @@ export const AgencyDisplay = ({
     <div
       className={`fr-input-group${showError ? " fr-input-group--error" : ""}`}
     >
-      <PostcodeAutocomplete onFound={setDepartmentCode} disabled={true} />
-      <label className="fr-label pt-4" htmlFor={name}>
-        {label}
-      </label>
-      {description && <span className="fr-hint-text">{description}</span>}
-      <div className="flex">
-        {isLoading && (
-          <div className="flex justify-center items-center pr-2">
-            <CircularProgress size="20px" />{" "}
-          </div>
-        )}
-        <select
-          className="fr-select"
-          id={name}
-          name={name}
-          value={value}
-          onChange={(evt) => {
-            setValue(evt.currentTarget.value);
-          }}
-          onBlur={onBlur}
-          aria-describedby={`agency-code-{name}-error-desc-error`}
-          disabled={true}
-        >
-          <Agencies agencies={agencies} />
-        </select>
-      </div>
+      <PostcodeAutocomplete
+        onFound={setDepartmentCode}
+        disabled={true}
+        label={t.agencySection.yourPostalcodeLabel}
+      />
+      <AgencyDropdownListField
+        isLoading={isLoading}
+        loaded={loaded}
+        disabled={true}
+        name={name}
+        value={value}
+        onBlur={onBlur}
+        agencies={agencies}
+        departmentCode={departmentCode}
+        setValue={setValue}
+      />
       {showError && (
-        <p id={`agency-code-{name}-error-desc-error`} className="fr-error-text">
-          {loadingError
-            ? "Erreur de chargement de la liste. Veuillez réessayer plus tard."
-            : ""}
-          {userError ? error : ""}
-        </p>
+        <AgencyErrorText
+          loadingError={loadingError}
+          userError={userError}
+          error={error}
+        />
       )}
     </div>
   );

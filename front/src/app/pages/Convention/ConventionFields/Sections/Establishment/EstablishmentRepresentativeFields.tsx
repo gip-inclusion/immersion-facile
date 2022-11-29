@@ -17,54 +17,56 @@ export const EstablishmentRepresentativeFields = ({
   return (
     <>
       <TextInput
-        label={`${t.establishment.establishmentRepresentative.firstName.label} *`}
+        label={`${t.establishmentSection.establishmentRepresentative.firstName.label} *`}
         name={getConventionFieldName(
           "signatories.establishmentRepresentative.firstName",
         )}
         type="text"
         placeholder=""
         description={
-          t.establishment.establishmentRepresentative.firstName.description
+          t.establishmentSection.establishmentRepresentative.firstName
+            .description
         }
         disabled={disabled}
       />
       <TextInput
-        label={`${t.establishment.establishmentRepresentative.lastName.label} *`}
+        label={`${t.establishmentSection.establishmentRepresentative.lastName.label} *`}
         name={getConventionFieldName(
           "signatories.establishmentRepresentative.lastName",
         )}
         type="text"
         placeholder=""
         description={
-          t.establishment.establishmentRepresentative.lastName.description
+          t.establishmentSection.establishmentRepresentative.lastName
+            .description
         }
         disabled={disabled}
       />
       <TextInput
-        label={`${t.establishment.establishmentRepresentative.phone.label} *`}
+        label={`${t.establishmentSection.establishmentRepresentative.phone.label} *`}
         name={getConventionFieldName(
           "signatories.establishmentRepresentative.phone",
         )}
         type="tel"
         placeholder={
-          t.establishment.establishmentRepresentative.phone.placeholder
+          t.establishmentSection.establishmentRepresentative.phone.placeholder
         }
         description={
-          t.establishment.establishmentRepresentative.phone.description
+          t.establishmentSection.establishmentRepresentative.phone.description
         }
         disabled={disabled}
       />
       <TextInput
-        label={`${t.establishment.establishmentRepresentative.email.label} *`}
+        label={`${t.establishmentSection.establishmentRepresentative.email.label} *`}
         name={getConventionFieldName(
           "signatories.establishmentRepresentative.email",
         )}
         type="email"
         placeholder={
-          t.establishment.establishmentRepresentative.email.placeholder
+          t.establishmentSection.establishmentRepresentative.email.placeholder
         }
         description={
-          t.establishment.establishmentRepresentative.email.description
+          t.establishmentSection.establishmentRepresentative.email.description
         }
         disabled={disabled}
       />

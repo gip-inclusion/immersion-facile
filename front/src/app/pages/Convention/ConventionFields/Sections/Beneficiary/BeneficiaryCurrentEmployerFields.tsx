@@ -44,7 +44,9 @@ export const BeneficiaryCurrentEmployerFields = ({
         </p>
       </Notification>
       <TextInput
-        label={t.beneficiaryCurrentEmployer.businessSiretLabel}
+        label={
+          t.beneficiarySection.beneficiaryCurrentEmployer.businessSiretLabel
+        }
         name={getConventionFieldName(
           "signatories.beneficiaryCurrentEmployer.businessSiret",
         )}
@@ -54,7 +56,9 @@ export const BeneficiaryCurrentEmployerFields = ({
         disabled={disabled}
       />
       <TextInput
-        label={t.beneficiaryCurrentEmployer.businessNameLabel}
+        label={
+          t.beneficiarySection.beneficiaryCurrentEmployer.businessNameLabel
+        }
         name={getConventionFieldName(
           "signatories.beneficiaryCurrentEmployer.businessName",
         )}
@@ -64,7 +68,7 @@ export const BeneficiaryCurrentEmployerFields = ({
         disabled={disabled}
       />
       <TextInput
-        label={t.beneficiaryCurrentEmployer.firstNameLabel}
+        label={t.beneficiarySection.beneficiaryCurrentEmployer.firstNameLabel}
         name={getConventionFieldName(
           "signatories.beneficiaryCurrentEmployer.firstName",
         )}
@@ -74,7 +78,7 @@ export const BeneficiaryCurrentEmployerFields = ({
         disabled={disabled}
       />
       <TextInput
-        label={t.beneficiaryCurrentEmployer.lastNameLabel}
+        label={t.beneficiarySection.beneficiaryCurrentEmployer.lastNameLabel}
         name={getConventionFieldName(
           "signatories.beneficiaryCurrentEmployer.lastName",
         )}
@@ -84,7 +88,7 @@ export const BeneficiaryCurrentEmployerFields = ({
         disabled={disabled}
       />
       <TextInput
-        label={t.beneficiaryCurrentEmployer.jobLabel}
+        label={t.beneficiarySection.beneficiaryCurrentEmployer.jobLabel}
         name={getConventionFieldName(
           "signatories.beneficiaryCurrentEmployer.job",
         )}
@@ -94,7 +98,7 @@ export const BeneficiaryCurrentEmployerFields = ({
         disabled={disabled}
       />
       <TextInput
-        label={t.beneficiaryCurrentEmployer.phoneLabel}
+        label={t.beneficiarySection.beneficiaryCurrentEmployer.phoneLabel}
         name={getConventionFieldName(
           "signatories.beneficiaryCurrentEmployer.phone",
         )}
@@ -104,7 +108,7 @@ export const BeneficiaryCurrentEmployerFields = ({
         disabled={disabled}
       />
       <TextInput
-        label={t.beneficiaryCurrentEmployer.emailLabel}
+        label={t.beneficiarySection.beneficiaryCurrentEmployer.emailLabel}
         name={getConventionFieldName(
           "signatories.beneficiaryCurrentEmployer.email",
         )}

@@ -1,9 +1,9 @@
 import React from "react";
 import { FederatedIdentity } from "shared";
 import { FormSectionTitle } from "src/uiComponents/FormSectionTitle";
-import { useConventionTextsFromFormikContext } from "../../texts/textSetup";
-import { ImmersionConditionsCommonFields } from "../ImmersionConditionsCommonFields";
-import { ShareActions } from "../ShareActions";
+import { useConventionTextsFromFormikContext } from "../../../texts/textSetup";
+import { ImmersionConditionsCommonFields } from "./ImmersionConditionsCommonFields";
+import { ShareActions } from "../../ShareActions";
 
 type ImmersionConditionFormSectionProperties = {
   federatedIdentity: FederatedIdentity | undefined;
@@ -18,7 +18,7 @@ export const ImmersionConditionFormSection = ({
   return (
     <>
       <FormSectionTitle>
-        {t.sectionTitles.conditionsToHost}
+        {t.immersionConditionsSection.title}
         <ShareActions
           isFrozen={isFrozen}
           federatedIdentity={federatedIdentity}

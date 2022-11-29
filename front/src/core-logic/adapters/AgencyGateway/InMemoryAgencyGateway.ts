@@ -60,6 +60,9 @@ const AGENCY_4_NEEDING_REVIEW = new AgencyDtoBuilder()
   .build();
 
 export class InMemoryAgencyGateway implements AgencyGateway {
+  listCciAgencies(_departmentCode: DepartmentCode): Promise<AgencyOption[]> {
+    throw new Error("Method not implemented.");
+  }
   private _agencies: Record<string, AgencyDto> = {
     [MISSION_LOCAL_AGENCY_ACTIVE.id]: MISSION_LOCAL_AGENCY_ACTIVE,
     [PE_AGENCY_ACTIVE.id]: PE_AGENCY_ACTIVE,

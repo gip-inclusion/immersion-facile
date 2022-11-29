@@ -23,7 +23,7 @@ export const BeneficiaryRepresentativeFields = ({
   return (
     <>
       <TextInput
-        label={`${t.beneficiaryRepresentative.firstNameLabel} *`}
+        label={`${t.beneficiarySection.beneficiaryRepresentative.firstNameLabel} *`}
         name={getConventionFieldName(
           "signatories.beneficiaryRepresentative.firstName",
         )}
@@ -33,7 +33,7 @@ export const BeneficiaryRepresentativeFields = ({
         disabled={disabled}
       />
       <TextInput
-        label={`${t.beneficiaryRepresentative.lastNameLabel} *`}
+        label={`${t.beneficiarySection.beneficiaryRepresentative.lastNameLabel} *`}
         name={getConventionFieldName(
           "signatories.beneficiaryRepresentative.lastName",
         )}
@@ -43,26 +43,34 @@ export const BeneficiaryRepresentativeFields = ({
         disabled={disabled}
       />
       <TextInput
-        label={`${t.beneficiaryRepresentative.email.label} *`}
+        label={`${t.beneficiarySection.beneficiaryRepresentative.email.label} *`}
         name={getConventionFieldName(
           "signatories.beneficiaryRepresentative.email",
         )}
         type="email"
-        placeholder={t.beneficiaryRepresentative.email.placeholder}
-        description={t.beneficiaryRepresentative.email.description}
+        placeholder={
+          t.beneficiarySection.beneficiaryRepresentative.email.placeholder
+        }
+        description={
+          t.beneficiarySection.beneficiaryRepresentative.email.description
+        }
         disabled={disabled}
       />
       {values.signatories.beneficiaryRepresentative?.email && (
         <ConventionEmailWarning />
       )}
       <TextInput
-        label={`${t.beneficiaryRepresentative.phone.label} *`}
+        label={`${t.beneficiarySection.beneficiaryRepresentative.phone.label} *`}
         name={getConventionFieldName(
           "signatories.beneficiaryRepresentative.phone",
         )}
         type="tel"
-        placeholder={t.beneficiaryRepresentative.phone.placeholder}
-        description={t.beneficiaryRepresentative.phone.description}
+        placeholder={
+          t.beneficiarySection.beneficiaryRepresentative.phone.placeholder
+        }
+        description={
+          t.beneficiarySection.beneficiaryRepresentative.phone.description
+        }
         disabled={disabled}
       />
     </>

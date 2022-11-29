@@ -111,27 +111,11 @@ export const ConventionForm = ({
     <div className="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
       <div className="fr-col-lg-7 fr-px-2w">
         <div className="flex justify-center">
-          <Title red>{t.conventionTitle}</Title>
+          <Title red>{t.intro.conventionTitle}</Title>
         </div>
-        <div className="fr-text">{t.welcome}</div>
+        <div className="fr-text">{t.intro.welcome}</div>
         <Notification type="info" title="">
-          <p>
-            Vérifiez que votre structure d’accompagnement est disponible dans la
-            liste ci-dessous.{" "}
-            <strong>Si ce n’est pas le cas, contactez votre conseiller.</strong>
-          </p>
-          <p>
-            <strong>
-              Si vous n'avez pas de structure d'accompagnement, retrouvez{" "}
-              <a
-                href="https://aide.immersion-facile.beta.gouv.fr/fr/article/je-nai-pas-de-structure-daccompagnement-et-je-veux-faire-une-immersion-1x15rdp"
-                target="_blank"
-              >
-                nos conseils ici
-              </a>
-              .
-            </strong>
-          </p>
+          {t.intro.conventionWelcomeNotification}
         </Notification>
 
         <Formik

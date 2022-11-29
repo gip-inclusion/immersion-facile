@@ -18,6 +18,9 @@ import {
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
 export class TestAgencyGateway implements AgencyGateway {
+  listCciAgencies(_departmentCode: DepartmentCode): Promise<AgencyOption[]> {
+    throw new Error("Method not implemented.");
+  }
   public agencies$ = new Subject<AgencyOption[]>();
   public fetchedAgency$ = new Subject<AgencyDto | undefined>();
   public updateAgencyResponse$ = new Subject<undefined>();

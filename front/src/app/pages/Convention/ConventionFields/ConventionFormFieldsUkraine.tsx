@@ -1,15 +1,15 @@
 import { useFormikContext } from "formik";
 import React from "react";
 import type { ConventionDto } from "shared";
-import { ImmersionConditionsCommonFields } from "src/app/pages/Convention/ConventionFields/ImmersionConditionsCommonFields";
 import { makeValuesToWatchInUrlForUkraine } from "src/app/pages/Convention/ConventionFields/makeValuesToWatchInUrl";
 import { SubmitButton } from "src/app/pages/Convention/ConventionFields/SubmitButtons";
 import { useConventionWatchValuesInUrl } from "src/app/pages/Convention/ConventionFields/useConventionWatchValuesInUrl";
 import { ConventionFrozenMessage } from "src/app/pages/Convention/ConventionFrozenMessage";
 import { ConventionSignOnlyMessage } from "src/app/pages/Convention/ConventionSignOnlyMessage";
 import { FormSectionTitle } from "src/uiComponents/FormSectionTitle";
-import { BeneficiaryCommonFields } from "./Sections/Beneficiary/BeneficiaryCommonFields";
+import { BeneficiaryFormSection } from "./Sections/Beneficiary/BeneficiaryFormSection";
 import { EstablishmentFormSection } from "./Sections/Establishment/EstablishmentFormSection";
+import { ImmersionConditionsCommonFields } from "./Sections/ImmersionCondition/ImmersionConditionsCommonFields";
 
 type ConventionFieldsProps = {
   isFrozen?: boolean;
@@ -35,8 +35,7 @@ export const ConventionFormFieldsUkraine = ({
           isAlreadySigned={alreadySubmitted ?? false}
         />
       )}
-      <FormSectionTitle>1. Coordonnées du bénéficiaire</FormSectionTitle>
-      <BeneficiaryCommonFields disabled={isFrozen} />
+      <BeneficiaryFormSection isFrozen={isFrozen} />
 
       <EstablishmentFormSection
         isFrozen={isFrozen}

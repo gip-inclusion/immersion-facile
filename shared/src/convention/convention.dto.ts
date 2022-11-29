@@ -58,10 +58,10 @@ export const conventionObjectiveOptions = [
   "Découvrir un métier ou un secteur d'activité",
   "Initier une démarche de recrutement",
 ] as const;
+export type ImmersionObjective = typeof conventionObjectiveOptions[number];
 
 export type WithJustification = { justification: string };
 
-export type ImmersionObjective = typeof conventionObjectiveOptions[number];
 export type InternshipKind = "immersion" | "mini-stage-cci";
 
 export type ConventionDtoWithoutExternalId = {

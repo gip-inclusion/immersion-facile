@@ -22,43 +22,55 @@ export const EstablishementTutorFields = ({
   return (
     <>
       <TextInput
-        label={`${t.establishment.establishmentTutor.firstName.label} *`}
+        label={`${t.establishmentSection.establishmentTutor.firstName.label} *`}
         name={getConventionFieldName("establishmentTutor.firstName")}
         type="text"
         placeholder=""
-        description={t.establishment.establishmentTutor.firstName.description}
+        description={
+          t.establishmentSection.establishmentTutor.firstName.description
+        }
         disabled={disabled || isFetchingSiret}
       />
       <TextInput
-        label={`${t.establishment.establishmentTutor.lastName.label} *`}
+        label={`${t.establishmentSection.establishmentTutor.lastName.label} *`}
         name={getConventionFieldName("establishmentTutor.lastName")}
         type="text"
         placeholder=""
-        description={t.establishment.establishmentTutor.lastName.description}
+        description={
+          t.establishmentSection.establishmentTutor.lastName.description
+        }
         disabled={disabled || isFetchingSiret}
       />
       <TextInput
-        label={`${t.establishment.establishmentTutor.job.label} *`}
+        label={`${t.establishmentSection.establishmentTutor.job.label} *`}
         name={getConventionFieldName("establishmentTutor.job")}
         type="text"
         placeholder=""
-        description={t.establishment.establishmentTutor.job.description}
+        description={t.establishmentSection.establishmentTutor.job.description}
         disabled={disabled || isFetchingSiret}
       />
       <TextInput
-        label={`${t.establishment.establishmentTutor.phone.label} *`}
+        label={`${t.establishmentSection.establishmentTutor.phone.label} *`}
         name={getConventionFieldName("establishmentTutor.phone")}
         type="tel"
-        placeholder={t.establishment.establishmentTutor.phone.placeholder}
-        description={t.establishment.establishmentTutor.phone.description}
+        placeholder={
+          t.establishmentSection.establishmentTutor.phone.placeholder
+        }
+        description={
+          t.establishmentSection.establishmentTutor.phone.description
+        }
         disabled={disabled}
       />
       <TextInput
-        label={`${t.establishment.establishmentTutor.email.label} *`}
+        label={`${t.establishmentSection.establishmentTutor.email.label} *`}
         name={getConventionFieldName("establishmentTutor.email")}
         type="email"
-        placeholder={t.establishment.establishmentTutor.email.placeholder}
-        description={t.establishment.establishmentTutor.email.description}
+        placeholder={
+          t.establishmentSection.establishmentTutor.email.placeholder
+        }
+        description={
+          t.establishmentSection.establishmentTutor.email.description
+        }
         disabled={disabled}
       />
       {values.establishmentTutor?.email && <ConventionEmailWarning />}
