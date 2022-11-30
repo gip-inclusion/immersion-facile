@@ -5,8 +5,8 @@ import {
   ConventionDto,
   conventionSchema,
   displayEmergencyContactInfos,
+  EmailParamsByEmailType,
   prettyPrintSchedule,
-  ValidatedConventionFinalConfirmationEmail,
 } from "shared";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
 
@@ -65,7 +65,7 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
 export const getValidatedConventionFinalConfirmationParams = (
   agency: AgencyDto,
   convention: ConventionDto,
-): ValidatedConventionFinalConfirmationEmail["params"] => {
+): EmailParamsByEmailType["VALIDATED_CONVENTION_FINAL_CONFIRMATION"] => {
   const {
     beneficiary,
     establishmentRepresentative,

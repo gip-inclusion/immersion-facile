@@ -1,10 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { generateHtmlFromTemplate, templateByName } from "html-templates";
+import { configureGenerateHtmlFromTemplate } from "html-templates";
 import { keys } from "ramda";
 import { DsfrTitle, ImmersionTextField } from "react-design-system";
+import { immersionFacileContactEmail, templatesByName } from "shared";
 
-type TemplateByName = typeof templateByName;
+type TemplateByName = typeof templatesByName;
 type TemplateName = keyof TemplateByName;
+
+const generateHtmlFromTemplate = configureGenerateHtmlFromTemplate(
+  templatesByName,
+  { contactEmail: immersionFacileContactEmail },
+);
 
 export const EmailPreviewTab = () => {
   const [currentTemplate, setCurrentTemplate] = useState<TemplateName>(
@@ -47,9 +53,9 @@ export const EmailPreviewTab = () => {
                   setCurrentTemplate(event.currentTarget.value as TemplateName)
                 }
               >
-                {keys(templateByName).map((templateName) => (
+                {keys(templatesByName).map((templateName) => (
                   <option key={templateName} value={templateName}>
-                    {templateByName[templateName].niceName}
+                    {templatesByName[templateName].niceName}
                   </option>
                 ))}
               </select>

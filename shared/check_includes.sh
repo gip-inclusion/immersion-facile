@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-files=$(grep --include=\*.{ts,tsx} -rnw 'src' -e "import .* from .*back/.*" -e "import .* from .*front/.*" -e "from .*shared.*")
+files=$(grep --include=\*.{ts,tsx} -rnw 'src' -e "import .* from .*back/.*" -e "import .* from .*front/.*" -e "from .*shared.*" -e "import .* from .*html-templates/.*")
 if [[ $files ]]; then 
   echo -e "\033[0;31mFound includes of front or back code in shared!\033[0m";
   echo $files;

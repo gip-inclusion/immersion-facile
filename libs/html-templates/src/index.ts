@@ -1,7 +1,7 @@
-import { generateHtmlFromTemplate } from "./generateHtmlFromTemplate";
+import { configureGenerateHtmlFromTemplate } from "./configureGenerateHtmlFromTemplate";
 import { ignoreTabs } from "./helpers/formatters";
-import { templateByName } from "./templatesByName";
+import { createTemplatesByName } from "./createTemplatesByName";
 
-export { generateHtmlFromTemplate, ignoreTabs, templateByName };
+export { configureGenerateHtmlFromTemplate, ignoreTabs, createTemplatesByName };
 
-export type { GenerateHtmlOptions } from "./generateHtmlFromTemplate";
+export type { GenerateHtmlOptions } from "./configureGenerateHtmlFromTemplate";

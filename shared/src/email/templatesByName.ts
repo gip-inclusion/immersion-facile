@@ -1,46 +1,21 @@
-import {
-  EmailType,
-  immersionFacileContactEmail,
-  isStringDate,
-  TemplatedEmail,
-  toDisplayedDate,
-} from "shared";
-import { defaultConventionFinalLegals } from "./components/email";
-import { advices } from "./components/email/advices";
-
-type CreateEmailVariable<P> = (params: P) => {
-  subject: string;
-  greetings?: string;
-  content?: string;
-  highlight?: string;
-  subContent?: string;
-  legals?: string;
-  agencyLogoUrl?: string;
-  button?: {
-    url: string;
-    label: string;
-  };
-};
+import { createTemplatesByName } from "html-templates";
+import { isStringDate, toDisplayedDate } from "../utils/date";
+import { advices } from "./advices";
+import { defaultConventionFinalLegals } from "./defaultConventionFinalLegals";
+import { EmailParamsByEmailType } from "./EmailParamsByEmailType";
+import { immersionFacileContactEmail } from "./knownEmailsAddresses";
 
 const defaultSignature = `
     Bonne journée,
     L'équipe Immersion Facilitée
 `;
 
-export const templateByName: {
-  [K in EmailType]: {
-    niceName: string;
-    createEmailVariables: CreateEmailVariable<
-      Extract<TemplatedEmail, { type: K }>["params"]
-    >;
-    tags?: string[];
-    attachmentUrls?: string[];
-  };
-} = {
+// to add a new EmailType, or changes the params of one, edit first EmailParamsByEmailType and let types guide you
+export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
   AGENCY_WAS_ACTIVATED: {
     niceName: "Activation agence",
     tags: ["activation prescripteur"],
-    createEmailVariables: ({ agencyName, agencyLogoUrl }) => ({
+    createEmailVariables: ({ agencyLogoUrl, agencyName }) => ({
       subject: `Immersion Facilitée - Votre structure a été activée`,
       greetings: "Bonjour,",
       content: `<strong>Votre structure prescriptrice d'immersion est activée !</strong> 
@@ -773,4 +748,4 @@ export const templateByName: {
     }),
     tags: ["confirmation de signature de convention"],
   },
-};
+});

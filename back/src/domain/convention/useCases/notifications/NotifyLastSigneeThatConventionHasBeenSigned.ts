@@ -2,7 +2,7 @@ import {
   ConventionDto,
   conventionSchema,
   Signatory,
-  SigneeHasSignedConvention,
+  TemplatedEmail,
 } from "shared";
 
 import {
@@ -78,7 +78,7 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
 const emailToSend = (
   convention: ConventionDto,
   lastSigneeEmail: { signedAt: string; email: string },
-): SigneeHasSignedConvention => ({
+): TemplatedEmail => ({
   type: "SIGNEE_HAS_SIGNED_CONVENTION",
   params: {
     demandeId: convention.id,

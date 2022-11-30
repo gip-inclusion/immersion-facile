@@ -1,10 +1,22 @@
 import type { AxiosInstance } from "axios";
-import { generateHtmlFromTemplate, GenerateHtmlOptions } from "html-templates";
+import {
+  configureGenerateHtmlFromTemplate,
+  GenerateHtmlOptions,
+} from "html-templates";
 import promClient from "prom-client";
-import { TemplatedEmail } from "shared";
+import {
+  immersionFacileContactEmail,
+  TemplatedEmail,
+  templatesByName,
+} from "shared";
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
 import { createLogger } from "../../../utils/logger";
 import { BadRequestError } from "../../primary/helpers/httpErrors";
+
+const generateHtmlFromTemplate = configureGenerateHtmlFromTemplate(
+  templatesByName,
+  { contactEmail: immersionFacileContactEmail },
+);
 
 export type EmailSentDto = {
   templatedEmail: TemplatedEmail;

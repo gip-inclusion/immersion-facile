@@ -24,6 +24,8 @@ export * from "./dashboard/dashboard.dto";
 export * from "./dashboard/dashboard.schema";
 export * from "./email/email";
 export * from "./email/email.schema";
+export * from "./email/templatesByName";
+export * from "./email/EmailParamsByEmailType";
 export * from "./email/knownEmailsAddresses";
 export * from "./envHelpers";
 export * from "./errors/managedErrors";
