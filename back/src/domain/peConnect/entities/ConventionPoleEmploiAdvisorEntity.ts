@@ -1,5 +1,6 @@
 import { FederatedIdentity, PeConnectIdentity } from "shared";
 import { ManagedRedirectError } from "../../../adapters/primary/helpers/redirectErrors";
+import { peAdvisorsErrorCount } from "../../../adapters/secondary/PeConnectGateway/peConnectCounters";
 import {
   ConventionPoleEmploiUserAdvisorEntity,
   PeConnectAdvisorDto,
@@ -43,8 +44,10 @@ const choosePreferredAdvisor = (
     .sort(preferCapEmploiPredicate);
 
   const preferredAdvisor = sortedValidAdvisors.at(0);
-  if (!preferredAdvisor)
+  if (!preferredAdvisor) {
+    peAdvisorsErrorCount.inc({ errorType: "peConnectNoValidAdvisor" });
     throw new ManagedRedirectError("peConnectNoValidAdvisor");
+  }
 
   return preferredAdvisor;
 };

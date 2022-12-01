@@ -30,6 +30,15 @@ import {
 import { PeConnectGateway } from "../../../domain/peConnect/port/PeConnectGateway";
 import { createLogger } from "../../../utils/logger";
 import { validateAndParseZodSchema } from "../../primary/helpers/httpErrors";
+import {
+  getAdvisorsInfoSuccessCount,
+  getUserAndAdvisorsSuccessCount,
+  getUserAndAdvisorsTotalCount,
+  getUserInfoErrorCount,
+  getUserSuccessCount,
+  oAuthGetAuthorizationCodeRedirectUrlCount,
+  peAdvisorsErrorCount,
+} from "./peConnectCounters";
 
 const logger = createLogger(__filename);
 
@@ -50,6 +59,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
   ) {}
 
   public oAuthGetAuthorizationCodeRedirectUrl(): AbsoluteUrl {
+    oAuthGetAuthorizationCodeRedirectUrlCount.inc();
     const authorizationCodePayload: ExternalPeConnectOAuthGrantPayload = {
       response_type: "code",
       client_id: this.authConfig.clientId,
@@ -63,7 +73,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
     )}`;
   }
 
-  public async peAccessTokenThroughAuthorizationCode(
+  private async peAccessTokenThroughAuthorizationCode(
     authorizationCode: string,
   ): Promise<AccessTokenDto> {
     const getAccessTokenPayload: ExternalPeConnectOAuthGetTokenWithCodeGrantPayload =
@@ -100,37 +110,63 @@ export class HttpPeConnectGateway implements PeConnectGateway {
   private async getUserInfo(
     accessToken: AccessTokenDto,
   ): Promise<PeConnectUserDto> {
-    const response: HttpResponse = await this.httpClient.get({
-      target: this.httpClient.targetsUrls.PECONNECT_USER_INFO,
-      adapterConfig: {
-        headers: peConnectheadersWithBearerAuthToken(accessToken),
-      },
-    });
+    const timerFlag =
+      accessToken.value.slice(0, 10) + " - PeConnect getUserInfo duration";
+    try {
+      // eslint-disable-next-line no-console
+      console.time(timerFlag);
+      const response: HttpResponse = await this.httpClient.get({
+        target: this.httpClient.targetsUrls.PECONNECT_USER_INFO,
+        adapterConfig: {
+          headers: peConnectheadersWithBearerAuthToken(accessToken),
+        },
+      });
 
-    const externalUser: ExternalPeConnectUser = validateAndParseZodSchema(
-      externalPeConnectUserSchema,
-      extractUserInfoBodyFromResponse(response),
-    );
+      const externalUser: ExternalPeConnectUser = validateAndParseZodSchema(
+        externalPeConnectUserSchema,
+        extractUserInfoBodyFromResponse(response),
+      );
 
-    return toPeConnectUserDto(externalUser);
+      getUserSuccessCount.inc();
+      return toPeConnectUserDto(externalUser);
+    } catch (e: any) {
+      getUserInfoErrorCount.inc({ errorType: e.error.message });
+      throw e;
+    } finally {
+      // eslint-disable-next-line no-console
+      console.timeEnd(timerFlag);
+    }
   }
 
   private async getAdvisorsInfo(
     accessToken: AccessTokenDto,
   ): Promise<PeConnectAdvisorDto[]> {
-    const response: AxiosResponse = await this.httpClient.get({
-      target: this.httpClient.targetsUrls.PECONNECT_ADVISORS_INFO,
-      adapterConfig: {
-        headers: peConnectheadersWithBearerAuthToken(accessToken),
-      },
-    });
+    const timerFlag =
+      accessToken.value.slice(0, 10) + " - PeConnect getAdvisorsInfo duration";
+    try {
+      // eslint-disable-next-line no-console
+      console.time(timerFlag);
+      const response: AxiosResponse = await this.httpClient.get({
+        target: this.httpClient.targetsUrls.PECONNECT_ADVISORS_INFO,
+        adapterConfig: {
+          headers: peConnectheadersWithBearerAuthToken(accessToken),
+        },
+      });
 
-    const advisors: ExternalPeConnectAdvisor[] = validateAndParseZodSchema(
-      externalPeConnectAdvisorsSchema,
-      extractAdvisorsBodyFromResponse(response),
-    );
+      const advisors: ExternalPeConnectAdvisor[] = validateAndParseZodSchema(
+        externalPeConnectAdvisorsSchema,
+        extractAdvisorsBodyFromResponse(response),
+      );
 
-    return advisors.map(toPeConnectAdvisorDto);
+      getAdvisorsInfoSuccessCount.inc();
+      return advisors.map(toPeConnectAdvisorDto);
+    } catch (e: any) {
+      peAdvisorsErrorCount.inc({ errorType: e.error.message });
+      throw e;
+    } finally {
+      // eslint-disable-next-line no-console
+      console.timeEnd(timerFlag);
+    }
   }
 
   public async getUserAndAdvisors(
@@ -138,11 +174,14 @@ export class HttpPeConnectGateway implements PeConnectGateway {
   ): Promise<PeUserAndAdvisors> {
     const accessToken: AccessTokenDto =
       await this.peAccessTokenThroughAuthorizationCode(authorizationCode);
+    getUserAndAdvisorsTotalCount.inc();
 
     const [user, advisors] = await Promise.all([
       this.getUserInfo(accessToken),
       this.getAdvisorsInfo(accessToken),
     ]);
+
+    getUserAndAdvisorsSuccessCount.inc();
 
     return {
       user,
