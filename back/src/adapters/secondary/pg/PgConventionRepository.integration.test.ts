@@ -365,6 +365,25 @@ describe("PgConventionRepository", () => {
     expect(await conventionRepository.getById(idA)).toEqual(updatedConvention);
   });
 
+  it("Updates an already saved immersion if the beneficiary representative is removed", async () => {
+    const idA: ConventionId = "aaaaac99-9c0b-aaaa-aa6d-6bb9bd38aaaa";
+    const convention = new ConventionDtoBuilder()
+      .withId(idA)
+      .withBeneficiaryRepresentative(beneficiaryRepresentative)
+      .build();
+    const externalId = await conventionRepository.save(convention);
+
+    const updatedConvention = new ConventionDtoBuilder()
+      .withId(idA)
+      .withExternalId(externalId)
+      .withBeneficiaryRepresentative(undefined)
+      .build();
+
+    await conventionRepository.update(updatedConvention);
+
+    expect(await conventionRepository.getById(idA)).toEqual(updatedConvention);
+  });
+
   const tutorIdAndRepIdFromConventionId = (conventionId: ConventionId) =>
     client.query<{
       establishment_tutor_id: number;

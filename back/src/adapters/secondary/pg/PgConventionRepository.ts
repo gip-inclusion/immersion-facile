@@ -17,6 +17,9 @@ import { getReadConventionById } from "./pgConventionSql";
 export const beneficiaryCurrentEmployerIdColumnName =
   "beneficiary_current_employer_id";
 
+export const beneficiaryRepresentativeIdColumnName =
+  "beneficiary_representative_id";
+
 export class PgConventionRepository implements ConventionRepository {
   constructor(private client: PoolClient) {}
 
@@ -99,6 +102,13 @@ export class PgConventionRepository implements ConventionRepository {
       : null;
 
     await this.updateBeneficiary(id, beneficiary);
+    const beneficiaryRepresentativeId = beneficiaryRepresentative
+      ? await this.updateBeneficiaryRepresentative(
+          id,
+          beneficiaryRepresentative,
+        )
+      : null;
+
     await this.updateConvention({
       convention,
       establishment_tutor_id,
@@ -108,10 +118,8 @@ export class PgConventionRepository implements ConventionRepository {
           establishment_tutor_id,
         }),
       beneficiary_current_employer_id: beneficiaryCurrentEmployerId,
+      beneficiary_representative_id: beneficiaryRepresentativeId,
     });
-
-    if (beneficiaryRepresentative)
-      await this.updateBeneficiaryRepresentative(id, beneficiaryRepresentative);
 
     return convention.id;
   }
@@ -194,11 +202,13 @@ export class PgConventionRepository implements ConventionRepository {
     establishment_tutor_id,
     establishment_representative_id,
     beneficiary_current_employer_id,
+    beneficiary_representative_id,
   }: {
     convention: ConventionDto;
     establishment_tutor_id: number;
     establishment_representative_id: number;
     beneficiary_current_employer_id: number | null;
+    beneficiary_representative_id: number | null;
   }) {
     const updateConventionQuery = `  
       UPDATE conventions
@@ -210,10 +220,10 @@ export class PgConventionRepository implements ConventionRepository {
             schedule=$10, individual_protection=$11, sanitary_prevention=$12, sanitary_prevention_description=$13, immersion_address=$14,
             immersion_objective=$15, immersion_appellation=$16, immersion_activities=$17, immersion_skills=$18, work_conditions=$19, 
             updated_at=now(),
-            establishment_tutor_id=$20, establishment_representative_id=$21, ${beneficiaryCurrentEmployerIdColumnName}=$22
+            establishment_tutor_id=$20, establishment_representative_id=$21, ${beneficiaryCurrentEmployerIdColumnName}=$22, ${beneficiaryRepresentativeIdColumnName}=$23
       WHERE id=$1`;
     // prettier-ignore
-    await this.client.query(updateConventionQuery, [ convention.id, convention.status, convention.agencyId, convention.dateSubmission, convention.dateStart, convention.dateEnd, convention.dateValidation, convention.siret, convention.businessName, convention.schedule, convention.individualProtection, convention.sanitaryPrevention, convention.sanitaryPreventionDescription, convention.immersionAddress, convention.immersionObjective, convention.immersionAppellation.appellationCode, convention.immersionActivities, convention.immersionSkills, convention.workConditions, establishment_tutor_id,establishment_representative_id,beneficiary_current_employer_id ]);
+    await this.client.query(updateConventionQuery, [ convention.id, convention.status, convention.agencyId, convention.dateSubmission, convention.dateStart, convention.dateEnd, convention.dateValidation, convention.siret, convention.businessName, convention.schedule, convention.individualProtection, convention.sanitaryPrevention, convention.sanitaryPreventionDescription, convention.immersionAddress, convention.immersionObjective, convention.immersionAppellation.appellationCode, convention.immersionActivities, convention.immersionSkills, convention.workConditions, establishment_tutor_id,establishment_representative_id,beneficiary_current_employer_id, beneficiary_representative_id ]);
   }
 
   private async updateBeneficiaryRepresentative(
@@ -224,9 +234,14 @@ export class PgConventionRepository implements ConventionRepository {
         UPDATE actors
           SET first_name=$2,  last_name=$3, email=$4, phone=$5, signed_at=$6
         FROM conventions 
-        WHERE conventions.id=$1 AND actors.id = conventions.beneficiary_representative_id`;
+        WHERE conventions.id=$1 AND actors.id = conventions.beneficiary_representative_id
+        RETURNING actors.id`;
+
     // prettier-ignore
-    await this.client.query(updateBeneficiaryRepresentativeQuery, [ id, beneficiaryRepresentative.firstName, beneficiaryRepresentative.lastName, beneficiaryRepresentative.email, beneficiaryRepresentative.phone, beneficiaryRepresentative.signedAt, ]);
+    const queryResult = await this.client.query<{id: number}>(updateBeneficiaryRepresentativeQuery, [ id, beneficiaryRepresentative.firstName, beneficiaryRepresentative.lastName, beneficiaryRepresentative.email, beneficiaryRepresentative.phone, beneficiaryRepresentative.signedAt, ]);
+    const result = queryResult.rows.at(0);
+    if (result) return result.id;
+    throw new Error(missingReturningRowError(queryResult));
   }
 
   private async updateEstablishmentRepresentative(

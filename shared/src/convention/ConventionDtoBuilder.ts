@@ -125,7 +125,7 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
   }
 
   public withBeneficiaryRepresentative(
-    beneficiaryRepresentative: BeneficiaryRepresentative,
+    beneficiaryRepresentative: BeneficiaryRepresentative | undefined,
   ): ConventionDtoBuilder {
     return new ConventionDtoBuilder({
       ...this.dto,
