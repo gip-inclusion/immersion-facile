@@ -12,9 +12,9 @@ import {
   signatoryRoles,
 } from "shared";
 import { ConventionFeedbackNotification } from "src/app/components/ConventionFeedbackNotification";
-import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
-import { routes } from "src/app/routing/routes";
-import { useAppSelector } from "src/app/utils/reduxHooks";
+import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
+import { routes } from "src/app/routes/routes";
+import { useAppSelector } from "src/hooks/reduxHooks";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import {
   conventionSelectors,
@@ -23,9 +23,9 @@ import {
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { useConvention } from "src/hooks/convention.hooks";
 import { useExistingSiret } from "src/hooks/siret.hooks";
-import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
+import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
 import { Route } from "type-route";
-import { ConventionFormFields } from "./ConventionFields/ConventionFormFields";
+import { ConventionFormFields } from "src/app/components/forms/convention/ConventionFormFields";
 
 type SignFormRoute = Route<typeof routes.conventionToSign>;
 

@@ -20,15 +20,15 @@ import {
 } from "src/app/components/agency/AgencyFormCommonFields";
 import { agencySubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
-import { formAgencyErrorLabels } from "src/app/pages/Agency/content/formAgency";
-import { useAppSelector } from "src/app/utils/reduxHooks";
+import { formAgencyErrorLabels } from "src/app/contents/agency/formAgency";
+import { useAppSelector } from "src/hooks/reduxHooks";
 import "src/assets/admin.css";
 import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
 import { agencyAdminSlice } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
-import { FillableList } from "src/uiComponents/form/FillableList";
-import { SimpleSelect } from "src/uiComponents/form/SimpleSelect";
-import { TextInput } from "src/uiComponents/form/TextInput";
-import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
+import { FillableList } from "src/app/components/forms/commons/FillableList";
+import { SimpleSelect } from "src/app/components/forms/commons/SimpleSelect";
+import { TextInput } from "src/app/components/forms/commons/TextInput";
+import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
 import { AgencyAutocomplete } from "./AgencyAutocomplete";
 
 export const EditAgency = () => (

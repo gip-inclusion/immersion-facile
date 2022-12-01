@@ -7,9 +7,9 @@ import { DataExportTab } from "src/app/pages/admin/DataExportTab";
 import { EmailPreviewTab } from "src/app/pages/admin/EmailPreviewTab";
 import { EmailsTab } from "src/app/pages/admin/EmailsTab";
 import { TechnicalOptions } from "src/app/pages/admin/TechnicalOptions";
-import { AdminTab } from "src/app/routing/route-params";
-import { routes } from "src/app/routing/routes";
-import { ENV } from "src/environmentVariables";
+import { AdminTab } from "src/app/routes/route-params";
+import { routes } from "src/app/routes/routes";
+import { ENV } from "src/config/environmentVariables";
 import { Route } from "type-route";
 
 const getAdminNavLinkId = (chunk: string) => `im-admin-nav__${chunk}`;

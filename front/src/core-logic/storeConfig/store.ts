@@ -1,7 +1,7 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { combineEpics, createEpicMiddleware, Epic } from "redux-observable";
 import { catchError } from "rxjs";
-import type { Dependencies } from "src/app/config/dependencies";
+import type { Dependencies } from "src/config/dependencies";
 import { adminAuthEpics } from "src/core-logic/domain/admin/adminAuth/adminAuth.epics";
 import { adminAuthSlice } from "src/core-logic/domain/admin/adminAuth/adminAuth.slice";
 import { dashboardUrlsEpics } from "src/core-logic/domain/admin/dashboardUrls/dashboardUrls.epics";

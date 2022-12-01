@@ -3,7 +3,7 @@ import React from "react";
 import { Switch } from "react-design-system/src/designSystemFrance/components/Switch";
 import { useDispatch } from "react-redux";
 import { FeatureFlag } from "shared";
-import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
+import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFlags.slice";
 
 const labelsByFeatureFlag: Record<FeatureFlag, string> = {

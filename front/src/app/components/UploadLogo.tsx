@@ -1,7 +1,7 @@
 import * as React from "react";
 import { File } from "react-design-system/immersionFacile";
 import { AbsoluteUrl } from "shared";
-import { technicalGateway } from "src/app/config/dependencies";
+import { technicalGateway } from "src/config/dependencies";
 
 interface UploadFileProps {
   label: string;

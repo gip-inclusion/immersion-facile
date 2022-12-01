@@ -1,4 +1,4 @@
-import { useAppSelector } from "src/app/utils/reduxHooks";
+import { useAppSelector } from "src/hooks/reduxHooks";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 
 // this hook should be use only in admin route

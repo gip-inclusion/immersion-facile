@@ -6,20 +6,20 @@ import {
   FormEstablishmentDto,
 } from "shared";
 import { MainWrapper } from "react-design-system";
-import { establishmentGateway } from "src/app/config/dependencies";
-import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
-import { routes } from "src/app/routing/routes";
-import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
+import { establishmentGateway } from "src/config/dependencies";
+import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
+import { routes } from "src/app/routes/routes";
+import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
-import { AddressAutocomplete } from "src/uiComponents/autocomplete/AddressAutocomplete";
-import { TextInput } from "src/uiComponents/form/TextInput";
+import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
+import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { Route } from "type-route";
 import { ApiDataContainer } from "../admin/ApiDataContainer";
 import {
   EstablishmentFormikForm,
   getLabelAndName,
   getMandatoryLabelAndName,
-} from "./components/EstablishmentFormikForm";
+} from "src/app/components/forms/establishment/EstablishmentFormikForm";
 
 export const EstablishmentEditionFormPage = ({
   route,

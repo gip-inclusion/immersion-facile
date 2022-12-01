@@ -1,6 +1,6 @@
 import { useField } from "formik";
 import React from "react";
-import { CheckboxGroupProps } from "src/uiComponents/form/CheckboxGroup";
+import { CheckboxGroupProps } from "src/app/components/forms/commons/CheckboxGroup";
 import { cleanStringToHTMLAttribute } from "shared";
 type BoolRadioProps = {
   name: string;

@@ -1,5 +1,5 @@
 import { FederatedIdentity } from "shared";
-import { ConventionInUrl } from "src/app/routing/route-params";
+import { ConventionInUrl } from "src/app/routes/route-params";
 
 type GenericPair<K extends string, Payload> = {
   key: K;

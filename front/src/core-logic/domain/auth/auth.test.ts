@@ -1,5 +1,5 @@
 import { expectToEqual, FederatedIdentity } from "shared";
-import { Dependencies } from "src/app/config/dependencies";
+import { Dependencies } from "src/config/dependencies";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { createTestStore } from "src/core-logic/storeConfig/createTestStore";

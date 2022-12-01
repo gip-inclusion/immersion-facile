@@ -2,15 +2,15 @@ import { keys } from "ramda";
 import React from "react";
 import { ButtonHome } from "react-design-system";
 import { Section } from "src/app/components/Section";
-import { deviceRepository } from "src/app/config/dependencies";
-import { ConventionImmersionPageRoute } from "src/app/pages/Convention/ConventionImmersionPage";
+import { deviceRepository } from "src/config/dependencies";
+import { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
 import {
   ButtonsGroup,
   PeConnectButton,
 } from "react-design-system/immersionFacile";
-import { EstablishmentSubTitle } from "src/app/pages/home/components/EstablishmentSubTitle";
-import { useRoute } from "src/app/routing/routes";
-import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
+import { EstablishmentSubTitle } from "src/app/components/EstablishmentSubTitle";
+import { useRoute } from "src/app/routes/routes";
+import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { useRedirectToConventionWithoutIdentityProvider } from "src/hooks/redirections.hooks";
 import { loginPeConnect } from "shared";
 

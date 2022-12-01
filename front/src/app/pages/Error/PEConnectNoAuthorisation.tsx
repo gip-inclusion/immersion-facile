@@ -1,5 +1,5 @@
 import React from "react";
-import { routes } from "src/app/routing/routes";
+import { routes } from "src/app/routes/routes";
 
 export const PEConnectNoAuthorisation = () => (
   <div role="alert" className={`fr-alert fr-alert--warning`}>

@@ -6,16 +6,16 @@ import { Form, Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { ButtonSearch, MainWrapper } from "react-design-system/immersionFacile";
 import { RomeAutocomplete } from "src/app/components/RomeAutocomplete";
-import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
-import { useAppSelector } from "src/app/utils/reduxHooks";
+import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
+import { useAppSelector } from "src/hooks/reduxHooks";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import { useSearchUseCase } from "src/hooks/search.hooks";
-import { AddressAutocomplete } from "src/uiComponents/autocomplete/AddressAutocomplete";
-import { HomeImmersionHowTo } from "src/uiComponents/ImmersionHowTo";
-import { StaticDropdown } from "./Dropdown/StaticDropdown";
-import { OurAdvises } from "./OurAdvises";
+import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
+import { HomeImmersionHowTo } from "src/app/components/ImmersionHowTo";
+import { StaticDropdown } from "src/app/components/search/Dropdown/StaticDropdown";
+import { OurAdvises } from "src/app/components/search/OurAdvises";
 import "./SearchPage.css";
-import { SearchResultPanel } from "./SearchResultPanel";
+import { SearchResultPanel } from "src/app/components/search/SearchResultPanel";
 import { addressDtoToString } from "shared";
 import { prop } from "ramda";
 import { SearchSortedBy } from "shared";
@@ -24,7 +24,7 @@ import {
   SearchStatus,
 } from "src/core-logic/domain/search/search.slice";
 import { Route } from "type-route";
-import { routes } from "src/app/routing/routes";
+import { routes } from "src/app/routes/routes";
 
 const radiusOptions = [1, 2, 5, 10, 20, 50, 100];
 const sortedByOptions: { value: SearchSortedBy; label: string }[] = [

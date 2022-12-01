@@ -2,9 +2,9 @@ import SearchIcon from "@mui/icons-material/Search";
 import React from "react";
 import { LinkWithButtonStyle } from "src/app/components/LinkWithButtonStyle";
 import { Section } from "src/app/components/Section";
-import { EstablishmentSubTitle } from "src/app/pages/home/components/EstablishmentSubTitle";
-import { EstablishmentTitle } from "src/app/pages/home/components/EstablishmentTitle";
-import { routes } from "src/app/routing/routes";
+import { EstablishmentSubTitle } from "src/app/components/EstablishmentSubTitle";
+import { EstablishmentTitle } from "src/app/components/EstablishmentTitle";
+import { routes } from "src/app/routes/routes";
 
 const styleType = "candidate";
 

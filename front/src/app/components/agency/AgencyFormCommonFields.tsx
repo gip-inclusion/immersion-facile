@@ -10,12 +10,12 @@ import {
 } from "shared";
 import { RadioGroup } from "src/app/components/RadioGroup";
 import { UploadLogo } from "src/app/components/UploadLogo";
-import { formAgencyFieldsLabels } from "src/app/pages/Agency/content/formAgency";
-import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
-import { AddressAutocomplete } from "src/uiComponents/autocomplete/AddressAutocomplete";
-import { FillableList } from "src/uiComponents/form/FillableList";
-import { SimpleSelect } from "src/uiComponents/form/SimpleSelect";
-import { TextInput } from "src/uiComponents/form/TextInput";
+import { formAgencyFieldsLabels } from "src/app/contents/agency/formAgency";
+import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
+import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
+import { FillableList } from "src/app/components/forms/commons/FillableList";
+import { SimpleSelect } from "src/app/components/forms/commons/SimpleSelect";
+import { TextInput } from "src/app/components/forms/commons/TextInput";
 
 const getName = (name: keyof CreateAgencyDto) => name;
 

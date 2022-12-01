@@ -1,7 +1,7 @@
 import React from "react";
 import { DsfrTitle, Notification } from "react-design-system";
 import { AbsoluteUrl } from "shared";
-import { ENV } from "src/environmentVariables";
+import { ENV } from "src/config/environmentVariables";
 
 const TitleButton = ({ url }: { url: AbsoluteUrl }) => (
   <a

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ErrorSelector } from "../Error/ErrorSelector";
+import { ErrorSelector } from "../error/ErrorSelector";
 
 // Inspired by https://itnext.io/centralizing-api-error-handling-in-react-apps-810b2be1d39d
 interface UseApiCallProps<T> {

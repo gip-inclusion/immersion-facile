@@ -7,11 +7,11 @@ import {
 } from "react-design-system/immersionFacile";
 import { useDispatch } from "react-redux";
 import { EmailSentDto, EmailVariables } from "shared";
-import { useAppSelector } from "src/app/utils/reduxHooks";
+import { useAppSelector } from "src/hooks/reduxHooks";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { sentEmailsSlice } from "src/core-logic/domain/admin/sentEmails/sentEmails.slice";
-import { ENV } from "src/environmentVariables";
-import { TextCell } from "src/uiComponents/admin/TextCell";
+import { ENV } from "src/config/environmentVariables";
+import { TextCell } from "src/app/components/admin/TextCell";
 
 export const EmailsTab = () => {
   const dispatch = useDispatch();

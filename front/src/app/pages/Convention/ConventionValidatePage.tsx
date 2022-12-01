@@ -9,18 +9,18 @@ import {
   UpdateConventionStatusRequestDto,
 } from "shared";
 import { ConventionFeedbackNotification } from "src/app/components/ConventionFeedbackNotification";
-import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
-import { useConventionTexts } from "src/app/pages/Convention/texts/textSetup";
-import { routes } from "src/app/routing/routes";
+import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
+import { useConventionTexts } from "src/app/contents/convention/textSetup";
+import { routes } from "src/app/routes/routes";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import {
   ConventionFeedbackKind,
   conventionSlice,
 } from "src/core-logic/domain/convention/convention.slice";
 import { useConvention } from "src/hooks/convention.hooks";
-import { ConventionValidation } from "src/uiComponents/admin/ConventionValidation";
+import { ConventionValidation } from "src/app/components/admin/ConventionValidation";
 import { Route } from "type-route";
-import { VerificationActionButton } from "./VerificationActionButton";
+import { VerificationActionButton } from "src/app/components/forms/convention/VerificationActionButton";
 
 type VerificationPageProps = {
   route: Route<typeof routes.conventionToValidate>;

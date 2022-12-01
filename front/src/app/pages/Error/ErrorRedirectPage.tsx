@@ -1,8 +1,8 @@
 import React, { ReactNode } from "react";
 import { isManagedError } from "shared";
-import { ContainerLayout } from "src/app/layouts/ContainerLayout";
-import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
-import { routes } from "src/app/routing/routes";
+import { ContainerLayout } from "src/app/components/layout/ContainerLayout";
+import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
+import { routes } from "src/app/routes/routes";
 import { Route } from "type-route";
 import { ManagedErrorSelector } from "./ManagedErrors";
 

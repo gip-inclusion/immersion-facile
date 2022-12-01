@@ -7,7 +7,7 @@ import {
   getSignatoryKey,
   isEstablishmentTutorIsEstablishmentRepresentative,
 } from "shared";
-import { useAppSelector } from "src/app/utils/reduxHooks";
+import { useAppSelector } from "src/hooks/reduxHooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 

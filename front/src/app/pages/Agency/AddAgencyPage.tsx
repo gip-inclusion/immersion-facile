@@ -14,12 +14,12 @@ import {
 } from "src/app/components/agency/AgencyFormCommonFields";
 import { agencySubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
-import { agencyGateway } from "src/app/config/dependencies";
-import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
+import { agencyGateway } from "src/config/dependencies";
+import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { AgencySubmitFeedback } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
-import { toFormikValidationSchema } from "src/uiComponents/form/zodValidate";
+import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
 import { v4 as uuidV4 } from "uuid";
-import { formAgencyErrorLabels } from "./content/formAgency";
+import { formAgencyErrorLabels } from "../../contents/agency/formAgency";
 
 const initialValues: CreateAgencyDto = {
   id: uuidV4(),

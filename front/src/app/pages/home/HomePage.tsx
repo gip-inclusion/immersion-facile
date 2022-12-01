@@ -8,15 +8,15 @@ import {
   SectionStats,
   SectionTextEmbed,
 } from "react-design-system/immersionFacile";
-import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
-import { routes } from "src/app/routing/routes";
+import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
+import { routes } from "src/app/routes/routes";
 import logoLeMoisLesEntreprises from "/src/assets/img/logo-le-mois-les-entreprises.svg";
 import {
   heroHeaderContent,
   heroHeaderNavCards,
   sectionFaqData,
   sectionStatsData,
-} from "./data/content";
+} from "src/app/contents/home/content";
 import { useDispatch } from "react-redux";
 import { SiretModal, useSiretModal } from "src/app/components/SiretModal";
 import {
@@ -25,7 +25,7 @@ import {
 } from "src/app/components/PeConnectModal";
 
 import { AnyAction, Dispatch } from "@reduxjs/toolkit";
-import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
+import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 
 export type UserType = "default" | "candidate" | "establishment" | "agency";
 

@@ -6,9 +6,9 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import { App } from "src/app/App";
-import { store } from "src/app/config/dependencies";
+import { store } from "src/config/dependencies";
 
-import { RouteProvider } from "./routing/routes";
+import { RouteProvider } from "./routes/routes";
 
 ReactDOM.render(
   <React.StrictMode>

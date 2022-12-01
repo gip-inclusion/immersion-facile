@@ -6,7 +6,7 @@ import { ActivateAgency } from "src/app/components/agency/ActivateAgency";
 import { EditAgency } from "src/app/components/agency/EditAgency";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { useDashboard } from "src/app/pages/admin/useDashboard";
-import { useAppSelector } from "src/app/utils/reduxHooks";
+import { useAppSelector } from "src/hooks/reduxHooks";
 import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
 
 export const AgencyTab = () => {

@@ -9,9 +9,9 @@ import {
   Tool,
 } from "react-design-system/immersionFacile";
 import { useDispatch } from "react-redux";
-import { routes, useRoute } from "src/app/routing/routes";
-import { useAppSelector } from "src/app/utils/reduxHooks";
-import { useFeatureFlags } from "src/app/utils/useFeatureFlags";
+import { routes, useRoute } from "src/app/routes/routes";
+import { useAppSelector } from "src/hooks/reduxHooks";
+import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { adminAuthSlice } from "src/core-logic/domain/admin/adminAuth/adminAuth.slice";
 

@@ -1,9 +1,9 @@
 import React from "react";
 import { FormEstablishmentSource } from "shared";
-import { HeaderFooterLayout } from "src/app/layouts/HeaderFooterLayout";
-import { routes } from "src/app/routing/routes";
+import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
+import { routes } from "src/app/routes/routes";
 import { Route } from "type-route";
-import { EstablishmentCreationForm } from "./components/EstablishmentCreationForm";
+import { EstablishmentCreationForm } from "src/app/components/forms/establishment/EstablishmentCreationForm";
 
 type EstablishmentFormForExternalsProps = {
   route: Route<typeof routes.formEstablishmentForExternals>;

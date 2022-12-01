@@ -6,10 +6,10 @@ import {
   Notification,
 } from "react-design-system/immersionFacile";
 import { AgencyDto, propEq } from "../../../../node_modules/shared";
-import { agencyGateway } from "src/app/config/dependencies";
+import { agencyGateway } from "src/config/dependencies";
 import { useAdminToken } from "src/hooks/useAdminToken";
-import { AgencyDetails } from "src/uiComponents/admin/AgencyDetails";
-import { WithBackground } from "src/uiComponents/admin/WithBackground";
+import { AgencyDetails } from "src/app/components/admin/AgencyDetails";
+import { WithBackground } from "src/app/components/admin/WithBackground";
 import "src/assets/admin.css";
 
 type ActivationResult = {

@@ -4,7 +4,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import { prop } from "ramda";
 import React from "react";
 import { AgencyId, AgencyOption, propEq } from "shared";
-import { useAppSelector } from "src/app/utils/reduxHooks";
+import { useAppSelector } from "src/hooks/reduxHooks";
 import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
 import { useAgencyAdminAutocompleteEpic } from "src/hooks/agenciesAdmin.hook";
 
