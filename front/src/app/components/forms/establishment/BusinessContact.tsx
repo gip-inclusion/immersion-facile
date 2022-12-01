@@ -6,7 +6,7 @@ import {
   FormEstablishmentDto,
   zEmail,
 } from "shared";
-import { RadioGroupForField } from "src/app/components/RadioGroup";
+import { RadioGroupForField } from "src/app/components/forms/commons/RadioGroup";
 import { FillableList } from "src/app/components/forms/commons/FillableList";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 

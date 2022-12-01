@@ -11,7 +11,7 @@ import {
   SignatoryRole,
   signatoryRoles,
 } from "shared";
-import { ConventionFeedbackNotification } from "src/app/components/ConventionFeedbackNotification";
+import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { routes } from "src/app/routes/routes";
 import { useAppSelector } from "src/hooks/reduxHooks";

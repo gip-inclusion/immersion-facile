@@ -5,7 +5,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { Form, Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { ButtonSearch, MainWrapper } from "react-design-system/immersionFacile";
-import { RomeAutocomplete } from "src/app/components/RomeAutocomplete";
+import { RomeAutocomplete } from "src/app/components/forms/autocomplete/RomeAutocomplete";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/hooks/reduxHooks";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";

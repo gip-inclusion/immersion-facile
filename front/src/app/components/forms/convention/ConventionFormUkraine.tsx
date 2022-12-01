@@ -3,7 +3,7 @@ import React from "react";
 import { Title } from "react-design-system/immersionFacile";
 import { useDispatch } from "react-redux";
 import { conventionUkraineSchema } from "shared";
-import { ConventionFeedbackNotification } from "src/app/components/ConventionFeedbackNotification";
+import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { ConventionFormFieldsUkraine } from "src/app/components/forms/convention/ConventionFormFieldsUkraine";
 import { ConventionPresentation } from "src/app/components/forms/convention/conventionHelpers";
 import { useAppSelector } from "src/hooks/reduxHooks";

@@ -8,7 +8,7 @@ import {
   isBeneficiaryMinor,
   isEstablishmentTutorIsEstablishmentRepresentative,
 } from "shared";
-import { ConventionFeedbackNotification } from "src/app/components/ConventionFeedbackNotification";
+import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import {
   ConventionPresentation,
   isConventionFrozen,

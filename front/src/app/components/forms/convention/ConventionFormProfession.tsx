@@ -2,7 +2,7 @@ import { useField } from "formik";
 import React from "react";
 import { TextInputError } from "react-design-system";
 import { AppellationDto, ConventionDto } from "shared";
-import { AppellationAutocomplete } from "src/app/components/AppellationAutocomplete";
+import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 
 type ConventionFormProfessionProps = {

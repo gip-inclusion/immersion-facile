@@ -2,7 +2,7 @@ import { useField } from "formik";
 import React from "react";
 import { ButtonDelete } from "react-design-system/immersionFacile";
 import { AppellationDto } from "shared";
-import { AppellationAutocomplete } from "src/app/components/AppellationAutocomplete";
+import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
 
 type ProfessionProps = {
   name: string;

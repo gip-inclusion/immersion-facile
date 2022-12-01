@@ -14,7 +14,7 @@ import { Notification } from "react-design-system";
 import {
   BoolRadioGroup,
   RadioGroupForField,
-} from "src/app/components/RadioGroup";
+} from "src/app/components/forms/commons/RadioGroup";
 import { ConventionFormProfession } from "src/app/components/forms/convention/ConventionFormProfession";
 import { useConventionTextsFromFormikContext } from "src/app/contents/convention/textSetup";
 import { useAppSelector } from "src/hooks/reduxHooks";

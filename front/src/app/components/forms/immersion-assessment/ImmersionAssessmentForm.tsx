@@ -9,7 +9,7 @@ import {
   ImmersionAssessmentDto,
   immersionAssessmentSchema,
 } from "shared";
-import { RadioGroupForField } from "src/app/components/RadioGroup";
+import { RadioGroupForField } from "src/app/components/forms/commons/RadioGroup";
 import { useAppSelector } from "src/hooks/reduxHooks";
 import {
   immersionAssessmentErrorSelector,

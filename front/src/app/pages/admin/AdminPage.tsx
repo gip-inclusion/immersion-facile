@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink, TabLinks } from "react-design-system/immersionFacile";
-import { ImmersionMarianneHeader } from "src/app/components/ImmersionMarianneHeader";
+import { ImmersionHeader } from "src/app/components/layout/ImmersionHeader";
 import { AgencyTab } from "src/app/pages/admin/AgencyTab";
 import { ConventionTab, EventsTab } from "src/app/pages/admin/DashboardTabs";
 import { DataExportTab } from "src/app/pages/admin/DataExportTab";
@@ -72,7 +72,7 @@ export const AdminPage = ({
 
   return (
     <>
-      <ImmersionMarianneHeader />
+      <ImmersionHeader />
       <div className="fr-container">
         <div className="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
           <div className="fr-col fr-p-2w mt-4">

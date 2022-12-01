@@ -6,7 +6,7 @@ import { SubmitButton } from "src/app/components/forms/convention/SubmitButtons"
 import { useConventionWatchValuesInUrl } from "src/app/components/forms/convention/useConventionWatchValuesInUrl";
 import { ConventionFrozenMessage } from "src/app/components/forms/convention/ConventionFrozenMessage";
 import { ConventionSignOnlyMessage } from "src/app/components/forms/convention/ConventionSignOnlyMessage";
-import { FormSectionTitle } from "src/app/components/FormSectionTitle";
+import { FormSectionTitle } from "src/app/components/forms/commons/FormSectionTitle";
 import { BeneficiaryFormSection } from "./sections/beneficiary/BeneficiaryFormSection";
 import { EstablishmentFormSection } from "./sections/establishment/EstablishmentFormSection";
 import { ImmersionConditionsCommonFields } from "./sections/immersion-conditions/ImmersionConditionsCommonFields";

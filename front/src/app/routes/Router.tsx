@@ -1,5 +1,4 @@
 import React from "react";
-import { SearchDebugPage } from "src/app/components/SearchDebugPage";
 import { AdminPage } from "src/app/pages/admin/AdminPage";
 import { AddAgencyPage } from "src/app/pages/agency/AddAgencyPage";
 import { ConventionImmersionPage } from "src/app/pages/convention/ConventionImmersionPage";
@@ -13,7 +12,6 @@ import { EstablishmentFormPageForExternals } from "src/app/pages/establishment/E
 import { SearchPage } from "src/app/pages/search/SearchPage";
 import { StatsPage } from "src/app/pages/StatsPage";
 import { PrivateRoute } from "src/app/routes/PrivateRoute";
-import { ENV } from "src/config/environmentVariables";
 import { RenewExpiredLinkPage } from "src/helpers/RenewExpiredLinkPage";
 import { EstablishmentFormPage } from "../pages/establishment/EstablishmentFormPage";
 import { HomePage } from "../pages/home/HomePage";
@@ -76,9 +74,6 @@ export const Router = () => {
       )}
       {route.name === "search" && <SearchPage route={route} />}
       {route.name === "stats" && <StatsPage />}
-      {ENV.envType !== "production" && route.name === "searchDebug" && (
-        <SearchDebugPage />
-      )}
     </>
   );
 };

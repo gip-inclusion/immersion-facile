@@ -8,7 +8,7 @@ import {
   CreateAgencyDto,
   zEmail,
 } from "shared";
-import { RadioGroup } from "src/app/components/RadioGroup";
+import { RadioGroup } from "src/app/components/forms/commons/RadioGroup";
 import { UploadLogo } from "src/app/components/UploadLogo";
 import { formAgencyFieldsLabels } from "src/app/contents/agency/formAgency";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";

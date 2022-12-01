@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
-import { ImmersionFooter } from "src/app/components/ImmersionFooter";
-import { ImmersionMarianneHeader } from "src/app/components/ImmersionMarianneHeader";
+import { ImmersionFooter } from "./ImmersionFooter";
+import { ImmersionHeader } from "./ImmersionHeader";
 import { SkipLinks, SkipLink } from "react-design-system/immersionFacile";
 
 const skipLinks: SkipLink[] = [
@@ -24,7 +24,7 @@ type HeaderFooterLayoutProps = {
 export const HeaderFooterLayout = ({ children }: HeaderFooterLayoutProps) => (
   <>
     <SkipLinks links={skipLinks}></SkipLinks>
-    <ImmersionMarianneHeader />
+    <ImmersionHeader />
     {children}
     <ImmersionFooter />
   </>

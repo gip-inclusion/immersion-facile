@@ -8,7 +8,7 @@ import {
   statusTransitionConfigs,
   UpdateConventionStatusRequestDto,
 } from "shared";
-import { ConventionFeedbackNotification } from "src/app/components/ConventionFeedbackNotification";
+import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useConventionTexts } from "src/app/contents/convention/textSetup";
 import { routes } from "src/app/routes/routes";
