@@ -14,15 +14,15 @@ import {
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { routes } from "src/app/routes/routes";
-import { useAppSelector } from "src/hooks/reduxHooks";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import {
   conventionSelectors,
   signatoryDataFromConvention,
 } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
-import { useConvention } from "src/hooks/convention.hooks";
-import { useExistingSiret } from "src/hooks/siret.hooks";
+import { useConvention } from "src/app/hooks/convention.hooks";
+import { useExistingSiret } from "src/app/hooks/siret.hooks";
 import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
 import { Route } from "type-route";
 import { ConventionFormFields } from "src/app/components/forms/convention/ConventionFormFields";

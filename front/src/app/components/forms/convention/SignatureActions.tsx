@@ -9,7 +9,7 @@ import {
   RequestModificationButton,
   SignButton,
 } from "src/app/components/forms/convention/SubmitButtons";
-import { useAppSelector } from "src/hooks/reduxHooks";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { DateCheckboxGroup } from "src/app/components/forms/commons/CheckboxGroup";
 

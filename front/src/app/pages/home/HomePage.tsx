@@ -89,7 +89,7 @@ export const HomePage = ({ type }: HomePageProps) => {
           overtitle="Devenez"
           title="entreprise accueillante"
           subtitle="Ouvrez vos portes aux talents de demain"
-          link={routes.landingEstablishment().link}
+          link={routes.homeEstablishments().link}
         />
       )}
     </HeaderFooterLayout>

@@ -17,7 +17,7 @@ import {
   ConventionFeedbackKind,
   conventionSlice,
 } from "src/core-logic/domain/convention/convention.slice";
-import { useConvention } from "src/hooks/convention.hooks";
+import { useConvention } from "src/app/hooks/convention.hooks";
 import { ConventionValidation } from "src/app/components/admin/ConventionValidation";
 import { Route } from "type-route";
 import { VerificationActionButton } from "src/app/components/forms/convention/VerificationActionButton";

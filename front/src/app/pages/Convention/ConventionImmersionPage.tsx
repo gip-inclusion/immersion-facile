@@ -9,7 +9,7 @@ import { ConventionFormContainerLayout } from "src/app/components/forms/conventi
 import { conventionInitialValuesFromUrl } from "src/app/components/forms/convention/conventionHelpers";
 
 import { routes } from "src/app/routes/routes";
-import { useAppSelector } from "src/hooks/reduxHooks";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";

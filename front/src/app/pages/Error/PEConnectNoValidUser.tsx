@@ -1,5 +1,5 @@
 import React from "react";
-import { useRedirectToConventionWithoutIdentityProvider } from "src/hooks/redirections.hooks";
+import { useRedirectToConventionWithoutIdentityProvider } from "src/app/hooks/redirections.hooks";
 
 export const PEConnectNoValidUser = () => {
   const redirectToConventionWithoutIdentityProvider =

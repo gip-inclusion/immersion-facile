@@ -3,7 +3,7 @@ import React from "react";
 import { useDispatch } from "react-redux";
 import { ConventionDto, getConventionFieldName } from "shared";
 import { RadioGroup } from "src/app/components/forms/commons/RadioGroup";
-import { useAppSelector } from "src/hooks/reduxHooks";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { DateInput } from "src/app/components/forms/commons/DateInput";

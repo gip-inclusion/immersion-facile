@@ -10,7 +10,7 @@ import {
 } from "react-design-system/immersionFacile";
 import { useDispatch } from "react-redux";
 import { routes, useRoute } from "src/app/routes/routes";
-import { useAppSelector } from "src/hooks/reduxHooks";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { adminAuthSlice } from "src/core-logic/domain/admin/adminAuth/adminAuth.slice";
@@ -154,11 +154,11 @@ export const ImmersionHeader = () => {
           ...routes.adminTab({ tab: "conventions" }).link,
         },
         {
-          label: "Landing entreprise",
+          label: "Emails",
           display: true,
           active: false,
-          id: getHeaderNavLinkId("admin-landing-establishment"),
-          ...routes.landingEstablishment().link,
+          id: getHeaderNavLinkId("admin-emails"),
+          ...routes.adminTab({ tab: "emails" }).link,
         },
       ],
     },

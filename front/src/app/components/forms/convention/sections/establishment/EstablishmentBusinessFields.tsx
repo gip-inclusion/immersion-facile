@@ -2,7 +2,10 @@ import React from "react";
 import { useField } from "formik";
 import { ConventionStatus, getConventionFieldName } from "shared";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
-import { useSiretFetcher, useSiretRelatedField } from "src/hooks/siret.hooks";
+import {
+  useSiretFetcher,
+  useSiretRelatedField,
+} from "src/app/hooks/siret.hooks";
 import { useConventionTextsFromFormikContext } from "src/app/contents/convention/textSetup";
 import {
   TextInputControlled,

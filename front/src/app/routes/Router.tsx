@@ -12,7 +12,7 @@ import { EstablishmentFormPageForExternals } from "src/app/pages/establishment/E
 import { SearchPage } from "src/app/pages/search/SearchPage";
 import { StatsPage } from "src/app/pages/StatsPage";
 import { PrivateRoute } from "src/app/routes/PrivateRoute";
-import { RenewExpiredLinkPage } from "src/helpers/RenewExpiredLinkPage";
+import { RenewExpiredLinkPage } from "src/app/routes/RenewExpiredLinkPage";
 import { EstablishmentFormPage } from "../pages/establishment/EstablishmentFormPage";
 import { HomePage } from "../pages/home/HomePage";
 import { ImmersionAssessmentPage } from "../pages/immersion-assessment/ImmersionAssessmentPage";
@@ -48,9 +48,7 @@ export const Router = () => {
       {route.name === "homeCandidates" && <HomePage type="candidate" />}
       {route.name === "homeEstablishments" && <HomePage type="establishment" />}
       {route.name === "homeAgencies" && <HomePage type="agency" />}
-      {route.name === "landingEstablishment" && (
-        <HomePage type="establishment" />
-      )}
+
       {route.name === "conventionImmersion" && (
         <ConventionImmersionPage route={route} />
       )}

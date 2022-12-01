@@ -7,7 +7,7 @@ import { establishmentSlice } from "src/core-logic/domain/establishmentPath/esta
 import { EstablishmentSubTitle } from "./EstablishmentSubTitle";
 import { EstablishmentTitle } from "src/app/components/EstablishmentTitle";
 import { routes } from "../routes/routes";
-import { useEstablishmentSiret } from "src/hooks/siret.hooks";
+import { useEstablishmentSiret } from "src/app/hooks/siret.hooks";
 import { SiretFetcherInput } from "src/app/components/SiretFetcherInput";
 
 export const EstablishmentHomeMenu = () => {
@@ -64,10 +64,7 @@ export const EstablishmentHomeMenu = () => {
       </div>
       {!modifyLinkWasSent && (
         <div className="pb-4">
-          <Link
-            text="En savoir plus"
-            url={routes.landingEstablishment().link}
-          />
+          <Link text="En savoir plus" url={routes.homeEstablishments().link} />
         </div>
       )}
     </Section>

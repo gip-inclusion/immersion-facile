@@ -5,9 +5,9 @@ import {
   DsfrTitle,
   Notification,
 } from "react-design-system/immersionFacile";
-import { AgencyDto, propEq } from "../../../../node_modules/shared";
+import { AgencyDto, propEq } from "shared";
 import { agencyGateway } from "src/config/dependencies";
-import { useAdminToken } from "src/hooks/useAdminToken";
+import { useAdminToken } from "src/app/hooks/useAdminToken";
 import { AgencyDetails } from "src/app/components/admin/AgencyDetails";
 import { WithBackground } from "src/app/components/admin/WithBackground";
 import "src/assets/admin.css";

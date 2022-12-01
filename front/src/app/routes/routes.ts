@@ -35,7 +35,10 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   ),
   home: defineRoute("/"),
   homeCandidates: defineRoute(`/${frontRoutes.homeCandidates}`),
-  homeEstablishments: defineRoute(`/${frontRoutes.homeEstablishments}`),
+  homeEstablishments: defineRoute([
+    `/${frontRoutes.homeEstablishments}`,
+    `/${frontRoutes.landingEstablishment}`,
+  ]),
   homeAgencies: defineRoute(`/${frontRoutes.homeAgencies}`),
   conventionImmersion: defineRoute(
     { jwt: param.query.optional.string, ...conventionValuesFromUrl },
@@ -63,7 +66,6 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { jwt: param.query.string },
     () => `/${frontRoutes.immersionAssessment}`,
   ),
-  landingEstablishment: defineRoute(`/${frontRoutes.landingEstablishment}`),
   renewConventionMagicLink: defineRoute(
     {
       expiredJwt: param.query.string,

@@ -17,9 +17,9 @@ import {
 } from "src/app/components/forms/commons/RadioGroup";
 import { ConventionFormProfession } from "src/app/components/forms/convention/ConventionFormProfession";
 import { useConventionTextsFromFormikContext } from "src/app/contents/convention/textSetup";
-import { useAppSelector } from "src/hooks/reduxHooks";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
-import { useSiretRelatedField } from "src/hooks/siret.hooks";
+import { useSiretRelatedField } from "src/app/hooks/siret.hooks";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { DateInput } from "src/app/components/forms/commons/DateInput";
 import { SchedulePicker } from "src/app/components/forms/commons/SchedulePicker/SchedulePicker";

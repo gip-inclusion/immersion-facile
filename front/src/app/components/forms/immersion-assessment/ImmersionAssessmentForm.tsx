@@ -10,12 +10,12 @@ import {
   immersionAssessmentSchema,
 } from "shared";
 import { RadioGroupForField } from "src/app/components/forms/commons/RadioGroup";
-import { useAppSelector } from "src/hooks/reduxHooks";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import {
   immersionAssessmentErrorSelector,
   immersionAssessmentStatusSelector,
 } from "src/core-logic/domain/immersionAssessment/immersionAssessment.selectors";
-import { useImmersionAssessment } from "src/hooks/immersionAssessment";
+import { useImmersionAssessment } from "src/app/hooks/immersionAssessment";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
 

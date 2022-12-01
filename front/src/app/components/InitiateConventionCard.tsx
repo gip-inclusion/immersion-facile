@@ -11,7 +11,7 @@ import {
 import { EstablishmentSubTitle } from "src/app/components/EstablishmentSubTitle";
 import { useRoute } from "src/app/routes/routes";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
-import { useRedirectToConventionWithoutIdentityProvider } from "src/hooks/redirections.hooks";
+import { useRedirectToConventionWithoutIdentityProvider } from "src/app/hooks/redirections.hooks";
 import { loginPeConnect } from "shared";
 
 const storeConventionRouteParamsOnDevice = (

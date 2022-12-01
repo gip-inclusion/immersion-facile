@@ -15,7 +15,7 @@ import {
   useInitialSiret,
   useSiretFetcher,
   useSiretRelatedField,
-} from "src/hooks/siret.hooks";
+} from "src/app/hooks/siret.hooks";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 
 import {

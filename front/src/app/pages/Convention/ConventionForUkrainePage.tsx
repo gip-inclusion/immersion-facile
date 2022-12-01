@@ -7,7 +7,7 @@ import { ConventionFormUkraine } from "src/app/components/forms/convention/Conve
 import { conventionInitialValuesFromUrl } from "src/app/components/forms/convention/conventionHelpers";
 import { ImmersionFacileAgencyNotActive } from "src/app/components/forms/convention/ImmersionFacileAgencyNotActive";
 import { routes } from "src/app/routes/routes";
-import { useObservable } from "src/hooks/useObservable";
+import { useObservable } from "src/app/hooks/useObservable";
 import { Route } from "type-route";
 
 export type ConventionUkrainePageRoute = Route<

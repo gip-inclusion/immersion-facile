@@ -2,7 +2,7 @@ import { useFormikContext } from "formik";
 import React from "react";
 import { ConventionDto, getConventionFieldName } from "shared";
 import { useConventionTextsFromFormikContext } from "src/app/contents/convention/textSetup";
-import { useSiretFetcher } from "src/hooks/siret.hooks";
+import { useSiretFetcher } from "src/app/hooks/siret.hooks";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
 

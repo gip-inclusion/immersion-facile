@@ -6,7 +6,7 @@ import { conventionUkraineSchema } from "shared";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { ConventionFormFieldsUkraine } from "src/app/components/forms/convention/ConventionFormFieldsUkraine";
 import { ConventionPresentation } from "src/app/components/forms/convention/conventionHelpers";
-import { useAppSelector } from "src/hooks/reduxHooks";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";

@@ -6,7 +6,7 @@ import {
   SubTitle,
   Title,
 } from "react-design-system/immersionFacile";
-import { useEstablishmentSiret } from "src/hooks/siret.hooks";
+import { useEstablishmentSiret } from "src/app/hooks/siret.hooks";
 import { SiretFetcherInput } from "./SiretFetcherInput";
 
 type ActionOnEstablishment = "register" | "edit";

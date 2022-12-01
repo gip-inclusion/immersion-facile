@@ -11,7 +11,7 @@ import {
 } from "shared";
 import { agencyGateway } from "src/config/dependencies";
 import { useConventionTextsFromFormikContext } from "src/app/contents/convention/textSetup";
-import { useConnectedWith } from "src/hooks/connectedWith";
+import { useConnectedWith } from "src/app/hooks/connectedWith";
 import { PostcodeAutocomplete } from "src/app/components/forms/commons/PostcodeAutocomplete";
 import { AgencyDropdownListField } from "./AgencyDropdownListField";
 import { AgencyErrorText } from "./AgencyErrorText";

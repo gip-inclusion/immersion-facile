@@ -4,9 +4,9 @@ import Autocomplete from "@mui/material/Autocomplete";
 import { prop } from "ramda";
 import React from "react";
 import { RomeDto } from "shared";
-import { useAppSelector } from "src/hooks/reduxHooks";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { romeAutocompleteSelector } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.selectors";
-import { useRomeAutocompleteUseCase } from "src/hooks/romeAutocomplete.hook";
+import { useRomeAutocompleteUseCase } from "src/app/hooks/romeAutocomplete.hook";
 
 type RomeAutocompleteProps = {
   title: string;

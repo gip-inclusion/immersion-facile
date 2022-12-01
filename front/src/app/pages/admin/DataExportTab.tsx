@@ -15,7 +15,7 @@ import {
   EstablishmentsWithFlattenOffersExportableParams,
 } from "shared";
 import { HttpExcelExportGateway } from "src/core-logic/adapters/ExcelExportGateway/HttpExcelExportGateway";
-import { useAdminToken } from "src/hooks/useAdminToken";
+import { useAdminToken } from "src/app/hooks/useAdminToken";
 import { WithBackground } from "src/app/components/admin/WithBackground";
 
 // TODO Mettre dans les dépendances ?

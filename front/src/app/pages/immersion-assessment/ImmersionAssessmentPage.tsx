@@ -9,7 +9,7 @@ import { ConventionMagicLinkPayload } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { routes } from "src/app/routes/routes";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
-import { useConvention } from "src/hooks/convention.hooks";
+import { useConvention } from "src/app/hooks/convention.hooks";
 import { Route } from "type-route";
 import { ImmersionAssessmentForm } from "src/app/components/forms/immersion-assessment/ImmersionAssessmentForm";
 import { ImmersionDescription } from "src/app/components/forms/immersion-assessment/ImmersionDescription";

@@ -1,7 +1,7 @@
 import { CircularProgress } from "@mui/material";
 import React, { ReactNode, useState } from "react";
 import { ContactMethod } from "shared";
-import { useAppSelector } from "src/hooks/reduxHooks";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import { SuccessFeedback } from "src/app/components/SuccessFeedback";
 import {

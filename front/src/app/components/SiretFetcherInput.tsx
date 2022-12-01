@@ -1,4 +1,4 @@
-import { useEstablishmentSiret } from "src/hooks/siret.hooks";
+import { useEstablishmentSiret } from "src/app/hooks/siret.hooks";
 import { ButtonHome, ImmersionTextField } from "react-design-system";
 import React from "react";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
