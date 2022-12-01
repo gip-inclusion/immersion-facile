@@ -72,7 +72,7 @@ const rootEpic: Epic = (action$, store$, dependencies) =>
     }),
   );
 
-export type StoreProps = {
+type StoreProps = {
   dependencies: Dependencies;
   preloadedState?: Partial<RootState>;
 };
@@ -96,4 +96,3 @@ export const createRootSelector = <T>(selector: (state: RootState) => T) =>
   selector;
 
 export type ReduxStore = ReturnType<typeof createStore>;
-export type AppDispatch = ReduxStore["dispatch"];

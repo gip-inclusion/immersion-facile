@@ -49,7 +49,6 @@ export const agencyGateway = dependencies.agencyGateway;
 export const deviceRepository = dependencies.deviceRepository;
 export const technicalGateway = dependencies.technicalGateway;
 export const romeAutocompleteGateway = dependencies.romeAutocompleteGateway;
-export const adminGateway = dependencies.adminGateway;
 
 export const store = createStore({
   dependencies,

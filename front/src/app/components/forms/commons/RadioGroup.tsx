@@ -1,7 +1,7 @@
 import { useField } from "formik";
 import React from "react";
-import { CheckboxGroupProps } from "src/app/components/forms/commons/CheckboxGroup";
 import { cleanStringToHTMLAttribute } from "shared";
+
 type BoolRadioProps = {
   name: string;
   label: string;
@@ -29,12 +29,19 @@ export const BoolRadioGroup = ({ name, label, disabled }: BoolRadioProps) => {
   );
 };
 
+type RadioGroupForFieldProps = {
+  name: string;
+  label: string;
+  options: Array<{ value: string | string[]; label?: string }>;
+  disabled?: boolean;
+};
+
 export const RadioGroupForField = ({
   name,
   label,
   options,
   disabled,
-}: CheckboxGroupProps) => {
+}: RadioGroupForFieldProps) => {
   const [field, meta, { setValue }] = useField({ name });
   const error = meta.touched && meta.error;
 
