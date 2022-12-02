@@ -7,6 +7,7 @@ import {
   OverFooter,
   OverFooterCols,
 } from "react-design-system/immersionFacile";
+import { routes } from "src/app/routes/routes";
 
 const getFooterNavLinkId = (chunk: string) => `im-footer-nav__${chunk}`;
 
@@ -85,20 +86,17 @@ const links: NavLink[] = [
 const bottomsLinks: NavLink[] = [
   {
     label: "Mentions légales",
-    href: "https://immersion-facile-1.gitbook.io/mentions-legales/",
-    target: "_blank",
+    ...routes.standard({ pagePath: "mentions-legales" }).link,
     id: getFooterNavLinkId("legals"),
   },
   {
     label: "Politique de confidentialité",
-    href: "https://immersion-facile-1.gitbook.io/mentions-legales/politique-de-confidentialite",
-    target: "_blank",
+    ...routes.standard({ pagePath: "politique-de-confidentialite" }).link,
     id: getFooterNavLinkId("privacy"),
   },
   {
     label: "Conditions générales d'utilisation",
-    href: "https://immersion-facile-1.gitbook.io/mentions-legales/conditions-generales-dutilisation",
-    target: "_blank",
+    ...routes.standard({ pagePath: "cgu" }).link,
     id: getFooterNavLinkId("cgu"),
   },
   {

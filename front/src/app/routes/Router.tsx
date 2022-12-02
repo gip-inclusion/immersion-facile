@@ -17,6 +17,8 @@ import { EstablishmentFormPage } from "../pages/establishment/EstablishmentFormP
 import { HomePage } from "../pages/home/HomePage";
 import { ImmersionAssessmentPage } from "../pages/immersion-assessment/ImmersionAssessmentPage";
 import { routes, useRoute } from "./routes";
+import { StandardPageSlugs, standardPageSlugs } from "./route-params";
+import { StandardLayout } from "../components/layout/StandardLayout";
 
 const NotAvailable = () => <div>Cette page n'est pas disponible.</div>;
 
@@ -72,6 +74,14 @@ export const Router = () => {
       )}
       {route.name === "search" && <SearchPage route={route} />}
       {route.name === "stats" && <StatsPage />}
+      {route.name === "standard" &&
+        standardPageSlugs.includes(
+          route.params.pagePath as StandardPageSlugs,
+        ) && <StandardLayout route={route} />}
+      {route.name === "standard" &&
+        !standardPageSlugs.includes(
+          route.params.pagePath as StandardPageSlugs,
+        ) && <NotAvailable />}
     </>
   );
 };

@@ -1,6 +1,17 @@
 import { AppellationDto, ScheduleDto } from "shared";
 import { param, ValueSerializer } from "type-route";
 
+export type StandardPageSlugs =
+  | "mentions-legales"
+  | "cgu"
+  | "politique-de-confidentialite";
+
+export const standardPageSlugs: StandardPageSlugs[] = [
+  "mentions-legales",
+  "cgu",
+  "politique-de-confidentialite",
+];
+
 export type AdminTab =
   | "conventions"
   | "events"

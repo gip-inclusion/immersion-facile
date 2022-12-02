@@ -15,6 +15,7 @@ export const frontRoutes = {
   homeCandidates: "accueil-beneficiaires",
   homeEstablishments: "accueil-entreprises",
   homeAgencies: "accueil-prescripteurs",
+  standard: "pages",
 };
 
 export const addEstablishmentFormRouteWithApiKey__v0 = "add-establishment-form"; // Becomes POST /v1/form-establishments
