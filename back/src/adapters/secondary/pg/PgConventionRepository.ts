@@ -102,11 +102,14 @@ export class PgConventionRepository implements ConventionRepository {
       : null;
 
     await this.updateBeneficiary(id, beneficiary);
+
     const beneficiaryRepresentativeId = beneficiaryRepresentative
-      ? await this.updateBeneficiaryRepresentative(
-          id,
-          beneficiaryRepresentative,
-        )
+      ? (await this.getBeneficiaryRepresentativeId(id)) === null
+        ? await this.insertBeneficiaryRepresentative(beneficiaryRepresentative)
+        : await this.updateBeneficiaryRepresentative(
+            id,
+            beneficiaryRepresentative,
+          )
       : null;
 
     await this.updateConvention({
@@ -122,6 +125,20 @@ export class PgConventionRepository implements ConventionRepository {
     });
 
     return convention.id;
+  }
+  private async getBeneficiaryRepresentativeId(id: ConventionId) {
+    const getBeneficiaryRepresentativeQuery = `  
+        SELECT ${beneficiaryRepresentativeIdColumnName}
+        FROM conventions 
+        WHERE conventions.id=$1
+        `;
+    // prettier-ignore
+    const getResult = await this.client.query<{
+      beneficiary_representative_id:number|null
+    }>(getBeneficiaryRepresentativeQuery, [ id]);
+    const result = getResult.rows.at(0);
+    if (result) return result.beneficiary_representative_id;
+    throw new Error(missingReturningRowError(getResult));
   }
 
   private async getBeneficiaryCurrentEmployerId(
