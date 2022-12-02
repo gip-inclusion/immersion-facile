@@ -76,8 +76,8 @@ export const HomePage = ({ type }: HomePageProps) => {
         />
         <SectionStats stats={sectionStatsDataForType} />
         <SectionTextEmbed
-          videoUrl="https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c0/Big_Buck_Bunny_4K.webm/Big_Buck_Bunny_4K.webm.720p.webm"
-          videoPosterUrl="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Big_Buck_Bunny_4K.webm/640px--Big_Buck_Bunny_4K.webm.jpg"
+          videoUrl=" https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise.mp4"
+          videoPosterUrl="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise_poster.webp"
         />
         <SectionFaq articles={sectionFaqData} />
       </MainWrapper>
