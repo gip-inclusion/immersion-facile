@@ -29,6 +29,7 @@ import {
 } from "../../../domain/peConnect/port/PeConnect.schema";
 import { PeConnectGateway } from "../../../domain/peConnect/port/PeConnectGateway";
 import { createLogger } from "../../../utils/logger";
+import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { validateAndParseZodSchema } from "../../primary/helpers/httpErrors";
 import {
   getAdvisorsInfoSuccessCount,
@@ -129,8 +130,14 @@ export class HttpPeConnectGateway implements PeConnectGateway {
 
       getUserSuccessCount.inc();
       return toPeConnectUserDto(externalUser);
-    } catch (e: any) {
-      getUserInfoErrorCount.inc({ errorType: e.error.message });
+    } catch (e: unknown) {
+      if (e instanceof Error)
+        getUserInfoErrorCount.inc({ errorType: e.message });
+      else
+        notifyObjectDiscord({
+          message: "Is not an error on catch.",
+          e,
+        });
       throw e;
     } finally {
       // eslint-disable-next-line no-console
@@ -160,8 +167,14 @@ export class HttpPeConnectGateway implements PeConnectGateway {
 
       getAdvisorsInfoSuccessCount.inc();
       return advisors.map(toPeConnectAdvisorDto);
-    } catch (e: any) {
-      peAdvisorsErrorCount.inc({ errorType: e.error.message });
+    } catch (e: unknown) {
+      if (e instanceof Error)
+        peAdvisorsErrorCount.inc({ errorType: e.message });
+      else
+        notifyObjectDiscord({
+          message: "Is not an error on catch.",
+          e,
+        });
       throw e;
     } finally {
       // eslint-disable-next-line no-console
