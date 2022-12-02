@@ -1,12 +1,17 @@
 import React from "react";
+import ReactPlayer from "react-player";
 import "./SectionTextEmbed.scss";
 
 type SectionTextEmbedProps = {
-  iframeUrl: string;
+  videoUrl: string;
+  videoPosterUrl: string;
 };
 const componentName = "im-section-text-embed";
 
-export const SectionTextEmbed = ({ iframeUrl }: SectionTextEmbedProps) => (
+export const SectionTextEmbed = ({
+  videoUrl,
+  videoPosterUrl,
+}: SectionTextEmbedProps) => (
   <section className={`fr-container ${componentName} fr-pt-8w fr-pb-10w`}>
     <div className={`${componentName}__header fr-mb-4w`}>
       <h3 className={`${componentName}__title`}>
@@ -43,7 +48,17 @@ export const SectionTextEmbed = ({ iframeUrl }: SectionTextEmbedProps) => (
         </li>
       </ul>
       <div className={`${componentName}__embed-wrapper fr-col-12 fr-col-lg-5`}>
-        <iframe src={iframeUrl} className={`${componentName}__embed`}></iframe>
+        <ReactPlayer
+          controls
+          url={videoUrl}
+          config={{
+            file: {
+              attributes: {
+                poster: videoPosterUrl,
+              },
+            },
+          }}
+        />
       </div>
     </div>
   </section>

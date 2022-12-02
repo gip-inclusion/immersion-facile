@@ -75,7 +75,10 @@ export const HomePage = ({ type }: HomePageProps) => {
           }
         />
         <SectionStats stats={sectionStatsDataForType} />
-        <SectionTextEmbed iframeUrl="https://www.powtoon.com/embed/c8x7n7AR2XE/" />
+        <SectionTextEmbed
+          videoUrl="https://upload.wikimedia.org/wikipedia/commons/transcoded/c/c0/Big_Buck_Bunny_4K.webm/Big_Buck_Bunny_4K.webm.720p.webm"
+          videoPosterUrl="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Big_Buck_Bunny_4K.webm/640px--Big_Buck_Bunny_4K.webm.jpg"
+        />
         <SectionFaq articles={sectionFaqData} />
       </MainWrapper>
       {featureFlags.enableTemporaryOperation && (
