@@ -47,6 +47,20 @@ const PE_AGENCY_ACTIVE = new AgencyDtoBuilder()
   .withStatus("active")
   .build();
 
+const CCI_ACTIVE = new AgencyDtoBuilder()
+  .withId("CCI-test-agency")
+  .withName("Test Agency CCI")
+  .withAddress({
+    streetNumberAndAddress: "CCI",
+    postcode: "75001",
+    city: "Paris",
+    departmentCode: "75",
+  })
+  .withKind("cci")
+  .withSignature("CCI Agency")
+  .withStatus("active")
+  .build();
+
 const AGENCY_3_NEEDING_REVIEW = new AgencyDtoBuilder()
   .withId("PE-test-agency-3-front")
   .withName("Test Agency 3 (front)")
@@ -60,14 +74,12 @@ const AGENCY_4_NEEDING_REVIEW = new AgencyDtoBuilder()
   .build();
 
 export class InMemoryAgencyGateway implements AgencyGateway {
-  listCciAgencies(_departmentCode: DepartmentCode): Promise<AgencyOption[]> {
-    throw new Error("Method not implemented.");
-  }
   private _agencies: Record<string, AgencyDto> = {
     [MISSION_LOCAL_AGENCY_ACTIVE.id]: MISSION_LOCAL_AGENCY_ACTIVE,
     [PE_AGENCY_ACTIVE.id]: PE_AGENCY_ACTIVE,
     [AGENCY_3_NEEDING_REVIEW.id]: AGENCY_3_NEEDING_REVIEW,
     [AGENCY_4_NEEDING_REVIEW.id]: AGENCY_4_NEEDING_REVIEW,
+    [CCI_ACTIVE.id]: CCI_ACTIVE,
   };
 
   updateAgency$(): Observable<void> {
@@ -83,10 +95,10 @@ export class InMemoryAgencyGateway implements AgencyGateway {
     };
   }
 
-  async listAgenciesByDepartmentCode(
+  async listAgenciesByDepartmentCodeWithoutCci(
     _departmentCode: DepartmentCode,
   ): Promise<AgencyOption[]> {
-    return values(this._agencies);
+    return values(this._agencies).filter(propNotEq("kind", "cci"));
   }
 
   async listPeAgencies(
@@ -99,6 +111,12 @@ export class InMemoryAgencyGateway implements AgencyGateway {
     _departmentCode: DepartmentCode,
   ): Promise<AgencyOption[]> {
     return values(this._agencies).filter(propNotEq("kind", "pole-emploi"));
+  }
+
+  async listCciAgencies(
+    _departmentCode: DepartmentCode,
+  ): Promise<AgencyOption[]> {
+    return values(this._agencies).filter(propNotEq("kind", "cci"));
   }
 
   async listAgenciesNeedingReview(): Promise<AgencyDto[]> {

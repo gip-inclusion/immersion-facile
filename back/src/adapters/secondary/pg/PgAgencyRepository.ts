@@ -43,10 +43,10 @@ type AgencyPgRow = Record<AgencyColumns, any>;
 const makeAgencyKindFiterSQL = (
   agencyKindFilter?: AgencyKindFilter,
 ): string | undefined => {
-  if (!agencyKindFilter) return;
-  return agencyKindFilter === "peOnly"
-    ? "kind = 'pole-emploi'"
-    : "kind != 'pole-emploi'";
+  if (agencyKindFilter === "peOnly") return "kind = 'pole-emploi'";
+  if (agencyKindFilter === "peExcluded") return "kind != 'pole-emploi'";
+  if (agencyKindFilter === "cciOnly") return "kind = 'cci'";
+  if (agencyKindFilter === "cciExcluded") return "kind != 'cci'";
 };
 
 const makeNameFilterSQL = (name?: string): string | undefined => {
@@ -91,7 +91,7 @@ export class PgAgencyRepository implements AgencyRepository {
   }): Promise<AgencyDto[]> {
     const filtersSQL = [
       makeDepartmentCodeFilterSQL(filters.departmentCode),
-      makeNameFilterSQL(filters.name),
+      makeNameFilterSQL(filters.nameIncludes),
       makeAgencyKindFiterSQL(filters.kind),
       makePositionFiterSQL(filters.position),
       makeStatusFilterSQL(filters.status),
@@ -109,14 +109,14 @@ export class PgAgencyRepository implements AgencyRepository {
         )}, position)`
       : "";
 
-    const query = `SELECT *, ST_AsGeoJSON(position) AS position
-    FROM public.agencies
-    ${whereClause}
-    ${sortClause}
-    ${limitClause}`;
+    const query = [
+      "SELECT *, ST_AsGeoJSON(position) AS position FROM public.agencies",
+      ...(whereClause ? [whereClause] : []),
+      ...(sortClause ? [sortClause] : []),
+      ...(limitClause ? [limitClause] : []),
+    ].join("\n");
 
     const pgResult = await this.client.query(query);
-
     return pgResult.rows.map(pgToEntity);
   }
 

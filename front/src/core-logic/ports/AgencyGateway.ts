@@ -13,7 +13,7 @@ import {
 
 export interface AgencyGateway {
   addAgency(agency: CreateAgencyDto): Promise<void>;
-  listAgenciesByDepartmentCode(
+  listAgenciesByDepartmentCodeWithoutCci(
     departmentCode: DepartmentCode,
   ): Promise<AgencyOption[]>;
 

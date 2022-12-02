@@ -5,8 +5,11 @@ import {
   ListAgenciesRequestDto,
   listAgenciesByDepartmentCodeRequestSchema,
 } from "shared";
-import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
-import { TransactionalUseCase } from "../../core/UseCase";
+import {
+  UnitOfWork,
+  UnitOfWorkPerformer,
+} from "../../../core/ports/UnitOfWork";
+import { TransactionalUseCase } from "../../../core/UseCase";
 
 export class ListAgenciesByFilter extends TransactionalUseCase<
   ListAgenciesRequestDto,
@@ -19,23 +22,23 @@ export class ListAgenciesByFilter extends TransactionalUseCase<
   inputSchema = listAgenciesByDepartmentCodeRequestSchema;
 
   public async _execute(
-    { departmentCode, name, filter }: ListAgenciesRequestDto,
+    { departmentCode, nameIncludes, kind }: ListAgenciesRequestDto,
     uow: UnitOfWork,
   ): Promise<AgencyOption[]> {
     const agencies = await uow.agencyRepository.getAgencies({
       filters: {
-        name,
+        nameIncludes,
         departmentCode,
-        kind: filter,
+        kind,
         status: activeAgencyStatuses,
       },
     });
 
-    return agencies.map(agencyToAgencyWithPositionDto);
+    return agencies.map(toAgencyOption);
   }
 }
 
-const agencyToAgencyWithPositionDto = (config: AgencyDto): AgencyOption => ({
-  id: config.id,
-  name: config.name,
+export const toAgencyOption = (agency: AgencyDto): AgencyOption => ({
+  id: agency.id,
+  name: agency.name,
 });

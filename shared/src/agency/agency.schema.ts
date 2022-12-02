@@ -44,8 +44,8 @@ const agencyKindSchema: z.ZodSchema<AgencyKind> = z.enum(agencyKindList);
 export const listAgenciesByDepartmentCodeRequestSchema: z.ZodSchema<ListAgenciesRequestDto> =
   z.object({
     departmentCode: z.string().optional(),
-    name: z.string().optional(),
-    filter: z.enum(["peOnly", "peExcluded"]).optional(),
+    nameIncludes: z.string().optional(),
+    kind: z.enum(["peOnly", "peExcluded", "cciOnly", "cciExcluded"]).optional(),
   });
 
 const createAgencyShape = {

@@ -144,10 +144,10 @@ const agenciesRetriever = ({
   if (internshipKind === "mini-stage-cci")
     return agencyGateway.listCciAgencies(departmentCode);
   if (shouldListAll)
-    return agencyGateway.listAgenciesByDepartmentCode(departmentCode);
+    return agencyGateway.listAgenciesByDepartmentCodeWithoutCci(departmentCode);
   return connectedWith && isPeConnectIdentity(connectedWith)
     ? agencyGateway.listPeAgencies(departmentCode)
-    : agencyGateway.listAgenciesByDepartmentCode(departmentCode);
+    : agencyGateway.listAgenciesByDepartmentCodeWithoutCci(departmentCode);
   // : agencyGateway.listNonPeAgencies(position);
   // -> for easy revert when new page is ready
 };

@@ -131,7 +131,7 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     const filterPredicate = (agency: AgencyDto) =>
       ![
         agencyHasDepartmentCode(agency, filters?.departmentCode),
-        agencyHasName(agency, filters?.name),
+        agencyHasName(agency, filters?.nameIncludes),
         agencyIsOfKind(agency, filters?.kind),
         agencyIsOfPosition(agency, filters?.position),
         agencyIsOfStatus(agency, filters?.status),
@@ -186,8 +186,7 @@ export class InMemoryAgencyRepository implements AgencyRepository {
 }
 
 const isAgencyPE = (agency: AgencyDto) => agency.kind === "pole-emploi";
-
-const isAgencyNotPE = (agency: AgencyDto) => agency.kind !== "pole-emploi";
+const isAgencyCci = (agency: AgencyDto) => agency.kind === "cci";
 
 const sortByNearestFrom =
   (position: GeoPositionDto) =>
@@ -209,10 +208,11 @@ const agencyIsOfKind = (
   agency: AgencyDto,
   agencyKindFilter?: AgencyKindFilter,
 ): boolean => {
-  if (!agencyKindFilter) return true;
-  return agencyKindFilter === "peOnly"
-    ? isAgencyPE(agency)
-    : isAgencyNotPE(agency);
+  if (agencyKindFilter === "peOnly") return isAgencyPE(agency);
+  if (agencyKindFilter === "peExcluded") return !isAgencyPE(agency);
+  if (agencyKindFilter === "cciOnly") return isAgencyCci(agency);
+  if (agencyKindFilter === "cciExcluded") return !isAgencyCci(agency);
+  return true;
 };
 
 const agencyIsOfStatus = (

@@ -124,6 +124,17 @@ describe("PgAgencyRepository", () => {
         .build(),
     ];
 
+    const agencyCciInParis = new AgencyDtoBuilder()
+      .withId("55555555-5555-5555-5555-555555555555")
+      .withKind("cci")
+      .withAddress({
+        departmentCode: "75",
+        city: "Paris",
+        postcode: "75001",
+        streetNumberAndAddress: "OSEF",
+      })
+      .build();
+
     it("returns empty list for empty table", async () => {
       const agencies = await agencyRepository.getAgencies({});
       expect(agencies).toEqual([]);
@@ -174,6 +185,28 @@ describe("PgAgencyRepository", () => {
       });
       expect(sortById(agencies)).toEqual([agency1PE]);
     });
+    it("if agencyKindFilter = 'cciOnly', returns only cci agencies", async () => {
+      await Promise.all([
+        agencyRepository.insert(agencyCciInParis),
+        agencyRepository.insert(agency1PE),
+      ]);
+
+      const agencies = await agencyRepository.getAgencies({
+        filters: { kind: "cciOnly" },
+      });
+      expect(sortById(agencies)).toEqual([agencyCciInParis]);
+    });
+    it("if agencyKindFilter = 'cciExcluded', returns agencies that are not kind cci", async () => {
+      await Promise.all([
+        agencyRepository.insert(agencyCciInParis),
+        agencyRepository.insert(agency1PE),
+      ]);
+
+      const agencies = await agencyRepository.getAgencies({
+        filters: { kind: "cciExcluded" },
+      });
+      expect(sortById(agencies)).toEqual([agency1PE]);
+    });
 
     it("returns all agencies filtered by name", async () => {
       await Promise.all([
@@ -182,12 +215,24 @@ describe("PgAgencyRepository", () => {
         agencyRepository.insert(agenciesByName[2]),
       ]);
       const agencies = await agencyRepository.getAgencies({
-        filters: { name: "Vitry" },
+        filters: { nameIncludes: "Vitry" },
       });
       expect(sortById(agencies)).toEqual([
         agenciesByName[0],
         agenciesByName[1],
       ]);
+    });
+    it("returns agencies filtered by departmentCode", async () => {
+      await Promise.all([
+        agencyRepository.insert(agenciesByName[0]),
+        agencyRepository.insert(agenciesByName[1]),
+        agencyRepository.insert(agenciesByName[2]),
+        agencyRepository.insert(agencyCciInParis),
+      ]);
+      const agencies = await agencyRepository.getAgencies({
+        filters: { departmentCode: "75" },
+      });
+      expect(sortById(agencies)).toEqual([agencyCciInParis]);
     });
   });
 

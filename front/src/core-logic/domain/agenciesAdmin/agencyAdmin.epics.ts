@@ -21,7 +21,7 @@ export const agencyAdminGetByNameEpic: AppEpic<AgencyAction> = (
     debounceTime(400, scheduler),
     distinctUntilChanged(),
     switchMap((action: PayloadAction<string>) =>
-      agencyGateway.listAgenciesByFilter$({ name: action.payload }),
+      agencyGateway.listAgenciesByFilter$({ nameIncludes: action.payload }),
     ),
     map(agencyAdminSlice.actions.setAgencyOptions),
   );

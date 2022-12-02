@@ -32,15 +32,16 @@ export type WithAgencyId = {
   id: AgencyId;
 };
 
-export const agencyKindList: NotEmptyArray<
-  Exclude<AgencyKind, "immersion-facile">
-> = [
+type AllowedAgencyKindToAdd = Exclude<AgencyKind, "immersion-facile">;
+
+export const agencyKindList: NotEmptyArray<AllowedAgencyKindToAdd> = [
   "pole-emploi",
   "mission-locale",
   "cap-emploi",
   "conseil-departemental",
   "prepa-apprentissage",
   "structure-IAE",
+  "cci",
   "autre",
 ];
 
@@ -57,11 +58,16 @@ export type AgencyKind =
   | "conseil-departemental"
   | "prepa-apprentissage"
   | "structure-IAE"
+  | "cci"
   | "autre";
 
 export const activeAgencyStatuses: AgencyStatus[] = ["active", "from-api-PE"];
 
-export type AgencyKindFilter = "peOnly" | "peExcluded";
+export type AgencyKindFilter =
+  | "peOnly"
+  | "peExcluded"
+  | "cciOnly"
+  | "cciExcluded";
 
 export type AgencyPositionFilter = {
   position: GeoPositionDto;
@@ -69,18 +75,17 @@ export type AgencyPositionFilter = {
 };
 
 export type GetAgenciesFilter = {
-  name?: string;
+  nameIncludes?: string;
   position?: AgencyPositionFilter;
   departmentCode?: DepartmentCode;
   kind?: AgencyKindFilter;
   status?: AgencyStatus[];
 };
 
-export type ListAgenciesRequestDto = {
-  name?: string;
-  departmentCode?: DepartmentCode;
-  filter?: AgencyKindFilter;
-};
+export type ListAgenciesRequestDto = Omit<
+  GetAgenciesFilter,
+  "status" | "position"
+>;
 
 export type PrivateListAgenciesRequestDto = {
   status?: AgencyStatus;

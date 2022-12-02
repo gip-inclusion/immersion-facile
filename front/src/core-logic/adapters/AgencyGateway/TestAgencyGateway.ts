@@ -18,9 +18,6 @@ import {
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
 export class TestAgencyGateway implements AgencyGateway {
-  listCciAgencies(_departmentCode: DepartmentCode): Promise<AgencyOption[]> {
-    throw new Error("Method not implemented.");
-  }
   public agencies$ = new Subject<AgencyOption[]>();
   public fetchedAgency$ = new Subject<AgencyDto | undefined>();
   public updateAgencyResponse$ = new Subject<undefined>();
@@ -60,7 +57,7 @@ export class TestAgencyGateway implements AgencyGateway {
     };
   }
 
-  async listAgenciesByDepartmentCode(
+  async listAgenciesByDepartmentCodeWithoutCci(
     _departmentCode: DepartmentCode,
   ): Promise<AgencyOption[]> {
     return values(this._agencies);
@@ -76,6 +73,12 @@ export class TestAgencyGateway implements AgencyGateway {
     _departmentCode: DepartmentCode,
   ): Promise<AgencyOption[]> {
     return values(this._agencies).filter(propNotEq("kind", "pole-emploi"));
+  }
+
+  async listCciAgencies(
+    _departmentCode: DepartmentCode,
+  ): Promise<AgencyOption[]> {
+    return values(this._agencies).filter(propNotEq("kind", "cci"));
   }
 
   async listAgenciesNeedingReview(): Promise<AgencyDto[]> {

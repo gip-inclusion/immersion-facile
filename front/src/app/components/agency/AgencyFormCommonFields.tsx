@@ -44,7 +44,9 @@ export const AgencyFormCommonFields = ({
         {...formAgencyFieldsLabels.kind}
         id="agency-kind"
         name={getName("kind")}
-        options={agencyListOfOptions}
+        options={agencyListOfOptions.sort((a, b) =>
+          a.label < b.label ? -1 : 0,
+        )}
       />
       <TextInput {...formAgencyFieldsLabels.name} name={getName("name")} />
       <AddressAutocomplete
@@ -57,7 +59,6 @@ export const AgencyFormCommonFields = ({
           typedSetField("address")(address);
         }}
       />
-
       <RadioGroup
         id="steps-for-validation"
         currentValue={validationSteps}
@@ -129,6 +130,7 @@ const agencyKindToLabel: Record<
   "cap-emploi": "Cap Emploi",
   "conseil-departemental": "Conseil Départemental",
   "prepa-apprentissage": "Prépa Apprentissage",
+  cci: "Chambres de Commerce et d'Industries",
   "structure-IAE": "Structure IAE",
   autre: "Autre",
 };

@@ -88,9 +88,6 @@ export const agencyTargets = createTargets<AgencyTargets>({
 
 export class HttpAgencyGateway implements AgencyGateway {
   constructor(private readonly httpClient: HttpClient<AgencyTargets>) {}
-  listCciAgencies(_departmentCode: DepartmentCode): Promise<AgencyOption[]> {
-    throw new Error("Method not implemented.");
-  }
 
   getImmersionFacileAgencyId$(): Observable<AgencyId | false> {
     return from(
@@ -151,11 +148,12 @@ export class HttpAgencyGateway implements AgencyGateway {
       );
   }
 
-  public listAgenciesByDepartmentCode(
+  public listAgenciesByDepartmentCodeWithoutCci(
     departmentCode: DepartmentCode,
   ): Promise<AgencyOption[]> {
     const request: ListAgenciesRequestDto = {
       departmentCode,
+      kind: "cciExcluded",
     };
     return this.getFilteredAgencies(request);
   }
@@ -171,7 +169,7 @@ export class HttpAgencyGateway implements AgencyGateway {
   ): Promise<AgencyOption[]> {
     const request: ListAgenciesRequestDto = {
       departmentCode,
-      filter: "peOnly",
+      kind: "peOnly",
     };
     return this.getFilteredAgencies(request);
   }
@@ -181,7 +179,15 @@ export class HttpAgencyGateway implements AgencyGateway {
   ): Promise<AgencyOption[]> {
     const request: ListAgenciesRequestDto = {
       departmentCode,
-      filter: "peExcluded",
+      kind: "peExcluded",
+    };
+    return this.getFilteredAgencies(request);
+  }
+
+  listCciAgencies(departmentCode: DepartmentCode): Promise<AgencyOption[]> {
+    const request: ListAgenciesRequestDto = {
+      departmentCode,
+      kind: "cciOnly",
     };
     return this.getFilteredAgencies(request);
   }
