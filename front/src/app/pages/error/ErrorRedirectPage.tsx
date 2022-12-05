@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import { isManagedError } from "shared";
-import { ContainerLayout } from "src/app/components/layout/ContainerLayout";
+import { MainWrapper } from "src/../../libs/react-design-system";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { routes } from "src/app/routes/routes";
 import { Route } from "type-route";
@@ -14,7 +14,7 @@ interface ErrorRedirectProps {
 
 export const ErrorRedirectPage = ({ route }: ErrorRedirectProps) => (
   <HeaderFooterLayout>
-    <ContainerLayout>{renderer({ route })}</ContainerLayout>
+    <MainWrapper layout="default">{renderer({ route })}</MainWrapper>
   </HeaderFooterLayout>
 );
 

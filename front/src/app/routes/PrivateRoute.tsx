@@ -1,9 +1,13 @@
 import { Form, Formik } from "formik";
 import React from "react";
-import { Button, Notification, SubTitle } from "react-design-system";
+import {
+  Button,
+  MainWrapper,
+  Notification,
+  SubTitle,
+} from "react-design-system";
 import { useDispatch } from "react-redux";
 import { UserAndPassword, userAndPasswordSchema } from "shared";
-import { ContainerLayout } from "src/app/components/layout/ContainerLayout";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
@@ -30,7 +34,7 @@ const LoginForm = () => {
 
   return (
     <HeaderFooterLayout>
-      <ContainerLayout>
+      <MainWrapper layout="default">
         <Formik
           initialValues={initialValues}
           validationSchema={toFormikValidationSchema(userAndPasswordSchema)}
@@ -58,7 +62,7 @@ const LoginForm = () => {
             </Form>
           )}
         </Formik>
-      </ContainerLayout>
+      </MainWrapper>
     </HeaderFooterLayout>
   );
 };

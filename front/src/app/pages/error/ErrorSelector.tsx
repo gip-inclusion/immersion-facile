@@ -17,8 +17,10 @@ export const ErrorSelector = ({
     <HttpClientErrorSelector error={error} jwt={jwt} />
   ) : (
     <ErrorPage>
-      <ManagedErrorSelector kind="unknownError">
-        {JSON.stringify(error)}
-      </ManagedErrorSelector>
+      <div className="fr-py-8w">
+        <ManagedErrorSelector kind="unknownError">
+          {JSON.stringify(error)}
+        </ManagedErrorSelector>
+      </div>
     </ErrorPage>
   );

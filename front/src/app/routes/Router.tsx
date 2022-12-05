@@ -19,15 +19,14 @@ import { ImmersionAssessmentPage } from "../pages/immersion-assessment/Immersion
 import { routes, useRoute } from "./routes";
 import { StandardPageSlugs, standardPageSlugs } from "./route-params";
 import { StandardLayout } from "../components/layout/StandardLayout";
-
-const NotAvailable = () => <div>Cette page n'est pas disponible.</div>;
+import { ErrorPage } from "../pages/error/ErrorPage";
 
 export const Router = () => {
   const route = useRoute();
 
   return (
     <>
-      {route.name === false && <NotAvailable />}
+      {route.name === false && <ErrorPage type="404" />}
       {route.name === "addAgency" && <AddAgencyPage />}
       {route.name === "adminTab" && (
         <PrivateRoute>
@@ -81,7 +80,7 @@ export const Router = () => {
       {route.name === "standard" &&
         !standardPageSlugs.includes(
           route.params.pagePath as StandardPageSlugs,
-        ) && <NotAvailable />}
+        ) && <ErrorPage type="404" />}
     </>
   );
 };
