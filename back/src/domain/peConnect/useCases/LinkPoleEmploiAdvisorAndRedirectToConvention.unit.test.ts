@@ -34,7 +34,7 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
     );
   });
 
-  describe("Pe Connect correctly identify user", () => {
+  describe("Pe Connect correctly identify OAuth", () => {
     it("the returned conventionAdvisor gets stored", async () => {
       peConnectGateway.setAccessToken(accessToken);
       peConnectGateway.setUser(peJobseekerUser);
@@ -86,7 +86,7 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
       );
     });
 
-    it("the user info and federated identity are present in the redirect url query parameters", async () => {
+    it("the OAuth info and federated identity are present in the redirect url query parameters", async () => {
       peConnectGateway.setAccessToken(accessToken);
       peConnectGateway.setUser(peJobseekerUser);
       peConnectGateway.setAdvisors([pePlacementAdvisor]);

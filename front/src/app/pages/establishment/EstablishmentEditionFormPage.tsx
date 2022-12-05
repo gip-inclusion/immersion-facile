@@ -6,11 +6,11 @@ import {
   FormEstablishmentDto,
 } from "shared";
 import { MainWrapper } from "react-design-system";
+import { decodeMagicLinkJwtWithoutSignatureCheck } from "shared";
 import { establishmentGateway } from "src/config/dependencies";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { routes } from "src/app/routes/routes";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
-import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { Route } from "type-route";
@@ -41,7 +41,9 @@ export const EstablishmentEditionFormPage = ({
         <ApiDataContainer
           callApi={() =>
             establishmentGateway.getFormEstablishmentFromJwt(
-              decodeJwt<EstablishmentJwtPayload>(route.params.jwt).siret,
+              decodeMagicLinkJwtWithoutSignatureCheck<EstablishmentJwtPayload>(
+                route.params.jwt,
+              ).siret,
               route.params.jwt,
             )
           }

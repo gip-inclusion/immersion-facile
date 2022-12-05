@@ -8,6 +8,7 @@ import {
 } from "../../domain/auth/jwt";
 import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
 import { Clock } from "../../domain/core/ports/Clock";
+import { UuidGenerator } from "../../domain/core/ports/UuidGenerator";
 import { createLogger } from "../../utils/logger";
 import { AppConfig } from "./config/appConfig";
 import { createAppDependencies } from "./config/createAppDependencies";
@@ -21,6 +22,7 @@ import { createApiKeyAuthRouterV1 } from "./routers/apiKeyAuthRouter/createApiKe
 import { createConventionRouter } from "./routers/convention/createConventionRouter";
 import { createEstablishmentRouter } from "./routers/createEstablishment/createEstablishmentRouter";
 import { createSearchImmersionRouter } from "./routers/apiKeyAuthRouter/createSearchImmersionRouter";
+import { createInclusionConnectRouter } from "./routers/inclusionConnect/createInclusionConnectRouter";
 import { createTechnicalRouter } from "./routers/technical/createTechnicalRouter";
 import { createFormCompletionRouter } from "./routers/formCompletion/createFormCompletionRouter";
 import { createHelloWorldRouter } from "./routers/helloWorld/createHelloWorldRouter";
@@ -44,6 +46,7 @@ export const createApp = async (
   generateApiJwt: GenerateApiConsumerJtw;
   generateMagicLinkJwt: GenerateMagicLinkJwt;
   clock: Clock;
+  uuidGenerator: UuidGenerator;
   inMemoryUow?: InMemoryUnitOfWork;
 }> => {
   const app = express();
@@ -77,6 +80,7 @@ export const createApp = async (
   app.use(createConventionRouter(deps));
   app.use(createAgenciesRouter(deps));
   app.use(createPeConnectRouter(deps));
+  app.use(createInclusionConnectRouter(deps));
   app.use(createApiKeyAuthRouter(deps));
   app.use(createEstablishmentRouter(deps));
 
@@ -91,6 +95,7 @@ export const createApp = async (
     generateApiJwt: deps.generateApiJwt,
     generateMagicLinkJwt: deps.generateMagicLinkJwt,
     clock: deps.clock,
+    uuidGenerator: deps.uuidGenerator,
     inMemoryUow: deps.inMemoryUow,
   };
 };

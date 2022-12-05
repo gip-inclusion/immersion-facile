@@ -1,9 +1,9 @@
 import { frontRoutes } from "shared";
 
-describe("Home user flow", () => {
+describe("Home OAuth flow", () => {
   const userTypes = ["candidate", "establishment", "agency"];
 
-  it("Should change theme based on user type", () => {
+  it("Should change theme based on OAuth type", () => {
     cy.wrap(userTypes).each((type) => {
       cy.visit("/");
       cy.get(`.im-hero-header__nav-card--${type}`).click();

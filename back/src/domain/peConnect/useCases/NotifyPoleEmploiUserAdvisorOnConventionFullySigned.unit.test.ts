@@ -30,7 +30,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
     );
   });
 
-  it("should resolve to undefined if the convention pole emploi user advisor is not found", async () => {
+  it("should resolve to undefined if the convention pole emploi OAuth advisor is not found", async () => {
     const conventionDtoFromEvent: ConventionDto = new ConventionDtoBuilder()
       .withId("some-invalid-id")
       .withFederatedIdentity("peConnect:blop")

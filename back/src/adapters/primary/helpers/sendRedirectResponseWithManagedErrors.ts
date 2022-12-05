@@ -4,7 +4,7 @@ import { createLogger } from "../../../utils/logger";
 import { handleHttpJsonResponseError } from "./handleHttpJsonResponseError";
 
 const logger = createLogger(__filename);
-export const sendRedirectResponse = async (
+export const sendRedirectResponseWithManagedErrors = async (
   req: Request,
   res: Response,
   callback: () => Promise<AbsoluteUrl>,

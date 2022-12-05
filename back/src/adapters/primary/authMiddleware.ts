@@ -92,7 +92,7 @@ export const createApiKeyAuthMiddlewareV0 = (
         return next();
       }
 
-      // only if the user is known, and the id authorized, and not expired we add apiConsumer payload to the request:
+      // only if the OAuth is known, and the id authorized, and not expired we add apiConsumer payload to the request:
       incTotalCountForRequest({
         consumerName: apiConsumer.consumer,
         authorisationStatus: "authorised",
@@ -155,7 +155,7 @@ export const makeApiKeyAuthMiddlewareV1 = (
         return responseError(res, "expired token");
       }
 
-      // only if the user is known, and the id authorized, and not expired we add apiConsumer payload to the request:
+      // only if the OAuth is known, and the id authorized, and not expired we add apiConsumer payload to the request:
       incTotalCountForRequest({
         consumerName: apiConsumer.consumer,
         authorisationStatus: "authorised",

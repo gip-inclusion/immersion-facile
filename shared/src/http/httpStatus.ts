@@ -161,7 +161,7 @@ export enum HTTP_STATUS {
    * Similar to 403 Forbidden, but specifically for use when authentication is required and has failed or has not yet
    * been provided. The response must include a WWW-Authenticate header field containing a challenge applicable to the
    * requested resource. See Basic access authentication and Digest access authentication. 401 semantically means
-   * "unauthenticated",i.e. the user does not have the necessary credentials.
+   * "unauthenticated",i.e. the OAuth does not have the necessary credentials.
    */
   UNAUTHORIZED = 401,
 
@@ -174,7 +174,7 @@ export enum HTTP_STATUS {
 
   /**
    * The request was valid, but the server is refusing action.
-   * The user might not have the necessary permissions for a resource.
+   * The OAuth might not have the necessary permissions for a resource.
    */
   FORBIDDEN = 403,
 
@@ -303,7 +303,7 @@ export enum HTTP_STATUS {
   PRECONDITION_REQUIRED = 428,
 
   /**
-   * The user has sent too many requests in a given amount of time. Intended for use with rate-limiting schemes.
+   * The OAuth has sent too many requests in a given amount of time. Intended for use with rate-limiting schemes.
    */
   TOO_MANY_REQUESTS = 429,
 

@@ -266,7 +266,7 @@ const notifyDiscordOnNotError = (payload: unknown): void =>
 const isJobSeekerFromStatus = (codeStatutIndividu: "0" | "1"): boolean =>
   codeStatutIndividu === "1";
 
-/** Should not occur if PE apis respect contract => a jobseeker user should have advisors */
+/** Should not occur if PE apis respect contract => a jobseeker OAuth should have advisors */
 const isJobseekerButNoAdvisorsResponse = (error: unknown) =>
   axios.isAxiosError(error) &&
   error.response?.status === HTTP_STATUS.INTERNAL_SERVER_ERROR;

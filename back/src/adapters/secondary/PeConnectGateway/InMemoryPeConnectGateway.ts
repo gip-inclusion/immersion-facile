@@ -14,7 +14,7 @@ export class InMemoryPeConnectGateway implements PeConnectGateway {
     user: PeConnectUserDto;
     advisors: PeConnectAdvisorDto[];
   }> {
-    if (!this._user) throw new Error("No user on gateway.");
+    if (!this._user) throw new Error("No OAuth on gateway.");
     const peUserAndAdvisor: {
       user: PeConnectUserDto;
       advisors: PeConnectAdvisorDto[];

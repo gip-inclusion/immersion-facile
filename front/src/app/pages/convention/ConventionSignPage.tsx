@@ -12,6 +12,7 @@ import {
   SignatoryRole,
   signatoryRoles,
 } from "shared";
+import { decodeMagicLinkJwtWithoutSignatureCheck } from "shared";
 import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { ConventionFormFields } from "src/app/components/forms/convention/ConventionFormFields";
@@ -21,7 +22,6 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useExistingSiret } from "src/app/hooks/siret.hooks";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import { routes } from "src/app/routes/routes";
-import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import {
   conventionSelectors,
   signatoryDataFromConvention,
@@ -36,7 +36,8 @@ interface SignFormProps {
 }
 
 const extractRole = (jwt: string): SignatoryRole => {
-  const payload = decodeJwt<ConventionMagicLinkPayload>(jwt);
+  const payload =
+    decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(jwt);
   const role = payload.role;
   if (!isSignatory(role))
     throw new Error(
@@ -54,7 +55,10 @@ export const ConventionSignPage = ({ route }: SignFormProps) => {
     );
   }
 
-  const payload = decodeJwt<ConventionMagicLinkPayload>(route.params.jwt);
+  const payload =
+    decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(
+      route.params.jwt,
+    );
 
   if (!signatoryRoles.includes(payload.role as SignatoryRole))
     return (

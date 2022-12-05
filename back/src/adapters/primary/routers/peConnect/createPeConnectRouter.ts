@@ -3,13 +3,13 @@ import { loginPeConnect, ManagedRedirectError, peConnect } from "shared";
 import { makePeConnectLoginPageUrl } from "../../../secondary/PeConnectGateway/peConnectApi.client";
 import { AppDependencies } from "../../config/createAppDependencies";
 import { FeatureDisabledError } from "../../helpers/httpErrors";
-import { sendRedirectResponse } from "../../helpers/sendRedirectResponse";
+import { sendRedirectResponseWithManagedErrors } from "../../helpers/sendRedirectResponseWithManagedErrors";
 
 export const createPeConnectRouter = (deps: AppDependencies) => {
   const peConnectRouter = Router({ mergeParams: true });
 
   peConnectRouter.route(`/${loginPeConnect}`).get(async (req, res) =>
-    sendRedirectResponse(
+    sendRedirectResponseWithManagedErrors(
       req,
       res,
       async () => {
@@ -22,7 +22,7 @@ export const createPeConnectRouter = (deps: AppDependencies) => {
   );
 
   peConnectRouter.route(`/${peConnect}`).get(async (req, res) =>
-    sendRedirectResponse(
+    sendRedirectResponseWithManagedErrors(
       req,
       res,
       async () => {

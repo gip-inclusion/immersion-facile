@@ -1,0 +1,89 @@
+import {
+  AbsoluteUrl,
+  decodeJwtWithoutSignatureCheck,
+  inclusionConnectImmersionTargets,
+  queryParamsAsString,
+} from "shared";
+import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
+import {
+  buildTestApp,
+  TestAppAndDeps,
+} from "../../../../_testBuilders/buildTestApp";
+import { fakeInclusionIdTokenWithCorrectPayload } from "../../../../domain/inclusionConnect/useCases/fakeInclusionIdTokenWithCorrectPayload";
+
+const clientId = "my-client-id";
+const clientSecret = "my-client-secret";
+const from = "immersion-facilité";
+const scope = "openid profile email";
+const state = "my-state";
+const nonce = "my-nonce";
+const domain = "immersion-uri.com";
+const responseType = "code" as const;
+const inclusionConnectBaseUri: AbsoluteUrl =
+  "http://fake-inclusion-connect-uri.com";
+
+describe("inclusion connection flow", () => {
+  let testAppAndDeps: TestAppAndDeps;
+
+  it("does successfully the complete inclusion connect flow", async () => {
+    testAppAndDeps = await buildTestApp(
+      new AppConfigBuilder({
+        INCLUSION_CONNECT_CLIENT_SECRET: clientSecret,
+        INCLUSION_CONNECT_CLIENT_ID: clientId,
+        INCLUSION_CONNECT_BASE_URI: inclusionConnectBaseUri,
+        DOMAIN: domain,
+      }).build(),
+    );
+
+    await expectTriggeringInclusionConnectFlowToRedirectToCorrectUrl();
+    const authCode = "inclusion-auth-code";
+    await redirectionAfterInclusionConnection({ code: authCode, state });
+  });
+
+  const expectTriggeringInclusionConnectFlowToRedirectToCorrectUrl =
+    async () => {
+      const uuids = [nonce, state];
+      testAppAndDeps.uuidGenerator.new = () =>
+        uuids.shift() ?? "no-uuid-provided";
+
+      await testAppAndDeps.request
+        .get(inclusionConnectImmersionTargets.startInclusionConnectLogin.url)
+        .expect(302)
+        .expect(
+          "Location",
+          encodeURI(
+            `${inclusionConnectBaseUri}/auth?${[
+              `client_id=${clientId}`,
+              `from=${from}`,
+              `nonce=${nonce}`,
+              `redirect_uri=https://${domain}/api/inclusion-connect`,
+              `response_type=${responseType}`,
+              `scope=${scope}`,
+              `state=${state}`,
+            ].join("&")}`,
+          ),
+        );
+    };
+
+  const redirectionAfterInclusionConnection = async (params: {
+    code: string;
+    state: string;
+  }) => {
+    const inclusionToken = "inclusion-token";
+    testAppAndDeps.gateways.inclusionConnectGateway.setAccessTokenResponse({
+      access_token: inclusionToken,
+      id_token: fakeInclusionIdTokenWithCorrectPayload,
+    });
+    const response = await testAppAndDeps.request.get(
+      `${
+        inclusionConnectImmersionTargets.afterLoginRedirection.url
+      }?${queryParamsAsString(params)}`,
+    );
+    expect(typeof response.body).toBe("string");
+    expect(response.status).toBe(200);
+    expect(
+      typeof decodeJwtWithoutSignatureCheck<{ userId: string }>(response.body)
+        .userId,
+    ).toBe("string");
+  };
+});

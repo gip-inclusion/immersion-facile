@@ -36,7 +36,7 @@ export const heroHeaderContent: Record<UserType, HeroHeaderInfos> = {
     title: "La meilleure façon de découvrir votre futur métier",
     displayName: "Candidat",
     illustration: heroHeaderCandidateIllustration,
-    icon: "fr-icon-user-line",
+    icon: "fr-icon-OAuth-line",
     subtitle:
       "Assurez le succès de votre projet professionnel en découvrant un métier en conditions réelles. Passez quelques jours en entreprise pour vérifier que ce métier vous plaît et vous convient. Profitez-en pour découvrir éventuellement votre futur employeur !",
   },
@@ -52,7 +52,7 @@ export const heroHeaderContent: Record<UserType, HeroHeaderInfos> = {
     title: "La meilleure façon de faire émerger de nouveaux talents",
     displayName: "Prescripteur",
     illustration: heroHeaderAgencyIllustration,
-    icon: "fr-icon-map-pin-user-line",
+    icon: "fr-icon-map-pin-OAuth-line",
     subtitle:
       "Avec Immersion Facilitée, trouvez un métier à tester, entrez en relation immédiatement avec une entreprise accueillante, remplissez une demande de convention et obtenez une réponse en temps record !",
   },
@@ -71,7 +71,7 @@ export const heroHeaderNavCards: (
     {
       overtitle: "Candidat",
       title: "Vous êtes candidat pour une immersion",
-      icon: "fr-icon-user-line",
+      icon: "fr-icon-OAuth-line",
       type: "candidate",
       id: getHeroHeaderId("home-candidate"),
       link: routes.homeCandidates().link,
@@ -87,7 +87,7 @@ export const heroHeaderNavCards: (
     {
       overtitle: "Prescripteur",
       title: "Vous êtes prescripteur",
-      icon: "fr-icon-map-pin-user-line",
+      icon: "fr-icon-map-pin-OAuth-line",
       id: getHeroHeaderId("home-agency"),
       type: "agency",
       link: routes.homeAgencies().link,

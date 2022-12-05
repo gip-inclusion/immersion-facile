@@ -16,7 +16,7 @@ import {
   UpdateConventionStatusRequestDto,
   WithConventionId,
 } from "shared";
-import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
+import { decodeMagicLinkJwtWithoutSignatureCheck } from "shared";
 import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 
 const CONVENTION_DRAFT_TEST = new ConventionDtoBuilder()
@@ -72,7 +72,8 @@ export class InMemoryConventionGateway implements ConventionGateway {
   // Same as GET above, but using a magic link
   private async getMagicLink(jwt: string): Promise<ConventionReadDto> {
     this.simulatedLatency && (await sleep(this.simulatedLatency));
-    const payload = decodeJwt<ConventionMagicLinkPayload>(jwt);
+    const payload =
+      decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(jwt);
     return this.inferConventionReadDto(
       this._conventions[payload.applicationId],
     );
@@ -83,7 +84,8 @@ export class InMemoryConventionGateway implements ConventionGateway {
     convention: ConventionDto,
     jwt: string,
   ): Promise<string> {
-    const payload = decodeJwt<ConventionMagicLinkPayload>(jwt);
+    const payload =
+      decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(jwt);
 
     this.simulatedLatency && (await sleep(this.simulatedLatency));
     this._conventions[payload.applicationId] = convention;
@@ -103,7 +105,8 @@ export class InMemoryConventionGateway implements ConventionGateway {
     updateStatusParams: UpdateConventionStatusRequestDto,
     jwt: string,
   ): Promise<WithConventionId> {
-    const payload = decodeJwt<ConventionMagicLinkPayload>(jwt);
+    const payload =
+      decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(jwt);
     this.simulatedLatency && (await sleep(this.simulatedLatency));
     this._conventions[payload.applicationId] = {
       ...this._conventions[payload.applicationId],
@@ -126,7 +129,8 @@ export class InMemoryConventionGateway implements ConventionGateway {
   // not used anymore, kept for inspiration for a simulated gateway
   public async signApplication(jwt: string): Promise<WithConventionId> {
     this.simulatedLatency && (await sleep(this.simulatedLatency));
-    const payload = decodeJwt<ConventionMagicLinkPayload>(jwt);
+    const payload =
+      decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(jwt);
     const convention = this._conventions[payload.applicationId];
     this._conventions[payload.applicationId] = signConventionDtoWithRole(
       convention,

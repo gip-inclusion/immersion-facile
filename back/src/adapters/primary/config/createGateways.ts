@@ -1,4 +1,9 @@
 import axios from "axios";
+import {
+  configureHttpClient,
+  createAxiosHandlerCreator,
+  HttpClient,
+} from "http-client";
 import { Pool } from "pg";
 import { exhaustiveCheck, immersionFacileContactEmail } from "shared";
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
@@ -7,6 +12,7 @@ import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
 import { DocumentGateway } from "../../../domain/generic/fileManagement/port/DocumentGateway";
+import { InclusionConnectGateway } from "../../../domain/inclusionConnect/port/InclusionConnectGateway";
 import { createLogger } from "../../../utils/logger";
 import {
   httpAdresseApiClient,
@@ -25,31 +31,40 @@ import { StubDashboardGateway } from "../../secondary/dashboardGateway/StubDashb
 import { HybridEmailGateway } from "../../secondary/emailGateway/HybridEmailGateway";
 import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmailGateway";
 import { SendinblueHtmlEmailGateway } from "../../secondary/emailGateway/SendinblueHtmlEmailGateway";
+
+import { InMemoryAccessTokenGateway } from "../../secondary/immersionOffer/InMemoryAccessTokenGateway";
 import { HttpLaBonneBoiteAPI } from "../../secondary/immersionOffer/laBonneBoite/HttpLaBonneBoiteAPI";
 import { InMemoryLaBonneBoiteAPI } from "../../secondary/immersionOffer/laBonneBoite/InMemoryLaBonneBoiteAPI";
-import { InMemoryPoleEmploiGateway } from "../../secondary/immersionOffer/poleEmploi/InMemoryPoleEmploiGateway";
-import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
-import { MinioDocumentGateway } from "../../secondary/MinioDocumentGateway";
-import { NotImplementedDocumentGateway } from "../../secondary/NotImplementedDocumentGateway";
-
-import { createAxiosHandlerCreator } from "http-client";
-import { InMemoryAccessTokenGateway } from "../../secondary/immersionOffer/InMemoryAccessTokenGateway";
 import { HttpPassEmploiGateway } from "../../secondary/immersionOffer/passEmploi/HttpPassEmploiGateway";
 import { InMemoryPassEmploiGateway } from "../../secondary/immersionOffer/passEmploi/InMemoryPassEmploiGateway";
 import { HttpPoleEmploiGateway } from "../../secondary/immersionOffer/poleEmploi/HttpPoleEmploiGateway";
-import { InMemoryPeConnectGateway } from "../../secondary/PeConnectGateway/InMemoryPeConnectGateway";
+import { InMemoryPoleEmploiGateway } from "../../secondary/immersionOffer/poleEmploi/InMemoryPoleEmploiGateway";
+import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
+import {
+  createInclusionConnectExternalTargets,
+  HttpInclusionConnectGateway,
+  InclusionConnectExternalTargets,
+} from "../../secondary/InclusionConnectGateway/HttpInclusionConnectGateway";
+import { InMemoryInclusionConnectGateway } from "../../secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
+import { MinioDocumentGateway } from "../../secondary/MinioDocumentGateway";
+import { NotImplementedDocumentGateway } from "../../secondary/NotImplementedDocumentGateway";
 import { HttpPeConnectGateway } from "../../secondary/PeConnectGateway/HttpPeConnectGateway";
+import { InMemoryPeConnectGateway } from "../../secondary/PeConnectGateway/InMemoryPeConnectGateway";
+import { makePeConnectHttpClient } from "../../secondary/PeConnectGateway/peConnectApi.client";
 import { ExcelExportGateway } from "../../secondary/reporting/ExcelExportGateway";
 import { InMemoryExportGateway } from "../../secondary/reporting/InMemoryExportGateway";
 import { S3DocumentGateway } from "../../secondary/S3DocumentGateway";
 import { HttpsSireneGateway } from "../../secondary/sirene/HttpsSireneGateway";
 import { InMemorySireneGateway } from "../../secondary/sirene/InMemorySireneGateway";
 import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
-import { makePeConnectHttpClient } from "../../secondary/PeConnectGateway/peConnectApi.client";
 
 const logger = createLogger(__filename);
 
 const AXIOS_TIMEOUT_MS = 10_000;
+
+const createHttpClient = configureHttpClient(
+  createAxiosHandlerCreator(axios.create({ timeout: AXIOS_TIMEOUT_MS })),
+);
 
 export type GetPgPoolFn = () => Pool;
 export const createGetPgPoolFn = (config: AppConfig): GetPgPoolFn => {
@@ -125,6 +140,7 @@ export const createGateways = async (config: AppConfig, clock: Clock) => {
         ? new HttpPassEmploiGateway(config.passEmploiUrl, config.passEmploiKey)
         : new InMemoryPassEmploiGateway(),
     peConnectGateway: createPoleEmploiConnectGateway(config),
+    inclusionConnectGateway: createInclusionConnectGateway(config),
     poleEmploiGateway:
       config.poleEmploiGateway === "HTTPS"
         ? new HttpPoleEmploiGateway(
@@ -204,6 +220,27 @@ const createPoleEmploiConnectGateway = (config: AppConfig) =>
         },
       )
     : new InMemoryPeConnectGateway();
+
+const createInclusionConnectGateway = (
+  config: AppConfig,
+): InclusionConnectGateway => {
+  if (config.inclusionConnectGateway === "HTTPS") {
+    const inclusionTargetUrls = createInclusionConnectExternalTargets({
+      inclusionConnectBaseUrl:
+        config.inclusionConnectConfig.inclusionConnectBaseUri,
+    });
+
+    const inclusionHttpClient: HttpClient<InclusionConnectExternalTargets> =
+      createHttpClient<InclusionConnectExternalTargets>(inclusionTargetUrls);
+
+    return new HttpInclusionConnectGateway(
+      inclusionHttpClient,
+      config.inclusionConnectConfig,
+    );
+  }
+
+  return new InMemoryInclusionConnectGateway();
+};
 
 const createAddressGateway = (config: AppConfig) =>
   ({

@@ -24,6 +24,9 @@ const defaultConfigParams = {
   ADMIN_EMAIL: "myAdmin@mail.com",
   REPORTING_GATEWAY: "EXCEL",
   STORAGE_ROOT: "NOT PROVIDED",
+  INCLUSION_CONNECT_CLIENT_ID: "inclusion-client-id",
+  INCLUSION_CONNECT_CLIENT_SECRET: "inclusion-client-secret",
+  INCLUSION_CONNECT_BASE_URI: "https://fake-inclusion.com",
 };
 
 // See "Working with AppConfig" in back/README.md for more details.

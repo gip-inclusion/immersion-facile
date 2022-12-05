@@ -4,6 +4,8 @@ import { ConventionQueries } from "../../convention/ports/ConventionQueries";
 import { ConventionRepository } from "../../convention/ports/ConventionRepository";
 import { ImmersionAssessmentRepository } from "../../convention/ports/ImmersionAssessmentRepository";
 import { PostalCodeDepartmentRegionQueries } from "../../generic/geo/ports/PostalCodeDepartmentRegionQueries";
+import { AuthenticatedUserRepository } from "../../generic/OAuth/ports/AuthentitcatedUserRepositiory";
+import { OngoingOAuthRepository } from "../../generic/OAuth/ports/OngoingOAuthRepositiory";
 import { DiscussionAggregateRepository } from "../../immersionOffer/ports/DiscussionAggregateRepository";
 import { EstablishmentAggregateRepository } from "../../immersionOffer/ports/EstablishmentAggregateRepository";
 import { FormEstablishmentRepository } from "../../immersionOffer/ports/FormEstablishmentRepository";
@@ -34,6 +36,8 @@ export type UnitOfWork = {
   getApiConsumersById: GetApiConsumerById;
   exportQueries: ExportQueries;
   discussionAggregateRepository: DiscussionAggregateRepository;
+  authenticatedUserRepository: AuthenticatedUserRepository;
+  ongoingOAuthRepository: OngoingOAuthRepository;
 };
 
 export interface UnitOfWorkPerformer {

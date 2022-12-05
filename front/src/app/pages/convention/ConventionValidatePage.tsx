@@ -8,11 +8,11 @@ import {
   statusTransitionConfigs,
   UpdateConventionStatusRequestDto,
 } from "shared";
+import { decodeMagicLinkJwtWithoutSignatureCheck } from "shared";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useConventionTexts } from "src/app/contents/convention/textSetup";
 import { routes } from "src/app/routes/routes";
-import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import {
   ConventionFeedbackKind,
   conventionSlice,
@@ -42,7 +42,8 @@ const isAllowedTransition = (
 
 export const ConventionValidatePage = ({ route }: VerificationPageProps) => {
   const jwt = route.params.jwt;
-  const { role } = decodeJwt<ConventionMagicLinkPayload>(jwt);
+  const { role } =
+    decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(jwt);
   const { convention, fetchConventionError, submitFeedback, isLoading } =
     useConvention(jwt);
   const t = useConventionTexts(convention?.internshipKind ?? "immersion");

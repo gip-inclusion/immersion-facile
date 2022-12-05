@@ -7,10 +7,10 @@ import {
   Notification,
 } from "react-design-system/immersionFacile";
 import { ConventionMagicLinkPayload } from "shared";
+import { decodeMagicLinkJwtWithoutSignatureCheck } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { routes } from "src/app/routes/routes";
 import { conventionGateway } from "src/config/dependencies";
-import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import { Route } from "type-route";
 
 interface RenewExpiredLinkProps {
@@ -26,7 +26,10 @@ export const RenewExpiredLinkContent = ({
   expiredJwt,
   originalURL,
 }: RenewExpiredLinkContentsProps) => {
-  const jwtPayload = decodeJwt<ConventionMagicLinkPayload>(expiredJwt);
+  const jwtPayload =
+    decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(
+      expiredJwt,
+    );
   // Flag that tracks if the link renewal had already been requested.
   const [requested, setRequested] = useState(false);
   // Tracks the success of the server request.

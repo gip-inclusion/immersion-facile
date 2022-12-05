@@ -6,9 +6,9 @@ import {
   Title,
 } from "react-design-system/immersionFacile";
 import { ConventionMagicLinkPayload } from "shared";
+import { decodeMagicLinkJwtWithoutSignatureCheck } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { routes } from "src/app/routes/routes";
-import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { Route } from "type-route";
 import { ImmersionAssessmentForm } from "src/app/components/forms/immersion-assessment/ImmersionAssessmentForm";
@@ -24,7 +24,10 @@ interface ImmersionAssessmentPageProps {
 export const ImmersionAssessmentPage = ({
   route,
 }: ImmersionAssessmentPageProps) => {
-  const { role } = decodeJwt<ConventionMagicLinkPayload>(route.params.jwt);
+  const { role } =
+    decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(
+      route.params.jwt,
+    );
   const { convention, fetchConventionError, isLoading } = useConvention(
     route.params.jwt,
   );

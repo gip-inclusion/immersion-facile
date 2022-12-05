@@ -11,6 +11,7 @@ import { InMemoryEstablishmentAggregateRepository } from "../../secondary/immers
 import { InMemoryLaBonneBoiteRequestRepository } from "../../secondary/immersionOffer/InMemoryLaBonneBoiteRequestRepository";
 import { InMemorySearchMadeRepository } from "../../secondary/immersionOffer/InMemorySearchMadeRepository";
 import { InMemoryAgencyRepository } from "../../secondary/InMemoryAgencyRepository";
+import { InMemoryAuthenticatedUserRepository } from "../../secondary/InMemoryAuthenticatedUserRepository";
 import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../secondary/InMemoryConventionPoleEmploiAdvisorRepository";
 import { InMemoryConventionQueries } from "../../secondary/InMemoryConventionQueries";
 import { InMemoryConventionRepository } from "../../secondary/InMemoryConventionRepository";
@@ -18,6 +19,7 @@ import { InMemoryExportQueries } from "../../secondary/InMemoryExportQueries";
 import { InMemoryFeatureFlagRepository } from "../../secondary/InMemoryFeatureFlagRepository";
 import { InMemoryFormEstablishmentRepository } from "../../secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryImmersionAssessmentRepository } from "../../secondary/InMemoryImmersionAssessmentRepository";
+import { InMemoryOngoingOAuthRepository } from "../../secondary/InMemoryOngoingOAuthRepository";
 import { InMemoryRomeRepository } from "../../secondary/InMemoryRomeRepository";
 import { InMemoryUowPerformer } from "../../secondary/InMemoryUowPerformer";
 import { makeStubGetApiConsumerById } from "../../secondary/makeStubGetApiConsumerById";
@@ -72,6 +74,8 @@ export const createInMemoryUow = () => {
     romeRepository: new InMemoryRomeRepository(),
     searchMadeRepository: new InMemorySearchMadeRepository(),
     getApiConsumersById: makeStubGetApiConsumerById({ clock: new RealClock() }),
+    authenticatedUserRepository: new InMemoryAuthenticatedUserRepository(),
+    ongoingOAuthRepository: new InMemoryOngoingOAuthRepository(),
   };
 };
 
@@ -102,6 +106,8 @@ export const createPgUow = (client: PoolClient): UnitOfWork => ({
   romeRepository: new PgRomeRepository(client),
   searchMadeRepository: new PgSearchMadeRepository(client),
   getApiConsumersById: makePgGetApiConsumerById(client),
+  authenticatedUserRepository: new InMemoryAuthenticatedUserRepository(),
+  ongoingOAuthRepository: new InMemoryOngoingOAuthRepository(),
 });
 
 export const createUowPerformer = (

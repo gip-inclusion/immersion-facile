@@ -4,6 +4,7 @@ import { DepartmentCodeFromPostcode } from "../../../domain/address/useCases/Dep
 import { LookupStreetAddress } from "../../../domain/address/useCases/LookupStreetAddress";
 import {
   GenerateAdminJwt,
+  GenerateAuthenticatedUserToken,
   GenerateMagicLinkJwt,
 } from "../../../domain/auth/jwt";
 import { ExportData } from "../../../domain/backoffice/useCases/ExportData";
@@ -58,6 +59,8 @@ import { RequestEditFormEstablishment } from "../../../domain/immersionOffer/use
 import { RetrieveFormEstablishmentFromAggregates } from "../../../domain/immersionOffer/useCases/RetrieveFormEstablishmentFromAggregates";
 import { SearchImmersion } from "../../../domain/immersionOffer/useCases/SearchImmersion";
 import { UpdateEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentAggregateFromFormEstablishement";
+import { AuthenticateWithInclusionCode } from "../../../domain/inclusionConnect/useCases/AuthenticateWithInclusionCode";
+import { InitiateInclusionConnect } from "../../../domain/inclusionConnect/useCases/InitiateInclusionConnect";
 import { AssociatePeConnectFederatedIdentity } from "../../../domain/peConnect/useCases/AssociateFederatedIdentityPeConnect";
 import { LinkPoleEmploiAdvisorAndRedirectToConvention } from "../../../domain/peConnect/useCases/LinkPoleEmploiAdvisorAndRedirectToConvention";
 import { NotifyPoleEmploiUserAdvisorOnConventionFullySigned } from "../../../domain/peConnect/useCases/NotifyPoleEmploiUserAdvisorOnConventionFullySigned";
@@ -76,6 +79,7 @@ export const createUseCases = (
   generateJwtFn: GenerateMagicLinkJwt,
   generateMagicLinkFn: GenerateConventionMagicLink,
   generateAdminJwt: GenerateAdminJwt,
+  generateAuthenticatedUserToken: GenerateAuthenticatedUserToken,
   uowPerformer: UnitOfWorkPerformer,
   clock: Clock,
   uuidGenerator: UuidGenerator,
@@ -89,6 +93,18 @@ export const createUseCases = (
 
   return {
     ...instantiatedUseCasesFromClasses({
+      initiateInclusionConnect: new InitiateInclusionConnect(
+        uowPerformer,
+        uuidGenerator,
+        config.inclusionConnectConfig,
+      ),
+      authenticateWithInclusionCode: new AuthenticateWithInclusionCode(
+        uowPerformer,
+        createNewEvent,
+        gateways.inclusionConnectGateway,
+        uuidGenerator,
+        generateAuthenticatedUserToken,
+      ),
       associatePeConnectFederatedIdentity:
         new AssociatePeConnectFederatedIdentity(uowPerformer, createNewEvent),
       uploadLogo: new UploadLogo(

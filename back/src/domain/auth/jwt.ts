@@ -11,6 +11,7 @@ export type GenerateMagicLinkJwt = GenerateJwtFn<PayloadOption>;
 export type GenerateEditFormEstablishmentUrl =
   GenerateJwtFn<EstablishmentJwtPayload>;
 export type GenerateAdminJwt = GenerateJwtFn<{ version: number }>;
+export type GenerateAuthenticatedUserToken = GenerateJwtFn<{ userId: string }>;
 
 export type GenerateApiConsumerJtw = GenerateJwtFn<WithApiConsumerId>;
 

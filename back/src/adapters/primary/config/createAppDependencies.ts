@@ -44,6 +44,10 @@ export const createAppDependencies = async (config: AppConfig) => {
     config.magicLinkJwtPrivateKey,
   );
   const generateAdminJwt = makeGenerateJwtHS256(config.adminJwtSecret, "365d");
+  const generateAuthenticatedUserToken = makeGenerateJwtHS256(
+    config.adminJwtSecret,
+    "1h",
+  );
   const generateMagicLinkFn = createGenerateConventionMagicLink(config);
 
   const redirectErrorUrl: AbsoluteUrl = `${config.immersionFacileBaseUrl}/${frontRoutes.error}`;
@@ -60,6 +64,7 @@ export const createAppDependencies = async (config: AppConfig) => {
     generateMagicLinkJwt,
     generateMagicLinkFn,
     generateAdminJwt,
+    generateAuthenticatedUserToken,
     uowPerformer,
     clock,
     uuidGenerator,
@@ -97,6 +102,7 @@ export const createAppDependencies = async (config: AppConfig) => {
     eventBus,
     eventCrawler: createEventCrawler(config, uowPerformer, eventBus),
     clock,
+    uuidGenerator,
     inMemoryUow,
   };
 };

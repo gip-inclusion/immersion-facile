@@ -17,7 +17,7 @@ describe("AdminLogin", () => {
     );
   });
 
-  it("throws Forbidden if user and password are not corret", async () => {
+  it("throws Forbidden if OAuth and password are not corret", async () => {
     await expectPromiseToFailWithError(
       adminLogin.execute({ user: "user", password: "password" }),
       new ForbiddenError("Wrong credentials"),
@@ -29,7 +29,7 @@ describe("AdminLogin", () => {
     );
   });
 
-  it("returns a jwt when user and password match", async () => {
+  it("returns a jwt when OAuth and password match", async () => {
     const token = await adminLogin.execute({ user: "user", password: "pwd" });
     expect(token).toBe(correctToken);
   });

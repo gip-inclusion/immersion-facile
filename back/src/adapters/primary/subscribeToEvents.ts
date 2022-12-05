@@ -97,6 +97,8 @@ const getUseCasesByTopics = (
   // Immersion Assessment related:
   ImmersionAssessmentCreated: [],
   EmailWithLinkToCreateAssessmentSent: [],
+
+  UserAuthenticatedSuccessfully: [],
 });
 
 export const subscribeToEvents = (deps: AppDependencies) => {

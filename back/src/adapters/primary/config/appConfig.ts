@@ -9,6 +9,7 @@ import {
   ProcessEnv,
 } from "shared";
 import { DomainTopic } from "../../../domain/core/eventBus/events";
+import { InclusionConnectConfig } from "../../../domain/inclusionConnect/useCases/InitiateInclusionConnect";
 import type { MinioParams } from "../../secondary/MinioDocumentGateway";
 import { S3Params } from "../../secondary/S3DocumentGateway";
 
@@ -163,6 +164,28 @@ export class AppConfig {
       authorizedValues: ["IN_MEMORY", "HTTPS"],
       defaultValue: "IN_MEMORY",
     });
+  }
+
+  // == Inclusion Connect gateway ==
+  public get inclusionConnectGateway() {
+    return this.throwIfNotInArray({
+      variableName: "INCLUSION_CONNECT_GATEWAY",
+      authorizedValues: ["IN_MEMORY", "HTTPS"],
+      defaultValue: "IN_MEMORY",
+    });
+  }
+
+  public get inclusionConnectConfig(): InclusionConnectConfig {
+    return {
+      clientId: this.throwIfNotDefined("INCLUSION_CONNECT_CLIENT_ID"),
+      clientSecret: this.throwIfNotDefined("INCLUSION_CONNECT_CLIENT_SECRET"),
+      immersionRedirectUri: `${this.immersionFacileBaseUrl}/api/inclusion-connect`,
+      inclusionConnectBaseUri: this.throwIfNotAbsoluteUrl(
+        "INCLUSION_CONNECT_BASE_URI",
+      ),
+      scope: "openid profile email",
+      from: "immersion-facilité",
+    };
   }
 
   // == Address Api gateway choice between 2 providers ==
