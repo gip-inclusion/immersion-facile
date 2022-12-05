@@ -1,5 +1,5 @@
 import React from "react";
-import { MainWrapper } from "src/../../libs/react-design-system";
+import { MainWrapper } from "react-design-system";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { HTTPFrontErrorType } from "src/app/contents/error/types";
 import { ErrorPageContent } from "./ErrorPageContent";
