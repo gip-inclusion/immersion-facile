@@ -21,6 +21,7 @@ export const getUserSuccessCount = new promClient.Counter({
 export const getUserInfoErrorCount = new promClient.Counter<"errorType">({
   name: "peConnect_getUserInfo_error",
   help: "The number of GetUserInfo success, broken down by error type",
+  labelNames: ["errorType"],
 });
 export const getAdvisorsInfoSuccessCount = new promClient.Counter({
   name: "peConnect_getAdvisorsInfo_success",
@@ -29,4 +30,5 @@ export const getAdvisorsInfoSuccessCount = new promClient.Counter({
 export const peAdvisorsErrorCount = new promClient.Counter<"errorType">({
   name: "peConnect_advisors_error",
   help: "The number of GetAdvisor success, broken down by error type",
+  labelNames: ["errorType"],
 });
