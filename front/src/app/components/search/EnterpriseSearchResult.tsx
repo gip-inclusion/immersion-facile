@@ -10,6 +10,7 @@ import {
   SearchImmersionResultDto,
 } from "shared";
 import { Icon } from "react-design-system";
+import "./EnterpriseSearchResult.scss";
 
 type EnterpriseSearchResultProps = {
   searchResult: SearchImmersionResultDto;
@@ -57,7 +58,7 @@ export const EnterpriseSearchResult = ({
   } = searchResult;
   const distanceKm = ((distance_m ?? 0) / 1000).toFixed(1);
   return (
-    <div className="flex flex-col items-stretch p-4 w-[80%] bg-white my-4 rounded border-solid border-gray-400 border gap-4">
+    <div className="im-search-result flex flex-col items-stretch p-4 w-[80%] bg-white my-4 rounded border-solid border-gray-400 border gap-4">
       <div className="flex flex-wrap justify-between">
         <div className="pb-2">
           <div className="font-bold text-xl leading-6 text-immersionGreen fr-pb-1w">
@@ -77,7 +78,11 @@ export const EnterpriseSearchResult = ({
           voluntaryToImmersion={voluntaryToImmersion}
         />
       </div>
-      <SearchResultInfo icon={<Icon type="gradienter-line" />}>
+      <SearchResultInfo
+        icon={
+          <Icon type="signal-tower-fill" className="im-search-result__icon" />
+        }
+      >
         <div className="flex justify-between w-full">
           <div>{distanceKm + " km"}</div>
           {numberOfEmployeeRange && (
@@ -130,7 +135,7 @@ const InfoLabel = ({
   className,
 }: InfoLabelProps) => {
   const defaultStyles =
-    "text-immersionBlue bg-blue-50 rounded-md p-2 w-56 h-10 text-center";
+    "text-immersionBlue bg-blue-50 rounded-md p-2 h-10 text-center";
   const allStyles = `${defaultStyles} ${className}`;
 
   if (voluntaryToImmersion) {
@@ -145,7 +150,7 @@ const InfoLabel = ({
     case undefined:
       return (
         <div className={allStyles}>
-          <Icon type="magic-fill" /> Tentez votre chance
+          <Icon type="star-s-line" /> Tentez votre chance
         </div>
       );
 
