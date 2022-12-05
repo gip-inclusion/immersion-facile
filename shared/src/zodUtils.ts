@@ -51,6 +51,15 @@ export const zEmail = z.preprocess(
   zString.email("Veuillez saisir une adresse e-mail valide"),
 );
 
+export const zEmailPossiblyEmpty = z.preprocess(
+  removeAccents,
+  z
+    .string()
+    .email("Veuillez saisir une adresse e-mail valide")
+    .optional()
+    .or(z.literal("")),
+);
+
 export const zBoolean = z.boolean({
   required_error: "Sélection obligatoire",
   invalid_type_error: "Un booléen est attendu",
