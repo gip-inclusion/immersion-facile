@@ -9,8 +9,7 @@ import {
   ContactMethod,
   SearchImmersionResultDto,
 } from "shared";
-import { DistanceIcon } from "src/app/components/icons/DistanceIcon";
-import { TrefleIcon } from "src/app/components/icons/TrefleIcon";
+import { Icon } from "react-design-system";
 
 type EnterpriseSearchResultProps = {
   searchResult: SearchImmersionResultDto;
@@ -78,7 +77,7 @@ export const EnterpriseSearchResult = ({
           voluntaryToImmersion={voluntaryToImmersion}
         />
       </div>
-      <SearchResultInfo icon={<DistanceIcon sx={{ color: iconColor }} />}>
+      <SearchResultInfo icon={<Icon type="gradienter-line" />}>
         <div className="flex justify-between w-full">
           <div>{distanceKm + " km"}</div>
           {numberOfEmployeeRange && (
@@ -146,7 +145,7 @@ const InfoLabel = ({
     case undefined:
       return (
         <div className={allStyles}>
-          <TrefleIcon /> Tentez votre chance
+          <Icon type="magic-fill" /> Tentez votre chance
         </div>
       );
 
