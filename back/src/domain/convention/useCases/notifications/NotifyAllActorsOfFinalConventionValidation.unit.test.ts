@@ -3,6 +3,7 @@ import {
   AgencyDtoBuilder,
   ConventionDto,
   ConventionDtoBuilder,
+  displayEmergencyContactInfos,
   expectTypeToMatchAndEqual,
   PeConnectIdentity,
   prettyPrintSchedule,
@@ -240,6 +241,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
         beneficiaryFirstName: convention.signatories.beneficiary.firstName,
         beneficiaryLastName: convention.signatories.beneficiary.lastName,
         emergencyContact: convention.signatories.beneficiary.emergencyContact,
+        beneficiaryBirthdate: convention.signatories.beneficiary.birthdate,
         emergencyContactPhone:
           convention.signatories.beneficiary.emergencyContactPhone,
         dateStart: parseISO(convention.dateStart).toLocaleDateString("fr"),
@@ -260,6 +262,9 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
         workConditions: convention.workConditions,
         beneficiaryRepresentativeName: "",
         agencyName: agency.name,
+        emergencyContactInfos: displayEmergencyContactInfos({
+          ...convention.signatories,
+        }),
       },
     );
   });
@@ -312,6 +317,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
         totalHours: 70,
         beneficiaryFirstName: convention.signatories.beneficiary.firstName,
         beneficiaryLastName: convention.signatories.beneficiary.lastName,
+        beneficiaryBirthdate: convention.signatories.beneficiary.birthdate,
         emergencyContact: convention.signatories.beneficiary.emergencyContact,
         emergencyContactPhone:
           convention.signatories.beneficiary.emergencyContactPhone,
@@ -335,6 +341,9 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
           convention.signatories.beneficiaryRepresentative!.firstName
         } ${convention.signatories.beneficiaryRepresentative!.lastName}`,
         agencyName: agency.name,
+        emergencyContactInfos: displayEmergencyContactInfos({
+          ...convention.signatories,
+        }),
       },
     );
   });

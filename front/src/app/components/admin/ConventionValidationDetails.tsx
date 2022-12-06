@@ -69,7 +69,7 @@ const ConventionValidationSection = ({
   const [markedAsRead, setMarkedAsRead] = useState<boolean>(false);
   const buildContent = (field: ColField): ReactNode => {
     let value;
-    if (field) {
+    if (field && field.key) {
       value = path(field.key, convention) as string;
       if (field.value) {
         value = field.value(convention);
@@ -81,7 +81,9 @@ const ConventionValidationSection = ({
     const relevantRows = rowFields.filter(
       (row) =>
         row.fields.filter(
-          (field) => field && path(field.key, convention) !== undefined,
+          (field) =>
+            (field && path(field.key, convention) !== undefined) ||
+            (field && field.key === "additionnalInfos"),
         ).length,
     );
     return relevantRows.map(

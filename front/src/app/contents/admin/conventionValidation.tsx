@@ -1,6 +1,11 @@
 import React from "react";
 
-import { ScheduleDto, toDisplayedDate, prettyPrintSchedule } from "shared";
+import {
+  ScheduleDto,
+  toDisplayedDate,
+  prettyPrintSchedule,
+  displayEmergencyContactInfos,
+} from "shared";
 import { ColField, FieldsAndTitle } from "./types";
 
 export const signToBooleanDisplay = (value: string | undefined) =>
@@ -55,19 +60,23 @@ const beneficiaryFields: ColField[] = [
     key: "signatories.beneficiary.lastName",
     colLabel: "Nom",
   },
-  null,
-  null,
   {
-    key: "signatories.beneficiary.birthdate",
-    colLabel: "Date de naissance",
-    value: (convention) =>
-      toDisplayedDate(new Date(convention.signatories.beneficiary.birthdate)),
-  },
-  {
-    key: "signatories.beneficiary.emergencyContact",
-    colLabel: "Contact d'urgence",
-    value: (convention) =>
-      `${convention.signatories.beneficiary.emergencyContact} (${convention.signatories.beneficiary.emergencyContactPhone} - ${convention.signatories.beneficiary.emergencyContactEmail})`,
+    key: "additionnalInfos",
+    colLabel: "Infos additionnelles",
+    value: (convention) => (
+      <span>
+        Date de naissance :{" "}
+        {toDisplayedDate(
+          new Date(convention.signatories.beneficiary.birthdate),
+        )}
+        <div className="fr-text--xs">
+          Contact d'urgence :{" "}
+          {displayEmergencyContactInfos({
+            ...convention.signatories,
+          })}
+        </div>
+      </span>
+    ),
   },
 ];
 
@@ -101,9 +110,6 @@ const beneficiaryRepresentativeFields: ColField[] = [
     colLabel: "Nom",
   },
   null,
-  null,
-  null,
-  null,
 ];
 
 const beneficiaryCurrentEmployerFields: ColField[] = [
@@ -136,21 +142,20 @@ const beneficiaryCurrentEmployerFields: ColField[] = [
     colLabel: "Nom",
   },
   {
-    key: "signatories.beneficiaryCurrentEmployer.businessSiret",
-    colLabel: "Siret",
-    value: (convention) =>
-      convention.signatories.beneficiaryCurrentEmployer
-        ? renderSiret(
+    key: "additionnalInfos",
+    colLabel: "Infos additionnelles",
+    value: (convention) => (
+      <span>
+        {convention.signatories.beneficiaryCurrentEmployer &&
+          renderSiret(
             convention.signatories.beneficiaryCurrentEmployer.businessSiret,
-          )
-        : "",
+          )}
+        <div className="fr-text--xs">
+          Poste : {convention.signatories.beneficiaryCurrentEmployer?.job}
+        </div>
+      </span>
+    ),
   },
-  {
-    key: "signatories.beneficiaryCurrentEmployer.job",
-    colLabel: "Poste",
-  },
-  null,
-  null,
 ];
 
 const establishmentRepresentativeFields: ColField[] = [
@@ -187,9 +192,6 @@ const establishmentRepresentativeFields: ColField[] = [
     colLabel: "Siret",
     value: (convention) => renderSiret(convention.siret),
   },
-  null,
-  null,
-  null,
 ];
 
 const enterpriseFields: ColField[] = [
@@ -320,10 +322,7 @@ export const sections: FieldsAndTitle[] = [
       "Téléphone",
       "Prénom",
       "Nom",
-      "Siret",
-      "Poste",
-      "Date de naissance",
-      "Contact d'urgence",
+      "Infos additionnelles",
     ],
     rowFields: [
       {

@@ -69,6 +69,7 @@ export * from "./utils";
 export * from "./utils";
 export * from "./utils";
 export * from "./utils/address";
+export * from "./utils/beneficiary";
 export * from "./utils/date";
 export * from "./utils/mergeObjectsExpectFalsyValues";
 export * from "./utils/postalCode";

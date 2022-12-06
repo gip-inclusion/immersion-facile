@@ -4,6 +4,7 @@ import {
   calculateTotalImmersionHoursBetweenDate,
   ConventionDto,
   conventionSchema,
+  displayEmergencyContactInfos,
   prettyPrintSchedule,
   ValidatedConventionFinalConfirmationEmail,
 } from "shared";
@@ -80,6 +81,7 @@ export const getValidatedConventionFinalConfirmationParams = (
     }),
     beneficiaryFirstName: beneficiary.firstName,
     beneficiaryLastName: beneficiary.lastName,
+    beneficiaryBirthdate: beneficiary.birthdate,
     beneficiaryCurrentEmployerName:
       beneficiaryCurrentEmployer &&
       `${beneficiaryCurrentEmployer.firstName} ${beneficiaryCurrentEmployer.lastName}`,
@@ -107,6 +109,10 @@ export const getValidatedConventionFinalConfirmationParams = (
       ? `${beneficiaryRepresentative.firstName} ${beneficiaryRepresentative.lastName}`
       : "",
     agencyName: agency.name,
+    emergencyContactInfos: displayEmergencyContactInfos({
+      beneficiaryRepresentative,
+      beneficiary,
+    }),
   };
 };
 

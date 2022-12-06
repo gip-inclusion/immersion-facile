@@ -94,6 +94,7 @@ export type ValidatedConventionFinalConfirmationEmail = GenericTemplatedEmail<
     totalHours: number;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
+    beneficiaryBirthdate: string;
     emergencyContact?: string;
     emergencyContactPhone?: string;
     dateStart: string;
@@ -114,6 +115,7 @@ export type ValidatedConventionFinalConfirmationEmail = GenericTemplatedEmail<
     signature: string;
     workConditions?: string;
     agencyName: string;
+    emergencyContactInfos?: string;
   }
 >;
 

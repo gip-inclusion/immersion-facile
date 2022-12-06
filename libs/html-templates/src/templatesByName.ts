@@ -156,13 +156,15 @@ export const templateByName: {
       sanitaryPrevention,
       individualProtection,
       agencyName,
+      emergencyContactInfos,
+      beneficiaryBirthdate,
     }) => ({
       subject: `Immersion Facilitée - Validation et convention de l'immersion pour observer l'activité de ${immersionAppellationLabel} au sein de ${businessName}`,
       greetings: "Bonjour,",
       content: `
       Bonne nouvelle ! 
 
-      La demande faite par ${beneficiaryFirstName} ${beneficiaryLastName} pour réaliser une immersion du ${dateStart} au ${dateEnd}, au sein de ${businessName} et encadrée par ${establishmentTutorName} a été validée et la convention est bien enregistrée. 
+      La demande faite par ${beneficiaryFirstName} ${beneficiaryLastName} (né le ${beneficiaryBirthdate}) pour réaliser une immersion du ${dateStart} au ${dateEnd}, au sein de ${businessName} et encadrée par ${establishmentTutorName} a été validée et la convention est bien enregistrée. 
       
       L'immersion peut donc démarrer aux dates convenues*.       
       
@@ -170,7 +172,15 @@ export const templateByName: {
       
       En cas de difficulté, prévenez au plus vite votre conseiller pour qu'il vous conseille au mieux.       
       ${defaultSignature}
-      
+
+      ${
+        emergencyContactInfos
+          ? `Si la situation l'impose, le contact d'urgence de ${beneficiaryFirstName} ${beneficiaryLastName} :
+        ${emergencyContactInfos}
+        
+        `
+          : ""
+      }      
       Vous trouverez ci-dessous la convention d'immersion :`,
       highlight: "Convention d'immersion professionnelle",
       subContent: `Cette convention est établie entre :
