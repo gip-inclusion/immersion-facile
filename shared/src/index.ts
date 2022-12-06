@@ -66,8 +66,6 @@ export * from "./tokens/jwt.schema";
 export * from "./tokens/MagicLinkPayload";
 export * from "./typeFlavors";
 export * from "./utils";
-export * from "./utils";
-export * from "./utils";
 export * from "./utils/address";
 export * from "./utils/beneficiary";
 export * from "./utils/date";
