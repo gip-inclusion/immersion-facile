@@ -46,6 +46,25 @@ describe("conventionDtoSchema", () => {
         "Jerome_Truc@associes.fr",
       );
     });
+    it("allow empty emergency contact email", () => {
+      const convention = new ConventionDtoBuilder()
+        .withBeneficiaryEmergencyContactEmail("")
+        .build();
+      const parsedConvention = conventionSchema.parse(convention);
+      expect(
+        parsedConvention.signatories.beneficiary.emergencyContactEmail,
+      ).toBe("");
+    });
+    it("ignores accents on emergency contact email", () => {
+      const convention = new ConventionDtoBuilder()
+        .withBeneficiaryEmergencyContactEmail("Jérôme_Truc@associés.fr")
+        .build();
+      const parsedConvention = conventionSchema.parse(convention);
+      expect(
+        parsedConvention.signatories.beneficiary.emergencyContactEmail,
+      ).toBe("Jerome_Truc@associes.fr");
+    });
+
     it("rejects equal beneficiary and establishment tutor emails", () => {
       expectConventionDtoToBeInvalid(
         new ConventionDtoBuilder()

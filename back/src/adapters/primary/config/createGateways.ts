@@ -1,10 +1,6 @@
 import axios from "axios";
 import { Pool } from "pg";
-import {
-  exhaustiveCheck,
-  ManagedAxios,
-  onFullfilledDefaultResponseInterceptorMaker,
-} from "shared";
+import { exhaustiveCheck } from "shared";
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
 import { Clock } from "../../../domain/core/ports/Clock";
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
@@ -36,20 +32,14 @@ import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/Pol
 import { MinioDocumentGateway } from "../../secondary/MinioDocumentGateway";
 import { NotImplementedDocumentGateway } from "../../secondary/NotImplementedDocumentGateway";
 
+import { createAxiosHandlerCreator } from "http-client";
 import { InMemoryAccessTokenGateway } from "../../secondary/immersionOffer/InMemoryAccessTokenGateway";
 import { HttpPassEmploiGateway } from "../../secondary/immersionOffer/passEmploi/HttpPassEmploiGateway";
 import { InMemoryPassEmploiGateway } from "../../secondary/immersionOffer/passEmploi/InMemoryPassEmploiGateway";
 import { HttpPoleEmploiGateway } from "../../secondary/immersionOffer/poleEmploi/HttpPoleEmploiGateway";
-import {
-  HttpPeConnectGateway,
-  PeConnectUrlTargets,
-} from "../../secondary/PeConnectGateway/HttpPeConnectGateway";
-import {
-  httpPeConnectGatewayTargetMapperMaker,
-  onRejectPeSpecificResponseInterceptorMaker,
-  peConnectApiErrorsToDomainErrors,
-} from "../../secondary/PeConnectGateway/HttpPeConnectGateway.config";
 import { InMemoryPeConnectGateway } from "../../secondary/PeConnectGateway/InMemoryPeConnectGateway";
+import { NewHttpPeConnectGateway } from "../../secondary/PeConnectGateway/NewHttpPeConnectGateway";
+import { makePeConnectHttpClient } from "../../secondary/PeConnectGateway/PeConnectApi";
 import { ExcelExportGateway } from "../../secondary/reporting/ExcelExportGateway";
 import { InMemoryExportGateway } from "../../secondary/reporting/InMemoryExportGateway";
 import { S3DocumentGateway } from "../../secondary/S3DocumentGateway";
@@ -198,20 +188,16 @@ const createEmailGateway = (config: AppConfig, clock: Clock): EmailGateway => {
 
 const createPoleEmploiConnectGateway = (config: AppConfig) =>
   config.peConnectGateway === "HTTPS"
-    ? new HttpPeConnectGateway(
-        {
-          clientId: config.poleEmploiClientId,
-          clientSecret: config.poleEmploiClientSecret,
-        },
-        new ManagedAxios<PeConnectUrlTargets>(
-          httpPeConnectGatewayTargetMapperMaker(config),
-          peConnectApiErrorsToDomainErrors,
-          {
-            timeout: AXIOS_TIMEOUT_MS,
-          },
-          onFullfilledDefaultResponseInterceptorMaker,
-          onRejectPeSpecificResponseInterceptorMaker,
+    ? new NewHttpPeConnectGateway(
+        makePeConnectHttpClient(
+          createAxiosHandlerCreator(
+            axios.create({
+              timeout: AXIOS_TIMEOUT_MS,
+            }),
+          ),
+          config,
         ),
+        config,
       )
     : new InMemoryPeConnectGateway(config.immersionFacileBaseUrl);
 

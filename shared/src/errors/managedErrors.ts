@@ -6,6 +6,7 @@ const managedErrorKinds = [
   "peConnectNoValidUser",
   "peConnectAdvisorForbiddenAccess",
   "peConnectUserForbiddenAccess",
+  "peConnectConnectionAborted",
   "httpUnknownClientError",
   "httpClientNotFoundError",
   "httpClientInvalidToken",

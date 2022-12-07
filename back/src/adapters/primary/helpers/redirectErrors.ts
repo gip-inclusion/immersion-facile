@@ -19,5 +19,6 @@ export class RawRedirectError extends RedirectError {
     cause?: Error,
   ) {
     super(`A raw redirect error has been thrown : ${title} ${message}`, cause);
+    this.name = "RawRedirectError";
   }
 }

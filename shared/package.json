@@ -26,8 +26,8 @@
     "@types/geojson": "^7946.0.10",
     "axios": "^0.26.1",
     "date-fns": "^2.28.0",
+    "http-client": "workspace:*",
     "ramda": "^0.28.0",
-    "zod": "^3.14.2",
-    "http-client": "workspace:*"
+    "zod": "^3.14.2"
   }
 }

@@ -1,6 +1,6 @@
 import { makezTrimmedString } from "shared";
 import { z } from "zod";
-import { ExternalAccessToken } from "../dto/AccessToken.dto";
+import { ExternalAccessToken } from "../../../adapters/secondary/PeConnectGateway/PeConnectApi";
 
 export const externalAccessTokenSchema: z.Schema<ExternalAccessToken> =
   z.object({

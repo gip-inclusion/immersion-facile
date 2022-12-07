@@ -183,6 +183,12 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     return this.withBeneficiary({ ...this.beneficiary, email });
   }
 
+  withBeneficiaryEmergencyContactEmail(
+    emergencyContactEmail: string | undefined,
+  ) {
+    return this.withBeneficiary({ ...this.beneficiary, emergencyContactEmail });
+  }
+
   public withBeneficiaryFirstName(firstName: string): ConventionDtoBuilder {
     return this.withBeneficiary({
       ...this.beneficiary,

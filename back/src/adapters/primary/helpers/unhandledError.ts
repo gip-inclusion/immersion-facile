@@ -4,6 +4,18 @@ import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 
 const logger = createLogger(__filename);
 
+export class UnhandledError extends Error {
+  constructor(
+    public override readonly message: string = "Unhandled Error",
+    public override readonly cause: Error,
+  ) {
+    super();
+    // Error.captureStackTrace(this, this.constructor);
+    this.name = "UnhandledError";
+    this.message = message;
+  }
+}
+
 export const unhandledError = (error: any, req: Request, res: Response) => {
   const stack = JSON.stringify(error.stack, null, 2);
   logger.error(

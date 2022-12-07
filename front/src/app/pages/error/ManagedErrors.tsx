@@ -6,6 +6,7 @@ import {
   HttpUnknownClientError,
 } from "./HttpClientErrors";
 import { PEConnectAdvisorForbiddenAccess } from "./PEConnectAdvisorForbiddenAccess";
+import { PEConnectConnectionAborted } from "./PEConnectConnectionAborted";
 import { PEConnectInvalidGrantError } from "./PEConnectInvalidGrantError";
 import { PEConnectNoAuthorisation } from "./PEConnectNoAuthorisation";
 import { PEConnectNoValidAdvisor } from "./PEConnectNoValidAdvisor";
@@ -34,6 +35,7 @@ const managedErrors: Record<
   ManagedErrorKind,
   (props: ManagedErrorProperties) => JSX.Element
 > = {
+  peConnectConnectionAborted: PEConnectConnectionAborted,
   peConnectNoAuthorisation: PEConnectNoAuthorisation,
   peConnectNoValidAdvisor: PEConnectNoValidAdvisor,
   peConnectNoValidUser: PEConnectNoValidUser,

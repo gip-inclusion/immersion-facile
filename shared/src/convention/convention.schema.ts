@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { agencyIdSchema } from "../agency/agency.schema";
-
-import { peConnectPrefixSchema } from "../federatedIdentities/federatedIdentity.schema";
+import { federatedIdentitySchema } from "../federatedIdentities/federatedIdentity.schema";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { scheduleSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret";
@@ -21,7 +20,6 @@ import {
 } from "../zodUtils";
 import { getConventionFieldName } from "./convention";
 import {
-  conventionStatuses,
   Beneficiary,
   BeneficiaryCurrentEmployer,
   BeneficiaryRepresentative,
@@ -31,6 +29,9 @@ import {
   ConventionId,
   conventionObjectiveOptions,
   ConventionReadDto,
+  conventionStatuses,
+  conventionStatusesWithJustification,
+  conventionStatusesWithoutJustification,
   EstablishmentRepresentative,
   EstablishmentTutor,
   GenerateMagicLinkRequestDto,
@@ -39,8 +40,6 @@ import {
   UpdateConventionRequestDto,
   UpdateConventionStatusRequestDto,
   WithConventionId,
-  conventionStatusesWithJustification,
-  conventionStatusesWithoutJustification,
   WithJustification,
 } from "./convention.dto";
 import {
@@ -75,7 +74,7 @@ const beneficiarySchema: z.Schema<Beneficiary> = signatorySchema.merge(
     emergencyContact: zStringPossiblyEmpty,
     emergencyContactPhone: phoneSchema.optional().or(z.literal("")),
     emergencyContactEmail: zEmailPossiblyEmpty,
-    federatedIdentity: peConnectPrefixSchema.optional(),
+    federatedIdentity: federatedIdentitySchema.optional(),
     birthdate: zString.regex(dateRegExp, "La date de saisie est invalide."),
   }),
 );

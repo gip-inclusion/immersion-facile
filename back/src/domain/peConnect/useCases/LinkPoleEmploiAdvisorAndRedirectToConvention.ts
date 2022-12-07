@@ -5,11 +5,12 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import {
   ConventionPeConnectFields,
   ConventionPoleEmploiUserAdvisorEntity,
+  PeUserAndAdvisor,
   toPartialConventionDtoWithPeIdentity,
 } from "../dto/PeConnect.dto";
 import {
+  chooseValidAdvisor,
   conventionPoleEmploiUserAdvisorFromDto,
-  poleEmploiUserAdvisorDTOFromUserAndAdvisors,
 } from "../entities/ConventionPoleEmploiAdvisorEntity";
 import { PeConnectGateway } from "../port/PeConnectGateway";
 
@@ -31,16 +32,23 @@ export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalU
     authorizationCode: string,
     uow: UnitOfWork,
   ): Promise<AbsoluteUrl> {
-    const { user, advisors } = await this.peConnectGateway.getUserAndAdvisors(
+    const accessToken = await this.peConnectGateway.getAccessToken(
       authorizationCode,
     );
+
+    if (!accessToken) return this.authFailedRedirectUrl();
+
+    const { user, advisors } = await this.peConnectGateway.getUserAndAdvisors(
+      accessToken,
+    );
+
+    const fromGateway: PeUserAndAdvisor = {
+      user,
+      advisor: user.isJobseeker ? chooseValidAdvisor(advisors) : undefined,
+    };
+
     const poleEmploiUserAdvisorEntity: ConventionPoleEmploiUserAdvisorEntity =
-      conventionPoleEmploiUserAdvisorFromDto(
-        poleEmploiUserAdvisorDTOFromUserAndAdvisors({
-          user,
-          advisors,
-        }),
-      );
+      conventionPoleEmploiUserAdvisorFromDto(fromGateway);
 
     await uow.conventionPoleEmploiAdvisorRepository.openSlotForNextConvention(
       poleEmploiUserAdvisorEntity,
@@ -51,5 +59,9 @@ export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalU
     );
 
     return `${this.baseUrlForRedirect}/${frontRoutes.conventionImmersionRoute}?${peQueryParams}`;
+  }
+
+  private authFailedRedirectUrl(): AbsoluteUrl {
+    return `${this.baseUrlForRedirect}/${frontRoutes.conventionImmersionRoute}?federatedIdentity=peConnect:AuthFailed`;
   }
 }

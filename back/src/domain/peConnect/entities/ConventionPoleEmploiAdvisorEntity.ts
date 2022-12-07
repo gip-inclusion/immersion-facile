@@ -1,52 +1,42 @@
 import { FederatedIdentity, PeConnectIdentity } from "shared";
-import { ManagedRedirectError } from "../../../adapters/primary/helpers/redirectErrors";
 import { peAdvisorsErrorCount } from "../../../adapters/secondary/PeConnectGateway/peConnectCounters";
 import {
   ConventionPoleEmploiUserAdvisorEntity,
-  PeConnectAdvisorDto,
-  PeConnectAdvisorEntity,
-  PeUserAndAdvisors,
-  PoleEmploiUserAdvisorDto,
-  toConventionPoleEmploiAdvisorDto,
+  PeUserAndAdvisor,
 } from "../dto/PeConnect.dto";
+import {
+  AllPeConnectAdvisorDto,
+  SupportedPeConnectAdvisorDto,
+} from "../dto/PeConnectAdvisor.dto";
 
 export const conventionPoleEmploiUserAdvisorFromDto = (
-  dto: PoleEmploiUserAdvisorDto,
+  dto: PeUserAndAdvisor,
 ): ConventionPoleEmploiUserAdvisorEntity => ({
   ...dto,
   conventionId: "",
   _entityName: "ConventionPoleEmploiAdvisor",
 });
 
-export const poleEmploiUserAdvisorDTOFromUserAndAdvisors = ({
-  user,
-  advisors,
-}: PeUserAndAdvisors): PoleEmploiUserAdvisorDto =>
-  toConventionPoleEmploiAdvisorDto({
-    user,
-    advisor: choosePreferredAdvisor(advisors),
-  });
-
 const preferCapEmploiPredicate = (
-  a: PeConnectAdvisorDto,
-  _: PeConnectAdvisorDto,
+  a: SupportedPeConnectAdvisorDto,
+  _: SupportedPeConnectAdvisorDto,
 ) => (a.type === "CAPEMPLOI" ? -1 : 1);
 
 const onlyValidAdvisorsForImmersion = (
-  advisor: PeConnectAdvisorDto,
-): advisor is PeConnectAdvisorEntity => advisor.type != "INDEMNISATION";
+  advisor: AllPeConnectAdvisorDto,
+): advisor is SupportedPeConnectAdvisorDto => advisor.type != "INDEMNISATION";
 
-const choosePreferredAdvisor = (
-  advisors: PeConnectAdvisorDto[],
-): PeConnectAdvisorEntity => {
-  const sortedValidAdvisors: PeConnectAdvisorEntity[] = advisors
+export const chooseValidAdvisor = (
+  advisors: AllPeConnectAdvisorDto[],
+): SupportedPeConnectAdvisorDto | undefined => {
+  const sortedValidAdvisors: SupportedPeConnectAdvisorDto[] = advisors
     .filter(onlyValidAdvisorsForImmersion)
     .sort(preferCapEmploiPredicate);
 
   const preferredAdvisor = sortedValidAdvisors.at(0);
   if (!preferredAdvisor) {
     peAdvisorsErrorCount.inc({ errorType: "peConnectNoValidAdvisor" });
-    throw new ManagedRedirectError("peConnectNoValidAdvisor");
+    return undefined;
   }
 
   return preferredAdvisor;

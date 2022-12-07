@@ -1,5 +1,12 @@
 import { Router } from "express";
-import { loginPeConnect, peConnect } from "shared";
+import {
+  AbsoluteUrl,
+  loginPeConnect,
+  peConnect,
+  queryParamsAsString,
+} from "shared";
+import { ExternalPeConnectOAuthGrantPayload } from "../../../secondary/PeConnectGateway/PeConnectApi";
+import { AppConfig } from "../../config/appConfig";
 import { AppDependencies } from "../../config/createAppDependencies";
 import { FeatureDisabledError } from "../../helpers/httpErrors";
 import { ManagedRedirectError } from "../../helpers/redirectErrors";
@@ -14,7 +21,7 @@ export const createPeConnectRouter = (deps: AppDependencies) => {
       res,
       async () => {
         await throwIfPeConnectDisabled(deps);
-        return deps.gateways.peConnectGateway.oAuthGetAuthorizationCodeRedirectUrl();
+        return routerMakeOauthGetAuthorizationCodeRedirectUrl(deps.config);
       },
       deps.errorHandlers.handleManagedRedirectResponseError,
       deps.errorHandlers.handleRawRedirectResponseError,
@@ -49,3 +56,40 @@ const throwIfPeConnectDisabled = async (deps: AppDependencies) => {
     throw new FeatureDisabledError("PeConnect");
   }
 };
+
+const makeOauthGetAuthorizationCodeRedirectUrl = (
+  peAuthCandidatUrl: AbsoluteUrl,
+  authorizationCodePayload: ExternalPeConnectOAuthGrantPayload,
+): AbsoluteUrl =>
+  `${peAuthCandidatUrl}/connexion/oauth2/authorize?${queryParamsAsString<ExternalPeConnectOAuthGrantPayload>(
+    authorizationCodePayload,
+  )}`;
+const peConnectNeededScopes = (clientId: string): string =>
+  [
+    `application_${clientId}`,
+    "api_peconnect-individuv1",
+    "api_peconnect-conseillersv1",
+    "api_peconnect-statutv1",
+    "individu",
+    "openid",
+    "profile",
+    "email",
+    "statut",
+  ].join(" ");
+
+function routerMakeOauthGetAuthorizationCodeRedirectUrl(
+  appConfig: AppConfig,
+): AbsoluteUrl {
+  const authorizationCodePayload: ExternalPeConnectOAuthGrantPayload = {
+    response_type: "code",
+    client_id: appConfig.poleEmploiClientId,
+    realm: "/individu",
+    redirect_uri: `${appConfig.immersionFacileBaseUrl}/api/pe-connect`,
+    scope: peConnectNeededScopes(appConfig.poleEmploiClientId),
+  };
+
+  return makeOauthGetAuthorizationCodeRedirectUrl(
+    appConfig.peAuthCandidatUrl,
+    authorizationCodePayload,
+  );
+}

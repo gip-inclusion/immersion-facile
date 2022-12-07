@@ -120,7 +120,7 @@ type GenericActor<R extends Role> = {
   lastName: string;
 };
 
-type GenericSignatory<R extends Role> = GenericActor<R> & {
+export type GenericSignatory<R extends Role> = GenericActor<R> & {
   signedAt?: string; // Date iso string
 };
 
