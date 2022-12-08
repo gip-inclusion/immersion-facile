@@ -11,13 +11,13 @@ export const contents404: HTTPFrontErrorContents = {
     <br>Sinon contactez-nous pour que l’on puisse vous rediriger vers la bonne information.`,
   buttons: [
     {
-      type: "primary",
+      kind: "primary",
       label: "Page d'accueil",
       ...routes.home().link,
     },
     {
-      type: "secondary",
-      label: "Page d'accueil",
+      kind: "secondary",
+      label: "Contactez-nous",
       href: "mailto:contact@immersion-facile.beta.gouv.fr",
     },
   ],

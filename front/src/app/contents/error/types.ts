@@ -10,7 +10,7 @@ export type HTTPFrontErrorContents = {
 
 export type ErrorButton = {
   label: string;
-  type: "primary" | "secondary";
+  kind: "primary" | "secondary";
   href?: string;
   onClick?: () => void;
 };
