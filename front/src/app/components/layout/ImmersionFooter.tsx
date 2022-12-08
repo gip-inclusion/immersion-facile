@@ -85,6 +85,10 @@ const links: NavLink[] = [
 ];
 const bottomsLinks: NavLink[] = [
   {
+    label: "Accessibilité : non conforme",
+    id: getFooterNavLinkId("accessibility"),
+  },
+  {
     label: "Mentions légales",
     ...routes.standard({ pagePath: "mentions-legales" }).link,
     id: getFooterNavLinkId("legals"),
