@@ -145,6 +145,11 @@ export const conventionSlice = createSlice({
       state.feedback = { kind: "errored", errorMessage: action.payload };
     },
 
+    // get convention status dashboard
+    conventionStatusDashboardRequested: (state, action: PayloadAction<Jwt>) => {
+      state.isLoading = true;
+    },
+
     isMinorChanged: (state, action: PayloadAction<boolean>) => {
       state.formUi.isMinor = action.payload;
     },

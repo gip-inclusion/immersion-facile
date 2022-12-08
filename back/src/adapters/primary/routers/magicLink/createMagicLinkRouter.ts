@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   ConventionReadDto,
   conventionsRoute,
+  getConventionStatusDashboard,
   immersionAssessmentRoute,
   signConventionRoute,
   updateConventionStatusRoute,
@@ -69,6 +70,19 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
           undefined,
           req.payloads.application,
         );
+      }),
+    );
+
+  authenticatedRouter
+    .route(`/${getConventionStatusDashboard}`)
+    .get((req, res) =>
+      // eslint-disable-next-line @typescript-eslint/require-await
+      sendHttpResponse(req, res, async () => {
+        if (!req?.payloads?.application) throw new UnauthorizedError();
+        return deps.useCases.getDashboard.execute({
+          name: "conventionStatus",
+          conventionId: req.payloads.application.applicationId,
+        });
       }),
     );
 

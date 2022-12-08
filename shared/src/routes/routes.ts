@@ -18,6 +18,7 @@ export const frontRoutes = {
   standard: "pages",
 };
 
+export const getConventionStatusDashboard = "statut-convention";
 export const addEstablishmentFormRouteWithApiKey__v0 = "add-establishment-form"; // Becomes POST /v1/form-establishments
 export const adminLogin = "login";
 export const agenciesRoute = "agencies";

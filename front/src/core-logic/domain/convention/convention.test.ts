@@ -443,6 +443,15 @@ describe("Convention slice", () => {
     });
   });
 
+  it("gets the dashboard for convention status check", () => {
+    const jwt = "some-correct-jwt";
+    store.dispatch(
+      conventionSlice.actions.conventionStatusDashboardRequested(jwt),
+    );
+    expectConventionState({ isLoading: true });
+    feedConventionGatewayWithDashboardUrl();
+  });
+
   it("stores the current signatory role", () => {
     expectConventionState({ currentSignatoryRole: null });
     const newRole: SignatoryRole = "beneficiary";
