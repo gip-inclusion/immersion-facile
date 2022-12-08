@@ -256,6 +256,7 @@ export const templateByName: {
       button: {
         url: magicLink,
         label: "Voir la demande",
+        target: "_blank",
       },
       subContent: `
       Vous pouvez demander des modifications ou la refuser, si nécessaire  ou la valider si cette demande correspond au projet de ${beneficiaryFirstName} ${beneficiaryLastName}, ${beneficiaryEmail}.      
@@ -418,6 +419,7 @@ export const templateByName: {
       button: {
         label: "Examiner la demande",
         url: magicLink,
+        target: "_blank",
       },
       subContent: defaultSignature,
     }),
