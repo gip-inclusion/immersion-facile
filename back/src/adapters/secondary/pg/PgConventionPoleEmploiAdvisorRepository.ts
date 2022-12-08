@@ -3,8 +3,9 @@ import { ConventionId, PeExternalId } from "shared";
 import {
   ConventionPoleEmploiUserAdvisorDto,
   ConventionPoleEmploiUserAdvisorEntity,
-  PoleEmploiUserAdvisorDto,
+  PeUserAndAdvisor,
 } from "../../../domain/peConnect/dto/PeConnect.dto";
+import { isPeAdvisorSupportedTypes } from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
 import {
   ConventionAndPeExternalIds,
   ConventionPoleEmploiAdvisorRepository,
@@ -43,48 +44,50 @@ export class PgConventionPoleEmploiAdvisorRepository
   }
 
   public async openSlotForNextConvention(
-    conventionPoleEmploiUserAdvisorEntity: PoleEmploiUserAdvisorDto,
+    peUserAndAdvisor: PeUserAndAdvisor,
   ): Promise<void> {
-    const { userPeExternalId, firstName, lastName, email, type } =
-      conventionPoleEmploiUserAdvisorEntity;
+    const { user, advisor } = peUserAndAdvisor;
 
     await this.client.query(upsertOnCompositePrimaryKeyConflict, [
-      userPeExternalId,
+      user.peExternalId,
       CONVENTION_ID_DEFAULT_UUID,
-      firstName,
-      lastName,
-      email,
-      type,
+      advisor ? advisor.firstName : null,
+      advisor ? advisor.lastName : null,
+      advisor ? advisor.email : null,
+      advisor ? advisor.type : null,
     ]);
   }
 
   public async getByConventionId(
     conventionId: ConventionId,
   ): Promise<ConventionPoleEmploiUserAdvisorEntity | undefined> {
-    const pgResult = await this.client.query(
-      `SELECT *
+    const pgResult =
+      await this.client.query<PgConventionPoleEmploiUserAdvisorDto>(
+        `SELECT *
        FROM partners_pe_connect
        WHERE convention_id = $1`,
-      [conventionId],
-    );
+        [conventionId],
+      );
 
-    if (pgResult.rows.length === 0) return;
-
-    return toConventionPoleEmploiUserAdvisorEntity(
-      conventionPoleEmploiUserAdvisorDtoSchema.parse(
-        toConventionPoleEmploiUserAdvisorDTO(pgResult.rows[0]),
-      ),
+    const result = pgResult.rows.at(0);
+    return (
+      result &&
+      toConventionPoleEmploiUserAdvisorEntity(
+        conventionPoleEmploiUserAdvisorDtoSchema.parse(
+          toConventionPoleEmploiUserAdvisorDTO(result),
+        ),
+      )
     );
   }
 }
 
-type RawResults = {
-  user_pe_external_id: any;
-  convention_id: any;
-  firstname: any;
-  lastname: any;
-  email: any;
-  type: any;
+export type PgConventionPoleEmploiUserAdvisorDto = {
+  user_pe_external_id: string;
+  convention_id: string;
+  firstname: string | null;
+  lastname: string | null;
+  email: string | null;
+  type: string | null;
 };
 
 const toConventionPoleEmploiUserAdvisorDTO = ({
@@ -94,13 +97,18 @@ const toConventionPoleEmploiUserAdvisorDTO = ({
   lastname,
   email,
   type,
-}: RawResults): ConventionPoleEmploiUserAdvisorDto => ({
-  userPeExternalId: user_pe_external_id,
+}: PgConventionPoleEmploiUserAdvisorDto): ConventionPoleEmploiUserAdvisorDto => ({
+  advisor:
+    firstname && lastname && email && type && isPeAdvisorSupportedTypes(type)
+      ? {
+          firstName: firstname,
+          lastName: lastname,
+          email,
+          type,
+        }
+      : undefined,
+  peExternalId: user_pe_external_id,
   conventionId: convention_id,
-  firstName: firstname,
-  lastName: lastname,
-  email,
-  type,
 });
 
 const toConventionPoleEmploiUserAdvisorEntity = (

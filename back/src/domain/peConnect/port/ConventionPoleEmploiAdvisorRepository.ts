@@ -1,5 +1,8 @@
 import { ConventionId, PeExternalId } from "shared";
-import { ConventionPoleEmploiUserAdvisorEntity } from "../dto/PeConnect.dto";
+import {
+  ConventionPoleEmploiUserAdvisorEntity,
+  PeUserAndAdvisor,
+} from "../dto/PeConnect.dto";
 
 export type ConventionAndPeExternalIds = {
   conventionId: ConventionId;
@@ -8,7 +11,7 @@ export type ConventionAndPeExternalIds = {
 
 export interface ConventionPoleEmploiAdvisorRepository {
   openSlotForNextConvention: (
-    advisor: ConventionPoleEmploiUserAdvisorEntity,
+    peUserAndAdvisor: PeUserAndAdvisor,
   ) => Promise<void>;
   associateConventionAndUserAdvisor: (
     conventionId: ConventionId,

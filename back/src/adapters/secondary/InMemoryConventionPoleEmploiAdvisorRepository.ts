@@ -1,7 +1,7 @@
 import { ConventionId, PeExternalId } from "shared";
 import {
   ConventionPoleEmploiUserAdvisorEntity,
-  PoleEmploiUserAdvisorDto,
+  PeUserAndAdvisor,
 } from "../../domain/peConnect/dto/PeConnect.dto";
 import {
   ConventionAndPeExternalIds,
@@ -12,15 +12,15 @@ import { NotFoundError } from "../primary/helpers/httpErrors";
 export class InMemoryConventionPoleEmploiAdvisorRepository
   implements ConventionPoleEmploiAdvisorRepository
 {
-  private _conventionPoleEmploiUsersAdvisors: ConventionPoleEmploiUserAdvisorEntity[] =
-    [];
-
   public async openSlotForNextConvention(
-    conventionPoleEmploiUserAdvisorEntity: ConventionPoleEmploiUserAdvisorEntity,
+    peUserAndAdvisor: PeUserAndAdvisor,
   ): Promise<void> {
-    this._conventionPoleEmploiUsersAdvisors.push(
-      conventionPoleEmploiUserAdvisorEntity,
-    );
+    this._conventionPoleEmploiUsersAdvisors.push({
+      advisor: peUserAndAdvisor.advisor,
+      conventionId: CONVENTION_ID_DEFAULT_UUID,
+      peExternalId: peUserAndAdvisor.user.peExternalId,
+      _entityName: "ConventionPoleEmploiAdvisor",
+    });
   }
 
   public async associateConventionAndUserAdvisor(
@@ -48,20 +48,6 @@ export class InMemoryConventionPoleEmploiAdvisorRepository
     );
   }
 
-  //test purposes only
-  public get conventionPoleEmploiUsersAdvisors() {
-    return this._conventionPoleEmploiUsersAdvisors;
-  }
-
-  //test purposes only
-  public setConventionPoleEmploiUsersAdvisor(
-    conventionPoleEmploiUserAdvisorEntity: ConventionPoleEmploiUserAdvisorEntity,
-  ) {
-    this._conventionPoleEmploiUsersAdvisors.push(
-      conventionPoleEmploiUserAdvisorEntity,
-    );
-  }
-
   private upsertWithClosedConvention = (
     oldEntity: ConventionPoleEmploiUserAdvisorEntity,
     newEntity: ConventionPoleEmploiUserAdvisorEntity,
@@ -78,29 +64,41 @@ export class InMemoryConventionPoleEmploiAdvisorRepository
       this._conventionPoleEmploiUsersAdvisors
         .filter(matchPeExternalId(peExternalId))
         .find(isOpenEntity);
-
-    if (!isEntity(entity))
-      throw new NotFoundError(
-        "There is no open pole emploi advisor entity linked to this user peExternalId",
-      );
-
-    return entity;
+    if (entity) return entity;
+    throw new NotFoundError(
+      "There is no open pole emploi advisor entity linked to this user peExternalId",
+    );
   }
+
+  //test purposes only
+  public get conventionPoleEmploiUsersAdvisors() {
+    return this._conventionPoleEmploiUsersAdvisors;
+  }
+
+  //test purposes only
+  public setConventionPoleEmploiUsersAdvisor(
+    conventionPoleEmploiUserAdvisorEntities: ConventionPoleEmploiUserAdvisorEntity[],
+  ) {
+    this._conventionPoleEmploiUsersAdvisors =
+      conventionPoleEmploiUserAdvisorEntities;
+  }
+
+  private _conventionPoleEmploiUsersAdvisors: ConventionPoleEmploiUserAdvisorEntity[] =
+    [];
 }
+
+export const CONVENTION_ID_DEFAULT_UUID =
+  "00000000-0000-0000-0000-000000000000";
 
 const matchPeExternalId =
   (peExternalId: string) =>
   (conventionPoleEmploiUserAdvisor: ConventionPoleEmploiUserAdvisorEntity) =>
-    conventionPoleEmploiUserAdvisor.userPeExternalId === peExternalId;
+    conventionPoleEmploiUserAdvisor.peExternalId === peExternalId;
 
 const matchConventionId =
   (conventionId: string) =>
   (conventionPoleEmploiUserAdvisor: ConventionPoleEmploiUserAdvisorEntity) =>
     conventionPoleEmploiUserAdvisor.conventionId === conventionId;
 
-const isEntity = (
-  e: PoleEmploiUserAdvisorDto | undefined,
-): e is PoleEmploiUserAdvisorDto => !!e;
-
 const isOpenEntity = (entity: ConventionPoleEmploiUserAdvisorEntity) =>
-  entity.conventionId === "";
+  entity.conventionId === CONVENTION_ID_DEFAULT_UUID;

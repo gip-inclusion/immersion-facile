@@ -4,8 +4,10 @@ import { SupportedPeConnectAdvisorDto } from "./PeConnectAdvisor.dto";
 import { PeConnectUserDto } from "./PeConnectUser.dto";
 
 export type ConventionPoleEmploiUserAdvisorDto = {
+  peExternalId: string;
   conventionId: string;
-} & PeUserAndAdvisor;
+  advisor?: SupportedPeConnectAdvisorDto;
+};
 
 export type ConventionPoleEmploiUserAdvisorEntity = EntityFromDto<
   ConventionPoleEmploiUserAdvisorDto,
@@ -17,6 +19,11 @@ export type ConventionPeConnectFields = Pick<
   "email" | "firstName" | "lastName" | "federatedIdentity"
 >;
 
+export type PeUserAndAdvisor = {
+  advisor: SupportedPeConnectAdvisorDto | undefined;
+  user: PeConnectUserDto;
+};
+
 export const toPartialConventionDtoWithPeIdentity = (
   peConnectUserInfo: PeConnectUserDto,
 ): ConventionPeConnectFields => ({
@@ -25,8 +32,3 @@ export const toPartialConventionDtoWithPeIdentity = (
   lastName: peConnectUserInfo.lastName,
   federatedIdentity: `peConnect:${peConnectUserInfo.peExternalId}`,
 });
-
-export type PeUserAndAdvisor = {
-  advisor: SupportedPeConnectAdvisorDto | undefined;
-  user: PeConnectUserDto;
-};

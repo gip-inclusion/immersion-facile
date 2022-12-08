@@ -35,15 +35,16 @@ export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends Transact
       );
       return;
     }
+    const advisor = conventionUserAdvisor.advisor;
+    if (!advisor) return;
 
     const beneficiary = conventionFromEvent.signatories.beneficiary;
-
     await this.emailGateway.sendEmail({
       type: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED",
-      recipients: [conventionUserAdvisor.email],
+      recipients: [advisor.email],
       params: {
-        advisorFirstName: conventionUserAdvisor.firstName,
-        advisorLastName: conventionUserAdvisor.lastName,
+        advisorFirstName: advisor.firstName,
+        advisorLastName: advisor.lastName,
         businessName: conventionFromEvent.businessName,
         dateEnd: conventionFromEvent.dateEnd,
         dateStart: conventionFromEvent.dateStart,
@@ -56,7 +57,7 @@ export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends Transact
           id: conventionFromEvent.id,
           role: "validator",
           targetRoute: frontRoutes.conventionToValidate,
-          email: conventionUserAdvisor.email,
+          email: advisor.email,
         }),
       },
     });

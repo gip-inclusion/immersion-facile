@@ -6,32 +6,55 @@ import {
 } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { PgAgencyRepository } from "./PgAgencyRepository";
-import { PgConventionPoleEmploiAdvisorRepository } from "./PgConventionPoleEmploiAdvisorRepository";
+import {
+  PgConventionPoleEmploiAdvisorRepository,
+  PgConventionPoleEmploiUserAdvisorDto,
+} from "./PgConventionPoleEmploiAdvisorRepository";
 import { PgConventionRepository } from "./PgConventionRepository";
 import {
   ConventionPoleEmploiUserAdvisorEntity,
-  PoleEmploiUserAdvisorDto,
+  PeUserAndAdvisor,
 } from "../../../domain/peConnect/dto/PeConnect.dto";
+import { PeConnectUserDto } from "../../../domain/peConnect/dto/PeConnectUser.dto";
+import { SupportedPeConnectAdvisorDto } from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
 
 const conventionId = "88401348-bad9-4933-87c6-405b8a8fe4cc";
 const userPeExternalId = "92f44bbf-103d-4312-bd74-217c7d79f618";
 
 const convention = new ConventionDtoBuilder().withId(conventionId).build();
 
-const poleEmploiFirstUserAdvisor: PoleEmploiUserAdvisorDto = {
-  userPeExternalId,
+const user: PeConnectUserDto = {
+  email: "",
+  firstName: "",
+  isJobseeker: true,
+  lastName: "",
+  peExternalId: userPeExternalId,
+};
+const placementAdvisor: SupportedPeConnectAdvisorDto = {
   firstName: "Jean",
   lastName: "Dupont",
   email: "jean.dupont@pole-emploi.fr",
   type: "PLACEMENT",
 };
-
-const poleEmploiUpdatedUserAdvisor: PoleEmploiUserAdvisorDto = {
-  userPeExternalId,
+const capemploiAdvisor: SupportedPeConnectAdvisorDto = {
   firstName: "Jeanne",
   lastName: "Delamare",
   email: "jeanne.delamare@pole-emploi.fr",
   type: "CAPEMPLOI",
+};
+const poleEmploiFirstUserAdvisor: PeUserAndAdvisor = {
+  advisor: placementAdvisor,
+  user,
+};
+
+const poleEmploiFirstUserWithoutAdvisor: PeUserAndAdvisor = {
+  advisor: undefined,
+  user,
+};
+
+const poleEmploiUpdatedUserAdvisor: PeUserAndAdvisor = {
+  advisor: capemploiAdvisor,
+  user,
 };
 
 describe("PgConventionPoleEmploiAdvisorRepository", () => {
@@ -74,12 +97,30 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
       const inDb = await client.query("SELECT * FROM partners_pe_connect");
       expect(inDb.rows).toHaveLength(1);
       expectObjectsToMatch(inDb.rows[0], {
-        user_pe_external_id: poleEmploiFirstUserAdvisor.userPeExternalId,
+        user_pe_external_id: poleEmploiFirstUserAdvisor.user.peExternalId,
         convention_id: "00000000-0000-0000-0000-000000000000",
-        firstname: poleEmploiFirstUserAdvisor.firstName,
-        lastname: poleEmploiFirstUserAdvisor.lastName,
-        email: poleEmploiFirstUserAdvisor.email,
-        type: poleEmploiFirstUserAdvisor.type,
+        firstname: placementAdvisor.firstName,
+        lastname: placementAdvisor.lastName,
+        email: placementAdvisor.email,
+        type: placementAdvisor.type,
+      });
+    });
+
+    it("should open a slot with no advisor", async () => {
+      await conventionPoleEmploiAdvisorRepository.openSlotForNextConvention(
+        poleEmploiFirstUserWithoutAdvisor,
+      );
+      const inDb = await client.query<PgConventionPoleEmploiUserAdvisorDto>(
+        "SELECT * FROM partners_pe_connect",
+      );
+      expect(inDb.rows).toHaveLength(1);
+      expectObjectsToMatch(inDb.rows[0], {
+        user_pe_external_id: poleEmploiFirstUserAdvisor.user.peExternalId,
+        convention_id: "00000000-0000-0000-0000-000000000000",
+        firstname: null,
+        lastname: null,
+        email: null,
+        type: null,
       });
     });
 
@@ -95,12 +136,12 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
       const inDb = await client.query("SELECT * FROM partners_pe_connect");
       expect(inDb.rows).toHaveLength(1);
       expectObjectsToMatch(inDb.rows[0], {
-        user_pe_external_id: poleEmploiUpdatedUserAdvisor.userPeExternalId,
+        user_pe_external_id: poleEmploiUpdatedUserAdvisor.user.peExternalId,
         convention_id: "00000000-0000-0000-0000-000000000000",
-        firstname: poleEmploiUpdatedUserAdvisor.firstName,
-        lastname: poleEmploiUpdatedUserAdvisor.lastName,
-        email: poleEmploiUpdatedUserAdvisor.email,
-        type: poleEmploiUpdatedUserAdvisor.type,
+        firstname: capemploiAdvisor.firstName,
+        lastname: capemploiAdvisor.lastName,
+        email: capemploiAdvisor.email,
+        type: capemploiAdvisor.type,
       });
     });
   });
@@ -131,13 +172,13 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
       const inDb = await client.query("SELECT * FROM partners_pe_connect");
       expect(inDb.rows).toHaveLength(1);
       expectObjectsToMatch(inDb.rows[0], {
-        user_pe_external_id: poleEmploiFirstUserAdvisor.userPeExternalId,
+        user_pe_external_id: poleEmploiFirstUserAdvisor.user.peExternalId,
         convention_id: conventionId,
       });
     });
   });
 
-  describe("retreive pole emploi user advisor", () => {
+  describe("getByConventionId", () => {
     it("should return undefined if no convention Advisor", async () => {
       const conventionAdvisor:
         | ConventionPoleEmploiUserAdvisorEntity
@@ -164,12 +205,30 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
       );
 
       expectObjectsToMatch(conventionAdvisor!, {
-        userPeExternalId: poleEmploiFirstUserAdvisor.userPeExternalId,
+        advisor: poleEmploiFirstUserAdvisor.advisor,
+        peExternalId: poleEmploiFirstUserAdvisor.user.peExternalId,
         conventionId,
-        firstName: poleEmploiFirstUserAdvisor.firstName,
-        lastName: poleEmploiFirstUserAdvisor.lastName,
-        email: poleEmploiFirstUserAdvisor.email,
-        type: poleEmploiFirstUserAdvisor.type,
+      });
+    });
+    it("convention advisor without advisor", async () => {
+      await conventionPoleEmploiAdvisorRepository.openSlotForNextConvention(
+        poleEmploiFirstUserWithoutAdvisor,
+      );
+      await conventionPoleEmploiAdvisorRepository.associateConventionAndUserAdvisor(
+        conventionId,
+        userPeExternalId,
+      );
+
+      const conventionAdvisor:
+        | ConventionPoleEmploiUserAdvisorEntity
+        | undefined = await conventionPoleEmploiAdvisorRepository.getByConventionId(
+        conventionId,
+      );
+
+      expectObjectsToMatch(conventionAdvisor!, {
+        advisor: undefined,
+        peExternalId: poleEmploiFirstUserAdvisor.user.peExternalId,
+        conventionId,
       });
     });
   });

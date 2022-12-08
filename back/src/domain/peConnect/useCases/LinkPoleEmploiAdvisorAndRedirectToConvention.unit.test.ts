@@ -1,11 +1,14 @@
 import { expectTypeToMatchAndEqual } from "shared";
-import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
-import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../../adapters/secondary/InMemoryConventionPoleEmploiAdvisorRepository";
+import {
+  createInMemoryUow,
+  InMemoryUnitOfWork,
+} from "../../../adapters/primary/config/uowConfig";
+import { CONVENTION_ID_DEFAULT_UUID } from "../../../adapters/secondary/InMemoryConventionPoleEmploiAdvisorRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemoryPeConnectGateway } from "../../../adapters/secondary/PeConnectGateway/InMemoryPeConnectGateway";
 import { conventionPoleEmploiUserAdvisorFromDto } from "../../../domain/peConnect/entities/ConventionPoleEmploiAdvisorEntity";
 import { LinkPoleEmploiAdvisorAndRedirectToConvention } from "../../../domain/peConnect/useCases/LinkPoleEmploiAdvisorAndRedirectToConvention";
-import { ConventionPoleEmploiUserAdvisorEntity } from "../dto/PeConnect.dto";
+import { AccessTokenDto } from "../dto/AccessToken.dto";
 import {
   AllPeConnectAdvisorDto,
   SupportedPeConnectAdvisorDto,
@@ -13,56 +16,52 @@ import {
 import { PeConnectUserDto } from "../dto/PeConnectUser.dto";
 
 describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
-  let linkPoleEmploiAdvisorAndRedirectToConvention: LinkPoleEmploiAdvisorAndRedirectToConvention;
-  let uowPerformer: InMemoryUowPerformer;
+  let uow: InMemoryUnitOfWork;
+  let usecase: LinkPoleEmploiAdvisorAndRedirectToConvention;
   let peConnectGateway: InMemoryPeConnectGateway;
-  let conventionPoleEmploiAdvisorRepo: InMemoryConventionPoleEmploiAdvisorRepository;
 
   const baseurl = "https://plop";
   const userPeExternalId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
-
   const authorizationCode = "123";
 
   beforeEach(() => {
-    const uow = createInMemoryUow();
-    conventionPoleEmploiAdvisorRepo = uow.conventionPoleEmploiAdvisorRepository;
-    uowPerformer = new InMemoryUowPerformer(uow);
+    uow = createInMemoryUow();
     peConnectGateway = new InMemoryPeConnectGateway();
-
-    linkPoleEmploiAdvisorAndRedirectToConvention =
-      new LinkPoleEmploiAdvisorAndRedirectToConvention(
-        uowPerformer,
-        peConnectGateway,
-        baseurl,
-      );
+    usecase = new LinkPoleEmploiAdvisorAndRedirectToConvention(
+      new InMemoryUowPerformer(uow),
+      peConnectGateway,
+      baseurl,
+    );
   });
 
-  describe.skip("Pe Connect correctly identify user", () => {
+  describe("Pe Connect correctly identify user", () => {
     it("the returned conventionAdvisor gets stored", async () => {
+      peConnectGateway.setAccessToken(accessToken);
       peConnectGateway.setUser(peJobseekerUser);
       peConnectGateway.setAdvisors([
         pePlacementAdvisor,
         peIndemnisationAdvisor,
       ]);
-      const authorizationCode = "123";
 
-      const expectedConventionPoleEmploiAdvisorEntity: ConventionPoleEmploiUserAdvisorEntity =
-        conventionPoleEmploiUserAdvisorFromDto({
-          advisor: pePlacementAdvisor,
-          user: peJobseekerUser,
-        });
-
-      await linkPoleEmploiAdvisorAndRedirectToConvention.execute(
-        authorizationCode,
-      );
+      await usecase.execute(authorizationCode);
 
       expectTypeToMatchAndEqual(
-        conventionPoleEmploiAdvisorRepo.conventionPoleEmploiUsersAdvisors[0],
-        expectedConventionPoleEmploiAdvisorEntity,
+        uow.conventionPoleEmploiAdvisorRepository
+          .conventionPoleEmploiUsersAdvisors,
+        [
+          conventionPoleEmploiUserAdvisorFromDto(
+            {
+              advisor: pePlacementAdvisor,
+              user: peJobseekerUser,
+            },
+            CONVENTION_ID_DEFAULT_UUID,
+          ),
+        ],
       );
     });
 
     it("only PLACEMENT and CAPEMPLOI advisor types are valid for conventionAdvisor", async () => {
+      peConnectGateway.setAccessToken(accessToken);
       peConnectGateway.setUser(peJobseekerUser);
       peConnectGateway.setAdvisors([
         peIndemnisationAdvisor,
@@ -70,30 +69,29 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
         peCapemploiAdvisor,
       ]);
 
-      const expectedConventionPoleEmploiUserAdvisor: ConventionPoleEmploiUserAdvisorEntity =
-        conventionPoleEmploiUserAdvisorFromDto({
-          advisor: peCapemploiAdvisor,
-          user: peJobseekerUser,
-        });
-
-      await linkPoleEmploiAdvisorAndRedirectToConvention.execute(
-        authorizationCode,
-      );
+      await usecase.execute(authorizationCode);
 
       expectTypeToMatchAndEqual(
-        conventionPoleEmploiAdvisorRepo.conventionPoleEmploiUsersAdvisors[0],
-        expectedConventionPoleEmploiUserAdvisor,
+        uow.conventionPoleEmploiAdvisorRepository
+          .conventionPoleEmploiUsersAdvisors,
+        [
+          conventionPoleEmploiUserAdvisorFromDto(
+            {
+              advisor: peCapemploiAdvisor,
+              user: peJobseekerUser,
+            },
+            CONVENTION_ID_DEFAULT_UUID,
+          ),
+        ],
       );
     });
 
     it("the user info and federated identity are present in the redirect url query parameters", async () => {
+      peConnectGateway.setAccessToken(accessToken);
       peConnectGateway.setUser(peJobseekerUser);
       peConnectGateway.setAdvisors([pePlacementAdvisor]);
 
-      const urlWithQueryParams =
-        await linkPoleEmploiAdvisorAndRedirectToConvention.execute(
-          authorizationCode,
-        );
+      const urlWithQueryParams = await usecase.execute(authorizationCode);
 
       expect(urlWithQueryParams).toBe(
         `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&federatedIdentity=peConnect:${userPeExternalId}`,
@@ -103,78 +101,122 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
 
   describe("Wrong path", () => {
     it("On PeConnect auth failure", async () => {
-      const urlWithQueryParams =
-        await linkPoleEmploiAdvisorAndRedirectToConvention.execute(
-          authorizationCode,
-        );
+      const urlWithQueryParams = await usecase.execute(authorizationCode);
 
       expect(urlWithQueryParams).toBe(
         `${baseurl}/demande-immersion?federatedIdentity=peConnect:AuthFailed`,
       );
+      expectTypeToMatchAndEqual(
+        uow.conventionPoleEmploiAdvisorRepository
+          .conventionPoleEmploiUsersAdvisors,
+        [],
+      );
     });
 
-    it("On PeConnected but no advisors", async () => {
-      peConnectGateway.setAccessToken({
-        expiresIn: 1,
-        value: "",
-      });
-      peConnectGateway.setUser(peJobseekerUser);
-      //peConnectGateway.setAdvisors([pePlacementAdvisor]);
+    it("On PeConnected and is not jobseeker", async () => {
+      peConnectGateway.setAccessToken(accessToken);
+      peConnectGateway.setUser(peNotJobseekerUser);
 
-      const urlWithQueryParams =
-        await linkPoleEmploiAdvisorAndRedirectToConvention.execute(
-          authorizationCode,
-        );
+      const urlWithQueryParams = await usecase.execute(authorizationCode);
 
       expect(urlWithQueryParams).toBe(
-        `${baseurl}/demande-immersion?federatedIdentity=peConnect:${peJobseekerUser.peExternalId}`,
+        `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&federatedIdentity=peConnect:${peJobseekerUser.peExternalId}`,
+      );
+      expectTypeToMatchAndEqual(
+        uow.conventionPoleEmploiAdvisorRepository
+          .conventionPoleEmploiUsersAdvisors,
+        [
+          conventionPoleEmploiUserAdvisorFromDto(
+            {
+              advisor: undefined,
+              user: peNotJobseekerUser,
+            },
+            CONVENTION_ID_DEFAULT_UUID,
+          ),
+        ],
       );
     });
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const mockedUser: PeConnectUserDto = {
-    isJobseeker: true,
-    firstName: "John",
-    lastName: "Doe",
-    peExternalId: "749dd14f-c82a-48b1-b1bb-fffc5467e4d4",
-    email: "john.doe@gmail.com",
-  };
+  it("On PeConnected and is jobseeker but no advisors", async () => {
+    peConnectGateway.setAccessToken(accessToken);
+    peConnectGateway.setUser(peJobseekerUser);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const mockedValidAdvisor: AllPeConnectAdvisorDto = {
-    email: "elsa.oldenburg@pole-emploi.net",
-    firstName: "Elsa",
-    lastName: "Oldenburg",
-    type: "CAPEMPLOI",
-  };
+    const urlWithQueryParams = await usecase.execute(authorizationCode);
 
-  const peJobseekerUser: PeConnectUserDto = {
-    isJobseeker: true,
-    firstName: "John",
-    lastName: "Doe",
-    peExternalId: "749dd14f-c82a-48b1-b1bb-fffc5467e4d4",
-    email: "john.doe@gmail.com",
-  };
-
-  const pePlacementAdvisor: SupportedPeConnectAdvisorDto = {
-    email: "jane.smith@pole-emploi.net",
-    lastName: "Smith",
-    firstName: "Jane",
-    type: "PLACEMENT",
-  };
-
-  const peIndemnisationAdvisor: AllPeConnectAdvisorDto = {
-    email: "017jean.dupont@pole-emploi.net",
-    firstName: "Jean",
-    lastName: "Dupont",
-    type: "INDEMNISATION",
-  };
-
-  const peCapemploiAdvisor: SupportedPeConnectAdvisorDto = {
-    email: "elsa.oldenburg@pole-emploi.net",
-    lastName: "Oldenburg",
-    firstName: "Elsa",
-    type: "CAPEMPLOI",
-  };
+    expect(urlWithQueryParams).toBe(
+      `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&federatedIdentity=peConnect:${peJobseekerUser.peExternalId}`,
+    );
+    expectTypeToMatchAndEqual(
+      uow.conventionPoleEmploiAdvisorRepository
+        .conventionPoleEmploiUsersAdvisors,
+      [
+        conventionPoleEmploiUserAdvisorFromDto(
+          {
+            advisor: undefined,
+            user: peJobseekerUser,
+          },
+          CONVENTION_ID_DEFAULT_UUID,
+        ),
+      ],
+    );
+  });
 });
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const mockedUser: PeConnectUserDto = {
+  isJobseeker: true,
+  firstName: "John",
+  lastName: "Doe",
+  peExternalId: "749dd14f-c82a-48b1-b1bb-fffc5467e4d4",
+  email: "john.doe@gmail.com",
+};
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const mockedValidAdvisor: AllPeConnectAdvisorDto = {
+  email: "elsa.oldenburg@pole-emploi.net",
+  firstName: "Elsa",
+  lastName: "Oldenburg",
+  type: "CAPEMPLOI",
+};
+
+const peJobseekerUser: PeConnectUserDto = {
+  isJobseeker: true,
+  firstName: "John",
+  lastName: "Doe",
+  peExternalId: "749dd14f-c82a-48b1-b1bb-fffc5467e4d4",
+  email: "john.doe@gmail.com",
+};
+const peNotJobseekerUser: PeConnectUserDto = {
+  isJobseeker: false,
+  firstName: "John",
+  lastName: "Doe",
+  peExternalId: "749dd14f-c82a-48b1-b1bb-fffc5467e4d4",
+  email: "john.doe@gmail.com",
+};
+
+const pePlacementAdvisor: SupportedPeConnectAdvisorDto = {
+  email: "jane.smith@pole-emploi.net",
+  lastName: "Smith",
+  firstName: "Jane",
+  type: "PLACEMENT",
+};
+
+const peIndemnisationAdvisor: AllPeConnectAdvisorDto = {
+  email: "017jean.dupont@pole-emploi.net",
+  firstName: "Jean",
+  lastName: "Dupont",
+  type: "INDEMNISATION",
+};
+
+const peCapemploiAdvisor: SupportedPeConnectAdvisorDto = {
+  email: "elsa.oldenburg@pole-emploi.net",
+  lastName: "Oldenburg",
+  firstName: "Elsa",
+  type: "CAPEMPLOI",
+};
+
+const accessToken: AccessTokenDto = {
+  expiresIn: 1,
+  value: "",
+};

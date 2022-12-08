@@ -1,5 +1,5 @@
 import { AccessTokenDto } from "../../../domain/peConnect/dto/AccessToken.dto";
-import { SupportedPeConnectAdvisorDto } from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
+import { AllPeConnectAdvisorDto } from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
 import { PeConnectUserDto } from "../../../domain/peConnect/dto/PeConnectUser.dto";
 import {
   ExternalAccessToken,
@@ -9,7 +9,7 @@ import {
 
 export const toPeConnectAdvisorDto = (
   fromApi: ExternalPeConnectAdvisor,
-): SupportedPeConnectAdvisorDto => ({
+): AllPeConnectAdvisorDto => ({
   email: fromApi.mail,
   firstName: fromApi.prenom,
   lastName: fromApi.nom,
@@ -17,12 +17,13 @@ export const toPeConnectAdvisorDto = (
 });
 
 export const toPeConnectUserDto = (
-  fromApi: ExternalPeConnectUser,
+  externalPeConnectUser: ExternalPeConnectUser & { isUserJobseeker: boolean },
 ): PeConnectUserDto => ({
-  email: fromApi.email,
-  firstName: fromApi.given_name,
-  lastName: fromApi.family_name,
-  peExternalId: fromApi.idIdentiteExterne,
+  isJobseeker: externalPeConnectUser.isUserJobseeker,
+  email: externalPeConnectUser.email,
+  firstName: externalPeConnectUser.given_name,
+  lastName: externalPeConnectUser.family_name,
+  peExternalId: externalPeConnectUser.idIdentiteExterne,
 });
 
 export const toAccessToken = (

@@ -67,9 +67,7 @@ const getUseCasesByTopics = (
   ],
 
   // ImmersionApplication Federated Identities
-  PeConnectFederatedIdentityAssociated: [
-    // useCases.notifyPoleEmploiUserAdvisorOnAssociation,
-  ],
+  PeConnectFederatedIdentityAssociated: [],
 
   // Establishment form related
   FormEstablishmentAdded: [

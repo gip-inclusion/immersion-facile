@@ -1,7 +1,7 @@
 import axios from "axios";
 import { HttpClient } from "http-client";
 import { AccessTokenDto } from "../../../domain/peConnect/dto/AccessToken.dto";
-import { SupportedPeConnectAdvisorDto } from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
+import { AllPeConnectAdvisorDto } from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
 import { externalAccessTokenSchema } from "../../../domain/peConnect/port/AccessToken.schema";
 import { PeConnectUserDto } from "../../../domain/peConnect/dto/PeConnectUser.dto";
 import { PeConnectGateway } from "../../../domain/peConnect/port/PeConnectGateway";
@@ -15,7 +15,9 @@ import {
 } from "./NewHttpgateway.mapper";
 import {
   ExternalAccessToken,
+  ExternalPeConnectAdvisor,
   externalPeConnectAdvisorsSchema,
+  ExternalPeConnectUser,
   externalPeConnectUserSchema,
   externalPeConnectUserStatutSchema,
   PeConnectHeaders,
@@ -66,7 +68,7 @@ export class NewHttpPeConnectGateway implements PeConnectGateway {
   // eslint-disable-next-line @typescript-eslint/require-await
   public async getUserAndAdvisors(accessToken: AccessTokenDto): Promise<{
     user: PeConnectUserDto;
-    advisors: SupportedPeConnectAdvisorDto[];
+    advisors: AllPeConnectAdvisorDto[];
   }> {
     const headers: PeConnectHeaders = {
       "Content-Type": "application/json",
@@ -75,37 +77,29 @@ export class NewHttpPeConnectGateway implements PeConnectGateway {
     };
 
     //getUserAndAdvisorsTotalCount.inc();
-
-    const [user, advisors] = await Promise.all([
+    const isUserJobseeker = await this.userIsJobseeker(headers);
+    const [externalPeUser, externalPeConnectAdvisors] = await Promise.all([
       this.getUserInfo(headers),
-      this.advisorsOrEmptyArray(headers),
+      isUserJobseeker ? this.getAdvisorsInfo(headers) : [],
     ]);
 
     //getUserAndAdvisorsSuccessCount.inc();
-
     return {
-      user,
-      advisors,
+      user: toPeConnectUserDto({ ...externalPeUser, isUserJobseeker }),
+      advisors: externalPeConnectAdvisors.map(toPeConnectAdvisorDto),
     };
-  }
-
-  private async advisorsOrEmptyArray(headers: PeConnectHeaders) {
-    return (await this.userIsJobseeker(headers))
-      ? this.getAdvisorsInfo(headers)
-      : [];
   }
 
   private async getUserInfo(
     headers: PeConnectHeaders,
-  ): Promise<PeConnectUserDto> {
+  ): Promise<ExternalPeConnectUser> {
     try {
       const getUserInfoResponse = await this.httpClient.getUserInfo({
         headers,
       });
-      const externalPeConnectUser = externalPeConnectUserSchema.parse(
+      return externalPeConnectUserSchema.parse(
         getUserInfoResponse.responseBody,
       );
-      return toPeConnectUserDto(externalPeConnectUser);
     } catch (error) {
       this.manageError(error, "getUserInfo");
     }
@@ -127,18 +121,19 @@ export class NewHttpPeConnectGateway implements PeConnectGateway {
 
   private async getAdvisorsInfo(
     headers: PeConnectHeaders,
-  ): Promise<SupportedPeConnectAdvisorDto[]> {
-    try {
-      const getAdvisorsResponse = await this.httpClient.getAdvisorsInfo({
+  ): Promise<ExternalPeConnectAdvisor[]> {
+    return this.httpClient
+      .getAdvisorsInfo({
         headers,
+      })
+      .then((response) =>
+        externalPeConnectAdvisorsSchema.parse(response.responseBody),
+      )
+      .catch((error) => {
+        if (axios.isAxiosError(error) && error.response?.status === 500)
+          return Promise.resolve([]);
+        this.manageError(error, "getAdvisorsInfo");
       });
-      const externalPeConnectAdvisors = externalPeConnectAdvisorsSchema.parse(
-        getAdvisorsResponse.responseBody,
-      );
-      return externalPeConnectAdvisors.map(toPeConnectAdvisorDto);
-    } catch (error) {
-      this.manageError(error, "getAdvisorsInfo");
-    }
   }
 
   private manageError(error: unknown, context: PeConnectTargetsKind): never {

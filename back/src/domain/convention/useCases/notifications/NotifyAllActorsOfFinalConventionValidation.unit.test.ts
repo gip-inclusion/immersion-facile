@@ -184,16 +184,18 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
     const userPeExternalId: PeConnectIdentity = `peConnect:i-am-an-external-id`;
     const userConventionAdvisor: ConventionPoleEmploiUserAdvisorEntity = {
       _entityName: "ConventionPoleEmploiAdvisor",
+      advisor: {
+        email: "elsa.oldenburg@pole-emploi.net",
+        firstName: "Elsa",
+        lastName: "Oldenburg",
+        type: "CAPEMPLOI",
+      },
+      peExternalId: userPeExternalId,
       conventionId: validConvention.id,
-      email: "elsa.oldenburg@pole-emploi.net",
-      firstName: "Elsa",
-      lastName: "Oldenburg",
-      userPeExternalId,
-      type: "CAPEMPLOI",
     };
 
     uow.conventionPoleEmploiAdvisorRepository.setConventionPoleEmploiUsersAdvisor(
-      userConventionAdvisor,
+      [userConventionAdvisor],
     );
 
     const agency = new AgencyDtoBuilder(defaultAgency)
@@ -210,7 +212,40 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
         validConvention.signatories.establishmentRepresentative.email,
         counsellorEmail,
         validatorEmail,
-        userConventionAdvisor.email,
+        userConventionAdvisor.advisor!.email,
+      ],
+      emailGw.getSentEmails(),
+      agency,
+      validConvention,
+    );
+  });
+  it("With PeConnect Federated identity: beneficiary, establishment tutor, agency counsellor & validator, and no advisor", async () => {
+    const userPeExternalId: PeConnectIdentity = `peConnect:i-am-an-external-id`;
+    const userConventionAdvisor: ConventionPoleEmploiUserAdvisorEntity = {
+      _entityName: "ConventionPoleEmploiAdvisor",
+      advisor: undefined,
+      peExternalId: userPeExternalId,
+      conventionId: validConvention.id,
+    };
+
+    uow.conventionPoleEmploiAdvisorRepository.setConventionPoleEmploiUsersAdvisor(
+      [userConventionAdvisor],
+    );
+
+    const agency = new AgencyDtoBuilder(defaultAgency)
+      .withCounsellorEmails([counsellorEmail])
+      .build();
+
+    uow.agencyRepository.setAgencies([agency]);
+
+    await notifyAllActorsOfFinalConventionValidation.execute(validConvention);
+
+    expectEmailFinalValidationConfirmationMatchingConvention(
+      [
+        validConvention.signatories.beneficiary.email,
+        validConvention.signatories.establishmentRepresentative.email,
+        counsellorEmail,
+        validatorEmail,
       ],
       emailGw.getSentEmails(),
       agency,

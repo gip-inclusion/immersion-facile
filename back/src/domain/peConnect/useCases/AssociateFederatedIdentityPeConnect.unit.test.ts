@@ -8,12 +8,15 @@ import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../../adapters/secondary/InMemoryConventionPoleEmploiAdvisorRepository";
+import {
+  CONVENTION_ID_DEFAULT_UUID,
+  InMemoryConventionPoleEmploiAdvisorRepository,
+} from "../../../adapters/secondary/InMemoryConventionPoleEmploiAdvisorRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
-import { PoleEmploiUserAdvisorDto } from "../../../domain/peConnect/dto/PeConnect.dto";
 import { conventionPoleEmploiUserAdvisorFromDto } from "../../../domain/peConnect/entities/ConventionPoleEmploiAdvisorEntity";
 import { AssociatePeConnectFederatedIdentity } from "../../../domain/peConnect/useCases/AssociateFederatedIdentityPeConnect";
+import { PeUserAndAdvisor } from "../dto/PeConnect.dto";
 
 describe("AssociatePeConnectFederatedIdentity", () => {
   let associatePeConnectFederatedIdentity: AssociatePeConnectFederatedIdentity;
@@ -36,9 +39,12 @@ describe("AssociatePeConnectFederatedIdentity", () => {
   });
 
   it("should not associate convention and federated identity if the federated identity does not match format", async () => {
-    conventionPoleEmploiAdvisorRepo.setConventionPoleEmploiUsersAdvisor(
-      conventionPoleEmploiUserAdvisorFromDto(userAdvisorDto),
-    );
+    conventionPoleEmploiAdvisorRepo.setConventionPoleEmploiUsersAdvisor([
+      conventionPoleEmploiUserAdvisorFromDto(
+        userAdvisorDto,
+        CONVENTION_ID_DEFAULT_UUID,
+      ),
+    ]);
 
     const conventionDtoFromEvent = new ConventionDtoBuilder()
       .withId(conventionId)
@@ -77,9 +83,12 @@ describe("AssociatePeConnectFederatedIdentity", () => {
   });
 
   it("should associate convention and federated identity if the federated identity match format", async () => {
-    conventionPoleEmploiAdvisorRepo.setConventionPoleEmploiUsersAdvisor(
-      conventionPoleEmploiUserAdvisorFromDto(userAdvisorDto),
-    );
+    conventionPoleEmploiAdvisorRepo.setConventionPoleEmploiUsersAdvisor([
+      conventionPoleEmploiUserAdvisorFromDto(
+        userAdvisorDto,
+        CONVENTION_ID_DEFAULT_UUID,
+      ),
+    ]);
 
     const conventionDtoFromEvent = new ConventionDtoBuilder()
       .withId(conventionId)
@@ -99,9 +108,45 @@ describe("AssociatePeConnectFederatedIdentity", () => {
   });
 
   it("should save event PeConnectFederatedIdentityAssociated", async () => {
-    conventionPoleEmploiAdvisorRepo.setConventionPoleEmploiUsersAdvisor(
-      conventionPoleEmploiUserAdvisorFromDto(userAdvisorDto),
-    );
+    conventionPoleEmploiAdvisorRepo.setConventionPoleEmploiUsersAdvisor([
+      conventionPoleEmploiUserAdvisorFromDto(
+        userAdvisorDto,
+        CONVENTION_ID_DEFAULT_UUID,
+      ),
+    ]);
+
+    const conventionDtoFromEvent = new ConventionDtoBuilder()
+      .withId(conventionId)
+      .withFederatedIdentity(`peConnect:${userPeExternalId}`)
+      .build();
+
+    await associatePeConnectFederatedIdentity.execute(conventionDtoFromEvent);
+
+    expect(
+      conventionPoleEmploiAdvisorRepo.conventionPoleEmploiUsersAdvisors,
+    ).toHaveLength(1);
+
+    // outbox rep
+    expect(outboxRepo.events).toHaveLength(1);
+    expectObjectsToMatch(outboxRepo.events[0], {
+      topic: "PeConnectFederatedIdentityAssociated",
+      payload: {
+        conventionId,
+        peExternalId: userPeExternalId,
+      },
+    });
+  });
+
+  it("without advisor", async () => {
+    conventionPoleEmploiAdvisorRepo.setConventionPoleEmploiUsersAdvisor([
+      conventionPoleEmploiUserAdvisorFromDto(
+        {
+          ...userAdvisorDto,
+          advisor: undefined,
+        },
+        CONVENTION_ID_DEFAULT_UUID,
+      ),
+    ]);
 
     const conventionDtoFromEvent = new ConventionDtoBuilder()
       .withId(conventionId)
@@ -128,10 +173,18 @@ describe("AssociatePeConnectFederatedIdentity", () => {
 
 const conventionId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
 const userPeExternalId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
-const userAdvisorDto: PoleEmploiUserAdvisorDto = {
-  email: "elsa.oldenburg@pole-emploi.net",
-  firstName: "Elsa",
-  lastName: "Oldenburg",
-  userPeExternalId,
-  type: "CAPEMPLOI",
+const userAdvisorDto: PeUserAndAdvisor = {
+  advisor: {
+    email: "elsa.oldenburg@pole-emploi.net",
+    firstName: "Elsa",
+    lastName: "Oldenburg",
+    type: "CAPEMPLOI",
+  },
+  user: {
+    peExternalId: userPeExternalId,
+    email: "",
+    firstName: "",
+    isJobseeker: true,
+    lastName: "",
+  },
 };

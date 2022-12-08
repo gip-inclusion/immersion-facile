@@ -11,9 +11,11 @@ import {
 
 export const conventionPoleEmploiUserAdvisorFromDto = (
   dto: PeUserAndAdvisor,
+  conventionId: string,
 ): ConventionPoleEmploiUserAdvisorEntity => ({
-  ...dto,
-  conventionId: "",
+  advisor: dto.advisor,
+  peExternalId: dto.user.peExternalId,
+  conventionId,
   _entityName: "ConventionPoleEmploiAdvisor",
 });
 

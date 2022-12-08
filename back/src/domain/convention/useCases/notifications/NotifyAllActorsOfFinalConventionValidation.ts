@@ -117,5 +117,8 @@ export const getValidatedConventionFinalConfirmationParams = (
 };
 
 const getPeAdvisorEmailIfExist = (
-  advisor: ConventionPoleEmploiUserAdvisorEntity | undefined,
-): [string] | [] => (advisor?.email ? [advisor.email] : []);
+  conventionPeUserAdvisor: ConventionPoleEmploiUserAdvisorEntity | undefined,
+): [string] | [] =>
+  conventionPeUserAdvisor?.advisor?.email
+    ? [conventionPeUserAdvisor.advisor.email]
+    : [];

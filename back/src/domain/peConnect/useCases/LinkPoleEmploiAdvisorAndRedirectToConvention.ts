@@ -2,16 +2,13 @@ import { AbsoluteUrl, frontRoutes, queryParamsAsString } from "shared";
 import { z } from "zod";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { AccessTokenDto } from "../dto/AccessToken.dto";
 import {
   ConventionPeConnectFields,
-  ConventionPoleEmploiUserAdvisorEntity,
   PeUserAndAdvisor,
   toPartialConventionDtoWithPeIdentity,
 } from "../dto/PeConnect.dto";
-import {
-  chooseValidAdvisor,
-  conventionPoleEmploiUserAdvisorFromDto,
-} from "../entities/ConventionPoleEmploiAdvisorEntity";
+import { chooseValidAdvisor } from "../entities/ConventionPoleEmploiAdvisorEntity";
 import { PeConnectGateway } from "../port/PeConnectGateway";
 
 export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalUseCase<
@@ -35,33 +32,35 @@ export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalU
     const accessToken = await this.peConnectGateway.getAccessToken(
       authorizationCode,
     );
+    return accessToken
+      ? this.onAccessToken(accessToken, uow)
+      : this.makeRedirectUrl({
+          federatedIdentity: "peConnect:AuthFailed",
+        });
+  }
 
-    if (!accessToken) return this.authFailedRedirectUrl();
-
+  private async onAccessToken(accessToken: AccessTokenDto, uow: UnitOfWork) {
     const { user, advisors } = await this.peConnectGateway.getUserAndAdvisors(
       accessToken,
     );
 
-    const fromGateway: PeUserAndAdvisor = {
+    const peUserAndAdvisor: PeUserAndAdvisor = {
       user,
       advisor: user.isJobseeker ? chooseValidAdvisor(advisors) : undefined,
     };
 
-    const poleEmploiUserAdvisorEntity: ConventionPoleEmploiUserAdvisorEntity =
-      conventionPoleEmploiUserAdvisorFromDto(fromGateway);
-
     await uow.conventionPoleEmploiAdvisorRepository.openSlotForNextConvention(
-      poleEmploiUserAdvisorEntity,
+      peUserAndAdvisor,
     );
 
-    const peQueryParams = queryParamsAsString<ConventionPeConnectFields>(
-      toPartialConventionDtoWithPeIdentity(user),
-    );
-
-    return `${this.baseUrlForRedirect}/${frontRoutes.conventionImmersionRoute}?${peQueryParams}`;
+    return this.makeRedirectUrl(toPartialConventionDtoWithPeIdentity(user));
   }
 
-  private authFailedRedirectUrl(): AbsoluteUrl {
-    return `${this.baseUrlForRedirect}/${frontRoutes.conventionImmersionRoute}?federatedIdentity=peConnect:AuthFailed`;
+  private makeRedirectUrl(
+    fields: Partial<ConventionPeConnectFields>,
+  ): AbsoluteUrl {
+    return `${this.baseUrlForRedirect}/${
+      frontRoutes.conventionImmersionRoute
+    }?${queryParamsAsString<Partial<ConventionPeConnectFields>>(fields)}`;
   }
 }

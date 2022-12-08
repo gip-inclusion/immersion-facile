@@ -60,7 +60,6 @@ import { SearchImmersion } from "../../../domain/immersionOffer/useCases/SearchI
 import { UpdateEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentAggregateFromFormEstablishement";
 import { AssociatePeConnectFederatedIdentity } from "../../../domain/peConnect/useCases/AssociateFederatedIdentityPeConnect";
 import { LinkPoleEmploiAdvisorAndRedirectToConvention } from "../../../domain/peConnect/useCases/LinkPoleEmploiAdvisorAndRedirectToConvention";
-import { NotifyPoleEmploiUserAdvisorOnConventionAssociation } from "../../../domain/peConnect/useCases/NotifyPoleEmploiUserAdvisorOnConventionAssociation";
 import { NotifyPoleEmploiUserAdvisorOnConventionFullySigned } from "../../../domain/peConnect/useCases/NotifyPoleEmploiUserAdvisorOnConventionFullySigned";
 import { AppellationSearch } from "../../../domain/rome/useCases/AppellationSearch";
 import { RomeSearch } from "../../../domain/rome/useCases/RomeSearch";
@@ -272,12 +271,6 @@ export const createUseCases = (
         uowPerformer,
         gateways.email,
       ),
-      notifyPoleEmploiUserAdvisorOnAssociation:
-        new NotifyPoleEmploiUserAdvisorOnConventionAssociation(
-          uowPerformer,
-          gateways.email,
-          generateMagicLinkFn,
-        ),
       notifyPoleEmploiUserAdvisorOnConventionFullySigned:
         new NotifyPoleEmploiUserAdvisorOnConventionFullySigned(
           uowPerformer,

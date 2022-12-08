@@ -55,7 +55,8 @@ describe("HttpPeConnectGateway", () => {
     nom: "prost",
     prenom: "alain",
   };
-  const peConnectUser = toPeConnectUserDto(peExternalUser);
+  const peConnectUser = (isUserJobseeker: boolean) =>
+    toPeConnectUserDto({ ...peExternalUser, isUserJobseeker });
   const peConnectAdvisorPlacement = toPeConnectAdvisorDto(
     peExternalAdvisorPlacement,
   );
@@ -125,7 +126,7 @@ describe("HttpPeConnectGateway", () => {
           });
         expectObjectsToMatch(await adapter.getUserAndAdvisors(accessToken), {
           advisors: [peConnectAdvisorPlacement],
-          user: peConnectUser,
+          user: peConnectUser(true),
         });
       });
       it(`OK with ${peExternalUser.email} user and ${peExternalAdvisorCapemploi.mail} advisor`, async () => {
@@ -142,12 +143,28 @@ describe("HttpPeConnectGateway", () => {
 
         expectObjectsToMatch(await adapter.getUserAndAdvisors(accessToken), {
           advisors: [peConnectAdvisorCapEmploi],
-          user: peConnectUser,
+          user: peConnectUser(true),
+        });
+      });
+      it(`OK with user not jobseeker -> no advisors`, async () => {
+        mock
+          .onGet(peConnectTargets(appConfig).getUserInfo.url)
+          .reply(200, peExternalUser)
+          .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
+          .reply(200, {
+            codeStatutIndividu: "0",
+            libelleStatutIndividu: "Non demandeur d'emploi",
+          });
+
+        expectObjectsToMatch(await adapter.getUserAndAdvisors(accessToken), {
+          advisors: [],
+          user: peConnectUser(false),
         });
       });
     });
     describe("Wrong path", () => {
       describe("Errors on getUserInfo", () => {
+        // eslint-disable-next-line jest/no-disabled-tests
         it.skip(`Timeout on getUserInfo -> Retry`, async () => {
           mock
             .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
@@ -158,29 +175,13 @@ describe("HttpPeConnectGateway", () => {
             .reply(200, peExternalUser);
           expectObjectsToMatch(await adapter.getUserAndAdvisors(accessToken), {
             advisors: [peConnectAdvisorCapEmploi],
-            user: peConnectUser,
+            user: peConnectUser(true),
           });
         });
 
+        // eslint-disable-next-line jest/no-disabled-tests
         it.skip("Should manage Zod Error", () => {
           expect(true).toBe(false);
-        });
-
-        it(`No advisors -> OK with no advisors on DTO`, async () => {
-          mock
-            .onGet(peConnectTargets(appConfig).getUserInfo.url)
-            .reply(200, peExternalUser)
-            .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
-            .reply(200, {
-              codeStatutIndividu: "0",
-              libelleStatutIndividu: "Non demandeur d'emploi",
-            })
-            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
-            .reply(500);
-          expectObjectsToMatch(await adapter.getUserAndAdvisors(accessToken), {
-            advisors: [],
-            user: peConnectUser,
-          });
         });
 
         it(`Connection aborted -> ManagedRedirectError kind peConnectConnectionAborted`, async () => {
@@ -242,6 +243,7 @@ describe("HttpPeConnectGateway", () => {
       });
 
       describe("Errors on getAdvisorsInfo", () => {
+        // eslint-disable-next-line jest/no-disabled-tests
         it.skip(`Timeout on getUserInfo -> Retry`, async () => {
           mock
             .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
@@ -252,10 +254,11 @@ describe("HttpPeConnectGateway", () => {
             .reply(200, peExternalUser);
           expectObjectsToMatch(await adapter.getUserAndAdvisors(accessToken), {
             advisors: [peConnectAdvisorCapEmploi],
-            user: peConnectUser,
+            user: peConnectUser(true),
           });
         });
 
+        // eslint-disable-next-line jest/no-disabled-tests
         it.skip("Should manage Zod Error", () => {
           expect(true).toBe(false);
         });
@@ -315,24 +318,23 @@ describe("HttpPeConnectGateway", () => {
             ),
           );
         });
-        it(`Error 500 -> RawRedirectError`, async () => {
+        it(`Error 500 -> OK with no advisors`, async () => {
           mock
-            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
-            .reply(500)
             .onGet(peConnectTargets(appConfig).getUserInfo.url)
             .reply(200, peExternalUser)
             .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
             .reply(200, {
               codeStatutIndividu: "1",
               libelleStatutIndividu: "Demandeur d'emploi",
-            });
-          await testRawRedirectError(
-            () => adapter.getUserAndAdvisors(accessToken),
-            new RawRedirectError(
-              "Une erreur est survenue - 500",
-              "Nous n'avons pas réussi à récupérer vos conseillers référents.",
-              new Error(),
-            ),
+            })
+            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+            .reply(500);
+          await expectObjectsToMatch(
+            await adapter.getUserAndAdvisors(accessToken),
+            {
+              advisors: [],
+              user: peConnectUser(true),
+            },
           );
         });
       });

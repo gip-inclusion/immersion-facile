@@ -199,7 +199,7 @@ const createPoleEmploiConnectGateway = (config: AppConfig) =>
         ),
         config,
       )
-    : new InMemoryPeConnectGateway(config.immersionFacileBaseUrl);
+    : new InMemoryPeConnectGateway();
 
 const createAddressGateway = (config: AppConfig) =>
   ({
