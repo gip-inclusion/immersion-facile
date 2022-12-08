@@ -2,13 +2,15 @@
   "name": "cypress",
   "version": "0.0.0",
   "scripts": {
-    "open": "CYPRESS_BASE_URL=http://localhost:3000 CYPRESS_ADMIN_USER=admin CYPRESS_ADMIN_PASSWORD=admin cypress open"
+    "open": "CYPRESS_BASE_URL=http://localhost:3000 CYPRESS_ADMIN_USER=admin CYPRESS_ADMIN_PASSWORD=admin node_modules/.bin/cypress open"
   },
   "devDependencies": {
-    "cypress": "10.9.0",
+    "axe-core": "^4.5.2",
+    "cypress": "10",
+    "cypress-axe": "^1.1.0",
     "cypress-html-validate": "^5.0.5",
     "html-validate": "^7.5.0",
-    "typescript": "^4.6.2",
-    "shared": "workspace:*"
+    "shared": "workspace:*",
+    "typescript": "^4.6.2"
   }
 }

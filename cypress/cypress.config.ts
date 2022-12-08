@@ -11,6 +11,13 @@ export default defineConfig({
     specPattern: "e2e/**/*.cy.{js,jsx,ts,tsx}",
     setupNodeEvents(on) {
       htmlvalidate.install(on, htmlValidateConfig);
+      on("task", {
+        log(message) {
+          console.log(message);
+
+          return null;
+        },
+      });
     },
   },
 });

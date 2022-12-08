@@ -2,10 +2,10 @@
   "compilerOptions": {
     "target": "es5",
     "lib": ["es5", "dom", "ES2015"],
-    "types": ["cypress", "node"],
+    "types": ["cypress", "node", "cypress-axe"],
     "paths": {
       "shared": ["../shared"]
     }
   },
-  "include": ["**/*.ts"],
+  "include": ["**/*.ts"]
 }
