@@ -174,36 +174,36 @@ describe("PgAgencyRepository", () => {
       });
       expect(sortById(agencies)).toEqual([agency2MissionLocale, agency1PE]);
     });
-    it("if agencyKindFilter = 'peOnly', returns only pe agencies", async () => {
+    it("if agencyKindFilter = 'immersionPeOnly', returns only pe agencies", async () => {
       await Promise.all([
         agencyRepository.insert(agency1PE),
         agencyRepository.insert(agency2MissionLocale),
       ]);
 
       const agencies = await agencyRepository.getAgencies({
-        filters: { kind: "peOnly" },
+        filters: { kind: "immersionPeOnly" },
       });
       expect(sortById(agencies)).toEqual([agency1PE]);
     });
-    it("if agencyKindFilter = 'cciOnly', returns only cci agencies", async () => {
+    it("if agencyKindFilter = 'miniStageOnly', returns only cci agencies", async () => {
       await Promise.all([
         agencyRepository.insert(agencyCciInParis),
         agencyRepository.insert(agency1PE),
       ]);
 
       const agencies = await agencyRepository.getAgencies({
-        filters: { kind: "cciOnly" },
+        filters: { kind: "miniStageOnly" },
       });
       expect(sortById(agencies)).toEqual([agencyCciInParis]);
     });
-    it("if agencyKindFilter = 'cciExcluded', returns agencies that are not kind cci", async () => {
+    it("if agencyKindFilter = 'miniStageExcluded', returns agencies that are not kind cci", async () => {
       await Promise.all([
         agencyRepository.insert(agencyCciInParis),
         agencyRepository.insert(agency1PE),
       ]);
 
       const agencies = await agencyRepository.getAgencies({
-        filters: { kind: "cciExcluded" },
+        filters: { kind: "miniStageExcluded" },
       });
       expect(sortById(agencies)).toEqual([agency1PE]);
     });
@@ -324,7 +324,7 @@ describe("PgAgencyRepository", () => {
       expect(agencies).toEqual([nancyAgency, epinalAgency]);
     });
 
-    it("if agencyKindFilter is 'peOnly', it returns only agencies of pe kind", async () => {
+    it("if agencyKindFilter is 'immersionPeOnly', it returns only agencies of pe kind", async () => {
       const peNancyAgency = agency1builder
         .withName("Nancy PE agency")
         .withKind("pole-emploi")
@@ -351,14 +351,14 @@ describe("PgAgencyRepository", () => {
             position: placeStanislasPosition,
             distance_km: 100,
           },
-          kind: "peOnly",
+          kind: "immersionPeOnly",
         },
       });
 
       // Assert
       expect(agencies).toEqual([peNancyAgency]);
     });
-    it("if agencyKindFilter is 'peExcluded', it returns all agencies except those from PE", async () => {
+    it("if agencyKindFilter is 'immersionWithoutPe', it returns all agencies except those from PE", async () => {
       const peNancyAgency = agency1builder
         .withName("Nancy PE agency")
         .withKind("pole-emploi")
@@ -373,9 +373,18 @@ describe("PgAgencyRepository", () => {
         .withStatus("active")
         .build();
 
+      const cciAgency = agency1builder
+        .withId("33333333-3333-3333-3333-333333333333")
+        .withName("Nancy CAP EMPLOI agency")
+        .withKind("cci")
+        .withPosition(placeStanislasPosition.lat, placeStanislasPosition.lon)
+        .withStatus("active")
+        .build();
+
       await Promise.all([
         agencyRepository.insert(peNancyAgency),
         agencyRepository.insert(capEmploiNancyAgency),
+        agencyRepository.insert(cciAgency),
       ]);
 
       // Act
@@ -385,7 +394,7 @@ describe("PgAgencyRepository", () => {
             position: placeStanislasPosition,
             distance_km: 100,
           },
-          kind: "peExcluded",
+          kind: "immersionWithoutPe",
         },
       });
 

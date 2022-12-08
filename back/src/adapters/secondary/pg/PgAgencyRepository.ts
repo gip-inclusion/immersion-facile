@@ -43,10 +43,11 @@ type AgencyPgRow = Record<AgencyColumns, any>;
 const makeAgencyKindFiterSQL = (
   agencyKindFilter?: AgencyKindFilter,
 ): string | undefined => {
-  if (agencyKindFilter === "peOnly") return "kind = 'pole-emploi'";
-  if (agencyKindFilter === "peExcluded") return "kind != 'pole-emploi'";
-  if (agencyKindFilter === "cciOnly") return "kind = 'cci'";
-  if (agencyKindFilter === "cciExcluded") return "kind != 'cci'";
+  if (agencyKindFilter === "immersionPeOnly") return "kind = 'pole-emploi'";
+  if (agencyKindFilter === "immersionWithoutPe")
+    return "kind != 'pole-emploi' AND kind != 'cci'";
+  if (agencyKindFilter === "miniStageOnly") return "kind = 'cci'";
+  if (agencyKindFilter === "miniStageExcluded") return "kind != 'cci'";
 };
 
 const makeNameFilterSQL = (name?: string): string | undefined => {

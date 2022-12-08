@@ -64,10 +64,10 @@ export type AgencyKind =
 export const activeAgencyStatuses: AgencyStatus[] = ["active", "from-api-PE"];
 
 export type AgencyKindFilter =
-  | "peOnly"
-  | "peExcluded"
-  | "cciOnly"
-  | "cciExcluded";
+  | "immersionPeOnly"
+  | "immersionWithoutPe"
+  | "miniStageOnly"
+  | "miniStageExcluded";
 
 export type AgencyPositionFilter = {
   position: GeoPositionDto;

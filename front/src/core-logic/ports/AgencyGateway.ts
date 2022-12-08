@@ -13,13 +13,19 @@ import {
 
 export interface AgencyGateway {
   addAgency(agency: CreateAgencyDto): Promise<void>;
-  listAgenciesByDepartmentCodeWithoutCci(
+  listImmersionAgencies(
     departmentCode: DepartmentCode,
   ): Promise<AgencyOption[]>;
 
-  listCciAgencies(departmentCode: DepartmentCode): Promise<AgencyOption[]>;
-  listNonPeAgencies(departmentCode: DepartmentCode): Promise<AgencyOption[]>;
-  listPeAgencies(departmentCode: DepartmentCode): Promise<AgencyOption[]>;
+  listMiniStageAgencies(
+    departmentCode: DepartmentCode,
+  ): Promise<AgencyOption[]>;
+  listImmersionWithoutPeAgencies(
+    departmentCode: DepartmentCode,
+  ): Promise<AgencyOption[]>;
+  listImmersionOnlyPeAgencies(
+    departmentCode: DepartmentCode,
+  ): Promise<AgencyOption[]>;
   listAgenciesNeedingReview(adminToken: AdminToken): Promise<AgencyDto[]>;
   validateAgency(adminToken: AdminToken, agencyId: AgencyId): Promise<void>;
 

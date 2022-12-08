@@ -72,29 +72,27 @@ describe("Query: List agencies by filter", () => {
   });
 
   describe("With Agency kind filter", () => {
-    it("List CCI only agencies", async () => {
+    it("List miniStageOnly agencies", async () => {
       expectTypeToMatchAndEqual(
-        await useCase.execute({ kind: "cciOnly" }, undefined),
+        await useCase.execute({ kind: "miniStageOnly" }, undefined),
         [cciAgency1InCergy, cciAgency2InParis].map(toAgencyOption),
       );
     });
-    it("List peExcluded agencies", async () => {
+    it("List immersionWithoutPe agencies", async () => {
       expectTypeToMatchAndEqual(
-        await useCase.execute({ kind: "peExcluded" }, undefined),
-        [otherAgencyInParis, cciAgency1InCergy, cciAgency2InParis].map(
-          toAgencyOption,
-        ),
+        await useCase.execute({ kind: "immersionWithoutPe" }, undefined),
+        [otherAgencyInParis].map(toAgencyOption),
       );
     });
-    it("List peOnly agencies", async () => {
+    it("List immersionPeOnly agencies", async () => {
       expectTypeToMatchAndEqual(
-        await useCase.execute({ kind: "peOnly" }, undefined),
+        await useCase.execute({ kind: "immersionPeOnly" }, undefined),
         [peAgency1InParis, peAgency2InParis].map(toAgencyOption),
       );
     });
-    it("List cciExcluded agencies", async () => {
+    it("List miniStageExcluded agencies", async () => {
       expectTypeToMatchAndEqual(
-        await useCase.execute({ kind: "cciExcluded" }, undefined),
+        await useCase.execute({ kind: "miniStageExcluded" }, undefined),
         [otherAgencyInParis, peAgency1InParis, peAgency2InParis].map(
           toAgencyOption,
         ),

@@ -95,25 +95,27 @@ export class InMemoryAgencyGateway implements AgencyGateway {
     };
   }
 
-  async listAgenciesByDepartmentCodeWithoutCci(
+  async listImmersionAgencies(
     _departmentCode: DepartmentCode,
   ): Promise<AgencyOption[]> {
     return values(this._agencies).filter(propNotEq("kind", "cci"));
   }
 
-  async listPeAgencies(
+  async listImmersionOnlyPeAgencies(
     _departmentCode: DepartmentCode,
   ): Promise<AgencyOption[]> {
     return values(this._agencies).filter(propEq("kind", "pole-emploi"));
   }
 
-  async listNonPeAgencies(
+  async listImmersionWithoutPeAgencies(
     _departmentCode: DepartmentCode,
   ): Promise<AgencyOption[]> {
-    return values(this._agencies).filter(propNotEq("kind", "pole-emploi"));
+    return values(this._agencies)
+      .filter(propNotEq("kind", "cci"))
+      .filter(propNotEq("kind", "pole-emploi"));
   }
 
-  async listCciAgencies(
+  async listMiniStageAgencies(
     _departmentCode: DepartmentCode,
   ): Promise<AgencyOption[]> {
     return values(this._agencies).filter(propNotEq("kind", "cci"));

@@ -2,18 +2,18 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { FederatedIdentity } from "shared";
 
 interface AuthState {
-  connectedWith: FederatedIdentity | null;
+  federatedIdentity: FederatedIdentity | null;
 }
 
 const initialState: AuthState = {
-  connectedWith: null,
+  federatedIdentity: null,
 };
 
 const onFederatedIdentityReceived = (
   state: AuthState,
   action: PayloadAction<FederatedIdentity>,
 ) => {
-  state.connectedWith = action.payload;
+  state.federatedIdentity = action.payload;
 };
 
 export const authSlice = createSlice({

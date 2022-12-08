@@ -148,46 +148,48 @@ export class HttpAgencyGateway implements AgencyGateway {
       );
   }
 
-  public listAgenciesByDepartmentCodeWithoutCci(
-    departmentCode: DepartmentCode,
-  ): Promise<AgencyOption[]> {
-    const request: ListAgenciesRequestDto = {
-      departmentCode,
-      kind: "cciExcluded",
-    };
-    return this.getFilteredAgencies(request);
-  }
-
   public listAgenciesByFilter$(
     filter: ListAgenciesRequestDto,
   ): Observable<AgencyOption[]> {
     return from(this.getFilteredAgencies(filter));
   }
 
-  public listPeAgencies(
+  public listImmersionAgencies(
     departmentCode: DepartmentCode,
   ): Promise<AgencyOption[]> {
     const request: ListAgenciesRequestDto = {
       departmentCode,
-      kind: "peOnly",
+      kind: "miniStageExcluded",
     };
     return this.getFilteredAgencies(request);
   }
 
-  public listNonPeAgencies(
+  public listImmersionOnlyPeAgencies(
     departmentCode: DepartmentCode,
   ): Promise<AgencyOption[]> {
     const request: ListAgenciesRequestDto = {
       departmentCode,
-      kind: "peExcluded",
+      kind: "immersionPeOnly",
     };
     return this.getFilteredAgencies(request);
   }
 
-  listCciAgencies(departmentCode: DepartmentCode): Promise<AgencyOption[]> {
+  public listImmersionWithoutPeAgencies(
+    departmentCode: DepartmentCode,
+  ): Promise<AgencyOption[]> {
     const request: ListAgenciesRequestDto = {
       departmentCode,
-      kind: "cciOnly",
+      kind: "immersionWithoutPe",
+    };
+    return this.getFilteredAgencies(request);
+  }
+
+  listMiniStageAgencies(
+    departmentCode: DepartmentCode,
+  ): Promise<AgencyOption[]> {
+    const request: ListAgenciesRequestDto = {
+      departmentCode,
+      kind: "miniStageOnly",
     };
     return this.getFilteredAgencies(request);
   }

@@ -1,11 +1,7 @@
 import { z } from "zod";
-import {
-  FederatedIdentity,
-  NoIdentityProvider,
-  PeConnectIdentity,
-} from "./federatedIdentity.dto";
-
-const noIdentityProvider: NoIdentityProvider = "noIdentityProvider";
+import { FederatedIdentity } from "./federatedIdentity.dto";
+import { noIdentityProvider } from "./noIdentityProvider.dto";
+import { PeConnectIdentity } from "./peConnectIdentity.dto";
 
 export const federatedIdentitySchema: z.Schema<FederatedIdentity> = z
   .enum([noIdentityProvider])

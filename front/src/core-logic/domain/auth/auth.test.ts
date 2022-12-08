@@ -25,7 +25,7 @@ describe("Auth slice", () => {
     const identity: FederatedIdentity = "peConnect:123";
     ({ store, dependencies } = createTestStore({
       auth: {
-        connectedWith: identity,
+        federatedIdentity: identity,
       },
     }));
     store.dispatch(
@@ -64,7 +64,7 @@ describe("Auth slice", () => {
   const expectFederatedIdentityToEqual = (
     expected: FederatedIdentity | null,
   ) => {
-    expectToEqual(authSelectors.connectedWith(store.getState()), expected);
+    expectToEqual(authSelectors.federatedIdentity(store.getState()), expected);
   };
 
   const expectFederatedIdentityInDevice = (

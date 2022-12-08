@@ -1,18 +1,18 @@
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
-import type { ConventionDto } from "shared";
-import { InternshipKind } from "shared";
 import {
   AgencyId,
   AgencyOption,
+  ConventionDto,
   DepartmentCode,
   FederatedIdentity,
+  InternshipKind,
   isPeConnectIdentity,
 } from "shared";
-import { agencyGateway } from "src/config/dependencies";
-import { useConventionTextsFromFormikContext } from "src/app/contents/convention/textSetup";
-import { useConnectedWith } from "src/app/hooks/connectedWith";
 import { PostcodeAutocomplete } from "src/app/components/forms/commons/PostcodeAutocomplete";
+import { useConventionTextsFromFormikContext } from "src/app/contents/convention/textSetup";
+import { useFederatedIdentity } from "src/app/hooks/federatedIdentity";
+import { agencyGateway } from "src/config/dependencies";
 import { AgencyDropdownListField } from "./AgencyDropdownListField";
 import { AgencyErrorText } from "./AgencyErrorText";
 
@@ -46,7 +46,7 @@ export const AgencySelector = ({
       name: "Veuillez indiquer un code postal",
     },
   ]);
-  const connectedWith = useConnectedWith();
+  const federatedIdentity = useFederatedIdentity();
 
   useEffect(() => {
     if (!departmentCode) return;
@@ -56,7 +56,7 @@ export const AgencySelector = ({
       internshipKind,
       shouldListAll,
       departmentCode,
-      connectedWith,
+      federatedIdentity,
     })
       .then((agencies: any) => {
         setAgencies([
@@ -134,20 +134,17 @@ const agenciesRetriever = ({
   internshipKind,
   departmentCode,
   shouldListAll,
-  connectedWith,
+  federatedIdentity,
 }: {
   internshipKind: InternshipKind;
   departmentCode: DepartmentCode;
   shouldListAll: boolean;
-  connectedWith: FederatedIdentity | null;
+  federatedIdentity: FederatedIdentity | null;
 }): Promise<AgencyOption[]> => {
   if (internshipKind === "mini-stage-cci")
-    return agencyGateway.listCciAgencies(departmentCode);
-  if (shouldListAll)
-    return agencyGateway.listAgenciesByDepartmentCodeWithoutCci(departmentCode);
-  return connectedWith && isPeConnectIdentity(connectedWith)
-    ? agencyGateway.listPeAgencies(departmentCode)
-    : agencyGateway.listAgenciesByDepartmentCodeWithoutCci(departmentCode);
-  // : agencyGateway.listNonPeAgencies(position);
-  // -> for easy revert when new page is ready
+    return agencyGateway.listMiniStageAgencies(departmentCode);
+  if (shouldListAll) return agencyGateway.listImmersionAgencies(departmentCode);
+  return federatedIdentity && isPeConnectIdentity(federatedIdentity)
+    ? agencyGateway.listImmersionOnlyPeAgencies(departmentCode)
+    : agencyGateway.listImmersionWithoutPeAgencies(departmentCode);
 };

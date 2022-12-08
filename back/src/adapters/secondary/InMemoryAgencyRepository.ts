@@ -185,7 +185,7 @@ export class InMemoryAgencyRepository implements AgencyRepository {
   }
 }
 
-const isAgencyPE = (agency: AgencyDto) => agency.kind === "pole-emploi";
+const isImmersionPeOnly = (agency: AgencyDto) => agency.kind === "pole-emploi";
 const isAgencyCci = (agency: AgencyDto) => agency.kind === "cci";
 
 const sortByNearestFrom =
@@ -208,10 +208,11 @@ const agencyIsOfKind = (
   agency: AgencyDto,
   agencyKindFilter?: AgencyKindFilter,
 ): boolean => {
-  if (agencyKindFilter === "peOnly") return isAgencyPE(agency);
-  if (agencyKindFilter === "peExcluded") return !isAgencyPE(agency);
-  if (agencyKindFilter === "cciOnly") return isAgencyCci(agency);
-  if (agencyKindFilter === "cciExcluded") return !isAgencyCci(agency);
+  if (agencyKindFilter === "immersionPeOnly") return isImmersionPeOnly(agency);
+  if (agencyKindFilter === "immersionWithoutPe")
+    return !isAgencyCci(agency) && !isImmersionPeOnly(agency);
+  if (agencyKindFilter === "miniStageOnly") return isAgencyCci(agency);
+  if (agencyKindFilter === "miniStageExcluded") return !isAgencyCci(agency);
   return true;
 };
 

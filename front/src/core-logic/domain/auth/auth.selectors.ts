@@ -1,7 +1,9 @@
 import { createRootSelector } from "src/core-logic/storeConfig/store";
 
-const connectedWith = createRootSelector((state) => state.auth.connectedWith);
+const federatedIdentity = createRootSelector(
+  (state) => state.auth.federatedIdentity,
+);
 
 export const authSelectors = {
-  connectedWith,
+  federatedIdentity,
 };

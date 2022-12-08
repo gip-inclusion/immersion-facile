@@ -20,10 +20,10 @@ const storeFederatedIdentityInDevice: AuthEpic = (
         .match,
     ),
     tap(() => {
-      if (state$.value.auth.connectedWith)
+      if (state$.value.auth.federatedIdentity)
         deviceRepository.set(
           "federatedIdentity",
-          state$.value.auth.connectedWith,
+          state$.value.auth.federatedIdentity,
         );
     }),
     map(() =>

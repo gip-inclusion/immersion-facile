@@ -35,7 +35,7 @@ export const ConventionImmersionPage = ({
 
 const PageContent = ({ route }: ConventionImmersionPageProps) => {
   const { enablePeConnectApi, isLoading } = useFeatureFlags();
-  const connectedWith = useAppSelector(authSelectors.connectedWith);
+  const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
 
   useFederatedIdentity(route);
   useFederatedIdentityOnReload();
@@ -53,7 +53,7 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
       />
     );
 
-  if (enablePeConnectApi && !connectedWith)
+  if (enablePeConnectApi && !federatedIdentity)
     return (
       <div className="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
         <InitiateConventionCard
