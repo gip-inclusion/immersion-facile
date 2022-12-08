@@ -81,7 +81,6 @@ const EditAgencyForm = () => {
       >
         {({ isSubmitting, setFieldValue, values, errors, submitCount }) => {
           const typedSetField = makeTypedSetField<AgencyDto>(setFieldValue);
-
           return (
             <Form className="m-5 max-w-6xl">
               <div>

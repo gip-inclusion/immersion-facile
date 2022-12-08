@@ -33,10 +33,12 @@ export const AgencyFormCommonFields = ({
 }: AgencyFormCommonFieldsProps) => {
   const { values, setFieldValue } = useFormikContext<CreateAgencyDto>();
   const typedSetField = makeTypedSetField<CreateAgencyDto>(setFieldValue);
-
+  const defaultValidationStepsValue = values.counsellorEmails.length
+    ? "twoSteps"
+    : "oneStep";
   const [validationSteps, setValidationSteps] = useState<
     "oneStep" | "twoSteps"
-  >("oneStep");
+  >(defaultValidationStepsValue);
 
   return (
     <>
