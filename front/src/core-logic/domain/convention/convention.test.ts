@@ -1,4 +1,5 @@
 import {
+  AbsoluteUrl,
   Beneficiary,
   ConventionDto,
   ConventionDtoBuilder,
@@ -57,6 +58,7 @@ describe("Convention slice", () => {
           },
           jwt: "some-correct-jwt",
           convention: null,
+          conventionStatusDashboardUrl: null,
           isLoading: false,
           fetchError: null,
           feedback: { kind: "idle" },
@@ -165,6 +167,7 @@ describe("Convention slice", () => {
           feedback: { kind: "justSubmitted" },
           isLoading: false,
           convention: null,
+          conventionStatusDashboardUrl: null,
           fetchError: null,
           jwt: null,
           currentSignatoryRole: null,
@@ -259,6 +262,7 @@ describe("Convention slice", () => {
           isLoading: false,
           feedback: { kind: "idle" },
           convention,
+          conventionStatusDashboardUrl: null,
           currentSignatoryRole: null,
         },
       }));
@@ -295,6 +299,7 @@ describe("Convention slice", () => {
           isLoading: false,
           feedback: { kind: "idle" },
           convention,
+          conventionStatusDashboardUrl: null,
           currentSignatoryRole: "beneficiary",
         },
       }));
@@ -351,6 +356,7 @@ describe("Convention slice", () => {
           },
           jwt: null,
           convention: conventionNotSigned,
+          conventionStatusDashboardUrl: null,
           feedback: { kind: "modificationsAskedFromSignatory" },
           isLoading: false,
           fetchError: null,
@@ -443,13 +449,30 @@ describe("Convention slice", () => {
     });
   });
 
-  it("gets the dashboard for convention status check", () => {
+  it("gets the dashboard Url for convention status check", () => {
     const jwt = "some-correct-jwt";
     store.dispatch(
       conventionSlice.actions.conventionStatusDashboardRequested(jwt),
     );
     expectConventionState({ isLoading: true });
-    feedConventionGatewayWithDashboardUrl();
+    const dashboardUrl: AbsoluteUrl = "https://my-dashboard.com/123";
+    feedGatewayWithConventionStatusDashboardUrl(dashboardUrl);
+    expectConventionState({ conventionStatusDashboardUrl: dashboardUrl });
+  });
+
+  it("stores the error when something goes wrong when fetching the dashboard Url for convention status check", () => {
+    const jwt = "some-correct-jwt";
+    store.dispatch(
+      conventionSlice.actions.conventionStatusDashboardRequested(jwt),
+    );
+    expectConventionState({ isLoading: true });
+    feedGatewayWithConventionStatusDashboardUrlError(new Error("Oops !"));
+    expectConventionState({
+      feedback: {
+        kind: "errored",
+        errorMessage: "Oops !",
+      },
+    });
   });
 
   it("stores the current signatory role", () => {
@@ -471,6 +494,7 @@ describe("Convention slice", () => {
         },
         jwt: null,
         convention: null,
+        conventionStatusDashboardUrl: null,
         feedback: { kind: "modificationsAskedFromSignatory" },
         isLoading: false,
         fetchError: null,
@@ -517,6 +541,7 @@ describe("Convention slice", () => {
         },
         jwt: null,
         convention,
+        conventionStatusDashboardUrl: null,
         feedback: { kind: "modificationsAskedFromSignatory" },
         isLoading: false,
         fetchError: null,
@@ -542,6 +567,14 @@ describe("Convention slice", () => {
 
   const feedGatewayWithUpdateConventionSuccess = () => {
     dependencies.conventionGateway.updateConventionResult$.next(undefined);
+  };
+
+  const feedGatewayWithConventionStatusDashboardUrl = (url: AbsoluteUrl) => {
+    dependencies.conventionGateway.conventionDashboardUrl$.next(url);
+  };
+
+  const feedGatewayWithConventionStatusDashboardUrlError = (error: Error) => {
+    dependencies.conventionGateway.conventionDashboardUrl$.error(error);
   };
 
   // const feedGatewayWithUpdateConventionError = (error: Error) => {

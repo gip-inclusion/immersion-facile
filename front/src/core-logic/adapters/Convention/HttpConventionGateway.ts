@@ -2,6 +2,8 @@ import { AxiosInstance } from "axios";
 import { from, Observable } from "rxjs";
 import { fromPromise } from "rxjs/internal/observable/innerFrom";
 import {
+  AbsoluteUrl,
+  absoluteUrlSchema,
   AdminToken,
   ConventionDto,
   ConventionId,
@@ -10,6 +12,7 @@ import {
   conventionShareRoute,
   conventionsRoute,
   generateMagicLinkRoute,
+  getConventionStatusDashboard,
   jwtSchema,
   renewMagicLinkRoute,
   Role,
@@ -24,6 +27,16 @@ import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 
 export class HttpConventionGateway implements ConventionGateway {
   constructor(private readonly httpClient: AxiosInstance) {}
+
+  getConventionStatusDashboardUrl$(jwt: string): Observable<AbsoluteUrl> {
+    return from(
+      this.httpClient
+        .get<unknown>(`/${getConventionStatusDashboard}`, {
+          headers: { authorization: jwt },
+        })
+        .then(({ data }) => absoluteUrlSchema.parse(data)),
+    );
+  }
 
   retrieveFromToken$(
     payload: string,

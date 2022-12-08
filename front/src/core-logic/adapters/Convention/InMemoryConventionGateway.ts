@@ -1,5 +1,6 @@
 import { from, Observable, Subject } from "rxjs";
 import {
+  AbsoluteUrl,
   AdminToken,
   AgencyOption,
   ConventionDto,
@@ -38,6 +39,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
   public conventionModificationResult$ = new Subject<void>();
   public addConventionResult$ = new Subject<void>();
   public updateConventionResult$ = new Subject<void>();
+  public conventionDashboardUrl$ = new Subject<AbsoluteUrl>();
 
   public addConventionCallCount = 0;
   public updateConventionCallCount = 0;
@@ -152,10 +154,14 @@ export class InMemoryConventionGateway implements ConventionGateway {
     throw new Error("500 Not Implemented In InMemory Gateway");
   }
 
-  async shareLinkByEmail(
+  public async shareLinkByEmail(
     _shareLinkByEmailDTO: ShareLinkByEmailDto,
   ): Promise<boolean> {
     return true;
+  }
+
+  public getConventionStatusDashboardUrl$(_jwt: string) {
+    return this.conventionDashboardUrl$;
   }
 
   private inferConventionReadDto(convention: ConventionDto): ConventionReadDto {

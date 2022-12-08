@@ -104,10 +104,27 @@ const conventionStatusChangeEpic: ConventionEpic = (
     ),
   );
 
+const getConventionStatusDashboardUrl: ConventionEpic = (
+  action$,
+  _,
+  { conventionGateway },
+) =>
+  action$.pipe(
+    filter(conventionSlice.actions.conventionStatusDashboardRequested.match),
+    switchMap(({ payload }) =>
+      conventionGateway.getConventionStatusDashboardUrl$(payload),
+    ),
+    map(conventionSlice.actions.conventionStatusDashboardSucceeded),
+    catchEpicError((error: Error) =>
+      conventionSlice.actions.conventionStatusDashboardFailed(error.message),
+    ),
+  );
+
 export const conventionEpics = [
   saveConventionEpic,
   getConventionEpic,
   signConventionEpic,
   conventionStatusChangeEpic,
   reflectFetchedConventionOnFormUi,
+  getConventionStatusDashboardUrl,
 ];

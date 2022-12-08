@@ -1,5 +1,6 @@
 import { Observable } from "rxjs";
 import {
+  AbsoluteUrl,
   AdminToken,
   ConventionDto,
   ConventionId,
@@ -36,4 +37,6 @@ export interface ConventionGateway {
 
   // shareLinkByEmailDTO
   shareLinkByEmail(shareLinkByEmailDTO: ShareLinkByEmailDto): Promise<boolean>;
+
+  getConventionStatusDashboardUrl$(jwt: string): Observable<AbsoluteUrl>;
 }

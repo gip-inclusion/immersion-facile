@@ -1,10 +1,10 @@
 import React from "react";
 import { Notification } from "react-design-system";
 import { MetabaseView } from "src/app/components/MetabaseView";
-import { useDashboard } from "src/app/pages/admin/useDashboard";
+import { useAdminDashboard } from "src/app/pages/admin/useAdminDashboard";
 
 export const ConventionTab = () => {
-  const { url, error } = useDashboard({ name: "conventions" });
+  const { url, error } = useAdminDashboard({ name: "conventions" });
 
   return error ? (
     <Notification type="error" title="Erreur" children={error} />
@@ -14,7 +14,7 @@ export const ConventionTab = () => {
 };
 
 export const EventsTab = () => {
-  const { url, error } = useDashboard({ name: "events" });
+  const { url, error } = useAdminDashboard({ name: "events" });
   return error ? (
     <Notification type="error" title="Erreur" children={error} />
   ) : (

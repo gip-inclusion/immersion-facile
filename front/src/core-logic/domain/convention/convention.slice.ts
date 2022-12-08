@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
+  AbsoluteUrl,
   ConventionDto,
   ConventionReadDto,
   Signatories,
@@ -34,6 +35,7 @@ export interface ConventionState {
   jwt: string | null;
   isLoading: boolean;
   convention: ConventionReadDto | null;
+  conventionStatusDashboardUrl: AbsoluteUrl | null;
   fetchError: string | null;
   feedback: ConventionSubmitFeedback;
   currentSignatoryRole: SignatoryRole | null;
@@ -47,6 +49,7 @@ const initialState: ConventionState = {
   },
   jwt: null,
   convention: null,
+  conventionStatusDashboardUrl: null,
   isLoading: false,
   fetchError: null,
   feedback: { kind: "idle" },
@@ -62,6 +65,14 @@ type StatusChangePayload = {
 type Jwt = string;
 type DateIsoStr = string;
 
+const setFeedbackAsErrored = (
+  state: ConventionState,
+  action: PayloadAction<string>,
+) => {
+  state.isLoading = false;
+  state.feedback = { kind: "errored", errorMessage: action.payload };
+};
+
 export const conventionSlice = createSlice({
   name: "convention",
   initialState,
@@ -74,10 +85,7 @@ export const conventionSlice = createSlice({
       state.isLoading = false;
       state.feedback = { kind: "justSubmitted" };
     },
-    saveConventionFailed: (state, action: PayloadAction<Jwt>) => {
-      state.isLoading = false;
-      state.feedback = { kind: "errored", errorMessage: action.payload };
-    },
+    saveConventionFailed: setFeedbackAsErrored,
 
     // Get convention from token
     fetchConventionRequested: (state, _action: PayloadAction<Jwt>) => {
@@ -121,10 +129,7 @@ export const conventionSlice = createSlice({
         }
       }
     },
-    signConventionFailed: (state, action: PayloadAction<string>) => {
-      state.isLoading = false;
-      state.feedback = { kind: "errored", errorMessage: action.payload };
-    },
+    signConventionFailed: setFeedbackAsErrored,
 
     // Modification requested
     statusChangeRequested: (
@@ -140,14 +145,25 @@ export const conventionSlice = createSlice({
       state.isLoading = false;
       state.feedback = { kind: action.payload };
     },
-    statusChangeFailed: (state, action: PayloadAction<string>) => {
-      state.isLoading = false;
-      state.feedback = { kind: "errored", errorMessage: action.payload };
-    },
+    statusChangeFailed: setFeedbackAsErrored,
 
     // get convention status dashboard
-    conventionStatusDashboardRequested: (state, action: PayloadAction<Jwt>) => {
+    conventionStatusDashboardRequested: (
+      state,
+      _action: PayloadAction<Jwt>,
+    ) => {
       state.isLoading = true;
+    },
+    conventionStatusDashboardSucceeded: (
+      state,
+      action: PayloadAction<AbsoluteUrl>,
+    ) => {
+      state.isLoading = false;
+      state.conventionStatusDashboardUrl = action.payload;
+    },
+    conventionStatusDashboardFailed: (state, action: PayloadAction<string>) => {
+      state.isLoading = false;
+      state.feedback = { kind: "errored", errorMessage: action.payload };
     },
 
     isMinorChanged: (state, action: PayloadAction<boolean>) => {

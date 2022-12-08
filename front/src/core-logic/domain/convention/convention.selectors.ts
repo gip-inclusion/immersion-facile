@@ -48,6 +48,11 @@ const signatoryData = createSelector(
   },
 );
 
+const conventionStatusDashboardUrl = createSelector(
+  conventionState,
+  ({ conventionStatusDashboardUrl }) => conventionStatusDashboardUrl,
+);
+
 export const conventionSelectors = {
   convention,
   fetchError,
@@ -57,6 +62,7 @@ export const conventionSelectors = {
   isMinor,
   isTutorEstablishmentRepresentative,
   hasCurrentEmployer,
+  conventionStatusDashboardUrl,
 };
 
 export const signatoryDataFromConvention = (
