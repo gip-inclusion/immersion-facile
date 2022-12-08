@@ -2,10 +2,10 @@ import React from "react";
 import { IconValue } from "./types";
 
 type IconProps = {
-  type: IconValue;
+  kind: IconValue;
   className?: string;
 };
 
-export const Icon = ({ type, className }: IconProps) => (
-  <i className={`fr-icon-${type} ${className ?? ""}`} aria-hidden="true"></i>
+export const Icon = ({ kind, className }: IconProps) => (
+  <i className={`fr-icon-${kind} ${className ?? ""}`} aria-hidden="true"></i>
 );
