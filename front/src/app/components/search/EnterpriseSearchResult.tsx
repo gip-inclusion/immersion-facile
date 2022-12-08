@@ -80,7 +80,7 @@ export const EnterpriseSearchResult = ({
       </div>
       <SearchResultInfo
         icon={
-          <Icon type="signal-tower-fill" className="im-search-result__icon" />
+          <Icon kind="signal-tower-fill" className="im-search-result__icon" />
         }
       >
         <div className="flex justify-between w-full">
@@ -150,7 +150,7 @@ const InfoLabel = ({
     case undefined:
       return (
         <div className={allStyles}>
-          <Icon type="star-s-line" /> Tentez votre chance
+          <Icon kind="star-s-line" /> Tentez votre chance
         </div>
       );
 
