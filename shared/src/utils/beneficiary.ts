@@ -2,6 +2,10 @@ import {
   Beneficiary,
   BeneficiaryRepresentative,
 } from "../convention/convention.dto";
+import { filter, join } from "ramda";
+import { pipeWithValue } from "../pipeWithValue";
+
+const isTruthy = <T>(t: T | null | undefined): t is T => !!t;
 
 const getEmergencyContactInfos = ({
   fullName,
@@ -12,32 +16,22 @@ const getEmergencyContactInfos = ({
   phone?: string;
   email?: string;
 }) => {
-  let infos = "";
-  if (fullName) {
-    infos += `${fullName} `;
-  }
-  if (phone || email) {
-    infos += "(";
-    if (phone) {
-      infos += phone;
-      if (email) {
-        infos += " - ";
-      }
-    }
-    if (email) {
-      infos += email;
-    }
-    infos += ")";
-  }
-  return infos;
+  const emailAndPhone = pipeWithValue(
+    [phone, email],
+    filter<string | undefined>(isTruthy),
+    join(" - "),
+    (str: string | undefined) => (str ? `(${str})` : ""),
+  );
+
+  return [fullName, emailAndPhone].join(" ");
 };
 
 export const displayEmergencyContactInfos = ({
   beneficiary,
   beneficiaryRepresentative,
 }: {
-  beneficiaryRepresentative?: BeneficiaryRepresentative;
-  beneficiary: Beneficiary;
+  beneficiaryRepresentative?: Partial<BeneficiaryRepresentative>;
+  beneficiary: Partial<Beneficiary>;
 }) =>
   beneficiaryRepresentative
     ? getEmergencyContactInfos({
