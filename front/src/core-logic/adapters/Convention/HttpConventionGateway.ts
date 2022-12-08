@@ -31,7 +31,7 @@ export class HttpConventionGateway implements ConventionGateway {
   getConventionStatusDashboardUrl$(jwt: string): Observable<AbsoluteUrl> {
     return from(
       this.httpClient
-        .get<unknown>(`/${getConventionStatusDashboard}`, {
+        .get<unknown>(`/auth/${getConventionStatusDashboard}`, {
           headers: { authorization: jwt },
         })
         .then(({ data }) => absoluteUrlSchema.parse(data)),

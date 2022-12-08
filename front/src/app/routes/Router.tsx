@@ -1,10 +1,11 @@
 import React from "react";
 import { AdminPage } from "src/app/pages/admin/AdminPage";
 import { AddAgencyPage } from "src/app/pages/agency/AddAgencyPage";
+import { ConventionPageForUkraine } from "src/app/pages/convention/ConventionForUkrainePage";
 import { ConventionImmersionPage } from "src/app/pages/convention/ConventionImmersionPage";
 import { ConventionMiniStagePage } from "src/app/pages/convention/ConventionMiniStagePage";
-import { ConventionPageForUkraine } from "src/app/pages/convention/ConventionForUkrainePage";
 import { ConventionSignPage } from "src/app/pages/convention/ConventionSignPage";
+import { ConventionStatusDashboardPage } from "src/app/pages/convention/ConventionStatusDashboardPage";
 import { ConventionValidatePage } from "src/app/pages/convention/ConventionValidatePage";
 import { ErrorRedirectPage } from "src/app/pages/error/ErrorRedirectPage";
 import { EstablishmentEditionFormPage } from "src/app/pages/establishment/EstablishmentEditionFormPage";
@@ -13,13 +14,13 @@ import { SearchPage } from "src/app/pages/search/SearchPage";
 import { StatsPage } from "src/app/pages/StatsPage";
 import { PrivateRoute } from "src/app/routes/PrivateRoute";
 import { RenewExpiredLinkPage } from "src/app/routes/RenewExpiredLinkPage";
+import { StandardLayout } from "../components/layout/StandardLayout";
+import { ErrorPage } from "../pages/error/ErrorPage";
 import { EstablishmentFormPage } from "../pages/establishment/EstablishmentFormPage";
 import { HomePage } from "../pages/home/HomePage";
 import { ImmersionAssessmentPage } from "../pages/immersion-assessment/ImmersionAssessmentPage";
-import { routes, useRoute } from "./routes";
 import { StandardPageSlugs, standardPageSlugs } from "./route-params";
-import { StandardLayout } from "../components/layout/StandardLayout";
-import { ErrorPage } from "../pages/error/ErrorPage";
+import { routes, useRoute } from "./routes";
 
 export const Router = () => {
   const route = useRoute();
@@ -64,6 +65,9 @@ export const Router = () => {
       )}
       {route.name === "conventionToSign" && (
         <ConventionSignPage route={route} />
+      )}
+      {route.name === "conventionStatusDashboard" && (
+        <ConventionStatusDashboardPage route={route} />
       )}
       {route.name === "immersionAssessment" && (
         <ImmersionAssessmentPage route={route} />

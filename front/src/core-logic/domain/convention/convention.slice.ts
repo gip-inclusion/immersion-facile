@@ -152,6 +152,7 @@ export const conventionSlice = createSlice({
       state,
       _action: PayloadAction<Jwt>,
     ) => {
+      state.feedback = { kind: "idle" };
       state.isLoading = true;
     },
     conventionStatusDashboardSucceeded: (

@@ -62,6 +62,10 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { jwt: param.query.string },
     () => `/${frontRoutes.conventionToSign}`,
   ),
+  conventionStatusDashboard: defineRoute(
+    { jwt: param.query.string },
+    () => `/${frontRoutes.conventionStatusDashboard}`,
+  ),
   immersionAssessment: defineRoute(
     { jwt: param.query.string },
     () => `/${frontRoutes.immersionAssessment}`,

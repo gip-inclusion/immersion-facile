@@ -16,9 +16,10 @@ export const frontRoutes = {
   homeEstablishments: "accueil-entreprises",
   homeAgencies: "accueil-prescripteurs",
   standard: "pages",
+  conventionStatusDashboard: "statut-convention",
 };
 
-export const getConventionStatusDashboard = "statut-convention";
+export const getConventionStatusDashboard = "status-convention";
 export const addEstablishmentFormRouteWithApiKey__v0 = "add-establishment-form"; // Becomes POST /v1/form-establishments
 export const adminLogin = "login";
 export const agenciesRoute = "agencies";
