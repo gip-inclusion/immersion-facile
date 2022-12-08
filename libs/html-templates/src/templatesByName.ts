@@ -108,7 +108,7 @@ export const templateByName: {
       content: `
       <strong>Une nouvelle demande d'immersion a été enregistrée.</strong>      ­
 
-      Vous pouvez prendre connaissance de la demande en <a href="${magicLink}">cliquant ici</a>.
+      Vous pouvez prendre connaissance de la demande en <a href="${magicLink}" target="_blank">cliquant ici</a>.
       <ul>
         <li>Vous pouvez dès maintenant demander des modifications ou la refuser si nécessaire.</li>
         <li>Vous ne pouvez pas la valider tant que le bénéficiaire et l'entreprise n'ont pas confirmé chacun leur accord pour cette demande.</li>
@@ -304,7 +304,7 @@ export const templateByName: {
       <strong>Etape 1</strong> : Si le demandeur d’emploi n’est pas reconnu par CVM, procédez à son identification afin de pouvoir traiter le mail. Vous avez les informations à la fin de cet email. 
       Consultez la procédure à suivre pour clôturer cet email : <a href="https://drive.google.com/file/d/1tWL68ua1f-NgYnPkXs979_CkukPtlGRU/view?usp=sharing">Comment traiter un mail Immersion Facilitée dans CVM ?</a>
 
-      <strong>Etape 2</strong> : <a href="${magicLink}">Vous pouvez y accéder en cliquant ici</a>      
+      <strong>Etape 2</strong> : <a href="${magicLink}" target="_blank">Vous pouvez y accéder en cliquant ici</a>      
 
       Tant que cette demande n'est pas encore confirmée par <strong>l'entreprise et par la/le bénéficiaire</strong>, vous pouvez demander des modifications ou la refuser, si nécessaire.
 
