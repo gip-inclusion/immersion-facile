@@ -3,11 +3,13 @@ import React, { useState } from "react";
 import {
   Button,
   LinkHome,
+  MainWrapper,
   Notification,
 } from "react-design-system/immersionFacile";
 import { ConventionMagicLinkPayload } from "shared";
-import { conventionGateway } from "src/config/dependencies";
+import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { routes } from "src/app/routes/routes";
+import { conventionGateway } from "src/config/dependencies";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import { Route } from "type-route";
 
@@ -75,6 +77,7 @@ export const RenewExpiredLinkContent = ({
       </div>
       {!requestSuccessful && (
         <Button
+          className="fr-mt-2w"
           disable={requested}
           onSubmit={onClick}
           id="im-renew-page__renew-link-button"
@@ -102,8 +105,12 @@ export const RenewExpiredLinkContent = ({
 };
 
 export const RenewExpiredLinkPage = ({ route }: RenewExpiredLinkProps) => (
-  <RenewExpiredLinkContent
-    expiredJwt={route.params.expiredJwt}
-    originalURL={route.params.originalURL}
-  />
+  <HeaderFooterLayout>
+    <MainWrapper layout="boxed">
+      <RenewExpiredLinkContent
+        expiredJwt={route.params.expiredJwt}
+        originalURL={route.params.originalURL}
+      />
+    </MainWrapper>
+  </HeaderFooterLayout>
 );

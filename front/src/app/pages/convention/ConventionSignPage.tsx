@@ -11,21 +11,21 @@ import {
   SignatoryRole,
   signatoryRoles,
 } from "shared";
+import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
+import { ConventionFormFields } from "src/app/components/forms/convention/ConventionFormFields";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
-import { routes } from "src/app/routes/routes";
+import { useConvention } from "src/app/hooks/convention.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { useExistingSiret } from "src/app/hooks/siret.hooks";
+import { routes } from "src/app/routes/routes";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import {
   conventionSelectors,
   signatoryDataFromConvention,
 } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
-import { useConvention } from "src/app/hooks/convention.hooks";
-import { useExistingSiret } from "src/app/hooks/siret.hooks";
-import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
 import { Route } from "type-route";
-import { ConventionFormFields } from "src/app/components/forms/convention/ConventionFormFields";
 
 type SignFormRoute = Route<typeof routes.conventionToSign>;
 
@@ -103,6 +103,28 @@ const SignFormSpecific = ({ jwt }: SignFormSpecificProps) => {
   useExistingSiret(convention?.siret);
 
   if (isLoading) return <p>Chargement en cours...</p>;
+  if (fetchConventionError) {
+    // un peu fragile, mais j'attends qu'on remette au carré les erreurs front/back. Ca fait un fix rapide (8/12/2022)
+    if (fetchConventionError.includes("Le lien magique est périmé")) {
+      routes
+        .renewConventionMagicLink({
+          expiredJwt: jwt,
+          originalURL: window.location.href,
+        })
+        .replace();
+    }
+
+    return (
+      <SignPageLayout>
+        <Notification
+          title="Erreur lors de la récupération de la convention"
+          type="error"
+        >
+          {fetchConventionError}
+        </Notification>
+      </SignPageLayout>
+    );
+  }
   if (!convention) return <p>Pas de convention correspondante trouvée...</p>;
   if (convention.status === "REJECTED") return <ConventionRejectedMessage />;
   if (convention.status === "DRAFT")
@@ -124,18 +146,6 @@ const SignFormSpecific = ({ jwt }: SignFormSpecificProps) => {
       }),
     );
   };
-
-  if (fetchConventionError)
-    return (
-      <SignPageLayout>
-        <Notification
-          title="Erreur lors de la récupération de la convention"
-          type="error"
-        >
-          {fetchConventionError}
-        </Notification>
-      </SignPageLayout>
-    );
 
   return (
     <SignPageLayout>
