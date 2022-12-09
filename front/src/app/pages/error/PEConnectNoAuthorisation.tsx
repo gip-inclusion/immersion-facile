@@ -1,6 +1,7 @@
 import React from "react";
 import { routes } from "src/app/routes/routes";
 import { Notification } from "react-design-system";
+import { immersionFacileContactEmail } from "shared";
 
 export const PEConnectNoAuthorisation = () => (
   <Notification
@@ -23,8 +24,8 @@ export const PEConnectNoAuthorisation = () => (
     </button>
     <p className="fr-my-2w">
       En cas de questionnement, n'hésitez pas à nous contacter par email sur
-      <a href="mailto:contact@immersion-facile.com">
-        contact@immersion-facile.com
+      <a href={`mailto:${immersionFacileContactEmail}`}>
+        {immersionFacileContactEmail}
       </a>
     </p>
   </Notification>

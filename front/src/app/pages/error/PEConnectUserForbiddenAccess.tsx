@@ -1,5 +1,6 @@
 import React from "react";
 import { Notification } from "react-design-system";
+import { immersionFacileContactEmail } from "shared";
 import { useRedirectToConventionWithoutIdentityProvider } from "src/app/hooks/redirections.hooks";
 
 export const PEConnectUserForbiddenAccess = () => {
@@ -25,8 +26,8 @@ export const PEConnectUserForbiddenAccess = () => {
       </button>
       <p className="fr-my-2w">
         En cas de questionnement, n'hésitez pas à nous contacter par email sur
-        <a href="mailto:contact@immersion-facile.com">
-          contact@immersion-facile.com
+        <a href={`mailto:${immersionFacileContactEmail}`}>
+          {immersionFacileContactEmail}
         </a>
       </p>
     </Notification>

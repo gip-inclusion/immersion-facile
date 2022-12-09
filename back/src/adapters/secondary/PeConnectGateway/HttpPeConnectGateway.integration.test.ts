@@ -10,14 +10,12 @@ import {
   testRawRedirectError,
 } from "shared";
 import { AppConfig } from "../../primary/config/appConfig";
-import {
-  toPeConnectUserDto,
-  toPeConnectAdvisorDto,
-} from "./Httpgateway.mapper";
 import { HttpPeConnectGateway } from "./HttpPeConnectGateway";
 import {
   makePeConnectHttpClient,
   peConnectTargets,
+  toPeConnectAdvisorDto,
+  toPeConnectUserDto,
 } from "./peConnectApi.client";
 import {
   ExternalPeConnectUser,

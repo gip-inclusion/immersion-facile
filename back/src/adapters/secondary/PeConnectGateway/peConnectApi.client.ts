@@ -6,10 +6,15 @@ import {
 } from "http-client";
 import { AbsoluteUrl, queryParamsAsString } from "shared";
 import { AccessTokenDto } from "../../../domain/peConnect/dto/AccessToken.dto";
+import { PeConnectAdvisorDto } from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
+import { PeConnectUserDto } from "../../../domain/peConnect/dto/PeConnectUser.dto";
 import { AppConfig } from "../../primary/config/appConfig";
 import {
   AccessTokenHttpRequestConfig,
+  ExternalAccessToken,
+  ExternalPeConnectAdvisor,
   ExternalPeConnectOAuthGrantPayload,
+  ExternalPeConnectUser,
   PeConnectHeaders,
   PeConnectOauthConfig,
   PeConnectTargets,
@@ -95,4 +100,30 @@ export const toAccessTokenHttpRequestConfig = (
   headers: {
     "Content-Type": "application/x-www-form-urlencoded",
   },
+});
+
+export const toPeConnectAdvisorDto = (
+  fromApi: ExternalPeConnectAdvisor,
+): PeConnectAdvisorDto => ({
+  email: fromApi.mail,
+  firstName: fromApi.prenom,
+  lastName: fromApi.nom,
+  type: fromApi.type,
+});
+
+export const toPeConnectUserDto = (
+  externalPeConnectUser: ExternalPeConnectUser & { isUserJobseeker: boolean },
+): PeConnectUserDto => ({
+  isJobseeker: externalPeConnectUser.isUserJobseeker,
+  email: externalPeConnectUser.email,
+  firstName: externalPeConnectUser.given_name,
+  lastName: externalPeConnectUser.family_name,
+  peExternalId: externalPeConnectUser.idIdentiteExterne,
+});
+
+export const toAccessToken = (
+  externalAccessToken: ExternalAccessToken,
+): AccessTokenDto => ({
+  value: externalAccessToken.access_token,
+  expiresIn: externalAccessToken.expires_in,
 });

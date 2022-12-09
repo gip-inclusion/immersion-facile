@@ -11,10 +11,10 @@ import { validateAndParseZodSchema } from "../../primary/helpers/httpErrors";
 import { UnhandledError } from "../../primary/helpers/unhandledError";
 import {
   toAccessToken,
+  toAccessTokenHttpRequestConfig,
   toPeConnectAdvisorDto,
   toPeConnectUserDto,
-} from "./Httpgateway.mapper";
-import { toAccessTokenHttpRequestConfig } from "./peConnectApi.client";
+} from "./peConnectApi.client";
 import {
   PeConnectTargets,
   PeConnectOauthConfig,
