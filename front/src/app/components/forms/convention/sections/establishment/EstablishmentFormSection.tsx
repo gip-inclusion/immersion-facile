@@ -13,6 +13,7 @@ import { useConventionTextsFromFormikContext } from "src/app/contents/convention
 import { EstablishementTutorFields } from "./EstablishementTutorFields";
 import { EstablishmentBusinessFields } from "./EstablishmentBusinessFields";
 import { EstablishmentRepresentativeFields } from "./EstablishmentRepresentativeFields";
+import { Notification } from "react-design-system";
 
 type EstablishmentFormSectionParams = {
   isFrozen: boolean | undefined;
@@ -45,7 +46,9 @@ export const EstablishmentFormSection = ({
           federatedIdentity={federatedIdentity}
         />
       </FormSectionTitle>
-      <h4>{t.establishmentSection.subtitle}</h4>
+      <Notification type="info" title="" className="fr-my-2w">
+        {t.establishmentSection.subtitle}
+      </Notification>
       <EstablishmentBusinessFields disabled={isFrozen || isFetchingSiret} />
       <RadioGroup
         id="is-establishmentRepresentative"

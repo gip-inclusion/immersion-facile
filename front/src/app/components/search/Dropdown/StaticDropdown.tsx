@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import "./searchdropdown.css";
 
 type StaticDropdownProps = {
-  title: string;
+  title?: NonNullable<string>;
   onSelection: (value: string, index: number) => void;
   inputStyle?: any;
   options: string[];
@@ -47,15 +47,18 @@ export const StaticDropdown = ({
   };
   return (
     <div className="autocomplete">
-      <label className="inputLabel searchdropdown-header" htmlFor={"search"}>
-        {title}
-      </label>
+      {title && (
+        <label className="inputLabel searchdropdown-header" htmlFor={id}>
+          {title}
+        </label>
+      )}
 
       <div className={"searchdropdown__inner"}>
         <button
           type={"button"}
           className={"searchdropdown__toggler"}
           ref={toggler}
+          aria-label={title ?? "Sélectionnez une option"}
           onClick={() => {
             setIsOpen(!isOpen);
           }}
@@ -65,6 +68,7 @@ export const StaticDropdown = ({
             type={"button"}
             className={"searchdropdown__button-clear fr-icon-close-circle-line"}
             ref={buttonClear}
+            aria-label="Réinitialiser le paramètre"
             onClick={onClearButtonClick}
           ></button>
         )}

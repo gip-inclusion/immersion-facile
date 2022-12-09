@@ -63,6 +63,5 @@ body .w-full {
 } */
 body .im-badge {
   /* to override dsfr specificity */
-  background: var(--grey-1000-100);
-  color: var(--blue-france-main-525);
+  background: var(--grey-1000-50);
 }

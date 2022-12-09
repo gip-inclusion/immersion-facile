@@ -146,7 +146,6 @@ export const SearchPage = ({
                           paddingLeft: "48px",
                           background: `white url(${distanceSearchIcon}) no-repeat scroll 11px 8px`,
                         }}
-                        title=""
                         onSelection={(
                           _newValue: string,
                           selectedIndex: number,

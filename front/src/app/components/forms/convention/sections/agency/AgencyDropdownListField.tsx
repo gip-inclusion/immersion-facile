@@ -48,6 +48,7 @@ export const AgencyDropdownListField = ({
             setValue(evt.currentTarget.value);
           }}
           onBlur={onBlur}
+          aria-label="Choisissez votre structure"
           aria-describedby={`agency-code-{name}-error-desc-error`}
           disabled={disabled || !loaded || !departmentCode}
         >

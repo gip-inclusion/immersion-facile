@@ -41,7 +41,7 @@ export const BoolRadioPicker = (props: BoolRadioPickerProps) => {
               />
               <label
                 className="fr-label"
-                htmlFor={props.name + "radio_yes"}
+                htmlFor={cleanStringToHTMLAttribute(props.name + "radio_yes")}
                 onClick={setFieldAsTrue}
               >
                 {props.yesLabel}
@@ -57,7 +57,7 @@ export const BoolRadioPicker = (props: BoolRadioPickerProps) => {
               />
               <label
                 className="fr-label"
-                htmlFor={props.name + "radio_no"}
+                htmlFor={cleanStringToHTMLAttribute(props.name + "radio_no")}
                 onClick={setFieldAsFalse}
               >
                 {props.noLabel}

@@ -141,7 +141,9 @@ const NavCard = ({
     <div
       className={`${componentName}__nav-card ${componentName}__nav-card--${type}`}
     >
-      <a {...link} id={id} className={`${componentName}__nav-card-link`}></a>
+      <a {...link} id={id} className={`${componentName}__nav-card-link`}>
+        <span className="fr-sr-only">{title}</span>
+      </a>
       <span className={`${componentName}__nav-card-overtitle`}>
         {overtitle}
       </span>

@@ -79,7 +79,7 @@ export const WeekdayPicker = ({
                   <div>Du</div>
                   <WeekdayDropdown
                     name="du"
-                    id="weekday-dropdown-start-day"
+                    id={`weekday-dropdown-start-day-${index}`}
                     minDay={0}
                     maxDay={dayRange[1]}
                     selected={dayRange[0]}
@@ -92,7 +92,7 @@ export const WeekdayPicker = ({
                   <div>Au</div>
                   <WeekdayDropdown
                     name="du"
-                    id="weekday-dropdown-end-day"
+                    id={`weekday-dropdown-end-day-${index}`}
                     minDay={dayRange[0]}
                     maxDay={6}
                     selected={dayRange[1]}

@@ -111,7 +111,9 @@ export const ConventionForm = ({
     <div className="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
       <div className="fr-col-lg-7 fr-px-2w">
         <div className="flex justify-center">
-          <Title red>{t.intro.conventionTitle}</Title>
+          <Title red heading={1}>
+            {t.intro.conventionTitle}
+          </Title>
         </div>
         <div className="fr-text">{t.intro.welcome}</div>
         <Notification type="info" title="">

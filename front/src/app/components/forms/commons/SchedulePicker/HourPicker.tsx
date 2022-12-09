@@ -54,12 +54,13 @@ export const HourPicker = ({
             <div key={name + index}>
               <div className="flex p-1 items-end">
                 <div className="date-or-time-block">
-                  <div>Début</div>
+                  <label htmlFor={name + index + "-start"}>Début</label>
                   <input
                     className="fr-input"
                     type="time"
                     value={hours.start}
                     max={hours.end}
+                    id={name + index + "-start"}
                     onChange={(evt) =>
                       onStartChange(index, evt.currentTarget.value)
                     }
@@ -73,13 +74,14 @@ export const HourPicker = ({
                 </div>
 
                 <div className="date-or-time-block">
-                  <div>Fin</div>
+                  <label htmlFor={name + index + "-end"}>Fin</label>
                   <input
                     className="fr-input"
                     value={hours.end}
                     onChange={(evt) =>
                       onEndChange(index, evt.currentTarget.value)
                     }
+                    id={name + index + "-end"}
                     type="time"
                     disabled={disabled}
                   />

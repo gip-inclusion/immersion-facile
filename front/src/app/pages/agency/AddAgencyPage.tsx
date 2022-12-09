@@ -49,7 +49,7 @@ export const AddAgencyPage = () => {
   return (
     <HeaderFooterLayout>
       <MainWrapper layout="boxed">
-        <Title>Ajout d'organisme encadrant les PMSMP</Title>
+        <Title heading={1}>Ajout d'organisme encadrant les PMSMP</Title>
         <Formik
           initialValues={initialValues}
           validationSchema={toFormikValidationSchema(createAgencySchema)}

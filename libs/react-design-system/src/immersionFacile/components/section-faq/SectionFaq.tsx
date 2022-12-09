@@ -1,6 +1,5 @@
 import React from "react";
 import { Button } from "../buttons";
-import { ButtonsGroup } from "../buttons-group";
 import "./SectionFaq.scss";
 
 export type SectionFaqProps = {
@@ -10,10 +9,12 @@ export type SectionFaqProps = {
 const componentName = "im-section-faq";
 export const SectionFaq = ({ articles }: SectionFaqProps) => (
   <section className={`${componentName} `}>
-    <div className={`fr-container ${componentName}__container fr-py-8w`}>
-      <h3 className={`${componentName}__title fr-mb-6w`}>
+    <div
+      className={`fr-container ${componentName}__container fr-py-8w fr-grid-row fr-grid-row--center`}
+    >
+      <h2 className={`${componentName}__title fr-mb-6w`}>
         Questions fréquentes
-      </h3>
+      </h2>
       {articles && articles.length > 0 && (
         <nav
           className={`${componentName}__items fr-grid-row fr-grid-row--gutters`}
@@ -27,15 +28,14 @@ export const SectionFaq = ({ articles }: SectionFaqProps) => (
           ))}
         </nav>
       )}
-      <ButtonsGroup className="fr-mt-4w fr-btns-group--center fr-btns-group--inline">
-        <Button
-          url="https://aide.immersion-facile.beta.gouv.fr/fr/"
-          target="_blank"
-          id={`im-section-faq__see-all-button`}
-        >
-          Voir toutes les questions fréquentes
-        </Button>
-      </ButtonsGroup>
+      <Button
+        url="https://aide.immersion-facile.beta.gouv.fr/fr/"
+        target="_blank"
+        id={`im-section-faq__see-all-button`}
+        className="fr-mt-4w fr-mx-auto"
+      >
+        Voir toutes les questions fréquentes
+      </Button>
     </div>
   </section>
 );

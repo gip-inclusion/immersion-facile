@@ -37,6 +37,7 @@ export const DateInput = (props: DateInputProps) => {
             value={field.value && format(new Date(field.value), "yyyy-MM-dd")}
             type="date"
             disabled={props.disabled}
+            aria-label={props.label}
             onKeyDown={(e) => e.preventDefault()}
             id={cleanStringToHTMLAttribute(props.name)}
             max={

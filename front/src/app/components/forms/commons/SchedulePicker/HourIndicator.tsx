@@ -5,7 +5,7 @@ import { formatHoursString } from "./TotaWeeklylHoursIndicator";
 export const HourIndicator = ({
   hours,
 }: HourIndicatorProperties): JSX.Element => {
-  const normalColor = "#1F8D49";
+  const normalColor = "#00854B";
   const badColor = "#E10600";
   return (
     <span

@@ -18,13 +18,13 @@ export const OverFooterCol = ({
   iconTitle,
 }: OverFooterColProps) => (
   <div className="fr-col-12 fr-col-md">
-    <h5 className="fr-h6">
+    <span className="fr-h6">
       <span
         aria-hidden="true"
         className={`fr-mr-2v ${iconTitle ? iconTitle : ""}`}
       ></span>
       {title}
-    </h5>
+    </span>
     <div>
       <div className="fr-editor">
         {subtitle && (

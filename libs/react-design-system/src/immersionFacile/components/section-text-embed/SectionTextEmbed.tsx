@@ -14,9 +14,9 @@ export const SectionTextEmbed = ({
 }: SectionTextEmbedProps) => (
   <section className={`fr-container ${componentName} fr-pt-8w fr-pb-10w`}>
     <div className={`${componentName}__header fr-mb-4w`}>
-      <h3 className={`${componentName}__title`}>
+      <h2 className={`${componentName}__title`}>
         Qu’est-ce qu’une immersion professionnelle ?
-      </h3>
+      </h2>
       <span className={`${componentName}__subtitle fr-badge im-badge fr-mb-2w`}>
         PMSMP ou Période de mise en situation en milieu professionnel
       </span>

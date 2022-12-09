@@ -1,6 +1,6 @@
 import React from "react";
 type ButtonGroupProps = {
-  children: React.ReactNode;
+  children: React.ReactChild[];
   className?: string;
 };
 
@@ -10,9 +10,9 @@ export const ButtonsGroup = function ({
 }: ButtonGroupProps) {
   return (
     <ul className={`fr-btns-group ${className ?? ""}`}>
-      {Array.isArray(children)
-        ? children.map((element, index) => <li key={index}>{element}</li>)
-        : children}
+      {children.map((child, index) => (
+        <li key={index}>{child}</li>
+      ))}
     </ul>
   );
 };

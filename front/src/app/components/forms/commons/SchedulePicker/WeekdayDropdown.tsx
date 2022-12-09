@@ -32,6 +32,7 @@ export const WeekdayDropdown = ({
       value={selected}
       onChange={onChangeHandler}
       disabled={disabled}
+      aria-label="Choisissez un jour de la semaine"
     >
       {weekdays
         .filter((_, index) => index >= minDay && index <= maxDay)
