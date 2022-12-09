@@ -1,12 +1,13 @@
 import React from "react";
 import { routes } from "src/app/routes/routes";
+import { Notification } from "react-design-system";
 
 export const PEConnectNoAuthorisation = () => (
-  <div role="alert" className={`fr-alert fr-alert--warning`}>
-    <p className="fr-alert__title">
-      Vous n'avez pas accordé les autorisations nécessaires à Pôle Emploi
-      Connect.
-    </p>
+  <Notification
+    title="Vous n'avez pas accordé les autorisations nécessaires à Pôle Emploi
+    Connect."
+    type="warning"
+  >
     <p className="fr-my-2w">
       Vous avez refusé d'accorder les autorisations nécessaires sur l'interface
       Pôle Emploi Connect.
@@ -26,5 +27,5 @@ export const PEConnectNoAuthorisation = () => (
         contact@immersion-facile.com
       </a>
     </p>
-  </div>
+  </Notification>
 );

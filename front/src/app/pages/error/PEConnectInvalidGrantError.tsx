@@ -1,16 +1,16 @@
 import React from "react";
 import { useRedirectToConventionWithoutIdentityProvider } from "src/app/hooks/redirections.hooks";
+import { Notification } from "react-design-system";
 
 export const PEConnectInvalidGrantError = () => {
   const redirectToConventionWithoutIdentityProvider =
     useRedirectToConventionWithoutIdentityProvider();
-
   return (
-    <div role="alert" className={`fr-alert fr-alert--warning`}>
-      <p className="fr-alert__title">
-        Le code d'autorisation retourné par Pôle Emploi Connect ne permet pas de
-        vous identifier.
-      </p>
+    <Notification
+      title="Le code d'autorisation retourné par Pôle Emploi Connect ne permet pas de
+      vous identifier."
+      type="warning"
+    >
       <p className="fr-my-2w">
         Le code d'autorisation retourné par Pôle Emploi ne permet pas d'avoir
         accès aux droits nécessaires pour lier votre compte.
@@ -30,6 +30,6 @@ export const PEConnectInvalidGrantError = () => {
           contact@immersion-facile.com
         </a>
       </p>
-    </div>
+    </Notification>
   );
 };

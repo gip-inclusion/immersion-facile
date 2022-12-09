@@ -1,34 +1,33 @@
 import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
 import { createAxiosHandlerCreator } from "http-client";
-import { expectObjectsToMatch, expectPromiseToFailWithError } from "shared";
-import { AppConfig } from "../../primary/config/appConfig";
 import {
+  expectObjectsToMatch,
+  expectPromiseToFailWithError,
   ManagedRedirectError,
   RawRedirectError,
-} from "../../primary/helpers/redirectErrors";
+  testManagedRedirectError,
+  testRawRedirectError,
+} from "shared";
+import { AppConfig } from "../../primary/config/appConfig";
 import {
   toPeConnectUserDto,
   toPeConnectAdvisorDto,
-} from "./NewHttpgateway.mapper";
-import { NewHttpPeConnectGateway } from "./NewHttpPeConnectGateway";
-
+} from "./Httpgateway.mapper";
+import { HttpPeConnectGateway } from "./HttpPeConnectGateway";
 import {
-  ExternalAccessToken,
-  ExternalPeConnectAdvisor,
-  ExternalPeConnectUser,
   makePeConnectHttpClient,
   peConnectTargets,
-} from "./PeConnectApi";
-
-//eslint-disable-next-line jest/prefer-spy-on
-// type TYPE = <T = any, R = AxiosResponse<T, any>, D = any>(
-//   config: AxiosRequestConfig<D>,
-// ) => Promise<R>;
+} from "./peConnectApi.client";
+import {
+  ExternalPeConnectUser,
+  ExternalPeConnectAdvisor,
+  ExternalAccessToken,
+} from "./peConnectApi.dto";
 
 describe("HttpPeConnectGateway", () => {
   const appConfig = {} as AppConfig;
-  const adapter = new NewHttpPeConnectGateway(
+  const adapter = new HttpPeConnectGateway(
     makePeConnectHttpClient(createAxiosHandlerCreator(axios), appConfig),
     appConfig,
   );
@@ -77,7 +76,7 @@ describe("HttpPeConnectGateway", () => {
           expires_in: 50,
         };
         mock
-          .onPost(peConnectTargets(appConfig).oauth2Step2AccessToken.url)
+          .onPost(peConnectTargets(appConfig).exchangeCodeForAccessToken.url)
           .reply(200, expectedResponse);
         expectObjectsToMatch(await adapter.getAccessToken(""), {
           expiresIn: expectedResponse.expires_in,
@@ -88,7 +87,7 @@ describe("HttpPeConnectGateway", () => {
     describe("Wrong path", () => {
       it("Invalid grant -> ManagedRedirectError kind peConnectInvalidGrant", async () => {
         mock
-          .onPost(peConnectTargets(appConfig).oauth2Step2AccessToken.url)
+          .onPost(peConnectTargets(appConfig).exchangeCodeForAccessToken.url)
           .reply(400, {
             error_description:
               "The provided access grant is invalid, expired, or revoked.",
@@ -101,7 +100,7 @@ describe("HttpPeConnectGateway", () => {
       });
       it("request aborted -> ManagedRedirectError kind peConnectConnectionAborted", async () => {
         mock
-          .onPost(peConnectTargets(appConfig).oauth2Step2AccessToken.url)
+          .onPost(peConnectTargets(appConfig).exchangeCodeForAccessToken.url)
           .abortRequest();
         await testManagedRedirectError(
           () => adapter.getAccessToken(""),
@@ -341,34 +340,3 @@ describe("HttpPeConnectGateway", () => {
     });
   });
 });
-
-const getError = async <TError>(call: () => unknown): Promise<TError> => {
-  try {
-    await call();
-    throw new Error();
-  } catch (error: unknown) {
-    return error as TError;
-  }
-};
-
-async function testRawRedirectError(
-  cb: () => unknown,
-  expectedError: RawRedirectError,
-) {
-  const error: RawRedirectError = await getError<RawRedirectError>(() => cb());
-  expect(error.constructor.name).toEqual(expectedError.constructor.name);
-  expect(error).toStrictEqual(expectedError);
-  expect(error.title).toStrictEqual(expectedError.title);
-}
-
-async function testManagedRedirectError(
-  cb: () => unknown,
-  expectedError: ManagedRedirectError,
-) {
-  const error: ManagedRedirectError = await getError<ManagedRedirectError>(() =>
-    cb(),
-  );
-  expect(error.constructor.name).toEqual(expectedError.constructor.name);
-  expect(error).toStrictEqual(expectedError);
-  expect(error.kind).toStrictEqual(expectedError.kind);
-}

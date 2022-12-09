@@ -1,14 +1,15 @@
 import React from "react";
+import { Notification } from "react-design-system";
 import { useRedirectToConventionWithoutIdentityProvider } from "src/app/hooks/redirections.hooks";
 
 export const PEConnectUserForbiddenAccess = () => {
   const redirectToConventionWithoutIdentityProvider =
     useRedirectToConventionWithoutIdentityProvider();
   return (
-    <div role="alert" className={`fr-alert fr-alert--warning`}>
-      <p className="fr-alert__title">
-        Pôle Emploi Connect refuse la connection
-      </p>
+    <Notification
+      title="Pôle Emploi Connect refuse la connection."
+      type="warning"
+    >
       <p className="fr-my-2w">
         Vous êtes bien authentifiés mais le service Pôle Emploi Connect refuse
         la récupération de vos informations. Nous travaillons activement à la
@@ -28,6 +29,6 @@ export const PEConnectUserForbiddenAccess = () => {
           contact@immersion-facile.com
         </a>
       </p>
-    </div>
+    </Notification>
   );
 };

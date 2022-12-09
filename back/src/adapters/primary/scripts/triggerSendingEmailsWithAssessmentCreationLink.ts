@@ -1,5 +1,6 @@
 import axios from "axios";
 import { Pool } from "pg";
+import { immersionFacileContactEmail } from "shared";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { SendEmailsWithAssessmentCreationLink } from "../../../domain/immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
 import { RealClock } from "../../secondary/core/ClockImplementations";
@@ -30,7 +31,7 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
           config.apiKeySendinblue,
           {
             name: "Immersion Facilitée",
-            email: "contact@immersion-facile.beta.gouv.fr",
+            email: immersionFacileContactEmail,
           },
         )
       : new InMemoryEmailGateway(clock);

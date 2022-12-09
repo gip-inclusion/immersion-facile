@@ -46,18 +46,13 @@ const removeAccents = (value: unknown) => {
   return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 };
 
-// const zStringWithoutAccent = z.preprocess(
-//   (val) => String(removeAccents(val)),
-//   z.string(),
-// );
-
 export const zEmail = z.preprocess(
-  (val) => String(removeAccents(val)),
+  removeAccents,
   z.string().email("Veuillez saisir une adresse e-mail valide"),
 );
 
 export const zEmailPossiblyEmpty = z.preprocess(
-  (val) => String(removeAccents(val)),
+  removeAccents,
   z
     .string()
     .email("Veuillez saisir une adresse e-mail valide")

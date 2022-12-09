@@ -1,3 +1,5 @@
+import { immersionFacileContactEmail } from "shared";
+
 export default {
   title: "Politique de confidentialité",
   content: `<strong>Traitement des données à caractère personnel</strong>
@@ -61,7 +63,7 @@ export default {
 
   Pour les exercer, faites nous parvenir une demande en précisant la date et l’heure précise de la requête – ces éléments sont indispensables pour nous permettre de retrouver votre recherche.
 
-  • Par voie électronique à l’adresse suivante : contact@immersion-facile.beta.gouv.fr
+  • Par voie électronique à l’adresse suivante : ${immersionFacileContactEmail}
   • Par voie postale :  Direction du Numérique Ministère des solidarités et de la santé 39-43 Quai André Citroën 75739 Paris Cedex 15
   
   En raison de l'obligation de sécurité et de confidentialité dans le traitement des données à caractère personnel qui incombe au responsable de traitement, les demandes des personnes concernées ne seront traitées que si nous sommes en mesure de vous identifier de façon certaine. En cas de doute sérieux sur votre identité, nous pouvons être amenés à vous demander la communication d’une preuve d’identité.    

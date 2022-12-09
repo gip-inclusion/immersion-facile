@@ -1,5 +1,10 @@
 import axios from "axios";
-import { AgencyDtoBuilder, ConventionDto, ConventionDtoBuilder } from "shared";
+import {
+  AgencyDtoBuilder,
+  ConventionDto,
+  ConventionDtoBuilder,
+  immersionFacileContactEmail,
+} from "shared";
 import {
   AppConfig,
   makeEmailAllowListPredicate,
@@ -44,7 +49,7 @@ describe("Notify To 2 Counsellors that an application is available", () => {
       config.apiKeySendinblue,
       {
         name: "Immersion Facilitée",
-        email: "contact@immersion-facile.beta.gouv.fr",
+        email: immersionFacileContactEmail,
       },
     );
     generateMagicLinkFn = createGenerateConventionMagicLink(config);

@@ -1,15 +1,15 @@
 import { AccessTokenDto } from "../../../domain/peConnect/dto/AccessToken.dto";
-import { AllPeConnectAdvisorDto } from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
+import { PeConnectAdvisorDto } from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
 import { PeConnectUserDto } from "../../../domain/peConnect/dto/PeConnectUser.dto";
 import {
-  ExternalAccessToken,
   ExternalPeConnectAdvisor,
   ExternalPeConnectUser,
-} from "./PeConnectApi";
+  ExternalAccessToken,
+} from "./peConnectApi.dto";
 
 export const toPeConnectAdvisorDto = (
   fromApi: ExternalPeConnectAdvisor,
-): AllPeConnectAdvisorDto => ({
+): PeConnectAdvisorDto => ({
   email: fromApi.mail,
   firstName: fromApi.prenom,
   lastName: fromApi.nom,

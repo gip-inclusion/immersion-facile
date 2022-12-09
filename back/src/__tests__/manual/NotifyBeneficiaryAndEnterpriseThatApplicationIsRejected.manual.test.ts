@@ -1,5 +1,9 @@
 import axios from "axios";
-import { AgencyDtoBuilder, ConventionDtoBuilder } from "shared";
+import {
+  AgencyDtoBuilder,
+  ConventionDtoBuilder,
+  immersionFacileContactEmail,
+} from "shared";
 import { AppConfig } from "../../adapters/primary/config/appConfig";
 import { createInMemoryUow } from "../../adapters/primary/config/uowConfig";
 import { SendinblueHtmlEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueHtmlEmailGateway";
@@ -37,7 +41,7 @@ describe("NotifyApplicationRejectedToBeneficiaryAndEnterprise", () => {
       config.apiKeySendinblue,
       {
         name: "Immersion Facilitée",
-        email: "contact@immersion-facile.beta.gouv.fr",
+        email: immersionFacileContactEmail,
       },
     );
     const uow = createInMemoryUow();

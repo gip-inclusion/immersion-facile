@@ -1,7 +1,7 @@
 import axios from "axios";
 import { addMonths } from "date-fns";
 import { Pool } from "pg";
-import { SiretDto } from "shared";
+import { immersionFacileContactEmail, SiretDto } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { SuggestEditFormEstablishment } from "../../../domain/immersionOffer/useCases/SuggestEditFormEstablishment";
@@ -70,7 +70,7 @@ const triggerSuggestEditFormEstablishmentEvery6Months = async () => {
           config.apiKeySendinblue,
           {
             name: "Immersion Facilitée",
-            email: "contact@immersion-facile.beta.gouv.fr",
+            email: immersionFacileContactEmail,
           },
         )
       : new InMemoryEmailGateway(clock);

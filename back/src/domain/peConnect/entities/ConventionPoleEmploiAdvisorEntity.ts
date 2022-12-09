@@ -1,12 +1,12 @@
 import { FederatedIdentity, PeConnectIdentity } from "shared";
-import { peAdvisorsErrorCount } from "../../../adapters/secondary/PeConnectGateway/peConnectCounters";
+import { getAdvisorsInfoCounter } from "../../../adapters/secondary/PeConnectGateway/peConnectApi.counter";
 import {
   ConventionPoleEmploiUserAdvisorEntity,
   PeUserAndAdvisor,
 } from "../dto/PeConnect.dto";
 import {
-  AllPeConnectAdvisorDto,
-  SupportedPeConnectAdvisorDto,
+  PeConnectAdvisorDto,
+  PeConnectImmersionAdvisorDto,
 } from "../dto/PeConnectAdvisor.dto";
 
 export const conventionPoleEmploiUserAdvisorFromDto = (
@@ -20,24 +20,24 @@ export const conventionPoleEmploiUserAdvisorFromDto = (
 });
 
 const preferCapEmploiPredicate = (
-  a: SupportedPeConnectAdvisorDto,
-  _: SupportedPeConnectAdvisorDto,
+  a: PeConnectImmersionAdvisorDto,
+  _: PeConnectImmersionAdvisorDto,
 ) => (a.type === "CAPEMPLOI" ? -1 : 1);
 
 const onlyValidAdvisorsForImmersion = (
-  advisor: AllPeConnectAdvisorDto,
-): advisor is SupportedPeConnectAdvisorDto => advisor.type != "INDEMNISATION";
+  advisor: PeConnectAdvisorDto,
+): advisor is PeConnectImmersionAdvisorDto => advisor.type != "INDEMNISATION";
 
 export const chooseValidAdvisor = (
-  advisors: AllPeConnectAdvisorDto[],
-): SupportedPeConnectAdvisorDto | undefined => {
-  const sortedValidAdvisors: SupportedPeConnectAdvisorDto[] = advisors
+  advisors: PeConnectAdvisorDto[],
+): PeConnectImmersionAdvisorDto | undefined => {
+  const sortedValidAdvisors: PeConnectImmersionAdvisorDto[] = advisors
     .filter(onlyValidAdvisorsForImmersion)
     .sort(preferCapEmploiPredicate);
 
   const preferredAdvisor = sortedValidAdvisors.at(0);
   if (!preferredAdvisor) {
-    peAdvisorsErrorCount.inc({ errorType: "peConnectNoValidAdvisor" });
+    getAdvisorsInfoCounter.error.inc({ errorType: "peConnectNoValidAdvisor" });
     return undefined;
   }
 

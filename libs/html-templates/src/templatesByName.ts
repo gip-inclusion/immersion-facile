@@ -1,5 +1,6 @@
 import {
   EmailType,
+  immersionFacileContactEmail,
   isStringDate,
   TemplatedEmail,
   toDisplayedDate,
@@ -663,7 +664,7 @@ export const templateByName: {
         label: "Modifier ma fiche entreprise",
         url: editFrontUrl,
       },
-      highlight: `Si vous n'êtes pas à l'origine de cette demande, nous vous recommandons de nous contacter rapidement par mail : contact@immersion-facile.beta.gouv.fr.`,
+      highlight: `Si vous n'êtes pas à l'origine de cette demande, nous vous recommandons de nous contacter rapidement par mail : ${immersionFacileContactEmail}.`,
       subContent: defaultSignature,
     }),
   },

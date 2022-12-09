@@ -8,6 +8,7 @@ import {
   OverFooterCols,
 } from "react-design-system/immersionFacile";
 import { routes } from "src/app/routes/routes";
+import { immersionFacileContactEmail } from "shared";
 
 const getFooterNavLinkId = (chunk: string) => `im-footer-nav__${chunk}`;
 
@@ -44,7 +45,7 @@ const overFooterCols: OverFooterCols = [
     iconTitle: "fr-icon-account-fill",
     link: {
       label: "Contactez l'équipe",
-      url: "mailto:contact@immersion-facile.beta.gouv.fr",
+      url: `mailto:${immersionFacileContactEmail}`,
     },
     id: getFooterNavLinkId("over-contact"),
   },
@@ -105,7 +106,7 @@ const bottomsLinks: NavLink[] = [
   },
   {
     label: "Nous contacter",
-    href: "mailto:contact@immersion-facile.beta.gouv.fr",
+    href: `mailto:${immersionFacileContactEmail}`,
     id: getFooterNavLinkId("privacy"),
   },
   {

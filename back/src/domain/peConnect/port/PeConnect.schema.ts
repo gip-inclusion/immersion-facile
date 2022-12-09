@@ -1,7 +1,7 @@
 import { makezTrimmedString } from "shared";
 import { z } from "zod";
 import { ConventionPoleEmploiUserAdvisorDto } from "../dto/PeConnect.dto";
-import { conventionPoleEmploiAdvisors } from "../dto/PeConnectAdvisor.dto";
+import { immersionPoleEmploiAdvisors } from "../dto/PeConnectAdvisor.dto";
 import { ConventionAndPeExternalIds } from "./ConventionPoleEmploiAdvisorRepository";
 
 export const conventionPoleEmploiUserAdvisorDtoSchema: z.Schema<ConventionPoleEmploiUserAdvisorDto> =
@@ -15,7 +15,7 @@ export const conventionPoleEmploiUserAdvisorDtoSchema: z.Schema<ConventionPoleEm
           "Le nom du conseiller ne peut pas être vide",
         ),
         email: z.string().email("L'email du conseiller est invalide"),
-        type: z.enum(conventionPoleEmploiAdvisors),
+        type: z.enum(immersionPoleEmploiAdvisors),
       })
       .optional(),
     peExternalId: z.string().uuid(),

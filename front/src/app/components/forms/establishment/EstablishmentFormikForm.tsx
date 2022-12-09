@@ -4,6 +4,7 @@ import { Notification, Title } from "react-design-system";
 import {
   FormEstablishmentDto,
   formEstablishmentSchema,
+  immersionFacileContactEmail,
   SiretDto,
 } from "shared";
 import { BoolCheckboxGroup } from "src/app/components/forms/commons/CheckboxGroup";
@@ -144,7 +145,7 @@ export const EstablishmentFormikForm = ({
                 </p>
                 <p>
                   Si vous avez besoin d'aide, envoyez-nous un email: <br />
-                  contact@immersion-facile.beta.gouv.fr
+                  {immersionFacileContactEmail}
                 </p>
               </>
             )}
@@ -200,9 +201,7 @@ const lineBreak = "%0D%0A";
 const deleteEstablishmentSubject = "Demande de suppression d'entreprise";
 const deleteEstablishmentBody = (siret: SiretDto) =>
   `Bonjour,${lineBreak}Je souhaite supprimer les données de mon entreprise dont le numéro de SIRET est ${siret}.${lineBreak}Cordialement.`;
-const immersionFacileContactEmailAddress =
-  "contact@immersion-facile.beta.gouv.fr";
 const mailtoHref = (siret: SiretDto) =>
-  `mailto:${immersionFacileContactEmailAddress}?subject=${deleteEstablishmentSubject}&body=${deleteEstablishmentBody(
+  `mailto:${immersionFacileContactEmail}?subject=${deleteEstablishmentSubject}&body=${deleteEstablishmentBody(
     siret,
   )}`;

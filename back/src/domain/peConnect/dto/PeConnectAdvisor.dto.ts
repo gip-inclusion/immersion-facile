@@ -1,28 +1,30 @@
 import { NotEmptyArray } from "shared";
 
-export const peAdvisorsSupportedTypes = ["PLACEMENT", "CAPEMPLOI"] as const;
-export const isPeAdvisorSupportedTypes = (
+export const peAdvisorImmersionKinds = ["PLACEMENT", "CAPEMPLOI"] as const;
+
+export const isPeAdvisorImmersionKind = (
   input: string,
-): input is AdvisorKind =>
-  conventionPoleEmploiAdvisors.some((value) => value === input);
+): input is PeConnectImmersionAdvisorsKind =>
+  immersionPoleEmploiAdvisors.some((value) => value === input);
 
-export const conventionPoleEmploiAdvisors: NotEmptyArray<AdvisorKind> = [
-  "PLACEMENT",
-  "CAPEMPLOI",
-];
+export const immersionPoleEmploiAdvisors: NotEmptyArray<PeConnectImmersionAdvisorsKind> =
+  ["PLACEMENT", "CAPEMPLOI"];
 
-export type AdvisorKind = typeof peAdvisorsSupportedTypes[number];
-export type SupportedPeConnectAdvisorDto = {
+export type PeConnectImmersionAdvisorsKind =
+  typeof peAdvisorImmersionKinds[number];
+
+export type PeConnectImmersionAdvisorDto = {
   email: string;
   firstName: string;
   lastName: string;
-  type: AdvisorKind;
+  type: PeConnectImmersionAdvisorsKind;
 };
 
-type AllPeAdvisorKind = AdvisorKind | "INDEMNISATION";
-export type AllPeConnectAdvisorDto = {
+type PeConnectAdvisorsKind = PeConnectImmersionAdvisorsKind | "INDEMNISATION";
+
+export type PeConnectAdvisorDto = {
   email: string;
   firstName: string;
   lastName: string;
-  type: AllPeAdvisorKind;
+  type: PeConnectAdvisorsKind;
 };

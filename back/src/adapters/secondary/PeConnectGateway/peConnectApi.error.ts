@@ -1,12 +1,12 @@
 import { AxiosError } from "axios";
-import { ConnectionRefusedError } from "shared";
 import {
+  ConnectionRefusedError,
+  HTTP_STATUS,
   ManagedRedirectError,
   RawRedirectError,
-} from "../../primary/helpers/redirectErrors";
+} from "shared";
 import { UnhandledError } from "../../primary/helpers/unhandledError";
-import HttpStatusCode from "./httpErrorCodes";
-import { PeConnectTargetsKind } from "./PeConnectApi";
+import { PeConnectTargetsKind } from "./peConnectApi.dto";
 
 export const peConnectErrorStrategy = (
   error: AxiosError,
@@ -31,7 +31,7 @@ export const peConnectErrorStrategy = (
     [
       isAdvisorsServerInternalError(context, error),
       makeRawRedirectError(
-        "Nous n'avons pas réussi à récupérer vos conseillers référents.",
+        "Nous n'avons pas réussi à récupérer vos conseillers référents alors que vous êtes demandeur d'emploi. Cette situation ne devrait pas survenir.",
         error,
       ),
     ],
@@ -65,8 +65,8 @@ export const isInvalidGrantError = (
   context: PeConnectTargetsKind,
   error: AxiosError,
 ) =>
-  context === "oauth2Step2AccessToken" &&
-  error.response?.status === HttpStatusCode.BAD_REQUEST &&
+  context === "exchangeCodeForAccessToken" &&
+  error.response?.status === HTTP_STATUS.BAD_REQUEST &&
   error.response?.data.error === "invalid_grant";
 
 export const hasNoErrorIdentifier = (error: AxiosError) =>
@@ -80,14 +80,14 @@ export const isUserServerInternalError = (
   error: AxiosError,
 ) =>
   context === "getUserInfo" &&
-  error.response?.status === HttpStatusCode.INTERNAL_SERVER_ERROR;
+  error.response?.status === HTTP_STATUS.INTERNAL_SERVER_ERROR;
 
 export const isAdvisorsServerInternalError = (
   context: PeConnectTargetsKind,
   error: AxiosError,
 ) =>
   context === "getAdvisorsInfo" &&
-  error.response?.status === HttpStatusCode.INTERNAL_SERVER_ERROR;
+  error.response?.status === HTTP_STATUS.INTERNAL_SERVER_ERROR;
 
 export const makeUnknownError = (error: AxiosError) =>
   new UnhandledError("Code erreur inconnu", error);
@@ -108,12 +108,12 @@ export const isAdvisorForbiddenError = (
   error: AxiosError,
   context: PeConnectTargetsKind,
 ): boolean =>
-  error.response?.status === HttpStatusCode.UNAUTHORIZED &&
+  error.response?.status === HTTP_STATUS.UNAUTHORIZED &&
   context === "getAdvisorsInfo";
 
 export const isUserForbiddenError = (
   error: AxiosError<any, any>,
   context: PeConnectTargetsKind,
 ): boolean =>
-  error.response?.status === HttpStatusCode.UNAUTHORIZED &&
+  error.response?.status === HTTP_STATUS.UNAUTHORIZED &&
   context === "getUserInfo";

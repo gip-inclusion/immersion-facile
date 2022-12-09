@@ -1,5 +1,5 @@
 import { AccessTokenDto } from "../dto/AccessToken.dto";
-import { AllPeConnectAdvisorDto } from "../dto/PeConnectAdvisor.dto";
+import { PeConnectAdvisorDto } from "../dto/PeConnectAdvisor.dto";
 import { PeConnectUserDto } from "../dto/PeConnectUser.dto";
 
 export interface PeConnectGateway {
@@ -8,6 +8,6 @@ export interface PeConnectGateway {
   ): Promise<AccessTokenDto | undefined>;
   getUserAndAdvisors(accessToken: AccessTokenDto): Promise<{
     user: PeConnectUserDto;
-    advisors: AllPeConnectAdvisorDto[];
+    advisors: PeConnectAdvisorDto[];
   }>;
 }

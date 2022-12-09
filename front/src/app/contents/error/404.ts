@@ -1,3 +1,4 @@
+import { immersionFacileContactEmail } from "shared";
 import { routes } from "src/app/routes/routes";
 import { HTTPFrontErrorContents } from "./types";
 
@@ -18,7 +19,7 @@ export const contents404: HTTPFrontErrorContents = {
     {
       kind: "secondary",
       label: "Contactez-nous",
-      href: "mailto:contact@immersion-facile.beta.gouv.fr",
+      href: `mailto:${immersionFacileContactEmail}`,
     },
   ],
 };

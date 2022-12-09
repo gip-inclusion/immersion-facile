@@ -7,6 +7,7 @@ import {
   ConventionDto,
   ConventionMagicLinkPayload,
   conventionSchema,
+  immersionFacileContactEmail,
   isSignatory,
   SignatoryRole,
   signatoryRoles,
@@ -66,8 +67,8 @@ export const ConventionSignPage = ({ route }: SignFormProps) => {
             <p>
               N'hésitez pas à nous contacter pour nous signaler comment ce lien
               vous est parvenu :{" "}
-              <a href="mailto:contact@immersion-facile.beta.gouv.fr">
-                contact@immersion-facile.beta.gouv.fr
+              <a href={`mailto:${immersionFacileContactEmail}`}>
+                {immersionFacileContactEmail}
               </a>
             </p>
           </Notification>

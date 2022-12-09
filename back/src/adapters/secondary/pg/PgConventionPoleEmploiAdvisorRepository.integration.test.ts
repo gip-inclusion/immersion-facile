@@ -16,7 +16,7 @@ import {
   PeUserAndAdvisor,
 } from "../../../domain/peConnect/dto/PeConnect.dto";
 import { PeConnectUserDto } from "../../../domain/peConnect/dto/PeConnectUser.dto";
-import { SupportedPeConnectAdvisorDto } from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
+import { PeConnectImmersionAdvisorDto } from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
 
 const conventionId = "88401348-bad9-4933-87c6-405b8a8fe4cc";
 const userPeExternalId = "92f44bbf-103d-4312-bd74-217c7d79f618";
@@ -30,13 +30,13 @@ const user: PeConnectUserDto = {
   lastName: "",
   peExternalId: userPeExternalId,
 };
-const placementAdvisor: SupportedPeConnectAdvisorDto = {
+const placementAdvisor: PeConnectImmersionAdvisorDto = {
   firstName: "Jean",
   lastName: "Dupont",
   email: "jean.dupont@pole-emploi.fr",
   type: "PLACEMENT",
 };
-const capemploiAdvisor: SupportedPeConnectAdvisorDto = {
+const capemploiAdvisor: PeConnectImmersionAdvisorDto = {
   firstName: "Jeanne",
   lastName: "Delamare",
   email: "jeanne.delamare@pole-emploi.fr",

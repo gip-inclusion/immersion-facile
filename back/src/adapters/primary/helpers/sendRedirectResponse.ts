@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
-import { AbsoluteUrl } from "shared";
+import { AbsoluteUrl, ManagedRedirectError, RawRedirectError } from "shared";
 import { createLogger } from "../../../utils/logger";
 import { handleHttpJsonResponseError } from "./handleHttpJsonResponseError";
-import { ManagedRedirectError, RawRedirectError } from "./redirectErrors";
 
 const logger = createLogger(__filename);
 export const sendRedirectResponse = async (

@@ -5,7 +5,7 @@ import {
   ConventionPoleEmploiUserAdvisorEntity,
   PeUserAndAdvisor,
 } from "../../../domain/peConnect/dto/PeConnect.dto";
-import { isPeAdvisorSupportedTypes } from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
+import { isPeAdvisorImmersionKind } from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
 import {
   ConventionAndPeExternalIds,
   ConventionPoleEmploiAdvisorRepository,
@@ -51,10 +51,10 @@ export class PgConventionPoleEmploiAdvisorRepository
     await this.client.query(upsertOnCompositePrimaryKeyConflict, [
       user.peExternalId,
       CONVENTION_ID_DEFAULT_UUID,
-      advisor ? advisor.firstName : null,
-      advisor ? advisor.lastName : null,
-      advisor ? advisor.email : null,
-      advisor ? advisor.type : null,
+      advisor?.firstName ?? null,
+      advisor?.lastName ?? null,
+      advisor?.email ?? null,
+      advisor?.type ?? null,
     ]);
   }
 
@@ -99,7 +99,7 @@ const toConventionPoleEmploiUserAdvisorDTO = ({
   type,
 }: PgConventionPoleEmploiUserAdvisorDto): ConventionPoleEmploiUserAdvisorDto => ({
   advisor:
-    firstname && lastname && email && type && isPeAdvisorSupportedTypes(type)
+    firstname && lastname && email && type && isPeAdvisorImmersionKind(type)
       ? {
           firstName: firstname,
           lastName: lastname,

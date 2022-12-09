@@ -37,6 +37,8 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
   const { enablePeConnectApi, isLoading } = useFeatureFlags();
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
 
+  const isNotPeConnected = enablePeConnectApi && !federatedIdentity;
+
   useFederatedIdentity(route);
   useFederatedIdentityOnReload();
 
@@ -53,19 +55,16 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
       />
     );
 
-  if (enablePeConnectApi && !federatedIdentity)
-    return (
-      <div className="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
-        <InitiateConventionCard
-          title="Une demande de convention d'immersion a été partagée avec vous. "
-          peConnectNotice="Je suis demandeur d’emploi et je connais mes identifiants à mon compte Pôle emploi. J'accède au formulaire ici :"
-          otherCaseNotice="Je suis dans une autre situation (candidat à une immersion sans identifiant Pôle emploi, entreprise ou conseiller emploi). J'accède au formulaire partagé ici :"
-          showFormButtonLabel="Ouvrir le formulaire"
-        />
-      </div>
-    );
-
-  return (
+  return isNotPeConnected ? (
+    <div className="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+      <InitiateConventionCard
+        title="Une demande de convention d'immersion a été partagée avec vous. "
+        peConnectNotice="Je suis demandeur d’emploi et je connais mes identifiants à mon compte Pôle emploi. J'accède au formulaire ici :"
+        otherCaseNotice="Je suis dans une autre situation (candidat à une immersion sans identifiant Pôle emploi, entreprise ou conseiller emploi). J'accède au formulaire partagé ici :"
+        showFormButtonLabel="Ouvrir le formulaire"
+      />
+    </div>
+  ) : (
     <ConventionForm
       properties={conventionInitialValuesFromUrl({
         route,

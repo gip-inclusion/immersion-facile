@@ -1,6 +1,6 @@
 import axios from "axios";
 import { Pool } from "pg";
-import { exhaustiveCheck } from "shared";
+import { exhaustiveCheck, immersionFacileContactEmail } from "shared";
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
 import { Clock } from "../../../domain/core/ports/Clock";
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
@@ -38,14 +38,14 @@ import { HttpPassEmploiGateway } from "../../secondary/immersionOffer/passEmploi
 import { InMemoryPassEmploiGateway } from "../../secondary/immersionOffer/passEmploi/InMemoryPassEmploiGateway";
 import { HttpPoleEmploiGateway } from "../../secondary/immersionOffer/poleEmploi/HttpPoleEmploiGateway";
 import { InMemoryPeConnectGateway } from "../../secondary/PeConnectGateway/InMemoryPeConnectGateway";
-import { NewHttpPeConnectGateway } from "../../secondary/PeConnectGateway/NewHttpPeConnectGateway";
-import { makePeConnectHttpClient } from "../../secondary/PeConnectGateway/PeConnectApi";
+import { HttpPeConnectGateway } from "../../secondary/PeConnectGateway/HttpPeConnectGateway";
 import { ExcelExportGateway } from "../../secondary/reporting/ExcelExportGateway";
 import { InMemoryExportGateway } from "../../secondary/reporting/InMemoryExportGateway";
 import { S3DocumentGateway } from "../../secondary/S3DocumentGateway";
 import { HttpsSireneGateway } from "../../secondary/sirene/HttpsSireneGateway";
 import { InMemorySireneGateway } from "../../secondary/sirene/InMemorySireneGateway";
 import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
+import { makePeConnectHttpClient } from "../../secondary/PeConnectGateway/peConnectApi.client";
 
 const logger = createLogger(__filename);
 
@@ -164,7 +164,7 @@ const createEmailGateway = (config: AppConfig, clock: Clock): EmailGateway => {
     config.apiKeySendinblue,
     {
       name: "Immersion Facilitée",
-      email: "contact@immersion-facile.beta.gouv.fr",
+      email: immersionFacileContactEmail,
     },
   );
 
@@ -188,7 +188,7 @@ const createEmailGateway = (config: AppConfig, clock: Clock): EmailGateway => {
 
 const createPoleEmploiConnectGateway = (config: AppConfig) =>
   config.peConnectGateway === "HTTPS"
-    ? new NewHttpPeConnectGateway(
+    ? new HttpPeConnectGateway(
         makePeConnectHttpClient(
           createAxiosHandlerCreator(
             axios.create({
@@ -197,7 +197,11 @@ const createPoleEmploiConnectGateway = (config: AppConfig) =>
           ),
           config,
         ),
-        config,
+        {
+          immersionFacileBaseUrl: config.immersionFacileBaseUrl,
+          poleEmploiClientId: config.poleEmploiClientId,
+          poleEmploiClientSecret: config.poleEmploiClientSecret,
+        },
       )
     : new InMemoryPeConnectGateway();
 

@@ -1,4 +1,5 @@
 import React from "react";
+import { Notification } from "react-design-system";
 import { useRedirectToConventionWithoutIdentityProvider } from "src/app/hooks/redirections.hooks";
 
 export const PEConnectNoValidAdvisor = () => {
@@ -6,10 +7,10 @@ export const PEConnectNoValidAdvisor = () => {
     useRedirectToConventionWithoutIdentityProvider();
 
   return (
-    <div role="alert" className={`fr-alert fr-alert--warning`}>
-      <p className="fr-alert__title">
-        Impossible d'identifier votre conseiller référent
-      </p>
+    <Notification
+      title="Impossible d'identifier votre conseiller référent"
+      type="warning"
+    >
       <p className="fr-my-2w">
         Les données retournées par Pôle Emploi ne permettent pas d'identifier le
         conseiller référent qui vous est dédié.
@@ -28,6 +29,6 @@ export const PEConnectNoValidAdvisor = () => {
           contact@immersion-facile.com
         </a>
       </p>
-    </div>
+    </Notification>
   );
 };

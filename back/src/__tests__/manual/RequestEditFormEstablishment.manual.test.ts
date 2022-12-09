@@ -1,4 +1,5 @@
 import axios from "axios";
+import { immersionFacileContactEmail } from "shared";
 import {
   AppConfig,
   makeEmailAllowListPredicate,
@@ -61,7 +62,7 @@ describe("RequestEditFormEstablishment", () => {
       config.apiKeySendinblue,
       {
         name: "Immersion Facilitée",
-        email: "contact@immersion-facile.beta.gouv.fr",
+        email: immersionFacileContactEmail,
       },
     );
     const generateEditFormEstablishmentUrl =

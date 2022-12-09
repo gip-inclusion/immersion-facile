@@ -1,4 +1,5 @@
 import React from "react";
+import { Notification } from "react-design-system";
 import { useRedirectToConventionWithoutIdentityProvider } from "src/app/hooks/redirections.hooks";
 
 export const PEConnectNoValidUser = () => {
@@ -6,11 +7,11 @@ export const PEConnectNoValidUser = () => {
     useRedirectToConventionWithoutIdentityProvider();
 
   return (
-    <div role="alert" className={`fr-alert fr-alert--warning`}>
-      <p className="fr-alert__title">
-        Les données retournées par Pôle Emploi Connect ne permettent pas de vous
-        identifier.
-      </p>
+    <Notification
+      title="Les données retournées par Pôle Emploi Connect ne permettent pas de vous
+      identifier."
+      type="warning"
+    >
       <p className="fr-my-2w">
         Les données retournées par Pôle Emploi ne permettent pas de vous
         identifier.
@@ -29,6 +30,6 @@ export const PEConnectNoValidUser = () => {
           contact@immersion-facile.com
         </a>
       </p>
-    </div>
+    </Notification>
   );
 };

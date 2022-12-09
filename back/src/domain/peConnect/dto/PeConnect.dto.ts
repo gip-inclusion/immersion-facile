@@ -1,12 +1,12 @@
 import { Beneficiary } from "shared";
 import { EntityFromDto } from "../../core/EntityFromDto";
-import { SupportedPeConnectAdvisorDto } from "./PeConnectAdvisor.dto";
+import { PeConnectImmersionAdvisorDto } from "./PeConnectAdvisor.dto";
 import { PeConnectUserDto } from "./PeConnectUser.dto";
 
 export type ConventionPoleEmploiUserAdvisorDto = {
   peExternalId: string;
   conventionId: string;
-  advisor?: SupportedPeConnectAdvisorDto;
+  advisor?: PeConnectImmersionAdvisorDto;
 };
 
 export type ConventionPoleEmploiUserAdvisorEntity = EntityFromDto<
@@ -20,7 +20,7 @@ export type ConventionPeConnectFields = Pick<
 >;
 
 export type PeUserAndAdvisor = {
-  advisor: SupportedPeConnectAdvisorDto | undefined;
+  advisor: PeConnectImmersionAdvisorDto | undefined;
   user: PeConnectUserDto;
 };
 

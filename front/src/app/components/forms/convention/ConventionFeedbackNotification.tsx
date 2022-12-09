@@ -1,6 +1,11 @@
 import { values } from "ramda";
 import React from "react";
-import { Signatories, Signatory, SignatoryRole } from "shared";
+import {
+  immersionFacileContactEmail,
+  Signatories,
+  Signatory,
+  SignatoryRole,
+} from "shared";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import {
   ConventionSubmitFeedback,
@@ -81,8 +86,8 @@ const InitialSubmitSuccessMessageBase = ({
     </p>
     <p className="fr-text fr-my-2w">
       Si vous ne recevez rien, alertez nous:&nbsp;
-      <a href="mailto:contact@immersion-facile.beta.gouv.fr">
-        contact@immersion-facile.beta.gouv.fr
+      <a href={`mailto:${immersionFacileContactEmail}`}>
+        {immersionFacileContactEmail}
       </a>
     </p>
   </div>

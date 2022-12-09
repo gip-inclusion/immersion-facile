@@ -10,8 +10,8 @@ import { conventionPoleEmploiUserAdvisorFromDto } from "../../../domain/peConnec
 import { LinkPoleEmploiAdvisorAndRedirectToConvention } from "../../../domain/peConnect/useCases/LinkPoleEmploiAdvisorAndRedirectToConvention";
 import { AccessTokenDto } from "../dto/AccessToken.dto";
 import {
-  AllPeConnectAdvisorDto,
-  SupportedPeConnectAdvisorDto,
+  PeConnectAdvisorDto,
+  PeConnectImmersionAdvisorDto,
 } from "../dto/PeConnectAdvisor.dto";
 import { PeConnectUserDto } from "../dto/PeConnectUser.dto";
 
@@ -173,7 +173,7 @@ const mockedUser: PeConnectUserDto = {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const mockedValidAdvisor: AllPeConnectAdvisorDto = {
+const mockedValidAdvisor: PeConnectAdvisorDto = {
   email: "elsa.oldenburg@pole-emploi.net",
   firstName: "Elsa",
   lastName: "Oldenburg",
@@ -195,21 +195,21 @@ const peNotJobseekerUser: PeConnectUserDto = {
   email: "john.doe@gmail.com",
 };
 
-const pePlacementAdvisor: SupportedPeConnectAdvisorDto = {
+const pePlacementAdvisor: PeConnectImmersionAdvisorDto = {
   email: "jane.smith@pole-emploi.net",
   lastName: "Smith",
   firstName: "Jane",
   type: "PLACEMENT",
 };
 
-const peIndemnisationAdvisor: AllPeConnectAdvisorDto = {
+const peIndemnisationAdvisor: PeConnectAdvisorDto = {
   email: "017jean.dupont@pole-emploi.net",
   firstName: "Jean",
   lastName: "Dupont",
   type: "INDEMNISATION",
 };
 
-const peCapemploiAdvisor: SupportedPeConnectAdvisorDto = {
+const peCapemploiAdvisor: PeConnectImmersionAdvisorDto = {
   email: "elsa.oldenburg@pole-emploi.net",
   lastName: "Oldenburg",
   firstName: "Elsa",

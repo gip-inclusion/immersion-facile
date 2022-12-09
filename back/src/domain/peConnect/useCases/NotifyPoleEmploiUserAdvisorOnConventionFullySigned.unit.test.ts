@@ -13,7 +13,7 @@ import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPer
 import { PeUserAndAdvisor } from "../../../domain/peConnect/dto/PeConnect.dto";
 import { NotifyPoleEmploiUserAdvisorOnConventionFullySigned } from "../../../domain/peConnect/useCases/NotifyPoleEmploiUserAdvisorOnConventionFullySigned";
 import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/fakeGenerateMagicLinkUrlFn";
-import { SupportedPeConnectAdvisorDto } from "../dto/PeConnectAdvisor.dto";
+import { PeConnectImmersionAdvisorDto } from "../dto/PeConnectAdvisor.dto";
 
 describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
   let uow: InMemoryUnitOfWork;
@@ -130,7 +130,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
 
 const conventionId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
 const userPeExternalId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
-const advisor: SupportedPeConnectAdvisorDto = {
+const advisor: PeConnectImmersionAdvisorDto = {
   email: "elsa.oldenburg@pole-emploi.net",
   firstName: "Elsa",
   lastName: "Oldenburg",
