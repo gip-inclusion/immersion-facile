@@ -4,10 +4,7 @@ import { ButtonHome } from "react-design-system";
 import { Section } from "src/app/components/Section";
 import { deviceRepository } from "src/config/dependencies";
 import { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
-import {
-  ButtonsGroup,
-  PeConnectButton,
-} from "react-design-system/immersionFacile";
+import { PeConnectButton } from "react-design-system/immersionFacile";
 import { EstablishmentSubTitle } from "src/app/components/EstablishmentSubTitle";
 import { useRoute } from "src/app/routes/routes";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
@@ -68,15 +65,12 @@ export const InitiateConventionCard = ({
           ></p>
         </>
       )}
-      {/*TODO : change HomeButton to take 'candidate' and 'establishment' as type params ('error' is very confusing here...)*/}
-      <ButtonsGroup>
-        <ButtonHome
-          type="candidate"
-          onClick={redirectToConventionWithoutIdentityProvider}
-        >
-          {showFormButtonLabel}
-        </ButtonHome>
-      </ButtonsGroup>
+      <ButtonHome
+        type="candidate"
+        onClick={redirectToConventionWithoutIdentityProvider}
+      >
+        {showFormButtonLabel}
+      </ButtonHome>
     </div>
   );
   const section = (

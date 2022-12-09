@@ -7,7 +7,7 @@ export type TitleProps = {
 };
 
 export const Title = ({ children, red, heading }: TitleProps) => {
-  const Tag = heading ? `h${heading}` : "div";
+  const Tag: keyof JSX.IntrinsicElements = heading ? `h${heading}` : "div";
   return (
     <Tag
       className={`${
