@@ -1,15 +1,14 @@
 import { keys } from "ramda";
 import React from "react";
-import { ButtonHome } from "react-design-system";
-import { Section } from "src/app/components/Section";
-import { deviceRepository } from "src/config/dependencies";
-import { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
-import { PeConnectButton } from "react-design-system/immersionFacile";
-import { EstablishmentSubTitle } from "src/app/components/EstablishmentSubTitle";
-import { useRoute } from "src/app/routes/routes";
-import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
-import { useRedirectToConventionWithoutIdentityProvider } from "src/app/hooks/redirections.hooks";
+import { ButtonHome, PeConnectButton } from "react-design-system";
 import { loginPeConnect } from "shared";
+import { EstablishmentSubTitle } from "src/app/components/EstablishmentSubTitle";
+import { Section } from "src/app/components/Section";
+import { useRedirectToConventionWithoutIdentityProvider } from "src/app/hooks/redirections.hooks";
+import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
+import { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
+import { useRoute } from "src/app/routes/routes";
+import { deviceRepository } from "src/config/dependencies";
 
 const storeConventionRouteParamsOnDevice = (
   routeParams: ConventionImmersionPageRoute["params"],
@@ -40,37 +39,49 @@ export const InitiateConventionCard = ({
   const redirectToConventionWithoutIdentityProvider =
     useRedirectToConventionWithoutIdentityProvider();
   const cardContent = (
-    <div className="flex flex-col w-full h-full items-center justify-center">
-      {enablePeConnectApi && (
+    <div>
+      {enablePeConnectApi ? (
         <>
-          <p className="text-center  fr-mb-2w">{peConnectNotice}</p>
-          <PeConnectButton
-            onClick={() => {
-              if (currentRoute.name === "conventionImmersion")
-                storeConventionRouteParamsOnDevice(currentRoute.params);
-            }}
-            peConnectEndpoint={loginPeConnect}
-          />
-          <a
-            className="small mt-1"
-            href="https://candidat.pole-emploi.fr/compte/identifiant/saisieinformations"
-            target="_blank"
-          >
-            Je ne connais pas mes identifiants
-          </a>
-          <strong className="pt-4">ou bien</strong>
-          <p
-            className="text-center fr-my-2w"
-            dangerouslySetInnerHTML={{ __html: otherCaseNotice }}
-          ></p>
+          <div className="flex flex-col w-full h-full items-center justify-center text-center">
+            <p
+              className="align-center"
+              dangerouslySetInnerHTML={{ __html: peConnectNotice }}
+            ></p>
+            <PeConnectButton
+              onClick={() => {
+                if (currentRoute.name === "conventionImmersion")
+                  storeConventionRouteParamsOnDevice(currentRoute.params);
+              }}
+              peConnectEndpoint={loginPeConnect}
+            />
+            <a
+              className="fr-text--sm fr-mt-1v"
+              href="https://candidat.pole-emploi.fr/compte/identifiant/saisieinformations"
+              target="_blank"
+            >
+              Je ne connais pas mes identifiants
+            </a>
+          </div>
+          <div className="flex flex-col w-full h-full items-center justify-center">
+            <strong className="fr-text--lead">ou bien</strong>
+          </div>
+          <div className="flex flex-col w-full h-full items-center justify-center">
+            <p
+              className="text-center"
+              dangerouslySetInnerHTML={{ __html: otherCaseNotice }}
+            ></p>
+            <OtherChoiceButton
+              label={showFormButtonLabel}
+              onClick={redirectToConventionWithoutIdentityProvider}
+            />
+          </div>
         </>
+      ) : (
+        <OtherChoiceButton
+          label={showFormButtonLabel}
+          onClick={redirectToConventionWithoutIdentityProvider}
+        />
       )}
-      <ButtonHome
-        type="candidate"
-        onClick={redirectToConventionWithoutIdentityProvider}
-      >
-        {showFormButtonLabel}
-      </ButtonHome>
     </div>
   );
   const section = (
@@ -81,3 +92,15 @@ export const InitiateConventionCard = ({
   );
   return useSection ? section : cardContent;
 };
+
+const OtherChoiceButton = (props: {
+  onClick: () => void;
+  label: string;
+}): JSX.Element => (
+  <>
+    {/*TODO : change HomeButton to take 'candidate' and 'establishment' as type params ('error' is very confusing here...)*/}
+    <ButtonHome type="candidate" onClick={props.onClick}>
+      {props.label}
+    </ButtonHome>
+  </>
+);
