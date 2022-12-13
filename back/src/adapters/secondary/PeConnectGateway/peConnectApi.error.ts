@@ -8,12 +8,29 @@ import {
 import { UnhandledError } from "../../primary/helpers/unhandledError";
 import { PeConnectTargetsKind } from "./peConnectApi.dto";
 
+// ! In a map the highest priority is given to the lasted entry
 export const peConnectErrorStrategy = (
   error: AxiosError,
   context: PeConnectTargetsKind,
 ) =>
   new Map<boolean, UnhandledError | RawRedirectError | ManagedRedirectError>([
+    // Generic catch all Http errors
+    [
+      isHttpClientError4XX(error),
+      makeRawRedirectError(
+        "Une erreur est survenue lors de la connexion aux service pole emploi",
+        error,
+      ),
+    ],
+    [
+      isHttpServerError5XX(error),
+      makeRawRedirectError(
+        "Une erreur est survenue lors de la connexion aux service pole emploi",
+        error,
+      ),
+    ],
     [hasNoErrorIdentifier(error), makeUnknownError(error)],
+    // Specific error management
     [
       error instanceof ConnectionRefusedError,
       makeRawRedirectError(
@@ -22,16 +39,16 @@ export const peConnectErrorStrategy = (
       ),
     ],
     [
-      isUserServerInternalError(context, error),
+      isUserInfoServerInternalError(context, error),
       makeRawRedirectError(
-        "Nous n'avons pas réussi à récupérer vos informations personnelles pôle emploi connect.",
+        "Nous n’avons pas réussi à récupérer vos informations personnelles pôle emploi connect.",
         error,
       ),
     ],
     [
       isAdvisorsServerInternalError(context, error),
       makeRawRedirectError(
-        "Nous n'avons pas réussi à récupérer vos conseillers référents alors que vous êtes demandeur d'emploi. Cette situation ne devrait pas survenir.",
+        "Nous n’avons pas réussi à récupérer vos conseillers référents alors que vous êtes demandeur d’emploi. Cette situation ne devrait pas survenir.",
         error,
       ),
     ],
@@ -51,7 +68,7 @@ export const peConnectErrorStrategy = (
       error.message === "Network Error",
       new RawRedirectError(
         `Une erreur est survenue - Erreur réseau`,
-        "Nous n'avons pas réussi à joindre pôle emploi connect.",
+        "Nous n’avons pas réussi à joindre pôle emploi connect.",
         error,
       ),
     ],
@@ -75,7 +92,7 @@ export const hasNoErrorIdentifier = (error: AxiosError) =>
 const rawRedirectTitle = (error: AxiosError) =>
   `Une erreur est survenue - ${error.response?.status ?? error.code}`;
 
-export const isUserServerInternalError = (
+export const isUserInfoServerInternalError = (
   context: PeConnectTargetsKind,
   error: AxiosError,
 ) =>
@@ -117,3 +134,15 @@ export const isUserForbiddenError = (
 ): boolean =>
   error.response?.status === HTTP_STATUS.UNAUTHORIZED &&
   context === "getUserInfo";
+
+export const isHttpServerError5XX = (error: AxiosError): boolean =>
+  !!error &&
+  !!error.response &&
+  !!error.response.status &&
+  error.response.status.toString().startsWith("5");
+
+export const isHttpClientError4XX = (error: AxiosError): boolean =>
+  !!error &&
+  !!error.response &&
+  !!error.response.status &&
+  error.response.status.toString().startsWith("4");

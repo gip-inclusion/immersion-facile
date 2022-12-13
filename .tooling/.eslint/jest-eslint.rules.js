@@ -14,6 +14,7 @@ module.exports = {
     },
   ],
   "jest/no-alias-methods": "error",
+  "jest/no-commented-out-tests": "off",
   "jest/no-duplicate-hooks": "error",
   "jest/no-if": "error",
   "jest/no-large-snapshots": ["error", { maxSize: 12, inlineMaxSize: 6 }],

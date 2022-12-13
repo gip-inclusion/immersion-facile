@@ -18,13 +18,14 @@ import {
   toPeConnectUserDto,
 } from "./peConnectApi.client";
 import {
-  ExternalPeConnectUser,
-  ExternalPeConnectAdvisor,
   ExternalAccessToken,
+  ExternalPeConnectAdvisor,
+  ExternalPeConnectUser,
 } from "./peConnectApi.dto";
 
 describe("HttpPeConnectGateway", () => {
   const appConfig = {} as AppConfig;
+
   const adapter = new HttpPeConnectGateway(
     makePeConnectHttpClient(createAxiosHandlerCreator(axios), appConfig),
     appConfig,
@@ -119,7 +120,7 @@ describe("HttpPeConnectGateway", () => {
           .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
           .reply(200, {
             codeStatutIndividu: "1",
-            libelleStatutIndividu: "Demandeur d'emploi",
+            libelleStatutIndividu: "Demandeur d’emploi",
           });
         expectObjectsToMatch(await adapter.getUserAndAdvisors(accessToken), {
           advisors: [peConnectAdvisorPlacement],
@@ -135,7 +136,7 @@ describe("HttpPeConnectGateway", () => {
           .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
           .reply(200, {
             codeStatutIndividu: "1",
-            libelleStatutIndividu: "Demandeur d'emploi",
+            libelleStatutIndividu: "Demandeur d’emploi",
           });
 
         expectObjectsToMatch(await adapter.getUserAndAdvisors(accessToken), {
@@ -150,7 +151,7 @@ describe("HttpPeConnectGateway", () => {
           .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
           .reply(200, {
             codeStatutIndividu: "0",
-            libelleStatutIndividu: "Non demandeur d'emploi",
+            libelleStatutIndividu: "Non demandeur d’emploi",
           });
 
         expectObjectsToMatch(await adapter.getUserAndAdvisors(accessToken), {
@@ -162,19 +163,24 @@ describe("HttpPeConnectGateway", () => {
     describe("Wrong path", () => {
       describe("Errors on getUserInfo", () => {
         // eslint-disable-next-line jest/no-disabled-tests
-        it.skip(`Timeout on getUserInfo -> Retry`, async () => {
-          mock
-            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
-            .reply(200, [peExternalAdvisorPlacement])
-            .onGet(peConnectTargets(appConfig).getUserInfo.url)
-            .timeoutOnce()
-            .onGet(peConnectTargets(appConfig).getUserInfo.url)
-            .reply(200, peExternalUser);
-          expectObjectsToMatch(await adapter.getUserAndAdvisors(accessToken), {
-            advisors: [peConnectAdvisorCapEmploi],
-            user: peConnectUser(true),
-          });
-        });
+        // it(`Timeout on getUserInfo -> Retry`, async () => {
+        //   mock
+        //     .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+        //     .reply(200, [peExternalAdvisorCapemploi])
+        //     .onGet(peConnectTargets(appConfig).getUserInfo.url)
+        //     .timeout()
+        //     /*            .onGet(peConnectTargets(appConfig).getUserInfo.url)
+        //     .reply(200, peExternalUser)*/
+        //     .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
+        //     .reply(200, {
+        //       codeStatutIndividu: "1",
+        //       libelleStatutIndividu: "Demandeur d’emploi",
+        //     });
+        //   expectObjectsToMatch(await adapter.getUserAndAdvisors(accessToken), {
+        //     advisors: [peConnectAdvisorCapEmploi],
+        //     user: peConnectUser(true),
+        //   });
+        // });
 
         // eslint-disable-next-line jest/no-disabled-tests
         it.skip("Should manage Zod Error", () => {
@@ -202,7 +208,7 @@ describe("HttpPeConnectGateway", () => {
             () => adapter.getUserAndAdvisors(accessToken),
             new RawRedirectError(
               "Une erreur est survenue - Erreur réseau",
-              "Nous n'avons pas réussi à joindre pôle emploi connect.",
+              "Nous n’avons pas réussi à joindre pôle emploi connect.",
               new Error(),
             ),
           );
@@ -232,7 +238,7 @@ describe("HttpPeConnectGateway", () => {
             () => adapter.getUserAndAdvisors(accessToken),
             new RawRedirectError(
               "Une erreur est survenue - 500",
-              "Nous n'avons pas réussi à récupérer vos informations personnelles pôle emploi connect.",
+              "Nous n’avons pas réussi à récupérer vos informations personnelles pôle emploi connect.",
               new Error(),
             ),
           );
@@ -241,24 +247,24 @@ describe("HttpPeConnectGateway", () => {
 
       describe("Errors on getAdvisorsInfo", () => {
         // eslint-disable-next-line jest/no-disabled-tests
-        it.skip(`Timeout on getUserInfo -> Retry`, async () => {
-          mock
-            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
-            .reply(200, [peExternalAdvisorPlacement])
-            .onGet(peConnectTargets(appConfig).getUserInfo.url)
-            .timeoutOnce()
-            .onGet(peConnectTargets(appConfig).getUserInfo.url)
-            .reply(200, peExternalUser);
-          expectObjectsToMatch(await adapter.getUserAndAdvisors(accessToken), {
-            advisors: [peConnectAdvisorCapEmploi],
-            user: peConnectUser(true),
-          });
-        });
-
-        // eslint-disable-next-line jest/no-disabled-tests
-        it.skip("Should manage Zod Error", () => {
-          expect(true).toBe(false);
-        });
+        // it(`Timeout on getAdvisorsInfo -> Retry`, async () => {
+        //   mock
+        //     .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+        //     .timeout()
+        //     /*            .onGet(peConnectTargets(appConfig).getUserInfo.url)
+        //     .reply(200, peExternalUser)*/
+        //     .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+        //     .reply(200, [peExternalAdvisorCapemploi])
+        //     .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
+        //     .reply(200, {
+        //       codeStatutIndividu: "1",
+        //       libelleStatutIndividu: "Demandeur d’emploi",
+        //     });
+        //   expectObjectsToMatch(await adapter.getUserAndAdvisors(accessToken), {
+        //     advisors: [peConnectAdvisorCapEmploi],
+        //     user: peConnectUser(true),
+        //   });
+        // });
 
         it(`Connection aborted -> ManagedRedirectError kind peConnectConnectionAborted`, async () => {
           mock
@@ -269,7 +275,7 @@ describe("HttpPeConnectGateway", () => {
             .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
             .reply(200, {
               codeStatutIndividu: "1",
-              libelleStatutIndividu: "Demandeur d'emploi",
+              libelleStatutIndividu: "Demandeur d’emploi",
             });
           await testManagedRedirectError(
             () => adapter.getUserAndAdvisors(accessToken),
@@ -285,13 +291,13 @@ describe("HttpPeConnectGateway", () => {
             .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
             .reply(200, {
               codeStatutIndividu: "1",
-              libelleStatutIndividu: "Demandeur d'emploi",
+              libelleStatutIndividu: "Demandeur d’emploi",
             });
           await testRawRedirectError(
             () => adapter.getUserAndAdvisors(accessToken),
             new RawRedirectError(
               "Une erreur est survenue - Erreur réseau",
-              "Nous n'avons pas réussi à joindre pôle emploi connect.",
+              "Nous n’avons pas réussi à joindre pôle emploi connect.",
               new Error(),
             ),
           );
@@ -305,7 +311,7 @@ describe("HttpPeConnectGateway", () => {
             .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
             .reply(200, {
               codeStatutIndividu: "1",
-              libelleStatutIndividu: "Demandeur d'emploi",
+              libelleStatutIndividu: "Demandeur d’emploi",
             });
           await testManagedRedirectError(
             () => adapter.getUserAndAdvisors(accessToken),
@@ -322,7 +328,7 @@ describe("HttpPeConnectGateway", () => {
             .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
             .reply(200, {
               codeStatutIndividu: "1",
-              libelleStatutIndividu: "Demandeur d'emploi",
+              libelleStatutIndividu: "Demandeur d’emploi",
             })
             .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
             .reply(500);

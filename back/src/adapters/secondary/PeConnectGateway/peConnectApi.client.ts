@@ -10,19 +10,17 @@ import { PeConnectAdvisorDto } from "../../../domain/peConnect/dto/PeConnectAdvi
 import { PeConnectUserDto } from "../../../domain/peConnect/dto/PeConnectUser.dto";
 import { AppConfig } from "../../primary/config/appConfig";
 import {
-  AccessTokenHttpRequestConfig,
   ExternalAccessToken,
   ExternalPeConnectAdvisor,
   ExternalPeConnectOAuthGrantPayload,
   ExternalPeConnectUser,
   PeConnectHeaders,
-  PeConnectOauthConfig,
   PeConnectTargets,
 } from "./peConnectApi.dto";
 
 export const makePeConnectHttpClient = (
   handlerCreator: HandlerCreator,
-  appConfig: AppConfig,
+  appConfig: PeConnectTargetsConfig,
 ): HttpClient<PeConnectTargets> =>
   configureHttpClient(handlerCreator)<PeConnectTargets>(
     peConnectTargets(appConfig),
@@ -41,23 +39,28 @@ export const peConnectNeededScopesForAllUsedApi = (clientId: string): string =>
     "statut",
   ].join(" ");
 
-export const peConnectTargets = (appConfig: AppConfig) =>
+type PeConnectTargetsConfig = {
+  peApiUrl: AbsoluteUrl;
+  peAuthCandidatUrl: AbsoluteUrl;
+};
+
+export const peConnectTargets = (config: PeConnectTargetsConfig) =>
   createTargets<PeConnectTargets>({
     getAdvisorsInfo: {
       method: "GET",
-      url: `${appConfig.peApiUrl}/partenaire/peconnect-conseillers/v1/contactspe/conseillers`,
+      url: `${config.peApiUrl}/partenaire/peconnect-conseillers/v1/contactspe/conseillers`,
     },
     getUserInfo: {
       method: "GET",
-      url: `${appConfig.peApiUrl}/partenaire/peconnect-individu/v1/userinfo`,
+      url: `${config.peApiUrl}/partenaire/peconnect-individu/v1/userinfo`,
     },
     getUserStatutInfo: {
       method: "GET",
-      url: `${appConfig.peApiUrl}/partenaire/peconnect-statut/v1/statut`,
+      url: `${config.peApiUrl}/partenaire/peconnect-statut/v1/statut`,
     },
     exchangeCodeForAccessToken: {
       method: "POST",
-      url: `${appConfig.peAuthCandidatUrl}/connexion/oauth2/access_token?realm=%2Findividu`,
+      url: `${config.peAuthCandidatUrl}/connexion/oauth2/access_token?realm=%2Findividu`,
     },
   });
 
@@ -85,22 +88,6 @@ export const makeOauthGetAuthorizationCodeRedirectUrl = (
   `${peAuthCandidatUrl}/connexion/oauth2/authorize?${queryParamsAsString<ExternalPeConnectOAuthGrantPayload>(
     authorizationCodePayload,
   )}`;
-
-export const toAccessTokenHttpRequestConfig = (
-  authorizationCode: string,
-  configs: PeConnectOauthConfig,
-): AccessTokenHttpRequestConfig => ({
-  body: {
-    client_id: configs.poleEmploiClientId,
-    client_secret: configs.poleEmploiClientSecret,
-    code: authorizationCode,
-    grant_type: "authorization_code",
-    redirect_uri: `${configs.immersionFacileBaseUrl}/api/pe-connect`,
-  },
-  headers: {
-    "Content-Type": "application/x-www-form-urlencoded",
-  },
-});
 
 export const toPeConnectAdvisorDto = (
   fromApi: ExternalPeConnectAdvisor,

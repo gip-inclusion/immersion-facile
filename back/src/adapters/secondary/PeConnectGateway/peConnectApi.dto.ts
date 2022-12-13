@@ -7,11 +7,7 @@ export type PeConnectTargets = CreateTargets<{
   getUserInfo: Target<void, void, PeConnectHeaders>;
   getAdvisorsInfo: Target<void, void, PeConnectHeaders>;
   getUserStatutInfo: Target<void, void, PeConnectHeaders>;
-  exchangeCodeForAccessToken: Target<
-    ExternalPeConnectOAuthGetTokenWithCodeGrantPayload,
-    void,
-    PeConnectAccessTokenHeaders
-  >;
+  exchangeCodeForAccessToken: Target<string, void, PeConnectAccessTokenHeaders>;
 }>;
 
 export type PeConnectTargetsKind = keyof PeConnectTargets;
@@ -34,7 +30,7 @@ export type ExternalPeConnectUser = {
 // External contract from https://pole-emploi.io/data/api/pole-emploi-connect/statut
 export type ExternalPeConnectStatut = {
   codeStatutIndividu: "0" | "1";
-  libelleStatutIndividu: "Non demandeur d'emploi" | "Demandeur d'emploi";
+  libelleStatutIndividu: "Non demandeur d’emploi" | "Demandeur d’emploi";
 };
 
 // External contract from https://pole-emploi.io/data/api/conseillers
@@ -78,9 +74,4 @@ export type PeConnectOauthConfig = {
   poleEmploiClientId: string;
   poleEmploiClientSecret: string;
   immersionFacileBaseUrl: AbsoluteUrl;
-};
-
-export type AccessTokenHttpRequestConfig = {
-  body: ExternalPeConnectOAuthGetTokenWithCodeGrantPayload;
-  headers: PeConnectAccessTokenHeaders;
 };

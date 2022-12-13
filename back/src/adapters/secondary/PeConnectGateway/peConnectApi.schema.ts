@@ -23,8 +23,8 @@ export const externalPeConnectUserStatutSchema: z.Schema<ExternalPeConnectStatut
   z.object({
     codeStatutIndividu: z.enum(["0", "1"]),
     libelleStatutIndividu: z.enum([
-      "Non demandeur d'emploi",
-      "Demandeur d'emploi",
+      "Non demandeur d’emploi",
+      "Demandeur d’emploi",
     ]),
   });
 
