@@ -83,9 +83,12 @@ const ConventionValidationSection = ({
         row.fields.filter(
           (field) =>
             (field && path(field.key, convention) !== undefined) ||
-            (field && field.key === "additionnalInfos"),
+            (field &&
+              field.key === "additionnalInfos" &&
+              path(field.key, convention) !== undefined),
         ).length,
     );
+
     return relevantRows.map(
       (row, index) =>
         row.fields.length > 0 && (

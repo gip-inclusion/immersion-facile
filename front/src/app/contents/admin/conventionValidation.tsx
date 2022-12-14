@@ -118,7 +118,7 @@ const beneficiaryCurrentEmployerFields: ColField[] = [
     colLabel: "Signé",
     value: (convention) =>
       signToBooleanDisplay(
-        convention.signatories.beneficiaryRepresentative?.signedAt,
+        convention.signatories.beneficiaryCurrentEmployer?.signedAt,
       ),
   },
   {
@@ -144,17 +144,19 @@ const beneficiaryCurrentEmployerFields: ColField[] = [
   {
     key: "additionnalInfos",
     colLabel: "Infos additionnelles",
-    value: (convention) => (
-      <span>
-        {convention.signatories.beneficiaryCurrentEmployer &&
-          renderSiret(
+    value: (convention) =>
+      convention.signatories.beneficiaryCurrentEmployer ? (
+        <span>
+          {renderSiret(
             convention.signatories.beneficiaryCurrentEmployer.businessSiret,
           )}
-        <div className="fr-text--xs">
-          Poste : {convention.signatories.beneficiaryCurrentEmployer?.job}
-        </div>
-      </span>
-    ),
+          <div className="fr-text--xs">
+            Poste : {convention.signatories.beneficiaryCurrentEmployer.job}
+          </div>
+        </span>
+      ) : (
+        ""
+      ),
   },
 ];
 
@@ -164,15 +166,15 @@ const establishmentRepresentativeFields: ColField[] = [
     colLabel: "Signé",
     value: (convention) =>
       signToBooleanDisplay(
-        convention.signatories.beneficiaryRepresentative?.signedAt,
+        convention.signatories.establishmentRepresentative.signedAt,
       ),
   },
   {
     key: "signatories.establishmentRepresentative.email",
     colLabel: "Mail du représentant",
     value: (convention) =>
-      convention.signatories.beneficiaryRepresentative
-        ? renderEmail(convention.signatories.beneficiaryRepresentative.email)
+      convention.signatories.establishmentRepresentative
+        ? renderEmail(convention.signatories.establishmentRepresentative.email)
         : "",
   },
   {

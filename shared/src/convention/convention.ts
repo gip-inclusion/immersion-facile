@@ -117,3 +117,12 @@ export const isEstablishmentTutorIsEstablishmentRepresentative = (
 export const isBeneficiaryMinor = (
   convention: Pick<ConventionDto, "signatories">,
 ): boolean => !!convention.signatories.beneficiaryRepresentative;
+
+export const signatoryKeyFromRole: Record<SignatoryRole, keyof Signatories> = {
+  "beneficiary-current-employer": "beneficiaryCurrentEmployer",
+  "beneficiary-representative": "beneficiaryRepresentative",
+  "establishment-representative": "establishmentRepresentative",
+  "legal-representative": "beneficiaryRepresentative",
+  beneficiary: "beneficiary",
+  establishment: "establishmentRepresentative",
+};
