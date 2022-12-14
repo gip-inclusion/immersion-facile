@@ -198,11 +198,10 @@ export class HttpPeConnectGateway implements PeConnectGateway {
           counter.success.inc();
           return externalPeConnectAdvisor;
         } catch (e) {
-          // eslint-disable-next-line no-console
-          console.log(
-            "ERROR WHILE PARSING externalPeConnectAdvisorsSchema",
-            response.responseBody,
-          );
+          notifyObjectDiscord({
+            message: "ERROR WHILE PARSING externalPeConnectAdvisorsSchema",
+            payload: response.responseBody,
+          });
           throw e;
         }
       })
