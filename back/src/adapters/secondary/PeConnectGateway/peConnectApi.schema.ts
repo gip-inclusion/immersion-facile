@@ -1,6 +1,9 @@
 import { zTrimmedString } from "shared";
 import { z } from "zod";
-import { peAdvisorImmersionKinds } from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
+import {
+  peAdvisorKinds,
+  PeConnectAdvisorsKind,
+} from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
 import {
   ExternalPeConnectAdvisor,
   ExternalPeConnectStatut,
@@ -28,13 +31,15 @@ export const externalPeConnectUserStatutSchema: z.Schema<ExternalPeConnectStatut
     ]),
   });
 
+const peAdvisorKindSchema: z.Schema<PeConnectAdvisorsKind> =
+  z.enum(peAdvisorKinds);
 export const externalPeConnectAdvisorSchema: z.Schema<ExternalPeConnectAdvisor> =
   z.object({
     nom: zTrimmedString,
     prenom: zTrimmedString,
     civilite: z.enum(["1", "2"]),
     mail: z.string().email("L'addresse email du conseillé doit être valide"),
-    type: z.enum(peAdvisorImmersionKinds),
+    type: peAdvisorKindSchema,
   });
 
 export const externalPeConnectAdvisorsSchema: z.Schema<

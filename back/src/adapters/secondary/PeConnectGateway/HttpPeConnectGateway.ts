@@ -192,11 +192,19 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         headers,
       })
       .then((response) => {
-        const externalPeConnectAdvisor = externalPeConnectAdvisorsSchema.parse(
-          response.responseBody,
-        );
-        counter.success.inc();
-        return externalPeConnectAdvisor;
+        try {
+          const externalPeConnectAdvisor =
+            externalPeConnectAdvisorsSchema.parse(response.responseBody);
+          counter.success.inc();
+          return externalPeConnectAdvisor;
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.log(
+            "ERROR WHILE PARSING externalPeConnectAdvisorsSchema",
+            response.responseBody,
+          );
+          throw e;
+        }
       })
       .catch((error) => {
         errorChecker(

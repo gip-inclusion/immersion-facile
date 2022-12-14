@@ -1,7 +1,7 @@
 import { CreateTargets, Target } from "http-client";
 import { AbsoluteUrl } from "shared";
 import { BearerToken } from "../../../domain/peConnect/dto/BearerToken";
-import { PeConnectImmersionAdvisorsKind } from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
+import { PeConnectAdvisorsKind } from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
 
 export type PeConnectTargets = CreateTargets<{
   getUserInfo: Target<void, void, PeConnectHeaders>;
@@ -39,7 +39,7 @@ export type ExternalPeConnectAdvisor = {
   prenom: string;
   civilite: "1" | "2";
   mail: string;
-  type: PeConnectImmersionAdvisorsKind;
+  type: PeConnectAdvisorsKind;
 };
 
 // External contract from https://pole-emploi.io/data/documentation/utilisation-api-pole-emploi/generer-access-token

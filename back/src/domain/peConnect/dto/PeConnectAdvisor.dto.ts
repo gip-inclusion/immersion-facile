@@ -1,6 +1,10 @@
 import { NotEmptyArray } from "shared";
 
 export const peAdvisorImmersionKinds = ["PLACEMENT", "CAPEMPLOI"] as const;
+export const peAdvisorKinds = [
+  ...peAdvisorImmersionKinds,
+  "INDEMNISATION",
+] as const;
 
 export const isPeAdvisorImmersionKind = (
   input: string,
@@ -20,7 +24,7 @@ export type PeConnectImmersionAdvisorDto = {
   type: PeConnectImmersionAdvisorsKind;
 };
 
-type PeConnectAdvisorsKind = PeConnectImmersionAdvisorsKind | "INDEMNISATION";
+export type PeConnectAdvisorsKind = typeof peAdvisorKinds[number];
 
 export type PeConnectAdvisorDto = {
   email: string;
