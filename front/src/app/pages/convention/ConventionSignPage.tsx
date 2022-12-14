@@ -19,6 +19,7 @@ import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useExistingSiret } from "src/app/hooks/siret.hooks";
+import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import { routes } from "src/app/routes/routes";
 import { decodeJwt } from "src/core-logic/adapters/decodeJwt";
 import {
@@ -104,28 +105,13 @@ const SignFormSpecific = ({ jwt }: SignFormSpecificProps) => {
   useExistingSiret(convention?.siret);
 
   if (isLoading) return <p>Chargement en cours...</p>;
-  if (fetchConventionError) {
-    // un peu fragile, mais j'attends qu'on remette au carré les erreurs front/back. Ca fait un fix rapide (8/12/2022)
-    if (fetchConventionError.includes("Le lien magique est périmé")) {
-      routes
-        .renewConventionMagicLink({
-          expiredJwt: jwt,
-          originalURL: window.location.href,
-        })
-        .replace();
-    }
-
+  if (fetchConventionError)
     return (
-      <SignPageLayout>
-        <Notification
-          title="Erreur lors de la récupération de la convention"
-          type="error"
-        >
-          {fetchConventionError}
-        </Notification>
-      </SignPageLayout>
+      <ShowErrorOrRedirectToRenewMagicLink
+        errorMessage={fetchConventionError}
+        jwt={jwt}
+      />
     );
-  }
   if (!convention) return <p>Pas de convention correspondante trouvée...</p>;
   if (convention.status === "REJECTED") return <ConventionRejectedMessage />;
   if (convention.status === "DRAFT")

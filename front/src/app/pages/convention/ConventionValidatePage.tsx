@@ -1,5 +1,5 @@
 import React from "react";
-import { MainWrapper, Notification } from "react-design-system";
+import { MainWrapper } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   ConventionMagicLinkPayload,
@@ -21,6 +21,7 @@ import { useConvention } from "src/app/hooks/convention.hooks";
 import { ConventionValidation } from "src/app/components/admin/ConventionValidation";
 import { Route } from "type-route";
 import { VerificationActionButton } from "src/app/components/forms/convention/VerificationActionButton";
+import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 
 type VerificationPageProps = {
   route: Route<typeof routes.conventionToValidate>;
@@ -50,12 +51,10 @@ export const ConventionValidatePage = ({ route }: VerificationPageProps) => {
 
   if (fetchConventionError)
     return (
-      <Notification
-        title="Erreur lors de la récupération de la convention"
-        type="error"
-      >
-        {fetchConventionError}
-      </Notification>
+      <ShowErrorOrRedirectToRenewMagicLink
+        errorMessage={fetchConventionError}
+        jwt={jwt}
+      />
     );
 
   if (isLoading) return <p>Chargement en cours...</p>;

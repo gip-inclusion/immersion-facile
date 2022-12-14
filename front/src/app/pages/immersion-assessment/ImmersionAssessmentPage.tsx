@@ -13,6 +13,7 @@ import { useConvention } from "src/app/hooks/convention.hooks";
 import { Route } from "type-route";
 import { ImmersionAssessmentForm } from "src/app/components/forms/immersion-assessment/ImmersionAssessmentForm";
 import { ImmersionDescription } from "src/app/components/forms/immersion-assessment/ImmersionDescription";
+import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 
 type ImmersionAssessmentRoute = Route<typeof routes.immersionAssessment>;
 
@@ -30,6 +31,15 @@ export const ImmersionAssessmentPage = ({
   const canCreateAssessment = convention?.status === "ACCEPTED_BY_VALIDATOR";
   const hasRight =
     role === "establishment" || role === "establishment-representative";
+
+  if (fetchConventionError)
+    return (
+      <ShowErrorOrRedirectToRenewMagicLink
+        errorMessage={fetchConventionError}
+        jwt={route.params.jwt}
+      />
+    );
+
   return (
     <HeaderFooterLayout>
       <MainWrapper layout="boxed">
@@ -39,11 +49,6 @@ export const ImmersionAssessmentPage = ({
           </Notification>
         ) : (
           <>
-            {fetchConventionError && (
-              <Notification type="error" title="Erreur">
-                {fetchConventionError}
-              </Notification>
-            )}
             {convention && !canCreateAssessment && (
               <Notification
                 type="error"
