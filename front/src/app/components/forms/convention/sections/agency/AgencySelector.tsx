@@ -146,5 +146,5 @@ const agenciesRetriever = ({
   if (shouldListAll) return agencyGateway.listImmersionAgencies(departmentCode);
   return federatedIdentity && isPeConnectIdentity(federatedIdentity)
     ? agencyGateway.listImmersionOnlyPeAgencies(departmentCode)
-    : agencyGateway.listImmersionWithoutPeAgencies(departmentCode);
+    : agencyGateway.listImmersionAgencies(departmentCode);
 };
