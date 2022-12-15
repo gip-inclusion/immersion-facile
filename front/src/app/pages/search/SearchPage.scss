@@ -1,0 +1,15 @@
+.search-page {
+  &__form {
+    display: flex;
+    align-items: center;
+    &-input-wrapper {
+      flex: 3 0 auto;
+      &--min {
+        flex: 1 1 auto;
+      }
+      & + .search-page__form-input-wrapper {
+        margin-left: 1rem;
+      }
+    }
+  }
+}

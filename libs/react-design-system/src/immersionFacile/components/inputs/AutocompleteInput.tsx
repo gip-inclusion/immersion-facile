@@ -5,7 +5,7 @@ import "./AutocompleteInput.css";
 export const AutocompleteInput =
   (
     headerClassName: string | undefined,
-    label: string,
+    label: string | undefined,
     inputStyle: React.CSSProperties | undefined,
     disabled: boolean | undefined,
     placeholder: string | undefined,
@@ -15,9 +15,11 @@ export const AutocompleteInput =
     (
       <div ref={params.InputProps.ref} className="if-autocomplete-input">
         <div className="if-autocomplete-input__wrapper">
-          <label className={`fr-label ${headerClassName ?? ""}`} htmlFor={id}>
-            {label}
-          </label>
+          {label && (
+            <label className={`fr-label ${headerClassName ?? ""}`} htmlFor={id}>
+              {label}
+            </label>
+          )}
 
           <input
             {...params.inputProps}

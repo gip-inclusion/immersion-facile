@@ -22,7 +22,7 @@ const getFeedBackMessage = (contactMethod?: ContactMethod) => {
   }
 };
 
-export const SearchResultPanel = () => {
+export const SearchResults = () => {
   const searchResults = useAppSelector(searchSelectors.searchResults);
   const searchStatus = useAppSelector(searchSelectors.searchStatus);
   const searchInfo = useAppSelector(searchSelectors.searchInfo);
@@ -43,30 +43,7 @@ export const SearchResultPanel = () => {
     return <SearchInfos>{searchInfo}</SearchInfos>;
 
   return (
-    <>
-      {searchResults.map((searchResult) => (
-        <EnterpriseSearchResult
-          key={searchResult.siret + "-" + searchResult.rome} // Should be unique !
-          searchResult={searchResult}
-          onButtonClick={() =>
-            dispatch({
-              type: "CLICKED_OPEN",
-              payload: {
-                immersionOfferRome: searchResult.rome,
-                immersionOfferSiret: searchResult.siret,
-                siret: searchResult.siret,
-                offer: {
-                  romeCode: searchResult.rome,
-                  romeLabel: searchResult.romeLabel,
-                },
-                contactMethod: searchResult.contactMode,
-                searchResultData: searchResult,
-              },
-            })
-          }
-          disableButton={modalState.isValidating}
-        />
-      ))}
+    <div className="fr-container">
       {searchStatus === "extraFetch" && searchInfo && (
         <SearchInfos>
           <div className="flex flex-col items-center">
@@ -75,28 +52,54 @@ export const SearchResultPanel = () => {
           </div>
         </SearchInfos>
       )}
-      <ContactEstablishmentModal
-        modalState={modalState}
-        dispatch={dispatch}
-        onSuccess={() => {
-          setSuccessfulValidatedMessage(
-            getFeedBackMessage(modalState.contactMethod),
-          );
-          setSuccessfullyValidated(true);
-        }}
-      />
-      {successfulValidationMessage && (
-        <SuccessFeedback
-          open={successFullyValidated}
-          handleClose={() => {
-            setSuccessfulValidatedMessage(null);
-            setSuccessfullyValidated(false);
+      <div className="fr-grid-row fr-grid-row--gutters">
+        {searchResults.map((searchResult) => (
+          <EnterpriseSearchResult
+            key={searchResult.siret + "-" + searchResult.rome} // Should be unique !
+            searchResult={searchResult}
+            onButtonClick={() =>
+              dispatch({
+                type: "CLICKED_OPEN",
+                payload: {
+                  immersionOfferRome: searchResult.rome,
+                  immersionOfferSiret: searchResult.siret,
+                  siret: searchResult.siret,
+                  offer: {
+                    romeCode: searchResult.rome,
+                    romeLabel: searchResult.romeLabel,
+                  },
+                  contactMethod: searchResult.contactMode,
+                  searchResultData: searchResult,
+                },
+              })
+            }
+            disableButton={modalState.isValidating}
+          />
+        ))}
+
+        <ContactEstablishmentModal
+          modalState={modalState}
+          dispatch={dispatch}
+          onSuccess={() => {
+            setSuccessfulValidatedMessage(
+              getFeedBackMessage(modalState.contactMethod),
+            );
+            setSuccessfullyValidated(true);
           }}
-        >
-          {successfulValidationMessage}
-        </SuccessFeedback>
-      )}
-    </>
+        />
+        {successfulValidationMessage && (
+          <SuccessFeedback
+            open={successFullyValidated}
+            handleClose={() => {
+              setSuccessfulValidatedMessage(null);
+              setSuccessfullyValidated(false);
+            }}
+          >
+            {successfulValidationMessage}
+          </SuccessFeedback>
+        )}
+      </div>
+    </div>
   );
 };
 
