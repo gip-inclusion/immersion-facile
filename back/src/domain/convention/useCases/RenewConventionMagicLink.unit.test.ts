@@ -1,4 +1,5 @@
 import {
+  AbsoluteUrl,
   AgencyDtoBuilder,
   ConventionDto,
   ConventionDtoBuilder,
@@ -20,21 +21,22 @@ import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGenerato
 import { InMemoryAgencyRepository } from "../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { RenewMagicLinkPayload } from "./notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
+import { RenewConventionMagicLink } from "./RenewConventionMagicLink";
+import {
+  CreateNewEvent,
+  makeCreateNewEvent,
+} from "../../core/eventBus/EventBus";
 import {
   GenerateMagicLinkJwt,
   makeGenerateJwtES256,
   makeVerifyJwtES256,
-} from "../../../domain/auth/jwt";
-import { RenewMagicLinkPayload } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
-import { RenewConventionMagicLink } from "../../../domain/convention/useCases/RenewConventionMagicLink";
-import {
-  CreateNewEvent,
-  makeCreateNewEvent,
-} from "../../../domain/core/eventBus/EventBus";
+} from "../../auth/jwt";
 
 const validConvention: ConventionDto = new ConventionDtoBuilder().build();
 
 const defaultAgency = AgencyDtoBuilder.create(validConvention.agencyId).build();
+const immersionBaseUrl: AbsoluteUrl = "http://immersion-fake.com";
 
 describe("RenewConventionMagicLink use case", () => {
   let conventionRepository: InMemoryConventionRepository;
@@ -69,6 +71,7 @@ describe("RenewConventionMagicLink use case", () => {
       generateJwtFn,
       config,
       clock,
+      immersionBaseUrl,
     );
   });
 
@@ -80,7 +83,7 @@ describe("RenewConventionMagicLink use case", () => {
     );
 
     const request: RenewMagicLinkRequestDto = {
-      linkFormat: "immersionfacile.com/%jwt%",
+      originalUrl: "immersionfacile.com/%jwt%",
       expiredJwt: generateJwtFn(payload),
     };
 
@@ -104,7 +107,7 @@ describe("RenewConventionMagicLink use case", () => {
     );
 
     const request: RenewMagicLinkRequestDto = {
-      linkFormat: "immersionfacile.com/%jwt%",
+      originalUrl: "immersionfacile.com/%jwt%",
       expiredJwt: generateJwtFn(payload),
     };
 
@@ -123,7 +126,7 @@ describe("RenewConventionMagicLink use case", () => {
     );
 
     const request: RenewMagicLinkRequestDto = {
-      linkFormat: "immersionfacile.com/%jwt%",
+      originalUrl: "immersionfacile.com/verification",
       expiredJwt: generateJwtFn(payload),
     };
 
@@ -133,7 +136,7 @@ describe("RenewConventionMagicLink use case", () => {
     );
   });
 
-  it("requires a link format that includes %jwt% string", async () => {
+  it("does not accept to renew links from url that are not supported", async () => {
     const payload = createConventionMagicLinkPayload(
       validConvention.id,
       "counsellor",
@@ -141,13 +144,15 @@ describe("RenewConventionMagicLink use case", () => {
     );
 
     const request: RenewMagicLinkRequestDto = {
-      linkFormat: "immersionfacile.com/",
+      originalUrl: "immersionfacile.com/",
       expiredJwt: generateJwtFn(payload),
     };
 
     await expectPromiseToFailWithError(
       renewConventionMagicLink.execute(request),
-      new BadRequestError(request.linkFormat),
+      new BadRequestError(
+        `Wrong link format, should be one of the supported route: /demande-immersion, /verifier-et-signer, /verification, /bilan-immersion. It was : ${request.originalUrl}`,
+      ),
     );
   });
 
@@ -159,7 +164,7 @@ describe("RenewConventionMagicLink use case", () => {
     );
 
     const request: RenewMagicLinkRequestDto = {
-      linkFormat: "immersionfacile.fr/%jwt%",
+      originalUrl: "immersionfacile.fr/verifier-et-signer",
       expiredJwt: generateJwtFn(expiredPayload),
     };
 
@@ -173,8 +178,9 @@ describe("RenewConventionMagicLink use case", () => {
       validConvention.signatories.beneficiary.email,
     ]);
     const ml = dispatchedPayload.magicLink;
-    expect(ml.startsWith("immersionfacile.fr/")).toBeTruthy();
-    const jwt = ml.replace("immersionfacile.fr/", "");
+    const expectedNewLinkStart = `${immersionBaseUrl}/verifier-et-signer?jwt=`;
+    expect(ml.startsWith(expectedNewLinkStart)).toBeTruthy();
+    const jwt = ml.replace(expectedNewLinkStart, "");
 
     const verifyJwt = makeVerifyJwtES256(config.magicLinkJwtPublicKey);
     expect(verifyJwt(jwt)).toBeDefined();

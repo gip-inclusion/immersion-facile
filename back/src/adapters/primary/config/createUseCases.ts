@@ -141,6 +141,7 @@ export const createUseCases = (
         generateJwtFn,
         config,
         clock,
+        config.immersionFacileBaseUrl,
       ),
 
       // immersionOffer

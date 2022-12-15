@@ -1,5 +1,6 @@
 import jwt, { TokenExpiredError } from "jsonwebtoken";
 import {
+  AbsoluteUrl,
   Beneficiary,
   ConventionId,
   ConventionMagicLinkPayload,
@@ -33,6 +34,13 @@ interface LinkRenewData {
   emailHash?: string;
 }
 
+const supportedRenewRoutes = [
+  frontRoutes.conventionImmersionRoute,
+  frontRoutes.conventionToSign,
+  frontRoutes.conventionToValidate,
+  frontRoutes.immersionAssessment,
+];
+
 // Extracts the data necessary for link renewal from any version of magic link payload.
 const extractDataFromExpiredJwt: (payload: any) => LinkRenewData = (
   payload: any,
@@ -65,6 +73,7 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
     private readonly generateMagicLinkJwt: GenerateMagicLinkJwt,
     private readonly config: AppConfig,
     private readonly clock: Clock,
+    private readonly immersionBaseUrl: AbsoluteUrl,
   ) {
     super(uowPerformer);
   }
@@ -72,7 +81,7 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
   inputSchema = renewMagicLinkRequestSchema;
 
   public async _execute(
-    { expiredJwt, linkFormat }: RenewMagicLinkRequestDto,
+    { expiredJwt, originalUrl }: RenewMagicLinkRequestDto,
     uow: UnitOfWork,
   ) {
     const { verifyJwt, verifyDeprecatedJwt } = verifyJwtConfig(this.config);
@@ -123,8 +132,15 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
       throw new BadRequestError(conventionDto.agencyId);
     }
 
-    if (!linkFormat.includes("%jwt%")) {
-      throw new BadRequestError(linkFormat);
+    const routeToRenew = supportedRenewRoutes.find((supportedRoute) =>
+      originalUrl.includes(`/${supportedRoute}`),
+    );
+    if (!routeToRenew) {
+      throw new BadRequestError(
+        `Wrong link format, should be one of the supported route: ${supportedRenewRoutes
+          .map((route) => `/${route}`)
+          .join(", ")}. It was : ${originalUrl}`,
+      );
     }
 
     const beneficiary: Beneficiary = conventionDto.signatories.beneficiary;
@@ -164,8 +180,8 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
           ),
         );
 
-        const magicLink = linkFormat.replaceAll("%jwt%", jwt);
-        const conventionStatusLink = `${this.config.immersionFacileBaseUrl}/${frontRoutes.conventionStatusDashboard}?jwt=${jwt}`;
+        const magicLink = `${this.immersionBaseUrl}/${routeToRenew}?jwt=${jwt}`;
+        const conventionStatusLink = `${this.immersionBaseUrl}/${frontRoutes.conventionStatusDashboard}?jwt=${jwt}`;
 
         const event = this.createNewEvent({
           topic: "MagicLinkRenewalRequested",

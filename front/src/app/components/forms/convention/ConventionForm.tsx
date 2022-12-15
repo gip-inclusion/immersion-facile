@@ -16,6 +16,7 @@ import {
 } from "src/app/components/forms/convention/conventionHelpers";
 import { useConventionTexts } from "src/app/contents/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
@@ -82,6 +83,7 @@ export const ConventionForm = ({
   useExistingSiret(initialValues.siret);
   const submitFeedback = useAppSelector(conventionSelectors.feedback);
   const fetchedConvention = useAppSelector(conventionSelectors.convention);
+  const fetchConventionError = useAppSelector(conventionSelectors.fetchError);
   const dispatch = useDispatch();
 
   useMatomo(properties.internshipKind);
@@ -109,6 +111,14 @@ export const ConventionForm = ({
   const isFrozen = isConventionFrozen(fetchedConvention ?? initialValues);
 
   if (!reduxFormUiReady) return null;
+
+  if (routeParams.jwt && fetchConventionError)
+    return (
+      <ShowErrorOrRedirectToRenewMagicLink
+        errorMessage={fetchConventionError}
+        jwt={routeParams.jwt}
+      />
+    );
 
   return (
     <div className="fr-grid-row fr-grid-row--center fr-grid-row--gutters">

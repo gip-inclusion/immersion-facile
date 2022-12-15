@@ -261,6 +261,6 @@ export const generateMagicLinkRequestSchema: z.Schema<GenerateMagicLinkRequestDt
 
 export const renewMagicLinkRequestSchema: z.Schema<RenewMagicLinkRequestDto> =
   z.object({
-    linkFormat: z.string(),
+    originalUrl: z.string(),
     expiredJwt: z.string(),
   });

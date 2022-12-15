@@ -193,6 +193,6 @@ export type GenerateMagicLinkResponseDto = {
 };
 
 export type RenewMagicLinkRequestDto = {
-  linkFormat: string;
+  originalUrl: string;
   expiredJwt: string;
 };
