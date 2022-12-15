@@ -14,6 +14,8 @@ import {
   generateMagicLinkRoute,
   getConventionStatusDashboard,
   jwtSchema,
+  queryParamsAsString,
+  RenewMagicLinkRequestDto,
   renewMagicLinkRoute,
   Role,
   ShareLinkByEmailDto,
@@ -150,13 +152,13 @@ export class HttpConventionGateway implements ConventionGateway {
 
   public async renewMagicLink(
     expiredJwt: string,
-    linkFormat: string,
+    originalUrl: string,
   ): Promise<void> {
-    await this.httpClient.get(
-      `/${renewMagicLinkRoute}?expiredJwt=${expiredJwt}&linkFormat=${encodeURIComponent(
-        linkFormat,
-      )}`,
-    );
+    const queryParams = queryParamsAsString<RenewMagicLinkRequestDto>({
+      expiredJwt,
+      originalUrl: encodeURIComponent(originalUrl),
+    });
+    await this.httpClient.get(`/${renewMagicLinkRoute}?${queryParams}`);
   }
 
   public async shareLinkByEmail(

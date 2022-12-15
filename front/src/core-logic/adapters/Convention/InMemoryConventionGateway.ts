@@ -146,7 +146,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
 
   public async renewMagicLink(
     _expiredJwt: string,
-    _linkFormat: string,
+    _originalUrl: string,
   ): Promise<void> {
     // This is supposed to ask the backend to send a new email to the owner of the expired magic link.
     // Since this operation makes no sense for local development, the implementation here is left empty.

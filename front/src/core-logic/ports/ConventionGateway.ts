@@ -33,7 +33,7 @@ export interface ConventionGateway {
     expired: boolean,
   ): Promise<string>;
 
-  renewMagicLink(expiredJwt: string, linkFormat: string): Promise<void>;
+  renewMagicLink(expiredJwt: string, originalUrl: string): Promise<void>;
 
   // shareLinkByEmailDTO
   shareLinkByEmail(shareLinkByEmailDTO: ShareLinkByEmailDto): Promise<boolean>;
