@@ -108,7 +108,7 @@ const bottomsLinks: NavLink[] = [
   {
     label: "Nous contacter",
     href: `mailto:${immersionFacileContactEmail}`,
-    id: getFooterNavLinkId("privacy"),
+    id: getFooterNavLinkId("contact"),
   },
   {
     label: "Statistiques",
