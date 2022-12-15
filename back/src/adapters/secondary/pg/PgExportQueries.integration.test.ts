@@ -100,7 +100,7 @@ describe("PgExportQueries", () => {
           Visible: "Oui",
           Origine: "immersion-facile",
           "Code Métier": "M1502",
-          Métier: "Développement des ressources humaines",
+          Métier: "Chargé / Chargée de recrutement",
           "Nombre de mise en relation pour cette entreprise": "0",
           "Nombre de convention validée pour cette entreprise": "0",
         };
