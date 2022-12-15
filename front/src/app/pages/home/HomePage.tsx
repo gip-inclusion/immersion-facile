@@ -48,6 +48,7 @@ export const HomePage = ({ type }: HomePageProps) => {
   const { title, subtitle, displayName, icon, illustration } =
     heroHeaderContent[type];
   const sectionStatsDataForType = sectionStatsData[type];
+  const sectionFaqDataForType = sectionFaqData[type];
   return (
     <HeaderFooterLayout>
       <MainWrapper layout="fullscreen" vSpacing={0} useBackground>
@@ -79,7 +80,7 @@ export const HomePage = ({ type }: HomePageProps) => {
           videoUrl=" https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise.mp4"
           videoPosterUrl="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise_poster.webp"
         />
-        <SectionFaq articles={sectionFaqData} />
+        <SectionFaq articles={sectionFaqDataForType} />
       </MainWrapper>
       {featureFlags.enableTemporaryOperation && (
         <FixedStamp
