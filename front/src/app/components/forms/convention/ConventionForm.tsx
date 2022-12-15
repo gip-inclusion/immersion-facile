@@ -22,6 +22,7 @@ import { conventionSlice } from "src/core-logic/domain/convention/convention.sli
 import { useExistingSiret } from "src/app/hooks/siret.hooks";
 import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
 import { ConventionFormFields } from "src/app/components/forms/convention/ConventionFormFields";
+import { useMatomo } from "src/app/hooks/useMatomo";
 
 const useClearConventionSubmitFeedbackOnUnmount = () => {
   const dispatch = useDispatch();
@@ -82,6 +83,8 @@ export const ConventionForm = ({
   const submitFeedback = useAppSelector(conventionSelectors.feedback);
   const fetchedConvention = useAppSelector(conventionSelectors.convention);
   const dispatch = useDispatch();
+
+  useMatomo(properties.internshipKind);
 
   useEffect(() => {
     if (
