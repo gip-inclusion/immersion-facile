@@ -7,6 +7,7 @@ import {
   ButtonSearch,
   MainWrapper,
   PageHeader,
+  SectionTextEmbed,
 } from "react-design-system/immersionFacile";
 import { RomeAutocomplete } from "src/app/components/forms/autocomplete/RomeAutocomplete";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
@@ -14,7 +15,6 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import { useSearchUseCase } from "src/app/hooks/search.hooks";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
-import { HomeImmersionHowTo } from "src/app/components/ImmersionHowTo";
 import { StaticDropdown } from "src/app/components/search/Dropdown/StaticDropdown";
 import { OurAdvises } from "src/app/components/search/OurAdvises";
 import "./SearchPage.scss";
@@ -212,7 +212,10 @@ export const SearchPage = ({
         <div className="fr-pt-6w">
           <SearchResults />
           <OurAdvises />
-          <HomeImmersionHowTo />
+          <SectionTextEmbed
+            videoUrl=" https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise.mp4"
+            videoPosterUrl="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise_poster.webp"
+          />
         </div>
       </MainWrapper>
     </HeaderFooterLayout>
