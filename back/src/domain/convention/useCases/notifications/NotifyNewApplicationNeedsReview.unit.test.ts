@@ -61,15 +61,22 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
 
       for (let i = 0; i < 2; i++) {
         const email = counsellorEmails[i];
+        const magicLinkCommonFields = {
+          id: conventionInReview.id,
+          role: "counsellor" as const,
+          email,
+        };
         expectedEmailConventionReviewMatchingConvention(
           sentEmails[i],
           email,
           conventionInReview,
           fakeGenerateMagicLinkUrlFn({
-            id: conventionInReview.id,
-            role: "counsellor",
+            ...magicLinkCommonFields,
             targetRoute: frontRoutes.conventionToValidate,
-            email,
+          }),
+          fakeGenerateMagicLinkUrlFn({
+            ...magicLinkCommonFields,
+            targetRoute: frontRoutes.conventionStatusDashboard,
           }),
           "en vérifier l'éligibilité",
         );
@@ -92,15 +99,22 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
 
       for (let i = 0; i < 2; i++) {
         const email = validatorEmails[i];
+        const magicLinkCommonFields = {
+          id: conventionInReview.id,
+          role: "validator" as const,
+          email,
+        };
         expectedEmailConventionReviewMatchingConvention(
           sentEmails[i],
           email,
           conventionInReview,
           fakeGenerateMagicLinkUrlFn({
-            id: conventionInReview.id,
-            role: "validator",
+            ...magicLinkCommonFields,
             targetRoute: frontRoutes.conventionToValidate,
-            email,
+          }),
+          fakeGenerateMagicLinkUrlFn({
+            ...magicLinkCommonFields,
+            targetRoute: frontRoutes.conventionStatusDashboard,
           }),
           "en considérer la validation",
         );
@@ -142,15 +156,22 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
 
       for (let i = 0; i < 2; i++) {
         const email = validatorEmails[i];
+        const magicLinkCommonFields = {
+          id: acceptedByCounsellorConvention.id,
+          role: "validator" as const,
+          email,
+        };
         expectedEmailConventionReviewMatchingConvention(
           sentEmails[i],
           email,
           acceptedByCounsellorConvention,
           fakeGenerateMagicLinkUrlFn({
-            id: acceptedByCounsellorConvention.id,
-            role: "validator",
+            ...magicLinkCommonFields,
             targetRoute: frontRoutes.conventionToValidate,
-            email,
+          }),
+          fakeGenerateMagicLinkUrlFn({
+            ...magicLinkCommonFields,
+            targetRoute: frontRoutes.conventionStatusDashboard,
           }),
           "en considérer la validation",
         );
@@ -187,16 +208,22 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
 
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(1);
-
+      const magicLinkCommonFields = {
+        id: acceptedByValidatorConvention.id,
+        role: "admin" as const,
+        email: adminEmail,
+      };
       expectedEmailConventionReviewMatchingConvention(
         sentEmails[0],
         adminEmail,
         acceptedByValidatorConvention,
         fakeGenerateMagicLinkUrlFn({
-          id: acceptedByValidatorConvention.id,
-          role: "admin",
+          ...magicLinkCommonFields,
           targetRoute: frontRoutes.conventionToValidate,
-          email: adminEmail,
+        }),
+        fakeGenerateMagicLinkUrlFn({
+          ...magicLinkCommonFields,
+          targetRoute: frontRoutes.conventionStatusDashboard,
         }),
         "en considérer la validation",
       );

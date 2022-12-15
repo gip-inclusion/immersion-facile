@@ -69,9 +69,16 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
     role: Role;
   }) {
     const beneficiary: Beneficiary = convention.signatories.beneficiary;
+
     await Promise.all(
-      recipients.map((counsellorEmail) =>
-        this.emailGateway.sendEmail({
+      recipients.map((counsellorEmail) => {
+        const magicLinkCommonFields = {
+          id: convention.id,
+          role,
+          email: counsellorEmail,
+        };
+
+        return this.emailGateway.sendEmail({
           type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
           recipients: [counsellorEmail],
           params: {
@@ -83,14 +90,16 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
             firstName: beneficiary.firstName,
             lastName: beneficiary.lastName,
             magicLink: this.generateMagicLinkFn({
-              id: convention.id,
-              role,
+              ...magicLinkCommonFields,
               targetRoute: frontRoutes.conventionToValidate,
-              email: counsellorEmail,
+            }),
+            conventionStatusLink: this.generateMagicLinkFn({
+              ...magicLinkCommonFields,
+              targetRoute: frontRoutes.conventionStatusDashboard,
             }),
           },
-        }),
-      ),
+        });
+      }),
     );
   }
 }

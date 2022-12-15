@@ -26,6 +26,7 @@ export type RenewMagicLinkPayload = z.infer<typeof renewMagicLinkPayloadSchema>
 export const renewMagicLinkPayloadSchema = z.object({
   emails: z.array(z.string()),
   magicLink: z.string(),
+  conventionStatusLink: z.string(),
 });
 
 export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification extends TransactionalUseCase<ConventionRequiresModificationPayload> {
@@ -67,6 +68,12 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
             role,
         );
 
+      const magicLinkCommonFields = {
+        id: convention.id,
+        role,
+        email,
+      };
+
       await this.emailGateway.sendEmail({
         type: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
         recipients: [email],
@@ -79,10 +86,12 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
           agency: agency.name,
           immersionAppellation: convention.immersionAppellation,
           magicLink: this.generateMagicLinkFn({
-            id: convention.id,
-            role,
+            ...magicLinkCommonFields,
             targetRoute: frontRoutes.conventionImmersionRoute,
-            email,
+          }),
+          conventionStatusLink: this.generateMagicLinkFn({
+            ...magicLinkCommonFields,
+            targetRoute: frontRoutes.conventionStatusDashboard,
           }),
         },
       });

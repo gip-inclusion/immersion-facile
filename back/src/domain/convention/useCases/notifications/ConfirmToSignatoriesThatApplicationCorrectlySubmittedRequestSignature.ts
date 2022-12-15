@@ -33,29 +33,37 @@ export class ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignatu
     } = convention.signatories;
 
     await Promise.all(
-      values(convention.signatories).map(
-        (signatory) =>
-          signatory &&
-          this.emailGateway.sendEmail({
-            type: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
-            recipients: [signatory.email],
-            params: {
-              signatoryName: `${signatory.firstName} ${signatory.lastName}`,
-              beneficiaryName: `${beneficiary.firstName} ${beneficiary.lastName}`,
-              establishmentRepresentativeName: `${establishmentRepresentative.firstName} ${establishmentRepresentative.lastName}`,
-              beneficiaryRepresentativeName:
-                beneficiaryRepresentative &&
-                `${beneficiaryRepresentative.firstName} ${beneficiaryRepresentative.lastName}`,
-              magicLink: this.generateMagicLinkFn({
-                id,
-                role: signatory.role,
-                targetRoute: frontRoutes.conventionToSign,
-                email: signatory.email,
-              }),
-              businessName,
-            },
-          }),
-      ),
+      values(convention.signatories).map((signatory) => {
+        if (!signatory) return;
+        const magicLinkCommonFields = {
+          id,
+          role: signatory.role,
+          targetRoute: frontRoutes.conventionToSign,
+          email: signatory.email,
+        };
+
+        return this.emailGateway.sendEmail({
+          type: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+          recipients: [signatory.email],
+          params: {
+            signatoryName: `${signatory.firstName} ${signatory.lastName}`,
+            beneficiaryName: `${beneficiary.firstName} ${beneficiary.lastName}`,
+            establishmentRepresentativeName: `${establishmentRepresentative.firstName} ${establishmentRepresentative.lastName}`,
+            beneficiaryRepresentativeName:
+              beneficiaryRepresentative &&
+              `${beneficiaryRepresentative.firstName} ${beneficiaryRepresentative.lastName}`,
+            magicLink: this.generateMagicLinkFn({
+              ...magicLinkCommonFields,
+              targetRoute: frontRoutes.conventionToSign,
+            }),
+            conventionStatusLink: this.generateMagicLinkFn({
+              ...magicLinkCommonFields,
+              targetRoute: frontRoutes.conventionStatusDashboard,
+            }),
+            businessName,
+          },
+        });
+      }),
     );
   }
 }

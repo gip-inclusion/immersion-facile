@@ -165,6 +165,7 @@ export const defaultEmailValueByEmailKind: {
     businessName: "BUSINESS_NAME",
     agencyName: "AGENCY_NAME",
     magicLink: "MAGIC_LINK",
+    conventionStatusLink: "CONVENTION_STATUS_LINK",
   },
   VALIDATED_CONVENTION_FINAL_CONFIRMATION: {
     totalHours: 0,
@@ -240,19 +241,23 @@ export const defaultEmailValueByEmailKind: {
     },
     agency: "AGENCY",
     magicLink: "MAGIC_LINK",
+    conventionStatusLink: "CONVENTION_STATUS_LINK",
   },
   NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION: {
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
     businessName: "BUSINESS_NAME",
     magicLink: "MAGIC_LINK",
+    conventionStatusLink: "CONVENTION_STATUS_LINK",
     possibleRoleAction: "POSSIBLE_ROLE_ACTION",
   },
   MAGIC_LINK_RENEWAL: {
     magicLink: "MAGIC_LINK",
+    conventionStatusLink: "CONVENTION_STATUS_LINK",
   },
   BENEFICIARY_OR_ESTABLISHMENT_REPRESENTATIVE_ALREADY_SIGNED_NOTIFICATION: {
     magicLink: "MAGIC_LINK",
+    conventionStatusLink: "CONVENTION_STATUS_LINK",
     existingSignatureName: "EXISTING_SIGNATURE_NAME",
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
@@ -266,6 +271,7 @@ export const defaultEmailValueByEmailKind: {
     beneficiaryRepresentativeName: undefined,
     signatoryName: "SIGNATORY_NAME",
     magicLink: "MAGIC_LINK",
+    conventionStatusLink: "CONVENTION_STATUS_LINK",
     businessName: "BUSINESS_NAME",
   },
   CONTACT_BY_EMAIL_REQUEST: {
@@ -325,6 +331,7 @@ export const defaultEmailValueByEmailKind: {
     beneficiaryRepresentativeName: undefined,
     signatoryName: "SIGNATORY_NAME",
     magicLink: "MAGIC_LINK",
+    conventionStatusLink: "CONVENTION_STATUS_LINK",
     businessName: "BUSINESS_NAME",
   },
   SIGNEE_HAS_SIGNED_CONVENTION: {

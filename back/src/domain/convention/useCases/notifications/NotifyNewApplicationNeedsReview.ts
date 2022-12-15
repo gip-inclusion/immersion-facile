@@ -67,17 +67,24 @@ export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<Conven
     );
     const beneficiary: Beneficiary = conventionDto.signatories.beneficiary;
     await Promise.all(
-      recipients.emails.map((email) =>
-        this.emailGateway.sendEmail({
+      recipients.emails.map((email) => {
+        const magicLinkCommonFields = {
+          id: conventionDto.id,
+          role: recipients.role,
+          email,
+        };
+        return this.emailGateway.sendEmail({
           type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
           recipients: [email],
           params: {
             businessName: conventionDto.businessName,
             magicLink: this.generateMagicLinkFn({
-              id: conventionDto.id,
-              role: recipients.role,
+              ...magicLinkCommonFields,
               targetRoute: frontRoutes.conventionToValidate,
-              email,
+            }),
+            conventionStatusLink: this.generateMagicLinkFn({
+              ...magicLinkCommonFields,
+              targetRoute: frontRoutes.conventionStatusDashboard,
             }),
             beneficiaryFirstName: beneficiary.firstName,
             beneficiaryLastName: beneficiary.lastName,
@@ -86,8 +93,8 @@ export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<Conven
                 ? "en vérifier l'éligibilité"
                 : "en considérer la validation",
           },
-        }),
-      ),
+        });
+      }),
     );
 
     logger.info(

@@ -37,6 +37,12 @@ export const expectEmaiSignatoryConfirmationSignatureRequestMatchingConvention =
       beneficiaryCurrentEmployer,
     } = convention.signatories;
 
+    const generateMagicLinkCommonFields = {
+      id,
+      role: signatory.role,
+      email: beneficiary.email,
+    };
+
     expectTypeToMatchAndEqual(templatedEmail, {
       type: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
       recipients: [recipient],
@@ -51,10 +57,12 @@ export const expectEmaiSignatoryConfirmationSignatureRequestMatchingConvention =
           beneficiaryCurrentEmployer &&
           `${beneficiaryCurrentEmployer.firstName} ${beneficiaryCurrentEmployer.lastName}`,
         magicLink: fakeGenerateMagicLinkUrlFn({
-          id,
-          role: signatory.role,
+          ...generateMagicLinkCommonFields,
           targetRoute: frontRoutes.conventionToSign,
-          email: beneficiary.email,
+        }),
+        conventionStatusLink: fakeGenerateMagicLinkUrlFn({
+          ...generateMagicLinkCommonFields,
+          targetRoute: frontRoutes.conventionStatusDashboard,
         }),
         businessName,
       },
@@ -95,6 +103,7 @@ export const expectedEmailConventionReviewMatchingConvention = (
   recipient: string,
   convention: ConventionDto,
   magicLink: string,
+  conventionStatusLink: string,
   possibleRoleAction: string,
 ) =>
   expectTypeToMatchAndEqual(templatedEmail, {
@@ -106,6 +115,7 @@ export const expectedEmailConventionReviewMatchingConvention = (
       businessName: convention.businessName,
       magicLink,
       possibleRoleAction,
+      conventionStatusLink,
     },
   });
 

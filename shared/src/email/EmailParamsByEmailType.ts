@@ -19,6 +19,7 @@ export type EmailParamsByEmailType = {
     businessName: string;
     agencyName: string;
     magicLink: string;
+    conventionStatusLink: string;
   };
   NEW_CONVENTION_ESTABLISHMENT_TUTOR_CONFIRMATION: {
     demandeId: string;
@@ -96,19 +97,23 @@ export type EmailParamsByEmailType = {
     immersionAppellation: AppellationDto;
     agency: string;
     magicLink: string;
+    conventionStatusLink: string;
   };
   NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION: {
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
     businessName: string;
     magicLink: string;
+    conventionStatusLink: string;
     possibleRoleAction: string;
   };
   MAGIC_LINK_RENEWAL: {
     magicLink: string;
+    conventionStatusLink: string;
   };
   BENEFICIARY_OR_ESTABLISHMENT_REPRESENTATIVE_ALREADY_SIGNED_NOTIFICATION: {
     magicLink: string;
+    conventionStatusLink: string;
     existingSignatureName: string;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
@@ -123,6 +128,7 @@ export type EmailParamsByEmailType = {
     beneficiaryCurrentEmployerName?: string;
     signatoryName: string; //< SIGNATORY_NAME
     magicLink: string; //< MAGIC_LINK
+    conventionStatusLink: string;
     businessName: string; //< COMPANY_NAME
   };
   CONTACT_BY_EMAIL_REQUEST: {
@@ -183,6 +189,7 @@ export type EmailParamsByEmailType = {
     beneficiaryCurrentEmployerName?: string;
     signatoryName: string; //< SIGNATORY_NAME
     magicLink: string; //< MAGIC_LINK
+    conventionStatusLink: string;
     businessName: string; //< COMPANY_NAME
   };
 };

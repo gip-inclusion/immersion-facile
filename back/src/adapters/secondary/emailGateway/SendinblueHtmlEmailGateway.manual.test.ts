@@ -22,6 +22,7 @@ describe("SendingBlueHtmlEmailGateway manual", () => {
       recipients: ["recette@immersion-facile.beta.gouv.fr"],
       params: {
         magicLink: "www.google.com",
+        conventionStatusLink: "www.google.com",
         businessName: "Super Corp",
         establishmentRepresentativeName: "Stéphane Le Rep",
         beneficiaryName: "John Doe",

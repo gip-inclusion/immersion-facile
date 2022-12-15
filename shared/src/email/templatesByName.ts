@@ -1,4 +1,4 @@
-import { createTemplatesByName } from "html-templates";
+import { createTemplatesByName, EmailButtonProps } from "html-templates";
 import { isStringDate, toDisplayedDate } from "../utils/date";
 import { advices } from "./advices";
 import { defaultConventionFinalLegals } from "./defaultConventionFinalLegals";
@@ -9,6 +9,12 @@ const defaultSignature = `
     Bonne journée,
     L'équipe Immersion Facilitée
 `;
+
+const createConventionStatusButton = (link: string): EmailButtonProps => ({
+  url: link,
+  label: "Voir l'état de ma demande",
+  target: "_blank",
+});
 
 // to add a new EmailType, or changes the params of one, edit first EmailParamsByEmailType and let types guide you
 export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
@@ -72,6 +78,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
     tags: ["notification conseiller création demande d’immersion"],
     createEmailVariables: ({
       magicLink,
+      conventionStatusLink,
       dateStart,
       dateEnd,
       firstName,
@@ -85,6 +92,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       <strong>Une nouvelle demande d'immersion a été enregistrée.</strong>      ­
 
       Vous pouvez prendre connaissance de la demande en <a href="${magicLink}" target="_blank">cliquant ici</a>.
+      Vous pouvez également suivre <a href="${conventionStatusLink}" target="_blank">l'état de la convention en cliquant ici</a>.
       <ul>
         <li>Vous pouvez dès maintenant demander des modifications ou la refuser si nécessaire.</li>
         <li>Vous ne pouvez pas la valider tant que le bénéficiaire et l'entreprise n'ont pas confirmé chacun leur accord pour cette demande.</li>
@@ -229,11 +237,13 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       content: `
       <strong>La demande d'immersion de ${beneficiaryFirstName} ${beneficiaryLastName} est signée. 
       A vous de l'étudier !</strong>`,
-      button: {
-        url: magicLink,
-        label: "Voir la demande",
-        target: "_blank",
-      },
+      buttons: [
+        {
+          url: magicLink,
+          label: "Voir la demande",
+          target: "_blank",
+        },
+      ],
       subContent: `
       Vous pouvez demander des modifications ou la refuser, si nécessaire  ou la valider si cette demande correspond au projet de ${beneficiaryFirstName} ${beneficiaryLastName}, ${beneficiaryEmail}.      
       
@@ -352,6 +362,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       beneficiaryLastName,
       businessName,
       magicLink,
+      conventionStatusLink,
       signature,
     }) => ({
       subject:
@@ -359,10 +370,13 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       greetings: "Bonjour,",
       content: `${agency} vous informe que la demande d'immersion de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName} nécessite d'être modifiée pour la raison suivante :
       ${justification}`,
-      button: {
-        url: magicLink,
-        label: "Modifier votre demande",
-      },
+      buttons: [
+        {
+          url: magicLink,
+          label: "Modifier votre demande",
+        },
+        createConventionStatusButton(conventionStatusLink),
+      ],
       subContent: `
       Après avoir corrigé votre demande, il vous faudra de nouveau confirmer votre accord. 
       
@@ -382,6 +396,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       possibleRoleAction,
       businessName,
       magicLink,
+      conventionStatusLink,
     }) => ({
       subject: `Immersion Facilitée - Demande d'immersion à étudier: ${beneficiaryFirstName} ${beneficiaryLastName} - ${businessName}`,
       greetings: "Bonjour,",
@@ -392,11 +407,14 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
 
       Nous vous remercions d'en prendre connaissance pour ${possibleRoleAction}.
       `,
-      button: {
-        label: "Examiner la demande",
-        url: magicLink,
-        target: "_blank",
-      },
+      buttons: [
+        {
+          label: "Examiner la demande",
+          url: magicLink,
+          target: "_blank",
+        },
+        createConventionStatusButton(conventionStatusLink),
+      ],
       subContent: defaultSignature,
     }),
     attachmentUrls: [
@@ -406,17 +424,20 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
   MAGIC_LINK_RENEWAL: {
     niceName: "Renouvellement de lien magique",
     tags: ["renouvellement de lien"],
-    createEmailVariables: ({ magicLink }) => ({
+    createEmailVariables: ({ magicLink, conventionStatusLink }) => ({
       subject:
         "Immersion Facilitée - Voici votre nouveau lien magique pour accéder à la demande d'immersion",
       greetings: "Bonjour,",
       content: `
       Vous venez de demander le renouvellement d'un lien pour accéder à une demande d'immersion. Veuillez le trouver ci-dessous :
       `,
-      button: {
-        url: magicLink,
-        label: "Voir ma demande d'immersion",
-      },
+      buttons: [
+        {
+          url: magicLink,
+          label: "Mon lien renouvelé",
+        },
+        createConventionStatusButton(conventionStatusLink),
+      ],
       subContent: defaultSignature,
       highlight:
         "Si vous n'êtes pas à l'origine de cette demande, veuillez contacter notre équipe.",
@@ -433,6 +454,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       establishmentRepresentativeName,
       existingSignatureName,
       magicLink,
+      conventionStatusLink,
     }) => ({
       subject:
         "Immersion Facilitée - À vous de confirmer votre demande de convention",
@@ -442,10 +464,10 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
 
       <strong>À vous maintenant de la confirmer !</strong>
       `,
-      button: {
-        url: magicLink,
-        label: "Confirmer ma demande de convention",
-      },
+      buttons: [
+        { url: magicLink, label: "Confirmer ma demande de convention" },
+        createConventionStatusButton(conventionStatusLink),
+      ],
       subContent: `
       Ensuite, il vous suffira d'attendre le mail de validation de l'organisme d'accompagnement.
 
@@ -466,6 +488,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       beneficiaryRepresentativeName,
       beneficiaryCurrentEmployerName,
       magicLink,
+      conventionStatusLink,
     }) => ({
       subject: "Immersion Facilitée - Confirmez une demande d'immersion",
       greetings: `Bonjour ${signatoryName},`,
@@ -487,7 +510,10 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
           <strong>Votre confirmation est obligatoire</strong> pour permettre à votre conseiller de valider la convention. Merci  !
         
         Vous devez maintenant confirmer votre demande.`,
-      button: { url: magicLink, label: "Confirmer ma demande" },
+      buttons: [
+        { url: magicLink, label: "Confirmer ma demande" },
+        createConventionStatusButton(conventionStatusLink),
+      ],
       highlight:
         "Attention, ne démarrez pas votre immersion tant que vous n'avez pas reçu cette validation ! Vous n'auriez pas de couverture en cas d'accident.",
       subContent: `La décision de votre conseiller vous sera transmise par mail.
@@ -535,10 +561,12 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
 
       Voici quelques conseils pour préparer ce premier échange :
       `,
-      button: {
-        url: "https://immersion.cellar-c2.services.clever-cloud.com/les_bons_conseils_entreprise.pdf",
-        label: "Nos bons conseils",
-      },
+      buttons: [
+        {
+          url: "https://immersion.cellar-c2.services.clever-cloud.com/les_bons_conseils_entreprise.pdf",
+          label: "Nos bons conseils",
+        },
+      ],
       subContent: defaultSignature,
     }),
   },
@@ -608,10 +636,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
         <strong>Une demande de convention d'immersion doit être complétée :</strong>
         ${additionalDetails}
       `,
-      button: {
-        label: "Compléter la demande",
-        url: conventionFormUrl,
-      },
+      buttons: [{ label: "Compléter la demande", url: conventionFormUrl }],
       subContent: defaultSignature,
     }),
   },
@@ -635,10 +660,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
 
       Vous pouvez ajouter ou supprimer des métiers, modifier l'adresse de l'entreprise,  les coordonnées du référent “Immersion” dans votre entreprise ou le mode de contact souhaité, etc.  
       `,
-      button: {
-        label: "Modifier ma fiche entreprise",
-        url: editFrontUrl,
-      },
+      buttons: [{ label: "Modifier ma fiche entreprise", url: editFrontUrl }],
       highlight: `Si vous n'êtes pas à l'origine de cette demande, nous vous recommandons de nous contacter rapidement par mail : ${immersionFacileContactEmail}.`,
       subContent: defaultSignature,
     }),
@@ -667,10 +689,12 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       Merci d'avoir rejoint la communauté des “entreprises s'engagent” et de contribuer ainsi à l'accès à l'emploi de tous les publics.
       `,
       subContent: defaultSignature,
-      button: {
-        label: "Nos bons conseils",
-        url: "https://immersion.cellar-c2.services.clever-cloud.com/livret_accueil_entreprise.pdf",
-      },
+      buttons: [
+        {
+          label: "Nos bons conseils",
+          url: "https://immersion.cellar-c2.services.clever-cloud.com/livret_accueil_entreprise.pdf",
+        },
+      ],
     }),
   },
   CREATE_IMMERSION_ASSESSMENT: {
@@ -690,10 +714,12 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       Nous vous remercions de votre accueil. 
 
       Pouvez-vous indiquer si cette immersion s'est bien déroulée jusqu'à sa date de fin prévue ?`,
-      button: {
-        label: "Evaluer cette immersion",
-        url: immersionAssessmentCreationLink,
-      },
+      buttons: [
+        {
+          label: "Evaluer cette immersion",
+          url: immersionAssessmentCreationLink,
+        },
+      ],
       subContent: `
       Cette information est importante pour la suite de son parcours professionnel. 
 
@@ -707,17 +733,17 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
   FULL_PREVIEW_EMAIL: {
     niceName: "Preview email complet (tous les blocs)",
     tags: ["aperçu pour tests"],
-    createEmailVariables: ({ beneficiaryName }) => ({
+    createEmailVariables: ({ beneficiaryName, conventionStatusLink }) => ({
       subject: "Test contenant toutes les blocs email",
       greetings: `Bonjour ${beneficiaryName}`,
       content: `Merci d'avoir confirmé votre demande d'immersion. Elle va être transmise à votre conseiller référent.
       
       Il vous informera par mail de la validation ou non de l'immersion. Le tuteur qui vous encadrera pendant cette période recevra aussi la réponse.`,
       legals: defaultConventionFinalLegals,
-      button: {
-        label: "Label de bouton",
-        url: "http://www.example.com",
-      },
+      buttons: [
+        { label: "Label de bouton", url: "http://www.example.com" },
+        createConventionStatusButton(conventionStatusLink),
+      ],
       subContent: `Il vous informera par mail de la validation ou non de l'immersion. Le tuteur qui vous encadrera pendant cette période recevra aussi la réponse.
       
       Bonne journée,

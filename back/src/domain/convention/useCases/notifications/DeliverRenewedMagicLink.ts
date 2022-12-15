@@ -15,11 +15,12 @@ export class DeliverRenewedMagicLink extends UseCase<RenewMagicLinkPayload> {
   public async _execute({
     emails,
     magicLink,
+    conventionStatusLink,
   }: RenewMagicLinkPayload): Promise<void> {
     await this.emailGateway.sendEmail({
       type: "MAGIC_LINK_RENEWAL",
       recipients: emails,
-      params: { magicLink },
+      params: { magicLink, conventionStatusLink },
     });
   }
 }

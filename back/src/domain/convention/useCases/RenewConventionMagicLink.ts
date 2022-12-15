@@ -5,6 +5,7 @@ import {
   ConventionMagicLinkPayload,
   createConventionMagicLinkPayload,
   EstablishmentRepresentative,
+  frontRoutes,
   RenewMagicLinkRequestDto,
   renewMagicLinkRequestSchema,
   Role,
@@ -164,12 +165,14 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
         );
 
         const magicLink = linkFormat.replaceAll("%jwt%", jwt);
+        const conventionStatusLink = `${this.config.immersionFacileBaseUrl}/${frontRoutes.conventionStatusDashboard}?jwt=${jwt}`;
 
         const event = this.createNewEvent({
           topic: "MagicLinkRenewalRequested",
           payload: {
             emails,
             magicLink,
+            conventionStatusLink,
           },
         });
 

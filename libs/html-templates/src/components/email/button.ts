@@ -1,17 +1,40 @@
-export const renderButton = (params?: {
+export type EmailButtonProps = {
   url: string;
   label: string;
   target?: "_blank" | "_self";
-}): string | undefined =>
+};
+
+const getButtonStyle = (index: number) =>
+  `text-decoration: none; display: inline-block; padding: 10px 20px; text-align: center; ${
+    index === 0
+      ? "background-color: #000091; color: #fff;"
+      : "border: #000091 1px solid; color: #000091;"
+  }`;
+
+export const renderButton = (params?: EmailButtonProps[]): string | undefined =>
   params &&
+  (params.length > 0 ? true : undefined) &&
   `<table>
-    <tr>
-      <td align="center" width="600" style="padding: 20px; padding-top: 10px; padding-bottom: 30px;">
-        <a style="text-decoration: none; display: inline-block;padding: 10px 20px; background-color: #000091; color: #fff; text-align: center;" href="${
-          params.url
-        }" ${params.target ? `target="${params.target}"` : ""}>${
-    params.label
-  }</a>
-      </td>
-    </tr>
+    ${params
+      .map(
+        ({ target, url, label }, index) =>
+          `<tr>
+              <td 
+                align="center" 
+                width="600"
+                style="padding: 20px; padding-top: 10px; padding-bottom: ${
+                  index === params.length - 1 ? "30px" : "10px"
+                };"
+              >
+                <a
+                  style="${getButtonStyle(index)}"
+                  href="${url}"
+                  ${target ? `target="${target}"` : ""}
+                >
+                  ${label}
+                </a>
+              </td>
+          </tr>`,
+      )
+      .join("")}
   </table>`;

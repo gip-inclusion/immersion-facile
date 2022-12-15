@@ -1,3 +1,5 @@
+import { EmailButtonProps } from "./components/email";
+
 type CreateEmailVariable<P> = (params: P) => {
   subject: string;
   greetings?: string;
@@ -6,10 +8,7 @@ type CreateEmailVariable<P> = (params: P) => {
   subContent?: string;
   legals?: string;
   agencyLogoUrl?: string;
-  button?: {
-    url: string;
-    label: string;
-  };
+  buttons?: EmailButtonProps[];
 };
 
 export type HtmlTemplateEmailData<P> = {
