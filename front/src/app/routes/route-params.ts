@@ -7,6 +7,7 @@ export const standardPageSlugs = [
   "mentions-legales",
   "cgu",
   "politique-de-confidentialite",
+  "declaration-accessibilite",
 ] as const;
 
 export type AdminTab =
@@ -21,6 +22,11 @@ export type AdminTab =
 export const adminTabSerializer: ValueSerializer<AdminTab> = {
   parse: (raw) => raw as AdminTab,
   stringify: (tab) => tab,
+};
+
+export const standardPagesSerializer: ValueSerializer<StandardPageSlugs> = {
+  parse: (raw) => raw as StandardPageSlugs,
+  stringify: (page) => page,
 };
 
 const scheduleSerializer: ValueSerializer<ScheduleDto> = {

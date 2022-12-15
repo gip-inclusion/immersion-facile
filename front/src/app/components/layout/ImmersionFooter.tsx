@@ -86,7 +86,8 @@ const links: NavLink[] = [
 ];
 const bottomsLinks: NavLink[] = [
   {
-    label: "Accessibilité : non conforme",
+    label: "Accessibilité : partiellement conforme",
+    ...routes.standard({ pagePath: "declaration-accessibilite" }).link,
     id: getFooterNavLinkId("accessibility"),
   },
   {

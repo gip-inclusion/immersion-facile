@@ -1,6 +1,10 @@
 import { frontRoutes } from "shared";
 import { createRouter, defineRoute, param } from "type-route";
-import { adminTabSerializer, conventionValuesFromUrl } from "./route-params";
+import {
+  adminTabSerializer,
+  conventionValuesFromUrl,
+  standardPagesSerializer,
+} from "./route-params";
 
 export const { RouteProvider, useRoute, routes } = createRouter({
   addAgency: defineRoute(`/${frontRoutes.addAgency}`),
@@ -93,7 +97,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   ),
   standard: defineRoute(
     {
-      pagePath: param.path.string,
+      pagePath: param.path.ofType(standardPagesSerializer),
     },
     (params) => `/${frontRoutes.standard}/${params.pagePath}`,
   ),
