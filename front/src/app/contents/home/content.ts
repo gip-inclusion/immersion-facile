@@ -312,53 +312,58 @@ export const sectionFaqData: Record<UserType, FaqCardProps[]> = {
   ],
   candidate: [
     {
+      title: "Qui peut bénéficier d'une Immersion Professionnelle (PMSMP) ?",
+      description: `S’inscrivant dans une démarche préventive (bénéficiaire salarié en recherche d’emploi ou de réorientation professionnelle) et proactive (bénéficiaire privé d’emploi, inscrit ou non auprès de Pôle emploi), les périodes...`,
+      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/qui-peut-beneficier-dune-immersion-professionnelle-pmsmp-jz1af4/?bust=1671185298396",
+    },
+    {
+      title:
+        "Je n'ai pas de structure d'accompagnement et je veux faire une immersion",
+      description: ` Pour faire une immersion et avoir une convention, il faut que vous soyez accompagné(e) par un organisme qui sera responsable de cette convention...`,
+      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/je-nai-pas-de-structure-daccompagnement-et-je-veux-faire-une-immersion-1x15rdp/?bust=1671185298408",
+    },
+    {
       title: "Comment trouver une entreprise accueillante ?",
-      description: `A partir de la page candidat du service Immersion Facilitée, cliquez sur le bouton "Trouver une entreprise accueillante" ou rendez-vous directement sur la page...`,
-      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-trouver-une-entreprise-accueillante-ek1x8s/",
-    },
-    {
-      title: "A quoi sert une immersion professionnelle ?",
-      description: `Elle vous permet d’assurer le succès de votre projet professionnel en découvrant un métier en conditions réelles, de passer quelques jours en entreprise pour vérifier...`,
-      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/a-quoi-sert-une-immersion-professionnelle-1yd6ije/",
-    },
-    {
-      title: "Comment contacter une entreprise pour demander une immersion ?",
-      description: `SI une entreprise a le label "entreprise accueillante", pour lui demander une une immersion, vous devez cliquer sur "contacter l'entreprise" et compléter le formulaire...`,
-      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-contacter-une-entreprise-pour-demander-une-immersion-8dqotx/",
+      description: `A partir de la page d'accueil du service Immersion Facilitée, cliquez sur les boutons "Vous êtes candidat pour une immersion" puis "Trouver une entreprise accueillante"...`,
+      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-trouver-une-entreprise-accueillante-ek1x8s/?bust=1671185298442",
     },
   ],
   establishment: [
     {
-      title: "Comment trouver une entreprise accueillante ?",
-      description: `A partir de la page candidat du service Immersion Facilitée, cliquez sur le bouton "Trouver une entreprise accueillante" ou rendez-vous directement sur la page...`,
-      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-trouver-une-entreprise-accueillante-ek1x8s/",
+      title:
+        "Comment référencer mon entreprise en tant qu'entreprise accueillante ?",
+      description: `A partir de la page d'accueil du service Immersion Facilitée, cliquez sur le bouton "Vous représentez une entreprise", puis sur "Référencer mon Entreprise"...`,
+      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-referencer-mon-entreprise-en-tant-quentreprise-accueillante-zr6rxv/?bust=1671185298453",
     },
     {
-      title: "A quoi sert une immersion professionnelle ?",
-      description: `Elle vous permet d’assurer le succès de votre projet professionnel en découvrant un métier en conditions réelles, de passer quelques jours en entreprise pour vérifier...`,
-      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/a-quoi-sert-une-immersion-professionnelle-1yd6ije/",
+      title:
+        "Ma structure peut-elle accueillir des immersions professionnelles ?",
+      description: `Une immersion professionnelle (ou Période de mise en situation en milieu professionnel -PMSMP) peut se faire dans n’importe quel type d’établissement, y compris le secteur public ou associatif...`,
+      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/ma-structure-peut-elle-accueillir-des-immersions-professionnelles-1ccin58/?bust=1671185298460",
     },
     {
-      title: "Comment contacter une entreprise pour demander une immersion ?",
-      description: `SI une entreprise a le label "entreprise accueillante", pour lui demander une une immersion, vous devez cliquer sur "contacter l'entreprise" et compléter le formulaire...`,
-      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-contacter-une-entreprise-pour-demander-une-immersion-8dqotx/",
+      title: "A quoi s'engage une entreprise accueillante ?",
+      description: `Le référencement permet à votre établissement d’être présent dans la liste de résultats sur Immersion Facilitée et sur l'application du contrat d'engagement Jeune...`,
+      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/a-quoi-sengage-une-entreprise-accueillante-1hs13d1/?bust=1671185298467",
     },
   ],
   agency: [
     {
-      title: "Comment trouver une entreprise accueillante ?",
-      description: `A partir de la page candidat du service Immersion Facilitée, cliquez sur le bouton "Trouver une entreprise accueillante" ou rendez-vous directement sur la page...`,
-      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-trouver-une-entreprise-accueillante-ek1x8s/",
+      title:
+        "Puis-je faire une demande de convention avec une entreprise non inscrite sur le site ?",
+      description: `La réponse en trois mots : oui, bien sûr. Les entreprises accueillantes sont des entreprises que nous avons contactées et qui se sont engagées à accueillir des immersions...`,
+      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/puis-je-faire-une-demande-de-convention-avec-une-entreprise-non-inscrite-sur-le-site-f9z742/?bust=1671185298387",
     },
     {
-      title: "A quoi sert une immersion professionnelle ?",
-      description: `Elle vous permet d’assurer le succès de votre projet professionnel en découvrant un métier en conditions réelles, de passer quelques jours en entreprise pour vérifier...`,
-      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/a-quoi-sert-une-immersion-professionnelle-1yd6ije/",
+      title: "Quelles sont les étapes de signature de la convention ?",
+      description: `Etape 1 : Signature du bénéficiaire et de l'entreprise. Le bénéficiaire et L'entreprise reçoivent un email appelé "Immersion Facilitée : Confirmez une demande d'immersion" ...`,
+      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/quelles-sont-les-etapes-de-signature-de-la-convention-17hf59q/?bust=1671185298400",
     },
     {
-      title: "Comment contacter une entreprise pour demander une immersion ?",
-      description: `SI une entreprise a le label "entreprise accueillante", pour lui demander une une immersion, vous devez cliquer sur "contacter l'entreprise" et compléter le formulaire...`,
-      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/comment-contacter-une-entreprise-pour-demander-une-immersion-8dqotx/",
+      title:
+        "Le bénéficiaire, l'entreprise ou le prescripteur n'a pas reçu la convention à signer",
+      description: `Que vous soyez bénéficiaire, entreprise accueillante ou prescripteur d'immersions, il est nécéssaire de pouvoir recevoir nos emails afin de signer éléctroniquement la convention....`,
+      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/le-beneficiaire-lentreprise-ou-le-prescripteur-na-pas-recu-la-convention-a-signer-125bxxd/?bust=1671185298404",
     },
   ],
 };
