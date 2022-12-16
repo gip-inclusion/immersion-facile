@@ -1,10 +1,14 @@
 import React from "react"; //ReactNode
 import {
+  addressDtoToString,
+  ContactMethod,
   //ContactMethod,
   SearchImmersionResultDto,
 } from "shared";
+import { ButtonsGroup } from "src/../../libs/react-design-system";
+import { getMapsLink } from "./ContactEstablishmentModal";
+// import "./SearchResult.scss";
 // import { Icon } from "react-design-system";
-import "./EnterpriseSearchResult.scss";
 
 type EnterpriseSearchResultProps = {
   searchResult: SearchImmersionResultDto;
@@ -17,7 +21,7 @@ type EnterpriseSearchResultProps = {
 //   children: ReactNode;
 // };
 
-export const EnterpriseSearchResult = ({
+export const SearchResult = ({
   onButtonClick,
   searchResult,
 }: EnterpriseSearchResultProps) => {
@@ -25,56 +29,94 @@ export const EnterpriseSearchResult = ({
     name,
     customizedName,
     distance_m,
-    // address,
-    // contactMode,
-    // numberOfEmployeeRange,
+    address,
+    contactMode,
+    numberOfEmployeeRange,
     nafLabel,
-    // romeLabel,
-    // appellationLabels,
-    // voluntaryToImmersion,
-    // website,
+    romeLabel,
+    appellationLabels,
+    voluntaryToImmersion,
+    website,
     // additionalInformation,
   } = searchResult;
   const distanceKm = ((distance_m ?? 0) / 1000).toFixed(1);
   return (
-    <div className="fr-col-12 fr-col-md-4 fr-mb-2w">
-      <div className="fr-card fr-enlarge-link" onClick={onButtonClick}>
-        <div className="fr-card__content">
-          <div className="fr-card__body">
+    <div className="fr-col-12 fr-col-md-4">
+      <div className="im-search-result fr-card">
+        <div className="fr-card__body">
+          <div className="fr-card__content">
             <h3 className="fr-card__title">{customizedName ?? name}</h3>
-
             <p className="fr-card__desc">
-              Éclairer les personnes à la recherche d'une formation
-              professionnelle dans leur choix
+              {" "}
+              {appellationLabels.length > 0
+                ? appellationLabels.join(", ")
+                : romeLabel}
             </p>
-            <div className="fr-card__start">
+            <p className="fr-card__desc">Plus d'informations :</p>
+            <ul className="fr-card__desc fr-text--xs">
               {nafLabel && (
-                <p className="fr-card__detail">
-                  <abbr title="Distance">{distanceKm}km</abbr>
-                </p>
-              )}
-              <ul className="fr-badges-group">
-                {nafLabel && (
-                  <li>
-                    <p className="fr-badge">{nafLabel}</p>
-                  </li>
-                )}
-
                 <li>
-                  <p className="fr-badge">label badge</p>
+                  <strong>{nafLabel}</strong>
                 </li>
-              </ul>
-            </div>
+              )}
+              {numberOfEmployeeRange && (
+                <li>
+                  {numberOfEmployeeRange}{" "}
+                  {numberOfEmployeeRange === "0" ? "salarié" : "salariés"}
+                </li>
+              )}
+              <li>
+                <a href={getMapsLink(searchResult)} target="_blank">
+                  {addressDtoToString(address).toLocaleLowerCase()}
+                </a>{" "}
+                (
+                <strong>
+                  {distanceKm}
+                  km
+                </strong>{" "}
+                de votre position)
+              </li>
+            </ul>
+            <ul className="fr-card__desc fr-badges-group">
+              <li>
+                <InfoLabel
+                  className=""
+                  contactMode={contactMode}
+                  voluntaryToImmersion={voluntaryToImmersion}
+                />
+              </li>
+            </ul>
           </div>
           <div className="fr-card__footer">
-            <ul className="fr-btns-group fr-btns-group--inline-reverse fr-btns-group--inline-lg">
+            <ButtonsGroup className="fr-btns-group fr-btns-group--sm">
+              <button className="fr-btn fr-btn--sm" onClick={onButtonClick}>
+                {contactMode === "PHONE" ||
+                contactMode === "EMAIL" ||
+                contactMode === "IN_PERSON"
+                  ? "Contacter l'entreprise"
+                  : "Tentez votre chance"}
+              </button>
+              {website ? (
+                <a
+                  className="fr-btn fr-btn--sm fr-btn--secondary"
+                  href={website}
+                  target="_blank"
+                >
+                  Voir le site web
+                </a>
+              ) : (
+                <></>
+              )}
+            </ButtonsGroup>
+
+            {/* <ul className="fr-btns-group fr-btns-group--inline-reverse fr-btns-group--inline-lg">
               <li>
                 <button className="fr-btn fr-btn--secondary">Label</button>
               </li>
               <li>
                 <button className="fr-btn">Label</button>
               </li>
-            </ul>
+            </ul> */}
           </div>
         </div>
       </div>
@@ -142,38 +184,21 @@ export const EnterpriseSearchResult = ({
   );
 };
 
-// type InfoLabelProps = {
-//   voluntaryToImmersion?: boolean;
-//   contactMode?: ContactMethod;
-//   className?: string;
-// };
+type InfoLabelProps = {
+  voluntaryToImmersion?: boolean;
+  contactMode?: ContactMethod;
+  className?: string;
+};
 
-// const InfoLabel = ({
-//   contactMode,
-//   voluntaryToImmersion,
-//   className,
-// }: InfoLabelProps) => {
-//   const defaultStyles =
-//     "text-immersionBlue bg-blue-50 rounded-md p-2 h-10 text-center";
-//   const allStyles = `${defaultStyles} ${className}`;
-
-//   if (voluntaryToImmersion) {
-//     return (
-//       <div className={allStyles}>
-//         <SentimentSatisfiedAltIcon /> Entreprise accueillante
-//       </div>
-//     );
-//   }
-
-//   switch (contactMode) {
-//     case undefined:
-//       return (
-//         <div className={allStyles}>
-//           <Icon kind="star-s-line" /> Tentez votre chance
-//         </div>
-//       );
-
-//     default:
-//       return null;
-//   }
-// };
+const InfoLabel = ({ contactMode, voluntaryToImmersion }: InfoLabelProps) => {
+  const luckyGuess = typeof contactMode === "undefined";
+  const className = `fr-badge ${
+    voluntaryToImmersion ? "fr-badge--blue-cumulus" : ""
+  } ${luckyGuess ? "fr-badge--purple-glycine" : ""}`;
+  const label = voluntaryToImmersion
+    ? "Entreprise accueillante"
+    : "Tentez votre chance";
+  return voluntaryToImmersion || luckyGuess ? (
+    <div className={className}>{label}</div>
+  ) : null;
+};

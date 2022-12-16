@@ -59,4 +59,32 @@ const extraFetchEpic: SearchEpic = (
     ),
   );
 
-export const searchEpics = [initialSearchEpic, extraFetchEpic];
+const initialFullSearchEpic: SearchEpic = (
+  action$,
+  _state$,
+  { immersionSearchGateway },
+) =>
+  action$.pipe(
+    filter(searchSlice.actions.fullSearchRequested.match),
+    switchMap((action) =>
+      immersionSearchGateway
+        .search({
+          ...action.payload,
+        })
+        .pipe(
+          take(1),
+          map((results) =>
+            searchSlice.actions.initialFullSearchSucceeded({
+              results,
+              searchParams: action.payload,
+            }),
+          ),
+        ),
+    ),
+  );
+
+export const searchEpics = [
+  initialSearchEpic,
+  extraFetchEpic,
+  initialFullSearchEpic,
+];

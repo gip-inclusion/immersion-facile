@@ -13,3 +13,12 @@ export const useSearchUseCase = () => {
     routes.search(values).replace();
   };
 };
+
+export const useFullSearchUseCase = () => {
+  const dispatch = useDispatch();
+
+  return (values: SearchPageParams) => {
+    dispatch(searchSlice.actions.fullSearchRequested(values));
+    routes.search(values).replace();
+  };
+};

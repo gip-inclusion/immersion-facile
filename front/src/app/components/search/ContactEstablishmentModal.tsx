@@ -159,7 +159,7 @@ const Bold = ({ children }: { children: string }) => (
   <strong>{children}</strong>
 );
 
-const getMapsLink = (
+export const getMapsLink = (
   searchResultData: SearchImmersionResultDto | undefined,
 ) => {
   if (!searchResultData) return;

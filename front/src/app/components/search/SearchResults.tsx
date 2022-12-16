@@ -1,5 +1,5 @@
 import { CircularProgress } from "@mui/material";
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { ContactMethod } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
@@ -8,7 +8,8 @@ import {
   ContactEstablishmentModal,
   useContactEstablishmentModal,
 } from "./ContactEstablishmentModal";
-import { EnterpriseSearchResult } from "./EnterpriseSearchResult";
+import { SearchResult } from "./SearchResult";
+import { Pagination } from "src/../../libs/react-design-system";
 
 const getFeedBackMessage = (contactMethod?: ContactMethod) => {
   switch (contactMethod) {
@@ -31,6 +32,19 @@ export const SearchResults = () => {
   const [successfulValidationMessage, setSuccessfulValidatedMessage] = useState<string | null>(null);
   const [successFullyValidated, setSuccessfullyValidated] = useState(false);
   const { modalState, dispatch } = useContactEstablishmentModal();
+  const [displayedResults, setDisplayedResults] = useState(searchResults);
+  const resultsPerPage = 6;
+  const [currentPage, setCurrentPage] = useState<number>(0);
+  const totalPages = Math.ceil(searchResults.length / resultsPerPage) - 1;
+  const getSearchResultsForPage = (currentPage: number) => {
+    const start = currentPage * resultsPerPage;
+    const end = start + resultsPerPage;
+    return searchResults.slice(start, end);
+  };
+
+  useEffect(() => {
+    setDisplayedResults(getSearchResultsForPage(currentPage));
+  }, [currentPage]);
 
   if (searchStatus === "initialFetch")
     return (
@@ -43,7 +57,7 @@ export const SearchResults = () => {
     return <SearchInfos>{searchInfo}</SearchInfos>;
 
   return (
-    <div className="fr-container">
+    <div className="fr-container fr-mb-10w">
       {searchStatus === "extraFetch" && searchInfo && (
         <SearchInfos>
           <div className="flex flex-col items-center">
@@ -53,8 +67,8 @@ export const SearchResults = () => {
         </SearchInfos>
       )}
       <div className="fr-grid-row fr-grid-row--gutters">
-        {searchResults.map((searchResult) => (
-          <EnterpriseSearchResult
+        {displayedResults.map((searchResult) => (
+          <SearchResult
             key={searchResult.siret + "-" + searchResult.rome} // Should be unique !
             searchResult={searchResult}
             onButtonClick={() =>
@@ -76,7 +90,13 @@ export const SearchResults = () => {
             disableButton={modalState.isValidating}
           />
         ))}
-
+        <div className="fr-container fr-grid-row fr-grid-row--center">
+          <Pagination
+            totalPages={totalPages}
+            setCurrentPage={setCurrentPage}
+            currentPage={currentPage}
+          />
+        </div>
         <ContactEstablishmentModal
           modalState={modalState}
           dispatch={dispatch}
