@@ -1,21 +1,23 @@
 import React from "react";
 import { MainWrapper } from "react-design-system";
+import { ManagedErrorKind } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
-import { HTTPFrontErrorType } from "src/app/contents/error/types";
 import { ErrorPageContent } from "./ErrorPageContent";
 
 type ErrorPageProperties = {
-  children?: React.ReactNode;
-  type?: HTTPFrontErrorType;
+  type?: ManagedErrorKind;
+  message?: string;
+  title?: string;
 };
 
 export const ErrorPage = ({
-  children,
   type,
+  message,
+  title,
 }: ErrorPageProperties): React.ReactElement => (
   <HeaderFooterLayout>
     <MainWrapper layout="default" vSpacing={0}>
-      {type ? <ErrorPageContent type={type} /> : children}
+      <ErrorPageContent type={type} message={message} title={title} />
     </MainWrapper>
   </HeaderFooterLayout>
 );

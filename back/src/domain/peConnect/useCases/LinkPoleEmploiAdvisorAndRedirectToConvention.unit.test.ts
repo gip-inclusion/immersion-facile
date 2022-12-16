@@ -113,6 +113,22 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
       );
     });
 
+    it("On PeConnect not user info", async () => {
+      peConnectGateway.setAccessToken(accessToken);
+      peConnectGateway.setUser(undefined);
+      peConnectGateway.setAdvisors([pePlacementAdvisor]);
+      const urlWithQueryParams = await usecase.execute(authorizationCode);
+
+      expect(urlWithQueryParams).toBe(
+        `${baseurl}/demande-immersion?federatedIdentity=peConnect:AuthFailed`,
+      );
+      expectTypeToMatchAndEqual(
+        uow.conventionPoleEmploiAdvisorRepository
+          .conventionPoleEmploiUsersAdvisors,
+        [],
+      );
+    });
+
     it("On PeConnected and is not jobseeker", async () => {
       peConnectGateway.setAccessToken(accessToken);
       peConnectGateway.setUser(peNotJobseekerUser);

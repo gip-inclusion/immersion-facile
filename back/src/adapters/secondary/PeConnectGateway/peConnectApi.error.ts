@@ -39,9 +39,16 @@ export const peConnectErrorStrategy = (
       ),
     ],
     [
-      isUserInfoServerInternalError(context, error),
+      isGetUserInfoServerInternalError(context, error),
       makeRawRedirectError(
         "Nous n’avons pas réussi à récupérer vos informations personnelles pôle emploi connect.",
+        error,
+      ),
+    ],
+    [
+      isGetUserStatusInfoServerInternalError(context, error),
+      makeRawRedirectError(
+        "Nous n’avons pas réussi à récupérer votre status pôle emploi connect.",
         error,
       ),
     ],
@@ -57,8 +64,15 @@ export const peConnectErrorStrategy = (
       new ManagedRedirectError("peConnectAdvisorForbiddenAccess", error),
     ],
     [
-      isUserForbiddenError(error, context),
-      new ManagedRedirectError("peConnectUserForbiddenAccess", error),
+      isGetUserInfoForbiddenError(error, context),
+      new ManagedRedirectError("peConnectGetUserInfoForbiddenAccess", error),
+    ],
+    [
+      isGetUserStatusInfoForbiddenError(error, context),
+      new ManagedRedirectError(
+        "peConnectGetUserStatusInfoForbiddenAccess",
+        error,
+      ),
     ],
     [
       error.code === "ECONNABORTED",
@@ -92,11 +106,18 @@ export const hasNoErrorIdentifier = (error: AxiosError) =>
 const rawRedirectTitle = (error: AxiosError) =>
   `Une erreur est survenue - ${error.response?.status ?? error.code}`;
 
-export const isUserInfoServerInternalError = (
+export const isGetUserInfoServerInternalError = (
   context: PeConnectTargetsKind,
   error: AxiosError,
 ) =>
   context === "getUserInfo" &&
+  error.response?.status === HTTP_STATUS.INTERNAL_SERVER_ERROR;
+
+export const isGetUserStatusInfoServerInternalError = (
+  context: PeConnectTargetsKind,
+  error: AxiosError,
+) =>
+  context === "getUserStatutInfo" &&
   error.response?.status === HTTP_STATUS.INTERNAL_SERVER_ERROR;
 
 export const isAdvisorsServerInternalError = (
@@ -128,12 +149,19 @@ export const isAdvisorForbiddenError = (
   error.response?.status === HTTP_STATUS.UNAUTHORIZED &&
   context === "getAdvisorsInfo";
 
-export const isUserForbiddenError = (
+export const isGetUserInfoForbiddenError = (
   error: AxiosError<any, any>,
   context: PeConnectTargetsKind,
 ): boolean =>
   error.response?.status === HTTP_STATUS.UNAUTHORIZED &&
   context === "getUserInfo";
+
+export const isGetUserStatusInfoForbiddenError = (
+  error: AxiosError<any, any>,
+  context: PeConnectTargetsKind,
+): boolean =>
+  error.response?.status === HTTP_STATUS.UNAUTHORIZED &&
+  context === "getUserStatutInfo";
 
 export const isHttpServerError5XX = (error: AxiosError): boolean =>
   !!error &&

@@ -1,7 +1,7 @@
 import React from "react";
 import { LegacyHttpClientError } from "shared";
 import { RenewExpiredLinkContent } from "src/app/routes/RenewExpiredLinkPage";
-import { ManagedErrorSelector } from "./ManagedErrors";
+import { ErrorPage } from "./ErrorPage";
 
 type HttpClientErrorProperties = {
   error: LegacyHttpClientError;
@@ -20,12 +20,13 @@ export const HttpClientErrorSelector = ({
       />
     );
   if (error.httpStatusCode === 401 && jwt)
-    return <ManagedErrorSelector kind="httpClientInvalidToken" />;
+    return <ErrorPage type="httpClientInvalidToken" />;
   if (error.httpStatusCode === 404)
-    return <ManagedErrorSelector kind="httpClientNotFoundError" />;
+    return <ErrorPage type="httpClientNotFoundError" />;
   return (
-    <ManagedErrorSelector kind="httpUnknownClientError">
-      {JSON.stringify(error)}
-    </ManagedErrorSelector>
+    <ErrorPage
+      type="httpUnknownClientError"
+      message={`<pre><code>${JSON.stringify(error, null, 2)}</code></pre>`}
+    />
   );
 };

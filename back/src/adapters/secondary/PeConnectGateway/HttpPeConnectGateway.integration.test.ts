@@ -183,8 +183,33 @@ describe("HttpPeConnectGateway", () => {
         // });
 
         // eslint-disable-next-line jest/no-disabled-tests
-        it.skip("Should manage Zod Error", () => {
-          expect(true).toBe(false);
+
+        it("Zod Error -> OK with undefined", async () => {
+          mock
+            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+            .reply(200, [peExternalAdvisorPlacement])
+            .onGet(peConnectTargets(appConfig).getUserInfo.url)
+            .reply(200, "UNSUPPORTED RESPONSE")
+            .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
+            .reply(200, {
+              codeStatutIndividu: "1",
+              libelleStatutIndividu: "Demandeur d’emploi",
+            });
+          expect(await adapter.getUserAndAdvisors(accessToken)).toBeUndefined();
+        });
+
+        it("Bad status code -> OK with undefined", async () => {
+          mock
+            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+            .reply(200, [peExternalAdvisorCapemploi])
+            .onGet(peConnectTargets(appConfig).getUserInfo.url)
+            .reply(201, peExternalUser)
+            .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
+            .reply(200, {
+              codeStatutIndividu: "1",
+              libelleStatutIndividu: "Demandeur d’emploi",
+            });
+          expect(await adapter.getUserAndAdvisors(accessToken)).toBeUndefined();
         });
 
         it(`Connection aborted -> ManagedRedirectError kind peConnectConnectionAborted`, async () => {
@@ -219,11 +244,10 @@ describe("HttpPeConnectGateway", () => {
             .reply(200, [peExternalAdvisorPlacement])
             .onGet(peConnectTargets(appConfig).getUserInfo.url)
             .reply(401);
-
           await expectPromiseToFailWithError(
             adapter.getUserAndAdvisors(accessToken),
             new ManagedRedirectError(
-              "peConnectUserForbiddenAccess",
+              "peConnectGetUserInfoForbiddenAccess",
               new Error(),
             ),
           );
@@ -265,6 +289,40 @@ describe("HttpPeConnectGateway", () => {
         //     user: peConnectUser(true),
         //   });
         // });
+
+        it("Zod Error -> OK with No advisors", async () => {
+          mock
+            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+            .reply(200, "UNSUPPORTED RESPONSE")
+            .onGet(peConnectTargets(appConfig).getUserInfo.url)
+            .reply(200, peExternalUser)
+            .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
+            .reply(200, {
+              codeStatutIndividu: "1",
+              libelleStatutIndividu: "Demandeur d’emploi",
+            });
+          expectObjectsToMatch(await adapter.getUserAndAdvisors(accessToken), {
+            advisors: [],
+            user: peConnectUser(true),
+          });
+        });
+
+        it("Bad status code -> OK with No advisors", async () => {
+          mock
+            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+            .reply(201, [peExternalAdvisorCapemploi])
+            .onGet(peConnectTargets(appConfig).getUserInfo.url)
+            .reply(200, peExternalUser)
+            .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
+            .reply(200, {
+              codeStatutIndividu: "1",
+              libelleStatutIndividu: "Demandeur d’emploi",
+            });
+          expectObjectsToMatch(await adapter.getUserAndAdvisors(accessToken), {
+            advisors: [],
+            user: peConnectUser(true),
+          });
+        });
 
         it(`Connection aborted -> ManagedRedirectError kind peConnectConnectionAborted`, async () => {
           mock
@@ -338,6 +396,101 @@ describe("HttpPeConnectGateway", () => {
               advisors: [],
               user: peConnectUser(true),
             },
+          );
+        });
+      });
+
+      describe("Errors on getUserStatutInfo", () => {
+        it("Zod Error getUserStatutInfo -> OK with No advisors and not jobseeker", async () => {
+          mock
+            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+            .reply(200, [peExternalAdvisorPlacement])
+            .onGet(peConnectTargets(appConfig).getUserInfo.url)
+            .reply(200, peExternalUser)
+            .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
+            .reply(200, "UNSUPPORTED RESPONSE");
+          expectObjectsToMatch(await adapter.getUserAndAdvisors(accessToken), {
+            advisors: [],
+            user: peConnectUser(false),
+          });
+        });
+        it("Bad status code -> OK with No advisors and not jobseeker", async () => {
+          mock
+            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+            .reply(200, [peExternalAdvisorCapemploi])
+            .onGet(peConnectTargets(appConfig).getUserInfo.url)
+            .reply(200, peExternalUser)
+            .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
+            .reply(201, {
+              codeStatutIndividu: "1",
+              libelleStatutIndividu: "Demandeur d’emploi",
+            });
+          expectObjectsToMatch(await adapter.getUserAndAdvisors(accessToken), {
+            advisors: [],
+            user: peConnectUser(false),
+          });
+        });
+        it(`Connection aborted -> ManagedRedirectError kind peConnectConnectionAborted`, async () => {
+          mock
+            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+            .reply(200, [peExternalAdvisorPlacement])
+            .onGet(peConnectTargets(appConfig).getUserInfo.url)
+            .reply(200, peExternalUser)
+            .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
+            .abortRequest();
+          await expectPromiseToFailWithError(
+            adapter.getUserAndAdvisors(accessToken),
+            new ManagedRedirectError("peConnectConnectionAborted", new Error()),
+          );
+        });
+        it(`Network error -> RawRedirectError`, async () => {
+          mock
+            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+            .reply(200, [peExternalAdvisorPlacement])
+            .onGet(peConnectTargets(appConfig).getUserInfo.url)
+            .reply(200, peExternalUser)
+            .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
+            .networkError();
+          await testRawRedirectError(
+            () => adapter.getUserAndAdvisors(accessToken),
+            new RawRedirectError(
+              "Une erreur est survenue - Erreur réseau",
+              "Nous n’avons pas réussi à joindre pôle emploi connect.",
+              new Error(),
+            ),
+          );
+        });
+        it(`Error 401 -> ManagedRedirectError kind peConnectUserForbiddenAccess`, async () => {
+          mock
+            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+            .reply(200, [peExternalAdvisorPlacement])
+            .onGet(peConnectTargets(appConfig).getUserInfo.url)
+            .reply(200, peExternalUser)
+            .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
+            .reply(401);
+          await expectPromiseToFailWithError(
+            adapter.getUserAndAdvisors(accessToken),
+            new ManagedRedirectError(
+              "peConnectGetUserStatusInfoForbiddenAccess",
+              new Error(),
+            ),
+          );
+        });
+        it(`Error 500 -> RawRedirectError`, async () => {
+          mock
+            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+            .reply(200, [peExternalAdvisorPlacement])
+            .onGet(peConnectTargets(appConfig).getUserInfo.url)
+            .reply(200, peExternalUser)
+            .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
+            .reply(500);
+          await testRawRedirectError(
+            () => adapter.getUserAndAdvisors(accessToken),
+            new RawRedirectError(
+              "Une erreur est survenue - 500",
+              "Nous n’avons pas réussi à récupérer votre status pôle emploi connect.",
+              new Error(),
+            ),
           );
         });
       });

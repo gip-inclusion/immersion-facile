@@ -1,13 +1,16 @@
 import axios from "axios";
 import { HttpClient } from "http-client";
-import { HTTP_STATUS, queryParamsAsString } from "shared";
+import {
+  HTTP_STATUS,
+  parseZodSchemaAndLogErrorOnParsingFailure,
+  queryParamsAsString,
+} from "shared";
 import { AccessTokenDto } from "../../../domain/peConnect/dto/AccessToken.dto";
 import { PeConnectAdvisorDto } from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
 import { PeConnectUserDto } from "../../../domain/peConnect/dto/PeConnectUser.dto";
 import { externalAccessTokenSchema } from "../../../domain/peConnect/port/AccessToken.schema";
 import { PeConnectGateway } from "../../../domain/peConnect/port/PeConnectGateway";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
-import { validateAndParseZodSchema } from "../../primary/helpers/httpErrors";
 import { UnhandledError } from "../../primary/helpers/unhandledError";
 import {
   toAccessToken,
@@ -15,28 +18,30 @@ import {
   toPeConnectUserDto,
 } from "./peConnectApi.client";
 import {
-  PeConnectTargets,
-  PeConnectOauthConfig,
-  ExternalAccessToken,
-  PeConnectHeaders,
-  ExternalPeConnectUser,
   ExternalPeConnectAdvisor,
+  ExternalPeConnectUser,
+  PeConnectHeaders,
+  PeConnectOauthConfig,
+  PeConnectTargets,
   PeConnectTargetsKind,
 } from "./peConnectApi.dto";
 import {
+  externalPeConnectAdvisorsSchema,
   externalPeConnectUserSchema,
   externalPeConnectUserStatutSchema,
-  externalPeConnectAdvisorsSchema,
 } from "./peConnectApi.schema";
 
+import { ZodError } from "zod";
+import { createLogger } from "../../../utils/logger";
 import {
   exchangeCodeForAccessTokenCounter,
   getAdvisorsInfoCounter,
   getUserInfoCounter,
   getUserStatutInfoCounter,
 } from "./peConnectApi.counter";
-import { peConnectErrorStrategy } from "./peConnectApi.error";
+import { peConnectErrorStrategy as peConnectAxiosErrorStrategy } from "./peConnectApi.error";
 
+const logger = createLogger(__filename);
 export class HttpPeConnectGateway implements PeConnectGateway {
   constructor(
     private httpClient: HttpClient<PeConnectTargets>,
@@ -45,17 +50,14 @@ export class HttpPeConnectGateway implements PeConnectGateway {
 
   public async getAccessToken(
     authorizationCode: string,
-  ): Promise<AccessTokenDto> {
+  ): Promise<AccessTokenDto | undefined> {
     const timerFlag = `${authorizationCode} - PeConnect getAccessToken duration`;
-
+    // eslint-disable-next-line no-console
+    console.time(timerFlag);
     const counter = exchangeCodeForAccessTokenCounter;
     try {
-      // eslint-disable-next-line no-console
-      console.time(timerFlag);
-
       counter.total.inc();
-
-      const result = await this.httpClient.exchangeCodeForAccessToken({
+      const response = await this.httpClient.exchangeCodeForAccessToken({
         body: queryParamsAsString({
           client_id: this.configs.poleEmploiClientId,
           client_secret: this.configs.poleEmploiClientSecret,
@@ -67,16 +69,19 @@ export class HttpPeConnectGateway implements PeConnectGateway {
           "Content-Type": "application/x-www-form-urlencoded",
         },
       });
-      const externalAccessToken: ExternalAccessToken =
-        validateAndParseZodSchema(
-          externalAccessTokenSchema,
-          result.responseBody,
-        );
-
+      if (response.status !== 200) {
+        counter.error.inc({
+          errorType: `Bad response status code ${response.status}`,
+        });
+        logger.error(response, "getAccessToken - Response status is not 200.");
+        return undefined;
+      }
+      const externalAccessToken = parseZodSchemaAndLogErrorOnParsingFailure(
+        externalAccessTokenSchema,
+        response.responseBody,
+        logger,
+      );
       counter.success.inc();
-      //const accessToken = toAccessToken(externalAccessToken);
-      //const trackId = stringToMd5(accessToken.value);
-      //logger.info({ trackId }, "PeConnect Get Access Token Success");
       return toAccessToken(externalAccessToken);
     } catch (error) {
       errorChecker(
@@ -94,44 +99,55 @@ export class HttpPeConnectGateway implements PeConnectGateway {
     }
   }
 
-  public async getUserAndAdvisors(accessToken: AccessTokenDto): Promise<{
-    user: PeConnectUserDto;
-    advisors: PeConnectAdvisorDto[];
-  }> {
+  public async getUserAndAdvisors(accessToken: AccessTokenDto): Promise<
+    | {
+        user: PeConnectUserDto;
+        advisors: PeConnectAdvisorDto[];
+      }
+    | undefined
+  > {
     const headers: PeConnectHeaders = {
       "Content-Type": "application/json",
       Accept: "application/json",
       Authorization: `Bearer ${accessToken.value}`,
     };
-
     const isUserJobseeker = await this.userIsJobseeker(headers);
     const [externalPeUser, externalPeConnectAdvisors] = await Promise.all([
       this.getUserInfo(headers),
       isUserJobseeker ? this.getAdvisorsInfo(headers) : [],
     ]);
-
-    return {
-      user: toPeConnectUserDto({ ...externalPeUser, isUserJobseeker }),
-      advisors: externalPeConnectAdvisors.map(toPeConnectAdvisorDto),
-    };
+    return externalPeUser
+      ? {
+          user: toPeConnectUserDto({ ...externalPeUser, isUserJobseeker }),
+          advisors: externalPeConnectAdvisors.map(toPeConnectAdvisorDto),
+        }
+      : undefined;
   }
 
   private async getUserInfo(
     headers: PeConnectHeaders,
-  ): Promise<ExternalPeConnectUser> {
+  ): Promise<ExternalPeConnectUser | undefined> {
     const timerFlag = `${headers.Authorization} - PeConnect getUserInfo duration`;
+    // eslint-disable-next-line no-console
+    console.time(timerFlag);
     const counter = getUserInfoCounter;
     try {
-      // eslint-disable-next-line no-console
-      console.time(timerFlag);
       counter.total.inc();
-      const getUserInfoResponse = await this.httpClient.getUserInfo({
+      const response = await this.httpClient.getUserInfo({
         headers,
       });
-      const externalPeConnectUser = externalPeConnectUserSchema.parse(
-        getUserInfoResponse.responseBody,
+      if (response.status !== 200) {
+        counter.error.inc({
+          errorType: `Bad response status code ${response.status}`,
+        });
+        logger.error(response, "getUserInfo - Response status is not 200.");
+        return undefined;
+      }
+      const externalPeConnectUser = parseZodSchemaAndLogErrorOnParsingFailure(
+        externalPeConnectUserSchema,
+        response.responseBody,
+        logger,
       );
-
       counter.success.inc();
       return externalPeConnectUser;
     } catch (error) {
@@ -140,6 +156,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         (error) => counter.error.inc({ errorType: error.message }),
         (payload) => notifyDiscordOnNotError(payload),
       );
+      if (error instanceof ZodError) return undefined;
       return managePeConnectError(error, "getUserInfo");
     } finally {
       // eslint-disable-next-line no-console
@@ -149,19 +166,25 @@ export class HttpPeConnectGateway implements PeConnectGateway {
 
   private async userIsJobseeker(headers: PeConnectHeaders): Promise<boolean> {
     const timerFlag = `${headers.Authorization} - PeConnect userIsJobseeker duration`;
+    // eslint-disable-next-line no-console
+    console.time(timerFlag);
     const counter = getUserStatutInfoCounter;
-
     try {
-      // eslint-disable-next-line no-console
-      console.time(timerFlag);
-
       counter.total.inc();
-      const getUserInfoResponse = await this.httpClient.getUserStatutInfo({
+      const response = await this.httpClient.getUserStatutInfo({
         headers,
       });
-
-      const externalPeConnectStatut = externalPeConnectUserStatutSchema.parse(
-        getUserInfoResponse.responseBody,
+      if (response.status !== 200) {
+        counter.error.inc({
+          errorType: `Bad response status code ${response.status}`,
+        });
+        logger.error(response, "userIsJobseeker - Response status is not 200.");
+        return false;
+      }
+      const externalPeConnectStatut = parseZodSchemaAndLogErrorOnParsingFailure(
+        externalPeConnectUserStatutSchema,
+        response.responseBody,
+        logger,
       );
       counter.success.inc();
       return isJobSeekerFromStatus(externalPeConnectStatut.codeStatutIndividu);
@@ -171,6 +194,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         (error) => counter.error.inc({ errorType: error.message }),
         (payload) => notifyDiscordOnNotError(payload),
       );
+      if (error instanceof ZodError) return false;
       return managePeConnectError(error, "getUserStatutInfo");
     } finally {
       // eslint-disable-next-line no-console
@@ -185,47 +209,47 @@ export class HttpPeConnectGateway implements PeConnectGateway {
     // eslint-disable-next-line no-console
     console.time(timerFlag);
     const counter = getAdvisorsInfoCounter;
-    counter.total.inc();
-
-    return this.httpClient
-      .getAdvisorsInfo({
+    try {
+      counter.total.inc();
+      const response = await this.httpClient.getAdvisorsInfo({
         headers,
-      })
-      .then((response) => {
-        try {
-          const externalPeConnectAdvisor =
-            externalPeConnectAdvisorsSchema.parse(response.responseBody);
-          counter.success.inc();
-          return externalPeConnectAdvisor;
-        } catch (e) {
-          notifyObjectDiscord({
-            message: "ERROR WHILE PARSING externalPeConnectAdvisorsSchema",
-            payload: response.responseBody,
-          });
-          throw e;
-        }
-      })
-      .catch((error) => {
-        errorChecker(
-          error,
-          (error) => counter.error.inc({ errorType: error.message }),
-          (payload) => notifyDiscordOnNotError(payload),
-        );
-        // TODO TODO TODO A RETRAVAILLER AVEC LE RETRY
-        // pour que managed error retourne une valeur
-        if (isJobseekerButNoAdvisorsResponse(error)) {
-          notifyObjectDiscord({
-            message: "isJobseekerButNoAdvisorsResponse - Should not occur",
-            error,
-          });
-          return Promise.resolve([]);
-        }
-        return managePeConnectError(error, "getAdvisorsInfo");
-      })
-      .finally(() => {
-        // eslint-disable-next-line no-console
-        console.timeEnd(timerFlag);
       });
+      if (response.status !== 200) {
+        counter.error.inc({
+          errorType: `Bad response status code ${response.status}`,
+        });
+        logger.error(response, "getAdvisorsInfo - Response status is not 200.");
+        return [];
+      }
+      const externalPeConnectAdvisors =
+        parseZodSchemaAndLogErrorOnParsingFailure(
+          externalPeConnectAdvisorsSchema,
+          response.responseBody,
+          logger,
+        );
+      counter.success.inc();
+      return externalPeConnectAdvisors;
+    } catch (error) {
+      errorChecker(
+        error,
+        (error) => counter.error.inc({ errorType: error.message }),
+        (payload) => notifyDiscordOnNotError(payload),
+      );
+      if (error instanceof ZodError) return [];
+      // TODO TODO TODO A RETRAVAILLER AVEC LE RETRY
+      // pour que managed error retourne une valeur
+      if (isJobseekerButNoAdvisorsResponse(error)) {
+        notifyObjectDiscord({
+          message: "isJobseekerButNoAdvisorsResponse - Should not occur",
+          error,
+        });
+        return [];
+      }
+      return managePeConnectError(error, "getAdvisorsInfo");
+    } finally {
+      // eslint-disable-next-line no-console
+      console.timeEnd(timerFlag);
+    }
   }
 }
 
@@ -238,17 +262,12 @@ export const managePeConnectError = (
       `Is not an error: ${JSON.stringify(error)}`,
       new Error("Not an error class"),
     );
-
-  if (!axios.isAxiosError(error))
-    throw new UnhandledError(`Non axios error - ${error.message}`, error);
-
-  const handledError = peConnectErrorStrategy(error, context).get(true);
-  if (handledError) throw handledError;
-
-  // TODO Changer en logger
-  // eslint-disable-next-line no-console
-  console.log("UNHANDLED AXIOS ERROR", error.toJSON());
-  throw new UnhandledError("Erreur axios non gérée", error);
+  if (axios.isAxiosError(error)) {
+    const handledError = peConnectAxiosErrorStrategy(error, context).get(true);
+    if (handledError) throw handledError;
+    throw new UnhandledError("Erreur axios non gérée", error);
+  }
+  throw new UnhandledError(`Non axios error - ${error.message}`, error);
 };
 
 const errorChecker = (

@@ -6,6 +6,7 @@
     "includecheck": "./check_includes.sh",
     "format:check": "pnpm -w prettier:glob --check ./libs/html-templates/src",
     "lint": "pnpm -w lintconfig:glob ./libs/html-templates/src",
+    "prettier": "pnpm -w prettier:glob --write ./libs/html-templates/src",
     "typecheck": "tsc --noEmit",
     "fullcheck": "pnpm -w fullcheck --filter=html-templates"
   },

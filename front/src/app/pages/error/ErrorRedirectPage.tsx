@@ -1,10 +1,8 @@
-import React, { ReactNode } from "react";
+import React from "react";
 import { isManagedError } from "shared";
-import { MainWrapper } from "react-design-system";
-import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { routes } from "src/app/routes/routes";
 import { Route } from "type-route";
-import { ManagedErrorSelector } from "./ManagedErrors";
+import { ErrorPage } from "./ErrorPage";
 
 export type ErrorRedirectRoute = Route<typeof routes.errorRedirect>;
 
@@ -12,30 +10,29 @@ interface ErrorRedirectProps {
   route: ErrorRedirectRoute;
 }
 
-export const ErrorRedirectPage = ({ route }: ErrorRedirectProps) => (
-  <HeaderFooterLayout>
-    <MainWrapper layout="default">{renderer({ route })}</MainWrapper>
-  </HeaderFooterLayout>
+export const ErrorRedirectPage = ({
+  route,
+}: ErrorRedirectProps): JSX.Element => (
+  <ErrorPage
+    type={isManagedError(route.params.kind) ? route.params.kind : undefined}
+    {...propertiesFromUrl(route)}
+  />
 );
-
-const renderer = ({ route }: ErrorRedirectProps): ReactNode =>
-  isManagedError(route.params.kind) ? (
-    <ManagedErrorSelector kind={route.params.kind} />
-  ) : (
-    <RedirectErrorFromUrl {...propertiesFromUrl(route)} />
-  );
 
 type RedirectErrorProps = {
   message: string;
   title: string;
 };
 
-const RedirectErrorFromUrl = (error: RedirectErrorProps) => (
-  <div role="alert" className={`fr-alert fr-alert--error`}>
-    <p className="fr-alert__title">{error.title}</p>
-    {`${error.message}`}
-  </div>
-);
+// const RedirectErrorFromUrl = ({
+//   message,
+//   title,
+// }: RedirectErrorProps): JSX.Element => (
+//   <div role="alert" className={`fr-alert fr-alert--error`}>
+//     <p className="fr-alert__title">{title}</p>
+//     {`${message}`}
+//   </div>
+// );
 
 const propertiesFromUrl = (route: ErrorRedirectRoute): RedirectErrorProps => ({
   message: route.params.message ?? "Une erreur inattendue est survenue",

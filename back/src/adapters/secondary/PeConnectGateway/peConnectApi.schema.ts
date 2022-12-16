@@ -6,6 +6,7 @@ import {
 } from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
 import {
   ExternalPeConnectAdvisor,
+  ExternalPeConnectAdvisors,
   ExternalPeConnectStatut,
   ExternalPeConnectUser,
 } from "./peConnectApi.dto";
@@ -42,6 +43,5 @@ export const externalPeConnectAdvisorSchema: z.Schema<ExternalPeConnectAdvisor> 
     type: peAdvisorKindSchema,
   });
 
-export const externalPeConnectAdvisorsSchema: z.Schema<
-  ExternalPeConnectAdvisor[]
-> = z.array(externalPeConnectAdvisorSchema);
+export const externalPeConnectAdvisorsSchema: z.Schema<ExternalPeConnectAdvisors> =
+  z.array(externalPeConnectAdvisorSchema);

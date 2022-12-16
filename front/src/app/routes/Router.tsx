@@ -27,7 +27,7 @@ export const Router = () => {
 
   return (
     <>
-      {route.name === false && <ErrorPage type="404" />}
+      {route.name === false && <ErrorPage type="httpClientNotFoundError" />}
       {route.name === "addAgency" && <AddAgencyPage />}
       {route.name === "adminTab" && (
         <PrivateRoute>
@@ -84,7 +84,7 @@ export const Router = () => {
       {route.name === "standard" &&
         !standardPageSlugs.includes(
           route.params.pagePath as StandardPageSlugs,
-        ) && <ErrorPage type="404" />}
+        ) && <ErrorPage type="httpClientNotFoundError" />}
     </>
   );
 };

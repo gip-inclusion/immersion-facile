@@ -1,5 +1,3 @@
-export type HTTPFrontErrorType = "404"; // "404" | "500" | "503"
-
 export type HTTPFrontErrorContents = {
   overtitle: string;
   title: string;
@@ -13,4 +11,5 @@ export type ErrorButton = {
   kind: "primary" | "secondary";
   href?: string;
   onClick?: () => void;
+  target?: React.HTMLAttributeAnchorTarget;
 };

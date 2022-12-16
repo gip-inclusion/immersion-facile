@@ -6,8 +6,11 @@ export interface PeConnectGateway {
   getAccessToken(
     authorizationCode: string,
   ): Promise<AccessTokenDto | undefined>;
-  getUserAndAdvisors(accessToken: AccessTokenDto): Promise<{
-    user: PeConnectUserDto;
-    advisors: PeConnectAdvisorDto[];
-  }>;
+  getUserAndAdvisors(accessToken: AccessTokenDto): Promise<
+    | {
+        user: PeConnectUserDto;
+        advisors: PeConnectAdvisorDto[];
+      }
+    | undefined
+  >;
 }

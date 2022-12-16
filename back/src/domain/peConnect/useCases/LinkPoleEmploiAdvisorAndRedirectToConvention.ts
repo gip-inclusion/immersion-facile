@@ -40,9 +40,14 @@ export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalU
   }
 
   private async onAccessToken(accessToken: AccessTokenDto, uow: UnitOfWork) {
-    const { user, advisors } = await this.peConnectGateway.getUserAndAdvisors(
+    const userAndAdvisors = await this.peConnectGateway.getUserAndAdvisors(
       accessToken,
     );
+    if (!userAndAdvisors)
+      return this.makeRedirectUrl({
+        federatedIdentity: "peConnect:AuthFailed",
+      });
+    const { user, advisors } = userAndAdvisors;
 
     const peUserAndAdvisor: PeUserAndAdvisor = {
       user,

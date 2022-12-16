@@ -1,3 +1,4 @@
+import { Logger } from "pino";
 import { preprocess, z } from "zod";
 import { timeHHmmRegExp } from "./utils/date";
 
@@ -79,3 +80,19 @@ export const zPreprocessedNumber = (schema = z.number()) =>
       throw new Error(`'${nAsString}' cannot be converted to number`);
     return n;
   }, schema);
+
+export const parseZodSchemaAndLogErrorOnParsingFailure = <T>(
+  schema: z.Schema<T>,
+  data: unknown,
+  logger: Logger,
+): T => {
+  try {
+    return schema.parse(data);
+  } catch (error) {
+    logger.error(
+      { payload: { data, error } },
+      `Parsing failed with schema '${schema.constructor.name}'`,
+    );
+    throw error;
+  }
+};

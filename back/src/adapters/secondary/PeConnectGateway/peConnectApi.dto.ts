@@ -42,6 +42,8 @@ export type ExternalPeConnectAdvisor = {
   type: PeConnectAdvisorsKind;
 };
 
+export type ExternalPeConnectAdvisors = ExternalPeConnectAdvisor[];
+
 // External contract from https://pole-emploi.io/data/documentation/utilisation-api-pole-emploi/generer-access-token
 export type ExternalPeConnectOAuthGrantPayload = {
   response_type: string;

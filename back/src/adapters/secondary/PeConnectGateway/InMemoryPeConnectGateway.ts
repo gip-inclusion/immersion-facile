@@ -10,11 +10,14 @@ export class InMemoryPeConnectGateway implements PeConnectGateway {
     return this._accessToken;
   }
 
-  public async getUserAndAdvisors(_accessToken: AccessTokenDto): Promise<{
-    user: PeConnectUserDto;
-    advisors: PeConnectAdvisorDto[];
-  }> {
-    if (!this._user) throw new Error("No OAuth on gateway.");
+  public async getUserAndAdvisors(_accessToken: AccessTokenDto): Promise<
+    | {
+        user: PeConnectUserDto;
+        advisors: PeConnectAdvisorDto[];
+      }
+    | undefined
+  > {
+    if (!this._user) return undefined;
     const peUserAndAdvisor: {
       user: PeConnectUserDto;
       advisors: PeConnectAdvisorDto[];
@@ -26,12 +29,12 @@ export class InMemoryPeConnectGateway implements PeConnectGateway {
   }
 
   // test
-  public setUser(user: PeConnectUserDto) {
+  public setUser(user: PeConnectUserDto | undefined) {
     this._user = user;
   }
 
   public setAdvisors(advisors: PeConnectAdvisorDto[]) {
-    this._advisors.push(...advisors);
+    this._advisors = advisors;
   }
 
   public setAccessToken(accessToken: AccessTokenDto) {
