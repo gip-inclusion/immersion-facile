@@ -8,7 +8,7 @@ import {
   ContactEstablishmentModal,
   useContactEstablishmentModal,
 } from "./ContactEstablishmentModal";
-import { SearchResult } from "./SearchResult";
+import { EnterpriseSearchResult } from "./EnterpriseSearchResult";
 
 const getFeedBackMessage = (contactMethod?: ContactMethod) => {
   switch (contactMethod) {
@@ -45,7 +45,7 @@ export const SearchResultPanel = () => {
   return (
     <>
       {searchResults.map((searchResult) => (
-        <SearchResult
+        <EnterpriseSearchResult
           key={searchResult.siret + "-" + searchResult.rome} // Should be unique !
           searchResult={searchResult}
           onButtonClick={() =>

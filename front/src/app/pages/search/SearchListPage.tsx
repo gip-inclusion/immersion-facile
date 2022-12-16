@@ -16,8 +16,8 @@ import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import { useFullSearchUseCase } from "src/app/hooks/search.hooks";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { OurAdvises } from "src/app/components/search/OurAdvises";
-import "./SearchPage.scss";
-import { SearchResults } from "src/app/components/search/SearchResults";
+import "./SearchListPage.scss";
+import { SearchListResults } from "src/app/components/search/SearchListResults";
 import { addressDtoToString, SearchSortedBy } from "shared";
 // import { SearchSortedBy } from "shared";
 import {
@@ -32,10 +32,10 @@ const sortedByOptions: { value: SearchSortedBy; label: string }[] = [
   { value: "distance", label: "Par proximité" },
   { value: "date", label: "Par date de publication" },
 ];
-export const SearchPage = ({
+export const SearchListPage = ({
   route,
 }: {
-  route: Route<typeof routes.search>;
+  route: Route<typeof routes.searchV2>;
 }) => {
   const searchStatus = useAppSelector(searchSelectors.searchStatus);
   const searchResults = useAppSelector(searchSelectors.searchResults);
@@ -87,7 +87,7 @@ export const SearchPage = ({
             )}
           >
             {({ setFieldValue, values }) => (
-              <Form className={"search-page__form"}>
+              <Form className={"search-page__form search-page__form--v2"}>
                 <div className={"search-page__form-input-wrapper"}>
                   <RomeAutocomplete
                     title="Mon périmètre de recherche"
@@ -221,7 +221,7 @@ export const SearchPage = ({
                   </div>
                 </div>
               </div>
-              <SearchResults />
+              <SearchListResults />
             </>
           )}
           {searchStatus === "extraFetch" ||

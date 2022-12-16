@@ -23,7 +23,7 @@ const getFeedBackMessage = (contactMethod?: ContactMethod) => {
   }
 };
 
-export const SearchResults = () => {
+export const SearchListResults = () => {
   const searchResults = useAppSelector(searchSelectors.searchResults);
   const searchStatus = useAppSelector(searchSelectors.searchStatus);
   const searchInfo = useAppSelector(searchSelectors.searchInfo);

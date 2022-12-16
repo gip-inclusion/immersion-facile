@@ -19,6 +19,6 @@ export const useFullSearchUseCase = () => {
 
   return (values: SearchPageParams) => {
     dispatch(searchSlice.actions.fullSearchRequested(values));
-    routes.search(values).replace();
+    routes.searchV2(values).replace();
   };
 };

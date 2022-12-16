@@ -2,6 +2,9 @@
   &__form {
     display: flex;
     align-items: flex-end;
+    &--v2 {
+      max-width: 100% !important;
+    }
     &-input-wrapper {
       flex: 3 0 auto;
 
