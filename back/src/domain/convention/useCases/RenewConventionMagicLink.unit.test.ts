@@ -185,4 +185,21 @@ describe("RenewConventionMagicLink use case", () => {
     const verifyJwt = makeVerifyJwtES256(config.magicLinkJwtPublicKey);
     expect(verifyJwt(jwt)).toBeDefined();
   });
+
+  it("Also work when using encoded Url", async () => {
+    const expiredPayload = createConventionMagicLinkPayload(
+      validConvention.id,
+      "beneficiary",
+      validConvention.signatories.beneficiary.email,
+    );
+
+    const request: RenewMagicLinkRequestDto = {
+      originalUrl: "immersionfacile.fr%2Fverifier-et-signer",
+      expiredJwt: generateJwtFn(expiredPayload),
+    };
+
+    await renewConventionMagicLink.execute(request);
+    // should not throw error
+    expect(outboxRepository.events).toHaveLength(1);
+  });
 });

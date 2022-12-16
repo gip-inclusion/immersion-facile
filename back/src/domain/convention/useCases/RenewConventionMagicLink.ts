@@ -133,7 +133,7 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
     }
 
     const routeToRenew = supportedRenewRoutes.find((supportedRoute) =>
-      originalUrl.includes(`/${supportedRoute}`),
+      decodeURIComponent(originalUrl).includes(`/${supportedRoute}`),
     );
     if (!routeToRenew) {
       throw new BadRequestError(
