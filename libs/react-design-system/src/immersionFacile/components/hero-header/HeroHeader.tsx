@@ -83,6 +83,7 @@ export const HeroHeader = ({
             <img
               src={illustration}
               alt="illustration immersion facilitée"
+              aria-hidden="true"
               className={`${componentName}__illustration`}
               style={parallax ? getParallaxStyle(5) : undefined}
             />

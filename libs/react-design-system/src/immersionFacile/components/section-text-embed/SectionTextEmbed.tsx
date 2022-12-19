@@ -25,7 +25,7 @@ export const SectionTextEmbed = ({
     <div
       className={`${componentName}__content fr-grid-row fr-grid-row--gutters`}
     >
-      <ul className={`${componentName}__list fr-col-12 fr-col-lg-6`}>
+      <ul className={`${componentName}__list fr-col-12 fr-col-md-6`}>
         <li className={`${componentName}__item`}>
           <strong>L’immersion est une période courte et non rémunérée</strong>{" "}
           en entreprise.
@@ -47,10 +47,12 @@ export const SectionTextEmbed = ({
           l’identifier.
         </li>
       </ul>
-      <div className={`${componentName}__embed-wrapper fr-col-12 fr-col-lg-5`}>
+      <div className={`${componentName}__embed-wrapper fr-col-12 fr-col-md-5`}>
         <ReactPlayer
           controls
           url={videoUrl}
+          width="100%"
+          height="auto"
           config={{
             file: {
               attributes: {

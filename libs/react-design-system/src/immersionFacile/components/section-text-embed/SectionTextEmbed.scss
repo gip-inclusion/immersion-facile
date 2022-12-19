@@ -12,7 +12,7 @@
   &__list {
     list-style-type: none;
     order: 1;
-    @include for-screen-min($bp-lg) {
+    @include for-screen-min($bp-md) {
       order: 0;
     }
   }
