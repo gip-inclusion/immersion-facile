@@ -24,16 +24,6 @@ type RedirectErrorProps = {
   title: string;
 };
 
-// const RedirectErrorFromUrl = ({
-//   message,
-//   title,
-// }: RedirectErrorProps): JSX.Element => (
-//   <div role="alert" className={`fr-alert fr-alert--error`}>
-//     <p className="fr-alert__title">{title}</p>
-//     {`${message}`}
-//   </div>
-// );
-
 const propertiesFromUrl = (route: ErrorRedirectRoute): RedirectErrorProps => ({
   message: route.params.message ?? "Une erreur inattendue est survenue",
   title: route.params.title ?? "Une erreur est survenue",
