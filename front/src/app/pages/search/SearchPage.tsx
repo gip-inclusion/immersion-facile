@@ -13,7 +13,7 @@ import { useSearchUseCase } from "src/app/hooks/search.hooks";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { HomeImmersionHowTo } from "src/app/components/ImmersionHowTo";
 import { StaticDropdown } from "src/app/components/search/Dropdown/StaticDropdown";
-import { OurAdvises } from "src/app/components/search/OurAdvises";
+import { OurAdvices } from "src/app/components/search/OurAdvices";
 import "./SearchPage.css";
 import { SearchResultPanel } from "src/app/components/search/SearchResultPanel";
 import { addressDtoToString } from "shared";
@@ -218,7 +218,7 @@ export const SearchPage = ({
           </div>
         </div>
         <div>
-          <OurAdvises />
+          <OurAdvices />
           <HomeImmersionHowTo />
         </div>
       </MainWrapper>

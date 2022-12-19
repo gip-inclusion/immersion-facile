@@ -5,16 +5,7 @@
     &--v2 {
       max-width: 100% !important;
     }
-    &-input-wrapper {
-      flex: 3 0 auto;
 
-      &--min {
-        flex: 1 1 auto;
-      }
-      & + .search-page__form-input-wrapper {
-        margin-left: 1rem;
-      }
-    }
     .fr-label {
       color: #fff;
     }

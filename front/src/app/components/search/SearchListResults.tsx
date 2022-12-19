@@ -1,5 +1,4 @@
-import { CircularProgress } from "@mui/material";
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ContactMethod } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
@@ -25,8 +24,6 @@ const getFeedBackMessage = (contactMethod?: ContactMethod) => {
 
 export const SearchListResults = () => {
   const searchResults = useAppSelector(searchSelectors.searchResults);
-  const searchStatus = useAppSelector(searchSelectors.searchStatus);
-  const searchInfo = useAppSelector(searchSelectors.searchInfo);
 
   // prettier-ignore
   const [successfulValidationMessage, setSuccessfulValidatedMessage] = useState<string | null>(null);
@@ -46,26 +43,8 @@ export const SearchListResults = () => {
     setDisplayedResults(getSearchResultsForPage(currentPage));
   }, [currentPage]);
 
-  if (searchStatus === "initialFetch")
-    return (
-      <SearchInfos>
-        <CircularProgress color="inherit" size="75px" />
-      </SearchInfos>
-    );
-
-  if (searchInfo && searchResults.length === 0)
-    return <SearchInfos>{searchInfo}</SearchInfos>;
-
   return (
     <div className="fr-container fr-mb-10w">
-      {searchStatus === "extraFetch" && searchInfo && (
-        <SearchInfos>
-          <div className="flex flex-col items-center">
-            <div>{searchInfo}</div>
-            <CircularProgress color="inherit" size="40px" />
-          </div>
-        </SearchInfos>
-      )}
       <div className="fr-grid-row fr-grid-row--gutters">
         {displayedResults.map((searchResult) => (
           <SearchResult
@@ -122,13 +101,3 @@ export const SearchListResults = () => {
     </div>
   );
 };
-
-type SearchInfosProps = {
-  children: ReactNode;
-};
-
-const SearchInfos = ({ children }: SearchInfosProps) => (
-  <div className="text-white sm:h-full text-2xl font-semibold flex justify-center items-center pb-16">
-    <div>{children}</div>
-  </div>
-);

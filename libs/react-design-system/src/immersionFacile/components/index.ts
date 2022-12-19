@@ -27,6 +27,7 @@ export * from "./page-header";
 export * from "./section-stats";
 export * from "./section-text-embed";
 export * from "./section-faq";
+export * from "./section-accordion";
 export * from "./skip-links";
 export * from "./error-notifications";
 export * from "./select";

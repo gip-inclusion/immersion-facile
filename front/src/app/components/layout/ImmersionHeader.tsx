@@ -160,6 +160,13 @@ export const ImmersionHeader = () => {
           id: getHeaderNavLinkId("admin-emails"),
           ...routes.adminTab({ tab: "emails" }).link,
         },
+        {
+          label: "Recherche V2",
+          display: true,
+          active: false,
+          id: getHeaderNavLinkId("admin-emails"),
+          ...routes.searchV2().link,
+        },
       ],
     },
   ];

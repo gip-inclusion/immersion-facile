@@ -81,7 +81,7 @@ export const AccordionDSFRItem = forwardRef(
     } = props;
     const TitleTag: ElementType = Tag;
     const TitleComponent: FC<ComponentProps> = ({ children }) => (
-      <TitleTag>{children}</TitleTag>
+      <TitleTag className="fr-mb-0">{children}</TitleTag>
     );
     const buttonRef = useRef<HTMLButtonElement>(null);
     const [initItem, setInitItem] = useState(initExpand);

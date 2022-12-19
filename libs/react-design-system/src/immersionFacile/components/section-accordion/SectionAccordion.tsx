@@ -1,25 +1,31 @@
 import React from "react";
-import {
-  AccordionDSFR,
-  AccordionDSFRItem,
-} from "react-design-system/designSystemFrance";
-import { SubTitle } from "react-design-system/immersionFacile";
+import { AccordionDSFR, AccordionDSFRItem } from "../../../designSystemFrance";
+import "./SectionAccordion.scss";
 
-export const OurAdvises = () => (
-  <div className="fr-container">
-    <h2>Nos conseils pour décrocher une immersion</h2>
+const componentName = "im-section-accordion";
+
+export const SectionAccordion = () => (
+  <div className={`fr-container ${componentName} fr-pb-8w`}>
+    <h2 className={`${componentName}__title`}>
+      Nos conseils pour décrocher une immersion
+    </h2>
     <div className="fr-grid-row fr-grid-row--gutters">
-      <p className="fr-col-12 fr-col-md-4">
+      <p
+        className={`fr-col-12 fr-col-offset-md-2 fr-col-md-8 ${componentName}__description`}
+      >
         Nous vous proposons de vous mettre directement en relation avec les
         entreprises signalées comme “entreprises accueillantes”. Pour les
         autres, voici nos conseils :
       </p>
-      <AccordionDSFR keepOpen={true} className="fr-col-12 fr-col-md-8">
+      <AccordionDSFR
+        keepOpen={true}
+        className="fr-col-12 fr-col-offset-md-2 fr-col-md-8"
+      >
         <AccordionDSFRItem
           title={"Comment contacter un employeur pour faire une immersion ?"}
           titleAs={"h3"}
         >
-          <ul className="fr-py-1w">
+          <ul>
             <li>
               Pour une petite entreprise, un artisan, un commerce, rendez-vous
               sur place et demandez à rencontrer le responsable.
@@ -36,11 +42,9 @@ export const OurAdvises = () => (
           </ul>
         </AccordionDSFRItem>
         <AccordionDSFRItem
-          title={
-            <SubTitle>Comment expliquer l'immersion à un employeur ?</SubTitle>
-          }
+          title={"Comment expliquer l'immersion à un employeur ?"}
         >
-          <ul className="fr-py-1w">
+          <ul>
             <li>
               C’est un stage d’observation, strictement encadré d’un point de
               vue juridique. Vous conservez votre statut et êtes couvert par

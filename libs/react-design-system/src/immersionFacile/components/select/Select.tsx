@@ -35,10 +35,10 @@ export const Select = ({
     )}
 
     <select className="fr-select" id={id} name={name} onChange={onChange}>
-      {options.map((option) => {
+      {options.map((option, index) => {
         const { label, value, ...rest } = option;
         return (
-          <option value={value} {...rest}>
+          <option value={value} key={`option-${value}-${index}`} {...rest}>
             {label}
           </option>
         );

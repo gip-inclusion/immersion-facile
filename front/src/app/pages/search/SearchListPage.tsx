@@ -1,12 +1,13 @@
 import locationSearchIcon from "/img/location-search-icon.svg";
 import SearchIcon from "@mui/icons-material/Search";
 import { Form, Formik } from "formik";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ButtonSearch,
   MainWrapper,
   PageHeader,
   SectionTextEmbed,
+  SectionAccordion,
   Select,
 } from "react-design-system/immersionFacile";
 import { RomeAutocomplete } from "src/app/components/forms/autocomplete/RomeAutocomplete";
@@ -15,7 +16,6 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import { useFullSearchUseCase } from "src/app/hooks/search.hooks";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
-import { OurAdvises } from "src/app/components/search/OurAdvises";
 import "./SearchListPage.scss";
 import { SearchListResults } from "src/app/components/search/SearchListResults";
 import { addressDtoToString, SearchSortedBy } from "shared";
@@ -29,8 +29,8 @@ import { routes } from "src/app/routes/routes";
 
 const radiusOptions = [1, 2, 5, 10, 20, 50, 100];
 const sortedByOptions: { value: SearchSortedBy; label: string }[] = [
-  { value: "distance", label: "Proximité" },
-  { value: "date", label: "Date de publication" },
+  { value: "distance", label: "Par proximité" },
+  { value: "date", label: "Par date de publication" },
 ];
 export const SearchListPage = ({
   route,
@@ -40,6 +40,7 @@ export const SearchListPage = ({
   const searchStatus = useAppSelector(searchSelectors.searchStatus);
   const searchResults = useAppSelector(searchSelectors.searchResults);
   const searchUseCase = useFullSearchUseCase();
+  const searchResultsWrapper = useRef<HTMLDivElement>(null);
   const initialValues = {
     latitude: 0,
     longitude: 0,
@@ -73,7 +74,18 @@ export const SearchListPage = ({
       searchUseCase(route.params as SearchPageParams);
     }
   }, []);
-
+  useEffect(() => {
+    if (
+      searchStatus !== "extraFetch" &&
+      searchStatus !== "initialFetch" &&
+      searchResultsWrapper.current
+    ) {
+      searchResultsWrapper.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [searchStatus]);
   return (
     <HeaderFooterLayout>
       <MainWrapper vSpacing={0} layout="fullscreen">
@@ -87,8 +99,16 @@ export const SearchListPage = ({
             )}
           >
             {({ setFieldValue, values }) => (
-              <Form className={"search-page__form search-page__form--v2"}>
-                <div className={"search-page__form-input-wrapper"}>
+              <Form
+                className={
+                  "search-page__form search-page__form--v2 fr-grid-row fr-grid-row--gutters"
+                }
+              >
+                <div
+                  className={
+                    "search-page__form-input-wrapper fr-col-12 fr-col-lg-4"
+                  }
+                >
                   <RomeAutocomplete
                     title="Mon périmètre de recherche"
                     setFormValue={(newValue) => {
@@ -106,13 +126,15 @@ export const SearchListPage = ({
                       romeCode: values.rome ?? "",
                     }}
                     placeholder={"Ex : boulangère, infirmier"}
-                    className="searchdropdown-header inputLabel"
                   />
                 </div>
-                <div className={"search-page__form-input-wrapper"}>
+                <div
+                  className={
+                    "search-page__form-input-wrapper fr-col-12 fr-col-lg-4"
+                  }
+                >
                   <AddressAutocomplete
                     label="Mon périmètre de recherche"
-                    headerClassName="searchdropdown-header inputLabel"
                     inputStyle={{
                       paddingLeft: "48px",
                       background: `white url(${locationSearchIcon}) no-repeat scroll 11px 8px`,
@@ -136,7 +158,7 @@ export const SearchListPage = ({
                 </div>
                 <div
                   className={
-                    "search-page__form-input-wrapper search-page__form-input-wrapper--min"
+                    "search-page__form-input-wrapper fr-col-12 fr-col-lg-2"
                   }
                 >
                   <Select
@@ -165,6 +187,7 @@ export const SearchListPage = ({
                       ...radiusOptions.map((n, index) => ({
                         label: `${n} km`,
                         value: index,
+                        selected: n === initialValues.distance_km,
                       })),
                     ]}
                     id="im-search-page__distance-dropdown"
@@ -173,7 +196,7 @@ export const SearchListPage = ({
 
                 <div
                   className={
-                    "search-page__form-input-wrapper search-page__form-input-wrapper--min"
+                    "search-page__form-input-wrapper fr-col-12 fr-col-lg-2"
                   }
                 >
                   <ButtonSearch
@@ -191,29 +214,59 @@ export const SearchListPage = ({
             )}
           </Formik>
         </PageHeader>
-        <div className="fr-pt-6w">
+        <div className="fr-pt-6w" ref={searchResultsWrapper}>
           {searchStatus === "ok" && (
             <>
               <div className="fr-container">
                 <div className="fr-grid-row fr-grid-row--gutters fr-mb-4w fr-grid-row--bottom">
-                  <div className="fr-col-12 fr-col-md-2">
-                    <Select
-                      label="Trier les résultats par :"
-                      id="filter"
-                      options={sortedByOptions}
-                      onChange={(event) => {
-                        const selectedIndex = event.currentTarget.selectedIndex;
-                        setFormikValues({
-                          ...formikValues,
-                          sortedBy: sortedByOptions[selectedIndex]?.value,
-                        });
-                        searchUseCase(formikValues);
-                      }}
-                    />
+                  <div className="fr-col-12 fr-col-md-8">
+                    <fieldset className="fr-fieldset fr-fieldset--inline fr-mb-0">
+                      <legend
+                        className="fr-fieldset__legend fr-text--regular"
+                        id="radio-inline-legend"
+                      >
+                        Trier les résultats :
+                      </legend>
+                      <div className="fr-fieldset__content">
+                        {sortedByOptions.map((option, index) => (
+                          <div
+                            className="fr-radio-group"
+                            key={`search-sort-option-${index}`}
+                          >
+                            <input
+                              type="radio"
+                              id={`search-sort-option-${index}`}
+                              name="search-sort-option"
+                              value={option.value}
+                              defaultChecked={
+                                formikValues.sortedBy === option.value
+                              }
+                              checked={formikValues.sortedBy === option.value}
+                              onChange={(_event) => {
+                                const selectedIndex = index;
+                                const newFormikValues = {
+                                  ...formikValues,
+                                  sortedBy:
+                                    sortedByOptions[selectedIndex]?.value,
+                                };
+                                setFormikValues(newFormikValues);
+                                searchUseCase(newFormikValues);
+                              }}
+                            />
+                            <label
+                              className="fr-label"
+                              htmlFor={`search-sort-option-${index}`}
+                            >
+                              {option.label}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </fieldset>
                   </div>
-                  <div className="fr-col-12 fr-col-md-4 fr-col-offset-md-6 fr-grid-row fr-grid-row--right">
+                  <div className="fr-col-12 fr-col-md-4 fr-grid-row fr-grid-row--right">
                     {searchStatus === "ok" && (
-                      <span>
+                      <span className="fr-h5">
                         <strong>{searchResults.length}</strong> résultats
                         trouvés
                       </span>
@@ -231,7 +284,7 @@ export const SearchListPage = ({
               </div>
             ))}
 
-          <OurAdvises />
+          <SectionAccordion />
           <SectionTextEmbed
             videoUrl=" https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise.mp4"
             videoPosterUrl="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise_poster.webp"

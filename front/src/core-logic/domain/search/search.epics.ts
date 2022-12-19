@@ -65,7 +65,7 @@ const initialFullSearchEpic: SearchEpic = (
   { immersionSearchGateway },
 ) =>
   action$.pipe(
-    filter(searchSlice.actions.fullSearchRequested.match),
+    filter(searchSlice.actions.initialFullSearchRequested.match),
     switchMap((action) =>
       immersionSearchGateway
         .search({

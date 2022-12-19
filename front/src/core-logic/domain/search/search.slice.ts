@@ -59,7 +59,10 @@ export const searchSlice = createSlice({
       state.searchResults.push(...action.payload);
       state.searchStatus = "ok";
     },
-    fullSearchRequested: (state, _action: PayloadAction<SearchParams>) => {
+    initialFullSearchRequested: (
+      state,
+      _action: PayloadAction<SearchParams>,
+    ) => {
       state.searchStatus = "initialFetch";
       state.searchResults = [];
     },

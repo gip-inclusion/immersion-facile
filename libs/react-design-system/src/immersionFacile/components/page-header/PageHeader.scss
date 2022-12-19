@@ -1,6 +1,33 @@
+$patternSizes: 80px, 160px, 130px;
 .im-page-header {
+  position: relative;
   background-color: var(--green-archipel-sun-391-moon-716);
   &__title {
     color: #fff;
+  }
+  &__pattern {
+    background: #fff;
+    border-radius: 50%;
+    opacity: 0.2;
+    filter: blur(20px);
+    position: absolute;
+    @for $i from 0 to length($patternSizes) {
+      &--#{$i} {
+        width: #{nth($patternSizes, $i + 1)};
+        height: #{nth($patternSizes, $i + 1)};
+      }
+    }
+    &--0 {
+      top: -100px;
+      right: 0;
+    }
+    &--1 {
+      top: 120px;
+      right: -150px;
+    }
+    &--2 {
+      bottom: -220px;
+      right: -50px;
+    }
   }
 }
