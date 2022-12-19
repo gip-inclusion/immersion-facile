@@ -55,13 +55,3 @@ body .w-full {
   color: #0079c1 !important;
   border: 1px solid #0079c1;
 }
-/* .bg-immersionRed:hover {
-  background-color: rgb(190 84 73 / var(--tw-bg-opacity));
-}
-.bg-immersionBlue:hover {
-  background-color: rgb(190 84 73 / var(--tw-bg-opacity));
-} */
-body .im-badge {
-  /* to override dsfr specificity */
-  background: var(--grey-1000-50);
-}

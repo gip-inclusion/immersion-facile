@@ -32,13 +32,17 @@
       font-size: 1.375rem;
       font-weight: bold;
     }
+    &-overtitle {
+      color: var(--blue-france-sun-113-625);
+      background: var(--grey-1000-50);
+    }
     &-description {
       font-size: 0.875rem;
       margin-bottom: 0;
     }
     & + #{$section}__stat {
-      margin-top: 1rem;
-      padding-top: 1rem;
+      margin-top: 1.5rem;
+      padding-top: 2rem;
       border-top: 1px solid var(--border-default-grey);
       @include for-screen-min($bp-lg) {
         margin-top: 0;

@@ -1,4 +1,5 @@
 @import "../../../config/responsive";
+@import "../../../config/functions/colors";
 
 $white: var(--grey-1000-100);
 $patternSizes: 80px, 160px, 130px;
@@ -11,17 +12,17 @@ $typesTints: (
   "candidate": (
     "heroBackground": var(--green-archipel-sun-391-moon-716),
     "primary": var(--green-archipel-main-557),
-    "light": var(--green-archipel-975-75),
+    "light": rgb(0, 144, 153, 0.05),
   ),
   "establishment": (
     "heroBackground": var(--blue-cumulus-sun-368-moon-732),
     "primary": var(--blue-cumulus-main-526),
-    "light": var(--blue-cumulus-925-125),
+    "light": rgb(65, 125, 196, 0.05),
   ),
   "agency": (
     "heroBackground": var(--purple-glycine-sun-319-moon-630),
     "primary": var(--purple-glycine-main-494),
-    "light": var(--purple-glycine-925-125),
+    "light": rgb(165, 88, 160, 0.05),
   ),
 );
 
@@ -38,7 +39,7 @@ $typesTints: (
   }
   @include for-screen-min($bp-lg) {
     background: transparent;
-    margin-bottom: 8rem;
+    margin-bottom: 3rem;
   }
   &:after {
     @include for-screen-min($bp-lg) {
@@ -126,8 +127,9 @@ $typesTints: (
     z-index: 20;
     list-style-type: none;
     margin-bottom: 0;
+    padding-bottom: 1rem;
     @include for-screen-min($bp-lg) {
-      margin-bottom: -2rem;
+      padding-bottom: 0;
     }
   }
   &__nav-cards {
@@ -138,7 +140,7 @@ $typesTints: (
     border-radius: 1rem;
     display: flex;
     align-items: center;
-    padding: 2.5rem;
+    padding: 2.5rem 2.5rem 3.5rem;
     text-align: center;
     position: relative;
     top: 0;
@@ -171,14 +173,14 @@ $typesTints: (
       content: "";
       display: block;
       position: absolute;
-      bottom: 1rem;
-      width: 0;
+      bottom: 3.2rem;
+      width: 30%;
       left: 50%;
       transform: translateX(-50%);
       height: 5px;
-      opacity: 0.5;
       transition: all 0.6s ease;
       border-radius: 4px;
+      opacity: 0.25;
     }
     @each $type, $colors in $typesTints {
       $primary: map-get($colors, "primary");
@@ -216,6 +218,7 @@ $typesTints: (
       right: 0;
       bottom: 0;
       z-index: 10;
+      outline-width: 8px;
       &:active {
         background-color: transparent !important;
       }
