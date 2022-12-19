@@ -38,6 +38,7 @@ export const UploadLogo = ({
       label={label}
       hint={hint}
       errorMessage={error}
+      id="file-upload-logo"
     />
   );
 };

@@ -37,6 +37,7 @@ export const SimpleSelect = ({
           input={
             <InputBase
               {...field}
+              id={id}
               className={`fr-input ${hasError ? "fr-input--error" : ""}`}
               placeholder="Rouen"
             />

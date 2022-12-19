@@ -8,6 +8,7 @@ export type FileProperties = {
   onChange?: React.ChangeEventHandler<HTMLInputElement> | undefined;
   errorMessage?: string;
   hint?: string;
+  id: string;
 };
 
 /**
@@ -21,13 +22,14 @@ export const File = ({
   hint,
   onChange,
   multiple,
+  id,
 }: FileProperties) => {
   const _className = classNames("fr-upload-group", className, {
     [`ds-fr--${label}`]: label,
   });
   return (
     <div className={_className}>
-      <label className="fr-label" htmlFor="file-upload">
+      <label className="fr-label" htmlFor={id}>
         {label}
         {hint && <p className="fr-hint-text">{hint}</p>}
       </label>
@@ -35,6 +37,7 @@ export const File = ({
         onChange={onChange}
         className="fr-upload"
         type="file"
+        id={id}
         aria-describedby={hint || undefined}
         multiple={multiple}
       />
