@@ -52,7 +52,7 @@ export default {
   
   <strong>Retour d’information et contact</strong>
   
-  Si vous n’arrivez pas à accéder à un contenu ou à un service, vous pouvez contacter le responsable de [nom du site] pour être orienté vers une alternative accessible ou obtenir le contenu sous une autre forme.
+  Si vous n’arrivez pas à accéder à un contenu ou à un service, vous pouvez contacter le responsable du site Immersion Facilitée pour être orienté vers une alternative accessible ou obtenir le contenu sous une autre forme.
   
     • Envoyer un message https://immersion-facile.beta.gouv.fr ;
     • Contacter GIP Plateforme de l'Inclusion : ${immersionFacileContactEmail}. 
@@ -65,7 +65,6 @@ export default {
   
     • Écrire un message au Défenseur des droits
     • Contacter le délégué du Défenseur des droits dans votre région 
-  
-  Envoyer un courrier par la poste (gratuit, ne pas mettre de timbre) Défenseur des droits Libre réponse 71120 75342 Paris CEDEX 07 
+    • Envoyer un courrier par la poste (gratuit, ne pas mettre de timbre) Défenseur des droits Libre réponse 71120 75342 Paris CEDEX 07 
 `,
 };
