@@ -1,5 +1,3 @@
-import locationSearchIcon from "/img/location-search-icon.svg";
-import SearchIcon from "@mui/icons-material/Search";
 import { Form, Formik } from "formik";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -74,18 +72,7 @@ export const SearchListPage = ({
       searchUseCase(route.params as SearchPageParams);
     }
   }, []);
-  useEffect(() => {
-    if (
-      searchStatus !== "extraFetch" &&
-      searchStatus !== "initialFetch" &&
-      searchResultsWrapper.current
-    ) {
-      searchResultsWrapper.current.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
-  }, [searchStatus]);
+
   return (
     <HeaderFooterLayout>
       <MainWrapper vSpacing={0} layout="fullscreen">
@@ -135,10 +122,6 @@ export const SearchListPage = ({
                 >
                   <AddressAutocomplete
                     label="Mon périmètre de recherche"
-                    inputStyle={{
-                      paddingLeft: "48px",
-                      background: `white url(${locationSearchIcon}) no-repeat scroll 11px 8px`,
-                    }}
                     initialSearchTerm={values.address}
                     setFormValue={({ position, address }) => {
                       setFieldValue("latitude", position.lat);
@@ -204,10 +187,7 @@ export const SearchListPage = ({
                     type="submit"
                     id={"im-search__submit-search"}
                   >
-                    <span>
-                      <SearchIcon />
-                      Rechercher
-                    </span>
+                    Rechercher
                   </ButtonSearch>
                 </div>
               </Form>
