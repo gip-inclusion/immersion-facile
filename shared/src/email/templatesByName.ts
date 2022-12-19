@@ -148,7 +148,9 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       content: `
       Bonne nouvelle ! 
 
-      La demande faite par ${beneficiaryFirstName} ${beneficiaryLastName} (né le ${beneficiaryBirthdate}) pour réaliser une immersion du ${dateStart} au ${dateEnd}, au sein de ${businessName} et encadrée par ${establishmentTutorName} a été validée et la convention est bien enregistrée. 
+      La demande faite par ${beneficiaryFirstName} ${beneficiaryLastName} (né le ${toDisplayedDate(
+        new Date(beneficiaryBirthdate),
+      )}) pour réaliser une immersion du ${dateStart} au ${dateEnd}, au sein de ${businessName} et encadrée par ${establishmentTutorName} a été validée et la convention est bien enregistrée. 
       
       L'immersion peut donc démarrer aux dates convenues*.       
       
