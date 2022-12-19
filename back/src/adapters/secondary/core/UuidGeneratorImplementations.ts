@@ -1,6 +1,13 @@
 import { v4 as uuidV4 } from "uuid";
 import { UuidGenerator } from "../../../domain/core/ports/UuidGenerator";
 
+export const prepareNextUuid = (
+  uuidGenerator: TestUuidGenerator,
+  uuid: string,
+): string => {
+  uuidGenerator.setNextUuid(uuid);
+  return uuid;
+};
 // To be used mostly for tests
 export class TestUuidGenerator implements UuidGenerator {
   constructor(private _nextUuids: string[] = []) {}

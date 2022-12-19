@@ -1,9 +1,5 @@
 import axios from "axios";
-import {
-  configureHttpClient,
-  createAxiosHandlerCreator,
-  HttpClient,
-} from "http-client";
+import { createAxiosHandlerCreator } from "http-client";
 import { Pool } from "pg";
 import { exhaustiveCheck, immersionFacileContactEmail } from "shared";
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
@@ -40,11 +36,8 @@ import { InMemoryPassEmploiGateway } from "../../secondary/immersionOffer/passEm
 import { HttpPoleEmploiGateway } from "../../secondary/immersionOffer/poleEmploi/HttpPoleEmploiGateway";
 import { InMemoryPoleEmploiGateway } from "../../secondary/immersionOffer/poleEmploi/InMemoryPoleEmploiGateway";
 import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
-import {
-  createInclusionConnectExternalTargets,
-  HttpInclusionConnectGateway,
-  InclusionConnectExternalTargets,
-} from "../../secondary/InclusionConnectGateway/HttpInclusionConnectGateway";
+import { HttpInclusionConnectGateway } from "../../secondary/InclusionConnectGateway/HttpInclusionConnectGateway";
+import { makeInclusionConnectHttpClient } from "../../secondary/InclusionConnectGateway/inclusionConnectApi.client";
 import { InMemoryInclusionConnectGateway } from "../../secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
 import { MinioDocumentGateway } from "../../secondary/MinioDocumentGateway";
 import { NotImplementedDocumentGateway } from "../../secondary/NotImplementedDocumentGateway";
@@ -61,10 +54,6 @@ import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
 const logger = createLogger(__filename);
 
 const AXIOS_TIMEOUT_MS = 10_000;
-
-const createHttpClient = configureHttpClient(
-  createAxiosHandlerCreator(axios.create({ timeout: AXIOS_TIMEOUT_MS })),
-);
 
 export type GetPgPoolFn = () => Pool;
 export const createGetPgPoolFn = (config: AppConfig): GetPgPoolFn => {
@@ -223,24 +212,21 @@ const createPoleEmploiConnectGateway = (config: AppConfig) =>
 
 const createInclusionConnectGateway = (
   config: AppConfig,
-): InclusionConnectGateway => {
-  if (config.inclusionConnectGateway === "HTTPS") {
-    const inclusionTargetUrls = createInclusionConnectExternalTargets({
-      inclusionConnectBaseUrl:
-        config.inclusionConnectConfig.inclusionConnectBaseUri,
-    });
-
-    const inclusionHttpClient: HttpClient<InclusionConnectExternalTargets> =
-      createHttpClient<InclusionConnectExternalTargets>(inclusionTargetUrls);
-
-    return new HttpInclusionConnectGateway(
-      inclusionHttpClient,
-      config.inclusionConnectConfig,
-    );
-  }
-
-  return new InMemoryInclusionConnectGateway();
-};
+): InclusionConnectGateway =>
+  config.inclusionConnectGateway === "HTTPS"
+    ? new HttpInclusionConnectGateway(
+        makeInclusionConnectHttpClient(
+          axios.create({
+            timeout: AXIOS_TIMEOUT_MS,
+          }),
+          {
+            inclusionConnectBaseUrl:
+              config.inclusionConnectConfig.inclusionConnectBaseUri,
+          },
+        ),
+        config.inclusionConnectConfig,
+      )
+    : new InMemoryInclusionConnectGateway();
 
 const createAddressGateway = (config: AppConfig) =>
   ({

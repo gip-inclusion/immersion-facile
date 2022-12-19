@@ -1,45 +1,12 @@
-import { createTargets, CreateTargets, HttpClient, Target } from "http-client";
-import { AbsoluteUrl } from "shared";
+import { HttpClient } from "http-client";
+import { InclusionConnectGateway } from "../../../domain/inclusionConnect/port/InclusionConnectGateway";
 import {
   InclusionAccessTokenResponse,
   inclusionAccessTokenResponseSchema,
-  InclusionConnectGateway,
-} from "../../../domain/inclusionConnect/port/InclusionConnectGateway";
+} from "../../../domain/inclusionConnect/port/InclusionAccessTokenResponse";
 import { InclusionConnectConfig } from "../../../domain/inclusionConnect/useCases/InitiateInclusionConnect";
 import { validateAndParseZodSchema } from "../../primary/helpers/httpErrors";
-
-export type InclusionConnectExternalTargets = CreateTargets<{
-  inclusionConnectGetAccessToken: Target<{
-    grant_type: "authorization_code";
-    redirect_uri: AbsoluteUrl;
-    client_id: string;
-    client_secret: string;
-    code: string;
-  }>;
-  inclusionConnectLogout: Target<
-    void,
-    { state: string; id_token_hint: string }
-  >;
-}>;
-
-type InclusionConnectTargetsConfig = {
-  inclusionConnectBaseUrl: AbsoluteUrl;
-};
-
-export const createInclusionConnectExternalTargets = ({
-  inclusionConnectBaseUrl,
-}: InclusionConnectTargetsConfig) =>
-  createTargets<InclusionConnectExternalTargets>({
-    // url should be of form: "https://{hostname}/realms/{realm-name}/protocol/openid-connect" then we add auth | token | logout,
-    inclusionConnectGetAccessToken: {
-      method: "POST",
-      url: `${inclusionConnectBaseUrl}/token`,
-    },
-    inclusionConnectLogout: {
-      method: "GET",
-      url: `${inclusionConnectBaseUrl}/logout`,
-    },
-  });
+import { InclusionConnectExternalTargets } from "./inclusionConnectApi.client";
 
 export class HttpInclusionConnectGateway implements InclusionConnectGateway {
   constructor(

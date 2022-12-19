@@ -3,48 +3,41 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
+import {
+  createInMemoryUow,
+  InMemoryUnitOfWork,
+} from "../../../adapters/primary/config/uowConfig";
 import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
 import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
-import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
-import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryInclusionConnectGateway } from "../../../adapters/secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
-import { InMemoryAuthenticatedUserRepository } from "../../../adapters/secondary/InMemoryAuthenticatedUserRepository";
-import { InMemoryOngoingOAuthRepository } from "../../../adapters/secondary/InMemoryOngoingOAuthRepository";
+import {
+  prepareNextUuid,
+  TestUuidGenerator,
+} from "../../../adapters/secondary/core/UuidGeneratorImplementations";
+import {
+  fakeInclusionPayload,
+  InMemoryInclusionConnectGateway,
+  prepareAccessToken,
+} from "../../../adapters/secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
+import { prepareOngoingOAuth } from "../../../adapters/secondary/InMemoryOngoingOAuthRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
-import { OngoingOAuth } from "../../generic/OAuth/entities/OngoingOAuth";
 import { AuthenticateWithInclusionCode } from "./AuthenticateWithInclusionCode";
-import {
-  fakeInclusionIdTokenWithCorrectPayload,
-  fakeInclusionPayload,
-} from "./fakeInclusionIdTokenWithCorrectPayload";
 
 const correctToken = "my-correct-token";
 
 describe("AuthenticateWithInclusionCode use case", () => {
-  let outboxRepo: InMemoryOutboxRepository;
-  let uowPerformer: InMemoryUowPerformer;
+  let uow: InMemoryUnitOfWork;
   let inclusionConnectGateway: InMemoryInclusionConnectGateway;
-  let authenticateWithInclusionCode: AuthenticateWithInclusionCode;
-  let ongoingOAuthRepository: InMemoryOngoingOAuthRepository;
   let uuidGenerator: TestUuidGenerator;
-  let authenticatedUserRepository: InMemoryAuthenticatedUserRepository;
+  let useCase: AuthenticateWithInclusionCode;
 
   beforeEach(() => {
-    const uow = createInMemoryUow();
-    outboxRepo = uow.outboxRepository;
-    ongoingOAuthRepository = uow.ongoingOAuthRepository;
-    authenticatedUserRepository = uow.authenticatedUserRepository;
-    uowPerformer = new InMemoryUowPerformer(uow);
+    uow = createInMemoryUow();
     uuidGenerator = new TestUuidGenerator();
-    const clock = new CustomClock();
-    const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
     inclusionConnectGateway = new InMemoryInclusionConnectGateway();
-
-    authenticateWithInclusionCode = new AuthenticateWithInclusionCode(
-      uowPerformer,
-      createNewEvent,
+    useCase = new AuthenticateWithInclusionCode(
+      new InMemoryUowPerformer(uow),
+      makeCreateNewEvent({ clock: new CustomClock(), uuidGenerator }),
       inclusionConnectGateway,
       uuidGenerator,
       () => correctToken,
@@ -54,7 +47,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
   it("rejects the connection if no state match the provided one in DB", async () => {
     const params = { code: "my-inclusion-code", state: "my-state" };
     await expectPromiseToFailWithError(
-      authenticateWithInclusionCode.execute(params),
+      useCase.execute(params),
       new ForbiddenError("No ongoing OAuth with provided state : my-state"),
     );
   });
@@ -62,15 +55,15 @@ describe("AuthenticateWithInclusionCode use case", () => {
   describe("when auth process goes successfully", () => {
     it("saves the user as Authenticated user", async () => {
       const { initialOngoingOAuth, userId } =
-        setUpSuccessFulAuthenticationConditions();
+        makeSuccessfulAuthenticationConditions();
 
-      await authenticateWithInclusionCode.execute({
+      await useCase.execute({
         code: "my-inclusion-code",
         state: initialOngoingOAuth.state,
       });
 
-      expect(authenticatedUserRepository.users).toHaveLength(1);
-      expectToEqual(authenticatedUserRepository.users[0], {
+      expect(uow.authenticatedUserRepository.users).toHaveLength(1);
+      expectToEqual(uow.authenticatedUserRepository.users[0], {
         id: userId,
         firstName: "John",
         lastName: "Doe",
@@ -80,15 +73,15 @@ describe("AuthenticateWithInclusionCode use case", () => {
 
     it("updates ongoingOAuth with userId and accessToken", async () => {
       const { accessToken, initialOngoingOAuth, userId } =
-        setUpSuccessFulAuthenticationConditions();
+        makeSuccessfulAuthenticationConditions();
 
-      await authenticateWithInclusionCode.execute({
+      await useCase.execute({
         code: "my-inclusion-code",
         state: initialOngoingOAuth.state,
       });
 
-      expect(ongoingOAuthRepository.ongoingOAuths).toHaveLength(1);
-      expectToEqual(ongoingOAuthRepository.ongoingOAuths[0], {
+      expect(uow.ongoingOAuthRepository.ongoingOAuths).toHaveLength(1);
+      expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths[0], {
         ...initialOngoingOAuth,
         accessToken,
         userId,
@@ -98,15 +91,15 @@ describe("AuthenticateWithInclusionCode use case", () => {
 
     it("saves UserConnectedSuccessfully event with relevant data", async () => {
       const { initialOngoingOAuth, userId } =
-        setUpSuccessFulAuthenticationConditions();
+        makeSuccessfulAuthenticationConditions();
 
-      await authenticateWithInclusionCode.execute({
+      await useCase.execute({
         code: "my-inclusion-code",
         state: initialOngoingOAuth.state,
       });
 
-      expect(outboxRepo.events).toHaveLength(1);
-      expectObjectsToMatch(outboxRepo.events[0], {
+      expect(uow.outboxRepository.events).toHaveLength(1);
+      expectObjectsToMatch(uow.outboxRepository.events[0], {
         topic: "UserAuthenticatedSuccessfully",
         payload: {
           provider: "inclusionConnect",
@@ -116,9 +109,9 @@ describe("AuthenticateWithInclusionCode use case", () => {
     });
 
     it("generates an app token and returns it", async () => {
-      const { initialOngoingOAuth } = setUpSuccessFulAuthenticationConditions();
+      const { initialOngoingOAuth } = makeSuccessfulAuthenticationConditions();
 
-      const appToken = await authenticateWithInclusionCode.execute({
+      const appToken = await useCase.execute({
         code: "my-inclusion-code",
         state: initialOngoingOAuth.state,
       });
@@ -126,28 +119,16 @@ describe("AuthenticateWithInclusionCode use case", () => {
       expect(appToken).toBe(correctToken);
     });
   });
-
-  const setUpSuccessFulAuthenticationConditions = () => {
-    const initialOngoingOAuth: OngoingOAuth = {
+  const makeSuccessfulAuthenticationConditions = () => ({
+    accessToken: prepareAccessToken(
+      inclusionConnectGateway,
+      "inclusion-access-token",
+    ),
+    initialOngoingOAuth: prepareOngoingOAuth(uow.ongoingOAuthRepository, {
       provider: "inclusionConnect",
       state: "my-state",
       nonce: "my-nonce",
-    };
-    ongoingOAuthRepository.ongoingOAuths = [initialOngoingOAuth];
-
-    const accessToken = "inclusion-access-token";
-    inclusionConnectGateway.setAccessTokenResponse({
-      access_token: accessToken,
-      id_token: fakeInclusionIdTokenWithCorrectPayload,
-    });
-
-    const userId = "generated-user-id";
-    uuidGenerator.setNextUuid(userId);
-
-    return {
-      accessToken,
-      initialOngoingOAuth,
-      userId,
-    };
-  };
+    }),
+    userId: prepareNextUuid(uuidGenerator, "generated-user-id"),
+  });
 });

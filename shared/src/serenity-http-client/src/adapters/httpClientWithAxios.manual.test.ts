@@ -15,7 +15,7 @@ describe("httpClient with axios concrete adapter", () => {
       rawQueryString,
     )}&limit=1`;
 
-  it("expect OAuth defined function to produce absolute url", () => {
+  it("expect user defined function to produce absolute url", () => {
     expect(targetToValidSearchUrl("18 avenue des Canuts 69120")).toBe(
       `https://api-adresse.data.gouv.fr/search/?q=18%20avenue%20des%20Canuts%2069120&limit=1`,
     );

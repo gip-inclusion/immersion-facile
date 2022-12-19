@@ -9,10 +9,8 @@ import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { AuthenticatedUser } from "../../generic/OAuth/entities/AuthenticatedUser";
 import { OngoingOAuth } from "../../generic/OAuth/entities/OngoingOAuth";
-import {
-  InclusionConnectGateway,
-  InclusionConnectIdTokenPayload,
-} from "../port/InclusionConnectGateway";
+import { InclusionConnectGateway } from "../port/InclusionConnectGateway";
+import { InclusionConnectIdTokenPayload } from "../entities/InclusionConnectIdTokenPayload";
 
 type Token = string;
 
@@ -40,11 +38,18 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       params.state,
       "inclusionConnect",
     );
-    if (!existingOngoingOAuth)
-      throw new ForbiddenError(
-        `No ongoing OAuth with provided state : ${params.state}`,
-      );
+    if (existingOngoingOAuth)
+      return this.onOngoingOAuth(params, uow, existingOngoingOAuth);
+    throw new ForbiddenError(
+      `No ongoing OAuth with provided state : ${params.state}`,
+    );
+  }
 
+  private async onOngoingOAuth(
+    params: AuthenticateWithInclusionCodeConnectParams,
+    uow: UnitOfWork,
+    existingOngoingOAuth: OngoingOAuth,
+  ) {
     const response = await this.inclusionConnectGateway.getAccessToken(
       params.code,
     );
@@ -53,40 +58,43 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
         response.id_token,
       );
 
-    const existingUser = await uow.authenticatedUserRepository.findByEmail(
-      jwtPayload.email,
-    );
+    const authenticatedUser =
+      (await uow.authenticatedUserRepository.findByEmail(jwtPayload.email)) ??
+      this.makeAuthenticatedUser(this.uuidGenerator.new(), jwtPayload);
 
-    const userId = this.uuidGenerator.new();
+    const ongoingOAuth: OngoingOAuth = {
+      ...existingOngoingOAuth,
+      userId: authenticatedUser.id,
+      externalId: jwtPayload.sub,
+      accessToken: response.access_token,
+    };
 
-    const authenticatedUser: AuthenticatedUser = existingUser ?? {
+    await Promise.all([
+      uow.ongoingOAuthRepository.save(ongoingOAuth),
+      uow.authenticatedUserRepository.save(authenticatedUser),
+      uow.outboxRepository.save(
+        this.createNewEvent({
+          topic: "UserAuthenticatedSuccessfully",
+          payload: {
+            userId: authenticatedUser.id,
+            provider: ongoingOAuth.provider,
+          },
+        }),
+      ),
+    ]);
+
+    return this.generateAppToken({ userId: authenticatedUser.id });
+  }
+
+  private makeAuthenticatedUser(
+    userId: string,
+    jwtPayload: InclusionConnectIdTokenPayload,
+  ): AuthenticatedUser {
+    return {
       id: userId,
       email: jwtPayload.email,
       firstName: jwtPayload.given_name,
       lastName: jwtPayload.family_name,
     };
-
-    const ongoingOAuth: OngoingOAuth = {
-      ...existingOngoingOAuth,
-      userId,
-      externalId: jwtPayload.sub,
-      accessToken: response.access_token,
-    };
-
-    const userAuthenticatedEvent = this.createNewEvent({
-      topic: "UserAuthenticatedSuccessfully",
-      payload: {
-        userId: authenticatedUser.id,
-        provider: ongoingOAuth.provider,
-      },
-    });
-
-    await Promise.all([
-      uow.ongoingOAuthRepository.save(ongoingOAuth),
-      uow.authenticatedUserRepository.save(authenticatedUser),
-      uow.outboxRepository.save(userAuthenticatedEvent),
-    ]);
-
-    return this.generateAppToken({ userId });
   }
 }

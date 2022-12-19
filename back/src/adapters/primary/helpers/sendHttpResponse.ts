@@ -2,16 +2,13 @@ import { Request, Response } from "express";
 import { handleHttpJsonResponseError } from "./handleHttpJsonResponseError";
 
 export const sendHttpResponse = async (
-  expressRequest: Request,
-  expressResponse: Response,
+  request: Request,
+  response: Response,
   callback: () => Promise<unknown>,
 ) => {
   try {
-    const serializableResponse = await callback();
-    expressResponse.status(200);
-
-    return expressResponse.json(serializableResponse ?? { success: true });
+    return response.status(200).json((await callback()) ?? { success: true });
   } catch (error: any) {
-    handleHttpJsonResponseError(expressRequest, expressResponse, error);
+    handleHttpJsonResponseError(request, response, error);
   }
 };

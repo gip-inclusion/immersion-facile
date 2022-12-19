@@ -71,7 +71,7 @@ describe("adminAuth slice", () => {
   });
 
   describe("logout", () => {
-    it("disconnects the admin OAuth", () => {
+    it("disconnects the admin user", () => {
       const adminToken = "a-token";
 
       ({ store, dependencies } = createTestStore({

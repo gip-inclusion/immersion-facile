@@ -18,9 +18,7 @@ export const sendRedirectResponseWithManagedErrors = async (
   ) => void,
 ) => {
   try {
-    const redirectUrl = await callback();
-    res.status(302);
-    return res.redirect(redirectUrl);
+    return res.status(302).redirect(await callback());
   } catch (error: any) {
     const stack = JSON.stringify(error.stack, null, 2);
     logger.error(

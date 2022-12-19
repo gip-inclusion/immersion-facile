@@ -25,7 +25,7 @@ describe("Establishment", () => {
     ({ store, dependencies } = storeAndDeps);
   });
 
-  it("reflects when OAuth wants to input siret", () => {
+  it("reflects when user wants to input siret", () => {
     store.dispatch(establishmentSlice.actions.gotReady());
     expectEstablishmentStateToMatch({
       status: "READY_FOR_LINK_REQUEST_OR_REDIRECTION",

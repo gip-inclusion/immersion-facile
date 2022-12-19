@@ -3,7 +3,7 @@ import { frontRoutes } from "shared";
 describe("Simple navigation", () => {
   it("Go to admin and log in", () => {
     cy.visit("/admin");
-    cy.get("#OAuth").type(Cypress.env("ADMIN_USER"));
+    cy.get("#user").type(Cypress.env("ADMIN_USER"));
     cy.get("#password").type(Cypress.env("ADMIN_PASSWORD"));
     cy.contains("Se connecter").click();
   });

@@ -41,9 +41,9 @@ describe("Filesystem utils", () => {
   });
 
   it("retrieve parent directory path", () => {
-    const directory = "/home/OAuth/immersion-facile/back/storage/tmp";
+    const directory = "/home/user/immersion-facile/back/storage/tmp";
     const expectedParentDirectoryPath =
-      "/home/OAuth/immersion-facile/back/storage";
+      "/home/user/immersion-facile/back/storage";
     expect(retrieveParentDirectory(directory)).toBe(
       expectedParentDirectoryPath,
     );

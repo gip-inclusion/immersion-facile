@@ -18,10 +18,9 @@ const inclusionConnectBaseUri: AbsoluteUrl =
 describe("InitiateInclusionConnect usecase", () => {
   it("construct redirect url with expected query params, and stores nounce and state in ongoingOAuth", async () => {
     const uow = createInMemoryUow();
-    const uowPerformer = new InMemoryUowPerformer(uow);
     const uuidGenerator = new TestUuidGenerator();
-    const initiateInclusionConnect = new InitiateInclusionConnect(
-      uowPerformer,
+    const useCase = new InitiateInclusionConnect(
+      new InMemoryUowPerformer(uow),
       uuidGenerator,
       {
         immersionRedirectUri,
@@ -35,7 +34,7 @@ describe("InitiateInclusionConnect usecase", () => {
 
     uuidGenerator.setNextUuids([nonce, state]);
 
-    const redirectUrl = await initiateInclusionConnect.execute();
+    const redirectUrl = await useCase.execute();
 
     expect(redirectUrl).toBe(
       encodeURI(
@@ -50,13 +49,14 @@ describe("InitiateInclusionConnect usecase", () => {
         ].join("&")}`,
       ),
     );
-    expect(uow.ongoingOAuthRepository.ongoingOAuths).toHaveLength(1);
-    expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths[0], {
-      nonce,
-      state,
-      provider: "inclusionConnect",
-      externalId: undefined,
-      accessToken: undefined,
-    });
+    expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
+      {
+        nonce,
+        state,
+        provider: "inclusionConnect",
+        externalId: undefined,
+        accessToken: undefined,
+      },
+    ]);
   });
 });
