@@ -7,7 +7,7 @@ import {
   MainWrapper,
   Title,
 } from "react-design-system/immersionFacile";
-import { CreateAgencyDto, createAgencySchema } from "shared";
+import { AgencyDto, CreateAgencyDto, createAgencySchema } from "shared";
 import {
   AgencyFormCommonFields,
   AgencyLogoUpload,
@@ -21,8 +21,8 @@ import { toFormikValidationSchema } from "src/app/components/forms/commons/zodVa
 import { v4 as uuidV4 } from "uuid";
 import { formAgencyErrorLabels } from "../../contents/agency/formAgency";
 
-const initialValues: CreateAgencyDto = {
-  id: uuidV4(),
+const initialValues: (id: AgencyDto["id"]) => CreateAgencyDto = (id) => ({
+  id,
   kind: "pole-emploi",
   name: "",
   address: {
@@ -40,7 +40,7 @@ const initialValues: CreateAgencyDto = {
   questionnaireUrl: "",
   logoUrl: undefined,
   signature: "",
-};
+});
 
 export const AddAgencyPage = () => {
   const [submitFeedback, setSubmitFeedback] = useState<AgencySubmitFeedback>({
@@ -51,7 +51,7 @@ export const AddAgencyPage = () => {
       <MainWrapper layout="boxed">
         <Title heading={1}>Ajout d'organisme encadrant les PMSMP</Title>
         <Formik
-          initialValues={initialValues}
+          initialValues={initialValues(uuidV4())}
           validationSchema={toFormikValidationSchema(createAgencySchema)}
           onSubmit={(values) =>
             agencyGateway
