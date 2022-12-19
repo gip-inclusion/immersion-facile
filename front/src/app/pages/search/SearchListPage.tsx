@@ -29,8 +29,8 @@ import { routes } from "src/app/routes/routes";
 
 const radiusOptions = [1, 2, 5, 10, 20, 50, 100];
 const sortedByOptions: { value: SearchSortedBy; label: string }[] = [
-  { value: "distance", label: "Par proximité" },
-  { value: "date", label: "Par date de publication" },
+  { value: "distance", label: "Proximité" },
+  { value: "date", label: "Date de publication" },
 ];
 export const SearchListPage = ({
   route,
@@ -198,7 +198,7 @@ export const SearchListPage = ({
                 <div className="fr-grid-row fr-grid-row--gutters fr-mb-4w fr-grid-row--bottom">
                   <div className="fr-col-12 fr-col-md-2">
                     <Select
-                      label="Filtrer les résultats par :"
+                      label="Trier les résultats par :"
                       id="filter"
                       options={sortedByOptions}
                       onChange={(event) => {
