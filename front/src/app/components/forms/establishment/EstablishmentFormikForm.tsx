@@ -101,7 +101,7 @@ export const EstablishmentFormikForm = ({
             pour chaque établissement (Siret différent).
           </p>
           <Form>
-            <h5 className="fr-text--lead fr-mb-2w">Votre établissement</h5>
+            <h2 className="fr-text--lead fr-mb-2w">Votre établissement</h2>
             {children}
             <BoolCheckboxGroup
               {...getLabelAndName("isEngagedEnterprise")}

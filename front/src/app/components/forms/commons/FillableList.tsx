@@ -103,7 +103,7 @@ const AddToList = ({
         error ? " fr-input-group--error" : ""
       } ${componentName}__add-to-list-wrapper fr-mb-2w`}
     >
-      <label className="fr-label" htmlFor={name}>
+      <label className="fr-label" htmlFor={cleanStringToHTMLAttribute(name)}>
         {label}
       </label>
       {description && <span className="fr-hint-text">{description}</span>}
@@ -112,7 +112,7 @@ const AddToList = ({
           id={cleanStringToHTMLAttribute(name)}
           value={inputValue}
           type="text"
-          name={name}
+          name={cleanStringToHTMLAttribute(name)}
           onKeyPress={(e) => {
             if (e.key === "Enter") {
               e.preventDefault();

@@ -38,7 +38,7 @@ export const BusinessContact = () => {
   return (
     <div className="fr-input-group">
       <div>
-        <h5>Détails du correspondant immersion :</h5>
+        <h2 className="fr-text--lead">Détails du correspondant immersion :</h2>
         <p>Le correspondant reçoit les demandes et les traite.</p>
       </div>
       <TextInput label="Nom du référent *" name={makeName("lastName")} />

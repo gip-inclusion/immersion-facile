@@ -23,7 +23,7 @@ export const AppellationList = ({ name, title }: AppellationListProps) => {
   return (
     <div className="im-appellation-autocomplete fr-input-group">
       <>
-        {title && <h5>{title}</h5>}
+        {title && <h2 className="fr-text--lead">{title}</h2>}
         <div className="flex flex-col gap-5">
           {appellations.map(({ appellationCode }, index) => (
             <FormEstablishmentAppellation

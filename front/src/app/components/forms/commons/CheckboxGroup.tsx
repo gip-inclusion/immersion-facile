@@ -40,21 +40,18 @@ export const BoolCheckboxGroup = (props: BoolCheckboxGroupProps) => {
             </span>
           )}
           <div className="fr-fieldset__content">
-            <div
-              className="fr-checkbox-group"
-              key={htmlName + props.name + "_oui"}
-            >
+            <div className="fr-checkbox-group" key={htmlName + props.name}>
               <input
                 {...field}
                 value={""}
                 type="checkbox"
-                id={htmlName}
+                id={htmlName + props.name}
                 checked={field.value}
                 disabled={props.disabled}
               />
               <label
                 className="fr-label"
-                htmlFor={htmlName + "oui"}
+                htmlFor={htmlName + props.name}
                 onClick={() => setValue(!field.value)}
               >
                 oui
