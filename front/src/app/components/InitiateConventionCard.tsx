@@ -42,7 +42,7 @@ export const InitiateConventionCard = ({
     <div>
       {enablePeConnectApi ? (
         <>
-          <div className="flex flex-col w-full h-full items-center justify-center text-center">
+          <div className="flex flex-col w-full items-center justify-center text-center">
             <p
               className="align-center"
               dangerouslySetInnerHTML={{ __html: peConnectNotice }}
@@ -62,10 +62,10 @@ export const InitiateConventionCard = ({
               Je ne connais pas mes identifiants
             </a>
           </div>
-          <div className="flex flex-col w-full h-full items-center justify-center">
+          <div className="flex flex-col w-full items-center justify-center">
             <strong className="fr-text--lead">ou bien</strong>
           </div>
-          <div className="flex flex-col w-full h-full items-center justify-center">
+          <div className="flex flex-col w-full items-center justify-center">
             <p
               className="text-center"
               dangerouslySetInnerHTML={{ __html: otherCaseNotice }}
