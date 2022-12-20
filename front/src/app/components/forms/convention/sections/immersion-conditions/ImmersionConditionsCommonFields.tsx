@@ -7,6 +7,7 @@ import {
   conventionObjectiveOptions,
   DateIntervalDto,
   getConventionFieldName,
+  isStringDate,
   reasonableSchedule,
   scheduleWithFirstDayActivity,
 } from "shared";
@@ -35,8 +36,11 @@ export const ImmersionConditionsCommonFields = ({
   const establishmentInfos = useAppSelector(siretSelectors.establishmentInfos);
   const isFetchingSiret = useAppSelector(siretSelectors.isFetching);
   const isSiretFetcherDisabled = values.status !== "DRAFT";
+  const defaultDateMax = isStringDate(values.dateStart)
+    ? new Date(values.dateStart)
+    : new Date();
   const [dateMax, setDateMax] = useState(
-    addMonths(new Date(values.dateStart), 1).toISOString(),
+    addMonths(defaultDateMax, 1).toISOString(),
   );
   useSiretRelatedField("businessName", {
     disabled: isSiretFetcherDisabled,
@@ -86,7 +90,9 @@ export const ImmersionConditionsCommonFields = ({
             end: new Date(values.dateEnd),
           });
           setFieldValue("dateStart", dateStart);
-          setDateMax(addMonths(new Date(dateStart), 1).toISOString());
+          if (isStringDate(dateStart)) {
+            setDateMax(addMonths(new Date(dateStart), 1).toISOString());
+          }
         }}
       />
       <DateInput

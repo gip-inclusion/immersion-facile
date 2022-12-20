@@ -122,5 +122,12 @@ describe("Convention Form", () => {
   // it("can't submit form if immersion duration exceeds 1 month", () => {});
   // it("can submit form with a complex schedule", () => {});
   // it("can edit multiple jobs dropdown", () => {});
-  // it("can edit input date with null / 0 value", () => {});
+  it("can edit input date with null / 0 value", () => {
+    cy.visit(conventionFormUrl);
+    cypressDoIfElementExists(".fr-btn--candidate", () => {
+      cy.get(".fr-btn--candidate").click();
+    });
+    cy.get(getIdFromConventionDTO("dateStart")).clear().type("00/00/0000");
+    cy.get(getIdFromConventionDTO("dateEnd")).clear().type("00/00/0000");
+  });
 });
