@@ -38,9 +38,6 @@ export const DateInput = (props: DateInputProps) => {
             type="date"
             disabled={props.disabled}
             aria-label={props.label}
-            // onKeyDown={(e) => {
-            //   e.preventDefault()
-            // }}
             id={cleanStringToHTMLAttribute(props.name)}
             max={
               props.max ? format(new Date(props.max), "yyyy-MM-dd") : undefined
