@@ -103,7 +103,7 @@ const AddToList = ({
         error ? " fr-input-group--error" : ""
       } ${componentName}__add-to-list-wrapper fr-mb-2w`}
     >
-      <label className="fr-label" htmlFor={name}>
+      <label className="fr-label" htmlFor={cleanStringToHTMLAttribute(name)}>
         {label}
       </label>
       {description && <span className="fr-hint-text">{description}</span>}
