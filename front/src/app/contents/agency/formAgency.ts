@@ -51,7 +51,7 @@ export const formAgencyFieldsLabels: Record<
     label: "Emails des administrateurs de la structure",
   },
   signature: {
-    label: "Texte de signature*",
+    label: "Texte de signature *",
     description:
       "Quel texte de signature souhaitez-vous pour les mails automatisés ?",
     placeholder: "L’équipe de l’agence de Boulogne-Billancourt",
