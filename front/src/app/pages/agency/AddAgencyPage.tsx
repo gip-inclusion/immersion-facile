@@ -46,6 +46,7 @@ export const AddAgencyPage = () => {
   const [submitFeedback, setSubmitFeedback] = useState<AgencySubmitFeedback>({
     kind: "idle",
   });
+
   return (
     <HeaderFooterLayout>
       <MainWrapper layout="boxed">

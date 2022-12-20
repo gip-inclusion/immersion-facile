@@ -29,11 +29,11 @@ export const formAgencyFieldsLabels: Record<
     label: "Identifiant",
   },
   name: {
-    label: "Nom de l'organisme",
+    label: "Nom de l'organisme*",
     placeholder: "Agence de Boulogne-Billancourt",
   },
   address: {
-    label: "Adresse de la structure",
+    label: "Adresse de la structure*",
   },
   position: {
     label: "Coordonnées géographiques de l'organisme",
@@ -42,7 +42,7 @@ export const formAgencyFieldsLabels: Record<
     label: "URL du logo de l'organisme",
   },
   validatorEmails: {
-    label: "Emails de validation définitive de la demande de convention",
+    label: "Emails de validation définitive de la demande de convention*",
     placeholder: "equipe.validation@mail.com, valideur.dupont@mail.com",
     description:
       "Les personnes ou emails génériques suivants valideront les conventions préalablement examinées.",
@@ -51,7 +51,7 @@ export const formAgencyFieldsLabels: Record<
     label: "Emails des administrateurs de la structure",
   },
   signature: {
-    label: "Texte de signature",
+    label: "Texte de signature*",
     description:
       "Quel texte de signature souhaitez-vous pour les mails automatisés ?",
     placeholder: "L’équipe de l’agence de Boulogne-Billancourt",
@@ -60,7 +60,7 @@ export const formAgencyFieldsLabels: Record<
     label: "Statut de la structure",
   },
   kind: {
-    label: "Type de structure",
+    label: "Type de structure*",
   },
   counsellorEmails: {
     label: "Emails pour examen préalable de la demande de convention",

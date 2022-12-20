@@ -133,7 +133,7 @@ const CreationSiretRelatedInputs = () => {
 
       <TextInput
         {...getMandatoryLabelAndName("businessName")}
-        disabled={featureFlags.enableInseeApi}
+        readOnly={featureFlags.enableInseeApi}
       />
       <TextInput
         {...getLabelAndName("businessNameCustomized")}

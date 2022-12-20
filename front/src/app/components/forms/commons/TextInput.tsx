@@ -13,6 +13,7 @@ type TextInputProps = {
   multiline?: boolean;
   className?: string;
   value?: string;
+  readOnly?: boolean;
 };
 
 export const TextInput = (props: TextInputProps) => {
