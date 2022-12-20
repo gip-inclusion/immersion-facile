@@ -22,7 +22,7 @@ export const makeGenerateJwtES256 =
   (payload) =>
     jwt.sign(payload, privateKey, {
       algorithm: "ES256",
-      noTimestamp: true,
+      //noTimestamp: true, //Remove iat on payload
     });
 
 export const makeVerifyJwtES256 =

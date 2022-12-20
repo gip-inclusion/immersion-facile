@@ -372,6 +372,7 @@ importers:
       html-templates: workspace:*
       http-client: workspace:*
       jest: ^27.5.1
+      js-base64: ^3.7.3
       pino: ^7.9.1
       ramda: ^0.28.0
       typescript: ^4.6.2
@@ -382,6 +383,7 @@ importers:
       date-fns: 2.28.0
       html-templates: link:../libs/html-templates
       http-client: link:../libs/http-client
+      js-base64: 3.7.3
       pino: 7.11.0
       ramda: 0.28.0
       zod: 3.14.2
@@ -13636,6 +13638,10 @@ packages:
   /joycon/3.1.1:
     resolution: {integrity: sha512-34wB/Y7MW7bzjKRjUKTa46I2Z7eV62Rkhva+KkopW7Qvv/OSWBqvkSY7vusOPrNuZcUG3tApvdVgNB8POj3SPw==}
     engines: {node: '>=10'}
+    dev: false
+
+  /js-base64/3.7.3:
+    resolution: {integrity: sha512-PAr6Xg2jvd7MCR6Ld9Jg3BmTcjYsHEBx1VlwEwULb/qowPf5VD9kEMagj23Gm7JRnSvE/Da/57nChZjnvL8v6A==}
     dev: false
 
   /js-string-escape/1.0.1:

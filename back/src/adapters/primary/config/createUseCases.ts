@@ -70,14 +70,14 @@ import { GetSiret } from "../../../domain/sirene/useCases/GetSiret";
 import { GetSiretIfNotAlreadySaved } from "../../../domain/sirene/useCases/GetSiretIfNotAlreadySaved";
 import { AppConfig } from "./appConfig";
 import { Gateways } from "./createGateways";
-import { GenerateConventionMagicLink } from "./createGenerateConventionMagicLink";
 import { makeGenerateEditFormEstablishmentUrl } from "./makeGenerateEditFormEstablishmentUrl";
+import { GenerateConventionMagicLink } from "./createGenerateConventionMagicLink";
 
 export const createUseCases = (
   config: AppConfig,
   gateways: Gateways,
-  generateJwtFn: GenerateMagicLinkJwt,
-  generateMagicLinkFn: GenerateConventionMagicLink,
+  generateMagicLinkJwt: GenerateMagicLinkJwt,
+  makeConventionMagicLink: GenerateConventionMagicLink,
   generateAdminJwt: GenerateAdminJwt,
   generateAuthenticatedUserToken: GenerateAuthenticatedUserToken,
   uowPerformer: UnitOfWorkPerformer,
@@ -150,11 +150,11 @@ export const createUseCases = (
         clock,
       ),
       signConvention: new SignConvention(uowPerformer, createNewEvent, clock),
-      generateMagicLink: new GenerateMagicLink(generateJwtFn),
+      generateMagicLink: new GenerateMagicLink(generateMagicLinkJwt, clock),
       renewConventionMagicLink: new RenewConventionMagicLink(
         uowPerformer,
         createNewEvent,
-        generateJwtFn,
+        generateMagicLinkJwt,
         config,
         clock,
         config.immersionFacileBaseUrl,
@@ -248,7 +248,7 @@ export const createUseCases = (
       confirmToSignatoriesThatConventionCorrectlySubmittedRequestSignature:
         new ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature(
           gateways.email,
-          generateMagicLinkFn,
+          makeConventionMagicLink,
         ),
       notifyLastSigneeThatConventionHasBeenSigned:
         new NotifyLastSigneeThatConventionHasBeenSigned(
@@ -263,12 +263,12 @@ export const createUseCases = (
       notifyNewConventionNeedsReview: new NotifyNewApplicationNeedsReview(
         uowPerformer,
         gateways.email,
-        generateMagicLinkFn,
+        makeConventionMagicLink,
       ),
       notifyToAgencyConventionSubmitted: new NotifyToAgencyApplicationSubmitted(
         uowPerformer,
         gateways.email,
-        generateMagicLinkFn,
+        makeConventionMagicLink,
       ),
       notifyBeneficiaryAndEnterpriseThatConventionIsRejected:
         new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
@@ -279,7 +279,7 @@ export const createUseCases = (
         new NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification(
           uowPerformer,
           gateways.email,
-          generateMagicLinkFn,
+          makeConventionMagicLink,
         ),
       deliverRenewedMagicLink: new DeliverRenewedMagicLink(gateways.email),
       notifyConfirmationEstablishmentCreated:
@@ -292,7 +292,7 @@ export const createUseCases = (
         new NotifyPoleEmploiUserAdvisorOnConventionFullySigned(
           uowPerformer,
           gateways.email,
-          generateMagicLinkFn,
+          makeConventionMagicLink,
         ),
       broadcastToPoleEmploiOnConventionUpdates:
         new BroadcastToPoleEmploiOnConventionUpdates(

@@ -6,10 +6,9 @@ export type GenerateConventionMagicLink = ReturnType<
   typeof createGenerateConventionMagicLink
 >;
 
-export const createGenerateConventionMagicLink = (config: AppConfig) => {
-  const generateJwt = makeGenerateJwtES256(config.magicLinkJwtPrivateKey);
-
-  return ({
+export const createGenerateConventionMagicLink =
+  (config: AppConfig) =>
+  ({
     id,
     role,
     targetRoute,
@@ -21,7 +20,8 @@ export const createGenerateConventionMagicLink = (config: AppConfig) => {
     email: string;
   }) => {
     const baseUrl = config.immersionFacileBaseUrl;
-    const jwt = generateJwt(createConventionMagicLinkPayload(id, role, email));
+    const jwt = makeGenerateJwtES256(config.magicLinkJwtPrivateKey)(
+      createConventionMagicLinkPayload(id, role, email),
+    );
     return `${baseUrl}/${targetRoute}?jwt=${jwt}`;
   };
-};
