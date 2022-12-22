@@ -17,6 +17,11 @@ code {
   visibility: hidden;
 }
 
+img {
+  max-width: 100%;
+  width: auto;
+}
+
 /* 
 
 Temp fix DSFR 1.7.x
@@ -27,10 +32,6 @@ TODO remove all of this asap
 input {
   font-family: "Marianne", Arial, sans-serif;
   font-size: 1rem;
-}
-[href]:not(.fr-btn, .fr-nav__link, .fr-card__title a, .fr-tag) {
-  background-image: none !important;
-  text-decoration: underline;
 }
 [href]:not(.fr-btn):hover {
   text-decoration: none;

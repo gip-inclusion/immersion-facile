@@ -14,9 +14,13 @@
     "prettier": "pnpm -w prettier:glob --write ./front/src",
     "format:check": "pnpm -w prettier:glob --check ./front/src",
     "lint": "pnpm -w lintconfig:glob ./front/src",
-    "fullcheck": "pnpm -w fullcheck --filter=front"
+    "fullcheck": "pnpm -w fullcheck --filter=front",
+    "postinstall": "copy-dsfr-to-public",
+    "predev": "only-include-used-icons",
+    "prebuild": "only-include-used-icons"
   },
   "dependencies": {
+    "@codegouvfr/react-dsfr": "^0.11.3",
     "@emotion/react": "^11.8.2",
     "@emotion/styled": "^11.8.1",
     "@gouvfr/dsfr": "1.8.5",
@@ -33,10 +37,10 @@
     "html-templates": "workspace:*",
     "http-client": "workspace:*",
     "ramda": "^0.28.0",
-    "react": "^17.0.2",
+    "react": "18",
     "react-design-system": "workspace:*",
-    "react-dom": "^17.0.2",
     "react-helmet": "^6.1.0",
+    "react-dom": "18",
     "react-redux": "^7.2.8",
     "redux": "^4.2.0",
     "redux-observable": "^2.0.0",

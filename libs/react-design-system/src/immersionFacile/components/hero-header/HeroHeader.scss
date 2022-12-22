@@ -218,6 +218,7 @@ $typesTints: (
       bottom: 0;
       z-index: 10;
       outline-width: 8px;
+      background-image: none;
       &:active {
         background-color: transparent !important;
       }

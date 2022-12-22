@@ -1,38 +1,28 @@
 import immersionFacileLogo from "/img/Logo-immersion-facilitee-01-RVB-reflets-crop.svg";
 import React from "react";
-import {
-  Header,
-  ImmersionLogo,
-  LinkHome,
-  MarianneLogo,
-  NavLink,
-  Tool,
-} from "react-design-system/immersionFacile";
 import { useDispatch } from "react-redux";
 import { routes, useRoute } from "src/app/routes/routes";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { adminAuthSlice } from "src/core-logic/domain/admin/adminAuth/adminAuth.slice";
+import { Header, HeaderProps } from "@codegouvfr/react-dsfr/Header";
 
-type HeaderNavLinks = (NavLink & {
-  display: boolean;
-  children?: (NavLink & { display: boolean })[];
-})[];
-
-const getHeaderNavLinkId = (chunk: string) => `im-header-nav__${chunk}`;
+//const getHeaderNavLinkId = (chunk: string) => `im-header-nav__${chunk}`;
 
 export const ImmersionHeader = () => {
   const featureFlags = useFeatureFlags();
   const dispatch = useDispatch();
   const currentRoute = useRoute();
   const isAdminConnected = useAppSelector(adminSelectors.auth.isAuthenticated);
-  const tools: Tool[] = [];
+  const tools: HeaderProps["quickAccessItems"] = [];
   if (isAdminConnected) {
     tools.push({
-      iconClassName: "fr-btn fr-icon-lock-line",
-      label: "Se déconnecter",
-      callback: () => dispatch(adminAuthSlice.actions.logoutRequested()),
+      iconId: "fr-icon-lock-line",
+      text: "Se déconnecter",
+      buttonProps: {
+        onClick: () => dispatch(adminAuthSlice.actions.logoutRequested()),
+      },
     });
   }
   const isCandidateRoute =
@@ -44,121 +34,85 @@ export const ImmersionHeader = () => {
   const isAgencyRoute =
     currentRoute.name === routes.addAgency().name ||
     currentRoute.name === routes.homeAgencies().name;
-  const links: HeaderNavLinks = [
+  const links: HeaderProps["navItems"] = [
     {
-      label: "Accueil",
-      display: true,
-      id: getHeaderNavLinkId("home"),
-      active: currentRoute.name === routes.home().name,
-      ...routes.home().link,
+      text: "Accueil",
+      linkProps: { ...routes.home().link },
+      isActive: currentRoute.name === routes.home().name,
+      //id: getHeaderNavLinkId("home"),
     },
     {
-      label: "Candidats",
-      display: true,
-      active: isCandidateRoute,
-      id: getHeaderNavLinkId("candidate-subnav-toggle"),
-      children: [
+      text: "Candidats",
+      isActive: isCandidateRoute,
+      //id: getHeaderNavLinkId("candidate-subnav-toggle"),
+      menuLinks: [
         {
-          label: "Accueil candidat",
-          display: true,
-          id: getHeaderNavLinkId("candidate-home"),
-          active: currentRoute.name === routes.homeCandidates().name,
-          ...routes.homeCandidates().link,
+          text: "Accueil candidat",
+          //id: getHeaderNavLinkId("candidate-home"),
+          isActive: currentRoute.name === routes.homeCandidates().name,
+          linkProps: { ...routes.homeCandidates().link },
         },
         {
-          label: "Trouver une entreprise accueillante",
-          display: true,
-          id: getHeaderNavLinkId("candidate-search"),
-          active: currentRoute.name === routes.search().name,
-          ...routes.search().link,
+          text: "Trouver une entreprise accueillante",
+          //id: getHeaderNavLinkId("candidate-search"),
+          isActive: currentRoute.name === routes.search().name,
+          linkProps: { ...routes.search().link },
         },
         {
-          label: "Remplir la demande de convention",
-          display: true,
-          id: getHeaderNavLinkId("candidate-form-convention"),
-          active: false,
-          ...routes.conventionImmersion().link,
+          text: "Remplir la demande de convention",
+          //id: getHeaderNavLinkId("candidate-form-convention"),
+          isActive: false,
+          linkProps: { ...routes.conventionImmersion().link },
         },
       ],
     },
     {
-      label: "Entreprises",
-      display: true,
-      id: getHeaderNavLinkId("establishment-subnav-toggle"),
-      active: isEstablishmentRoute,
-      children: [
+      text: "Entreprises",
+      //id: getHeaderNavLinkId("establishment-subnav-toggle"),
+      isActive: isEstablishmentRoute,
+      menuLinks: [
         {
-          label: "Accueil entreprise",
-          display: true,
-          active: currentRoute.name === routes.homeEstablishments().name,
-          id: getHeaderNavLinkId("establishment-home"),
-          ...routes.homeEstablishments().link,
+          text: "Accueil entreprise",
+          isActive: currentRoute.name === routes.homeEstablishments().name,
+          //id: getHeaderNavLinkId("establishment-home"),
+          linkProps: { ...routes.homeEstablishments().link },
         },
         {
-          label: "Référencer mon entreprise",
-          display: true,
-          active: currentRoute.name === routes.formEstablishment().name,
-          id: getHeaderNavLinkId("establishment-form"),
-          ...routes.formEstablishment().link,
+          text: "Référencer mon entreprise",
+          isActive: currentRoute.name === routes.formEstablishment().name,
+          //id: getHeaderNavLinkId("establishment-form"),
+          linkProps: { ...routes.formEstablishment().link },
         },
         {
-          label: "Remplir la demande de convention",
-          display: true,
-          active: false,
-          id: getHeaderNavLinkId("establishment-form-convention"),
-          ...routes.conventionImmersion().link,
+          text: "Remplir la demande de convention",
+          isActive: false,
+          //id: getHeaderNavLinkId("establishment-form-convention"),
+          linkProps: { ...routes.conventionImmersion().link },
         },
       ],
     },
     {
-      label: "Prescripteurs",
-      display: true,
-      id: getHeaderNavLinkId("agency-subnav-toggle"),
-      active: isAgencyRoute,
-      children: [
+      text: "Prescripteurs",
+      //id: getHeaderNavLinkId("agency-subnav-toggle"),
+      isActive: isAgencyRoute,
+      menuLinks: [
         {
-          label: "Accueil prescripteurs",
-          display: true,
-          active: currentRoute.name === routes.homeAgencies().name,
-          id: getHeaderNavLinkId("agency-home"),
-          ...routes.homeAgencies().link,
+          text: "Accueil prescripteurs",
+          isActive: currentRoute.name === routes.homeAgencies().name,
+          //id: getHeaderNavLinkId("agency-home"),
+          linkProps: { ...routes.homeAgencies().link },
         },
         {
-          label: "Référencer mon organisme",
-          display: true,
-          active: currentRoute.name === routes.addAgency().name,
-          id: getHeaderNavLinkId("agency-form"),
-          ...routes.addAgency().link,
+          text: "Référencer mon organisme",
+          isActive: currentRoute.name === routes.addAgency().name,
+          //id: getHeaderNavLinkId("agency-form"),
+          linkProps: { ...routes.addAgency().link },
         },
         {
-          label: "Remplir la demande de convention",
-          display: true,
-          active: false,
-          id: getHeaderNavLinkId("agency-form-convention"),
-          ...routes.conventionImmersion().link,
-        },
-      ],
-    },
-    {
-      label: "Admin",
-      display: isAdminConnected && featureFlags.enableAdminUi,
-      active:
-        currentRoute.name === routes.adminTab({ tab: "conventions" }).name,
-      id: getHeaderNavLinkId("admin-subnav-toggle"),
-      children: [
-        {
-          label: "Backoffice",
-          display: true,
-          active: false,
-          id: getHeaderNavLinkId("admin-home"),
-          ...routes.adminTab({ tab: "conventions" }).link,
-        },
-        {
-          label: "Emails",
-          display: true,
-          active: false,
-          id: getHeaderNavLinkId("admin-emails"),
-          ...routes.adminTab({ tab: "emails" }).link,
+          text: "Remplir la demande de convention",
+          isActive: false,
+          //id: getHeaderNavLinkId("agency-form-convention"),
+          linkProps: { ...routes.conventionImmersion().link },
         },
         {
           label: "Recherche V2",
@@ -171,21 +125,51 @@ export const ImmersionHeader = () => {
     },
   ];
 
-  const linksFiltered = links.filter((link) => link.display);
+  if (isAdminConnected && featureFlags.enableAdminUi) {
+    links.push({
+      text: "Admin",
+      isActive:
+        currentRoute.name === routes.adminTab({ tab: "conventions" }).name,
+      //id: getHeaderNavLinkId("admin-subnav-toggle"),
+      menuLinks: [
+        {
+          text: "Backoffice",
+          isActive: false,
+          //id: getHeaderNavLinkId("admin-home"),
+          linkProps: { ...routes.adminTab({ tab: "conventions" }).link },
+        },
+        {
+          text: "Emails",
+          isActive: false,
+          //id: getHeaderNavLinkId("admin-emails"),
+          linkProps: { ...routes.adminTab({ tab: "emails" }).link },
+        },
+      ],
+    });
+  }
+
   return (
     <Header
-      marianneLogo={
-        <LinkHome {...routes.home().link}>
-          <MarianneLogo />
-        </LinkHome>
+      brandTop={
+        <>
+          République
+          <br />
+          Française
+        </>
       }
-      immersionLogo={
-        <LinkHome {...routes.home().link} className="w-full h-full shadow-none">
-          <ImmersionLogo url={immersionFacileLogo} />
-        </LinkHome>
-      }
-      tools={tools}
-      navLinks={linksFiltered}
+      homeLinkProps={{
+        href: "/",
+        title: "Immersion Facilitée - Accueil",
+      }}
+      operatorLogo={{
+        orientation: "vertical",
+        imgUrl: immersionFacileLogo,
+        alt: "Immersion Facilitée",
+      }}
+      serviceTagline="Faciliter la réalisation des immersions professionelles"
+      serviceTitle="Immersion Facilitée"
+      navItems={links}
+      quickAccessItems={tools}
     />
   );
 };
