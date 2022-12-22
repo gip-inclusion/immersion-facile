@@ -1,11 +1,11 @@
 import jwt, { TokenExpiredError } from "jsonwebtoken";
 import {
   AbsoluteUrl,
-  Beneficiary,
+  AgencyDto,
+  ConventionDto,
   ConventionId,
   ConventionMagicLinkPayload,
   createConventionMagicLinkPayload,
-  EstablishmentRepresentative,
   frontRoutes,
   RenewMagicLinkRequestDto,
   renewMagicLinkRequestSchema,
@@ -28,41 +28,6 @@ import { TransactionalUseCase } from "../../core/UseCase";
 
 const logger = createLogger(__filename);
 
-interface LinkRenewData {
-  role: Role;
-  applicationId: ConventionId;
-  emailHash?: string;
-}
-
-const supportedRenewRoutes = [
-  frontRoutes.conventionImmersionRoute,
-  frontRoutes.conventionToSign,
-  frontRoutes.conventionToValidate,
-  frontRoutes.immersionAssessment,
-];
-
-// Extracts the data necessary for link renewal from any version of magic link payload.
-const extractDataFromExpiredJwt: (payload: any) => LinkRenewData = (
-  payload: any,
-) => {
-  if (!payload.version) {
-    return {
-      role: payload.roles[0],
-      applicationId: payload.applicationId,
-      emailHash: undefined,
-    };
-  }
-  // Once there are more JWT versions, expand this code to upgrade old JWTs, e.g.:
-  // else if (payload.version === 1) {...}
-  else {
-    return {
-      role: payload.role,
-      applicationId: payload.applicationId,
-      emailHash: payload.emailHash,
-    };
-  }
-};
-
 export class RenewConventionMagicLink extends TransactionalUseCase<
   RenewMagicLinkRequestDto,
   void
@@ -84,10 +49,105 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
     { expiredJwt, originalUrl }: RenewMagicLinkRequestDto,
     uow: UnitOfWork,
   ) {
+    const { emailHash, role, applicationId } = extractDataFromExpiredJwt(
+      this.extractValidPayload(expiredJwt),
+    );
+
+    const convention = await this.getconvention(uow, applicationId);
+    const emails = conventionEmailsByRole(
+      role,
+      convention,
+      await this.getAgency(uow, convention),
+    )[role];
+    if (emails instanceof Error) throw emails;
+
+    const route = this.findRouteToRenew(originalUrl);
+
+    // Only renew the link if the email hash matches
+    await this.onEmails(emails, emailHash, applicationId, role, route, uow);
+  }
+
+  private async onEmails(
+    emails: string[],
+    emailHash: string | undefined,
+    applicationId: ConventionId,
+    role: Role,
+    route: string,
+    uow: UnitOfWork,
+  ) {
+    let foundHit = false;
+    for (const email of emails) {
+      if (!emailHash || stringToMd5(email) === emailHash) {
+        foundHit = true;
+        const jwt = this.generateMagicLinkJwt(
+          createConventionMagicLinkPayload(
+            applicationId,
+            role,
+            email,
+            undefined,
+            this.clock.timestamp.bind(this.clock),
+          ),
+        );
+
+        const magicLink = `${this.immersionBaseUrl}/${route}?jwt=${jwt}`;
+        const conventionStatusLink = `${this.immersionBaseUrl}/${frontRoutes.conventionStatusDashboard}?jwt=${jwt}`;
+
+        await uow.outboxRepository.save(
+          this.createNewEvent({
+            topic: "MagicLinkRenewalRequested",
+            payload: {
+              emails,
+              magicLink,
+              conventionStatusLink,
+            },
+          }),
+        );
+      }
+    }
+    if (!foundHit) {
+      throw new BadRequestError(
+        "Le lien magique n'est plus associé à cette demande d'immersion",
+      );
+    }
+  }
+
+  private async getconvention(uow: UnitOfWork, applicationId: ConventionId) {
+    const convention = await uow.conventionRepository.getById(applicationId);
+    if (convention) return convention;
+    throw new NotFoundError(applicationId);
+  }
+
+  private async getAgency(uow: UnitOfWork, convention: ConventionDto) {
+    const agency = await uow.agencyRepository.getById(convention.agencyId);
+    if (agency) return agency;
+    logger.error(
+      { agencyId: convention.agencyId },
+      "No Agency Config found for this agency code",
+    );
+    throw new BadRequestError(convention.agencyId);
+  }
+
+  private findRouteToRenew(originalUrl: string) {
+    const supportedRenewRoutes = [
+      frontRoutes.conventionImmersionRoute,
+      frontRoutes.conventionToSign,
+      frontRoutes.conventionToValidate,
+      frontRoutes.immersionAssessment,
+    ];
+    const routeToRenew = supportedRenewRoutes.find((supportedRoute) =>
+      decodeURIComponent(originalUrl).includes(`/${supportedRoute}`),
+    );
+    if (routeToRenew) return routeToRenew;
+    throw new BadRequestError(
+      `Wrong link format, should be one of the supported route: ${supportedRenewRoutes
+        .map((route) => `/${route}`)
+        .join(", ")}. It was : ${originalUrl}`,
+    );
+  }
+
+  private extractValidPayload(expiredJwt: string) {
     const { verifyJwt, verifyDeprecatedJwt } = verifyJwtConfig(this.config);
-
     let payloadToExtract: any | undefined;
-
     try {
       // If the following doesn't throw, we're dealing with a JWT that we signed, so it's
       // probably expired or an old version.
@@ -112,93 +172,64 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
         }
       }
     }
-
-    if (!payloadToExtract) {
-      throw new BadRequestError("Malformed expired JWT");
-    }
-
-    const { emailHash, role, applicationId } =
-      extractDataFromExpiredJwt(payloadToExtract);
-
-    const conventionDto = await uow.conventionRepository.getById(applicationId);
-    if (!conventionDto) throw new NotFoundError(applicationId);
-
-    const agency = await uow.agencyRepository.getById(conventionDto.agencyId);
-    if (!agency) {
-      logger.error(
-        { agencyId: conventionDto.agencyId },
-        "No Agency Config found for this agency code",
-      );
-      throw new BadRequestError(conventionDto.agencyId);
-    }
-
-    const routeToRenew = supportedRenewRoutes.find((supportedRoute) =>
-      decodeURIComponent(originalUrl).includes(`/${supportedRoute}`),
-    );
-    if (!routeToRenew) {
-      throw new BadRequestError(
-        `Wrong link format, should be one of the supported route: ${supportedRenewRoutes
-          .map((route) => `/${route}`)
-          .join(", ")}. It was : ${originalUrl}`,
-      );
-    }
-
-    const beneficiary: Beneficiary = conventionDto.signatories.beneficiary;
-    const establishmentRepresentative: EstablishmentRepresentative =
-      conventionDto.signatories.establishmentRepresentative;
-
-    let emails: string[] = [];
-    switch (role) {
-      case "admin":
-        throw new BadRequestError("L'admin n'a pas de liens magiques.");
-      case "beneficiary":
-        emails = [beneficiary.email];
-        break;
-      case "counsellor":
-        emails = agency.counsellorEmails;
-        break;
-      case "validator":
-        emails = agency.validatorEmails;
-        break;
-      case "establishment":
-        emails = [establishmentRepresentative.email];
-        break;
-    }
-
-    // Only renew the link if the email hash matches
-    let foundHit = false;
-    for (const email of emails) {
-      if (!emailHash || stringToMd5(email) === emailHash) {
-        foundHit = true;
-        const jwt = this.generateMagicLinkJwt(
-          createConventionMagicLinkPayload(
-            applicationId,
-            role,
-            email,
-            undefined,
-            this.clock.timestamp.bind(this.clock),
-          ),
-        );
-
-        const magicLink = `${this.immersionBaseUrl}/${routeToRenew}?jwt=${jwt}`;
-        const conventionStatusLink = `${this.immersionBaseUrl}/${frontRoutes.conventionStatusDashboard}?jwt=${jwt}`;
-
-        const event = this.createNewEvent({
-          topic: "MagicLinkRenewalRequested",
-          payload: {
-            emails,
-            magicLink,
-            conventionStatusLink,
-          },
-        });
-
-        await uow.outboxRepository.save(event);
-      }
-    }
-    if (!foundHit) {
-      throw new BadRequestError(
-        "Le lien magique n'est plus associé à cette demande d'immersion",
-      );
-    }
+    if (payloadToExtract) return payloadToExtract;
+    throw new BadRequestError("Malformed expired JWT");
   }
 }
+
+// Extracts the data necessary for link renewal from any version of magic link payload.
+type LinkRenewData = {
+  role: Role;
+  applicationId: ConventionId;
+  emailHash?: string;
+};
+const extractDataFromExpiredJwt: (payload: any) => LinkRenewData = (
+  payload: any,
+) =>
+  !payload.version
+    ? {
+        role: payload.roles[0],
+        applicationId: payload.applicationId,
+        emailHash: undefined,
+      }
+    : // Once there are more JWT versions, expand this code to upgrade old JWTs, e.g.:
+      // else if (payload.version === 1) {...}
+      {
+        role: payload.role,
+        applicationId: payload.applicationId,
+        emailHash: payload.emailHash,
+      };
+
+const conventionEmailsByRole = (
+  role: Role,
+  convention: ConventionDto,
+  agency: AgencyDto,
+): Record<Role, string[] | Error> => ({
+  admin: new BadRequestError("L'admin n'a pas de liens magiques."),
+  beneficiary: [convention.signatories.beneficiary.email],
+  "beneficiary-current-employer": convention.signatories
+    .beneficiaryCurrentEmployer
+    ? [convention.signatories.beneficiaryCurrentEmployer.email]
+    : new BadRequestError(
+        "There is no beneficiaryCurrentEmployer on convention.",
+      ),
+  "beneficiary-representative": convention.signatories.beneficiaryRepresentative
+    ? [convention.signatories.beneficiaryRepresentative.email]
+    : new BadRequestError(
+        "There is no beneficiaryRepresentative on convention.",
+      ),
+  "legal-representative": convention.signatories.beneficiaryRepresentative
+    ? [convention.signatories.beneficiaryRepresentative.email]
+    : new BadRequestError(
+        "There is no beneficiaryRepresentative on convention.",
+      ),
+  counsellor: agency.counsellorEmails,
+  validator: agency.validatorEmails,
+  establishment: [convention.signatories.establishmentRepresentative.email],
+  "establishment-representative": [
+    convention.signatories.establishmentRepresentative.email,
+  ],
+  "establishment-tutor": new BadRequestError(
+    `Le rôle ${role} n'est pas supporté pour le renouvellement de lien magique.`,
+  ),
+});
