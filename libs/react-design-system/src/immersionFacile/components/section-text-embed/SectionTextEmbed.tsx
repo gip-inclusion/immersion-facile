@@ -47,7 +47,7 @@ export const SectionTextEmbed = ({
           l’identifier.
         </li>
       </ul>
-      <div className={`${componentName}__embed-wrapper fr-col-12 fr-col-md-5`}>
+      <div className={`${componentName}__embed-wrapper fr-col-12 fr-col-md-6`}>
         <ReactPlayer
           controls
           url={videoUrl}
