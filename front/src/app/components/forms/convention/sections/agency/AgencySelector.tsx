@@ -10,7 +10,7 @@ import {
   isPeConnectIdentity,
 } from "shared";
 import { PostcodeAutocomplete } from "src/app/components/forms/commons/PostcodeAutocomplete";
-import { useConventionTextsFromFormikContext } from "src/app/contents/convention/textSetup";
+import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
 import { useFederatedIdentity } from "src/app/hooks/federatedIdentity";
 import { agencyGateway } from "src/config/dependencies";
 import { AgencyDropdownListField } from "./AgencyDropdownListField";

@@ -1,5 +1,5 @@
 import React from "react";
-import { useConventionTextsFromFormikContext } from "src/app/contents/convention/textSetup";
+import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
 
 type SignOnlyMessageProps = {
   isAlreadySigned: boolean;

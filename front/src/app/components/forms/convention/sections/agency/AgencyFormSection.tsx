@@ -1,7 +1,7 @@
 import React from "react";
 import { InternshipKind } from "shared";
 import { FormSectionTitle } from "src/app/components/forms/commons/FormSectionTitle";
-import { useConventionTextsFromFormikContext } from "src/app/contents/convention/textSetup";
+import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
 import { AgencyDisplayReadOnly } from "./AgencyDisplayReadOnly";
 import { AgencySelector } from "./AgencySelector";
 

@@ -3,7 +3,7 @@ import React from "react";
 import {
   immersionTexts,
   ConventionTexts,
-} from "src/app/contents/convention/immersionTexts";
+} from "src/app/contents/forms/convention/immersionTexts";
 
 export const miniStageTexts: ConventionTexts = mergeDeepRight(immersionTexts, {
   intro: {

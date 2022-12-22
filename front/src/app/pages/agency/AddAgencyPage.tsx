@@ -19,7 +19,7 @@ import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout
 import { AgencySubmitFeedback } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
 import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
 import { v4 as uuidV4 } from "uuid";
-import { formAgencyErrorLabels } from "../../contents/agency/formAgency";
+import { formAgencyErrorLabels } from "../../contents/forms/agency/formAgency";
 
 const initialValues: (id: AgencyDto["id"]) => CreateAgencyDto = (id) => ({
   id,

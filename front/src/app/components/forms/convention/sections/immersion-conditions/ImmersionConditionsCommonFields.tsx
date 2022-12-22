@@ -17,7 +17,7 @@ import {
   RadioGroupForField,
 } from "src/app/components/forms/commons/RadioGroup";
 import { ConventionFormProfession } from "src/app/components/forms/convention/ConventionFormProfession";
-import { useConventionTextsFromFormikContext } from "src/app/contents/convention/textSetup";
+import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import { useSiretRelatedField } from "src/app/hooks/siret.hooks";

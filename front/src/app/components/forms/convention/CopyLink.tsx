@@ -1,7 +1,7 @@
 import ShareIcon from "@mui/icons-material/Share";
 import { IconButton, Tooltip } from "@mui/material";
 import React, { useState } from "react";
-import { useConventionTextsFromFormikContext } from "src/app/contents/convention/textSetup";
+import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
 
 const iconColor = "#3458a2";
 

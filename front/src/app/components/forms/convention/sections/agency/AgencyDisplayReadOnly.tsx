@@ -4,7 +4,7 @@ import type { ConventionDto } from "shared";
 import { AgencyId, AgencyOption, DepartmentCode } from "shared";
 import { agencyGateway } from "src/config/dependencies";
 import { PostcodeAutocomplete } from "src/app/components/forms/commons/PostcodeAutocomplete";
-import { useConventionTextsFromFormikContext } from "src/app/contents/convention/textSetup";
+import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
 import { AgencyDropdownListField } from "./AgencyDropdownListField";
 import { AgencyErrorText } from "./AgencyErrorText";
 

@@ -20,7 +20,7 @@ import {
 } from "src/app/components/agency/AgencyFormCommonFields";
 import { agencySubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
-import { formAgencyErrorLabels } from "src/app/contents/agency/formAgency";
+import { formAgencyErrorLabels } from "src/app/contents/forms/agency/formAgency";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import "src/assets/admin.css";
 import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";

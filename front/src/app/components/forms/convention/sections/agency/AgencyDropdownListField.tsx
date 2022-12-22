@@ -2,7 +2,7 @@ import { CircularProgress } from "@mui/material";
 import React from "react";
 import { AgencyId, AgencyOption, DepartmentCode } from "shared";
 import { Agencies } from "src/app/components/agency/Agency";
-import { useConventionTextsFromFormikContext } from "src/app/contents/convention/textSetup";
+import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
 
 export type AgencyDropdownListFieldProperties = {
   isLoading: boolean;

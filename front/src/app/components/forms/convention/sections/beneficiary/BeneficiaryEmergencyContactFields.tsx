@@ -1,6 +1,6 @@
 import React from "react";
 import { getConventionFieldName } from "shared";
-import { useConventionTextsFromFormikContext } from "src/app/contents/convention/textSetup";
+import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 
 export type BeneficiaryEmergencyContactFieldsProperties = {

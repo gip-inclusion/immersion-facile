@@ -10,7 +10,7 @@ import {
 } from "shared";
 import { RadioGroup } from "src/app/components/forms/commons/RadioGroup";
 import { UploadLogo } from "src/app/components/UploadLogo";
-import { formAgencyFieldsLabels } from "src/app/contents/agency/formAgency";
+import { formAgencyFieldsLabels } from "src/app/contents/forms/agency/formAgency";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { FillableList } from "src/app/components/forms/commons/FillableList";

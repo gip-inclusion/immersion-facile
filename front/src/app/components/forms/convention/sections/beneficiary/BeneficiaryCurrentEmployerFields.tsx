@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { getConventionFieldName, Role } from "shared";
 import { Notification } from "react-design-system";
-import { useConventionTextsFromFormikContext } from "src/app/contents/convention/textSetup";
+import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { useField } from "formik";
 

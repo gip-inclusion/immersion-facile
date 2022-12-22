@@ -6,7 +6,7 @@ import {
   getConventionFieldName,
   Role,
 } from "shared";
-import { useConventionTextsFromFormikContext } from "src/app/contents/convention/textSetup";
+import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
 

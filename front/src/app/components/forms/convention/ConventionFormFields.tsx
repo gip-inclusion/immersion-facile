@@ -10,7 +10,7 @@ import { SubmitButton } from "src/app/components/forms/convention/SubmitButtons"
 import { useConventionWatchValuesInUrl } from "src/app/components/forms/convention/useConventionWatchValuesInUrl";
 import { ConventionFrozenMessage } from "src/app/components/forms/convention/ConventionFrozenMessage";
 import { ConventionSignOnlyMessage } from "src/app/components/forms/convention/ConventionSignOnlyMessage";
-import { useConventionTextsFromFormikContext } from "src/app/contents/convention/textSetup";
+import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { AgencyFormSection } from "./sections/agency/AgencyFormSection";
 import { BeneficiaryFormSection } from "./sections/beneficiary/BeneficiaryFormSection";

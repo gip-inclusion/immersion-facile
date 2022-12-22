@@ -14,7 +14,7 @@ import {
   isConventionFrozen,
   undefinedIfEmptyString,
 } from "src/app/components/forms/convention/conventionHelpers";
-import { useConventionTexts } from "src/app/contents/convention/textSetup";
+import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";

@@ -6,7 +6,7 @@ import {
   useSiretFetcher,
   useSiretRelatedField,
 } from "src/app/hooks/siret.hooks";
-import { useConventionTextsFromFormikContext } from "src/app/contents/convention/textSetup";
+import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
 import {
   TextInputControlled,
   TextInput,

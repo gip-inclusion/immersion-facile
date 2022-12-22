@@ -1,7 +1,7 @@
 import React from "react";
 import { FederatedIdentity } from "shared";
 import { FormSectionTitle } from "src/app/components/forms/commons/FormSectionTitle";
-import { useConventionTextsFromFormikContext } from "src/app/contents/convention/textSetup";
+import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
 import { ImmersionConditionsCommonFields } from "./ImmersionConditionsCommonFields";
 import { ShareActions } from "../../ShareActions";
 

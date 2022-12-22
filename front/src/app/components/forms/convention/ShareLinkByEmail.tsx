@@ -3,7 +3,7 @@ import { IconButton, Tooltip } from "@mui/material";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 import React, { useState } from "react";
-import { useConventionTextsFromFormikContext } from "src/app/contents/convention/textSetup";
+import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
 import {
   ElementModalContainer,
   useElementContainerModal,

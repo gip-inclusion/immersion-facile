@@ -9,7 +9,7 @@ import { conventionSlice } from "src/core-logic/domain/convention/convention.sli
 import { useTutorIsEstablishmentRepresentative } from "src/app/hooks/convention.hooks";
 import { useSiretFetcher } from "src/app/hooks/siret.hooks";
 import { FormSectionTitle } from "src/app/components/forms/commons/FormSectionTitle";
-import { useConventionTextsFromFormikContext } from "src/app/contents/convention/textSetup";
+import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
 import { EstablishementTutorFields } from "./EstablishementTutorFields";
 import { EstablishmentBusinessFields } from "./EstablishmentBusinessFields";
 import { EstablishmentRepresentativeFields } from "./EstablishmentRepresentativeFields";
