@@ -82,6 +82,21 @@ describe("AssociatePeConnectFederatedIdentity", () => {
     await expect(outboxRepo.events).toHaveLength(0);
   });
 
+  it("authfailed", async () => {
+    const conventionDtoFromEvent = new ConventionDtoBuilder()
+      .withId(conventionId)
+      .withFederatedIdentity("peConnect:AuthFailed")
+      .build();
+
+    await associatePeConnectFederatedIdentity.execute(conventionDtoFromEvent);
+
+    expectObjectsToMatch(
+      conventionPoleEmploiAdvisorRepo.conventionPoleEmploiUsersAdvisors,
+      [],
+    );
+    expectObjectsToMatch(outboxRepo.events, []);
+  });
+
   it("should associate convention and federated identity if the federated identity match format", async () => {
     conventionPoleEmploiAdvisorRepo.setConventionPoleEmploiUsersAdvisor([
       conventionPoleEmploiUserAdvisorFromDto(

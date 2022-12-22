@@ -33,10 +33,19 @@ export class AssociatePeConnectFederatedIdentity extends TransactionalUseCase<Co
       return;
     }
 
+    const peExternalId = toPeExternalId(
+      convention.signatories.beneficiary.federatedIdentity,
+    );
+    if (peExternalId === "AuthFailed") {
+      logger.info(
+        `Convention ${convention.id} federated identity is PeConnect but with failed authentication, aborting AssociatePeConnectFederatedIdentity use case`,
+      );
+      return;
+    }
     const conventionAndPeExternalIds: ConventionAndPeExternalIds =
       await uow.conventionPoleEmploiAdvisorRepository.associateConventionAndUserAdvisor(
         convention.id,
-        toPeExternalId(convention.signatories.beneficiary.federatedIdentity),
+        peExternalId,
       );
 
     const event = this.createNewEvent({
