@@ -8,12 +8,12 @@ import {
 
 import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
 import { AppConfig } from "../../primary/config/appConfig";
+import { httpAdresseApiClient } from "./HttpApiAdresseAddressGateway";
 
 import {
   createHttpOpenCageDataClient,
   HttpOpenCageDataAddressGateway,
   minimumCharErrorMessage,
-  missingDepartmentOnFeatureForPostcode,
   OpenCageDataTargets,
   openCageDataTargets,
 } from "./HttpOpenCageDataAddressGateway";
@@ -55,6 +55,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
   beforeEach(() => {
     httpAddressGateway = new HttpOpenCageDataAddressGateway(
       createHttpOpenCageDataClient<OpenCageDataTargets>(openCageDataTargets),
+      httpAdresseApiClient,
       apiKey,
     );
   });
@@ -306,6 +307,8 @@ describe("HttpOpenCageDataAddressGateway", () => {
       ["69970", "69"],
       ["86000", "86"],
       ["01590", "39"],
+      ["20137", "2A"],
+      ["29120", "29"],
     ])(
       "findDepartmentCodeFromPostCode: postal code %s should return %s",
       async (postcode: string, expected: string) => {
@@ -323,26 +326,6 @@ describe("HttpOpenCageDataAddressGateway", () => {
       );
       expectTypeToMatchAndEqual(result, "06");
     }, 5000);
-
-    it("findDepartmentCodeFromPostCode : BUG should return department code 29 from postcode 29120", async () => {
-      await expectPromiseToFailWithError(
-        httpAddressGateway.findDepartmentCodeFromPostCode("29120"),
-        new Error(
-          missingDepartmentOnFeatureForPostcode("29120", {
-            "ISO_3166-1_alpha-2": "FR",
-            "ISO_3166-1_alpha-3": "FRA",
-            _category: "postcode",
-            _type: "postcode",
-            continent: "Europe",
-            country: "France",
-            country_code: "fr",
-            political_union: "European Union",
-            postcode: "29120",
-            region: "France métropolitaine",
-          }),
-        ),
-      );
-    }, 5000);
   });
 });
 
@@ -352,6 +335,7 @@ describe("HttpOpenCageDataAddressGateway check parrarel call", () => {
     const httpAddressGateway: AddressGateway =
       new HttpOpenCageDataAddressGateway(
         createHttpOpenCageDataClient<OpenCageDataTargets>(openCageDataTargets),
+        httpAdresseApiClient,
         apiKey,
       );
 

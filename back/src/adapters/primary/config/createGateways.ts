@@ -234,6 +234,7 @@ const createAddressGateway = (config: AppConfig) =>
     OPEN_CAGE_DATA: () =>
       new HttpOpenCageDataAddressGateway(
         createHttpOpenCageDataClient<OpenCageDataTargets>(openCageDataTargets),
+        httpAdresseApiClient,
         config.apiKeyOpenCageData,
       ),
     ADRESSE_API: () => new HttpApiAdresseAddressGateway(httpAdresseApiClient),

@@ -12,7 +12,10 @@ import {
   AddressAndPosition,
   AddressDto,
   DepartmentCode,
+  featureToAddressDto,
   GeoPositionDto,
+  ManagedAxios,
+  toFeatureCollection,
 } from "shared";
 import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
 
@@ -35,6 +38,8 @@ export type OpenCageDataTargets = CreateTargets<{
   geocoding: Target<void, QueryParams, void, BaseUrl>;
 }>;
 
+type APIAddressTargetUrls = "apiAddressReverse" | "apiAddressSearchPlainText";
+
 export const openCageDataTargets = createTargets<OpenCageDataTargets>({
   geocoding: {
     method: "GET",
@@ -53,9 +58,24 @@ export const minimumCharErrorMessage = (minLength: number) =>
 export class HttpOpenCageDataAddressGateway implements AddressGateway {
   constructor(
     private readonly httpClient: HttpClient<OpenCageDataTargets>,
+    private readonly APIAddressClient: ManagedAxios<APIAddressTargetUrls>,
     private apiKey: string,
   ) {}
-
+  public async getDepartmentCodeFromAddressAPI(
+    postCode: string,
+  ): Promise<DepartmentCode | null> {
+    const { data } = await this.APIAddressClient.get({
+      target: this.APIAddressClient.targetsUrls.apiAddressSearchPlainText,
+      targetParams: {
+        text: postCode,
+      },
+    });
+    const feature = toFeatureCollection(data).features.at(0);
+    if (!feature) {
+      throw new Error(`No feature on Address API for postCode ${postCode}`);
+    }
+    return featureToAddressDto(feature).departmentCode;
+  }
   public async findDepartmentCodeFromPostCode(
     postCode: string,
   ): Promise<DepartmentCode | null> {
@@ -73,15 +93,8 @@ export class HttpOpenCageDataAddressGateway implements AddressGateway {
       reponse.responseBody as OpenCageDataFeatureCollection
     ).features.at(0);
     if (!feature) throw new Error(missingFeatureForPostcode(postCode));
-
     const department = getDepartmentFromAliases(feature.properties.components);
-    if (!department)
-      throw new Error(
-        missingDepartmentOnFeatureForPostcode(
-          postCode,
-          feature.properties.components,
-        ),
-      );
+    if (!department) return this.getDepartmentCodeFromAddressAPI(postCode);
 
     const departmentCode = departmentNameToDepartmentCode[department];
     if (!departmentCode)
