@@ -1,13 +1,7 @@
 import { AgencyDto } from "shared";
+import { FormField } from "../types";
 
 type ValidationSteps = "oneStep" | "twoSteps";
-
-type FormField = {
-  label: string;
-  description?: string;
-  placeholder?: string;
-  options?: { label: string; value: ValidationSteps }[];
-};
 
 const numberOfStepsOptions: { label: string; value: ValidationSteps }[] = [
   {
@@ -23,7 +17,7 @@ const numberOfStepsOptions: { label: string; value: ValidationSteps }[] = [
 
 export const formAgencyFieldsLabels: Record<
   keyof AgencyDto | "stepsForValidation",
-  FormField
+  FormField<ValidationSteps>
 > = {
   id: {
     label: "Identifiant",
