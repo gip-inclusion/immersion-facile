@@ -90,7 +90,10 @@ const EditionSiretRelatedInputs = ({
         {...getMandatoryLabelAndName("businessName")}
         readOnly={featureFlags.enableInseeApi}
       />
-      <TextInput {...getLabelAndName("businessNameCustomized")} />
+      <TextInput
+        {...getLabelAndName("businessNameCustomized")}
+        autoComplete="organization"
+      />
       <AddressAutocomplete
         initialSearchTerm={businessAddress}
         label={businessLabelAndName.label}

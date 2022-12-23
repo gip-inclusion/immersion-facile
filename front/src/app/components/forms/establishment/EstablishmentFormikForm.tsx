@@ -109,7 +109,7 @@ export const EstablishmentFormikForm = ({
               descriptionLink=""
               disabled={false}
             />
-            <TextInput {...getLabelAndName("website")} />
+            <TextInput {...getLabelAndName("website")} autoComplete="url" />
             <TextInput
               {...getLabelAndName("additionalInformation")}
               multiline={true}

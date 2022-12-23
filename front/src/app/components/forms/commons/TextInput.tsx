@@ -2,6 +2,7 @@ import { useField } from "formik";
 import React, { useEffect } from "react";
 import { ImmersionTextField } from "react-design-system/immersionFacile";
 import { cleanStringToHTMLAttribute } from "shared";
+import { AutocompleteAttributeValue } from "src/../../libs/react-design-system/src/immersionFacile/components/inputs/AutocompleteAttributeValue.type";
 
 type TextInputProps = {
   label: string;
@@ -14,6 +15,7 @@ type TextInputProps = {
   className?: string;
   value?: string;
   readOnly?: boolean;
+  autoComplete?: AutocompleteAttributeValue;
 };
 
 export const TextInput = (props: TextInputProps) => {

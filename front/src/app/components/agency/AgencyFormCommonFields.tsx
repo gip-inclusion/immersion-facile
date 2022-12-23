@@ -50,7 +50,11 @@ export const AgencyFormCommonFields = ({
           a.label < b.label ? -1 : 0,
         )}
       />
-      <TextInput {...formAgencyFieldsLabels.name} name={getName("name")} />
+      <TextInput
+        {...formAgencyFieldsLabels.name}
+        name={getName("name")}
+        autoComplete="organization"
+      />
       <AddressAutocomplete
         {...formAgencyFieldsLabels.address}
         initialSearchTerm={
