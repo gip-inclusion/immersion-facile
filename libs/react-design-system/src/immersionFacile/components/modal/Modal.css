@@ -1,11 +1,11 @@
-.fr-modal__body {
+.fr-modal--legacy .fr-modal__body {
   opacity: 0;
   transform: translateY(2rem);
   transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
   will-change: transform, opacity;
 }
 
-.fr-modal__content-inner {
+.fr-modal--legacy .fr-modal__content-inner {
   max-width: 400px;
   margin: auto;
 }

@@ -39,7 +39,7 @@ export const ModalDialog = ({
   const colSizes = { sm: 4, lg: 8, md: 6 };
   const _colSize = size ? colSizes[size] : null;
   const _className = classNames(
-    "fr-modal",
+    "fr-modal fr-modal--legacy",
 
     {
       "fr-modal--opened": isOpen,
