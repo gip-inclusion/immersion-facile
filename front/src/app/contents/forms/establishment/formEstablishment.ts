@@ -39,7 +39,7 @@ const preferredContactMethodOptions: Array<{
 
 export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
   siret: {
-    label: "Indiquez le SIRET de la structure d'accueil *",
+    label: "Indiquez le SIRET de la structure d'accueil",
     id: "establishment-siret",
     name: "siret",
     required: true,

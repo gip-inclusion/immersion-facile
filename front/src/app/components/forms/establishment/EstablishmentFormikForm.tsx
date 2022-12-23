@@ -1,6 +1,6 @@
 import { Form, Formik } from "formik";
 import React, { useState } from "react";
-import { Notification, Title } from "react-design-system";
+import { ErrorNotifications, Notification, Title } from "react-design-system";
 import {
   FormEstablishmentDto,
   formEstablishmentSchema,
@@ -10,6 +10,8 @@ import {
 import { BoolCheckboxGroup } from "src/app/components/forms/commons/CheckboxGroup";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
+import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
+import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { AppellationList } from "./AppellationList";
 import { BusinessContact } from "./BusinessContact";
 import { fieldsToLabel, FieldsWithLabel } from "./fieldsToLabels";
@@ -39,7 +41,7 @@ export const EstablishmentFormikForm = ({
 }: EstablishmentFormProps) => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<Error | null>(null);
-
+  const { formErrorLabels } = useFormContents(formEstablishmentFieldsLabels);
   let errorMessage = submitError?.message;
   if (
     submitError &&
@@ -150,21 +152,11 @@ export const EstablishmentFormikForm = ({
               </>
             )}
 
-            {submitCount !== 0 && Object.values(errors).length > 0 && (
-              <div style={{ color: "red" }}>
-                Veuillez corriger les champs erronés :
-                <ul>
-                  {(Object.keys(errors) as FieldsWithLabel[]).map((field) => {
-                    const err = errors[field];
-                    return typeof err === "string" ? (
-                      <li key={field}>
-                        {fieldsToLabel[field] || field}: {err}
-                      </li>
-                    ) : null;
-                  })}
-                </ul>
-              </div>
-            )}
+            <ErrorNotifications
+              labels={formErrorLabels}
+              errors={errors as Record<string, string>}
+              visible={submitCount !== 0 && Object.values(errors).length > 0}
+            />
             {submitError && (
               <>
                 <Notification
@@ -182,13 +174,15 @@ export const EstablishmentFormikForm = ({
               </Notification>
             )}
             {!isSuccess && (
-              <button
-                className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"
-                type="submit"
-                disabled={isSubmitting}
-              >
-                Enregistrer mes informations
-              </button>
+              <div className="fr-mt-4w">
+                <button
+                  className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"
+                  type="submit"
+                  disabled={isSubmitting}
+                >
+                  Enregistrer mes informations
+                </button>
+              </div>
             )}
           </Form>
         </>

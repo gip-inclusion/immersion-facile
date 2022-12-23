@@ -32,7 +32,7 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
     required: true,
     name: "name",
     id: "agency-name",
-    autocomplete: "organization",
+    autoComplete: "organization",
   },
   address: {
     label: "Adresse de la structure",
@@ -116,12 +116,3 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
     options: numberOfStepsOptions,
   },
 };
-
-export const formAgencyErrorLabels: Partial<Record<keyof AgencyDto, string>> =
-  Object.keys(formAgencyFieldsLabels).reduce(
-    (sum, field) => ({
-      ...sum,
-      [field]: formAgencyFieldsLabels[field as keyof AgencyDto]?.label,
-    }),
-    {},
-  );

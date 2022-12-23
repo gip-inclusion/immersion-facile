@@ -8,5 +8,5 @@ export type FormField<OptionValue = void> = {
   name: string;
   options?: { label: string; value: OptionValue }[];
   required?: boolean;
-  autocomplete?: AutocompleteAttributeValue;
+  autoComplete?: AutocompleteAttributeValue;
 };

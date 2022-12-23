@@ -19,7 +19,8 @@ import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout
 import { AgencySubmitFeedback } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
 import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
 import { v4 as uuidV4 } from "uuid";
-import { formAgencyErrorLabels } from "../../contents/forms/agency/formAgency";
+import { useFormContents } from "src/app/hooks/formContents.hooks";
+import { formAgencyFieldsLabels } from "src/app/contents/forms/agency/formAgency";
 
 const initialValues: (id: AgencyDto["id"]) => CreateAgencyDto = (id) => ({
   id,
@@ -46,7 +47,7 @@ export const AddAgencyPage = () => {
   const [submitFeedback, setSubmitFeedback] = useState<AgencySubmitFeedback>({
     kind: "idle",
   });
-
+  const { formErrorLabels } = useFormContents(formAgencyFieldsLabels);
   return (
     <HeaderFooterLayout>
       <MainWrapper layout="boxed">
@@ -74,7 +75,7 @@ export const AddAgencyPage = () => {
               <AgencyFormCommonFields />
               <AgencyLogoUpload />
               <ErrorNotifications
-                labels={formAgencyErrorLabels}
+                labels={formErrorLabels}
                 errors={errors as Record<string, string>}
                 visible={submitCount !== 0 && Object.values(errors).length > 0}
               />
