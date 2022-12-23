@@ -15,16 +15,19 @@ const numberOfStepsOptions: { label: string; value: ValidationSteps }[] = [
   },
 ];
 
-export const formAgencyFieldsLabels: Record<
+export type FormAgencyFieldsLabels = Record<
   keyof AgencyDto | "stepsForValidation",
   FormField<ValidationSteps>
-> = {
+>;
+
+export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
   id: {
     label: "Identifiant",
   },
   name: {
     label: "Nom de l'organisme *",
     placeholder: "Agence de Boulogne-Billancourt",
+    required: true,
   },
   address: {
     label: "Adresse de la structure *",

@@ -16,6 +16,7 @@ import { AddressAutocomplete } from "src/app/components/forms/autocomplete/Addre
 import { FillableList } from "src/app/components/forms/commons/FillableList";
 import { SimpleSelect } from "src/app/components/forms/commons/SimpleSelect";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
+import { useFormContents } from "src/app/hooks/formContents.hooks";
 
 const getName = (name: keyof CreateAgencyDto) => name;
 
@@ -39,11 +40,12 @@ export const AgencyFormCommonFields = ({
   const [validationSteps, setValidationSteps] = useState<
     "oneStep" | "twoSteps"
   >(defaultValidationStepsValue);
-
+  const { formatFieldLabel } = useFormContents(formAgencyFieldsLabels);
   return (
     <>
       <SimpleSelect
         {...formAgencyFieldsLabels.kind}
+        label={formatFieldLabel(formAgencyFieldsLabels.kind)}
         id="agency-kind"
         name={getName("kind")}
         options={agencyListOfOptions.sort((a, b) =>

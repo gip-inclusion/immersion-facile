@@ -13,8 +13,13 @@ type FormEstablishmentField =
     >
   | "businessContact";
 
+export type FormEstablishmentFieldsLabels = Record<
+  FormEstablishmentField,
+  FormField | Record<keyof BusinessContactDto, FormField<ContactMethod>>
+>;
+
 const preferredContactMethodOptions: Array<{
-  label?: string;
+  label: string;
   value: ContactMethod;
 }> = [
   {
@@ -33,10 +38,7 @@ const preferredContactMethodOptions: Array<{
   },
 ];
 
-export const formEstablishmentFieldsLabels: Record<
-  FormEstablishmentField,
-  FormField | Record<keyof BusinessContactDto, FormField>
-> = {
+export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
   siret: {
     label: "Indiquez le SIRET de la structure d'accueil *",
 
@@ -106,18 +108,24 @@ export const formEstablishmentFieldsLabels: Record<
 };
 
 export const getFieldLabel = (key: FormEstablishmentField) => {
-  const { label, required } = path(key, formEstablishmentFieldsLabels);
-  return `${label}${required ?? " *"}`;
+  const field = path(key, formEstablishmentFieldsLabels);
+  if ("label" in field) {
+    return `${field.label}${field.required ?? " *"}`;
+  }
 };
 
 export const formEstablishmentErrorLabels: Partial<
-  Record<keyof FormEstablishmentDto, string>
-> = Object.keys(formEstablishmentFieldsLabels).reduce(
-  (sum, field) => ({
+  Record<FormEstablishmentField, string>
+> = (
+  Object.keys(formEstablishmentFieldsLabels) as FormEstablishmentField[]
+).reduce((sum, key: FormEstablishmentField) => {
+  let value;
+  const field = path(key, formEstablishmentFieldsLabels);
+  if ("label" in field) {
+    value = field.label;
+  }
+  return {
     ...sum,
-    [field]:
-      formEstablishmentFieldsLabels[field as keyof FormEstablishmentField]
-        ?.label,
-  }),
-  {},
-);
+    [key]: value,
+  };
+}, {});
