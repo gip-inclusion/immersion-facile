@@ -1,4 +1,5 @@
 import React from "react";
+import { AutocompleteAttributeValue } from "./AutocompleteAttributeValue.type";
 
 export type InputProperties = {
   name: string;
@@ -14,6 +15,7 @@ export type InputProperties = {
   disabled?: boolean;
   id?: string;
   readOnly?: boolean;
+  autoComplete?: AutocompleteAttributeValue;
 };
 export const Input = ({
   name,
@@ -27,6 +29,7 @@ export const Input = ({
   disabled,
   id,
   readOnly,
+  autoComplete,
 }: InputProperties): JSX.Element => (
   <input
     id={id}
@@ -41,5 +44,6 @@ export const Input = ({
     aria-describedby="text-input-error-desc-error"
     disabled={disabled}
     readOnly={readOnly}
+    autoComplete={autoComplete}
   />
 );

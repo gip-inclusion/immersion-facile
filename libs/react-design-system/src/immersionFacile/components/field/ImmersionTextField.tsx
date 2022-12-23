@@ -1,5 +1,6 @@
 import React from "react";
 import { Input, InputGroup, TextArea, TextInputError } from "../inputs";
+import { AutocompleteAttributeValue } from "../inputs/AutocompleteAttributeValue.type";
 import { Label } from "../label";
 import { FieldDescription } from "./FieldDescription";
 
@@ -21,6 +22,7 @@ export interface ImmersionTextFieldProps {
   type?: string;
   id?: string;
   readOnly?: boolean;
+  autoComplete?: AutocompleteAttributeValue;
 }
 
 export const ImmersionTextField = ({
@@ -39,6 +41,7 @@ export const ImmersionTextField = ({
   name,
   id,
   readOnly,
+  autoComplete,
 }: ImmersionTextFieldProps) => (
   <InputGroup className={className} error={error}>
     <Label label={label} htmlFor={id} />
@@ -72,6 +75,7 @@ export const ImmersionTextField = ({
           disabled,
           id,
           readOnly,
+          autoComplete,
         }}
       />
     )}
