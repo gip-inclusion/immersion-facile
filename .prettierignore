@@ -1,7 +1,7 @@
 /dist
 coverage/
 node_modules/
-src/assets/
+front/src/assets/
 .git/
 .idea/
 .angular/

@@ -5,3 +5,4 @@ node_modules/
 .git/
 vite.config.ts
 cypress
+front/src/assets/
