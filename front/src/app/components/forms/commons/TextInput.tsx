@@ -2,7 +2,7 @@ import { useField } from "formik";
 import React, { useEffect } from "react";
 import { ImmersionTextField } from "react-design-system/immersionFacile";
 import { cleanStringToHTMLAttribute } from "shared";
-import { AutocompleteAttributeValue } from "src/../../libs/react-design-system/src/immersionFacile/components/inputs/AutocompleteAttributeValue.type";
+import type { AutocompleteAttributeValue } from "react-design-system/immersionFacile";
 
 type TextInputProps = {
   label: string;
