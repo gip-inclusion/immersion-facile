@@ -4,7 +4,7 @@ import * as React from "react";
 
 type SimpleSelectProps = {
   label: string;
-  id: string;
+  id?: string;
   name: string;
   options: Array<{ value: string; label: string }>;
   className?: string;

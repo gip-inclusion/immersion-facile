@@ -41,24 +41,23 @@ export const AgencyFormCommonFields = ({
     "oneStep" | "twoSteps"
   >(defaultValidationStepsValue);
   const { formatFieldLabel } = useFormContents(formAgencyFieldsLabels);
+
   return (
     <>
       <SimpleSelect
         {...formAgencyFieldsLabels.kind}
         label={formatFieldLabel(formAgencyFieldsLabels.kind)}
-        id="agency-kind"
-        name={getName("kind")}
         options={agencyListOfOptions.sort((a, b) =>
           a.label < b.label ? -1 : 0,
         )}
       />
       <TextInput
         {...formAgencyFieldsLabels.name}
-        name={getName("name")}
-        autoComplete="organization"
+        label={formatFieldLabel(formAgencyFieldsLabels.name)}
       />
       <AddressAutocomplete
         {...formAgencyFieldsLabels.address}
+        label={formatFieldLabel(formAgencyFieldsLabels.address)}
         initialSearchTerm={
           addressInitialValue && addressDtoToString(addressInitialValue)
         }
@@ -68,16 +67,15 @@ export const AgencyFormCommonFields = ({
         }}
       />
       <RadioGroup
-        id="steps-for-validation"
+        {...formAgencyFieldsLabels.stepsForValidation}
         currentValue={validationSteps}
         setCurrentValue={setValidationSteps}
-        groupLabel={formAgencyFieldsLabels.stepsForValidation.label}
-        options={formAgencyFieldsLabels.stepsForValidation.options}
+        groupLabel={formatFieldLabel(formAgencyFieldsLabels.stepsForValidation)}
       />
       {validationSteps === "twoSteps" && (
         <FillableList
           {...formAgencyFieldsLabels.counsellorEmails}
-          name="counsellor-emails"
+          label={formatFieldLabel(formAgencyFieldsLabels.counsellorEmails)}
           valuesInList={values.counsellorEmails}
           setValues={typedSetField("counsellorEmails")}
           validationSchema={zEmail}
@@ -86,7 +84,7 @@ export const AgencyFormCommonFields = ({
 
       <FillableList
         {...formAgencyFieldsLabels.validatorEmails}
-        name="validator-emails"
+        label={formatFieldLabel(formAgencyFieldsLabels.validatorEmails)}
         description={descriptionByValidationSteps[validationSteps]}
         valuesInList={values.validatorEmails}
         setValues={typedSetField("validatorEmails")}
@@ -102,7 +100,7 @@ export const AgencyFormCommonFields = ({
 
       <TextInput
         {...formAgencyFieldsLabels.signature}
-        name={getName("signature")}
+        label={formatFieldLabel(formAgencyFieldsLabels.signature)}
       />
     </>
   );
@@ -119,8 +117,8 @@ export const AgencyLogoUpload = () => {
       <UploadLogo
         setFileUrl={typedSetField("logoUrl")}
         maxSize_Mo={2}
-        label="Changer le logo"
-        hint="Cela permet de personnaliser les mails automatisés."
+        {...formAgencyFieldsLabels.logoUrl}
+        hint={formAgencyFieldsLabels.logoUrl.description}
       />
       {values.logoUrl && (
         <img src={values.logoUrl} alt="uploaded-logo" width="100px" />

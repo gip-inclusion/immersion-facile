@@ -1,10 +1,34 @@
 import { useFormikContext } from "formik";
 import React from "react";
-import { BusinessContactDto, FormEstablishmentDto, zEmail } from "shared";
+import {
+  BusinessContactDto,
+  ContactMethod,
+  FormEstablishmentDto,
+  zEmail,
+} from "shared";
 import { RadioGroupForField } from "src/app/components/forms/commons/RadioGroup";
 import { FillableList } from "src/app/components/forms/commons/FillableList";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
-import { getFieldLabel } from "src/app/contents/forms/establishment/formEstablishment";
+
+const preferredContactMethodOptions: Array<{
+  label?: string;
+  value: ContactMethod;
+}> = [
+  {
+    value: "EMAIL",
+    label:
+      "Par mail (la demande passera par un formulaire afin de ne pas exposer l'adresse mail)",
+  },
+  {
+    value: "PHONE",
+    label:
+      "Par téléphone (seuls les candidats identifiés auront accès au numéro de téléphone)",
+  },
+  {
+    value: "IN_PERSON",
+    label: "Se présenter en personne à votre établissement",
+  },
+];
 
 export const BusinessContact = () => {
   const parentFieldName: keyof FormEstablishmentDto = "businessContact";
@@ -17,10 +41,7 @@ export const BusinessContact = () => {
         <h2 className="fr-text--lead">Détails du correspondant immersion :</h2>
         <p>Le correspondant reçoit les demandes et les traite.</p>
       </div>
-      <TextInput
-        label={getFieldLabel("businessContact.lastName")}
-        name={makeName("lastName")}
-      />
+      <TextInput label="Nom du référent *" name={makeName("lastName")} />
       <TextInput label="Prénom du référent *" name={makeName("firstName")} />
       <TextInput label="Fonction du référent *" name={makeName("job")} />
       <TextInput
