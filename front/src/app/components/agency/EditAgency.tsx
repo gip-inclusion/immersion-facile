@@ -20,7 +20,6 @@ import {
 } from "src/app/components/agency/AgencyFormCommonFields";
 import { agencySubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
-import { formAgencyErrorLabels } from "src/app/contents/forms/agency/formAgency";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import "src/assets/admin.css";
 import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
@@ -30,6 +29,8 @@ import { SimpleSelect } from "src/app/components/forms/commons/SimpleSelect";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
 import { AgencyAutocomplete } from "./AgencyAutocomplete";
+import { useFormContents } from "src/app/hooks/formContents.hooks";
+import { formAgencyFieldsLabels } from "src/app/contents/forms/agency/formAgency";
 
 export const EditAgency = () => (
   <>
@@ -67,6 +68,7 @@ const EditAgencyForm = () => {
   const dispatch = useDispatch();
   const feedback = useAppSelector(agencyAdminSelectors.feedback);
   const agency = useAppSelector(agencyAdminSelectors.agency);
+  const { formErrorLabels } = useFormContents(formAgencyFieldsLabels);
 
   if (!agency) return null;
   return (
@@ -117,7 +119,7 @@ const EditAgencyForm = () => {
                 <AgencyLogoUpload />
               </div>
               <ErrorNotifications
-                labels={formAgencyErrorLabels}
+                labels={formErrorLabels}
                 errors={errors as Record<string, string>}
                 visible={submitCount !== 0 && Object.values(errors).length > 0}
               />
