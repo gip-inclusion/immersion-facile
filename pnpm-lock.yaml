@@ -185,6 +185,7 @@ importers:
       '@types/ramda': ^0.28.1
       '@types/react': ^17.0.41
       '@types/react-dom': ^17.0.14
+      '@types/react-helmet': ^6.1.6
       '@types/react-redux': ^7.1.23
       '@types/uuid': ^8.3.4
       '@vitejs/plugin-react': ^2.1.0
@@ -204,6 +205,7 @@ importers:
       react: ^17.0.2
       react-design-system: workspace:*
       react-dom: ^17.0.2
+      react-helmet: ^6.1.0
       react-redux: ^7.2.8
       redux: ^4.2.0
       redux-observable: ^2.0.0
@@ -223,6 +225,7 @@ importers:
       '@mui/icons-material': 5.8.0_thescs6epir3llb7jldxow7if4
       '@mui/material': 5.8.0_zdaquy43folvhsznh4trclztdq
       '@reduxjs/toolkit': 1.8.1_bjryulbxll5jujtwpu5a2wm2cy
+      '@types/react-helmet': 6.1.6
       axios: 0.26.1
       date-fns: 2.28.0
       eslint: 8.16.0
@@ -235,6 +238,7 @@ importers:
       react: 17.0.2
       react-design-system: link:../libs/react-design-system
       react-dom: 17.0.2_react@17.0.2
+      react-helmet: 6.1.0_react@17.0.2
       react-redux: 7.2.8_sfoxds7t5ydpegc3knd667wn6m
       redux: 4.2.0
       redux-observable: 2.0.0_redux@4.2.0
@@ -1985,7 +1989,6 @@ packages:
     dependencies:
       '@babel/core': 7.18.0
       '@babel/helper-plugin-utils': 7.17.12
-    dev: false
 
   /@babel/plugin-syntax-jsx/7.17.12_@babel+core@7.18.2:
     resolution: {integrity: sha512-spyY3E3AURfxh/RHtjx5j6hs8am5NbUBGfcZ2vB3uShSpZdQyXSf5rR5Mk76vbtlAZOelyVQ71Fg0x9SG4fsog==}
@@ -4244,7 +4247,6 @@ packages:
       find-root: 1.1.0
       source-map: 0.5.7
       stylis: 4.0.13
-    dev: false
 
   /@emotion/babel-plugin/11.9.2_@babel+core@7.18.2:
     resolution: {integrity: sha512-Pr/7HGH6H6yKgnVFNEj2MVlreu3ADqftqjqwUvDy/OJzKFgxKeTQ+eeUf20FOTuHVkDON2iNa25rAXVYtWJCjw==}
@@ -4307,7 +4309,6 @@ packages:
       '@types/react': 17.0.45
       hoist-non-react-statics: 3.3.2
       react: 17.0.2
-    dev: false
 
   /@emotion/react/11.9.0_ddpcdz72weezmodm7yk4v5n3v4:
     resolution: {integrity: sha512-lBVSF5d0ceKtfKCDQJveNAtkC7ayxpVlgOohLgXqRwqWr9bOf4TZAFFyIcNngnV6xK6X4x2ZeXq7vliHkoVkxQ==}
@@ -4366,7 +4367,6 @@ packages:
       '@emotion/utils': 1.1.0
       '@types/react': 17.0.45
       react: 17.0.2
-    dev: false
 
   /@emotion/styled/11.8.1_74quhjy2o5fky35ibrqgdmklba:
     resolution: {integrity: sha512-OghEVAYBZMpEquHZwuelXcRjRJQOVayvbmNR0zr174NHdmMgrNkLC6TljKC5h9lZLkN5WGrdUcrKlOJ4phhoTQ==}
@@ -5088,8 +5088,8 @@ packages:
     dependencies:
       '@babel/runtime': 7.18.0
       '@emotion/cache': 11.7.1
-      '@emotion/react': 11.9.0_ddpcdz72weezmodm7yk4v5n3v4
-      '@emotion/styled': 11.8.1_74quhjy2o5fky35ibrqgdmklba
+      '@emotion/react': 11.9.0_citxzijaigt45he3z6kuy2ivbq
+      '@emotion/styled': 11.8.1_3mkbovqfrbpc53bljqhapolzfu
       prop-types: 15.8.1
       react: 17.0.2
 
@@ -7007,6 +7007,12 @@ packages:
     dependencies:
       '@types/react': 17.0.45
     dev: true
+
+  /@types/react-helmet/6.1.6:
+    resolution: {integrity: sha512-ZKcoOdW/Tg+kiUbkFCBtvDw0k3nD4HJ/h/B9yWxN4uDO8OkRksWTO+EL+z/Qu3aHTeTll3Ro0Cc/8UhwBCMG5A==}
+    dependencies:
+      '@types/react': 17.0.45
+    dev: false
 
   /@types/react-is/17.0.3:
     resolution: {integrity: sha512-aBTIWg1emtu95bLTLx0cpkxwGW3ueZv71nE2YFBpL8k/z5czEW8yYpOo8Dp+UUAFAtKwNaOsh/ioSeQnWlZcfw==}
@@ -15871,6 +15877,18 @@ packages:
     resolution: {integrity: sha512-rtGImPZ0YyLrscKI9xTpV8psd6I8VAtjKCzQDlzyDvqJA8XOW78TXYQwNRNd8g8JZnDu8q9Fu/1v4HPAVwVdHA==}
     dev: false
 
+  /react-helmet/6.1.0_react@17.0.2:
+    resolution: {integrity: sha512-4uMzEY9nlDlgxr61NL3XbKRy1hEkXmKNXhjbAIOVw5vcFrsdYbH2FEwcNyWvWinl103nXgzYNlns9ca+8kFiWw==}
+    peerDependencies:
+      react: '>=16.3.0'
+    dependencies:
+      object-assign: 4.1.1
+      prop-types: 15.8.1
+      react: 17.0.2
+      react-fast-compare: 3.2.0
+      react-side-effect: 2.1.2_react@17.0.2
+    dev: false
+
   /react-inspector/5.1.1_react@17.0.2:
     resolution: {integrity: sha512-GURDaYzoLbW8pMGXwYPDBIv6nqei4kK7LPRZ9q9HCZF54wqXz/dnylBp/kfE9XmekBhHvLDdcYeyIwSrvtOiWg==}
     peerDependencies:
@@ -15955,6 +15973,14 @@ packages:
     resolution: {integrity: sha512-wViHqhAd8OHeLS/IRMJjTSDHF3U9eWi62F/MledQGPdJGDhodXJ9PBLNGr6WWL7qlH12Mt3TyTpbS+hGXMjCzQ==}
     engines: {node: '>=0.10.0'}
     dev: true
+
+  /react-side-effect/2.1.2_react@17.0.2:
+    resolution: {integrity: sha512-PVjOcvVOyIILrYoyGEpDN3vmYNLdy1CajSFNt4TDsVQC5KpTijDvWVoR+/7Rz2xT978D8/ZtFceXxzsPwZEDvw==}
+    peerDependencies:
+      react: ^16.3.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 17.0.2
+    dev: false
 
   /react-syntax-highlighter/15.5.0_react@17.0.2:
     resolution: {integrity: sha512-+zq2myprEnQmH5yw6Gqc8lD55QHnpKaU8TOcFeC/Lg/MQSs8UknEA0JC4nTZGFAXC2J2Hyj/ijJ7NlabyPi2gg==}
