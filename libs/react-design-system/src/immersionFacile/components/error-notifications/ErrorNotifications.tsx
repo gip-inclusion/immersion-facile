@@ -4,7 +4,7 @@ import { Notification } from "../notification";
 const componentName = "im-notification-errors";
 
 type ErrorNotificationsProps = {
-  labels?: Record<string, string>;
+  labels?: Record<string, string | undefined>;
   errors: Record<string, string>;
   visible: boolean;
 };
@@ -14,7 +14,7 @@ const ErrorMessage = ({
   field,
   error,
 }: {
-  labels?: Record<string, string>;
+  labels?: Record<string, string | undefined>;
   field: string;
   error: string | object;
 }) => (

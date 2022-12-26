@@ -15,11 +15,9 @@ import { AddressAutocomplete } from "src/app/components/forms/autocomplete/Addre
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { Route } from "type-route";
 import { ApiDataContainer } from "../admin/ApiDataContainer";
-import {
-  EstablishmentFormikForm,
-  getLabelAndName,
-  getMandatoryLabelAndName,
-} from "src/app/components/forms/establishment/EstablishmentFormikForm";
+import { EstablishmentFormikForm } from "src/app/components/forms/establishment/EstablishmentFormikForm";
+import { useFormContents } from "src/app/hooks/formContents.hooks";
+import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 
 export const EstablishmentEditionFormPage = ({
   route,
@@ -78,25 +76,23 @@ const EditionSiretRelatedInputs = ({
   businessAddress: string;
 }) => {
   const featureFlags = useFeatureFlags();
-  const businessLabelAndName = getMandatoryLabelAndName("businessAddress");
+  const { getFormFields } = useFormContents(formEstablishmentFieldsLabels);
+  const formContents = getFormFields();
   const [_, __, { setValue: setAddressValue }] = useField<string>(
-    businessLabelAndName.name,
+    formContents.businessName.name,
   );
 
   return (
     <>
-      <TextInput {...getMandatoryLabelAndName("siret")} disabled={true} />
+      <TextInput {...formContents.siret} disabled={true} />
       <TextInput
-        {...getMandatoryLabelAndName("businessName")}
+        {...formContents.businessName}
         readOnly={featureFlags.enableInseeApi}
       />
-      <TextInput
-        {...getLabelAndName("businessNameCustomized")}
-        autoComplete="organization"
-      />
+      <TextInput {...formContents.businessNameCustomized} />
       <AddressAutocomplete
         initialSearchTerm={businessAddress}
-        label={businessLabelAndName.label}
+        {...formContents.businessNameCustomized}
         setFormValue={({ address }) =>
           setAddressValue(addressDtoToString(address))
         }

@@ -1,41 +1,18 @@
-import {
-  BusinessContactDto,
-  ContactMethod,
-  FormEstablishmentDto,
-} from "shared";
-import { FormField } from "../types";
+import { BusinessContactDto, FormEstablishmentDto } from "shared";
+import { FormFieldsObject } from "src/app/hooks/formContents.hooks";
+import { FormFieldAttributes } from "../types";
 
-type FormEstablishmentField =
+type FormEstablishmentField = Partial<
   | Exclude<
-      keyof Partial<FormEstablishmentDto>,
+      keyof FormEstablishmentDto,
       "id" | "naf" | "businessContact" | "source" | "isSearchable"
     >
-  | "businessContact";
-
-export type FormEstablishmentFieldsLabels = Record<
-  FormEstablishmentField,
-  FormField | Record<keyof BusinessContactDto, FormField<ContactMethod>>
+  | `businessContact.${keyof BusinessContactDto}`
 >;
 
-const preferredContactMethodOptions: Array<{
-  label: string;
-  value: ContactMethod;
-}> = [
-  {
-    value: "EMAIL",
-    label:
-      "Par mail (la demande passera par un formulaire afin de ne pas exposer l'adresse mail)",
-  },
-  {
-    value: "PHONE",
-    label:
-      "Par téléphone (seuls les candidats identifiés auront accès au numéro de téléphone)",
-  },
-  {
-    value: "IN_PERSON",
-    label: "Se présenter en personne à votre établissement",
-  },
-];
+export type FormEstablishmentFieldsLabels = FormFieldsObject<
+  Record<FormEstablishmentField, FormFieldAttributes>
+>;
 
 export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
   siret: {
@@ -56,6 +33,7 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
       "Indiquez le nom de l'enseigne de l'établissement d'accueil, si elle diffère de la raison sociale",
     id: "establishment-businessNameCustomized",
     name: "businessNameCustomized",
+    autoComplete: "organization",
   },
   businessAddress: {
     label: "Vérifiez l'adresse de votre établissement",
@@ -63,51 +41,48 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
     id: "establishment-businessAddress",
     name: "businessAddress",
   },
-  businessContact: {
-    lastName: {
-      label: "Nom du référent",
-      required: true,
-      id: "establishment-businessContact-lastName",
-      name: "businessContact.lastName",
-    },
-    firstName: {
-      label: "Prénom du référent",
-      required: true,
-      id: "establishment-businessContact-firstName",
-      name: "businessContact.firstName",
-    },
-    job: {
-      label: "Fonction du référent",
-      required: true,
-      id: "establishment-businessContact-job",
-      name: "businessContact.job",
-    },
-    phone: {
-      label: "Numéro de téléphone (ne sera pas communiqué directement)",
-      required: true,
-      id: "establishment-businessContact-phone",
-      name: "businessContact.phone",
-    },
-    email: {
-      label: "Email",
-      required: true,
-      id: "establishment-businessContact-email",
-      name: "businessContact.email",
-    },
-    copyEmails: {
-      label: "Autres destinataires",
-      description: "Adresses mail à mettre en copie",
-      placeholder: "cc1@mail.com, cc2@mail.com",
-      id: "establishment-businessContact-copyEmails",
-      name: "businessContact.copyEmails",
-    },
-    contactMethod: {
-      label: "Comment souhaitez-vous que les candidats vous contactent ?",
-      options: preferredContactMethodOptions,
-      required: true,
-      id: "establishment-businessContact-contactMethod",
-      name: "businessContact.contactMethod",
-    },
+  "businessContact.lastName": {
+    label: "Nom du référent",
+    required: true,
+    id: "establishment-businessContact-lastName",
+    name: "businessContact.lastName",
+  },
+  "businessContact.firstName": {
+    label: "Prénom du référent",
+    required: true,
+    id: "establishment-businessContact-firstName",
+    name: "businessContact.firstName",
+  },
+  "businessContact.job": {
+    label: "Fonction du référent",
+    required: true,
+    id: "establishment-businessContact-job",
+    name: "businessContact.job",
+  },
+  "businessContact.phone": {
+    label: "Numéro de téléphone (ne sera pas communiqué directement)",
+    required: true,
+    id: "establishment-businessContact-phone",
+    name: "businessContact.phone",
+  },
+  "businessContact.email": {
+    label: "Email",
+    required: true,
+    id: "establishment-businessContact-email",
+    name: "businessContact.email",
+  },
+  "businessContact.copyEmails": {
+    label: "Autres destinataires",
+    description: "Adresses mail à mettre en copie",
+    placeholder: "cc1@mail.com, cc2@mail.com",
+    id: "establishment-businessContact-copyEmails",
+    name: "businessContact.copyEmails",
+  },
+  "businessContact.contactMethod": {
+    label: "Comment souhaitez-vous que les candidats vous contactent ?",
+    required: true,
+    id: "establishment-businessContact-contactMethod",
+    name: "businessContact.contactMethod",
   },
   isEngagedEnterprise: {
     label:
@@ -119,7 +94,6 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
     label: "",
     description: undefined,
     placeholder: undefined,
-    options: undefined,
     id: "establishment-appellations",
     name: "appellations",
   },

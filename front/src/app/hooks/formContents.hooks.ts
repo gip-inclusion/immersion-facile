@@ -1,55 +1,56 @@
-import { path } from "shared";
-import { FormAgencyFieldsLabels } from "../contents/forms/agency/formAgency";
-import { FormEstablishmentFieldsLabels } from "../contents/forms/establishment/formEstablishment";
-import { FormField } from "../contents/forms/types";
+import { FormFieldAttributes } from "../contents/forms/types";
 
-type FormFieldsLabels = Partial<
-  FormAgencyFieldsLabels & FormEstablishmentFieldsLabels
->;
+export type FormFieldsObject<T> = Record<keyof T, FormFieldAttributes>;
 
-const formatFieldLabel = (field: FormField<unknown>) =>
+type FormFieldsKeys<T> = keyof FormFieldsObject<T>;
+
+const defaultField: FormFieldAttributes = {
+  label: "field label not set",
+  id: "field-id-not-set",
+  name: "field-name-not-set",
+};
+
+const formatFieldLabel = (field: FormFieldAttributes) =>
   `${field.label}${field.required ? " *" : ""}`;
 
-const getFormErrorLabels = (formFieldsLabels: FormFieldsLabels) =>
-  Object.keys(formFieldsLabels).reduce((sum, key) => {
-    let value;
-    const field = path(key as keyof FormFieldsLabels, formFieldsLabels);
-    if (field && "label" in field) {
-      value = field.label;
-    }
-    return {
-      ...sum,
-      [key]: value,
-    };
-  }, {});
+const getFormErrors =
+  <T>(formFieldsLabels: FormFieldsObject<T>) =>
+  () =>
+    Object.fromEntries(
+      Object.keys(formFieldsLabels).map((key) => [
+        key,
+        formFieldsLabels[key as FormFieldsKeys<T>]?.label,
+      ]),
+    );
+const getFormFieldAttributes = <T>(
+  key: FormFieldsKeys<T>,
+  formFieldsLabels: FormFieldsObject<T>,
+) => {
+  const field = formFieldsLabels[key];
+  const formattedField = {
+    ...defaultField,
+    ...(field ? field : {}),
+    label: field ? formatFieldLabel(field) : defaultField.label,
+    name: key,
+  };
+  return formattedField;
+};
 
-// const getFormField = (
-//   key: keyof FormFieldsLabels,
-//   formFieldsLabels: FormFieldsLabels,
-// ) => {
-//   const field = path(key, formFieldsLabels);
-//   if (field && "label" in field) {
-//     field.label = formatFieldLabel(key, formFieldsLabels);
-//   }
-//   return (
-//     field || {
-//       label: "field not set",
-//     }
-//   );
-// };
+const getFormFields =
+  <T>(formFieldsLabels: FormFieldsObject<T>) =>
+  () =>
+    Object.keys(formFieldsLabels).reduce(
+      (sum, key) => ({
+        ...sum,
+        [key]: getFormFieldAttributes(
+          key as FormFieldsKeys<T>,
+          formFieldsLabels,
+        ),
+      }),
+      formFieldsLabels,
+    );
 
-// const getFormFields = (
-//   formFieldsLabels: FormFieldsLabels,
-// ): Partial<Record<keyof FormFieldsLabels, FormFieldsLabels>> =>
-//   Object.keys(formFieldsLabels).reduce(
-//     (sum, key) => ({
-//       ...sum,
-//       [key]: getFormField(key as keyof FormFieldsLabels, formFieldsLabels),
-//     }),
-//     {},
-//   );
-
-export const useFormContents = (formFieldsLabels: FormFieldsLabels) => ({
-  formErrorLabels: getFormErrorLabels(formFieldsLabels),
-  formatFieldLabel,
+export const useFormContents = <T>(formFieldsLabels: FormFieldsObject<T>) => ({
+  getFormErrors: getFormErrors(formFieldsLabels),
+  getFormFields: getFormFields(formFieldsLabels),
 });

@@ -2,7 +2,7 @@ import { FormControl, InputBase, MenuItem, Select } from "@mui/material";
 import { useField } from "formik";
 import * as React from "react";
 
-type SimpleSelectProps = {
+export type SimpleSelectProps = {
   label: string;
   id?: string;
   name: string;

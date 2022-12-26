@@ -23,11 +23,9 @@ import {
   TextInputControlled,
 } from "src/app/components/forms/commons/TextInput";
 import { defaultInitialValue } from "./defaultInitialValue";
-import {
-  EstablishmentFormikForm,
-  getLabelAndName,
-  getMandatoryLabelAndName,
-} from "./EstablishmentFormikForm";
+import { EstablishmentFormikForm } from "./EstablishmentFormikForm";
+import { useFormContents } from "src/app/hooks/formContents.hooks";
+import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 
 type EstablishmentCreationFormProps = {
   source: FormEstablishmentSource;
@@ -70,22 +68,21 @@ const CreationSiretRelatedInputs = () => {
 
   const [requestEmailToEditFormError, setRequestEmailToEditFormError] =
     useState<string | null>(null);
-
+  const { getFormFields } = useFormContents(formEstablishmentFieldsLabels);
+  const formContents = getFormFields();
   useSiretRelatedField("businessName");
   useSiretRelatedField("businessAddress");
   useSiretRelatedField("naf");
   const featureFlags = useFeatureFlags();
 
-  const businessLabelAndName = getMandatoryLabelAndName("businessAddress");
-
   const [_, __, { setValue: setAddressValue }] = useField<string>(
-    businessLabelAndName.name,
+    formContents.businessName.name,
   );
   useEffect(() => () => updateSiret(""), []);
   return (
     <>
       <TextInputControlled
-        {...getMandatoryLabelAndName("siret")}
+        {...formContents.siret}
         value={currentSiret}
         setValue={updateSiret}
         error={siretErrorToDisplay}
@@ -132,16 +129,16 @@ const CreationSiretRelatedInputs = () => {
       )}
 
       <TextInput
-        {...getMandatoryLabelAndName("businessName")}
+        {...formContents.businessName}
         readOnly={featureFlags.enableInseeApi}
       />
       <TextInput
-        {...getLabelAndName("businessNameCustomized")}
+        {...formContents.businessNameCustomized}
         disabled={isFetchingSiret}
       />
       <AddressAutocomplete
         initialSearchTerm={establishmentInfos?.businessAddress}
-        label={businessLabelAndName.label}
+        {...formContents.businessAddress}
         setFormValue={({ address }) =>
           setAddressValue(addressDtoToString(address))
         }

@@ -1,12 +1,11 @@
 import { AutocompleteAttributeValue } from "react-design-system";
 
-export type FormField<OptionValue = void> = {
+export type FormFieldAttributes = {
   label: string;
   description?: string;
   placeholder?: string;
   id: string;
   name: string;
-  options?: { label: string; value: OptionValue }[];
   required?: boolean;
   autoComplete?: AutocompleteAttributeValue;
 };

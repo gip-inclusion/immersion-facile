@@ -1,23 +1,9 @@
 import { AgencyDto } from "shared";
-import { FormField } from "../types";
+import { FormFieldsObject } from "src/app/hooks/formContents.hooks";
+import { FormFieldAttributes } from "../types";
 
-type ValidationSteps = "oneStep" | "twoSteps";
-
-const numberOfStepsOptions: { label: string; value: ValidationSteps }[] = [
-  {
-    label: "1: La Convention est examinée et validée par la même personne",
-    value: "oneStep",
-  },
-  {
-    label:
-      "2: La Convention est examinée par une personne puis validée par quelqu’un d’autre",
-    value: "twoSteps",
-  },
-];
-
-export type FormAgencyFieldsLabels = Record<
-  keyof AgencyDto | "stepsForValidation",
-  FormField<ValidationSteps>
+export type FormAgencyFieldsLabels = FormFieldsObject<
+  Record<Partial<keyof AgencyDto | "stepsForValidation">, FormFieldAttributes>
 >;
 
 export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
@@ -113,6 +99,5 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
     name: "steps-for-validation",
     id: "steps-for-validation",
     label: "Combien d'étapes de validation des immersions y a-t-il ? *",
-    options: numberOfStepsOptions,
   },
 };

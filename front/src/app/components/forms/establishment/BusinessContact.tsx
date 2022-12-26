@@ -1,14 +1,11 @@
 import { useFormikContext } from "formik";
 import React from "react";
-import {
-  BusinessContactDto,
-  ContactMethod,
-  FormEstablishmentDto,
-  zEmail,
-} from "shared";
+import { ContactMethod, FormEstablishmentDto, zEmail } from "shared";
 import { RadioGroupForField } from "src/app/components/forms/commons/RadioGroup";
 import { FillableList } from "src/app/components/forms/commons/FillableList";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
+import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
+import { useFormContents } from "src/app/hooks/formContents.hooks";
 
 const preferredContactMethodOptions: Array<{
   label?: string;
@@ -31,9 +28,8 @@ const preferredContactMethodOptions: Array<{
 ];
 
 export const BusinessContact = () => {
-  const parentFieldName: keyof FormEstablishmentDto = "businessContact";
-  const makeName = (name: keyof BusinessContactDto) =>
-    `${parentFieldName}.${name}`;
+  const { getFormFields } = useFormContents(formEstablishmentFieldsLabels);
+  const formContents = getFormFields();
   const { values, setFieldValue } = useFormikContext<FormEstablishmentDto>();
   return (
     <div className="fr-input-group">
@@ -41,28 +37,21 @@ export const BusinessContact = () => {
         <h2 className="fr-text--lead">Détails du correspondant immersion :</h2>
         <p>Le correspondant reçoit les demandes et les traite.</p>
       </div>
-      <TextInput label="Nom du référent *" name={makeName("lastName")} />
-      <TextInput label="Prénom du référent *" name={makeName("firstName")} />
-      <TextInput label="Fonction du référent *" name={makeName("job")} />
-      <TextInput
-        label="Numéro de téléphone (ne sera pas communiqué directement) *"
-        name={makeName("phone")}
-      />
-      <TextInput label="Email *" name={makeName("email")} />
+      <TextInput {...formContents["businessContact.lastName"]} />
+      <TextInput {...formContents["businessContact.firstName"]} />
+      <TextInput {...formContents["businessContact.job"]} />
+      <TextInput {...formContents["businessContact.phone"]} />
+      <TextInput {...formContents["businessContact.email"]} />
       <FillableList
-        name={makeName("copyEmails")}
-        label="Autres destinataires"
-        description={"Adresses mail à mettre en copie"}
-        placeholder="cc1@mail.com, cc2@mail.com"
+        {...formContents["businessContact.copyEmails"]}
         valuesInList={values.businessContact.copyEmails}
         setValues={(newValues) => {
-          setFieldValue(makeName("copyEmails"), newValues);
+          setFieldValue("businessContact.copyEmails", newValues);
         }}
         validationSchema={zEmail}
       />
       <RadioGroupForField
-        name={makeName("contactMethod")}
-        label="Comment souhaitez-vous que les candidats vous contactent ? *"
+        {...formContents["businessContact.contactMethod"]}
         options={preferredContactMethodOptions}
       />
     </div>

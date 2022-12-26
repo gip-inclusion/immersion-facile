@@ -6,6 +6,7 @@ import {
   formEstablishmentSchema,
   immersionFacileContactEmail,
   SiretDto,
+  toDotNotation,
 } from "shared";
 import { BoolCheckboxGroup } from "src/app/components/forms/commons/CheckboxGroup";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
@@ -14,7 +15,6 @@ import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishm
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { AppellationList } from "./AppellationList";
 import { BusinessContact } from "./BusinessContact";
-import { fieldsToLabel, FieldsWithLabel } from "./fieldsToLabels";
 
 type EstablishmentFormProps = {
   initialValues: FormEstablishmentDto;
@@ -22,16 +22,6 @@ type EstablishmentFormProps = {
   isEditing?: boolean;
   children: React.ReactNode;
 };
-
-export const getMandatoryLabelAndName = (field: FieldsWithLabel) => ({
-  label: fieldsToLabel[field] + " *",
-  name: field,
-});
-
-export const getLabelAndName = (field: FieldsWithLabel) => ({
-  label: fieldsToLabel[field],
-  name: field,
-});
 
 export const EstablishmentFormikForm = ({
   initialValues,
@@ -41,7 +31,10 @@ export const EstablishmentFormikForm = ({
 }: EstablishmentFormProps) => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<Error | null>(null);
-  const { formErrorLabels } = useFormContents(formEstablishmentFieldsLabels);
+  const { getFormErrors, getFormFields } = useFormContents(
+    formEstablishmentFieldsLabels,
+  );
+  const formContents = getFormFields();
   let errorMessage = submitError?.message;
   if (
     submitError &&
@@ -106,19 +99,19 @@ export const EstablishmentFormikForm = ({
             <h2 className="fr-text--lead fr-mb-2w">Votre établissement</h2>
             {children}
             <BoolCheckboxGroup
-              {...getLabelAndName("isEngagedEnterprise")}
+              {...formContents.isEngagedEnterprise}
               description=""
               descriptionLink=""
               disabled={false}
             />
-            <TextInput {...getLabelAndName("website")} autoComplete="url" />
+            <TextInput {...formContents.website} />
             <TextInput
-              {...getLabelAndName("additionalInformation")}
+              {...formContents.additionalInformation}
               multiline={true}
             />
             <AppellationList
-              name="appellations"
-              title={`${fieldsToLabel["appellations"]} *`}
+              {...formContents.appellations}
+              title={formContents.appellations.label}
             />
             <BusinessContact />
 
@@ -151,10 +144,9 @@ export const EstablishmentFormikForm = ({
                 </p>
               </>
             )}
-
             <ErrorNotifications
-              labels={formErrorLabels}
-              errors={errors as Record<string, string>}
+              labels={getFormErrors()}
+              errors={toDotNotation(errors)}
               visible={submitCount !== 0 && Object.values(errors).length > 0}
             />
             {submitError && (

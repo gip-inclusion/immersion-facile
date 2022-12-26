@@ -7,7 +7,12 @@ import {
   MainWrapper,
   Title,
 } from "react-design-system/immersionFacile";
-import { AgencyDto, CreateAgencyDto, createAgencySchema } from "shared";
+import {
+  AgencyDto,
+  CreateAgencyDto,
+  createAgencySchema,
+  toDotNotation,
+} from "shared";
 import {
   AgencyFormCommonFields,
   AgencyLogoUpload,
@@ -47,7 +52,7 @@ export const AddAgencyPage = () => {
   const [submitFeedback, setSubmitFeedback] = useState<AgencySubmitFeedback>({
     kind: "idle",
   });
-  const { formErrorLabels } = useFormContents(formAgencyFieldsLabels);
+  const { getFormErrors } = useFormContents(formAgencyFieldsLabels);
   return (
     <HeaderFooterLayout>
       <MainWrapper layout="boxed">
@@ -75,8 +80,8 @@ export const AddAgencyPage = () => {
               <AgencyFormCommonFields />
               <AgencyLogoUpload />
               <ErrorNotifications
-                labels={formErrorLabels}
-                errors={errors as Record<string, string>}
+                labels={getFormErrors()}
+                errors={toDotNotation(errors)}
                 visible={submitCount !== 0 && Object.values(errors).length > 0}
               />
               <SubmitFeedbackNotification
