@@ -11,6 +11,7 @@ import {
   agencySchema,
   AgencyStatus,
   allAgencyStatuses,
+  toDotNotation,
   zEmail,
 } from "shared";
 import {
@@ -68,7 +69,7 @@ const EditAgencyForm = () => {
   const dispatch = useDispatch();
   const feedback = useAppSelector(agencyAdminSelectors.feedback);
   const agency = useAppSelector(agencyAdminSelectors.agency);
-  const { formErrorLabels } = useFormContents(formAgencyFieldsLabels);
+  const { getFormErrors } = useFormContents(formAgencyFieldsLabels);
 
   if (!agency) return null;
   return (
@@ -119,8 +120,8 @@ const EditAgencyForm = () => {
                 <AgencyLogoUpload />
               </div>
               <ErrorNotifications
-                labels={formErrorLabels}
-                errors={errors as Record<string, string>}
+                labels={getFormErrors()}
+                errors={toDotNotation(errors)}
                 visible={submitCount !== 0 && Object.values(errors).length > 0}
               />
               <SubmitFeedbackNotification
