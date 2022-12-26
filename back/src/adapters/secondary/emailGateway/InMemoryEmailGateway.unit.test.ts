@@ -1,23 +1,23 @@
 import { TemplatedEmail, expectArraysToMatch } from "shared";
-import { CustomClock } from "../core/ClockImplementations";
+import { CustomTimeGateway } from "../core/TimeGateway/CustomTimeGateway";
 import { InMemoryEmailGateway } from "./InMemoryEmailGateway";
 
 describe("In memory EmailGateway", () => {
-  let clock: CustomClock;
+  let timeGateway: CustomTimeGateway;
 
   beforeEach(() => {
-    clock = new CustomClock();
+    timeGateway = new CustomTimeGateway();
   });
 
   it("should be able to retrieve last emails sent in order", async () => {
-    const inMemoryEmailGateway = new InMemoryEmailGateway(clock, 5);
+    const inMemoryEmailGateway = new InMemoryEmailGateway(timeGateway, 5);
     const secondDateIso = "2022-02-02T14:00:00.000Z";
     const secondTemplatedEmail: TemplatedEmail = {
       type: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
       recipients: ["establishment-ceo-second@gmail.com"],
       params: { editFrontUrl: "plop-second" },
     };
-    clock.setNextDate(new Date(secondDateIso));
+    timeGateway.setNextDate(new Date(secondDateIso));
     await inMemoryEmailGateway.sendEmail(secondTemplatedEmail);
 
     const firstDateIso = "2022-01-01T12:00:00.000Z";
@@ -26,7 +26,7 @@ describe("In memory EmailGateway", () => {
       recipients: ["establishment-ceo@gmail.com"],
       params: { editFrontUrl: "plop" },
     };
-    clock.setNextDate(new Date(firstDateIso));
+    timeGateway.setNextDate(new Date(firstDateIso));
     await inMemoryEmailGateway.sendEmail(firstTemplatedEmail);
 
     await expectArraysToMatch(inMemoryEmailGateway.getLastSentEmailDtos(), [
@@ -42,8 +42,8 @@ describe("In memory EmailGateway", () => {
   });
 
   it("should be able to retrieve at most the given maximum of emails", async () => {
-    const inMemoryEmailGateway = new InMemoryEmailGateway(clock, 1);
-    clock.setNextDate(new Date("2022-01-01T12:00:00.000Z"));
+    const inMemoryEmailGateway = new InMemoryEmailGateway(timeGateway, 1);
+    timeGateway.setNextDate(new Date("2022-01-01T12:00:00.000Z"));
     await inMemoryEmailGateway.sendEmail({
       type: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
       recipients: ["establishment-ceo@gmail.com"],

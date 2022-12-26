@@ -1,11 +1,15 @@
 import {
   allRoles,
+  ConventionDto,
   conventionSchema,
+  CreateConventionMagicLinkPayloadProperties,
   frontRoutes,
+  Role,
   zTrimmedString,
 } from "shared";
 import { z } from "zod";
 import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
+import { TimeGateway } from "../../../core/ports/TimeGateway";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
@@ -34,6 +38,7 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
     uowPerformer: UnitOfWorkPerformer,
     private readonly emailGateway: EmailGateway,
     private readonly generateMagicLinkFn: GenerateConventionMagicLink,
+    private readonly timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
   }
@@ -50,36 +55,25 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
         `Unable to send mail. No agency config found for ${convention.agencyId}`,
       );
     }
-    const beneficiary = convention.signatories.beneficiary;
-    const establishmentRepresentative =
-      convention.signatories.establishmentRepresentative;
 
     for (const role of roles) {
-      let email: string | undefined = undefined;
-      if (role === "beneficiary") {
-        email = beneficiary.email;
-      } else if (role === "establishment") {
-        email = establishmentRepresentative.email;
-      }
+      const email = emailByRoleForConventionNeedsModification(role, convention);
+      if (email instanceof Error) throw email;
 
-      if (!email)
-        throw new Error(
-          "unexpected role for beneficiary/enterprise modification request notification: " +
-            role,
-        );
-
-      const magicLinkCommonFields = {
-        id: convention.id,
-        role,
-        email,
-      };
+      const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties =
+        {
+          id: convention.id,
+          role,
+          email,
+          now: this.timeGateway.now(),
+        };
 
       await this.emailGateway.sendEmail({
         type: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
         recipients: [email],
         params: {
-          beneficiaryFirstName: beneficiary.firstName,
-          beneficiaryLastName: beneficiary.lastName,
+          beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+          beneficiaryLastName: convention.signatories.beneficiary.lastName,
           businessName: convention.businessName,
           justification,
           signature: agency.signature,
@@ -98,3 +92,26 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
     }
   }
 }
+
+const emailByRoleForConventionNeedsModification = (
+  role: Role,
+  convention: ConventionDto,
+): string | Error => {
+  const error = new Error(
+    `Unsupported role for beneficiary/enterprise modification request notification: ${role}`,
+  );
+  const strategy: Record<Role, string | Error> = {
+    admin: error,
+    "beneficiary-current-employer": error,
+    "beneficiary-representative": error,
+    "establishment-tutor": error,
+    "legal-representative": error,
+    counsellor: error,
+    validator: error,
+    "establishment-representative":
+      convention.signatories.establishmentRepresentative.email,
+    establishment: convention.signatories.establishmentRepresentative.email,
+    beneficiary: convention.signatories.beneficiary.email,
+  };
+  return strategy[role];
+};

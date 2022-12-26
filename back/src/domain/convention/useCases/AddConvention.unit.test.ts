@@ -11,7 +11,6 @@ import {
   ConflictError,
   ForbiddenError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
@@ -23,14 +22,15 @@ import {
   makeCreateNewEvent,
 } from "../../../domain/core/eventBus/EventBus";
 import { DomainEvent } from "../../../domain/core/eventBus/events";
+import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 
 describe("Add Convention", () => {
   let addConvention: AddConvention;
   let conventionRepository: InMemoryConventionRepository;
-  let clock: CustomClock;
   let uuidGenerator: TestUuidGenerator;
   let createNewEvent: CreateNewEvent;
   let outboxRepository: InMemoryOutboxRepository;
+  let timeGateway: CustomTimeGateway;
   const validConvention = new ConventionDtoBuilder().build();
   const { externalId, ...validConventionParams } = validConvention;
 
@@ -45,9 +45,12 @@ describe("Add Convention", () => {
       enableAdminUi: false,
       enableInseeApi: true,
     });
-    clock = new CustomClock();
+    timeGateway = new CustomTimeGateway();
     uuidGenerator = new TestUuidGenerator();
-    createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
+    createNewEvent = makeCreateNewEvent({
+      timeGateway,
+      uuidGenerator,
+    });
     stubGetSiret = new StubGetSiret();
     uowPerformer = new InMemoryUowPerformer(uow);
     addConvention = new AddConvention(
@@ -60,7 +63,7 @@ describe("Add Convention", () => {
   it("saves valid applications in the repository", async () => {
     const occurredAt = new Date("2021-10-15T15:00");
     const id = "eventId";
-    clock.setNextDate(occurredAt);
+    timeGateway.setNextDate(occurredAt);
     uuidGenerator.setNextUuid(id);
     conventionRepository.setNextExternalId("00000000001");
 

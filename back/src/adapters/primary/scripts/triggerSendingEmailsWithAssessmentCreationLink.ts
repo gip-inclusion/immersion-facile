@@ -3,7 +3,7 @@ import { Pool } from "pg";
 import { immersionFacileContactEmail } from "shared";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { SendEmailsWithAssessmentCreationLink } from "../../../domain/immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
-import { RealClock } from "../../secondary/core/ClockImplementations";
+import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmailGateway";
 import { SendinblueHtmlEmailGateway } from "../../secondary/emailGateway/SendinblueHtmlEmailGateway";
@@ -18,7 +18,7 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
   const pool = new Pool({
     connectionString: dbUrl,
   });
-  const clock = new RealClock();
+  const timeGateway = new RealTimeGateway();
 
   const emailGateway =
     config.emailGateway === "SENDINBLUE"
@@ -34,7 +34,7 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
             email: immersionFacileContactEmail,
           },
         )
-      : new InMemoryEmailGateway(clock);
+      : new InMemoryEmailGateway(timeGateway);
 
   const { uowPerformer } = createUowPerformer(config, () => pool);
 
@@ -42,9 +42,12 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
     new SendEmailsWithAssessmentCreationLink(
       uowPerformer,
       emailGateway,
-      clock,
+      timeGateway,
       createGenerateConventionMagicLink(config),
-      makeCreateNewEvent({ clock, uuidGenerator: new UuidV4Generator() }),
+      makeCreateNewEvent({
+        timeGateway,
+        uuidGenerator: new UuidV4Generator(),
+      }),
     );
 
   await sendEmailsWithAssessmentCreationLink.execute();

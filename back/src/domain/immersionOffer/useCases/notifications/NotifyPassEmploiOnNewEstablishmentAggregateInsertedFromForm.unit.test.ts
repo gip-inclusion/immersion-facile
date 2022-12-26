@@ -1,17 +1,15 @@
+import { expectArraysToEqual } from "shared";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
-import { CustomClock } from "../../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryPassEmploiGateway } from "../../../../adapters/secondary/immersionOffer/passEmploi/InMemoryPassEmploiGateway";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../../../_testBuilders/EstablishmentEntityV2Builder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
-import { expectArraysToEqual } from "shared";
 import { PassEmploiNotificationParams } from "../../ports/PassEmploiGateway";
 import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "./NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
 
 const prepareUseCase = () => {
   const uow = createInMemoryUow();
   const establishmentAggregateRepository = uow.establishmentAggregateRepository;
-  const clock = new CustomClock();
   const passEmploiGateway = new InMemoryPassEmploiGateway();
   const useCase =
     new NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm(
@@ -20,7 +18,6 @@ const prepareUseCase = () => {
 
   return {
     useCase,
-    clock,
     passEmploiGateway,
     establishmentAggregateRepository,
   };

@@ -11,7 +11,7 @@ import {
   EventPublication,
   SubscriptionId,
 } from "../../../domain/core/eventBus/events";
-import { Clock, DateStr } from "../../../domain/core/ports/Clock";
+import { TimeGateway, DateStr } from "../../../domain/core/ports/TimeGateway";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
@@ -23,12 +23,15 @@ type SubscriptionsForTopic = Record<string, EventCallback<DomainTopic>>;
 export class InMemoryEventBus implements EventBus {
   public subscriptions: Partial<Record<DomainTopic, SubscriptionsForTopic>>;
 
-  constructor(private clock: Clock, private uowPerformer: UnitOfWorkPerformer) {
+  constructor(
+    private timeGateway: TimeGateway,
+    private uowPerformer: UnitOfWorkPerformer,
+  ) {
     this.subscriptions = {};
   }
 
   public async publish(event: DomainEvent) {
-    const publishedAt = this.clock.now().toISOString();
+    const publishedAt = this.timeGateway.now().toISOString();
     const publishedEvent = await this._publish(event, publishedAt);
     logger.info(
       {

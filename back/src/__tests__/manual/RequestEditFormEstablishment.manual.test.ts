@@ -5,7 +5,7 @@ import {
   makeEmailAllowListPredicate,
 } from "../../adapters/primary/config/appConfig";
 import { makeGenerateEditFormEstablishmentUrl } from "../../adapters/primary/config/makeGenerateEditFormEstablishmentUrl";
-import { RealClock } from "../../adapters/secondary/core/ClockImplementations";
+import { RealTimeGateway } from "../../adapters/secondary/core/TimeGateway/RealTimeGateway";
 import { SendinblueHtmlEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueHtmlEmailGateway";
 import { InMemoryUowPerformer } from "../../adapters/secondary/InMemoryUowPerformer";
 import { CreateNewEvent } from "../../domain/core/eventBus/EventBus";
@@ -36,7 +36,7 @@ describe("RequestEditFormEstablishment", () => {
     businessContact: ContactEntityV2,
   ): RequestEditFormEstablishment => {
     const config = AppConfig.createFromEnv();
-    const clock = new RealClock();
+    const timeGateway = new RealTimeGateway();
 
     const unitOfWork = {
       establishmentAggregateRepository: {
@@ -71,7 +71,7 @@ describe("RequestEditFormEstablishment", () => {
     return new RequestEditFormEstablishment(
       uowPerformer,
       emailGateway,
-      clock,
+      timeGateway,
       generateEditFormEstablishmentUrl,
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       (() => {}) as unknown as CreateNewEvent,

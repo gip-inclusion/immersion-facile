@@ -9,7 +9,6 @@ import {
   expectPromiseToFailWithError,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
-import { makeTestCreateNewEvent } from "../../../_testBuilders/makeTestCreateNewEvent";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,
@@ -18,11 +17,14 @@ import {
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
+import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
+import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryImmersionAssessmentRepository } from "../../../adapters/secondary/InMemoryImmersionAssessmentRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { ImmersionAssessmentEntity } from "../../../domain/convention/entities/ImmersionAssessmentEntity";
 import { CreateImmersionAssessment } from "../../../domain/convention/useCases/CreateImmersionAssessment";
+import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 
 const conventionId = "conventionId";
 
@@ -62,10 +64,12 @@ describe("CreateImmersionAssessment", () => {
     conventionRepository.setConventions({
       [convention.id]: convention,
     });
-    const createNewEvent = makeTestCreateNewEvent();
     createImmersionAssessment = new CreateImmersionAssessment(
       uowPerformer,
-      createNewEvent,
+      makeCreateNewEvent({
+        timeGateway: new CustomTimeGateway(),
+        uuidGenerator: new TestUuidGenerator(),
+      }),
     );
   });
 

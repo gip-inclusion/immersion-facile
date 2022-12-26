@@ -5,17 +5,18 @@ import {
   InMemoryGateways,
 } from "../../../../_testBuilders/buildTestApp";
 import { AppConfig } from "../../config/appConfig";
-import { Clock } from "../../../../domain/core/ports/Clock";
+import { TimeGateway } from "../../../../domain/core/ports/TimeGateway";
 
 describe(`/${emailRoute} route`, () => {
   let request: SuperTest<Test>;
   let gateways: InMemoryGateways;
   let adminToken: AdminToken;
   let appConfig: AppConfig;
-  let clock: Clock;
+  let timeGateway: TimeGateway;
 
   beforeEach(async () => {
-    ({ request, gateways, appConfig, clock } = await buildTestApp());
+    ({ request, gateways, appConfig } = await buildTestApp());
+    timeGateway = gateways.timeGateway;
 
     const response = await request.post("/admin/login").send({
       user: appConfig.backofficeUsername,
@@ -37,7 +38,7 @@ describe(`/${emailRoute} route`, () => {
     it("Returns last sent emails", async () => {
       // Prepare
       const dateNow = new Date("2022-01-01T12:00:00.000Z");
-      clock.now = () => dateNow;
+      timeGateway.now = () => dateNow;
       await gateways.email.sendEmail({
         type: "AGENCY_WAS_ACTIVATED",
         recipients: ["toto@email.com"],

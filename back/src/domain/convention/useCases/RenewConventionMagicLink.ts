@@ -22,7 +22,7 @@ import {
 import { createLogger } from "../../../utils/logger";
 import { GenerateMagicLinkJwt } from "../../auth/jwt";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
-import { Clock } from "../../core/ports/Clock";
+import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
@@ -37,7 +37,7 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
     private readonly createNewEvent: CreateNewEvent,
     private readonly generateMagicLinkJwt: GenerateMagicLinkJwt,
     private readonly config: AppConfig,
-    private readonly clock: Clock,
+    private readonly timeGateway: TimeGateway,
     private readonly immersionBaseUrl: AbsoluteUrl,
   ) {
     super(uowPerformer);
@@ -80,13 +80,12 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
       if (!emailHash || stringToMd5(email) === emailHash) {
         foundHit = true;
         const jwt = this.generateMagicLinkJwt(
-          createConventionMagicLinkPayload(
-            applicationId,
+          createConventionMagicLinkPayload({
+            id: applicationId,
             role,
             email,
-            undefined,
-            this.clock.timestamp.bind(this.clock),
-          ),
+            now: this.timeGateway.now(),
+          }),
         );
 
         const magicLink = `${this.immersionBaseUrl}/${route}?jwt=${jwt}`;

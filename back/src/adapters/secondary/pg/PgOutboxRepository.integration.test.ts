@@ -3,8 +3,7 @@ import { ConventionDtoBuilder, expectArraysToEqualIgnoringOrder } from "shared";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { DomainTopic, DomainEvent } from "../../../domain/core/eventBus/events";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
-
-import { CustomClock } from "../core/ClockImplementations";
+import { CustomTimeGateway } from "../core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../core/UuidGeneratorImplementations";
 import { PgOutboxRepository, StoredEventRow } from "./PgOutboxRepository";
 
@@ -13,12 +12,12 @@ describe("PgOutboxRepository", () => {
   let client: PoolClient;
   let outboxRepository: PgOutboxRepository;
   const uuidGenerator = new TestUuidGenerator();
-  const clock = new CustomClock();
+  const timeGateway = new CustomTimeGateway();
   const quarantinedTopic: DomainTopic = "ImmersionApplicationRejected";
 
   const createNewEvent = makeCreateNewEvent({
     uuidGenerator,
-    clock,
+    timeGateway,
     quarantinedTopics: [quarantinedTopic],
   });
 
@@ -42,7 +41,7 @@ describe("PgOutboxRepository", () => {
 
   it("saves an event with published data", async () => {
     const convention = new ConventionDtoBuilder().build();
-    clock.setNextDate(new Date("2021-11-15T09:00:00.000Z"));
+    timeGateway.setNextDate(new Date("2021-11-15T09:00:00.000Z"));
     uuidGenerator.setNextUuid("cccccc99-9c0c-cccc-cc6d-6cc9cd38cccc");
     const alreadyProcessedEvent = createNewEvent({
       topic: "ImmersionApplicationSubmittedByBeneficiary",
@@ -146,7 +145,7 @@ describe("PgOutboxRepository", () => {
   it("sets to quarantined event if the event is already in db with publications", async () => {
     const convention = new ConventionDtoBuilder().build();
     uuidGenerator.setNextUuid("bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb");
-    clock.setNextDate(new Date("2021-11-15T10:01:00.000Z"));
+    timeGateway.setNextDate(new Date("2021-11-15T10:01:00.000Z"));
     const eventFailedToRerun = createNewEvent({
       topic: "ImmersionApplicationSubmittedByBeneficiary",
       payload: convention,

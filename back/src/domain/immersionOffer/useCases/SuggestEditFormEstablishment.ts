@@ -7,7 +7,7 @@ import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { GenerateEditFormEstablishmentUrl } from "../../auth/jwt";
 import { EmailGateway } from "../../convention/ports/EmailGateway";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
-import { Clock } from "../../core/ports/Clock";
+import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
@@ -17,7 +17,7 @@ export class SuggestEditFormEstablishment extends TransactionalUseCase<SiretDto>
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private emailGateway: EmailGateway,
-    private clock: Clock,
+    private timeGateway: TimeGateway,
     private generateEditFormEstablishmentUrl: GenerateEditFormEstablishmentUrl,
     private createNewEvent: CreateNewEvent,
   ) {
@@ -33,7 +33,7 @@ export class SuggestEditFormEstablishment extends TransactionalUseCase<SiretDto>
 
     if (!contact) throw Error("Email du contact introuvable.");
 
-    const now = this.clock.now();
+    const now = this.timeGateway.now();
 
     const payload = createEstablishmentMagicLinkPayload({
       siret,

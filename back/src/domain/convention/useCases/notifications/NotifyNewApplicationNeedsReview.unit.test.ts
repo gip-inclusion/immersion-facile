@@ -2,12 +2,14 @@ import {
   AgencyDtoBuilder,
   ConventionDto,
   ConventionDtoBuilder,
+  CreateConventionMagicLinkPayloadProperties,
   frontRoutes,
 } from "shared";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
 } from "../../../../adapters/primary/config/uowConfig";
+import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { expectedEmailConventionReviewMatchingConvention } from "../../../../_testBuilders/emailAssertions";
@@ -24,14 +26,17 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
   let uow: InMemoryUnitOfWork;
   let emailGw: InMemoryEmailGateway;
   let notifyNewConventionNeedsReview: NotifyNewApplicationNeedsReview;
+  const timeGateway = new CustomTimeGateway();
 
   beforeEach(() => {
     emailGw = new InMemoryEmailGateway();
     uow = createInMemoryUow();
+
     notifyNewConventionNeedsReview = new NotifyNewApplicationNeedsReview(
       new InMemoryUowPerformer(uow),
       emailGw,
       fakeGenerateMagicLinkUrlFn,
+      timeGateway,
     );
   });
 
@@ -61,11 +66,13 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
 
       for (let i = 0; i < 2; i++) {
         const email = counsellorEmails[i];
-        const magicLinkCommonFields = {
-          id: conventionInReview.id,
-          role: "counsellor" as const,
-          email,
-        };
+        const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties =
+          {
+            id: conventionInReview.id,
+            role: "counsellor" as const,
+            email,
+            now: timeGateway.now(),
+          };
         expectedEmailConventionReviewMatchingConvention(
           sentEmails[i],
           email,
@@ -99,11 +106,13 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
 
       for (let i = 0; i < 2; i++) {
         const email = validatorEmails[i];
-        const magicLinkCommonFields = {
-          id: conventionInReview.id,
-          role: "validator" as const,
-          email,
-        };
+        const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties =
+          {
+            id: conventionInReview.id,
+            role: "validator" as const,
+            email,
+            now: timeGateway.now(),
+          };
         expectedEmailConventionReviewMatchingConvention(
           sentEmails[i],
           email,
@@ -156,11 +165,13 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
 
       for (let i = 0; i < 2; i++) {
         const email = validatorEmails[i];
-        const magicLinkCommonFields = {
-          id: acceptedByCounsellorConvention.id,
-          role: "validator" as const,
-          email,
-        };
+        const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties =
+          {
+            id: acceptedByCounsellorConvention.id,
+            role: "validator" as const,
+            email,
+            now: timeGateway.now(),
+          };
         expectedEmailConventionReviewMatchingConvention(
           sentEmails[i],
           email,
@@ -208,11 +219,13 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
 
       const sentEmails = emailGw.getSentEmails();
       expect(sentEmails).toHaveLength(1);
-      const magicLinkCommonFields = {
-        id: acceptedByValidatorConvention.id,
-        role: "admin" as const,
-        email: adminEmail,
-      };
+      const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties =
+        {
+          id: acceptedByValidatorConvention.id,
+          role: "admin" as const,
+          email: adminEmail,
+          now: timeGateway.now(),
+        };
       expectedEmailConventionReviewMatchingConvention(
         sentEmails[0],
         adminEmail,

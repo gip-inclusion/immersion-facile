@@ -2,7 +2,6 @@ import { Pool } from "pg";
 import { ApplyAgenciesAddressesFromPositions } from "../../../domain/convention/useCases/agencies/ApplyAgenciesAddressesFromPositions";
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
-import { RealClock } from "../../secondary/core/ClockImplementations";
 import { AppConfig } from "../config/appConfig";
 import { createGateways } from "../config/createGateways";
 import { createUowPerformer } from "../config/uowConfig";
@@ -16,7 +15,7 @@ import { createUowPerformer } from "../config/uowConfig";
 
 const applyAgenciesAddressDtosFromPositions = async () => {
   const config = AppConfig.createFromEnv();
-  const { addressApi } = await createGateways(config, new RealClock());
+  const { addressApi } = await createGateways(config);
   const { uowPerformer } = createUowPerformer(
     config,
     () =>

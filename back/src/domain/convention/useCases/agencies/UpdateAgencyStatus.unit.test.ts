@@ -1,9 +1,8 @@
 import { AgencyDtoBuilder } from "shared";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
-import { CustomClock } from "../../../../adapters/secondary/core/ClockImplementations";
+import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-
 import { makeCreateNewEvent } from "../../../core/eventBus/EventBus";
 import { UpdateAgencyStatus } from "./UpdateAgencyStatus";
 
@@ -13,13 +12,13 @@ const nextUuid = "event-uuid";
 const prepareUseCase = () => {
   const uow = createInMemoryUow();
   const uuidGenerator = new TestUuidGenerator();
-  const clock = new CustomClock();
-  clock.setNextDate(nextDate);
+  const timeGateway = new CustomTimeGateway();
+  timeGateway.setNextDate(nextDate);
   uuidGenerator.setNextUuid(nextUuid);
 
   const createNewEvent = makeCreateNewEvent({
     uuidGenerator,
-    clock,
+    timeGateway,
   });
 
   const useCase = new UpdateAgencyStatus(
@@ -31,7 +30,6 @@ const prepareUseCase = () => {
     useCase,
     outboxRepository: uow.outboxRepository,
     agencyRepository: uow.agencyRepository,
-    clock,
     uuidGenerator,
   };
 };

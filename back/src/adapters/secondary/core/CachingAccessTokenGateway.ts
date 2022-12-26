@@ -4,8 +4,8 @@ import {
   AccessTokenGateway,
   GetAccessTokenResponse,
 } from "../../../domain/core/ports/AccessTokenGateway";
-import { Clock } from "../../../domain/core/ports/Clock";
-import { RealClock } from "./ClockImplementations";
+import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
+import { RealTimeGateway } from "./TimeGateway/RealTimeGateway";
 
 type Scope = string;
 type CacheEntry = {
@@ -28,7 +28,7 @@ export class CachingAccessTokenGateway implements AccessTokenGateway {
 
   public constructor(
     private readonly delegate: AccessTokenGateway,
-    private readonly clock: Clock = new RealClock(),
+    private readonly timeGateway: TimeGateway = new RealTimeGateway(),
   ) {}
 
   public async getAccessToken(scope: string): Promise<GetAccessTokenResponse> {
@@ -45,7 +45,7 @@ export class CachingAccessTokenGateway implements AccessTokenGateway {
     const response = await this.delegate.getAccessToken(scope);
 
     const expirationTime = addSeconds(
-      this.clock.now(),
+      this.timeGateway.now(),
       response.expires_in - minTtlSec || 0,
     );
 
@@ -56,7 +56,7 @@ export class CachingAccessTokenGateway implements AccessTokenGateway {
   }
 
   private isExpired(entry: CacheEntry): boolean {
-    const now = this.clock.now();
+    const now = this.timeGateway.now();
     return isAfter(now, entry.expirationTime);
   }
 }

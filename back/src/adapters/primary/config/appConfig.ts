@@ -138,6 +138,14 @@ export class AppConfig {
     };
   }
 
+  public get timeGateway() {
+    return this.throwIfNotInArray({
+      variableName: "TIME_GATEWAY",
+      authorizedValues: ["CUSTOM", "REAL"],
+      defaultValue: "REAL",
+    });
+  }
+
   // == Email gateway ==
   public get emailGateway() {
     return this.throwIfNotInArray({

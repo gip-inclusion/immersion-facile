@@ -36,18 +36,29 @@ export const allRoles = [
 export const stringToMd5 = (str: string) =>
   crypto.createHash("md5").update(str).digest("hex");
 
-export const createConventionMagicLinkPayload = (
-  applicationId: ConventionId,
-  role: Role,
-  email: string,
+export type CreateConventionMagicLinkPayloadProperties = {
+  id: ConventionId;
+  role: Role;
+  email: string;
+  now: Date;
+  durationDays?: number;
+  iat?: number;
+  exp?: number;
+  version?: number;
+};
+
+export const createConventionMagicLinkPayload = ({
+  id,
+  role,
+  email,
+  now,
   durationDays = 31,
-  nowFn = Date.now,
-  iat: number = Math.round(nowFn() / 1000),
-  exp: number = iat + durationDays * 24 * 3600,
+  iat = Math.round(now.getTime() / 1000),
+  exp = iat + durationDays * 24 * 3600,
   version = currentJwtVersions.application,
-): ConventionMagicLinkPayload => ({
+}: CreateConventionMagicLinkPayloadProperties): ConventionMagicLinkPayload => ({
   version,
-  applicationId,
+  applicationId: id, //TODO : replace applicationId by conventionId on convention magic link payload (applicationId was legacy name)
   role,
   iat,
   exp,

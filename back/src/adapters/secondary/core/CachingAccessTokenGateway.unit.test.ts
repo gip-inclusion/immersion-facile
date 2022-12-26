@@ -1,7 +1,7 @@
 import minutesToSeconds from "date-fns/minutesToSeconds";
 import { CachingAccessTokenGateway } from "./CachingAccessTokenGateway";
-import { CustomClock } from "./ClockImplementations";
 import { GetAccessTokenResponse } from "../../../domain/core/ports/AccessTokenGateway";
+import { CustomTimeGateway } from "./TimeGateway/CustomTimeGateway";
 
 const testResponse1: GetAccessTokenResponse = {
   access_token: "token1",
@@ -14,12 +14,12 @@ const testResponse2: GetAccessTokenResponse = {
 
 describe("CachingAccessTokenGateway", () => {
   let mockGetAccessTokenFn: jest.Mock;
-  let fakeClock: CustomClock;
+  let fakeClock: CustomTimeGateway;
   let cachedAccessTokenGateway: CachingAccessTokenGateway;
 
   beforeEach(() => {
     mockGetAccessTokenFn = jest.fn();
-    fakeClock = new CustomClock();
+    fakeClock = new CustomTimeGateway();
     cachedAccessTokenGateway = new CachingAccessTokenGateway(
       {
         getAccessToken: mockGetAccessTokenFn,

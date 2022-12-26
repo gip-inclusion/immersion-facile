@@ -11,7 +11,6 @@ const deadlineMs = 100_000;
 
 describe("ExponentialBackoffRetryStrategy", () => {
   let mockNow: jest.Mock;
-  let mockNowNumber: jest.Mock;
   let mockSleep: jest.Mock;
   let mockRandom: jest.Mock;
   let mockCallback: jest.Mock;
@@ -20,7 +19,6 @@ describe("ExponentialBackoffRetryStrategy", () => {
 
   beforeEach(() => {
     mockNow = jest.fn();
-    mockNowNumber = jest.fn();
     mockSleep = jest.fn();
     mockRandom = jest.fn();
     mockCallback = jest.fn();
@@ -28,7 +26,7 @@ describe("ExponentialBackoffRetryStrategy", () => {
     retryStrategy = new ExponentialBackoffRetryStrategy(
       maxBackoffPeriodMs,
       deadlineMs,
-      { now: mockNow, timestamp: mockNowNumber },
+      { now: mockNow },
       mockSleep,
       mockRandom,
     );

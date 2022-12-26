@@ -7,7 +7,6 @@ import {
   GenerateMagicLinkJwt,
 } from "../../domain/auth/jwt";
 import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
-import { Clock } from "../../domain/core/ports/Clock";
 import { UuidGenerator } from "../../domain/core/ports/UuidGenerator";
 import { createLogger } from "../../utils/logger";
 import { AppConfig } from "./config/appConfig";
@@ -19,15 +18,15 @@ import { createAdminRouter } from "./routers/admin/createAdminRouter";
 import { createAgenciesRouter } from "./routers/agencies/createAgenciesRouter";
 import { createApiKeyAuthRouter } from "./routers/apiKeyAuthRouter/createApiKeyAuthRouter";
 import { createApiKeyAuthRouterV1 } from "./routers/apiKeyAuthRouter/createApiKeyAuthRouter.v1";
+import { createSearchImmersionRouter } from "./routers/apiKeyAuthRouter/createSearchImmersionRouter";
 import { createConventionRouter } from "./routers/convention/createConventionRouter";
 import { createEstablishmentRouter } from "./routers/createEstablishment/createEstablishmentRouter";
-import { createSearchImmersionRouter } from "./routers/apiKeyAuthRouter/createSearchImmersionRouter";
-import { createInclusionConnectRouter } from "./routers/inclusionConnect/createInclusionConnectRouter";
-import { createTechnicalRouter } from "./routers/technical/createTechnicalRouter";
 import { createFormCompletionRouter } from "./routers/formCompletion/createFormCompletionRouter";
 import { createHelloWorldRouter } from "./routers/helloWorld/createHelloWorldRouter";
+import { createInclusionConnectRouter } from "./routers/inclusionConnect/createInclusionConnectRouter";
 import { createMagicLinkRouter } from "./routers/magicLink/createMagicLinkRouter";
 import { createPeConnectRouter } from "./routers/peConnect/createPeConnectRouter";
+import { createTechnicalRouter } from "./routers/technical/createTechnicalRouter";
 import { subscribeToEvents } from "./subscribeToEvents";
 
 const logger = createLogger(__filename);
@@ -45,7 +44,6 @@ export const createApp = async (
   eventCrawler: EventCrawler;
   generateApiJwt: GenerateApiConsumerJtw;
   generateMagicLinkJwt: GenerateMagicLinkJwt;
-  clock: Clock;
   uuidGenerator: UuidGenerator;
   inMemoryUow?: InMemoryUnitOfWork;
 }> => {
@@ -94,7 +92,6 @@ export const createApp = async (
     eventCrawler: deps.eventCrawler,
     generateApiJwt: deps.generateApiJwt,
     generateMagicLinkJwt: deps.generateMagicLinkJwt,
-    clock: deps.clock,
     uuidGenerator: deps.uuidGenerator,
     inMemoryUow: deps.inMemoryUow,
   };

@@ -7,7 +7,6 @@ import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { SuggestEditFormEstablishment } from "../../../domain/immersionOffer/useCases/SuggestEditFormEstablishment";
 import { createLogger } from "../../../utils/logger";
 import { notifyDiscord } from "../../../utils/notifyDiscord";
-import { RealClock } from "../../secondary/core/ClockImplementations";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmailGateway";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
@@ -15,6 +14,7 @@ import { AppConfig, makeEmailAllowListPredicate } from "../config/appConfig";
 import { makeGenerateEditFormEstablishmentUrl } from "../config/makeGenerateEditFormEstablishmentUrl";
 import { createPgUow } from "../config/uowConfig";
 import { SendinblueHtmlEmailGateway } from "../../secondary/emailGateway/SendinblueHtmlEmailGateway";
+import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 
 const NB_MONTHS_BEFORE_SUGGEST = 6;
 
@@ -32,9 +32,9 @@ const triggerSuggestEditFormEstablishmentEvery6Months = async () => {
     connectionString: dbUrl,
   });
   const client = await pool.connect();
-  const clock = new RealClock();
+  const timeGateway = new RealTimeGateway();
 
-  const since = addMonths(clock.now(), -NB_MONTHS_BEFORE_SUGGEST);
+  const since = addMonths(timeGateway.now(), -NB_MONTHS_BEFORE_SUGGEST);
 
   const establishmentsToContact = (
     await client.query(
@@ -73,14 +73,17 @@ const triggerSuggestEditFormEstablishmentEvery6Months = async () => {
             email: immersionFacileContactEmail,
           },
         )
-      : new InMemoryEmailGateway(clock);
+      : new InMemoryEmailGateway(timeGateway);
 
   const suggestEditFormEstablishment = new SuggestEditFormEstablishment(
     pgUowPerformer,
     emailGateway,
-    clock,
+    timeGateway,
     makeGenerateEditFormEstablishmentUrl(config),
-    makeCreateNewEvent({ clock, uuidGenerator: new UuidV4Generator() }),
+    makeCreateNewEvent({
+      timeGateway,
+      uuidGenerator: new UuidV4Generator(),
+    }),
   );
 
   const errors: Record<SiretDto, any> = {};

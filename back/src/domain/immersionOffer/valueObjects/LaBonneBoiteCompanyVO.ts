@@ -1,6 +1,6 @@
 import { addressStringToDto, NafDto, SiretDto } from "shared";
 import { createLogger } from "../../../utils/logger";
-import { Clock } from "../../core/ports/Clock";
+import { TimeGateway } from "../../core/ports/TimeGateway";
 import {
   EstablishmentAggregate,
   EstablishmentEntityV2,
@@ -40,7 +40,7 @@ export class LaBonneBoiteCompanyVO {
   }
 
   public toEstablishmentAggregate(
-    clock: Clock,
+    timeGateway: TimeGateway,
     extraData?: {
       nafDto?: NafDto;
       numberEmployeesRange?: NumberEmployeesRange;
@@ -72,7 +72,7 @@ export class LaBonneBoiteCompanyVO {
         {
           romeCode: this.props.matched_rome_code,
           score: this.props.stars,
-          createdAt: clock.now(),
+          createdAt: timeGateway.now(),
         },
       ],
     };

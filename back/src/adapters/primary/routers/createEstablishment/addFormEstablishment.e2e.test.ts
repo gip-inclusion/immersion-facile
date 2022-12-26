@@ -128,9 +128,12 @@ describe("Route to add an establishment form with API key (for exemple for un-je
   });
 
   describe("v1", () => {
+    const consumerv1FormEstablishmentsRoute = `/v1/form-establishments`;
     it("forbids access to route if no api consumer", async () => {
       const { request } = await buildTestApp();
-      const response = await request.post(`/v1/form-establishments`).send({});
+      const response = await request
+        .post(consumerv1FormEstablishmentsRoute)
+        .send({});
       expect(response.body).toEqual({ error: "forbidden: unauthenticated" });
       expect(response.status).toBe(401);
     });
@@ -138,7 +141,7 @@ describe("Route to add an establishment form with API key (for exemple for un-je
     it("forbids access to route if invalid jwt", async () => {
       const { request } = await buildTestApp();
       const response = await request
-        .post(`/v1/form-establishments`)
+        .post(consumerv1FormEstablishmentsRoute)
         .set("Authorization", "jwt-invalid")
         .send({});
       expect(response.body).toEqual({ error: "forbidden: incorrect Jwt" });
@@ -149,7 +152,7 @@ describe("Route to add an establishment form with API key (for exemple for un-je
       const { request, generateApiJwt } = await buildTestApp();
       const jwt = generateApiJwt({ id: "my-unknown-id" });
       const response = await request
-        .post(`/v1/form-establishments`)
+        .post(consumerv1FormEstablishmentsRoute)
         .set("Authorization", jwt)
         .send({});
 
@@ -161,7 +164,7 @@ describe("Route to add an establishment form with API key (for exemple for un-je
       const { request, generateApiJwt } = await buildTestApp();
       const jwt = generateApiJwt({ id: "my-unauthorized-id" });
       const response = await request
-        .post(`/v1/form-establishments`)
+        .post(consumerv1FormEstablishmentsRoute)
         .set("Authorization", jwt)
         .send({});
       expect(response.body).toEqual({
@@ -171,10 +174,11 @@ describe("Route to add an establishment form with API key (for exemple for un-je
     });
 
     it("forbids access to route if token has expired", async () => {
-      const { request, generateApiJwt } = await buildTestApp();
+      const { request, generateApiJwt, gateways } = await buildTestApp();
+      gateways.timeGateway.setNextDate(new Date());
       const jwt = generateApiJwt({ id: "my-outdated-id" });
       const response = await request
-        .post(`/v1/form-establishments`)
+        .post(consumerv1FormEstablishmentsRoute)
         .set("Authorization", jwt)
         .send({});
       expect(response.body).toEqual({
@@ -197,7 +201,7 @@ describe("Route to add an establishment form with API key (for exemple for un-je
       const jwt = generateApiJwt({ id: "my-authorized-id" });
 
       const response = await request
-        .post(`/v1/form-establishments`)
+        .post(consumerv1FormEstablishmentsRoute)
         .set("Authorization", jwt)
         .send(formEstablishmentDtoPublicV1);
 

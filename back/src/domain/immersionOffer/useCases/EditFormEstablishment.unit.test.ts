@@ -10,7 +10,7 @@ import {
   ConflictError,
   ForbiddenError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
+import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
@@ -22,15 +22,17 @@ const prepareUseCase = () => {
   const formEstablishmentRepository = uow.formEstablishmentRepository;
   const outboxRepository = uow.outboxRepository;
   const uowPerformer = new InMemoryUowPerformer(uow);
-  const clock = new CustomClock();
+  const timeGateway = new CustomTimeGateway();
   const uuidGenerator = new TestUuidGenerator();
-  const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
+  const createNewEvent = makeCreateNewEvent({
+    timeGateway,
+    uuidGenerator,
+  });
 
   const useCase = new EditFormEstablishment(uowPerformer, createNewEvent);
 
   return {
     useCase,
-    clock,
     outboxRepository,
     formEstablishmentRepository,
   };

@@ -5,8 +5,8 @@ import {
   expectToEqual,
 } from "shared";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
-import { CustomClock } from "../../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../../adapters/secondary/core/InMemoryOutboxRepository";
+import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryAgencyRepository } from "../../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
@@ -20,9 +20,12 @@ describe("Update agency", () => {
   let updateAgency: UpdateAgency;
 
   beforeEach(() => {
-    const clock = new CustomClock();
+    const timeGateway = new CustomTimeGateway();
     const uuidGenerator = new TestUuidGenerator();
-    const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
+    const createNewEvent = makeCreateNewEvent({
+      timeGateway,
+      uuidGenerator,
+    });
     const uow = createInMemoryUow();
     agencyRepository = uow.agencyRepository;
     outboxRepository = uow.outboxRepository;

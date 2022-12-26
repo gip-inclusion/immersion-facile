@@ -3,8 +3,7 @@ import { ConventionDtoBuilder, expectArraysToEqualIgnoringOrder } from "shared";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { DomainTopic, DomainEvent } from "../../../domain/core/eventBus/events";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
-
-import { CustomClock } from "../core/ClockImplementations";
+import { CustomTimeGateway } from "../core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../core/UuidGeneratorImplementations";
 import { PgOutboxQueries } from "./PgOutboxQueries";
 import { PgOutboxRepository } from "./PgOutboxRepository";
@@ -14,12 +13,12 @@ describe("PgOutboxQueries for crawling purposes", () => {
   let client: PoolClient;
   let outboxQueries: PgOutboxQueries;
   const uuidGenerator = new TestUuidGenerator();
-  const clock = new CustomClock();
+  const timeGateway = new CustomTimeGateway();
   const quarantinedTopic: DomainTopic = "ImmersionApplicationRejected";
 
   const createNewEvent = makeCreateNewEvent({
     uuidGenerator,
-    clock,
+    timeGateway,
     quarantinedTopics: [quarantinedTopic],
   });
 
@@ -44,7 +43,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
   it("finds all events to be processed", async () => {
     // prepare
     uuidGenerator.setNextUuid("aaaaac99-9c0a-aaaa-aa6d-6aa9ad38aaaa");
-    clock.setNextDate(new Date("2021-11-15T10:00:00.000Z"));
+    timeGateway.setNextDate(new Date("2021-11-15T10:00:00.000Z"));
     const convention = new ConventionDtoBuilder().build();
     const event1 = createNewEvent({
       topic: "ImmersionApplicationSubmittedByBeneficiary",
@@ -52,13 +51,13 @@ describe("PgOutboxQueries for crawling purposes", () => {
     });
 
     uuidGenerator.setNextUuid("bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb");
-    clock.setNextDate(new Date("2021-11-15T10:01:00.000Z"));
+    timeGateway.setNextDate(new Date("2021-11-15T10:01:00.000Z"));
     const event2 = createNewEvent({
       topic: "ImmersionApplicationSubmittedByBeneficiary",
       payload: convention,
     });
 
-    clock.setNextDate(new Date("2021-11-15T09:00:00.000Z"));
+    timeGateway.setNextDate(new Date("2021-11-15T09:00:00.000Z"));
     uuidGenerator.setNextUuid("cccccc99-9c0c-cccc-cc6d-6cc9cd38cccc");
     const alreadyProcessedEvent = createNewEvent({
       topic: "ImmersionApplicationSubmittedByBeneficiary",
@@ -66,7 +65,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
       publications: [{ publishedAt: "2021-11-15T08:30:00.000Z", failures: [] }],
     });
 
-    clock.setNextDate(new Date("2021-11-15T10:03:00.000Z"));
+    timeGateway.setNextDate(new Date("2021-11-15T10:03:00.000Z"));
     uuidGenerator.setNextUuid("dddddd99-9d0d-dddd-dd6d-6dd9dd38dddd");
     const quarantinedEvent = createNewEvent({
       topic: quarantinedTopic,
@@ -90,7 +89,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
   it("finds all events that have failed and should be reprocessed", async () => {
     // prepare
     uuidGenerator.setNextUuid("aaaaac99-9c0a-aaaa-aa6d-6aa9ad38aaaa");
-    clock.setNextDate(new Date("2021-11-15T10:00:00.000Z"));
+    timeGateway.setNextDate(new Date("2021-11-15T10:00:00.000Z"));
     const convention = new ConventionDtoBuilder().build();
     const event1 = createNewEvent({
       topic: "ImmersionApplicationSubmittedByBeneficiary",
@@ -98,7 +97,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
     });
 
     uuidGenerator.setNextUuid("bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb");
-    clock.setNextDate(new Date("2021-11-15T10:01:00.000Z"));
+    timeGateway.setNextDate(new Date("2021-11-15T10:01:00.000Z"));
     const eventFailedToRerun = createNewEvent({
       topic: "ImmersionApplicationSubmittedByBeneficiary",
       payload: convention,
@@ -119,7 +118,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
       ],
     });
 
-    clock.setNextDate(new Date("2021-11-15T09:00:00.000Z"));
+    timeGateway.setNextDate(new Date("2021-11-15T09:00:00.000Z"));
     uuidGenerator.setNextUuid("cccccc99-9c0c-cccc-cc6d-6cc9cd38cccc");
     const withFailureButEventuallySuccessfulEvent = createNewEvent({
       topic: "ImmersionApplicationSubmittedByBeneficiary",
@@ -135,7 +134,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
       ],
     });
 
-    clock.setNextDate(new Date("2021-11-15T10:03:00.000Z"));
+    timeGateway.setNextDate(new Date("2021-11-15T10:03:00.000Z"));
     uuidGenerator.setNextUuid("dddddd99-9d0d-dddd-dd6d-6dd9dd38dddd");
     const failedButQuarantinedEvent = createNewEvent({
       topic: quarantinedTopic,

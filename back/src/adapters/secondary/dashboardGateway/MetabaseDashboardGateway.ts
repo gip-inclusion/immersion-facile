@@ -28,28 +28,31 @@ export class MetabaseDashboardGateway implements DashboardGateway {
     private metabaseApiKey: string,
   ) {}
 
-  public getConventionStatusUrl(id: ConventionId): AbsoluteUrl {
+  public getConventionStatusUrl(id: ConventionId, now: Date): AbsoluteUrl {
     const dashboard = dashboardByName.conventionStatus;
     const token = this.createToken({
       dashboard,
       params: { id: [id] },
+      now,
     });
     return this.makeUrl(token, dashboard);
   }
 
-  public getAgencyUrl(agencyId: AgencyId): AbsoluteUrl {
+  public getAgencyUrl(agencyId: AgencyId, now: Date): AbsoluteUrl {
     const dashboard = dashboardByName.agency;
     const token = this.createToken({
       dashboard,
       params: { filtrer_par_structure: [agencyId] },
+      now,
     });
     return this.makeUrl(token, dashboard);
   }
 
-  public getDashboardUrl(dashboardName: DashboardName): AbsoluteUrl {
+  public getDashboardUrl(dashboardName: DashboardName, now: Date): AbsoluteUrl {
     const dashboard = dashboardByName[dashboardName];
     const token = this.createToken({
       dashboard,
+      now,
     });
     return this.makeUrl(token, dashboard);
   }
@@ -61,14 +64,16 @@ export class MetabaseDashboardGateway implements DashboardGateway {
   private createToken({
     dashboard,
     params = {},
+    now,
   }: {
     dashboard: MetabaseDashboard;
     params?: Record<string, string[]>;
+    now: Date;
   }): string {
     const payload: MetabasePayload = {
       resource: { [dashboard.kind]: dashboard.id },
       params,
-      exp: Math.round(Date.now() / 1000) + 60 * 30, // 30 minute expiration
+      exp: Math.round(now.getTime() / 1000) + 60 * 30, // 30 minute expiration
     };
 
     return jwt.sign(payload, this.metabaseApiKey);

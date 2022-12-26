@@ -1,7 +1,10 @@
 import { addMilliseconds } from "date-fns";
-import { Clock, DateStr } from "../../../domain/core/ports/Clock";
+import {
+  TimeGateway,
+  DateStr,
+} from "../../../../domain/core/ports/TimeGateway";
 
-export class CustomClock extends Clock {
+export class CustomTimeGateway extends TimeGateway {
   constructor(private _nextDate = new Date("2021-09-01T10:10:00.000Z")) {
     super();
   }
@@ -20,11 +23,5 @@ export class CustomClock extends Clock {
 
   advanceByMs(ms: number) {
     this._nextDate = addMilliseconds(this._nextDate, ms);
-  }
-}
-
-export class RealClock extends Clock {
-  public now() {
-    return new Date();
   }
 }

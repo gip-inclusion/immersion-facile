@@ -3,7 +3,6 @@ import {
   makeGenerateJwtES256,
   makeGenerateJwtHS256,
 } from "../../../domain/auth/jwt";
-import { RealClock } from "../../secondary/core/ClockImplementations";
 import { InMemoryEventBus } from "../../secondary/core/InMemoryEventBus";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { makeAdminAuthMiddleware } from "../adminAuthMiddleware";
@@ -23,7 +22,6 @@ import { createGenerateConventionMagicLink } from "./createGenerateConventionMag
 import { createUseCases } from "./createUseCases";
 import { createUowPerformer } from "./uowConfig";
 
-const clock = new RealClock();
 const uuidGenerator = new UuidV4Generator();
 
 export type AppDependencies = ReturnType<
@@ -34,11 +32,11 @@ export type AppDependencies = ReturnType<
 
 export const createAppDependencies = async (config: AppConfig) => {
   const getPgPoolFn = createGetPgPoolFn(config);
-  const gateways = await createGateways(config, clock);
+  const gateways = await createGateways(config);
 
   const { uowPerformer, inMemoryUow } = createUowPerformer(config, getPgPoolFn);
 
-  const eventBus = new InMemoryEventBus(clock, uowPerformer);
+  const eventBus = new InMemoryEventBus(gateways.timeGateway, uowPerformer);
   const generateApiJwt = makeGenerateJwtES256(config.apiJwtPrivateKey);
   const generateMagicLinkJwt = makeGenerateJwtES256(
     config.magicLinkJwtPrivateKey,
@@ -66,7 +64,6 @@ export const createAppDependencies = async (config: AppConfig) => {
     generateAdminJwt,
     generateAuthenticatedUserToken,
     uowPerformer,
-    clock,
     uuidGenerator,
   );
 
@@ -85,23 +82,22 @@ export const createAppDependencies = async (config: AppConfig) => {
     ),
     apiKeyAuthMiddlewareV0: createApiKeyAuthMiddlewareV0(
       useCases.getApiConsumerById.execute,
-      clock,
+      gateways.timeGateway,
       config,
     ),
     apiKeyAuthMiddleware: makeApiKeyAuthMiddlewareV1(
       useCases.getApiConsumerById.execute,
-      clock,
+      gateways.timeGateway,
       config,
     ),
     adminAuthMiddleware: await makeAdminAuthMiddleware(
       config.adminJwtSecret,
-      clock,
+      gateways.timeGateway,
     ),
     generateMagicLinkJwt,
     generateApiJwt,
     eventBus,
     eventCrawler: createEventCrawler(config, uowPerformer, eventBus),
-    clock,
     uuidGenerator,
     inMemoryUow,
   };

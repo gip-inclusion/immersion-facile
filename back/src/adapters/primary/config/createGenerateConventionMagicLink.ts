@@ -1,4 +1,7 @@
-import { ConventionId, createConventionMagicLinkPayload, Role } from "shared";
+import {
+  createConventionMagicLinkPayload,
+  CreateConventionMagicLinkPayloadProperties,
+} from "shared";
 import { makeGenerateJwtES256 } from "../../../domain/auth/jwt";
 import { AppConfig } from "./appConfig";
 
@@ -9,19 +12,11 @@ export type GenerateConventionMagicLink = ReturnType<
 export const createGenerateConventionMagicLink =
   (config: AppConfig) =>
   ({
-    id,
-    role,
     targetRoute,
-    email,
-  }: {
-    id: ConventionId;
-    role: Role;
+    ...jwtPayload
+  }: CreateConventionMagicLinkPayloadProperties & {
     targetRoute: string;
-    email: string;
-  }) => {
-    const baseUrl = config.immersionFacileBaseUrl;
-    const jwt = makeGenerateJwtES256(config.magicLinkJwtPrivateKey)(
-      createConventionMagicLinkPayload(id, role, email),
-    );
-    return `${baseUrl}/${targetRoute}?jwt=${jwt}`;
-  };
+  }) =>
+    `${config.immersionFacileBaseUrl}/${targetRoute}?jwt=${makeGenerateJwtES256(
+      config.magicLinkJwtPrivateKey,
+    )(createConventionMagicLinkPayload(jwtPayload))}`;

@@ -10,7 +10,6 @@ import {
   BadRequestError,
   ConflictError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryFeatureFlagRepository } from "../../../adapters/secondary/InMemoryFeatureFlagRepository";
@@ -18,6 +17,7 @@ import { InMemoryFormEstablishmentRepository } from "../../../adapters/secondary
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { AddFormEstablishment } from "../../../domain/immersionOffer/useCases/AddFormEstablishment";
+import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 
 describe("Add FormEstablishment", () => {
   let addFormEstablishment: AddFormEstablishment;
@@ -38,9 +38,11 @@ describe("Add FormEstablishment", () => {
 
     uowPerformer = new InMemoryUowPerformer(uow);
 
-    const clock = new CustomClock();
     const uuidGenerator = new TestUuidGenerator();
-    const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
+    const createNewEvent = makeCreateNewEvent({
+      timeGateway: new CustomTimeGateway(),
+      uuidGenerator,
+    });
 
     addFormEstablishment = new AddFormEstablishment(
       uowPerformer,

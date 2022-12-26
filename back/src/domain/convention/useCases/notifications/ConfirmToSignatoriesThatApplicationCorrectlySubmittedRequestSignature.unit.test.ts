@@ -1,4 +1,5 @@
 import { ConventionDto, ConventionDtoBuilder } from "shared";
+import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { expectEmaiSignatoryConfirmationSignatureRequestMatchingConvention } from "../../../../_testBuilders/emailAssertions";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/fakeGenerateMagicLinkUrlFn";
@@ -21,6 +22,7 @@ describe("Add Convention Notifications", () => {
     new ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature(
       emailGw,
       fakeGenerateMagicLinkUrlFn,
+      new CustomTimeGateway(),
     );
 
   beforeEach(() => {

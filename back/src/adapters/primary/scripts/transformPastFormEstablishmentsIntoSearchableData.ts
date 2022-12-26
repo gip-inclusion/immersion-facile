@@ -9,7 +9,6 @@ import {
   httpAdresseApiClient,
   HttpApiAdresseAddressGateway,
 } from "../../secondary/addressGateway/HttpApiAdresseAddressGateway";
-import { RealClock } from "../../secondary/core/ClockImplementations";
 import {
   defaultMaxBackoffPeriodMs,
   defaultRetryDeadlineMs,
@@ -21,12 +20,13 @@ import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { AppConfig } from "../config/appConfig";
 import { createPgUow } from "../config/uowConfig";
 import { HttpsSireneGateway } from "../../secondary/sirene/HttpsSireneGateway";
+import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 
 const maxQpsSireneApi = 0.25;
 
 const logger = createLogger(__filename);
 
-const clock = new RealClock();
+const timeGateway = new RealTimeGateway();
 
 const config = AppConfig.createFromEnv();
 
@@ -50,12 +50,12 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
   const addressAPI = new HttpApiAdresseAddressGateway(httpAdresseApiClient);
   const sireneGateway = new HttpsSireneGateway(
     config.sireneHttpsConfig,
-    clock,
-    new QpsRateLimiter(maxQpsSireneApi, clock, sleep),
+    timeGateway,
+    new QpsRateLimiter(maxQpsSireneApi, timeGateway, sleep),
     new ExponentialBackoffRetryStrategy(
       defaultMaxBackoffPeriodMs,
       defaultRetryDeadlineMs,
-      clock,
+      timeGateway,
       sleep,
       random,
     ),
@@ -68,8 +68,8 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
     sireneGateway,
     addressAPI,
     new UuidV4Generator(),
-    clock,
-    makeCreateNewEvent({ clock, uuidGenerator }),
+    timeGateway,
+    makeCreateNewEvent({ timeGateway, uuidGenerator }),
   );
   const missingFormEstablishmentRows = (
     await clientOrigin.query(

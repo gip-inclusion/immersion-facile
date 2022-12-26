@@ -35,7 +35,7 @@ import { SignConvention } from "../../../domain/convention/useCases/SignConventi
 import { UpdateConvention } from "../../../domain/convention/useCases/UpdateConvention";
 import { UpdateConventionStatus } from "../../../domain/convention/useCases/UpdateConventionStatus";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
-import { Clock } from "../../../domain/core/ports/Clock";
+import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { UuidGenerator } from "../../../domain/core/ports/UuidGenerator";
 import { TransactionalUseCase, UseCase } from "../../../domain/core/UseCase";
@@ -81,11 +81,10 @@ export const createUseCases = (
   generateAdminJwt: GenerateAdminJwt,
   generateAuthenticatedUserToken: GenerateAuthenticatedUserToken,
   uowPerformer: UnitOfWorkPerformer,
-  clock: Clock,
   uuidGenerator: UuidGenerator,
 ) => {
   const createNewEvent = makeCreateNewEvent({
-    clock,
+    timeGateway: gateways.timeGateway,
     uuidGenerator,
     quarantinedTopics: config.quarantinedTopics,
   });
@@ -147,16 +146,23 @@ export const createUseCases = (
       updateConventionStatus: new UpdateConventionStatus(
         uowPerformer,
         createNewEvent,
-        clock,
+        gateways.timeGateway,
       ),
-      signConvention: new SignConvention(uowPerformer, createNewEvent, clock),
-      generateMagicLink: new GenerateMagicLink(generateMagicLinkJwt, clock),
+      signConvention: new SignConvention(
+        uowPerformer,
+        createNewEvent,
+        gateways.timeGateway,
+      ),
+      generateMagicLink: new GenerateMagicLink(
+        generateMagicLinkJwt,
+        gateways.timeGateway,
+      ),
       renewConventionMagicLink: new RenewConventionMagicLink(
         uowPerformer,
         createNewEvent,
         generateMagicLinkJwt,
         config,
-        clock,
+        gateways.timeGateway,
         config.immersionFacileBaseUrl,
       ),
 
@@ -184,7 +190,7 @@ export const createUseCases = (
           uowPerformer,
           gateways.addressApi,
           uuidGenerator,
-          clock,
+          gateways.timeGateway,
         ),
       insertEstablishmentAggregateFromForm:
         new InsertEstablishmentAggregateFromForm(
@@ -192,7 +198,7 @@ export const createUseCases = (
           gateways.sirene,
           gateways.addressApi,
           uuidGenerator,
-          clock,
+          gateways.timeGateway,
           createNewEvent,
         ),
       contactEstablishment: new ContactEstablishment(
@@ -202,19 +208,19 @@ export const createUseCases = (
       insertDiscussionAggregateFromContactRequest:
         new InsertDiscussionAggregateFromContactRequest(
           uowPerformer,
-          clock,
+          gateways.timeGateway,
           uuidGenerator,
         ),
       callLaBonneBoiteAndUpdateRepositories:
         new CallLaBonneBoiteAndUpdateRepositories(
           uowPerformer,
           gateways.laBonneBoiteAPI,
-          clock,
+          gateways.timeGateway,
         ),
       requestEditFormEstablishment: new RequestEditFormEstablishment(
         uowPerformer,
         gateways.email,
-        clock,
+        gateways.timeGateway,
         makeGenerateEditFormEstablishmentUrl(config),
         createNewEvent,
       ),
@@ -243,12 +249,13 @@ export const createUseCases = (
         gateways.email,
       ),
       // METABASE
-      ...dashboardUseCases(gateways.dashboardGateway),
+      ...dashboardUseCases(gateways.dashboardGateway, gateways.timeGateway),
       // notifications
       confirmToSignatoriesThatConventionCorrectlySubmittedRequestSignature:
         new ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature(
           gateways.email,
           makeConventionMagicLink,
+          gateways.timeGateway,
         ),
       notifyLastSigneeThatConventionHasBeenSigned:
         new NotifyLastSigneeThatConventionHasBeenSigned(
@@ -264,11 +271,13 @@ export const createUseCases = (
         uowPerformer,
         gateways.email,
         makeConventionMagicLink,
+        gateways.timeGateway,
       ),
       notifyToAgencyConventionSubmitted: new NotifyToAgencyApplicationSubmitted(
         uowPerformer,
         gateways.email,
         makeConventionMagicLink,
+        gateways.timeGateway,
       ),
       notifyBeneficiaryAndEnterpriseThatConventionIsRejected:
         new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
@@ -280,6 +289,7 @@ export const createUseCases = (
           uowPerformer,
           gateways.email,
           makeConventionMagicLink,
+          gateways.timeGateway,
         ),
       deliverRenewedMagicLink: new DeliverRenewedMagicLink(gateways.email),
       notifyConfirmationEstablishmentCreated:
@@ -293,6 +303,7 @@ export const createUseCases = (
           uowPerformer,
           gateways.email,
           makeConventionMagicLink,
+          gateways.timeGateway,
         ),
       broadcastToPoleEmploiOnConventionUpdates:
         new BroadcastToPoleEmploiOnConventionUpdates(
@@ -313,7 +324,7 @@ export const createUseCases = (
       getFeatureFlags: (_: void) =>
         uowPerformer.perform((uow) => uow.featureFlagRepository.getAll()),
       getApiConsumerById: (id: ApiConsumerId) =>
-        uowPerformer.perform((uow) => uow.getApiConsumersById(id)),
+        uowPerformer.perform((uow) => uow.apiConsumerRepository.getById(id)),
       getAgencyById: (id: AgencyId) =>
         uowPerformer.perform((uow) => uow.agencyRepository.getById(id)),
       isFormEstablishmentWithSiretAlreadySaved: (siret: SiretDto) =>
@@ -330,8 +341,11 @@ export const createUseCases = (
   };
 };
 
-const dashboardUseCases = (gateway: DashboardGateway) => ({
-  getDashboard: new GetDashboardUrl(gateway),
+const dashboardUseCases = (
+  gateway: DashboardGateway,
+  timeGateway: TimeGateway,
+) => ({
+  getDashboard: new GetDashboardUrl(gateway, timeGateway),
 });
 
 export type UseCases = ReturnType<typeof createUseCases>;

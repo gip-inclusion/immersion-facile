@@ -14,9 +14,11 @@ import {
   GenerateConventionMagicLink,
 } from "../../adapters/primary/config/createGenerateConventionMagicLink";
 import { createInMemoryUow } from "../../adapters/primary/config/uowConfig";
+import { CustomTimeGateway } from "../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { SendinblueHtmlEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueHtmlEmailGateway";
 import { InMemoryUowPerformer } from "../../adapters/secondary/InMemoryUowPerformer";
 import { NotifyNewApplicationNeedsReview } from "../../domain/convention/useCases/notifications/NotifyNewApplicationNeedsReview";
+import { TimeGateway } from "../../domain/core/ports/TimeGateway";
 
 // These tests are not hermetic and not meant for automated testing. They will send emails using
 // sendinblue, use up production quota, and fail for uncontrollable reasons such as quota
@@ -37,6 +39,7 @@ describe("Notify To 2 Counsellors that an application is available", () => {
   let emailGw: SendinblueHtmlEmailGateway;
   let generateMagicLinkFn: GenerateConventionMagicLink;
   let agency;
+  let timeGateway: TimeGateway;
 
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
@@ -53,6 +56,7 @@ describe("Notify To 2 Counsellors that an application is available", () => {
       },
     );
     generateMagicLinkFn = createGenerateConventionMagicLink(config);
+    timeGateway = new CustomTimeGateway();
   });
 
   //eslint-disable-next-line jest/expect-expect
@@ -73,6 +77,7 @@ describe("Notify To 2 Counsellors that an application is available", () => {
       new InMemoryUowPerformer(uow),
       emailGw,
       generateMagicLinkFn,
+      timeGateway,
     );
     await notifyNewApplicationNeedsReview.execute(validConvention);
   });
@@ -99,6 +104,7 @@ describe("Notify To 2 Counsellors that an application is available", () => {
       new InMemoryUowPerformer(uow),
       emailGw,
       generateMagicLinkFn,
+      timeGateway,
     );
     await notifyNewApplicationNeedsReview.execute(validConvention);
   });
@@ -122,6 +128,7 @@ describe("Notify To 2 Counsellors that an application is available", () => {
       new InMemoryUowPerformer(uow),
       emailGw,
       generateMagicLinkFn,
+      timeGateway,
     );
     await notifyNewApplicationNeedsReview.execute(validConvention);
   });

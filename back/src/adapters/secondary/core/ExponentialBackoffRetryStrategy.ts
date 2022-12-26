@@ -4,7 +4,7 @@ import {
   secondsToMilliseconds,
 } from "date-fns";
 import { RandomFn, SleepFn } from "shared";
-import { Clock } from "../../../domain/core/ports/Clock";
+import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
 import {
   RetryableError,
   RetryStrategy,
@@ -29,13 +29,13 @@ export class ExponentialBackoffRetryStrategy implements RetryStrategy {
   public constructor(
     private readonly maxBackoffPeriodMs: number,
     private readonly retryDeadlineMs: number,
-    private readonly clock: Clock,
+    private readonly timeGateway: TimeGateway,
     private readonly sleepFn: SleepFn,
     private readonly randomFn: RandomFn,
   ) {}
 
   public async apply<T>(cb: () => Promise<T>): Promise<T> {
-    const startTime = this.clock.now();
+    const startTime = this.timeGateway.now();
     let backoffDurationS = 1;
 
     // TODO Faire une fonction récursive
@@ -58,7 +58,7 @@ export class ExponentialBackoffRetryStrategy implements RetryStrategy {
         await this.sleepFn(truncatedBackoffDurationMs);
 
         const msSinceStart = differenceInMilliseconds(
-          this.clock.now(),
+          this.timeGateway.now(),
           startTime,
         );
 

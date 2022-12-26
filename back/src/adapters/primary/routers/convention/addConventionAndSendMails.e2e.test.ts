@@ -24,8 +24,15 @@ import { InMemoryOutboxRepository } from "../../../secondary/core/InMemoryOutbox
 import { InMemoryEmailGateway } from "../../../secondary/emailGateway/InMemoryEmailGateway";
 
 const validatorEmail = "validator@mail.com";
-const beneficiarySignDate = new Date("2022-09-08");
-const establishmentRepresentativeSignDate = new Date("2022-09-10");
+const beneficiarySubmitDate = new Date();
+beneficiarySubmitDate.setDate(beneficiarySubmitDate.getDate() - 3);
+const beneficiarySignDate = new Date();
+beneficiarySignDate.setDate(beneficiarySignDate.getDate() - 2);
+const establishmentRepresentativeSignDate = new Date();
+establishmentRepresentativeSignDate.setDate(
+  establishmentRepresentativeSignDate.getDate() - 1,
+);
+const validationDate = new Date();
 
 describe("Add Convention Notifications, then checks the mails are sent (trigerred by events)", () => {
   it("saves valid app in repository with full express app", async () => {
@@ -77,7 +84,6 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       .withoutDateValidation()
       .withFederatedIdentity("peConnect:fake")
       .build();
-
     const appAndDeps = await buildTestApp();
     const agency = await appAndDeps.inMemoryUow.agencyRepository.getById(
       initialConvention.agencyId,
@@ -93,6 +99,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       await beneficiarySubmitsApplicationForTheFirstTime(
         appAndDeps,
         initialConvention,
+        beneficiarySubmitDate,
       );
 
     await beneficiarySignsApplication(
@@ -144,7 +151,9 @@ const numberOfEmailInitialySent = 4;
 const beneficiarySubmitsApplicationForTheFirstTime = async (
   { request, gateways, eventCrawler, inMemoryUow }: TestAppAndDeps,
   convention: ConventionDto,
+  submitDate: Date,
 ) => {
+  gateways.timeGateway.setNextDate(submitDate);
   const { externalId, ...createConventionParams } = convention;
   const result = await request
     .post(`/${conventionsRoute}`)
@@ -195,11 +204,11 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
 };
 
 const beneficiarySignsApplication = async (
-  { request, gateways, eventCrawler, inMemoryUow, clock }: TestAppAndDeps,
+  { request, gateways, eventCrawler, inMemoryUow }: TestAppAndDeps,
   beneficiarySignJwt: string,
   initialConvention: ConventionDto,
 ) => {
-  clock.now = () => beneficiarySignDate;
+  gateways.timeGateway.setNextDate(beneficiarySignDate);
 
   const response = await request
     .post(`/auth/${signConventionRoute}/${initialConvention.id}`)
@@ -225,11 +234,11 @@ const beneficiarySignsApplication = async (
 };
 
 const establishmentSignsApplication = async (
-  { request, gateways, eventCrawler, inMemoryUow, clock }: TestAppAndDeps,
+  { request, gateways, eventCrawler, inMemoryUow }: TestAppAndDeps,
   establishmentSignJwt: string,
   initialConvention: ConventionDto,
 ) => {
-  clock.now = () => establishmentRepresentativeSignDate;
+  gateways.timeGateway.setNextDate(establishmentRepresentativeSignDate);
 
   await request
     .post(`/auth/${signConventionRoute}/${initialConvention.id}`)
@@ -266,7 +275,7 @@ const establishmentSignsApplication = async (
 };
 
 const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
-  { request, gateways, eventCrawler, clock, inMemoryUow }: TestAppAndDeps,
+  { request, gateways, eventCrawler, inMemoryUow }: TestAppAndDeps,
   validatorReviewJwt: string,
   initialConvention: ConventionDto,
 ) => {
@@ -274,8 +283,7 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
     status: "ACCEPTED_BY_VALIDATOR",
   };
 
-  const validationDate = new Date("2022-01-01T12:00:00.000");
-  clock.now = () => validationDate;
+  gateways.timeGateway.setNextDate(validationDate);
 
   await request
     .post(`/auth/${updateConventionStatusRoute}/${initialConvention.id}`)

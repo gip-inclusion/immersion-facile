@@ -15,7 +15,7 @@ import {
 import { IdentityProvider } from "../../generic/OAuth/entities/OngoingOAuth";
 import { EstablishmentAggregate } from "../../immersionOffer/entities/EstablishmentEntity";
 import { ConventionAndPeExternalIds } from "../../peConnect/port/ConventionPoleEmploiAdvisorRepository";
-import type { DateStr } from "../ports/Clock";
+import type { DateStr } from "../ports/TimeGateway";
 
 export type SubscriptionId = Flavor<string, "SubscriptionId">;
 

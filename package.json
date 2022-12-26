@@ -24,7 +24,7 @@
     "lint-staged": "lint-staged --config=./.tooling/.lintstaged/.lintstagedrc",
     "includecheck": "turbo run includecheck",
     "format:check": "turbo run format:check",
-    "fullcheck": "turbo run includecheck format:check lint typecheck test",
+    "fullcheck": "turbo run includecheck format:check lint typecheck test --concurrency=50%",
     "typecheck": "turbo run typecheck",
     "lint": "turbo run lint",
     "test": "turbo run test"

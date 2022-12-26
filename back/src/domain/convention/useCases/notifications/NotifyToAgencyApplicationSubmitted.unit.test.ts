@@ -1,12 +1,13 @@
 import {
-  AgencyDtoBuilder,
-  ConventionDtoBuilder,
-  frontRoutes,
-  expectTypeToMatchAndEqual,
   AgencyDto,
+  AgencyDtoBuilder,
   ConventionDto,
+  ConventionDtoBuilder,
+  expectTypeToMatchAndEqual,
+  frontRoutes,
 } from "shared";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
+import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryAgencyRepository } from "../../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
@@ -53,6 +54,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
   let emailGateway: InMemoryEmailGateway;
   let agencyRepository: InMemoryAgencyRepository;
   let notifyToAgencyApplicationSubmitted: NotifyToAgencyApplicationSubmitted;
+  const timeGateway = new CustomTimeGateway();
 
   beforeEach(() => {
     emailGateway = new InMemoryEmailGateway();
@@ -72,6 +74,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
       uowPerformer,
       emailGateway,
       fakeGenerateMagicLinkUrlFn,
+      timeGateway,
     );
   });
 
@@ -93,12 +96,14 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
             role: "counsellor",
             targetRoute: frontRoutes.conventionToValidate,
             email: councellorEmail2,
+            now: timeGateway.now(),
           }),
           conventionStatusLink: fakeGenerateMagicLinkUrlFn({
             id: validConvention.id,
             role: "counsellor",
             targetRoute: frontRoutes.conventionStatusDashboard,
             email: councellorEmail2,
+            now: timeGateway.now(),
           }),
         },
       },
@@ -112,12 +117,14 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
             role: "counsellor",
             targetRoute: frontRoutes.conventionToValidate,
             email: councellorEmail2,
+            now: timeGateway.now(),
           }),
           conventionStatusLink: fakeGenerateMagicLinkUrlFn({
             id: validConvention.id,
             role: "counsellor",
             targetRoute: frontRoutes.conventionStatusDashboard,
             email: councellorEmail2,
+            now: timeGateway.now(),
           }),
         },
       },
@@ -142,12 +149,14 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
             role: "validator",
             targetRoute: frontRoutes.conventionToValidate,
             email: validatorEmail,
+            now: timeGateway.now(),
           }),
           conventionStatusLink: fakeGenerateMagicLinkUrlFn({
             id: validConvention.id,
             role: "validator",
             targetRoute: frontRoutes.conventionStatusDashboard,
             email: validatorEmail,
+            now: timeGateway.now(),
           }),
         },
       },
@@ -174,12 +183,14 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
             role: "counsellor",
             targetRoute: frontRoutes.conventionToValidate,
             email: councellorEmail2,
+            now: timeGateway.now(),
           }),
           conventionStatusLink: fakeGenerateMagicLinkUrlFn({
             id: validConvention.id,
             role: "counsellor",
             targetRoute: frontRoutes.conventionStatusDashboard,
             email: councellorEmail2,
+            now: timeGateway.now(),
           }),
         },
       },
@@ -193,12 +204,14 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
             role: "counsellor",
             targetRoute: frontRoutes.conventionToValidate,
             email: councellorEmail2,
+            now: timeGateway.now(),
           }),
           conventionStatusLink: fakeGenerateMagicLinkUrlFn({
             id: validConvention.id,
             role: "counsellor",
             targetRoute: frontRoutes.conventionStatusDashboard,
             email: councellorEmail2,
+            now: timeGateway.now(),
           }),
         },
       },

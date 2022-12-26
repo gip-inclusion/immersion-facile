@@ -57,7 +57,7 @@ describe(`PUT /${formEstablishmentsRoute} - Route to post edited form establishm
 
   it("Throws 401 if Jwt is expired", async () => {
     const config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
-    const { request, clock } = await buildTestApp();
+    const { request, gateways } = await buildTestApp();
     const generateJwtWithWrongKey = makeGenerateJwtES256(
       config.apiJwtPrivateKey,
     ); // Private Key is the wrong one !
@@ -66,7 +66,7 @@ describe(`PUT /${formEstablishmentsRoute} - Route to post edited form establishm
       createEstablishmentMagicLinkPayload({
         siret: "12345678901234",
         durationDays: 1,
-        now: subYears(clock.now(), 1),
+        now: subYears(gateways.timeGateway.now(), 1),
       }),
     );
     const response = await request

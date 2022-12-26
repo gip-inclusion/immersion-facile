@@ -1,10 +1,6 @@
 import { addYears, subYears } from "date-fns";
-import { Clock } from "../../domain/core/ports/Clock";
-import { GetApiConsumerById } from "../../domain/core/ports/GetApiConsumerById";
-
-type Deps = {
-  clock: Clock;
-};
+import { ApiConsumerId, ApiConsumer } from "shared";
+import { ApiConsumerRepository } from "../../domain/auth/ports/ApiConsumerRepository";
 
 /**
  *
@@ -15,16 +11,17 @@ const authorizedId = "my-authorized-id";
 const unauthorizedId = "my-unauthorized-id";
 const outdatedId = "my-outdated-id";
 
-export const makeStubGetApiConsumerById =
-  ({ clock }: Deps): GetApiConsumerById =>
-  async (id) => {
+const now = new Date();
+
+export class InMemoryApiConsumerRepository implements ApiConsumerRepository {
+  async getById(id: ApiConsumerId): Promise<ApiConsumer | undefined> {
     switch (id) {
       case authorizedId:
         return {
           id: authorizedId,
           consumer: "passeEmploi",
-          createdAt: clock.now(),
-          expirationDate: addYears(clock.now(), 1),
+          createdAt: now,
+          expirationDate: addYears(now, 1),
           isAuthorized: true,
         };
 
@@ -32,8 +29,8 @@ export const makeStubGetApiConsumerById =
         return {
           id: authorizedId,
           consumer: "passeEmploi",
-          createdAt: clock.now(),
-          expirationDate: addYears(clock.now(), 1),
+          createdAt: now,
+          expirationDate: addYears(now, 1),
           isAuthorized: false,
         };
 
@@ -41,12 +38,13 @@ export const makeStubGetApiConsumerById =
         return {
           id: authorizedId,
           consumer: "passeEmploi",
-          createdAt: clock.now(),
-          expirationDate: subYears(clock.now(), 1),
+          createdAt: subYears(now, 2),
+          expirationDate: subYears(now, 1),
           isAuthorized: true,
         };
 
       default:
         return;
     }
-  };
+  }
+}

@@ -5,7 +5,7 @@ import {
   GeoPositionDto,
   NafDto,
 } from "shared";
-import { Clock } from "../domain/core/ports/Clock";
+import { TimeGateway } from "../domain/core/ports/TimeGateway";
 import { UuidGenerator } from "../domain/core/ports/UuidGenerator";
 import { ContactEntityV2 } from "../domain/immersionOffer/entities/ContactEntity";
 import {
@@ -21,28 +21,28 @@ import { SireneEstablishmentVO } from "../domain/sirene/valueObjects/SireneEstab
 const offerFromFormScore = 10;
 
 const appelationToImmersionOfferEntity =
-  (clock: Clock) =>
+  (timeGateway: TimeGateway) =>
   ({ romeCode, appellationCode }: AppellationDto): ImmersionOfferEntityV2 => ({
     romeCode,
     appellationCode,
     score: offerFromFormScore,
-    createdAt: clock.now(),
+    createdAt: timeGateway.now(),
   });
 
 export const makeFormEstablishmentToEstablishmentAggregate = ({
   uuidGenerator,
-  clock,
+  timeGateway,
   addressGateway,
   sireneGateway,
 }: {
   uuidGenerator: UuidGenerator;
-  clock: Clock;
+  timeGateway: TimeGateway;
   addressGateway: AddressGateway;
   sireneGateway: SireneGateway;
 }) => {
   const createEstablishmentAggregate = makeCreateEstablishmentAggregate({
     uuidGenerator,
-    clock,
+    timeGateway,
   });
 
   return async (
@@ -68,16 +68,16 @@ export const makeFormEstablishmentToEstablishmentAggregate = ({
 
 export const makeUpdateEstablishmentAggregateFromFormEstablishment = ({
   uuidGenerator,
-  clock,
+  timeGateway,
   addressGateway,
 }: {
   uuidGenerator: UuidGenerator;
-  clock: Clock;
+  timeGateway: TimeGateway;
   addressGateway: AddressGateway;
 }) => {
   const createEstablishmentAggregate = makeCreateEstablishmentAggregate({
     uuidGenerator,
-    clock,
+    timeGateway,
   });
 
   return async (
@@ -152,7 +152,13 @@ const getNafAndNumberOfEmployee = async (
 };
 
 const makeCreateEstablishmentAggregate =
-  ({ uuidGenerator, clock }: { uuidGenerator: UuidGenerator; clock: Clock }) =>
+  ({
+    uuidGenerator,
+    timeGateway,
+  }: {
+    uuidGenerator: UuidGenerator;
+    timeGateway: TimeGateway;
+  }) =>
   ({
     formEstablishment,
     nafAndNumberOfEmployee: { nafDto, numberEmployeesRange },
@@ -169,7 +175,7 @@ const makeCreateEstablishmentAggregate =
 
     const immersionOffers: ImmersionOfferEntityV2[] =
       formEstablishment.appellations.map(
-        appelationToImmersionOfferEntity(clock),
+        appelationToImmersionOfferEntity(timeGateway),
       );
 
     const establishment: EstablishmentEntityV2 = {
@@ -187,7 +193,7 @@ const makeCreateEstablishmentAggregate =
       position,
       numberEmployeesRange,
       isActive: true,
-      updatedAt: clock.now(),
+      updatedAt: timeGateway.now(),
       isSearchable: formEstablishment.isSearchable,
     };
 

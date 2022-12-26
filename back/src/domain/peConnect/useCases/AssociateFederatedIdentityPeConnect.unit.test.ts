@@ -5,8 +5,8 @@ import {
 } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
-import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
+import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import {
   CONVENTION_ID_DEFAULT_UUID,
@@ -30,9 +30,11 @@ describe("AssociatePeConnectFederatedIdentity", () => {
     outboxRepo = uow.outboxRepository;
     uowPerformer = new InMemoryUowPerformer(uow);
 
-    const clock = new CustomClock();
     const uuidGenerator = new TestUuidGenerator();
-    const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
+    const createNewEvent = makeCreateNewEvent({
+      timeGateway: new CustomTimeGateway(),
+      uuidGenerator,
+    });
 
     associatePeConnectFederatedIdentity =
       new AssociatePeConnectFederatedIdentity(uowPerformer, createNewEvent);

@@ -11,7 +11,7 @@ import {
   WithApiConsumerId,
 } from "shared";
 import { makeVerifyJwtES256 } from "../../domain/auth/jwt";
-import { Clock } from "../../domain/core/ports/Clock";
+import { TimeGateway } from "../../domain/core/ports/TimeGateway";
 import { GetApiConsumerById } from "../../domain/core/ports/GetApiConsumerById";
 import { createLogger } from "../../utils/logger";
 import { AppConfig } from "./config/appConfig";
@@ -51,7 +51,7 @@ const createIncTotalCountForRequest =
 // should be deleted when all consumer migrate to v1
 export const createApiKeyAuthMiddlewareV0 = (
   getApiConsumerById: GetApiConsumerById,
-  clock: Clock,
+  timeGateway: TimeGateway,
   config: AppConfig,
 ) => {
   const verifyJwt = makeVerifyJwtES256<WithApiConsumerId>(
@@ -84,7 +84,7 @@ export const createApiKeyAuthMiddlewareV0 = (
         return next();
       }
 
-      if (apiConsumer.expirationDate < clock.now()) {
+      if (apiConsumer.expirationDate < timeGateway.now()) {
         incTotalCountForRequest({
           authorisationStatus: "expiredToken",
           consumerName: apiConsumer.consumer,
@@ -114,7 +114,7 @@ const responseError = (res: Response, message: string, status = 403) =>
 
 export const makeApiKeyAuthMiddlewareV1 = (
   getApiConsumerById: GetApiConsumerById,
-  clock: Clock,
+  timeGateway: TimeGateway,
   config: AppConfig,
 ) => {
   const verifyJwt = makeVerifyJwtES256<WithApiConsumerId>(
@@ -130,6 +130,7 @@ export const makeApiKeyAuthMiddlewareV1 = (
 
     try {
       const { id } = verifyJwt(req.headers.authorization);
+
       const apiConsumer = await getApiConsumerById(id);
 
       if (!apiConsumer) {
@@ -147,7 +148,7 @@ export const makeApiKeyAuthMiddlewareV1 = (
         return responseError(res, "unauthorised consumer Id");
       }
 
-      if (apiConsumer.expirationDate < clock.now()) {
+      if (apiConsumer.expirationDate < timeGateway.now()) {
         incTotalCountForRequest({
           authorisationStatus: "expiredToken",
           consumerName: apiConsumer.consumer,
@@ -177,7 +178,6 @@ export const makeMagicLinkAuthMiddleware = (
   payloadKey: PayloadKey,
 ) => {
   const { verifyJwt, verifyDeprecatedJwt } = verifyJwtConfig(config);
-
   return (req: Request, res: Response, next: NextFunction) => {
     const maybeJwt = req.headers.authorization;
     if (!maybeJwt) {
@@ -225,7 +225,6 @@ export const makeMagicLinkAuthMiddleware = (
           { token: maybeJwt, payload: unsafePayload },
           "token expired",
         );
-
         return unsafePayload
           ? sendNeedsRenewedLinkError(res, err)
           : sendAuthenticationError(res, err);

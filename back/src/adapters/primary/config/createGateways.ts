@@ -3,7 +3,7 @@ import { createAxiosHandlerCreator } from "http-client";
 import { Pool } from "pg";
 import { exhaustiveCheck, immersionFacileContactEmail } from "shared";
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
-import { Clock } from "../../../domain/core/ports/Clock";
+import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
@@ -50,6 +50,8 @@ import { S3DocumentGateway } from "../../secondary/S3DocumentGateway";
 import { HttpsSireneGateway } from "../../secondary/sirene/HttpsSireneGateway";
 import { InMemorySireneGateway } from "../../secondary/sirene/InMemorySireneGateway";
 import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
+import { CustomTimeGateway } from "../../secondary/core/TimeGateway/CustomTimeGateway";
+import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 
 const logger = createLogger(__filename);
 
@@ -86,7 +88,7 @@ export type Gateways = ReturnType<typeof createGateways> extends Promise<infer T
   : never;
 
 // eslint-disable-next-line @typescript-eslint/require-await
-export const createGateways = async (config: AppConfig, clock: Clock) => {
+export const createGateways = async (config: AppConfig) => {
   logger.info({
     emailGateway: config.emailGateway,
     repositories: config.repositories,
@@ -105,15 +107,24 @@ export const createGateways = async (config: AppConfig, clock: Clock) => {
           noRateLimit,
           noRetries,
         ),
-        clock,
       )
     : new InMemoryAccessTokenGateway();
+
+  const timeGateway =
+    config.timeGateway === "CUSTOM"
+      ? new CustomTimeGateway()
+      : new RealTimeGateway();
 
   return {
     addressApi: createAddressGateway(config),
     dashboardGateway: createDashboardGateway(config),
     documentGateway: createDocumentGateway(config),
-    email: createEmailGateway(config, clock),
+    email: createEmailGateway(config, timeGateway),
+    exportGateway:
+      config.reporting === "EXCEL"
+        ? new ExcelExportGateway()
+        : new InMemoryExportGateway(),
+    inclusionConnectGateway: createInclusionConnectGateway(config),
     laBonneBoiteAPI:
       config.laBonneBoiteGateway === "HTTPS"
         ? new HttpLaBonneBoiteAPI(
@@ -129,7 +140,6 @@ export const createGateways = async (config: AppConfig, clock: Clock) => {
         ? new HttpPassEmploiGateway(config.passEmploiUrl, config.passEmploiKey)
         : new InMemoryPassEmploiGateway(),
     peConnectGateway: createPoleEmploiConnectGateway(config),
-    inclusionConnectGateway: createInclusionConnectGateway(config),
     poleEmploiGateway:
       config.poleEmploiGateway === "HTTPS"
         ? new HttpPoleEmploiGateway(
@@ -140,25 +150,25 @@ export const createGateways = async (config: AppConfig, clock: Clock) => {
             noRetries,
           )
         : new InMemoryPoleEmploiGateway(),
+    timeGateway,
     sirene:
       config.sireneGateway === "HTTPS"
         ? new HttpsSireneGateway(
             config.sireneHttpsConfig,
-            clock,
+            timeGateway,
             noRateLimit,
             noRetries,
           )
         : new InMemorySireneGateway(),
-    exportGateway:
-      config.reporting === "EXCEL"
-        ? new ExcelExportGateway()
-        : new InMemoryExportGateway(),
   };
 };
 
-const createEmailGateway = (config: AppConfig, clock: Clock): EmailGateway => {
+const createEmailGateway = (
+  config: AppConfig,
+  timeGateway: TimeGateway,
+): EmailGateway => {
   if (config.emailGateway === "IN_MEMORY")
-    return new InMemoryEmailGateway(clock);
+    return new InMemoryEmailGateway(timeGateway);
 
   const sendinblueHtmlEmailGateway = new SendinblueHtmlEmailGateway(
     axios,
@@ -180,7 +190,7 @@ const createEmailGateway = (config: AppConfig, clock: Clock): EmailGateway => {
   if (config.emailGateway === "HYBRID")
     return new HybridEmailGateway(
       sendinblueHtmlEmailGateway,
-      new InMemoryEmailGateway(clock, 15),
+      new InMemoryEmailGateway(timeGateway, 15),
     );
 
   if (config.emailGateway === "SENDINBLUE") return sendinblueHtmlEmailGateway;

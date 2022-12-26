@@ -1,4 +1,4 @@
-import { DateStr } from "../../core/ports/Clock";
+import { DateStr } from "../../core/ports/TimeGateway";
 
 // This is an interface contract with Pole Emploi (conventions broadcast).
 // ⚠️ Beware of NOT breaking contract ! ⚠️

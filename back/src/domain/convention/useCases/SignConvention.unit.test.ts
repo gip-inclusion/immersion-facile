@@ -19,8 +19,8 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
+import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
@@ -48,21 +48,24 @@ describe("Sign convention", () => {
   let conventionRepository: InMemoryConventionRepository;
   let outboxRepository: InMemoryOutboxRepository;
   let signConvention: SignConvention;
-  let clock: CustomClock;
+  let timeGateway: CustomTimeGateway;
 
   beforeEach(() => {
     const uow = createInMemoryUow();
     conventionRepository = uow.conventionRepository;
     outboxRepository = uow.outboxRepository;
 
-    clock = new CustomClock();
+    timeGateway = new CustomTimeGateway();
     const uuidGenerator = new TestUuidGenerator();
-    const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
+    const createNewEvent = makeCreateNewEvent({
+      timeGateway,
+      uuidGenerator,
+    });
 
     signConvention = new SignConvention(
       new InMemoryUowPerformer(uow),
       createNewEvent,
-      clock,
+      timeGateway,
     );
   });
 
@@ -135,7 +138,7 @@ describe("Sign convention", () => {
         [conventionInDb.id]: conventionInDb,
       });
       const signedAt = new Date("2022-01-01");
-      clock.setNextDate(signedAt);
+      timeGateway.setNextDate(signedAt);
 
       await triggerSignature({
         role,
@@ -173,7 +176,7 @@ describe("Sign convention", () => {
       [initialConvention.id]: initialConvention,
     });
     const signedAt = new Date("2022-01-01");
-    clock.setNextDate(signedAt);
+    timeGateway.setNextDate(signedAt);
 
     await triggerSignature({
       role: "establishment",
@@ -212,7 +215,7 @@ describe("Sign convention", () => {
     });
 
     const establishmentRepresentativeSignedAt = new Date("2022-01-01");
-    clock.setNextDate(establishmentRepresentativeSignedAt);
+    timeGateway.setNextDate(establishmentRepresentativeSignedAt);
 
     await triggerSignature({
       role: "establishment",
@@ -257,7 +260,7 @@ describe("Sign convention", () => {
     });
 
     const establishmentRepresentativeSignedAt = new Date("2022-01-01");
-    clock.setNextDate(establishmentRepresentativeSignedAt);
+    timeGateway.setNextDate(establishmentRepresentativeSignedAt);
 
     await triggerSignature({
       role: "establishment",

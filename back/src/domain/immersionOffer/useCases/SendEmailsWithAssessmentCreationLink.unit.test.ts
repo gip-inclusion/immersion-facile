@@ -1,6 +1,6 @@
 import { ConventionDtoBuilder, ConventionId, Role } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
-import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
+import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { UuidV4Generator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
@@ -14,10 +14,13 @@ const prepareUseCase = () => {
   const outboxRepository = uow.outboxRepository;
   const conventionRepository = uow.conventionRepository;
 
-  const clock = new CustomClock();
+  const timeGateway = new CustomTimeGateway();
   const emailGateway = new InMemoryEmailGateway();
   const uuidGenerator = new UuidV4Generator();
-  const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
+  const createNewEvent = makeCreateNewEvent({
+    timeGateway,
+    uuidGenerator,
+  });
 
   const generateConventionMagicLink = ({
     id,
@@ -33,7 +36,7 @@ const prepareUseCase = () => {
     new SendEmailsWithAssessmentCreationLink(
       new InMemoryUowPerformer(uow),
       emailGateway,
-      clock,
+      timeGateway,
       generateConventionMagicLink,
       createNewEvent,
     );
@@ -44,7 +47,7 @@ const prepareUseCase = () => {
     outboxRepository,
     emailGateway,
     conventionRepository,
-    clock,
+    timeGateway,
   };
 };
 
@@ -56,10 +59,10 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
       outboxRepository,
       emailGateway,
       conventionRepository,
-      clock,
+      timeGateway,
     } = prepareUseCase();
 
-    clock.setNextDate(new Date("2021-05-15T08:00:00.000Z"));
+    timeGateway.setNextDate(new Date("2021-05-15T08:00:00.000Z"));
 
     const immersionApplicationEndingTomorrow = new ConventionDtoBuilder()
       .withDateStart("2021-05-13T10:00:00.000Z")
@@ -110,10 +113,10 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
       outboxRepository,
       emailGateway,
       conventionRepository,
-      clock,
+      timeGateway,
     } = prepareUseCase();
 
-    clock.setNextDate(new Date("2021-05-15T08:00:00.000Z"));
+    timeGateway.setNextDate(new Date("2021-05-15T08:00:00.000Z"));
 
     const immersionApplicationEndingTomorrow = new ConventionDtoBuilder()
       .withDateEnd("2021-05-16T10:00:00.000Z")

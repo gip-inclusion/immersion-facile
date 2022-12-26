@@ -8,6 +8,7 @@ import {
   createInMemoryUow,
   InMemoryUnitOfWork,
 } from "../../../adapters/primary/config/uowConfig";
+import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { PeUserAndAdvisor } from "../../../domain/peConnect/dto/PeConnect.dto";
@@ -19,6 +20,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
   let uow: InMemoryUnitOfWork;
   let emailGateway: InMemoryEmailGateway;
   let usecase: NotifyPoleEmploiUserAdvisorOnConventionFullySigned;
+  const timeGateway = new CustomTimeGateway();
 
   beforeEach(() => {
     emailGateway = new InMemoryEmailGateway();
@@ -27,6 +29,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
       new InMemoryUowPerformer(uow),
       emailGateway,
       fakeGenerateMagicLinkUrlFn,
+      timeGateway,
     );
   });
 
@@ -90,6 +93,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
             role: "validator",
             targetRoute: frontRoutes.conventionToValidate,
             email: advisor.email,
+            now: timeGateway.now(),
           }),
         },
       },

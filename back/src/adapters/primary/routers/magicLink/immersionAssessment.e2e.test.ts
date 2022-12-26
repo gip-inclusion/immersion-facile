@@ -15,11 +15,12 @@ describe("Immersion assessment routes", () => {
         await buildTestApp();
 
       const jwt = generateMagicLinkJwt(
-        createConventionMagicLinkPayload(
-          conventionId,
-          "establishment",
-          "establishment@company.fr",
-        ),
+        createConventionMagicLinkPayload({
+          id: conventionId,
+          role: "establishment",
+          email: "establishment@company.fr",
+          now: new Date(),
+        }),
       );
 
       const convention = new ConventionDtoBuilder()

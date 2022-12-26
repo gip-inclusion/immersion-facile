@@ -14,7 +14,6 @@ import { EstablishmentEntityV2Builder } from "../../../_testBuilders/Establishme
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
-import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
@@ -27,6 +26,7 @@ import {
   SireneEstablishmentVO,
 } from "../../../domain/sirene/valueObjects/SireneEstablishmentVO";
 import { InMemorySireneGateway } from "../../../adapters/secondary/sirene/InMemorySireneGateway";
+import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 
 const fakeSiret = "90040893100013";
 const fakePosition: GeoPositionDto = { lat: 49.119146, lon: 6.17602 };
@@ -78,15 +78,15 @@ describe("Insert Establishment aggregate from form data", () => {
       establishmentAggregateRepository: establishmentAggregateRepo,
       outboxRepository: outboxRepo,
     });
-    const clock = new CustomClock();
+    const timeGateway = new CustomTimeGateway();
 
     useCase = new InsertEstablishmentAggregateFromForm(
       uowPerformer,
       sireneRepo,
       addressAPI,
       uuidGenerator,
-      clock,
-      makeCreateNewEvent({ clock, uuidGenerator }),
+      timeGateway,
+      makeCreateNewEvent({ timeGateway, uuidGenerator }),
     );
   });
 

@@ -7,20 +7,20 @@ import {
 } from "shared";
 import { makeGenerateJwtES256 } from "../../../domain/auth/jwt";
 import { createLogger } from "../../../utils/logger";
-import { RealClock } from "../../secondary/core/ClockImplementations";
+import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { AppConfig } from "../config/appConfig";
 
 const logger = createLogger(__filename);
 
 const uuidGenerator = new UuidV4Generator();
-const clock = new RealClock();
+const timeGateway = new RealTimeGateway();
 const appConfig = AppConfig.createFromEnv();
 const generateApiKeyJwt = makeGenerateJwtES256<WithApiConsumerId>(
   appConfig.apiJwtPrivateKey,
 );
 
-const createdAt = clock.now();
+const createdAt = timeGateway.now();
 const expirationDate = addYears(createdAt, 2);
 
 const getNameOrThrow = (name: string): ApiConsumerName => {

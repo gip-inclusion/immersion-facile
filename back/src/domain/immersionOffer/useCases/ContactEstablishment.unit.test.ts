@@ -9,7 +9,6 @@ import { EstablishmentEntityV2Builder } from "../../../_testBuilders/Establishme
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
-import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
@@ -17,6 +16,7 @@ import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPer
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { ContactEstablishment } from "../../../domain/immersionOffer/useCases/ContactEstablishment";
+import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 
 const immersionOffer = new ImmersionOfferEntityV2Builder().build();
 const siret = "11112222333344";
@@ -37,7 +37,7 @@ describe("ContactEstablishment", () => {
   let outboxRepository: InMemoryOutboxRepository;
   let uowPerformer: UnitOfWorkPerformer;
   let uuidGenerator: TestUuidGenerator;
-  let clock: CustomClock;
+  let timeGateway: CustomTimeGateway;
 
   beforeEach(() => {
     establishmentAggregateRepository =
@@ -48,9 +48,12 @@ describe("ContactEstablishment", () => {
       establishmentAggregateRepository,
       outboxRepository,
     });
-    clock = new CustomClock();
+    timeGateway = new CustomTimeGateway();
     uuidGenerator = new TestUuidGenerator();
-    const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
+    const createNewEvent = makeCreateNewEvent({
+      timeGateway,
+      uuidGenerator,
+    });
 
     contactEstablishment = new ContactEstablishment(
       uowPerformer,
@@ -78,7 +81,7 @@ describe("ContactEstablishment", () => {
     uuidGenerator.setNextUuid(eventId);
 
     const now = new Date("2021-12-08T15:00");
-    clock.setNextDate(now);
+    timeGateway.setNextDate(now);
 
     const validEmailRequest: ContactEstablishmentRequestDto = {
       ...validRequest,
@@ -119,7 +122,7 @@ describe("ContactEstablishment", () => {
     uuidGenerator.setNextUuid(eventId);
 
     const now = new Date("2021-12-08T15:00");
-    clock.setNextDate(now);
+    timeGateway.setNextDate(now);
 
     const validPhoneRequest: ContactEstablishmentRequestDto = {
       ...validRequest,
@@ -159,7 +162,7 @@ describe("ContactEstablishment", () => {
     uuidGenerator.setNextUuid(eventId);
 
     const now = new Date("2021-12-08T15:00");
-    clock.setNextDate(now);
+    timeGateway.setNextDate(now);
 
     const validInPersonRequest: ContactEstablishmentRequestDto = {
       ...validRequest,

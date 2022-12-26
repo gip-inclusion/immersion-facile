@@ -8,7 +8,7 @@ import {
   InMemoryUnitOfWork,
 } from "../../../adapters/primary/config/uowConfig";
 import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
-import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
+import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import {
   prepareNextUuid,
   TestUuidGenerator,
@@ -37,7 +37,10 @@ describe("AuthenticateWithInclusionCode use case", () => {
     inclusionConnectGateway = new InMemoryInclusionConnectGateway();
     useCase = new AuthenticateWithInclusionCode(
       new InMemoryUowPerformer(uow),
-      makeCreateNewEvent({ clock: new CustomClock(), uuidGenerator }),
+      makeCreateNewEvent({
+        timeGateway: new CustomTimeGateway(),
+        uuidGenerator,
+      }),
       inclusionConnectGateway,
       uuidGenerator,
       () => correctToken,

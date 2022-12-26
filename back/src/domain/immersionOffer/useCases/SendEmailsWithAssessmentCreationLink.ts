@@ -6,7 +6,7 @@ import { createLogger } from "../../../utils/logger";
 import { notifyDiscord } from "../../../utils/notifyDiscord";
 import { EmailGateway } from "../../convention/ports/EmailGateway";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
-import { Clock } from "../../core/ports/Clock";
+import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
@@ -26,7 +26,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<v
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private emailGateway: EmailGateway,
-    private clock: Clock,
+    private timeGateway: TimeGateway,
     private generateConventionMagicLink: GenerateConventionMagicLink,
     private createNewEvent: CreateNewEvent,
   ) {
@@ -34,7 +34,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<v
   }
 
   protected async _execute(_: void, uow: UnitOfWork): Promise<void> {
-    const now = this.clock.now();
+    const now = this.timeGateway.now();
     const tomorrow = addDays(now, 1);
     const assessmentEmailParamsOfImmersionEndingTomorrow =
       await uow.conventionQueries.getAllImmersionAssessmentEmailParamsForThoseEndingThatDidntReceivedAssessmentLink(
@@ -78,6 +78,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<v
       email: immersionAssessmentEmailParams.establishmentTutorEmail,
       role: "establishment",
       targetRoute: frontRoutes.immersionAssessment,
+      now: this.timeGateway.now(),
     });
 
     await this.emailGateway.sendEmail({

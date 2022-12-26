@@ -13,7 +13,6 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
@@ -24,6 +23,7 @@ import {
   CreateNewEvent,
   makeCreateNewEvent,
 } from "../../core/eventBus/EventBus";
+import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 
 describe("Update Convention", () => {
   let updateConvention: UpdateConvention;
@@ -42,7 +42,7 @@ describe("Update Convention", () => {
     });
 
     createNewEvent = makeCreateNewEvent({
-      clock: new CustomClock(),
+      timeGateway: new CustomTimeGateway(),
       uuidGenerator: new TestUuidGenerator(),
     });
 

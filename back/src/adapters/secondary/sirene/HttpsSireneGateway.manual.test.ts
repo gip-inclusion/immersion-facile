@@ -1,9 +1,10 @@
 import { AppConfig } from "../../primary/config/appConfig";
-import { RealClock } from "../core/ClockImplementations";
+
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { SireneGateway } from "../../../domain/sirene/ports/SireneGateway";
 import { HttpsSireneGateway } from "./HttpsSireneGateway";
+import { RealTimeGateway } from "../core/TimeGateway/RealTimeGateway";
 
 // These tests are not hermetic and not meant for automated testing. They will make requests to the
 // real SIRENE API, use up production quota, and fail for uncontrollable reasons such as quota
@@ -19,7 +20,7 @@ describe("HttpsSireneGateway", () => {
     const config = AppConfig.createFromEnv();
     sireneGateway = new HttpsSireneGateway(
       config.sireneHttpsConfig,
-      new RealClock(),
+      new RealTimeGateway(),
       noRateLimit,
       noRetries,
     );

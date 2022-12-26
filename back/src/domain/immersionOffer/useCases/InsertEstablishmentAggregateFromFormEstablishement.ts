@@ -3,7 +3,7 @@ import { createLogger } from "../../../utils/logger";
 import { makeFormEstablishmentToEstablishmentAggregate } from "../../../utils/makeFormEstablishmentToEstablishmentAggregate";
 import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
-import { Clock } from "../../core/ports/Clock";
+import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -25,7 +25,7 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
     private readonly sireneGateway: SireneGateway,
     private readonly addressAPI: AddressGateway,
     private readonly uuidGenerator: UuidGenerator,
-    private readonly clock: Clock,
+    private readonly timeGateway: TimeGateway,
     private readonly createNewEvent: CreateNewEvent,
   ) {
     super(uowPerformer);
@@ -51,7 +51,7 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
         sireneGateway: this.sireneGateway,
         addressGateway: this.addressAPI,
         uuidGenerator: this.uuidGenerator,
-        clock: this.clock,
+        timeGateway: this.timeGateway,
       })(formEstablishment);
 
     log(

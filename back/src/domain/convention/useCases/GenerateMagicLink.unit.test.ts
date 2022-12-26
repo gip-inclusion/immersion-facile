@@ -6,7 +6,7 @@ import {
   GenerateMagicLinkRequestDto,
   Role,
 } from "shared";
-import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
+import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import {
   GenerateMagicLinkJwt,
   makeGenerateJwtES256,
@@ -25,8 +25,11 @@ describe("Generate magic links", () => {
       const id = "123";
       const role = "validator" as Role;
       const email = "foo@bar.com";
-      const clock = new CustomClock();
-      const result = await new GenerateMagicLink(generateJwtFn, clock).execute({
+      const timeGateway = new CustomTimeGateway();
+      const result = await new GenerateMagicLink(
+        generateJwtFn,
+        timeGateway,
+      ).execute({
         applicationId: id,
         role,
         expired: false,
@@ -34,9 +37,12 @@ describe("Generate magic links", () => {
 
       expect(result).toEqual({
         jwt: generateJwtFn(
-          createConventionMagicLinkPayload(id, role, email, undefined, () =>
-            clock.now().getTime(),
-          ),
+          createConventionMagicLinkPayload({
+            id,
+            role,
+            email,
+            now: timeGateway.now(),
+          }),
         ),
       });
     });
@@ -48,7 +54,7 @@ describe("Generate magic links", () => {
       };
       const result = await new GenerateMagicLink(
         makeGenerateJwtES256(new AppConfigBuilder({}).build().apiJwtPrivateKey),
-        new CustomClock(new Date("2022-12-20T00:00:00.000Z")),
+        new CustomTimeGateway(new Date("2022-12-20T00:00:00.000Z")),
       ).execute(request);
 
       expectToEqual(

@@ -6,6 +6,7 @@ import { InMemoryUnitOfWork } from "../adapters/primary/config/uowConfig";
 import { createApp } from "../adapters/primary/server";
 import { InMemoryAddressGateway } from "../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { BasicEventCrawler } from "../adapters/secondary/core/EventCrawlerImplementations";
+import { CustomTimeGateway } from "../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { StubDashboardGateway } from "../adapters/secondary/dashboardGateway/StubDashboardGateway";
 import type { InMemoryEmailGateway } from "../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryLaBonneBoiteAPI } from "../adapters/secondary/immersionOffer/laBonneBoite/InMemoryLaBonneBoiteAPI";
@@ -20,7 +21,6 @@ import {
   GenerateApiConsumerJtw,
   GenerateMagicLinkJwt,
 } from "../domain/auth/jwt";
-import { Clock } from "../domain/core/ports/Clock";
 import { UuidGenerator } from "../domain/core/ports/UuidGenerator";
 import { AppConfigBuilder } from "./AppConfigBuilder";
 
@@ -36,6 +36,7 @@ export type InMemoryGateways = {
   dashboardGateway: StubDashboardGateway;
   addressApi: InMemoryAddressGateway;
   exportGateway: InMemoryExportGateway;
+  timeGateway: CustomTimeGateway;
 };
 
 // following function only to type check that InMemoryRepositories is assignable to Repositories :
@@ -49,7 +50,6 @@ export type TestAppAndDeps = {
   appConfig: AppConfig;
   generateApiJwt: GenerateApiConsumerJtw;
   generateMagicLinkJwt: GenerateMagicLinkJwt;
-  clock: Clock;
   uuidGenerator: UuidGenerator;
   inMemoryUow: InMemoryUnitOfWork;
 };
@@ -67,25 +67,27 @@ export const buildTestApp = async (
     .build();
 
   const appConfig = new AppConfigBuilder({
-    ENABLE_ENTERPRISE_SIGNATURE: "TRUE",
-    SKIP_EMAIL_ALLOW_LIST: "TRUE",
-    EMAIL_GATEWAY: "IN_MEMORY",
-    SIRENE_REPOSITORY: "IN_MEMORY",
+    ADDRESS_API_GATEWAY: "IN_MEMORY",
+    EVENT_CRAWLER_PERIOD_MS: "0", // will not crawl automatically
     DOMAIN: "my-domain",
-    REPOSITORIES: "IN_MEMORY",
+    EMAIL_GATEWAY: "IN_MEMORY",
+    ENABLE_ENTERPRISE_SIGNATURE: "TRUE",
+    INCLUSION_CONNECT_GATEWAY: "IN_MEMORY",
     LA_BONNE_BOITE_GATEWAY: "IN_MEMORY",
     PASS_EMPLOI_GATEWAY: "IN_MEMORY",
-    INCLUSION_CONNECT_GATEWAY: "IN_MEMORY",
     PE_CONNECT_GATEWAY: "IN_MEMORY",
-    EVENT_CRAWLER_PERIOD_MS: "0", // will not crawl automatically
     REPORTING_GATEWAY: "EXCEL",
-    ADDRESS_API_GATEWAY: "IN_MEMORY",
+    REPOSITORIES: "IN_MEMORY",
+    SKIP_EMAIL_ALLOW_LIST: "TRUE",
+    SIRENE_REPOSITORY: "IN_MEMORY",
+    TIME_GATEWAY: "CUSTOM",
     ...appConfigOverrides?.configParams,
   }).build();
 
   if (appConfig.emailGateway !== "IN_MEMORY") throwNotSupportedError();
   if (appConfig.repositories !== "IN_MEMORY") throwNotSupportedError();
   if (appConfig.sireneGateway !== "IN_MEMORY") throwNotSupportedError();
+  if (appConfig.timeGateway !== "CUSTOM") throwNotSupportedError();
 
   const {
     app,
@@ -93,7 +95,6 @@ export const buildTestApp = async (
     eventCrawler: rawEventCrawler,
     generateApiJwt,
     generateMagicLinkJwt,
-    clock,
     uuidGenerator,
     inMemoryUow: uow,
   } = await createApp(appConfig);
@@ -113,7 +114,6 @@ export const buildTestApp = async (
     appConfig,
     generateApiJwt,
     generateMagicLinkJwt,
-    clock,
     uuidGenerator,
     inMemoryUow,
   };

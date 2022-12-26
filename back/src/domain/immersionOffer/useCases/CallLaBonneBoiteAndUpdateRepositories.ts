@@ -6,7 +6,7 @@ import {
   searchImmersionQueryParamsSchema,
 } from "shared";
 import { createLogger } from "../../../utils/logger";
-import { Clock } from "../../core/ports/Clock";
+import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { LaBonneBoiteRequestEntity } from "../entities/LaBonneBoiteRequestEntity";
@@ -42,7 +42,7 @@ export class CallLaBonneBoiteAndUpdateRepositories extends TransactionalUseCase<
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly laBonneBoiteAPI: LaBonneBoiteAPI,
-    private readonly clock: Clock,
+    private readonly timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
   }
@@ -118,7 +118,7 @@ export class CallLaBonneBoiteAndUpdateRepositories extends TransactionalUseCase<
         const company = relevantCompanies.find(propEq("siret", siret))!;
         return {
           siret: company.siret,
-          createdAt: this.clock.now(),
+          createdAt: this.timeGateway.now(),
           romeCode: company.props.matched_rome_code,
           score: company.props.stars,
         };
@@ -145,7 +145,7 @@ export class CallLaBonneBoiteAndUpdateRepositories extends TransactionalUseCase<
       return {
         relevantCompanies: laBonneBoiteRelevantCompanies,
         lbbRequestEntity: {
-          requestedAt: this.clock.now(),
+          requestedAt: this.timeGateway.now(),
           params: requestParams,
           result: {
             error: null,
@@ -160,7 +160,7 @@ export class CallLaBonneBoiteAndUpdateRepositories extends TransactionalUseCase<
       counterSearchImmersionLBBRequestsError.inc();
       return {
         lbbRequestEntity: {
-          requestedAt: this.clock.now(),
+          requestedAt: this.timeGateway.now(),
           params: requestParams,
           result: {
             error: e?.message ?? "erorr without message",
@@ -177,7 +177,7 @@ export class CallLaBonneBoiteAndUpdateRepositories extends TransactionalUseCase<
     companies: LaBonneBoiteCompanyVO[],
   ) {
     const llbResultsConvertedToEstablishmentAggregates = companies.map(
-      (company) => company.toEstablishmentAggregate(this.clock),
+      (company) => company.toEstablishmentAggregate(this.timeGateway),
     );
 
     await uow.establishmentAggregateRepository.insertEstablishmentAggregates(
@@ -198,7 +198,7 @@ export class CallLaBonneBoiteAndUpdateRepositories extends TransactionalUseCase<
           {
             rome: requestParams.rome,
             position: { lat: requestParams.lat, lon: requestParams.lon },
-            since: addDays(this.clock.now(), -30),
+            since: addDays(this.timeGateway.now(), -30),
           },
         );
 

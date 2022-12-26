@@ -1,6 +1,6 @@
 import { FormEstablishmentDto, formEstablishmentSchema } from "shared";
 import { makeUpdateEstablishmentAggregateFromFormEstablishment } from "../../../utils/makeFormEstablishmentToEstablishmentAggregate";
-import { Clock } from "../../core/ports/Clock";
+import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -14,7 +14,7 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
     uowPerformer: UnitOfWorkPerformer,
     private readonly addressAPI: AddressGateway,
     private readonly uuidGenerator: UuidGenerator,
-    private readonly clock: Clock,
+    private readonly timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
   }
@@ -40,14 +40,14 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
       await makeUpdateEstablishmentAggregateFromFormEstablishment({
         addressGateway: this.addressAPI,
         uuidGenerator: this.uuidGenerator,
-        clock: this.clock,
+        timeGateway: this.timeGateway,
       })(initialEstablishementAggregate, formEstablishment);
 
     if (!establishmentAggregate) return;
 
     await uow.establishmentAggregateRepository.updateEstablishmentAggregate(
       establishmentAggregate,
-      this.clock.now(),
+      this.timeGateway.now(),
     );
   }
 }

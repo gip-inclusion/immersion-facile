@@ -12,7 +12,7 @@ import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainEvent, DomainTopic } from "../../core/eventBus/events";
-import { Clock } from "../../core/ports/Clock";
+import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { makeGetStoredConventionOrThrowIfNotAllowed } from "../entities/Convention";
@@ -40,7 +40,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly createNewEvent: CreateNewEvent,
-    private readonly clock: Clock,
+    private readonly timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
   }
@@ -64,7 +64,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
       applicationId,
     );
 
-    const conventionUpdatedAt = this.clock.now().toISOString();
+    const conventionUpdatedAt = this.timeGateway.now().toISOString();
     const {
       beneficiary,
       establishmentRepresentative,

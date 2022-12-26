@@ -1,13 +1,13 @@
 import { Pool } from "pg";
 import { random, sleep } from "shared";
 import { createLogger } from "../../../utils/logger";
-import { RealClock } from "../../secondary/core/ClockImplementations";
 import {
   defaultMaxBackoffPeriodMs,
   defaultRetryDeadlineMs,
   ExponentialBackoffRetryStrategy,
 } from "../../secondary/core/ExponentialBackoffRetryStrategy";
 import { QpsRateLimiter } from "../../secondary/core/QpsRateLimiter";
+import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { HttpsSireneGateway } from "../../secondary/sirene/HttpsSireneGateway";
 import { AppConfig } from "../config/appConfig";
 
@@ -15,7 +15,7 @@ const maxQpsSireneApi = 0.25;
 
 const logger = createLogger(__filename);
 
-const clock = new RealClock();
+const timeGateway = new RealTimeGateway();
 
 const config = AppConfig.createFromEnv();
 
@@ -32,12 +32,12 @@ const freeQuarantinedFormEstablishmentsWithCorrectSiret = async () => {
 
   const sireneGateway = new HttpsSireneGateway(
     config.sireneHttpsConfig,
-    clock,
-    new QpsRateLimiter(maxQpsSireneApi, clock, sleep),
+    timeGateway,
+    new QpsRateLimiter(maxQpsSireneApi, timeGateway, sleep),
     new ExponentialBackoffRetryStrategy(
       defaultMaxBackoffPeriodMs,
       defaultRetryDeadlineMs,
-      clock,
+      timeGateway,
       sleep,
       random,
     ),

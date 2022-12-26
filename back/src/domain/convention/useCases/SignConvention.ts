@@ -14,7 +14,7 @@ import {
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainTopic } from "../../core/eventBus/events";
-import { Clock } from "../../core/ports/Clock";
+import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { throwIfTransitionNotAllowed } from "../entities/Convention";
@@ -55,7 +55,7 @@ export class SignConvention extends TransactionalUseCase<
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly createNewEvent: CreateNewEvent,
-    private clock: Clock,
+    private timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
   }
@@ -81,7 +81,7 @@ export class SignConvention extends TransactionalUseCase<
     const signedConvention = signConventionDtoWithRole(
       initialConvention,
       role,
-      this.clock.now().toISOString(),
+      this.timeGateway.now().toISOString(),
     );
     throwIfTransitionNotAllowed({
       role,

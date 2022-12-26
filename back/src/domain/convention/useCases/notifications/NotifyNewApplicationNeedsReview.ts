@@ -4,11 +4,13 @@ import {
   ConventionDto,
   conventionSchema,
   ConventionStatus,
+  CreateConventionMagicLinkPayloadProperties,
   frontRoutes,
   Role,
 } from "shared";
 import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
 import { createLogger } from "../../../../utils/logger";
+import { TimeGateway } from "../../../core/ports/TimeGateway";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
@@ -23,6 +25,7 @@ export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<Conven
     uowPerformer: UnitOfWorkPerformer,
     private readonly emailGateway: EmailGateway,
     private readonly generateMagicLinkFn: GenerateConventionMagicLink,
+    private readonly timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
   }
@@ -68,11 +71,13 @@ export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<Conven
     const beneficiary: Beneficiary = conventionDto.signatories.beneficiary;
     await Promise.all(
       recipients.emails.map((email) => {
-        const magicLinkCommonFields = {
-          id: conventionDto.id,
-          role: recipients.role,
-          email,
-        };
+        const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties =
+          {
+            id: conventionDto.id,
+            role: recipients.role,
+            email,
+            now: this.timeGateway.now(),
+          };
         return this.emailGateway.sendEmail({
           type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
           recipients: [email],

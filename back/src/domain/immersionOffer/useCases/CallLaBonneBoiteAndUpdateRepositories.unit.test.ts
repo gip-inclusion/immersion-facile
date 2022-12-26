@@ -8,7 +8,6 @@ import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionO
 import { LaBonneBoiteCompanyBuilder } from "../../../_testBuilders/LaBonneBoiteResponseBuilder";
 
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
-import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { LaBonneBoiteRequestEntity } from "../../../domain/immersionOffer/entities/LaBonneBoiteRequestEntity";
@@ -18,6 +17,7 @@ import {
   LaBonneBoiteCompanyVO,
 } from "../../../domain/immersionOffer/valueObjects/LaBonneBoiteCompanyVO";
 import { InMemoryLaBonneBoiteAPI } from "../../../adapters/secondary/immersionOffer/laBonneBoite/InMemoryLaBonneBoiteAPI";
+import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 
 const prepareUseCase = () => {
   const uow = createInMemoryUow();
@@ -26,7 +26,7 @@ const prepareUseCase = () => {
 
   const laBonneBoiteAPI = new InMemoryLaBonneBoiteAPI();
   const uuidGenerator = new TestUuidGenerator();
-  const clock = new CustomClock();
+  const timeGateway = new CustomTimeGateway();
 
   const lbbCompany = new LaBonneBoiteCompanyBuilder()
     .withRome("M1607")
@@ -38,7 +38,7 @@ const prepareUseCase = () => {
   const useCase = new CallLaBonneBoiteAndUpdateRepositories(
     new InMemoryUowPerformer(uow),
     laBonneBoiteAPI,
-    clock,
+    timeGateway,
   );
 
   return {
@@ -47,7 +47,7 @@ const prepareUseCase = () => {
     laBonneBoiteRequestRepository,
     laBonneBoiteAPI,
     uuidGenerator,
-    clock,
+    timeGateway,
   };
 };
 
@@ -84,10 +84,14 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
 
     it("should add the request entity to the repository", async () => {
       // Prepare
-      const { useCase, laBonneBoiteRequestRepository, laBonneBoiteAPI, clock } =
-        prepareUseCase();
+      const {
+        useCase,
+        laBonneBoiteRequestRepository,
+        laBonneBoiteAPI,
+        timeGateway,
+      } = prepareUseCase();
 
-      clock.setNextDate(nextDate);
+      timeGateway.setNextDate(nextDate);
       laBonneBoiteAPI.setNextResults([]);
 
       // Act
@@ -234,7 +238,7 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
         useCase,
         laBonneBoiteAPI,
         establishmentAggregateRepository,
-        clock,
+        timeGateway,
       } = await prepareUseCase();
       const alreadyExistingAggregateFromLBB =
         new EstablishmentAggregateBuilder()
@@ -265,7 +269,7 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
           .build(),
       ]);
       const newOffercreatedAt = new Date("2022-05-18");
-      clock.setNextDate(newOffercreatedAt);
+      timeGateway.setNextDate(newOffercreatedAt);
 
       // Act : this establishment is referenced in LBB
       await useCase.execute(dto);
@@ -313,13 +317,17 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
 
     it("should not request LBB if the request has been made in the last month", async () => {
       // Prepare
-      const { useCase, laBonneBoiteRequestRepository, laBonneBoiteAPI, clock } =
-        prepareUseCase();
+      const {
+        useCase,
+        laBonneBoiteRequestRepository,
+        laBonneBoiteAPI,
+        timeGateway,
+      } = prepareUseCase();
 
       laBonneBoiteRequestRepository.laBonneBoiteRequests = [
         previousSimilarRequestEntity,
       ];
-      clock.setNextDate(new Date("2021-01-30"));
+      timeGateway.setNextDate(new Date("2021-01-30"));
 
       // Act
       await useCase.execute({
@@ -339,13 +347,13 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
 
     it("should request LBB if the request was made more than a month ago", async () => {
       // Prepare
-      const { useCase, laBonneBoiteRequestRepository, clock } =
+      const { useCase, laBonneBoiteRequestRepository, timeGateway } =
         await prepareUseCase();
 
       laBonneBoiteRequestRepository.laBonneBoiteRequests = [
         previousSimilarRequestEntity,
       ];
-      clock.setNextDate(new Date("2021-02-01"));
+      timeGateway.setNextDate(new Date("2021-02-01"));
 
       // Act
       await useCase.execute({

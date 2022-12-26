@@ -3,7 +3,6 @@ import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../domain/core/ports/UnitOfWork";
-import { RealClock } from "../../secondary/core/ClockImplementations";
 import { InMemoryOutboxQueries } from "../../secondary/core/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../secondary/core/InMemoryOutboxRepository";
 import { InMemoryDiscussionAggregateRepository } from "../../secondary/immersionOffer/InMemoryDiscussionAggregateRepository";
@@ -22,8 +21,6 @@ import { InMemoryImmersionAssessmentRepository } from "../../secondary/InMemoryI
 import { InMemoryOngoingOAuthRepository } from "../../secondary/InMemoryOngoingOAuthRepository";
 import { InMemoryRomeRepository } from "../../secondary/InMemoryRomeRepository";
 import { InMemoryUowPerformer } from "../../secondary/InMemoryUowPerformer";
-import { makeStubGetApiConsumerById } from "../../secondary/makeStubGetApiConsumerById";
-import { makePgGetApiConsumerById } from "../../secondary/pg/makePgGetApiConsumerById";
 import { PgAgencyRepository } from "../../secondary/pg/PgAgencyRepository";
 import { PgConventionPoleEmploiAdvisorRepository } from "../../secondary/pg/PgConventionPoleEmploiAdvisorRepository";
 import { PgConventionQueries } from "../../secondary/pg/PgConventionQueries";
@@ -44,6 +41,8 @@ import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { stubPostalCodeDepartmentRegionQueries } from "../../secondary/StubPostalCodeDepartmentRegionQueries";
 import { AppConfig } from "./appConfig";
 import { GetPgPoolFn } from "./createGateways";
+import { InMemoryApiConsumerRepository } from "../../secondary/InMemoryApiConsumerRepository";
+import { PgApiConsumerRepository } from "../../secondary/pg/PgApiConsumerRepository";
 
 export type InMemoryUnitOfWork = ReturnType<typeof createInMemoryUow>;
 export const createInMemoryUow = () => {
@@ -53,6 +52,8 @@ export const createInMemoryUow = () => {
 
   return {
     agencyRepository: new InMemoryAgencyRepository(),
+    apiConsumerRepository: new InMemoryApiConsumerRepository(),
+    authenticatedUserRepository: new InMemoryAuthenticatedUserRepository(),
     conventionQueries: new InMemoryConventionQueries(
       conventionRepository,
       outboxRepository,
@@ -68,14 +69,12 @@ export const createInMemoryUow = () => {
     formEstablishmentRepository: new InMemoryFormEstablishmentRepository(),
     immersionAssessmentRepository: new InMemoryImmersionAssessmentRepository(),
     laBonneBoiteRequestRepository: new InMemoryLaBonneBoiteRequestRepository(),
+    ongoingOAuthRepository: new InMemoryOngoingOAuthRepository(),
     outboxRepository,
     outboxQueries,
     postalCodeDepartmentRegionQueries: stubPostalCodeDepartmentRegionQueries,
     romeRepository: new InMemoryRomeRepository(),
     searchMadeRepository: new InMemorySearchMadeRepository(),
-    getApiConsumersById: makeStubGetApiConsumerById({ clock: new RealClock() }),
-    authenticatedUserRepository: new InMemoryAuthenticatedUserRepository(),
-    ongoingOAuthRepository: new InMemoryOngoingOAuthRepository(),
   };
 };
 
@@ -85,6 +84,8 @@ const _isAssignable = (inMemoryUow: InMemoryUnitOfWork): UnitOfWork =>
 
 export const createPgUow = (client: PoolClient): UnitOfWork => ({
   agencyRepository: new PgAgencyRepository(client),
+  apiConsumerRepository: new PgApiConsumerRepository(client),
+  authenticatedUserRepository: new InMemoryAuthenticatedUserRepository(),
   conventionRepository: new PgConventionRepository(client),
   conventionQueries: new PgConventionQueries(client),
   conventionPoleEmploiAdvisorRepository:
@@ -98,6 +99,7 @@ export const createPgUow = (client: PoolClient): UnitOfWork => ({
   formEstablishmentRepository: new PgFormEstablishmentRepository(client),
   immersionAssessmentRepository: new PgImmersionAssessmentRepository(client),
   laBonneBoiteRequestRepository: new PgLaBonneBoiteRequestRepository(client),
+  ongoingOAuthRepository: new InMemoryOngoingOAuthRepository(),
   outboxRepository: new PgOutboxRepository(client),
   outboxQueries: new PgOutboxQueries(client),
   postalCodeDepartmentRegionQueries: new PgPostalCodeDepartmentRegionQueries(
@@ -105,9 +107,6 @@ export const createPgUow = (client: PoolClient): UnitOfWork => ({
   ),
   romeRepository: new PgRomeRepository(client),
   searchMadeRepository: new PgSearchMadeRepository(client),
-  getApiConsumersById: makePgGetApiConsumerById(client),
-  authenticatedUserRepository: new InMemoryAuthenticatedUserRepository(),
-  ongoingOAuthRepository: new InMemoryOngoingOAuthRepository(),
 });
 
 export const createUowPerformer = (

@@ -5,14 +5,11 @@ import {
 } from "../../../domain/auth/jwt";
 import { AppConfig } from "./appConfig";
 
-export const makeGenerateEditFormEstablishmentUrl = (
-  config: AppConfig,
-): GenerateEditFormEstablishmentUrl => {
-  const generateJwt = makeGenerateJwtES256<EstablishmentJwtPayload>(
-    config.magicLinkJwtPrivateKey,
-  );
-  return (payload: EstablishmentJwtPayload) => {
-    const editJwt = generateJwt(payload);
-    return `${config.immersionFacileBaseUrl}/${frontRoutes.editFormEstablishmentRoute}?jwt=${editJwt}`;
-  };
-};
+export const makeGenerateEditFormEstablishmentUrl =
+  (config: AppConfig): GenerateEditFormEstablishmentUrl =>
+  (payload: EstablishmentJwtPayload) =>
+    `${config.immersionFacileBaseUrl}/${
+      frontRoutes.editFormEstablishmentRoute
+    }?jwt=${makeGenerateJwtES256<EstablishmentJwtPayload>(
+      config.magicLinkJwtPrivateKey,
+    )(payload)}`;

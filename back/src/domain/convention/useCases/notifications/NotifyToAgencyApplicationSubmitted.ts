@@ -2,11 +2,13 @@ import {
   Beneficiary,
   ConventionDto,
   conventionSchema,
+  CreateConventionMagicLinkPayloadProperties,
   frontRoutes,
   Role,
 } from "shared";
 import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
+import { TimeGateway } from "../../../core/ports/TimeGateway";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
@@ -24,6 +26,7 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
     uowPerformer: UnitOfWorkPerformer,
     private readonly emailGateway: EmailGateway,
     private readonly generateMagicLinkFn: GenerateConventionMagicLink,
+    private readonly timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
   }
@@ -72,11 +75,13 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
 
     await Promise.all(
       recipients.map((counsellorEmail) => {
-        const magicLinkCommonFields = {
-          id: convention.id,
-          role,
-          email: counsellorEmail,
-        };
+        const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties =
+          {
+            id: convention.id,
+            role,
+            email: counsellorEmail,
+            now: this.timeGateway.now(),
+          };
 
         return this.emailGateway.sendEmail({
           type: "NEW_CONVENTION_AGENCY_NOTIFICATION",

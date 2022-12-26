@@ -19,9 +19,9 @@ import {
   ForbiddenError,
   UnauthorizedError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxQueries } from "../../../adapters/secondary/core/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
+import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
@@ -65,16 +65,16 @@ export const setupInitialState = async ({
   const uow = createInMemoryUow();
   const conventionRepository = uow.conventionRepository;
   const outboxRepository = uow.outboxRepository;
-  const clock = new CustomClock();
+  const timeGateway = new CustomTimeGateway();
   const createNewEvent = makeCreateNewEvent({
-    clock,
+    timeGateway,
     uuidGenerator: new TestUuidGenerator(),
   });
 
   const updateConventionStatus = new UpdateConventionStatus(
     new InMemoryUowPerformer(uow),
     createNewEvent,
-    clock,
+    timeGateway,
   );
 
   await conventionRepository.save(originalConvention);
@@ -83,7 +83,7 @@ export const setupInitialState = async ({
     updateConventionStatus,
     conventionRepository,
     outboxRepository,
-    clock,
+    timeGateway,
   };
 };
 
@@ -106,7 +106,12 @@ export const executeUpdateConventionStatusUseCase = async ({
 }: ExecuteUseCaseParams): Promise<ConventionDto> => {
   const response = await updateConventionStatus.execute(
     updateStatusParams,
-    createConventionMagicLinkPayload(conventionId, role, email),
+    createConventionMagicLinkPayload({
+      id: conventionId,
+      role,
+      email,
+      now: new Date(),
+    }),
   );
   expect(response.id).toEqual(conventionId);
   const storedConvention = await conventionRepository.getById(conventionId);
@@ -157,12 +162,12 @@ const makeTestAcceptsStatusUpdate =
       updateConventionStatus,
       conventionRepository,
       outboxRepository,
-      clock,
+      timeGateway,
     } = await setupInitialState({
       initialStatus,
     });
 
-    if (nextDate) clock.setNextDate(nextDate);
+    if (nextDate) timeGateway.setNextDate(nextDate);
 
     const storedConvention = await executeUpdateConventionStatusUseCase({
       conventionId: originalConvention.id,

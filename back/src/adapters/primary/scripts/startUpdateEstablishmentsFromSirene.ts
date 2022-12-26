@@ -7,13 +7,13 @@ import {
   httpAdresseApiClient,
   HttpApiAdresseAddressGateway,
 } from "../../secondary/addressGateway/HttpApiAdresseAddressGateway";
-import { RealClock } from "../../secondary/core/ClockImplementations";
 import {
   defaultMaxBackoffPeriodMs,
   defaultRetryDeadlineMs,
   ExponentialBackoffRetryStrategy,
 } from "../../secondary/core/ExponentialBackoffRetryStrategy";
 import { QpsRateLimiter } from "../../secondary/core/QpsRateLimiter";
+import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { PgEstablishmentAggregateRepository } from "../../secondary/pg/PgEstablishmentAggregateRepository";
 import { HttpsSireneGateway } from "../../secondary/sirene/HttpsSireneGateway";
 import { AppConfig } from "../config/appConfig";
@@ -31,23 +31,23 @@ const main = async () => {
 
   const config = AppConfig.createFromEnv();
 
-  const clock = new RealClock();
+  const timeGateway = new RealTimeGateway();
 
   const retryStrategy = new ExponentialBackoffRetryStrategy(
     defaultMaxBackoffPeriodMs,
     defaultRetryDeadlineMs,
-    clock,
+    timeGateway,
     sleep,
     random,
   );
   const rateLimiter = new QpsRateLimiter(
     MAX_QPS_SIRENE__AND_ADDRESS_API,
-    clock,
+    timeGateway,
     sleep,
   );
   const sireneGateway = new HttpsSireneGateway(
     config.sireneHttpsConfig,
-    clock,
+    timeGateway,
     rateLimiter,
     retryStrategy,
   );
@@ -67,7 +67,7 @@ const main = async () => {
       establishmentAggregateRepository,
       sireneGateway,
       addressAPI,
-      new RealClock(),
+      new RealTimeGateway(),
     );
 
   let errorCode;

@@ -15,14 +15,13 @@ import {
 import { DeliverRenewedMagicLink } from "../../../../domain/convention/useCases/notifications/DeliverRenewedMagicLink";
 import { RenewConventionMagicLink } from "../../../../domain/convention/useCases/RenewConventionMagicLink";
 import {
-  CreateNewEvent,
   EventBus,
   makeCreateNewEvent,
 } from "../../../../domain/core/eventBus/EventBus";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
-import { CustomClock } from "../../../secondary/core/ClockImplementations";
 import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
 import { InMemoryEventBus } from "../../../secondary/core/InMemoryEventBus";
+import { CustomTimeGateway } from "../../../secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../secondary/core/UuidGeneratorImplementations";
 import { InMemoryEmailGateway } from "../../../secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryConventionRepository } from "../../../secondary/InMemoryConventionRepository";
@@ -45,9 +44,7 @@ const immersionBaseUrl: AbsoluteUrl = "http://fake-immersion.com";
 
 describe("Magic link renewal flow", () => {
   let conventionRepository: InMemoryConventionRepository;
-  let clock: CustomClock;
-  let uuidGenerator: TestUuidGenerator;
-  let createNewEvent: CreateNewEvent;
+  let timeGateway: CustomTimeGateway;
   let emailGw: InMemoryEmailGateway;
   let eventBus: EventBus;
   let eventCrawler: BasicEventCrawler;
@@ -60,16 +57,15 @@ describe("Magic link renewal flow", () => {
   beforeEach(() => {
     const uow = createInMemoryUow();
 
-    const agencyRepository = uow.agencyRepository;
-    agencyRepository.setAgencies([agency]);
+    uow.agencyRepository.setAgencies([agency]);
+
     conventionRepository = uow.conventionRepository;
-    clock = new CustomClock();
-    clock.setNextDate(new Date());
-    uuidGenerator = new TestUuidGenerator();
-    createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
+    timeGateway = new CustomTimeGateway();
+    timeGateway.setNextDate(new Date());
+
     const uowPerformer = new InMemoryUowPerformer(uow);
-    emailGw = new InMemoryEmailGateway(clock);
-    eventBus = new InMemoryEventBus(clock, uowPerformer);
+    emailGw = new InMemoryEmailGateway(timeGateway);
+    eventBus = new InMemoryEventBus(timeGateway, uowPerformer);
     eventCrawler = new BasicEventCrawler(uowPerformer, eventBus);
 
     config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
@@ -78,10 +74,13 @@ describe("Magic link renewal flow", () => {
 
     renewMagicLink = new RenewConventionMagicLink(
       uowPerformer,
-      createNewEvent,
+      makeCreateNewEvent({
+        timeGateway,
+        uuidGenerator: new TestUuidGenerator(),
+      }),
       generateJwtFn,
       config,
-      clock,
+      timeGateway,
       immersionBaseUrl,
     );
 
@@ -96,11 +95,12 @@ describe("Magic link renewal flow", () => {
       deliverRenewedMagicLink.execute(event.payload),
     );
 
-    const payload = createConventionMagicLinkPayload(
-      validConvention.id,
-      "beneficiary",
-      validConvention.signatories.beneficiary.email,
-    );
+    const payload = createConventionMagicLinkPayload({
+      id: validConvention.id,
+      role: "beneficiary",
+      email: validConvention.signatories.beneficiary.email,
+      now: new Date(),
+    });
 
     const request: RenewMagicLinkRequestDto = {
       originalUrl: "immersionfacile.fr/verifier-et-signer",

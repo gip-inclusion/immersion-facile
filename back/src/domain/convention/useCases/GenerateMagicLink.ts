@@ -5,7 +5,7 @@ import {
   GenerateMagicLinkResponseDto,
 } from "shared";
 import { GenerateMagicLinkJwt } from "../../auth/jwt";
-import { Clock } from "../../core/ports/Clock";
+import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UseCase } from "../../core/UseCase";
 
 export class GenerateMagicLink extends UseCase<
@@ -14,7 +14,7 @@ export class GenerateMagicLink extends UseCase<
 > {
   constructor(
     private readonly generateMagicLinkJwt: GenerateMagicLinkJwt,
-    private clock: Clock,
+    private readonly timeGateway: TimeGateway,
   ) {
     super();
   }
@@ -27,26 +27,16 @@ export class GenerateMagicLink extends UseCase<
     role,
     expired,
   }: GenerateMagicLinkRequestDto) {
-    const now = this.clock.now().getTime();
-    const twoDaysAgo = Math.round((now - 48 * 3600 * 1000) / 1000);
-
-    const payload = expired
-      ? createConventionMagicLinkPayload(
-          applicationId,
-          role,
-          "backoffice administrator",
-          1,
-          () => now,
-          undefined,
-          twoDaysAgo,
-        )
-      : createConventionMagicLinkPayload(
-          applicationId,
-          role,
-          "backoffice administrator",
-          undefined,
-          () => now,
-        );
+    const now = this.timeGateway.now();
+    const twoDaysAgo = Math.round((now.getTime() - 48 * 3600 * 1000) / 1000);
+    const payload = createConventionMagicLinkPayload({
+      id: applicationId,
+      role,
+      email: "backoffice administrator",
+      durationDays: expired ? 1 : undefined,
+      now,
+      exp: expired ? twoDaysAgo : undefined,
+    });
     return {
       jwt: this.generateMagicLinkJwt(payload),
     };

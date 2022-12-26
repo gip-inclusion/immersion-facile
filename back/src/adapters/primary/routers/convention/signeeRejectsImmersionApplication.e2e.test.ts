@@ -24,6 +24,8 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
     const { externalId, ...createConventionParams } = validConvention;
     const appAndDeps = await buildTestApp();
 
+    appAndDeps.gateways.timeGateway.setNextDate(new Date());
+
     const { tutorJwt } = await beneficiarySubmitsApplicationForTheFirstTime(
       appAndDeps,
       createConventionParams,

@@ -2,7 +2,7 @@ import {
   ContactEstablishmentRequestDto,
   contactEstablishmentRequestSchema,
 } from "shared";
-import { Clock } from "../../core/ports/Clock";
+import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -16,7 +16,7 @@ export class InsertDiscussionAggregateFromContactRequest extends TransactionalUs
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly clock: Clock,
+    private readonly timeGateway: TimeGateway,
     private readonly uuidGenerator: UuidGenerator,
   ) {
     super(uowPerformer);
@@ -26,7 +26,7 @@ export class InsertDiscussionAggregateFromContactRequest extends TransactionalUs
     params: ContactEstablishmentRequestDto,
     { discussionAggregateRepository }: UnitOfWork,
   ): Promise<void> {
-    const createdAt = this.clock.now();
+    const createdAt = this.timeGateway.now();
     const discussion: DiscussionAggregate = {
       id: this.uuidGenerator.new(),
       potentialBeneficiaryFirstName: params.potentialBeneficiaryFirstName,

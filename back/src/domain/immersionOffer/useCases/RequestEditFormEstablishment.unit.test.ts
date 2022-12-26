@@ -8,13 +8,13 @@ import { EstablishmentAggregateBuilder } from "../../../_testBuilders/Establishm
 
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
-import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { UuidV4Generator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { EstablishmentAggregateRepository } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
 import { RequestEditFormEstablishment } from "../../../domain/immersionOffer/useCases/RequestEditFormEstablishment";
+import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 
 const siret = "12345678912345";
 const contactEmail = "jerome@gmail.com";
@@ -43,22 +43,22 @@ const prepareUseCase = () => {
 
   setMethodGetContactEmailFromSiret(establishmentAggregateRepository); // In most of the tests, we need the contact to be defined
 
-  const clock = new CustomClock();
+  const timeGateway = new CustomTimeGateway();
   const emailGateway = new InMemoryEmailGateway();
   const uuidGenerator = new UuidV4Generator();
-  const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
-
-  const uowPerformer = new InMemoryUowPerformer(uow);
 
   const generateEditFormEstablishmentUrl = (payload: EstablishmentJwtPayload) =>
     `www.immersion-facile.fr/edit?jwt=jwtOfSiret[${payload.siret}]`;
 
   const useCase = new RequestEditFormEstablishment(
-    uowPerformer,
+    new InMemoryUowPerformer(uow),
     emailGateway,
-    clock,
+    timeGateway,
     generateEditFormEstablishmentUrl,
-    createNewEvent,
+    makeCreateNewEvent({
+      timeGateway,
+      uuidGenerator,
+    }),
   );
   return {
     useCase,
@@ -66,7 +66,7 @@ const prepareUseCase = () => {
     outboxRepository,
     establishmentAggregateRepository,
     emailGateway,
-    clock,
+    timeGateway,
   };
 };
 
@@ -126,7 +126,7 @@ describe("RequestUpdateFormEstablishment", () => {
   describe("If an email has already been sent for this establishment.", () => {
     it("Throws an error if an email has already been sent to this contact and the edit link is still valid", async () => {
       // Prepare
-      const { useCase, outboxQueries, clock } = prepareUseCase();
+      const { useCase, outboxQueries, timeGateway } = prepareUseCase();
 
       outboxQueries.getLastPayloadOfFormEstablishmentEditLinkSentWithSiret =
         //eslint-disable-next-line @typescript-eslint/require-await
@@ -137,7 +137,7 @@ describe("RequestUpdateFormEstablishment", () => {
           version: 1,
         });
 
-      clock.setNextDate(new Date("2021-01-01T13:00:00.000")); // The last email's link for this siret has not expired
+      timeGateway.setNextDate(new Date("2021-01-01T13:00:00.000")); // The last email's link for this siret has not expired
 
       // Act and assert
       await expectPromiseToFailWithError(
@@ -151,8 +151,13 @@ describe("RequestUpdateFormEstablishment", () => {
 
   it("Sends a new email if the edit link in last email has expired", async () => {
     // Prepare
-    const { useCase, outboxRepository, outboxQueries, emailGateway, clock } =
-      prepareUseCase();
+    const {
+      useCase,
+      outboxRepository,
+      outboxQueries,
+      emailGateway,
+      timeGateway,
+    } = prepareUseCase();
 
     outboxQueries.getLastPayloadOfFormEstablishmentEditLinkSentWithSiret =
       //eslint-disable-next-line @typescript-eslint/require-await
@@ -162,7 +167,7 @@ describe("RequestUpdateFormEstablishment", () => {
         exp: new Date("2021-01-02T12:00:00.000").getTime(),
         version: 1,
       });
-    clock.setNextDate(new Date("2021-01-02T13:00:00.000")); // 1 hour after the link of the last email for this siret has expired
+    timeGateway.setNextDate(new Date("2021-01-02T13:00:00.000")); // 1 hour after the link of the last email for this siret has expired
 
     // Act
     await useCase.execute(siret);

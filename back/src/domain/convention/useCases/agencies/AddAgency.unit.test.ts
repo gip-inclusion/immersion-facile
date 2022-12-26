@@ -5,13 +5,13 @@ import {
 } from "shared";
 
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
-import { CustomClock } from "../../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryOutboxRepository } from "../../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { TestUuidGenerator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryAgencyRepository } from "../../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { AddAgency, defaultQuestionnaireUrl } from "./AddAgency";
 import { makeCreateNewEvent } from "../../../core/eventBus/EventBus";
+import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 
 const defaultAdminEmail = "myAdmin@mail.com";
 
@@ -44,9 +44,12 @@ describe("AddAgency use case", () => {
     outboxRepo = uow.outboxRepository;
     agencyRepo = uow.agencyRepository;
     uowPerformer = new InMemoryUowPerformer(uow);
-    const clock = new CustomClock();
+    const timeGateway = new CustomTimeGateway();
     const uuidGenerator = new TestUuidGenerator();
-    const createNewEvent = makeCreateNewEvent({ clock, uuidGenerator });
+    const createNewEvent = makeCreateNewEvent({
+      timeGateway,
+      uuidGenerator,
+    });
 
     addAgency = new AddAgency(uowPerformer, createNewEvent, defaultAdminEmail);
   });

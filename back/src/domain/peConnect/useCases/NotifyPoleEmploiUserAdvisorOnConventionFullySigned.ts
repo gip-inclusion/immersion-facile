@@ -1,6 +1,7 @@
 import { ConventionDto, conventionSchema, frontRoutes } from "shared";
 import { GenerateConventionMagicLink } from "../../../adapters/primary/config/createGenerateConventionMagicLink";
 import { EmailGateway } from "../../convention/ports/EmailGateway";
+import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
@@ -9,6 +10,7 @@ export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends Transact
     uowPerformer: UnitOfWorkPerformer,
     private readonly emailGateway: EmailGateway,
     private readonly generateMagicLinkFn: GenerateConventionMagicLink,
+    private readonly timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
   }
@@ -48,6 +50,7 @@ export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends Transact
             role: "validator",
             targetRoute: frontRoutes.conventionToValidate,
             email: advisor.email,
+            now: this.timeGateway.now(),
           }),
         },
       });

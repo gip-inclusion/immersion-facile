@@ -1,20 +1,18 @@
 import { Pool, PoolClient } from "pg";
 import { ApiConsumer, expectTypeToMatchAndEqual } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
-
-import { makePgGetApiConsumerById } from "./makePgGetApiConsumerById";
-import { GetApiConsumerById } from "../../../domain/core/ports/GetApiConsumerById";
+import { PgApiConsumerRepository } from "./PgApiConsumerRepository";
 
 describe("PG GetApiConsumerById", () => {
   let pool: Pool;
   let client: PoolClient;
-  let getAuthorizedApiConsumersIds: GetApiConsumerById;
+  let apiConsumerRepository: PgApiConsumerRepository;
 
   beforeAll(async () => {
     pool = getTestPgPool();
     client = await pool.connect();
     await client.query("DELETE FROM api_consumers");
-    getAuthorizedApiConsumersIds = makePgGetApiConsumerById(client);
+    apiConsumerRepository = new PgApiConsumerRepository(client);
   });
 
   afterAll(async () => {
@@ -34,7 +32,7 @@ describe("PG GetApiConsumerById", () => {
 
     await insertInTable(apiConsumer);
 
-    const apiConsumerFetched = await getAuthorizedApiConsumersIds(
+    const apiConsumerFetched = await apiConsumerRepository.getById(
       apiConsumer.id,
     );
 

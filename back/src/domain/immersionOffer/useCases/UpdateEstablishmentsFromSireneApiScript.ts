@@ -1,7 +1,7 @@
 import { addDays } from "date-fns";
 import { z } from "zod";
 import { createLogger } from "../../../utils/logger";
-import { Clock } from "../../core/ports/Clock";
+import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UseCase } from "../../core/UseCase";
 import { SireneGateway } from "../../sirene/ports/SireneGateway";
 import { SireneEstablishmentVO } from "../../sirene/valueObjects/SireneEstablishmentVO";
@@ -17,7 +17,7 @@ export class UpdateEstablishmentsFromSireneApiScript extends UseCase<void> {
     private readonly establishmentAggregateRepository: EstablishmentAggregateRepository,
     private readonly sireneGateway: SireneGateway,
     private readonly addressAPI: AddressGateway,
-    private readonly clock: Clock,
+    private readonly timeGateway: TimeGateway,
   ) {
     super();
   }
@@ -25,7 +25,10 @@ export class UpdateEstablishmentsFromSireneApiScript extends UseCase<void> {
   inputSchema = z.void();
 
   public async _execute() {
-    const since = addDays(this.clock.now(), -SIRENE_NB_DAYS_BEFORE_REFRESH);
+    const since = addDays(
+      this.timeGateway.now(),
+      -SIRENE_NB_DAYS_BEFORE_REFRESH,
+    );
     const establishmentSiretsToUpdate =
       await this.establishmentAggregateRepository.getActiveEstablishmentSiretsFromLaBonneBoiteNotUpdatedSince(
         since,
@@ -65,7 +68,7 @@ export class UpdateEstablishmentsFromSireneApiScript extends UseCase<void> {
     if (!sireneAnswer || sireneAnswer.etablissements.length === 0) {
       await this.establishmentAggregateRepository.updateEstablishment({
         siret,
-        updatedAt: this.clock.now(),
+        updatedAt: this.timeGateway.now(),
         isActive: false,
       });
       return;
@@ -92,7 +95,7 @@ export class UpdateEstablishmentsFromSireneApiScript extends UseCase<void> {
 
     await this.establishmentAggregateRepository.updateEstablishment({
       siret,
-      updatedAt: this.clock.now(),
+      updatedAt: this.timeGateway.now(),
       nafDto,
       numberEmployeesRange,
       address: positionAndAddress?.address,

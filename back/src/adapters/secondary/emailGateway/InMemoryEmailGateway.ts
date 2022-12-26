@@ -1,15 +1,15 @@
 import { prop } from "ramda";
 import { EmailSentDto, TemplatedEmail } from "shared";
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
-import { Clock } from "../../../domain/core/ports/Clock";
+import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
 import { createLogger } from "../../../utils/logger";
-import { CustomClock } from "../core/ClockImplementations";
+import { CustomTimeGateway } from "../core/TimeGateway/CustomTimeGateway";
 
 const logger = createLogger(__filename);
 
 export class InMemoryEmailGateway implements EmailGateway {
   public constructor(
-    private readonly clock: Clock = new CustomClock(),
+    private readonly timeGateway: TimeGateway = new CustomTimeGateway(),
     private readonly numberOfEmailToKeep: number | null = null,
   ) {}
 
@@ -39,7 +39,7 @@ export class InMemoryEmailGateway implements EmailGateway {
 
     this.sentEmails.push({
       templatedEmail,
-      sentAt: this.clock.now().toISOString(),
+      sentAt: this.timeGateway.now().toISOString(),
     });
   }
 

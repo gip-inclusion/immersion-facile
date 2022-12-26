@@ -1,8 +1,8 @@
-import { CustomClock } from "./ClockImplementations";
 import { QpsRateLimiter } from "./QpsRateLimiter";
+import { CustomTimeGateway } from "./TimeGateway/CustomTimeGateway";
 
 describe("QpsRateLimiter", () => {
-  let fakeClock: CustomClock;
+  let fakeClock: CustomTimeGateway;
   let mockSleep: jest.Mock;
   let mockCallback: jest.Mock;
   let rateLimiter: QpsRateLimiter;
@@ -25,7 +25,7 @@ describe("QpsRateLimiter", () => {
   };
 
   beforeEach(() => {
-    fakeClock = new CustomClock(new Date(1000000));
+    fakeClock = new CustomTimeGateway(new Date(1000000));
     mockSleep = jest.fn();
     mockCallback = jest.fn();
 

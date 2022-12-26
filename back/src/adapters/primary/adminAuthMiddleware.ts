@@ -1,14 +1,14 @@
 import { NextFunction, Request, Response } from "express";
 import { AppJwtPayload } from "shared";
 import { makeVerifyJwtHS256 } from "../../domain/auth/jwt";
-import { Clock } from "../../domain/core/ports/Clock";
+import { TimeGateway } from "../../domain/core/ports/TimeGateway";
 import { createLogger } from "../../utils/logger";
 
 const logger = createLogger(__filename);
 
 export const makeAdminAuthMiddleware = (
   jwtAdminSecret: string,
-  clock: Clock,
+  timeGateway: TimeGateway,
 ) => {
   const verifyJwt = makeVerifyJwtHS256<AppJwtPayload>(jwtAdminSecret);
   return (req: Request, res: Response, next: NextFunction) => {
@@ -19,7 +19,7 @@ export const makeAdminAuthMiddleware = (
       const payload = verifyJwt(req.headers.authorization);
       const expirationDate = new Date(payload.exp * 1000);
 
-      if (clock.now() > expirationDate) {
+      if (timeGateway.now() > expirationDate) {
         return res.status(401).json({ error: "Token is expired" });
       }
 

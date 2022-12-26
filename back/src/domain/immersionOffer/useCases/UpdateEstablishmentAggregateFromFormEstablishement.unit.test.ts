@@ -10,7 +10,6 @@ import { EstablishmentEntityV2Builder } from "../../../_testBuilders/Establishme
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
-import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
@@ -21,6 +20,7 @@ import {
   SireneEstablishmentVO,
 } from "../../../domain/sirene/valueObjects/SireneEstablishmentVO";
 import { InMemorySireneGateway } from "../../../adapters/secondary/sirene/InMemorySireneGateway";
+import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 
 const prepareSireneRepo = (
   sireneRepo: InMemorySireneGateway,
@@ -61,7 +61,7 @@ describe("Update Establishment aggregate from form data", () => {
         uowPerformer,
         addressAPI,
         uuidGenerator,
-        new CustomClock(),
+        new CustomTimeGateway(),
       );
   });
 

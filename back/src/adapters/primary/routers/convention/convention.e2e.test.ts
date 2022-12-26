@@ -56,6 +56,8 @@ const initializeSystemUnderTest = async (
   adminToken = response.body;
 };
 
+const now = new Date();
+
 describe("convention e2e", () => {
   describe("/demandes-immersion route", () => {
     describe("DEV environment", () => {
@@ -114,8 +116,8 @@ describe("convention e2e", () => {
             applicationId: convention.id,
             role: "beneficiary" as Role,
             emailHash: stringToMd5(convention.signatories.beneficiary.email),
-            iat: Math.round(Date.now() / 1000),
-            exp: Math.round(Date.now() / 1000) + 31 * 24 * 3600,
+            iat: Math.round(now.getTime() / 1000),
+            exp: Math.round(now.getTime() / 1000) + 31 * 24 * 3600,
             version: currentJwtVersions.application,
           };
           const jwt = generateMagicLinkJwt(payload);
@@ -131,15 +133,14 @@ describe("convention e2e", () => {
         });
 
         it("redirects expired magic links to a renewal page", async () => {
-          const payload = createConventionMagicLinkPayload(
-            convention.id,
-            "beneficiary",
-            convention.signatories.beneficiary.email,
-            1,
-            undefined,
-            undefined,
-            Math.round(Date.now() / 1000) - 2 * 24 * 3600,
-          );
+          const payload = createConventionMagicLinkPayload({
+            id: convention.id,
+            role: "beneficiary",
+            email: convention.signatories.beneficiary.email,
+            durationDays: 1,
+            now,
+            exp: Math.round(now.getTime() / 1000) - 2 * 24 * 3600,
+          });
           const jwt = generateMagicLinkJwt(payload);
 
           // GETting the created application 403's and sets needsNewMagicLink flag to inform the front end to go to the link renewal page.
@@ -178,11 +179,12 @@ describe("convention e2e", () => {
         };
 
         const jwt = generateMagicLinkJwt(
-          createConventionMagicLinkPayload(
-            convention.id,
-            "beneficiary",
-            convention.signatories.beneficiary.email,
-          ),
+          createConventionMagicLinkPayload({
+            id: convention.id,
+            role: "beneficiary",
+            email: convention.signatories.beneficiary.email,
+            now,
+          }),
         );
 
         await request
@@ -206,11 +208,12 @@ describe("convention e2e", () => {
       it("Fetching unknown application IDs fails with 404 Not Found", async () => {
         const unknownId = "unknown-demande-immersion-id";
         const jwt = generateMagicLinkJwt(
-          createConventionMagicLinkPayload(
-            unknownId,
-            "beneficiary",
-            "some email",
-          ),
+          createConventionMagicLinkPayload({
+            id: unknownId,
+            role: "beneficiary",
+            email: "some email",
+            now,
+          }),
         );
         await request
           .get(`/${conventionsRoute}/anything`)
@@ -232,11 +235,12 @@ describe("convention e2e", () => {
           conventionWithUnknownId;
 
         const jwt = generateMagicLinkJwt(
-          createConventionMagicLinkPayload(
-            unknownId,
-            "beneficiary",
-            "some email",
-          ),
+          createConventionMagicLinkPayload({
+            id: unknownId,
+            role: "beneficiary",
+            email: "some email",
+            now,
+          }),
         );
 
         await request
@@ -278,11 +282,12 @@ describe("convention e2e", () => {
     it("Succeeds for rejected application and notifies Pole Emploi", async () => {
       // A counsellor rejects the application.
       const counsellorJwt = generateMagicLinkJwt(
-        createConventionMagicLinkPayload(
-          conventionId,
-          "counsellor",
-          "counsellor@pe.fr",
-        ),
+        createConventionMagicLinkPayload({
+          id: conventionId,
+          role: "counsellor",
+          email: "counsellor@pe.fr",
+          now,
+        }),
       );
       await request
         .post(`/auth/${updateConventionStatusRoute}/${counsellorJwt}`)
@@ -307,11 +312,12 @@ describe("convention e2e", () => {
     it("Returns error 403 for unauthorized requests", async () => {
       // A tutor tries to validate the application, but fails.
       const tutorJwt = generateMagicLinkJwt(
-        createConventionMagicLinkPayload(
-          conventionId,
-          "establishment",
-          convention.signatories.establishmentRepresentative.email,
-        ),
+        createConventionMagicLinkPayload({
+          id: conventionId,
+          role: "establishment",
+          email: convention.signatories.establishmentRepresentative.email,
+          now,
+        }),
       );
       await request
         .post(`/auth/${updateConventionStatusRoute}/${conventionId}`)
@@ -322,11 +328,12 @@ describe("convention e2e", () => {
 
     it("Returns error 404 for unknown application ids", async () => {
       const counsellorJwt = generateMagicLinkJwt(
-        createConventionMagicLinkPayload(
-          "unknown_application_id",
-          "counsellor",
-          "counsellor@pe.fr",
-        ),
+        createConventionMagicLinkPayload({
+          id: "unknown_application_id",
+          role: "counsellor",
+          email: "counsellor@pe.fr",
+          now,
+        }),
       );
       await request
         .post(`/auth/${updateConventionStatusRoute}/unknown_application_id`)

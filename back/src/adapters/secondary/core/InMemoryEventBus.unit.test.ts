@@ -4,7 +4,6 @@ import {
   expectTypeToMatchAndEqual,
 } from "shared";
 import { createInMemoryUow } from "../../primary/config/uowConfig";
-import { CustomClock } from "./ClockImplementations";
 import { InMemoryEventBus } from "./InMemoryEventBus";
 import { InMemoryOutboxRepository } from "./InMemoryOutboxRepository";
 import { InMemoryUowPerformer } from "../InMemoryUowPerformer";
@@ -13,6 +12,7 @@ import type {
   EventFailure,
 } from "../../../domain/core/eventBus/events";
 import { spyOnTopic } from "../../../_testBuilders/spyOnTopic";
+import { CustomTimeGateway } from "./TimeGateway/CustomTimeGateway";
 
 const domainEvt: DomainEvent = {
   id: "anId",
@@ -25,22 +25,22 @@ const domainEvt: DomainEvent = {
 
 describe("InMemoryEventBus", () => {
   let anEventBus: InMemoryEventBus;
-  let clock: CustomClock;
+  let timeGateway: CustomTimeGateway;
   let outboxRepository: InMemoryOutboxRepository;
 
   beforeEach(() => {
-    clock = new CustomClock();
+    timeGateway = new CustomTimeGateway();
     const uow = createInMemoryUow();
     outboxRepository = uow.outboxRepository;
     const uowPerformer = new InMemoryUowPerformer(uow);
-    anEventBus = new InMemoryEventBus(clock, uowPerformer);
+    anEventBus = new InMemoryEventBus(timeGateway, uowPerformer);
   });
 
   describe("Publish to an existing topic", () => {
     it("Marks event as published even if no-one was subscribed to it", async () => {
       // Prepare
       const publishDate = new Date("2022-01-01");
-      clock.setNextDate(publishDate);
+      timeGateway.setNextDate(publishDate);
 
       // Act
       await anEventBus.publish(domainEvt);
@@ -60,7 +60,7 @@ describe("InMemoryEventBus", () => {
     it("Publishes to a new topic and check we have only one spyed event", async () => {
       // Prepare
       const publishDate = new Date("2022-01-01");
-      clock.setNextDate(publishDate);
+      timeGateway.setNextDate(publishDate);
       const publishedEvents = spyOnTopic(
         anEventBus,
         "ImmersionApplicationSubmittedByBeneficiary",
@@ -88,7 +88,7 @@ describe("InMemoryEventBus", () => {
   it("Publish to the same topic and check that 2 subscribers get the message", async () => {
     // Prepare
     const publishDate = new Date("2022-01-01");
-    clock.setNextDate(publishDate);
+    timeGateway.setNextDate(publishDate);
     const eventsOnFirstHandler = spyOnTopic(
       anEventBus,
       "ImmersionApplicationSubmittedByBeneficiary",
@@ -120,7 +120,7 @@ describe("InMemoryEventBus", () => {
     it("catch the error and flags the failing subscriber", async () => {
       // Prepare
       const publishDate = new Date("2022-01-01");
-      clock.setNextDate(publishDate);
+      timeGateway.setNextDate(publishDate);
       const eventsOnFirstHandler = spyOnTopic(
         anEventBus,
         "ImmersionApplicationSubmittedByBeneficiary",
@@ -183,7 +183,7 @@ describe("InMemoryEventBus", () => {
     it("saves the new publications linked to the event", async () => {
       // Prepare
       const rePublishDate = new Date("2022-01-02");
-      clock.setNextDate(rePublishDate);
+      timeGateway.setNextDate(rePublishDate);
       const eventsOnInitiallyFailedHandler = spyOnTopic(
         anEventBus,
         "ImmersionApplicationSubmittedByBeneficiary",
@@ -222,7 +222,7 @@ describe("InMemoryEventBus", () => {
     it("only re-executes the subscriptions that failed", async () => {
       // Prepare
       const rePublishDate = new Date("2022-01-02");
-      clock.setNextDate(rePublishDate);
+      timeGateway.setNextDate(rePublishDate);
       const eventsOnFirstHandler = spyOnTopic(
         anEventBus,
         "ImmersionApplicationSubmittedByBeneficiary",
@@ -280,7 +280,7 @@ describe("InMemoryEventBus", () => {
       };
 
       const rePublishDate = new Date("2022-01-04");
-      clock.setNextDate(rePublishDate);
+      timeGateway.setNextDate(rePublishDate);
       anEventBus.subscribe(
         "ImmersionApplicationSubmittedByBeneficiary",
         failedSubscriptionId,

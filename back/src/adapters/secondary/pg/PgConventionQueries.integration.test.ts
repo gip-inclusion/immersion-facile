@@ -10,7 +10,7 @@ import {
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { ImmersionAssessmentEmailParams } from "../../../domain/immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
-import { RealClock } from "../core/ClockImplementations";
+import { RealTimeGateway } from "../core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../core/UuidGeneratorImplementations";
 import { PgAgencyRepository } from "./PgAgencyRepository";
 import { PgConventionQueries } from "./PgConventionQueries";
@@ -142,7 +142,7 @@ describe("Pg implementation of ConventionQueries", () => {
       );
 
       const createNewEvent = makeCreateNewEvent({
-        clock: new RealClock(),
+        timeGateway: new RealTimeGateway(),
         uuidGenerator: new UuidV4Generator(),
       });
       const eventEmailSentToImmersion1 = createNewEvent({

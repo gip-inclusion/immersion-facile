@@ -8,7 +8,7 @@ import {
   EventFailure,
   EventPublication,
 } from "../../../domain/core/eventBus/events";
-import { DateStr } from "../../../domain/core/ports/Clock";
+import { DateStr } from "../../../domain/core/ports/TimeGateway";
 import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
 
 const counterEventsSavedBeforePublish = new promClient.Counter({

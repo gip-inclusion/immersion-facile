@@ -1,11 +1,12 @@
 import { secondsToMilliseconds, formatISO } from "date-fns";
 import { SiretDto } from "shared";
-import { Clock } from "../../../domain/core/ports/Clock";
+
 import { RateLimiter } from "../../../domain/core/ports/RateLimiter";
 import {
   RetryableError,
   RetryStrategy,
 } from "../../../domain/core/ports/RetryStrategy";
+import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
 import {
   SireneGateway,
   SireneGatewayAnswer,
@@ -23,7 +24,7 @@ const logger = createLogger(__filename);
 export class HttpsSireneGateway extends SireneGateway {
   public constructor(
     private readonly axiosConfig: AxiosConfig,
-    private readonly clock: Clock,
+    private readonly timeGateway: TimeGateway,
     private readonly rateLimiter: RateLimiter,
     private readonly retryStrategy: RetryStrategy,
   ) {
@@ -85,7 +86,9 @@ export class HttpsSireneGateway extends SireneGateway {
     //     F= établissement fermé
     if (!includeClosedEstablishments) {
       params.q += " AND periode(etatAdministratifEtablissement:A)";
-      params.date = formatISO(this.clock.now(), { representation: "date" });
+      params.date = formatISO(this.timeGateway.now(), {
+        representation: "date",
+      });
     }
 
     return params;

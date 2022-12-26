@@ -17,11 +17,12 @@ describe("getConventionStatusDashboardUrl", () => {
     const conventionId = "my-Convention-id";
     const beneficiaryEmail = "joe@lebenef.fr";
     const jwt = generateMagicLinkJwt(
-      createConventionMagicLinkPayload(
-        conventionId,
-        "beneficiary",
-        beneficiaryEmail,
-      ),
+      createConventionMagicLinkPayload({
+        id: conventionId,
+        role: "beneficiary",
+        email: beneficiaryEmail,
+        now: new Date(),
+      }),
     );
 
     const convention = new ConventionDtoBuilder()

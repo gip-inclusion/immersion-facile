@@ -10,6 +10,7 @@ import {
   Signatory,
   TemplatedEmail,
   expectTypeToMatchAndEqual,
+  CreateConventionMagicLinkPayloadProperties,
 } from "shared";
 import { getValidatedConventionFinalConfirmationParams } from "../domain/convention/useCases/notifications/NotifyAllActorsOfFinalConventionValidation";
 import { ContactEntityV2 } from "../domain/immersionOffer/entities/ContactEntity";
@@ -37,11 +38,13 @@ export const expectEmaiSignatoryConfirmationSignatureRequestMatchingConvention =
       beneficiaryCurrentEmployer,
     } = convention.signatories;
 
-    const generateMagicLinkCommonFields = {
-      id,
-      role: signatory.role,
-      email: beneficiary.email,
-    };
+    const generateMagicLinkCommonFields: CreateConventionMagicLinkPayloadProperties =
+      {
+        id,
+        role: signatory.role,
+        email: beneficiary.email,
+        now: new Date(),
+      };
 
     expectTypeToMatchAndEqual(templatedEmail, {
       type: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",

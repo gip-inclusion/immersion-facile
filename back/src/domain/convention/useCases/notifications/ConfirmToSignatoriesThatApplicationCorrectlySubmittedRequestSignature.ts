@@ -1,7 +1,13 @@
 import { values } from "ramda";
-import { ConventionDto, conventionSchema, frontRoutes } from "shared";
+import {
+  ConventionDto,
+  conventionSchema,
+  CreateConventionMagicLinkPayloadProperties,
+  frontRoutes,
+} from "shared";
 import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
 import { createLogger } from "../../../../utils/logger";
+import { TimeGateway } from "../../../core/ports/TimeGateway";
 import { UseCase } from "../../../core/UseCase";
 import { EmailGateway } from "../../ports/EmailGateway";
 
@@ -11,6 +17,7 @@ export class ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignatu
   constructor(
     private readonly emailGateway: EmailGateway,
     private readonly generateMagicLinkFn: GenerateConventionMagicLink,
+    private readonly timeGateway: TimeGateway,
   ) {
     super();
   }
@@ -35,12 +42,13 @@ export class ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignatu
     await Promise.all(
       values(convention.signatories).map((signatory) => {
         if (!signatory) return;
-        const magicLinkCommonFields = {
-          id,
-          role: signatory.role,
-          targetRoute: frontRoutes.conventionToSign,
-          email: signatory.email,
-        };
+        const conventionMagicLinkPayload: CreateConventionMagicLinkPayloadProperties =
+          {
+            id,
+            role: signatory.role,
+            email: signatory.email,
+            now: this.timeGateway.now(),
+          };
 
         return this.emailGateway.sendEmail({
           type: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
@@ -53,11 +61,11 @@ export class ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignatu
               beneficiaryRepresentative &&
               `${beneficiaryRepresentative.firstName} ${beneficiaryRepresentative.lastName}`,
             magicLink: this.generateMagicLinkFn({
-              ...magicLinkCommonFields,
+              ...conventionMagicLinkPayload,
               targetRoute: frontRoutes.conventionToSign,
             }),
             conventionStatusLink: this.generateMagicLinkFn({
-              ...magicLinkCommonFields,
+              ...conventionMagicLinkPayload,
               targetRoute: frontRoutes.conventionStatusDashboard,
             }),
             businessName,

@@ -4,30 +4,30 @@ import { EstablishmentEntityV2Builder } from "../../../_testBuilders/Establishme
 import { SireneEstablishmentVOBuilder } from "../../../_testBuilders/SireneEstablishmentVOBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
-import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { EstablishmentEntityV2 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { UpdateEstablishmentsFromSireneApiScript } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentsFromSireneApiScript";
 import { InMemorySireneGateway } from "../../../adapters/secondary/sirene/InMemorySireneGateway";
+import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 
 const prepareUseCase = () => {
   const sireneRepo = new InMemorySireneGateway();
   const uow = createInMemoryUow();
   const establishmentAggregateRepository = uow.establishmentAggregateRepository;
-  const clock = new CustomClock();
+  const timeGateway = new CustomTimeGateway();
   const addressAPI = new InMemoryAddressGateway();
   const useCase = new UpdateEstablishmentsFromSireneApiScript(
     establishmentAggregateRepository,
     sireneRepo,
     addressAPI,
-    clock,
+    timeGateway,
   );
 
   return {
     sireneRepo,
     establishmentAggregateRepository,
     addressAPI,
-    clock,
+    timeGateway,
     useCase,
   };
 };
@@ -56,8 +56,12 @@ describe("Update establishments from Sirene API", () => {
   const moreThanAWeekAgo = new Date("2020-01-06T00:00:00");
 
   it("Should update modification date of establishments that have not been modified since one week", async () => {
-    const { clock, sireneRepo, establishmentAggregateRepository, useCase } =
-      prepareUseCase();
+    const {
+      timeGateway,
+      sireneRepo,
+      establishmentAggregateRepository,
+      useCase,
+    } = prepareUseCase();
     // Prepare
     establishmentAggregateRepository.establishmentAggregates = [
       makeEstablishmentWithUpdatedAt("oldSiret", moreThanAWeekAgo),
@@ -66,7 +70,7 @@ describe("Update establishments from Sirene API", () => {
     sireneRepo.setEstablishment(
       new SireneEstablishmentVOBuilder().withSiret("recentSiret").build(),
     );
-    clock.setNextDate(now);
+    timeGateway.setNextDate(now);
 
     // Act
     await useCase.execute();
@@ -88,7 +92,7 @@ describe("Update establishments from Sirene API", () => {
 
   it("Should close establishments that are not longer referenced in Sirene API", async () => {
     // Prepare
-    const { clock, establishmentAggregateRepository, useCase } =
+    const { timeGateway, establishmentAggregateRepository, useCase } =
       prepareUseCase();
     establishmentAggregateRepository.establishmentAggregates = [
       makeEstablishmentWithUpdatedAt(
@@ -96,7 +100,7 @@ describe("Update establishments from Sirene API", () => {
         moreThanAWeekAgo,
       ),
     ];
-    clock.setNextDate(now);
+    timeGateway.setNextDate(now);
 
     // Act
     await useCase.execute();
@@ -112,8 +116,12 @@ describe("Update establishments from Sirene API", () => {
   });
   it("Should update naf code and number of employee range of establishment based on Sirene answer", async () => {
     // Prepare
-    const { clock, sireneRepo, establishmentAggregateRepository, useCase } =
-      prepareUseCase();
+    const {
+      timeGateway,
+      sireneRepo,
+      establishmentAggregateRepository,
+      useCase,
+    } = prepareUseCase();
     establishmentAggregateRepository.establishmentAggregates = [
       makeEstablishmentWithUpdatedAt("establishmentToUpdate", moreThanAWeekAgo),
     ];
@@ -128,7 +136,7 @@ describe("Update establishments from Sirene API", () => {
         .build(),
     );
 
-    clock.setNextDate(now);
+    timeGateway.setNextDate(now);
 
     // Act
     await useCase.execute();
@@ -151,7 +159,7 @@ describe("Update establishments from Sirene API", () => {
     it("If address API succeeds, it should update address and coordinates", async () => {
       // Prepare
       const {
-        clock,
+        timeGateway,
         sireneRepo,
         establishmentAggregateRepository,
         addressAPI,
@@ -189,7 +197,7 @@ describe("Update establishments from Sirene API", () => {
         },
       ]);
 
-      clock.setNextDate(now);
+      timeGateway.setNextDate(now);
 
       // Act
       await useCase.execute();
@@ -215,7 +223,7 @@ describe("Update establishments from Sirene API", () => {
     it("If adresse API fails, it should not change the address and position", async () => {
       // Prepare
       const {
-        clock,
+        timeGateway,
         sireneRepo,
         establishmentAggregateRepository,
         addressAPI,
@@ -235,7 +243,7 @@ describe("Update establishments from Sirene API", () => {
           .build(),
       );
       addressAPI.setNextPosition(undefined);
-      clock.setNextDate(now);
+      timeGateway.setNextDate(now);
 
       // Act
       await useCase.execute();

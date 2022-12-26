@@ -13,8 +13,8 @@ import { LaBonneBoiteRequestRepository } from "../../immersionOffer/ports/LaBonn
 import { SearchMadeRepository } from "../../immersionOffer/ports/SearchMadeRepository";
 import { ConventionPoleEmploiAdvisorRepository } from "../../peConnect/port/ConventionPoleEmploiAdvisorRepository";
 import { RomeRepository } from "../../rome/ports/RomeRepository";
+import { ApiConsumerRepository } from "../../auth/ports/ApiConsumerRepository";
 import { FeatureFlagRepository } from "./FeatureFlagRepository";
-import { GetApiConsumerById } from "./GetApiConsumerById";
 import { OutboxQueries } from "./OutboxQueries";
 import { OutboxRepository } from "./OutboxRepository";
 
@@ -33,7 +33,7 @@ export type UnitOfWork = {
   featureFlagRepository: FeatureFlagRepository;
   laBonneBoiteRequestRepository: LaBonneBoiteRequestRepository;
   searchMadeRepository: SearchMadeRepository;
-  getApiConsumersById: GetApiConsumerById;
+  apiConsumerRepository: ApiConsumerRepository;
   exportQueries: ExportQueries;
   discussionAggregateRepository: DiscussionAggregateRepository;
   authenticatedUserRepository: AuthenticatedUserRepository;

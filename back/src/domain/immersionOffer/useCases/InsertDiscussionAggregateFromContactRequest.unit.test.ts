@@ -3,7 +3,7 @@ import {
   expectTypeToMatchAndEqual,
 } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
-import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
+import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryDiscussionAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryDiscussionAggregateRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
@@ -15,7 +15,7 @@ describe("Insert discussion aggregate from contact request DTO", () => {
     const discussionAggregateRepository =
       new InMemoryDiscussionAggregateRepository();
     const uuidGenerator = new TestUuidGenerator();
-    const clock = new CustomClock();
+    const timeGateway = new CustomTimeGateway();
     const uowPerformer = new InMemoryUowPerformer({
       ...createInMemoryUow(),
       discussionAggregateRepository,
@@ -23,12 +23,12 @@ describe("Insert discussion aggregate from contact request DTO", () => {
 
     const useCase = new InsertDiscussionAggregateFromContactRequest(
       uowPerformer,
-      clock,
+      timeGateway,
       uuidGenerator,
     );
     const connectionDate = new Date("2022-01-01T12:00:00.000");
     const discussionId = "someDiscussionUuid";
-    clock.setNextDate(connectionDate);
+    timeGateway.setNextDate(connectionDate);
     uuidGenerator.setNextUuid(discussionId);
 
     // Act

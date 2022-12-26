@@ -23,7 +23,7 @@ import {
   BadRequestError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { CustomClock } from "../../../adapters/secondary/core/ClockImplementations";
+import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeGenerateJwtES256, makeVerifyJwtES256 } from "../../auth/jwt";
@@ -55,35 +55,32 @@ const validConvention: ConventionDto = new ConventionDtoBuilder()
 
 const defaultAgency = AgencyDtoBuilder.create(validConvention.agencyId).build();
 const immersionBaseUrl: AbsoluteUrl = "http://immersion-fake.com";
-
+const email = "some email";
 describe("RenewConventionMagicLink use case", () => {
   const config: AppConfig = new AppConfigBuilder()
     .withTestPresetPreviousKeys()
     .build();
   const generateJwtFn = makeGenerateJwtES256(config.magicLinkJwtPrivateKey);
-  const clock = new CustomClock(new Date());
+  const timeGateway = new CustomTimeGateway(new Date());
 
   let uow: InMemoryUnitOfWork;
   let useCase: RenewConventionMagicLink;
 
   beforeEach(() => {
-    const entity = new ConventionDtoBuilder()
-      .withBeneficiaryCurentEmployer(currentEmployer)
-      .withBeneficiaryRepresentative(beneficiaryRepresentative)
-      .build();
-
     uow = createInMemoryUow();
     uow.agencyRepository.setAgencies([defaultAgency]);
-    uow.conventionRepository.setConventions({ [entity.id]: entity });
+    uow.conventionRepository.setConventions({
+      [validConvention.id]: validConvention,
+    });
     useCase = new RenewConventionMagicLink(
       new InMemoryUowPerformer(uow),
       makeCreateNewEvent({
-        clock,
+        timeGateway,
         uuidGenerator: new TestUuidGenerator(),
       }),
       generateJwtFn,
       config,
-      clock,
+      timeGateway,
       immersionBaseUrl,
     );
   });
@@ -121,11 +118,12 @@ describe("RenewConventionMagicLink use case", () => {
     ])(
       "Posts an event to deliver a correct JWT for correct responses for role %s",
       async (expectedRole, expectedEmails) => {
-        const expiredPayload = createConventionMagicLinkPayload(
-          validConvention.id,
-          expectedRole,
-          expectedEmails,
-        );
+        const expiredPayload = createConventionMagicLinkPayload({
+          id: validConvention.id,
+          role: expectedRole,
+          email: expectedEmails,
+          now: timeGateway.now(),
+        });
 
         const request: RenewMagicLinkRequestDto = {
           originalUrl: "immersionfacile.fr/verifier-et-signer",
@@ -149,23 +147,23 @@ describe("RenewConventionMagicLink use case", () => {
           makeVerifyJwtES256<ConventionMagicLinkPayload>(
             config.magicLinkJwtPublicKey,
           )(jwt),
-          createConventionMagicLinkPayload(
-            validConvention.id,
-            expectedRole,
-            expectedEmails,
-            undefined,
-            () => clock.now().getTime(),
-          ),
+          createConventionMagicLinkPayload({
+            id: validConvention.id,
+            role: expectedRole,
+            email: expectedEmails,
+            now: timeGateway.now(),
+          }),
         );
       },
     );
 
     it("Also work when using encoded Url", async () => {
-      const expiredPayload = createConventionMagicLinkPayload(
-        validConvention.id,
-        "beneficiary",
-        validConvention.signatories.beneficiary.email,
-      );
+      const expiredPayload = createConventionMagicLinkPayload({
+        id: validConvention.id,
+        role: "beneficiary",
+        email: validConvention.signatories.beneficiary.email,
+        now: timeGateway.now(),
+      });
 
       const request: RenewMagicLinkRequestDto = {
         originalUrl: "immersionfacile.fr%2Fverifier-et-signer",
@@ -180,11 +178,12 @@ describe("RenewConventionMagicLink use case", () => {
 
   describe("Wrong paths", () => {
     it("requires a valid application id", async () => {
-      const payload = createConventionMagicLinkPayload(
-        "not-a-valid-id",
-        "counsellor",
-        "some email",
-      );
+      const payload = createConventionMagicLinkPayload({
+        id: "not-a-valid-id",
+        role: "counsellor",
+        email,
+        now: timeGateway.now(),
+      });
 
       const request: RenewMagicLinkRequestDto = {
         originalUrl: "immersionfacile.com/%jwt%",
@@ -204,11 +203,12 @@ describe("RenewConventionMagicLink use case", () => {
         .build();
       uow.conventionRepository.setConventions({ [entity.id]: entity });
 
-      const payload = createConventionMagicLinkPayload(
-        validConvention.id,
-        "counsellor",
-        "some email",
-      );
+      const payload = createConventionMagicLinkPayload({
+        id: validConvention.id,
+        role: "counsellor",
+        email,
+        now: timeGateway.now(),
+      });
 
       const request: RenewMagicLinkRequestDto = {
         originalUrl: "immersionfacile.com/%jwt%",
@@ -223,11 +223,12 @@ describe("RenewConventionMagicLink use case", () => {
 
     // Admins use non-magic-link based authentication, so no need to renew these.
     it("Refuses to generate admin magic links", async () => {
-      const payload = createConventionMagicLinkPayload(
-        validConvention.id,
-        "admin",
-        "some email",
-      );
+      const payload = createConventionMagicLinkPayload({
+        id: validConvention.id,
+        role: "admin",
+        email,
+        now: timeGateway.now(),
+      });
 
       const request: RenewMagicLinkRequestDto = {
         originalUrl: "immersionfacile.com/verification",
@@ -241,11 +242,12 @@ describe("RenewConventionMagicLink use case", () => {
     });
 
     it("does not accept to renew links from url that are not supported", async () => {
-      const payload = createConventionMagicLinkPayload(
-        validConvention.id,
-        "counsellor",
-        "some email",
-      );
+      const payload = createConventionMagicLinkPayload({
+        id: validConvention.id,
+        role: "counsellor",
+        email,
+        now: timeGateway.now(),
+      });
 
       const request: RenewMagicLinkRequestDto = {
         originalUrl: "immersionfacile.com/",
