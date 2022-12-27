@@ -13,149 +13,159 @@ export const defaultMetaContents: MetaContentType = {
 
 export const metaContents: Record<keyof typeof routes, MetaContentType> = {
   addAgency: {
-    title: "formulaire d'ajout d'un prescripteur",
-    description: "",
+    title: "Formulaire d'ajout d'un prescripteur",
+    description: "Devenir prescripteur de PMSMP et immersions professionnelles",
   },
   adminTab: {
-    title: "",
-    description: "",
+    title: "AdminTab",
+    description: "Faciliter la réalisation des immersions professionnelles.",
   },
   adminRoot: {
-    title: "admin",
-    description: "",
+    title: "Admin",
+    description: "Faciliter la réalisation des immersions professionnelles.",
   },
   debugPopulateDB: {
-    title: "",
-    description: "",
+    title: "DebugPopulateDB",
+    description: "Faciliter la réalisation des immersions professionnelles.",
   },
   editFormEstablishment: {
-    title: "formulaire d'édition entreprise",
-    description: "",
+    title: "Formulaire d'édition entreprise",
+    description:
+      "Modifier une entreprise accueillante de PMSMP et immersions professionnelles.",
   },
   errorRedirect: {
-    title: "error",
-    description: "",
+    title: "Erreur",
+    description: "Faciliter la réalisation des immersions professionnelles.",
   },
   formEstablishment: {
-    title: "formulaire de creation entreprise",
-    description: "",
+    title: "Formulaire de creation entreprise",
+    description:
+      "Devenir entreprise accueillante de PMSMP et immersions professionnelles.",
   },
   formEstablishmentForExternals: {
-    title: "",
-    description: "",
+    title: "Formulaire de creation entreprise",
+    description:
+      "Devenir entreprise accueillante de PMSMP et immersions professionnelles.",
   },
   home: {
-    title: "acceuil",
-    description: "",
+    title: "Accueil Immersion Facilitée",
+    description:
+      "Faciliter la réalisation des immersions professionnelles et PMSMP.",
   },
   homeCandidates: {
-    title: "accueil béneficiaires",
-    description: "",
+    title: "Accueil béneficiaires",
+    description:
+      "Trouver une entreprise pour votre Immersion Professionnelle ou PMSMP et faire une demande de convention.",
   },
   homeEstablishments: {
-    title: "accueil entreprises",
-    description: "",
+    title: "Accueil entreprises",
+    description:
+      "Devenir entreprise accueillante de PMSMP et immersions professionnelles ou modifier une fiche entreprise",
   },
   homeAgencies: {
-    title: "accueil prescripteurs",
-    description: "",
+    title: "Accueil prescripteurs",
+    description: "Devenir prescripteur de PMSMP et immersions professionnelles",
   },
   conventionImmersion: {
-    title: "demande d'immersion",
-    description: "",
+    title: "Demande d'immersion",
+    description:
+      "Démarrer une demande de convention pour une PMSMP ou Immersion Professionnelle.",
   },
   conventionMiniStage: {
-    title: "demande de mini-stage",
-    description: "",
+    title: "Demande de mini-stage",
+    description:
+      "Démarrer une demande de convention pour un mini-stage, stage de 3ème ou stage de seconde.",
   },
   conventionForUkraine: {
-    title: "les entreprises s'engagent pour l'ukraine",
-    description: "",
+    title: "Les entreprises s'engagent pour l'ukraine",
+    description: "Faciliter la réalisation des immersions professionnelles.",
   },
   conventionToValidate: {
-    title: "vérification",
-    description: "",
+    title: "Vérification",
+    description: "Faciliter la réalisation des immersions professionnelles.",
   },
   conventionToSign: {
-    title: "verifier et signer",
-    description: "",
+    title: "Verifier et signer",
+    description: "Faciliter la réalisation des immersions professionnelles.",
   },
   conventionStatusDashboard: {
-    title: "statut convention",
-    description: "",
+    title: "Statut convention",
+    description: "Faciliter la réalisation des immersions professionnelles.",
   },
   immersionAssessment: {
-    title: "bilan d'immersion",
-    description: "",
+    title: "Bilan d'immersion",
+    description: "Faciliter la réalisation des immersions professionnelles.",
   },
   renewConventionMagicLink: {
-    title: "refraichir le lien",
-    description: "",
+    title: "Rafraichir le lien",
+    description: "Faciliter la réalisation des immersions professionnelles.",
   },
   searchDebug: {
-    title: "",
-    description: "",
+    title: "SearchDebug",
+    description: "Faciliter la réalisation des immersions professionnelles.",
   },
   stats: {
-    title: "stats",
-    description: "",
+    title: "Stats",
+    description:
+      "Découvrir les statistiques et l'impact du site Immersion Facile",
   },
   search: {
-    title: "recherche",
-    description: "",
+    title: "Recherche",
+    description:
+      "Utilisez notre moteur de recherche pour trouver une entreprise accueillante d'Immersions Professionnelles ou PMSMP",
   },
   standard: {
-    title: "",
-    description: "",
+    title: "Standard",
+    description: "Faciliter la réalisation des immersions professionnelles.",
   },
 };
 
 export const standardMetaContent: Record<StandardPageSlugs, MetaContentType> = {
   "mentions-legales": {
-    title: "mentions legales",
-    description: "",
+    title: "Mentions legales",
+    description: "Faciliter la réalisation des immersions professionnelles.",
   },
   cgu: {
-    title: "conditions générales d'utilisation",
+    title: "Conditions générales d'utilisation",
     description: "pages des conditions générales d'utilisations",
   },
   "politique-de-confidentialite": {
-    title: "politique de confidentialité",
-    description: "",
+    title: "Politique de confidentialité",
+    description: "Faciliter la réalisation des immersions professionnelles.",
   },
   "declaration-accessibilite": {
-    title: "déclaration d'accessibilité",
-    description: "",
+    title: "Déclaration d'accessibilité",
+    description: "Faciliter la réalisation des immersions professionnelles.",
   },
 };
 
 export const adminMetaContent: Record<AdminTab, MetaContentType> = {
   conventions: {
     title: "admin: conventions",
-    description: "",
+    description: "Page admin: Conventions",
   },
   events: {
-    title: "admin: evenement",
-    description: "",
+    title: "admin: évenement",
+    description: "Page admin: Evenement",
   },
   "agency-validation": {
     title: "admin: validation d'agence",
-    description: "",
+    description: "Page admin: Validation d'agence",
   },
   exports: {
     title: "admin: export de données",
-    description: "",
+    description: "Page admin: Export de données",
   },
   emails: {
     title: "admin: emails",
-    description: "",
+    description: "Page admin: Emails",
   },
   "technical-options": {
     title: "admin: options techniques",
-    description: "",
+    description: "Page admin: Options techniques",
   },
   "email-preview": {
     title: "admin: aperçus email",
-    description: "",
+    description: "Page admin: Aperçus email",
   },
 };
