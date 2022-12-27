@@ -8,10 +8,8 @@ import {
   ImmersionAssessmentDto,
   WithConventionId,
 } from "shared";
-import {
-  ConventionRequiresModificationPayload,
-  RenewMagicLinkPayload,
-} from "../../convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
+import { RenewMagicLinkPayload } from "../../convention/useCases/notifications/DeliverRenewedMagicLink";
+import { ConventionRequiresModificationPayload } from "../../convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 import { IdentityProvider } from "../../generic/OAuth/entities/OngoingOAuth";
 import { EstablishmentAggregate } from "../../immersionOffer/entities/EstablishmentEntity";
 import { ConventionAndPeExternalIds } from "../../peConnect/port/ConventionPoleEmploiAdvisorRepository";

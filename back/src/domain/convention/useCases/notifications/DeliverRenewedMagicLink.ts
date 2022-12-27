@@ -1,9 +1,14 @@
+import { z } from "zod";
 import { UseCase } from "../../../core/UseCase";
 import { EmailGateway } from "../../ports/EmailGateway";
-import {
-  RenewMagicLinkPayload,
-  renewMagicLinkPayloadSchema,
-} from "./NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
+
+// prettier-ignore
+export type RenewMagicLinkPayload = z.infer<typeof renewMagicLinkPayloadSchema>
+export const renewMagicLinkPayloadSchema = z.object({
+  emails: z.array(z.string()),
+  magicLink: z.string(),
+  conventionStatusLink: z.string(),
+});
 
 export class DeliverRenewedMagicLink extends UseCase<RenewMagicLinkPayload> {
   constructor(private readonly emailGateway: EmailGateway) {

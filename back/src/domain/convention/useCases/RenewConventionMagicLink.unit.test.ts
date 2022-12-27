@@ -28,8 +28,8 @@ import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGenerato
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeGenerateJwtES256, makeVerifyJwtES256 } from "../../auth/jwt";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
-import { RenewMagicLinkPayload } from "./notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 import { RenewConventionMagicLink } from "./RenewConventionMagicLink";
+import { RenewMagicLinkPayload } from "./notifications/DeliverRenewedMagicLink";
 
 const currentEmployer: BeneficiaryCurrentEmployer = {
   email: "currentEmployer@mail.com",
@@ -56,6 +56,7 @@ const validConvention: ConventionDto = new ConventionDtoBuilder()
 const defaultAgency = AgencyDtoBuilder.create(validConvention.agencyId).build();
 const immersionBaseUrl: AbsoluteUrl = "http://immersion-fake.com";
 const email = "some email";
+
 describe("RenewConventionMagicLink use case", () => {
   const config: AppConfig = new AppConfigBuilder()
     .withTestPresetPreviousKeys()

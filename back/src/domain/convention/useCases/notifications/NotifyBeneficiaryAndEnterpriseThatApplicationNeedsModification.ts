@@ -25,14 +25,6 @@ const conventionRequiresModificationSchema = z.object({
   roles: z.array(z.enum(allRoles)),
 });
 
-// prettier-ignore
-export type RenewMagicLinkPayload = z.infer<typeof renewMagicLinkPayloadSchema>
-export const renewMagicLinkPayloadSchema = z.object({
-  emails: z.array(z.string()),
-  magicLink: z.string(),
-  conventionStatusLink: z.string(),
-});
-
 export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification extends TransactionalUseCase<ConventionRequiresModificationPayload> {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
