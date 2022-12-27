@@ -6,40 +6,44 @@ export type FormAgencyFieldsLabels = FormFieldsObject<
   Record<Partial<keyof AgencyDto | "stepsForValidation">, FormFieldAttributes>
 >;
 
+const defaultProps = {
+  name: "",
+};
+
 export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
   id: {
+    ...defaultProps,
     label: "Identifiant",
-    name: "id",
     id: "agency-id",
   },
   name: {
+    ...defaultProps,
     label: "Nom de l'organisme",
     placeholder: "Agence de Boulogne-Billancourt",
     required: true,
-    name: "name",
     id: "agency-name",
     autoComplete: "organization",
   },
   address: {
+    ...defaultProps,
     label: "Adresse de la structure",
     required: true,
-    name: "address",
     id: "agency-address",
   },
   position: {
+    ...defaultProps,
     label: "Coordonnées géographiques de l'organisme",
-    name: "position",
     id: "agency-position",
   },
   logoUrl: {
+    ...defaultProps,
     label: "Changer le logo",
     id: "agency-logoUrl",
-    name: "logoUrl",
     description: "Cela permet de personnaliser les mails automatisés.",
   },
   validatorEmails: {
+    ...defaultProps,
     required: true,
-    name: "validator-emails",
     id: "agency-validator-emails",
     label: "Emails de validation définitive de la demande de convention",
     placeholder: "equipe.validation@mail.com, valideur.dupont@mail.com",
@@ -47,13 +51,13 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
       "Les personnes ou emails génériques suivants valideront les conventions préalablement examinées.",
   },
   adminEmails: {
+    ...defaultProps,
     label: "Emails des administrateurs de la structure",
-    name: "adminEmails",
     id: "agency-adminEmails",
   },
   signature: {
+    ...defaultProps,
     label: "Texte de signature",
-    name: "signature",
     id: "agency-signature",
     required: true,
     description:
@@ -61,18 +65,18 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
     placeholder: "L’équipe de l’agence de Boulogne-Billancourt",
   },
   status: {
+    ...defaultProps,
     label: "Statut de la structure",
-    name: "status",
     id: "agency-status",
   },
   kind: {
+    ...defaultProps,
     label: "Type de structure",
     id: "agency-kind",
-    name: "kind",
     required: true,
   },
   counsellorEmails: {
-    name: "counsellor-emails",
+    ...defaultProps,
     id: "agency-counsellor-emails",
     label: "Emails pour examen préalable de la demande de convention",
     placeholder: "equipe1@mail.com, conseiller.dupont@mail.com",
@@ -80,23 +84,23 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
       "Les personnes ou emails génériques suivants recevront en premier les demandes de convention à examiner.",
   },
   codeSafir: {
+    ...defaultProps,
     label: "Code SAFIR",
-    name: "codeSafir",
     id: "agency-codeSafir",
   },
   questionnaireUrl: {
-    name: "questionnaireUrl",
+    ...defaultProps,
     id: "agency-questionnaireUrl",
     label: "Lien vers le document de support du bilan de fin d’immersion ",
     placeholder: "https://docs.google.com/document/d/mon-document-pour-bilan",
   },
   agencySiret: {
+    ...defaultProps,
     label: "SIRET de la structure",
-    name: "agencySiret",
     id: "agency-agencySiret",
   },
   stepsForValidation: {
-    name: "steps-for-validation",
+    ...defaultProps,
     id: "steps-for-validation",
     label: "Combien d'étapes de validation des immersions y a-t-il ? *",
   },

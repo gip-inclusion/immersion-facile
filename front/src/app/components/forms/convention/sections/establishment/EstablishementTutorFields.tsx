@@ -1,10 +1,11 @@
 import { useFormikContext } from "formik";
 import React from "react";
-import { ConventionDto, getConventionFieldName } from "shared";
-import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
+import { ConventionDto } from "shared";
 import { useSiretFetcher } from "src/app/hooks/siret.hooks";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
+import { useFormContents } from "src/app/hooks/formContents.hooks";
+import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 
 type EstablishementTutorFieldsProperties = {
   disabled: boolean | undefined;
@@ -16,61 +17,36 @@ export const EstablishementTutorFields = ({
   const { isFetchingSiret } = useSiretFetcher({
     shouldFetchEvenIfAlreadySaved: true,
   });
-  const t = useConventionTextsFromFormikContext();
   const { values } = useFormikContext<ConventionDto>();
-
+  const { getFormFields } = useFormContents(
+    formConventionFieldsLabels(values.internshipKind),
+  );
+  const formContents = getFormFields();
   return (
     <>
       <TextInput
-        label={`${t.establishmentSection.establishmentTutor.firstName.label} *`}
-        name={getConventionFieldName("establishmentTutor.firstName")}
+        {...formContents["establishmentTutor.firstName"]}
         type="text"
-        placeholder=""
-        description={
-          t.establishmentSection.establishmentTutor.firstName.description
-        }
         disabled={disabled || isFetchingSiret}
       />
       <TextInput
-        label={`${t.establishmentSection.establishmentTutor.lastName.label} *`}
-        name={getConventionFieldName("establishmentTutor.lastName")}
+        {...formContents["establishmentTutor.lastName"]}
         type="text"
-        placeholder=""
-        description={
-          t.establishmentSection.establishmentTutor.lastName.description
-        }
         disabled={disabled || isFetchingSiret}
       />
       <TextInput
-        label={`${t.establishmentSection.establishmentTutor.job.label} *`}
-        name={getConventionFieldName("establishmentTutor.job")}
+        {...formContents["establishmentTutor.job"]}
         type="text"
-        placeholder=""
-        description={t.establishmentSection.establishmentTutor.job.description}
         disabled={disabled || isFetchingSiret}
       />
       <TextInput
-        label={`${t.establishmentSection.establishmentTutor.phone.label} *`}
-        name={getConventionFieldName("establishmentTutor.phone")}
+        {...formContents["establishmentTutor.phone"]}
         type="tel"
-        placeholder={
-          t.establishmentSection.establishmentTutor.phone.placeholder
-        }
-        description={
-          t.establishmentSection.establishmentTutor.phone.description
-        }
         disabled={disabled}
       />
       <TextInput
-        label={`${t.establishmentSection.establishmentTutor.email.label} *`}
-        name={getConventionFieldName("establishmentTutor.email")}
+        {...formContents["establishmentTutor.email"]}
         type="email"
-        placeholder={
-          t.establishmentSection.establishmentTutor.email.placeholder
-        }
-        description={
-          t.establishmentSection.establishmentTutor.email.description
-        }
         disabled={disabled}
       />
       {values.establishmentTutor?.email && <ConventionEmailWarning />}

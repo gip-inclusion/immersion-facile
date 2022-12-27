@@ -1,4 +1,8 @@
-import { FormFieldAttributes } from "../contents/forms/types";
+import { FormFieldsObjectForContent } from "../contents/forms/convention/formConvention";
+import {
+  FormFieldAttributes,
+  FormFieldAttributesForContent,
+} from "../contents/forms/types";
 
 export type FormFieldsObject<T> = Record<keyof T, FormFieldAttributes>;
 
@@ -10,11 +14,11 @@ const defaultField: FormFieldAttributes = {
   name: "field-name-not-set",
 };
 
-const formatFieldLabel = (field: FormFieldAttributes) =>
+const formatFieldLabel = (field: FormFieldAttributesForContent) =>
   `${field.label}${field.required ? " *" : ""}`;
 
 const getFormErrors =
-  <T>(formFieldsLabels: FormFieldsObject<T>) =>
+  <T>(formFieldsLabels: FormFieldsObjectForContent<T>) =>
   () =>
     Object.fromEntries(
       Object.keys(formFieldsLabels).map((key) => [
@@ -24,21 +28,20 @@ const getFormErrors =
     );
 const getFormFieldAttributes = <T>(
   key: FormFieldsKeys<T>,
-  formFieldsLabels: FormFieldsObject<T>,
-) => {
+  formFieldsLabels: FormFieldsObjectForContent<T>,
+): FormFieldAttributes => {
   const field = formFieldsLabels[key];
-  const formattedField = {
+  return {
     ...defaultField,
     ...(field ? field : {}),
     label: field ? formatFieldLabel(field) : defaultField.label,
-    name: key,
+    name: String(key),
   };
-  return formattedField;
 };
 
 const getFormFields =
-  <T>(formFieldsLabels: FormFieldsObject<T>) =>
-  () =>
+  <T>(formFieldsLabels: FormFieldsObjectForContent<T>) =>
+  (): FormFieldsObject<T> =>
     Object.keys(formFieldsLabels).reduce(
       (sum, key) => ({
         ...sum,
@@ -47,10 +50,12 @@ const getFormFields =
           formFieldsLabels,
         ),
       }),
-      formFieldsLabels,
+      formFieldsLabels as FormFieldsObject<T>,
     );
 
-export const useFormContents = <T>(formFieldsLabels: FormFieldsObject<T>) => ({
+export const useFormContents = <T>(
+  formFieldsLabels: FormFieldsObjectForContent<T>,
+) => ({
   getFormErrors: getFormErrors(formFieldsLabels),
   getFormFields: getFormFields(formFieldsLabels),
 });

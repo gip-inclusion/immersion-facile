@@ -1,8 +1,7 @@
 import { useFormikContext } from "formik";
 import React, { useEffect } from "react";
-import type { ConventionDto, Signatory } from "shared";
-import { getConventionFieldName } from "shared";
-import { Notification } from "react-design-system";
+import { ConventionDto, Signatory, toDotNotation } from "shared";
+import { ErrorNotifications, Notification } from "react-design-system";
 import { deviceRepository } from "src/config/dependencies";
 import { makeValuesToWatchInUrl } from "src/app/components/forms/convention/makeValuesToWatchInUrl";
 import { SignatureActions } from "src/app/components/forms/convention/SignatureActions";
@@ -16,6 +15,8 @@ import { AgencyFormSection } from "./sections/agency/AgencyFormSection";
 import { BeneficiaryFormSection } from "./sections/beneficiary/BeneficiaryFormSection";
 import { EstablishmentFormSection } from "./sections/establishment/EstablishmentFormSection";
 import { ImmersionConditionFormSection } from "./sections/immersion-conditions/ImmersionConditionFormSection";
+import { useFormContents } from "src/app/hooks/formContents.hooks";
+import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 
 type ConventionFieldsProps = {
   isFrozen?: boolean;
@@ -47,6 +48,10 @@ export const ConventionFormFields = ({
   const { enablePeConnectApi } = useFeatureFlags();
   const watchedValues = makeValuesToWatchInUrl(conventionValues);
   useConventionWatchValuesInUrl(watchedValues);
+  const { getFormFields, getFormErrors } = useFormContents(
+    formConventionFieldsLabels(conventionValues.internshipKind),
+  );
+  const formContents = getFormFields();
   const t = useConventionTextsFromFormikContext();
 
   return (
@@ -57,9 +62,7 @@ export const ConventionFormFields = ({
       )}
       <input
         type="hidden"
-        name={getConventionFieldName(
-          "signatories.beneficiary.federatedIdentity",
-        )}
+        {...formContents["signatories.beneficiary.federatedIdentity"]}
       />
 
       <AgencyFormSection
@@ -84,14 +87,6 @@ export const ConventionFormFields = ({
         }
         isFrozen={isFrozen}
       />
-
-      {!isSignatureMode &&
-        submitCount !== 0 &&
-        Object.values(errors).length > 0 && (
-          <div className="fr-alert fr-alert--error">
-            <p>{t.signatures.fixErrors}</p>
-          </div>
-        )}
       {!isFrozen && (
         <Notification title={""} type={"info"} className="fr-my-2w">
           <ol>
@@ -110,12 +105,22 @@ export const ConventionFormFields = ({
           </ol>
         </Notification>
       )}
-      {!isFrozen && !isSignatureMode && (
-        <SubmitButton
-          isSubmitting={isSubmitting}
-          disabled={isFrozen || isSignatureMode}
-          onSubmit={submitForm}
+      {!isSignatureMode && (
+        <ErrorNotifications
+          labels={getFormErrors()}
+          errors={toDotNotation(errors)}
+          visible={submitCount !== 0 && Object.values(errors).length > 0}
         />
+      )}
+
+      {!isFrozen && !isSignatureMode && (
+        <div className="fr-mt-4w">
+          <SubmitButton
+            isSubmitting={isSubmitting}
+            disabled={isFrozen || isSignatureMode}
+            onSubmit={submitForm}
+          />
+        </div>
       )}
       {isSignatureMode && (
         <>

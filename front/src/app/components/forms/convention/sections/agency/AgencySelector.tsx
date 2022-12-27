@@ -3,15 +3,15 @@ import React, { useEffect, useState } from "react";
 import {
   AgencyId,
   AgencyOption,
-  ConventionDto,
   DepartmentCode,
   FederatedIdentity,
   InternshipKind,
   isPeConnectIdentity,
 } from "shared";
 import { PostcodeAutocomplete } from "src/app/components/forms/commons/PostcodeAutocomplete";
-import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
+import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { useFederatedIdentity } from "src/app/hooks/federatedIdentity";
+import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { agencyGateway } from "src/config/dependencies";
 import { AgencyDropdownListField } from "./AgencyDropdownListField";
 import { AgencyErrorText } from "./AgencyErrorText";
@@ -29,10 +29,13 @@ export const AgencySelector = ({
   defaultAgencyId,
   shouldListAll,
 }: AgencySelectorProps) => {
-  const t = useConventionTextsFromFormikContext();
-  const name: keyof ConventionDto = "agencyId";
+  const { getFormFields } = useFormContents(
+    formConventionFieldsLabels(internshipKind),
+  );
+  const { agencyId: agencyIdField, postalCode: postalCodeField } =
+    getFormFields();
   const [{ value, onBlur }, { touched, error }, { setValue }] =
-    useField<AgencyId>({ name });
+    useField<AgencyId>(agencyIdField.name || "agencyId");
 
   const [isLoading, setIsLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -92,21 +95,21 @@ export const AgencySelector = ({
 
   const userError = touched && error;
   const showError = userError || loadingError;
-
   return (
     <div
       className={`fr-input-group${showError ? " fr-input-group--error" : ""}`}
     >
       <PostcodeAutocomplete
-        label={t.agencySection.yourPostalcodeLabel}
+        {...postalCodeField}
         onFound={setDepartmentCode}
         disabled={disabled}
       />
       <AgencyDropdownListField
+        {...agencyIdField}
+        name={agencyIdField.name || "agencyId"}
         isLoading={isLoading}
         loaded={loaded}
         disabled={disabled}
-        name={name}
         value={value}
         onBlur={onBlur}
         agencies={agencies}

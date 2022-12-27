@@ -1,7 +1,7 @@
 import { useFormikContext } from "formik";
 import React from "react";
 import { useDispatch } from "react-redux";
-import { ConventionDto, getConventionFieldName } from "shared";
+import { ConventionDto } from "shared";
 import { RadioGroup } from "src/app/components/forms/commons/RadioGroup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
@@ -14,6 +14,8 @@ import { useConventionTextsFromFormikContext } from "src/app/contents/forms/conv
 import { BeneficiaryCurrentEmployerFields } from "./BeneficiaryCurrentEmployerFields";
 import { BeneficiaryEmergencyContactFields } from "./BeneficiaryEmergencyContactFields";
 import { BeneficiaryRepresentativeFields } from "./BeneficiaryRepresentativeFields";
+import { useFormContents } from "src/app/hooks/formContents.hooks";
+import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 
 type beneficiaryFormSectionProperties = {
   isFrozen: boolean | undefined;
@@ -29,28 +31,25 @@ export const BeneficiaryFormSection = ({
   const dispatch = useDispatch();
   const t = useConventionTextsFromFormikContext();
   const { values } = useFormikContext<ConventionDto>();
+  const { getFormFields } = useFormContents(
+    formConventionFieldsLabels(values.internshipKind),
+  );
+  const formContents = getFormFields();
   return (
     <>
       <FormSectionTitle>{t.beneficiarySection.title}</FormSectionTitle>
       <TextInput
-        label={`${t.beneficiarySection.firstNameLabel} *`}
-        name={getConventionFieldName("signatories.beneficiary.firstName")}
+        {...formContents["signatories.beneficiary.firstName"]}
         type="text"
-        placeholder=""
-        description=""
         disabled={isFrozen}
       />
       <TextInput
-        label={`${t.beneficiarySection.lastNameLabel} *`}
-        name={getConventionFieldName("signatories.beneficiary.lastName")}
+        {...formContents["signatories.beneficiary.lastName"]}
         type="text"
-        placeholder=""
-        description=""
         disabled={isFrozen}
       />
       <DateInput
-        label={`${t.beneficiarySection.birthdate} *`}
-        name={getConventionFieldName("signatories.beneficiary.birthdate")}
+        {...formContents["signatories.beneficiary.birthdate"]}
         disabled={isFrozen}
         onDateChange={(date) => {
           setFieldValue(
@@ -60,30 +59,24 @@ export const BeneficiaryFormSection = ({
         }}
       />
       <TextInput
-        label={`${t.beneficiarySection.email.label} *`}
-        name={getConventionFieldName("signatories.beneficiary.email")}
+        {...formContents["signatories.beneficiary.email"]}
         type="email"
-        placeholder={t.beneficiarySection.email.placeholder}
-        description={t.beneficiarySection.email.description}
         disabled={isFrozen}
       />
       {values.signatories.beneficiary.email && <ConventionEmailWarning />}
       <TextInput
-        label={`${t.beneficiarySection.phone.label} *`}
-        name={getConventionFieldName("signatories.beneficiary.phone")}
+        {...formContents["signatories.beneficiary.phone"]}
         type="tel"
-        placeholder={t.beneficiarySection.phone.placeholder}
-        description={t.beneficiarySection.phone.description}
         disabled={isFrozen}
       />
       <RadioGroup
-        id="is-minor"
+        {...formContents.isMinor}
         disabled={isFrozen}
         currentValue={isMinor}
         setCurrentValue={(value) =>
           dispatch(conventionSlice.actions.isMinorChanged(value))
         }
-        groupLabel={`${t.beneficiarySection.isMinorLabel} *`}
+        groupLabel={formContents.isMinor.label}
         options={[
           { label: t.yes, value: true },
           { label: t.no, value: false },
@@ -95,13 +88,13 @@ export const BeneficiaryFormSection = ({
         <BeneficiaryEmergencyContactFields disabled={isFrozen} />
       )}
       <RadioGroup
-        id="is-current-employer"
+        {...formContents.isCurrentEmployer}
         disabled={isFrozen}
         currentValue={hasCurrentEmployer}
         setCurrentValue={(value) =>
           dispatch(conventionSlice.actions.isCurrentEmployerChanged(value))
         }
-        groupLabel={`${t.beneficiarySection.beneficiaryCurrentEmployer.hasCurrentEmployerLabel} *`}
+        groupLabel={formContents.isCurrentEmployer.label}
         options={[
           { label: t.yes, value: true },
           { label: t.no, value: false },

@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { FederatedIdentity } from "shared";
+import { ConventionDto, FederatedIdentity } from "shared";
 import { RadioGroup } from "src/app/components/forms/commons/RadioGroup";
 import { ShareActions } from "src/app/components/forms/convention/ShareActions";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -14,6 +14,9 @@ import { EstablishementTutorFields } from "./EstablishementTutorFields";
 import { EstablishmentBusinessFields } from "./EstablishmentBusinessFields";
 import { EstablishmentRepresentativeFields } from "./EstablishmentRepresentativeFields";
 import { Notification } from "react-design-system";
+import { useFormContents } from "src/app/hooks/formContents.hooks";
+import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
+import { useFormikContext } from "formik";
 
 type EstablishmentFormSectionParams = {
   isFrozen: boolean | undefined;
@@ -30,9 +33,12 @@ export const EstablishmentFormSection = ({
   const isTutorEstablishmentRepresentative = useAppSelector(
     conventionSelectors.isTutorEstablishmentRepresentative,
   );
-
+  const { values } = useFormikContext<ConventionDto>();
   const t = useConventionTextsFromFormikContext();
-
+  const { getFormFields } = useFormContents(
+    formConventionFieldsLabels(values.internshipKind),
+  );
+  const formContents = getFormFields();
   const { isFetchingSiret } = useSiretFetcher({
     shouldFetchEvenIfAlreadySaved: true,
   });
@@ -51,7 +57,7 @@ export const EstablishmentFormSection = ({
       </Notification>
       <EstablishmentBusinessFields disabled={isFrozen || isFetchingSiret} />
       <RadioGroup
-        id="is-establishmentRepresentative"
+        {...formContents.isEstablishmentTutorIsEstablishmentRepresentative}
         disabled={isFrozen || isFetchingSiret}
         currentValue={isTutorEstablishmentRepresentative}
         setCurrentValue={(value) => {
@@ -61,7 +67,9 @@ export const EstablishmentFormSection = ({
             ),
           );
         }}
-        groupLabel={`${t.establishmentSection.isEstablishmentTutorIsEstablishmentRepresentative} *`}
+        groupLabel={
+          formContents.isEstablishmentTutorIsEstablishmentRepresentative.label
+        }
         options={[
           { label: t.yes, value: true },
           { label: t.no, value: false },

@@ -44,7 +44,7 @@ export const PostcodeAutocomplete = ({
 
   return (
     <>
-      <TextInput label={`${label} *`} name={name} disabled={disabled} />
+      <TextInput label={`${label}`} name={name} disabled={disabled} />
       {error && (
         <p id={`post-code-error-desc-error`} className="fr-error-text">
           {error}

@@ -1,9 +1,10 @@
 import { useFormikContext } from "formik";
 import React from "react";
-import { ConventionDto, getConventionFieldName } from "shared";
+import { ConventionDto } from "shared";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
-import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
+import { useFormContents } from "src/app/hooks/formContents.hooks";
+import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 
 type EstablishmentRepresentativeFieldsProperties = {
   disabled: boolean | undefined;
@@ -12,62 +13,31 @@ type EstablishmentRepresentativeFieldsProperties = {
 export const EstablishmentRepresentativeFields = ({
   disabled,
 }: EstablishmentRepresentativeFieldsProperties): JSX.Element => {
-  const t = useConventionTextsFromFormikContext();
   const { values } = useFormikContext<ConventionDto>();
+  const { getFormFields } = useFormContents(
+    formConventionFieldsLabels(values.internshipKind),
+  );
+  const formContents = getFormFields();
   return (
     <>
       <TextInput
-        label={`${t.establishmentSection.establishmentRepresentative.firstName.label} *`}
-        name={getConventionFieldName(
-          "signatories.establishmentRepresentative.firstName",
-        )}
+        {...formContents["signatories.establishmentRepresentative.firstName"]}
         type="text"
-        placeholder=""
-        description={
-          t.establishmentSection.establishmentRepresentative.firstName
-            .description
-        }
         disabled={disabled}
       />
       <TextInput
-        label={`${t.establishmentSection.establishmentRepresentative.lastName.label} *`}
-        name={getConventionFieldName(
-          "signatories.establishmentRepresentative.lastName",
-        )}
+        {...formContents["signatories.establishmentRepresentative.lastName"]}
         type="text"
-        placeholder=""
-        description={
-          t.establishmentSection.establishmentRepresentative.lastName
-            .description
-        }
         disabled={disabled}
       />
       <TextInput
-        label={`${t.establishmentSection.establishmentRepresentative.phone.label} *`}
-        name={getConventionFieldName(
-          "signatories.establishmentRepresentative.phone",
-        )}
+        {...formContents["signatories.establishmentRepresentative.phone"]}
         type="tel"
-        placeholder={
-          t.establishmentSection.establishmentRepresentative.phone.placeholder
-        }
-        description={
-          t.establishmentSection.establishmentRepresentative.phone.description
-        }
         disabled={disabled}
       />
       <TextInput
-        label={`${t.establishmentSection.establishmentRepresentative.email.label} *`}
-        name={getConventionFieldName(
-          "signatories.establishmentRepresentative.email",
-        )}
+        {...formContents["signatories.establishmentRepresentative.email"]}
         type="email"
-        placeholder={
-          t.establishmentSection.establishmentRepresentative.email.placeholder
-        }
-        description={
-          t.establishmentSection.establishmentRepresentative.email.description
-        }
         disabled={disabled}
       />
       {values.signatories.establishmentRepresentative?.email && (

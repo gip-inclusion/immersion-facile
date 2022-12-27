@@ -1,7 +1,9 @@
 import React from "react";
-import { getConventionFieldName } from "shared";
-import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
+import { ConventionDto } from "shared";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
+import { useFormContents } from "src/app/hooks/formContents.hooks";
+import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
+import { useFormikContext } from "formik";
 
 export type BeneficiaryEmergencyContactFieldsProperties = {
   disabled: boolean | undefined;
@@ -10,37 +12,27 @@ export type BeneficiaryEmergencyContactFieldsProperties = {
 export const BeneficiaryEmergencyContactFields = ({
   disabled,
 }: BeneficiaryEmergencyContactFieldsProperties): JSX.Element => {
-  const t = useConventionTextsFromFormikContext();
+  const { values } = useFormikContext<ConventionDto>();
+
+  const { getFormFields } = useFormContents(
+    formConventionFieldsLabels(values.internshipKind),
+  );
+  const formContents = getFormFields();
   return (
     <>
       <TextInput
-        label={t.beneficiarySection.emergencyContact.nameLabel}
-        name={getConventionFieldName(
-          "signatories.beneficiary.emergencyContact",
-        )}
+        {...formContents["signatories.beneficiary.emergencyContact"]}
         type="text"
-        placeholder=""
-        description=""
         disabled={disabled}
       />
       <TextInput
-        label={t.beneficiarySection.emergencyContact.phone.label}
-        name={getConventionFieldName(
-          "signatories.beneficiary.emergencyContactPhone",
-        )}
+        {...formContents["signatories.beneficiary.emergencyContactPhone"]}
         type="tel"
-        placeholder={t.beneficiarySection.emergencyContact.phone.placeholder}
-        description=""
         disabled={disabled}
       />
       <TextInput
-        label={t.beneficiarySection.emergencyContact.email.label}
-        name={getConventionFieldName(
-          "signatories.beneficiary.emergencyContactEmail",
-        )}
+        {...formContents["signatories.beneficiary.emergencyContactEmail"]}
         type="text"
-        placeholder={t.beneficiarySection.emergencyContact.email.placeholder}
-        description=""
         disabled={disabled}
       />
     </>

@@ -30,7 +30,7 @@ export const AgencyDropdownListField = ({
   const t = useConventionTextsFromFormikContext();
   return (
     <>
-      <label className="fr-label pt-4" htmlFor={name}>
+      <label className="fr-label fr-pt-1w" htmlFor={name}>
         {`${t.agencySection.yourAgencyLabel} *`}
       </label>
       <div className="flex">
