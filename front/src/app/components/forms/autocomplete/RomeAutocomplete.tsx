@@ -9,7 +9,7 @@ import { romeAutocompleteSelector } from "src/core-logic/domain/romeAutocomplete
 import { useRomeAutocompleteUseCase } from "src/app/hooks/romeAutocomplete.hook";
 
 type RomeAutocompleteProps = {
-  title?: string;
+  title: string;
   initialValue?: RomeDto | undefined;
   setFormValue: (p: RomeDto) => void;
   className?: string;
@@ -64,23 +64,17 @@ export const RomeAutocomplete = ({
         }}
         renderInput={(params) => (
           <div ref={params.InputProps.ref} className="if-autocomplete-search">
-            {title && (
-              <label
-                className={`fr-label ${className ?? ""}`}
-                htmlFor={params.inputProps.id}
-              >
-                {title}
-                {tooltip && tooltip !== "" && (
-                  <Tooltip
-                    title={tooltip}
-                    className={"fr-ml-1w"}
-                    placement="top"
-                  >
-                    <InfoRoundedIcon />
-                  </Tooltip>
-                )}
-              </label>
-            )}
+            <label
+              className={`fr-label ${className ?? ""}`}
+              htmlFor={params.inputProps.id}
+            >
+              {title}
+              {tooltip && tooltip !== "" && (
+                <Tooltip title={tooltip} className={"fr-ml-1w"} placement="top">
+                  <InfoRoundedIcon />
+                </Tooltip>
+              )}
+            </label>
 
             <input
               {...params.inputProps}

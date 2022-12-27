@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ContactMethod } from "shared";
+import { ContactMethod, SearchImmersionResultDto } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import { SuccessFeedback } from "src/app/components/SuccessFeedback";
@@ -29,7 +29,8 @@ export const SearchListResults = () => {
   const [successfulValidationMessage, setSuccessfulValidatedMessage] = useState<string | null>(null);
   const [successFullyValidated, setSuccessfullyValidated] = useState(false);
   const { modalState, dispatch } = useContactEstablishmentModal();
-  const [displayedResults, setDisplayedResults] = useState(searchResults);
+  const [displayedResults, setDisplayedResults] =
+    useState<SearchImmersionResultDto[]>(searchResults);
   const resultsPerPage = 6;
   const [currentPage, setCurrentPage] = useState<number>(0);
   const totalPages = Math.ceil(searchResults.length / resultsPerPage) - 1;

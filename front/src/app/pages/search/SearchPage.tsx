@@ -202,6 +202,7 @@ export const SearchPage = ({
                       }
                       type="submit"
                       id={"im-search__submit-search"}
+                      className="w-full"
                     >
                       <span>
                         <SearchIcon />

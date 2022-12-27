@@ -1,25 +1,17 @@
-import React from "react"; //ReactNode
+import React from "react";
 import {
   addressDtoToString,
   ContactMethod,
-  //ContactMethod,
   SearchImmersionResultDto,
 } from "shared";
 import { ButtonsGroup } from "src/../../libs/react-design-system";
 import { getMapsLink } from "./ContactEstablishmentModal";
-// import "./SearchResult.scss";
-// import { Icon } from "react-design-system";
 
-type EnterpriseSearchResultProps = {
+export type EnterpriseSearchResultProps = {
   searchResult: SearchImmersionResultDto;
   onButtonClick: () => void;
   disableButton?: boolean;
 };
-
-// type SearchResultInfoProps = {
-//   icon: ReactNode;
-//   children: ReactNode;
-// };
 
 export const SearchResult = ({
   onButtonClick,
@@ -108,78 +100,9 @@ export const SearchResult = ({
                 <></>
               )}
             </ButtonsGroup>
-
-            {/* <ul className="fr-btns-group fr-btns-group--inline-reverse fr-btns-group--inline-lg">
-              <li>
-                <button className="fr-btn fr-btn--secondary">Label</button>
-              </li>
-              <li>
-                <button className="fr-btn">Label</button>
-              </li>
-            </ul> */}
           </div>
         </div>
       </div>
-      {/* <div className="im-search-result fr-card fr-card--grey fr-enlarge-link">
-        <div className="flex flex-wrap justify-between">
-          <div className="pb-2">
-            <h3>{customizedName ?? name}</h3>
-
-            <div>
-              {appellationLabels.length > 0
-                ? appellationLabels.join(", ")
-                : romeLabel}
-            </div>
-          </div>
-
-          <InfoLabel
-            className=""
-            contactMode={contactMode}
-            voluntaryToImmersion={voluntaryToImmersion}
-          />
-        </div>
-        <SearchResultInfo
-          icon={
-            <Icon kind="signal-tower-fill" className="im-search-result__icon" />
-          }
-        >
-          <div className="flex justify-between w-full">
-            <div>{distanceKm + " km"}</div>
-            {numberOfEmployeeRange && (
-              <div>
-                {numberOfEmployeeRange}{" "}
-                {numberOfEmployeeRange === "0" ? "salarié" : "salariés"}
-              </div>
-            )}
-          </div>
-        </SearchResultInfo>
-        <SearchResultInfo icon={<LocationOnIcon sx={{ color: iconColor }} />}>
-          {addressDtoToString(address).toLocaleLowerCase()}
-        </SearchResultInfo>
-        {website && (
-          <SearchResultInfo icon={<LaunchIcon sx={{ color: iconColor }} />}>
-            <a href={website}>{website}</a>
-          </SearchResultInfo>
-        )}
-        {additionalInformation && (
-          <SearchResultInfo icon={<CommentIcon sx={{ color: iconColor }} />}>
-            {additionalInformation}
-          </SearchResultInfo>
-        )}
-        <hr className="pb-2" />
-        <ButtonSearch
-          className={"fr-btn--green-archipel"}
-          onClick={onButtonClick}
-          disabled={disableButton}
-          id={"im-search__search-result-action"}
-        >
-          {contactMode === "PHONE" ||
-          contactMode === "EMAIL" ||
-          contactMode === "IN_PERSON"
-            ? "Contacter l'entreprise"
-            : "Tentez votre chance"}
-        </ButtonSearch>
-      </div> */}
     </div>
   );
 };

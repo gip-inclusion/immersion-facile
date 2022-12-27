@@ -59,22 +59,5 @@ export const searchSlice = createSlice({
       state.searchResults.push(...action.payload);
       state.searchStatus = "ok";
     },
-    initialFullSearchRequested: (
-      state,
-      _action: PayloadAction<SearchParams>,
-    ) => {
-      state.searchStatus = "initialFetch";
-      state.searchResults = [];
-    },
-    initialFullSearchSucceeded: (
-      state,
-      action: PayloadAction<{
-        results: SearchImmersionResultDto[];
-        searchParams: SearchParams;
-      }>,
-    ) => {
-      state.searchResults = action.payload.results;
-      state.searchStatus = "ok";
-    },
   },
 });

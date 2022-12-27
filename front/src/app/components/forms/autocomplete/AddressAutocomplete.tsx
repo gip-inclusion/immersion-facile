@@ -6,7 +6,7 @@ import { useDebounce } from "src/app/hooks/useDebounce";
 import { getAddressesFromApi } from "./getAddressesFromApi";
 
 export type AddressAutocompleteProps = {
-  label?: string;
+  label: string;
   initialSearchTerm?: string;
   disabled?: boolean;
   headerClassName?: string;

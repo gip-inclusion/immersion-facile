@@ -3,13 +3,13 @@ import React from "react";
 export type SelectOption = {
   label: string;
   value: string | number | readonly string[] | undefined;
-  selected?: boolean;
   disabled?: boolean;
   hidden?: boolean;
 };
 
 export type SelectProps = {
   options: SelectOption[];
+  value?: string | number;
   label: string;
   hideLabel?: boolean;
   id: string;
@@ -21,6 +21,7 @@ export type SelectProps = {
 export const Select = ({
   options,
   label,
+  value,
   id,
   name,
   onChange,
@@ -34,7 +35,13 @@ export const Select = ({
       </label>
     )}
 
-    <select className="fr-select" id={id} name={name} onChange={onChange}>
+    <select
+      className="fr-select"
+      id={id}
+      name={name}
+      onChange={onChange}
+      value={value}
+    >
       {options.map((option, index) => {
         const { label, value, ...rest } = option;
         return (

@@ -164,7 +164,7 @@ export const ImmersionHeader = () => {
           label: "Recherche V2",
           display: true,
           active: false,
-          id: getHeaderNavLinkId("admin-emails"),
+          id: getHeaderNavLinkId("admin-search-v2"),
           ...routes.searchV2().link,
         },
       ],

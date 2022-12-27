@@ -7,17 +7,18 @@ import {
   SectionTextEmbed,
   SectionAccordion,
   Select,
+  Loader,
 } from "react-design-system/immersionFacile";
 import { RomeAutocomplete } from "src/app/components/forms/autocomplete/RomeAutocomplete";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
-import { useFullSearchUseCase } from "src/app/hooks/search.hooks";
+import { useSearchUseCaseV2 } from "src/app/hooks/search.hooks";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import "./SearchListPage.scss";
 import { SearchListResults } from "src/app/components/search/SearchListResults";
 import { addressDtoToString, SearchSortedBy } from "shared";
-// import { SearchSortedBy } from "shared";
+
 import {
   SearchPageParams,
   SearchStatus,
@@ -37,7 +38,7 @@ export const SearchListPage = ({
 }) => {
   const searchStatus = useAppSelector(searchSelectors.searchStatus);
   const searchResults = useAppSelector(searchSelectors.searchResults);
-  const searchUseCase = useFullSearchUseCase();
+  const searchUseCase = useSearchUseCaseV2();
   const searchResultsWrapper = useRef<HTMLDivElement>(null);
   const initialValues = {
     latitude: 0,
@@ -160,17 +161,18 @@ export const SearchListPage = ({
                         distance_km: radiusOptions[selectedIndex],
                       });
                     }}
+                    value={radiusOptions.findIndex(
+                      (option) => option === values.distance_km,
+                    )}
                     options={[
                       {
                         label: "Distance",
                         value: undefined,
                         disabled: true,
-                        selected: true,
                       },
                       ...radiusOptions.map((n, index) => ({
                         label: `${n} km`,
                         value: index,
-                        selected: n === initialValues.distance_km,
                       })),
                     ]}
                     id="im-search-page__distance-dropdown"
@@ -218,9 +220,6 @@ export const SearchListPage = ({
                               id={`search-sort-option-${index}`}
                               name="search-sort-option"
                               value={option.value}
-                              defaultChecked={
-                                formikValues.sortedBy === option.value
-                              }
                               checked={formikValues.sortedBy === option.value}
                               onChange={(_event) => {
                                 const selectedIndex = index;
@@ -258,11 +257,7 @@ export const SearchListPage = ({
             </>
           )}
           {searchStatus === "extraFetch" ||
-            (searchStatus === "initialFetch" && (
-              <div className="fr-container fr-mb-4w">
-                <span>Chargement...</span>
-              </div>
-            ))}
+            (searchStatus === "initialFetch" && <Loader />)}
 
           <SectionAccordion />
           <SectionTextEmbed

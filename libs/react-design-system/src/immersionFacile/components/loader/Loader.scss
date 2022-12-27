@@ -1,0 +1,37 @@
+.im-loader {
+  &__overlay {
+    background: var(--grey-1000-100);
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    opacity: 0.8;
+    z-index: 9999;
+  }
+  &__spinner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    &-icon {
+      &:before {
+        width: 5rem;
+        height: 5rem;
+        color: var(--background-action-high-blue-france);
+        animation: rotate 2s linear infinite;
+        backface-visibility: hidden;
+      }
+    }
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
