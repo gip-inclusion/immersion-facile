@@ -157,6 +157,7 @@ importers:
       cypress: '10'
       cypress-axe: ^1.1.0
       cypress-html-validate: ^5.0.5
+      front: workspace:*
       html-validate: ^7.5.0
       shared: workspace:*
       typescript: ^4.6.2
@@ -165,6 +166,7 @@ importers:
       cypress: 10.9.0
       cypress-axe: 1.1.0_qd4sf2rgfh3zmldnkx52bb6pny
       cypress-html-validate: 5.0.5_b433phfjkbgzhah6t3pzkxhddq
+      front: link:../front
       html-validate: 7.5.0
       shared: link:../shared
       typescript: 4.6.4
