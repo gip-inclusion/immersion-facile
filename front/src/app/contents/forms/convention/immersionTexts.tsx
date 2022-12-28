@@ -84,7 +84,7 @@ export const immersionTexts = {
         placeholder: "0606060607",
       },
       email: {
-        label: "Email de la personne à prévenir en cas d'urgence",
+        label: "E-mail de la personne à prévenir en cas d'urgence",
         placeholder: "contact@urgence.com",
       },
     },

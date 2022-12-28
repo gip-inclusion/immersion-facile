@@ -71,7 +71,7 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
   },
   "businessContact.email": {
     ...defaultProps,
-    label: "Email",
+    label: "E-mail",
     required: true,
     id: "establishment-businessContact-email",
   },

@@ -320,7 +320,7 @@ export const sections: FieldsAndTitle[] = [
     cols: [
       "",
       "Convention signée ?",
-      "Email",
+      "E-mail",
       "Téléphone",
       "Prénom",
       "Nom",

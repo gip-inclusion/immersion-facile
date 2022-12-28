@@ -160,7 +160,7 @@ const beneficiarySection = {
     required: true,
   },
   "signatories.beneficiary.email": {
-    label: "Email",
+    label: "E-mail",
     id: "form-convention-signatories-beneficiary-email",
     required: true,
     placeholder: "nom@exemple.com",
@@ -187,10 +187,12 @@ const beneficiarySection = {
   "signatories.beneficiary.emergencyContactPhone": {
     label: "Téléphone de la personne à prévenir en cas d'urgence",
     id: "form-convention-signatories-beneficiary-emergencyContactPhone",
+    placeholder: "0606060607",
   },
   "signatories.beneficiary.emergencyContactEmail": {
-    label: "Email de la personne à prévenir en cas d'urgence",
+    label: "E-mail de la personne à prévenir en cas d'urgence",
     id: "form-convention-signatories-beneficiary-emergencyContactEmail",
+    placeholder: "contact@urgence.com",
   },
 };
 const establishmentTutorSection = {
@@ -265,7 +267,7 @@ const beneficiaryCurrentEmployerSection = {
     id: "form-convention-signatories-beneficiaryCurrentEmployer-job",
   },
   "signatories.beneficiaryCurrentEmployer.email": {
-    label: "Email",
+    label: "E-mail",
     id: "form-convention-signatories-beneficiaryCurrentEmployer-phone",
   },
   "signatories.beneficiaryCurrentEmployer.phone": {
@@ -289,12 +291,14 @@ const beneficiaryCurrentEmployerSection = {
 const establishmentRepresentativeSection = {
   "signatories.establishmentRepresentative.email": {
     label: "Indiquez l'e-mail du représentant de l'entreprise",
+    placeholder: "nom@exemple.com",
     description: "pour envoyer la validation de la convention",
     id: "form-convention-signatories-establishmentRepresentative-email",
     required: true,
   },
   "signatories.establishmentRepresentative.phone": {
     label: "Indiquez le numéro de téléphone du représentant de l'entreprise",
+    placeholder: "0605040302",
     description: "pour qu’on puisse le contacter à propos de l’immersion",
     id: "form-convention-signatories-establishmentRepresentative-phone",
     required: true,

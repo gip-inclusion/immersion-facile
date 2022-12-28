@@ -6,6 +6,13 @@ import {
 
 export type FormFieldsObject<T> = Record<keyof T, FormFieldAttributes>;
 
+export const useFormContents = <T>(
+  formFieldsLabels: FormFieldsObjectForContent<T>,
+) => ({
+  getFormFields: getFormFields(formFieldsLabels),
+  getFormErrors: getFormErrors(formFieldsLabels),
+});
+
 type FormFieldsKeys<T> = keyof FormFieldsObject<T>;
 
 const defaultField: FormFieldAttributes = {
@@ -26,18 +33,6 @@ const getFormErrors =
         formFieldsLabels[key as FormFieldsKeys<T>]?.label,
       ]),
     );
-const getFormFieldAttributes = <T>(
-  key: FormFieldsKeys<T>,
-  formFieldsLabels: FormFieldsObjectForContent<T>,
-): FormFieldAttributes => {
-  const field = formFieldsLabels[key];
-  return {
-    ...defaultField,
-    ...(field ? field : {}),
-    label: field ? formatFieldLabel(field) : defaultField.label,
-    name: String(key),
-  };
-};
 
 const getFormFields =
   <T>(formFieldsLabels: FormFieldsObjectForContent<T>) =>
@@ -53,9 +48,15 @@ const getFormFields =
       formFieldsLabels as FormFieldsObject<T>,
     );
 
-export const useFormContents = <T>(
+const getFormFieldAttributes = <T>(
+  key: FormFieldsKeys<T>,
   formFieldsLabels: FormFieldsObjectForContent<T>,
-) => ({
-  getFormErrors: getFormErrors(formFieldsLabels),
-  getFormFields: getFormFields(formFieldsLabels),
-});
+): FormFieldAttributes => {
+  const field = formFieldsLabels[key];
+  return {
+    ...defaultField,
+    ...(field ? field : {}),
+    label: field ? formatFieldLabel(field) : defaultField.label,
+    name: String(key),
+  };
+};
