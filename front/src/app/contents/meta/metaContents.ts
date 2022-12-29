@@ -11,7 +11,9 @@ export const defaultMetaContents: MetaContentType = {
   description: "Faciliter la réalisation des immersions professionnelles.",
 };
 
-export const metaContents: Record<keyof typeof routes, MetaContentType> = {
+export const metaContents: Partial<
+  Record<keyof typeof routes, MetaContentType>
+> = {
   addAgency: {
     title: "Formulaire d'ajout d'un prescripteur",
     description: "Devenir prescripteur de PMSMP et immersions professionnelles",
@@ -38,12 +40,12 @@ export const metaContents: Record<keyof typeof routes, MetaContentType> = {
     description: "Faciliter la réalisation des immersions professionnelles.",
   },
   formEstablishment: {
-    title: "Formulaire de creation entreprise",
+    title: "Formulaire de référencement entreprise",
     description:
       "Devenir entreprise accueillante de PMSMP et immersions professionnelles.",
   },
   formEstablishmentForExternals: {
-    title: "Formulaire de creation entreprise",
+    title: "Formulaire de référencement entreprise",
     description:
       "Devenir entreprise accueillante de PMSMP et immersions professionnelles.",
   },
@@ -67,7 +69,7 @@ export const metaContents: Record<keyof typeof routes, MetaContentType> = {
     description: "Devenir prescripteur de PMSMP et immersions professionnelles",
   },
   conventionImmersion: {
-    title: "Demande d'immersion",
+    title: "Formulaire de demande d'immersion",
     description:
       "Démarrer une demande de convention pour une PMSMP ou Immersion Professionnelle.",
   },
@@ -81,11 +83,11 @@ export const metaContents: Record<keyof typeof routes, MetaContentType> = {
     description: "Faciliter la réalisation des immersions professionnelles.",
   },
   conventionToValidate: {
-    title: "Vérification",
+    title: "Vérification de convention d'immersion",
     description: "Faciliter la réalisation des immersions professionnelles.",
   },
   conventionToSign: {
-    title: "Verifier et signer",
+    title: "Vérifier et signer une convention d'immersion",
     description: "Faciliter la réalisation des immersions professionnelles.",
   },
   conventionStatusDashboard: {
@@ -105,24 +107,21 @@ export const metaContents: Record<keyof typeof routes, MetaContentType> = {
     description: "Faciliter la réalisation des immersions professionnelles.",
   },
   stats: {
-    title: "Stats",
+    title: "Statistiques",
     description:
       "Découvrir les statistiques et l'impact du site Immersion Facile",
   },
   search: {
-    title: "Recherche",
+    title:
+      "Rechercher une entreprise pour réaliser une immersion professionnelle",
     description:
       "Utilisez notre moteur de recherche pour trouver une entreprise accueillante d'Immersions Professionnelles ou PMSMP",
-  },
-  standard: {
-    title: "Standard",
-    description: "Faciliter la réalisation des immersions professionnelles.",
   },
 };
 
 export const standardMetaContent: Record<StandardPageSlugs, MetaContentType> = {
   "mentions-legales": {
-    title: "Mentions legales",
+    title: "Mentions légales",
     description: "Faciliter la réalisation des immersions professionnelles.",
   },
   cgu: {

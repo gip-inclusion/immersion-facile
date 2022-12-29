@@ -5,8 +5,6 @@ import {
 } from "front/src/app/contents/meta/metaContents";
 import { StandardPageSlugs } from "front/src/app/routes/route-params";
 
-//TODO import jwt generator to test routes that required a JWT param
-
 const routesNames: Array<{
   routeName: keyof typeof routes | StandardPageSlugs;
   params?: Partial<Record<"jwt" | "consumer" | "pagePath", string>>;
@@ -49,32 +47,27 @@ const routesNames: Array<{
 describe("Check Meta contents ", () => {
   routesNames.forEach((route) => {
     it(`Should render the correct title value according to the route called: ${route.routeName} `, () => {
+      const expectedTitle =
+        route.routeName === "standard"
+          ? `${
+              standardMetaContent[`${route.params.pagePath}`].title
+            } - PMSMP: Immersion Facile`
+          : `${
+              metaContents[`${route.routeName}`].title
+            } - PMSMP: Immersion Facile`;
+
+      const expectedDescription =
+        route.routeName === "standard"
+          ? standardMetaContent[`${route.params.pagePath}`].description
+          : metaContents[`${route.routeName}`].description;
+
       cy.visit(`${routes[`${route.routeName}`]({ ...route.params }).href}`);
-      if (route.routeName === "standard") {
-        cy.title().should(
-          "eq",
-          `${
-            standardMetaContent[`${route.params.pagePath}`].title
-          } - PMSMP: Immersion Facile`,
-        );
-        cy.get('head meta[name="description"]').should(
-          "have.attr",
-          "content",
-          `${standardMetaContent[`${route.params.pagePath}`].description}`,
-        );
-      } else {
-        cy.title().should(
-          "eq",
-          `${
-            metaContents[`${route.routeName}`].title
-          } - PMSMP: Immersion Facile`,
-        );
-        cy.get('head meta[name="description"]').should(
-          "have.attr",
-          "content",
-          `${metaContents[`${route.routeName}`].description}`,
-        );
-      }
+      cy.title().should("eq", expectedTitle);
+      cy.get('head meta[name="description"]').should(
+        "have.attr",
+        "content",
+        expectedDescription,
+      );
     });
   });
 });
