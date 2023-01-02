@@ -2,8 +2,8 @@
   "name": "cypress",
   "version": "0.0.0",
   "scripts": {
-    "open": "CYPRESS_BASE_URL=http://localhost:3000 CYPRESS_ADMIN_USER=admin CYPRESS_ADMIN_PASSWORD=admin node_modules/.bin/cypress open",
-    "install": "CYPRESS_BASE_URL=http://localhost:3000 CYPRESS_ADMIN_USER=admin CYPRESS_ADMIN_PASSWORD=admin node_modules/.bin/cypress install"
+    "open": "CYPRESS_ADMIN_USER=admin CYPRESS_ADMIN_PASSWORD=admin node_modules/.bin/cypress open",
+    "install": "CYPRESS_ADMIN_USER=admin CYPRESS_ADMIN_PASSWORD=admin node_modules/.bin/cypress install"
   },
   "devDependencies": {
     "axe-core": "^4.5.2",
