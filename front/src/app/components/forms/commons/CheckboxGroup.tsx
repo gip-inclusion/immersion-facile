@@ -10,10 +10,10 @@ type BoolCheckboxGroupProps = {
 };
 
 export const BoolCheckboxGroup = (props: BoolCheckboxGroupProps) => {
-  const [field, meta, { setValue }] = useField<boolean>({ name: props.name });
+  const [field, meta] = useField<boolean>({ name: props.name });
   const isError = meta.touched && meta.error;
   const htmlName = isError ? "checkBox-error" : "checkbox";
-
+  const id = htmlName + props.name;
   return (
     <>
       <div className="fr-form-group">
@@ -40,20 +40,16 @@ export const BoolCheckboxGroup = (props: BoolCheckboxGroupProps) => {
             </span>
           )}
           <div className="fr-fieldset__content">
-            <div className="fr-checkbox-group" key={htmlName + props.name}>
+            <div className="fr-checkbox-group" key={id}>
               <input
                 {...field}
                 value={""}
                 type="checkbox"
-                id={htmlName + props.name}
+                id={id}
                 checked={field.value}
                 disabled={props.disabled}
               />
-              <label
-                className="fr-label"
-                htmlFor={htmlName + props.name}
-                onClick={() => setValue(!field.value)}
-              >
+              <label className="fr-label" htmlFor={id}>
                 oui
               </label>
             </div>
