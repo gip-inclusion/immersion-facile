@@ -8,6 +8,7 @@ export const standardPageSlugs = [
   "cgu",
   "politique-de-confidentialite",
   "declaration-accessibilite",
+  "plan-du-site",
 ] as const;
 
 export type AdminTab =

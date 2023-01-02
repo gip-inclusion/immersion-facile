@@ -19,7 +19,7 @@ export const StandardLayout = ({ route }: StandardLayoutProps) => {
   return (
     <HeaderFooterLayout>
       <MainWrapper layout="boxed">
-        <h2>{title}</h2>
+        <h1 className="fr-h2">{title}</h1>
         <div
           dangerouslySetInnerHTML={{
             __html: renderContent(content, false) || "",

@@ -116,6 +116,11 @@ const bottomsLinks: NavLink[] = [
     target: "_blank",
     id: getFooterNavLinkId("stats"),
   },
+  {
+    label: "Plan du site",
+    ...routes.standard({ pagePath: "plan-du-site" }).link,
+    id: getFooterNavLinkId("sitemap"),
+  },
 ];
 
 export const ImmersionFooter = () => (
