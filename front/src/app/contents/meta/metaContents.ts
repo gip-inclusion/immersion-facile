@@ -136,6 +136,10 @@ export const standardMetaContent: Record<StandardPageSlugs, MetaContentType> = {
     title: "Déclaration d'accessibilité",
     description: "Faciliter la réalisation des immersions professionnelles.",
   },
+  "plan-du-site": {
+    title: "Plan du site",
+    description: "Plan du site: Immersion Facile",
+  },
 };
 
 export const adminMetaContent: Record<AdminTab, MetaContentType> = {
