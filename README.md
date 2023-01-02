@@ -59,6 +59,10 @@ Le conteneur faisant parti du docker-compose et la PG_URL étant fourni, cela de
 Les autres services ont une implémentation IN_MEMORY mais pour fonctionner avec les véritables services il faut fournir les secrets /clés API.
 Ce n'est pas censé être nécessaire en local, si jamais c'était le cas, veuillez vous rapprocher de l'équipe.
 
+#### Mise en place du stockage temporaire
+
+Créer le dossier `back/storage/tmp`
+
 #### Lancer le projet avec docker-compose
 
 ```sh
