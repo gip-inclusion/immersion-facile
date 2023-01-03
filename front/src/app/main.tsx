@@ -9,8 +9,9 @@ import { App } from "src/app/App";
 import { store } from "src/config/dependencies";
 import { MetaContent } from "./components/layout/MetaContent";
 
-import { startReactDsfr } from "@codegouvfr/react-dsfr";
-startReactDsfr({ defaultColorScheme: "system" });
+import { startReactDsfr } from "@codegouvfr/react-dsfr/spa";
+
+startReactDsfr({ defaultColorScheme: "light" });
 import { RouteProvider } from "./routes/routes";
 
 ReactDOM.render(

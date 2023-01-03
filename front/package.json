@@ -20,8 +20,8 @@
     "prebuild": "only-include-used-icons"
   },
   "dependencies": {
-    "@codegouvfr/react-dsfr": "^0.11.3",
-    "@emotion/react": "^11.8.2",
+    "@codegouvfr/react-dsfr": "^0.21.0",
+    "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
     "@gouvfr/dsfr": "1.8.5",
     "@mui/icons-material": "^5.5.1",
@@ -39,13 +39,14 @@
     "ramda": "^0.28.0",
     "react": "18",
     "react-design-system": "workspace:*",
-    "react-helmet": "^6.1.0",
     "react-dom": "18",
+    "react-helmet": "^6.1.0",
     "react-redux": "^7.2.8",
     "redux": "^4.2.0",
     "redux-observable": "^2.0.0",
     "rxjs": "^7.5.5",
     "shared": "workspace:*",
+    "tss-react": "^4.5.2",
     "type-route": "^0.6.0",
     "uuid": "^8.3.2",
     "zod": "^3.14.2"

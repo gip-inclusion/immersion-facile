@@ -176,8 +176,8 @@ importers:
       '@babel/core': ^7.17.9
       '@babel/preset-env': ^7.16.11
       '@babel/preset-typescript': ^7.16.7
-      '@codegouvfr/react-dsfr': ^0.11.3
-      '@emotion/react': ^11.8.2
+      '@codegouvfr/react-dsfr': ^0.21.0
+      '@emotion/react': ^11.9.0
       '@emotion/styled': ^11.8.1
       '@gouvfr/dsfr': 1.8.5
       '@mui/icons-material': ^5.5.1
@@ -216,13 +216,14 @@ importers:
       sass: ^1.55.0
       shared: workspace:*
       tailwindcss: ^3.0.23
+      tss-react: ^4.5.2
       type-route: ^0.6.0
       typescript: ^4.6.2
       uuid: ^8.3.2
       vite: ^3.1.4
       zod: ^3.14.2
     dependencies:
-      '@codegouvfr/react-dsfr': 0.11.3_pihaayrhg2ylu5pcyghfouutvq
+      '@codegouvfr/react-dsfr': 0.21.0_pihaayrhg2ylu5pcyghfouutvq
       '@emotion/react': 11.9.0_25nzklci6corv267yrysf2i26i
       '@emotion/styled': 11.8.1_mfqs3cojiaxtwt5wihxwmv3zn4
       '@gouvfr/dsfr': 1.8.5
@@ -248,6 +249,7 @@ importers:
       redux-observable: 2.0.0_redux@4.2.0
       rxjs: 7.5.5
       shared: link:../shared
+      tss-react: 4.5.2_bhkoqihgv6davxuuuxoekgflgy
       type-route: 0.6.0
       uuid: 8.3.2
       zod: 3.14.2
@@ -4082,8 +4084,8 @@ packages:
       minimist: 1.2.6
     dev: true
 
-  /@codegouvfr/react-dsfr/0.11.3_pihaayrhg2ylu5pcyghfouutvq:
-    resolution: {integrity: sha512-1eoijnMB0w9YUksB+2MvIwx4G+Xpvsu98HS968NsQB+QIovBNF3EifmW+IcflxTQ7DYx9Mlph+cirdZgUs5K7w==}
+  /@codegouvfr/react-dsfr/0.21.0_pihaayrhg2ylu5pcyghfouutvq:
+    resolution: {integrity: sha512-nVXtEhi4DTi0r9ysEEa9wz1dHkLRLn2Mxvg41Su2DC+zYMSdpblCrXfBFcoORPk+d5C0mxe3hAMQnrJSsRrfPQ==}
     hasBin: true
     peerDependencies:
       '@types/react': ^16.0.0 || ^17.0.0 || ^18.0.0
@@ -17832,6 +17834,23 @@ packages:
 
   /tslib/2.4.0:
     resolution: {integrity: sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==}
+
+  /tss-react/4.5.2_bhkoqihgv6davxuuuxoekgflgy:
+    resolution: {integrity: sha512-Q5JycexkHWgMm7SdJrazsAL9JEfaFfiumZSjXl2QHJH7F8Adg4L/0m993/UzcjGfZO7z9l4g+EDkVGDP8nfJFQ==}
+    peerDependencies:
+      '@emotion/react': ^11.4.1
+      '@emotion/server': ^11.4.0
+      react: ^16.8.0 || ^17.0.2 || ^18.0.0
+    peerDependenciesMeta:
+      '@emotion/server':
+        optional: true
+    dependencies:
+      '@emotion/cache': 11.7.1
+      '@emotion/react': 11.9.0_25nzklci6corv267yrysf2i26i
+      '@emotion/serialize': 1.0.3
+      '@emotion/utils': 1.1.0
+      react: 18.2.0
+    dev: false
 
   /tsutils/3.21.0_typescript@4.6.4:
     resolution: {integrity: sha512-mHKK3iUXL+3UF6xL5k0PEhKRUBKPBCv/+RkEOpjRWxxx27KKRBmmA60A9pgOUvMi8GKhRMPEmjBRPzs2W7O1OA==}

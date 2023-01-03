@@ -1,4 +1,5 @@
 import immersionFacileLogo from "/img/Logo-immersion-facilitee-01-RVB-reflets-crop.svg";
+import { makeStyles } from "tss-react/dsfr";
 import React from "react";
 import { useDispatch } from "react-redux";
 import { routes, useRoute } from "src/app/routes/routes";
@@ -11,12 +12,14 @@ import {
   Display,
   headerFooterDisplayItem,
 } from "@codegouvfr/react-dsfr/Display";
+import { MainNavigationProps } from "@codegouvfr/react-dsfr/MainNavigation";
 const getHeaderNavLinkId = (chunk: string) => `im-header-nav__${chunk}`;
 
 export const ImmersionHeader = () => {
   const featureFlags = useFeatureFlags();
   const dispatch = useDispatch();
   const currentRoute = useRoute();
+  const { classes } = customStyles();
   const isAdminConnected = useAppSelector(adminSelectors.auth.isAuthenticated);
   const tools: HeaderProps["quickAccessItems"] = [];
   if (isAdminConnected) {
@@ -40,7 +43,7 @@ export const ImmersionHeader = () => {
   const isAgencyRoute =
     currentRoute.name === routes.addAgency().name ||
     currentRoute.name === routes.homeAgencies().name;
-  const links: HeaderProps["navItems"] = [
+  const links: MainNavigationProps.Item[] = [
     {
       text: "Accueil",
       linkProps: {
@@ -64,7 +67,6 @@ export const ImmersionHeader = () => {
         },
         {
           text: "Trouver une entreprise accueillante",
-          //id: getHeaderNavLinkId("candidate-search"),
           isActive: currentRoute.name === routes.search().name,
           linkProps: {
             ...routes.search().link,
@@ -143,16 +145,16 @@ export const ImmersionHeader = () => {
           },
         },
         {
-          label: "Recherche V2",
-          display: true,
-          active: false,
-          id: getHeaderNavLinkId("admin-search-v2"),
-          ...routes.searchV2().link,
+          text: "Recherche V2",
+          isActive: false,
+          linkProps: {
+            ...routes.searchV2().link,
+            id: getHeaderNavLinkId("admin-search-v2"),
+          },
         },
       ],
     },
   ];
-
   if (isAdminConnected && featureFlags.enableAdminUi) {
     links.push({
       text: "Admin",
@@ -183,6 +185,7 @@ export const ImmersionHeader = () => {
   return (
     <>
       <Header
+        classes={classes}
         brandTop={
           <>
             République
@@ -195,16 +198,24 @@ export const ImmersionHeader = () => {
           title: "Immersion Facilitée - Accueil",
         }}
         operatorLogo={{
-          orientation: "vertical",
+          orientation: "horizontal",
           imgUrl: immersionFacileLogo,
           alt: "Immersion Facilitée",
         }}
         serviceTagline="Faciliter la réalisation des immersions professionelles"
         serviceTitle="Immersion Facilitée"
-        navItems={links}
+        navigation={links}
         quickAccessItems={tools}
       />
       <Display />
     </>
   );
 };
+
+ImmersionHeader.displayName = "ImmersionHeader";
+
+const customStyles = makeStyles({ name: ImmersionHeader.displayName })(() => ({
+  operator: {
+    width: 95,
+  },
+}));
