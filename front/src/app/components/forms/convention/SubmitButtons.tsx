@@ -6,9 +6,14 @@ type SubmitButtonProps = {
   isSubmitting: boolean;
   onSubmit: () => Promise<void>;
   disabled?: boolean;
+  id?: string;
 };
 
-export const SubmitButton = ({ onSubmit, isSubmitting }: SubmitButtonProps) => {
+export const SubmitButton = ({
+  onSubmit,
+  isSubmitting,
+  id = "im-submit-button",
+}: SubmitButtonProps) => {
   const [_, __, { setValue }] = useField<ConventionStatus>({ name: "status" });
 
   const makeInReviewAndSubmit = () => {
@@ -22,6 +27,7 @@ export const SubmitButton = ({ onSubmit, isSubmitting }: SubmitButtonProps) => {
       type="button"
       onClick={makeInReviewAndSubmit}
       disabled={isSubmitting}
+      id={id}
     >
       Envoyer la demande
     </button>

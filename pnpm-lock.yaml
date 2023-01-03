@@ -157,6 +157,7 @@ importers:
       cypress: '10'
       cypress-axe: ^1.1.0
       cypress-html-validate: ^5.0.5
+      date-fns: ^2.28.0
       front: workspace:*
       html-validate: ^7.5.0
       shared: workspace:*
@@ -166,6 +167,7 @@ importers:
       cypress: 10.9.0
       cypress-axe: 1.1.0_qd4sf2rgfh3zmldnkx52bb6pny
       cypress-html-validate: 5.0.5_b433phfjkbgzhah6t3pzkxhddq
+      date-fns: 2.28.0
       front: link:../front
       html-validate: 7.5.0
       shared: link:../shared
@@ -9933,7 +9935,6 @@ packages:
   /date-fns/2.28.0:
     resolution: {integrity: sha512-8d35hViGYx/QH0icHYCeLmsLmMUheMmTyV9Fcm6gvNwdw31yXXH+O85sOBJ+OLnLQMKZowvpKb6FgMIQjcpvQw==}
     engines: {node: '>=0.11'}
-    dev: false
 
   /dateformat/4.6.3:
     resolution: {integrity: sha512-2P0p0pFGzHS5EMnhdxQi7aJN+iMheud0UhG4dlE1DLAlvL8JHjJJTX/CSm4JXwV0Ka5nGk3zC5mcb5bUQUxxMA==}

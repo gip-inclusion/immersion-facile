@@ -46,7 +46,9 @@ const routesNames: Array<{
 ];
 describe("Check Meta contents ", () => {
   routesNames.forEach((route) => {
-    it(`Should render the correct title value according to the route called: ${route.routeName} `, () => {
+    it(`Should render the correct title value according to the route called: ${
+      route.routeName
+    } ${route.params?.pagePath ? `(${route.params?.pagePath})` : ""}`, () => {
       const expectedTitle =
         route.routeName === "standard"
           ? `${

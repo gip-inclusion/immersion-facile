@@ -82,7 +82,7 @@ export const AgencyFormCommonFields = ({
         options={numberOfStepsOptions}
         currentValue={validationSteps}
         setCurrentValue={setValidationSteps}
-        groupLabel={formAgencyFieldsLabels.stepsForValidation.label}
+        groupLabel={fieldsContent.stepsForValidation.label}
       />
       {validationSteps === "twoSteps" && (
         <FillableList

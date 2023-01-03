@@ -1,6 +1,7 @@
 import { frontRoutes } from "shared";
 
 describe("Simple navigation", () => {
+  // TODO: do separate test for admin navigation
   it("Go to admin and log in", () => {
     cy.visit("/admin");
     cy.get("#user").type(Cypress.env("ADMIN_USER"));
@@ -9,47 +10,52 @@ describe("Simple navigation", () => {
   });
 
   it("Go to home page", () => {
-    goToTab({ tabLabel: "Home", expectedRoute: "/" });
+    goToTab({ tabLabel: "Accueil", expectedRoute: "/" });
+  });
+
+  it("Goes to home candidates", () => {
+    goToTab({
+      tabLabel: "Accueil candidat",
+      expectedRoute: `/${frontRoutes.homeCandidates}`,
+    });
+  });
+  it("Goes to home establishment", () => {
+    goToTab({
+      tabLabel: "Accueil entreprise",
+      expectedRoute: `/${frontRoutes.homeEstablishments}`,
+    });
+  });
+  it("Goes to home agency", () => {
+    goToTab({
+      tabLabel: "Accueil prescripteurs",
+      expectedRoute: `/${frontRoutes.homeAgencies}`,
+    });
   });
 
   it("Goes to convention page", () => {
     goToTab({
-      tabLabel: "Demande immersion",
+      tabLabel: "Remplir la demande de convention",
       expectedRoute: `/${frontRoutes.conventionImmersionRoute}`,
     });
   });
 
-  it("Goes to Backoffice page", () => {
+  it("Goes to Establishment form", () => {
     goToTab({
-      tabLabel: "Backoffice",
-      expectedRoute: `/${frontRoutes.admin}`,
-    });
-  });
-
-  it("Goes to Establishment page", () => {
-    goToTab({
-      tabLabel: "Formulaire Entreprise",
+      tabLabel: "Référencer mon entreprise",
       expectedRoute: `/${frontRoutes.establishment}`,
-    });
-  });
-
-  it("Goes to landing establishment page", () => {
-    goToTab({
-      tabLabel: "Landing entreprise",
-      expectedRoute: `/${frontRoutes.landingEstablishment}`,
     });
   });
 
   it("Goes to search page", () => {
     goToTab({
-      tabLabel: "Recherche",
+      tabLabel: "Trouver une entreprise accueillante",
       expectedRoute: `/${frontRoutes.search}`,
     });
   });
 
   it("Goes to add agency page", () => {
     goToTab({
-      tabLabel: "Ajouter agence",
+      tabLabel: "Référencer mon organisme",
       expectedRoute: `/${frontRoutes.addAgency}`,
     });
   });
@@ -59,11 +65,6 @@ describe("Simple navigation", () => {
     expectLocationToBe("/");
   });
 
-  it("Click on 'Je demande une convention'", () => {
-    cy.contains("Je demande une convention").click();
-    expectLocationToBe(`/${frontRoutes.conventionImmersionRoute}`);
-  });
-
   const goToTab = ({
     tabLabel,
     expectedRoute,
@@ -71,8 +72,18 @@ describe("Simple navigation", () => {
     tabLabel: string;
     expectedRoute: string;
   }) => {
-    cy.get(".fr-nav__item a").contains(tabLabel).click();
-    expectLocationToBe(expectedRoute);
+    const target = cy.get(".fr-nav__item a").contains(tabLabel);
+    target.then(($element) => {
+      if (!$element.is(":visible")) {
+        $element
+          .parent()
+          .parents(".fr-nav__item")
+          .find(".fr-nav__btn")
+          .trigger("click");
+      }
+      target.click();
+      expectLocationToBe(expectedRoute);
+    });
   };
 
   const expectLocationToBe = (route: string) => {

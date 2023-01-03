@@ -67,6 +67,7 @@ export const Header = ({
                     title="Afficher le menu"
                     className="fr-btn--menu fr-btn"
                     onClick={onMenuMobileToggleClick}
+                    type="button"
                   >
                     Menu
                   </button>

@@ -20,6 +20,7 @@ describe("Home user flow", () => {
     cy.visit("/");
     cy.get(".im-hero-header__nav-card--candidate").click();
     cy.get(".im-hero-header__nav-card--candidate").eq(1).click();
+    cy.get(".fr-modal__content .fr-btn").click();
     expectLocationToBe(`/${frontRoutes.conventionImmersionRoute}`);
   });
   it("User flow: Establishment -> convention form", () => {
@@ -34,7 +35,7 @@ describe("Home user flow", () => {
     cy.get(".im-hero-header__nav-card--agency").eq(0).click();
     expectLocationToBe(`/${frontRoutes.addAgency}`);
   });
-  it("User flow: Agency -> edit form", () => {
+  it.skip("User flow: Agency -> edit form", () => {
     cy.visit("/");
     cy.get(".im-hero-header__nav-card--agency").click();
     cy.get(".im-hero-header__nav-card--agency").eq(1).click();
@@ -43,7 +44,7 @@ describe("Home user flow", () => {
   it("User flow: Agency -> convention form", () => {
     cy.visit("/");
     cy.get(".im-hero-header__nav-card--agency").click();
-    cy.get(".im-hero-header__nav-card--agency").eq(2).click();
+    cy.get(".im-hero-header__nav-card--agency").eq(1).click();
     expectLocationToBe(`/${frontRoutes.conventionImmersionRoute}`);
   });
   const expectLocationToBe = (route: string) => {

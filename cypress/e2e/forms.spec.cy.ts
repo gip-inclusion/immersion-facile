@@ -10,12 +10,14 @@ import {
   featureFlagsRoute,
   appellationRoute,
 } from "shared";
+import { addDays, format } from "date-fns";
+
 import { cypressDoIfElementExists, fillSelectRandomly } from "../utils";
 
 const getIdFromConventionDTO = (field: DotNestedKeys<ConventionDto>) =>
   `#${cleanStringToHTMLAttribute(getConventionFieldName(field))}`;
 
-describe("Convention Form", () => {
+describe("Convention Form (on dev http, prefilled forms false)", () => {
   const conventionFormUrl = `${frontRoutes.conventionImmersionRoute}`;
   const baseApiRoute = "/api/";
   it("can submit form with basic infos", () => {
@@ -37,10 +39,12 @@ describe("Convention Form", () => {
 
     cy.visit(conventionFormUrl);
     cy.wait("@featureFlagsRequest");
+
     cypressDoIfElementExists(".fr-btn--candidate", () => {
       cy.get(".fr-btn--candidate").click();
     });
     cy.get("#postalcode").clear().type("86000");
+
     cy.wait("@agenciesRequest");
     fillSelectRandomly({ element: "#agencyId" });
     cy.get(getIdFromConventionDTO("signatories.beneficiary.firstName"))
@@ -55,6 +59,9 @@ describe("Convention Form", () => {
     cy.get(getIdFromConventionDTO("signatories.beneficiary.phone"))
       .clear()
       .type("0585968574");
+    cy.get(getIdFromConventionDTO("signatories.beneficiary.birthdate"))
+      .clear()
+      .type("1985-05-25");
     cy.get("#siret").clear().type("78886997200026");
     cypressDoIfElementExists(
       getIdFromConventionDTO("businessName") + ":not([disabled])",
@@ -79,13 +86,13 @@ describe("Convention Form", () => {
     cy.get(getIdFromConventionDTO("establishmentTutor.email"))
       .clear()
       .type("establishmentTutor@example.com");
-    cy.get(getIdFromConventionDTO("dateStart")).clear().type("2022-09-22");
-    cy.get(getIdFromConventionDTO("dateEnd")).clear().type("2022-10-22");
-    cy.get("#address-autocomplete")
+    cy.get(getIdFromConventionDTO("dateStart")).clear().type(getCurrentDate());
+    cy.get(getIdFromConventionDTO("dateEnd")).clear().type(getTomorrowDate());
+    cy.get("#im-address-autocomplete")
       .clear()
       .type("71 Bd Saint-Michel 75005 Paris");
     cy.wait("@autocompleteAddressRequest");
-    cy.get("#address-autocomplete").then(($element) => {
+    cy.get("#im-address-autocomplete").then(($element) => {
       const listboxId = $element.attr("aria-controls");
       cy.get(`#${listboxId} .MuiAutocomplete-option`).then((options) => {
         options.eq(0).trigger("click");
@@ -111,12 +118,13 @@ describe("Convention Form", () => {
     cy.get(getIdFromConventionDTO("immersionActivities"))
       .clear()
       .type("Regarder le pain");
-    cy.get("button[type=submit]").click();
-    cy.wait("@conventionAddRequest")
-      .its("response.statusCode")
-      .should("eq", 200)
+    cy.get("#im-submit-button")
+      .click()
       .then(() => {
         cy.get(".fr-alert--error").should("not.exist");
+        cy.wait("@conventionAddRequest")
+          .its("response.statusCode")
+          .should("eq", 200);
       });
   });
   // it("can't submit form if immersion duration exceeds 1 month", () => {});
@@ -127,7 +135,16 @@ describe("Convention Form", () => {
     cypressDoIfElementExists(".fr-btn--candidate", () => {
       cy.get(".fr-btn--candidate").click();
     });
-    cy.get(getIdFromConventionDTO("dateStart")).clear().type("00/00/0000");
-    cy.get(getIdFromConventionDTO("dateEnd")).clear().type("00/00/0000");
+    cy.get(getIdFromConventionDTO("dateStart"))
+      .type("1998-02-03")
+      .clear()
+      .type("1998-03-21");
+    cy.get(getIdFromConventionDTO("dateEnd"))
+      .type("1998-02-03")
+      .clear()
+      .type("1998-05-22");
   });
 });
+
+const getCurrentDate = () => format(new Date(), "yyyy-MM-dd");
+const getTomorrowDate = () => format(addDays(new Date(), 1), "yyyy-MM-dd");
