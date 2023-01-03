@@ -1,14 +1,16 @@
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
+import { Select } from "react-design-system";
 import {
   AgencyId,
   AgencyOption,
   DepartmentCode,
+  departmentNameToDepartmentCode,
   FederatedIdentity,
   InternshipKind,
   isPeConnectIdentity,
+  keys,
 } from "shared";
-import { PostcodeAutocomplete } from "src/app/components/forms/commons/PostcodeAutocomplete";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { useFederatedIdentity } from "src/app/hooks/federatedIdentity";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
@@ -32,7 +34,7 @@ export const AgencySelector = ({
   const { getFormFields } = useFormContents(
     formConventionFieldsLabels(internshipKind),
   );
-  const { agencyId: agencyIdField, postalCode: postalCodeField } =
+  const { agencyId: agencyIdField, departmentCode: departmentCodeField } =
     getFormFields();
   const [{ value, onBlur }, { touched, error }, { setValue }] =
     useField<AgencyId>(agencyIdField.name || "agencyId");
@@ -99,11 +101,12 @@ export const AgencySelector = ({
     <div
       className={`fr-input-group${showError ? " fr-input-group--error" : ""}`}
     >
-      <PostcodeAutocomplete
-        {...postalCodeField}
-        onFound={setDepartmentCode}
-        disabled={disabled}
+      <Select
+        options={departmentOptions}
+        {...departmentCodeField}
+        onChange={(event) => setDepartmentCode(event.currentTarget.value)}
       />
+
       <AgencyDropdownListField
         {...agencyIdField}
         name={agencyIdField.name || "agencyId"}
@@ -126,6 +129,18 @@ export const AgencySelector = ({
     </div>
   );
 };
+
+type DepartmentOption = {
+  label: string;
+  value: string;
+}; //satisfies SelectOption
+
+const departmentOptions = keys(departmentNameToDepartmentCode).map(
+  (departmentName: string): DepartmentOption => ({
+    label: `${departmentNameToDepartmentCode[departmentName]} - ${departmentName}`,
+    value: departmentNameToDepartmentCode[departmentName],
+  }),
+);
 
 const isDefaultAgencyOnAgenciesAndEnabled = (
   disabled: boolean | undefined,

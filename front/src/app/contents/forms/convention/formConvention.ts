@@ -7,12 +7,16 @@ export type FormFieldsObjectForContent<T> = Record<
   FormFieldAttributesForContent
 >;
 
+// Remove and replace by ConventionField when postalCode is removed from ConventionDTO
+type ConventionFieldWithoutPostalCode = Exclude<ConventionField, "postalCode">;
+
 export type FormConventionFieldsLabels = FormFieldsObjectForContent<
   Record<
-    | ConventionField
+    | ConventionFieldWithoutPostalCode
     | "isCurrentEmployer"
     | "isEstablishmentTutorIsEstablishmentRepresentative"
-    | "isMinor",
+    | "isMinor"
+    | "departmentCode",
     FormFieldAttributesForContent
   >
 >;
@@ -33,9 +37,9 @@ export const formConventionFieldsLabels: (
 });
 
 const conventionSection = (internshipKind: InternshipKind) => ({
-  postalCode: {
-    label: "Votre code postal",
-    id: "form-convention-postalCode",
+  departmentCode: {
+    label: "Votre département",
+    id: "form-convention-departmentCode",
     required: true,
   },
   agencyId: {
