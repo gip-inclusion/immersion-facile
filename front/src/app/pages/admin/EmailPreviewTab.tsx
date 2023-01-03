@@ -337,5 +337,6 @@ export const defaultEmailValueByEmailKind: {
   SIGNEE_HAS_SIGNED_CONVENTION: {
     signedAt: new Date().toISOString(),
     demandeId: "DEMANDE_ID",
+    conventionStatusLink: "CONVENTION_STATUS_LINK",
   },
 };

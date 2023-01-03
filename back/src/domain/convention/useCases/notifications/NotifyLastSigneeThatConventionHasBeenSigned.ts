@@ -1,9 +1,13 @@
 import {
   ConventionDto,
   conventionSchema,
+  frontRoutes,
   Signatory,
+  SignatoryRole,
   TemplatedEmail,
 } from "shared";
+import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
+import { TimeGateway } from "../../../core/ports/TimeGateway";
 
 import {
   UnitOfWork,
@@ -22,6 +26,8 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly emailGateway: EmailGateway,
+    private readonly generateMagicLink: GenerateConventionMagicLink,
+    private readonly timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
   }
@@ -48,14 +54,14 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
     );
     if (lastSigneeEmail)
       return this.emailGateway.sendEmail(
-        emailToSend(repositoryConvention, lastSigneeEmail),
+        this.emailToSend(repositoryConvention, lastSigneeEmail),
       );
     throw new Error(noSignatoryMessage(repositoryConvention));
   }
 
   private lastSigneeEmail(
     signatories: Signatory[],
-  ): { signedAt: string; email: string } | undefined {
+  ): { signedAt: string; email: string; role: SignatoryRole } | undefined {
     const signatoryEmailsOrderedBySignedAt = signatories
       .filter(
         (
@@ -65,24 +71,34 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
         } => signatory.signedAt !== undefined,
       )
       .sort((a, b) => (a.signedAt < b.signedAt ? -1 : 0))
-      .map(({ email, signedAt }) => ({
+      .map(({ email, signedAt, role }) => ({
         email,
         signedAt,
+        role,
       }));
-    return signatoryEmailsOrderedBySignedAt.at(
-      signatoryEmailsOrderedBySignedAt.length - 1,
-    );
+    return signatoryEmailsOrderedBySignedAt.at(-1);
+  }
+
+  private emailToSend(
+    convention: ConventionDto,
+    lastSignee: { signedAt: string; email: string; role: SignatoryRole },
+  ): TemplatedEmail {
+    const conventionStatusLink = this.generateMagicLink({
+      targetRoute: frontRoutes.conventionStatusDashboard,
+      id: convention.id,
+      role: lastSignee.role,
+      email: lastSignee.email,
+      now: this.timeGateway.now(),
+    });
+
+    return {
+      type: "SIGNEE_HAS_SIGNED_CONVENTION",
+      params: {
+        demandeId: convention.id,
+        signedAt: lastSignee.signedAt,
+        conventionStatusLink,
+      },
+      recipients: [lastSignee.email],
+    };
   }
 }
-
-const emailToSend = (
-  convention: ConventionDto,
-  lastSigneeEmail: { signedAt: string; email: string },
-): TemplatedEmail => ({
-  type: "SIGNEE_HAS_SIGNED_CONVENTION",
-  params: {
-    demandeId: convention.id,
-    signedAt: lastSigneeEmail.signedAt,
-  },
-  recipients: [lastSigneeEmail.email],
-});

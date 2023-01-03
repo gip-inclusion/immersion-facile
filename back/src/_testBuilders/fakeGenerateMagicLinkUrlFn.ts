@@ -3,4 +3,7 @@ import { GenerateConventionMagicLink } from "../adapters/primary/config/createGe
 
 export const fakeGenerateMagicLinkUrlFn: GenerateConventionMagicLink = (
   props: CreateConventionMagicLinkPayloadProperties & { targetRoute: string },
-) => `http://fake-magic-link/${props.id}/${props.targetRoute}/${props.role}`;
+) =>
+  `http://fake-magic-link/${props.id}/${props.targetRoute}/${
+    props.role
+  }/${props.now.toISOString()}`;

@@ -759,7 +759,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
   },
   SIGNEE_HAS_SIGNED_CONVENTION: {
     niceName: "Confirmation de signature de l'immersion",
-    createEmailVariables: ({ demandeId, signedAt }) => ({
+    createEmailVariables: ({ demandeId, signedAt, conventionStatusLink }) => ({
       subject: `Immersion Facilitée - Confirmation de signature de l'immersion - ${demandeId}`,
       greetings: `Bonjour,`,
       content: `
@@ -775,6 +775,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       Vous recevrez une notification lorsque ce sera fait.
       `,
       subContent: defaultSignature,
+      buttons: [createConventionStatusButton(conventionStatusLink)],
     }),
     tags: ["confirmation de signature de convention"],
   },

@@ -16,21 +16,25 @@ const validConvention: ConventionDto = new ConventionDtoBuilder()
   .build();
 
 describe("Add Convention Notifications", () => {
+  let confirmSignatoryConventionCorrectlySubmitted: ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature;
   let emailGw: InMemoryEmailGateway;
-
-  const createUseCase = () =>
-    new ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature(
-      emailGw,
-      fakeGenerateMagicLinkUrlFn,
-      new CustomTimeGateway(),
-    );
+  let timeGateway: CustomTimeGateway;
 
   beforeEach(() => {
     emailGw = new InMemoryEmailGateway();
+    timeGateway = new CustomTimeGateway();
+    confirmSignatoryConventionCorrectlySubmitted =
+      new ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature(
+        emailGw,
+        fakeGenerateMagicLinkUrlFn,
+        timeGateway,
+      );
   });
 
   it("Sends confirmation email to all signatories", async () => {
-    await createUseCase().execute(validConvention);
+    const now = new Date();
+    timeGateway.setNextDate(now);
+    await confirmSignatoryConventionCorrectlySubmitted.execute(validConvention);
 
     const sentEmails = emailGw.getSentEmails();
 
@@ -40,18 +44,21 @@ describe("Add Convention Notifications", () => {
       convention: validConvention,
       signatory: validConvention.signatories.beneficiary,
       recipient: validConvention.signatories.beneficiary.email,
+      now,
     });
     expectEmaiSignatoryConfirmationSignatureRequestMatchingConvention({
       templatedEmail: sentEmails[1],
       convention: validConvention,
       signatory: validConvention.signatories.establishmentRepresentative,
       recipient: validConvention.signatories.establishmentRepresentative.email,
+      now,
     });
     expectEmaiSignatoryConfirmationSignatureRequestMatchingConvention({
       templatedEmail: sentEmails[2],
       convention: validConvention,
       signatory: validConvention.signatories.beneficiaryRepresentative!,
       recipient: validConvention.signatories.beneficiaryRepresentative!.email,
+      now,
     });
   });
 });

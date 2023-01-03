@@ -3,6 +3,7 @@ import {
   ConventionDtoBuilder,
   expectPromiseToFailWithError,
   expectToEqual,
+  frontRoutes,
 } from "shared";
 import {
   createInMemoryUow,
@@ -15,12 +16,15 @@ import {
   NotifyLastSigneeThatConventionHasBeenSigned,
 } from "./NotifyLastSigneeThatConventionHasBeenSigned";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/fakeGenerateMagicLinkUrlFn";
+import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 
 describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
   let conventionSignedByNoOne: ConventionDto;
   let emailGw: InMemoryEmailGateway;
   let usecase: NotifyLastSigneeThatConventionHasBeenSigned;
   let uow: InMemoryUnitOfWork;
+  let timeGateway: CustomTimeGateway;
 
   beforeEach(() => {
     conventionSignedByNoOne = new ConventionDtoBuilder()
@@ -29,9 +33,12 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
       .build();
     emailGw = new InMemoryEmailGateway();
     uow = createInMemoryUow();
+    timeGateway = new CustomTimeGateway();
     usecase = new NotifyLastSigneeThatConventionHasBeenSigned(
       new InMemoryUowPerformer(uow),
       emailGw,
+      fakeGenerateMagicLinkUrlFn,
+      timeGateway,
     );
   });
 
@@ -39,18 +46,28 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
     const signedConvention = new ConventionDtoBuilder(conventionSignedByNoOne)
       .signedByBeneficiary(new Date().toISOString())
       .build();
+    const now = new Date();
+    timeGateway.setNextDate(now);
 
     uow.conventionRepository._conventions = {
       [signedConvention.id]: signedConvention,
     };
 
     await usecase.execute(signedConvention);
+    const conventionStatusLink = fakeGenerateMagicLinkUrlFn({
+      targetRoute: frontRoutes.conventionStatusDashboard,
+      id: signedConvention.id,
+      role: "beneficiary",
+      email: signedConvention.signatories.beneficiary.email,
+      now,
+    });
 
     expectToEqual(emailGw.getSentEmails(), [
       {
         params: {
           demandeId: signedConvention.id,
           signedAt: signedConvention.signatories.beneficiary.signedAt!,
+          conventionStatusLink,
         },
         recipients: [signedConvention.signatories.beneficiary.email],
         type: "SIGNEE_HAS_SIGNED_CONVENTION",
@@ -63,6 +80,8 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
       .signedByBeneficiary(new Date().toISOString())
       .signedByEstablishmentRepresentative(new Date().toISOString())
       .build();
+    const now = new Date();
+    timeGateway.setNextDate(now);
     uow.conventionRepository._conventions = {
       [signedConvention.id]: signedConvention,
     };
@@ -75,6 +94,14 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
           signedAt:
             signedConvention.signatories.establishmentRepresentative.signedAt!,
           demandeId: signedConvention.id,
+          conventionStatusLink: fakeGenerateMagicLinkUrlFn({
+            targetRoute: frontRoutes.conventionStatusDashboard,
+            id: signedConvention.id,
+            role: "establishment-representative",
+            email:
+              signedConvention.signatories.establishmentRepresentative.email,
+            now,
+          }),
         },
         recipients: [
           signedConvention.signatories.establishmentRepresentative.email,

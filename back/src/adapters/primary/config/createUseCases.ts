@@ -261,6 +261,8 @@ export const createUseCases = (
         new NotifyLastSigneeThatConventionHasBeenSigned(
           uowPerformer,
           gateways.email,
+          makeConventionMagicLink,
+          gateways.timeGateway,
         ),
       notifyAllActorsOfFinalConventionValidation:
         new NotifyAllActorsOfFinalConventionValidation(

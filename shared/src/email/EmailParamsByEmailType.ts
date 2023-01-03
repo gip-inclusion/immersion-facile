@@ -4,6 +4,7 @@ export type EmailParamsByEmailType = {
   SIGNEE_HAS_SIGNED_CONVENTION: {
     demandeId: string;
     signedAt: string;
+    conventionStatusLink: string;
   };
   NEW_CONVENTION_BENEFICIARY_CONFIRMATION: {
     demandeId: string;

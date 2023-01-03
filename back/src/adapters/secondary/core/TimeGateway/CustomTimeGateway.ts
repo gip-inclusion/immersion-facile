@@ -4,10 +4,8 @@ import {
   DateStr,
 } from "../../../../domain/core/ports/TimeGateway";
 
-export class CustomTimeGateway extends TimeGateway {
-  constructor(private _nextDate = new Date("2021-09-01T10:10:00.000Z")) {
-    super();
-  }
+export class CustomTimeGateway implements TimeGateway {
+  constructor(private _nextDate = new Date("2021-09-01T10:10:00.000Z")) {}
 
   now() {
     return this._nextDate;

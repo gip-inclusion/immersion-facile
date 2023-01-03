@@ -24,11 +24,13 @@ export const expectEmaiSignatoryConfirmationSignatureRequestMatchingConvention =
     convention,
     signatory,
     recipient,
+    now,
   }: {
     templatedEmail: TemplatedEmail;
     convention: ConventionDto;
     signatory: Signatory;
     recipient: string;
+    now: Date;
   }) => {
     const { id, businessName } = convention;
     const {
@@ -43,7 +45,7 @@ export const expectEmaiSignatoryConfirmationSignatureRequestMatchingConvention =
         id,
         role: signatory.role,
         email: beneficiary.email,
-        now: new Date(),
+        now,
       };
 
     expectTypeToMatchAndEqual(templatedEmail, {

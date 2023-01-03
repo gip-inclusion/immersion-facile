@@ -24,9 +24,10 @@ type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type EmailVariables = KeysOfUnion<TemplatedEmail["params"]>;
 
 type TemplateByName = typeof templatesByName;
+
 export type TemplatedEmail = ValueOf<{
-  [K in keyof TemplateByName]: GenericTemplatedEmail<
-    K,
-    Parameters<TemplateByName[K]["createEmailVariables"]>[0]
+  [TemplateName in keyof TemplateByName]: GenericTemplatedEmail<
+    TemplateName,
+    Parameters<TemplateByName[TemplateName]["createEmailVariables"]>[0]
   >;
 }>;
