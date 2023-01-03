@@ -78,7 +78,7 @@ export const AgencyFormCommonFields = ({
         }}
       />
       <RadioGroup
-        {...formAgencyFieldsLabels.stepsForValidation}
+        {...fieldsContent.stepsForValidation}
         options={numberOfStepsOptions}
         currentValue={validationSteps}
         setCurrentValue={setValidationSteps}
@@ -86,7 +86,7 @@ export const AgencyFormCommonFields = ({
       />
       {validationSteps === "twoSteps" && (
         <FillableList
-          {...formAgencyFieldsLabels.counsellorEmails}
+          {...fieldsContent.counsellorEmails}
           valuesInList={values.counsellorEmails}
           setValues={typedSetField("counsellorEmails")}
           validationSchema={zEmail}
@@ -94,7 +94,7 @@ export const AgencyFormCommonFields = ({
       )}
 
       <FillableList
-        {...formAgencyFieldsLabels.validatorEmails}
+        {...fieldsContent.validatorEmails}
         description={descriptionByValidationSteps[validationSteps]}
         valuesInList={values.validatorEmails}
         setValues={typedSetField("validatorEmails")}
@@ -102,10 +102,10 @@ export const AgencyFormCommonFields = ({
       />
 
       {values.kind !== "pole-emploi" && (
-        <TextInput {...formAgencyFieldsLabels.questionnaireUrl} />
+        <TextInput {...fieldsContent.questionnaireUrl} />
       )}
 
-      <TextInput {...formAgencyFieldsLabels.signature} />
+      <TextInput {...fieldsContent.signature} />
     </>
   );
 };

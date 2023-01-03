@@ -1,10 +1,12 @@
-import { AgencyDto } from "shared";
+import { AddressDto, AgencyDto } from "shared";
 import { FormFieldsObjectForContent } from "src/app/hooks/formContents.hooks";
 import { FormFieldAttributesForContent } from "../types";
 
 export type FormAgencyFieldsLabels = FormFieldsObjectForContent<
   Record<
-    Partial<keyof AgencyDto | "stepsForValidation">,
+    Partial<
+      keyof AgencyDto | "stepsForValidation" | `address.${keyof AddressDto}`
+    >,
     FormFieldAttributesForContent
   >
 >;
@@ -25,6 +27,22 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
     label: "Adresse de la structure",
     required: true,
     id: "agency-address",
+  },
+  "address.city": {
+    label: "Ville",
+    id: "agency-address-city",
+  },
+  "address.departmentCode": {
+    label: "Code de département",
+    id: "agency-address-departementCode",
+  },
+  "address.postcode": {
+    label: "Code postal",
+    id: "agency-address-postCode",
+  },
+  "address.streetNumberAndAddress": {
+    label: "Numéro et nom de rue",
+    id: "agency-address-streetNumberAndAddress",
   },
   position: {
     label: "Coordonnées géographiques de l'organisme",
