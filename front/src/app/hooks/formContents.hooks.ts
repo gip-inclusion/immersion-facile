@@ -1,10 +1,13 @@
-import { FormFieldsObjectForContent } from "../contents/forms/convention/formConvention";
 import {
   FormFieldAttributes,
   FormFieldAttributesForContent,
 } from "../contents/forms/types";
 
 export type FormFieldsObject<T> = Record<keyof T, FormFieldAttributes>;
+export type FormFieldsObjectForContent<T> = Record<
+  keyof T,
+  FormFieldAttributesForContent
+>;
 
 export const useFormContents = <T>(
   formFieldsLabels: FormFieldsObjectForContent<T>,
