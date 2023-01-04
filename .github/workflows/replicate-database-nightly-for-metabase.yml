@@ -42,7 +42,7 @@ jobs:
     uses: romain-cambonie/serenity-workflow-dev/.github/workflows/replicate-remote-db-standalone.use-case.yml@master
     with:
       application-name: ${{ inputs.application-name || 'database-nightly' }}
-      addon-plan-postgresql: ${{ inputs.addon-plan-postgresql || 'postgresql-starter-2048' }}
+      addon-plan-postgresql: ${{ inputs.addon-plan-postgresql || 'postgresql-starter-4096' }}
       extensions: "postgis"
     secrets:
       SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
