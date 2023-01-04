@@ -1,3 +1,5 @@
+# Depending from external context is problematic
+
 FROM node:16.15 as builder
 RUN curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm
 
@@ -23,6 +25,9 @@ FROM builder
 COPY ./front/ /app/front
 
 WORKDIR /app/front
+
+# Necessary to use react-dsrfr, but copy-dsfr-to-public needs to have vite.config to process correctly.
+RUN pnpm postinstall
 
 RUN pnpm build
 CMD npm run serve -- --host 0.0.0.0
