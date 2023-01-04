@@ -19,8 +19,6 @@ import {
   AgencyLogoUpload,
   makeTypedSetField,
 } from "src/app/components/agency/AgencyFormCommonFields";
-import { agencySubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
-import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import "src/assets/admin.css";
 import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
@@ -56,6 +54,7 @@ const getName = (name: keyof AgencyDto) => name;
 const agencyStatusToLabel: Record<AgencyStatus, string> = {
   active: "Active",
   closed: "Fermée",
+  rejected: "Rejetée",
   needsReview: "En attende d'activation",
   "from-api-PE": "Import Api",
 };
@@ -67,8 +66,8 @@ const statusListOfOptions = allAgencyStatuses.map((agencyStatus) => ({
 
 const EditAgencyForm = () => {
   const dispatch = useDispatch();
-  const feedback = useAppSelector(agencyAdminSelectors.feedback);
   const agency = useAppSelector(agencyAdminSelectors.agency);
+  const feedback = useAppSelector(agencyAdminSelectors.feedback);
   const { getFormErrors } = useFormContents(formAgencyFieldsLabels);
 
   if (!agency) return null;
@@ -124,10 +123,7 @@ const EditAgencyForm = () => {
                 errors={toDotNotation(errors)}
                 visible={submitCount !== 0 && Object.values(errors).length > 0}
               />
-              <SubmitFeedbackNotification
-                submitFeedback={feedback}
-                messageByKind={agencySubmitMessageByKind}
-              />
+
               <div className="fr-mt-4w">
                 <Button
                   type="submit"

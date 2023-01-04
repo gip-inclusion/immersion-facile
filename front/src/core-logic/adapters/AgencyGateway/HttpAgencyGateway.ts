@@ -154,6 +154,12 @@ export class HttpAgencyGateway implements AgencyGateway {
     return from(this.getFilteredAgencies(filter));
   }
 
+  public listAgenciesNeedingReview$(
+    adminToken: AdminToken,
+  ): Observable<AgencyDto[]> {
+    return from(this.listAgenciesNeedingReview(adminToken));
+  }
+
   public listImmersionAgencies(
     departmentCode: DepartmentCode,
   ): Promise<AgencyOption[]> {
@@ -195,7 +201,7 @@ export class HttpAgencyGateway implements AgencyGateway {
   }
 
   // TODO Mieux identifier l'admin
-  public listAgenciesNeedingReview(
+  private listAgenciesNeedingReview(
     adminToken: AdminToken,
   ): Promise<AgencyDto[]> {
     return this.httpClient

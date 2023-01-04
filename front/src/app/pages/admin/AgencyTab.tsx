@@ -8,12 +8,18 @@ import { MetabaseView } from "src/app/components/MetabaseView";
 import { useAdminDashboard } from "src/app/pages/admin/useAdminDashboard";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
+import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
+import { agencySubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
 
 export const AgencyTab = () => {
   const agency = useAppSelector(agencyAdminSelectors.agency);
-
+  const feedback = useAppSelector(agencyAdminSelectors.feedback);
   return (
     <>
+      <SubmitFeedbackNotification
+        submitFeedback={feedback}
+        messageByKind={agencySubmitMessageByKind}
+      />
       <ActivateAgency />
       <EditAgency />
 

@@ -6,7 +6,7 @@ import React from "react";
 import { AgencyId, AgencyOption, propEq } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
-import { useAgencyAdminAutocompleteEpic } from "src/app/hooks/agenciesAdmin.hook";
+import { useAgencyAdminAutocomplete } from "src/app/hooks/agenciesAdmin.hook";
 
 type AgencyAutocompleteProps = {
   title: string;
@@ -28,7 +28,7 @@ export const AgencyAutocomplete = ({
   // TODO Mutualiser juste l'autocomplete avec les conventions ? Ou passer le selecteur en param du composant
   const { agencySearchText, isSearching, selectedAgencyId, agencyOptions } =
     useAppSelector(agencyAdminSelectors.agencyState);
-  const { updateSearchTerm, selectOption } = useAgencyAdminAutocompleteEpic();
+  const { updateSearchTerm, selectOption } = useAgencyAdminAutocomplete();
 
   const noOptionText =
     isSearching || !agencySearchText ? "..." : "Aucune agence trouvée";

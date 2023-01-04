@@ -2,7 +2,7 @@ import {
   AgencyDto,
   AgencyDtoBuilder,
   AgencyOption,
-  expectObjectsToMatch,
+  expectToEqual,
 } from "shared";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
 import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
@@ -10,12 +10,14 @@ import {
   agencyAdminInitialState,
   agencyAdminSlice,
   AgencyAdminState,
+  AgencySubmitFeedback,
 } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
 import {
   createTestStore,
   TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
+import { AGENCY_4_NEEDING_REVIEW } from "../../adapters/AgencyGateway/InMemoryAgencyGateway";
 
 describe("agencyAdmin", () => {
   let store: ReduxStore;
@@ -23,6 +25,68 @@ describe("agencyAdmin", () => {
 
   beforeEach(() => {
     ({ store, dependencies } = createTestStore());
+  });
+
+  describe("Agency activate or reject", () => {
+    describe("fetch agencies needing review", () => {
+      it("triggers fetch of agencies needing review, shows it is fetching", () => {
+        store.dispatch(
+          agencyAdminSlice.actions.fetchAgenciesNeedingReviewRequested(),
+        );
+
+        expectAgencyAdminStateToMatch({
+          isFetchingAgenciesNeedingReview: true,
+          agencyOptions: [],
+        });
+      });
+      it("after fetch agencies options are fetched", () => {
+        const expectedAgencies: AgencyOption[] = [
+          { id: "my-id", name: "My expected agency" },
+        ];
+
+        store.dispatch(
+          agencyAdminSlice.actions.fetchAgenciesNeedingReviewRequested(),
+        );
+        feedWithAgencyOptions(expectedAgencies);
+        expectAgencyAdminStateToMatch({
+          isFetchingAgenciesNeedingReview: false,
+          agencyNeedingReviewOptions: expectedAgencies,
+        });
+      });
+
+      it("display feedback error on fetch failure", () => {
+        const expectedFeedback: AgencySubmitFeedback = {
+          kind: "errored",
+          errorMessage: "Ceci est mon erreur",
+        };
+
+        store.dispatch(
+          agencyAdminSlice.actions.fetchAgenciesNeedingReviewRequested(),
+        );
+
+        feedAgencyOptionsWithError(new Error(expectedFeedback.errorMessage));
+
+        expectAgencyAdminStateToMatch({
+          feedback: expectedFeedback,
+          isFetchingAgenciesNeedingReview: false,
+          agencyNeedingReviewOptions: [],
+        });
+      });
+
+      it("display the agency to activate or reject on selection", () => {
+        store.dispatch(
+          agencyAdminSlice.actions.setSelectedAgencyNeedingReviewId(
+            AGENCY_4_NEEDING_REVIEW.id,
+          ),
+        );
+
+        feedWithFetchedAgency(AGENCY_4_NEEDING_REVIEW);
+
+        expectAgencyAdminStateToMatch({
+          agencyNeedingReview: AGENCY_4_NEEDING_REVIEW,
+        });
+      });
+    });
   });
 
   describe("Agency autocomplete", () => {
@@ -43,15 +107,17 @@ describe("agencyAdmin", () => {
       expectIsSearchingToBe(true);
       fastForwardObservables();
       expectIsSearchingToBe(true);
-      const agencies: AgencyOption[] = [{ id: "123", name: "My agency" }];
+      const agencies: AgencyOption[] = [{ id: "my-id", name: "My agency" }];
       feedWithAgencyOptions(agencies);
       expectAgencyAdminStateToMatch({
+        agencySearchText: searchedText,
         isSearching: false,
         agencyOptions: agencies,
       });
     });
 
     it("selects one of the results and fetches the corresponding Agency", () => {
+      const agencySearchText = "My ";
       const agencyDto = new AgencyDtoBuilder().build();
       const agencyOptions: AgencyOption[] = [
         { id: agencyDto.id, name: agencyDto.name },
@@ -62,10 +128,12 @@ describe("agencyAdmin", () => {
         admin: adminPreloadedState({
           agencyAdmin: {
             agencyOptions,
-            agencySearchText: "My ",
+            agencyNeedingReviewOptions: [],
+            agencySearchText,
             agency: null,
-            selectedAgencyId: null,
+            agencyNeedingReview: null,
             isSearching: false,
+            isFetchingAgenciesNeedingReview: false,
             isUpdating: false,
             feedback: { kind: "idle" },
             error: null,
@@ -77,14 +145,13 @@ describe("agencyAdmin", () => {
         agencyAdminSlice.actions.setSelectedAgencyId(agencyDto.id),
       );
 
-      expectAgencyAdminStateToMatch({
-        selectedAgencyId: agencyDto.id,
-      });
       feedWithFetchedAgency(agencyDto);
 
       expectAgencyAdminStateToMatch({
         isSearching: false,
         agency: agencyDto,
+        agencyOptions,
+        agencySearchText,
       });
     });
   });
@@ -100,7 +167,6 @@ describe("agencyAdmin", () => {
           ...agencyAdminInitialState,
           feedback: { kind: "agencyUpdated" },
           agencyOptions,
-          selectedAgencyId: "456",
           agency: agencyDto1,
         },
       }),
@@ -109,6 +175,7 @@ describe("agencyAdmin", () => {
     expectAgencyAdminStateToMatch({
       feedback: { kind: "idle" },
       agency: null,
+      agencyOptions,
     });
   });
 
@@ -159,19 +226,25 @@ describe("agencyAdmin", () => {
   });
 
   const expectAgencyAdminStateToMatch = (params: Partial<AgencyAdminState>) => {
-    expectObjectsToMatch(
-      agencyAdminSelectors.agencyState(store.getState()),
-      params,
-    );
+    expectToEqual(agencyAdminSelectors.agencyState(store.getState()), {
+      ...agencyAdminInitialState,
+      ...params,
+    });
   };
 
   const expectIsSearchingToBe = (isSearching: boolean) =>
-    expectAgencyAdminStateToMatch({ isSearching });
+    expect(agencyAdminSelectors.agencyState(store.getState()).isSearching).toBe(
+      isSearching,
+    );
 
   const fastForwardObservables = () => dependencies.scheduler.flush();
 
   const feedWithAgencyOptions = (agencyOptions: AgencyOption[]) => {
     dependencies.agencyGateway.agencies$.next(agencyOptions);
+  };
+
+  const feedAgencyOptionsWithError = (error: Error) => {
+    dependencies.agencyGateway.agencies$.error(error);
   };
 
   const feedWithFetchedAgency = (agencyDto: AgencyDto) => {

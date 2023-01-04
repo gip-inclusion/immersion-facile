@@ -2,7 +2,7 @@ import { useDispatch } from "react-redux";
 import { AgencyId } from "shared";
 import { agencyAdminSlice } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
 
-export const useAgencyAdminAutocompleteEpic = () => {
+export const useAgencyAdminAutocomplete = () => {
   const dispatch = useDispatch();
 
   return {

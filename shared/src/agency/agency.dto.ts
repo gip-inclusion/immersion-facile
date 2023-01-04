@@ -8,6 +8,7 @@ export type AgencyStatus = typeof allAgencyStatuses[number];
 export const allAgencyStatuses = [
   "active",
   "closed",
+  "rejected",
   "needsReview",
   "from-api-PE",
 ] as const;
@@ -82,10 +83,7 @@ export type GetAgenciesFilter = {
   status?: AgencyStatus[];
 };
 
-export type ListAgenciesRequestDto = Omit<
-  GetAgenciesFilter,
-  "status" | "position"
->;
+export type ListAgenciesRequestDto = Omit<GetAgenciesFilter, "position">;
 
 export type PrivateListAgenciesRequestDto = {
   status?: AgencyStatus;

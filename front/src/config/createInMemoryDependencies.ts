@@ -17,33 +17,38 @@ import {
 } from "src/core-logic/adapters/RomeAutocompleteGateway/InMemoryRomeAutocompleteGateway";
 import { SimulatedSiretGatewayThroughBack } from "src/core-logic/adapters/SiretGatewayThroughBack/SimulatedSiretGatewayThroughBack";
 import { SimulatedTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/SimulatedTechnicalGateway";
+import { BehaviorSubject } from "rxjs";
 
 const SIMULATED_LATENCY_MS = 400;
 
-export const createInMemoryDependencies = (): Dependencies => ({
-  addressGateway: new InMemoryAddressGateway(SIMULATED_LATENCY_MS),
-  adminGateway: new SimulatedAdminGateway(),
-  agencyGateway: new InMemoryAgencyGateway(),
-  conventionGateway: new InMemoryConventionGateway(SIMULATED_LATENCY_MS),
-  establishmentGateway: new InMemoryEstablishmentGateway(
-    ["12345678901238", "12345678901239", "12345678901237"],
-    undefined,
-    true,
-  ),
-  immersionAssessmentGateway: new SimulatedImmersionAssessmentGateway(),
-  immersionSearchGateway: new InMemoryImmersionSearchGateway(
-    seedSearchResults,
-    SIMULATED_LATENCY_MS,
-  ),
-  romeAutocompleteGateway: new InMemoryRomeAutocompleteGateway(
-    seedRomeDtos,
-    SIMULATED_LATENCY_MS,
-  ),
-  sentEmailGateway: new StubSentEmailGateway(),
-  siretGatewayThroughBack: getSimulatedSiretGatewayThroughBack(),
-  technicalGateway: new SimulatedTechnicalGateway(),
-  ...createCommonDependencies(),
-});
+export const createInMemoryDependencies = (): Dependencies => {
+  const agencyGateway = new InMemoryAgencyGateway();
+
+  return {
+    addressGateway: new InMemoryAddressGateway(SIMULATED_LATENCY_MS),
+    adminGateway: new SimulatedAdminGateway(),
+    agencyGateway: new InMemoryAgencyGateway(),
+    conventionGateway: new InMemoryConventionGateway(SIMULATED_LATENCY_MS),
+    establishmentGateway: new InMemoryEstablishmentGateway(
+      ["12345678901238", "12345678901239", "12345678901237"],
+      undefined,
+      true,
+    ),
+    immersionAssessmentGateway: new SimulatedImmersionAssessmentGateway(),
+    immersionSearchGateway: new InMemoryImmersionSearchGateway(
+      seedSearchResults,
+      SIMULATED_LATENCY_MS,
+    ),
+    romeAutocompleteGateway: new InMemoryRomeAutocompleteGateway(
+      seedRomeDtos,
+      SIMULATED_LATENCY_MS,
+    ),
+    sentEmailGateway: new StubSentEmailGateway(),
+    siretGatewayThroughBack: getSimulatedSiretGatewayThroughBack(),
+    technicalGateway: new SimulatedTechnicalGateway(),
+    ...createCommonDependencies(),
+  };
+};
 
 const getSimulatedSiretGatewayThroughBack = () =>
   new SimulatedSiretGatewayThroughBack(SIMULATED_LATENCY_MS, {

@@ -1,6 +1,8 @@
 import React, { ReactNode } from "react";
 import { AgencyDto, AgencyStatus, keys } from "shared";
 import { TextCell } from "./TextCell";
+import { agencyAdminSelectors } from "../../../core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 
 type AgencyField = keyof AgencyDto;
 type FieldsToLabel = Partial<Record<AgencyField, string>>;
@@ -35,7 +37,9 @@ const formatAgencyStatus = (status: AgencyStatus) => {
   return "⁉️ STATUT INDÉFINI";
 };
 
-export const AgencyDetails = ({ agency }: { agency: AgencyDto }) => {
+export const AgencyDetails = () => {
+  const agency: AgencyDto | null = useAppSelector(agencyAdminSelectors.agency);
+  if (!agency) return null;
   const buildContent = (field: AgencyField): ReactNode => {
     const value = agency[field];
     if (field === "status") return formatAgencyStatus(agency.status);

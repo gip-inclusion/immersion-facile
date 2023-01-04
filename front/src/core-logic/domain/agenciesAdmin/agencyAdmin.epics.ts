@@ -11,7 +11,7 @@ import { agencyAdminSlice } from "./agencyAdmin.slice";
 
 type AgencyAction = ActionOfSlice<typeof agencyAdminSlice>;
 
-export const agencyAdminGetByNameEpic: AppEpic<AgencyAction> = (
+const agencyAdminGetByNameEpic: AppEpic<AgencyAction> = (
   action$,
   _state$,
   { agencyGateway, scheduler },
@@ -26,7 +26,41 @@ export const agencyAdminGetByNameEpic: AppEpic<AgencyAction> = (
     map(agencyAdminSlice.actions.setAgencyOptions),
   );
 
-export const agencyAdminGetDetailsEpic: AppEpic<AgencyAction> = (
+const agencyAdminGetNeedingReviewEpic: AppEpic<AgencyAction> = (
+  action$,
+  state$,
+  { agencyGateway },
+) =>
+  action$.pipe(
+    filter(agencyAdminSlice.actions.fetchAgenciesNeedingReviewRequested.match),
+    switchMap(() =>
+      agencyGateway.listAgenciesNeedingReview$(
+        state$.value.admin.adminAuth.adminToken || "",
+      ),
+    ),
+    map(agencyAdminSlice.actions.setAgencyNeedingReviewOptions),
+    catchEpicError((error: Error) =>
+      agencyAdminSlice.actions.fetchAgenciesNeedingReviewFailed(error.message),
+    ),
+  );
+
+const agencyAdminGetDetailsForStatusEpic: AppEpic<AgencyAction> = (
+  action$,
+  state$,
+  dependencies,
+) =>
+  action$.pipe(
+    filter(agencyAdminSlice.actions.setSelectedAgencyNeedingReviewId.match),
+    switchMap((action: PayloadAction<AgencyId>) =>
+      dependencies.agencyGateway.getAgencyAdminById$(
+        action.payload,
+        state$.value.admin.adminAuth.adminToken ?? "",
+      ),
+    ),
+    map((agency) => agencyAdminSlice.actions.setAgencyNeedingReview(agency ?? null)),
+  );
+
+const agencyAdminGetDetailsForUpdateEpic: AppEpic<AgencyAction> = (
   action$,
   state$,
   dependencies,
@@ -42,7 +76,7 @@ export const agencyAdminGetDetailsEpic: AppEpic<AgencyAction> = (
     map((agency) => agencyAdminSlice.actions.setAgency(agency ?? null)),
   );
 
-export const updateAgencyEpic: AppEpic<AgencyAction> = (
+const updateAgencyEpic: AppEpic<AgencyAction> = (
   action$,
   state$,
   { agencyGateway },
@@ -63,6 +97,8 @@ export const updateAgencyEpic: AppEpic<AgencyAction> = (
 
 export const agenciesAdminEpics = [
   agencyAdminGetByNameEpic,
-  agencyAdminGetDetailsEpic,
+  agencyAdminGetNeedingReviewEpic,
+  agencyAdminGetDetailsForUpdateEpic,
+  agencyAdminGetDetailsForStatusEpic,
   updateAgencyEpic,
 ];

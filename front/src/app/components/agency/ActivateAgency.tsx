@@ -1,131 +1,119 @@
-import { prop } from "ramda";
-import React, { useEffect, useState } from "react";
+import React, { ReactNode, useEffect } from "react";
 import {
-  ArrayDropdown,
   DsfrTitle,
-  Notification,
+  Select,
+  SelectOption,
 } from "react-design-system/immersionFacile";
-import { AgencyDto, propEq } from "shared";
-import { agencyGateway } from "src/config/dependencies";
-import { useAdminToken } from "src/app/hooks/useAdminToken";
-import { AgencyDetails } from "src/app/components/admin/AgencyDetails";
-import { WithBackground } from "src/app/components/admin/WithBackground";
+import { useDispatch } from "react-redux";
+import { AgencyDto, AgencyOption } from "shared";
 import "src/assets/admin.css";
+import { agencyAdminSlice } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
+import { AgencyDetails } from "../admin/AgencyDetails";
+import { useAppSelector } from "../../hooks/reduxHooks";
+import { agencyAdminSelectors } from "../../../core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
 
-type ActivationResult = {
-  status: "success" | "error";
-  text: string;
-  message: string;
+const toSelectOption = (option: AgencyOption): SelectOption => ({
+  label: option.name,
+  value: option.id,
+});
+
+const useFetchAgenciesNeedingReview = () => {
+  const {
+    agencyNeedingReviewOptions,
+    selectedAgencyId,
+    selectedAgencyNeedingReviewId,
+  } = useAppSelector(agencyAdminSelectors.agencyState);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(agencyAdminSlice.actions.fetchAgenciesNeedingReviewRequested());
+  }, []);
+
+  return {
+    agencyNeedingReviewOptions,
+    selectedAgencyId,
+    selectedAgencyNeedingReviewId,
+  };
 };
 
 export const ActivateAgency = () => {
-  const adminToken = useAdminToken();
-  const [agenciesNeedingReview, setAgenciesNeedingReview] = useState<
-    AgencyDto[]
-  >([]);
+  const {
+    agencyNeedingReviewOptions,
+    selectedAgencyId,
+    selectedAgencyNeedingReviewId,
+  } = useFetchAgenciesNeedingReview();
 
-  const [activationButtonDisabled, setActivationButtonDisabled] =
-    useState(true);
-
-  const [activationResult, setActivationResult] = useState<
-    ActivationResult | undefined
-  >();
-
-  const fetchAgenciesNeedingReview = () => {
-    agencyGateway.listAgenciesNeedingReview(adminToken).then(
-      (agencies) => {
-        setAgenciesNeedingReview(agencies);
-      },
-      (error: any) => {
-        // eslint-disable-next-line no-console
-        console.log("setAgenciesNeedingReview", error);
-      },
-    );
-  };
-
-  useEffect(fetchAgenciesNeedingReview, []);
-
-  const [selectedAgency, setSelectedAgency] = useState<AgencyDto | undefined>();
-
-  useEffect(() => setActivationResult(undefined), [selectedAgency?.id]);
-
-  const filterChanged = (selectedAgencyName?: string) => {
-    if (!selectedAgencyName) {
-      setSelectedAgency(undefined);
-      return;
-    }
-    setSelectedAgency(
-      agenciesNeedingReview.find(propEq("name", selectedAgencyName)),
-    );
-    setActivationButtonDisabled(false);
-  };
-
-  const validateAgency = (agency: AgencyDto) => {
-    setActivationButtonDisabled(true);
-    return agencyGateway
-      .validateAgency(adminToken, agency.id)
-      .then(() => {
-        setActivationResult({
-          status: "success",
-          text: "Agence activée",
-          message: "L'agence a bien été activée !",
-        });
-      })
-      .catch((error) => {
-        setActivationResult({
-          status: "error",
-          text: "Problème lors de l'activation",
-          message: error.message,
-        });
-      })
-      .finally(() => {
-        fetchAgenciesNeedingReview();
-      });
-  };
-
-  const numberOfAgenciesToReview = agenciesNeedingReview.length;
+  const dispatch = useDispatch();
 
   return (
     <>
-      <DsfrTitle level={5} text="Activer des agences" />
-      <WithBackground>
-        <div className="w-2/3">
-          {numberOfAgenciesToReview > 0
-            ? `${numberOfAgenciesToReview} agence${
-                numberOfAgenciesToReview === 1 ? "" : "s"
-              } en attente d'activation`
-            : "Aucune agence en attente d'activation"}
-          {numberOfAgenciesToReview > 0 && (
-            <ArrayDropdown
-              label="Sélectionner une agence"
-              options={agenciesNeedingReview.map(prop("name"))}
-              onSelect={filterChanged}
-              allowEmpty={true}
-              defaultSelectedOption={selectedAgency?.name}
-            />
-          )}
-        </div>
-      </WithBackground>
-      {selectedAgency && (
-        <div className="p-4 flex flex-col gap-4">
-          <AgencyDetails agency={selectedAgency} />
-          <button
-            disabled={activationButtonDisabled}
-            className="fr-btn flex"
-            onClick={() => selectedAgency && validateAgency(selectedAgency)}
-          >
-            Activer cette agence
-          </button>
-          {activationResult && (
-            <Notification
-              type={activationResult.status}
-              title={activationResult.text}
-            >
-              {activationResult.message}
-            </Notification>
-          )}
-        </div>
-      )}
+      <DsfrTitle
+        level={5}
+        text="Activer ou Rejeter une agence"
+        className="fr-mt-4w"
+      />
+      <div
+        className="w-2/3 p-5"
+        style={{
+          backgroundColor: "#E5E5F4",
+        }}
+      >
+        {agencyNeedingReviewOptions.length} agence(s) en attente de revue
+        {agencyNeedingReviewOptions.length > 0 && (
+          <Select
+            label={selectedAgencyId ?? "Pas d'agence"}
+            id={"IDJDJD"}
+            options={agencyNeedingReviewOptions.map(toSelectOption)}
+            onChange={(event) =>
+              dispatch(
+                agencyAdminSlice.actions.setSelectedAgencyNeedingReviewId(
+                  event.currentTarget.value,
+                ),
+              )
+            }
+          />
+        )}
+        <AgencyDetails />
+        {selectedAgencyNeedingReviewId && (
+          <>
+            <UpdateAgencyStatusButton status={"active"}>
+              Activer cette agence
+            </UpdateAgencyStatusButton>
+            <UpdateAgencyStatusButton status={"rejected"}>
+              Rejeter cette agence
+            </UpdateAgencyStatusButton>
+          </>
+        )}
+      </div>
     </>
+  );
+};
+
+const UpdateAgencyStatusButton = ({
+  children,
+  status,
+}: {
+  children: ReactNode;
+  status: "active" | "rejected";
+}) => {
+  const dispatch = useDispatch();
+  const agency: AgencyDto | null = useAppSelector(agencyAdminSelectors.agency);
+  return (
+    <button
+      className="fr-btn flex"
+      //onClick={() => selectedAgency && validateAgency(selectedAgency)}
+      onClick={() => {
+        //setActivationButtonDisabled(true);
+        if (!agency) return;
+        dispatch(
+          agencyAdminSlice.actions.updateAgencyRequested({
+            ...agency,
+            status,
+          }),
+        );
+      }}
+    >
+      {children}
+    </button>
   );
 };

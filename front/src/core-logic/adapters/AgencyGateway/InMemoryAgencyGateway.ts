@@ -67,7 +67,7 @@ const AGENCY_3_NEEDING_REVIEW = new AgencyDtoBuilder()
   .withStatus("needsReview")
   .build();
 
-const AGENCY_4_NEEDING_REVIEW = new AgencyDtoBuilder()
+export const AGENCY_4_NEEDING_REVIEW = new AgencyDtoBuilder()
   .withId("PE-test-agency-4-front")
   .withName("Test Agency 4 (front)")
   .withStatus("needsReview")
@@ -165,5 +165,15 @@ export class InMemoryAgencyGateway implements AgencyGateway {
     _adminToken: AdminToken,
   ): Observable<AgencyDto> {
     return undefined as unknown as Observable<AgencyDto>;
+  }
+
+  listAgenciesNeedingReview$(
+    _adminToken: AdminToken,
+  ): Observable<AgencyOption[]> {
+    return of(
+      values(this._agencies)
+        .filter((agency) => agency.status === "needsReview")
+        .map((agency) => ({ id: agency.id, name: agency.name })),
+    );
   }
 }

@@ -26,7 +26,11 @@ export interface AgencyGateway {
   listImmersionOnlyPeAgencies(
     departmentCode: DepartmentCode,
   ): Promise<AgencyOption[]>;
-  listAgenciesNeedingReview(adminToken: AdminToken): Promise<AgencyDto[]>;
+
+  listAgenciesNeedingReview$(
+    adminToken: AdminToken,
+  ): Observable<AgencyOption[]>;
+
   validateAgency(adminToken: AdminToken, agencyId: AgencyId): Promise<void>;
 
   getAgencyAdminById$(

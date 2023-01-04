@@ -81,6 +81,12 @@ export class TestAgencyGateway implements AgencyGateway {
     return values(this._agencies).filter(propNotEq("kind", "cci"));
   }
 
+  listAgenciesNeedingReview$(
+    _adminToken: AdminToken,
+  ): Observable<AgencyOption[]> {
+    return this.agencies$;
+  }
+
   async listAgenciesNeedingReview(): Promise<AgencyDto[]> {
     return values(this._agencies).filter(propEq("status", "needsReview"));
   }
