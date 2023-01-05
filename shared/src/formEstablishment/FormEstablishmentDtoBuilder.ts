@@ -23,7 +23,6 @@ const validFormEstablishment: FormEstablishmentDto = {
   businessName: "Ma super entreprise",
   businessNameCustomized: "Ma belle enseigne du quartier",
   isEngagedEnterprise: false,
-  fitForDisabledWorkers: false,
   siret: "01234567890123",
   website: "www@super.com/jobs",
   additionalInformation: "",

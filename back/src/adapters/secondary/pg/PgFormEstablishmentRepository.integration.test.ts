@@ -51,6 +51,7 @@ describe("PgFormEstablishmentRepository", () => {
 
     const siretB = "22222222222222";
     const formEstablishmentB = FormEstablishmentDtoBuilder.valid()
+      .withFitForDisabledWorkers(true)
       .withSiret(siretB)
       .build();
 
@@ -81,6 +82,7 @@ describe("PgFormEstablishmentRepository", () => {
       await formEstablishmentRepository.update({
         ...formEstablishment,
         businessName: "newName",
+        fitForDisabledWorkers: true,
       });
 
       // Assert

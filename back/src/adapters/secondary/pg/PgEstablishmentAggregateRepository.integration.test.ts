@@ -87,19 +87,33 @@ describe("Postgres implementation of immersion offer repository", () => {
       expect(searchWithNoRomeResult).toHaveLength(0);
     });
 
-    const insertActiveEstablishmentAndOfferAndEventuallyContact = async (
-      siret: string,
-      rome: string,
-      establishmentPosition: GeoPositionDto,
-      appellationCode?: string,
-      offerContactUid?: string,
-      dataSource: DataSource = "form",
-      sourceProvider: FormEstablishmentSource = "immersion-facile",
-      address?: AddressDto,
-      nafCode?: string,
-      numberEmployeesRange?: NumberEmployeesRange,
-      offerCreatedAt?: Date,
-    ) => {
+    const insertActiveEstablishmentAndOfferAndEventuallyContact = async ({
+      siret,
+      rome,
+      establishmentPosition,
+      appellationCode,
+      offerContactUid,
+      dataSource = "form",
+      sourceProvider = "immersion-facile",
+      address,
+      nafCode,
+      numberEmployeesRange,
+      offerCreatedAt,
+      fitForDisabledWorkers,
+    }: {
+      siret: string;
+      rome: string;
+      establishmentPosition: GeoPositionDto;
+      appellationCode?: string;
+      offerContactUid?: string;
+      dataSource?: DataSource;
+      sourceProvider?: FormEstablishmentSource;
+      address?: AddressDto;
+      nafCode?: string;
+      numberEmployeesRange?: NumberEmployeesRange;
+      offerCreatedAt?: Date;
+      fitForDisabledWorkers?: boolean;
+    }) => {
       await insertEstablishment({
         siret,
         isActive: true,
@@ -109,6 +123,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         address,
         nafCode,
         numberEmployeesRange,
+        fitForDisabledWorkers,
       });
       if (offerContactUid) {
         await insertImmersionContact({
@@ -128,14 +143,18 @@ describe("Postgres implementation of immersion offer repository", () => {
         // Prepare
         /// Two establishments match
         await insertActiveEstablishmentAndOfferAndEventuallyContact(
-          "78000403200029",
-          "A1101", // Whatever
-          searchedPosition, // Position matching
+          {
+            siret: "78000403200029",
+            rome: "A1101",
+            establishmentPosition: searchedPosition,
+          }, // Position matching
         );
         await insertActiveEstablishmentAndOfferAndEventuallyContact(
-          "79000403200029",
-          "A1201", // Whatever
-          searchedPosition, // Position matching
+          {
+            siret: "79000403200029",
+            rome: "A1201",
+            establishmentPosition: searchedPosition,
+          }, // Position matching
         );
 
         // Act
@@ -157,10 +176,12 @@ describe("Postgres implementation of immersion offer repository", () => {
         // Prepare
         /// Two establishments located inside geographical area
         await insertActiveEstablishmentAndOfferAndEventuallyContact(
-          "78000403200029",
-          "A1101", // Whatever
-          searchedPosition, // Position matching
-          "20404", // Appellation : Tractoriste agricole; Tractoriste agricole
+          {
+            siret: "78000403200029",
+            rome: "A1101",
+            establishmentPosition: searchedPosition,
+            appellationCode: "20404",
+          }, // Appellation : Tractoriste agricole; Tractoriste agricole
         );
         await insertImmersionOffer({
           romeCode: "A1101", // Same rome and establishment as offer
@@ -169,16 +190,20 @@ describe("Postgres implementation of immersion offer repository", () => {
         });
 
         await insertActiveEstablishmentAndOfferAndEventuallyContact(
-          "79000403200029",
-          "A1201",
-          searchedPosition, // Position matching
-          undefined, // No appellation given
+          {
+            siret: "79000403200029",
+            rome: "A1201",
+            establishmentPosition: searchedPosition,
+            appellationCode: undefined,
+          }, // No appellation given
         );
         /// Establishment oustide geographical area
         await insertActiveEstablishmentAndOfferAndEventuallyContact(
-          "99000403200029",
-          "A1101", // Whatever
-          farFromSearchedPosition, // Position not matching
+          {
+            siret: "99000403200029",
+            rome: "A1101",
+            establishmentPosition: farFromSearchedPosition,
+          }, // Position not matching
         );
 
         // Act
@@ -282,18 +307,19 @@ describe("Postgres implementation of immersion offer repository", () => {
       const matchingNaf = "8622B";
       const matchingNumberOfEmployeeRange = "1-2";
       const matchingNafLabel = "Activité des médecins spécialistes";
-      await insertActiveEstablishmentAndOfferAndEventuallyContact(
-        siretMatchingToSearch,
-        informationGeographiqueRome, // Matching
-        searchedPosition, // Establishment position matching
-        cartographeAppellation, // No appellation given
-        undefined, // no  contact !
-        "form", // data source
-        "immersion-facile", // source_provider
-        matchingEstablishmentAddress,
-        matchingNaf,
-        matchingNumberOfEmployeeRange,
-      );
+      await insertActiveEstablishmentAndOfferAndEventuallyContact({
+        siret: siretMatchingToSearch,
+        rome: informationGeographiqueRome,
+        establishmentPosition: searchedPosition,
+        appellationCode: cartographeAppellation,
+        offerContactUid: undefined,
+        dataSource: "form",
+        sourceProvider: "immersion-facile",
+        address: matchingEstablishmentAddress,
+        nafCode: matchingNaf,
+        numberEmployeesRange: matchingNumberOfEmployeeRange,
+        fitForDisabledWorkers: true,
+      });
 
       await insertImmersionOffer({
         siret: siretMatchingToSearch,
@@ -302,18 +328,18 @@ describe("Postgres implementation of immersion offer repository", () => {
       });
 
       /// Establishment with offer inside geographical area but an other rome
-      await insertActiveEstablishmentAndOfferAndEventuallyContact(
-        "88000403200029",
-        notMatchingRome, // Not matching
-        searchedPosition,
-      );
+      await insertActiveEstablishmentAndOfferAndEventuallyContact({
+        siret: "88000403200029",
+        rome: notMatchingRome,
+        establishmentPosition: searchedPosition,
+      });
 
       // Establishment with offer with searched rome but oustide geographical area
-      await insertActiveEstablishmentAndOfferAndEventuallyContact(
-        "99000403200029",
-        informationGeographiqueRome,
-        farFromSearchedPosition,
-      );
+      await insertActiveEstablishmentAndOfferAndEventuallyContact({
+        siret: "99000403200029",
+        rome: informationGeographiqueRome,
+        establishmentPosition: farFromSearchedPosition,
+      });
 
       // Act
       const searchResult: SearchImmersionResultDto[] =
@@ -337,6 +363,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         naf: matchingNaf,
         nafLabel: matchingNafLabel,
         position: searchedPosition,
+        fitForDisabledWorkers: true,
       };
 
       expect(searchResult).toMatchObject([expectedResult]);
@@ -347,21 +374,25 @@ describe("Postgres implementation of immersion offer repository", () => {
       const lbbSiret1 = "11000403200029";
 
       await insertActiveEstablishmentAndOfferAndEventuallyContact(
-        lbbSiret1,
-        informationGeographiqueRome, // Matching
-        searchedPosition, // Establishment position matching
-        cartographeAppellation,
-        undefined,
-        "api_labonneboite", // data source
+        {
+          siret: lbbSiret1,
+          rome: informationGeographiqueRome,
+          establishmentPosition: searchedPosition,
+          appellationCode: cartographeAppellation,
+          offerContactUid: undefined,
+          dataSource: "api_labonneboite",
+        }, // data source
       );
 
       await insertActiveEstablishmentAndOfferAndEventuallyContact(
-        formSiret,
-        informationGeographiqueRome, // Matching
-        searchedPosition, // Establishment position matching
-        cartographeAppellation,
-        undefined,
-        "form", // data source
+        {
+          siret: formSiret,
+          rome: informationGeographiqueRome,
+          establishmentPosition: searchedPosition,
+          appellationCode: cartographeAppellation,
+          offerContactUid: undefined,
+          dataSource: "form",
+        }, // data source
       );
 
       // Act
@@ -459,13 +490,13 @@ describe("Postgres implementation of immersion offer repository", () => {
       const siretMatchingToSearch = "78000403200029";
       const contactUidOfOfferMatchingSearch = testUid1;
 
-      await insertActiveEstablishmentAndOfferAndEventuallyContact(
-        siretMatchingToSearch,
-        informationGeographiqueRome, // Matching
-        searchedPosition, // Establishment position matching
-        undefined, // No appellation given
-        contactUidOfOfferMatchingSearch,
-      );
+      await insertActiveEstablishmentAndOfferAndEventuallyContact({
+        siret: siretMatchingToSearch,
+        rome: informationGeographiqueRome,
+        establishmentPosition: searchedPosition,
+        appellationCode: undefined,
+        offerContactUid: contactUidOfOfferMatchingSearch,
+      });
 
       // With multiple contacts
       await insertImmersionContact({
@@ -1338,6 +1369,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         website: establishment.website,
         additionalInformation: establishment.additionalInformation,
         voluntaryToImmersion: establishment.voluntaryToImmersion,
+        fitForDisabledWorkers: establishment.fitForDisabledWorkers,
         position: establishment.position,
         address: establishment.address,
         numberOfEmployeeRange: establishment.numberEmployeesRange,
@@ -1393,6 +1425,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         website: establishment.website,
         additionalInformation: establishment.additionalInformation,
         voluntaryToImmersion: establishment.voluntaryToImmersion,
+        fitForDisabledWorkers: undefined,
         position: establishment.position,
         address: establishment.address,
         numberOfEmployeeRange: establishment.numberEmployeesRange,
@@ -1669,13 +1702,14 @@ describe("Postgres implementation of immersion offer repository", () => {
     dataSource?: DataSource;
     sourceProvider?: FormEstablishmentSource;
     position?: GeoPositionDto;
+    fitForDisabledWorkers?: boolean;
   }) => {
     const defaultPosition = { lon: 12.2, lat: 2.1 };
     const position = props.position ?? defaultPosition;
     const insertQuery = `
     INSERT INTO establishments (
-      siret, name,  street_number_and_address, post_code, city, department_code, number_employees, naf_code, data_source, source_provider, update_date, is_active, is_searchable, gps, lon, lat
-    ) VALUES ($1, '', $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, ST_GeographyFromText('POINT(${position.lon} ${position.lat})'), $13, $14)`;
+      siret, name, street_number_and_address, post_code, city, department_code, number_employees, naf_code, data_source, source_provider, update_date, is_active, is_searchable, fit_for_disabled_workers, gps, lon, lat
+    ) VALUES ($1, '', $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, ST_GeographyFromText('POINT(${position.lon} ${position.lat})'), $14, $15)`;
     const addressDto = props.address ?? rueGuillaumeTellDto;
     await client.query(insertQuery, [
       props.siret,
@@ -1690,6 +1724,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       props.updatedAt ? `'${props.updatedAt.toISOString()}'` : null,
       props.isActive ?? true,
       props.isSearchable ?? true,
+      props.fitForDisabledWorkers,
       position.lon,
       position.lat,
     ]);

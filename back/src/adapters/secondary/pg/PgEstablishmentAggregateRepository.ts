@@ -148,6 +148,7 @@ export class PgEstablishmentAggregateRepository
       establishment.isActive,
       establishment.isSearchable,
       establishment.isCommited,
+      establishment.fitForDisabledWorkers,
     ]);
 
     if (establishmentFields.length === 0) return;
@@ -156,7 +157,7 @@ export class PgEstablishmentAggregateRepository
       const query = fixStGeographyEscapingInQuery(
         format(
           `INSERT INTO establishments (
-          siret, name, customized_name, website, additional_information, street_number_and_address, post_code, city, department_code, number_employees, naf_code, naf_nomenclature, data_source, source_provider, gps, lon, lat, update_date, is_active, is_searchable, is_commited
+          siret, name, customized_name, website, additional_information, street_number_and_address, post_code, city, department_code, number_employees, naf_code, naf_nomenclature, data_source, source_provider, gps, lon, lat, update_date, is_active, is_searchable, is_commited, fit_for_disabled_workers 
         ) VALUES %L
         ON CONFLICT
           ON CONSTRAINT establishments_pkey
@@ -169,7 +170,8 @@ export class PgEstablishmentAggregateRepository
                 department_code=EXCLUDED.department_code,
                 number_employees=EXCLUDED.number_employees,
                 naf_code=EXCLUDED.naf_code,
-                data_source=EXCLUDED.data_source
+                data_source=EXCLUDED.data_source,
+                fit_for_disabled_workers=EXCLUDED.fit_for_disabled_workers
               WHERE
                 EXCLUDED.data_source='form'
                 OR (
@@ -349,7 +351,7 @@ export class PgEstablishmentAggregateRepository
 
     const selectedOffersSubQuery = format(
       `WITH active_establishments_within_area AS 
-        (SELECT siret, (data_source = 'form')::boolean AS voluntary_to_immersion, gps 
+        (SELECT siret, fit_for_disabled_workers, (data_source = 'form')::boolean AS voluntary_to_immersion, gps
          FROM establishments WHERE is_active AND is_searchable AND ST_DWithin(gps, ST_GeographyFromText($1), $2) ${filterOnVoluntaryToImmersion(
            searchMade.voluntaryToImmersion,
          )}),
@@ -358,13 +360,14 @@ export class PgEstablishmentAggregateRepository
             aewa.siret, rome_code, prd.libelle_rome AS rome_label, ST_Distance(gps, ST_GeographyFromText($1)) AS distance_m,
             COALESCE(JSON_AGG(DISTINCT libelle_appellation_long) FILTER (WHERE libelle_appellation_long IS NOT NULL), '[]') AS appellation_labels,
             MAX(created_at) AS max_created_at, 
-            voluntary_to_immersion
-            FROM active_establishments_within_area aewa 
+            voluntary_to_immersion,
+            fit_for_disabled_workers
+          FROM active_establishments_within_area aewa 
             LEFT JOIN immersion_offers io ON io.siret = aewa.siret 
             LEFT JOIN public_appellations_data pad ON io.rome_appellation = pad.ogr_appellation
             LEFT JOIN public_romes_data prd ON io.rome_code = prd.code_rome
             ${searchMade.rome ? "WHERE rome_code = %1$L" : ""}
-            GROUP BY(aewa.siret, aewa.gps, aewa.voluntary_to_immersion, io.rome_code, prd.libelle_rome)
+            GROUP BY(aewa.siret, aewa.gps, aewa.voluntary_to_immersion, aewa.fit_for_disabled_workers, io.rome_code, prd.libelle_rome)
           )
         SELECT *, (ROW_NUMBER () OVER (${sortExpression}))::integer as row_number from matching_offers ${sortExpression}
         LIMIT $3`,
@@ -617,19 +620,24 @@ export class PgEstablishmentAggregateRepository
       ),
       selectedOffersSubQueryParams,
     );
-    return pgResult.rows.map((row) => ({
-      ...row.search_immersion_result,
-      // TODO : find a way to return 'undefined' instead of 'null' from query
-      customizedName: optional(row.search_immersion_result.customizedName),
-      contactMode: optional(row.search_immersion_result.contactMode),
-      contactDetails: row.search_immersion_result.contactDetails?.id
-        ? row.search_immersion_result.contactDetails
-        : undefined,
-      distance_m: optional(row.search_immersion_result.distance_m),
-      numberOfEmployeeRange: optional(
-        row.search_immersion_result.numberOfEmployeeRange,
-      ),
-    }));
+    return pgResult.rows.map(
+      (row): SearchImmersionResultDto => ({
+        ...row.search_immersion_result,
+        // TODO : find a way to return 'undefined' instead of 'null' from query
+        customizedName: optional(row.search_immersion_result.customizedName),
+        contactMode: optional(row.search_immersion_result.contactMode),
+        contactDetails: row.search_immersion_result.contactDetails?.id
+          ? row.search_immersion_result.contactDetails
+          : undefined,
+        distance_m: optional(row.search_immersion_result.distance_m),
+        numberOfEmployeeRange: optional(
+          row.search_immersion_result.numberOfEmployeeRange,
+        ),
+        fitForDisabledWorkers: optional(
+          row.search_immersion_result.fitForDisabledWorkers,
+        ),
+      }),
+    );
   }
 
   async getEstablishmentAggregateBySiret(
@@ -747,6 +755,7 @@ const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
       'additionalInformation', e.additional_information, 
       'customizedName', e.customized_name, 
       'voluntaryToImmersion', e.data_source = 'form',
+      'fitForDisabledWorkers', e.fit_for_disabled_workers,
       'position', JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat), 
       'romeLabel', io.rome_label,
       'appellationLabels',  io.appellation_labels,

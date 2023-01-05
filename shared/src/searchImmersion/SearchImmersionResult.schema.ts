@@ -37,6 +37,7 @@ export const searchImmersionResultSchema: z.Schema<SearchImmersionResultDto> =
     numberOfEmployeeRange: z.string().optional(),
     website: zStringPossiblyEmpty.optional(),
     additionalInformation: zStringPossiblyEmpty.optional(),
+    fitForDisabledWorkers: z.boolean().optional(),
   });
 
 export const searchImmersionsSchema = z.array(searchImmersionResultSchema);
