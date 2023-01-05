@@ -72,7 +72,6 @@ const validConvention: ConventionDto = {
   id: DEMANDE_IMMERSION_ID,
   externalId: CONVENTION_EXTERNAL_ID,
   status: "DRAFT",
-  postalCode: "75001",
   agencyId: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
   immersionAddress: "169 boulevard de la villette, 75010 Paris",
   dateSubmission: DATE_SUBMISSION,

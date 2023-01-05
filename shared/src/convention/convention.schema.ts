@@ -5,7 +5,7 @@ import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellati
 import { scheduleSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret";
 import { allRoles } from "../tokens/MagicLinkPayload";
-import { phoneRegExp, stringOfNumbers } from "../utils";
+import { phoneRegExp } from "../utils";
 import { dateRegExp } from "../utils/date";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import {
@@ -118,11 +118,6 @@ const conventionWithoutExternalIdZObject = z.object({
   externalId: externalConventionIdSchema.optional(),
   status: z.enum(conventionStatuses),
   rejectionJustification: z.string().optional(),
-  postalCode: z
-    .string()
-    .regex(stringOfNumbers)
-    .length(5, "5 chiffres sont nécessaires pour le code postal")
-    .optional(),
   agencyId: agencyIdSchema,
   dateSubmission: zString.regex(dateRegExp, "La date de saisie est invalide."),
   dateStart: zString.regex(dateRegExp, "La date de démarrage est invalide."),
