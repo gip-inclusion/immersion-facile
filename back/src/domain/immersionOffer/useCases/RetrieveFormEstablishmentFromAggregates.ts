@@ -64,6 +64,8 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
         establishmentAggregate.establishment.address,
       ),
       isEngagedEnterprise: establishmentAggregate.establishment.isCommited,
+      fitForDisabledWorkers:
+        establishmentAggregate.establishment.fitForDisabledWorkers,
       naf: establishmentAggregate.establishment?.nafDto,
       appellations: offersAsAppellationDto,
       businessContact: establishmentAggregate.contact,

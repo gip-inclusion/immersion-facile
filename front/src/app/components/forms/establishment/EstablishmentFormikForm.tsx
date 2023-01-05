@@ -104,6 +104,12 @@ export const EstablishmentFormikForm = ({
               descriptionLink=""
               disabled={false}
             />
+            <BoolCheckboxGroup
+              {...formContents.fitForDisabledWorkers}
+              description=""
+              descriptionLink=""
+              disabled={false}
+            />
             <TextInput {...formContents.website} />
             <TextInput
               {...formContents.additionalInformation}

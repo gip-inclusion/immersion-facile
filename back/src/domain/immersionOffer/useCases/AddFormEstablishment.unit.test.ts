@@ -52,7 +52,9 @@ describe("Add FormEstablishment", () => {
   });
 
   it("saves an establishment in the repository", async () => {
-    const formEstablishment = FormEstablishmentDtoBuilder.valid().build();
+    const formEstablishment = FormEstablishmentDtoBuilder.valid()
+      .withFitForDisabledWorkers(true)
+      .build();
 
     expect(await addFormEstablishment.execute(formEstablishment)).toEqual(
       formEstablishment.siret,

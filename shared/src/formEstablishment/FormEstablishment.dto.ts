@@ -36,6 +36,7 @@ export type FormEstablishmentDto = {
   businessNameCustomized?: string;
   businessAddress: string;
   isEngagedEnterprise?: boolean;
+  fitForDisabledWorkers?: boolean;
   naf?: NafDto; // { code: string, nomenclature: string }
   appellations: AppellationDto[]; // at least one
   businessContact: BusinessContactDto;

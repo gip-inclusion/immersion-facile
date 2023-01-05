@@ -30,6 +30,7 @@ export type EstablishmentEntityV2 = {
   isActive: boolean;
   isSearchable: boolean;
   isCommited?: boolean;
+  fitForDisabledWorkers?: boolean;
   website?: string;
   additionalInformation?: string;
 };

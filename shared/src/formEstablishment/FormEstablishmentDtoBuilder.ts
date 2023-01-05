@@ -23,6 +23,7 @@ const validFormEstablishment: FormEstablishmentDto = {
   businessName: "Ma super entreprise",
   businessNameCustomized: "Ma belle enseigne du quartier",
   isEngagedEnterprise: false,
+  fitForDisabledWorkers: false,
   siret: "01234567890123",
   website: "www@super.com/jobs",
   additionalInformation: "",
@@ -85,6 +86,13 @@ export class FormEstablishmentDtoBuilder
 
   public withBusinessAddress(businessAddress: string) {
     return new FormEstablishmentDtoBuilder({ ...this.dto, businessAddress });
+  }
+
+  public withFitForDisabledWorkers(fitForDisabledWorkers: boolean) {
+    return new FormEstablishmentDtoBuilder({
+      ...this.dto,
+      fitForDisabledWorkers,
+    });
   }
 
   public withMail(email: string) {

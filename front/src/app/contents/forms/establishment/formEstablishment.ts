@@ -78,6 +78,11 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
       "Mon entreprise est membre de la communauté « Les entreprises s'engagent »",
     id: "establishment-isEngagedEnterprise",
   },
+  fitForDisabledWorkers: {
+    label:
+      "Mon entreprise accueille en priorité des personnes en situation de handicap",
+    id: "establishment-fitForDisabledWorkers",
+  },
   appellations: {
     label: "",
     id: "establishment-appellations",

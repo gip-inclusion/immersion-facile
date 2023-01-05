@@ -107,6 +107,7 @@ describe("Insert Establishment aggregate from form data", () => {
       },
     ];
     const formEstablishment = FormEstablishmentDtoBuilder.valid()
+      .withFitForDisabledWorkers(true)
       .withSiret(fakeSiret)
       .withAppellations(professions)
       .withBusinessContact(fakeBusinessContact)
@@ -126,6 +127,7 @@ describe("Insert Establishment aggregate from form data", () => {
         { romeCode: "A1102", appellationCode: "11717" },
       ],
       contactEmail: fakeBusinessContact.email,
+      fitForDisabledWorkers: true,
     });
   });
 
@@ -137,6 +139,7 @@ describe("Insert Establishment aggregate from form data", () => {
       romeCode: string;
       appellationCode?: string;
     }[];
+    fitForDisabledWorkers?: boolean;
   }) => {
     const repoEstablishmentAggregate =
       establishmentAggregateRepo.establishmentAggregates[0];
@@ -149,6 +152,9 @@ describe("Insert Establishment aggregate from form data", () => {
       expected.nafDto,
     );
     expect(repoEstablishmentAggregate.establishment.dataSource).toBe("form");
+    expect(repoEstablishmentAggregate.establishment.fitForDisabledWorkers).toBe(
+      expected.fitForDisabledWorkers,
+    );
 
     // Contact
     expect(repoEstablishmentAggregate.contact).toBeDefined();

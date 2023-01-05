@@ -195,6 +195,7 @@ const makeCreateEstablishmentAggregate =
       isActive: true,
       updatedAt: timeGateway.now(),
       isSearchable: formEstablishment.isSearchable,
+      fitForDisabledWorkers: formEstablishment.fitForDisabledWorkers,
     };
 
     const establishmentAggregate: EstablishmentAggregate = {

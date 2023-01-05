@@ -59,6 +59,7 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z.object(
     additionalInformation: zStringPossiblyEmpty,
     businessAddress: addressWithPostalCodeSchema,
     isEngagedEnterprise: zBoolean.optional(),
+    fitForDisabledWorkers: zBoolean.optional(),
     naf: nafSchema.optional(),
     appellations: z
       .array(appellationDtoSchema)
