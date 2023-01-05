@@ -49,7 +49,7 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
     id: "agency-position",
   },
   logoUrl: {
-    label: "Changer le logo",
+    label: "Téléverser le logo de votre organisme",
     id: "agency-logoUrl",
     description: "Cela permet de personnaliser les mails automatisés.",
   },

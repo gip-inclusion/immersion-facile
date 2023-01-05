@@ -130,7 +130,7 @@ const conventionSection = (internshipKind: InternshipKind) => ({
   },
   isCurrentEmployer: {
     label:
-      "Le bénéficiaire de l’immersion est-il actuellement salarié(e) d’une autre entreprise (que celle où l’immersion va avoir lieu) ?",
+      "Si le bénéficiaire est actuellement salarié d'une entreprise, l'immersion va-t-elle se dérouler pendant le temps de travail habituel ?",
     id: "form-convention-isCurrentEmployer",
     required: true,
   },
