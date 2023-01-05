@@ -17,9 +17,9 @@ import {
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { FillableList } from "src/app/components/forms/commons/FillableList";
-import { SimpleSelect } from "src/app/components/forms/commons/SimpleSelect";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
+import { Select } from "react-design-system";
 
 type AgencyFormCommonFieldsProps = {
   addressInitialValue?: AddressDto;
@@ -60,11 +60,12 @@ export const AgencyFormCommonFields = ({
 
   return (
     <>
-      <SimpleSelect
+      <Select
         {...fieldsContent.kind}
         options={agencyListOfOptions.sort((a, b) =>
           a.label < b.label ? -1 : 0,
         )}
+        placeholder="Veuillez choisir un type de structure"
       />
       <TextInput {...fieldsContent.name} />
       <AddressAutocomplete
@@ -146,10 +147,12 @@ const agencyKindToLabel: Record<
   autre: "Autre",
 };
 
-export const agencyListOfOptions = agencyKindList.map((agencyKind) => ({
-  value: agencyKind,
-  label: agencyKindToLabel[agencyKind],
-}));
+export const agencyListOfOptions = [
+  ...agencyKindList.map((agencyKind) => ({
+    value: agencyKind,
+    label: agencyKindToLabel[agencyKind],
+  })),
+];
 
 type MakeTypedSetField = <T extends Record<string, unknown>>(
   setFieldValue: FormikHelpers<T>["setFieldValue"],

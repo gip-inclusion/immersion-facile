@@ -80,7 +80,6 @@ export const RomeAutocomplete = ({
               {...params.inputProps}
               className={"fr-input"}
               placeholder={placeholder}
-              style={{ backgroundColor: "#fff" }}
               type="text"
             />
           </div>

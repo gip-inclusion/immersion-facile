@@ -16,6 +16,7 @@ export type SelectProps = {
   name?: string;
   onChange?: React.ChangeEventHandler<HTMLSelectElement>;
   className?: string;
+  placeholder?: string;
 };
 
 export const Select = ({
@@ -27,6 +28,7 @@ export const Select = ({
   onChange,
   hideLabel,
   className,
+  placeholder,
 }: SelectProps) => (
   <div className={`fr-select-group ${className ?? ""}`}>
     {!hideLabel && (
@@ -42,6 +44,11 @@ export const Select = ({
       onChange={onChange}
       value={value}
     >
+      {placeholder && (
+        <option value="" disabled selected>
+          {placeholder}
+        </option>
+      )}
       {options.map((option, index) => {
         const { label, value, ...rest } = option;
         return (
