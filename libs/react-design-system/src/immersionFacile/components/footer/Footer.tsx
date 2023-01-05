@@ -6,7 +6,7 @@ export type FooterProps = {
   links?: NavLink[];
   bottomLinks?: NavLink[];
   ministereLogo: React.ReactNode;
-  partnersLogos?: React.ReactNode[];
+  partnersLogos?: React.ReactNode;
 };
 
 const TopLink = ({ link }: { link: NavLink }) => (
@@ -28,12 +28,6 @@ const BottomLink = ({ link }: { link: NavLink }) => (
   </li>
 );
 
-const LogoPartner = ({ children }: { children: React.ReactNode }) => (
-  <div className="fr-footer__partners-link im-footer__partner-link">
-    {children}
-  </div>
-);
-
 export const Footer = ({
   links,
   bottomLinks,
@@ -44,10 +38,7 @@ export const Footer = ({
     <div className="fr-container">
       <div className="fr-footer__body">
         {ministereLogo}
-        {partnersLogos &&
-          partnersLogos.map((logo, i) => (
-            <LogoPartner key={i}>{logo}</LogoPartner>
-          ))}
+        {partnersLogos}
 
         <div className="fr-footer__content im-footer__content">
           {links && links.length > 0 && (

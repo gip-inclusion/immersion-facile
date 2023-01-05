@@ -1,5 +1,6 @@
 import immersionFacileLogo from "/img/Logo-immersion-facilitee-01-RVB-reflets-crop.svg";
 import { makeStyles } from "tss-react/dsfr";
+import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";
 import React from "react";
 import { useDispatch } from "react-redux";
 import { routes, useRoute } from "src/app/routes/routes";
@@ -19,7 +20,14 @@ export const ImmersionHeader = () => {
   const featureFlags = useFeatureFlags();
   const dispatch = useDispatch();
   const currentRoute = useRoute();
-  const { classes } = customStyles();
+  const darkModeState = useIsDark();
+  const { classes } = makeStyles({ name: ImmersionHeader.displayName })(() => ({
+    operator: {
+      width: 95,
+      filter: darkModeState.isDark ? "invert(1) grayscale(1)" : "",
+    },
+  }))();
+
   const isAdminConnected = useAppSelector(adminSelectors.auth.isAuthenticated);
   const tools: HeaderProps["quickAccessItems"] = [];
   if (isAdminConnected) {
@@ -213,9 +221,3 @@ export const ImmersionHeader = () => {
 };
 
 ImmersionHeader.displayName = "ImmersionHeader";
-
-const customStyles = makeStyles({ name: ImmersionHeader.displayName })(() => ({
-  operator: {
-    width: 95,
-  },
-}));

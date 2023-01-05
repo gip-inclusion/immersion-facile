@@ -2,6 +2,8 @@ import lesEntrepriseSengagent from "/img/les-entreprises-s-engagent.svg";
 import poleEmploiLogo from "/img/pole-emploi-logo.svg";
 import plateformeLogo from "/img/plateforme-inclusion-logo.svg";
 import React from "react";
+import { makeStyles, useStyles } from "tss-react/dsfr";
+import { fr } from "@codegouvfr/react-dsfr";
 import { Footer, NavLink } from "react-design-system";
 import {
   OverFooter,
@@ -9,6 +11,7 @@ import {
 } from "react-design-system/immersionFacile";
 import { routes } from "src/app/routes/routes";
 import { immersionFacileContactEmail } from "shared";
+import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";
 
 const getFooterNavLinkId = (chunk: string) => `im-footer-nav__${chunk}`;
 
@@ -26,16 +29,47 @@ export const MinistereLogo = () => (
   </div>
 );
 
-const PoleEmploiLogo = () => (
-  <img src={poleEmploiLogo} alt="Pole Emploi" style={{ margin: "0 1.5rem" }} />
-);
-const EntreprisesLogo = () => (
-  <img src={lesEntrepriseSengagent} alt="Les entreprises s'engagent" />
-);
-
-const PlateformeLogo = () => (
-  <img src={plateformeLogo} alt="Plateforme de l'Inclusion" />
-);
+const PartnersLogos = () => {
+  const { cx } = useStyles();
+  const darkModeState = useIsDark();
+  const { classes } = makeStyles({ name: ImmersionFooter.displayName })(() => ({
+    partnerLogo: {
+      filter: darkModeState.isDark ? "invert(1) grayscale(1)" : "",
+    },
+  }))();
+  return (
+    <>
+      <img
+        src={poleEmploiLogo}
+        alt="Pole Emploi"
+        style={{ margin: "0 1.5rem" }}
+        className={cx(
+          fr.cx("fr-footer__partners-link"),
+          "im-footer__partner-link",
+          classes.partnerLogo,
+        )}
+      />
+      <img
+        src={lesEntrepriseSengagent}
+        alt="Les entreprises s'engagent"
+        className={cx(
+          fr.cx("fr-footer__partners-link"),
+          "im-footer__partner-link",
+          classes.partnerLogo,
+        )}
+      />
+      <img
+        src={plateformeLogo}
+        alt="Plateforme de l'Inclusion"
+        className={cx(
+          fr.cx("fr-footer__partners-link"),
+          "im-footer__partner-link",
+          classes.partnerLogo,
+        )}
+      />
+    </>
+  );
+};
 
 const overFooterCols: OverFooterCols = [
   {
@@ -129,12 +163,10 @@ export const ImmersionFooter = () => (
     <Footer
       links={links}
       ministereLogo={<MinistereLogo />}
-      partnersLogos={[
-        <PoleEmploiLogo />,
-        <EntreprisesLogo />,
-        <PlateformeLogo />,
-      ]}
+      partnersLogos={<PartnersLogos />}
       bottomLinks={bottomsLinks}
     />
   </>
 );
+
+ImmersionFooter.displayName = "ImmersionFooter";

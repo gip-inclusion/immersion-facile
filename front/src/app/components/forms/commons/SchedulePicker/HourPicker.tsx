@@ -1,7 +1,8 @@
 import { ErrorMessage } from "formik";
 import React from "react";
-import { ButtonAdd, ButtonDelete } from "react-design-system/immersionFacile";
+import { ButtonAdd } from "react-design-system/immersionFacile";
 import { TimePeriodDto } from "shared";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 
 type HourPickerProps = {
   name: string;
@@ -92,7 +93,13 @@ export const HourPicker = ({
                   />
                 </div>
 
-                {!disabled && <ButtonDelete onClick={() => remove(index)} />}
+                {!disabled && (
+                  <Button
+                    iconId="fr-icon-delete-bin-line"
+                    title="Supprimer"
+                    onClick={() => remove(index)}
+                  />
+                )}
               </div>
             </div>
           );

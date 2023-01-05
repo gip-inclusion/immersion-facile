@@ -1,6 +1,6 @@
 import { FieldHookConfig } from "formik";
 import React from "react";
-import { ButtonAdd, ButtonDelete } from "react-design-system/immersionFacile";
+import { ButtonAdd } from "react-design-system/immersionFacile";
 import {
   DateIntervalDto,
   DayPeriodsDto,
@@ -8,6 +8,8 @@ import {
   WeekdayNumber,
   WeekDayRangeSchemaDTO,
 } from "shared";
+import { Button } from "@codegouvfr/react-dsfr/Button";
+
 import { WeekdayDropdown } from "./WeekdayDropdown";
 
 type WeekdayPickerProps = {
@@ -100,9 +102,10 @@ export const WeekdayPicker = ({
                     disabled={disabled}
                   />
                 </div>
-                {!disabled && (
-                  <ButtonDelete
-                    isHidden={!isRemovable}
+                {!disabled && isRemovable && (
+                  <Button
+                    iconId="fr-icon-delete-bin-line"
+                    title="Supprimer"
                     disabled={!isRemovable}
                     onClick={() => remove(index)}
                   />

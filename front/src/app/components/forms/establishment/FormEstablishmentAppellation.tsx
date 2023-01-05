@@ -1,8 +1,8 @@
 import { useField } from "formik";
 import React from "react";
-import { ButtonDelete } from "react-design-system/immersionFacile";
 import { AppellationDto } from "shared";
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 
 type ProfessionProps = {
   name: string;
@@ -28,7 +28,11 @@ export const FormEstablishmentAppellation = ({
         />
       </div>
       <div>
-        <ButtonDelete onClick={onDelete} />
+        <Button
+          iconId="fr-icon-delete-bin-line"
+          title="Suppression"
+          onClick={onDelete}
+        />
       </div>
     </div>
   );

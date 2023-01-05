@@ -12,7 +12,7 @@ export const FormSectionTitle = ({ children }: FormSectionTitleProps) => {
       <div className="h-6" />
       <div
         className={
-          "sticky top-0 text-immersionBlue-dark font-semibold py-2 mb-1 bg-white border-b text-lg z-10 flex justify-between"
+          "sticky top-0 text-immersionBlue-dark font-semibold py-2 mb-1 border-b text-lg z-10 flex justify-between"
         }
       >
         <div>{title}</div>
