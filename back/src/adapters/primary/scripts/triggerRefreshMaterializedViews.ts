@@ -1,7 +1,11 @@
 import { Pool } from "pg";
+import { createLogger } from "../../../utils/logger";
 import { AppConfig } from "../config/appConfig";
 
+const logger = createLogger(__filename);
+
 const triggerRefreshMaterializedViews = async () => {
+  logger.info("Starting to refresh materialized views");
   const config = AppConfig.createFromEnv();
 
   const dbUrl = config.pgImmersionDbUrl;
@@ -28,10 +32,10 @@ const triggerRefreshMaterializedViews = async () => {
 /* eslint-disable no-console */
 triggerRefreshMaterializedViews()
   .then(() => {
-    console.log("Finished successfully");
+    logger.info("Finished successfully");
     process.exit(0);
   })
   .catch((error) => {
-    console.error("Script failed with error : ", error);
+    logger.error("Script failed with error : ", error);
     process.exit(1);
   });
