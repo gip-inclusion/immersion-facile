@@ -29,6 +29,7 @@ export const SearchResult = ({
     appellationLabels,
     voluntaryToImmersion,
     website,
+    fitForDisabledWorkers,
     // additionalInformation,
   } = searchResult;
   const distanceKm = ((distance_m ?? 0) / 1000).toFixed(1);
@@ -77,6 +78,11 @@ export const SearchResult = ({
                   voluntaryToImmersion={voluntaryToImmersion}
                 />
               </li>
+              {fitForDisabledWorkers && (
+                <li>
+                  <Label>Priorité aux personnes en situation de handicap</Label>
+                </li>
+              )}
             </ul>
           </div>
           <div className="fr-card__footer">
@@ -115,13 +121,24 @@ type InfoLabelProps = {
 
 const InfoLabel = ({ contactMode, voluntaryToImmersion }: InfoLabelProps) => {
   const luckyGuess = typeof contactMode === "undefined";
-  const className = `fr-badge ${
-    voluntaryToImmersion ? "fr-badge--blue-cumulus" : ""
-  } ${luckyGuess ? "fr-badge--purple-glycine" : ""}`;
+  const className = [
+    ...(voluntaryToImmersion ? ["fr-badge--blue-cumulus"] : []),
+    ...(luckyGuess ? ["fr-badge--purple-glycine"] : []),
+  ].join(" ");
+
   const label = voluntaryToImmersion
     ? "Entreprise accueillante"
     : "Tentez votre chance";
+
   return voluntaryToImmersion || luckyGuess ? (
-    <div className={className}>{label}</div>
+    <Label className={className}>{label}</Label>
   ) : null;
 };
+
+const Label = ({
+  children,
+  className,
+}: {
+  children: string;
+  className?: string;
+}) => <div className={`fr-badge ${className}`}>{children}</div>;

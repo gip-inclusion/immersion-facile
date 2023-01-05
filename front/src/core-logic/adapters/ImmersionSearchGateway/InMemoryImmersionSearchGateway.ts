@@ -78,6 +78,7 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     siret: "12345678901234",
     name: "Super Corp",
     voluntaryToImmersion: true,
+    fitForDisabledWorkers: true,
     position: { lat: 48.8666, lon: 2.3333 },
     address: defaultAddress,
     contactMode: "EMAIL",

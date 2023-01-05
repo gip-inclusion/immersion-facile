@@ -1,3 +1,4 @@
+import { fr } from "@codegouvfr/react-dsfr";
 import CommentIcon from "@mui/icons-material/Comment";
 import LaunchIcon from "@mui/icons-material/Launch";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
@@ -55,6 +56,7 @@ export const EnterpriseSearchResult = ({
     voluntaryToImmersion,
     website,
     additionalInformation,
+    fitForDisabledWorkers,
   } = searchResult;
   const distanceKm = ((distance_m ?? 0) / 1000).toFixed(1);
   return (
@@ -77,6 +79,11 @@ export const EnterpriseSearchResult = ({
           contactMode={contactMode}
           voluntaryToImmersion={voluntaryToImmersion}
         />
+        {fitForDisabledWorkers && (
+          <div className={fr.cx("fr-badge", "fr-m-1w")}>
+            Priorité aux personnes en situation de handicap
+          </div>
+        )}
       </div>
       <SearchResultInfo
         icon={
@@ -146,15 +153,13 @@ const InfoLabel = ({
     );
   }
 
-  switch (contactMode) {
-    case undefined:
-      return (
-        <div className={allStyles}>
-          <Icon kind="star-s-line" /> Tentez votre chance
-        </div>
-      );
-
-    default:
-      return null;
+  if (contactMode) {
+    return (
+      <div className={allStyles}>
+        <Icon kind="star-s-line" /> Tentez votre chance
+      </div>
+    );
   }
+
+  return null;
 };
