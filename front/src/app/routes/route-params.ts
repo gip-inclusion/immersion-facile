@@ -61,6 +61,7 @@ export const conventionValuesFromUrl = {
   emergencyContactPhone: param.query.optional.string,
   emergencyContactEmail: param.query.optional.string,
   birthdate: param.query.optional.string,
+  departmentCode: param.query.optional.string,
 
   brEmail: param.query.optional.string,
   brFirstName: param.query.optional.string,
@@ -75,7 +76,6 @@ export const conventionValuesFromUrl = {
   bceBusinessName: param.query.optional.string,
   bceJob: param.query.optional.string,
 
-  postalCode: param.query.optional.string,
   siret: param.query.optional.string,
   businessName: param.query.optional.string,
   etFirstName: param.query.optional.string,

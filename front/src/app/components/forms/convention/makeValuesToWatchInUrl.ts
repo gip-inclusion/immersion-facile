@@ -9,6 +9,7 @@ const commonKeysToWatch: ConventionFormKeysInUrl[] = [
   "firstName",
   "lastName",
   "phone",
+  "birthdate",
   "emergencyContact",
   "emergencyContactPhone",
   "dateStart",
@@ -89,6 +90,7 @@ const convertToConventionInUrl = (
     erPhone: establishmentRepresentative.phone,
     firstName: beneficiary.firstName,
     lastName: beneficiary.lastName,
+    birthdate: beneficiary.birthdate,
     email: beneficiary.email,
     phone: beneficiary.phone,
     emergencyContact: beneficiary.emergencyContact,
@@ -101,9 +103,8 @@ export const makeValuesToWatchInUrl = (conventionDto: ConventionDto) => {
   const conventionInUrl = convertToConventionInUrl(conventionDto);
   const keysToWatch: ConventionFormKeysInUrl[] = [
     ...commonKeysToWatch,
-    "postalCode",
+    "departmentCode",
   ];
-
   return keysToWatch.reduce(
     (acc, watchedKey) => ({
       ...acc,

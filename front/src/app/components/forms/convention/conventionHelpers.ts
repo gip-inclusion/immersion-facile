@@ -3,6 +3,7 @@ import {
   ConventionDto,
   ConventionId,
   ConventionStatus,
+  DepartmentCode,
   EstablishmentTutor,
   FederatedIdentity,
   ImmersionObjective,
@@ -38,6 +39,10 @@ type WithEstablishmentTutor = {
   establishmentTutor: EstablishmentTutor;
 };
 
+type WithDepartmentCode = {
+  departmentCode: DepartmentCode;
+};
+
 type WithIntershipKind = {
   internshipKind: InternshipKind;
 };
@@ -48,7 +53,8 @@ export type ConventionPresentation = OmitFromExistingKeys<
 > &
   WithSignatures &
   WithEstablishmentTutor &
-  WithIntershipKind;
+  WithIntershipKind &
+  WithDepartmentCode;
 
 export const conventionInitialValuesFromUrl = ({
   route,
@@ -146,9 +152,7 @@ export const conventionInitialValuesFromUrl = ({
           }
         : undefined,
     },
-
-    postalCode: params.postalCode ?? "",
-
+    departmentCode: params.departmentCode ?? "",
     dateStart,
     dateEnd,
 

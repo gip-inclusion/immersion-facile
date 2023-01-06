@@ -38,13 +38,17 @@ export const AgencySelector = ({
     getFormFields();
   const [{ value, onBlur }, { touched, error }, { setValue }] =
     useField<AgencyId>(agencyIdField.name || "agencyId");
-
+  const [
+    { value: departmentCodeValue },
+    _,
+    { setValue: setDepartmentCodeValue },
+  ] = useField<DepartmentCode | null>(
+    departmentCodeField.name || "departmentCode",
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [loadingError, setLoadingError] = useState(false);
-  const [departmentCode, setDepartmentCode] = useState<DepartmentCode | null>(
-    null,
-  );
+
   const [agencies, setAgencies] = useState([
     {
       id: "",
@@ -54,13 +58,13 @@ export const AgencySelector = ({
   const federatedIdentity = useFederatedIdentity();
 
   useEffect(() => {
-    if (!departmentCode) return;
+    if (!departmentCodeValue) return;
 
     setIsLoading(true);
     agenciesRetriever({
       internshipKind,
       shouldListAll,
-      departmentCode,
+      departmentCode: departmentCodeValue,
       federatedIdentity,
     })
       .then((agencies: any) => {
@@ -93,7 +97,7 @@ export const AgencySelector = ({
       .finally(() => {
         setIsLoading(false);
       });
-  }, [departmentCode]);
+  }, [departmentCodeValue]);
 
   const userError = touched && error;
   const showError = userError || loadingError;
@@ -104,7 +108,8 @@ export const AgencySelector = ({
       <Select
         options={departmentOptions}
         {...departmentCodeField}
-        onChange={(event) => setDepartmentCode(event.currentTarget.value)}
+        onChange={(event) => setDepartmentCodeValue(event.currentTarget.value)}
+        value={departmentCodeValue as string}
       />
 
       <AgencyDropdownListField
@@ -116,7 +121,7 @@ export const AgencySelector = ({
         value={value}
         onBlur={onBlur}
         agencies={agencies}
-        departmentCode={departmentCode}
+        departmentCode={departmentCodeValue}
         setValue={setValue}
       />
       {showError && (
