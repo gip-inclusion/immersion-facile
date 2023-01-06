@@ -24,7 +24,7 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
   const timeGateway = new RealTimeGateway();
 
   const emailGateway =
-    config.emailGateway === "SENDINBLUE"
+    config.emailGateway === "SENDINBLUE_HTML"
       ? new SendinblueHtmlEmailGateway(
           axios,
           makeEmailAllowListPredicate({
