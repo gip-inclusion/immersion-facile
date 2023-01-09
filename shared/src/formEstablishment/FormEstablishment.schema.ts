@@ -5,6 +5,7 @@ import { siretSchema } from "../siret/siret";
 import { NotEmptyArray, phoneRegExp } from "../utils";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import {
+  localization,
   zBoolean,
   zEmail,
   zString,
@@ -34,7 +35,7 @@ export const businessContactSchema: z.Schema<BusinessContactDto> = z.object({
   lastName: zTrimmedString,
   firstName: zTrimmedString,
   job: zTrimmedString,
-  phone: zString.regex(phoneRegExp, "Numero de téléphone incorrect"),
+  phone: zString.regex(phoneRegExp, localization.invalidPhone),
   email: zEmail,
   contactMethod: preferredContactMethodSchema,
   copyEmails: z.array(zEmail),
@@ -63,9 +64,8 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z.object(
     naf: nafSchema.optional(),
     appellations: z
       .array(appellationDtoSchema)
-      .min(1, "Spécifiez au moins 1 métier"),
+      .min(1, localization.atLeastOneJob),
     businessContact: businessContactSchema,
     isSearchable: zBoolean,
   },
-  { required_error: "Veuillez compléter le formulaire" },
 );

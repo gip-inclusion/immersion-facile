@@ -12,6 +12,8 @@ export const localization = {
   invalidDateEnd: "Le format de la date de fin est invalide",
   invalidEmailFormat: "Veuillez saisir une adresse e-mail valide",
   invalidDateStartDateEnd: "La date de fin doit être après la date de début.",
+  atLeastOneEmail: "Vous devez renseigner au moins un email",
+  atLeastOneJob: "Vous devez renseigner au moins un métier",
   invalidValidationFormatDate:
     "Le format de la date de validation est invalide.",
   invalidPostalCode: "Veuillez spécifier un code postal dans l'adresse.",

@@ -2,7 +2,7 @@ import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { addressSchema } from "../address/address.schema";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
-import { zEmail, zString, zTrimmedString } from "../zodUtils";
+import { localization, zEmail, zString, zTrimmedString } from "../zodUtils";
 import {
   AgencyDto,
   AgencyId,
@@ -63,7 +63,7 @@ const createAgencyShape = {
   position: geoPositionSchema,
   counsellorEmails: z.array(zEmail),
   validatorEmails: z.array(zEmail).refine((emails) => emails.length > 0, {
-    message: "Vous devez renseigner au moins un email de validation",
+    message: localization.atLeastOneEmail,
   }),
   questionnaireUrl: z.string().optional(),
   signature: zString,
