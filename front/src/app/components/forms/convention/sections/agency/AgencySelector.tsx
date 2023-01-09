@@ -52,7 +52,7 @@ export const AgencySelector = ({
   const [agencies, setAgencies] = useState([
     {
       id: "",
-      name: departmentCodeField.placeholder,
+      name: departmentCodeField.placeholder ?? "",
     },
   ]);
   const federatedIdentity = useFederatedIdentity();
