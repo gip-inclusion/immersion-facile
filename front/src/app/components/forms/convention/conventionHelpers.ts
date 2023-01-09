@@ -21,6 +21,7 @@ import { ConventionUkrainePageRoute } from "src/app/pages/convention/ConventionF
 import { ConventionInUrl } from "src/app/routes/route-params";
 import { ENV } from "src/config/environmentVariables";
 import { v4 as uuidV4 } from "uuid";
+import { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
 
 export const isConventionFrozen = (
   convention: Partial<ConventionDto>,
@@ -63,7 +64,8 @@ export const conventionInitialValuesFromUrl = ({
   route:
     | ConventionMiniStagePageRoute
     | ConventionImmersionPageRoute
-    | ConventionUkrainePageRoute;
+    | ConventionUkrainePageRoute
+    | ConventionImmersionForExternalsRoute;
   internshipKind: InternshipKind;
 }): ConventionPresentation => {
   const dataFromDevice = deviceRepository.get("partialConventionInUrl") ?? {};

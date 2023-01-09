@@ -23,6 +23,7 @@ import { HomePage } from "../pages/home/HomePage";
 import { ImmersionAssessmentPage } from "../pages/immersion-assessment/ImmersionAssessmentPage";
 import { StandardPageSlugs, standardPageSlugs } from "./route-params";
 import { routes, useRoute } from "./routes";
+import { ConventionPageForExternals } from "../pages/convention/ConventionPageForExternals";
 
 export const Router = () => {
   const route = useRoute();
@@ -55,6 +56,9 @@ export const Router = () => {
 
       {route.name === "conventionImmersion" && (
         <ConventionImmersionPage route={route} />
+      )}
+      {route.name === "conventionImmersionForExternals" && (
+        <ConventionPageForExternals route={route} />
       )}
       {route.name === "conventionMiniStage" && (
         <ConventionMiniStagePage route={route} />

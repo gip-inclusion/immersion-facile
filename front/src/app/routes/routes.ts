@@ -48,6 +48,14 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { jwt: param.query.optional.string, ...conventionValuesFromUrl },
     () => `/${frontRoutes.conventionImmersionRoute}`,
   ),
+  conventionImmersionForExternals: defineRoute(
+    {
+      consumer: param.path.string,
+      jwt: param.query.optional.string,
+      ...conventionValuesFromUrl,
+    },
+    (params) => `/${frontRoutes.conventionImmersionRoute}/${params.consumer}`,
+  ),
   conventionMiniStage: defineRoute(
     { jwt: param.query.optional.string, ...conventionValuesFromUrl },
     () => `/${frontRoutes.conventionMiniStageRoute}`,
