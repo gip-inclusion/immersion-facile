@@ -7,7 +7,12 @@ import {
   ScheduleDto,
 } from "./Schedule.dto";
 import { dayPeriodsSchema, timePeriodsSchema } from "./Schedule.schema";
-import { emptySchedule, frenchDayMapping } from "./ScheduleUtils";
+import {
+  calculateNumberOfWorkedDays,
+  calculateTotalImmersionHoursFromComplexSchedule,
+  emptySchedule,
+  frenchDayMapping,
+} from "./ScheduleUtils";
 
 const emptyRegularSchedule: RegularScheduleDto = {
   dayPeriods: [[0, 6]],
@@ -77,6 +82,9 @@ export class ScheduleDtoBuilder implements Builder<ScheduleDto> {
 
     return new ScheduleDtoBuilder({
       ...this.dto,
+      workedDays: calculateNumberOfWorkedDays(complexSchedule),
+      totalHours:
+        calculateTotalImmersionHoursFromComplexSchedule(complexSchedule),
       isSimple: true,
       complexSchedule,
     });
@@ -96,6 +104,13 @@ export class ScheduleDtoBuilder implements Builder<ScheduleDto> {
       isSimple: false,
       complexSchedule,
     });
+  }
+
+  public withTotalHours(totalHours: number) {
+    return new ScheduleDtoBuilder({ ...this.dto, totalHours });
+  }
+  public withWorkedDays(workedDays: number) {
+    return new ScheduleDtoBuilder({ ...this.dto, workedDays });
   }
 
   public build() {

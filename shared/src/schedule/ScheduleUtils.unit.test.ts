@@ -1,8 +1,10 @@
+import { expectToEqual } from "../expectToEqual";
 import { weekdays, DayPeriodsDto } from "./Schedule.dto";
 import { scheduleSchema, isoStringSchema } from "./Schedule.schema";
 import { ScheduleDtoBuilder } from "./ScheduleDtoBuilder";
 import {
   calculateTotalImmersionHoursBetweenDate,
+  calculateTotalImmersionHoursFromComplexSchedule,
   convertToFrenchNamedDays,
   dayPeriodsFromComplexSchedule,
   isArrayOfWeekdays,
@@ -137,6 +139,8 @@ describe("ScheduleUtils", () => {
     it("prints schedules with schedule that have no timeperiod", () => {
       expect(
         prettyPrintSchedule({
+          totalHours: 12,
+          workedDays: 4,
           isSimple: false,
           selectedIndex: 6,
           complexSchedule: [
@@ -144,8 +148,8 @@ describe("ScheduleUtils", () => {
               date: "2022-07-18T00:00:00.000Z",
               timePeriods: [
                 {
-                  end: "17:00",
                   start: "14:00",
+                  end: "17:00",
                 },
               ],
             },
@@ -157,12 +161,12 @@ describe("ScheduleUtils", () => {
               date: "2022-07-20T00:00:00.000Z",
               timePeriods: [
                 {
-                  end: "12:00",
                   start: "10:00",
+                  end: "12:00",
                 },
                 {
-                  end: "16:00",
                   start: "14:00",
+                  end: "16:00",
                 },
               ],
             },
@@ -170,8 +174,8 @@ describe("ScheduleUtils", () => {
               date: "2022-07-21T00:00:00.000Z",
               timePeriods: [
                 {
-                  end: "16:00",
                   start: "14:00",
+                  end: "16:00",
                 },
               ],
             },
@@ -183,8 +187,8 @@ describe("ScheduleUtils", () => {
               date: "2022-07-23T00:00:00.000Z",
               timePeriods: [
                 {
-                  end: "12:00",
                   start: "09:00",
+                  end: "12:00",
                 },
               ],
             },
@@ -254,6 +258,34 @@ describe("ScheduleUtils", () => {
       expect(isArrayOfWeekdays([1, 2, 3])).toBe(false);
       expect(isArrayOfWeekdays(["Lundi"])).toBe(false);
       expect(isArrayOfWeekdays(["lundi", "MARDI"])).toBe(false);
+    });
+  });
+
+  describe("CalculateTotalImmersionHoursFromComplexSchedule", () => {
+    it("calculates correctly the total number of hours from a complex schedule", () => {
+      const schedule = new ScheduleDtoBuilder()
+        .withEmptyComplexSchedule({
+          start: new Date("2022-06-06"),
+          end: new Date("2022-06-10"),
+        })
+        .withRegularSchedule({
+          dayPeriods: [
+            [0, 0],
+            [2, 3],
+          ],
+          timePeriods: [
+            { start: "09:00", end: "12:30" },
+            { start: "14:00", end: "18:00" },
+          ],
+        })
+        .build();
+
+      expectToEqual(
+        calculateTotalImmersionHoursFromComplexSchedule(
+          schedule.complexSchedule,
+        ),
+        22.5,
+      );
     });
   });
 
@@ -468,6 +500,45 @@ describe("ScheduleUtils", () => {
           .build();
 
         expect(() => scheduleSchema.parse(emptySchedule)).toThrow();
+      });
+      describe("check matching totalHours and worked days", () => {
+        const scheduleBuilder = new ScheduleDtoBuilder()
+          .withEmptyComplexSchedule({
+            start: new Date("2022-06-06"),
+            end: new Date("2022-06-10"),
+          })
+          .withRegularSchedule({
+            dayPeriods: [
+              [0, 0],
+              [2, 3],
+            ],
+            timePeriods: [
+              { start: "09:00", end: "12:30" },
+              { start: "14:00", end: "18:00" },
+            ],
+          });
+
+        it("does not validate schema if totalHours do not match calculated one", () => {
+          const schedule = scheduleBuilder.withTotalHours(3).build();
+          expect(() => scheduleSchema.parse(schedule)).toThrow();
+        });
+
+        it("validates schema if totalHours matches calculated one", () => {
+          const schedule = scheduleBuilder.withTotalHours(22.5).build();
+          const validated = scheduleSchema.parse(schedule);
+          expectToEqual(validated.totalHours, 22.5);
+        });
+
+        it("does not validate schema if workedDays do not match calculated one", () => {
+          const schedule = scheduleBuilder.withWorkedDays(1).build();
+          expect(() => scheduleSchema.parse(schedule)).toThrow();
+        });
+
+        it("validates schema if workedDays matches calculated one", () => {
+          const schedule = scheduleBuilder.withWorkedDays(3).build();
+          const validated = scheduleSchema.parse(schedule);
+          expectToEqual(validated.workedDays, 3);
+        });
       });
     });
 

@@ -48,14 +48,6 @@ export const calculateWeeklyHoursFromSchedule = (schedule: ScheduleDto) =>
 export const isArrayOfWeekdays = (value: any): boolean =>
   Array.isArray(value) && value.every((el) => weekdays.includes(el));
 
-export const prettyPrintDayFromSchedule = (
-  schedule: ScheduleDto,
-  dayIndex: number,
-): string => {
-  const complexSchedule = schedule.complexSchedule;
-  return prettyPrintDaySchedule(complexSchedule[dayIndex].timePeriods);
-};
-
 type DatesOfImmersion = {
   dateStart: string;
   dateEnd: string;
@@ -111,11 +103,18 @@ const reasonableTimePeriods: TimePeriodsDto = [
     end: "16:00",
   },
 ];
-export const reasonableSchedule = (interval: DateIntervalDto): ScheduleDto => ({
-  isSimple: true,
-  selectedIndex: 0,
-  complexSchedule: makeComplexSchedule(interval, reasonableTimePeriods),
-});
+export const reasonableSchedule = (interval: DateIntervalDto): ScheduleDto => {
+  const complexSchedule = makeComplexSchedule(interval, reasonableTimePeriods);
+
+  return {
+    totalHours:
+      calculateTotalImmersionHoursFromComplexSchedule(complexSchedule),
+    workedDays: calculateNumberOfWorkedDays(complexSchedule),
+    isSimple: true,
+    selectedIndex: 0,
+    complexSchedule,
+  };
+};
 
 export const frenchDayMapping = (
   originalDate: string,
@@ -181,6 +180,10 @@ const isPeriodsOverlap = (
 const periodToHumanReadableString = (period: TimePeriodDto): string =>
   "(" + period.start + " - " + period.end + ")";
 
+export const calculateNumberOfWorkedDays = (
+  complexSchedule: DailyScheduleDto[],
+): number => complexSchedule.filter((v) => v.timePeriods.length > 0).length;
+
 export const validateSchedule = (schedule: ScheduleDto): string | undefined => {
   const totalWeeksHours = calculateWeeklyHoursFromSchedule(schedule);
   for (const [totalHoursIndex, totalHours] of totalWeeksHours.entries()) {
@@ -189,6 +192,17 @@ export const validateSchedule = (schedule: ScheduleDto): string | undefined => {
         totalHoursIndex + 1
       }.`;
   }
+
+  const totalHoursFromComplexSchedule =
+    calculateTotalImmersionHoursFromComplexSchedule(schedule.complexSchedule);
+
+  if (totalHoursFromComplexSchedule !== schedule.totalHours)
+    return `Le nombre total d'heure ne correspond pas à celui du calendrier. Calcul du calendrier: ${totalHoursFromComplexSchedule}, Nombre total heures fourni: ${schedule.totalHours}`;
+
+  const workedDays = calculateNumberOfWorkedDays(schedule.complexSchedule);
+  if (workedDays !== schedule.workedDays)
+    return `Le nombre total de jours travaillés ne correspond pas à celui du calendrier. Calcul du calendrier: ${workedDays}, Nombre de jours fourni: ${schedule.workedDays}`;
+
   for (const dailySchedule of schedule.complexSchedule) {
     for (const [periodIndex, period] of dailySchedule.timePeriods.entries()) {
       // Check if all periods are positive.
@@ -265,26 +279,6 @@ export const prettyPrintComplexSchedule = (
         : freeDay;
       return dayToPush !== "" && lines.push(dayToPush);
     });
-  });
-  return lines.join("\n");
-};
-
-export const prettyPrintComplexScheduleSummary = (
-  complexSchedule: DailyScheduleDto[],
-): string => {
-  const lines: string[] = [];
-  makeImmersionTimetable(complexSchedule).forEach((week) => {
-    week.forEach(
-      (day) =>
-        day.dailySchedule &&
-        lines.push(
-          `${
-            frenchDayMapping(day.dailySchedule.date).frenchDayName
-          } ${toFrenchReadableDate(
-            day.dailySchedule.date,
-          )} : ${prettyPrintDaySchedule(day.dailySchedule.timePeriods)}`,
-        ),
-    );
   });
   return lines.join("\n");
 };
@@ -427,6 +421,8 @@ export const regularTimePeriods = (schedule: ScheduleDto): TimePeriodsDto => {
 export const emptySchedule = (
   interval: DateIntervalDto,
 ): Readonly<ScheduleDto> => ({
+  totalHours: 0,
+  workedDays: 0,
   isSimple: false,
   selectedIndex: 0,
   complexSchedule: makeComplexSchedule(interval, []),
@@ -435,6 +431,8 @@ export const emptySchedule = (
 export const scheduleWithFirstDayActivity = (
   interval: DateIntervalDto,
 ): Readonly<ScheduleDto> => ({
+  totalHours: 7,
+  workedDays: 0,
   isSimple: false,
   selectedIndex: 0,
   complexSchedule: makeComplexSchedule(interval, []).map((schedule) => {

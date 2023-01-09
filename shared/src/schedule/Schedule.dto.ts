@@ -10,6 +10,8 @@ export type Weekday =
   | "dimanche";
 
 export type ScheduleDto = {
+  totalHours: number;
+  workedDays: number;
   isSimple: boolean;
   selectedIndex: number; // TODO this is a view constraint and should be removed
   complexSchedule: DailyScheduleDto[];
