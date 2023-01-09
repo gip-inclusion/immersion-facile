@@ -38,6 +38,7 @@ export const requiredBoolean = {
 };
 
 export const zString = z.string(requiredText).min(1, localization.required);
+export const zStringCanBeEmpty = z.string(requiredText);
 
 export const zStringPossiblyEmpty = zString
   .optional()

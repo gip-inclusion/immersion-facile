@@ -10,12 +10,6 @@ describe("SendEmailWhenAgencyIsActivated", () => {
     const updatedAgency = AgencyDtoBuilder.create()
       .withValidatorEmails(["toto@email.com"])
       .withName("just-activated-agency")
-      .withAddress({
-        postcode: "75001",
-        city: "Paris",
-        streetNumberAndAddress: "24 rue de la rue",
-        departmentCode: "75",
-      })
       .build();
 
     // Act
