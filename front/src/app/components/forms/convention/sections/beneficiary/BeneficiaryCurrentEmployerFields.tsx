@@ -1,9 +1,12 @@
 import React, { useEffect } from "react";
-import { getConventionFieldName, Role } from "shared";
+import { useFormikContext } from "formik";
+
+import { ConventionDto, getConventionFieldName, Role } from "shared";
 import { Notification } from "react-design-system";
-import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { useField } from "formik";
+import { useFormContents } from "src/app/hooks/formContents.hooks";
+import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 
 type BeneficiaryCurrentEmployerFieldsProperties = {
   disabled: boolean | undefined;
@@ -12,7 +15,12 @@ type BeneficiaryCurrentEmployerFieldsProperties = {
 export const BeneficiaryCurrentEmployerFields = ({
   disabled,
 }: BeneficiaryCurrentEmployerFieldsProperties): JSX.Element => {
-  const t = useConventionTextsFromFormikContext();
+  const { values } = useFormikContext<ConventionDto>();
+
+  const { getFormFields } = useFormContents(
+    formConventionFieldsLabels(values.internshipKind),
+  );
+  const formFields = getFormFields();
   const [, , { setValue: setBeneficiaryCurrentEmployer }] = useField(
     getConventionFieldName("signatories.beneficiaryCurrentEmployer"),
   );
@@ -44,77 +52,31 @@ export const BeneficiaryCurrentEmployerFields = ({
         </p>
       </Notification>
       <TextInput
-        label={
-          t.beneficiarySection.beneficiaryCurrentEmployer.businessSiretLabel
-        }
-        name={getConventionFieldName(
-          "signatories.beneficiaryCurrentEmployer.businessSiret",
-        )}
-        type="text"
-        placeholder=""
-        description=""
+        {...formFields["signatories.beneficiaryCurrentEmployer.businessSiret"]}
         disabled={disabled}
       />
       <TextInput
-        label={
-          t.beneficiarySection.beneficiaryCurrentEmployer.businessNameLabel
-        }
-        name={getConventionFieldName(
-          "signatories.beneficiaryCurrentEmployer.businessName",
-        )}
-        type="text"
-        placeholder=""
-        description=""
+        {...formFields["signatories.beneficiaryCurrentEmployer.businessName"]}
         disabled={disabled}
       />
       <TextInput
-        label={t.beneficiarySection.beneficiaryCurrentEmployer.firstNameLabel}
-        name={getConventionFieldName(
-          "signatories.beneficiaryCurrentEmployer.firstName",
-        )}
-        type="text"
-        placeholder=""
-        description=""
+        {...formFields["signatories.beneficiaryCurrentEmployer.firstName"]}
         disabled={disabled}
       />
       <TextInput
-        label={t.beneficiarySection.beneficiaryCurrentEmployer.lastNameLabel}
-        name={getConventionFieldName(
-          "signatories.beneficiaryCurrentEmployer.lastName",
-        )}
-        type="text"
-        placeholder=""
-        description=""
+        {...formFields["signatories.beneficiaryCurrentEmployer.lastName"]}
         disabled={disabled}
       />
       <TextInput
-        label={t.beneficiarySection.beneficiaryCurrentEmployer.jobLabel}
-        name={getConventionFieldName(
-          "signatories.beneficiaryCurrentEmployer.job",
-        )}
-        type="text"
-        placeholder=""
-        description=""
+        {...formFields["signatories.beneficiaryCurrentEmployer.job"]}
         disabled={disabled}
       />
       <TextInput
-        label={t.beneficiarySection.beneficiaryCurrentEmployer.phoneLabel}
-        name={getConventionFieldName(
-          "signatories.beneficiaryCurrentEmployer.phone",
-        )}
-        type="text"
-        placeholder=""
-        description=""
+        {...formFields["signatories.beneficiaryCurrentEmployer.phone"]}
         disabled={disabled}
       />
       <TextInput
-        label={t.beneficiarySection.beneficiaryCurrentEmployer.emailLabel}
-        name={getConventionFieldName(
-          "signatories.beneficiaryCurrentEmployer.email",
-        )}
-        type="text"
-        placeholder=""
-        description=""
+        {...formFields["signatories.beneficiaryCurrentEmployer.email"]}
         disabled={disabled}
       />
     </>

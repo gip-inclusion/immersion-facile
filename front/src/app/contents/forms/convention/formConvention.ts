@@ -265,7 +265,8 @@ const beneficiaryRepresentativeSection = {
 const beneficiaryCurrentEmployerSection = {
   "signatories.beneficiaryCurrentEmployer.businessName": {
     label: "Raison sociale de l'entreprise",
-    id: "",
+    id: "form-convention-signatories-beneficiaryCurrentEmployer-businessName",
+    required: true,
   },
   "signatories.beneficiaryCurrentEmployer.job": {
     label: "Fonction",
@@ -274,22 +275,27 @@ const beneficiaryCurrentEmployerSection = {
   "signatories.beneficiaryCurrentEmployer.email": {
     label: "E-mail",
     id: "form-convention-signatories-beneficiaryCurrentEmployer-phone",
+    required: true,
   },
   "signatories.beneficiaryCurrentEmployer.phone": {
     label: "Téléphone",
     id: "form-convention-signatories-beneficiaryCurrentEmployer-phone",
+    required: true,
   },
   "signatories.beneficiaryCurrentEmployer.firstName": {
     label: "Prénom",
     id: "form-convention-signatories-beneficiaryCurrentEmployer-firstName",
+    required: true,
   },
   "signatories.beneficiaryCurrentEmployer.lastName": {
     label: "Nom de famille",
     id: "form-convention-signatories-beneficiaryCurrentEmployer-phone",
+    required: true,
   },
   "signatories.beneficiaryCurrentEmployer.businessSiret": {
     label: "Siret",
     id: "form-convention-signatories-beneficiaryCurrentEmployer-businessSiret",
+    required: true,
   },
 };
 
