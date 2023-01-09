@@ -16,6 +16,7 @@ import { BeneficiaryEmergencyContactFields } from "./BeneficiaryEmergencyContact
 import { BeneficiaryRepresentativeFields } from "./BeneficiaryRepresentativeFields";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
+import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 
 type beneficiaryFormSectionProperties = {
   isFrozen: boolean | undefined;
@@ -24,6 +25,8 @@ export const BeneficiaryFormSection = ({
   isFrozen,
 }: beneficiaryFormSectionProperties): JSX.Element => {
   const isMinor = useAppSelector(conventionSelectors.isMinor);
+  const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
+
   const hasCurrentEmployer = useAppSelector(
     conventionSelectors.hasCurrentEmployer,
   );
@@ -35,18 +38,19 @@ export const BeneficiaryFormSection = ({
     formConventionFieldsLabels(values.internshipKind),
   );
   const formContents = getFormFields();
+  const isPEConnected = federatedIdentity?.includes("peConnect:");
   return (
     <>
       <FormSectionTitle>{t.beneficiarySection.title}</FormSectionTitle>
       <TextInput
         {...formContents["signatories.beneficiary.firstName"]}
         type="text"
-        disabled={isFrozen}
+        disabled={isFrozen || isPEConnected}
       />
       <TextInput
         {...formContents["signatories.beneficiary.lastName"]}
         type="text"
-        disabled={isFrozen}
+        disabled={isFrozen || isPEConnected}
       />
       <DateInput
         {...formContents["signatories.beneficiary.birthdate"]}
@@ -61,7 +65,7 @@ export const BeneficiaryFormSection = ({
       <TextInput
         {...formContents["signatories.beneficiary.email"]}
         type="email"
-        disabled={isFrozen}
+        disabled={isFrozen || isPEConnected}
       />
       {values.signatories.beneficiary.email && <ConventionEmailWarning />}
       <TextInput
