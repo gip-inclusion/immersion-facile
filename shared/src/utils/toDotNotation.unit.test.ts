@@ -18,14 +18,14 @@ describe("toDotNotation utils", () => {
   });
   it("should transform a nested object to a flat object using dot notation on a form errors object", () => {
     const sample = {
-      siret: "Obligatoire",
+      siret: localization.required,
       businessAddress: "Veuillez spécifier un code postal dans l'adresse.",
       businessContact: {
         email: "Required",
       },
     };
     const expected = {
-      siret: "Obligatoire",
+      siret: localization.required,
       businessAddress: "Veuillez spécifier un code postal dans l'adresse.",
       "businessContact.email": "Required",
     };

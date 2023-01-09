@@ -17,6 +17,7 @@ import {
   zStringPossiblyEmptyWithMax,
   zTrimmedString,
   zTrimmedStringWithMax,
+  localization,
 } from "../zodUtils";
 import { getConventionFieldName } from "./convention";
 import {
@@ -27,7 +28,6 @@ import {
   ConventionDtoWithoutExternalId,
   ConventionExternalId,
   ConventionId,
-  conventionObjectiveOptions,
   ConventionReadDto,
   conventionStatuses,
   conventionStatusesWithJustification,
@@ -35,6 +35,7 @@ import {
   EstablishmentRepresentative,
   EstablishmentTutor,
   GenerateMagicLinkRequestDto,
+  ImmersionObjectiveEnum,
   RenewMagicLinkRequestDto,
   Signatories,
   UpdateConventionRequestDto,
@@ -57,7 +58,7 @@ export const externalConventionIdSchema: z.ZodSchema<ConventionExternalId> =
   zTrimmedString;
 
 const roleSchema = z.enum(allRoles);
-const phoneSchema = zString.regex(phoneRegExp, "Numéro de téléphone incorrect");
+const phoneSchema = zString.regex(phoneRegExp, localization.invalidPhone);
 
 const signatorySchema = z.object({
   role: roleSchema,
@@ -75,7 +76,7 @@ const beneficiarySchema: z.Schema<Beneficiary> = signatorySchema.merge(
     emergencyContactPhone: phoneSchema.optional().or(z.literal("")),
     emergencyContactEmail: zEmailPossiblyEmpty,
     federatedIdentity: federatedIdentitySchema.optional(),
-    birthdate: zString.regex(dateRegExp, "La date de saisie est invalide."),
+    birthdate: zString.regex(dateRegExp, localization.invalidDate),
   }),
 );
 
@@ -113,17 +114,21 @@ const beneficiaryCurrentEmployerSchema: z.Schema<BeneficiaryCurrentEmployer> =
     }),
   );
 
+const immersionObjectiveNativeEnum = z.nativeEnum(ImmersionObjectiveEnum, {
+  errorMap: () => ({ message: localization.invalidImmersionObjective }),
+});
+
 const conventionWithoutExternalIdZObject = z.object({
   id: conventionIdSchema,
   externalId: externalConventionIdSchema.optional(),
   status: z.enum(conventionStatuses),
   rejectionJustification: z.string().optional(),
   agencyId: agencyIdSchema,
-  dateSubmission: zString.regex(dateRegExp, "La date de saisie est invalide."),
-  dateStart: zString.regex(dateRegExp, "La date de démarrage est invalide."),
-  dateEnd: zString.regex(dateRegExp, "La date de fin invalide."),
+  dateSubmission: zString.regex(dateRegExp, localization.invalidDate),
+  dateStart: zString.regex(dateRegExp, localization.invalidDateStart),
+  dateEnd: zString.regex(dateRegExp, localization.invalidDateEnd),
   dateValidation: zString
-    .regex(dateRegExp, "La date de validation invalide.")
+    .regex(dateRegExp, localization.invalidValidationFormatDate)
     .optional(),
   siret: siretSchema,
   businessName: zTrimmedString,
@@ -133,7 +138,8 @@ const conventionWithoutExternalIdZObject = z.object({
   sanitaryPrevention: zBoolean,
   sanitaryPreventionDescription: zStringPossiblyEmptyWithMax(255),
   immersionAddress: addressWithPostalCodeSchema,
-  immersionObjective: z.enum(conventionObjectiveOptions),
+
+  immersionObjective: immersionObjectiveNativeEnum,
   immersionAppellation: appellationDtoSchema,
   immersionActivities: zTrimmedStringWithMax(2000),
   immersionSkills: zStringPossiblyEmptyWithMax(2000),
@@ -150,7 +156,7 @@ const conventionWithoutExternalIdZObject = z.object({
 export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExternalId> =
   conventionWithoutExternalIdZObject
     .refine(startDateIsBeforeEndDate, {
-      message: "La date de fin doit être après la date de début.",
+      message: localization.invalidDateStartDateEnd,
       path: [getConventionFieldName("dateEnd")],
     })
     .refine(underMaxCalendarDuration, getConventionTooLongMessageAndPath)
@@ -176,7 +182,7 @@ export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExt
             .some((otherSignatory) => otherSignatory.email === signatory.email)
         )
           addIssue(
-            "Les emails des signataires doivent être différents.",
+            localization.signatoriesDistinctEmails,
             getConventionFieldName(`signatories.${signatory.key}.email`),
           );
       });
@@ -188,12 +194,12 @@ export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExt
         )
       )
         addIssue(
-          "Le mail du tuteur doit être différent des mails du bénéficiaire, de son représentant légal et de son employeur actuel.",
+          localization.beneficiaryTutorEmailMustBeDistinct,
           getConventionFieldName("establishmentTutor.email"),
         );
     })
     .refine(mustBeSignedByEveryone, {
-      message: "La confirmation de votre accord est obligatoire.",
+      message: localization.mustBeSignedByEveryone,
       path: [getConventionFieldName("status")],
     });
 

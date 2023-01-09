@@ -58,7 +58,14 @@ export const conventionObjectiveOptions = [
   "Découvrir un métier ou un secteur d'activité",
   "Initier une démarche de recrutement",
 ] as const;
+
 export type ImmersionObjective = typeof conventionObjectiveOptions[number];
+
+export enum ImmersionObjectiveEnum {
+  "Confirmer un projet professionnel",
+  "Découvrir un métier ou un secteur d'activité",
+  "Initier une démarche de recrutement",
+}
 
 export type WithJustification = { justification: string };
 
@@ -82,7 +89,7 @@ export type ConventionDtoWithoutExternalId = {
   sanitaryPrevention: boolean;
   sanitaryPreventionDescription: string;
   immersionAddress: string;
-  immersionObjective: ImmersionObjective;
+  immersionObjective: ImmersionObjectiveEnum;
   immersionAppellation: AppellationDto;
   immersionActivities: string;
   immersionSkills: string;

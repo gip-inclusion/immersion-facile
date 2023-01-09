@@ -2,42 +2,64 @@ import { Logger } from "pino";
 import { preprocess, z } from "zod";
 import { timeHHmmRegExp } from "./utils/date";
 
-export const zString = z
-  .string({
-    required_error: "Obligatoire",
-    invalid_type_error: "Une chaine de caractères est attendue",
-  })
-  .min(1, "Obligatoire");
+export const localization = {
+  required: "Obligatoire",
+  expectText: "Une chaine de caractères est attendue",
+  maxCharacters: (max: number) => `Le maximum est de ${max} caractères`,
+  invalidTimeFormat: "Le format de l'heure est invalide",
+  invalidDate: "Le format de la date saisie est invalide",
+  invalidDateStart: "Le format de la date de début est invalide",
+  invalidDateEnd: "Le format de la date de fin est invalide",
+  invalidEmailFormat: "Veuillez saisir une adresse e-mail valide",
+  invalidDateStartDateEnd: "La date de fin doit être après la date de début.",
+  invalidValidationFormatDate:
+    "Le format de la date de validation est invalide.",
+  invalidPostalCode: "Veuillez spécifier un code postal dans l'adresse.",
+  invalidImmersionObjective: "Vous devez choisir un objectif d'immersion",
+  expectedBoolean: "La sélection d'une valeur (oui/non) est obligatoire",
+  invalidPhone: "Numéro de téléphone incorrect",
+  signatoriesDistinctEmails:
+    "Les emails des signataires doivent être différents.",
+  beneficiaryTutorEmailMustBeDistinct:
+    "Le mail du tuteur doit être différent des mails du bénéficiaire, de son représentant légal et de son employeur actuel.",
+  mustBeSignedByEveryone: "La confirmation de votre accord est obligatoire.",
+};
+
+export const requiredText = {
+  required_error: localization.required,
+  invalid_type_error: localization.expectText,
+};
+
+export const requiredBoolean = {
+  required_error: localization.required,
+  invalid_type_error: localization.expectText,
+};
+
+export const zString = z.string(requiredText).min(1, localization.required);
 
 export const zStringPossiblyEmpty = zString
   .optional()
   .or(z.literal("")) as z.Schema<string>;
 
-export const maxMessage = (max: number) =>
-  `Le maximum est de ${max} caractères`;
-
 export const zStringPossiblyEmptyWithMax = (max: number) =>
   zString
-    .max(max, maxMessage(max))
+    .max(max, localization.maxCharacters(max))
     .optional()
     .or(z.literal("")) as z.Schema<string>;
 
 export const zTrimmedString = zString
   .transform((s) => s.trim())
-  .refine((s) => s.length > 0, "Obligatoire");
+  .refine((s) => s.length > 0, localization.required);
 
 export const zTrimmedStringWithMax = (max: number) =>
   zString
-    .max(max, maxMessage(max))
+    .max(max, localization.maxCharacters(max))
     .transform((s) => s.trim())
-    .refine((s) => s.length > 0, "Obligatoire");
+    .refine((s) => s.length > 0, localization.required);
 
 export const zTimeString = z
-  .string({
-    required_error: "Obligatoire",
-    invalid_type_error: "Une chaine de caractères est attendue",
-  })
-  .regex(timeHHmmRegExp, "Le format de l'heure est invalide");
+  .string(requiredText)
+  .regex(timeHHmmRegExp, localization.invalidTimeFormat);
 
 export const makezTrimmedString = (message: string) =>
   zString.transform((s) => s.trim()).refine((s) => s.length > 0, message);
@@ -49,22 +71,19 @@ const removeAccents = (value: unknown) => {
 
 export const zEmail = z.preprocess(
   removeAccents,
-  z.string().email("Veuillez saisir une adresse e-mail valide"),
+  z.string(requiredText).email(localization.invalidEmailFormat),
 );
 
 export const zEmailPossiblyEmpty = z.preprocess(
   removeAccents,
   z
     .string()
-    .email("Veuillez saisir une adresse e-mail valide")
+    .email(localization.invalidEmailFormat)
     .optional()
     .or(z.literal("")),
 );
 
-export const zBoolean = z.boolean({
-  required_error: "Sélection obligatoire",
-  invalid_type_error: "Un booléen est attendu",
-});
+export const zBoolean = z.boolean(requiredBoolean);
 
 export const zPreprocessedBoolean = () =>
   preprocess((candidate) => {

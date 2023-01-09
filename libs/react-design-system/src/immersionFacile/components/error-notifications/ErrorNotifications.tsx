@@ -24,7 +24,7 @@ const ErrorMessage = ({
     </strong>{" "}
     :{" "}
     <span className={`${componentName}__error-message`}>
-      {typeof error === "string" ? error : "Obligatoire"}
+      {typeof error === "string" ? error : localization.required}
     </span>
   </>
 );
