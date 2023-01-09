@@ -52,7 +52,7 @@ export const AgencySelector = ({
   const [agencies, setAgencies] = useState([
     {
       id: "",
-      name: "Veuillez indiquer un code postal",
+      name: departmentCodeField.placeholder,
     },
   ]);
   const federatedIdentity = useFederatedIdentity();
@@ -71,7 +71,7 @@ export const AgencySelector = ({
         setAgencies([
           {
             id: "",
-            name: "",
+            name: "Veuillez sélectionner une structure",
           },
           ...agencies,
         ]);

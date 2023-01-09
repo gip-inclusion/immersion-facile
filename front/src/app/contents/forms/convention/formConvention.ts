@@ -41,6 +41,7 @@ const conventionSection = (internshipKind: InternshipKind) => ({
     label: "Votre département",
     id: "form-convention-departmentCode",
     required: true,
+    placeholder: "Veuillez sélectionner un département",
   },
   agencyId: {
     label: "Votre structure d'accompagnement",
