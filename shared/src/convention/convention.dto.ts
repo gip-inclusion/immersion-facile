@@ -89,7 +89,7 @@ export type ConventionDtoWithoutExternalId = {
   sanitaryPrevention: boolean;
   sanitaryPreventionDescription: string;
   immersionAddress: string;
-  immersionObjective: ImmersionObjectiveEnum;
+  immersionObjective: ImmersionObjective;
   immersionAppellation: AppellationDto;
   immersionActivities: string;
   immersionSkills: string;

@@ -18,6 +18,7 @@ import {
   zTrimmedString,
   zTrimmedStringWithMax,
   localization,
+  zEnumValidation,
 } from "../zodUtils";
 import { getConventionFieldName } from "./convention";
 import {
@@ -28,6 +29,7 @@ import {
   ConventionDtoWithoutExternalId,
   ConventionExternalId,
   ConventionId,
+  conventionObjectiveOptions,
   ConventionReadDto,
   conventionStatuses,
   conventionStatusesWithJustification,
@@ -35,7 +37,7 @@ import {
   EstablishmentRepresentative,
   EstablishmentTutor,
   GenerateMagicLinkRequestDto,
-  ImmersionObjectiveEnum,
+  ImmersionObjective,
   RenewMagicLinkRequestDto,
   Signatories,
   UpdateConventionRequestDto,
@@ -114,9 +116,11 @@ const beneficiaryCurrentEmployerSchema: z.Schema<BeneficiaryCurrentEmployer> =
     }),
   );
 
-const immersionObjectiveNativeEnum = z.nativeEnum(ImmersionObjectiveEnum, {
-  errorMap: () => ({ message: localization.invalidImmersionObjective }),
-});
+const immersionObjectiveSchema: z.Schema<ImmersionObjective> =
+  zEnumValidation<ImmersionObjective>(
+    conventionObjectiveOptions,
+    localization.invalidImmersionObjective,
+  );
 
 const conventionWithoutExternalIdZObject = z.object({
   id: conventionIdSchema,
@@ -138,8 +142,7 @@ const conventionWithoutExternalIdZObject = z.object({
   sanitaryPrevention: zBoolean,
   sanitaryPreventionDescription: zStringPossiblyEmptyWithMax(255),
   immersionAddress: addressWithPostalCodeSchema,
-
-  immersionObjective: immersionObjectiveNativeEnum,
+  immersionObjective: immersionObjectiveSchema,
   immersionAppellation: appellationDtoSchema,
   immersionActivities: zTrimmedStringWithMax(2000),
   immersionSkills: zStringPossiblyEmptyWithMax(2000),
