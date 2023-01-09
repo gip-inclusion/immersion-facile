@@ -118,10 +118,10 @@ export const parseZodSchemaAndLogErrorOnParsingFailure = <T>(
   }
 };
 
-export const zEnumValidation = <T>(
+export const zEnumValidation = <T extends string>(
   values: readonly T[],
   errorMessage: string,
 ): z.ZodType<T, z.ZodTypeDef, T> =>
-  z.custom((val) => values.includes(val as T), {
+  z.custom((val: unknown): val is T => values.includes(val as T), {
     message: errorMessage,
   });
