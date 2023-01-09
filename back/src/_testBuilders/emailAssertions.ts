@@ -44,7 +44,7 @@ export const expectEmaiSignatoryConfirmationSignatureRequestMatchingConvention =
       {
         id,
         role: signatory.role,
-        email: beneficiary.email,
+        email: signatory.email,
         now,
       };
 
