@@ -55,6 +55,8 @@ const postProcessing: Partial<
 > = {
   conventions: (row: ExportedRow) => ({
     ...row,
+    "Date de début": toFrenchShortDate(row["Date de début"] as string),
+    "Date de fin": toFrenchShortDate(row["Date de fin"] as string),
     Programme: prettyPrintComplexSchedule(
       row["Programme"] as DailyScheduleDto[],
     ),
@@ -63,3 +65,10 @@ const postProcessing: Partial<
     ),
   }),
 };
+
+const toFrenchShortDate = (isoString: string): string =>
+  new Date(isoString).toLocaleString("fr-FR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
