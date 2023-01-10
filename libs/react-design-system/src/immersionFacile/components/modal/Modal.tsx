@@ -1,4 +1,4 @@
-import classNames from "classnames";
+import classNames, { ArgumentArray } from "classnames";
 import React, { Children, cloneElement, useEffect } from "react";
 
 import ReactDOM from "react-dom";
@@ -20,7 +20,7 @@ export type ModalDialogProperties = {
   children?: React.ReactNode | React.ReactNode[];
   id?: string;
   size?: "sm" | "md" | "lg";
-  className?: string | object | [];
+  className?: ArgumentArray;
   canClose?: boolean;
 };
 

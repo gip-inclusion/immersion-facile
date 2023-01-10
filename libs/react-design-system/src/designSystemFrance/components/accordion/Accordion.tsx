@@ -1,4 +1,4 @@
-import classNames from "classnames";
+import classNames, { ArgumentArray } from "classnames";
 import React, {
   Children,
   cloneElement,
@@ -10,7 +10,7 @@ import React, {
 } from "react";
 
 export type AccordionProperties = {
-  className?: string | object | [];
+  className?: ArgumentArray;
   children: React.ReactNode;
   as: ElementType;
   size: "sm" | "md" | "lg";

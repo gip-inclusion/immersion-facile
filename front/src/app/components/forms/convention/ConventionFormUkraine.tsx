@@ -1,15 +1,15 @@
-import { Formik, FormikProps, FormikValues } from "formik";
+import { Formik, FormikProps } from "formik";
 import React from "react";
 import { Title } from "react-design-system/immersionFacile";
 import { useDispatch } from "react-redux";
 import { conventionUkraineSchema } from "shared";
+import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { ConventionFormFieldsUkraine } from "src/app/components/forms/convention/ConventionFormFieldsUkraine";
 import { ConventionPresentation } from "src/app/components/forms/convention/conventionHelpers";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
-import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
 
 type ConventionFormProps = {
   properties: ConventionPresentation;
@@ -31,7 +31,7 @@ export const ConventionFormUkraine = ({ properties }: ConventionFormProps) => {
           dispatch(conventionSlice.actions.saveConventionRequested(convention));
         }}
       >
-        {(props: FormikProps<FormikValues>) => (
+        {(props: FormikProps<ConventionPresentation>): JSX.Element => (
           <div>
             <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
               <ConventionFormFieldsUkraine />

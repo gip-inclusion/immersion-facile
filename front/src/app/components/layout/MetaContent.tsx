@@ -1,8 +1,8 @@
 import React from "react";
 import { routes, useRoute } from "src/app/routes/routes";
 import { Route } from "type-route";
-import { Helmet } from "react-helmet";
 import { StandardPageSlugs } from "src/app/routes/route-params";
+import { Helmet, HelmetProvider } from "react-helmet-async";
 import {
   adminMetaContent,
   MetaContentType,
@@ -16,19 +16,21 @@ export const MetaContent = (): JSX.Element => {
   const contents = getMetaContents(route);
 
   return (
-    <Helmet>
-      <title>
-        {contents
-          ? `${contents.title} - PMSMP: Immersion Facile`
-          : defaultMetaContents.title}
-      </title>
-      <meta
-        name="description"
-        content={
-          contents ? contents.description : defaultMetaContents.description
-        }
-      />
-    </Helmet>
+    <HelmetProvider>
+      <Helmet>
+        <title>
+          {contents
+            ? `${contents.title} - PMSMP: Immersion Facile`
+            : defaultMetaContents.title}
+        </title>
+        <meta
+          name="description"
+          content={
+            contents ? contents.description : defaultMetaContents.description
+          }
+        />
+      </Helmet>
+    </HelmetProvider>
   );
 };
 

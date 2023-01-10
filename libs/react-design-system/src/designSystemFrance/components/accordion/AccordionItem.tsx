@@ -1,4 +1,4 @@
-import classNames from "classnames";
+import classNames, { ArgumentArray } from "classnames";
 import React, {
   ElementType,
   FC,
@@ -28,7 +28,7 @@ type AccordionItemProps = {
     id: number,
   ) => void;
   children?: React.ReactNode;
-  className?: string | object | [];
+  className?: ArgumentArray;
   id?: number | string;
   initExpand?: boolean;
   size?: "sm" | "md" | "lg";
@@ -149,7 +149,7 @@ export const AccordionDSFRItem = forwardRef(
 
 AccordionDSFRItem.defaultProps = {
   titleAs: "h3",
-  className: "",
+  className: [""],
   initExpand: false,
   expandedItems: [],
   size: "md",

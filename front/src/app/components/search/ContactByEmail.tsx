@@ -61,40 +61,42 @@ export const ContactByEmail = ({
     >
       {({ errors, submitCount }) => (
         <Form>
-          <p className="pb-6">
-            Cette entreprise a choisi d'être contactée par mail. Veuillez
-            compléter ce formulaire qui sera transmis à l'entreprise.
-          </p>
-          <TextInput
-            label="Votre email *"
-            name={getName("potentialBeneficiaryEmail")}
-          />
-          <TextInput
-            label="Votre prénom *"
-            name={getName("potentialBeneficiaryFirstName")}
-          />
-          <TextInput
-            label="Votre nom *"
-            name={getName("potentialBeneficiaryLastName")}
-          />
-          <TextInput
-            label="Votre message *"
-            name={getName("message")}
-            type="text"
-            multiline
-          />
-          {submitCount !== 0 &&
-            Object.values(errors).length > 0 &&
-            //eslint-disable-next-line no-console
-            console.log("onSubmit error", { errors })}
-          <Button
-            level="secondary"
-            type="submit"
-            disable={isSubmitting}
-            id="im-contact-establishment__contact-email-button"
-          >
-            Envoyer
-          </Button>
+          <>
+            <p className="pb-6">
+              Cette entreprise a choisi d'être contactée par mail. Veuillez
+              compléter ce formulaire qui sera transmis à l'entreprise.
+            </p>
+            <TextInput
+              label="Votre email *"
+              name={getName("potentialBeneficiaryEmail")}
+            />
+            <TextInput
+              label="Votre prénom *"
+              name={getName("potentialBeneficiaryFirstName")}
+            />
+            <TextInput
+              label="Votre nom *"
+              name={getName("potentialBeneficiaryLastName")}
+            />
+            <TextInput
+              label="Votre message *"
+              name={getName("message")}
+              type="text"
+              multiline
+            />
+            {submitCount !== 0 &&
+              Object.values(errors).length > 0 &&
+              //eslint-disable-next-line no-console
+              console.log("onSubmit error", { errors })}
+            <Button
+              level="secondary"
+              type="submit"
+              disable={isSubmitting}
+              id="im-contact-establishment__contact-email-button"
+            >
+              Envoyer
+            </Button>
+          </>
         </Form>
       )}
     </Formik>

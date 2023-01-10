@@ -60,5 +60,5 @@ Default.args = {
       </ul>
     </AccordionDSFRItem>,
   ],
-  className: "w-full max-w-3xl",
+  className: ["w-full max-w-3xl"],
 };

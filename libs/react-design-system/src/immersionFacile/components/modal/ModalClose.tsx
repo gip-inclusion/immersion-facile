@@ -1,4 +1,4 @@
-import classNames from "classnames";
+import classNames, { ArgumentArray } from "classnames";
 import React from "react";
 import { HideCallback } from "./Modal";
 
@@ -6,7 +6,7 @@ type ModalCloseProperties = {
   hide: HideCallback;
   title: string;
   children?: JSX.Element;
-  className?: string | object | [];
+  className?: ArgumentArray;
 };
 
 export const ModalClose = ({

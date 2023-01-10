@@ -1,8 +1,8 @@
-import classNames from "classnames";
+import classNames, { ArgumentArray } from "classnames";
 import React from "react";
 
 export type FileProperties = {
-  className?: string | object | [];
+  className?: ArgumentArray;
   label: string;
   multiple?: boolean;
   onChange?: React.ChangeEventHandler<HTMLInputElement> | undefined;

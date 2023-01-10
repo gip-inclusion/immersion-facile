@@ -13,7 +13,7 @@ export const OurAdvices = () => (
       entreprises signalées comme “entreprises accueillantes”. Pour les autres,
       voici nos conseils :
     </p>
-    <AccordionDSFR keepOpen={true} className="w-full max-w-3xl ">
+    <AccordionDSFR keepOpen={true} className={["w-full max-w-3xl"]}>
       <AccordionDSFRItem
         title={
           <SubTitle>

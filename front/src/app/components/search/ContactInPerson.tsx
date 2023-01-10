@@ -50,42 +50,44 @@ export const ContactInPerson = ({
     >
       {({ errors, submitCount }) => (
         <Form>
-          <p className={"fr-my-2w"}>
-            Cette entreprise souhaite que vous vous présentiez directement pour
-            candidater.
-          </p>
-          <p className={"fr-my-2w"}>
-            Merci de nous indiquer vos coordonnées. Vous recevrez par e-mail le
-            nom de la personne à contacter ainsi que des conseils pour présenter
-            votre demande d’immersion. Ces informations sont personnelles et
-            confidentielles. Elles ne peuvent pas être communiquées à d’autres
-            personnes.
-          </p>
-          <p className={"fr-my-2w"}>Merci !</p>
-          <TextInput
-            label="Votre email *"
-            name={getName("potentialBeneficiaryEmail")}
-          />
-          <TextInput
-            label="Votre prénom *"
-            name={getName("potentialBeneficiaryFirstName")}
-          />
-          <TextInput
-            label="Votre nom *"
-            name={getName("potentialBeneficiaryLastName")}
-          />
-          {submitCount !== 0 &&
-            Object.values(errors).length > 0 &&
-            //eslint-disable-next-line no-console
-            console.log("onSubmit Error", { errors })}
-          <Button
-            level="secondary"
-            type="submit"
-            disable={isSubmitting}
-            id="im-contact-establishment__contact-in-person-button"
-          >
-            Envoyer
-          </Button>
+          <>
+            <p className={"fr-my-2w"}>
+              Cette entreprise souhaite que vous vous présentiez directement
+              pour candidater.
+            </p>
+            <p className={"fr-my-2w"}>
+              Merci de nous indiquer vos coordonnées. Vous recevrez par e-mail
+              le nom de la personne à contacter ainsi que des conseils pour
+              présenter votre demande d’immersion. Ces informations sont
+              personnelles et confidentielles. Elles ne peuvent pas être
+              communiquées à d’autres personnes.
+            </p>
+            <p className={"fr-my-2w"}>Merci !</p>
+            <TextInput
+              label="Votre email *"
+              name={getName("potentialBeneficiaryEmail")}
+            />
+            <TextInput
+              label="Votre prénom *"
+              name={getName("potentialBeneficiaryFirstName")}
+            />
+            <TextInput
+              label="Votre nom *"
+              name={getName("potentialBeneficiaryLastName")}
+            />
+            {submitCount !== 0 &&
+              Object.values(errors).length > 0 &&
+              //eslint-disable-next-line no-console
+              console.log("onSubmit Error", { errors })}
+            <Button
+              level="secondary"
+              type="submit"
+              disable={isSubmitting}
+              id="im-contact-establishment__contact-in-person-button"
+            >
+              Envoyer
+            </Button>
+          </>
         </Form>
       )}
     </Formik>

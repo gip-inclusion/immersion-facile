@@ -140,88 +140,93 @@ const SignFormSpecific = ({ jwt }: SignFormSpecificProps) => {
 
   return (
     <SignPageLayout>
-      <h2>
-        Formulaire pour conventionner une période de mise en situation
-        professionnelle (PMSMP)
-      </h2>
+      <>
+        <h2>
+          Formulaire pour conventionner une période de mise en situation
+          professionnelle (PMSMP)
+        </h2>
 
-      <div className="fr-text">
-        Voici la demande de convention qui vient d'être complétée. <br />
-        Relisez la bien et si cela vous convient, signez la avec le bouton "je
-        signe cette demande"
-        <p className="fr-text--xs fr-mt-1w">
-          Ce formulaire vaut équivalence du CERFA 13912 * 04
-        </p>
-      </div>
-      <Formik
-        enableReinitialize={true}
-        initialValues={convention}
-        validationSchema={toFormikValidationSchema(conventionSchema)}
-        onSubmit={(values, { setErrors, setSubmitting }) => {
-          if (!currentSignatory) return;
+        <div className="fr-text">
+          Voici la demande de convention qui vient d'être complétée. <br />
+          Relisez la bien et si cela vous convient, signez la avec le bouton "je
+          signe cette demande"
+          <p className="fr-text--xs fr-mt-1w">
+            Ce formulaire vaut équivalence du CERFA 13912 * 04
+          </p>
+        </div>
+        <Formik
+          enableReinitialize={true}
+          initialValues={convention}
+          validationSchema={toFormikValidationSchema(conventionSchema)}
+          onSubmit={(values, { setErrors, setSubmitting }) => {
+            if (!currentSignatory) return;
 
-          // Confirm checkbox
-          const { signedAtFieldName, signatory } = signatoryDataFromConvention(
-            mergeDeepRight(
-              convention as ConventionDto,
-              values as ConventionDto,
-            ) as ConventionDto,
-            currentSignatory.role,
-          );
+            // Confirm checkbox
+            const { signedAtFieldName, signatory } =
+              signatoryDataFromConvention(
+                mergeDeepRight(
+                  convention as ConventionDto,
+                  values as ConventionDto,
+                ) as ConventionDto,
+                currentSignatory.role,
+              );
 
-          const conditionsAccepted = !!signatory?.signedAt;
+            const conditionsAccepted = !!signatory?.signedAt;
 
-          if (!conditionsAccepted) {
-            setErrors({
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              [signedAtFieldName!]: "La signature est obligatoire",
-            });
+            if (!conditionsAccepted) {
+              setErrors({
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                [signedAtFieldName!]: "La signature est obligatoire",
+              });
 
-            setSubmitting(false);
-            return;
-          }
+              setSubmitting(false);
+              return;
+            }
 
-          dispatch(
-            conventionSlice.actions.signConventionRequested({
-              jwt,
-              role: signatory.role,
-              signedAt: new Date().toISOString(),
-            }),
-          );
-        }}
-      >
-        {(props) => {
-          if (Object.values(props.errors).length > 0) {
-            // eslint-disable-next-line no-console
-            console.log("Erros in form : ", props.errors);
-          }
+            dispatch(
+              conventionSlice.actions.signConventionRequested({
+                jwt,
+                role: signatory.role,
+                signedAt: new Date().toISOString(),
+              }),
+            );
+          }}
+        >
+          {(props) => {
+            if (Object.values(props.errors).length > 0) {
+              // eslint-disable-next-line no-console
+              console.log("Erros in form : ", props.errors);
+            }
 
-          return (
-            <div>
-              <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
-                {currentSignatory && (
-                  <ConventionFormFields
-                    isFrozen={true}
-                    isSignOnly={true}
-                    signatory={currentSignatory}
-                    onModificationsRequired={askFormModificationWithMessageForm}
+            return (
+              <div>
+                <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
+                  {currentSignatory && (
+                    <ConventionFormFields
+                      isFrozen={true}
+                      isSignOnly={true}
+                      signatory={currentSignatory}
+                      onModificationsRequired={
+                        askFormModificationWithMessageForm
+                      }
+                    />
+                  )}
+                  {Object.values(props.errors).length > 0 && (
+                    <div style={{ color: "red" }}>
+                      Veuillez corriger les champs erronés
+                    </div>
+                  )}
+
+                  <ConventionFeedbackNotification
+                    submitFeedback={submitFeedback}
+                    signatories={props.values.signatories}
                   />
-                )}
-                {Object.values(props.errors).length > 0 && (
-                  <div style={{ color: "red" }}>
-                    Veuillez corriger les champs erronés
-                  </div>
-                )}
-
-                <ConventionFeedbackNotification
-                  submitFeedback={submitFeedback}
-                  signatories={props.values.signatories}
-                />
-              </form>
-            </div>
-          );
-        }}
-      </Formik>
+                </form>
+              </div>
+            );
+          }}
+        </Formik>
+      </>
     </SignPageLayout>
   );
 };
@@ -262,7 +267,11 @@ const ConventionNeedsModificationMessage = (props: { jwt: string }) => (
   </SignPageLayout>
 );
 
-const SignPageLayout: React.FC = ({ children }) => (
+const SignPageLayout = ({
+  children,
+}: {
+  children: React.ReactElement;
+}): JSX.Element => (
   <div className="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
     <div className="fr-col-lg-8 fr-p-2w">{children}</div>
   </div>

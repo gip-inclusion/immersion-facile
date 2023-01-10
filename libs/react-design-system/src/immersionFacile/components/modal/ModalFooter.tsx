@@ -1,9 +1,9 @@
-import classNames from "classnames";
+import classNames, { ArgumentArray } from "classnames";
 import React from "react";
 
 type ModalFooterProperties = {
   children: JSX.Element;
-  className: string | object | [];
+  className: ArgumentArray;
 };
 
 export const ModalFooter = ({ children, className }: ModalFooterProperties) => (

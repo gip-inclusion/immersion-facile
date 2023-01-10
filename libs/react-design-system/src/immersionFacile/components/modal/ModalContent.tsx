@@ -1,9 +1,9 @@
-import classNames from "classnames";
+import classNames, { ArgumentArray } from "classnames";
 import React from "react";
 
 type ModalContentProperties = {
   children: React.ReactNode;
-  className: string | object | [];
+  className: ArgumentArray;
 };
 
 export const ModalContent = ({

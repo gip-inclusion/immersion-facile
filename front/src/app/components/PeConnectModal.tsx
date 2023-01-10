@@ -59,7 +59,7 @@ export const PeConnectModal = ({
   return (
     <ModalDialog isOpen={modalState.isOpen} hide={hide}>
       <ModalClose hide={hide} title="Fermer la fenêtre" />
-      <ModalContent className={"fr-modal__content-inner"}>
+      <ModalContent className={["fr-modal__content-inner"]}>
         <Title>Activer une demande de convention</Title>
         <InitiateConventionCard
           title="Activer une demande de convention"

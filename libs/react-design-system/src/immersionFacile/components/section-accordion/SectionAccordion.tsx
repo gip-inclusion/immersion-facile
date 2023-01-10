@@ -19,7 +19,7 @@ export const SectionAccordion = () => (
       </p>
       <AccordionDSFR
         keepOpen={true}
-        className="fr-col-12 fr-col-offset-md-2 fr-col-md-8"
+        className={["fr-col-12 fr-col-offset-md-2 fr-col-md-8"]}
       >
         <AccordionDSFRItem
           title={"Comment contacter un employeur pour faire une immersion ?"}
