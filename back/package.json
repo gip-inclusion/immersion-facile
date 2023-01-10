@@ -39,7 +39,7 @@
     "axios": "^0.26.1",
     "body-parser": "^1.20.0",
     "bottleneck": "^2.19.5",
-    "date-fns": "^2.28.0",
+    "date-fns": "2.28.0",
     "dotenv": "^16.0.0",
     "exceljs": "^4.3.0",
     "express": "^4.17.3",
