@@ -152,14 +152,6 @@ export const ImmersionHeader = () => {
             id: getHeaderNavLinkId("agency-form-convention"),
           },
         },
-        {
-          text: "Recherche V2",
-          isActive: false,
-          linkProps: {
-            ...routes.searchV2().link,
-            id: getHeaderNavLinkId("admin-search-v2"),
-          },
-        },
       ],
     },
   ];
@@ -184,6 +176,14 @@ export const ImmersionHeader = () => {
           linkProps: {
             ...routes.adminTab({ tab: "emails" }).link,
             id: getHeaderNavLinkId("admin-emails"),
+          },
+        },
+        {
+          text: "Recherche V2",
+          isActive: false,
+          linkProps: {
+            ...routes.searchV2().link,
+            id: getHeaderNavLinkId("admin-search-v2"),
           },
         },
       ],
