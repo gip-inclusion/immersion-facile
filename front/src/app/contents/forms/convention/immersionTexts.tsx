@@ -44,7 +44,6 @@ export const immersionTexts = {
   agencySection: {
     title: "Pour commencer nous avons besoin de",
     yourAgencyLabel: "Votre structure d'accompagnement",
-    yourPostalcodeLabel: "Votre code postal",
   },
   beneficiarySection: {
     title: "1. Informations du candidat",
