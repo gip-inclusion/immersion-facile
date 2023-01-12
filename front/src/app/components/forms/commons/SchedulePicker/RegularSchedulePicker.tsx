@@ -1,6 +1,8 @@
 import { useField } from "formik";
 import React from "react";
 import {
+  calculateNumberOfWorkedDays,
+  calculateTotalImmersionHoursFromComplexSchedule,
   calculateWeeklyHoursFromSchedule,
   ConventionDto,
   DailyScheduleDto,
@@ -59,6 +61,13 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
               }),
             );
             const schedule: ScheduleDto = { ...field.value, complexSchedule };
+            schedule.totalHours =
+              calculateTotalImmersionHoursFromComplexSchedule(
+                schedule.complexSchedule,
+              );
+            schedule.workedDays = calculateNumberOfWorkedDays(
+              schedule.complexSchedule,
+            );
             setValue(schedule);
           }}
           disabled={props.disabled}

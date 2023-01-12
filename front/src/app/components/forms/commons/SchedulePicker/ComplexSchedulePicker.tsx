@@ -1,6 +1,11 @@
 import { useField } from "formik";
 import React from "react";
-import { ConventionDto, ScheduleDto } from "shared";
+import {
+  calculateNumberOfWorkedDays,
+  calculateTotalImmersionHoursFromComplexSchedule,
+  ConventionDto,
+  ScheduleDto,
+} from "shared";
 import { DayPicker } from "./DayPicker";
 import { HourPicker } from "./HourPicker";
 
@@ -36,6 +41,12 @@ export const ComplexSchedulePicker = ({
           const schedule: ScheduleDto = { ...field.value };
           schedule.complexSchedule[schedule.selectedIndex].timePeriods =
             newHours;
+          schedule.totalHours = calculateTotalImmersionHoursFromComplexSchedule(
+            schedule.complexSchedule,
+          );
+          schedule.workedDays = calculateNumberOfWorkedDays(
+            schedule.complexSchedule,
+          );
           setValue(schedule);
         }}
         disabled={disabled}
