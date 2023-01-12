@@ -19,7 +19,18 @@ export const useConventionWatchValuesInUrl = (
       !!route.params.jwt
     )
       return;
-    routes.conventionImmersion(watchedValues).replace();
+
+    if (route.name === "conventionImmersion") {
+      routes.conventionImmersion(watchedValues).replace();
+    }
+    if (route.name === "conventionImmersionForExternals") {
+      routes
+        .conventionImmersionForExternals({
+          ...watchedValues,
+          consumer: route.params.consumer,
+        })
+        .replace();
+    }
   }, [
     ...Object.values(watchedValuesExceptScheduleAndAppellation),
     JSON.stringify(schedule),
