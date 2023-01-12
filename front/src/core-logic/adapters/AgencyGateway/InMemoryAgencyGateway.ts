@@ -121,10 +121,6 @@ export class InMemoryAgencyGateway implements AgencyGateway {
     return values(this._agencies).filter(propNotEq("kind", "cci"));
   }
 
-  async listAgenciesNeedingReview(): Promise<AgencyDto[]> {
-    return values(this._agencies).filter(propEq("status", "needsReview"));
-  }
-
   async validateAgency(_: AdminToken, agencyId: AgencyId): Promise<void> {
     this._agencies[agencyId].status = "active";
   }
@@ -137,23 +133,10 @@ export class InMemoryAgencyGateway implements AgencyGateway {
     throw new Error(`Missing agency with id ${withAgencyId.id}.`);
   }
 
-  getImmersionFacileAgencyId(): Observable<AgencyId> {
-    return of("agency-id-with-immersion-facile-kind");
-  }
-
   listAgenciesByFilter$(
     _filter: ListAgenciesRequestDto,
   ): Observable<AgencyOption[]> {
-    return of([
-      {
-        id: "2",
-        name: "Agence 2",
-      },
-      {
-        id: "3",
-        name: "Agence 3",
-      },
-    ]);
+    return of(values(this._agencies));
   }
 
   getImmersionFacileAgencyId$(): Observable<AgencyId> {

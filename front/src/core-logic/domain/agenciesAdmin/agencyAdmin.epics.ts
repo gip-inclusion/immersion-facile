@@ -57,7 +57,9 @@ const agencyAdminGetDetailsForStatusEpic: AppEpic<AgencyAction> = (
         state$.value.admin.adminAuth.adminToken ?? "",
       ),
     ),
-    map((agency) => agencyAdminSlice.actions.setAgencyNeedingReview(agency ?? null)),
+    map((agency) =>
+      agencyAdminSlice.actions.setAgencyNeedingReview(agency ?? null),
+    ),
   );
 
 const agencyAdminGetDetailsForUpdateEpic: AppEpic<AgencyAction> = (

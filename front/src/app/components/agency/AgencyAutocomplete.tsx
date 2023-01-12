@@ -3,10 +3,22 @@ import { Tooltip } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import { prop } from "ramda";
 import React from "react";
+import { useDispatch } from "react-redux";
 import { AgencyId, AgencyOption, propEq } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
-import { useAgencyAdminAutocomplete } from "src/app/hooks/agenciesAdmin.hook";
+import { agencyAdminSlice } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
+
+export const useAgencyAdminAutocomplete = () => {
+  const dispatch = useDispatch();
+
+  return {
+    updateSearchTerm: (searchTerm: string) =>
+      dispatch(agencyAdminSlice.actions.setAgencySearchText(searchTerm)),
+    selectOption: (agencyId: AgencyId) =>
+      dispatch(agencyAdminSlice.actions.setSelectedAgencyId(agencyId)),
+  };
+};
 
 type AgencyAutocompleteProps = {
   title: string;
@@ -26,7 +38,7 @@ export const AgencyAutocomplete = ({
   tooltip,
 }: AgencyAutocompleteProps): JSX.Element => {
   // TODO Mutualiser juste l'autocomplete avec les conventions ? Ou passer le selecteur en param du composant
-  const { agencySearchText, isSearching, selectedAgencyId, agencyOptions } =
+  const { agencySearchText, isSearching, agencyOptions, agency } =
     useAppSelector(agencyAdminSelectors.agencyState);
   const { updateSearchTerm, selectOption } = useAgencyAdminAutocomplete();
 
@@ -44,7 +56,7 @@ export const AgencyAutocomplete = ({
         disablePortal
         filterOptions={(x) => x}
         options={agencyOptions.map(prop("id"))}
-        value={selectedAgencyId}
+        value={agency?.id}
         noOptionsText={
           agencySearchText ? noOptionText : "Saisissez le nom d'une agence"
         }
