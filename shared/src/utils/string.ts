@@ -20,5 +20,5 @@ export const cleanStringToHTMLAttribute = (
   if (suffix) {
     result += `-${suffix}`;
   }
-  return result;
+  return result.replaceAll(":", "");
 };

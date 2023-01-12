@@ -26,6 +26,7 @@ describe("String cleaner utils", () => {
       "-super",
       "input-mille-sabords-capitaine-21--super",
     ],
+    ["autocomplete-input", null, ":rb1:", "autocomplete-input-rb1"],
   ])(
     "should clean strings to HTML attribute value",
     (input, prefix, suffix, expected) => {

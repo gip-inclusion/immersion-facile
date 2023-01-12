@@ -21,7 +21,10 @@ export const DateInput = (props: DateInputProps) => {
           meta.touched && meta.error ? " fr-input-group--error" : ""
         }`}
       >
-        <label className="fr-label" htmlFor="text-input-calendar">
+        <label
+          className="fr-label"
+          htmlFor={cleanStringToHTMLAttribute(props.name)}
+        >
           {props.label}
         </label>
         <div>

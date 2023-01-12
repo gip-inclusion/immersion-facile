@@ -20,11 +20,12 @@ const romeSearchMatchToProposal = ({
 });
 
 type AppellationAutocompleteProps = {
-  title: string;
+  label: string;
   initialValue?: AppellationDto | undefined;
   setFormValue: (p: AppellationDto) => void;
   className?: string;
   selectedAppellations?: AppellationDto[];
+  description?: string;
 };
 
 type Option = Proposal<AppellationDto>;
@@ -32,9 +33,10 @@ type Option = Proposal<AppellationDto>;
 export const AppellationAutocomplete = ({
   initialValue,
   setFormValue,
-  title,
+  label,
   className,
   selectedAppellations = [],
+  description,
 }: AppellationAutocompleteProps) => {
   const initialOption: Option | null = initialValue
     ? {
@@ -137,8 +139,11 @@ export const AppellationAutocomplete = ({
                 className={`fr-label ${className ?? ""}`}
                 htmlFor={inputId}
               >
-                {title}
+                {label}
               </label>
+              {description && (
+                <span className="fr-hint-text">{description}</span>
+              )}
               <input
                 {...params.inputProps}
                 id={inputId}

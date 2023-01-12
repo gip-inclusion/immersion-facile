@@ -21,7 +21,7 @@ export const FormEstablishmentAppellation = ({
     <div className="flex items-end">
       <div className="flex-1">
         <AppellationAutocomplete
-          title="Rechercher un métier *"
+          label="Rechercher un métier *"
           initialValue={value}
           setFormValue={setValue}
           selectedAppellations={selectedAppellations}

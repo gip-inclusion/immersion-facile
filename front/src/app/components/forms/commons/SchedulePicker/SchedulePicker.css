@@ -49,8 +49,11 @@
 }
 
 .date-or-time-block {
-  min-width: 135px;
-  margin: auto 10px;
+  flex: 1 1 8rem;
+}
+
+.date-or-time-block + .date-or-time-block {
+  margin-left: 10px;
 }
 
 .schedule-picker {
