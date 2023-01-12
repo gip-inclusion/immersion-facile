@@ -13,7 +13,12 @@ export const useConventionWatchValuesInUrl = (
 
   const route = useRoute();
   useEffect(() => {
-    if (route.name !== "conventionImmersion" || !!route.params.jwt) return;
+    if (
+      (route.name !== "conventionImmersion" &&
+        route.name !== "conventionImmersionForExternals") ||
+      !!route.params.jwt
+    )
+      return;
     routes.conventionImmersion(watchedValues).replace();
   }, [
     ...Object.values(watchedValuesExceptScheduleAndAppellation),
