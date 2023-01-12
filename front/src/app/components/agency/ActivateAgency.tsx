@@ -1,16 +1,18 @@
-import React, { ReactNode, useEffect } from "react";
+import { fr } from "@codegouvfr/react-dsfr";
+import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
+import React, { useEffect } from "react";
 import {
   DsfrTitle,
   Select,
   SelectOption,
 } from "react-design-system/immersionFacile";
 import { useDispatch } from "react-redux";
-import { AgencyDto, AgencyOption } from "shared";
+import { AgencyOption, AgencyStatus } from "shared";
 import "src/assets/admin.css";
+import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
 import { agencyAdminSlice } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
-import { AgencyDetails } from "../admin/AgencyDetails";
 import { useAppSelector } from "../../hooks/reduxHooks";
-import { agencyAdminSelectors } from "../../../core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
+import { AgencyDetails } from "../admin/AgencyDetails";
 
 const toSelectOption = (option: AgencyOption): SelectOption => ({
   label: option.name,
@@ -38,6 +40,16 @@ export const ActivateAgency = () => {
     useFetchAgenciesNeedingReview();
 
   const dispatch = useDispatch();
+
+  const updateAgencyStatus = (status: AgencyStatus) => {
+    if (!agencyNeedingReview) return;
+    dispatch(
+      agencyAdminSlice.actions.updateAgencyRequested({
+        ...agencyNeedingReview,
+        status,
+      }),
+    );
+  };
 
   return (
     <>
@@ -68,45 +80,28 @@ export const ActivateAgency = () => {
 
         <AgencyDetails />
         {agencyNeedingReview?.id && (
-          <>
-            <UpdateAgencyStatusButton status={"active"}>
-              Activer cette agence
-            </UpdateAgencyStatusButton>
-            <UpdateAgencyStatusButton status={"rejected"}>
-              Rejeter cette agence
-            </UpdateAgencyStatusButton>
-          </>
+          <ButtonsGroup
+            className={fr.cx("fr-mt-4w")}
+            buttonsEquisized
+            alignment="center"
+            inlineLayoutWhen="always"
+            buttons={[
+              {
+                iconId: "fr-icon-checkbox-fill",
+                children: "Activer cette agence",
+                priority: "primary",
+                onClick: () => updateAgencyStatus("active"),
+              },
+              {
+                iconId: "fr-icon-alert-fill",
+                children: "Rejeter cette agence",
+                priority: "secondary",
+                onClick: () => updateAgencyStatus("rejected"),
+              },
+            ]}
+          />
         )}
       </div>
     </>
-  );
-};
-
-const UpdateAgencyStatusButton = ({
-  children,
-  status,
-}: {
-  children: ReactNode;
-  status: "active" | "rejected";
-}) => {
-  const dispatch = useDispatch();
-  const agency: AgencyDto | null = useAppSelector(agencyAdminSelectors.agency);
-  return (
-    <button
-      className="fr-btn flex"
-      //onClick={() => selectedAgency && validateAgency(selectedAgency)}
-      onClick={() => {
-        //setActivationButtonDisabled(true);
-        if (!agency) return;
-        dispatch(
-          agencyAdminSlice.actions.updateAgencyRequested({
-            ...agency,
-            status,
-          }),
-        );
-      }}
-    >
-      {children}
-    </button>
   );
 };
