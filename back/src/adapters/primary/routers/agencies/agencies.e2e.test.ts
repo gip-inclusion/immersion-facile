@@ -112,7 +112,9 @@ describe(`/${agenciesRoute} route`, () => {
       await request
         .get(`/admin/${agenciesRoute}?status=needsReview`)
         .set("Authorization", adminToken)
-        .expect(200, [agency4NeedsReview]);
+        .expect(200, [
+          { id: agency4NeedsReview.id, name: agency4NeedsReview.name },
+        ]);
     });
   });
 

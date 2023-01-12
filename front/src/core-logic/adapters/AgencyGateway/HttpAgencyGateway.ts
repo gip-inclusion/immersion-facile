@@ -4,7 +4,6 @@ import {
   AdminToken,
   agenciesIdAndNameSchema,
   agenciesRoute,
-  agenciesSchema,
   AgencyDto,
   AgencyId,
   agencyIdResponseSchema,
@@ -156,7 +155,7 @@ export class HttpAgencyGateway implements AgencyGateway {
 
   public listAgenciesNeedingReview$(
     adminToken: AdminToken,
-  ): Observable<AgencyDto[]> {
+  ): Observable<AgencyOption[]> {
     return from(this.listAgenciesNeedingReview(adminToken));
   }
 
@@ -203,13 +202,13 @@ export class HttpAgencyGateway implements AgencyGateway {
   // TODO Mieux identifier l'admin
   private listAgenciesNeedingReview(
     adminToken: AdminToken,
-  ): Promise<AgencyDto[]> {
+  ): Promise<AgencyOption[]> {
     return this.httpClient
       .listAgenciesNeedingReview({
         queryParams: { status: "needsReview" },
         headers: { authorization: adminToken },
       })
-      .then(({ responseBody }) => agenciesSchema.parse(responseBody));
+      .then(({ responseBody }) => agenciesIdAndNameSchema.parse(responseBody));
   }
 
   // TODO Mieux identifier l'admin
