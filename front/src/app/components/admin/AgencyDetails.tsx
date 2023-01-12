@@ -38,13 +38,14 @@ const formatAgencyStatus = (status: AgencyStatus) => {
 };
 
 export const AgencyDetails = () => {
-  const agency: AgencyDto | null = useAppSelector(agencyAdminSelectors.agency);
+  const agency: AgencyDto | null = useAppSelector(
+    agencyAdminSelectors.agencyNeedingReview,
+  );
   if (!agency) return null;
   const buildContent = (field: AgencyField): ReactNode => {
     const value = agency[field];
     if (field === "status") return formatAgencyStatus(agency.status);
     if (typeof value === "string") return value;
-    if (typeof value === "boolean") return value ? "✅" : "❌";
     return JSON.stringify(value);
   };
 

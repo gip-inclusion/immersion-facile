@@ -161,10 +161,10 @@ export class InMemoryAgencyGateway implements AgencyGateway {
   }
 
   getAgencyAdminById$(
-    _agencyId: AgencyId,
+    agencyId: AgencyId,
     _adminToken: AdminToken,
   ): Observable<AgencyDto> {
-    return undefined as unknown as Observable<AgencyDto>;
+    return of(this._agencies[agencyId]);
   }
 
   listAgenciesNeedingReview$(

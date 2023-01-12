@@ -6,9 +6,9 @@ const agencyState = ({ admin }: RootState) => admin.agencyAdmin;
 export const agencyAdminSelectors = {
   agencyState,
   agency: createSelector(agencyState, ({ agency }) => agency),
-  feedback: createSelector(agencyState, ({ feedback }) => feedback),
-  selectedAgencyId: createSelector(
+  agencyNeedingReview: createSelector(
     agencyState,
-    ({ selectedAgencyId }) => selectedAgencyId,
+    ({ agencyNeedingReview }) => agencyNeedingReview,
   ),
+  feedback: createSelector(agencyState, ({ feedback }) => feedback),
 };

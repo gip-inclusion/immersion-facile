@@ -18,11 +18,9 @@ const toSelectOption = (option: AgencyOption): SelectOption => ({
 });
 
 const useFetchAgenciesNeedingReview = () => {
-  const {
-    agencyNeedingReviewOptions,
-    selectedAgencyId,
-    selectedAgencyNeedingReviewId,
-  } = useAppSelector(agencyAdminSelectors.agencyState);
+  const { agencyNeedingReviewOptions, agencyNeedingReview } = useAppSelector(
+    agencyAdminSelectors.agencyState,
+  );
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -31,17 +29,13 @@ const useFetchAgenciesNeedingReview = () => {
 
   return {
     agencyNeedingReviewOptions,
-    selectedAgencyId,
-    selectedAgencyNeedingReviewId,
+    agencyNeedingReview,
   };
 };
 
 export const ActivateAgency = () => {
-  const {
-    agencyNeedingReviewOptions,
-    selectedAgencyId,
-    selectedAgencyNeedingReviewId,
-  } = useFetchAgenciesNeedingReview();
+  const { agencyNeedingReviewOptions, agencyNeedingReview } =
+    useFetchAgenciesNeedingReview();
 
   const dispatch = useDispatch();
 
@@ -58,23 +52,22 @@ export const ActivateAgency = () => {
           backgroundColor: "#E5E5F4",
         }}
       >
-        {agencyNeedingReviewOptions.length} agence(s) en attente de revue
-        {agencyNeedingReviewOptions.length > 0 && (
-          <Select
-            label={selectedAgencyId ?? "Pas d'agence"}
-            id={"IDJDJD"}
-            options={agencyNeedingReviewOptions.map(toSelectOption)}
-            onChange={(event) =>
-              dispatch(
-                agencyAdminSlice.actions.setSelectedAgencyNeedingReviewId(
-                  event.currentTarget.value,
-                ),
-              )
-            }
-          />
-        )}
+        <Select
+          placeholder="Veuillez sélectionner une agence"
+          label={`${agencyNeedingReviewOptions.length} agence(s) en attente de revue`}
+          id={"agency-selector"}
+          options={agencyNeedingReviewOptions.map(toSelectOption)}
+          onChange={(event) =>
+            dispatch(
+              agencyAdminSlice.actions.setSelectedAgencyNeedingReviewId(
+                event.currentTarget.value,
+              ),
+            )
+          }
+        />
+
         <AgencyDetails />
-        {selectedAgencyNeedingReviewId && (
+        {agencyNeedingReview?.id && (
           <>
             <UpdateAgencyStatusButton status={"active"}>
               Activer cette agence
