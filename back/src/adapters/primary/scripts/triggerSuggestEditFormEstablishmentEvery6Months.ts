@@ -60,7 +60,7 @@ const triggerSuggestEditFormEstablishmentEvery6Months = async () => {
   const pgUowPerformer = new PgUowPerformer(testPool, createPgUow);
 
   const emailGateway =
-    config.emailGateway === "SENDINBLUE"
+    config.emailGateway === "SENDINBLUE_HTML"
       ? new SendinblueHtmlEmailGateway(
           axios,
           makeEmailAllowListPredicate({

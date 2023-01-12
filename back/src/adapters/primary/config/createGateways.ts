@@ -193,8 +193,6 @@ const createEmailGateway = (
       new InMemoryEmailGateway(timeGateway, 15),
     );
 
-  if (config.emailGateway === "SENDINBLUE") return sendinblueHtmlEmailGateway;
-
   return exhaustiveCheck(config.emailGateway, {
     variableName: "config.emailGateway",
     throwIfReached: true,

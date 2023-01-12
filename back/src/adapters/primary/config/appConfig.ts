@@ -150,12 +150,7 @@ export class AppConfig {
   public get emailGateway() {
     return this.throwIfNotInArray({
       variableName: "EMAIL_GATEWAY",
-      authorizedValues: [
-        "IN_MEMORY",
-        "HYBRID",
-        "SENDINBLUE",
-        "SENDINBLUE_HTML",
-      ],
+      authorizedValues: ["IN_MEMORY", "HYBRID", "SENDINBLUE_HTML"],
       defaultValue: "IN_MEMORY",
     });
   }
