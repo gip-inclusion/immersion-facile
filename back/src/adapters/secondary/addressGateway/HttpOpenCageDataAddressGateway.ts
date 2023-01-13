@@ -22,7 +22,9 @@ import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGate
 
 // https://github.com/OpenCageData/opencagedata-misc-docs/blob/master/countrycode.md
 // On prends la france et toutes ses territoires dépendants.
-const baseUrl = "https://api.opencagedata.com/geocode/v1/geojson";
+const baseUrl = "https://api.opencagedata.com";
+const geoJsonUrl = `${baseUrl}/geocode/v1/geojson`;
+const geoSearchUrl = `${baseUrl}/geosearch`;
 type BaseUrl = typeof baseUrl;
 const franceAndAttachedTerritoryCountryCodes =
   "fr,bl,gf,gp,mf,mq,nc,pf,pm,re,tf,wf,yt";
@@ -37,6 +39,7 @@ type QueryParams = {
 
 export type OpenCageDataTargets = CreateTargets<{
   geocoding: Target<void, QueryParams, void, BaseUrl>;
+  geosearch: Target<void, QueryParams, void, BaseUrl>;
 }>;
 
 type APIAddressTargetUrls = "apiAddressReverse" | "apiAddressSearchPlainText";
@@ -44,7 +47,11 @@ type APIAddressTargetUrls = "apiAddressReverse" | "apiAddressSearchPlainText";
 export const openCageDataTargets = createTargets<OpenCageDataTargets>({
   geocoding: {
     method: "GET",
-    url: baseUrl,
+    url: geoJsonUrl as BaseUrl,
+  },
+  geosearch: {
+    method: "GET",
+    url: geoSearchUrl as BaseUrl,
   },
 });
 
@@ -60,7 +67,8 @@ export class HttpOpenCageDataAddressGateway implements AddressGateway {
   constructor(
     private readonly httpClient: HttpClient<OpenCageDataTargets>,
     private readonly APIAddressClient: ManagedAxios<APIAddressTargetUrls>,
-    private apiKey: string,
+    private geocodingApiKey: string,
+    private geosearchApiKey: string,
   ) {}
   public async getDepartmentCodeFromAddressAPI(
     postCode: string,
@@ -83,7 +91,7 @@ export class HttpOpenCageDataAddressGateway implements AddressGateway {
     const reponse = await this.httpClient.geocoding({
       queryParams: {
         countrycode: franceAndAttachedTerritoryCountryCodes,
-        key: this.apiKey,
+        key: this.geocodingApiKey,
         language,
         limit: "1",
         q: postCode,
@@ -111,7 +119,7 @@ export class HttpOpenCageDataAddressGateway implements AddressGateway {
     const { responseBody } = await this.httpClient.geocoding({
       queryParams: {
         countrycode: franceAndAttachedTerritoryCountryCodes,
-        key: this.apiKey,
+        key: this.geocodingApiKey,
         language,
         limit: "1",
         q: `${position.lat}+${position.lon}`,
@@ -132,15 +140,14 @@ export class HttpOpenCageDataAddressGateway implements AddressGateway {
     try {
       if (query.length < queryMinLength)
         throw new Error(minimumCharErrorMessage(queryMinLength));
-      const { responseBody } = await this.httpClient.geocoding({
+      const { responseBody } = await this.httpClient.geosearch({
         queryParams: {
           countrycode: franceAndAttachedTerritoryCountryCodes,
-          key: this.apiKey,
+          key: this.geosearchApiKey,
           language,
           q: query,
         },
       });
-
       return (responseBody as OpenCageDataFeatureCollection).features
         .map((feature) => this.toAddressAndPosition(feature))
         .filter((feature): feature is AddressAndPosition => !!feature);
