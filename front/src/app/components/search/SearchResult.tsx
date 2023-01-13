@@ -42,7 +42,7 @@ export const SearchResult = ({
   const [establismentNameFirstLetter, ...establismentNameOtherLetters] =
     establishmentRawName;
   const establismentName = [
-    establismentNameFirstLetter,
+    establismentNameFirstLetter.toLocaleUpperCase(),
     establismentNameOtherLetters.join("").toLocaleLowerCase(),
   ].join("");
 

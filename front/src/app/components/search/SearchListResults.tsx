@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ContactMethod, SearchImmersionResultDto } from "shared";
+import { ContactMethod, frontRoutes, SearchImmersionResultDto } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import { SuccessFeedback } from "src/app/components/SuccessFeedback";
@@ -7,8 +7,9 @@ import {
   ContactEstablishmentModal,
   useContactEstablishmentModal,
 } from "./ContactEstablishmentModal";
+import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 import { SearchResult } from "./SearchResult";
-import { Pagination } from "src/../../libs/react-design-system";
+import { routes } from "src/app/routes/routes";
 
 const getFeedBackMessage = (contactMethod?: ContactMethod) => {
   switch (contactMethod) {
@@ -72,9 +73,18 @@ export const SearchListResults = () => {
         ))}
         <div className="fr-container fr-grid-row fr-grid-row--center">
           <Pagination
-            totalPages={totalPages}
-            setCurrentPage={setCurrentPage}
-            currentPage={currentPage}
+            showFirstLast
+            count={totalPages}
+            defaultPage={currentPage}
+            getPageLinkProps={(pageNumber) => ({
+              title: `Résultats de recherche, page : ${pageNumber}`,
+              onClick: (event) => {
+                event.preventDefault();
+                setCurrentPage(pageNumber);
+              },
+              href: "#", // TODO : PR vers react-dsfr pour gérer pagination full front
+              key: `pagination-link-${pageNumber}`,
+            })}
           />
         </div>
         <ContactEstablishmentModal

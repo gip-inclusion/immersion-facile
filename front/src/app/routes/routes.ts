@@ -112,6 +112,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       rome: param.query.optional.string,
       romeLabel: param.query.optional.string,
       sortedBy: param.query.optional.string,
+      page: param.query.optional.number,
     },
     () => `/${frontRoutes.searchV2}`,
   ),
