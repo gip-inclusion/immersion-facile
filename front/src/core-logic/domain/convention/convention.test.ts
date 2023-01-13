@@ -117,7 +117,11 @@ describe("Convention slice", () => {
 
     it("stores the Convention if one matches in backend", () => {
       const convention = new ConventionDtoBuilder().build();
-      const conventionRead = { ...convention, agencyName: "agency" };
+      const conventionRead = {
+        ...convention,
+        agencyName: "agency",
+        agencyDepartment: "75",
+      };
       expectConventionState({
         isLoading: false,
         convention: null,
@@ -183,7 +187,11 @@ describe("Convention slice", () => {
       const convention = new ConventionDtoBuilder()
         .withEstablishmentRepresentativeEmail("a-different@email.com")
         .build();
-      const conventionRead = { ...convention, agencyName: "agency" };
+      const conventionRead = {
+        ...convention,
+        agencyName: "agency",
+        agencyDepartment: "75",
+      };
       expectConventionState({
         isLoading: false,
         convention: null,
@@ -214,7 +222,11 @@ describe("Convention slice", () => {
           role: "beneficiary-representative",
         })
         .build();
-      const conventionRead = { ...convention, agencyName: "agency" };
+      const conventionRead = {
+        ...convention,
+        agencyName: "agency",
+        agencyDepartment: "75",
+      };
       expectConventionState({
         isLoading: false,
         convention: null,
@@ -249,6 +261,7 @@ describe("Convention slice", () => {
       const convention = {
         ...new ConventionDtoBuilder().build(),
         agencyName: "My agency",
+        agencyDepartment: "75",
       };
       ({ store, dependencies } = createTestStore({
         convention: {
@@ -285,6 +298,7 @@ describe("Convention slice", () => {
       const convention = {
         ...new ConventionDtoBuilder().withBeneficiary(beneficiary).build(),
         agencyName: "My agency",
+        agencyDepartment: "75",
       };
 
       ({ store, dependencies } = createTestStore({
@@ -338,6 +352,7 @@ describe("Convention slice", () => {
       const conventionBuilder = new ConventionDtoBuilder().notSigned();
       const addAgencyName = (convention: ConventionDto): ConventionReadDto => ({
         agencyName: "My agency",
+        agencyDepartment: "75",
         ...convention,
       });
 
@@ -531,6 +546,7 @@ describe("Convention slice", () => {
     const convention = {
       ...new ConventionDtoBuilder().build(),
       agencyName: "agency",
+      agencyDepartment: "75",
     };
     ({ store } = createTestStore({
       convention: {

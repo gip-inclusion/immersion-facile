@@ -171,7 +171,8 @@ export class InMemoryConventionGateway implements ConventionGateway {
   private inferConventionReadDto(convention: ConventionDto): ConventionReadDto {
     return {
       ...convention,
-      agencyName: this._agencies[convention.agencyId].name ?? "agency-name",
+      agencyName: this._agencies[convention.agencyId]?.name ?? "agency-name",
+      agencyDepartment: "75",
     };
   }
 }

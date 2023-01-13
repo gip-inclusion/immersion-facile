@@ -15,8 +15,7 @@ export type FormConventionFieldsLabels = FormFieldsObjectForContent<
     | ConventionFieldWithoutPostalCode
     | "isCurrentEmployer"
     | "isEstablishmentTutorIsEstablishmentRepresentative"
-    | "isMinor"
-    | "departmentCode",
+    | "isMinor",
     FormFieldAttributesForContent
   >
 >;
@@ -37,9 +36,9 @@ export const formConventionFieldsLabels: (
 });
 
 const conventionSection = (internshipKind: InternshipKind) => ({
-  departmentCode: {
+  agencyDepartment: {
     label: "Votre département",
-    id: "form-convention-departmentCode",
+    id: "form-convention-agencyDepartement",
     required: true,
     placeholder: "Veuillez sélectionner un département",
   },

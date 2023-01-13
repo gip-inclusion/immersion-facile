@@ -34,7 +34,7 @@ export const AgencySelector = ({
   const { getFormFields } = useFormContents(
     formConventionFieldsLabels(internshipKind),
   );
-  const { agencyId: agencyIdField, departmentCode: departmentCodeField } =
+  const { agencyId: agencyIdField, agencyDepartment: agencyDepartmentField } =
     getFormFields();
   const [{ value, onBlur }, { touched, error }, { setValue }] =
     useField<AgencyId>(agencyIdField.name || "agencyId");
@@ -42,9 +42,7 @@ export const AgencySelector = ({
     { value: departmentCodeValue },
     _,
     { setValue: setDepartmentCodeValue },
-  ] = useField<DepartmentCode | null>(
-    departmentCodeField.name || "departmentCode",
-  );
+  ] = useField<DepartmentCode | null>(agencyDepartmentField.name);
   const [isLoading, setIsLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [loadingError, setLoadingError] = useState(false);
@@ -52,7 +50,7 @@ export const AgencySelector = ({
   const [agencies, setAgencies] = useState([
     {
       id: "",
-      name: departmentCodeField.placeholder ?? "",
+      name: agencyDepartmentField.placeholder ?? "",
     },
   ]);
   const federatedIdentity = useFederatedIdentity();
@@ -107,7 +105,7 @@ export const AgencySelector = ({
     >
       <Select
         options={departmentOptions}
-        {...departmentCodeField}
+        {...agencyDepartmentField}
         onChange={(event) => setDepartmentCodeValue(event.currentTarget.value)}
         value={departmentCodeValue as string}
       />
