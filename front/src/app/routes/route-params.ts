@@ -1,7 +1,7 @@
 import { AppellationDto, ScheduleDto } from "shared";
 import { param, ValueSerializer } from "type-route";
 
-export type StandardPageSlugs = (typeof standardPageSlugs)[number];
+export type StandardPageSlugs = typeof standardPageSlugs[number];
 
 export const standardPageSlugs = [
   "mentions-legales",

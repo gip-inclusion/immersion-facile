@@ -6,7 +6,7 @@ export type WithApiConsumerId = {
   id: ApiConsumerId;
 };
 
-export type ApiConsumerName = (typeof authorisedNames)[number];
+export type ApiConsumerName = typeof authorisedNames[number];
 
 export const authorisedNames = [
   "passeEmploi",

@@ -15,7 +15,7 @@ export const immersionPoleEmploiAdvisors: NotEmptyArray<PeConnectImmersionAdviso
   ["PLACEMENT", "CAPEMPLOI"];
 
 export type PeConnectImmersionAdvisorsKind =
-  (typeof peAdvisorImmersionKinds)[number];
+  typeof peAdvisorImmersionKinds[number];
 
 export type PeConnectImmersionAdvisorDto = {
   email: string;
@@ -24,7 +24,7 @@ export type PeConnectImmersionAdvisorDto = {
   type: PeConnectImmersionAdvisorsKind;
 };
 
-export type PeConnectAdvisorsKind = (typeof peAdvisorKinds)[number];
+export type PeConnectAdvisorsKind = typeof peAdvisorKinds[number];
 
 export type PeConnectAdvisorDto = {
   email: string;

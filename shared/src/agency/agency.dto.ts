@@ -4,7 +4,7 @@ import { GeoPositionDto } from "../geoPosition/geoPosition.dto";
 import { Flavor } from "../typeFlavors";
 import { NotEmptyArray, RequireField } from "../utils";
 
-export type AgencyStatus = (typeof allAgencyStatuses)[number];
+export type AgencyStatus = typeof allAgencyStatuses[number];
 export const allAgencyStatuses = [
   "active",
   "closed",

@@ -1,4 +1,4 @@
-export type ManagedErrorKind = (typeof managedErrorKinds)[number];
+export type ManagedErrorKind = typeof managedErrorKinds[number];
 const managedErrorKinds = [
   "peConnectInvalidGrant",
   "peConnectNoAuthorisation",

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export type FeatureFlag = (typeof featureFlags)[number];
+export type FeatureFlag = typeof featureFlags[number];
 const featureFlags = [
   "enableAdminUi",
   "enableInseeApi",

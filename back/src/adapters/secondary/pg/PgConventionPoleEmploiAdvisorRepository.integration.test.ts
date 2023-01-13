@@ -182,10 +182,9 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
     it("should return undefined if no convention Advisor", async () => {
       const conventionAdvisor:
         | ConventionPoleEmploiUserAdvisorEntity
-        | undefined =
-        await conventionPoleEmploiAdvisorRepository.getByConventionId(
-          conventionId,
-        );
+        | undefined = await conventionPoleEmploiAdvisorRepository.getByConventionId(
+        conventionId,
+      );
 
       expect(conventionAdvisor).toBeUndefined();
     });
@@ -201,10 +200,9 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
 
       const conventionAdvisor:
         | ConventionPoleEmploiUserAdvisorEntity
-        | undefined =
-        await conventionPoleEmploiAdvisorRepository.getByConventionId(
-          conventionId,
-        );
+        | undefined = await conventionPoleEmploiAdvisorRepository.getByConventionId(
+        conventionId,
+      );
 
       expectObjectsToMatch(conventionAdvisor!, {
         advisor: poleEmploiFirstUserAdvisor.advisor,
@@ -223,10 +221,9 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
 
       const conventionAdvisor:
         | ConventionPoleEmploiUserAdvisorEntity
-        | undefined =
-        await conventionPoleEmploiAdvisorRepository.getByConventionId(
-          conventionId,
-        );
+        | undefined = await conventionPoleEmploiAdvisorRepository.getByConventionId(
+        conventionId,
+      );
 
       expectObjectsToMatch(conventionAdvisor!, {
         advisor: undefined,

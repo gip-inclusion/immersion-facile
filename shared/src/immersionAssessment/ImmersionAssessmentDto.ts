@@ -1,6 +1,6 @@
 import { ConventionId } from "../convention/convention.dto";
 
-export type AssessmentStatus = (typeof assessmentStatuses)[number];
+export type AssessmentStatus = typeof assessmentStatuses[number];
 export const assessmentStatuses = ["FINISHED", "ABANDONED"] as const;
 
 export interface ImmersionAssessmentDto {

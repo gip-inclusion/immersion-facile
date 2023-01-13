@@ -5,7 +5,7 @@ export type InfrastructureErrorKinds =
 
 export type TCPWrapperErrorCodes = "ECONNREFUSED" | "ECONNRESET";
 export type AxiosInfrastructureErrorCodes =
-  (typeof axiosInfrastructureErrorCodes)[number];
+  typeof axiosInfrastructureErrorCodes[number];
 
 const axiosInfrastructureErrorCodes = [
   "ERR_BAD_OPTION_VALUE",
