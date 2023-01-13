@@ -152,6 +152,14 @@ export const ImmersionHeader = () => {
             id: getHeaderNavLinkId("agency-form-convention"),
           },
         },
+        {
+          text: "Mon organisme",
+          isActive: false,
+          linkProps: {
+            ...routes.agencyDashboard().link,
+            id: getHeaderNavLinkId("agency-my-dashboard"),
+          },
+        },
       ],
     },
   ];

@@ -1,6 +1,7 @@
 export const frontRoutes = {
   admin: "admin",
   addAgency: "ajouter-prescripteur",
+  agencyDashboard: "agence-dashboard",
   conventionImmersionRoute: "demande-immersion",
   conventionMiniStageRoute: "demande-mini-stage",
   conventionToValidate: "verification",
