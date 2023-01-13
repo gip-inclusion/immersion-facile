@@ -1,5 +1,3 @@
-//import "../tracer";
-
 import { createLogger } from "../../../utils/logger";
 import { AppConfig } from "../config/appConfig";
 import { createApp } from "../server";

@@ -41,7 +41,7 @@ export const getSiretResponseSchema = z.object({
   isOpen: z.boolean(),
 });
 
-export type GetSiretInfoError = typeof siretInfoErrors[number];
+export type GetSiretInfoError = (typeof siretInfoErrors)[number];
 export type GetSiretInfo = GetSiretResponseDto | GetSiretInfoError;
 export const getSiretInfoError = z.enum(siretInfoErrors);
 export const getSiretInfoSchema: z.Schema<GetSiretInfo> = z.union([

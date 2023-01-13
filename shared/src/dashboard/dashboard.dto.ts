@@ -5,12 +5,12 @@ export type DashboardName =
   | AdminDashboardName
   | ConventionMagicLinkDashboardName;
 
-export type AdminDashboardName = typeof dashboardNames[number];
+export type AdminDashboardName = (typeof dashboardNames)[number];
 export const simpleDashboardNames = ["conventions", "events"] as const;
 export const dashboardNames = [...simpleDashboardNames, "agency"] as const;
 
 export type ConventionMagicLinkDashboardName =
-  typeof conventionMagicLinkDashboardNames[number];
+  (typeof conventionMagicLinkDashboardNames)[number];
 export const conventionMagicLinkDashboardNames = ["conventionStatus"] as const;
 
 type GenericGetDashboardParams<

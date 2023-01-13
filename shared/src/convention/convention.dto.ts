@@ -6,10 +6,10 @@ import { SiretDto } from "../siret/siret";
 import { Role } from "../tokens/MagicLinkPayload";
 import { Flavor } from "../typeFlavors";
 
-export type ConventionStatus = typeof conventionStatuses[number];
+export type ConventionStatus = (typeof conventionStatuses)[number];
 
 type ConventionStatusWithoutJustification =
-  typeof conventionStatusesWithoutJustification[number];
+  (typeof conventionStatusesWithoutJustification)[number];
 
 export const conventionStatusesWithoutJustification = [
   "READY_TO_SIGN",
@@ -28,7 +28,7 @@ export const doesStatusNeedsJustification = (
   );
 
 export type ConventionStatusWithJustification =
-  typeof conventionStatusesWithJustification[number];
+  (typeof conventionStatusesWithJustification)[number];
 export const conventionStatusesWithJustification = [
   "REJECTED",
   "DRAFT",
@@ -59,7 +59,7 @@ export const conventionObjectiveOptions = [
   "Initier une démarche de recrutement",
 ] as const;
 
-export type ImmersionObjective = typeof conventionObjectiveOptions[number];
+export type ImmersionObjective = (typeof conventionObjectiveOptions)[number];
 
 export type WithJustification = { justification: string };
 
