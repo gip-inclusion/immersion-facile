@@ -50,7 +50,7 @@ export const SchedulePicker = ({
       </span>
       {meta.error && (
         <div id={name + "-error-description"} className="fr-error-text">
-          {meta.error}
+          {JSON.stringify(meta.error)}
         </div>
       )}
       {field.value.isSimple ? (
