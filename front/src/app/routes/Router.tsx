@@ -1,6 +1,7 @@
 import React from "react";
 import { AdminPage } from "src/app/pages/admin/AdminPage";
 import { AddAgencyPage } from "src/app/pages/agency/AddAgencyPage";
+import { AgencyDashboardPage } from "src/app/pages/AgencyDashboardPage";
 import { ConventionPageForUkraine } from "src/app/pages/convention/ConventionForUkrainePage";
 import { ConventionImmersionPage } from "src/app/pages/convention/ConventionImmersionPage";
 import { ConventionMiniStagePage } from "src/app/pages/convention/ConventionMiniStagePage";
@@ -12,7 +13,8 @@ import { EstablishmentEditionFormPage } from "src/app/pages/establishment/Establ
 import { EstablishmentFormPageForExternals } from "src/app/pages/establishment/EstablishmentFormPageForExternals";
 import { SearchPage } from "src/app/pages/search/SearchPage";
 import { StatsPage } from "src/app/pages/StatsPage";
-import { PrivateRoute } from "src/app/routes/PrivateRoute";
+import { AdminRoute } from "src/app/routes/AdminRoute";
+import { InclusionConnectedRoute } from "src/app/routes/InclusionConnectedRoute";
 import { RenewExpiredLinkPage } from "src/app/routes/RenewExpiredLinkPage";
 import { Route } from "type-route";
 import { StandardLayout } from "../components/layout/StandardLayout";
@@ -32,11 +34,15 @@ const getPageByRouteName: {
   addAgency: () => <AddAgencyPage />,
   adminRoot: () => routes.adminTab({ tab: "conventions" }).replace(),
   adminTab: (route) => (
-    <PrivateRoute>
+    <AdminRoute>
       <AdminPage route={route} />
-    </PrivateRoute>
+    </AdminRoute>
   ),
-  agencyDashboard: () => <div>todo</div>,
+  agencyDashboard: () => (
+    <InclusionConnectedRoute>
+      <AgencyDashboardPage />
+    </InclusionConnectedRoute>
+  ),
   conventionForUkraine: (route) => <ConventionPageForUkraine route={route} />,
   conventionImmersion: (route) => <ConventionImmersionPage route={route} />,
   conventionImmersionForExternals: (route) => (

@@ -15,14 +15,12 @@ import { adminAuthSlice } from "src/core-logic/domain/admin/adminAuth/adminAuth.
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
 
-export const PrivateRoute = ({
-  children,
-}: {
-  children: React.ReactElement;
-}) => {
-  const isAuthenticated = useAppSelector(adminSelectors.auth.isAuthenticated);
+export const AdminRoute = ({ children }: { children: React.ReactElement }) => {
+  const isAuthenticatedAsAdmin = useAppSelector(
+    adminSelectors.auth.isAuthenticated,
+  );
 
-  if (!isAuthenticated) return <LoginForm />;
+  if (!isAuthenticatedAsAdmin) return <LoginForm />;
   return children;
 };
 
