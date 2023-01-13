@@ -15,7 +15,7 @@ describe("PrivateListAgencies use case", () => {
     privateListAgencies = new PrivateListAgencies(uowPerformer);
   });
 
-  it("does something", async () => {
+  it("should return agencies needing review as id an name object", async () => {
     const expectedAgency = {
       id: "1",
       name: "Agency needing review",

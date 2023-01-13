@@ -9,8 +9,6 @@ export interface AgencyAdminState {
   agencySearchText: string;
   agencyOptions: AgencyOption[];
   agencyNeedingReviewOptions: AgencyOption[];
-  // selectedAgencyNeedingReviewId: AgencyId | null;
-  // selectedAgencyId: AgencyId | null;
   agency: AgencyDto | null;
   agencyNeedingReview: AgencyDto | null;
   isSearching: boolean;
@@ -22,8 +20,6 @@ export interface AgencyAdminState {
 
 export const agencyAdminInitialState: AgencyAdminState = {
   agencyNeedingReviewOptions: [],
-  //selectedAgencyNeedingReviewId: null,
-  // selectedAgencyId: null,
   agencySearchText: "",
   agencyOptions: [],
   agency: null,
