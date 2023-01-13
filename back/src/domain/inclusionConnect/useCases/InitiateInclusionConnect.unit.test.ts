@@ -10,7 +10,7 @@ const from = "immersion-facilité";
 const scope = "openid profile email";
 const state = "my-state";
 const nonce = "my-nonce";
-const immersionRedirectUri: AbsoluteUrl = "http://immersion-uri.com";
+const immersionUri: AbsoluteUrl = "http://immersion-uri.com";
 const responseType = "code" as const;
 const inclusionConnectBaseUri: AbsoluteUrl =
   "http://fake-inclusion-connect-uri.com";
@@ -23,7 +23,7 @@ describe("InitiateInclusionConnect usecase", () => {
       new InMemoryUowPerformer(uow),
       uuidGenerator,
       {
-        immersionRedirectUri,
+        immersionRedirectUri: immersionUri,
         inclusionConnectBaseUri,
         scope,
         clientId,
@@ -42,7 +42,7 @@ describe("InitiateInclusionConnect usecase", () => {
           `client_id=${clientId}`,
           `from=${from}`,
           `nonce=${nonce}`,
-          `redirect_uri=${immersionRedirectUri}`,
+          `redirect_uri=${immersionUri}/api/inclusion-connect-after-login`,
           `response_type=${responseType}`,
           `scope=${scope}`,
           `state=${state}`,

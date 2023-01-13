@@ -1,4 +1,8 @@
-import { AbsoluteUrl, queryParamsAsString } from "shared";
+import {
+  AbsoluteUrl,
+  inclusionConnectImmersionTargets,
+  queryParamsAsString,
+} from "shared";
 import { z } from "zod";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
@@ -54,7 +58,7 @@ export class InitiateInclusionConnect extends TransactionalUseCase<
       client_id: this.inclusionConnectConfig.clientId,
       from: "immersion-facilité",
       nonce,
-      redirect_uri: this.inclusionConnectConfig.immersionRedirectUri,
+      redirect_uri: `${this.inclusionConnectConfig.immersionRedirectUri}/api${inclusionConnectImmersionTargets.afterLoginRedirection.url}`,
       response_type: "code",
       scope: this.inclusionConnectConfig.scope,
       state,

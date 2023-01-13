@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { InclusionConnectButton, MainWrapper } from "react-design-system";
+import { inclusionConnectImmersionTargets } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 
 export const InclusionConnectedRoute = ({
@@ -14,9 +15,11 @@ export const InclusionConnectedRoute = ({
       <HeaderFooterLayout>
         <MainWrapper layout="boxed">
           <InclusionConnectButton
-            inclusionConnectEndpoint="yolo"
-            onClick={(e) => {
-              e.preventDefault();
+            inclusionConnectEndpoint={
+              inclusionConnectImmersionTargets.startInclusionConnectLogin.url
+            }
+            onClick={() => {
+              // this is a temporary fake log in
               setIsInclusionConnected(true);
             }}
           />

@@ -182,7 +182,7 @@ export class AppConfig {
     return {
       clientId: this.throwIfNotDefined("INCLUSION_CONNECT_CLIENT_ID"),
       clientSecret: this.throwIfNotDefined("INCLUSION_CONNECT_CLIENT_SECRET"),
-      immersionRedirectUri: `${this.immersionFacileBaseUrl}/api/inclusion-connect`,
+      immersionRedirectUri: this.immersionFacileBaseUrl,
       inclusionConnectBaseUri: this.throwIfNotAbsoluteUrl(
         "INCLUSION_CONNECT_BASE_URI",
       ),
