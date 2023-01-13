@@ -29,6 +29,7 @@ export const FormEstablishmentAppellation = ({
       </div>
       <div>
         <Button
+          type="button"
           iconId="fr-icon-delete-bin-line"
           title="Suppression"
           onClick={onDelete}

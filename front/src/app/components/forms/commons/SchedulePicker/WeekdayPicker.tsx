@@ -104,6 +104,7 @@ export const WeekdayPicker = ({
                 </div>
                 {!disabled && isRemovable && (
                   <Button
+                    type="button"
                     iconId="fr-icon-delete-bin-line"
                     title="Supprimer"
                     disabled={!isRemovable}
