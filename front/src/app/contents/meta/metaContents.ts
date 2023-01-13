@@ -102,10 +102,6 @@ export const metaContents: Partial<
     title: "Rafraichir le lien",
     description: "Faciliter la réalisation des immersions professionnelles.",
   },
-  searchDebug: {
-    title: "SearchDebug",
-    description: "Faciliter la réalisation des immersions professionnelles.",
-  },
   stats: {
     title: "Statistiques",
     description:

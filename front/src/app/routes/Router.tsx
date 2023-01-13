@@ -11,10 +11,10 @@ import { ErrorRedirectPage } from "src/app/pages/error/ErrorRedirectPage";
 import { EstablishmentEditionFormPage } from "src/app/pages/establishment/EstablishmentEditionFormPage";
 import { EstablishmentFormPageForExternals } from "src/app/pages/establishment/EstablishmentFormPageForExternals";
 import { SearchPage } from "src/app/pages/search/SearchPage";
-
 import { StatsPage } from "src/app/pages/StatsPage";
 import { PrivateRoute } from "src/app/routes/PrivateRoute";
 import { RenewExpiredLinkPage } from "src/app/routes/RenewExpiredLinkPage";
+import { Route } from "type-route";
 import { StandardLayout } from "../components/layout/StandardLayout";
 import { ErrorPage } from "../pages/error/ErrorPage";
 import { EstablishmentFormPage } from "../pages/establishment/EstablishmentFormPage";
@@ -24,72 +24,66 @@ import { StandardPageSlugs, standardPageSlugs } from "./route-params";
 import { routes, useRoute } from "./routes";
 import { ConventionPageForExternals } from "../pages/convention/ConventionPageForExternals";
 
+type Routes = typeof routes;
+
+const getPageByRouteName: {
+  [K in keyof Routes]: (route: Route<Routes[K]>) => unknown;
+} = {
+  addAgency: () => <AddAgencyPage />,
+  adminRoot: () => routes.adminTab({ tab: "conventions" }).replace(),
+  adminTab: (route) => (
+    <PrivateRoute>
+      <AdminPage route={route} />
+    </PrivateRoute>
+  ),
+  agencyDashboard: () => <div>todo</div>,
+  conventionForUkraine: (route) => <ConventionPageForUkraine route={route} />,
+  conventionImmersion: (route) => <ConventionImmersionPage route={route} />,
+  conventionImmersionForExternals: (route) => (
+    <ConventionPageForExternals route={route} />
+  ),
+  conventionMiniStage: (route) => <ConventionMiniStagePage route={route} />,
+  conventionStatusDashboard: (route) => (
+    <ConventionStatusDashboardPage route={route} />
+  ),
+  conventionToSign: (route) => <ConventionSignPage route={route} />,
+  conventionToValidate: (route) => <ConventionValidatePage route={route} />,
+  debugPopulateDB: () => undefined,
+  editFormEstablishment: (route) => (
+    <EstablishmentEditionFormPage route={route} />
+  ),
+  errorRedirect: (route) => <ErrorRedirectPage route={route} />,
+  formEstablishment: (route) => <EstablishmentFormPage route={route} />,
+  formEstablishmentForExternals: (route) => (
+    <EstablishmentFormPageForExternals route={route} />
+  ),
+  home: () => <HomePage type="default" />,
+  homeAgencies: () => <HomePage type="agency" />,
+  homeCandidates: () => <HomePage type="candidate" />,
+  homeEstablishments: () => <HomePage type="establishment" />,
+  immersionAssessment: (route) => <ImmersionAssessmentPage route={route} />,
+  renewConventionMagicLink: (route) => <RenewExpiredLinkPage route={route} />,
+  search: (route) => <SearchPage route={route} />,
+  standard: (route) =>
+    standardPageSlugs.includes(route.params.pagePath as StandardPageSlugs) ? (
+      <StandardLayout route={route} />
+    ) : (
+      <ErrorPage type="httpClientNotFoundError" />
+    ),
+  stats: () => <StatsPage />,
+};
+
 export const Router = () => {
   const route = useRoute();
+  const routeName = route.name;
 
   return (
     <>
-      {route.name === false && <ErrorPage type="httpClientNotFoundError" />}
-      {route.name === "addAgency" && <AddAgencyPage />}
-      {route.name === "adminTab" && (
-        <PrivateRoute>
-          <AdminPage route={route} />
-        </PrivateRoute>
+      {routeName === false ? (
+        <ErrorPage type="httpClientNotFoundError" />
+      ) : (
+        getPageByRouteName[routeName](route as Route<unknown>)
       )}
-      {route.name === "adminRoot" &&
-        routes.adminTab({ tab: "conventions" }).replace()}
-      {route.name === "editFormEstablishment" && (
-        <EstablishmentEditionFormPage route={route} />
-      )}
-      {route.name === "errorRedirect" && <ErrorRedirectPage route={route} />}
-      {route.name === "formEstablishment" && (
-        <EstablishmentFormPage route={route} />
-      )}
-      {route.name === "formEstablishmentForExternals" && (
-        <EstablishmentFormPageForExternals route={route} />
-      )}
-      {route.name === "home" && <HomePage type="default" />}
-      {route.name === "homeCandidates" && <HomePage type="candidate" />}
-      {route.name === "homeEstablishments" && <HomePage type="establishment" />}
-      {route.name === "homeAgencies" && <HomePage type="agency" />}
-
-      {route.name === "conventionImmersion" && (
-        <ConventionImmersionPage route={route} />
-      )}
-      {route.name === "conventionImmersionForExternals" && (
-        <ConventionPageForExternals route={route} />
-      )}
-      {route.name === "conventionMiniStage" && (
-        <ConventionMiniStagePage route={route} />
-      )}
-      {route.name === "conventionForUkraine" && (
-        <ConventionPageForUkraine route={route} />
-      )}
-      {route.name === "conventionToValidate" && (
-        <ConventionValidatePage route={route} />
-      )}
-      {route.name === "conventionToSign" && (
-        <ConventionSignPage route={route} />
-      )}
-      {route.name === "conventionStatusDashboard" && (
-        <ConventionStatusDashboardPage route={route} />
-      )}
-      {route.name === "immersionAssessment" && (
-        <ImmersionAssessmentPage route={route} />
-      )}
-      {route.name === "renewConventionMagicLink" && (
-        <RenewExpiredLinkPage route={route} />
-      )}
-      {route.name === "search" && <SearchPage route={route} />}
-      {route.name === "stats" && <StatsPage />}
-      {route.name === "standard" &&
-        standardPageSlugs.includes(
-          route.params.pagePath as StandardPageSlugs,
-        ) && <StandardLayout route={route} />}
-      {route.name === "standard" &&
-        !standardPageSlugs.includes(
-          route.params.pagePath as StandardPageSlugs,
-        ) && <ErrorPage type="httpClientNotFoundError" />}
     </>
   );
 };

@@ -90,7 +90,6 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     },
     () => `/${frontRoutes.magicLinkRenewal}`,
   ),
-  searchDebug: defineRoute("/debug/search"),
   stats: defineRoute("/stats"),
   search: defineRoute(
     {
