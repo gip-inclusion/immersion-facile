@@ -129,6 +129,7 @@ describe("conventionDtoSchema", () => {
       const validConventionRead: ConventionReadDto = {
         ...new ConventionDtoBuilder().build(),
         agencyName: "dsfsdfsdf",
+        agencyDepartment: "75",
         externalId: "sdfsdff",
       };
       expect(() =>
@@ -141,6 +142,7 @@ describe("conventionDtoSchema", () => {
           .withBeneficiaryRepresentative(beneficiaryRepresentative)
           .build(),
         agencyName: "dsfsdfsdf",
+        agencyDepartment: "90",
         externalId: "sdfsdff",
       };
       expect(() => conventionReadSchema.parse(invalidConventionRead)).toThrow();

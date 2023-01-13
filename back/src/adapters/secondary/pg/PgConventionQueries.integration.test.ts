@@ -58,6 +58,7 @@ describe("Pg implementation of ConventionQueries", () => {
         idA,
         idA,
         "agency A",
+        "75",
       );
 
       // Act
@@ -71,8 +72,8 @@ describe("Pg implementation of ConventionQueries", () => {
     it("Gets all saved conventionAdminDtos", async () => {
       // Prepare
       const insertedConventionReadDtos = await Promise.all([
-        insertAgencyAndConvention(idA, idA, "agency A"),
-        insertAgencyAndConvention(idB, idB, "agency B"),
+        insertAgencyAndConvention(idA, idA, "agency A", "75"),
+        insertAgencyAndConvention(idB, idB, "agency B", "76"),
       ]);
       // Act
       const resultAll = await conventionQueries.getLatestConventions({});
@@ -83,8 +84,8 @@ describe("Pg implementation of ConventionQueries", () => {
     it("Gets only convention of a given agency", async () => {
       // Prepare
       const insertedConventionReadDtos = await Promise.all([
-        insertAgencyAndConvention(idA, idA, "agency A"),
-        insertAgencyAndConvention(idB, idB, "agency B"),
+        insertAgencyAndConvention(idA, idA, "agency A", "75"),
+        insertAgencyAndConvention(idB, idB, "agency B", "76"),
       ]);
 
       // Act
@@ -180,10 +181,17 @@ describe("Pg implementation of ConventionQueries", () => {
     conventionId: ConventionId,
     agencyId: string,
     agencyName: string,
+    agencyDepartment: string,
   ): Promise<ConventionReadDto> => {
     const agency = AgencyDtoBuilder.create()
       .withId(agencyId)
       .withName(agencyName)
+      .withAddress({
+        city: "Paris",
+        departmentCode: agencyDepartment,
+        postcode: "75017",
+        streetNumberAndAddress: "Avenue des champs Elysées",
+      })
       .build();
     const convention = new ConventionDtoBuilder()
       .withAgencyId(agencyId)
@@ -232,6 +240,6 @@ describe("Pg implementation of ConventionQueries", () => {
 
     await agencyRepo.insert(agency);
     const externalId = await conventionRepository.save(convention);
-    return { ...convention, externalId, agencyName };
+    return { ...convention, externalId, agencyName, agencyDepartment };
   };
 });

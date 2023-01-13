@@ -28,7 +28,7 @@ export class PgConventionRepository implements ConventionRepository {
   ): Promise<ConventionDto | undefined> {
     const readDto = await getReadConventionById(this.client, conventionId);
     if (!readDto) return;
-    const { agencyName, ...dto } = readDto;
+    const { agencyName, agencyDepartment, ...dto } = readDto;
     return dto;
   }
 

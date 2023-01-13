@@ -215,6 +215,7 @@ export const conventionReadSchema: z.Schema<ConventionReadDto> =
   conventionSchema.and(
     z.object({
       agencyName: z.string(),
+      agencyDepartment: z.string(),
     }),
   );
 

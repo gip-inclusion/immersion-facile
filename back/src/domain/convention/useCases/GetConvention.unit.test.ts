@@ -6,10 +6,13 @@ import {
 
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
-import { TEST_AGENCY_NAME } from "../../../adapters/secondary/InMemoryConventionQueries";
+import {
+  TEST_AGENCY_DEPARTMENT,
+  TEST_AGENCY_NAME,
+} from "../../../adapters/secondary/InMemoryConventionQueries";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { GetConvention } from "../../../domain/convention/useCases/GetConvention";
+import { GetConvention } from "./GetConvention";
 
 describe("Get Convention", () => {
   let getConvention: GetConvention;
@@ -38,7 +41,11 @@ describe("Get Convention", () => {
       const convention = await getConvention.execute({
         id: entity.id,
       });
-      expectToEqual(convention, { ...entity, agencyName: TEST_AGENCY_NAME });
+      expectToEqual(convention, {
+        ...entity,
+        agencyName: TEST_AGENCY_NAME,
+        agencyDepartment: TEST_AGENCY_DEPARTMENT,
+      });
     });
   });
 });

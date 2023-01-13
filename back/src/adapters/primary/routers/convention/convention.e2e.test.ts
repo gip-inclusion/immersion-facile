@@ -18,7 +18,10 @@ import {
 } from "../../../../_testBuilders/buildTestApp";
 import { GenerateMagicLinkJwt } from "../../../../domain/auth/jwt";
 import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
-import { TEST_AGENCY_NAME } from "../../../secondary/InMemoryConventionQueries";
+import {
+  TEST_AGENCY_DEPARTMENT,
+  TEST_AGENCY_NAME,
+} from "../../../secondary/InMemoryConventionQueries";
 import { AppConfig } from "../../config/appConfig";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
@@ -92,6 +95,7 @@ describe("convention e2e", () => {
           .expect(200, {
             ...convention,
             agencyName: TEST_AGENCY_NAME,
+            agencyDepartment: TEST_AGENCY_DEPARTMENT,
           });
       });
 
@@ -129,6 +133,7 @@ describe("convention e2e", () => {
             .expect(200, {
               ...convention,
               agencyName: TEST_AGENCY_NAME,
+              agencyDepartment: TEST_AGENCY_DEPARTMENT,
             });
         });
 
@@ -201,6 +206,7 @@ describe("convention e2e", () => {
         expect(result.body).toEqual({
           ...updatedConvention,
           agencyName: TEST_AGENCY_NAME,
+          agencyDepartment: TEST_AGENCY_DEPARTMENT,
         });
         expect(result.status).toBe(200);
       });

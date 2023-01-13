@@ -13,6 +13,7 @@ import { InMemoryOutboxRepository } from "./core/InMemoryOutboxRepository";
 import { InMemoryConventionRepository } from "./InMemoryConventionRepository";
 
 export const TEST_AGENCY_NAME = "TEST_AGENCY_NAME";
+export const TEST_AGENCY_DEPARTMENT = "75-test";
 const logger = createLogger(__filename);
 
 export class InMemoryConventionQueries implements ConventionQueries {
@@ -29,7 +30,11 @@ export class InMemoryConventionQueries implements ConventionQueries {
     return Object.values(this.conventionRepository._conventions)
       .filter((dto) => !status || dto.status === status)
       .filter((dto) => !agencyId || dto.agencyId === agencyId)
-      .map((dto) => ({ ...dto, agencyName: TEST_AGENCY_NAME }));
+      .map((dto) => ({
+        ...dto,
+        agencyName: TEST_AGENCY_NAME,
+        agencyDepartment: TEST_AGENCY_DEPARTMENT,
+      }));
   }
 
   public async getConventionById(
@@ -43,6 +48,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
       storedConvention && {
         ...storedConvention,
         agencyName: TEST_AGENCY_NAME,
+        agencyDepartment: TEST_AGENCY_DEPARTMENT,
       }
     );
   }

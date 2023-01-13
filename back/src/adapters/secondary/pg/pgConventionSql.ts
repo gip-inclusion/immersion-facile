@@ -60,7 +60,7 @@ WITH
     LEFT JOIN partners_pe_connect AS p ON p.convention_id = b.convention_id)
 
 SELECT 
-  conventions.id, 
+  conventions.id,
   JSON_STRIP_NULLS(
     JSON_BUILD_OBJECT(
       'id', conventions.id,
@@ -78,6 +78,7 @@ SELECT
       'postalCode', postal_code, 
       'agencyId', agency_id, 
       'agencyName', agencies.name,
+      'agencyDepartment', agencies.department_code,
       'individualProtection', individual_protection,
       'sanitaryPrevention', sanitary_prevention,
       'sanitaryPreventionDescription', sanitary_prevention_description,
