@@ -1,13 +1,13 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
-import React from "react";
+import React, { useState } from "react";
 import {
   addressDtoToString,
   ContactMethod,
   SearchImmersionResultDto,
 } from "shared";
 import { getMapsLink } from "./ContactEstablishmentModal";
-
+import LinesEllipsis from "react-lines-ellipsis";
 import "./SearchResult.scss";
 
 export type EnterpriseSearchResultProps = {
@@ -35,17 +35,21 @@ export const SearchResult = ({
     voluntaryToImmersion,
     website,
     fitForDisabledWorkers,
-    // additionalInformation,
+    additionalInformation,
   } = searchResult;
   const distanceKm = ((distance_m ?? 0) / 1000).toFixed(1);
   const establishmentRawName = customizedName ?? name;
   const [establismentNameFirstLetter, ...establismentNameOtherLetters] =
     establishmentRawName;
+  const [additionalInformationClamped, setAdditionalInformationClamped] =
+    useState<boolean>(true);
   const establismentName = [
     establismentNameFirstLetter.toLocaleUpperCase(),
     establismentNameOtherLetters.join("").toLocaleLowerCase(),
   ].join("");
-
+  const onAdditionalInformationClick = () => {
+    setAdditionalInformationClamped((prevValue) => !prevValue);
+  };
   return (
     <div className="fr-col-12 fr-col-md-4">
       <div className={`${componentName} fr-card`}>
@@ -86,6 +90,22 @@ export const SearchResult = ({
                   <a href={website} target="_blank">
                     Voir le site de l'entreprise
                   </a>
+                </li>
+              )}
+              {additionalInformation && (
+                <li>
+                  <LinesEllipsis
+                    text={additionalInformation}
+                    maxLine={additionalInformationClamped ? 2 : 10}
+                    basedOn="letters"
+                    ellipsis={"..."}
+                  />
+                  <button
+                    className={fr.cx("fr-tag", "fr-tag--sm", "fr-mt-1w")}
+                    onClick={onAdditionalInformationClick}
+                  >
+                    {additionalInformationClamped ? "Voir plus" : "Voir moins"}
+                  </button>
                 </li>
               )}
             </ul>

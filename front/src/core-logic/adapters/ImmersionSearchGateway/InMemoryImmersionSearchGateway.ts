@@ -87,7 +87,7 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     nafLabel: "Métallurgie",
     website: "www.corp.com/job",
     additionalInformation:
-      "Si vous aimez la métallurgie et la bonne bière, vous serez ravis !",
+      "Afin de transmettre le savoir faire vous serez encadré par une équipe professionnelle dirigée par un champion du monde de la pizza, afin de transmettre le savoir faire vous serez encadré par une équipe professionnelle dirigée par un champion du monde de la pizza",
     distance_m: 7984654,
   },
   {

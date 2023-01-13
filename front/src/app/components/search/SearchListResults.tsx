@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ContactMethod, frontRoutes, SearchImmersionResultDto } from "shared";
+import { ContactMethod, SearchImmersionResultDto } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import { SuccessFeedback } from "src/app/components/SuccessFeedback";
@@ -9,7 +9,6 @@ import {
 } from "./ContactEstablishmentModal";
 import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 import { SearchResult } from "./SearchResult";
-import { routes } from "src/app/routes/routes";
 
 const getFeedBackMessage = (contactMethod?: ContactMethod) => {
   switch (contactMethod) {
@@ -75,12 +74,12 @@ export const SearchListResults = () => {
           <Pagination
             showFirstLast
             count={totalPages}
-            defaultPage={currentPage}
+            defaultPage={currentPage + 1}
             getPageLinkProps={(pageNumber) => ({
               title: `Résultats de recherche, page : ${pageNumber}`,
               onClick: (event) => {
                 event.preventDefault();
-                setCurrentPage(pageNumber);
+                setCurrentPage(pageNumber - 1);
               },
               href: "#", // TODO : PR vers react-dsfr pour gérer pagination full front
               key: `pagination-link-${pageNumber}`,
