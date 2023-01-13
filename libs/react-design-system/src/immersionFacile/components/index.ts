@@ -31,5 +31,4 @@ export * from "./section-accordion";
 export * from "./skip-links";
 export * from "./error-notifications";
 export * from "./select";
-export * from "./pagination";
 export * from "./loader";

@@ -24,7 +24,6 @@ const getFeedBackMessage = (contactMethod?: ContactMethod) => {
 
 export const SearchListResults = () => {
   const searchResults = useAppSelector(searchSelectors.searchResults);
-
   // prettier-ignore
   const [successfulValidationMessage, setSuccessfulValidatedMessage] = useState<string | null>(null);
   const [successFullyValidated, setSuccessfullyValidated] = useState(false);

@@ -182,7 +182,7 @@ export const ImmersionHeader = () => {
           text: "Recherche V2",
           isActive: false,
           linkProps: {
-            ...routes.searchV2().link,
+            ...routes.search().link,
             id: getHeaderNavLinkId("admin-search-v2"),
           },
         },

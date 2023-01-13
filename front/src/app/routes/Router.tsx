@@ -11,7 +11,6 @@ import { ErrorRedirectPage } from "src/app/pages/error/ErrorRedirectPage";
 import { EstablishmentEditionFormPage } from "src/app/pages/establishment/EstablishmentEditionFormPage";
 import { EstablishmentFormPageForExternals } from "src/app/pages/establishment/EstablishmentFormPageForExternals";
 import { SearchPage } from "src/app/pages/search/SearchPage";
-import { SearchListPage } from "src/app/pages/search/SearchListPage";
 
 import { StatsPage } from "src/app/pages/StatsPage";
 import { PrivateRoute } from "src/app/routes/PrivateRoute";
@@ -82,7 +81,6 @@ export const Router = () => {
         <RenewExpiredLinkPage route={route} />
       )}
       {route.name === "search" && <SearchPage route={route} />}
-      {route.name === "searchV2" && <SearchListPage route={route} />}
       {route.name === "stats" && <StatsPage />}
       {route.name === "standard" &&
         standardPageSlugs.includes(

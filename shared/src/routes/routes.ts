@@ -12,7 +12,6 @@ export const frontRoutes = {
   landingEstablishment: "accueil-etablissement",
   magicLinkRenewal: "refraichir-lien",
   search: "recherche",
-  searchV2: "recherche-v2",
   homeCandidates: "accueil-beneficiaires",
   homeEstablishments: "accueil-entreprises",
   homeAgencies: "accueil-prescripteurs",

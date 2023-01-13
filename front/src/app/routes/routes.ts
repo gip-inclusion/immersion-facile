@@ -103,19 +103,6 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     },
     () => `/${frontRoutes.search}`,
   ),
-  searchV2: defineRoute(
-    {
-      distance_km: param.query.optional.number,
-      latitude: param.query.optional.number,
-      longitude: param.query.optional.number,
-      address: param.query.optional.string,
-      rome: param.query.optional.string,
-      romeLabel: param.query.optional.string,
-      sortedBy: param.query.optional.string,
-      page: param.query.optional.number,
-    },
-    () => `/${frontRoutes.searchV2}`,
-  ),
   standard: defineRoute(
     {
       pagePath: param.path.ofType(standardPagesSerializer),
