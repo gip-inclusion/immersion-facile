@@ -15,6 +15,11 @@ describe("PgAuthenticatedUserRepository", () => {
     pgAuthenticatedUserRepository = new PgAuthenticatedUserRepository(client);
     await client.query("DELETE FROM authenticated_users");
   });
+  afterAll(async () => {
+    client.release();
+    await pool.end();
+  });
+
   it("returns undefined if no authenticated user are found", async () => {
     const response = await pgAuthenticatedUserRepository.findByEmail(
       "joe@mail.com",
