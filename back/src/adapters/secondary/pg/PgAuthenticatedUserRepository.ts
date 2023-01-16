@@ -32,7 +32,7 @@ export class PgAuthenticatedUserRepository
       await this.client.query(
         `
         UPDATE authenticated_users
-        SET first_name=$2, last_name=$3 
+        SET first_name=$2, last_name=$3, updated_at=now()
         WHERE email=$1
         `,
         [email, firstName, lastName],

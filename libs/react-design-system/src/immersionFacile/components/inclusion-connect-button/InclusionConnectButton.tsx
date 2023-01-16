@@ -14,7 +14,6 @@ export const InclusionConnectButton = ({
     onClick={onClick}
     href={`/api/${inclusionConnectEndpoint}`}
     className="btn-inclusion-connect"
-    target="_blank"
   >
     <img
       src="./logo-inclusion-connect-two-lines.svg"

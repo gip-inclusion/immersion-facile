@@ -7,6 +7,6 @@ export type AuthenticatedUser = {
   email: string;
   firstName: string;
   lastName: string;
-  // createdAt: string;
-  // lastConnection: string;
+  createdAt: string;
+  // updatedAt: string;
 };

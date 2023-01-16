@@ -1,5 +1,11 @@
 import { MigrationBuilder } from "node-pg-migrate";
 
+const timestampTz = (pgm: MigrationBuilder) => ({
+  type: "timestamptz",
+  notNull: true,
+  default: pgm.func("now()"),
+});
+
 const ongoingOAuthTableName = "ongoing_oauths";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
@@ -10,6 +16,8 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     user_id: { type: "uuid" },
     external_id: { type: "text" },
     access_token: { type: "text" },
+    created_at: timestampTz(pgm),
+    updated_at: timestampTz(pgm),
   });
 }
 

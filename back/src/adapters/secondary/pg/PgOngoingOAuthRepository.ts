@@ -13,6 +13,8 @@ type PersistenceOngoingOAuth = {
   user_id?: string;
   external_id?: string;
   access_token?: string;
+  createAt: string;
+  updateAt: string;
 };
 
 export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
@@ -38,7 +40,7 @@ export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
       await this.client.query(
         `
         UPDATE ongoing_oauths
-        SET state=$1, nonce=$2, provider=$3, user_id=$4, external_id=$5, access_token=$6 
+        SET state=$1, nonce=$2, provider=$3, user_id=$4, external_id=$5, access_token=$6, updated_at=now() 
         WHERE state=$1 
       `,
         [state, nonce, provider, userId, externalId, accessToken],
