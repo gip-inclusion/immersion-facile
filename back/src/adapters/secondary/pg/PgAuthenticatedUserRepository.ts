@@ -28,7 +28,14 @@ export class PgAuthenticatedUserRepository
 
   public async save(user: AuthenticatedUser): Promise<void> {
     const { id, email, firstName, lastName } = user;
-    if (await this.findByEmail(user.email)) {
+    const existingUser = await this.findByEmail(user.email);
+    if (existingUser) {
+      if (
+        existingUser.firstName === firstName &&
+        existingUser.lastName === lastName
+      )
+        return;
+
       await this.client.query(
         `
         UPDATE authenticated_users
