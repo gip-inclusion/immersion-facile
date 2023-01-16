@@ -15,7 +15,11 @@ import { adminAuthSlice } from "src/core-logic/domain/admin/adminAuth/adminAuth.
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
 
-export const AdminRoute = ({ children }: { children: React.ReactElement }) => {
+export const AdminPrivateRoute = ({
+  children,
+}: {
+  children: React.ReactElement;
+}) => {
   const isAuthenticatedAsAdmin = useAppSelector(
     adminSelectors.auth.isAuthenticated,
   );

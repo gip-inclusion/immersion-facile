@@ -13,8 +13,8 @@ import { EstablishmentEditionFormPage } from "src/app/pages/establishment/Establ
 import { EstablishmentFormPageForExternals } from "src/app/pages/establishment/EstablishmentFormPageForExternals";
 import { SearchPage } from "src/app/pages/search/SearchPage";
 import { StatsPage } from "src/app/pages/StatsPage";
-import { AdminRoute } from "src/app/routes/AdminRoute";
-import { InclusionConnectedRoute } from "src/app/routes/InclusionConnectedRoute";
+import { AdminPrivateRoute } from "src/app/routes/AdminPrivateRoute";
+import { InclusionConnectedPrivateRoute } from "src/app/routes/InclusionConnectedPrivateRoute";
 import { RenewExpiredLinkPage } from "src/app/routes/RenewExpiredLinkPage";
 import { Route } from "type-route";
 import { StandardLayout } from "../components/layout/StandardLayout";
@@ -34,14 +34,14 @@ const getPageByRouteName: {
   addAgency: () => <AddAgencyPage />,
   adminRoot: () => routes.adminTab({ tab: "conventions" }).replace(),
   adminTab: (route) => (
-    <AdminRoute>
+    <AdminPrivateRoute>
       <AdminPage route={route} />
-    </AdminRoute>
+    </AdminPrivateRoute>
   ),
   agencyDashboard: () => (
-    <InclusionConnectedRoute>
+    <InclusionConnectedPrivateRoute>
       <AgencyDashboardPage />
-    </InclusionConnectedRoute>
+    </InclusionConnectedPrivateRoute>
   ),
   conventionForUkraine: (route) => <ConventionPageForUkraine route={route} />,
   conventionImmersion: (route) => <ConventionImmersionPage route={route} />,

@@ -3,7 +3,7 @@ import { InclusionConnectButton, MainWrapper } from "react-design-system";
 import { inclusionConnectImmersionTargets } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 
-export const InclusionConnectedRoute = ({
+export const InclusionConnectedPrivateRoute = ({
   children,
 }: {
   children: React.ReactElement;

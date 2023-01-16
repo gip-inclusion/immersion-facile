@@ -152,14 +152,6 @@ export const ImmersionHeader = () => {
             id: getHeaderNavLinkId("agency-form-convention"),
           },
         },
-        {
-          text: "Mon organisme",
-          isActive: false,
-          linkProps: {
-            ...routes.agencyDashboard().link,
-            id: getHeaderNavLinkId("agency-my-dashboard"),
-          },
-        },
       ],
     },
   ];
@@ -192,6 +184,14 @@ export const ImmersionHeader = () => {
           linkProps: {
             ...routes.search().link,
             id: getHeaderNavLinkId("admin-search-v2"),
+          },
+        },
+        {
+          text: "Mon organisme (dashboard agence)",
+          isActive: false,
+          linkProps: {
+            ...routes.agencyDashboard().link,
+            id: getHeaderNavLinkId("agency-my-dashboard"),
           },
         },
       ],
