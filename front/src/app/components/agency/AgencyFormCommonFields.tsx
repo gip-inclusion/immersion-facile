@@ -57,7 +57,6 @@ export const AgencyFormCommonFields = ({
   >(defaultValidationStepsValue);
   const { getFormFields } = useFormContents(formAgencyFieldsLabels);
   const fieldsContent = getFormFields();
-
   return (
     <>
       <Select
@@ -65,6 +64,10 @@ export const AgencyFormCommonFields = ({
         options={agencyListOfOptions.sort((a, b) =>
           a.label < b.label ? -1 : 0,
         )}
+        value={values.kind}
+        onChange={(event) =>
+          setFieldValue(fieldsContent.kind.name, event.currentTarget.value)
+        }
         placeholder="Veuillez choisir un type de structure"
       />
       <TextInput {...fieldsContent.name} />
