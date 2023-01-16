@@ -645,11 +645,35 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
     }),
   },
   SUGGEST_EDIT_FORM_ESTABLISHMENT: {
-    niceName: "[KO] Suggestion de mise à jour d'etablissement",
+    niceName: "Suggestion de mise à jour d'etablissement",
     tags: ["mise à jour fiche entreprise"],
-    createEmailVariables: () => ({
-      subject: "TODO",
-      content: "TODO",
+    createEmailVariables: ({ editFrontUrl }) => ({
+      subject:
+        "Immersion Facilitée - Mettez à jour les informations de votre entreprise accueillante",
+      greetings: "Bonjour,",
+      content: `Votre entreprise est inscrite dans l'annuaire des entreprises accueillantes d'Immersion Facilitée depuis au moins 6 mois. Merci !
+
+      Vous pouvez mettre à jour, si vous le souhaitez, les informations saisies au moment du référencement.
+      
+      Vous pouvez :
+      • ajouter ou supprimer des métiers
+      • modifier l'enseigne ou l'adresse
+      • modifier les coordonnées du référent "Immersion"
+      • modifier le mode de contact souhaité
+      • ajouter un lien vers le site ou des informations complémentaires sur l'activité de l'entreprise
+      • en suspendre la visibilité
+      `,
+      subContent: `Nous vous invitons à cliquer sur le bouton ci-dessus pour mettre à jour vos informations.
+      
+      Si vous n'avez pas besoin de faire de modifications, vous n'avez rien à faire, les informations concernant votre entreprise seront affichées à l'identique.
+      
+      ${defaultSignature}`,
+      legals:
+        "* Pour les entreprises de 20 salariés et plus, les personnes en situation de handicap accueillies en immersion sont comptabilisées au titre de l'obligation d'emploi.",
+      buttons: [
+        { label: "Mettre à jour ma fiche établissement", url: editFrontUrl },
+      ],
+      highlight: `Nouveauté ! Il est maintenant possible d'informer que votre entreprise peut accueillir en immersion des personnes en situation de handicap *`,
     }),
   },
   EDIT_FORM_ESTABLISHMENT_LINK: {
