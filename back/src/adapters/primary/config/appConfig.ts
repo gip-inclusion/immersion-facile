@@ -2,6 +2,7 @@ import * as dotenv from "dotenv";
 import { trim } from "ramda";
 import {
   AbsoluteUrl,
+  inclusionConnectImmersionTargets,
   makeGetBooleanVariable,
   makeThrowIfNotAbsoluteUrl,
   makeThrowIfNotDefined,
@@ -182,7 +183,7 @@ export class AppConfig {
     return {
       clientId: this.throwIfNotDefined("INCLUSION_CONNECT_CLIENT_ID"),
       clientSecret: this.throwIfNotDefined("INCLUSION_CONNECT_CLIENT_SECRET"),
-      immersionRedirectUri: this.immersionFacileBaseUrl,
+      immersionRedirectUri: `${this.immersionFacileBaseUrl}/api${inclusionConnectImmersionTargets.afterLoginRedirection.url}`,
       inclusionConnectBaseUri: this.throwIfNotAbsoluteUrl(
         "INCLUSION_CONNECT_BASE_URI",
       ),

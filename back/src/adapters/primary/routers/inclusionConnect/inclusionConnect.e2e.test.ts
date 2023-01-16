@@ -2,6 +2,7 @@ import {
   AbsoluteUrl,
   AuthenticateWithInclusionCodeConnectParams,
   decodeJwtWithoutSignatureCheck,
+  frontRoutes,
   inclusionConnectImmersionTargets,
   queryParamsAsString,
 } from "shared";
@@ -87,11 +88,19 @@ describe("inclusion connection flow", () => {
         inclusionConnectImmersionTargets.afterLoginRedirection.url
       }?${queryParamsAsString(params)}`,
     );
-    expect(typeof response.body).toBe("string");
-    expect(response.status).toBe(200);
+
+    expect(response.status).toBe(302);
+    expect(response.header.location).toContain(
+      `https://${domain}/${frontRoutes.agencyDashboard}?token=`,
+    );
+
+    const token = response.header.location.replace(
+      `https://${domain}/${frontRoutes.agencyDashboard}?token=`,
+      "",
+    );
+
     expect(
-      typeof decodeJwtWithoutSignatureCheck<{ userId: string }>(response.body)
-        .userId,
+      typeof decodeJwtWithoutSignatureCheck<{ userId: string }>(token).userId,
     ).toBe("string");
   };
 });

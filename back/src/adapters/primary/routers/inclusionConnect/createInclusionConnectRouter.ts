@@ -1,7 +1,10 @@
 import { Router } from "express";
-import { inclusionConnectImmersionTargets } from "shared";
+import {
+  frontRoutes,
+  inclusionConnectImmersionTargets,
+  queryParamsAsString,
+} from "shared";
 import { AppDependencies } from "../../config/createAppDependencies";
-import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 import { sendRedirectResponse } from "../../helpers/sendRedirectResponse";
 
 export const createInclusionConnectRouter = (deps: AppDependencies) => {
@@ -18,9 +21,14 @@ export const createInclusionConnectRouter = (deps: AppDependencies) => {
   inclusionConnectRouter
     .route(inclusionConnectImmersionTargets.afterLoginRedirection.url)
     .get(async (req, res) =>
-      sendHttpResponse(req, res, async () =>
-        deps.useCases.authenticateWithInclusionCode.execute(req.query as any),
-      ),
+      sendRedirectResponse(req, res, async () => {
+        const token = await deps.useCases.authenticateWithInclusionCode.execute(
+          req.query as any,
+        );
+        return `${deps.config.immersionFacileBaseUrl}/${
+          frontRoutes.agencyDashboard
+        }?${queryParamsAsString({ token })}`;
+      }),
     );
 
   return inclusionConnectRouter;

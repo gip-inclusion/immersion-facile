@@ -24,12 +24,18 @@ export class HttpInclusionConnectGateway implements InclusionConnectGateway {
           code,
           client_id: this.inclusionConnectConfig.clientId,
           client_secret: this.inclusionConnectConfig.clientSecret,
-          redirect_uri: this.inclusionConnectConfig.immersionRedirectUri,
           grant_type: "authorization_code",
+          redirect_uri: this.inclusionConnectConfig.immersionRedirectUri,
+        },
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
         },
       })
       .catch((error) => {
-        logger.error("Error trying to get Access Token", error?.response?.data);
+        logger.error(
+          { body: error?.response?.data },
+          "Error trying to get Access Token",
+        );
         throw error;
       });
 
