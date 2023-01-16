@@ -58,6 +58,9 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
         response.id_token,
       );
 
+    if (jwtPayload.nonce !== existingOngoingOAuth.nonce)
+      throw new ForbiddenError("Nonce mismatch");
+
     const existingAuthenticatedUser =
       await uow.authenticatedUserRepository.findByEmail(jwtPayload.email);
 

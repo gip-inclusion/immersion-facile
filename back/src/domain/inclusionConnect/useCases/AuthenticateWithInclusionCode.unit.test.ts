@@ -53,6 +53,28 @@ describe("AuthenticateWithInclusionCode use case", () => {
     );
   });
 
+  it("should raise a Forbidden error if the nonce does not match", async () => {
+    const existingNonce = "existing-nonce";
+    const initialOngoingOAuth: OngoingOAuth = {
+      provider: "inclusionConnect",
+      state: "my-state",
+      nonce: existingNonce,
+    };
+    uow.ongoingOAuthRepository.ongoingOAuths = [initialOngoingOAuth];
+
+    const accessToken = "inclusion-access-token";
+    inclusionConnectGateway.setAccessTokenResponse({
+      ...defaultInclusionAccessTokenResponse,
+      access_token: accessToken,
+    });
+
+    const params = { code: "my-inclusion-code", state: "my-state" };
+    await expectPromiseToFailWithError(
+      useCase.execute(params),
+      new ForbiddenError("Nonce mismatch"),
+    );
+  });
+
   describe("when auth process goes successfully", () => {
     describe("when user had never connected before", () => {
       it("saves the user as Authenticated user", async () => {
@@ -149,7 +171,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
     const initialOngoingOAuth: OngoingOAuth = {
       provider: "inclusionConnect",
       state: "my-state",
-      nonce: "my-nonce",
+      nonce: "nounce", // matches the one in the payload of the token
     };
     uow.ongoingOAuthRepository.ongoingOAuths = [initialOngoingOAuth];
 
