@@ -92,7 +92,7 @@ const EditionSiretRelatedInputs = ({
       <TextInput {...formContents.businessNameCustomized} />
       <AddressAutocomplete
         initialSearchTerm={businessAddress}
-        {...formContents.businessNameCustomized}
+        {...formContents.businessAddress}
         setFormValue={({ address }) =>
           setAddressValue(addressDtoToString(address))
         }
