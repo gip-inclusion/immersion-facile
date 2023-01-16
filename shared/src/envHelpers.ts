@@ -1,5 +1,4 @@
 import { AbsoluteUrl, absoluteUrlSchema } from "./AbsoluteUrl";
-
 export type ProcessEnv = { [key: string]: string | undefined };
 
 type ThrowIfNotInArrayParams<T> = {
@@ -48,6 +47,21 @@ export const makeThrowIfNotAbsoluteUrl =
     }
   };
 
+export type OpenCageGeoSearchKey = `oc_gs_${string}`;
+
+export const makeThrowIfNotOpenCageGeosearchKey =
+  (processEnv: ProcessEnv) =>
+  (variableName: string): OpenCageGeoSearchKey => {
+    const value = processEnv[variableName];
+    if (!value) throw new Error(`Expected ${variableName} to be Defined`);
+    if (value.indexOf("oc_gs_") === 0) {
+      return value as OpenCageGeoSearchKey;
+    } else {
+      throw new Error(
+        `Provided value ${value} for ${variableName} is not an OpenCage Data Geosearch key.`,
+      );
+    }
+  };
 /*
  * Value should can only be a string,
  * so any string containing "TRUE" or "True" (case insensitive) will be considered true,

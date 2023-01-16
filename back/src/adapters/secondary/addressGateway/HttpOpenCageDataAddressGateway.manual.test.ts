@@ -4,6 +4,7 @@ import {
   expectPromiseToFailWithError,
   expectTypeToMatchAndEqual,
   GeoPositionDto,
+  LookupSearchResult,
 } from "shared";
 
 import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
@@ -47,7 +48,8 @@ const resultFromApiAddress = {
   ],
 };
 
-const apiKey = AppConfig.createFromEnv().apiKeyOpenCageData;
+const geocodingApiKey = AppConfig.createFromEnv().apiKeyOpenCageDataGeocoding;
+const geosearchApiKey = AppConfig.createFromEnv().apiKeyOpenCageDataGeosearch;
 
 describe("HttpOpenCageDataAddressGateway", () => {
   let httpAddressGateway: AddressGateway;
@@ -56,7 +58,8 @@ describe("HttpOpenCageDataAddressGateway", () => {
     httpAddressGateway = new HttpOpenCageDataAddressGateway(
       createHttpOpenCageDataClient<OpenCageDataTargets>(openCageDataTargets),
       httpAdresseApiClient,
-      apiKey,
+      geocodingApiKey,
+      geosearchApiKey,
     );
   });
 
@@ -196,7 +199,48 @@ describe("HttpOpenCageDataAddressGateway", () => {
       });
     });
   });
+  describe("lookupLocationName", () => {
+    it.each([
+      {
+        candidateQuery: "Uzerche",
+        expectedSearchResult: {
+          bounds: {
+            northeast: {
+              lat: "45.46268",
+              lng: "1.60699",
+            },
+            southwest: {
+              lat: "45.39357",
+              lng: "1.52545",
+            },
+          },
+          formatted: "Uzerche, Corrèze, France",
+          geometry: {
+            lat: "45.42433",
+            lng: "1.56373",
+          },
+          name: "Uzerche",
+        },
+      },
+    ])(
+      "should work if searching for $candidateQuery location query expect $expectedSearchResult",
+      async ({
+        candidateQuery,
+        expectedSearchResult,
+      }: {
+        candidateQuery: string;
+        expectedSearchResult: LookupSearchResult;
+      }) => {
+        const resultMetropolitanFrance =
+          await httpAddressGateway.lookupLocationName(candidateQuery);
 
+        const firstResult: LookupSearchResult | undefined =
+          resultMetropolitanFrance.at(0);
+        expect(firstResult).toEqual(expectedSearchResult);
+      },
+      10000,
+    );
+  });
   describe("findDepartmentCodeFromPostCode", () => {
     it.each([
       ["01240", "01"],
@@ -336,7 +380,8 @@ describe("HttpOpenCageDataAddressGateway check parrarel call", () => {
       new HttpOpenCageDataAddressGateway(
         createHttpOpenCageDataClient<OpenCageDataTargets>(openCageDataTargets),
         httpAdresseApiClient,
-        apiKey,
+        geocodingApiKey,
+        geosearchApiKey,
       );
 
     const coordinates: GeoPositionDto[] = [];

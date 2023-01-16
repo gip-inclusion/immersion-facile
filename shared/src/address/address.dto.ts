@@ -9,6 +9,25 @@ export type DepartmentCode = Flavor<string, "DepartmentCode">;
 export type Postcode = Flavor<string, "Postcode">;
 export type LookupAddress = Flavor<string, "LookupAddress">;
 
+export type LookupSearchResult = {
+  bounds: {
+    northeast: {
+      lat: string;
+      lng: string;
+    };
+    southwest: {
+      lat: string;
+      lng: string;
+    };
+  };
+  formatted: string;
+  geometry: {
+    lat: string;
+    lng: string;
+  };
+  name: string;
+};
+
 export type AddressDto = {
   streetNumberAndAddress: string;
   postcode: Postcode; // (ex: "75001")

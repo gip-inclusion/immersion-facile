@@ -15,7 +15,9 @@ import {
   departmentNameToDepartmentCode,
   featureToAddressDto,
   GeoPositionDto,
+  LookupSearchResult,
   ManagedAxios,
+  OpenCageGeoSearchKey,
   toFeatureCollection,
 } from "shared";
 import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
@@ -23,13 +25,14 @@ import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGate
 // https://github.com/OpenCageData/opencagedata-misc-docs/blob/master/countrycode.md
 // On prends la france et toutes ses territoires dépendants.
 const baseUrl = "https://api.opencagedata.com";
-const geoJsonUrl = `${baseUrl}/geocode/v1/geojson`;
+const geoCodingUrl = `${baseUrl}/geocode/v1/geojson`;
 const geoSearchUrl = `${baseUrl}/geosearch`;
 type BaseUrl = typeof baseUrl;
+
 const franceAndAttachedTerritoryCountryCodes =
   "fr,bl,gf,gp,mf,mq,nc,pf,pm,re,tf,wf,yt";
 const language = "fr";
-type QueryParams = {
+type GeoCodingQueryParams = {
   q: string;
   key: string;
   language?: string;
@@ -37,9 +40,21 @@ type QueryParams = {
   limit?: string;
 };
 
+type GeoSearchQueryParams = {
+  q: string;
+  language?: string;
+  countrycode?: string;
+  limit?: string;
+};
+
+type GeoSearchHeaders = {
+  "OpenCage-Geosearch-Key": OpenCageGeoSearchKey;
+  Origin: string;
+};
+
 export type OpenCageDataTargets = CreateTargets<{
-  geocoding: Target<void, QueryParams, void, BaseUrl>;
-  geosearch: Target<void, QueryParams, void, BaseUrl>;
+  geocoding: Target<void, GeoCodingQueryParams, void, BaseUrl>;
+  geosearch: Target<void, GeoSearchQueryParams, GeoSearchHeaders, BaseUrl>;
 }>;
 
 type APIAddressTargetUrls = "apiAddressReverse" | "apiAddressSearchPlainText";
@@ -47,7 +62,7 @@ type APIAddressTargetUrls = "apiAddressReverse" | "apiAddressSearchPlainText";
 export const openCageDataTargets = createTargets<OpenCageDataTargets>({
   geocoding: {
     method: "GET",
-    url: geoJsonUrl as BaseUrl,
+    url: geoCodingUrl as BaseUrl,
   },
   geosearch: {
     method: "GET",
@@ -68,7 +83,7 @@ export class HttpOpenCageDataAddressGateway implements AddressGateway {
     private readonly httpClient: HttpClient<OpenCageDataTargets>,
     private readonly APIAddressClient: ManagedAxios<APIAddressTargetUrls>,
     private geocodingApiKey: string,
-    private geosearchApiKey: string,
+    private geosearchApiKey: OpenCageGeoSearchKey,
   ) {}
   public async getDepartmentCodeFromAddressAPI(
     postCode: string,
@@ -131,7 +146,6 @@ export class HttpOpenCageDataAddressGateway implements AddressGateway {
     );
     return feature && this.featureToAddress(feature);
   }
-
   public async lookupStreetAddress(
     query: string,
   ): Promise<AddressAndPosition[]> {
@@ -140,17 +154,48 @@ export class HttpOpenCageDataAddressGateway implements AddressGateway {
     try {
       if (query.length < queryMinLength)
         throw new Error(minimumCharErrorMessage(queryMinLength));
-      const { responseBody } = await this.httpClient.geosearch({
+      const { responseBody } = await this.httpClient.geocoding({
         queryParams: {
           countrycode: franceAndAttachedTerritoryCountryCodes,
-          key: this.geosearchApiKey,
+          key: this.geocodingApiKey,
           language,
           q: query,
         },
       });
+
       return (responseBody as OpenCageDataFeatureCollection).features
         .map((feature) => this.toAddressAndPosition(feature))
         .filter((feature): feature is AddressAndPosition => !!feature);
+    } finally {
+      // eslint-disable-next-line no-console
+      console.timeEnd(`lookupStreetAddress Duration - ${query}`);
+    }
+  }
+
+  public async lookupLocationName(
+    query: string,
+  ): Promise<LookupSearchResult[]> {
+    // eslint-disable-next-line no-console
+    console.time(`lookupLocationName Duration - ${query}`);
+    try {
+      if (query.length < queryMinLength)
+        throw new Error(minimumCharErrorMessage(queryMinLength));
+
+      const { responseBody } = await this.httpClient.geosearch({
+        headers: {
+          "OpenCage-Geosearch-Key": this.geosearchApiKey,
+          Origin: "https://beta.pole-emploi.fr",
+        },
+        mode: "cors",
+        queryParams: {
+          countrycode: "fr",
+          language,
+          limit: "5",
+          q: query,
+        },
+      });
+
+      return (responseBody as OpenCageDataSearchResultCollection).results;
     } finally {
       // eslint-disable-next-line no-console
       console.timeEnd(`lookupStreetAddress Duration - ${query}`);
@@ -206,6 +251,17 @@ type OpenCageDataFeatureCollection = GeoJSON.FeatureCollection<
   Point,
   OpenCageDataProperties
 >;
+
+type OpenCageDataSearchResultCollection = {
+  documentation: string;
+  licenses: object[];
+  results: LookupSearchResult[];
+  status: object;
+  stay_informed: object;
+  thanks: string;
+  timestamp: object;
+  total_results: number;
+};
 
 type OpenCageDataProperties = {
   components: OpenCageDataAddressComponents; // The address component

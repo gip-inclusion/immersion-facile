@@ -243,7 +243,8 @@ const createAddressGateway = (config: AppConfig) =>
       new HttpOpenCageDataAddressGateway(
         createHttpOpenCageDataClient<OpenCageDataTargets>(openCageDataTargets),
         httpAdresseApiClient,
-        config.apiKeyOpenCageData,
+        config.apiKeyOpenCageDataGeocoding,
+        config.apiKeyOpenCageDataGeosearch,
       ),
     ADRESSE_API: () => new HttpApiAdresseAddressGateway(httpAdresseApiClient),
   }[config.apiAddress]());
