@@ -79,7 +79,7 @@ const EditionSiretRelatedInputs = ({
   const { getFormFields } = useFormContents(formEstablishmentFieldsLabels);
   const formContents = getFormFields();
   const [_, __, { setValue: setAddressValue }] = useField<string>(
-    formContents.businessName.name,
+    formContents.businessAddress.name,
   );
 
   return (
