@@ -16,12 +16,13 @@ export type GenerateAuthenticatedUserToken = GenerateJwtFn<{ userId: string }>;
 export type GenerateApiConsumerJtw = GenerateJwtFn<WithApiConsumerId>;
 
 // prettier-ignore
-export type GenerateJwtFn<Payload extends AnyObject> = (payload: Payload) => string;
+export type GenerateJwtFn<Payload extends AnyObject> = (payload: Payload, expiresIn_s?: number) => string;
 export const makeGenerateJwtES256 =
   <P extends AnyObject>(privateKey: string): GenerateJwtFn<P> =>
-  (payload) =>
+  (payload, expiresIn_s?: number) =>
     jwt.sign(payload, privateKey, {
       algorithm: "ES256",
+      ...(expiresIn_s ? { expiresIn: expiresIn_s } : {}),
       //noTimestamp: true, //Remove iat on payload
     });
 

@@ -1,5 +1,10 @@
 import { z } from "zod";
 
+// see documentation : https://github.com/betagouv/itou-inclusion-connect/blob/master/docs/openid_connect.md
+
+// id_token is a jwt that has a payload of kind : InclusionAccessTokenResponse
+// access_token could be used to call UserInfo endpoint
+
 export type InclusionAccessTokenResponse = {
   access_token: string;
   token_type: "Bearer";

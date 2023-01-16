@@ -91,7 +91,10 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       ),
     ]);
 
-    return this.generateAppToken({ userId: newOrUpdatedAuthenticatedUser.id });
+    return this.generateAppToken(
+      { userId: newOrUpdatedAuthenticatedUser.id },
+      response.expires_in * 60,
+    );
   }
 
   private makeAuthenticatedUser(
