@@ -16,17 +16,6 @@ export const fakeInclusionPayload = {
   email: "john.doe@inclusion.com",
 };
 
-export const prepareAccessToken = (
-  inclusionConnectGateway: InMemoryInclusionConnectGateway,
-  accessToken: string,
-) => {
-  inclusionConnectGateway.setAccessTokenResponse({
-    ...defaultInclusionAccessTokenResponse,
-    access_token: accessToken,
-  });
-  return accessToken;
-};
-
 export const defaultInclusionAccessTokenResponse: InclusionAccessTokenResponse =
   {
     token_type: "Bearer",

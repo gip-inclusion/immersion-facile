@@ -58,32 +58,40 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
         response.id_token,
       );
 
-    const authenticatedUser =
-      (await uow.authenticatedUserRepository.findByEmail(jwtPayload.email)) ??
-      this.makeAuthenticatedUser(this.uuidGenerator.new(), jwtPayload);
+    const existingAuthenticatedUser =
+      await uow.authenticatedUserRepository.findByEmail(jwtPayload.email);
+
+    const newOrUpdatedAuthenticatedUser: AuthenticatedUser = {
+      ...existingAuthenticatedUser,
+      ...this.makeAuthenticatedUser(this.uuidGenerator.new(), jwtPayload),
+      ...(existingAuthenticatedUser && {
+        email: existingAuthenticatedUser.email,
+        id: existingAuthenticatedUser.id,
+      }),
+    };
 
     const ongoingOAuth: OngoingOAuth = {
       ...existingOngoingOAuth,
-      userId: authenticatedUser.id,
+      userId: newOrUpdatedAuthenticatedUser.id,
       externalId: jwtPayload.sub,
       accessToken: response.access_token,
     };
 
     await Promise.all([
       uow.ongoingOAuthRepository.save(ongoingOAuth),
-      uow.authenticatedUserRepository.save(authenticatedUser),
+      uow.authenticatedUserRepository.save(newOrUpdatedAuthenticatedUser),
       uow.outboxRepository.save(
         this.createNewEvent({
           topic: "UserAuthenticatedSuccessfully",
           payload: {
-            userId: authenticatedUser.id,
+            userId: newOrUpdatedAuthenticatedUser.id,
             provider: ongoingOAuth.provider,
           },
         }),
       ),
     ]);
 
-    return this.generateAppToken({ userId: authenticatedUser.id });
+    return this.generateAppToken({ userId: newOrUpdatedAuthenticatedUser.id });
   }
 
   private makeAuthenticatedUser(

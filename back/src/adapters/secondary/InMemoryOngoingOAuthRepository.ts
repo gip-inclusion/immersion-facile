@@ -4,14 +4,6 @@ import {
 } from "../../domain/generic/OAuth/entities/OngoingOAuth";
 import { OngoingOAuthRepository } from "../../domain/generic/OAuth/ports/OngoingOAuthRepositiory";
 
-export const prepareOngoingOAuth = (
-  ongoingOAuthRepository: InMemoryOngoingOAuthRepository,
-  ongoingOAuth: OngoingOAuth,
-) => {
-  ongoingOAuthRepository.ongoingOAuths = [ongoingOAuth];
-  return ongoingOAuth;
-};
-
 export class InMemoryOngoingOAuthRepository implements OngoingOAuthRepository {
   public async save(newOngoingOAuth: OngoingOAuth): Promise<void> {
     const existingOngoingOAuth = await this.findByState(
