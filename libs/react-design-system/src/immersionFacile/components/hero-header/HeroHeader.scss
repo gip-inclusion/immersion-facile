@@ -172,7 +172,7 @@ $typesTints: (
       content: "";
       display: block;
       position: absolute;
-      bottom: 3.2rem;
+      bottom: 1rem;
       width: 30%;
       left: 50%;
       transform: translateX(-50%);
@@ -180,6 +180,9 @@ $typesTints: (
       transition: all 0.6s ease;
       border-radius: 4px;
       opacity: 0.25;
+      @include for-screen-min($bp-lg) {
+        bottom: 3.2rem;
+      }
     }
     @each $type, $colors in $typesTints {
       $primary: map-get($colors, "primary");
