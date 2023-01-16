@@ -73,7 +73,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
         });
       });
 
-      it("updates ongoingOAuth with userId and accessToken", async () => {
+      it("updates ongoingOAuth with userId, accessToken and externalId", async () => {
         const { accessToken, initialOngoingOAuth, userId } =
           makeSuccessfulAuthenticationConditions();
 

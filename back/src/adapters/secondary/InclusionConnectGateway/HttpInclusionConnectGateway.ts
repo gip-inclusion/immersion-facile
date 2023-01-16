@@ -5,8 +5,11 @@ import {
   inclusionAccessTokenResponseSchema,
 } from "../../../domain/inclusionConnect/port/InclusionAccessTokenResponse";
 import { InclusionConnectConfig } from "../../../domain/inclusionConnect/useCases/InitiateInclusionConnect";
+import { createLogger } from "../../../utils/logger";
 import { validateAndParseZodSchema } from "../../primary/helpers/httpErrors";
 import { InclusionConnectExternalTargets } from "./inclusionConnectApi.client";
+
+const logger = createLogger(__filename);
 
 export class HttpInclusionConnectGateway implements InclusionConnectGateway {
   constructor(
@@ -15,8 +18,8 @@ export class HttpInclusionConnectGateway implements InclusionConnectGateway {
   ) {}
 
   async getAccessToken(code: string): Promise<InclusionAccessTokenResponse> {
-    const { responseBody } =
-      await this.httpClient.inclusionConnectGetAccessToken({
+    const { responseBody } = await this.httpClient
+      .inclusionConnectGetAccessToken({
         body: {
           code,
           client_id: this.inclusionConnectConfig.clientId,
@@ -24,6 +27,10 @@ export class HttpInclusionConnectGateway implements InclusionConnectGateway {
           redirect_uri: this.inclusionConnectConfig.immersionRedirectUri,
           grant_type: "authorization_code",
         },
+      })
+      .catch((error) => {
+        logger.error("Error trying to get Access Token", error?.response?.data);
+        throw error;
       });
 
     return validateAndParseZodSchema(

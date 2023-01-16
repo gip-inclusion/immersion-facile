@@ -29,7 +29,7 @@ export class InMemoryInclusionConnectGateway
 {
   async getAccessToken(_code: string): Promise<InclusionAccessTokenResponse> {
     if (this.accessTokenResponse) return this.accessTokenResponse;
-    throw new Error("");
+    throw new Error("No access token provided (in memory)");
   }
 
   // for test purposes
