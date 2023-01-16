@@ -118,7 +118,7 @@ export class InMemoryAgencyGateway implements AgencyGateway {
   async listMiniStageAgencies(
     _departmentCode: DepartmentCode,
   ): Promise<AgencyOption[]> {
-    return values(this._agencies).filter(propNotEq("kind", "cci"));
+    return values(this._agencies).filter(propEq("kind", "cci"));
   }
 
   async validateAgency(_: AdminToken, agencyId: AgencyId): Promise<void> {

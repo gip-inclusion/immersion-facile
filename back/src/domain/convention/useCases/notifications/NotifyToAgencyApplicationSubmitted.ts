@@ -1,5 +1,4 @@
 import {
-  Beneficiary,
   ConventionDto,
   conventionSchema,
   CreateConventionMagicLinkPayloadProperties,
@@ -71,8 +70,6 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
     agencyName: string;
     role: Role;
   }) {
-    const beneficiary: Beneficiary = convention.signatories.beneficiary;
-
     await Promise.all(
       recipients.map((counsellorEmail) => {
         const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties =
@@ -92,8 +89,8 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
             dateEnd: convention.dateEnd,
             dateStart: convention.dateStart,
             demandeId: convention.id,
-            firstName: beneficiary.firstName,
-            lastName: beneficiary.lastName,
+            firstName: convention.signatories.beneficiary.firstName,
+            lastName: convention.signatories.beneficiary.lastName,
             magicLink: this.generateMagicLinkFn({
               ...magicLinkCommonFields,
               targetRoute: frontRoutes.conventionToValidate,

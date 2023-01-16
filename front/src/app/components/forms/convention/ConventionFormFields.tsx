@@ -1,23 +1,23 @@
+import { fr } from "@codegouvfr/react-dsfr";
 import { useFormikContext } from "formik";
 import React, { useEffect } from "react";
-import { ConventionDto, Signatory, toDotNotation } from "shared";
 import { ErrorNotifications, Notification } from "react-design-system";
-import { deviceRepository } from "src/config/dependencies";
+import { ConventionDto, Signatory, toDotNotation } from "shared";
+import { ConventionFrozenMessage } from "src/app/components/forms/convention/ConventionFrozenMessage";
+import { ConventionSignOnlyMessage } from "src/app/components/forms/convention/ConventionSignOnlyMessage";
 import { makeValuesToWatchInUrl } from "src/app/components/forms/convention/makeValuesToWatchInUrl";
 import { SignatureActions } from "src/app/components/forms/convention/SignatureActions";
 import { SubmitButton } from "src/app/components/forms/convention/SubmitButtons";
 import { useConventionWatchValuesInUrl } from "src/app/components/forms/convention/useConventionWatchValuesInUrl";
-import { ConventionFrozenMessage } from "src/app/components/forms/convention/ConventionFrozenMessage";
-import { ConventionSignOnlyMessage } from "src/app/components/forms/convention/ConventionSignOnlyMessage";
+import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
+import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
+import { deviceRepository } from "src/config/dependencies";
 import { AgencyFormSection } from "./sections/agency/AgencyFormSection";
 import { BeneficiaryFormSection } from "./sections/beneficiary/BeneficiaryFormSection";
 import { EstablishmentFormSection } from "./sections/establishment/EstablishmentFormSection";
 import { ImmersionConditionFormSection } from "./sections/immersion-conditions/ImmersionConditionFormSection";
-import { useFormContents } from "src/app/hooks/formContents.hooks";
-import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
-import { fr } from "@codegouvfr/react-dsfr";
 
 type ConventionFieldsProps = {
   isFrozen?: boolean;

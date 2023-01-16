@@ -1,8 +1,8 @@
 import { ReactNode } from "react";
 
 import {
-  BeneficiaryCurrentEmployer,
   Beneficiary,
+  BeneficiaryCurrentEmployer,
   BeneficiaryRepresentative,
   ConventionReadDto,
   EstablishmentRepresentative,
@@ -19,7 +19,8 @@ export type FieldsAndTitle = {
 export type ConventionField =
   | keyof ConventionReadDto
   | `establishmentTutor.${keyof EstablishmentTutor}`
-  | `signatories.beneficiary.${keyof Beneficiary}`
+  | `signatories.beneficiary.${keyof Beneficiary<"immersion">}`
+  | `signatories.beneficiary.${keyof Beneficiary<"mini-stage-cci">}`
   | `signatories.beneficiaryRepresentative.${keyof BeneficiaryRepresentative}`
   | `signatories.beneficiaryCurrentEmployer.${keyof BeneficiaryCurrentEmployer}`
   | `signatories.establishmentRepresentative.${keyof EstablishmentRepresentative}`;

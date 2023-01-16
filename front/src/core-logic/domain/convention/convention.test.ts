@@ -287,7 +287,7 @@ describe("Convention slice", () => {
     });
 
     it("selects signatory data in convention when there is convention and currentSignatoryRole", () => {
-      const beneficiary: Beneficiary = {
+      const beneficiary: Beneficiary<"immersion"> = {
         email: "benef@mail.com",
         role: "beneficiary",
         phone: "0614000000",

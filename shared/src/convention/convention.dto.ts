@@ -8,6 +8,16 @@ import { Flavor } from "../typeFlavors";
 
 export type ConventionStatus = (typeof conventionStatuses)[number];
 
+export const isBeneficiary = (
+  beneficiary: Beneficiary<InternshipKind>,
+): beneficiary is Beneficiary<"immersion"> =>
+  !("levelOfEducation" in beneficiary);
+
+export const isBeneficiaryStudent = (
+  beneficiary: Beneficiary<InternshipKind>,
+): beneficiary is Beneficiary<"mini-stage-cci"> =>
+  "levelOfEducation" in beneficiary;
+
 type ConventionStatusWithoutJustification =
   (typeof conventionStatusesWithoutJustification)[number];
 
@@ -65,7 +75,7 @@ export type WithJustification = { justification: string };
 
 export type InternshipKind = "immersion" | "mini-stage-cci";
 
-export type ConventionDtoWithoutExternalId = {
+export type ConventionCommon = {
   id: ConventionId;
   status: ConventionStatus;
   rejectionJustification?: string;
@@ -87,13 +97,22 @@ export type ConventionDtoWithoutExternalId = {
   immersionAppellation: AppellationDto;
   immersionActivities: string;
   immersionSkills: string;
-  internshipKind: InternshipKind;
-  signatories: Signatories;
   establishmentTutor: EstablishmentTutor;
 };
 
-export type Signatories = {
-  beneficiary: Beneficiary;
+export type ConventionInternshipKindSpecific<T extends InternshipKind> = {
+  internshipKind: T;
+  signatories: Signatories<T>;
+};
+
+export type ConventionDtoWithoutExternalId = ConventionCommon &
+  (
+    | ConventionInternshipKindSpecific<"immersion">
+    | ConventionInternshipKindSpecific<"mini-stage-cci">
+  );
+
+export type Signatories<T extends InternshipKind = InternshipKind> = {
+  beneficiary: Beneficiary<T>;
   establishmentRepresentative: EstablishmentRepresentative;
   beneficiaryRepresentative?: BeneficiaryRepresentative;
   beneficiaryCurrentEmployer?: BeneficiaryCurrentEmployer;
@@ -125,13 +144,41 @@ export type GenericSignatory<R extends Role> = GenericActor<R> & {
   signedAt?: string; // Date iso string
 };
 
-export type Beneficiary = GenericSignatory<"beneficiary"> & {
-  emergencyContact?: string;
-  emergencyContactPhone?: string;
-  emergencyContactEmail?: string;
-  federatedIdentity?: FederatedIdentity;
-  birthdate: string; // Date iso string
+type StudentProperties = {
+  levelOfEducation: LevelOfEducation;
 };
+
+/* eslint-disable @typescript-eslint/ban-types */
+//prettier-ignore
+export type Beneficiary<T extends InternshipKind> =
+  GenericSignatory<"beneficiary"> & {
+    emergencyContact?: string;
+    emergencyContactPhone?: string;
+    emergencyContactEmail?: string;
+    federatedIdentity?: FederatedIdentity;
+    birthdate: string; // Date iso string
+  } 
+  & (T extends "mini-stage-cci" ? StudentProperties : {});
+/* eslint-enable @typescript-eslint/ban-types */
+
+export type LevelOfEducation = (typeof levelsOfEducation)[number];
+
+export const levelsOfEducation = [
+  "5ème",
+  "4ème",
+  "3ème",
+  "2nde",
+  "1ère",
+  "Terminale",
+  "Etude supérieure 1ère année",
+  "Etude supérieure 2ème année",
+  "Etude supérieure 3ème année",
+  "Etude supérieure 4ème année",
+  "Etude supérieure 5ème année",
+  "Etude supérieure 6ème année",
+  "Etude supérieure 7ème année",
+  "Etude supérieure 8ème année",
+] as const;
 
 export type BeneficiaryRepresentative = GenericSignatory<
   "beneficiary-representative" | "legal-representative"

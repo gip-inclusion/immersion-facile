@@ -8,6 +8,7 @@ import {
   FederatedIdentity,
   ImmersionObjective,
   InternshipKind,
+  LevelOfEducation,
   mergeObjectsExceptFalsyValues,
   OmitFromExistingKeys,
   reasonableSchedule,
@@ -24,8 +25,8 @@ import { v4 as uuidV4 } from "uuid";
 import { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
 
 export const isConventionFrozen = (
-  convention: Partial<ConventionDto>,
-): boolean => !convention.status || convention.status !== "DRAFT";
+  status: ConventionStatus | undefined,
+): boolean => status !== "DRAFT";
 
 export const undefinedIfEmptyString = (text?: string): string | undefined =>
   text || undefined;
@@ -120,6 +121,7 @@ export const conventionInitialValuesFromUrl = ({
         emergencyContact: params.emergencyContact ?? "",
         emergencyContactPhone: params.emergencyContactPhone ?? "",
         emergencyContactEmail: params.emergencyContactEmail ?? "",
+        levelOfEducation: (params.led as LevelOfEducation) ?? "",
         birthdate: params.birthdate ?? "",
         federatedIdentity: params.federatedIdentity as
           | FederatedIdentity

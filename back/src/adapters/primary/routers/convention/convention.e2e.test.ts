@@ -170,18 +170,12 @@ describe("convention e2e", () => {
           .expect(200, { id: convention.id });
 
         // POSTing an updated application to the same id succeeds.
-        const updatedConvention: ConventionDto = {
-          ...convention,
-          signatories: {
-            beneficiary: {
-              ...convention.signatories.beneficiary,
-              email: "new@email.fr",
-            },
-            establishmentRepresentative:
-              convention.signatories.establishmentRepresentative,
-          },
-          status: "READY_TO_SIGN",
-        };
+        const updatedConvention: ConventionDto = new ConventionDtoBuilder(
+          convention,
+        )
+          .withBeneficiaryEmail("new@email.fr")
+          .withStatus("READY_TO_SIGN")
+          .build();
 
         const jwt = generateMagicLinkJwt(
           createConventionMagicLinkPayload({

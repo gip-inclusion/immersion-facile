@@ -1,4 +1,4 @@
-import { Beneficiary } from "shared";
+import { Beneficiary, InternshipKind } from "shared";
 import { EntityFromDto } from "../../core/EntityFromDto";
 import { PeConnectImmersionAdvisorDto } from "./PeConnectAdvisor.dto";
 import { PeConnectUserDto } from "./PeConnectUser.dto";
@@ -15,7 +15,7 @@ export type ConventionPoleEmploiUserAdvisorEntity = EntityFromDto<
 >;
 
 export type ConventionPeConnectFields = Pick<
-  Beneficiary,
+  Beneficiary<InternshipKind>,
   "email" | "firstName" | "lastName" | "federatedIdentity"
 >;
 

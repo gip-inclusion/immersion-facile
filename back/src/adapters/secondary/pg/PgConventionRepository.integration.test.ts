@@ -9,6 +9,7 @@ import {
   EstablishmentRepresentative,
   EstablishmentTutor,
   expectToEqual,
+  reasonableSchedule,
 } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { PgAgencyRepository } from "./PgAgencyRepository";
@@ -67,6 +68,33 @@ describe("PgConventionRepository", () => {
       externalId: savedExternalId,
     });
     expect(typeof savedExternalId).toBe("string");
+  });
+
+  it("Adds/Update a new CCI convention", async () => {
+    const convention = new ConventionDtoBuilder()
+      .withInternshipKind("mini-stage-cci")
+      .withId("aaaaac99-9c0b-bbbb-bb6d-6bb9bd38aaaa")
+      .withDateStart(new Date("2023-01-02").toISOString())
+      .withDateEnd(new Date("2023-01-06").toISOString())
+      .withSchedule(reasonableSchedule)
+      .build();
+
+    const savedExternalId = await conventionRepository.save(convention);
+
+    expect(await conventionRepository.getById(convention.id)).toEqual({
+      ...convention,
+      externalId: savedExternalId,
+    });
+
+    const updatedConvention = new ConventionDtoBuilder(convention)
+      .withBeneficiaryFirstName("Marvin")
+      .withExternalId(savedExternalId)
+      .build();
+
+    await conventionRepository.update(updatedConvention);
+    expect(await conventionRepository.getById(updatedConvention.id)).toEqual(
+      updatedConvention,
+    );
   });
 
   it("Adds a new convention with field workConditions undefined and no signatories", async () => {
@@ -144,16 +172,14 @@ describe("PgConventionRepository", () => {
 
     await conventionRepository.save(convention);
 
-    const updatedConvention: ConventionDto = {
-      ...convention,
-      signatories: {
-        ...convention.signatories,
-        establishmentRepresentative: {
-          ...establishmentRepresentative,
-          signedAt: signedDate,
-        },
-      },
-    };
+    const updatedConvention: ConventionDto = new ConventionDtoBuilder(
+      convention,
+    )
+      .withEstablishmentRepresentative({
+        ...establishmentRepresentative,
+        signedAt: signedDate,
+      })
+      .build();
 
     await conventionRepository.update(updatedConvention);
     const updatedConventionStored = await conventionRepository.getById(

@@ -55,12 +55,12 @@ export const miniStageTexts: ConventionTexts = mergeDeepRight(immersionTexts, {
   agencySection: {
     title: "Pour commencer",
     yourAgencyLabel:
-      "Choisissez le Point orientation de la chambre de commerce et d’industrie près de chez vous !",
+      "Choisissez le Point Orientation de la chambre de commerce et d’industrie près de chez vous !",
     yourPostalcodeLabel:
       "Saisissez le code postal de votre entreprise d’accueil",
   },
   beneficiarySection: {
-    title: "1. Vos coordinnées",
+    title: "1. Vos coordonnées",
     phone: {
       description: "pour qu’on puisse vous contacter à propos du stage",
     },

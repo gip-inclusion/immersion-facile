@@ -1,22 +1,27 @@
 import { useFormikContext } from "formik";
 import React from "react";
+import { SectionTitle, Select, SelectOption } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { ConventionDto, peConnectAuthFailed } from "shared";
+import {
+  ConventionDto,
+  isBeneficiaryStudent,
+  levelsOfEducation,
+  peConnectAuthFailed,
+} from "shared";
+import { DateInput } from "src/app/components/forms/commons/DateInput";
 import { RadioGroup } from "src/app/components/forms/commons/RadioGroup";
+import { TextInput } from "src/app/components/forms/commons/TextInput";
+import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
+import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
+import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
+import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
-import { DateInput } from "src/app/components/forms/commons/DateInput";
-import { TextInput } from "src/app/components/forms/commons/TextInput";
-import { SectionTitle } from "react-design-system";
-import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
-import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
 import { BeneficiaryCurrentEmployerFields } from "./BeneficiaryCurrentEmployerFields";
 import { BeneficiaryEmergencyContactFields } from "./BeneficiaryEmergencyContactFields";
 import { BeneficiaryRepresentativeFields } from "./BeneficiaryRepresentativeFields";
-import { useFormContents } from "src/app/hooks/formContents.hooks";
-import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
-import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 
 type beneficiaryFormSectionProperties = {
   isFrozen: boolean | undefined;
@@ -30,12 +35,12 @@ export const BeneficiaryFormSection = ({
   const hasCurrentEmployer = useAppSelector(
     conventionSelectors.hasCurrentEmployer,
   );
-  const { setFieldValue } = useFormikContext<ConventionDto>();
+  const { setFieldValue, values } = useFormikContext<ConventionDto>();
   const dispatch = useDispatch();
   const t = useConventionTextsFromFormikContext();
-  const { values } = useFormikContext<ConventionDto>();
+  const { values: conventionValues } = useFormikContext<ConventionDto>();
   const { getFormFields } = useFormContents(
-    formConventionFieldsLabels(values.internshipKind),
+    formConventionFieldsLabels(conventionValues.internshipKind),
   );
   const formContents = getFormFields();
   const isPEConnected =
@@ -44,6 +49,9 @@ export const BeneficiaryFormSection = ({
   // const isFilledField = (fieldValue: string) => fieldValue.length > 0;
   // const shouldDisableField = (fieldValue: string) =>
   //   isPEConnected && isFilledField(fieldValue);
+  const levelsOfEducationToSelectOption = (): SelectOption[] =>
+    levelsOfEducation.map((level: string) => ({ label: level, value: level }));
+
   return (
     <>
       <SectionTitle>{t.beneficiarySection.title}</SectionTitle>
@@ -72,12 +80,32 @@ export const BeneficiaryFormSection = ({
         type="email"
         disabled={isFrozen || isPEConnected}
       />
-      {values.signatories.beneficiary.email && <ConventionEmailWarning />}
+      {conventionValues.signatories.beneficiary.email && (
+        <ConventionEmailWarning />
+      )}
       <TextInput
         {...formContents["signatories.beneficiary.phone"]}
         type="tel"
         disabled={isFrozen}
       />
+      {conventionValues.internshipKind === "mini-stage-cci" && (
+        <Select
+          {...formContents["signatories.beneficiary.levelOfEducation"]}
+          disabled={isFrozen}
+          value={
+            isBeneficiaryStudent(values.signatories.beneficiary)
+              ? values.signatories.beneficiary.levelOfEducation
+              : ""
+          }
+          onChange={(event) =>
+            setFieldValue(
+              formContents["signatories.beneficiary.levelOfEducation"].name,
+              event.currentTarget.value,
+            )
+          }
+          options={levelsOfEducationToSelectOption()}
+        />
+      )}
       <RadioGroup
         {...formContents.isMinor}
         disabled={isFrozen}

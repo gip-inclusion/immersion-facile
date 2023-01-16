@@ -178,41 +178,39 @@ const makeTestAcceptsStatusUpdate =
       conventionRepository,
     });
 
-    const { beneficiary, establishmentRepresentative } =
-      originalConvention.signatories;
-
     const {
       beneficiarySignedAt,
       establishmentRepresentativeSignedAt,
+      signatories,
+      internshipKind,
       ...restOfUpdatedFields
     } = updatedFields;
 
-    const hasSignedProperty =
+    const hasSignedProperty: boolean =
       Object.hasOwn(updatedFields, "beneficiarySignedAt") ||
       Object.hasOwn(updatedFields, "establishementRepresentativeSignedAt");
 
-    const expectedConvention: ConventionDto = {
+    const expectedConvention = new ConventionDtoBuilder({
       ...originalConvention,
-      status: updateStatusParams.status,
-      ...(updateStatusParams.status === "REJECTED"
-        ? { rejectionJustification: updateStatusParams.justification }
-        : {}),
       ...restOfUpdatedFields,
-      ...(hasSignedProperty
-        ? {
-            signatories: {
-              beneficiary: {
-                ...beneficiary,
-                signedAt: beneficiarySignedAt,
-              },
-              establishmentRepresentative: {
-                ...establishmentRepresentative,
-                signedAt: establishmentRepresentativeSignedAt,
-              },
-            },
-          }
-        : {}),
-    };
+    })
+      .withRejectionJustification(
+        updateStatusParams.status === "REJECTED"
+          ? updateStatusParams.justification
+          : originalConvention.rejectionJustification,
+      )
+      .withStatus(updateStatusParams.status)
+      .signedByBeneficiary(
+        hasSignedProperty
+          ? beneficiarySignedAt
+          : originalConvention.signatories.beneficiary.signedAt,
+      )
+      .signedByEstablishmentRepresentative(
+        hasSignedProperty
+          ? establishmentRepresentativeSignedAt
+          : originalConvention.signatories.establishmentRepresentative.signedAt,
+      )
+      .build();
 
     expectToEqual(storedConvention, expectedConvention);
 

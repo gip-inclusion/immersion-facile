@@ -1,6 +1,6 @@
-import { mapObjIndexed } from "ramda";
 import {
   ConventionDto,
+  ConventionDtoBuilder,
   ConventionMagicLinkPayload,
   ConventionStatus,
   UpdateConventionStatusRequestDto,
@@ -11,7 +11,7 @@ import {
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
-import { DomainEvent, DomainTopic } from "../../core/eventBus/events";
+import { DomainTopic } from "../../core/eventBus/events";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -55,73 +55,42 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     const { status } = params;
     logger.debug({ status, applicationId, role });
 
-    const getStoredConventionOrThrowIfNotAllowed =
-      makeGetStoredConventionOrThrowIfNotAllowed(uow.conventionRepository);
-
-    const storedDto = await getStoredConventionOrThrowIfNotAllowed(
-      status,
-      role,
-      applicationId,
-    );
-
     const conventionUpdatedAt = this.timeGateway.now().toISOString();
-    const {
-      beneficiary,
-      establishmentRepresentative,
-      beneficiaryCurrentEmployer,
-      ...otherSignatories
-    } = storedDto.signatories;
-    const updatedDto: ConventionDto = {
-      ...storedDto,
-      ...(params.status === "REJECTED" && {
-        rejectionJustification: params.justification,
-      }),
-      ...(status === "DRAFT" && {
-        signatories: {
-          ...mapObjIndexed(
-            (signatory) => ({ ...signatory, signedAt: undefined }),
-            otherSignatories,
-          ),
-          beneficiaryCurrentEmployer: beneficiaryCurrentEmployer
-            ? {
-                ...beneficiaryCurrentEmployer,
-                signedAt: undefined,
-              }
-            : undefined,
-          beneficiary: {
-            ...beneficiary,
-            signedAt: undefined,
-          },
-          establishmentRepresentative: {
-            ...establishmentRepresentative,
-            signedAt: undefined,
-          },
-        },
-      }),
 
-      status,
-      dateValidation: validatedConventionStatuses.includes(status)
-        ? conventionUpdatedAt
-        : undefined,
-    };
+    const conventionBuilder = new ConventionDtoBuilder(
+      await makeGetStoredConventionOrThrowIfNotAllowed(
+        uow.conventionRepository,
+      )(status, role, applicationId),
+    )
+      .withStatus(status)
+      .withDateValidation(
+        validatedConventionStatuses.includes(status)
+          ? conventionUpdatedAt
+          : undefined,
+      )
+      .withRejectionJustification(
+        status === "REJECTED" ? params.justification : undefined,
+      );
+    if (status === "DRAFT") conventionBuilder.notSigned();
+
+    const updatedDto: ConventionDto = conventionBuilder.build();
 
     const updatedId = await uow.conventionRepository.update(updatedDto);
     if (!updatedId) throw new NotFoundError(updatedId);
 
     const domainTopic = domainTopicByTargetStatusMap[status];
-    if (!domainTopic) return { id: updatedId };
+    if (domainTopic)
+      await uow.outboxRepository.save({
+        ...this.createEvent(
+          updatedDto,
+          domainTopic,
+          params.status === "REJECTED" || params.status === "DRAFT"
+            ? params.justification
+            : undefined,
+        ),
+        occurredAt: conventionUpdatedAt,
+      });
 
-    const event: DomainEvent = {
-      ...this.createEvent(
-        updatedDto,
-        domainTopic,
-        params.status === "REJECTED" || params.status === "DRAFT"
-          ? params.justification
-          : undefined,
-      ),
-      occurredAt: conventionUpdatedAt,
-    };
-    await uow.outboxRepository.save(event);
     return { id: updatedId };
   }
 

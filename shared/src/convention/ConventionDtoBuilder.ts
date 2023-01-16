@@ -6,16 +6,18 @@ import { DateIntervalDto, ScheduleDto } from "../schedule/Schedule.dto";
 import { reasonableSchedule } from "../schedule/ScheduleUtils";
 import {
   Beneficiary,
+  BeneficiaryCurrentEmployer,
+  BeneficiaryRepresentative,
   ConventionDto,
   ConventionExternalId,
   ConventionId,
   ConventionStatus,
+  EstablishmentRepresentative,
+  EstablishmentTutor,
   ImmersionObjective,
   InternshipKind,
-  BeneficiaryRepresentative,
-  EstablishmentTutor,
-  EstablishmentRepresentative,
-  BeneficiaryCurrentEmployer,
+  isBeneficiary,
+  isBeneficiaryStudent,
 } from "./convention.dto";
 
 export const DEMANDE_IMMERSION_ID = "40400404-9c0b-bbbb-bb6d-6bb9bd38bbbb";
@@ -37,7 +39,7 @@ export const VALID_PHONES = [
   "+41800001853",
 ];
 
-const beneficiary: Beneficiary = {
+const beneficiary: Beneficiary<"immersion"> = {
   role: "beneficiary",
   email: VALID_EMAILS[0],
   phone: VALID_PHONES[0],
@@ -110,29 +112,85 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
   public withInternshipKind(
     internshipKind: InternshipKind,
   ): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({ ...this.dto, internshipKind });
+    return internshipKind === "immersion"
+      ? new ConventionDtoBuilder({
+          ...this.dto,
+          internshipKind,
+          signatories: {
+            ...this.dto.signatories,
+            beneficiary,
+          },
+        })
+      : new ConventionDtoBuilder({
+          ...this.dto,
+          internshipKind,
+          signatories: {
+            ...this.dto.signatories,
+            beneficiary: {
+              ...beneficiary,
+              levelOfEducation: "3ème",
+            },
+          },
+        });
   }
 
-  public withBeneficiary(beneficiary: Beneficiary): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({
-      ...this.dto,
-      signatories: {
-        ...this.dto.signatories,
-        beneficiary,
-      },
-    });
+  public withBeneficiary(
+    beneficiary: Beneficiary<InternshipKind>,
+  ): ConventionDtoBuilder {
+    if (this.dto.internshipKind === "immersion" && isBeneficiary(beneficiary)) {
+      return new ConventionDtoBuilder({
+        ...this.dto,
+        signatories: {
+          ...this.dto.signatories,
+          beneficiary,
+        },
+      });
+    }
+    if (
+      this.dto.internshipKind === "mini-stage-cci" &&
+      isBeneficiaryStudent(beneficiary)
+    )
+      return new ConventionDtoBuilder({
+        ...this.dto,
+        signatories: {
+          ...this.dto.signatories,
+          beneficiary,
+        },
+      });
+    throw new Error(
+      `Beneficiary is not compatible with convention internship kind '${this.dto.internshipKind}'.`,
+    );
   }
 
   public withBeneficiaryRepresentative(
     beneficiaryRepresentative: BeneficiaryRepresentative | undefined,
   ): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({
-      ...this.dto,
-      signatories: {
-        ...this.dto.signatories,
-        beneficiaryRepresentative,
-      },
-    });
+    if (
+      this.dto.internshipKind === "immersion" &&
+      isBeneficiary(this.dto.signatories.beneficiary)
+    ) {
+      return new ConventionDtoBuilder({
+        ...this.dto,
+        signatories: {
+          ...this.dto.signatories,
+          beneficiaryRepresentative,
+        },
+      });
+    }
+    if (
+      this.dto.internshipKind === "mini-stage-cci" &&
+      isBeneficiaryStudent(this.dto.signatories.beneficiary)
+    )
+      return new ConventionDtoBuilder({
+        ...this.dto,
+        signatories: {
+          ...this.dto.signatories,
+          beneficiaryRepresentative,
+        },
+      });
+    throw new Error(
+      `Beneficiary is not compatible with convention internship kind '${this.dto.internshipKind}'.`,
+    );
   }
 
   public withBeneficiaryRepresentativeEmail(email: string) {
@@ -149,26 +207,63 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
   public withBeneficiaryCurentEmployer(
     beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer,
   ): ConventionDtoBuilder {
-    const dtoBuilder = new ConventionDtoBuilder({
-      ...this.dto,
-      signatories: {
-        ...this.dto.signatories,
-        beneficiaryCurrentEmployer,
-      },
-    });
-    return dtoBuilder;
+    if (
+      this.dto.internshipKind === "immersion" &&
+      isBeneficiary(this.dto.signatories.beneficiary)
+    ) {
+      return new ConventionDtoBuilder({
+        ...this.dto,
+        signatories: {
+          ...this.dto.signatories,
+          beneficiaryCurrentEmployer,
+        },
+      });
+    }
+    if (
+      this.dto.internshipKind === "mini-stage-cci" &&
+      isBeneficiaryStudent(this.dto.signatories.beneficiary)
+    )
+      return new ConventionDtoBuilder({
+        ...this.dto,
+        signatories: {
+          ...this.dto.signatories,
+          beneficiaryCurrentEmployer,
+        },
+      });
+    throw new Error(
+      `Beneficiary is not compatible with convention internship kind '${this.dto.internshipKind}'.`,
+    );
   }
 
   public withEstablishmentRepresentative(
     establishmentRepresentative: EstablishmentRepresentative,
   ) {
-    return new ConventionDtoBuilder({
-      ...this.dto,
-      signatories: {
-        ...this.dto.signatories,
-        establishmentRepresentative,
-      },
-    });
+    if (
+      this.dto.internshipKind === "immersion" &&
+      isBeneficiary(this.dto.signatories.beneficiary)
+    ) {
+      return new ConventionDtoBuilder({
+        ...this.dto,
+        signatories: {
+          ...this.dto.signatories,
+          establishmentRepresentative,
+        },
+      });
+    }
+    if (
+      this.dto.internshipKind === "mini-stage-cci" &&
+      isBeneficiaryStudent(this.dto.signatories.beneficiary)
+    )
+      return new ConventionDtoBuilder({
+        ...this.dto,
+        signatories: {
+          ...this.dto.signatories,
+          establishmentRepresentative,
+        },
+      });
+    throw new Error(
+      `Beneficiary is not compatible with convention internship kind '${this.dto.internshipKind}'.`,
+    );
   }
 
   public withEstablishmentRepresentativeEmail(email: string) {
@@ -253,7 +348,9 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     return new ConventionDtoBuilder({ ...this.dto, dateEnd });
   }
 
-  public withDateValidation(dateValidation: string): ConventionDtoBuilder {
+  public withDateValidation(
+    dateValidation: string | undefined,
+  ): ConventionDtoBuilder {
     return new ConventionDtoBuilder({ ...this.dto, dateValidation });
   }
   public withoutDateValidation(): ConventionDtoBuilder {
@@ -328,7 +425,9 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     });
   }
 
-  public withRejectionJustification(rejectionJustification: string) {
+  public withRejectionJustification(
+    rejectionJustification: string | undefined,
+  ) {
     return new ConventionDtoBuilder({
       ...this.dto,
       rejectionJustification,
@@ -359,31 +458,71 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
       federatedIdentity,
     });
   }
+
   withoutFederatedIdentity(): ConventionDtoBuilder {
     return this.withBeneficiary({
       ...this.beneficiary,
       federatedIdentity: undefined,
     });
   }
-  public notSigned() {
-    return new ConventionDtoBuilder({
-      ...this.dto,
-      signatories: {
-        beneficiary: { ...this.beneficiary, signedAt: undefined },
-        beneficiaryCurrentEmployer: this.beneficiaryCurrentEmployer && {
-          ...this.beneficiaryCurrentEmployer,
-          signedAt: undefined,
+  public notSigned(): ConventionDtoBuilder {
+    if (
+      this.dto.internshipKind === "immersion" &&
+      isBeneficiary(this.dto.signatories.beneficiary)
+    ) {
+      this.dto = {
+        ...this.dto,
+        signatories: {
+          beneficiary: {
+            ...this.dto.signatories.beneficiary,
+            signedAt: undefined,
+          },
+          beneficiaryCurrentEmployer: this.beneficiaryCurrentEmployer && {
+            ...this.beneficiaryCurrentEmployer,
+            signedAt: undefined,
+          },
+          establishmentRepresentative: {
+            ...this.establishmentRepresentative,
+            signedAt: undefined,
+          },
+          beneficiaryRepresentative: this.beneficiaryRepresentative && {
+            ...this.beneficiaryRepresentative,
+            signedAt: undefined,
+          },
         },
-        establishmentRepresentative: {
-          ...this.establishmentRepresentative,
-          signedAt: undefined,
+      };
+      return new ConventionDtoBuilder(this.dto);
+    }
+    if (
+      this.dto.internshipKind === "mini-stage-cci" &&
+      isBeneficiaryStudent(this.dto.signatories.beneficiary)
+    ) {
+      this.dto = {
+        ...this.dto,
+        signatories: {
+          beneficiary: {
+            ...this.dto.signatories.beneficiary,
+            signedAt: undefined,
+          },
+          beneficiaryCurrentEmployer: this.beneficiaryCurrentEmployer && {
+            ...this.beneficiaryCurrentEmployer,
+            signedAt: undefined,
+          },
+          establishmentRepresentative: {
+            ...this.establishmentRepresentative,
+            signedAt: undefined,
+          },
+          beneficiaryRepresentative: this.beneficiaryRepresentative && {
+            ...this.beneficiaryRepresentative,
+            signedAt: undefined,
+          },
         },
-        beneficiaryRepresentative: this.beneficiaryRepresentative && {
-          ...this.beneficiaryRepresentative,
-          signedAt: undefined,
-        },
-      },
-    });
+      };
+      return new ConventionDtoBuilder(this.dto);
+    }
+    throw new Error(
+      `Beneficiary is not compatible with convention internship kind '${this.dto.internshipKind}'.`,
+    );
   }
 
   public signedByBeneficiary(signedAt: string | undefined) {
@@ -430,7 +569,7 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     return this.dto.signatories.establishmentRepresentative;
   }
 
-  private get beneficiary(): Beneficiary {
+  private get beneficiary(): Beneficiary<InternshipKind> {
     return this.dto.signatories.beneficiary;
   }
 

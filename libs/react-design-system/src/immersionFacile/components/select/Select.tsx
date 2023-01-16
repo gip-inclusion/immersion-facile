@@ -19,6 +19,7 @@ export type SelectProps = {
   onChange?: React.ChangeEventHandler<HTMLSelectElement>;
   className?: string;
   placeholder?: string;
+  disabled?: boolean;
 };
 
 export const Select = ({

@@ -1,4 +1,4 @@
-import { ConventionDto } from "shared";
+import { ConventionDto, isBeneficiaryStudent } from "shared";
 import {
   ConventionFormKeysInUrl,
   ConventionInUrl,
@@ -10,6 +10,7 @@ const commonKeysToWatch: ConventionFormKeysInUrl[] = [
   "lastName",
   "phone",
   "birthdate",
+  "led",
   "emergencyContact",
   "emergencyContactPhone",
   "dateStart",
@@ -61,6 +62,9 @@ const convertToConventionInUrl = (
     },
     ...flatValues
   } = conventionDto;
+  const levelOfEducation = isBeneficiaryStudent(beneficiary)
+    ? beneficiary.levelOfEducation
+    : undefined;
 
   return {
     ...flatValues,
@@ -93,6 +97,7 @@ const convertToConventionInUrl = (
     birthdate: beneficiary.birthdate,
     email: beneficiary.email,
     phone: beneficiary.phone,
+    ...(levelOfEducation ? { led: levelOfEducation } : {}),
     emergencyContact: beneficiary.emergencyContact,
     emergencyContactPhone: beneficiary.emergencyContactPhone,
     federatedIdentity: beneficiary.federatedIdentity,

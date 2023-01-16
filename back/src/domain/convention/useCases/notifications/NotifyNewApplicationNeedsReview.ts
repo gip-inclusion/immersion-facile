@@ -1,6 +1,5 @@
 import {
   AgencyDto,
-  Beneficiary,
   ConventionDto,
   conventionSchema,
   ConventionStatus,
@@ -68,7 +67,7 @@ export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<Conven
       },
       "Sending Mail to review an immersion",
     );
-    const beneficiary: Beneficiary = conventionDto.signatories.beneficiary;
+
     await Promise.all(
       recipients.emails.map((email) => {
         const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties =
@@ -91,8 +90,9 @@ export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<Conven
               ...magicLinkCommonFields,
               targetRoute: frontRoutes.conventionStatusDashboard,
             }),
-            beneficiaryFirstName: beneficiary.firstName,
-            beneficiaryLastName: beneficiary.lastName,
+            beneficiaryFirstName:
+              conventionDto.signatories.beneficiary.firstName,
+            beneficiaryLastName: conventionDto.signatories.beneficiary.lastName,
             possibleRoleAction:
               recipients.role === "counsellor"
                 ? "en vérifier l'éligibilité"

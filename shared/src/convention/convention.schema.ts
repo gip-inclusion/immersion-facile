@@ -25,10 +25,12 @@ import {
   Beneficiary,
   BeneficiaryCurrentEmployer,
   BeneficiaryRepresentative,
+  ConventionCommon,
   ConventionDto,
   ConventionDtoWithoutExternalId,
   ConventionExternalId,
   ConventionId,
+  ConventionInternshipKindSpecific,
   conventionObjectiveOptions,
   ConventionReadDto,
   conventionStatuses,
@@ -38,6 +40,8 @@ import {
   EstablishmentTutor,
   GenerateMagicLinkRequestDto,
   ImmersionObjective,
+  InternshipKind,
+  levelsOfEducation,
   RenewMagicLinkRequestDto,
   Signatories,
   UpdateConventionRequestDto,
@@ -71,16 +75,26 @@ const signatorySchema = z.object({
   signedAt: zString.regex(dateRegExp).optional(),
 });
 
-const beneficiarySchema: z.Schema<Beneficiary> = signatorySchema.merge(
-  z.object({
-    role: z.enum(["beneficiary"]),
-    emergencyContact: zStringPossiblyEmpty,
-    emergencyContactPhone: phoneSchema.optional().or(z.literal("")),
-    emergencyContactEmail: zEmailPossiblyEmpty,
-    federatedIdentity: federatedIdentitySchema.optional(),
-    birthdate: zString.regex(dateRegExp, localization.invalidDate),
-  }),
-);
+const beneficiarySchema: z.Schema<Beneficiary<"immersion">> =
+  signatorySchema.merge(
+    z.object({
+      role: z.enum(["beneficiary"]),
+      emergencyContact: zStringPossiblyEmpty,
+      emergencyContactPhone: phoneSchema.optional().or(z.literal("")),
+      emergencyContactEmail: zEmailPossiblyEmpty,
+      federatedIdentity: federatedIdentitySchema.optional(),
+      birthdate: zString.regex(dateRegExp, localization.invalidDate),
+    }),
+  );
+const studentBeneficiarySchema: z.Schema<Beneficiary<"mini-stage-cci">> =
+  beneficiarySchema.and(
+    z.object({
+      levelOfEducation: zEnumValidation(
+        levelsOfEducation,
+        "Votre niveau d'étude est obligatoire.",
+      ),
+    }),
+  );
 
 const establishmentTutorSchema: z.Schema<EstablishmentTutor> =
   signatorySchema.merge(
@@ -122,7 +136,7 @@ const immersionObjectiveSchema: z.Schema<ImmersionObjective> =
     localization.invalidImmersionObjective,
   );
 
-const conventionWithoutExternalIdZObject = z.object({
+const conventionCommonSchema: z.Schema<ConventionCommon> = z.object({
   id: conventionIdSchema,
   externalId: externalConventionIdSchema.optional(),
   status: z.enum(conventionStatuses),
@@ -146,18 +160,36 @@ const conventionWithoutExternalIdZObject = z.object({
   immersionAppellation: appellationDtoSchema,
   immersionActivities: zTrimmedStringWithMax(2000),
   immersionSkills: zStringPossiblyEmptyWithMax(2000),
-  internshipKind: z.enum(["immersion", "mini-stage-cci"]),
-  signatories: z.object({
-    beneficiary: beneficiarySchema,
-    establishmentRepresentative: establishmentRepresentativeSchema,
-    beneficiaryRepresentative: beneficiaryRepresentativeSchema.optional(),
-    beneficiaryCurrentEmployer: beneficiaryCurrentEmployerSchema.optional(),
-  }),
   establishmentTutor: establishmentTutorSchema,
 });
 
+const conventionInternshipKindSpecificSchema: z.Schema<
+  ConventionInternshipKindSpecific<InternshipKind>
+> = z
+  .object({
+    internshipKind: z.literal("immersion"),
+    signatories: z.object({
+      beneficiary: beneficiarySchema,
+      establishmentRepresentative: establishmentRepresentativeSchema,
+      beneficiaryRepresentative: beneficiaryRepresentativeSchema.optional(),
+      beneficiaryCurrentEmployer: beneficiaryCurrentEmployerSchema.optional(),
+    }),
+  })
+  .or(
+    z.object({
+      internshipKind: z.literal("mini-stage-cci"),
+      signatories: z.object({
+        beneficiary: studentBeneficiarySchema,
+        establishmentRepresentative: establishmentRepresentativeSchema,
+        beneficiaryRepresentative: beneficiaryRepresentativeSchema.optional(),
+        beneficiaryCurrentEmployer: beneficiaryCurrentEmployerSchema.optional(),
+      }),
+    }),
+  );
+
 export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExternalId> =
-  conventionWithoutExternalIdZObject
+  conventionCommonSchema
+    .and(conventionInternshipKindSpecificSchema)
     .refine(startDateIsBeforeEndDate, {
       message: localization.invalidDateStartDateEnd,
       path: [getConventionFieldName("dateEnd")],
@@ -189,7 +221,6 @@ export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExt
             getConventionFieldName(`signatories.${signatory.key}.email`),
           );
       });
-
       if (
         !isTutorEmailDifferentThanBeneficiaryRelatedEmails(
           convention.signatories,

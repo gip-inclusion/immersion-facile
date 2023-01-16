@@ -4,6 +4,7 @@ import { Notification } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   ConventionDto,
+  ConventionReadDto,
   conventionWithoutExternalIdSchema,
   isBeneficiaryMinor,
   isEstablishmentTutorIsEstablishmentRepresentative,
@@ -84,7 +85,9 @@ export const ConventionForm = ({
 
   useExistingSiret(initialValues.siret);
   const submitFeedback = useAppSelector(conventionSelectors.feedback);
-  const fetchedConvention = useAppSelector(conventionSelectors.convention);
+  const fetchedConvention: ConventionReadDto | null = useAppSelector(
+    conventionSelectors.convention,
+  );
   const fetchConventionError = useAppSelector(conventionSelectors.fetchError);
   const dispatch = useDispatch();
 
@@ -110,7 +113,9 @@ export const ConventionForm = ({
 
   const t = useConventionTexts(initialValues.internshipKind);
 
-  const isFrozen = isConventionFrozen(fetchedConvention ?? initialValues);
+  const isFrozen = isConventionFrozen(
+    fetchedConvention ? fetchedConvention.status : initialValues.status,
+  );
 
   if (!reduxFormUiReady) return null;
 

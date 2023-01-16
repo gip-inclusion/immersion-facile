@@ -15,14 +15,19 @@ export const useConventionWatchValuesInUrl = (
   useEffect(() => {
     if (
       (route.name !== "conventionImmersion" &&
-        route.name !== "conventionImmersionForExternals") ||
+        route.name !== "conventionImmersionForExternals" &&
+        route.name !== "conventionMiniStage") ||
       !!route.params.jwt
     )
       return;
 
-    if (route.name === "conventionImmersion") {
-      routes.conventionImmersion(watchedValues).replace();
+    if (
+      route.name === "conventionImmersion" ||
+      route.name === "conventionMiniStage"
+    ) {
+      routes[route.name](watchedValues).replace();
     }
+
     if (route.name === "conventionImmersionForExternals") {
       routes
         .conventionImmersionForExternals({

@@ -1,6 +1,7 @@
 import {
   Beneficiary,
   BeneficiaryRepresentative,
+  InternshipKind,
 } from "../convention/convention.dto";
 import { filter, join } from "ramda";
 import { pipeWithValue } from "../pipeWithValue";
@@ -26,12 +27,12 @@ const getEmergencyContactInfos = ({
   return [fullName, emailAndPhone].join(" ");
 };
 
-export const displayEmergencyContactInfos = ({
+export const displayEmergencyContactInfos = <T extends InternshipKind>({
   beneficiary,
   beneficiaryRepresentative,
 }: {
   beneficiaryRepresentative?: Partial<BeneficiaryRepresentative>;
-  beneficiary: Partial<Beneficiary>;
+  beneficiary: Partial<Beneficiary<T>>;
 }) =>
   beneficiaryRepresentative
     ? getEmergencyContactInfos({

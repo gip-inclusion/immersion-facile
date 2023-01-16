@@ -179,6 +179,12 @@ const beneficiarySection = {
     id: "form-convention-signatories-beneficiary-phone",
     required: true,
   },
+  "signatories.beneficiary.levelOfEducation": {
+    label: "Niveau d'étude",
+    id: "form-convention-signatories-beneficiary-level-of-education",
+    placeholder: "Précisez votre statut",
+    required: true,
+  },
   "signatories.beneficiary.federatedIdentity": {
     // hidden field
     label: "",
