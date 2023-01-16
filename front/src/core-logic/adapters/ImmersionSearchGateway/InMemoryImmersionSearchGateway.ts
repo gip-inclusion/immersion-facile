@@ -208,7 +208,7 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     contactMode: "EMAIL",
     appellationLabels: ["Boulanger-pâtissier / Boulangère-pâtissière"],
     voluntaryToImmersion: true,
-    additionalInformation: "",
+    additionalInformation: "Test avec description courte",
     numberOfEmployeeRange: "20-49",
   },
   {

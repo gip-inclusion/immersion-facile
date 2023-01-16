@@ -43,12 +43,29 @@ export const SearchResult = ({
     establishmentRawName;
   const [additionalInformationClamped, setAdditionalInformationClamped] =
     useState<boolean>(true);
+  const [additionalInformationIsTooLong, setAdditionalInformationIsTooLong] =
+    useState<boolean>(false);
+  const [
+    shouldUpdateAdditionalInformationState,
+    setShouldUpdateAdditionalInformationState,
+  ] = useState<boolean>(true);
   const establismentName = [
     establismentNameFirstLetter.toLocaleUpperCase(),
     establismentNameOtherLetters.join("").toLocaleLowerCase(),
   ].join("");
   const onAdditionalInformationClick = () => {
     setAdditionalInformationClamped((prevValue) => !prevValue);
+  };
+  const onAdditionalInformationReflow = (additionalInformationDisplayState: {
+    clamped: boolean;
+    text: string;
+  }) => {
+    if (shouldUpdateAdditionalInformationState) {
+      setAdditionalInformationIsTooLong(
+        additionalInformationDisplayState.clamped,
+      );
+      setShouldUpdateAdditionalInformationState(false);
+    }
   };
   return (
     <div className="fr-col-12 fr-col-md-4">
@@ -99,13 +116,18 @@ export const SearchResult = ({
                     maxLine={additionalInformationClamped ? 2 : 10}
                     basedOn="letters"
                     ellipsis={"..."}
+                    onReflow={onAdditionalInformationReflow}
                   />
-                  <button
-                    className={fr.cx("fr-tag", "fr-tag--sm", "fr-mt-1w")}
-                    onClick={onAdditionalInformationClick}
-                  >
-                    {additionalInformationClamped ? "Voir plus" : "Voir moins"}
-                  </button>
+                  {additionalInformationIsTooLong && (
+                    <button
+                      className={fr.cx("fr-tag", "fr-tag--sm", "fr-mt-1w")}
+                      onClick={onAdditionalInformationClick}
+                    >
+                      {additionalInformationClamped
+                        ? "Voir plus"
+                        : "Voir moins"}
+                    </button>
+                  )}
                 </li>
               )}
             </ul>
