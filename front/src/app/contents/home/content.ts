@@ -342,9 +342,9 @@ export const sectionFaqData: Record<UserType, FaqCardProps[]> = {
       url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/ma-structure-peut-elle-accueillir-des-immersions-professionnelles-1ccin58/",
     },
     {
-      title: "A quoi s'engage une entreprise accueillante ?",
-      description: `Le référencement permet à votre établissement d’être présent dans la liste de résultats sur Immersion Facilitée et sur l'application du contrat d'engagement Jeune...`,
-      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/a-quoi-sengage-une-entreprise-accueillante-1hs13d1/",
+      title: "Quelles sont les obligations à respecter pour une immersion ?",
+      description: `Le bénéficiaire s’engage à exercer les activités et tâches telles que définies dans la présente convention et à mettre en œuvre l’ensemble des actions lui permettant d’atteindre les objectifs...`,
+      url: "https://aide.immersion-facile.beta.gouv.fr/fr/article/quelles-sont-les-obligations-a-respecter-pour-une-immersion-1bl944v/",
     },
   ],
   agency: [
