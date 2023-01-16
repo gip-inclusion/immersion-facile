@@ -76,7 +76,7 @@ const CreationSiretRelatedInputs = () => {
   const featureFlags = useFeatureFlags();
 
   const [_, __, { setValue: setAddressValue }] = useField<string>(
-    formContents.businessName.name,
+    formContents.businessAddress.name,
   );
   useEffect(() => () => updateSiret(""), []);
   return (
