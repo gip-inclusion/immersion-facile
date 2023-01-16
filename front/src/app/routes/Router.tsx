@@ -38,8 +38,8 @@ const getPageByRouteName: {
       <AdminPage route={route} />
     </AdminPrivateRoute>
   ),
-  agencyDashboard: () => (
-    <InclusionConnectedPrivateRoute>
+  agencyDashboard: (route) => (
+    <InclusionConnectedPrivateRoute route={route}>
       <AgencyDashboardPage />
     </InclusionConnectedPrivateRoute>
   ),

@@ -26,7 +26,7 @@ describe("PgAuthenticatedUserRepository", () => {
     );
     expect(response).toBeUndefined();
   });
-  it("saves an authenticated user, than finds it from id, than updates it", async () => {
+  it("saves an authenticated user, than finds it from email, than updates it", async () => {
     const email = "joe@mail.com";
     const user: AuthenticatedUser = {
       email,
