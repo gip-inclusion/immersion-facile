@@ -99,7 +99,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       distance_km: param.query.optional.number,
       latitude: param.query.optional.number,
       longitude: param.query.optional.number,
-      address: param.query.optional.string,
+      place: param.query.optional.string,
       rome: param.query.optional.string,
       romeLabel: param.query.optional.string,
       sortedBy: param.query.optional.string,

@@ -57,6 +57,7 @@ export const PlaceAutocomplete = ({
           searchValue ? noOptionText : "Saisissez un lieu ou une ville ⌨️"
         }
         options={options}
+        inputValue={initialValue}
         value={selectedOption}
         id={id}
         getOptionLabel={(option) => option.label}
