@@ -85,10 +85,11 @@ export const ConventionValidatePage = ({ route }: VerificationPageProps) => {
             bottom: 0,
             left: 0,
             right: 0,
-            background: "rgba(255,255,255,.7)",
+            background: "var(--background-raised-grey)",
             padding: ".3rem",
             display: "flex",
             justifyContent: "center",
+            zIndex: 10,
           }}
         >
           {isAllowedTransition(currentStatus, "REJECTED", role) && (
