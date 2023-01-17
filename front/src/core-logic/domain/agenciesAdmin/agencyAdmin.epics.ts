@@ -1,7 +1,7 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { debounceTime, distinctUntilChanged, filter } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
-import { AgencyId } from "shared";
+import { AgencyId, replaceArrayElement } from "shared";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
   ActionOfSlice,
@@ -11,7 +11,9 @@ import { agencyAdminSlice } from "./agencyAdmin.slice";
 
 type AgencyAction = ActionOfSlice<typeof agencyAdminSlice>;
 
-const agencyAdminGetByNameEpic: AppEpic<AgencyAction> = (
+type AgencyEpic = AppEpic<AgencyAction | { type: "do-nothing" }>;
+
+const agencyAdminGetByNameEpic: AgencyEpic = (
   action$,
   _state$,
   { agencyGateway, scheduler },
@@ -26,7 +28,7 @@ const agencyAdminGetByNameEpic: AppEpic<AgencyAction> = (
     map(agencyAdminSlice.actions.setAgencyOptions),
   );
 
-const agencyAdminGetNeedingReviewEpic: AppEpic<AgencyAction> = (
+const agencyAdminGetNeedingReviewEpic: AgencyEpic = (
   action$,
   state$,
   { agencyGateway },
@@ -44,7 +46,7 @@ const agencyAdminGetNeedingReviewEpic: AppEpic<AgencyAction> = (
     ),
   );
 
-const agencyAdminGetDetailsForStatusEpic: AppEpic<AgencyAction> = (
+const agencyAdminGetDetailsForStatusEpic: AgencyEpic = (
   action$,
   state$,
   dependencies,
@@ -62,7 +64,7 @@ const agencyAdminGetDetailsForStatusEpic: AppEpic<AgencyAction> = (
     ),
   );
 
-const agencyAdminGetDetailsForUpdateEpic: AppEpic<AgencyAction> = (
+const agencyAdminGetDetailsForUpdateEpic: AgencyEpic = (
   action$,
   state$,
   dependencies,
@@ -78,11 +80,7 @@ const agencyAdminGetDetailsForUpdateEpic: AppEpic<AgencyAction> = (
     map((agency) => agencyAdminSlice.actions.setAgency(agency ?? null)),
   );
 
-const updateAgencyEpic: AppEpic<AgencyAction> = (
-  action$,
-  state$,
-  { agencyGateway },
-) =>
+const updateAgencyEpic: AgencyEpic = (action$, state$, { agencyGateway }) =>
   action$.pipe(
     filter(agencyAdminSlice.actions.updateAgencyRequested.match),
     switchMap(({ payload }) =>
@@ -97,29 +95,39 @@ const updateAgencyEpic: AppEpic<AgencyAction> = (
     ),
   );
 
-const agencyDoesNotNeedReviewAnymoreEpic: AppEpic<AgencyAction> = (
-  action$,
-  state$,
-) =>
+const agencyDoesNotNeedReviewAnymoreEpic: AgencyEpic = (action$, state$) =>
   action$.pipe(
     filter(agencyAdminSlice.actions.updateAgencySucceeded.match),
     map(({ payload }) => {
-      const agencyNeedingReviewOptions =
-        state$.value.admin.agencyAdmin.agencyNeedingReviewOptions.filter(
-          ({ id }) => id !== payload.id,
+      const agencyAdminState = state$.value.admin.agencyAdmin;
+      const agencyWasNeedingReviewIndex =
+        agencyAdminState.agencyNeedingReviewOptions.findIndex(
+          ({ id }) => id === payload.id,
         );
+      if (agencyWasNeedingReviewIndex === -1) return { type: "do-nothing" };
 
-      const agencyNeedingReview =
-        payload.status === "needsReview" ? payload : null;
+      if (payload.status === "needsReview") {
+        return agencyAdminSlice.actions.agencyNeedingReviewChangedAfterAnUpdate(
+          {
+            agencyNeedingReviewOptions: replaceArrayElement(
+              agencyAdminState.agencyNeedingReviewOptions,
+              agencyWasNeedingReviewIndex,
+              {
+                id: payload.id,
+                name: payload.name,
+              },
+            ),
+            agencyNeedingReview: payload,
+          },
+        );
+      }
 
       return agencyAdminSlice.actions.agencyNeedingReviewChangedAfterAnUpdate({
-        agencyNeedingReviewOptions: [
-          ...agencyNeedingReviewOptions,
-          ...(payload.status === "needsReview"
-            ? [{ id: payload.id, name: payload.name }]
-            : []),
-        ],
-        agencyNeedingReview,
+        agencyNeedingReviewOptions:
+          agencyAdminState.agencyNeedingReviewOptions.filter(
+            ({ id }) => id !== payload.id,
+          ),
+        agencyNeedingReview: null,
       });
     }),
   );

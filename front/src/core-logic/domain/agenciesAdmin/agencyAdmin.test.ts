@@ -20,6 +20,7 @@ import { ReduxStore } from "src/core-logic/storeConfig/store";
 import {
   AGENCY_NEEDING_REVIEW_1,
   AGENCY_NEEDING_REVIEW_2,
+  PE_AGENCY_ACTIVE,
 } from "../../adapters/AgencyGateway/InMemoryAgencyGateway";
 
 describe("agencyAdmin", () => {
@@ -77,7 +78,6 @@ describe("agencyAdmin", () => {
       });
 
       it("display the agency to activate or reject on selection", () => {
-        // noinspection JSVoidFunctionReturnValueUsed
         store.dispatch(
           agencyAdminSlice.actions.setSelectedAgencyNeedingReviewId(
             AGENCY_NEEDING_REVIEW_2.id,
@@ -140,7 +140,7 @@ describe("agencyAdmin", () => {
           });
         });
 
-        it("editing an agency in a status expect needsReview should no impact the needingReview slice", () => {
+        it("editing an agency field (except status) should no impact the agencyNeedsReview in state", () => {
           const newName = "A new hope";
 
           const expectedUpdatedAgency = {
@@ -166,6 +166,27 @@ describe("agencyAdmin", () => {
               },
             ],
             agencyNeedingReview: expectedUpdatedAgency,
+            feedback: { kind: "agencyUpdated" },
+          });
+        });
+
+        it("editing an agency which is not needing review, should not impact the one needing review", () => {
+          store.dispatch(
+            agencyAdminSlice.actions.updateAgencySucceeded(PE_AGENCY_ACTIVE),
+          );
+
+          expectAgencyAdminStateToMatch({
+            agencyNeedingReviewOptions: [
+              {
+                id: AGENCY_NEEDING_REVIEW_1.id,
+                name: AGENCY_NEEDING_REVIEW_1.name,
+              },
+              {
+                id: AGENCY_NEEDING_REVIEW_2.id,
+                name: AGENCY_NEEDING_REVIEW_2.name,
+              },
+            ],
+            agencyNeedingReview: AGENCY_NEEDING_REVIEW_2,
             feedback: { kind: "agencyUpdated" },
           });
         });

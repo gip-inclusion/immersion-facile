@@ -32,7 +32,7 @@ const MISSION_LOCAL_AGENCY_ACTIVE = new AgencyDtoBuilder()
   .withStatus("active")
   .build();
 
-const PE_AGENCY_ACTIVE = new AgencyDtoBuilder()
+export const PE_AGENCY_ACTIVE = new AgencyDtoBuilder()
   .withId("PE-test-agency-2-front")
   .withName("Test Agency 2 PE (front)")
   .withAddress({
@@ -62,14 +62,14 @@ const CCI_ACTIVE = new AgencyDtoBuilder()
   .build();
 
 export const AGENCY_NEEDING_REVIEW_1 = new AgencyDtoBuilder()
-  .withId("PE-test-agency-3-front")
-  .withName("Test Agency 3 (front)")
+  .withId("PE-test-agency-needs-review-1-front")
+  .withName("Test Agency Needs review 1 (front)")
   .withStatus("needsReview")
   .build();
 
 export const AGENCY_NEEDING_REVIEW_2 = new AgencyDtoBuilder()
-  .withId("PE-test-agency-4-front")
-  .withName("Test Agency 4 (front)")
+  .withId("PE-test-agency-needs-review-2-front")
+  .withName("Test Agency Needs review 2 (front)")
   .withStatus("needsReview")
   .build();
 
