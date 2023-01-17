@@ -10,7 +10,7 @@ import { store } from "src/config/dependencies";
 import { MetaContent } from "./components/layout/MetaContent";
 import { RouteProvider } from "./routes/routes";
 
-startReactDsfr({ defaultColorScheme: "system" });
+startReactDsfr({ defaultColorScheme: "light" });
 
 const rootContainer = document.getElementById("root");
 if (!rootContainer) throw new Error("Html Element with Id 'root' is missing.");
