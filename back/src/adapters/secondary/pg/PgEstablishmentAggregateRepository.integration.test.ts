@@ -11,6 +11,7 @@ import {
   expectArraysToEqualIgnoringOrder,
   expectTypeToMatchAndEqual,
   expectPromiseToFailWith,
+  expectObjectsToMatch,
 } from "shared";
 import {
   NumberEmployeesRange,
@@ -690,7 +691,7 @@ describe("Postgres implementation of immersion offer repository", () => {
 
   describe("Pg implementation of method updateEstablishment", () => {
     const position = { lon: 2, lat: 3 };
-    it("Updates the parameter `updatedAt` and `isActive if given", async () => {
+    it("Updates the parameter `updatedAt`, `fitForDisabledWorkers` and `isActive if given", async () => {
       // Prepare
       const siretOfEstablishmentToUpdate = "78000403200021";
 
@@ -698,6 +699,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         siret: siretOfEstablishmentToUpdate,
         updatedAt: new Date("2020-04-14T12:00:00.000"),
         isActive: true,
+        fitForDisabledWorkers: false,
         position,
       });
 
@@ -706,6 +708,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       await pgEstablishmentAggregateRepository.updateEstablishment({
         siret: siretOfEstablishmentToUpdate,
         isActive: false,
+        fitForDisabledWorkers: true,
         updatedAt,
       });
 
@@ -713,9 +716,11 @@ describe("Postgres implementation of immersion offer repository", () => {
       const establishmentRowInDB = await retrieveEstablishmentWithSiret(
         siretOfEstablishmentToUpdate,
       );
-      expect(establishmentRowInDB).toMatchObject({
+
+      expectObjectsToMatch(establishmentRowInDB, {
         is_active: false,
         update_date: updatedAt,
+        fit_for_disabled_workers: true,
       });
     });
 
@@ -1633,6 +1638,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     update_date?: Date;
     is_active: boolean;
     is_commited?: boolean | null;
+    fit_for_disabled_workers: boolean | null;
   };
 
   const getAllEstablishmentsRows = async (): Promise<PgEstablishmentRow[]> =>

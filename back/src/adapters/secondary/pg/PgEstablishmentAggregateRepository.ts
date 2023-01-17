@@ -480,7 +480,12 @@ export class PgEstablishmentAggregateRepository
                       ? ", additional_information=%18$L"
                       : ""
                   }
-                   WHERE siret=%19$L;`;
+                  ${
+                    propertiesToUpdate.fitForDisabledWorkers !== undefined
+                      ? ", fit_for_disabled_workers=%19$L"
+                      : ""
+                  }
+                   WHERE siret=%20$L;`;
     const queryArgs = [
       propertiesToUpdate.updatedAt.toISOString(),
       propertiesToUpdate.isActive,
@@ -503,6 +508,7 @@ export class PgEstablishmentAggregateRepository
       propertiesToUpdate.isCommited,
       propertiesToUpdate.website,
       propertiesToUpdate.additionalInformation,
+      propertiesToUpdate.fitForDisabledWorkers,
 
       propertiesToUpdate.siret,
     ];
