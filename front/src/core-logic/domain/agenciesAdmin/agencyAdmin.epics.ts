@@ -86,15 +86,42 @@ const updateAgencyEpic: AppEpic<AgencyAction> = (
   action$.pipe(
     filter(agencyAdminSlice.actions.updateAgencyRequested.match),
     switchMap(({ payload }) =>
-      agencyGateway.updateAgency$(
-        payload,
-        state$.value.admin.adminAuth.adminToken || "",
-      ),
+      agencyGateway
+        .updateAgency$(payload, state$.value.admin.adminAuth.adminToken || "")
+        .pipe(
+          map(() => agencyAdminSlice.actions.updateAgencySucceeded(payload)),
+        ),
     ),
-    map(agencyAdminSlice.actions.updateAgencySucceeded),
     catchEpicError((error: Error) =>
       agencyAdminSlice.actions.updateAgencyFailed(error.message),
     ),
+  );
+
+const agencyDoesNotNeedReviewAnymoreEpic: AppEpic<AgencyAction> = (
+  action$,
+  state$,
+) =>
+  action$.pipe(
+    filter(agencyAdminSlice.actions.updateAgencySucceeded.match),
+    map(({ payload }) => {
+      const agencyNeedingReviewOptions =
+        state$.value.admin.agencyAdmin.agencyNeedingReviewOptions.filter(
+          ({ id }) => id !== payload.id,
+        );
+
+      const agencyNeedingReview =
+        payload.status === "needsReview" ? payload : null;
+
+      return agencyAdminSlice.actions.agencyNeedingReviewChangedAfterAnUpdate({
+        agencyNeedingReviewOptions: [
+          ...agencyNeedingReviewOptions,
+          ...(payload.status === "needsReview"
+            ? [{ id: payload.id, name: payload.name }]
+            : []),
+        ],
+        agencyNeedingReview,
+      });
+    }),
   );
 
 export const agenciesAdminEpics = [
@@ -103,4 +130,5 @@ export const agenciesAdminEpics = [
   agencyAdminGetDetailsForUpdateEpic,
   agencyAdminGetDetailsForStatusEpic,
   updateAgencyEpic,
+  agencyDoesNotNeedReviewAnymoreEpic,
 ];

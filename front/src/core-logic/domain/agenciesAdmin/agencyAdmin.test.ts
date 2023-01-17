@@ -17,7 +17,10 @@ import {
   TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
-import { AGENCY_4_NEEDING_REVIEW } from "../../adapters/AgencyGateway/InMemoryAgencyGateway";
+import {
+  AGENCY_NEEDING_REVIEW_1,
+  AGENCY_NEEDING_REVIEW_2,
+} from "../../adapters/AgencyGateway/InMemoryAgencyGateway";
 
 describe("agencyAdmin", () => {
   let store: ReduxStore;
@@ -74,16 +77,97 @@ describe("agencyAdmin", () => {
       });
 
       it("display the agency to activate or reject on selection", () => {
+        // noinspection JSVoidFunctionReturnValueUsed
         store.dispatch(
           agencyAdminSlice.actions.setSelectedAgencyNeedingReviewId(
-            AGENCY_4_NEEDING_REVIEW.id,
+            AGENCY_NEEDING_REVIEW_2.id,
           ),
         );
 
-        feedWithFetchedAgency(AGENCY_4_NEEDING_REVIEW);
+        feedWithFetchedAgency(AGENCY_NEEDING_REVIEW_2);
 
         expectAgencyAdminStateToMatch({
-          agencyNeedingReview: AGENCY_4_NEEDING_REVIEW,
+          agencyNeedingReview: AGENCY_NEEDING_REVIEW_2,
+        });
+      });
+
+      describe("Needing review related", () => {
+        beforeEach(() => {
+          ({ store, dependencies } = createTestStore({
+            admin: adminPreloadedState({
+              agencyAdmin: {
+                agencyOptions: [],
+                agencyNeedingReviewOptions: [
+                  {
+                    id: AGENCY_NEEDING_REVIEW_1.id,
+                    name: AGENCY_NEEDING_REVIEW_1.name,
+                  },
+                  {
+                    id: AGENCY_NEEDING_REVIEW_2.id,
+                    name: AGENCY_NEEDING_REVIEW_2.name,
+                  },
+                ],
+                agencySearchText: "",
+                agency: null,
+                agencyNeedingReview: AGENCY_NEEDING_REVIEW_2,
+                isSearching: false,
+                isFetchingAgenciesNeedingReview: false,
+                isUpdating: false,
+                feedback: { kind: "agencyUpdated" },
+                error: null,
+              },
+            }),
+          }));
+        });
+
+        it("remove from agencyNeedingReviewOptions on update success and remove displayed agency", () => {
+          store.dispatch(
+            agencyAdminSlice.actions.updateAgencySucceeded({
+              ...AGENCY_NEEDING_REVIEW_2,
+              status: "active",
+            }),
+          );
+
+          expectAgencyAdminStateToMatch({
+            agencyNeedingReviewOptions: [
+              {
+                id: AGENCY_NEEDING_REVIEW_1.id,
+                name: AGENCY_NEEDING_REVIEW_1.name,
+              },
+            ],
+            agencyNeedingReview: null,
+            feedback: { kind: "agencyUpdated" },
+          });
+        });
+
+        it("editing an agency in a status expect needsReview should no impact the needingReview slice", () => {
+          const newName = "A new hope";
+
+          const expectedUpdatedAgency = {
+            ...AGENCY_NEEDING_REVIEW_2,
+            name: newName,
+          };
+
+          store.dispatch(
+            agencyAdminSlice.actions.updateAgencySucceeded(
+              expectedUpdatedAgency,
+            ),
+          );
+
+          expectAgencyAdminStateToMatch({
+            agencyNeedingReviewOptions: [
+              {
+                id: AGENCY_NEEDING_REVIEW_1.id,
+                name: AGENCY_NEEDING_REVIEW_1.name,
+              },
+              {
+                id: AGENCY_NEEDING_REVIEW_2.id,
+                name: expectedUpdatedAgency.name,
+              },
+            ],
+            agencyNeedingReview: expectedUpdatedAgency,
+            feedback: { kind: "agencyUpdated" },
+          });
         });
       });
     });

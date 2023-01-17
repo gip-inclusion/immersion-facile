@@ -86,9 +86,20 @@ export const agencyAdminSlice = createSlice({
       state.isUpdating = true;
       state.feedback = { kind: "idle" };
     },
-    updateAgencySucceeded: (state) => {
+    updateAgencySucceeded: (state, _action: PayloadAction<AgencyDto>) => {
       state.isUpdating = false;
       state.feedback = { kind: "agencyUpdated" };
+    },
+    agencyNeedingReviewChangedAfterAnUpdate: (
+      state,
+      action: PayloadAction<{
+        agencyNeedingReviewOptions: AgencyOption[];
+        agencyNeedingReview: AgencyDto | null;
+      }>,
+    ) => {
+      state.agencyNeedingReviewOptions =
+        action.payload.agencyNeedingReviewOptions;
+      state.agencyNeedingReview = action.payload.agencyNeedingReview;
     },
     updateAgencyFailed: (state, action: PayloadAction<string>) => {
       state.isUpdating = false;

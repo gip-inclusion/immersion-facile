@@ -61,13 +61,13 @@ const CCI_ACTIVE = new AgencyDtoBuilder()
   .withStatus("active")
   .build();
 
-const AGENCY_3_NEEDING_REVIEW = new AgencyDtoBuilder()
+export const AGENCY_NEEDING_REVIEW_1 = new AgencyDtoBuilder()
   .withId("PE-test-agency-3-front")
   .withName("Test Agency 3 (front)")
   .withStatus("needsReview")
   .build();
 
-export const AGENCY_4_NEEDING_REVIEW = new AgencyDtoBuilder()
+export const AGENCY_NEEDING_REVIEW_2 = new AgencyDtoBuilder()
   .withId("PE-test-agency-4-front")
   .withName("Test Agency 4 (front)")
   .withStatus("needsReview")
@@ -77,8 +77,8 @@ export class InMemoryAgencyGateway implements AgencyGateway {
   private _agencies: Record<string, AgencyDto> = {
     [MISSION_LOCAL_AGENCY_ACTIVE.id]: MISSION_LOCAL_AGENCY_ACTIVE,
     [PE_AGENCY_ACTIVE.id]: PE_AGENCY_ACTIVE,
-    [AGENCY_3_NEEDING_REVIEW.id]: AGENCY_3_NEEDING_REVIEW,
-    [AGENCY_4_NEEDING_REVIEW.id]: AGENCY_4_NEEDING_REVIEW,
+    [AGENCY_NEEDING_REVIEW_1.id]: AGENCY_NEEDING_REVIEW_1,
+    [AGENCY_NEEDING_REVIEW_2.id]: AGENCY_NEEDING_REVIEW_2,
     [CCI_ACTIVE.id]: CCI_ACTIVE,
   };
 
