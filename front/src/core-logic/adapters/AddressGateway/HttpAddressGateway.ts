@@ -6,6 +6,11 @@ import {
   departmentCodeFromPostcodeRoute,
   findDepartmentCodeFromPostcodeResponseSchema,
   lookupAddressQueryParam,
+  LookupLocationInput,
+  lookupLocationQueryParam,
+  lookupLocationRoute,
+  LookupSearchResult,
+  lookupSearchResultsSchema,
   lookupStreetAddressRoute,
   postCodeQueryParam,
 } from "shared";
@@ -13,6 +18,20 @@ import { AddressGateway } from "src/core-logic/ports/AddressGateway";
 
 export class HttpAddressGateway implements AddressGateway {
   constructor(private readonly httpClient: AxiosInstance) {}
+
+  public async lookupLocation(
+    query: LookupLocationInput,
+  ): Promise<LookupSearchResult[]> {
+    const { data } = await this.httpClient.get<unknown>(
+      "/api" + lookupLocationRoute,
+      {
+        params: {
+          [lookupLocationQueryParam]: query,
+        },
+      },
+    );
+    return lookupSearchResultsSchema.parse(data);
+  }
 
   public async lookupStreetAddress(
     lookup: string,

@@ -9,7 +9,7 @@ export type SearchMade = {
   lon: number;
   sortedBy?: SearchSortedBy;
   voluntaryToImmersion?: boolean;
-  address?: string;
+  place?: string;
 };
 
 export type SearchMadeEntity = {

@@ -8,5 +8,5 @@ export type SearchImmersionQueryParamsDto = {
   distance_km: number;
   sortedBy?: SearchSortedBy;
   voluntaryToImmersion?: boolean;
-  address?: string;
+  place?: string;
 };

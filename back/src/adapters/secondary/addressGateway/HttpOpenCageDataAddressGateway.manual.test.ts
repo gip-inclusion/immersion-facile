@@ -262,6 +262,46 @@ describe("HttpOpenCageDataAddressGateway", () => {
         candidateQuery: "Bordeaux 33000",
         expectedSearchResult: [],
       },
+      {
+        candidateQuery: "bar",
+        expectedSearchResult: [
+          {
+            label: "Baralle, Pas-de-Calais, France",
+            position: {
+              lat: 50.21132,
+              lon: 3.05763,
+            },
+          },
+          {
+            label: "Barastre, Pas-de-Calais, France",
+            position: {
+              lat: 50.07605,
+              lon: 2.93402,
+            },
+          },
+          {
+            label: "Barly, Pas-de-Calais, France",
+            position: {
+              lat: 50.25129,
+              lon: 2.54786,
+            },
+          },
+          {
+            label: "Barlin, Pas-de-Calais, France",
+            position: {
+              lat: 50.45684,
+              lon: 2.61748,
+            },
+          },
+          {
+            label: "Bar-le-Duc, Meuse, France",
+            position: {
+              lat: 48.77127,
+              lon: 5.16238,
+            },
+          },
+        ],
+      },
     ])(
       "should work if searching for $candidateQuery location query expect $expectedSearchResult",
       async ({

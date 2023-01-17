@@ -14,10 +14,9 @@ import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import { useSearchUseCase } from "src/app/hooks/search.hooks";
-import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import "./SearchPage.scss";
 import { SearchListResults } from "src/app/components/search/SearchListResults";
-import { addressDtoToString, SearchSortedBy } from "shared";
+import { SearchSortedBy } from "shared";
 
 import {
   SearchPageParams,
@@ -25,6 +24,7 @@ import {
 } from "src/core-logic/domain/search/search.slice";
 import { Route } from "type-route";
 import { routes } from "src/app/routes/routes";
+import { PlaceAutocomplete } from "src/app/components/forms/autocomplete/PlaceAutocomplete";
 
 const radiusOptions = [1, 2, 5, 10, 20, 50, 100];
 const sortedByOptions: { value: SearchSortedBy; label: string }[] = [
@@ -45,7 +45,7 @@ export const SearchPage = ({
     latitude: 0,
     longitude: 0,
     distance_km: 10,
-    address: "",
+    place: "",
     sortedBy: undefined,
   };
   const [formikValues, setFormikValues] =
@@ -102,7 +102,7 @@ export const SearchPage = ({
                   }
                 >
                   <RomeAutocomplete
-                    title="Je recherche un métier"
+                    title="Je recherche le métier :"
                     setFormValue={(newValue) => {
                       setFieldValue("romeLabel", newValue.romeLabel);
                       setFieldValue("rome", newValue.romeCode);
@@ -120,23 +120,24 @@ export const SearchPage = ({
                     "search-page__form-input-wrapper fr-col-12 fr-col-lg-4"
                   }
                 >
-                  <AddressAutocomplete
-                    label="Mon périmètre de recherche"
-                    initialSearchTerm={values.address}
-                    setFormValue={({ position, address }) => {
+                  <PlaceAutocomplete
+                    label="Je me situe dans la ville de :"
+                    initialValue={values.place}
+                    onValueChange={(lookupSearchResult) => {
+                      if (!lookupSearchResult) return;
+                      const { position, label } = lookupSearchResult;
                       setFieldValue("latitude", position.lat);
                       setFieldValue("longitude", position.lon);
-                      setFieldValue("address", addressDtoToString(address));
+                      setFieldValue("place", label);
                       setFormikValues(values);
                       setFormikValues({
                         ...values,
                         latitude: position.lat,
                         longitude: position.lon,
-                        address: addressDtoToString(address),
+                        place: label,
                       });
                     }}
                     id="im-search-page__address-autocomplete"
-                    placeholder={"Ex : Bordeaux 33000"}
                   />
                 </div>
                 <div

@@ -16,6 +16,7 @@ import {
   featureToAddressDto,
   GeoPositionDto,
   LookupSearchResult,
+  lookupSearchResultsSchema,
   ManagedAxios,
   OpenCageGeoSearchKey,
   toFeatureCollection,
@@ -93,7 +94,6 @@ const AXIOS_TIMEOUT_MS = 10_000;
 export const createHttpOpenCageDataClient = configureHttpClient(
   createAxiosHandlerCreator(axios.create({ timeout: AXIOS_TIMEOUT_MS })),
 );
-export const queryMinLength = 2;
 export const minimumCharErrorMessage = (minLength: number) =>
   `Lookup street address require a minimum of ${minLength} char.`;
 
@@ -170,6 +170,7 @@ export class HttpOpenCageDataAddressGateway implements AddressGateway {
   ): Promise<AddressAndPosition[]> {
     // eslint-disable-next-line no-console
     console.time(`lookupStreetAddress Duration - ${query}`);
+    const queryMinLength = 2;
     try {
       if (query.length < queryMinLength)
         throw new Error(minimumCharErrorMessage(queryMinLength));
@@ -196,6 +197,7 @@ export class HttpOpenCageDataAddressGateway implements AddressGateway {
   ): Promise<LookupSearchResult[]> {
     // eslint-disable-next-line no-console
     console.time(`lookupLocationName Duration - ${query}`);
+    const queryMinLength = 3;
     try {
       if (query.length < queryMinLength)
         throw new Error(minimumCharErrorMessage(queryMinLength));
@@ -213,8 +215,10 @@ export class HttpOpenCageDataAddressGateway implements AddressGateway {
           q: query,
         },
       });
-      return toLookupSearchResults(
-        responseBody as OpenCageDataSearchResultCollection,
+      return lookupSearchResultsSchema.parse(
+        toLookupSearchResults(
+          responseBody as OpenCageDataSearchResultCollection,
+        ),
       );
     } finally {
       // eslint-disable-next-line no-console
