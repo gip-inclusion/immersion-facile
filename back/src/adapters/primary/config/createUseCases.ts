@@ -103,6 +103,7 @@ export const createUseCases = (
         gateways.inclusionConnectGateway,
         uuidGenerator,
         generateAuthenticatedUserToken,
+        config.immersionFacileBaseUrl,
       ),
       associatePeConnectFederatedIdentity:
         new AssociatePeConnectFederatedIdentity(uowPerformer, createNewEvent),

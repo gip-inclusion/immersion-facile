@@ -1,4 +1,9 @@
-import { decodeJwtWithoutSignatureCheck } from "shared";
+import {
+  AbsoluteUrl,
+  decodeJwtWithoutSignatureCheck,
+  frontRoutes,
+  queryParamsAsString,
+} from "shared";
 import { AuthenticateWithInclusionCodeConnectParams } from "shared";
 import { authenticateWithInclusionCodeSchema } from "shared";
 import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
@@ -12,11 +17,11 @@ import { OngoingOAuth } from "../../generic/OAuth/entities/OngoingOAuth";
 import { InclusionConnectGateway } from "../port/InclusionConnectGateway";
 import { InclusionConnectIdTokenPayload } from "../entities/InclusionConnectIdTokenPayload";
 
-type Token = string;
+type ConnectedRedirectUrl = AbsoluteUrl;
 
 export class AuthenticateWithInclusionCode extends TransactionalUseCase<
   AuthenticateWithInclusionCodeConnectParams,
-  Token
+  ConnectedRedirectUrl
 > {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
@@ -24,6 +29,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     private inclusionConnectGateway: InclusionConnectGateway,
     private uuidGenerator: UuidGenerator,
     private generateAppToken: GenerateAuthenticatedUserToken,
+    private immersionFacileBaseUrl: AbsoluteUrl,
   ) {
     super(uowPerformer);
   }
@@ -33,7 +39,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
   protected async _execute(
     params: AuthenticateWithInclusionCodeConnectParams,
     uow: UnitOfWork,
-  ): Promise<Token> {
+  ): Promise<ConnectedRedirectUrl> {
     const existingOngoingOAuth = await uow.ongoingOAuthRepository.findByState(
       params.state,
       "inclusionConnect",
@@ -49,7 +55,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     params: AuthenticateWithInclusionCodeConnectParams,
     uow: UnitOfWork,
     existingOngoingOAuth: OngoingOAuth,
-  ) {
+  ): Promise<ConnectedRedirectUrl> {
     const response = await this.inclusionConnectGateway.getAccessToken(
       params.code,
     );
@@ -94,10 +100,14 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       ),
     ]);
 
-    return this.generateAppToken(
+    const token = this.generateAppToken(
       { userId: newOrUpdatedAuthenticatedUser.id },
       response.expires_in * 60,
     );
+
+    return `${this.immersionFacileBaseUrl}/${
+      frontRoutes.agencyDashboard
+    }?${queryParamsAsString({ token })}`;
   }
 
   private makeAuthenticatedUser(

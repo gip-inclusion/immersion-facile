@@ -1,7 +1,7 @@
 import type { AxiosInstance } from "axios";
 import { HandlerCreator } from "../configureHttpClient";
 
-const convertToFormData = (body: Record<string, unknown>): string =>
+const convertToUrlEncodedFormData = (body: Record<string, unknown>): string =>
   Object.keys(body)
     .map((key) => `${key}=${body[key]}`)
     .join("&");
@@ -21,7 +21,9 @@ export const createAxiosHandlerCreator =
     const response = await axios.request({
       method: target.method,
       url: target.url,
-      data: isFormUrlencoded ? convertToFormData(params.body) : params.body,
+      data: isFormUrlencoded
+        ? convertToUrlEncodedFormData(params.body)
+        : params.body,
       params: params.queryParams,
       headers: {
         ...axios.defaults.headers,

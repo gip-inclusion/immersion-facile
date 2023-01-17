@@ -1,7 +1,9 @@
 import {
+  AbsoluteUrl,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
+  frontRoutes,
 } from "shared";
 import {
   createInMemoryUow,
@@ -21,6 +23,7 @@ import { AuthenticatedUser } from "../../generic/OAuth/entities/AuthenticatedUse
 import { OngoingOAuth } from "../../generic/OAuth/entities/OngoingOAuth";
 import { AuthenticateWithInclusionCode } from "./AuthenticateWithInclusionCode";
 
+const immersionBaseUrl: AbsoluteUrl = "http://my-immersion-domain.com";
 const correctToken = "my-correct-token";
 
 describe("AuthenticateWithInclusionCode use case", () => {
@@ -42,6 +45,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
       inclusionConnectGateway,
       uuidGenerator,
       () => correctToken,
+      immersionBaseUrl,
     );
   });
 
@@ -155,15 +159,17 @@ describe("AuthenticateWithInclusionCode use case", () => {
       });
     });
 
-    it("generates an app token and returns it", async () => {
+    it("generates an app token and returns a redirection url which includes it", async () => {
       const { initialOngoingOAuth } = makeSuccessfulAuthenticationConditions();
 
-      const appToken = await useCase.execute({
+      const redirectedUrl = await useCase.execute({
         code: "my-inclusion-code",
         state: initialOngoingOAuth.state,
       });
 
-      expect(appToken).toBe(correctToken);
+      expect(redirectedUrl).toBe(
+        `${immersionBaseUrl}/${frontRoutes.agencyDashboard}?token=${correctToken}`,
+      );
     });
   });
 
