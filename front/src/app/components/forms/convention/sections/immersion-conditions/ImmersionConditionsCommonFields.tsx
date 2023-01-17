@@ -25,6 +25,7 @@ import { AddressAutocomplete } from "src/app/components/forms/autocomplete/Addre
 import { DateInput } from "src/app/components/forms/commons/DateInput";
 import { SchedulePicker } from "src/app/components/forms/commons/SchedulePicker/SchedulePicker";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
+import { fr } from "@codegouvfr/react-dsfr";
 
 export const ImmersionConditionsCommonFields = ({
   disabled,
@@ -62,7 +63,7 @@ export const ImmersionConditionsCommonFields = ({
     <>
       {values.internshipKind === "mini-stage-cci" && (
         <>
-          <Notification title="" type="info">
+          <Notification title="" type="info" className={fr.cx("fr-mb-4w")}>
             La présente convention est signée pour la durée de la période
             d’observation en milieu professionnel, qui ne peut dépasser une
             semaine sur une période de vacances scolaires fixée annuellement par
@@ -71,7 +72,11 @@ export const ImmersionConditionsCommonFields = ({
             heures pour les jeunes de moins de 15 ans et 35 heures pour les
             jeunes de 15 ans et plus répartis sur 5 jours.
           </Notification>
-          <Notification title="Assurances" type="info">
+          <Notification
+            title="Assurances"
+            type="info"
+            className={fr.cx("fr-mb-4w")}
+          >
             Afin de préparer au mieux les conditions de réalisation du stage,
             les signataires de la conventions s’engagent à avoir une couverture
             d’assurance suffisante tant pour les dommages pouvant être
@@ -137,7 +142,7 @@ export const ImmersionConditionsCommonFields = ({
         disabled={disabled}
       />
       {values.internshipKind === "mini-stage-cci" && (
-        <Notification title="" type="info">
+        <Notification title="" type="info" className={fr.cx("fr-mb-4w")}>
           En application des articles L 4153-8 et D 4153-15 et suivants du code
           du travail, relatif aux travaux interdits et règlementés, le jeune,
           s’il est mineur, ne peut accéder aux machines, appareils ou produits
@@ -164,7 +169,7 @@ export const ImmersionConditionsCommonFields = ({
         disabled={disabled}
       />
       {values.internshipKind === "mini-stage-cci" && (
-        <Notification title="" type="info">
+        <Notification title="" type="info" className={fr.cx("fr-mb-4w")}>
           De même, les parties signataires de la convention s’engagent à mettre
           en œuvre et respecter les consignes publiées par les services de
           l’Etat, notamment pour exemple celles concernant les mesures de
@@ -202,7 +207,7 @@ export const ImmersionConditionsCommonFields = ({
         disabled={disabled}
       />
       {values.internshipKind === "mini-stage-cci" && (
-        <Notification title="" type="info">
+        <Notification title="" type="info" className={fr.cx("fr-mb-4w")}>
           Durant la période d’observation, le jeune participe à des activités de
           l’entreprise, en liaison avec les objectifs précisés dans l’annexe
           pédagogique, sous le contrôle des personnels responsables de leur
