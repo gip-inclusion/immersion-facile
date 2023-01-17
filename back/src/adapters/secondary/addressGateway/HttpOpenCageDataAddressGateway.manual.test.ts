@@ -2,6 +2,7 @@ import {
   AddressAndPosition,
   AddressDto,
   expectPromiseToFailWithError,
+  expectToEqual,
   expectTypeToMatchAndEqual,
   GeoPositionDto,
   LookupSearchResult,
@@ -24,7 +25,7 @@ const resultFromApiAddress = {
   features: [
     {
       type: "Feature",
-      geometry: {
+      position: {
         type: "Point",
         coordinates: [7.511081, 48.532594],
       },
@@ -203,24 +204,63 @@ describe("HttpOpenCageDataAddressGateway", () => {
     it.each([
       {
         candidateQuery: "Uzerche",
-        expectedSearchResult: {
-          bounds: {
-            northeast: {
-              lat: "45.46268",
-              lng: "1.60699",
-            },
-            southwest: {
-              lat: "45.39357",
-              lng: "1.52545",
+        expectedSearchResult: [
+          {
+            label: "Uzerche, Corrèze, France",
+            position: {
+              lat: 45.42433,
+              lon: 1.56373,
             },
           },
-          formatted: "Uzerche, Corrèze, France",
-          geometry: {
-            lat: "45.42433",
-            lng: "1.56373",
+        ],
+      },
+      {
+        candidateQuery: "Paris",
+        expectedSearchResult: [
+          {
+            label: "Paris, Île-de-France, France",
+            position: {
+              lat: 48.85889,
+              lon: 2.32004,
+            },
           },
-          name: "Uzerche",
-        },
+          {
+            label: "Paris 16e Arrondissement, Paris, Île-de-France, France",
+            position: {
+              lat: 48.86317,
+              lon: 2.27576,
+            },
+          },
+          {
+            label: "Montmartre, Paris, Île-de-France, France",
+            position: {
+              lat: 48.88671,
+              lon: 2.34157,
+            },
+          },
+          {
+            label: "Paris-l'Hôpital, Saône-et-Loire, France",
+            position: {
+              lat: 46.91503,
+              lon: 4.63302,
+            },
+          },
+          {
+            label: "Paris 8e Arrondissement, Paris, Île-de-France, France",
+            position: {
+              lat: 48.87748,
+              lon: 2.31765,
+            },
+          },
+        ],
+      },
+      {
+        candidateQuery: "75001",
+        expectedSearchResult: [],
+      },
+      {
+        candidateQuery: "Bordeaux 33000",
+        expectedSearchResult: [],
       },
     ])(
       "should work if searching for $candidateQuery location query expect $expectedSearchResult",
@@ -229,14 +269,11 @@ describe("HttpOpenCageDataAddressGateway", () => {
         expectedSearchResult,
       }: {
         candidateQuery: string;
-        expectedSearchResult: LookupSearchResult;
+        expectedSearchResult: LookupSearchResult[];
       }) => {
         const resultMetropolitanFrance =
           await httpAddressGateway.lookupLocationName(candidateQuery);
-
-        const firstResult: LookupSearchResult | undefined =
-          resultMetropolitanFrance.at(0);
-        expect(firstResult).toEqual(expectedSearchResult);
+        expectToEqual(resultMetropolitanFrance, expectedSearchResult);
       },
       10000,
     );
@@ -389,8 +426,8 @@ describe("HttpOpenCageDataAddressGateway check parrarel call", () => {
 
     for (let index = 0; index < parallelCalls; index++) {
       coordinates.push({
-        lat: resultFromApiAddress.features[0].geometry.coordinates[1],
-        lon: resultFromApiAddress.features[0].geometry.coordinates[0],
+        lat: resultFromApiAddress.features[0].position.coordinates[1],
+        lon: resultFromApiAddress.features[0].position.coordinates[0],
       });
       expectedResults.push({
         streetNumberAndAddress: "Rue Gaston Romazzotti",

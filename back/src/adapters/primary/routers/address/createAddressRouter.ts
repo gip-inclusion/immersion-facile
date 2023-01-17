@@ -4,6 +4,9 @@ import {
   departmentCodeFromPostcodeRoute,
   lookupAddressQueryParam,
   lookupAddressSchema,
+  lookupLocationInputSchema,
+  lookupLocationQueryParam,
+  lookupLocationRoute,
   lookupStreetAddressRoute,
   postCodeQueryParam,
 } from "shared";
@@ -22,7 +25,15 @@ export const createAddressRouter = (deps: AppDependencies) => {
         ),
       ),
     );
-
+  addressRouter
+    .route(lookupLocationRoute)
+    .get(async (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.lookupLocation.execute(
+          lookupLocationInputSchema.parse(req.query[lookupLocationQueryParam]),
+        ),
+      ),
+    );
   addressRouter
     .route(departmentCodeFromPostcodeRoute)
     .get(async (req, res) =>

@@ -2,7 +2,6 @@ export * from "./address/address.dto";
 export * from "./address/address.query";
 export * from "./address/address.response";
 export * from "./address/address.schema";
-export * from "./address/lookupAddress.schema";
 export * from "./admin/admin.dto";
 export * from "./admin/admin.schema";
 export * from "./agency/agency";

@@ -6,6 +6,7 @@ import {
   featureToAddressDto,
   featureToAddressWithPosition,
   GeoPositionDto,
+  LookupSearchResult,
   ManagedAxios,
   TargetUrlsMapper,
   toFeatureCollection,
@@ -50,6 +51,10 @@ export class HttpApiAdresseAddressGateway implements AddressGateway {
       reservoirIncreaseInterval: 1000,
       reservoirIncreaseAmount: maxQueryPerSeconds,
     });
+  }
+
+  lookupLocationName(_query: string): Promise<LookupSearchResult[]> {
+    throw new Error("Method not implemented.");
   }
 
   public async lookupStreetAddress(

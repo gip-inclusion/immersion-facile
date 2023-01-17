@@ -1,6 +1,9 @@
 import {
   departmentCodeFromPostcodeRoute,
   departmentCodeFromPostcodeUrl,
+  lookupLocationRoute,
+  lookupLocationUrl,
+  LookupSearchResult,
   lookupStreetAddressRoute,
   lookupStreetAddressUrl,
 } from "shared";
@@ -31,6 +34,25 @@ describe("addressRouter", () => {
         lookupStreetAddressUrl(query8bdduportLookup),
       );
       expect(response.body).toEqual(expected8bdduportAddressAndPositions);
+      expect(response.status).toBe(200);
+    });
+  });
+
+  describe(`${lookupLocationRoute} route`, () => {
+    const exampleQuery = "Saint-Emil";
+    const expectedLookupSearchResults: LookupSearchResult[] = [
+      {
+        label: "Saint-Emilion",
+        position: {
+          lat: 23,
+          lon: 12,
+        },
+      },
+    ];
+    it(`GET ${lookupLocationUrl(exampleQuery)}`, async () => {
+      addressGateway.setLookupSearchResults(expectedLookupSearchResults);
+      const response = await request.get(lookupLocationUrl(exampleQuery));
+      expect(response.body).toEqual(expectedLookupSearchResults);
       expect(response.status).toBe(200);
     });
   });

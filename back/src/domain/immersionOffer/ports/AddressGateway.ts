@@ -3,12 +3,13 @@ import {
   AddressDto,
   DepartmentCode,
   GeoPositionDto,
+  LookupLocationInput,
   LookupSearchResult,
 } from "shared";
 
 export interface AddressGateway {
   lookupStreetAddress(query: string): Promise<AddressAndPosition[]>;
-  lookupLocationName(query: string): Promise<LookupSearchResult[]>;
+  lookupLocationName(query: LookupLocationInput): Promise<LookupSearchResult[]>;
   findDepartmentCodeFromPostCode(
     postCode: string,
   ): Promise<DepartmentCode | null>;

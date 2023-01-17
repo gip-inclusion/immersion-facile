@@ -53,3 +53,4 @@ export const updateConventionStatusRoute = "update-application-status";
 export const uploadFileRoute = "upload-file";
 export const lookupStreetAddressRoute = `/${addressRoute}/lookupStreetAddress`;
 export const departmentCodeFromPostcodeRoute = `/${addressRoute}/findDepartmentCodeFromPostCode`;
+export const lookupLocationRoute = `/${addressRoute}/lookup-location`;

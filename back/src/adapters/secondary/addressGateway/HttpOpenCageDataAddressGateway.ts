@@ -52,6 +52,25 @@ type GeoSearchHeaders = {
   Origin: string;
 };
 
+type OpenCageDataLookupSearchResult = {
+  bounds: {
+    northeast: {
+      lat: string;
+      lng: string;
+    };
+    southwest: {
+      lat: string;
+      lng: string;
+    };
+  };
+  formatted: string;
+  geometry: {
+    lat: string;
+    lng: string;
+  };
+  name: string;
+};
+
 export type OpenCageDataTargets = CreateTargets<{
   geocoding: Target<void, GeoCodingQueryParams, void, BaseUrl>;
   geosearch: Target<void, GeoSearchQueryParams, GeoSearchHeaders, BaseUrl>;
@@ -184,7 +203,7 @@ export class HttpOpenCageDataAddressGateway implements AddressGateway {
       const { responseBody } = await this.httpClient.geosearch({
         headers: {
           "OpenCage-Geosearch-Key": this.geosearchApiKey,
-          Origin: "https://beta.pole-emploi.fr",
+          Origin: "https://beta.pole-emploi.fr", // OC Geosearch needs an Origin that fits to API key domain (with https://)
         },
         mode: "cors",
         queryParams: {
@@ -194,8 +213,9 @@ export class HttpOpenCageDataAddressGateway implements AddressGateway {
           q: query,
         },
       });
-
-      return (responseBody as OpenCageDataSearchResultCollection).results;
+      return toLookupSearchResults(
+        responseBody as OpenCageDataSearchResultCollection,
+      );
     } finally {
       // eslint-disable-next-line no-console
       console.timeEnd(`lookupStreetAddress Duration - ${query}`);
@@ -252,10 +272,11 @@ type OpenCageDataFeatureCollection = GeoJSON.FeatureCollection<
   OpenCageDataProperties
 >;
 
-type OpenCageDataSearchResultCollection = {
+export type OpenCageDataSearchResultCollection = {
+  // move to shared ?
   documentation: string;
   licenses: object[];
-  results: LookupSearchResult[];
+  results: OpenCageDataLookupSearchResult[];
   status: object;
   stay_informed: object;
   thanks: string;
@@ -342,3 +363,14 @@ export const missingDepartmentOnFeatureForPostcode = (
   `No department provided for postcode ${postCode}. OCD Components: ${JSON.stringify(
     components,
   )}`;
+
+const toLookupSearchResults = (
+  input: OpenCageDataSearchResultCollection,
+): LookupSearchResult[] =>
+  input.results.map((result) => ({
+    label: result.formatted,
+    position: {
+      lat: parseFloat(result.geometry.lat),
+      lon: parseFloat(result.geometry.lng),
+    },
+  }));

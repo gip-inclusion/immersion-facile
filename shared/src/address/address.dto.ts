@@ -8,24 +8,11 @@ import { Flavor } from "../typeFlavors";
 export type DepartmentCode = Flavor<string, "DepartmentCode">;
 export type Postcode = Flavor<string, "Postcode">;
 export type LookupAddress = Flavor<string, "LookupAddress">;
+export type LookupLocationInput = Flavor<string, "LookupLocation">;
 
 export type LookupSearchResult = {
-  bounds: {
-    northeast: {
-      lat: string;
-      lng: string;
-    };
-    southwest: {
-      lat: string;
-      lng: string;
-    };
-  };
-  formatted: string;
-  geometry: {
-    lat: string;
-    lng: string;
-  };
-  name: string;
+  label: string;
+  position: GeoPositionDto;
 };
 
 export type AddressDto = {

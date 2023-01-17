@@ -73,6 +73,7 @@ import { Gateways } from "./createGateways";
 import { makeGenerateEditFormEstablishmentUrl } from "./makeGenerateEditFormEstablishmentUrl";
 import { GenerateConventionMagicLink } from "./createGenerateConventionMagicLink";
 import { AddFormEstablishmentBatch } from "../../../domain/immersionOffer/useCases/AddFormEstablismentsBatch";
+import { LookupLocation } from "../../../domain/address/useCases/LookupLocation";
 
 export const createUseCases = (
   config: AppConfig,
@@ -121,6 +122,7 @@ export const createUseCases = (
 
       // Address
       lookupStreetAddress: new LookupStreetAddress(gateways.addressApi),
+      lookupLocation: new LookupLocation(gateways.addressApi),
       departmentCodeFromPostcode: new DepartmentCodeFromPostcode(
         gateways.addressApi,
       ),
