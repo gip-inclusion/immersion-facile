@@ -33,7 +33,7 @@ describe("PgSearchesMadeRepository", () => {
       lon: 4.17602,
       needsToBeSearched: true,
       sortedBy: "distance",
-      address: "7 rue de la Noé 44000 Nantes",
+      place: "Nantes",
       voluntaryToImmersion: true,
     };
     await pgSearchesMadeRepository.insertSearchMade(searchMade);
@@ -94,7 +94,7 @@ describe("PgSearchesMadeRepository", () => {
       lon: res.rows[0].lon,
       sortedBy: res.rows[0].sorted_by,
       voluntaryToImmersion: res.rows[0].voluntary_to_immersion,
-      address: res.rows[0].address,
+      place: res.rows[0].address,
       needsToBeSearched: res.rows[0].needstobesearched,
     };
   };
