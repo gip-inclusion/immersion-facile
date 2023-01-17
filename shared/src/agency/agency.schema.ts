@@ -2,7 +2,13 @@ import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { addressSchema } from "../address/address.schema";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
-import { localization, zEmail, zString, zTrimmedString } from "../zodUtils";
+import {
+  localization,
+  zEmail,
+  zEnumValidation,
+  zString,
+  zTrimmedString,
+} from "../zodUtils";
 import {
   AgencyDto,
   AgencyId,
@@ -39,7 +45,10 @@ export const agenciesIdAndNameSchema: z.ZodSchema<AgencyOption[]> = z.array(
   agencyIdAndNameSchema,
 );
 
-const agencyKindSchema: z.ZodSchema<AgencyKind> = z.enum(agencyKindList);
+const agencyKindSchema: z.ZodSchema<AgencyKind> = zEnumValidation(
+  agencyKindList,
+  "Ce type de structure n'est pas supporté",
+);
 
 export const listAgenciesByDepartmentCodeRequestSchema: z.ZodSchema<ListAgenciesRequestDto> =
   z.object({

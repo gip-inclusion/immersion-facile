@@ -68,7 +68,6 @@ export const AgencyFormCommonFields = ({
         onChange={(event) =>
           setFieldValue(fieldsContent.kind.name, event.currentTarget.value)
         }
-        placeholder="Veuillez choisir un type de structure"
       />
       <TextInput {...fieldsContent.name} />
       <AddressAutocomplete

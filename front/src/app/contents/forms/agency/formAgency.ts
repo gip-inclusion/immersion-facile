@@ -81,6 +81,7 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
     label: "Type de structure",
     id: "agency-kind",
     required: true,
+    placeholder: "Veuillez choisir un type de structure",
   },
   counsellorEmails: {
     id: "agency-counsellor-emails",

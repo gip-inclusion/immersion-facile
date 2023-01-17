@@ -9,6 +9,7 @@ import {
 } from "react-design-system/immersionFacile";
 import {
   AgencyDto,
+  AgencyKind,
   CreateAgencyDto,
   createAgencySchema,
   toDotNotation,
@@ -27,9 +28,15 @@ import { v4 as uuidV4 } from "uuid";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { formAgencyFieldsLabels } from "src/app/contents/forms/agency/formAgency";
 
-const initialValues: (id: AgencyDto["id"]) => CreateAgencyDto = (id) => ({
+type CreateAgencyInitialValues = Omit<CreateAgencyDto, "kind"> & {
+  kind: AgencyKind | "";
+};
+
+const initialValues: (id: AgencyDto["id"]) => CreateAgencyInitialValues = (
   id,
-  kind: "pole-emploi",
+) => ({
+  id,
+  kind: "",
   name: "",
   address: {
     streetNumberAndAddress: "",
@@ -60,10 +67,12 @@ export const AddAgencyPage = () => {
         <Formik
           initialValues={initialValues(uuidV4())}
           validationSchema={toFormikValidationSchema(createAgencySchema)}
-          onSubmit={(values) =>
-            agencyGateway
+          onSubmit={(values) => {
+            if (values.kind === "") throw new Error("Agency kind is empty");
+            return agencyGateway
               .addAgency({
                 ...values,
+                kind: values.kind,
                 questionnaireUrl:
                   values.kind === "pole-emploi" ? "" : values.questionnaireUrl,
               })
@@ -72,8 +81,8 @@ export const AddAgencyPage = () => {
                 //eslint-disable-next-line  no-console
                 console.log("AddAgencyPage", e);
                 setSubmitFeedback(e);
-              })
-          }
+              });
+          }}
         >
           {({ isSubmitting, errors, submitCount }) => (
             <Form>
