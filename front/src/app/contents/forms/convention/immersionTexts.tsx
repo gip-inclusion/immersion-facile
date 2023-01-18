@@ -229,4 +229,25 @@ export const immersionTexts = {
     conventionAlreadyValidated: "Demande déjà validée",
     markAsValidated: "Valider la demande",
   },
+
+  sign: {
+    title:
+      "Formulaire pour conventionner une période de mise en situation professionnelle (PMSMP)",
+    summary: `Voici la demande de convention qui vient d'être complétée. <br />
+    Relisez la bien et si cela vous convient, signez la avec le bouton "je
+    signe cette demande"`,
+    regulations: "Ce formulaire vaut équivalence du CERFA 13912 * 04",
+    rejected: {
+      title: "Désolé : votre demande d'immersion a été refusée",
+      detail:
+        "Votre demande d'immersion a été refusée. Vous avez reçu un mail vous en donnant les raisons.",
+      contact: "Veuillez contacter votre conseiller pour plus d'informations.",
+    },
+    needsModification: {
+      title: "Des modifications ont été demandées sur votre demande",
+      detail:
+        "Vous ne pouvez pas encore signer votre demande d'immersion car des modifications ont été réclamées par votre conseiller (Vous avez reçu un mail précisant les changements à effectuer).",
+      editionLink: "Cliquez ici pour aller à la page d'édition",
+    },
+  },
 };

@@ -3,7 +3,7 @@ import React from "react";
 import {
   immersionTexts,
   ConventionTexts,
-} from "src/app/contents/forms/convention/immersionTexts";
+} from "../../../contents/forms/convention/immersionTexts";
 
 export const miniStageTexts: ConventionTexts = mergeDeepRight(immersionTexts, {
   intro: {
@@ -118,4 +118,19 @@ export const miniStageTexts: ConventionTexts = mergeDeepRight(immersionTexts, {
   conventionAlreadySigned: "Vous avez déjà signé cette demande de stage.",
   conventionReadyToBeSigned: "Cette demande de stage est prête à être signée.",
   conventionNotEditable: "Cette demande de stage n'est plus modifiable.",
+  sign: {
+    title: "Formulaire pour conventionner un mini stage",
+    regulations:
+      "Ce formulaire vaut équivalence du CERFA ***********************",
+    rejected: {
+      title: "Désolé : votre demande de mini stage a été refusée",
+      detail:
+        "Votre demande de mini stage a été refusée. Vous avez reçu un mail vous en donnant les raisons.",
+    },
+    needsModification: {
+      title: "Des modifications ont été demandées sur votre demande",
+      detail:
+        "Vous ne pouvez pas encore signer votre demande de mini stage car des modifications ont été réclamées par votre conseiller (Vous avez reçu un mail précisant les changements à effectuer).",
+    },
+  },
 });
