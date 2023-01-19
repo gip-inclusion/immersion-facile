@@ -1,9 +1,9 @@
 import { SuperTest, Test } from "supertest";
-import { formAlreadyExistsRoute } from "shared";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../../../_testBuilders/EstablishmentEntityV2Builder";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
+import { establishmentTargets } from "shared";
 
 describe("route to check if a form's siret already exists", () => {
   let request: SuperTest<Test>;
@@ -15,7 +15,7 @@ describe("route to check if a form's siret already exists", () => {
   });
   it("Returns false if the siret does not exist", async () => {
     await request
-      .get(`/${formAlreadyExistsRoute}/${siret}`)
+      .get(establishmentTargets.isEstablishmentWithSiretAlreadyRegistered.url)
       .expect(200, "false");
   });
 
@@ -33,7 +33,12 @@ describe("route to check if a form's siret already exists", () => {
       ],
     );
     await request
-      .get(`/${formAlreadyExistsRoute}/${siret}`)
+      .get(
+        establishmentTargets.isEstablishmentWithSiretAlreadyRegistered.url.replace(
+          ":siret",
+          siret,
+        ),
+      )
       .expect(200, "true");
   });
 });

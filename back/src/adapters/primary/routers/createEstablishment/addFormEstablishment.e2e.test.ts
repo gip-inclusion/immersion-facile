@@ -1,7 +1,7 @@
 import {
+  establishmentTargets,
   FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
-  formEstablishmentsRoute,
 } from "shared";
 import { avenueChampsElysees } from "../../../../_testBuilders/addressDtos";
 import {
@@ -22,7 +22,7 @@ describe("Route to post form establishments from front (hence, without API key)"
       .build();
 
     const response = await request
-      .post(`/${formEstablishmentsRoute}`)
+      .post(establishmentTargets.addFormEstablishment.url)
       .send(formEstablishment);
 
     expect(response.status).toBe(200);
@@ -49,7 +49,7 @@ describe("Route to post form establishments from front (hence, without API key)"
     };
 
     const response = await request
-      .post(`/${formEstablishmentsRoute}`)
+      .post(establishmentTargets.addFormEstablishment.url)
       .send(formEstablishmentWithBusinessContact);
 
     expect(response.status).toBe(200);

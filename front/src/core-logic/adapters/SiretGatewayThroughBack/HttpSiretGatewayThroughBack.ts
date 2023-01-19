@@ -1,7 +1,7 @@
 import { AxiosError, AxiosInstance, AxiosResponse } from "axios";
 import { from, Observable } from "rxjs";
 import {
-  formAlreadyExistsRoute,
+  establishmentTargets,
   getSiretIfNotSavedRoute,
   GetSiretInfo,
   GetSiretInfoError,
@@ -23,7 +23,12 @@ export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
   isSiretAlreadyInSaved(siret: SiretDto): Observable<boolean> {
     return from(
       this.httpClient
-        .get<unknown>(`/${formAlreadyExistsRoute}/${siret}`)
+        .get<unknown>(
+          establishmentTargets.isEstablishmentWithSiretAlreadyRegistered.url.replace(
+            ":siret",
+            siret,
+          ),
+        )
         .then(({ data }) => {
           const isSiretAlreadyExist = isSiretExistResponseSchema.parse(data);
           return isSiretAlreadyExist;

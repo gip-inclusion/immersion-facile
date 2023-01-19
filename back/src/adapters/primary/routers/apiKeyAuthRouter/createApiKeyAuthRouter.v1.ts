@@ -1,7 +1,7 @@
 import { Router } from "express";
 import promClient from "prom-client";
 import {
-  formEstablishmentsRoute,
+  establishmentTargets,
   immersionOffersRoute,
   pipeWithValue,
   SiretAndRomeDto,
@@ -28,25 +28,27 @@ export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
   publicV1Router.use(deps.apiKeyAuthMiddleware);
 
   // Form establishments routes
-  publicV1Router.route(`/${formEstablishmentsRoute}`).post(async (req, res) => {
-    counterFormEstablishmentCaller.inc({
-      referer: req.get("Referrer"),
-    });
-    return sendHttpResponse(req, res, () => {
-      if (!req.apiConsumer?.isAuthorized) throw new ForbiddenError();
+  publicV1Router
+    .route(establishmentTargets.addFormEstablishment.url)
+    .post(async (req, res) => {
+      counterFormEstablishmentCaller.inc({
+        referer: req.get("Referrer"),
+      });
+      return sendHttpResponse(req, res, () => {
+        if (!req.apiConsumer?.isAuthorized) throw new ForbiddenError();
 
-      return pipeWithValue(
-        validateAndParseZodSchema(formEstablishmentPublicV1Schema, req.body),
-        formEstablishmentDtoPublicV1ToDomain,
-        (domainFormEstablishmentWithoutSource) =>
-          deps.useCases.addFormEstablishment.execute({
-            ...domainFormEstablishmentWithoutSource,
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            source: req.apiConsumer!.consumer,
-          }),
-      );
+        return pipeWithValue(
+          validateAndParseZodSchema(formEstablishmentPublicV1Schema, req.body),
+          formEstablishmentDtoPublicV1ToDomain,
+          (domainFormEstablishmentWithoutSource) =>
+            deps.useCases.addFormEstablishment.execute({
+              ...domainFormEstablishmentWithoutSource,
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              source: req.apiConsumer!.consumer,
+            }),
+        );
+      });
     });
-  });
 
   // Immersion offers routes
   publicV1Router.route(`/${immersionOffersRoute}`).get(async (req, res) =>

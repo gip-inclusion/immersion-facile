@@ -1,6 +1,6 @@
 import {
   createEstablishmentMagicLinkPayload,
-  formEstablishmentsRoute,
+  establishmentTargets,
 } from "shared";
 import { TEST_ESTABLISHMENT1_SIRET } from "../../../secondary/sirene/InMemorySireneGateway";
 import {
@@ -15,7 +15,12 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
   it("Throws 401 if not authenticated", async () => {
     const { request } = await buildTestApp();
 
-    const response = await request.get(`/${formEstablishmentsRoute}/noJwt`);
+    const response = await request.get(
+      establishmentTargets.getFormEstablishment.url.replace(
+        ":siret",
+        "no-siret",
+      ),
+    );
 
     // Assert
     expect(response.status).toBe(401);
@@ -46,8 +51,11 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
         now: new Date(),
       }),
     );
+
     const response = await request
-      .get(`/${formEstablishmentsRoute}/${siret}`)
+      .get(
+        establishmentTargets.getFormEstablishment.url.replace(":siret", siret),
+      )
       .set("Authorization", validJwt);
 
     // Assert

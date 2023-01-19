@@ -1,10 +1,5 @@
 import { Router } from "express";
-import {
-  contactEstablishmentRoute,
-  formAlreadyExistsRoute,
-  formEstablishmentsRoute,
-  requestEmailToUpdateFormRoute,
-} from "shared";
+import { contactEstablishmentRoute, establishmentTargets } from "shared";
 import { AppDependencies } from "../../config/createAppDependencies";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 
@@ -12,7 +7,7 @@ export const establismentRouterWithoutJwt = (deps: AppDependencies): Router => {
   // Routes WITHOUT jwt auth
   const router = Router({ mergeParams: true });
   router
-    .route(`/${formEstablishmentsRoute}`)
+    .route(establishmentTargets.addFormEstablishment.url)
     .post(async (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.addFormEstablishment.execute(req.body),
@@ -20,7 +15,7 @@ export const establismentRouterWithoutJwt = (deps: AppDependencies): Router => {
     );
 
   router
-    .route(`/${formAlreadyExistsRoute}/:siret`)
+    .route(establishmentTargets.isEstablishmentWithSiretAlreadyRegistered.url)
     .get(async (req, res) =>
       sendHttpResponse(req, res, async () =>
         deps.useCases.isFormEstablishmentWithSiretAlreadySaved.execute(
@@ -30,17 +25,7 @@ export const establismentRouterWithoutJwt = (deps: AppDependencies): Router => {
     );
 
   router
-    .route(`/${formAlreadyExistsRoute}/:siret`)
-    .get(async (req, res) =>
-      sendHttpResponse(req, res, async () =>
-        deps.useCases.isFormEstablishmentWithSiretAlreadySaved.execute(
-          req.params.siret,
-        ),
-      ),
-    );
-
-  router
-    .route(`/${requestEmailToUpdateFormRoute}/:siret`)
+    .route(establishmentTargets.requestEmailToUpdateFormRoute.url)
     .post(async (req, res) =>
       sendHttpResponse(req, res, async () =>
         deps.useCases.requestEditFormEstablishment.execute(req.params.siret),

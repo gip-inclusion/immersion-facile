@@ -1,5 +1,5 @@
 import { Request, Router } from "express";
-import { formEstablishmentsRoute } from "shared";
+import { establishmentTargets } from "shared";
 import { AppDependencies } from "../../config/createAppDependencies";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 
@@ -13,7 +13,7 @@ export const establishmentRouterWithJwt = (deps: AppDependencies): Router => {
   router.use(deps.establishmentMagicLinkAuthMiddleware);
 
   router
-    .route(`/${formEstablishmentsRoute}/:siret`)
+    .route(establishmentTargets.getFormEstablishment.url)
     .get(async (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.retrieveFormEstablishmentFromAggregates.execute(
@@ -24,7 +24,7 @@ export const establishmentRouterWithJwt = (deps: AppDependencies): Router => {
     );
 
   router
-    .route(`/${formEstablishmentsRoute}`)
+    .route(establishmentTargets.updateFormEstablishment.url)
     .put(async (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.editFormEstablishment.execute(

@@ -57,6 +57,7 @@ export * from "./romeAndAppellationDtos/romeAndAppellation.schema";
 export * from "./routes/routes";
 export * from "./routes/adminTargets";
 export * from "./routes/inclusionConnectTargets";
+export * from "./routes/establishementTargets";
 export * from "./schedule/Schedule.dto";
 export * from "./schedule/Schedule.schema";
 export * from "./schedule/ScheduleDtoBuilder";

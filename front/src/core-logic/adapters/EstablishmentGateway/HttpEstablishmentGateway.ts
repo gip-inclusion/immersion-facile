@@ -1,45 +1,43 @@
-import { AxiosInstance } from "axios";
+import { HttpClient } from "http-client";
 import { from, Observable } from "rxjs";
 import {
-  formAlreadyExistsRoute,
+  EstablishmentTargets,
   FormEstablishmentDto,
   formEstablishmentSchema,
-  formEstablishmentsRoute,
   isSiretExistResponseSchema,
-  requestEmailToUpdateFormRoute,
   SiretDto,
   siretSchema,
 } from "shared";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
 
 export class HttpEstablishmentGateway implements EstablishmentGateway {
-  constructor(private readonly httpClient: AxiosInstance) {}
+  constructor(private readonly httpClient: HttpClient<EstablishmentTargets>) {}
 
   public async addFormEstablishment(
     establishment: FormEstablishmentDto,
   ): Promise<SiretDto> {
-    const { data } = await this.httpClient.post<unknown>(
-      `/${formEstablishmentsRoute}`,
-      establishment,
-    );
-    const siretDto = siretSchema.parse(data);
-    return siretDto;
+    const response = await this.httpClient.addFormEstablishment({
+      body: establishment,
+    });
+    return siretSchema.parse(response.responseBody);
   }
 
   public async isEstablishmentAlreadyRegisteredBySiret(
     siret: SiretDto,
   ): Promise<boolean> {
-    const { data } = await this.httpClient.get<unknown>(
-      `/${formAlreadyExistsRoute}/${siret}`,
-    );
-    const isSiretExistResponse = isSiretExistResponseSchema.parse(data);
-    return isSiretExistResponse;
+    const response =
+      await this.httpClient.isEstablishmentWithSiretAlreadyRegistered({
+        urlParams: { siret },
+      });
+    return isSiretExistResponseSchema.parse(response.responseBody);
   }
 
   public async requestEstablishmentModification(
     siret: SiretDto,
   ): Promise<void> {
-    await this.httpClient.post(`/${requestEmailToUpdateFormRoute}/${siret}`);
+    await this.httpClient.requestEmailToUpdateFormRoute({
+      urlParams: { siret },
+    });
   }
 
   public requestEstablishmentModification$(siret: SiretDto): Observable<void> {
@@ -50,23 +48,19 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
     siret: SiretDto,
     jwt: string,
   ): Promise<FormEstablishmentDto> {
-    const { data } = await this.httpClient.get(
-      `/${formEstablishmentsRoute}/${siret}`,
-      {
-        headers: {
-          Authorization: jwt,
-        },
-      },
-    );
-    const formEstablishmentDto = formEstablishmentSchema.parse(data);
-    return formEstablishmentDto;
+    const { responseBody } = await this.httpClient.getFormEstablishment({
+      urlParams: { siret },
+      headers: { Authorization: jwt },
+    });
+    return formEstablishmentSchema.parse(responseBody);
   }
 
   public async updateFormEstablishment(
     establishment: FormEstablishmentDto,
     jwt: string,
   ): Promise<void> {
-    await this.httpClient.put(`/${formEstablishmentsRoute}`, establishment, {
+    await this.httpClient.updateFormEstablishment({
+      body: establishment,
       headers: {
         Authorization: jwt,
       },

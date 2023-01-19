@@ -1,8 +1,8 @@
 import { subYears } from "date-fns";
 import {
   createEstablishmentMagicLinkPayload,
+  establishmentTargets,
   FormEstablishmentDtoBuilder,
-  formEstablishmentsRoute,
 } from "shared";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
@@ -10,11 +10,13 @@ import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { makeGenerateJwtES256 } from "../../../../domain/auth/jwt";
 import { TEST_ESTABLISHMENT1_SIRET } from "../../../secondary/sirene/InMemorySireneGateway";
 
-describe(`PUT /${formEstablishmentsRoute} - Route to post edited form establishments`, () => {
+describe(`PUT /${establishmentTargets.updateFormEstablishment.url} - Route to post edited form establishments`, () => {
   it("Throws 401 if not authenticated", async () => {
     const { request } = await buildTestApp();
 
-    const response = await request.put(`/${formEstablishmentsRoute}`).send({});
+    const response = await request
+      .put(establishmentTargets.updateFormEstablishment.url)
+      .send({});
 
     // Assert
     expect(response.body).toEqual({ error: "forbidden: unauthenticated" });
@@ -36,7 +38,7 @@ describe(`PUT /${formEstablishmentsRoute} - Route to post edited form establishm
       }),
     );
     const response = await request
-      .put(`/${formEstablishmentsRoute}`)
+      .put(establishmentTargets.updateFormEstablishment.url)
       .set("Authorization", wrongJwt)
       .send({});
 
@@ -47,7 +49,7 @@ describe(`PUT /${formEstablishmentsRoute} - Route to post edited form establishm
   it("Throws 401 if jwt is malformed", async () => {
     const { request } = await buildTestApp();
     const response = await request
-      .put(`/${formEstablishmentsRoute}`)
+      .put(establishmentTargets.updateFormEstablishment.url)
       .set("Authorization", "malformed-jwt")
       .send({});
     // Assert
@@ -70,7 +72,7 @@ describe(`PUT /${formEstablishmentsRoute} - Route to post edited form establishm
       }),
     );
     const response = await request
-      .put(`/${formEstablishmentsRoute}`)
+      .put(establishmentTargets.updateFormEstablishment.url)
       .set("Authorization", wrongJwt)
       .send({});
 
@@ -101,7 +103,7 @@ describe(`PUT /${formEstablishmentsRoute} - Route to post edited form establishm
       .withSiret(TEST_ESTABLISHMENT1_SIRET)
       .build();
     const response = await request
-      .put(`/${formEstablishmentsRoute}`)
+      .put(establishmentTargets.updateFormEstablishment.url)
       .set("Authorization", validJwt)
       .send(formEstablishment);
 
