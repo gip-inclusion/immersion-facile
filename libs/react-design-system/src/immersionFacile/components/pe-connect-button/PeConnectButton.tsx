@@ -1,5 +1,5 @@
 import React from "react";
-import "./PeConnectButton.css";
+import "./PeConnectButton.scss";
 
 export type PeConnectButtonProps = {
   onClick: (e: React.MouseEvent<HTMLAnchorElement>) => void;
@@ -15,9 +15,9 @@ export const PeConnectButton = ({
       onClick={onClick}
       href={`/api/${peConnectEndpoint}`}
       className="pe-connect__button"
-      title="Connexion avec PE Connect"
+      title="Se connecter avec Pôle emploi"
     >
-      Connexion avec PE Connect
+      Se connecter avec Pôle emploi
     </a>
   </div>
 );
