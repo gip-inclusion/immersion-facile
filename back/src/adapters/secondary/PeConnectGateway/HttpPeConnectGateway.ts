@@ -263,6 +263,10 @@ export const managePeConnectError = (
       new Error("Not an error class"),
     );
   if (axios.isAxiosError(error)) {
+    logger.error(
+      { message: error?.message, body: error?.response?.data },
+      "PE CONNECT ERROR",
+    );
     const handledError = peConnectAxiosErrorStrategy(error, context).get(true);
     if (handledError) throw handledError;
     throw new UnhandledError("Erreur axios non gérée", error);

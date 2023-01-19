@@ -7,17 +7,22 @@ import {
   Target,
 } from "http-client";
 import { AbsoluteUrl } from "shared";
-import {
-  InclusionConnectGetAccessTokenBody,
-  InclusionConnectLogoutQueryParams,
-} from "./inclusionConnectApi.dto";
+import { InclusionConnectLogoutQueryParams } from "./inclusionConnectApi.dto";
+
+type WithContentTypeUrlEncoded = {
+  "Content-Type": "application/x-www-form-urlencoded";
+};
 
 type InclusionConnectTargetsConfig = {
   inclusionConnectBaseUrl: AbsoluteUrl;
 };
 
 export type InclusionConnectExternalTargets = CreateTargets<{
-  inclusionConnectGetAccessToken: Target<InclusionConnectGetAccessTokenBody>;
+  inclusionConnectGetAccessToken: Target<
+    string,
+    void,
+    WithContentTypeUrlEncoded
+  >;
   inclusionConnectLogout: Target<void, InclusionConnectLogoutQueryParams>;
 }>;
 

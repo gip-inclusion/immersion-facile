@@ -100,7 +100,7 @@ const overFooterCols: OverFooterCols = [
       "Consultez notre FAQ et trouver les réponses aux questions les plus fréquentes.",
     iconTitle: "fr-icon-questionnaire-fill",
     link: {
-      label: "Accéder à notre FAQ",
+      label: "Accédez à notre FAQ",
       url: "https://aide.immersion-facile.beta.gouv.fr/fr/",
     },
     id: getFooterNavLinkId("over-faq"),

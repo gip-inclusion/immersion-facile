@@ -1,4 +1,5 @@
 import { HttpClient } from "http-client";
+import { queryParamsAsString } from "shared";
 import { InclusionConnectGateway } from "../../../domain/inclusionConnect/port/InclusionConnectGateway";
 import {
   InclusionAccessTokenResponse,
@@ -20,13 +21,13 @@ export class HttpInclusionConnectGateway implements InclusionConnectGateway {
   async getAccessToken(code: string): Promise<InclusionAccessTokenResponse> {
     const { responseBody } = await this.httpClient
       .inclusionConnectGetAccessToken({
-        body: {
+        body: queryParamsAsString({
           code,
           client_id: this.inclusionConnectConfig.clientId,
           client_secret: this.inclusionConnectConfig.clientSecret,
           grant_type: "authorization_code",
           redirect_uri: this.inclusionConnectConfig.immersionRedirectUri,
-        },
+        }),
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
