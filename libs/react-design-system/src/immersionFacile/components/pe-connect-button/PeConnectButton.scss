@@ -1,0 +1,41 @@
+/*============================================
+== Pôle emploi Connect
+=============================================*/
+.pe-connect {
+  clear: both;
+  &__button {
+    border-radius: 100px;
+    text-decoration: none !important;
+    display: inline-flex;
+    height: 60px;
+    align-items: center;
+    background: var(--blue-ecume-sun-247-moon-675); //info-200
+    background-size: 33px auto;
+    color: var(--grey-1000-100);
+    padding: 0 1.5rem 0 3.95rem;
+    position: relative;
+    font-weight: 500;
+    &:before {
+      content: "";
+      display: block;
+      position: absolute;
+      top: 50%;
+      left: 1.4rem;
+      transform: translateY(-50%);
+      background: url("/img/pe-connect-logo.svg") no-repeat center center;
+      width: 33px;
+      height: 32px;
+      background-size: contain;
+      mix-blend-mode: lighten;
+    }
+    &:hover {
+      body & {
+        background-color: var(--blue-ecume-main-400);
+      }
+    }
+    &:focus {
+      opacity: 0.7;
+      background-color: var(--blue-ecume-main-400);
+    }
+  }
+}
