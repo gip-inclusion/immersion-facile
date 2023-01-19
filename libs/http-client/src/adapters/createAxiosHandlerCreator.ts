@@ -11,9 +11,9 @@ export const createAxiosHandlerCreator =
   (target) =>
   async (params = {}) => {
     const contentType =
-      params.headers["Content-Type"] ??
-      params.headers["content-type"] ??
-      params.headers["Content-type"];
+      params.headers?.["Content-Type"] ??
+      params.headers?.["content-type"] ??
+      params.headers?.["Content-type"];
 
     const isFormUrlencoded =
       contentType === "application/x-www-form-urlencoded";
