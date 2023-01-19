@@ -3,7 +3,9 @@ import { establishmentTargets } from "shared";
 import { AppDependencies } from "../../config/createAppDependencies";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 
-export const establishmentRouterWithJwt = (deps: AppDependencies): Router => {
+export const establishmentRouterWithMagicLinkJwt = (
+  deps: AppDependencies,
+): Router => {
   // this considers the jwt checks have been made by the middleware
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const getEstablishmentPayload = (req: Request) => req.payloads!.establishment;

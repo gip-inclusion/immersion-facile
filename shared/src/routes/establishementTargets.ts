@@ -11,6 +11,7 @@ const formEstablishmentsUrl = "/form-establishments";
 const formEstablishmentFromSiretUrl = "/form-establishments/:siret";
 const formEstablishmentAlreadyExitsUrl = "/form-already-exists/:siret";
 const requestEmailToUpdateFormUrl = "/request-email-to-update-form/:siret";
+const formEstablishmentByBatchUrl = "/admin/add-form-establishment-batch";
 
 export type EstablishmentTargets = CreateTargets<{
   addFormEstablishment: Target<FormEstablishmentDto>;
@@ -40,7 +41,8 @@ export type EstablishmentTargets = CreateTargets<{
   addFormEstablishmentBatch: Target<
     FormEstablishmentBatch,
     void,
-    WithAuthorization
+    WithAuthorization,
+    typeof formEstablishmentByBatchUrl
   >;
 }>;
 
@@ -61,6 +63,6 @@ export const establishmentTargets = createTargets<EstablishmentTargets>({
   },
   addFormEstablishmentBatch: {
     method: "POST",
-    url: "/add-form-establishment-batch",
+    url: formEstablishmentByBatchUrl,
   },
 });
