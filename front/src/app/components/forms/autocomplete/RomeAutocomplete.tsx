@@ -10,7 +10,7 @@ import { useRomeAutocompleteUseCase } from "src/app/hooks/romeAutocomplete.hook"
 
 type RomeAutocompleteProps = {
   title: string;
-  initialValue?: RomeDto | undefined;
+  value?: RomeDto | undefined;
   setFormValue: (p: RomeDto) => void;
   className?: string;
   placeholder: string;
@@ -27,11 +27,12 @@ export const RomeAutocomplete = ({
   className,
   placeholder = "Ex : boulangère, infirmier",
   tooltip,
-  initialValue,
+  value,
   id = "im-rome-autocomplete",
 }: RomeAutocompleteProps): JSX.Element => {
-  const { romeSearchText, isSearching, selectedRomeDto, romeOptions } =
-    useAppSelector(romeAutocompleteSelector);
+  const { romeSearchText, isSearching, romeOptions } = useAppSelector(
+    romeAutocompleteSelector,
+  );
   const { updateSearchTerm, selectOption } = useRomeAutocompleteUseCase();
 
   const noOptionText =
@@ -44,7 +45,7 @@ export const RomeAutocomplete = ({
         filterOptions={(x) => x}
         options={romeOptions}
         id={id}
-        value={selectedRomeDto ?? initialValue}
+        value={value}
         noOptionsText={romeSearchText ? noOptionText : "Saisissez un métier"}
         getOptionLabel={(option: RomeDto) => option.romeLabel}
         renderOption={(props, option) => <li {...props}>{option.romeLabel}</li>}

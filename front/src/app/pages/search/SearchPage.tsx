@@ -38,6 +38,7 @@ export const SearchPage = ({
 }) => {
   const searchStatus = useAppSelector(searchSelectors.searchStatus);
   const searchResults = useAppSelector(searchSelectors.searchResults);
+
   const searchUseCase = useSearchUseCase();
   const searchResultsWrapper = useRef<HTMLDivElement>(null);
   const initialValues = {
@@ -102,14 +103,9 @@ export const SearchPage = ({
                     setFormValue={(newValue) => {
                       setFieldValue("romeLabel", newValue.romeLabel);
                       setFieldValue("rome", newValue.romeCode);
-                      setFormikValues({
-                        ...values,
-                        romeLabel: newValue.romeLabel,
-                        rome: newValue.romeCode,
-                      });
                     }}
                     id={"im-search-page__rome-autocomplete"}
-                    initialValue={{
+                    value={{
                       romeLabel: values.romeLabel ?? "",
                       romeCode: values.rome ?? "",
                     }}
