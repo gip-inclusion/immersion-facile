@@ -1,5 +1,8 @@
 import { createTargets, CreateTargets, Target } from "http-client";
-import { FormEstablishmentDto } from "../formEstablishment/FormEstablishment.dto";
+import {
+  FormEstablishmentBulk,
+  FormEstablishmentDto,
+} from "../formEstablishment/FormEstablishment.dto";
 type WithAuthorization = {
   Authorization: string;
 };
@@ -34,6 +37,11 @@ export type EstablishmentTargets = CreateTargets<{
     void,
     typeof requestEmailToUpdateFormUrl
   >;
+  addFormEstablishmentBulk: Target<
+    FormEstablishmentBulk,
+    void,
+    WithAuthorization
+  >;
 }>;
 
 export const establishmentTargets = createTargets<EstablishmentTargets>({
@@ -50,5 +58,9 @@ export const establishmentTargets = createTargets<EstablishmentTargets>({
   requestEmailToUpdateFormRoute: {
     method: "POST",
     url: requestEmailToUpdateFormUrl,
+  },
+  addFormEstablishmentBulk: {
+    method: "POST",
+    url: "/add-form-establishment-bulk",
   },
 });
