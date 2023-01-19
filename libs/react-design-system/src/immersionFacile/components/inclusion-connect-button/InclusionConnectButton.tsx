@@ -1,4 +1,4 @@
-import "./InclusionConnectButton.css";
+import "./InclusionConnectButton.scss";
 import React from "react";
 
 export interface InclusionConnectButtonProps {
@@ -13,12 +13,8 @@ export const InclusionConnectButton = ({
   <a
     onClick={onClick}
     href={`/api/${inclusionConnectEndpoint}`}
-    className="btn-inclusion-connect"
+    className="inclusion-connect-button"
   >
-    <img
-      src="./logo-inclusion-connect-two-lines.svg"
-      height="37"
-      alt="Se connecter avec Inclusion Connect"
-    />
+    Se connecter avec Inclusion Connect
   </a>
 );
