@@ -9,6 +9,7 @@ export type FileProperties = {
   errorMessage?: string;
   hint?: string;
   id: string;
+  accept?: string;
 };
 
 /**
@@ -23,6 +24,7 @@ export const File = ({
   onChange,
   multiple,
   id,
+  accept,
 }: FileProperties) => {
   const _className = classNames("fr-upload-group", className, {
     [`ds-fr--${label}`]: label,
@@ -40,6 +42,7 @@ export const File = ({
         id={id}
         aria-describedby={hint || undefined}
         multiple={multiple}
+        accept={accept}
       />
       {errorMessage && (
         <p id="file-upload-with-error-desc-error" className="fr-error-text">

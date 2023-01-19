@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { DsfrTitle } from "src/../../libs/react-design-system";
 import { UploadCsv } from "src/app/components/UploadCsv";
 import Papa from "papaparse";
@@ -48,6 +48,8 @@ export const AddEstablishmentByBatchTab = () => {
     FormEstablishmentDto[] | undefined
   >(undefined);
 
+  const tableElement = useRef<HTMLTableElement | null>(null);
+
   useEffect(() => {
     const updatedStagingEstablishments = parsedReturn?.data.map(
       (establishmentRow: EstablishmentCSVRow): FormEstablishmentDto => ({
@@ -90,9 +92,11 @@ export const AddEstablishmentByBatchTab = () => {
     );
     setStagingEstablishments(updatedStagingEstablishments);
   }, [parsedReturn]);
-
+  const onFullscreenClick = async () => {
+    await tableElement.current?.requestFullscreen();
+  };
   return (
-    <div className="admin-tab__import-bulk-establishment">
+    <div className="admin-tab__import-batch-establishment">
       <DsfrTitle level={5} text="Import en masse d'entreprises" />
       <div className={fr.cx("fr-input-group")}>
         <label className={fr.cx("fr-label")} htmlFor="group-name-input">
@@ -121,10 +125,21 @@ export const AddEstablishmentByBatchTab = () => {
       />
 
       {stagingEstablishments && !!stagingEstablishments.length && (
-        <>
-          <div className={fr.cx("fr-table", "fr-table--bordered", "fr-mt-4w")}>
+        <div className={fr.cx("fr-mt-6w")}>
+          <Button
+            title="Importer ces succursales"
+            onClick={() => alert("Todo import")}
+          >
+            Importer ces succursales
+          </Button>
+          <div
+            className={fr.cx("fr-table", "fr-table--bordered", "fr-mt-4w")}
+            ref={tableElement}
+          >
             <table>
-              <caption>Résumé de l'import à effectuer</caption>
+              <caption onClick={onFullscreenClick}>
+                Résumé de l'import à effectuer (voir en plein écran)
+              </caption>
               <thead>
                 <tr>
                   {keys(stagingEstablishments[0]).map((key) => (
@@ -138,7 +153,10 @@ export const AddEstablishmentByBatchTab = () => {
                 {stagingEstablishments.map((establishment) => (
                   <tr key={establishment.siret}>
                     {values(establishment).map((value, index) => (
-                      <td key={`${establishment.siret}-value-${index}`}>
+                      <td
+                        key={`${establishment.siret}-value-${index}`}
+                        className={fr.cx("fr-text--xs")}
+                      >
                         {value ? JSON.stringify(value) : ""}
                       </td>
                     ))}
@@ -147,13 +165,7 @@ export const AddEstablishmentByBatchTab = () => {
               </tbody>
             </table>
           </div>
-          <Button
-            title="Importer ces succursales"
-            onClick={() => alert("Todo import")}
-          >
-            Importer ces succursales
-          </Button>
-        </>
+        </div>
       )}
     </div>
   );

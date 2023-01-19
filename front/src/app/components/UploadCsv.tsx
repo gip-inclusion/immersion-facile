@@ -35,6 +35,7 @@ export const UploadCsv = ({
       label={label}
       hint={hint}
       errorMessage={error}
+      accept={".csv"}
       id="file-upload-csv"
     />
   );
