@@ -23,6 +23,7 @@ export const ImmersionHeader = () => {
   const darkModeState = useIsDark();
   const { classes } = makeStyles({ name: ImmersionHeader.displayName })(() => ({
     operator: {
+      boxSizing: "content-box",
       width: 95,
       filter: darkModeState.isDark ? "invert(1) grayscale(1)" : "",
     },
