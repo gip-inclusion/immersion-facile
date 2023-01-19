@@ -32,7 +32,7 @@ export const SearchListResults = () => {
     useState<SearchImmersionResultDto[]>(searchResults);
   const resultsPerPage = 6;
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const totalPages = Math.ceil(searchResults.length / resultsPerPage) - 1;
+  const totalPages = Math.ceil(searchResults.length / resultsPerPage);
   const getSearchResultsForPage = (currentPage: number) => {
     const start = currentPage * resultsPerPage;
     const end = start + resultsPerPage;
