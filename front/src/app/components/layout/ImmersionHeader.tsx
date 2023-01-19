@@ -30,18 +30,15 @@ export const ImmersionHeader = () => {
   }))();
 
   const isAdminConnected = useAppSelector(adminSelectors.auth.isAuthenticated);
-  const tools: HeaderProps["quickAccessItems"] = [];
+  const tools: HeaderProps["quickAccessItems"] = [headerFooterDisplayItem];
   if (isAdminConnected) {
-    tools.push(
-      {
-        iconId: "fr-icon-lock-line",
-        text: "Se déconnecter",
-        buttonProps: {
-          onClick: () => dispatch(adminAuthSlice.actions.logoutRequested()),
-        },
+    tools.push({
+      iconId: "fr-icon-lock-line",
+      text: "Se déconnecter",
+      buttonProps: {
+        onClick: () => dispatch(adminAuthSlice.actions.logoutRequested()),
       },
-      headerFooterDisplayItem,
-    );
+    });
   }
   const isCandidateRoute =
     currentRoute.name === routes.search().name ||
