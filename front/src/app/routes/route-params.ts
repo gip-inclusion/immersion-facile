@@ -19,7 +19,7 @@ export type AdminTab =
   | "emails"
   | "technical-options"
   | "email-preview"
-  | "establishment-bulk";
+  | "establishment-batch";
 
 export const adminTabSerializer: ValueSerializer<AdminTab> = {
   parse: (raw) => raw as AdminTab,

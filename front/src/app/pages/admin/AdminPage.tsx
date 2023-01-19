@@ -1,7 +1,7 @@
 import React from "react";
 import { NavLink, TabLinks } from "react-design-system/immersionFacile";
 import { ImmersionHeader } from "src/app/components/layout/ImmersionHeader";
-import { AddEstablishmentByBulkTab } from "src/app/pages/admin/AddEstablishmentByBulkTab";
+import { AddEstablishmentByBatchTab } from "src/app/pages/admin/AddEstablishmentByBatchTab";
 import { AgencyTab } from "src/app/pages/admin/AgencyTab";
 import { ConventionTab, EventsTab } from "src/app/pages/admin/DashboardTabs";
 import { DataExportTab } from "src/app/pages/admin/DataExportTab";
@@ -64,16 +64,16 @@ const getNavLinks = (currentTab: AdminTab): NavLink[] => [
   },
   {
     label: "Ajout d'établissements groupés",
-    active: currentTab === "establishment-bulk",
-    ...routes.adminTab({ tab: "establishment-bulk" }).link,
-    id: getAdminNavLinkId("establishment-bulk"),
+    active: currentTab === "establishment-batch",
+    ...routes.adminTab({ tab: "establishment-batch" }).link,
+    id: getAdminNavLinkId("establishment-batch"),
   },
 ];
 
 const tabsByName: Record<AdminTab, () => JSX.Element> = {
   "agency-validation": () => <AgencyTab />,
   "email-preview": () => <EmailPreviewTab />,
-  "establishment-bulk": () => <AddEstablishmentByBulkTab />,
+  "establishment-batch": () => <AddEstablishmentByBatchTab />,
   "technical-options": () => <TechnicalOptions />,
   conventions: () => <ConventionTab />,
   emails: () => <EmailsTab />,

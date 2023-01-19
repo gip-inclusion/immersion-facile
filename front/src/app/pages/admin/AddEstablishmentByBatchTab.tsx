@@ -2,7 +2,7 @@ import { map, zipObj } from "ramda";
 import React from "react";
 import { UploadCsv } from "src/app/components/UploadCsv";
 
-export const AddEstablishmentByBulkTab = () => (
+export const AddEstablishmentByBatchTab = () => (
   <div>
     Vous pouvez ajouter des établissements grace à un csv ....
     <br />

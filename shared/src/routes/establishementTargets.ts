@@ -1,6 +1,6 @@
 import { createTargets, CreateTargets, Target } from "http-client";
 import {
-  FormEstablishmentBulk,
+  FormEstablishmentBatch,
   FormEstablishmentDto,
 } from "../formEstablishment/FormEstablishment.dto";
 type WithAuthorization = {
@@ -37,8 +37,8 @@ export type EstablishmentTargets = CreateTargets<{
     void,
     typeof requestEmailToUpdateFormUrl
   >;
-  addFormEstablishmentBulk: Target<
-    FormEstablishmentBulk,
+  addFormEstablishmentBatch: Target<
+    FormEstablishmentBatch,
     void,
     WithAuthorization
   >;
@@ -59,8 +59,8 @@ export const establishmentTargets = createTargets<EstablishmentTargets>({
     method: "POST",
     url: requestEmailToUpdateFormUrl,
   },
-  addFormEstablishmentBulk: {
+  addFormEstablishmentBatch: {
     method: "POST",
-    url: "/add-form-establishment-bulk",
+    url: "/add-form-establishment-batch",
   },
 });
