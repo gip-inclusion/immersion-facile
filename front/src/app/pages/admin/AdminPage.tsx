@@ -1,6 +1,7 @@
 import React from "react";
 import { NavLink, TabLinks } from "react-design-system/immersionFacile";
 import { ImmersionHeader } from "src/app/components/layout/ImmersionHeader";
+import { AddEstablishmentByBulkTab } from "src/app/pages/admin/AddEstablishmentByBulkTab";
 import { AgencyTab } from "src/app/pages/admin/AgencyTab";
 import { ConventionTab, EventsTab } from "src/app/pages/admin/DashboardTabs";
 import { DataExportTab } from "src/app/pages/admin/DataExportTab";
@@ -61,7 +62,24 @@ const getNavLinks = (currentTab: AdminTab): NavLink[] => [
     ...routes.adminTab({ tab: "email-preview" }).link,
     id: getAdminNavLinkId("email-preview"),
   },
+  {
+    label: "Ajout d'établissements groupés",
+    active: currentTab === "establishment-bulk",
+    ...routes.adminTab({ tab: "establishment-bulk" }).link,
+    id: getAdminNavLinkId("establishment-bulk"),
+  },
 ];
+
+const tabsByName: Record<AdminTab, () => JSX.Element> = {
+  "agency-validation": () => <AgencyTab />,
+  "email-preview": () => <EmailPreviewTab />,
+  "establishment-bulk": () => <AddEstablishmentByBulkTab />,
+  "technical-options": () => <TechnicalOptions />,
+  conventions: () => <ConventionTab />,
+  emails: () => <EmailsTab />,
+  events: () => <EventsTab />,
+  exports: () => <DataExportTab />,
+};
 
 export const AdminPage = ({
   route,
@@ -88,15 +106,7 @@ export const AdminPage = ({
                 },
               }}
             />
-            <div className="fr-tab-content">
-              {currentTab === "conventions" && <ConventionTab />}
-              {currentTab === "events" && <EventsTab />}
-              {currentTab === "agency-validation" && <AgencyTab />}
-              {currentTab === "exports" && <DataExportTab />}
-              {currentTab === "technical-options" && <TechnicalOptions />}
-              {currentTab === "email-preview" && <EmailPreviewTab />}
-              {currentTab === "emails" && <EmailsTab />}
-            </div>
+            <div className="fr-tab-content">{tabsByName[currentTab]()}</div>
           </div>
         </div>
       </div>

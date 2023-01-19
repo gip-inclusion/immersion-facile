@@ -16,4 +16,5 @@ export interface EstablishmentGateway {
     establishment: FormEstablishmentDto,
     jwt: string,
   ) => Promise<void>;
+  // addFormEstablishmentBulk$: () => {};
 }

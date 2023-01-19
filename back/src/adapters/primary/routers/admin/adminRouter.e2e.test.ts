@@ -101,11 +101,11 @@ describe("/admin router", () => {
       const initialFeatureFlagsResponse = await request.get(
         `/${featureFlagsRoute}`,
       );
-      expect(initialFeatureFlagsResponse.body.enableLogoUpload).toBe(false);
+      expect(initialFeatureFlagsResponse.body.enableLogoUpload).toBe(true);
 
       const params: SetFeatureFlagParams = {
         flagName: "enableLogoUpload",
-        value: true,
+        value: false,
       };
 
       const response = await request
@@ -119,7 +119,7 @@ describe("/admin router", () => {
       const updatedFeatureFlagsResponse = await request.get(
         `/${featureFlagsRoute}`,
       );
-      expect(updatedFeatureFlagsResponse.body.enableLogoUpload).toBe(true);
+      expect(updatedFeatureFlagsResponse.body.enableLogoUpload).toBe(false);
     });
   });
 });

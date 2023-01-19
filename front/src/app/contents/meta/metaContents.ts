@@ -167,4 +167,8 @@ export const adminMetaContent: Record<AdminTab, MetaContentType> = {
     title: "admin: aperçus email",
     description: "Page admin: Aperçus email",
   },
+  "establishment-bulk": {
+    title: "admin: ajout d'établissements groupés",
+    description: "Page admin: Ajout d'établissements groupés",
+  },
 };

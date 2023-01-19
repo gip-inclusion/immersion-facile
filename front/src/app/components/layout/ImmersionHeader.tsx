@@ -177,14 +177,6 @@ export const ImmersionHeader = () => {
           },
         },
         {
-          text: "Recherche V2",
-          isActive: false,
-          linkProps: {
-            ...routes.search().link,
-            id: getHeaderNavLinkId("admin-search-v2"),
-          },
-        },
-        {
           text: "Mon organisme (dashboard agence)",
           isActive: false,
           linkProps: {

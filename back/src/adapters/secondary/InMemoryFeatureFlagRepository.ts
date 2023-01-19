@@ -5,7 +5,7 @@ const defaultFlags: FeatureFlags = {
   enableAdminUi: true,
   enableInseeApi: true,
   enablePeConnectApi: true,
-  enableLogoUpload: false,
+  enableLogoUpload: true,
   enablePeConventionBroadcast: true,
   enableTemporaryOperation: false,
 };
