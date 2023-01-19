@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
-import { DsfrTitle } from "src/../../libs/react-design-system";
+import { DsfrTitle } from "react-design-system";
 import { UploadCsv } from "src/app/components/UploadCsv";
 import Papa from "papaparse";
-import { ContactMethod, FormEstablishmentDto } from "src/../../shared/src";
+import { ContactMethod, FormEstablishmentDto } from "shared";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { keys, values } from "ramda";
 import { fr } from "@codegouvfr/react-dsfr";
