@@ -137,8 +137,16 @@ export const AddEstablishmentByBatchTab = () => {
             ref={tableElement}
           >
             <table>
-              <caption onClick={onFullscreenClick}>
-                Résumé de l'import à effectuer (voir en plein écran)
+              <caption>
+                Résumé de l'import à effectuer
+                <Button
+                  size={"small"}
+                  priority={"tertiary"}
+                  className={"fr-ml-2w"}
+                  onClick={onFullscreenClick}
+                >
+                  Voir en plein écran
+                </Button>
               </caption>
               <thead>
                 <tr>
