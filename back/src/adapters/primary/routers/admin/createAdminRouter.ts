@@ -7,7 +7,6 @@ import {
   AgencyId,
   conventionsRoute,
   emailRoute,
-  establishmentTargets,
   ExportDataDto,
   exportRoute,
   featureFlagsRoute,
@@ -146,9 +145,7 @@ export const createAdminRouter = (
 
   //Establishment
   adminRouter
-    .route(
-      removeRouterPrefix(establishmentTargets.addFormEstablishmentBatch.url),
-    )
+    .route(removeRouterPrefix(adminTargets.addFormEstablishmentBatch.url))
     .post(async (req, res) =>
       // eslint-disable-next-line @typescript-eslint/require-await
       sendHttpResponse(req, res, async () => "yolo"),

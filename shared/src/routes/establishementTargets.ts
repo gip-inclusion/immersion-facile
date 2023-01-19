@@ -1,8 +1,6 @@
 import { createTargets, CreateTargets, Target } from "http-client";
-import {
-  FormEstablishmentBatch,
-  FormEstablishmentDto,
-} from "../formEstablishment/FormEstablishment.dto";
+import { FormEstablishmentDto } from "../formEstablishment/FormEstablishment.dto";
+
 type WithAuthorization = {
   Authorization: string;
 };
@@ -11,7 +9,6 @@ const formEstablishmentsUrl = "/form-establishments";
 const formEstablishmentFromSiretUrl = "/form-establishments/:siret";
 const formEstablishmentAlreadyExitsUrl = "/form-already-exists/:siret";
 const requestEmailToUpdateFormUrl = "/request-email-to-update-form/:siret";
-const formEstablishmentByBatchUrl = "/admin/add-form-establishment-batch";
 
 export type EstablishmentTargets = CreateTargets<{
   addFormEstablishment: Target<FormEstablishmentDto>;
@@ -38,12 +35,6 @@ export type EstablishmentTargets = CreateTargets<{
     void,
     typeof requestEmailToUpdateFormUrl
   >;
-  addFormEstablishmentBatch: Target<
-    FormEstablishmentBatch,
-    void,
-    WithAuthorization,
-    typeof formEstablishmentByBatchUrl
-  >;
 }>;
 
 export const establishmentTargets = createTargets<EstablishmentTargets>({
@@ -60,9 +51,5 @@ export const establishmentTargets = createTargets<EstablishmentTargets>({
   requestEmailToUpdateFormRoute: {
     method: "POST",
     url: requestEmailToUpdateFormUrl,
-  },
-  addFormEstablishmentBatch: {
-    method: "POST",
-    url: formEstablishmentByBatchUrl,
   },
 });

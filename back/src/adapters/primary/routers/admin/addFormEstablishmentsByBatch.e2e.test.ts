@@ -1,13 +1,10 @@
-import {
-  AdminToken,
-  establishmentTargets,
-} from "../../../../../node_modules/shared";
+import { adminTargets, AdminToken } from "shared";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { SuperTest, Test } from "supertest";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 
 const addFormEstablishmentBatchRoute =
-  establishmentTargets.addFormEstablishmentBatch.url;
+  adminTargets.addFormEstablishmentBatch.url;
 
 describe("POST /add-form-establishment-batch", () => {
   let request: SuperTest<Test>;
