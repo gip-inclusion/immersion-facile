@@ -219,7 +219,7 @@ export const ImmersionHeader = () => {
           imgUrl: immersionFacileLogo,
           alt: "Immersion Facilitée",
         }}
-        serviceTagline="Faciliter la réalisation des immersions professionelles"
+        serviceTagline="Faciliter la réalisation des immersions professionnelles"
         serviceTitle="Immersion Facilitée"
         navigation={links}
         quickAccessItems={tools}

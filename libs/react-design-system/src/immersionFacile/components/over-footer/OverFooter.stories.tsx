@@ -33,10 +33,10 @@ OverFooterMock.args = {
     {
       title: "Le centre de support",
       subtitle:
-        "Consultez notre centre d'aide (FAQ) pour trouver les réponses aux principales questions demandées",
+        "Consultez notre centre d'aide (FAQ) pour trouvez les réponses aux principales questions demandées",
       iconTitle: "fr-icon-questionnaire-fill",
       link: {
-        label: "Accéder à notre FAQ",
+        label: "Accédez à notre FAQ",
         url: "https://aide.immersion-facile.beta.gouv.fr/fr/",
       },
       id: "im-over-footer__link-2",
