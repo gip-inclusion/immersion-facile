@@ -19,9 +19,7 @@ const requestEstablishmentModification: AppEpic<EstablishmentAction> = (
   action$.pipe(
     filter(establishmentSlice.actions.sendModificationLinkRequested.match),
     switchMap((action) =>
-      establishmentGateway.requestEstablishmentModificationObservable(
-        action.payload,
-      ),
+      establishmentGateway.requestEstablishmentModification$(action.payload),
     ),
     map(establishmentSlice.actions.sendModificationLinkSucceeded),
   );

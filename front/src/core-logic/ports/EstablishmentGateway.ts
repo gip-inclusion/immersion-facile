@@ -7,7 +7,7 @@ export interface EstablishmentGateway {
   ) => Promise<SiretDto>;
   isEstablishmentAlreadyRegisteredBySiret(siret: SiretDto): Promise<boolean>;
   requestEstablishmentModification(siret: SiretDto): Promise<void>;
-  requestEstablishmentModificationObservable(siret: SiretDto): Observable<void>;
+  requestEstablishmentModification$(siret: SiretDto): Observable<void>;
   getFormEstablishmentFromJwt: (
     siret: SiretDto,
     jwt: string,

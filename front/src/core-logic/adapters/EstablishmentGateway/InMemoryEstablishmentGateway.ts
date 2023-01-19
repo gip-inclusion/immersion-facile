@@ -37,9 +37,7 @@ export class InMemoryEstablishmentGateway implements EstablishmentGateway {
 
   public establishmentModificationResponse$ = new Subject<void>();
 
-  public requestEstablishmentModificationObservable(
-    _siret: SiretDto,
-  ): Observable<void> {
+  public requestEstablishmentModification$(_siret: SiretDto): Observable<void> {
     return this.simulateBack
       ? of(undefined)
       : this.establishmentModificationResponse$;

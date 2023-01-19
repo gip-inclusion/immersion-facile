@@ -42,9 +42,7 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
     await this.httpClient.post(`/${requestEmailToUpdateFormRoute}/${siret}`);
   }
 
-  public requestEstablishmentModificationObservable(
-    siret: SiretDto,
-  ): Observable<void> {
+  public requestEstablishmentModification$(siret: SiretDto): Observable<void> {
     return from(this.requestEstablishmentModification(siret));
   }
 
