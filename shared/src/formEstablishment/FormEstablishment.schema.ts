@@ -15,6 +15,7 @@ import {
 import {
   BusinessContactDto,
   ContactMethod,
+  FormEstablishmentBulk,
   FormEstablishmentDto,
   FormEstablishmentSource,
   ImmersionContactInEstablishmentId,
@@ -69,3 +70,9 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z.object(
     isSearchable: zBoolean,
   },
 );
+
+export const formEstablishmentBulkSchema: z.Schema<FormEstablishmentBulk> =
+  z.object({
+    groupName: zString,
+    formEstablishments: z.array(formEstablishmentSchema),
+  });

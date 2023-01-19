@@ -44,3 +44,8 @@ export type FormEstablishmentDto = {
   additionalInformation?: string;
   isSearchable: boolean;
 };
+
+export type FormEstablishmentBulk = {
+  groupName: string;
+  formEstablishments: FormEstablishmentDto[];
+};
