@@ -72,6 +72,7 @@ import { AppConfig } from "./appConfig";
 import { Gateways } from "./createGateways";
 import { makeGenerateEditFormEstablishmentUrl } from "./makeGenerateEditFormEstablishmentUrl";
 import { GenerateConventionMagicLink } from "./createGenerateConventionMagicLink";
+import { AddFormEstablishmentBatch } from "../../../domain/immersionOffer/useCases/AddFormEstablismentsBatch";
 
 export const createUseCases = (
   config: AppConfig,
@@ -89,6 +90,11 @@ export const createUseCases = (
     quarantinedTopics: config.quarantinedTopics,
   });
   const getSiret = new GetSiret(gateways.sirene);
+  const addFormEstablishment = new AddFormEstablishment(
+    uowPerformer,
+    createNewEvent,
+    getSiret,
+  );
 
   return {
     ...instantiatedUseCasesFromClasses({
@@ -128,6 +134,13 @@ export const createUseCases = (
       ),
       getSentEmails: new GetSentEmails(gateways.email),
       exportData: new ExportData(uowPerformer, gateways.exportGateway),
+      addFormEstablishmentBatch: new AddFormEstablishmentBatch(
+        uowPerformer,
+        addFormEstablishment,
+      ),
+      // uowPerformer,
+      // createNewEvent,
+      // getSiret,
 
       // Conventions
       createImmersionAssessment: new CreateImmersionAssessment(
@@ -174,11 +187,7 @@ export const createUseCases = (
         uowPerformer,
       ),
 
-      addFormEstablishment: new AddFormEstablishment(
-        uowPerformer,
-        createNewEvent,
-        getSiret,
-      ),
+      addFormEstablishment,
 
       editFormEstablishment: new EditFormEstablishment(
         uowPerformer,

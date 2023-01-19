@@ -148,7 +148,9 @@ export const createAdminRouter = (
     .route(removeRouterPrefix(adminTargets.addFormEstablishmentBatch.url))
     .post(async (req, res) =>
       // eslint-disable-next-line @typescript-eslint/require-await
-      sendHttpResponse(req, res, async () => "yolo"),
+      sendHttpResponse(req, res, async () =>
+        deps.useCases.addFormEstablishmentBatch.execute(req.body),
+      ),
     );
 
   return [routerPrefix, adminRouter];

@@ -1,4 +1,10 @@
-import { adminTargets, AdminToken } from "shared";
+import {
+  adminTargets,
+  AdminToken,
+  FormEstablishmentBatch,
+  FormEstablishmentDto,
+  FormEstablishmentDtoBuilder,
+} from "shared";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { SuperTest, Test } from "supertest";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
@@ -33,10 +39,19 @@ describe("POST /add-form-establishment-batch", () => {
     expect(response.status).toBe(401);
   });
 
-  it("returns 200 if authenticated", async () => {
+  it("returns 200 if everything work", async () => {
+    const formEstablishment1: FormEstablishmentDto =
+      FormEstablishmentDtoBuilder.valid().build();
+
+    const payload: FormEstablishmentBatch = {
+      groupName: "Tesla",
+      formEstablishments: [formEstablishment1],
+    };
+
     const response = await request
       .post(addFormEstablishmentBatchRoute)
-      .set("authorization", token);
+      .set("authorization", token)
+      .send(payload);
 
     expect(response.status).toBe(200);
   });
