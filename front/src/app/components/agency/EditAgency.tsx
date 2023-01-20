@@ -26,16 +26,12 @@ import { toFormikValidationSchema } from "src/app/components/forms/commons/zodVa
 import { AgencyAutocomplete } from "./AgencyAutocomplete";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { formAgencyFieldsLabels } from "src/app/contents/forms/agency/formAgency";
+import { fr } from "@codegouvfr/react-dsfr";
 
 export const EditAgency = () => (
   <>
     <DsfrTitle level={5} text="Editer une agence" className="fr-mt-4w" />
-    <div
-      className="w-2/3 p-5"
-      style={{
-        backgroundColor: "#E5E5F4",
-      }}
-    >
+    <div className={fr.cx("fr-px-6w", "fr-py-4w", "fr-card")}>
       <AgencyAutocomplete
         title="Je sélectionne une agence"
         placeholder={"Ex : Agence de Berry"}
@@ -80,7 +76,7 @@ const EditAgencyForm = () => {
         {({ isSubmitting, setFieldValue, values, errors, submitCount }) => {
           const typedSetField = makeTypedSetField<AgencyDto>(setFieldValue);
           return (
-            <Form className="m-5 max-w-6xl">
+            <Form className={fr.cx("fr-my-4w")}>
               <div>
                 <AgencyFormCommonFields addressInitialValue={agency.address} />
                 <FillableList

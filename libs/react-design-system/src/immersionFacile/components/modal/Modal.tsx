@@ -1,3 +1,4 @@
+import { fr } from "@codegouvfr/react-dsfr";
 import classNames, { ArgumentArray } from "classnames";
 import React, { Children, cloneElement, useEffect } from "react";
 
@@ -30,14 +31,14 @@ const MODAL_ANIMATION_TIME = 300;
 export const ModalDialog = ({
   children,
   hide,
-  size,
+  size = "md",
   className,
   isOpen,
   canClose,
 }: ModalDialogProperties) => {
   // const [openedModal, setOpenedModal] = useState(isOpen);
   const colSizes = { sm: 4, lg: 8, md: 6 };
-  const _colSize = size ? colSizes[size] : null;
+  const colSize = colSizes[size];
   const _className = classNames(
     "fr-modal fr-modal--legacy",
 
@@ -95,7 +96,7 @@ export const ModalDialog = ({
       shouldCloseOnOverlayClick={true}
     >
       <div className="fr-grid-row fr-grid-row--center">
-        <div className="fr-modal__body fr-col-md-6">
+        <div className={fr.cx("fr-modal__body", `fr-col-md-${colSize}`)}>
           <div className="fr-modal__header">{closeComponent}</div>
           <div className="fr-modal__content">
             {title}

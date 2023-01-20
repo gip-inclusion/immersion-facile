@@ -1,8 +1,8 @@
 import { useEstablishmentSiret } from "src/app/hooks/siret.hooks";
-import { ButtonHome, ImmersionTextField } from "react-design-system";
+import { ImmersionTextField } from "react-design-system";
 import React from "react";
-import SendRoundedIcon from "@mui/icons-material/SendRounded";
-import { EstablishmentSubTitle } from "src/app/components/EstablishmentSubTitle";
+import { fr } from "@codegouvfr/react-dsfr";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 
 type SiretFetcherInputProps = {
   placeholder: string;
@@ -29,7 +29,6 @@ export const SiretFetcherInput = ({
   return (
     <>
       <ImmersionTextField
-        className="w-3/4"
         id="siret-fetcher-input"
         name="siret"
         label={label}
@@ -50,12 +49,10 @@ export const SiretFetcherInput = ({
 
 const ModifyEstablishmentRequestNotification = () => (
   <>
-    <SendRoundedIcon
-      className="py-1"
-      sx={{ color: "#3458a2", fontSize: "xx-large" }}
-    />
-    <EstablishmentSubTitle type="establishment" text="Demande envoyée" />
-    <p className="text-immersionBlue-dark  text-center text-xs py-2">
+    <span className={fr.cx("fr-valid-text", "fr-text--md", "fr-mb-2w")}>
+      Demande envoyée
+    </span>
+    <p>
       Un e-mail a été envoyé au référent de cet établissement avec un lien
       permettant la mise à jour des informations. Le lien est valable 24h.
     </p>
@@ -70,11 +67,13 @@ const ModifyEstablishmentRequestForMailUpdate = ({
   onClick,
 }: ModifyEstablishmentRequestForMailUpdateProps) => (
   <>
-    <span className="text-immersionBlue-dark  text-center text-xs pb-2">
+    <p className={fr.cx("fr-valid-text", "fr-mb-2w")}>
       Nous avons bien trouvé votre établissement dans notre base de donnée.
-    </span>
-    <ButtonHome type="establishment-secondary" onClick={onClick}>
-      Recevoir le mail de modification
-    </ButtonHome>
+    </p>
+    <div className={fr.cx("fr-grid-row", "fr-grid-row--center")}>
+      <Button type="button" onClick={onClick} priority="secondary">
+        Recevoir le mail de modification
+      </Button>
+    </div>
   </>
 );

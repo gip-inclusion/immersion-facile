@@ -52,14 +52,9 @@ export const ActivateAgency = () => {
       <DsfrTitle
         level={5}
         text="Activer ou Rejeter une agence"
-        className="fr-mt-4w"
+        className={fr.cx("fr-mt-4w")}
       />
-      <div
-        className="w-2/3 p-5"
-        style={{
-          backgroundColor: "#E5E5F4",
-        }}
-      >
+      <div className={fr.cx("fr-px-6w", "fr-py-4w", "fr-card")}>
         <Select
           placeholder="Veuillez sélectionner une agence"
           label={`${agencyNeedingReviewOptions.length} agence(s) en attente de revue`}

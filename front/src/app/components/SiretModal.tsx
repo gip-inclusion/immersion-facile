@@ -3,9 +3,8 @@ import {
   ModalClose,
   ModalContent,
   ModalDialog,
-  SubTitle,
-  Title,
-} from "react-design-system";
+  ModalTitle,
+} from "react-design-system/immersionFacile";
 import { useEstablishmentSiret } from "src/app/hooks/siret.hooks";
 import { SiretFetcherInput } from "./SiretFetcherInput";
 
@@ -82,17 +81,15 @@ export const SiretModal = ({ modalState, dispatch }: SiretModalProps) => {
 
   const getModalContents = (mode: ActionOnEstablishment) => contents[mode];
   return (
-    <ModalDialog isOpen={modalState.isOpen} hide={hide}>
+    <ModalDialog isOpen={modalState.isOpen} hide={hide} size="sm">
       <ModalClose hide={hide} title="Fermer la fenêtre" />
       <ModalContent>
-        <Title>{getModalContents(modalState.mode).title}</Title>
-        <SubTitle>{getModalContents(modalState.mode).subtitle}</SubTitle>
-        <div className="fr-grid-row fr-grid-row--center">
-          <SiretFetcherInput
-            placeholder="Entrez le Siret de votre entreprise"
-            shouldFetchEvenIfAlreadySaved={false}
-          />
-        </div>
+        <ModalTitle>{getModalContents(modalState.mode).title}</ModalTitle>
+        <p>{getModalContents(modalState.mode).subtitle}</p>
+        <SiretFetcherInput
+          placeholder="Entrez le Siret de votre entreprise"
+          shouldFetchEvenIfAlreadySaved={false}
+        />
       </ModalContent>
     </ModalDialog>
   );
