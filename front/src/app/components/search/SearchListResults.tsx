@@ -9,6 +9,8 @@ import {
 } from "./ContactEstablishmentModal";
 import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 import { SearchResult } from "./SearchResult";
+import { Select } from "src/../../libs/react-design-system";
+import { fr } from "@codegouvfr/react-dsfr";
 
 const getFeedBackMessage = (contactMethod?: ContactMethod) => {
   switch (contactMethod) {
@@ -22,6 +24,8 @@ const getFeedBackMessage = (contactMethod?: ContactMethod) => {
   }
 };
 
+const resultsPerPageOptions = [6, 12, 24, 48];
+
 export const SearchListResults = () => {
   const searchResults = useAppSelector(searchSelectors.searchResults);
   // prettier-ignore
@@ -30,7 +34,7 @@ export const SearchListResults = () => {
   const { modalState, dispatch } = useContactEstablishmentModal();
   const [displayedResults, setDisplayedResults] =
     useState<SearchImmersionResultDto[]>(searchResults);
-  const resultsPerPage = 6;
+  const [resultsPerPage, setResultsPerPage] = useState<number>(6);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const totalPages = Math.ceil(searchResults.length / resultsPerPage);
   const getSearchResultsForPage = (currentPage: number) => {
@@ -41,7 +45,7 @@ export const SearchListResults = () => {
 
   useEffect(() => {
     setDisplayedResults(getSearchResultsForPage(currentPage));
-  }, [currentPage]);
+  }, [currentPage, resultsPerPage]);
 
   return (
     <div className="fr-container fr-mb-10w">
@@ -69,21 +73,46 @@ export const SearchListResults = () => {
             disableButton={modalState.isValidating}
           />
         ))}
-        <div className="fr-container fr-grid-row fr-grid-row--center">
-          <Pagination
-            showFirstLast
-            count={totalPages}
-            defaultPage={currentPage + 1}
-            getPageLinkProps={(pageNumber) => ({
-              title: `Résultats de recherche, page : ${pageNumber}`,
-              onClick: (event) => {
-                event.preventDefault();
-                setCurrentPage(pageNumber - 1);
-              },
-              href: "#", // TODO : PR vers react-dsfr pour gérer pagination full front
-              key: `pagination-link-${pageNumber}`,
-            })}
-          />
+        <div
+          className={fr.cx(
+            "fr-container",
+            "fr-grid-row",
+            "fr-grid-row--center",
+          )}
+        >
+          <div className={fr.cx("fr-col-9")}>
+            <Pagination
+              showFirstLast
+              count={totalPages}
+              defaultPage={currentPage + 1}
+              getPageLinkProps={(pageNumber) => ({
+                title: `Résultats de recherche, page : ${pageNumber}`,
+                onClick: (event) => {
+                  event.preventDefault();
+                  setCurrentPage(pageNumber - 1);
+                },
+                href: "#", // TODO : PR vers react-dsfr pour gérer pagination full front
+                key: `pagination-link-${pageNumber}`,
+              })}
+            />
+          </div>
+          <div className={fr.cx("fr-col-3")}>
+            <Select
+              label="Nombres de resultats par page"
+              className={fr.cx("")}
+              onChange={(event) => {
+                setResultsPerPage(parseInt(event.currentTarget.value));
+              }}
+              value={resultsPerPage}
+              options={[
+                ...resultsPerPageOptions.map((number) => ({
+                  label: `${number}`,
+                  value: number,
+                })),
+              ]}
+              id="im-search-page__results-per-page-dropdown"
+            />
+          </div>
         </div>
         <ContactEstablishmentModal
           modalState={modalState}
