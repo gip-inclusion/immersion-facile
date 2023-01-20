@@ -110,28 +110,24 @@ const AddToList = ({
       >
         {label}
       </label>
-      {description && (
-        <span className={fr.cx("fr-hint-text")}>{description}</span>
-      )}
-      <div className={fr.cx("fr-grid-row")}>
-        <div className={fr.cx("fr-col")}>
-          <input
-            id={cleanStringToHTMLAttribute(name)}
-            value={inputValue}
-            type="text"
-            name={name}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                onAddClick();
-              }
-            }}
-            onChange={(e) => setInputValue(e.target.value)}
-            className={`fr-input${error ? " fr-input--error" : ""}`}
-            placeholder={placeholder || ""}
-            aria-describedby="text-input-error-desc-error"
-          />
-        </div>
+      {description && <span className="fr-hint-text">{description}</span>}
+      <div className="fr-grid-row">
+        <input
+          id={cleanStringToHTMLAttribute(name)}
+          value={inputValue}
+          type="text"
+          name={name}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              onAddClick();
+            }
+          }}
+          onChange={(e) => setInputValue(e.target.value)}
+          className={`fr-input${error ? " fr-input--error" : ""}`}
+          placeholder={placeholder || ""}
+          aria-describedby="text-input-error-desc-error"
+        />
         <Button type="button" onClick={onAddClick}>
           Ajouter
         </Button>
