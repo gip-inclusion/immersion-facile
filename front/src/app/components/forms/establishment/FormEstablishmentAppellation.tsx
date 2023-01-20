@@ -3,6 +3,7 @@ import React from "react";
 import { AppellationDto } from "shared";
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import { fr } from "@codegouvfr/react-dsfr";
 
 type ProfessionProps = {
   name: string;
@@ -18,8 +19,8 @@ export const FormEstablishmentAppellation = ({
   const [{ value }, _, { setValue }] = useField<AppellationDto>(name);
 
   return (
-    <div className="flex items-end">
-      <div className="flex-1">
+    <div className={fr.cx("fr-grid-row", "fr-grid-row--bottom")}>
+      <div className={fr.cx("fr-col")}>
         <AppellationAutocomplete
           label="Rechercher un métier *"
           initialValue={value}
@@ -27,14 +28,12 @@ export const FormEstablishmentAppellation = ({
           selectedAppellations={selectedAppellations}
         />
       </div>
-      <div>
-        <Button
-          type="button"
-          iconId="fr-icon-delete-bin-line"
-          title="Suppression"
-          onClick={onDelete}
-        />
-      </div>
+      <Button
+        type="button"
+        iconId="fr-icon-delete-bin-line"
+        title="Suppression"
+        onClick={onDelete}
+      />
     </div>
   );
 };

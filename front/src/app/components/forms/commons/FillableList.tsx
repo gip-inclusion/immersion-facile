@@ -2,6 +2,8 @@ import MuiChip from "@mui/material/Chip";
 import { styled } from "@mui/material/styles";
 import React, { useEffect, useState } from "react";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import { fr } from "@codegouvfr/react-dsfr";
+
 import {
   cleanStringToHTMLAttribute,
   notEqual,
@@ -102,27 +104,34 @@ const AddToList = ({
         error ? " fr-input-group--error" : ""
       } ${componentName}__add-to-list-wrapper fr-mb-2w`}
     >
-      <label className="fr-label" htmlFor={cleanStringToHTMLAttribute(name)}>
+      <label
+        className={fr.cx("fr-label")}
+        htmlFor={cleanStringToHTMLAttribute(name)}
+      >
         {label}
       </label>
-      {description && <span className="fr-hint-text">{description}</span>}
-      <div className="fr-grid-row">
-        <input
-          id={cleanStringToHTMLAttribute(name)}
-          value={inputValue}
-          type="text"
-          name={name}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              onAddClick();
-            }
-          }}
-          onChange={(e) => setInputValue(e.target.value)}
-          className={`fr-input${error ? " fr-input--error" : ""}`}
-          placeholder={placeholder || ""}
-          aria-describedby="text-input-error-desc-error"
-        />
+      {description && (
+        <span className={fr.cx("fr-hint-text")}>{description}</span>
+      )}
+      <div className={fr.cx("fr-grid-row")}>
+        <div className={fr.cx("fr-col")}>
+          <input
+            id={cleanStringToHTMLAttribute(name)}
+            value={inputValue}
+            type="text"
+            name={name}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                onAddClick();
+              }
+            }}
+            onChange={(e) => setInputValue(e.target.value)}
+            className={`fr-input${error ? " fr-input--error" : ""}`}
+            placeholder={placeholder || ""}
+            aria-describedby="text-input-error-desc-error"
+          />
+        </div>
         <Button type="button" onClick={onAddClick}>
           Ajouter
         </Button>

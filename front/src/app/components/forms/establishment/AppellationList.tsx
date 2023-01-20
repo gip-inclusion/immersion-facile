@@ -24,16 +24,14 @@ export const AppellationList = ({ name, title }: AppellationListProps) => {
     <div className="im-appellation-autocomplete fr-input-group">
       <>
         {title && <h2 className="fr-text--lead">{title}</h2>}
-        <div className="flex flex-col gap-5">
-          {appellations.map(({ appellationCode }, index) => (
-            <FormEstablishmentAppellation
-              name={`${name}[${index}]`}
-              onDelete={() => onDelete(index)}
-              key={`${appellationCode}-${index}`}
-              selectedAppellations={appellations}
-            />
-          ))}
-        </div>
+        {appellations.map(({ appellationCode }, index) => (
+          <FormEstablishmentAppellation
+            name={`${name}[${index}]`}
+            onDelete={() => onDelete(index)}
+            key={`${appellationCode}-${index}`}
+            selectedAppellations={appellations}
+          />
+        ))}
       </>
       <ButtonAdd
         className="fr-my-4v"
