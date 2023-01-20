@@ -5,12 +5,16 @@ import "./SectionTextEmbed.scss";
 type SectionTextEmbedProps = {
   videoUrl: string;
   videoPosterUrl: string;
+  videoTranscription: string;
+  videoDescription: string;
 };
 const componentName = "im-section-text-embed";
 
 export const SectionTextEmbed = ({
   videoUrl,
   videoPosterUrl,
+  videoTranscription,
+  videoDescription,
 }: SectionTextEmbedProps) => (
   <section className={`fr-container ${componentName} fr-pt-8w fr-pb-10w`}>
     <div className={`${componentName}__header fr-mb-4w`}>
@@ -58,9 +62,21 @@ export const SectionTextEmbed = ({
               attributes: {
                 poster: videoPosterUrl,
               },
+              tracks: [
+                {
+                  kind: "descriptions",
+                  src: videoDescription,
+                  srcLang: "fr",
+                  default: false,
+                  label: "description-fr",
+                },
+              ],
             },
           }}
         />
+        <a className={"fr-text--xs"} href={videoTranscription} target="_blank">
+          Lien vers la transcription textuelle
+        </a>
       </div>
     </div>
   </section>
