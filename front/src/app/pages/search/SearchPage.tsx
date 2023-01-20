@@ -78,7 +78,10 @@ export const SearchPage = ({
   return (
     <HeaderFooterLayout>
       <MainWrapper vSpacing={0} layout="fullscreen">
-        <PageHeader title="Je trouve une entreprise pour réaliser mon immersion professionnelle">
+        <PageHeader
+          title="Je trouve une entreprise pour réaliser mon immersion professionnelle"
+          theme="candidate"
+        >
           <Formik<SearchPageParams>
             initialValues={formikValues}
             onSubmit={searchUseCase}

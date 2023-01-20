@@ -8,7 +8,7 @@ import { conventionSelectors } from "src/core-logic/domain/convention/convention
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { useTutorIsEstablishmentRepresentative } from "src/app/hooks/convention.hooks";
 import { useSiretFetcher } from "src/app/hooks/siret.hooks";
-import { FormSectionTitle } from "src/app/components/forms/commons/FormSectionTitle";
+import { SectionTitle } from "react-design-system";
 import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
 import { EstablishementTutorFields } from "./EstablishementTutorFields";
 import { EstablishmentBusinessFields } from "./EstablishmentBusinessFields";
@@ -45,13 +45,13 @@ export const EstablishmentFormSection = ({
 
   return (
     <>
-      <FormSectionTitle>
+      <SectionTitle>
         {t.establishmentSection.title}
         <ShareActions
           isFrozen={isFrozen || isFetchingSiret}
           federatedIdentity={federatedIdentity}
         />
-      </FormSectionTitle>
+      </SectionTitle>
       <Notification type="info" title="" className="fr-my-2w">
         {t.establishmentSection.subtitle}
       </Notification>

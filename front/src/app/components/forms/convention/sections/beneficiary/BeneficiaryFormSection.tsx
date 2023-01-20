@@ -8,7 +8,7 @@ import { conventionSelectors } from "src/core-logic/domain/convention/convention
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { DateInput } from "src/app/components/forms/commons/DateInput";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
-import { FormSectionTitle } from "src/app/components/forms/commons/FormSectionTitle";
+import { SectionTitle } from "react-design-system";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
 import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
 import { BeneficiaryCurrentEmployerFields } from "./BeneficiaryCurrentEmployerFields";
@@ -41,7 +41,7 @@ export const BeneficiaryFormSection = ({
   const isPEConnected = federatedIdentity?.includes("peConnect:");
   return (
     <>
-      <FormSectionTitle>{t.beneficiarySection.title}</FormSectionTitle>
+      <SectionTitle>{t.beneficiarySection.title}</SectionTitle>
       <TextInput
         {...formContents["signatories.beneficiary.firstName"]}
         type="text"

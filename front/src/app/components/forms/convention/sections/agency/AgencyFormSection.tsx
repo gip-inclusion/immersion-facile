@@ -1,6 +1,6 @@
 import React from "react";
 import { InternshipKind } from "shared";
-import { FormSectionTitle } from "src/app/components/forms/commons/FormSectionTitle";
+import { SectionTitle } from "react-design-system";
 import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
 import { AgencyDisplayReadOnly } from "./AgencyDisplayReadOnly";
 import { AgencySelector } from "./AgencySelector";
@@ -21,7 +21,7 @@ export const AgencyFormSection = ({
   const t = useConventionTextsFromFormikContext();
   return (
     <>
-      <FormSectionTitle>{t.agencySection.title}</FormSectionTitle>
+      <SectionTitle>{t.agencySection.title}</SectionTitle>
       {isFrozen ? (
         <AgencyDisplayReadOnly agencyId={agencyId} />
       ) : (

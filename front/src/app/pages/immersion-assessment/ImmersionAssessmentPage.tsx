@@ -1,6 +1,6 @@
-import { CircularProgress } from "@mui/material";
 import React from "react";
 import {
+  Loader,
   MainWrapper,
   Notification,
   Title,
@@ -77,7 +77,7 @@ export const ImmersionAssessmentPage = ({
             )}
           </>
         )}
-        {isLoading && <CircularProgress />}
+        {isLoading && <Loader />}
       </MainWrapper>
     </HeaderFooterLayout>
   );

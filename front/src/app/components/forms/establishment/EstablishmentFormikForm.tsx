@@ -1,6 +1,6 @@
 import { Form, Formik } from "formik";
 import React, { useState } from "react";
-import { ErrorNotifications, Notification, Title } from "react-design-system";
+import { ErrorNotifications, Notification } from "react-design-system";
 import {
   FormEstablishmentDto,
   formEstablishmentSchema,
@@ -73,7 +73,6 @@ export const EstablishmentFormikForm = ({
     >
       {({ isSubmitting, submitCount, errors, values }) => (
         <>
-          <Title heading={1}>Référencer mon entreprise</Title>
           <p>
             Bienvenue sur l'espace de référencement des entreprises volontaires
             pour l'accueil des immersions professionnelles.

@@ -8,6 +8,7 @@ type MainWrapperProps = {
   className?: string;
   layout: "default" | "boxed" | "fullscreen";
   useBackground?: boolean;
+  pageHeader?: React.ReactNode;
 };
 
 export const MainWrapper = ({
@@ -17,6 +18,7 @@ export const MainWrapper = ({
   children,
   layout,
   useBackground,
+  pageHeader,
 }: MainWrapperProps) => {
   const spacing = `${vSpacing ? `fr-py-${vSpacing}w` : ""} ${
     hSpacing ? `fr-px-${hSpacing}w` : ""
@@ -26,16 +28,19 @@ export const MainWrapper = ({
     classNameValue += "fr-container fr-grid--center";
   }
   return (
-    <main className={classNameValue} id="main-content">
-      {layout === "boxed" && (
-        <div className="fr-grid-row fr-grid-row--center">
-          <div className="fr-col-lg-7 fr-px-2w">{children}</div>
-        </div>
-      )}
-      {layout !== "boxed" && children}
-      {useBackground && (
-        <div className={"im-main-wrapper__custom-background"}></div>
-      )}
-    </main>
+    <>
+      {pageHeader}
+      <main className={classNameValue} id="main-content">
+        {layout === "boxed" && (
+          <div className="fr-grid-row fr-grid-row--center">
+            <div className="fr-col-lg-7 fr-px-2w">{children}</div>
+          </div>
+        )}
+        {layout !== "boxed" && children}
+        {useBackground && (
+          <div className={"im-main-wrapper__custom-background"}></div>
+        )}
+      </main>
+    </>
   );
 };

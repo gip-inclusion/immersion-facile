@@ -32,3 +32,4 @@ export * from "./skip-links";
 export * from "./error-notifications";
 export * from "./select";
 export * from "./loader";
+export * from "./section-title";

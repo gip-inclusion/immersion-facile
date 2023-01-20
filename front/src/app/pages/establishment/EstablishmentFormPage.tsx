@@ -1,5 +1,5 @@
 import React from "react";
-import { MainWrapper } from "react-design-system/immersionFacile";
+import { MainWrapper, PageHeader } from "react-design-system/immersionFacile";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { routes } from "src/app/routes/routes";
 import { Route } from "type-route";
@@ -11,7 +11,16 @@ export const EstablishmentFormPage = ({
   route: Route<typeof routes.formEstablishment>;
 }) => (
   <HeaderFooterLayout>
-    <MainWrapper layout="boxed">
+    <MainWrapper
+      layout="boxed"
+      pageHeader={
+        <PageHeader
+          title="Éditer une entreprise référencée"
+          centered
+          theme="establishment"
+        />
+      }
+    >
       <EstablishmentCreationForm
         source="immersion-facile"
         siret={route.params.siret}

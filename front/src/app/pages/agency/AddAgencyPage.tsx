@@ -5,7 +5,7 @@ import {
   Button,
   ErrorNotifications,
   MainWrapper,
-  Title,
+  PageHeader,
 } from "react-design-system/immersionFacile";
 import {
   AgencyDto,
@@ -62,8 +62,16 @@ export const AddAgencyPage = () => {
   const { getFormErrors } = useFormContents(formAgencyFieldsLabels);
   return (
     <HeaderFooterLayout>
-      <MainWrapper layout="boxed">
-        <Title heading={1}>Ajout d'organisme encadrant les PMSMP</Title>
+      <MainWrapper
+        layout="boxed"
+        pageHeader={
+          <PageHeader
+            title="Ajout d'organisme encadrant les PMSMP"
+            centered
+            theme="agency"
+          />
+        }
+      >
         <Formik
           initialValues={initialValues(uuidV4())}
           validationSchema={toFormikValidationSchema(createAgencySchema)}

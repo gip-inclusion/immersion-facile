@@ -5,7 +5,7 @@ import {
   EstablishmentJwtPayload,
   FormEstablishmentDto,
 } from "shared";
-import { MainWrapper } from "react-design-system";
+import { MainWrapper, PageHeader } from "react-design-system";
 import { decodeMagicLinkJwtWithoutSignatureCheck } from "shared";
 import { establishmentGateway } from "src/config/dependencies";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
@@ -35,7 +35,16 @@ export const EstablishmentEditionFormPage = ({
       );
   return (
     <HeaderFooterLayout>
-      <MainWrapper layout="boxed">
+      <MainWrapper
+        layout="boxed"
+        pageHeader={
+          <PageHeader
+            title="Éditer une entreprise référencée"
+            centered
+            theme="establishment"
+          />
+        }
+      >
         <ApiDataContainer
           callApi={() =>
             establishmentGateway.getFormEstablishmentFromJwt(

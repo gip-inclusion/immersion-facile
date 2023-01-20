@@ -1,7 +1,12 @@
 import { Formik } from "formik";
 import { mergeDeepRight } from "ramda";
 import React, { useEffect } from "react";
-import { Notification } from "react-design-system/immersionFacile";
+import {
+  Loader,
+  MainWrapper,
+  Notification,
+  PageHeader,
+} from "react-design-system/immersionFacile";
 import { useDispatch } from "react-redux";
 import {
   ConventionDto,
@@ -108,7 +113,7 @@ const SignFormSpecific = ({ jwt }: SignFormSpecificProps) => {
 
   useExistingSiret(convention?.siret);
 
-  if (isLoading) return <p>Chargement en cours...</p>;
+  if (isLoading) return <Loader />;
   if (fetchConventionError)
     return (
       <ShowErrorOrRedirectToRenewMagicLink
@@ -139,13 +144,18 @@ const SignFormSpecific = ({ jwt }: SignFormSpecificProps) => {
   };
 
   return (
-    <SignPageLayout>
+    <MainWrapper
+      layout="boxed"
+      pageHeader={
+        <PageHeader
+          title="Formulaire pour conventionner une période de mise en situation
+    professionnelle (PMSMP)"
+          centered
+          theme="candidate"
+        />
+      }
+    >
       <>
-        <h2>
-          Formulaire pour conventionner une période de mise en situation
-          professionnelle (PMSMP)
-        </h2>
-
         <div className="fr-text">
           Voici la demande de convention qui vient d'être complétée. <br />
           Relisez la bien et si cela vous convient, signez la avec le bouton "je
@@ -199,40 +209,36 @@ const SignFormSpecific = ({ jwt }: SignFormSpecificProps) => {
             }
 
             return (
-              <div>
-                <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
-                  {currentSignatory && (
-                    <ConventionFormFields
-                      isFrozen={true}
-                      isSignOnly={true}
-                      signatory={currentSignatory}
-                      onModificationsRequired={
-                        askFormModificationWithMessageForm
-                      }
-                    />
-                  )}
-                  {Object.values(props.errors).length > 0 && (
-                    <div style={{ color: "red" }}>
-                      Veuillez corriger les champs erronés
-                    </div>
-                  )}
-
-                  <ConventionFeedbackNotification
-                    submitFeedback={submitFeedback}
-                    signatories={props.values.signatories}
+              <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
+                {currentSignatory && (
+                  <ConventionFormFields
+                    isFrozen={true}
+                    isSignOnly={true}
+                    signatory={currentSignatory}
+                    onModificationsRequired={askFormModificationWithMessageForm}
                   />
-                </form>
-              </div>
+                )}
+                {Object.values(props.errors).length > 0 && (
+                  <div style={{ color: "red" }}>
+                    Veuillez corriger les champs erronés
+                  </div>
+                )}
+
+                <ConventionFeedbackNotification
+                  submitFeedback={submitFeedback}
+                  signatories={props.values.signatories}
+                />
+              </form>
             );
           }}
         </Formik>
       </>
-    </SignPageLayout>
+    </MainWrapper>
   );
 };
 
 const ConventionRejectedMessage = () => (
-  <SignPageLayout>
+  <MainWrapper layout="boxed">
     <Notification
       type="error"
       title="Désolé : votre demande d'immersion a été refusée"
@@ -243,7 +249,7 @@ const ConventionRejectedMessage = () => (
       </p>
       <p>Veuillez contacter votre conseiller pour plus d'informations.</p>
     </Notification>
-  </SignPageLayout>
+  </MainWrapper>
 );
 
 const ConventionNeedsModificationMessage = (props: { jwt: string }) => (

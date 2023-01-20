@@ -27,7 +27,10 @@ export const ConventionPageForUkraine = ({
   );
 
   return (
-    <ConventionFormContainerLayout>
+    <ConventionFormContainerLayout
+      title="Formulaire pour conventionner une période de mise en situation
+    professionnelle (PMSMP) à destination des réfugiés ukrainiens"
+    >
       {agencyId ? (
         <ConventionFormUkraine
           properties={{

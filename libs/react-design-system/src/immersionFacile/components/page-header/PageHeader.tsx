@@ -6,6 +6,8 @@ type PageHeaderProps = {
   className?: string;
   children?: React.ReactNode;
   usePatterns?: boolean;
+  centered?: boolean;
+  theme?: "default" | "candidate" | "establishment" | "agency";
 };
 
 const componentName = "im-page-header";
@@ -15,10 +17,22 @@ export const PageHeader = ({
   className,
   children,
   usePatterns,
+  centered,
+  theme = "default",
 }: PageHeaderProps) => (
-  <section className={`${componentName} ${className ?? ""} fr-py-6w`}>
+  <section
+    className={`${componentName} ${componentName}--${theme} ${
+      className ?? ""
+    } fr-pb-5w fr-pt-6w`}
+  >
     <div className={`${componentName}__inner fr-container`}>
-      <h1 className={`${componentName}__title`}>{title}</h1>
+      <h1
+        className={`${componentName}__title ${
+          centered ? `${componentName}__title--centered` : ""
+        }`}
+      >
+        {title}
+      </h1>
       {children}
       {usePatterns && (
         <div className="im-page-header__patterns">

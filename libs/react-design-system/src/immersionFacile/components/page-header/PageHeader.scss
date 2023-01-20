@@ -1,12 +1,26 @@
 $patternSizes: 80px, 160px, 130px;
 .im-page-header {
   position: relative;
-  background-color: var(--green-archipel-sun-391-moon-716);
+  &--default {
+    background-color: var(--blue-france-sun-113-625);
+  }
+  &--candidate {
+    background-color: var(--green-archipel-sun-391-moon-716);
+  }
+  &--establishment {
+    background-color: var(--blue-cumulus-sun-368-moon-732);
+  }
+  &--agency {
+    background-color: var(--purple-glycine-sun-319-moon-630);
+  }
   &__title {
-    color: #fff;
+    color: var(--grey-1000-100);
+    &--centered {
+      text-align: center;
+    }
   }
   &__pattern {
-    background: #fff;
+    background: var(--grey-1000-100);
     border-radius: 50%;
     opacity: 0.2;
     filter: blur(20px);

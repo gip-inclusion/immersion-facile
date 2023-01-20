@@ -1,6 +1,5 @@
 import { Formik, FormikProps } from "formik";
 import React from "react";
-import { Title } from "react-design-system/immersionFacile";
 import { useDispatch } from "react-redux";
 import { conventionUkraineSchema } from "shared";
 import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
@@ -49,13 +48,6 @@ export const ConventionFormUkraine = ({ properties }: ConventionFormProps) => {
 
 const StaticText = () => (
   <>
-    <div className="flex justify-center">
-      <Title red>
-        Formulaire pour conventionner une période de mise en situation
-        professionnelle (PMSMP) à destination des réfugiés ukrainiens
-      </Title>
-    </div>
-
     <div className="fr-text">
       <p className="fr-text--xs">
         Ce formulaire vaut équivalence du CERFA 13912 * 04
