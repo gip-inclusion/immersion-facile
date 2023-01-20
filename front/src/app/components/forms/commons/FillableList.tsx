@@ -1,8 +1,7 @@
 import MuiChip from "@mui/material/Chip";
 import { styled } from "@mui/material/styles";
-import * as React from "react";
-import { useEffect, useState } from "react";
-import { Button } from "react-design-system";
+import React, { useEffect, useState } from "react";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 import {
   cleanStringToHTMLAttribute,
   notEqual,
@@ -107,13 +106,13 @@ const AddToList = ({
         {label}
       </label>
       {description && <span className="fr-hint-text">{description}</span>}
-      <div className="flex items-center justify-center w-full">
+      <div className="fr-grid-row">
         <input
           id={cleanStringToHTMLAttribute(name)}
           value={inputValue}
           type="text"
           name={name}
-          onKeyPress={(e) => {
+          onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault();
               onAddClick();
@@ -124,7 +123,7 @@ const AddToList = ({
           placeholder={placeholder || ""}
           aria-describedby="text-input-error-desc-error"
         />
-        <Button type="button" className="h-10" onSubmit={onAddClick}>
+        <Button type="button" onClick={onAddClick}>
           Ajouter
         </Button>
       </div>

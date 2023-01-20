@@ -41,7 +41,7 @@ export const InitiateConventionCard = ({
     <div>
       {enablePeConnectApi ? (
         <>
-          <div>
+          <div className={fr.cx("fr-btns-group--center")}>
             <p dangerouslySetInnerHTML={{ __html: peConnectNotice }}></p>
             <div className={fr.cx("fr-btns-group--center", "fr-mb-4w")}>
               <PeConnectButton
@@ -62,7 +62,7 @@ export const InitiateConventionCard = ({
           </div>
 
           <strong className={fr.cx("fr-text--lead", "fr-hr-or")}>ou</strong>
-          <div>
+          <div className={fr.cx("fr-btns-group--center")}>
             <p dangerouslySetInnerHTML={{ __html: otherCaseNotice }}></p>
             <OtherChoiceButton
               label={showFormButtonLabel}

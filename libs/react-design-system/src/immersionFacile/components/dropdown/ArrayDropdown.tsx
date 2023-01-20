@@ -27,7 +27,7 @@ export const ArrayDropdown = <T extends string>({
     return onSelect(option ? option : undefined);
   };
   return (
-    <div className="flex gap-4 items-center font-medium justify-between">
+    <div>
       {label && <label className="fr-label">{label}</label>}
       <select
         className="fr-select"

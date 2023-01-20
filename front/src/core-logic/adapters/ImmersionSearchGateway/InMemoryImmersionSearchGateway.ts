@@ -99,7 +99,6 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     voluntaryToImmersion: false,
     position: { lat: 48.8666, lon: 2.3333 },
     address: defaultAddress,
-    contactMode: "PHONE",
     romeLabel:
       "Méga métier, avec un texte très long pour le décrire, et qui va peut-être aller à la ligne",
     appellationLabels: [],
@@ -182,7 +181,6 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     position: { lat: 48.882481, lon: 2.409773 },
     romeLabel: "Boulangerie - viennoiserie",
     distance_m: 7086.36203317,
-    contactMode: "EMAIL",
     customizedName: "SASU",
     appellationLabels: ["Boulanger / Boulangère"],
     voluntaryToImmersion: true,

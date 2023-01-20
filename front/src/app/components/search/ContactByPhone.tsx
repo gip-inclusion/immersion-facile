@@ -1,6 +1,6 @@
 import { Form, Formik } from "formik";
 import React, { useState } from "react";
-import { Button } from "react-design-system";
+import { Button, ModalTitle } from "react-design-system";
 import {
   ContactEstablishmentByPhoneDto,
   contactEstablishmentByPhoneSchema,
@@ -51,6 +51,7 @@ export const ContactByPhone = ({
       {({ errors, submitCount }) => (
         <Form>
           <>
+            <ModalTitle>Contacter l'entreprise</ModalTitle>
             <p className={"fr-my-2w"}>
               Cette entreprise souhaite être contactée par téléphone. Merci de
               nous indiquer vos coordonnées.

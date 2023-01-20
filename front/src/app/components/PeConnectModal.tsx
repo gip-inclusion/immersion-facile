@@ -3,8 +3,8 @@ import {
   ModalClose,
   ModalContent,
   ModalDialog,
-  Title,
-} from "react-design-system";
+  ModalTitle,
+} from "react-design-system/immersionFacile";
 import { InitiateConventionCard } from "./InitiateConventionCard";
 
 type ModalState = {
@@ -57,10 +57,10 @@ export const PeConnectModal = ({
   };
 
   return (
-    <ModalDialog isOpen={modalState.isOpen} hide={hide}>
+    <ModalDialog isOpen={modalState.isOpen} hide={hide} size="sm">
       <ModalClose hide={hide} title="Fermer la fenêtre" />
       <ModalContent className={["fr-modal__content-inner"]}>
-        <Title>Activer une demande de convention</Title>
+        <ModalTitle>Activer une demande de convention</ModalTitle>
         <InitiateConventionCard
           title="Activer une demande de convention"
           peConnectNotice="Je suis accompagné(e) par<br/>

@@ -1,11 +1,6 @@
 import { Form, Formik } from "formik";
 import React from "react";
-import {
-  Button,
-  MainWrapper,
-  Notification,
-  SubTitle,
-} from "react-design-system";
+import { Button, MainWrapper, Notification } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { UserAndPassword, userAndPasswordSchema } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
@@ -14,6 +9,7 @@ import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { adminAuthSlice } from "src/core-logic/domain/admin/adminAuth/adminAuth.slice";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
+import { fr } from "@codegouvfr/react-dsfr";
 
 export const AdminPrivateRoute = ({
   children,
@@ -36,7 +32,7 @@ const LoginForm = () => {
 
   return (
     <HeaderFooterLayout>
-      <MainWrapper layout="default">
+      <MainWrapper layout="boxed">
         <Formik
           initialValues={initialValues}
           validationSchema={toFormikValidationSchema(userAndPasswordSchema)}
@@ -46,21 +42,33 @@ const LoginForm = () => {
         >
           {() => (
             <Form>
-              <SubTitle>Veuillez vous connectez</SubTitle>
-              <TextInput label="Utilisateur" name="user" />
-              <TextInput label="Mot de passe" name="password" type="password" />
-              <Button
-                disable={isLoading}
-                type="submit"
-                id="im-login__submit-button"
+              <span className={fr.cx("fr-h5")}>Veuillez vous connecter</span>
+              <div
+                className={fr.cx("fr-card", "fr-py-4w", "fr-px-8w", "fr-mt-2w")}
               >
-                Se connecter
-              </Button>
-              {error && (
-                <Notification title="Une erreur est survenue" type="error">
-                  {error}
-                </Notification>
-              )}
+                <TextInput label="Utilisateur" name="user" />
+                <TextInput
+                  label="Mot de passe"
+                  name="password"
+                  type="password"
+                />
+                <Button
+                  disable={isLoading}
+                  type="submit"
+                  id="im-login__submit-button"
+                >
+                  Se connecter
+                </Button>
+                {error && (
+                  <Notification
+                    className={fr.cx("fr-mt-2w")}
+                    title="Une erreur est survenue"
+                    type="error"
+                  >
+                    {error}
+                  </Notification>
+                )}
+              </div>
             </Form>
           )}
         </Formik>

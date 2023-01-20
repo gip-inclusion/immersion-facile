@@ -3,8 +3,8 @@ import {
   ModalClose,
   ModalContent,
   ModalDialog,
+  ModalTitle,
   SubTitle,
-  Title,
 } from "react-design-system";
 import {
   ContactMethod,
@@ -13,6 +13,8 @@ import {
   SearchImmersionResultDto,
   SiretDto,
 } from "shared";
+import { fr } from "@codegouvfr/react-dsfr";
+
 import { ContactByEmail } from "./ContactByEmail";
 import { ContactByPhone } from "./ContactByPhone";
 import { ContactInPerson } from "./ContactInPerson";
@@ -101,7 +103,7 @@ export const ContactEstablishmentModal = ({
   };
   return (
     <ModalDialog isOpen={modalState.isOpen} hide={hide}>
-      <ModalClose hide={hide} title="Close the modal window" />
+      <ModalClose hide={hide} title="Fermer la fenêtre" />
       <ModalContent>
         <ModalContactContent
           modalState={modalState}
@@ -176,7 +178,7 @@ const AdvisesForContact = ({
   data: SearchImmersionResultDto | undefined;
 }) => (
   <div>
-    <Title red>Tentez votre chance</Title>
+    <ModalTitle>Tentez votre chance</ModalTitle>
     <Paragraph>
       Cette entreprise peut recruter sur ce métier et être intéressée pour vous
       recevoir en immersion. Tentez votre chance en la contactant !
@@ -203,7 +205,10 @@ const AdvisesForContact = ({
         </a>
       </li>
     </ul>
-    <Title>Nos conseils pour cette première prise de contact ! </Title>
+    <hr className={fr.cx("fr-hr", "fr-mt-2w")} />
+    <ModalTitle>
+      Nos conseils pour cette première prise de contact !{" "}
+    </ModalTitle>
 
     <SubTitle>Comment présenter votre demande ? </SubTitle>
     <Paragraph>

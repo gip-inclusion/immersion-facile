@@ -1,6 +1,6 @@
 import { Form, Formik } from "formik";
 import React, { useState } from "react";
-import { Button } from "react-design-system";
+import { Button, ModalTitle } from "react-design-system/immersionFacile";
 import {
   ContactEstablishmentByMailDto,
   contactEstablishmentByMailSchema,
@@ -62,7 +62,9 @@ export const ContactByEmail = ({
       {({ errors, submitCount }) => (
         <Form>
           <>
-            <p className="pb-6">
+            <ModalTitle>Contacter l'entreprise</ModalTitle>
+
+            <p className="fr-pb-3w">
               Cette entreprise a choisi d'être contactée par mail. Veuillez
               compléter ce formulaire qui sera transmis à l'entreprise.
             </p>
