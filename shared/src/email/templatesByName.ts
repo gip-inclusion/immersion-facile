@@ -188,7 +188,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       
       Cette immersion se déroulera au sein de ${businessName}, à l'adresse suivante ${immersionAddress}.
       
-      L'immersion se déroulera du du ${dateStart} au ${dateEnd}. 
+      L'immersion se déroulera du ${dateStart} au ${dateEnd}. 
       
       Les horaires de l'immersion seront :
       ${scheduleText}       
