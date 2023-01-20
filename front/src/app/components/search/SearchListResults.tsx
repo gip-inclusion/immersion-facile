@@ -99,7 +99,7 @@ export const SearchListResults = () => {
           <div className={fr.cx("fr-col-3")}>
             <Select
               label="Nombres de resultats par page"
-              className={fr.cx("")}
+              className={fr.cx()}
               onChange={(event) => {
                 setResultsPerPage(parseInt(event.currentTarget.value));
               }}
