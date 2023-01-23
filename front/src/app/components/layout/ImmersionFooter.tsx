@@ -73,15 +73,15 @@ const PartnersLogos = () => {
 
 const overFooterCols: OverFooterCols = [
   {
-    title: "Contactez-nous",
+    title: "Le centre d'aide",
     subtitle:
-      "L'équipe Immersion Facilitée vous accompagne pour toute demande spécifique.",
-    iconTitle: "fr-icon-account-fill",
+      "Consultez notre FAQ, trouvez les réponses aux questions les plus fréquentes et contactez-nous si vous n'avez pas trouvé de réponse",
+    iconTitle: "fr-icon-questionnaire-fill",
     link: {
-      label: "Contactez l'équipe",
-      url: `mailto:${immersionFacileContactEmail}`,
+      label: "Accédez à notre FAQ",
+      url: "https://aide.immersion-facile.beta.gouv.fr/fr/",
     },
-    id: getFooterNavLinkId("over-contact"),
+    id: getFooterNavLinkId("over-faq"),
   },
   {
     title: "Rejoignez la communauté",
@@ -95,15 +95,15 @@ const overFooterCols: OverFooterCols = [
     id: getFooterNavLinkId("over-linkedin"),
   },
   {
-    title: "Le centre d'aide",
+    title: "Les chiffres-clé de notre impact",
     subtitle:
-      "Consultez notre FAQ et trouver les réponses aux questions les plus fréquentes.",
-    iconTitle: "fr-icon-questionnaire-fill",
+      "Vous souhaitez en savoir plus sur les résultats atteints par Immersion Facilitée ?",
+    iconTitle: "fr-icon-line-chart-line",
     link: {
-      label: "Accédez à notre FAQ",
-      url: "https://aide.immersion-facile.beta.gouv.fr/fr/",
+      label: "Nos statistiques",
+      url: routes.stats().link.href,
     },
-    id: getFooterNavLinkId("over-faq"),
+    id: getFooterNavLinkId("over-contact"),
   },
 ];
 const links: NavLink[] = [
