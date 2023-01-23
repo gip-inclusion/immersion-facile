@@ -9,7 +9,7 @@ import {
 } from "./ContactEstablishmentModal";
 import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 import { SearchResult } from "./SearchResult";
-import { Select } from "src/../../libs/react-design-system";
+import { Select } from "react-design-system";
 import { fr } from "@codegouvfr/react-dsfr";
 
 const getFeedBackMessage = (contactMethod?: ContactMethod) => {
