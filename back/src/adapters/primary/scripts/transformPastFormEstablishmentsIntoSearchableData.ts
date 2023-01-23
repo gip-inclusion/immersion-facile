@@ -6,10 +6,6 @@ import { InsertEstablishmentAggregateFromForm } from "../../../domain/immersionO
 import { createLogger } from "../../../utils/logger";
 import { notifyDiscord } from "../../../utils/notifyDiscord";
 import {
-  httpAdresseApiClient,
-  HttpApiAdresseAddressGateway,
-} from "../../secondary/addressGateway/HttpApiAdresseAddressGateway";
-import {
   defaultMaxBackoffPeriodMs,
   defaultRetryDeadlineMs,
   ExponentialBackoffRetryStrategy,
@@ -21,6 +17,13 @@ import { AppConfig } from "../config/appConfig";
 import { createPgUow } from "../config/uowConfig";
 import { HttpsSireneGateway } from "../../secondary/sirene/HttpsSireneGateway";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
+import {
+  createHttpOpenCageDataClient,
+  httpAdresseApiClient,
+  HttpOpenCageDataAddressGateway,
+  openCageDataTargets,
+  OpenCageDataTargets,
+} from "../../secondary/addressGateway/HttpOpenCageDataAddressGateway";
 
 const maxQpsSireneApi = 0.25;
 
@@ -47,7 +50,12 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
     connectionString: destinationPgConnectionString,
   });
   const clientDestination = await poolDestination.connect();
-  const addressAPI = new HttpApiAdresseAddressGateway(httpAdresseApiClient);
+  const addressAPI = new HttpOpenCageDataAddressGateway(
+    createHttpOpenCageDataClient<OpenCageDataTargets>(openCageDataTargets),
+    httpAdresseApiClient,
+    config.apiKeyOpenCageDataGeocoding,
+    config.apiKeyOpenCageDataGeosearch,
+  );
   const sireneGateway = new HttpsSireneGateway(
     config.sireneHttpsConfig,
     timeGateway,

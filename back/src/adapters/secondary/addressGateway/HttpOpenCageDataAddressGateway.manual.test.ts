@@ -10,10 +10,10 @@ import {
 
 import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
 import { AppConfig } from "../../primary/config/appConfig";
-import { httpAdresseApiClient } from "./HttpApiAdresseAddressGateway";
 
 import {
   createHttpOpenCageDataClient,
+  httpAdresseApiClient,
   HttpOpenCageDataAddressGateway,
   minimumCharErrorMessage,
   OpenCageDataTargets,

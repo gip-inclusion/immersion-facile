@@ -19,6 +19,7 @@ import {
   lookupSearchResultsSchema,
   ManagedAxios,
   OpenCageGeoSearchKey,
+  TargetUrlsMapper,
   toFeatureCollection,
 } from "shared";
 import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
@@ -89,6 +90,29 @@ export const openCageDataTargets = createTargets<OpenCageDataTargets>({
     url: geoSearchUrl as BaseUrl,
   },
 });
+
+// https://api.gouv.fr/les-api/base-adresse-nationale
+const apiAddressBaseUrl = `https://api-adresse.data.gouv.fr`;
+const apiRoutes = {
+  search: `/search`,
+  reverse: `/reverse`,
+};
+type TargetUrls = "apiAddressReverse" | "apiAddressSearchPlainText";
+
+const adresseApiTargetUrlsMapper: TargetUrlsMapper<TargetUrls> = {
+  apiAddressReverse: (param: { lat: string; lon: string }) =>
+    `${apiAddressBaseUrl}${apiRoutes.reverse}?lon=${param.lon}&lat=${param.lat}`,
+  apiAddressSearchPlainText: (param: { text: string }) =>
+    `${apiAddressBaseUrl}${apiRoutes.search}?q=${encodeURI(param.text)}`,
+};
+
+export const httpAdresseApiClient = new ManagedAxios(
+  adresseApiTargetUrlsMapper,
+  undefined,
+  {
+    timeout: 20000,
+  },
+);
 
 const AXIOS_TIMEOUT_MS = 10_000;
 export const createHttpOpenCageDataClient = configureHttpClient(

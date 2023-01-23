@@ -4,9 +4,12 @@ import { UpdateEstablishmentsFromSireneApiScript } from "../../../domain/immersi
 import { createLogger } from "../../../utils/logger";
 import { PipelineStats } from "../../../utils/pipelineStats";
 import {
+  createHttpOpenCageDataClient,
   httpAdresseApiClient,
-  HttpApiAdresseAddressGateway,
-} from "../../secondary/addressGateway/HttpApiAdresseAddressGateway";
+  HttpOpenCageDataAddressGateway,
+  openCageDataTargets,
+  OpenCageDataTargets,
+} from "../../secondary/addressGateway/HttpOpenCageDataAddressGateway";
 import {
   defaultMaxBackoffPeriodMs,
   defaultRetryDeadlineMs,
@@ -52,7 +55,12 @@ const main = async () => {
     retryStrategy,
   );
 
-  const addressAPI = new HttpApiAdresseAddressGateway(httpAdresseApiClient);
+  const addressAPI = new HttpOpenCageDataAddressGateway(
+    createHttpOpenCageDataClient<OpenCageDataTargets>(openCageDataTargets),
+    httpAdresseApiClient,
+    config.apiKeyOpenCageDataGeocoding,
+    config.apiKeyOpenCageDataGeosearch,
+  );
 
   const pool = new Pool({
     connectionString: config.pgImmersionDbUrl,

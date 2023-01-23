@@ -200,7 +200,7 @@ export class AppConfig {
   public get apiAddress() {
     return this.throwIfNotInArray({
       variableName: "ADDRESS_API_GATEWAY",
-      authorizedValues: ["IN_MEMORY", "ADRESSE_API", "OPEN_CAGE_DATA"],
+      authorizedValues: ["IN_MEMORY", "OPEN_CAGE_DATA"],
     });
   }
 

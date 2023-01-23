@@ -11,11 +11,8 @@ import { DocumentGateway } from "../../../domain/generic/fileManagement/port/Doc
 import { InclusionConnectGateway } from "../../../domain/inclusionConnect/port/InclusionConnectGateway";
 import { createLogger } from "../../../utils/logger";
 import {
-  httpAdresseApiClient,
-  HttpApiAdresseAddressGateway,
-} from "../../secondary/addressGateway/HttpApiAdresseAddressGateway";
-import {
   createHttpOpenCageDataClient,
+  httpAdresseApiClient,
   HttpOpenCageDataAddressGateway,
   OpenCageDataTargets,
   openCageDataTargets,
@@ -246,7 +243,6 @@ const createAddressGateway = (config: AppConfig) =>
         config.apiKeyOpenCageDataGeocoding,
         config.apiKeyOpenCageDataGeosearch,
       ),
-    ADRESSE_API: () => new HttpApiAdresseAddressGateway(httpAdresseApiClient),
   }[config.apiAddress]());
 
 const createDocumentGateway = (config: AppConfig): DocumentGateway => {
