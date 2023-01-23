@@ -38,7 +38,8 @@ export const SearchResult = ({
     additionalInformation,
   } = searchResult;
   const distanceKm = ((distance_m ?? 0) / 1000).toFixed(1);
-  const establishmentRawName = customizedName ?? name;
+  const establishmentRawName =
+    customizedName && customizedName.length > 0 ? customizedName : name;
   const [establismentNameFirstLetter, ...establismentNameOtherLetters] =
     establishmentRawName;
   const [additionalInformationClamped, setAdditionalInformationClamped] =

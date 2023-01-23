@@ -194,6 +194,7 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     name: "TRANCHE DE CAKE",
     rome: "D1102",
     siret: "49049275800027",
+    customizedName: "Boulangerie avec Custom name",
     address: {
       city: "PARIS 15",
       postcode: "75015",
@@ -213,7 +214,7 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
   },
   {
     naf: "1071C",
-    name: "SAS LORETTE VOUILLE",
+    name: "SAS LORETTE VOUILLE (avec custom name vide)",
     rome: "D1102",
     siret: "87804354600018",
     address: {
@@ -222,6 +223,7 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
       departmentCode: "75",
       streetNumberAndAddress: "1 RUE DE VOUILLE",
     },
+    customizedName: "",
     website: "",
     nafLabel: "Fabrication de pain et de pâtisserie fraîche",
     position: { lat: 48.835483, lon: 2.302884 },
