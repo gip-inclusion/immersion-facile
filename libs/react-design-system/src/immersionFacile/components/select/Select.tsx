@@ -36,11 +36,12 @@ export const Select = ({
 
   return (
     <div className={cx(fr.cx("fr-select-group"), className)}>
-      {!hideLabel && (
-        <label className={fr.cx("fr-label")} htmlFor={id}>
-          {label}
-        </label>
-      )}
+      <label
+        className={fr.cx("fr-label", hideLabel ? "fr-sr-only" : undefined)}
+        htmlFor={id}
+      >
+        {label}
+      </label>
 
       <select
         className={fr.cx("fr-select")}
