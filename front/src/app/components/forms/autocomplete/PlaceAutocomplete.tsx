@@ -1,6 +1,6 @@
 import Autocomplete from "@mui/material/Autocomplete";
 import React, { useState } from "react";
-import { AutocompleteInput } from "react-design-system/immersionFacile";
+import { AutocompleteInput } from "react-design-system";
 import { LookupSearchResult } from "shared";
 import { apiAddressGateway } from "src/config/dependencies";
 
