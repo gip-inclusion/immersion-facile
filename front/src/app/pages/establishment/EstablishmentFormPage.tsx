@@ -15,7 +15,7 @@ export const EstablishmentFormPage = ({
       layout="boxed"
       pageHeader={
         <PageHeader
-          title="Éditer une entreprise référencée"
+          title="Référencer mon entreprise"
           centered
           theme="establishment"
         />
