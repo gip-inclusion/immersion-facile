@@ -1,6 +1,6 @@
 import { Form, Formik } from "formik";
 import React, { useState } from "react";
-import { Button } from "react-design-system/immersionFacile";
+import { Button } from "react-design-system";
 import {
   ContactEstablishmentByMailDto,
   contactEstablishmentByMailSchema,

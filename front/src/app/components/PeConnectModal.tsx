@@ -4,7 +4,7 @@ import {
   ModalContent,
   ModalDialog,
   Title,
-} from "react-design-system/immersionFacile";
+} from "react-design-system";
 import { InitiateConventionCard } from "./InitiateConventionCard";
 
 type ModalState = {

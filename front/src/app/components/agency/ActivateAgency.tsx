@@ -1,11 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import React, { useEffect } from "react";
-import {
-  DsfrTitle,
-  Select,
-  SelectOption,
-} from "react-design-system/immersionFacile";
+import { DsfrTitle, Select, SelectOption } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { AgencyOption, AgencyStatus } from "shared";
 import "src/assets/admin.css";

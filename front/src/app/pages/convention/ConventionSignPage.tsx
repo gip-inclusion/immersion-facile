@@ -6,7 +6,7 @@ import {
   MainWrapper,
   Notification,
   PageHeader,
-} from "react-design-system/immersionFacile";
+} from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   ConventionDto,

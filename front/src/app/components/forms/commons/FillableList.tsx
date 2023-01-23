@@ -2,7 +2,7 @@ import MuiChip from "@mui/material/Chip";
 import { styled } from "@mui/material/styles";
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { Button } from "react-design-system/immersionFacile";
+import { Button } from "react-design-system";
 import {
   cleanStringToHTMLAttribute,
   notEqual,

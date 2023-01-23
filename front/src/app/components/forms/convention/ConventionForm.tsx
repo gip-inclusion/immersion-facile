@@ -1,6 +1,6 @@
 import { Formik } from "formik";
 import React, { useEffect, useState } from "react";
-import { Notification } from "react-design-system/immersionFacile";
+import { Notification } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   ConventionDto,

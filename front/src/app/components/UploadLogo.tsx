@@ -1,5 +1,5 @@
 import * as React from "react";
-import { File } from "react-design-system/immersionFacile";
+import { File } from "react-design-system";
 import { AbsoluteUrl } from "shared";
 import { technicalGateway } from "src/config/dependencies";
 

@@ -8,7 +8,7 @@ import {
   SectionAccordion,
   Select,
   Loader,
-} from "react-design-system/immersionFacile";
+} from "react-design-system";
 import { RomeAutocomplete } from "src/app/components/forms/autocomplete/RomeAutocomplete";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";

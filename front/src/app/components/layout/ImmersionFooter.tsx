@@ -5,10 +5,7 @@ import React from "react";
 import { makeStyles, useStyles } from "tss-react/dsfr";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Footer, NavLink } from "react-design-system";
-import {
-  OverFooter,
-  OverFooterCols,
-} from "react-design-system/immersionFacile";
+import { OverFooter, OverFooterCols } from "react-design-system";
 import { routes } from "src/app/routes/routes";
 import { immersionFacileContactEmail } from "shared";
 import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";

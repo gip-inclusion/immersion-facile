@@ -5,7 +5,7 @@ import {
   ModalDialog,
   SubTitle,
   Title,
-} from "react-design-system/immersionFacile";
+} from "react-design-system";
 import { useEstablishmentSiret } from "src/app/hooks/siret.hooks";
 import { SiretFetcherInput } from "./SiretFetcherInput";
 

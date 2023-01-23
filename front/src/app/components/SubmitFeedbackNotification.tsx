@@ -1,5 +1,5 @@
 import React from "react";
-import { Notification } from "react-design-system/immersionFacile";
+import { Notification } from "react-design-system";
 import {
   SubmitFeedBack,
   isFeedbackError,

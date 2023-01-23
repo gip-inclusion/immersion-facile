@@ -1,6 +1,6 @@
 import { useField } from "formik";
 import React, { useState, useEffect } from "react";
-import { Button, Notification } from "react-design-system/immersionFacile";
+import { Button, Notification } from "react-design-system";
 import {
   addressDtoToString,
   FormEstablishmentDto,

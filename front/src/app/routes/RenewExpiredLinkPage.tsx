@@ -5,7 +5,7 @@ import {
   LinkHome,
   MainWrapper,
   Notification,
-} from "react-design-system/immersionFacile";
+} from "react-design-system";
 import { ConventionMagicLinkPayload } from "shared";
 import { decodeMagicLinkJwtWithoutSignatureCheck } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";

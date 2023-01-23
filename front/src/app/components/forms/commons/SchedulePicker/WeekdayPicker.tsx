@@ -1,6 +1,6 @@
 import { FieldHookConfig } from "formik";
 import React from "react";
-import { ButtonAdd } from "react-design-system/immersionFacile";
+import { ButtonAdd } from "react-design-system";
 import {
   DateIntervalDto,
   DayPeriodsDto,

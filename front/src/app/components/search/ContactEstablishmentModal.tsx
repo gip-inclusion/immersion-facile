@@ -5,7 +5,7 @@ import {
   ModalDialog,
   SubTitle,
   Title,
-} from "react-design-system/immersionFacile";
+} from "react-design-system";
 import {
   ContactMethod,
   RomeCode,

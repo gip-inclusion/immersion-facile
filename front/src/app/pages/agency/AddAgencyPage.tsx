@@ -6,7 +6,7 @@ import {
   ErrorNotifications,
   MainWrapper,
   PageHeader,
-} from "react-design-system/immersionFacile";
+} from "react-design-system";
 import {
   AgencyDto,
   AgencyKind,

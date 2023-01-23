@@ -1,9 +1,5 @@
 import { Dispatch } from "@reduxjs/toolkit";
-import {
-  HeroHeaderNavCard,
-  Stat,
-  FaqCardProps,
-} from "react-design-system/immersionFacile";
+import { HeroHeaderNavCard, Stat, FaqCardProps } from "react-design-system";
 import { routes } from "src/app/routes/routes";
 import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
 import type { UserType } from "src/app/pages/home/HomePage";

@@ -1,6 +1,6 @@
 import Autocomplete from "@mui/material/Autocomplete";
 import React, { useEffect, useState } from "react";
-import { AutocompleteInput } from "react-design-system/immersionFacile";
+import { AutocompleteInput } from "react-design-system";
 import { AddressAndPosition, addressDtoToString } from "shared";
 import { useDebounce } from "src/app/hooks/useDebounce";
 import { getAddressesFromApi } from "./getAddressesFromApi";

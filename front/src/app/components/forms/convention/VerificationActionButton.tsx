@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button } from "react-design-system/immersionFacile";
+import { Button } from "react-design-system";
 import {
   ConventionStatus,
   doesStatusNeedsJustification,

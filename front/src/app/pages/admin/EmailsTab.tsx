@@ -1,10 +1,6 @@
 import { keys } from "ramda";
 import React, { useEffect } from "react";
-import {
-  Accordion,
-  DsfrTitle,
-  Notification,
-} from "react-design-system/immersionFacile";
+import { Accordion, DsfrTitle, Notification } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { EmailSentDto, EmailVariables } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";

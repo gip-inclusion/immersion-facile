@@ -1,6 +1,6 @@
 import { ErrorMessage } from "formik";
 import React from "react";
-import { ButtonAdd } from "react-design-system/immersionFacile";
+import { ButtonAdd } from "react-design-system";
 import { removeAtIndex, replaceArrayElement, TimePeriodDto } from "shared";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 

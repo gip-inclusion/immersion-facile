@@ -1,7 +1,7 @@
 import React from "react";
 import { Form, Formik } from "formik";
 import { identity } from "ramda";
-import { Button, Notification } from "react-design-system/immersionFacile";
+import { Button, Notification } from "react-design-system";
 import {
   AssessmentStatus,
   assessmentStatuses,

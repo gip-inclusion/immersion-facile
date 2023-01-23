@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink, TabLinks } from "react-design-system/immersionFacile";
+import { NavLink, TabLinks } from "react-design-system";
 import { ImmersionHeader } from "src/app/components/layout/ImmersionHeader";
 import { AddEstablishmentByBatchTab } from "src/app/pages/admin/AddEstablishmentByBatchTab";
 import { AgencyTab } from "src/app/pages/admin/AgencyTab";

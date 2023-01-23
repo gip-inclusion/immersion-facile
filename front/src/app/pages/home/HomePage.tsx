@@ -7,7 +7,7 @@ import {
   SectionFaq,
   SectionStats,
   SectionTextEmbed,
-} from "react-design-system/immersionFacile";
+} from "react-design-system";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { routes } from "src/app/routes/routes";
 import logoLeMoisLesEntreprises from "/src/assets/img/logo-le-mois-les-entreprises.svg";

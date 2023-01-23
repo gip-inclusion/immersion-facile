@@ -1,6 +1,6 @@
 import { useField } from "formik";
 import React from "react";
-import { ButtonAdd } from "react-design-system/immersionFacile";
+import { ButtonAdd } from "react-design-system";
 import { AppellationDto, removeAtIndex } from "shared";
 import { FormEstablishmentAppellation } from "./FormEstablishmentAppellation";
 

@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { MainWrapper, PageHeader } from "react-design-system/immersionFacile";
+import { MainWrapper, PageHeader } from "react-design-system";
 
 type ConventionFormContainerLayoutProps = {
   children: ReactNode;

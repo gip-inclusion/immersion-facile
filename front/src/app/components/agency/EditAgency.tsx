@@ -1,10 +1,6 @@
 import { Form, Formik } from "formik";
 import React from "react";
-import {
-  Button,
-  DsfrTitle,
-  ErrorNotifications,
-} from "react-design-system/immersionFacile";
+import { Button, DsfrTitle, ErrorNotifications } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   AgencyDto,

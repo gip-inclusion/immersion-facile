@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  Loader,
-  MainWrapper,
-  Notification,
-  Title,
-} from "react-design-system/immersionFacile";
+import { Loader, MainWrapper, Notification, Title } from "react-design-system";
 import { ConventionMagicLinkPayload } from "shared";
 import { decodeMagicLinkJwtWithoutSignatureCheck } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";

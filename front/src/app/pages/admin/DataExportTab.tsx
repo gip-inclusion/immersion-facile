@@ -5,7 +5,7 @@ import {
   ArrayDropdown,
   DsfrTitle,
   ImmersionTextField,
-} from "react-design-system/immersionFacile";
+} from "react-design-system";
 import {
   AgenciesExportableParams,
   ContactRequestsExportableParams,

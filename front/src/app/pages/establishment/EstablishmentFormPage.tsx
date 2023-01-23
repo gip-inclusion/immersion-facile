@@ -1,5 +1,5 @@
 import React from "react";
-import { MainWrapper, PageHeader } from "react-design-system/immersionFacile";
+import { MainWrapper, PageHeader } from "react-design-system";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { routes } from "src/app/routes/routes";
 import { Route } from "type-route";
