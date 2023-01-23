@@ -1,7 +1,7 @@
 import { useFormikContext } from "formik";
 import React from "react";
 import { useDispatch } from "react-redux";
-import { ConventionDto } from "shared";
+import { ConventionDto, peConnectAuthFailed } from "shared";
 import { RadioGroup } from "src/app/components/forms/commons/RadioGroup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
@@ -38,7 +38,12 @@ export const BeneficiaryFormSection = ({
     formConventionFieldsLabels(values.internshipKind),
   );
   const formContents = getFormFields();
-  const isPEConnected = federatedIdentity?.includes("peConnect:");
+  const isPEConnected =
+    federatedIdentity?.includes("peConnect:") &&
+    federatedIdentity !== peConnectAuthFailed;
+  // const isFilledField = (fieldValue: string) => fieldValue.length > 0;
+  // const shouldDisableField = (fieldValue: string) =>
+  //   isPEConnected && isFilledField(fieldValue);
   return (
     <>
       <SectionTitle>{t.beneficiarySection.title}</SectionTitle>

@@ -15,3 +15,5 @@ export type PeExternalId = Flavor<string, "PeExternalId">;
 export const toPeExternalId = (
   federatedIdentity: PeConnectIdentity,
 ): PeExternalId => federatedIdentity.substring(peConnectPrefix.length);
+
+export const peConnectAuthFailed: PeConnectIdentity = `${peConnectPrefix}AuthFailed`;
