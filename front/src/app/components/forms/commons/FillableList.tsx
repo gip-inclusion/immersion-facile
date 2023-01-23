@@ -112,8 +112,10 @@ const AddToList = ({
       >
         {label}
       </label>
-      {description && <span className="fr-hint-text">{description}</span>}
-      <div className="fr-grid-row">
+      {description && (
+        <span className={fr.cx("fr-hint-text")}>{description}</span>
+      )}
+      <div className={fr.cx("fr-grid-row")}>
         <input
           id={cleanStringToHTMLAttribute(name)}
           value={inputValue}
@@ -126,7 +128,7 @@ const AddToList = ({
             }
           }}
           onChange={(e) => setInputValue(e.target.value)}
-          className={`fr-input${error ? " fr-input--error" : ""}`}
+          className={fr.cx("fr-input", error ? "fr-input--error" : undefined)}
           placeholder={placeholder || ""}
           aria-describedby="text-input-error-desc-error"
         />
