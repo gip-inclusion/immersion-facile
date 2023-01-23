@@ -7,6 +7,8 @@ import { RomeDto } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { romeAutocompleteSelector } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.selectors";
 import { useRomeAutocompleteUseCase } from "src/app/hooks/romeAutocomplete.hook";
+import { useStyles } from "tss-react/dsfr";
+import { fr } from "@codegouvfr/react-dsfr";
 
 type RomeAutocompleteProps = {
   title: string;
@@ -34,6 +36,8 @@ export const RomeAutocomplete = ({
     romeAutocompleteSelector,
   );
   const { updateSearchTerm, selectOption } = useRomeAutocompleteUseCase();
+
+  const { cx } = useStyles();
 
   const noOptionText =
     isSearching || !romeSearchText ? "..." : "Aucun métier trouvé";
@@ -64,14 +68,21 @@ export const RomeAutocomplete = ({
           }
         }}
         renderInput={(params) => (
-          <div ref={params.InputProps.ref} className="if-autocomplete-search">
+          <div
+            ref={params.InputProps.ref}
+            className={cx("im-autocomplete-search")}
+          >
             <label
-              className={`fr-label ${className ?? ""}`}
+              className={cx(fr.cx("fr-label"), className)}
               htmlFor={params.inputProps.id}
             >
               {title}
               {tooltip && tooltip !== "" && (
-                <Tooltip title={tooltip} className={"fr-ml-1w"} placement="top">
+                <Tooltip
+                  title={tooltip}
+                  className={fr.cx("fr-ml-1w")}
+                  placement="top"
+                >
                   <InfoRoundedIcon />
                 </Tooltip>
               )}
@@ -79,7 +90,7 @@ export const RomeAutocomplete = ({
 
             <input
               {...params.inputProps}
-              className={"fr-input"}
+              className={fr.cx("fr-input")}
               placeholder={placeholder}
               type="text"
             />

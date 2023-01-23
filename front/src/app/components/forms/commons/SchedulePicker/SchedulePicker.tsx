@@ -10,6 +10,7 @@ import {
 import { BoolRadioPicker } from "./BoolRadioPicker";
 import { ComplexSchedulePicker } from "./ComplexSchedulePicker";
 import { RegularSchedulePicker } from "./RegularSchedulePicker";
+import { fr } from "@codegouvfr/react-dsfr";
 import "./SchedulePicker.css";
 
 type SchedulePickerProps = {
@@ -43,13 +44,16 @@ export const SchedulePicker = ({
         setFieldValue={onBoolRadioPickerChange}
         disabled={disabled}
       />
-      <span className="fr-h4">
+      <span className={fr.cx("fr-h4")}>
         {field.value.isSimple
           ? "Sélectionnez la période des jours *"
           : "Sélectionnez les horaires de travail jour par jour *"}
       </span>
       {meta.error && (
-        <div id={name + "-error-description"} className="fr-error-text">
+        <div
+          id={name + "-error-description"}
+          className={fr.cx("fr-error-text")}
+        >
           {JSON.stringify(meta.error)}
         </div>
       )}

@@ -1,4 +1,6 @@
 import React from "react";
+import { fr } from "@codegouvfr/react-dsfr";
+import { useStyles } from "tss-react/dsfr";
 
 export type SelectOption = {
   label: string;
@@ -29,32 +31,38 @@ export const Select = ({
   hideLabel,
   className,
   placeholder,
-}: SelectProps) => (
-  <div className={`fr-select-group ${className ?? ""}`}>
-    <label className={`fr-label ${hideLabel ? "fr-sr-only" : ""}`} htmlFor={id}>
-      {label}
-    </label>
+}: SelectProps) => {
+  const { cx } = useStyles();
 
-    <select
-      className="fr-select"
-      id={id}
-      name={name}
-      onChange={onChange}
-      value={value}
-    >
-      {placeholder && (
-        <option value="" disabled selected>
-          {placeholder}
-        </option>
+  return (
+    <div className={cx(fr.cx("fr-select-group"), className)}>
+      {!hideLabel && (
+        <label className={fr.cx("fr-label")} htmlFor={id}>
+          {label}
+        </label>
       )}
-      {options.map((option, index) => {
-        const { label, value, ...rest } = option;
-        return (
-          <option value={value} key={`option-${value}-${index}`} {...rest}>
-            {label}
+
+      <select
+        className={fr.cx("fr-select")}
+        id={id}
+        name={name}
+        onChange={onChange}
+        value={value}
+      >
+        {placeholder && (
+          <option value="" disabled selected>
+            {placeholder}
           </option>
-        );
-      })}
-    </select>
-  </div>
-);
+        )}
+        {options.map((option, index) => {
+          const { label, value, ...rest } = option;
+          return (
+            <option value={value} key={`option-${value}-${index}`} {...rest}>
+              {label}
+            </option>
+          );
+        })}
+      </select>
+    </div>
+  );
+};

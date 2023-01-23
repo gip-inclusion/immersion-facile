@@ -7,6 +7,8 @@ import {
   FieldsAndTitle,
   RowFields,
 } from "src/app/contents/admin/types";
+import { fr } from "@codegouvfr/react-dsfr";
+import { useStyles } from "tss-react/dsfr";
 
 const cellStyles = {
   overflow: "hidden",
@@ -35,12 +37,21 @@ export const ConventionValidationDetails = ({
     <>
       <h4>
         Convention{" "}
-        <span className="fr-badge fr-badge--success">{convention.id}</span>
+        <span className={fr.cx("fr-badge", "fr-badge--success")}>
+          {convention.id}
+        </span>
         <button
           disabled={isCopied}
           ref={copyButton}
           onClick={onCopyButtonClick}
-          className="fr-btn fr-btn--sm fr-icon-clipboard-fill fr-btn--tertiary-no-outline fr-btn--icon-left fr-ml-1w"
+          className={fr.cx(
+            "fr-btn",
+            "fr-btn--sm",
+            "fr-icon-clipboard-fill",
+            "fr-btn--tertiary-no-outline",
+            "fr-btn--icon-left",
+            "fr-ml-1w",
+          )}
         >
           {isCopied ? "Copié !" : "Copier cet ID"}
         </button>
@@ -66,6 +77,7 @@ const ConventionValidationSection = ({
   list: FieldsAndTitle;
   index: number;
 }) => {
+  const { cx } = useStyles();
   const [markedAsRead, setMarkedAsRead] = useState<boolean>(false);
   const buildContent = (field: ColField): ReactNode => {
     let value;
@@ -114,7 +126,10 @@ const ConventionValidationSection = ({
   };
   return (
     <div
-      className={`fr-table fr-table--bordered ${list.additionalClasses ?? ""}`}
+      className={cx(
+        fr.cx("fr-table", "fr-table--bordered"),
+        list.additionalClasses,
+      )}
       key={list.listTitle}
     >
       <table>
@@ -126,16 +141,16 @@ const ConventionValidationSection = ({
           }}
         >
           {list.listTitle}
-          <div className="fr-toggle">
+          <div className={fr.cx("fr-toggle")}>
             <input
               type="checkbox"
               onChange={() => setMarkedAsRead((read) => !read)}
-              className="fr-toggle__input"
+              className={fr.cx("fr-toggle__input")}
               id={`fr-toggle__input-${index}`}
               checked={markedAsRead}
             />
             <label
-              className="fr-toggle__label"
+              className={fr.cx("fr-toggle__label")}
               htmlFor={`fr-toggle__input-${index}`}
             >
               {markedAsRead ? "Vérifier à nouveau" : "Marquer comme vu"}

@@ -3,6 +3,8 @@ import { configureGenerateHtmlFromTemplate } from "html-templates";
 import { keys } from "ramda";
 import { DsfrTitle, ImmersionTextField } from "react-design-system";
 import { immersionFacileContactEmail, templatesByName } from "shared";
+import { fr } from "@codegouvfr/react-dsfr";
+import { useStyles } from "tss-react/dsfr";
 
 type TemplateByName = typeof templatesByName;
 type TemplateName = keyof TemplateByName;
@@ -13,6 +15,8 @@ const generateHtmlFromTemplate = configureGenerateHtmlFromTemplate(
 );
 
 export const EmailPreviewTab = () => {
+  const { cx } = useStyles();
+
   const [currentTemplate, setCurrentTemplate] = useState<TemplateName>(
     "AGENCY_WAS_ACTIVATED",
   );
@@ -35,18 +39,19 @@ export const EmailPreviewTab = () => {
     },
   );
   //console.log(fakeContent.htmlContent);
+
   return (
-    <div className="admin-tab__email-preview">
+    <div className={cx("admin-tab__email-preview")}>
       <DsfrTitle level={5} text="Aperçu de template email" />
       <div>
-        <div className="fr-grid-row fr-grid-row--gutters">
-          <aside className="fr-col-12 fr-col-lg-4">
-            <div className="fr-select-group">
-              <label className="fr-label" htmlFor="selectTemplateName">
+        <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
+          <aside className={fr.cx("fr-col-12", "fr-col-lg-4")}>
+            <div className={fr.cx("fr-select-group")}>
+              <label className={fr.cx("fr-label")} htmlFor="selectTemplateName">
                 Liste de templates email :
               </label>
               <select
-                className="fr-select"
+                className={fr.cx("fr-select")}
                 id="selectTemplateName"
                 name="templateName"
                 onChange={(event) =>
@@ -62,23 +67,27 @@ export const EmailPreviewTab = () => {
             </div>
 
             <h6>Métadonnées</h6>
-            <ul className="fr-badge-group">
+            <ul className={fr.cx("fr-badge-group")}>
               <li>
-                <span className="fr-badge fr-badge--green-menthe">Sujet</span>
+                <span className={fr.cx("fr-badge", "fr-badge--green-menthe")}>
+                  Sujet
+                </span>
               </li>
               <li>{fakeContent.subject}</li>
             </ul>
             {fakeContent.tags && fakeContent.tags.length > -1 && (
-              <ul className="fr-badge-group fr-mt-2w">
+              <ul className={fr.cx("fr-badge-group", "fr-mt-2w")}>
                 <li>
-                  <span className="fr-badge fr-badge--blue-ecume">Tags</span>
+                  <span className={fr.cx("fr-badge", "fr-badge--blue-ecume")}>
+                    Tags
+                  </span>
                 </li>
                 <li>{fakeContent.tags.join(", ")}</li>
               </ul>
             )}
 
-            <h6 className="fr-mt-4w">Données de prévisualisation</h6>
-            <ul className="fr-badge-group">
+            <h6 className={fr.cx("fr-mt-4w")}>Données de prévisualisation</h6>
+            <ul className={fr.cx("fr-badge-group")}>
               {Object.keys(emailVariables)
                 .sort()
                 .map((variableName) => {
@@ -93,7 +102,7 @@ export const EmailPreviewTab = () => {
                           label={variableName}
                           name={variableName}
                           value={variableValue ?? ""}
-                          className={"fr-mb-2w"}
+                          className={fr.cx("fr-mb-2w")}
                           onChange={(e) =>
                             setEmailVariables({
                               ...emailVariables,
@@ -102,9 +111,11 @@ export const EmailPreviewTab = () => {
                           }
                         />
                       ) : (
-                        <div className="fr-input-group fr-mb-2w">
-                          <label className="fr-label">{variableName}</label>
-                          <pre className={"fr-text--xs fr-m-auto"}>
+                        <div className={fr.cx("fr-input-group", "fr-mb-2w")}>
+                          <label className={fr.cx("fr-label")}>
+                            {variableName}
+                          </label>
+                          <pre className={fr.cx("fr-text--xs", "fr-m-auto")}>
                             <code>
                               {JSON.stringify(variableValue, null, 2)}
                             </code>
@@ -115,7 +126,7 @@ export const EmailPreviewTab = () => {
                   );
                 })}
             </ul>
-            <h6 className="fr-mt-4w">Pièces jointes</h6>
+            <h6 className={fr.cx("fr-mt-4w")}>Pièces jointes</h6>
             {fakeContent.attachment ? (
               <ul>
                 {fakeContent.attachment.map((att) => (
@@ -130,9 +141,9 @@ export const EmailPreviewTab = () => {
               <p>Ce template de mail n'a pas de pièces jointes.</p>
             )}
           </aside>
-          <section className="fr-col-12 fr-col-lg-8">
+          <section className={fr.cx("fr-col-12", "fr-col-lg-8")}>
             <div
-              className="admin-tab__email-preview-wrapper"
+              className={cx("admin-tab__email-preview-wrapper")}
               dangerouslySetInnerHTML={{ __html: fakeContent.htmlContent }}
             ></div>
           </section>

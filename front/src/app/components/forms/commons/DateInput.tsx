@@ -2,6 +2,7 @@ import { format } from "date-fns";
 import { useField } from "formik";
 import React from "react";
 import { cleanStringToHTMLAttribute } from "shared";
+import { fr } from "@codegouvfr/react-dsfr";
 
 type DateInputProps = {
   name: string;
@@ -22,7 +23,7 @@ export const DateInput = (props: DateInputProps) => {
         }`}
       >
         <label
-          className="fr-label"
+          className={fr.cx("fr-label")}
           htmlFor={cleanStringToHTMLAttribute(props.name)}
         >
           {props.label}
@@ -48,23 +49,11 @@ export const DateInput = (props: DateInputProps) => {
             onChange={(event) => props.onDateChange(event.target.value)}
           />
         </div>
-        {/*<div className="fr-input-wrap fr-fi-calendar-line">*/}
-        {/*  <input*/}
-        {/*    className={`fr-input${*/}
-        {/*      meta.touched && meta.error ? " fr-input--error" : ""*/}
-        {/*    }`}*/}
-        {/*    {...field}*/}
-        {/*    value={format(new Date(field.value), "yyyy-MM-dd")}*/}
-        {/*    type="date"*/}
-        {/*    disabled={props.disabled}*/}
-        {/*    max={*/}
-        {/*      props.max ? format(new Date(props.max), "yyyy-MM-dd") : undefined*/}
-        {/*    }*/}
-        {/*    onChange={(event) => props.onDateChange(event.target.value)}*/}
-        {/*  />*/}
-        {/*</div>*/}
         {meta.touched && meta.error && (
-          <p id="text-input-email-error-desc-error" className="fr-error-text">
+          <p
+            id="text-input-email-error-desc-error"
+            className={fr.cx("fr-error-text")}
+          >
             {meta.error}
           </p>
         )}

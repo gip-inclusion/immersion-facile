@@ -2,12 +2,14 @@ import React from "react";
 import { DsfrTitle, Notification } from "react-design-system";
 import { AbsoluteUrl } from "shared";
 import { ENV } from "src/config/environmentVariables";
+import { fr } from "@codegouvfr/react-dsfr";
+import { useStyles } from "tss-react/dsfr";
 
 const TitleButton = ({ url }: { url: AbsoluteUrl }) => (
   <a
     href={url}
     target="_blank"
-    className="fr-btn fr-btn--tertiary fr-btn--sm fr-ml-auto"
+    className={fr.cx("fr-btn", "fr-btn--tertiary", "fr-btn--sm", "fr-ml-auto")}
   >
     Ouvrir en plein écran
   </a>
@@ -20,6 +22,7 @@ export const MetabaseView = ({
   url?: AbsoluteUrl;
   title: string;
 }) => {
+  const { cx } = useStyles();
   if (!url) return <p>Chargement du dashboard en cours...</p>;
   return (
     <div>
@@ -27,7 +30,7 @@ export const MetabaseView = ({
         level={5}
         text={title}
         action={<TitleButton url={url} />}
-        className={"flex"}
+        className={cx("flex")}
       />
       {ENV.envType === "production" ? (
         <iframe src={url} frameBorder="0" width="100%" height="800"></iframe>

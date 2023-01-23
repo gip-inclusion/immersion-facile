@@ -1,6 +1,7 @@
 import { FormControl, InputBase, MenuItem, Select } from "@mui/material";
 import { useField } from "formik";
 import * as React from "react";
+import { fr } from "@codegouvfr/react-dsfr";
 
 type SimpleSelectProps = {
   label: string;
@@ -27,7 +28,7 @@ export const SimpleSelect = ({
       }`}
     >
       <FormControl fullWidth error={hasError}>
-        <label className="fr-label" htmlFor={id}>
+        <label className={fr.cx("fr-label")} htmlFor={id}>
           {label}
         </label>
         <Select
@@ -50,7 +51,10 @@ export const SimpleSelect = ({
           ))}
         </Select>
         {meta.error && (
-          <p id="text-input-email-error-desc-error" className="fr-error-text">
+          <p
+            id="text-input-email-error-desc-error"
+            className={fr.cx("fr-error-text")}
+          >
             {meta.error}
           </p>
         )}

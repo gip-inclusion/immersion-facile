@@ -4,6 +4,7 @@ import { AutocompleteInput } from "react-design-system";
 import { AddressAndPosition, addressDtoToString } from "shared";
 import { useDebounce } from "src/app/hooks/useDebounce";
 import { getAddressesFromApi } from "./getAddressesFromApi";
+import { useStyles } from "tss-react/dsfr";
 
 export type AddressAutocompleteProps = {
   label: string;
@@ -34,6 +35,7 @@ export const AddressAutocomplete = ({
   const [options, setOptions] = useState<AddressAndPosition[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const debounceSearchTerm = useDebounce(searchTerm, 400);
+  const { cx } = useStyles();
 
   useEffect(
     () =>
@@ -62,7 +64,7 @@ export const AddressAutocomplete = ({
   const noOptionText =
     isSearching || !debounceSearchTerm ? "..." : "Aucune adresse trouvée.";
   return (
-    <div className="fr-input-group">
+    <div className={cx("fr-input-group")}>
       <Autocomplete
         loading={isSearching}
         loadingText="Recherche d'adresse en cours... 🔎"
@@ -85,7 +87,7 @@ export const AddressAutocomplete = ({
         )}
       />
       {notice && (
-        <span className="if-autocomplete-input__notice">{notice}</span>
+        <span className={cx("im-autocomplete-input__notice")}>{notice}</span>
       )}
     </div>
   );

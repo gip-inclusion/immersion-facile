@@ -9,6 +9,8 @@ import { romeAutocompleteGateway } from "src/config/dependencies";
 import { useDebounce } from "src/app/hooks/useDebounce";
 import { Proposal } from "src/app/components/forms/establishment/Proposal";
 import { StringWithHighlights } from "src/app/components/forms/establishment/StringWithHighlights";
+import { fr } from "@codegouvfr/react-dsfr";
+import { useStyles } from "tss-react/dsfr";
 
 const romeSearchMatchToProposal = ({
   matchRanges,
@@ -52,6 +54,7 @@ export const AppellationAutocomplete = ({
   const [searchTerm, setSearchTerm] = useState<string>(
     initialValue?.appellationLabel ?? "",
   );
+  const { cx } = useStyles();
   const [options, setOptions] = useState<Option[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const debounceSearchTerm = useDebounce(searchTerm, 300);
@@ -136,18 +139,18 @@ export const AppellationAutocomplete = ({
           return (
             <div ref={params.InputProps.ref}>
               <label
-                className={`fr-label ${className ?? ""}`}
+                className={cx(fr.cx("fr-label"), className)}
                 htmlFor={inputId}
               >
                 {label}
               </label>
               {description && (
-                <span className="fr-hint-text">{description}</span>
+                <span className={fr.cx("fr-hint-text")}>{description}</span>
               )}
               <input
                 {...params.inputProps}
                 id={inputId}
-                className={"fr-input"}
+                className={fr.cx("fr-input")}
                 placeholder="Prêt à porter"
               />
             </div>

@@ -3,6 +3,7 @@ import { styled } from "@mui/material/styles";
 import React, { useEffect, useState } from "react";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { fr } from "@codegouvfr/react-dsfr";
+import { useStyles } from "tss-react/dsfr";
 
 import {
   cleanStringToHTMLAttribute,
@@ -27,9 +28,10 @@ export const FillableList = (
   },
 ) => {
   const { valuesInList, setValues, ...addToListProps } = props;
+  const { cx } = useStyles();
 
   return (
-    <div className={`fr-input-group ${componentName}`}>
+    <div className={cx(fr.cx("fr-input-group"), componentName)}>
       <AddToList
         {...addToListProps}
         onAdd={(inputValue) => {
@@ -133,7 +135,10 @@ const AddToList = ({
         </Button>
       </div>
       {error && (
-        <p id="text-input-email-error-desc-error" className="fr-error-text">
+        <p
+          id="text-input-email-error-desc-error"
+          className={fr.cx("fr-error-text")}
+        >
           {error}
         </p>
       )}

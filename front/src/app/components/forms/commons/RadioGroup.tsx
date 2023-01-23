@@ -1,6 +1,7 @@
 import { useField } from "formik";
 import React from "react";
 import { cleanStringToHTMLAttribute } from "shared";
+import { fr } from "@codegouvfr/react-dsfr";
 
 type BoolRadioProps = {
   name: string;
@@ -85,7 +86,7 @@ export const RadioGroup = <T extends string | number | string[] | boolean>({
   description,
 }: RadioGroupProps<T>) => (
   <>
-    <div className="fr-form-group fr-input-group">
+    <div className={fr.cx("fr-input-group", "fr-input-group")}>
       <fieldset
         className={error ? "fr-fieldset fr-fieldset--error" : "fr-fieldset"}
         aria-labelledby={
@@ -93,18 +94,20 @@ export const RadioGroup = <T extends string | number | string[] | boolean>({
         }
         role="group"
       >
-        <legend className="fr-fieldset__legend fr-text--regular">
+        <legend className={fr.cx("fr-fieldset__legend", "fr-text--regular")}>
           {groupLabel}
-          {description && <span className="fr-hint-text">{description}</span>}
+          {description && (
+            <span className={fr.cx("fr-hint-text")}>{description}</span>
+          )}
         </legend>
-        <div className="fr-fieldset__content">
+        <div className={fr.cx("fr-fieldset__content")}>
           {options &&
             options.map(({ value, label }) => {
               const inputValue = getInputValue(value);
               const optionId = makeOptionId(value, id);
 
               return (
-                <div className="fr-radio-group" key={optionId}>
+                <div className={fr.cx("fr-radio-group")} key={optionId}>
                   <input
                     id={optionId}
                     type="radio"
@@ -113,7 +116,7 @@ export const RadioGroup = <T extends string | number | string[] | boolean>({
                     checked={isEqual(value, currentValue)}
                     onChange={() => setCurrentValue(value)}
                   />
-                  <label className="fr-label" htmlFor={optionId}>
+                  <label className={fr.cx("fr-label")} htmlFor={optionId}>
                     {label ?? value}
                   </label>
                 </div>
@@ -121,7 +124,7 @@ export const RadioGroup = <T extends string | number | string[] | boolean>({
             })}
         </div>
         {error && (
-          <p id="radio-error-desc-error" className="fr-error-text">
+          <p id="radio-error-desc-error" className={fr.cx("fr-error-text")}>
             {error}
           </p>
         )}

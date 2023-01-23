@@ -8,6 +8,8 @@ import { AgencyId, AgencyOption, propEq } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
 import { agencyAdminSlice } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
+import { useStyles } from "tss-react/dsfr";
+import { fr } from "@codegouvfr/react-dsfr";
 
 export const useAgencyAdminAutocomplete = () => {
   const dispatch = useDispatch();
@@ -42,6 +44,8 @@ export const AgencyAutocomplete = ({
     useAppSelector(agencyAdminSelectors.agencyState);
   const { updateSearchTerm, selectOption } = useAgencyAdminAutocomplete();
 
+  const { cx } = useStyles();
+
   const noOptionText =
     isSearching || !agencySearchText ? "..." : "Aucune agence trouvée";
 
@@ -74,11 +78,21 @@ export const AgencyAutocomplete = ({
           }
         }}
         renderInput={(params) => (
-          <div ref={params.InputProps.ref} className="if-autocomplete-search">
-            <label className={`fr-label ${className ?? ""}`} htmlFor={"search"}>
+          <div
+            ref={params.InputProps.ref}
+            className={cx("im-autocomplete-search")}
+          >
+            <label
+              className={cx(fr.cx("fr-label"), className)}
+              htmlFor={"search"}
+            >
               {title}
               {tooltip && tooltip !== "" && (
-                <Tooltip title={tooltip} className={"fr-ml-1w"} placement="top">
+                <Tooltip
+                  title={tooltip}
+                  className={fr.cx("fr-ml-1w")}
+                  placement="top"
+                >
                   <InfoRoundedIcon />
                 </Tooltip>
               )}
@@ -86,7 +100,7 @@ export const AgencyAutocomplete = ({
             <input
               {...params.inputProps}
               value={getNameFromAgencyId(params.inputProps.value?.toString())}
-              className={"fr-input"}
+              className={fr.cx("fr-input")}
               placeholder={placeholder}
               style={{ backgroundColor: "#fff" }}
               type="text"

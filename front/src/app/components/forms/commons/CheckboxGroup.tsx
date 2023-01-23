@@ -1,5 +1,6 @@
 import { useField } from "formik";
 import React from "react";
+import { fr } from "@codegouvfr/react-dsfr";
 
 type BoolCheckboxGroupProps = {
   label: string;
@@ -16,7 +17,7 @@ export const BoolCheckboxGroup = (props: BoolCheckboxGroupProps) => {
   const id = htmlName + props.name;
   return (
     <>
-      <div className="fr-form-group">
+      <div className={fr.cx("fr-input-group")}>
         <fieldset
           className={isError ? "fr-fieldset fr-fieldset--error" : "fr-fieldset"}
           aria-labelledby={
@@ -27,20 +28,20 @@ export const BoolCheckboxGroup = (props: BoolCheckboxGroupProps) => {
           role="group"
         >
           <legend
-            className="fr-fieldset__legend fr-text--regular"
+            className={fr.cx("fr-fieldset__legend", "fr-text--regular")}
             id="checkboxes-error-legend"
           >
             {props.label}
           </legend>
           {props.description && (
-            <span className="fr-hint-text">
+            <span className={fr.cx("fr-hint-text")}>
               <a href={props.descriptionLink} target="_blank">
                 {props.description}
               </a>
             </span>
           )}
-          <div className="fr-fieldset__content">
-            <div className="fr-checkbox-group" key={id}>
+          <div className={fr.cx("fr-fieldset__content")}>
+            <div className={fr.cx("fr-checkbox-group")} key={id}>
               <input
                 {...field}
                 value={""}
@@ -49,13 +50,16 @@ export const BoolCheckboxGroup = (props: BoolCheckboxGroupProps) => {
                 checked={field.value}
                 disabled={props.disabled}
               />
-              <label className="fr-label" htmlFor={id}>
+              <label className={fr.cx("fr-label")} htmlFor={id}>
                 oui
               </label>
             </div>
           </div>
           {isError && (
-            <p id="checkboxes-error-desc-error" className="fr-error-text">
+            <p
+              id="checkboxes-error-desc-error"
+              className={fr.cx("fr-error-text")}
+            >
               {meta.error}
             </p>
           )}
@@ -82,7 +86,7 @@ export const DateCheckboxGroup = (props: DateCheckboxGroupProps) => {
 
   return (
     <>
-      <div className="fr-form-group">
+      <div className={fr.cx("fr-input-group")}>
         <fieldset
           className={isError ? "fr-fieldset fr-fieldset--error" : "fr-fieldset"}
           aria-labelledby={
@@ -93,12 +97,12 @@ export const DateCheckboxGroup = (props: DateCheckboxGroupProps) => {
           role="group"
         >
           <legend
-            className="fr-fieldset__legend fr-text--regular"
+            className={fr.cx("fr-fieldset__legend", "fr-text--regular")}
             id="checkboxes-error-legend"
           >
             {props.label}
             {props.description && (
-              <span className="fr-hint-text">
+              <span className={fr.cx("fr-hint-text")}>
                 <a href={props.descriptionLink} target="_blank">
                   {props.description}
                 </a>
@@ -106,9 +110,9 @@ export const DateCheckboxGroup = (props: DateCheckboxGroupProps) => {
             )}
           </legend>
 
-          <div className="fr-fieldset__content">
+          <div className={fr.cx("fr-fieldset__content")}>
             <div
-              className="fr-checkbox-group"
+              className={fr.cx("fr-checkbox-group")}
               key={htmlName + props.name + "_oui"}
             >
               <input
@@ -120,7 +124,7 @@ export const DateCheckboxGroup = (props: DateCheckboxGroupProps) => {
                 disabled={props.disabled}
               />
               <label
-                className="fr-label"
+                className={fr.cx("fr-label")}
                 htmlFor={htmlName + "oui"}
                 onClick={() =>
                   setValue(field.value ? undefined : new Date().toISOString())
@@ -131,7 +135,10 @@ export const DateCheckboxGroup = (props: DateCheckboxGroupProps) => {
             </div>
           </div>
           {isError && (
-            <p id="checkboxes-error-desc-error" className="fr-error-text">
+            <p
+              id="checkboxes-error-desc-error"
+              className={fr.cx("fr-error-text")}
+            >
               {meta.error}
             </p>
           )}

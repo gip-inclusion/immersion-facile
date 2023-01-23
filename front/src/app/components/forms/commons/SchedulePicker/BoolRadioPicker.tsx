@@ -1,6 +1,7 @@
 import { FieldHookConfig } from "formik";
 import React from "react";
 import { cleanStringToHTMLAttribute } from "shared";
+import { fr } from "@codegouvfr/react-dsfr";
 
 type BoolRadioPickerProps = {
   label: string;
@@ -17,21 +18,21 @@ export const BoolRadioPicker = (props: BoolRadioPickerProps) => {
 
   return (
     <>
-      <div className="fr-form-group">
+      <div className={fr.cx("fr-input-group")}>
         <fieldset
-          className="fr-fieldset"
+          className={fr.cx("fr-fieldset")}
           role="group"
           disabled={props.disabled}
         >
-          <legend className="fr-fieldset__legend fr-text--regular">
+          <legend className={fr.cx("fr-fieldset__legend", "fr-text--regular")}>
             {props.label}
             {props.description && (
-              <span className="fr-hint-text">{props.description}</span>
+              <span className={fr.cx("fr-hint-text")}>{props.description}</span>
             )}
           </legend>
 
-          <div className="fr-fieldset__content">
-            <div className="fr-radio-group" key={props.name + "_oui"}>
+          <div className={fr.cx("fr-fieldset__content")}>
+            <div className={fr.cx("fr-radio-group")} key={props.name + "_oui"}>
               <input
                 id={cleanStringToHTMLAttribute(props.name + "radio_yes")}
                 type="radio"
@@ -40,14 +41,14 @@ export const BoolRadioPicker = (props: BoolRadioPickerProps) => {
                 disabled={props.disabled}
               />
               <label
-                className="fr-label"
+                className={fr.cx("fr-label")}
                 htmlFor={cleanStringToHTMLAttribute(props.name + "radio_yes")}
                 onClick={setFieldAsTrue}
               >
                 {props.yesLabel}
               </label>
             </div>
-            <div className="fr-radio-group" key={props.name + "_non"}>
+            <div className={fr.cx("fr-radio-group")} key={props.name + "_non"}>
               <input
                 id={cleanStringToHTMLAttribute(props.name + "radio_no")}
                 type="radio"
@@ -56,7 +57,7 @@ export const BoolRadioPicker = (props: BoolRadioPickerProps) => {
                 disabled={props.disabled}
               />
               <label
-                className="fr-label"
+                className={fr.cx("fr-label")}
                 htmlFor={cleanStringToHTMLAttribute(props.name + "radio_no")}
                 onClick={setFieldAsFalse}
               >

@@ -30,7 +30,11 @@ import { fr } from "@codegouvfr/react-dsfr";
 
 export const EditAgency = () => (
   <>
-    <DsfrTitle level={5} text="Editer une agence" className="fr-mt-4w" />
+    <DsfrTitle
+      level={5}
+      text="Editer une agence"
+      className={fr.cx("fr-mt-4w")}
+    />
     <div className={fr.cx("fr-px-6w", "fr-py-4w", "fr-card")}>
       <AgencyAutocomplete
         title="Je sélectionne une agence"
@@ -116,7 +120,7 @@ const EditAgencyForm = () => {
                 visible={submitCount !== 0 && Object.values(errors).length > 0}
               />
 
-              <div className="fr-mt-4w">
+              <div className={fr.cx("fr-mt-4w")}>
                 <Button
                   type="submit"
                   disable={isSubmitting || feedback.kind !== "idle"}

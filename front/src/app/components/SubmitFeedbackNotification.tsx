@@ -4,6 +4,7 @@ import {
   SubmitFeedBack,
   isFeedbackError,
 } from "src/core-logic/domain/SubmitFeedback";
+import { fr } from "@codegouvfr/react-dsfr";
 
 export type SubmitFeedbackProps<T extends string> = {
   submitFeedback: SubmitFeedBack<T>;
@@ -17,7 +18,7 @@ export const SubmitFeedbackNotification = <T extends string>({
   if (submitFeedback.kind === "idle") return null;
 
   return (
-    <div className="fr-mt-4w">
+    <div className={fr.cx("fr-mt-4w")}>
       {isFeedbackError(submitFeedback) ? (
         <Notification
           type="error"
