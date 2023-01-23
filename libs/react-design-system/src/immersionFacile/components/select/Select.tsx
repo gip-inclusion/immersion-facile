@@ -31,11 +31,9 @@ export const Select = ({
   placeholder,
 }: SelectProps) => (
   <div className={`fr-select-group ${className ?? ""}`}>
-    {!hideLabel && (
-      <label className="fr-label" htmlFor={id}>
-        {label}
-      </label>
-    )}
+    <label className={`fr-label ${hideLabel ? "fr-sr-only" : ""}`} htmlFor={id}>
+      {label}
+    </label>
 
     <select
       className="fr-select"
