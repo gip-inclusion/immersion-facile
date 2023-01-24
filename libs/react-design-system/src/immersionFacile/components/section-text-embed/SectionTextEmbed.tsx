@@ -1,6 +1,7 @@
 import React from "react";
 import ReactPlayer from "react-player";
 import "./SectionTextEmbed.scss";
+import { fr } from "@codegouvfr/react-dsfr";
 
 type SectionTextEmbedProps = {
   videoUrl: string;
@@ -52,6 +53,7 @@ export const SectionTextEmbed = ({
         </li>
       </ul>
       <div className={`${componentName}__embed-wrapper fr-col-12 fr-col-md-6`}>
+        <h3 className={fr.cx("fr-sr-only")}>Vidéo Immersion en entreprise</h3>
         <ReactPlayer
           controls
           url={videoUrl}
@@ -74,8 +76,16 @@ export const SectionTextEmbed = ({
             },
           }}
         />
-        <a className={"fr-text--xs"} href={videoTranscription} target="_blank">
-          Lien vers la transcription textuelle
+        <a
+          className={fr.cx(
+            "fr-download__link",
+            "fr-icon-download-line",
+            "fr-link--icon-right",
+          )}
+          href={videoTranscription}
+          aria-label="Transcription textuelle, téléchargement en format texte"
+        >
+          Télécharger la transcription textuelle
         </a>
       </div>
     </div>
