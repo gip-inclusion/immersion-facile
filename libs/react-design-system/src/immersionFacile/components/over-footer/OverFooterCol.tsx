@@ -1,4 +1,6 @@
 import React from "react";
+import { fr } from "@codegouvfr/react-dsfr";
+import { useStyles } from "tss-react/dsfr";
 
 export type OverFooterColProps = {
   title: string;
@@ -16,39 +18,46 @@ export const OverFooterCol = ({
   subtitle,
   link,
   iconTitle,
-}: OverFooterColProps) => (
-  <div className="fr-col-12 fr-col-md">
-    <p className="fr-h6">
-      <span
-        aria-hidden="true"
-        className={`fr-mr-2v ${iconTitle ? iconTitle : ""}`}
-      ></span>
-      {title}
-    </p>
-    <div>
-      <div className="fr-editor">
-        {subtitle && (
-          <div className="fr-grid-row">
-            <div className="fr-col">
-              <p>{subtitle}</p>
+}: OverFooterColProps) => {
+  const { cx } = useStyles();
+  return (
+    <div className={fr.cx("fr-col-12", "fr-col-md")}>
+      <p className={fr.cx("fr-h6")}>
+        <span
+          aria-hidden="true"
+          className={cx(fr.cx("fr-mr-2v"), iconTitle)}
+        ></span>
+        {title}
+      </p>
+      <div>
+        <div>
+          {subtitle && (
+            <div className={fr.cx("fr-grid-row")}>
+              <div className={fr.cx("fr-col")}>
+                <p>{subtitle}</p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {link && (
-          <div className="fr-grid-row fr-mb-3w">
-            <div className="fr-col">
-              <a
-                href={link.url}
-                target="_blank"
-                className="fr-link   fr-icon-arrow-right-line fr-link--icon-right"
-              >
-                {link.label}
-              </a>
+          {link && (
+            <div className={fr.cx("fr-grid-row", "fr-mb-3w")}>
+              <div className={fr.cx("fr-col")}>
+                <a
+                  href={link.url}
+                  target="_blank"
+                  className={fr.cx(
+                    "fr-link",
+                    "fr-icon-arrow-right-line",
+                    "fr-link--icon-right",
+                  )}
+                >
+                  {link.label}
+                </a>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};

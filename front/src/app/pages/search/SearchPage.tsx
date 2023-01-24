@@ -25,6 +25,8 @@ import {
 import { Route } from "type-route";
 import { routes } from "src/app/routes/routes";
 import { PlaceAutocomplete } from "src/app/components/forms/autocomplete/PlaceAutocomplete";
+import { fr } from "@codegouvfr/react-dsfr";
+import { useStyles } from "tss-react/dsfr";
 
 const radiusOptions = [1, 2, 5, 10, 20, 50, 100];
 const sortedByOptions: { value: SearchSortedBy; label: string }[] = [
@@ -36,6 +38,7 @@ export const SearchPage = ({
 }: {
   route: Route<typeof routes.search>;
 }) => {
+  const { cx } = useStyles();
   const searchStatus = useAppSelector(searchSelectors.searchStatus);
   const searchResults = useAppSelector(searchSelectors.searchResults);
 
@@ -92,14 +95,17 @@ export const SearchPage = ({
           >
             {({ setFieldValue, values }) => (
               <Form
-                className={
-                  "search-page__form search-page__form--v2 fr-grid-row fr-grid-row--gutters"
-                }
+                className={cx(
+                  fr.cx("fr-grid-row", "fr-grid-row--gutters"),
+                  "search-page__form",
+                  "search-page__form--v2",
+                )}
               >
                 <div
-                  className={
-                    "search-page__form-input-wrapper fr-col-12 fr-col-lg-4"
-                  }
+                  className={cx(
+                    fr.cx("fr-col-12", "fr-col-lg-4"),
+                    "search-page__form-input-wrapper",
+                  )}
                 >
                   <RomeAutocomplete
                     title="Je recherche le métier :"
@@ -116,9 +122,10 @@ export const SearchPage = ({
                   />
                 </div>
                 <div
-                  className={
-                    "search-page__form-input-wrapper fr-col-12 fr-col-lg-4"
-                  }
+                  className={cx(
+                    fr.cx("fr-col-12", "fr-col-lg-4"),
+                    "search-page__form-input-wrapper",
+                  )}
                 >
                   <PlaceAutocomplete
                     label="Je me situe dans la ville de :"
@@ -140,9 +147,10 @@ export const SearchPage = ({
                   />
                 </div>
                 <div
-                  className={
-                    "search-page__form-input-wrapper fr-col-12 fr-col-lg-2"
-                  }
+                  className={cx(
+                    fr.cx("fr-col-12", "fr-col-lg-2"),
+                    "search-page__form-input-wrapper",
+                  )}
                 >
                   <Select
                     label="Distance maximum"
@@ -179,9 +187,10 @@ export const SearchPage = ({
                 </div>
 
                 <div
-                  className={
-                    "search-page__form-input-wrapper fr-col-12 fr-col-lg-2"
-                  }
+                  className={cx(
+                    fr.cx("fr-col-12", "fr-col-lg-2"),
+                    "search-page__form-input-wrapper",
+                  )}
                 >
                   <ButtonSearch
                     disabled={!availableForSearchRequest(searchStatus, values)}
@@ -195,23 +204,39 @@ export const SearchPage = ({
             )}
           </Formik>
         </PageHeader>
-        <div className="fr-pt-6w" ref={searchResultsWrapper}>
+        <div className={fr.cx("fr-pt-6w")} ref={searchResultsWrapper}>
           {searchStatus === "ok" && (
             <>
-              <div className="fr-container">
-                <div className="fr-grid-row fr-grid-row--gutters fr-mb-4w fr-grid-row--bottom">
-                  <div className="fr-col-12 fr-col-md-8">
-                    <fieldset className="fr-fieldset fr-fieldset--inline fr-mb-0">
+              <div className={fr.cx("fr-container")}>
+                <div
+                  className={fr.cx(
+                    "fr-grid-row",
+                    "fr-grid-row--gutters",
+                    "fr-mb-4w",
+                    "fr-grid-row--bottom",
+                  )}
+                >
+                  <div className={fr.cx("fr-col-12", "fr-col-md-8")}>
+                    <fieldset
+                      className={fr.cx(
+                        "fr-fieldset",
+                        "fr-fieldset--inline",
+                        "fr-mb-0",
+                      )}
+                    >
                       <legend
-                        className="fr-fieldset__legend fr-text--regular"
+                        className={fr.cx(
+                          "fr-fieldset__legend",
+                          "fr-text--regular",
+                        )}
                         id="radio-inline-legend"
                       >
                         Trier les résultats :
                       </legend>
-                      <div className="fr-fieldset__content">
+                      <div className={fr.cx("fr-fieldset__content")}>
                         {sortedByOptions.map((option, index) => (
                           <div
-                            className="fr-radio-group"
+                            className={fr.cx("fr-radio-group")}
                             key={`search-sort-option-${index}`}
                           >
                             <input
@@ -232,7 +257,7 @@ export const SearchPage = ({
                               }}
                             />
                             <label
-                              className="fr-label"
+                              className={fr.cx("fr-label")}
                               htmlFor={`search-sort-option-${index}`}
                             >
                               {option.label}
@@ -242,9 +267,16 @@ export const SearchPage = ({
                       </div>
                     </fieldset>
                   </div>
-                  <div className="fr-col-12 fr-col-md-4 fr-grid-row fr-grid-row--right">
+                  <div
+                    className={fr.cx(
+                      "fr-col-12",
+                      "fr-col-md-4",
+                      "fr-grid-row",
+                      "fr-grid-row--right",
+                    )}
+                  >
                     {searchStatus === "ok" && (
-                      <span className="fr-h5">
+                      <span className={fr.cx("fr-h5")}>
                         <strong>{searchResults.length}</strong> résultats
                         trouvés
                       </span>

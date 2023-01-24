@@ -1,5 +1,7 @@
 import React from "react";
 import { Button } from "../buttons";
+import { fr } from "@codegouvfr/react-dsfr";
+import { useStyles } from "tss-react/dsfr";
 import "./SectionFaq.scss";
 
 export type SectionFaqProps = {
@@ -7,38 +9,52 @@ export type SectionFaqProps = {
 };
 
 const componentName = "im-section-faq";
-export const SectionFaq = ({ articles }: SectionFaqProps) => (
-  <section className={`${componentName} `}>
-    <div
-      className={`fr-container ${componentName}__container fr-py-8w fr-grid-row fr-grid-row--center`}
-    >
-      <h2 className={`${componentName}__title fr-mb-6w`}>
-        Questions fréquentes
-      </h2>
-      {articles && articles.length > 0 && (
-        <nav
-          className={`${componentName}__items fr-grid-row fr-grid-row--gutters`}
-        >
-          {articles.map((article, index) => (
-            <FaqCard
-              key={`section-faq-item-${index}`}
-              {...article}
-              index={index}
-            />
-          ))}
-        </nav>
-      )}
-      <Button
-        url="https://aide.immersion-facile.beta.gouv.fr/fr/"
-        target="_blank"
-        id={`im-section-faq__see-all-button`}
-        className="fr-mt-4w fr-mx-auto"
+export const SectionFaq = ({ articles }: SectionFaqProps) => {
+  const { cx } = useStyles();
+  return (
+    <section className={cx(componentName)}>
+      <div
+        className={cx(
+          fr.cx(
+            "fr-container",
+            "fr-py-8w",
+            "fr-grid-row",
+            "fr-grid-row--center",
+          ),
+          `${componentName}__container`,
+        )}
       >
-        Voir toutes les questions fréquentes
-      </Button>
-    </div>
-  </section>
-);
+        <h2 className={cx(fr.cx("fr-mb-6w"), `${componentName}__title`)}>
+          Questions fréquentes
+        </h2>
+        {articles && articles.length > 0 && (
+          <nav
+            className={cx(
+              fr.cx("fr-grid-row", "fr-grid-row--gutters"),
+              `${componentName}__items`,
+            )}
+          >
+            {articles.map((article, index) => (
+              <FaqCard
+                key={`section-faq-item-${index}`}
+                {...article}
+                index={index}
+              />
+            ))}
+          </nav>
+        )}
+        <Button
+          url="https://aide.immersion-facile.beta.gouv.fr/fr/"
+          target="_blank"
+          id={`im-section-faq__see-all-button`}
+          className={fr.cx("fr-mt-4w", "fr-mx-auto")}
+        >
+          Voir toutes les questions fréquentes
+        </Button>
+      </div>
+    </section>
+  );
+};
 
 export type FaqCardProps = {
   title: string;
@@ -48,11 +64,11 @@ export type FaqCardProps = {
 };
 
 const FaqCard = ({ title, description, url, index }: FaqCardProps) => (
-  <div className="fr-col-12 fr-col-lg-4">
-    <div className="fr-card fr-enlarge-link">
-      <div className="fr-card__body">
-        <div className="fr-card__content">
-          <h3 className="fr-card__title">
+  <div className={fr.cx("fr-col-12", "fr-col-lg-4")}>
+    <div className={fr.cx("fr-card", "fr-enlarge-link")}>
+      <div className={fr.cx("fr-card__body")}>
+        <div className={fr.cx("fr-card__content")}>
+          <h3 className={fr.cx("fr-card__title")}>
             <a
               href={url}
               target="_blank"
@@ -61,7 +77,7 @@ const FaqCard = ({ title, description, url, index }: FaqCardProps) => (
               {title}
             </a>
           </h3>
-          <p className="fr-card__desc">{description}</p>
+          <p className={fr.cx("fr-card__desc")}>{description}</p>
         </div>
       </div>
     </div>

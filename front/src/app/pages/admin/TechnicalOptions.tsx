@@ -5,6 +5,8 @@ import { useDispatch } from "react-redux";
 import { FeatureFlag } from "shared";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFlags.slice";
+import { fr } from "@codegouvfr/react-dsfr";
+import { useStyles } from "tss-react/dsfr";
 
 const labelsByFeatureFlag: Record<FeatureFlag, string> = {
   enableAdminUi: "Ui Admin",
@@ -18,18 +20,22 @@ const labelsByFeatureFlag: Record<FeatureFlag, string> = {
 export const TechnicalOptions = () => {
   const { isLoading, ...featureFlags } = useFeatureFlags();
   const dispatch = useDispatch();
+  const { cx } = useStyles();
 
   return (
-    <div className="fr-container">
+    <div className={fr.cx("fr-container")}>
       <h4>Les fonctionnalités optionnelles :</h4>
-      <div className="fr-grid-row">
-        <div className="fr-col-6">
-          <div className="fr-form-group">
-            <fieldset className="fr-fieldset">
-              <div className="fr-fieldset__content">
+      <div className={fr.cx("fr-grid-row")}>
+        <div className={fr.cx("fr-col-6")}>
+          <div className={fr.cx("fr-input-group")}>
+            <fieldset className={fr.cx("fr-fieldset")}>
+              <div className={fr.cx("fr-fieldset__content")}>
                 {keys(featureFlags).map((featureFlagName) => (
                   <div
-                    className="fr-radio-group fr-radio-rich hover:opacity-60"
+                    className={cx(
+                      fr.cx("fr-radio-group", "fr-radio-rich"),
+                      "hover:opacity-60",
+                    )}
                     key={featureFlagName}
                   >
                     <Switch
