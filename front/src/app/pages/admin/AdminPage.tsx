@@ -92,22 +92,20 @@ export const AdminPage = ({
     <>
       <ImmersionHeader />
       <div className="fr-container">
-        <div className="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
-          <div className="fr-col fr-p-2w mt-4">
-            <TabLinks
-              navLinks={getNavLinks(currentTab)}
-              navWrapper={{
-                role: "navigation",
-                id: "menu-admin",
-                className: "fr-nav fr-nav--admin",
-                ariaLabel: "Menu admin",
-                style: {
-                  marginBottom: "1.5rem",
-                },
-              }}
-            />
-            <div className="fr-tab-content">{tabsByName[currentTab]()}</div>
-          </div>
+        <div className="fr-mt-2w">
+          <TabLinks
+            navLinks={getNavLinks(currentTab)}
+            navWrapper={{
+              role: "navigation",
+              id: "menu-admin",
+              className: "fr-nav fr-nav--admin",
+              ariaLabel: "Menu admin",
+              style: {
+                marginBottom: "1.5rem",
+              },
+            }}
+          />
+          <div className="fr-tab-content">{tabsByName[currentTab]()}</div>
         </div>
       </div>
     </>

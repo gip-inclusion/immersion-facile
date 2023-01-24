@@ -82,11 +82,8 @@ const Email = ({ email }: { email: EmailSentDto }) => {
               return (
                 <li key={key}>
                   {" "}
-                  <span className="font-normal">{key} :</span>{" "}
-                  <span
-                    style={{ width: "500px" }}
-                    className="font-thin inline-block break-words"
-                  >
+                  <span>{key} :</span>{" "}
+                  <span style={{ wordWrap: "break-word" }}>
                     {links.includes(key) ? (
                       <a href={value as string}>Liens vers la page</a>
                     ) : (
