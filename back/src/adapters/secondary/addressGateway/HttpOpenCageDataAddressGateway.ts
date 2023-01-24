@@ -229,7 +229,7 @@ export class HttpOpenCageDataAddressGateway implements AddressGateway {
       const { responseBody } = await this.httpClient.geosearch({
         headers: {
           "OpenCage-Geosearch-Key": this.geosearchApiKey,
-          Origin: "https://beta.pole-emploi.fr", // OC Geosearch needs an Origin that fits to API key domain (with https://)
+          Origin: "https://immersion-facile.beta.gouv.fr", // OC Geosearch needs an Origin that fits to API key domain (with https://)
         },
         mode: "cors",
         queryParams: {
