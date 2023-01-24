@@ -13,7 +13,7 @@ import { EstablishmentEditionFormPage } from "src/app/pages/establishment/Establ
 import { EstablishmentFormPageForExternals } from "src/app/pages/establishment/EstablishmentFormPageForExternals";
 import { SearchPage } from "src/app/pages/search/SearchPage";
 import { StatsPage } from "src/app/pages/StatsPage";
-import { AdminPrivateRoute } from "src/app/routes/AdminPrivateRoute";
+import { AdminPrivateRoute, LoginForm } from "src/app/routes/AdminPrivateRoute";
 import { InclusionConnectedPrivateRoute } from "src/app/routes/InclusionConnectedPrivateRoute";
 import { RenewExpiredLinkPage } from "src/app/routes/RenewExpiredLinkPage";
 import { Route } from "type-route";
@@ -22,7 +22,12 @@ import { ErrorPage } from "../pages/error/ErrorPage";
 import { EstablishmentFormPage } from "../pages/establishment/EstablishmentFormPage";
 import { HomePage } from "../pages/home/HomePage";
 import { ImmersionAssessmentPage } from "../pages/immersion-assessment/ImmersionAssessmentPage";
-import { StandardPageSlugs, standardPageSlugs } from "./route-params";
+import {
+  AdminTab,
+  adminTabs,
+  StandardPageSlugs,
+  standardPageSlugs,
+} from "./route-params";
 import { routes, useRoute } from "./routes";
 import { ConventionPageForExternals } from "../pages/convention/ConventionPageForExternals";
 
@@ -32,12 +37,15 @@ const getPageByRouteName: {
   [K in keyof Routes]: (route: Route<Routes[K]>) => unknown;
 } = {
   addAgency: () => <AddAgencyPage />,
-  adminRoot: () => routes.adminTab({ tab: "conventions" }).replace(),
-  adminTab: (route) => (
-    <AdminPrivateRoute>
-      <AdminPage route={route} />
-    </AdminPrivateRoute>
-  ),
+  adminRoot: () => <LoginForm />,
+  adminTab: (route) =>
+    adminTabs.includes(route.params.tab as AdminTab) ? (
+      <AdminPrivateRoute>
+        <AdminPage route={route} />
+      </AdminPrivateRoute>
+    ) : (
+      <ErrorPage type="httpClientNotFoundError" />
+    ),
   agencyDashboard: (route) => (
     <InclusionConnectedPrivateRoute route={route}>
       <AgencyDashboardPage />
@@ -82,7 +90,6 @@ const getPageByRouteName: {
 export const Router = () => {
   const route = useRoute();
   const routeName = route.name;
-
   return (
     <>
       {routeName === false ? (

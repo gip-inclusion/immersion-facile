@@ -11,15 +11,18 @@ export const standardPageSlugs = [
   "plan-du-site",
 ] as const;
 
-export type AdminTab =
-  | "conventions"
-  | "events"
-  | "agency-validation"
-  | "exports"
-  | "emails"
-  | "technical-options"
-  | "email-preview"
-  | "establishment-batch";
+export const adminTabs = [
+  "conventions",
+  "events",
+  "agency-validation",
+  "exports",
+  "emails",
+  "technical-options",
+  "email-preview",
+  "establishment-batch",
+] as const;
+
+export type AdminTab = (typeof adminTabs)[number];
 
 export const adminTabSerializer: ValueSerializer<AdminTab> = {
   parse: (raw) => raw as AdminTab,

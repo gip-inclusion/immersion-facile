@@ -1,5 +1,5 @@
 import { Form, Formik } from "formik";
-import React from "react";
+import React, { useEffect } from "react";
 import { Button, MainWrapper, Notification } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { UserAndPassword, userAndPasswordSchema } from "shared";
@@ -10,26 +10,39 @@ import { adminAuthSlice } from "src/core-logic/domain/admin/adminAuth/adminAuth.
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
 import { fr } from "@codegouvfr/react-dsfr";
+import { routes } from "./routes";
+import { AdminTab } from "./route-params";
 
 export const AdminPrivateRoute = ({
   children,
 }: {
   children: React.ReactElement;
-}) => {
-  const isAuthenticatedAsAdmin = useAppSelector(
-    adminSelectors.auth.isAuthenticated,
+}) =>
+  useAppSelector(adminSelectors.auth.isAuthenticated) ? (
+    children
+  ) : (
+    <LoginForm redirectRouteName={children.props.route.params.tab} />
   );
 
-  if (!isAuthenticatedAsAdmin) return <LoginForm />;
-  return children;
-};
-
-const LoginForm = () => {
+export const LoginForm = ({
+  redirectRouteName,
+}: {
+  redirectRouteName?: AdminTab;
+}) => {
   const dispatch = useDispatch();
   const error = useAppSelector(adminSelectors.auth.error);
   const isLoading = useAppSelector(adminSelectors.auth.isLoading);
+  const isAuthenticated = useAppSelector(adminSelectors.auth.isAuthenticated);
   const initialValues: UserAndPassword = { user: "", password: "" };
-
+  useEffect(() => {
+    if (isAuthenticated) {
+      routes
+        .adminTab({
+          tab: redirectRouteName || "conventions",
+        })
+        .push();
+    }
+  }, [isAuthenticated]);
   return (
     <HeaderFooterLayout>
       <MainWrapper layout="boxed">
