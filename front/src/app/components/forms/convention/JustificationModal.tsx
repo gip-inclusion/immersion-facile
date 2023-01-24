@@ -17,6 +17,7 @@ import {
 } from "shared";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
+import { fr } from "@codegouvfr/react-dsfr";
 
 type JustificationModalProps = {
   title: React.ReactNode;
@@ -45,7 +46,7 @@ export const JustificationModal = ({
           <Notification
             title={"Attention !"}
             type={"warning"}
-            className="fr-mb-2w"
+            className={fr.cx("fr-mb-2w")}
           >
             Ne surtout pas demander de modification si une signature manque !
             Cela revient à annuler les signatures déjà enregistrées. Pour
@@ -66,7 +67,12 @@ export const JustificationModal = ({
               label={inputLabelByStatus[newStatus]}
               name={name}
             />
-            <ButtonsGroup className="fr-btns-group--inline-md fr-btns-group--center">
+            <ButtonsGroup
+              className={fr.cx(
+                "fr-btns-group--inline-md",
+                "fr-btns-group--center",
+              )}
+            >
               <Button
                 type="button"
                 level={"secondary"}

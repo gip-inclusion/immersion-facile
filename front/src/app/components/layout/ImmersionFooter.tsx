@@ -13,8 +13,8 @@ import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";
 const getFooterNavLinkId = (chunk: string) => `im-footer-nav__${chunk}`;
 
 export const MinistereLogo = () => (
-  <div className="fr-footer__brand fr-enlarge-link">
-    <p className="fr-logo">
+  <div className={fr.cx("fr-footer__brand", "fr-enlarge-link")}>
+    <p className={fr.cx("fr-logo")}>
       Ministère
       <br />
       du travail,

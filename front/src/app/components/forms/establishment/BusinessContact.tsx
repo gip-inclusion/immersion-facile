@@ -6,6 +6,7 @@ import { FillableList } from "src/app/components/forms/commons/FillableList";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
+import { fr } from "@codegouvfr/react-dsfr";
 
 const preferredContactMethodOptions: Array<{
   label?: string;
@@ -32,9 +33,11 @@ export const BusinessContact = () => {
   const formContents = getFormFields();
   const { values, setFieldValue } = useFormikContext<FormEstablishmentDto>();
   return (
-    <div className="fr-input-group">
+    <div className={fr.cx("fr-input-group")}>
       <div>
-        <h2 className="fr-text--lead">Détails du correspondant immersion :</h2>
+        <h2 className={fr.cx("fr-text--lead")}>
+          Détails du correspondant immersion :
+        </h2>
         <p>Le correspondant reçoit les demandes et les traite.</p>
       </div>
       <TextInput {...formContents["businessContact.lastName"]} />

@@ -3,6 +3,8 @@ import React from "react";
 import { ButtonAdd } from "react-design-system";
 import { AppellationDto, removeAtIndex } from "shared";
 import { FormEstablishmentAppellation } from "./FormEstablishmentAppellation";
+import { fr } from "@codegouvfr/react-dsfr";
+import { useStyles } from "tss-react/dsfr";
 
 type AppellationListProps = {
   name: string;
@@ -10,6 +12,7 @@ type AppellationListProps = {
 };
 
 export const AppellationList = ({ name, title }: AppellationListProps) => {
+  const { cx } = useStyles();
   const [field, { touched, error }, { setValue }] = useField<AppellationDto[]>({
     name,
   });
@@ -21,9 +24,9 @@ export const AppellationList = ({ name, title }: AppellationListProps) => {
   };
 
   return (
-    <div className="im-appellation-autocomplete fr-input-group">
+    <div className={cx(fr.cx("fr-input-group"), "im-appellation-autocomplete")}>
       <>
-        {title && <h2 className="fr-text--lead">{title}</h2>}
+        {title && <h2 className={fr.cx("fr-text--lead")}>{title}</h2>}
         {appellations.map(({ appellationCode }, index) => (
           <FormEstablishmentAppellation
             name={`${name}[${index}]`}
@@ -34,7 +37,7 @@ export const AppellationList = ({ name, title }: AppellationListProps) => {
         ))}
       </>
       <ButtonAdd
-        className="fr-my-4v"
+        className={fr.cx("fr-my-4v")}
         onClick={() =>
           setValue([
             ...field.value,
@@ -51,7 +54,10 @@ export const AppellationList = ({ name, title }: AppellationListProps) => {
       </ButtonAdd>
 
       {touched && error && (
-        <div id={name + "-error-description"} className="fr-error-text">
+        <div
+          id={name + "-error-description"}
+          className={fr.cx("fr-error-text")}
+        >
           {typeof error === "string" ? error : "Indiquez au moins 1 métier."}
         </div>
       )}

@@ -15,6 +15,7 @@ import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishm
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { AppellationList } from "./AppellationList";
 import { BusinessContact } from "./BusinessContact";
+import { fr } from "@codegouvfr/react-dsfr";
 
 type EstablishmentFormProps = {
   initialValues: FormEstablishmentDto;
@@ -95,7 +96,9 @@ export const EstablishmentFormikForm = ({
             pour chaque établissement (Siret différent).
           </p>
           <Form>
-            <h2 className="fr-text--lead fr-mb-2w">Votre établissement</h2>
+            <h2 className={fr.cx("fr-text--lead", "fr-mb-2w")}>
+              Votre établissement
+            </h2>
             {children}
             <BoolCheckboxGroup
               {...formContents.isEngagedEnterprise}
@@ -171,9 +174,13 @@ export const EstablishmentFormikForm = ({
               </Notification>
             )}
             {!isSuccess && (
-              <div className="fr-mt-4w">
+              <div className={fr.cx("fr-mt-4w")}>
                 <button
-                  className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"
+                  className={fr.cx(
+                    "fr-btn",
+                    "fr-icon-checkbox-circle-line",
+                    "fr-btn--icon-left",
+                  )}
                   type="submit"
                   disabled={isSubmitting}
                 >

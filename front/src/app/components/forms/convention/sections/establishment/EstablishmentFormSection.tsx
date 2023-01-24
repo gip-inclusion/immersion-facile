@@ -17,6 +17,7 @@ import { Notification } from "react-design-system";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { useFormikContext } from "formik";
+import { fr } from "@codegouvfr/react-dsfr";
 
 type EstablishmentFormSectionParams = {
   isFrozen: boolean | undefined;
@@ -52,7 +53,7 @@ export const EstablishmentFormSection = ({
           federatedIdentity={federatedIdentity}
         />
       </SectionTitle>
-      <Notification type="info" title="" className="fr-my-2w">
+      <Notification type="info" title="" className={fr.cx("fr-my-2w")}>
         {t.establishmentSection.subtitle}
       </Notification>
       <EstablishmentBusinessFields disabled={isFrozen || isFetchingSiret} />

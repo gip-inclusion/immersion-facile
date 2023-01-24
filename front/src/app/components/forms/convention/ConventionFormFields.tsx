@@ -17,6 +17,7 @@ import { EstablishmentFormSection } from "./sections/establishment/Establishment
 import { ImmersionConditionFormSection } from "./sections/immersion-conditions/ImmersionConditionFormSection";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
+import { fr } from "@codegouvfr/react-dsfr";
 
 type ConventionFieldsProps = {
   isFrozen?: boolean;
@@ -88,7 +89,7 @@ export const ConventionFormFields = ({
         isFrozen={isFrozen}
       />
       {!isFrozen && (
-        <Notification title={""} type={"info"} className="fr-my-2w">
+        <Notification title={""} type={"info"} className={fr.cx("fr-my-2w")}>
           <ol>
             <li>
               Une fois le formulaire envoyé, chaque signataire de la convention
@@ -114,7 +115,7 @@ export const ConventionFormFields = ({
       )}
 
       {!isFrozen && !isSignatureMode && (
-        <div className="fr-mt-4w">
+        <div className={fr.cx("fr-mt-4w")}>
           <SubmitButton
             isSubmitting={isSubmitting}
             disabled={isFrozen || isSignatureMode}

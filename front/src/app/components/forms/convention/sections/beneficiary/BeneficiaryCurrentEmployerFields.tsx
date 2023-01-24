@@ -7,6 +7,7 @@ import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { useField } from "formik";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
+import { fr } from "@codegouvfr/react-dsfr";
 
 type BeneficiaryCurrentEmployerFieldsProperties = {
   disabled: boolean | undefined;
@@ -36,7 +37,7 @@ export const BeneficiaryCurrentEmployerFields = ({
       <Notification
         type="info"
         title="Accord de l'employeur"
-        className="fr-mb-2w"
+        className={fr.cx("fr-mb-2w")}
       >
         <p>
           <strong>

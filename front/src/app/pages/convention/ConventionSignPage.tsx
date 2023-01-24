@@ -33,6 +33,8 @@ import {
 } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { Route } from "type-route";
+import { fr } from "@codegouvfr/react-dsfr";
+import { useStyles } from "tss-react/dsfr";
 
 type SignFormRoute = Route<typeof routes.conventionToSign>;
 
@@ -68,7 +70,7 @@ export const ConventionSignPage = ({ route }: SignFormProps) => {
   if (!signatoryRoles.includes(payload.role as SignatoryRole))
     return (
       <HeaderFooterLayout>
-        <div className="p-5">
+        <div className={fr.cx("fr-p-2w")}>
           <Notification title="Utilisateur incorrect" type="error">
             <p>
               Seul les signataires peuvent signer la convention. Le lien que
@@ -105,6 +107,8 @@ const SignFormSpecific = ({ jwt }: SignFormSpecificProps) => {
     conventionSelectors.signatoryData,
   );
   const dispatch = useDispatch();
+
+  const { cx } = useStyles();
 
   useEffect(() => {
     const role = extractRole(jwt);
@@ -156,11 +160,11 @@ const SignFormSpecific = ({ jwt }: SignFormSpecificProps) => {
       }
     >
       <>
-        <div className="fr-text">
+        <div className={cx("fr-text")}>
           Voici la demande de convention qui vient d'être complétée. <br />
           Relisez la bien et si cela vous convient, signez la avec le bouton "je
           signe cette demande"
-          <p className="fr-text--xs fr-mt-1w">
+          <p className={fr.cx("fr-text--xs", "fr-mt-1w")}>
             Ce formulaire vaut équivalence du CERFA 13912 * 04
           </p>
         </div>
@@ -243,7 +247,7 @@ const ConventionRejectedMessage = () => (
       type="error"
       title="Désolé : votre demande d'immersion a été refusée"
     >
-      <p className="fr-mt-1w">
+      <p className={fr.cx("fr-mt-1w")}>
         Votre demande d'immersion a été refusée. Vous avez reçu un mail vous en
         donnant les raisons.
       </p>
@@ -257,28 +261,34 @@ const ConventionNeedsModificationMessage = (props: { jwt: string }) => (
     <Notification
       type="info"
       title="Des modifications ont été demandées sur votre demande"
+      className={fr.cx("fr-my-2w")}
     >
-      <p className="fr-mt-1w">
+      <p className={fr.cx("fr-mt-1w")}>
         Vous ne pouvez pas encore signer votre demande d'immersion car des
         modifications ont été réclamées par votre conseiller (Vous avez reçu un
         mail précisant les changements à effectuer).
       </p>
 
-      <span className="block">
+      <p>
         <a {...routes.conventionImmersion({ jwt: props.jwt }).link}>
           Cliquez ici pour aller à la page d'édition
         </a>
-      </span>
+      </p>
     </Notification>
   </SignPageLayout>
 );
-
 const SignPageLayout = ({
   children,
 }: {
   children: React.ReactElement;
 }): JSX.Element => (
-  <div className="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
-    <div className="fr-col-lg-8 fr-p-2w">{children}</div>
+  <div
+    className={fr.cx(
+      "fr-grid-row",
+      "fr-grid-row--center",
+      "fr-grid-row--gutters",
+    )}
+  >
+    <div className={fr.cx("fr-col-lg-8", "fr-p-2w")}>{children}</div>
   </div>
 );

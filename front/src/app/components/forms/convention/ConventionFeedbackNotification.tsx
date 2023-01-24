@@ -11,6 +11,8 @@ import {
   ConventionSubmitFeedback,
   ConventionFeedbackKind,
 } from "src/core-logic/domain/convention/convention.slice";
+import { fr } from "@codegouvfr/react-dsfr";
+import { useStyles } from "tss-react/dsfr";
 
 type ConventionSubmitFeedbackNotificationProps = {
   submitFeedback: ConventionSubmitFeedback;
@@ -72,23 +74,26 @@ const InitialSubmitSuccessMessageBase = ({
   children,
 }: {
   children: React.ReactNode;
-}) => (
-  <div className={"fr-mt-2w"}>
-    Merci d'avoir complété cette demande de convention.
-    <ul className={"fr-my-2w"}>{children}</ul>
-    <p className="fr-text fr-my-2w">
-      N'hésitez pas à prévenir et relancer votre tuteur. Sans votre signature et
-      celle de l'entreprise, la demande ne peut pas être étudiée par votre
-      conseiller.
-    </p>
-    <p className="fr-text fr-my-2w">
-      Pensez à vérifier votre boîte mail et vos spams.
-    </p>
-    <p className="fr-text fr-my-2w">
-      Si vous ne recevez rien, alertez nous:&nbsp;
-      <a href={`mailto:${immersionFacileContactEmail}`}>
-        {immersionFacileContactEmail}
-      </a>
-    </p>
-  </div>
-);
+}) => {
+  const { cx } = useStyles();
+  return (
+    <div className={fr.cx("fr-mt-2w")}>
+      Merci d'avoir complété cette demande de convention.
+      <ul className={fr.cx("fr-my-2w")}>{children}</ul>
+      <p className={cx(fr.cx("fr-my-2w"), "fr-text")}>
+        N'hésitez pas à prévenir et relancer votre tuteur. Sans votre signature
+        et celle de l'entreprise, la demande ne peut pas être étudiée par votre
+        conseiller.
+      </p>
+      <p className={cx(fr.cx("fr-my-2w"), "fr-text")}>
+        Pensez à vérifier votre boîte mail et vos spams.
+      </p>
+      <p className={cx(fr.cx("fr-my-2w"), "fr-text")}>
+        Si vous ne recevez rien, alertez nous:&nbsp;
+        <a href={`mailto:${immersionFacileContactEmail}`}>
+          {immersionFacileContactEmail}
+        </a>
+      </p>
+    </div>
+  );
+};

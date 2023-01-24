@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import { AutocompleteInput } from "react-design-system";
 import { LookupSearchResult } from "shared";
 import { apiAddressGateway } from "src/config/dependencies";
+import { fr } from "@codegouvfr/react-dsfr";
+import { useStyles } from "tss-react/dsfr";
 
 export type PlaceAutocompleteProps = {
   label: string;
@@ -27,6 +29,7 @@ export const PlaceAutocomplete = ({
   onValueChange,
   id = "im-place-autocomplete",
 }: PlaceAutocompleteProps) => {
+  const { cx } = useStyles();
   const [selectedOption, setSelectedOption] =
     useState<LookupSearchResult | null>(null);
   const [searchValue, setSearchValue] = useState<string>(initialValue);
@@ -49,7 +52,7 @@ export const PlaceAutocomplete = ({
     setSearchValue(value ? value.label : "");
   };
   return (
-    <div className="fr-input-group">
+    <div className={fr.cx("fr-input-group")}>
       <Autocomplete
         loading={isSearching}
         loadingText="Recherche de ville en cours... 🔎"
@@ -75,7 +78,9 @@ export const PlaceAutocomplete = ({
         )}
       />
       {description && (
-        <span className="if-autocomplete-input__notice">{description}</span>
+        <span className={cx("if-autocomplete-input__notice")}>
+          {description}
+        </span>
       )}
     </div>
   );

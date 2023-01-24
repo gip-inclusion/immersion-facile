@@ -9,6 +9,8 @@ import { ConventionPresentation } from "src/app/components/forms/convention/conv
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
+import { fr } from "@codegouvfr/react-dsfr";
+import { useStyles } from "tss-react/dsfr";
 
 type ConventionFormProps = {
   properties: ConventionPresentation;
@@ -46,12 +48,15 @@ export const ConventionFormUkraine = ({ properties }: ConventionFormProps) => {
   );
 };
 
-const StaticText = () => (
-  <>
-    <div className="fr-text">
-      <p className="fr-text--xs">
-        Ce formulaire vaut équivalence du CERFA 13912 * 04
-      </p>
-    </div>
-  </>
-);
+const StaticText = () => {
+  const { cx } = useStyles();
+  return (
+    <>
+      <div className={cx("fr-text")}>
+        <p className={fr.cx("fr-text--xs")}>
+          Ce formulaire vaut équivalence du CERFA 13912 * 04
+        </p>
+      </div>
+    </>
+  );
+};

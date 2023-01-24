@@ -18,6 +18,7 @@ import {
 import { useImmersionAssessment } from "src/app/hooks/immersionAssessment";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
+import { fr } from "@codegouvfr/react-dsfr";
 
 type ImmersionAssessmentFormProperties = {
   convention: ConventionReadDto;
@@ -57,7 +58,7 @@ export const ImmersionAssessmentForm = ({
             label="Comment s'est passée l'immersion ?"
             name={getName("establishmentFeedback")}
           />
-          <ul className="fr-btns-group">
+          <ul className={fr.cx("fr-btns-group")}>
             <li>
               <Button
                 type="submit"
@@ -70,7 +71,7 @@ export const ImmersionAssessmentForm = ({
                 <Notification
                   type="error"
                   title="Erreur"
-                  className="fr-mx-1w fr-mb-4w"
+                  className={fr.cx("fr-mx-1w", "fr-mb-4w")}
                 >
                   {assessmentError}
                 </Notification>
@@ -79,7 +80,7 @@ export const ImmersionAssessmentForm = ({
                 <Notification
                   type="success"
                   title={"Bilan envoyé"}
-                  className="fr-mx-1w fr-mb-4w"
+                  className={fr.cx("fr-mx-1w", "fr-mb-4w")}
                 >
                   Le bilan a bien été envoyé au conseiller
                 </Notification>

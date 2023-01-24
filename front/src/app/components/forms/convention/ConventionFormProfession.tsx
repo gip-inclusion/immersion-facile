@@ -4,6 +4,7 @@ import { TextInputError } from "react-design-system";
 import { AppellationDto, ConventionDto } from "shared";
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
+import { fr } from "@codegouvfr/react-dsfr";
 
 type ConventionFormProfessionProps = {
   label: string;
@@ -39,7 +40,7 @@ export const ConventionFormProfession = ({
 
   return (
     <>
-      <div className="fr-input-group">
+      <div className={fr.cx("fr-input-group")}>
         <AppellationAutocomplete
           label={label}
           initialValue={initialFieldValue}

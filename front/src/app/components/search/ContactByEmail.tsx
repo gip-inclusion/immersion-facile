@@ -10,6 +10,7 @@ import {
 import { immersionSearchGateway } from "src/config/dependencies";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
+import { fr } from "@codegouvfr/react-dsfr";
 
 type ContactByEmailProps = {
   siret: SiretDto;
@@ -64,7 +65,7 @@ export const ContactByEmail = ({
           <>
             <ModalTitle>Contacter l'entreprise</ModalTitle>
 
-            <p className="fr-pb-3w">
+            <p className={fr.cx("fr-pb-3w")}>
               Cette entreprise a choisi d'être contactée par mail. Veuillez
               compléter ce formulaire qui sera transmis à l'entreprise.
             </p>

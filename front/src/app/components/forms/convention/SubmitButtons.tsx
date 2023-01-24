@@ -1,6 +1,7 @@
 import { useField } from "formik";
 import React from "react";
 import { ConventionStatus } from "shared";
+import { fr } from "@codegouvfr/react-dsfr";
 
 type SubmitButtonProps = {
   isSubmitting: boolean;
@@ -23,7 +24,11 @@ export const SubmitButton = ({
 
   return (
     <button
-      className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"
+      className={fr.cx(
+        "fr-btn",
+        "fr-icon-checkbox-circle-line",
+        "fr-btn--icon-left",
+      )}
       type="button"
       onClick={makeInReviewAndSubmit}
       disabled={isSubmitting}
@@ -40,7 +45,11 @@ export const SignButton = ({
   disabled,
 }: SubmitButtonProps) => (
   <button
-    className="fr-btn fr-fi-checkbox-circle-line fr-btn--icon-left"
+    className={fr.cx(
+      "fr-btn",
+      "fr-icon-checkbox-circle-line",
+      "fr-btn--icon-left",
+    )}
     type="button"
     onClick={onSubmit}
     disabled={isSubmitting || disabled}
@@ -55,7 +64,12 @@ export const RequestModificationButton = ({
   disabled,
 }: SubmitButtonProps) => (
   <button
-    className="fr-btn fr-fi-edit-fill fr-btn--icon-left fr-btn--secondary"
+    className={fr.cx(
+      "fr-btn",
+      "fr-icon-edit-fill",
+      "fr-btn--icon-left",
+      "fr-btn--secondary",
+    )}
     type="button"
     onClick={onSubmit}
     disabled={isSubmitting || disabled}

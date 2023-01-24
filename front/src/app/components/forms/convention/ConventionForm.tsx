@@ -24,6 +24,7 @@ import { useExistingSiret } from "src/app/hooks/siret.hooks";
 import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
 import { ConventionFormFields } from "src/app/components/forms/convention/ConventionFormFields";
 import { useMatomo } from "src/app/hooks/useMatomo";
+import { useStyles } from "tss-react/dsfr";
 
 const useClearConventionSubmitFeedbackOnUnmount = () => {
   const dispatch = useDispatch();
@@ -65,6 +66,7 @@ export const ConventionForm = ({
   properties,
   routeParams = {},
 }: ConventionFormProps) => {
+  const { cx } = useStyles();
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
   const [initialValues] = useState<ConventionPresentation>({
     ...properties,
@@ -122,7 +124,7 @@ export const ConventionForm = ({
 
   return (
     <>
-      <div className="fr-text">{t.intro.welcome}</div>
+      <div className={cx("fr-text")}>{t.intro.welcome}</div>
       <Notification type="info" title="">
         {t.intro.conventionWelcomeNotification}
       </Notification>
