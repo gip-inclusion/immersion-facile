@@ -23,7 +23,7 @@ export const PageHeader = ({
   <section
     className={`${componentName} ${componentName}--${theme} ${
       className ?? ""
-    } fr-pb-5w fr-pt-6w`}
+    } fr-pb-5w fr-pt-8w`}
   >
     <div className={`${componentName}__inner fr-container`}>
       <h1
