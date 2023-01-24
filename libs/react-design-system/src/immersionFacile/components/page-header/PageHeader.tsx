@@ -23,13 +23,13 @@ export const PageHeader = ({
   <section
     className={`${componentName} ${componentName}--${theme} ${
       className ?? ""
-    } fr-pb-5w fr-pt-8w`}
+    } fr-py-7w`}
   >
     <div className={`${componentName}__inner fr-container`}>
       <h1
         className={`${componentName}__title ${
           centered ? `${componentName}__title--centered` : ""
-        }`}
+        } ${children ? "" : "fr-my-auto"}`}
       >
         {title}
       </h1>
