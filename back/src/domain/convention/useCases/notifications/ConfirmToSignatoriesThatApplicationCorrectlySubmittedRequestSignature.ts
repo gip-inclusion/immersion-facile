@@ -54,6 +54,7 @@ export class ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignatu
           type: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
           recipients: [signatory.email],
           params: {
+            internshipKind: convention.internshipKind,
             signatoryName: `${signatory.firstName} ${signatory.lastName}`,
             beneficiaryName: `${beneficiary.firstName} ${beneficiary.lastName}`,
             establishmentRepresentativeName: `${establishmentRepresentative.firstName} ${establishmentRepresentative.lastName}`,

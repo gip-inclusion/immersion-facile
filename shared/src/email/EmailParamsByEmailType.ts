@@ -1,17 +1,21 @@
+import { InternshipKind } from "../convention/convention.dto";
 import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 
 export type EmailParamsByEmailType = {
   SIGNEE_HAS_SIGNED_CONVENTION: {
+    internshipKind: InternshipKind;
     demandeId: string;
     signedAt: string;
     conventionStatusLink: string;
   };
   NEW_CONVENTION_BENEFICIARY_CONFIRMATION: {
+    internshipKind: InternshipKind;
     demandeId: string;
     firstName: string;
     lastName: string;
   };
   NEW_CONVENTION_AGENCY_NOTIFICATION: {
+    internshipKind: InternshipKind;
     demandeId: string;
     firstName: string;
     lastName: string;
@@ -23,12 +27,14 @@ export type EmailParamsByEmailType = {
     conventionStatusLink: string;
   };
   NEW_CONVENTION_ESTABLISHMENT_TUTOR_CONFIRMATION: {
+    internshipKind: InternshipKind;
     demandeId: string;
     establishmentTutorName: string;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
   };
   VALIDATED_CONVENTION_FINAL_CONFIRMATION: {
+    internshipKind: InternshipKind;
     totalHours: number;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
@@ -70,7 +76,6 @@ export type EmailParamsByEmailType = {
   POLE_EMPLOI_ADVISOR_ON_CONVENTION_ASSOCIATION: {
     advisorFirstName: string;
     advisorLastName: string;
-    //advisorType: string;
     immersionAddress: string;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
@@ -81,6 +86,7 @@ export type EmailParamsByEmailType = {
     magicLink: string;
   };
   REJECTED_CONVENTION_NOTIFICATION: {
+    internshipKind: InternshipKind;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
     rejectionReason: string;
@@ -90,6 +96,7 @@ export type EmailParamsByEmailType = {
     agency: string;
   };
   CONVENTION_MODIFICATION_REQUEST_NOTIFICATION: {
+    internshipKind: InternshipKind;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
     justification: string;
@@ -101,6 +108,7 @@ export type EmailParamsByEmailType = {
     conventionStatusLink: string;
   };
   NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION: {
+    internshipKind: InternshipKind;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
     businessName: string;
@@ -109,10 +117,12 @@ export type EmailParamsByEmailType = {
     possibleRoleAction: string;
   };
   MAGIC_LINK_RENEWAL: {
+    internshipKind: InternshipKind;
     magicLink: string;
     conventionStatusLink: string;
   };
   BENEFICIARY_OR_ESTABLISHMENT_REPRESENTATIVE_ALREADY_SIGNED_NOTIFICATION: {
+    internshipKind: InternshipKind;
     magicLink: string;
     conventionStatusLink: string;
     existingSignatureName: string;
@@ -123,44 +133,46 @@ export type EmailParamsByEmailType = {
     establishmentRepresentativeName: string;
   };
   NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE: {
-    beneficiaryName: string; //< BENEFICIARY_NAME
-    establishmentRepresentativeName: string; //< MENTOR_NAME
-    beneficiaryRepresentativeName?: string; //< LEGAL_REPRESENTATIVE_NAME
+    internshipKind: InternshipKind;
+    beneficiaryName: string;
+    establishmentRepresentativeName: string;
+    beneficiaryRepresentativeName?: string;
     beneficiaryCurrentEmployerName?: string;
-    signatoryName: string; //< SIGNATORY_NAME
-    magicLink: string; //< MAGIC_LINK
+    signatoryName: string;
+    magicLink: string;
     conventionStatusLink: string;
-    businessName: string; //< COMPANY_NAME
+    businessName: string;
   };
   CONTACT_BY_EMAIL_REQUEST: {
-    businessName: string; //< BUSINESS_NAME
-    contactFirstName: string; //< CONTACT_FIRSTNAME
-    contactLastName: string; //< CONTACT_LASTNAME
-    jobLabel: string; //< JOB_LABEL
-    potentialBeneficiaryFirstName: string; //< POTENTIAL_BENEFICIARY_FIRSTNAME
-    potentialBeneficiaryLastName: string; //< POTENTIAL_BENEFICIARY_LASTNAME
-    potentialBeneficiaryEmail: string; //< POTENTIAL_BENEFICIARY_EMAIL
-    message: string; //< MESSAGE
+    businessName: string;
+    contactFirstName: string;
+    contactLastName: string;
+    jobLabel: string;
+    potentialBeneficiaryFirstName: string;
+    potentialBeneficiaryLastName: string;
+    potentialBeneficiaryEmail: string;
+    message: string;
   };
   CONTACT_BY_PHONE_INSTRUCTIONS: {
-    businessName: string; //< BUSINESS_NAME
-    contactFirstName: string; //< CONTACT_FIRSTNAME
-    contactLastName: string; //< CONTACT_LASTNAME
-    contactPhone: string; //< CONTACT_PHONE
-    potentialBeneficiaryFirstName: string; //< POTENTIAL_BENEFICIARY_FIRSTNAME
-    potentialBeneficiaryLastName: string; //< POTENTIAL_BENEFICIARY_LASTNAME
+    businessName: string;
+    contactFirstName: string;
+    contactLastName: string;
+    contactPhone: string;
+    potentialBeneficiaryFirstName: string;
+    potentialBeneficiaryLastName: string;
   };
   CONTACT_IN_PERSON_INSTRUCTIONS: {
-    businessName: string; //< BUSINESS_NAME
-    contactFirstName: string; //< CONTACT_FIRSTNAME
-    contactLastName: string; //< CONTACT_LASTNAME
-    businessAddress: string; //< BUSINESS_ADDRESS
-    potentialBeneficiaryFirstName: string; //< POTENTIAL_BENEFICIARY_FIRSTNAME
-    potentialBeneficiaryLastName: string; //< POTENTIAL_BENEFICIARY_LASTNAME
+    businessName: string;
+    contactFirstName: string;
+    contactLastName: string;
+    businessAddress: string;
+    potentialBeneficiaryFirstName: string;
+    potentialBeneficiaryLastName: string;
   };
   SHARE_DRAFT_CONVENTION_BY_LINK: {
-    additionalDetails: string; //< ADDITIONAL_DETAILS
-    conventionFormUrl: string; //< APPLICATION_FORM_LINK
+    internshipKind: InternshipKind;
+    additionalDetails: string;
+    conventionFormUrl: string;
   };
   AGENCY_WAS_ACTIVATED: {
     agencyName: string;
@@ -178,19 +190,21 @@ export type EmailParamsByEmailType = {
     businessName: string;
   };
   CREATE_IMMERSION_ASSESSMENT: {
+    internshipKind: InternshipKind;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
     establishmentTutorName: string;
     immersionAssessmentCreationLink: string;
   };
   FULL_PREVIEW_EMAIL: {
-    beneficiaryName: string; //< BENEFICIARY_NAME
-    establishmentRepresentativeName: string; //< MENTOR_NAME
-    beneficiaryRepresentativeName?: string; //< LEGAL_REPRESENTATIVE_NAME
+    internshipKind: InternshipKind;
+    beneficiaryName: string;
+    establishmentRepresentativeName: string;
+    beneficiaryRepresentativeName?: string;
     beneficiaryCurrentEmployerName?: string;
-    signatoryName: string; //< SIGNATORY_NAME
-    magicLink: string; //< MAGIC_LINK
+    signatoryName: string;
+    magicLink: string;
     conventionStatusLink: string;
-    businessName: string; //< COMPANY_NAME
+    businessName: string;
   };
 };

@@ -65,6 +65,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
     expectToEqual(emailGw.getSentEmails(), [
       {
         params: {
+          internshipKind: signedConvention.internshipKind,
           demandeId: signedConvention.id,
           signedAt: signedConvention.signatories.beneficiary.signedAt!,
           conventionStatusLink,
@@ -91,6 +92,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
     expectToEqual(emailGw.getSentEmails(), [
       {
         params: {
+          internshipKind: signedConvention.internshipKind,
           signedAt:
             signedConvention.signatories.establishmentRepresentative.signedAt!,
           demandeId: signedConvention.id,

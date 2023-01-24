@@ -24,6 +24,7 @@ describe("Notify Discord", () => {
       id: "000112256465465465456",
       occurredAt: new Date().toISOString(),
       payload: {
+        internshipKind: "immersion",
         emails: ["test@mail.com"],
         magicLink: "http://0000magicLink00000",
         conventionStatusLink: "http://0000conventionStatusLink00000",

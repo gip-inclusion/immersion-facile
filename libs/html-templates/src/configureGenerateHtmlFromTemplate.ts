@@ -29,6 +29,10 @@ export const configureGenerateHtmlFromTemplate =
   <TemplateByName extends Record<string, HtmlTemplateEmailData<any>>>(
     templateByName: TemplateByName,
     config: { contactEmail: string },
+    customParts: {
+      header: string | undefined;
+      footer: string | undefined;
+    },
   ) =>
   <N extends keyof TemplateByName>(
     templateName: N,
@@ -40,8 +44,7 @@ export const configureGenerateHtmlFromTemplate =
     tags?: string[];
     attachment?: { url: string }[];
   } => {
-    const { createEmailVariables, tags, attachmentUrls } =
-      templateByName[templateName];
+    const { createEmailVariables, tags } = templateByName[templateName];
     const {
       subject,
       agencyLogoUrl,
@@ -51,6 +54,7 @@ export const configureGenerateHtmlFromTemplate =
       highlight,
       subContent,
       legals,
+      attachmentUrls,
     } = createEmailVariables(params as any);
 
     const doctype =
@@ -63,14 +67,14 @@ export const configureGenerateHtmlFromTemplate =
           <body>
             <table width="600" align="center" style="margin-top: 20px">
               ${[
-                renderHeader(agencyLogoUrl),
+                renderHeader(agencyLogoUrl, customParts.header),
                 renderGreetings(greetings),
                 renderContent(content),
                 renderButton(buttons),
                 renderHighlight(highlight),
                 renderContent(subContent),
                 renderLegals(legals),
-                renderFooter(config.contactEmail),
+                renderFooter(config.contactEmail, customParts.footer),
               ]
                 .map(renderHTMLRow)
                 .join("")}       

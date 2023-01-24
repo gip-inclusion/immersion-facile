@@ -41,6 +41,7 @@ import {
   GenerateMagicLinkRequestDto,
   ImmersionObjective,
   InternshipKind,
+  internshipKinds,
   levelsOfEducation,
   RenewMagicLinkRequestDto,
   Signatories,
@@ -162,6 +163,9 @@ const conventionCommonSchema: z.Schema<ConventionCommon> = z.object({
   immersionSkills: zStringPossiblyEmptyWithMax(2000),
   establishmentTutor: establishmentTutorSchema,
 });
+
+export const internshipKindSchema: z.Schema<InternshipKind> =
+  z.enum(internshipKinds);
 
 const conventionInternshipKindSpecificSchema: z.Schema<
   ConventionInternshipKindSpecific<InternshipKind>

@@ -272,6 +272,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
     expectTypeToMatchAndEqual(
       getValidatedConventionFinalConfirmationParams(agency, convention),
       {
+        internshipKind: convention.internshipKind,
         totalHours: 70,
         beneficiaryFirstName: convention.signatories.beneficiary.firstName,
         beneficiaryLastName: convention.signatories.beneficiary.lastName,
@@ -349,6 +350,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
     expectTypeToMatchAndEqual(
       getValidatedConventionFinalConfirmationParams(agency, convention),
       {
+        internshipKind: convention.internshipKind,
         totalHours: 70,
         beneficiaryFirstName: convention.signatories.beneficiary.firstName,
         beneficiaryLastName: convention.signatories.beneficiary.lastName,

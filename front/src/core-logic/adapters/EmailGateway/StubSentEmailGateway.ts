@@ -10,6 +10,7 @@ export class StubSentEmailGateway implements StubSentEmailGateway {
           recipients: ["tom.cruise@email.com"],
           cc: ["emilie.cooper@immersion.fr"],
           params: {
+            internshipKind: "immersion",
             beneficiaryFirstName: "Charlotte",
             beneficiaryLastName: "Grondin",
             businessName: "Boulangerie de la plage",
@@ -28,6 +29,7 @@ export class StubSentEmailGateway implements StubSentEmailGateway {
           recipients: ["virgina.wolf@email.com", "helene.joyeux@email.com"],
           cc: ["erika.grandjean@immersion.fr"],
           params: {
+            internshipKind: "immersion",
             beneficiaryFirstName: "Charlotte",
             beneficiaryLastName: "Grondin",
             establishmentTutorName: "Erika Grandjean",

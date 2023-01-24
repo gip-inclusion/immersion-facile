@@ -16,16 +16,19 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected extends Tra
 
   inputSchema = conventionSchema;
 
-  public async _execute(dto: ConventionDto, uow: UnitOfWork): Promise<void> {
-    const agency = await uow.agencyRepository.getById(dto.agencyId);
+  public async _execute(
+    convention: ConventionDto,
+    uow: UnitOfWork,
+  ): Promise<void> {
+    const agency = await uow.agencyRepository.getById(convention.agencyId);
     if (!agency) {
       throw new Error(
-        `Unable to send mail. No agency config found for ${dto.agencyId}`,
+        `Unable to send mail. No agency config found for ${convention.agencyId}`,
       );
     }
-    const beneficiary = dto.signatories.beneficiary;
+    const beneficiary = convention.signatories.beneficiary;
     const establishmentRepresentative =
-      dto.signatories.establishmentRepresentative;
+      convention.signatories.establishmentRepresentative;
 
     const recipients = [
       beneficiary.email,
@@ -36,13 +39,14 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected extends Tra
       type: "REJECTED_CONVENTION_NOTIFICATION",
       recipients,
       params: {
+        internshipKind: convention.internshipKind,
         beneficiaryFirstName: beneficiary.firstName,
         beneficiaryLastName: beneficiary.lastName,
-        businessName: dto.businessName,
-        rejectionReason: dto.rejectionJustification || "",
+        businessName: convention.businessName,
+        rejectionReason: convention.rejectionJustification || "",
         signature: agency.signature,
         agency: agency.name,
-        immersionProfession: dto.immersionAppellation.appellationLabel,
+        immersionProfession: convention.immersionAppellation.appellationLabel,
       },
     });
   }

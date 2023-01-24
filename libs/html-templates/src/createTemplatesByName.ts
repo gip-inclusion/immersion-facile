@@ -9,13 +9,13 @@ type CreateEmailVariable<P> = (params: P) => {
   legals?: string;
   agencyLogoUrl?: string;
   buttons?: EmailButtonProps[];
+  attachmentUrls?: string[];
 };
 
 export type HtmlTemplateEmailData<P> = {
   niceName: string;
   createEmailVariables: CreateEmailVariable<P>;
   tags?: string[];
-  attachmentUrls?: string[];
 };
 
 export const createTemplatesByName = <

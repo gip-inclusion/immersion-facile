@@ -21,6 +21,7 @@ describe("SendingBlueHtmlEmailGateway manual", () => {
       type: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
       recipients: ["recette@immersion-facile.beta.gouv.fr"],
       params: {
+        internshipKind: "immersion",
         magicLink: "www.google.com",
         conventionStatusLink: "www.google.com",
         businessName: "Super Corp",

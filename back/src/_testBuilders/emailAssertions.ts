@@ -52,6 +52,7 @@ export const expectEmaiSignatoryConfirmationSignatureRequestMatchingConvention =
       type: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
       recipients: [recipient],
       params: {
+        internshipKind: convention.internshipKind,
         signatoryName: `${signatory.firstName} ${signatory.lastName}`,
         beneficiaryName: `${beneficiary.firstName} ${beneficiary.lastName}`,
         establishmentRepresentativeName: `${establishmentRepresentative.firstName} ${establishmentRepresentative.lastName}`,
@@ -115,6 +116,7 @@ export const expectedEmailConventionReviewMatchingConvention = (
     type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
     recipients: [recipient],
     params: {
+      internshipKind: convention.internshipKind,
       beneficiaryFirstName: convention.signatories.beneficiary.firstName,
       beneficiaryLastName: convention.signatories.beneficiary.lastName,
       businessName: convention.businessName,
@@ -127,20 +129,21 @@ export const expectedEmailConventionReviewMatchingConvention = (
 export const expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected = (
   templatedEmail: TemplatedEmail,
   recipients: string[],
-  dto: ConventionDto,
+  convention: ConventionDto,
   agency: AgencyDto,
 ) => {
   expectTypeToMatchAndEqual(templatedEmail, {
     type: "REJECTED_CONVENTION_NOTIFICATION",
     recipients,
     params: {
-      beneficiaryFirstName: dto.signatories.beneficiary.firstName,
-      beneficiaryLastName: dto.signatories.beneficiary.lastName,
-      businessName: dto.businessName,
-      rejectionReason: dto.rejectionJustification || "",
+      internshipKind: convention.internshipKind,
+      beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+      beneficiaryLastName: convention.signatories.beneficiary.lastName,
+      businessName: convention.businessName,
+      rejectionReason: convention.rejectionJustification || "",
       signature: agency.signature,
       agency: agency.name,
-      immersionProfession: dto.immersionAppellation.appellationLabel,
+      immersionProfession: convention.immersionAppellation.appellationLabel,
     },
   });
 };

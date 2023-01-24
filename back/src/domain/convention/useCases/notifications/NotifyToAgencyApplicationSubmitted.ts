@@ -84,6 +84,7 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
           type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
           recipients: [counsellorEmail],
           params: {
+            internshipKind: convention.internshipKind,
             agencyName,
             businessName: convention.businessName,
             dateEnd: convention.dateEnd,

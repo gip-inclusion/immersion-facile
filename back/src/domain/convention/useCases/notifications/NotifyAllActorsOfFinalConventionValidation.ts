@@ -74,6 +74,7 @@ export const getValidatedConventionFinalConfirmationParams = (
   } = convention.signatories;
 
   return {
+    internshipKind: convention.internshipKind,
     totalHours: calculateTotalImmersionHoursBetweenDate({
       dateStart: convention.dateStart,
       dateEnd: convention.dateEnd,

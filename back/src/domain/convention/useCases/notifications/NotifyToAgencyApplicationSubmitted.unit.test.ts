@@ -90,6 +90,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
         type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
         recipients: [councellorEmail],
         params: {
+          internshipKind: validConvention.internshipKind,
           ...expectedParams(agencyWithCounsellors, validConvention),
           magicLink: fakeGenerateMagicLinkUrlFn({
             id: validConvention.id,
@@ -111,6 +112,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
         type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
         recipients: [councellorEmail2],
         params: {
+          internshipKind: validConvention.internshipKind,
           ...expectedParams(agencyWithCounsellors, validConvention),
           magicLink: fakeGenerateMagicLinkUrlFn({
             id: validConvention.id,
@@ -143,6 +145,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
         type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
         recipients: [validatorEmail],
         params: {
+          internshipKind: validConvention.internshipKind,
           ...expectedParams(agencyWithCounsellors, validConvention),
           magicLink: fakeGenerateMagicLinkUrlFn({
             id: validConvention.id,
@@ -177,6 +180,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
         type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
         recipients: [councellorEmail],
         params: {
+          internshipKind: validConvention.internshipKind,
           ...expectedParams(agencyWithConsellorsAndValidator, validConvention),
           magicLink: fakeGenerateMagicLinkUrlFn({
             id: validConvention.id,
@@ -198,6 +202,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
         type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
         recipients: [councellorEmail2],
         params: {
+          internshipKind: validConvention.internshipKind,
           ...expectedParams(agencyWithConsellorsAndValidator, validConvention),
           magicLink: fakeGenerateMagicLinkUrlFn({
             id: validConvention.id,

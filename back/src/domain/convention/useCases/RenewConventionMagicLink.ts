@@ -7,6 +7,7 @@ import {
   ConventionMagicLinkPayload,
   createConventionMagicLinkPayload,
   frontRoutes,
+  InternshipKind,
   RenewMagicLinkRequestDto,
   renewMagicLinkRequestSchema,
   Role,
@@ -64,7 +65,15 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
     const route = this.findRouteToRenew(originalUrl);
 
     // Only renew the link if the email hash matches
-    await this.onEmails(emails, emailHash, applicationId, role, route, uow);
+    await this.onEmails(
+      emails,
+      emailHash,
+      applicationId,
+      role,
+      route,
+      uow,
+      convention.internshipKind,
+    );
   }
 
   private async onEmails(
@@ -74,6 +83,7 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
     role: Role,
     route: string,
     uow: UnitOfWork,
+    internshipKind: InternshipKind,
   ) {
     let foundHit = false;
     for (const email of emails) {
@@ -95,6 +105,7 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
           this.createNewEvent({
             topic: "MagicLinkRenewalRequested",
             payload: {
+              internshipKind,
               emails,
               magicLink,
               conventionStatusLink,

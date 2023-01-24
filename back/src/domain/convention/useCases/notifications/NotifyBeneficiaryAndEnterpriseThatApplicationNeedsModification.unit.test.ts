@@ -76,6 +76,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
             type: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
             recipients: [expectedRecipient],
             params: {
+              internshipKind: convention.internshipKind,
               agency: agency.name,
               beneficiaryFirstName:
                 convention.signatories.beneficiary.firstName,

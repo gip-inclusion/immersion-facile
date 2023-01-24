@@ -52,7 +52,9 @@ export class PgConventionQueries implements ConventionQueries {
               'beneficiaryFirstName', beneficiaries.first_name, 
               'beneficiaryLastName', beneficiaries.last_name,
               'establishmentTutorName', CONCAT(establishmentTutors.first_name, ' ', establishmentTutors.last_name), 
-              'establishmentTutorEmail', establishmentTutors.email) AS params
+              'establishmentTutorEmail', establishmentTutors.email,
+              'internshipKind',conventions.internship_kind
+        ) AS params      
        FROM conventions 
        LEFT JOIN beneficiaries ON beneficiaries.convention_id = conventions.id
        LEFT JOIN establishmentTutors ON establishmentTutors.convention_id = conventions.id

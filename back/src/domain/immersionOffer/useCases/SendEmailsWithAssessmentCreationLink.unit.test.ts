@@ -1,4 +1,9 @@
-import { ConventionDtoBuilder, ConventionId, Role } from "shared";
+import {
+  ConventionDtoBuilder,
+  ConventionId,
+  expectToEqual,
+  Role,
+} from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { UuidV4Generator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
@@ -86,20 +91,24 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
 
     // Assert
     const sentEmails = emailGateway.getSentEmails();
-    expect(sentEmails).toHaveLength(1);
-    expect(sentEmails[0].type).toBe("CREATE_IMMERSION_ASSESSMENT");
-    expect(sentEmails[0].recipients).toEqual([
-      immersionApplicationEndingTomorrow.establishmentTutor.email,
+    expectToEqual(sentEmails, [
+      {
+        type: "CREATE_IMMERSION_ASSESSMENT",
+        recipients: [
+          immersionApplicationEndingTomorrow.establishmentTutor.email,
+        ],
+        params: {
+          internshipKind: immersionApplicationEndingTomorrow.internshipKind,
+          immersionAssessmentCreationLink: `www.immersion-facile.fr/bilan-immersion?jwt=jwtOfImmersion[immersion-ending-tommorow-id]`,
+          establishmentTutorName: "Tom Cruise",
+          beneficiaryFirstName:
+            immersionApplicationEndingTomorrow.signatories.beneficiary
+              .firstName,
+          beneficiaryLastName:
+            immersionApplicationEndingTomorrow.signatories.beneficiary.lastName,
+        },
+      },
     ]);
-
-    expect(sentEmails[0].params).toEqual({
-      immersionAssessmentCreationLink: `www.immersion-facile.fr/bilan-immersion?jwt=jwtOfImmersion[immersion-ending-tommorow-id]`,
-      establishmentTutorName: "Tom Cruise",
-      beneficiaryFirstName:
-        immersionApplicationEndingTomorrow.signatories.beneficiary.firstName,
-      beneficiaryLastName:
-        immersionApplicationEndingTomorrow.signatories.beneficiary.lastName,
-    });
     expect(outboxRepository.events).toHaveLength(1);
     expect(outboxRepository.events[0].payload).toMatchObject({
       id: "immersion-ending-tommorow-id",

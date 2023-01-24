@@ -145,6 +145,7 @@ describe("SendingBlueHtmlEmailGateway unit", () => {
       <img src="https://immersion.cellar-c2.services.clever-cloud.com/ac685d94-401a-4f93-b288-1100a8d96297.png" width="223" height="108" alt="Immersion Facilitée - République Française"/>
       </a>
       </td>
+
       <td width="60%" align="right">
       <img src="https://beta.gouv.fr/img/logo_twitter_image-2019.jpg" alt="" style="max-width: 150px; max-height: 120px; height: auto; margin-left: 20px;"/>
       </td>
@@ -204,13 +205,10 @@ describe("SendingBlueHtmlEmailGateway unit", () => {
       <td height="30"></td>
       </tr>
       <tr>
-
       <td width="600" style="background-color: #F5F5FE; text-align: center; padding: 20px 50px; ">
-      <p style="margin-bottom: .5rem; font-weight: bold; font-size: 18px;">L'immersion facilitée - Une startup d’Etat du Groupement d’Intérêt Public - La plateforme de l’inclusion
-      </p>
+      <p style="margin-bottom: .5rem; font-weight: bold; font-size: 18px;">L'immersion facilitée - Une startup d’Etat du Groupement d’Intérêt Public - La plateforme de l’inclusion</p>
       <p style="font-size: 18px; margin-top: 0;">20 avenue de Ségur, 75007, Paris</p>
       <p style="font-size: 14px;">Vous avez reçu cet email car vous l'avez renseigné lors de votre demande de convention d'immersion. Si vous n'êtes pas le destinataire de cette notification, merci de nous prévenir à <a href="mailto:${immersionFacileContactEmail}">${immersionFacileContactEmail}</a></p>
-
       </td>
       </tr>
       <tr>

@@ -3,6 +3,7 @@ import { Form, Formik, useField } from "formik";
 import React from "react";
 import {
   getConventionFieldName,
+  InternshipKind,
   ShareLinkByEmailDto,
   shareLinkByEmailSchema,
 } from "shared";
@@ -20,12 +21,15 @@ const makeInitialValues = ({
   lastName,
   establishmentRepresentativeEmail,
   link,
+  internshipKind,
 }: {
   firstName: string;
   lastName: string;
   establishmentRepresentativeEmail: string;
   link: string;
+  internshipKind: InternshipKind;
 }): Required<ShareLinkByEmailDto> => ({
+  internshipKind,
   email: establishmentRepresentativeEmail,
   conventionLink: link,
   details: `${firstName || "Prénom"} ${
@@ -36,7 +40,11 @@ const makeInitialValues = ({
 const getName = (name: keyof ShareLinkByEmailDto) => name;
 
 export const ShareForm = ({ onSuccess, onError }: ShareFormProps) => {
-  const submit = async (values: { email: string; details: string }) => {
+  const submit = async (values: {
+    email: string;
+    details: string;
+    internshipKind: InternshipKind;
+  }) => {
     const result = await conventionGateway.shareLinkByEmail({
       ...values,
       conventionLink: window.location.href,
@@ -55,10 +63,14 @@ export const ShareForm = ({ onSuccess, onError }: ShareFormProps) => {
   const [lastName] = useField<string>({
     name: getConventionFieldName("signatories.beneficiary.lastName"),
   });
+  const [internshipKind] = useField<InternshipKind>({
+    name: getConventionFieldName("internshipKind"),
+  });
 
   return (
     <Formik
       initialValues={makeInitialValues({
+        internshipKind: internshipKind.value,
         establishmentRepresentativeEmail:
           establishmentRepresentativeEmail.value,
         firstName: firstName.value,

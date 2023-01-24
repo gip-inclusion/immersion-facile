@@ -81,6 +81,7 @@ export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<Conven
           type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
           recipients: [email],
           params: {
+            internshipKind: conventionDto.internshipKind,
             businessName: conventionDto.businessName,
             magicLink: this.generateMagicLinkFn({
               ...magicLinkCommonFields,

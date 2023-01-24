@@ -1,5 +1,5 @@
 import { addDays } from "date-fns";
-import { ConventionId, frontRoutes } from "shared";
+import { ConventionId, frontRoutes, InternshipKind } from "shared";
 import { z } from "zod";
 import { GenerateConventionMagicLink } from "../../../adapters/primary/config/createGenerateConventionMagicLink";
 import { createLogger } from "../../../utils/logger";
@@ -13,6 +13,7 @@ import { TransactionalUseCase } from "../../core/UseCase";
 const logger = createLogger(__filename);
 
 export type ImmersionAssessmentEmailParams = {
+  internshipKind: InternshipKind;
   immersionId: ConventionId;
   establishmentTutorName: string;
   establishmentTutorEmail: string;
@@ -85,6 +86,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<v
       type: "CREATE_IMMERSION_ASSESSMENT",
       recipients: [immersionAssessmentEmailParams.establishmentTutorEmail],
       params: {
+        internshipKind: immersionAssessmentEmailParams.internshipKind,
         immersionAssessmentCreationLink,
         establishmentTutorName:
           immersionAssessmentEmailParams.establishmentTutorName,

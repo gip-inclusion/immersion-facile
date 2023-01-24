@@ -163,6 +163,7 @@ describe("Pg implementation of ConventionQueries", () => {
       // Assert
       expect(queryResults).toHaveLength(1);
       const expectedResult: ImmersionAssessmentEmailParams = {
+        internshipKind: validatedImmersionEndingThe15th.internshipKind,
         immersionId: validatedImmersionEndingThe15th.id,
         establishmentTutorEmail:
           validatedImmersionEndingThe15th.signatories

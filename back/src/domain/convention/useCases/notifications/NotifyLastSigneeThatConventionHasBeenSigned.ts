@@ -94,6 +94,7 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
     return {
       type: "SIGNEE_HAS_SIGNED_CONVENTION",
       params: {
+        internshipKind: convention.internshipKind,
         demandeId: convention.id,
         signedAt: lastSignee.signedAt,
         conventionStatusLink,

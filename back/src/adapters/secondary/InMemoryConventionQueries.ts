@@ -73,6 +73,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
         const { beneficiary } = convention.signatories;
 
         return {
+          internshipKind: convention.internshipKind,
           immersionId: convention.id,
           establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
           establishmentTutorEmail: convention.establishmentTutor.email,

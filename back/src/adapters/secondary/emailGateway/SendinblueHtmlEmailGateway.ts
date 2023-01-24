@@ -3,6 +3,10 @@ import {
   configureGenerateHtmlFromTemplate,
   GenerateHtmlOptions,
 } from "html-templates";
+import {
+  cciCustomHtmlFooter,
+  cciCustomHtmlHeader,
+} from "html-templates/src/components/email";
 import promClient from "prom-client";
 import {
   immersionFacileContactEmail,
@@ -12,11 +16,6 @@ import {
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
 import { createLogger } from "../../../utils/logger";
 import { BadRequestError } from "../../primary/helpers/httpErrors";
-
-const generateHtmlFromTemplate = configureGenerateHtmlFromTemplate(
-  templatesByName,
-  { contactEmail: immersionFacileContactEmail },
-);
 
 export type EmailSentDto = {
   templatedEmail: TemplatedEmail;
@@ -50,20 +49,6 @@ export class SendinblueHtmlEmailGateway implements EmailGateway {
     private generateHtmlOptions: GenerateHtmlOptions = {},
   ) {}
 
-  public getLastSentEmailDtos(): EmailSentDto[] {
-    throw new BadRequestError(
-      "It is not possible de get last sent mails from SendInBlue email gateway",
-    );
-  }
-
-  private filterAllowListAndConvertToRecipients(
-    emails: string[] = [],
-  ): RecipientOrSender[] {
-    return emails
-      .filter(this.emailAllowListPredicate)
-      .map((email) => ({ email }));
-  }
-
   public async sendEmail(email: TemplatedEmail) {
     if (email.recipients.length === 0) {
       logger.error({ email }, "No recipient for provided email");
@@ -74,11 +59,19 @@ export class SendinblueHtmlEmailGateway implements EmailGateway {
     const emailData: HtmlEmailData = {
       to: this.filterAllowListAndConvertToRecipients(email.recipients),
       ...(cc.length ? { cc } : {}),
-      ...generateHtmlFromTemplate(
-        email.type,
-        email.params,
-        this.generateHtmlOptions,
-      ),
+      ...configureGenerateHtmlFromTemplate(
+        templatesByName,
+        {
+          contactEmail: immersionFacileContactEmail,
+        },
+        "internshipKind" in email.params &&
+          email.params.internshipKind === "mini-stage-cci"
+          ? {
+              header: cciCustomHtmlHeader,
+              footer: cciCustomHtmlFooter,
+            }
+          : { footer: undefined, header: undefined },
+      )(email.type, email.params, this.generateHtmlOptions),
       sender: this.sender,
     };
 
@@ -103,7 +96,21 @@ export class SendinblueHtmlEmailGateway implements EmailGateway {
       });
   }
 
-  public async sendTransacEmail(emailData: HtmlEmailData) {
+  public getLastSentEmailDtos(): EmailSentDto[] {
+    throw new BadRequestError(
+      "It is not possible de get last sent mails from SendInBlue email gateway",
+    );
+  }
+
+  private filterAllowListAndConvertToRecipients(
+    emails: string[] = [],
+  ): RecipientOrSender[] {
+    return emails
+      .filter(this.emailAllowListPredicate)
+      .map((email) => ({ email }));
+  }
+
+  private async sendTransacEmail(emailData: HtmlEmailData) {
     const headers = {
       accept: "application/json",
       "content-type": "application/json",

@@ -1,18 +1,21 @@
-import React, { useEffect, useState } from "react";
-import { configureGenerateHtmlFromTemplate } from "html-templates";
-import { keys } from "ramda";
-import { DsfrTitle, ImmersionTextField } from "react-design-system";
-import { immersionFacileContactEmail, templatesByName } from "shared";
 import { fr } from "@codegouvfr/react-dsfr";
+import { configureGenerateHtmlFromTemplate } from "html-templates";
+import {
+  cciCustomHtmlFooter,
+  cciCustomHtmlHeader,
+} from "html-templates/src/components/email";
+import { keys } from "ramda";
+import React, { useEffect, useState } from "react";
+import { DsfrTitle, ImmersionTextField, Select } from "react-design-system";
+import {
+  immersionFacileContactEmail,
+  internshipKinds,
+  templatesByName,
+} from "shared";
 import { useStyles } from "tss-react/dsfr";
 
 type TemplateByName = typeof templatesByName;
 type TemplateName = keyof TemplateByName;
-
-const generateHtmlFromTemplate = configureGenerateHtmlFromTemplate(
-  templatesByName,
-  { contactEmail: immersionFacileContactEmail },
-);
 
 export const EmailPreviewTab = () => {
   const { cx } = useStyles();
@@ -31,14 +34,19 @@ export const EmailPreviewTab = () => {
     setEmailVariables(defaultEmailVariableForTemplate);
   }, [currentTemplate]);
 
-  const fakeContent = generateHtmlFromTemplate(
-    currentTemplate,
-    emailVariables,
-    {
-      skipHead: true,
-    },
-  );
-  //console.log(fakeContent.htmlContent);
+  const fakeContent = configureGenerateHtmlFromTemplate(
+    templatesByName,
+    { contactEmail: immersionFacileContactEmail },
+    "internshipKind" in emailVariables &&
+      emailVariables.internshipKind === "mini-stage-cci"
+      ? {
+          header: cciCustomHtmlHeader,
+          footer: cciCustomHtmlFooter,
+        }
+      : { footer: undefined, header: undefined },
+  )(currentTemplate, emailVariables, {
+    skipHead: true,
+  });
 
   return (
     <div className={cx("admin-tab__email-preview")}>
@@ -87,44 +95,27 @@ export const EmailPreviewTab = () => {
             )}
 
             <h6 className={fr.cx("fr-mt-4w")}>Données de prévisualisation</h6>
-            <ul className={fr.cx("fr-badge-group")}>
+            <ul>
               {Object.keys(emailVariables)
                 .sort()
-                .map((variableName) => {
-                  const variableValue: any =
-                    emailVariables[variableName as keyof typeof emailVariables];
-                  return (
-                    <li key={variableName}>
-                      {["string", "number", "undefined"].includes(
-                        typeof variableValue,
-                      ) ? (
-                        <ImmersionTextField
-                          label={variableName}
-                          name={variableName}
-                          value={variableValue ?? ""}
-                          className={fr.cx("fr-mb-2w")}
-                          onChange={(e) =>
-                            setEmailVariables({
-                              ...emailVariables,
-                              [variableName]: e.target.value,
-                            })
-                          }
-                        />
-                      ) : (
-                        <div className={fr.cx("fr-input-group", "fr-mb-2w")}>
-                          <label className={fr.cx("fr-label")}>
-                            {variableName}
-                          </label>
-                          <pre className={fr.cx("fr-text--xs", "fr-m-auto")}>
-                            <code>
-                              {JSON.stringify(variableValue, null, 2)}
-                            </code>
-                          </pre>
-                        </div>
-                      )}
-                    </li>
-                  );
-                })}
+                .map((variableName) => (
+                  <li key={variableName}>
+                    <EmailVariableField
+                      variableName={variableName}
+                      variableValue={
+                        emailVariables[
+                          variableName as keyof typeof emailVariables
+                        ]
+                      }
+                      onChange={(value) =>
+                        setEmailVariables({
+                          ...emailVariables,
+                          [variableName]: value,
+                        })
+                      }
+                    />
+                  </li>
+                ))}
             </ul>
             <h6 className={fr.cx("fr-mt-4w")}>Pièces jointes</h6>
             {fakeContent.attachment ? (
@@ -153,21 +144,69 @@ export const EmailPreviewTab = () => {
   );
 };
 
+type EmailVariableFieldProps = {
+  variableName: string;
+  variableValue: any;
+  onChange(value: any): void;
+};
+const EmailVariableField = ({
+  variableName,
+  variableValue,
+  onChange,
+}: EmailVariableFieldProps): JSX.Element => {
+  if (variableName === "internshipKind")
+    return (
+      <Select
+        id=""
+        label={variableName}
+        name={variableName}
+        options={internshipKinds.map((internshipKind) => ({
+          label: internshipKind,
+          value: internshipKind,
+        }))}
+        className={fr.cx("fr-mb-2w")}
+        onChange={(e) => onChange(e.target.value)}
+        value={variableValue}
+      />
+    );
+  if (["string", "number", "undefined"].includes(typeof variableValue))
+    return (
+      <ImmersionTextField
+        label={variableName}
+        name={variableName}
+        value={variableValue ?? ""}
+        className={fr.cx("fr-mb-2w")}
+        onChange={(e) => onChange(e.target.value)}
+      />
+    );
+  return (
+    <div className={fr.cx("fr-input-group", "fr-mb-2w")}>
+      <label className={fr.cx("fr-label")}>{variableName}</label>
+      <pre className={fr.cx("fr-text--xs", "fr-m-auto")}>
+        <code>{JSON.stringify(variableValue, null, 2)}</code>
+      </pre>
+    </div>
+  );
+};
+
 export const defaultEmailValueByEmailKind: {
   [K in TemplateName]: Parameters<TemplateByName[K]["createEmailVariables"]>[0];
 } = {
   NEW_CONVENTION_BENEFICIARY_CONFIRMATION: {
+    internshipKind: "immersion",
     demandeId: "DEMANDE_ID",
     firstName: "FIRST_NAME",
     lastName: "LAST_NAME",
   },
   NEW_CONVENTION_ESTABLISHMENT_TUTOR_CONFIRMATION: {
+    internshipKind: "immersion",
     demandeId: "DEMANDE_ID",
     establishmentTutorName: "ESTABLISHMENT_TUTOR_NAME",
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
   },
   NEW_CONVENTION_AGENCY_NOTIFICATION: {
+    internshipKind: "immersion",
     demandeId: "DEMANDE_ID",
     firstName: "FIRST_NAME",
     lastName: "LAST_NAME",
@@ -179,6 +218,7 @@ export const defaultEmailValueByEmailKind: {
     conventionStatusLink: "CONVENTION_STATUS_LINK",
   },
   VALIDATED_CONVENTION_FINAL_CONFIRMATION: {
+    internshipKind: "immersion",
     totalHours: 0,
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
@@ -230,6 +270,7 @@ export const defaultEmailValueByEmailKind: {
     magicLink: "MAGIC_LINK",
   },
   REJECTED_CONVENTION_NOTIFICATION: {
+    internshipKind: "immersion",
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
     rejectionReason: "REJECTION_REASON",
@@ -239,6 +280,7 @@ export const defaultEmailValueByEmailKind: {
     agency: "AGENCY",
   },
   CONVENTION_MODIFICATION_REQUEST_NOTIFICATION: {
+    internshipKind: "immersion",
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
     justification: "REASON",
@@ -255,6 +297,7 @@ export const defaultEmailValueByEmailKind: {
     conventionStatusLink: "CONVENTION_STATUS_LINK",
   },
   NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION: {
+    internshipKind: "immersion",
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
     businessName: "BUSINESS_NAME",
@@ -263,10 +306,12 @@ export const defaultEmailValueByEmailKind: {
     possibleRoleAction: "POSSIBLE_ROLE_ACTION",
   },
   MAGIC_LINK_RENEWAL: {
+    internshipKind: "immersion",
     magicLink: "MAGIC_LINK",
     conventionStatusLink: "CONVENTION_STATUS_LINK",
   },
   BENEFICIARY_OR_ESTABLISHMENT_REPRESENTATIVE_ALREADY_SIGNED_NOTIFICATION: {
+    internshipKind: "immersion",
     magicLink: "MAGIC_LINK",
     conventionStatusLink: "CONVENTION_STATUS_LINK",
     existingSignatureName: "EXISTING_SIGNATURE_NAME",
@@ -277,6 +322,7 @@ export const defaultEmailValueByEmailKind: {
     establishmentRepresentativeName: "ESTABLISHMENT_REPRESENTATIVE_NAME",
   },
   NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE: {
+    internshipKind: "immersion",
     beneficiaryName: "BENEFICIARY_NAME",
     establishmentRepresentativeName: "ESTABLISHMENT_REPRESENTATIVE_NAME",
     beneficiaryRepresentativeName: undefined,
@@ -312,6 +358,7 @@ export const defaultEmailValueByEmailKind: {
     potentialBeneficiaryLastName: "POTENTIAL_BENEFICIARY_LAST_NAME",
   },
   SHARE_DRAFT_CONVENTION_BY_LINK: {
+    internshipKind: "immersion",
     additionalDetails: "ADDITIONAL_DETAILS",
     conventionFormUrl: "CONVENTION_FORM_URL",
   },
@@ -331,12 +378,14 @@ export const defaultEmailValueByEmailKind: {
     businessName: "BUSINESS_NAME",
   },
   CREATE_IMMERSION_ASSESSMENT: {
+    internshipKind: "immersion",
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
     establishmentTutorName: "ESTABLISHMENT_TUTOR_NAME",
     immersionAssessmentCreationLink: "IMMERSION_ASSESSMENT_CREATION_LINK",
   },
   FULL_PREVIEW_EMAIL: {
+    internshipKind: "immersion",
     beneficiaryName: "BENEFICIARY_NAME",
     establishmentRepresentativeName: "ESTABLISHMENT_REPRESENTATIVE_NAME",
     beneficiaryRepresentativeName: undefined,
@@ -346,6 +395,7 @@ export const defaultEmailValueByEmailKind: {
     businessName: "BUSINESS_NAME",
   },
   SIGNEE_HAS_SIGNED_CONVENTION: {
+    internshipKind: "immersion",
     signedAt: new Date().toISOString(),
     demandeId: "DEMANDE_ID",
     conventionStatusLink: "CONVENTION_STATUS_LINK",

@@ -36,7 +36,13 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
   NEW_CONVENTION_BENEFICIARY_CONFIRMATION: {
     niceName: "Confirmation bénéficiaire nouvelle convention",
     tags: ["demande signature bénéficiaire"],
-    createEmailVariables: ({ firstName, lastName }) => ({
+    createEmailVariables: ({
+      firstName,
+      lastName,
+      internshipKind,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      demandeId,
+    }) => ({
       subject:
         "Immersion Facilitée - Votre confirmation pour votre demande d'immersion est enregistrée",
       greetings: `Bonjour ${firstName} ${lastName},`,
@@ -46,10 +52,13 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
         Il vous informera par mail de la validation ou non de l'immersion. Le tuteur qui vous encadrera pendant cette période recevra aussi la réponse.`,
       highlight: `Attention, ne démarrez pas cette immersion tant que vous n'avez pas reçu cette validation !`,
       subContent: defaultSignature,
+      attachmentUrls:
+        internshipKind === "immersion"
+          ? [
+              "https://immersion.cellar-c2.services.clever-cloud.com/les_bons_conseils_beneficiaire.pdf",
+            ]
+          : undefined,
     }),
-    attachmentUrls: [
-      "https://immersion.cellar-c2.services.clever-cloud.com/les_bons_conseils_beneficiaire.pdf",
-    ],
   },
   NEW_CONVENTION_ESTABLISHMENT_TUTOR_CONFIRMATION: {
     niceName: "Confirmation tuteur nouvelle convention",
@@ -58,6 +67,10 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       establishmentTutorName,
       beneficiaryFirstName,
       beneficiaryLastName,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      internshipKind,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      demandeId,
     }) => ({
       subject:
         "Immersion Facilitée - Demande d'immersion professionnelle confirmée",
@@ -85,6 +98,9 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       lastName,
       businessName,
       agencyName,
+      internshipKind,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      demandeId,
     }) => ({
       subject: `Immersion Facilitée - une demande de convention d'immersion est déposée : ${firstName}, ${lastName} - ${businessName} - ${agencyName}.`,
       greetings: "Bonjour,",
@@ -112,10 +128,13 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       ${agencyName}
       `,
       subContent: defaultSignature,
+      attachmentUrls:
+        internshipKind === "immersion"
+          ? [
+              "https://immersion.cellar-c2.services.clever-cloud.com/les_bons_conseils_prescripteur.pdf",
+            ]
+          : undefined,
     }),
-    attachmentUrls: [
-      "https://immersion.cellar-c2.services.clever-cloud.com/les_bons_conseils_prescripteur.pdf",
-    ],
   },
   VALIDATED_CONVENTION_FINAL_CONFIRMATION: {
     niceName: "Convention finale validée",
@@ -142,6 +161,16 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       agencyName,
       emergencyContactInfos,
       beneficiaryBirthdate,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      internshipKind,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      questionnaireUrl,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      totalHours,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      emergencyContact,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      emergencyContactPhone,
     }) => ({
       subject: `Immersion Facilitée - Validation et convention de l'immersion pour observer l'activité de ${immersionAppellationLabel} au sein de ${businessName}`,
       greetings: "Bonjour,",
@@ -263,10 +292,10 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
 
       ${defaultSignature}
       `,
+      attachmentUrls: [
+        "https://immersion.cellar-c2.services.clever-cloud.com/les_bons_conseils_prescripteur_pole_emploi.pdf",
+      ],
     }),
-    attachmentUrls: [
-      "https://immersion.cellar-c2.services.clever-cloud.com/les_bons_conseils_prescripteur_pole_emploi.pdf",
-    ],
   },
   POLE_EMPLOI_ADVISOR_ON_CONVENTION_ASSOCIATION: {
     niceName:
@@ -325,10 +354,10 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
 
       `,
       subContent: defaultSignature,
+      attachmentUrls: [
+        "https://immersion.cellar-c2.services.clever-cloud.com/les_bons_conseils_prescripteur_pole_emploi.pdf",
+      ],
     }),
-    attachmentUrls: [
-      "https://immersion.cellar-c2.services.clever-cloud.com/les_bons_conseils_prescripteur_pole_emploi.pdf",
-    ],
   },
   REJECTED_CONVENTION_NOTIFICATION: {
     niceName: "Notification de convention rejetée",
@@ -341,6 +370,8 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       agency,
       businessName,
       signature,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      internshipKind,
     }) => ({
       subject: `Immersion Facilitée - Refus de la demande d'immersion pour observer l'activité de ${immersionProfession} au sein de ${businessName}`,
       greetings: "Bonjour,",
@@ -368,6 +399,10 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       magicLink,
       conventionStatusLink,
       signature,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      immersionAppellation,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      internshipKind,
     }) => ({
       subject:
         "Immersion Facilitée - veuillez modifier cette demande d'immersion",
@@ -401,6 +436,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       businessName,
       magicLink,
       conventionStatusLink,
+      internshipKind,
     }) => ({
       subject: `Immersion Facilitée - Demande d'immersion à étudier: ${beneficiaryFirstName} ${beneficiaryLastName} - ${businessName}`,
       greetings: "Bonjour,",
@@ -420,15 +456,23 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
         createConventionStatusButton(conventionStatusLink),
       ],
       subContent: defaultSignature,
+      attachmentUrls:
+        internshipKind === "immersion"
+          ? [
+              "https://immersion.cellar-c2.services.clever-cloud.com/les_bons_conseils_prescripteur.pdf",
+            ]
+          : undefined,
     }),
-    attachmentUrls: [
-      "https://immersion.cellar-c2.services.clever-cloud.com/les_bons_conseils_prescripteur.pdf",
-    ],
   },
   MAGIC_LINK_RENEWAL: {
     niceName: "Renouvellement de lien magique",
     tags: ["renouvellement de lien"],
-    createEmailVariables: ({ magicLink, conventionStatusLink }) => ({
+    createEmailVariables: ({
+      magicLink,
+      conventionStatusLink,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      internshipKind,
+    }) => ({
       subject:
         "Immersion Facilitée - Voici votre nouveau lien magique pour accéder à la demande d'immersion",
       greetings: "Bonjour,",
@@ -459,6 +503,8 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       existingSignatureName,
       magicLink,
       conventionStatusLink,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      internshipKind,
     }) => ({
       subject:
         "Immersion Facilitée - À vous de confirmer votre demande de convention",
@@ -493,6 +539,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       beneficiaryCurrentEmployerName,
       magicLink,
       conventionStatusLink,
+      internshipKind,
     }) => ({
       subject: "Immersion Facilitée - Confirmez une demande d'immersion",
       greetings: `Bonjour ${signatoryName},`,
@@ -524,10 +571,13 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
 
         ${defaultSignature}
       `,
+      attachmentUrls:
+        internshipKind === "immersion"
+          ? [
+              "https://immersion.cellar-c2.services.clever-cloud.com/les_etapes_de_votre_demande.pdf",
+            ]
+          : undefined,
     }),
-    attachmentUrls: [
-      "https://immersion.cellar-c2.services.clever-cloud.com/les_etapes_de_votre_demande.pdf",
-    ],
   },
   CONTACT_BY_EMAIL_REQUEST: {
     niceName: "Mise en relation par mail",
@@ -632,7 +682,12 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
   SHARE_DRAFT_CONVENTION_BY_LINK: {
     niceName: "Partager le formulaire de convention par lien",
     tags: ["partage de convention"],
-    createEmailVariables: ({ additionalDetails, conventionFormUrl }) => ({
+    createEmailVariables: ({
+      additionalDetails,
+      conventionFormUrl,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      internshipKind,
+    }) => ({
       subject:
         "Immersion Facilitée - Une demande de convention préremplie vous est transmise pour que vous la complétiez",
       greetings: "Bonjour,",
@@ -733,6 +788,8 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       beneficiaryFirstName,
       beneficiaryLastName,
       immersionAssessmentCreationLink,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      internshipKind,
     }) => ({
       subject: "Immersion Facilitée - Comment s'est déroulée l'immersion ?",
       greetings: `Bonjour ${establishmentTutorName},`,
@@ -761,7 +818,24 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
   FULL_PREVIEW_EMAIL: {
     niceName: "Preview email complet (tous les blocs)",
     tags: ["aperçu pour tests"],
-    createEmailVariables: ({ beneficiaryName, conventionStatusLink }) => ({
+    createEmailVariables: ({
+      beneficiaryName,
+      conventionStatusLink,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      businessName,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      establishmentRepresentativeName,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      internshipKind,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      magicLink,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      signatoryName,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      beneficiaryCurrentEmployerName,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      beneficiaryRepresentativeName,
+    }) => ({
       subject: "Test contenant toutes les blocs email",
       greetings: `Bonjour ${beneficiaryName}`,
       content: `Merci d'avoir confirmé votre demande d'immersion. Elle va être transmise à votre conseiller référent.
@@ -783,7 +857,13 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
   },
   SIGNEE_HAS_SIGNED_CONVENTION: {
     niceName: "Confirmation de signature de l'immersion",
-    createEmailVariables: ({ demandeId, signedAt, conventionStatusLink }) => ({
+    createEmailVariables: ({
+      demandeId,
+      signedAt,
+      conventionStatusLink,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      internshipKind,
+    }) => ({
       subject: `Immersion Facilitée - Confirmation de signature de l'immersion - ${demandeId}`,
       greetings: `Bonjour,`,
       content: `

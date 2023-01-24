@@ -64,6 +64,7 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
         type: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
         recipients: [email],
         params: {
+          internshipKind: convention.internshipKind,
           beneficiaryFirstName: convention.signatories.beneficiary.firstName,
           beneficiaryLastName: convention.signatories.beneficiary.lastName,
           businessName: convention.businessName,

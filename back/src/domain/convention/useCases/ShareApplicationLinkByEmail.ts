@@ -13,6 +13,7 @@ export class ShareApplicationLinkByEmail extends UseCase<ShareLinkByEmailDto> {
       type: "SHARE_DRAFT_CONVENTION_BY_LINK",
       recipients: [params.email],
       params: {
+        internshipKind: params.internshipKind,
         additionalDetails: params.details,
         conventionFormUrl: params.conventionLink,
       },

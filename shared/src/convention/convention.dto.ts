@@ -73,7 +73,8 @@ export type ImmersionObjective = (typeof conventionObjectiveOptions)[number];
 
 export type WithJustification = { justification: string };
 
-export type InternshipKind = "immersion" | "mini-stage-cci";
+export const internshipKinds = ["immersion", "mini-stage-cci"] as const;
+export type InternshipKind = (typeof internshipKinds)[number];
 
 export type ConventionCommon = {
   id: ConventionId;
