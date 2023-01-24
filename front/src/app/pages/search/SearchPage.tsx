@@ -129,7 +129,6 @@ export const SearchPage = ({
                       setFieldValue("latitude", position.lat);
                       setFieldValue("longitude", position.lon);
                       setFieldValue("place", label);
-                      setFormikValues(values);
                       setFormikValues({
                         ...values,
                         latitude: position.lat,

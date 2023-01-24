@@ -21,8 +21,8 @@ export const TotalWeeklyHoursIndicator = ({
   week,
   totalHours,
 }: TotalWeeklyHoursIndicatorProps) => (
-  <p>
-    Total hebdomadaire semaine {week}: &nbsp;
+  <li className="fr-text--xs fr-my-auto">
+    Semaine {week}: &nbsp;
     <HourIndicator hours={totalHours} />
-  </p>
+  </li>
 );

@@ -22,7 +22,7 @@ export const WeeklyRow = ({
   disabled,
   onChange,
 }: WeeklyRowProperties) => (
-  <div className="flex">
+  <div className="fr-grid-row fr-mt-1w fr-grid-row--middle">
     {weeklyCalendar.map((dayOfWeek) =>
       dayOfWeek.dailySchedule !== null ? (
         <DayCircle
@@ -45,8 +45,6 @@ export const WeeklyRow = ({
         />
       ),
     )}
-    <div className="flex w-full justify-center items-center">
-      <HourIndicator hours={calculateWeeklyHours(weeklyCalendar)} />
-    </div>
+    <HourIndicator hours={calculateWeeklyHours(weeklyCalendar)} />
   </div>
 );

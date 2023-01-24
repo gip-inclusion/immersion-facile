@@ -37,7 +37,6 @@ export const HourPicker = ({
 
   return (
     <>
-      <div className="col"></div>
       {timePeriods.length > 0 &&
         timePeriods.map((hours, index) => {
           const onStartChange = (index: number, value: string) => {
@@ -62,8 +61,11 @@ export const HourPicker = ({
           };
 
           return (
-            <div key={name + index}>
-              <div className="flex p-1 items-end">
+            <div
+              key={name + index}
+              className="schedule-picker__section fr-mt-2w"
+            >
+              <div className="schedule-picker__row">
                 <div className="date-or-time-block">
                   <label htmlFor={name + index + "-start"}>Début</label>
                   <input

@@ -16,7 +16,7 @@ export const DayCircle = ({
 }: DayCircleProps) => {
   if (dayStatus === "hasTime")
     return (
-      <div className="relative">
+      <div className="schedule-picker__day-circle">
         <button
           type="button"
           className={`numberCircle `}
@@ -26,7 +26,7 @@ export const DayCircle = ({
         >
           <div>{name}</div>
         </button>
-        <div className="absolute -top-2 right-0">
+        <div className="schedule-picker__day-circle-icon">
           <CheckCircleIcon sx={{ color: "#1F8D49" }} fontSize="small" />
         </div>
       </div>

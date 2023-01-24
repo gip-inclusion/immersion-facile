@@ -30,12 +30,13 @@ export const PlaceAutocomplete = ({
   const [selectedOption, setSelectedOption] =
     useState<LookupSearchResult | null>(null);
   const [searchValue, setSearchValue] = useState<string>(initialValue);
+
   const [options, setOptions] = useState<LookupSearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
   const noOptionText = isSearching ? "..." : "Aucun lieu trouvé 😥";
-  const onInputChange = async (value: string | null) => {
-    if (!value) return;
+  const onInputChange = async (value: string) => {
+    setSearchValue(value);
     if (value.length < 3) return;
     setIsSearching(true);
     const results = await apiAddressGateway.lookupLocation(value);
@@ -57,13 +58,13 @@ export const PlaceAutocomplete = ({
           searchValue ? noOptionText : "Saisissez un lieu ou une ville ⌨️"
         }
         options={options}
-        inputValue={initialValue}
+        inputValue={searchValue || initialValue}
         value={selectedOption}
         id={id}
         getOptionLabel={(option) => option.label}
         onChange={(_, value) => onValueSelected(value)}
         onInputChange={(_, inputValue) => onInputChange(inputValue)}
-        filterOptions={(option) => option} // https://mui.com/material-ui/react-autocomplete/#search-as-you-type
+        filterOptions={(option) => option}
         renderInput={AutocompleteInput(
           headerClassName,
           label,

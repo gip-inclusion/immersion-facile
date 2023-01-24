@@ -20,7 +20,7 @@ export const ComplexSchedulePicker = ({
   const [field, _, { setValue }] = useField<ScheduleDto>({ name });
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="schedule-picker schedule-picker--complex  fr-mb-2w">
       <DayPicker
         complexSchedule={field.value.complexSchedule}
         selectedIndex={field.value.selectedIndex}

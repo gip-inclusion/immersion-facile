@@ -16,8 +16,8 @@ export const DayPicker = ({
   onChange,
   disabled,
 }: DayPickerProps) => (
-  <div className="max-w-fit">
-    <div className="flex">
+  <>
+    <div className="fr-grid-row fr-mt-1w">
       {["L", "M", "M", "J", "V", "S", "D"].map((name, index) => (
         <DayCircle
           key={name + index}
@@ -26,9 +26,7 @@ export const DayPicker = ({
           disabled={true}
         />
       ))}
-      <div className="flex justify-center items-center text-center font-bold fr-text--xs schedule-picker__total-cell">
-        total t/sem
-      </div>
+      <strong className="fr-text--xs fr-my-auto fr-ml-2w">total t/sem</strong>
     </div>
     {makeImmersionTimetable(complexSchedule).map((weeklyCalendar, index) => (
       <WeeklyRow
@@ -40,5 +38,5 @@ export const DayPicker = ({
         onChange={onChange}
       />
     ))}
-  </div>
+  </>
 );

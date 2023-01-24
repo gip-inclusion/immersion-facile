@@ -44,11 +44,11 @@ export const SchedulePicker = ({
         setFieldValue={onBoolRadioPickerChange}
         disabled={disabled}
       />
-      <span className={fr.cx("fr-h4")}>
+      <p className={fr.cx("fr-h4", "fr-mt-4w")}>
         {field.value.isSimple
           ? "Sélectionnez la période des jours *"
           : "Sélectionnez les horaires de travail jour par jour *"}
-      </span>
+      </p>
       {meta.error && (
         <div
           id={name + "-error-description"}

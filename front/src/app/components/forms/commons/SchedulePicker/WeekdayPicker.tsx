@@ -54,8 +54,7 @@ export const WeekdayPicker = ({
   };
 
   return (
-    <>
-      <div className="col"></div>
+    <div className="schedule-picker__section">
       {dayPeriods.length > 0 &&
         dayPeriods.map((dayRange, index) => {
           const onStartChange = (value: number) => {
@@ -76,7 +75,7 @@ export const WeekdayPicker = ({
 
           return (
             <div key={name + index}>
-              <div className="flex p-1 items-end">
+              <div className="schedule-picker__row">
                 <div className="date-or-time-block">
                   <div>Du</div>
                   <WeekdayDropdown
@@ -122,6 +121,6 @@ export const WeekdayPicker = ({
       >
         Ajouter une période
       </ButtonAdd>
-    </>
+    </div>
   );
 };
