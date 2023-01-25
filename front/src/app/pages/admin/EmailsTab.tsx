@@ -74,9 +74,13 @@ const Email = ({ email }: { email: EmailSentDto }) => {
               )[key];
 
               const links: EmailVariables[] = [
-                "magicLink",
+                "agencyLogoUrl",
                 "conventionFormUrl",
+                "conventionStatusLink",
                 "editFrontUrl",
+                "immersionAssessmentCreationLink",
+                "magicLink",
+                "questionnaireUrl",
               ];
 
               return (
@@ -85,7 +89,7 @@ const Email = ({ email }: { email: EmailSentDto }) => {
                   <span>{key} :</span>{" "}
                   <span style={{ wordWrap: "break-word" }}>
                     {links.includes(key) ? (
-                      <a href={value as string}>Liens vers la page</a>
+                      <a href={value as string}>Lien vers la page</a>
                     ) : (
                       JSON.stringify(value, undefined, 2)
                     )}
