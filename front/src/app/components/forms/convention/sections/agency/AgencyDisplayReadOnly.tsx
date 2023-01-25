@@ -2,6 +2,7 @@ import { useField } from "formik";
 import React, { useEffect, useState } from "react";
 import type { ConventionDto } from "shared";
 import { AgencyId, AgencyOption } from "shared";
+import { Loader } from "src/../../libs/react-design-system";
 import { agencyGateway } from "src/config/dependencies";
 import { AgencyDropdownListField } from "./AgencyDropdownListField";
 import { AgencyErrorText } from "./AgencyErrorText";
@@ -20,7 +21,6 @@ export const AgencyDisplayReadOnly = ({ agencyId }: AgencyDisplayProps) => {
     useField<AgencyId>({ name });
 
   const [isLoading, setIsLoading] = useState(false);
-  const [loaded, setLoaded] = useState(false);
   const [loadingError, setLoadingError] = useState(false);
   const [agencies, setAgencies] = useState([placeholderAgency]);
 
@@ -38,14 +38,12 @@ export const AgencyDisplayReadOnly = ({ agencyId }: AgencyDisplayProps) => {
         ]);
         if (agencyId && agencies.map((agency) => agency.id).includes(agencyId))
           setValue(agencyId);
-        setLoaded(true);
         setLoadingError(false);
       })
       .catch((e) => {
         //eslint-disable-next-line no-console
         console.log("AgencyDisplay", e);
         setAgencies([]);
-        setLoaded(false);
         setLoadingError(true);
       })
       .finally(() => {
@@ -62,7 +60,6 @@ export const AgencyDisplayReadOnly = ({ agencyId }: AgencyDisplayProps) => {
     >
       <AgencyDropdownListField
         isLoading={isLoading}
-        loaded={loaded}
         disabled={true}
         name={name}
         value={value}
@@ -78,6 +75,7 @@ export const AgencyDisplayReadOnly = ({ agencyId }: AgencyDisplayProps) => {
           error={error}
         />
       )}
+      {isLoading && <Loader />}
     </div>
   );
 };

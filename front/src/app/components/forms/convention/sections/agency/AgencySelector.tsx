@@ -1,6 +1,6 @@
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
-import { Select } from "react-design-system";
+import { Loader, Select } from "react-design-system";
 import {
   AgencyId,
   AgencyOption,
@@ -44,7 +44,6 @@ export const AgencySelector = ({
     { setValue: setDepartmentCodeValue },
   ] = useField<DepartmentCode | null>(agencyDepartmentField.name);
   const [isLoading, setIsLoading] = useState(false);
-  const [loaded, setLoaded] = useState(false);
   const [loadingError, setLoadingError] = useState(false);
 
   const [agencies, setAgencies] = useState([
@@ -65,7 +64,7 @@ export const AgencySelector = ({
       departmentCode: departmentCodeValue,
       federatedIdentity,
     })
-      .then((agencies: any) => {
+      .then((agencies) => {
         setAgencies([
           {
             id: "",
@@ -82,14 +81,12 @@ export const AgencySelector = ({
           )
         )
           setValue(defaultAgencyId);
-        setLoaded(true);
         setLoadingError(false);
       })
       .catch((e: any) => {
         //eslint-disable-next-line no-console
         console.log("AgencySelector", e);
         setAgencies([]);
-        setLoaded(false);
         setLoadingError(true);
       })
       .finally(() => {
@@ -114,7 +111,6 @@ export const AgencySelector = ({
         {...agencyIdField}
         name={agencyIdField.name || "agencyId"}
         isLoading={isLoading}
-        loaded={loaded}
         disabled={disabled}
         value={value}
         onBlur={onBlur}
@@ -129,6 +125,7 @@ export const AgencySelector = ({
           error={error}
         />
       )}
+      {isLoading && <Loader />}
     </div>
   );
 };
