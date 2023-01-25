@@ -120,12 +120,6 @@ export const ImmersionConditionsCommonFields = ({
           end: new Date(values.dateEnd),
         }}
       />
-      <TextInput
-        label={t.immersionConditionsSection.workConditions.label}
-        name={getConventionFieldName("workConditions")}
-        description={t.immersionConditionsSection.workConditions.description}
-        disabled={disabled}
-      />
       <AddressAutocomplete
         initialSearchTerm={
           values.immersionAddress ?? establishmentInfos?.businessAddress
@@ -197,6 +191,13 @@ export const ImmersionConditionsCommonFields = ({
         initialFieldValue={values.immersionAppellation}
       />
       <TextInput
+        label={t.immersionConditionsSection.workConditions.label}
+        name={getConventionFieldName("workConditions")}
+        description={t.immersionConditionsSection.workConditions.description}
+        disabled={disabled}
+        multiline={true}
+      />
+      <TextInput
         label={`${t.immersionConditionsSection.immersionActivities.label} *`}
         name={getConventionFieldName("immersionActivities")}
         type="text"
@@ -205,6 +206,7 @@ export const ImmersionConditionsCommonFields = ({
           t.immersionConditionsSection.immersionActivities.description
         }
         disabled={disabled}
+        multiline={true}
       />
       {values.internshipKind === "mini-stage-cci" && (
         <Notification title="" type="info" className={fr.cx("fr-mb-4w")}>
