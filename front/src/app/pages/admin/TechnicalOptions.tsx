@@ -6,7 +6,6 @@ import { FeatureFlag } from "shared";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFlags.slice";
 import { fr } from "@codegouvfr/react-dsfr";
-import { useStyles } from "tss-react/dsfr";
 
 const labelsByFeatureFlag: Record<FeatureFlag, string> = {
   enableAdminUi: "Ui Admin",
@@ -20,7 +19,6 @@ const labelsByFeatureFlag: Record<FeatureFlag, string> = {
 export const TechnicalOptions = () => {
   const { isLoading, ...featureFlags } = useFeatureFlags();
   const dispatch = useDispatch();
-  const { cx } = useStyles();
 
   return (
     <div className={fr.cx("fr-container")}>
@@ -32,10 +30,7 @@ export const TechnicalOptions = () => {
               <div className={fr.cx("fr-fieldset__content")}>
                 {keys(featureFlags).map((featureFlagName) => (
                   <div
-                    className={cx(
-                      fr.cx("fr-radio-group", "fr-radio-rich"),
-                      "hover:opacity-60",
-                    )}
+                    className={fr.cx("fr-radio-group", "fr-radio-rich")}
                     key={featureFlagName}
                   >
                     <Switch

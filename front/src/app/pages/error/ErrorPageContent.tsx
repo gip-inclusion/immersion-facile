@@ -58,14 +58,14 @@ export const ErrorPageContent = ({
             <li>
               {button.onClick ? (
                 <button
-                  className={cx(fr.cx("fr-btn"), ` fr-btn--${button.kind}`)}
+                  className={cx(fr.cx("fr-btn"), `fr-btn--${button.kind}`)}
                   onClick={button.onClick}
                 >
                   {button.label}
                 </button>
               ) : (
                 <a
-                  className={cx(fr.cx("fr-btn"), ` fr-btn--${button.kind}`)}
+                  className={cx(fr.cx("fr-btn"), `fr-btn--${button.kind}`)}
                   href={button.href}
                   target={button.target}
                 >
@@ -88,7 +88,7 @@ export const ErrorPageContent = ({
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className={fr.cx("fr-responsive-img")}
+          className={cx(fr.cx("fr-responsive-img"), "fr-artwork")}
           aria-hidden="true"
           width="160"
           height="200"
