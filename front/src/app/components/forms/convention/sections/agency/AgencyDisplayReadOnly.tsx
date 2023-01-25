@@ -2,7 +2,7 @@ import { useField } from "formik";
 import React, { useEffect, useState } from "react";
 import type { ConventionDto } from "shared";
 import { AgencyId, AgencyOption } from "shared";
-import { Loader } from "src/../../libs/react-design-system";
+import { Loader } from "react-design-system";
 import { agencyGateway } from "src/config/dependencies";
 import { AgencyDropdownListField } from "./AgencyDropdownListField";
 import { AgencyErrorText } from "./AgencyErrorText";
