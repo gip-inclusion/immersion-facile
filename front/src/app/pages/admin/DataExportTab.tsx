@@ -25,12 +25,12 @@ export const excelExportGateway = new HttpExcelExportGateway(
 );
 
 export const DataExportTab = () => (
-  <div className="flex flex-col gap-8">
+  <>
     <ExportEntreprises />
     <ExportConventions />
     <ExportAgencies />
     <ExportContactRequests />
-  </div>
+  </>
 );
 
 const ExportSection = ({ children }: { children: React.ReactNode }) => (
@@ -103,7 +103,6 @@ const ExportEntreprises = () => {
               label="Filtre par activité"
               name="Filter par activité"
               placeholder="Ex : Culture"
-              className="flex justify-between"
               onChange={(event) => {
                 setExportableParams({
                   ...exportableParams,
@@ -240,7 +239,6 @@ const ExportConventions = () => {
               label="Filtre par département"
               name="Filter par département"
               placeholder="Ex : Mayotte"
-              className="flex justify-between"
               onChange={(event) => {
                 setExportableParams({
                   ...exportableParams,
@@ -258,7 +256,6 @@ const ExportConventions = () => {
               label="Filtre par Région"
               name="Filter par Région"
               placeholder="Ex : La Réunion"
-              className="flex justify-between"
               onChange={(event) => {
                 setExportableParams({
                   ...exportableParams,
@@ -399,7 +396,7 @@ const DownloadButton = ({ onClick }: { onClick: () => Promise<void> }) => {
     <>
       <button
         disabled={isDownloading}
-        className="fr-btn"
+        className={fr.cx("fr-btn")}
         onClick={(_e) => {
           setError(undefined);
           setIsDownloading(true);
@@ -428,11 +425,11 @@ const LabeledCheckbox = ({
   label: string;
   onChange: (checked: boolean) => void;
 }) => (
-  <div className="flex gap-4 items-center font-medium justify-between">
-    <label className="fr-label">{label}</label>
+  <>
+    <label className={fr.cx("fr-label")}>{label}</label>
     <Checkbox
       onChange={(e) => onChange(e.currentTarget.checked)}
       color="primary"
     />
-  </div>
+  </>
 );
