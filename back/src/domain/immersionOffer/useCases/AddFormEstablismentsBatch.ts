@@ -4,29 +4,40 @@ import {
   formEstablishmentBatchSchema,
   splitInChunks,
 } from "shared";
-import { TransactionalUseCase } from "../../core/UseCase";
 import { UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { UseCase } from "../../core/UseCase";
+import { EstablishmentGroupEntity } from "../entities/EstablishmentGroupEntity";
 import { AddFormEstablishment } from "./AddFormEstablishment";
-// import { promise } from "zod";
 
-export class AddFormEstablishmentBatch extends TransactionalUseCase<
+export class AddFormEstablishmentBatch extends UseCase<
   FormEstablishmentBatchDto,
   void,
   AppJwtPayload
 > {
   constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    private addFormEstablishmentUseCase: AddFormEstablishment, //private createNewEvent: CreateNewEvent, // private readonly getSiret: GetSiretUseCase,
+    private addFormEstablishmentUseCase: AddFormEstablishment,
+    private uowPerformer: UnitOfWorkPerformer,
   ) {
-    super(uowPerformer);
+    super();
   }
 
   protected inputSchema = formEstablishmentBatchSchema;
 
-  protected async _execute(params: FormEstablishmentBatchDto): Promise<void> {
+  protected async _execute({
+    formEstablishments,
+    groupName,
+  }: FormEstablishmentBatchDto): Promise<void> {
+    const group: EstablishmentGroupEntity = {
+      name: groupName,
+      sirets: formEstablishments.map(({ siret }) => siret),
+    };
+    await this.uowPerformer.perform((uow) =>
+      uow.establishmentGroupRepository.save(group),
+    );
+
     const sizeOfChunk = 15;
     const chunksOfFormEstablishments = splitInChunks(
-      params.formEstablishments,
+      formEstablishments,
       sizeOfChunk,
     );
 

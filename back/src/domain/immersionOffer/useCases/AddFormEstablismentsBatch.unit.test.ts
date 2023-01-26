@@ -5,6 +5,7 @@ import {
   FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
 } from "shared";
+import { InMemoryEstablishmentGroupRepository } from "../../../adapters/secondary/immersionOffer/inMemoryEstablishmentGroupRepository";
 import { AddFormEstablishment } from "./AddFormEstablishment";
 import { AddFormEstablishmentBatch } from "./AddFormEstablismentsBatch";
 import {
@@ -25,6 +26,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
   let addFormEstablishmentBatch: AddFormEstablishmentBatch;
   let formEstablishmentRepo: InMemoryFormEstablishmentRepository;
   let outboxRepo: InMemoryOutboxRepository;
+  let establishmentGroupRepository: InMemoryEstablishmentGroupRepository;
   let stubGetSiret: StubGetSiret;
   let uowPerformer: InMemoryUowPerformer;
   let uuidGenerator: TestUuidGenerator;
@@ -33,6 +35,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
     uow = createInMemoryUow();
     stubGetSiret = new StubGetSiret();
     formEstablishmentRepo = uow.formEstablishmentRepository;
+    establishmentGroupRepository = uow.establishmentGroupRepository;
     outboxRepo = uow.outboxRepository;
     uow.featureFlagRepository = new InMemoryFeatureFlagRepository({
       enableAdminUi: false,
@@ -54,8 +57,8 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
     );
 
     addFormEstablishmentBatch = new AddFormEstablishmentBatch(
-      new InMemoryUowPerformer(uow),
       addFormEstablishment,
+      uowPerformer,
     );
   });
 
@@ -95,13 +98,20 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
     });
   });
 
-  it("creates the establishmentGroup of establishments", async () => {
+  it("creates the establishmentGroup with the sirets of the establishments", async () => {
     const formEstablishmentBatch = createFormEstablishmentBatchDto();
     uuidGenerator.setNextUuids(["event1-id", "event2-id"]);
 
     await addFormEstablishmentBatch.execute(formEstablishmentBatch);
 
-    expect(true).toBe(false);
+    expect(establishmentGroupRepository.groups).toHaveLength(1);
+    expectToEqual(establishmentGroupRepository.groups[0], {
+      name: formEstablishmentBatch.groupName,
+      sirets: [
+        formEstablishmentBatch.formEstablishments[0].siret,
+        formEstablishmentBatch.formEstablishments[1].siret,
+      ],
+    });
   });
 });
 

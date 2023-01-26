@@ -5,7 +5,10 @@ export class InMemoryEstablishmentGroupRepository
   implements EstablishmentGroupRepository
 {
   // eslint-disable-next-line @typescript-eslint/require-await
-  public async save(_group: EstablishmentGroupEntity) {
-    throw new Error("Not implemented");
+  public async save(group: EstablishmentGroupEntity) {
+    this.groups.push(group);
   }
+
+  // for test purpose
+  public groups: EstablishmentGroupEntity[] = [];
 }

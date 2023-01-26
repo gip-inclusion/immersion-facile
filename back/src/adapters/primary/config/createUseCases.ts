@@ -137,8 +137,8 @@ export const createUseCases = (
       getSentEmails: new GetSentEmails(gateways.email),
       exportData: new ExportData(uowPerformer, gateways.exportGateway),
       addFormEstablishmentBatch: new AddFormEstablishmentBatch(
-        uowPerformer,
         addFormEstablishment,
+        uowPerformer,
       ),
       // uowPerformer,
       // createNewEvent,
