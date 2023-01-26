@@ -84,6 +84,7 @@ export * from "./utils/postalCode";
 export * from "./utils/queryParams";
 export * from "./utils/string";
 export * from "./utils/toDotNotation";
+export * from "./utils/csv";
 export * from "./zodUtils";
 export * from "./date";
 export * from "./test.helpers";
