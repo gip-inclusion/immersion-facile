@@ -16,7 +16,7 @@ export class AddFormEstablishmentBatch extends TransactionalUseCase<
 > {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private addFormEstablishmentUsecase: AddFormEstablishment, //private createNewEvent: CreateNewEvent, // private readonly getSiret: GetSiretUseCase,
+    private addFormEstablishmentUseCase: AddFormEstablishment, //private createNewEvent: CreateNewEvent, // private readonly getSiret: GetSiretUseCase,
   ) {
     super(uowPerformer);
   }
@@ -34,7 +34,7 @@ export class AddFormEstablishmentBatch extends TransactionalUseCase<
       const chunkOfFormEstablishments = chunksOfFormEstablishments[i];
       await Promise.all(
         chunkOfFormEstablishments.map((formEstablishment) =>
-          this.addFormEstablishmentUsecase.execute(formEstablishment),
+          this.addFormEstablishmentUseCase.execute(formEstablishment),
         ),
       );
     }

@@ -95,7 +95,14 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
     });
   });
 
-  // it("creates the group of establishments", () => {})
+  it("creates the establishmentGroup of establishments", async () => {
+    const formEstablishmentBatch = createFormEstablishmentBatchDto();
+    uuidGenerator.setNextUuids(["event1-id", "event2-id"]);
+
+    await addFormEstablishmentBatch.execute(formEstablishmentBatch);
+
+    expect(true).toBe(false);
+  });
 });
 
 const createFormEstablishmentBatchDto = (): FormEstablishmentBatchDto => {

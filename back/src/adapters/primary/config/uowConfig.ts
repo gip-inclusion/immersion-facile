@@ -7,9 +7,11 @@ import { InMemoryOutboxQueries } from "../../secondary/core/InMemoryOutboxQuerie
 import { InMemoryOutboxRepository } from "../../secondary/core/InMemoryOutboxRepository";
 import { InMemoryDiscussionAggregateRepository } from "../../secondary/immersionOffer/InMemoryDiscussionAggregateRepository";
 import { InMemoryEstablishmentAggregateRepository } from "../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
+import { InMemoryEstablishmentGroupRepository } from "../../secondary/immersionOffer/inMemoryEstablishmentGroupRepository";
 import { InMemoryLaBonneBoiteRequestRepository } from "../../secondary/immersionOffer/InMemoryLaBonneBoiteRequestRepository";
 import { InMemorySearchMadeRepository } from "../../secondary/immersionOffer/InMemorySearchMadeRepository";
 import { InMemoryAgencyRepository } from "../../secondary/InMemoryAgencyRepository";
+import { InMemoryApiConsumerRepository } from "../../secondary/InMemoryApiConsumerRepository";
 import { InMemoryAuthenticatedUserRepository } from "../../secondary/InMemoryAuthenticatedUserRepository";
 import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../secondary/InMemoryConventionPoleEmploiAdvisorRepository";
 import { InMemoryConventionQueries } from "../../secondary/InMemoryConventionQueries";
@@ -22,12 +24,14 @@ import { InMemoryOngoingOAuthRepository } from "../../secondary/InMemoryOngoingO
 import { InMemoryRomeRepository } from "../../secondary/InMemoryRomeRepository";
 import { InMemoryUowPerformer } from "../../secondary/InMemoryUowPerformer";
 import { PgAgencyRepository } from "../../secondary/pg/PgAgencyRepository";
+import { PgApiConsumerRepository } from "../../secondary/pg/PgApiConsumerRepository";
 import { PgAuthenticatedUserRepository } from "../../secondary/pg/PgAuthenticatedUserRepository";
 import { PgConventionPoleEmploiAdvisorRepository } from "../../secondary/pg/PgConventionPoleEmploiAdvisorRepository";
 import { PgConventionQueries } from "../../secondary/pg/PgConventionQueries";
 import { PgConventionRepository } from "../../secondary/pg/PgConventionRepository";
 import { PgDiscussionAggregateRepository } from "../../secondary/pg/PgDiscussionAggregateRepository";
 import { PgEstablishmentAggregateRepository } from "../../secondary/pg/PgEstablishmentAggregateRepository";
+import { PgEstablishmentGroupRepository } from "../../secondary/pg/PgEstablishmentGroupRepository";
 import { PgExportQueries } from "../../secondary/pg/PgExportQueries";
 import { PgFeatureFlagRepository } from "../../secondary/pg/PgFeatureFlagRepository";
 import { PgFormEstablishmentRepository } from "../../secondary/pg/PgFormEstablishmentRepository";
@@ -43,10 +47,9 @@ import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { stubPostalCodeDepartmentRegionQueries } from "../../secondary/StubPostalCodeDepartmentRegionQueries";
 import { AppConfig } from "./appConfig";
 import { GetPgPoolFn } from "./createGateways";
-import { InMemoryApiConsumerRepository } from "../../secondary/InMemoryApiConsumerRepository";
-import { PgApiConsumerRepository } from "../../secondary/pg/PgApiConsumerRepository";
 
 export type InMemoryUnitOfWork = ReturnType<typeof createInMemoryUow>;
+
 export const createInMemoryUow = () => {
   const outboxRepository = new InMemoryOutboxRepository();
   const outboxQueries = new InMemoryOutboxQueries(outboxRepository);
@@ -66,6 +69,7 @@ export const createInMemoryUow = () => {
     discussionAggregateRepository: new InMemoryDiscussionAggregateRepository(),
     establishmentAggregateRepository:
       new InMemoryEstablishmentAggregateRepository(),
+    establishmentGroupRepository: new InMemoryEstablishmentGroupRepository(),
     exportQueries: new InMemoryExportQueries(),
     featureFlagRepository: new InMemoryFeatureFlagRepository(),
     formEstablishmentRepository: new InMemoryFormEstablishmentRepository(),
@@ -96,6 +100,7 @@ export const createPgUow = (client: PoolClient): UnitOfWork => ({
   establishmentAggregateRepository: new PgEstablishmentAggregateRepository(
     client,
   ),
+  establishmentGroupRepository: new PgEstablishmentGroupRepository(client),
   exportQueries: new PgExportQueries(client),
   featureFlagRepository: new PgFeatureFlagRepository(client),
   formEstablishmentRepository: new PgFormEstablishmentRepository(client),
