@@ -1,8 +1,10 @@
-import { useField } from "formik";
+import { useField, useFormikContext } from "formik";
 import React, { useEffect, useState } from "react";
 import type { ConventionDto } from "shared";
 import { AgencyId, AgencyOption } from "shared";
 import { Loader } from "react-design-system";
+import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
+import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { agencyGateway } from "src/config/dependencies";
 import { AgencyDropdownListField } from "./AgencyDropdownListField";
 import { AgencyErrorText } from "./AgencyErrorText";
@@ -19,10 +21,15 @@ export const AgencyDisplayReadOnly = ({ agencyId }: AgencyDisplayProps) => {
   const name: keyof ConventionDto = "agencyId";
   const [{ value, onBlur }, { touched, error }, { setValue }] =
     useField<AgencyId>({ name });
+  const { values } = useFormikContext<ConventionDto>();
 
   const [isLoading, setIsLoading] = useState(false);
   const [loadingError, setLoadingError] = useState(false);
   const [agencies, setAgencies] = useState([placeholderAgency]);
+  const { getFormFields } = useFormContents(
+    formConventionFieldsLabels(values.internshipKind),
+  );
+  const formContents = getFormFields();
 
   useEffect(() => {
     if (!agencyId) return;
@@ -59,9 +66,9 @@ export const AgencyDisplayReadOnly = ({ agencyId }: AgencyDisplayProps) => {
       className={`fr-input-group${showError ? " fr-input-group--error" : ""}`}
     >
       <AgencyDropdownListField
+        {...formContents["agencyId"]}
         isLoading={isLoading}
         disabled={true}
-        name={name}
         value={value}
         onBlur={onBlur}
         agencies={agencies}

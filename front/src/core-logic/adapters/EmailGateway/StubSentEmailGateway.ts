@@ -45,6 +45,7 @@ export class StubSentEmailGateway implements StubSentEmailGateway {
           recipients: ["virgina.wolf@email.com", "helene.joyeux@email.com"],
           cc: ["erika.grandjean@immersion.fr"],
           params: {
+            internshipKind: "immersion",
             demandeId: "55c4872f-9537-4e8e-8102-71bd9380a0f7",
             firstName: "fgfsdgsdfg",
             lastName: "fgdfgdf",

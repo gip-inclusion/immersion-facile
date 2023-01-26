@@ -6,9 +6,10 @@ import {
   getConventionFieldName,
   Role,
 } from "shared";
-import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
+import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
+import { useFormContents } from "src/app/hooks/formContents.hooks";
 
 type BeneficiaryRepresentativeFieldsProps = { disabled?: boolean };
 
@@ -17,60 +18,34 @@ export const BeneficiaryRepresentativeFields = ({
 }: BeneficiaryRepresentativeFieldsProps) => {
   useBeneficiaryRepresentativeAsEmergencyContact();
   useBeneficiaryRepresentativeRole();
-  const t = useConventionTextsFromFormikContext();
   const { values } = useFormikContext<ConventionDto>();
-
+  const { getFormFields } = useFormContents(
+    formConventionFieldsLabels(values.internshipKind),
+  );
+  const formContents = getFormFields();
   return (
     <>
       <TextInput
-        label={`${t.beneficiarySection.beneficiaryRepresentative.firstNameLabel} *`}
-        name={getConventionFieldName(
-          "signatories.beneficiaryRepresentative.firstName",
-        )}
+        {...formContents["signatories.beneficiaryRepresentative.firstName"]}
         type="text"
-        placeholder=""
-        description=""
         disabled={disabled}
       />
       <TextInput
-        label={`${t.beneficiarySection.beneficiaryRepresentative.lastNameLabel} *`}
-        name={getConventionFieldName(
-          "signatories.beneficiaryRepresentative.lastName",
-        )}
+        {...formContents["signatories.beneficiaryRepresentative.lastName"]}
         type="text"
-        placeholder=""
-        description=""
         disabled={disabled}
       />
       <TextInput
-        label={`${t.beneficiarySection.beneficiaryRepresentative.email.label} *`}
-        name={getConventionFieldName(
-          "signatories.beneficiaryRepresentative.email",
-        )}
+        {...formContents["signatories.beneficiaryRepresentative.email"]}
         type="email"
-        placeholder={
-          t.beneficiarySection.beneficiaryRepresentative.email.placeholder
-        }
-        description={
-          t.beneficiarySection.beneficiaryRepresentative.email.description
-        }
         disabled={disabled}
       />
       {values.signatories.beneficiaryRepresentative?.email && (
         <ConventionEmailWarning />
       )}
       <TextInput
-        label={`${t.beneficiarySection.beneficiaryRepresentative.phone.label} *`}
-        name={getConventionFieldName(
-          "signatories.beneficiaryRepresentative.phone",
-        )}
+        {...formContents["signatories.beneficiaryRepresentative.phone"]}
         type="tel"
-        placeholder={
-          t.beneficiarySection.beneficiaryRepresentative.phone.placeholder
-        }
-        description={
-          t.beneficiarySection.beneficiaryRepresentative.phone.description
-        }
         disabled={disabled}
       />
     </>

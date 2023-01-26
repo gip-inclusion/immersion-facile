@@ -1,38 +1,37 @@
+import { fr } from "@codegouvfr/react-dsfr";
 import { addMonths } from "date-fns";
 import { useFormikContext } from "formik";
 import React, { useState } from "react";
+import { Notification } from "react-design-system";
 import {
   addressDtoToString,
   ConventionDto,
   conventionObjectiveOptions,
   DateIntervalDto,
-  getConventionFieldName,
   isStringDate,
   reasonableSchedule,
   scheduleWithFirstDayActivity,
 } from "shared";
-import { Notification } from "react-design-system";
+import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
+import { DateInput } from "src/app/components/forms/commons/DateInput";
 import {
   BoolRadioGroup,
   RadioGroupForField,
 } from "src/app/components/forms/commons/RadioGroup";
-import { ConventionFormProfession } from "src/app/components/forms/convention/ConventionFormProfession";
-import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
-import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
-import { useSiretRelatedField } from "src/app/hooks/siret.hooks";
-import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
-import { DateInput } from "src/app/components/forms/commons/DateInput";
 import { SchedulePicker } from "src/app/components/forms/commons/SchedulePicker/SchedulePicker";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
-import { fr } from "@codegouvfr/react-dsfr";
+import { ConventionFormProfession } from "src/app/components/forms/convention/ConventionFormProfession";
+import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
+import { useFormContents } from "src/app/hooks/formContents.hooks";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { useSiretRelatedField } from "src/app/hooks/siret.hooks";
+import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 
 export const ImmersionConditionsCommonFields = ({
   disabled,
 }: {
   disabled?: boolean;
 }) => {
-  const t = useConventionTextsFromFormikContext();
   const { setFieldValue, values } = useFormikContext<ConventionDto>();
   const establishmentInfos = useAppSelector(siretSelectors.establishmentInfos);
   const isFetchingSiret = useAppSelector(siretSelectors.isFetching);
@@ -50,6 +49,10 @@ export const ImmersionConditionsCommonFields = ({
     fieldToUpdate: "immersionAddress",
     disabled: isSiretFetcherDisabled,
   });
+  const { getFormFields } = useFormContents(
+    formConventionFieldsLabels(values.internshipKind),
+  );
+  const formContents = getFormFields();
 
   const resetSchedule = (interval: DateIntervalDto) => {
     setFieldValue(
@@ -86,8 +89,7 @@ export const ImmersionConditionsCommonFields = ({
         </>
       )}
       <DateInput
-        label={`${t.immersionConditionsSection.dateStartLabel} *`}
-        name={getConventionFieldName("dateStart")}
+        {...formContents["dateStart"]}
         disabled={disabled}
         onDateChange={(dateStart) => {
           resetSchedule({
@@ -101,8 +103,7 @@ export const ImmersionConditionsCommonFields = ({
         }}
       />
       <DateInput
-        label={`${t.immersionConditionsSection.dateEndLabel} *`}
-        name={getConventionFieldName("dateEnd")}
+        {...formContents["dateEnd"]}
         disabled={disabled}
         max={dateMax}
         onDateChange={(dateEnd) => {
@@ -121,18 +122,17 @@ export const ImmersionConditionsCommonFields = ({
         }}
       />
       <AddressAutocomplete
+        {...formContents["immersionAddress"]}
         initialSearchTerm={
           values.immersionAddress ?? establishmentInfos?.businessAddress
         }
-        label={`${t.immersionConditionsSection.immersionAddressLabel} *`}
         setFormValue={({ address }) =>
           setFieldValue("immersionAddress", addressDtoToString(address))
         }
         disabled={disabled || isFetchingSiret}
       />
       <BoolRadioGroup
-        name={getConventionFieldName("individualProtection")}
-        label={`${t.immersionConditionsSection.individualProtectionLabel} *`}
+        {...formContents["individualProtection"]}
         disabled={disabled}
       />
       {values.internshipKind === "mini-stage-cci" && (
@@ -147,19 +147,12 @@ export const ImmersionConditionsCommonFields = ({
         </Notification>
       )}
       <BoolRadioGroup
-        name={getConventionFieldName("sanitaryPrevention")}
-        label={`${t.immersionConditionsSection.sanitaryPreventionLabel} *`}
+        {...formContents["sanitaryPrevention"]}
         disabled={disabled}
       />
-
       <TextInput
-        label={t.immersionConditionsSection.sanitaryPreventionDetails.label}
-        name={getConventionFieldName("sanitaryPreventionDescription")}
+        {...formContents["sanitaryPreventionDescription"]}
         type="text"
-        placeholder=""
-        description={
-          t.immersionConditionsSection.sanitaryPreventionDetails.description
-        }
         disabled={disabled}
       />
       {values.internshipKind === "mini-stage-cci" && (
@@ -171,8 +164,7 @@ export const ImmersionConditionsCommonFields = ({
         </Notification>
       )}
       <RadioGroupForField
-        name={getConventionFieldName("immersionObjective")}
-        label={`${t.immersionConditionsSection.immersionObjectiveLabel} *`}
+        {...formContents["immersionObjective"]}
         options={conventionObjectiveOptions
           .filter((value) =>
             values.internshipKind !== "mini-stage-cci"
@@ -185,26 +177,22 @@ export const ImmersionConditionsCommonFields = ({
         disabled={disabled}
       />
       <ConventionFormProfession
-        label={`${t.immersionConditionsSection.profession.label} *`}
-        description={t.immersionConditionsSection.profession.description}
+        {...formContents["immersionAppellation"]}
         disabled={disabled}
         initialFieldValue={values.immersionAppellation}
       />
       <TextInput
-        label={t.immersionConditionsSection.workConditions.label}
-        name={getConventionFieldName("workConditions")}
-        description={t.immersionConditionsSection.workConditions.description}
+        {...formContents["workConditions"]}
         disabled={disabled}
         multiline={true}
       />
       <TextInput
-        label={`${t.immersionConditionsSection.immersionActivities.label} *`}
-        name={getConventionFieldName("immersionActivities")}
-        type="text"
-        placeholder=""
-        description={
-          t.immersionConditionsSection.immersionActivities.description
-        }
+        {...formContents["businessAdvantages"]}
+        disabled={disabled}
+        multiline={true}
+      />
+      <TextInput
+        {...formContents["immersionActivities"]}
         disabled={disabled}
         multiline={true}
       />
@@ -220,11 +208,8 @@ export const ImmersionConditionsCommonFields = ({
         </Notification>
       )}
       <TextInput
-        label={`${t.immersionConditionsSection.immersionSkills.label}`}
-        name={getConventionFieldName("immersionSkills")}
+        {...formContents["immersionSkills"]}
         type="text"
-        placeholder=""
-        description={t.immersionConditionsSection.immersionSkills.description}
         disabled={disabled}
       />
     </>

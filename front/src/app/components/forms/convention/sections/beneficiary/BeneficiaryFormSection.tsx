@@ -106,6 +106,12 @@ export const BeneficiaryFormSection = ({
           options={levelsOfEducationToSelectOption()}
         />
       )}
+      <TextInput
+        {...formContents["signatories.beneficiary.financiaryHelp"]}
+        type="text"
+        multiline={true}
+        disabled={isFrozen}
+      />
       <RadioGroup
         {...formContents.isMinor}
         disabled={isFrozen}

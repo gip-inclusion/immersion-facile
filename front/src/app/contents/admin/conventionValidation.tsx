@@ -65,16 +65,24 @@ const beneficiaryFields: ColField[] = [
     colLabel: "Infos additionnelles",
     value: (convention) => (
       <span>
-        Date de naissance :{" "}
-        {toDisplayedDate(
-          new Date(convention.signatories.beneficiary.birthdate),
-        )}
+        <div className="fr-text--xs">
+          Date de naissance :{" "}
+          {toDisplayedDate(
+            new Date(convention.signatories.beneficiary.birthdate),
+          )}
+        </div>
         <div className="fr-text--xs">
           Contact d'urgence :{" "}
           {displayEmergencyContactInfos({
             ...convention.signatories,
           })}
         </div>
+        {convention.signatories.beneficiary.financiaryHelp && (
+          <div className="fr-text--xs">
+            Aide financière :{" "}
+            {convention.signatories.beneficiary.financiaryHelp}
+          </div>
+        )}
       </span>
     ),
   },
@@ -311,6 +319,10 @@ const immersionJobFields: ColField[] = [
   {
     key: "workConditions",
     colLabel: "Conditions de travail particulières",
+  },
+  {
+    key: "businessAdvantages",
+    colLabel: "Avantages proposés par l'entreprise",
   },
 ];
 

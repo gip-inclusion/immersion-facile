@@ -109,7 +109,6 @@ export const AgencySelector = ({
 
       <AgencyDropdownListField
         {...agencyIdField}
-        name={agencyIdField.name || "agencyId"}
         isLoading={isLoading}
         disabled={disabled}
         value={value}

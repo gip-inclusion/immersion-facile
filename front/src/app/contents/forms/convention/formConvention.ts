@@ -10,25 +10,25 @@ export type FormFieldsObjectForContent<T> = Record<
 // Remove and replace by ConventionField when postalCode is removed from ConventionDTO
 type ConventionFieldWithoutPostalCode = Exclude<ConventionField, "postalCode">;
 
+type FormFieldKeys =
+  | ConventionFieldWithoutPostalCode
+  | "isCurrentEmployer"
+  | "isEstablishmentTutorIsEstablishmentRepresentative"
+  | "isMinor";
+
 export type FormConventionFieldsLabels = FormFieldsObjectForContent<
-  Record<
-    | ConventionFieldWithoutPostalCode
-    | "isCurrentEmployer"
-    | "isEstablishmentTutorIsEstablishmentRepresentative"
-    | "isMinor",
-    FormFieldAttributesForContent
-  >
+  Record<FormFieldKeys, FormFieldAttributesForContent>
 >;
 
 export const formConventionFieldsLabels: (
-  conventionType: InternshipKind,
-) => FormConventionFieldsLabels = (conventionType) => ({
-  ...conventionSection(conventionType),
-  ...beneficiarySection,
-  ...establishmentTutorSection,
-  ...beneficiaryRepresentativeSection,
+  internshipKind: InternshipKind,
+) => FormConventionFieldsLabels = (internshipKind) => ({
+  ...conventionSection(internshipKind),
+  ...beneficiarySection(internshipKind),
+  ...beneficiaryRepresentativeSection(internshipKind),
   ...beneficiaryCurrentEmployerSection,
-  ...establishmentRepresentativeSection,
+  ...establishmentTutorSection(internshipKind),
+  ...establishmentRepresentativeSection(internshipKind),
   //
   // TODO: exclude these fields from typing
   //
@@ -37,60 +37,81 @@ export const formConventionFieldsLabels: (
 
 const conventionSection = (internshipKind: InternshipKind) => ({
   agencyDepartment: {
-    label: "Votre département",
+    label:
+      internshipKind === "immersion"
+        ? "Votre département"
+        : "Saisissez le département de votre entreprise d’accueil",
     id: "form-convention-agencyDepartement",
     required: true,
     placeholder: "Veuillez sélectionner un département",
   },
   agencyId: {
-    label: "Votre structure d'accompagnement",
+    label:
+      internshipKind === "immersion"
+        ? "Votre structure d'accompagnement"
+        : "Choisissez le Point Orientation de la chambre de commerce et d’industrie près de chez vous !",
     id: "form-convention-agencyId",
     required: true,
   },
   dateStart: {
     label:
-      internshipKind === "mini-stage-cci"
-        ? "Date de début du stage"
-        : "Date de début de l'immersion",
+      internshipKind === "immersion"
+        ? "Date de début de l'immersion"
+        : "Date de début du stage",
     id: "form-convention-dateStart",
     required: true,
   },
   dateEnd: {
-    label: "Date de fin de l'immersion",
+    label:
+      internshipKind === "immersion"
+        ? "Date de fin de l'immersion"
+        : "Date de fin du stage",
     id: "form-convention-dateStart",
     required: true,
   },
-
   siret: {
-    label: "Indiquez le SIRET de la structure d'accueil",
+    label:
+      internshipKind === "immersion"
+        ? "Indiquez le SIRET de la structure d'accueil"
+        : "Indiquez le SIRET de l’entreprise où vous allez faire votre stage",
     description:
-      "la structure d'accueil, c'est l'entreprise, le commerce, l'association ... où vous allez faire votre immersion",
+      internshipKind === "immersion"
+        ? "la structure d'accueil, c'est l'entreprise, le commerce, l'association ... où vous allez faire votre immersion"
+        : "la structure d'accueil, où vous allez faire votre stage",
     placeholder: "362 521 879 00034",
     id: "form-convention-siret",
     required: true,
   },
   businessName: {
-    label: "Indiquez le nom (raison sociale) de l'établissement d'accueil",
+    label:
+      internshipKind === "immersion"
+        ? "Indiquez le nom (raison sociale) de l'établissement d'accueil"
+        : "Indiquez le nom (raison sociale) de votre entreprise",
     id: "form-convention-businessName",
     required: true,
   },
-
   workConditions: {
     label:
-      "Conditions de travail, propres  au métier observé pendant l’immersion. ",
+      internshipKind === "immersion"
+        ? "Conditions de travail, propres au métier observé pendant l’immersion. "
+        : "Conditions de travail, propres au métier observé pendant le stage ",
     description:
       "Ex : transport de marchandises longue distance - pas de retour au domicile pendant 2 jours",
     id: "form-convention-workConditions",
   },
   individualProtection: {
     label:
-      "Un équipement de protection individuelle est-il fourni pour l’immersion ?",
+      internshipKind === "immersion"
+        ? "Un équipement de protection individuelle est-il fourni pour l’immersion ?"
+        : "Un équipement de protection individuelle est-il fourni pour le stage",
     id: "form-convention-individualProtection",
     required: true,
   },
   sanitaryPrevention: {
     label:
-      "Des mesures de prévention sanitaire sont-elles prévues pour l’immersion ?",
+      internshipKind === "immersion"
+        ? "Des mesures de prévention sanitaire sont-elles prévues pour l’immersion ?"
+        : "Des mesures de prévention sanitaire sont-elles prévues pour le stage ?",
     id: "form-convention-sanitaryPrevention",
     required: true,
   },
@@ -100,7 +121,10 @@ const conventionSection = (internshipKind: InternshipKind) => ({
     id: "form-convention-sanitaryPreventionDescription",
   },
   immersionAddress: {
-    label: "Adresse du lieu où se fera l'immersion",
+    label:
+      internshipKind === "immersion"
+        ? "Adresse du lieu où se fera l'immersion"
+        : "Adresse du lieu où se fera le stage",
     placeholder: "Ex: Bordeaux 33000",
     id: "form-convention-workConditions",
     required: true,
@@ -110,20 +134,29 @@ const conventionSection = (internshipKind: InternshipKind) => ({
     id: "form-convention-immersionObjective",
   },
   immersionAppellation: {
-    label: "Intitulé du poste / métier observé pendant l'immersion",
+    label:
+      internshipKind === "immersion"
+        ? "Intitulé du poste / métier observé pendant l'immersion"
+        : "Intitulé du métier observé pendant le stage",
     description: "Ex : employé libre service, web développeur, boulanger …",
     placeholder: "Prêt à porter",
     id: "form-convention-immersionAppellation",
     required: true,
   },
   immersionActivities: {
-    label: "Activités observées / pratiquées pendant l'immersion",
+    label:
+      internshipKind === "immersion"
+        ? "Activités observées / pratiquées pendant l'immersion"
+        : "Activités observées / pratiquées pendant le stage",
     description: "Ex : mise en rayon, accueil et aide à la clientèle",
     id: "form-convention-immersionActivities",
     required: true,
   },
   immersionSkills: {
-    label: "Compétences/aptitudes observées / évaluées pendant l'immersion",
+    label:
+      internshipKind === "immersion"
+        ? "Compétences/aptitudes observées / évaluées pendant l'immersion"
+        : "Compétences/aptitudes observées / évaluées pendant le stage",
     description:
       "Ex : communiquer à l'oral, résoudre des problèmes, travailler en équipe",
     id: "form-convention-immersionSkills",
@@ -140,6 +173,13 @@ const conventionSection = (internshipKind: InternshipKind) => ({
     id: "form-convention-isEstablishmentTutorIsEstablishmentRepresentative",
     required: true,
   },
+  businessAdvantages: {
+    label: "Avantages",
+    id: "form-convention-businessAdvantages",
+    description: "Avantages proposés par l'entreprise",
+    placeholder:
+      "navettes jusqu'au lieu de travail, panier repas, hébergement...",
+  },
   isMinor: {
     label: "La personne qui va faire l'immersion est-elle mineure ?",
     id: "form-convention-isMinor",
@@ -147,7 +187,7 @@ const conventionSection = (internshipKind: InternshipKind) => ({
   },
 });
 
-const beneficiarySection = {
+const beneficiarySection = (internshipKind: InternshipKind) => ({
   "signatories.beneficiary.firstName": {
     label: "Prénom",
     id: "form-convention-signatories-beneficiary-firstName",
@@ -171,10 +211,12 @@ const beneficiarySection = {
     description:
       "cela nous permet de vous transmettre la validation de la convention",
   },
-
   "signatories.beneficiary.phone": {
     label: "Téléphone",
-    description: "pour qu’on puisse vous contacter à propos de l’immersion",
+    description:
+      internshipKind === "immersion"
+        ? "pour qu’on puisse vous contacter à propos de l’immersion"
+        : "pour qu’on puisse vous contacter à propos du stage",
     placeholder: "0605040302",
     id: "form-convention-signatories-beneficiary-phone",
     required: true,
@@ -184,6 +226,13 @@ const beneficiarySection = {
     id: "form-convention-signatories-beneficiary-level-of-education",
     placeholder: "Précisez votre statut",
     required: true,
+  },
+  "signatories.beneficiary.financiaryHelp": {
+    label: "Aide financière",
+    id: "form-convention-signatories-beneficiary-financiary-help",
+    placeholder: "exemple: aide à la mobilité",
+    description:
+      "Le bénéficiaire a-t-il besoin d'une aide financière pour réaliser l'immersion?",
   },
   "signatories.beneficiary.federatedIdentity": {
     // hidden field
@@ -204,23 +253,9 @@ const beneficiarySection = {
     id: "form-convention-signatories-beneficiary-emergencyContactEmail",
     placeholder: "contact@urgence.com",
   },
-};
-const establishmentTutorSection = {
-  "establishmentTutor.email": {
-    label: "Indiquez l'e-mail du tuteur",
-    description: "pour envoyer la validation de la convention",
-    placeholder: "nom@exemple.com",
-    id: "form-convention-establishmentTutor-email",
-    required: true,
-  },
-  "establishmentTutor.phone": {
-    label:
-      "Indiquez le numéro de téléphone du tuteur ou de la structure d'accueil",
-    description: "pour qu’on puisse le/la contacter à propos de l’immersion",
-    placeholder: "0605040302",
-    id: "form-convention-establishmentTutor-phone",
-    required: true,
-  },
+});
+
+const establishmentTutorSection = (internshipKind: InternshipKind) => ({
   "establishmentTutor.firstName": {
     label: "Indiquez le prénom du tuteur",
     description: "Ex : Alain",
@@ -233,28 +268,35 @@ const establishmentTutorSection = {
     id: "form-convention-establishmentTutor-lastName",
     required: true,
   },
+  "establishmentTutor.email": {
+    label: "Indiquez l'e-mail du tuteur",
+    description: "pour envoyer la validation de la convention",
+    placeholder: "nom@exemple.com",
+    id: "form-convention-establishmentTutor-email",
+    required: true,
+  },
+  "establishmentTutor.phone": {
+    label:
+      internshipKind === "immersion"
+        ? "Indiquez le numéro de téléphone du tuteur ou de la structure d'accueil"
+        : "Indiquez le numéro de téléphone du tuteur ou de l’entreprise",
+    description:
+      internshipKind === "immersion"
+        ? "pour qu’on puisse le/la contacter à propos de l’immersion"
+        : "pour qu’on puisse le/la contacter à propos du stage",
+    placeholder: "0605040302",
+    id: "form-convention-establishmentTutor-phone",
+    required: true,
+  },
   "establishmentTutor.job": {
     label: "Indiquez la fonction du tuteur",
     description: "Ex : Pilote automobile",
     id: "form-convention-establishmentTutor-job",
     required: true,
   },
-};
+});
 
-const beneficiaryRepresentativeSection = {
-  "signatories.beneficiaryRepresentative.email": {
-    label: "Adresse email du représentant légal",
-    id: "form-convention-signatories-beneficiaryRepresentative-email",
-    description:
-      "cela nous permet de vous transmettre la validation de la convention",
-    required: true,
-  },
-  "signatories.beneficiaryRepresentative.phone": {
-    label: "Téléphone",
-    id: "form-convention-signatories-beneficiaryRepresentative-phone",
-    description: "pour qu’on puisse vous contacter à propos de l’immersion",
-    required: true,
-  },
+const beneficiaryRepresentativeSection = (internshipKind: InternshipKind) => ({
   "signatories.beneficiaryRepresentative.firstName": {
     label: "Prénom du représentant légal",
     id: "form-convention-signatories-beneficiaryRepresentative-firstName",
@@ -265,7 +307,23 @@ const beneficiaryRepresentativeSection = {
     id: "form-convention-signatories-beneficiaryRepresentative-lastName",
     required: true,
   },
-};
+  "signatories.beneficiaryRepresentative.email": {
+    label: "Adresse email du représentant légal",
+    id: "form-convention-signatories-beneficiaryRepresentative-email",
+    description:
+      "cela nous permet de vous transmettre la validation de la convention",
+    required: true,
+  },
+  "signatories.beneficiaryRepresentative.phone": {
+    label: "Téléphone",
+    id: "form-convention-signatories-beneficiaryRepresentative-phone",
+    description:
+      internshipKind === "immersion"
+        ? "pour qu’on puisse vous contacter à propos de l’immersion"
+        : "pour qu’on puisse vous contacter à propos du stage",
+    required: true,
+  },
+});
 
 const beneficiaryCurrentEmployerSection = {
   "signatories.beneficiaryCurrentEmployer.businessName": {
@@ -304,21 +362,9 @@ const beneficiaryCurrentEmployerSection = {
   },
 };
 
-const establishmentRepresentativeSection = {
-  "signatories.establishmentRepresentative.email": {
-    label: "Indiquez l'e-mail du représentant de l'entreprise",
-    placeholder: "nom@exemple.com",
-    description: "pour envoyer la validation de la convention",
-    id: "form-convention-signatories-establishmentRepresentative-email",
-    required: true,
-  },
-  "signatories.establishmentRepresentative.phone": {
-    label: "Indiquez le numéro de téléphone du représentant de l'entreprise",
-    placeholder: "0605040302",
-    description: "pour qu’on puisse le contacter à propos de l’immersion",
-    id: "form-convention-signatories-establishmentRepresentative-phone",
-    required: true,
-  },
+const establishmentRepresentativeSection = (
+  internshipKind: InternshipKind,
+) => ({
   "signatories.establishmentRepresentative.firstName": {
     label: "Indiquez le prénom du représentant de l'entreprise",
     description: "Ex : Alain",
@@ -331,7 +377,24 @@ const establishmentRepresentativeSection = {
     id: "form-convention-signatories-establishmentRepresentative-lastName",
     required: true,
   },
-};
+  "signatories.establishmentRepresentative.email": {
+    label: "Indiquez l'e-mail du représentant de l'entreprise",
+    placeholder: "nom@exemple.com",
+    description: "pour envoyer la validation de la convention",
+    id: "form-convention-signatories-establishmentRepresentative-email",
+    required: true,
+  },
+  "signatories.establishmentRepresentative.phone": {
+    label: "Indiquez le numéro de téléphone du représentant de l'entreprise",
+    placeholder: "0605040302",
+    description:
+      internshipKind === "immersion"
+        ? "pour qu’on puisse le/la contacter à propos de l’immersion"
+        : "pour qu’on puisse le/la contacter à propos du stage",
+    id: "form-convention-signatories-establishmentRepresentative-phone",
+    required: true,
+  },
+});
 
 const fieldsToExclude = {
   agencyName: {
@@ -339,7 +402,6 @@ const fieldsToExclude = {
     description: undefined,
     placeholder: undefined,
     id: "",
-    name: "",
     required: undefined,
     autoComplete: undefined,
   },
@@ -396,7 +458,6 @@ const fieldsToExclude = {
     description: undefined,
     placeholder: undefined,
     id: "",
-    name: "",
     required: undefined,
     autoComplete: undefined,
   },
@@ -405,7 +466,6 @@ const fieldsToExclude = {
     description: undefined,
     placeholder: undefined,
     id: "",
-    name: "",
     required: undefined,
     autoComplete: undefined,
   },
@@ -415,7 +475,6 @@ const fieldsToExclude = {
     description: undefined,
     placeholder: undefined,
     id: "",
-    name: "",
     required: undefined,
     autoComplete: undefined,
   },
@@ -424,7 +483,6 @@ const fieldsToExclude = {
     description: undefined,
     placeholder: undefined,
     id: "",
-    name: "",
     required: undefined,
     autoComplete: undefined,
   },
@@ -433,7 +491,6 @@ const fieldsToExclude = {
     description: undefined,
     placeholder: undefined,
     id: "",
-    name: "",
     required: undefined,
     autoComplete: undefined,
   },
@@ -442,7 +499,6 @@ const fieldsToExclude = {
     description: undefined,
     placeholder: undefined,
     id: "",
-    name: "",
     required: undefined,
     autoComplete: undefined,
   },
@@ -451,7 +507,6 @@ const fieldsToExclude = {
     description: undefined,
     placeholder: undefined,
     id: "",
-    name: "",
     required: undefined,
     autoComplete: undefined,
   },

@@ -90,6 +90,7 @@ export type ConventionCommon = {
   businessName: string;
   schedule: ScheduleDto;
   workConditions?: string;
+  businessAdvantages?: string;
   individualProtection: boolean;
   sanitaryPrevention: boolean;
   sanitaryPreventionDescription: string;
@@ -157,6 +158,7 @@ export type Beneficiary<T extends InternshipKind> =
     emergencyContactPhone?: string;
     emergencyContactEmail?: string;
     federatedIdentity?: FederatedIdentity;
+    financiaryHelp?:string;
     birthdate: string; // Date iso string
   } 
   & (T extends "mini-stage-cci" ? StudentProperties : {});

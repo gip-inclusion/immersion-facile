@@ -1,20 +1,19 @@
 import React, { useEffect } from "react";
+import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { FederatedIdentity } from "shared";
-import { InitiateConventionCard } from "src/app/components/InitiateConventionCard";
-import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
 import { ConventionFormContainerLayout } from "src/app/components/forms/convention/ConventionFormContainerLayout";
 import { conventionInitialValuesFromUrl } from "src/app/components/forms/convention/conventionHelpers";
-
-import { routes } from "src/app/routes/routes";
+import { InitiateConventionCard } from "src/app/components/InitiateConventionCard";
+import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
+import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
+import { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { Route } from "type-route";
-import { immersionTexts } from "src/app/contents/forms/convention/immersionTexts";
-import { Loader } from "react-design-system";
 
 export type ConventionImmersionPageRoute = Route<
   typeof routes.conventionImmersion
@@ -28,7 +27,9 @@ export const ConventionImmersionPage = ({
   route,
 }: ConventionImmersionPageProps) => (
   <HeaderFooterLayout>
-    <ConventionFormContainerLayout title={immersionTexts.intro.conventionTitle}>
+    <ConventionFormContainerLayout
+      title={useConventionTexts("immersion").intro.conventionTitle}
+    >
       <PageContent route={route} />
     </ConventionFormContainerLayout>
   </HeaderFooterLayout>

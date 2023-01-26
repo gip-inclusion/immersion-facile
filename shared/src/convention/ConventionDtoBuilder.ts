@@ -49,6 +49,7 @@ const beneficiary: Beneficiary<"immersion"> = {
   emergencyContact: "Clariss Ocon",
   emergencyContactPhone: "0663567896",
   emergencyContactEmail: "clariss.ocon@emergencycontact.com",
+  financiaryHelp: "Un stage rémunéré au SMIC?",
   birthdate: "2002-10-05T14:48:00.000Z",
 };
 
@@ -95,6 +96,7 @@ const validConvention: ConventionDto = {
     appellationCode: "17751",
     appellationLabel: "Pilote de machines d'abattage",
   },
+  businessAdvantages: "Prise en charge du panier repas",
   immersionActivities: "Piloter un automobile",
   immersionSkills: "Utilisation des pneus optimale, gestion de carburant",
   internshipKind: "immersion",

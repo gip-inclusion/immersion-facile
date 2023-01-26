@@ -84,6 +84,7 @@ const beneficiarySchema: z.Schema<Beneficiary<"immersion">> =
       emergencyContactPhone: phoneSchema.optional().or(z.literal("")),
       emergencyContactEmail: zEmailPossiblyEmpty,
       federatedIdentity: federatedIdentitySchema.optional(),
+      financiaryHelp: zStringPossiblyEmpty,
       birthdate: zString.regex(dateRegExp, localization.invalidDate),
     }),
   );
@@ -153,6 +154,7 @@ const conventionCommonSchema: z.Schema<ConventionCommon> = z.object({
   businessName: zTrimmedString,
   schedule: scheduleSchema,
   workConditions: z.string().optional(),
+  businessAdvantages: z.string().optional(),
   individualProtection: zBoolean,
   sanitaryPrevention: zBoolean,
   sanitaryPreventionDescription: zStringPossiblyEmptyWithMax(255),
