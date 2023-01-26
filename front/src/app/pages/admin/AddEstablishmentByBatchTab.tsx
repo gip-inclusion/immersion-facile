@@ -5,6 +5,7 @@ import Papa from "papaparse";
 import { ContactMethod, FormEstablishmentDto } from "shared";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { keys, values } from "ramda";
+import { makeStyles } from "tss-react/dsfr";
 import { fr } from "@codegouvfr/react-dsfr";
 
 type CSVBoolean = "1" | "0" | "";
@@ -43,13 +44,22 @@ export const AddEstablishmentByBatchTab = () => {
 
   const [parsedReturn, setParsedReturn] =
     useState<Papa.ParseResult<EstablishmentCSVRow> | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const [stagingEstablishments, setStagingEstablishments] = useState<
     FormEstablishmentDto[] | undefined
   >(undefined);
 
   const tableElement = useRef<HTMLTableElement | null>(null);
+  useEffect(() => {
+    const onFullscreenChange = () =>
+      setIsFullscreen(!!document.fullscreenElement);
 
+    document.addEventListener("fullscreenchange", onFullscreenChange);
+
+    return () =>
+      document.removeEventListener("fullscreenchange", onFullscreenChange);
+  }, []);
   useEffect(() => {
     const updatedStagingEstablishments = parsedReturn?.data.map(
       (establishmentRow: EstablishmentCSVRow): FormEstablishmentDto => ({
@@ -93,8 +103,19 @@ export const AddEstablishmentByBatchTab = () => {
     setStagingEstablishments(updatedStagingEstablishments);
   }, [parsedReturn]);
   const onFullscreenClick = async () => {
-    await tableElement.current?.requestFullscreen();
+    isFullscreen
+      ? await document.exitFullscreen()
+      : await tableElement.current?.requestFullscreen();
   };
+  const { classes, cx } = useStyles({
+    tableWrapper: {
+      background: isFullscreen ? "var(--background-raised-grey)" : "inherit",
+    },
+    table: {
+      maxHeight: isFullscreen ? "none" : "400px",
+      overflow: isFullscreen ? "auto" : "scroll",
+    },
+  });
   return (
     <div className="admin-tab__import-batch-establishment">
       <DsfrTitle level={5} text="Import en masse d'entreprises" />
@@ -133,10 +154,13 @@ export const AddEstablishmentByBatchTab = () => {
             Importer ces succursales
           </Button>
           <div
-            className={fr.cx("fr-table", "fr-table--bordered", "fr-mt-4w")}
+            className={cx(
+              fr.cx("fr-table", "fr-table--bordered", "fr-mt-4w"),
+              classes.tableWrapper,
+            )}
             ref={tableElement}
           >
-            <table>
+            <table className={cx(classes.table)}>
               <caption>
                 Résumé de l'import à effectuer
                 <Button
@@ -145,7 +169,9 @@ export const AddEstablishmentByBatchTab = () => {
                   className={"fr-ml-2w"}
                   onClick={onFullscreenClick}
                 >
-                  Voir en plein écran
+                  {isFullscreen
+                    ? "Fermer le mode plein écran"
+                    : "Voir en plein écran"}
                 </Button>
               </caption>
               <thead>
@@ -178,3 +204,15 @@ export const AddEstablishmentByBatchTab = () => {
     </div>
   );
 };
+
+const useStyles = makeStyles<{
+  tableWrapper: {
+    background: string;
+  };
+  table: {
+    maxHeight: "none" | "400px";
+    overflow: "auto" | "scroll";
+  };
+}>()((_theme, overrides) => ({
+  ...overrides,
+}));
