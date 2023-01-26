@@ -3,6 +3,7 @@
     "target": "es6",
     "lib": ["esNext"],
     "module": "CommonJS",
+    "outDir": "build",
     "strict": true,
     "strictNullChecks": true,
     "esModuleInterop": true,

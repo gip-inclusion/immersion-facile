@@ -4,13 +4,17 @@ import { createApp } from "../server";
 
 const logger = createLogger(__filename);
 
-const port = 1234;
+const getPort = (): number => {
+  if (!process.env.PORT) return 1234;
+  return parseInt(process.env.PORT);
+};
 
 const appConfig = AppConfig.createFromEnv();
 
 createApp(appConfig).then(
   ({ app }) => {
-    app.listen(port, () => {
+    const port = getPort();
+    app.listen(port, "0.0.0.0", () => {
       logger.info(`server started at http://localhost:${port}`);
     });
   },

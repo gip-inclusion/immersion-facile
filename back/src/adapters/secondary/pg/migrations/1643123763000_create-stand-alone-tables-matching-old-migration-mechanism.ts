@@ -15,6 +15,8 @@ export const up = (pgm: MigrationBuilder) => {
     payload: { type: "jsonb", notNull: true },
   });
 
+  pgm.createExtension("postgis", { ifNotExists: true });
+
   pgm.createTable("agencies", {
     id: { type: "uuid", primaryKey: true },
     name: { type: "varchar(255)", notNull: true },
