@@ -45,7 +45,7 @@ export type FormEstablishmentDto = {
   isSearchable: boolean;
 };
 
-export type FormEstablishmentBatch = {
+export type FormEstablishmentBatchDto = {
   groupName: string;
   formEstablishments: FormEstablishmentDto[];
 };

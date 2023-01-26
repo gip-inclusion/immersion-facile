@@ -15,7 +15,7 @@ import {
 import {
   BusinessContactDto,
   ContactMethod,
-  FormEstablishmentBatch,
+  FormEstablishmentBatchDto,
   FormEstablishmentDto,
   FormEstablishmentSource,
   ImmersionContactInEstablishmentId,
@@ -71,7 +71,7 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z.object(
   },
 );
 
-export const formEstablishmentBatchSchema: z.Schema<FormEstablishmentBatch> =
+export const formEstablishmentBatchSchema: z.Schema<FormEstablishmentBatchDto> =
   z.object({
     groupName: zString,
     formEstablishments: z.array(formEstablishmentSchema),

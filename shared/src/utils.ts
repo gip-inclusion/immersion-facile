@@ -68,6 +68,19 @@ export const exhaustiveCheck = (
   return shouldBeNever;
 };
 
+export const splitInChunks = <T>(
+  originalArray: T[],
+  sizeOfChunk: number,
+): Array<T[]> =>
+  originalArray
+    .reduce((acc, element) => {
+      const [currentChunk = [], ...rest] = acc;
+      return currentChunk.length < sizeOfChunk
+        ? [[...currentChunk, element], ...rest]
+        : [[element], currentChunk, ...rest];
+    }, [] as Array<T[]>)
+    .reverse();
+
 export type ValueOf<T> = T[keyof T];
 
 type DotPrefix<T extends string> = T extends "" ? "" : `.${T}`;

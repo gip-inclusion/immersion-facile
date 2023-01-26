@@ -5,7 +5,7 @@ import {
 } from "shared";
 import { UseCase } from "../domain/core/UseCase";
 
-const initialResponse: GetSiretResponseDto = {
+export const defaultSiretResponse: GetSiretResponseDto = {
   siret: "12345678901234",
   businessName: "TEST BUSINESS NAME",
   businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
@@ -18,7 +18,7 @@ export class StubGetSiret extends UseCase<
   GetSiretResponseDto
 > {
   private error: Error | null = null;
-  constructor(private response: GetSiretResponseDto = initialResponse) {
+  constructor(private response: GetSiretResponseDto = defaultSiretResponse) {
     super();
   }
 
