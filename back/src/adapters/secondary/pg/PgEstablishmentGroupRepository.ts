@@ -1,4 +1,6 @@
 import { PoolClient } from "pg";
+import format from "pg-format";
+import { SiretDto } from "shared";
 import { EstablishmentGroupEntity } from "../../../domain/immersionOffer/entities/EstablishmentGroupEntity";
 import { EstablishmentGroupRepository } from "../../../domain/immersionOffer/ports/EstablishmentGroupRepository";
 
@@ -7,8 +9,22 @@ export class PgEstablishmentGroupRepository
 {
   constructor(private client: PoolClient) {}
 
-  async save(_group: EstablishmentGroupEntity): Promise<void> {
-    throw new Error("Not implemented");
-    return Promise.resolve(undefined);
+  async create(group: EstablishmentGroupEntity): Promise<void> {
+    await this.client.query(
+      `
+            INSERT INTO establishment_groups (name) VALUES ($1)
+        `,
+      [group.name],
+    );
+
+    const groupAndSiretPairs: [string, SiretDto][] = group.sirets.map(
+      (siret) => [group.name, siret],
+    );
+    await this.client.query(
+      format(
+        `INSERT INTO establishment_groups__sirets (group_name, siret) VALUES %L`,
+        groupAndSiretPairs,
+      ),
+    );
   }
 }
