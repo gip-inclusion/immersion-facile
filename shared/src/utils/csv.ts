@@ -8,9 +8,9 @@ export const establishmentAppellationsFromCSVToDto = (
     .split(",")
     .map((appellationCode) => ({
       appellationCode,
-      appellationLabel: "Todo",
-      romeCode: "A8754",
-      romeLabel: "Todo",
+      appellationLabel: "Should be mapped by backend",
+      romeCode: "A9999",
+      romeLabel: "Should be mapped by backend",
     }));
 
 export const establishmentCopyEmailsFromCSVToDto = (
