@@ -2,6 +2,7 @@ import { Observable, of, throwError } from "rxjs";
 import {
   AbsoluteUrl,
   AdminToken,
+  FormEstablishmentBatchDto,
   GetDashboardParams,
   UserAndPassword,
 } from "shared";
@@ -23,5 +24,11 @@ export class SimulatedAdminGateway implements AdminGateway {
   ): Observable<AbsoluteUrl> {
     const url: AbsoluteUrl = `http://${name}.com`;
     return of(url);
+  }
+  public addEstablishmentBatch$(
+    _establishmentBatch: FormEstablishmentBatchDto,
+    _token: AdminToken,
+  ): Observable<void> {
+    return of(undefined);
   }
 }

@@ -25,6 +25,8 @@ import { agenciesSlice } from "../domain/agenciesConvention/agencies.slice";
 import { authEpics } from "../domain/auth/auth.epics";
 import { conventionEpics } from "../domain/convention/convention.epics";
 import { conventionSlice } from "../domain/convention/convention.slice";
+import { establishmentBatchEpics } from "../domain/establishmentBatch/establishmentBatch.epics";
+import { establishmentBatchSlice } from "../domain/establishmentBatch/establishmentBatch.slice";
 import { establishmentSlice } from "../domain/establishmentPath/establishment.slice";
 import { immersionAssessmentEpics } from "../domain/immersionAssessment/immersionAssessment.epics";
 import { immersionAssessmentSlice } from "../domain/immersionAssessment/immersionAssessment.slice";
@@ -33,6 +35,7 @@ const allEpics: any[] = [
   ...dashboardUrlsEpics,
   ...sentEmailsEpics,
   ...adminAuthEpics,
+  ...establishmentBatchEpics,
   ...agenciesEpics,
   ...authEpics,
   ...establishmentEpics,
@@ -55,6 +58,7 @@ const rootReducer = combineReducers({
   [conventionSlice.name]: conventionSlice.reducer,
   [immersionAssessmentSlice.name]: immersionAssessmentSlice.reducer,
   [authSlice.name]: authSlice.reducer,
+  [establishmentBatchSlice.name]: establishmentBatchSlice.reducer,
   admin: combineReducers({
     [adminAuthSlice.name]: adminAuthSlice.reducer,
     [dashboardUrlsSlice.name]: dashboardUrlsSlice.reducer,

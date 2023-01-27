@@ -17,6 +17,11 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { Input } from "@codegouvfr/react-dsfr/Input";
+import { useDispatch } from "react-redux";
+import { establishmentBatchSlice } from "src/core-logic/domain/establishmentBatch/establishmentBatch.slice";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { establishmentBatchSelectors } from "src/core-logic/domain/establishmentBatch/establishmentBatch.selectors";
+import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 
 type CSVBoolean = "1" | "0" | "";
 type CSVOptionalString = string | "";
@@ -45,22 +50,30 @@ type EstablishmentCSVRow = {
 };
 type AddEstablishmentByBatchTabForm = {
   groupName: string;
-  inputFile: string;
+  inputFile: FileList;
 };
 
 export const AddEstablishmentByBatchTab = () => {
   const {
     register,
     handleSubmit,
-    setValue,
     getValues,
     formState: { errors },
   } = useForm<AddEstablishmentByBatchTabForm>();
-
+  const feedback = useAppSelector(establishmentBatchSelectors.feedback);
   const onSubmit = (formData: AddEstablishmentByBatchTabForm) => {
-    Papa.parse(formData.inputFile, papaOptions);
-    setFormSubmitted(true);
+    const reader = new FileReader();
+    const files = formData.inputFile;
+    if (files?.length) {
+      const file = files[0];
+      reader.addEventListener("load", () => {
+        Papa.parse(reader.result as string, papaOptions);
+        setFormSubmitted(true);
+      });
+      reader.readAsDataURL(file);
+    }
   };
+  const dispatch = useDispatch();
   const papaOptions: Papa.ParseRemoteConfig<EstablishmentCSVRow> = {
     header: true,
     complete: (papaParsedReturn: Papa.ParseResult<EstablishmentCSVRow>) =>
@@ -192,20 +205,10 @@ export const AddEstablishmentByBatchTab = () => {
             id: "inputFile-input",
             readOnly: formSubmitted,
             type: "file",
-            onChange: (event) => {
-              const reader = new FileReader();
-              if (event.target.files?.length) {
-                const file = event.target.files[0];
-                reader.onload = function () {
-                  const rawCsvUrl = reader.result as string;
-                  setValue("inputFile", rawCsvUrl);
-                };
-                reader.readAsDataURL(file);
-              }
-            },
             accept: ".csv",
           }}
-          state={errors.groupName ? "error" : "default"}
+          state={errors.inputFile ? "error" : "default"}
+          stateRelatedMessage={errors.inputFile ? "Ce champ est requis" : ""}
         />
 
         <Button
@@ -262,12 +265,28 @@ export const AddEstablishmentByBatchTab = () => {
                   </Button>
                   <Button
                     title="Importer ces succursales"
-                    onClick={() => alert("Todo import")}
+                    onClick={() =>
+                      dispatch(
+                        establishmentBatchSlice.actions.addEstablishmentBatchRequested(
+                          {
+                            groupName: getValues().groupName,
+                            formEstablishments:
+                              stagingEstablishments.establishments ?? [],
+                          },
+                        ),
+                      )
+                    }
                     type="button"
                     className={fr.cx("fr-ml-1w")}
                   >
                     Importer ces succursales
                   </Button>
+                  <SubmitFeedbackNotification
+                    submitFeedback={feedback}
+                    messageByKind={{
+                      success: "Super, ça a bien été ajouté !",
+                    }}
+                  />
                 </caption>
 
                 <thead>

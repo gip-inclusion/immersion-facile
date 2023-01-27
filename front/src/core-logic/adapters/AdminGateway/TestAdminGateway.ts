@@ -1,5 +1,5 @@
 import { Observable, Subject } from "rxjs";
-import { AbsoluteUrl, AdminToken } from "shared";
+import { AbsoluteUrl, AdminToken, FormEstablishmentBatchDto } from "shared";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
 export class TestAdminGateway implements AdminGateway {
@@ -11,6 +11,14 @@ export class TestAdminGateway implements AdminGateway {
     return this.dashboardUrl$;
   }
 
+  public addEstablishmentBatch$(
+    _establishmentBatch: FormEstablishmentBatchDto,
+    _token: AdminToken,
+  ): Observable<void> {
+    return this.establishmentBatchResponse$;
+  }
+
   public token$ = new Subject<string>();
   public dashboardUrl$ = new Subject<AbsoluteUrl>();
+  public establishmentBatchResponse$ = new Subject<void>();
 }

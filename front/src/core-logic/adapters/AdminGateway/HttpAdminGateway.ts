@@ -6,6 +6,7 @@ import {
   AdminTargets,
   AdminToken,
   adminTokenSchema,
+  FormEstablishmentBatchDto,
   GetDashboardParams,
   UserAndPassword,
 } from "shared";
@@ -38,6 +39,23 @@ export class HttpAdminGateway implements AdminGateway {
           },
         })
         .then(({ responseBody }) => absoluteUrlSchema.parse(responseBody)),
+    );
+  }
+  public addEstablishmentBatch$(
+    establishmentBatch: FormEstablishmentBatchDto,
+    token: AdminToken,
+  ): Observable<void> {
+    return from(
+      this.httpClient
+        .addFormEstablishmentBatch({
+          headers: {
+            authorization: token,
+          },
+          body: establishmentBatch,
+        })
+        .then(() => {
+          // force void return
+        }),
     );
   }
 }
