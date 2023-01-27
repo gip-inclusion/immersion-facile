@@ -65,15 +65,38 @@ describe("Establishment batch", () => {
   });
 
   it("should update establishments to review in store", () => {
+    const formEstablishment = FormEstablishmentDtoBuilder.valid().build();
+
     const candidateEstablishmentsFromCSV: EstablishmentCSVRow[] = [
       {
-        siret: "98798765454",
-        appellations_code: "8979878,98798879",
-        businessContact_copyEmails: "zefzfz@fezefez.fr",
+        // todo builder
+        businessAddress: "1 Rue du Moulin, 12345 Quelque Part",
+        businessContact_email: "amil@mail.com",
+        businessContact_firstName: "Esteban",
+        businessContact_lastName: "Ocon",
+        businessContact_phone: "+33012345678",
+        businessContact_job: "a job",
+        businessContact_contactMethod: "EMAIL",
+        businessContact_copyEmails: "copy1@mail.com, copy2@mail.com",
+        naf_code: "A",
+        businessName: "Ma super entreprise",
+        businessNameCustomized: "Ma belle enseigne du quartier",
+        siret: "01234567890123",
+        website: "www@super.com/jobs",
+        additionalInformation: "",
+        appellations_code: "11111, 22222, 33333",
+        isEngagedEnterprise: "1",
+        isSearchable: "0",
+        fitForDisabledWorkers: "",
       },
     ];
     const expectedCandidateEstablishmentParsed: FormEstablishmentDtoWithErrors[] =
-      [];
+      [
+        {
+          ...formEstablishment,
+          zodErrors: [],
+        },
+      ];
     store.dispatch(
       establishmentBatchSlice.actions.candidateEstablishmentBatchProvided(
         candidateEstablishmentsFromCSV,

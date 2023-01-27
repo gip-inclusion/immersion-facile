@@ -55,7 +55,7 @@ const addEstablishmentBatchEpic: AppEpic<EstablishmentBatchAction> = (
     ),
   );
 
-const candidateEstablishmentMapper = (
+export const candidateEstablishmentMapper = (
   establishmentRow: EstablishmentCSVRow,
 ): FormEstablishmentDtoWithErrors => {
   let errors: z.ZodIssue[] = [];
