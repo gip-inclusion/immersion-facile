@@ -1,7 +1,9 @@
 import {
+  AppellationDto,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
   FormEstablishmentDtoBuilder,
+  defaultValidFormEstablishment,
 } from "shared";
 import { StubGetSiret } from "../../../_testBuilders/StubGetSiret";
 
@@ -14,15 +16,17 @@ import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMem
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryFeatureFlagRepository } from "../../../adapters/secondary/InMemoryFeatureFlagRepository";
 import { InMemoryFormEstablishmentRepository } from "../../../adapters/secondary/InMemoryFormEstablishmentRepository";
+import { InMemoryRomeRepository } from "../../../adapters/secondary/InMemoryRomeRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
-import { AddFormEstablishment } from "../../../domain/immersionOffer/useCases/AddFormEstablishment";
+import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
+import { AddFormEstablishment } from "./AddFormEstablishment";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 
 describe("Add FormEstablishment", () => {
   let addFormEstablishment: AddFormEstablishment;
   let formEstablishmentRepo: InMemoryFormEstablishmentRepository;
   let outboxRepo: InMemoryOutboxRepository;
+  let romeRepository: InMemoryRomeRepository;
   let stubGetSiret: StubGetSiret;
   let uowPerformer: InMemoryUowPerformer;
 
@@ -31,6 +35,8 @@ describe("Add FormEstablishment", () => {
     const uow = createInMemoryUow();
     formEstablishmentRepo = uow.formEstablishmentRepository;
     outboxRepo = uow.outboxRepository;
+    romeRepository = uow.romeRepository;
+    romeRepository.appellations = defaultValidFormEstablishment.appellations;
     uow.featureFlagRepository = new InMemoryFeatureFlagRepository({
       enableAdminUi: false,
       enableInseeApi: true,
@@ -67,6 +73,51 @@ describe("Add FormEstablishment", () => {
     expect(outboxRepo.events[0]).toMatchObject({
       topic: "FormEstablishmentAdded",
       payload: formEstablishment,
+    });
+  });
+
+  it("considers appellation_code as a reference, and ignores the labels, and rome (it fetches the one matching the appellation code anyways)", async () => {
+    const weirdAppellationDto: AppellationDto = {
+      appellationCode: "12694", // le bon code
+      appellationLabel:
+        "une boulette, ca devrait être 'Coiffeur / Coiffeuse mixte'",
+      romeCode: "A0000", // devrait être D1202
+      romeLabel: "une autre boulette, ca devrait être 'Coiffure'",
+    };
+
+    const formEstablishmentBuilder =
+      FormEstablishmentDtoBuilder.valid().withAppellations([
+        weirdAppellationDto,
+      ]);
+
+    const formEstablishmentWithWeirdAppellationDto =
+      formEstablishmentBuilder.build();
+
+    const correctAppellationDto: AppellationDto = {
+      appellationCode: "12694",
+      appellationLabel: "Coiffeur / Coiffeuse mixte",
+      romeCode: "D1202",
+      romeLabel: "Coiffure",
+    };
+    romeRepository.appellations = [correctAppellationDto];
+
+    const formEstablishmentWithCorrectAppellationDto = formEstablishmentBuilder
+      .withAppellations([correctAppellationDto])
+      .build();
+
+    expect(
+      await addFormEstablishment.execute(
+        formEstablishmentWithWeirdAppellationDto,
+      ),
+    ).toEqual(formEstablishmentWithWeirdAppellationDto.siret);
+
+    const storedInRepo = await formEstablishmentRepo.getAll();
+    expect(storedInRepo).toHaveLength(1);
+    expect(storedInRepo[0]).toEqual(formEstablishmentWithCorrectAppellationDto);
+    expect(outboxRepo.events).toHaveLength(1);
+    expect(outboxRepo.events[0]).toMatchObject({
+      topic: "FormEstablishmentAdded",
+      payload: formEstablishmentWithCorrectAppellationDto,
     });
   });
 

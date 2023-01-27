@@ -1,5 +1,5 @@
 import { PoolClient } from "pg";
-import { AppellationDto, RomeDto } from "shared";
+import { AppellationCode, AppellationDto, RomeDto } from "shared";
 import { RomeRepository } from "../../../domain/rome/ports/RomeRepository";
 import { createLogger } from "../../../utils/logger";
 
@@ -86,22 +86,35 @@ export class PgRomeRepository implements RomeRepository {
         LIMIT 80`,
         [toTsQuery(queryBeginning), `%${queryBeginning}%`, `%${lastWord}%`],
       )
-      .then((res) =>
-        res.rows.map(
-          (row): AppellationDto => ({
-            appellationCode: row.ogr_appellation.toString(),
-            romeCode: row.code_rome,
-            appellationLabel: row.libelle_appellation_long,
-            romeLabel: row.libelle_rome,
-          }),
-        ),
-      )
+      .then((res) => res.rows.map(convertRowToAppellationDto))
       .catch((error) => {
         logger.error({ error, query }, "searchAppellation error");
         return [];
       });
   }
+
+  public async getFullAppellationsFromCodes(
+    codes: AppellationCode[],
+  ): Promise<AppellationDto[]> {
+    const { rows } = await this.client.query(
+      `
+        SELECT ogr_appellation, libelle_appellation_long, appellations.code_rome, libelle_rome
+        FROM public_appellations_data AS appellations
+        JOIN public_romes_data AS romes ON  appellations.code_rome = romes.code_rome
+        WHERE appellations.ogr_appellation = ANY ($1)
+    `,
+      [codes],
+    );
+    return rows.map(convertRowToAppellationDto);
+  }
 }
+
+const convertRowToAppellationDto = (row: any): AppellationDto => ({
+  appellationCode: row.ogr_appellation?.toString(),
+  romeCode: row.code_rome,
+  appellationLabel: row.libelle_appellation_long,
+  romeLabel: row.libelle_rome,
+});
 
 const toTsQuery = (query: string): string => query.split(/\s+/).join(" & ");
 

@@ -1,4 +1,5 @@
 import {
+  defaultValidFormEstablishment,
   establishmentTargets,
   FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
@@ -16,6 +17,8 @@ describe("Route to post form establishments from front (hence, without API key)"
   // from front
   it("support posting valid establishment from front", async () => {
     const { request, inMemoryUow } = await buildTestApp();
+    inMemoryUow.romeRepository.appellations =
+      defaultValidFormEstablishment.appellations;
 
     const formEstablishment = FormEstablishmentDtoBuilder.valid()
       .withSiret(TEST_ESTABLISHMENT1_SIRET)
@@ -33,8 +36,11 @@ describe("Route to post form establishments from front (hence, without API key)"
   });
 
   it("Check if email notification has been sent and published after FormEstablishment added", async () => {
-    const { eventCrawler, gateways, request }: TestAppAndDeps =
+    const { eventCrawler, gateways, request, inMemoryUow }: TestAppAndDeps =
       await buildTestApp();
+
+    inMemoryUow.romeRepository.appellations =
+      defaultValidFormEstablishment.appellations;
 
     const formEstablishment: FormEstablishmentDto =
       FormEstablishmentDtoBuilder.valid()

@@ -1,4 +1,5 @@
 import {
+  defaultValidFormEstablishment,
   expectObjectsToMatch,
   expectToEqual,
   FormEstablishmentBatchDto,
@@ -37,6 +38,8 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
     formEstablishmentRepo = uow.formEstablishmentRepository;
     establishmentGroupRepository = uow.establishmentGroupRepository;
     outboxRepo = uow.outboxRepository;
+    uow.romeRepository.appellations =
+      defaultValidFormEstablishment.appellations;
     uow.featureFlagRepository = new InMemoryFeatureFlagRepository({
       enableAdminUi: false,
       enableInseeApi: true,

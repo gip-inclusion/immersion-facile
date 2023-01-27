@@ -2,8 +2,8 @@ import { AppellationMatchDto } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryRomeRepository } from "../../../adapters/secondary/InMemoryRomeRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { RomeRepository } from "../../../domain/rome/ports/RomeRepository";
-import { AppellationSearch } from "../../../domain/rome/useCases/AppellationSearch";
+import { RomeRepository } from "../ports/RomeRepository";
+import { AppellationSearch } from "./AppellationSearch";
 
 describe("AppellationSearch", () => {
   let romeRepo: RomeRepository;
@@ -56,10 +56,12 @@ describe("AppellationSearch", () => {
     const mockSearchMetierFn = jest.fn();
     const mockSearchAppellationFn = jest.fn();
     const mockAppellationToCodeMetier = jest.fn();
+    const mockGetFullAppellationsFromCodes = jest.fn();
     romeRepo = {
       searchRome: mockSearchMetierFn,
       searchAppellation: mockSearchAppellationFn,
       appellationToCodeMetier: mockAppellationToCodeMetier,
+      getFullAppellationsFromCodes: mockGetFullAppellationsFromCodes,
     };
 
     const response = await createUseCase().execute("la");

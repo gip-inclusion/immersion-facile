@@ -10,7 +10,9 @@ describe(`/${appellationRoute} route`, () => {
   });
 
   it("forwards valid requests", async () => {
-    await request.get(`/${appellationRoute}?searchText=rail`).expect(200, [
+    const response = await request.get(`/${appellationRoute}?searchText=trail`);
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual([
       {
         appellation: {
           appellationCode: "20714",
@@ -20,7 +22,7 @@ describe(`/${appellationRoute} route`, () => {
         },
         matchRanges: [
           {
-            startIndexInclusive: 3,
+            startIndexInclusive: 2,
             endIndexExclusive: 7,
           },
         ],
@@ -37,7 +39,7 @@ describe(`/${romeRoute} route`, () => {
   });
 
   it("forwards valid requests", async () => {
-    await request.get(`/${romeRoute}?searchText=rail`).expect(200, [
+    await request.get(`/${romeRoute}?searchText=rails`).expect(200, [
       {
         romeCode: "N4301",
         romeLabel: "Conduite sur rails",

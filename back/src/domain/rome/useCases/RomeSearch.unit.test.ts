@@ -2,7 +2,7 @@ import { RomeDto } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryRomeRepository } from "../../../adapters/secondary/InMemoryRomeRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { RomeSearch } from "../../../domain/rome/useCases/RomeSearch";
+import { RomeSearch } from "./RomeSearch";
 
 const prepareUseCase = () => {
   const romeRepo = new InMemoryRomeRepository();
@@ -20,7 +20,7 @@ describe("RomeSearch", () => {
     const expected: RomeDto[] = [
       {
         romeCode: "A1409",
-        romeLabel: "Élevage de lapins et volailles",
+        romeLabel: "Élevage",
       },
     ];
     expect(response).toEqual(expected);

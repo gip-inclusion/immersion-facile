@@ -7,7 +7,7 @@ import {
   FormEstablishmentSource,
 } from "./FormEstablishment.dto";
 
-const validFormEstablishment: FormEstablishmentDto = {
+export const defaultValidFormEstablishment: FormEstablishmentDto = {
   source: "immersion-facile",
   businessAddress: "1 Rue du Moulin, 12345 Quelque Part",
   businessContact: {
@@ -76,7 +76,7 @@ export class FormEstablishmentDtoBuilder
   private constructor(private dto: FormEstablishmentDto) {}
 
   public static valid() {
-    return new FormEstablishmentDtoBuilder(validFormEstablishment);
+    return new FormEstablishmentDtoBuilder(defaultValidFormEstablishment);
   }
 
   public static allEmptyFields() {

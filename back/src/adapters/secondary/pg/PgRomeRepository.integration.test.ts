@@ -1,12 +1,11 @@
 import { Pool, PoolClient } from "pg";
-import { expectTypeToMatchAndEqual } from "shared";
+import { expectToEqual, expectTypeToMatchAndEqual } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 
 import { PgRomeRepository } from "./PgRomeRepository";
 
 describe("Postgres implementation of Rome Gateway", () => {
   let pool: Pool;
-
   let client: PoolClient;
   let pgRomeRepository: PgRomeRepository;
 
@@ -26,6 +25,28 @@ describe("Postgres implementation of Rome Gateway", () => {
     it("Conversion of appellation to ROME works", async () => {
       expect(await pgRomeRepository.appellationToCodeMetier("10868")).toBe(
         "D1102",
+      );
+    });
+  });
+
+  describe("getFullAppellationsFromCodes", () => {
+    it("gets Appellations DTOs when providing the codes", async () => {
+      expectToEqual(
+        await pgRomeRepository.getFullAppellationsFromCodes(["10868", "12694"]),
+        [
+          {
+            appellationCode: "10868",
+            appellationLabel: "Aide-boulanger / Aide-boulangère",
+            romeCode: "D1102",
+            romeLabel: "Boulangerie - viennoiserie",
+          },
+          {
+            appellationCode: "12694",
+            appellationLabel: "Coiffeur / Coiffeuse mixte",
+            romeCode: "D1202",
+            romeLabel: "Coiffure",
+          },
+        ],
       );
     });
   });

@@ -43,14 +43,23 @@ export class AddFormEstablishment extends TransactionalUseCase<
       await rejectsSiretIfNotAnOpenCompany(this.getSiret, dto.siret);
     }
 
+    const appellations = await uow.romeRepository.getFullAppellationsFromCodes(
+      dto.appellations.map(({ appellationCode }) => appellationCode),
+    );
+
+    const correctFormEstablishement: FormEstablishmentDto = {
+      ...dto,
+      appellations,
+    };
+
     const event = this.createNewEvent({
       topic: "FormEstablishmentAdded",
-      payload: dto,
+      payload: correctFormEstablishement,
       ...(featureFlags.enableInseeApi ? {} : { wasQuarantined: true }),
     });
 
     await Promise.all([
-      uow.formEstablishmentRepository.create(dto),
+      uow.formEstablishmentRepository.create(correctFormEstablishement),
       uow.outboxRepository.save(event),
     ]);
 

@@ -6,4 +6,7 @@ export interface RomeRepository {
   ): Promise<RomeCode | undefined>;
   searchRome: (query: string) => Promise<RomeDto[]>;
   searchAppellation: (query: string) => Promise<AppellationDto[]>;
+  getFullAppellationsFromCodes: (
+    codes: AppellationCode[],
+  ) => Promise<AppellationDto[]>;
 }
