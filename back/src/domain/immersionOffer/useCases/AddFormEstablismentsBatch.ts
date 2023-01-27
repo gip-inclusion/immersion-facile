@@ -1,22 +1,14 @@
 import {
   AppJwtPayload,
+  EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   formEstablishmentBatchSchema,
-  SiretDto,
   splitInChunks,
 } from "shared";
 import { UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UseCase } from "../../core/UseCase";
 import { EstablishmentGroupEntity } from "../entities/EstablishmentGroupEntity";
 import { AddFormEstablishment } from "./AddFormEstablishment";
-
-type SiretAdditionFailure = { siret: SiretDto; errorMessage: string };
-
-type EstablishmentBatchReport = {
-  numberOfEstablishmentsProcessed: number;
-  numberOfSuccess: number;
-  failures: SiretAdditionFailure[];
-};
 
 export class AddFormEstablishmentBatch extends UseCase<
   FormEstablishmentBatchDto,

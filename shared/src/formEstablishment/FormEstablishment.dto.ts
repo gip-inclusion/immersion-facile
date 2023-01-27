@@ -49,3 +49,11 @@ export type FormEstablishmentBatchDto = {
   groupName: string;
   formEstablishments: FormEstablishmentDto[];
 };
+
+type SiretAdditionFailure = { siret: SiretDto; errorMessage: string };
+
+export type EstablishmentBatchReport = {
+  numberOfEstablishmentsProcessed: number;
+  numberOfSuccess: number;
+  failures: SiretAdditionFailure[];
+};

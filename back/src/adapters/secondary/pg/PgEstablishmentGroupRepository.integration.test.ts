@@ -18,7 +18,11 @@ describe("PgEstablishmentGroupRepository", () => {
   beforeAll(async () => {
     pool = getTestPgPool();
     client = await pool.connect();
+  });
+
+  beforeEach(async () => {
     pgEstablishmentGroupRepository = new PgEstablishmentGroupRepository(client);
+    await client.query("DELETE FROM establishment_groups__sirets");
     await client.query("DELETE FROM establishment_groups");
   });
 
