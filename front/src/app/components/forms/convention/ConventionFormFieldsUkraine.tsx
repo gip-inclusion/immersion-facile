@@ -35,7 +35,7 @@ export const ConventionFormFieldsUkraine = ({
           isAlreadySigned={alreadySubmitted ?? false}
         />
       )}
-      <BeneficiaryFormSection isFrozen={isFrozen} />
+      <BeneficiaryFormSection isFrozen={isFrozen} internshipKind="immersion" />
 
       <EstablishmentFormSection
         isFrozen={isFrozen}
