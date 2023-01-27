@@ -2,6 +2,7 @@ import {
   AppJwtPayload,
   FormEstablishmentBatchDto,
   formEstablishmentBatchSchema,
+  SiretDto,
   splitInChunks,
 } from "shared";
 import { UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
@@ -9,9 +10,17 @@ import { UseCase } from "../../core/UseCase";
 import { EstablishmentGroupEntity } from "../entities/EstablishmentGroupEntity";
 import { AddFormEstablishment } from "./AddFormEstablishment";
 
+type SiretAdditionFailure = { siret: SiretDto; errorMessage: string };
+
+type EstablishmentBatchReport = {
+  numberOfEstablishmentsProcessed: number;
+  numberOfSuccess: number;
+  failures: SiretAdditionFailure[];
+};
+
 export class AddFormEstablishmentBatch extends UseCase<
   FormEstablishmentBatchDto,
-  void,
+  EstablishmentBatchReport,
   AppJwtPayload
 > {
   constructor(
@@ -26,7 +35,7 @@ export class AddFormEstablishmentBatch extends UseCase<
   protected async _execute({
     formEstablishments,
     groupName,
-  }: FormEstablishmentBatchDto): Promise<void> {
+  }: FormEstablishmentBatchDto): Promise<EstablishmentBatchReport> {
     const group: EstablishmentGroupEntity = {
       name: groupName,
       sirets: formEstablishments.map(({ siret }) => siret),
@@ -41,13 +50,31 @@ export class AddFormEstablishmentBatch extends UseCase<
       sizeOfChunk,
     );
 
+    const report: EstablishmentBatchReport = {
+      numberOfEstablishmentsProcessed: 0,
+      numberOfSuccess: 0,
+      failures: [],
+    };
+
     for (let i = 0; i < chunksOfFormEstablishments.length; i++) {
       const chunkOfFormEstablishments = chunksOfFormEstablishments[i];
       await Promise.all(
-        chunkOfFormEstablishments.map((formEstablishment) =>
-          this.addFormEstablishmentUseCase.execute(formEstablishment),
-        ),
+        chunkOfFormEstablishments.map(async (formEstablishment) => {
+          try {
+            await this.addFormEstablishmentUseCase.execute(formEstablishment);
+            report.numberOfSuccess += 1;
+          } catch (error: any) {
+            report.failures.push({
+              siret: formEstablishment.siret,
+              errorMessage: error?.message,
+            });
+          } finally {
+            report.numberOfEstablishmentsProcessed += 1;
+          }
+        }),
       );
     }
+
+    return report;
   }
 }

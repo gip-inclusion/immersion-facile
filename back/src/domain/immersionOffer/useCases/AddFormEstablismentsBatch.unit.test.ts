@@ -65,10 +65,12 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
     );
   });
 
-  it("Adds two formEstablishments", async () => {
+  it("Adds two formEstablishments successfully and returns report", async () => {
     const formEstablishmentBatch = createFormEstablishmentBatchDto();
 
-    await addFormEstablishmentBatch.execute(formEstablishmentBatch);
+    const report = await addFormEstablishmentBatch.execute(
+      formEstablishmentBatch,
+    );
 
     const formEstablishmentsInRepo = await formEstablishmentRepo.getAll();
     expect(formEstablishmentsInRepo).toHaveLength(2);
@@ -80,6 +82,34 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
       formEstablishmentsInRepo[1],
       formEstablishmentBatch.formEstablishments[1],
     );
+    expectToEqual(report, {
+      numberOfEstablishmentsProcessed: 2,
+      numberOfSuccess: 2,
+      failures: [],
+    });
+  });
+
+  it("reports the errors when something goes wrong with an addition", async () => {
+    const formEstablishmentBatch = createFormEstablishmentBatchDto();
+    const existingFormEstablishment =
+      formEstablishmentBatch.formEstablishments[0];
+    formEstablishmentRepo.setFormEstablishments([existingFormEstablishment]);
+
+    const report = await addFormEstablishmentBatch.execute(
+      formEstablishmentBatch,
+    );
+
+    expectToEqual(report, {
+      numberOfEstablishmentsProcessed: 2,
+      numberOfSuccess: 1,
+      failures: [
+        {
+          errorMessage:
+            "Establishment with siret 01234567890123 already exists",
+          siret: existingFormEstablishment.siret,
+        },
+      ],
+    });
   });
 
   it("Saves an event with topic : 'FormEstablishmentAdded'", async () => {

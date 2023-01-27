@@ -55,7 +55,11 @@ describe("POST /add-form-establishment-batch", () => {
       .set("authorization", token)
       .send(payload);
 
-    expect(response.body).toEqual({ success: true });
+    expect(response.body).toEqual({
+      failures: [],
+      numberOfEstablishmentsProcessed: 1,
+      numberOfSuccess: 1,
+    });
     expect(response.status).toBe(200);
   });
 });
