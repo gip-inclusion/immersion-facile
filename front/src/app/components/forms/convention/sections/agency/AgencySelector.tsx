@@ -101,7 +101,13 @@ export const AgencySelector = ({
       className={`fr-input-group${showError ? " fr-input-group--error" : ""}`}
     >
       <Select
-        options={departmentOptions}
+        options={
+          internshipKind === "immersion"
+            ? departmentOptions
+            : departmentOptions.filter((department) =>
+                miniStageRestrictedDepartments.includes(department.value),
+              )
+        }
         {...agencyDepartmentField}
         onChange={(event) => setDepartmentCodeValue(event.currentTarget.value)}
         value={departmentCodeValue as string}
@@ -133,6 +139,18 @@ type DepartmentOption = {
   label: string;
   value: string;
 }; //satisfies SelectOption
+
+const miniStageRestrictedDepartments = [
+  "29",
+  "22",
+  "56",
+  "35",
+  "53",
+  "72",
+  "49",
+  "44",
+  "85",
+];
 
 const departmentOptions = keys(departmentNameToDepartmentCode).map(
   (departmentName: string): DepartmentOption => ({

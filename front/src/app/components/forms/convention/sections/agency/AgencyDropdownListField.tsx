@@ -28,7 +28,7 @@ export const AgencyDropdownListField = ({
 }: AgencyDropdownListFieldProperties): JSX.Element => (
   <>
     <label className={fr.cx("fr-label", "fr-pt-1w")} htmlFor={name}>
-      {`${label} *`}
+      {`${label}`}
     </label>
     <select
       className={fr.cx("fr-select")}
