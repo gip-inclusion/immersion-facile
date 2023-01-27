@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import { DsfrTitle } from "react-design-system";
-import { UploadCsv } from "src/app/components/UploadCsv";
 import Papa from "papaparse";
 import {
   ContactMethod,
@@ -17,6 +16,7 @@ import { makeStyles } from "tss-react/dsfr";
 import { fr } from "@codegouvfr/react-dsfr";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
+import { Input } from "@codegouvfr/react-dsfr/Input";
 
 type CSVBoolean = "1" | "0" | "";
 type CSVOptionalString = string | "";
@@ -174,39 +174,40 @@ export const AddEstablishmentByBatchTab = () => {
     <div className="admin-tab__import-batch-establishment">
       <DsfrTitle level={5} text="Import en masse d'entreprises" />
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div
-          className={fr.cx(
-            "fr-input-group",
-            errors.groupName && "fr-input-group--error",
-          )}
-        >
-          <label className={fr.cx("fr-label")} htmlFor="group-name-input">
-            Renseignez un nom de groupe d'entreprises *
-          </label>
-          <input
-            className={fr.cx("fr-input")}
-            type="text"
-            placeholder={"Le nom de votre groupement d'entreprise"}
-            id="groupName-input"
-            {...register("groupName", { required: true })}
-            readOnly={formSubmitted}
-          />
-        </div>
-
-        <UploadCsv
-          label={"Uploadez votre CSV *"}
-          maxSize_Mo={10}
-          onUpload={(file) => {
-            const reader = new FileReader();
-            reader.onload = function () {
-              const rawCsvUrl = reader.result as string;
-              setValue("inputFile", rawCsvUrl);
-            };
-            reader.readAsDataURL(file);
+        <Input
+          label="Renseignez un nom de groupe d'entreprises *"
+          nativeInputProps={{
+            ...register("groupName", { required: true }),
+            id: "groupName-input",
+            placeholder: "Le nom de votre groupement d'entreprise",
+            readOnly: formSubmitted,
           }}
-          disabled={formSubmitted}
-          {...register("inputFile", { required: true })}
+          state={errors.groupName ? "error" : "default"}
+          stateRelatedMessage={errors.groupName ? "Ce champ est requis" : ""}
         />
+        <Input
+          label="Uploadez votre CSV *"
+          nativeInputProps={{
+            ...register("inputFile", { required: true }),
+            id: "inputFile-input",
+            readOnly: formSubmitted,
+            type: "file",
+            onChange: (event) => {
+              const reader = new FileReader();
+              if (event.target.files?.length) {
+                const file = event.target.files[0];
+                reader.onload = function () {
+                  const rawCsvUrl = reader.result as string;
+                  setValue("inputFile", rawCsvUrl);
+                };
+                reader.readAsDataURL(file);
+              }
+            },
+            accept: ".csv",
+          }}
+          state={errors.groupName ? "error" : "default"}
+        />
+
         <Button
           title="Vérifier les données à importer"
           onClick={() => undefined}
