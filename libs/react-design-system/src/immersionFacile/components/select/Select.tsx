@@ -32,6 +32,7 @@ export const Select = ({
   hideLabel,
   className,
   placeholder,
+  disabled,
 }: SelectProps) => {
   const { cx } = useStyles();
 
@@ -50,6 +51,7 @@ export const Select = ({
         name={name}
         onChange={onChange}
         value={value}
+        disabled={disabled}
       >
         {placeholder && (
           <option value="" disabled selected>

@@ -21,7 +21,11 @@ export const ConventionSignFormIntro = ({
           "fr-text"
         }
       >
-        {t.sign.summary}
+        <p
+          className={fr.cx("fr-text--md")}
+          dangerouslySetInnerHTML={{ __html: t.sign.summary }}
+        />
+
         <p className={fr.cx("fr-text--xs", "fr-mt-1w")}>{t.sign.regulations}</p>
       </div>
     </>

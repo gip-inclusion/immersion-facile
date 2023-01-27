@@ -4,6 +4,7 @@ import { SectionTitle, Select, SelectOption } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   ConventionDto,
+  InternshipKind,
   isBeneficiaryStudent,
   levelsOfEducation,
   peConnectAuthFailed,
@@ -25,9 +26,11 @@ import { BeneficiaryRepresentativeFields } from "./BeneficiaryRepresentativeFiel
 
 type beneficiaryFormSectionProperties = {
   isFrozen: boolean | undefined;
+  internshipKind: InternshipKind;
 };
 export const BeneficiaryFormSection = ({
   isFrozen,
+  internshipKind,
 }: beneficiaryFormSectionProperties): JSX.Element => {
   const isMinor = useAppSelector(conventionSelectors.isMinor);
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
@@ -130,21 +133,25 @@ export const BeneficiaryFormSection = ({
       ) : (
         <BeneficiaryEmergencyContactFields disabled={isFrozen} />
       )}
-      <RadioGroup
-        {...formContents.isCurrentEmployer}
-        disabled={isFrozen}
-        currentValue={hasCurrentEmployer}
-        setCurrentValue={(value) =>
-          dispatch(conventionSlice.actions.isCurrentEmployerChanged(value))
-        }
-        groupLabel={formContents.isCurrentEmployer.label}
-        options={[
-          { label: t.yes, value: true },
-          { label: t.no, value: false },
-        ]}
-      />
-      {hasCurrentEmployer && (
-        <BeneficiaryCurrentEmployerFields disabled={isFrozen} />
+      {internshipKind !== "mini-stage-cci" && (
+        <>
+          <RadioGroup
+            {...formContents.isCurrentEmployer}
+            disabled={isFrozen}
+            currentValue={hasCurrentEmployer}
+            setCurrentValue={(value) =>
+              dispatch(conventionSlice.actions.isCurrentEmployerChanged(value))
+            }
+            groupLabel={formContents.isCurrentEmployer.label}
+            options={[
+              { label: t.yes, value: true },
+              { label: t.no, value: false },
+            ]}
+          />
+          {hasCurrentEmployer && (
+            <BeneficiaryCurrentEmployerFields disabled={isFrozen} />
+          )}
+        </>
       )}
     </>
   );

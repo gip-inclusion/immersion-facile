@@ -73,7 +73,10 @@ export const ConventionFormFields = ({
         isFrozen={isFrozen}
       />
 
-      <BeneficiaryFormSection isFrozen={isFrozen} />
+      <BeneficiaryFormSection
+        isFrozen={isFrozen}
+        internshipKind={conventionValues.internshipKind}
+      />
 
       <EstablishmentFormSection
         isFrozen={isFrozen}
