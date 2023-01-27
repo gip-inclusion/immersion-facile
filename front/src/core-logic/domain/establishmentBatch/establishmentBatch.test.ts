@@ -1,7 +1,4 @@
-import {
-  FormEstablishmentBatchDto,
-  FormEstablishmentDtoBuilder,
-} from "src/../../shared/src";
+import { FormEstablishmentBatchDto, FormEstablishmentDtoBuilder } from "shared";
 import {
   createTestStore,
   TestDependencies,
