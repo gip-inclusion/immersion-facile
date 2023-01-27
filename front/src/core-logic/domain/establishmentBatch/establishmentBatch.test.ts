@@ -7,6 +7,8 @@ import { ReduxStore } from "src/core-logic/storeConfig/store";
 import {
   AddFormEstablishmentBatchFeedback,
   establishmentBatchSlice,
+  EstablishmentCSVRow,
+  FormEstablishmentDtoWithErrors,
 } from "./establishmentBatch.slice";
 
 const establishmentBatch: FormEstablishmentBatchDto = {
@@ -62,9 +64,34 @@ describe("Establishment batch", () => {
     });
   });
 
+  it("should update establishments to review in store", () => {
+    const candidateEstablishmentsFromCSV: EstablishmentCSVRow[] = [
+      {
+        siret: "98798765454",
+        appellations_code: "8979878,98798879",
+        businessContact_copyEmails: "zefzfz@fezefez.fr",
+      },
+    ];
+    const expectedCandidateEstablishmentParsed: FormEstablishmentDtoWithErrors[] =
+      [];
+    store.dispatch(
+      establishmentBatchSlice.actions.candidateEstablishmentBatchProvided(
+        candidateEstablishmentsFromCSV,
+      ),
+    );
+    expectStaginEstablishmentsToEqual(expectedCandidateEstablishmentParsed);
+  });
+
   const expectIsLoadingToBe = (isLoading: boolean) =>
     expect(store.getState().establishmentBatch.isLoading).toBe(isLoading);
 
   const expectFeedbackToEqual = (feedback: AddFormEstablishmentBatchFeedback) =>
     expect(store.getState().establishmentBatch.feedback).toEqual(feedback);
+
+  const expectStaginEstablishmentsToEqual = (
+    stagingEstablishments: FormEstablishmentDtoWithErrors[],
+  ) =>
+    expect(store.getState().establishmentBatch.candidateEstablishments).toEqual(
+      stagingEstablishments,
+    );
 });
