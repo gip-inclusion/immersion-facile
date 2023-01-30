@@ -10,6 +10,7 @@ import { ContactEntityV2Builder } from "../../../../_testBuilders/ContactEntityV
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../../../_testBuilders/EstablishmentEntityV2Builder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { validAuthorizedApiKeyId } from "../../../secondary/InMemoryApiConsumerRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { SearchImmersionResultPublicV0 } from "../DtoAndSchemas/v0/output/SearchImmersionResultPublicV0.dto";
 import {
@@ -22,7 +23,6 @@ import {
   makeGenerateJwtES256,
 } from "../../../../domain/auth/jwt";
 
-const authorizedApiKeyId = "my-authorized-id";
 const immersionOfferId = "78000403200019-B1805";
 const immersionOfferRome = "B1805";
 
@@ -34,7 +34,7 @@ describe("Route to get immersion offer by id", () => {
   beforeEach(async () => {
     const config = new AppConfigBuilder()
       .withRepositories("IN_MEMORY")
-      .withAuthorizedApiKeyIds([authorizedApiKeyId])
+      .withAuthorizedApiKeyIds([validAuthorizedApiKeyId])
       .build();
     ({ request, inMemoryUow } = await buildTestApp(config));
     generateApiJwt = makeGenerateJwtES256(config.apiJwtPrivateKey);
@@ -112,7 +112,7 @@ describe("Route to get immersion offer by id", () => {
     };
 
     const authToken = generateApiJwt({
-      id: authorizedApiKeyId,
+      id: validAuthorizedApiKeyId,
     });
 
     await request
@@ -123,7 +123,7 @@ describe("Route to get immersion offer by id", () => {
 
   it("rejects requests with wrong format id", async () => {
     const authToken = generateApiJwt({
-      id: authorizedApiKeyId,
+      id: validAuthorizedApiKeyId,
     });
     await request
       .get(`/${getImmersionOfferByIdRoute__v0}/sfdfdsdf`)
