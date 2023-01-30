@@ -1,8 +1,6 @@
 import { Pool, PoolClient } from "pg";
-import { expectPromiseToFailWithError } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { EstablishmentGroupEntity } from "../../../domain/immersionOffer/entities/EstablishmentGroupEntity";
-import { ConflictError } from "../../primary/helpers/httpErrors";
 import { PgEstablishmentGroupRepository } from "./PgEstablishmentGroupRepository";
 
 const group: EstablishmentGroupEntity = {
@@ -32,7 +30,7 @@ describe("PgEstablishmentGroupRepository", () => {
   });
 
   it("creates an EstablishmentGroup and the links with sirets", async () => {
-    await pgEstablishmentGroupRepository.create(group);
+    await pgEstablishmentGroupRepository.save(group);
     const groups = await getAllGroups();
     expect(groups).toMatchObject([{ name: "Carrefour" }]);
 
@@ -43,14 +41,22 @@ describe("PgEstablishmentGroupRepository", () => {
     ]);
   });
 
-  it("fails with conflict error when a group with the same name already exists", async () => {
-    await pgEstablishmentGroupRepository.create(group);
-    await expectPromiseToFailWithError(
-      pgEstablishmentGroupRepository.create(group),
-      new ConflictError(
-        "Establishment Group with name 'Carrefour' already exists",
-      ),
-    );
+  it("updates the group when one with the same name already exists", async () => {
+    await pgEstablishmentGroupRepository.save(group);
+    const updatedGroup: EstablishmentGroupEntity = {
+      name: group.name,
+      sirets: ["55556666555566", "77778888777788"],
+    };
+
+    await pgEstablishmentGroupRepository.save(updatedGroup);
+
+    const groups = await getAllGroups();
+    const groupSirets = await getAllGroupsSirets();
+    expect(groups).toMatchObject([{ name: "Carrefour" }]);
+    expect(groupSirets).toMatchObject([
+      { group_name: "Carrefour", siret: updatedGroup.sirets[0] },
+      { group_name: "Carrefour", siret: updatedGroup.sirets[1] },
+    ]);
   });
 
   const getAllGroups = async () => {

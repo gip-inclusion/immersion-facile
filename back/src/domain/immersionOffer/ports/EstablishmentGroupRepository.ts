@@ -1,5 +1,5 @@
 import { EstablishmentGroupEntity } from "../entities/EstablishmentGroupEntity";
 
 export interface EstablishmentGroupRepository {
-  create: (group: EstablishmentGroupEntity) => Promise<void>;
+  save: (group: EstablishmentGroupEntity) => Promise<void>;
 }

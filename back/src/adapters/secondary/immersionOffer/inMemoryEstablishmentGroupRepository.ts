@@ -1,14 +1,27 @@
 import { EstablishmentGroupEntity } from "../../../domain/immersionOffer/entities/EstablishmentGroupEntity";
 import { EstablishmentGroupRepository } from "../../../domain/immersionOffer/ports/EstablishmentGroupRepository";
 
+/* eslint-disable @typescript-eslint/require-await */
 export class InMemoryEstablishmentGroupRepository
   implements EstablishmentGroupRepository
 {
-  // eslint-disable-next-line @typescript-eslint/require-await
-  public async create(group: EstablishmentGroupEntity) {
-    this.groups.push(group);
+  public async save(group: EstablishmentGroupEntity) {
+    this.groupsByName[group.name] = group;
   }
 
   // for test purpose
-  public groups: EstablishmentGroupEntity[] = [];
+  private groupsByName: Record<string, EstablishmentGroupEntity> = {};
+
+  public set groups(groups: EstablishmentGroupEntity[]) {
+    this.groupsByName = groups.reduce(
+      (acc, group) => ({ ...acc, [group.name]: group }),
+      {} as Record<string, EstablishmentGroupEntity>,
+    );
+  }
+
+  public get groups(): EstablishmentGroupEntity[] {
+    return Object.values(this.groupsByName);
+  }
 }
+
+/* eslint-enable @typescript-eslint/require-await */

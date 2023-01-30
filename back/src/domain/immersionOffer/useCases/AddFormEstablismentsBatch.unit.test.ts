@@ -146,6 +146,43 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
       ],
     });
   });
+
+  it("updates Group if it already exists", async () => {
+    const formEstablishmentBatch = createFormEstablishmentBatchDto();
+    await establishmentGroupRepository.save({
+      name: formEstablishmentBatch.groupName,
+      sirets: [formEstablishmentBatch.formEstablishments[0].siret],
+    });
+    await formEstablishmentRepo.setFormEstablishments([
+      formEstablishmentBatch.formEstablishments[0],
+    ]);
+    uuidGenerator.setNextUuids(["event1-id", "event2-id"]);
+
+    const report = await addFormEstablishmentBatch.execute(
+      formEstablishmentBatch,
+    );
+
+    expectToEqual(report, {
+      numberOfEstablishmentsProcessed: 2,
+      numberOfSuccess: 1,
+      failures: [
+        {
+          siret: formEstablishmentBatch.formEstablishments[0].siret,
+          errorMessage:
+            "Establishment with siret 01234567890123 already exists",
+        },
+      ],
+    });
+
+    expect(establishmentGroupRepository.groups).toHaveLength(1);
+    expectToEqual(establishmentGroupRepository.groups[0], {
+      name: formEstablishmentBatch.groupName,
+      sirets: [
+        formEstablishmentBatch.formEstablishments[0].siret,
+        formEstablishmentBatch.formEstablishments[1].siret,
+      ],
+    });
+  });
 });
 
 const createFormEstablishmentBatchDto = (): FormEstablishmentBatchDto => {

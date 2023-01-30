@@ -33,7 +33,7 @@ export class AddFormEstablishmentBatch extends UseCase<
       sirets: formEstablishments.map(({ siret }) => siret),
     };
     await this.uowPerformer.perform((uow) =>
-      uow.establishmentGroupRepository.create(group),
+      uow.establishmentGroupRepository.save(group),
     );
 
     const sizeOfChunk = 15;
