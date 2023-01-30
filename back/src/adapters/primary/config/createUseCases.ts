@@ -74,6 +74,7 @@ import { makeGenerateEditFormEstablishmentUrl } from "./makeGenerateEditFormEsta
 import { GenerateConventionMagicLink } from "./createGenerateConventionMagicLink";
 import { AddFormEstablishmentBatch } from "../../../domain/immersionOffer/useCases/AddFormEstablismentsBatch";
 import { LookupLocation } from "../../../domain/address/useCases/LookupLocation";
+import { NotFoundError } from "../helpers/httpErrors";
 
 export const createUseCases = (
   config: AppConfig,
@@ -348,9 +349,16 @@ export const createUseCases = (
           ),
         ),
       getImmersionFacileAgencyIdByKind: (_: void) =>
-        uowPerformer.perform((uow) =>
-          uow.agencyRepository.getImmersionFacileAgencyId(),
-        ),
+        uowPerformer.perform(async (uow) => {
+          const agencyId =
+            await uow.agencyRepository.getImmersionFacileAgencyId();
+          if (!agencyId) {
+            throw new NotFoundError(
+              `No agency found with kind immersion-facilitee`,
+            );
+          }
+          return agencyId;
+        }),
     }),
   };
 };

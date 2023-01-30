@@ -205,7 +205,7 @@ export class PgAgencyRepository implements AgencyRepository {
     await this.client.query(format(query, ...params));
   }
 
-  async getImmersionFacileAgencyId(): Promise<AgencyId> {
+  async getImmersionFacileAgencyId(): Promise<AgencyId | undefined> {
     const pgResult = await this.client.query(`
            SELECT id 
            FROM agencies

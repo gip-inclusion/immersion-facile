@@ -14,6 +14,7 @@ import { useConventionTextsFromFormikContext } from "src/app/contents/forms/conv
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
+import { useRoute } from "src/app/routes/routes";
 import { deviceRepository } from "src/config/dependencies";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { AgencyFormSection } from "./sections/agency/AgencyFormSection";
@@ -36,22 +37,31 @@ export const ConventionFormFields = ({
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   onModificationsRequired = async () => {},
 }: ConventionFieldsProps): JSX.Element => {
-  const preselectedAgencyId = useAppSelector(
-    conventionSelectors.preselectedAgencyId,
-  );
-
-  useEffect(() => {
-    deviceRepository.delete("partialConventionInUrl");
-  }, []);
-
-  const alreadySigned = !!signatory?.signedAt;
   const {
     errors,
     submitCount,
     isSubmitting,
     submitForm,
+    setFieldValue,
     values: conventionValues,
   } = useFormikContext<ConventionDto>();
+  const preselectedAgencyId = useAppSelector(
+    conventionSelectors.preselectedAgencyId,
+  );
+  const route = useRoute();
+
+  useEffect(() => {
+    deviceRepository.delete("partialConventionInUrl");
+  }, []);
+
+  useEffect(() => {
+    if (route.name === "conventionCustomAgency" && preselectedAgencyId) {
+      setFieldValue("agencyId", preselectedAgencyId);
+    }
+  }, [preselectedAgencyId]);
+
+  const alreadySigned = !!signatory?.signedAt;
+
   const { enablePeConnectApi } = useFeatureFlags();
   const watchedValues = makeValuesToWatchInUrl(conventionValues);
   useConventionWatchValuesInUrl(watchedValues);
@@ -60,7 +70,6 @@ export const ConventionFormFields = ({
   );
   const formContents = getFormFields();
   const t = useConventionTextsFromFormikContext();
-
   return (
     <>
       {isFrozen && !isSignatureMode && <ConventionFrozenMessage />}
@@ -71,7 +80,7 @@ export const ConventionFormFields = ({
         type="hidden"
         {...formContents["signatories.beneficiary.federatedIdentity"]}
       />
-      {!preselectedAgencyId && (
+      {route.name !== "conventionCustomAgency" && (
         <AgencyFormSection
           internshipKind={conventionValues.internshipKind}
           agencyId={conventionValues.agencyId}
@@ -79,14 +88,8 @@ export const ConventionFormFields = ({
           isFrozen={isFrozen}
         />
       )}
-      {preselectedAgencyId && (
-        <input
-          type="hidden"
-          {...formContents.agencyId}
-          value={preselectedAgencyId}
-        />
-      )}
 
+      <input type="hidden" {...formContents.agencyId} />
       <BeneficiaryFormSection
         isFrozen={isFrozen}
         internshipKind={conventionValues.internshipKind}

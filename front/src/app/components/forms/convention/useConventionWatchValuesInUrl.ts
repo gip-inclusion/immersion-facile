@@ -16,6 +16,7 @@ export const useConventionWatchValuesInUrl = (
     if (
       (route.name !== "conventionImmersion" &&
         route.name !== "conventionImmersionForExternals" &&
+        route.name !== "conventionCustomAgency" &&
         route.name !== "conventionMiniStage") ||
       !!route.params.jwt
     )
@@ -23,6 +24,7 @@ export const useConventionWatchValuesInUrl = (
 
     if (
       route.name === "conventionImmersion" ||
+      route.name === "conventionCustomAgency" ||
       route.name === "conventionMiniStage"
     ) {
       routes[route.name](watchedValues).replace();

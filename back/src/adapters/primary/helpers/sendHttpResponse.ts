@@ -7,7 +7,12 @@ export const sendHttpResponse = async (
   callback: () => Promise<unknown>,
 ) => {
   try {
-    return response.status(200).json((await callback()) ?? { success: true });
+    const useCaseResult = await callback();
+    const { method } = request;
+    if (method === "GET" && !useCaseResult) {
+      return response.status(200).json(useCaseResult);
+    }
+    return response.status(200).json(useCaseResult ?? { success: true });
   } catch (error: any) {
     handleHttpJsonResponseError(request, response, error);
   }

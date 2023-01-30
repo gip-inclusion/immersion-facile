@@ -9,7 +9,7 @@ export interface AgencyRepository {
   insert: (config: AgencyDto) => Promise<AgencyId | undefined>;
   update: (config: PartialAgencyDto) => Promise<void>;
   getById: (id: AgencyId) => Promise<AgencyDto | undefined>;
-  getImmersionFacileAgencyId: () => Promise<AgencyId>;
+  getImmersionFacileAgencyId: () => Promise<AgencyId | undefined>;
   getAgencies: (props: {
     filters?: GetAgenciesFilter;
     limit?: number;
