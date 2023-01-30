@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { MainWrapper } from "src/../../libs/react-design-system";
+import { MainWrapper } from "react-design-system";
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
 import { conventionInitialValuesFromUrl } from "src/app/components/forms/convention/conventionHelpers";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";

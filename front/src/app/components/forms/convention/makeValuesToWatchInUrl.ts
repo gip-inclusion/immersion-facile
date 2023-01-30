@@ -118,16 +118,3 @@ export const makeValuesToWatchInUrl = (conventionDto: ConventionDto) => {
     {} as ConventionInUrl,
   );
 };
-
-export const makeValuesToWatchInUrlForUkraine = (
-  conventionDto: ConventionDto,
-) => {
-  const conventionInUrl = convertToConventionInUrl(conventionDto);
-  return commonKeysToWatch.reduce(
-    (acc, watchedKey) => ({
-      ...acc,
-      [watchedKey]: conventionInUrl[watchedKey],
-    }),
-    {} as ConventionInUrl,
-  );
-};

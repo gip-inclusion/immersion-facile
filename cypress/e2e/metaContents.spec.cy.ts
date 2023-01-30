@@ -10,7 +10,7 @@ const routesNames: Array<{
   params?: Partial<Record<"jwt" | "consumer" | "pagePath", string>>;
 }> = [
   { routeName: "addAgency" },
-  { routeName: "conventionForUkraine" },
+  { routeName: "conventionCustomAgency" },
   { routeName: "conventionImmersion" },
   { routeName: "conventionMiniStage" },
   // { routeName: "conventionStatusDashboard" },
