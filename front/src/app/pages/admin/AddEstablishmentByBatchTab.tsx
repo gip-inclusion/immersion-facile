@@ -92,6 +92,7 @@ export const AddEstablishmentByBatchTab = () => {
   const { classes, cx } = useStyles({
     tableWrapper: {
       background: isFullscreen ? "var(--background-raised-grey)" : "inherit",
+      overflow: isFullscreen ? "auto" : "hidden",
     },
     table: {
       display: isFullscreen ? "block" : "none !important",
@@ -137,7 +138,10 @@ export const AddEstablishmentByBatchTab = () => {
     dispatch(
       establishmentBatchSlice.actions.addEstablishmentBatchRequested({
         groupName: getValues().groupName,
-        formEstablishments: candidateEstablishments ?? [],
+        formEstablishments:
+          candidateEstablishments.filter(
+            (establishment) => establishment.zodErrors.length === 0,
+          ) ?? [],
       }),
     );
     setFormSubmitted(false);
@@ -239,7 +243,7 @@ export const AddEstablishmentByBatchTab = () => {
                 success: getBatchSuccessMessage(),
               }}
             />
-            <table className={cx(classes.table)}>
+            <table className={cx(fr.cx("fr-mt-2w"), classes.table)}>
               <thead>
                 <tr>
                   {keys(candidateEstablishments[0]).map((key) => (
@@ -253,9 +257,10 @@ export const AddEstablishmentByBatchTab = () => {
                 {candidateEstablishments.map((establishment, index) => (
                   <tr
                     key={`${establishment.siret}-${index}`}
+                    className={cx({})}
                     style={{
                       backgroundColor: establishment.zodErrors.length
-                        ? "red"
+                        ? "var(--error-950-100)"
                         : "",
                     }}
                   >
@@ -281,6 +286,7 @@ export const AddEstablishmentByBatchTab = () => {
 const useStyles = makeStyles<{
   tableWrapper: {
     background: string;
+    overflow: "auto" | "hidden";
   };
   table: {
     display: "block" | "none !important";
