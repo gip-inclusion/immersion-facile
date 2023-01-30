@@ -30,9 +30,16 @@ describe("PgEstablishmentGroupRepository", () => {
   });
 
   it("creates an EstablishmentGroup and the links with sirets", async () => {
+    await pgEstablishmentGroupRepository.save({
+      name: "L'amie caline",
+      sirets: [],
+    });
     await pgEstablishmentGroupRepository.save(group);
     const groups = await getAllGroups();
-    expect(groups).toMatchObject([{ name: "Carrefour" }]);
+    expect(groups).toMatchObject([
+      { name: "L'amie caline" },
+      { name: "Carrefour" },
+    ]);
 
     const groupSirets = await getAllGroupsSirets();
     expect(groupSirets).toMatchObject([

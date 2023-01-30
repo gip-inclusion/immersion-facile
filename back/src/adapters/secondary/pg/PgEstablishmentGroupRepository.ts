@@ -11,15 +11,14 @@ export class PgEstablishmentGroupRepository
 
   async save(group: EstablishmentGroupEntity): Promise<void> {
     const { rows } = await this.client.query(
-      `SELECT * FROM establishment_groups`,
+      `SELECT * FROM establishment_groups WHERE name = $1`,
+      [group.name],
     );
-    const establishmentGroupAlreadyExists = !!rows[0];
+    const establishmentGroupAlreadyExists = !!rows.length;
     if (establishmentGroupAlreadyExists) {
       await this.clearExistingSiretsForGroup(group.name);
       await this.insertEstablishmentGroupSirets(group);
-    }
-
-    if (!establishmentGroupAlreadyExists) {
+    } else {
       await this.client.query(
         `
             INSERT INTO establishment_groups (name) VALUES ($1)
@@ -33,6 +32,7 @@ export class PgEstablishmentGroupRepository
   private async insertEstablishmentGroupSirets(
     group: EstablishmentGroupEntity,
   ) {
+    if (!group.sirets.length) return;
     const groupAndSiretPairs: [string, SiretDto][] = group.sirets.map(
       (siret) => [group.name, siret],
     );
