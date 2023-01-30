@@ -181,7 +181,7 @@ const conventionSection = (internshipKind: InternshipKind) => ({
       "navettes jusqu'au lieu de travail, panier repas, hébergement...",
   },
   isMinor: {
-    label: "La personne qui va faire l'immersion est-elle mineure ?",
+    label: "Etes vous mineur ou majeur protégé ?",
     id: "form-convention-isMinor",
     required: true,
   },
@@ -228,11 +228,11 @@ const beneficiarySection = (internshipKind: InternshipKind) => ({
     required: true,
   },
   "signatories.beneficiary.financiaryHelp": {
-    label: "Aide financière",
+    label: "Aide matérielle",
     id: "form-convention-signatories-beneficiary-financiary-help",
     placeholder: "exemple: aide à la mobilité",
     description:
-      "Le bénéficiaire a-t-il besoin d'une aide financière pour réaliser l'immersion?",
+      "Le bénéficiaire a-t-il besoin d'une aide matérielle pour réaliser l'immersion?",
   },
   "signatories.beneficiary.federatedIdentity": {
     // hidden field

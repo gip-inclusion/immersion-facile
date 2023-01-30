@@ -176,7 +176,7 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
     regulations:
       internshipKind === "immersion"
         ? "Ce formulaire vaut équivalence du CERFA 13912 * 04"
-        : "Ce formulaire vaut équivalence du CERFA ***********************",
+        : "",
     rejected: {
       title:
         internshipKind === "immersion"
