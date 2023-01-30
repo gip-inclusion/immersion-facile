@@ -7,7 +7,6 @@ import { ConventionFormContainerLayout } from "src/app/components/forms/conventi
 import { conventionInitialValuesFromUrl } from "src/app/components/forms/convention/conventionHelpers";
 import { InitiateConventionCard } from "src/app/components/InitiateConventionCard";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
-import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { routes } from "src/app/routes/routes";
@@ -28,9 +27,7 @@ export const ConventionImmersionPage = ({
   route,
 }: ConventionImmersionPageProps) => (
   <HeaderFooterLayout>
-    <ConventionFormContainerLayout
-      title={useConventionTexts("immersion").intro.conventionTitle}
-    >
+    <ConventionFormContainerLayout>
       <PageContent route={route} />
     </ConventionFormContainerLayout>
   </HeaderFooterLayout>

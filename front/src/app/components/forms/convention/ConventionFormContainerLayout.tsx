@@ -3,17 +3,21 @@ import { MainWrapper, PageHeader } from "react-design-system";
 
 type ConventionFormContainerLayoutProps = {
   children: ReactNode;
-  title: string;
 };
 
 export const ConventionFormContainerLayout = ({
-  title,
   children,
 }: ConventionFormContainerLayoutProps) => (
   <>
     <MainWrapper
       layout={"boxed"}
-      pageHeader={<PageHeader centered title={title} theme="candidate" />}
+      pageHeader={
+        <PageHeader
+          centered
+          title={"Formulaire pour conventionner une période d'immersion"}
+          theme="candidate"
+        />
+      }
     >
       {children}
     </MainWrapper>

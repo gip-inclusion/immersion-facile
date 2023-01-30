@@ -7,7 +7,7 @@ import { ConventionFrozenMessage } from "src/app/components/forms/convention/Con
 import { ConventionSignOnlyMessage } from "src/app/components/forms/convention/ConventionSignOnlyMessage";
 import { makeValuesToWatchInUrl } from "src/app/components/forms/convention/makeValuesToWatchInUrl";
 import { SignatureActions } from "src/app/components/forms/convention/SignatureActions";
-import { SubmitButton } from "src/app/components/forms/convention/SubmitButtons";
+import { SubmitButton } from "src/app/components/forms/convention/SubmitButton";
 import { useConventionWatchValuesInUrl } from "src/app/components/forms/convention/useConventionWatchValuesInUrl";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
@@ -132,6 +132,7 @@ export const ConventionFormFields = ({
             <p>{t.conventionAlreadySigned}</p>
           ) : (
             <SignatureActions
+              internshipKind={conventionValues.internshipKind}
               alreadySigned={alreadySigned}
               signatory={signatory}
               isSubmitting={isSubmitting}

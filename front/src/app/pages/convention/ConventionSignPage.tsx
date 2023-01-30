@@ -1,11 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import React, { useEffect } from "react";
-import {
-  Loader,
-  MainWrapper,
-  Notification,
-  PageHeader,
-} from "react-design-system";
+import { Loader, Notification } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   ConventionMagicLinkPayload,
@@ -15,6 +10,7 @@ import {
   SignatoryRole,
   signatoryRoles,
 } from "shared";
+import { ConventionFormContainerLayout } from "src/app/components/forms/convention/ConventionFormContainerLayout";
 import { Route } from "type-route";
 import { conventionSlice } from "../../../core-logic/domain/convention/convention.slice";
 import { ConventionSignForm } from "../../components/forms/convention/ConventionSignForm";
@@ -103,17 +99,7 @@ const ConventionSignPageContent = ({
   const t = useConventionTexts(convention.internshipKind);
 
   return (
-    <MainWrapper
-      layout="boxed"
-      pageHeader={
-        <PageHeader
-          title="Formulaire pour conventionner une période de mise en situation
-    professionnelle (PMSMP)"
-          centered
-          theme="candidate"
-        />
-      }
-    >
+    <ConventionFormContainerLayout>
       <>
         {convention.status === "REJECTED" && (
           <Notification type="error" title={t.sign.rejected.title}>
@@ -149,7 +135,7 @@ const ConventionSignPageContent = ({
           </>
         )}
       </>
-    </MainWrapper>
+    </ConventionFormContainerLayout>
   );
 };
 

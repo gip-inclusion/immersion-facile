@@ -2,7 +2,7 @@ import { useFormikContext } from "formik";
 import React from "react";
 import type { ConventionDto } from "shared";
 import { makeValuesToWatchInUrlForUkraine } from "src/app/components/forms/convention/makeValuesToWatchInUrl";
-import { SubmitButton } from "src/app/components/forms/convention/SubmitButtons";
+import { SubmitButton } from "src/app/components/forms/convention/SubmitButton";
 import { useConventionWatchValuesInUrl } from "src/app/components/forms/convention/useConventionWatchValuesInUrl";
 import { ConventionFrozenMessage } from "src/app/components/forms/convention/ConventionFrozenMessage";
 import { ConventionSignOnlyMessage } from "src/app/components/forms/convention/ConventionSignOnlyMessage";

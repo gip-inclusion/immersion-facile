@@ -77,9 +77,15 @@ type DateCheckboxGroupProps = {
   name: string;
 };
 
-export const DateCheckboxGroup = (props: DateCheckboxGroupProps) => {
+export const DateCheckboxGroup = ({
+  label,
+  name,
+  description,
+  descriptionLink,
+  disabled,
+}: DateCheckboxGroupProps) => {
   const [field, meta, { setValue }] = useField<string | undefined>({
-    name: props.name,
+    name,
   });
   const isError = meta.touched && meta.error;
   const htmlName = isError ? "checkBox-error" : "checkbox";
@@ -100,11 +106,11 @@ export const DateCheckboxGroup = (props: DateCheckboxGroupProps) => {
             className={fr.cx("fr-fieldset__legend", "fr-text--regular")}
             id="checkboxes-error-legend"
           >
-            {props.label}
-            {props.description && (
+            {label}
+            {description && (
               <span className={fr.cx("fr-hint-text")}>
-                <a href={props.descriptionLink} target="_blank">
-                  {props.description}
+                <a href={descriptionLink} target="_blank">
+                  {description}
                 </a>
               </span>
             )}
@@ -113,7 +119,7 @@ export const DateCheckboxGroup = (props: DateCheckboxGroupProps) => {
           <div className={fr.cx("fr-fieldset__content")}>
             <div
               className={fr.cx("fr-checkbox-group")}
-              key={htmlName + props.name + "_oui"}
+              key={htmlName + name + "_oui"}
             >
               <input
                 {...field}
@@ -121,7 +127,7 @@ export const DateCheckboxGroup = (props: DateCheckboxGroupProps) => {
                 type="checkbox"
                 id={htmlName}
                 checked={!!field.value}
-                disabled={props.disabled}
+                disabled={disabled}
               />
               <label
                 className={fr.cx("fr-label")}
