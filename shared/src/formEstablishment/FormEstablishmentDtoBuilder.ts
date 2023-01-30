@@ -3,6 +3,7 @@ import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto
 import { SiretDto } from "../siret/siret";
 import {
   BusinessContactDto,
+  EstablishmentCSVRow,
   FormEstablishmentDto,
   FormEstablishmentSource,
 } from "./FormEstablishment.dto";
@@ -119,7 +120,36 @@ export class FormEstablishmentDtoBuilder
   public withBusinessContact(businessContact: BusinessContactDto) {
     return new FormEstablishmentDtoBuilder({ ...this.dto, businessContact });
   }
+  public buildCsvRow(): EstablishmentCSVRow {
+    return FormEstablishmentToEstablishmentCsvRow(this.dto);
+  }
   public build() {
     return this.dto;
   }
 }
+
+const FormEstablishmentToEstablishmentCsvRow = (
+  establishment: FormEstablishmentDto,
+): EstablishmentCSVRow => ({
+  businessAddress: establishment.businessAddress,
+  businessContact_email: establishment.businessContact.email,
+  businessContact_firstName: establishment.businessContact.firstName,
+  businessContact_lastName: establishment.businessContact.lastName,
+  businessContact_phone: establishment.businessContact.phone,
+  businessContact_job: establishment.businessContact.job,
+  businessContact_contactMethod: establishment.businessContact.contactMethod,
+  businessContact_copyEmails:
+    establishment.businessContact.copyEmails.join(","),
+  naf_code: establishment.naf?.code ?? "",
+  businessName: establishment.businessName,
+  businessNameCustomized: establishment.businessNameCustomized ?? "",
+  siret: establishment.siret,
+  website: establishment.website ?? "",
+  additionalInformation: establishment.additionalInformation ?? "",
+  appellations_code: establishment.appellations
+    .map((appellation) => appellation.appellationCode)
+    .join(","),
+  isEngagedEnterprise: establishment.isEngagedEnterprise ? "1" : "0",
+  isSearchable: establishment.isSearchable ? "1" : "0",
+  fitForDisabledWorkers: establishment.fitForDisabledWorkers ? "1" : "0",
+});

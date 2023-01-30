@@ -2,6 +2,7 @@ import { Observable } from "rxjs";
 import {
   AbsoluteUrl,
   AdminToken,
+  EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetDashboardParams,
   UserAndPassword,
@@ -16,5 +17,5 @@ export interface AdminGateway {
   addEstablishmentBatch$: (
     establishmentBatch: FormEstablishmentBatchDto,
     token: AdminToken,
-  ) => Observable<void>;
+  ) => Observable<EstablishmentBatchReport>;
 }

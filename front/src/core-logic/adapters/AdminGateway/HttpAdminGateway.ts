@@ -6,6 +6,7 @@ import {
   AdminTargets,
   AdminToken,
   adminTokenSchema,
+  EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetDashboardParams,
   UserAndPassword,
@@ -44,7 +45,7 @@ export class HttpAdminGateway implements AdminGateway {
   public addEstablishmentBatch$(
     establishmentBatch: FormEstablishmentBatchDto,
     token: AdminToken,
-  ): Observable<void> {
+  ): Observable<EstablishmentBatchReport> {
     return from(
       this.httpClient
         .addFormEstablishmentBatch({
@@ -53,9 +54,7 @@ export class HttpAdminGateway implements AdminGateway {
           },
           body: establishmentBatch,
         })
-        .then(() => {
-          // force void return
-        }),
+        .then((response) => response.responseBody as EstablishmentBatchReport),
     );
   }
 }

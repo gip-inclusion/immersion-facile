@@ -1,35 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
-  ContactMethod,
+  EstablishmentBatchReport,
+  EstablishmentCSVRow,
   FormEstablishmentBatchDto,
   FormEstablishmentDto,
 } from "shared";
 import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
 import { z } from "zod";
-
-export type CSVBoolean = "1" | "0" | "";
-export type CSVOptionalString = string | "";
-
-export type EstablishmentCSVRow = {
-  siret: string;
-  businessNameCustomized: CSVOptionalString;
-  businessName: string;
-  businessAddress: string;
-  naf_code: string;
-  appellations_code: string;
-  isEngagedEnterprise: CSVBoolean;
-  businessContact_job: string;
-  businessContact_email: string;
-  businessContact_phone: string;
-  businessContact_lastName: string;
-  businessContact_firstName: string;
-  businessContact_contactMethod: ContactMethod;
-  businessContact_copyEmails: string;
-  isSearchable: CSVBoolean;
-  website: CSVOptionalString;
-  additionalInformation: CSVOptionalString;
-  fitForDisabledWorkers: CSVBoolean;
-};
 
 export type AddFormEstablishmentBatchFeedback = SubmitFeedBack<"success">;
 export type FormEstablishmentDtoWithErrors = FormEstablishmentDto & {
@@ -39,6 +16,7 @@ export type EstablishmentBatchState = {
   isLoading: boolean;
   candidateEstablishments: FormEstablishmentDtoWithErrors[];
   feedback: AddFormEstablishmentBatchFeedback;
+  addBatchResponse: EstablishmentBatchReport | null;
 };
 
 const initialState: EstablishmentBatchState = {
@@ -47,6 +25,7 @@ const initialState: EstablishmentBatchState = {
     kind: "idle",
   },
   candidateEstablishments: [],
+  addBatchResponse: null,
 };
 
 export const establishmentBatchSlice = createSlice({
@@ -69,11 +48,15 @@ export const establishmentBatchSlice = createSlice({
     ) => {
       state.isLoading = true;
     },
-    addEstablishmentBatchSucceeded: (state) => {
+    addEstablishmentBatchSucceeded: (
+      state,
+      action: PayloadAction<EstablishmentBatchReport>,
+    ) => {
       state.isLoading = false;
       state.feedback = {
         kind: "success",
       };
+      state.addBatchResponse = action.payload;
     },
     addEstablishmentBatchErrored: (state, action: PayloadAction<string>) => {
       state.isLoading = false;

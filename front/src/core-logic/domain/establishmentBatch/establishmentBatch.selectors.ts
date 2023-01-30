@@ -9,6 +9,14 @@ const candidateEstablishments = createRootSelector(
   (state) => state.establishmentBatch.candidateEstablishments,
 );
 
+const isLoading = createRootSelector(
+  (state) => state.establishmentBatch.isLoading,
+);
+
+const addBatchResponse = createRootSelector(
+  (state) => state.establishmentBatch.addBatchResponse,
+);
+
 const numberOfValidCandidateEstablishments = createSelector(
   candidateEstablishments,
   (candidateEstablishments) =>
@@ -30,4 +38,6 @@ export const establishmentBatchSelectors = {
   candidateEstablishments,
   numberOfValidCandidateEstablishments,
   numberOfInvalidCandidateEstablishments,
+  isLoading,
+  addBatchResponse,
 };

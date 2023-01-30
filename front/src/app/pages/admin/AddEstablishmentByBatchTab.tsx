@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { DsfrTitle } from "react-design-system";
+import { DsfrTitle, Loader } from "react-design-system";
 import Papa from "papaparse";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { keys, values } from "ramda";
@@ -29,6 +29,10 @@ export const AddEstablishmentByBatchTab = () => {
     formState: { errors },
   } = useForm<AddEstablishmentByBatchTabForm>();
   const feedback = useAppSelector(establishmentBatchSelectors.feedback);
+  const isLoading = useAppSelector(establishmentBatchSelectors.isLoading);
+  const addBatchResponse = useAppSelector(
+    establishmentBatchSelectors.addBatchResponse,
+  );
   const candidateEstablishments = useAppSelector(
     establishmentBatchSelectors.candidateEstablishments,
   );
@@ -92,12 +96,57 @@ export const AddEstablishmentByBatchTab = () => {
       background: isFullscreen ? "var(--background-raised-grey)" : "inherit",
     },
     table: {
-      maxHeight: isFullscreen ? "90vh" : "0",
-      overflow: isFullscreen ? "auto" : "hidden",
+      display: isFullscreen ? "block" : "none !important",
     },
   });
+  const getBatchSuccessMessage = () => (
+    <>
+      {addBatchResponse && (
+        <ul>
+          {!!addBatchResponse.numberOfEstablishmentsProcessed && (
+            <li>
+              {addBatchResponse.numberOfEstablishmentsProcessed} établissements
+              traités
+            </li>
+          )}
+
+          {!!addBatchResponse.numberOfSuccess && (
+            <li>
+              {addBatchResponse.numberOfSuccess} établissements ajoutés avec
+              succès
+            </li>
+          )}
+          {addBatchResponse.failures && addBatchResponse.failures.length && (
+            <li>
+              <span>
+                {addBatchResponse.failures.length} erreurs lors d'ajout
+                d'établissements
+              </span>
+              <ul>
+                {addBatchResponse.failures.map((failure) => (
+                  <li>
+                    <strong>{failure.siret}</strong> : {failure.errorMessage}
+                  </li>
+                ))}
+              </ul>
+            </li>
+          )}
+        </ul>
+      )}
+    </>
+  );
+  const onEstablishmentsImportClick = () => {
+    dispatch(
+      establishmentBatchSlice.actions.addEstablishmentBatchRequested({
+        groupName: getValues().groupName,
+        formEstablishments: candidateEstablishments ?? [],
+      }),
+    );
+    setFormSubmitted(false);
+  };
   return (
     <div className="admin-tab__import-batch-establishment">
+      {isLoading && <Loader />}
       <DsfrTitle level={5} text="Import en masse d'entreprises" />
       <form onSubmit={handleSubmit(onSubmit)}>
         <Input
@@ -143,63 +192,56 @@ export const AddEstablishmentByBatchTab = () => {
             )}
             ref={tableElement}
           >
-            <table className={cx(classes.table)}>
-              <caption>
+            <div>
+              <h3>
                 Résumé de l'import à effectuer pour le groupe{" "}
                 {getValues("groupName")} :{" "}
-                <ul>
-                  {!!numberOfValidCandidateEstablishments && (
-                    <li>
-                      <span className={fr.cx("fr-valid-text")}>
-                        {numberOfValidCandidateEstablishments} établissement(s)
-                        prêts à être importés
-                      </span>
-                    </li>
-                  )}
-                  {!!numberOfInvalidCandidateEstablishments && (
-                    <li>
-                      <span className={fr.cx("fr-error-text")}>
-                        {numberOfInvalidCandidateEstablishments}{" "}
-                        établissement(s) en erreur et ne seront pas importés
-                      </span>
-                    </li>
-                  )}
-                </ul>
-                <Button
-                  priority={"tertiary"}
-                  className={fr.cx("fr-mt-2w")}
-                  type="button"
-                  onClick={onFullscreenClick}
-                >
-                  {isFullscreen
-                    ? "Fermer le mode plein écran"
-                    : "Voir le détail en plein écran"}
-                </Button>
-                <Button
-                  title="Importer ces succursales"
-                  onClick={() =>
-                    dispatch(
-                      establishmentBatchSlice.actions.addEstablishmentBatchRequested(
-                        {
-                          groupName: getValues().groupName,
-                          formEstablishments: candidateEstablishments ?? [],
-                        },
-                      ),
-                    )
-                  }
-                  type="button"
-                  className={fr.cx("fr-ml-1w")}
-                >
-                  Importer ces succursales
-                </Button>
-                <SubmitFeedbackNotification
-                  submitFeedback={feedback}
-                  messageByKind={{
-                    success: "Super, ça a bien été ajouté !",
-                  }}
-                />
-              </caption>
+              </h3>
 
+              <ul>
+                {!!numberOfValidCandidateEstablishments && (
+                  <li>
+                    <span className={fr.cx("fr-valid-text")}>
+                      {numberOfValidCandidateEstablishments} établissement(s)
+                      prêts à être importés
+                    </span>
+                  </li>
+                )}
+                {!!numberOfInvalidCandidateEstablishments && (
+                  <li>
+                    <span className={fr.cx("fr-error-text")}>
+                      {numberOfInvalidCandidateEstablishments} établissement(s)
+                      en erreur et ne seront pas importés
+                    </span>
+                  </li>
+                )}
+              </ul>
+              <Button
+                priority={"tertiary"}
+                className={fr.cx("fr-mt-2w")}
+                type="button"
+                onClick={onFullscreenClick}
+              >
+                {isFullscreen
+                  ? "Fermer le mode plein écran"
+                  : "Voir le détail en plein écran"}
+              </Button>
+              <Button
+                title="Importer ces succursales"
+                onClick={onEstablishmentsImportClick}
+                type="button"
+                className={fr.cx("fr-ml-1w")}
+              >
+                Importer ces succursales
+              </Button>
+            </div>
+            <SubmitFeedbackNotification
+              submitFeedback={feedback}
+              messageByKind={{
+                success: getBatchSuccessMessage(),
+              }}
+            />
+            <table className={cx(classes.table)}>
               <thead>
                 <tr>
                   {keys(candidateEstablishments[0]).map((key) => (
@@ -243,8 +285,7 @@ const useStyles = makeStyles<{
     background: string;
   };
   table: {
-    maxHeight: "90vh" | "0";
-    overflow: "auto" | "hidden";
+    display: "block" | "none !important";
   };
 }>()((_theme, overrides) => ({
   ...overrides,

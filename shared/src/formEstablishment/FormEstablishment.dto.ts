@@ -45,6 +45,30 @@ export type FormEstablishmentDto = {
   isSearchable: boolean;
 };
 
+export type CSVBoolean = "1" | "0" | "";
+export type CSVOptionalString = string | "";
+
+export type EstablishmentCSVRow = {
+  siret: string;
+  businessNameCustomized: CSVOptionalString;
+  businessName: string;
+  businessAddress: string;
+  naf_code: string;
+  appellations_code: string;
+  isEngagedEnterprise: CSVBoolean;
+  businessContact_job: string;
+  businessContact_email: string;
+  businessContact_phone: string;
+  businessContact_lastName: string;
+  businessContact_firstName: string;
+  businessContact_contactMethod: ContactMethod;
+  businessContact_copyEmails: string;
+  isSearchable: CSVBoolean;
+  website: CSVOptionalString;
+  additionalInformation: CSVOptionalString;
+  fitForDisabledWorkers: CSVBoolean;
+};
+
 export type FormEstablishmentBatchDto = {
   groupName: string;
   formEstablishments: FormEstablishmentDto[];

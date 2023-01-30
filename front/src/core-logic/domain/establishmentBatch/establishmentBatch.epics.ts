@@ -8,7 +8,6 @@ import {
 } from "src/core-logic/storeConfig/redux.helpers";
 import {
   establishmentBatchSlice,
-  EstablishmentCSVRow,
   FormEstablishmentDtoWithErrors,
 } from "./establishmentBatch.slice";
 import {
@@ -17,6 +16,7 @@ import {
   establishmentCopyEmailsFromCSVToDto,
   formEstablishmentSchema,
   FormEstablishmentSource,
+  EstablishmentCSVRow,
 } from "shared";
 
 type EstablishmentBatchAction = ActionOfSlice<typeof establishmentBatchSlice>;
@@ -47,7 +47,11 @@ const addEstablishmentBatchEpic: AppEpic<EstablishmentBatchAction> = (
         state$.value.admin.adminAuth.adminToken || "",
       ),
     ),
-    map(establishmentBatchSlice.actions.addEstablishmentBatchSucceeded),
+    map((batchResponse) =>
+      establishmentBatchSlice.actions.addEstablishmentBatchSucceeded(
+        batchResponse,
+      ),
+    ),
     catchEpicError((error) =>
       establishmentBatchSlice.actions.addEstablishmentBatchErrored(
         error.message,

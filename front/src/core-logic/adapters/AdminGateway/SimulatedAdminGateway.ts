@@ -2,6 +2,7 @@ import { Observable, of, throwError } from "rxjs";
 import {
   AbsoluteUrl,
   AdminToken,
+  EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetDashboardParams,
   UserAndPassword,
@@ -28,7 +29,24 @@ export class SimulatedAdminGateway implements AdminGateway {
   public addEstablishmentBatch$(
     _establishmentBatch: FormEstablishmentBatchDto,
     _token: AdminToken,
-  ): Observable<void> {
-    return of(undefined);
+  ): Observable<EstablishmentBatchReport> {
+    return of({
+      numberOfEstablishmentsProcessed: 12,
+      numberOfSuccess: 8,
+      failures: [
+        {
+          siret: "744854745000266",
+          errorMessage: "Test erreur 1",
+        },
+        {
+          siret: "744854745000267",
+          errorMessage: "Test erreur 2",
+        },
+        {
+          siret: "744854745000268",
+          errorMessage: "Test erreur 3",
+        },
+      ],
+    });
   }
 }
