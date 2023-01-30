@@ -13,16 +13,18 @@ import {
   agencyPublicDisplaySchema,
   agencyPublicInfoByIdRoute,
   agencySchema,
-  AgencyStatus,
   CreateAgencyDto,
   DepartmentCode,
   ListAgenciesRequestDto,
   WithAgencyId,
   WithAuthorization,
 } from "shared";
-import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
-
-type WithAgencyStatus = { status: AgencyStatus };
+import {
+  ActiveOrRejectedStatus,
+  AgencyGateway,
+  WithActiveOrRejectedStatus,
+  WithAgencyStatus,
+} from "src/core-logic/ports/AgencyGateway";
 
 export type AgencyTargets = CreateTargets<{
   getAgencyAdminById: Target<
@@ -32,7 +34,7 @@ export type AgencyTargets = CreateTargets<{
     `/admin/${typeof agenciesRoute}/:agencyId`
   >;
   updateAgencyStatus: Target<
-    WithAgencyStatus,
+    WithActiveOrRejectedStatus,
     void,
     WithAuthorization,
     `/admin/${typeof agenciesRoute}/:agencyId`
@@ -211,15 +213,24 @@ export class HttpAgencyGateway implements AgencyGateway {
   }
 
   // TODO Mieux identifier l'admin
-  public async validateAgency(
+  public async validateOrRejectAgency(
     adminToken: AdminToken,
     agencyId: AgencyId,
+    status: ActiveOrRejectedStatus,
   ): Promise<void> {
     await this.httpClient.updateAgencyStatus({
-      body: { status: "active" },
+      body: { status },
       headers: { authorization: adminToken },
       urlParams: { agencyId },
     });
+  }
+
+  public validateOrRejectAgency$(
+    adminToken: AdminToken,
+    agencyId: AgencyId,
+    status: ActiveOrRejectedStatus,
+  ): Observable<void> {
+    return from(this.validateOrRejectAgency(adminToken, agencyId, status));
   }
 
   private getFilteredAgencies(

@@ -92,40 +92,55 @@ describe("agencyAdmin", () => {
       });
 
       describe("Needing review related", () => {
+        const preloadedAgencyAdminState: AgencyAdminState = {
+          agencyOptions: [],
+          agencyNeedingReviewOptions: [
+            {
+              id: AGENCY_NEEDING_REVIEW_1.id,
+              name: AGENCY_NEEDING_REVIEW_1.name,
+            },
+            {
+              id: AGENCY_NEEDING_REVIEW_2.id,
+              name: AGENCY_NEEDING_REVIEW_2.name,
+            },
+          ],
+          agencySearchText: "",
+          agency: null,
+          agencyNeedingReview: AGENCY_NEEDING_REVIEW_2,
+          isSearching: false,
+          isFetchingAgenciesNeedingReview: false,
+          isUpdating: false,
+          feedback: { kind: "idle" },
+          error: null,
+        };
+
         beforeEach(() => {
           ({ store, dependencies } = createTestStore({
             admin: adminPreloadedState({
-              agencyAdmin: {
-                agencyOptions: [],
-                agencyNeedingReviewOptions: [
-                  {
-                    id: AGENCY_NEEDING_REVIEW_1.id,
-                    name: AGENCY_NEEDING_REVIEW_1.name,
-                  },
-                  {
-                    id: AGENCY_NEEDING_REVIEW_2.id,
-                    name: AGENCY_NEEDING_REVIEW_2.name,
-                  },
-                ],
-                agencySearchText: "",
-                agency: null,
-                agencyNeedingReview: AGENCY_NEEDING_REVIEW_2,
-                isSearching: false,
-                isFetchingAgenciesNeedingReview: false,
-                isUpdating: false,
-                feedback: { kind: "agencyUpdated" },
-                error: null,
-              },
+              agencyAdmin: { ...preloadedAgencyAdminState },
             }),
           }));
         });
 
-        it("remove from agencyNeedingReviewOptions on update success and remove displayed agency", () => {
+        it("shows when status update is ongoing", () => {
           store.dispatch(
-            agencyAdminSlice.actions.updateAgencySucceeded({
-              ...AGENCY_NEEDING_REVIEW_2,
+            agencyAdminSlice.actions.updateAgencyNeedingReviewStatusRequested({
+              id: preloadedAgencyAdminState.agencyNeedingReviewOptions[0].id,
               status: "active",
             }),
+          );
+          const expectedAgencyAdminState: AgencyAdminState = {
+            ...preloadedAgencyAdminState,
+            isUpdating: true,
+          };
+          expectAgencyAdminStateToMatch(expectedAgencyAdminState);
+        });
+
+        it("remove from agencyNeedingReviewOptions on update success and remove displayed agency", () => {
+          store.dispatch(
+            agencyAdminSlice.actions.updateAgencyNeedingReviewStatusSucceded(
+              AGENCY_NEEDING_REVIEW_2.id,
+            ),
           );
 
           expectAgencyAdminStateToMatch({
@@ -136,36 +151,6 @@ describe("agencyAdmin", () => {
               },
             ],
             agencyNeedingReview: null,
-            feedback: { kind: "agencyUpdated" },
-          });
-        });
-
-        it("editing an agency field (except status) should no impact the agencyNeedsReview in state", () => {
-          const newName = "A new hope";
-
-          const expectedUpdatedAgency = {
-            ...AGENCY_NEEDING_REVIEW_2,
-            name: newName,
-          };
-
-          store.dispatch(
-            agencyAdminSlice.actions.updateAgencySucceeded(
-              expectedUpdatedAgency,
-            ),
-          );
-
-          expectAgencyAdminStateToMatch({
-            agencyNeedingReviewOptions: [
-              {
-                id: AGENCY_NEEDING_REVIEW_1.id,
-                name: AGENCY_NEEDING_REVIEW_1.name,
-              },
-              {
-                id: AGENCY_NEEDING_REVIEW_2.id,
-                name: expectedUpdatedAgency.name,
-              },
-            ],
-            agencyNeedingReview: expectedUpdatedAgency,
             feedback: { kind: "agencyUpdated" },
           });
         });
@@ -194,97 +179,73 @@ describe("agencyAdmin", () => {
     });
   });
 
-  describe("Agency autocomplete", () => {
-    it("shows when search is onGoing", () => {
-      const searchedText = "agen";
-      store.dispatch(
-        agencyAdminSlice.actions.setAgencySearchText(searchedText),
-      );
-      expectAgencyAdminStateToMatch({
-        isSearching: true,
-        agencySearchText: searchedText,
-      });
-    });
-
-    it("does not trigger call api before debounce time is reached, then triggers search and gets results", () => {
-      const searchedText = "agen";
-      whenSearchTextIsProvided(searchedText);
-      expectIsSearchingToBe(true);
-      fastForwardObservables();
-      expectIsSearchingToBe(true);
-      const agencies: AgencyOption[] = [{ id: "my-id", name: "My agency" }];
-      feedWithAgencyOptions(agencies);
-      expectAgencyAdminStateToMatch({
-        agencySearchText: searchedText,
-        isSearching: false,
-        agencyOptions: agencies,
-      });
-    });
-
-    it("selects one of the results and fetches the corresponding Agency", () => {
-      const agencySearchText = "My ";
-      const agencyDto = new AgencyDtoBuilder().build();
-      const agencyOptions: AgencyOption[] = [
-        { id: agencyDto.id, name: agencyDto.name },
-        { id: "456", name: "My other agency" },
-      ];
-
-      ({ store, dependencies } = createTestStore({
-        admin: adminPreloadedState({
-          agencyAdmin: {
-            agencyOptions,
-            agencyNeedingReviewOptions: [],
-            agencySearchText,
-            agency: null,
-            agencyNeedingReview: null,
-            isSearching: false,
-            isFetchingAgenciesNeedingReview: false,
-            isUpdating: false,
-            feedback: { kind: "idle" },
-            error: null,
-          },
-        }),
-      }));
-
-      store.dispatch(
-        agencyAdminSlice.actions.setSelectedAgencyId(agencyDto.id),
-      );
-
-      feedWithFetchedAgency(agencyDto);
-
-      expectAgencyAdminStateToMatch({
-        isSearching: false,
-        agency: agencyDto,
-        agencyOptions,
-        agencySearchText,
-      });
-    });
-  });
-
-  it("clears feedback and agency on agency selection", () => {
-    const agencyDto1 = new AgencyDtoBuilder().withId("1").build();
-    const agencyOptions: AgencyOption[] = [
-      { id: agencyDto1.id, name: agencyDto1.name },
-    ];
-    ({ store, dependencies } = createTestStore({
-      admin: adminPreloadedState({
-        agencyAdmin: {
-          ...agencyAdminInitialState,
-          feedback: { kind: "agencyUpdated" },
-          agencyOptions,
-          agency: agencyDto1,
-        },
-      }),
-    }));
-    store.dispatch(agencyAdminSlice.actions.setSelectedAgencyId("anything"));
-    expectAgencyAdminStateToMatch({
-      feedback: { kind: "idle" },
-      agency: null,
-      agencyOptions,
-    });
-  });
-
   describe("Agency update", () => {
+    describe("Agency autocomplete", () => {
+      it("shows when search is onGoing", () => {
+        const searchedText = "agen";
+        store.dispatch(
+          agencyAdminSlice.actions.setAgencySearchText(searchedText),
+        );
+        expectAgencyAdminStateToMatch({
+          isSearching: true,
+          agencySearchText: searchedText,
+        });
+      });
+
+      it("does not trigger call api before debounce time is reached, then triggers search and gets results", () => {
+        const searchedText = "agen";
+        whenSearchTextIsProvided(searchedText);
+        expectIsSearchingToBe(true);
+        fastForwardObservables();
+        expectIsSearchingToBe(true);
+        const agencies: AgencyOption[] = [{ id: "my-id", name: "My agency" }];
+        feedWithAgencyOptions(agencies);
+        expectAgencyAdminStateToMatch({
+          agencySearchText: searchedText,
+          isSearching: false,
+          agencyOptions: agencies,
+        });
+      });
+
+      it("selects one of the results and fetches the corresponding Agency", () => {
+        const agencySearchText = "My ";
+        const agencyDto = new AgencyDtoBuilder().build();
+        const agencyOptions: AgencyOption[] = [
+          { id: agencyDto.id, name: agencyDto.name },
+          { id: "456", name: "My other agency" },
+        ];
+
+        ({ store, dependencies } = createTestStore({
+          admin: adminPreloadedState({
+            agencyAdmin: {
+              agencyOptions,
+              agencyNeedingReviewOptions: [],
+              agencySearchText,
+              agency: null,
+              agencyNeedingReview: null,
+              isSearching: false,
+              isFetchingAgenciesNeedingReview: false,
+              isUpdating: false,
+              feedback: { kind: "idle" },
+              error: null,
+            },
+          }),
+        }));
+
+        store.dispatch(
+          agencyAdminSlice.actions.setSelectedAgencyId(agencyDto.id),
+        );
+
+        feedWithFetchedAgency(agencyDto);
+
+        expectAgencyAdminStateToMatch({
+          isSearching: false,
+          agency: agencyDto,
+          agencyOptions,
+          agencySearchText,
+        });
+      });
+    });
     const agencyDto = new AgencyDtoBuilder().build();
 
     it("shows when update is ongoing", () => {
@@ -326,6 +287,29 @@ describe("agencyAdmin", () => {
       expectAgencyAdminStateToMatch({
         isUpdating: false,
         feedback: { kind: "errored", errorMessage: "Something went wrong !" },
+      });
+    });
+
+    it("clears feedback and agency on agency selection", () => {
+      const agencyDto1 = new AgencyDtoBuilder().withId("1").build();
+      const agencyOptions: AgencyOption[] = [
+        { id: agencyDto1.id, name: agencyDto1.name },
+      ];
+      ({ store, dependencies } = createTestStore({
+        admin: adminPreloadedState({
+          agencyAdmin: {
+            ...agencyAdminInitialState,
+            feedback: { kind: "agencyUpdated" },
+            agencyOptions,
+            agency: agencyDto1,
+          },
+        }),
+      }));
+      store.dispatch(agencyAdminSlice.actions.setSelectedAgencyId("anything"));
+      expectAgencyAdminStateToMatch({
+        feedback: { kind: "idle" },
+        agency: null,
+        agencyOptions,
       });
     });
   });

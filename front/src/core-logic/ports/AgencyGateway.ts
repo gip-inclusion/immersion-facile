@@ -5,11 +5,19 @@ import {
   AgencyId,
   AgencyOption,
   AgencyPublicDisplayDto,
+  AgencyStatus,
   CreateAgencyDto,
   DepartmentCode,
   ListAgenciesRequestDto,
   WithAgencyId,
 } from "shared";
+
+export type WithAgencyStatus = { status: AgencyStatus };
+export type ActiveOrRejectedStatus = Extract<
+  "active" | "rejected",
+  AgencyStatus
+>;
+export type WithActiveOrRejectedStatus = { status: ActiveOrRejectedStatus };
 
 export interface AgencyGateway {
   addAgency(agency: CreateAgencyDto): Promise<void>;
@@ -31,7 +39,11 @@ export interface AgencyGateway {
     adminToken: AdminToken,
   ): Observable<AgencyOption[]>;
 
-  validateAgency(adminToken: AdminToken, agencyId: AgencyId): Promise<void>;
+  validateOrRejectAgency$(
+    adminToken: AdminToken,
+    agencyId: AgencyId,
+    status: ActiveOrRejectedStatus,
+  ): Observable<void>;
 
   getAgencyAdminById$(
     agencyId: AgencyId,

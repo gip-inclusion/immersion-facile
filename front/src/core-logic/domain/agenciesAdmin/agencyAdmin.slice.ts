@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AgencyDto, AgencyId, AgencyOption } from "shared";
 import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
+import { ActiveOrRejectedStatus } from "../../ports/AgencyGateway";
 
 export type AgencySuccessFeedbackKind = "agencyAdded" | "agencyUpdated";
 export type AgencySubmitFeedback = SubmitFeedBack<AgencySuccessFeedbackKind>;
@@ -90,6 +91,28 @@ export const agencyAdminSlice = createSlice({
       state.isUpdating = false;
       state.feedback = { kind: "agencyUpdated" };
     },
+    updateAgencyNeedingReviewStatusRequested: (
+      state,
+      _action: PayloadAction<{ id: AgencyId; status: ActiveOrRejectedStatus }>,
+    ) => {
+      state.isUpdating = true;
+      state.feedback = { kind: "idle" };
+    },
+    updateAgencyNeedingReviewStatusSucceded: (
+      state,
+      _action: PayloadAction<AgencyId>,
+    ) => {
+      state.isUpdating = false;
+      state.feedback = { kind: "agencyUpdated" };
+    },
+    updateAgencyFailed: (state, action: PayloadAction<string>) => {
+      state.isUpdating = false;
+      state.feedback = { kind: "errored", errorMessage: action.payload };
+    },
+    updateAgencyStatusFailed: (state, action: PayloadAction<string>) => {
+      state.isUpdating = false;
+      state.feedback = { kind: "errored", errorMessage: action.payload };
+    },
     agencyNeedingReviewChangedAfterAnUpdate: (
       state,
       action: PayloadAction<{
@@ -100,10 +123,6 @@ export const agencyAdminSlice = createSlice({
       state.agencyNeedingReviewOptions =
         action.payload.agencyNeedingReviewOptions;
       state.agencyNeedingReview = action.payload.agencyNeedingReview;
-    },
-    updateAgencyFailed: (state, action: PayloadAction<string>) => {
-      state.isUpdating = false;
-      state.feedback = { kind: "errored", errorMessage: action.payload };
     },
   },
 });

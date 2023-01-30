@@ -1,6 +1,6 @@
 /* eslint-disable  @typescript-eslint/require-await */
 import { values } from "ramda";
-import { Observable, Subject } from "rxjs";
+import { from, Observable, Subject } from "rxjs";
 import {
   AdminToken,
   AgencyDto,
@@ -93,8 +93,15 @@ export class TestAgencyGateway implements AgencyGateway {
     return values(this._agencies).filter(propEq("status", "needsReview"));
   }
 
-  async validateAgency(_: AdminToken, agencyId: AgencyId): Promise<void> {
+  async validateOrRejectAgency(
+    _: AdminToken,
+    agencyId: AgencyId,
+  ): Promise<void> {
     this._agencies[agencyId].status = "active";
+  }
+
+  validateOrRejectAgency$(_: AdminToken, agencyId: AgencyId): Observable<void> {
+    return from(this.validateOrRejectAgency(_, agencyId));
   }
 
   async getAgencyPublicInfoById(

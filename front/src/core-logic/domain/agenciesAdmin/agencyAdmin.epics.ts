@@ -1,7 +1,7 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { debounceTime, distinctUntilChanged, filter } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
-import { AgencyId, replaceArrayElement } from "shared";
+import { AgencyId } from "shared";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
   ActionOfSlice,
@@ -95,37 +95,52 @@ const updateAgencyEpic: AgencyEpic = (action$, state$, { agencyGateway }) =>
     ),
   );
 
+const updateAgencyNeedingReviewStatusEpic: AgencyEpic = (
+  action$,
+  state$,
+  { agencyGateway },
+) =>
+  action$.pipe(
+    filter(
+      agencyAdminSlice.actions.updateAgencyNeedingReviewStatusRequested.match,
+    ),
+    switchMap(({ payload }) =>
+      agencyGateway
+        .validateOrRejectAgency$(
+          state$.value.admin.adminAuth.adminToken || "",
+          payload.id,
+          payload.status,
+        )
+        .pipe(
+          map(() =>
+            agencyAdminSlice.actions.updateAgencyNeedingReviewStatusSucceded(
+              payload.id,
+            ),
+          ),
+        ),
+    ),
+    catchEpicError((error: Error) =>
+      agencyAdminSlice.actions.updateAgencyStatusFailed(error.message),
+    ),
+  );
+
 const agencyDoesNotNeedReviewAnymoreEpic: AgencyEpic = (action$, state$) =>
   action$.pipe(
-    filter(agencyAdminSlice.actions.updateAgencySucceeded.match),
+    filter(
+      agencyAdminSlice.actions.updateAgencyNeedingReviewStatusSucceded.match,
+    ),
     map(({ payload }) => {
       const agencyAdminState = state$.value.admin.agencyAdmin;
       const agencyWasNeedingReviewIndex =
         agencyAdminState.agencyNeedingReviewOptions.findIndex(
-          ({ id }) => id === payload.id,
+          ({ id }) => id === payload,
         );
       if (agencyWasNeedingReviewIndex === -1) return { type: "do-nothing" };
-
-      if (payload.status === "needsReview") {
-        return agencyAdminSlice.actions.agencyNeedingReviewChangedAfterAnUpdate(
-          {
-            agencyNeedingReviewOptions: replaceArrayElement(
-              agencyAdminState.agencyNeedingReviewOptions,
-              agencyWasNeedingReviewIndex,
-              {
-                id: payload.id,
-                name: payload.name,
-              },
-            ),
-            agencyNeedingReview: payload,
-          },
-        );
-      }
 
       return agencyAdminSlice.actions.agencyNeedingReviewChangedAfterAnUpdate({
         agencyNeedingReviewOptions:
           agencyAdminState.agencyNeedingReviewOptions.filter(
-            ({ id }) => id !== payload.id,
+            ({ id }) => id !== payload,
           ),
         agencyNeedingReview: null,
       });
@@ -138,5 +153,6 @@ export const agenciesAdminEpics = [
   agencyAdminGetDetailsForUpdateEpic,
   agencyAdminGetDetailsForStatusEpic,
   updateAgencyEpic,
+  updateAgencyNeedingReviewStatusEpic,
   agencyDoesNotNeedReviewAnymoreEpic,
 ];

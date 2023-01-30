@@ -1,6 +1,6 @@
 /* eslint-disable  @typescript-eslint/require-await */
 import { values } from "ramda";
-import { Observable, of } from "rxjs";
+import { from, Observable, of } from "rxjs";
 import {
   AdminToken,
   AgencyDto,
@@ -121,8 +121,18 @@ export class InMemoryAgencyGateway implements AgencyGateway {
     return values(this._agencies).filter(propEq("kind", "cci"));
   }
 
-  async validateAgency(_: AdminToken, agencyId: AgencyId): Promise<void> {
+  async validateOrRejectAgency(
+    _: AdminToken,
+    agencyId: AgencyId,
+  ): Promise<void> {
     this._agencies[agencyId].status = "active";
+  }
+
+  public validateOrRejectAgency$(
+    adminToken: AdminToken,
+    agencyId: AgencyId,
+  ): Observable<void> {
+    return from(this.validateOrRejectAgency(adminToken, agencyId));
   }
 
   async getAgencyPublicInfoById(

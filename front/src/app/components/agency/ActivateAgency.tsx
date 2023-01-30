@@ -3,12 +3,13 @@ import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import React, { useEffect } from "react";
 import { DsfrTitle, Select, SelectOption } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { AgencyOption, AgencyStatus } from "shared";
+import { AgencyOption } from "shared";
 import "src/assets/admin.css";
 import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
 import { agencyAdminSlice } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
 import { useAppSelector } from "../../hooks/reduxHooks";
 import { AgencyDetails } from "../admin/AgencyDetails";
+import { ActiveOrRejectedStatus } from "../../../core-logic/ports/AgencyGateway";
 
 const toSelectOption = (option: AgencyOption): SelectOption => ({
   label: option.name,
@@ -37,11 +38,11 @@ export const ActivateAgency = () => {
 
   const dispatch = useDispatch();
 
-  const updateAgencyStatus = (status: AgencyStatus) => {
+  const updateAgencyStatus = (status: ActiveOrRejectedStatus) => {
     if (!agencyNeedingReview) return;
     dispatch(
-      agencyAdminSlice.actions.updateAgencyRequested({
-        ...agencyNeedingReview,
+      agencyAdminSlice.actions.updateAgencyNeedingReviewStatusRequested({
+        id: agencyNeedingReview.id,
         status,
       }),
     );
