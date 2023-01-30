@@ -1,13 +1,20 @@
 import { createTemplatesByName, EmailButtonProps } from "html-templates";
+import { InternshipKind } from "../convention/convention.dto";
 import { isStringDate, toDisplayedDate } from "../utils/date";
 import { advices } from "./advices";
 import { defaultConventionFinalLegals } from "./defaultConventionFinalLegals";
 import { EmailParamsByEmailType } from "./EmailParamsByEmailType";
 import { immersionFacileContactEmail } from "./knownEmailsAddresses";
 
-const defaultSignature = `
+const defaultSignature = (internshipKind: InternshipKind) =>
+  internshipKind === "immersion"
+    ? `
     Bonne journée,
     L'équipe Immersion Facilitée
+`
+    : `
+    Bonne journée, 
+    L’équipe du Point Orientation Apprentissage
 `;
 
 const createConventionStatusButton = (link: string): EmailButtonProps => ({
@@ -30,7 +37,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
         
         Merci à vous !`,
       agencyLogoUrl,
-      subContent: defaultSignature,
+      subContent: defaultSignature("immersion"),
     }),
   },
   NEW_CONVENTION_BENEFICIARY_CONFIRMATION: {
@@ -43,15 +50,23 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       demandeId,
     }) => ({
-      subject:
-        "Immersion Facilitée - Votre confirmation pour votre demande d'immersion est enregistrée",
+      subject: `${
+        internshipKind === "immersion"
+          ? "Immersion Facilitée - Votre confirmation pour votre demande de convention est enregistrée"
+          : "Mini Stage - Votre confirmation pour votre demande de mini stage est enregistrée"
+      }`,
       greetings: `Bonjour ${firstName} ${lastName},`,
       content: `
-        Merci d'avoir confirmé votre demande d'immersion. Elle va être transmise à votre conseiller référent. 
+        Merci d'avoir confirmé votre demande de convention. Elle va être transmise à votre conseiller référent.
+        La convention est enregistrée avec le numéro: ${demandeId}.
 
-        Il vous informera par mail de la validation ou non de l'immersion. Le tuteur qui vous encadrera pendant cette période recevra aussi la réponse.`,
-      highlight: `Attention, ne démarrez pas cette immersion tant que vous n'avez pas reçu cette validation !`,
-      subContent: defaultSignature,
+        Il vous informera par mail de la validation ou non ${
+          internshipKind === "immersion" ? "de l'immersion" : "du mini stage"
+        }. Le tuteur qui vous encadrera pendant cette période recevra aussi la réponse.`,
+      highlight: `Attention, ne démarrez pas ${
+        internshipKind === "immersion" ? "cette immersion" : "ce mini stage"
+      } tant que vous n'avez pas reçu cette validation !`,
+      subContent: defaultSignature(internshipKind),
       attachmentUrls:
         internshipKind === "immersion"
           ? [
@@ -67,23 +82,36 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       establishmentTutorName,
       beneficiaryFirstName,
       beneficiaryLastName,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       internshipKind,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       demandeId,
     }) => ({
-      subject:
-        "Immersion Facilitée - Demande d'immersion professionnelle confirmée",
+      subject: `${
+        internshipKind === "immersion"
+          ? "Immersion Facilitée - Demande de convention confirmée"
+          : "Mini Stage - Demande de mini stage confirmée"
+      }`,
       greetings: `Bonjour ${establishmentTutorName},`,
       content: `
-      Vous venez de confirmer la demande d'immersion professionnelle pour ${beneficiaryFirstName} ${beneficiaryLastName}  au sein de votre entreprise.      
+      Vous venez de confirmer la demande ${
+        internshipKind === "immersion"
+          ? "d'immersion professionnelle"
+          : "de mini stage"
+      } pour ${beneficiaryFirstName} ${beneficiaryLastName}  au sein de votre entreprise.      
 
-      Cette demande va être transmise à son conseiller référent.
-      Il vous informera prochainement par mail de la validation ou non de l'immersion. 
+      Cette demande va être transmise à son ${
+        internshipKind === "immersion"
+          ? "conseiller référent"
+          : "conseiller de la chambre de commerce et d'instrustrie - CCI"
+      }.
+      Il vous informera prochainement par mail de la validation ou non ${
+        internshipKind === "immersion" ? "de l'immersion" : "du mini stage"
+      }. 
       `,
-      highlight:
-        "Attention, ne démarrez pas cette immersion tant que vous n'avez pas reçu la validation !",
-      subContent: defaultSignature,
+      highlight: `Attention, ne démarrez pas ${
+        internshipKind === "immersion" ? "cette immersion" : "ce mini stage"
+      } tant que vous n'avez pas reçu la validation !`,
+      subContent: defaultSignature(internshipKind),
     }),
   },
   NEW_CONVENTION_AGENCY_NOTIFICATION: {
@@ -102,10 +130,17 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       demandeId,
     }) => ({
-      subject: `Immersion Facilitée - une demande de convention d'immersion est déposée : ${firstName}, ${lastName} - ${businessName} - ${agencyName}.`,
+      subject:
+        internshipKind === "immersion"
+          ? `Immersion Facilitée - une demande de convention d'immersion est déposée : ${firstName}, ${lastName} - ${businessName} - ${agencyName}.`
+          : `Mini Stage - une demande de convention de mini stage est déposée : ${firstName}, ${lastName} - ${businessName} - ${agencyName}.`,
       greetings: "Bonjour,",
       content: `
-      <strong>Une nouvelle demande d'immersion a été enregistrée.</strong>      ­
+      <strong>Une nouvelle demande ${
+        internshipKind === "immersion"
+          ? "d'immersion professionnelle"
+          : "de mini stage"
+      } a été enregistrée.</strong>      ­
 
       Vous pouvez prendre connaissance de la demande en <a href="${magicLink}" target="_blank">cliquant ici</a>.
       Vous pouvez également suivre <a href="${conventionStatusLink}" target="_blank">l'état de la convention en cliquant ici</a>.
@@ -114,7 +149,9 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
         <li>Vous ne pouvez pas la valider tant que le bénéficiaire et l'entreprise n'ont pas confirmé chacun leur accord pour cette demande.</li>
         <li>Vous avez connaissance du mail et du téléphone de chacun. Vous pouvez les relancer en cas de besoin.</li>
       </ul> 
-      <strong>Dates de l'immersion :</strong> 
+      <strong>Dates ${
+        internshipKind === "immersion" ? "de l'immersion" : "du mini stage"
+      } :</strong> 
       - du ${dateStart}
       - au ${dateEnd}      
 
@@ -127,7 +164,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       <strong>Structure d'accompagnement :</strong>
       ${agencyName}
       `,
-      subContent: defaultSignature,
+      subContent: defaultSignature(internshipKind),
       attachmentUrls:
         internshipKind === "immersion"
           ? [
@@ -161,7 +198,6 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       agencyName,
       emergencyContactInfos,
       beneficiaryBirthdate,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       internshipKind,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       questionnaireUrl,
@@ -172,7 +208,10 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       emergencyContactPhone,
     }) => ({
-      subject: `Immersion Facilitée - Validation et convention de l'immersion pour observer l'activité de ${immersionAppellationLabel} au sein de ${businessName}`,
+      subject:
+        internshipKind === "immersion"
+          ? `Immersion Facilitée - Validation et convention de l'immersion pour observer l'activité de ${immersionAppellationLabel} au sein de ${businessName}`
+          : `Mini Stage - Validation et convention du mini stage pour observer l'activité de ${immersionAppellationLabel} au sein de ${businessName}`,
       greetings: "Bonjour,",
       content: `
       Bonne nouvelle ! 
@@ -183,12 +222,22 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
           : "Date invalide"
       }) pour réaliser une immersion du ${dateStart} au ${dateEnd}, au sein de ${businessName} et encadrée par ${establishmentTutorName} a été validée et la convention est bien enregistrée. 
       
-      L'immersion peut donc démarrer aux dates convenues*.       
+      ${
+        internshipKind === "immersion" ? "L'immersion" : "Le mini stage"
+      } peut donc démarrer aux dates convenues*.       
       
-      À la fin de l'immersion, nous vous remercions de compléter la fiche d'évaluation de l'immersion <a href="https://immersion.cellar-c2.services.clever-cloud.com/bilan-immersion-professionnelle-inscriptible.pdf">à télécharger ici</a>, et de l'envoyer au conseiller qui a signé la convention (Pôle Emploi, Mission Locale…). Cette évaluation doit être complétée par le tuteur, si possible en présence du bénéficiaire de l'immersion.
+      ${
+        internshipKind === "immersion"
+          ? `À la fin de l'immersion, nous vous remercions de compléter la fiche d'évaluation de l'immersion <a href="https://immersion.cellar-c2.services.clever-cloud.com/bilan-immersion-professionnelle-inscriptible.pdf">à télécharger ici</a>, et de l'envoyer au conseiller qui a signé la convention (Pôle Emploi, Mission Locale…). Cette évaluation doit être complétée par le tuteur, si possible en présence du bénéficiaire de l'immersion.`
+          : `À la fin du mini stage, nous vous remercions de compléter la fiche d'évaluation du mini stage <a href="??????????">NOTICE BILAN A FOURNIR</a>, et de l'envoyer au conseiller de la chambre de commerce et d'instrustrie - CCI qui a signé la convention. Cette évaluation doit être complétée par le tuteur, si possible en présence du bénéficiaire du mini stage.`
+      }
       
-      En cas de difficulté, prévenez au plus vite votre conseiller pour qu'il vous conseille au mieux.       
-      ${defaultSignature}
+      En cas de difficulté, prévenez au plus vite votre ${
+        internshipKind === "immersion"
+          ? "conseiller"
+          : "conseiller de la chambre de commerce et d'instrustrie - CCI"
+      } pour qu'il vous conseille au mieux.       
+      ${defaultSignature(internshipKind)}
 
       ${
         emergencyContactInfos
@@ -198,8 +247,15 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
         `
           : ""
       }      
-      Vous trouverez ci-dessous la convention d'immersion :`,
-      highlight: "Convention d'immersion professionnelle",
+      ${
+        internshipKind === "immersion"
+          ? "Vous trouverez ci-dessous la convention d'immersion professionnelle:"
+          : "Vous trouverez ci-dessous la convention de mini stage :"
+      }`,
+      highlight:
+        internshipKind === "immersion"
+          ? "Convention d'immersion professionnelle"
+          : "Convention de mini stage",
       subContent: `Cette convention est établie entre :
       ${[
         `${beneficiaryFirstName} ${beneficiaryLastName}`,
@@ -215,20 +271,30 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       
       Toutes ces parties ont signé cette convention par le moyen d'une signature électronique, dans le cadre d'une téléprocédure créée par l'Etat. 
       
-      Cette immersion se déroulera au sein de ${businessName}, à l'adresse suivante ${immersionAddress}.
+      ${
+        internshipKind === "immersion" ? "Cette immersion" : "Ce mini stage"
+      } se déroulera au sein de ${businessName}, à l'adresse suivante ${immersionAddress}.
       
-      L'immersion se déroulera du ${dateStart} au ${dateEnd}. 
+      ${
+        internshipKind === "immersion" ? "L'immersion" : "Le mini stage"
+      } se déroulera du ${dateStart} au ${dateEnd}. 
       
-      Les horaires de l'immersion seront :
+      Les horaires ${
+        internshipKind === "immersion" ? "de l'immersion" : "du mini stage"
+      } seront :
       ${scheduleText}       
       
-      L'immersion aura pour objectif de découvrir les activités nécessaires en lien avec le métier de ${immersionAppellationLabel}.
+      ${
+        internshipKind === "immersion" ? "L'immersion" : "Le mini stage"
+      } aura pour objectif de découvrir les activités nécessaires en lien avec le métier de ${immersionAppellationLabel}.
       
       Ces activités sont : ${immersionActivities}
       
       Les compétences et savoir-être observés sont : ${immersionSkills}.
       
-      Cette immersion se déroulera dans les conditions réelles d'exercice de ce métier. 
+      ${
+        internshipKind === "immersion" ? "Cette immersion" : "Ce mini stage"
+      } se déroulera dans les conditions réelles d'exercice de ce métier. 
       
       ${
         workConditions
@@ -239,15 +305,21 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       
       Encadrement : ${beneficiaryFirstName} ${beneficiaryLastName} sera encadré(e) par ${establishmentTutorName}.
 
-      Dans le cadre de cette immersion,      
+      Dans le cadre de ${
+        internshipKind === "immersion" ? "cette immersion" : "ce mini stage"
+      },      
       - des mesures de prévention sanitaire sont prévues :      
       ${sanitaryPrevention}.
       - un équipement de protection est fourni : ${individualProtection}.
       
-      ${beneficiaryFirstName} ${beneficiaryLastName}, ${beneficiaryRepresentativeName} et ${establishmentRepresentativeName} en signant cette convention, s'engagent à respecter les obligations réglementaires de la Période de Mise en Situation Professionnelle, rappelées ci-après.
+      ${beneficiaryFirstName} ${beneficiaryLastName}, ${beneficiaryRepresentativeName} et ${establishmentRepresentativeName} en signant cette convention, s'engagent à respecter les obligations réglementaires ${
+        internshipKind === "immersion"
+          ? "de la Période de Mise en Situation Professionnelle"
+          : "du mini stage"
+      }, rappelées ci-après.
       
       ${signature}`,
-      legals: defaultConventionFinalLegals,
+      legals: defaultConventionFinalLegals(internshipKind),
     }),
   },
   POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED: {
@@ -290,7 +362,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       - ${businessName}
       - ${immersionAddress}
 
-      ${defaultSignature}
+      ${defaultSignature("immersion")}
       `,
       attachmentUrls: [
         "https://immersion.cellar-c2.services.clever-cloud.com/les_bons_conseils_prescripteur_pole_emploi.pdf",
@@ -353,7 +425,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       - ${immersionAddress}
 
       `,
-      subContent: defaultSignature,
+      subContent: defaultSignature("immersion"),
       attachmentUrls: [
         "https://immersion.cellar-c2.services.clever-cloud.com/les_bons_conseils_prescripteur_pole_emploi.pdf",
       ],
@@ -370,17 +442,27 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       agency,
       businessName,
       signature,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       internshipKind,
     }) => ({
-      subject: `Immersion Facilitée - Refus de la demande d'immersion pour observer l'activité de ${immersionProfession} au sein de ${businessName}`,
+      subject:
+        internshipKind === "immersion"
+          ? `Immersion Facilitée - Refus de la demande d'immersion pour observer l'activité de ${immersionProfession} au sein de ${businessName}`
+          : `Mini Stage - Refus de la demande de mini stage pour l'activité de ${immersionProfession} au sein de ${businessName}`,
       greetings: "Bonjour,",
       content: `
-      Nous vous informons que la demande d'immersion professionnelle de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName} a été refusée par ${agency}.
+      Nous vous informons que la demande ${
+        internshipKind === "immersion"
+          ? "d'immersion professionnelle"
+          : "de mini stage"
+      } de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName} a été refusée par ${agency}.
       
       Les raisons en sont ${rejectionReason} par ${agency}.       
       
-      Vous pouvez vous rapprocher de votre conseiller pour en échanger.      
+      Vous pouvez vous rapprocher de votre conseiller${
+        internshipKind === "immersion"
+          ? ""
+          : " de la chambre de commerce et d'instrustrie - CCI"
+      } pour en échanger.      
       
       Bien cordialement,       
       ${signature} 
@@ -399,15 +481,18 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       magicLink,
       conventionStatusLink,
       signature,
+      internshipKind,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       immersionAppellation,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      internshipKind,
     }) => ({
       subject:
-        "Immersion Facilitée - veuillez modifier cette demande d'immersion",
+        internshipKind === "immersion"
+          ? "Immersion Facilitée - veuillez modifier cette demande d'immersion professionnelle"
+          : "Mini Stage - veuillez modifier cette demande de mini stage",
       greetings: "Bonjour,",
-      content: `${agency} vous informe que la demande d'immersion de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName} nécessite d'être modifiée pour la raison suivante :
+      content: `${agency} vous informe que la demande ${
+        internshipKind === "immersion" ? "d'immersion" : "de mini stage"
+      } de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName} nécessite d'être modifiée pour la raison suivante :
       ${justification}`,
       buttons: [
         {
@@ -438,12 +523,19 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       conventionStatusLink,
       internshipKind,
     }) => ({
-      subject: `Immersion Facilitée - Demande d'immersion à étudier: ${beneficiaryFirstName} ${beneficiaryLastName} - ${businessName}`,
+      subject:
+        internshipKind === "immersion"
+          ? `Immersion Facilitée - Demande d'immersion à étudier: ${beneficiaryFirstName} ${beneficiaryLastName} - ${businessName}`
+          : `Mini Stage - Demande de mini stage à étudier: ${beneficiaryFirstName} ${beneficiaryLastName} - ${businessName}`,
       greetings: "Bonjour,",
       content: `
-      <strong>Une nouvelle demande d'immersion a été enregistrée.</strong>
+      <strong>Une nouvelle demande ${
+        internshipKind === "immersion" ? "d'immersion" : "de mini stage"
+      } a été enregistrée.</strong>
 
-      Une demande d'immersion de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName} vous est envoyée pour que vous l'examiniez. 
+      Une demande ${
+        internshipKind === "immersion" ? "d'immersion" : "de mini stage"
+      } de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName} vous est envoyée pour que vous l'examiniez. 
 
       Nous vous remercions d'en prendre connaissance pour ${possibleRoleAction}.
       `,
@@ -455,7 +547,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
         },
         createConventionStatusButton(conventionStatusLink),
       ],
-      subContent: defaultSignature,
+      subContent: defaultSignature(internshipKind),
       attachmentUrls:
         internshipKind === "immersion"
           ? [
@@ -470,14 +562,17 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
     createEmailVariables: ({
       magicLink,
       conventionStatusLink,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       internshipKind,
     }) => ({
       subject:
-        "Immersion Facilitée - Voici votre nouveau lien magique pour accéder à la demande d'immersion",
+        internshipKind === "immersion"
+          ? "Immersion Facilitée - Voici votre nouveau lien magique pour accéder à la demande d'immersion"
+          : `Mini Stage - Voici votre nouveau lien magique pour accéder à la demande de mini stage`,
       greetings: "Bonjour,",
       content: `
-      Vous venez de demander le renouvellement d'un lien pour accéder à une demande d'immersion. Veuillez le trouver ci-dessous :
+      Vous venez de demander le renouvellement d'un lien pour accéder à une demande ${
+        internshipKind === "immersion" ? "d'immersion" : "de mini stage"
+      }. Veuillez le trouver ci-dessous :
       `,
       buttons: [
         {
@@ -486,7 +581,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
         },
         createConventionStatusButton(conventionStatusLink),
       ],
-      subContent: defaultSignature,
+      subContent: defaultSignature(internshipKind),
       highlight:
         "Si vous n'êtes pas à l'origine de cette demande, veuillez contacter notre équipe.",
     }),
@@ -503,14 +598,17 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       existingSignatureName,
       magicLink,
       conventionStatusLink,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       internshipKind,
     }) => ({
       subject:
-        "Immersion Facilitée - À vous de confirmer votre demande de convention",
+        internshipKind === "immersion"
+          ? "Immersion Facilitée - À vous de confirmer votre demande de convention"
+          : "Mini Stage - À vous de confirmer votre demande de mini stage",
       greetings: "Bonjour,",
       content: `
-      La demande de convention pour l'immersion de ${beneficiaryFirstName} ${beneficiaryLastName} pour le métier de ${immersionProfession} dans l'entreprise ${businessName} encadré par ${establishmentRepresentativeName} vient d'être signée par ${existingSignatureName}.
+      La demande de convention pour ${
+        internshipKind === "immersion" ? "l'immersion" : "le mini stage"
+      } de ${beneficiaryFirstName} ${beneficiaryLastName} pour le métier de ${immersionProfession} dans l'entreprise ${businessName} encadré par ${establishmentRepresentativeName} vient d'être signée par ${existingSignatureName}.
 
       <strong>À vous maintenant de la confirmer !</strong>
       `,
@@ -521,9 +619,11 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       subContent: `
       Ensuite, il vous suffira d'attendre le mail de validation de l'organisme d'accompagnement.
 
-      <strong>Attention, ne démarrez pas l'immersion sans ce mail de validation. Sinon, le risque “accident du travail” ne sera pas couvert.</strong>
+      <strong>Attention, ne démarrez pas ${
+        internshipKind === "immersion" ? "l'immersion" : "le mini stage"
+      } sans ce mail de validation. Sinon, le risque “accident du travail” ne sera pas couvert.</strong>
       
-      ${defaultSignature}
+      ${defaultSignature(internshipKind)}
       `,
     }),
   },
@@ -541,9 +641,14 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       conventionStatusLink,
       internshipKind,
     }) => ({
-      subject: "Immersion Facilitée - Confirmez une demande d'immersion",
+      subject:
+        internshipKind === "immersion"
+          ? "Immersion Facilitée - Confirmez une demande d'immersion"
+          : "Mini Stage - Confirmez une demande de mini stage",
       greetings: `Bonjour ${signatoryName},`,
-      content: `Une demande de convention d'immersion vient d'être enregistrée. Vous devez maintenant la confirmer.
+      content: `Une demande de convention ${
+        internshipKind === "immersion" ? "d'immersion" : "de mini stage"
+      } vient d'être enregistrée. Vous devez maintenant la confirmer.
         
         Pour rappel, cette demande concerne : 
            - Le bénéficiaire ${beneficiaryName}${
@@ -558,18 +663,27 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
            - L'entreprise ${businessName}
            - Le tuteur dans l'entreprise ${establishmentRepresentativeName}
         
-          <strong>Votre confirmation est obligatoire</strong> pour permettre à votre conseiller de valider la convention. Merci  !
+          <strong>Votre confirmation est obligatoire</strong> pour permettre à votre ${
+            internshipKind === "immersion"
+              ? "conseiller"
+              : "conseiller de la chambre de commerce et d'instrustrie - CCI"
+          } de valider la convention. Merci  !
         
         Vous devez maintenant confirmer votre demande.`,
       buttons: [
         { url: magicLink, label: "Confirmer ma demande" },
         createConventionStatusButton(conventionStatusLink),
       ],
-      highlight:
-        "Attention, ne démarrez pas votre immersion tant que vous n'avez pas reçu cette validation ! Vous n'auriez pas de couverture en cas d'accident.",
-      subContent: `La décision de votre conseiller vous sera transmise par mail.
+      highlight: `Attention, ne démarrez pas votre ${
+        internshipKind === "immersion" ? "immersion" : "mini stage"
+      } tant que vous n'avez pas reçu cette validation ! Vous n'auriez pas de couverture en cas d'accident.`,
+      subContent: `La décision de votre ${
+        internshipKind === "immersion"
+          ? "conseiller"
+          : "conseiller de la chambre de commerce et d'instrustrie - CCI"
+      } vous sera transmise par mail.
 
-        ${defaultSignature}
+        ${defaultSignature(internshipKind)}
       `,
       attachmentUrls:
         internshipKind === "immersion"
@@ -621,7 +735,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
           label: "Nos bons conseils",
         },
       ],
-      subContent: defaultSignature,
+      subContent: defaultSignature("immersion"),
     }),
   },
   CONTACT_BY_PHONE_INSTRUCTIONS: {
@@ -676,7 +790,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
     `,
       highlight:
         "Ces informations sont personnelles et confidentielles. Elles ne peuvent pas être communiquées à d’autres personnes. ",
-      subContent: defaultSignature,
+      subContent: defaultSignature("immersion"),
     }),
   },
   SHARE_DRAFT_CONVENTION_BY_LINK: {
@@ -685,18 +799,20 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
     createEmailVariables: ({
       additionalDetails,
       conventionFormUrl,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       internshipKind,
     }) => ({
-      subject:
-        "Immersion Facilitée - Une demande de convention préremplie vous est transmise pour que vous la complétiez",
+      subject: `${
+        internshipKind ? "Immersion Facilitée" : "Mini Stage"
+      } - Une demande de convention préremplie vous est transmise pour que vous la complétiez`,
       greetings: "Bonjour,",
       content: `
-        <strong>Une demande de convention d'immersion doit être complétée :</strong>
+        <strong>Une demande de convention ${
+          internshipKind === "immersion" ? "d'immersion" : "de mini stage"
+        } doit être complétée :</strong>
         ${additionalDetails}
       `,
       buttons: [{ label: "Compléter la demande", url: conventionFormUrl }],
-      subContent: defaultSignature,
+      subContent: defaultSignature(internshipKind),
     }),
   },
   SUGGEST_EDIT_FORM_ESTABLISHMENT: {
@@ -722,7 +838,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       
       Si vous n'avez pas besoin de faire de modifications, vous n'avez rien à faire, les informations concernant votre entreprise seront affichées à l'identique.
       
-      ${defaultSignature}`,
+      ${defaultSignature("immersion")}`,
       legals:
         "* Pour les entreprises de 20 salariés et plus, les personnes en situation de handicap accueillies en immersion sont comptabilisées au titre de l'obligation d'emploi.",
       buttons: [
@@ -745,7 +861,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       `,
       buttons: [{ label: "Modifier ma fiche entreprise", url: editFrontUrl }],
       highlight: `Si vous n'êtes pas à l'origine de cette demande, nous vous recommandons de nous contacter rapidement par mail : ${immersionFacileContactEmail}.`,
-      subContent: defaultSignature,
+      subContent: defaultSignature("immersion"),
     }),
   },
   NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION: {
@@ -771,7 +887,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
 
       Merci d'avoir rejoint la communauté des “entreprises s'engagent” et de contribuer ainsi à l'accès à l'emploi de tous les publics.
       `,
-      subContent: defaultSignature,
+      subContent: defaultSignature("immersion"),
       buttons: [
         {
           label: "Nos bons conseils",
@@ -788,30 +904,44 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       beneficiaryFirstName,
       beneficiaryLastName,
       immersionAssessmentCreationLink,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       internshipKind,
     }) => ({
-      subject: "Immersion Facilitée - Comment s'est déroulée l'immersion ?",
+      subject:
+        internshipKind === "immersion"
+          ? "Immersion Facilitée - Comment s'est déroulée l'immersion ?"
+          : "Mini Stage - Comment s'est déroulée le mini stage ?",
       greetings: `Bonjour ${establishmentTutorName},`,
       content: `
-      L'immersion  professionnelle de ${beneficiaryFirstName} ${beneficiaryLastName} au sein de votre entreprise est en passe de s'achever. 
+      ${
+        internshipKind === "immersion"
+          ? "L'immersion professionnelle"
+          : "Le mini stage"
+      } de ${beneficiaryFirstName} ${beneficiaryLastName} au sein de votre entreprise est en passe de s'achever. 
 
       Nous vous remercions de votre accueil. 
 
-      Pouvez-vous indiquer si cette immersion s'est bien déroulée jusqu'à sa date de fin prévue ?`,
+      Pouvez-vous indiquer si ${
+        internshipKind ? "cette immersion" : "ce mini stage"
+      } s'est bien déroulée jusqu'à sa date de fin prévue ?`,
       buttons: [
         {
-          label: "Evaluer cette immersion",
+          label: `Evaluer ${
+            internshipKind === "immersion" ? "cette immersion" : "ce mini stage"
+          }`,
           url: immersionAssessmentCreationLink,
         },
       ],
       subContent: `
       Cette information est importante pour la suite de son parcours professionnel. 
 
-      N'oubliez pas non plus de compléter avec ${beneficiaryFirstName} ${beneficiaryLastName} le <a href="https://immersion.cellar-c2.services.clever-cloud.com/0a57f38d-1dbe-4eb4-8835-9b8fc48a13d8.pdf">bilan de l'immersion en PDF</a>. 
+      N'oubliez pas non plus de compléter avec ${beneficiaryFirstName} ${beneficiaryLastName} le ${
+        internshipKind === "immersion"
+          ? `<a href="https://immersion.cellar-c2.services.clever-cloud.com/0a57f38d-1dbe-4eb4-8835-9b8fc48a13d8.pdf">bilan de l'immersion en PDF</a>`
+          : `<a href="?????????????????????????">?????????????????BILAN MINI STAGE en PDF???????</a>`
+      }. 
 
       Merci  !      
-      ${defaultSignature}
+      ${defaultSignature(internshipKind)}
       `,
     }),
   },
@@ -821,12 +951,11 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
     createEmailVariables: ({
       beneficiaryName,
       conventionStatusLink,
+      internshipKind,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       businessName,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       establishmentRepresentativeName,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      internshipKind,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       magicLink,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -838,21 +967,31 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
     }) => ({
       subject: "Test contenant toutes les blocs email",
       greetings: `Bonjour ${beneficiaryName}`,
-      content: `Merci d'avoir confirmé votre demande d'immersion. Elle va être transmise à votre conseiller référent.
+      content: `Merci d'avoir confirmé votre demande ${
+        internshipKind ? "d'immersion" : "de mini stage"
+      }. Elle va être transmise à votre ${
+        internshipKind === "immersion"
+          ? "conseiller"
+          : "conseiller de la chambre de commerce et d'instrustrie - CCI"
+      } référent.
       
-      Il vous informera par mail de la validation ou non de l'immersion. Le tuteur qui vous encadrera pendant cette période recevra aussi la réponse.`,
-      legals: defaultConventionFinalLegals,
+      Il vous informera par mail de la validation ou non ${
+        internshipKind === "immersion" ? "de l'immersion" : "du mini stage"
+      }. Le tuteur qui vous encadrera pendant cette période recevra aussi la réponse.`,
+      legals: defaultConventionFinalLegals(internshipKind),
       buttons: [
         { label: "Label de bouton", url: "http://www.example.com" },
         createConventionStatusButton(conventionStatusLink),
       ],
-      subContent: `Il vous informera par mail de la validation ou non de l'immersion. Le tuteur qui vous encadrera pendant cette période recevra aussi la réponse.
+      subContent: `Il vous informera par mail de la validation ou non ${
+        internshipKind === "immersion" ? "de l'immersion" : "du mini stage"
+      }. Le tuteur qui vous encadrera pendant cette période recevra aussi la réponse.
       
-      Bonne journée,
-      L'équipe Immersion Facilitée
+      ${defaultSignature(internshipKind)}
       `,
-      highlight:
-        "Attention, ne démarrez pas cette immersion tant que vous n'avez pas reçu cette validation !",
+      highlight: `Attention, ne démarrez pas ${
+        internshipKind === "immersion" ? "cette immersion" : "ce mini stage"
+      } tant que vous n'avez pas reçu cette validation !`,
     }),
   },
   SIGNEE_HAS_SIGNED_CONVENTION: {
@@ -861,13 +1000,19 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       demandeId,
       signedAt,
       conventionStatusLink,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       internshipKind,
     }) => ({
-      subject: `Immersion Facilitée - Confirmation de signature de l'immersion - ${demandeId}`,
+      subject:
+        internshipKind === "immersion"
+          ? `Immersion Facilitée - Confirmation de signature de l'immersion - ${demandeId}`
+          : `Mini Stage - Confirmation de signature du mini stage - ${demandeId}`,
       greetings: `Bonjour,`,
       content: `
-      Nous confirmons que vous avez signé la convention d'immersion professionnelle ${demandeId} le ${
+      Nous confirmons que vous avez signé ${
+        internshipKind === "immersion"
+          ? "la convention d'immersion professionnelle"
+          : "le mini stage"
+      } ${demandeId} le ${
         isStringDate(signedAt)
           ? toDisplayedDate(new Date(signedAt), true)
           : "DATE INVALIDE"
@@ -875,10 +1020,16 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       `,
       highlight: `
       Attention. Votre convention est en cours d'examen.
-      Avant de débuter l'immersion, veuillez vous assurer que la convention a bien été validée par un conseiller.
+      Avant de débuter ${
+        internshipKind === "immersion" ? "l'immersion" : "le mini stage"
+      }, veuillez vous assurer que la convention a bien été validée par un conseiller${
+        internshipKind === "immersion"
+          ? ""
+          : " de la chambre de commerce et d'instrustrie - CCI"
+      }.
       Vous recevrez une notification lorsque ce sera fait.
       `,
-      subContent: defaultSignature,
+      subContent: defaultSignature(internshipKind),
       buttons: [createConventionStatusButton(conventionStatusLink)],
     }),
     tags: ["confirmation de signature de convention"],
