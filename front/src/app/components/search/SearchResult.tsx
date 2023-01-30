@@ -9,6 +9,7 @@ import {
 import { getMapsLink } from "./ContactEstablishmentModal";
 import LinesEllipsis from "react-lines-ellipsis";
 import "./SearchResult.scss";
+import { useStyles } from "tss-react/dsfr";
 
 export type EnterpriseSearchResultProps = {
   searchResult: SearchImmersionResultDto;
@@ -22,6 +23,7 @@ export const SearchResult = ({
   onButtonClick,
   searchResult,
 }: EnterpriseSearchResultProps) => {
+  const { cx } = useStyles();
   const {
     name,
     customizedName,
@@ -69,18 +71,18 @@ export const SearchResult = ({
     }
   };
   return (
-    <div className="fr-col-12 fr-col-md-4">
-      <div className={`${componentName} fr-card`}>
-        <div className="fr-card__body">
-          <div className="fr-card__content">
-            <h3 className="fr-card__title">{establismentName}</h3>
-            <p className="fr-card__desc">
+    <div className={fr.cx("fr-col-12", "fr-col-md-4")}>
+      <div className={cx(fr.cx("fr-card"), componentName)}>
+        <div className={fr.cx("fr-card__body")}>
+          <div className={fr.cx("fr-card__content")}>
+            <h3 className={fr.cx("fr-card__title")}>{establismentName}</h3>
+            <p className={fr.cx("fr-card__desc")}>
               {" "}
               {appellationLabels.length > 0
                 ? appellationLabels.join(", ")
                 : romeLabel}
             </p>
-            <ul className="fr-card__desc fr-text--xs">
+            <ul className={fr.cx("fr-card__desc", "fr-text--xs")}>
               {nafLabel && <li>{nafLabel}</li>}
               {numberOfEmployeeRange && (
                 <li>
@@ -92,7 +94,7 @@ export const SearchResult = ({
                 <a
                   href={getMapsLink(searchResult)}
                   target="_blank"
-                  className={`${componentName}__location-link`}
+                  className={cx(`${componentName}__location-link`)}
                 >
                   {addressDtoToString(address).toLocaleLowerCase()}
                 </a>{" "}
@@ -132,10 +134,9 @@ export const SearchResult = ({
                 </li>
               )}
             </ul>
-            <ul className="fr-card__desc fr-badges-group">
+            <ul className={fr.cx("fr-card__desc", "fr-badges-group")}>
               <li>
                 <InfoLabel
-                  className=""
                   contactMode={contactMode}
                   voluntaryToImmersion={voluntaryToImmersion}
                 />
@@ -149,7 +150,7 @@ export const SearchResult = ({
               )}
             </ul>
           </div>
-          <div className="fr-card__footer">
+          <div className={fr.cx("fr-card__footer")}>
             <Button
               size="small"
               type="button"
@@ -176,10 +177,11 @@ type InfoLabelProps = {
 };
 
 const InfoLabel = ({ contactMode, voluntaryToImmersion }: InfoLabelProps) => {
+  const { cx } = useStyles();
   const luckyGuess = typeof contactMode === "undefined";
   const className = [
-    ...(voluntaryToImmersion ? ["fr-badge--blue-cumulus"] : []),
-    ...(luckyGuess ? ["fr-badge--purple-glycine"] : []),
+    ...(voluntaryToImmersion ? [fr.cx("fr-badge--blue-cumulus")] : []),
+    ...(luckyGuess ? [fr.cx("fr-badge--purple-glycine")] : []),
   ].join(" ");
 
   const label = voluntaryToImmersion
@@ -187,7 +189,7 @@ const InfoLabel = ({ contactMode, voluntaryToImmersion }: InfoLabelProps) => {
     : "Tentez votre chance";
 
   return voluntaryToImmersion || luckyGuess ? (
-    <Label className={className}>{label}</Label>
+    <Label className={cx(className)}>{label}</Label>
   ) : null;
 };
 
@@ -197,4 +199,7 @@ const Label = ({
 }: {
   children: string;
   className?: string;
-}) => <span className={`fr-badge ${className}`}>{children}</span>;
+}) => {
+  const { cx } = useStyles();
+  return <span className={cx(fr.cx("fr-badge"), className)}>{children}</span>;
+};

@@ -1,6 +1,7 @@
 import React from "react";
 import { useField } from "formik";
 import { getConventionFieldName, InternshipKind } from "shared";
+import { fr } from "@codegouvfr/react-dsfr";
 
 export const useConventionTexts = (internshipKind: InternshipKind) =>
   immersionTexts(internshipKind);
@@ -27,7 +28,7 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
             formulaire avec votre entreprise accueillante et initiez une
             convention pour réaliser votre immersion professionnelle.
           </p>
-          <p className="fr-text--xs fr-mt-1w">
+          <p className={fr.cx("fr-text--xs", "fr-mt-1w")}>
             Ce formulaire vaut équivalence du CERFA 13912 * 04
           </p>
         </>
@@ -73,7 +74,7 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
             uniquement en Bretagne et Pays de Loire
           </strong>
           <br />
-          <p className="fr-text--xs fr-mt-1w">
+          <p className={fr.cx("fr-text--xs", "fr-mt-1w")}>
             La convention doit être établie, signée par toutes les parties et
             visée par la Chambre de Commerce et d’Industrie <u>avant</u> le
             démarrage de la période d’observation en milieu professionnel. Sans

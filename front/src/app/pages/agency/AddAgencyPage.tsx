@@ -27,6 +27,7 @@ import { toFormikValidationSchema } from "src/app/components/forms/commons/zodVa
 import { v4 as uuidV4 } from "uuid";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { formAgencyFieldsLabels } from "src/app/contents/forms/agency/formAgency";
+import { fr } from "@codegouvfr/react-dsfr";
 
 type CreateAgencyInitialValues = Omit<CreateAgencyDto, "kind"> & {
   kind: AgencyKind | "";
@@ -105,7 +106,7 @@ export const AddAgencyPage = () => {
                 submitFeedback={submitFeedback}
                 messageByKind={agencySubmitMessageByKind}
               />
-              <div className="fr-mt-4w">
+              <div className={fr.cx("fr-mt-4w")}>
                 <Button
                   type="submit"
                   disable={isSubmitting || submitFeedback.kind !== "idle"}

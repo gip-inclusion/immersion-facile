@@ -12,6 +12,7 @@ import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout
 import { routes } from "src/app/routes/routes";
 import { conventionGateway } from "src/config/dependencies";
 import { Route } from "type-route";
+import { fr } from "@codegouvfr/react-dsfr";
 
 interface RenewExpiredLinkProps {
   route: Route<typeof routes.renewConventionMagicLink>;
@@ -80,7 +81,7 @@ export const RenewExpiredLinkContent = ({
       </div>
       {!requestSuccessful && (
         <Button
-          className="fr-mt-2w"
+          className={fr.cx("fr-mt-2w")}
           disable={requested}
           onSubmit={onClick}
           id="im-renew-page__renew-link-button"

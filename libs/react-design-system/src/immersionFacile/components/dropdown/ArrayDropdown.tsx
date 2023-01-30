@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { fr } from "@codegouvfr/react-dsfr";
 
 export interface ArrayDropdownProps<T extends string> {
   options: T[];
@@ -28,9 +29,9 @@ export const ArrayDropdown = <T extends string>({
   };
   return (
     <div>
-      {label && <label className="fr-label">{label}</label>}
+      {label && <label className={fr.cx("fr-label")}>{label}</label>}
       <select
-        className="fr-select"
+        className={fr.cx("fr-select")}
         id="roles-dropdown"
         name="select"
         onChange={onChange}

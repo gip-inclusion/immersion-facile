@@ -58,8 +58,8 @@ export const SearchListResults = () => {
 
   return (
     <>
-      <div className="fr-container ">
-        <div className="fr-grid-row fr-grid-row--gutters">
+      <div className={fr.cx("fr-container")}>
+        <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
           {displayedResults.map((searchResult) => (
             <SearchResult
               key={searchResult.siret + "-" + searchResult.rome} // Should be unique !

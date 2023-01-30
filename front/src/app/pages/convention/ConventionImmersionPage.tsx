@@ -14,6 +14,7 @@ import { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { Route } from "type-route";
+import { fr } from "@codegouvfr/react-dsfr";
 
 export type ConventionImmersionPageRoute = Route<
   typeof routes.conventionImmersion
@@ -59,7 +60,13 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
     );
 
   return isNotPeConnected ? (
-    <div className="fr-grid-row fr-grid-row--center fr-grid-row--gutters">
+    <div
+      className={fr.cx(
+        "fr-grid-row",
+        "fr-grid-row--center",
+        "fr-grid-row--gutters",
+      )}
+    >
       <InitiateConventionCard
         title={
           isSharedConvention

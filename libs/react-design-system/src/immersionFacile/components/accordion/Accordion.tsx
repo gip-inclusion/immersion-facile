@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { fr } from "@codegouvfr/react-dsfr";
+import { useStyles } from "tss-react/dsfr";
 
 export interface AccordionProps {
   title: string;
@@ -6,18 +8,22 @@ export interface AccordionProps {
 }
 
 export const Accordion = ({ title, children }: AccordionProps) => {
+  const { cx } = useStyles();
   const id = title + "-accordion";
   const [expanded, setExpanded] = useState(true);
 
   const divClass = expanded
-    ? "fr-collapse fr-collapse--expanded"
-    : "fr-collapse";
+    ? fr.cx("fr-collapse", "fr-collapse--expanded")
+    : fr.cx("fr-collapse");
 
   return (
-    <section className="fr-accordion" style={{ flex: 1, minWidth: "100%" }}>
-      <h3 className="fr-accordion__title">
+    <section
+      className={fr.cx("fr-accordion")}
+      style={{ flex: 1, minWidth: "100%" }}
+    >
+      <h3 className={fr.cx("fr-accordion__title")}>
         <button
-          className="fr-accordion__btn"
+          className={fr.cx("fr-accordion__btn")}
           aria-expanded={expanded}
           aria-controls={id}
           onClick={() => setExpanded(!expanded)}
@@ -26,7 +32,7 @@ export const Accordion = ({ title, children }: AccordionProps) => {
         </button>
       </h3>
       <div
-        className={divClass}
+        className={cx(divClass)}
         id={id}
         style={expanded ? { maxHeight: "none" } : {}}
       >

@@ -12,6 +12,7 @@ import { AdminTab } from "src/app/routes/route-params";
 import { routes } from "src/app/routes/routes";
 import { ENV } from "src/config/environmentVariables";
 import { Route } from "type-route";
+import { fr } from "@codegouvfr/react-dsfr";
 
 const getAdminNavLinkId = (chunk: string) => `im-admin-nav__${chunk}`;
 
@@ -91,8 +92,8 @@ export const AdminPage = ({
   return (
     <>
       <ImmersionHeader />
-      <div className="fr-container">
-        <div className="fr-mt-2w">
+      <div className={fr.cx("fr-container")}>
+        <div className={fr.cx("fr-mt-2w")}>
           <TabLinks
             navLinks={getNavLinks(currentTab)}
             navWrapper={{

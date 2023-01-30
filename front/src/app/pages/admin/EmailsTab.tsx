@@ -8,6 +8,7 @@ import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { sentEmailsSlice } from "src/core-logic/domain/admin/sentEmails/sentEmails.slice";
 import { ENV } from "src/config/environmentVariables";
 import { TextCell } from "src/app/components/admin/TextCell";
+import { fr } from "@codegouvfr/react-dsfr";
 
 export const EmailsTab = () => {
   const dispatch = useDispatch();
@@ -35,7 +36,7 @@ export const EmailsTab = () => {
           {errorMessage}
         </Notification>
       ) : (
-        <ul className="fr-accordions-group">
+        <ul className={fr.cx("fr-accordions-group")}>
           {latestEmails.map((email, index) => (
             <li key={index}>
               <Email email={email} />
@@ -67,7 +68,7 @@ const Email = ({ email }: { email: EmailSentDto }) => {
       <TextCell
         title="Paramètres"
         contents={
-          <ul className="text-xs">
+          <ul className={fr.cx("fr-text--xs")}>
             {keys(email.templatedEmail.params).map((key: EmailVariables) => {
               const value = (
                 email.templatedEmail.params as Record<EmailVariables, string>

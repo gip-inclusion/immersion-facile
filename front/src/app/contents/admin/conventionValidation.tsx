@@ -7,6 +7,7 @@ import {
   displayEmergencyContactInfos,
 } from "shared";
 import { ColField, FieldsAndTitle } from "./types";
+import { fr } from "@codegouvfr/react-dsfr";
 
 export const signToBooleanDisplay = (value: string | undefined) =>
   value ? `✅ (${toDisplayedDate(new Date(value))})` : "❌";
@@ -65,20 +66,20 @@ const beneficiaryFields: ColField[] = [
     colLabel: "Infos additionnelles",
     value: (convention) => (
       <span>
-        <div className="fr-text--xs">
+        <div className={fr.cx("fr-text--xs")}>
           Date de naissance :{" "}
           {toDisplayedDate(
             new Date(convention.signatories.beneficiary.birthdate),
           )}
         </div>
-        <div className="fr-text--xs">
+        <div className={fr.cx("fr-text--xs")}>
           Contact d'urgence :{" "}
           {displayEmergencyContactInfos({
             ...convention.signatories,
           })}
         </div>
         {convention.signatories.beneficiary.financiaryHelp && (
-          <div className="fr-text--xs">
+          <div className={fr.cx("fr-text--xs")}>
             Aide financière :{" "}
             {convention.signatories.beneficiary.financiaryHelp}
           </div>
@@ -158,7 +159,7 @@ const beneficiaryCurrentEmployerFields: ColField[] = [
           {renderSiret(
             convention.signatories.beneficiaryCurrentEmployer.businessSiret,
           )}
-          <div className="fr-text--xs">
+          <div className={fr.cx("fr-text--xs")}>
             Poste : {convention.signatories.beneficiaryCurrentEmployer.job}
           </div>
         </span>
