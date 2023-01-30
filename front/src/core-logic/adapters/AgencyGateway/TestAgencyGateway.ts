@@ -1,6 +1,6 @@
 /* eslint-disable  @typescript-eslint/require-await */
 import { values } from "ramda";
-import { Observable, of, Subject } from "rxjs";
+import { Observable, Subject } from "rxjs";
 import {
   AdminToken,
   AgencyDto,
@@ -20,6 +20,8 @@ import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 export class TestAgencyGateway implements AgencyGateway {
   public agencies$ = new Subject<AgencyOption[]>();
   public fetchedAgency$ = new Subject<AgencyDto | undefined>();
+  public customAgencyId$ = new Subject<AgencyId | false>();
+
   public updateAgencyResponse$ = new Subject<undefined>();
 
   public updateAgency$(
@@ -42,8 +44,8 @@ export class TestAgencyGateway implements AgencyGateway {
     return this.fetchedAgency$;
   }
 
-  getImmersionFacileAgencyId$(): Observable<AgencyId> {
-    return of("agency-id-with-immersion-facile-kind");
+  getImmersionFacileAgencyId$(): Observable<AgencyId | false> {
+    return this.customAgencyId$;
   }
 
   private _agencies: Record<string, AgencyDto> = {};

@@ -45,7 +45,7 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
 
   if (isLoading) return <Loader />;
 
-  if (route.params.jwt)
+  if ("jwt" in route.params)
     return (
       <ConventionForm
         properties={conventionInitialValuesFromUrl({

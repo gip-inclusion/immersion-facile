@@ -64,11 +64,12 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { jwt: param.query.optional.string, ...conventionValuesFromUrl },
     () => `/${frontRoutes.conventionMiniStageRoute}`,
   ),
-  conventionForUkraine: defineRoute(
+  conventionCustomAgency: defineRoute(
     {
+      jwt: param.query.optional.string,
       ...conventionValuesFromUrl,
     },
-    () => `/demande-immersion/lesentreprises-sengagent-ukraine`,
+    () => `/${frontRoutes.conventionImmersionRoute}-agence-immersion-facilitee`,
   ),
   conventionToValidate: defineRoute(
     { jwt: param.query.string },

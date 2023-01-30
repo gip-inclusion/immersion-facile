@@ -53,6 +53,11 @@ const conventionStatusDashboardUrl = createSelector(
   ({ conventionStatusDashboardUrl }) => conventionStatusDashboardUrl,
 );
 
+const preselectedAgencyId = createSelector(
+  conventionState,
+  ({ formUi }) => formUi.preselectedAgencyId,
+);
+
 export const conventionSelectors = {
   convention,
   fetchError,
@@ -63,6 +68,7 @@ export const conventionSelectors = {
   isTutorEstablishmentRepresentative,
   hasCurrentEmployer,
   conventionStatusDashboardUrl,
+  preselectedAgencyId,
 };
 
 export const signatoryDataFromConvention = (

@@ -12,8 +12,10 @@ import { useConventionWatchValuesInUrl } from "src/app/components/forms/conventi
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { deviceRepository } from "src/config/dependencies";
+import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { AgencyFormSection } from "./sections/agency/AgencyFormSection";
 import { BeneficiaryFormSection } from "./sections/beneficiary/BeneficiaryFormSection";
 import { EstablishmentFormSection } from "./sections/establishment/EstablishmentFormSection";
@@ -34,6 +36,10 @@ export const ConventionFormFields = ({
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   onModificationsRequired = async () => {},
 }: ConventionFieldsProps): JSX.Element => {
+  const preselectedAgencyId = useAppSelector(
+    conventionSelectors.preselectedAgencyId,
+  );
+
   useEffect(() => {
     deviceRepository.delete("partialConventionInUrl");
   }, []);
@@ -65,13 +71,21 @@ export const ConventionFormFields = ({
         type="hidden"
         {...formContents["signatories.beneficiary.federatedIdentity"]}
       />
-
-      <AgencyFormSection
-        internshipKind={conventionValues.internshipKind}
-        agencyId={conventionValues.agencyId}
-        enablePeConnectApi={enablePeConnectApi}
-        isFrozen={isFrozen}
-      />
+      {!preselectedAgencyId && (
+        <AgencyFormSection
+          internshipKind={conventionValues.internshipKind}
+          agencyId={conventionValues.agencyId}
+          enablePeConnectApi={enablePeConnectApi}
+          isFrozen={isFrozen}
+        />
+      )}
+      {preselectedAgencyId && (
+        <input
+          type="hidden"
+          {...formContents.agencyId}
+          value={preselectedAgencyId}
+        />
+      )}
 
       <BeneficiaryFormSection
         isFrozen={isFrozen}

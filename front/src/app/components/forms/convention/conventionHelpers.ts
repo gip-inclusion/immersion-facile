@@ -18,11 +18,11 @@ import {
 import { deviceRepository } from "src/config/dependencies";
 import { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
 import { ConventionMiniStagePageRoute } from "src/app/pages/convention/ConventionMiniStagePage";
-import { ConventionUkrainePageRoute } from "src/app/pages/convention/ConventionForUkrainePage";
 import { ConventionInUrl } from "src/app/routes/route-params";
 import { ENV } from "src/config/environmentVariables";
 import { v4 as uuidV4 } from "uuid";
 import { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
+import { ConventionCustomAgencyPageRoute } from "src/app/pages/convention/ConventionCustomAgencyPage";
 
 export const isConventionFrozen = (
   status: ConventionStatus | undefined,
@@ -65,7 +65,7 @@ export const conventionInitialValuesFromUrl = ({
   route:
     | ConventionMiniStagePageRoute
     | ConventionImmersionPageRoute
-    | ConventionUkrainePageRoute
+    | ConventionCustomAgencyPageRoute
     | ConventionImmersionForExternalsRoute;
   internshipKind: InternshipKind;
 }): ConventionPresentation => {

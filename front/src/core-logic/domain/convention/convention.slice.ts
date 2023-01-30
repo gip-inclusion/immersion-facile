@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   AbsoluteUrl,
+  AgencyId,
   ConventionDto,
   ConventionReadDto,
   Signatories,
@@ -28,6 +29,7 @@ export type ConventionSubmitFeedback = SubmitFeedBack<ConventionFeedbackKind>;
 
 export interface ConventionState {
   formUi: {
+    preselectedAgencyId: AgencyId | null;
     isMinor: boolean;
     isTutorEstablishmentRepresentative: boolean;
     hasCurrentEmployer: boolean;
@@ -43,6 +45,7 @@ export interface ConventionState {
 
 const initialState: ConventionState = {
   formUi: {
+    preselectedAgencyId: null,
     isMinor: false,
     isTutorEstablishmentRepresentative: true,
     hasCurrentEmployer: false,
@@ -199,6 +202,18 @@ export const conventionSlice = createSlice({
     ) => {
       state.currentSignatoryRole = action.payload;
     },
+
+    preselectedAgencyIdRequested: (state) => {
+      state.isLoading = true;
+    },
+    preselectedAgencyIdSucceeded: (
+      state,
+      { payload }: PayloadAction<AgencyId | null>,
+    ) => {
+      state.isLoading = false;
+      state.formUi.preselectedAgencyId = payload;
+    },
+    preselectedAgencyIdFailed: (state) => state,
   },
 });
 

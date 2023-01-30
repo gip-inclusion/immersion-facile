@@ -78,8 +78,8 @@ export const metaContents: Partial<
     description:
       "Démarrer une demande de convention pour un mini-stage, stage de 3ème ou stage de seconde.",
   },
-  conventionForUkraine: {
-    title: "Les entreprises s'engagent pour l'ukraine",
+  conventionCustomAgency: {
+    title: "Demande de convention d'immersion",
     description: "Faciliter la réalisation des immersions professionnelles.",
   },
   conventionToValidate: {

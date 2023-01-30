@@ -60,7 +60,7 @@ const useWaitForReduxFormUiReadyBeforeFormikInitialisation = (
 
 type ConventionFormProps = {
   properties: ConventionPresentation;
-  routeParams?: { jwt?: string; demandeId?: string };
+  routeParams?: { jwt?: string };
 };
 
 export const ConventionForm = ({
@@ -69,6 +69,7 @@ export const ConventionForm = ({
 }: ConventionFormProps) => {
   const { cx } = useStyles();
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
+
   const [initialValues] = useState<ConventionPresentation>({
     ...properties,
     signatories: {

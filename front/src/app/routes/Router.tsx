@@ -2,7 +2,6 @@ import React from "react";
 import { AdminPage } from "src/app/pages/admin/AdminPage";
 import { AddAgencyPage } from "src/app/pages/agency/AddAgencyPage";
 import { AgencyDashboardPage } from "src/app/pages/AgencyDashboardPage";
-import { ConventionPageForUkraine } from "src/app/pages/convention/ConventionForUkrainePage";
 import { ConventionImmersionPage } from "src/app/pages/convention/ConventionImmersionPage";
 import { ConventionMiniStagePage } from "src/app/pages/convention/ConventionMiniStagePage";
 import { ConventionSignPage } from "src/app/pages/convention/ConventionSignPage";
@@ -30,6 +29,7 @@ import {
 } from "./route-params";
 import { routes, useRoute } from "./routes";
 import { ConventionPageForExternals } from "../pages/convention/ConventionPageForExternals";
+import { ConventionCustomAgencyPage } from "../pages/convention/ConventionCustomAgencyPage";
 
 type Routes = typeof routes;
 
@@ -51,7 +51,9 @@ const getPageByRouteName: {
       <AgencyDashboardPage />
     </InclusionConnectedPrivateRoute>
   ),
-  conventionForUkraine: (route) => <ConventionPageForUkraine route={route} />,
+  conventionCustomAgency: (route) => (
+    <ConventionCustomAgencyPage route={route} />
+  ),
   conventionImmersion: (route) => <ConventionImmersionPage route={route} />,
   conventionImmersionForExternals: (route) => (
     <ConventionPageForExternals route={route} />

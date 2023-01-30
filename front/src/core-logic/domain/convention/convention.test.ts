@@ -1,5 +1,7 @@
 import {
   AbsoluteUrl,
+  AgencyDtoBuilder,
+  AgencyId,
   Beneficiary,
   ConventionDto,
   ConventionDtoBuilder,
@@ -52,6 +54,7 @@ describe("Convention slice", () => {
       ({ store, dependencies } = createTestStore({
         convention: {
           formUi: {
+            preselectedAgencyId: null,
             isMinor: false,
             isTutorEstablishmentRepresentative: true,
             hasCurrentEmployer: false,
@@ -164,6 +167,7 @@ describe("Convention slice", () => {
       ({ store } = createTestStore({
         convention: {
           formUi: {
+            preselectedAgencyId: null,
             isMinor: false,
             isTutorEstablishmentRepresentative: true,
             hasCurrentEmployer: false,
@@ -205,6 +209,7 @@ describe("Convention slice", () => {
         convention: conventionRead,
         isLoading: false,
         formUi: {
+          preselectedAgencyId: null,
           isMinor: false,
           isTutorEstablishmentRepresentative: false,
           hasCurrentEmployer: false,
@@ -240,6 +245,7 @@ describe("Convention slice", () => {
         convention: conventionRead,
         isLoading: false,
         formUi: {
+          preselectedAgencyId: null,
           isMinor: true,
           isTutorEstablishmentRepresentative: false,
           hasCurrentEmployer: false,
@@ -266,6 +272,7 @@ describe("Convention slice", () => {
       ({ store, dependencies } = createTestStore({
         convention: {
           formUi: {
+            preselectedAgencyId: null,
             isMinor: false,
             isTutorEstablishmentRepresentative: true,
             hasCurrentEmployer: false,
@@ -304,6 +311,7 @@ describe("Convention slice", () => {
       ({ store, dependencies } = createTestStore({
         convention: {
           formUi: {
+            preselectedAgencyId: null,
             isMinor: false,
             isTutorEstablishmentRepresentative: true,
             hasCurrentEmployer: false,
@@ -365,6 +373,7 @@ describe("Convention slice", () => {
       ({ store, dependencies } = createTestStore({
         convention: {
           formUi: {
+            preselectedAgencyId: null,
             isMinor: false,
             isTutorEstablishmentRepresentative: true,
             hasCurrentEmployer: false,
@@ -503,6 +512,7 @@ describe("Convention slice", () => {
     ({ store } = createTestStore({
       convention: {
         formUi: {
+          preselectedAgencyId: null,
           isMinor: false,
           isTutorEstablishmentRepresentative: true,
           hasCurrentEmployer: false,
@@ -551,6 +561,7 @@ describe("Convention slice", () => {
     ({ store } = createTestStore({
       convention: {
         formUi: {
+          preselectedAgencyId: null,
           isMinor: false,
           isTutorEstablishmentRepresentative: true,
           hasCurrentEmployer: false,
@@ -569,8 +580,29 @@ describe("Convention slice", () => {
     expectConventionState({ convention: null });
   });
 
+  describe("Getting custom agency id for convention form", () => {
+    it("changes loading state when fetches custom agency id", () => {
+      store.dispatch(conventionSlice.actions.preselectedAgencyIdRequested());
+      expectIsLoadingToBe(true);
+    });
+    it("fetches agency id successfully", () => {
+      const agency = new AgencyDtoBuilder().build();
+      store.dispatch(conventionSlice.actions.preselectedAgencyIdRequested());
+      dependencies.agencyGateway.customAgencyId$.next(agency.id);
+      expectIsLoadingToBe(false);
+      expectPreselectedAgencyIdToBe(agency.id);
+    });
+  });
+
   const expectConventionState = (conventionState: Partial<ConventionState>) => {
     expectObjectsToMatch(store.getState().convention, conventionState);
+  };
+
+  const expectPreselectedAgencyIdToBe = (expected: AgencyId) => {
+    expectToEqual(
+      conventionSelectors.preselectedAgencyId(store.getState()),
+      expected,
+    );
   };
 
   const feedGatewayWithAddConventionSuccess = () => {
@@ -640,7 +672,9 @@ describe("Convention slice", () => {
   const expectIsMinorToBe = (expected: boolean) => {
     expectToEqual(conventionSelectors.isMinor(store.getState()), expected);
   };
-
+  const expectIsLoadingToBe = (expected: boolean) => {
+    expectToEqual(conventionSelectors.isLoading(store.getState()), expected);
+  };
   const expectIsTutorEstablishmentRepresentativeToBe = (expected: boolean) => {
     expectToEqual(
       conventionSelectors.isTutorEstablishmentRepresentative(store.getState()),
