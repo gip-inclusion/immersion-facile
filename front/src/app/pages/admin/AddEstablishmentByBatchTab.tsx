@@ -8,13 +8,11 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { useForm } from "react-hook-form";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { useDispatch } from "react-redux";
-import {
-  establishmentBatchSlice,
-  EstablishmentCSVRow,
-} from "src/core-logic/domain/establishmentBatch/establishmentBatch.slice";
+import { establishmentBatchSlice } from "src/core-logic/domain/establishmentBatch/establishmentBatch.slice";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { establishmentBatchSelectors } from "src/core-logic/domain/establishmentBatch/establishmentBatch.selectors";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
+import { EstablishmentCSVRow } from "shared";
 
 type AddEstablishmentByBatchTabForm = {
   groupName: string;
