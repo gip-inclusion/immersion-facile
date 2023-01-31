@@ -109,7 +109,7 @@ export const ConventionFormFields = ({
         isFrozen={isFrozen}
       />
       {!isFrozen && (
-        <Notification title={""} type={"info"} className={fr.cx("fr-my-2w")}>
+        <Notification title={""} type={"warning"} className={fr.cx("fr-my-2w")}>
           <ol>
             <li>
               Une fois le formulaire envoyé, chaque signataire de la convention
