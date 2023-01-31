@@ -8,14 +8,15 @@ import {
   AgencyStatus,
   CreateAgencyDto,
   DepartmentCode,
+  ExtractFromExisting,
   ListAgenciesRequestDto,
   WithAgencyId,
 } from "shared";
 
 export type WithAgencyStatus = { status: AgencyStatus };
-export type ActiveOrRejectedStatus = Extract<
-  "active" | "rejected",
-  AgencyStatus
+export type ActiveOrRejectedStatus = ExtractFromExisting<
+  AgencyStatus,
+  "active" | "rejected"
 >;
 export type WithActiveOrRejectedStatus = { status: ActiveOrRejectedStatus };
 
