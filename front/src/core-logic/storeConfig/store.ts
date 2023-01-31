@@ -28,6 +28,8 @@ import { conventionSlice } from "../domain/convention/convention.slice";
 import { establishmentBatchEpics } from "../domain/establishmentBatch/establishmentBatch.epics";
 import { establishmentBatchSlice } from "../domain/establishmentBatch/establishmentBatch.slice";
 import { establishmentSlice } from "../domain/establishmentPath/establishment.slice";
+import { geosearchEpics } from "../domain/geosearch/geosearch.epics";
+import { geosearchSlice } from "../domain/geosearch/geosearch.slice";
 import { immersionAssessmentEpics } from "../domain/immersionAssessment/immersionAssessment.epics";
 import { immersionAssessmentSlice } from "../domain/immersionAssessment/immersionAssessment.slice";
 
@@ -39,6 +41,7 @@ const allEpics: any[] = [
   ...agenciesEpics,
   ...authEpics,
   ...establishmentEpics,
+  ...geosearchEpics,
   ...searchEpics,
   ...siretEpics,
   ...featureFlagEpics,
@@ -55,6 +58,7 @@ const rootReducer = combineReducers({
   [romeAutocompleteSlice.name]: romeAutocompleteSlice.reducer,
   [siretSlice.name]: siretSlice.reducer,
   [establishmentSlice.name]: establishmentSlice.reducer,
+  [geosearchSlice.name]: geosearchSlice.reducer,
   [conventionSlice.name]: conventionSlice.reducer,
   [immersionAssessmentSlice.name]: immersionAssessmentSlice.reducer,
   [authSlice.name]: authSlice.reducer,

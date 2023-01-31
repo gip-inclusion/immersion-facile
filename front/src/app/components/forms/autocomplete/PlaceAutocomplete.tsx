@@ -40,12 +40,12 @@ export const PlaceAutocomplete = ({
 
   const noOptionText = isSearching ? "..." : "Aucun lieu trouvé 😥";
   const onInputChange = async (value: string) => {
-    setSearchValue(value);
-    if (value.length < 3) return;
-    setIsSearching(true);
-    const results = await apiAddressGateway.lookupLocation(value);
-    setIsSearching(false);
-    setOptions(results);
+    // setSearchValue(value);
+    // if (value.length < 3) return;
+    // setIsSearching(true);
+    // const results = await apiAddressGateway.lookupLocation(value);
+    // setIsSearching(false);
+    // setOptions(results);
   };
   const onValueSelected = (value: LookupSearchResult | null) => {
     onValueChange(value);

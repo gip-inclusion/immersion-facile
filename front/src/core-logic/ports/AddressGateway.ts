@@ -1,3 +1,4 @@
+import { Observable } from "rxjs";
 import {
   AddressAndPosition,
   DepartmentCode,
@@ -9,7 +10,7 @@ import {
 
 export interface AddressGateway {
   lookupStreetAddress(lookup: LookupAddress): Promise<AddressAndPosition[]>;
-  lookupLocation(query: LookupLocationInput): Promise<LookupSearchResult[]>;
+  lookupLocation$(query: LookupLocationInput): Observable<LookupSearchResult[]>;
   findDepartmentCodeFromPostCode(
     postcode: Postcode,
   ): Promise<DepartmentCode | null>;

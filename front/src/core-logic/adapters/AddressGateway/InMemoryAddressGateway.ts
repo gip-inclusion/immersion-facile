@@ -1,3 +1,4 @@
+import { from, Observable } from "rxjs";
 import {
   AddressAndPosition,
   DepartmentCode,
@@ -10,14 +11,15 @@ import { AddressGateway } from "src/core-logic/ports/AddressGateway";
 export class InMemoryAddressGateway implements AddressGateway {
   constructor(private simulatedLatencyMs: number | undefined = undefined) {}
 
-  public async lookupLocation(
+  private async lookupLocation(
     query: LookupLocationInput,
   ): Promise<LookupSearchResult[]> {
     if (this.simulatedLatencyMs) await sleep(this.simulatedLatencyMs);
 
     if (query === "givemeanemptylistplease") return [];
     if (query === "givemeanerrorplease") throw new Error("418 I'm a teapot");
-    return [
+
+    const testLocationSet = [
       {
         label: "Baralle, Pas-de-Calais, France",
         position: {
@@ -53,7 +55,13 @@ export class InMemoryAddressGateway implements AddressGateway {
           lon: 5.16238,
         },
       },
-    ].filter((result) => result.label.includes(query));
+    ];
+    return testLocationSet.filter((result) => result.label.includes(query));
+  }
+  public lookupLocation$(
+    query: LookupLocationInput,
+  ): Observable<LookupSearchResult[]> {
+    return from(this.lookupLocation(query));
   }
 
   public async lookupStreetAddress(
