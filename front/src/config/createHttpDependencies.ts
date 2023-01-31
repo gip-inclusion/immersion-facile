@@ -5,6 +5,8 @@ import {
   adminTargets,
   establishmentTargets,
   EstablishmentTargets,
+  AddressTargets,
+  addressTargets,
 } from "shared";
 import { createCommonDependencies } from "src/config/createCommonDependencies";
 import type { Dependencies } from "src/config/dependencies";
@@ -30,7 +32,9 @@ export const createHttpDependencies = (): Dependencies => {
   const createHttpClient = configureHttpClient(handlerCreator);
 
   return {
-    addressGateway: new HttpAddressGateway(createManagedAxiosInstance()),
+    addressGateway: new HttpAddressGateway(
+      createHttpClient<AddressTargets>(addressTargets),
+    ),
     adminGateway: new HttpAdminGateway(
       createHttpClient<AdminTargets>(adminTargets),
     ),

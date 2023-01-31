@@ -1,15 +1,15 @@
 import {
   ConventionMagicLinkPayload,
-  DepartmentCodeFromPostcodeQuery,
   departmentCodeFromPostcodeQuerySchema,
   FindDepartmentCodeFromPostcodeResponse,
+  WithDepartmentCodeFromPostcodeQuery,
 } from "shared";
 import { ZodType, ZodTypeDef } from "zod";
 import { UseCase } from "../../core/UseCase";
 import { AddressGateway } from "../../immersionOffer/ports/AddressGateway";
 
 export class DepartmentCodeFromPostcode extends UseCase<
-  DepartmentCodeFromPostcodeQuery,
+  WithDepartmentCodeFromPostcodeQuery,
   FindDepartmentCodeFromPostcodeResponse
 > {
   constructor(private apiAddressGateway: AddressGateway) {
@@ -17,18 +17,18 @@ export class DepartmentCodeFromPostcode extends UseCase<
   }
 
   protected inputSchema: ZodType<
-    DepartmentCodeFromPostcodeQuery,
+    WithDepartmentCodeFromPostcodeQuery,
     ZodTypeDef,
-    DepartmentCodeFromPostcodeQuery
+    WithDepartmentCodeFromPostcodeQuery
   > = departmentCodeFromPostcodeQuerySchema;
 
   protected async _execute(
-    params: DepartmentCodeFromPostcodeQuery,
+    params: WithDepartmentCodeFromPostcodeQuery,
     _jwtPayload?: ConventionMagicLinkPayload | undefined,
   ): Promise<FindDepartmentCodeFromPostcodeResponse> {
     const departmentCode =
       await this.apiAddressGateway.findDepartmentCodeFromPostCode(
-        this.inputSchema.parse(params),
+        params.postcode,
       );
     return {
       departmentCode,

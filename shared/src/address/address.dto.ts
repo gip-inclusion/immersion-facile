@@ -6,9 +6,12 @@ import { GeoPositionDto } from "../geoPosition/geoPosition.dto";
 import { Flavor } from "../typeFlavors";
 
 export type DepartmentCode = Flavor<string, "DepartmentCode">;
+export type WithDepartmentCodeFromPostcodeQuery = { postcode: LookupAddress };
 export type Postcode = Flavor<string, "Postcode">;
 export type LookupAddress = Flavor<string, "LookupAddress">;
+export type WithLookupAddress = { lookup: LookupAddress };
 export type LookupLocationInput = Flavor<string, "LookupLocation">;
+export type WithLookupLocationInput = { query: LookupLocationInput };
 
 export type LookupSearchResult = {
   label: string;
@@ -48,3 +51,8 @@ export const featureToAddressWithPosition = (
         },
       }
     : undefined;
+
+export type DepartmentCodeFromPostcodeQuery = Flavor<
+  string,
+  "FindDepartmentCodeFromPostcodeQuery"
+>;

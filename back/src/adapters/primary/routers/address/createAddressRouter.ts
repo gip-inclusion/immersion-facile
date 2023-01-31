@@ -1,15 +1,5 @@
 import { Router } from "express";
-import {
-  departmentCodeFromPostcodeQuerySchema,
-  departmentCodeFromPostcodeRoute,
-  lookupAddressQueryParam,
-  lookupAddressSchema,
-  lookupLocationInputSchema,
-  lookupLocationQueryParam,
-  lookupLocationRoute,
-  lookupStreetAddressRoute,
-  postCodeQueryParam,
-} from "shared";
+import { addressTargets } from "shared";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 
@@ -17,32 +7,25 @@ export const createAddressRouter = (deps: AppDependencies) => {
   const addressRouter = Router();
 
   addressRouter
-    .route(lookupStreetAddressRoute)
+    .route(addressTargets.lookupStreetAddress.url)
     .get(async (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.lookupStreetAddress.execute(
-          lookupAddressSchema.parse(req.query[lookupAddressQueryParam]),
-        ),
+        deps.useCases.lookupStreetAddress.execute(req.query as any),
+      ),
+    );
+
+  addressRouter
+    .route(addressTargets.lookupLocation.url)
+    .get(async (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.lookupLocation.execute(req.query as any),
       ),
     );
   addressRouter
-    .route(lookupLocationRoute)
+    .route(addressTargets.departmentCodeFromPostcode.url)
     .get(async (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.lookupLocation.execute(
-          lookupLocationInputSchema.parse(req.query[lookupLocationQueryParam]),
-        ),
-      ),
-    );
-  addressRouter
-    .route(departmentCodeFromPostcodeRoute)
-    .get(async (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.departmentCodeFromPostcode.execute(
-          departmentCodeFromPostcodeQuerySchema.parse(
-            req.query[postCodeQueryParam],
-          ),
-        ),
+        deps.useCases.departmentCodeFromPostcode.execute(req.query as any),
       ),
     );
 

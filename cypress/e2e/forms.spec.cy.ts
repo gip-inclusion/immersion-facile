@@ -5,10 +5,10 @@ import {
   ConventionDto,
   DotNestedKeys,
   agenciesRoute,
-  lookupStreetAddressRoute,
   conventionsRoute,
   featureFlagsRoute,
   appellationRoute,
+  addressTargets,
 } from "shared";
 import { addDays, format } from "date-fns";
 
@@ -27,9 +27,10 @@ describe("Convention Form (on dev http, prefilled forms false)", () => {
     cy.intercept("GET", `${baseApiRoute}${agenciesRoute}?**`).as(
       "agenciesRequest",
     );
-    cy.intercept("GET", `${baseApiRoute}${lookupStreetAddressRoute}?**`).as(
-      "autocompleteAddressRequest",
-    );
+    cy.intercept(
+      "GET",
+      `${baseApiRoute}${addressTargets.lookupStreetAddress.url}?**`,
+    ).as("autocompleteAddressRequest");
     cy.intercept("GET", `${baseApiRoute}${appellationRoute}?**`).as(
       "autocompleteAppellationRequest",
     );

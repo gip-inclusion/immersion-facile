@@ -1,7 +1,4 @@
-import {
-  DepartmentCodeFromPostcodeQuery,
-  expectTypeToMatchAndEqual,
-} from "shared";
+import { expectTypeToMatchAndEqual } from "shared";
 
 import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { DepartmentCodeFromPostcode } from "./DepartmentCodeFromPostCode";
@@ -19,14 +16,8 @@ describe("Department Code From Postcode", () => {
     const expectedDepartmentCode = "75";
     addressApiGateway.setDepartmentCode(expectedDepartmentCode);
 
-    const findDepartmentCodeFromPostCodeQuery: DepartmentCodeFromPostcodeQuery =
-      "75001";
-
-    expectTypeToMatchAndEqual(
-      await useCase.execute(findDepartmentCodeFromPostCodeQuery),
-      {
-        departmentCode: expectedDepartmentCode,
-      },
-    );
+    expectTypeToMatchAndEqual(await useCase.execute({ postcode: "75001" }), {
+      departmentCode: expectedDepartmentCode,
+    });
   });
 });

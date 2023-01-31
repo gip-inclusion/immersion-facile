@@ -1,11 +1,9 @@
 import {
-  departmentCodeFromPostcodeRoute,
-  departmentCodeFromPostcodeUrl,
-  lookupLocationRoute,
-  lookupLocationUrl,
+  addressTargets,
+  LookupAddress,
+  LookupLocationInput,
   LookupSearchResult,
-  lookupStreetAddressRoute,
-  lookupStreetAddressUrl,
+  Postcode,
 } from "shared";
 import { SuperTest, Test } from "supertest";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
@@ -14,6 +12,18 @@ import {
   expected8bdduportAddressAndPositions,
   query8bdduportLookup,
 } from "../../../secondary/addressGateway/testUtils";
+
+const lookupAddressQueryParam = "lookup";
+const postCodeQueryParam = "postcode";
+const lookupLocationQueryParam = "query";
+
+const lookupStreetAddressUrl = (lookup: LookupAddress): string =>
+  `${addressTargets.lookupStreetAddress.url}?${lookupAddressQueryParam}=${lookup}`;
+const departmentCodeFromPostcodeUrl = (postcode: Postcode): string =>
+  `${addressTargets.departmentCodeFromPostcode.url}?${postCodeQueryParam}=${postcode}`;
+
+const lookupLocationUrl = (lookupLocationInput: LookupLocationInput): string =>
+  `${addressTargets.lookupLocation.url}?${lookupLocationQueryParam}=${lookupLocationInput}`;
 
 describe("addressRouter", () => {
   let request: SuperTest<Test>;
@@ -25,20 +35,20 @@ describe("addressRouter", () => {
     addressGateway = testAppAndDeps.gateways.addressApi;
   });
 
-  describe(`${lookupStreetAddressRoute} route`, () => {
+  describe(`${addressTargets.lookupStreetAddress.url} route`, () => {
     it(`GET ${lookupStreetAddressUrl(query8bdduportLookup)}`, async () => {
       addressGateway.setAddressAndPosition(
         expected8bdduportAddressAndPositions,
       );
       const response = await request.get(
-        lookupStreetAddressUrl(query8bdduportLookup),
+        `${addressTargets.lookupStreetAddress.url}?${lookupAddressQueryParam}=${query8bdduportLookup}`,
       );
       expect(response.body).toEqual(expected8bdduportAddressAndPositions);
       expect(response.status).toBe(200);
     });
   });
 
-  describe(`${lookupLocationRoute} route`, () => {
+  describe(`${addressTargets.lookupLocation.url} route`, () => {
     const exampleQuery = "Saint-Emil";
     const expectedLookupSearchResults: LookupSearchResult[] = [
       {
@@ -57,7 +67,7 @@ describe("addressRouter", () => {
     });
   });
 
-  describe(`${departmentCodeFromPostcodeRoute} route`, () => {
+  describe(`${addressTargets.departmentCodeFromPostcode.url}  route`, () => {
     it(`GET ${departmentCodeFromPostcodeUrl("75001")}`, async () => {
       addressGateway.setDepartmentCode("75");
       const response = await request.get(

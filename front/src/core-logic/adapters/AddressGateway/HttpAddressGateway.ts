@@ -1,63 +1,54 @@
-import { AxiosInstance } from "axios";
 import {
   AddressAndPosition,
   addressAndPositionListSchema,
+  AddressTargets,
   DepartmentCode,
-  departmentCodeFromPostcodeRoute,
   findDepartmentCodeFromPostcodeResponseSchema,
-  lookupAddressQueryParam,
   LookupLocationInput,
-  lookupLocationQueryParam,
-  lookupLocationRoute,
   LookupSearchResult,
   lookupSearchResultsSchema,
-  lookupStreetAddressRoute,
-  postCodeQueryParam,
 } from "shared";
 import { AddressGateway } from "src/core-logic/ports/AddressGateway";
+import { HttpClient } from "http-client";
 
 export class HttpAddressGateway implements AddressGateway {
-  constructor(private readonly httpClient: AxiosInstance) {}
+  constructor(private readonly httpClient: HttpClient<AddressTargets>) {}
 
   public async lookupLocation(
     query: LookupLocationInput,
   ): Promise<LookupSearchResult[]> {
-    const { data } = await this.httpClient.get<unknown>(
-      "/api" + lookupLocationRoute,
-      {
-        params: {
-          [lookupLocationQueryParam]: query,
-        },
+    const response = await this.httpClient.lookupLocation({
+      queryParams: {
+        query,
       },
-    );
-    return lookupSearchResultsSchema.parse(data);
+    });
+    return lookupSearchResultsSchema.parse(response.responseBody);
   }
 
   public async lookupStreetAddress(
     lookup: string,
   ): Promise<AddressAndPosition[]> {
-    const { data } = await this.httpClient.get<unknown>(
-      "/api" + lookupStreetAddressRoute,
-      {
-        params: { [lookupAddressQueryParam]: lookup },
+    const response = await this.httpClient.lookupStreetAddress({
+      queryParams: {
+        lookup,
       },
-    );
-    return addressAndPositionListSchema.parse(data);
+    });
+    return addressAndPositionListSchema.parse(response.responseBody);
   }
 
   public async findDepartmentCodeFromPostCode(
-    query: string,
+    postcode: string,
   ): Promise<DepartmentCode | null> {
     //TODO Remove catch to differentiate between http & domain errors
     try {
-      const { data } = await this.httpClient.get<unknown>(
-        "/api" + departmentCodeFromPostcodeRoute,
-        {
-          params: { [postCodeQueryParam]: query },
+      const response = await this.httpClient.departmentCodeFromPostcode({
+        queryParams: {
+          postcode,
         },
-      );
-      return findDepartmentCodeFromPostcodeResponseSchema.parse(data)
-        .departmentCode;
+      });
+      return findDepartmentCodeFromPostcodeResponseSchema.parse(
+        response.responseBody,
+      ).departmentCode;
     } catch (e) {
       //eslint-disable-next-line no-console
       console.error("Api Adresse Search Error", e);

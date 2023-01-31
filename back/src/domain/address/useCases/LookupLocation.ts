@@ -1,32 +1,30 @@
 import {
   ConventionMagicLinkPayload,
-  LookupLocationInput,
-  LookupSearchResult,
   lookupLocationInputSchema,
+  LookupSearchResult,
+  WithLookupLocationInput,
 } from "shared";
 import { ZodType, ZodTypeDef } from "zod";
 import { UseCase } from "../../core/UseCase";
 import { AddressGateway } from "../../immersionOffer/ports/AddressGateway";
 
 export class LookupLocation extends UseCase<
-  LookupLocationInput,
+  WithLookupLocationInput,
   LookupSearchResult[]
 > {
   constructor(private addressApiGateway: AddressGateway) {
     super();
   }
   protected inputSchema: ZodType<
-    LookupLocationInput,
+    WithLookupLocationInput,
     ZodTypeDef,
-    LookupLocationInput
+    WithLookupLocationInput
   > = lookupLocationInputSchema;
 
   protected _execute(
-    params: LookupLocationInput,
+    params: WithLookupLocationInput,
     _jwtPayload?: ConventionMagicLinkPayload | undefined,
   ): Promise<LookupSearchResult[]> {
-    return this.addressApiGateway.lookupLocationName(
-      this.inputSchema.parse(params),
-    );
+    return this.addressApiGateway.lookupLocationName(params.query);
   }
 }

@@ -97,7 +97,7 @@ export type AddressesTargets = CreateTargets<{
   >;
 }>;
 
-export const addressesTargets = createTargets<AddressesTargets>({
+export const addressesExternalTargets = createTargets<AddressesTargets>({
   getDepartmentCode: {
     method: "GET",
     url: getDepartmentCodeUrl,
@@ -113,7 +113,7 @@ export const addressesTargets = createTargets<AddressesTargets>({
 });
 
 const AXIOS_TIMEOUT_MS = 10_000;
-export const createHttpOpenCageDataClient = configureHttpClient(
+export const createHttpAddressClient = configureHttpClient(
   createAxiosHandlerCreator(axios.create({ timeout: AXIOS_TIMEOUT_MS })),
 );
 export const minimumCharErrorMessage = (minLength: number) =>

@@ -1,5 +1,4 @@
 export * from "./address/address.dto";
-export * from "./address/address.query";
 export * from "./address/address.response";
 export * from "./address/address.schema";
 export * from "./admin/admin.dto";
@@ -54,6 +53,7 @@ export * from "./rome";
 export * from "./romeAndAppellationDtos/romeAndAppellation.dto";
 export * from "./romeAndAppellationDtos/romeAndAppellation.schema";
 export * from "./routes/routes";
+export * from "./routes/addressTargets";
 export * from "./routes/adminTargets";
 export * from "./routes/inclusionConnectTargets";
 export * from "./routes/establishementTargets";

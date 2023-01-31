@@ -2,12 +2,14 @@ import { z } from "zod";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { zStringCanBeEmpty } from "../zodUtils";
 import {
-  LookupAddress,
-  LookupLocationInput,
+  AddressAndPosition,
+  AddressDto,
+  DepartmentCode,
   LookupSearchResult,
+  WithDepartmentCodeFromPostcodeQuery,
+  WithLookupAddress,
+  WithLookupLocationInput,
 } from "./address.dto";
-
-import { AddressAndPosition, AddressDto, DepartmentCode } from "./address.dto";
 
 export const departmentCodeSchema: z.Schema<DepartmentCode> = z.string();
 
@@ -34,7 +36,16 @@ export const addressAndPositionListSchema: z.ZodSchema<AddressAndPosition[]> =
 export const lookupSearchResultsSchema: z.ZodSchema<LookupSearchResult[]> =
   z.array(lookupSearchResultSchema);
 
-export const lookupAddressSchema: z.Schema<LookupAddress> = z.string();
+export const lookupAddressSchema: z.Schema<WithLookupAddress> = z.object({
+  lookup: z.string(),
+});
 
-export const lookupLocationInputSchema: z.Schema<LookupLocationInput> =
-  z.string();
+export const lookupLocationInputSchema: z.Schema<WithLookupLocationInput> =
+  z.object({
+    query: z.string(),
+  });
+
+export const departmentCodeFromPostcodeQuerySchema: z.Schema<WithDepartmentCodeFromPostcodeQuery> =
+  z.object({
+    postcode: z.string(),
+  });
