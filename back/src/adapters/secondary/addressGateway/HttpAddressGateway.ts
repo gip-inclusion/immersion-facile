@@ -17,23 +17,33 @@ import {
   GeoPositionDto,
   LookupSearchResult,
   lookupSearchResultsSchema,
-  ManagedAxios,
   OpenCageGeoSearchKey,
-  TargetUrlsMapper,
   toFeatureCollection,
 } from "shared";
 import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
 
 // https://github.com/OpenCageData/opencagedata-misc-docs/blob/master/countrycode.md
 // On prends la france et toutes ses territoires dépendants.
-const baseUrl = "https://api.opencagedata.com";
-const geoCodingUrl = `${baseUrl}/geocode/v1/geojson`;
-const geoSearchUrl = `${baseUrl}/geosearch`;
-type BaseUrl = typeof baseUrl;
+const openCageDataBaseUrl = "https://api.opencagedata.com";
+
+// https://api.gouv.fr/les-api/base-adresse-nationale
+const apiAddressBaseUrl = `https://api-adresse.data.gouv.fr`;
+
+const getDepartmentCodeUrl = `${apiAddressBaseUrl}/search`;
+const geoCodingUrl = `${openCageDataBaseUrl}/geocode/v1/geojson`;
+const geoSearchUrl = `${openCageDataBaseUrl}/geosearch`;
+
+type OpenCageDataBaseUrl = typeof openCageDataBaseUrl;
+type ApiAddresseBaseUrl = typeof apiAddressBaseUrl;
 
 const franceAndAttachedTerritoryCountryCodes =
   "fr,bl,gf,gp,mf,mq,nc,pf,pm,re,tf,wf,yt";
 const language = "fr";
+
+type DepartmentCodeQueryParams = {
+  q: string;
+};
+
 type GeoCodingQueryParams = {
   q: string;
   key: string;
@@ -73,46 +83,36 @@ type OpenCageDataLookupSearchResult = {
   name: string;
 };
 
-export type OpenCageDataTargets = CreateTargets<{
-  geocoding: Target<void, GeoCodingQueryParams, void, BaseUrl>;
-  geosearch: Target<void, GeoSearchQueryParams, GeoSearchHeaders, BaseUrl>;
+export type AddressesTargets = CreateTargets<{
+  getDepartmentCode: Target<
+    void,
+    DepartmentCodeQueryParams,
+    void,
+    ApiAddresseBaseUrl
+  >;
+  geocoding: Target<void, GeoCodingQueryParams, void, OpenCageDataBaseUrl>;
+  geosearch: Target<
+    void,
+    GeoSearchQueryParams,
+    GeoSearchHeaders,
+    OpenCageDataBaseUrl
+  >;
 }>;
 
-type APIAddressTargetUrls = "apiAddressReverse" | "apiAddressSearchPlainText";
-
-export const openCageDataTargets = createTargets<OpenCageDataTargets>({
+export const addressesTargets = createTargets<AddressesTargets>({
+  getDepartmentCode: {
+    method: "GET",
+    url: getDepartmentCodeUrl as ApiAddresseBaseUrl,
+  },
   geocoding: {
     method: "GET",
-    url: geoCodingUrl as BaseUrl,
+    url: geoCodingUrl as OpenCageDataBaseUrl,
   },
   geosearch: {
     method: "GET",
-    url: geoSearchUrl as BaseUrl,
+    url: geoSearchUrl as OpenCageDataBaseUrl,
   },
 });
-
-// https://api.gouv.fr/les-api/base-adresse-nationale
-const apiAddressBaseUrl = `https://api-adresse.data.gouv.fr`;
-const apiRoutes = {
-  search: `/search`,
-  reverse: `/reverse`,
-};
-type TargetUrls = "apiAddressReverse" | "apiAddressSearchPlainText";
-
-const adresseApiTargetUrlsMapper: TargetUrlsMapper<TargetUrls> = {
-  apiAddressReverse: (param: { lat: string; lon: string }) =>
-    `${apiAddressBaseUrl}${apiRoutes.reverse}?lon=${param.lon}&lat=${param.lat}`,
-  apiAddressSearchPlainText: (param: { text: string }) =>
-    `${apiAddressBaseUrl}${apiRoutes.search}?q=${encodeURI(param.text)}`,
-};
-
-export const httpAdresseApiClient = new ManagedAxios(
-  adresseApiTargetUrlsMapper,
-  undefined,
-  {
-    timeout: 20000,
-  },
-);
 
 const AXIOS_TIMEOUT_MS = 10_000;
 export const createHttpOpenCageDataClient = configureHttpClient(
@@ -121,23 +121,21 @@ export const createHttpOpenCageDataClient = configureHttpClient(
 export const minimumCharErrorMessage = (minLength: number) =>
   `Lookup street address require a minimum of ${minLength} char.`;
 
-export class HttpOpenCageDataAddressGateway implements AddressGateway {
+export class HttpAddressGateway implements AddressGateway {
   constructor(
-    private readonly httpClient: HttpClient<OpenCageDataTargets>,
-    private readonly APIAddressClient: ManagedAxios<APIAddressTargetUrls>,
+    private readonly httpClient: HttpClient<AddressesTargets>,
     private geocodingApiKey: string,
     private geosearchApiKey: OpenCageGeoSearchKey,
   ) {}
   public async getDepartmentCodeFromAddressAPI(
     postCode: string,
   ): Promise<DepartmentCode | null> {
-    const { data } = await this.APIAddressClient.get({
-      target: this.APIAddressClient.targetsUrls.apiAddressSearchPlainText,
-      targetParams: {
-        text: postCode,
+    const response = await this.httpClient.getDepartmentCode({
+      queryParams: {
+        q: postCode,
       },
     });
-    const feature = toFeatureCollection(data).features.at(0);
+    const feature = toFeatureCollection(response.responseBody).features.at(0);
     if (!feature) {
       throw new Error(`No feature on Address API for postCode ${postCode}`);
     }
@@ -146,7 +144,7 @@ export class HttpOpenCageDataAddressGateway implements AddressGateway {
   public async findDepartmentCodeFromPostCode(
     postCode: string,
   ): Promise<DepartmentCode | null> {
-    const reponse = await this.httpClient.geocoding({
+    const response = await this.httpClient.geocoding({
       queryParams: {
         countrycode: franceAndAttachedTerritoryCountryCodes,
         key: this.geocodingApiKey,
@@ -157,7 +155,7 @@ export class HttpOpenCageDataAddressGateway implements AddressGateway {
     });
 
     const feature = (
-      reponse.responseBody as OpenCageDataFeatureCollection
+      response.responseBody as OpenCageDataFeatureCollection
     ).features.at(0);
     if (!feature) throw new Error(missingFeatureForPostcode(postCode));
     const department = getDepartmentFromAliases(feature.properties.components);

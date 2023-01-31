@@ -12,11 +12,10 @@ import { InclusionConnectGateway } from "../../../domain/inclusionConnect/port/I
 import { createLogger } from "../../../utils/logger";
 import {
   createHttpOpenCageDataClient,
-  httpAdresseApiClient,
-  HttpOpenCageDataAddressGateway,
-  OpenCageDataTargets,
-  openCageDataTargets,
-} from "../../secondary/addressGateway/HttpOpenCageDataAddressGateway";
+  HttpAddressGateway,
+  AddressesTargets,
+  addressesTargets,
+} from "../../secondary/addressGateway/HttpAddressGateway";
 import { InMemoryAddressGateway } from "../../secondary/addressGateway/InMemoryAddressGateway";
 import { CachingAccessTokenGateway } from "../../secondary/core/CachingAccessTokenGateway";
 import { MetabaseDashboardGateway } from "../../secondary/dashboardGateway/MetabaseDashboardGateway";
@@ -237,9 +236,8 @@ const createAddressGateway = (config: AppConfig) =>
   ({
     IN_MEMORY: () => new InMemoryAddressGateway(),
     OPEN_CAGE_DATA: () =>
-      new HttpOpenCageDataAddressGateway(
-        createHttpOpenCageDataClient<OpenCageDataTargets>(openCageDataTargets),
-        httpAdresseApiClient,
+      new HttpAddressGateway(
+        createHttpOpenCageDataClient<AddressesTargets>(addressesTargets),
         config.apiKeyOpenCageDataGeocoding,
         config.apiKeyOpenCageDataGeosearch,
       ),

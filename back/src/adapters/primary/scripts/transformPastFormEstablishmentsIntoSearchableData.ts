@@ -19,11 +19,10 @@ import { HttpsSireneGateway } from "../../secondary/sirene/HttpsSireneGateway";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import {
   createHttpOpenCageDataClient,
-  httpAdresseApiClient,
-  HttpOpenCageDataAddressGateway,
-  openCageDataTargets,
-  OpenCageDataTargets,
-} from "../../secondary/addressGateway/HttpOpenCageDataAddressGateway";
+  HttpAddressGateway,
+  addressesTargets,
+  AddressesTargets,
+} from "../../secondary/addressGateway/HttpAddressGateway";
 
 const maxQpsSireneApi = 0.25;
 
@@ -50,9 +49,8 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
     connectionString: destinationPgConnectionString,
   });
   const clientDestination = await poolDestination.connect();
-  const addressAPI = new HttpOpenCageDataAddressGateway(
-    createHttpOpenCageDataClient<OpenCageDataTargets>(openCageDataTargets),
-    httpAdresseApiClient,
+  const addressAPI = new HttpAddressGateway(
+    createHttpOpenCageDataClient<AddressesTargets>(addressesTargets),
     config.apiKeyOpenCageDataGeocoding,
     config.apiKeyOpenCageDataGeosearch,
   );

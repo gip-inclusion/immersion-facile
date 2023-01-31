@@ -5,11 +5,10 @@ import { createLogger } from "../../../utils/logger";
 import { PipelineStats } from "../../../utils/pipelineStats";
 import {
   createHttpOpenCageDataClient,
-  httpAdresseApiClient,
-  HttpOpenCageDataAddressGateway,
-  openCageDataTargets,
-  OpenCageDataTargets,
-} from "../../secondary/addressGateway/HttpOpenCageDataAddressGateway";
+  HttpAddressGateway,
+  addressesTargets,
+  AddressesTargets,
+} from "../../secondary/addressGateway/HttpAddressGateway";
 import {
   defaultMaxBackoffPeriodMs,
   defaultRetryDeadlineMs,
@@ -55,9 +54,8 @@ const main = async () => {
     retryStrategy,
   );
 
-  const addressAPI = new HttpOpenCageDataAddressGateway(
-    createHttpOpenCageDataClient<OpenCageDataTargets>(openCageDataTargets),
-    httpAdresseApiClient,
+  const addressAPI = new HttpAddressGateway(
+    createHttpOpenCageDataClient<AddressesTargets>(addressesTargets),
     config.apiKeyOpenCageDataGeocoding,
     config.apiKeyOpenCageDataGeosearch,
   );

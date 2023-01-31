@@ -13,12 +13,11 @@ import { AppConfig } from "../../primary/config/appConfig";
 
 import {
   createHttpOpenCageDataClient,
-  httpAdresseApiClient,
-  HttpOpenCageDataAddressGateway,
+  HttpAddressGateway,
   minimumCharErrorMessage,
-  OpenCageDataTargets,
-  openCageDataTargets,
-} from "./HttpOpenCageDataAddressGateway";
+  AddressesTargets,
+  addressesTargets,
+} from "./HttpAddressGateway";
 
 const resultFromApiAddress = {
   type: "FeatureCollection",
@@ -56,9 +55,8 @@ describe("HttpOpenCageDataAddressGateway", () => {
   let httpAddressGateway: AddressGateway;
 
   beforeEach(() => {
-    httpAddressGateway = new HttpOpenCageDataAddressGateway(
-      createHttpOpenCageDataClient<OpenCageDataTargets>(openCageDataTargets),
-      httpAdresseApiClient,
+    httpAddressGateway = new HttpAddressGateway(
+      createHttpOpenCageDataClient<AddressesTargets>(addressesTargets),
       geocodingApiKey,
       geosearchApiKey,
     );
@@ -453,13 +451,11 @@ describe("HttpOpenCageDataAddressGateway", () => {
 describe("HttpOpenCageDataAddressGateway check parrarel call", () => {
   const parallelCalls = 10;
   it(`Should support ${parallelCalls} of parallel calls`, async () => {
-    const httpAddressGateway: AddressGateway =
-      new HttpOpenCageDataAddressGateway(
-        createHttpOpenCageDataClient<OpenCageDataTargets>(openCageDataTargets),
-        httpAdresseApiClient,
-        geocodingApiKey,
-        geosearchApiKey,
-      );
+    const httpAddressGateway: AddressGateway = new HttpAddressGateway(
+      createHttpOpenCageDataClient<AddressesTargets>(addressesTargets),
+      geocodingApiKey,
+      geosearchApiKey,
+    );
 
     const coordinates: GeoPositionDto[] = [];
     const expectedResults: AddressDto[] = [];

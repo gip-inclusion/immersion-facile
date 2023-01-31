@@ -4,11 +4,10 @@ import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import {
   createHttpOpenCageDataClient,
-  httpAdresseApiClient,
-  HttpOpenCageDataAddressGateway,
-  openCageDataTargets,
-  OpenCageDataTargets,
-} from "../../secondary/addressGateway/HttpOpenCageDataAddressGateway";
+  HttpAddressGateway,
+  addressesTargets,
+  AddressesTargets,
+} from "../../secondary/addressGateway/HttpAddressGateway";
 import { ConsoleAppLogger } from "../../secondary/core/ConsoleAppLogger";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { HttpPeAgenciesReferential } from "../../secondary/immersionOffer/peAgenciesReferential/HttpPeAgenciesReferential";
@@ -30,9 +29,8 @@ const updateAllPeAgenciesScript = async () => {
     config.poleEmploiClientId,
   );
 
-  const adressAPI = new HttpOpenCageDataAddressGateway(
-    createHttpOpenCageDataClient<OpenCageDataTargets>(openCageDataTargets),
-    httpAdresseApiClient,
+  const adressAPI = new HttpAddressGateway(
+    createHttpOpenCageDataClient<AddressesTargets>(addressesTargets),
     config.apiKeyOpenCageDataGeocoding,
     config.apiKeyOpenCageDataGeosearch,
   );
