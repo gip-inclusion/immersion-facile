@@ -1,17 +1,7 @@
 import { PoolClient } from "pg";
 import { ConventionId, ConventionReadDto, conventionReadSchema } from "shared";
 
-export const selectAllConventionDtosById = `
-WITH 
-  beneficiaries AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = beneficiary_id),
-  beneficiaryRepresentative AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = beneficiary_representative_id),
-  beneficiariesCurrentEmployer AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = beneficiary_current_employer_id),
-  establishmentTutors AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = establishment_tutor_id),
-  establishmentRepresentative AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = establishment_representative_id),
-  formated_signatories AS (
-    SELECT 
-    b.convention_id,
-    JSON_BUILD_OBJECT(
+const buildSignatoriesObject = `JSON_BUILD_OBJECT(
       'beneficiary' , JSON_BUILD_OBJECT(
         'role', 'beneficiary',
         'firstName', b.first_name,
@@ -54,70 +44,66 @@ WITH
         'phone', br.phone,
         'signedAt', date_to_iso(br.signed_at)
       ) END
-    ) AS signatories
-    FROM beneficiaries AS b
-    LEFT JOIN beneficiaryRepresentative as br ON b.convention_id = br.convention_id
-    LEFT JOIN beneficiariesCurrentEmployer as bce ON b.convention_id = bce.convention_id
-    LEFT JOIN establishmentRepresentative as er ON b.convention_id = er.convention_id
-    LEFT JOIN partners_pe_connect AS p ON p.convention_id = b.convention_id)
+    )`;
 
-SELECT 
-  conventions.id,
-  JSON_STRIP_NULLS(
-    JSON_BUILD_OBJECT(
-      'id', conventions.id,
-      'externalId', external_id::text, 
-      'status', conventions.status,
-      'dateValidation', date_to_iso(date_validation),
-      'dateSubmission', date_to_iso(date_submission),
-      'dateStart',  date_to_iso(date_start),
-      'dateEnd', date_to_iso(date_end),
-      'signatories', signatories,
-      'siret', siret, 
-      'schedule', schedule,
-      'businessName', business_name, 
-      'workConditions', work_conditions, 
-      'postalCode', postal_code, 
-      'agencyId', agency_id, 
-      'agencyName', agencies.name,
-      'agencyDepartment', agencies.department_code,
-      'individualProtection', individual_protection,
-      'sanitaryPrevention', sanitary_prevention,
-      'sanitaryPreventionDescription', sanitary_prevention_description,
-      'immersionAddress', immersion_address,
-      'immersionObjective', immersion_objective,
-      'immersionAppellation', JSON_BUILD_OBJECT(
-        'appellationCode', vad.appellation_code::text, 
-        'appellationLabel', vad.appellation_label, 
-        'romeCode', vad.rome_code,  
-        'romeLabel', vad.rome_label
-      ),
-      'immersionActivities', immersion_activities,
-      'immersionSkills', immersion_skills,
-      'internshipKind', internship_kind,
-      'establishmentTutor' , JSON_BUILD_OBJECT(
-        'role', 'establishment-tutor',
-        'firstName', et.first_name,
-        'lastName', et.last_name,
-        'email', et.email,
-        'phone', et.phone,
-        'job', et.extra_fields ->> 'job'
-      ),
-      'businessAdvantages', business_advantages
-    )
-  ) AS dto
+const buildDto = `JSON_STRIP_NULLS(
+  JSON_BUILD_OBJECT(
+    'id', conventions.id,
+    'externalId', external_id::text,
+    'status', conventions.status,
+    'dateValidation', date_to_iso(date_validation),
+    'dateSubmission', date_to_iso(date_submission),
+    'dateStart',  date_to_iso(date_start),
+    'dateEnd', date_to_iso(date_end),
+    'signatories', ${buildSignatoriesObject},
+    'siret', siret,
+    'schedule', schedule,
+    'businessName', business_name,
+    'workConditions', work_conditions,
+    'postalCode', postal_code,
+    'agencyId', agency_id,
+    'agencyName', agencies.name,
+    'agencyDepartment', agencies.department_code,
+    'individualProtection', individual_protection,
+    'sanitaryPrevention', sanitary_prevention,
+    'sanitaryPreventionDescription', sanitary_prevention_description,
+    'immersionAddress', immersion_address,
+    'immersionObjective', immersion_objective,
+    'immersionAppellation', JSON_BUILD_OBJECT(
+      'appellationCode', vad.appellation_code::text,
+      'appellationLabel', vad.appellation_label,
+      'romeCode', vad.rome_code,
+      'romeLabel', vad.rome_label
+    ),
+    'immersionActivities', immersion_activities,
+    'immersionSkills', immersion_skills,
+    'internshipKind', internship_kind,
+    'businessAdvantages', business_advantages,
+    'establishmentTutor' , JSON_BUILD_OBJECT(
+      'role', 'establishment-tutor',
+      'firstName', et.first_name,
+      'lastName', et.last_name,
+      'email', et.email,
+      'phone', et.phone,
+      'job', et.extra_fields ->> 'job'
+)
+))`;
 
-FROM 
-conventions LEFT JOIN formated_signatories ON formated_signatories.convention_id = conventions.id
-LEFT JOIN establishmentTutors as et ON conventions.id = et.convention_id
-LEFT JOIN view_appellations_dto AS vad ON vad.appellation_code = conventions.immersion_appellation
-LEFT JOIN convention_external_ids AS cei ON cei.convention_id = conventions.id
-LEFT JOIN agencies ON agencies.id = conventions.agency_id
+export const selectAllConventionDtosById = `SELECT conventions.id, ${buildDto} as dto 
+  FROM conventions
+  LEFT JOIN actors AS b ON b.id = conventions.beneficiary_id
+  LEFT JOIN actors AS br ON br.id = conventions.beneficiary_representative_id
+  LEFT JOIN actors AS bce ON bce.id = conventions.beneficiary_current_employer_id
+  LEFT JOIN actors AS er ON er.id = conventions.establishment_representative_id
+  LEFT JOIN partners_pe_connect AS p ON p.convention_id = conventions.id
+  LEFT JOIN actors as et ON et.id = conventions.establishment_tutor_id
+  LEFT JOIN view_appellations_dto AS vad ON vad.appellation_code = conventions.immersion_appellation
+  LEFT JOIN convention_external_ids AS cei ON cei.convention_id = conventions.id
+  LEFT JOIN agencies ON agencies.id = conventions.agency_id
 `;
 
 const getReadConventionByIdQuery = `
-WITH convention_dtos AS (${selectAllConventionDtosById})
-SELECT * FROM convention_dtos WHERE id = $1`;
+  ${selectAllConventionDtosById} WHERE conventions.id = $1`;
 
 export const getReadConventionById = async (
   client: PoolClient,
