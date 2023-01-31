@@ -94,5 +94,9 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
   additionalInformation: {
     label: "Informations complémentaires",
     id: "establishment-additionalInformation",
+    description:
+      "En information complémentaire, nous vous conseillons de valoriser votre histoire afin de donner envie à un candidat de découvrir un métier au sein de votre établissement.",
+    placeholder:
+      "Ex : ma biographie d’entreprise (valeurs, écosystème, projections), mon potentiel d’embauche ou toute autre information essentielle pour l’accueil du bénéficiaire au sein de mon établissement",
   },
 };
