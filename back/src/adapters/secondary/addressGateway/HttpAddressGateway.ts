@@ -9,6 +9,7 @@ import {
   Target,
 } from "http-client";
 import {
+  AbsoluteUrl,
   AddressAndPosition,
   AddressDto,
   DepartmentCode,
@@ -24,17 +25,14 @@ import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGate
 
 // https://github.com/OpenCageData/opencagedata-misc-docs/blob/master/countrycode.md
 // On prends la france et toutes ses territoires dépendants.
-const openCageDataBaseUrl = "https://api.opencagedata.com";
+const openCageDataBaseUrl = "https://api.opencagedata.com" as const;
 
 // https://api.gouv.fr/les-api/base-adresse-nationale
-const apiAddressBaseUrl = `https://api-adresse.data.gouv.fr`;
+const apiAddressBaseUrl: AbsoluteUrl = `https://api-adresse.data.gouv.fr`;
 
-const getDepartmentCodeUrl = `${apiAddressBaseUrl}/search`;
-const geoCodingUrl = `${openCageDataBaseUrl}/geocode/v1/geojson`;
-const geoSearchUrl = `${openCageDataBaseUrl}/geosearch`;
-
-type OpenCageDataBaseUrl = typeof openCageDataBaseUrl;
-type ApiAddresseBaseUrl = typeof apiAddressBaseUrl;
+const getDepartmentCodeUrl = `${apiAddressBaseUrl}/search` as const;
+const geoCodingUrl = `${openCageDataBaseUrl}/geocode/v1/geojson` as const;
+const geoSearchUrl = `${openCageDataBaseUrl}/geosearch` as const;
 
 const franceAndAttachedTerritoryCountryCodes =
   "fr,bl,gf,gp,mf,mq,nc,pf,pm,re,tf,wf,yt";
@@ -88,29 +86,29 @@ export type AddressesTargets = CreateTargets<{
     void,
     DepartmentCodeQueryParams,
     void,
-    ApiAddresseBaseUrl
+    typeof getDepartmentCodeUrl
   >;
-  geocoding: Target<void, GeoCodingQueryParams, void, OpenCageDataBaseUrl>;
+  geocoding: Target<void, GeoCodingQueryParams, void, typeof geoCodingUrl>;
   geosearch: Target<
     void,
     GeoSearchQueryParams,
     GeoSearchHeaders,
-    OpenCageDataBaseUrl
+    typeof geoSearchUrl
   >;
 }>;
 
 export const addressesTargets = createTargets<AddressesTargets>({
   getDepartmentCode: {
     method: "GET",
-    url: getDepartmentCodeUrl as ApiAddresseBaseUrl,
+    url: getDepartmentCodeUrl,
   },
   geocoding: {
     method: "GET",
-    url: geoCodingUrl as OpenCageDataBaseUrl,
+    url: geoCodingUrl,
   },
   geosearch: {
     method: "GET",
-    url: geoSearchUrl as OpenCageDataBaseUrl,
+    url: geoSearchUrl,
   },
 });
 
