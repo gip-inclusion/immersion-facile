@@ -20,7 +20,7 @@ import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 export class TestAgencyGateway implements AgencyGateway {
   public agencies$ = new Subject<AgencyOption[]>();
   public fetchedAgency$ = new Subject<AgencyDto | undefined>();
-  public customAgencyId$ = new Subject<AgencyId | false>();
+  public customAgencyId$ = new Subject<AgencyId | undefined>();
 
   public updateAgencyResponse$ = new Subject<undefined>();
 
@@ -44,7 +44,7 @@ export class TestAgencyGateway implements AgencyGateway {
     return this.fetchedAgency$;
   }
 
-  getImmersionFacileAgencyId$(): Observable<AgencyId | false> {
+  getImmersionFacileAgencyId$(): Observable<AgencyId | undefined> {
     return this.customAgencyId$;
   }
 

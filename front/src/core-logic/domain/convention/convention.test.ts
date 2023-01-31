@@ -592,13 +592,21 @@ describe("Convention slice", () => {
       expectIsLoadingToBe(false);
       expectPreselectedAgencyIdToBe(agency.id);
     });
+    it("returns an error if fetches fail", () => {
+      store.dispatch(conventionSlice.actions.preselectedAgencyIdRequested());
+      dependencies.agencyGateway.customAgencyId$.error(
+        new Error("Failed fetch preselectedAgencyId"),
+      );
+      expectIsLoadingToBe(false);
+      expectPreselectedAgencyIdToBe(null);
+    });
   });
 
   const expectConventionState = (conventionState: Partial<ConventionState>) => {
     expectObjectsToMatch(store.getState().convention, conventionState);
   };
 
-  const expectPreselectedAgencyIdToBe = (expected: AgencyId) => {
+  const expectPreselectedAgencyIdToBe = (expected: AgencyId | null) => {
     expectToEqual(
       conventionSelectors.preselectedAgencyId(store.getState()),
       expected,

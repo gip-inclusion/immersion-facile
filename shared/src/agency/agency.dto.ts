@@ -24,11 +24,7 @@ export type AgencyDto = RequireField<CreateAgencyDto, "questionnaireUrl"> & {
 export type PartialAgencyDto = Partial<AgencyDto> & { id: AgencyId };
 
 export type AgencyId = Flavor<string, "AgencyId">;
-export type AgencyIdResponse =
-  | AgencyId
-  | {
-      success: boolean;
-    };
+export type AgencyIdResponse = AgencyId | undefined;
 export type WithAgencyId = {
   id: AgencyId;
 };

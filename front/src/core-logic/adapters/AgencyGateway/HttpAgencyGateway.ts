@@ -88,12 +88,11 @@ export const agencyTargets = createTargets<AgencyTargets>({
 export class HttpAgencyGateway implements AgencyGateway {
   constructor(private readonly httpClient: HttpClient<AgencyTargets>) {}
 
-  getImmersionFacileAgencyId$(): Observable<AgencyId | false> {
+  getImmersionFacileAgencyId$(): Observable<AgencyId | undefined> {
     return from(
-      this.httpClient.getImmersionFacileAgencyId().then(({ responseBody }) => {
-        const agencyIdResponse = agencyIdResponseSchema.parse(responseBody);
-        return typeof agencyIdResponse === "string" ? agencyIdResponse : false;
-      }),
+      this.httpClient
+        .getImmersionFacileAgencyId()
+        .then(({ responseBody }) => agencyIdResponseSchema.parse(responseBody)),
     );
   }
 

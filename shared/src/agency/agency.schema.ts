@@ -31,10 +31,8 @@ export const withAgencyIdSchema: z.Schema<WithAgencyId> = z.object({
   id: agencyIdSchema,
 });
 
-export const agencyIdResponseSchema: z.ZodSchema<AgencyIdResponse> = z.union([
-  agencyIdSchema,
-  z.object({ success: z.boolean() }),
-]);
+export const agencyIdResponseSchema: z.ZodSchema<AgencyIdResponse> =
+  agencyIdSchema.optional();
 
 export const agencyIdAndNameSchema: z.ZodSchema<AgencyOption> = z.object({
   id: agencyIdSchema,

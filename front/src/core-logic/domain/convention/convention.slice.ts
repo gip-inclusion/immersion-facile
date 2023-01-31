@@ -213,7 +213,7 @@ export const conventionSlice = createSlice({
       state.isLoading = false;
       state.formUi.preselectedAgencyId = payload;
     },
-    preselectedAgencyIdFailed: (state) => state,
+    preselectedAgencyIdFailed: setFeedbackAsErrored,
   },
 });
 

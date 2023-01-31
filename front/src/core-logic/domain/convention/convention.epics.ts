@@ -127,9 +127,9 @@ const getPreselectAgencyId: ConventionEpic = (action$, _, { agencyGateway }) =>
     map((agencyId) =>
       conventionSlice.actions.preselectedAgencyIdSucceeded(agencyId || null),
     ),
-    // catchEpicError((error: Error) =>
-    //   conventionSlice.actions.prese(error.message),
-    // ),
+    catchEpicError((error: Error) =>
+      conventionSlice.actions.preselectedAgencyIdFailed(error.message),
+    ),
   );
 export const conventionEpics = [
   saveConventionEpic,
