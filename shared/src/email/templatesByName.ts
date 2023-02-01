@@ -102,7 +102,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       Cette demande va être transmise à son ${
         internshipKind === "immersion"
           ? "conseiller référent"
-          : "conseiller de la chambre de commerce et d'instrustrie - CCI"
+          : "conseiller de la Chambre de Commerce et d'Instrustrie - CCI"
       }.
       Il vous informera prochainement par mail de la validation ou non ${
         internshipKind === "immersion" ? "de l'immersion" : "du mini stage"
@@ -229,13 +229,13 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       ${
         internshipKind === "immersion"
           ? `À la fin de l'immersion, nous vous remercions de compléter la fiche d'évaluation de l'immersion <a href="https://immersion.cellar-c2.services.clever-cloud.com/bilan-immersion-professionnelle-inscriptible.pdf">à télécharger ici</a>, et de l'envoyer au conseiller qui a signé la convention (Pôle Emploi, Mission Locale…). Cette évaluation doit être complétée par le tuteur, si possible en présence du bénéficiaire de l'immersion.`
-          : `À la fin du mini stage, nous vous remercions de compléter la fiche d'évaluation du mini stage <a href="??????????">NOTICE BILAN A FOURNIR</a>, et de l'envoyer au conseiller de la chambre de commerce et d'instrustrie - CCI qui a signé la convention. Cette évaluation doit être complétée par le tuteur, si possible en présence du bénéficiaire du mini stage.`
+          : `À la fin du mini stage, nous vous remercions de compléter la fiche d'évaluation du mini stage <a href="??????????">NOTICE BILAN A FOURNIR</a>, et de l'envoyer au conseiller de la Chambre de Commerce et d'Instrustrie - CCI qui a signé la convention. Cette évaluation doit être complétée par le tuteur, si possible en présence du bénéficiaire du mini stage.`
       }
       
       En cas de difficulté, prévenez au plus vite votre ${
         internshipKind === "immersion"
           ? "conseiller"
-          : "conseiller de la chambre de commerce et d'instrustrie - CCI"
+          : "conseiller de la Chambre de Commerce et d'Instrustrie - CCI"
       } pour qu'il vous conseille au mieux.       
       ${defaultSignature(internshipKind)}
 
@@ -666,7 +666,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
           <strong>Votre confirmation est obligatoire</strong> pour permettre à votre ${
             internshipKind === "immersion"
               ? "conseiller"
-              : "conseiller de la chambre de commerce et d'instrustrie - CCI"
+              : "conseiller de la Chambre de Commerce et d'Instrustrie - CCI"
           } de valider la convention. Merci  !
         
         Vous devez maintenant confirmer votre demande.`,
@@ -680,7 +680,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       subContent: `La décision de votre ${
         internshipKind === "immersion"
           ? "conseiller"
-          : "conseiller de la chambre de commerce et d'instrustrie - CCI"
+          : "conseiller de la Chambre de Commerce et d'Instrustrie - CCI"
       } vous sera transmise par mail.
 
         ${defaultSignature(internshipKind)}
@@ -972,7 +972,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       }. Elle va être transmise à votre ${
         internshipKind === "immersion"
           ? "conseiller"
-          : "conseiller de la chambre de commerce et d'instrustrie - CCI"
+          : "conseiller de la Chambre de Commerce et d'Instrustrie - CCI"
       } référent.
       
       Il vous informera par mail de la validation ou non ${

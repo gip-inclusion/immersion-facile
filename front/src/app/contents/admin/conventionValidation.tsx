@@ -80,7 +80,7 @@ const beneficiaryFields: ColField[] = [
         </div>
         {convention.signatories.beneficiary.financiaryHelp && (
           <div className={fr.cx("fr-text--xs")}>
-            Aide financière :{" "}
+            Aide matérielle :{" "}
             {convention.signatories.beneficiary.financiaryHelp}
           </div>
         )}

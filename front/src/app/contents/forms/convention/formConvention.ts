@@ -174,10 +174,9 @@ const conventionSection = (internshipKind: InternshipKind) => ({
     required: true,
   },
   businessAdvantages: {
-    label: "Avantages",
+    label: "Avantages proposés par l'entreprise",
     id: "form-convention-businessAdvantages",
-    description: "Avantages proposés par l'entreprise",
-    placeholder:
+    description:
       "navettes jusqu'au lieu de travail, panier repas, hébergement...",
   },
   isMinor: {
