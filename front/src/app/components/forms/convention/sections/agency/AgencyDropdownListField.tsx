@@ -40,7 +40,7 @@ export const AgencyDropdownListField = ({
       }}
       onBlur={onBlur}
       aria-label="Choisissez votre structure"
-      aria-describedby={`agency-code-{name}-error-desc-error`}
+      aria-describedby={`agency-code-${name}-error-desc-error`}
       disabled={disabled || isLoading || !departmentCode}
     >
       <Agencies agencies={agencies} />

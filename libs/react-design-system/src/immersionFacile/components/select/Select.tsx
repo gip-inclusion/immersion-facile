@@ -35,6 +35,7 @@ export const Select = ({
   disabled,
 }: SelectProps) => {
   const { cx } = useStyles();
+  const shouldShowPlaceholder = placeholder && !value;
 
   return (
     <div className={cx(fr.cx("fr-select-group"), className)}>
@@ -50,11 +51,11 @@ export const Select = ({
         id={id}
         name={name}
         onChange={onChange}
-        value={value}
+        value={shouldShowPlaceholder ? "" : value}
         disabled={disabled}
       >
         {placeholder && (
-          <option value="" disabled selected>
+          <option value="" disabled>
             {placeholder}
           </option>
         )}

@@ -1,6 +1,6 @@
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
-import { Loader, Select } from "react-design-system";
+import { Loader, Select, SelectOption } from "react-design-system";
 import {
   AgencyId,
   AgencyOption,
@@ -15,7 +15,7 @@ import { formConventionFieldsLabels } from "src/app/contents/forms/convention/fo
 import { useFederatedIdentity } from "src/app/hooks/federatedIdentity";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { agencyGateway } from "src/config/dependencies";
-import { AgencyDropdownListField } from "./AgencyDropdownListField";
+// import { AgencyDropdownListField } from "./AgencyDropdownListField";
 import { AgencyErrorText } from "./AgencyErrorText";
 
 type AgencySelectorProps = {
@@ -36,8 +36,9 @@ export const AgencySelector = ({
   );
   const { agencyId: agencyIdField, agencyDepartment: agencyDepartmentField } =
     getFormFields();
-  const [{ value, onBlur }, { touched, error }, { setValue }] =
-    useField<AgencyId>(agencyIdField.name || "agencyId");
+  const [{ value }, { touched, error }, { setValue }] = useField<AgencyId>(
+    agencyIdField.name || "agencyId",
+  );
   const [
     { value: departmentCodeValue },
     _,
@@ -65,13 +66,7 @@ export const AgencySelector = ({
       federatedIdentity,
     })
       .then((agencies) => {
-        setAgencies([
-          {
-            id: "",
-            name: "Veuillez sélectionner une structure",
-          },
-          ...agencies,
-        ]);
+        setAgencies(agencies);
         if (
           defaultAgencyId &&
           isDefaultAgencyOnAgenciesAndEnabled(
@@ -81,6 +76,7 @@ export const AgencySelector = ({
           )
         )
           setValue(defaultAgencyId);
+        else setValue("");
         setLoadingError(false);
       })
       .catch((e: any) => {
@@ -93,7 +89,6 @@ export const AgencySelector = ({
         setIsLoading(false);
       });
   }, [departmentCodeValue]);
-
   const userError = touched && error;
   const showError = userError || loadingError;
   return (
@@ -113,15 +108,19 @@ export const AgencySelector = ({
         value={departmentCodeValue as string}
       />
 
-      <AgencyDropdownListField
+      <Select
+        options={agencies.map(
+          ({ id, name }): SelectOption => ({ label: name, value: id }),
+        )}
         {...agencyIdField}
-        isLoading={isLoading}
-        disabled={disabled}
+        onChange={(event) => setValue(event.currentTarget.value)}
         value={value}
-        onBlur={onBlur}
-        agencies={agencies}
-        departmentCode={departmentCodeValue}
-        setValue={setValue}
+        disabled={disabled || isLoading || !departmentCodeValue}
+        placeholder={
+          departmentCodeValue
+            ? "Veuillez sélectionner une structure"
+            : "Veuillez sélectionner un département"
+        }
       />
       {showError && (
         <AgencyErrorText
