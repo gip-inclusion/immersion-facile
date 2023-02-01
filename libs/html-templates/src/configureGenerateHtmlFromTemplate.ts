@@ -30,8 +30,8 @@ export const configureGenerateHtmlFromTemplate =
     templateByName: TemplateByName,
     config: { contactEmail: string },
     customParts: {
-      header: string | undefined;
-      footer: string | undefined;
+      header: ((agencyLogoUrl?: string) => string) | undefined;
+      footer: ((contactEmail: string) => string) | undefined;
     },
   ) =>
   <N extends keyof TemplateByName>(

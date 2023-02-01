@@ -1,10 +1,12 @@
 export const renderHeader = (
   agencyLogoUrl: string | undefined,
-  customHtmlHeader: string | undefined,
+  customHtmlHeader: ((agencyLogoUrl?: string) => string) | undefined,
 ): string =>
   customHtmlHeader
-    ? customHtmlHeader
-    : `
+    ? customHtmlHeader(agencyLogoUrl)
+    : defaultHeader(agencyLogoUrl);
+
+const defaultHeader = (agencyLogoUrl?: string) => `
   <table width="600">
     <tr>
       <td width="35%">
@@ -40,7 +42,7 @@ export const renderHeader = (
     </tr>
   </table>`;
 
-export const cciCustomHtmlHeader = `
+export const cciCustomHtmlHeader = (agencyLogoUrl?: string): string => `
 <table width="600">
   <tr>
     <td width="60%">
@@ -48,12 +50,22 @@ export const cciCustomHtmlHeader = `
         <img src="https://www.cci.fr/sites/g/files/mwbcuj1451/files/Logo_CCI_RVB_Version_Blanche.png" width="333" height="83" alt="Chambre de Commerce et d'Industrie"/>
       </a>
     </td>
-    <td width="40%">
-      <div style="margin-left: 20px;">
-        <p style="color: #161616; font-weight: bold; font-size: 20px; margin: 0">Chambre de Commerce et d'Industrie</p>
-        <p style="color: #3A3A3A; font-size: 14px; margin: 0">Mini stage</p>
-      </div>
-    </td>
+    ${
+      agencyLogoUrl && agencyLogoUrl !== ""
+        ? `
+      <td width="60%" align="right">
+        <img src="${agencyLogoUrl}" alt="" style="max-width: 150px; max-height: 120px; height: auto; margin-left: 20px;"/>
+      </td>
+      `
+        : `
+      <td width="40%">
+        <div style="margin-left: 20px;">
+          <p style="color: #161616; font-weight: bold; font-size: 20px; margin: 0">Chambre de Commerce et d'Industrie</p>
+          <p style="color: #3A3A3A; font-size: 14px; margin: 0">Mini stage</p>
+        </div>
+      </td>
+      `
+    }
   </tr>
   <tr>
     <td width="600" height="10" colspan="2"></td>
