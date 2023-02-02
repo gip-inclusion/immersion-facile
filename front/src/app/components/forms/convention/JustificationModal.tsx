@@ -7,7 +7,7 @@ import {
   ModalContent,
   ModalDialog,
   Notification,
-  Title,
+  ModalTitle,
 } from "react-design-system";
 import {
   ConventionStatusWithJustification,
@@ -41,7 +41,7 @@ export const JustificationModal = ({
     <ModalDialog isOpen={isOpen} hide={closeModal}>
       <ModalClose hide={closeModal} title="Close the modal window" />
       <ModalContent>
-        <Title>{title}</Title>
+        <ModalTitle>{title}</ModalTitle>
         {newStatus === "DRAFT" && (
           <Notification
             title={"Attention !"}
@@ -59,9 +59,9 @@ export const JustificationModal = ({
             type={"warning"}
             className={fr.cx("fr-mb-2w")}
           >
-            Ne surtout pas refuser une immersion si une signature manque !
-            Relancer le signataire manquant en l’appelant ou en lui envoyant un
-            mail.
+            Ne surtout pas refuser une immersion si une signature manque ! Cela
+            revient à annuler les signatures déjà enregistrées. Pour relancer un
+            signataire manquant, le contacter par mail.
           </Notification>
         )}
         <Formik
