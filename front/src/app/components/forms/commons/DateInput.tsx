@@ -44,7 +44,9 @@ export const DateInput = (props: DateInputProps) => {
             aria-label={props.label}
             id={cleanStringToHTMLAttribute(props.name)}
             max={
-              props.max ? format(new Date(props.max), "yyyy-MM-dd") : undefined
+              props.max
+                ? format(new Date(props.max), "yyyy-MM-dd")
+                : "9999-12-31"
             }
             onChange={(event) => props.onDateChange(event.target.value)}
           />
