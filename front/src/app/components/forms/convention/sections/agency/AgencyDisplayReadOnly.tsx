@@ -2,11 +2,10 @@ import { useField, useFormikContext } from "formik";
 import React, { useEffect, useState } from "react";
 import type { ConventionDto } from "shared";
 import { AgencyId, AgencyOption } from "shared";
-import { Loader } from "react-design-system";
+import { Loader, Select, SelectOption } from "react-design-system";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { agencyGateway } from "src/config/dependencies";
-import { AgencyDropdownListField } from "./AgencyDropdownListField";
 import { AgencyErrorText } from "./AgencyErrorText";
 
 const placeholderAgency: AgencyOption = {
@@ -19,8 +18,9 @@ type AgencyDisplayProps = {
 
 export const AgencyDisplayReadOnly = ({ agencyId }: AgencyDisplayProps) => {
   const name: keyof ConventionDto = "agencyId";
-  const [{ value, onBlur }, { touched, error }, { setValue }] =
-    useField<AgencyId>({ name });
+  const [{ value }, { touched, error }, { setValue }] = useField<AgencyId>({
+    name,
+  });
   const { values } = useFormikContext<ConventionDto>();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -65,16 +65,16 @@ export const AgencyDisplayReadOnly = ({ agencyId }: AgencyDisplayProps) => {
     <div
       className={`fr-input-group${showError ? " fr-input-group--error" : ""}`}
     >
-      <AgencyDropdownListField
+      <Select
+        options={agencies.map(
+          ({ id, name }): SelectOption => ({ label: name, value: id }),
+        )}
         {...formContents["agencyId"]}
-        isLoading={isLoading}
-        disabled={true}
+        onChange={(event) => setValue(event.currentTarget.value)}
         value={value}
-        onBlur={onBlur}
-        agencies={agencies}
-        departmentCode={null}
-        setValue={setValue}
+        disabled={true}
       />
+
       {showError && (
         <AgencyErrorText
           loadingError={loadingError}

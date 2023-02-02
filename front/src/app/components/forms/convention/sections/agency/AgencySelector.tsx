@@ -15,7 +15,6 @@ import { formConventionFieldsLabels } from "src/app/contents/forms/convention/fo
 import { useFederatedIdentity } from "src/app/hooks/federatedIdentity";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { agencyGateway } from "src/config/dependencies";
-// import { AgencyDropdownListField } from "./AgencyDropdownListField";
 import { AgencyErrorText } from "./AgencyErrorText";
 
 type AgencySelectorProps = {
