@@ -1,14 +1,15 @@
 import {
   expectArraysToEqual,
+  expectObjectsToMatch,
   expectToEqual,
   LookupSearchResult,
-} from "src/../../shared/src";
+} from "shared";
 import {
   createTestStore,
   TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
-import { geosearchSlice } from "./geosearch.slice";
+import { GeoSearchFeedback, geosearchSlice } from "./geosearch.slice";
 
 describe("Geosearch epic", () => {
   let store: ReduxStore;
@@ -34,12 +35,42 @@ describe("Geosearch epic", () => {
         },
       },
     ];
-    expectLoadingToBe(false);
     store.dispatch(geosearchSlice.actions.queryHasChanged(query));
     dependencies.scheduler.flush();
     expectLoadingToBe(true);
+    dependencies.addressGateway.lookupLocationResults$.next(
+      expectedSuggestions,
+    );
+    expectLoadingToBe(false);
     expectSuggestionsToBe(expectedSuggestions);
   });
+  it("should update selected suggestion in store", () => {
+    const lookupSearchResult: LookupSearchResult = {
+      label: "Mon super résultat",
+      position: {
+        lat: 49.6548,
+        lon: 2.65498,
+      },
+    };
+    store.dispatch(
+      geosearchSlice.actions.suggestionHaveBeenSelected(lookupSearchResult),
+    );
+    expectSelectedSuggestionToBe(lookupSearchResult);
+  });
+
+  it("should throw an error if something goes wrong and returns error feedback", () => {
+    const errorMessage = "Error trying to get location";
+    store.dispatch(geosearchSlice.actions.suggestionsHaveBeenRequested());
+    dependencies.addressGateway.lookupLocationResults$.error(
+      new Error(errorMessage),
+    );
+    expectLoadingToBe(false);
+    expectFeedbackToEqual({
+      kind: "errored",
+      errorMessage,
+    });
+  });
+
   const expectQueryToBe = (expected: string) => {
     expectToEqual(store.getState().geosearch.query, expected);
   };
@@ -49,4 +80,9 @@ describe("Geosearch epic", () => {
   const expectSuggestionsToBe = (expected: LookupSearchResult[]) => {
     expectArraysToEqual(store.getState().geosearch.suggestions, expected);
   };
+  const expectSelectedSuggestionToBe = (expected: LookupSearchResult) => {
+    expectObjectsToMatch(store.getState().geosearch.value, expected);
+  };
+  const expectFeedbackToEqual = (feedback: GeoSearchFeedback) =>
+    expect(store.getState().geosearch.feedback).toEqual(feedback);
 });

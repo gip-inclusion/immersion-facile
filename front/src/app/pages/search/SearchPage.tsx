@@ -130,6 +130,7 @@ export const SearchPage = ({
                   <PlaceAutocomplete
                     label="Je me situe dans la ville de :"
                     initialValue={values.place}
+                    inputValue={values.place || ""}
                     onValueChange={(lookupSearchResult) => {
                       if (!lookupSearchResult) return;
                       const { position, label } = lookupSearchResult;
@@ -142,6 +143,9 @@ export const SearchPage = ({
                         longitude: position.lon,
                         place: label,
                       });
+                    }}
+                    onInputValueChange={(newInputValue) => {
+                      setFieldValue("place", newInputValue);
                     }}
                     id="im-search-page__address-autocomplete"
                   />

@@ -1,12 +1,12 @@
 import {
-  concatWith,
   debounceTime,
   distinctUntilChanged,
   filter,
   map,
-  of,
   switchMap,
 } from "rxjs";
+import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
+// import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
   ActionOfSlice,
   AppEpic,
@@ -18,10 +18,10 @@ type GeosearchAction = ActionOfSlice<typeof geosearchSlice>;
 const queryMinLength = 3;
 const debounceDuration = 400;
 
-export const geosearchLookupEpic: AppEpic<GeosearchAction> = (
+const geosearchQueryEpic: AppEpic<GeosearchAction> = (
   action$,
   _state$,
-  { addressGateway, scheduler },
+  { scheduler },
 ) =>
   action$.pipe(
     filter(geosearchSlice.actions.queryHasChanged.match),
@@ -29,15 +29,22 @@ export const geosearchLookupEpic: AppEpic<GeosearchAction> = (
     filter((action) => action.payload.length >= queryMinLength),
     debounceTime(debounceDuration, scheduler),
     distinctUntilChanged(),
-    switchMap((action) =>
-      of(geosearchSlice.actions.suggestionsHaveBeenRequested()).pipe(
-        concatWith(
-          addressGateway
-            .lookupLocation$(action.payload)
-            .pipe(map(geosearchSlice.actions.suggestionsSuccessfullyFetched)),
-        ),
-      ),
-    ),
+    map(geosearchSlice.actions.suggestionsHaveBeenRequested),
   );
 
-export const geosearchEpics = [geosearchLookupEpic];
+const geosearchRequestEpic: AppEpic<GeosearchAction> = (
+  action$,
+  state$,
+  { addressGateway },
+) =>
+  action$.pipe(
+    filter(geosearchSlice.actions.suggestionsHaveBeenRequested.match),
+    switchMap(() =>
+      addressGateway.lookupLocation$(state$.value.geosearch.query),
+    ),
+    map(geosearchSlice.actions.suggestionsSuccessfullyFetched),
+    catchEpicError((error) =>
+      geosearchSlice.actions.suggestionsFailed(error.message),
+    ),
+  );
+export const geosearchEpics = [geosearchQueryEpic, geosearchRequestEpic];

@@ -1,9 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { LookupSearchResult } from "src/../../shared/src";
+import { LookupLocationInput, LookupSearchResult } from "shared";
 import { SubmitFeedBack } from "../SubmitFeedback";
 
+export type GeoSearchFeedback = SubmitFeedBack<"success">;
+
 type GeoSearchState = {
-  feedback: SubmitFeedBack<"success">;
+  feedback: GeoSearchFeedback;
   suggestions: LookupSearchResult[];
   value: LookupSearchResult | null;
   query: string;
@@ -24,11 +26,10 @@ export const geosearchSlice = createSlice({
   name: "geosearch",
   initialState,
   reducers: {
-    queryHasChanged: (state, action: PayloadAction<string>) => {
+    queryHasChanged: (state, action: PayloadAction<LookupLocationInput>) => {
       state.query = action.payload;
       state.suggestions = [];
       state.value = null;
-      state.isLoading = false;
     },
     suggestionsHaveBeenRequested: (state) => {
       state.isLoading = true;
@@ -44,6 +45,8 @@ export const geosearchSlice = createSlice({
       state.isLoading = false;
       state.feedback = { kind: "errored", errorMessage: action.payload };
     },
-    suggestionHaveBeenSelected: () => {},
+    suggestionHaveBeenSelected: (state, action) => {
+      state.value = action.payload;
+    },
   },
 });

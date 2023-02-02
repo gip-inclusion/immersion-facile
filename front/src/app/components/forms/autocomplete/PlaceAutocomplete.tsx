@@ -1,11 +1,13 @@
 import Autocomplete from "@mui/material/Autocomplete";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { AutocompleteInput } from "react-design-system";
 import { LookupSearchResult } from "shared";
-import { apiAddressGateway } from "src/config/dependencies";
 import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
-import { useDebounce } from "src/app/hooks/useDebounce";
+import { useDispatch } from "react-redux";
+import { geosearchSlice } from "src/core-logic/domain/geosearch/geosearch.slice";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { geosearchSelectors } from "src/core-logic/domain/geosearch/geosearch.selectors";
 
 export type PlaceAutocompleteProps = {
   label: string;
@@ -17,6 +19,8 @@ export type PlaceAutocompleteProps = {
   description?: string;
   id?: string;
   onValueChange: (value: LookupSearchResult | null) => void;
+  onInputValueChange: (inputValue: string | undefined) => void;
+  inputValue: string;
 };
 
 export const PlaceAutocomplete = ({
@@ -28,51 +32,43 @@ export const PlaceAutocomplete = ({
   placeholder = "Ex : Saint-Emilion",
   description,
   onValueChange,
+  inputValue = "",
+  onInputValueChange,
   id = "im-place-autocomplete",
 }: PlaceAutocompleteProps) => {
   const { cx } = useStyles();
-  const [selectedOption, setSelectedOption] =
-    useState<LookupSearchResult | null>(null);
-  const [searchValue, setSearchValue] = useState<string>(initialValue);
-  const debounceSearchTerm = useDebounce(searchValue, 400);
-  const [options, setOptions] = useState<LookupSearchResult[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
+  const dispatch = useDispatch();
 
-  const noOptionText = isSearching ? "..." : "Aucun lieu trouvé 😥";
-  const onInputChange = async (value: string) => {
-    // setSearchValue(value);
-    // if (value.length < 3) return;
-    // setIsSearching(true);
-    // const results = await apiAddressGateway.lookupLocation(value);
-    // setIsSearching(false);
-    // setOptions(results);
+  const suggestions = useAppSelector(geosearchSelectors.suggestions);
+  const isLoading = useAppSelector(geosearchSelectors.isLoading);
+  const value = useAppSelector(geosearchSelectors.value);
+  const noOptionText = () => {
+    if (isLoading) return "...";
+    if (!isLoading && suggestions.length === 0) return "Aucun lieu trouvé 😥";
+    return "Saisissez un lieu ou une ville ⌨️";
+  };
+  const onInputChange = (value: string) => {
+    dispatch(geosearchSlice.actions.queryHasChanged(value));
+    onInputValueChange(value);
   };
   const onValueSelected = (value: LookupSearchResult | null) => {
+    dispatch(geosearchSlice.actions.suggestionHaveBeenSelected(value));
     onValueChange(value);
-    setSelectedOption(value);
-    setSearchValue(value ? value.label : "");
   };
-  useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    onInputChange(debounceSearchTerm);
-  }, [debounceSearchTerm]);
-
   return (
     <div className={fr.cx("fr-input-group")}>
       <Autocomplete
-        loading={isSearching}
+        loading={isLoading}
         loadingText="Recherche de ville en cours... 🔎"
         disablePortal
-        noOptionsText={
-          searchValue ? noOptionText : "Saisissez un lieu ou une ville ⌨️"
-        }
-        options={options}
-        inputValue={searchValue || initialValue}
-        value={selectedOption}
+        noOptionsText={noOptionText()}
+        options={suggestions}
+        inputValue={inputValue || initialValue}
+        value={value}
         id={id}
         getOptionLabel={(option) => option.label}
         onChange={(_, value) => onValueSelected(value)}
-        onInputChange={(_, inputValue) => setSearchValue(inputValue)}
+        onInputChange={(_, inputValue) => onInputChange(inputValue)}
         filterOptions={(option) => option}
         renderInput={AutocompleteInput(
           headerClassName,
