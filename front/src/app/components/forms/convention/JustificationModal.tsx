@@ -53,6 +53,17 @@ export const JustificationModal = ({
             relancer un signataire manquant, le contacter par mail.
           </Notification>
         )}
+        {newStatus === "REJECTED" && (
+          <Notification
+            title={"Attention !"}
+            type={"warning"}
+            className={fr.cx("fr-mb-2w")}
+          >
+            Ne surtout pas refuser une immersion si une signature manque !
+            Relancer le signataire manquant en l’appelant ou en lui envoyant un
+            mail.
+          </Notification>
+        )}
         <Formik
           initialValues={{ justification: "" }}
           validationSchema={toFormikValidationSchema(withJustificationSchema)}
