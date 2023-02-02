@@ -24,6 +24,9 @@ export const adminTabs = [
 
 export type AdminTab = (typeof adminTabs)[number];
 
+export const isAdminTab = (input: string): input is AdminTab =>
+  adminTabs.includes(input as AdminTab);
+
 export const adminTabSerializer: ValueSerializer<AdminTab> = {
   parse: (raw) => raw as AdminTab,
   stringify: (tab) => tab,
