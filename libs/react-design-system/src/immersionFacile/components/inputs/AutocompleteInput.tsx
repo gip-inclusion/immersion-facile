@@ -1,5 +1,7 @@
 import { AutocompleteRenderInputParams } from "@mui/material/Autocomplete";
 import React from "react";
+import { fr } from "@codegouvfr/react-dsfr";
+import { useStyles } from "tss-react/dsfr";
 import "./AutocompleteInput.css";
 
 export const AutocompleteInput =
@@ -11,11 +13,15 @@ export const AutocompleteInput =
     placeholder: string | undefined,
     id: string | undefined,
   ) =>
-  (params: AutocompleteRenderInputParams): JSX.Element =>
-    (
-      <div ref={params.InputProps.ref} className="if-autocomplete-input">
-        <div className="if-autocomplete-input__wrapper">
-          <label className={`fr-label ${headerClassName ?? ""}`} htmlFor={id}>
+  (params: AutocompleteRenderInputParams): JSX.Element => {
+    const { cx } = useStyles();
+    return (
+      <div ref={params.InputProps.ref} className={cx("if-autocomplete-input")}>
+        <div className={cx("if-autocomplete-input__wrapper")}>
+          <label
+            className={cx(fr.cx("fr-label"), headerClassName)}
+            htmlFor={id}
+          >
             {label}
           </label>
 
@@ -24,10 +30,11 @@ export const AutocompleteInput =
             id={id}
             style={inputStyle}
             disabled={disabled}
-            className={"fr-input"}
+            className={fr.cx("fr-input")}
             placeholder={placeholder}
             type="text"
           />
         </div>
       </div>
     );
+  };

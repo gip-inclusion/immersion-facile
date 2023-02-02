@@ -90,15 +90,15 @@ export const ModalDialog = ({
     <Modal
       aria-labelledby="fr-modal-title-modal"
       className={_className}
-      overlayClassName={"fr-container-md"}
+      overlayClassName={fr.cx("fr-container-md")}
       isOpen={isOpen}
       onRequestClose={hide}
       shouldCloseOnOverlayClick={true}
     >
-      <div className="fr-grid-row fr-grid-row--center">
+      <div className={fr.cx("fr-grid-row", "fr-grid-row--center")}>
         <div className={fr.cx("fr-modal__body", `fr-col-md-${colSize}`)}>
-          <div className="fr-modal__header">{closeComponent}</div>
-          <div className="fr-modal__content">
+          <div className={fr.cx("fr-modal__header")}>{closeComponent}</div>
+          <div className={fr.cx("fr-modal__content")}>
             {title}
             {content}
           </div>

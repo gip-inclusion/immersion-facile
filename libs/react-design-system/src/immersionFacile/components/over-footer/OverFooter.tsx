@@ -1,20 +1,28 @@
 import React from "react";
 import { OverFooterCol, OverFooterColProps } from "./OverFooterCol";
+import { useStyles } from "tss-react/dsfr";
+import { fr } from "@codegouvfr/react-dsfr";
 import "./OverFooter.css";
 export type OverFooterCols = OverFooterColProps[];
 export type OverFooterProps = {
   cols: OverFooterCols;
 };
 
-export const OverFooter = ({ cols = [] }: OverFooterProps) => (
-  <aside id="over-footer" className="over-footer fr-pt-8w fr-pb-4w">
-    <div className="fr-container">
-      <div className="fr-grid-row fr-grid-row--gutters">
-        {cols.length > -1 &&
-          cols.map((col, index) => (
-            <OverFooterCol key={`col-${index}`} {...col} />
-          ))}
+export const OverFooter = ({ cols = [] }: OverFooterProps) => {
+  const { cx } = useStyles();
+  return (
+    <aside
+      id="over-footer"
+      className={cx(fr.cx("fr-pt-8w", "fr-pb-4w"), "over-footer")}
+    >
+      <div className={fr.cx("fr-container")}>
+        <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
+          {cols.length > -1 &&
+            cols.map((col, index) => (
+              <OverFooterCol key={`col-${index}`} {...col} />
+            ))}
+        </div>
       </div>
-    </div>
-  </aside>
-);
+    </aside>
+  );
+};

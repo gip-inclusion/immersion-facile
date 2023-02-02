@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "type-route";
+import { fr } from "@codegouvfr/react-dsfr";
+import { useStyles } from "tss-react/dsfr";
 import "./HeroHeader.scss";
 
 type UserType = "default" | "candidate" | "establishment" | "agency";
@@ -42,6 +44,7 @@ export const HeroHeader = ({
   icon,
   typeDisplayName,
 }: HeroHeaderProps) => {
+  const { cx } = useStyles();
   const [windowScrollY, setWindowScrollY] = useState<number>(window.scrollY);
   const onWindowScroll = () => {
     setWindowScrollY(window.scrollY);
@@ -58,55 +61,87 @@ export const HeroHeader = ({
   }, []);
   return (
     <section
-      className={`${componentName} ${componentName}--${type} fr-pt-8w fr-pb-2w`}
+      className={cx(
+        fr.cx("fr-pt-8w", "fr-pb-2w"),
+        componentName,
+        `${componentName}--${type}`,
+      )}
     >
-      <div className={`fr-container ${componentName}__container`}>
-        <div className={`${componentName}__text-wrapper`}>
+      <div className={cx(fr.cx("fr-container"), `${componentName}__container`)}>
+        <div className={cx(`${componentName}__text-wrapper`)}>
           {type !== "default" && (
-            <div className={`${componentName}__type-wrapper fr-mb-2w`}>
-              <span className={`${componentName}__type-icon ${icon}`}></span>
-              <span className={`${componentName}__type-label`}>
+            <div
+              className={cx(
+                fr.cx("fr-mb-2w"),
+                `${componentName}__type-wrapper`,
+              )}
+            >
+              <span className={cx(`${componentName}__type-icon`, icon)}></span>
+              <span className={cx(`${componentName}__type-label`)}>
                 {typeDisplayName}
               </span>
             </div>
           )}
-          <h1 className={`${componentName}__title fr-display--xs`}>{title}</h1>
+          <h1
+            className={cx(fr.cx("fr-display--xs"), `${componentName}__title`)}
+          >
+            {title}
+          </h1>
           {description && (
-            <h2 className={`${componentName}__description fr-text--xl`}>
+            <h2
+              className={cx(
+                fr.cx("fr-text--xl"),
+                `${componentName}__description`,
+              )}
+            >
               {description}
             </h2>
           )}
         </div>
 
         {illustration && (
-          <div className={`${componentName}__illustration-wrapper`}>
+          <div className={cx(`${componentName}__illustration-wrapper`)}>
             <img
               src={illustration}
               alt="illustration immersion facilitée"
               aria-hidden="true"
-              className={`${componentName}__illustration`}
+              className={cx(`${componentName}__illustration`)}
               style={parallax ? getParallaxStyle(5) : undefined}
             />
           </div>
         )}
         {patterns && (
-          <div className={`${componentName}__patterns`}>
+          <div className={cx(`${componentName}__patterns`)}>
             {Array.from(Array(3).entries()).map((_item, index) => (
               <div
                 key={`${componentName}__pattern--${index}`}
-                className={`${componentName}__pattern ${componentName}__pattern--${index}`}
+                className={cx(
+                  `${componentName}__pattern`,
+                  `${componentName}__pattern--${index}`,
+                )}
               ></div>
             ))}
           </div>
         )}
       </div>
       {navCards && navCards.length > 0 && (
-        <div className={`${componentName}__nav-cards-wrapper fr-container`}>
+        <div
+          className={cx(
+            fr.cx("fr-container"),
+            `${componentName}__nav-cards-wrapper`,
+          )}
+        >
           <nav
-            className={`${componentName}__nav-cards fr-grid-row fr-grid-row--gutters`}
-            aria-labelledby={`${componentName}__nav-cards-label`}
+            className={cx(
+              fr.cx("fr-grid-row", "fr-grid-row--gutters"),
+              `${componentName}__nav-cards`,
+            )}
+            aria-labelledby={cx(`${componentName}__nav-cards-label`)}
           >
-            <h3 id={`${componentName}__nav-cards-label`} className="fr-hidden">
+            <h3
+              id={`${componentName}__nav-cards-label`}
+              className={fr.cx("fr-hidden")}
+            >
               Parcours utilisateur : candidat, entreprise, prescripteur
             </h3>
             {navCards.map((card) => (
@@ -133,25 +168,31 @@ const NavCard = ({
   type,
   total,
   id,
-}: HeroHeaderNavCard) => (
-  <div
-    className={`${componentName}__nav-card-wrapper fr-col-12 fr-col-lg-${
-      total ? 12 / total : 4
-    }`}
-  >
+}: HeroHeaderNavCard) => {
+  const { cx } = useStyles();
+  return (
     <div
-      className={`${componentName}__nav-card ${componentName}__nav-card--${type}`}
+      className={`${componentName}__nav-card-wrapper fr-col-12 fr-col-lg-${
+        total ? 12 / total : 4
+      }`}
     >
-      <a {...link} id={id} className={`${componentName}__nav-card-link`}>
-        <span className="fr-sr-only">{title}</span>
-      </a>
-      <span className={`${componentName}__nav-card-overtitle`}>
-        {overtitle}
-      </span>
-      {icon && (
-        <span className={`${componentName}__nav-card-icon ${icon}`}></span>
-      )}
-      <h3 className={`${componentName}__nav-card-title`}>{title}</h3>
+      <div
+        className={cx(
+          `${componentName}__nav-card`,
+          `${componentName}__nav-card--${type}`,
+        )}
+      >
+        <a {...link} id={id} className={cx(`${componentName}__nav-card-link`)}>
+          <span className={fr.cx("fr-sr-only")}>{title}</span>
+        </a>
+        <span className={cx(`${componentName}__nav-card-overtitle`)}>
+          {overtitle}
+        </span>
+        {icon && (
+          <span className={cx(`${componentName}__nav-card-icon`, icon)}></span>
+        )}
+        <h3 className={cx(`${componentName}__nav-card-title`)}>{title}</h3>
+      </div>
     </div>
-  </div>
-);
+  );
+};

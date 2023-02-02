@@ -1,3 +1,4 @@
+import { fr } from "@codegouvfr/react-dsfr";
 import classNames, { ArgumentArray } from "classnames";
 import React, {
   Children,
@@ -83,7 +84,7 @@ export const AccordionDSFR = ({
 
   return (
     <HtmlComponent className={classNames(className)}>
-      <ul className="fr-accordions-group">{childs}</ul>
+      <ul className={fr.cx("fr-accordions-group")}>{childs}</ul>
     </HtmlComponent>
   );
 };
