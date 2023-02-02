@@ -1,10 +1,11 @@
 import Autocomplete from "@mui/material/Autocomplete";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AutocompleteInput } from "react-design-system";
 import { LookupSearchResult } from "shared";
 import { apiAddressGateway } from "src/config/dependencies";
 import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
+import { useDebounce } from "src/app/hooks/useDebounce";
 
 export type PlaceAutocompleteProps = {
   label: string;
@@ -33,7 +34,7 @@ export const PlaceAutocomplete = ({
   const [selectedOption, setSelectedOption] =
     useState<LookupSearchResult | null>(null);
   const [searchValue, setSearchValue] = useState<string>(initialValue);
-
+  const debounceSearchTerm = useDebounce(searchValue, 400);
   const [options, setOptions] = useState<LookupSearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
@@ -51,6 +52,11 @@ export const PlaceAutocomplete = ({
     setSelectedOption(value);
     setSearchValue(value ? value.label : "");
   };
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    onInputChange(debounceSearchTerm);
+  }, [debounceSearchTerm]);
+
   return (
     <div className={fr.cx("fr-input-group")}>
       <Autocomplete
@@ -66,7 +72,7 @@ export const PlaceAutocomplete = ({
         id={id}
         getOptionLabel={(option) => option.label}
         onChange={(_, value) => onValueSelected(value)}
-        onInputChange={(_, inputValue) => onInputChange(inputValue)}
+        onInputChange={(_, inputValue) => setSearchValue(inputValue)}
         filterOptions={(option) => option}
         renderInput={AutocompleteInput(
           headerClassName,
