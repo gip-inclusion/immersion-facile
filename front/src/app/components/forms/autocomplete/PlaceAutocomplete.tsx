@@ -42,10 +42,11 @@ export const PlaceAutocomplete = ({
   const noOptionText = isSearching ? "..." : "Aucun lieu trouvé 😥";
   const [inputHasChanged, setInputHasChanged] = useState(false);
   const getInputValue = () => {
-    if (!inputValue && !selectedPlace && !inputHasChanged)
-      return initialInputValue;
-    if (!inputValue && selectedPlace && inputHasChanged)
-      return selectedPlace.label;
+    const isInitialRendering =
+      !inputValue && !selectedPlace && !inputHasChanged;
+    const isPlaceSelected = !inputValue && selectedPlace && inputHasChanged;
+    if (isInitialRendering) return initialInputValue;
+    if (isPlaceSelected) return selectedPlace.label;
     return inputValue;
   };
   return (
