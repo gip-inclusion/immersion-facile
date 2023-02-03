@@ -128,7 +128,6 @@ export const SearchPage = ({
                 >
                   <PlaceAutocomplete
                     label="Je me situe dans la ville de :"
-                    //inputValue={formikValues.place}
                     initialInputValue={formikValues.place}
                     onValueChange={(lookupSearchResult) => {
                       if (!lookupSearchResult) return;
