@@ -64,7 +64,7 @@ export const PlaceAutocomplete = ({
         id={id}
         getOptionLabel={(option) => option.label}
         onChange={(_, value) => {
-          dispatch(geosearchSlice.actions.suggestionHaveBeenSelected(value));
+          dispatch(geosearchSlice.actions.suggestionHasBeenSelected(value));
           onValueChange(value);
         }}
         onInputChange={(_, newInputValue) => {

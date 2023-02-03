@@ -53,7 +53,7 @@ describe("Geosearch epic", () => {
       },
     };
     store.dispatch(
-      geosearchSlice.actions.suggestionHaveBeenSelected(lookupSearchResult),
+      geosearchSlice.actions.suggestionHasBeenSelected(lookupSearchResult),
     );
     expectSelectedSuggestionToBe(lookupSearchResult);
   });

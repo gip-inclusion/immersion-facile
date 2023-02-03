@@ -45,7 +45,7 @@ export const geosearchSlice = createSlice({
       state.isLoading = false;
       state.feedback = { kind: "errored", errorMessage: action.payload };
     },
-    suggestionHaveBeenSelected: (state, action) => {
+    suggestionHasBeenSelected: (state, action) => {
       state.value = action.payload;
     },
   },
