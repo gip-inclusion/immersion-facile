@@ -1,6 +1,7 @@
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import React from "react";
 import { DayStatus } from "./utils/getDayStatus";
+import { useStyles } from "tss-react/dsfr";
 
 type DayCircleProps = {
   dayStatus: DayStatus;
@@ -14,19 +15,20 @@ export const DayCircle = ({
   disabled,
   name,
 }: DayCircleProps) => {
+  const { cx } = useStyles();
   if (dayStatus === "hasTime")
     return (
-      <div className="schedule-picker__day-circle">
+      <div className={cx("schedule-picker__day-circle")}>
         <button
           type="button"
-          className={`numberCircle `}
+          className={cx(`numberCircle`)}
           style={{ backgroundColor: "#B8FEC9" }}
           onClick={onClick}
           disabled={disabled}
         >
           <div>{name}</div>
         </button>
-        <div className="schedule-picker__day-circle-icon">
+        <div className={cx("schedule-picker__day-circle-icon")}>
           <CheckCircleIcon sx={{ color: "#1F8D49" }} fontSize="small" />
         </div>
       </div>
@@ -36,10 +38,10 @@ export const DayCircle = ({
     <div>
       <button
         type="button"
-        className={`numberCircle ${
-          dayStatus === "isSelected" ? "selected" : ""
-        }`}
-        //className={`w-11 h-11 `}
+        className={cx(
+          "numberCircle",
+          `${dayStatus === "isSelected" ?? "selected"}`,
+        )}
         onClick={onClick}
         disabled={disabled}
       >

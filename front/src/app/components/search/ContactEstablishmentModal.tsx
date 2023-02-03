@@ -154,7 +154,7 @@ const ModalContactContent = ({
 };
 
 const Paragraph = ({ children }: { children: ReactNode }) => (
-  <p className="fr-mb-2w">{children}</p>
+  <p className={fr.cx("fr-mb-2w")}>{children}</p>
 );
 
 const Bold = ({ children }: { children: string }) => (
@@ -183,11 +183,11 @@ const AdvisesForContact = ({
       Cette entreprise peut recruter sur ce métier et être intéressée pour vous
       recevoir en immersion. Tentez votre chance en la contactant !
     </Paragraph>
-    <ul className="fr-btns-group fr-mt-3w">
+    <ul className={fr.cx("fr-btns-group", "fr-mt-3w")}>
       <li>
         {data?.website && (
           <a
-            className="fr-btn fr-btn--secondary"
+            className={fr.cx("fr-btn", "fr-btn--secondary")}
             href={data?.website}
             target="_blank"
           >
@@ -197,7 +197,7 @@ const AdvisesForContact = ({
       </li>
       <li>
         <a
-          className="fr-btn fr-btn--secondary"
+          className={fr.cx("fr-btn", "fr-btn--secondary")}
           href={getMapsLink(data)}
           target="_blank"
         >
@@ -218,7 +218,7 @@ const AdvisesForContact = ({
     </Paragraph>
     <Paragraph>
       <Bold>Par exemple : </Bold>
-      <span className="italic">
+      <span>
         “Je souhaite devenir mécanicien auto et je voudrais découvrir comment ce
         métier se pratique dans un garage comme le vôtre. Ca me permettra de
         vérifier que cela me plaît vraiment. La personne qui m’accueillera et me
@@ -239,7 +239,7 @@ const AdvisesForContact = ({
     </Paragraph>
     <Paragraph>
       <Bold>Par exemple : </Bold>
-      <span className="italic">
+      <span>
         “il faudrait que je fasse une immersion avant de m’inscrire à une
         formation. “
       </span>

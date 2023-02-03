@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "type-route";
+import { useStyles } from "tss-react/dsfr";
 
 import "./FixedStamp.css";
 
@@ -17,16 +18,21 @@ export const FixedStamp = ({
   subtitle,
   overtitle,
   link,
-}: FixedStampProps) => (
-  <aside className={"fixed-stamp"}>
-    {image && <div className={"fixed-stamp__image-wrapper"}>{image}</div>}
-    <div className={"fixed-stamp__content"}>
-      {overtitle && (
-        <span className={"fixed-stamp__overtitle"}>{overtitle}</span>
-      )}
-      {title && <span className={"fixed-stamp__title"}>{title}</span>}
-      {subtitle && <span className={"fixed-stamp__subtitle"}>{subtitle}</span>}
-    </div>
-    {link && <a className="fixed-stamp__overlay-link" {...link} />}
-  </aside>
-);
+}: FixedStampProps) => {
+  const { cx } = useStyles();
+  return (
+    <aside className={cx("fixed-stamp")}>
+      {image && <div className={cx("fixed-stamp__image-wrapper")}>{image}</div>}
+      <div className={cx("fixed-stamp__content")}>
+        {overtitle && (
+          <span className={cx("fixed-stamp__overtitle")}>{overtitle}</span>
+        )}
+        {title && <span className={cx("fixed-stamp__title")}>{title}</span>}
+        {subtitle && (
+          <span className={cx("fixed-stamp__subtitle")}>{subtitle}</span>
+        )}
+      </div>
+      {link && <a className={cx("fixed-stamp__overlay-link")} {...link} />}
+    </aside>
+  );
+};

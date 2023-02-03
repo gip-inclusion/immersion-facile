@@ -4,6 +4,8 @@ import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout
 import { routes } from "src/app/routes/routes";
 import { Route } from "type-route";
 import { EstablishmentCreationForm } from "src/app/components/forms/establishment/EstablishmentCreationForm";
+import { fr } from "@codegouvfr/react-dsfr";
+import { MainWrapper } from "src/../../libs/react-design-system";
 
 type EstablishmentFormForExternalsProps = {
   route: Route<typeof routes.formEstablishmentForExternals>;
@@ -29,16 +31,15 @@ export const EstablishmentFormPageForExternals = ({
   if (!consumerConfig)
     return (
       <HeaderFooterLayout>
-        <div
-          role="alert"
-          className="fr-alert fr-alert--info w-5/6 m-auto mt-10"
-        >
-          <p className="fr-alert__title">
-            La source '{consumer}' n'est pas référencée. Êtes vous certain
-            d’avoir la bonne url ?
-          </p>
-          <p>Veuillez contacter immersion facile pour être référencé.</p>
-        </div>
+        <MainWrapper layout="boxed">
+          <div role="alert" className={fr.cx("fr-alert", "fr-alert--info")}>
+            <p className={fr.cx("fr-alert__title")}>
+              La source '{consumer}' n'est pas référencée. Êtes vous certain
+              d’avoir la bonne url ?
+            </p>
+            <p>Veuillez contacter immersion facile pour être référencé.</p>
+          </div>
+        </MainWrapper>
       </HeaderFooterLayout>
     );
 

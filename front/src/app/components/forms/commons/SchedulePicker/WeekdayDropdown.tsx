@@ -1,5 +1,6 @@
 import React, { ChangeEvent } from "react";
 import { weekdays } from "shared";
+import { fr } from "@codegouvfr/react-dsfr";
 
 type WeekdayDropdownProps = {
   name: string;
@@ -26,7 +27,7 @@ export const WeekdayDropdown = ({
 
   return (
     <select
-      className="fr-select"
+      className={fr.cx("fr-select")}
       id={id}
       name={name}
       value={selected}

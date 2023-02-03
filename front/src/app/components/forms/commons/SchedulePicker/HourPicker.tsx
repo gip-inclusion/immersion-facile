@@ -3,6 +3,8 @@ import React from "react";
 import { ButtonAdd } from "react-design-system";
 import { removeAtIndex, replaceArrayElement, TimePeriodDto } from "shared";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import { fr } from "@codegouvfr/react-dsfr";
+import { useStyles } from "tss-react/dsfr";
 
 type HourPickerProps = {
   name: string;
@@ -17,6 +19,7 @@ export const HourPicker = ({
   onValueChange,
   disabled,
 }: HourPickerProps) => {
+  const { cx } = useStyles();
   const add = () => {
     const newTimePeriods = [...timePeriods];
     let start = "09:00";
@@ -63,13 +66,13 @@ export const HourPicker = ({
           return (
             <div
               key={name + index}
-              className="schedule-picker__section fr-mt-2w"
+              className={cx(fr.cx("fr-mt-2w"), "schedule-picker__section")}
             >
-              <div className="schedule-picker__row">
-                <div className="date-or-time-block">
+              <div className={cx("schedule-picker__row")}>
+                <div className={cx("date-or-time-block")}>
                   <label htmlFor={name + index + "-start"}>Début</label>
                   <input
-                    className="fr-input"
+                    className={fr.cx("fr-input")}
                     type="time"
                     value={hours.start}
                     max={hours.end}
@@ -82,14 +85,14 @@ export const HourPicker = ({
                   <ErrorMessage
                     name={`hours.${index}.start`}
                     component="div"
-                    className="field-error"
+                    className={cx("field-error")}
                   />
                 </div>
 
-                <div className="date-or-time-block">
+                <div className={cx("date-or-time-block")}>
                   <label htmlFor={name + index + "-end"}>Fin</label>
                   <input
-                    className="fr-input"
+                    className={fr.cx("fr-input")}
                     value={hours.end}
                     onChange={(evt) =>
                       onEndChange(index, evt.currentTarget.value)
@@ -101,7 +104,7 @@ export const HourPicker = ({
                   <ErrorMessage
                     name={`hours.${index}.end`}
                     component="div"
-                    className="field-error"
+                    className={cx("field-error")}
                   />
                 </div>
 
@@ -118,7 +121,7 @@ export const HourPicker = ({
           );
         })}
       {!disabled && (
-        <ButtonAdd className="fr-my-2w" onClick={() => add()}>
+        <ButtonAdd className={fr.cx("fr-my-2w")} onClick={() => add()}>
           Ajouter des horaires
         </ButtonAdd>
       )}

@@ -17,6 +17,8 @@ import {
 import { HourPicker } from "./HourPicker";
 import { TotalWeeklyHoursIndicator } from "./TotaWeeklylHoursIndicator";
 import { WeekdayPicker } from "./WeekdayPicker";
+import { fr } from "@codegouvfr/react-dsfr";
+import { useStyles } from "tss-react/dsfr";
 
 export type RegularSchedulePickerProps = {
   interval: DateIntervalDto;
@@ -24,12 +26,24 @@ export type RegularSchedulePickerProps = {
 };
 
 export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
+  const { cx } = useStyles();
   const name: keyof ConventionDto = "schedule";
   const [field, _, { setValue }] = useField<ScheduleDto>({ name });
   return (
     <>
-      <div className="schedule-picker schedule-picker--regular fr-grid-row fr-grid-row--gutters fr-mb-2w">
-        <div className="schedule-picker__inner fr-col-12 fr-col-lg-8">
+      <div
+        className={cx(
+          fr.cx("fr-grid-row", "fr-grid-row--gutters", "fr-mb-2w"),
+          "schedule-picker",
+          "schedule-picker--regular",
+        )}
+      >
+        <div
+          className={cx(
+            fr.cx("fr-col-12", "fr-col-lg-8"),
+            "schedule-picker__inner",
+          )}
+        >
           <WeekdayPicker
             name={name}
             dayPeriods={dayPeriodsFromComplexSchedule(
@@ -49,7 +63,9 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
             disabled={props.disabled}
           />
 
-          <p className="fr-h5 fr-mt-2w">Sélectionnez les horaires</p>
+          <p className={fr.cx("fr-h5", "fr-mt-2w")}>
+            Sélectionnez les horaires
+          </p>
 
           <HourPicker
             name={name}
@@ -74,11 +90,16 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
             disabled={props.disabled}
           />
         </div>
-        <div className="schedule-picker__week-hours-summary fr-col-12 fr-col-lg-4">
-          <p className="fr-text--sm fr-mb-1w">
+        <div
+          className={cx(
+            fr.cx("fr-col-12", "fr-col-lg-4"),
+            "schedule-picker__week-hours-summary",
+          )}
+        >
+          <p className={fr.cx("fr-text--sm", "fr-mb-1w")}>
             <strong>Récapitulatif hebdomadaire</strong>
           </p>
-          <hr className="fr-hr fr-pb-1w" />
+          <hr className={fr.cx("fr-hr", "fr-pb-1w")} />
           {weeksHoursIndicator(field.value)}
         </div>
       </div>

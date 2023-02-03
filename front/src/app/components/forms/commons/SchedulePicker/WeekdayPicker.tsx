@@ -9,6 +9,8 @@ import {
   WeekDayRangeSchemaDTO,
 } from "shared";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import { fr } from "@codegouvfr/react-dsfr";
+import { useStyles } from "tss-react/dsfr";
 
 import { WeekdayDropdown } from "./WeekdayDropdown";
 
@@ -26,6 +28,7 @@ export const WeekdayPicker = ({
   disabled,
   interval,
 }: WeekdayPickerProps) => {
+  const { cx } = useStyles();
   const canAddNewPeriod = (): WeekDayRangeSchemaDTO | false => {
     if (dayPeriods.length === 0) return false;
     const lastPeriod = dayPeriods[dayPeriods.length - 1];
@@ -54,7 +57,7 @@ export const WeekdayPicker = ({
   };
 
   return (
-    <div className="schedule-picker__section">
+    <div className={cx("schedule-picker__section")}>
       {dayPeriods.length > 0 &&
         dayPeriods.map((dayRange, index) => {
           const onStartChange = (value: number) => {
@@ -75,8 +78,8 @@ export const WeekdayPicker = ({
 
           return (
             <div key={name + index}>
-              <div className="schedule-picker__row">
-                <div className="date-or-time-block">
+              <div className={cx("schedule-picker__row")}>
+                <div className={cx("date-or-time-block")}>
                   <div>Du</div>
                   <WeekdayDropdown
                     name="du"
@@ -89,7 +92,7 @@ export const WeekdayPicker = ({
                   />
                 </div>
 
-                <div className="date-or-time-block">
+                <div className={cx("date-or-time-block")}>
                   <div>Au</div>
                   <WeekdayDropdown
                     name="du"
@@ -115,7 +118,7 @@ export const WeekdayPicker = ({
           );
         })}
       <ButtonAdd
-        className="fr-my-2w"
+        className={fr.cx("fr-my-2w")}
         disabled={!isPeriodButtonActive()}
         onClick={() => add()}
       >

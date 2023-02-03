@@ -4,6 +4,7 @@ import { calculateWeeklyHours, WeeklyImmersionTimetableDto } from "shared";
 import { DayCircle } from "./DayCircle";
 import { HourIndicator } from "./HourIndicator";
 import { getDayStatus } from "./utils/getDayStatus";
+import { fr } from "@codegouvfr/react-dsfr";
 
 type WeeklyRowProperties = {
   weeklyCalendar: WeeklyImmersionTimetableDto;
@@ -22,7 +23,7 @@ export const WeeklyRow = ({
   disabled,
   onChange,
 }: WeeklyRowProperties) => (
-  <div className="fr-grid-row fr-mt-1w fr-grid-row--middle">
+  <div className={fr.cx("fr-grid-row", "fr-mt-1w", "fr-grid-row--middle")}>
     {weeklyCalendar.map((dayOfWeek) =>
       dayOfWeek.dailySchedule !== null ? (
         <DayCircle

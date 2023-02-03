@@ -25,12 +25,7 @@ export const StringWithHighlights = ({
             startIndexInclusive,
             endIndexExclusive,
           );
-          if (bolded)
-            return (
-              <span className="font-bold" key={index}>
-                {text}
-              </span>
-            );
+          if (bolded) return <span key={index}>{text}</span>;
           return <Fragment key={index}>{text}</Fragment>;
         },
       )}

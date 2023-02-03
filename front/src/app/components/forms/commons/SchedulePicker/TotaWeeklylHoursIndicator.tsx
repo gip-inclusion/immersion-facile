@@ -1,3 +1,4 @@
+import { fr } from "@codegouvfr/react-dsfr";
 import React from "react";
 import { HourIndicator } from "./HourIndicator";
 
@@ -21,7 +22,7 @@ export const TotalWeeklyHoursIndicator = ({
   week,
   totalHours,
 }: TotalWeeklyHoursIndicatorProps) => (
-  <li className="fr-text--xs fr-my-auto">
+  <li className={fr.cx("fr-text--xs", "fr-my-auto")}>
     Semaine {week}: &nbsp;
     <HourIndicator hours={totalHours} />
   </li>

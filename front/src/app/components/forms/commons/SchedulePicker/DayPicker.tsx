@@ -2,6 +2,7 @@ import React from "react";
 import { DailyScheduleDto, makeImmersionTimetable } from "shared";
 import { DayCircle } from "./DayCircle";
 import { WeeklyRow } from "./WeeklyRow";
+import { fr } from "@codegouvfr/react-dsfr";
 
 type DayPickerProps = {
   complexSchedule: DailyScheduleDto[];
@@ -17,7 +18,7 @@ export const DayPicker = ({
   disabled,
 }: DayPickerProps) => (
   <>
-    <div className="fr-grid-row fr-mt-1w">
+    <div className={fr.cx("fr-grid-row", "fr-mt-1w")}>
       {["L", "M", "M", "J", "V", "S", "D"].map((name, index) => (
         <DayCircle
           key={name + index}
@@ -26,7 +27,9 @@ export const DayPicker = ({
           disabled={true}
         />
       ))}
-      <strong className="fr-text--xs fr-my-auto fr-ml-2w">total t/sem</strong>
+      <strong className={fr.cx("fr-text--xs", "fr-my-auto", "fr-ml-2w")}>
+        total t/sem
+      </strong>
     </div>
     {makeImmersionTimetable(complexSchedule).map((weeklyCalendar, index) => (
       <WeeklyRow

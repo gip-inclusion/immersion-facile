@@ -1,5 +1,6 @@
 import classNames, { ArgumentArray } from "classnames";
 import React from "react";
+import { fr } from "@codegouvfr/react-dsfr";
 
 export type FileProperties = {
   className?: ArgumentArray;
@@ -31,13 +32,13 @@ export const File = ({
   });
   return (
     <div className={_className}>
-      <label className="fr-label" htmlFor={id}>
+      <label className={fr.cx("fr-label")} htmlFor={id}>
         {label}
-        {hint && <p className="fr-hint-text">{hint}</p>}
+        {hint && <p className={fr.cx("fr-hint-text")}>{hint}</p>}
       </label>
       <input
         onChange={onChange}
-        className="fr-upload"
+        className={fr.cx("fr-upload")}
         type="file"
         id={id}
         aria-describedby={hint || undefined}
@@ -45,7 +46,10 @@ export const File = ({
         accept={accept}
       />
       {errorMessage && (
-        <p id="file-upload-with-error-desc-error" className="fr-error-text">
+        <p
+          id="file-upload-with-error-desc-error"
+          className={fr.cx("fr-error-text")}
+        >
           {errorMessage}
         </p>
       )}

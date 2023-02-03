@@ -147,7 +147,7 @@ export const AddEstablishmentByBatchTab = () => {
     setFormSubmitted(false);
   };
   return (
-    <div className="admin-tab__import-batch-establishment">
+    <div className={cx("admin-tab__import-batch-establishment")}>
       {isLoading && <Loader />}
       <DsfrTitle level={5} text="Import en masse d'entreprises" />
       <form onSubmit={handleSubmit(onSubmit)}>
