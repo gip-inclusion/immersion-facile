@@ -19,6 +19,7 @@ export class StubSentEmailGateway implements StubSentEmailGateway {
             signature: "agence signature",
             agency: "agence de Bretagne",
             immersionProfession: "Vendeur / Vendeur",
+            agencyLogoUrl: "",
           },
         },
         sentAt: "2022-01-07T19:00:00.000",
@@ -34,6 +35,7 @@ export class StubSentEmailGateway implements StubSentEmailGateway {
             beneficiaryLastName: "Grondin",
             establishmentTutorName: "Erika Grandjean",
             immersionAssessmentCreationLink: "http://immersion/dsndjedfdj",
+            agencyLogoUrl: "",
           },
         },
         sentAt: "2022-01-07T20:00:00.000",
@@ -57,6 +59,7 @@ export class StubSentEmailGateway implements StubSentEmailGateway {
               "fdslkmfjsdflksjfsdlfhjsdfohjsdfdsfoihjcfwdkxcjfchsdkjbqsedkhj.dsfsdflkjhsfdlkjhfsdgkljhbsdkljhbsdkljbhsdfdffg/dsfjsdfhsdkjwghsdqk/sfsdsfhgfjfggdqederghhrteezsdrfsdfvdfghfghr?jwt=eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2ZXJzaW9uIjoxLCJhcHBsaWNhdGlvbklkIjoiNTVjNDg3MmYtOTUzNy00ZThlLTgxMDItNzFiZDkzODBhMGY3Iiwicm9sZSI6InZhbGlkYXRvciIsImlhdCI6MTY3NDY0MjU4MiwiZXhwIjoxNjc3MzIwOTgyLCJlbWFpbEhhc2giOiIzM2E1ZGVlNzI3MjNkZWI0MmQyZWFjOGJhOGRiYWQ0YSJ9.nH7fhbr44kg9tKJfRNtmijaXLOCan6woip7LGjtMlVjx5YxViBkc-l_eTMnO8w90FV6vEUplJy8J3PT_guXwKQ",
             conventionStatusLink:
               "fdslkmfjsdflksjfsdlfhjsdfohjsdfdsfoihjcfwdkxcjfchsdkjbqsedkhj.dsfsdflkjhsfdlkjhfsdgkljhbsdkljhbsdkljbhsdfdffg/dsfjsdfhsdkjwghsdqk/sfsdsfhgfjfggdqederghhrteezsdrfsdfvdfghfghr?jwt=eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2ZXJzaW9uIjoxLCJhcHBsaWNhdGlvbklkIjoiNTVjNDg3MmYtOTUzNy00ZThlLTgxMDItNzFiZDkzODBhMGY3Iiwicm9sZSI6InZhbGlkYXRvciIsImlhdCI6MTY3NDY0MjU4MiwiZXhwIjoxNjc3MzIwOTgyLCJlbWFpbEhhc2giOiIzM2E1ZGVlNzI3MjNkZWI0MmQyZWFjOGJhOGRiYWQ0YSJ9.nH7fhbr44kg9tKJfRNtmijaXLOCan6woip7LGjtMlVjx5YxViBkc-l_eTMnO8w90FV6vEUplJy8J3PT_guXwKQ",
+            agencyLogoUrl: "",
           },
         },
         sentAt: "2022-01-07T20:00:00.000",

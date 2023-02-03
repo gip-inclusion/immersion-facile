@@ -28,30 +28,41 @@ export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends Transact
       uow.conventionRepository.getById(conventionFromEvent.id),
     ]);
 
-    const advisor = conventionPeAdvisor?.advisor;
-    const beneficiary = convention?.signatories.beneficiary;
+    if (!convention) return;
 
-    if (advisor && beneficiary)
+    const agency = await uow.agencyRepository.getById(convention.agencyId);
+    if (!agency)
+      throw new Error(
+        `Missing agency ${convention.agencyId} on agency repository.`,
+      );
+
+    if (!conventionPeAdvisor)
+      throw new Error(
+        `Missing convention PeAdvisor for convention ${conventionFromEvent.id} on conventionPoleEmploiAdvisor repository.`,
+      );
+
+    if (conventionPeAdvisor.advisor)
       await this.emailGateway.sendEmail({
         type: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED",
-        recipients: [advisor.email],
+        recipients: [conventionPeAdvisor.advisor.email],
         params: {
-          advisorFirstName: advisor.firstName,
-          advisorLastName: advisor.lastName,
+          advisorFirstName: conventionPeAdvisor.advisor.firstName,
+          advisorLastName: conventionPeAdvisor.advisor.lastName,
           businessName: conventionFromEvent.businessName,
           dateEnd: conventionFromEvent.dateEnd,
           dateStart: conventionFromEvent.dateStart,
-          beneficiaryFirstName: beneficiary.firstName,
-          beneficiaryLastName: beneficiary.lastName,
-          beneficiaryEmail: beneficiary.email,
+          beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+          beneficiaryLastName: convention.signatories.beneficiary.lastName,
+          beneficiaryEmail: convention.signatories.beneficiary.email,
           immersionAddress: conventionFromEvent.immersionAddress,
           magicLink: this.generateMagicLinkFn({
             id: conventionFromEvent.id,
             role: "validator",
             targetRoute: frontRoutes.conventionToValidate,
-            email: advisor.email,
+            email: conventionPeAdvisor.advisor.email,
             now: this.timeGateway.now(),
           }),
+          agencyLogoUrl: agency.logoUrl,
         },
       });
   }

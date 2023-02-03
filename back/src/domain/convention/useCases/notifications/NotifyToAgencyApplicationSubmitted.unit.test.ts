@@ -106,6 +106,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
             email: councellorEmail,
             now: timeGateway.now(),
           }),
+          agencyLogoUrl: agencyWithCounsellors.logoUrl,
         },
       },
       {
@@ -128,6 +129,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
             email: councellorEmail2,
             now: timeGateway.now(),
           }),
+          agencyLogoUrl: agencyWithCounsellors.logoUrl,
         },
       },
     ]);
@@ -161,6 +163,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
             email: validatorEmail,
             now: timeGateway.now(),
           }),
+          agencyLogoUrl: agencyWithCounsellors.logoUrl,
         },
       },
     ]);
@@ -196,6 +199,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
             email: councellorEmail,
             now: timeGateway.now(),
           }),
+          agencyLogoUrl: agencyWithConsellorsAndValidator.logoUrl,
         },
       },
       {
@@ -218,6 +222,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
             email: councellorEmail2,
             now: timeGateway.now(),
           }),
+          agencyLogoUrl: agencyWithConsellorsAndValidator.logoUrl,
         },
       },
     ]);

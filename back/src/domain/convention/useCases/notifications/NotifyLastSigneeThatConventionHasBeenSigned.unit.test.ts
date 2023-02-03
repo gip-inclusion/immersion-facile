@@ -1,4 +1,5 @@
 import {
+  AgencyDto,
   ConventionDto,
   ConventionDtoBuilder,
   expectPromiseToFailWithError,
@@ -25,14 +26,18 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
   let usecase: NotifyLastSigneeThatConventionHasBeenSigned;
   let uow: InMemoryUnitOfWork;
   let timeGateway: CustomTimeGateway;
+  let agency: AgencyDto;
 
   beforeEach(() => {
+    uow = createInMemoryUow();
+    agency = uow.agencyRepository.agencies[0];
     conventionSignedByNoOne = new ConventionDtoBuilder()
+      .withAgencyId(agency.id)
       .signedByBeneficiary(undefined)
       .signedByEstablishmentRepresentative(undefined)
       .build();
     emailGw = new InMemoryEmailGateway();
-    uow = createInMemoryUow();
+
     timeGateway = new CustomTimeGateway();
     usecase = new NotifyLastSigneeThatConventionHasBeenSigned(
       new InMemoryUowPerformer(uow),
@@ -69,6 +74,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
           demandeId: signedConvention.id,
           signedAt: signedConvention.signatories.beneficiary.signedAt!,
           conventionStatusLink,
+          agencyLogoUrl: agency.logoUrl,
         },
         recipients: [signedConvention.signatories.beneficiary.email],
         type: "SIGNEE_HAS_SIGNED_CONVENTION",
@@ -81,6 +87,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
       .signedByBeneficiary(new Date().toISOString())
       .signedByEstablishmentRepresentative(new Date().toISOString())
       .build();
+    const expectedAgency = uow.agencyRepository.agencies[0];
     const now = new Date();
     timeGateway.setNextDate(now);
     uow.conventionRepository._conventions = {
@@ -104,6 +111,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
               signedConvention.signatories.establishmentRepresentative.email,
             now,
           }),
+          agencyLogoUrl: expectedAgency.logoUrl,
         },
         recipients: [
           signedConvention.signatories.establishmentRepresentative.email,

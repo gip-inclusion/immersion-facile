@@ -7,7 +7,6 @@ import {
   WithConventionId,
 } from "shared";
 import { ConventionQueries } from "../../domain/convention/ports/ConventionQueries";
-import { ImmersionAssessmentEmailParams } from "../../domain/immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
 import { createLogger } from "../../utils/logger";
 import { InMemoryOutboxRepository } from "./core/InMemoryOutboxRepository";
 import { InMemoryConventionRepository } from "./InMemoryConventionRepository";
@@ -53,15 +52,14 @@ export class InMemoryConventionQueries implements ConventionQueries {
     );
   }
 
-  public async getAllImmersionAssessmentEmailParamsForThoseEndingThatDidntReceivedAssessmentLink(
+  public async getAllConventionsForThoseEndingThatDidntReceivedAssessmentLink(
     dateEnd: Date,
-  ): Promise<ImmersionAssessmentEmailParams[]> {
+  ): Promise<ConventionReadDto[]> {
     const immersionIdsThatAlreadyGotAnEmail = this.outboxRepository
       ? this.outboxRepository.events
           .filter(propEq("topic", "EmailWithLinkToCreateAssessmentSent"))
           .map((event) => (event.payload as WithConventionId).id)
       : [];
-
     return Object.values(this.conventionRepository._conventions)
       .filter(
         (convention) =>
@@ -69,17 +67,10 @@ export class InMemoryConventionQueries implements ConventionQueries {
           validatedConventionStatuses.includes(convention.status) &&
           !immersionIdsThatAlreadyGotAnEmail.includes(convention.id),
       )
-      .map((convention) => {
-        const { beneficiary } = convention.signatories;
-
-        return {
-          internshipKind: convention.internshipKind,
-          immersionId: convention.id,
-          establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
-          establishmentTutorEmail: convention.establishmentTutor.email,
-          beneficiaryFirstName: beneficiary.firstName,
-          beneficiaryLastName: beneficiary.lastName,
-        };
-      });
+      .map((convention) => ({
+        ...convention,
+        agencyName: TEST_AGENCY_NAME,
+        agencyDepartment: TEST_AGENCY_DEPARTMENT,
+      }));
   }
 }

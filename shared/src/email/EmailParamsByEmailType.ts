@@ -7,12 +7,14 @@ export type EmailParamsByEmailType = {
     demandeId: string;
     signedAt: string;
     conventionStatusLink: string;
+    agencyLogoUrl: string | undefined;
   };
   NEW_CONVENTION_BENEFICIARY_CONFIRMATION: {
     internshipKind: InternshipKind;
     demandeId: string;
     firstName: string;
     lastName: string;
+    agencyLogoUrl: string | undefined;
   };
   NEW_CONVENTION_AGENCY_NOTIFICATION: {
     internshipKind: InternshipKind;
@@ -25,6 +27,7 @@ export type EmailParamsByEmailType = {
     agencyName: string;
     magicLink: string;
     conventionStatusLink: string;
+    agencyLogoUrl: string | undefined;
   };
   NEW_CONVENTION_ESTABLISHMENT_TUTOR_CONFIRMATION: {
     internshipKind: InternshipKind;
@@ -32,6 +35,7 @@ export type EmailParamsByEmailType = {
     establishmentTutorName: string;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
+    agencyLogoUrl: string | undefined;
   };
   VALIDATED_CONVENTION_FINAL_CONFIRMATION: {
     internshipKind: InternshipKind;
@@ -60,6 +64,7 @@ export type EmailParamsByEmailType = {
     agencyName: string;
     emergencyContactInfos: string;
     beneficiaryBirthdate: string;
+    agencyLogoUrl: string | undefined;
   };
   POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED: {
     advisorFirstName: string;
@@ -72,6 +77,7 @@ export type EmailParamsByEmailType = {
     dateEnd: string;
     businessName: string;
     magicLink: string;
+    agencyLogoUrl: string | undefined;
   };
   POLE_EMPLOI_ADVISOR_ON_CONVENTION_ASSOCIATION: {
     advisorFirstName: string;
@@ -84,6 +90,7 @@ export type EmailParamsByEmailType = {
     dateEnd: string;
     businessName: string;
     magicLink: string;
+    agencyLogoUrl: string | undefined;
   };
   REJECTED_CONVENTION_NOTIFICATION: {
     internshipKind: InternshipKind;
@@ -94,6 +101,7 @@ export type EmailParamsByEmailType = {
     signature: string;
     immersionProfession: string;
     agency: string;
+    agencyLogoUrl: string | undefined;
   };
   CONVENTION_MODIFICATION_REQUEST_NOTIFICATION: {
     internshipKind: InternshipKind;
@@ -106,6 +114,7 @@ export type EmailParamsByEmailType = {
     agency: string;
     magicLink: string;
     conventionStatusLink: string;
+    agencyLogoUrl: string | undefined;
   };
   NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION: {
     internshipKind: InternshipKind;
@@ -115,6 +124,7 @@ export type EmailParamsByEmailType = {
     magicLink: string;
     conventionStatusLink: string;
     possibleRoleAction: string;
+    agencyLogoUrl: string | undefined;
   };
   MAGIC_LINK_RENEWAL: {
     internshipKind: InternshipKind;
@@ -131,6 +141,7 @@ export type EmailParamsByEmailType = {
     immersionProfession: string;
     businessName: string;
     establishmentRepresentativeName: string;
+    agencyLogoUrl: string | undefined;
   };
   NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE: {
     internshipKind: InternshipKind;
@@ -142,6 +153,7 @@ export type EmailParamsByEmailType = {
     magicLink: string;
     conventionStatusLink: string;
     businessName: string;
+    agencyLogoUrl: string | undefined;
   };
   CONTACT_BY_EMAIL_REQUEST: {
     businessName: string;
@@ -176,7 +188,7 @@ export type EmailParamsByEmailType = {
   };
   AGENCY_WAS_ACTIVATED: {
     agencyName: string;
-    agencyLogoUrl?: string;
+    agencyLogoUrl: string | undefined;
   };
   EDIT_FORM_ESTABLISHMENT_LINK: {
     editFrontUrl: string;
@@ -195,6 +207,7 @@ export type EmailParamsByEmailType = {
     beneficiaryLastName: string;
     establishmentTutorName: string;
     immersionAssessmentCreationLink: string;
+    agencyLogoUrl: string | undefined;
   };
   FULL_PREVIEW_EMAIL: {
     internshipKind: InternshipKind;
@@ -206,5 +219,6 @@ export type EmailParamsByEmailType = {
     magicLink: string;
     conventionStatusLink: string;
     businessName: string;
+    agencyLogoUrl: string | undefined;
   };
 };

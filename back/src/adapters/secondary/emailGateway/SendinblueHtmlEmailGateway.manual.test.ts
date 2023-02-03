@@ -28,6 +28,7 @@ describe("SendingBlueHtmlEmailGateway manual", () => {
         establishmentRepresentativeName: "Stéphane Le Rep",
         beneficiaryName: "John Doe",
         signatoryName: "John Doe",
+        agencyLogoUrl: "toto",
       },
     });
 

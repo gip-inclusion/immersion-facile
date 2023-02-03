@@ -98,6 +98,7 @@ export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<Conven
               recipients.role === "counsellor"
                 ? "en vérifier l'éligibilité"
                 : "en considérer la validation",
+            agencyLogoUrl: agency.logoUrl,
           },
         });
       }),

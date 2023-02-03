@@ -61,6 +61,9 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
 
     expectSentEmails(gateways.email, [
       {
+        type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
+      },
+      {
         type: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
         recipients: [validConvention.signatories.beneficiary.email],
       },
@@ -69,9 +72,6 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
         recipients: [
           validConvention.signatories.establishmentRepresentative.email,
         ],
-      },
-      {
-        type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
       },
     ]);
   });
@@ -176,17 +176,17 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   const sentEmails = gateways.email.getSentEmails();
   expect(sentEmails).toHaveLength(numberOfEmailInitialySent - 1);
   expect(sentEmails.map((e) => e.recipients)).toEqual([
+    [VALID_EMAILS[2]],
     [VALID_EMAILS[0]],
     [VALID_EMAILS[1]],
-    [VALID_EMAILS[2]],
   ]);
 
   const beneficiarySignEmail = expectEmailOfType(
-    sentEmails[0],
+    sentEmails[1],
     "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
   );
   const establishmentSignEmail = expectEmailOfType(
-    sentEmails[1],
+    sentEmails[2],
     "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
   );
 

@@ -114,6 +114,7 @@ export const getValidatedConventionFinalConfirmationParams = (
       beneficiaryRepresentative,
       beneficiary,
     }),
+    agencyLogoUrl: agency.logoUrl,
   };
 };
 

@@ -266,6 +266,7 @@ export const createUseCases = (
       // notifications
       confirmToSignatoriesThatConventionCorrectlySubmittedRequestSignature:
         new ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature(
+          uowPerformer,
           gateways.email,
           makeConventionMagicLink,
           gateways.timeGateway,

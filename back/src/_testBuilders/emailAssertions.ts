@@ -25,12 +25,14 @@ export const expectEmaiSignatoryConfirmationSignatureRequestMatchingConvention =
     signatory,
     recipient,
     now,
+    agency,
   }: {
     templatedEmail: TemplatedEmail;
     convention: ConventionDto;
     signatory: Signatory;
     recipient: string;
     now: Date;
+    agency: AgencyDto;
   }) => {
     const { id, businessName } = convention;
     const {
@@ -71,6 +73,7 @@ export const expectEmaiSignatoryConfirmationSignatureRequestMatchingConvention =
           targetRoute: frontRoutes.conventionStatusDashboard,
         }),
         businessName,
+        agencyLogoUrl: agency.logoUrl,
       },
     });
   };
@@ -104,14 +107,25 @@ export const expectedEmailEstablishmentCreatedReviewMatchingEstablisment = (
     cc: establishmentDto.businessContact.copyEmails,
   });
 
-export const expectedEmailConventionReviewMatchingConvention = (
-  templatedEmail: TemplatedEmail,
-  recipient: string,
-  convention: ConventionDto,
-  magicLink: string,
-  conventionStatusLink: string,
-  possibleRoleAction: string,
-) =>
+type ExpectedEmailConventionReviewMatchingConventionProps = {
+  templatedEmail: TemplatedEmail;
+  recipient: string;
+  convention: ConventionDto;
+  magicLink: string;
+  conventionStatusLink: string;
+  possibleRoleAction: string;
+  agency: AgencyDto;
+};
+
+export const expectedEmailConventionReviewMatchingConvention = ({
+  templatedEmail,
+  recipient,
+  convention,
+  magicLink,
+  conventionStatusLink,
+  possibleRoleAction,
+  agency,
+}: ExpectedEmailConventionReviewMatchingConventionProps) =>
   expectTypeToMatchAndEqual(templatedEmail, {
     type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
     recipients: [recipient],
@@ -123,6 +137,7 @@ export const expectedEmailConventionReviewMatchingConvention = (
       magicLink,
       possibleRoleAction,
       conventionStatusLink,
+      agencyLogoUrl: agency.logoUrl,
     },
   });
 
@@ -144,6 +159,7 @@ export const expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected = (
       signature: agency.signature,
       agency: agency.name,
       immersionProfession: convention.immersionAppellation.appellationLabel,
+      agencyLogoUrl: agency.logoUrl,
     },
   });
 };

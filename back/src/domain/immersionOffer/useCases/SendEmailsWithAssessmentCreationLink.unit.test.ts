@@ -53,6 +53,7 @@ const prepareUseCase = () => {
     emailGateway,
     conventionRepository,
     timeGateway,
+    agencyRepository: uow.agencyRepository,
   };
 };
 
@@ -65,11 +66,13 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
       emailGateway,
       conventionRepository,
       timeGateway,
+      agencyRepository,
     } = prepareUseCase();
 
     timeGateway.setNextDate(new Date("2021-05-15T08:00:00.000Z"));
-
+    const expectedAgency = agencyRepository.agencies[0];
     const immersionApplicationEndingTomorrow = new ConventionDtoBuilder()
+      .withAgencyId(expectedAgency.id)
       .withDateStart("2021-05-13T10:00:00.000Z")
       .withDateEnd("2021-05-16T10:00:00.000Z")
       .withId("immersion-ending-tommorow-id")
@@ -79,6 +82,7 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
       .build();
 
     const immersionApplicationEndingYesterday = new ConventionDtoBuilder()
+      .withAgencyId(expectedAgency.id)
       .withDateEnd("2021-05-14T10:00:00.000Z")
       .validated()
       .build();
@@ -106,6 +110,7 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
               .firstName,
           beneficiaryLastName:
             immersionApplicationEndingTomorrow.signatories.beneficiary.lastName,
+          agencyLogoUrl: expectedAgency.logoUrl,
         },
       },
     ]);

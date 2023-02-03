@@ -8,7 +8,6 @@ import {
   validatedConventionStatuses,
 } from "shared";
 import { ConventionQueries } from "../../../domain/convention/ports/ConventionQueries";
-import { ImmersionAssessmentEmailParams } from "../../../domain/immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
 import {
   getReadConventionById,
   selectAllConventionDtosById,
@@ -39,33 +38,17 @@ export class PgConventionQueries implements ConventionQueries {
     return getReadConventionById(this.client, id);
   }
 
-  public async getAllImmersionAssessmentEmailParamsForThoseEndingThatDidntReceivedAssessmentLink(
+  public async getAllConventionsForThoseEndingThatDidntReceivedAssessmentLink(
     dateEnd: Date,
-  ): Promise<ImmersionAssessmentEmailParams[]> {
-    const pgResult = await this.client.query(
+  ): Promise<ConventionReadDto[]> {
+    const filtersSQL = [
+      format("conventions.date_end::date = %1$L", dateEnd),
+      format("conventions.status IN (%1$L)", validatedConventionStatuses),
       format(
-        `
-        WITH beneficiaries AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = beneficiary_id),
-          establishmentTutors AS (SELECT conventions.id as convention_id, actors.* from actors LEFT JOIN conventions ON actors.id = establishment_tutor_id)
-        SELECT JSON_BUILD_OBJECT(
-              'immersionId', conventions.id, 
-              'beneficiaryFirstName', beneficiaries.first_name, 
-              'beneficiaryLastName', beneficiaries.last_name,
-              'establishmentTutorName', CONCAT(establishmentTutors.first_name, ' ', establishmentTutors.last_name), 
-              'establishmentTutorEmail', establishmentTutors.email,
-              'internshipKind',conventions.internship_kind
-        ) AS params      
-       FROM conventions 
-       LEFT JOIN beneficiaries ON beneficiaries.convention_id = conventions.id
-       LEFT JOIN establishmentTutors ON establishmentTutors.convention_id = conventions.id
-       WHERE date_end::date = $1
-       AND status IN (%1$L)
-       AND conventions.id NOT IN (SELECT (payload ->> 'id')::uuid FROM outbox where topic = 'EmailWithLinkToCreateAssessmentSent' )`,
-        validatedConventionStatuses,
+        "conventions.id NOT IN (SELECT (payload ->> 'id')::uuid FROM outbox where topic = 'EmailWithLinkToCreateAssessmentSent' )",
       ),
-      [dateEnd],
-    );
-    return pgResult.rows.map((row) => row.params);
+    ];
+    return this.getConventionsWhere(`WHERE ${filtersSQL.join(" AND ")}`);
   }
 
   private async getConventionsWhere(

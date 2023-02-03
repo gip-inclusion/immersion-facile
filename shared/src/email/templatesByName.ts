@@ -47,8 +47,8 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       firstName,
       lastName,
       internshipKind,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       demandeId,
+      agencyLogoUrl,
     }) => ({
       subject: `${
         internshipKind === "immersion"
@@ -73,6 +73,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
               "https://immersion.cellar-c2.services.clever-cloud.com/les_bons_conseils_beneficiaire.pdf",
             ]
           : undefined,
+      agencyLogoUrl,
     }),
   },
   NEW_CONVENTION_ESTABLISHMENT_TUTOR_CONFIRMATION: {
@@ -85,6 +86,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       internshipKind,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       demandeId,
+      agencyLogoUrl,
     }) => ({
       subject: `${
         internshipKind === "immersion"
@@ -112,6 +114,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
         internshipKind === "immersion" ? "cette immersion" : "ce mini stage"
       } tant que vous n'avez pas reçu la validation !`,
       subContent: defaultSignature(internshipKind),
+      agencyLogoUrl,
     }),
   },
   NEW_CONVENTION_AGENCY_NOTIFICATION: {
@@ -129,6 +132,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       internshipKind,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       demandeId,
+      agencyLogoUrl,
     }) => ({
       subject:
         internshipKind === "immersion"
@@ -171,6 +175,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
               "https://immersion.cellar-c2.services.clever-cloud.com/les_bons_conseils_prescripteur.pdf",
             ]
           : undefined,
+      agencyLogoUrl,
     }),
   },
   VALIDATED_CONVENTION_FINAL_CONFIRMATION: {
@@ -207,6 +212,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       emergencyContact,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       emergencyContactPhone,
+      agencyLogoUrl,
     }) => ({
       subject:
         internshipKind === "immersion"
@@ -320,6 +326,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       
       ${signature}`,
       legals: defaultConventionFinalLegals(internshipKind),
+      agencyLogoUrl,
     }),
   },
   POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED: {
@@ -336,6 +343,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       dateEnd,
       dateStart,
       immersionAddress,
+      agencyLogoUrl,
     }) => ({
       subject: `Immersion Facilitée - la demande de convention d'immersion envoyée par ${beneficiaryFirstName} ${beneficiaryLastName} est totalement signée. A vous de la valider !`,
       greetings: `Bonjour ${advisorFirstName} ${advisorLastName},`,
@@ -367,6 +375,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       attachmentUrls: [
         "https://immersion.cellar-c2.services.clever-cloud.com/les_bons_conseils_prescripteur_pole_emploi.pdf",
       ],
+      agencyLogoUrl,
     }),
   },
   POLE_EMPLOI_ADVISOR_ON_CONVENTION_ASSOCIATION: {
@@ -384,6 +393,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       beneficiaryLastName,
       businessName,
       immersionAddress,
+      agencyLogoUrl,
     }) => ({
       subject: `Immersion Facilitée - une demande de convention d'immersion vous est directement adressée par: ${beneficiaryFirstName} ${beneficiaryLastName}`,
       greetings: `Bonjour ${advisorFirstName} ${advisorLastName},`,
@@ -429,6 +439,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       attachmentUrls: [
         "https://immersion.cellar-c2.services.clever-cloud.com/les_bons_conseils_prescripteur_pole_emploi.pdf",
       ],
+      agencyLogoUrl,
     }),
   },
   REJECTED_CONVENTION_NOTIFICATION: {
@@ -443,6 +454,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       businessName,
       signature,
       internshipKind,
+      agencyLogoUrl,
     }) => ({
       subject:
         internshipKind === "immersion"
@@ -467,6 +479,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       Bien cordialement,       
       ${signature} 
       `,
+      agencyLogoUrl,
     }),
   },
   CONVENTION_MODIFICATION_REQUEST_NOTIFICATION: {
@@ -484,6 +497,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       internshipKind,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       immersionAppellation,
+      agencyLogoUrl,
     }) => ({
       subject:
         internshipKind === "immersion"
@@ -509,6 +523,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       Bien cordialement,      
       ${signature}
       `,
+      agencyLogoUrl,
     }),
   },
   NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION: {
@@ -522,6 +537,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       magicLink,
       conventionStatusLink,
       internshipKind,
+      agencyLogoUrl,
     }) => ({
       subject:
         internshipKind === "immersion"
@@ -554,6 +570,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
               "https://immersion.cellar-c2.services.clever-cloud.com/les_bons_conseils_prescripteur.pdf",
             ]
           : undefined,
+      agencyLogoUrl,
     }),
   },
   MAGIC_LINK_RENEWAL: {
@@ -599,6 +616,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       magicLink,
       conventionStatusLink,
       internshipKind,
+      agencyLogoUrl,
     }) => ({
       subject:
         internshipKind === "immersion"
@@ -625,6 +643,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       
       ${defaultSignature(internshipKind)}
       `,
+      agencyLogoUrl,
     }),
   },
   NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE: {
@@ -640,6 +659,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       magicLink,
       conventionStatusLink,
       internshipKind,
+      agencyLogoUrl,
     }) => ({
       subject:
         internshipKind === "immersion"
@@ -691,6 +711,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
               "https://immersion.cellar-c2.services.clever-cloud.com/les_etapes_de_votre_demande.pdf",
             ]
           : undefined,
+      agencyLogoUrl,
     }),
   },
   CONTACT_BY_EMAIL_REQUEST: {
@@ -905,6 +926,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       beneficiaryLastName,
       immersionAssessmentCreationLink,
       internshipKind,
+      agencyLogoUrl,
     }) => ({
       subject:
         internshipKind === "immersion"
@@ -943,6 +965,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       Merci  !      
       ${defaultSignature(internshipKind)}
       `,
+      agencyLogoUrl,
     }),
   },
   FULL_PREVIEW_EMAIL: {
@@ -964,6 +987,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       beneficiaryCurrentEmployerName,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       beneficiaryRepresentativeName,
+      agencyLogoUrl,
     }) => ({
       subject: "Test contenant toutes les blocs email",
       greetings: `Bonjour ${beneficiaryName}`,
@@ -992,6 +1016,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       highlight: `Attention, ne démarrez pas ${
         internshipKind === "immersion" ? "cette immersion" : "ce mini stage"
       } tant que vous n'avez pas reçu cette validation !`,
+      agencyLogoUrl,
     }),
   },
   SIGNEE_HAS_SIGNED_CONVENTION: {
@@ -1001,6 +1026,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       signedAt,
       conventionStatusLink,
       internshipKind,
+      agencyLogoUrl,
     }) => ({
       subject:
         internshipKind === "immersion"
@@ -1031,6 +1057,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       `,
       subContent: defaultSignature(internshipKind),
       buttons: [createConventionStatusButton(conventionStatusLink)],
+      agencyLogoUrl,
     }),
     tags: ["confirmation de signature de convention"],
   },

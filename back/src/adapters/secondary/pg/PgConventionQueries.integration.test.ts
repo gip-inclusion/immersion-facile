@@ -6,9 +6,9 @@ import {
   ConventionReadDto,
   expectTypeToMatchAndEqual,
   expectArraysToEqualIgnoringOrder,
+  expectToEqual,
 } from "shared";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
-import { ImmersionAssessmentEmailParams } from "../../../domain/immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { RealTimeGateway } from "../core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../core/UuidGeneratorImplementations";
@@ -98,7 +98,7 @@ describe("Pg implementation of ConventionQueries", () => {
     });
   });
 
-  describe("PG implementation of method getAllImmersionAssessmentEmailParamsForThoseEndingThatDidntReceivedAssessmentLink", () => {
+  describe("PG implementation of method getAllConventionsForThoseEndingThatDidntReceivedAssessmentLink", () => {
     beforeEach(async () => {
       const agencyRepository = new PgAgencyRepository(client);
       await agencyRepository.insert(AgencyDtoBuilder.create().build());
@@ -110,26 +110,34 @@ describe("Pg implementation of ConventionQueries", () => {
       // Prepare : insert an immersion ending the 14/05/2022 and two others ending the 15/05/2022 amongst which one already received an assessment link.
       const conventionRepo = new PgConventionRepository(client);
       const outboxRepo = new PgOutboxRepository(client);
+      const dateStart = new Date("2022-05-10").toISOString();
+      const dateEnd14 = new Date("2022-05-14").toISOString();
+      const dateEnd15 = new Date("2022-05-15").toISOString();
       const validatedImmersionEndingThe14th = new ConventionDtoBuilder()
         .withId("aaaaac14-9c0a-aaaa-aa6d-6aa9ad38aaaa")
         .validated()
-        .withDateEnd("2022-05-14")
+        .withDateStart(dateStart)
+        .withDateEnd(dateEnd14)
         .build();
       const validatedImmersionEndingThe15thThatAlreadyReceivedAnEmail =
         new ConventionDtoBuilder()
           .withId("aaaaac15-9c0a-aaaa-aa6d-6aa9ad38aaaa")
           .validated()
-          .withDateEnd("2022-05-15")
+          .withDateStart(dateStart)
+          .withDateEnd(dateEnd15)
           .build();
       const validatedImmersionEndingThe15th = new ConventionDtoBuilder()
         .withId("bbbbbc15-9c0a-aaaa-aa6d-6aa9ad38aaaa")
         .validated()
-        .withDateEnd("2022-05-15")
+        .withDateStart(dateStart)
+        .withDateEnd(dateEnd15)
         .withEstablishmentTutorFirstName("Romain")
         .withEstablishmentTutorLastName("Grandjean")
+        .withExternalId("3")
         .build();
       const ongoingImmersionEndingThe15th = new ConventionDtoBuilder()
         .withId("cccccc15-9c0a-aaaa-aa6d-6aa9ad38aaaa")
+        .withDateStart("2022-05-10")
         .withDateEnd("2022-05-15")
         .withStatus("IN_REVIEW")
         .build();
@@ -156,25 +164,18 @@ describe("Pg implementation of ConventionQueries", () => {
 
       // Act
       const queryResults =
-        await conventionQueries.getAllImmersionAssessmentEmailParamsForThoseEndingThatDidntReceivedAssessmentLink(
+        await conventionQueries.getAllConventionsForThoseEndingThatDidntReceivedAssessmentLink(
           new Date("2022-05-15"),
         );
 
       // Assert
-      expect(queryResults).toHaveLength(1);
-      const expectedResult: ImmersionAssessmentEmailParams = {
-        internshipKind: validatedImmersionEndingThe15th.internshipKind,
-        immersionId: validatedImmersionEndingThe15th.id,
-        establishmentTutorEmail:
-          validatedImmersionEndingThe15th.signatories
-            .establishmentRepresentative.email,
-        establishmentTutorName: "Romain Grandjean",
-        beneficiaryFirstName:
-          validatedImmersionEndingThe15th.signatories.beneficiary.firstName,
-        beneficiaryLastName:
-          validatedImmersionEndingThe15th.signatories.beneficiary.lastName,
-      };
-      expect(queryResults[0]).toEqual(expectedResult);
+      expectToEqual(queryResults, [
+        {
+          ...validatedImmersionEndingThe15th,
+          agencyName: "empty-name",
+          agencyDepartment: "",
+        },
+      ]);
     });
   });
 

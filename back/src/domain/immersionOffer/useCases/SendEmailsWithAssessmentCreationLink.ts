@@ -1,5 +1,5 @@
 import { addDays } from "date-fns";
-import { ConventionId, frontRoutes, InternshipKind } from "shared";
+import { ConventionDto, ConventionId, frontRoutes } from "shared";
 import { z } from "zod";
 import { GenerateConventionMagicLink } from "../../../adapters/primary/config/createGenerateConventionMagicLink";
 import { createLogger } from "../../../utils/logger";
@@ -11,15 +11,6 @@ import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
 const logger = createLogger(__filename);
-
-export type ImmersionAssessmentEmailParams = {
-  internshipKind: InternshipKind;
-  immersionId: ConventionId;
-  establishmentTutorName: string;
-  establishmentTutorEmail: string;
-  beneficiaryFirstName: string;
-  beneficiaryLastName: string;
-};
 
 export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<void> {
   inputSchema = z.void();
@@ -37,70 +28,70 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<v
   protected async _execute(_: void, uow: UnitOfWork): Promise<void> {
     const now = this.timeGateway.now();
     const tomorrow = addDays(now, 1);
-    const assessmentEmailParamsOfImmersionEndingTomorrow =
-      await uow.conventionQueries.getAllImmersionAssessmentEmailParamsForThoseEndingThatDidntReceivedAssessmentLink(
+    const conventions =
+      await uow.conventionQueries.getAllConventionsForThoseEndingThatDidntReceivedAssessmentLink(
         tomorrow,
       );
 
     logger.info(
       `[${now.toISOString()}]: About to send assessment email to ${
-        assessmentEmailParamsOfImmersionEndingTomorrow.length
+        conventions.length
       } establishments`,
     );
-    if (assessmentEmailParamsOfImmersionEndingTomorrow.length === 0) return;
+    if (conventions.length === 0) return;
 
     const errors: Record<ConventionId, any> = {};
     await Promise.all(
-      assessmentEmailParamsOfImmersionEndingTomorrow.map(
-        async (immersionEndingTomorrow) => {
-          await this._sendOneEmailWithImmersionAssessmentCreationLink(
-            uow,
-            immersionEndingTomorrow,
-          ).catch((error: any) => {
-            errors[immersionEndingTomorrow.immersionId] = error;
-          });
-        },
-      ),
+      conventions.map(async (convention) => {
+        await this._sendOneEmailWithImmersionAssessmentCreationLink(
+          uow,
+          convention,
+        ).catch((error: any) => {
+          errors[convention.id] = error;
+        });
+      }),
     );
 
     // Notify discord with a
-    this.notifyDiscord(
-      errors,
-      assessmentEmailParamsOfImmersionEndingTomorrow.length,
-    );
+    this.notifyDiscord(errors, conventions.length);
   }
 
   private async _sendOneEmailWithImmersionAssessmentCreationLink(
     uow: UnitOfWork,
-    immersionAssessmentEmailParams: ImmersionAssessmentEmailParams,
+    convention: ConventionDto,
   ) {
-    const immersionAssessmentCreationLink = this.generateConventionMagicLink({
-      id: immersionAssessmentEmailParams.immersionId,
-      email: immersionAssessmentEmailParams.establishmentTutorEmail,
-      role: "establishment",
-      targetRoute: frontRoutes.immersionAssessment,
-      now: this.timeGateway.now(),
-    });
+    const agency = await uow.agencyRepository.getById(convention.agencyId);
+    if (!agency)
+      throw new Error(`Missing agency ${convention.agencyId} on repository.`);
 
     await this.emailGateway.sendEmail({
       type: "CREATE_IMMERSION_ASSESSMENT",
-      recipients: [immersionAssessmentEmailParams.establishmentTutorEmail],
+      recipients: [convention.establishmentTutor.email],
       params: {
-        internshipKind: immersionAssessmentEmailParams.internshipKind,
-        immersionAssessmentCreationLink,
+        internshipKind: convention.internshipKind,
+        immersionAssessmentCreationLink: this.generateConventionMagicLink({
+          id: convention.id,
+          email: convention.establishmentTutor.email,
+          role: "establishment",
+          targetRoute: frontRoutes.immersionAssessment,
+          now: this.timeGateway.now(),
+        }),
         establishmentTutorName:
-          immersionAssessmentEmailParams.establishmentTutorName,
-        beneficiaryFirstName:
-          immersionAssessmentEmailParams.beneficiaryFirstName,
-        beneficiaryLastName: immersionAssessmentEmailParams.beneficiaryLastName,
+          convention.establishmentTutor.firstName +
+          " " +
+          convention.establishmentTutor.lastName,
+        beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+        beneficiaryLastName: convention.signatories.beneficiary.lastName,
+        agencyLogoUrl: agency.logoUrl,
       },
     });
 
-    const event = this.createNewEvent({
-      topic: "EmailWithLinkToCreateAssessmentSent",
-      payload: { id: immersionAssessmentEmailParams.immersionId },
-    });
-    await uow.outboxRepository.save(event);
+    await uow.outboxRepository.save(
+      this.createNewEvent({
+        topic: "EmailWithLinkToCreateAssessmentSent",
+        payload: { id: convention.id },
+      }),
+    );
   }
 
   private notifyDiscord(

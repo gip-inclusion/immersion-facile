@@ -3,6 +3,7 @@ import {
   ConventionDtoBuilder,
   frontRoutes,
   expectTypeToMatchAndEqual,
+  AgencyDto,
 } from "shared";
 import {
   createInMemoryUow,
@@ -20,11 +21,13 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
   let uow: InMemoryUnitOfWork;
   let emailGateway: InMemoryEmailGateway;
   let usecase: NotifyPoleEmploiUserAdvisorOnConventionFullySigned;
+  let agency: AgencyDto;
   const timeGateway = new CustomTimeGateway();
 
   beforeEach(() => {
     emailGateway = new InMemoryEmailGateway();
     uow = createInMemoryUow();
+    agency = uow.agencyRepository.agencies[0];
     usecase = new NotifyPoleEmploiUserAdvisorOnConventionFullySigned(
       new InMemoryUowPerformer(uow),
       emailGateway,
@@ -45,6 +48,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
   it("should send email with the correct params", async () => {
     const conventionDtoFromEvent = new ConventionDtoBuilder()
       .withId(conventionId)
+      .withAgencyId(agency.id)
       .withFederatedIdentity(`peConnect:${userPeExternalId}`)
       .withBeneficiaryFirstName("John")
       .withBeneficiaryLastName("Doe")
@@ -95,6 +99,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
             email: advisor.email,
             now: timeGateway.now(),
           }),
+          agencyLogoUrl: agency.logoUrl,
         },
       },
     ]);
@@ -102,6 +107,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
   it("peConnected without advisor", async () => {
     const conventionDtoFromEvent = new ConventionDtoBuilder()
       .withId(conventionId)
+      .withAgencyId(agency.id)
       .withFederatedIdentity(`peConnect:${userPeExternalId}`)
       .withBeneficiaryFirstName("John")
       .withBeneficiaryLastName("Doe")

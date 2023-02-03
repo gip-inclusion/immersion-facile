@@ -14,6 +14,9 @@ import {
 } from "shared";
 import { useStyles } from "tss-react/dsfr";
 
+const defaultEmailPreviewUrl =
+  "https://upload.wikimedia.org/wikipedia/en/9/9a/Trollface_non-free.png";
+
 type TemplateByName = typeof templatesByName;
 type TemplateName = keyof TemplateByName;
 
@@ -197,6 +200,7 @@ export const defaultEmailValueByEmailKind: {
     demandeId: "DEMANDE_ID",
     firstName: "FIRST_NAME",
     lastName: "LAST_NAME",
+    agencyLogoUrl: defaultEmailPreviewUrl,
   },
   NEW_CONVENTION_ESTABLISHMENT_TUTOR_CONFIRMATION: {
     internshipKind: "immersion",
@@ -204,6 +208,7 @@ export const defaultEmailValueByEmailKind: {
     establishmentTutorName: "ESTABLISHMENT_TUTOR_NAME",
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
+    agencyLogoUrl: defaultEmailPreviewUrl,
   },
   NEW_CONVENTION_AGENCY_NOTIFICATION: {
     internshipKind: "immersion",
@@ -216,6 +221,7 @@ export const defaultEmailValueByEmailKind: {
     agencyName: "AGENCY_NAME",
     magicLink: "MAGIC_LINK",
     conventionStatusLink: "CONVENTION_STATUS_LINK",
+    agencyLogoUrl: defaultEmailPreviewUrl,
   },
   VALIDATED_CONVENTION_FINAL_CONFIRMATION: {
     internshipKind: "immersion",
@@ -244,6 +250,7 @@ export const defaultEmailValueByEmailKind: {
     workConditions: undefined,
     agencyName: "AGENCY_NAME",
     beneficiaryCurrentEmployerName: "BENEFICIARY_CURRENT_EMPLOYER_NAME",
+    agencyLogoUrl: defaultEmailPreviewUrl,
   },
   POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED: {
     advisorFirstName: "ADVISOR_FIRST_NAME",
@@ -256,6 +263,7 @@ export const defaultEmailValueByEmailKind: {
     dateEnd: "DATE_END",
     businessName: "BUSINESS_NAME",
     magicLink: "MAGIC_LINK",
+    agencyLogoUrl: defaultEmailPreviewUrl,
   },
   POLE_EMPLOI_ADVISOR_ON_CONVENTION_ASSOCIATION: {
     advisorFirstName: "ADVISOR_FIRST_NAME",
@@ -268,6 +276,7 @@ export const defaultEmailValueByEmailKind: {
     dateEnd: "DATE_END",
     businessName: "BUSINESS_NAME",
     magicLink: "MAGIC_LINK",
+    agencyLogoUrl: defaultEmailPreviewUrl,
   },
   REJECTED_CONVENTION_NOTIFICATION: {
     internshipKind: "immersion",
@@ -278,6 +287,7 @@ export const defaultEmailValueByEmailKind: {
     signature: "SIGNATURE",
     immersionProfession: "IMMERSION_PROFESSION",
     agency: "AGENCY",
+    agencyLogoUrl: defaultEmailPreviewUrl,
   },
   CONVENTION_MODIFICATION_REQUEST_NOTIFICATION: {
     internshipKind: "immersion",
@@ -295,6 +305,7 @@ export const defaultEmailValueByEmailKind: {
     agency: "AGENCY",
     magicLink: "MAGIC_LINK",
     conventionStatusLink: "CONVENTION_STATUS_LINK",
+    agencyLogoUrl: defaultEmailPreviewUrl,
   },
   NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION: {
     internshipKind: "immersion",
@@ -304,6 +315,7 @@ export const defaultEmailValueByEmailKind: {
     magicLink: "MAGIC_LINK",
     conventionStatusLink: "CONVENTION_STATUS_LINK",
     possibleRoleAction: "POSSIBLE_ROLE_ACTION",
+    agencyLogoUrl: defaultEmailPreviewUrl,
   },
   MAGIC_LINK_RENEWAL: {
     internshipKind: "immersion",
@@ -320,6 +332,7 @@ export const defaultEmailValueByEmailKind: {
     immersionProfession: "IMMERSION_PROFESSION",
     businessName: "BUSINESS_NAME",
     establishmentRepresentativeName: "ESTABLISHMENT_REPRESENTATIVE_NAME",
+    agencyLogoUrl: defaultEmailPreviewUrl,
   },
   NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE: {
     internshipKind: "immersion",
@@ -330,6 +343,7 @@ export const defaultEmailValueByEmailKind: {
     magicLink: "MAGIC_LINK",
     conventionStatusLink: "CONVENTION_STATUS_LINK",
     businessName: "BUSINESS_NAME",
+    agencyLogoUrl: defaultEmailPreviewUrl,
   },
   CONTACT_BY_EMAIL_REQUEST: {
     businessName: "BUSINESS_NAME",
@@ -364,7 +378,7 @@ export const defaultEmailValueByEmailKind: {
   },
   AGENCY_WAS_ACTIVATED: {
     agencyName: "AGENCY_NAME",
-    agencyLogoUrl: undefined,
+    agencyLogoUrl: defaultEmailPreviewUrl,
   },
   SUGGEST_EDIT_FORM_ESTABLISHMENT: {
     editFrontUrl: "EDIT_FRONT_URL",
@@ -383,6 +397,7 @@ export const defaultEmailValueByEmailKind: {
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
     establishmentTutorName: "ESTABLISHMENT_TUTOR_NAME",
     immersionAssessmentCreationLink: "IMMERSION_ASSESSMENT_CREATION_LINK",
+    agencyLogoUrl: defaultEmailPreviewUrl,
   },
   FULL_PREVIEW_EMAIL: {
     internshipKind: "immersion",
@@ -393,11 +408,13 @@ export const defaultEmailValueByEmailKind: {
     magicLink: "MAGIC_LINK",
     conventionStatusLink: "CONVENTION_STATUS_LINK",
     businessName: "BUSINESS_NAME",
+    agencyLogoUrl: defaultEmailPreviewUrl,
   },
   SIGNEE_HAS_SIGNED_CONVENTION: {
     internshipKind: "immersion",
     signedAt: new Date().toISOString(),
     demandeId: "DEMANDE_ID",
     conventionStatusLink: "CONVENTION_STATUS_LINK",
+    agencyLogoUrl: defaultEmailPreviewUrl,
   },
 };

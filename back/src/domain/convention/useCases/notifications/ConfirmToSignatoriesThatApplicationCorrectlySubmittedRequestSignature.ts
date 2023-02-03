@@ -8,23 +8,31 @@ import {
 import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
 import { createLogger } from "../../../../utils/logger";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
-import { UseCase } from "../../../core/UseCase";
+import {
+  UnitOfWork,
+  UnitOfWorkPerformer,
+} from "../../../core/ports/UnitOfWork";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import { EmailGateway } from "../../ports/EmailGateway";
 
 const logger = createLogger(__filename);
 
-export class ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature extends UseCase<ConventionDto> {
+export class ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature extends TransactionalUseCase<ConventionDto> {
   constructor(
+    uowPerformer: UnitOfWorkPerformer,
     private readonly emailGateway: EmailGateway,
     private readonly generateMagicLinkFn: GenerateConventionMagicLink,
     private readonly timeGateway: TimeGateway,
   ) {
-    super();
+    super(uowPerformer);
   }
 
   inputSchema = conventionSchema;
 
-  public async _execute(convention: ConventionDto): Promise<void> {
+  public async _execute(
+    convention: ConventionDto,
+    uow: UnitOfWork,
+  ): Promise<void> {
     if (convention.status === "PARTIALLY_SIGNED") {
       logger.info(
         `Skipping sending signature-requiring establishment representative confirmation as convention is already partially signed`,
@@ -32,7 +40,11 @@ export class ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignatu
       return;
     }
 
-    const { id, businessName } = convention;
+    const { id, businessName, agencyId } = convention;
+
+    const agency = await uow.agencyRepository.getById(agencyId);
+    if (!agency) throw new Error(`Missing agency with id ${agencyId}`);
+
     const {
       beneficiary,
       beneficiaryRepresentative,
@@ -70,6 +82,7 @@ export class ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignatu
               targetRoute: frontRoutes.conventionStatusDashboard,
             }),
             businessName,
+            agencyLogoUrl: agency.logoUrl,
           },
         });
       }),

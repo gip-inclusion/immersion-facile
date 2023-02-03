@@ -93,6 +93,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
                 targetRoute: frontRoutes.conventionImmersionRoute,
               }),
               signature: agency.signature,
+              agencyLogoUrl: agency.logoUrl,
             },
           },
         ]);

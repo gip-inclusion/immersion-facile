@@ -47,6 +47,7 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected extends Tra
         signature: agency.signature,
         agency: agency.name,
         immersionProfession: convention.immersionAppellation.appellationLabel,
+        agencyLogoUrl: agency.logoUrl,
       },
     });
   }

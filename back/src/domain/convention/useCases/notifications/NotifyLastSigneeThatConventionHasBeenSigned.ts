@@ -1,4 +1,5 @@
 import {
+  AgencyDto,
   ConventionDto,
   conventionSchema,
   frontRoutes,
@@ -8,7 +9,6 @@ import {
 } from "shared";
 import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
-
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
@@ -18,6 +18,9 @@ import { EmailGateway } from "../../ports/EmailGateway";
 
 export const missingConventionMessage = (convention: ConventionDto) =>
   `Missing convention ${convention.id} on convention repository.`;
+
+export const missingAgencyMessage = (convention: ConventionDto) =>
+  `Missing agency '${convention.agencyId}' on agency repository.`;
 
 export const noSignatoryMessage = (convention: ConventionDto): string =>
   `No signatories has signed the convention id ${convention.id}.`;
@@ -41,20 +44,25 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
     const repositoryConvention = await uow.conventionRepository.getById(
       convention.id,
     );
-    if (repositoryConvention)
-      return this.onRepositoryConvention(repositoryConvention);
-    throw new Error(missingConventionMessage(convention));
+    if (!repositoryConvention)
+      throw new Error(missingConventionMessage(convention));
+    const agency = await uow.agencyRepository.getById(
+      repositoryConvention.agencyId,
+    );
+    if (!agency) throw new Error(missingAgencyMessage(repositoryConvention));
+    return this.onRepositoryConvention(repositoryConvention, agency);
   }
 
   private onRepositoryConvention(
     repositoryConvention: ConventionDto,
+    agency: AgencyDto,
   ): Promise<void> {
     const lastSigneeEmail = this.lastSigneeEmail(
       Object.values(repositoryConvention.signatories),
     );
     if (lastSigneeEmail)
       return this.emailGateway.sendEmail(
-        this.emailToSend(repositoryConvention, lastSigneeEmail),
+        this.emailToSend(repositoryConvention, lastSigneeEmail, agency),
       );
     throw new Error(noSignatoryMessage(repositoryConvention));
   }
@@ -82,6 +90,7 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
   private emailToSend(
     convention: ConventionDto,
     lastSignee: { signedAt: string; email: string; role: SignatoryRole },
+    agency: AgencyDto,
   ): TemplatedEmail {
     const conventionStatusLink = this.generateMagicLink({
       targetRoute: frontRoutes.conventionStatusDashboard,
@@ -94,6 +103,7 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
     return {
       type: "SIGNEE_HAS_SIGNED_CONVENTION",
       params: {
+        agencyLogoUrl: agency.logoUrl,
         internshipKind: convention.internshipKind,
         demandeId: convention.id,
         signedAt: lastSignee.signedAt,

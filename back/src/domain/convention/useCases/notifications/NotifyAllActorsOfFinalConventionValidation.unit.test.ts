@@ -301,6 +301,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
         emergencyContactInfos: displayEmergencyContactInfos({
           ...convention.signatories,
         }),
+        agencyLogoUrl: agency.logoUrl,
       },
     );
   });
@@ -381,6 +382,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
         emergencyContactInfos: displayEmergencyContactInfos({
           ...convention.signatories,
         }),
+        agencyLogoUrl: agency.logoUrl,
       },
     );
   });

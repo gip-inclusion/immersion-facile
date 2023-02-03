@@ -3,7 +3,6 @@ import {
   ConventionReadDto,
   ListConventionsRequestDto,
 } from "shared";
-import { ImmersionAssessmentEmailParams } from "../../immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
 
 export interface ConventionQueries {
   getLatestConventions: (
@@ -12,7 +11,7 @@ export interface ConventionQueries {
   getConventionById: (
     id: ConventionId,
   ) => Promise<ConventionReadDto | undefined>;
-  getAllImmersionAssessmentEmailParamsForThoseEndingThatDidntReceivedAssessmentLink: (
+  getAllConventionsForThoseEndingThatDidntReceivedAssessmentLink: (
     dateEnd: Date,
-  ) => Promise<ImmersionAssessmentEmailParams[]>;
+  ) => Promise<ConventionReadDto[]>;
 }

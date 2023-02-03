@@ -1,4 +1,5 @@
 import {
+  AgencyDto,
   ConventionDto,
   conventionSchema,
   CreateConventionMagicLinkPayloadProperties,
@@ -43,49 +44,53 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
 
     const hasCounsellors = agency.counsellorEmails.length > 0;
 
-    if (!hasCounsellors)
-      return this.sendEmailToRecipients({
-        recipients: agency.validatorEmails,
-        convention,
-        agencyName: agency.name,
-        role: "validator",
-      });
+    const recipients: {
+      recipients: string[];
+      role: Role;
+    } = hasCounsellors
+      ? {
+          recipients: agency.counsellorEmails,
+          role: "counsellor",
+        }
+      : {
+          recipients: agency.validatorEmails,
+          role: "validator",
+        };
 
     return this.sendEmailToRecipients({
-      recipients: agency.counsellorEmails,
+      agency,
       convention,
-      agencyName: agency.name,
-      role: "counsellor",
+      ...recipients,
     });
   }
 
   private async sendEmailToRecipients({
+    agency,
     recipients,
     convention,
-    agencyName,
     role,
   }: {
     recipients: string[];
+    agency: AgencyDto;
     convention: ConventionDto;
-    agencyName: string;
     role: Role;
   }) {
     await Promise.all(
-      recipients.map((counsellorEmail) => {
+      recipients.map((email) => {
         const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties =
           {
             id: convention.id,
             role,
-            email: counsellorEmail,
+            email,
             now: this.timeGateway.now(),
           };
 
         return this.emailGateway.sendEmail({
           type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
-          recipients: [counsellorEmail],
+          recipients: [email],
           params: {
             internshipKind: convention.internshipKind,
-            agencyName,
+            agencyName: agency.name,
             businessName: convention.businessName,
             dateEnd: convention.dateEnd,
             dateStart: convention.dateStart,
@@ -100,6 +105,7 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
               ...magicLinkCommonFields,
               targetRoute: frontRoutes.conventionStatusDashboard,
             }),
+            agencyLogoUrl: agency.logoUrl,
           },
         });
       }),

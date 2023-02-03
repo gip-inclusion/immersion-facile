@@ -39,6 +39,7 @@ const testAgencies: AgencyDto[] = [
       lat: 22.319469,
       lon: 114.189505,
     },
+    logoUrl: "http://LOGO AGENCY IF URL",
   },
   {
     id: "test-agency-1-back",
@@ -60,6 +61,7 @@ const testAgencies: AgencyDto[] = [
       lat: 1,
       lon: 2,
     },
+    logoUrl: "http://LOGO AGENCY 1 URL",
   },
   {
     id: "test-agency-2-back",
@@ -81,6 +83,7 @@ const testAgencies: AgencyDto[] = [
       lat: 40,
       lon: 50,
     },
+    logoUrl: "http://LOGO AGENCY 2 URL",
   },
   {
     id: "test-agency-3-back",
@@ -102,12 +105,11 @@ const testAgencies: AgencyDto[] = [
       lat: 88,
       lon: 89.9999,
     },
+    logoUrl: "http://LOGO AGENCY 3 URL",
   },
 ];
 
 export class InMemoryAgencyRepository implements AgencyRepository {
-  private _agencies: { [id: string]: AgencyDto } = {};
-
   constructor(agencyList: AgencyDto[] = testAgencies) {
     agencyList.forEach((agency) => {
       this._agencies[agency.id] = agency;
@@ -183,6 +185,8 @@ export class InMemoryAgencyRepository implements AgencyRepository {
       this._agencies[agency.id] = agency;
     });
   }
+
+  private _agencies: { [id: string]: AgencyDto } = {};
 }
 
 const isImmersionPeOnly = (agency: AgencyDto) => agency.kind === "pole-emploi";

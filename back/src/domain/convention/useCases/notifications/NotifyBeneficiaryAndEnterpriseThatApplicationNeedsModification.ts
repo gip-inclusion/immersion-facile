@@ -80,6 +80,7 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
             ...magicLinkCommonFields,
             targetRoute: frontRoutes.conventionStatusDashboard,
           }),
+          agencyLogoUrl: agency.logoUrl,
         },
       });
     }

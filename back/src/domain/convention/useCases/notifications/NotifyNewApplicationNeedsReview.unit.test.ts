@@ -73,20 +73,21 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
             email,
             now: timeGateway.now(),
           };
-        expectedEmailConventionReviewMatchingConvention(
-          sentEmails[i],
-          email,
-          conventionInReview,
-          fakeGenerateMagicLinkUrlFn({
+        expectedEmailConventionReviewMatchingConvention({
+          templatedEmail: sentEmails[i],
+          recipient: email,
+          convention: conventionInReview,
+          magicLink: fakeGenerateMagicLinkUrlFn({
             ...magicLinkCommonFields,
             targetRoute: frontRoutes.conventionToValidate,
           }),
-          fakeGenerateMagicLinkUrlFn({
+          conventionStatusLink: fakeGenerateMagicLinkUrlFn({
             ...magicLinkCommonFields,
             targetRoute: frontRoutes.conventionStatusDashboard,
           }),
-          "en vérifier l'éligibilité",
-        );
+          possibleRoleAction: "en vérifier l'éligibilité",
+          agency,
+        });
       }
     });
 
@@ -113,20 +114,21 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
             email,
             now: timeGateway.now(),
           };
-        expectedEmailConventionReviewMatchingConvention(
-          sentEmails[i],
-          email,
-          conventionInReview,
-          fakeGenerateMagicLinkUrlFn({
+        expectedEmailConventionReviewMatchingConvention({
+          templatedEmail: sentEmails[i],
+          recipient: email,
+          convention: conventionInReview,
+          magicLink: fakeGenerateMagicLinkUrlFn({
             ...magicLinkCommonFields,
             targetRoute: frontRoutes.conventionToValidate,
           }),
-          fakeGenerateMagicLinkUrlFn({
+          conventionStatusLink: fakeGenerateMagicLinkUrlFn({
             ...magicLinkCommonFields,
             targetRoute: frontRoutes.conventionStatusDashboard,
           }),
-          "en considérer la validation",
-        );
+          possibleRoleAction: "en considérer la validation",
+          agency,
+        });
       }
     });
 
@@ -172,20 +174,21 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
             email,
             now: timeGateway.now(),
           };
-        expectedEmailConventionReviewMatchingConvention(
-          sentEmails[i],
-          email,
-          acceptedByCounsellorConvention,
-          fakeGenerateMagicLinkUrlFn({
+        expectedEmailConventionReviewMatchingConvention({
+          templatedEmail: sentEmails[i],
+          recipient: email,
+          convention: acceptedByCounsellorConvention,
+          magicLink: fakeGenerateMagicLinkUrlFn({
             ...magicLinkCommonFields,
             targetRoute: frontRoutes.conventionToValidate,
           }),
-          fakeGenerateMagicLinkUrlFn({
+          conventionStatusLink: fakeGenerateMagicLinkUrlFn({
             ...magicLinkCommonFields,
             targetRoute: frontRoutes.conventionStatusDashboard,
           }),
-          "en considérer la validation",
-        );
+          possibleRoleAction: "en considérer la validation",
+          agency,
+        });
       }
     });
 
@@ -226,20 +229,21 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
           email: adminEmail,
           now: timeGateway.now(),
         };
-      expectedEmailConventionReviewMatchingConvention(
-        sentEmails[0],
-        adminEmail,
-        acceptedByValidatorConvention,
-        fakeGenerateMagicLinkUrlFn({
+      expectedEmailConventionReviewMatchingConvention({
+        templatedEmail: sentEmails[0],
+        recipient: adminEmail,
+        convention: acceptedByValidatorConvention,
+        magicLink: fakeGenerateMagicLinkUrlFn({
           ...magicLinkCommonFields,
           targetRoute: frontRoutes.conventionToValidate,
         }),
-        fakeGenerateMagicLinkUrlFn({
+        conventionStatusLink: fakeGenerateMagicLinkUrlFn({
           ...magicLinkCommonFields,
           targetRoute: frontRoutes.conventionStatusDashboard,
         }),
-        "en considérer la validation",
-      );
+        possibleRoleAction: "en considérer la validation",
+        agency,
+      });
     });
 
     it("No admin available => ensure no mail is sent", async () => {
