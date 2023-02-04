@@ -27,6 +27,7 @@ export const InclusionConnectedPrivateRoute = ({
             inclusionConnectEndpoint={
               inclusionConnectImmersionTargets.startInclusionConnectLogin.url
             }
+            layout="2-lines"
           />
         </MainWrapper>
       </HeaderFooterLayout>

@@ -3,7 +3,7 @@
   align-items: center;
   height: 3.625rem;
   font-size: 1rem;
-  line-height: 1.375rem;
+  line-height: 1.35rem;
   text-align: center;
   padding: 0.5rem 1rem 0.5rem 3.875rem;
   border-radius: 50rem;
@@ -12,9 +12,9 @@
   color: var(--grey-1000-100);
   border: 4px solid var(--blue-france-sun-113-625);
   background: url("./assets/img/logo-inclusion-connect-bg.svg")
-    var(--blue-france-sun-113-625) no-repeat 0.8rem center;
-  background-size: 38px auto;
-  font-weight: 500;
+    var(--blue-france-sun-113-625) no-repeat left center;
+  font-weight: 400;
+  transition: all 0.3s ease;
   &.active,
   &.focus,
   &.hover,
@@ -44,5 +44,11 @@
     pointer-events: none;
     background-color: var(--grey-950-125-active);
     border-color: var(--grey-950-125-active);
+  }
+  &__ic-label {
+    font-weight: 900;
+  }
+  &--2-lines {
+    max-width: 14.375rem;
   }
 }
