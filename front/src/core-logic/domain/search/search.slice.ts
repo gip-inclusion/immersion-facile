@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
+  AppellationDto,
   OmitFromExistingKeys,
   SearchImmersionQueryParamsDto,
   SearchImmersionResultDto,
@@ -8,11 +9,10 @@ import {
 export type SearchParams = OmitFromExistingKeys<
   SearchImmersionQueryParamsDto,
   "voluntaryToImmersion"
->;
+> &
+  Partial<AppellationDto>;
 
-export type SearchPageParams = SearchParams & {
-  romeLabel?: string;
-};
+export type SearchPageParams = Exclude<SearchParams, "romeCode">;
 
 export type SearchStatus =
   | "noSearchMade"

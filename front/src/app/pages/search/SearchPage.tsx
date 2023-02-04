@@ -9,7 +9,6 @@ import {
   Select,
   Loader,
 } from "react-design-system";
-import { RomeAutocomplete } from "src/app/components/forms/autocomplete/RomeAutocomplete";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
@@ -27,6 +26,7 @@ import { routes } from "src/app/routes/routes";
 import { PlaceAutocomplete } from "src/app/components/forms/autocomplete/PlaceAutocomplete";
 import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
+import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
 
 const radiusOptions = [1, 2, 5, 10, 20, 50, 100];
 const sortedByOptions: { value: SearchSortedBy; label: string }[] = [
@@ -106,18 +106,27 @@ export const SearchPage = ({
                     "search-page__form-input-wrapper",
                   )}
                 >
-                  <RomeAutocomplete
-                    title="Je recherche le métier :"
+                  <AppellationAutocomplete
+                    label="Je recherche le métier :"
                     setFormValue={(newValue) => {
-                      setFieldValue("romeLabel", newValue.romeLabel);
-                      setFieldValue("rome", newValue.romeCode);
+                      setFormikValues({
+                        ...values,
+                        ...{
+                          romeLabel: newValue.romeLabel,
+                          rome: newValue.romeCode,
+                          appellationLabel: newValue.appellationLabel,
+                          appellationCode: newValue.appellationCode,
+                        },
+                      });
                     }}
-                    id={"im-search-page__rome-autocomplete"}
-                    value={{
-                      romeLabel: values.romeLabel ?? "",
-                      romeCode: values.rome ?? "",
-                    }}
-                    placeholder={"Ex : boulangère, infirmier"}
+                    selectedAppellations={[
+                      {
+                        romeLabel: values.romeLabel ?? "",
+                        romeCode: values.rome ?? "",
+                        appellationCode: values.appellationCode ?? "",
+                        appellationLabel: values.appellationLabel ?? "",
+                      },
+                    ]}
                   />
                 </div>
                 <div
