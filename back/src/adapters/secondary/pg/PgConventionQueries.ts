@@ -42,11 +42,9 @@ export class PgConventionQueries implements ConventionQueries {
     dateEnd: Date,
   ): Promise<ConventionReadDto[]> {
     const filtersSQL = [
-      format("conventions.date_end::date = %1$L", dateEnd),
-      format("conventions.status IN (%1$L)", validatedConventionStatuses),
-      format(
-        "conventions.id NOT IN (SELECT (payload ->> 'id')::uuid FROM outbox where topic = 'EmailWithLinkToCreateAssessmentSent' )",
-      ),
+      this.whereConventionsDateEndMatch(dateEnd),
+      this.whereConventionsAreValidated(),
+      this.whereConventionsAssessmentEmailHasNotBeenAlreadySent(),
     ];
     return this.getConventionsWhere(`WHERE ${filtersSQL.join(" AND ")}`);
   }
@@ -63,5 +61,19 @@ export class PgConventionQueries implements ConventionQueries {
     ${limit ? "LIMIT " + limit : ""}`;
     const pgResult = await this.client.query<{ dto: unknown }>(query);
     return pgResult.rows.map((row) => conventionReadSchema.parse(row.dto));
+  }
+
+  private whereConventionsAssessmentEmailHasNotBeenAlreadySent() {
+    return format(
+      "conventions.id NOT IN (SELECT (payload ->> 'id')::uuid FROM outbox where topic = 'EmailWithLinkToCreateAssessmentSent' )",
+    );
+  }
+
+  private whereConventionsAreValidated() {
+    return format("conventions.status IN (%1$L)", validatedConventionStatuses);
+  }
+
+  private whereConventionsDateEndMatch(dateEnd: Date) {
+    return format("conventions.date_end::date = %1$L", dateEnd);
   }
 }

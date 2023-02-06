@@ -87,7 +87,6 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
       .signedByBeneficiary(new Date().toISOString())
       .signedByEstablishmentRepresentative(new Date().toISOString())
       .build();
-    const expectedAgency = uow.agencyRepository.agencies[0];
     const now = new Date();
     timeGateway.setNextDate(now);
     uow.conventionRepository._conventions = {
@@ -111,7 +110,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
               signedConvention.signatories.establishmentRepresentative.email,
             now,
           }),
-          agencyLogoUrl: expectedAgency.logoUrl,
+          agencyLogoUrl: agency.logoUrl,
         },
         recipients: [
           signedConvention.signatories.establishmentRepresentative.email,

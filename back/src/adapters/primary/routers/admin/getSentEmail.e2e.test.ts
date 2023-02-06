@@ -42,7 +42,10 @@ describe(`/${emailRoute} route`, () => {
       await gateways.email.sendEmail({
         type: "AGENCY_WAS_ACTIVATED",
         recipients: ["toto@email.com"],
-        params: { agencyName: "Agence du Grand Est", agencyLogoUrl: ":)" },
+        params: {
+          agencyName: "Agence du Grand Est",
+          agencyLogoUrl: "http://:)",
+        },
       });
 
       // Getting the application succeeds and shows that it's validated.
@@ -50,7 +53,10 @@ describe(`/${emailRoute} route`, () => {
         templatedEmail: {
           type: "AGENCY_WAS_ACTIVATED",
           recipients: ["toto@email.com"],
-          params: { agencyName: "Agence du Grand Est", agencyLogoUrl: ":)" },
+          params: {
+            agencyName: "Agence du Grand Est",
+            agencyLogoUrl: "http://:)",
+          },
         },
         sentAt: dateNow.toISOString(),
       };

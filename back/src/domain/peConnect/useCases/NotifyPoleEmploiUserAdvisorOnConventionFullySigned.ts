@@ -31,17 +31,8 @@ export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends Transact
     if (!convention) return;
 
     const agency = await uow.agencyRepository.getById(convention.agencyId);
-    if (!agency)
-      throw new Error(
-        `Missing agency ${convention.agencyId} on agency repository.`,
-      );
 
-    if (!conventionPeAdvisor)
-      throw new Error(
-        `Missing convention PeAdvisor for convention ${conventionFromEvent.id} on conventionPoleEmploiAdvisor repository.`,
-      );
-
-    if (conventionPeAdvisor.advisor)
+    if (conventionPeAdvisor && conventionPeAdvisor.advisor && agency)
       await this.emailGateway.sendEmail({
         type: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED",
         recipients: [conventionPeAdvisor.advisor.email],
