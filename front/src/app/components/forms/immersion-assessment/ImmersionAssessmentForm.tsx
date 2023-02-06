@@ -8,6 +8,7 @@ import {
   ConventionReadDto,
   ImmersionAssessmentDto,
   immersionAssessmentSchema,
+  InternshipKind,
 } from "shared";
 import { RadioGroupForField } from "src/app/components/forms/commons/RadioGroup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -50,12 +51,16 @@ export const ImmersionAssessmentForm = ({
             name={getName("status")}
             options={assessmentStatuses.map((value) => ({
               value,
-              label: labels[value],
+              label: getLabels(convention.internshipKind)[value],
             }))}
           />
           <TextInput
             multiline={true}
-            label="Comment s'est passée l'immersion ?"
+            label={
+              convention.internshipKind === "immersion"
+                ? "Comment s'est passée l'immersion ?"
+                : "Comment s'est passée le mini-stage ?"
+            }
             name={getName("establishmentFeedback")}
           />
           <ul className={fr.cx("fr-btns-group")}>
@@ -106,10 +111,19 @@ export const ImmersionAssessmentForm = ({
 };
 
 const getName = (name: keyof ImmersionAssessmentDto) => name;
-const labels: Record<AssessmentStatus, string> = {
-  FINISHED: "Le bénéficiaire a suivi son immersion jusqu'à la fin",
-  ABANDONED: "Le bénéficiaire a abandonné l'immersion",
-};
+const getLabels = (
+  internshipKind: InternshipKind,
+): Record<AssessmentStatus, string> => ({
+  FINISHED:
+    internshipKind === "immersion"
+      ? "Le bénéficiaire a suivi son immersion jusqu'à la fin"
+      : "Le bénéficiaire a suivi son mini-stage jusqu'à la fin",
+  ABANDONED:
+    internshipKind === "immersion"
+      ? "Le bénéficiaire a abandonné l'immersion"
+      : "Le bénéficiaire a abandonné le mini-stage",
+});
+
 const downloadFullImmersionAssessmentPdf = () => {
   window.open(
     "https://immersion.cellar-c2.services.clever-cloud.com/bilan-immersion-professionnelle-inscriptible.pdf",

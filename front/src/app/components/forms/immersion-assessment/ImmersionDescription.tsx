@@ -12,9 +12,12 @@ export const ImmersionDescription = ({
   const dateEnd = toDisplayedDate(new Date(convention.dateEnd));
   return (
     <p>
-      L'immersion de <strong>{beneficiaryName}</strong> auprès de
-      l'établissement <strong>{convention.businessName}</strong> qui a eu lieu
-      du <strong>{dateStart}</strong> au <strong>{dateEnd}</strong> touche à sa
+      {convention.internshipKind === "immersion"
+        ? "L'immersion"
+        : "Le mini-stage"}{" "}
+      de <strong>{beneficiaryName}</strong> auprès de l'établissement{" "}
+      <strong>{convention.businessName}</strong> qui a eu lieu du{" "}
+      <strong>{dateStart}</strong> au <strong>{dateEnd}</strong> touche à sa
       fin.
     </p>
   );

@@ -1,14 +1,16 @@
 import React from "react";
-import { Loader, MainWrapper, Notification, Title } from "react-design-system";
-import { ConventionMagicLinkPayload } from "shared";
-import { decodeMagicLinkJwtWithoutSignatureCheck } from "shared";
-import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
-import { routes } from "src/app/routes/routes";
-import { useConvention } from "src/app/hooks/convention.hooks";
-import { Route } from "type-route";
+import { Loader, MainWrapper, Notification } from "react-design-system";
+import {
+  ConventionMagicLinkPayload,
+  decodeMagicLinkJwtWithoutSignatureCheck,
+} from "shared";
 import { ImmersionAssessmentForm } from "src/app/components/forms/immersion-assessment/ImmersionAssessmentForm";
 import { ImmersionDescription } from "src/app/components/forms/immersion-assessment/ImmersionDescription";
+import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
+import { useConvention } from "src/app/hooks/convention.hooks";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
+import { routes } from "src/app/routes/routes";
+import { Route } from "type-route";
 
 type ImmersionAssessmentRoute = Route<typeof routes.immersionAssessment>;
 
@@ -55,12 +57,15 @@ export const ImmersionAssessmentPage = ({
                 Seule une convention entièrement validée peut recevoir un bilan
               </Notification>
             )}
-            <Title>
-              Bilan de l'immersion
-              {convention
-                ? ` de ${convention.signatories.beneficiary.firstName} ${convention.signatories.beneficiary.lastName}`
-                : ""}
-            </Title>
+            {convention && (
+              <h1>
+                {convention.internshipKind === "immersion"
+                  ? "Bilan de l'immersion"
+                  : "Bilan du mini-stage"}{" "}
+                de {convention.signatories.beneficiary.firstName}
+                {convention.signatories.beneficiary.lastName}
+              </h1>
+            )}
             {canCreateAssessment && (
               <>
                 <ImmersionDescription convention={convention} />
