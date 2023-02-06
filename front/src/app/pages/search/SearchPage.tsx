@@ -44,12 +44,16 @@ export const SearchPage = ({
 
   const searchUseCase = useSearchUseCase();
   const searchResultsWrapper = useRef<HTMLDivElement>(null);
-  const initialValues = {
+  const initialValues: SearchPageParams = {
     latitude: 0,
     longitude: 0,
     distance_km: 10,
     place: "",
     sortedBy: undefined,
+    appellationCode: "",
+    appellationLabel: "",
+    rome: "",
+    romeLabel: "",
   };
   const [formikValues, setFormikValues] =
     useState<SearchPageParams>(initialValues);
@@ -96,14 +100,14 @@ export const SearchPage = ({
               <Form
                 className={cx(
                   fr.cx("fr-grid-row", "fr-grid-row--gutters"),
-                  "search-page__form",
-                  "search-page__form--v2",
+                  "im-search-page__form",
+                  "im-search-page__form--v2",
                 )}
               >
                 <div
                   className={cx(
                     fr.cx("fr-col-12", "fr-col-lg-4"),
-                    "search-page__form-input-wrapper",
+                    "im-search-page__form-input-wrapper",
                   )}
                 >
                   <AppellationAutocomplete
@@ -115,14 +119,25 @@ export const SearchPage = ({
                       appellationCode: route.params.appellationCode ?? "",
                     }}
                     setFormValue={(newValue) => {
+                      const newAppellationValue = {
+                        romeLabel: newValue.romeLabel,
+                        rome: newValue.romeCode,
+                        appellationLabel: newValue.appellationLabel,
+                        appellationCode: newValue.appellationCode,
+                      };
+                      setFieldValue("rome", newAppellationValue.rome);
+                      setFieldValue("romeLabel", newAppellationValue.romeLabel);
+                      setFieldValue(
+                        "appellationCode",
+                        newAppellationValue.appellationCode,
+                      );
+                      setFieldValue(
+                        "appellationLabel",
+                        newAppellationValue.appellationLabel,
+                      );
                       setFormikValues({
                         ...values,
-                        ...{
-                          romeLabel: newValue.romeLabel,
-                          rome: newValue.romeCode,
-                          appellationLabel: newValue.appellationLabel,
-                          appellationCode: newValue.appellationCode,
-                        },
+                        ...newAppellationValue,
                       });
                     }}
                     selectedAppellations={[
@@ -138,7 +153,7 @@ export const SearchPage = ({
                 <div
                   className={cx(
                     fr.cx("fr-col-12", "fr-col-lg-4"),
-                    "search-page__form-input-wrapper",
+                    "im-search-page__form-input-wrapper",
                   )}
                 >
                   <PlaceAutocomplete
@@ -163,7 +178,7 @@ export const SearchPage = ({
                 <div
                   className={cx(
                     fr.cx("fr-col-12", "fr-col-lg-2"),
-                    "search-page__form-input-wrapper",
+                    "im-search-page__form-input-wrapper",
                   )}
                 >
                   <Select
@@ -203,7 +218,7 @@ export const SearchPage = ({
                 <div
                   className={cx(
                     fr.cx("fr-col-12", "fr-col-lg-2"),
-                    "search-page__form-input-wrapper",
+                    "im-search-page__form-input-wrapper",
                   )}
                 >
                   <ButtonSearch
@@ -227,7 +242,6 @@ export const SearchPage = ({
                     "fr-grid-row",
                     "fr-grid-row--gutters",
                     "fr-mb-4w",
-                    "fr-grid-row--bottom",
                   )}
                 >
                   <div className={fr.cx("fr-col-12", "fr-col-md-8")}>
@@ -281,21 +295,41 @@ export const SearchPage = ({
                       </div>
                     </fieldset>
                   </div>
-                  <div
-                    className={fr.cx(
-                      "fr-col-12",
-                      "fr-col-md-4",
-                      "fr-grid-row",
-                      "fr-grid-row--right",
+                  <aside
+                    className={cx(
+                      fr.cx(
+                        "fr-col-12",
+                        "fr-col-md-4",
+                        "fr-grid-row",
+                        "fr-grid-row--right",
+                      ),
+                      "im-search-page__results-summary",
                     )}
                   >
                     {searchStatus === "ok" && (
-                      <span className={fr.cx("fr-h5")}>
-                        <strong>{searchResults.length}</strong> résultats
-                        trouvés
-                      </span>
+                      <>
+                        <span className={fr.cx("fr-h5", "fr-mb-0")}>
+                          <strong>{searchResults.length}</strong> résultats
+                          trouvés
+                        </span>
+                        <span
+                          className={cx(
+                            fr.cx("fr-text--xs"),
+                            "im-search-page__results-summary-description",
+                          )}
+                        >
+                          pour la recherche{" "}
+                          <strong className={fr.cx("fr-text--bold")}>
+                            {route.params.appellationLabel}
+                          </strong>
+                          , étendue au secteur{" "}
+                          <strong className={fr.cx("fr-text--bold")}>
+                            {route.params.romeLabel}
+                          </strong>
+                        </span>
+                      </>
                     )}
-                  </div>
+                  </aside>
                 </div>
               </div>
               <SearchListResults />

@@ -1,4 +1,4 @@
-.search-page {
+.im-search-page {
   &__form {
     display: flex;
     align-items: flex-end;
@@ -9,5 +9,8 @@
     .fr-label {
       color: var(--grey-1000-100);
     }
+  }
+  &__results-summary {
+    text-align: right;
   }
 }
