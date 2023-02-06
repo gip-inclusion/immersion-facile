@@ -132,6 +132,7 @@ const conventionSection = (internshipKind: InternshipKind) => ({
   immersionObjective: {
     label: "Objet de la période de mise en situation en milieu professionnel",
     id: "form-convention-immersionObjective",
+    required: true,
   },
   immersionAppellation: {
     label:
