@@ -1,6 +1,7 @@
 import React, { Fragment } from "react";
 import { MatchRangeDto } from "shared";
 import { Proposal } from "./Proposal";
+import { fr } from "@codegouvfr/react-dsfr";
 
 type SliceOfString = {
   startIndexInclusive: number;
@@ -25,7 +26,12 @@ export const StringWithHighlights = ({
             startIndexInclusive,
             endIndexExclusive,
           );
-          if (bolded) return <span key={index}>{text}</span>;
+          if (bolded)
+            return (
+              <span className={fr.cx("fr-text--bold")} key={index}>
+                {text}
+              </span>
+            );
           return <Fragment key={index}>{text}</Fragment>;
         },
       )}
