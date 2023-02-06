@@ -104,6 +104,8 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       rome: param.query.optional.string,
       romeLabel: param.query.optional.string,
       sortedBy: param.query.optional.string,
+      appellationLabel: param.query.optional.string,
+      appellationCode: param.query.optional.string,
     },
     () => `/${frontRoutes.search}`,
   ),

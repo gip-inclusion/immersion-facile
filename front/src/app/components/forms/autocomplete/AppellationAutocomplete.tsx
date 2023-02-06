@@ -28,6 +28,7 @@ type AppellationAutocompleteProps = {
   className?: string;
   selectedAppellations?: AppellationDto[];
   description?: string;
+  placeholder?: string;
 };
 
 type Option = Proposal<AppellationDto>;
@@ -39,6 +40,7 @@ export const AppellationAutocomplete = ({
   className,
   selectedAppellations = [],
   description,
+  placeholder,
 }: AppellationAutocompleteProps) => {
   const initialOption: Option | null = initialValue
     ? {
@@ -57,6 +59,7 @@ export const AppellationAutocomplete = ({
   const { cx } = useStyles();
   const [options, setOptions] = useState<Option[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [inputHasChanged, setInputHasChanged] = useState(false);
   const debounceSearchTerm = useDebounce(searchTerm, 300);
   useEffect(() => {
     if (initialOption && selectedOption === null) {
@@ -102,6 +105,8 @@ export const AppellationAutocomplete = ({
         filterOptions={(x) => x}
         options={options}
         value={selectedOption}
+        defaultValue={initialOption}
+        inputValue={inputHasChanged ? searchTerm : initialOption?.description}
         noOptionsText={searchTerm ? noOptionText : "Saisissez un métier"}
         getOptionLabel={(option: Option) => option.value.appellationLabel}
         renderOption={(props, option) => (
@@ -113,20 +118,25 @@ export const AppellationAutocomplete = ({
           </li>
         )}
         onChange={(_, selectedOption: Option | null) => {
-          setSelectedOption(selectedOption ?? null);
-          setFormValue(
-            selectedOption
-              ? selectedOption.value
-              : {
-                  appellationCode: "",
-                  appellationLabel: "",
-                  romeCode: "",
-                  romeLabel: "",
-                },
-          );
+          if (selectedOption) {
+            setSelectedOption(selectedOption);
+            setFormValue(
+              selectedOption
+                ? selectedOption.value
+                : {
+                    appellationCode: "",
+                    appellationLabel: "",
+                    romeCode: "",
+                    romeLabel: "",
+                  },
+            );
+          }
         }}
         onInputChange={(_, newSearchTerm) => {
-          setSearchTerm(newSearchTerm);
+          if (searchTerm !== newSearchTerm) {
+            setSearchTerm(newSearchTerm);
+            setInputHasChanged(true);
+          }
         }}
         renderInput={(params) => {
           const { id } = params;
@@ -151,7 +161,7 @@ export const AppellationAutocomplete = ({
                 {...params.inputProps}
                 id={inputId}
                 className={fr.cx("fr-input")}
-                placeholder="Prêt à porter"
+                placeholder={placeholder ?? "Ex: boulanger, styliste, etc."}
               />
             </div>
           );

@@ -108,6 +108,12 @@ export const SearchPage = ({
                 >
                   <AppellationAutocomplete
                     label="Je recherche le métier :"
+                    initialValue={{
+                      romeCode: route.params.rome ?? "",
+                      romeLabel: route.params.romeLabel ?? "",
+                      appellationLabel: route.params.appellationLabel ?? "",
+                      appellationCode: route.params.appellationCode ?? "",
+                    }}
                     setFormValue={(newValue) => {
                       setFormikValues({
                         ...values,
