@@ -6,7 +6,6 @@ import { InitiateInclusionConnect } from "./InitiateInclusionConnect";
 
 const clientId = "my-client-id";
 const clientSecret = "my-client-secret";
-const from = "immersion-facilité";
 const scope = "openid profile email";
 const state = "my-state";
 const nonce = "my-nonce";
@@ -28,7 +27,6 @@ describe("InitiateInclusionConnect usecase", () => {
         inclusionConnectBaseUri,
         scope,
         clientId,
-        from,
         clientSecret,
       },
     );
@@ -41,7 +39,6 @@ describe("InitiateInclusionConnect usecase", () => {
       encodeURI(
         `${inclusionConnectBaseUri}/auth?${[
           `client_id=${clientId}`,
-          `from=${from}`,
           `nonce=${nonce}`,
           `redirect_uri=${immersionRedirectUri}`,
           `response_type=${responseType}`,

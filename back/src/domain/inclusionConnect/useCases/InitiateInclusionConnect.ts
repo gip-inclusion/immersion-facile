@@ -11,7 +11,6 @@ type InclusionConnectUrlParams = {
   scope: string;
   state: string;
   nonce: string;
-  from: "immersion-facilité";
   login_hint?: string;
 };
 
@@ -21,7 +20,6 @@ export type InclusionConnectConfig = {
   immersionRedirectUri: AbsoluteUrl;
   inclusionConnectBaseUri: AbsoluteUrl;
   scope: string;
-  from: "immersion-facilité";
 };
 
 export class InitiateInclusionConnect extends TransactionalUseCase<
@@ -52,7 +50,6 @@ export class InitiateInclusionConnect extends TransactionalUseCase<
       this.inclusionConnectConfig.inclusionConnectBaseUri
     }/auth?${queryParamsAsString<InclusionConnectUrlParams>({
       client_id: this.inclusionConnectConfig.clientId,
-      from: "immersion-facilité",
       nonce,
       redirect_uri: this.inclusionConnectConfig.immersionRedirectUri,
       response_type: "code",

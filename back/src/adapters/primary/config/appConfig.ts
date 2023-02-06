@@ -190,7 +190,6 @@ export class AppConfig {
         "INCLUSION_CONNECT_BASE_URI",
       ),
       scope: "openid profile email",
-      from: "immersion-facilité",
     };
   }
 
