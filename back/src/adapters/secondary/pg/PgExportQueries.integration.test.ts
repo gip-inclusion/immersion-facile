@@ -182,8 +182,8 @@ describe("PgExportQueries", () => {
           Statut: "active",
           Adresse: "2 RUE JACQUARD",
           "Code Postal": "69120",
-          "Emails des conseillers": agencyInRepo.counsellorEmails,
-          "Emails des valideurs": agencyInRepo.validatorEmails,
+          "Emails des conseillers": "",
+          "Emails des valideurs": '"validator@mail.com"',
           Département: "Rhône",
           Région: "Auvergne-Rhône-Alpes",
         };
