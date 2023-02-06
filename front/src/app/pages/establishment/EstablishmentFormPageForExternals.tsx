@@ -5,7 +5,7 @@ import { routes } from "src/app/routes/routes";
 import { Route } from "type-route";
 import { EstablishmentCreationForm } from "src/app/components/forms/establishment/EstablishmentCreationForm";
 import { fr } from "@codegouvfr/react-dsfr";
-import { MainWrapper } from "src/../../libs/react-design-system";
+import { MainWrapper } from "react-design-system";
 
 type EstablishmentFormForExternalsProps = {
   route: Route<typeof routes.formEstablishmentForExternals>;
