@@ -2,7 +2,12 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { useFormikContext } from "formik";
 import React, { useEffect } from "react";
 import { ErrorNotifications, Notification } from "react-design-system";
-import { ConventionDto, Signatory, toDotNotation } from "shared";
+import {
+  ConventionDto,
+  convertStringToFederatedIdentity,
+  Signatory,
+  toDotNotation,
+} from "shared";
 import { ConventionFrozenMessage } from "src/app/components/forms/convention/ConventionFrozenMessage";
 import { ConventionSignOnlyMessage } from "src/app/components/forms/convention/ConventionSignOnlyMessage";
 import { makeValuesToWatchInUrl } from "src/app/components/forms/convention/makeValuesToWatchInUrl";
@@ -70,6 +75,12 @@ export const ConventionFormFields = ({
   );
   const formContents = getFormFields();
   const t = useConventionTextsFromFormikContext();
+  const federatedIdentity =
+    conventionValues.signatories.beneficiary.federatedIdentity &&
+    convertStringToFederatedIdentity(
+      conventionValues.signatories.beneficiary.federatedIdentity,
+    );
+
   return (
     <>
       {isFrozen && !isSignatureMode && <ConventionFrozenMessage />}
@@ -97,15 +108,11 @@ export const ConventionFormFields = ({
 
       <EstablishmentFormSection
         isFrozen={isFrozen}
-        federatedIdentity={
-          conventionValues.signatories.beneficiary.federatedIdentity
-        }
+        federatedIdentity={federatedIdentity}
       />
 
       <ImmersionConditionFormSection
-        federatedIdentity={
-          conventionValues.signatories.beneficiary.federatedIdentity
-        }
+        federatedIdentity={federatedIdentity}
         isFrozen={isFrozen}
       />
       {!isFrozen && (

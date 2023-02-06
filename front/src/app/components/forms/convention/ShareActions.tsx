@@ -8,7 +8,11 @@ export const ShareActions = (props: {
   federatedIdentity?: FederatedIdentity;
 }) => {
   if (props.isFrozen) return null;
-  if (props.federatedIdentity !== "noIdentityProvider") return null;
+  if (
+    props.federatedIdentity &&
+    props.federatedIdentity.provider !== "noIdentityProvider"
+  )
+    return null;
   return (
     <>
       <CopyLink />

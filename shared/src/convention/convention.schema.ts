@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { agencyIdSchema } from "../agency/agency.schema";
-import { federatedIdentitySchema } from "../federatedIdentities/federatedIdentity.schema";
+import { conventionFederatedIdentityStringSchema } from "../federatedIdentities/conventionFederatedIdentityStringSchema";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { scheduleSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret";
@@ -83,7 +83,7 @@ const beneficiarySchema: z.Schema<Beneficiary<"immersion">> =
       emergencyContact: zStringPossiblyEmpty,
       emergencyContactPhone: phoneSchema.optional().or(z.literal("")),
       emergencyContactEmail: zEmailPossiblyEmpty,
-      federatedIdentity: federatedIdentitySchema.optional(),
+      federatedIdentity: conventionFederatedIdentityStringSchema.optional(),
       financiaryHelp: zStringPossiblyEmpty,
       birthdate: zString.regex(dateRegExp, localization.invalidDate),
     }),

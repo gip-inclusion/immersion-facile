@@ -1,6 +1,6 @@
 import { AgencyId } from "../agency/agency.dto";
 import { Builder } from "../Builder";
-import { FederatedIdentity } from "../federatedIdentities/federatedIdentity.dto";
+import { ConventionFederatedIdentityString } from "../federatedIdentities/federatedIdentity.dto";
 import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { DateIntervalDto, ScheduleDto } from "../schedule/Schedule.dto";
 import { reasonableSchedule } from "../schedule/ScheduleUtils";
@@ -453,7 +453,7 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
   }
 
   withFederatedIdentity(
-    federatedIdentity: FederatedIdentity,
+    federatedIdentity: ConventionFederatedIdentityString,
   ): ConventionDtoBuilder {
     return this.withBeneficiary({
       ...this.beneficiary,

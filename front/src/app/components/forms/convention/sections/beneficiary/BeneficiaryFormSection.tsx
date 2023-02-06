@@ -7,7 +7,6 @@ import {
   InternshipKind,
   isBeneficiaryStudent,
   levelsOfEducation,
-  peConnectAuthFailed,
 } from "shared";
 import { DateInput } from "src/app/components/forms/commons/DateInput";
 import { RadioGroup } from "src/app/components/forms/commons/RadioGroup";
@@ -33,10 +32,11 @@ export const BeneficiaryFormSection = ({
   internshipKind,
 }: beneficiaryFormSectionProperties): JSX.Element => {
   const isMinor = useAppSelector(conventionSelectors.isMinor);
-  const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
-
   const hasCurrentEmployer = useAppSelector(
     conventionSelectors.hasCurrentEmployer,
+  );
+  const isSuccessfullyPeConnected = useAppSelector(
+    authSelectors.isSuccessfullyPeConnected,
   );
   const { setFieldValue, values } = useFormikContext<ConventionDto>();
   const dispatch = useDispatch();
@@ -46,9 +46,6 @@ export const BeneficiaryFormSection = ({
     formConventionFieldsLabels(conventionValues.internshipKind),
   );
   const formContents = getFormFields();
-  const isPEConnected =
-    federatedIdentity?.includes("peConnect:") &&
-    federatedIdentity !== peConnectAuthFailed;
   // const isFilledField = (fieldValue: string) => fieldValue.length > 0;
   // const shouldDisableField = (fieldValue: string) =>
   //   isPEConnected && isFilledField(fieldValue);
@@ -61,12 +58,12 @@ export const BeneficiaryFormSection = ({
       <TextInput
         {...formContents["signatories.beneficiary.firstName"]}
         type="text"
-        disabled={isFrozen || isPEConnected}
+        disabled={isFrozen || isSuccessfullyPeConnected}
       />
       <TextInput
         {...formContents["signatories.beneficiary.lastName"]}
         type="text"
-        disabled={isFrozen || isPEConnected}
+        disabled={isFrozen || isSuccessfullyPeConnected}
       />
       <DateInput
         {...formContents["signatories.beneficiary.birthdate"]}
@@ -81,7 +78,7 @@ export const BeneficiaryFormSection = ({
       <TextInput
         {...formContents["signatories.beneficiary.email"]}
         type="email"
-        disabled={isFrozen || isPEConnected}
+        disabled={isFrozen || isSuccessfullyPeConnected}
       />
       {conventionValues.signatories.beneficiary.email && (
         <ConventionEmailWarning />

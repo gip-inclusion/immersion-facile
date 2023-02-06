@@ -18,7 +18,6 @@ import {
 
 const clientId = "my-client-id";
 const clientSecret = "my-client-secret";
-const from = "immersion-facilité";
 const scope = "openid profile email";
 const state = "my-state";
 const nonce = "nounce"; // matches the one in payload;
@@ -63,7 +62,6 @@ describe("inclusion connection flow", () => {
         location: encodeURI(
           `${inclusionConnectBaseUri}/auth?${[
             `client_id=${clientId}`,
-            `from=${from}`,
             `nonce=${nonce}`,
             `redirect_uri=https://${domain}/api${inclusionConnectImmersionTargets.afterLoginRedirection.url}`,
             `response_type=${responseType}`,

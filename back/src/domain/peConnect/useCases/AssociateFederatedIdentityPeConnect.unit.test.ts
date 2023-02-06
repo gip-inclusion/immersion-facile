@@ -1,7 +1,7 @@
 import {
   ConventionDtoBuilder,
+  ConventionFederatedIdentityString,
   expectObjectsToMatch,
-  PeConnectIdentity,
 } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
@@ -13,10 +13,10 @@ import {
   InMemoryConventionPoleEmploiAdvisorRepository,
 } from "../../../adapters/secondary/InMemoryConventionPoleEmploiAdvisorRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
-import { conventionPoleEmploiUserAdvisorFromDto } from "../../../domain/peConnect/entities/ConventionPoleEmploiAdvisorEntity";
-import { AssociatePeConnectFederatedIdentity } from "../../../domain/peConnect/useCases/AssociateFederatedIdentityPeConnect";
+import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { PeUserAndAdvisor } from "../dto/PeConnect.dto";
+import { conventionPoleEmploiUserAdvisorFromDto } from "../entities/ConventionPoleEmploiAdvisorEntity";
+import { AssociatePeConnectFederatedIdentity } from "./AssociateFederatedIdentityPeConnect";
 
 describe("AssociatePeConnectFederatedIdentity", () => {
   let associatePeConnectFederatedIdentity: AssociatePeConnectFederatedIdentity;
@@ -51,7 +51,7 @@ describe("AssociatePeConnectFederatedIdentity", () => {
     const conventionDtoFromEvent = new ConventionDtoBuilder()
       .withId(conventionId)
       .withFederatedIdentity(
-        "Does not start with peConnect:" as PeConnectIdentity,
+        "Does not start with peConnect:" as ConventionFederatedIdentityString,
       )
       .build();
 

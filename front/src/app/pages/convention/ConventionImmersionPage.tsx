@@ -1,7 +1,12 @@
+import { fr } from "@codegouvfr/react-dsfr";
 import React, { useEffect, useState } from "react";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { FederatedIdentity, isPeConnectIdentity } from "shared";
+import {
+  ConventionFederatedIdentityString,
+  convertStringToFederatedIdentity,
+  isPeConnectIdentity,
+} from "shared";
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
 import { ConventionFormContainerLayout } from "src/app/components/forms/convention/ConventionFormContainerLayout";
 import { conventionInitialValuesFromUrl } from "src/app/components/forms/convention/conventionHelpers";
@@ -13,7 +18,6 @@ import { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { Route } from "type-route";
-import { fr } from "@codegouvfr/react-dsfr";
 
 export type ConventionImmersionPageRoute = Route<
   typeof routes.conventionImmersion
@@ -97,11 +101,14 @@ const useFederatedIdentity = (route: ConventionImmersionPageRoute) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (route.params.federatedIdentity)
+    if (route.params.federatedIdentity) {
       dispatch(
         authSlice.actions.federatedIdentityProvided(
-          route.params.federatedIdentity as FederatedIdentity,
+          convertStringToFederatedIdentity(
+            route.params.federatedIdentity as ConventionFederatedIdentityString,
+          ),
         ),
       );
+    }
   }, [route.params.federatedIdentity]);
 };

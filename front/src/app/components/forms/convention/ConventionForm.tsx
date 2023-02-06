@@ -68,7 +68,9 @@ export const ConventionForm = ({
   routeParams = {},
 }: ConventionFormProps) => {
   const { cx } = useStyles();
-  const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
+  const federatedIdentityString = useAppSelector(
+    authSelectors.conventionFederatedIdentityString,
+  );
 
   const [initialValues] = useState<ConventionPresentation>({
     ...properties,
@@ -78,7 +80,7 @@ export const ConventionForm = ({
         ...properties.signatories.beneficiary,
         federatedIdentity:
           properties.signatories.beneficiary.federatedIdentity ??
-          federatedIdentity ??
+          federatedIdentityString ??
           undefined,
       },
     },

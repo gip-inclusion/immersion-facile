@@ -1,9 +1,13 @@
-import { ConventionDto, conventionSchema, toPeExternalId } from "shared";
+import {
+  ConventionDto,
+  conventionSchema,
+  convertStringToFederatedIdentity,
+  isPeConnectIdentity,
+} from "shared";
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { isPeConnectIdentity } from "../entities/ConventionPoleEmploiAdvisorEntity";
 import { ConventionAndPeExternalIds } from "../port/ConventionPoleEmploiAdvisorRepository";
 
 const logger = createLogger(__filename);
@@ -22,20 +26,20 @@ export class AssociatePeConnectFederatedIdentity extends TransactionalUseCase<Co
     convention: ConventionDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    if (
-      !isPeConnectIdentity(
-        convention?.signatories.beneficiary.federatedIdentity,
-      )
-    ) {
+    const federatedIdentity =
+      convention.signatories.beneficiary.federatedIdentity &&
+      convertStringToFederatedIdentity(
+        convention.signatories.beneficiary.federatedIdentity,
+      );
+
+    if (!isPeConnectIdentity(federatedIdentity)) {
       logger.info(
         `Convention ${convention.id} federated identity is not of format peConnect, aborting AssociatePeConnectFederatedIdentity use case`,
       );
       return;
     }
 
-    const peExternalId = toPeExternalId(
-      convention.signatories.beneficiary.federatedIdentity,
-    );
+    const peExternalId = federatedIdentity.token;
     if (peExternalId === "AuthFailed") {
       logger.info(
         `Convention ${convention.id} federated identity is PeConnect but with failed authentication, aborting AssociatePeConnectFederatedIdentity use case`,

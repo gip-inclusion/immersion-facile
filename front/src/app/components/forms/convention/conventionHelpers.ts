@@ -1,11 +1,11 @@
 import { addDays, startOfToday } from "date-fns";
 import {
   ConventionDto,
+  ConventionFederatedIdentityString,
   ConventionId,
   ConventionStatus,
   DepartmentCode,
   EstablishmentTutor,
-  FederatedIdentity,
   ImmersionObjective,
   InternshipKind,
   LevelOfEducation,
@@ -15,14 +15,14 @@ import {
   Signatories,
   toDateString,
 } from "shared";
-import { deviceRepository } from "src/config/dependencies";
+import { ConventionCustomAgencyPageRoute } from "src/app/pages/convention/ConventionCustomAgencyPage";
 import { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
 import { ConventionMiniStagePageRoute } from "src/app/pages/convention/ConventionMiniStagePage";
+import { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
 import { ConventionInUrl } from "src/app/routes/route-params";
+import { deviceRepository } from "src/config/dependencies";
 import { ENV } from "src/config/environmentVariables";
 import { v4 as uuidV4 } from "uuid";
-import { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
-import { ConventionCustomAgencyPageRoute } from "src/app/pages/convention/ConventionCustomAgencyPage";
 
 export const isConventionFrozen = (
   status: ConventionStatus | undefined,
@@ -124,7 +124,7 @@ export const conventionInitialValuesFromUrl = ({
         levelOfEducation: (params.led as LevelOfEducation) ?? "",
         birthdate: params.birthdate ?? "",
         federatedIdentity: params.federatedIdentity as
-          | FederatedIdentity
+          | ConventionFederatedIdentityString
           | undefined,
       },
       establishmentRepresentative: {

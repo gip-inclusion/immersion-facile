@@ -1,23 +1,22 @@
+import { fr } from "@codegouvfr/react-dsfr";
+import { useFormikContext } from "formik";
 import React from "react";
+import { Notification, SectionTitle } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { ConventionDto, FederatedIdentity } from "shared";
 import { RadioGroup } from "src/app/components/forms/commons/RadioGroup";
 import { ShareActions } from "src/app/components/forms/convention/ShareActions";
+import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
+import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
+import { useTutorIsEstablishmentRepresentative } from "src/app/hooks/convention.hooks";
+import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { useSiretFetcher } from "src/app/hooks/siret.hooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
-import { useTutorIsEstablishmentRepresentative } from "src/app/hooks/convention.hooks";
-import { useSiretFetcher } from "src/app/hooks/siret.hooks";
-import { SectionTitle } from "react-design-system";
-import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
 import { EstablishementTutorFields } from "./EstablishementTutorFields";
 import { EstablishmentBusinessFields } from "./EstablishmentBusinessFields";
 import { EstablishmentRepresentativeFields } from "./EstablishmentRepresentativeFields";
-import { Notification } from "react-design-system";
-import { useFormContents } from "src/app/hooks/formContents.hooks";
-import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
-import { useFormikContext } from "formik";
-import { fr } from "@codegouvfr/react-dsfr";
 
 type EstablishmentFormSectionParams = {
   isFrozen: boolean | undefined;

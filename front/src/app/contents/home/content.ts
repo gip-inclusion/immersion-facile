@@ -158,7 +158,10 @@ export const heroHeaderNavCards: (
         onClick: (event) => {
           event.preventDefault();
           storeDispatch(
-            authSlice.actions.federatedIdentityProvided("noIdentityProvider"),
+            authSlice.actions.federatedIdentityProvided({
+              provider: "noIdentityProvider",
+              token: null,
+            }),
           );
           routes.conventionImmersion().push();
         },
@@ -183,7 +186,10 @@ export const heroHeaderNavCards: (
         onClick: (event) => {
           event.preventDefault();
           storeDispatch(
-            authSlice.actions.federatedIdentityProvided("noIdentityProvider"),
+            authSlice.actions.federatedIdentityProvided({
+              provider: "noIdentityProvider",
+              token: null,
+            }),
           );
           routes.conventionImmersion().push();
         },

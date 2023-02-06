@@ -16,13 +16,13 @@ describe("Auth slice", () => {
 
   it("stores the federated identity when someones connects", () => {
     expectFederatedIdentityToEqual(null);
-    const identity: FederatedIdentity = "peConnect:123";
+    const identity: FederatedIdentity = { provider: "peConnect", token: "123" };
     store.dispatch(authSlice.actions.federatedIdentityProvided(identity));
     expectFederatedIdentityToEqual(identity);
   });
 
   it("stores to device storage the federated identity when asked for", () => {
-    const identity: FederatedIdentity = "peConnect:123";
+    const identity: FederatedIdentity = { provider: "peConnect", token: "123" };
     ({ store, dependencies } = createTestStore({
       auth: {
         federatedIdentity: identity,
@@ -35,7 +35,7 @@ describe("Auth slice", () => {
   });
 
   it("deletes federatedIdentity stored in device when asked for", () => {
-    const identity: FederatedIdentity = "peConnect:123";
+    const identity: FederatedIdentity = { provider: "peConnect", token: "123" };
     dependencies.deviceRepository.set("federatedIdentity", identity);
     store.dispatch(
       authSlice.actions.federatedIdentityInDeviceDeletionTriggered(),
@@ -46,7 +46,7 @@ describe("Auth slice", () => {
 
   it("retrieves federatedIdentity if stored in device", () => {
     expectFederatedIdentityToEqual(null);
-    const identity: FederatedIdentity = "peConnect:123";
+    const identity: FederatedIdentity = { provider: "peConnect", token: "123" };
     dependencies.deviceRepository.set("federatedIdentity", identity);
     store.dispatch(appIsReadyAction());
     expectFederatedIdentityToEqual(identity);

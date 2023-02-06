@@ -12,9 +12,10 @@ import {
   keys,
 } from "shared";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
-import { useFederatedIdentity } from "src/app/hooks/federatedIdentity";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { agencyGateway } from "src/config/dependencies";
+import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { AgencyErrorText } from "./AgencyErrorText";
 
 type AgencySelectorProps = {
@@ -52,7 +53,7 @@ export const AgencySelector = ({
       name: agencyDepartmentField.placeholder ?? "",
     },
   ]);
-  const federatedIdentity = useFederatedIdentity();
+  const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
 
   useEffect(() => {
     if (!departmentCodeValue) return;

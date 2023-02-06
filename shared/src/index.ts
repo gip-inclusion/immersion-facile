@@ -32,8 +32,6 @@ export * from "./expectToEqual";
 export * from "./exportable";
 export * from "./featureFlags";
 export * from "./federatedIdentities/federatedIdentity.dto";
-export * from "./federatedIdentities/noIdentityProvider.dto";
-export * from "./federatedIdentities/peConnectIdentity.dto";
 export * from "./formEstablishment/FormEstablishment.dto";
 export * from "./formEstablishment/FormEstablishment.schema";
 export * from "./formEstablishment/FormEstablishmentDtoBuilder";
