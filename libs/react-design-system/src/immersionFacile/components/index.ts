@@ -1,4 +1,3 @@
-export * from "./accordion";
 export * from "./buttons";
 export * from "./dropdown";
 export * from "./field";

@@ -1,6 +1,6 @@
 import { keys } from "ramda";
 import React, { useEffect } from "react";
-import { Accordion, DsfrTitle, Notification } from "react-design-system";
+import { DsfrTitle, Notification } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { EmailSentDto, EmailVariables } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -9,6 +9,7 @@ import { sentEmailsSlice } from "src/core-logic/domain/admin/sentEmails/sentEmai
 import { ENV } from "src/config/environmentVariables";
 import { TextCell } from "src/app/components/admin/TextCell";
 import { fr } from "@codegouvfr/react-dsfr";
+import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
 
 export const EmailsTab = () => {
   const dispatch = useDispatch();
@@ -53,57 +54,65 @@ const Email = ({ email }: { email: EmailSentDto }) => {
   const sentAtDate = new Date(email.sentAt);
   return (
     <Accordion
-      title={`${email.error ? "❌" : "✅"} ${
+      label={`${email.error ? "❌" : "✅"} ${
         email.templatedEmail.type
       } envoyé le ${sentAtDate.toLocaleDateString(
         "fr",
       )} à ${sentAtDate.toLocaleTimeString("fr")}`}
-    >
-      <TextCell title="Type" contents={email.templatedEmail.type} />
-      <TextCell
-        title="Destinataires"
-        contents={email.templatedEmail.recipients.join(", ")}
-      />
-      <TextCell title="CC" contents={email.templatedEmail.cc?.join(", ")} />
-      <TextCell
-        title="Paramètres"
-        contents={
-          <ul className={fr.cx("fr-text--xs")}>
-            {keys(email.templatedEmail.params).map((key: EmailVariables) => {
-              const value = (
-                email.templatedEmail.params as Record<EmailVariables, string>
-              )[key];
+      content={
+        <>
+          <TextCell title="Type" contents={email.templatedEmail.type} />
+          <TextCell
+            title="Destinataires"
+            contents={email.templatedEmail.recipients.join(", ")}
+          />
+          <TextCell title="CC" contents={email.templatedEmail.cc?.join(", ")} />
+          <TextCell
+            title="Paramètres"
+            contents={
+              <ul className={fr.cx("fr-text--xs")}>
+                {keys(email.templatedEmail.params).map(
+                  (key: EmailVariables) => {
+                    const value = (
+                      email.templatedEmail.params as Record<
+                        EmailVariables,
+                        string
+                      >
+                    )[key];
 
-              const links: EmailVariables[] = [
-                "agencyLogoUrl",
-                "conventionFormUrl",
-                "conventionStatusLink",
-                "editFrontUrl",
-                "immersionAssessmentCreationLink",
-                "magicLink",
-                "questionnaireUrl",
-              ];
+                    const links: EmailVariables[] = [
+                      "agencyLogoUrl",
+                      "conventionFormUrl",
+                      "conventionStatusLink",
+                      "editFrontUrl",
+                      "immersionAssessmentCreationLink",
+                      "magicLink",
+                      "questionnaireUrl",
+                    ];
 
-              return (
-                <li key={key}>
-                  {" "}
-                  <span>{key} :</span>{" "}
-                  <span style={{ wordWrap: "break-word" }}>
-                    {links.includes(key) ? (
-                      <a href={value as string}>Lien vers la page</a>
-                    ) : (
-                      JSON.stringify(value, undefined, 2)
-                    )}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        }
-      />
-      {email?.error && (
-        <TextCell title="Message d'erreur" contents={email.error} />
-      )}
-    </Accordion>
+                    return (
+                      <li key={key}>
+                        {" "}
+                        <span>{key} :</span>{" "}
+                        <span style={{ wordWrap: "break-word" }}>
+                          {links.includes(key) ? (
+                            <a href={value as string}>Lien vers la page</a>
+                          ) : (
+                            JSON.stringify(value, undefined, 2)
+                          )}
+                        </span>
+                      </li>
+                    );
+                  },
+                )}
+              </ul>
+            }
+          />
+          {email?.error && (
+            <TextCell title="Message d'erreur" contents={email.error} />
+          )}
+        </>
+      }
+    />
   );
 };
