@@ -8,10 +8,10 @@ const currentFederatedIdentity = createRootSelector(
 
 const conventionFederatedIdentityString = createSelector(
   currentFederatedIdentity,
-  (federatedIdentity): ConventionFederatedIdentityString =>
+  (federatedIdentity): ConventionFederatedIdentityString | null =>
     federatedIdentity?.provider === "peConnect"
       ? `${federatedIdentity.provider}:${federatedIdentity.token}`
-      : "noIdentityProvider",
+      : null,
 );
 
 const isSuccessfullyPeConnected = createSelector(

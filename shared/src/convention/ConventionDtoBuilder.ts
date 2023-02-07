@@ -453,11 +453,11 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
   }
 
   withFederatedIdentity(
-    federatedIdentity: ConventionFederatedIdentityString,
+    federatedIdentity: ConventionFederatedIdentityString | undefined,
   ): ConventionDtoBuilder {
     return this.withBeneficiary({
       ...this.beneficiary,
-      federatedIdentity,
+      ...(federatedIdentity ? { federatedIdentity } : {}),
     });
   }
 

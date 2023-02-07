@@ -11,7 +11,7 @@ const initialState: AuthState = {
 
 const onFederatedIdentityReceived = (
   state: AuthState,
-  action: PayloadAction<FederatedIdentity>,
+  action: PayloadAction<FederatedIdentity | null>,
 ) => {
   state.federatedIdentity = action.payload;
 };

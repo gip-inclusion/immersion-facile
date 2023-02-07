@@ -74,7 +74,7 @@ describe("AssociatePeConnectFederatedIdentity", () => {
   it("should not associate convention if no federatedIdentity is 'noIdentityProvider'", async () => {
     const conventionDtoFromEvent = new ConventionDtoBuilder()
       .withId(conventionId)
-      .withFederatedIdentity("noIdentityProvider")
+      .withFederatedIdentity(undefined)
       .build();
 
     await associatePeConnectFederatedIdentity.execute(conventionDtoFromEvent),

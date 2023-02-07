@@ -7,12 +7,7 @@ export const useRedirectToConventionWithoutIdentityProvider = () => {
   const route = useRoute();
 
   return () => {
-    dispatch(
-      authSlice.actions.federatedIdentityProvided({
-        provider: "noIdentityProvider",
-        token: null,
-      }),
-    );
+    dispatch(authSlice.actions.federatedIdentityProvided(null));
     if (route.name !== routes.conventionImmersion.name)
       routes.conventionImmersion().push();
   };

@@ -24,32 +24,19 @@ export const isPeConnectIdentity = (
 ): federatedIdentity is PeConnectIdentity =>
   federatedIdentity?.provider === "peConnect";
 
-export const noIdentityProvider = "noIdentityProvider";
-export type NoIdentity = GenericFederatedIdentity<
-  typeof noIdentityProvider,
-  null
->;
-
 export type InclusionConnectIdentity = GenericFederatedIdentity<
   "inclusionConnect",
   string
 >;
 
-export type FederatedIdentity =
-  | InclusionConnectIdentity
-  | PeConnectIdentity
-  | NoIdentity;
+export type FederatedIdentity = InclusionConnectIdentity | PeConnectIdentity;
 
 export type ConventionFederatedIdentityString =
-  | typeof noIdentityProvider
   | `${PeConnectIdentity["provider"]}:${string}`;
 
 export const convertStringToFederatedIdentity = (
   federatedIdentityString: ConventionFederatedIdentityString,
 ): FederatedIdentity => {
-  if (federatedIdentityString === "noIdentityProvider")
-    return { provider: "noIdentityProvider", token: null };
-
   const [, token] = federatedIdentityString.split(":");
   return {
     provider: "peConnect",

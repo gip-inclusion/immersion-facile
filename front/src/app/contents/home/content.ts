@@ -157,12 +157,7 @@ export const heroHeaderNavCards: (
         href: "",
         onClick: (event) => {
           event.preventDefault();
-          storeDispatch(
-            authSlice.actions.federatedIdentityProvided({
-              provider: "noIdentityProvider",
-              token: null,
-            }),
-          );
+          storeDispatch(authSlice.actions.federatedIdentityProvided(null));
           routes.conventionImmersion().push();
         },
       },
@@ -185,12 +180,7 @@ export const heroHeaderNavCards: (
         href: "",
         onClick: (event) => {
           event.preventDefault();
-          storeDispatch(
-            authSlice.actions.federatedIdentityProvided({
-              provider: "noIdentityProvider",
-              token: null,
-            }),
-          );
+          storeDispatch(authSlice.actions.federatedIdentityProvided(null));
           routes.conventionImmersion().push();
         },
       },
