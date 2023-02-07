@@ -28,22 +28,23 @@ const geosearchQueryEpic: AppEpic<GeosearchAction> = (
     filter((action) => action.payload.length >= queryMinLength),
     debounceTime(debounceDuration, scheduler),
     distinctUntilChanged(),
-    map(geosearchSlice.actions.suggestionsHaveBeenRequested),
+    map((action) =>
+      geosearchSlice.actions.suggestionsHaveBeenRequested(action.payload),
+    ),
   );
 
 const geosearchRequestEpic: AppEpic<GeosearchAction> = (
   action$,
-  state$,
+  _,
   { addressGateway },
 ) =>
   action$.pipe(
     filter(geosearchSlice.actions.suggestionsHaveBeenRequested.match),
-    switchMap(() =>
-      addressGateway.lookupLocation$(state$.value.geosearch.query),
-    ),
+    switchMap((action) => addressGateway.lookupLocation$(action.payload)),
     map(geosearchSlice.actions.suggestionsSuccessfullyFetched),
     catchEpicError((error) =>
       geosearchSlice.actions.suggestionsFailed(error.message),
     ),
   );
+
 export const geosearchEpics = [geosearchQueryEpic, geosearchRequestEpic];

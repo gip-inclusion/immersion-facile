@@ -31,7 +31,10 @@ export const geosearchSlice = createSlice({
       state.suggestions = [];
       state.value = null;
     },
-    suggestionsHaveBeenRequested: (state) => {
+    suggestionsHaveBeenRequested: (
+      state,
+      _action: PayloadAction<LookupLocationInput>,
+    ) => {
       state.isLoading = true;
     },
     suggestionsSuccessfullyFetched: (

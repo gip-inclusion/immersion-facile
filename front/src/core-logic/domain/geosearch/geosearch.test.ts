@@ -60,7 +60,7 @@ describe("Geosearch epic", () => {
 
   it("should throw an error if something goes wrong and returns error feedback", () => {
     const errorMessage = "Error trying to get location";
-    store.dispatch(geosearchSlice.actions.suggestionsHaveBeenRequested());
+    store.dispatch(geosearchSlice.actions.suggestionsHaveBeenRequested("bord"));
     dependencies.addressGateway.lookupLocationResults$.error(
       new Error(errorMessage),
     );
