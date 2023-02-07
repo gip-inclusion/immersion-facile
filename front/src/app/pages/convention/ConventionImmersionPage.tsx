@@ -41,7 +41,6 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
   const isSharedConvention = Object.keys(route.params).length > 0;
 
   useFederatedIdentity(route);
-  useFederatedIdentityOnReload();
 
   if (isLoading) return <Loader />;
 
@@ -97,19 +96,4 @@ const useFederatedIdentity = (route: ConventionImmersionPageRoute) => {
         ),
       );
   }, [route.params.federatedIdentity]);
-};
-
-const useFederatedIdentityOnReload = () => {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(authSlice.actions.federatedIdentityInDeviceDeletionTriggered());
-    const onWindowUnload = () => {
-      dispatch(
-        authSlice.actions.federatedIdentityFromStoreToDeviceStorageTriggered(),
-      );
-    };
-    window.addEventListener("beforeunload", onWindowUnload);
-    return () => window.removeEventListener("beforeunload", onWindowUnload);
-  }, []);
 };
