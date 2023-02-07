@@ -1,11 +1,11 @@
 import { keys } from "ramda";
 import React from "react";
-import { Switch } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { FeatureFlag } from "shared";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFlags.slice";
 import { fr } from "@codegouvfr/react-dsfr";
+import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 
 const labelsByFeatureFlag: Record<FeatureFlag, string> = {
   enableAdminUi: "Ui Admin",
@@ -29,27 +29,24 @@ export const TechnicalOptions = () => {
             <fieldset className={fr.cx("fr-fieldset")}>
               <div className={fr.cx("fr-fieldset__content")}>
                 {keys(featureFlags).map((featureFlagName) => (
-                  <div
-                    className={fr.cx("fr-radio-group", "fr-radio-rich")}
+                  <ToggleSwitch
                     key={featureFlagName}
-                  >
-                    <Switch
-                      label={labelsByFeatureFlag[featureFlagName]}
-                      checked={featureFlags[featureFlagName]}
-                      onChange={() => {
-                        const isConfirmed = window.confirm(
-                          "Vous aller changer ce réglage pour tous les utilisateurs, voulez-vous confirmer ?",
-                        );
+                    label={labelsByFeatureFlag[featureFlagName]}
+                    checked={featureFlags[featureFlagName]}
+                    showCheckedHint={false}
+                    onChange={() => {
+                      const isConfirmed = window.confirm(
+                        "Vous aller changer ce réglage pour tous les utilisateurs, voulez-vous confirmer ?",
+                      );
 
-                        if (isConfirmed)
-                          dispatch(
-                            featureFlagsSlice.actions.setFeatureFlagRequested(
-                              featureFlagName,
-                            ),
-                          );
-                      }}
-                    />
-                  </div>
+                      if (isConfirmed)
+                        dispatch(
+                          featureFlagsSlice.actions.setFeatureFlagRequested(
+                            featureFlagName,
+                          ),
+                        );
+                    }}
+                  />
                 ))}
               </div>
             </fieldset>

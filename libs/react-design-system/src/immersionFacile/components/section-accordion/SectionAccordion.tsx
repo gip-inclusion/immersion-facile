@@ -1,5 +1,4 @@
 import React from "react";
-// import { AccordionDSFR, AccordionDSFRItem } from "../../../designSystemFrance";
 import "./SectionAccordion.scss";
 import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
