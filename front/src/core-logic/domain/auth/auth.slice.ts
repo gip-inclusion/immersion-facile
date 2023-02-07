@@ -22,13 +22,14 @@ export const authSlice = createSlice({
   reducers: {
     federatedIdentityProvided: onFederatedIdentityReceived,
 
-    federatedIdentityFromStoreToDeviceStorageTriggered: (state) => state,
     federatedIdentityFromStoreToDeviceStorageSucceeded: (state) => state,
 
     federatedIdentityFoundInDevice: onFederatedIdentityReceived,
     federatedIdentityNotFoundInDevice: (state) => state,
 
-    federatedIdentityInDeviceDeletionTriggered: (state) => state,
+    federatedIdentityDeletionTriggered: (state) => {
+      state.federatedIdentity = null;
+    },
     federatedIdentityInDeviceDeletionSucceeded: (state) => state,
   },
 });

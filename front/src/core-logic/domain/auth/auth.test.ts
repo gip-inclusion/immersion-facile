@@ -14,32 +14,27 @@ describe("Auth slice", () => {
     ({ store, dependencies } = createTestStore());
   });
 
-  it("stores the federated identity when someones connects", () => {
+  it("stores the federated identity when someones connects (in store and in device)", () => {
     expectFederatedIdentityToEqual(null);
-    const identity: FederatedIdentity = { provider: "peConnect", token: "123" };
+    const identity: FederatedIdentity = {
+      provider: "inclusionConnect",
+      token: "123",
+    };
     store.dispatch(authSlice.actions.federatedIdentityProvided(identity));
     expectFederatedIdentityToEqual(identity);
-  });
-
-  it("stores to device storage the federated identity when asked for", () => {
-    const identity: FederatedIdentity = { provider: "peConnect", token: "123" };
-    ({ store, dependencies } = createTestStore({
-      auth: {
-        federatedIdentity: identity,
-      },
-    }));
-    store.dispatch(
-      authSlice.actions.federatedIdentityFromStoreToDeviceStorageTriggered(),
-    );
     expectFederatedIdentityInDevice(identity);
   });
 
-  it("deletes federatedIdentity stored in device when asked for", () => {
-    const identity: FederatedIdentity = { provider: "peConnect", token: "123" };
-    dependencies.deviceRepository.set("federatedIdentity", identity);
-    store.dispatch(
-      authSlice.actions.federatedIdentityInDeviceDeletionTriggered(),
-    );
+  it("deletes federatedIdentity stored in device and in store when asked for", () => {
+    const federatedIdentity: FederatedIdentity = {
+      provider: "peConnect",
+      token: "123",
+    };
+    ({ store, dependencies } = createTestStore({
+      auth: { federatedIdentity },
+    }));
+    dependencies.deviceRepository.set("federatedIdentity", federatedIdentity);
+    store.dispatch(authSlice.actions.federatedIdentityDeletionTriggered());
     expectFederatedIdentityToEqual(null);
     expectFederatedIdentityInDevice(undefined);
   });
