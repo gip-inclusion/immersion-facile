@@ -308,25 +308,27 @@ export const SearchPage = ({
                           <strong>{searchResults.length}</strong> résultats
                           trouvés
                         </span>
-                        <span
-                          className={cx(
-                            fr.cx("fr-text--xs"),
-                            "im-search-page__results-summary-description",
-                          )}
-                        >
-                          pour la recherche{" "}
-                          <strong className={fr.cx("fr-text--bold")}>
-                            {route.params.appellationLabel}
-                          </strong>
-                          , étendue au secteur{" "}
-                          <a
-                            href={`https://candidat.pole-emploi.fr/marche-du-travail/fichemetierrome?codeRome=${route.params.rome}`}
-                            target="_blank"
-                            className={fr.cx("fr-text--bold")}
+                        {route.params.rome && route.params.romeLabel && (
+                          <span
+                            className={cx(
+                              fr.cx("fr-text--xs"),
+                              "im-search-page__results-summary-description",
+                            )}
                           >
-                            {route.params.romeLabel}
-                          </a>
-                        </span>
+                            pour la recherche{" "}
+                            <strong className={fr.cx("fr-text--bold")}>
+                              {route.params.appellationLabel}
+                            </strong>
+                            , étendue au secteur{" "}
+                            <a
+                              href={`https://candidat.pole-emploi.fr/marche-du-travail/fichemetierrome?codeRome=${route.params.rome}`}
+                              target="_blank"
+                              className={fr.cx("fr-text--bold")}
+                            >
+                              {route.params.romeLabel}
+                            </a>
+                          </span>
+                        )}
                       </>
                     )}
                   </aside>
