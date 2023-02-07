@@ -17,6 +17,7 @@ import {
   formEstablishmentSchema,
   FormEstablishmentSource,
   EstablishmentCSVRow,
+  isCSVCellEmptyString,
 } from "shared";
 
 type EstablishmentBatchAction = ActionOfSlice<typeof establishmentBatchSlice>;
@@ -80,9 +81,13 @@ export const candidateEstablishmentMapper = (
     ),
     businessContact: {
       contactMethod: establishmentRow.businessContact_contactMethod,
-      copyEmails: establishmentCopyEmailsFromCSVToDto(
+      copyEmails: isCSVCellEmptyString(
         establishmentRow.businessContact_copyEmails,
-      ),
+      )
+        ? []
+        : establishmentCopyEmailsFromCSVToDto(
+            establishmentRow.businessContact_copyEmails,
+          ),
       email: establishmentRow.businessContact_email,
       firstName: establishmentRow.businessContact_firstName,
       job: establishmentRow.businessContact_job,

@@ -18,3 +18,5 @@ export const establishmentCopyEmailsFromCSVToDto = (
 ): string[] => copyEmailsRow.replaceAll(" ", "").split(",");
 
 export const csvBooleanToBoolean = (value: string) => Boolean(parseInt(value));
+
+export const isCSVCellEmptyString = (value: string) => value.trim() === "";
