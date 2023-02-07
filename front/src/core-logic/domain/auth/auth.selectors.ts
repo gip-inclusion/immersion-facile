@@ -21,8 +21,14 @@ const isSuccessfullyPeConnected = createSelector(
     federatedIdentity.token !== authFailed,
 );
 
+const isInclusionConnected = createSelector(
+  currentFederatedIdentity,
+  (federatedIdentity) => federatedIdentity?.provider === "inclusionConnect",
+);
+
 export const authSelectors = {
   federatedIdentity: currentFederatedIdentity,
   conventionFederatedIdentityString,
   isSuccessfullyPeConnected,
+  isInclusionConnected,
 };

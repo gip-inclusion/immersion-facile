@@ -1,6 +1,9 @@
 import { Flavor } from "../typeFlavors";
 
-type FederatedIdentityProvider = "peConnect" | "noIdentityProvider";
+type FederatedIdentityProvider =
+  | "inclusionConnect"
+  | "peConnect"
+  | "noIdentityProvider";
 
 type GenericFederatedIdentity<
   P extends FederatedIdentityProvider,
@@ -27,7 +30,15 @@ export type NoIdentity = GenericFederatedIdentity<
   null
 >;
 
-export type FederatedIdentity = PeConnectIdentity | NoIdentity;
+export type InclusionConnectIdentity = GenericFederatedIdentity<
+  "inclusionConnect",
+  string
+>;
+
+export type FederatedIdentity =
+  | InclusionConnectIdentity
+  | PeConnectIdentity
+  | NoIdentity;
 
 export type ConventionFederatedIdentityString =
   | typeof noIdentityProvider
