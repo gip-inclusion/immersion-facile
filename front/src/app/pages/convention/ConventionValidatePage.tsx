@@ -22,6 +22,7 @@ import { ConventionValidation } from "src/app/components/admin/ConventionValidat
 import { Route } from "type-route";
 import { VerificationActionButton } from "src/app/components/forms/convention/VerificationActionButton";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
+import { fr } from "@codegouvfr/react-dsfr";
 
 type VerificationPageProps = {
   route: Route<typeof routes.conventionToValidate>;
@@ -155,6 +156,19 @@ export const ConventionValidatePage = ({ route }: VerificationPageProps) => {
             signatories={convention.signatories}
           />
         </div>
+        <section>
+          <hr className={fr.cx("fr-hr", "fr-my-4w")} />
+          <iframe
+            src="https://tally.so/embed/wM1oRp?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1"
+            loading="lazy"
+            width="100%"
+            height="250"
+            frameBorder="0"
+            marginHeight={0}
+            marginWidth={0}
+            title="NPS Prescripteurs"
+          ></iframe>
+        </section>
       </MainWrapper>
     </HeaderFooterLayout>
   );
