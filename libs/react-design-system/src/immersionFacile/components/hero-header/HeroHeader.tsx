@@ -17,7 +17,6 @@ export type HeroHeaderProps = {
   patterns?: boolean;
   navCards?: HeroHeaderNavCard[];
   siretModal: JSX.Element;
-  peConnectModal: JSX.Element;
 };
 export type HeroHeaderNavCard = {
   title: string;
@@ -40,7 +39,6 @@ export const HeroHeader = ({
   navCards,
   parallax,
   siretModal,
-  peConnectModal,
   icon,
   typeDisplayName,
 }: HeroHeaderProps) => {
@@ -155,7 +153,6 @@ export const HeroHeader = ({
         </div>
       )}
       {siretModal}
-      {peConnectModal}
     </section>
   );
 };

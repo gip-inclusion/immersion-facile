@@ -19,10 +19,6 @@ import {
 } from "src/app/contents/home/content";
 import { useDispatch } from "react-redux";
 import { SiretModal, useSiretModal } from "src/app/components/SiretModal";
-import {
-  PeConnectModal,
-  usePeConnectModal,
-} from "src/app/components/PeConnectModal";
 
 import { AnyAction, Dispatch } from "@reduxjs/toolkit";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
@@ -38,12 +34,9 @@ export const HomePage = ({ type }: HomePageProps) => {
   const storeDispatch = useDispatch();
   const { modalState: siretModalState, dispatch: siretModalDispatch } =
     useSiretModal();
-  const { modalState: peConnectModalState, dispatch: peConnectModalDispatch } =
-    usePeConnectModal();
   const heroHeaderNavCardsWithDispatch = heroHeaderNavCards(
     storeDispatch,
     siretModalDispatch as Dispatch<AnyAction>,
-    peConnectModalDispatch as Dispatch<AnyAction>,
   );
   const { title, subtitle, displayName, icon, illustration } =
     heroHeaderContent[type];
@@ -66,12 +59,6 @@ export const HomePage = ({ type }: HomePageProps) => {
             <SiretModal
               modalState={siretModalState}
               dispatch={siretModalDispatch}
-            />
-          }
-          peConnectModal={
-            <PeConnectModal
-              modalState={peConnectModalState}
-              dispatch={peConnectModalDispatch}
             />
           }
         />

@@ -57,7 +57,6 @@ export const heroHeaderContent: Record<UserType, HeroHeaderInfos> = {
 export const heroHeaderNavCards: (
   storeDispatch: Dispatch,
   siretModalDispatch: Dispatch,
-  peConnectModalDispatch: Dispatch,
 ) => Record<UserType, HeroHeaderNavCard[]> = (
   storeDispatch: Dispatch,
   siretModalDispatch: Dispatch,
