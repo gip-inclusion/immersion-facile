@@ -2,7 +2,6 @@ import { keys } from "ramda";
 import React from "react";
 import { ButtonHome, PeConnectButton } from "react-design-system";
 import { loginPeConnect } from "shared";
-import { useRedirectToConventionWithoutIdentityProvider } from "src/app/hooks/redirections.hooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
 import { useRoute } from "src/app/routes/routes";
@@ -24,6 +23,7 @@ type InitiateConventionCardProps = {
   showFormButtonLabel: string;
   otherCaseNotice: string;
   useSection?: boolean;
+  onNotPeConnectButtonClick: () => void;
 };
 
 export const InitiateConventionCard = ({
@@ -32,11 +32,10 @@ export const InitiateConventionCard = ({
   showFormButtonLabel,
   otherCaseNotice,
   useSection = true,
+  onNotPeConnectButtonClick,
 }: InitiateConventionCardProps) => {
   const { enablePeConnectApi } = useFeatureFlags();
   const currentRoute = useRoute();
-  const redirectToConventionWithoutIdentityProvider =
-    useRedirectToConventionWithoutIdentityProvider();
   const cardContent = (
     <div>
       {enablePeConnectApi ? (
@@ -66,14 +65,14 @@ export const InitiateConventionCard = ({
             <p dangerouslySetInnerHTML={{ __html: otherCaseNotice }}></p>
             <OtherChoiceButton
               label={showFormButtonLabel}
-              onClick={redirectToConventionWithoutIdentityProvider}
+              onClick={onNotPeConnectButtonClick}
             />
           </div>
         </>
       ) : (
         <OtherChoiceButton
           label={showFormButtonLabel}
-          onClick={redirectToConventionWithoutIdentityProvider}
+          onClick={onNotPeConnectButtonClick}
         />
       )}
     </div>

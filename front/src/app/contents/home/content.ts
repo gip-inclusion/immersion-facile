@@ -61,7 +61,6 @@ export const heroHeaderNavCards: (
 ) => Record<UserType, HeroHeaderNavCard[]> = (
   storeDispatch: Dispatch,
   siretModalDispatch: Dispatch,
-  peConnectModalDispatch: Dispatch,
 ) => ({
   default: [
     {
@@ -102,15 +101,7 @@ export const heroHeaderNavCards: (
       icon: "fr-icon-file-line",
       type: "candidate",
       id: getHeroHeaderId("candidate-form-convention"),
-      link: {
-        href: "",
-        onClick: (event) => {
-          event.preventDefault();
-          peConnectModalDispatch({
-            type: "CLICKED_OPEN",
-          });
-        },
-      },
+      link: routes.conventionImmersion().link,
     },
     // {
     //   title: "Conseils utiles pour l’immersion",

@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { FederatedIdentity } from "shared";
+import { FederatedIdentity, isPeConnectIdentity } from "shared";
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
 import { ConventionFormContainerLayout } from "src/app/components/forms/convention/ConventionFormContainerLayout";
 import { conventionInitialValuesFromUrl } from "src/app/components/forms/convention/conventionHelpers";
@@ -36,11 +36,18 @@ export const ConventionImmersionPage = ({
 const PageContent = ({ route }: ConventionImmersionPageProps) => {
   const { enablePeConnectApi, isLoading } = useFeatureFlags();
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
-
-  const isNotPeConnected = enablePeConnectApi && !federatedIdentity;
+  const [shouldShowForm, setShouldShowForm] = useState(false);
   const isSharedConvention = Object.keys(route.params).length > 0;
 
   useFederatedIdentity(route);
+
+  useEffect(() => {
+    setShouldShowForm(
+      enablePeConnectApi &&
+        !!federatedIdentity &&
+        isPeConnectIdentity(federatedIdentity),
+    );
+  }, [enablePeConnectApi, federatedIdentity]);
 
   if (isLoading) return <Loader />;
 
@@ -55,7 +62,15 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
       />
     );
 
-  return isNotPeConnected ? (
+  return shouldShowForm ? (
+    <ConventionForm
+      properties={conventionInitialValuesFromUrl({
+        route,
+        internshipKind: "immersion",
+      })}
+      routeParams={route.params}
+    />
+  ) : (
     <div
       className={fr.cx(
         "fr-grid-row",
@@ -72,16 +87,9 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
         peConnectNotice="Je suis demandeur d’emploi et je connais mes identifiants à mon compte Pôle emploi. J'accède au formulaire ici :"
         otherCaseNotice="Je suis dans une autre situation (candidat à une immersion sans identifiant Pôle emploi, entreprise ou conseiller emploi). J'accède au formulaire partagé ici :"
         showFormButtonLabel="Ouvrir le formulaire"
+        onNotPeConnectButtonClick={() => setShouldShowForm(true)}
       />
     </div>
-  ) : (
-    <ConventionForm
-      properties={conventionInitialValuesFromUrl({
-        route,
-        internshipKind: "immersion",
-      })}
-      routeParams={route.params}
-    />
   );
 };
 
