@@ -319,9 +319,13 @@ export const SearchPage = ({
                             {route.params.appellationLabel}
                           </strong>
                           , étendue au secteur{" "}
-                          <strong className={fr.cx("fr-text--bold")}>
+                          <a
+                            href={`https://candidat.pole-emploi.fr/marche-du-travail/fichemetierrome?codeRome=${route.params.rome}`}
+                            target="_blank"
+                            className={fr.cx("fr-text--bold")}
+                          >
                             {route.params.romeLabel}
-                          </strong>
+                          </a>
                         </span>
                       </>
                     )}
