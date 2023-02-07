@@ -8,7 +8,6 @@ export * from "./link";
 export * from "./notification";
 export * from "./text";
 export * from "./tabLinks";
-export * from "./logo";
 export * from "./footer";
 export * from "./main-wrapper";
 export * from "./file";
