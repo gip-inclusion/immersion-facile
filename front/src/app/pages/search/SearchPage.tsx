@@ -50,10 +50,6 @@ export const SearchPage = ({
     distance_km: 10,
     place: "",
     sortedBy: undefined,
-    appellationCode: "",
-    appellationLabel: "",
-    rome: "",
-    romeLabel: "",
   };
   const [formikValues, setFormikValues] =
     useState<SearchPageParams>(initialValues);
