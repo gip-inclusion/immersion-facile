@@ -59,6 +59,13 @@ export const SectionTextEmbed = ({
           url={videoUrl}
           width="100%"
           height="auto"
+          playing
+          light={
+            <img
+              src={videoPosterUrl}
+              alt="Vignette vidéo Immersion en entreprise"
+            />
+          }
           config={{
             file: {
               attributes: {
