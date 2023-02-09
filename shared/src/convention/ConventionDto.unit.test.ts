@@ -1,5 +1,5 @@
+import { addDays } from "date-fns";
 import { keys } from "ramda";
-import { addDays } from "../date";
 import { splitCasesBetweenPassingAndFailing } from "../test.helpers";
 import {
   maximumCalendarDayByInternshipKind,
@@ -235,7 +235,9 @@ describe("conventionDtoSchema", () => {
           const convention = new ConventionDtoBuilder()
             .withInternshipKind(intershipKind)
             .withDateStart(DATE_START)
-            .withDateEnd(addDays(DATE_START, maxCalendarDays + 1))
+            .withDateEnd(
+              addDays(new Date(DATE_START), maxCalendarDays + 1).toISOString(),
+            )
             .build();
 
           expectConventionDtoToBeInvalid(convention);
@@ -246,7 +248,10 @@ describe("conventionDtoSchema", () => {
         "for $intershipKind accepts end date that are <= $maxCalendarDays calendar days after the start date",
         ({ intershipKind, maxCalendarDays }) => {
           const dateStart = DATE_START;
-          const dateEnd = addDays(DATE_START, maxCalendarDays);
+          const dateEnd = addDays(
+            new Date(DATE_START),
+            maxCalendarDays,
+          ).toISOString();
           const convention = new ConventionDtoBuilder()
             .withInternshipKind(intershipKind)
             .withDateStart(dateStart)

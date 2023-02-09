@@ -1,4 +1,4 @@
-import { addDays, format, getDay, parseISO } from "date-fns";
+import { addDays, addHours, format, getDay, parseISO } from "date-fns";
 import { prop } from "ramda";
 
 import {
@@ -466,7 +466,7 @@ export const makeComplexSchedule = (
   for (
     let currentDate = start;
     currentDate <= end;
-    currentDate = addDays(currentDate, 1)
+    currentDate = addHours(currentDate, 24)
   )
     complexSchedules.push(makeDailySchedule(currentDate, timePeriods));
   return complexSchedules;

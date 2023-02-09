@@ -1,8 +1,9 @@
 import { expectToEqual } from "../expectToEqual";
-import { weekdays, DayPeriodsDto } from "./Schedule.dto";
-import { scheduleSchema, isoStringSchema } from "./Schedule.schema";
+import { DayPeriodsDto, weekdays } from "./Schedule.dto";
+import { isoStringSchema, scheduleSchema } from "./Schedule.schema";
 import { ScheduleDtoBuilder } from "./ScheduleDtoBuilder";
 import {
+  calculateNumberOfWorkedDays,
   calculateTotalImmersionHoursBetweenDate,
   calculateTotalImmersionHoursFromComplexSchedule,
   convertToFrenchNamedDays,
@@ -641,6 +642,39 @@ describe("ScheduleUtils", () => {
       expect(isoStringSchema.parse("2022-07-05")).toEqual(
         new Date("2022-07-05").toISOString(),
       );
+    });
+  });
+  describe("french hour changes (changement d'heure)", () => {
+    it("schedule with 26th March", () => {
+      const interval = {
+        start: new Date("2023-03-21"),
+        end: new Date("2023-03-30"),
+      };
+      const schedule = new ScheduleDtoBuilder()
+        .withEmptyComplexSchedule(interval)
+        .withRegularSchedule({
+          dayPeriods: [[6, 6]],
+          timePeriods: [{ start: "08:00", end: "12:00" }],
+        })
+        .build();
+      expectToEqual(schedule.complexSchedule, [
+        {
+          date: "2023-03-26T00:00:00.000Z",
+          timePeriods: [
+            {
+              start: "08:00",
+              end: "12:00",
+            },
+          ],
+        },
+      ]);
+      expectToEqual(
+        calculateTotalImmersionHoursFromComplexSchedule(
+          schedule.complexSchedule,
+        ),
+        4,
+      );
+      expectToEqual(calculateNumberOfWorkedDays(schedule.complexSchedule), 1);
     });
   });
 });

@@ -84,7 +84,6 @@ export * from "./utils/string";
 export * from "./utils/toDotNotation";
 export * from "./utils/csv";
 export * from "./zodUtils";
-export * from "./date";
 export * from "./test.helpers";
 export { absoluteUrlSchema } from "./AbsoluteUrl";
 export { HttpClientError as LegacyHttpClientError } from "./httpClient/errors/4xxClientError.error";
