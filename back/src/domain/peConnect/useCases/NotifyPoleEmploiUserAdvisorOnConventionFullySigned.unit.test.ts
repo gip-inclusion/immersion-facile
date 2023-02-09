@@ -12,8 +12,8 @@ import {
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { PeUserAndAdvisor } from "../../../domain/peConnect/dto/PeConnect.dto";
-import { NotifyPoleEmploiUserAdvisorOnConventionFullySigned } from "../../../domain/peConnect/useCases/NotifyPoleEmploiUserAdvisorOnConventionFullySigned";
+import { PeUserAndAdvisor } from "../dto/PeConnect.dto";
+import { NotifyPoleEmploiUserAdvisorOnConventionFullySigned } from "./NotifyPoleEmploiUserAdvisorOnConventionFullySigned";
 import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/fakeGenerateMagicLinkUrlFn";
 import { PeConnectImmersionAdvisorDto } from "../dto/PeConnectAdvisor.dto";
 
@@ -39,7 +39,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
   it("should resolve to undefined if the convention pole emploi OAuth advisor is not found", async () => {
     const conventionDtoFromEvent: ConventionDto = new ConventionDtoBuilder()
       .withId("some-invalid-id")
-      .withFederatedIdentity("peConnect:blop")
+      .withFederatedIdentity({ provider: "peConnect", token: "blop" })
       .build();
 
     expect(await usecase.execute(conventionDtoFromEvent)).toBeUndefined();
@@ -49,7 +49,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
     const conventionDtoFromEvent = new ConventionDtoBuilder()
       .withId(conventionId)
       .withAgencyId(agency.id)
-      .withFederatedIdentity(`peConnect:${userPeExternalId}`)
+      .withFederatedIdentity({ provider: "peConnect", token: userPeExternalId })
       .withBeneficiaryFirstName("John")
       .withBeneficiaryLastName("Doe")
       .withBeneficiaryEmail("john.doe@plop.fr")
@@ -108,7 +108,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
     const conventionDtoFromEvent = new ConventionDtoBuilder()
       .withId(conventionId)
       .withAgencyId(agency.id)
-      .withFederatedIdentity(`peConnect:${userPeExternalId}`)
+      .withFederatedIdentity({ provider: "peConnect", token: userPeExternalId })
       .withBeneficiaryFirstName("John")
       .withBeneficiaryLastName("Doe")
       .withBeneficiaryEmail("john.doe@plop.fr")

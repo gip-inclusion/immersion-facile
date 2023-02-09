@@ -11,7 +11,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 const storeConventionRouteParamsOnDevice = (
   routeParams: ConventionImmersionPageRoute["params"],
 ) => {
-  const { federatedIdentity, jwt, ...partialConvention } = routeParams;
+  const { fedId, fedIdProvider, jwt, ...partialConvention } = routeParams;
   if (keys(partialConvention).length) {
     deviceRepository.set("partialConventionInUrl", partialConvention);
   }

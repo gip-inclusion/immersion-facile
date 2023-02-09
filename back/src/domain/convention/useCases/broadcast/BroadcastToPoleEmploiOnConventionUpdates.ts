@@ -78,7 +78,7 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
         ? convention.externalId.padStart(11, "0")
         : "no-external-id",
       originalId: convention.id,
-      peConnectId: beneficiary.federatedIdentity.replace("peConnect:", ""),
+      peConnectId: beneficiary.federatedIdentity.token,
       status: conventionStatusToPoleEmploiStatus[convention.status],
       email: beneficiary.email,
       telephone: beneficiary.phone,

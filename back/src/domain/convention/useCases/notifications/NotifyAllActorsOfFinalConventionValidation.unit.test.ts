@@ -3,7 +3,6 @@ import {
   AgencyDtoBuilder,
   ConventionDto,
   ConventionDtoBuilder,
-  ConventionFederatedIdentityString,
   displayEmergencyContactInfos,
   expectTypeToMatchAndEqual,
   prettyPrintSchedule,
@@ -181,7 +180,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
     );
   });
   it("With PeConnect Federated identity: beneficiary, establishment tutor, agency counsellor & validator, and dedicated advisor", async () => {
-    const userPeExternalId: ConventionFederatedIdentityString = `peConnect:i-am-an-external-id`;
+    const userPeExternalId = "i-am-an-external-id";
     const userConventionAdvisor: ConventionPoleEmploiUserAdvisorEntity = {
       _entityName: "ConventionPoleEmploiAdvisor",
       advisor: {
@@ -220,7 +219,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
     );
   });
   it("With PeConnect Federated identity: beneficiary, establishment tutor, agency counsellor & validator, and no advisor", async () => {
-    const userPeExternalId: ConventionFederatedIdentityString = `peConnect:i-am-an-external-id`;
+    const userPeExternalId = "i-am-an-external-id";
     const userConventionAdvisor: ConventionPoleEmploiUserAdvisorEntity = {
       _entityName: "ConventionPoleEmploiAdvisor",
       advisor: undefined,

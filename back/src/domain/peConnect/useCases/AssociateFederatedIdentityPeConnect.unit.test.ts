@@ -1,10 +1,5 @@
-import {
-  ConventionDtoBuilder,
-  ConventionFederatedIdentityString,
-  expectObjectsToMatch,
-} from "shared";
+import { ConventionDtoBuilder, expectObjectsToMatch } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
-import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
@@ -40,25 +35,6 @@ describe("AssociatePeConnectFederatedIdentity", () => {
       new AssociatePeConnectFederatedIdentity(uowPerformer, createNewEvent);
   });
 
-  it("should not associate convention and federated identity if the federated identity does not match format", async () => {
-    conventionPoleEmploiAdvisorRepo.setConventionPoleEmploiUsersAdvisor([
-      conventionPoleEmploiUserAdvisorFromDto(
-        userAdvisorDto,
-        CONVENTION_ID_DEFAULT_UUID,
-      ),
-    ]);
-
-    const conventionDtoFromEvent = new ConventionDtoBuilder()
-      .withId(conventionId)
-      .withFederatedIdentity(
-        "Does not start with peConnect:" as ConventionFederatedIdentityString,
-      )
-      .build();
-
-    await expect(
-      associatePeConnectFederatedIdentity.execute(conventionDtoFromEvent),
-    ).rejects.toThrow(BadRequestError);
-  });
   it("should not associate convention if no federatedIdentity is provided", async () => {
     const conventionDtoFromEvent = new ConventionDtoBuilder()
       .withId(conventionId)
@@ -87,7 +63,7 @@ describe("AssociatePeConnectFederatedIdentity", () => {
   it("authfailed", async () => {
     const conventionDtoFromEvent = new ConventionDtoBuilder()
       .withId(conventionId)
-      .withFederatedIdentity("peConnect:AuthFailed")
+      .withFederatedIdentity({ provider: "peConnect", token: "AuthFailed" })
       .build();
 
     await associatePeConnectFederatedIdentity.execute(conventionDtoFromEvent);
@@ -109,7 +85,7 @@ describe("AssociatePeConnectFederatedIdentity", () => {
 
     const conventionDtoFromEvent = new ConventionDtoBuilder()
       .withId(conventionId)
-      .withFederatedIdentity(`peConnect:${userPeExternalId}`)
+      .withFederatedIdentity({ provider: "peConnect", token: userPeExternalId })
       .build();
 
     await associatePeConnectFederatedIdentity.execute(conventionDtoFromEvent);
@@ -134,7 +110,7 @@ describe("AssociatePeConnectFederatedIdentity", () => {
 
     const conventionDtoFromEvent = new ConventionDtoBuilder()
       .withId(conventionId)
-      .withFederatedIdentity(`peConnect:${userPeExternalId}`)
+      .withFederatedIdentity({ provider: "peConnect", token: userPeExternalId })
       .build();
 
     await associatePeConnectFederatedIdentity.execute(conventionDtoFromEvent);
@@ -167,7 +143,7 @@ describe("AssociatePeConnectFederatedIdentity", () => {
 
     const conventionDtoFromEvent = new ConventionDtoBuilder()
       .withId(conventionId)
-      .withFederatedIdentity(`peConnect:${userPeExternalId}`)
+      .withFederatedIdentity({ provider: "peConnect", token: userPeExternalId })
       .build();
 
     await associatePeConnectFederatedIdentity.execute(conventionDtoFromEvent);

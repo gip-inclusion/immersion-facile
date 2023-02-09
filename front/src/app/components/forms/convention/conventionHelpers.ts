@@ -1,7 +1,6 @@
 import { addDays, startOfToday } from "date-fns";
 import {
   ConventionDto,
-  ConventionFederatedIdentityString,
   ConventionId,
   ConventionStatus,
   DepartmentCode,
@@ -11,6 +10,7 @@ import {
   LevelOfEducation,
   mergeObjectsExceptFalsyValues,
   OmitFromExistingKeys,
+  PeConnectIdentity,
   reasonableSchedule,
   Signatories,
   toDateString,
@@ -123,9 +123,14 @@ export const conventionInitialValuesFromUrl = ({
         emergencyContactEmail: params.emergencyContactEmail ?? "",
         levelOfEducation: (params.led as LevelOfEducation) ?? "",
         birthdate: params.birthdate ?? "",
-        federatedIdentity: params.federatedIdentity as
-          | ConventionFederatedIdentityString
-          | undefined,
+        ...(params.fedId && params.fedIdProvider
+          ? {
+              federatedIdentity: {
+                provider: params.fedIdProvider as PeConnectIdentity["provider"],
+                token: params.fedId,
+              },
+            }
+          : {}),
       },
       establishmentRepresentative: {
         role: "establishment-representative",

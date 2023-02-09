@@ -35,7 +35,8 @@ export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalU
     return accessToken
       ? this.onAccessToken(accessToken, uow)
       : this.makeRedirectUrl({
-          federatedIdentity: "peConnect:AuthFailed",
+          fedIdProvider: "peConnect",
+          fedId: "AuthFailed",
         });
   }
 
@@ -45,7 +46,8 @@ export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalU
     );
     if (!userAndAdvisors)
       return this.makeRedirectUrl({
-        federatedIdentity: "peConnect:AuthFailed",
+        fedIdProvider: "peConnect",
+        fedId: "AuthFailed",
       });
     const { user, advisors } = userAndAdvisors;
 

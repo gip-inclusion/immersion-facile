@@ -100,7 +100,8 @@ const convertToConventionInUrl = (
     ...(levelOfEducation ? { led: levelOfEducation } : {}),
     emergencyContact: beneficiary.emergencyContact,
     emergencyContactPhone: beneficiary.emergencyContactPhone,
-    federatedIdentity: beneficiary.federatedIdentity,
+    fedId: beneficiary.federatedIdentity?.token,
+    fedIdProvider: beneficiary.federatedIdentity?.provider,
   };
 };
 

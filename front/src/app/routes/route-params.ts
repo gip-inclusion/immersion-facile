@@ -59,7 +59,8 @@ export type ConventionFormKeysInUrl = keyof ConventionQueryParams;
 type ConventionQueryParams = typeof conventionValuesFromUrl;
 
 export const conventionValuesFromUrl = {
-  federatedIdentity: param.query.optional.string,
+  fedId: param.query.optional.string,
+  fedIdProvider: param.query.optional.string,
   email: param.query.optional.string,
   firstName: param.query.optional.string,
   lastName: param.query.optional.string,

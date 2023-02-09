@@ -59,7 +59,7 @@ describe("Broadcasts events to pole-emploi", () => {
     const convention = new ConventionDtoBuilder()
       .withId(immersionConventionId)
       .withExternalId(peExternalId)
-      .withFederatedIdentity("peConnect:some-id")
+      .withFederatedIdentity({ provider: "peConnect", token: "some-id" })
       .withDateStart("2021-05-13T10:00:00.000Z")
       .withDateEnd("2021-05-14T10:30:00.000Z") // Lasts 1 day and half an hour, ie. 24.5 hours
       .withImmersionObjective("Confirmer un projet professionnel")
@@ -90,7 +90,7 @@ describe("Broadcasts events to pole-emploi", () => {
         romeLabel: "some Rome",
       })
       .withStatus("ACCEPTED_BY_VALIDATOR")
-      .withFederatedIdentity("peConnect:some-id")
+      .withFederatedIdentity({ provider: "peConnect", token: "some-id" })
       .withDateStart("2021-05-12")
       .withDateEnd("2021-05-14T00:30:00.000Z") //
       .withSchedule(reasonableSchedule)

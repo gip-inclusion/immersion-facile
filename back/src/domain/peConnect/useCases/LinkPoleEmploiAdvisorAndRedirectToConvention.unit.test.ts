@@ -6,8 +6,8 @@ import {
 import { CONVENTION_ID_DEFAULT_UUID } from "../../../adapters/secondary/InMemoryConventionPoleEmploiAdvisorRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemoryPeConnectGateway } from "../../../adapters/secondary/PeConnectGateway/InMemoryPeConnectGateway";
-import { conventionPoleEmploiUserAdvisorFromDto } from "../../../domain/peConnect/entities/ConventionPoleEmploiAdvisorEntity";
-import { LinkPoleEmploiAdvisorAndRedirectToConvention } from "../../../domain/peConnect/useCases/LinkPoleEmploiAdvisorAndRedirectToConvention";
+import { conventionPoleEmploiUserAdvisorFromDto } from "../entities/ConventionPoleEmploiAdvisorEntity";
+import { LinkPoleEmploiAdvisorAndRedirectToConvention } from "./LinkPoleEmploiAdvisorAndRedirectToConvention";
 import { AccessTokenDto } from "../dto/AccessToken.dto";
 import {
   PeConnectAdvisorDto,
@@ -94,7 +94,7 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
       const urlWithQueryParams = await usecase.execute(authorizationCode);
 
       expect(urlWithQueryParams).toBe(
-        `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&federatedIdentity=peConnect:${userPeExternalId}`,
+        `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&fedId=${userPeExternalId}&fedIdProvider=peConnect`,
       );
     });
   });
@@ -104,7 +104,7 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
       const urlWithQueryParams = await usecase.execute(authorizationCode);
 
       expect(urlWithQueryParams).toBe(
-        `${baseurl}/demande-immersion?federatedIdentity=peConnect:AuthFailed`,
+        `${baseurl}/demande-immersion?fedIdProvider=peConnect&fedId=AuthFailed`,
       );
       expectTypeToMatchAndEqual(
         uow.conventionPoleEmploiAdvisorRepository
@@ -120,7 +120,7 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
       const urlWithQueryParams = await usecase.execute(authorizationCode);
 
       expect(urlWithQueryParams).toBe(
-        `${baseurl}/demande-immersion?federatedIdentity=peConnect:AuthFailed`,
+        `${baseurl}/demande-immersion?fedIdProvider=peConnect&fedId=AuthFailed`,
       );
       expectTypeToMatchAndEqual(
         uow.conventionPoleEmploiAdvisorRepository
@@ -136,7 +136,7 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
       const urlWithQueryParams = await usecase.execute(authorizationCode);
 
       expect(urlWithQueryParams).toBe(
-        `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&federatedIdentity=peConnect:${peJobseekerUser.peExternalId}`,
+        `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&fedId=${peJobseekerUser.peExternalId}&fedIdProvider=peConnect`,
       );
       expectTypeToMatchAndEqual(
         uow.conventionPoleEmploiAdvisorRepository
@@ -161,7 +161,7 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
     const urlWithQueryParams = await usecase.execute(authorizationCode);
 
     expect(urlWithQueryParams).toBe(
-      `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&federatedIdentity=peConnect:${peJobseekerUser.peExternalId}`,
+      `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&fedId=${peJobseekerUser.peExternalId}&fedIdProvider=peConnect`,
     );
     expectTypeToMatchAndEqual(
       uow.conventionPoleEmploiAdvisorRepository

@@ -1,4 +1,4 @@
-import { Beneficiary, InternshipKind } from "shared";
+import { Beneficiary, FederatedIdentityProvider, InternshipKind } from "shared";
 import { EntityFromDto } from "../../core/EntityFromDto";
 import { PeConnectImmersionAdvisorDto } from "./PeConnectAdvisor.dto";
 import { PeConnectUserDto } from "./PeConnectUser.dto";
@@ -16,8 +16,11 @@ export type ConventionPoleEmploiUserAdvisorEntity = EntityFromDto<
 
 export type ConventionPeConnectFields = Pick<
   Beneficiary<InternshipKind>,
-  "email" | "firstName" | "lastName" | "federatedIdentity"
->;
+  "email" | "firstName" | "lastName"
+> & {
+  fedId: string;
+  fedIdProvider: FederatedIdentityProvider;
+};
 
 export type PeUserAndAdvisor = {
   advisor: PeConnectImmersionAdvisorDto | undefined;
@@ -30,5 +33,6 @@ export const toPartialConventionDtoWithPeIdentity = (
   email: peConnectUserInfo.email,
   firstName: peConnectUserInfo.firstName,
   lastName: peConnectUserInfo.lastName,
-  federatedIdentity: `peConnect:${peConnectUserInfo.peExternalId}`,
+  fedId: peConnectUserInfo.peExternalId,
+  fedIdProvider: "peConnect",
 });

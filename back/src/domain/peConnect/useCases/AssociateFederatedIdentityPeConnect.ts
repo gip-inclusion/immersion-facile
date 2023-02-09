@@ -1,9 +1,4 @@
-import {
-  ConventionDto,
-  conventionSchema,
-  convertStringToFederatedIdentity,
-  isPeConnectIdentity,
-} from "shared";
+import { ConventionDto, conventionSchema, isPeConnectIdentity } from "shared";
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
@@ -27,10 +22,7 @@ export class AssociatePeConnectFederatedIdentity extends TransactionalUseCase<Co
     uow: UnitOfWork,
   ): Promise<void> {
     const federatedIdentity =
-      convention.signatories.beneficiary.federatedIdentity &&
-      convertStringToFederatedIdentity(
-        convention.signatories.beneficiary.federatedIdentity,
-      );
+      convention.signatories.beneficiary.federatedIdentity;
 
     if (!isPeConnectIdentity(federatedIdentity)) {
       logger.info(

@@ -8,6 +8,7 @@ import {
   conventionWithoutExternalIdSchema,
   isBeneficiaryMinor,
   isEstablishmentTutorIsEstablishmentRepresentative,
+  isPeConnectIdentity,
 } from "shared";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import {
@@ -68,9 +69,12 @@ export const ConventionForm = ({
   routeParams = {},
 }: ConventionFormProps) => {
   const { cx } = useStyles();
-  const federatedIdentityString = useAppSelector(
-    authSelectors.conventionFederatedIdentityString,
-  );
+  const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
+
+  const peConnectIdentity =
+    federatedIdentity && isPeConnectIdentity(federatedIdentity)
+      ? federatedIdentity
+      : undefined;
 
   const [initialValues] = useState<ConventionPresentation>({
     ...properties,
@@ -80,8 +84,7 @@ export const ConventionForm = ({
         ...properties.signatories.beneficiary,
         federatedIdentity:
           properties.signatories.beneficiary.federatedIdentity ??
-          federatedIdentityString ??
-          undefined,
+          peConnectIdentity,
       },
     },
   });

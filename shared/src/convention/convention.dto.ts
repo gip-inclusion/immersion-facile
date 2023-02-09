@@ -1,5 +1,5 @@
 import { AgencyId } from "../agency/agency.dto";
-import { ConventionFederatedIdentityString } from "../federatedIdentities/federatedIdentity.dto";
+import { PeConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
 import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { ScheduleDto } from "../schedule/Schedule.dto";
 import { SiretDto } from "../siret/siret";
@@ -157,7 +157,7 @@ export type Beneficiary<T extends InternshipKind> =
     emergencyContact?: string;
     emergencyContactPhone?: string;
     emergencyContactEmail?: string;
-    federatedIdentity?: ConventionFederatedIdentityString;
+    federatedIdentity?: PeConnectIdentity;
     financiaryHelp?:string;
     birthdate: string; // Date iso string
   } 

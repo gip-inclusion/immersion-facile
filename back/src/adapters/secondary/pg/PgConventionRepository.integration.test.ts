@@ -311,7 +311,7 @@ describe("PgConventionRepository", () => {
   it("Retrieves federated identity if exists", async () => {
     const peConnectId = "bbbbac99-9c0b-bbbb-bb6d-6bb9bd38bbbb";
     const convention = new ConventionDtoBuilder()
-      .withFederatedIdentity(`peConnect:${peConnectId}`)
+      .withFederatedIdentity({ provider: "peConnect", token: peConnectId })
       .build();
 
     await client.query(

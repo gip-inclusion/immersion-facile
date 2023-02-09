@@ -34,7 +34,7 @@ let adminToken: AdminToken;
 
 const convention = new ConventionDtoBuilder()
   .withStatus("IN_REVIEW")
-  .withFederatedIdentity("peConnect:some-id")
+  .withFederatedIdentity({ provider: "peConnect", token: "some-id" })
   .build();
 
 const conventionId = convention.id;

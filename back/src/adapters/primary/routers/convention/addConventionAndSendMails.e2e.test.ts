@@ -82,7 +82,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       .notSigned()
       .withStatus("READY_TO_SIGN")
       .withoutDateValidation()
-      .withFederatedIdentity("peConnect:fake")
+      .withFederatedIdentity({ provider: "peConnect", token: "fake" })
       .build();
     const appAndDeps = await buildTestApp();
     const agency = await appAndDeps.inMemoryUow.agencyRepository.getById(
