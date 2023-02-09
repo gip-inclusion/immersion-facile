@@ -1,6 +1,5 @@
 import { FieldHookConfig } from "formik";
 import React from "react";
-import { ButtonAdd } from "react-design-system";
 import {
   DateIntervalDto,
   DayPeriodsDto,
@@ -117,13 +116,18 @@ export const WeekdayPicker = ({
             </div>
           );
         })}
-      <ButtonAdd
+
+      <Button
         className={fr.cx("fr-my-2w")}
+        type="button"
+        iconId="fr-icon-add-line"
+        title="Ajouter une période"
         disabled={!isPeriodButtonActive()}
+        priority="secondary"
         onClick={() => add()}
       >
         Ajouter une période
-      </ButtonAdd>
+      </Button>
     </div>
   );
 };

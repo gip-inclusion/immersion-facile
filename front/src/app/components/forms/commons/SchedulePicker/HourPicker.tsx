@@ -1,6 +1,5 @@
 import { ErrorMessage } from "formik";
 import React from "react";
-import { ButtonAdd } from "react-design-system";
 import { removeAtIndex, replaceArrayElement, TimePeriodDto } from "shared";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { fr } from "@codegouvfr/react-dsfr";
@@ -121,9 +120,16 @@ export const HourPicker = ({
           );
         })}
       {!disabled && (
-        <ButtonAdd className={fr.cx("fr-my-2w")} onClick={() => add()}>
+        <Button
+          className={fr.cx("fr-my-2w")}
+          type="button"
+          iconId="fr-icon-add-line"
+          title="Ajouter des horaires"
+          priority="secondary"
+          onClick={() => add()}
+        >
           Ajouter des horaires
-        </ButtonAdd>
+        </Button>
       )}
     </>
   );

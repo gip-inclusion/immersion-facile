@@ -1,4 +1,3 @@
-import { Button } from "@mui/material";
 import { Form, Formik, useField } from "formik";
 import React from "react";
 import {
@@ -10,6 +9,7 @@ import {
 import { conventionGateway } from "src/config/dependencies";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 
 type ShareFormProps = {
   onSuccess: () => void;
@@ -94,7 +94,9 @@ export const ShareForm = ({ onSuccess, onError }: ShareFormProps) => {
             name={getName("details")}
             multiline={true}
           />
-          <Button type={"submit"}>Envoyer</Button>
+          <Button type="submit" title="Envoyer" onClick={() => undefined}>
+            Envoyer
+          </Button>
         </Form>
       )}
     </Formik>

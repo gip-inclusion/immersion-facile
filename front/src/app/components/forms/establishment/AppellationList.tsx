@@ -1,10 +1,10 @@
 import { useField } from "formik";
 import React from "react";
-import { ButtonAdd } from "react-design-system";
 import { AppellationDto, removeAtIndex } from "shared";
 import { FormEstablishmentAppellation } from "./FormEstablishmentAppellation";
 import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 
 type AppellationListProps = {
   name: string;
@@ -36,8 +36,13 @@ export const AppellationList = ({ name, title }: AppellationListProps) => {
           />
         ))}
       </>
-      <ButtonAdd
+
+      <Button
         className={fr.cx("fr-my-4v")}
+        type="button"
+        iconId="fr-icon-add-line"
+        title="Ajouter un métier"
+        priority="secondary"
         onClick={() =>
           setValue([
             ...field.value,
@@ -51,7 +56,7 @@ export const AppellationList = ({ name, title }: AppellationListProps) => {
         }
       >
         Ajouter un métier
-      </ButtonAdd>
+      </Button>
 
       {touched && error && (
         <div
