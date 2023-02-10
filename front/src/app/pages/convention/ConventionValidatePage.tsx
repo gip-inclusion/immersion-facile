@@ -63,7 +63,11 @@ export const ConventionValidatePage = ({ route }: VerificationPageProps) => {
 
   const disabled = submitFeedback.kind !== "idle";
   const currentStatus = convention.status;
-
+  const npsShowStatuses: (typeof currentStatus)[] = [
+    "IN_REVIEW",
+    "ACCEPTED_BY_COUNSELLOR",
+    "ACCEPTED_BY_VALIDATOR",
+  ];
   const createOnSubmitWithFeedbackKind =
     (feedbackKind: ConventionFeedbackKind) =>
     (updateStatusParams: UpdateConventionStatusRequestDto) =>
@@ -155,8 +159,14 @@ export const ConventionValidatePage = ({ route }: VerificationPageProps) => {
             signatories={convention.signatories}
           />
         </div>
-        {isAllowedTransition(currentStatus, "ACCEPTED_BY_COUNSELLOR", role) && (
-          <NPSForm conventionId={convention.id} />
+        {npsShowStatuses.includes(currentStatus) && (
+          <NPSForm
+            conventionInfos={{
+              id: convention.id,
+              role,
+              status: currentStatus,
+            }}
+          />
         )}
       </MainWrapper>
     </HeaderFooterLayout>
