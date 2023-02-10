@@ -42,7 +42,7 @@
     "webpack": ">=2.0.0"
   },
   "dependencies": {
-    "@codegouvfr/react-dsfr": "^0.24.0",
+    "@codegouvfr/react-dsfr": "^0.32.0",
     "react-modal": "^3.15.1",
     "react-player": "^2.11.0",
     "tss-react": "^4.5.2"

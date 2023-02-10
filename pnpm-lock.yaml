@@ -176,7 +176,7 @@ importers:
       '@babel/core': ^7.17.9
       '@babel/preset-env': ^7.16.11
       '@babel/preset-typescript': ^7.16.7
-      '@codegouvfr/react-dsfr': ^0.24.0
+      '@codegouvfr/react-dsfr': ^0.32.0
       '@emotion/react': ^11.9.0
       '@emotion/styled': ^11.8.1
       '@gouvfr/dsfr': 1.8.5
@@ -226,7 +226,7 @@ importers:
       vite: ^3.1.4
       zod: 3.14.2
     dependencies:
-      '@codegouvfr/react-dsfr': 0.24.0_kzbn2opkn2327fwg5yzwzya5o4
+      '@codegouvfr/react-dsfr': 0.32.0_react@18.2.0
       '@gouvfr/dsfr': 1.8.5
       '@mui/icons-material': 5.8.0_alwf6rroyhghlql2agxrgm25sa
       '@mui/material': 5.8.0_pl23bfwwqmsmlv26mksoju46ae
@@ -315,7 +315,7 @@ importers:
   libs/react-design-system:
     specifiers:
       '@babel/core': ^7.18.2
-      '@codegouvfr/react-dsfr': ^0.24.0
+      '@codegouvfr/react-dsfr': ^0.32.0
       '@emotion/react': ^11.9.0
       '@emotion/styled': ^11.8.1
       '@gouvfr/dsfr': ^1.5.1
@@ -345,7 +345,7 @@ importers:
       typescript: '>=4.3.0'
       webpack: '>=2.0.0'
     dependencies:
-      '@codegouvfr/react-dsfr': 0.24.0_kzbn2opkn2327fwg5yzwzya5o4
+      '@codegouvfr/react-dsfr': 0.32.0_react@18.2.0
       react-modal: 3.16.1_biqbaboplfbrettd7655fr4n2y
       react-player: 2.11.0_react@18.2.0
       tss-react: 4.5.2_hp5f5nkljdiwilp4rgxyefcplu
@@ -3417,17 +3417,12 @@ packages:
       minimist: 1.2.7
     dev: true
 
-  /@codegouvfr/react-dsfr/0.24.0_kzbn2opkn2327fwg5yzwzya5o4:
-    resolution: {integrity: sha512-5Uos8tZdgUNCWyzgOv8l4UU3F53ffyZZvLeSi3jAsu7DLeLUGQNJhybX7Xg74HcTcB0lEm4Ky4c237HIM3A8Xw==}
+  /@codegouvfr/react-dsfr/0.32.0_react@18.2.0:
+    resolution: {integrity: sha512-O5cN1VHkD+NkuTEBYVUeWDOPnqZQIbWyNDcJHab+8JYlj9+2GeWmuCugGYMwv/3X1NQEdeEAQwrnLAFQEzrEkw==}
     hasBin: true
     peerDependencies:
-      '@types/react': ^16.0.0 || ^17.0.0 || ^18.0.0
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
     dependencies:
-      '@types/react': 18.0.26
       react: 18.2.0
       tsafe: 1.4.1
     dev: false

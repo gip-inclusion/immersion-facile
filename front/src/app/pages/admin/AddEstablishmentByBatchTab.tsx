@@ -177,7 +177,6 @@ export const AddEstablishmentByBatchTab = () => {
 
         <Button
           title="Vérifier les données à importer"
-          onClick={() => undefined}
           className={fr.cx("fr-mt-2w")}
           disabled={formSubmitted}
         >
