@@ -58,7 +58,7 @@ export const createApp = async (
     }),
   );
   app.use(metrics);
-  app.use(bodyParser.json());
+  app.use(bodyParser.json({ limit: "800kb" }));
 
   const deps = await createAppDependencies(config);
 
