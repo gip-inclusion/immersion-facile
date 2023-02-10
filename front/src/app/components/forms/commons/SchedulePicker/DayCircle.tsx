@@ -40,7 +40,7 @@ export const DayCircle = ({
         type="button"
         className={cx(
           "numberCircle",
-          `${dayStatus === "isSelected" ?? "selected"}`,
+          `${dayStatus === "isSelected" && "selected"}`,
         )}
         onClick={onClick}
         disabled={disabled}

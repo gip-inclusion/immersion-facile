@@ -34,9 +34,9 @@ export const ComplexSchedulePicker = ({
         complexSchedule={field.value.complexSchedule}
         selectedIndex={field.value.selectedIndex}
         onChange={(lastClickedIndex) => {
-          const schedule = field.value;
-          schedule.selectedIndex = lastClickedIndex;
-          setValue(schedule);
+          const updatedSchedule = JSON.parse(JSON.stringify(field.value));
+          updatedSchedule.selectedIndex = lastClickedIndex;
+          setValue(updatedSchedule);
         }}
       />
       <HourPicker
@@ -47,16 +47,20 @@ export const ComplexSchedulePicker = ({
             : []
         }
         onValueChange={(newHours) => {
-          const schedule: ScheduleDto = { ...field.value };
-          schedule.complexSchedule[schedule.selectedIndex].timePeriods =
-            newHours;
-          schedule.totalHours = calculateTotalImmersionHoursFromComplexSchedule(
-            schedule.complexSchedule,
+          const updatedSchedule: ScheduleDto = JSON.parse(
+            JSON.stringify(field.value),
           );
-          schedule.workedDays = calculateNumberOfWorkedDays(
-            schedule.complexSchedule,
+          updatedSchedule.complexSchedule[
+            updatedSchedule.selectedIndex
+          ].timePeriods = newHours;
+          updatedSchedule.totalHours =
+            calculateTotalImmersionHoursFromComplexSchedule(
+              updatedSchedule.complexSchedule,
+            );
+          updatedSchedule.workedDays = calculateNumberOfWorkedDays(
+            updatedSchedule.complexSchedule,
           );
-          setValue(schedule);
+          setValue(updatedSchedule);
         }}
         disabled={disabled}
       />
