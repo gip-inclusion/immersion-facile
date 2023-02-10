@@ -34,7 +34,7 @@ export const SectionAccordion = () => {
         >
           <Accordion
             label="Comment contacter un employeur pour faire une immersion ?"
-            content={
+            children={
               <>
                 <ul>
                   <li>
@@ -57,7 +57,7 @@ export const SectionAccordion = () => {
           />
           <Accordion
             label="Comment expliquer l'immersion à un employeur ?"
-            content={
+            children={
               <>
                 <ul>
                   <li>
