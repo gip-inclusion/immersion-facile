@@ -59,60 +59,52 @@ const Email = ({ email }: { email: EmailSentDto }) => {
       } envoyé le ${sentAtDate.toLocaleDateString(
         "fr",
       )} à ${sentAtDate.toLocaleTimeString("fr")}`}
-      children={
-        <>
-          <TextCell title="Type" contents={email.templatedEmail.type} />
-          <TextCell
-            title="Destinataires"
-            contents={email.templatedEmail.recipients.join(", ")}
-          />
-          <TextCell title="CC" contents={email.templatedEmail.cc?.join(", ")} />
-          <TextCell
-            title="Paramètres"
-            contents={
-              <ul className={fr.cx("fr-text--xs")}>
-                {keys(email.templatedEmail.params).map(
-                  (key: EmailVariables) => {
-                    const value = (
-                      email.templatedEmail.params as Record<
-                        EmailVariables,
-                        string
-                      >
-                    )[key];
+    >
+      <TextCell title="Type" contents={email.templatedEmail.type} />
+      <TextCell
+        title="Destinataires"
+        contents={email.templatedEmail.recipients.join(", ")}
+      />
+      <TextCell title="CC" contents={email.templatedEmail.cc?.join(", ")} />
+      <TextCell
+        title="Paramètres"
+        contents={
+          <ul className={fr.cx("fr-text--xs")}>
+            {keys(email.templatedEmail.params).map((key: EmailVariables) => {
+              const value = (
+                email.templatedEmail.params as Record<EmailVariables, string>
+              )[key];
 
-                    const links: EmailVariables[] = [
-                      "agencyLogoUrl",
-                      "conventionFormUrl",
-                      "conventionStatusLink",
-                      "editFrontUrl",
-                      "immersionAssessmentCreationLink",
-                      "magicLink",
-                      "questionnaireUrl",
-                    ];
+              const links: EmailVariables[] = [
+                "agencyLogoUrl",
+                "conventionFormUrl",
+                "conventionStatusLink",
+                "editFrontUrl",
+                "immersionAssessmentCreationLink",
+                "magicLink",
+                "questionnaireUrl",
+              ];
 
-                    return (
-                      <li key={key}>
-                        {" "}
-                        <span>{key} :</span>{" "}
-                        <span style={{ wordWrap: "break-word" }}>
-                          {links.includes(key) ? (
-                            <a href={value as string}>Lien vers la page</a>
-                          ) : (
-                            JSON.stringify(value, undefined, 2)
-                          )}
-                        </span>
-                      </li>
-                    );
-                  },
-                )}
-              </ul>
-            }
-          />
-          {email?.error && (
-            <TextCell title="Message d'erreur" contents={email.error} />
-          )}
-        </>
-      }
-    />
+              return (
+                <li key={key}>
+                  {" "}
+                  <span>{key} :</span>{" "}
+                  <span style={{ wordWrap: "break-word" }}>
+                    {links.includes(key) ? (
+                      <a href={value as string}>Lien vers la page</a>
+                    ) : (
+                      JSON.stringify(value, undefined, 2)
+                    )}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        }
+      />
+      {email?.error && (
+        <TextCell title="Message d'erreur" contents={email.error} />
+      )}
+    </Accordion>
   );
 };
