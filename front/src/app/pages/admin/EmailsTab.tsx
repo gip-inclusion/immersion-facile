@@ -59,7 +59,7 @@ const Email = ({ email }: { email: EmailSentDto }) => {
       } envoyé le ${sentAtDate.toLocaleDateString(
         "fr",
       )} à ${sentAtDate.toLocaleTimeString("fr")}`}
-      content={
+      children={
         <>
           <TextCell title="Type" contents={email.templatedEmail.type} />
           <TextCell
