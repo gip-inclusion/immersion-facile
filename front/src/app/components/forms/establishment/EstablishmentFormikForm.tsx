@@ -24,6 +24,11 @@ type EstablishmentFormProps = {
   children: React.ReactNode;
 };
 
+const getErrorsFromResponseData = (
+  error: Error | null,
+): error is Error & { response: { data: { errors: string } } } =>
+  !!error && !!(error as any)?.response?.data?.errors;
+
 export const EstablishmentFormikForm = ({
   initialValues,
   saveForm,
@@ -37,12 +42,8 @@ export const EstablishmentFormikForm = ({
   );
   const formContents = getFormFields();
   let errorMessage = submitError?.message;
-  if (
-    submitError &&
-    "response" in submitError &&
-    "data" in submitError["response"] &&
-    "errors" in submitError["response"]["data"]
-  ) {
+
+  if (getErrorsFromResponseData(submitError)) {
     errorMessage = submitError["response"]["data"]["errors"];
   }
 

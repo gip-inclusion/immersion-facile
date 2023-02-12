@@ -361,7 +361,7 @@ export const createUseCases = (
           return agencyId;
         }),
     }),
-  };
+  } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };
 
 const dashboardUseCases = (
@@ -372,12 +372,6 @@ const dashboardUseCases = (
 });
 
 export type UseCases = ReturnType<typeof createUseCases>;
-
-// for type validation
-// if this does not compile, make sure all useCase in createUseCases are assignable to InstantiatedUseCase :
-const _isAssignable = (
-  useCases: UseCases,
-): Record<string, InstantiatedUseCase<any, any, any>> => useCases;
 
 export type InstantiatedUseCase<
   Input = void,

@@ -1,6 +1,6 @@
 import { VirtualTimeScheduler } from "rxjs";
+import { Dependencies } from "src/config/dependencies";
 import { TestAdminGateway } from "src/core-logic/adapters/AdminGateway/TestAdminGateway";
-
 import { InMemoryConventionGateway } from "src/core-logic/adapters/Convention/InMemoryConventionGateway";
 import { createTestDeviceRepository } from "src/core-logic/adapters/DeviceRepository/createTestDeviceRepository";
 import { TestSentEmailGateway } from "src/core-logic/adapters/EmailGateway/TestSentEmailGateway";
@@ -9,33 +9,15 @@ import { InMemoryImmersionSearchGateway } from "src/core-logic/adapters/Immersio
 import { InMemoryNavigationGateway } from "src/core-logic/adapters/NavigationGateway/InMemoryNavigationGateway";
 import { InMemoryRomeAutocompleteGateway } from "src/core-logic/adapters/RomeAutocompleteGateway/InMemoryRomeAutocompleteGateway";
 import { TestTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/TestTechnicalGateway";
-import { DeviceRepository } from "src/core-logic/ports/DeviceRepository";
 import { createStore, RootState } from "src/core-logic/storeConfig/store";
 import { TestAddressGateway } from "../adapters/AddressGateway/TestAddressGateway";
 import { TestAgencyGateway } from "../adapters/AgencyGateway/TestAgencyGateway";
 import { TestImmersionAssessmentGateway } from "../adapters/AssessmentGateway/TestImmersionAssessmentGateway";
 import { TestSiretGatewayThroughBack } from "../adapters/SiretGatewayThroughBack/TestSiretGatewayThroughBack";
 
-export interface TestDependencies {
-  adminGateway: TestAdminGateway;
-  immersionAssessmentGateway: TestImmersionAssessmentGateway;
-  siretGatewayThroughBack: TestSiretGatewayThroughBack;
-  agencyGateway: TestAgencyGateway;
-  addressGateway: TestAddressGateway;
-  technicalGateway: TestTechnicalGateway;
-  establishmentGateway: InMemoryEstablishmentGateway;
-  conventionGateway: InMemoryConventionGateway;
-  immersionSearchGateway: InMemoryImmersionSearchGateway;
-  romeAutocompleteGateway: InMemoryRomeAutocompleteGateway;
-  deviceRepository: DeviceRepository;
-  navigationGateway: InMemoryNavigationGateway;
-  sentEmailGateway: TestSentEmailGateway;
-  scheduler: VirtualTimeScheduler;
-  minSearchResultsToPreventRefetch: number;
-}
-
-export const createTestStore = (preloadedState?: Partial<RootState>) => {
-  const dependencies: TestDependencies = {
+export type TestDependencies = ReturnType<typeof createTestDependencies>;
+const createTestDependencies = () =>
+  ({
     adminGateway: new TestAdminGateway(),
     immersionAssessmentGateway: new TestImmersionAssessmentGateway(),
     siretGatewayThroughBack: new TestSiretGatewayThroughBack(),
@@ -51,7 +33,10 @@ export const createTestStore = (preloadedState?: Partial<RootState>) => {
     sentEmailGateway: new TestSentEmailGateway(),
     scheduler: new VirtualTimeScheduler(),
     minSearchResultsToPreventRefetch: 2,
-  };
+  } satisfies Dependencies);
+
+export const createTestStore = (preloadedState?: Partial<RootState>) => {
+  const dependencies = createTestDependencies();
   return { store: createStore({ dependencies, preloadedState }), dependencies };
 };
 

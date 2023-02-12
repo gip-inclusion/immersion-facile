@@ -81,12 +81,8 @@ export const createInMemoryUow = () => {
     postalCodeDepartmentRegionQueries: stubPostalCodeDepartmentRegionQueries,
     romeRepository: new InMemoryRomeRepository(),
     searchMadeRepository: new InMemorySearchMadeRepository(),
-  };
+  } satisfies UnitOfWork;
 };
-
-// for typechecking only
-const _isAssignable = (inMemoryUow: InMemoryUnitOfWork): UnitOfWork =>
-  inMemoryUow;
 
 export const createPgUow = (client: PoolClient): UnitOfWork => ({
   agencyRepository: new PgAgencyRepository(client),
