@@ -56,7 +56,7 @@ export class InMemoryAddressGateway implements AddressGateway {
         },
       },
     ];
-    return testLocationSet.filter((result) => result.label.includes(query));
+    return testLocationSet;
   }
   public lookupLocation$(
     query: LookupLocationInput,

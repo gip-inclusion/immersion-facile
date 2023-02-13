@@ -112,9 +112,16 @@ type FormikInputProps = {
   label: string;
 };
 const FormikInput = ({ name, label }: FormikInputProps) => {
-  const [field] = useField<string>({ name });
+  const [field, meta] = useField<string>({ name });
+  const errorRelatedProps = meta.touched &&
+    meta.error && {
+      state: "error" as const,
+      stateRelatedMessage: meta.error,
+    };
 
-  return <Input label={label} nativeInputProps={field} />;
+  return (
+    <Input label={label} nativeInputProps={field} {...errorRelatedProps} />
+  );
 };
 
 type FormikTextAreaProps = {
@@ -123,9 +130,18 @@ type FormikTextAreaProps = {
   rows?: number;
 };
 const FormikTextArea = ({ name, label, rows }: FormikTextAreaProps) => {
-  const [field] = useField<string>({ name });
-
+  const [field, meta] = useField<string>({ name });
+  const errorRelatedProps = meta.touched &&
+    meta.error && {
+      state: "error" as const,
+      stateRelatedMessage: meta.error,
+    };
   return (
-    <Input label={label} nativeTextAreaProps={{ ...field, rows }} textArea />
+    <Input
+      label={label}
+      nativeTextAreaProps={{ ...field, rows }}
+      textArea
+      {...errorRelatedProps}
+    />
   );
 };
