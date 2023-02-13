@@ -1,16 +1,27 @@
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
+import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
+import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
 
 export const AgencyDashboardPage = () => {
   // the Layout (Header, Footer...) is given by InclusionConnectedPrivateRoute (higher order component)
   const inclusionConnectToken = useAppSelector(
     authSelectors.inclusionConnectToken,
   );
+  const agencyDashboardUrl = useAppSelector(
+    inclusionConnectedSelectors.agencyDashboardUrl,
+  );
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(
+      inclusionConnectedSlice.actions.agencyDashboardUrlFetchRequested(),
+    );
+  }, []);
 
   if (!inclusionConnectToken)
     return (
@@ -37,6 +48,9 @@ export const AgencyDashboardPage = () => {
         <br />
         Voici votre token,(obtenu grâce à inclusion connect)
         <p style={{ width: "200px" }}>{inclusionConnectToken}</p>
+        <strong>
+          Url du dashboard récupérée du back : {agencyDashboardUrl}
+        </strong>
       </div>
     </div>
   );
