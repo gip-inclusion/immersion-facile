@@ -42,9 +42,9 @@ export const createAppDependencies = async (config: AppConfig) => {
     config.magicLinkJwtPrivateKey,
   );
   const generateAdminJwt = makeGenerateJwtHS256(config.adminJwtSecret, "365d");
-  const generateAuthenticatedUserToken = makeGenerateJwtHS256(
-    config.adminJwtSecret,
-    "1h",
+  const generateAuthenticatedUserToken = makeGenerateJwtES256(
+    config.apiJwtPrivateKey,
+    3600,
   );
   const generateMagicLinkFn = createGenerateConventionMagicLink(config);
 
@@ -96,6 +96,7 @@ export const createAppDependencies = async (config: AppConfig) => {
     ),
     generateMagicLinkJwt,
     generateApiJwt,
+    generateAuthenticatedUserToken,
     eventBus,
     eventCrawler: createEventCrawler(config, uowPerformer, eventBus),
     uuidGenerator,

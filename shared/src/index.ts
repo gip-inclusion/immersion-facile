@@ -53,6 +53,7 @@ export * from "./romeAndAppellationDtos/romeAndAppellation.schema";
 export * from "./routes/routes";
 export * from "./routes/addressTargets";
 export * from "./routes/adminTargets";
+export * from "./routes/inclusionConnectedAllowedTargets";
 export * from "./routes/inclusionConnectTargets";
 export * from "./routes/establishementTargets";
 export * from "./schedule/Schedule.dto";

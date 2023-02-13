@@ -7,7 +7,7 @@ import {
 import { AuthenticateWithInclusionCodeConnectParams } from "shared";
 import { authenticateWithInclusionCodeSchema } from "shared";
 import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
-import { GenerateAuthenticatedUserToken } from "../../auth/jwt";
+import { GenerateAuthenticatedUserJwt } from "../../auth/jwt";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
@@ -28,7 +28,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     private createNewEvent: CreateNewEvent,
     private inclusionConnectGateway: InclusionConnectGateway,
     private uuidGenerator: UuidGenerator,
-    private generateAppToken: GenerateAuthenticatedUserToken,
+    private generateAppToken: GenerateAuthenticatedUserJwt,
     private immersionFacileBaseUrl: AbsoluteUrl,
   ) {
     super(uowPerformer);

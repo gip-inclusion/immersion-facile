@@ -7,22 +7,27 @@ import {
 
 type AnyObject = Record<string, unknown>;
 
+export type GenerateAuthenticatedUserJwt = GenerateJwtFn<{ userId: string }>;
 export type GenerateMagicLinkJwt = GenerateJwtFn<PayloadOption>;
 export type GenerateEditFormEstablishmentUrl =
   GenerateJwtFn<EstablishmentJwtPayload>;
 export type GenerateAdminJwt = GenerateJwtFn<{ version: number }>;
-export type GenerateAuthenticatedUserToken = GenerateJwtFn<{ userId: string }>;
 
 export type GenerateApiConsumerJtw = GenerateJwtFn<WithApiConsumerId>;
 
 // prettier-ignore
 export type GenerateJwtFn<Payload extends AnyObject> = (payload: Payload, expiresInSeconds?: number) => string;
 export const makeGenerateJwtES256 =
-  <P extends AnyObject>(privateKey: string): GenerateJwtFn<P> =>
+  <P extends AnyObject>(
+    privateKey: string,
+    defaultExpiresInSeconds?: number,
+  ): GenerateJwtFn<P> =>
   (payload, expiresInSeconds?: number) =>
     jwt.sign(payload, privateKey, {
       algorithm: "ES256",
-      ...(expiresInSeconds ? { expiresIn: expiresInSeconds } : {}),
+      ...(expiresInSeconds !== undefined || defaultExpiresInSeconds
+        ? { expiresIn: expiresInSeconds ?? defaultExpiresInSeconds }
+        : {}),
       //noTimestamp: true, //Remove iat on payload
     });
 

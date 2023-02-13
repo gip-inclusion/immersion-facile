@@ -4,7 +4,7 @@ import { DepartmentCodeFromPostcode } from "../../../domain/address/useCases/Dep
 import { LookupStreetAddress } from "../../../domain/address/useCases/LookupStreetAddress";
 import {
   GenerateAdminJwt,
-  GenerateAuthenticatedUserToken,
+  GenerateAuthenticatedUserJwt,
   GenerateMagicLinkJwt,
 } from "../../../domain/auth/jwt";
 import { ExportData } from "../../../domain/backoffice/useCases/ExportData";
@@ -82,7 +82,7 @@ export const createUseCases = (
   generateMagicLinkJwt: GenerateMagicLinkJwt,
   makeConventionMagicLink: GenerateConventionMagicLink,
   generateAdminJwt: GenerateAdminJwt,
-  generateAuthenticatedUserToken: GenerateAuthenticatedUserToken,
+  generateAuthenticatedUserToken: GenerateAuthenticatedUserJwt,
   uowPerformer: UnitOfWorkPerformer,
   uuidGenerator: UuidGenerator,
 ) => {

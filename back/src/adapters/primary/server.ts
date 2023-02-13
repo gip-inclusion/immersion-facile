@@ -4,6 +4,7 @@ import expressPrometheusMiddleware from "express-prometheus-middleware";
 import PinoHttp from "pino-http";
 import {
   GenerateApiConsumerJtw,
+  GenerateAuthenticatedUserJwt,
   GenerateMagicLinkJwt,
 } from "../../domain/auth/jwt";
 import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
@@ -23,6 +24,7 @@ import { createConventionRouter } from "./routers/convention/createConventionRou
 import { createEstablishmentRouter } from "./routers/createEstablishment/createEstablishmentRouter";
 import { createFormCompletionRouter } from "./routers/formCompletion/createFormCompletionRouter";
 import { createHelloWorldRouter } from "./routers/helloWorld/createHelloWorldRouter";
+import { createInclusionConnectedAllowedRouter } from "./routers/inclusionConnect/createInclusionConnectedAllowedRouter";
 import { createInclusionConnectRouter } from "./routers/inclusionConnect/createInclusionConnectRouter";
 import { createMagicLinkRouter } from "./routers/magicLink/createMagicLinkRouter";
 import { createPeConnectRouter } from "./routers/peConnect/createPeConnectRouter";
@@ -44,6 +46,7 @@ export const createApp = async (
   eventCrawler: EventCrawler;
   generateApiJwt: GenerateApiConsumerJtw;
   generateMagicLinkJwt: GenerateMagicLinkJwt;
+  generateAuthenticatedUserToken: GenerateAuthenticatedUserJwt;
   uuidGenerator: UuidGenerator;
   inMemoryUow?: InMemoryUnitOfWork;
 }> => {
@@ -71,6 +74,7 @@ export const createApp = async (
   app.use("/auth", createMagicLinkRouter(deps));
   app.use(...createAdminRouter(deps));
   app.use("/v1", createApiKeyAuthRouterV1(deps));
+  app.use(...createInclusionConnectedAllowedRouter(deps));
   // ----
   app.use(createFormCompletionRouter(deps));
   app.use(createTechnicalRouter(deps));
@@ -92,6 +96,7 @@ export const createApp = async (
     eventCrawler: deps.eventCrawler,
     generateApiJwt: deps.generateApiJwt,
     generateMagicLinkJwt: deps.generateMagicLinkJwt,
+    generateAuthenticatedUserToken: deps.generateAuthenticatedUserToken,
     uuidGenerator: deps.uuidGenerator,
     inMemoryUow: deps.inMemoryUow,
   };

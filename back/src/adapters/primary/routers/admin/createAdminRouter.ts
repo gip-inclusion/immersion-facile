@@ -17,24 +17,17 @@ import type { AppDependencies } from "../../config/createAppDependencies";
 import { BadRequestError } from "../../helpers/httpErrors";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 import { sendZipResponse } from "../../helpers/sendZipResponse";
-
-type RelativeUrl = `/${string}`;
-type RemovePrefix<
-  U extends string,
-  Prefix extends string,
-> = U extends `${Prefix}/${infer V}` ? `/${V}` : never;
-
-const routerPrefix = "/admin";
-
-const removeRouterPrefix = <U extends RelativeUrl>(
-  url: U,
-): RemovePrefix<U, typeof routerPrefix> =>
-  url.replace(routerPrefix, "") as RemovePrefix<U, typeof routerPrefix>;
+import {
+  createRemoveRouterPrefix,
+  RelativeUrl,
+} from "../../createRemoveRouterPrefix";
 
 export const createAdminRouter = (
   deps: AppDependencies,
 ): [RelativeUrl, Router] => {
   const adminRouter = Router({ mergeParams: true });
+  const { removeRouterPrefix, routerPrefix } =
+    createRemoveRouterPrefix("/admin");
 
   adminRouter
     .route(`/${adminLogin}`)

@@ -3,6 +3,7 @@ import { ConventionId } from "../convention/convention.dto";
 import { SiretDto } from "../siret/siret";
 
 export type JwtPayloads = {
+  inclusion?: InclusionConnectJwtPayload;
   application?: ConventionMagicLinkPayload;
   establishment?: EstablishmentJwtPayload;
   admin?: AppJwtPayload;
@@ -14,6 +15,7 @@ export type PayloadKey = keyof JwtPayloads;
 export type PayloadOption = ValueOf<Required<JwtPayloads>>;
 
 export const currentJwtVersions: Record<PayloadKey, number> = {
+  inclusion: 1,
   application: 1,
   establishment: 1,
   admin: 1,
@@ -76,6 +78,8 @@ export type ConventionMagicLinkPayload = AppJwtPayload & {
   role: Role;
   emailHash: string; //< md5 of email
 };
+
+export type InclusionConnectJwtPayload = AppJwtPayload & { userId: string };
 
 export type EstablishmentJwtPayload = AppJwtPayload & {
   siret: string;

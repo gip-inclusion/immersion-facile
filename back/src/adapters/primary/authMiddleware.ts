@@ -6,6 +6,7 @@ import {
   ConventionMagicLinkPayload,
   currentJwtVersions,
   EstablishmentJwtPayload,
+  InclusionConnectJwtPayload,
   PayloadKey,
   PayloadOption,
   WithApiConsumerId,
@@ -208,6 +209,9 @@ export const makeMagicLinkAuthMiddleware = (
         case "admin":
           req.payloads = { admin: payload };
           break;
+        case "inclusion":
+          req.payloads = { inclusion: payload as InclusionConnectJwtPayload };
+          break;
         default:
           // eslint-disable-next-line no-case-declarations
           const unhandledPayloadKey: never = payloadKey;
@@ -256,6 +260,7 @@ const sendNeedsRenewedLinkError = (res: Response, err: Error) => {
     needsNewMagicLink: true,
   });
 };
+
 export const verifyJwtConfig = (config: AppConfig) => {
   const verifyJwt = makeVerifyJwtES256<PayloadOption>(
     config.magicLinkJwtPublicKey,
@@ -266,5 +271,6 @@ export const verifyJwtConfig = (config: AppConfig) => {
     : () => {
         throw new Error("No deprecated JWT private key provided");
       };
+
   return { verifyJwt, verifyDeprecatedJwt };
 };

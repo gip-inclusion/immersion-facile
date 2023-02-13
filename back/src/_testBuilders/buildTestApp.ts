@@ -19,6 +19,7 @@ import { InMemoryExportGateway } from "../adapters/secondary/reporting/InMemoryE
 import { InMemorySireneGateway } from "../adapters/secondary/sirene/InMemorySireneGateway";
 import {
   GenerateApiConsumerJtw,
+  GenerateAuthenticatedUserJwt,
   GenerateMagicLinkJwt,
 } from "../domain/auth/jwt";
 import { UuidGenerator } from "../domain/core/ports/UuidGenerator";
@@ -50,6 +51,7 @@ export type TestAppAndDeps = {
   appConfig: AppConfig;
   generateApiJwt: GenerateApiConsumerJtw;
   generateMagicLinkJwt: GenerateMagicLinkJwt;
+  generateAuthenticatedUserToken: GenerateAuthenticatedUserJwt;
   uuidGenerator: UuidGenerator;
   inMemoryUow: InMemoryUnitOfWork;
 };
@@ -95,6 +97,7 @@ export const buildTestApp = async (
     eventCrawler: rawEventCrawler,
     generateApiJwt,
     generateMagicLinkJwt,
+    generateAuthenticatedUserToken,
     uuidGenerator,
     inMemoryUow: uow,
   } = await createApp(appConfig);
@@ -114,6 +117,7 @@ export const buildTestApp = async (
     appConfig,
     generateApiJwt,
     generateMagicLinkJwt,
+    generateAuthenticatedUserToken,
     uuidGenerator,
     inMemoryUow,
   };
