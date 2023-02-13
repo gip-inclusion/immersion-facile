@@ -11,6 +11,7 @@ import { immersionSearchGateway } from "src/config/dependencies";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
 import { fr } from "@codegouvfr/react-dsfr";
+import { Input } from "@codegouvfr/react-dsfr/Input";
 
 type ContactByEmailProps = {
   siret: SiretDto;
@@ -60,7 +61,7 @@ export const ContactByEmail = ({
         onSuccess();
       }}
     >
-      {({ errors, submitCount }) => (
+      {({ errors, submitCount, values, handleChange }) => (
         <Form>
           <>
             <ModalTitle>Contacter l'entreprise</ModalTitle>
@@ -81,12 +82,18 @@ export const ContactByEmail = ({
               label="Votre nom *"
               name={getName("potentialBeneficiaryLastName")}
             />
-            <TextInput
+
+            <Input
               label="Votre message *"
-              name={getName("message")}
-              type="text"
-              multiline
+              textArea
+              nativeTextAreaProps={{
+                name: getName("message"),
+                rows: 6,
+                value: values.message,
+                onChange: handleChange,
+              }}
             />
+
             {submitCount !== 0 &&
               Object.values(errors).length > 0 &&
               //eslint-disable-next-line no-console
