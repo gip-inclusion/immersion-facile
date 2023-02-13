@@ -1,4 +1,4 @@
-import { Form, Formik } from "formik";
+import { Form, Formik, useField } from "formik";
 import React, { useState } from "react";
 import { Button, ModalTitle } from "react-design-system";
 import {
@@ -8,7 +8,6 @@ import {
   SiretDto,
 } from "shared";
 import { immersionSearchGateway } from "src/config/dependencies";
-import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Input } from "@codegouvfr/react-dsfr/Input";
@@ -61,7 +60,7 @@ export const ContactByEmail = ({
         onSuccess();
       }}
     >
-      {({ errors, submitCount, values, handleChange }) => (
+      {({ errors, submitCount }) => (
         <Form>
           <>
             <ModalTitle>Contacter l'entreprise</ModalTitle>
@@ -70,28 +69,23 @@ export const ContactByEmail = ({
               Cette entreprise a choisi d'être contactée par mail. Veuillez
               compléter ce formulaire qui sera transmis à l'entreprise.
             </p>
-            <TextInput
+            <FormikInput
               label="Votre email *"
               name={getName("potentialBeneficiaryEmail")}
             />
-            <TextInput
+            <FormikInput
               label="Votre prénom *"
               name={getName("potentialBeneficiaryFirstName")}
             />
-            <TextInput
+            <FormikInput
               label="Votre nom *"
               name={getName("potentialBeneficiaryLastName")}
             />
 
-            <Input
+            <FormikTextArea
               label="Votre message *"
-              textArea
-              nativeTextAreaProps={{
-                name: getName("message"),
-                rows: 6,
-                value: values.message,
-                onChange: handleChange,
-              }}
+              name={getName("message")}
+              rows={6}
             />
 
             {submitCount !== 0 &&
@@ -110,5 +104,28 @@ export const ContactByEmail = ({
         </Form>
       )}
     </Formik>
+  );
+};
+
+type FormikInputProps = {
+  name: string;
+  label: string;
+};
+const FormikInput = ({ name, label }: FormikInputProps) => {
+  const [field] = useField<string>({ name });
+
+  return <Input label={label} nativeInputProps={field} />;
+};
+
+type FormikTextAreaProps = {
+  name: string;
+  label: string;
+  rows?: number;
+};
+const FormikTextArea = ({ name, label, rows }: FormikTextAreaProps) => {
+  const [field] = useField<string>({ name });
+
+  return (
+    <Input label={label} nativeTextAreaProps={{ ...field, rows }} textArea />
   );
 };
