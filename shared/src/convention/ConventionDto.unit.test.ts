@@ -1,5 +1,6 @@
 import { addDays } from "date-fns";
 import { keys } from "ramda";
+import { reasonableSchedule } from "../schedule/ScheduleUtils";
 import { splitCasesBetweenPassingAndFailing } from "../test.helpers";
 import {
   maximumCalendarDayByInternshipKind,
@@ -12,6 +13,7 @@ import {
 } from "./convention.dto";
 import { conventionReadSchema, conventionSchema } from "./convention.schema";
 import { ConventionDtoBuilder, DATE_START } from "./ConventionDtoBuilder";
+
 const currentEmployer: BeneficiaryCurrentEmployer = {
   role: "beneficiary-current-employer",
   email: "email@email.com",
@@ -262,7 +264,28 @@ describe("conventionDtoSchema", () => {
         },
       );
     });
-
+    describe("CCI specific, minor under 16yo", () => {
+      it("max week hours depends on beneficiary age", () => {
+        const dateStart = DATE_START;
+        const dateEnd = addDays(new Date(DATE_START), 4).toISOString();
+        const convention = new ConventionDtoBuilder()
+          .withInternshipKind("mini-stage-cci")
+          .withDateStart(dateStart)
+          .withDateEnd(dateEnd)
+          .withSchedule(reasonableSchedule)
+          .withBeneficiary({
+            birthdate: new Date("2008-05-26").toISOString(),
+            firstName: "Jean",
+            lastName: "Bono",
+            role: "beneficiary",
+            email: "jean@bono.com",
+            levelOfEducation: "4ème",
+            phone: "0836656565",
+          })
+          .build();
+        expectConventionDtoToBeInvalid(convention);
+      });
+    });
     describe("status that are available without signatures", () => {
       const [allowWithoutSignature, failingWithoutSignature] =
         splitCasesBetweenPassingAndFailing<ConventionStatus>(

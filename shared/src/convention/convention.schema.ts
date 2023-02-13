@@ -1,7 +1,9 @@
+import { differenceInCalendarYears } from "date-fns";
 import { z } from "zod";
 import { agencyIdSchema } from "../agency/agency.schema";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { scheduleSchema } from "../schedule/Schedule.schema";
+import { calculateWeeklyHoursFromSchedule } from "../schedule/ScheduleUtils";
 import { siretSchema } from "../siret/siret";
 import { allRoles } from "../tokens/MagicLinkPayload";
 import { phoneRegExp } from "../utils";
@@ -24,6 +26,8 @@ import {
   Beneficiary,
   BeneficiaryCurrentEmployer,
   BeneficiaryRepresentative,
+  CCI_WEEKLY_LIMITED_SCHEDULE_AGE,
+  CCI_WEEKLY_LIMITED_SCHEDULE_HOURS,
   ConventionCommon,
   ConventionDto,
   ConventionDtoWithoutExternalId,
@@ -236,6 +240,24 @@ export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExt
           localization.beneficiaryTutorEmailMustBeDistinct,
           getConventionFieldName("establishmentTutor.email"),
         );
+
+      const beneficiaryAge = differenceInCalendarYears(
+        new Date(),
+        new Date(convention.signatories.beneficiary.birthdate),
+      );
+      const weeklyHours = calculateWeeklyHoursFromSchedule(convention.schedule);
+      if (
+        convention.internshipKind === "mini-stage-cci" &&
+        beneficiaryAge < CCI_WEEKLY_LIMITED_SCHEDULE_AGE &&
+        weeklyHours.some(
+          (weeklyHourSet) => weeklyHourSet > CCI_WEEKLY_LIMITED_SCHEDULE_HOURS,
+        )
+      ) {
+        addIssue(
+          `La durée maximale hebdomadaire pour un mini-stage d'une personne de moins de ${CCI_WEEKLY_LIMITED_SCHEDULE_AGE} ans est de ${CCI_WEEKLY_LIMITED_SCHEDULE_HOURS}h`,
+          getConventionFieldName("schedule.totalHours"),
+        );
+      }
     })
     .refine(mustBeSignedByEveryone, {
       message: localization.mustBeSignedByEveryone,

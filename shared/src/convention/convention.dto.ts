@@ -56,6 +56,9 @@ export const maximumCalendarDayByInternshipKind: Record<
   "mini-stage-cci": 5,
 };
 
+export const CCI_WEEKLY_LIMITED_SCHEDULE_HOURS = 30;
+export const CCI_WEEKLY_LIMITED_SCHEDULE_AGE = 16;
+
 export const validatedConventionStatuses: ConventionStatus[] = [
   "ACCEPTED_BY_VALIDATOR",
 ];
