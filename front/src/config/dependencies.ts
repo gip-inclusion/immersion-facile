@@ -9,6 +9,7 @@ import { DeviceRepository } from "src/core-logic/ports/DeviceRepository";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
 import { ImmersionAssessmentGateway } from "src/core-logic/ports/ImmersionAssessmentGateway";
 import { ImmersionSearchGateway } from "src/core-logic/ports/ImmersionSearchGateway";
+import { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
 import { NavigationGateway } from "src/core-logic/ports/NavigationGateway";
 import { RomeAutocompleteGateway } from "src/core-logic/ports/RomeAutocompleteGateway";
 import { SentEmailGateway } from "src/core-logic/ports/SentEmailGateway";
@@ -27,6 +28,7 @@ export type Dependencies = {
   establishmentGateway: EstablishmentGateway;
   conventionGateway: ConventionGateway;
   immersionSearchGateway: ImmersionSearchGateway;
+  inclusionConnectedGateway: InclusionConnectedGateway;
   romeAutocompleteGateway: RomeAutocompleteGateway;
   navigationGateway: NavigationGateway;
   deviceRepository: DeviceRepository;

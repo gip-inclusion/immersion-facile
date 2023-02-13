@@ -11,6 +11,7 @@ import {
   InMemoryImmersionSearchGateway,
   seedSearchResults,
 } from "src/core-logic/adapters/ImmersionSearchGateway/InMemoryImmersionSearchGateway";
+import { SimulatedInclusionConnectedGateway } from "src/core-logic/adapters/InclusionConnected/SimulatedInclusionConnectedGateway";
 import {
   InMemoryRomeAutocompleteGateway,
   seedRomeDtos,
@@ -42,6 +43,7 @@ export const createInMemoryDependencies = (): Dependencies => ({
   sentEmailGateway: new StubSentEmailGateway(),
   siretGatewayThroughBack: getSimulatedSiretGatewayThroughBack(),
   technicalGateway: new SimulatedTechnicalGateway(),
+  inclusionConnectedGateway: new SimulatedInclusionConnectedGateway(),
   ...createCommonDependencies(),
 });
 

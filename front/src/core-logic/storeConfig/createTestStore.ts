@@ -6,6 +6,7 @@ import { createTestDeviceRepository } from "src/core-logic/adapters/DeviceReposi
 import { TestSentEmailGateway } from "src/core-logic/adapters/EmailGateway/TestSentEmailGateway";
 import { InMemoryEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/InMemoryEstablishmentGateway";
 import { InMemoryImmersionSearchGateway } from "src/core-logic/adapters/ImmersionSearchGateway/InMemoryImmersionSearchGateway";
+import { TestInclusionConnectedGateway } from "src/core-logic/adapters/InclusionConnected/TestInclusionConnectedGateway";
 import { InMemoryNavigationGateway } from "src/core-logic/adapters/NavigationGateway/InMemoryNavigationGateway";
 import { InMemoryRomeAutocompleteGateway } from "src/core-logic/adapters/RomeAutocompleteGateway/InMemoryRomeAutocompleteGateway";
 import { TestTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/TestTechnicalGateway";
@@ -16,6 +17,7 @@ import { TestImmersionAssessmentGateway } from "../adapters/AssessmentGateway/Te
 import { TestSiretGatewayThroughBack } from "../adapters/SiretGatewayThroughBack/TestSiretGatewayThroughBack";
 
 export type TestDependencies = ReturnType<typeof createTestDependencies>;
+
 const createTestDependencies = () =>
   ({
     adminGateway: new TestAdminGateway(),
@@ -28,6 +30,7 @@ const createTestDependencies = () =>
     technicalGateway: new TestTechnicalGateway(),
     agencyGateway: new TestAgencyGateway(),
     romeAutocompleteGateway: new InMemoryRomeAutocompleteGateway(),
+    inclusionConnectedGateway: new TestInclusionConnectedGateway(),
     deviceRepository: createTestDeviceRepository(),
     navigationGateway: new InMemoryNavigationGateway(),
     sentEmailGateway: new TestSentEmailGateway(),

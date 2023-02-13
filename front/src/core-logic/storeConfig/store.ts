@@ -14,6 +14,8 @@ import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { establishmentEpics } from "src/core-logic/domain/establishmentPath/establishment.epics";
 import { featureFlagEpics } from "src/core-logic/domain/featureFlags/featureFlags.epics";
 import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFlags.slice";
+import { inclusionConnectedEpics } from "src/core-logic/domain/inclusionConnected/inclusionConnected.epics";
+import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
 import { romeAutocompleteEpic } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.epics";
 import { romeAutocompleteSlice } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.slice";
 import { searchEpics } from "src/core-logic/domain/search/search.epics";
@@ -49,6 +51,7 @@ const allEpics: any[] = [
   romeAutocompleteEpic,
   ...conventionEpics,
   ...immersionAssessmentEpics,
+  ...inclusionConnectedEpics,
 ];
 
 const rootReducer = combineReducers({
@@ -63,6 +66,7 @@ const rootReducer = combineReducers({
   [immersionAssessmentSlice.name]: immersionAssessmentSlice.reducer,
   [authSlice.name]: authSlice.reducer,
   [establishmentBatchSlice.name]: establishmentBatchSlice.reducer,
+  [inclusionConnectedSlice.name]: inclusionConnectedSlice.reducer,
   admin: combineReducers({
     [adminAuthSlice.name]: adminAuthSlice.reducer,
     [dashboardUrlsSlice.name]: dashboardUrlsSlice.reducer,
