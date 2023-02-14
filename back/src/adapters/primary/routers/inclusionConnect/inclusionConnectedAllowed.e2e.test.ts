@@ -42,9 +42,7 @@ describe("Router for users authenticated with Inclusion Connect", () => {
       .get(inclusionConnectedAllowedTargets.getAgencyDashboard.url)
       .set("Authorization", token);
 
-    expect(response.body).toEqual({
-      success: "All good, userId is 123. TODO, get dashboard",
-    });
+    expect(response.body).toBe("https://www.my-dashboard-url.com/123");
     expect(response.status).toBe(200);
   });
 });

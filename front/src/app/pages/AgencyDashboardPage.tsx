@@ -1,6 +1,7 @@
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
+import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
@@ -15,6 +16,7 @@ export const AgencyDashboardPage = () => {
   const agencyDashboardUrl = useAppSelector(
     inclusionConnectedSelectors.agencyDashboardUrl,
   );
+  const feedback = useAppSelector(inclusionConnectedSelectors.feedback);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -52,6 +54,10 @@ export const AgencyDashboardPage = () => {
           Url du dashboard récupérée du back : {agencyDashboardUrl}
         </strong>
       </div>
+      <SubmitFeedbackNotification
+        submitFeedback={feedback}
+        messageByKind={{ success: "Dashboard récupéré avec succès" }}
+      />
     </div>
   );
 };

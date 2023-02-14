@@ -14,7 +14,7 @@ export const createInclusionConnectedMiddleware = (jwtSecret: string) => {
       req.payloads = { inclusion: inclusionPayload };
       next();
     } catch (error: any) {
-      return forbidden(res, error.message);
+      return forbidden(res, error?.message);
     }
   };
 };

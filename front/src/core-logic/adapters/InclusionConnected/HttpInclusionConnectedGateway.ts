@@ -1,5 +1,5 @@
 import { HttpClient } from "http-client";
-import { from, Observable } from "rxjs";
+import { from, map, Observable } from "rxjs";
 import {
   AbsoluteUrl,
   absoluteUrlSchema,
@@ -15,14 +15,14 @@ export class HttpInclusionConnectedGateway
   ) {}
 
   public getMyAgencyDashboardUrl$(token: string): Observable<AbsoluteUrl> {
-    return from(this.getMyAgencyDashboardUrl(token));
+    return from(this.getMyAgencyDashboardUrl(token)).pipe(
+      map(({ responseBody }) => absoluteUrlSchema.parse(responseBody)),
+    );
   }
 
   private getMyAgencyDashboardUrl(token: string) {
-    return this.httpClient
-      .getAgencyDashboard({
-        headers: { authorization: token },
-      })
-      .then(({ responseBody }) => absoluteUrlSchema.parse(responseBody));
+    return this.httpClient.getAgencyDashboard({
+      headers: { authorization: token },
+    });
   }
 }

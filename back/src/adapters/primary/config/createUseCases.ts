@@ -41,6 +41,7 @@ import { UuidGenerator } from "../../../domain/core/ports/UuidGenerator";
 import { TransactionalUseCase, UseCase } from "../../../domain/core/UseCase";
 import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
 import { GetDashboardUrl } from "../../../domain/dashboard/useCases/GetDashboardUrl";
+import { GetUserAgencyDashboardUrl } from "../../../domain/dashboard/useCases/GetUserAgencyDashboardUrl";
 import { AdminLogin } from "../../../domain/generic/authentication/useCases/AdminLogin";
 import { UploadLogo } from "../../../domain/generic/fileManagement/useCases/UploadLogo";
 import { GetSentEmails } from "../../../domain/generic/notifications/useCases/GetSentEmails";
@@ -100,6 +101,7 @@ export const createUseCases = (
 
   return {
     ...instantiatedUseCasesFromClasses({
+      getUserAgencyDashboardUrl: new GetUserAgencyDashboardUrl(uowPerformer),
       initiateInclusionConnect: new InitiateInclusionConnect(
         uowPerformer,
         uuidGenerator,
