@@ -41,8 +41,8 @@ type WithEstablishmentTutor = {
   establishmentTutor: EstablishmentTutor;
 };
 
-type WithDepartmentCode = {
-  departmentCode: DepartmentCode;
+type WithAgencyDepartment = {
+  agencyDepartment: DepartmentCode;
 };
 
 type WithIntershipKind = {
@@ -56,7 +56,7 @@ export type ConventionPresentation = OmitFromExistingKeys<
   WithSignatures &
   WithEstablishmentTutor &
   WithIntershipKind &
-  WithDepartmentCode;
+  WithAgencyDepartment;
 
 export const conventionInitialValuesFromUrl = ({
   route,
@@ -161,7 +161,7 @@ export const conventionInitialValuesFromUrl = ({
           }
         : undefined,
     },
-    departmentCode: params.departmentCode ?? "",
+    agencyDepartment: params.agencyDepartment ?? "",
     dateStart,
     dateEnd,
 

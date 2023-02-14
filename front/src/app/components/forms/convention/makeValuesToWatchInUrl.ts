@@ -109,7 +109,7 @@ export const makeValuesToWatchInUrl = (conventionDto: ConventionDto) => {
   const conventionInUrl = convertToConventionInUrl(conventionDto);
   const keysToWatch: ConventionFormKeysInUrl[] = [
     ...commonKeysToWatch,
-    "departmentCode",
+    "agencyDepartment",
   ];
   return keysToWatch.reduce(
     (acc, watchedKey) => ({

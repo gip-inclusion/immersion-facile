@@ -78,6 +78,7 @@ export const ConventionForm = ({
 
   const [initialValues] = useState<ConventionPresentation>({
     ...properties,
+
     signatories: {
       ...properties.signatories,
       beneficiary: {

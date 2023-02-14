@@ -39,11 +39,8 @@ export const AgencySelector = ({
   const [{ value }, { touched, error }, { setValue }] = useField<AgencyId>(
     agencyIdField.name || "agencyId",
   );
-  const [
-    { value: departmentCodeValue },
-    _,
-    { setValue: setDepartmentCodeValue },
-  ] = useField<DepartmentCode | null>(agencyDepartmentField.name);
+  const [{ value: agencyDepartment }, _, { setValue: setAgencyDepartment }] =
+    useField<DepartmentCode | null>(agencyDepartmentField.name);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingError, setLoadingError] = useState(false);
 
@@ -56,13 +53,13 @@ export const AgencySelector = ({
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
 
   useEffect(() => {
-    if (!departmentCodeValue) return;
+    if (!agencyDepartment) return;
 
     setIsLoading(true);
     agenciesRetriever({
       internshipKind,
       shouldListAll,
-      departmentCode: departmentCodeValue,
+      departmentCode: agencyDepartment,
       federatedIdentity,
     })
       .then((agencies) => {
@@ -88,7 +85,7 @@ export const AgencySelector = ({
       .finally(() => {
         setIsLoading(false);
       });
-  }, [departmentCodeValue]);
+  }, [agencyDepartment]);
   const userError = touched && error;
   const showError = userError || loadingError;
   return (
@@ -104,8 +101,8 @@ export const AgencySelector = ({
               )
         }
         {...agencyDepartmentField}
-        onChange={(event) => setDepartmentCodeValue(event.currentTarget.value)}
-        value={departmentCodeValue as string}
+        onChange={(event) => setAgencyDepartment(event.currentTarget.value)}
+        value={agencyDepartment as string}
       />
 
       <Select
@@ -115,9 +112,9 @@ export const AgencySelector = ({
         {...agencyIdField}
         onChange={(event) => setValue(event.currentTarget.value)}
         value={value}
-        disabled={disabled || isLoading || !departmentCodeValue}
+        disabled={disabled || isLoading || !agencyDepartment}
         placeholder={
-          departmentCodeValue
+          agencyDepartment
             ? "Veuillez sélectionner une structure"
             : "Veuillez sélectionner un département"
         }

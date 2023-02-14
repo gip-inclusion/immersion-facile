@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { useFormikContext } from "formik";
 import React, { useEffect } from "react";
 import { ErrorNotifications, Notification } from "react-design-system";
-import { ConventionDto, Signatory, toDotNotation } from "shared";
+import { ConventionReadDto, Signatory, toDotNotation } from "shared";
 import { ConventionFrozenMessage } from "src/app/components/forms/convention/ConventionFrozenMessage";
 import { ConventionSignOnlyMessage } from "src/app/components/forms/convention/ConventionSignOnlyMessage";
 import { makeValuesToWatchInUrl } from "src/app/components/forms/convention/makeValuesToWatchInUrl";
@@ -44,7 +44,7 @@ export const ConventionFormFields = ({
     submitForm,
     setFieldValue,
     values: conventionValues,
-  } = useFormikContext<ConventionDto>();
+  } = useFormikContext<ConventionReadDto>();
   const preselectedAgencyId = useAppSelector(
     conventionSelectors.preselectedAgencyId,
   );

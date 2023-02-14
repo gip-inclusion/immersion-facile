@@ -70,7 +70,7 @@ export const conventionValuesFromUrl = {
   emergencyContactPhone: param.query.optional.string,
   emergencyContactEmail: param.query.optional.string,
   birthdate: param.query.optional.string,
-  departmentCode: param.query.optional.string,
+  agencyDepartment: param.query.optional.string,
 
   brEmail: param.query.optional.string,
   brFirstName: param.query.optional.string,
