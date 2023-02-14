@@ -6,7 +6,7 @@
     "test:manual": "jest --runInBand --watchAll --testRegex=.manual.test.ts",
     "dev": "VITE_GATEWAY=IN_MEMORY vite",
     "dev-http": "vite",
-    "build": "vite build",
+    "build": "rm front-build.tar.gz && rm -rf scalingo/dist && vite build && mv dist scalingo/dist && tar -czf front-build.tar.gz scalingo",
     "build-with-shared-as-is": "vite build",
     "serve": "vite preview",
     "typecheck": "tsc --noEmit",

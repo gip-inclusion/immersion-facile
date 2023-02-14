@@ -5,5 +5,8 @@ dist-ssr
 *.local
 .idea
 .vscode/settings.json
+front-build.tar.gz
+build
+scalingo/dist
 
 /src/assets/dsfr/

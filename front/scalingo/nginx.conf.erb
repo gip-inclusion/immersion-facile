@@ -1,0 +1,9 @@
+location / {
+  root /app/dist;
+  try_files $uri /index.html;
+}
+
+location /api {
+  rewrite /api/(.*) /$1 break;
+  proxy_pass https://<%= ENV['APP'].gsub("front", "back") %>.<%= ENV['REGION_NAME'] %>.scalingo.io;
+}
