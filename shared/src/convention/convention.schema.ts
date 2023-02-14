@@ -172,29 +172,35 @@ const conventionCommonSchema: z.Schema<ConventionCommon> = z.object({
 export const internshipKindSchema: z.Schema<InternshipKind> =
   z.enum(internshipKinds);
 
-const conventionInternshipKindSpecificSchema: z.Schema<
+const immersionSignatoriesSchema: z.Schema<Signatories<"immersion">> = z.object(
+  {
+    beneficiary: beneficiarySchema,
+    establishmentRepresentative: establishmentRepresentativeSchema,
+    beneficiaryRepresentative: beneficiaryRepresentativeSchema.optional(),
+    beneficiaryCurrentEmployer: beneficiaryCurrentEmployerSchema.optional(),
+  },
+);
+
+const cciSignatoriesSchema: z.Schema<Signatories<"mini-stage-cci">> = z.object({
+  beneficiary: studentBeneficiarySchema,
+  establishmentRepresentative: establishmentRepresentativeSchema,
+  beneficiaryRepresentative: beneficiaryRepresentativeSchema.optional(),
+  beneficiaryCurrentEmployer: beneficiaryCurrentEmployerSchema.optional(),
+});
+
+// https://github.com/colinhacks/zod#discriminated-unions
+export const conventionInternshipKindSpecificSchema: z.Schema<
   ConventionInternshipKindSpecific<InternshipKind>
-> = z
-  .object({
+> = z.discriminatedUnion("internshipKind", [
+  z.object({
     internshipKind: z.literal("immersion"),
-    signatories: z.object({
-      beneficiary: beneficiarySchema,
-      establishmentRepresentative: establishmentRepresentativeSchema,
-      beneficiaryRepresentative: beneficiaryRepresentativeSchema.optional(),
-      beneficiaryCurrentEmployer: beneficiaryCurrentEmployerSchema.optional(),
-    }),
-  })
-  .or(
-    z.object({
-      internshipKind: z.literal("mini-stage-cci"),
-      signatories: z.object({
-        beneficiary: studentBeneficiarySchema,
-        establishmentRepresentative: establishmentRepresentativeSchema,
-        beneficiaryRepresentative: beneficiaryRepresentativeSchema.optional(),
-        beneficiaryCurrentEmployer: beneficiaryCurrentEmployerSchema.optional(),
-      }),
-    }),
-  );
+    signatories: immersionSignatoriesSchema,
+  }),
+  z.object({
+    internshipKind: z.literal("mini-stage-cci"),
+    signatories: cciSignatoriesSchema,
+  }),
+]);
 
 export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExternalId> =
   conventionCommonSchema
@@ -230,6 +236,7 @@ export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExt
             getConventionFieldName(`signatories.${signatory.key}.email`),
           );
       });
+
       if (
         !isTutorEmailDifferentThanBeneficiaryRelatedEmails(
           convention.signatories,

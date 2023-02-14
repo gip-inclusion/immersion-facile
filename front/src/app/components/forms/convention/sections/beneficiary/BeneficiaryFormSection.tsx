@@ -41,16 +41,16 @@ export const BeneficiaryFormSection = ({
   const { setFieldValue, values } = useFormikContext<ConventionDto>();
   const dispatch = useDispatch();
   const t = useConventionTextsFromFormikContext();
-  const { values: conventionValues } = useFormikContext<ConventionDto>();
   const { getFormFields } = useFormContents(
-    formConventionFieldsLabels(conventionValues.internshipKind),
+    formConventionFieldsLabels(values.internshipKind),
   );
   const formContents = getFormFields();
   // const isFilledField = (fieldValue: string) => fieldValue.length > 0;
   // const shouldDisableField = (fieldValue: string) =>
   //   isPEConnected && isFilledField(fieldValue);
-  const levelsOfEducationToSelectOption = (): SelectOption[] =>
-    levelsOfEducation.map((level: string) => ({ label: level, value: level }));
+  const levelsOfEducationToSelectOption: SelectOption[] = levelsOfEducation.map(
+    (level: string) => ({ label: level, value: level }),
+  );
 
   return (
     <>
@@ -80,15 +80,13 @@ export const BeneficiaryFormSection = ({
         type="email"
         disabled={isFrozen || isSuccessfullyPeConnected}
       />
-      {conventionValues.signatories.beneficiary.email && (
-        <ConventionEmailWarning />
-      )}
+      {values.signatories.beneficiary.email && <ConventionEmailWarning />}
       <TextInput
         {...formContents["signatories.beneficiary.phone"]}
         type="tel"
         disabled={isFrozen}
       />
-      {conventionValues.internshipKind === "mini-stage-cci" && (
+      {values.internshipKind === "mini-stage-cci" && (
         <Select
           {...formContents["signatories.beneficiary.levelOfEducation"]}
           disabled={isFrozen}
@@ -103,7 +101,7 @@ export const BeneficiaryFormSection = ({
               event.currentTarget.value,
             )
           }
-          options={levelsOfEducationToSelectOption()}
+          options={levelsOfEducationToSelectOption}
         />
       )}
       <TextInput

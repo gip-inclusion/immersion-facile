@@ -10,8 +10,16 @@ import {
   BeneficiaryRepresentative,
   BeneficiaryCurrentEmployer,
   ConventionReadDto,
+  ConventionInternshipKindSpecific,
+  InternshipKind,
+  Beneficiary,
+  EstablishmentRepresentative,
 } from "./convention.dto";
-import { conventionReadSchema, conventionSchema } from "./convention.schema";
+import {
+  conventionInternshipKindSpecificSchema,
+  conventionReadSchema,
+  conventionSchema,
+} from "./convention.schema";
 import { ConventionDtoBuilder, DATE_START } from "./ConventionDtoBuilder";
 
 const currentEmployer: BeneficiaryCurrentEmployer = {
@@ -320,6 +328,91 @@ describe("conventionDtoSchema", () => {
           expectConventionDtoToBeInvalid(convention);
         },
       );
+    });
+  });
+
+  describe("differentiate beneficiaries according to internshipkind", () => {
+    const establishmentRepresentative: EstablishmentRepresentative = {
+      email: "b@b.com",
+      firstName: "dfssd",
+      lastName: "fghfg",
+      phone: "022334455",
+      role: "establishment-representative",
+    };
+    const beneficiaryStudent: Beneficiary<"mini-stage-cci"> = {
+      birthdate: new Date().toISOString(),
+      levelOfEducation: "1ère",
+      email: "a@a.com",
+      firstName: "student",
+      lastName: "student",
+      phone: "0011223344",
+      role: "beneficiary",
+    };
+    const beneficiary: Beneficiary<"immersion"> = {
+      birthdate: new Date().toISOString(),
+      email: "a@a.com",
+      firstName: "sdfgf",
+      lastName: "sdfs",
+      phone: "0011223344",
+      role: "beneficiary",
+    };
+
+    it("right path internship immersion", () => {
+      const conventionInternshipKindSpecificImmersion: ConventionInternshipKindSpecific<"immersion"> =
+        {
+          internshipKind: "immersion",
+          signatories: {
+            beneficiary,
+            establishmentRepresentative,
+          },
+        };
+      expect(() =>
+        conventionInternshipKindSpecificSchema.parse(
+          conventionInternshipKindSpecificImmersion,
+        ),
+      ).not.toThrow();
+      expect(
+        conventionInternshipKindSpecificSchema.parse(
+          conventionInternshipKindSpecificImmersion,
+        ),
+      ).toBeTruthy();
+    });
+
+    it("right path internship mini-stage-cci", () => {
+      const conventionInternshipKindSpecificCci: ConventionInternshipKindSpecific<"mini-stage-cci"> =
+        {
+          internshipKind: "mini-stage-cci",
+          signatories: {
+            beneficiary: beneficiaryStudent,
+            establishmentRepresentative,
+          },
+        };
+      expect(() =>
+        conventionInternshipKindSpecificSchema.parse(
+          conventionInternshipKindSpecificCci,
+        ),
+      ).not.toThrow();
+      expect(
+        conventionInternshipKindSpecificSchema.parse(
+          conventionInternshipKindSpecificCci,
+        ),
+      ).toBeTruthy();
+    });
+
+    it("bad path internship mini-stage-cci", () => {
+      const badConventionInternshipKindSpecific: ConventionInternshipKindSpecific<InternshipKind> =
+        {
+          internshipKind: "mini-stage-cci",
+          signatories: {
+            beneficiary,
+            establishmentRepresentative,
+          },
+        };
+      expect(() =>
+        conventionInternshipKindSpecificSchema.parse(
+          badConventionInternshipKindSpecific,
+        ),
+      ).toThrow();
     });
   });
 });

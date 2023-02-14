@@ -14,10 +14,27 @@ export class ValidationError extends Error {
 
 const createValidationError = (e: z.ZodError) => {
   const error = new ValidationError(e.message);
-  error.inner = e.errors.map((err) => ({
-    message: err.message,
-    path: err.path.join("."),
-  }));
+  error.inner = e.errors
+    .map((err) =>
+      err.code === "invalid_union"
+        ? err.unionErrors.map((unionError) =>
+            unionError.issues.map((issue) => ({
+              message: issue.message,
+              path: issue.path.join("."),
+            })),
+          )
+        : {
+            message: err.message,
+            path: err.path.join("."),
+          },
+    )
+    .flat(2);
+
+  //eslint-disable-next-line no-console
+  console.log(
+    "zod error :",
+    error.inner.map((e) => `${e.path} : ${e.message}`),
+  );
 
   return error;
 };
@@ -32,12 +49,6 @@ export const toFormikValidationSchema = <T>(
     try {
       schema.parse(obj);
     } catch (err: unknown) {
-      const error = err as z.ZodError<T>;
-      //eslint-disable-next-line no-console
-      console.log(
-        "zod error :",
-        error.errors.map((e) => `${e.path} : ${e.message}`),
-      );
       throw createValidationError(err as z.ZodError<T>);
     }
   },
