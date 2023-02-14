@@ -1,6 +1,6 @@
 import { Form, Formik } from "formik";
 import React from "react";
-import { Button, DsfrTitle, ErrorNotifications } from "react-design-system";
+import { DsfrTitle, ErrorNotifications } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   AgencyDto,
@@ -27,6 +27,7 @@ import { AgencyAutocomplete } from "./AgencyAutocomplete";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { formAgencyFieldsLabels } from "src/app/contents/forms/agency/formAgency";
 import { fr } from "@codegouvfr/react-dsfr";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 
 export const EditAgency = () => (
   <>
@@ -123,8 +124,10 @@ const EditAgencyForm = () => {
               <div className={fr.cx("fr-mt-4w")}>
                 <Button
                   type="submit"
-                  disable={isSubmitting || feedback.kind !== "idle"}
-                  id={`im-form-edit-agency__submit-button`}
+                  nativeButtonProps={{
+                    disabled: isSubmitting || feedback.kind !== "idle",
+                    id: "im-form-edit-agency__submit-button",
+                  }}
                 >
                   Mettre à jour
                 </Button>

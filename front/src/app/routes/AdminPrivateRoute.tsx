@@ -1,6 +1,6 @@
 import { Form, Formik } from "formik";
 import React, { useEffect } from "react";
-import { Button, MainWrapper } from "react-design-system";
+import { MainWrapper } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { UserAndPassword, userAndPasswordSchema } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
@@ -13,6 +13,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { routes } from "./routes";
 import { AdminTab } from "./route-params";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 
 export const AdminPrivateRoute = ({
   children,
@@ -67,9 +68,11 @@ export const LoginForm = ({
                   type="password"
                 />
                 <Button
-                  disable={isLoading}
+                  disabled={isLoading}
                   type="submit"
-                  id="im-login__submit-button"
+                  nativeButtonProps={{
+                    id: "im-login__submit-button",
+                  }}
                 >
                   Se connecter
                 </Button>

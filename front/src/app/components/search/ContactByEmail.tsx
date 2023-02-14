@@ -104,9 +104,10 @@ export const ContactByEmail = ({
           priority="secondary"
           type="submit"
           disabled={isSubmitting}
-          nativeButtonProps={{
+              nativeButtonProps={{
+            nativeButtonProps={{
             id: "im-contact-establishment__contact-email-button",
-          }}
+              }}
         >
           Envoyer
         </Button>

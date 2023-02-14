@@ -12,6 +12,7 @@ import { immersionSearchGateway } from "src/config/dependencies";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 
 type ContactInPersonProps = {
   siret: SiretDto;
@@ -90,9 +91,10 @@ export const ContactInPerson = ({
           priority="secondary"
           type="submit"
           disabled={isSubmitting}
-          nativeButtonProps={{
+              nativeButtonProps={{
+            nativeButtonProps={{
             id: "im-contact-establishment__contact-in-person-button",
-          }}
+              }}
         >
           Envoyer
         </Button>

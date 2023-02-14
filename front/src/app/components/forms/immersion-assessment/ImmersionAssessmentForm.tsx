@@ -1,7 +1,7 @@
 import React from "react";
 import { Form, Formik } from "formik";
 import { identity } from "ramda";
-import { Button } from "react-design-system";
+import { Button, Notification } from "react-design-system";
 import {
   AssessmentStatus,
   assessmentStatuses,
@@ -21,6 +21,7 @@ import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 
 type ImmersionAssessmentFormProperties = {
   convention: ConventionReadDto;
@@ -68,8 +69,10 @@ export const ImmersionAssessmentForm = ({
             <li>
               <Button
                 type="submit"
-                disable={isDisabled}
-                id={"im-assessment-form__submit-button"}
+                disabled={isDisabled}
+                nativeButtonProps={{
+                  id: "im-assessment-form__submit-button",
+                }}
               >
                 Envoyer
               </Button>
@@ -93,10 +96,12 @@ export const ImmersionAssessmentForm = ({
             {isDisabled && (
               <li>
                 <Button
-                  level="secondary"
+                  priority="secondary"
                   type="button"
-                  onSubmit={downloadFullImmersionAssessmentPdf}
-                  id="im-assessment-form__download-button"
+                  onClick={downloadFullImmersionAssessmentPdf}
+                  nativeButtonProps={{
+                    id: "im-assessment-form__download-button",
+                  }}
                 >
                   Télécharger le bilan détaillé en PDF
                 </Button>

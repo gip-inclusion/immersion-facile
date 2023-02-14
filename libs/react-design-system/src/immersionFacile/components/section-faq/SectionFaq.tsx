@@ -1,7 +1,7 @@
 import React from "react";
-import { Button } from "../buttons";
 import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 import "./SectionFaq.scss";
 
 export type SectionFaqProps = {
@@ -43,10 +43,13 @@ export const SectionFaq = ({ articles }: SectionFaqProps) => {
             ))}
           </nav>
         )}
+
         <Button
-          url="https://aide.immersion-facile.beta.gouv.fr/fr/"
-          target="_blank"
-          id={`im-section-faq__see-all-button`}
+          linkProps={{
+            href: "https://aide.immersion-facile.beta.gouv.fr/fr/",
+            target: "_blank",
+            id: "im-section-faq__see-all-button",
+          }}
           className={fr.cx("fr-mt-4w", "fr-mx-auto")}
         >
           Voir toutes les questions fréquentes

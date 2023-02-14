@@ -1,8 +1,6 @@
 import { Form, Formik } from "formik";
 import React from "react";
 import {
-  Button,
-  ButtonsGroup,
   ModalClose,
   ModalContent,
   ModalDialog,
@@ -17,6 +15,7 @@ import {
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
 import { fr } from "@codegouvfr/react-dsfr";
+import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 
 type JustificationModalProps = {
@@ -77,23 +76,27 @@ export const JustificationModal = ({
               name={name}
             />
             <ButtonsGroup
-              className={fr.cx(
-                "fr-btns-group--inline-md",
-                "fr-btns-group--center",
-              )}
-            >
-              <Button
-                type="button"
-                level={"secondary"}
-                onSubmit={closeModal}
-                id={`im-justification-modal__cancel-button`}
-              >
-                Annuler
-              </Button>
-              <Button id={`im-justification-modal__send-button`} type="submit">
-                Envoyer
-              </Button>
-            </ButtonsGroup>
+              alignment="center"
+              inlineLayoutWhen="always"
+              buttons={[
+                {
+                  type: "button",
+                  priority: "secondary",
+                  onClick: closeModal,
+                  nativeButtonProps: {
+                    id: `im-justification-modal__cancel-button`,
+                  },
+                  children: "Annuler",
+                },
+                {
+                  type: "submit",
+                  nativeButtonProps: {
+                    id: `im-justification-modal__send-button`,
+                  },
+                  children: "Envoyer",
+                },
+              ]}
+            />
           </Form>
         </Formik>
       </ModalContent>

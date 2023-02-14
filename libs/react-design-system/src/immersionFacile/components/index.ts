@@ -1,4 +1,3 @@
-export * from "./buttons";
 export * from "./dropdown";
 export * from "./field";
 export * from "./image";
@@ -16,7 +15,6 @@ export * from "./fixed-stamp";
 export * from "./over-footer";
 export * from "./pe-connect-button";
 export * from "./inclusion-connect-button";
-export * from "./buttons-group";
 export * from "./hero-header";
 export * from "./page-header";
 export * from "./section-stats";

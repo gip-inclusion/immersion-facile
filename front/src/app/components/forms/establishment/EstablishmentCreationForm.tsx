@@ -1,6 +1,5 @@
 import { useField } from "formik";
 import React, { useState, useEffect } from "react";
-import { Button } from "react-design-system";
 import {
   addressDtoToString,
   FormEstablishmentDto,
@@ -27,6 +26,7 @@ import { EstablishmentFormikForm } from "./EstablishmentFormikForm";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 
 type EstablishmentCreationFormProps = {
   source: FormEstablishmentSource;
@@ -95,9 +95,7 @@ const CreationSiretRelatedInputs = () => {
           <div>
             Cette entreprise a déjà été référencée.
             <Button
-              disable={requestEmailToEditFormSucceed}
-              id="im-form-add-establishment__edit-establishment-button"
-              onSubmit={() => {
+              onClick={() => {
                 establishmentGateway
                   .requestEstablishmentModification(currentSiret)
                   .then(() => {
@@ -106,6 +104,10 @@ const CreationSiretRelatedInputs = () => {
                   .catch((err) => {
                     setRequestEmailToEditFormError(err.response.data.errors);
                   });
+              }}
+              nativeButtonProps={{
+                disabled: requestEmailToEditFormSucceed,
+                id: "im-form-add-establishment__edit-establishment-button",
               }}
             >
               Demande de modification du formulaire de référencement

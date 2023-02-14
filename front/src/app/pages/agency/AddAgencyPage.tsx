@@ -2,7 +2,6 @@ import { Form, Formik } from "formik";
 import * as React from "react";
 import { useState } from "react";
 import {
-  Button,
   ErrorNotifications,
   MainWrapper,
   PageHeader,
@@ -28,6 +27,7 @@ import { v4 as uuidV4 } from "uuid";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { formAgencyFieldsLabels } from "src/app/contents/forms/agency/formAgency";
 import { fr } from "@codegouvfr/react-dsfr";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 
 type CreateAgencyInitialValues = Omit<CreateAgencyDto, "kind"> & {
   kind: AgencyKind | "";
@@ -109,8 +109,10 @@ export const AddAgencyPage = () => {
               <div className={fr.cx("fr-mt-4w")}>
                 <Button
                   type="submit"
-                  disable={isSubmitting || submitFeedback.kind !== "idle"}
-                  id={`im-form-add-agency__submit-button`}
+                  nativeButtonProps={{
+                    disabled: isSubmitting || submitFeedback.kind !== "idle",
+                    id: "im-form-add-agency__submit-button",
+                  }}
                 >
                   Soumettre
                 </Button>

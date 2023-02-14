@@ -1,5 +1,8 @@
 import React, { useState } from "react";
-import { Button, LinkHome, MainWrapper } from "react-design-system";
+import {
+  LinkHome,
+  MainWrapper,
+} from "react-design-system";
 import { ConventionMagicLinkPayload } from "shared";
 import { decodeMagicLinkJwtWithoutSignatureCheck } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
@@ -8,6 +11,7 @@ import { conventionGateway } from "src/config/dependencies";
 import { Route } from "type-route";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 
 interface RenewExpiredLinkProps {
   route: Route<typeof routes.renewConventionMagicLink>;
@@ -77,9 +81,11 @@ export const RenewExpiredLinkContent = ({
       {!requestSuccessful && (
         <Button
           className={fr.cx("fr-mt-2w")}
-          disable={requested}
-          onSubmit={onClick}
-          id="im-renew-page__renew-link-button"
+          disabled={requested}
+          onClick={onClick}
+          nativeButtonProps={{
+            id: "im-renew-page__renew-link-button",
+          }}
         >
           Demander un nouveau lien
         </Button>

@@ -1,7 +1,6 @@
 import { Form, Formik } from "formik";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  ButtonSearch,
   MainWrapper,
   PageHeader,
   SectionTextEmbed,
@@ -27,6 +26,7 @@ import { PlaceAutocomplete } from "src/app/components/forms/autocomplete/PlaceAu
 import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 
 const radiusOptions = [1, 2, 5, 10, 20, 50, 100];
 const sortedByOptions: { value: SearchSortedBy; label: string }[] = [
@@ -217,13 +217,15 @@ export const SearchPage = ({
                     "im-search-page__form-input-wrapper",
                   )}
                 >
-                  <ButtonSearch
+                  <Button
                     disabled={!availableForSearchRequest(searchStatus, values)}
                     type="submit"
-                    id={"im-search__submit-search"}
+                    nativeButtonProps={{
+                      id: "im-search__submit-search",
+                    }}
                   >
                     Rechercher
-                  </ButtonSearch>
+                  </Button>
                 </div>
               </Form>
             )}

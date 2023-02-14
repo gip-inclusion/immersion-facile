@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { Button } from "react-design-system";
 import {
   ConventionStatus,
   doesStatusNeedsJustification,
   UpdateConventionStatusRequestDto,
 } from "shared";
 import { JustificationModal } from "src/app/components/forms/convention/JustificationModal";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 
 export type VerificationActionButtonProps = {
   onSubmit: (params: UpdateConventionStatusRequestDto) => void;
@@ -40,15 +40,17 @@ export const VerificationActionButton = ({
   return (
     <>
       <Button
-        level={newStatus === "REJECTED" ? "secondary" : "primary"}
-        disable={disabled}
-        onSubmit={() => {
+        priority={newStatus === "REJECTED" ? "secondary" : "primary"}
+        onClick={() => {
           doesStatusNeedsJustification(newStatus)
             ? setIsOpen(true)
             : onSubmit({ status: newStatus });
         }}
         className={className}
-        id={`im-convention-validation__submit-button`}
+        nativeButtonProps={{
+          disabled,
+          id: "im-convention-validation__submit-button",
+        }}
       >
         {children}
       </Button>

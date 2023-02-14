@@ -1,12 +1,13 @@
 import { keys } from "ramda";
 import React from "react";
-import { ButtonHome, PeConnectButton } from "react-design-system";
+import { PeConnectButton } from "react-design-system";
 import { loginPeConnect } from "shared";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
 import { useRoute } from "src/app/routes/routes";
 import { deviceRepository } from "src/config/dependencies";
 import { fr } from "@codegouvfr/react-dsfr";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 
 const storeConventionRouteParamsOnDevice = (
   routeParams: ConventionImmersionPageRoute["params"],
@@ -63,17 +64,16 @@ export const InitiateConventionCard = ({
           <strong className={fr.cx("fr-text--lead", "fr-hr-or")}>ou</strong>
           <div className={fr.cx("fr-btns-group--center")}>
             <p dangerouslySetInnerHTML={{ __html: otherCaseNotice }}></p>
-            <OtherChoiceButton
-              label={showFormButtonLabel}
-              onClick={onNotPeConnectButtonClick}
-            />
+
+            <Button type="button" onClick={onNotPeConnectButtonClick}>
+              {showFormButtonLabel}
+            </Button>
           </div>
         </>
       ) : (
-        <OtherChoiceButton
-          label={showFormButtonLabel}
-          onClick={onNotPeConnectButtonClick}
-        />
+        <Button type="button" onClick={onNotPeConnectButtonClick}>
+          {showFormButtonLabel}
+        </Button>
       )}
     </div>
   );
@@ -97,15 +97,3 @@ export const InitiateConventionCard = ({
   );
   return useSection ? section : cardContent;
 };
-
-const OtherChoiceButton = (props: {
-  onClick: () => void;
-  label: string;
-}): JSX.Element => (
-  <>
-    {/*TODO : change HomeButton to take 'candidate' and 'establishment' as type params ('error' is very confusing here...)*/}
-    <ButtonHome type="candidate" onClick={props.onClick}>
-      {props.label}
-    </ButtonHome>
-  </>
-);
