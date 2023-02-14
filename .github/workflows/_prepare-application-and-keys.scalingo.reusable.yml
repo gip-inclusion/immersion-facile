@@ -1,0 +1,50 @@
+name: zReusable Prepare Application Scalingo
+#prepare-application
+#deploy-from-release-artifact
+#cleanup-deploy-keys
+
+on:
+  workflow_call:
+    inputs:
+      application-name:
+        required: true
+        type: string
+        # Should have a maximum length of 47 characters
+
+    secrets:
+      SCALINGO_API_TOKEN:
+        required: true
+
+    outputs:
+      deployer-private-ssh-key:
+        description: "The private generated SSH key for pushing to the remote"
+        value: ${{ jobs.prepare-application.outputs.deployer-private-ssh-key }}
+
+jobs:
+  prepare-application:
+    runs-on: ubuntu-latest
+    container:
+      image: rcambonie/scalingo-cli
+    outputs:
+      deployer-private-ssh-key: ${{ steps.deployer-private-ssh-key.outputs.private-key }}
+    steps:
+      - name: Login with api-token
+        run: scalingo login --api-token=${{ secrets.SCALINGO_API_TOKEN }}
+
+      - name: Create application if needed
+        run: |
+          set +e
+          APP_ALREADY_EXIST=$(scalingo apps | grep -c ${{ inputs.application-name }} )
+          set -e
+          if [[ $APP_ALREADY_EXIST -eq 0 ]]; then scalingo create ${{ inputs.application-name }}; else echo 'App exists already or has an invalid name'; fi
+
+      - name: Generate transient ssh-keys then add the public key to the logged account for deployment
+        run: |
+          mkdir -p /home/.ssh
+          ssh-keygen -q -t rsa -N '' -f /home/.ssh/id_rsa
+          scalingo keys-add ${{ inputs.application-name }} /home/.ssh/id_rsa.pub
+
+      - name: Set the generate ssh private key as an output, key value will masked in logs, handling the set-output truncate multiline string behaviours (ref:https://github.community/t/set-output-truncates-multiline-strings/16852)
+        id: deployer-private-ssh-key
+        run: |
+          echo "::set-output name=private-key::$(cat /home/.ssh/id_rsa)"

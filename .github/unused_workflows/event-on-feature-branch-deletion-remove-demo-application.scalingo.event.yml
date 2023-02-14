@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  application-name: 'immersion-facile'
+  application-name: "immersion-facile"
 
 jobs:
   dynamic-variables:

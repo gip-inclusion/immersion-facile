@@ -9,11 +9,11 @@ on:
       scalingo-remote-domain-url:
         required: false
         type: string
-        default: 'git@ssh.osc-fr1.scalingo.com'
+        default: "git@ssh.osc-fr1.scalingo.com"
       scalingo-ssh-host-domain:
         required: false
         type: string
-        default: 'ssh.osc-fr1.scalingo.com'
+        default: "ssh.osc-fr1.scalingo.com"
 
     secrets:
       SCALINGO_API_TOKEN:
@@ -56,8 +56,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: create-app-and-environment
     steps:
-#      - name: Retrieve project files for current branch
-#        uses: actions/checkout@v3
+      #      - name: Retrieve project files for current branch
+      #        uses: actions/checkout@v3
 
       - name: We should only have server.js / package.json and dist
         uses: actions/download-artifact@v3
@@ -70,7 +70,7 @@ jobs:
           touch server.js
           CONTENT=$(cat << EOF
           var express = require('express');
-  
+
           var app = express();
           var directory = '/' + (process.env.STATIC_DIR || 'dist')
           app.use(express.static(__dirname + directory));
@@ -109,7 +109,7 @@ jobs:
           RewriteCond %{REQUEST_FILENAME} !-d
           RewriteCond %{REQUEST_FILENAME} !-f
           RewriteRule . index.html [L]
-          
+
           <FilesMatch "index\.html">
           Header set Cache-Control "max-age=60, private, proxy-revalidate"
           </FilesMatch>

@@ -17,11 +17,9 @@ on:
         required: false
         type: string
 
-
     secrets:
       SCALINGO_API_TOKEN:
         required: true
-
 
 jobs:
   addon-postgresql:
@@ -49,16 +47,14 @@ jobs:
     steps:
       - name: Save the feature app database url string
         id: feature-app-database-url
-        run : |
+        run: |
           TARGET_DATABASE_URL=$(scalingo --app ${{ inputs.application-full-name }} env | grep SCALINGO_POSTGRESQL_URL)
           TARGET_DATABASE_URL=${TARGET_URL//SCALINGO_POSTGRESQL_URL=/}
             echo "::set-output name=target-database-url::$TARGET_DATABASE_URL"
 
       #TODO Add a transformation script (anonymisation ?) between dump and restore
       - name: Restore from prod dump
-        run: scalingo --app ${{ inputs.reference-application-name }} run bash -c "dbclient-fetcher psql && \
-         pg_dump --clean --if-exists --format c --no-owner --no-privileges --no-comments --exclude-schema 'information_schema' --exclude-schema '^pg_*' --dbname $DATABASE_URL --file dump.pgsql && \
-         pg_restore --clean --if-exists --no-owner --no-privileges --no-comments --dbname ${{ steps.feature-app-database-url.outputs.target-database-url }} --file dump.pgsql"
-
-
-
+        run:
+          scalingo --app ${{ inputs.reference-application-name }} run bash -c "dbclient-fetcher psql && \
+          pg_dump --clean --if-exists --format c --no-owner --no-privileges --no-comments --exclude-schema 'information_schema' --exclude-schema '^pg_*' --dbname $DATABASE_URL --file dump.pgsql && \
+          pg_restore --clean --if-exists --no-owner --no-privileges --no-comments --dbname ${{ steps.feature-app-database-url.outputs.target-database-url }} --file dump.pgsql"
