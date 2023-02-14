@@ -74,16 +74,19 @@ const removeAccents = (value: unknown) => {
 
 export const zEmail = z.preprocess(
   removeAccents,
-  z.string(requiredText).email(localization.invalidEmailFormat),
+  z
+    .string(requiredText)
+    .email(localization.invalidEmailFormat)
+    .refine(
+      (email) =>
+        email.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/), // emails patterns without underscore in the domain part
+      localization.invalidEmailFormat,
+    ),
 );
 
 export const zEmailPossiblyEmpty = z.preprocess(
   removeAccents,
-  z
-    .string()
-    .email(localization.invalidEmailFormat)
-    .optional()
-    .or(z.literal("")),
+  zEmail.optional().or(z.literal("")),
 );
 
 export const zBoolean = z.boolean(requiredBoolean);
