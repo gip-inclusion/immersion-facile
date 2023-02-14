@@ -1,6 +1,6 @@
-import { Form, Formik, useField } from "formik";
-import React, { useState } from "react";
-import { Button, ModalTitle } from "react-design-system";
+import { useForm, type FormState, type FieldValues } from "react-hook-form";
+import React from "react";
+import { ModalTitle } from "react-design-system";
 import {
   ContactEstablishmentByMailDto,
   contactEstablishmentByMailSchema,
@@ -8,9 +8,10 @@ import {
   SiretDto,
 } from "shared";
 import { immersionSearchGateway } from "src/config/dependencies";
-import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Input } from "@codegouvfr/react-dsfr/Input";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 
 type ContactByEmailProps = {
   siret: SiretDto;
@@ -18,17 +19,30 @@ type ContactByEmailProps = {
   onSuccess: () => void;
 };
 
-const getName = (v: keyof ContactEstablishmentByMailDto) => v;
-
 const initialMessage =
-  "Bonjour, \n\
-  J’ai trouvé votre entreprise sur 'Immersion Facilitée.'\n\
-  Je souhaiterais passer quelques jours dans votre entreprise en immersion professionnelle auprès de vos salariés pour découvrir ce métier.\n\
+  "Bonjour, \n\n\
+J’ai trouvé votre entreprise sur 'Immersion Facilitée.'\n\
+Je souhaiterais passer quelques jours dans votre entreprise en immersion professionnelle auprès de vos salariés pour découvrir ce métier.\n\
   \n\
-  Pourriez-vous me contacter par mail pour me proposer un rendez-vous ? \n\
-  Je pourrais alors vous expliquer directement mon projet. \n\
+Pourriez-vous me contacter par mail pour me proposer un rendez-vous ? \n\
+Je pourrais alors vous expliquer directement mon projet. \n\
   \n\
-  En vous remerciant,";
+En vous remerciant,";
+
+const makeFieldError =
+  <Context extends FieldValues>(context: FormState<Context>) =>
+  (
+    name: keyof Context,
+  ): {
+    state: "error" | "default";
+    stateRelatedMessage: string | undefined;
+  } | null =>
+    name in context.errors
+      ? {
+          state: "error" as const,
+          stateRelatedMessage: context.errors[name]?.message as string,
+        }
+      : null;
 
 export const ContactByEmail = ({
   siret,
@@ -45,103 +59,70 @@ export const ContactByEmail = ({
     message: initialMessage,
   };
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const methods = useForm<ContactEstablishmentByMailDto>({
+    resolver: zodResolver(contactEstablishmentByMailSchema),
+    mode: "onTouched",
+    defaultValues: initialValues,
+  });
+  const {
+    register,
+    handleSubmit,
+    formState,
+    formState: { isSubmitting },
+  } = methods;
+  const getFieldError = makeFieldError(formState);
+  const onFormValid = async (values: ContactEstablishmentByMailDto) => {
+    await immersionSearchGateway.contactEstablishment(values);
+    onSuccess();
+  };
   return (
-    <Formik
-      initialValues={initialValues}
-      validationSchema={toFormikValidationSchema(
-        contactEstablishmentByMailSchema,
-      )}
-      onSubmit={async (values) => {
-        setIsSubmitting(true);
-        await immersionSearchGateway.contactEstablishment(values);
-        setIsSubmitting(false);
-        onSuccess();
-      }}
-    >
-      {({ errors, submitCount }) => (
-        <Form>
-          <>
-            <ModalTitle>Contacter l'entreprise</ModalTitle>
+    <form onSubmit={handleSubmit(onFormValid)}>
+      <>
+        <ModalTitle>Contacter l'entreprise</ModalTitle>
 
-            <p className={fr.cx("fr-pb-3w")}>
-              Cette entreprise a choisi d'être contactée par mail. Veuillez
-              compléter ce formulaire qui sera transmis à l'entreprise.
-            </p>
-            <FormikInput
-              label="Votre email *"
-              name={getName("potentialBeneficiaryEmail")}
-            />
-            <FormikInput
-              label="Votre prénom *"
-              name={getName("potentialBeneficiaryFirstName")}
-            />
-            <FormikInput
-              label="Votre nom *"
-              name={getName("potentialBeneficiaryLastName")}
-            />
+        <p className={fr.cx("fr-pb-3w")}>
+          Cette entreprise a choisi d'être contactée par mail. Veuillez
+          compléter ce formulaire qui sera transmis à l'entreprise.
+        </p>
+        <Input
+          label="Votre email *"
+          nativeInputProps={{
+            ...register("potentialBeneficiaryEmail"),
+            type: "email",
+          }}
+          {...getFieldError("potentialBeneficiaryEmail")}
+        />
+        <Input
+          label="Votre prénom *"
+          nativeInputProps={register("potentialBeneficiaryFirstName")}
+          {...getFieldError("potentialBeneficiaryFirstName")}
+        />
+        <Input
+          label="Votre nom *"
+          nativeInputProps={register("potentialBeneficiaryLastName")}
+          {...getFieldError("potentialBeneficiaryLastName")}
+        />
+        <Input
+          label="Votre message *"
+          textArea
+          nativeTextAreaProps={{
+            ...register("message"),
+            rows: 6,
+          }}
+          {...getFieldError("message")}
+        />
 
-            <FormikTextArea
-              label="Votre message *"
-              name={getName("message")}
-              rows={6}
-            />
-
-            {submitCount !== 0 &&
-              Object.values(errors).length > 0 &&
-              //eslint-disable-next-line no-console
-              console.log("onSubmit error", { errors })}
-            <Button
-              level="secondary"
-              type="submit"
-              disable={isSubmitting}
-              id="im-contact-establishment__contact-email-button"
-            >
-              Envoyer
-            </Button>
-          </>
-        </Form>
-      )}
-    </Formik>
-  );
-};
-
-type FormikInputProps = {
-  name: string;
-  label: string;
-};
-const FormikInput = ({ name, label }: FormikInputProps) => {
-  const [field, meta] = useField<string>({ name });
-  const errorRelatedProps = meta.touched &&
-    meta.error && {
-      state: "error" as const,
-      stateRelatedMessage: meta.error,
-    };
-
-  return (
-    <Input label={label} nativeInputProps={field} {...errorRelatedProps} />
-  );
-};
-
-type FormikTextAreaProps = {
-  name: string;
-  label: string;
-  rows?: number;
-};
-const FormikTextArea = ({ name, label, rows }: FormikTextAreaProps) => {
-  const [field, meta] = useField<string>({ name });
-  const errorRelatedProps = meta.touched &&
-    meta.error && {
-      state: "error" as const,
-      stateRelatedMessage: meta.error,
-    };
-  return (
-    <Input
-      label={label}
-      nativeTextAreaProps={{ ...field, rows }}
-      textArea
-      {...errorRelatedProps}
-    />
+        <Button
+          priority="secondary"
+          type="submit"
+          disabled={isSubmitting}
+          nativeButtonProps={{
+            id: "im-contact-establishment__contact-email-button",
+          }}
+        >
+          Envoyer
+        </Button>
+      </>
+    </form>
   );
 };

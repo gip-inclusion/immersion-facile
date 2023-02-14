@@ -180,6 +180,7 @@ importers:
       '@emotion/react': ^11.9.0
       '@emotion/styled': ^11.8.1
       '@gouvfr/dsfr': 1.8.5
+      '@hookform/resolvers': ^2.9.11
       '@mui/icons-material': ^5.5.1
       '@mui/material': ^5.11.8
       '@reduxjs/toolkit': ^1.8.1
@@ -228,6 +229,7 @@ importers:
     dependencies:
       '@codegouvfr/react-dsfr': 0.32.0_react@18.2.0
       '@gouvfr/dsfr': 1.8.5
+      '@hookform/resolvers': 2.9.11_react-hook-form@7.42.1
       '@mui/icons-material': 5.8.0_agg4gj4teu3mtdwwc44pgjorny
       '@mui/material': 5.11.8_ycdaimc3s5rm6wfgbwnk474bn4
       '@reduxjs/toolkit': 1.8.1_4wic3pw3dccvku2ikwp24gz4m4
@@ -3304,6 +3306,14 @@ packages:
   /@gouvfr/dsfr/1.8.5:
     resolution: {integrity: sha512-29L+THvWmYJXztPa0Os5TS9yD2WQbrH7VnCKxkyUXQZQ+6lsGebtz0GdCnLexOWDfCn1y53Mh7+/ihxI/z0Vjw==}
     engines: {node: '>=14.18.0'}
+
+  /@hookform/resolvers/2.9.11_react-hook-form@7.42.1:
+    resolution: {integrity: sha512-bA3aZ79UgcHj7tFV7RlgThzwSSHZgvfbt2wprldRkYBcMopdMvHyO17Wwp/twcJasNFischFfS7oz8Katz8DdQ==}
+    peerDependencies:
+      react-hook-form: ^7.0.0
+    dependencies:
+      react-hook-form: 7.42.1_react@18.2.0
+    dev: false
 
   /@html-validate/stylish/3.0.1:
     resolution: {integrity: sha512-jQNDrSnWvJEPSlqC1tFqcbmVuJy2x61UwqFsXHxYT2sgCXFW4AVhsoIcHkECCmUHtQ8hpHU6yOBGA+rMLZhS7A==}

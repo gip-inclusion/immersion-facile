@@ -191,16 +191,27 @@ const cciSignatoriesSchema: z.Schema<Signatories<"mini-stage-cci">> = z.object({
 // https://github.com/colinhacks/zod#discriminated-unions
 export const conventionInternshipKindSpecificSchema: z.Schema<
   ConventionInternshipKindSpecific<InternshipKind>
-> = z.discriminatedUnion("internshipKind", [
-  z.object({
-    internshipKind: z.literal("immersion"),
-    signatories: immersionSignatoriesSchema,
-  }),
-  z.object({
-    internshipKind: z.literal("mini-stage-cci"),
-    signatories: cciSignatoriesSchema,
-  }),
-]);
+> = z
+  .object({
+    internshipKind: z.string(),
+    signatories: z.object({
+      beneficiary: beneficiarySchema,
+      establishmentRepresentative: establishmentRepresentativeSchema,
+      beneficiaryRepresentative: beneficiaryRepresentativeSchema.optional(),
+      beneficiaryCurrentEmployer: beneficiaryCurrentEmployerSchema.optional(),
+    }),
+  })
+  .or(
+    z.object({
+      internshipKind: z.string(),
+      signatories: z.object({
+        beneficiary: studentBeneficiarySchema,
+        establishmentRepresentative: establishmentRepresentativeSchema,
+        beneficiaryRepresentative: beneficiaryRepresentativeSchema.optional(),
+        beneficiaryCurrentEmployer: beneficiaryCurrentEmployerSchema.optional(),
+      }),
+    }),
+  );
 
 export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExternalId> =
   conventionCommonSchema
