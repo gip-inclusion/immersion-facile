@@ -37,6 +37,7 @@ import { PgExportQueries } from "../../secondary/pg/PgExportQueries";
 import { PgFeatureFlagRepository } from "../../secondary/pg/PgFeatureFlagRepository";
 import { PgFormEstablishmentRepository } from "../../secondary/pg/PgFormEstablishmentRepository";
 import { PgImmersionAssessmentRepository } from "../../secondary/pg/PgImmersionAssessmentRepository";
+import { PgInclusionConnectedUserQueries } from "../../secondary/pg/PgInclusionConnectedUserQueries";
 import { PgLaBonneBoiteRequestRepository } from "../../secondary/pg/PgLaBonneBoiteRequestRepository";
 import { PgOngoingOAuthRepository } from "../../secondary/pg/PgOngoingOAuthRepository";
 import { PgOutboxQueries } from "../../secondary/pg/PgOutboxQueries";
@@ -106,6 +107,7 @@ export const createPgUow = (client: PoolClient): UnitOfWork => ({
   featureFlagRepository: new PgFeatureFlagRepository(client),
   formEstablishmentRepository: new PgFormEstablishmentRepository(client),
   immersionAssessmentRepository: new PgImmersionAssessmentRepository(client),
+  inclusionConnectedUserQueries: new PgInclusionConnectedUserQueries(client),
   laBonneBoiteRequestRepository: new PgLaBonneBoiteRequestRepository(client),
   ongoingOAuthRepository: new PgOngoingOAuthRepository(client),
   outboxRepository: new PgOutboxRepository(client),

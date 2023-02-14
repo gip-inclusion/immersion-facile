@@ -38,7 +38,7 @@ type AgencyColumns =
   | "street_number_and_address"
   | "validator_emails";
 
-type AgencyPgRow = Record<AgencyColumns, any>;
+export type PersistenceAgency = Record<AgencyColumns, any>;
 
 const makeAgencyKindFiterSQL = (
   agencyKindFilter?: AgencyKindFilter,
@@ -118,7 +118,7 @@ export class PgAgencyRepository implements AgencyRepository {
     ].join("\n");
 
     const pgResult = await this.client.query(query);
-    return pgResult.rows.map(pgToEntity);
+    return pgResult.rows.map(persistenceAgencyToAgencyDto);
   }
 
   public async getAgencyWhereEmailMatches(email: string) {
@@ -139,7 +139,7 @@ export class PgAgencyRepository implements AgencyRepository {
     const first = pgResult.rows[0];
 
     if (!first) return;
-    return pgToEntity(first);
+    return persistenceAgencyToAgencyDto(first);
   }
 
   public async getById(id: AgencyId): Promise<AgencyDto | undefined> {
@@ -155,7 +155,7 @@ export class PgAgencyRepository implements AgencyRepository {
     const pgAgency = pgResult.rows[0];
     if (!pgAgency) return;
 
-    return pgToEntity(pgAgency);
+    return persistenceAgencyToAgencyDto(pgAgency);
   }
 
   public async insert(agency: AgencyDto): Promise<AgencyId | undefined> {
@@ -240,7 +240,9 @@ const entityToPgArray = (agency: Partial<AgencyDto>): any[] => [
   agency.address?.departmentCode,
 ];
 
-const pgToEntity = (params: AgencyPgRow): AgencyDto => ({
+export const persistenceAgencyToAgencyDto = (
+  params: PersistenceAgency,
+): AgencyDto => ({
   address: {
     streetNumberAndAddress: params.street_number_and_address,
     postcode: params.post_code,

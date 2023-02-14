@@ -1,8 +1,5 @@
 import { values } from "ramda";
-import {
-  AuthenticatedUser,
-  AuthenticatedUserId,
-} from "../../domain/generic/OAuth/entities/AuthenticatedUser";
+import { AuthenticatedUser } from "../../domain/generic/OAuth/entities/AuthenticatedUser";
 import { AuthenticatedUserRepository } from "../../domain/generic/OAuth/ports/AuthentitcatedUserRepositiory";
 
 export class InMemoryAuthenticatedUserRepository
@@ -14,12 +11,6 @@ export class InMemoryAuthenticatedUserRepository
 
   async findByEmail(email: string): Promise<AuthenticatedUser | undefined> {
     return this.users.find((user) => user.email === email);
-  }
-
-  async findById(
-    id: AuthenticatedUserId,
-  ): Promise<AuthenticatedUser | undefined> {
-    return this.usersById[id];
   }
 
   private usersById: Record<string, AuthenticatedUser> = {};

@@ -23,7 +23,7 @@ export class PgAuthenticatedUserRepository
       `,
       [email],
     );
-    return this.toAuthenticatedUser(response.rows[0]);
+    return toAuthenticatedUser(response.rows[0]);
   }
 
   public async save(user: AuthenticatedUser): Promise<void> {
@@ -53,16 +53,14 @@ export class PgAuthenticatedUserRepository
       );
     }
   }
-
-  private toAuthenticatedUser(
-    raw?: PersistenceAuthenticatedUser,
-  ): AuthenticatedUser | undefined {
-    if (!raw) return;
-    return {
-      id: raw.id,
-      email: raw.email,
-      firstName: raw.first_name,
-      lastName: raw.last_name,
-    };
-  }
 }
+
+const toAuthenticatedUser = (
+  raw?: PersistenceAuthenticatedUser,
+): AuthenticatedUser | undefined =>
+  raw && {
+    id: raw.id,
+    email: raw.email,
+    firstName: raw.first_name,
+    lastName: raw.last_name,
+  };

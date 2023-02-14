@@ -101,7 +101,11 @@ export const createUseCases = (
 
   return {
     ...instantiatedUseCasesFromClasses({
-      getUserAgencyDashboardUrl: new GetUserAgencyDashboardUrl(uowPerformer),
+      getUserAgencyDashboardUrl: new GetUserAgencyDashboardUrl(
+        uowPerformer,
+        gateways.dashboardGateway,
+        gateways.timeGateway,
+      ),
       initiateInclusionConnect: new InitiateInclusionConnect(
         uowPerformer,
         uuidGenerator,
