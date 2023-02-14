@@ -1,4 +1,5 @@
 import { filter, map, switchMap } from "rxjs";
+import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
@@ -23,10 +24,13 @@ const getAgencyDashboardEpic: AppEpic<InclusionConnectedAction> = (
       ),
     ),
     map(inclusionConnectedSlice.actions.agencyDashboardUrlFetchSucceeded),
-    catchEpicError((error) =>
-      inclusionConnectedSlice.actions.agencyDashboardUrlFetchFailed(
-        error.message,
-      ),
-    ),
+    catchEpicError((error) => {
+      if (error?.message.includes("jwt expired"))
+        return authSlice.actions.federatedIdentityDeletionTriggered();
+
+      return inclusionConnectedSlice.actions.agencyDashboardUrlFetchFailed(
+        error?.message,
+      );
+    }),
   );
 export const inclusionConnectedEpics = [getAgencyDashboardEpic];

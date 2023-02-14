@@ -34,7 +34,8 @@ describe("Router for users authenticated with Inclusion Connect", () => {
   });
 
   it("Right path : HTTP 200 with dashboard url on response body", async () => {
-    const { request, generateAuthenticatedUserJwt, inMemoryUow } = await buildTestApp();
+    const { request, generateAuthenticatedUserJwt, inMemoryUow } =
+      await buildTestApp();
     const userId = "123";
     const agency = new AgencyDtoBuilder().build();
     inMemoryUow.inclusionConnectedUserQueries.setInclusionConnectedUsers([

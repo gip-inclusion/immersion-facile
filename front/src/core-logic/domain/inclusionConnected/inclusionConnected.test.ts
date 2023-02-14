@@ -51,6 +51,28 @@ describe("InclusionConnected", () => {
     expectFeedbackToEqual({ kind: "errored", errorMessage });
   });
 
+  it("disconnects the users if the response includes : 'jwt expired'", () => {
+    ({ store, dependencies } = createTestStore({
+      auth: {
+        federatedIdentity: {
+          token: "some-existing-token",
+          provider: "inclusionConnect",
+        },
+      },
+    }));
+    store.dispatch(
+      inclusionConnectedSlice.actions.agencyDashboardUrlFetchRequested(),
+    );
+    expectIsLoadingToBe(true);
+
+    const errorMessage = "Something went wrong : jwt expired";
+    dependencies.inclusionConnectedGateway.dashboardUrl$.error(
+      new Error(errorMessage),
+    );
+    expectDashboardUrlToBe(null);
+    expectFeedbackToEqual({ kind: "idle" });
+  });
+
   const expectIsLoadingToBe = (expected: boolean) => {
     expect(inclusionConnectedSelectors.isLoading(store.getState())).toBe(
       expected,
