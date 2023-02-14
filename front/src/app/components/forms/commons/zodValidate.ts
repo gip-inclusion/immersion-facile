@@ -15,22 +15,26 @@ export class ValidationError extends Error {
 const createValidationError = (e: z.ZodError) => {
   const error = new ValidationError(e.message);
   error.inner = e.errors
-    .map((err) => {
-      if (err.code === "invalid_union") {
-        //console.log(err);
-        return err.unionErrors.map((unionError) =>
-          unionError.issues.map((issue) => ({
-            message: issue.message,
-            path: issue.path.join("."),
-          })),
-        );
-      }
-      return {
-        message: err.message,
-        path: err.path.join("."),
-      };
-    })
+    .map((err) =>
+      err.code === "invalid_union"
+        ? err.unionErrors.map((unionError) =>
+            unionError.issues.map((issue) => ({
+              message: issue.message,
+              path: issue.path.join("."),
+            })),
+          )
+        : {
+            message: err.message,
+            path: err.path.join("."),
+          },
+    )
     .flat(2);
+
+  //eslint-disable-next-line no-console
+  console.log(
+    "zod error :",
+    error.inner.map((e) => `${e.path} : ${e.message}`),
+  );
 
   return error;
 };
