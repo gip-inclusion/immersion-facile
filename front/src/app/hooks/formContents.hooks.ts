@@ -2,6 +2,7 @@ import {
   FormFieldAttributes,
   FormFieldAttributesForContent,
 } from "../contents/forms/types";
+import { type FormState, type FieldValues } from "react-hook-form";
 
 export type FormFieldsObject<T> = Record<keyof T, FormFieldAttributes>;
 export type FormFieldsObjectForContent<T> = Record<
@@ -63,3 +64,18 @@ const getFormFieldAttributes = <T>(
     name: String(key),
   };
 };
+
+export const makeFieldError =
+  <Context extends FieldValues>(context: FormState<Context>) =>
+  (
+    name: keyof Context,
+  ): {
+    state: "error" | "default";
+    stateRelatedMessage: string | undefined;
+  } | null =>
+    name in context.errors
+      ? {
+          state: "error" as const,
+          stateRelatedMessage: context.errors[name]?.message as string,
+        }
+      : null;

@@ -1,4 +1,4 @@
-import { useForm, type FormState, type FieldValues } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import React from "react";
 import { ModalTitle } from "react-design-system";
 import {
@@ -12,6 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import { makeFieldError } from "src/app/hooks/formContents.hooks";
 
 type ContactByEmailProps = {
   siret: SiretDto;
@@ -28,21 +29,6 @@ Pourriez-vous me contacter par mail pour me proposer un rendez-vous ? \n\
 Je pourrais alors vous expliquer directement mon projet. \n\
   \n\
 En vous remerciant,";
-
-const makeFieldError =
-  <Context extends FieldValues>(context: FormState<Context>) =>
-  (
-    name: keyof Context,
-  ): {
-    state: "error" | "default";
-    stateRelatedMessage: string | undefined;
-  } | null =>
-    name in context.errors
-      ? {
-          state: "error" as const,
-          stateRelatedMessage: context.errors[name]?.message as string,
-        }
-      : null;
 
 export const ContactByEmail = ({
   siret,
@@ -70,7 +56,9 @@ export const ContactByEmail = ({
     formState,
     formState: { isSubmitting },
   } = methods;
+
   const getFieldError = makeFieldError(formState);
+
   const onFormValid = async (values: ContactEstablishmentByMailDto) => {
     await immersionSearchGateway.contactEstablishment(values);
     onSuccess();

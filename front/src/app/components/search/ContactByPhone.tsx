@@ -1,6 +1,5 @@
-import { Form, Formik } from "formik";
-import React, { useState } from "react";
-import { Button, ModalTitle } from "react-design-system";
+import React from "react";
+import { ModalTitle } from "react-design-system";
 import {
   ContactEstablishmentByPhoneDto,
   contactEstablishmentByPhoneSchema,
@@ -8,16 +7,17 @@ import {
   SiretDto,
 } from "shared";
 import { immersionSearchGateway } from "src/config/dependencies";
-import { TextInput } from "src/app/components/forms/commons/TextInput";
-import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Input } from "@codegouvfr/react-dsfr/Input";
+import { Button } from "@codegouvfr/react-dsfr/Button";
+import { makeFieldError } from "src/app/hooks/formContents.hooks";
 
 type ContactByPhoneProps = {
   siret: SiretDto;
   offer: RomeDto;
   onSuccess: () => void;
 };
-
-const getName = (v: keyof ContactEstablishmentByPhoneDto) => v;
 
 export const ContactByPhone = ({
   siret,
@@ -33,65 +33,73 @@ export const ContactByPhone = ({
     potentialBeneficiaryEmail: "",
   };
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const methods = useForm<ContactEstablishmentByPhoneDto>({
+    resolver: zodResolver(contactEstablishmentByPhoneSchema),
+    mode: "onTouched",
+    defaultValues: initialValues,
+  });
+
+  const {
+    register,
+    handleSubmit,
+    formState,
+    formState: { isSubmitting },
+  } = methods;
+
+  const getFieldError = makeFieldError(formState);
+
+  const onFormValid = async (values: ContactEstablishmentByPhoneDto) => {
+    await immersionSearchGateway.contactEstablishment(values);
+    onSuccess();
+  };
 
   return (
-    <Formik
-      initialValues={initialValues}
-      validationSchema={toFormikValidationSchema(
-        contactEstablishmentByPhoneSchema,
-      )}
-      onSubmit={async (values) => {
-        setIsSubmitting(true);
-        await immersionSearchGateway.contactEstablishment(values);
-        setIsSubmitting(false);
-        onSuccess();
-      }}
-    >
-      {({ errors, submitCount }) => (
-        <Form>
-          <>
-            <ModalTitle>Contacter l'entreprise</ModalTitle>
-            <p className={"fr-my-2w"}>
-              Cette entreprise souhaite être contactée par téléphone. Merci de
-              nous indiquer vos coordonnées.
-            </p>
-            <p className={"fr-my-2w"}>
-              Nous allons vous transmettre par e-mail le nom de la personne à
-              contacter, son numéro de téléphone ainsi que des conseils pour
-              présenter votre demande d’immersion.
-            </p>
-            <p className={"fr-my-2w"}>
-              Ces informations sont personnelles et confidentielles. Elles ne
-              peuvent pas être communiquées à d’autres personnes. Merci !
-            </p>
-            <TextInput
-              label="Votre email *"
-              name={getName("potentialBeneficiaryEmail")}
-            />
-            <TextInput
-              label="Votre prénom *"
-              name={getName("potentialBeneficiaryFirstName")}
-            />
-            <TextInput
-              label="Votre nom *"
-              name={getName("potentialBeneficiaryLastName")}
-            />
-            {submitCount !== 0 &&
-              Object.values(errors).length > 0 &&
-              //eslint-disable-next-line no-console
-              console.log("onSubmit Error", { errors })}
-            <Button
-              level="secondary"
-              type="submit"
-              disable={isSubmitting}
-              id="im-contact-establishment__contact-phone-button"
-            >
-              Envoyer
-            </Button>
-          </>
-        </Form>
-      )}
-    </Formik>
+    <form onSubmit={handleSubmit(onFormValid)}>
+      <>
+        <ModalTitle>Contacter l'entreprise</ModalTitle>
+        <p className={"fr-my-2w"}>
+          Cette entreprise souhaite être contactée par téléphone. Merci de nous
+          indiquer vos coordonnées.
+        </p>
+        <p className={"fr-my-2w"}>
+          Nous allons vous transmettre par e-mail le nom de la personne à
+          contacter, son numéro de téléphone ainsi que des conseils pour
+          présenter votre demande d’immersion.
+        </p>
+        <p className={"fr-my-2w"}>
+          Ces informations sont personnelles et confidentielles. Elles ne
+          peuvent pas être communiquées à d’autres personnes. Merci !
+        </p>
+        <Input
+          label="Votre email *"
+          nativeInputProps={{
+            ...register("potentialBeneficiaryEmail"),
+            type: "email",
+          }}
+          {...getFieldError("potentialBeneficiaryEmail")}
+        />
+        <Input
+          label="Votre prénom *"
+          nativeInputProps={register("potentialBeneficiaryFirstName")}
+          {...getFieldError("potentialBeneficiaryFirstName")}
+        />
+        <Input
+          label="Votre nom *"
+          nativeInputProps={register("potentialBeneficiaryLastName")}
+          {...getFieldError("potentialBeneficiaryLastName")}
+        />
+
+        <Button
+          priority="secondary"
+          type="submit"
+          disabled={isSubmitting}
+          nativeButtonProps={{
+            id: "im-contact-establishment__contact-phone-button",
+          }}
+        >
+          Envoyer
+        </Button>
+      </>
+    </form>
   );
 };
