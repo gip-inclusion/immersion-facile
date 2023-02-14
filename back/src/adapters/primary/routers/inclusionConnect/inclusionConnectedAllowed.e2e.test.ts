@@ -1,4 +1,4 @@
-import { inclusionConnectedAllowedTargets } from "shared";
+import { AgencyDtoBuilder, inclusionConnectedAllowedTargets } from "shared";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 
 describe("Router for users authenticated with Inclusion Connect", () => {
@@ -34,15 +34,25 @@ describe("Router for users authenticated with Inclusion Connect", () => {
   });
 
   it("Right path : HTTP 200 with dashboard url on response body", async () => {
-    const { request, generateAuthenticatedUserJwt } = await buildTestApp();
+    const { request, generateAuthenticatedUserJwt, inMemoryUow } = await buildTestApp();
     const userId = "123";
+    const agency = new AgencyDtoBuilder().build();
+    inMemoryUow.inclusionConnectedUserQueries.setInclusionConnectedUsers([
+      {
+        id: userId,
+        email: "joe@mail.com",
+        firstName: "Joe",
+        lastName: "Doe",
+        agencies: [agency],
+      },
+    ]);
     const token = generateAuthenticatedUserJwt({ userId });
 
     const response = await request
       .get(inclusionConnectedAllowedTargets.getAgencyDashboard.url)
       .set("Authorization", token);
 
-    expect(response.body).toBe("https://www.my-dashboard-url.com/123");
+    expect(response.body).toBe(`http://stubAgencyDashboard/${agency.id}`);
     expect(response.status).toBe(200);
   });
 });

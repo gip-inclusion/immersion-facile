@@ -20,6 +20,7 @@ import { InMemoryExportQueries } from "../../secondary/InMemoryExportQueries";
 import { InMemoryFeatureFlagRepository } from "../../secondary/InMemoryFeatureFlagRepository";
 import { InMemoryFormEstablishmentRepository } from "../../secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryImmersionAssessmentRepository } from "../../secondary/InMemoryImmersionAssessmentRepository";
+import { InMemoryInclusionConnectedUserQueries } from "../../secondary/InMemoryInclusionConnectedUserQueries";
 import { InMemoryOngoingOAuthRepository } from "../../secondary/InMemoryOngoingOAuthRepository";
 import { InMemoryRomeRepository } from "../../secondary/InMemoryRomeRepository";
 import { InMemoryUowPerformer } from "../../secondary/InMemoryUowPerformer";
@@ -54,11 +55,14 @@ export const createInMemoryUow = () => {
   const outboxRepository = new InMemoryOutboxRepository();
   const outboxQueries = new InMemoryOutboxQueries(outboxRepository);
   const conventionRepository = new InMemoryConventionRepository();
+  const authenticatedUserRepository = new InMemoryAuthenticatedUserRepository();
+  const inclusionConnectedUserQueries =
+    new InMemoryInclusionConnectedUserQueries(authenticatedUserRepository);
 
   return {
     agencyRepository: new InMemoryAgencyRepository(),
     apiConsumerRepository: new InMemoryApiConsumerRepository(),
-    authenticatedUserRepository: new InMemoryAuthenticatedUserRepository(),
+    authenticatedUserRepository,
     conventionQueries: new InMemoryConventionQueries(
       conventionRepository,
       outboxRepository,
@@ -74,6 +78,7 @@ export const createInMemoryUow = () => {
     featureFlagRepository: new InMemoryFeatureFlagRepository(),
     formEstablishmentRepository: new InMemoryFormEstablishmentRepository(),
     immersionAssessmentRepository: new InMemoryImmersionAssessmentRepository(),
+    inclusionConnectedUserQueries,
     laBonneBoiteRequestRepository: new InMemoryLaBonneBoiteRequestRepository(),
     ongoingOAuthRepository: new InMemoryOngoingOAuthRepository(),
     outboxRepository,

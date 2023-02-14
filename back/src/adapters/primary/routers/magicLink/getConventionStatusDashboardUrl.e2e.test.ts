@@ -41,7 +41,7 @@ describe("getConventionStatusDashboardUrl", () => {
 
     expect(response.status).toBe(200);
     expect(response.body).toBe(
-      `http://notImplementedConventionStatusDashboard/${convention.id}`,
+      `http://stubConventionStatusDashboard/${convention.id}`,
     );
   });
 });

@@ -53,7 +53,7 @@ describe("/admin router", () => {
           adminTargets.getDashboardUrl.url.replace(":dashboardName", "events"),
         )
         .set("authorization", token);
-      expect(response.body).toBe("http://notImplementedDashboard/events");
+      expect(response.body).toBe("http://stubDashboard/events");
       expect(response.status).toBe(200);
     });
 
@@ -66,9 +66,7 @@ describe("/admin router", () => {
           )}?agencyId=my-agency-id`,
         )
         .set("authorization", token);
-      expect(response.body).toBe(
-        "http://notImplementedAgencyDashboard/my-agency-id",
-      );
+      expect(response.body).toBe("http://stubAgencyDashboard/my-agency-id");
       expect(response.status).toBe(200);
     });
     it("Fails to get the absolute Url of the agency dashboard when no agencyId is provided", async () => {

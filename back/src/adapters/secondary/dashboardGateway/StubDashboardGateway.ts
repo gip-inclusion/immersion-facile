@@ -12,18 +12,18 @@ const logger = createLogger(__filename);
 export class StubDashboardGateway implements DashboardGateway {
   getAgencyUrl(id: AgencyId): AbsoluteUrl {
     logger.warn("Dashboard gateway not implemented, getAgencyUrl method");
-    return `http://notImplementedAgencyDashboard/${id as string}`;
+    return `http://stubAgencyDashboard/${id as string}`;
   }
 
   getDashboardUrl(dashboardName: AdminDashboardName): AbsoluteUrl {
     logger.warn("Dashboard gateway not implemented, getDashboardUrl method");
-    return `http://notImplementedDashboard/${dashboardName}`;
+    return `http://stubDashboard/${dashboardName}`;
   }
 
   getConventionStatusUrl(id: ConventionId): AbsoluteUrl {
     logger.warn(
       "Dashboard gateway not implemented, getConventionStatusUrl method",
     );
-    return `http://notImplementedConventionStatusDashboard/${id as string}`;
+    return `http://stubConventionStatusDashboard/${id as string}`;
   }
 }
