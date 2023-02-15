@@ -1,6 +1,5 @@
-import { Form, Formik } from "formik";
 import React from "react";
-import { DsfrTitle, ErrorNotifications } from "react-design-system";
+import { DsfrTitle, ErrorNotifications, Select } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   AgencyDto,
@@ -10,43 +9,48 @@ import {
   toDotNotation,
   zEmail,
 } from "shared";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 import {
   AgencyFormCommonFields,
   AgencyLogoUpload,
-  makeTypedSetField,
 } from "src/app/components/agency/AgencyFormCommonFields";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import "src/assets/admin.css";
 import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
 import { agencyAdminSlice } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
 import { FillableList } from "src/app/components/forms/commons/FillableList";
-import { SimpleSelect } from "src/app/components/forms/commons/SimpleSelect";
-import { TextInput } from "src/app/components/forms/commons/TextInput";
-import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
 import { AgencyAutocomplete } from "./AgencyAutocomplete";
-import { useFormContents } from "src/app/hooks/formContents.hooks";
+import {
+  formErrorsToFlatErrors,
+  useFormContents,
+} from "src/app/hooks/formContents.hooks";
 import { formAgencyFieldsLabels } from "src/app/contents/forms/agency/formAgency";
 import { fr } from "@codegouvfr/react-dsfr";
-import { Button } from "@codegouvfr/react-dsfr/Button";
+import { useForm, FormProvider } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Input } from "@codegouvfr/react-dsfr/Input";
+import { makeFieldError } from "src/app/hooks/formContents.hooks";
 
-export const EditAgency = () => (
-  <>
-    <DsfrTitle
-      level={5}
-      text="Editer une agence"
-      className={fr.cx("fr-mt-4w")}
-    />
-    <div className={fr.cx("fr-px-6w", "fr-py-4w", "fr-card")}>
-      <AgencyAutocomplete
-        title="Je sélectionne une agence"
-        placeholder={"Ex : Agence de Berry"}
+export const EditAgency = () => {
+  const agency = useAppSelector(agencyAdminSelectors.agency);
+
+  return (
+    <>
+      <DsfrTitle
+        level={5}
+        text="Editer une agence"
+        className={fr.cx("fr-mt-4w")}
       />
-    </div>
-    <EditAgencyForm />
-  </>
-);
-
-const getName = (name: keyof AgencyDto) => name;
+      <div className={fr.cx("fr-px-6w", "fr-py-4w", "fr-card")}>
+        <AgencyAutocomplete
+          title="Je sélectionne une agence"
+          placeholder={"Ex : Agence de Berry"}
+        />
+      </div>
+      {agency && <EditAgencyForm agency={agency} />}
+    </>
+  );
+};
 
 const agencyStatusToLabel: Record<AgencyStatus, string> = {
   active: "Active",
@@ -61,81 +65,92 @@ const statusListOfOptions = allAgencyStatuses.map((agencyStatus) => ({
   label: agencyStatusToLabel[agencyStatus],
 }));
 
-const EditAgencyForm = () => {
+const EditAgencyForm = ({ agency }: { agency: AgencyDto }) => {
   const dispatch = useDispatch();
-  const agency = useAppSelector(agencyAdminSelectors.agency);
-  const feedback = useAppSelector(agencyAdminSelectors.feedback);
+  const agencyState = useAppSelector(agencyAdminSelectors.agencyState);
   const { getFormErrors } = useFormContents(formAgencyFieldsLabels);
+  const methods = useForm<AgencyDto>({
+    resolver: zodResolver(agencySchema),
+    mode: "onTouched",
+    defaultValues: agency,
+  });
 
-  if (!agency) return null;
+  const {
+    register,
+    setValue,
+    handleSubmit,
+    formState,
+    watch,
+    formState: { errors, submitCount },
+  } = methods;
+
+  const getFieldError = makeFieldError(formState);
   return (
-    <div>
-      <Formik
-        initialValues={agency}
-        validationSchema={toFormikValidationSchema(agencySchema)}
-        onSubmit={(values, { setSubmitting }) => {
-          dispatch(agencyAdminSlice.actions.updateAgencyRequested(values));
-          setSubmitting(false);
-        }}
+    <FormProvider {...methods}>
+      <form
+        className={fr.cx("fr-my-4w")}
+        onSubmit={handleSubmit((values) =>
+          dispatch(agencyAdminSlice.actions.updateAgencyRequested(values)),
+        )}
       >
-        {({ isSubmitting, setFieldValue, values, errors, submitCount }) => {
-          const typedSetField = makeTypedSetField<AgencyDto>(setFieldValue);
-          return (
-            <Form className={fr.cx("fr-my-4w")}>
-              <div>
-                <AgencyFormCommonFields addressInitialValue={agency.address} />
-                <FillableList
-                  name="agency-admin-emails"
-                  label="⚠️Emails administrateur de l'agence ⚠️"
-                  description="Ces emails auront le droit d'accéder aux tableaux de bord et d'éditer les informations et accès du personnel de l'agence"
-                  placeholder="admin.agence@mail.com"
-                  valuesInList={values.adminEmails}
-                  setValues={typedSetField("adminEmails")}
-                  validationSchema={zEmail}
-                />
+        <div className={fr.cx("fr-mb-4w")}>
+          <AgencyFormCommonFields addressInitialValue={agency.address} />
+          <FillableList
+            name="agency-admin-emails"
+            label="⚠️Emails administrateur de l'agence ⚠️"
+            description="Ces emails auront le droit d'accéder aux tableaux de bord et d'éditer les informations et accès du personnel de l'agence"
+            placeholder="admin.agence@mail.com"
+            valuesInList={watch("adminEmails")}
+            setValues={(values) => setValue("adminEmails", values)}
+            validationSchema={zEmail}
+          />
 
-                <SimpleSelect
-                  id="agency-status"
-                  label="⚠️Statut de l'agence ⚠️"
-                  name={getName("status")}
-                  options={statusListOfOptions}
-                />
+          <Select
+            id="agency-status"
+            label="⚠️Statut de l'agence ⚠️"
+            options={statusListOfOptions}
+            name={register("status").name}
+            onChange={register("status").onChange}
+          />
 
-                <TextInput
-                  name={getName("agencySiret")}
-                  label="⚠️Siret de l'agence ⚠️"
-                  placeholder="n° de siret"
-                />
+          <Input
+            label="⚠️Siret de l'agence ⚠️"
+            nativeInputProps={{
+              ...register("agencySiret"),
+              placeholder: "n° de siret",
+            }}
+            {...getFieldError("agencySiret")}
+          />
 
-                <TextInput
-                  name={getName("codeSafir")}
-                  label="⚠️Code Safir de l'agence ⚠️"
-                  placeholder="n° de siret"
-                />
+          <Input
+            label="⚠️Code Safir de l'agence ⚠️"
+            nativeInputProps={{
+              ...register("codeSafir"),
+              placeholder: "Code Safir ",
+            }}
+            {...getFieldError("codeSafir")}
+          />
 
-                <AgencyLogoUpload />
-              </div>
-              <ErrorNotifications
-                labels={getFormErrors()}
-                errors={toDotNotation(errors)}
-                visible={submitCount !== 0 && Object.values(errors).length > 0}
-              />
+          <AgencyLogoUpload />
+        </div>
+        <ErrorNotifications
+          labels={getFormErrors()}
+          errors={toDotNotation(formErrorsToFlatErrors(errors))}
+          visible={submitCount !== 0 && Object.values(errors).length > 0}
+        />
 
-              <div className={fr.cx("fr-mt-4w")}>
-                <Button
-                  type="submit"
-                  nativeButtonProps={{
-                    disabled: isSubmitting || feedback.kind !== "idle",
-                    id: "im-form-edit-agency__submit-button",
-                  }}
-                >
-                  Mettre à jour
-                </Button>
-              </div>
-            </Form>
-          );
-        }}
-      </Formik>
-    </div>
+        <div className={fr.cx("fr-mt-4w")}>
+          <Button
+            type="submit"
+            disabled={agencyState.isUpdating}
+            nativeButtonProps={{
+              id: `im-form-edit-agency__submit-button`,
+            }}
+          >
+            Mettre à jour
+          </Button>
+        </div>
+      </form>
+    </FormProvider>
   );
 };

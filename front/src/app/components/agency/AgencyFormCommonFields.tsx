@@ -1,4 +1,3 @@
-import { FormikHelpers, useFormikContext } from "formik";
 import React, { useState } from "react";
 import {
   AddressDto,
@@ -17,9 +16,13 @@ import {
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { FillableList } from "src/app/components/forms/commons/FillableList";
-import { TextInput } from "src/app/components/forms/commons/TextInput";
-import { useFormContents } from "src/app/hooks/formContents.hooks";
+import {
+  makeFieldError,
+  useFormContents,
+} from "src/app/hooks/formContents.hooks";
 import { Select } from "react-design-system";
+import { useFormContext } from "react-hook-form";
+import { Input } from "@codegouvfr/react-dsfr/Input";
 
 type AgencyFormCommonFieldsProps = {
   addressInitialValue?: AddressDto;
@@ -47,9 +50,10 @@ const descriptionByValidationSteps = {
 export const AgencyFormCommonFields = ({
   addressInitialValue,
 }: AgencyFormCommonFieldsProps) => {
-  const { values, setFieldValue } = useFormikContext<CreateAgencyDto>();
-  const typedSetField = makeTypedSetField<CreateAgencyDto>(setFieldValue);
-  const defaultValidationStepsValue = values.counsellorEmails.length
+  const { getValues, setValue, register, formState, watch } =
+    useFormContext<CreateAgencyDto>();
+  const formValues = getValues();
+  const defaultValidationStepsValue = formValues.counsellorEmails.length
     ? "twoSteps"
     : "oneStep";
   const [validationSteps, setValidationSteps] = useState<
@@ -57,27 +61,38 @@ export const AgencyFormCommonFields = ({
   >(defaultValidationStepsValue);
   const { getFormFields } = useFormContents(formAgencyFieldsLabels);
   const fieldsContent = getFormFields();
+  const getFieldError = makeFieldError(formState);
+
   return (
     <>
       <Select
-        {...fieldsContent.kind}
+        id={fieldsContent.kind.id}
+        label={fieldsContent.kind.label}
+        placeholder={fieldsContent.kind.placeholder}
         options={agencyListOfOptions.sort((a, b) =>
           a.label < b.label ? -1 : 0,
         )}
-        value={values.kind}
-        onChange={(event) =>
-          setFieldValue(fieldsContent.kind.name, event.currentTarget.value)
-        }
+        name={register("kind").name}
+        onChange={(e) => setValue("kind", e.currentTarget.value as AgencyKind)}
+        value={watch("kind")}
       />
-      <TextInput {...fieldsContent.name} />
+
+      <Input
+        label={fieldsContent.name.label}
+        nativeInputProps={{
+          ...register("name"),
+          ...fieldsContent.name,
+        }}
+        {...getFieldError("name")}
+      />
       <AddressAutocomplete
         {...fieldsContent.address}
         initialSearchTerm={
           addressInitialValue && addressDtoToString(addressInitialValue)
         }
         setFormValue={({ position, address }) => {
-          typedSetField("position")(position);
-          typedSetField("address")(address);
+          setValue("position", position);
+          setValue("address", address);
         }}
       />
       <RadioGroup
@@ -90,8 +105,8 @@ export const AgencyFormCommonFields = ({
       {validationSteps === "twoSteps" && (
         <FillableList
           {...fieldsContent.counsellorEmails}
-          valuesInList={values.counsellorEmails}
-          setValues={typedSetField("counsellorEmails")}
+          valuesInList={watch("counsellorEmails")}
+          setValues={(values) => setValue("counsellorEmails", values)}
           validationSchema={zEmail}
         />
       )}
@@ -99,37 +114,52 @@ export const AgencyFormCommonFields = ({
       <FillableList
         {...fieldsContent.validatorEmails}
         description={descriptionByValidationSteps[validationSteps]}
-        valuesInList={values.validatorEmails}
-        setValues={typedSetField("validatorEmails")}
+        valuesInList={watch("validatorEmails")}
+        setValues={(values) => setValue("validatorEmails", values)}
         validationSchema={zEmail}
       />
 
-      {values.kind !== "pole-emploi" && (
-        <TextInput {...fieldsContent.questionnaireUrl} />
+      {formValues.kind !== "pole-emploi" && (
+        <Input
+          label={fieldsContent.questionnaireUrl.label}
+          nativeInputProps={{
+            ...register("questionnaireUrl"),
+            ...fieldsContent.questionnaireUrl,
+          }}
+          {...getFieldError("questionnaireUrl")}
+        />
       )}
 
-      <TextInput {...fieldsContent.signature} />
+      <Input
+        label={fieldsContent.signature.label}
+        nativeInputProps={{
+          ...register("signature"),
+          ...fieldsContent.signature,
+        }}
+        {...getFieldError("signature")}
+      />
     </>
   );
 };
 
 export const AgencyLogoUpload = () => {
+  const { getValues, setValue } = useFormContext<CreateAgencyDto>();
   const { enableLogoUpload } = useFeatureFlags();
-  const { values, setFieldValue } = useFormikContext<CreateAgencyDto>();
-  const typedSetField = makeTypedSetField(setFieldValue);
   const { getFormFields } = useFormContents(formAgencyFieldsLabels);
   const fieldsContent: FormAgencyFieldsLabels = getFormFields();
+  const formValues = getValues();
+
   if (!enableLogoUpload) return null;
   return (
     <>
       <UploadLogo
-        setFileUrl={typedSetField("logoUrl")}
+        setFileUrl={(value) => setValue("logoUrl", value)}
         maxSize_Mo={2}
         {...formAgencyFieldsLabels.logoUrl}
         hint={fieldsContent.logoUrl.description}
       />
-      {values.logoUrl && (
-        <img src={values.logoUrl} alt="uploaded-logo" width="100px" />
+      {formValues.logoUrl && (
+        <img src={formValues.logoUrl} alt="uploaded-logo" width="100px" />
       )}
     </>
   );
@@ -155,13 +185,3 @@ export const agencyListOfOptions = [
     label: agencyKindToLabel[agencyKind],
   })),
 ];
-
-type MakeTypedSetField = <T extends Record<string, unknown>>(
-  setFieldValue: FormikHelpers<T>["setFieldValue"],
-) => <K extends Exclude<keyof T, "id">>(
-  fieldName: K,
-) => (fieldValue: T[K]) => void;
-
-export const makeTypedSetField: MakeTypedSetField =
-  (setFieldValue) => (fieldName) => (fieldValue) =>
-    setFieldValue(fieldName as string, fieldValue);

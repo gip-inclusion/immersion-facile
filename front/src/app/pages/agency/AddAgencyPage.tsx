@@ -1,6 +1,5 @@
-import { Form, Formik } from "formik";
-import * as React from "react";
 import { useState } from "react";
+import * as React from "react";
 import {
   ErrorNotifications,
   MainWrapper,
@@ -22,14 +21,17 @@ import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNot
 import { agencyGateway } from "src/config/dependencies";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { AgencySubmitFeedback } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
-import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
 import { v4 as uuidV4 } from "uuid";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { formAgencyFieldsLabels } from "src/app/contents/forms/agency/formAgency";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 
-type CreateAgencyInitialValues = Omit<CreateAgencyDto, "kind"> & {
+import { SubmitHandler, useForm, FormProvider } from "react-hook-form";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+
+export type CreateAgencyInitialValues = Omit<CreateAgencyDto, "kind"> & {
   kind: AgencyKind | "";
 };
 
@@ -61,6 +63,38 @@ export const AddAgencyPage = () => {
     kind: "idle",
   });
   const { getFormErrors } = useFormContents(formAgencyFieldsLabels);
+
+  const methods = useForm<CreateAgencyInitialValues>({
+    resolver: zodResolver(createAgencySchema),
+    mode: "onTouched",
+    defaultValues: initialValues(uuidV4()),
+  });
+
+  const {
+    handleSubmit,
+    formState: { isSubmitting, errors, submitCount },
+  } = methods;
+
+  // const getFieldError = makeFieldError(formState);
+  //
+
+  const onFormValid: SubmitHandler<CreateAgencyInitialValues> = (values) => {
+    if (values.kind === "") throw new Error("Agency kind is empty");
+    return agencyGateway
+      .addAgency({
+        ...values,
+        kind: values.kind,
+        questionnaireUrl:
+          values.kind === "pole-emploi" ? "" : values.questionnaireUrl,
+      })
+      .then(() => setSubmitFeedback({ kind: "agencyAdded" }))
+      .catch((e) => {
+        //eslint-disable-next-line  no-console
+        console.log("AddAgencyPage", e);
+        setSubmitFeedback(e);
+      });
+  };
+
   return (
     <HeaderFooterLayout>
       <MainWrapper
@@ -73,53 +107,32 @@ export const AddAgencyPage = () => {
           />
         }
       >
-        <Formik
-          initialValues={initialValues(uuidV4())}
-          validationSchema={toFormikValidationSchema(createAgencySchema)}
-          onSubmit={(values) => {
-            if (values.kind === "") throw new Error("Agency kind is empty");
-            return agencyGateway
-              .addAgency({
-                ...values,
-                kind: values.kind,
-                questionnaireUrl:
-                  values.kind === "pole-emploi" ? "" : values.questionnaireUrl,
-              })
-              .then(() => setSubmitFeedback({ kind: "agencyAdded" }))
-              .catch((e) => {
-                //eslint-disable-next-line  no-console
-                console.log("AddAgencyPage", e);
-                setSubmitFeedback(e);
-              });
-          }}
-        >
-          {({ isSubmitting, errors, submitCount }) => (
-            <Form>
-              <AgencyFormCommonFields />
-              <AgencyLogoUpload />
-              <ErrorNotifications
-                labels={getFormErrors()}
-                errors={toDotNotation(errors)}
-                visible={submitCount !== 0 && Object.values(errors).length > 0}
-              />
-              <SubmitFeedbackNotification
-                submitFeedback={submitFeedback}
-                messageByKind={agencySubmitMessageByKind}
-              />
-              <div className={fr.cx("fr-mt-4w")}>
-                <Button
-                  type="submit"
-                  disabled={isSubmitting || submitFeedback.kind !== "idle"}
-                  nativeButtonProps={{
-                    id: "im-form-add-agency__submit-button",
-                  }}
-                >
-                  Soumettre
-                </Button>
-              </div>
-            </Form>
-          )}
-        </Formik>
+        <FormProvider {...methods}>
+          <form onSubmit={handleSubmit(onFormValid)}>
+            <AgencyFormCommonFields />
+            <AgencyLogoUpload />
+            <ErrorNotifications
+              labels={getFormErrors()}
+              errors={toDotNotation(errors)}
+              visible={submitCount !== 0 && Object.values(errors).length > 0}
+            />
+            <SubmitFeedbackNotification
+              submitFeedback={submitFeedback}
+              messageByKind={agencySubmitMessageByKind}
+            />
+            <div className={fr.cx("fr-mt-4w")}>
+              <Button
+                type="submit"
+                disabled={isSubmitting || submitFeedback.kind !== "idle"}
+                nativeButtonProps={{
+                  id: "im-form-add-agency__submit-button",
+                }}
+              >
+                Soumettre
+              </Button>
+            </div>
+          </form>
+        </FormProvider>
       </MainWrapper>
     </HeaderFooterLayout>
   );

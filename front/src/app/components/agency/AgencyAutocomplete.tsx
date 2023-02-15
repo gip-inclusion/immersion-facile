@@ -60,7 +60,7 @@ export const AgencyAutocomplete = ({
         disablePortal
         filterOptions={(x) => x}
         options={agencyOptions.map(prop("id"))}
-        value={agency?.id}
+        value={agency ? agency.id : ""}
         noOptionsText={
           agencySearchText ? noOptionText : "Saisissez le nom d'une agence"
         }
