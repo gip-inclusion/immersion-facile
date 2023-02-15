@@ -1,10 +1,15 @@
 import { parseISO } from "date-fns";
 import React from "react";
-import { calculateWeeklyHours, WeeklyImmersionTimetableDto } from "shared";
+import {
+  calculateWeeklyHours,
+  ConventionDto,
+  WeeklyImmersionTimetableDto,
+} from "shared";
 import { DayCircle } from "./DayCircle";
 import { HourIndicator } from "./HourIndicator";
 import { getDayStatus } from "./utils/getDayStatus";
 import { fr } from "@codegouvfr/react-dsfr";
+import { useFormikContext } from "formik";
 
 type WeeklyRowProperties = {
   weeklyCalendar: WeeklyImmersionTimetableDto;
@@ -22,30 +27,37 @@ export const WeeklyRow = ({
   selectedIndex,
   disabled,
   onChange,
-}: WeeklyRowProperties) => (
-  <div className={fr.cx("fr-grid-row", "fr-mt-1w", "fr-grid-row--middle")}>
-    {weeklyCalendar.map((dayOfWeek) =>
-      dayOfWeek.dailySchedule !== null ? (
-        <DayCircle
-          key={dayOfWeek.key.toString()}
-          name={makeName(dayOfWeek.dailySchedule.date)}
-          dayStatus={getDayStatus(
-            dayOfWeek.dailySchedule,
-            dayOfWeek.key,
-            selectedIndex,
-          )}
-          disabled={disabled}
-          onClick={() => onChange(dayOfWeek.key)}
-        />
-      ) : (
-        <DayCircle
-          key={dayOfWeek.key.toString()}
-          name={`x`}
-          dayStatus={"empty"}
-          disabled={true}
-        />
-      ),
-    )}
-    <HourIndicator hours={calculateWeeklyHours(weeklyCalendar)} />
-  </div>
-);
+}: WeeklyRowProperties) => {
+  const { values } = useFormikContext<ConventionDto>();
+  return (
+    <div className={fr.cx("fr-grid-row", "fr-mt-1w", "fr-grid-row--middle")}>
+      {weeklyCalendar.map((dayOfWeek) =>
+        dayOfWeek.dailySchedule !== null ? (
+          <DayCircle
+            key={dayOfWeek.key.toString()}
+            name={makeName(dayOfWeek.dailySchedule.date)}
+            dayStatus={getDayStatus(
+              dayOfWeek.dailySchedule,
+              dayOfWeek.key,
+              selectedIndex,
+            )}
+            disabled={disabled}
+            onClick={() => onChange(dayOfWeek.key)}
+          />
+        ) : (
+          <DayCircle
+            key={dayOfWeek.key.toString()}
+            name={`x`}
+            dayStatus={"empty"}
+            disabled={true}
+          />
+        ),
+      )}
+      <HourIndicator
+        hours={calculateWeeklyHours(weeklyCalendar)}
+        internshipKind={values.internshipKind}
+        birthdate={values.signatories.beneficiary.birthdate}
+      />
+    </div>
+  );
+};

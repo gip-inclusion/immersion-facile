@@ -100,14 +100,18 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
             <strong>Récapitulatif hebdomadaire</strong>
           </p>
           <hr className={fr.cx("fr-hr", "fr-pb-1w")} />
-          {weeksHoursIndicator(field.value)}
+          <WeeksHoursIndicator schedule={field.value} />
         </div>
       </div>
     </>
   );
 };
 
-const weeksHoursIndicator = (schedule: ScheduleDto) => (
+const WeeksHoursIndicator = ({
+  schedule,
+}: {
+  schedule: ScheduleDto;
+}): JSX.Element => (
   <ul>
     {calculateWeeklyHoursFromSchedule(schedule).map((weekTotalHours, index) => (
       <TotalWeeklyHoursIndicator

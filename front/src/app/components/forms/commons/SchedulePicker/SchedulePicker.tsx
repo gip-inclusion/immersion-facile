@@ -32,6 +32,9 @@ export const SchedulePicker = ({
         : scheduleWithFirstDayActivity(interval),
     );
   };
+
+  const scheduleErrors = meta.error ? toArrayOfScheduleErrors(meta.error) : [];
+
   return (
     <>
       <BoolRadioPicker
@@ -49,14 +52,14 @@ export const SchedulePicker = ({
           ? "Sélectionnez la période des jours *"
           : "Sélectionnez les horaires de travail jour par jour *"}
       </p>
-      {meta.error && (
+      {scheduleErrors.map((value, index) => (
         <div
-          id={name + "-error-description"}
+          id={`${name}${index + 1}-error-description`}
           className={fr.cx("fr-error-text")}
         >
-          {JSON.stringify(meta.error)}
+          {value}
         </div>
-      )}
+      ))}
       {field.value.isSimple ? (
         <RegularSchedulePicker interval={interval} disabled={disabled} />
       ) : (
@@ -64,4 +67,17 @@ export const SchedulePicker = ({
       )}
     </>
   );
+};
+
+const toArrayOfScheduleErrors = (input: string): string[] => {
+  try {
+    const json = JSON.parse(input);
+    return Array.isArray(json)
+      ? json
+      : Object.entries(json).map(([key, value]) => `${key} : ${value}`);
+  } catch (_e) {
+    return typeof input === "object"
+      ? Object.entries(input).map(([key, value]) => `${key} : ${value}`)
+      : [input];
+  }
 };
