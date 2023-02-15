@@ -74,10 +74,10 @@ const toArrayOfScheduleErrors = (input: string): string[] => {
     const json = JSON.parse(input);
     return Array.isArray(json)
       ? json
-      : Object.entries(json).map(([key, value]) => `${key} : ${value}`);
+      : Object.entries(json).map(([_key, value]) => `${value}`);
   } catch (_e) {
     return typeof input === "object"
-      ? Object.entries(input).map(([key, value]) => `${key} : ${value}`)
+      ? Object.entries(input).map(([_key, value]) => `${value}`)
       : [input];
   }
 };
