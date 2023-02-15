@@ -5,7 +5,6 @@ export * from "./image";
 export * from "./inputs";
 export * from "./label";
 export * from "./link";
-export * from "./notification";
 export * from "./text";
 export * from "./tabLinks";
 export * from "./footer";

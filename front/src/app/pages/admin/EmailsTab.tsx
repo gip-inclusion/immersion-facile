@@ -1,6 +1,6 @@
 import { keys } from "ramda";
 import React, { useEffect } from "react";
-import { DsfrTitle, Notification } from "react-design-system";
+import { DsfrTitle } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { EmailSentDto, EmailVariables } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -10,6 +10,7 @@ import { ENV } from "src/config/environmentVariables";
 import { TextCell } from "src/app/components/admin/TextCell";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 
 export const EmailsTab = () => {
   const dispatch = useDispatch();
@@ -23,9 +24,11 @@ export const EmailsTab = () => {
     return (
       <div>
         <DsfrTitle level={5} text="Derniers emails envoyés" />
-        <Notification title={"Non disponible en production"} type="warning">
-          La récupération des emails n'est pas disponible en production
-        </Notification>
+        <Alert
+          title={"Non disponible en production"}
+          severity="warning"
+          description="La récupération des emails n'est pas disponible en production"
+        />
       </div>
     );
 
@@ -33,9 +36,7 @@ export const EmailsTab = () => {
     <div>
       <DsfrTitle level={5} text="Derniers emails envoyés" />
       {errorMessage ? (
-        <Notification title={"Oups..."} type="error">
-          {errorMessage}
-        </Notification>
+        <Alert title={"Oups..."} severity="error" description={errorMessage} />
       ) : (
         <ul className={fr.cx("fr-accordions-group")}>
           {latestEmails.map((email, index) => (

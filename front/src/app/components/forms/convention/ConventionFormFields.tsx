@@ -1,7 +1,8 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { useFormikContext } from "formik";
 import React, { useEffect } from "react";
-import { ErrorNotifications, Notification } from "react-design-system";
+import { ErrorNotifications } from "react-design-system";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { ConventionReadDto, Signatory, toDotNotation } from "shared";
 import { ConventionFrozenMessage } from "src/app/components/forms/convention/ConventionFrozenMessage";
 import { ConventionSignOnlyMessage } from "src/app/components/forms/convention/ConventionSignOnlyMessage";
@@ -108,22 +109,27 @@ export const ConventionFormFields = ({
         isFrozen={isFrozen}
       />
       {!isFrozen && (
-        <Notification title={""} type={"warning"} className={fr.cx("fr-my-2w")}>
-          <ol>
-            <li>
-              Une fois le formulaire envoyé, chaque signataire de la convention
-              va recevoir un email.
-            </li>
-            <li>
-              Pensez à vérifier votre boîte email et votre dossier de spams.
-            </li>
-            <li>
-              Pensez également à informer les autres signataires de la
-              convention qu'ils devront vérifier leur boîte email et leur
-              dossier de spams.
-            </li>
-          </ol>
-        </Notification>
+        <Alert
+          small
+          severity="warning"
+          className={fr.cx("fr-my-2w")}
+          description={
+            <ol>
+              <li>
+                Une fois le formulaire envoyé, chaque signataire de la
+                convention va recevoir un email.
+              </li>
+              <li>
+                Pensez à vérifier votre boîte email et votre dossier de spams.
+              </li>
+              <li>
+                Pensez également à informer les autres signataires de la
+                convention qu'ils devront vérifier leur boîte email et leur
+                dossier de spams.
+              </li>
+            </ol>
+          }
+        />
       )}
       {!isSignatureMode && (
         <ErrorNotifications

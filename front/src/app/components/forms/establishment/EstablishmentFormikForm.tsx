@@ -1,6 +1,6 @@
 import { Form, Formik } from "formik";
 import React, { useState } from "react";
-import { ErrorNotifications, Notification } from "react-design-system";
+import { ErrorNotifications } from "react-design-system";
 import {
   FormEstablishmentDto,
   formEstablishmentSchema,
@@ -16,6 +16,7 @@ import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { AppellationList } from "./AppellationList";
 import { BusinessContact } from "./BusinessContact";
 import { fr } from "@codegouvfr/react-dsfr";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 
 type EstablishmentFormProps = {
   initialValues: FormEstablishmentDto;
@@ -160,19 +161,20 @@ export const EstablishmentFormikForm = ({
             />
             {submitError && (
               <>
-                <Notification
-                  type="error"
+                <Alert
+                  severity="error"
                   title="Veuillez nous excuser. Un problème est survenu qui a compromis l'enregistrement de vos informations. "
-                >
-                  {errorMessage}
-                </Notification>
+                  description={errorMessage}
+                />
               </>
             )}
             {isSuccess && (
-              <Notification type="success" title="Succès de l'envoi">
-                Succès. Nous avons bien enregistré les informations concernant
-                votre entreprise.
-              </Notification>
+              <Alert
+                severity="success"
+                title="Succès de l'envoi"
+                description=" Succès. Nous avons bien enregistré les informations concernant
+              votre entreprise."
+              />
             )}
             {!isSuccess && (
               <div className={fr.cx("fr-mt-4w")}>

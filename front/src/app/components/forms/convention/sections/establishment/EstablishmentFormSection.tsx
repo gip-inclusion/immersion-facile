@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { useFormikContext } from "formik";
 import React from "react";
-import { Notification, SectionTitle } from "react-design-system";
+import { SectionTitle } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { ConventionDto, FederatedIdentity } from "shared";
 import { RadioGroup } from "src/app/components/forms/commons/RadioGroup";
@@ -17,6 +17,7 @@ import { conventionSlice } from "src/core-logic/domain/convention/convention.sli
 import { EstablishementTutorFields } from "./EstablishementTutorFields";
 import { EstablishmentBusinessFields } from "./EstablishmentBusinessFields";
 import { EstablishmentRepresentativeFields } from "./EstablishmentRepresentativeFields";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 
 type EstablishmentFormSectionParams = {
   isFrozen: boolean | undefined;
@@ -52,9 +53,13 @@ export const EstablishmentFormSection = ({
           federatedIdentity={federatedIdentity}
         />
       </SectionTitle>
-      <Notification type="info" title="" className={fr.cx("fr-my-2w")}>
-        {t.establishmentSection.subtitle}
-      </Notification>
+      <Alert
+        severity="info"
+        small
+        className={fr.cx("fr-my-2w")}
+        description={t.establishmentSection.subtitle}
+      />
+
       <EstablishmentBusinessFields disabled={isFrozen || isFetchingSiret} />
       <RadioGroup
         {...formContents.isEstablishmentTutorIsEstablishmentRepresentative}

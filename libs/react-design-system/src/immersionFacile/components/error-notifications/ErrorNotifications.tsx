@@ -1,5 +1,5 @@
 import React from "react";
-import { Notification } from "../notification";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 
 const componentName = "im-notification-errors";
 
@@ -36,21 +36,22 @@ export const ErrorNotifications = ({
 }: ErrorNotificationsProps) => {
   if (!visible) return null;
   return (
-    <Notification
-      type="error"
+    <Alert
+      severity="error"
       title="Veuillez corriger les erreurs suivantes"
       className={`${componentName}`}
-    >
-      <ul className={`${componentName}__error-list`}>
-        {Object.keys(errors).map((field) => {
-          const error = errors[field];
-          return (
-            <li key={field} className={`${componentName}__error-wrapper`}>
-              <ErrorMessage labels={labels} field={field} error={error} />
-            </li>
-          );
-        })}
-      </ul>
-    </Notification>
+      description={
+        <ul className={`${componentName}__error-list`}>
+          {Object.keys(errors).map((field) => {
+            const error = errors[field];
+            return (
+              <li key={field} className={`${componentName}__error-wrapper`}>
+                <ErrorMessage labels={labels} field={field} error={error} />
+              </li>
+            );
+          })}
+        </ul>
+      }
+    />
   );
 };

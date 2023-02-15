@@ -1,5 +1,5 @@
-import React from "react";
-import { Notification } from "react-design-system";
+import React, { ReactNode } from "react";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import {
   SubmitFeedBack,
   isFeedbackError,
@@ -8,7 +8,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 
 export type SubmitFeedbackProps<T extends string> = {
   submitFeedback: SubmitFeedBack<T>;
-  messageByKind: Record<T, React.ReactNode>;
+  messageByKind: Record<T, NonNullable<ReactNode>>;
 };
 
 export const SubmitFeedbackNotification = <T extends string>({
@@ -20,16 +20,17 @@ export const SubmitFeedbackNotification = <T extends string>({
   return (
     <div className={fr.cx("fr-mt-4w")}>
       {isFeedbackError(submitFeedback) ? (
-        <Notification
-          type="error"
+        <Alert
+          severity="error"
           title="Désolé : nous n'avons pas été en mesure d'enregistrer vos informations. Veuillez réessayer ultérieurement"
-        >
-          {submitFeedback.errorMessage}
-        </Notification>
+          description={submitFeedback.errorMessage}
+        />
       ) : (
-        <Notification type="success" title="Succès">
-          {messageByKind[submitFeedback.kind]}
-        </Notification>
+        <Alert
+          severity="success"
+          title="Succès"
+          description={messageByKind[submitFeedback.kind]}
+        />
       )}
     </div>
   );

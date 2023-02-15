@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import React, { useEffect } from "react";
-import { Loader, Notification } from "react-design-system";
+import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   ConventionMagicLinkPayload,
@@ -22,6 +22,7 @@ import { useConvention } from "../../hooks/convention.hooks";
 import { useExistingSiret } from "../../hooks/siret.hooks";
 import { routes } from "../../routes/routes";
 import { ShowErrorOrRedirectToRenewMagicLink } from "./ShowErrorOrRedirectToRenewMagicLink";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 
 interface ConventionSignPageProperties {
   route: Route<typeof routes.conventionToSign>;
@@ -31,12 +32,11 @@ export const ConventionSignPage = ({ route }: ConventionSignPageProperties) => (
   <HeaderFooterLayout>
     {!route.params.jwt ? (
       <SignPageLayout>
-        <Notification
+        <Alert
           title={commonContent.invalidLinkNotification.title}
-          type="error"
-        >
-          {commonContent.invalidLinkNotification.details}
-        </Notification>
+          severity="error"
+          description={commonContent.invalidLinkNotification.details}
+        />
       </SignPageLayout>
     ) : (
       <>
@@ -48,18 +48,21 @@ export const ConventionSignPage = ({ route }: ConventionSignPageProperties) => (
           <ConventionSignPageContent jwt={route.params.jwt} />
         ) : (
           <SignPageLayout>
-            <Notification
+            <Alert
               title={commonContent.incorrectUserNotification.title}
-              type="error"
-            >
-              <p>{commonContent.incorrectUserNotification.detail}</p>
-              <p>
-                {commonContent.incorrectUserNotification.contact}{" "}
-                <a href={`mailto:${immersionFacileContactEmail}`}>
-                  {immersionFacileContactEmail}
-                </a>
-              </p>
-            </Notification>
+              severity="error"
+              description={
+                <>
+                  <p>{commonContent.incorrectUserNotification.detail}</p>
+                  <p>
+                    {commonContent.incorrectUserNotification.contact}{" "}
+                    <a href={`mailto:${immersionFacileContactEmail}`}>
+                      {immersionFacileContactEmail}
+                    </a>
+                  </p>
+                </>
+              }
+            />
           </SignPageLayout>
         )}
       </>
@@ -102,27 +105,39 @@ const ConventionSignPageContent = ({
     <ConventionFormContainerLayout>
       <>
         {convention.status === "REJECTED" && (
-          <Notification type="error" title={t.sign.rejected.title}>
-            <p className={fr.cx("fr-mt-1w")}>{t.sign.rejected.detail}</p>
-            <p>{t.sign.rejected.contact}</p>
-          </Notification>
+          <Alert
+            severity="error"
+            title={t.sign.rejected.title}
+            description={
+              <>
+                <p className={fr.cx("fr-mt-1w")}>{t.sign.rejected.detail}</p>
+                <p>{t.sign.rejected.contact}</p>
+              </>
+            }
+          />
         )}
         {convention.status === "DRAFT" && (
-          <Notification type="info" title={t.sign.needsModification.title}>
-            <p className={fr.cx("fr-mt-1w")}>
-              {t.sign.needsModification.detail}
-            </p>
-            <span
-              className={
-                //fr.cx("block") is not supported
-                "block"
-              }
-            >
-              <a {...routes.conventionImmersion({ jwt }).link}>
-                {t.sign.needsModification.editionLink}
-              </a>
-            </span>
-          </Notification>
+          <Alert
+            severity="info"
+            title={t.sign.needsModification.title}
+            description={
+              <>
+                <p className={fr.cx("fr-mt-1w")}>
+                  {t.sign.needsModification.detail}
+                </p>
+                <span
+                  className={
+                    //fr.cx("block") is not supported
+                    "block"
+                  }
+                >
+                  <a {...routes.conventionImmersion({ jwt }).link}>
+                    {t.sign.needsModification.editionLink}
+                  </a>
+                </span>
+              </>
+            }
+          />
         )}
         {convention.status !== "DRAFT" && convention.status !== "REJECTED" && (
           <>

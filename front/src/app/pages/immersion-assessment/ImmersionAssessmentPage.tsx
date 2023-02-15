@@ -1,5 +1,5 @@
 import React from "react";
-import { Loader, MainWrapper, Notification } from "react-design-system";
+import { Loader, MainWrapper } from "react-design-system";
 import {
   ConventionMagicLinkPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
@@ -11,6 +11,7 @@ import { useConvention } from "src/app/hooks/convention.hooks";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import { routes } from "src/app/routes/routes";
 import { Route } from "type-route";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 
 type ImmersionAssessmentRoute = Route<typeof routes.immersionAssessment>;
 
@@ -44,18 +45,19 @@ export const ImmersionAssessmentPage = ({
     <HeaderFooterLayout>
       <MainWrapper layout="boxed">
         {!hasRight ? (
-          <Notification type="error" title="Erreur">
-            Vous n'êtes pas autorisé a accéder à cette page
-          </Notification>
+          <Alert
+            severity="error"
+            title="Erreur"
+            description="Vous n'êtes pas autorisé a accéder à cette page"
+          />
         ) : (
           <>
             {convention && !canCreateAssessment && (
-              <Notification
-                type="error"
+              <Alert
+                severity="error"
                 title="Votre convention n'est pas prête à recevoir un bilan"
-              >
-                Seule une convention entièrement validée peut recevoir un bilan
-              </Notification>
+                description="Seule une convention entièrement validée peut recevoir un bilan"
+              />
             )}
             {convention && (
               <h1>

@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useFormikContext } from "formik";
 
 import { ConventionDto, getConventionFieldName, Role } from "shared";
-import { Notification } from "react-design-system";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { useField } from "formik";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
@@ -34,24 +34,29 @@ export const BeneficiaryCurrentEmployerFields = ({
   }, []);
   return (
     <>
-      <Notification
-        type="info"
+      <Alert
+        severity="info"
         title="Accord de l'employeur"
         className={fr.cx("fr-mb-2w")}
-      >
-        <p>
-          <strong>
-            Si l'immersion se fait en dehors du temps de travail, l'accord de
-            l'employeur n'est pas nécessaire.
-          </strong>
-        </p>
-        <p>
-          Le bénéficiaire peut effectuer son immersion sur son temps de travail.
-          Dans ce cas, l’accord de son employeur actuel est nécessaire. Le
-          contrat de travail n’est pas suspendu et l’employeur actuel couvre le
-          risque accident du travail pendant la durée de l’immersion.
-        </p>
-      </Notification>
+        description={
+          <>
+            <p>
+              <strong>
+                Si l'immersion se fait en dehors du temps de travail, l'accord
+                de l'employeur n'est pas nécessaire.
+              </strong>
+            </p>
+            <p>
+              Le bénéficiaire peut effectuer son immersion sur son temps de
+              travail. Dans ce cas, l’accord de son employeur actuel est
+              nécessaire. Le contrat de travail n’est pas suspendu et
+              l’employeur actuel couvre le risque accident du travail pendant la
+              durée de l’immersion.
+            </p>
+          </>
+        }
+      />
+
       <TextInput
         {...formFields["signatories.beneficiaryCurrentEmployer.businessSiret"]}
         disabled={disabled}

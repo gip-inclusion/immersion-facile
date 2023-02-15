@@ -1,6 +1,6 @@
 import { useField } from "formik";
 import React, { useState, useEffect } from "react";
-import { Button, Notification } from "react-design-system";
+import { Button } from "react-design-system";
 import {
   addressDtoToString,
   FormEstablishmentDto,
@@ -26,6 +26,7 @@ import { defaultInitialValue } from "./defaultInitialValue";
 import { EstablishmentFormikForm } from "./EstablishmentFormikForm";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 
 type EstablishmentCreationFormProps = {
   source: FormEstablishmentSource;
@@ -112,19 +113,20 @@ const CreationSiretRelatedInputs = () => {
           </div>
         )}
       {requestEmailToEditFormSucceed && (
-        <Notification type="success" title="Succès de la demande">
-          Succès. Un mail a été envoyé au référent de cet établissement avec un
-          lien permettant la mise à jour des informations.
-        </Notification>
+        <Alert
+          severity="success"
+          title="Succès de la demande"
+          description="Succès. Un mail a été envoyé au référent de cet établissement avec un
+        lien permettant la mise à jour des informations."
+        />
       )}
       {requestEmailToEditFormError && (
         <>
-          <Notification
-            type="info"
+          <Alert
+            severity="info"
             title="La demande de modification n'a pas aboutie."
-          >
-            {requestEmailToEditFormError}
-          </Notification>
+            description={requestEmailToEditFormError}
+          />
         </>
       )}
 

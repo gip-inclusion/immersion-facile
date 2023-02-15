@@ -6,7 +6,6 @@ import {
   ModalClose,
   ModalContent,
   ModalDialog,
-  Notification,
   ModalTitle,
 } from "react-design-system";
 import {
@@ -18,6 +17,7 @@ import {
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
 import { fr } from "@codegouvfr/react-dsfr";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 
 type JustificationModalProps = {
   title: React.ReactNode;
@@ -43,26 +43,24 @@ export const JustificationModal = ({
       <ModalContent>
         <ModalTitle>{title}</ModalTitle>
         {newStatus === "DRAFT" && (
-          <Notification
-            title={"Attention !"}
-            type={"warning"}
+          <Alert
+            severity="warning"
+            title="Attention !"
             className={fr.cx("fr-mb-2w")}
-          >
-            Ne surtout pas demander de modification si une signature manque !
+            description=" Ne surtout pas demander de modification si une signature manque !
             Cela revient à annuler les signatures déjà enregistrées. Pour
-            relancer un signataire manquant, le contacter par mail.
-          </Notification>
+            relancer un signataire manquant, le contacter par mail."
+          />
         )}
         {newStatus === "REJECTED" && (
-          <Notification
-            title={"Attention !"}
-            type={"warning"}
+          <Alert
+            severity="warning"
+            title="Attention !"
             className={fr.cx("fr-mb-2w")}
-          >
-            Ne surtout pas refuser une immersion si une signature manque ! Cela
-            revient à annuler les signatures déjà enregistrées. Pour relancer un
-            signataire manquant, le contacter par mail.
-          </Notification>
+            description="  Ne surtout pas refuser une immersion si une signature manque ! Cela
+          revient à annuler les signatures déjà enregistrées. Pour relancer un
+          signataire manquant, le contacter par mail."
+          />
         )}
         <Formik
           initialValues={{ justification: "" }}

@@ -1,7 +1,7 @@
 import { MainWrapper } from "react-design-system";
 import { routes } from "src/app/routes/routes";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
-import { Notification } from "react-design-system";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import React from "react";
 
 export const ShowErrorOrRedirectToRenewMagicLink = ({
@@ -24,12 +24,11 @@ export const ShowErrorOrRedirectToRenewMagicLink = ({
   return (
     <HeaderFooterLayout>
       <MainWrapper layout="boxed">
-        <Notification
+        <Alert
           title="Erreur lors de la récupération de la convention"
-          type="error"
-        >
-          {errorMessage}
-        </Notification>
+          severity="error"
+          description={errorMessage}
+        />
       </MainWrapper>
     </HeaderFooterLayout>
   );

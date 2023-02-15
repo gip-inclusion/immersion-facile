@@ -1,6 +1,6 @@
 import { Formik } from "formik";
 import React, { useEffect, useState } from "react";
-import { Notification } from "react-design-system";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { useDispatch } from "react-redux";
 import {
   ConventionDto,
@@ -137,9 +137,11 @@ export const ConventionForm = ({
   return (
     <>
       <div className={cx("fr-text")}>{t.intro.welcome}</div>
-      <Notification type="info" title="">
-        {t.intro.conventionWelcomeNotification}
-      </Notification>
+      <Alert
+        severity="info"
+        small
+        description={t.intro.conventionWelcomeNotification}
+      />
 
       <Formik
         enableReinitialize={true}

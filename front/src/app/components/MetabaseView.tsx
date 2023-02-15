@@ -1,9 +1,10 @@
 import React from "react";
-import { DsfrTitle, Notification } from "react-design-system";
+import { DsfrTitle } from "react-design-system";
 import { AbsoluteUrl } from "shared";
 import { ENV } from "src/config/environmentVariables";
 import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 
 const TitleButton = ({ url }: { url: AbsoluteUrl }) => (
   <a
@@ -35,10 +36,12 @@ export const MetabaseView = ({
       {ENV.envType === "production" ? (
         <iframe src={url} frameBorder="0" width="100%" height="800"></iframe>
       ) : (
-        <Notification title={"Non disponible hors production"} type="warning">
-          Cette fonctionnalité n'est disponible qu'en production (pas de
-          metabase en dehors de la production)
-        </Notification>
+        <Alert
+          title="Non disponible hors production"
+          severity="warning"
+          description="Cette fonctionnalité n'est disponible qu'en production (pas de
+          metabase en dehors de la production)"
+        />
       )}
     </div>
   );

@@ -1,5 +1,5 @@
 import React from "react";
-import { Notification } from "react-design-system";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { AgencyDto } from "shared";
 
 import { ActivateAgency } from "src/app/components/agency/ActivateAgency";
@@ -37,7 +37,7 @@ const AgencyDashboard = ({ agency }: { agency: AgencyDto }) => {
   if (!agency) return null;
 
   return error ? (
-    <Notification type="error" title="Erreur" children={error} />
+    <Alert severity="error" title="Erreur" description={error} />
   ) : (
     <MetabaseView title={agency.name} url={url} />
   );

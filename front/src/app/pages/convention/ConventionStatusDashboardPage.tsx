@@ -1,4 +1,4 @@
-import { MainWrapper, Notification } from "react-design-system";
+import { MainWrapper } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { MetabaseView } from "src/app/components/MetabaseView";
@@ -8,6 +8,7 @@ import { conventionSelectors } from "src/core-logic/domain/convention/convention
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { Route } from "type-route";
 import React, { useEffect } from "react";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 
 export const ConventionStatusDashboardPage = ({
   route,
@@ -52,12 +53,11 @@ const ConventionStatusDashboard = ({ jwt }: { jwt: string }) => {
 
   if (feedback.kind === "errored")
     return (
-      <Notification
+      <Alert
         title={"Impossible de récupérer l'état de la convention"}
-        type="error"
-      >
-        {feedback.errorMessage}
-      </Notification>
+        severity="error"
+        description={feedback.errorMessage}
+      />
     );
 
   if (!conventionStatusDashboardUrl)

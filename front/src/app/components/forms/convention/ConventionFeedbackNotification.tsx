@@ -1,5 +1,5 @@
 import { values } from "ramda";
-import React from "react";
+import React, { ReactNode } from "react";
 import {
   immersionFacileContactEmail,
   Signatories,
@@ -44,7 +44,7 @@ const labelByRole: Record<SignatoryRole, string> = {
 
 export const createConventionFeedbackMessageByKind = (
   signatories: Signatories,
-): Record<ConventionFeedbackKind, React.ReactNode> => ({
+): Record<ConventionFeedbackKind, NonNullable<ReactNode>> => ({
   modificationsAskedFromSignatory:
     "Vous avez renvoyé la demande pour modification.",
   signedSuccessfully: "Votre accord a été enregistré.",

@@ -1,6 +1,6 @@
 import { Form, Formik } from "formik";
 import React, { useEffect } from "react";
-import { Button, MainWrapper, Notification } from "react-design-system";
+import { Button, MainWrapper } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { UserAndPassword, userAndPasswordSchema } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
@@ -12,6 +12,7 @@ import { toFormikValidationSchema } from "src/app/components/forms/commons/zodVa
 import { fr } from "@codegouvfr/react-dsfr";
 import { routes } from "./routes";
 import { AdminTab } from "./route-params";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 
 export const AdminPrivateRoute = ({
   children,
@@ -73,13 +74,12 @@ export const LoginForm = ({
                   Se connecter
                 </Button>
                 {error && (
-                  <Notification
-                    className={fr.cx("fr-mt-2w")}
+                  <Alert
+                    severity="error"
                     title="Une erreur est survenue"
-                    type="error"
-                  >
-                    {error}
-                  </Notification>
+                    className={fr.cx("fr-mt-2w")}
+                    description={error}
+                  />
                 )}
               </div>
             </Form>

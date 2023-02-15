@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { addMonths } from "date-fns";
 import { useFormikContext } from "formik";
 import React, { useState } from "react";
-import { Notification } from "react-design-system";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import {
   addressDtoToString,
   ConventionDto,
@@ -66,26 +66,29 @@ export const ImmersionConditionsCommonFields = ({
     <>
       {values.internshipKind === "mini-stage-cci" && (
         <>
-          <Notification title="" type="info" className={fr.cx("fr-mb-4w")}>
-            La présente convention est signée pour la durée de la période
+          <Alert
+            small
+            severity="info"
+            className={fr.cx("fr-mb-4w")}
+            description="La présente convention est signée pour la durée de la période
             d’observation en milieu professionnel, qui ne peut dépasser une
             semaine sur une période de vacances scolaires fixée annuellement par
             le Ministère de l’éducation nationale. La durée de la présence
             hebdomadaire des jeunes en milieu professionnel ne peut excéder 30
             heures pour les jeunes de moins de 15 ans et 35 heures pour les
-            jeunes de 15 ans et plus répartis sur 5 jours.
-          </Notification>
-          <Notification
+            jeunes de 15 ans et plus répartis sur 5 jours."
+          />
+
+          <Alert
             title="Assurances"
-            type="info"
+            severity="info"
             className={fr.cx("fr-mb-4w")}
-          >
-            Afin de préparer au mieux les conditions de réalisation du stage,
+            description="Afin de préparer au mieux les conditions de réalisation du stage,
             les signataires de la conventions s’engagent à avoir une couverture
             d’assurance suffisante tant pour les dommages pouvant être
             occasionnés par le jeune que pour les risques auxquels il peut être
-            exposé.
-          </Notification>
+            exposé."
+          />
         </>
       )}
       <DateInput
@@ -136,15 +139,18 @@ export const ImmersionConditionsCommonFields = ({
         disabled={disabled}
       />
       {values.internshipKind === "mini-stage-cci" && (
-        <Notification title="" type="info" className={fr.cx("fr-mb-4w")}>
-          En application des articles L 4153-8 et D 4153-15 et suivants du code
-          du travail, relatif aux travaux interdits et règlementés, le jeune,
-          s’il est mineur, ne peut accéder aux machines, appareils ou produits
-          dont l’usage est proscrit aux mineurs. Il ne peut ni procéder à des
-          manœuvres ou manipulations sur d’autres machines, produits ou
-          appareils de production, ni effectuer les travaux légers autorisés aux
-          mineurs par le même code.
-        </Notification>
+        <Alert
+          small
+          severity="info"
+          className={fr.cx("fr-mb-4w")}
+          description=" En application des articles L 4153-8 et D 4153-15 et suivants du code
+        du travail, relatif aux travaux interdits et règlementés, le jeune,
+        s’il est mineur, ne peut accéder aux machines, appareils ou produits
+        dont l’usage est proscrit aux mineurs. Il ne peut ni procéder à des
+        manœuvres ou manipulations sur d’autres machines, produits ou
+        appareils de production, ni effectuer les travaux légers autorisés aux
+        mineurs par le même code."
+        />
       )}
       <BoolRadioGroup
         {...formContents["sanitaryPrevention"]}
@@ -156,12 +162,15 @@ export const ImmersionConditionsCommonFields = ({
         disabled={disabled}
       />
       {values.internshipKind === "mini-stage-cci" && (
-        <Notification title="" type="info" className={fr.cx("fr-mb-4w")}>
-          De même, les parties signataires de la convention s’engagent à mettre
-          en œuvre et respecter les consignes publiées par les services de
-          l’Etat, notamment pour exemple celles concernant les mesures de
-          prévention des risques de contamination en matière sanitaire.
-        </Notification>
+        <Alert
+          small
+          severity="info"
+          className={fr.cx("fr-mb-4w")}
+          description="De même, les parties signataires de la convention s’engagent à mettre
+        en œuvre et respecter les consignes publiées par les services de
+        l’Etat, notamment pour exemple celles concernant les mesures de
+        prévention des risques de contamination en matière sanitaire."
+        />
       )}
       <RadioGroupForField
         {...formContents["immersionObjective"]}
@@ -197,15 +206,18 @@ export const ImmersionConditionsCommonFields = ({
         multiline={true}
       />
       {values.internshipKind === "mini-stage-cci" && (
-        <Notification title="" type="info" className={fr.cx("fr-mb-4w")}>
-          Durant la période d’observation, le jeune participe à des activités de
-          l’entreprise, en liaison avec les objectifs précisés dans l’annexe
-          pédagogique, sous le contrôle des personnels responsables de leur
-          encadrement en milieu professionnel. Il est soumis aux règles
-          générales en vigueur dans l’entreprise ou l’organisme d’accueil,
-          notamment en matière de santé, sécurité, d’horaires et de discipline.
-          Le jeune est tenu au respect du secret professionnel.
-        </Notification>
+        <Alert
+          small
+          severity="info"
+          className={fr.cx("fr-mb-4w")}
+          description="  Durant la période d’observation, le jeune participe à des activités de
+        l’entreprise, en liaison avec les objectifs précisés dans l’annexe
+        pédagogique, sous le contrôle des personnels responsables de leur
+        encadrement en milieu professionnel. Il est soumis aux règles
+        générales en vigueur dans l’entreprise ou l’organisme d’accueil,
+        notamment en matière de santé, sécurité, d’horaires et de discipline.
+        Le jeune est tenu au respect du secret professionnel."
+        />
       )}
       <TextInput
         {...formContents["immersionSkills"]}

@@ -1,11 +1,5 @@
 import React, { useState } from "react";
-
-import {
-  Button,
-  LinkHome,
-  MainWrapper,
-  Notification,
-} from "react-design-system";
+import { Button, LinkHome, MainWrapper } from "react-design-system";
 import { ConventionMagicLinkPayload } from "shared";
 import { decodeMagicLinkJwtWithoutSignatureCheck } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
@@ -13,6 +7,7 @@ import { routes } from "src/app/routes/routes";
 import { conventionGateway } from "src/config/dependencies";
 import { Route } from "type-route";
 import { fr } from "@codegouvfr/react-dsfr";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 
 interface RenewExpiredLinkProps {
   route: Route<typeof routes.renewConventionMagicLink>;
@@ -97,12 +92,11 @@ export const RenewExpiredLinkContent = ({
         </p>
       )}
       {errorMessage && (
-        <Notification
-          type="error"
+        <Alert
+          severity="error"
           title="Désolé : nous n'avons pas été en mesure d'enregistrer vos informations. Veuillez réessayer ultérieurement."
-        >
-          {errorMessage}
-        </Notification>
+          description={errorMessage}
+        />
       )}
     </>
   );

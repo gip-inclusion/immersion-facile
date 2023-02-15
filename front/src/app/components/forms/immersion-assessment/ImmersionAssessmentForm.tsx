@@ -1,7 +1,7 @@
 import React from "react";
 import { Form, Formik } from "formik";
 import { identity } from "ramda";
-import { Button, Notification } from "react-design-system";
+import { Button } from "react-design-system";
 import {
   AssessmentStatus,
   assessmentStatuses,
@@ -20,6 +20,7 @@ import { useImmersionAssessment } from "src/app/hooks/immersionAssessment";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
 import { fr } from "@codegouvfr/react-dsfr";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 
 type ImmersionAssessmentFormProperties = {
   convention: ConventionReadDto;
@@ -73,22 +74,20 @@ export const ImmersionAssessmentForm = ({
                 Envoyer
               </Button>
               {assessmentError && (
-                <Notification
-                  type="error"
+                <Alert
+                  severity="error"
                   title="Erreur"
                   className={fr.cx("fr-mx-1w", "fr-mb-4w")}
-                >
-                  {assessmentError}
-                </Notification>
+                  description={assessmentError}
+                />
               )}
               {assessmentStatus === "Success" && (
-                <Notification
-                  type="success"
+                <Alert
+                  severity="success"
                   title={"Bilan envoyé"}
                   className={fr.cx("fr-mx-1w", "fr-mb-4w")}
-                >
-                  Le bilan a bien été envoyé au conseiller
-                </Notification>
+                  description="Le bilan a bien été envoyé au conseiller"
+                />
               )}
             </li>
             {isDisabled && (
