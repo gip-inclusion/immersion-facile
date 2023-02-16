@@ -1,0 +1,100 @@
+# https://www.postgresql.org/docs/current/app-pgrestore.html --jobs=number-of-jobs
+name: zReusable Scalingo Postgresql Clone database from postgreurl
+# Clone a database data from its fully qualified url
+
+on:
+  workflow_call:
+    inputs:
+      application-name:
+        required: true
+        type: string
+
+    secrets:
+      SCALINGO_API_TOKEN:
+        required: true
+      REMOTE_DATABASE_URL:
+        required: true
+
+jobs:
+  variables-from-database-url:
+    name: Extract the database-user (same value) identifier
+    runs-on: ubuntu-latest
+    container:
+      image: rcambonie/scalingo-cli
+
+    outputs:
+      user-database: ${{ steps.variables.outputs.user-database }}
+
+    steps:
+      - name: Login with api-token
+        run: scalingo login --api-token=${{ secrets.SCALINGO_API_TOKEN }}
+
+      - name: Extract user-database and database name from connexion string
+        id: variables
+        shell: bash
+        run: |
+          TARGET_DATABASE_URL=$(scalingo --app ${{ inputs.application-name }} env | grep SCALINGO_POSTGRESQL_URL=)
+          TARGET_DATABASE_URL=${TARGET_DATABASE_URL//SCALINGO_POSTGRESQL_URL/}
+          regex='.+/(.+)\?.*$'
+          [[ $TARGET_DATABASE_URL =~ $regex ]]
+          echo "::set-output name=user-database::${BASH_REMATCH[1]}"
+
+  dump-and-restore-remote-db-schema:
+    name: Dump and restore the production database schema
+    needs:
+      - variables-from-database-url
+    runs-on: ubuntu-latest
+    container:
+      image: rcambonie/scalingo-cli
+
+    steps:
+      - name: Login with api-token
+        run: scalingo login --api-token=${{ secrets.SCALINGO_API_TOKEN }}
+
+      - name: Dump and restore the remote database schema.
+        env:
+          REMOTE_DATABASE_URL: ${{ secrets.REMOTE_DATABASE_URL }}
+          DATABASE_VAR: "$DATABASE_URL"
+        run: >
+          scalingo --app ${{ inputs.application-name }} run bash -c "echo 'Installing pgsql-client' && 
+          dbclient-fetcher pgsql && 
+          echo 'Dumping schema' && 
+          pg_dump --schema-only --format c --no-owner --no-privileges --no-comments --exclude-schema 'information_schema' --exclude-schema '^pg_*' --dbname $REMOTE_DATABASE_URL --file dump-schema.pgsql &&
+          echo 'Finished dumping schema' && 
+          pg_restore --schema-only --verbose --no-owner --no-privileges --no-comments --dbname "$DATABASE_VAR" dump-schema.pgsql"
+
+  grant-all-privileges:
+    needs:
+      - dump-and-restore-remote-db-schema
+      - variables-from-database-url
+    uses: ./.github/workflows/_grant-all-privileges.postgresql.scalingo.reusable.yml
+    with:
+      application-name: ${{ inputs.application-name }}
+      user-database: ${{ needs.variables-from-database-url.outputs.user-database }}
+    secrets:
+      SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
+
+  dump-and-restore-remote-db-data:
+    needs:
+      - grant-all-privileges
+    runs-on: ubuntu-latest
+    name: Dump and restore the remote database data.
+    env:
+      REMOTE_DATABASE_URL: ${{ secrets.REMOTE_DATABASE_URL }}
+      DATABASE_VAR: "$DATABASE_URL"
+    container:
+      image: rcambonie/scalingo-cli
+
+    steps:
+      - name: Login with api-token
+        run: scalingo login --api-token=${{ secrets.SCALINGO_API_TOKEN }}
+
+      - name: Dump the remote database data and restore it to the local database.
+        run: >-
+          scalingo --app ${{ inputs.application-name }} run bash -c "echo 'Installing pgsql-client' &&
+          dbclient-fetcher pgsql &&
+          echo 'Dumping data' &&
+          pg_dump --data-only --format c --no-owner --no-privileges --no-comments --dbname $REMOTE_DATABASE_URL --file dump-data.pgsql &&
+          echo 'Finished dumping data' &&
+          pg_restore --data-only --verbose --no-owner --no-privileges --no-comments --dbname "$DATABASE_VAR" dump-data.pgsql; 
+          exit 0"
