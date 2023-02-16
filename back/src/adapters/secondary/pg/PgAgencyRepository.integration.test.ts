@@ -40,7 +40,7 @@ const agency2builder = AgencyDtoBuilder.create(
     departmentCode: "75",
   })
   .withCounsellorEmails(["counsellorA@agency2.fr", "counsellorB@agency2.fr"])
-  .withValidatorEmails([]) // no validators
+  .withValidatorEmails(["agency2@validator.com"]) // no validators
   .withAdminEmails(["adminA@agency2.fr", "adminB@agency2.fr"])
   .withQuestionnaireUrl("http://questionnaire.agency2.fr")
   .withSignature("The team of agency2");

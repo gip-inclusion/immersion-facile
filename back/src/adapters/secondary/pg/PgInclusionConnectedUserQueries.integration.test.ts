@@ -23,7 +23,10 @@ describe("PgInclusionConnectedUserQueries", () => {
     client = await pool.connect();
   });
 
-  afterAll(() => client.release());
+  afterAll(async () => {
+    client.release();
+    await pool.end();
+  });
 
   beforeEach(async () => {
     await client.query("DELETE FROM authenticated_users");
