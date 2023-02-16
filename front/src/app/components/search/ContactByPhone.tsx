@@ -10,7 +10,6 @@ import { immersionSearchGateway } from "src/config/dependencies";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { Button } from "@codegouvfr/react-dsfr/Button";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 

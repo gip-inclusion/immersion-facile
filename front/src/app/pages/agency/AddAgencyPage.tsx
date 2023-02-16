@@ -109,8 +109,8 @@ export const AddAgencyPage = () => {
               <div className={fr.cx("fr-mt-4w")}>
                 <Button
                   type="submit"
+                  disabled={isSubmitting || submitFeedback.kind !== "idle"}
                   nativeButtonProps={{
-                    disabled: isSubmitting || submitFeedback.kind !== "idle",
                     id: "im-form-add-agency__submit-button",
                   }}
                 >

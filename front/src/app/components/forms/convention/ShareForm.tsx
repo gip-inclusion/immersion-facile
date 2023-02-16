@@ -94,7 +94,7 @@ export const ShareForm = ({ onSuccess, onError }: ShareFormProps) => {
             name={getName("details")}
             multiline={true}
           />
-          <Button type="submit" title="Envoyer" onClick={() => undefined}>
+          <Button type="submit" title="Envoyer">
             Envoyer
           </Button>
         </Form>

@@ -47,8 +47,8 @@ export const VerificationActionButton = ({
             : onSubmit({ status: newStatus });
         }}
         className={className}
+        disabled={disabled}
         nativeButtonProps={{
-          disabled,
           id: "im-convention-validation__submit-button",
         }}
       >
