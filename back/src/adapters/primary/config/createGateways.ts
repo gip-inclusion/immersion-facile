@@ -35,7 +35,6 @@ import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/Pol
 import { HttpInclusionConnectGateway } from "../../secondary/InclusionConnectGateway/HttpInclusionConnectGateway";
 import { makeInclusionConnectHttpClient } from "../../secondary/InclusionConnectGateway/inclusionConnectApi.client";
 import { InMemoryInclusionConnectGateway } from "../../secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
-import { MinioDocumentGateway } from "../../secondary/MinioDocumentGateway";
 import { NotImplementedDocumentGateway } from "../../secondary/NotImplementedDocumentGateway";
 import { HttpPeConnectGateway } from "../../secondary/PeConnectGateway/HttpPeConnectGateway";
 import { InMemoryPeConnectGateway } from "../../secondary/PeConnectGateway/InMemoryPeConnectGateway";
@@ -248,9 +247,6 @@ const createDocumentGateway = (config: AppConfig): DocumentGateway => {
     case "S3":
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return new S3DocumentGateway(config.cellarS3Params!);
-    case "MINIO":
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return new MinioDocumentGateway(config.minioParams!);
     case "NONE":
       return new NotImplementedDocumentGateway();
     default: {

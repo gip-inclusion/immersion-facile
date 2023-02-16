@@ -12,7 +12,6 @@ import {
 } from "shared";
 import { DomainTopic } from "../../../domain/core/eventBus/events";
 import { InclusionConnectConfig } from "../../../domain/inclusionConnect/useCases/InitiateInclusionConnect";
-import type { MinioParams } from "../../secondary/MinioDocumentGateway";
 import { S3Params } from "../../secondary/S3DocumentGateway";
 
 export type AccessTokenConfig = {
@@ -356,7 +355,7 @@ export class AppConfig {
 
   public get documentGateway() {
     return this.throwIfNotInArray({
-      authorizedValues: ["NONE", "MINIO", "S3"],
+      authorizedValues: ["NONE", "S3"],
       variableName: "DOCUMENT_GATEWAY",
       defaultValue: "NONE",
     });
@@ -369,18 +368,6 @@ export class AppConfig {
         accessKeyId: this.throwIfNotDefined("CELLAR_ADDON_KEY_ID"),
         secretAccessKey: this.throwIfNotDefined("CELLAR_ADDON_KEY_SECRET"),
         bucketName: this.throwIfNotDefined("CELLAR_BUCKET"),
-      };
-    }
-  }
-
-  public get minioParams(): MinioParams | undefined {
-    if (this.documentGateway === "MINIO") {
-      return {
-        endPoint: this.throwIfNotDefined("MINIO_ENDPOINT"),
-        port: +this.throwIfNotDefined("MINO_PORT"),
-        accessKey: this.throwIfNotDefined("MINIO_ACCESS_KEY"),
-        secretKey: this.throwIfNotDefined("MINIO_SECRET_KEY"),
-        bucketName: this.throwIfNotDefined("MINIO_BUCKET"),
       };
     }
   }
