@@ -1,6 +1,8 @@
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
+import { AbsoluteUrl } from "shared";
+import { MetabaseView } from "src/app/components/MetabaseView";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
@@ -45,15 +47,15 @@ export const AgencyDashboardPage = () => {
       </Button>
       <br />
       <br />
-      <div>
-        Bienvenue sur le tableau de bord de l'agence
-        <br />
-        Voici votre token,(obtenu grâce à inclusion connect)
-        <p style={{ width: "200px" }}>{inclusionConnectToken}</p>
-        <strong>
-          Url du dashboard récupérée du back : {agencyDashboardUrl}
-        </strong>
-      </div>
+
+      <h1>Bienvenue</h1>
+
+      {agencyDashboardUrl ? (
+        <AgencyDashboard url={agencyDashboardUrl} />
+      ) : (
+        <NoAgencyLinkedToUser />
+      )}
+
       <SubmitFeedbackNotification
         submitFeedback={feedback}
         messageByKind={{ success: "Dashboard récupéré avec succès" }}
@@ -61,3 +63,14 @@ export const AgencyDashboardPage = () => {
     </div>
   );
 };
+
+const NoAgencyLinkedToUser = () => (
+  <p>
+    Vous êtes bien connecté avec Inclusion Connect mais nous ne savons pas à
+    quelle agence vous êtes rattachée... Vous pouvez contacter le support pour
+    nous communiquer votre agence.
+  </p>
+);
+const AgencyDashboard = ({ url }: { url: AbsoluteUrl }) => (
+  <MetabaseView title="Tableau de bord agence" url={url} />
+);

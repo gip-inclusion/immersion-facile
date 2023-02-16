@@ -5,7 +5,7 @@ import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
 export type InclusionConnectedFeedback = SubmitFeedBack<"success">;
 
 type InclusionConnectedState = {
-  dashboardUrl: string | null;
+  dashboardUrl: AbsoluteUrl | null;
   isLoading: boolean;
   feedback: InclusionConnectedFeedback;
 };
