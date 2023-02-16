@@ -89,4 +89,4 @@ export * from "./test.helpers";
 export { absoluteUrlSchema } from "./AbsoluteUrl";
 export { HttpClientError as LegacyHttpClientError } from "./httpClient/errors/4xxClientError.error";
 export { HttpServerError as LegacyHttpServerError } from "./httpClient/errors/5xxServerError.error";
-export { departmentNameToDepartmentCode } from "./apiAdresse/departmentNameToDepartmentCode";
+export * from "./apiAdresse/departmentNameToDepartmentCode";

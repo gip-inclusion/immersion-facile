@@ -104,3 +104,26 @@ export const departmentNameToDepartmentCode: Record<string, string> = {
   "La Réunion": "974",
   Mayotte: "976",
 };
+
+const nouvelleAquitaineDepartmentsCodes = [
+  "16",
+  "17",
+  "19",
+  "23",
+  "24",
+  "33",
+  "40",
+  "47",
+  "64",
+  "79",
+  "86",
+  "87",
+];
+const paysDeLaLoireDepartmentsCodes = ["44", "49", "53", "72", "85"];
+const bretagneDepartmentsCodes = ["22", "29", "35", "56"];
+
+export const miniStageRestrictedDepartments = [
+  ...bretagneDepartmentsCodes,
+  ...nouvelleAquitaineDepartmentsCodes,
+  ...paysDeLaLoireDepartmentsCodes,
+];

@@ -6,6 +6,7 @@ import {
   AgencyOption,
   DepartmentCode,
   departmentNameToDepartmentCode,
+  miniStageRestrictedDepartments,
   FederatedIdentity,
   InternshipKind,
   isPeConnectIdentity,
@@ -135,18 +136,6 @@ type DepartmentOption = {
   label: string;
   value: string;
 }; //satisfies SelectOption
-
-const miniStageRestrictedDepartments = [
-  "29",
-  "22",
-  "56",
-  "35",
-  "53",
-  "72",
-  "49",
-  "44",
-  "85",
-];
 
 const departmentOptions = keys(departmentNameToDepartmentCode).map(
   (departmentName: string): DepartmentOption => ({
