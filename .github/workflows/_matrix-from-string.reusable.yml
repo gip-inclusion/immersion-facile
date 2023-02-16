@@ -4,7 +4,7 @@
 # Usage: set this workflows as a dependency of your matrixed job.
 
 #tasks-from-string:
-#  uses: .github/workflows/_matrix-from-string.reusable.yml
+#  uses: ./.github/workflows/_matrix-from-string.reusable.yml
 #  with:
 #    input-string: 'lint,prettier,test'
 #    separator: ','

@@ -35,7 +35,7 @@ env:
 
 jobs:
   replicate-db:
-    uses: .github/workflows/_replicate-remote-db-standalone.use-case.yml
+    uses: ./.github/workflows/_replicate-remote-db-standalone.use-case.yml
     with:
       application-name: ${{ inputs.application-name || 'database-nightly' }}
       addon-plan-postgresql: ${{ inputs.addon-plan-postgresql || 'postgresql-starter-4096' }}
@@ -47,7 +47,7 @@ jobs:
   refresh-materialized-views:
     needs:
       - replicate-db
-    uses: .github/workflows/_refresh-materialized-views.postgresql.scalingo.reusable.yml
+    uses: ./.github/workflows/_refresh-materialized-views.postgresql.scalingo.reusable.yml
     with:
       application-name: ${{ inputs.application-name || 'database-nightly' }}
       views-as-comma-separated-string: "view_siret_with_department_region,view_contact_requests,view_establishments,view_establishments_with_flatten_offers,view_establishments_with_aggregated_offers"
@@ -57,7 +57,7 @@ jobs:
   encrypted-database-credentials:
     needs:
       - refresh-materialized-views
-    uses: .github/workflows/_encrypted-database-credentials.postgresql.scalingo.reusable.yml
+    uses: ./.github/workflows/_encrypted-database-credentials.postgresql.scalingo.reusable.yml
     with:
       application-name: ${{ inputs.application-name || 'database-nightly' }}
     secrets:

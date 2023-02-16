@@ -21,7 +21,7 @@ on:
 
 jobs:
   get-extensions:
-    uses: .github/workflows/_matrix-from-string.reusable.yml
+    uses: ./.github/workflows/_matrix-from-string.reusable.yml
     with:
       input-string: ${{ inputs.extensions-as-comma-separated-string }}
       separator: ","
