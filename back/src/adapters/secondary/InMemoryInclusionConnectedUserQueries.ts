@@ -18,8 +18,6 @@ export class InMemoryInclusionConnectedUserQueries
     return { ...user, agencies: this.agenciesByUserId[userId] ?? [] };
   }
 
-  // linkAgencyToUser(userId: string, agencyId: string): Promise<void> {}
-
   public agenciesByUserId: Record<string, AgencyDto[]> = {};
 
   setInclusionConnectedUsers(

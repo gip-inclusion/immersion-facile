@@ -5,6 +5,7 @@ import {
   AgencyId,
   AgencyKindFilter,
   AgencyPositionFilter,
+  agencySchema,
   AgencyStatus,
   DepartmentCode,
   GeoPositionDto,
@@ -13,6 +14,7 @@ import {
 } from "shared";
 import { AgencyRepository } from "../../../domain/convention/ports/AgencyRepository";
 import { createLogger } from "../../../utils/logger";
+import { validateAndParseZodSchema } from "../../primary/helpers/httpErrors";
 import { optional } from "./pgUtils";
 
 const logger = createLogger(__filename);
@@ -242,27 +244,28 @@ const entityToPgArray = (agency: Partial<AgencyDto>): any[] => [
 
 export const persistenceAgencyToAgencyDto = (
   params: PersistenceAgency,
-): AgencyDto => ({
-  address: {
-    streetNumberAndAddress: params.street_number_and_address,
-    postcode: params.post_code,
-    departmentCode: params.department_code,
-    city: params.city,
-  },
-  adminEmails: params.admin_emails,
-  agencySiret: optional(params.agency_siret),
-  codeSafir: optional(params.code_safir),
-  counsellorEmails: params.counsellor_emails,
-  id: params.id,
-  kind: params.kind,
-  logoUrl: optional(params.logo_url),
-  name: params.name,
-  position: parseGeoJson(params.position),
-  questionnaireUrl: params.questionnaire_url,
-  signature: params.email_signature,
-  status: params.status,
-  validatorEmails: params.validator_emails,
-});
+): AgencyDto =>
+  validateAndParseZodSchema(agencySchema, {
+    address: {
+      streetNumberAndAddress: params.street_number_and_address,
+      postcode: params.post_code,
+      departmentCode: params.department_code,
+      city: params.city,
+    },
+    adminEmails: params.admin_emails,
+    agencySiret: optional(params.agency_siret),
+    codeSafir: optional(params.code_safir),
+    counsellorEmails: params.counsellor_emails,
+    id: params.id,
+    kind: params.kind,
+    logoUrl: optional(params.logo_url),
+    name: params.name,
+    position: parseGeoJson(params.position),
+    questionnaireUrl: params.questionnaire_url,
+    signature: params.email_signature,
+    status: params.status,
+    validatorEmails: params.validator_emails,
+  });
 
 export const parseGeoJson = (raw: string): GeoPositionDto => {
   const json = JSON.parse(raw);

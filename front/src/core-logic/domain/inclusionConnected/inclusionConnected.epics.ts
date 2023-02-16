@@ -24,13 +24,12 @@ const getAgencyDashboardEpic: AppEpic<InclusionConnectedAction> = (
       ),
     ),
     map(inclusionConnectedSlice.actions.agencyDashboardUrlFetchSucceeded),
-    catchEpicError((error) => {
-      if (error?.message.includes("jwt expired"))
-        return authSlice.actions.federatedIdentityDeletionTriggered();
-
-      return inclusionConnectedSlice.actions.agencyDashboardUrlFetchFailed(
-        error?.message,
-      );
-    }),
+    catchEpicError((error) =>
+      error?.message.includes("jwt expired")
+        ? authSlice.actions.federatedIdentityDeletionTriggered()
+        : inclusionConnectedSlice.actions.agencyDashboardUrlFetchFailed(
+            error?.message,
+          ),
+    ),
   );
 export const inclusionConnectedEpics = [getAgencyDashboardEpic];

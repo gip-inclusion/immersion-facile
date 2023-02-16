@@ -1,7 +1,7 @@
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { AbsoluteUrl } from "shared";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -51,9 +51,15 @@ export const AgencyDashboardPage = () => {
       <h1>Bienvenue</h1>
 
       {agencyDashboardUrl ? (
-        <AgencyDashboard url={agencyDashboardUrl} />
+        <MetabaseView title="Tableau de bord agence" url={agencyDashboardUrl} />
       ) : (
-        <NoAgencyLinkedToUser />
+        <Alert
+          severity="warning"
+          title="Pas d'agence rattachée"
+          description="Vous êtes bien connecté avec Inclusion Connect mais nous ne savons pas à
+    quelle agence vous êtes rattachée... Vous pouvez contacter le support pour
+    nous communiquer votre agence."
+        />
       )}
 
       <SubmitFeedbackNotification
@@ -63,14 +69,3 @@ export const AgencyDashboardPage = () => {
     </div>
   );
 };
-
-const NoAgencyLinkedToUser = () => (
-  <p>
-    Vous êtes bien connecté avec Inclusion Connect mais nous ne savons pas à
-    quelle agence vous êtes rattachée... Vous pouvez contacter le support pour
-    nous communiquer votre agence.
-  </p>
-);
-const AgencyDashboard = ({ url }: { url: AbsoluteUrl }) => (
-  <MetabaseView title="Tableau de bord agence" url={url} />
-);
