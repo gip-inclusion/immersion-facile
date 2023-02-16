@@ -46,7 +46,7 @@ export const createApp = async (
   eventCrawler: EventCrawler;
   generateApiJwt: GenerateApiConsumerJtw;
   generateMagicLinkJwt: GenerateMagicLinkJwt;
-  generateAuthenticatedUserToken: GenerateAuthenticatedUserJwt;
+  generateAuthenticatedUserJwt: GenerateAuthenticatedUserJwt;
   uuidGenerator: UuidGenerator;
   inMemoryUow?: InMemoryUnitOfWork;
 }> => {
@@ -96,7 +96,7 @@ export const createApp = async (
     eventCrawler: deps.eventCrawler,
     generateApiJwt: deps.generateApiJwt,
     generateMagicLinkJwt: deps.generateMagicLinkJwt,
-    generateAuthenticatedUserToken: deps.generateAuthenticatedUserToken,
+    generateAuthenticatedUserJwt: deps.generateAuthenticatedUserToken,
     uuidGenerator: deps.uuidGenerator,
     inMemoryUow: deps.inMemoryUow,
   };

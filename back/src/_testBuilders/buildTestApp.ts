@@ -51,7 +51,7 @@ export type TestAppAndDeps = {
   appConfig: AppConfig;
   generateApiJwt: GenerateApiConsumerJtw;
   generateMagicLinkJwt: GenerateMagicLinkJwt;
-  generateAuthenticatedUserToken: GenerateAuthenticatedUserJwt;
+  generateAuthenticatedUserJwt: GenerateAuthenticatedUserJwt;
   uuidGenerator: UuidGenerator;
   inMemoryUow: InMemoryUnitOfWork;
 };
@@ -97,7 +97,7 @@ export const buildTestApp = async (
     eventCrawler: rawEventCrawler,
     generateApiJwt,
     generateMagicLinkJwt,
-    generateAuthenticatedUserToken,
+    generateAuthenticatedUserJwt,
     uuidGenerator,
     inMemoryUow: uow,
   } = await createApp(appConfig);
@@ -117,7 +117,7 @@ export const buildTestApp = async (
     appConfig,
     generateApiJwt,
     generateMagicLinkJwt,
-    generateAuthenticatedUserToken,
+    generateAuthenticatedUserJwt,
     uuidGenerator,
     inMemoryUow,
   };

@@ -21,9 +21,9 @@ describe("Router for users authenticated with Inclusion Connect", () => {
   });
 
   it("throws forbidden if token is expired", async () => {
-    const { request, generateAuthenticatedUserToken } = await buildTestApp();
+    const { request, generateAuthenticatedUserJwt } = await buildTestApp();
     const userId = "123";
-    const token = generateAuthenticatedUserToken({ userId }, 0);
+    const token = generateAuthenticatedUserJwt({ userId }, 0);
 
     const response = await request
       .get(inclusionConnectedAllowedTargets.getAgencyDashboard.url)
@@ -33,10 +33,10 @@ describe("Router for users authenticated with Inclusion Connect", () => {
     expect(response.status).toBe(403);
   });
 
-  it("sets the payload in the request, and returns 200 when things are good !", async () => {
-    const { request, generateAuthenticatedUserToken } = await buildTestApp();
+  it("Right path : HTTP 200 with dashboard url on response body", async () => {
+    const { request, generateAuthenticatedUserJwt } = await buildTestApp();
     const userId = "123";
-    const token = generateAuthenticatedUserToken({ userId });
+    const token = generateAuthenticatedUserJwt({ userId });
 
     const response = await request
       .get(inclusionConnectedAllowedTargets.getAgencyDashboard.url)
