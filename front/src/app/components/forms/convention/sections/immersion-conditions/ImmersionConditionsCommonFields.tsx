@@ -143,7 +143,7 @@ export const ImmersionConditionsCommonFields = ({
           small
           severity="info"
           className={fr.cx("fr-mb-4w")}
-          description=" En application des articles L 4153-8 et D 4153-15 et suivants du code
+          description="En application des articles L 4153-8 et D 4153-15 et suivants du code
         du travail, relatif aux travaux interdits et règlementés, le jeune,
         s’il est mineur, ne peut accéder aux machines, appareils ou produits
         dont l’usage est proscrit aux mineurs. Il ne peut ni procéder à des
@@ -210,7 +210,7 @@ export const ImmersionConditionsCommonFields = ({
           small
           severity="info"
           className={fr.cx("fr-mb-4w")}
-          description="  Durant la période d’observation, le jeune participe à des activités de
+          description="Durant la période d’observation, le jeune participe à des activités de
         l’entreprise, en liaison avec les objectifs précisés dans l’annexe
         pédagogique, sous le contrôle des personnels responsables de leur
         encadrement en milieu professionnel. Il est soumis aux règles

@@ -172,7 +172,7 @@ export const EstablishmentFormikForm = ({
               <Alert
                 severity="success"
                 title="Succès de l'envoi"
-                description=" Succès. Nous avons bien enregistré les informations concernant
+                description="Succès. Nous avons bien enregistré les informations concernant
               votre entreprise."
               />
             )}

@@ -47,7 +47,7 @@ export const JustificationModal = ({
             severity="warning"
             title="Attention !"
             className={fr.cx("fr-mb-2w")}
-            description=" Ne surtout pas demander de modification si une signature manque !
+            description="Ne surtout pas demander de modification si une signature manque !
             Cela revient à annuler les signatures déjà enregistrées. Pour
             relancer un signataire manquant, le contacter par mail."
           />
@@ -57,7 +57,7 @@ export const JustificationModal = ({
             severity="warning"
             title="Attention !"
             className={fr.cx("fr-mb-2w")}
-            description="  Ne surtout pas refuser une immersion si une signature manque ! Cela
+            description="Ne surtout pas refuser une immersion si une signature manque ! Cela
           revient à annuler les signatures déjà enregistrées. Pour relancer un
           signataire manquant, le contacter par mail."
           />
