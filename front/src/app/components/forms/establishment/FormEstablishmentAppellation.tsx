@@ -20,7 +20,7 @@ export const FormEstablishmentAppellation = ({
 
   return (
     <div className={fr.cx("fr-grid-row", "fr-grid-row--bottom")}>
-      <div className={fr.cx("fr-col")}>
+      <div className={fr.cx("fr-col", "fr-mt-2w")}>
         <AppellationAutocomplete
           label="Rechercher un métier *"
           initialValue={value}

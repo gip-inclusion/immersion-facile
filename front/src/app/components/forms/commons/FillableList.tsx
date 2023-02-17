@@ -116,22 +116,24 @@ const AddToList = ({
         <span className={fr.cx("fr-hint-text")}>{description}</span>
       )}
       <div className={fr.cx("fr-grid-row")}>
-        <input
-          id={cleanStringToHTMLAttribute(name)}
-          value={inputValue}
-          type="text"
-          name={name}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              onAddClick();
-            }
-          }}
-          onChange={(e) => setInputValue(e.target.value)}
-          className={fr.cx("fr-input", error ? "fr-input--error" : undefined)}
-          placeholder={placeholder || ""}
-          aria-describedby="text-input-error-desc-error"
-        />
+        <div className={fr.cx("fr-col")}>
+          <input
+            id={cleanStringToHTMLAttribute(name)}
+            value={inputValue}
+            type="text"
+            name={name}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                onAddClick();
+              }
+            }}
+            onChange={(e) => setInputValue(e.target.value)}
+            className={fr.cx("fr-input", error ? "fr-input--error" : undefined)}
+            placeholder={placeholder || ""}
+            aria-describedby="text-input-error-desc-error"
+          />
+        </div>
         <Button type="button" onClick={onAddClick}>
           Ajouter
         </Button>

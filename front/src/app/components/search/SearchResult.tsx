@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import {
   addressDtoToString,
   ContactMethod,
+  FormEstablishmentDto,
   SearchImmersionResultDto,
 } from "shared";
 import { getMapsLink } from "./ContactEstablishmentModal";
@@ -13,16 +14,55 @@ import { useStyles } from "tss-react/dsfr";
 import { toAbsoluteUrl } from "shared";
 
 export type EnterpriseSearchResultProps = {
-  searchResult: SearchImmersionResultDto;
-  onButtonClick: () => void;
+  establishment: SearchImmersionResultDto;
+  onButtonClick?: () => void;
   disableButton?: boolean;
+  preview?: boolean;
+  layout?: "fr-col-md-4" | "fr-col-md-6";
 };
 
 const componentName = "im-search-result";
 
+export const establishmentToSearchResultPreview = (
+  establishment: FormEstablishmentDto,
+): SearchImmersionResultDto => ({
+  ...establishment,
+  rome:
+    establishment.appellations.length > 0
+      ? establishment.appellations[0].romeCode
+      : "",
+  romeLabel:
+    establishment.appellations.length > 0
+      ? establishment.appellations[0].romeLabel
+      : "",
+  appellationLabels: establishment.appellations.map(
+    (appellation) => appellation.appellationLabel,
+  ),
+  nafLabel: establishment.naf?.nomenclature || "",
+  naf: establishment.naf?.code || "",
+  name:
+    establishment.businessNameCustomized ||
+    establishment.businessName ||
+    "Mon entreprise",
+  // Fake data
+  voluntaryToImmersion: true,
+  position: {
+    lat: 0,
+    lon: 0,
+  },
+  address: {
+    streetNumberAndAddress: establishment.businessAddress,
+    city: "",
+    departmentCode: "",
+    postcode: "",
+  },
+});
+
 export const SearchResult = ({
   onButtonClick,
-  searchResult,
+  establishment,
+  preview,
+  layout = "fr-col-md-4",
 }: EnterpriseSearchResultProps) => {
   const { cx } = useStyles();
   const {
@@ -39,7 +79,7 @@ export const SearchResult = ({
     website,
     fitForDisabledWorkers,
     additionalInformation,
-  } = searchResult;
+  } = establishment;
   const distanceKm = ((distance_m ?? 0) / 1000).toFixed(1);
   const establishmentRawName =
     customizedName && customizedName.length > 0 ? customizedName : name;
@@ -72,7 +112,7 @@ export const SearchResult = ({
     }
   };
   return (
-    <div className={fr.cx("fr-col-12", "fr-col-md-4")}>
+    <div className={fr.cx("fr-col-12", layout)}>
       <div className={cx(fr.cx("fr-card"), componentName)}>
         <div className={fr.cx("fr-card__body")}>
           <div className={fr.cx("fr-card__content")}>
@@ -93,7 +133,7 @@ export const SearchResult = ({
               )}
               <li>
                 <a
-                  href={getMapsLink(searchResult)}
+                  href={getMapsLink(establishment)}
                   target="_blank"
                   className={cx(`${componentName}__location-link`)}
                 >
@@ -156,11 +196,18 @@ export const SearchResult = ({
               size="small"
               type="button"
               iconId="fr-icon-mail-fill"
-              onClick={onButtonClick}
+              onClick={
+                preview
+                  ? () => {
+                      //
+                    }
+                  : onButtonClick
+              }
             >
               {contactMode === "PHONE" ||
               contactMode === "EMAIL" ||
-              contactMode === "IN_PERSON"
+              contactMode === "IN_PERSON" ||
+              preview
                 ? "Contacter l'entreprise"
                 : "Tentez votre chance"}
             </Button>

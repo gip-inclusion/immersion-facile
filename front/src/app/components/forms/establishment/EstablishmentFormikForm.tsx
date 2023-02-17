@@ -1,6 +1,8 @@
 import { Form, Formik } from "formik";
 import React, { useState } from "react";
 import { ErrorNotifications } from "react-design-system";
+import Button from "@codegouvfr/react-dsfr/Button";
+
 import {
   FormEstablishmentDto,
   formEstablishmentSchema,
@@ -17,6 +19,11 @@ import { AppellationList } from "./AppellationList";
 import { BusinessContact } from "./BusinessContact";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { useStyles } from "tss-react/dsfr";
+import {
+  establishmentToSearchResultPreview,
+  SearchResult,
+} from "../../search/SearchResult";
 
 type EstablishmentFormProps = {
   initialValues: FormEstablishmentDto;
@@ -41,6 +48,7 @@ export const EstablishmentFormikForm = ({
   const { getFormErrors, getFormFields } = useFormContents(
     formEstablishmentFieldsLabels,
   );
+  const { cx } = useStyles();
   const formContents = getFormFields();
   let errorMessage = submitError?.message;
 
@@ -119,6 +127,9 @@ export const EstablishmentFormikForm = ({
               {...formContents.additionalInformation}
               multiline={true}
             />
+            <h2 className={fr.cx("fr-text--lead", "fr-mb-2w")}>
+              Les métiers que vous proposez à l'immersion :
+            </h2>
             <AppellationList
               {...formContents.appellations}
               title={formContents.appellations.label}
@@ -138,15 +149,7 @@ export const EstablishmentFormikForm = ({
                 <p>
                   Vous pouvez demander la suppression définitive de votre
                   entreprise{" "}
-                  <a
-                    href={"#"}
-                    onClick={(event) => {
-                      event.preventDefault();
-                      window.open(mailtoHref(initialValues.siret));
-                    }}
-                  >
-                    en cliquant ici
-                  </a>
+                  <a href={mailtoHref(initialValues.siret)}>en cliquant ici</a>
                 </p>
                 <p>
                   Si vous avez besoin d'aide, envoyez-nous un email: <br />
@@ -154,6 +157,30 @@ export const EstablishmentFormikForm = ({
                 </p>
               </>
             )}
+            {Object.values(errors).length === 0 && (
+              <section className={cx("im-establishment-preview")}>
+                <h2 className={fr.cx("fr-text--lead", "fr-mb-2w")}>
+                  Prévisualisation de votre entreprise
+                </h2>
+                <p className={fr.cx("fr-hint-text")}>
+                  Voici un exemple d'aperçu de votre entreprise, tel qu'il
+                  apparaitra dans notre moteur de recherche
+                </p>
+                <div
+                  className={cx(
+                    fr.cx("fr-grid-row", "fr-mb-4w"),
+                    "im-establishment-preview__inner",
+                  )}
+                >
+                  <SearchResult
+                    establishment={establishmentToSearchResultPreview(values)}
+                    preview
+                    layout="fr-col-md-6"
+                  />
+                </div>
+              </section>
+            )}
+
             <ErrorNotifications
               labels={getFormErrors()}
               errors={toDotNotation(errors)}
@@ -178,17 +205,14 @@ export const EstablishmentFormikForm = ({
             )}
             {!isSuccess && (
               <div className={fr.cx("fr-mt-4w")}>
-                <button
-                  className={fr.cx(
-                    "fr-btn",
-                    "fr-icon-checkbox-circle-line",
-                    "fr-btn--icon-left",
-                  )}
+                <Button
+                  iconId="fr-icon-checkbox-circle-line"
+                  iconPosition="left"
                   type="submit"
                   disabled={isSubmitting}
                 >
                   Enregistrer mes informations
-                </button>
+                </Button>
               </div>
             )}
           </Form>
