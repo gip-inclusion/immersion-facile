@@ -53,13 +53,17 @@ export class CallLaBonneBoiteAndUpdateRepositories extends TransactionalUseCase<
     searchImmersionRequestDto: SearchImmersionQueryParamsDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    if (!searchImmersionRequestDto.rome) return;
+    const { rome, latitude, longitude, distance_km } =
+      searchImmersionRequestDto;
+    // eslint-disable-next-line no-console
+    console.time(`updateReposFromLBBduration-${rome}-${latitude}-${longitude}`);
+    if (!rome) return;
 
     const requestParams: LaBonneBoiteRequestParams = {
-      rome: searchImmersionRequestDto.rome,
-      lon: searchImmersionRequestDto.longitude,
-      lat: searchImmersionRequestDto.latitude,
-      distance_km: searchImmersionRequestDto.distance_km,
+      rome,
+      lon: longitude,
+      lat: latitude,
+      distance_km,
     };
 
     const shouldCallLaBonneBoite: boolean =
@@ -125,6 +129,10 @@ export class CallLaBonneBoiteAndUpdateRepositories extends TransactionalUseCase<
       });
     await uow.establishmentAggregateRepository.createImmersionOffersToEstablishments(
       immersionOffersWithSiretsToAdd,
+    );
+    // eslint-disable-next-line no-console
+    console.timeEnd(
+      `updateReposFromLBBduration-${rome}-${latitude}-${longitude}`,
     );
   }
 

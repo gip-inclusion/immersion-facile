@@ -38,6 +38,10 @@ export class SearchImmersion extends TransactionalUseCase<
     uow: UnitOfWork,
     apiConsumer: ApiConsumer,
   ): Promise<SearchImmersionResultDto[]> {
+    // eslint-disable-next-line no-console
+    console.time(
+      `searchImmersionDuration-${params.rome}-${params.latitude}-${params.longitude}`,
+    );
     const apiConsumerName = apiConsumer?.consumer;
 
     const searchMade: SearchMade = {
@@ -76,6 +80,11 @@ export class SearchImmersion extends TransactionalUseCase<
     );
 
     histogramSearchImmersionStoredCount.observe(resultsFromStorage.length);
+
+    // eslint-disable-next-line no-console
+    console.timeEnd(
+      `searchImmersionDuration-${params.rome}-${params.latitude}-${params.longitude}`,
+    );
 
     return resultsFromStorage;
   }
