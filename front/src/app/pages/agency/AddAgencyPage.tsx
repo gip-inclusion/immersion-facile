@@ -27,7 +27,6 @@ import {
   useFormContents,
 } from "src/app/hooks/formContents.hooks";
 import { formAgencyFieldsLabels } from "src/app/contents/forms/agency/formAgency";
-import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 
 import { SubmitHandler, useForm, FormProvider } from "react-hook-form";
@@ -115,26 +114,24 @@ export const AddAgencyPage = () => {
             <AgencyFormCommonFields />
             <AgencyLogoUpload />
 
-            <div className={fr.cx("fr-mt-4w")}>
-              <ErrorNotifications
-                labels={getFormErrors()}
-                errors={toDotNotation(formErrorsToFlatErrors(errors))}
-                visible={submitCount !== 0 && Object.values(errors).length > 0}
-              />
-              <SubmitFeedbackNotification
-                submitFeedback={submitFeedback}
-                messageByKind={agencySubmitMessageByKind}
-              />
-              <Button
-                type="submit"
-                disabled={isSubmitting || submitFeedback.kind !== "idle"}
-                nativeButtonProps={{
-                  id: "im-form-add-agency__submit-button",
-                }}
-              >
-                Soumettre
-              </Button>
-            </div>
+            <ErrorNotifications
+              labels={getFormErrors()}
+              errors={toDotNotation(formErrorsToFlatErrors(errors))}
+              visible={submitCount !== 0 && Object.values(errors).length > 0}
+            />
+            <SubmitFeedbackNotification
+              submitFeedback={submitFeedback}
+              messageByKind={agencySubmitMessageByKind}
+            />
+            <Button
+              type="submit"
+              disabled={isSubmitting || submitFeedback.kind !== "idle"}
+              nativeButtonProps={{
+                id: "im-form-add-agency__submit-button",
+              }}
+            >
+              Soumettre
+            </Button>
           </form>
         </FormProvider>
       </MainWrapper>

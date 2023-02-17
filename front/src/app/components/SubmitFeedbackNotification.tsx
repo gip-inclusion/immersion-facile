@@ -18,7 +18,7 @@ export const SubmitFeedbackNotification = <T extends string>({
   if (submitFeedback.kind === "idle") return null;
 
   return (
-    <div className={fr.cx("fr-mt-4w")}>
+    <div className={fr.cx("fr-my-2w")}>
       {isFeedbackError(submitFeedback) ? (
         <Alert
           severity="error"
