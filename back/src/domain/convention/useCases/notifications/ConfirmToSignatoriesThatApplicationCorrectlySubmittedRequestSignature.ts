@@ -69,6 +69,7 @@ export class ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignatu
             internshipKind: convention.internshipKind,
             signatoryName: `${signatory.firstName} ${signatory.lastName}`,
             beneficiaryName: `${beneficiary.firstName} ${beneficiary.lastName}`,
+            establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
             establishmentRepresentativeName: `${establishmentRepresentative.firstName} ${establishmentRepresentative.lastName}`,
             beneficiaryRepresentativeName:
               beneficiaryRepresentative &&

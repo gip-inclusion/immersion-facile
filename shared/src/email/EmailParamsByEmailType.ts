@@ -148,6 +148,7 @@ export type EmailParamsByEmailType = {
     internshipKind: InternshipKind;
     beneficiaryName: string;
     establishmentRepresentativeName: string;
+    establishmentTutorName: string;
     beneficiaryRepresentativeName?: string;
     beneficiaryCurrentEmployerName?: string;
     signatoryName: string;

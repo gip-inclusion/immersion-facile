@@ -338,6 +338,7 @@ export const defaultEmailValueByEmailKind: {
     internshipKind: "immersion",
     beneficiaryName: "BENEFICIARY_NAME",
     establishmentRepresentativeName: "ESTABLISHMENT_REPRESENTATIVE_NAME",
+    establishmentTutorName: "ESTABLISHMENT_TUTOR_NAME",
     beneficiaryRepresentativeName: undefined,
     signatoryName: "SIGNATORY_NAME",
     magicLink: "MAGIC_LINK",

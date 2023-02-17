@@ -26,6 +26,7 @@ describe("SendingBlueHtmlEmailGateway manual", () => {
         conventionStatusLink: "www.google.com",
         businessName: "Super Corp",
         establishmentRepresentativeName: "Stéphane Le Rep",
+        establishmentTutorName: "Joe le tuteur",
         beneficiaryName: "John Doe",
         signatoryName: "John Doe",
         agencyLogoUrl: "http://toto",

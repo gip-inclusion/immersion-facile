@@ -247,10 +247,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
 
       ${
         emergencyContactInfos
-          ? `Si la situation l'impose, le contact d'urgence de ${beneficiaryFirstName} ${beneficiaryLastName} :
-        ${emergencyContactInfos}
-        
-        `
+          ? `Si la situation l'impose, le contact d'urgence de ${beneficiaryFirstName} ${beneficiaryLastName} : ${emergencyContactInfos}`
           : ""
       }      
       ${
@@ -366,7 +363,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       - du ${dateStart}
       - au ${dateEnd}
       
-      <strong>Entreprise  d'accueil :</strong>
+      <strong>Entreprise d'accueil :</strong>
       - ${businessName}
       - ${immersionAddress}
 
@@ -653,6 +650,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       signatoryName,
       beneficiaryName,
       businessName,
+      establishmentTutorName,
       establishmentRepresentativeName,
       beneficiaryRepresentativeName,
       beneficiaryCurrentEmployerName,
@@ -680,14 +678,14 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
           ? `\n- L'employeur actuel du bénéficiare ${beneficiaryCurrentEmployerName}`
           : ""
       }
-           - L'entreprise ${businessName}
-           - Le tuteur dans l'entreprise ${establishmentRepresentativeName}
+           - L'entreprise ${businessName} représentée par ${establishmentRepresentativeName}
+           - Le tuteur dans l'entreprise ${establishmentTutorName}
         
           <strong>Votre confirmation est obligatoire</strong> pour permettre à votre ${
             internshipKind === "immersion"
               ? "conseiller"
               : "conseiller de la Chambre de Commerce et d'Instrustrie - CCI"
-          } de valider la convention. Merci  !
+          } de valider la convention. Merci !
         
         Vous devez maintenant confirmer votre demande.`,
       buttons: [
