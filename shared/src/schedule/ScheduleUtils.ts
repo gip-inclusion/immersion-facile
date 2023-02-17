@@ -105,7 +105,6 @@ const reasonableTimePeriods: TimePeriodsDto = [
 ];
 export const reasonableSchedule = (interval: DateIntervalDto): ScheduleDto => {
   const complexSchedule = makeComplexSchedule(interval, reasonableTimePeriods);
-
   return {
     totalHours:
       calculateTotalImmersionHoursFromComplexSchedule(complexSchedule),
@@ -453,10 +452,13 @@ export const scheduleWithFirstDayActivity = (
 export const makeDailySchedule = (
   date: Date,
   schedules: TimePeriodsDto,
-): DailyScheduleDto => ({
-  date: date.toISOString(),
-  timePeriods: [...schedules],
-});
+): DailyScheduleDto => {
+  const timePeriods = JSON.parse(JSON.stringify(schedules));
+  return {
+    date: date.toISOString(),
+    timePeriods,
+  };
+};
 
 export const makeComplexSchedule = (
   { start, end }: DateIntervalDto,
