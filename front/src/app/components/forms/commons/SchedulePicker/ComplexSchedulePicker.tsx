@@ -10,6 +10,7 @@ import { DayPicker } from "./DayPicker";
 import { HourPicker } from "./HourPicker";
 import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
+import { clone } from "ramda";
 
 type ComplexSchedulePickerProps = {
   disabled?: boolean;
@@ -34,7 +35,7 @@ export const ComplexSchedulePicker = ({
         complexSchedule={field.value.complexSchedule}
         selectedIndex={field.value.selectedIndex}
         onChange={(lastClickedIndex) => {
-          const updatedSchedule = JSON.parse(JSON.stringify(field.value));
+          const updatedSchedule = clone(field.value);
           updatedSchedule.selectedIndex = lastClickedIndex;
           setValue(updatedSchedule);
         }}

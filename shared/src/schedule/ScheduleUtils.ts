@@ -1,5 +1,5 @@
 import { addDays, addHours, format, getDay, parseISO } from "date-fns";
-import { prop } from "ramda";
+import { clone, prop } from "ramda";
 
 import {
   DailyScheduleDto,
@@ -453,7 +453,7 @@ export const makeDailySchedule = (
   date: Date,
   schedules: TimePeriodsDto,
 ): DailyScheduleDto => {
-  const timePeriods = JSON.parse(JSON.stringify(schedules));
+  const timePeriods = clone(schedules);
   return {
     date: date.toISOString(),
     timePeriods,

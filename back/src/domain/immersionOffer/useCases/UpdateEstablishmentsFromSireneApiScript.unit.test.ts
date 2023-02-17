@@ -5,8 +5,8 @@ import { SireneEstablishmentVOBuilder } from "../../../_testBuilders/SireneEstab
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
-import { EstablishmentEntityV2 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
-import { UpdateEstablishmentsFromSireneApiScript } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentsFromSireneApiScript";
+import { EstablishmentEntityV2 } from "../entities/EstablishmentEntity";
+import { UpdateEstablishmentsFromSireneApiScript } from "./UpdateEstablishmentsFromSireneApiScript";
 import { InMemorySireneGateway } from "../../../adapters/secondary/sirene/InMemorySireneGateway";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 

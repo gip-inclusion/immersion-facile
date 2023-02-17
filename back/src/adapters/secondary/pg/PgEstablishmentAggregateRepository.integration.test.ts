@@ -1786,6 +1786,6 @@ describe("Postgres implementation of immersion offer repository", () => {
   ) => {
     expect(JSON.parse(JSON.stringify(actual))).toEqual(
       JSON.parse(JSON.stringify(expected)),
-    ); // parse and stringinfy to avoid comparing no key vs. undefined key
+    ); // parse and stringify to avoid comparing no key vs. undefined key (Does not work with clone() from ramda)
   };
 });

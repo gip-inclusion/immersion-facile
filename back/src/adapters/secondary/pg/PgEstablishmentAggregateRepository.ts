@@ -34,7 +34,7 @@ const offersEqual = (a: ImmersionOfferEntityV2, b: ImmersionOfferEntityV2) =>
   a.romeCode === b.romeCode && a.appellationCode == b.appellationCode;
 
 const objectsDeepEqual = <T>(a: T, b: T) =>
-  equals(JSON.parse(JSON.stringify(a)), JSON.parse(JSON.stringify(b)));
+  equals(JSON.parse(JSON.stringify(a)), JSON.parse(JSON.stringify(b))); // replacing with clone() would does not work here
 
 const establishmentsEqual = (
   a: EstablishmentEntityV2,

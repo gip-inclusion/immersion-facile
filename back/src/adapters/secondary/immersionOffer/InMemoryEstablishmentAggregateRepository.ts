@@ -154,7 +154,7 @@ export class InMemoryEstablishmentAggregateRepository
               ...aggregate,
               establishment: {
                 ...aggregate.establishment,
-                ...JSON.parse(JSON.stringify(propertiesToUpdate)), // parse and stringify to drop undefined values from propertiesToUpdate
+                ...JSON.parse(JSON.stringify(propertiesToUpdate)), // parse and stringify to drop undefined values from propertiesToUpdate (Does not work with clone() from ramda)
                 updatedAt: propertiesToUpdate.updatedAt,
               },
             }
