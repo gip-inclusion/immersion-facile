@@ -8,5 +8,5 @@ export const absoluteUrlSchema = z
   .string()
   .regex(/^https?:\/\/.+?$/) as z.Schema<AbsoluteUrl>;
 
-export const toAbsoluteUrl = (string: string): AbsoluteUrl =>
-  !/^https?:\/\//i.test(string) ? `https://${string}` : (string as AbsoluteUrl);
+export const toAbsoluteUrl = (url: string): AbsoluteUrl =>
+  !/^https?:\/\//i.test(url) ? `https://${url}` : (url as AbsoluteUrl);
