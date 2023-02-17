@@ -111,16 +111,17 @@ export const AddAgencyPage = () => {
           <form onSubmit={handleSubmit(onFormValid)}>
             <AgencyFormCommonFields />
             <AgencyLogoUpload />
-            <ErrorNotifications
-              labels={getFormErrors()}
-              errors={toDotNotation(errors)}
-              visible={submitCount !== 0 && Object.values(errors).length > 0}
-            />
-            <SubmitFeedbackNotification
-              submitFeedback={submitFeedback}
-              messageByKind={agencySubmitMessageByKind}
-            />
+
             <div className={fr.cx("fr-mt-4w")}>
+              <ErrorNotifications
+                labels={getFormErrors()}
+                errors={toDotNotation(errors)}
+                visible={submitCount !== 0 && Object.values(errors).length > 0}
+              />
+              <SubmitFeedbackNotification
+                submitFeedback={submitFeedback}
+                messageByKind={agencySubmitMessageByKind}
+              />
               <Button
                 type="submit"
                 disabled={isSubmitting || submitFeedback.kind !== "idle"}
