@@ -4,6 +4,7 @@ import {
   SearchMadeId,
 } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { SearchMadeRepository } from "../../../domain/immersionOffer/ports/SearchMadeRepository";
+import { optional } from "./pgUtils";
 
 export class PgSearchMadeRepository implements SearchMadeRepository {
   constructor(private client: PoolClient) {}
@@ -11,8 +12,8 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
   async insertSearchMade(searchMade: SearchMadeEntity) {
     await this.client.query(
       `INSERT INTO searches_made (
-         id, ROME, lat, lon, distance, needsToBeSearched, gps, voluntary_to_immersion, api_consumer_name, sorted_by, address
-       ) VALUES ($1, $2, $3, $4, $5, $6, ST_GeographyFromText($7), $8, $9, $10, $11)`,
+         id, ROME, lat, lon, distance, needsToBeSearched, gps, voluntary_to_immersion, api_consumer_name, sorted_by, address, appellation_code
+       ) VALUES ($1, $2, $3, $4, $5, $6, ST_GeographyFromText($7), $8, $9, $10, $11, $12)`,
       [
         searchMade.id,
         searchMade.rome,
@@ -25,6 +26,7 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
         searchMade.apiConsumerName,
         searchMade.sortedBy,
         searchMade.place,
+        searchMade.appellationCode,
       ],
     );
   }
@@ -39,10 +41,13 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
         distance_km: row.distance,
         lat: row.lat,
         lon: row.lon,
-        rome: row.rome,
+        rome: optional(row.rome),
         needsToBeSearched: row.needstobesearched,
         sortedBy: row.sorted_by,
         place: row.address,
+        appellationCode: optional(row.appellation_code),
+        apiConsumerName: optional(row.api_consumer_name),
+        voluntaryToImmersion: row.voluntary_to_immersion,
       }),
     );
   }
