@@ -19,11 +19,7 @@ import { AppellationList } from "./AppellationList";
 import { BusinessContact } from "./BusinessContact";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import { useStyles } from "tss-react/dsfr";
-import {
-  establishmentToSearchResultPreview,
-  SearchResult,
-} from "../../search/SearchResult";
+import { SearchResultPreview } from "./SearchResultPreview";
 
 type EstablishmentFormProps = {
   initialValues: FormEstablishmentDto;
@@ -48,7 +44,6 @@ export const EstablishmentFormikForm = ({
   const { getFormErrors, getFormFields } = useFormContents(
     formEstablishmentFieldsLabels,
   );
-  const { cx } = useStyles();
   const formContents = getFormFields();
   let errorMessage = submitError?.message;
 
@@ -158,27 +153,7 @@ export const EstablishmentFormikForm = ({
               </>
             )}
             {Object.values(errors).length === 0 && (
-              <section className={cx("im-establishment-preview")}>
-                <h2 className={fr.cx("fr-text--lead", "fr-mb-2w")}>
-                  Prévisualisation de votre entreprise
-                </h2>
-                <p className={fr.cx("fr-hint-text")}>
-                  Voici un exemple d'aperçu de votre entreprise, tel qu'il
-                  apparaitra dans notre moteur de recherche
-                </p>
-                <div
-                  className={cx(
-                    fr.cx("fr-grid-row", "fr-mb-4w"),
-                    "im-establishment-preview__inner",
-                  )}
-                >
-                  <SearchResult
-                    establishment={establishmentToSearchResultPreview(values)}
-                    preview
-                    layout="fr-col-md-6"
-                  />
-                </div>
-              </section>
+              <SearchResultPreview establishment={values} />
             )}
 
             <ErrorNotifications

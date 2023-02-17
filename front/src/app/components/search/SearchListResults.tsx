@@ -63,7 +63,7 @@ export const SearchListResults = () => {
           {displayedResults.map((searchResult) => (
             <SearchResult
               key={searchResult.siret + "-" + searchResult.rome} // Should be unique !
-              searchResult={searchResult}
+              establishment={searchResult}
               onButtonClick={() =>
                 dispatch({
                   type: "CLICKED_OPEN",

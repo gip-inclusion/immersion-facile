@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import {
   addressDtoToString,
   ContactMethod,
-  FormEstablishmentDto,
   SearchImmersionResultDto,
 } from "shared";
 import { getMapsLink } from "./ContactEstablishmentModal";
@@ -22,41 +21,6 @@ export type EnterpriseSearchResultProps = {
 };
 
 const componentName = "im-search-result";
-
-export const establishmentToSearchResultPreview = (
-  establishment: FormEstablishmentDto,
-): SearchImmersionResultDto => ({
-  ...establishment,
-  rome:
-    establishment.appellations.length > 0
-      ? establishment.appellations[0].romeCode
-      : "",
-  romeLabel:
-    establishment.appellations.length > 0
-      ? establishment.appellations[0].romeLabel
-      : "",
-  appellationLabels: establishment.appellations.map(
-    (appellation) => appellation.appellationLabel,
-  ),
-  nafLabel: establishment.naf?.nomenclature || "",
-  naf: establishment.naf?.code || "",
-  name:
-    establishment.businessNameCustomized ||
-    establishment.businessName ||
-    "Mon entreprise",
-  // Fake data
-  voluntaryToImmersion: true,
-  position: {
-    lat: 0,
-    lon: 0,
-  },
-  address: {
-    streetNumberAndAddress: establishment.businessAddress,
-    city: "",
-    departmentCode: "",
-    postcode: "",
-  },
-});
 
 export const SearchResult = ({
   onButtonClick,
