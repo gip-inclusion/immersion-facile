@@ -86,7 +86,7 @@ export * from "./utils/toDotNotation";
 export * from "./utils/csv";
 export * from "./zodUtils";
 export * from "./test.helpers";
-export { absoluteUrlSchema } from "./AbsoluteUrl";
+export { absoluteUrlSchema, toAbsoluteUrl } from "./AbsoluteUrl";
 export { HttpClientError as LegacyHttpClientError } from "./httpClient/errors/4xxClientError.error";
 export { HttpServerError as LegacyHttpServerError } from "./httpClient/errors/5xxServerError.error";
 export * from "./apiAdresse/departmentNameToDepartmentCode";

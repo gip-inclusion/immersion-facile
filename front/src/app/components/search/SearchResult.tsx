@@ -10,6 +10,7 @@ import { getMapsLink } from "./ContactEstablishmentModal";
 import LinesEllipsis from "react-lines-ellipsis";
 import "./SearchResult.scss";
 import { useStyles } from "tss-react/dsfr";
+import { toAbsoluteUrl } from "shared";
 
 export type EnterpriseSearchResultProps = {
   searchResult: SearchImmersionResultDto;
@@ -107,7 +108,7 @@ export const SearchResult = ({
               </li>
               {website && (
                 <li>
-                  <a href={website} target="_blank">
+                  <a href={toAbsoluteUrl(website)} target="_blank">
                     Voir le site de l'entreprise
                   </a>
                 </li>
