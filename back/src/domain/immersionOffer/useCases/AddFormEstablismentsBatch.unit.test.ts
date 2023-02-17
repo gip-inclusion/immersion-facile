@@ -41,7 +41,6 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
     uow.romeRepository.appellations =
       defaultValidFormEstablishment.appellations;
     uow.featureFlagRepository = new InMemoryFeatureFlagRepository({
-      enableAdminUi: false,
       enableInseeApi: true,
     });
 

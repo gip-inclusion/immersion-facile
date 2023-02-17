@@ -26,7 +26,6 @@ describe("PG getFeatureFlags", () => {
   it("gets all the Feature Flags of the app", async () => {
     const expectedFeatureFlags: FeatureFlags = {
       enableInseeApi: true,
-      enableAdminUi: true,
       enablePeConnectApi: true,
       enableLogoUpload: false,
       enablePeConventionBroadcast: true,
@@ -39,7 +38,6 @@ describe("PG getFeatureFlags", () => {
 
     expectTypeToMatchAndEqual(featureFlags, {
       enableInseeApi: true,
-      enableAdminUi: true,
       enablePeConnectApi: true,
       enableLogoUpload: false,
       enablePeConventionBroadcast: true,
@@ -50,7 +48,6 @@ describe("PG getFeatureFlags", () => {
   it("sets a Feature Flag to the given value", async () => {
     const initialFeatureFlags: FeatureFlags = {
       enableInseeApi: true,
-      enableAdminUi: true,
       enablePeConnectApi: true,
       enablePeConventionBroadcast: true,
       enableLogoUpload: false,
@@ -68,7 +65,6 @@ describe("PG getFeatureFlags", () => {
 
     expectTypeToMatchAndEqual(featureFlags, {
       enableInseeApi: true,
-      enableAdminUi: true,
       enablePeConnectApi: true,
       enablePeConventionBroadcast: true,
       enableLogoUpload: true,

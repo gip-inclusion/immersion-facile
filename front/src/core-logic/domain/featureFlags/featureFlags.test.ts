@@ -11,7 +11,6 @@ import {
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 
 const defaultFeatureFlags: FeatureFlags = {
-  enableAdminUi: false,
   enableInseeApi: true,
   enablePeConnectApi: false,
   enableLogoUpload: false,
@@ -20,7 +19,6 @@ const defaultFeatureFlags: FeatureFlags = {
 };
 
 const flagsFromApi: FeatureFlags = {
-  enableAdminUi: true,
   enableInseeApi: true,
   enablePeConnectApi: true,
   enableLogoUpload: false,

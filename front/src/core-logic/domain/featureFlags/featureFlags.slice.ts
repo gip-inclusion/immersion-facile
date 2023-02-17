@@ -6,7 +6,6 @@ export type FeatureFlagsState = FeatureFlags & {
 };
 
 const initialState: FeatureFlagsState = {
-  enableAdminUi: false,
   enableInseeApi: true,
   enablePeConnectApi: false,
   enableLogoUpload: false,

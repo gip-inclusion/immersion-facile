@@ -38,7 +38,6 @@ describe("Add FormEstablishment", () => {
     romeRepository = uow.romeRepository;
     romeRepository.appellations = defaultValidFormEstablishment.appellations;
     uow.featureFlagRepository = new InMemoryFeatureFlagRepository({
-      enableAdminUi: false,
       enableInseeApi: true,
     });
 
@@ -163,7 +162,6 @@ describe("Add FormEstablishment", () => {
     describe("when feature flag to do siret validation is OFF", () => {
       it("accepts formEstablishment with SIRETs that don't correspond to active businesses and quarantines events", async () => {
         const featureFlagRepository = new InMemoryFeatureFlagRepository({
-          enableAdminUi: false,
           enableInseeApi: false,
         });
         uowPerformer.setUow({

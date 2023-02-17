@@ -37,7 +37,6 @@ describe("Update Convention", () => {
     conventionRepository = uow.conventionRepository;
     outboxRepo = uow.outboxRepository;
     uow.featureFlagRepository = new InMemoryFeatureFlagRepository({
-      enableAdminUi: false,
       enableInseeApi: true,
     });
 

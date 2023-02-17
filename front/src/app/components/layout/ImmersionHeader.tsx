@@ -5,7 +5,6 @@ import React from "react";
 import { useDispatch } from "react-redux";
 import { routes, useRoute } from "src/app/routes/routes";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { adminAuthSlice } from "src/core-logic/domain/admin/adminAuth/adminAuth.slice";
 import { Header, HeaderProps } from "@codegouvfr/react-dsfr/Header";
@@ -14,10 +13,10 @@ import {
   headerFooterDisplayItem,
 } from "@codegouvfr/react-dsfr/Display";
 import { MainNavigationProps } from "@codegouvfr/react-dsfr/MainNavigation";
+
 const getHeaderNavLinkId = (chunk: string) => `im-header-nav__${chunk}`;
 
 export const ImmersionHeader = () => {
-  const featureFlags = useFeatureFlags();
   const dispatch = useDispatch();
   const currentRoute = useRoute();
   const darkModeState = useIsDark();
@@ -153,7 +152,7 @@ export const ImmersionHeader = () => {
       ],
     },
   ];
-  if (isAdminConnected && featureFlags.enableAdminUi) {
+  if (isAdminConnected) {
     links.push({
       text: "Admin",
       isActive:

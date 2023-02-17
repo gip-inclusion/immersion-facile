@@ -42,7 +42,6 @@ describe("Add Convention", () => {
     conventionRepository = uow.conventionRepository;
     outboxRepository = uow.outboxRepository;
     uow.featureFlagRepository = new InMemoryFeatureFlagRepository({
-      enableAdminUi: false,
       enableInseeApi: true,
     });
     timeGateway = new CustomTimeGateway();
@@ -135,7 +134,6 @@ describe("Add Convention", () => {
       it("accepts applications with SIRETs that don't correspond to active businesses", async () => {
         uowPerformer.setUow({
           featureFlagRepository: new InMemoryFeatureFlagRepository({
-            enableAdminUi: false,
             enableInseeApi: false,
           }),
         });

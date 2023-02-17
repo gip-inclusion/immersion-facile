@@ -8,7 +8,6 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 
 const labelsByFeatureFlag: Record<FeatureFlag, string> = {
-  enableAdminUi: "Ui Admin",
   enableInseeApi: "API insee (siret)",
   enableLogoUpload: "Upload de logos (pour agences)",
   enablePeConnectApi: "PE Connect",

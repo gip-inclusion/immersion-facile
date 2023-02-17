@@ -24,7 +24,6 @@ export const fastForwardObservables = createScenarioUnitTest<string>(
 );
 
 const defaultFlagsInFront: FeatureFlags = {
-  enableAdminUi: true,
   enableInseeApi: true,
   enablePeConnectApi: true,
   enableLogoUpload: true,
