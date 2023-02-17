@@ -148,7 +148,7 @@ export class PgAgencyRepository implements AgencyRepository {
     const pgResult = await this.client.query(
       "SELECT id, name, status, kind, counsellor_emails, validator_emails, \
         admin_emails, questionnaire_url, email_signature, logo_url, ST_AsGeoJSON(position) AS position, \
-        street_number_and_address, post_code, city, department_code \
+        street_number_and_address, post_code, city, department_code, agency_siret, code_safir \
       FROM public.agencies\
       WHERE id = $1",
       [id],

@@ -1,5 +1,7 @@
 import React from "react";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { useStyles } from "tss-react/dsfr";
+import { fr } from "@codegouvfr/react-dsfr";
 
 const componentName = "im-notification-errors";
 
@@ -34,12 +36,13 @@ export const ErrorNotifications = ({
   errors,
   visible,
 }: ErrorNotificationsProps) => {
+  const { cx } = useStyles();
   if (!visible) return null;
   return (
     <Alert
       severity="error"
       title="Veuillez corriger les erreurs suivantes"
-      className={`${componentName}`}
+      className={cx(componentName, fr.cx("fr-my-2w"))}
       description={
         <ul className={`${componentName}__error-list`}>
           {Object.keys(errors).map((field) => {

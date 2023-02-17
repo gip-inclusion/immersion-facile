@@ -22,7 +22,10 @@ import { agencyGateway } from "src/config/dependencies";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { AgencySubmitFeedback } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
 import { v4 as uuidV4 } from "uuid";
-import { useFormContents } from "src/app/hooks/formContents.hooks";
+import {
+  formErrorsToFlatErrors,
+  useFormContents,
+} from "src/app/hooks/formContents.hooks";
 import { formAgencyFieldsLabels } from "src/app/contents/forms/agency/formAgency";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
@@ -115,7 +118,7 @@ export const AddAgencyPage = () => {
             <div className={fr.cx("fr-mt-4w")}>
               <ErrorNotifications
                 labels={getFormErrors()}
-                errors={toDotNotation(errors)}
+                errors={toDotNotation(formErrorsToFlatErrors(errors))}
                 visible={submitCount !== 0 && Object.values(errors).length > 0}
               />
               <SubmitFeedbackNotification

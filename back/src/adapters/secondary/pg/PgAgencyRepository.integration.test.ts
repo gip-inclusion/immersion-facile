@@ -74,7 +74,10 @@ describe("PgAgencyRepository", () => {
   });
 
   describe("getById", () => {
-    const agency1 = agency1builder.build();
+    const agency1 = agency1builder
+      .withAgencySiret("01234567890123")
+      .withCodeSafir("AZERTY")
+      .build();
 
     it("returns existing agency", async () => {
       await agencyRepository.insert(agency1);

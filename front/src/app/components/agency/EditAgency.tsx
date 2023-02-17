@@ -74,7 +74,6 @@ const EditAgencyForm = ({ agency }: { agency: AgencyDto }) => {
     mode: "onTouched",
     defaultValues: agency,
   });
-
   const {
     register,
     setValue,
