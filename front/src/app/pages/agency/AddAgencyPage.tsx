@@ -77,9 +77,6 @@ export const AddAgencyPage = () => {
     formState: { isSubmitting, errors, submitCount },
   } = methods;
 
-  // const getFieldError = makeFieldError(formState);
-  //
-
   const onFormValid: SubmitHandler<CreateAgencyInitialValues> = (values) => {
     if (values.kind === "") throw new Error("Agency kind is empty");
     return agencyGateway
