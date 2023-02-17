@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { romeCodeSchema } from "../rome";
+import { appellationSchema, romeCodeSchema } from "../rome";
 import { siretSchema } from "../siret/siret";
 import { zPreprocessedBoolean, zPreprocessedNumber } from "../zodUtils";
 import { SearchImmersionQueryParamsDto } from "./SearchImmersionQueryParams.dto";
@@ -7,6 +7,7 @@ import { SearchImmersionQueryParamsDto } from "./SearchImmersionQueryParams.dto"
 export const searchImmersionQueryParamsSchema: z.Schema<SearchImmersionQueryParamsDto> =
   z.object({
     rome: romeCodeSchema.optional(),
+    appellationCode: appellationSchema.optional(),
     siret: siretSchema.optional(),
     latitude: zPreprocessedNumber(),
     longitude: zPreprocessedNumber(),
@@ -14,6 +15,6 @@ export const searchImmersionQueryParamsSchema: z.Schema<SearchImmersionQueryPara
       z.number().positive("'distance_km' doit être > 0").max(100),
     ),
     voluntaryToImmersion: zPreprocessedBoolean().optional(),
-    address: z.string().optional(),
+    place: z.string().optional(),
     sortedBy: z.enum(["distance", "date"]).optional(),
   });

@@ -33,16 +33,18 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
     const requestResult = await this.client.query(
       "SELECT * from searches_made WHERE needstobesearched=true",
     );
-    return requestResult.rows.map((row) => ({
-      id: row.id,
-      distance_km: row.distance,
-      lat: row.lat,
-      lon: row.lon,
-      rome: row.rome,
-      needsToBeSearched: row.needstobesearched,
-      sortedBy: row.sorted_by,
-      address: row.address,
-    }));
+    return requestResult.rows.map(
+      (row): SearchMadeEntity => ({
+        id: row.id,
+        distance_km: row.distance,
+        lat: row.lat,
+        lon: row.lon,
+        rome: row.rome,
+        needsToBeSearched: row.needstobesearched,
+        sortedBy: row.sorted_by,
+        place: row.address,
+      }),
+    );
   }
   public async markSearchAsProcessed(
     searchMadeId: SearchMadeId,
