@@ -105,25 +105,16 @@ export const departmentNameToDepartmentCode: Record<string, string> = {
   Mayotte: "976",
 };
 
-const nouvelleAquitaineDepartmentsCodes = [
-  "16",
-  "17",
-  "19",
-  "23",
-  "24",
-  "33",
-  "40",
-  "47",
-  "64",
-  "79",
-  "86",
-  "87",
-];
+// prettier-ignore
+const nouvelleAquitaineDepartmentsCodes = ["16", "17", "19", "23", "24", "33", "40", "47", "64", "79", "86", "87"];
 const paysDeLaLoireDepartmentsCodes = ["44", "49", "53", "72", "85"];
 const bretagneDepartmentsCodes = ["22", "29", "35", "56"];
+// prettier-ignore
+const occitanieDepartmentsCodes = ["09", "11", "12", "30", "31", "32", "34", "46", "48", "65", "66", "81", "82"];
 
 export const miniStageRestrictedDepartments = [
   ...bretagneDepartmentsCodes,
   ...nouvelleAquitaineDepartmentsCodes,
   ...paysDeLaLoireDepartmentsCodes,
+  ...occitanieDepartmentsCodes,
 ];
