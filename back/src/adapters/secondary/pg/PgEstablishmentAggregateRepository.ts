@@ -212,6 +212,7 @@ export class PgEstablishmentAggregateRepository
         contact.phone,
         contact.contactMethod,
         JSON.stringify(contact.copyEmails),
+        contact.maxContactPerWeek,
       ];
     });
 
@@ -222,7 +223,7 @@ export class PgEstablishmentAggregateRepository
     try {
       const insertContactsQuery = format(
         `INSERT INTO immersion_contacts (
-        uuid, lastname, firstname, email, job, phone, contact_mode, copy_emails
+        uuid, lastname, firstname, email, job, phone, contact_mode, copy_emails, max_contact_per_week
       ) VALUES %L`,
         contactFields,
       );

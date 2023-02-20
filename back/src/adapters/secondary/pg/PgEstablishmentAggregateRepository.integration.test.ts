@@ -848,6 +848,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         const contact = new ContactEntityV2Builder()
           .withId(contactId)
           .withContactMethod("EMAIL")
+          .withMaxContactPerWeek(5)
           .build();
 
         // Act
@@ -871,6 +872,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           establishment_siret: siret1,
           contact_mode: "EMAIL",
           copy_emails: contact.copyEmails,
+          max_contact_per_week: contact.maxContactPerWeek!,
         };
         expect(actualImmersionContactRows[0]).toMatchObject(
           expectedImmersionContactRow,
@@ -1661,6 +1663,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     establishment_siret: string;
     contact_mode: ContactMethod;
     copy_emails: string[];
+    max_contact_per_week: number | null;
   };
 
   const getAllImmersionContactsRows = async (): Promise<
