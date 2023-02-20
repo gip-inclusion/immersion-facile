@@ -63,7 +63,6 @@
     "querystring": "^0.2.1",
     "ramda": "^0.28.0",
     "shared": "workspace:*",
-    "slugify": "^1.6.5",
     "ts-node": "^10.9.1",
     "uuid": "^8.3.2",
     "zod": "3.14.2"

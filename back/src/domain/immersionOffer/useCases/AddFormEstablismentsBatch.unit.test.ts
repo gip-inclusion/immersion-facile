@@ -138,6 +138,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
 
     expect(establishmentGroupRepository.groups).toHaveLength(1);
     expectToEqual(establishmentGroupRepository.groups[0], {
+      slug: "l-amie-caline",
       name: formEstablishmentBatch.groupName,
       sirets: [
         formEstablishmentBatch.formEstablishments[0].siret,
@@ -149,6 +150,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
   it("updates Group if it already exists", async () => {
     const formEstablishmentBatch = createFormEstablishmentBatchDto();
     await establishmentGroupRepository.save({
+      slug: "l'amie-caline",
       name: formEstablishmentBatch.groupName,
       sirets: [formEstablishmentBatch.formEstablishments[0].siret],
     });
@@ -175,6 +177,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
 
     expect(establishmentGroupRepository.groups).toHaveLength(1);
     expectToEqual(establishmentGroupRepository.groups[0], {
+      slug: "l-amie-caline",
       name: formEstablishmentBatch.groupName,
       sirets: [
         formEstablishmentBatch.formEstablishments[0].siret,
@@ -195,7 +198,7 @@ const createFormEstablishmentBatchDto = (): FormEstablishmentBatchDto => {
       .build();
 
   return {
-    groupName: "Tesla",
+    groupName: "L'amie caline",
     formEstablishments: [formEstablishment1, formEstablishment2],
   };
 };

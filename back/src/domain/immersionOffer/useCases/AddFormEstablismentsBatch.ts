@@ -10,6 +10,15 @@ import { UseCase } from "../../core/UseCase";
 import { EstablishmentGroupEntity } from "../entities/EstablishmentGroupEntity";
 import { AddFormEstablishment } from "./AddFormEstablishment";
 
+const slugify = (str: string) =>
+  str
+    .trim()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[()]/g, "")
+    .toLowerCase()
+    .replace(/\W/g, "-");
+
 export class AddFormEstablishmentBatch extends UseCase<
   FormEstablishmentBatchDto,
   EstablishmentBatchReport,
@@ -29,6 +38,7 @@ export class AddFormEstablishmentBatch extends UseCase<
     groupName,
   }: FormEstablishmentBatchDto): Promise<EstablishmentBatchReport> {
     const group: EstablishmentGroupEntity = {
+      slug: slugify(groupName),
       name: groupName,
       sirets: formEstablishments.map(({ siret }) => siret),
     };

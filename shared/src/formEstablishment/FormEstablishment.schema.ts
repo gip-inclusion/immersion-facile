@@ -18,6 +18,7 @@ import {
   FormEstablishmentBatchDto,
   FormEstablishmentDto,
   FormEstablishmentSource,
+  EstablishmentGroupName,
   ImmersionContactInEstablishmentId,
 } from "./FormEstablishment.dto";
 
@@ -86,3 +87,6 @@ export const formEstablishmentBatchSchema: z.Schema<FormEstablishmentBatchDto> =
     groupName: zString,
     formEstablishments: z.array(formEstablishmentSchema),
   });
+
+export const establishmentGroupSchema: z.Schema<EstablishmentGroupName> =
+  zString;

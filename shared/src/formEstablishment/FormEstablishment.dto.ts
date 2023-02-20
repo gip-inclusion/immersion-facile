@@ -69,8 +69,10 @@ export type EstablishmentCSVRow = {
   fitForDisabledWorkers: CSVBoolean;
 };
 
+export type EstablishmentGroupName = Flavor<string, "EstablishmentGroupName">;
+
 export type FormEstablishmentBatchDto = {
-  groupName: string;
+  groupName: EstablishmentGroupName;
   formEstablishments: FormEstablishmentDto[];
 };
 
