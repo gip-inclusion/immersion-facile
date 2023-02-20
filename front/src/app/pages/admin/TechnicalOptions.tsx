@@ -27,7 +27,7 @@ export const TechnicalOptions = () => {
           <div className={fr.cx("fr-input-group")}>
             <fieldset className={fr.cx("fr-fieldset")}>
               <div className={fr.cx("fr-fieldset__content")}>
-                {keys(featureFlags).map((featureFlagName) => (
+                {keys(labelsByFeatureFlag).map((featureFlagName) => (
                   <ToggleSwitch
                     key={featureFlagName}
                     label={labelsByFeatureFlag[featureFlagName]}
