@@ -59,6 +59,7 @@ describe("Add FormEstablishment", () => {
   it("saves an establishment in the repository", async () => {
     const formEstablishment = FormEstablishmentDtoBuilder.valid()
       .withFitForDisabledWorkers(true)
+      .withMaxContactPerWeek(9)
       .build();
 
     expect(await addFormEstablishment.execute(formEstablishment)).toEqual(

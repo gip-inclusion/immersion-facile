@@ -11,4 +11,5 @@ export type ContactEntityV2 = {
   phone: string;
   contactMethod: ContactMethod;
   copyEmails: string[];
+  maxContactPerWeek?: number;
 };

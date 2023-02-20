@@ -11,6 +11,7 @@ export type BusinessContactDtoPublicV1 = {
   email: string; // a valid email
   contactMethod: ContactMethodPublicV1;
   copyEmails: string[];
+  maxContactPerWeek?: number;
 };
 
 export type ContactMethodPublicV1 = "EMAIL" | "PHONE" | "IN_PERSON";

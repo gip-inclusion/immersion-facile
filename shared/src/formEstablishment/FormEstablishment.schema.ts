@@ -40,7 +40,11 @@ export const businessContactSchema: z.Schema<BusinessContactDto> = z.object({
   email: zEmail,
   contactMethod: preferredContactMethodSchema,
   copyEmails: z.array(zEmail),
-  maxContactPerWeek: z.number().optional(),
+  maxContactPerWeek: z
+    .number()
+    .positive({ message: "La valeur renseignée ne peut pas être négative" })
+    .int({ message: "La valeur renseignée ne peut pas contenir de décimale" })
+    .optional(),
 });
 
 const formEstablishmentSources: NotEmptyArray<FormEstablishmentSource> = [

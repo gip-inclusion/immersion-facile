@@ -7,6 +7,7 @@ import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { fr } from "@codegouvfr/react-dsfr";
+import { Input } from "@codegouvfr/react-dsfr/Input";
 
 const preferredContactMethodOptions: Array<{
   label?: string;
@@ -31,7 +32,8 @@ const preferredContactMethodOptions: Array<{
 export const BusinessContact = () => {
   const { getFormFields } = useFormContents(formEstablishmentFieldsLabels);
   const formContents = getFormFields();
-  const { values, setFieldValue } = useFormikContext<FormEstablishmentDto>();
+  const { values, setFieldValue, handleChange } =
+    useFormikContext<FormEstablishmentDto>();
   return (
     <div className={fr.cx("fr-input-group")}>
       <div>
@@ -61,9 +63,17 @@ export const BusinessContact = () => {
         options={preferredContactMethodOptions}
       />
 
-      <TextInput
-        {...formContents["businessContact.maxContactPerWeek"]}
-        type="number"
+      <Input
+        label={formContents["businessContact.maxContactPerWeek"].label}
+        hintText={formContents["businessContact.maxContactPerWeek"].description}
+        nativeInputProps={{
+          ...formContents["businessContact.maxContactPerWeek"],
+          type: "number",
+          min: 0,
+          pattern: "\\d*",
+          onChange: handleChange,
+          value: values.businessContact.maxContactPerWeek,
+        }}
       />
     </div>
   );

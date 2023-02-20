@@ -95,6 +95,13 @@ export class FormEstablishmentDtoBuilder
     });
   }
 
+  public withMaxContactPerWeek(maxContactPerWeek: number) {
+    return new FormEstablishmentDtoBuilder({
+      ...this.dto,
+      businessContact: { ...this.dto.businessContact, maxContactPerWeek },
+    });
+  }
+
   public withMail(email: string) {
     return new FormEstablishmentDtoBuilder({
       ...this.dto,
