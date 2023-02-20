@@ -2,7 +2,7 @@ import { AbsoluteUrl } from "../AbsoluteUrl";
 import { AddressDto, DepartmentCode } from "../address/address.dto";
 import { GeoPositionDto } from "../geoPosition/geoPosition.dto";
 import { Flavor } from "../typeFlavors";
-import { NotEmptyArray, RequireField } from "../utils";
+import { RequireField } from "../utils";
 
 export type AgencyStatus = (typeof allAgencyStatuses)[number];
 export const allAgencyStatuses = [
@@ -29,9 +29,7 @@ export type WithAgencyId = {
   id: AgencyId;
 };
 
-type AllowedAgencyKindToAdd = Exclude<AgencyKind, "immersion-facile">;
-
-export const agencyKindList: NotEmptyArray<AllowedAgencyKindToAdd> = [
+export const agencyKindList = [
   "pole-emploi",
   "mission-locale",
   "cap-emploi",
@@ -40,23 +38,15 @@ export const agencyKindList: NotEmptyArray<AllowedAgencyKindToAdd> = [
   "structure-IAE",
   "cci",
   "autre",
-];
+  "immersion-facile",
+] as const;
 
 export type AgencyOption = {
   id: AgencyId;
   name: string;
 };
 
-export type AgencyKind =
-  | "immersion-facile"
-  | "pole-emploi"
-  | "mission-locale"
-  | "cap-emploi"
-  | "conseil-departemental"
-  | "prepa-apprentissage"
-  | "structure-IAE"
-  | "cci"
-  | "autre";
+export type AgencyKind = (typeof agencyKindList)[number];
 
 export const activeAgencyStatuses: AgencyStatus[] = ["active", "from-api-PE"];
 

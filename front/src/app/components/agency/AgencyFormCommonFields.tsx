@@ -165,10 +165,9 @@ export const AgencyLogoUpload = () => {
   );
 };
 
-const agencyKindToLabel: Record<
-  Exclude<AgencyKind, "immersion-facile">,
-  string
-> = {
+type AllowedAgencyKindToAdd = Exclude<AgencyKind, "immersion-facile">;
+
+const agencyKindToLabel: Record<AllowedAgencyKindToAdd, string> = {
   "mission-locale": "Mission Locale",
   "pole-emploi": "Pole Emploi",
   "cap-emploi": "Cap Emploi",
@@ -179,9 +178,12 @@ const agencyKindToLabel: Record<
   autre: "Autre",
 };
 
-export const agencyListOfOptions = [
-  ...agencyKindList.map((agencyKind) => ({
+export const agencyListOfOptions = agencyKindList
+  .filter(
+    (agencyKind): agencyKind is AllowedAgencyKindToAdd =>
+      agencyKind !== "immersion-facile",
+  )
+  .map((agencyKind) => ({
     value: agencyKind,
     label: agencyKindToLabel[agencyKind],
-  })),
-];
+  }));
