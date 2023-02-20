@@ -73,7 +73,11 @@ export const AddressAutocomplete = ({
         options={options}
         value={selectedOption}
         id={id}
-        getOptionLabel={(option) => addressDtoToString(option.address)}
+        getOptionLabel={(option) => {
+          // add empty string to return because mui autocomplete return type must be string
+          if (!option.address) return "";
+          return addressDtoToString(option.address);
+        }}
         onChange={onAutocompleteChange(setSelectedOption, setFormValue)}
         onInputChange={onAutocompleteInput(setSearchTerm)}
         filterOptions={(option) => option} // https://mui.com/material-ui/react-autocomplete/#search-as-you-type
