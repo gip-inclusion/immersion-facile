@@ -1,8 +1,9 @@
 import React from "react";
 import { Link } from "type-route";
 import { useStyles } from "tss-react/dsfr";
+import { fr } from "@codegouvfr/react-dsfr";
 
-import "./FixedStamp.css";
+import "./FixedStamp.scss";
 
 type FixedStampProps = {
   image: JSX.Element;
@@ -27,7 +28,11 @@ export const FixedStamp = ({
         {overtitle && (
           <span className={cx("fixed-stamp__overtitle")}>{overtitle}</span>
         )}
-        {title && <span className={cx("fixed-stamp__title")}>{title}</span>}
+        {title && (
+          <span className={cx(fr.cx("fr-text--bold"), "fixed-stamp__title")}>
+            {title}
+          </span>
+        )}
         {subtitle && (
           <span className={cx("fixed-stamp__subtitle")}>{subtitle}</span>
         )}
