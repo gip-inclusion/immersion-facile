@@ -24,12 +24,15 @@ import { ImmersionAssessmentPage } from "../pages/immersion-assessment/Immersion
 import {
   AdminTab,
   adminTabs,
+  AuthorizedGroupSlugs,
+  authorizedGroupSlugs,
   StandardPageSlugs,
   standardPageSlugs,
 } from "./route-params";
 import { routes, useRoute } from "./routes";
 import { ConventionPageForExternals } from "../pages/convention/ConventionPageForExternals";
 import { ConventionCustomAgencyPage } from "../pages/convention/ConventionCustomAgencyPage";
+import { GroupPage } from "../pages/group/GroupPage";
 
 type Routes = typeof routes;
 
@@ -83,6 +86,14 @@ const getPageByRouteName: {
   standard: (route) =>
     standardPageSlugs.includes(route.params.pagePath as StandardPageSlugs) ? (
       <StandardLayout route={route} />
+    ) : (
+      <ErrorPage type="httpClientNotFoundError" />
+    ),
+  group: (route) =>
+    authorizedGroupSlugs.includes(
+      route.params.groupName as AuthorizedGroupSlugs,
+    ) ? (
+      <GroupPage route={route} />
     ) : (
       <ErrorPage type="httpClientNotFoundError" />
     ),

@@ -54,8 +54,8 @@ export const ErrorPageContent = ({
           dangerouslySetInnerHTML={{ __html: content.description }}
         />
         <ul className={fr.cx("fr-btns-group", "fr-btns-group--inline-md")}>
-          {content.buttons.map((button: ErrorButton) => (
-            <li>
+          {content.buttons.map((button: ErrorButton, index) => (
+            <li key={`${button.kind}-${index}`}>
               {button.onClick ? (
                 <button
                   className={cx(fr.cx("fr-btn"), `fr-btn--${button.kind}`)}

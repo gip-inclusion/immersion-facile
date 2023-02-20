@@ -1,7 +1,10 @@
 import React from "react";
 import { routes, useRoute } from "src/app/routes/routes";
 import { Route } from "type-route";
-import { StandardPageSlugs } from "src/app/routes/route-params";
+import {
+  AuthorizedGroupSlugs,
+  StandardPageSlugs,
+} from "src/app/routes/route-params";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import {
   adminMetaContent,
@@ -9,6 +12,7 @@ import {
   metaContents,
   standardMetaContent,
   defaultMetaContents,
+  groupMetaContent,
 } from "src/app/contents/meta/metaContents";
 
 export const MetaContent = (): JSX.Element => {
@@ -40,6 +44,9 @@ const getMetaContents = (
   if (route.name) {
     if (route.name === "standard") {
       return standardMetaContent[route.params.pagePath as StandardPageSlugs];
+    }
+    if (route.name === "group") {
+      return groupMetaContent(route.params.groupName as AuthorizedGroupSlugs);
     }
     if (route.name === "adminTab") {
       return adminMetaContent[route.params.tab];

@@ -10,6 +10,7 @@ type PageHeaderProps = {
   usePatterns?: boolean;
   centered?: boolean;
   theme?: "default" | "candidate" | "establishment" | "agency";
+  classes?: Partial<Record<"root" | "inner" | "title", string>>;
 };
 
 const componentName = "im-page-header";
@@ -21,6 +22,7 @@ export const PageHeader = ({
   usePatterns,
   centered,
   theme = "default",
+  classes = {},
 }: PageHeaderProps) => {
   const { cx } = useStyles();
   return (
@@ -30,13 +32,19 @@ export const PageHeader = ({
         componentName,
         `${componentName}--${theme}`,
         ` ${className ?? ""}`,
+        classes.root,
       )}
     >
-      <div className={cx(`${componentName}__inner fr-container`)}>
+      <div
+        className={cx(`${componentName}__inner fr-container`, classes.inner)}
+      >
         <h1
-          className={`${componentName}__title ${
-            centered ? `${componentName}__title--centered` : ""
-          } ${children ? "" : "fr-my-auto"}`}
+          className={cx(
+            `${componentName}__title`,
+            centered && `${componentName}__title--centered`,
+            children ? "" : "fr-my-auto",
+            classes.title,
+          )}
         >
           {title}
         </h1>

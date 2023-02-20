@@ -18,6 +18,7 @@ export const frontRoutes = {
   homeAgencies: "accueil-prescripteurs",
   standard: "pages",
   conventionStatusDashboard: "statut-convention",
+  group: "enseigne",
 };
 
 export const getConventionStatusDashboard = "status-convention";

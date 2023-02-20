@@ -1,6 +1,10 @@
 import { AppellationDto, ScheduleDto } from "shared";
 import { param, ValueSerializer } from "type-route";
 
+export type AuthorizedGroupSlugs = (typeof authorizedGroupSlugs)[number];
+
+export const authorizedGroupSlugs = ["decathlon"] as const;
+
 export type StandardPageSlugs = (typeof standardPageSlugs)[number];
 
 export const standardPageSlugs = [
@@ -34,6 +38,11 @@ export const adminTabSerializer: ValueSerializer<AdminTab> = {
 
 export const standardPagesSerializer: ValueSerializer<StandardPageSlugs> = {
   parse: (raw) => raw as StandardPageSlugs,
+  stringify: (page) => page,
+};
+
+export const groupsSerializer: ValueSerializer<AuthorizedGroupSlugs> = {
+  parse: (raw) => raw as AuthorizedGroupSlugs,
   stringify: (page) => page,
 };
 

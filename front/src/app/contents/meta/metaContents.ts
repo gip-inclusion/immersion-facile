@@ -1,4 +1,8 @@
-import { AdminTab, StandardPageSlugs } from "src/app/routes/route-params";
+import {
+  AdminTab,
+  AuthorizedGroupSlugs,
+  StandardPageSlugs,
+} from "src/app/routes/route-params";
 import { routes } from "src/app/routes/routes";
 
 export type MetaContentType = {
@@ -137,6 +141,13 @@ export const standardMetaContent: Record<StandardPageSlugs, MetaContentType> = {
     description: "Plan du site: Immersion Facile",
   },
 };
+
+export const groupMetaContent = (
+  groupName: AuthorizedGroupSlugs,
+): MetaContentType => ({
+  title: `${groupName} - toutes les immersions`,
+  description: `Toutes les immersions proposées par ${groupName}`,
+});
 
 export const adminMetaContent: Record<AdminTab, MetaContentType> = {
   conventions: {

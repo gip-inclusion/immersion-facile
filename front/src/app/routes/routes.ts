@@ -3,6 +3,7 @@ import { createRouter, defineRoute, param } from "type-route";
 import {
   adminTabSerializer,
   conventionValuesFromUrl,
+  groupsSerializer,
   standardPagesSerializer,
 } from "./route-params";
 
@@ -126,5 +127,11 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       pagePath: param.path.ofType(standardPagesSerializer),
     },
     (params) => `/${frontRoutes.standard}/${params.pagePath}`,
+  ),
+  group: defineRoute(
+    {
+      groupName: param.path.ofType(groupsSerializer),
+    },
+    (params) => `/${frontRoutes.group}/${params.groupName}`,
   ),
 });
