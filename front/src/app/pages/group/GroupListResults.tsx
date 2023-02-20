@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
-import { ContactMethod, SearchImmersionResultDto } from "src/../../shared/src";
+import { ContactMethod, SearchImmersionResultDto } from "shared";
 import {
   ContactEstablishmentModal,
   useContactEstablishmentModal,
