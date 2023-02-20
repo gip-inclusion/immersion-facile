@@ -16,6 +16,7 @@ export type BusinessContactDto = {
   email: string; // a valid email
   contactMethod: ContactMethod;
   copyEmails: string[];
+  maxContactPerWeek?: number;
 };
 
 export type FormEstablishmentSourceInUrl =

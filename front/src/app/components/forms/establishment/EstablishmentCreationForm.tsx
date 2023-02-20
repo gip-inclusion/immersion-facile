@@ -190,5 +190,6 @@ const creationInitialValuesWithoutSourceAndSearchable = (
           email: "joe@mail.com",
           contactMethod: "EMAIL",
           copyEmails: ["recrutement@boucherie.net"],
+          maxContactPerWeek: 5,
         },
       };

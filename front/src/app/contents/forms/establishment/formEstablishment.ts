@@ -73,6 +73,14 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
     required: true,
     id: "establishment-businessContact-contactMethod",
   },
+  "businessContact.maxContactPerWeek": {
+    label:
+      "Au maximum, combien de mises en relation souhaitez-vous recevoir par semaine ?",
+    description:
+      "Par exemple, en renseignant 5 : si vous avez déjà reçu 5 demandes cette semaine, vous n'apparaîtrez plus dans la liste des entreprises accueillantes jusqu'à la semaine suivante.",
+    required: false,
+    id: "establishment-businessContact-maxContactPerWeek",
+  },
   isEngagedEnterprise: {
     label:
       "Mon entreprise est membre de la communauté « Les entreprises s'engagent »",

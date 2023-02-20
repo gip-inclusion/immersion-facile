@@ -53,9 +53,17 @@ export const BusinessContact = () => {
         }}
         validationSchema={zEmail}
       />
+      <h2 className={fr.cx("fr-text--lead")}>
+        Mises en relation avec les candidats :
+      </h2>
       <RadioGroupForField
         {...formContents["businessContact.contactMethod"]}
         options={preferredContactMethodOptions}
+      />
+
+      <TextInput
+        {...formContents["businessContact.maxContactPerWeek"]}
+        type="number"
       />
     </div>
   );

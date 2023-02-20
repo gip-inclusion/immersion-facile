@@ -40,6 +40,7 @@ export const businessContactSchema: z.Schema<BusinessContactDto> = z.object({
   email: zEmail,
   contactMethod: preferredContactMethodSchema,
   copyEmails: z.array(zEmail),
+  maxContactPerWeek: z.number().optional(),
 });
 
 const formEstablishmentSources: NotEmptyArray<FormEstablishmentSource> = [
