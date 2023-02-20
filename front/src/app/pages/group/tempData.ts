@@ -1,4 +1,4 @@
-import { SearchImmersionResultDto } from "src/../../shared/src";
+import { SearchImmersionResultDto } from "shared";
 
 export default [
   {

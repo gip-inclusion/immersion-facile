@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   MainWrapper,
   PageHeader,
@@ -42,15 +42,25 @@ export const GroupPage = ({ route }: GroupPageProps) => {
   const [displayedResults, setDisplayedResults] =
     useState<SearchImmersionResultDto[]>(tempData);
   const [query, setQuery] = useState<string>("");
-  const onFilterSubmit = () => {
-    setDisplayedResults((prevDisplayedResults) =>
-      prevDisplayedResults.filter((displayedResult: SearchImmersionResultDto) =>
+  const onFilterSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setDisplayedResults(
+      tempData.filter((displayedResult: SearchImmersionResultDto) =>
         JSON.stringify(Object.values(displayedResult))
           .toLowerCase()
           .includes(query.toLowerCase()),
       ),
     );
   };
+  useEffect(() => {
+    setDisplayedResults(
+      tempData.filter((displayedResult: SearchImmersionResultDto) =>
+        JSON.stringify(Object.values(displayedResult))
+          .toLowerCase()
+          .includes(query.toLowerCase()),
+      ),
+    );
+  }, [query]);
   const { classes } = makeStyles({ name: "GroupPage" })(() => ({
     root: {
       backgroundColor: groupTheme[groupName].theme.tintColor,
@@ -64,7 +74,10 @@ export const GroupPage = ({ route }: GroupPageProps) => {
           theme="establishment"
           classes={classes}
         >
-          <div className={fr.cx("fr-grid-row", "fr-grid-row--bottom")}>
+          <form
+            className={fr.cx("fr-grid-row", "fr-grid-row--bottom")}
+            onSubmit={onFilterSubmit}
+          >
             <div className={fr.cx("fr-col-12", "fr-col-lg-6")}>
               <Input
                 label={`Cherchez dans les immersions proposées par ${groupTheme[groupName].name}`}
@@ -77,9 +90,9 @@ export const GroupPage = ({ route }: GroupPageProps) => {
               />
             </div>
             <div className={fr.cx("fr-col-12", "fr-col-lg-3")}>
-              <Button onClick={onFilterSubmit}>Filtrer les résultats</Button>
+              <Button>Filtrer les résultats</Button>
             </div>
-          </div>
+          </form>
         </PageHeader>
         <div className={fr.cx("fr-mt-6w")}>
           <GroupListResults results={displayedResults} />
