@@ -51,7 +51,10 @@ export class SendinblueHtmlEmailGateway implements EmailGateway {
 
   public async sendEmail(email: TemplatedEmail) {
     if (email.recipients.length === 0) {
-      logger.error({ email }, "No recipient for provided email");
+      logger.error(
+        { emailType: email.type, emailParams: email.params },
+        "No recipient for provided email",
+      );
       throw new BadRequestError("No recipient for provided email");
     }
     const cc = this.filterAllowListAndConvertToRecipients(email.cc);
@@ -79,12 +82,24 @@ export class SendinblueHtmlEmailGateway implements EmailGateway {
 
     const emailType = email.type;
     counterSendTransactEmailTotal.inc({ emailType });
-    logger.info({ emailData }, "Sending email");
+    logger.info(
+      {
+        to: emailData.to,
+        type: email.type,
+        subject: emailData.subject,
+        cc: emailData.cc,
+        params: email.params,
+      },
+      "Sending email",
+    );
 
     return this.sendTransacEmail(emailData)
-      .then((data) => {
+      .then(() => {
         counterSendTransactEmailSuccess.inc({ emailType });
-        logger.info(data, "Email sending succeeded");
+        logger.info(
+          { to: emailData.to, type: email.type },
+          "Email sending succeeded",
+        );
       })
       .catch((error) => {
         counterSendTransactEmailError.inc({ emailType });
