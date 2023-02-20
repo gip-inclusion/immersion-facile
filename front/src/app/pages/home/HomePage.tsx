@@ -21,7 +21,6 @@ import { SiretModal, useSiretModal } from "src/app/components/SiretModal";
 
 import { AnyAction, Dispatch } from "@reduxjs/toolkit";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
-import { ENV } from "src/config/environmentVariables";
 
 export type UserType = "default" | "candidate" | "establishment" | "agency";
 
@@ -71,31 +70,30 @@ export const HomePage = ({ type }: HomePageProps) => {
         />
         <SectionFaq articles={sectionFaqDataForType} />
       </MainWrapper>
-      {featureFlags.enableTemporaryOperation ||
-        (ENV.envType === "local" && (
-          <FixedStamp
-            image={
-              <img
-                src={
-                  "https://immersion.cellar-c2.services.clever-cloud.com/logo-decathlon.svg"
-                }
-                alt="Inclusiv'Day - Décathlon"
-              />
-            }
-            subtitle="ouvre ses portes aux nouveaux talents, pourquoi pas vous ?"
-            link={
-              routes.search({
-                rome: "D1211",
-                distance_km: 100,
-                latitude: 48.85889,
-                longitude: 2.32004,
-                appellationLabel: "Vendeur / Vendeuse en équipement de sport",
-                appellationCode: "20578",
-                place: "Paris, Île-de-France, France",
-              }).link
-            }
-          />
-        ))}
+      {featureFlags.enableTemporaryOperation && (
+        <FixedStamp
+          image={
+            <img
+              src={
+                "https://immersion.cellar-c2.services.clever-cloud.com/logo-decathlon.svg"
+              }
+              alt="Inclusiv'Day - Décathlon"
+            />
+          }
+          subtitle="ouvre ses portes aux nouveaux talents, pourquoi pas vous ?"
+          link={
+            routes.search({
+              rome: "D1211",
+              distance_km: 100,
+              latitude: 48.85889,
+              longitude: 2.32004,
+              appellationLabel: "Vendeur / Vendeuse en équipement de sport",
+              appellationCode: "20578",
+              place: "Paris, Île-de-France, France",
+            }).link
+          }
+        />
+      )}
     </HeaderFooterLayout>
   );
 };
