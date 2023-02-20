@@ -1,6 +1,6 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
-import { SiretDto } from "shared";
+import { SearchImmersionResultDto, SiretDto } from "shared";
 import { EstablishmentGroupEntity } from "../../../domain/immersionOffer/entities/EstablishmentGroupEntity";
 import { EstablishmentGroupRepository } from "../../../domain/immersionOffer/ports/EstablishmentGroupRepository";
 
@@ -27,6 +27,24 @@ export class PgEstablishmentGroupRepository
       );
       await this.insertEstablishmentGroupSirets(group);
     }
+  }
+
+  public async findSearchImmersionResultsBySlug(
+    slug: string,
+  ): Promise<SearchImmersionResultDto[]> {
+    const response = await this.client.query(
+      `
+      SELECT slug, establishment_groups__sirets.siret, g.name AS group_name,
+        e.name AS establishment_name,e.street_number_and_address, e.post_code, e.city, e.department_code, e.lat, e.lon
+      FROM establishment_groups__sirets
+      LEFT JOIN establishment_groups g ON g.slug = establishment_groups__sirets.group_slug
+      LEFT JOIN establishments e ON e.siret = establishment_groups__sirets.siret
+      WHERE establishment_groups__sirets.group_slug = $1
+    `,
+      [slug],
+    );
+
+    return response.rows;
   }
 
   private async insertEstablishmentGroupSirets(

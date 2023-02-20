@@ -14,9 +14,9 @@ const slugify = (str: string) =>
   str
     .trim()
     .normalize("NFD")
+    .toLowerCase()
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[()]/g, "")
-    .toLowerCase()
     .replace(/\W/g, "-");
 
 export class AddFormEstablishmentBatch extends UseCase<

@@ -198,7 +198,7 @@ const createFormEstablishmentBatchDto = (): FormEstablishmentBatchDto => {
       .build();
 
   return {
-    groupName: "L'amie caline",
+    groupName: "L'amie caliné",
     formEstablishments: [formEstablishment1, formEstablishment2],
   };
 };

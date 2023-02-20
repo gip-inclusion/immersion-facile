@@ -18,8 +18,8 @@ import {
   FormEstablishmentBatchDto,
   FormEstablishmentDto,
   FormEstablishmentSource,
-  EstablishmentGroupName,
   ImmersionContactInEstablishmentId,
+  WithEstablishmentGroupSlug,
 } from "./FormEstablishment.dto";
 
 // prettier-ignore
@@ -88,5 +88,5 @@ export const formEstablishmentBatchSchema: z.Schema<FormEstablishmentBatchDto> =
     formEstablishments: z.array(formEstablishmentSchema),
   });
 
-export const establishmentGroupSchema: z.Schema<EstablishmentGroupName> =
-  zString;
+export const withEstablishmentGroupSlugSchema: z.Schema<WithEstablishmentGroupSlug> =
+  z.object({ slug: zString });

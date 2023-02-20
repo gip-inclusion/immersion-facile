@@ -1,6 +1,9 @@
 import { Pool, PoolClient } from "pg";
+import { expectToEqual, SearchImmersionResultDto } from "shared";
+import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { EstablishmentGroupEntity } from "../../../domain/immersionOffer/entities/EstablishmentGroupEntity";
+import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 import { PgEstablishmentGroupRepository } from "./PgEstablishmentGroupRepository";
 
 const group: EstablishmentGroupEntity = {
@@ -13,6 +16,7 @@ describe("PgEstablishmentGroupRepository", () => {
   let pool: Pool;
   let client: PoolClient;
   let pgEstablishmentGroupRepository: PgEstablishmentGroupRepository;
+  let pgEstablishmentAggregateRepository: PgEstablishmentAggregateRepository;
 
   beforeAll(async () => {
     pool = getTestPgPool();
@@ -21,6 +25,9 @@ describe("PgEstablishmentGroupRepository", () => {
 
   beforeEach(async () => {
     pgEstablishmentGroupRepository = new PgEstablishmentGroupRepository(client);
+    pgEstablishmentAggregateRepository = new PgEstablishmentAggregateRepository(
+      client,
+    );
     await client.query("DELETE FROM establishment_groups__sirets");
     await client.query("DELETE FROM establishment_groups");
   });
@@ -67,6 +74,51 @@ describe("PgEstablishmentGroupRepository", () => {
       { group_slug: "carrefour", siret: updatedGroup.sirets[0] },
       { group_slug: "carrefour", siret: updatedGroup.sirets[1] },
     ]);
+  });
+
+  it("finds search immersion results by slug", async () => {
+    const establishmentAggregate1 = new EstablishmentAggregateBuilder()
+      .withEstablishmentSiret(group.sirets[0])
+      .build();
+    const establishmentAggregate2 = new EstablishmentAggregateBuilder()
+      .withEstablishmentSiret(group.sirets[1])
+      .build();
+    await pgEstablishmentGroupRepository.save(group);
+    await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
+      establishmentAggregate1,
+      establishmentAggregate2,
+    ]);
+
+    const { establishment: establishment1 } = establishmentAggregate1;
+    const { establishment: establishment2 } = establishmentAggregate2;
+
+    const searchImmersionResults =
+      await pgEstablishmentGroupRepository.findSearchImmersionResultsBySlug(
+        group.slug,
+      );
+
+    const searchResult1: SearchImmersionResultDto = {
+      additionalInformation: "",
+      address: establishment1.address,
+      appellationLabels: ["Lalal"],
+      contactDetails: undefined,
+      contactMode: undefined,
+      customizedName: "Le nom custom",
+      distance_m: 0,
+      fitForDisabledWorkers: false,
+      naf: "8622B",
+      nafLabel: "Activité des médecins spécialistes",
+      name: "Le nom",
+      numberOfEmployeeRange: "1-2",
+      position: establishment1.position,
+      rome: "M1808",
+      romeLabel: "Médecin généraliste",
+      siret: establishment1.siret,
+      voluntaryToImmersion: true,
+      website: "",
+    };
+
+    expectToEqual(searchImmersionResults, [searchResult1]);
   });
 
   const getAllGroups = async () => {

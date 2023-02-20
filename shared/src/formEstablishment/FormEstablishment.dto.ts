@@ -70,6 +70,9 @@ export type EstablishmentCSVRow = {
 };
 
 export type EstablishmentGroupName = Flavor<string, "EstablishmentGroupName">;
+export type WithEstablishmentGroupSlug = {
+  slug: string;
+};
 
 export type FormEstablishmentBatchDto = {
   groupName: EstablishmentGroupName;

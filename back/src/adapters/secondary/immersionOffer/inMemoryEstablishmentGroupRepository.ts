@@ -1,3 +1,4 @@
+import { SearchImmersionResultDto } from "shared";
 import { EstablishmentGroupEntity } from "../../../domain/immersionOffer/entities/EstablishmentGroupEntity";
 import { EstablishmentGroupRepository } from "../../../domain/immersionOffer/ports/EstablishmentGroupRepository";
 
@@ -7,6 +8,12 @@ export class InMemoryEstablishmentGroupRepository
 {
   public async save(group: EstablishmentGroupEntity) {
     this.groupsByName[group.name] = group;
+  }
+
+  public async findSearchImmersionResultsBySlug(
+    slug: string,
+  ): Promise<SearchImmersionResultDto[]> {
+    throw new Error(`Not implemented - ${slug}`);
   }
 
   // for test purpose
