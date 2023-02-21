@@ -1,0 +1,72 @@
+name: Déployer Métabase sur Scalingo
+
+on:
+  workflow_dispatch:
+    inputs:
+      application-name:
+        description: "Nom de votre application metabase, doit être unique, ne peut pas contenir 'scalingo'"
+        required: true
+
+env:
+  addon-plan-postgresql: "postgresql-starter-512"
+  package-manager: "yarn"
+  package-manager-dependencies-command: "yarn install --frozen-lockfile"
+  metabase-repository: "https://github.com/Scalingo/metabase-scalingo"
+
+jobs:
+  dynamic-variables:
+    outputs:
+      node-version: ${{ steps.variables.outputs.node-version }}
+      application-name: ${{ steps.variables.outputs.application-name }}
+      metabase-repository: ${{ steps.variables.outputs.metabase-repository }}
+      addon-plan-postgresql: ${{ steps.variables.outputs.addon-plan-postgresql }}
+      package-manager: ${{ steps.variables.outputs.package-manager }}
+      package-manager-dependencies-command: ${{ steps.variables.outputs.package-manager-dependencies-command }}
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Interpolated variables from env variables
+        id: variables
+        run: |
+          echo "node-version=${{ env.node-version }}" >> $GITHUB_OUTPUT
+          echo "application-name=${{ inputs.application-name }}" >> $GITHUB_OUTPUT
+          echo "metabase-repository=${{ env.metabase-repository }}" >> $GITHUB_OUTPUT
+          echo "addon-plan-postgresql=${{ env.addon-plan-postgresql }}" >> $GITHUB_OUTPUT
+          echo "package-manager=${{ env.package-manager }}" >> $GITHUB_OUTPUT
+          echo "package-manager-dependencies-command=${{ env.package-manager-dependencies-command }}" >> $GITHUB_OUTPUT
+
+  prepare-application:
+    needs:
+      - dynamic-variables
+    uses: ./.github/workflows/_prepare-application-and-keys.scalingo.reusable.yml
+    with:
+      application-name: ${{ needs.dynamic-variables.outputs.application-name }}
+    secrets:
+      SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
+
+  setup-database-addon:
+    needs:
+      - dynamic-variables
+      - prepare-application
+    uses: ./.github/workflows/_setup-addon.postgresql.scalingo.reusable.yml
+    with:
+      application-name: ${{ needs.dynamic-variables.outputs.application-name }}
+      addon-plan-postgresql: ${{ needs.dynamic-variables.outputs.addon-plan-postgresql }}
+    secrets:
+      SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
+
+  deploy-from-repository:
+    needs:
+      - dynamic-variables
+      - setup-database-addon
+      - prepare-application
+    uses: ./.github/workflows/_deploy-application-from-repository-with-buildpack.scalingo.reusable.yml
+    with:
+      application-name: ${{ needs.dynamic-variables.outputs.application-name }}
+      repository-url: ${{ needs.dynamic-variables.outputs.metabase-repository }}
+      deployer-private-ssh-key: ${{ needs.prepare-application.outputs.deployer-private-ssh-key }}
+      scalingo-remote-git-url: "git@ssh.osc-fr1.scalingo.com"
+      scalingo-deployed-domain-url: ".osc-fr1.scalingo.com"
+      scalingo-ssh-host-domain: "ssh.osc-fr1.scalingo.com"
+    secrets:
+      SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
