@@ -8,6 +8,7 @@ import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishm
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Input } from "@codegouvfr/react-dsfr/Input";
+import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 
 const preferredContactMethodOptions: Array<{
   label?: string;
@@ -34,6 +35,7 @@ export const BusinessContact = () => {
   const formContents = getFormFields();
   const { values, setFieldValue, handleChange } =
     useFormikContext<FormEstablishmentDto>();
+  const { enableMaxContactPerWeek } = useFeatureFlags();
   return (
     <div className={fr.cx("fr-input-group")}>
       <div>
@@ -63,18 +65,22 @@ export const BusinessContact = () => {
         options={preferredContactMethodOptions}
       />
 
-      <Input
-        label={formContents["businessContact.maxContactPerWeek"].label}
-        hintText={formContents["businessContact.maxContactPerWeek"].description}
-        nativeInputProps={{
-          ...formContents["businessContact.maxContactPerWeek"],
-          type: "number",
-          min: 0,
-          pattern: "\\d*",
-          onChange: handleChange,
-          value: values.businessContact.maxContactPerWeek,
-        }}
-      />
+      {enableMaxContactPerWeek && (
+        <Input
+          label={formContents["businessContact.maxContactPerWeek"].label}
+          hintText={
+            formContents["businessContact.maxContactPerWeek"].description
+          }
+          nativeInputProps={{
+            ...formContents["businessContact.maxContactPerWeek"],
+            type: "number",
+            min: 0,
+            pattern: "\\d*",
+            onChange: handleChange,
+            value: values.businessContact.maxContactPerWeek,
+          }}
+        />
+      )}
     </div>
   );
 };

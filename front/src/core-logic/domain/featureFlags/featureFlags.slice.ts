@@ -11,6 +11,7 @@ const initialState: FeatureFlagsState = {
   enableLogoUpload: false,
   enablePeConventionBroadcast: false,
   enableTemporaryOperation: false,
+  enableMaxContactPerWeek: false,
   isLoading: true,
 };
 

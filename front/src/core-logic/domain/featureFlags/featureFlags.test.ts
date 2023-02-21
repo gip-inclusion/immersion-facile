@@ -16,6 +16,7 @@ const defaultFeatureFlags: FeatureFlags = {
   enableLogoUpload: false,
   enablePeConventionBroadcast: false,
   enableTemporaryOperation: false,
+  enableMaxContactPerWeek: false,
 };
 
 const flagsFromApi: FeatureFlags = {
@@ -24,6 +25,7 @@ const flagsFromApi: FeatureFlags = {
   enableLogoUpload: false,
   enablePeConventionBroadcast: true,
   enableTemporaryOperation: false,
+  enableMaxContactPerWeek: false,
 };
 
 describe("feature flag slice", () => {

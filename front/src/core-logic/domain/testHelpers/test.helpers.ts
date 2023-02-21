@@ -29,6 +29,7 @@ const defaultFlagsInFront: FeatureFlags = {
   enableLogoUpload: true,
   enablePeConventionBroadcast: true,
   enableTemporaryOperation: false,
+  enableMaxContactPerWeek: false,
 };
 
 export const makeStubFeatureFlags = (

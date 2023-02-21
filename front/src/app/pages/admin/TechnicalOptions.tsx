@@ -13,6 +13,8 @@ const labelsByFeatureFlag: Record<FeatureFlag, string> = {
   enablePeConnectApi: "PE Connect",
   enablePeConventionBroadcast: "Diffusion des Conventions à Pole Emploi",
   enableTemporaryOperation: "Activer l'offre temporaire",
+  enableMaxContactPerWeek:
+    "Activer le nombre de mise en contact maximum par semaine sur le formulaire entreprise",
 };
 
 export const TechnicalOptions = () => {
