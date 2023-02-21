@@ -11,13 +11,15 @@ const establishmentToSearchResultPreview = ({
   businessName,
   businessAddress,
   siret,
+  website,
+  fitForDisabledWorkers,
 }: FormEstablishmentDto): SearchImmersionResultDto => ({
   rome: appellations.length > 0 ? appellations[0].romeCode : "",
   romeLabel: appellations.length > 0 ? appellations[0].romeLabel : "",
   appellationLabels: appellations.map(
     (appellation) => appellation.appellationLabel,
   ),
-  nafLabel: naf?.nomenclature || "",
+  nafLabel: naf?.code || "",
   naf: naf?.code || "",
   name: businessNameCustomized || businessName || "Mon entreprise",
   // Fake data
@@ -33,6 +35,8 @@ const establishmentToSearchResultPreview = ({
     postcode: "",
   },
   siret,
+  website,
+  fitForDisabledWorkers,
 });
 
 type SearchResultPreviewProps = {
