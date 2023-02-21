@@ -38,6 +38,9 @@ export const BeneficiaryFormSection = ({
   const isSuccessfullyPeConnected = useAppSelector(
     authSelectors.isSuccessfullyPeConnected,
   );
+  const connectedUser = useAppSelector(authSelectors.connectedUser);
+  const userFieldsAreFilled = isSuccessfullyPeConnected && !!connectedUser;
+
   const { setFieldValue, values } = useFormikContext<ConventionDto>();
   const dispatch = useDispatch();
   const t = useConventionTextsFromFormikContext();
@@ -57,13 +60,15 @@ export const BeneficiaryFormSection = ({
       <SectionTitle>{t.beneficiarySection.title}</SectionTitle>
       <TextInput
         {...formContents["signatories.beneficiary.firstName"]}
+        {...(userFieldsAreFilled ? { value: connectedUser.firstName } : {})}
         type="text"
-        disabled={isFrozen || isSuccessfullyPeConnected}
+        disabled={isFrozen || userFieldsAreFilled}
       />
       <TextInput
         {...formContents["signatories.beneficiary.lastName"]}
+        {...(userFieldsAreFilled ? { value: connectedUser.lastName } : {})}
         type="text"
-        disabled={isFrozen || isSuccessfullyPeConnected}
+        disabled={isFrozen || userFieldsAreFilled}
       />
       <DateInput
         {...formContents["signatories.beneficiary.birthdate"]}
@@ -77,8 +82,9 @@ export const BeneficiaryFormSection = ({
       />
       <TextInput
         {...formContents["signatories.beneficiary.email"]}
+        {...(userFieldsAreFilled ? { value: connectedUser.email } : {})}
         type="email"
-        disabled={isFrozen || isSuccessfullyPeConnected}
+        disabled={isFrozen || userFieldsAreFilled}
       />
       {values.signatories.beneficiary.email && <ConventionEmailWarning />}
       <TextInput

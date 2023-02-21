@@ -1,19 +1,25 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { FederatedIdentity } from "shared";
 
+export type FederatedIdentityWithUser = FederatedIdentity & {
+  email: string;
+  firstName: string;
+  lastName: string;
+};
+
 interface AuthState {
-  federatedIdentity: FederatedIdentity | null;
+  federatedIdentityWithUser: FederatedIdentityWithUser | null;
 }
 
 const initialState: AuthState = {
-  federatedIdentity: null,
+  federatedIdentityWithUser: null,
 };
 
 const onFederatedIdentityReceived = (
   state: AuthState,
-  action: PayloadAction<FederatedIdentity | null>,
+  action: PayloadAction<FederatedIdentityWithUser | null>,
 ) => {
-  state.federatedIdentity = action.payload;
+  state.federatedIdentityWithUser = action.payload;
 };
 
 export const authSlice = createSlice({
@@ -28,7 +34,7 @@ export const authSlice = createSlice({
     federatedIdentityNotFoundInDevice: (state) => state,
 
     federatedIdentityDeletionTriggered: (state) => {
-      state.federatedIdentity = null;
+      state.federatedIdentityWithUser = null;
     },
     federatedIdentityInDeviceDeletionSucceeded: (state) => state,
   },

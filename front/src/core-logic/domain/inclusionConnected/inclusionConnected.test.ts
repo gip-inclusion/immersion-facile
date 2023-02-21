@@ -54,9 +54,12 @@ describe("InclusionConnected", () => {
   it("disconnects the users if the response includes : 'jwt expired'", () => {
     ({ store, dependencies } = createTestStore({
       auth: {
-        federatedIdentity: {
+        federatedIdentityWithUser: {
           token: "some-existing-token",
           provider: "inclusionConnect",
+          firstName: "John",
+          lastName: "Doe",
+          email: "john.doe@mail.com",
         },
       },
     }));

@@ -1,5 +1,5 @@
-import { FederatedIdentity } from "shared";
 import { ConventionInUrl } from "src/app/routes/route-params";
+import { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 
 type GenericPair<K extends string, Payload> = {
   key: K;
@@ -9,7 +9,7 @@ type GenericPair<K extends string, Payload> = {
 type StoredPair =
   | GenericPair<"partialConventionInUrl", Partial<ConventionInUrl>>
   | GenericPair<"adminToken", string>
-  | GenericPair<"federatedIdentity", FederatedIdentity>;
+  | GenericPair<"federatedIdentityWithUser", FederatedIdentityWithUser>;
 
 export type KeyInDevice = StoredPair["key"];
 

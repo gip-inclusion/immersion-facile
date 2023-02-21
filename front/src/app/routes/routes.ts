@@ -45,7 +45,12 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   ]),
   homeAgencies: defineRoute(`/${frontRoutes.homeAgencies}`),
   agencyDashboard: defineRoute(
-    { token: param.query.optional.string },
+    {
+      token: param.query.optional.string,
+      firstName: param.query.optional.string,
+      lastName: param.query.optional.string,
+      email: param.query.optional.string,
+    },
     () => `/${frontRoutes.agencyDashboard}`,
   ),
   conventionImmersion: defineRoute(

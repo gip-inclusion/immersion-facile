@@ -96,14 +96,25 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
 const useFederatedIdentityFromUrl = (route: ConventionImmersionPageRoute) => {
   const dispatch = useDispatch();
 
+  const {
+    fedId,
+    fedIdProvider,
+    email = "",
+    firstName = "",
+    lastName = "",
+  } = route.params;
+
   useEffect(() => {
-    if (route.params.fedId && route.params.fedIdProvider) {
+    if (fedId && fedIdProvider) {
       dispatch(
         authSlice.actions.federatedIdentityProvided({
-          provider: route.params.fedIdProvider as FederatedIdentityProvider,
-          token: route.params.fedId,
+          provider: fedIdProvider as FederatedIdentityProvider,
+          token: fedId,
+          email,
+          firstName,
+          lastName,
         }),
       );
     }
-  }, [route.params.fedId, route.params.fedIdProvider]);
+  }, [fedId, fedIdProvider, email, firstName, lastName]);
 };

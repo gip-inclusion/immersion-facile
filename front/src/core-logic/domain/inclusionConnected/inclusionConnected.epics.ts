@@ -20,7 +20,7 @@ const getAgencyDashboardEpic: AppEpic<InclusionConnectedAction> = (
     ),
     switchMap(() =>
       inclusionConnectedGateway.getMyAgencyDashboardUrl$(
-        state$.value.auth.federatedIdentity?.token ?? "",
+        state$.value.auth.federatedIdentityWithUser?.token ?? "",
       ),
     ),
     map(inclusionConnectedSlice.actions.agencyDashboardUrlFetchSucceeded),
