@@ -160,6 +160,7 @@ export const SearchResult = ({
               size="small"
               type="button"
               iconId="fr-icon-mail-fill"
+              disabled={preview}
               onClick={
                 preview
                   ? () => {

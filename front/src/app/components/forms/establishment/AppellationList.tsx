@@ -17,7 +17,16 @@ export const AppellationList = ({ name, title }: AppellationListProps) => {
     name,
   });
 
-  const appellations = field.value;
+  const appellations = field.value.length
+    ? field.value
+    : [
+        {
+          appellationCode: "",
+          appellationLabel: "",
+          romeCode: "",
+          romeLabel: "",
+        },
+      ];
 
   const onDelete = (index: number) => {
     setValue(removeAtIndex(appellations, index));
