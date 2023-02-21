@@ -27,7 +27,7 @@ export const PlaceAutocomplete = ({
   disabled,
   headerClassName,
   styles,
-  placeholder = "Ex : Saint-Emilion",
+  placeholder = "Ex : Saint-Denis, La Réunion, France",
   description,
   onValueChange,
   initialInputValue,
@@ -71,6 +71,11 @@ export const PlaceAutocomplete = ({
             onValueChange(selectedPlace);
             setInputHasChanged(false);
           }
+        }}
+        ListboxProps={{
+          style: {
+            maxHeight: "11rem",
+          },
         }}
         onInputChange={(_, newInputValue, reason) => {
           if (inputValue !== newInputValue && reason === "input") {

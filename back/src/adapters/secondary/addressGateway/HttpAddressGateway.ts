@@ -231,7 +231,7 @@ export class HttpAddressGateway implements AddressGateway {
         queryParams: {
           countrycode: "fr",
           language,
-          limit: "5",
+          limit: "10",
           q: query,
         },
       });
