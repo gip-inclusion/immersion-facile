@@ -323,8 +323,9 @@ export class PgEstablishmentAggregateRepository
             job = $4, 
             phone = $5, 
             contact_mode = $6, 
-            copy_emails = $7
-       WHERE uuid = $8`,
+            copy_emails = $7,
+            max_contact_per_week = $8
+       WHERE uuid = $9`,
         [
           updatedAggregate.contact.lastName,
           updatedAggregate.contact.firstName,
@@ -333,6 +334,7 @@ export class PgEstablishmentAggregateRepository
           updatedAggregate.contact.phone,
           updatedAggregate.contact.contactMethod,
           JSON.stringify(updatedAggregate.contact.copyEmails),
+          updatedAggregate.contact.maxContactPerWeek,
           existingAggregate.contact.id,
         ],
       );
@@ -687,7 +689,8 @@ export class PgEstablishmentAggregateRepository
             'contactMethod', ic.contact_mode,
             'phone', ic.phone,
             'email', ic.email,
-            'copyEmails', ic.copy_emails)
+            'copyEmails', ic.copy_emails,
+            'maxContactPerWeek', ic.max_contact_per_week)
           )) AS aggregate
           FROM filtered_immersion_offers AS io
           LEFT JOIN establishments AS e ON e.siret = io.siret

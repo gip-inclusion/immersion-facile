@@ -1600,6 +1600,7 @@ describe("Postgres implementation of immersion offer repository", () => {
             phone: "0600335980",
             contactMethod: "PHONE",
             copyEmails: ["olivia.baini@email.fr"],
+            maxContactPerWeek: 7,
           },
         };
         await pgEstablishmentAggregateRepository.updateEstablishmentAggregate(
@@ -1611,6 +1612,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           await pgEstablishmentAggregateRepository.getEstablishmentAggregateBySiret(
             existingSiret,
           );
+
         expect(retrievedAggregate).toBeDefined();
         const expectedAggregate = {
           ...updatedAggregate,
