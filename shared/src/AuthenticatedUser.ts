@@ -1,4 +1,4 @@
-import { Flavor } from "shared";
+import { Flavor } from "./typeFlavors";
 
 type AuthenticatedUserId = Flavor<string, "AuthenticatedUserId">;
 

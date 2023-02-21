@@ -1,10 +1,22 @@
-import { frontRoutes } from "shared";
+import { AuthenticatedUserQueryParams, frontRoutes } from "shared";
 import { createRouter, defineRoute, param } from "type-route";
 import {
   adminTabSerializer,
   conventionValuesFromUrl,
   standardPagesSerializer,
 } from "./route-params";
+
+const createInclusionConnectedParams = <
+  T extends Record<keyof AuthenticatedUserQueryParams, unknown>,
+>(
+  t: T,
+) => t;
+const inclusionConnectedParams = createInclusionConnectedParams({
+  token: param.query.optional.string,
+  firstName: param.query.optional.string,
+  lastName: param.query.optional.string,
+  email: param.query.optional.string,
+});
 
 export const { RouteProvider, useRoute, routes } = createRouter({
   addAgency: defineRoute(`/${frontRoutes.addAgency}`),
@@ -45,12 +57,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   ]),
   homeAgencies: defineRoute(`/${frontRoutes.homeAgencies}`),
   agencyDashboard: defineRoute(
-    {
-      token: param.query.optional.string,
-      firstName: param.query.optional.string,
-      lastName: param.query.optional.string,
-      email: param.query.optional.string,
-    },
+    inclusionConnectedParams,
     () => `/${frontRoutes.agencyDashboard}`,
   ),
   conventionImmersion: defineRoute(

@@ -1,5 +1,6 @@
 import {
   AbsoluteUrl,
+  AuthenticatedUser,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -19,7 +20,6 @@ import {
 } from "../../../adapters/secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
-import { AuthenticatedUser } from "../../generic/OAuth/entities/AuthenticatedUser";
 import { OngoingOAuth } from "../../generic/OAuth/entities/OngoingOAuth";
 import { AuthenticateWithInclusionCode } from "./AuthenticateWithInclusionCode";
 
@@ -159,7 +159,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
       });
     });
 
-    it("generates an app token and returns a redirection url which includes it", async () => {
+    it("generates an app token and returns a redirection url which includes token and user data", async () => {
       const { initialOngoingOAuth } = makeSuccessfulAuthenticationConditions();
 
       const redirectedUrl = await useCase.execute({
@@ -168,7 +168,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
       });
 
       expect(redirectedUrl).toBe(
-        `${immersionBaseUrl}/${frontRoutes.agencyDashboard}?token=${correctToken}`,
+        `${immersionBaseUrl}/${frontRoutes.agencyDashboard}?token=${correctToken}&firstName=John&lastName=Doe&email=john.doe@inclusion.com`,
       );
     });
   });

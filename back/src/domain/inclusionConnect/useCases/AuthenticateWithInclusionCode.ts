@@ -1,21 +1,22 @@
 import {
   AbsoluteUrl,
+  AuthenticatedUser,
+  AuthenticatedUserQueryParams,
+  AuthenticateWithInclusionCodeConnectParams,
+  authenticateWithInclusionCodeSchema,
   decodeJwtWithoutSignatureCheck,
   frontRoutes,
   queryParamsAsString,
 } from "shared";
-import { AuthenticateWithInclusionCodeConnectParams } from "shared";
-import { authenticateWithInclusionCodeSchema } from "shared";
 import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
 import { GenerateAuthenticatedUserJwt } from "../../auth/jwt";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { AuthenticatedUser } from "../../generic/OAuth/entities/AuthenticatedUser";
 import { OngoingOAuth } from "../../generic/OAuth/entities/OngoingOAuth";
-import { InclusionConnectGateway } from "../port/InclusionConnectGateway";
 import { InclusionConnectIdTokenPayload } from "../entities/InclusionConnectIdTokenPayload";
+import { InclusionConnectGateway } from "../port/InclusionConnectGateway";
 
 type ConnectedRedirectUrl = AbsoluteUrl;
 
@@ -107,7 +108,12 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
 
     return `${this.immersionFacileBaseUrl}/${
       frontRoutes.agencyDashboard
-    }?${queryParamsAsString({ token })}`;
+    }?${queryParamsAsString<AuthenticatedUserQueryParams>({
+      token,
+      firstName: newOrUpdatedAuthenticatedUser.firstName,
+      lastName: newOrUpdatedAuthenticatedUser.lastName,
+      email: newOrUpdatedAuthenticatedUser.email,
+    })}`;
   }
 
   private makeAuthenticatedUser(
@@ -116,9 +122,9 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
   ): AuthenticatedUser {
     return {
       id: userId,
-      email: jwtPayload.email,
       firstName: jwtPayload.given_name,
       lastName: jwtPayload.family_name,
+      email: jwtPayload.email,
     };
   }
 }

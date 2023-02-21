@@ -10,6 +10,7 @@ export * from "./agency/AgencyDtoBuilder";
 export * from "./apiAdresse/apiAddress.dto";
 export * from "./apiAdresse/apiAddress.schema";
 export * from "./apiConsumer/ApiConsumer";
+export * from "./AuthenticatedUser";
 export * from "./Builder";
 export * from "./contactEstablishmentRequest/contactEstablishmentRequest.dto";
 export * from "./contactEstablishmentRequest/contactEstablishmentRequest.schema";

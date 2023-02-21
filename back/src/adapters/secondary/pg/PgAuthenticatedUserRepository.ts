@@ -1,6 +1,6 @@
 import { PoolClient } from "pg";
-import { AuthenticatedUser } from "../../../domain/generic/OAuth/entities/AuthenticatedUser";
-import { AuthenticatedUserRepository } from "../../../domain/generic/OAuth/ports/AuthentitcatedUserRepositiory";
+import { AuthenticatedUser } from "shared";
+import { AuthenticatedUserRepository } from "../../../domain/generic/OAuth/ports/AuthenticatedUserRepositiory";
 
 type PersistenceAuthenticatedUser = {
   id: string;

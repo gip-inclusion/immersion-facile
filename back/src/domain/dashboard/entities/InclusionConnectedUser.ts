@@ -1,5 +1,5 @@
 import { AgencyDto } from "shared";
-import { AuthenticatedUser } from "../../generic/OAuth/entities/AuthenticatedUser";
+import { AuthenticatedUser } from "shared";
 
 export type InclusionConnectedUser = AuthenticatedUser & {
   agencies: AgencyDto[];

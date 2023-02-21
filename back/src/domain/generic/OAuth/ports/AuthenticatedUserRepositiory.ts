@@ -1,4 +1,4 @@
-import { AuthenticatedUser } from "../entities/AuthenticatedUser";
+import { AuthenticatedUser } from "shared";
 
 export interface AuthenticatedUserRepository {
   save(user: AuthenticatedUser): Promise<void>;

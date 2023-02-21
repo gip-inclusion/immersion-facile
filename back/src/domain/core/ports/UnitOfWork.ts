@@ -6,7 +6,7 @@ import { ConventionRepository } from "../../convention/ports/ConventionRepositor
 import { ImmersionAssessmentRepository } from "../../convention/ports/ImmersionAssessmentRepository";
 import { InclusionConnectedUserQueries } from "../../dashboard/port/InclusionConnectedUserQueries";
 import { PostalCodeDepartmentRegionQueries } from "../../generic/geo/ports/PostalCodeDepartmentRegionQueries";
-import { AuthenticatedUserRepository } from "../../generic/OAuth/ports/AuthentitcatedUserRepositiory";
+import { AuthenticatedUserRepository } from "../../generic/OAuth/ports/AuthenticatedUserRepositiory";
 import { OngoingOAuthRepository } from "../../generic/OAuth/ports/OngoingOAuthRepositiory";
 import { DiscussionAggregateRepository } from "../../immersionOffer/ports/DiscussionAggregateRepository";
 import { EstablishmentAggregateRepository } from "../../immersionOffer/ports/EstablishmentAggregateRepository";
