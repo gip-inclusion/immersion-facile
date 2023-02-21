@@ -57,7 +57,7 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
     required: true,
     id: "agency-validator-emails",
     label: "Emails de validation définitive de la demande de convention",
-    placeholder: "equipe.validation@mail.com, valideur.dupont@mail.com",
+    placeholder: "valideur.dupont@mail.com",
     description:
       "Les personnes ou emails génériques suivants valideront les conventions préalablement examinées.",
   },
@@ -86,7 +86,7 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
   counsellorEmails: {
     id: "agency-counsellor-emails",
     label: "Emails pour examen préalable de la demande de convention",
-    placeholder: "equipe1@mail.com, conseiller.dupont@mail.com",
+    placeholder: "conseiller.dupont@mail.com",
     description:
       "Les personnes ou emails génériques suivants recevront en premier les demandes de convention à examiner.",
   },
