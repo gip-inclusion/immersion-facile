@@ -44,7 +44,7 @@ export const PlaceAutocomplete = ({
   const getInputValue = () => {
     const isInitialRendering =
       !inputValue && !selectedPlace && !inputHasChanged;
-    const isPlaceSelected = !inputValue && selectedPlace && inputHasChanged;
+    const isPlaceSelected = !inputHasChanged && selectedPlace;
     if (isInitialRendering) return initialInputValue;
     if (isPlaceSelected) return selectedPlace.label;
     return inputValue;
@@ -63,12 +63,17 @@ export const PlaceAutocomplete = ({
         value={selectedPlace}
         id={id}
         getOptionLabel={(option) => option.label}
-        onChange={(_, value) => {
-          dispatch(geosearchSlice.actions.suggestionHasBeenSelected(value));
-          onValueChange(value);
+        onChange={(_, selectedPlace, reason) => {
+          if (reason === "selectOption") {
+            dispatch(
+              geosearchSlice.actions.suggestionHasBeenSelected(selectedPlace),
+            );
+            onValueChange(selectedPlace);
+            setInputHasChanged(false);
+          }
         }}
-        onInputChange={(_, newInputValue) => {
-          if (inputValue !== newInputValue) {
+        onInputChange={(_, newInputValue, reason) => {
+          if (inputValue !== newInputValue && reason === "input") {
             dispatch(geosearchSlice.actions.queryHasChanged(newInputValue));
             setInputHasChanged(true);
           }

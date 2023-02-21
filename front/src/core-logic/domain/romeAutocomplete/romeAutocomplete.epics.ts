@@ -24,7 +24,7 @@ export const romeAutocompleteEpic: AppEpic<RomeAutocompleteAction> = (
     filter(romeAutocompleteSlice.actions.setRomeSearchText.match),
     map((action) => ({ ...action, payload: action.payload.trim() })),
     filter((action) => action.payload.length > 2),
-    debounceTime(400, scheduler),
+    debounceTime(500, scheduler),
     distinctUntilChanged(),
     switchMap((action) =>
       of(romeAutocompleteSlice.actions.searchStarted()).pipe(
