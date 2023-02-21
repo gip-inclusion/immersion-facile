@@ -36,7 +36,7 @@ export const cciCustomHtmlFooter = (contactEmail: string) => `<table>
   </tr>
   <tr>
     <td align="center" style="padding: 20px;">
-      <img src="https://www.cci.fr/sites/g/files/mwbcuj1451/files/Logo_CCI_RVB_Version_Blanche.png" width="333" height="83" alt="Chambre de Commerce et d'Industrie"/>
+      <img src="https://immersion.cellar-c2.services.clever-cloud.com/logo-cci-blanc.png" width="899" height="173" alt="Chambre de Commerce et d'Industrie" style="max-width: 350px; max-height: 120px; height: auto;"/>
     </td>
   </tr>
 </table>`;
