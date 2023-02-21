@@ -44,7 +44,11 @@ jobs:
           ssh-keygen -q -t rsa -N '' -f /home/.ssh/id_rsa
           scalingo keys-add ${{ inputs.application-name }} /home/.ssh/id_rsa.pub
 
-      - name: Set the generate ssh private key as an output, key value will masked in logs, handling the set-output truncate multiline string behaviours (ref:https://github.community/t/set-output-truncates-multiline-strings/16852)
+      - name: Set the generate ssh private key as an output, key value will masked in logs, handling the $GITHUB_OUTPUT truncate multiline string behaviours
         id: deployer-private-ssh-key
         run: |
-          echo "::set-output name=private-key::$(cat /home/.ssh/id_rsa)"
+          PRIVATE_KEY_AS_MULTILINE=$(cat /home/.ssh/id_rsa)
+          PRIVATE_KEY_AS_SINGLELINE="${PRIVATE_KEY_AS_MULTILINE//'%'/'%25'}"
+          PRIVATE_KEY_AS_SINGLELINE="${PRIVATE_KEY_AS_SINGLELINE//$'\n'/'%0A'}"
+          PRIVATE_KEY_AS_SINGLELINE="${PRIVATE_KEY_AS_SINGLELINE//$'\r'/'%0D'}"
+          echo "private-key=$PRIVATE_KEY_AS_SINGLELINE" >> $GITHUB_OUTPUT

@@ -50,7 +50,7 @@ jobs:
         run: |
           TARGET_DATABASE_URL=$(scalingo --app ${{ inputs.application-full-name }} env | grep SCALINGO_POSTGRESQL_URL)
           TARGET_DATABASE_URL=${TARGET_URL//SCALINGO_POSTGRESQL_URL=/}
-            echo "::set-output name=target-database-url::$TARGET_DATABASE_URL"
+          echo "target-database-url=$TARGET_DATABASE_URL" >> $GITHUB_OUTPUT
 
       #TODO Add a transformation script (anonymisation ?) between dump and restore
       - name: Restore from prod dump

@@ -45,10 +45,10 @@ jobs:
         run: >-
           if 
           (( $(scalingo -a ${{ inputs.application-name }} addons | grep -c 'PostgreSQL.*running' ) >= 1 ));
-          then echo "Addon already exist"; echo "::set-output name=status::'addon-existed-previously'";
+          then echo "Addon already exist"; echo "status=addon-existed-previously" >> $GITHUB_OUTPUT;
           else echo "Creating addon"; 
           scalingo --app ${{ inputs.application-name }} addons-add postgresql ${{ inputs.addon-plan-postgresql }}
-          && echo "::set-output name=status::'addon-created'";
+          && echo "status='addon-created'" >> $GITHUB_OUTPUT;
           fi;
 
       - name: Destroy and recreate the PostgreSQL addon.
@@ -62,7 +62,7 @@ jobs:
           (( $(scalingo -a ${{ inputs.application-name }} addons | grep -c 'PostgreSQL.*running' ) == 0 ));
           then echo "Creating addon"; 
           scalingo --app ${{ inputs.application-name }} addons-add postgresql ${{ inputs.addon-plan-postgresql }}
-          && echo "::set-output name=status::'addon-created'" 
+          && echo "status='addon-created'" >> $GITHUB_OUTPUT
           && exit 0;
           fi
            
@@ -78,4 +78,4 @@ jobs:
 
           scalingo --app ${{ inputs.application-name }} addons-add postgresql ${{ inputs.addon-plan-postgresql }}
 
-          echo "::set-output name=status::'addon-created'"
+          echo "status='addon-created'" >> $GITHUB_OUTPUT

@@ -37,7 +37,7 @@ jobs:
           TARGET_DATABASE_URL=${TARGET_DATABASE_URL//SCALINGO_POSTGRESQL_URL/}
           regex='.+/(.+)\?.*$'
           [[ $TARGET_DATABASE_URL =~ $regex ]]
-          echo "::set-output name=user-database::${BASH_REMATCH[1]}"
+          echo "user-database=${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
 
   dump-and-restore-remote-db-schema:
     name: Dump and restore the production database schema

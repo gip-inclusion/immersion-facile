@@ -22,4 +22,4 @@ jobs:
         run: |
           FEATURES_BRANCHES=$(git branch -r | gawk 'match($0, /feature\/(.+)/, captureGroup) { printf "\"%s\",",captureGroup[1]} ')
           ${FEATURES_BRANCHES:0:-1}
-          echo '::set-output name=branches::['$FEATURES_BRANCHES']'
+          echo "branches=['$FEATURES_BRANCHES']" >> $GITHUB_OUTPUT

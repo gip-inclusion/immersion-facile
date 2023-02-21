@@ -60,4 +60,4 @@ jobs:
         run: |
           ARRAY=$(jq -r '.${{ inputs.field }} | split("${{ inputs.separator }}")' <<< '{"${{ inputs.field }}": "${{ inputs.input-string }}"}')
           ARRAY_WITHOUT_WHITESPACES=$(echo $ARRAY | sed 's/ //g')
-          echo "::set-output name=matrix::$ARRAY_WITHOUT_WHITESPACES"
+          echo "matrix=$ARRAY_WITHOUT_WHITESPACES" >> $GITHUB_OUTPUT

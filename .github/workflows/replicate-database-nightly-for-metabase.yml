@@ -90,7 +90,7 @@ jobs:
           https://${{ env.metabase-application-name }}${{ env.scalingo-domain }}/api/session
           )
 
-          echo "::set-output name=metabase-token::$(echo $TOKEN | jq '.id')"
+          echo "metabase-token=$(echo $TOKEN | jq '.id')" >> $GITHUB_OUTPUT
 
       - name: Set datasource
         run: >-

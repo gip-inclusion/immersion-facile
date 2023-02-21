@@ -33,31 +33,30 @@ jobs:
         id: node-version
         run: |
           NODE_VERSION=${{ env.node-version }}
-          echo "::set-output name=value::$NODE_VERSION"
-
+          echo "value=$NODE_VERSION" >> $GITHUB_OUTPUT
       - name: Deployed application base name
         id: application-name
         run: |
           APPLICATION_NAME=${{ env.application-name }}
-          echo "::set-output name=value::$APPLICATION_NAME"
+          echo "value=$APPLICATION_NAME" >> $GITHUB_OUTPUT
 
       - name: Scalingo postgresql addon plan
         id: addon-plan-postgresql
         run: |
           POSTGRESQL_PLAN=$(echo ${{ env.addon-plan-postgresql }})
-          echo "::set-output name=value::$POSTGRESQL_PLAN"
+          echo "value=$POSTGRESQL_PLAN" >> $GITHUB_OUTPUT
 
       - name: Has a discord webhook for notification been defined
         id: is-discord-hooked
         run: |
           IS_HOOKED=${{ secrets.DISCORD_NOTIFY_HOOK_URL != '' }}
-          echo "::set-output name=value::$IS_HOOKED"
+          echo "value=$IS_HOOKED" >> $GITHUB_OUTPUT
 
       - name: Deployed domain url
         id: deployed-domain
         run: |
           DEPLOYED_DOMAIN=${{ env.application-name }}.osc-fr1.scalingo.io
-          echo "::set-output name=value::$DEPLOYED_DOMAIN"
+          echo "value=$DEPLOYED_DOMAIN" >> $GITHUB_OUTPUT
 
   dependencies:
     needs:

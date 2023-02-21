@@ -31,45 +31,44 @@ jobs:
         id: node-version
         run: |
           NODE_VERSION=${{ env.node-version }}
-          echo "::set-output name=value::$NODE_VERSION"
-
+          echo "value=$NODE_VERSION" >> $GITHUB_OUTPUT
       - name: Deployed application base name
         id: application-name
         run: |
           APPLICATION_NAME=${{ env.application-name }}
           BRANCH_SHORT_REF=$(echo ${{ github.event.ref }} | cut -d'/' -f 4)
           APPLICATION_TRIMMED_NAME=$(echo $APPLICATION_NAME-$BRANCH_SHORT_REF | cut -c1-47)
-          echo "::set-output name=value::$APPLICATION_TRIMMED_NAME"
+          echo "value=$APPLICATION_TRIMMED_NAME" >> $GITHUB_OUTPUT
 
       - name: Reference application (to copy config / db from)
         id: reference-application-name
         run: |
           REFERENCE_APPLICATION_NAME=${{ env.reference-application-name }}
-          echo "::set-output name=value::$REFERENCE_APPLICATION_NAME"
+          echo "value=$REFERENCE_APPLICATION_NAME" >> $GITHUB_OUTPUT
 
       - name: Scalingo postgresql addon plan
         id: addon-plan-postgresql
         run: |
           POSTGRESQL_PLAN=$(echo ${{ env.addon-plan-postgresql }})
-          echo "::set-output name=value::$POSTGRESQL_PLAN"
+          echo "value=$POSTGRESQL_PLAN" >> $GITHUB_OUTPUT
 
       - name: Has a discord webhook for notification been defined
         id: is-discord-hooked
         run: |
           IS_HOOKED=${{ secrets.DISCORD_NOTIFY_HOOK_URL != '' }}
-          echo "::set-output name=value::$IS_HOOKED"
+          echo "value=$IS_HOOKED" >> $GITHUB_OUTPUT
 
       - name: Deployed domain url
         id: deployed-domain
         run: |
           DEPLOYED_DOMAIN=${{ steps.application-name.outputs.value }}.osc-fr1.scalingo.io
-          echo "::set-output name=value::$DEPLOYED_DOMAIN"
+          echo "value=$DEPLOYED_DOMAIN" >> $GITHUB_OUTPUT
 
       - name: Deployed friendly app name domain url
         id: deployed-app-name
         run: |
           DEPLOYED_APP_NAME=$(echo ${{ github.event.ref }} | cut -d'/' -f 4)
-          echo "::set-output name=value::$DEPLOYED_APP_NAME"
+          echo "value=$DEPLOYED_APP_NAME" >> $GITHUB_OUTPUT
 
   dependencies:
     runs-on: ubuntu-latest
@@ -94,8 +93,8 @@ jobs:
       - name: Expose pnpm cache configurationstore directory
         id: pnpm-cache
         run: |
-          echo "::set-output name=path::$(pnpm store path)"
-          echo "::set-output name=key::${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}"
+          echo "path=$(pnpm store path)" >> $GITHUB_OUTPUT
+          echo "key=${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}" >> $GITHUB_OUTPUT
 
       - uses: actions/cache@v3
         name: Setup pnpm cache
