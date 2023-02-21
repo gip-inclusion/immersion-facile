@@ -1,4 +1,4 @@
-import { addDays } from "date-fns";
+import { addDays, subYears } from "date-fns";
 import { keys } from "ramda";
 import { reasonableSchedule } from "../schedule/ScheduleUtils";
 import { splitCasesBetweenPassingAndFailing } from "../test.helpers";
@@ -414,6 +414,27 @@ describe("conventionDtoSchema", () => {
         ),
       ).toThrow();
     });
+  });
+
+  it("rejects when beneficiary age is under 16yr with internship kind 'immersion'", () => {
+    const immersionStartDate = new Date("2022-01-01");
+    const beneficiary: Beneficiary<"immersion"> = {
+      birthdate: addDays(subYears(immersionStartDate, 16), 1).toISOString(),
+      email: "a@a.com",
+      firstName: "sdfgf",
+      lastName: "sdfs",
+      phone: "0011223344",
+      role: "beneficiary",
+    };
+
+    const convention = new ConventionDtoBuilder()
+      .withInternshipKind("immersion")
+      .withDateStart(immersionStartDate.toISOString())
+      .withDateEnd(new Date("2022-01-02").toISOString())
+      .withBeneficiary(beneficiary)
+      .build();
+
+    expectConventionDtoToBeInvalid(convention);
   });
 });
 

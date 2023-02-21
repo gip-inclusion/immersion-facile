@@ -1,4 +1,4 @@
-import { differenceInCalendarYears } from "date-fns";
+import { differenceInYears } from "date-fns";
 import { z } from "zod";
 import { agencyIdSchema } from "../agency/agency.schema";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
@@ -43,6 +43,7 @@ import {
   EstablishmentTutor,
   GenerateMagicLinkRequestDto,
   ImmersionObjective,
+  IMMERSION_BENEFICIARY_MINIMUM_AGE_REQUIREMENT,
   InternshipKind,
   internshipKinds,
   levelsOfEducation,
@@ -248,14 +249,14 @@ export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExt
           getConventionFieldName("establishmentTutor.email"),
         );
 
-      const beneficiaryAge = differenceInCalendarYears(
-        new Date(),
+      const beneficiaryAgeAtConventionStart = differenceInYears(
+        new Date(convention.dateStart),
         new Date(convention.signatories.beneficiary.birthdate),
       );
       const weeklyHours = calculateWeeklyHoursFromSchedule(convention.schedule);
       if (
         convention.internshipKind === "mini-stage-cci" &&
-        beneficiaryAge < CCI_WEEKLY_LIMITED_SCHEDULE_AGE &&
+        beneficiaryAgeAtConventionStart < CCI_WEEKLY_LIMITED_SCHEDULE_AGE &&
         weeklyHours.some(
           (weeklyHourSet) => weeklyHourSet > CCI_WEEKLY_LIMITED_SCHEDULE_HOURS,
         )
@@ -265,6 +266,16 @@ export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExt
           getConventionFieldName("schedule.totalHours"),
         );
       }
+
+      if (
+        beneficiaryAgeAtConventionStart <
+          IMMERSION_BENEFICIARY_MINIMUM_AGE_REQUIREMENT &&
+        convention.internshipKind === "immersion"
+      )
+        addIssue(
+          `L'age minimum du bénéficiaire est de ${IMMERSION_BENEFICIARY_MINIMUM_AGE_REQUIREMENT}ans`,
+          getConventionFieldName("dateStart"),
+        );
     })
     .refine(mustBeSignedByEveryone, {
       message: localization.mustBeSignedByEveryone,
