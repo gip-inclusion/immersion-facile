@@ -1,5 +1,5 @@
 import { useFormikContext } from "formik";
-import React from "react";
+import React, { useEffect } from "react";
 import { SectionTitle, Select, SelectOption } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
@@ -48,6 +48,14 @@ export const BeneficiaryFormSection = ({
     formConventionFieldsLabels(values.internshipKind),
   );
   const formContents = getFormFields();
+  useEffect(() => {
+    if (userFieldsAreFilled)
+      Object.entries({
+        "signatories.beneficiary.firstName": connectedUser.firstName,
+        "signatories.beneficiary.lastName": connectedUser.lastName,
+        "signatories.beneficiary.email": connectedUser.email,
+      }).forEach(([key, value]) => setFieldValue(key, value));
+  }, [userFieldsAreFilled]);
   // const isFilledField = (fieldValue: string) => fieldValue.length > 0;
   // const shouldDisableField = (fieldValue: string) =>
   //   isPEConnected && isFilledField(fieldValue);
