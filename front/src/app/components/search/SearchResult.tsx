@@ -88,7 +88,7 @@ export const SearchResult = ({
                 : romeLabel}
             </p>
             <ul className={fr.cx("fr-card__desc", "fr-text--xs")}>
-              {nafLabel && <li>{nafLabel}</li>}
+              {nafLabel && nafLabel !== "" && <li>{nafLabel}</li>}
               {numberOfEmployeeRange && (
                 <li>
                   {numberOfEmployeeRange}{" "}

@@ -20,7 +20,7 @@ const establishmentToSearchResultPreview = ({
   appellationLabels: appellations.map(
     (appellation) => appellation.appellationLabel,
   ),
-  nafLabel: "Code activité NAF",
+  nafLabel: "",
   naf: naf?.code || "",
   name: businessNameCustomized || businessName || "Mon entreprise",
   // Fake data
