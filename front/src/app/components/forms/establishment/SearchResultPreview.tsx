@@ -13,6 +13,7 @@ const establishmentToSearchResultPreview = ({
   siret,
   website,
   fitForDisabledWorkers,
+  additionalInformation,
 }: FormEstablishmentDto): SearchImmersionResultDto => ({
   rome: appellations.length > 0 ? appellations[0].romeCode : "",
   romeLabel: appellations.length > 0 ? appellations[0].romeLabel : "",
@@ -37,6 +38,7 @@ const establishmentToSearchResultPreview = ({
   siret,
   website,
   fitForDisabledWorkers,
+  additionalInformation,
 });
 
 type SearchResultPreviewProps = {
