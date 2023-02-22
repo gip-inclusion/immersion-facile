@@ -15,6 +15,7 @@ export const defaultInitialValue = (
     email: "",
     contactMethod: "EMAIL",
     copyEmails: [],
+    maxContactPerWeek: 5,
   },
   isSearchable: true,
   website: "",
