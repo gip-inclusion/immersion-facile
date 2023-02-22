@@ -274,7 +274,7 @@ export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExt
       )
         addIssue(
           `L'age minimum du bénéficiaire est de ${IMMERSION_BENEFICIARY_MINIMUM_AGE_REQUIREMENT}ans`,
-          getConventionFieldName("dateStart"),
+          getConventionFieldName("signatories.beneficiary.birthdate"),
         );
     })
     .refine(mustBeSignedByEveryone, {
