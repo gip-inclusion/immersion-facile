@@ -1,6 +1,7 @@
 import {
   AgencyDtoBuilder,
   expectObjectsToMatch,
+  expectPromiseToFail,
   expectPromiseToFailWith,
   expectToEqual,
 } from "shared";
@@ -42,6 +43,36 @@ describe("Update agency", () => {
       updateAgency.execute(agency),
       `No agency found with id : ${agency.id}`,
     );
+  });
+
+  it("Fails to add agency if address components are empty", async () => {
+    const initialAgencyInRepo = new AgencyDtoBuilder().build();
+    agencyRepository.setAgencies([initialAgencyInRepo]);
+    const updatedAgency = new AgencyDtoBuilder()
+      .withId(initialAgencyInRepo.id)
+      .withName("L'agence modifié")
+      .withValidatorEmails(["new-validator@mail.com"])
+      .withAddress({
+        streetNumberAndAddress: "",
+        postcode: "",
+        city: "",
+        departmentCode: "",
+      })
+      .build();
+    await expectPromiseToFail(updateAgency.execute(updatedAgency));
+  });
+
+  it("Fails to add agency if geo components are 0,0", async () => {
+    const initialAgencyInRepo = new AgencyDtoBuilder().build();
+    agencyRepository.setAgencies([initialAgencyInRepo]);
+    const updatedAgency = new AgencyDtoBuilder()
+      .withId(initialAgencyInRepo.id)
+      .withName("L'agence modifié")
+      .withValidatorEmails(["new-validator@mail.com"])
+      .withPosition(0, 0)
+      .build();
+
+    await expectPromiseToFail(updateAgency.execute(updatedAgency));
   });
 
   it("Updates agency and create corresponding event", async () => {

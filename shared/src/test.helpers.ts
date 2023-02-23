@@ -1,6 +1,10 @@
 import { partition } from "ramda";
 import { EmailType, TemplatedEmail } from "./email/email";
 
+export const expectPromiseToFail = async (promise: Promise<unknown>) => {
+  await expect(promise).rejects.toThrow();
+};
+
 export const expectPromiseToFailWith = async (
   promise: Promise<unknown>,
   errorMessage: string,

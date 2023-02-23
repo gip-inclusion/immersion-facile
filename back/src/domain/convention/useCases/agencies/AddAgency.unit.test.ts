@@ -1,17 +1,18 @@
 import {
   CreateAgencyDto,
   expectObjectsToMatch,
+  expectPromiseToFail,
   expectTypeToMatchAndEqual,
 } from "shared";
 
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import { InMemoryOutboxRepository } from "../../../../adapters/secondary/core/InMemoryOutboxRepository";
+import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryAgencyRepository } from "../../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { AddAgency, defaultQuestionnaireUrl } from "./AddAgency";
 import { makeCreateNewEvent } from "../../../core/eventBus/EventBus";
-import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
+import { AddAgency, defaultQuestionnaireUrl } from "./AddAgency";
 
 const defaultAdminEmail = "myAdmin@mail.com";
 
@@ -98,5 +99,35 @@ describe("AddAgency use case", () => {
         questionnaireUrl: defaultQuestionnaireUrl,
       },
     ]);
+  });
+
+  it("Fails to add agency if address components are empty", async () => {
+    const agency: CreateAgencyDto = {
+      ...parisMissionLocaleParams,
+      address: {
+        streetNumberAndAddress: "",
+        postcode: "",
+        city: "",
+        departmentCode: "",
+      },
+    };
+    await expectPromiseToFail(addAgency.execute(agency));
+  });
+
+  it("Fails to add agency if geo components are 0,0", async () => {
+    const agency: CreateAgencyDto = {
+      ...parisMissionLocaleParams,
+      address: {
+        streetNumberAndAddress: "26 rue du Labrador",
+        city: "Poitiers",
+        departmentCode: "86",
+        postcode: "86000",
+      },
+      position: {
+        lat: 0,
+        lon: 0,
+      },
+    };
+    await expectPromiseToFail(addAgency.execute(agency));
   });
 });

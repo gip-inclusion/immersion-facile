@@ -4,10 +4,10 @@ import { Builder } from "../Builder";
 import { AgencyDto, AgencyId, AgencyKind, AgencyStatus } from "./agency.dto";
 
 const emptyAddress: AddressDto = {
-  streetNumberAndAddress: "",
-  departmentCode: "",
-  city: "",
-  postcode: "",
+  streetNumberAndAddress: "26 rue de l'adresse par défaut",
+  city: "Ville par défaut",
+  departmentCode: "86",
+  postcode: "86000",
 };
 
 export const defaultValidatorEmail = "validator@mail.com";
@@ -24,8 +24,8 @@ const emptyAgency: AgencyDto = {
   signature: "empty-signature",
   address: emptyAddress,
   position: {
-    lat: 0,
-    lon: 0,
+    lat: 48.866667, // Paris lat/lon
+    lon: 2.333333,
   },
 };
 
