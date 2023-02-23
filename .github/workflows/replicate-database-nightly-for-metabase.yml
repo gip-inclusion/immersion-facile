@@ -32,7 +32,6 @@ env:
   metabase-application-name: "immersion-facile"
   scalingo-domain: ".osc-fr1.scalingo.io"
   metabase-database-id: "4"
-  default-branch-ref: "refs/heads/dev"
 
 jobs:
   replicate-db:
@@ -66,7 +65,7 @@ jobs:
       GPG_SECRET_SIGNING_PASSPHRASE: ${{ secrets.GPG_SECRET_SIGNING_PASSPHRASE }}
 
   set-metabase-datasource:
-    if: github.ref == github.event.repository.default_branch
+    if: github.ref == 'refs/heads/dev'
     needs:
       - encrypted-database-credentials
     runs-on: ubuntu-latest
