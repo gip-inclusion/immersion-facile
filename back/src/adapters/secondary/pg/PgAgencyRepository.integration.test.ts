@@ -110,6 +110,7 @@ describe("PgAgencyRepository", () => {
       .withId("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee")
       .withName("Agency from PE referenciel")
       .withStatus("from-api-PE")
+      .withPosition(48.8415502, 2.4019552)
       .build();
 
     const agenciesByName = [
@@ -171,7 +172,10 @@ describe("PgAgencyRepository", () => {
 
       const agencies = await agencyRepository.getAgencies({
         filters: {
-          position: { position: { lat: 0, lon: 0 }, distance_km: 10 },
+          position: {
+            position: { lat: 48.866667, lon: 2.333333 },
+            distance_km: 10,
+          },
         },
         limit: 2,
       });
@@ -414,7 +418,7 @@ describe("PgAgencyRepository", () => {
         .withAddress({
           departmentCode: "95",
           city: "Cergy",
-          postcode: "",
+          postcode: "95000",
           streetNumberAndAddress: "",
         })
         .build();
