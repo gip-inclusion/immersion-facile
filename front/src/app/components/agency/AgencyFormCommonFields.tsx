@@ -173,7 +173,7 @@ const agencyKindToLabel: Record<AllowedAgencyKindToAdd, string> = {
   "cap-emploi": "Cap Emploi",
   "conseil-departemental": "Conseil Départemental",
   "prepa-apprentissage": "Prépa Apprentissage",
-  cci: "Chambres de Commerce et d'Industries",
+  cci: "Chambres de Commerce et d'Industrie",
   "structure-IAE": "Structure IAE",
   autre: "Autre",
 };
