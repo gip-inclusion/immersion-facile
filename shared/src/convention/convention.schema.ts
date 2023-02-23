@@ -273,7 +273,7 @@ export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExt
         convention.internshipKind === "immersion"
       )
         addIssue(
-          `L'age minimum du bénéficiaire est de ${IMMERSION_BENEFICIARY_MINIMUM_AGE_REQUIREMENT}ans`,
+          `L'âge minimum du bénéficiaire est de ${IMMERSION_BENEFICIARY_MINIMUM_AGE_REQUIREMENT}ans`,
           getConventionFieldName("signatories.beneficiary.birthdate"),
         );
     })
