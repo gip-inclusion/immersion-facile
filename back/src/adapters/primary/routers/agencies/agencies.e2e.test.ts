@@ -16,9 +16,9 @@ import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 const defaultAddress: AddressDto = {
   streetNumberAndAddress: "",
-  postcode: "",
+  postcode: "75002",
   departmentCode: "75",
-  city: "",
+  city: "Paris",
 };
 
 describe(`/${agenciesRoute} route`, () => {

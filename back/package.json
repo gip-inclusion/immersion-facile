@@ -13,7 +13,6 @@
     "trigger-suggest-edit-form-establishment-every-6-months": "ts-node src/adapters/primary/scripts/triggerSuggestEditFormEstablishmentEvery6Months.ts",
     "trigger-sending-emails-with-assessment-creation-link": "ts-node src/adapters/primary/scripts/triggerSendingEmailsWithAssessmentCreationLink.ts",
     "trigger-refresh-materialized-views": "ts-node src/adapters/primary/scripts/triggerRefreshMaterializedViews.ts",
-    "applyAgenciesAddressDtosFromPositions": "ts-node src/adapters/primary/scripts/applyAgenciesAddressDtosFromPositions.script.ts",
     "generate-api-key": "ts-node src/adapters/primary/scripts/generateApiKey.ts",
     "test:unit": "jest --watchAll --testRegex=.unit.test.ts",
     "test:e2e": "jest --watchAll --testRegex=.e2e.test.ts",
