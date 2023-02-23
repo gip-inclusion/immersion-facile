@@ -1,4 +1,5 @@
 import { addDays } from "date-fns";
+import { AddressAndPosition } from "shared";
 import { z } from "zod";
 import { createLogger } from "../../../utils/logger";
 import { TimeGateway } from "../../core/ports/TimeGateway";
@@ -35,19 +36,13 @@ export class UpdateEstablishmentsFromSireneApiScript extends UseCase<void> {
       );
 
     logger.info(
-      `Found ${
-        establishmentSiretsToUpdate.length
-      } establishment to update with siret ${establishmentSiretsToUpdate.join(
-        ", ",
-      )}`,
+      `Found ${establishmentSiretsToUpdate.length} establishments to update`,
     );
 
     // TODO parallelize this using Promise.all once we know it works :)
     for (const siret of establishmentSiretsToUpdate) {
       try {
-        logger.info(`Updating establishment with siret ${siret}...`);
         await this.updateEstablishmentWithSiret(siret);
-        logger.info(`Successfuly updated establishment with siret ${siret} !`);
       } catch (error) {
         logger.warn(
           "Accountered an error when updating establishment with siret :",
@@ -80,26 +75,49 @@ export class UpdateEstablishmentsFromSireneApiScript extends UseCase<void> {
     );
     const nafDto = sireneEstablishment.nafAndNomenclature;
     const numberEmployeesRange = sireneEstablishment.numberEmployeesRange;
-    const formatedAddress = sireneEstablishment.formatedAddress;
+    const formattedAddress = sireneEstablishment.formatedAddress;
 
-    const positionAndAddress = (
-      await this.addressAPI.lookupStreetAddress(formatedAddress)
-    ).at(0);
-
-    if (!positionAndAddress) {
-      logger.warn(
-        { siret, formatedAddress },
-        "Unable to retrieve position from API Address",
-      );
-    }
+    const positionAndAddress = await this.getPositionAndAddressIfNeeded(
+      siret,
+      formattedAddress,
+    );
 
     await this.establishmentAggregateRepository.updateEstablishment({
       siret,
       updatedAt: this.timeGateway.now(),
       nafDto,
       numberEmployeesRange,
-      address: positionAndAddress?.address,
-      position: positionAndAddress?.position,
+      ...(positionAndAddress ? positionAndAddress : {}),
     });
+  }
+
+  private async getPositionAndAddressIfNeeded(
+    siret: string,
+    formattedAddress: string,
+  ): Promise<AddressAndPosition | undefined> {
+    const establishmentAggregate =
+      await this.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
+        siret,
+      );
+
+    const hasNeverBeenUpdated =
+      !establishmentAggregate?.establishment?.updatedAt;
+
+    if (hasNeverBeenUpdated)
+      return (await this.addressAPI.lookupStreetAddress(formattedAddress)).at(
+        0,
+      );
+
+    const cityInAggregate = establishmentAggregate?.establishment?.address.city
+      .trim()
+      .toLowerCase();
+
+    if (
+      cityInAggregate &&
+      formattedAddress.toLowerCase().includes(cityInAggregate)
+    )
+      return;
+
+    return (await this.addressAPI.lookupStreetAddress(formattedAddress)).at(0);
   }
 }

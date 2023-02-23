@@ -1,4 +1,4 @@
-import { pathEq } from "shared";
+import { AddressDto, pathEq } from "shared";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
 import { SireneEstablishmentVOBuilder } from "../../../_testBuilders/SireneEstablishmentVOBuilder";
@@ -156,7 +156,7 @@ describe("Update establishments from Sirene API", () => {
   });
 
   describe("Should update establishment address and position based on sirene and address API", () => {
-    it("If address API succeeds, it should update address and coordinates", async () => {
+    it("When address API succeeds, it should update address and coordinates", async () => {
       // Prepare
       const {
         timeGateway,
@@ -175,24 +175,26 @@ describe("Update establishments from Sirene API", () => {
         new SireneEstablishmentVOBuilder()
           .withSiret("establishmentToUpdate")
           .withAdresseEtablissement({
-            numeroVoieEtablissement: "7",
+            numeroVoieEtablissement: "25",
             typeVoieEtablissement: "rue",
-            libelleVoieEtablissement: "Guillaume Tell",
-            codePostalEtablissement: "75017",
-            libelleCommuneEtablissement: "Paris",
+            libelleVoieEtablissement: "du Premier Film",
+            codePostalEtablissement: "69008",
+            libelleCommuneEtablissement: "Lyon",
           })
           .build(),
       );
       const newEstablishmentPosition = { lon: 2.2931917, lat: 48.8840654 };
 
+      const newAddressFromSirenApi: AddressDto = {
+        streetNumberAndAddress: "25 Rue du Premier Film",
+        city: "Lyon",
+        departmentCode: "69",
+        postcode: "69008",
+      };
+
       addressAPI.setAddressAndPosition([
         {
-          address: {
-            streetNumberAndAddress: "7 RUE GUILLAUME TELL",
-            city: "PARIS",
-            departmentCode: "75",
-            postcode: "75017",
-          },
+          address: newAddressFromSirenApi,
           position: newEstablishmentPosition,
         },
       ]);
@@ -210,16 +212,75 @@ describe("Update establishments from Sirene API", () => {
         ),
         {
           updatedAt: now,
-          address: {
-            streetNumberAndAddress: "7 RUE GUILLAUME TELL",
-            city: "PARIS",
-            departmentCode: "75",
-            postcode: "75017",
-          },
+          address: newAddressFromSirenApi,
           position: newEstablishmentPosition,
         },
       );
     });
+
+    it("When api succeeds but establishment as already been updated and new address is in the same city, it should not update", async () => {
+      // Prepare
+      const {
+        timeGateway,
+        sireneRepo,
+        establishmentAggregateRepository,
+        addressAPI,
+        useCase,
+      } = prepareUseCase();
+      const initialEstablishmentAggregate = makeEstablishmentWithUpdatedAt(
+        "establishmentToUpdate",
+        moreThanAWeekAgo,
+      );
+      establishmentAggregateRepository.establishmentAggregates = [
+        initialEstablishmentAggregate,
+      ];
+      sireneRepo.setEstablishment(
+        new SireneEstablishmentVOBuilder()
+          .withSiret("establishmentToUpdate")
+          .withAdresseEtablissement({
+            numeroVoieEtablissement: "7",
+            typeVoieEtablissement: "rue",
+            libelleVoieEtablissement: "Guillaume Tell",
+            codePostalEtablissement: "75017",
+            libelleCommuneEtablissement: "Paris",
+          })
+          .build(),
+      );
+      const newEstablishmentPosition = { lon: 2.2931917, lat: 48.8840654 };
+
+      const newAddressFromSirenApi: AddressDto = {
+        streetNumberAndAddress: "7 RUE GUILLAUME TELL",
+        city: "PARIS",
+        departmentCode: "75",
+        postcode: "75017",
+      };
+
+      addressAPI.setAddressAndPosition([
+        {
+          address: newAddressFromSirenApi,
+          position: newEstablishmentPosition,
+        },
+      ]);
+
+      timeGateway.setNextDate(now);
+
+      // Act
+      await useCase.execute();
+
+      // Assert
+      expectEstablishmentToMatch(
+        findEstablishmentEntityGivenSiret(
+          establishmentAggregateRepository,
+          "establishmentToUpdate",
+        ),
+        {
+          updatedAt: now,
+          address: initialEstablishmentAggregate.establishment.address,
+          position: initialEstablishmentAggregate.establishment.position,
+        },
+      );
+    });
+
     it("If adresse API fails, it should not change the address and position", async () => {
       // Prepare
       const {
