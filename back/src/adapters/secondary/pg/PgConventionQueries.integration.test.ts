@@ -99,9 +99,10 @@ describe("Pg implementation of ConventionQueries", () => {
   });
 
   describe("PG implementation of method getAllConventionsForThoseEndingThatDidntReceivedAssessmentLink", () => {
+    const agency = AgencyDtoBuilder.create().build();
     beforeEach(async () => {
       const agencyRepository = new PgAgencyRepository(client);
-      await agencyRepository.insert(AgencyDtoBuilder.create().build());
+      await agencyRepository.insert(agency);
       await client.query("DELETE FROM outbox_failures");
       await client.query("DELETE FROM outbox_publications");
       await client.query("DELETE FROM outbox");
@@ -173,7 +174,7 @@ describe("Pg implementation of ConventionQueries", () => {
         {
           ...validatedImmersionEndingThe15th,
           agencyName: "empty-name",
-          agencyDepartment: "",
+          agencyDepartment: agency.address.departmentCode,
         },
       ]);
     });
