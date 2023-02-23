@@ -129,7 +129,7 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
       );
     });
 
-    it("On PeConnected and is not jobseeker", async () => {
+    it("On PeConnected and is not jobseeker should not open slot", async () => {
       peConnectGateway.setAccessToken(accessToken);
       peConnectGateway.setUser(peNotJobseekerUser);
 
@@ -141,20 +141,12 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
       expectTypeToMatchAndEqual(
         uow.conventionPoleEmploiAdvisorRepository
           .conventionPoleEmploiUsersAdvisors,
-        [
-          conventionPoleEmploiUserAdvisorFromDto(
-            {
-              advisor: undefined,
-              user: peNotJobseekerUser,
-            },
-            CONVENTION_ID_DEFAULT_UUID,
-          ),
-        ],
+        [],
       );
     });
   });
 
-  it("On PeConnected and is jobseeker but no advisors", async () => {
+  it("On PeConnected and is jobseeker but no advisors should not open slot", async () => {
     peConnectGateway.setAccessToken(accessToken);
     peConnectGateway.setUser(peJobseekerUser);
 
@@ -166,15 +158,7 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
     expectTypeToMatchAndEqual(
       uow.conventionPoleEmploiAdvisorRepository
         .conventionPoleEmploiUsersAdvisors,
-      [
-        conventionPoleEmploiUserAdvisorFromDto(
-          {
-            advisor: undefined,
-            user: peJobseekerUser,
-          },
-          CONVENTION_ID_DEFAULT_UUID,
-        ),
-      ],
+      [],
     );
   });
 });
