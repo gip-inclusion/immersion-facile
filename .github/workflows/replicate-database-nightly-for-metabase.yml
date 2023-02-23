@@ -32,6 +32,7 @@ env:
   metabase-application-name: "immersion-facile"
   scalingo-domain: ".osc-fr1.scalingo.io"
   metabase-database-id: "4"
+  default-branch-ref: "refs/heads/dev"
 
 jobs:
   replicate-db:
@@ -64,9 +65,8 @@ jobs:
       SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
       GPG_SECRET_SIGNING_PASSPHRASE: ${{ secrets.GPG_SECRET_SIGNING_PASSPHRASE }}
 
-  # TODO Externalise to set-metabase-datasource.metabase.scalingo.reusable.yml
   set-metabase-datasource:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == env.default-branch-ref
     needs:
       - encrypted-database-credentials
     runs-on: ubuntu-latest
