@@ -80,7 +80,7 @@ export const SearchResult = ({
       <div className={cx(fr.cx("fr-card"), componentName)}>
         <div className={fr.cx("fr-card__body")}>
           <div className={fr.cx("fr-card__content")}>
-            <h2 className={fr.cx("fr-card__title")}>{establismentName}</h2>
+            <h3 className={fr.cx("fr-card__title")}>{establismentName}</h3>
             <p className={fr.cx("fr-card__desc")}>
               {" "}
               {appellationLabels.length > 0

@@ -293,7 +293,7 @@ export const SearchPage = ({
                       </div>
                     </fieldset>
                   </div>
-                  <aside
+                  <div
                     className={cx(
                       fr.cx(
                         "fr-col-12",
@@ -306,10 +306,10 @@ export const SearchPage = ({
                   >
                     {searchStatus === "ok" && (
                       <>
-                        <span className={fr.cx("fr-h5", "fr-mb-0")}>
+                        <h2 className={fr.cx("fr-h5", "fr-mb-0")}>
                           <strong>{searchResults.length}</strong> résultats
                           trouvés
-                        </span>
+                        </h2>
                         {route.params.rome && route.params.romeLabel && (
                           <span
                             className={cx(
@@ -333,7 +333,7 @@ export const SearchPage = ({
                         )}
                       </>
                     )}
-                  </aside>
+                  </div>
                 </div>
               </div>
               <SearchListResults />
