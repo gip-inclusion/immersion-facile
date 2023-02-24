@@ -20,7 +20,7 @@ import { InMemoryExportQueries } from "../../secondary/InMemoryExportQueries";
 import { InMemoryFeatureFlagRepository } from "../../secondary/InMemoryFeatureFlagRepository";
 import { InMemoryFormEstablishmentRepository } from "../../secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryImmersionAssessmentRepository } from "../../secondary/InMemoryImmersionAssessmentRepository";
-import { InMemoryInclusionConnectedUserQueries } from "../../secondary/InMemoryInclusionConnectedUserQueries";
+import { InMemoryInclusionConnectedUserRepository } from "../../secondary/InMemoryInclusionConnectedUserRepository";
 import { InMemoryOngoingOAuthRepository } from "../../secondary/InMemoryOngoingOAuthRepository";
 import { InMemoryRomeRepository } from "../../secondary/InMemoryRomeRepository";
 import { InMemoryUowPerformer } from "../../secondary/InMemoryUowPerformer";
@@ -37,7 +37,7 @@ import { PgExportQueries } from "../../secondary/pg/PgExportQueries";
 import { PgFeatureFlagRepository } from "../../secondary/pg/PgFeatureFlagRepository";
 import { PgFormEstablishmentRepository } from "../../secondary/pg/PgFormEstablishmentRepository";
 import { PgImmersionAssessmentRepository } from "../../secondary/pg/PgImmersionAssessmentRepository";
-import { PgInclusionConnectedUserQueries } from "../../secondary/pg/PgInclusionConnectedUserQueries";
+import { PgInclusionConnectedUserRepository } from "../../secondary/pg/PgInclusionConnectedUserRepository";
 import { PgLaBonneBoiteRequestRepository } from "../../secondary/pg/PgLaBonneBoiteRequestRepository";
 import { PgOngoingOAuthRepository } from "../../secondary/pg/PgOngoingOAuthRepository";
 import { PgOutboxQueries } from "../../secondary/pg/PgOutboxQueries";
@@ -58,7 +58,7 @@ export const createInMemoryUow = () => {
   const conventionRepository = new InMemoryConventionRepository();
   const authenticatedUserRepository = new InMemoryAuthenticatedUserRepository();
   const inclusionConnectedUserQueries =
-    new InMemoryInclusionConnectedUserQueries(authenticatedUserRepository);
+    new InMemoryInclusionConnectedUserRepository(authenticatedUserRepository);
 
   return {
     agencyRepository: new InMemoryAgencyRepository(),
@@ -79,7 +79,7 @@ export const createInMemoryUow = () => {
     featureFlagRepository: new InMemoryFeatureFlagRepository(),
     formEstablishmentRepository: new InMemoryFormEstablishmentRepository(),
     immersionAssessmentRepository: new InMemoryImmersionAssessmentRepository(),
-    inclusionConnectedUserQueries,
+    inclusionConnectedUserRepository: inclusionConnectedUserQueries,
     laBonneBoiteRequestRepository: new InMemoryLaBonneBoiteRequestRepository(),
     ongoingOAuthRepository: new InMemoryOngoingOAuthRepository(),
     outboxRepository,
@@ -107,7 +107,9 @@ export const createPgUow = (client: PoolClient): UnitOfWork => ({
   featureFlagRepository: new PgFeatureFlagRepository(client),
   formEstablishmentRepository: new PgFormEstablishmentRepository(client),
   immersionAssessmentRepository: new PgImmersionAssessmentRepository(client),
-  inclusionConnectedUserQueries: new PgInclusionConnectedUserQueries(client),
+  inclusionConnectedUserRepository: new PgInclusionConnectedUserRepository(
+    client,
+  ),
   laBonneBoiteRequestRepository: new PgLaBonneBoiteRequestRepository(client),
   ongoingOAuthRepository: new PgOngoingOAuthRepository(client),
   outboxRepository: new PgOutboxRepository(client),

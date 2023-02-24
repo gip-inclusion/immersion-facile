@@ -1,5 +1,7 @@
 import {
   AgencyDto,
+  AgencyId,
+  AuthenticatedUserId,
   ContactEstablishmentRequestDto,
   ConventionDto,
   EstablishmentJwtPayload,
@@ -77,7 +79,8 @@ export type DomainEvent =
   | GenericEvent<"FederatedIdentityNotBoundToConvention", ConventionDto>
   // USER CONNECTED related (only inclusion connect for now).
   // We don't put full OAuth in payload to avoid private data in logs etc...
-  | GenericEvent<"UserAuthenticatedSuccessfully", { userId: string, provider: IdentityProvider }>;
+  | GenericEvent<"UserAuthenticatedSuccessfully", { userId: string, provider: IdentityProvider }>
+  | GenericEvent<"AgencyRegisteredToInclusionConnectedUser", { userId: AuthenticatedUserId, agencyId: AgencyId }>;
 
 export type DomainTopic = DomainEvent["topic"];
 

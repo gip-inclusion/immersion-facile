@@ -1,14 +1,17 @@
 import { PoolClient } from "pg";
 import { AgencyDto } from "shared";
-import { InclusionConnectedUser } from "../../../domain/dashboard/entities/InclusionConnectedUser";
-import { InclusionConnectedUserQueries } from "../../../domain/dashboard/port/InclusionConnectedUserQueries";
+import {
+  AgencyRight,
+  InclusionConnectedUser,
+} from "../../../domain/dashboard/entities/InclusionConnectedUser";
+import { InclusionConnectedUserRepository } from "../../../domain/dashboard/port/InclusionConnectedUserRepository";
 import {
   PersistenceAgency,
   persistenceAgencyToAgencyDto,
 } from "./PgAgencyRepository";
 
-export class PgInclusionConnectedUserQueries
-  implements InclusionConnectedUserQueries
+export class PgInclusionConnectedUserRepository
+  implements InclusionConnectedUserRepository
 {
   constructor(private client: PoolClient) {}
 
@@ -26,12 +29,19 @@ export class PgInclusionConnectedUserQueries
     if (response.rows.length === 0) return;
     return toInclusionConnectedUser(response.rows);
   }
+
+  addAgencyToUser(
+    _user: InclusionConnectedUser,
+    _agencyId: AgencyDto,
+  ): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
 }
 
 const toInclusionConnectedUser = (
   rows: (PersistenceInclusionConnectedUser & PersistenceAgency)[],
 ): InclusionConnectedUser | undefined =>
-  rows.reduce((acc, row) => {
+  rows.reduce((acc, row): InclusionConnectedUser => {
     const { user_id, email, first_name, last_name, ...persistenceAgency } = row;
     const agency: AgencyDto | null =
       persistenceAgency.id && persistenceAgencyToAgencyDto(persistenceAgency);
@@ -42,7 +52,10 @@ const toInclusionConnectedUser = (
       email: acc.email ?? row.email,
       firstName: acc.firstName ?? row.first_name,
       lastName: acc.lastName ?? row.last_name,
-      agencies: [...(acc.agencies ?? []), ...(agency ? [agency] : [])],
+      agencyRights: [
+        ...(acc.agencyRights ?? []),
+        ...(agency ? [{ agency, role: "toReview" } satisfies AgencyRight] : []),
+      ],
     };
   }, {} as InclusionConnectedUser);
 

@@ -38,13 +38,13 @@ describe("Router for users authenticated with Inclusion Connect", () => {
       await buildTestApp();
     const userId = "123";
     const agency = new AgencyDtoBuilder().build();
-    inMemoryUow.inclusionConnectedUserQueries.setInclusionConnectedUsers([
+    inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
       {
         id: userId,
         email: "joe@mail.com",
         firstName: "Joe",
         lastName: "Doe",
-        agencies: [agency],
+        agencyRights: [{ agency, role: "validator" }],
       },
     ]);
     const token = generateAuthenticatedUserJwt({ userId });

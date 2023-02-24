@@ -3,7 +3,7 @@ import { AgencyDtoBuilder, expectToEqual } from "shared";
 import { AuthenticatedUser } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { PgAgencyRepository } from "./PgAgencyRepository";
-import { PgInclusionConnectedUserQueries } from "./PgInclusionConnectedUserQueries";
+import { PgInclusionConnectedUserRepository } from "./PgInclusionConnectedUserRepository";
 
 const authenticatedUser: AuthenticatedUser = {
   id: "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
@@ -15,7 +15,7 @@ const authenticatedUser: AuthenticatedUser = {
 describe("PgInclusionConnectedUserQueries", () => {
   let pool: Pool;
   let client: PoolClient;
-  let inclusionConnectQueries: PgInclusionConnectedUserQueries;
+  let inclusionConnectQueries: PgInclusionConnectedUserRepository;
   let agencyRepository: PgAgencyRepository;
 
   beforeAll(async () => {
@@ -32,7 +32,7 @@ describe("PgInclusionConnectedUserQueries", () => {
     await client.query("DELETE FROM authenticated_users");
     await client.query("DELETE FROM conventions");
     await client.query("DELETE FROM agencies");
-    inclusionConnectQueries = new PgInclusionConnectedUserQueries(client);
+    inclusionConnectQueries = new PgInclusionConnectedUserRepository(client);
     agencyRepository = new PgAgencyRepository(client);
   });
 
@@ -43,7 +43,7 @@ describe("PgInclusionConnectedUserQueries", () => {
     );
     expectToEqual(inclusionConnectedUser, {
       ...authenticatedUser,
-      agencies: [],
+      agencyRights: [],
     });
   });
 
@@ -75,7 +75,10 @@ describe("PgInclusionConnectedUserQueries", () => {
     );
     expectToEqual(inclusionConnectedUser, {
       ...authenticatedUser,
-      agencies: [agency1, agency2],
+      agencyRights: [
+        { agency: agency1, role: "toReview" },
+        { agency: agency2, role: "validator" },
+      ],
     });
   });
 

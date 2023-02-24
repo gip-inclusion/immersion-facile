@@ -101,6 +101,7 @@ const getUseCasesByTopics = (
   NewAgencyAdded: [],
   AgencyActivated: [useCases.sendEmailWhenAgencyIsActivated],
   AgencyUpdated: [],
+  AgencyRegisteredToInclusionConnectedUser: [],
 
   // Immersion Assessment related:
   ImmersionAssessmentCreated: [],

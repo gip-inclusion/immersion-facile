@@ -104,3 +104,7 @@ export type CreateAgencyDto = {
   logoUrl?: AbsoluteUrl;
   signature: string;
 };
+
+export type RegisterAgencyToInclusionConnectUserParams = {
+  agencyId: AgencyId;
+};

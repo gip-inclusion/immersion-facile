@@ -1,6 +1,9 @@
 import { AbsoluteUrl, InclusionConnectJwtPayload } from "shared";
 import { z } from "zod";
-import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
+import {
+  ForbiddenError,
+  NotFoundError,
+} from "../../../adapters/primary/helpers/httpErrors";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -24,18 +27,25 @@ export class GetUserAgencyDashboardUrl extends TransactionalUseCase<
   protected async _execute(
     _: void,
     uow: UnitOfWork,
-    jwtPayload: InclusionConnectJwtPayload,
+    jwtPayload?: InclusionConnectJwtPayload,
   ): Promise<AbsoluteUrl> {
+    if (!jwtPayload) throw new ForbiddenError("No JWT token provided");
     const { userId } = jwtPayload;
-    const user = await uow.inclusionConnectedUserQueries.getById(userId);
+    const user = await uow.inclusionConnectedUserRepository.getById(userId);
     if (!user)
       throw new NotFoundError(`No user found with provided ID : ${userId}`);
 
-    if (user.agencies.length === 0)
-      throw new NotFoundError(`No agencies found for user with ID : ${userId}`);
+    const agencyRight = user.agencyRights.at(0);
+    if (!agencyRight)
+      throw new NotFoundError(`No agency found for user with ID : ${userId}`);
+
+    if (agencyRight.role === "toReview")
+      throw new ForbiddenError(
+        `User with ID : ${userId} has not sufficient rights to access this dashboard`,
+      );
 
     return this.dashboardGateway.getAgencyUrl(
-      user.agencies[0].id,
+      agencyRight.agency.id,
       this.timeGateway.now(),
     );
   }

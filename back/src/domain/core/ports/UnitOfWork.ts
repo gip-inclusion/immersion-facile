@@ -4,7 +4,7 @@ import { AgencyRepository } from "../../convention/ports/AgencyRepository";
 import { ConventionQueries } from "../../convention/ports/ConventionQueries";
 import { ConventionRepository } from "../../convention/ports/ConventionRepository";
 import { ImmersionAssessmentRepository } from "../../convention/ports/ImmersionAssessmentRepository";
-import { InclusionConnectedUserQueries } from "../../dashboard/port/InclusionConnectedUserQueries";
+import { InclusionConnectedUserRepository } from "../../dashboard/port/InclusionConnectedUserRepository";
 import { PostalCodeDepartmentRegionQueries } from "../../generic/geo/ports/PostalCodeDepartmentRegionQueries";
 import { AuthenticatedUserRepository } from "../../generic/OAuth/ports/AuthenticatedUserRepositiory";
 import { OngoingOAuthRepository } from "../../generic/OAuth/ports/OngoingOAuthRepositiory";
@@ -23,7 +23,7 @@ import { OutboxRepository } from "./OutboxRepository";
 export type UnitOfWork = {
   conventionPoleEmploiAdvisorRepository: ConventionPoleEmploiAdvisorRepository;
   immersionAssessmentRepository: ImmersionAssessmentRepository;
-  inclusionConnectedUserQueries: InclusionConnectedUserQueries;
+  inclusionConnectedUserRepository: InclusionConnectedUserRepository;
   romeRepository: RomeRepository;
   outboxRepository: OutboxRepository;
   outboxQueries: OutboxQueries;

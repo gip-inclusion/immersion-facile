@@ -25,6 +25,7 @@ import {
   PrivateListAgenciesRequestDto,
   UpdateAgencyRequestDto,
   WithAgencyId,
+  RegisterAgencyToInclusionConnectUserParams,
 } from "./agency.dto";
 
 export const agencyIdSchema: z.ZodSchema<AgencyId> = zTrimmedString;
@@ -136,4 +137,9 @@ export const agencyPublicDisplaySchema: z.ZodSchema<AgencyPublicDisplayDto> =
     agencySiret: siretSchema.optional().or(z.literal("")),
     logoUrl: absoluteUrlSchema.optional(),
     signature: zString,
+  });
+
+export const matchUserAndAgencySchema: z.Schema<RegisterAgencyToInclusionConnectUserParams> =
+  z.object({
+    agencyId: agencyIdSchema,
   });

@@ -7,8 +7,9 @@ import { AuthenticatedUser } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { StubDashboardGateway } from "../../../adapters/secondary/dashboardGateway/StubDashboardGateway";
-import { InMemoryInclusionConnectedUserQueries } from "../../../adapters/secondary/InMemoryInclusionConnectedUserQueries";
+import { InMemoryInclusionConnectedUserRepository } from "../../../adapters/secondary/InMemoryInclusionConnectedUserRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { AgencyRole } from "../entities/InclusionConnectedUser";
 import { GetUserAgencyDashboardUrl } from "./GetUserAgencyDashboardUrl";
 
 const userId = "123";
@@ -28,11 +29,11 @@ const john: AuthenticatedUser = {
 describe("GetUserAgencyDashboardUrl", () => {
   let getUserAgencyDashboardUrl: GetUserAgencyDashboardUrl;
   let uowPerformer: InMemoryUowPerformer;
-  let inclusionConnectedUserQueries: InMemoryInclusionConnectedUserQueries;
+  let inclusionConnectedUserRepository: InMemoryInclusionConnectedUserRepository;
 
   beforeEach(() => {
     const uow = createInMemoryUow();
-    inclusionConnectedUserQueries = uow.inclusionConnectedUserQueries;
+    inclusionConnectedUserRepository = uow.inclusionConnectedUserRepository;
     uowPerformer = new InMemoryUowPerformer(uow);
     getUserAgencyDashboardUrl = new GetUserAgencyDashboardUrl(
       uowPerformer,
@@ -48,28 +49,58 @@ describe("GetUserAgencyDashboardUrl", () => {
     );
   });
 
-  it("throws NotFoundError if the user has no agencies attached", async () => {
-    inclusionConnectedUserQueries.setInclusionConnectedUsers([
+  it("throws NotFoundError if the user has no agency attached", async () => {
+    inclusionConnectedUserRepository.setInclusionConnectedUsers([
       {
         ...john,
-        agencies: [],
+        agencyRights: [],
       },
     ]);
     await expectPromiseToFailWith(
       getUserAgencyDashboardUrl.execute(undefined, inclusionConnectJwtPayload),
-      `No agencies found for user with ID : ${userId}`,
+      `No agency found for user with ID : ${userId}`,
     );
   });
 
-  it("returns the dashboard url for the first agency of the user", async () => {
-    const agency = new AgencyDtoBuilder().build();
-    inclusionConnectedUserQueries.setInclusionConnectedUsers([
-      { ...john, agencies: [agency] },
-    ]);
-    const url = await getUserAgencyDashboardUrl.execute(
-      undefined,
-      inclusionConnectJwtPayload,
+  it("throws Forbidden if no jwt token provided", async () => {
+    await expectPromiseToFailWith(
+      getUserAgencyDashboardUrl.execute(),
+      "No JWT token provided",
     );
-    expect(url).toBe(`http://stubAgencyDashboard/${agency.id}`); // coming from StubDashboardGateway
   });
+
+  it("throws Forbidden if the user has not sufficient rights (councellor at least)", async () => {
+    inclusionConnectedUserRepository.setInclusionConnectedUsers([
+      {
+        ...john,
+        agencyRights: [
+          { agency: new AgencyDtoBuilder().build(), role: "toReview" },
+        ],
+      },
+    ]);
+    await expectPromiseToFailWith(
+      getUserAgencyDashboardUrl.execute(undefined, inclusionConnectJwtPayload),
+      `User with ID : ${userId} has not sufficient rights to access this dashboard`,
+    );
+  });
+
+  const agencyRolesAllowedToGetDashboard: AgencyRole[] = [
+    "counsellor",
+    "validator",
+    "agencyOwner",
+  ];
+  it.each(agencyRolesAllowedToGetDashboard)(
+    "returns the dashboard url for the first agency of the %s",
+    async (agencyUserRole) => {
+      const agency = new AgencyDtoBuilder().build();
+      inclusionConnectedUserRepository.setInclusionConnectedUsers([
+        { ...john, agencyRights: [{ agency, role: agencyUserRole }] },
+      ]);
+      const url = await getUserAgencyDashboardUrl.execute(
+        undefined,
+        inclusionConnectJwtPayload,
+      );
+      expect(url).toBe(`http://stubAgencyDashboard/${agency.id}`); // coming from StubDashboardGateway
+    },
+  );
 });
