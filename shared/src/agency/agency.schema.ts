@@ -8,6 +8,7 @@ import {
   zEmail,
   zEnumValidation,
   zString,
+  zStringPossiblyEmpty,
   zTrimmedString,
 } from "../zodUtils";
 import {
@@ -73,7 +74,6 @@ const createAgencyShape = {
   validatorEmails: z.array(zEmail).refine((emails) => emails.length > 0, {
     message: localization.atLeastOneEmail,
   }),
-
   questionnaireUrl: z.string().optional(),
   signature: zString,
   logoUrl: absoluteUrlSchema.optional(),
@@ -94,7 +94,7 @@ export const editAgencySchema: z.ZodSchema<AgencyDto> = createAgencySchema.and(
     questionnaireUrl: z.string(),
     status: agencyStatusSchema,
     adminEmails: z.array(zString),
-    codeSafir: zString.optional(),
+    codeSafir: zStringPossiblyEmpty,
   }),
 );
 
@@ -110,7 +110,7 @@ export const agencySchema: z.ZodSchema<AgencyDto> = z
       questionnaireUrl: z.string(),
       status: agencyStatusSchema,
       adminEmails: z.array(zString),
-      codeSafir: zString.optional(),
+      codeSafir: zStringPossiblyEmpty,
     }),
   );
 
