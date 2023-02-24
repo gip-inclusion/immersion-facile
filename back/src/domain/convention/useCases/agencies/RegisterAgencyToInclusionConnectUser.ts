@@ -48,13 +48,15 @@ export class RegisterAgencyToInclusionConnectUser extends TransactionalUseCase<
     if (!agency)
       throw new NotFoundError(`Agency not found with id: ${dto.agencyId}`);
 
+    user.agencyRights.push({ agency, role: "toReview" });
+
     const event = this.createNewEvent({
       topic: "AgencyRegisteredToInclusionConnectedUser",
       payload: { userId: user.id, agencyId: agency.id },
     });
 
     await Promise.all([
-      uow.inclusionConnectedUserRepository.addAgencyToUser(user, agency),
+      uow.inclusionConnectedUserRepository.update(user),
       uow.outboxRepository.save(event),
     ]);
   }

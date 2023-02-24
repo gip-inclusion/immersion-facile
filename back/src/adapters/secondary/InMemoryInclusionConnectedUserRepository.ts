@@ -1,4 +1,4 @@
-import { AgencyDto, AuthenticatedUserId } from "shared";
+import { AuthenticatedUserId } from "shared";
 import {
   AgencyRight,
   InclusionConnectedUser,
@@ -23,14 +23,8 @@ export class InMemoryInclusionConnectedUserRepository
     return { ...user, agencyRights: this.agenciesByUserId[userId] ?? [] };
   }
 
-  async addAgencyToUser(
-    user: InclusionConnectedUser,
-    agency: AgencyDto,
-  ): Promise<void> {
-    this.agenciesByUserId[user.id] = [
-      ...(this.agenciesByUserId[user.id] ?? []),
-      { agency, role: "toReview" },
-    ];
+  async update(user: InclusionConnectedUser): Promise<void> {
+    this.agenciesByUserId[user.id] = user.agencyRights;
   }
 
   public agenciesByUserId: AgencyRightsByUserId = {};

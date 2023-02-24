@@ -33,7 +33,7 @@ describe("Router for users authenticated with Inclusion Connect", () => {
     expect(response.status).toBe(403);
   });
 
-  it("Right path : HTTP 200 with dashboard url on response body", async () => {
+  it("Right path getAgencyDashboard : HTTP 200 with dashboard url on response body", async () => {
     const { request, generateAuthenticatedUserJwt, inMemoryUow } =
       await buildTestApp();
     const userId = "123";
@@ -55,5 +55,9 @@ describe("Router for users authenticated with Inclusion Connect", () => {
 
     expect(response.body).toBe(`http://stubAgencyDashboard/${agency.id}`);
     expect(response.status).toBe(200);
+  });
+
+  describe("RegisterAgencyToInclusionConnectUser use case", () => {
+    it("should not be allowed without Inclusion Token", () => {});
   });
 });

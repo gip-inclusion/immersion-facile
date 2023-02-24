@@ -66,9 +66,7 @@ export const AgencyDashboardPage = () => {
       )}
 
       {feedback.kind === "errored" &&
-        !feedback.errorMessage.includes(
-          "No agencies found for user with ID",
-        ) && (
+        !feedback.errorMessage.includes("No agency found for user with ID") && (
           <SubmitFeedbackNotification
             submitFeedback={feedback}
             messageByKind={{ errored: "pas utilisé" }}
