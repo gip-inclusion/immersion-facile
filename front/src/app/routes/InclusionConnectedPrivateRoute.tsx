@@ -54,7 +54,7 @@ export const InclusionConnectedPrivateRoute = ({
 
   return (
     <HeaderFooterLayout>
-      <MainWrapper layout="boxed">{children}</MainWrapper>
+      <MainWrapper layout="default">{children}</MainWrapper>
     </HeaderFooterLayout>
   );
 };

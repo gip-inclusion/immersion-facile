@@ -1,3 +1,4 @@
+import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import React, { useEffect } from "react";
@@ -36,19 +37,21 @@ export const AgencyDashboardPage = () => {
     );
 
   return (
-    <div>
-      <Button
-        onClick={() => {
-          dispatch(authSlice.actions.federatedIdentityDeletionTriggered());
-        }}
-        type="button"
-      >
-        Se déconnecter
-      </Button>
-      <br />
-      <br />
-
-      <h1>Bienvenue</h1>
+    <>
+      <div className={fr.cx("fr-grid-row")}>
+        <h1>Bienvenue</h1>
+        <div className={fr.cx("fr-ml-auto", "fr-mt-1w")}>
+          <Button
+            onClick={() => {
+              dispatch(authSlice.actions.federatedIdentityDeletionTriggered());
+            }}
+            type="button"
+            priority="secondary"
+          >
+            Se déconnecter
+          </Button>
+        </div>
+      </div>
 
       {agencyDashboardUrl ? (
         <MetabaseView title="Tableau de bord agence" url={agencyDashboardUrl} />
@@ -62,10 +65,15 @@ export const AgencyDashboardPage = () => {
         />
       )}
 
-      <SubmitFeedbackNotification
-        submitFeedback={feedback}
-        messageByKind={{ success: "Dashboard récupéré avec succès" }}
-      />
-    </div>
+      {feedback.kind === "errored" &&
+        !feedback.errorMessage.includes(
+          "No agencies found for user with ID",
+        ) && (
+          <SubmitFeedbackNotification
+            submitFeedback={feedback}
+            messageByKind={{ errored: "pas utilisé" }}
+          />
+        )}
+    </>
   );
 };
