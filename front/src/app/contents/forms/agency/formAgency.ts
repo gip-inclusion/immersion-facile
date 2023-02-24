@@ -27,6 +27,7 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
     label: "Adresse de la structure",
     required: true,
     id: "agency-address",
+    placeholder: "Ex: 26 rue du labrador, 37000 Tours",
   },
   "address.city": {
     label: "Ville",

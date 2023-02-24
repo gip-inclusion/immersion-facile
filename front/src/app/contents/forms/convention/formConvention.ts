@@ -125,7 +125,7 @@ const conventionSection = (internshipKind: InternshipKind) => ({
       internshipKind === "immersion"
         ? "Adresse du lieu où se fera l'immersion"
         : "Adresse du lieu où se fera le stage",
-    placeholder: "Ex: Bordeaux 33000",
+    placeholder: "Ex: 26 rue du labrador, 37000 Tours",
     id: "form-convention-workConditions",
     required: true,
   },
