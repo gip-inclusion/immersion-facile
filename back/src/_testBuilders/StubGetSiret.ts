@@ -1,7 +1,7 @@
 import {
   GetSiretRequestDto,
-  getSiretRequestSchema,
   GetSiretResponseDto,
+  getSiretRequestSchema,
 } from "shared";
 import { UseCase } from "../domain/core/UseCase";
 

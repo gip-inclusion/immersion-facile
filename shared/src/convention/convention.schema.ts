@@ -4,7 +4,7 @@ import { agencyIdSchema } from "../agency/agency.schema";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { scheduleSchema } from "../schedule/Schedule.schema";
 import { calculateWeeklyHoursFromSchedule } from "../schedule/ScheduleUtils";
-import { siretSchema } from "../siret/siret";
+import { siretSchema } from "../siret/siret.schema";
 import { allRoles } from "../tokens/MagicLinkPayload";
 import { phoneRegExp } from "../utils";
 import { dateRegExp } from "../utils/date";

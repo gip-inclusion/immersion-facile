@@ -1,14 +1,14 @@
+import { z } from "zod";
 import {
   appellationDtoSchema,
   geoPositionSchema,
   phoneRegExp,
   romeCodeSchema,
-  siretSchema,
   zEmail,
   zString,
   zTrimmedString,
+  siretSchema,
 } from "shared";
-import { z } from "zod";
 import { SearchImmersionResultPublicV0 } from "./SearchImmersionResultPublicV0.dto";
 
 export const immersionContactInEstablishmentIdSchema: z.ZodSchema<string> =

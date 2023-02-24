@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { appellationSchema, romeCodeSchema } from "../rome";
-import { siretSchema } from "../siret/siret";
+import { siretSchema } from "../siret/siret.schema";
 import { zPreprocessedBoolean, zPreprocessedNumber } from "../zodUtils";
 import { SearchImmersionQueryParamsDto } from "./SearchImmersionQueryParams.dto";
 

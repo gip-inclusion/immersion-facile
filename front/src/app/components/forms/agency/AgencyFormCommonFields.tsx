@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import { Input } from "@codegouvfr/react-dsfr/Input";
+import { Select } from "react-design-system";
+import { useFormContext } from "react-hook-form";
 import {
   AddressDto,
   addressDtoToString,
@@ -20,9 +23,6 @@ import {
   makeFieldError,
   useFormContents,
 } from "src/app/hooks/formContents.hooks";
-import { Select } from "react-design-system";
-import { useFormContext } from "react-hook-form";
-import { Input } from "@codegouvfr/react-dsfr/Input";
 
 type AgencyFormCommonFieldsProps = {
   addressInitialValue?: AddressDto;

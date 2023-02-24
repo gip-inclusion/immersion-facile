@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { nafSchema } from "../naf";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
-import { siretSchema } from "../siret/siret";
+import { siretSchema } from "../siret/siret.schema";
 import { NotEmptyArray, phoneRegExp } from "../utils";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import {

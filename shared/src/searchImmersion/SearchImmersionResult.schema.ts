@@ -2,7 +2,7 @@ import { z } from "zod";
 import { addressSchema } from "../address/address.schema";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { romeCodeSchema } from "../rome";
-import { siretSchema } from "../siret/siret";
+import { siretSchema } from "../siret/siret.schema";
 import { zStringPossiblyEmpty } from "../zodUtils";
 import {
   SearchContactDto,

@@ -1,8 +1,8 @@
+import { RequireField } from "../utils";
 import { AbsoluteUrl } from "../AbsoluteUrl";
 import { AddressDto, DepartmentCode } from "../address/address.dto";
 import { GeoPositionDto } from "../geoPosition/geoPosition.dto";
 import { Flavor } from "../typeFlavors";
-import { RequireField } from "../utils";
 
 export type AgencyStatus = (typeof allAgencyStatuses)[number];
 export const allAgencyStatuses = [
@@ -17,7 +17,6 @@ export type AgencyDto = RequireField<CreateAgencyDto, "questionnaireUrl"> & {
   kind: AgencyKind;
   status: AgencyStatus;
   adminEmails: string[];
-  agencySiret?: string;
   codeSafir?: string;
 };
 
@@ -96,6 +95,7 @@ export type CreateAgencyDto = {
   validatorEmails: string[];
   // adminEmails: string[];
   questionnaireUrl?: string;
+  agencySiret?: string;
   logoUrl?: AbsoluteUrl;
   signature: string;
 };

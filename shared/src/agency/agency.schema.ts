@@ -2,6 +2,7 @@ import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { addressSchema } from "../address/address.schema";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
+import { siretSchema } from "../siret/siret.schema";
 import {
   localization,
   zEmail,
@@ -12,10 +13,10 @@ import {
 import {
   AgencyDto,
   AgencyId,
-  AgencyOption,
   AgencyIdResponse,
   AgencyKind,
   agencyKindList,
+  AgencyOption,
   AgencyPublicDisplayDto,
   allAgencyStatuses,
   CreateAgencyDto,
@@ -72,24 +73,46 @@ const createAgencyShape = {
   validatorEmails: z.array(zEmail).refine((emails) => emails.length > 0, {
     message: localization.atLeastOneEmail,
   }),
+
   questionnaireUrl: z.string().optional(),
   signature: zString,
   logoUrl: absoluteUrlSchema.optional(),
 };
 
-export const createAgencySchema: z.ZodSchema<CreateAgencyDto> =
-  z.object(createAgencyShape);
+export const createAgencySchema: z.ZodSchema<CreateAgencyDto> = z
+  .object(createAgencyShape)
+  .and(
+    z.object({
+      agencySiret: siretSchema,
+    }),
+  );
 
 const agencyStatusSchema = z.enum(allAgencyStatuses);
 
-export const agencySchema: z.ZodSchema<AgencyDto> = z.object({
-  ...createAgencyShape,
-  questionnaireUrl: z.string(),
-  status: agencyStatusSchema,
-  adminEmails: z.array(zString),
-  agencySiret: zString.optional(),
-  codeSafir: zString.optional(),
-});
+export const editAgencySchema: z.ZodSchema<AgencyDto> = createAgencySchema.and(
+  z.object({
+    questionnaireUrl: z.string(),
+    status: agencyStatusSchema,
+    adminEmails: z.array(zString),
+    codeSafir: zString.optional(),
+  }),
+);
+
+export const agencySchema: z.ZodSchema<AgencyDto> = z
+  .object(createAgencyShape)
+  .and(
+    z.object({
+      agencySiret: siretSchema.optional().or(z.literal("")),
+    }),
+  )
+  .and(
+    z.object({
+      questionnaireUrl: z.string(),
+      status: agencyStatusSchema,
+      adminEmails: z.array(zString),
+      codeSafir: zString.optional(),
+    }),
+  );
 
 export const agenciesSchema: z.ZodSchema<AgencyDto[]> = z.array(agencySchema);
 
@@ -110,5 +133,6 @@ export const agencyPublicDisplaySchema: z.ZodSchema<AgencyPublicDisplayDto> =
     name: zString,
     address: addressSchema,
     position: geoPositionSchema,
+    agencySiret: siretSchema.optional().or(z.literal("")),
     logoUrl: absoluteUrlSchema.optional(),
   });
