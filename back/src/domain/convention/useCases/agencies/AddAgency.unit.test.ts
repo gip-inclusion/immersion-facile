@@ -32,6 +32,7 @@ const parisMissionLocaleParams: CreateAgencyDto = {
   questionnaireUrl: "www.myUrl.com",
   signature: "Super signature of the agency",
   logoUrl: "https://www.myUrl.com",
+  agencySiret: "01234567891234",
 };
 
 describe("AddAgency use case", () => {

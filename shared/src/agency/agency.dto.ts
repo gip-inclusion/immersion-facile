@@ -3,6 +3,7 @@ import { AbsoluteUrl } from "../AbsoluteUrl";
 import { AddressDto, DepartmentCode } from "../address/address.dto";
 import { GeoPositionDto } from "../geoPosition/geoPosition.dto";
 import { Flavor } from "../typeFlavors";
+import { SiretDto } from "../siret/siret";
 
 export type AgencyStatus = (typeof allAgencyStatuses)[number];
 export const allAgencyStatuses = [
@@ -13,11 +14,15 @@ export const allAgencyStatuses = [
   "from-api-PE",
 ] as const;
 
-export type AgencyDto = RequireField<CreateAgencyDto, "questionnaireUrl"> & {
+export type AgencyDto = Omit<
+  RequireField<CreateAgencyDto, "questionnaireUrl">,
+  "agencySiret"
+> & {
   kind: AgencyKind;
   status: AgencyStatus;
   adminEmails: string[];
   codeSafir?: string;
+  agencySiret?: SiretDto;
 };
 
 export type PartialAgencyDto = Partial<AgencyDto> & { id: AgencyId };
@@ -95,7 +100,7 @@ export type CreateAgencyDto = {
   validatorEmails: string[];
   // adminEmails: string[];
   questionnaireUrl?: string;
-  agencySiret?: string;
+  agencySiret: SiretDto;
   logoUrl?: AbsoluteUrl;
   signature: string;
 };

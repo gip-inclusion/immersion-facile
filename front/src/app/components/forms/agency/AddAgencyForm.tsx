@@ -122,4 +122,5 @@ const initialValues: (id: AgencyDto["id"]) => CreateAgencyInitialValues = (
   questionnaireUrl: "",
   logoUrl: undefined,
   signature: "",
+  agencySiret: "",
 });
