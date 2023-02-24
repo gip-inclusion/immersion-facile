@@ -956,8 +956,8 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
 
       N'oubliez pas non plus de compléter avec ${beneficiaryFirstName} ${beneficiaryLastName} le ${
         internshipKind === "immersion"
-          ? `<a href="https://immersion.cellar-c2.services.clever-cloud.com/0a57f38d-1dbe-4eb4-8835-9b8fc48a13d8.pdf">bilan de l'immersion en PDF</a>`
-          : `<a href="?????????????????????????">?????????????????BILAN MINI STAGE en PDF???????</a>`
+          ? `<a href="https://immersion.cellar-c2.services.clever-cloud.com/PMSMP_Bilan.pdf">bilan de l'immersion en PDF</a>`
+          : `<a href="https://immersion.cellar-c2.services.clever-cloud.com/CCI_MiniStage_Bilan.pdf">bilan du mini stage en PDF</a>`
       }. 
 
       Merci  !      
