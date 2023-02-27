@@ -80,6 +80,9 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         externalAccessTokenSchema,
         response.responseBody,
         logger,
+        {
+          token: authorizationCode,
+        },
       );
       counter.success.inc();
       return toAccessToken(externalAccessToken);
@@ -149,6 +152,9 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         externalPeConnectUserSchema,
         response.responseBody,
         logger,
+        {
+          token: headers.Authorization,
+        },
       );
       counter.success.inc();
       return externalPeConnectUser;
@@ -189,6 +195,9 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         externalPeConnectUserStatutSchema,
         response.responseBody,
         logger,
+        {
+          token: headers.Authorization,
+        },
       );
       counter.success.inc();
       return isJobSeekerFromStatus(externalPeConnectStatut.codeStatutIndividu);
@@ -232,6 +241,9 @@ export class HttpPeConnectGateway implements PeConnectGateway {
           externalPeConnectAdvisorsSchema,
           response.responseBody,
           logger,
+          {
+            token: headers.Authorization,
+          },
         );
       counter.success.inc();
       return externalPeConnectAdvisors;

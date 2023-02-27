@@ -1,6 +1,6 @@
 export type PeConnectUserDto = {
   isJobseeker: boolean;
-  email: string;
+  email?: string;
   firstName: string;
   lastName: string;
   peExternalId: string;

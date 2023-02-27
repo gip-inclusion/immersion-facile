@@ -110,12 +110,13 @@ export const parseZodSchemaAndLogErrorOnParsingFailure = <T>(
   schema: z.Schema<T>,
   data: unknown,
   logger: Logger,
+  context: Record<string, string>,
 ): T => {
   try {
     return schema.parse(data);
   } catch (error) {
     logger.error(
-      { payload: { data, error } },
+      { payload: { context, data, error } },
       `Parsing failed with schema '${schema.constructor.name}'`,
     );
     throw error;

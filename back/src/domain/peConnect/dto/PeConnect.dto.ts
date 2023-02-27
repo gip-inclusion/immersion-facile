@@ -30,7 +30,7 @@ export type PeUserAndAdvisor = {
 export const toPartialConventionDtoWithPeIdentity = (
   peConnectUserInfo: PeConnectUserDto,
 ): ConventionPeConnectFields => ({
-  email: peConnectUserInfo.email,
+  email: peConnectUserInfo.email || "",
   firstName: peConnectUserInfo.firstName,
   lastName: peConnectUserInfo.lastName,
   fedId: peConnectUserInfo.peExternalId,
