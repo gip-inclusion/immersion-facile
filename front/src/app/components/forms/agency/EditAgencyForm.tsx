@@ -97,15 +97,6 @@ export const EditAgencyForm = ({
           />
 
           <Input
-            label="⚠️Siret de l'agence ⚠️"
-            nativeInputProps={{
-              ...register("agencySiret"),
-              placeholder: "n° de siret",
-            }}
-            {...getFieldError("agencySiret")}
-          />
-
-          <Input
             label="⚠️Code Safir de l'agence ⚠️"
             nativeInputProps={{
               ...register("codeSafir"),

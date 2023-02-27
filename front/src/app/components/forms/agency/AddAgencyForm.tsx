@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { v4 as uuidV4 } from "uuid";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import { Input } from "@codegouvfr/react-dsfr/Input";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ErrorNotifications } from "react-design-system";
@@ -21,11 +20,11 @@ import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNot
 import { formAgencyFieldsLabels } from "src/app/contents/forms/agency/formAgency";
 import {
   formErrorsToFlatErrors,
-  makeFieldError,
   useFormContents,
 } from "src/app/hooks/formContents.hooks";
 import { agencyGateway } from "src/config/dependencies";
 import { AgencySubmitFeedback } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
+import { fr } from "@codegouvfr/react-dsfr";
 
 type CreateAgencyInitialValues = Omit<CreateAgencyDto, "kind"> & {
   kind: AgencyKind | "";
@@ -42,8 +41,7 @@ export const AddAgencyForm = (): JSX.Element => {
     defaultValues: initialValues(uuidV4()),
   });
 
-  const { handleSubmit, formState, register } = methods;
-  const getFieldError = makeFieldError(formState);
+  const { handleSubmit, formState } = methods;
 
   const onFormValid: SubmitHandler<CreateAgencyInitialValues> = (values) => {
     if (values.kind === "") throw new Error("Agency kind is empty");
@@ -65,16 +63,12 @@ export const AddAgencyForm = (): JSX.Element => {
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onFormValid)}>
+        <p className={fr.cx("fr-text--xs")}>
+          Tout les champs marqués d'une astérix (*) sont obligatoires.
+        </p>
         <AgencyFormCommonFields />
         <AgencyLogoUpload />
-        <Input
-          label="Siret de l'agence"
-          nativeInputProps={{
-            ...register("agencySiret"),
-            placeholder: "n° de siret",
-          }}
-          {...getFieldError("agencySiret")}
-        />
+
         <ErrorNotifications
           labels={getFormErrors()}
           errors={toDotNotation(formErrorsToFlatErrors(formState.errors))}

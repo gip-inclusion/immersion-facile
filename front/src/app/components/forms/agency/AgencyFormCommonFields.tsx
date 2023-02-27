@@ -138,6 +138,15 @@ export const AgencyFormCommonFields = ({
         }}
         {...getFieldError("signature")}
       />
+
+      <Input
+        label={fieldsContent.agencySiret.label}
+        nativeInputProps={{
+          ...register("agencySiret"),
+          placeholder: "n° de siret",
+        }}
+        {...getFieldError("agencySiret")}
+      />
     </>
   );
 };

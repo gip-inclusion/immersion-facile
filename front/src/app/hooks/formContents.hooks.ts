@@ -31,7 +31,7 @@ const defaultField: FormFieldAttributes = {
 };
 
 const formatFieldLabel = (field: FormFieldAttributesForContent) =>
-  `${field.label}${field.required ? " *" : ""}`;
+  `${field.label}${field.required ? " *" : " (OPTIONNEL)"}`;
 
 const getFormErrors =
   <T>(formFieldsLabels: FormFieldsObjectForContent<T>) =>
