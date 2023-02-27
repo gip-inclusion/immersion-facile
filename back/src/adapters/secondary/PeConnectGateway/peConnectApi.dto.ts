@@ -19,7 +19,7 @@ export type ExternalAccessToken = {
 
 // External contract from https://pole-emploi.io/data/api/pole-emploi-connect
 export type ExternalPeConnectUser = {
-  email: string;
+  email?: string;
   family_name: string;
   gender: "male" | "female";
   given_name: string;

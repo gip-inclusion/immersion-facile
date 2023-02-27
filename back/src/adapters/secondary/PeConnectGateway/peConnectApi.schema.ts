@@ -1,4 +1,4 @@
-import { zTrimmedString } from "shared";
+import { zString, zTrimmedString } from "shared";
 import { z } from "zod";
 import {
   peAdvisorKinds,
@@ -15,12 +15,13 @@ export const externalPeConnectUserSchema: z.Schema<ExternalPeConnectUser> =
   z.object({
     email: z
       .string()
-      .email("L'addresse email pole emploi doit être remplie valide"),
+      .email("L'addresse email pole emploi doit être remplie valide")
+      .optional(),
     family_name: zTrimmedString,
     gender: z.enum(["male", "female"]),
     given_name: zTrimmedString,
-    idIdentiteExterne: z.string().uuid(),
-    sub: z.string().uuid(),
+    idIdentiteExterne: zString,
+    sub: zString,
   });
 
 export const externalPeConnectUserStatutSchema: z.Schema<ExternalPeConnectStatut> =
