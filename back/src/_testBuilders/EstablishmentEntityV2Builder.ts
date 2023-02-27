@@ -29,6 +29,7 @@ export const validEstablishmentEntityV2: EstablishmentEntityV2 = {
   updatedAt: new Date("2022-01-05T12:00:00.000"),
   isActive: true,
   isSearchable: true,
+  maxContactPerWeek: 10,
 };
 
 export class EstablishmentEntityV2Builder

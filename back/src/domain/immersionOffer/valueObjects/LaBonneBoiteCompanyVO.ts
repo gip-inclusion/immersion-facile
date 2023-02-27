@@ -64,6 +64,7 @@ export class LaBonneBoiteCompanyVO {
       isSearchable: true,
       additionalInformation: "",
       website: this.props.website ?? this.props.url,
+      maxContactPerWeek: 10,
     };
 
     return {
