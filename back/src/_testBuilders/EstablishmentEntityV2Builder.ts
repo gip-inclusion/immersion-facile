@@ -108,6 +108,13 @@ export class EstablishmentEntityV2Builder
     return new EstablishmentEntityV2Builder({ ...this.entity, updatedAt });
   }
 
+  withMaxContactPerWeek(maxContactPerWeek: number) {
+    return new EstablishmentEntityV2Builder({
+      ...this.entity,
+      maxContactPerWeek,
+    });
+  }
+
   build() {
     return this.entity;
   }

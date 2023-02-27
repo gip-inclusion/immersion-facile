@@ -787,8 +787,9 @@ describe("Postgres implementation of immersion offer repository", () => {
       });
       it("adds the establishment values in `establishments` table when one new establishment is given", async () => {
         // Prepare
-        const establishmentToInsert =
-          new EstablishmentEntityV2Builder().build();
+        const establishmentToInsert = new EstablishmentEntityV2Builder()
+          .withMaxContactPerWeek(7)
+          .build();
 
         // Act;
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
@@ -814,6 +815,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           data_source: establishmentToInsert.dataSource,
           update_date: establishmentToInsert.updatedAt,
           is_active: establishmentToInsert.isActive,
+          max_contact_per_week: establishmentToInsert.maxContactPerWeek!,
         };
         const actualEstablishmentRows = await getAllEstablishmentsRows();
         expect(actualEstablishmentRows).toHaveLength(1);
@@ -848,7 +850,6 @@ describe("Postgres implementation of immersion offer repository", () => {
         const contact = new ContactEntityV2Builder()
           .withId(contactId)
           .withContactMethod("EMAIL")
-          .withMaxContactPerWeek(5)
           .build();
 
         // Act
@@ -872,7 +873,6 @@ describe("Postgres implementation of immersion offer repository", () => {
           establishment_siret: siret1,
           contact_mode: "EMAIL",
           copy_emails: contact.copyEmails,
-          max_contact_per_week: contact.maxContactPerWeek!,
         };
         expect(actualImmersionContactRows[0]).toMatchObject(
           expectedImmersionContactRow,
@@ -1160,7 +1160,6 @@ describe("Postgres implementation of immersion offer repository", () => {
       const romeCode = "A1101";
       const siretWithRomeCodeOffer = "11111111111111";
       const siretWithoutRomeCodeOffer = "22222222222222";
-
       await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
         new EstablishmentAggregateBuilder()
           .withEstablishmentSiret(siretWithRomeCodeOffer)
@@ -1170,7 +1169,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           .build(),
         new EstablishmentAggregateBuilder()
           .withEstablishmentSiret(siretWithoutRomeCodeOffer)
-
+          .withContactId("12233432-1111-2222-3333-123456789123")
           .build(),
       ]);
 
@@ -1569,6 +1568,7 @@ describe("Postgres implementation of immersion offer repository", () => {
             isSearchable: false,
             website: "www.updated-website.fr",
             additionalInformation: "Some additional informations",
+            maxContactPerWeek: 7,
           },
         };
         await pgEstablishmentAggregateRepository.updateEstablishmentAggregate(
@@ -1600,7 +1600,6 @@ describe("Postgres implementation of immersion offer repository", () => {
             phone: "0600335980",
             contactMethod: "PHONE",
             copyEmails: ["olivia.baini@email.fr"],
-            maxContactPerWeek: 7,
           },
         };
         await pgEstablishmentAggregateRepository.updateEstablishmentAggregate(
@@ -1643,6 +1642,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     is_active: boolean;
     is_commited?: boolean | null;
     fit_for_disabled_workers: boolean | null;
+    max_contact_per_week: number | null;
   };
 
   const getAllEstablishmentsRows = async (): Promise<PgEstablishmentRow[]> =>
@@ -1665,7 +1665,6 @@ describe("Postgres implementation of immersion offer repository", () => {
     establishment_siret: string;
     contact_mode: ContactMethod;
     copy_emails: string[];
-    max_contact_per_week: number | null;
   };
 
   const getAllImmersionContactsRows = async (): Promise<

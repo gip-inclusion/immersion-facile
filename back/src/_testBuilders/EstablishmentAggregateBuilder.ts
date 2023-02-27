@@ -20,39 +20,39 @@ export class EstablishmentAggregateBuilder
   implements Builder<EstablishmentAggregate>
 {
   constructor(
-    private readonly entity: EstablishmentAggregate = validEstablishmentAggregate,
+    private readonly aggregate: EstablishmentAggregate = validEstablishmentAggregate,
   ) {}
 
   public withEstablishment(establishment: EstablishmentEntityV2) {
     return new EstablishmentAggregateBuilder({
-      ...this.entity,
+      ...this.aggregate,
       establishment,
     });
   }
 
   public withImmersionOffers(immersionOffers: ImmersionOfferEntityV2[]) {
     return new EstablishmentAggregateBuilder({
-      ...this.entity,
+      ...this.aggregate,
       immersionOffers,
     });
   }
 
   public withContact(contact: ContactEntityV2) {
     return new EstablishmentAggregateBuilder({
-      ...this.entity,
+      ...this.aggregate,
       contact,
     });
   }
   public withoutContact() {
     return new EstablishmentAggregateBuilder({
-      ...this.entity,
+      ...this.aggregate,
       contact: undefined,
     });
   }
 
   public withEstablishmentSiret(siret: string) {
     return new EstablishmentAggregateBuilder({
-      ...this.entity,
+      ...this.aggregate,
       establishment: new EstablishmentEntityV2Builder()
         .withSiret(siret)
         .build(),
@@ -60,14 +60,25 @@ export class EstablishmentAggregateBuilder
   }
   public withContactId(id: string) {
     return new EstablishmentAggregateBuilder({
-      ...this.entity,
+      ...this.aggregate,
       contact: new ContactEntityV2Builder().withId(id).build(),
     });
   }
   public withGeneratedContactId() {
     return this.withContactId(new UuidV4Generator().new());
   }
+
+  public withMaxContactPerWeek(maxContactPerWeek: number) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      establishment: new EstablishmentEntityV2Builder(
+        this.aggregate.establishment,
+      )
+        .withMaxContactPerWeek(maxContactPerWeek)
+        .build(),
+    });
+  }
   build() {
-    return this.entity;
+    return this.aggregate;
   }
 }

@@ -33,6 +33,7 @@ export type EstablishmentEntityV2 = {
   fitForDisabledWorkers?: boolean;
   website?: string;
   additionalInformation?: string;
+  maxContactPerWeek?: number;
 };
 
 export type AnnotatedEstablishmentEntityV2 = EstablishmentEntityV2 & {

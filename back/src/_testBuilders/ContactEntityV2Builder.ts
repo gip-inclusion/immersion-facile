@@ -49,9 +49,6 @@ export class ContactEntityV2Builder implements Builder<ContactEntityV2> {
   withPhone(phone: string) {
     return new ContactEntityV2Builder({ ...this.entity, phone });
   }
-  withMaxContactPerWeek(maxContactPerWeek: number) {
-    return new ContactEntityV2Builder({ ...this.entity, maxContactPerWeek });
-  }
 
   build() {
     return this.entity;

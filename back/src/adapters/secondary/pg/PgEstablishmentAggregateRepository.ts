@@ -149,6 +149,7 @@ export class PgEstablishmentAggregateRepository
       establishment.isSearchable,
       establishment.isCommited,
       establishment.fitForDisabledWorkers,
+      establishment.maxContactPerWeek,
     ]);
 
     if (establishmentFields.length === 0) return;
@@ -157,7 +158,7 @@ export class PgEstablishmentAggregateRepository
       const query = fixStGeographyEscapingInQuery(
         format(
           `INSERT INTO establishments (
-          siret, name, customized_name, website, additional_information, street_number_and_address, post_code, city, department_code, number_employees, naf_code, naf_nomenclature, data_source, source_provider, gps, lon, lat, update_date, is_active, is_searchable, is_commited, fit_for_disabled_workers 
+          siret, name, customized_name, website, additional_information, street_number_and_address, post_code, city, department_code, number_employees, naf_code, naf_nomenclature, data_source, source_provider, gps, lon, lat, update_date, is_active, is_searchable, is_commited, fit_for_disabled_workers, max_contact_per_week 
         ) VALUES %L
         ON CONFLICT
           ON CONSTRAINT establishments_pkey
@@ -171,7 +172,8 @@ export class PgEstablishmentAggregateRepository
                 number_employees=EXCLUDED.number_employees,
                 naf_code=EXCLUDED.naf_code,
                 data_source=EXCLUDED.data_source,
-                fit_for_disabled_workers=EXCLUDED.fit_for_disabled_workers
+                fit_for_disabled_workers=EXCLUDED.fit_for_disabled_workers,
+                max_contact_per_week=EXCLUDED.max_contact_per_week
               WHERE
                 EXCLUDED.data_source='form'
                 OR (
@@ -212,7 +214,6 @@ export class PgEstablishmentAggregateRepository
         contact.phone,
         contact.contactMethod,
         JSON.stringify(contact.copyEmails),
-        contact.maxContactPerWeek,
       ];
     });
 
@@ -223,7 +224,7 @@ export class PgEstablishmentAggregateRepository
     try {
       const insertContactsQuery = format(
         `INSERT INTO immersion_contacts (
-        uuid, lastname, firstname, email, job, phone, contact_mode, copy_emails, max_contact_per_week
+        uuid, lastname, firstname, email, job, phone, contact_mode, copy_emails
       ) VALUES %L`,
         contactFields,
       );
@@ -238,6 +239,7 @@ export class PgEstablishmentAggregateRepository
       await this.client.query(insertEstablishmentsContactsQuery);
     } catch (e: any) {
       logger.error(e, "Error inserting contacts");
+      throw e;
     }
   }
 
@@ -323,9 +325,8 @@ export class PgEstablishmentAggregateRepository
             job = $4, 
             phone = $5, 
             contact_mode = $6, 
-            copy_emails = $7,
-            max_contact_per_week = $8
-       WHERE uuid = $9`,
+            copy_emails = $7
+       WHERE uuid = $8`,
         [
           updatedAggregate.contact.lastName,
           updatedAggregate.contact.firstName,
@@ -334,7 +335,6 @@ export class PgEstablishmentAggregateRepository
           updatedAggregate.contact.phone,
           updatedAggregate.contact.contactMethod,
           JSON.stringify(updatedAggregate.contact.copyEmails),
-          updatedAggregate.contact.maxContactPerWeek,
           existingAggregate.contact.id,
         ],
       );
@@ -488,7 +488,12 @@ export class PgEstablishmentAggregateRepository
                       ? ", fit_for_disabled_workers=%19$L"
                       : ""
                   }
-                   WHERE siret=%20$L;`;
+                  ${
+                    propertiesToUpdate.maxContactPerWeek !== undefined
+                      ? ", max_contact_per_week=%20$L"
+                      : ""
+                  }
+                   WHERE siret=%21$L;`;
     const queryArgs = [
       propertiesToUpdate.updatedAt.toISOString(),
       propertiesToUpdate.isActive,
@@ -512,7 +517,7 @@ export class PgEstablishmentAggregateRepository
       propertiesToUpdate.website,
       propertiesToUpdate.additionalInformation,
       propertiesToUpdate.fitForDisabledWorkers,
-
+      propertiesToUpdate.maxContactPerWeek,
       propertiesToUpdate.siret,
     ];
     const formatedQuery = format(updateQuery, ...queryArgs);
@@ -678,7 +683,8 @@ export class PgEstablishmentAggregateRepository
             'updatedAt', to_char(e.update_date::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'), 
             'isActive', e.is_active, 
             'isSearchable', e.is_searchable, 
-            'isCommited', e.is_commited
+            'isCommited', e.is_commited,
+            'maxContactPerWeek', e.max_contact_per_week
             ),
           'immersionOffers', io.immersionOffers,
           'contact', JSON_BUILD_OBJECT(
@@ -689,8 +695,8 @@ export class PgEstablishmentAggregateRepository
             'contactMethod', ic.contact_mode,
             'phone', ic.phone,
             'email', ic.email,
-            'copyEmails', ic.copy_emails,
-            'maxContactPerWeek', ic.max_contact_per_week)
+            'copyEmails', ic.copy_emails
+            )
           )) AS aggregate
           FROM filtered_immersion_offers AS io
           LEFT JOIN establishments AS e ON e.siret = io.siret

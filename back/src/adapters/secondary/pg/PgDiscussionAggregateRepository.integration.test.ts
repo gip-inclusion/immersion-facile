@@ -36,7 +36,10 @@ describe("PgDiscussionAggregateRepository", () => {
       client,
     );
     await establishmentAggregateRepo.insertEstablishmentAggregates([
-      new EstablishmentAggregateBuilder().withEstablishmentSiret(siret).build(),
+      new EstablishmentAggregateBuilder()
+        .withEstablishmentSiret(siret)
+        .withContactId("12345678-1111-2222-3333-444444444444")
+        .build(),
     ]);
 
     // Act
