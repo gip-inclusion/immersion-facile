@@ -5,8 +5,12 @@ import {
   ConventionDtoBuilder,
   expectTypeToMatchAndEqual,
   frontRoutes,
+  PeConnectIdentity,
 } from "shared";
-import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
+import {
+  createInMemoryUow,
+  InMemoryUnitOfWork,
+} from "../../../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryAgencyRepository } from "../../../../adapters/secondary/InMemoryAgencyRepository";
@@ -40,6 +44,13 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
     .withValidatorEmails([validatorEmail])
     .withName("test-agency-name")
     .build();
+  const agencyPeWithCouncellors = AgencyDtoBuilder.create(
+    "agency-pe-with-councellors",
+  )
+    .withCounsellorEmails([councellorEmail, councellorEmail2])
+    .withKind("pole-emploi")
+    .withName("test-agency-name")
+    .build();
 
   const expectedParams = (agency: AgencyDto, convention: ConventionDto) => ({
     agencyName: agency.name,
@@ -54,6 +65,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
   let emailGateway: InMemoryEmailGateway;
   let agencyRepository: InMemoryAgencyRepository;
   let notifyToAgencyApplicationSubmitted: NotifyToAgencyApplicationSubmitted;
+  let uow: InMemoryUnitOfWork;
   const timeGateway = new CustomTimeGateway();
 
   beforeEach(() => {
@@ -63,10 +75,11 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
       agencyWithCounsellors,
       agencyWithOnlyValidator,
       agencyWithConsellorsAndValidator,
+      agencyPeWithCouncellors,
     ]);
-
+    uow = createInMemoryUow();
     const uowPerformer = new InMemoryUowPerformer({
-      ...createInMemoryUow(),
+      ...uow,
       agencyRepository,
     });
 
@@ -223,6 +236,82 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
             now: timeGateway.now(),
           }),
           agencyLogoUrl: agencyWithConsellorsAndValidator.logoUrl,
+        },
+      },
+    ]);
+  });
+  it("Sends notification email to agency with warning when beneficiary is PeConnected and beneficiary has no PE advisor", async () => {
+    const peIdentity: PeConnectIdentity = {
+      provider: "peConnect",
+      token: "123",
+    };
+    const validConvention = new ConventionDtoBuilder()
+      .withAgencyId(agencyPeWithCouncellors.id)
+      .withFederatedIdentity(peIdentity)
+      .build();
+
+    uow.conventionPoleEmploiAdvisorRepository.setConventionPoleEmploiUsersAdvisor(
+      [
+        {
+          conventionId: validConvention.id,
+          peExternalId: peIdentity.token,
+          _entityName: "ConventionPoleEmploiAdvisor",
+          advisor: undefined,
+        },
+      ],
+    );
+
+    await notifyToAgencyApplicationSubmitted.execute(validConvention);
+
+    const sentEmails = emailGateway.getSentEmails();
+
+    expectTypeToMatchAndEqual(sentEmails, [
+      {
+        type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
+        recipients: [councellorEmail],
+        params: {
+          internshipKind: validConvention.internshipKind,
+          warning: `Attention: aucun conseiller référent Pôle emploi ne semble être associé à ce bénéficiaire.`,
+          ...expectedParams(agencyWithConsellorsAndValidator, validConvention),
+          magicLink: fakeGenerateMagicLinkUrlFn({
+            id: validConvention.id,
+            role: "counsellor",
+            targetRoute: frontRoutes.conventionToValidate,
+            email: councellorEmail,
+            now: timeGateway.now(),
+          }),
+          conventionStatusLink: fakeGenerateMagicLinkUrlFn({
+            id: validConvention.id,
+            role: "counsellor",
+            targetRoute: frontRoutes.conventionStatusDashboard,
+            email: councellorEmail,
+            now: timeGateway.now(),
+          }),
+          agencyLogoUrl: agencyWithConsellorsAndValidator.logoUrl,
+        },
+      },
+      {
+        type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
+        recipients: [councellorEmail2],
+        params: {
+          internshipKind: validConvention.internshipKind,
+          ...expectedParams(agencyWithConsellorsAndValidator, validConvention),
+          magicLink: fakeGenerateMagicLinkUrlFn({
+            id: validConvention.id,
+            role: "counsellor",
+            targetRoute: frontRoutes.conventionToValidate,
+            email: councellorEmail2,
+            now: timeGateway.now(),
+          }),
+          conventionStatusLink: fakeGenerateMagicLinkUrlFn({
+            id: validConvention.id,
+            role: "counsellor",
+            targetRoute: frontRoutes.conventionStatusDashboard,
+            email: councellorEmail2,
+            now: timeGateway.now(),
+          }),
+          agencyLogoUrl: agencyWithConsellorsAndValidator.logoUrl,
+          warning: `Attention: aucun conseiller référent Pôle emploi ne semble être associé à ce bénéficiaire.`,
         },
       },
     ]);

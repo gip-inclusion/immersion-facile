@@ -12,7 +12,6 @@ import { RenewMagicLinkPayload } from "../../convention/useCases/notifications/D
 import { ConventionRequiresModificationPayload } from "../../convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 import { IdentityProvider } from "../../generic/OAuth/entities/OngoingOAuth";
 import { EstablishmentAggregate } from "../../immersionOffer/entities/EstablishmentEntity";
-import { ConventionAndPeExternalIds } from "../../peConnect/port/ConventionPoleEmploiAdvisorRepository";
 import type { DateStr } from "../ports/TimeGateway";
 
 export type SubscriptionId = Flavor<string, "SubscriptionId">;
@@ -72,8 +71,8 @@ export type DomainEvent =
   | GenericEvent<"EmailWithLinkToCreateAssessmentSent", WithConventionId>
 
   // PECONNECT related
-  | GenericEvent<"PeConnectFederatedIdentityAssociated", ConventionAndPeExternalIds>
-
+  | GenericEvent<"FederatedIdentityBoundToConvention", ConventionDto>
+  | GenericEvent<"FederatedIdentityNotBoundToConvention", ConventionDto>
   // USER CONNECTED related (only inclusion connect for now).
   // We don't put full OAuth in payload to avoid private data in logs etc...
   | GenericEvent<"UserAuthenticatedSuccessfully", { userId: string, provider: IdentityProvider }>;

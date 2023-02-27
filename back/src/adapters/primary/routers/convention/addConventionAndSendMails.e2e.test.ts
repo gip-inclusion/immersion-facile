@@ -58,11 +58,9 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
     ]);
 
     await eventCrawler.processNewEvents();
+    await eventCrawler.processNewEvents();
 
     expectSentEmails(gateways.email, [
-      {
-        type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
-      },
       {
         type: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
         recipients: [validConvention.signatories.beneficiary.email],
@@ -72,6 +70,9 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
         recipients: [
           validConvention.signatories.establishmentRepresentative.email,
         ],
+      },
+      {
+        type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
       },
     ]);
   });
@@ -167,6 +168,7 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   );
 
   await eventCrawler.processNewEvents();
+  await eventCrawler.processNewEvents();
 
   const peNotification = gateways.poleEmploiGateway.notifications[0];
   expect(peNotification.id).toBe("00000000001");
@@ -176,17 +178,17 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   const sentEmails = gateways.email.getSentEmails();
   expect(sentEmails).toHaveLength(numberOfEmailInitialySent - 1);
   expect(sentEmails.map((e) => e.recipients)).toEqual([
-    [VALID_EMAILS[2]],
     [VALID_EMAILS[0]],
     [VALID_EMAILS[1]],
+    [VALID_EMAILS[2]],
   ]);
 
   const beneficiarySignEmail = expectEmailOfType(
-    sentEmails[1],
+    sentEmails[0],
     "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
   );
   const establishmentSignEmail = expectEmailOfType(
-    sentEmails[2],
+    sentEmails[1],
     "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
   );
 

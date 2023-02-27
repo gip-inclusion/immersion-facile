@@ -62,7 +62,7 @@ import { SearchImmersion } from "../../../domain/immersionOffer/useCases/SearchI
 import { UpdateEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentAggregateFromFormEstablishement";
 import { AuthenticateWithInclusionCode } from "../../../domain/inclusionConnect/useCases/AuthenticateWithInclusionCode";
 import { InitiateInclusionConnect } from "../../../domain/inclusionConnect/useCases/InitiateInclusionConnect";
-import { AssociatePeConnectFederatedIdentity } from "../../../domain/peConnect/useCases/AssociateFederatedIdentityPeConnect";
+import { BindConventionToFederatedIdentity } from "../../../domain/peConnect/useCases/BindConventionToFederatedIdentity";
 import { LinkPoleEmploiAdvisorAndRedirectToConvention } from "../../../domain/peConnect/useCases/LinkPoleEmploiAdvisorAndRedirectToConvention";
 import { NotifyPoleEmploiUserAdvisorOnConventionFullySigned } from "../../../domain/peConnect/useCases/NotifyPoleEmploiUserAdvisorOnConventionFullySigned";
 import { AppellationSearch } from "../../../domain/rome/useCases/AppellationSearch";
@@ -119,8 +119,10 @@ export const createUseCases = (
         generateAuthenticatedUserToken,
         config.immersionFacileBaseUrl,
       ),
-      associatePeConnectFederatedIdentity:
-        new AssociatePeConnectFederatedIdentity(uowPerformer, createNewEvent),
+      bindConventionToFederatedIdentity: new BindConventionToFederatedIdentity(
+        uowPerformer,
+        createNewEvent,
+      ),
       uploadLogo: new UploadLogo(
         uowPerformer,
         gateways.documentGateway,

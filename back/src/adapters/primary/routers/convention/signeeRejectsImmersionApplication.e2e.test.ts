@@ -59,21 +59,22 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   );
 
   await eventCrawler.processNewEvents();
+  await eventCrawler.processNewEvents();
 
   const sentEmails = gateways.email.getSentEmails();
   expect(sentEmails).toHaveLength(3);
   expect(sentEmails.map((e) => e.recipients)).toEqual([
-    ["validator@mail.com"],
     [createConventionParams.signatories.beneficiary.email],
     [createConventionParams.signatories.establishmentRepresentative.email],
+    ["validator@mail.com"],
   ]);
 
   const beneficiarySignEmail = expectEmailOfType(
-    sentEmails[1],
+    sentEmails[0],
     "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
   );
   const establishmentSignEmail = expectEmailOfType(
-    sentEmails[2],
+    sentEmails[1],
     "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
   );
 

@@ -21,10 +21,7 @@ const getUseCasesByTopics = (
 ): UseCaseSubscriptionsByTopics => ({
   // "Happy case" for immersion application.
   ImmersionApplicationSubmittedByBeneficiary: [
-    useCases.notifyToAgencyConventionSubmitted,
-    useCases.confirmToSignatoriesThatConventionCorrectlySubmittedRequestSignature,
-    useCases.associatePeConnectFederatedIdentity,
-    useCases.broadcastToPoleEmploiOnConventionUpdates,
+    useCases.bindConventionToFederatedIdentity,
   ],
   ConventionSubmittedAfterModification: [
     // useCases.notifyToAgencyConventionSubmitted,
@@ -67,7 +64,16 @@ const getUseCasesByTopics = (
   ],
 
   // ImmersionApplication Federated Identities
-  PeConnectFederatedIdentityAssociated: [],
+  FederatedIdentityBoundToConvention: [
+    useCases.notifyToAgencyConventionSubmitted,
+    useCases.confirmToSignatoriesThatConventionCorrectlySubmittedRequestSignature,
+    useCases.broadcastToPoleEmploiOnConventionUpdates,
+  ],
+  FederatedIdentityNotBoundToConvention: [
+    useCases.notifyToAgencyConventionSubmitted,
+    useCases.confirmToSignatoriesThatConventionCorrectlySubmittedRequestSignature,
+    useCases.broadcastToPoleEmploiOnConventionUpdates,
+  ],
 
   // Establishment form related
   FormEstablishmentAdded: [

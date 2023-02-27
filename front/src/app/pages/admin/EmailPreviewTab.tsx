@@ -222,6 +222,7 @@ export const defaultEmailValueByEmailKind: {
     magicLink: "MAGIC_LINK",
     conventionStatusLink: "CONVENTION_STATUS_LINK",
     agencyLogoUrl: defaultEmailPreviewUrl,
+    warning: "WARNING",
   },
   VALIDATED_CONVENTION_FINAL_CONFIRMATION: {
     internshipKind: "immersion",

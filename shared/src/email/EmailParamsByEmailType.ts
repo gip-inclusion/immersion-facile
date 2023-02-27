@@ -29,6 +29,7 @@ export type EmailParamsByEmailType = {
     magicLink: string;
     conventionStatusLink: string;
     agencyLogoUrl: AbsoluteUrl | undefined;
+    warning?: string;
   };
   NEW_CONVENTION_ESTABLISHMENT_TUTOR_CONFIRMATION: {
     internshipKind: InternshipKind;

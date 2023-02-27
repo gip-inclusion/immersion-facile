@@ -130,6 +130,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       businessName,
       agencyName,
       internshipKind,
+      warning,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       demandeId,
       agencyLogoUrl,
@@ -144,7 +145,9 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
         internshipKind === "immersion"
           ? "d'immersion professionnelle"
           : "de mini stage"
-      } a été enregistrée.</strong>      ­
+      } a été enregistrée.</strong>
+
+      
 
       Vous pouvez prendre connaissance de la demande en <a href="${magicLink}" target="_blank">cliquant ici</a>.
       Vous pouvez également suivre <a href="${conventionStatusLink}" target="_blank">l'état de la convention en cliquant ici</a>.
@@ -168,6 +171,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       <strong>Structure d'accompagnement :</strong>
       ${agencyName}
       `,
+      highlight: warning,
       subContent: defaultSignature(internshipKind),
       attachmentUrls:
         internshipKind === "immersion"

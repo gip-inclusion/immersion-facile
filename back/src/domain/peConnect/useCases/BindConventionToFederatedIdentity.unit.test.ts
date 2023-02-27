@@ -8,17 +8,20 @@ import {
   InMemoryConventionPoleEmploiAdvisorRepository,
 } from "../../../adapters/secondary/InMemoryConventionPoleEmploiAdvisorRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
+import {
+  CreateNewEvent,
+  makeCreateNewEvent,
+} from "../../core/eventBus/EventBus";
 import { PeUserAndAdvisor } from "../dto/PeConnect.dto";
 import { conventionPoleEmploiUserAdvisorFromDto } from "../entities/ConventionPoleEmploiAdvisorEntity";
-import { AssociatePeConnectFederatedIdentity } from "./AssociateFederatedIdentityPeConnect";
+import { BindConventionToFederatedIdentity } from "./BindConventionToFederatedIdentity";
 
 describe("AssociatePeConnectFederatedIdentity", () => {
-  let associatePeConnectFederatedIdentity: AssociatePeConnectFederatedIdentity;
+  let associatePeConnectFederatedIdentity: BindConventionToFederatedIdentity;
   let uowPerformer: InMemoryUowPerformer;
   let conventionPoleEmploiAdvisorRepo: InMemoryConventionPoleEmploiAdvisorRepository;
   let outboxRepo: InMemoryOutboxRepository;
-
+  let createNewEvent: CreateNewEvent;
   beforeEach(() => {
     const uow = createInMemoryUow();
     conventionPoleEmploiAdvisorRepo = uow.conventionPoleEmploiAdvisorRepository;
@@ -26,38 +29,31 @@ describe("AssociatePeConnectFederatedIdentity", () => {
     uowPerformer = new InMemoryUowPerformer(uow);
 
     const uuidGenerator = new TestUuidGenerator();
-    const createNewEvent = makeCreateNewEvent({
+    createNewEvent = makeCreateNewEvent({
       timeGateway: new CustomTimeGateway(),
       uuidGenerator,
     });
 
-    associatePeConnectFederatedIdentity =
-      new AssociatePeConnectFederatedIdentity(uowPerformer, createNewEvent);
+    associatePeConnectFederatedIdentity = new BindConventionToFederatedIdentity(
+      uowPerformer,
+      createNewEvent,
+    );
   });
 
   it("should not associate convention if no federatedIdentity is provided", async () => {
     const conventionDtoFromEvent = new ConventionDtoBuilder()
       .withId(conventionId)
-      .build();
-
-    await associatePeConnectFederatedIdentity.execute(conventionDtoFromEvent),
-      expect(
-        conventionPoleEmploiAdvisorRepo.conventionPoleEmploiUsersAdvisors,
-      ).toHaveLength(0);
-    await expect(outboxRepo.events).toHaveLength(0);
-  });
-
-  it("should not associate convention if no federatedIdentity is 'noIdentityProvider'", async () => {
-    const conventionDtoFromEvent = new ConventionDtoBuilder()
-      .withId(conventionId)
       .withFederatedIdentity(undefined)
       .build();
-
+    const expectedEvent = createNewEvent({
+      topic: "FederatedIdentityNotBoundToConvention",
+      payload: conventionDtoFromEvent,
+    });
     await associatePeConnectFederatedIdentity.execute(conventionDtoFromEvent),
       expect(
         conventionPoleEmploiAdvisorRepo.conventionPoleEmploiUsersAdvisors,
       ).toHaveLength(0);
-    await expect(outboxRepo.events).toHaveLength(0);
+    await expectObjectsToMatch(outboxRepo.events, [expectedEvent]);
   });
 
   it("authfailed", async () => {
@@ -72,7 +68,12 @@ describe("AssociatePeConnectFederatedIdentity", () => {
       conventionPoleEmploiAdvisorRepo.conventionPoleEmploiUsersAdvisors,
       [],
     );
-    expectObjectsToMatch(outboxRepo.events, []);
+
+    const expectedEvent = createNewEvent({
+      topic: "FederatedIdentityNotBoundToConvention",
+      payload: conventionDtoFromEvent,
+    });
+    expectObjectsToMatch(outboxRepo.events, [expectedEvent]);
   });
 
   it("should associate convention and federated identity if the federated identity match format", async () => {
@@ -122,11 +123,8 @@ describe("AssociatePeConnectFederatedIdentity", () => {
     // outbox rep
     expect(outboxRepo.events).toHaveLength(1);
     expectObjectsToMatch(outboxRepo.events[0], {
-      topic: "PeConnectFederatedIdentityAssociated",
-      payload: {
-        conventionId,
-        peExternalId: userPeExternalId,
-      },
+      topic: "FederatedIdentityBoundToConvention",
+      payload: conventionDtoFromEvent,
     });
   });
 
@@ -155,11 +153,8 @@ describe("AssociatePeConnectFederatedIdentity", () => {
     // outbox rep
     expect(outboxRepo.events).toHaveLength(1);
     expectObjectsToMatch(outboxRepo.events[0], {
-      topic: "PeConnectFederatedIdentityAssociated",
-      payload: {
-        conventionId,
-        peExternalId: userPeExternalId,
-      },
+      topic: "FederatedIdentityBoundToConvention",
+      payload: conventionDtoFromEvent,
     });
   });
 });

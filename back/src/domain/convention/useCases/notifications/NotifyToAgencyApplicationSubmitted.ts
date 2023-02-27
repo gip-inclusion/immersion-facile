@@ -61,6 +61,7 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
       agency,
       convention,
       ...recipients,
+      warning: await this.makeWarning(agency, convention, uow),
     });
   }
 
@@ -69,11 +70,13 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
     recipients,
     convention,
     role,
+    warning,
   }: {
     recipients: string[];
     agency: AgencyDto;
     convention: ConventionDto;
     role: Role;
+    warning?: string;
   }) {
     await Promise.all(
       recipients.map((email) => {
@@ -106,9 +109,25 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
               targetRoute: frontRoutes.conventionStatusDashboard,
             }),
             agencyLogoUrl: agency.logoUrl,
+            warning,
           },
         });
       }),
     );
+  }
+  private async makeWarning(
+    agency: AgencyDto,
+    convention: ConventionDto,
+    uow: UnitOfWork,
+  ): Promise<string | undefined> {
+    if (agency.kind !== "pole-emploi") return;
+    const conventionAdsivorEntity =
+      await uow.conventionPoleEmploiAdvisorRepository.getByConventionId(
+        convention.id,
+      );
+    const advisor = conventionAdsivorEntity?.advisor;
+    return !advisor
+      ? "Attention: aucun conseiller référent Pôle emploi ne semble être associé à ce bénéficiaire."
+      : `Un mail a également été envoyé au conseiller référent (${advisor.firstName} ${advisor.lastName} - ${advisor.email})`;
   }
 }
