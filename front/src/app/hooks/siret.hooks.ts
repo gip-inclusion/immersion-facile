@@ -51,7 +51,11 @@ export const useSiretFetcher = ({
 
   useEffect(() => {
     if (shouldFetchEvenIfAlreadySaved !== storeShouldFetchEvenIfAlreadySaved)
-      dispatch(siretSlice.actions.toggleShouldFetchEvenIfAlreadySaved());
+      dispatch(
+        siretSlice.actions.setShouldFetchEvenIfAlreadySaved(
+          shouldFetchEvenIfAlreadySaved,
+        ),
+      );
   }, [storeShouldFetchEvenIfAlreadySaved]);
 
   return {

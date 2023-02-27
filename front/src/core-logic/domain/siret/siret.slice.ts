@@ -24,9 +24,11 @@ export const siretSlice = createSlice({
   name: "siret",
   initialState,
   reducers: {
-    toggleShouldFetchEvenIfAlreadySaved: (state) => {
-      state.shouldFetchEvenIfAlreadySaved =
-        !state.shouldFetchEvenIfAlreadySaved;
+    setShouldFetchEvenIfAlreadySaved: (
+      state,
+      action: PayloadAction<boolean>,
+    ) => {
+      state.shouldFetchEvenIfAlreadySaved = action.payload;
     },
     siretModified: (state, action: PayloadAction<string>) => {
       state.currentSiret = action.payload;

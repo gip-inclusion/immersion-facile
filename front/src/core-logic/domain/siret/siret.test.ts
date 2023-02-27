@@ -118,12 +118,14 @@ describe("Siret validation and fetching", () => {
         establishment: { siret: "yolo" } as GetSiretResponseDto,
       });
       expectShouldFetchEvenIfAlreadySavedToBe(true);
-      store.dispatch(siretSlice.actions.toggleShouldFetchEvenIfAlreadySaved());
+      store.dispatch(
+        siretSlice.actions.setShouldFetchEvenIfAlreadySaved(false),
+      );
       expectShouldFetchEvenIfAlreadySavedToBe(false);
       expectSiretErrorToBe(null);
       expectEstablishmentToEqual(null);
       expectCurrentSiretToBe("10002000300040");
-      store.dispatch(siretSlice.actions.toggleShouldFetchEvenIfAlreadySaved());
+      store.dispatch(siretSlice.actions.setShouldFetchEvenIfAlreadySaved(true));
       expectShouldFetchEvenIfAlreadySavedToBe(true);
       expectIsSearchingToBe(true);
     });

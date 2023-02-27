@@ -21,7 +21,7 @@ type SiretEpic = AppEpic<SiretAction>;
 
 const toggleShouldFetchEvenIfAlreadySaved: SiretEpic = (action$, state$) =>
   action$.pipe(
-    filter(siretSlice.actions.toggleShouldFetchEvenIfAlreadySaved.match),
+    filter(siretSlice.actions.setShouldFetchEvenIfAlreadySaved.match),
     map(() =>
       siretSlice.actions.siretModified(state$.value.siret.currentSiret),
     ),
