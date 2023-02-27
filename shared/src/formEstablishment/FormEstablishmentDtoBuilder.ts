@@ -28,7 +28,6 @@ export const defaultValidFormEstablishment: FormEstablishmentDto = {
   siret: "01234567890123",
   website: "www@super.com/jobs",
   additionalInformation: "",
-  isSearchable: true,
   appellations: [
     {
       romeCode: "A1111",
@@ -68,7 +67,6 @@ const emptyFormEstablishment: FormEstablishmentDto = {
   businessName: "",
   siret: "",
   appellations: [],
-  isSearchable: true,
   website: "",
   additionalInformation: "",
   maxContactsPerWeek: 10,
@@ -160,6 +158,6 @@ const FormEstablishmentToEstablishmentCsvRow = (
     .map((appellation) => appellation.appellationCode)
     .join(","),
   isEngagedEnterprise: establishment.isEngagedEnterprise ? "1" : "0",
-  isSearchable: establishment.isSearchable ? "1" : "0",
+  isSearchable: establishment.maxContactsPerWeek > 0 ? "1" : "0",
   fitForDisabledWorkers: establishment.fitForDisabledWorkers ? "1" : "0",
 });

@@ -59,7 +59,6 @@ export const formEstablishmentDtoPublicV0ToDomain = (
       copyEmails: [],
     },
 
-    isSearchable: true,
     website: "",
     additionalInformation: "",
     maxContactsPerWeek: defaultMaxContactsPerWeek,

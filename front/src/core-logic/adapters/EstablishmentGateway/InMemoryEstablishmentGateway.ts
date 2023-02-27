@@ -92,7 +92,6 @@ export class InMemoryEstablishmentGateway implements EstablishmentGateway {
         contactMethod: "EMAIL",
         copyEmails: ["recrutement@boucherie.net"],
       },
-      isSearchable: true,
       website: "www.boulanger-immerge.com",
       additionalInformation:
         "Si vous aimez les croissants et êtes à l'aise avec la monnaie, vous allez adorer !",

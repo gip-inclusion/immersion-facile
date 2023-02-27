@@ -157,7 +157,7 @@ const CreationSiretRelatedInputs = () => {
 // Should be handled by Unit Test Suites
 const creationInitialValuesWithoutSourceAndSearchable = (
   siret?: SiretDto,
-): OmitFromExistingKeys<FormEstablishmentDto, "source" | "isSearchable"> =>
+): OmitFromExistingKeys<FormEstablishmentDto, "source"> =>
   !ENV.prefilledForms
     ? defaultInitialValue(siret)
     : {

@@ -201,6 +201,7 @@ describe("Route to add an establishment form with API key (for exemple for un-je
 
       const formEstablishmentDtoPublicV1: FormEstablishmentDtoPublicV1 = {
         ...formEstablishmentDto,
+        isSearchable: true,
         businessAddress: avenueChampsElysees,
       };
 

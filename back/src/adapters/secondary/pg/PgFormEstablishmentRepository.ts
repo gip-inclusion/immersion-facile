@@ -103,7 +103,6 @@ export class PgFormEstablishmentRepository
       naf: params.naf,
       appellations: params.professions,
       businessContact: params.business_contact,
-      isSearchable: params.is_searchable,
       fitForDisabledWorkers: optional(params.fit_for_disabled_workers),
       maxContactsPerWeek: params.max_contacts_per_week,
     };

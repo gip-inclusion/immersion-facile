@@ -69,7 +69,6 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
       naf: establishmentAggregate.establishment?.nafDto,
       appellations: offersAsAppellationDto,
       businessContact: establishmentAggregate.contact,
-      isSearchable: establishmentAggregate.establishment.isSearchable,
       maxContactsPerWeek:
         establishmentAggregate.establishment.maxContactsPerWeek,
     };

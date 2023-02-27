@@ -68,10 +68,11 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z.object(
       .array(appellationDtoSchema)
       .min(1, localization.atLeastOneJob),
     businessContact: businessContactSchema,
-    isSearchable: zBoolean,
     maxContactsPerWeek: z
       .number()
-      .positive({ message: "La valeur renseignée ne peut pas être négative" })
+      .nonnegative({
+        message: "La valeur renseignée ne peut pas être négative",
+      })
       .int({
         message: "La valeur renseignée ne peut pas contenir de décimale",
       }),

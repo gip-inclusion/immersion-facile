@@ -101,7 +101,6 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
       naf: row.naf,
       appellations: row.professions,
       businessContact: row.business_contact,
-      isSearchable: true,
       maxContactsPerWeek: row.max_contacts_per_week,
     };
     try {

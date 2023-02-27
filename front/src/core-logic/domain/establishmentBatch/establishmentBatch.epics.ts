@@ -96,14 +96,15 @@ export const candidateEstablishmentMapper = (
       lastName: establishmentRow.businessContact_lastName,
       phone: establishmentRow.businessContact_phone,
     },
-    isSearchable: csvBooleanToBoolean(establishmentRow.isSearchable),
     fitForDisabledWorkers: csvBooleanToBoolean(
       establishmentRow.fitForDisabledWorkers,
     ),
     isEngagedEnterprise: csvBooleanToBoolean(
       establishmentRow.isEngagedEnterprise,
     ),
-    maxContactsPerWeek: defaultMaxContactsPerWeek,
+    maxContactsPerWeek: csvBooleanToBoolean(establishmentRow.isSearchable)
+      ? defaultMaxContactsPerWeek
+      : 0,
   };
   try {
     formEstablishmentSchema.parse(mappedEstablishment);

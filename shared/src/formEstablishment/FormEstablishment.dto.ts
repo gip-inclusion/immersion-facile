@@ -42,7 +42,6 @@ export type FormEstablishmentDto = {
   businessContact: BusinessContactDto;
   website?: string;
   additionalInformation?: string;
-  isSearchable: boolean;
   maxContactsPerWeek: number;
 };
 

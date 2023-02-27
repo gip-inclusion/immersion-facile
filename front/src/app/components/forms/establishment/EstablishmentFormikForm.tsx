@@ -2,8 +2,10 @@ import { Form, Formik } from "formik";
 import React, { useState } from "react";
 import { ErrorNotifications } from "react-design-system";
 import Button from "@codegouvfr/react-dsfr/Button";
+import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 
 import {
+  defaultMaxContactsPerWeek,
   FormEstablishmentDto,
   formEstablishmentSchema,
   immersionFacileContactEmail,
@@ -46,6 +48,9 @@ export const EstablishmentFormikForm = ({
   const { getFormErrors, getFormFields } = useFormContents(
     formEstablishmentFieldsLabels,
   );
+  const [isSearchable, setIsSearchable] = useState(
+    initialValues.maxContactsPerWeek > 0,
+  );
   const formContents = getFormFields();
   let errorMessage = submitError?.message;
   const { enableMaxContactPerWeek } = useFeatureFlags();
@@ -80,7 +85,14 @@ export const EstablishmentFormikForm = ({
         }
       }}
     >
-      {({ isSubmitting, submitCount, errors, values, handleChange }) => (
+      {({
+        isSubmitting,
+        submitCount,
+        errors,
+        values,
+        handleChange,
+        setFieldValue,
+      }) => (
         <>
           <p>
             Bienvenue sur l'espace de référencement des entreprises volontaires
@@ -139,7 +151,35 @@ export const EstablishmentFormikForm = ({
             />
             <BusinessContact />
 
-            {enableMaxContactPerWeek && (
+            {isEditing && (
+              <Checkbox
+                hintText={`${
+                  isSearchable
+                    ? "(décochez la case si vous ne  voulez pas être visible sur la recherche)."
+                    : "(cochez la case si vous voulez être visible sur la recherche)."
+                } Vous pourrez réactiver la visibilité à tout moment`}
+                legend="L'entreprise est-elle recherchable par les utilisateurs ?"
+                options={[
+                  {
+                    label: "Oui",
+                    nativeInputProps: {
+                      checked: isSearchable,
+                      onChange: (e) => {
+                        setIsSearchable(e.currentTarget.checked);
+                        setFieldValue(
+                          "maxContactsPerWeek",
+                          e.currentTarget.checked
+                            ? defaultMaxContactsPerWeek
+                            : 0,
+                        );
+                      },
+                    },
+                  },
+                ]}
+              />
+            )}
+
+            {enableMaxContactPerWeek && isSearchable && (
               <Input
                 label={formContents.maxContactsPerWeek.label}
                 hintText={formContents.maxContactsPerWeek.description}
@@ -156,14 +196,6 @@ export const EstablishmentFormikForm = ({
 
             {isEditing && (
               <>
-                <BoolCheckboxGroup
-                  name="isSearchable"
-                  label={`L'entreprise est-elle recherchable par les utilisateurs ? ${
-                    values.isSearchable
-                      ? "(décochez la case si vous ne  voulez pas être visible sur la recherche)."
-                      : "(cochez la case si vous voulez être visible sur la recherche)."
-                  } Vous pourrez réactiver la visibilité à tout moment`}
-                />
                 <p>
                   Vous pouvez demander la suppression définitive de votre
                   entreprise{" "}
@@ -175,6 +207,7 @@ export const EstablishmentFormikForm = ({
                 </p>
               </>
             )}
+
             {Object.values(errors).length === 0 && (
               <SearchResultPreview establishment={values} />
             )}
@@ -198,7 +231,7 @@ export const EstablishmentFormikForm = ({
                 severity="success"
                 title="Succès de l'envoi"
                 description="Succès. Nous avons bien enregistré les informations concernant
-              votre entreprise."
+                votre entreprise."
               />
             )}
             {!isSuccess && (

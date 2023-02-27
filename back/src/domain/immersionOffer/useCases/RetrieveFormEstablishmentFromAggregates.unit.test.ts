@@ -97,7 +97,6 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       businessAddress: addressDtoToString(establishment.address),
       isEngagedEnterprise: establishment.isCommited,
       naf: establishment.nafDto,
-      isSearchable: establishment.isSearchable,
       appellations: [
         {
           appellationLabel: "test_appellation_label",
