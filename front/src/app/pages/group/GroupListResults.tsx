@@ -75,6 +75,7 @@ export const GroupListResults = ({ results }: GroupListResultsProps) => {
                   },
                 })
               }
+              showDistance={false}
               disableButton={modalState.isValidating}
             />
           ))}

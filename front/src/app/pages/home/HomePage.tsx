@@ -82,14 +82,8 @@ export const HomePage = ({ type }: HomePageProps) => {
           }
           subtitle="ouvre ses portes aux nouveaux talents, pourquoi pas vous ?"
           link={
-            routes.search({
-              rome: "D1211",
-              distance_km: 100,
-              latitude: 48.85889,
-              longitude: 2.32004,
-              appellationLabel: "Vendeur / Vendeuse en équipement de sport",
-              appellationCode: "20578",
-              place: "Paris, Île-de-France, France",
+            routes.group({
+              groupName: "decathlon",
             }).link
           }
         />

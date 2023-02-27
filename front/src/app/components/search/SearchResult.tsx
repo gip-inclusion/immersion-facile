@@ -17,6 +17,7 @@ export type EnterpriseSearchResultProps = {
   onButtonClick?: () => void;
   disableButton?: boolean;
   preview?: boolean;
+  showDistance?: boolean;
   layout?: "fr-col-md-4" | "fr-col-md-6";
 };
 
@@ -27,6 +28,7 @@ export const SearchResult = ({
   establishment,
   preview,
   layout = "fr-col-md-4",
+  showDistance = true,
 }: EnterpriseSearchResultProps) => {
   const { cx } = useStyles();
   const {
@@ -103,12 +105,15 @@ export const SearchResult = ({
                 >
                   {addressDtoToString(address).toLocaleLowerCase()}
                 </a>{" "}
-                (
-                <strong>
-                  {distanceKm}
-                  km
-                </strong>{" "}
-                de votre position)
+                {showDistance && (
+                  <span>
+                    <strong>
+                      {distanceKm}
+                      km
+                    </strong>{" "}
+                    de votre position
+                  </span>
+                )}
               </li>
               {website && (
                 <li>
