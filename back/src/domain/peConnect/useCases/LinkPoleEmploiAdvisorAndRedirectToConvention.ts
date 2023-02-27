@@ -56,7 +56,7 @@ export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalU
       advisor: user.isJobseeker ? chooseValidAdvisor(advisors) : undefined,
     };
 
-    if (peUserAndAdvisor.advisor)
+    if (peUserAndAdvisor.user.isJobseeker)
       await uow.conventionPoleEmploiAdvisorRepository.openSlotForNextConvention(
         peUserAndAdvisor,
       );
