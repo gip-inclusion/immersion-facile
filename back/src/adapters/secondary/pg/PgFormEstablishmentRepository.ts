@@ -40,16 +40,16 @@ export class PgFormEstablishmentRepository
     formEstablishmentDto: FormEstablishmentDto,
   ): Promise<void> {
     // prettier-ignore
-    const {  siret, source, businessName, businessNameCustomized, businessAddress, isEngagedEnterprise, naf, appellations: professions, businessContact,  website, additionalInformation, fitForDisabledWorkers } =
+    const {  siret, source, businessName, businessNameCustomized, businessAddress, isEngagedEnterprise, naf, appellations: professions, businessContact,  website, additionalInformation, fitForDisabledWorkers, maxContactPerWeek } =
       formEstablishmentDto
 
     const query = `INSERT INTO form_establishments(
-        siret, source, business_name, business_name_customized, business_address, website, additional_information, is_engaged_enterprise, naf, professions, business_contact, fit_for_disabled_workers
-      ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`;
+        siret, source, business_name, business_name_customized, business_address, website, additional_information, is_engaged_enterprise, naf, professions, business_contact, fit_for_disabled_workers, max_contact_per_week
+      ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`;
 
     // prettier-ignore
     try {
-      await this.client.query(query, [siret, source, businessName, businessNameCustomized, businessAddress, website, additionalInformation, isEngagedEnterprise, naf, JSON.stringify(professions), JSON.stringify(businessContact), fitForDisabledWorkers]);
+      await this.client.query(query, [siret, source, businessName, businessNameCustomized, businessAddress, website, additionalInformation, isEngagedEnterprise, naf, JSON.stringify(professions), JSON.stringify(businessContact), fitForDisabledWorkers, maxContactPerWeek]);
     } catch (error: any) {
       logger.error({error}, "Cannot save form establishment ")
       notifyObjectDiscord({
@@ -71,7 +71,8 @@ export class PgFormEstablishmentRepository
                     naf=$7,
                     professions=$8,
                     business_contact=$9,
-                    fit_for_disabled_workers=$10
+                    fit_for_disabled_workers=$10,
+                    max_contact_per_week=$11
                     WHERE siret=$1`;
 
     await this.client.query(query, [
@@ -85,6 +86,7 @@ export class PgFormEstablishmentRepository
       JSON.stringify(formEstablishmentDto.appellations),
       JSON.stringify(formEstablishmentDto.businessContact),
       formEstablishmentDto.fitForDisabledWorkers,
+      formEstablishmentDto.maxContactPerWeek,
     ]);
   }
 
