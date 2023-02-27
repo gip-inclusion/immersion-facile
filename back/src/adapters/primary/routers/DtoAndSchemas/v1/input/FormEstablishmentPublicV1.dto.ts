@@ -37,7 +37,10 @@ export type FormEstablishmentDtoPublicV1 = {
 
 export const formEstablishmentDtoPublicV1ToDomain = (
   publicV1: FormEstablishmentDtoPublicV1,
-): OmitFromExistingKeys<FormEstablishmentDto, "source"> => ({
+): OmitFromExistingKeys<
+  FormEstablishmentDto,
+  "source" | "maxContactPerWeek"
+> => ({
   ...publicV1,
   website: "",
   additionalInformation: "",

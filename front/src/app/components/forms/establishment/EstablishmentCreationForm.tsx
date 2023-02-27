@@ -2,6 +2,7 @@ import { useField } from "formik";
 import React, { useState, useEffect } from "react";
 import {
   addressDtoToString,
+  defaultMaxContactPerWeek,
   FormEstablishmentDto,
   FormEstablishmentSource,
   OmitFromExistingKeys,
@@ -168,6 +169,7 @@ const creationInitialValuesWithoutSourceAndSearchable = (
           "My Customized Business name, not replaced by API",
         businessAddress: "My business address, replaced by result from API",
         isEngagedEnterprise: true,
+        maxContactPerWeek: defaultMaxContactPerWeek,
         appellations: [
           {
             appellationCode: "11573",
@@ -190,6 +192,5 @@ const creationInitialValuesWithoutSourceAndSearchable = (
           email: "joe@mail.com",
           contactMethod: "EMAIL",
           copyEmails: ["recrutement@boucherie.net"],
-          maxContactPerWeek: 5,
         },
       };

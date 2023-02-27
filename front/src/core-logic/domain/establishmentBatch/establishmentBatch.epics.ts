@@ -18,6 +18,8 @@ import {
   FormEstablishmentSource,
   EstablishmentCSVRow,
   isCSVCellEmptyString,
+  FormEstablishmentDto,
+  defaultMaxContactPerWeek,
 } from "shared";
 
 type EstablishmentBatchAction = ActionOfSlice<typeof establishmentBatchSlice>;
@@ -64,7 +66,7 @@ export const candidateEstablishmentMapper = (
   establishmentRow: EstablishmentCSVRow,
 ): FormEstablishmentDtoWithErrors => {
   let errors: z.ZodIssue[] = [];
-  const mappedEstablishment = {
+  const mappedEstablishment: FormEstablishmentDto = {
     businessAddress: establishmentRow.businessAddress,
     businessName: establishmentRow.businessName,
     siret: establishmentRow.siret,
@@ -101,6 +103,7 @@ export const candidateEstablishmentMapper = (
     isEngagedEnterprise: csvBooleanToBoolean(
       establishmentRow.isEngagedEnterprise,
     ),
+    maxContactPerWeek: defaultMaxContactPerWeek,
   };
   try {
     formEstablishmentSchema.parse(mappedEstablishment);

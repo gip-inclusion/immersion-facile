@@ -102,6 +102,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
       appellations: row.professions,
       businessContact: row.business_contact,
       isSearchable: true,
+      maxContactPerWeek: row.max_contact_per_week,
     };
     try {
       await upsertAggregateFromForm.execute(formEstablishmentDto);

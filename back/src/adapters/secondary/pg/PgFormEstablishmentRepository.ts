@@ -103,6 +103,7 @@ export class PgFormEstablishmentRepository
       businessContact: params.business_contact,
       isSearchable: params.is_searchable,
       fitForDisabledWorkers: optional(params.fit_for_disabled_workers),
+      maxContactPerWeek: params.max_contact_per_week,
     };
   }
 }

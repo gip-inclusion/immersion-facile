@@ -7,6 +7,7 @@ import {
   FormEstablishmentDto,
   FormEstablishmentSource,
 } from "./FormEstablishment.dto";
+import { defaultMaxContactPerWeek } from "./FormEstablishment.schema";
 
 export const defaultValidFormEstablishment: FormEstablishmentDto = {
   source: "immersion-facile",
@@ -48,6 +49,7 @@ export const defaultValidFormEstablishment: FormEstablishmentDto = {
       appellationLabel: "Boucher / Bouchère",
     },
   ],
+  maxContactPerWeek: defaultMaxContactPerWeek,
 };
 
 const emptyFormEstablishment: FormEstablishmentDto = {
@@ -69,6 +71,7 @@ const emptyFormEstablishment: FormEstablishmentDto = {
   isSearchable: true,
   website: "",
   additionalInformation: "",
+  maxContactPerWeek: 10,
 };
 
 export class FormEstablishmentDtoBuilder
@@ -98,7 +101,7 @@ export class FormEstablishmentDtoBuilder
   public withMaxContactPerWeek(maxContactPerWeek: number) {
     return new FormEstablishmentDtoBuilder({
       ...this.dto,
-      businessContact: { ...this.dto.businessContact, maxContactPerWeek },
+      maxContactPerWeek,
     });
   }
 

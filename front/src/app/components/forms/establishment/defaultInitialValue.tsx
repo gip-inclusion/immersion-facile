@@ -1,4 +1,9 @@
-import { FormEstablishmentDto, OmitFromExistingKeys, SiretDto } from "shared";
+import {
+  defaultMaxContactPerWeek,
+  FormEstablishmentDto,
+  OmitFromExistingKeys,
+  SiretDto,
+} from "shared";
 
 export const defaultInitialValue = (
   siret?: SiretDto,
@@ -15,9 +20,9 @@ export const defaultInitialValue = (
     email: "",
     contactMethod: "EMAIL",
     copyEmails: [],
-    maxContactPerWeek: 5,
   },
   isSearchable: true,
   website: "",
   additionalInformation: "",
+  maxContactPerWeek: defaultMaxContactPerWeek,
 });

@@ -77,14 +77,6 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
     required: true,
     id: "establishment-businessContact-contactMethod",
   },
-  "businessContact.maxContactPerWeek": {
-    label:
-      "Au maximum, combien de mises en relation souhaitez-vous recevoir par semaine ?",
-    description:
-      "Par exemple, en renseignant 5 : si vous avez déjà reçu 5 demandes cette semaine, vous n'apparaîtrez plus dans la liste des entreprises accueillantes jusqu'à la semaine suivante.",
-    required: true,
-    id: "establishment-businessContact-maxContactPerWeek",
-  },
   isEngagedEnterprise: {
     label:
       "Mon entreprise est membre de la communauté « Les entreprises s'engagent »",
@@ -111,5 +103,13 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
       "En information complémentaire, nous vous conseillons de valoriser votre histoire afin de donner envie à un candidat de découvrir un métier au sein de votre établissement.",
     placeholder:
       "Ex : ma biographie d’entreprise (valeurs, écosystème, projections), mon potentiel d’embauche ou toute autre information essentielle pour l’accueil du bénéficiaire au sein de mon établissement (optionnel)",
+  },
+  maxContactPerWeek: {
+    label:
+      "Au maximum, combien de mises en relation souhaitez-vous recevoir par semaine ?",
+    description:
+      "Par exemple, en renseignant 5 : si vous avez déjà reçu 5 demandes cette semaine, vous n'apparaîtrez plus dans la liste des entreprises accueillantes jusqu'à la semaine suivante.",
+    required: true,
+    id: "establishment-maxContactPerWeek",
   },
 };

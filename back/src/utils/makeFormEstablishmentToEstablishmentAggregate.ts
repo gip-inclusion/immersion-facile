@@ -19,7 +19,6 @@ import { SireneGateway } from "../domain/sirene/ports/SireneGateway";
 import { SireneEstablishmentVO } from "../domain/sirene/valueObjects/SireneEstablishmentVO";
 
 const offerFromFormScore = 10;
-const defaultMaxContactPerWeek = 10;
 
 const appelationToImmersionOfferEntity =
   (timeGateway: TimeGateway) =>
@@ -197,9 +196,7 @@ const makeCreateEstablishmentAggregate =
       updatedAt: timeGateway.now(),
       isSearchable: formEstablishment.isSearchable,
       fitForDisabledWorkers: formEstablishment.fitForDisabledWorkers,
-      maxContactPerWeek:
-        formEstablishment.businessContact.maxContactPerWeek ??
-        defaultMaxContactPerWeek,
+      maxContactPerWeek: formEstablishment.maxContactPerWeek,
     };
 
     const establishmentAggregate: EstablishmentAggregate = {

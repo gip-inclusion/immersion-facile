@@ -1,5 +1,10 @@
 import { Observable, of, Subject } from "rxjs";
-import { FormEstablishmentDto, SiretDto, sleep } from "shared";
+import {
+  defaultMaxContactPerWeek,
+  FormEstablishmentDto,
+  SiretDto,
+  sleep,
+} from "shared";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
 
 export class InMemoryEstablishmentGateway implements EstablishmentGateway {
@@ -63,6 +68,7 @@ export class InMemoryEstablishmentGateway implements EstablishmentGateway {
       businessNameCustomized: `My business customized name, retrieved from jwt ${jwt}`,
       businessAddress: "5 Rue de la Huchette, 75005 Paris",
       isEngagedEnterprise: true,
+      maxContactPerWeek: defaultMaxContactPerWeek,
       appellations: [
         {
           appellationCode: "11573",

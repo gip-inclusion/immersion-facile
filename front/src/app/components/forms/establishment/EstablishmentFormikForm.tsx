@@ -20,6 +20,8 @@ import { BusinessContact } from "./BusinessContact";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { SearchResultPreview } from "./SearchResultPreview";
+import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
+import { Input } from "@codegouvfr/react-dsfr/Input";
 
 type EstablishmentFormProps = {
   initialValues: FormEstablishmentDto;
@@ -46,6 +48,7 @@ export const EstablishmentFormikForm = ({
   );
   const formContents = getFormFields();
   let errorMessage = submitError?.message;
+  const { enableMaxContactPerWeek } = useFeatureFlags();
 
   if (getErrorsFromResponseData(submitError)) {
     errorMessage = submitError["response"]["data"]["errors"];
@@ -77,7 +80,7 @@ export const EstablishmentFormikForm = ({
         }
       }}
     >
-      {({ isSubmitting, submitCount, errors, values }) => (
+      {({ isSubmitting, submitCount, errors, values, handleChange }) => (
         <>
           <p>
             Bienvenue sur l'espace de référencement des entreprises volontaires
@@ -135,6 +138,21 @@ export const EstablishmentFormikForm = ({
               title={formContents.appellations.label}
             />
             <BusinessContact />
+
+            {enableMaxContactPerWeek && (
+              <Input
+                label={formContents.maxContactPerWeek.label}
+                hintText={formContents.maxContactPerWeek.description}
+                nativeInputProps={{
+                  ...formContents.maxContactPerWeek,
+                  type: "number",
+                  min: 0,
+                  pattern: "\\d*",
+                  onChange: handleChange,
+                  value: values.maxContactPerWeek,
+                }}
+              />
+            )}
 
             {isEditing && (
               <>

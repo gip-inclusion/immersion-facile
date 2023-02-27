@@ -1,4 +1,9 @@
-import { Flavor, FormEstablishmentDto, OmitFromExistingKeys } from "shared";
+import {
+  defaultMaxContactPerWeek,
+  Flavor,
+  FormEstablishmentDto,
+  OmitFromExistingKeys,
+} from "shared";
 
 // prettier-ignore
 export type ImmersionContactInEstablishmentId = Flavor<string, "ImmersionContactInEstablishmentId">;
@@ -58,5 +63,6 @@ export const formEstablishmentDtoPublicV0ToDomain = (
     isSearchable: true,
     website: "",
     additionalInformation: "",
+    maxContactPerWeek: defaultMaxContactPerWeek,
   };
 };

@@ -16,7 +16,6 @@ export type BusinessContactDto = {
   email: string; // a valid email
   contactMethod: ContactMethod;
   copyEmails: string[];
-  maxContactPerWeek?: number;
 };
 
 export type FormEstablishmentSourceInUrl =
@@ -44,6 +43,7 @@ export type FormEstablishmentDto = {
   website?: string;
   additionalInformation?: string;
   isSearchable: boolean;
+  maxContactPerWeek: number;
 };
 
 export type CSVBoolean = "1" | "0" | "";
