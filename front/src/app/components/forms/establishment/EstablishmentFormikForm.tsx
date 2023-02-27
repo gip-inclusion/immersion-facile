@@ -141,15 +141,15 @@ export const EstablishmentFormikForm = ({
 
             {enableMaxContactPerWeek && (
               <Input
-                label={formContents.maxContactPerWeek.label}
-                hintText={formContents.maxContactPerWeek.description}
+                label={formContents.maxContactsPerWeek.label}
+                hintText={formContents.maxContactsPerWeek.description}
                 nativeInputProps={{
-                  ...formContents.maxContactPerWeek,
+                  ...formContents.maxContactsPerWeek,
                   type: "number",
                   min: 0,
                   pattern: "\\d*",
                   onChange: handleChange,
-                  value: values.maxContactPerWeek,
+                  value: values.maxContactsPerWeek,
                 }}
               />
             )}

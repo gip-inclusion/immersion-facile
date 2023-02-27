@@ -19,7 +19,7 @@ import {
   EstablishmentCSVRow,
   isCSVCellEmptyString,
   FormEstablishmentDto,
-  defaultMaxContactPerWeek,
+  defaultMaxContactsPerWeek,
 } from "shared";
 
 type EstablishmentBatchAction = ActionOfSlice<typeof establishmentBatchSlice>;
@@ -103,7 +103,7 @@ export const candidateEstablishmentMapper = (
     isEngagedEnterprise: csvBooleanToBoolean(
       establishmentRow.isEngagedEnterprise,
     ),
-    maxContactPerWeek: defaultMaxContactPerWeek,
+    maxContactsPerWeek: defaultMaxContactsPerWeek,
   };
   try {
     formEstablishmentSchema.parse(mappedEstablishment);

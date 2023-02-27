@@ -1,5 +1,5 @@
 import {
-  defaultMaxContactPerWeek,
+  defaultMaxContactsPerWeek,
   Flavor,
   FormEstablishmentDto,
   OmitFromExistingKeys,
@@ -20,7 +20,6 @@ export type BusinessContactDtoPublicV0 = {
   job: string;
   phone: string; // we have a very permissive regex /^\+?[0-9]+$/
   email: string; // a valid email
-  maxContactPerWeek?: number;
 };
 
 export type ContactMethodPublicV0 = "UNKNOWN" | "EMAIL" | "PHONE" | "IN_PERSON";
@@ -63,6 +62,6 @@ export const formEstablishmentDtoPublicV0ToDomain = (
     isSearchable: true,
     website: "",
     additionalInformation: "",
-    maxContactPerWeek: defaultMaxContactPerWeek,
+    maxContactsPerWeek: defaultMaxContactsPerWeek,
   };
 };

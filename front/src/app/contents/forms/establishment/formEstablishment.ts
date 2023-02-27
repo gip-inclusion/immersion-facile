@@ -104,7 +104,7 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
     placeholder:
       "Ex : ma biographie d’entreprise (valeurs, écosystème, projections), mon potentiel d’embauche ou toute autre information essentielle pour l’accueil du bénéficiaire au sein de mon établissement (optionnel)",
   },
-  maxContactPerWeek: {
+  maxContactsPerWeek: {
     label:
       "Au maximum, combien de mises en relation souhaitez-vous recevoir par semaine ?",
     description:

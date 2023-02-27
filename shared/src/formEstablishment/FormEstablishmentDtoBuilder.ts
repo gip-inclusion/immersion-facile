@@ -7,7 +7,7 @@ import {
   FormEstablishmentDto,
   FormEstablishmentSource,
 } from "./FormEstablishment.dto";
-import { defaultMaxContactPerWeek } from "./FormEstablishment.schema";
+import { defaultMaxContactsPerWeek } from "./FormEstablishment.schema";
 
 export const defaultValidFormEstablishment: FormEstablishmentDto = {
   source: "immersion-facile",
@@ -49,7 +49,7 @@ export const defaultValidFormEstablishment: FormEstablishmentDto = {
       appellationLabel: "Boucher / Bouchère",
     },
   ],
-  maxContactPerWeek: defaultMaxContactPerWeek,
+  maxContactsPerWeek: defaultMaxContactsPerWeek,
 };
 
 const emptyFormEstablishment: FormEstablishmentDto = {
@@ -71,7 +71,7 @@ const emptyFormEstablishment: FormEstablishmentDto = {
   isSearchable: true,
   website: "",
   additionalInformation: "",
-  maxContactPerWeek: 10,
+  maxContactsPerWeek: 10,
 };
 
 export class FormEstablishmentDtoBuilder
@@ -98,10 +98,10 @@ export class FormEstablishmentDtoBuilder
     });
   }
 
-  public withMaxContactPerWeek(maxContactPerWeek: number) {
+  public withMaxContactsPerWeek(maxContactsPerWeek: number) {
     return new FormEstablishmentDtoBuilder({
       ...this.dto,
-      maxContactPerWeek,
+      maxContactsPerWeek,
     });
   }
 

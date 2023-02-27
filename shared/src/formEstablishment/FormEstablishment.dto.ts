@@ -43,7 +43,7 @@ export type FormEstablishmentDto = {
   website?: string;
   additionalInformation?: string;
   isSearchable: boolean;
-  maxContactPerWeek: number;
+  maxContactsPerWeek: number;
 };
 
 export type CSVBoolean = "1" | "0" | "";

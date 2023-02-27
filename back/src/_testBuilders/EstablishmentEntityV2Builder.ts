@@ -29,7 +29,7 @@ export const validEstablishmentEntityV2: EstablishmentEntityV2 = {
   updatedAt: new Date("2022-01-05T12:00:00.000"),
   isActive: true,
   isSearchable: true,
-  maxContactPerWeek: 10,
+  maxContactsPerWeek: 10,
 };
 
 export class EstablishmentEntityV2Builder
@@ -109,10 +109,10 @@ export class EstablishmentEntityV2Builder
     return new EstablishmentEntityV2Builder({ ...this.entity, updatedAt });
   }
 
-  withMaxContactPerWeek(maxContactPerWeek: number) {
+  withMaxContactsPerWeek(maxContactsPerWeek: number) {
     return new EstablishmentEntityV2Builder({
       ...this.entity,
-      maxContactPerWeek,
+      maxContactsPerWeek,
     });
   }
 

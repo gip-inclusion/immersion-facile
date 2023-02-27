@@ -1,5 +1,5 @@
 import {
-  defaultMaxContactPerWeek,
+  defaultMaxContactsPerWeek as defaultMaxContactsPerWeek,
   FormEstablishmentDto,
   OmitFromExistingKeys,
   SiretDto,
@@ -24,5 +24,5 @@ export const defaultInitialValue = (
   isSearchable: true,
   website: "",
   additionalInformation: "",
-  maxContactPerWeek: defaultMaxContactPerWeek,
+  maxContactsPerWeek: defaultMaxContactsPerWeek,
 });

@@ -70,7 +70,8 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
       appellations: offersAsAppellationDto,
       businessContact: establishmentAggregate.contact,
       isSearchable: establishmentAggregate.establishment.isSearchable,
-      maxContactPerWeek: establishmentAggregate.establishment.maxContactPerWeek,
+      maxContactsPerWeek:
+        establishmentAggregate.establishment.maxContactsPerWeek,
     };
     return retrievedForm;
   }

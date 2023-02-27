@@ -1,6 +1,6 @@
 import { Observable, of, Subject } from "rxjs";
 import {
-  defaultMaxContactPerWeek,
+  defaultMaxContactsPerWeek,
   FormEstablishmentDto,
   SiretDto,
   sleep,
@@ -68,7 +68,7 @@ export class InMemoryEstablishmentGateway implements EstablishmentGateway {
       businessNameCustomized: `My business customized name, retrieved from jwt ${jwt}`,
       businessAddress: "5 Rue de la Huchette, 75005 Paris",
       isEngagedEnterprise: true,
-      maxContactPerWeek: defaultMaxContactPerWeek,
+      maxContactsPerWeek: defaultMaxContactsPerWeek,
       appellations: [
         {
           appellationCode: "11573",

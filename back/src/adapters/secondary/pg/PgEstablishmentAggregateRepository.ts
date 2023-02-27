@@ -149,7 +149,7 @@ export class PgEstablishmentAggregateRepository
       establishment.isSearchable,
       establishment.isCommited,
       establishment.fitForDisabledWorkers,
-      establishment.maxContactPerWeek,
+      establishment.maxContactsPerWeek,
     ]);
 
     if (establishmentFields.length === 0) return;
@@ -158,7 +158,7 @@ export class PgEstablishmentAggregateRepository
       const query = fixStGeographyEscapingInQuery(
         format(
           `INSERT INTO establishments (
-          siret, name, customized_name, website, additional_information, street_number_and_address, post_code, city, department_code, number_employees, naf_code, naf_nomenclature, data_source, source_provider, gps, lon, lat, update_date, is_active, is_searchable, is_commited, fit_for_disabled_workers, max_contact_per_week 
+          siret, name, customized_name, website, additional_information, street_number_and_address, post_code, city, department_code, number_employees, naf_code, naf_nomenclature, data_source, source_provider, gps, lon, lat, update_date, is_active, is_searchable, is_commited, fit_for_disabled_workers, max_contacts_per_week 
         ) VALUES %L
         ON CONFLICT
           ON CONSTRAINT establishments_pkey
@@ -173,7 +173,7 @@ export class PgEstablishmentAggregateRepository
                 naf_code=EXCLUDED.naf_code,
                 data_source=EXCLUDED.data_source,
                 fit_for_disabled_workers=EXCLUDED.fit_for_disabled_workers,
-                max_contact_per_week=EXCLUDED.max_contact_per_week
+                max_contacts_per_week=EXCLUDED.max_contacts_per_week
               WHERE
                 EXCLUDED.data_source='form'
                 OR (
@@ -489,8 +489,8 @@ export class PgEstablishmentAggregateRepository
                       : ""
                   }
                   ${
-                    propertiesToUpdate.maxContactPerWeek !== undefined
-                      ? ", max_contact_per_week=%20$L"
+                    propertiesToUpdate.maxContactsPerWeek !== undefined
+                      ? ", max_contacts_per_week=%20$L"
                       : ""
                   }
                    WHERE siret=%21$L;`;
@@ -517,7 +517,7 @@ export class PgEstablishmentAggregateRepository
       propertiesToUpdate.website,
       propertiesToUpdate.additionalInformation,
       propertiesToUpdate.fitForDisabledWorkers,
-      propertiesToUpdate.maxContactPerWeek,
+      propertiesToUpdate.maxContactsPerWeek,
       propertiesToUpdate.siret,
     ];
     const formatedQuery = format(updateQuery, ...queryArgs);
@@ -684,7 +684,7 @@ export class PgEstablishmentAggregateRepository
             'isActive', e.is_active, 
             'isSearchable', e.is_searchable, 
             'isCommited', e.is_commited,
-            'maxContactPerWeek', e.max_contact_per_week
+            'maxContactsPerWeek', e.max_contacts_per_week
             ),
           'immersionOffers', io.immersionOffers,
           'contact', JSON_BUILD_OBJECT(

@@ -31,7 +31,7 @@ describe("PgFormEstablishmentRepository", () => {
     const formEstablishment = FormEstablishmentDtoBuilder.valid()
       .withSource("lesentreprises-sengagent")
       .withSiret("88888888888888")
-      .withMaxContactPerWeek(8)
+      .withMaxContactsPerWeek(8)
       .build();
 
     await formEstablishmentRepository.create(formEstablishment);

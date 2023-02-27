@@ -196,7 +196,7 @@ const makeCreateEstablishmentAggregate =
       updatedAt: timeGateway.now(),
       isSearchable: formEstablishment.isSearchable,
       fitForDisabledWorkers: formEstablishment.fitForDisabledWorkers,
-      maxContactPerWeek: formEstablishment.maxContactPerWeek,
+      maxContactsPerWeek: formEstablishment.maxContactsPerWeek,
     };
 
     const establishmentAggregate: EstablishmentAggregate = {

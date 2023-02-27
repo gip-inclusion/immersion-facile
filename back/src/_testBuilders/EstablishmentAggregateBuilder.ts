@@ -68,13 +68,13 @@ export class EstablishmentAggregateBuilder
     return this.withContactId(new UuidV4Generator().new());
   }
 
-  public withMaxContactPerWeek(maxContactPerWeek: number) {
+  public withMaxContactsPerWeek(maxContactsPerWeek: number) {
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
       establishment: new EstablishmentEntityV2Builder(
         this.aggregate.establishment,
       )
-        .withMaxContactPerWeek(maxContactPerWeek)
+        .withMaxContactsPerWeek(maxContactsPerWeek)
         .build(),
     });
   }

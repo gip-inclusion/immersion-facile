@@ -788,7 +788,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       it("adds the establishment values in `establishments` table when one new establishment is given", async () => {
         // Prepare
         const establishmentToInsert = new EstablishmentEntityV2Builder()
-          .withMaxContactPerWeek(7)
+          .withMaxContactsPerWeek(7)
           .build();
 
         // Act;
@@ -815,7 +815,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           data_source: establishmentToInsert.dataSource,
           update_date: establishmentToInsert.updatedAt,
           is_active: establishmentToInsert.isActive,
-          max_contact_per_week: establishmentToInsert.maxContactPerWeek!,
+          max_contacts_per_week: establishmentToInsert.maxContactsPerWeek!,
         };
         const actualEstablishmentRows = await getAllEstablishmentsRows();
         expect(actualEstablishmentRows).toHaveLength(1);
@@ -1568,7 +1568,7 @@ describe("Postgres implementation of immersion offer repository", () => {
             isSearchable: false,
             website: "www.updated-website.fr",
             additionalInformation: "Some additional informations",
-            maxContactPerWeek: 7,
+            maxContactsPerWeek: 7,
           },
         };
         await pgEstablishmentAggregateRepository.updateEstablishmentAggregate(
@@ -1642,7 +1642,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     is_active: boolean;
     is_commited?: boolean | null;
     fit_for_disabled_workers: boolean | null;
-    max_contact_per_week: number | null;
+    max_contacts_per_week: number | null;
   };
 
   const getAllEstablishmentsRows = async (): Promise<PgEstablishmentRow[]> =>

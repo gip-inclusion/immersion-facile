@@ -25,7 +25,7 @@ import {
 export const immersionContactInEstablishmentIdSchema: z.ZodSchema<ImmersionContactInEstablishmentId> =
   zTrimmedString;
 
-export const defaultMaxContactPerWeek = 10;
+export const defaultMaxContactsPerWeek = 10;
 const validContactMethods: NotEmptyArray<ContactMethod> = [
   "EMAIL",
   "PHONE",
@@ -41,11 +41,6 @@ export const businessContactSchema: z.Schema<BusinessContactDto> = z.object({
   email: zEmail,
   contactMethod: preferredContactMethodSchema,
   copyEmails: z.array(zEmail),
-  maxContactPerWeek: z
-    .number()
-    .positive({ message: "La valeur renseignée ne peut pas être négative" })
-    .int({ message: "La valeur renseignée ne peut pas contenir de décimale" })
-    .optional(),
 });
 
 const formEstablishmentSources: NotEmptyArray<FormEstablishmentSource> = [
@@ -74,7 +69,12 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z.object(
       .min(1, localization.atLeastOneJob),
     businessContact: businessContactSchema,
     isSearchable: zBoolean,
-    maxContactPerWeek: z.number(),
+    maxContactsPerWeek: z
+      .number()
+      .positive({ message: "La valeur renseignée ne peut pas être négative" })
+      .int({
+        message: "La valeur renseignée ne peut pas contenir de décimale",
+      }),
   },
 );
 

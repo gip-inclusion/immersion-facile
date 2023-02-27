@@ -109,7 +109,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       businessContact: contact,
       website: establishment.website,
       additionalInformation: establishment.additionalInformation,
-      maxContactPerWeek: establishment.maxContactPerWeek,
+      maxContactsPerWeek: establishment.maxContactsPerWeek,
     };
     expect(retrievedForm).toMatchObject(expectedForm);
   });
