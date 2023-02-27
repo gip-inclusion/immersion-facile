@@ -92,7 +92,9 @@ export class HttpPeConnectGateway implements PeConnectGateway {
           }),
         (payload) => notifyDiscordOnNotError(payload),
       );
-      return managePeConnectError(error, "exchangeCodeForAccessToken");
+      return managePeConnectError(error, "exchangeCodeForAccessToken", {
+        authorization: authorizationCode,
+      });
     } finally {
       // eslint-disable-next-line no-console
       console.timeEnd(timerFlag);
@@ -157,7 +159,9 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         (payload) => notifyDiscordOnNotError(payload),
       );
       if (error instanceof ZodError) return undefined;
-      return managePeConnectError(error, "getUserInfo");
+      return managePeConnectError(error, "getUserInfo", {
+        authorization: headers.Authorization,
+      });
     } finally {
       // eslint-disable-next-line no-console
       console.timeEnd(timerFlag);
@@ -195,7 +199,9 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         (payload) => notifyDiscordOnNotError(payload),
       );
       if (error instanceof ZodError) return false;
-      return managePeConnectError(error, "getUserStatutInfo");
+      return managePeConnectError(error, "getUserStatutInfo", {
+        authorization: headers.Authorization,
+      });
     } finally {
       // eslint-disable-next-line no-console
       console.timeEnd(timerFlag);
@@ -240,12 +246,14 @@ export class HttpPeConnectGateway implements PeConnectGateway {
       // pour que managed error retourne une valeur
       if (isJobseekerButNoAdvisorsResponse(error)) {
         notifyObjectDiscord({
-          message: "isJobseekerButNoAdvisorsResponse - Should not occur",
+          message: `isJobseekerButNoAdvisorsResponse for token: ${headers.Authorization}`,
           error,
         });
         return [];
       }
-      return managePeConnectError(error, "getAdvisorsInfo");
+      return managePeConnectError(error, "getAdvisorsInfo", {
+        authorization: headers.Authorization,
+      });
     } finally {
       // eslint-disable-next-line no-console
       console.timeEnd(timerFlag);
@@ -255,7 +263,8 @@ export class HttpPeConnectGateway implements PeConnectGateway {
 
 export const managePeConnectError = (
   error: unknown,
-  context: PeConnectTargetsKind,
+  targetKind: PeConnectTargetsKind,
+  context: Record<string, string>,
 ): never => {
   if (!(error instanceof Error))
     throw new UnhandledError(
@@ -264,14 +273,26 @@ export const managePeConnectError = (
     );
   if (axios.isAxiosError(error)) {
     logger.error(
-      { message: error?.message, body: error?.response?.data },
+      {
+        targetKind,
+        context,
+        message: error?.message,
+        body: error?.response?.data,
+      },
       "PE CONNECT ERROR",
     );
-    const handledError = peConnectAxiosErrorStrategy(error, context).get(true);
+    const handledError = peConnectAxiosErrorStrategy(error, targetKind).get(
+      true,
+    );
     if (handledError) throw handledError;
     throw new UnhandledError("Erreur axios non gérée", error);
   }
-  throw new UnhandledError(`Non axios error - ${error.message}`, error);
+  throw new UnhandledError(
+    `Non axios error - ${
+      error.message
+    } - targetKind: ${targetKind} - context: ${JSON.stringify(context)}`,
+    error,
+  );
 };
 
 const errorChecker = (
