@@ -111,7 +111,6 @@ export const AppellationAutocomplete = ({
         inputValue={inputHasChanged ? searchTerm : initialOption?.description}
         noOptionsText={searchTerm ? noOptionText : "Saisissez un métier"}
         getOptionLabel={(option: Option) => option.value.appellationLabel}
-        open={true}
         id={id}
         renderOption={(props, option) => (
           <li {...props}>
