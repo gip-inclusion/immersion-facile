@@ -7,7 +7,10 @@ import {
   FormEstablishmentDto,
   FormEstablishmentSource,
 } from "./FormEstablishment.dto";
-import { defaultMaxContactsPerWeek } from "./FormEstablishment.schema";
+import {
+  defaultMaxContactsPerWeek,
+  noContactPerWeek,
+} from "./FormEstablishment.schema";
 
 export const defaultValidFormEstablishment: FormEstablishmentDto = {
   source: "immersion-facile",
@@ -69,7 +72,7 @@ const emptyFormEstablishment: FormEstablishmentDto = {
   appellations: [],
   website: "",
   additionalInformation: "",
-  maxContactsPerWeek: 10,
+  maxContactsPerWeek: defaultMaxContactsPerWeek,
 };
 
 export class FormEstablishmentDtoBuilder
@@ -158,6 +161,6 @@ const FormEstablishmentToEstablishmentCsvRow = (
     .map((appellation) => appellation.appellationCode)
     .join(","),
   isEngagedEnterprise: establishment.isEngagedEnterprise ? "1" : "0",
-  isSearchable: establishment.maxContactsPerWeek > 0 ? "1" : "0",
+  isSearchable: establishment.maxContactsPerWeek > noContactPerWeek ? "1" : "0",
   fitForDisabledWorkers: establishment.fitForDisabledWorkers ? "1" : "0",
 });

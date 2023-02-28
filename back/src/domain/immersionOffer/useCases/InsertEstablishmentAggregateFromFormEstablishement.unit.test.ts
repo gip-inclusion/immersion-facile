@@ -8,9 +8,9 @@ import {
   avenueChampsElyseesDto,
   rueGuillaumeTellDto,
 } from "../../../_testBuilders/addressDtos";
-import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
+import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
-import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
+import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
@@ -19,7 +19,7 @@ import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGenerato
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
-import { EstablishmentEntityV2 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
+import { EstablishmentEntity } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { InsertEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
 import {
   SireneEstablishmentProps,
@@ -31,7 +31,7 @@ import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/
 const fakeSiret = "90040893100013";
 const fakePosition: GeoPositionDto = { lat: 49.119146, lon: 6.17602 };
 const fakeAddress = avenueChampsElyseesDto;
-const fakeBusinessContact = new ContactEntityV2Builder().build();
+const fakeBusinessContact = new ContactEntityBuilder().build();
 
 const expectedNafDto: NafDto = { code: "8559A", nomenclature: "nomencl" };
 
@@ -192,10 +192,10 @@ describe("Insert Establishment aggregate from form data", () => {
   it("Removes (and replaces) establishment and offers with same siret if exists", async () => {
     const siret = "12345678911234";
     // Prepare : insert an establishment aggregate from LBB with siret
-    const previousContact = new ContactEntityV2Builder()
+    const previousContact = new ContactEntityBuilder()
       .withEmail("previous.contact@gmail.com")
       .build();
-    const previousEstablishment = new EstablishmentEntityV2Builder()
+    const previousEstablishment = new EstablishmentEntityBuilder()
       .withSiret(siret)
       .withDataSource("api_labonneboite")
       .build();
@@ -222,7 +222,7 @@ describe("Insert Establishment aggregate from form data", () => {
         },
       ])
       .withBusinessContact(
-        new ContactEntityV2Builder().withEmail("new.contact@gmail.com").build(),
+        new ContactEntityBuilder().withEmail("new.contact@gmail.com").build(),
       )
       .build();
 
@@ -243,7 +243,7 @@ describe("Insert Establishment aggregate from form data", () => {
     expect(establishmentAggregateRepo.establishmentAggregates).toHaveLength(1);
 
     // Establishment matches update from form
-    const partialExpectedEstablishment: Partial<EstablishmentEntityV2> = {
+    const partialExpectedEstablishment: Partial<EstablishmentEntity> = {
       siret,
       address: rueGuillaumeTellDto,
       dataSource: "form",

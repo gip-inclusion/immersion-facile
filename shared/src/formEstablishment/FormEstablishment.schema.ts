@@ -26,6 +26,8 @@ export const immersionContactInEstablishmentIdSchema: z.ZodSchema<ImmersionConta
   zTrimmedString;
 
 export const defaultMaxContactsPerWeek = 10;
+export const noContactPerWeek = 0;
+
 const validContactMethods: NotEmptyArray<ContactMethod> = [
   "EMAIL",
   "PHONE",

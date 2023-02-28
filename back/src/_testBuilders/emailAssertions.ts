@@ -13,8 +13,8 @@ import {
   CreateConventionMagicLinkPayloadProperties,
 } from "shared";
 import { getValidatedConventionFinalConfirmationParams } from "../domain/convention/useCases/notifications/NotifyAllActorsOfFinalConventionValidation";
-import { ContactEntityV2 } from "../domain/immersionOffer/entities/ContactEntity";
-import { EstablishmentEntityV2 } from "../domain/immersionOffer/entities/EstablishmentEntity";
+import { ContactEntity } from "../domain/immersionOffer/entities/ContactEntity";
+import { EstablishmentEntity } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import { AnnotatedImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { fakeGenerateMagicLinkUrlFn } from "./fakeGenerateMagicLinkUrlFn";
 
@@ -169,8 +169,8 @@ export const expectContactByEmailRequest = (
   templatedEmail: TemplatedEmail,
   recipients: string[],
   annotatedImmersionOffer: AnnotatedImmersionOfferEntityV2,
-  establishment: EstablishmentEntityV2,
-  contact: ContactEntityV2,
+  establishment: EstablishmentEntity,
+  contact: ContactEntity,
   payload: ContactEstablishmentByMailDto,
   copy: string[],
 ) => {
@@ -194,8 +194,8 @@ export const expectContactByEmailRequest = (
 export const expectContactByPhoneInstructions = (
   templatedEmail: TemplatedEmail,
   recipients: string[],
-  establishment: EstablishmentEntityV2,
-  contact: ContactEntityV2,
+  establishment: EstablishmentEntity,
+  contact: ContactEntity,
   payload: ContactEstablishmentByPhoneDto,
 ) => {
   expectTypeToMatchAndEqual(templatedEmail, {
@@ -215,8 +215,8 @@ export const expectContactByPhoneInstructions = (
 export const expectContactInPersonInstructions = (
   templatedEmail: TemplatedEmail,
   recipients: string[],
-  establishment: EstablishmentEntityV2,
-  contact: ContactEntityV2,
+  establishment: EstablishmentEntity,
+  contact: ContactEntity,
   payload: ContactEstablishmentInPersonDto,
 ) => {
   expectTypeToMatchAndEqual(templatedEmail, {

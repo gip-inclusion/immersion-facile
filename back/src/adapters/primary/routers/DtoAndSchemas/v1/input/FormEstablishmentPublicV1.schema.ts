@@ -29,6 +29,15 @@ export const formEstablishmentPublicV1Schema: z.Schema<FormEstablishmentDtoPubli
         .min(1, "Spécifiez au moins 1 métier"),
       businessContact: businessContactSchema,
       isSearchable: zBoolean,
+      maxContactsPerWeek: z
+        .number()
+        .nonnegative({
+          message: "La valeur renseignée ne peut pas être négative",
+        })
+        .int({
+          message: "La valeur renseignée ne peut pas contenir de décimale",
+        })
+        .optional(),
     },
     { required_error: "Veuillez compléter le formulaire" },
   );

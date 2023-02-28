@@ -12,10 +12,11 @@ import {
   expectTypeToMatchAndEqual,
   expectPromiseToFailWith,
   expectObjectsToMatch,
+  defaultMaxContactsPerWeek,
 } from "shared";
 import {
   NumberEmployeesRange,
-  EstablishmentEntityV2,
+  EstablishmentEntity,
   EstablishmentAggregate,
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
@@ -24,9 +25,9 @@ import {
   rueGuillaumeTellDto,
   rueJacquardDto,
 } from "../../../_testBuilders/addressDtos";
-import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
+import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
-import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
+import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
@@ -729,7 +730,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       const siretOfEstablishmentToUpdate = "78000403200021";
 
       const updateProps: Pick<
-        EstablishmentEntityV2,
+        EstablishmentEntity,
         "address" | "nafDto" | "numberEmployeesRange" | "position"
       > = {
         nafDto: { code: "8722B", nomenclature: "nomenc" },
@@ -787,7 +788,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       });
       it("adds the establishment values in `establishments` table when one new establishment is given", async () => {
         // Prepare
-        const establishmentToInsert = new EstablishmentEntityV2Builder()
+        const establishmentToInsert = new EstablishmentEntityBuilder()
           .withMaxContactsPerWeek(7)
           .build();
 
@@ -815,7 +816,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           data_source: establishmentToInsert.dataSource,
           update_date: establishmentToInsert.updatedAt,
           is_active: establishmentToInsert.isActive,
-          max_contacts_per_week: establishmentToInsert.maxContactsPerWeek!,
+          max_contacts_per_week: establishmentToInsert.maxContactsPerWeek,
         };
         const actualEstablishmentRows = await getAllEstablishmentsRows();
         expect(actualEstablishmentRows).toHaveLength(1);
@@ -847,7 +848,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       it("adds a new row in contact table with contact referencing the establishment siret", async () => {
         // Prepare
         const contactId = "3ca6e619-d654-4d0d-8fa6-2febefbe953d";
-        const contact = new ContactEntityV2Builder()
+        const contact = new ContactEntityBuilder()
           .withId(contactId)
           .withContactMethod("EMAIL")
           .build();
@@ -947,7 +948,7 @@ describe("Postgres implementation of immersion offer repository", () => {
             [
               new EstablishmentAggregateBuilder()
                 .withEstablishment(
-                  new EstablishmentEntityV2Builder()
+                  new EstablishmentEntityBuilder()
                     .withSiret(existingSiret)
                     .withDataSource("api_labonneboite")
                     .withAddress({
@@ -1000,7 +1001,7 @@ describe("Postgres implementation of immersion offer repository", () => {
             [
               new EstablishmentAggregateBuilder()
                 .withEstablishment(
-                  new EstablishmentEntityV2Builder()
+                  new EstablishmentEntityBuilder()
                     .withSiret(existingSiret)
                     .withAddress(newAddress)
                     .withDataSource("api_labonneboite")
@@ -1039,7 +1040,7 @@ describe("Postgres implementation of immersion offer repository", () => {
             [
               new EstablishmentAggregateBuilder()
                 .withEstablishment(
-                  new EstablishmentEntityV2Builder()
+                  new EstablishmentEntityBuilder()
                     .withSiret(existingSiret)
                     .withDataSource("form")
                     .build(),
@@ -1248,11 +1249,11 @@ describe("Postgres implementation of immersion offer repository", () => {
 
   describe("Pg implementation of method  getOffersAsAppelationDtoForFormEstablishment", () => {
     const siretInTable = "12345678901234";
-    const establishment = new EstablishmentEntityV2Builder()
+    const establishment = new EstablishmentEntityBuilder()
       .withSiret(siretInTable)
       .withAddress(rueGuillaumeTellDto)
       .build();
-    const contact = new ContactEntityV2Builder()
+    const contact = new ContactEntityBuilder()
       .withEmail("toto@gmail.com")
       .build();
     const offers = [
@@ -1324,7 +1325,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       // Prepare
       const siret = "12345678901234";
       const boulangerRome = "D1102";
-      const establishment = new EstablishmentEntityV2Builder()
+      const establishment = new EstablishmentEntityBuilder()
         .withSiret(siret)
         .withCustomizedName("La boulangerie de Lucie")
         .withNafDto({ code: "1071Z", nomenclature: "NAFRev2" })
@@ -1341,7 +1342,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       const otherOffer = new ImmersionOfferEntityV2Builder()
         .withRomeCode("H2102")
         .build();
-      const contact = new ContactEntityV2Builder()
+      const contact = new ContactEntityBuilder()
         .withGeneratedContactId()
         .build();
 
@@ -1394,7 +1395,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     it("Returns reconstructed SearchImmersionResultDto for given siret and rome when no appellation and no contact is specified", async () => {
       // Prepare
       const siret = "12345678901234";
-      const establishment = new EstablishmentEntityV2Builder()
+      const establishment = new EstablishmentEntityBuilder()
         .withSiret(siret)
         .withCustomizedName("La boulangerie de Lucie")
         .withNafDto({ code: "1071Z", nomenclature: "NAFRev2" })
@@ -1456,7 +1457,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         // Prepare
         const establishmentAggregate = new EstablishmentAggregateBuilder()
           .withEstablishment(
-            new EstablishmentEntityV2Builder()
+            new EstablishmentEntityBuilder()
               .withSiret(siret)
               .withUpdatedAt(new Date("2020-01-05T23:00:00"))
               .build(),
@@ -1642,7 +1643,7 @@ describe("Postgres implementation of immersion offer repository", () => {
     is_active: boolean;
     is_commited?: boolean | null;
     fit_for_disabled_workers: boolean | null;
-    max_contacts_per_week: number | null;
+    max_contacts_per_week: number;
   };
 
   const getAllEstablishmentsRows = async (): Promise<PgEstablishmentRow[]> =>
@@ -1738,7 +1739,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       props.fitForDisabledWorkers,
       position.lon,
       position.lat,
-      props.maxContactsPerWeek ?? 10,
+      props.maxContactsPerWeek ?? defaultMaxContactsPerWeek,
     ]);
   };
   const insertImmersionOffer = async (props: {

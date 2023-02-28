@@ -4,9 +4,9 @@ import {
   expectPromiseToFailWithError,
   FormEstablishmentDto,
 } from "shared";
-import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
+import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
-import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
+import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
@@ -50,7 +50,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
     await establishmentAggregateRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(
-          new EstablishmentEntityV2Builder()
+          new EstablishmentEntityBuilder()
             .withSiret(siret)
             .withDataSource("api_labonneboite")
             .build(),
@@ -67,11 +67,11 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
   });
   it("returns a reconstructed form if establishment with siret exists with dataSource=form", async () => {
     const { useCase, establishmentAggregateRepository } = prepareUseCase();
-    const establishment = new EstablishmentEntityV2Builder()
+    const establishment = new EstablishmentEntityBuilder()
       .withSiret(siret)
       .withDataSource("form")
       .build();
-    const contact = new ContactEntityV2Builder().build();
+    const contact = new ContactEntityBuilder().build();
     const offer = new ImmersionOfferEntityV2Builder()
       .withRomeCode("A1101")
       .withAppellationCode("11987")

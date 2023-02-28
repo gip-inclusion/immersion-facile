@@ -9,6 +9,7 @@ import {
   FormEstablishmentDto,
   formEstablishmentSchema,
   immersionFacileContactEmail,
+  noContactPerWeek,
   SiretDto,
   toDotNotation,
 } from "shared";
@@ -49,7 +50,7 @@ export const EstablishmentFormikForm = ({
     formEstablishmentFieldsLabels,
   );
   const [isSearchable, setIsSearchable] = useState(
-    initialValues.maxContactsPerWeek > 0,
+    initialValues.maxContactsPerWeek > noContactPerWeek,
   );
   const formContents = getFormFields();
   let errorMessage = submitError?.message;
@@ -170,7 +171,7 @@ export const EstablishmentFormikForm = ({
                           "maxContactsPerWeek",
                           e.currentTarget.checked
                             ? defaultMaxContactsPerWeek
-                            : 0,
+                            : noContactPerWeek,
                         );
                       },
                     },

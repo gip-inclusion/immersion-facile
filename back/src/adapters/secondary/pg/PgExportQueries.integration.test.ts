@@ -11,9 +11,9 @@ import {
   avenueChampsElyseesDto,
   rueBitcheDto,
 } from "../../../_testBuilders/addressDtos";
-import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
+import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
-import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
+import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { UuidV4Generator } from "../core/UuidGeneratorImplementations";
@@ -287,9 +287,7 @@ describe("PgExportQueries", () => {
         // Prepare
         const establishmentAggregate = new EstablishmentAggregateBuilder()
           .withEstablishment(
-            new EstablishmentEntityV2Builder()
-              .withAddress(rueBitcheDto)
-              .build(),
+            new EstablishmentEntityBuilder().withAddress(rueBitcheDto).build(),
           )
           .build();
 
@@ -344,7 +342,7 @@ describe("PgExportQueries", () => {
 });
 
 const establishmentAggregateArtusInterim = (): EstablishmentAggregate => ({
-  establishment: new EstablishmentEntityV2Builder()
+  establishment: new EstablishmentEntityBuilder()
     .withSiret("79158476600012")
     .withAddress({
       streetNumberAndAddress: "9 PL DE LA VENDEE",
@@ -369,7 +367,7 @@ const establishmentAggregateArtusInterim = (): EstablishmentAggregate => ({
       .withAppellationCode("17537")
       .build(),
   ],
-  contact: new ContactEntityV2Builder()
+  contact: new ContactEntityBuilder()
     .withFirstname("Lauren")
     .withLastname("SCHEBUR")
     .withEmail("contact@artusinterim.world")
@@ -379,7 +377,7 @@ const establishmentAggregateArtusInterim = (): EstablishmentAggregate => ({
 });
 
 const establishmentAggregateMiniWorldLyon = (): EstablishmentAggregate => ({
-  establishment: new EstablishmentEntityV2Builder()
+  establishment: new EstablishmentEntityBuilder()
     .withSiret("79341726200037")
     .withAddress(rueJacquardDto)
     .withName("MINI WORLD LYON")
@@ -407,7 +405,7 @@ const establishmentAggregateMiniWorldLyon = (): EstablishmentAggregate => ({
       .withAppellationCode("19825")
       .build(),
   ],
-  contact: new ContactEntityV2Builder()
+  contact: new ContactEntityBuilder()
     .withId("88401348-bad9-4933-87c6-405b8a8fe4bb")
     .withFirstname("Max")
     .withLastname("BOYBAR")

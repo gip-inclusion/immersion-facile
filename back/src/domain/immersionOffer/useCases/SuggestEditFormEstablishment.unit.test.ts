@@ -1,5 +1,5 @@
 import { EstablishmentJwtPayload, expectPromiseToFailWithError } from "shared";
-import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
+import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { UuidV4Generator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
@@ -21,7 +21,7 @@ const setMethodGetContactEmailFromSiret = (
     async (_siret: string) =>
       new EstablishmentAggregateBuilder()
         .withContact(
-          new ContactEntityV2Builder()
+          new ContactEntityBuilder()
             .withEmail(contactEmail)
             .withCopyEmails(copyEmails)
             .build(),

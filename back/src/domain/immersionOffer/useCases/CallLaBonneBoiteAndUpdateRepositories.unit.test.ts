@@ -3,7 +3,7 @@ import {
   SearchImmersionQueryParamsDto,
 } from "shared";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
-import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
+import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { LaBonneBoiteCompanyBuilder } from "../../../_testBuilders/LaBonneBoiteResponseBuilder";
 
@@ -165,7 +165,7 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
       const alreadyExistingAggregateFromForm =
         new EstablishmentAggregateBuilder()
           .withEstablishment(
-            new EstablishmentEntityV2Builder()
+            new EstablishmentEntityBuilder()
               .withSiret(conflictSiret)
               .withDataSource("form")
               .build(),
@@ -197,7 +197,7 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
       const alreadyExistingAggregateFromLBB =
         new EstablishmentAggregateBuilder()
           .withEstablishment(
-            new EstablishmentEntityV2Builder()
+            new EstablishmentEntityBuilder()
               .withSiret(existingSiret)
               .withDataSource("api_labonneboite")
               .withUpdatedAt(new Date("2022-05-11"))
@@ -243,7 +243,7 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
       const alreadyExistingAggregateFromLBB =
         new EstablishmentAggregateBuilder()
           .withEstablishment(
-            new EstablishmentEntityV2Builder()
+            new EstablishmentEntityBuilder()
               .withSiret(existingSiret)
               .withDataSource("api_labonneboite")
               .withUpdatedAt(new Date("2022-05-11"))

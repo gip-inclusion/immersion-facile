@@ -1,4 +1,9 @@
-import { Flavor, FormEstablishmentDto, OmitFromExistingKeys } from "shared";
+import {
+  defaultMaxContactsPerWeek,
+  Flavor,
+  FormEstablishmentDto,
+  OmitFromExistingKeys,
+} from "shared";
 
 // prettier-ignore
 export type ImmersionContactInEstablishmentId = Flavor<string, "ImmersionContactInEstablishmentId">;
@@ -32,15 +37,14 @@ export type FormEstablishmentDtoPublicV1 = {
   appellations: AppellationDtoPublicV1[]; // at least one
   businessContact: BusinessContactDtoPublicV1;
   isSearchable: boolean;
+  maxContactsPerWeek?: number;
 };
 
 export const formEstablishmentDtoPublicV1ToDomain = (
   publicV1: FormEstablishmentDtoPublicV1,
-): OmitFromExistingKeys<
-  FormEstablishmentDto,
-  "source" | "maxContactsPerWeek"
-> => ({
+): OmitFromExistingKeys<FormEstablishmentDto, "source"> => ({
   ...publicV1,
   website: "",
   additionalInformation: "",
+  maxContactsPerWeek: publicV1.maxContactsPerWeek ?? defaultMaxContactsPerWeek,
 });

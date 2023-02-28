@@ -6,9 +6,9 @@ import {
 } from "../../../../_testBuilders/addressDtos";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
-import { ContactEntityV2Builder } from "../../../../_testBuilders/ContactEntityV2Builder";
+import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
-import { EstablishmentEntityV2Builder } from "../../../../_testBuilders/EstablishmentEntityV2Builder";
+import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { validAuthorizedApiKeyId } from "../../../secondary/InMemoryApiConsumerRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
@@ -43,14 +43,14 @@ describe("Route to get immersion offer by id", () => {
       [
         new EstablishmentAggregateBuilder()
           .withEstablishment(
-            new EstablishmentEntityV2Builder()
+            new EstablishmentEntityBuilder()
               .withPosition(TEST_POSITION)
               .withAddress(rueSaintHonoreDto)
               .withNumberOfEmployeeRange("10-19")
               .build(),
           )
           .withContact(
-            new ContactEntityV2Builder().withContactMethod("EMAIL").build(),
+            new ContactEntityBuilder().withContactMethod("EMAIL").build(),
           )
           .withImmersionOffers([
             new ImmersionOfferEntityV2Builder()

@@ -9,7 +9,7 @@ import {
 } from "../../../../_testBuilders/addressDtos";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
-import { EstablishmentEntityV2Builder } from "../../../../_testBuilders/EstablishmentEntityV2Builder";
+import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 
 describe("Route to retrieve form establishment given an establishment JWT", () => {
   it("Throws 401 if not authenticated", async () => {
@@ -33,7 +33,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
       [
         new EstablishmentAggregateBuilder()
           .withEstablishment(
-            new EstablishmentEntityV2Builder()
+            new EstablishmentEntityBuilder()
               .withSiret(siret)
               .withDataSource("form")
               .withAddress(rueSaintHonoreDto)

@@ -5,7 +5,7 @@ import {
   NafDto,
   SiretDto,
 } from "shared";
-import { ContactEntityV2 } from "./ContactEntity";
+import { ContactEntity } from "./ContactEntity";
 import { ImmersionOfferEntityV2 } from "./ImmersionOfferEntity";
 
 export type DataSource = "api_labonneboite" | "form";
@@ -15,7 +15,7 @@ export type SourceProvider = FormEstablishmentSource | ApiSource;
 // prettier-ignore
 export type NumberEmployeesRange = ""| "0"| "1-2"| "3-5"| "6-9"| "10-19"| "20-49"| "50-99"| "100-199"| "200-249"| "250-499"| "500-999"| "1000-1999"| "2000-4999"| "5000-9999"| "+10000";
 
-export type EstablishmentEntityV2 = {
+export type EstablishmentEntity = {
   siret: SiretDto;
   name: string;
   customizedName?: string;
@@ -36,12 +36,12 @@ export type EstablishmentEntityV2 = {
   maxContactsPerWeek: number;
 };
 
-export type AnnotatedEstablishmentEntityV2 = EstablishmentEntityV2 & {
+export type AnnotatedEstablishmentEntityV2 = EstablishmentEntity & {
   nafLabel: string;
 };
 
 export type EstablishmentAggregate = {
-  establishment: EstablishmentEntityV2;
+  establishment: EstablishmentEntity;
   immersionOffers: ImmersionOfferEntityV2[];
-  contact?: ContactEntityV2;
+  contact?: ContactEntity;
 };

@@ -4,9 +4,9 @@ import {
   SearchImmersionQueryParamsDto,
   SearchImmersionResultDto,
 } from "shared";
-import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
+import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
-import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
+import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
@@ -44,7 +44,7 @@ const insertLBBAggregate = async (
   establishmentAggregateRepository.insertEstablishmentAggregates([
     new EstablishmentAggregateBuilder()
       .withEstablishment(
-        new EstablishmentEntityV2Builder()
+        new EstablishmentEntityBuilder()
           .withDataSource("api_labonneboite")
           .build(),
       )
@@ -64,7 +64,7 @@ const prepareSearchableData = async () => {
   );
   const siret = "78000403200019";
 
-  const establishment = new EstablishmentEntityV2Builder()
+  const establishment = new EstablishmentEntityBuilder()
     .withSiret(siret)
     .withAddress({
       streetNumberAndAddress: "55 Rue du Faubourg Saint-Honoré",
@@ -85,9 +85,7 @@ const prepareSearchableData = async () => {
     .withRomeCode(boulangerRome)
     .build();
 
-  const contact = new ContactEntityV2Builder()
-    .withContactMethod("EMAIL")
-    .build();
+  const contact = new ContactEntityBuilder().withContactMethod("EMAIL").build();
 
   const establishmentAggregateInMetzForSecretariat =
     new EstablishmentAggregateBuilder()

@@ -1,11 +1,11 @@
 import { Builder } from "shared";
 import { UuidV4Generator } from "../adapters/secondary/core/UuidGeneratorImplementations";
 import {
-  ContactEntityV2,
+  ContactEntity as ContactEntity,
   ContactMethod,
 } from "../domain/immersionOffer/entities/ContactEntity";
 
-const validContactEntityV2: ContactEntityV2 = {
+const validContactEntityV2: ContactEntity = {
   id: "3ca6e619-d654-4d0d-8fa6-2febefbe953d",
   lastName: "Prost",
   firstName: "Alain",
@@ -16,38 +16,36 @@ const validContactEntityV2: ContactEntityV2 = {
   copyEmails: [],
 };
 
-export class ContactEntityV2Builder implements Builder<ContactEntityV2> {
-  constructor(
-    private readonly entity: ContactEntityV2 = validContactEntityV2,
-  ) {}
+export class ContactEntityBuilder implements Builder<ContactEntity> {
+  constructor(private readonly entity: ContactEntity = validContactEntityV2) {}
 
   withId(id: string) {
-    return new ContactEntityV2Builder({ ...this.entity, id });
+    return new ContactEntityBuilder({ ...this.entity, id });
   }
   withGeneratedContactId() {
     return this.withId(new UuidV4Generator().new());
   }
   withContactMethod(contactMethod: ContactMethod) {
-    return new ContactEntityV2Builder({ ...this.entity, contactMethod });
+    return new ContactEntityBuilder({ ...this.entity, contactMethod });
   }
 
   withEmail(email: string) {
-    return new ContactEntityV2Builder({ ...this.entity, email });
+    return new ContactEntityBuilder({ ...this.entity, email });
   }
   withCopyEmails(copyEmails: string[]) {
-    return new ContactEntityV2Builder({ ...this.entity, copyEmails });
+    return new ContactEntityBuilder({ ...this.entity, copyEmails });
   }
 
   withFirstname(firstName: string) {
-    return new ContactEntityV2Builder({ ...this.entity, firstName });
+    return new ContactEntityBuilder({ ...this.entity, firstName });
   }
 
   withLastname(lastName: string) {
-    return new ContactEntityV2Builder({ ...this.entity, lastName });
+    return new ContactEntityBuilder({ ...this.entity, lastName });
   }
 
   withPhone(phone: string) {
-    return new ContactEntityV2Builder({ ...this.entity, phone });
+    return new ContactEntityBuilder({ ...this.entity, phone });
   }
 
   build() {

@@ -11,7 +11,7 @@ import {
 } from "../../../../_testBuilders/addressDtos";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
-import { EstablishmentEntityV2Builder } from "../../../../_testBuilders/EstablishmentEntityV2Builder";
+import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { InMemoryEstablishmentAggregateRepository } from "../../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { SearchImmersionResultPublicV0 } from "../DtoAndSchemas/v0/output/SearchImmersionResultPublicV0.dto";
@@ -45,7 +45,7 @@ describe("search-immersion route", () => {
               new ImmersionOfferEntityV2Builder().withRomeCode("A1000").build(),
             ])
             .withEstablishment(
-              new EstablishmentEntityV2Builder()
+              new EstablishmentEntityBuilder()
                 .withPosition({
                   lat: 48.8531,
                   lon: 2.34999,
@@ -145,7 +145,7 @@ describe("search-immersion route", () => {
               new ImmersionOfferEntityV2Builder().withRomeCode("A1000").build(),
             ])
             .withEstablishment(
-              new EstablishmentEntityV2Builder()
+              new EstablishmentEntityBuilder()
                 .withPosition({
                   lat: 48.8531,
                   lon: 2.34999,
@@ -240,7 +240,7 @@ describe("search-immersion route", () => {
               new ImmersionOfferEntityV2Builder().withRomeCode("A1000").build(),
             ])
             .withEstablishment(
-              new EstablishmentEntityV2Builder()
+              new EstablishmentEntityBuilder()
                 .withPosition({
                   lat: 48.8531,
                   lon: 2.34999,

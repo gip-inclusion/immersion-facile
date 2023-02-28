@@ -2,7 +2,7 @@ import { addHours } from "date-fns";
 import { EstablishmentJwtPayload, requestEmailToUpdateFormRoute } from "shared";
 import { SuperTest, Test } from "supertest";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
-import { ContactEntityV2Builder } from "../../../../_testBuilders/ContactEntityV2Builder";
+import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { DomainEvent } from "../../../../domain/core/eventBus/events";
@@ -18,7 +18,7 @@ describe("Route to generate an establishment edition link", () => {
       async () =>
         new EstablishmentAggregateBuilder()
           .withContact(
-            new ContactEntityV2Builder().withEmail("erik@gmail.com").build(),
+            new ContactEntityBuilder().withEmail("erik@gmail.com").build(),
           )
           .build();
   });

@@ -1,19 +1,19 @@
 import { Builder } from "shared";
 import { UuidV4Generator } from "../adapters/secondary/core/UuidGeneratorImplementations";
-import { ContactEntityV2 } from "../domain/immersionOffer/entities/ContactEntity";
+import { ContactEntity } from "../domain/immersionOffer/entities/ContactEntity";
 import {
   EstablishmentAggregate,
-  EstablishmentEntityV2,
+  EstablishmentEntity,
 } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import { ImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
-import { ContactEntityV2Builder } from "./ContactEntityV2Builder";
-import { EstablishmentEntityV2Builder } from "./EstablishmentEntityV2Builder";
+import { ContactEntityBuilder } from "./ContactEntityBuilder";
+import { EstablishmentEntityBuilder } from "./EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "./ImmersionOfferEntityV2Builder";
 
 const validEstablishmentAggregate: EstablishmentAggregate = {
-  establishment: new EstablishmentEntityV2Builder().build(),
+  establishment: new EstablishmentEntityBuilder().build(),
   immersionOffers: [new ImmersionOfferEntityV2Builder().build()],
-  contact: new ContactEntityV2Builder().build(),
+  contact: new ContactEntityBuilder().build(),
 };
 
 export class EstablishmentAggregateBuilder
@@ -23,7 +23,7 @@ export class EstablishmentAggregateBuilder
     private readonly aggregate: EstablishmentAggregate = validEstablishmentAggregate,
   ) {}
 
-  public withEstablishment(establishment: EstablishmentEntityV2) {
+  public withEstablishment(establishment: EstablishmentEntity) {
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
       establishment,
@@ -37,7 +37,7 @@ export class EstablishmentAggregateBuilder
     });
   }
 
-  public withContact(contact: ContactEntityV2) {
+  public withContact(contact: ContactEntity) {
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
       contact,
@@ -53,15 +53,13 @@ export class EstablishmentAggregateBuilder
   public withEstablishmentSiret(siret: string) {
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
-      establishment: new EstablishmentEntityV2Builder()
-        .withSiret(siret)
-        .build(),
+      establishment: new EstablishmentEntityBuilder().withSiret(siret).build(),
     });
   }
   public withContactId(id: string) {
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
-      contact: new ContactEntityV2Builder().withId(id).build(),
+      contact: new ContactEntityBuilder().withId(id).build(),
     });
   }
   public withGeneratedContactId() {
@@ -71,7 +69,7 @@ export class EstablishmentAggregateBuilder
   public withMaxContactsPerWeek(maxContactsPerWeek: number) {
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
-      establishment: new EstablishmentEntityV2Builder(
+      establishment: new EstablishmentEntityBuilder(
         this.aggregate.establishment,
       )
         .withMaxContactsPerWeek(maxContactsPerWeek)

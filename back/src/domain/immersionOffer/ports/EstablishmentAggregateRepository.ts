@@ -2,7 +2,7 @@ import { AppellationDto, SearchImmersionResultDto, SiretDto } from "shared";
 import {
   DataSource,
   EstablishmentAggregate,
-  EstablishmentEntityV2,
+  EstablishmentEntity,
 } from "../entities/EstablishmentEntity";
 import { ImmersionOfferEntityV2 } from "../entities/ImmersionOfferEntity";
 import { SearchMade } from "../entities/SearchMadeEntity";
@@ -32,7 +32,7 @@ export interface EstablishmentAggregateRepository {
   ) => Promise<SiretDto[]>;
 
   updateEstablishment: (
-    propertiesToUpdate: Partial<EstablishmentEntityV2> & {
+    propertiesToUpdate: Partial<EstablishmentEntity> & {
       updatedAt: Date;
       siret: SiretDto;
     },

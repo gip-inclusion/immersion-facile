@@ -5,9 +5,9 @@ import {
 } from "../../../../_testBuilders/addressDtos";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
-import { ContactEntityV2Builder } from "../../../../_testBuilders/ContactEntityV2Builder";
+import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
-import { EstablishmentEntityV2Builder } from "../../../../_testBuilders/EstablishmentEntityV2Builder";
+import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { GenerateApiConsumerJtw } from "../../../../domain/auth/jwt";
 import {
@@ -43,7 +43,7 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v1/immersio
       [
         new EstablishmentAggregateBuilder()
           .withEstablishment(
-            new EstablishmentEntityV2Builder()
+            new EstablishmentEntityBuilder()
               .withSiret(immersionOfferSiret)
               .withPosition(TEST_POSITION)
               .withNumberOfEmployeeRange("10-19")
@@ -51,7 +51,7 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v1/immersio
               .build(),
           )
           .withContact(
-            new ContactEntityV2Builder().withContactMethod("EMAIL").build(),
+            new ContactEntityBuilder().withContactMethod("EMAIL").build(),
           )
           .withImmersionOffers([
             new ImmersionOfferEntityV2Builder()

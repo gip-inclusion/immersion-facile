@@ -1,7 +1,7 @@
 import { SuperTest, Test } from "supertest";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
-import { EstablishmentEntityV2Builder } from "../../../../_testBuilders/EstablishmentEntityV2Builder";
+import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 import { establishmentTargets } from "shared";
 
@@ -24,7 +24,7 @@ describe("route to check if a form's siret already exists", () => {
       [
         new EstablishmentAggregateBuilder()
           .withEstablishment(
-            new EstablishmentEntityV2Builder()
+            new EstablishmentEntityBuilder()
               .withDataSource("form")
               .withSiret(siret)
               .build(),

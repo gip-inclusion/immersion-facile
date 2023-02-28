@@ -1,9 +1,14 @@
-import { addressStringToDto, NafDto, SiretDto } from "shared";
+import {
+  addressStringToDto,
+  defaultMaxContactsPerWeek,
+  NafDto,
+  SiretDto,
+} from "shared";
 import { createLogger } from "../../../utils/logger";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import {
   EstablishmentAggregate,
-  EstablishmentEntityV2,
+  EstablishmentEntity,
   NumberEmployeesRange,
 } from "../entities/EstablishmentEntity";
 
@@ -46,7 +51,7 @@ export class LaBonneBoiteCompanyVO {
       numberEmployeesRange?: NumberEmployeesRange;
     },
   ): EstablishmentAggregate {
-    const establishment: EstablishmentEntityV2 = {
+    const establishment: EstablishmentEntity = {
       address: addressStringToDto(this.props.address),
       position: {
         lat: this.props.lat,
@@ -64,7 +69,7 @@ export class LaBonneBoiteCompanyVO {
       isSearchable: true,
       additionalInformation: "",
       website: this.props.website ?? this.props.url,
-      maxContactsPerWeek: 10,
+      maxContactsPerWeek: defaultMaxContactsPerWeek,
     };
 
     return {

@@ -8,11 +8,11 @@ import {
   SearchSortedBy,
   SiretDto,
 } from "shared";
-import { ContactEntityV2 } from "../../../domain/immersionOffer/entities/ContactEntity";
+import { ContactEntity } from "../../../domain/immersionOffer/entities/ContactEntity";
 import {
   DataSource,
   EstablishmentAggregate,
-  EstablishmentEntityV2,
+  EstablishmentEntity,
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { ImmersionOfferEntityV2 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
@@ -37,8 +37,8 @@ const objectsDeepEqual = <T>(a: T, b: T) =>
   equals(JSON.parse(JSON.stringify(a)), JSON.parse(JSON.stringify(b))); // replacing with clone() would does not work here
 
 const establishmentsEqual = (
-  a: EstablishmentEntityV2,
-  b: EstablishmentEntityV2,
+  a: EstablishmentEntity,
+  b: EstablishmentEntity,
 ) => {
   // Ignore key updatedAt
   const { updatedAt: _unusedUpdatedAtA, ...establishmentAWithoutUpdatedAt } = a;
@@ -49,7 +49,7 @@ const establishmentsEqual = (
     establishmentBWithoutUpdatedAt,
   );
 };
-const contactsEqual = (a: ContactEntityV2, b: ContactEntityV2) => {
+const contactsEqual = (a: ContactEntity, b: ContactEntity) => {
   // Ignore key id
   const { id: _unusedIdA, ...contactAWithoutId } = a;
   const { id: _unusedIdB, ...contactBWithoutId } = b;
@@ -309,7 +309,7 @@ export class PgEstablishmentAggregateRepository
 
   private async _updateContactFromAggregates(
     existingAggregate: EstablishmentAggregate & {
-      contact: ContactEntityV2;
+      contact: ContactEntity;
     },
     updatedAggregate: EstablishmentAggregate,
   ) {
@@ -432,7 +432,7 @@ export class PgEstablishmentAggregateRepository
   }
 
   public async updateEstablishment(
-    propertiesToUpdate: Partial<EstablishmentEntityV2> & {
+    propertiesToUpdate: Partial<EstablishmentEntity> & {
       updatedAt: Date;
       siret: SiretDto;
     },

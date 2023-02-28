@@ -6,14 +6,14 @@ import {
   TEST_ROME_LABEL,
 } from "../../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { ContactEntityV2Builder } from "../../../../_testBuilders/ContactEntityV2Builder";
+import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBuilder";
 import {
   expectContactByEmailRequest,
   expectContactByPhoneInstructions,
   expectContactInPersonInstructions,
 } from "../../../../_testBuilders/emailAssertions";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
-import { EstablishmentEntityV2Builder } from "../../../../_testBuilders/EstablishmentEntityV2Builder";
+import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { NotifyContactRequest } from "./NotifyContactRequest";
 
@@ -56,10 +56,10 @@ describe("NotifyContactRequest", () => {
       contactMode: "EMAIL",
       message: "message_to_send",
     };
-    const establishment = new EstablishmentEntityV2Builder()
+    const establishment = new EstablishmentEntityBuilder()
       .withSiret(siret)
       .build();
-    const contact = new ContactEntityV2Builder()
+    const contact = new ContactEntityBuilder()
       .withId(contactId)
       .withContactMethod("EMAIL")
       .withEmail(allowedContactEmail)
@@ -97,10 +97,10 @@ describe("NotifyContactRequest", () => {
       ...payload,
       contactMode: "PHONE",
     };
-    const establishment = new EstablishmentEntityV2Builder()
+    const establishment = new EstablishmentEntityBuilder()
       .withSiret(siret)
       .build();
-    const contact = new ContactEntityV2Builder()
+    const contact = new ContactEntityBuilder()
       .withId(contactId)
       .withContactMethod("PHONE")
       .build();
@@ -131,10 +131,10 @@ describe("NotifyContactRequest", () => {
       ...payload,
       contactMode: "IN_PERSON",
     };
-    const establishment = new EstablishmentEntityV2Builder()
+    const establishment = new EstablishmentEntityBuilder()
       .withSiret(siret)
       .build();
-    const contact = new ContactEntityV2Builder()
+    const contact = new ContactEntityBuilder()
       .withId(contactId)
       .withContactMethod("IN_PERSON")
       .build();

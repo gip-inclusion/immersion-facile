@@ -12,7 +12,7 @@ import { CreateNewEvent } from "../../domain/core/eventBus/EventBus";
 import { OutboxQueries } from "../../domain/core/ports/OutboxQueries";
 import { OutboxRepository } from "../../domain/core/ports/OutboxRepository";
 import { UnitOfWork } from "../../domain/core/ports/UnitOfWork";
-import { ContactEntityV2 } from "../../domain/immersionOffer/entities/ContactEntity";
+import { ContactEntity } from "../../domain/immersionOffer/entities/ContactEntity";
 import { EstablishmentAggregateRepository } from "../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
 import { RequestEditFormEstablishment } from "../../domain/immersionOffer/useCases/RequestEditFormEstablishment";
 
@@ -21,7 +21,7 @@ import { RequestEditFormEstablishment } from "../../domain/immersionOffer/useCas
 
 const SIRET = "12345678901234";
 const RECIPIENT_ADDRESS = "romain.cambonie@beta.gouv.fr";
-const BASE_BUSINESS_CONTACT: Omit<ContactEntityV2, "copyEmails"> = {
+const BASE_BUSINESS_CONTACT: Omit<ContactEntity, "copyEmails"> = {
   id: "iamanid",
   email: RECIPIENT_ADDRESS,
   firstName: "Esteban",
@@ -33,14 +33,14 @@ const BASE_BUSINESS_CONTACT: Omit<ContactEntityV2, "copyEmails"> = {
 
 describe("RequestEditFormEstablishment", () => {
   const useCaseFromMinimalConfig = (
-    businessContact: ContactEntityV2,
+    businessContact: ContactEntity,
   ): RequestEditFormEstablishment => {
     const config = AppConfig.createFromEnv();
     const timeGateway = new RealTimeGateway();
 
     const unitOfWork = {
       establishmentAggregateRepository: {
-        getContactForEstablishmentSiret: (): ContactEntityV2 => businessContact,
+        getContactForEstablishmentSiret: (): ContactEntity => businessContact,
       } as unknown as EstablishmentAggregateRepository,
       outboxQueries: {
         getLastPayloadOfFormEstablishmentEditLinkSentWithSiret: (): undefined =>
@@ -81,7 +81,7 @@ describe("RequestEditFormEstablishment", () => {
   // eslint-disable-next-line jest/expect-expect
   it("Requesting an edit link should work even if copyEmails are undefined or an empty array", async () => {
     //Arrange deps
-    const contactWithEmptyCopyEmails: ContactEntityV2 = {
+    const contactWithEmptyCopyEmails: ContactEntity = {
       ...BASE_BUSINESS_CONTACT,
       copyEmails: [],
     };

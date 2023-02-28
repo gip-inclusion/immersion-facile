@@ -2,7 +2,6 @@ import { Router } from "express";
 import promClient from "prom-client";
 import {
   contactEstablishmentRoute,
-  defaultMaxContactsPerWeek,
   establishmentTargets,
   immersionOffersRoute,
   pipeWithValue,
@@ -49,7 +48,6 @@ export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
               ...domainFormEstablishmentWithoutSource,
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               source: req.apiConsumer!.consumer,
-              maxContactsPerWeek: defaultMaxContactsPerWeek,
             }),
         );
       });

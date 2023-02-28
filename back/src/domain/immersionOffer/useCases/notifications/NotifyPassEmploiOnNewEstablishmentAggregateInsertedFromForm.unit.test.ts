@@ -2,7 +2,7 @@ import { expectArraysToEqual } from "shared";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import { InMemoryPassEmploiGateway } from "../../../../adapters/secondary/immersionOffer/passEmploi/InMemoryPassEmploiGateway";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
-import { EstablishmentEntityV2Builder } from "../../../../_testBuilders/EstablishmentEntityV2Builder";
+import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { PassEmploiNotificationParams } from "../../ports/PassEmploiGateway";
 import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "./NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
@@ -32,7 +32,7 @@ describe("Notify pass-emploi", () => {
     const position = { lon: 1, lat: 1 };
     const newAggregate = new EstablishmentAggregateBuilder()
       .withEstablishment(
-        new EstablishmentEntityV2Builder()
+        new EstablishmentEntityBuilder()
           .withSiret(siret)
           .withPosition(position)
           .build(),

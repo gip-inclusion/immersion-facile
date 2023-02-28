@@ -3,9 +3,9 @@ import {
   expectArraysToEqual,
   expectPromiseToFailWithError,
 } from "shared";
-import { ContactEntityV2Builder } from "../../../_testBuilders/ContactEntityV2Builder";
+import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
-import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
+import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
@@ -65,10 +65,10 @@ describe("ContactEstablishment", () => {
     await establishmentAggregateRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(
-          new EstablishmentEntityV2Builder().withSiret(siret).build(),
+          new EstablishmentEntityBuilder().withSiret(siret).build(),
         )
         .withContact(
-          new ContactEntityV2Builder()
+          new ContactEntityBuilder()
             .withId(contactId)
             .withContactMethod("EMAIL")
             .build(),
@@ -106,10 +106,10 @@ describe("ContactEstablishment", () => {
     await establishmentAggregateRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(
-          new EstablishmentEntityV2Builder().withSiret(siret).build(),
+          new EstablishmentEntityBuilder().withSiret(siret).build(),
         )
         .withContact(
-          new ContactEntityV2Builder()
+          new ContactEntityBuilder()
             .withId(contactId)
             .withContactMethod("PHONE")
             .build(),
@@ -146,10 +146,10 @@ describe("ContactEstablishment", () => {
     await establishmentAggregateRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(
-          new EstablishmentEntityV2Builder().withSiret(siret).build(),
+          new EstablishmentEntityBuilder().withSiret(siret).build(),
         )
         .withContact(
-          new ContactEntityV2Builder()
+          new ContactEntityBuilder()
             .withId(contactId)
             .withContactMethod("IN_PERSON")
             .build(),
@@ -186,10 +186,10 @@ describe("ContactEstablishment", () => {
     await establishmentAggregateRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(
-          new EstablishmentEntityV2Builder().withSiret(siret).build(),
+          new EstablishmentEntityBuilder().withSiret(siret).build(),
         )
         .withContact(
-          new ContactEntityV2Builder()
+          new ContactEntityBuilder()
             .withId("wrong_contact_id")
             .withContactMethod("EMAIL")
             .build(),
@@ -213,7 +213,7 @@ describe("ContactEstablishment", () => {
     await establishmentAggregateRepository.insertEstablishmentAggregates([
       new EstablishmentAggregateBuilder()
         .withEstablishment(
-          new EstablishmentEntityV2Builder().withSiret(siret).build(),
+          new EstablishmentEntityBuilder().withSiret(siret).build(),
         )
         .withoutContact() // no contact
         .withImmersionOffers([immersionOffer])

@@ -1,11 +1,11 @@
 import { AddressDto, pathEq } from "shared";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
-import { EstablishmentEntityV2Builder } from "../../../_testBuilders/EstablishmentEntityV2Builder";
+import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { SireneEstablishmentVOBuilder } from "../../../_testBuilders/SireneEstablishmentVOBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
-import { EstablishmentEntityV2 } from "../entities/EstablishmentEntity";
+import { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import { UpdateEstablishmentsFromSireneApiScript } from "./UpdateEstablishmentsFromSireneApiScript";
 import { InMemorySireneGateway } from "../../../adapters/secondary/sirene/InMemorySireneGateway";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
@@ -35,7 +35,7 @@ const prepareUseCase = () => {
 const makeEstablishmentWithUpdatedAt = (siret: string, updatedAt: Date) =>
   new EstablishmentAggregateBuilder()
     .withEstablishment(
-      new EstablishmentEntityV2Builder()
+      new EstablishmentEntityBuilder()
         .withSiret(siret)
         .withUpdatedAt(updatedAt)
         .build(),
@@ -45,7 +45,7 @@ const makeEstablishmentWithUpdatedAt = (siret: string, updatedAt: Date) =>
 const findEstablishmentEntityGivenSiret = (
   establishmentAggregateRepository: InMemoryEstablishmentAggregateRepository,
   siret: string,
-): EstablishmentEntityV2 | undefined =>
+): EstablishmentEntity | undefined =>
   establishmentAggregateRepository.establishmentAggregates.find(
     pathEq("establishment.siret", siret),
   )?.establishment;
@@ -326,6 +326,6 @@ describe("Update establishments from Sirene API", () => {
 });
 
 const expectEstablishmentToMatch = (
-  actualEstablishment: undefined | EstablishmentEntityV2,
-  expected: Partial<EstablishmentEntityV2>,
+  actualEstablishment: undefined | EstablishmentEntity,
+  expected: Partial<EstablishmentEntity>,
 ) => expect(actualEstablishment).toMatchObject(expected);

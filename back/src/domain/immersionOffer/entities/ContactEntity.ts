@@ -2,7 +2,7 @@ import { ImmersionContactInEstablishmentId } from "shared";
 
 export type ContactMethod = "EMAIL" | "PHONE" | "IN_PERSON";
 
-export type ContactEntityV2 = {
+export type ContactEntity = {
   id: ImmersionContactInEstablishmentId;
   lastName: string;
   firstName: string;

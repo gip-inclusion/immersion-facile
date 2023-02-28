@@ -10,11 +10,11 @@ import {
   SearchImmersionResultDto,
   SiretDto,
 } from "shared";
-import { ContactEntityV2 } from "../../../domain/immersionOffer/entities/ContactEntity";
+import { ContactEntity } from "../../../domain/immersionOffer/entities/ContactEntity";
 import {
   DataSource,
   EstablishmentAggregate,
-  EstablishmentEntityV2,
+  EstablishmentEntity,
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { ImmersionOfferEntityV2 } from "../../../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
@@ -142,7 +142,7 @@ export class InMemoryEstablishmentAggregateRepository
   }
 
   public async updateEstablishment(
-    propertiesToUpdate: Partial<EstablishmentEntityV2> & {
+    propertiesToUpdate: Partial<EstablishmentEntity> & {
       updatedAt: Date;
       siret: SiretDto;
     },
@@ -274,8 +274,8 @@ export class InMemoryEstablishmentAggregateRepository
 
 const buildSearchImmersionResultDto = (
   immersionOffer: ImmersionOfferEntityV2,
-  establishment: EstablishmentEntityV2,
-  contact: ContactEntityV2 | undefined,
+  establishment: EstablishmentEntity,
+  contact: ContactEntity | undefined,
   searchMade: SearchMade,
   withContactDetails: boolean,
 ): SearchImmersionResultDto => ({

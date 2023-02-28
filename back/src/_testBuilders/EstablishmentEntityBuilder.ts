@@ -1,18 +1,19 @@
 import {
   AddressDto,
   Builder,
+  defaultMaxContactsPerWeek,
   FormEstablishmentSource,
   GeoPositionDto,
   NafDto,
 } from "shared";
 import {
   DataSource,
-  EstablishmentEntityV2,
+  EstablishmentEntity,
   NumberEmployeesRange,
 } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import { avenueChampsElyseesDto } from "./addressDtos";
 
-export const validEstablishmentEntityV2: EstablishmentEntityV2 = {
+export const validEstablishmentEntityV2: EstablishmentEntity = {
   siret: "78000403200019",
   name: "Company inside repository",
   address: avenueChampsElyseesDto,
@@ -29,37 +30,37 @@ export const validEstablishmentEntityV2: EstablishmentEntityV2 = {
   updatedAt: new Date("2022-01-05T12:00:00.000"),
   isActive: true,
   isSearchable: true,
-  maxContactsPerWeek: 10,
+  maxContactsPerWeek: defaultMaxContactsPerWeek,
 };
 
-export class EstablishmentEntityV2Builder
-  implements Builder<EstablishmentEntityV2>
+export class EstablishmentEntityBuilder
+  implements Builder<EstablishmentEntity>
 {
   constructor(
-    private readonly entity: EstablishmentEntityV2 = validEstablishmentEntityV2,
+    private readonly entity: EstablishmentEntity = validEstablishmentEntityV2,
   ) {}
 
   withSiret(siret: string) {
-    return new EstablishmentEntityV2Builder({ ...this.entity, siret });
+    return new EstablishmentEntityBuilder({ ...this.entity, siret });
   }
 
   withAddress(address: AddressDto) {
-    return new EstablishmentEntityV2Builder({ ...this.entity, address });
+    return new EstablishmentEntityBuilder({ ...this.entity, address });
   }
   withWebsite(website: string) {
-    return new EstablishmentEntityV2Builder({ ...this.entity, website });
+    return new EstablishmentEntityBuilder({ ...this.entity, website });
   }
   withPosition(position: GeoPositionDto) {
-    return new EstablishmentEntityV2Builder({ ...this.entity, position });
+    return new EstablishmentEntityBuilder({ ...this.entity, position });
   }
   withName(name: string) {
-    return new EstablishmentEntityV2Builder({ ...this.entity, name });
+    return new EstablishmentEntityBuilder({ ...this.entity, name });
   }
   withCustomizedName(customizedName: string) {
-    return new EstablishmentEntityV2Builder({ ...this.entity, customizedName });
+    return new EstablishmentEntityBuilder({ ...this.entity, customizedName });
   }
   withDataSource(dataSource: DataSource) {
-    return new EstablishmentEntityV2Builder({
+    return new EstablishmentEntityBuilder({
       ...this.entity,
       dataSource,
       voluntaryToImmersion: dataSource === "form",
@@ -67,50 +68,50 @@ export class EstablishmentEntityV2Builder
   }
 
   withNafDto(nafDto: NafDto) {
-    return new EstablishmentEntityV2Builder({ ...this.entity, nafDto });
+    return new EstablishmentEntityBuilder({ ...this.entity, nafDto });
   }
 
   withNumberOfEmployeeRange(numberEmployeesRange: NumberEmployeesRange) {
-    return new EstablishmentEntityV2Builder({
+    return new EstablishmentEntityBuilder({
       ...this.entity,
       numberEmployeesRange,
     });
   }
 
   withIsCommited(isCommited: boolean) {
-    return new EstablishmentEntityV2Builder({
+    return new EstablishmentEntityBuilder({
       ...this.entity,
       isCommited,
     });
   }
 
   notActive() {
-    return new EstablishmentEntityV2Builder({
+    return new EstablishmentEntityBuilder({
       ...this.entity,
       isActive: false,
     });
   }
 
   withSourceProvider(sourceProvider: FormEstablishmentSource) {
-    return new EstablishmentEntityV2Builder({
+    return new EstablishmentEntityBuilder({
       ...this.entity,
       sourceProvider,
     });
   }
 
   withAdditionalInformation(additionalInformation: string) {
-    return new EstablishmentEntityV2Builder({
+    return new EstablishmentEntityBuilder({
       ...this.entity,
       additionalInformation,
     });
   }
 
   withUpdatedAt(updatedAt: Date) {
-    return new EstablishmentEntityV2Builder({ ...this.entity, updatedAt });
+    return new EstablishmentEntityBuilder({ ...this.entity, updatedAt });
   }
 
   withMaxContactsPerWeek(maxContactsPerWeek: number) {
-    return new EstablishmentEntityV2Builder({
+    return new EstablishmentEntityBuilder({
       ...this.entity,
       maxContactsPerWeek,
     });

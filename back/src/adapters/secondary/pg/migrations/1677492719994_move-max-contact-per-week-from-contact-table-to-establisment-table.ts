@@ -38,12 +38,20 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
+  pgm.sql(
+    "UPDATE establishments SET is_searchable=false WHERE max_contacts_per_week=0",
+  );
   pgm.dropColumn(establishmentTableName, maxContactsPerWeekCol);
+
   pgm.addColumn(contactTableName, {
     ["max_contact_per_week"]: { type: "int4", notNull: false },
   });
+
   pgm.addColumn(formEstablishmentsTableName, {
     is_searchable: { type: "bool", notNull: true, default: true },
   });
+  pgm.sql(
+    "UPDATE form_establishments SET is_searchable=false WHERE max_contacts_per_week=0",
+  );
   pgm.dropColumn(formEstablishmentsTableName, maxContactsPerWeekCol);
 }

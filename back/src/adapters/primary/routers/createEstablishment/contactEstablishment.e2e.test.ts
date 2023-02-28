@@ -8,9 +8,9 @@ import {
   InMemoryGateways,
   buildTestApp,
 } from "../../../../_testBuilders/buildTestApp";
-import { ContactEntityV2Builder } from "../../../../_testBuilders/ContactEntityV2Builder";
+import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
-import { EstablishmentEntityV2Builder } from "../../../../_testBuilders/EstablishmentEntityV2Builder";
+import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
@@ -39,10 +39,10 @@ describe(`/${contactEstablishmentRoute} route`, () => {
   });
 
   it("sends email for valid request and save the discussion", async () => {
-    const establishment = new EstablishmentEntityV2Builder()
+    const establishment = new EstablishmentEntityBuilder()
       .withSiret(siret)
       .build();
-    const contact = new ContactEntityV2Builder()
+    const contact = new ContactEntityBuilder()
       .withId(contactId)
       .withContactMethod("EMAIL")
       .build();

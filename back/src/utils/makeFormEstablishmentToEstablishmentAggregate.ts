@@ -4,13 +4,14 @@ import {
   FormEstablishmentDto,
   GeoPositionDto,
   NafDto,
+  noContactPerWeek,
 } from "shared";
 import { TimeGateway } from "../domain/core/ports/TimeGateway";
 import { UuidGenerator } from "../domain/core/ports/UuidGenerator";
-import { ContactEntityV2 } from "../domain/immersionOffer/entities/ContactEntity";
+import { ContactEntity } from "../domain/immersionOffer/entities/ContactEntity";
 import {
   EstablishmentAggregate,
-  EstablishmentEntityV2,
+  EstablishmentEntity,
   NumberEmployeesRange,
 } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import { ImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
@@ -168,7 +169,7 @@ const makeCreateEstablishmentAggregate =
     addressAndPosition: AddressAndPosition;
     nafAndNumberOfEmployee: NafAndNumberOfEmpolyee;
   }) => {
-    const contact: ContactEntityV2 = {
+    const contact: ContactEntity = {
       id: uuidGenerator.new(),
       ...formEstablishment.businessContact,
     };
@@ -178,7 +179,7 @@ const makeCreateEstablishmentAggregate =
         appelationToImmersionOfferEntity(timeGateway),
       );
 
-    const establishment: EstablishmentEntityV2 = {
+    const establishment: EstablishmentEntity = {
       siret: formEstablishment.siret,
       name: formEstablishment.businessName,
       customizedName: formEstablishment.businessNameCustomized,
@@ -195,7 +196,7 @@ const makeCreateEstablishmentAggregate =
       isActive: true,
       updatedAt: timeGateway.now(),
       fitForDisabledWorkers: formEstablishment.fitForDisabledWorkers,
-      isSearchable: formEstablishment.maxContactsPerWeek > 0,
+      isSearchable: formEstablishment.maxContactsPerWeek > noContactPerWeek,
       maxContactsPerWeek: formEstablishment.maxContactsPerWeek,
     };
 
