@@ -33,7 +33,7 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
     autoComplete: "organization",
     description:
       "Nom sous lequel vous souhaitez apparaitre dans les résultats de recherche",
-    placeholder: "ex: Nom de mon enseigne (optionnel)",
+    placeholder: "Ex: Nom de mon enseigne (optionnel)",
   },
   businessAddress: {
     label: "Vérifiez l'adresse de votre établissement",
@@ -69,7 +69,7 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
   "businessContact.copyEmails": {
     label: "Autres destinataires",
     description: "Adresses mail à mettre en copie",
-    placeholder: "cc1@mail.com, cc2@mail.com (optionnel)",
+    placeholder: "Ex : cc1@mail.com, cc2@mail.com (optionnel)",
     id: "establishment-businessContact-copyEmails",
   },
   "businessContact.contactMethod": {
@@ -102,7 +102,7 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
   website: {
     label: "URL vers votre site internet",
     id: "establishment-website",
-    placeholder: "ex : https://mon-site-internet.fr (optionnel)",
+    placeholder: "Ex : https://mon-site-internet.fr (optionnel)",
   },
   additionalInformation: {
     label: "Informations complémentaires",

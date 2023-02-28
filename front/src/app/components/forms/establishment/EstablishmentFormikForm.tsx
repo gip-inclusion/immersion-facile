@@ -102,7 +102,7 @@ export const EstablishmentFormikForm = ({
           </p>
 
           <p className={fr.cx("fr-text--xs")}>
-            Tout les champs marqués d'une astérix (*) sont obligatoires.
+            Tout les champs marqués d'une astérisque (*) sont obligatoires.
           </p>
 
           <Form>

@@ -185,7 +185,7 @@ const conventionSection = (internshipKind: InternshipKind) => ({
     id: "form-convention-businessAdvantages",
     description: "Précisez les avantages proposés par l'entreprise",
     placeholder:
-      "navettes jusqu'au lieu de travail, panier repas, hébergement... (optionnel)",
+      "Ex : navettes jusqu'au lieu de travail, panier repas, hébergement... (optionnel)",
   },
   isMinor: {
     label: "Etes vous mineur ou majeur protégé ?",
@@ -237,7 +237,7 @@ const beneficiarySection = (internshipKind: InternshipKind) => ({
   "signatories.beneficiary.financiaryHelp": {
     label: "Aide matérielle",
     id: "form-convention-signatories-beneficiary-financiary-help",
-    placeholder: "exemple: aide à la mobilité (optionnel)",
+    placeholder: "Ex : aide à la mobilité (optionnel)",
     description:
       "Le bénéficiaire a-t-il besoin d'une aide matérielle pour réaliser l'immersion?",
   },
@@ -249,17 +249,17 @@ const beneficiarySection = (internshipKind: InternshipKind) => ({
   "signatories.beneficiary.emergencyContact": {
     label: "Prénom et nom de la personne à prévenir en cas d'urgence",
     id: "form-convention-signatories-beneficiary-emergencyContact",
-    placeholder: "Jean Dupont (optionnel)",
+    placeholder: "Ex : Jean Dupont (optionnel)",
   },
   "signatories.beneficiary.emergencyContactPhone": {
     label: "Téléphone de la personne à prévenir en cas d'urgence",
     id: "form-convention-signatories-beneficiary-emergencyContactPhone",
-    placeholder: "0606060607 (optionnel)",
+    placeholder: "Ex : 0606060607 (optionnel)",
   },
   "signatories.beneficiary.emergencyContactEmail": {
     label: "E-mail de la personne à prévenir en cas d'urgence",
     id: "form-convention-signatories-beneficiary-emergencyContactEmail",
-    placeholder: "contact@urgence.com (optionnel)",
+    placeholder: "Ex : contact@urgence.com (optionnel)",
   },
 });
 
