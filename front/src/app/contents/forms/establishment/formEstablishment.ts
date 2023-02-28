@@ -33,13 +33,13 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
     autoComplete: "organization",
     description:
       "Nom sous lequel vous souhaitez apparaitre dans les résultats de recherche",
-    placeholder: "Ex: Nom de mon enseigne (optionnel)",
+    placeholder: "Ex : Nom de mon enseigne (optionnel)",
   },
   businessAddress: {
     label: "Vérifiez l'adresse de votre établissement",
     required: true,
     id: "establishment-businessAddress",
-    placeholder: "Ex: 26 rue du labrador, 37000 Tours",
+    placeholder: "Ex : 26 rue du labrador, 37000 Tours",
   },
   "businessContact.lastName": {
     label: "Nom du référent",

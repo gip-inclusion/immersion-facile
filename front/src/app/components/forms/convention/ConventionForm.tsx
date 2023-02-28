@@ -145,7 +145,7 @@ export const ConventionForm = ({
       />
 
       <p className={fr.cx("fr-text--xs", "fr-mt-3w")}>
-        Tout les champs marqués d'une astérisque (*) sont obligatoires.
+        Tous les champs marqués d'une astérisque (*) sont obligatoires.
       </p>
 
       <Formik

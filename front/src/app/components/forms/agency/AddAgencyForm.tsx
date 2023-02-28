@@ -64,7 +64,7 @@ export const AddAgencyForm = (): JSX.Element => {
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onFormValid)}>
         <p className={fr.cx("fr-text--xs")}>
-          Tout les champs marqués d'une astérisque (*) sont obligatoires.
+          Tous les champs marqués d'une astérisque (*) sont obligatoires.
         </p>
         <AgencyFormCommonFields />
         <AgencyLogoUpload />
