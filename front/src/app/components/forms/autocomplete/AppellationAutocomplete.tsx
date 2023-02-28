@@ -29,6 +29,7 @@ type AppellationAutocompleteProps = {
   selectedAppellations?: AppellationDto[];
   description?: string;
   placeholder?: string;
+  id?: string;
 };
 
 type Option = Proposal<AppellationDto>;
@@ -41,6 +42,7 @@ export const AppellationAutocomplete = ({
   selectedAppellations = [],
   description,
   placeholder,
+  id = "im-appellation-autocomplete",
 }: AppellationAutocompleteProps) => {
   const initialOption: Option | null = initialValue
     ? {
@@ -109,6 +111,8 @@ export const AppellationAutocomplete = ({
         inputValue={inputHasChanged ? searchTerm : initialOption?.description}
         noOptionsText={searchTerm ? noOptionText : "Saisissez un métier"}
         getOptionLabel={(option: Option) => option.value.appellationLabel}
+        open={true}
+        id={id}
         renderOption={(props, option) => (
           <li {...props}>
             <StringWithHighlights
@@ -140,11 +144,7 @@ export const AppellationAutocomplete = ({
         }}
         renderInput={(params) => {
           const { id } = params;
-          const inputId = cleanStringToHTMLAttribute(
-            "appellation-autocomplete",
-            null,
-            id,
-          );
+          const inputId = cleanStringToHTMLAttribute(id, null);
 
           return (
             <div ref={params.InputProps.ref}>

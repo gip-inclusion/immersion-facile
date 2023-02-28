@@ -144,6 +144,7 @@ export const SearchPage = ({
                         appellationLabel: values.appellationLabel ?? "",
                       },
                     ]}
+                    id={"im-search-page__appellation-autocomplete"}
                   />
                 </div>
                 <div
