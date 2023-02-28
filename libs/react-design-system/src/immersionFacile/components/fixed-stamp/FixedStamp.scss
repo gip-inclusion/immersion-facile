@@ -2,7 +2,7 @@
 
 .fixed-stamp {
   position: fixed;
-  background: #fff;
+  background: var(--grey-1000-100);
   padding: 0.8rem 1.5rem 0.8rem 0.8rem;
   border-radius: 5px 0 0 5px;
   top: 50%;
@@ -41,7 +41,7 @@
   }
   &__title {
     font-size: 0.75rem;
-    color: #0079c1;
+    color: var(--blue-cumulus-main-526);
   }
   &__subtitle {
     font-size: 0.625rem;
