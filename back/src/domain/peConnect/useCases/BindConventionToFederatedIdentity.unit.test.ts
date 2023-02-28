@@ -1,4 +1,8 @@
-import { ConventionDtoBuilder, expectObjectsToMatch } from "shared";
+import {
+  ConventionDtoBuilder,
+  expectObjectsToMatch,
+  expectToEqual,
+} from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
@@ -156,6 +160,29 @@ describe("AssociatePeConnectFederatedIdentity", () => {
       topic: "FederatedIdentityBoundToConvention",
       payload: conventionDtoFromEvent,
     });
+  });
+
+  it("without open slot then no association and FederatedIdentityNotBoundToConvention event", async () => {
+    conventionPoleEmploiAdvisorRepo.setConventionPoleEmploiUsersAdvisor([]);
+
+    const conventionDtoFromEvent = new ConventionDtoBuilder()
+      .withId(conventionId)
+      .withFederatedIdentity({ provider: "peConnect", token: userPeExternalId })
+      .build();
+
+    await associatePeConnectFederatedIdentity.execute(conventionDtoFromEvent);
+
+    expectToEqual(
+      conventionPoleEmploiAdvisorRepo.conventionPoleEmploiUsersAdvisors,
+      [],
+    );
+
+    expectToEqual(outboxRepo.events, [
+      createNewEvent({
+        topic: "FederatedIdentityNotBoundToConvention",
+        payload: conventionDtoFromEvent,
+      }),
+    ]);
   });
 });
 
