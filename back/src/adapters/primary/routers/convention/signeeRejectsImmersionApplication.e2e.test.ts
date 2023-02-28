@@ -58,6 +58,7 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
     "READY_TO_SIGN",
   );
 
+  //Need to process events 2 times in order to handle submit & associate events
   await eventCrawler.processNewEvents();
   await eventCrawler.processNewEvents();
 
