@@ -96,8 +96,10 @@ const conventionSection = (internshipKind: InternshipKind) => ({
         ? "Conditions de travail, propres au métier observé pendant l’immersion. "
         : "Conditions de travail, propres au métier observé pendant le stage ",
     description:
-      "Ex : transport de marchandises longue distance - pas de retour au domicile pendant 2 jours",
+      "Précisez les conditions de travail, propres au métier observé ",
     id: "form-convention-workConditions",
+    placeholder:
+      "Ex : transport de marchandises longue distance - pas de retour au domicile pendant 2 jours (optionnel)",
   },
   individualProtection: {
     label:
@@ -117,8 +119,10 @@ const conventionSection = (internshipKind: InternshipKind) => ({
   },
   sanitaryPreventionDescription: {
     label: "Si oui, précisez-les",
-    description: "Ex : fourniture de gel, de masques",
+    description:
+      "Précisez les mesures de prévention sanitaire prévues pour l’immersion",
     id: "form-convention-sanitaryPreventionDescription",
+    placeholder: "Ex : fourniture de gel, de masques (optionnel)",
   },
   immersionAddress: {
     label:
@@ -149,18 +153,20 @@ const conventionSection = (internshipKind: InternshipKind) => ({
       internshipKind === "immersion"
         ? "Activités observées / pratiquées pendant l'immersion"
         : "Activités observées / pratiquées pendant le stage",
-    description: "Ex : mise en rayon, accueil et aide à la clientèle",
+    description: "Précisez les activités observées / pratiquées",
     id: "form-convention-immersionActivities",
     required: true,
+    placeholder: "Ex : mise en rayon, accueil et aide à la clientèle",
   },
   immersionSkills: {
     label:
       internshipKind === "immersion"
         ? "Compétences/aptitudes observées / évaluées pendant l'immersion"
         : "Compétences/aptitudes observées / évaluées pendant le stage",
-    description:
-      "Ex : communiquer à l'oral, résoudre des problèmes, travailler en équipe",
+    description: "Précisez les compétences/aptitudes observées",
     id: "form-convention-immersionSkills",
+    placeholder:
+      "Ex : communiquer à l'oral, résoudre des problèmes, travailler en équipe (optionnel)",
   },
   isCurrentEmployer: {
     label:
@@ -177,8 +183,9 @@ const conventionSection = (internshipKind: InternshipKind) => ({
   businessAdvantages: {
     label: "Avantages proposés par l'entreprise",
     id: "form-convention-businessAdvantages",
-    description:
-      "navettes jusqu'au lieu de travail, panier repas, hébergement...",
+    description: "Précisez les avantages proposés par l'entreprise",
+    placeholder:
+      "navettes jusqu'au lieu de travail, panier repas, hébergement... (optionnel)",
   },
   isMinor: {
     label: "Etes vous mineur ou majeur protégé ?",
@@ -230,7 +237,7 @@ const beneficiarySection = (internshipKind: InternshipKind) => ({
   "signatories.beneficiary.financiaryHelp": {
     label: "Aide matérielle",
     id: "form-convention-signatories-beneficiary-financiary-help",
-    placeholder: "exemple: aide à la mobilité",
+    placeholder: "exemple: aide à la mobilité (optionnel)",
     description:
       "Le bénéficiaire a-t-il besoin d'une aide matérielle pour réaliser l'immersion?",
   },
@@ -242,16 +249,17 @@ const beneficiarySection = (internshipKind: InternshipKind) => ({
   "signatories.beneficiary.emergencyContact": {
     label: "Prénom et nom de la personne à prévenir en cas d'urgence",
     id: "form-convention-signatories-beneficiary-emergencyContact",
+    placeholder: "Jean Dupont (optionnel)",
   },
   "signatories.beneficiary.emergencyContactPhone": {
     label: "Téléphone de la personne à prévenir en cas d'urgence",
     id: "form-convention-signatories-beneficiary-emergencyContactPhone",
-    placeholder: "0606060607",
+    placeholder: "0606060607 (optionnel)",
   },
   "signatories.beneficiary.emergencyContactEmail": {
     label: "E-mail de la personne à prévenir en cas d'urgence",
     id: "form-convention-signatories-beneficiary-emergencyContactEmail",
-    placeholder: "contact@urgence.com",
+    placeholder: "contact@urgence.com (optionnel)",
   },
 });
 

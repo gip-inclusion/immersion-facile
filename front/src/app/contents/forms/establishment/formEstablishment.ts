@@ -31,6 +31,9 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
       "Indiquez le nom de l'enseigne de l'établissement d'accueil, si elle diffère de la raison sociale",
     id: "establishment-businessNameCustomized",
     autoComplete: "organization",
+    description:
+      "Nom sous lequel vous souhaitez apparaitre dans les résultats de recherche",
+    placeholder: "ex: Nom de mon enseigne (optionnel)",
   },
   businessAddress: {
     label: "Vérifiez l'adresse de votre établissement",
@@ -66,7 +69,7 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
   "businessContact.copyEmails": {
     label: "Autres destinataires",
     description: "Adresses mail à mettre en copie",
-    placeholder: "cc1@mail.com, cc2@mail.com",
+    placeholder: "cc1@mail.com, cc2@mail.com (optionnel)",
     id: "establishment-businessContact-copyEmails",
   },
   "businessContact.contactMethod": {
@@ -79,7 +82,7 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
       "Au maximum, combien de mises en relation souhaitez-vous recevoir par semaine ?",
     description:
       "Par exemple, en renseignant 5 : si vous avez déjà reçu 5 demandes cette semaine, vous n'apparaîtrez plus dans la liste des entreprises accueillantes jusqu'à la semaine suivante.",
-    required: false,
+    required: true,
     id: "establishment-businessContact-maxContactPerWeek",
   },
   isEngagedEnterprise: {
@@ -99,6 +102,7 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
   website: {
     label: "URL vers votre site internet",
     id: "establishment-website",
+    placeholder: "ex : https://mon-site-internet.fr (optionnel)",
   },
   additionalInformation: {
     label: "Informations complémentaires",
@@ -106,6 +110,6 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
     description:
       "En information complémentaire, nous vous conseillons de valoriser votre histoire afin de donner envie à un candidat de découvrir un métier au sein de votre établissement.",
     placeholder:
-      "Ex : ma biographie d’entreprise (valeurs, écosystème, projections), mon potentiel d’embauche ou toute autre information essentielle pour l’accueil du bénéficiaire au sein de mon établissement",
+      "Ex : ma biographie d’entreprise (valeurs, écosystème, projections), mon potentiel d’embauche ou toute autre information essentielle pour l’accueil du bénéficiaire au sein de mon établissement (optionnel)",
   },
 };
