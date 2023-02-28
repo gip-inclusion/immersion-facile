@@ -1713,13 +1713,14 @@ describe("Postgres implementation of immersion offer repository", () => {
     sourceProvider?: FormEstablishmentSource;
     position?: GeoPositionDto;
     fitForDisabledWorkers?: boolean;
+    maxContactsPerWeek?: number;
   }) => {
     const defaultPosition = { lon: 12.2, lat: 2.1 };
     const position = props.position ?? defaultPosition;
     const insertQuery = `
     INSERT INTO establishments (
-      siret, name, street_number_and_address, post_code, city, department_code, number_employees, naf_code, data_source, source_provider, update_date, is_active, is_searchable, fit_for_disabled_workers, gps, lon, lat
-    ) VALUES ($1, '', $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, ST_GeographyFromText('POINT(${position.lon} ${position.lat})'), $14, $15)`;
+      siret, name, street_number_and_address, post_code, city, department_code, number_employees, naf_code, data_source, source_provider, update_date, is_active, is_searchable, fit_for_disabled_workers, gps, lon, lat, max_contacts_per_week
+    ) VALUES ($1, '', $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, ST_GeographyFromText('POINT(${position.lon} ${position.lat})'), $14, $15, $16)`;
     const addressDto = props.address ?? rueGuillaumeTellDto;
     await client.query(insertQuery, [
       props.siret,
@@ -1737,6 +1738,7 @@ describe("Postgres implementation of immersion offer repository", () => {
       props.fitForDisabledWorkers,
       position.lon,
       position.lat,
+      props.maxContactsPerWeek ?? 10,
     ]);
   };
   const insertImmersionOffer = async (props: {
