@@ -117,6 +117,13 @@ export class EstablishmentEntityBuilder
     });
   }
 
+  withIsSearchable(isSearchable: boolean) {
+    return new EstablishmentEntityBuilder({
+      ...this.entity,
+      isSearchable,
+    });
+  }
+
   build() {
     return this.entity;
   }

@@ -76,6 +76,18 @@ export class EstablishmentAggregateBuilder
         .build(),
     });
   }
+
+  public withIsSearchable(isSearchable: boolean) {
+    return new EstablishmentAggregateBuilder({
+      ...this.aggregate,
+      establishment: new EstablishmentEntityBuilder(
+        this.aggregate.establishment,
+      )
+        .withIsSearchable(isSearchable)
+        .build(),
+    });
+  }
+
   build() {
     return this.aggregate;
   }

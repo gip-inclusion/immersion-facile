@@ -1,4 +1,5 @@
 import { PoolClient } from "pg";
+import { SiretDto } from "shared";
 import {
   DiscussionId,
   DiscussionAggregate,
@@ -86,5 +87,19 @@ export class PgDiscussionAggregateRepository
         sentAt: new Date(exchange.sentAt),
       })),
     };
+  }
+
+  async countDiscussionsForSiretSince(
+    siret: SiretDto,
+    since: Date,
+  ): Promise<number> {
+    const pgResult = await this.client.query(
+      `SELECT COUNT(*) 
+      FROM discussions
+      WHERE siret = $1 AND created_at >= $2`,
+      [siret, since],
+    );
+
+    return parseInt(pgResult.rows[0].count);
   }
 }

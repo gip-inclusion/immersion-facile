@@ -1,3 +1,4 @@
+import { SiretDto } from "shared";
 import {
   DiscussionId,
   DiscussionAggregate,
@@ -10,4 +11,8 @@ export interface DiscussionAggregateRepository {
   retrieveDiscussionAggregate: (
     discussionId: DiscussionId,
   ) => Promise<DiscussionAggregate | undefined>;
+  countDiscussionsForSiretSince: (
+    siret: SiretDto,
+    since: Date,
+  ) => Promise<number>;
 }
