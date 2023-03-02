@@ -309,6 +309,7 @@ const calculateTotalImmersionHoursBetweenDateComplex = ({
 
 export const dayPeriodsFromComplexSchedule = (
   complexSchedule: DailyScheduleDto[],
+  startDayDate?: Date,
 ): DayPeriodsDto => {
   const manageTimePeriodOnDay = (frenchDay: number) => {
     const isSameFrenchDay = (day: DailyScheduleDto, frenchDay: number) =>
@@ -349,7 +350,8 @@ export const dayPeriodsFromComplexSchedule = (
       frenchDay = lastFrenchDayWithTimePeriod;
     }
   }
-  return dayPeriods;
+  const startDay = startDayDate?.getDay() || 0;
+  return startDay > 0 ? dayPeriods.sort((a) => startDay - a[0]) : dayPeriods;
 };
 
 export const makeImmersionTimetable = (

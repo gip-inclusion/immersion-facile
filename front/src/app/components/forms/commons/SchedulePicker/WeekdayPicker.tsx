@@ -103,15 +103,13 @@ export const WeekdayPicker = ({
                     disabled={disabled}
                   />
                 </div>
-                {!disabled && isRemovable && (
-                  <Button
-                    type="button"
-                    iconId="fr-icon-delete-bin-line"
-                    title="Supprimer"
-                    disabled={!isRemovable}
-                    onClick={() => remove(index)}
-                  />
-                )}
+                <Button
+                  type="button"
+                  iconId="fr-icon-delete-bin-line"
+                  title="Supprimer"
+                  disabled={disabled || !isRemovable}
+                  onClick={() => remove(index)}
+                />
               </div>
             </div>
           );

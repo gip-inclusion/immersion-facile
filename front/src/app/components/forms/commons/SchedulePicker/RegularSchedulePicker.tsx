@@ -48,6 +48,7 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
             name={name}
             dayPeriods={dayPeriodsFromComplexSchedule(
               field.value.complexSchedule,
+              props.interval.start,
             )}
             onValueChange={(dayPeriods: DayPeriodsDto) => {
               field.value = new ScheduleDtoBuilder(field.value)
