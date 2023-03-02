@@ -73,7 +73,7 @@ describe("Update Convention", () => {
 
   describe("When no Convention with id exists", () => {
     it("throws NotFoundError", async () => {
-      const id = "40400000000000404";
+      const id = "add5c20e-6dd2-45af-affe-927358005251";
       const validConvention = new ConventionDtoBuilder()
         .withStatus("READY_TO_SIGN")
         .withId(id)
@@ -84,7 +84,7 @@ describe("Update Convention", () => {
           id,
           convention: validConvention,
         }),
-        new NotFoundError("Convention with id 40400000000000404 was not found"),
+        new NotFoundError(`Convention with id ${id} was not found`),
       );
     });
   });
@@ -233,7 +233,7 @@ describe("Update Convention", () => {
             id: convention.id,
           }),
           new ForbiddenError(
-            "Convention 40400404-9c0b-bbbb-bb6d-6bb9bd38bbbb with modifications should have status READY_TO_SIGN",
+            `Convention ${convention.id} with modifications should have status READY_TO_SIGN`,
           ),
         );
       }
@@ -276,7 +276,7 @@ describe("Update Convention", () => {
           id: draftConvention.id,
         }),
         new ForbiddenError(
-          "Convention 40400404-9c0b-bbbb-bb6d-6bb9bd38bbbb with modifications should have status READY_TO_SIGN",
+          `Convention ${id} with modifications should have status READY_TO_SIGN`,
         ),
       );
     });

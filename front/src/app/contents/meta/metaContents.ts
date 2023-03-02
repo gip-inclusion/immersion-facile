@@ -86,7 +86,7 @@ export const metaContents: Partial<
     title: "Demande de convention d'immersion",
     description: "Faciliter la réalisation des immersions professionnelles.",
   },
-  conventionToValidate: {
+  manageConvention: {
     title: "Vérification de convention d'immersion",
     description: "Faciliter la réalisation des immersions professionnelles.",
   },

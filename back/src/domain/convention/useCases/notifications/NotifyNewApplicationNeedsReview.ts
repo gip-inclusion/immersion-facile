@@ -85,7 +85,7 @@ export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<Conven
             businessName: conventionDto.businessName,
             magicLink: this.generateMagicLinkFn({
               ...magicLinkCommonFields,
-              targetRoute: frontRoutes.conventionToValidate,
+              targetRoute: frontRoutes.manageConvention,
             }),
             conventionStatusLink: this.generateMagicLinkFn({
               ...magicLinkCommonFields,

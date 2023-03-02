@@ -22,7 +22,7 @@ const generateJwtFn: GenerateMagicLinkJwt = (payload) => {
 describe("Generate magic links", () => {
   describe("Magic link generator use case", () => {
     it("Generates magic links with its fn", async () => {
-      const id = "123";
+      const id = "add5c20e-6dd2-45af-affe-927358005251";
       const role = "validator" as Role;
       const email = "foo@bar.com";
       const timeGateway = new CustomTimeGateway();
@@ -48,7 +48,7 @@ describe("Generate magic links", () => {
     });
     it("Decode convention magic link", async () => {
       const request: GenerateMagicLinkRequestDto = {
-        applicationId: "123",
+        applicationId: "20f44402-80f9-42ad-9f53-9353cb2629ee",
         role: "validator",
         expired: false,
       };

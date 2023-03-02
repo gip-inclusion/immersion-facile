@@ -49,7 +49,7 @@ export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends Transact
           magicLink: this.generateMagicLinkFn({
             id: conventionFromEvent.id,
             role: "validator",
-            targetRoute: frontRoutes.conventionToValidate,
+            targetRoute: frontRoutes.manageConvention,
             email: conventionPeAdvisor.advisor.email,
             now: this.timeGateway.now(),
           }),

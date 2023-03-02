@@ -21,11 +21,47 @@ const inclusionConnectedParams = createInclusionConnectedParams({
 
 export const { RouteProvider, useRoute, routes } = createRouter({
   addAgency: defineRoute(`/${frontRoutes.addAgency}`),
+  adminRoot: defineRoute(`/${frontRoutes.admin}`),
   adminTab: defineRoute(
     { tab: param.path.ofType(adminTabSerializer) },
     ({ tab }) => `/${frontRoutes.admin}/${tab}`,
   ),
-  adminRoot: defineRoute(`/${frontRoutes.admin}`),
+  agencyDashboard: defineRoute(
+    inclusionConnectedParams,
+    () => `/${frontRoutes.agencyDashboard}`,
+  ),
+  conventionCustomAgency: defineRoute(
+    { jwt: param.query.optional.string, ...conventionValuesFromUrl },
+    () => `/${frontRoutes.conventionImmersionRoute}-agence-immersion-facilitee`,
+  ),
+  conventionDocument: defineRoute(
+    { jwt: param.query.string },
+    () => `/${frontRoutes.conventionDocument}`,
+  ),
+  conventionImmersion: defineRoute(
+    { jwt: param.query.optional.string, ...conventionValuesFromUrl },
+    () => `/${frontRoutes.conventionImmersionRoute}`,
+  ),
+  conventionImmersionForExternals: defineRoute(
+    {
+      consumer: param.path.string,
+      jwt: param.query.optional.string,
+      ...conventionValuesFromUrl,
+    },
+    (params) => `/${frontRoutes.conventionImmersionRoute}/${params.consumer}`,
+  ),
+  conventionMiniStage: defineRoute(
+    { jwt: param.query.optional.string, ...conventionValuesFromUrl },
+    () => `/${frontRoutes.conventionMiniStageRoute}`,
+  ),
+  conventionStatusDashboard: defineRoute(
+    { jwt: param.query.string },
+    () => `/${frontRoutes.conventionStatusDashboard}`,
+  ),
+  conventionToSign: defineRoute(
+    { jwt: param.query.string },
+    () => `/${frontRoutes.conventionToSign}`,
+  ),
   debugPopulateDB: defineRoute(
     { count: param.path.number },
     (params) => `/debug/populate/${params.count}`,
@@ -50,68 +86,37 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { consumer: param.path.string },
     (params) => `/etablissement/${params.consumer}`,
   ),
+  group: defineRoute(
+    { groupName: param.path.ofType(groupsSerializer) },
+    (params) => `/${frontRoutes.group}/${params.groupName}`,
+  ),
   home: defineRoute("/"),
+  homeAgencies: defineRoute(`/${frontRoutes.homeAgencies}`),
   homeCandidates: defineRoute(`/${frontRoutes.homeCandidates}`),
   homeEstablishments: defineRoute([
     `/${frontRoutes.homeEstablishments}`,
     `/${frontRoutes.landingEstablishment}`,
   ]),
-  homeAgencies: defineRoute(`/${frontRoutes.homeAgencies}`),
-  agencyDashboard: defineRoute(
-    inclusionConnectedParams,
-    () => `/${frontRoutes.agencyDashboard}`,
-  ),
-  conventionImmersion: defineRoute(
-    { jwt: param.query.optional.string, ...conventionValuesFromUrl },
-    () => `/${frontRoutes.conventionImmersionRoute}`,
-  ),
-  conventionDocument: defineRoute(
-    { jwt: param.query.string },
-    () => `/${frontRoutes.conventionDocument}`,
-  ),
-  conventionImmersionForExternals: defineRoute(
-    {
-      consumer: param.path.string,
-      jwt: param.query.optional.string,
-      ...conventionValuesFromUrl,
-    },
-    (params) => `/${frontRoutes.conventionImmersionRoute}/${params.consumer}`,
-  ),
-  conventionMiniStage: defineRoute(
-    { jwt: param.query.optional.string, ...conventionValuesFromUrl },
-    () => `/${frontRoutes.conventionMiniStageRoute}`,
-  ),
-  conventionCustomAgency: defineRoute(
-    {
-      jwt: param.query.optional.string,
-      ...conventionValuesFromUrl,
-    },
-    () => `/${frontRoutes.conventionImmersionRoute}-agence-immersion-facilitee`,
-  ),
-  conventionToValidate: defineRoute(
-    { jwt: param.query.string },
-    () => `/${frontRoutes.conventionToValidate}`,
-  ),
-  conventionToSign: defineRoute(
-    { jwt: param.query.string },
-    () => `/${frontRoutes.conventionToSign}`,
-  ),
-  conventionStatusDashboard: defineRoute(
-    { jwt: param.query.string },
-    () => `/${frontRoutes.conventionStatusDashboard}`,
-  ),
   immersionAssessment: defineRoute(
     { jwt: param.query.string },
     () => `/${frontRoutes.immersionAssessment}`,
   ),
+  manageConvention: defineRoute(
+    { jwt: param.query.string },
+    () => `/${frontRoutes.manageConvention}`,
+  ),
+  manageConventionAdmin: defineRoute(
+    { conventionId: param.query.string },
+    () => `/${frontRoutes.manageConventionAdmin}`,
+  ),
+  manageConventionOld: defineRoute(
+    { jwt: param.query.string },
+    () => `/${frontRoutes.manageConventionOld}`,
+  ),
   renewConventionMagicLink: defineRoute(
-    {
-      expiredJwt: param.query.string,
-      originalURL: param.query.string,
-    },
+    { expiredJwt: param.query.string, originalURL: param.query.string },
     () => `/${frontRoutes.magicLinkRenewal}`,
   ),
-  stats: defineRoute("/stats"),
   search: defineRoute(
     {
       distance_km: param.query.optional.number,
@@ -127,15 +132,8 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     () => `/${frontRoutes.search}`,
   ),
   standard: defineRoute(
-    {
-      pagePath: param.path.ofType(standardPagesSerializer),
-    },
+    { pagePath: param.path.ofType(standardPagesSerializer) },
     (params) => `/${frontRoutes.standard}/${params.pagePath}`,
   ),
-  group: defineRoute(
-    {
-      groupName: param.path.ofType(groupsSerializer),
-    },
-    (params) => `/${frontRoutes.group}/${params.groupName}`,
-  ),
+  stats: defineRoute("/stats"),
 });

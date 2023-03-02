@@ -20,7 +20,7 @@ import {
   isBeneficiaryStudent,
 } from "./convention.dto";
 
-export const DEMANDE_IMMERSION_ID = "40400404-9c0b-bbbb-bb6d-6bb9bd38bbbb";
+export const DEMANDE_IMMERSION_ID = "a99eaca1-ee70-4c90-b3f4-668d492f7392";
 export const CONVENTION_EXTERNAL_ID = "00000000001";
 export const VALID_EMAILS = [
   "beneficiary@email.fr",

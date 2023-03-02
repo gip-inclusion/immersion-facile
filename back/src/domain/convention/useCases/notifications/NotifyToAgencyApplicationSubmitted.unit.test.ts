@@ -108,7 +108,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
           magicLink: fakeGenerateMagicLinkUrlFn({
             id: validConvention.id,
             role: "counsellor",
-            targetRoute: frontRoutes.conventionToValidate,
+            targetRoute: frontRoutes.manageConvention,
             email: councellorEmail,
             now: timeGateway.now(),
           }),
@@ -131,7 +131,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
           magicLink: fakeGenerateMagicLinkUrlFn({
             id: validConvention.id,
             role: "counsellor",
-            targetRoute: frontRoutes.conventionToValidate,
+            targetRoute: frontRoutes.manageConvention,
             email: councellorEmail2,
             now: timeGateway.now(),
           }),
@@ -165,7 +165,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
           magicLink: fakeGenerateMagicLinkUrlFn({
             id: validConvention.id,
             role: "validator",
-            targetRoute: frontRoutes.conventionToValidate,
+            targetRoute: frontRoutes.manageConvention,
             email: validatorEmail,
             now: timeGateway.now(),
           }),
@@ -201,7 +201,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
           magicLink: fakeGenerateMagicLinkUrlFn({
             id: validConvention.id,
             role: "counsellor",
-            targetRoute: frontRoutes.conventionToValidate,
+            targetRoute: frontRoutes.manageConvention,
             email: councellorEmail,
             now: timeGateway.now(),
           }),
@@ -224,7 +224,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
           magicLink: fakeGenerateMagicLinkUrlFn({
             id: validConvention.id,
             role: "counsellor",
-            targetRoute: frontRoutes.conventionToValidate,
+            targetRoute: frontRoutes.manageConvention,
             email: councellorEmail2,
             now: timeGateway.now(),
           }),
@@ -276,7 +276,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
           magicLink: fakeGenerateMagicLinkUrlFn({
             id: validConvention.id,
             role: "counsellor",
-            targetRoute: frontRoutes.conventionToValidate,
+            targetRoute: frontRoutes.manageConvention,
             email: councellorEmail,
             now: timeGateway.now(),
           }),
@@ -299,7 +299,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
           magicLink: fakeGenerateMagicLinkUrlFn({
             id: validConvention.id,
             role: "counsellor",
-            targetRoute: frontRoutes.conventionToValidate,
+            targetRoute: frontRoutes.manageConvention,
             email: councellorEmail2,
             now: timeGateway.now(),
           }),

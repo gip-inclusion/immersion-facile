@@ -206,7 +206,7 @@ describe("convention e2e", () => {
       });
 
       it("Fetching unknown application IDs fails with 404 Not Found", async () => {
-        const unknownId = "unknown-demande-immersion-id";
+        const unknownId = "add5c20e-6dd2-45af-affe-927358005251";
         const jwt = generateMagicLinkJwt(
           createConventionMagicLinkPayload({
             id: unknownId,

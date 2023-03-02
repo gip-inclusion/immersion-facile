@@ -38,7 +38,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
 
   it("should resolve to undefined if the convention pole emploi OAuth advisor is not found", async () => {
     const conventionDtoFromEvent: ConventionDto = new ConventionDtoBuilder()
-      .withId("some-invalid-id")
+      .withId("add5c20e-6dd2-45af-affe-927358005251")
       .withFederatedIdentity({ provider: "peConnect", token: "blop" })
       .build();
 
@@ -95,7 +95,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
           magicLink: fakeGenerateMagicLinkUrlFn({
             id: conventionDtoFromEvent.id,
             role: "validator",
-            targetRoute: frontRoutes.conventionToValidate,
+            targetRoute: frontRoutes.manageConvention,
             email: advisor.email,
             now: timeGateway.now(),
           }),

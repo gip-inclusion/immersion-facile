@@ -3,28 +3,29 @@ import { preprocess, z } from "zod";
 import { timeHHmmRegExp } from "./utils/date";
 
 export const localization = {
-  required: "Obligatoire",
-  expectText: "Une chaine de caractères est attendue",
-  maxCharacters: (max: number) => `Le maximum est de ${max} caractères`,
-  invalidTimeFormat: "Le format de l'heure est invalide",
-  invalidDate: "Le format de la date saisie est invalide",
-  invalidDateStart: "Le format de la date de début est invalide",
-  invalidDateEnd: "Le format de la date de fin est invalide",
-  invalidEmailFormat: "Veuillez saisir une adresse e-mail valide",
-  invalidDateStartDateEnd: "La date de fin doit être après la date de début.",
   atLeastOneEmail: "Vous devez renseigner au moins un email",
   atLeastOneJob: "Vous devez renseigner au moins un métier",
-  invalidValidationFormatDate:
-    "Le format de la date de validation est invalide.",
-  invalidPostalCode: "Veuillez spécifier un code postal dans l'adresse.",
-  invalidImmersionObjective: "Vous devez choisir un objectif d'immersion",
-  expectedBoolean: "La sélection d'une valeur (oui/non) est obligatoire",
-  invalidPhone: "Numéro de téléphone incorrect",
-  signatoriesDistinctEmails:
-    "Les emails des signataires doivent être différents.",
   beneficiaryTutorEmailMustBeDistinct:
     "Le mail du tuteur doit être différent des mails du bénéficiaire, de son représentant légal et de son employeur actuel.",
+  expectedBoolean: "La sélection d'une valeur (oui/non) est obligatoire",
+  expectText: "Une chaine de caractères est attendue",
+  invalidDate: "Le format de la date saisie est invalide",
+  invalidDateEnd: "Le format de la date de fin est invalide",
+  invalidDateStart: "Le format de la date de début est invalide",
+  invalidDateStartDateEnd: "La date de fin doit être après la date de début.",
+  invalidEmailFormat: "Veuillez saisir une adresse e-mail valide",
+  invalidImmersionObjective: "Vous devez choisir un objectif d'immersion",
+  invalidPhone: "Numéro de téléphone incorrect",
+  invalidPostalCode: "Veuillez spécifier un code postal dans l'adresse.",
+  invalidTimeFormat: "Le format de l'heure est invalide",
+  invalidUuid: "Le format de l'identifiant est invalide",
+  invalidValidationFormatDate:
+    "Le format de la date de validation est invalide.",
+  maxCharacters: (max: number) => `Le maximum est de ${max} caractères`,
   mustBeSignedByEveryone: "La confirmation de votre accord est obligatoire.",
+  required: "Obligatoire",
+  signatoriesDistinctEmails:
+    "Les emails des signataires doivent être différents.",
 };
 
 export const requiredText = {

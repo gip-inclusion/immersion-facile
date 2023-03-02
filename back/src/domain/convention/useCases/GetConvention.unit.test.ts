@@ -1,5 +1,6 @@
 import {
   ConventionDtoBuilder,
+  ConventionId,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
@@ -26,9 +27,10 @@ describe("Get Convention", () => {
 
   describe("When the Convention does not exist", () => {
     it("throws NotFoundError", async () => {
+      const conventionId: ConventionId = "add5c20e-6dd2-45af-affe-927358005251";
       await expectPromiseToFailWithError(
-        getConvention.execute({ id: "unknown_demande_immersion_id" }),
-        new NotFoundError("unknown_demande_immersion_id"),
+        getConvention.execute({ id: conventionId }),
+        new NotFoundError(conventionId),
       );
     });
   });

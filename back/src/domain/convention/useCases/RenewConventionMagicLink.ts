@@ -141,7 +141,7 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
     const supportedRenewRoutes = [
       frontRoutes.conventionImmersionRoute,
       frontRoutes.conventionToSign,
-      frontRoutes.conventionToValidate,
+      frontRoutes.manageConvention,
       frontRoutes.immersionAssessment,
     ];
     const routeToRenew = supportedRenewRoutes.find((supportedRoute) =>

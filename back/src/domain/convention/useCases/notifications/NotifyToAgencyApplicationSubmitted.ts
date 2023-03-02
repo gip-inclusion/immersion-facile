@@ -102,7 +102,7 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
             lastName: convention.signatories.beneficiary.lastName,
             magicLink: this.generateMagicLinkFn({
               ...magicLinkCommonFields,
-              targetRoute: frontRoutes.conventionToValidate,
+              targetRoute: frontRoutes.manageConvention,
             }),
             conventionStatusLink: this.generateMagicLinkFn({
               ...magicLinkCommonFields,

@@ -65,7 +65,9 @@ import {
 
 const zTrimmedStringMax255 = zTrimmedStringWithMax(255);
 
-export const conventionIdSchema: z.ZodSchema<ConventionId> = zTrimmedString;
+export const conventionIdSchema: z.ZodSchema<ConventionId> = z
+  .string()
+  .uuid(localization.invalidUuid);
 export const externalConventionIdSchema: z.ZodSchema<ConventionExternalId> =
   zTrimmedString;
 

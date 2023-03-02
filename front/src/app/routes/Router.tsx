@@ -6,7 +6,6 @@ import { ConventionImmersionPage } from "src/app/pages/convention/ConventionImme
 import { ConventionMiniStagePage } from "src/app/pages/convention/ConventionMiniStagePage";
 import { ConventionSignPage } from "src/app/pages/convention/ConventionSignPage";
 import { ConventionStatusDashboardPage } from "src/app/pages/convention/ConventionStatusDashboardPage";
-import { ConventionValidatePage } from "src/app/pages/convention/ConventionValidatePage";
 import { ErrorRedirectPage } from "src/app/pages/error/ErrorRedirectPage";
 import { EstablishmentEditionFormPage } from "src/app/pages/establishment/EstablishmentEditionFormPage";
 import { EstablishmentFormPageForExternals } from "src/app/pages/establishment/EstablishmentFormPageForExternals";
@@ -34,6 +33,8 @@ import { ConventionPageForExternals } from "../pages/convention/ConventionPageFo
 import { ConventionCustomAgencyPage } from "../pages/convention/ConventionCustomAgencyPage";
 import { GroupPage } from "../pages/group/GroupPage";
 import { ConventionDocumentPage } from "../pages/convention/ConventionDocumentPage";
+import { ConventionManageAdminPage } from "../pages/convention/ConventionManageAdminPage";
+import { ConventionManagePage } from "../pages/convention/ConventionManagePage";
 
 type Routes = typeof routes;
 
@@ -68,7 +69,6 @@ const getPageByRouteName: {
     <ConventionStatusDashboardPage route={route} />
   ),
   conventionToSign: (route) => <ConventionSignPage route={route} />,
-  conventionToValidate: (route) => <ConventionValidatePage route={route} />,
   debugPopulateDB: () => undefined,
   editFormEstablishment: (route) => (
     <EstablishmentEditionFormPage route={route} />
@@ -78,24 +78,27 @@ const getPageByRouteName: {
   formEstablishmentForExternals: (route) => (
     <EstablishmentFormPageForExternals route={route} />
   ),
-  home: () => <HomePage type="default" />,
-  homeAgencies: () => <HomePage type="agency" />,
-  homeCandidates: () => <HomePage type="candidate" />,
-  homeEstablishments: () => <HomePage type="establishment" />,
-  immersionAssessment: (route) => <ImmersionAssessmentPage route={route} />,
-  renewConventionMagicLink: (route) => <RenewExpiredLinkPage route={route} />,
-  search: (route) => <SearchPage route={route} />,
-  standard: (route) =>
-    standardPageSlugs.includes(route.params.pagePath as StandardPageSlugs) ? (
-      <StandardLayout route={route} />
-    ) : (
-      <ErrorPage type="httpClientNotFoundError" />
-    ),
   group: (route) =>
     authorizedGroupSlugs.includes(
       route.params.groupName as AuthorizedGroupSlugs,
     ) ? (
       <GroupPage route={route} />
+    ) : (
+      <ErrorPage type="httpClientNotFoundError" />
+    ),
+  home: () => <HomePage type="default" />,
+  homeAgencies: () => <HomePage type="agency" />,
+  homeCandidates: () => <HomePage type="candidate" />,
+  homeEstablishments: () => <HomePage type="establishment" />,
+  immersionAssessment: (route) => <ImmersionAssessmentPage route={route} />,
+  manageConvention: (route) => <ConventionManagePage route={route} />,
+  manageConventionAdmin: (route) => <ConventionManageAdminPage route={route} />,
+  manageConventionOld: (route) => <ConventionManagePage route={route} />,
+  renewConventionMagicLink: (route) => <RenewExpiredLinkPage route={route} />,
+  search: (route) => <SearchPage route={route} />,
+  standard: (route) =>
+    standardPageSlugs.includes(route.params.pagePath as StandardPageSlugs) ? (
+      <StandardLayout route={route} />
     ) : (
       <ErrorPage type="httpClientNotFoundError" />
     ),

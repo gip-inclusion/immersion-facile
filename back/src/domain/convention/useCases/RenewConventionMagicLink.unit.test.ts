@@ -258,7 +258,7 @@ describe("RenewConventionMagicLink use case", () => {
       await expectPromiseToFailWithError(
         useCase.execute(request),
         new BadRequestError(
-          `Wrong link format, should be one of the supported route: /demande-immersion, /verifier-et-signer, /verification, /bilan-immersion. It was : ${request.originalUrl}`,
+          `Wrong link format, should be one of the supported route: /demande-immersion, /verifier-et-signer, /pilotage-convention, /bilan-immersion. It was : ${request.originalUrl}`,
         ),
       );
     });

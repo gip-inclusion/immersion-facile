@@ -79,7 +79,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
           convention: conventionInReview,
           magicLink: fakeGenerateMagicLinkUrlFn({
             ...magicLinkCommonFields,
-            targetRoute: frontRoutes.conventionToValidate,
+            targetRoute: frontRoutes.manageConvention,
           }),
           conventionStatusLink: fakeGenerateMagicLinkUrlFn({
             ...magicLinkCommonFields,
@@ -120,7 +120,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
           convention: conventionInReview,
           magicLink: fakeGenerateMagicLinkUrlFn({
             ...magicLinkCommonFields,
-            targetRoute: frontRoutes.conventionToValidate,
+            targetRoute: frontRoutes.manageConvention,
           }),
           conventionStatusLink: fakeGenerateMagicLinkUrlFn({
             ...magicLinkCommonFields,
@@ -180,7 +180,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
           convention: acceptedByCounsellorConvention,
           magicLink: fakeGenerateMagicLinkUrlFn({
             ...magicLinkCommonFields,
-            targetRoute: frontRoutes.conventionToValidate,
+            targetRoute: frontRoutes.manageConvention,
           }),
           conventionStatusLink: fakeGenerateMagicLinkUrlFn({
             ...magicLinkCommonFields,
@@ -235,7 +235,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
         convention: acceptedByValidatorConvention,
         magicLink: fakeGenerateMagicLinkUrlFn({
           ...magicLinkCommonFields,
-          targetRoute: frontRoutes.conventionToValidate,
+          targetRoute: frontRoutes.manageConvention,
         }),
         conventionStatusLink: fakeGenerateMagicLinkUrlFn({
           ...magicLinkCommonFields,
