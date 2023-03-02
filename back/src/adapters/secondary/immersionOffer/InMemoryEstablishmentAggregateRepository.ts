@@ -41,6 +41,10 @@ export class InMemoryEstablishmentAggregateRepository
     private _establishmentAggregates: EstablishmentAggregate[] = [],
   ) {}
 
+  async markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek() {
+    throw new Error("NOT implemented");
+  }
+
   async insertEstablishmentAggregates(aggregates: EstablishmentAggregate[]) {
     logger.info({ aggregates }, "insertEstablishmentAggregates");
     this._establishmentAggregates = [

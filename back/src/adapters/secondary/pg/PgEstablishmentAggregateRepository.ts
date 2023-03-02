@@ -29,6 +29,10 @@ const logger = createLogger(__filename);
 
 export type PgDataSource = "api_labonneboite" | "form";
 
+type PgSiretQueryResult = {
+  siret: SiretDto;
+};
+
 const offersEqual = (a: ImmersionOfferEntityV2, b: ImmersionOfferEntityV2) =>
   // Only compare romeCode and appellationCode
   a.romeCode === b.romeCode && a.appellationCode == b.appellationCode;
@@ -723,6 +727,51 @@ export class PgEstablishmentAggregateRepository
         ),
         contact: aggregateWithStringDates.contact,
       }
+    );
+  }
+
+  async markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(
+    date: Date,
+  ) {
+    const { rows: siretsWithSomeRecentDiscussionsButLessThanMax } =
+      await this.client.query<PgSiretQueryResult>(
+        `
+      SELECT e.siret
+      FROM discussions d
+      LEFT JOIN establishments e ON e.siret = d.siret
+      WHERE d.created_at > $1
+      GROUP BY e.siret HAVING COUNT(*) < e.max_contacts_per_week
+      `,
+        [date],
+      );
+
+    const { rows: siretsWithNoOrOldDiscussions } =
+      await this.client.query<PgSiretQueryResult>(
+        `
+        SELECT e.siret
+        FROM establishments e
+        LEFT JOIN discussions d ON d.siret = e.siret
+        WHERE is_searchable = false
+            AND max_contacts_per_week > 0
+            AND d.created_at < $1
+        `,
+        [date],
+      );
+
+    const siretsToUpdate: SiretDto[] = Array.from(
+      new Set(
+        [
+          ...siretsWithNoOrOldDiscussions,
+          ...siretsWithSomeRecentDiscussionsButLessThanMax,
+        ].map(({ siret }) => siret),
+      ),
+    );
+
+    await this.client.query(
+      format(
+        `UPDATE establishments SET is_searchable = true WHERE siret IN (%L)`,
+        siretsToUpdate,
+      ),
     );
   }
 }

@@ -57,4 +57,8 @@ export interface EstablishmentAggregateRepository {
   groupEstablishmentSiretsByDataSource: (
     sirets: SiretDto[],
   ) => Promise<Record<DataSource, SiretDto[]>>;
+
+  markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek: (
+    fromDate: Date,
+  ) => Promise<void>;
 }

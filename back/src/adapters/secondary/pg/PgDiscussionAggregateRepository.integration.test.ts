@@ -1,34 +1,9 @@
 import { Pool, PoolClient } from "pg";
-import { SiretDto } from "shared";
-import { DiscussionAggregate } from "../../../domain/immersionOffer/entities/DiscussionAggregate";
+import { createDiscussionAggregate } from "../../../_testBuilders/DiscussionAggregateBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { PgDiscussionAggregateRepository } from "./PgDiscussionAggregateRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
-
-// TODO : create a DiscussionAggregateBuilder
-const createDiscussionAggregate = (
-  id: string,
-  siret: SiretDto,
-  createdAt: Date,
-): DiscussionAggregate => ({
-  id,
-  romeCode: "M1607",
-  siret,
-  contactMode: "EMAIL",
-  createdAt,
-  potentialBeneficiaryFirstName: "Claire",
-  potentialBeneficiaryLastName: "Bertrand",
-  potentialBeneficiaryEmail: "claire.bertrand@email.fr",
-  exchanges: [
-    {
-      sentAt: createdAt,
-      message: "Bonjour ! J'aimerais faire une immersion.",
-      recipient: "establishment",
-      sender: "potentialBeneficiary",
-    },
-  ],
-});
 
 describe("PgDiscussionAggregateRepository", () => {
   let pool: Pool;
@@ -70,11 +45,11 @@ describe("PgDiscussionAggregateRepository", () => {
 
     // Act
     const createdAt = new Date("2022-01-01T11:00:00.000Z");
-    const discussionAggregate = createDiscussionAggregate(
-      "9f6dad2c-6f02-11ec-90d6-0242ac120003",
+    const discussionAggregate = createDiscussionAggregate({
+      id: "9f6dad2c-6f02-11ec-90d6-0242ac120003",
       siret,
       createdAt,
-    );
+    });
 
     await pgDiscussionAggregateRepository.insertDiscussionAggregate(
       discussionAggregate,
@@ -100,23 +75,23 @@ describe("PgDiscussionAggregateRepository", () => {
         .build(),
     ]);
 
-    const discussionAggregate1 = createDiscussionAggregate(
-      "bbbbbd2c-6f02-11ec-90d6-0242ac120003",
+    const discussionAggregate1 = createDiscussionAggregate({
+      id: "bbbbbd2c-6f02-11ec-90d6-0242ac120003",
       siret,
-      new Date("2023-03-05"),
-    );
+      createdAt: new Date("2023-03-05"),
+    });
 
-    const discussionAggregate2 = createDiscussionAggregate(
-      "cccccd2c-6f02-11ec-90d6-0242ac120003",
+    const discussionAggregate2 = createDiscussionAggregate({
+      id: "cccccd2c-6f02-11ec-90d6-0242ac120003",
       siret,
-      new Date("2023-03-07"),
-    );
+      createdAt: new Date("2023-03-07"),
+    });
 
-    const discussionAggregateToOld = createDiscussionAggregate(
-      "aaaaad2c-6f02-11ec-90d6-0242ac120003",
+    const discussionAggregateToOld = createDiscussionAggregate({
+      id: "aaaaad2c-6f02-11ec-90d6-0242ac120003",
       siret,
-      new Date("2023-03-04"),
-    );
+      createdAt: new Date("2023-03-04"),
+    });
 
     await Promise.all([
       pgDiscussionAggregateRepository.insertDiscussionAggregate(

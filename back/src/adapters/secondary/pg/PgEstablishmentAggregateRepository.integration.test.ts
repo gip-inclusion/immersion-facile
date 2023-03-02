@@ -14,6 +14,7 @@ import {
   expectObjectsToMatch,
   defaultMaxContactsPerWeek,
 } from "shared";
+import { createDiscussionAggregate } from "../../../_testBuilders/DiscussionAggregateBuilder";
 import {
   NumberEmployeesRange,
   EstablishmentEntity,
@@ -30,6 +31,7 @@ import { EstablishmentAggregateBuilder } from "../../../_testBuilders/Establishm
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { PgDiscussionAggregateRepository } from "./PgDiscussionAggregateRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 
 const testUid1 = "11111111-a2a5-430a-b558-ed3e2f03512d";
@@ -1622,6 +1624,89 @@ describe("Postgres implementation of immersion offer repository", () => {
           },
         };
         expectAggregateEqual(retrievedAggregate!, expectedAggregate);
+      });
+    });
+
+    describe("markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek", () => {
+      it("updates establishments back to is_searchable when discussion are old enough", async () => {
+        await client.query("DELETE FROM discussions");
+        const since = new Date("2021-01-10T00:00:00.000Z");
+        const pgDiscussionRepository = new PgDiscussionAggregateRepository(
+          client,
+        );
+        const siret1 = "11111111111122";
+        const establishment1 = new EstablishmentAggregateBuilder()
+          .withEstablishmentSiret(siret1)
+          .withIsSearchable(false)
+          .withMaxContactsPerWeek(0)
+          .build();
+
+        const siret2 = "11112222111122";
+        const establishment2 = new EstablishmentAggregateBuilder()
+          .withEstablishmentSiret(siret2)
+          .withContactId("11111111-1111-1111-1111-111111111111")
+          .withIsSearchable(false)
+          .withMaxContactsPerWeek(2)
+          .build();
+
+        const siret3 = "11113333111133";
+        const establishment3 = new EstablishmentAggregateBuilder()
+          .withEstablishmentSiret(siret3)
+          .withContactId("22222222-2222-2222-2222-222222222222")
+          .withIsSearchable(false)
+          .withMaxContactsPerWeek(1)
+          .build();
+
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
+          establishment1,
+          establishment2,
+          establishment3,
+        ]);
+
+        await Promise.all([
+          pgDiscussionRepository.insertDiscussionAggregate(
+            createDiscussionAggregate({
+              id: "11111111-1111-1111-1111-000000000000",
+              siret: siret2,
+              createdAt: new Date("2021-01-11T00:00:00.000Z"),
+            }),
+          ),
+          pgDiscussionRepository.insertDiscussionAggregate(
+            createDiscussionAggregate({
+              id: "22222222-2222-2222-2222-000000000000",
+              siret: siret2,
+              createdAt: new Date("2021-01-11T00:00:00.000Z"),
+            }),
+          ),
+          pgDiscussionRepository.insertDiscussionAggregate(
+            createDiscussionAggregate({
+              id: "33333333-3333-3333-3333-000000000000",
+              siret: siret3,
+              createdAt: new Date("2021-01-09T00:00:00.000Z"),
+            }),
+          ),
+        ]);
+
+        await pgEstablishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(
+          since,
+        );
+        const estab1After =
+          await pgEstablishmentAggregateRepository.getEstablishmentAggregateBySiret(
+            siret1,
+          );
+        expect(estab1After!.establishment.isSearchable).toBe(false);
+
+        const estab2After =
+          await pgEstablishmentAggregateRepository.getEstablishmentAggregateBySiret(
+            siret2,
+          );
+        expect(estab2After!.establishment.isSearchable).toBe(false);
+
+        const estab3After =
+          await pgEstablishmentAggregateRepository.getEstablishmentAggregateBySiret(
+            siret3,
+          );
+        expect(estab3After!.establishment.isSearchable).toBe(true);
       });
     });
   });
