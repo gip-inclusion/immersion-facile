@@ -52,7 +52,7 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
             )}
             onValueChange={(dayPeriods: DayPeriodsDto) => {
               field.value = new ScheduleDtoBuilder(field.value)
-                .withEmptyComplexSchedule(props.interval)
+                .withDateInterval(props.interval)
                 .withRegularSchedule({
                   dayPeriods,
                   timePeriods: regularTimePeriods(field.value),

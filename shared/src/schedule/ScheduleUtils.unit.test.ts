@@ -1,9 +1,10 @@
 import { expectToEqual } from "../expectToEqual";
-import { DayPeriodsDto, weekdays } from "./Schedule.dto";
+import { DayPeriodsDto, ScheduleDto, weekdays } from "./Schedule.dto";
 import { isoStringSchema, scheduleSchema } from "./Schedule.schema";
 import { ScheduleDtoBuilder } from "./ScheduleDtoBuilder";
 import {
   calculateNumberOfWorkedDays,
+  calculateScheduleTotalDurationInDays,
   calculateTotalImmersionHoursBetweenDate,
   calculateTotalImmersionHoursFromComplexSchedule,
   convertToFrenchNamedDays,
@@ -18,7 +19,7 @@ describe("ScheduleUtils", () => {
     const timePeriods = [{ start: "08:00", end: "10:00" }];
     it("with empty regular schedule and same days", () => {
       const scheduleFromEmptyComplexSchedule = new ScheduleDtoBuilder()
-        .withEmptyComplexSchedule({
+        .withDateInterval({
           start: new Date("2022-06-25"),
           end: new Date("2022-06-26"),
         })
@@ -40,7 +41,7 @@ describe("ScheduleUtils", () => {
     describe("with updated regular schedule dayPeriods", () => {
       it("initial dayPeriods", () => {
         const scheduleFromEmptyComplexSchedule = new ScheduleDtoBuilder()
-          .withEmptyComplexSchedule({
+          .withDateInterval({
             start: new Date("2022-06-22"),
             end: new Date("2022-07-03"),
           })
@@ -60,7 +61,7 @@ describe("ScheduleUtils", () => {
       });
       it("updated dayPeriods", () => {
         const scheduleFromEmptyComplexSchedule = new ScheduleDtoBuilder()
-          .withEmptyComplexSchedule({
+          .withDateInterval({
             start: new Date("2022-06-22"),
             end: new Date("2022-07-03"),
           })
@@ -217,7 +218,7 @@ describe("ScheduleUtils", () => {
       expect(
         convertToFrenchNamedDays(
           new ScheduleDtoBuilder()
-            .withEmptyComplexSchedule({
+            .withDateInterval({
               start: new Date(2022, 6, 13),
               end: new Date(2022, 6, 19),
             })
@@ -261,11 +262,45 @@ describe("ScheduleUtils", () => {
       expect(isArrayOfWeekdays(["lundi", "MARDI"])).toBe(false);
     });
   });
+  describe("calculateTotalDurationInDays", () => {
+    it("calculates correctly the total duration in days for a complex schedule", () => {
+      const expectedForShortSchedule = 6;
+      const expectedForLongSchedule = 16;
+      const exampleShortComplexSchedule: ScheduleDto = complexSchedule();
+      const exampleLongComplexSchedule: ScheduleDto = longComplexSchedule();
+      expect(
+        calculateScheduleTotalDurationInDays(
+          exampleShortComplexSchedule.complexSchedule,
+        ),
+      ).toEqual(expectedForShortSchedule);
+      expect(
+        calculateScheduleTotalDurationInDays(
+          exampleLongComplexSchedule.complexSchedule,
+        ),
+      ).toEqual(expectedForLongSchedule);
+    });
 
+    it("calculates correctly the total duration in days for a regular schedule", () => {
+      const expectedForShortSchedule = 6;
+      const expectedForLongSchedule = 11;
+      const exampleShortRegularSchedule: ScheduleDto = regularSchedule();
+      const exampleLongRegularSchedule: ScheduleDto = longRegularSchedule();
+      expect(
+        calculateScheduleTotalDurationInDays(
+          exampleShortRegularSchedule.complexSchedule,
+        ),
+      ).toEqual(expectedForShortSchedule);
+      expect(
+        calculateScheduleTotalDurationInDays(
+          exampleLongRegularSchedule.complexSchedule,
+        ),
+      ).toEqual(expectedForLongSchedule);
+    });
+  });
   describe("CalculateTotalImmersionHoursFromComplexSchedule", () => {
     it("calculates correctly the total number of hours from a complex schedule", () => {
       const schedule = new ScheduleDtoBuilder()
-        .withEmptyComplexSchedule({
+        .withDateInterval({
           start: new Date("2022-06-06"),
           end: new Date("2022-06-10"),
         })
@@ -293,7 +328,7 @@ describe("ScheduleUtils", () => {
   describe("calculateTotalImmersionHoursBetweenDate", () => {
     describe("with simple schedule", () => {
       const regularScheduleClassic = new ScheduleDtoBuilder()
-        .withEmptyComplexSchedule({
+        .withDateInterval({
           start: new Date("2022-06-04"),
           end: new Date("2022-06-28"),
         })
@@ -433,7 +468,7 @@ describe("ScheduleUtils", () => {
     });
     describe("with complex schedule that return 0 if bad date string format", () => {
       const complexSchedule = new ScheduleDtoBuilder()
-        .withEmptyComplexSchedule({
+        .withDateInterval({
           start: new Date("2022-06-13"),
           end: new Date("2022-07-11"),
         })
@@ -477,7 +512,7 @@ describe("ScheduleUtils", () => {
     describe("with no schedule", () => {
       it("empty day period without simple schedule build", () => {
         const schedule = new ScheduleDtoBuilder()
-          .withEmptyComplexSchedule(dateInterval)
+          .withDateInterval(dateInterval)
           .build();
         expect(dayPeriodsFromComplexSchedule(schedule.complexSchedule)).toEqual(
           [],
@@ -485,7 +520,7 @@ describe("ScheduleUtils", () => {
       });
       it(`dayperiods '${JSON.stringify([])}'`, () => {
         const schedule = new ScheduleDtoBuilder()
-          .withEmptyComplexSchedule(dateInterval)
+          .withDateInterval(dateInterval)
           .withRegularSchedule({ dayPeriods: [], timePeriods })
           .build();
         expect(dayPeriodsFromComplexSchedule(schedule.complexSchedule)).toEqual(
@@ -504,7 +539,7 @@ describe("ScheduleUtils", () => {
       });
       describe("check matching totalHours and worked days", () => {
         const scheduleBuilder = new ScheduleDtoBuilder()
-          .withEmptyComplexSchedule({
+          .withDateInterval({
             start: new Date("2022-06-06"),
             end: new Date("2022-06-10"),
           })
@@ -556,7 +591,7 @@ describe("ScheduleUtils", () => {
       dayPeriodsScenarios.forEach((dayPeriods) =>
         it(`dayperiods '${JSON.stringify(dayPeriods)}'`, () => {
           const schedule = new ScheduleDtoBuilder()
-            .withEmptyComplexSchedule(dateInterval)
+            .withDateInterval(dateInterval)
             .withRegularSchedule({
               dayPeriods,
               timePeriods,
@@ -582,7 +617,7 @@ describe("ScheduleUtils", () => {
       dayPeriodsScenarios.forEach((dayPeriods) =>
         it(`dayperiods '${JSON.stringify(dayPeriods)}'`, () => {
           const schedule = new ScheduleDtoBuilder()
-            .withEmptyComplexSchedule(dateInterval)
+            .withDateInterval(dateInterval)
             .withRegularSchedule({
               dayPeriods,
               timePeriods,
@@ -617,7 +652,7 @@ describe("ScheduleUtils", () => {
       dayPeriodsScenarios.forEach((dayPeriods) =>
         it(`dayperiods '${JSON.stringify(dayPeriods)}'`, () => {
           const schedule = new ScheduleDtoBuilder()
-            .withEmptyComplexSchedule(dateInterval)
+            .withDateInterval(dateInterval)
             .withRegularSchedule({
               dayPeriods,
               timePeriods,
@@ -651,7 +686,7 @@ describe("ScheduleUtils", () => {
         end: new Date("2023-03-30"),
       };
       const schedule = new ScheduleDtoBuilder()
-        .withEmptyComplexSchedule(interval)
+        .withDateInterval(interval)
         .withRegularSchedule({
           dayPeriods: [[6, 6]],
           timePeriods: [{ start: "08:00", end: "12:00" }],
@@ -701,8 +736,49 @@ const complexSchedule = () =>
     ])
     .build();
 
+const longComplexSchedule = () =>
+  new ScheduleDtoBuilder()
+    .withComplexSchedule([
+      makeDailySchedule(new Date("2023-06-13"), [
+        { start: "01:00", end: "02:00" },
+      ]),
+      makeDailySchedule(new Date("2023-06-14"), []),
+      makeDailySchedule(new Date("2023-06-15"), []),
+      makeDailySchedule(new Date("2023-06-16"), [
+        { start: "01:00", end: "02:00" },
+        { start: "03:00", end: "04:00" },
+      ]),
+      makeDailySchedule(new Date("2023-06-17"), []),
+      makeDailySchedule(new Date("2023-06-27"), []),
+      makeDailySchedule(new Date("2023-06-29"), [
+        { start: "01:00", end: "02:00" },
+        { start: "03:00", end: "04:00" },
+        { start: "05:00", end: "06:00" },
+      ]),
+    ])
+    .build();
+
 const regularSchedule = () =>
   new ScheduleDtoBuilder()
+    .withRegularSchedule({
+      dayPeriods: [
+        [0, 0],
+        [2, 3],
+        [6, 6],
+      ],
+      timePeriods: [
+        { start: "01:00", end: "02:00" },
+        { start: "03:00", end: "04:00" },
+      ],
+    })
+    .build();
+
+const longRegularSchedule = () =>
+  new ScheduleDtoBuilder()
+    .withDateInterval({
+      start: new Date("2022-06-15"),
+      end: new Date("2022-06-26"),
+    })
     .withRegularSchedule({
       dayPeriods: [
         [0, 0],

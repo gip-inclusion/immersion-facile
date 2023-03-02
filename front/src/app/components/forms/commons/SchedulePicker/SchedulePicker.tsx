@@ -56,6 +56,7 @@ export const SchedulePicker = ({
         <div
           id={`${name}${index + 1}-error-description`}
           className={fr.cx("fr-error-text")}
+          key={`error-${index}`}
         >
           {value}
         </div>

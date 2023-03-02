@@ -1,4 +1,11 @@
-import { addDays, addHours, format, getDay, parseISO } from "date-fns";
+import {
+  addDays,
+  addHours,
+  differenceInDays,
+  format,
+  getDay,
+  parseISO,
+} from "date-fns";
 import { clone, prop } from "ramda";
 
 import {
@@ -328,7 +335,6 @@ export const dayPeriodsFromComplexSchedule = (
     false,
     false,
   ];
-
   timePeriodsOnFrenchDays.forEach((_, frenchDay) =>
     manageTimePeriodOnDay(frenchDay),
   );
@@ -351,7 +357,12 @@ export const dayPeriodsFromComplexSchedule = (
     }
   }
   const startDay = startDayDate?.getDay() || 0;
-  return startDay > 0 ? dayPeriods.sort((a) => startDay - a[0]) : dayPeriods;
+  const shouldSortDayPeriods =
+    startDay > 0 && calculateScheduleTotalDurationInDays(complexSchedule) < 8; // if the schedule is shorter than a week, we sort the day periods to start with the startDay
+
+  return shouldSortDayPeriods
+    ? dayPeriods.sort((a) => startDay - a[0])
+    : dayPeriods;
 };
 
 export const makeImmersionTimetable = (
@@ -474,4 +485,13 @@ export const makeComplexSchedule = (
   )
     complexSchedules.push(makeDailySchedule(currentDate, timePeriods));
   return complexSchedules;
+};
+
+export const calculateScheduleTotalDurationInDays = (
+  complexSchedule: DailyScheduleDto[],
+) => {
+  const dates = complexSchedule.map(prop("date"));
+  const dateStart = dates.sort()[0];
+  const dateEnd = dates.reverse()[0];
+  return differenceInDays(new Date(dateEnd), new Date(dateStart));
 };

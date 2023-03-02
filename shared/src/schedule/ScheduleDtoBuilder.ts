@@ -90,9 +90,7 @@ export class ScheduleDtoBuilder implements Builder<ScheduleDto> {
     });
   }
 
-  public withEmptyComplexSchedule(
-    interval: DateIntervalDto,
-  ): ScheduleDtoBuilder {
+  public withDateInterval(interval: DateIntervalDto): ScheduleDtoBuilder {
     return this.withComplexSchedule(emptySchedule(interval).complexSchedule);
   }
 
