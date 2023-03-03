@@ -106,6 +106,8 @@ export const zPreprocessedNumber = (schema = z.number()) =>
     return n;
   }, schema);
 
+export const zUuidLike = z.string().length(36);
+
 export const parseZodSchemaAndLogErrorOnParsingFailure = <T>(
   schema: z.Schema<T>,
   data: unknown,

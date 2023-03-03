@@ -3,17 +3,17 @@ import { keys } from "ramda";
 import { reasonableSchedule } from "../schedule/ScheduleUtils";
 import { splitCasesBetweenPassingAndFailing } from "../test.helpers";
 import {
-  maximumCalendarDayByInternshipKind,
+  Beneficiary,
+  BeneficiaryCurrentEmployer,
+  BeneficiaryRepresentative,
+  ConventionDto,
+  ConventionInternshipKindSpecific,
+  ConventionReadDto,
   ConventionStatus,
   conventionStatuses,
-  ConventionDto,
-  BeneficiaryRepresentative,
-  BeneficiaryCurrentEmployer,
-  ConventionReadDto,
-  ConventionInternshipKindSpecific,
-  InternshipKind,
-  Beneficiary,
   EstablishmentRepresentative,
+  InternshipKind,
+  maximumCalendarDayByInternshipKind,
 } from "./convention.dto";
 import {
   conventionInternshipKindSpecificSchema,

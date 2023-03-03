@@ -1,5 +1,9 @@
 import { PoolClient } from "pg";
-import { ConventionId, PeExternalId } from "shared";
+import {
+  ConventionId,
+  parseZodSchemaAndLogErrorOnParsingFailure,
+  PeExternalId,
+} from "shared";
 import {
   ConventionPoleEmploiUserAdvisorDto,
   ConventionPoleEmploiUserAdvisorEntity,
@@ -11,8 +15,11 @@ import {
   ConventionPoleEmploiAdvisorRepository,
 } from "../../../domain/peConnect/port/ConventionPoleEmploiAdvisorRepository";
 import { conventionPoleEmploiUserAdvisorDtoSchema } from "../../../domain/peConnect/port/PeConnect.schema";
+import { createLogger } from "../../../utils/logger";
 
 const CONVENTION_ID_DEFAULT_UUID = "00000000-0000-0000-0000-000000000000";
+
+const logger = createLogger(__filename);
 
 export class PgConventionPoleEmploiAdvisorRepository
   implements ConventionPoleEmploiAdvisorRepository
@@ -70,11 +77,17 @@ export class PgConventionPoleEmploiAdvisorRepository
       );
 
     const result = pgResult.rows.at(0);
+    const conventionPeUserAdvisor =
+      result && toConventionPoleEmploiUserAdvisorDTO(result);
+
     return (
-      result &&
+      conventionPeUserAdvisor &&
       toConventionPoleEmploiUserAdvisorEntity(
-        conventionPoleEmploiUserAdvisorDtoSchema.parse(
-          toConventionPoleEmploiUserAdvisorDTO(result),
+        parseZodSchemaAndLogErrorOnParsingFailure(
+          conventionPoleEmploiUserAdvisorDtoSchema,
+          conventionPeUserAdvisor,
+          logger,
+          { conventionPeUserAdvisor: JSON.stringify(conventionPeUserAdvisor) },
         ),
       )
     );

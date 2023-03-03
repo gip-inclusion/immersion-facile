@@ -1,6 +1,7 @@
 import { differenceInYears } from "date-fns";
 import { z } from "zod";
 import { agencyIdSchema } from "../agency/agency.schema";
+import { peConnectIdentitySchema } from "../federatedIdentities/federatedIdentity.schema";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { scheduleSchema } from "../schedule/Schedule.schema";
 import { calculateWeeklyHoursFromSchedule } from "../schedule/ScheduleUtils";
@@ -87,7 +88,7 @@ const beneficiarySchema: z.Schema<Beneficiary<"immersion">> =
       emergencyContact: zStringPossiblyEmpty,
       emergencyContactPhone: phoneSchema.optional().or(z.literal("")),
       emergencyContactEmail: zEmailPossiblyEmpty,
-      federatedIdentity: z.any(),
+      federatedIdentity: peConnectIdentitySchema.optional(),
       financiaryHelp: zStringPossiblyEmpty,
       birthdate: zString.regex(dateRegExp, localization.invalidDate),
     }),
@@ -294,12 +295,6 @@ export const conventionReadSchema: z.Schema<ConventionReadDto> =
       agencyDepartment: z.string(),
     }),
   );
-
-export const conventionReadsSchema: z.Schema<Array<ConventionReadDto>> =
-  z.array(conventionReadSchema);
-
-export const conventionUkraineSchema: z.Schema<ConventionDto> =
-  conventionSchema;
 
 export const withConventionIdSchema: z.Schema<WithConventionId> = z.object({
   id: conventionIdSchema,

@@ -1,8 +1,7 @@
-import { makezTrimmedString } from "shared";
+import { makezTrimmedString, zUuidLike } from "shared";
 import { z } from "zod";
 import { ConventionPoleEmploiUserAdvisorDto } from "../dto/PeConnect.dto";
 import { immersionPoleEmploiAdvisors } from "../dto/PeConnectAdvisor.dto";
-import { ConventionAndPeExternalIds } from "./ConventionPoleEmploiAdvisorRepository";
 
 export const conventionPoleEmploiUserAdvisorDtoSchema: z.Schema<ConventionPoleEmploiUserAdvisorDto> =
   z.object({
@@ -18,12 +17,6 @@ export const conventionPoleEmploiUserAdvisorDtoSchema: z.Schema<ConventionPoleEm
         type: z.enum(immersionPoleEmploiAdvisors),
       })
       .optional(),
-    peExternalId: z.string().uuid(),
-    conventionId: z.string().uuid(),
-  });
-
-export const conventionPoleEmploiUserAdvisorIdsSchema: z.Schema<ConventionAndPeExternalIds> =
-  z.object({
-    peExternalId: z.string().uuid(),
+    peExternalId: zUuidLike,
     conventionId: z.string().uuid(),
   });
