@@ -13,6 +13,7 @@ import { AddConvention } from "../../../domain/convention/useCases/AddConvention
 import { AddAgency } from "../../../domain/convention/useCases/agencies/AddAgency";
 import { ListAgenciesByFilter } from "../../../domain/convention/useCases/agencies/ListAgenciesByFilter";
 import { PrivateListAgencies } from "../../../domain/convention/useCases/agencies/PrivateListAgencies";
+import { RegisterAgencyToInclusionConnectUser } from "../../../domain/convention/useCases/agencies/RegisterAgencyToInclusionConnectUser";
 import { UpdateAgency } from "../../../domain/convention/useCases/agencies/UpdateAgency";
 import { UpdateAgencyStatus } from "../../../domain/convention/useCases/agencies/UpdateAgencyStatus";
 import { BroadcastToPoleEmploiOnConventionUpdates } from "../../../domain/convention/useCases/broadcast/BroadcastToPoleEmploiOnConventionUpdates";
@@ -109,6 +110,8 @@ export const createUseCases = (
 
   return {
     ...instantiatedUseCasesFromClasses({
+      registerAgencyToInclusionConnectUser:
+        new RegisterAgencyToInclusionConnectUser(uowPerformer, createNewEvent),
       getUserAgencyDashboardUrl: new GetUserAgencyDashboardUrl(
         uowPerformer,
         gateways.dashboardGateway,

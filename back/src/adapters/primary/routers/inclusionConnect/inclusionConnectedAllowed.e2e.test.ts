@@ -58,6 +58,39 @@ describe("Router for users authenticated with Inclusion Connect", () => {
   });
 
   describe("RegisterAgencyToInclusionConnectUser use case", () => {
-    it("should not be allowed without Inclusion Token", () => {});
+    it("throws without Inclusion Token", async () => {
+      const { request } = await buildTestApp();
+      const response = await request.post(
+        inclusionConnectedAllowedTargets.registerAgencyToUser.url,
+      );
+      expect(response.body).toEqual({
+        error: "You need to authenticate first",
+      });
+      expect(response.status).toBe(401);
+    });
+
+    it("should work", async () => {
+      const { request, inMemoryUow, generateAuthenticatedUserJwt } =
+        await buildTestApp();
+      const userId = "123";
+      const agency = new AgencyDtoBuilder().build();
+      inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+        {
+          id: userId,
+          email: "joe@mail.com",
+          firstName: "Joe",
+          lastName: "Doe",
+          agencyRights: [{ agency, role: "validator" }],
+        },
+      ]);
+      const token = generateAuthenticatedUserJwt({ userId });
+      const response = await request
+        .post(inclusionConnectedAllowedTargets.registerAgencyToUser.url)
+        .set("Authorization", token);
+      expect(response.body).toEqual({
+        yolo: "work in progress",
+      });
+      expect(response.status).toBe(401);
+    });
   });
 });

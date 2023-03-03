@@ -22,26 +22,6 @@ export const createConventionMagicLinkPayload = ({
   emailHash: stringToMd5(email),
 });
 
-export type AppJwtPayload = {
-  iat: number; // number of seconds from 1970-01-01T00:00:00Z UTC until the specified UTC date/time, ignoring leap seconds
-  exp: number; // number of seconds from 1970-01-01T00:00:00Z UTC until the specified UTC date/time, ignoring leap seconds
-  version: number;
-};
-
-export type ConventionMagicLinkPayload = AppJwtPayload & {
-  applicationId: ConventionId;
-  role: Role;
-  emailHash: string; //< md5 of email
-};
-
-export type InclusionConnectDomainJwtPayload = { userId: string };
-export type InclusionConnectJwtPayload = AppJwtPayload &
-  InclusionConnectDomainJwtPayload;
-
-export type EstablishmentJwtPayload = AppJwtPayload & {
-  siret: string;
-};
-
 export const createEstablishmentMagicLinkPayload = ({
   siret,
   durationDays,
@@ -81,6 +61,7 @@ export type AppJwtPayload = {
   version: number;
 };
 
+export type InclusionConnectDomainJwtPayload = { userId: string };
 export type InclusionConnectJwtPayload = AppJwtPayload & { userId: string };
 
 export type EstablishmentJwtPayload = AppJwtPayload & {

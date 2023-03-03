@@ -30,5 +30,16 @@ export const createInclusionConnectedAllowedRouter = (
       ),
   );
 
+  inclusionConnectedRouter.post(
+    inclusionConnectedAllowedTargets.registerAgencyToUser.url,
+    (req, res) =>
+      sendHttpResponse(req, res, async () =>
+        deps.useCases.registerAgencyToInclusionConnectUser.execute(
+          req.body,
+          req.payloads?.inclusion,
+        ),
+      ),
+  );
+
   return [routerPrefix, inclusionConnectedRouter];
 };
