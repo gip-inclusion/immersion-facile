@@ -252,6 +252,7 @@ export const defaultEmailValueByEmailKind: {
     agencyName: "AGENCY_NAME",
     beneficiaryCurrentEmployerName: "BENEFICIARY_CURRENT_EMPLOYER_NAME",
     agencyLogoUrl: defaultEmailPreviewUrl,
+    magicLink: "MAGIC_LINK",
   },
   POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED: {
     advisorFirstName: "ADVISOR_FIRST_NAME",

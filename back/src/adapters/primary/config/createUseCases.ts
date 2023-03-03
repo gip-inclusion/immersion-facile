@@ -290,6 +290,8 @@ export const createUseCases = (
         new NotifyAllActorsOfFinalConventionValidation(
           uowPerformer,
           gateways.email,
+          makeConventionMagicLink,
+          gateways.timeGateway,
         ),
       notifyNewConventionNeedsReview: new NotifyNewApplicationNeedsReview(
         uowPerformer,

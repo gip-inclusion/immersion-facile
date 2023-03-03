@@ -33,6 +33,7 @@ import { routes, useRoute } from "./routes";
 import { ConventionPageForExternals } from "../pages/convention/ConventionPageForExternals";
 import { ConventionCustomAgencyPage } from "../pages/convention/ConventionCustomAgencyPage";
 import { GroupPage } from "../pages/group/GroupPage";
+import { ConventionDocumentPage } from "../pages/convention/ConventionDocumentPage";
 
 type Routes = typeof routes;
 
@@ -61,6 +62,7 @@ const getPageByRouteName: {
   conventionImmersionForExternals: (route) => (
     <ConventionPageForExternals route={route} />
   ),
+  conventionDocument: (route) => <ConventionDocumentPage route={route} />,
   conventionMiniStage: (route) => <ConventionMiniStagePage route={route} />,
   conventionStatusDashboard: (route) => (
     <ConventionStatusDashboardPage route={route} />

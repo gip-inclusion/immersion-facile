@@ -49,24 +49,13 @@ export type EmailParamsByEmailType = {
     dateStart: string;
     dateEnd: string;
     establishmentTutorName: string;
-    establishmentRepresentativeName: string;
-    beneficiaryRepresentativeName: string;
-    beneficiaryCurrentEmployerName?: string;
-    scheduleText: string[];
     businessName: string;
-    immersionAddress: string;
     immersionAppellationLabel: string;
-    immersionActivities: string;
-    immersionSkills: string;
-    sanitaryPrevention: string;
-    individualProtection: string;
     questionnaireUrl: string;
-    signature: string;
-    workConditions?: string;
-    agencyName: string;
     emergencyContactInfos: string;
     beneficiaryBirthdate: string;
     agencyLogoUrl: AbsoluteUrl | undefined;
+    magicLink: string;
   };
   POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED: {
     advisorFirstName: string;

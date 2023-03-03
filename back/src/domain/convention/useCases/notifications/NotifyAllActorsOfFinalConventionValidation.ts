@@ -4,11 +4,15 @@ import {
   calculateTotalImmersionHoursBetweenDate,
   ConventionDto,
   conventionSchema,
+  CreateConventionMagicLinkPayloadProperties,
   displayEmergencyContactInfos,
   EmailParamsByEmailType,
+  frontRoutes,
   prettyPrintSchedule,
 } from "shared";
+import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
+import { TimeGateway } from "../../../core/ports/TimeGateway";
 
 import {
   UnitOfWork,
@@ -22,6 +26,8 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly emailGateway: EmailGateway,
+    private readonly generateMagicLinkFn: GenerateConventionMagicLink,
+    private readonly timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
   }
@@ -56,7 +62,12 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
           ? [convention.establishmentTutor.email]
           : []),
       ],
-      params: getValidatedConventionFinalConfirmationParams(agency, convention),
+      params: getValidatedConventionFinalConfirmationParams(
+        agency,
+        convention,
+        this.generateMagicLinkFn,
+        this.timeGateway,
+      ),
     });
   }
 }
@@ -65,6 +76,8 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
 export const getValidatedConventionFinalConfirmationParams = (
   agency: AgencyDto,
   convention: ConventionDto,
+  generateMagicLinkFn: GenerateConventionMagicLink,
+  timeGateway: TimeGateway,
 ): EmailParamsByEmailType["VALIDATED_CONVENTION_FINAL_CONFIRMATION"] => {
   const {
     beneficiary,
@@ -72,7 +85,14 @@ export const getValidatedConventionFinalConfirmationParams = (
     beneficiaryRepresentative,
     beneficiaryCurrentEmployer,
   } = convention.signatories;
-
+  const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties = {
+    id: convention.id,
+    // role and email should not be valid
+    role: beneficiary.role,
+    email: beneficiary.email,
+    now: timeGateway.now(),
+    exp: timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365, // 1 year
+  };
   return {
     internshipKind: convention.internshipKind,
     totalHours: calculateTotalImmersionHoursBetweenDate({
@@ -115,6 +135,10 @@ export const getValidatedConventionFinalConfirmationParams = (
       beneficiary,
     }),
     agencyLogoUrl: agency.logoUrl,
+    magicLink: generateMagicLinkFn({
+      ...magicLinkCommonFields,
+      targetRoute: frontRoutes.conventionDocument,
+    }),
   };
 };
 

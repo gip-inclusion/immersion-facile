@@ -192,20 +192,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       dateEnd,
       businessName,
       establishmentTutorName,
-      signature,
-      beneficiaryRepresentativeName,
-      establishmentRepresentativeName,
-      beneficiaryCurrentEmployerName,
-      immersionAddress,
-      scheduleText,
-      immersionActivities,
       immersionAppellationLabel,
-      immersionSkills,
-      workConditions,
-      sanitaryPrevention,
-      individualProtection,
-      agencyName,
-      emergencyContactInfos,
       beneficiaryBirthdate,
       internshipKind,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -217,6 +204,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       emergencyContactPhone,
       agencyLogoUrl,
+      magicLink,
     }) => ({
       subject:
         internshipKind === "immersion"
@@ -247,86 +235,18 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
           ? "conseiller"
           : "conseiller de la Chambre de Commerce et d'Instrustrie - CCI"
       } pour qu'il vous conseille au mieux.       
-      ${defaultSignature(internshipKind)}
-
-      ${
-        emergencyContactInfos
-          ? `Si la situation l'impose, le contact d'urgence de ${beneficiaryFirstName} ${beneficiaryLastName} : ${emergencyContactInfos}`
-          : ""
-      }      
-      ${
-        internshipKind === "immersion"
-          ? "Vous trouverez ci-dessous la convention d'immersion professionnelle:"
-          : "Vous trouverez ci-dessous la convention de mini stage :"
-      }`,
+      ${defaultSignature(internshipKind)}`,
+      buttons: [
+        {
+          label: "Voir la convention",
+          url: magicLink,
+        },
+      ],
       highlight:
         internshipKind === "immersion"
           ? "Convention d'immersion professionnelle"
           : "Convention de mini stage",
-      subContent: `Cette convention est établie entre :
-      ${[
-        `${beneficiaryFirstName} ${beneficiaryLastName}`,
-        beneficiaryRepresentativeName,
-        beneficiaryCurrentEmployerName,
-        establishmentRepresentativeName,
-        agencyName,
-      ]
-        .filter((str) => !!str)
-        .map((str) => `- ${str}`)
-        .join("\n")}
-      
-      
-      Toutes ces parties ont signé cette convention par le moyen d'une signature électronique, dans le cadre d'une téléprocédure créée par l'Etat. 
-      
-      ${
-        internshipKind === "immersion" ? "Cette immersion" : "Ce mini stage"
-      } se déroulera au sein de ${businessName}, à l'adresse suivante ${immersionAddress}.
-      
-      ${
-        internshipKind === "immersion" ? "L'immersion" : "Le mini stage"
-      } se déroulera du ${dateStart} au ${dateEnd}. 
-      
-      Les horaires ${
-        internshipKind === "immersion" ? "de l'immersion" : "du mini stage"
-      } seront :
-      ${scheduleText}       
-      
-      ${
-        internshipKind === "immersion" ? "L'immersion" : "Le mini stage"
-      } aura pour objectif de découvrir les activités nécessaires en lien avec le métier de ${immersionAppellationLabel}.
-      
-      Ces activités sont : ${immersionActivities}
-      
-      Les compétences et savoir-être observés sont : ${immersionSkills}.
-      
-      ${
-        internshipKind === "immersion" ? "Cette immersion" : "Ce mini stage"
-      } se déroulera dans les conditions réelles d'exercice de ce métier. 
-      
-      ${
-        workConditions
-          ? `Les conditions particulières d'exercice du métier sont : ${workConditions}`
-          : ""
-      }
-      
-      
-      Encadrement : ${beneficiaryFirstName} ${beneficiaryLastName} sera encadré(e) par ${establishmentTutorName}.
 
-      Dans le cadre de ${
-        internshipKind === "immersion" ? "cette immersion" : "ce mini stage"
-      },      
-      - des mesures de prévention sanitaire sont prévues :      
-      ${sanitaryPrevention}.
-      - un équipement de protection est fourni : ${individualProtection}.
-      
-      ${beneficiaryFirstName} ${beneficiaryLastName}, ${beneficiaryRepresentativeName} et ${establishmentRepresentativeName} en signant cette convention, s'engagent à respecter les obligations réglementaires ${
-        internshipKind === "immersion"
-          ? "de la Période de Mise en Situation Professionnelle"
-          : "du mini stage"
-      }, rappelées ci-après.
-      
-      ${signature}`,
-      legals: defaultConventionFinalLegals(internshipKind),
       agencyLogoUrl,
     }),
   },

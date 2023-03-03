@@ -1,0 +1,19 @@
+@import "../../../config/responsive";
+
+.im-convention-document {
+  @include for-screen-min($bp-lg) {
+    margin: 2rem auto;
+    max-width: 90%;
+    padding: 6rem 8rem;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    line-height: 1.4;
+  }
+  &__title {
+    text-align: center;
+  }
+  @media print {
+    padding: 0;
+    box-shadow: none;
+    max-width: 100%;
+  }
+}

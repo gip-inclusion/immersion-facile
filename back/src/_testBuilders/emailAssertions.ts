@@ -12,7 +12,9 @@ import {
   expectTypeToMatchAndEqual,
   CreateConventionMagicLinkPayloadProperties,
 } from "shared";
+import { GenerateConventionMagicLink } from "../adapters/primary/config/createGenerateConventionMagicLink";
 import { getValidatedConventionFinalConfirmationParams } from "../domain/convention/useCases/notifications/NotifyAllActorsOfFinalConventionValidation";
+import { TimeGateway } from "../domain/core/ports/TimeGateway";
 import { ContactEntity } from "../domain/immersionOffer/entities/ContactEntity";
 import { EstablishmentEntity } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import { AnnotatedImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
@@ -84,12 +86,19 @@ export const expectEmailFinalValidationConfirmationMatchingConvention = (
   templatedEmails: TemplatedEmail[],
   agency: AgencyDto,
   convention: ConventionDto,
+  generateMagicLinkFn: GenerateConventionMagicLink,
+  timeGateway: TimeGateway,
 ) =>
   expectTypeToMatchAndEqual(templatedEmails, [
     {
       type: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
       recipients,
-      params: getValidatedConventionFinalConfirmationParams(agency, convention),
+      params: getValidatedConventionFinalConfirmationParams(
+        agency,
+        convention,
+        generateMagicLinkFn,
+        timeGateway,
+      ),
     },
   ]);
 
