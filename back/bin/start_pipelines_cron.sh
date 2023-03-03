@@ -12,22 +12,21 @@ echo "Running $0 $@ (pwd: $(pwd))"
 #  overwritten.
 : "${CRONFILE:?Variable not set or empty}"
 
-#  ESTABLISHMENT_UPDATE_FROM_SIRENE (optional).
 #  pipeline in cron format. Default: daily at 00:.
 : "${ESTABLISHMENT_UPDATE_FROM_SIRENE:=14 0 * * *}"
 
-#  ESTABLISHMENT_SUGGEST_FORM_EDITION (optional).
 #  pipeline in cron format. Default: daily at 00:08
 : "${ESTABLISHMENT_SUGGEST_FORM_EDITION:=8 0 * * *}"
 
 
-#  EMAIL_WITH_ASSESSMENT_CREATION_LINK (optional).
 #  pipeline in cron format. Default: daily at 23h53
 : "${EMAIL_WITH_ASSESSMENT_CREATION_LINK:=53 23 * * *}"
 
-#  REFRESH_MATERIALIZED_VIEWS (optional).
 #  pipeline in cron format. Default: daily at 01h12
 : "${REFRESH_MATERIALIZED_VIEWS:=12 01 * * *}"
+
+#  pipeline in cron format. Default: daily at 23h45
+: "${MARK_ESTABLISHMENTS_AS_SEARCHABLE:=45 23 * * *}"
 
 # Create logdir if it doesn't already exist.
 if [[ ! -d $LOGDIR ]]; then
@@ -51,6 +50,9 @@ $EMAIL_WITH_ASSESSMENT_CREATION_LINK cd /app/back && pnpm trigger-sending-emails
 
 # Pipeline: trigger-refresh-materialized-views
 $REFRESH_MATERIALIZED_VIEWS cd /app/back && pnpm trigger-refresh-materialized-views >> $LOGDIR/trigger-refresh-materialized-views.log 2>&1
+
+# Pipeline: mark-establishments-as-searchable-when-max-contacts-allows
+$MARK_ESTABLISHMENTS_AS_SEARCHABLE cd /app/back && pnpm mark-establishments-as-searchable-when-max-contacts-allows >> $LOGDIR/mark-establishments-as-searchable-when-max-contatcs-allows.log 2>&1
 
 EOT
 

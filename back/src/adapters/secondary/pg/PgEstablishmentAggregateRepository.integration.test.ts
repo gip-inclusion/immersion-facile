@@ -1687,9 +1687,13 @@ describe("Postgres implementation of immersion offer repository", () => {
           ),
         ]);
 
-        await pgEstablishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(
-          since,
-        );
+        const numberOfEstablishmentUpdated =
+          await pgEstablishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(
+            since,
+          );
+
+        expect(numberOfEstablishmentUpdated).toBe(1);
+
         const estab1After =
           await pgEstablishmentAggregateRepository.getEstablishmentAggregateBySiret(
             siret1,

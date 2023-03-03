@@ -41,7 +41,9 @@ export class InMemoryEstablishmentAggregateRepository
     private _establishmentAggregates: EstablishmentAggregate[] = [],
   ) {}
 
-  async markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek() {
+  async markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(): Promise<number> {
+    // not implemented because this method is used only in a script,
+    // and the use case consists only in a PG query
     throw new Error("NOT implemented");
   }
 

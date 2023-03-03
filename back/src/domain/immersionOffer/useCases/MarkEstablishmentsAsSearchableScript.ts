@@ -4,7 +4,10 @@ import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregat
 import subDays from "date-fns/subDays";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 
-export class MarkEstablishmentsAsSearchableScript extends UseCase<void> {
+export class MarkEstablishmentsAsSearchableScript extends UseCase<
+  void,
+  number
+> {
   constructor(
     private readonly establishmentAggregateRepository: EstablishmentAggregateRepository,
     private readonly timeGateway: TimeGateway,
@@ -14,9 +17,9 @@ export class MarkEstablishmentsAsSearchableScript extends UseCase<void> {
 
   inputSchema = z.void();
 
-  public async _execute() {
+  protected async _execute(): Promise<number> {
     const since = subDays(this.timeGateway.now(), 7);
-    await this.establishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(
+    return this.establishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(
       since,
     );
   }

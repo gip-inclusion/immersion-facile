@@ -60,5 +60,5 @@ export interface EstablishmentAggregateRepository {
 
   markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek: (
     fromDate: Date,
-  ) => Promise<void>;
+  ) => Promise<number>;
 }

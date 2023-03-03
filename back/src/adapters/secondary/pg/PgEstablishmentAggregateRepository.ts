@@ -732,7 +732,7 @@ export class PgEstablishmentAggregateRepository
 
   async markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(
     date: Date,
-  ) {
+  ): Promise<number> {
     const { rows: siretsWithSomeRecentDiscussionsButLessThanMax } =
       await this.client.query<PgSiretQueryResult>(
         `
@@ -773,6 +773,8 @@ export class PgEstablishmentAggregateRepository
         siretsToUpdate,
       ),
     );
+
+    return siretsToUpdate.length;
   }
 }
 
