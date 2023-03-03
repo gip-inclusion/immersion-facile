@@ -3,7 +3,8 @@ services:
   back:
     build:
       context: "."
-      dockerfile: Dockerfile.back
+      dockerfile: Dockerfile.all
+      target: back
     env_file:
       - .env
     depends_on:
@@ -27,14 +28,16 @@ services:
   front:
     build:
       context: "."
-      dockerfile: Dockerfile.front
+      dockerfile: Dockerfile.all
+      target: front
     env_file:
       - .env
 
   pipelines:
     build:
       context: "."
-      dockerfile: Dockerfile.pipelines
+      dockerfile: Dockerfile.all
+      target: pipelines
     env_file:
       - .env
     environment:
