@@ -1,14 +1,12 @@
 import { parseISO } from "date-fns";
 import {
   AgencyDto,
-  calculateTotalImmersionHoursBetweenDate,
   ConventionDto,
   conventionSchema,
   CreateConventionMagicLinkPayloadProperties,
   displayEmergencyContactInfos,
   EmailParamsByEmailType,
   frontRoutes,
-  prettyPrintSchedule,
 } from "shared";
 import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
@@ -79,12 +77,7 @@ export const getValidatedConventionFinalConfirmationParams = (
   generateMagicLinkFn: GenerateConventionMagicLink,
   timeGateway: TimeGateway,
 ): EmailParamsByEmailType["VALIDATED_CONVENTION_FINAL_CONFIRMATION"] => {
-  const {
-    beneficiary,
-    establishmentRepresentative,
-    beneficiaryRepresentative,
-    beneficiaryCurrentEmployer,
-  } = convention.signatories;
+  const { beneficiary, beneficiaryRepresentative } = convention.signatories;
   const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties = {
     id: convention.id,
     // role and email should not be valid
@@ -95,41 +88,17 @@ export const getValidatedConventionFinalConfirmationParams = (
   };
   return {
     internshipKind: convention.internshipKind,
-    totalHours: calculateTotalImmersionHoursBetweenDate({
-      dateStart: convention.dateStart,
-      dateEnd: convention.dateEnd,
-      schedule: convention.schedule,
-    }),
+
     beneficiaryFirstName: beneficiary.firstName,
     beneficiaryLastName: beneficiary.lastName,
     beneficiaryBirthdate: beneficiary.birthdate,
-    beneficiaryCurrentEmployerName:
-      beneficiaryCurrentEmployer &&
-      `${beneficiaryCurrentEmployer.firstName} ${beneficiaryCurrentEmployer.lastName}`,
-    emergencyContact: beneficiary.emergencyContact,
-    emergencyContactPhone: beneficiary.emergencyContactPhone,
+
     dateStart: parseISO(convention.dateStart).toLocaleDateString("fr"),
     dateEnd: parseISO(convention.dateEnd).toLocaleDateString("fr"),
     establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
-    establishmentRepresentativeName: `${establishmentRepresentative.firstName} ${establishmentRepresentative.lastName}`,
-    scheduleText: prettyPrintSchedule(convention.schedule).split("\n"),
     businessName: convention.businessName,
-    immersionAddress: convention.immersionAddress || "",
     immersionAppellationLabel: convention.immersionAppellation.appellationLabel,
-    immersionActivities: convention.immersionActivities,
-    immersionSkills: convention.immersionSkills ?? "Non renseigné",
-    sanitaryPrevention:
-      convention.sanitaryPrevention && convention.sanitaryPreventionDescription
-        ? convention.sanitaryPreventionDescription
-        : "non",
-    individualProtection: convention.individualProtection ? "oui" : "non",
-    questionnaireUrl: agency.questionnaireUrl,
-    signature: agency.signature,
-    workConditions: convention.workConditions,
-    beneficiaryRepresentativeName: beneficiaryRepresentative
-      ? `${beneficiaryRepresentative.firstName} ${beneficiaryRepresentative.lastName}`
-      : "",
-    agencyName: agency.name,
+
     emergencyContactInfos: displayEmergencyContactInfos({
       beneficiaryRepresentative,
       beneficiary,

@@ -1,6 +1,6 @@
 /* eslint-disable  @typescript-eslint/require-await */
 import { values } from "ramda";
-import { from, Observable, of } from "rxjs";
+import { from, Observable, of, Subject } from "rxjs";
 import {
   AdminToken,
   AgencyDto,
@@ -82,6 +82,8 @@ export class InMemoryAgencyGateway implements AgencyGateway {
     [CCI_ACTIVE.id]: CCI_ACTIVE,
   };
 
+  public agencyInfo$ = new Subject<AgencyPublicDisplayDto>();
+
   updateAgency$(): Observable<void> {
     return of(undefined);
   }
@@ -141,6 +143,12 @@ export class InMemoryAgencyGateway implements AgencyGateway {
     const agency = this._agencies[withAgencyId.id];
     if (agency) return toAgencyPublicDisplayDto(agency);
     throw new Error(`Missing agency with id ${withAgencyId.id}.`);
+  }
+
+  getAgencyPublicInfoById$(
+    agencyId: WithAgencyId,
+  ): Observable<AgencyPublicDisplayDto> {
+    return from(this.getAgencyPublicInfoById(agencyId));
   }
 
   listAgenciesByFilter$(

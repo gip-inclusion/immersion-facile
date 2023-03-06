@@ -55,6 +55,10 @@ export interface AgencyGateway {
     agencyId: WithAgencyId,
   ): Promise<AgencyPublicDisplayDto>;
 
+  getAgencyPublicInfoById$(
+    agencyId: WithAgencyId,
+  ): Observable<AgencyPublicDisplayDto>;
+
   listAgenciesByFilter$(
     filter: ListAgenciesRequestDto,
   ): Observable<AgencyOption[]>;

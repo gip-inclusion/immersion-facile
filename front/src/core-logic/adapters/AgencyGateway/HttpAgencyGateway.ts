@@ -148,6 +148,12 @@ export class HttpAgencyGateway implements AgencyGateway {
       );
   }
 
+  getAgencyPublicInfoById$(
+    agencyId: WithAgencyId,
+  ): Observable<AgencyPublicDisplayDto> {
+    return from(this.getAgencyPublicInfoById(agencyId));
+  }
+
   public listAgenciesByFilter$(
     filter: ListAgenciesRequestDto,
   ): Observable<AgencyOption[]> {

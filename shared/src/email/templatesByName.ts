@@ -195,14 +195,6 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       immersionAppellationLabel,
       beneficiaryBirthdate,
       internshipKind,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      questionnaireUrl,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      totalHours,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      emergencyContact,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      emergencyContactPhone,
       agencyLogoUrl,
       magicLink,
     }) => ({

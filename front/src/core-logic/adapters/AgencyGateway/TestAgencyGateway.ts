@@ -21,6 +21,7 @@ export class TestAgencyGateway implements AgencyGateway {
   public agencies$ = new Subject<AgencyOption[]>();
   public fetchedAgency$ = new Subject<AgencyDto | undefined>();
   public customAgencyId$ = new Subject<AgencyId | undefined>();
+  public agencyInfo$ = new Subject<AgencyPublicDisplayDto>();
 
   public updateAgencyResponse$ = new Subject<undefined>();
 
@@ -110,5 +111,11 @@ export class TestAgencyGateway implements AgencyGateway {
     const agency = this._agencies[withAgencyId.id];
     if (agency) return toAgencyPublicDisplayDto(agency);
     throw new Error(`Missing agency with id ${withAgencyId.id}.`);
+  }
+
+  getAgencyPublicInfoById$(
+    _agencyId: WithAgencyId,
+  ): Observable<AgencyPublicDisplayDto> {
+    return this.agencyInfo$;
   }
 }

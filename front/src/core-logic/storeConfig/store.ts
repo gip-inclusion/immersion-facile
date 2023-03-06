@@ -24,6 +24,8 @@ import { siretEpics } from "src/core-logic/domain/siret/siret.epics";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import { agenciesEpics } from "../domain/agenciesConvention/agencies.epics";
 import { agenciesSlice } from "../domain/agenciesConvention/agencies.slice";
+import { agencyInfoEpics } from "../domain/agencyInfo/agencyInfo.epics";
+import { agencyInfoSlice } from "../domain/agencyInfo/agencyInfo.slice";
 import { authEpics } from "../domain/auth/auth.epics";
 import { conventionEpics } from "../domain/convention/convention.epics";
 import { conventionSlice } from "../domain/convention/convention.slice";
@@ -52,9 +54,11 @@ const allEpics: any[] = [
   ...conventionEpics,
   ...immersionAssessmentEpics,
   ...inclusionConnectedEpics,
+  ...agencyInfoEpics,
 ];
 
 const rootReducer = combineReducers({
+  [agencyInfoSlice.name]: agencyInfoSlice.reducer,
   [agenciesSlice.name]: agenciesSlice.reducer,
   [searchSlice.name]: searchSlice.reducer,
   [featureFlagsSlice.name]: featureFlagsSlice.reducer,

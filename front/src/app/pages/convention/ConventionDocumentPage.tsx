@@ -1,8 +1,9 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import React from "react";
+import React, { useEffect } from "react";
 import { Loader, MainWrapper } from "react-design-system";
 import {
   displayEmergencyContactInfos,
+  isStringDate,
   prettyPrintSchedule,
   toDisplayedDate,
 } from "shared";
@@ -11,6 +12,8 @@ import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/Sh
 import { routes } from "src/app/routes/routes";
 import { Route } from "type-route";
 import { ConventionDocument } from "react-design-system";
+import { useDispatch } from "react-redux";
+import { agencyInfoSlice } from "src/core-logic/domain/agencyInfo/agencyInfo.slice";
 
 type ConventionDocumentPageProps = {
   route: Route<typeof routes.conventionDocument>;
@@ -22,6 +25,14 @@ export const ConventionDocumentPage = ({
   const jwt = route.params.jwt;
   const { convention, fetchConventionError, isLoading } = useConvention(jwt);
   const canShowConvention = convention?.status === "ACCEPTED_BY_VALIDATOR";
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (convention) {
+      dispatch(
+        agencyInfoSlice.actions.fetchAgencyInfoRequested(convention.agencyId),
+      );
+    }
+  }, [convention]);
   if (fetchConventionError)
     return (
       <ShowErrorOrRedirectToRenewMagicLink
@@ -40,14 +51,18 @@ export const ConventionDocumentPage = ({
     beneficiaryRepresentative,
   } = convention.signatories;
   const { internshipKind } = convention;
-
+  const agencyAddress = {
+    streetNumberAndAddress: "",
+    postcode: "",
+    city: "",
+  };
   return (
     <MainWrapper layout="default" vSpacing={8}>
       {canShowConvention && (
         <ConventionDocument
           title={
             internshipKind === "immersion"
-              ? "Convention d'immersion professionnelle"
+              ? "Convention relative à la mise en œuvre d’une période de mise en situation en milieu professionnel"
               : "Convention de mini-stage"
           }
         >
@@ -57,6 +72,14 @@ export const ConventionDocumentPage = ({
               <strong>
                 {beneficiary.firstName} {beneficiary.lastName}
               </strong>
+              né le{" "}
+              <strong>
+                {isStringDate(beneficiary.birthdate)
+                  ? toDisplayedDate(new Date(beneficiary.birthdate))
+                  : "Date invalide"}
+              </strong>{" "}
+              en qualité de <strong>bénéficiaire</strong> (tel:{" "}
+              {beneficiary.phone})
             </li>
             {beneficiaryRepresentative && (
               <li>
@@ -64,6 +87,9 @@ export const ConventionDocumentPage = ({
                   {beneficiaryRepresentative.firstName}{" "}
                   {beneficiaryRepresentative.lastName}
                 </strong>
+                en qualité de{" "}
+                <strong>représentant légal du bénéficiaire</strong> (tel:{" "}
+                {beneficiaryRepresentative.phone})
               </li>
             )}
             {beneficiaryCurrentEmployer && (
@@ -72,6 +98,12 @@ export const ConventionDocumentPage = ({
                   {beneficiaryCurrentEmployer.firstName}{" "}
                   {beneficiaryCurrentEmployer.lastName}
                 </strong>
+                en qualité de{" "}
+                <strong>
+                  représentant de l'entreprise employant actuellement le
+                  bénéficiaire
+                </strong>{" "}
+                (tel: {beneficiaryCurrentEmployer.phone})
               </li>
             )}
             {establishmentRepresentative && (
@@ -80,10 +112,15 @@ export const ConventionDocumentPage = ({
                   {establishmentRepresentative.firstName}{" "}
                   {establishmentRepresentative.lastName}
                 </strong>
+                en qualité de <strong>représentant de l'entreprise</strong>{" "}
+                {convention.businessName} (tel:{" "}
+                {establishmentRepresentative.phone})
               </li>
             )}
             <li>
-              <strong>{convention.agencyName}</strong>
+              <strong>{convention.agencyName}</strong>(
+              {agencyAddress.streetNumberAndAddress}, {agencyAddress.postcode}{" "}
+              {agencyAddress.city} {})
             </li>
           </ul>
           <p>
