@@ -3,12 +3,12 @@ import { AgencyId, AgencyPublicDisplayDto } from "src/../../shared/src";
 import { SubmitFeedBack } from "../SubmitFeedback";
 
 export type AgencyInfoState = {
-  agencyInfo: AgencyPublicDisplayDto | null;
+  details: AgencyPublicDisplayDto | null;
   isLoading: boolean;
   feedback: SubmitFeedBack<"success">;
 };
 const initialState: AgencyInfoState = {
-  agencyInfo: null,
+  details: null,
   isLoading: false,
   feedback: { kind: "idle" },
 };
@@ -19,13 +19,15 @@ export const agencyInfoSlice = createSlice({
   reducers: {
     fetchAgencyInfoRequested: (state, _action: PayloadAction<AgencyId>) => {
       state.isLoading = true;
+      state.details = null;
     },
     fetchAgencyInfoSucceeded: (
       state,
       action: PayloadAction<AgencyPublicDisplayDto>,
     ) => {
-      state.agencyInfo = action.payload;
+      state.details = action.payload;
       state.isLoading = false;
+      state.feedback = { kind: "success" };
     },
     fetchAgencyInfoFailed: (state, action: PayloadAction<string>) => {
       state.feedback = { kind: "errored", errorMessage: action.payload };

@@ -18,13 +18,14 @@ describe("Agency info in store", () => {
     store.dispatch(
       agencyInfoSlice.actions.fetchAgencyInfoRequested(fakeAgencyId),
     );
-
     expectIsLoadingToBe(true);
   });
 
   it("should store agency info when agency is fetched from agency id", () => {
     const agency = new AgencyDtoBuilder().build();
-
+    const expectedFeedback: AgencyInfoState["feedback"] = {
+      kind: "success",
+    };
     const expectedAgencyInfos = {
       id: agency.id,
       name: agency.name,
@@ -44,6 +45,7 @@ describe("Agency info in store", () => {
 
     expectAgencyInfoToEqual(expectedAgencyInfos);
     expectIsLoadingToBe(false);
+    expectFeedbackToEqual(expectedFeedback);
   });
 
   it("should throw an error when something goes wrong", () => {
@@ -59,15 +61,15 @@ describe("Agency info in store", () => {
     dependencies.agencyGateway.agencyInfo$.error(new Error(errorMessage));
 
     expectIsLoadingToBe(false);
-    expectAgencyInfoToEqual(agencyInfoSlice.getInitialState().agencyInfo);
+    expectAgencyInfoToEqual(agencyInfoSlice.getInitialState().details);
     expectFeedbackToEqual(expectedFeedback);
   });
 
   const expectIsLoadingToBe = (expected: AgencyInfoState["isLoading"]) =>
     expect(store.getState().agencyInfo.isLoading).toBe(expected);
 
-  const expectAgencyInfoToEqual = (expected: AgencyInfoState["agencyInfo"]) =>
-    expect(store.getState().agencyInfo.agencyInfo).toEqual(expected);
+  const expectAgencyInfoToEqual = (expected: AgencyInfoState["details"]) =>
+    expect(store.getState().agencyInfo.details).toEqual(expected);
 
   const expectFeedbackToEqual = (expected: AgencyInfoState["feedback"]) =>
     expect(store.getState().agencyInfo.feedback).toEqual(expected);

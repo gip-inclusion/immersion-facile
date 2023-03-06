@@ -14,6 +14,8 @@ import { Route } from "type-route";
 import { ConventionDocument } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { agencyInfoSlice } from "src/core-logic/domain/agencyInfo/agencyInfo.slice";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { agencyInfoSelectors } from "src/core-logic/domain/agencyInfo/agencyInfo.selectors";
 
 type ConventionDocumentPageProps = {
   route: Route<typeof routes.conventionDocument>;
@@ -24,6 +26,8 @@ export const ConventionDocumentPage = ({
 }: ConventionDocumentPageProps) => {
   const jwt = route.params.jwt;
   const { convention, fetchConventionError, isLoading } = useConvention(jwt);
+  const agencyInfo = useAppSelector(agencyInfoSelectors.details);
+  const agencyFeedback = useAppSelector(agencyInfoSelectors.feedback);
   const canShowConvention = convention?.status === "ACCEPTED_BY_VALIDATOR";
   const dispatch = useDispatch();
   useEffect(() => {
@@ -52,12 +56,6 @@ export const ConventionDocumentPage = ({
   } = convention.signatories;
   const { internshipKind } = convention;
 
-  const agencyAddress = {
-    streetNumberAndAddress: "",
-    postcode: "",
-    city: "",
-  };
-
   return (
     <MainWrapper layout="default" vSpacing={8}>
       {canShowConvention && (
@@ -73,8 +71,8 @@ export const ConventionDocumentPage = ({
             <li>
               <strong>
                 {beneficiary.firstName} {beneficiary.lastName}
-              </strong>
-              né le{" "}
+              </strong>{" "}
+              né•e le{" "}
               <strong>
                 {isStringDate(beneficiary.birthdate)
                   ? toDisplayedDate(new Date(beneficiary.birthdate))
@@ -88,9 +86,9 @@ export const ConventionDocumentPage = ({
                 <strong>
                   {beneficiaryRepresentative.firstName}{" "}
                   {beneficiaryRepresentative.lastName}
-                </strong>
+                </strong>{" "}
                 en qualité de{" "}
-                <strong>représentant légal du bénéficiaire</strong> (tel:{" "}
+                <strong>représentant•e légal•e du bénéficiaire</strong> (tel:{" "}
                 {beneficiaryRepresentative.phone})
               </li>
             )}
@@ -99,10 +97,10 @@ export const ConventionDocumentPage = ({
                 <strong>
                   {beneficiaryCurrentEmployer.firstName}{" "}
                   {beneficiaryCurrentEmployer.lastName}
-                </strong>
+                </strong>{" "}
                 en qualité de{" "}
                 <strong>
-                  représentant de l'entreprise employant actuellement le
+                  représentant•e de l'entreprise employant actuellement le
                   bénéficiaire
                 </strong>{" "}
                 (tel: {beneficiaryCurrentEmployer.phone})
@@ -113,22 +111,26 @@ export const ConventionDocumentPage = ({
                 <strong>
                   {establishmentRepresentative.firstName}{" "}
                   {establishmentRepresentative.lastName}
-                </strong>
-                en qualité de <strong>représentant de l'entreprise</strong>{" "}
+                </strong>{" "}
+                en qualité de <strong>représentant•e de l'entreprise</strong>{" "}
                 {convention.businessName} (tel:{" "}
                 {establishmentRepresentative.phone})
               </li>
             )}
             <li>
-              <strong>{convention.agencyName}</strong>(
-              {agencyAddress.streetNumberAndAddress}, {agencyAddress.postcode}{" "}
-              {agencyAddress.city} {})
+              <strong>{convention.agencyName}</strong>{" "}
+              {agencyFeedback.kind === "success" && agencyInfo && (
+                <>
+                  ({agencyInfo.address.streetNumberAndAddress},{" "}
+                  {agencyInfo.address.postcode} {agencyInfo.address.city} {})
+                </>
+              )}
             </li>
           </ul>
           <p>
             Toutes ces parties ont signé cette convention par le moyen d'une
             signature électronique, dans le cadre d'une téléprocédure créée par
-            l'Etat.
+            l'État.
           </p>
           <p>
             {internshipKind === "immersion"

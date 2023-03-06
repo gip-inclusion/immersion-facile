@@ -7,3 +7,9 @@
     @content;
   }
 }
+
+@mixin for-print() {
+  @media print {
+    @content;
+  }
+}

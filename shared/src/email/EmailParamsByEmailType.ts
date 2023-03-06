@@ -41,17 +41,13 @@ export type EmailParamsByEmailType = {
   };
   VALIDATED_CONVENTION_FINAL_CONFIRMATION: {
     internshipKind: InternshipKind;
-    totalHours: number;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
-    emergencyContact?: string;
-    emergencyContactPhone?: string;
     dateStart: string;
     dateEnd: string;
     establishmentTutorName: string;
     businessName: string;
     immersionAppellationLabel: string;
-    questionnaireUrl: string;
     emergencyContactInfos: string;
     beneficiaryBirthdate: string;
     agencyLogoUrl: AbsoluteUrl | undefined;
