@@ -13,10 +13,11 @@ describe("getConventionStatusDashboardUrl", () => {
   });
 
   it("gets the dashboard url if token is correct", async () => {
-    const { request, generateMagicLinkJwt, inMemoryUow } = await buildTestApp();
+    const { request, generateConventionJwt, inMemoryUow } =
+      await buildTestApp();
     const conventionId = "my-Convention-id";
     const beneficiaryEmail = "joe@lebenef.fr";
-    const jwt = generateMagicLinkJwt(
+    const jwt = generateConventionJwt(
       createConventionMagicLinkPayload({
         id: conventionId,
         role: "beneficiary",

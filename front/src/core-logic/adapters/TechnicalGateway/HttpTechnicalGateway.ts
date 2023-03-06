@@ -2,7 +2,7 @@ import { AxiosInstance, AxiosResponse } from "axios";
 import { from, map, Observable } from "rxjs";
 import {
   AbsoluteUrl,
-  AdminToken,
+  BackOfficeJwt,
   FeatureFlags,
   featureFlagsRoute,
   featureFlagsSchema,
@@ -31,7 +31,7 @@ export class HttpTechnicalGateway implements TechnicalGateway {
 
   setFeatureFlag = (
     params: SetFeatureFlagParams,
-    token: AdminToken,
+    token: BackOfficeJwt,
   ): Observable<void> =>
     from(
       this.httpClient.post(`/admin/${featureFlagsRoute}`, params, {

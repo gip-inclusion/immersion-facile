@@ -1,14 +1,14 @@
 import { Observable, Subject } from "rxjs";
 import {
   AbsoluteUrl,
-  AdminToken,
+  BackOfficeJwt,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
 } from "shared";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
 export class TestAdminGateway implements AdminGateway {
-  login(): Observable<AdminToken> {
+  login(): Observable<BackOfficeJwt> {
     return this.token$;
   }
 
@@ -18,7 +18,7 @@ export class TestAdminGateway implements AdminGateway {
 
   public addEstablishmentBatch$(
     _establishmentBatch: FormEstablishmentBatchDto,
-    _token: AdminToken,
+    _token: BackOfficeJwt,
   ): Observable<EstablishmentBatchReport> {
     return this.establishmentBatchResponse$;
   }

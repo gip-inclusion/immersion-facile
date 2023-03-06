@@ -26,8 +26,9 @@ describe(`PUT /${establishmentTargets.updateFormEstablishment.url} - Route to po
   it("Throws 401 if Jwt is generated from wrong private key", async () => {
     const config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
     const { request } = await buildTestApp();
-    const generateJwtWithWrongKey = makeGenerateJwtES256(
+    const generateJwtWithWrongKey = makeGenerateJwtES256<"editEstablishment">(
       config.apiJwtPrivateKey,
+      undefined,
     ); // Private Key is the wrong one !
 
     const wrongJwt = generateJwtWithWrongKey(
@@ -60,8 +61,9 @@ describe(`PUT /${establishmentTargets.updateFormEstablishment.url} - Route to po
   it("Throws 401 if Jwt is expired", async () => {
     const config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
     const { request, gateways } = await buildTestApp();
-    const generateJwtWithWrongKey = makeGenerateJwtES256(
+    const generateJwtWithWrongKey = makeGenerateJwtES256<"editEstablishment">(
       config.apiJwtPrivateKey,
+      undefined,
     ); // Private Key is the wrong one !
 
     const wrongJwt = generateJwtWithWrongKey(
@@ -83,9 +85,10 @@ describe(`PUT /${establishmentTargets.updateFormEstablishment.url} - Route to po
 
   it("Supports posting already existing form establisment when authenticated", async () => {
     // Prepare
-    const { request, inMemoryUow, generateMagicLinkJwt } = await buildTestApp();
+    const { request, inMemoryUow, generateEditEstablishmentJwt } =
+      await buildTestApp();
 
-    const validJwt = generateMagicLinkJwt(
+    const validJwt = generateEditEstablishmentJwt(
       createEstablishmentMagicLinkPayload({
         siret: TEST_ESTABLISHMENT1_SIRET,
         durationDays: 1,

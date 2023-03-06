@@ -4,16 +4,16 @@ import {
   generateMagicLinkRequestSchema,
   GenerateMagicLinkResponseDto,
 } from "shared";
-import { GenerateMagicLinkJwt } from "../../auth/jwt";
+import { GenerateConventionJwt } from "../../auth/jwt";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UseCase } from "../../core/UseCase";
 
-export class GenerateMagicLink extends UseCase<
+export class GenerateConventionMagicLinkUseCase extends UseCase<
   GenerateMagicLinkRequestDto,
   GenerateMagicLinkResponseDto
 > {
   constructor(
-    private readonly generateMagicLinkJwt: GenerateMagicLinkJwt,
+    private readonly generateMagicLinkJwt: GenerateConventionJwt,
     private readonly timeGateway: TimeGateway,
   ) {
     super();

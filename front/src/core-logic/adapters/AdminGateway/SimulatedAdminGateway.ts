@@ -1,7 +1,7 @@
 import { Observable, of, throwError } from "rxjs";
 import {
   AbsoluteUrl,
-  AdminToken,
+  BackOfficeJwt,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetDashboardParams,
@@ -10,7 +10,7 @@ import {
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
 export class SimulatedAdminGateway implements AdminGateway {
-  login({ user }: UserAndPassword): Observable<AdminToken> {
+  login({ user }: UserAndPassword): Observable<BackOfficeJwt> {
     if (user.toLowerCase() === "failed")
       return throwError(
         () =>
@@ -21,14 +21,14 @@ export class SimulatedAdminGateway implements AdminGateway {
 
   public getDashboardUrl$(
     { name }: GetDashboardParams,
-    _token: AdminToken,
+    _token: BackOfficeJwt,
   ): Observable<AbsoluteUrl> {
     const url: AbsoluteUrl = `http://${name}.com`;
     return of(url);
   }
   public addEstablishmentBatch$(
     _establishmentBatch: FormEstablishmentBatchDto,
-    _token: AdminToken,
+    _token: BackOfficeJwt,
   ): Observable<EstablishmentBatchReport> {
     return of({
       numberOfEstablishmentsProcessed: 12,

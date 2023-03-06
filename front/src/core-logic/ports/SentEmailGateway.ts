@@ -1,6 +1,6 @@
 import { Observable } from "rxjs";
-import { AdminToken, EmailSentDto } from "shared";
+import { BackOfficeJwt, EmailSentDto } from "shared";
 
 export interface SentEmailGateway {
-  getLatest(adminToken: AdminToken): Observable<EmailSentDto[]>;
+  getLatest(adminToken: BackOfficeJwt): Observable<EmailSentDto[]>;
 }

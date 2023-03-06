@@ -1,4 +1,4 @@
-import { AdminToken, emailRoute, EmailSentDto } from "shared";
+import { BackOfficeJwt, emailRoute, EmailSentDto } from "shared";
 import { SuperTest, Test } from "supertest";
 import {
   buildTestApp,
@@ -10,7 +10,7 @@ import { TimeGateway } from "../../../../domain/core/ports/TimeGateway";
 describe(`/${emailRoute} route`, () => {
   let request: SuperTest<Test>;
   let gateways: InMemoryGateways;
-  let adminToken: AdminToken;
+  let adminToken: BackOfficeJwt;
   let appConfig: AppConfig;
   let timeGateway: TimeGateway;
 

@@ -5,7 +5,6 @@ import {
   BeneficiaryRepresentative,
   ConventionDto,
   ConventionDtoBuilder,
-  ConventionMagicLinkPayload,
   createConventionMagicLinkPayload,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -28,8 +27,8 @@ import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGenerato
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeGenerateJwtES256, makeVerifyJwtES256 } from "../../auth/jwt";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
-import { RenewConventionMagicLink } from "./RenewConventionMagicLink";
 import { RenewMagicLinkPayload } from "./notifications/DeliverRenewedMagicLink";
+import { RenewConventionMagicLink } from "./RenewConventionMagicLink";
 
 const currentEmployer: BeneficiaryCurrentEmployer = {
   email: "currentEmployer@mail.com",
@@ -61,7 +60,10 @@ describe("RenewConventionMagicLink use case", () => {
   const config: AppConfig = new AppConfigBuilder()
     .withTestPresetPreviousKeys()
     .build();
-  const generateJwtFn = makeGenerateJwtES256(config.magicLinkJwtPrivateKey);
+  const generateConventionJwt = makeGenerateJwtES256<"convention">(
+    config.magicLinkJwtPrivateKey,
+    undefined,
+  );
   const timeGateway = new CustomTimeGateway(new Date());
 
   let uow: InMemoryUnitOfWork;
@@ -79,7 +81,7 @@ describe("RenewConventionMagicLink use case", () => {
         timeGateway,
         uuidGenerator: new TestUuidGenerator(),
       }),
-      generateJwtFn,
+      generateConventionJwt,
       config,
       timeGateway,
       immersionBaseUrl,
@@ -128,7 +130,7 @@ describe("RenewConventionMagicLink use case", () => {
 
         const request: RenewMagicLinkRequestDto = {
           originalUrl: "immersionfacile.fr/verifier-et-signer",
-          expiredJwt: generateJwtFn(expiredPayload),
+          expiredJwt: generateConventionJwt(expiredPayload),
         };
 
         await useCase.execute(request);
@@ -145,9 +147,7 @@ describe("RenewConventionMagicLink use case", () => {
         expect(url).toBe(`${immersionBaseUrl}/verifier-et-signer`);
 
         expectToEqual(
-          makeVerifyJwtES256<ConventionMagicLinkPayload>(
-            config.magicLinkJwtPublicKey,
-          )(jwt),
+          makeVerifyJwtES256<"convention">(config.magicLinkJwtPublicKey)(jwt),
           createConventionMagicLinkPayload({
             id: validConvention.id,
             role: expectedRole,
@@ -168,7 +168,7 @@ describe("RenewConventionMagicLink use case", () => {
 
       const request: RenewMagicLinkRequestDto = {
         originalUrl: "immersionfacile.fr%2Fverifier-et-signer",
-        expiredJwt: generateJwtFn(expiredPayload),
+        expiredJwt: generateConventionJwt(expiredPayload),
       };
 
       await useCase.execute(request);
@@ -188,7 +188,7 @@ describe("RenewConventionMagicLink use case", () => {
 
       const request: RenewMagicLinkRequestDto = {
         originalUrl: "immersionfacile.com/%jwt%",
-        expiredJwt: generateJwtFn(payload),
+        expiredJwt: generateConventionJwt(payload),
       };
 
       await expectPromiseToFailWithError(
@@ -213,7 +213,7 @@ describe("RenewConventionMagicLink use case", () => {
 
       const request: RenewMagicLinkRequestDto = {
         originalUrl: "immersionfacile.com/%jwt%",
-        expiredJwt: generateJwtFn(payload),
+        expiredJwt: generateConventionJwt(payload),
       };
 
       await expectPromiseToFailWithError(
@@ -233,7 +233,7 @@ describe("RenewConventionMagicLink use case", () => {
 
       const request: RenewMagicLinkRequestDto = {
         originalUrl: "immersionfacile.com/verification",
-        expiredJwt: generateJwtFn(payload),
+        expiredJwt: generateConventionJwt(payload),
       };
 
       await expectPromiseToFailWithError(
@@ -252,7 +252,7 @@ describe("RenewConventionMagicLink use case", () => {
 
       const request: RenewMagicLinkRequestDto = {
         originalUrl: "immersionfacile.com/",
-        expiredJwt: generateJwtFn(payload),
+        expiredJwt: generateConventionJwt(payload),
       };
 
       await expectPromiseToFailWithError(

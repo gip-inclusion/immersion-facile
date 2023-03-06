@@ -21,7 +21,7 @@ export const ConventionManageAdminPage = ({
   return (
     <HeaderFooterLayout>
       <MainWrapper layout="default" vSpacing={8}>
-        <ConventionManageContent jwt={} />
+        <ConventionManageContent jwt={"0000000000000000000000000"} />
       </MainWrapper>
     </HeaderFooterLayout>
   );

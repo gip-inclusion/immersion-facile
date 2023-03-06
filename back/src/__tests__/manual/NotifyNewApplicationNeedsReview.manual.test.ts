@@ -10,15 +10,17 @@ import {
   makeEmailAllowListPredicate,
 } from "../../adapters/primary/config/appConfig";
 import {
-  createGenerateConventionMagicLink,
-  GenerateConventionMagicLink,
-} from "../../adapters/primary/config/createGenerateConventionMagicLink";
+  GenerateConventionMagicLinkUrl,
+  makeGenerateConventionMagicLinkUrl,
+} from "../../adapters/primary/config/magicLinkUrl";
+
 import { createInMemoryUow } from "../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { SendinblueHtmlEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueHtmlEmailGateway";
 import { InMemoryUowPerformer } from "../../adapters/secondary/InMemoryUowPerformer";
 import { NotifyNewApplicationNeedsReview } from "../../domain/convention/useCases/notifications/NotifyNewApplicationNeedsReview";
 import { TimeGateway } from "../../domain/core/ports/TimeGateway";
+import { generateConventionJwtTestFn } from "../../_testBuilders/jwtTestHelper";
 
 // These tests are not hermetic and not meant for automated testing. They will send emails using
 // sendinblue, use up production quota, and fail for uncontrollable reasons such as quota
@@ -37,7 +39,7 @@ const validConvention: ConventionDto = new ConventionDtoBuilder()
 
 describe("Notify To 2 Counsellors that an application is available", () => {
   let emailGw: SendinblueHtmlEmailGateway;
-  let generateMagicLinkFn: GenerateConventionMagicLink;
+  let generateMagicLinkFn: GenerateConventionMagicLinkUrl;
   let agency;
   let timeGateway: TimeGateway;
 
@@ -55,7 +57,10 @@ describe("Notify To 2 Counsellors that an application is available", () => {
         email: immersionFacileContactEmail,
       },
     );
-    generateMagicLinkFn = createGenerateConventionMagicLink(config);
+    generateMagicLinkFn = makeGenerateConventionMagicLinkUrl(
+      config,
+      generateConventionJwtTestFn,
+    );
     timeGateway = new CustomTimeGateway();
   });
 

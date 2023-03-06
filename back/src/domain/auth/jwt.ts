@@ -1,58 +1,109 @@
 import jwt from "jsonwebtoken";
 import {
+  ApiConsumerJwtPayload,
+  BackOfficeJwt,
+  ConventionMagicLinkJwt,
+  ConventionMagicLinkPayload,
   EstablishmentJwtPayload,
-  PayloadOption,
-  WithApiConsumerId,
+  Flavor,
 } from "shared";
 
-type AnyObject = Record<string, unknown>;
+type AuthenticatedUserJwtPayload = {
+  userId: string;
+};
+type BackOfficeJwtPayload = Record<string, never>;
 
-export type GenerateAuthenticatedUserJwt = GenerateJwtFn<{ userId: string }>;
-export type GenerateMagicLinkJwt = GenerateJwtFn<PayloadOption>;
-export type GenerateEditFormEstablishmentUrl =
-  GenerateJwtFn<EstablishmentJwtPayload>;
-export type GenerateAdminJwt = GenerateJwtFn<{ version: number }>;
+export type GenerateConventionJwt = GenerateJwtFn<"convention">;
+export type GenerateAuthenticatedUserJwt = GenerateJwtFn<"authenticatedUser">;
+export type GenerateEditFormEstablishmentJwt =
+  GenerateJwtFn<"editEstablishment">;
+export type GenerateAdminJwt = GenerateJwtFn<"backOffice">;
+export type GenerateApiConsumerJtw = GenerateJwtFn<"apiConsumer">;
 
-export type GenerateApiConsumerJtw = GenerateJwtFn<WithApiConsumerId>;
+type JwtTokenMapping<K extends string, T extends string, JwtPayload> = {
+  token: T;
+  kind: K;
+  payload: JwtPayload;
+};
 
-// prettier-ignore
-export type GenerateJwtFn<Payload extends AnyObject> = (payload: Payload, expiresInSeconds?: number) => string;
+type JwtMap =
+  | JwtTokenMapping<
+      "convention",
+      ConventionMagicLinkJwt,
+      ConventionMagicLinkPayload
+    >
+  | JwtTokenMapping<
+      "editEstablishment",
+      EditEstablishmentJwt,
+      EstablishmentJwtPayload
+    >
+  | JwtTokenMapping<
+      "authenticatedUser",
+      AuthenticatedUserJwt,
+      AuthenticatedUserJwtPayload
+    >
+  | JwtTokenMapping<"backOffice", BackOfficeJwt, BackOfficeJwtPayload>
+  | JwtTokenMapping<"apiConsumer", ApiConsumerJwt, ApiConsumerJwtPayload>;
+
+export type JwtKind = JwtMap["kind"];
+
+type ApiConsumerJwt = Flavor<string, "ApiConsumerJwt">;
+type EditEstablishmentJwt = Flavor<string, "EditEstablishmentJwt">;
+type AuthenticatedUserJwt = Flavor<string, "AuthenticatedUserJwt">;
+
+export type GenerateJwtFn<K extends JwtKind> = (
+  payload: Extract<JwtMap, { kind: K }>["payload"],
+  expiresInSeconds?: number,
+) => Extract<JwtMap, { kind: K }>["token"];
+
+// TODO see if typing can be improved
 export const makeGenerateJwtES256 =
-  <P extends AnyObject>(
+  <K extends JwtKind = never>(
     privateKey: string,
-    defaultExpiresInSeconds?: number,
-  ): GenerateJwtFn<P> =>
-  (payload, expiresInSeconds?: number) =>
+    defaultExpiresInSeconds: number | undefined,
+  ): GenerateJwtFn<K> =>
+  (payload: any, expiresInSeconds?: string | number) =>
     jwt.sign(payload, privateKey, {
       algorithm: "ES256",
-      ...(expiresInSeconds !== undefined || defaultExpiresInSeconds
+      ...(!("exp" in payload) &&
+      (expiresInSeconds !== undefined || defaultExpiresInSeconds)
         ? { expiresIn: expiresInSeconds ?? defaultExpiresInSeconds }
         : {}),
       //noTimestamp: true, //Remove iat on payload
-    });
+    }) as any;
 
-export const makeVerifyJwtES256 =
-  <Payload>(jwtPublicKey: string) =>
-  (jwtString: string) =>
-    jwt.verify(jwtString, jwtPublicKey, {
-      algorithms: ["ES256"],
-      complete: false,
-      ignoreExpiration: false,
-    }) as Payload;
-
-export const makeGenerateJwtHS256 =
-  <P extends AnyObject>(secret: string, expiresIn: string): GenerateJwtFn<P> =>
-  (payload) =>
+export const makeGenerateJwtHS256 = <K extends JwtKind = never>(
+  secret: string,
+  expiresIn: string,
+): GenerateJwtFn<K> =>
+  ((payload: any) =>
     jwt.sign(payload, secret, {
       algorithm: "HS256",
-      expiresIn,
-    });
+      ...(!("exp" in payload) ? { expiresIn } : {}),
+    })) as any;
 
-export const makeVerifyJwtHS256 =
-  <Payload>(secret: string) =>
-  (jwtString: string) =>
+export type VerifyJwtFn<K extends JwtKind> = (
+  jwt: Extract<JwtMap, { kind: K }>["token"],
+) => JwtPayloadCommonFields & Extract<JwtMap, { kind: K }>["payload"];
+
+export const makeVerifyJwtHS256 = <K extends JwtKind>(
+  secret: string,
+): VerifyJwtFn<K> =>
+  ((jwtString: string) =>
     jwt.verify(jwtString, secret, {
       algorithms: ["HS256"],
       complete: false,
       ignoreExpiration: false,
-    }) as Payload;
+    })) as any;
+
+export const makeVerifyJwtES256 = <K extends JwtKind>(
+  jwtPublicKey: string,
+): VerifyJwtFn<K> =>
+  ((jwtString: string) =>
+    jwt.verify(jwtString, jwtPublicKey, {
+      algorithms: ["ES256"],
+      complete: false,
+      ignoreExpiration: false,
+    })) as any;
+
+type JwtPayloadCommonFields = { exp: number; iat: number; version: number };

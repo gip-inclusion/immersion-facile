@@ -22,7 +22,7 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
       sendHttpResponse(req, res, () =>
         deps.useCases.createImmersionAssessment.execute(
           req.body,
-          req.payloads?.application,
+          req.payloads?.convention,
         ),
       ),
     );
@@ -31,19 +31,19 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
     .route(`/${conventionsRoute}/:jwt`)
     .get(async (req, res) =>
       sendHttpResponse(req, res, async () => {
-        if (!req.payloads?.application) throw new UnauthorizedError();
+        if (!req.payloads?.convention) throw new UnauthorizedError();
         const result: ConventionReadDto =
           await deps.useCases.getConvention.execute({
-            id: req.payloads.application.applicationId,
+            id: req.payloads.convention.applicationId,
           });
         return result;
       }),
     )
     .post(async (req, res) =>
       sendHttpResponse(req, res, () => {
-        if (!req.payloads?.application) throw new UnauthorizedError();
+        if (!req.payloads?.convention) throw new UnauthorizedError();
         return deps.useCases.updateConvention.execute({
-          id: req.payloads.application.applicationId,
+          id: req.payloads.convention.applicationId,
           convention: req.body,
         });
       }),
@@ -53,10 +53,10 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
     .route(`/${updateConventionStatusRoute}/:jwt`)
     .post(async (req, res) =>
       sendHttpResponse(req, res, () => {
-        if (!req?.payloads?.application) throw new UnauthorizedError();
+        if (!req?.payloads?.convention) throw new UnauthorizedError();
         return deps.useCases.updateConventionStatus.execute(
           req.body,
-          req.payloads.application,
+          req.payloads.convention,
         );
       }),
     );
@@ -65,10 +65,10 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
     .route(`/${signConventionRoute}/:jwt`)
     .post(async (req, res) =>
       sendHttpResponse(req, res, () => {
-        if (!req?.payloads?.application) throw new UnauthorizedError();
+        if (!req?.payloads?.convention) throw new UnauthorizedError();
         return deps.useCases.signConvention.execute(
           undefined,
-          req.payloads.application,
+          req.payloads.convention,
         );
       }),
     );
@@ -78,10 +78,10 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
     .get((req, res) =>
       // eslint-disable-next-line @typescript-eslint/require-await
       sendHttpResponse(req, res, async () => {
-        if (!req?.payloads?.application) throw new UnauthorizedError();
+        if (!req?.payloads?.convention) throw new UnauthorizedError();
         return deps.useCases.getDashboard.execute({
           name: "conventionStatus",
-          conventionId: req.payloads.application.applicationId,
+          conventionId: req.payloads.convention.applicationId,
         });
       }),
     );

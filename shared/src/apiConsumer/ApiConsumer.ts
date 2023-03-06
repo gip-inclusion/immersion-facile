@@ -2,7 +2,7 @@ import { Flavor } from "../typeFlavors";
 
 export type ApiConsumerId = Flavor<string, "ApiConsumerId">;
 
-export type WithApiConsumerId = {
+export type ApiConsumerJwtPayload = {
   id: ApiConsumerId;
 };
 

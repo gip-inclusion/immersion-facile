@@ -11,10 +11,11 @@ import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementatio
 import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmailGateway";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { AppConfig, makeEmailAllowListPredicate } from "../config/appConfig";
-import { makeGenerateEditFormEstablishmentUrl } from "../config/makeGenerateEditFormEstablishmentUrl";
+import { makeGenerateEditFormEstablishmentUrl } from "../config/magicLinkUrl";
 import { createPgUow } from "../config/uowConfig";
 import { SendinblueHtmlEmailGateway } from "../../secondary/emailGateway/SendinblueHtmlEmailGateway";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
+import { makeGenerateJwtES256 } from "../../../domain/auth/jwt";
 
 const NB_MONTHS_BEFORE_SUGGEST = 6;
 
@@ -75,11 +76,17 @@ const triggerSuggestEditFormEstablishmentEvery6Months = async () => {
         )
       : new InMemoryEmailGateway(timeGateway);
 
+  const generateEditEstablishmentJwt =
+    makeGenerateJwtES256<"editEstablishment">(
+      config.magicLinkJwtPrivateKey,
+      3600 * 24,
+    );
+
   const suggestEditFormEstablishment = new SuggestEditFormEstablishment(
     pgUowPerformer,
     emailGateway,
     timeGateway,
-    makeGenerateEditFormEstablishmentUrl(config),
+    makeGenerateEditFormEstablishmentUrl(config, generateEditEstablishmentJwt),
     makeCreateNewEvent({
       timeGateway,
       uuidGenerator: new UuidV4Generator(),

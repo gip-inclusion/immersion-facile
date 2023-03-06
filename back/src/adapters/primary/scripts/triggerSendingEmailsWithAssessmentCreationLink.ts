@@ -1,6 +1,7 @@
 import axios from "axios";
 import { Pool } from "pg";
 import { immersionFacileContactEmail } from "shared";
+import { makeGenerateJwtES256 } from "../../../domain/auth/jwt";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { SendEmailsWithAssessmentCreationLink } from "../../../domain/immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
 import { createLogger } from "../../../utils/logger";
@@ -9,7 +10,7 @@ import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementatio
 import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmailGateway";
 import { SendinblueHtmlEmailGateway } from "../../secondary/emailGateway/SendinblueHtmlEmailGateway";
 import { AppConfig, makeEmailAllowListPredicate } from "../config/appConfig";
-import { createGenerateConventionMagicLink } from "../config/createGenerateConventionMagicLink";
+import { makeGenerateConventionMagicLinkUrl } from "../config/magicLinkUrl";
 import { createUowPerformer } from "../config/uowConfig";
 const logger = createLogger(__filename);
 
@@ -41,12 +42,17 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
 
   const { uowPerformer } = createUowPerformer(config, () => pool);
 
+  const generateConventionJwt = makeGenerateJwtES256<"convention">(
+    config.magicLinkJwtPrivateKey,
+    3600 * 24 * 30,
+  );
+
   const sendEmailsWithAssessmentCreationLink =
     new SendEmailsWithAssessmentCreationLink(
       uowPerformer,
       emailGateway,
       timeGateway,
-      createGenerateConventionMagicLink(config),
+      makeGenerateConventionMagicLinkUrl(config, generateConventionJwt),
       makeCreateNewEvent({
         timeGateway,
         uuidGenerator: new UuidV4Generator(),

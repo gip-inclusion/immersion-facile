@@ -1,7 +1,7 @@
 import { addDays } from "date-fns";
 import { ConventionDto, ConventionId, frontRoutes } from "shared";
 import { z } from "zod";
-import { GenerateConventionMagicLink } from "../../../adapters/primary/config/createGenerateConventionMagicLink";
+import { GenerateConventionMagicLinkUrl } from "../../../adapters/primary/config/magicLinkUrl";
 import { createLogger } from "../../../utils/logger";
 import { notifyDiscord } from "../../../utils/notifyDiscord";
 import { EmailGateway } from "../../convention/ports/EmailGateway";
@@ -19,7 +19,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<v
     uowPerformer: UnitOfWorkPerformer,
     private emailGateway: EmailGateway,
     private timeGateway: TimeGateway,
-    private generateConventionMagicLink: GenerateConventionMagicLink,
+    private generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     private createNewEvent: CreateNewEvent,
   ) {
     super(uowPerformer);
@@ -69,7 +69,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<v
       recipients: [convention.establishmentTutor.email],
       params: {
         internshipKind: convention.internshipKind,
-        immersionAssessmentCreationLink: this.generateConventionMagicLink({
+        immersionAssessmentCreationLink: this.generateConventionMagicLinkUrl({
           id: convention.id,
           email: convention.establishmentTutor.email,
           role: "establishment",

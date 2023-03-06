@@ -8,7 +8,7 @@ import {
   zTrimmedString,
 } from "shared";
 import { z } from "zod";
-import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
+import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import {
   UnitOfWork,
@@ -29,7 +29,7 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly emailGateway: EmailGateway,
-    private readonly generateMagicLinkFn: GenerateConventionMagicLink,
+    private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     private readonly timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
@@ -72,11 +72,11 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
           signature: agency.signature,
           agency: agency.name,
           immersionAppellation: convention.immersionAppellation,
-          magicLink: this.generateMagicLinkFn({
+          magicLink: this.generateConventionMagicLinkUrl({
             ...magicLinkCommonFields,
             targetRoute: frontRoutes.conventionImmersionRoute,
           }),
-          conventionStatusLink: this.generateMagicLinkFn({
+          conventionStatusLink: this.generateConventionMagicLinkUrl({
             ...magicLinkCommonFields,
             targetRoute: frontRoutes.conventionStatusDashboard,
           }),

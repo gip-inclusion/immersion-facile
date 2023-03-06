@@ -8,7 +8,7 @@ import {
   TemplatedEmail,
 } from "shared";
 import {
-  GenerateMagicLinkJwt,
+  GenerateConventionJwt,
   makeGenerateJwtES256,
   makeVerifyJwtES256,
 } from "../../../../domain/auth/jwt";
@@ -52,7 +52,7 @@ describe("Magic link renewal flow", () => {
   let renewMagicLink: RenewConventionMagicLink;
   let deliverRenewedMagicLink: DeliverRenewedMagicLink;
   let config: AppConfig;
-  let generateJwtFn: GenerateMagicLinkJwt;
+  let generateConventionJwt: GenerateConventionJwt;
 
   beforeEach(() => {
     const uow = createInMemoryUow();
@@ -70,7 +70,10 @@ describe("Magic link renewal flow", () => {
 
     config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
 
-    generateJwtFn = makeGenerateJwtES256(config.magicLinkJwtPrivateKey);
+    generateConventionJwt = makeGenerateJwtES256<"convention">(
+      config.magicLinkJwtPrivateKey,
+      3600 * 24, // one day
+    );
 
     renewMagicLink = new RenewConventionMagicLink(
       uowPerformer,
@@ -78,7 +81,7 @@ describe("Magic link renewal flow", () => {
         timeGateway,
         uuidGenerator: new TestUuidGenerator(),
       }),
-      generateJwtFn,
+      generateConventionJwt,
       config,
       timeGateway,
       immersionBaseUrl,
@@ -104,7 +107,7 @@ describe("Magic link renewal flow", () => {
 
     const request: RenewMagicLinkRequestDto = {
       originalUrl: "immersionfacile.fr/verifier-et-signer",
-      expiredJwt: generateJwtFn(payload),
+      expiredJwt: generateConventionJwt(payload),
     };
 
     await renewMagicLink.execute(request);

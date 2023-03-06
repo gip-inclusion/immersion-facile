@@ -11,10 +11,10 @@ const conventionId = "my-Convention-id";
 describe("Immersion assessment routes", () => {
   describe(`POST /auth/${immersionAssessmentRoute}/:jwt`, () => {
     it("returns 200 if the jwt is valid", async () => {
-      const { request, generateMagicLinkJwt, inMemoryUow } =
+      const { request, generateConventionJwt, inMemoryUow } =
         await buildTestApp();
 
-      const jwt = generateMagicLinkJwt(
+      const jwt = generateConventionJwt(
         createConventionMagicLinkPayload({
           id: conventionId,
           role: "establishment",

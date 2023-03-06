@@ -1,9 +1,9 @@
 import { Observable, Subject } from "rxjs";
-import { AdminToken, EmailSentDto } from "shared";
+import { BackOfficeJwt, EmailSentDto } from "shared";
 import { SentEmailGateway } from "src/core-logic/ports/SentEmailGateway";
 
 export class TestSentEmailGateway implements SentEmailGateway {
-  getLatest(_: AdminToken): Observable<EmailSentDto[]> {
+  getLatest(_: BackOfficeJwt): Observable<EmailSentDto[]> {
     return this.sentEmails$;
   }
 

@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from "express";
-import { AppJwtPayload } from "shared";
 import { makeVerifyJwtHS256 } from "../../domain/auth/jwt";
 import { TimeGateway } from "../../domain/core/ports/TimeGateway";
 import { createLogger } from "../../utils/logger";
@@ -10,7 +9,7 @@ export const makeAdminAuthMiddleware = (
   jwtAdminSecret: string,
   timeGateway: TimeGateway,
 ) => {
-  const verifyJwt = makeVerifyJwtHS256<AppJwtPayload>(jwtAdminSecret);
+  const verifyJwt = makeVerifyJwtHS256<"backOffice">(jwtAdminSecret);
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.headers.authorization) {
       return res.status(401).json({ error: `You need to authenticate first` });

@@ -4,8 +4,8 @@ import {
   AbsoluteUrl,
   absoluteUrlSchema,
   AdminTargets,
-  AdminToken,
   adminTokenSchema,
+  BackOfficeJwt,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetDashboardParams,
@@ -16,7 +16,7 @@ import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 export class HttpAdminGateway implements AdminGateway {
   constructor(private readonly httpClient: HttpClient<AdminTargets>) {}
 
-  public login(userAndPassword: UserAndPassword): Observable<AdminToken> {
+  public login(userAndPassword: UserAndPassword): Observable<BackOfficeJwt> {
     return from(
       this.httpClient
         .login({ body: userAndPassword })
@@ -26,7 +26,7 @@ export class HttpAdminGateway implements AdminGateway {
 
   public getDashboardUrl$(
     params: GetDashboardParams,
-    token: AdminToken,
+    token: BackOfficeJwt,
   ): Observable<AbsoluteUrl> {
     return from(
       this.httpClient
@@ -44,7 +44,7 @@ export class HttpAdminGateway implements AdminGateway {
   }
   public addEstablishmentBatch$(
     establishmentBatch: FormEstablishmentBatchDto,
-    token: AdminToken,
+    token: BackOfficeJwt,
   ): Observable<EstablishmentBatchReport> {
     return from(
       this.httpClient

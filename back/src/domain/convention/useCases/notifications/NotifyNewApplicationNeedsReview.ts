@@ -7,7 +7,7 @@ import {
   frontRoutes,
   Role,
 } from "shared";
-import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
+import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
 import { createLogger } from "../../../../utils/logger";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import {
@@ -23,7 +23,7 @@ export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<Conven
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly emailGateway: EmailGateway,
-    private readonly generateMagicLinkFn: GenerateConventionMagicLink,
+    private readonly generateMagicLinkFn: GenerateConventionMagicLinkUrl,
     private readonly timeGateway: TimeGateway,
   ) {
     super(uowPerformer);

@@ -1,8 +1,8 @@
 import { Observable, of } from "rxjs";
-import { AdminToken, EmailSentDto } from "shared";
+import { BackOfficeJwt, EmailSentDto } from "shared";
 
 export class StubSentEmailGateway implements StubSentEmailGateway {
-  public getLatest(_adminToken: AdminToken): Observable<EmailSentDto[]> {
+  public getLatest(_adminToken: BackOfficeJwt): Observable<EmailSentDto[]> {
     return of([
       {
         templatedEmail: {

@@ -18,7 +18,6 @@ import {
 import { AppConfig } from "./appConfig";
 import { createEventCrawler } from "./createEventCrawler";
 import { createGateways, createGetPgPoolFn } from "./createGateways";
-import { createGenerateConventionMagicLink } from "./createGenerateConventionMagicLink";
 import { createUseCases } from "./createUseCases";
 import { createUowPerformer } from "./uowConfig";
 
@@ -37,16 +36,29 @@ export const createAppDependencies = async (config: AppConfig) => {
   const { uowPerformer, inMemoryUow } = createUowPerformer(config, getPgPoolFn);
 
   const eventBus = new InMemoryEventBus(gateways.timeGateway, uowPerformer);
-  const generateApiJwt = makeGenerateJwtES256(config.apiJwtPrivateKey);
-  const generateMagicLinkJwt = makeGenerateJwtES256(
-    config.magicLinkJwtPrivateKey,
-  );
-  const generateAdminJwt = makeGenerateJwtHS256(config.adminJwtSecret, "365d");
-  const generateAuthenticatedUserToken = makeGenerateJwtES256(
+  const generateApiJwt = makeGenerateJwtES256<"apiConsumer">(
     config.apiJwtPrivateKey,
-    3600,
+    undefined, // no expiration
   );
-  const generateMagicLinkFn = createGenerateConventionMagicLink(config);
+  const oneDaysInSecond = 3600 * 24;
+  const generateEditEstablishmentJwt =
+    makeGenerateJwtES256<"editEstablishment">(
+      config.magicLinkJwtPrivateKey,
+      oneDaysInSecond,
+    );
+
+  const generateAdminJwt = makeGenerateJwtHS256<"backOffice">(
+    config.adminJwtSecret,
+    "365d",
+  );
+  const generateAuthenticatedUserToken =
+    makeGenerateJwtES256<"authenticatedUser">(config.apiJwtPrivateKey, 3600);
+
+  const thirtyDaysInSecond = 3600 * 24 * 30;
+  const generateConventionJwt = makeGenerateJwtES256<"convention">(
+    config.magicLinkJwtPrivateKey,
+    thirtyDaysInSecond,
+  );
 
   const redirectErrorUrl: AbsoluteUrl = `${config.immersionFacileBaseUrl}/${frontRoutes.error}`;
   const errorHandlers = {
@@ -59,8 +71,8 @@ export const createAppDependencies = async (config: AppConfig) => {
   const useCases = createUseCases(
     config,
     gateways,
-    generateMagicLinkJwt,
-    generateMagicLinkFn,
+    generateConventionJwt,
+    generateEditEstablishmentJwt,
     generateAdminJwt,
     generateAuthenticatedUserToken,
     uowPerformer,
@@ -73,7 +85,7 @@ export const createAppDependencies = async (config: AppConfig) => {
     gateways,
     applicationMagicLinkAuthMiddleware: makeMagicLinkAuthMiddleware(
       config,
-      "application",
+      "convention",
     ),
     errorHandlers,
     establishmentMagicLinkAuthMiddleware: makeMagicLinkAuthMiddleware(
@@ -94,7 +106,8 @@ export const createAppDependencies = async (config: AppConfig) => {
       config.adminJwtSecret,
       gateways.timeGateway,
     ),
-    generateMagicLinkJwt,
+    generateEditEstablishmentJwt,
+    generateConventionJwt,
     generateApiJwt,
     generateAuthenticatedUserToken,
     eventBus,

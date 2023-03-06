@@ -1,6 +1,6 @@
 import { Flavor } from "../typeFlavors";
 
-export type AdminToken = Flavor<string, "AdminToken">;
+export type BackOfficeJwt = Flavor<string, "BackOfficeJwt">;
 
 export type UserAndPassword = {
   user: string;

@@ -15,7 +15,7 @@ import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGatew
 import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryAgencyRepository } from "../../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/fakeGenerateMagicLinkUrlFn";
+import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
 import { NotifyToAgencyApplicationSubmitted } from "./NotifyToAgencyApplicationSubmitted";
 
 describe("NotifyToAgencyApplicationSubmitted", () => {

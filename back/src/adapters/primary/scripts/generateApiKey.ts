@@ -1,10 +1,5 @@
 import { addYears } from "date-fns";
-import {
-  ApiConsumer,
-  ApiConsumerName,
-  authorisedNames,
-  WithApiConsumerId,
-} from "shared";
+import { ApiConsumer, ApiConsumerName, authorisedNames } from "shared";
 import { makeGenerateJwtES256 } from "../../../domain/auth/jwt";
 import { createLogger } from "../../../utils/logger";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
@@ -16,8 +11,9 @@ const logger = createLogger(__filename);
 const uuidGenerator = new UuidV4Generator();
 const timeGateway = new RealTimeGateway();
 const appConfig = AppConfig.createFromEnv();
-const generateApiKeyJwt = makeGenerateJwtES256<WithApiConsumerId>(
+const generateApiKeyJwt = makeGenerateJwtES256<"apiConsumer">(
   appConfig.apiJwtPrivateKey,
+  undefined,
 );
 
 const createdAt = timeGateway.now();

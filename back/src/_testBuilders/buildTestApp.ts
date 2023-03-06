@@ -20,7 +20,8 @@ import { InMemorySireneGateway } from "../adapters/secondary/sirene/InMemorySire
 import {
   GenerateApiConsumerJtw,
   GenerateAuthenticatedUserJwt,
-  GenerateMagicLinkJwt,
+  GenerateConventionJwt,
+  GenerateEditFormEstablishmentJwt,
 } from "../domain/auth/jwt";
 import { UuidGenerator } from "../domain/core/ports/UuidGenerator";
 import { AppConfigBuilder } from "./AppConfigBuilder";
@@ -50,7 +51,8 @@ export type TestAppAndDeps = {
   eventCrawler: BasicEventCrawler;
   appConfig: AppConfig;
   generateApiJwt: GenerateApiConsumerJtw;
-  generateMagicLinkJwt: GenerateMagicLinkJwt;
+  generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt;
+  generateConventionJwt: GenerateConventionJwt;
   generateAuthenticatedUserJwt: GenerateAuthenticatedUserJwt;
   uuidGenerator: UuidGenerator;
   inMemoryUow: InMemoryUnitOfWork;
@@ -96,7 +98,8 @@ export const buildTestApp = async (
     gateways,
     eventCrawler: rawEventCrawler,
     generateApiJwt,
-    generateMagicLinkJwt,
+    generateConventionJwt,
+    generateEditEstablishmentJwt,
     generateAuthenticatedUserJwt,
     uuidGenerator,
     inMemoryUow: uow,
@@ -116,7 +119,8 @@ export const buildTestApp = async (
     eventCrawler,
     appConfig,
     generateApiJwt,
-    generateMagicLinkJwt,
+    generateConventionJwt,
+    generateEditEstablishmentJwt,
     generateAuthenticatedUserJwt,
     uuidGenerator,
     inMemoryUow,

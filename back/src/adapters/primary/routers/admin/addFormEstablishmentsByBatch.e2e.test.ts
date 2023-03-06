@@ -1,6 +1,6 @@
 import {
   adminTargets,
-  AdminToken,
+  BackOfficeJwt,
   FormEstablishmentBatchDto,
   FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
@@ -14,7 +14,7 @@ const addFormEstablishmentBatchUrl = adminTargets.addFormEstablishmentBatch.url;
 
 describe("POST /add-form-establishment-batch", () => {
   let request: SuperTest<Test>;
-  let token: AdminToken;
+  let token: BackOfficeJwt;
 
   beforeEach(async () => {
     const appConfig = new AppConfigBuilder()

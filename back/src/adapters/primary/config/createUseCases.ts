@@ -1,25 +1,27 @@
 import { keys } from "ramda";
 import { AgencyId, ApiConsumerId, SiretDto, sleep } from "shared";
 import { DepartmentCodeFromPostcode } from "../../../domain/address/useCases/DepartmentCodeFromPostCode";
+import { LookupLocation } from "../../../domain/address/useCases/LookupLocation";
 import { LookupStreetAddress } from "../../../domain/address/useCases/LookupStreetAddress";
 import {
   GenerateAdminJwt,
   GenerateAuthenticatedUserJwt,
-  GenerateMagicLinkJwt,
+  GenerateConventionJwt,
+  GenerateEditFormEstablishmentJwt,
 } from "../../../domain/auth/jwt";
 import { ExportData } from "../../../domain/backoffice/useCases/ExportData";
 import { SetFeatureFlag } from "../../../domain/backoffice/useCases/SetFeatureFlag";
 import { AddConvention } from "../../../domain/convention/useCases/AddConvention";
 import { AddAgency } from "../../../domain/convention/useCases/agencies/AddAgency";
+import { ListAgenciesByFilter } from "../../../domain/convention/useCases/agencies/ListAgenciesByFilter";
 import { PrivateListAgencies } from "../../../domain/convention/useCases/agencies/PrivateListAgencies";
 import { UpdateAgency } from "../../../domain/convention/useCases/agencies/UpdateAgency";
 import { UpdateAgencyStatus } from "../../../domain/convention/useCases/agencies/UpdateAgencyStatus";
 import { BroadcastToPoleEmploiOnConventionUpdates } from "../../../domain/convention/useCases/broadcast/BroadcastToPoleEmploiOnConventionUpdates";
 import { CreateImmersionAssessment } from "../../../domain/convention/useCases/CreateImmersionAssessment";
-import { GenerateMagicLink } from "../../../domain/convention/useCases/GenerateMagicLink";
+import { GenerateConventionMagicLinkUseCase } from "../../../domain/convention/useCases/GenerateConventionMagicLinkUseCase";
 import { GetAgencyPublicInfoById } from "../../../domain/convention/useCases/GetAgencyPublicInfoById";
 import { GetConvention } from "../../../domain/convention/useCases/GetConvention";
-import { ListAgenciesByFilter } from "../../../domain/convention/useCases/agencies/ListAgenciesByFilter";
 import { ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/convention/useCases/notifications/ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature";
 import { DeliverRenewedMagicLink } from "../../../domain/convention/useCases/notifications/DeliverRenewedMagicLink";
 import { NotifyAllActorsOfFinalConventionValidation } from "../../../domain/convention/useCases/notifications/NotifyAllActorsOfFinalConventionValidation";
@@ -46,6 +48,7 @@ import { AdminLogin } from "../../../domain/generic/authentication/useCases/Admi
 import { UploadLogo } from "../../../domain/generic/fileManagement/useCases/UploadLogo";
 import { GetSentEmails } from "../../../domain/generic/notifications/useCases/GetSentEmails";
 import { AddFormEstablishment } from "../../../domain/immersionOffer/useCases/AddFormEstablishment";
+import { AddFormEstablishmentBatch } from "../../../domain/immersionOffer/useCases/AddFormEstablismentsBatch";
 import { CallLaBonneBoiteAndUpdateRepositories } from "../../../domain/immersionOffer/useCases/CallLaBonneBoiteAndUpdateRepositories";
 import { ContactEstablishment } from "../../../domain/immersionOffer/useCases/ContactEstablishment";
 import { EditFormEstablishment } from "../../../domain/immersionOffer/useCases/EditFormEstablishment";
@@ -70,19 +73,19 @@ import { AppellationSearch } from "../../../domain/rome/useCases/AppellationSear
 import { RomeSearch } from "../../../domain/rome/useCases/RomeSearch";
 import { GetSiret } from "../../../domain/sirene/useCases/GetSiret";
 import { GetSiretIfNotAlreadySaved } from "../../../domain/sirene/useCases/GetSiretIfNotAlreadySaved";
+import { NotFoundError } from "../helpers/httpErrors";
 import { AppConfig } from "./appConfig";
 import { Gateways } from "./createGateways";
-import { makeGenerateEditFormEstablishmentUrl } from "./makeGenerateEditFormEstablishmentUrl";
-import { GenerateConventionMagicLink } from "./createGenerateConventionMagicLink";
-import { AddFormEstablishmentBatch } from "../../../domain/immersionOffer/useCases/AddFormEstablismentsBatch";
-import { LookupLocation } from "../../../domain/address/useCases/LookupLocation";
-import { NotFoundError } from "../helpers/httpErrors";
+import {
+  makeGenerateConventionMagicLinkUrl,
+  makeGenerateEditFormEstablishmentUrl,
+} from "./magicLinkUrl";
 
 export const createUseCases = (
   config: AppConfig,
   gateways: Gateways,
-  generateMagicLinkJwt: GenerateMagicLinkJwt,
-  makeConventionMagicLink: GenerateConventionMagicLink,
+  generateConventionJwt: GenerateConventionJwt,
+  generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt,
   generateAdminJwt: GenerateAdminJwt,
   generateAuthenticatedUserToken: GenerateAuthenticatedUserJwt,
   uowPerformer: UnitOfWorkPerformer,
@@ -98,6 +101,11 @@ export const createUseCases = (
     uowPerformer,
     createNewEvent,
     getSiret,
+  );
+
+  const generateConventionMagicLinkUrl = makeGenerateConventionMagicLinkUrl(
+    config,
+    generateConventionJwt,
   );
 
   return {
@@ -179,14 +187,14 @@ export const createUseCases = (
         createNewEvent,
         gateways.timeGateway,
       ),
-      generateMagicLink: new GenerateMagicLink(
-        generateMagicLinkJwt,
+      generateMagicLink: new GenerateConventionMagicLinkUseCase(
+        generateConventionJwt,
         gateways.timeGateway,
       ),
       renewConventionMagicLink: new RenewConventionMagicLink(
         uowPerformer,
         createNewEvent,
-        generateMagicLinkJwt,
+        generateConventionJwt,
         config,
         gateways.timeGateway,
         config.immersionFacileBaseUrl,
@@ -244,7 +252,10 @@ export const createUseCases = (
         uowPerformer,
         gateways.email,
         gateways.timeGateway,
-        makeGenerateEditFormEstablishmentUrl(config),
+        makeGenerateEditFormEstablishmentUrl(
+          config,
+          generateEditEstablishmentJwt,
+        ),
         createNewEvent,
       ),
 
@@ -278,14 +289,14 @@ export const createUseCases = (
         new ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature(
           uowPerformer,
           gateways.email,
-          makeConventionMagicLink,
+          generateConventionMagicLinkUrl,
           gateways.timeGateway,
         ),
       notifyLastSigneeThatConventionHasBeenSigned:
         new NotifyLastSigneeThatConventionHasBeenSigned(
           uowPerformer,
           gateways.email,
-          makeConventionMagicLink,
+          generateConventionMagicLinkUrl,
           gateways.timeGateway,
         ),
       notifyAllActorsOfFinalConventionValidation:
@@ -298,13 +309,13 @@ export const createUseCases = (
       notifyNewConventionNeedsReview: new NotifyNewApplicationNeedsReview(
         uowPerformer,
         gateways.email,
-        makeConventionMagicLink,
+        generateConventionMagicLinkUrl,
         gateways.timeGateway,
       ),
       notifyToAgencyConventionSubmitted: new NotifyToAgencyApplicationSubmitted(
         uowPerformer,
         gateways.email,
-        makeConventionMagicLink,
+        generateConventionMagicLinkUrl,
         gateways.timeGateway,
       ),
       notifyBeneficiaryAndEnterpriseThatConventionIsRejected:
@@ -316,7 +327,7 @@ export const createUseCases = (
         new NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification(
           uowPerformer,
           gateways.email,
-          makeConventionMagicLink,
+          generateConventionMagicLinkUrl,
           gateways.timeGateway,
         ),
       deliverRenewedMagicLink: new DeliverRenewedMagicLink(gateways.email),
@@ -330,7 +341,7 @@ export const createUseCases = (
         new NotifyPoleEmploiUserAdvisorOnConventionFullySigned(
           uowPerformer,
           gateways.email,
-          makeConventionMagicLink,
+          generateConventionMagicLinkUrl,
           gateways.timeGateway,
         ),
       broadcastToPoleEmploiOnConventionUpdates:

@@ -14,8 +14,8 @@ import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/I
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { PeUserAndAdvisor } from "../dto/PeConnect.dto";
 import { NotifyPoleEmploiUserAdvisorOnConventionFullySigned } from "./NotifyPoleEmploiUserAdvisorOnConventionFullySigned";
-import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/fakeGenerateMagicLinkUrlFn";
 import { PeConnectImmersionAdvisorDto } from "../dto/PeConnectAdvisor.dto";
+import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/jwtTestHelper";
 
 describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
   let uow: InMemoryUnitOfWork;

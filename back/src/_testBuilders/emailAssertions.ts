@@ -20,7 +20,7 @@ import { TimeGateway } from "../domain/core/ports/TimeGateway";
 import { ContactEntity } from "../domain/immersionOffer/entities/ContactEntity";
 import { EstablishmentEntity } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import { AnnotatedImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
-import { fakeGenerateMagicLinkUrlFn } from "./fakeGenerateMagicLinkUrlFn";
+import { fakeGenerateMagicLinkUrlFn } from "./jwtTestHelper";
 
 // TODO: we should use hardcoded values instead of relying on the getValidatedConventionFinalConfirmationParams
 export const getValidatedConventionFinalConfirmationParams = (

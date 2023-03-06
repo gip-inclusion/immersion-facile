@@ -1,4 +1,4 @@
-import { AdminToken } from "shared";
+import { BackOfficeJwt } from "shared";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import {
   adminAuthSlice,
@@ -94,7 +94,7 @@ describe("adminAuth slice", () => {
     );
   };
 
-  const expectTokenToBe = (expected: AdminToken | null) => {
+  const expectTokenToBe = (expected: BackOfficeJwt | null) => {
     expect(adminSelectors.auth.token(store.getState())).toBe(expected);
   };
 
@@ -106,11 +106,13 @@ describe("adminAuth slice", () => {
     expect(adminSelectors.auth.error(store.getState())).toBe(expected);
   };
 
-  const expectAdminTokenInDevice = (expectedToken: AdminToken | undefined) => {
+  const expectAdminTokenInDevice = (
+    expectedToken: BackOfficeJwt | undefined,
+  ) => {
     expect(dependencies.deviceRepository.get("adminToken")).toBe(expectedToken);
   };
 
-  const feedAdminGatewayWithToken = (token: AdminToken) => {
+  const feedAdminGatewayWithToken = (token: BackOfficeJwt) => {
     dependencies.adminGateway.token$.next(token);
   };
 

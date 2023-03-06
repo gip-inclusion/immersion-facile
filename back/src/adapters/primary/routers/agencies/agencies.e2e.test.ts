@@ -1,6 +1,6 @@
 import {
   AddressDto,
-  AdminToken,
+  BackOfficeJwt,
   agenciesRoute,
   AgencyDtoBuilder,
   expectToEqual,
@@ -26,7 +26,7 @@ describe(`/${agenciesRoute} route`, () => {
   let gateways: InMemoryGateways;
   let inMemoryUow: InMemoryUnitOfWork;
   let eventCrawler: BasicEventCrawler;
-  let adminToken: AdminToken;
+  let adminToken: BackOfficeJwt;
   let appConfig: AppConfig;
 
   beforeEach(async () => {

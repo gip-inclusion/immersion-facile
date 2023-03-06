@@ -21,7 +21,7 @@ import {
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { createLogger } from "../../../utils/logger";
-import { GenerateMagicLinkJwt } from "../../auth/jwt";
+import { GenerateConventionJwt } from "../../auth/jwt";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
@@ -36,7 +36,7 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly createNewEvent: CreateNewEvent,
-    private readonly generateMagicLinkJwt: GenerateMagicLinkJwt,
+    private readonly generateMagicLinkJwt: GenerateConventionJwt,
     private readonly config: AppConfig,
     private readonly timeGateway: TimeGateway,
     private readonly immersionBaseUrl: AbsoluteUrl,

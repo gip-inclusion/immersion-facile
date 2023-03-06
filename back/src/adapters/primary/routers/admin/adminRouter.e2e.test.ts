@@ -1,6 +1,6 @@
 import {
   adminTargets,
-  AdminToken,
+  BackOfficeJwt,
   featureFlagsRoute,
   SetFeatureFlagParams,
 } from "shared";
@@ -10,7 +10,7 @@ import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 
 describe("/admin router", () => {
   let request: SuperTest<Test>;
-  let token: AdminToken;
+  let token: BackOfficeJwt;
 
   beforeEach(async () => {
     const appConfig = new AppConfigBuilder()

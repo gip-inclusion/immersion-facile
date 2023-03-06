@@ -7,7 +7,7 @@ import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGatew
 import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { expectEmaiSignatoryConfirmationSignatureRequestMatchingConvention } from "../../../../_testBuilders/emailAssertions";
-import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/fakeGenerateMagicLinkUrlFn";
+import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
 import { ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature } from "./ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature";
 
 describe("Add Convention Notifications", () => {

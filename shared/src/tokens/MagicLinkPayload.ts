@@ -1,11 +1,14 @@
 import * as crypto from "crypto";
 import { ConventionId } from "../convention/convention.dto";
 import { SiretDto } from "../siret/siret";
+import { Flavor } from "../typeFlavors";
+
+export type ConventionMagicLinkJwt = Flavor<string, "ConventionMagicLinkJwt">;
 
 export type JwtPayloads = {
-  inclusion?: InclusionConnectJwtPayload;
-  application?: ConventionMagicLinkPayload;
+  convention?: ConventionMagicLinkPayload;
   establishment?: EstablishmentJwtPayload;
+  inclusion?: InclusionConnectJwtPayload;
   admin?: AppJwtPayload;
 };
 
@@ -15,10 +18,10 @@ export type PayloadKey = keyof JwtPayloads;
 export type PayloadOption = ValueOf<Required<JwtPayloads>>;
 
 export const currentJwtVersions: Record<PayloadKey, number> = {
-  inclusion: 1,
-  application: 1,
+  convention: 1,
   establishment: 1,
   admin: 1,
+  inclusion: 1,
 };
 
 export type Role = (typeof allRoles)[number];
@@ -57,7 +60,7 @@ export const createConventionMagicLinkPayload = ({
   durationDays = 31,
   iat = Math.round(now.getTime() / 1000),
   exp = iat + durationDays * 24 * 3600,
-  version = currentJwtVersions.application,
+  version = currentJwtVersions.convention,
 }: CreateConventionMagicLinkPayloadProperties): ConventionMagicLinkPayload => ({
   version,
   applicationId: id, //TODO : replace applicationId by conventionId on convention magic link payload (applicationId was legacy name)

@@ -14,7 +14,7 @@ import {
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/fakeGenerateMagicLinkUrlFn";
+import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "./NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 
@@ -25,7 +25,6 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
   let timeGateway: TimeGateway;
   const convention = new ConventionDtoBuilder().build();
   const agency = new AgencyDtoBuilder().withId(convention.agencyId).build();
-  const generateMagicLinkFn = fakeGenerateMagicLinkUrlFn;
 
   beforeEach(() => {
     uow = createInMemoryUow();
@@ -37,7 +36,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
       new NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification(
         new InMemoryUowPerformer(uow),
         emailGateway,
-        generateMagicLinkFn,
+        fakeGenerateMagicLinkUrlFn,
         timeGateway,
       );
   });
@@ -82,13 +81,13 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
                 convention.signatories.beneficiary.firstName,
               beneficiaryLastName: convention.signatories.beneficiary.lastName,
               businessName: convention.businessName,
-              conventionStatusLink: generateMagicLinkFn({
+              conventionStatusLink: fakeGenerateMagicLinkUrlFn({
                 ...magicLinkCommonFields,
                 targetRoute: frontRoutes.conventionStatusDashboard,
               }),
               immersionAppellation: convention.immersionAppellation,
               justification,
-              magicLink: generateMagicLinkFn({
+              magicLink: fakeGenerateMagicLinkUrlFn({
                 ...magicLinkCommonFields,
                 targetRoute: frontRoutes.conventionImmersionRoute,
               }),

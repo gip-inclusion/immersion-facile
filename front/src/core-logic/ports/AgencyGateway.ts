@@ -1,6 +1,6 @@
 import { Observable } from "rxjs";
 import {
-  AdminToken,
+  BackOfficeJwt,
   AgencyDto,
   AgencyId,
   AgencyOption,
@@ -37,18 +37,18 @@ export interface AgencyGateway {
   ): Promise<AgencyOption[]>;
 
   listAgenciesNeedingReview$(
-    adminToken: AdminToken,
+    adminToken: BackOfficeJwt,
   ): Observable<AgencyOption[]>;
 
   validateOrRejectAgency$(
-    adminToken: AdminToken,
+    adminToken: BackOfficeJwt,
     agencyId: AgencyId,
     status: ActiveOrRejectedStatus,
   ): Observable<void>;
 
   getAgencyAdminById$(
     agencyId: AgencyId,
-    adminToken: AdminToken,
+    adminToken: BackOfficeJwt,
   ): Observable<AgencyDto | undefined>;
 
   getAgencyPublicInfoById(
@@ -63,5 +63,8 @@ export interface AgencyGateway {
     filter: ListAgenciesRequestDto,
   ): Observable<AgencyOption[]>;
   getImmersionFacileAgencyId$(): Observable<AgencyId | undefined>;
-  updateAgency$(agencyDto: AgencyDto, adminToken: AdminToken): Observable<void>;
+  updateAgency$(
+    agencyDto: AgencyDto,
+    adminToken: BackOfficeJwt,
+  ): Observable<void>;
 }

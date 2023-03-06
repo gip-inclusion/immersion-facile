@@ -6,14 +6,12 @@ import {
   ConventionMagicLinkPayload,
   currentJwtVersions,
   EstablishmentJwtPayload,
-  InclusionConnectJwtPayload,
+  ExtractFromExisting,
   PayloadKey,
-  PayloadOption,
-  WithApiConsumerId,
 } from "shared";
-import { makeVerifyJwtES256 } from "../../domain/auth/jwt";
-import { TimeGateway } from "../../domain/core/ports/TimeGateway";
+import { JwtKind, makeVerifyJwtES256 } from "../../domain/auth/jwt";
 import { GetApiConsumerById } from "../../domain/core/ports/GetApiConsumerById";
+import { TimeGateway } from "../../domain/core/ports/TimeGateway";
 import { createLogger } from "../../utils/logger";
 import { AppConfig } from "./config/appConfig";
 
@@ -55,9 +53,7 @@ export const createApiKeyAuthMiddlewareV0 = (
   timeGateway: TimeGateway,
   config: AppConfig,
 ) => {
-  const verifyJwt = makeVerifyJwtES256<WithApiConsumerId>(
-    config.apiJwtPublicKey,
-  );
+  const verifyJwt = makeVerifyJwtES256<"apiConsumer">(config.apiJwtPublicKey);
 
   return async (req: Request, _res: Response, next: NextFunction) => {
     const incTotalCountForRequest = createIncTotalCountForRequest(req);
@@ -118,9 +114,7 @@ export const makeApiKeyAuthMiddlewareV1 = (
   timeGateway: TimeGateway,
   config: AppConfig,
 ) => {
-  const verifyJwt = makeVerifyJwtES256<WithApiConsumerId>(
-    config.apiJwtPublicKey,
-  );
+  const verifyJwt = makeVerifyJwtES256<"apiConsumer">(config.apiJwtPublicKey);
 
   return async (req: Request, res: Response, next: NextFunction) => {
     const incTotalCountForRequest = createIncTotalCountForRequest(req);
@@ -176,9 +170,11 @@ export const makeApiKeyAuthMiddlewareV1 = (
 
 export const makeMagicLinkAuthMiddleware = (
   config: AppConfig,
-  payloadKey: PayloadKey,
+  payloadKey: ExtractFromExisting<PayloadKey, "convention" | "establishment">,
 ) => {
-  const { verifyJwt, verifyDeprecatedJwt } = verifyJwtConfig(config);
+  const { verifyJwt, verifyDeprecatedJwt } = verifyJwtConfig<
+    "convention" | "editEstablishment"
+  >(config);
   return (req: Request, res: Response, next: NextFunction) => {
     const maybeJwt = req.headers.authorization;
     if (!maybeJwt) {
@@ -200,17 +196,11 @@ export const makeMagicLinkAuthMiddleware = (
       }
 
       switch (payloadKey) {
-        case "application":
-          req.payloads = { application: payload as ConventionMagicLinkPayload };
+        case "convention":
+          req.payloads = { convention: payload as ConventionMagicLinkPayload };
           break;
         case "establishment":
           req.payloads = { establishment: payload as EstablishmentJwtPayload };
-          break;
-        case "admin":
-          req.payloads = { admin: payload };
-          break;
-        case "inclusion":
-          req.payloads = { inclusion: payload as InclusionConnectJwtPayload };
           break;
         default:
           // eslint-disable-next-line no-case-declarations
@@ -261,13 +251,11 @@ const sendNeedsRenewedLinkError = (res: Response, err: Error) => {
   });
 };
 
-export const verifyJwtConfig = (config: AppConfig) => {
-  const verifyJwt = makeVerifyJwtES256<PayloadOption>(
-    config.magicLinkJwtPublicKey,
-  );
+export const verifyJwtConfig = <K extends JwtKind>(config: AppConfig) => {
+  const verifyJwt = makeVerifyJwtES256<K>(config.magicLinkJwtPublicKey);
 
   const verifyDeprecatedJwt = config.magicLinkJwtPreviousPublicKey
-    ? makeVerifyJwtES256<PayloadOption>(config.magicLinkJwtPreviousPublicKey)
+    ? makeVerifyJwtES256<K>(config.magicLinkJwtPreviousPublicKey)
     : () => {
         throw new Error("No deprecated JWT private key provided");
       };

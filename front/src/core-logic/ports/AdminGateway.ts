@@ -1,7 +1,7 @@
 import { Observable } from "rxjs";
 import {
   AbsoluteUrl,
-  AdminToken,
+  BackOfficeJwt,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetDashboardParams,
@@ -9,13 +9,13 @@ import {
 } from "shared";
 
 export interface AdminGateway {
-  login: (params: UserAndPassword) => Observable<AdminToken>;
+  login: (params: UserAndPassword) => Observable<BackOfficeJwt>;
   getDashboardUrl$: (
     params: GetDashboardParams,
-    token: AdminToken,
+    token: BackOfficeJwt,
   ) => Observable<AbsoluteUrl>;
   addEstablishmentBatch$: (
     establishmentBatch: FormEstablishmentBatchDto,
-    token: AdminToken,
+    token: BackOfficeJwt,
   ) => Observable<EstablishmentBatchReport>;
 }

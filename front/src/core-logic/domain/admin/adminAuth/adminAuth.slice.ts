@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AdminToken } from "shared";
+import { BackOfficeJwt } from "shared";
 
 export type AdminAuthState = {
-  adminToken: AdminToken | null;
+  adminToken: BackOfficeJwt | null;
   isLoading: boolean;
   error: string | null;
 };
@@ -23,7 +23,7 @@ export const adminAuthSlice = createSlice({
     ) => {
       state.isLoading = true;
     },
-    loginSucceeded: (state, action: PayloadAction<AdminToken>) => {
+    loginSucceeded: (state, action: PayloadAction<BackOfficeJwt>) => {
       state.adminToken = action.payload;
       state.isLoading = false;
       state.error = null;
@@ -33,7 +33,7 @@ export const adminAuthSlice = createSlice({
       state.isLoading = false;
     },
     adminTokenStoredInDevice: (state) => state,
-    tokenFoundInDevice: (state, action: PayloadAction<AdminToken>) => {
+    tokenFoundInDevice: (state, action: PayloadAction<BackOfficeJwt>) => {
       state.adminToken = action.payload;
     },
     noTokenFoundInDevice: (state) => {

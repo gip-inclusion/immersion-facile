@@ -4,7 +4,7 @@ import {
   AppConfig,
   makeEmailAllowListPredicate,
 } from "../../adapters/primary/config/appConfig";
-import { makeGenerateEditFormEstablishmentUrl } from "../../adapters/primary/config/makeGenerateEditFormEstablishmentUrl";
+import { makeGenerateEditFormEstablishmentUrl } from "../../adapters/primary/config/magicLinkUrl";
 import { RealTimeGateway } from "../../adapters/secondary/core/TimeGateway/RealTimeGateway";
 import { SendinblueHtmlEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueHtmlEmailGateway";
 import { InMemoryUowPerformer } from "../../adapters/secondary/InMemoryUowPerformer";
@@ -15,6 +15,7 @@ import { UnitOfWork } from "../../domain/core/ports/UnitOfWork";
 import { ContactEntity } from "../../domain/immersionOffer/entities/ContactEntity";
 import { EstablishmentAggregateRepository } from "../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
 import { RequestEditFormEstablishment } from "../../domain/immersionOffer/useCases/RequestEditFormEstablishment";
+import { generateEditFormEstablishmentJwtTestFn } from "../../_testBuilders/jwtTestHelper";
 
 // Requires the following environment variables to be set for the tests to pass:
 // - SENDINBLUE_API_KEY
@@ -65,8 +66,12 @@ describe("RequestEditFormEstablishment", () => {
         email: immersionFacileContactEmail,
       },
     );
+
     const generateEditFormEstablishmentUrl =
-      makeGenerateEditFormEstablishmentUrl(config);
+      makeGenerateEditFormEstablishmentUrl(
+        config,
+        generateEditFormEstablishmentJwtTestFn,
+      );
 
     return new RequestEditFormEstablishment(
       uowPerformer,

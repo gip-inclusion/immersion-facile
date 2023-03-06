@@ -1,5 +1,5 @@
 import { AxiosInstance } from "axios";
-import { AdminToken, ExportDataDto, exportRoute } from "shared";
+import { BackOfficeJwt, ExportDataDto, exportRoute } from "shared";
 
 import { ExcelExportGateway } from "src/core-logic/ports/ExcelExportGateway";
 
@@ -7,7 +7,7 @@ export class HttpExcelExportGateway implements ExcelExportGateway {
   constructor(private readonly httpClient: AxiosInstance) {}
 
   public async exportData(
-    adminToken: AdminToken,
+    adminToken: BackOfficeJwt,
     exportDataDto: ExportDataDto,
   ) {
     const response = await this.httpClient.post(

@@ -1,7 +1,7 @@
 import { createTargets, CreateTargets, HttpClient, Target } from "http-client";
 import { from, Observable } from "rxjs";
 import {
-  AdminToken,
+  BackOfficeJwt,
   agenciesIdAndNameSchema,
   agenciesRoute,
   AgencyDto,
@@ -100,14 +100,14 @@ export class HttpAgencyGateway implements AgencyGateway {
 
   public getAgencyAdminById$(
     agencyId: AgencyId,
-    adminToken: AdminToken,
+    adminToken: BackOfficeJwt,
   ): Observable<AgencyDto> {
     return from(this.getAdminAgencyById(agencyId, adminToken));
   }
 
   public updateAgency$(
     agencyDto: AgencyDto,
-    adminToken: AdminToken,
+    adminToken: BackOfficeJwt,
   ): Observable<void> {
     return from(
       this.httpClient
@@ -124,7 +124,7 @@ export class HttpAgencyGateway implements AgencyGateway {
 
   private getAdminAgencyById(
     agencyId: AgencyId,
-    adminToken: AdminToken,
+    adminToken: BackOfficeJwt,
   ): Promise<AgencyDto> {
     return this.httpClient
       .getAgencyAdminById({
@@ -161,7 +161,7 @@ export class HttpAgencyGateway implements AgencyGateway {
   }
 
   public listAgenciesNeedingReview$(
-    adminToken: AdminToken,
+    adminToken: BackOfficeJwt,
   ): Observable<AgencyOption[]> {
     return from(this.listAgenciesNeedingReview(adminToken));
   }
@@ -208,7 +208,7 @@ export class HttpAgencyGateway implements AgencyGateway {
 
   // TODO Mieux identifier l'admin
   private listAgenciesNeedingReview(
-    adminToken: AdminToken,
+    adminToken: BackOfficeJwt,
   ): Promise<AgencyOption[]> {
     return this.httpClient
       .listAgenciesNeedingReview({
@@ -220,7 +220,7 @@ export class HttpAgencyGateway implements AgencyGateway {
 
   // TODO Mieux identifier l'admin
   public async validateOrRejectAgency(
-    adminToken: AdminToken,
+    adminToken: BackOfficeJwt,
     agencyId: AgencyId,
     status: ActiveOrRejectedStatus,
   ): Promise<void> {
@@ -232,7 +232,7 @@ export class HttpAgencyGateway implements AgencyGateway {
   }
 
   public validateOrRejectAgency$(
-    adminToken: AdminToken,
+    adminToken: BackOfficeJwt,
     agencyId: AgencyId,
     status: ActiveOrRejectedStatus,
   ): Observable<void> {

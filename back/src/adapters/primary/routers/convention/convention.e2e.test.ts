@@ -1,5 +1,5 @@
 import {
-  AdminToken,
+  BackOfficeJwt,
   ConventionDto,
   ConventionDtoBuilder,
   conventionsRoute,
@@ -11,12 +11,12 @@ import {
   updateConventionStatusRoute,
 } from "shared";
 import { SuperTest, Test } from "supertest";
+import { GenerateConventionJwt } from "../../../../domain/auth/jwt";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import {
   buildTestApp,
   InMemoryGateways,
 } from "../../../../_testBuilders/buildTestApp";
-import { GenerateMagicLinkJwt } from "../../../../domain/auth/jwt";
 import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
 import {
   TEST_AGENCY_DEPARTMENT,
@@ -26,11 +26,11 @@ import { AppConfig } from "../../config/appConfig";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 let request: SuperTest<Test>;
-let generateMagicLinkJwt: GenerateMagicLinkJwt;
+let generateConventionJwt: GenerateConventionJwt;
 let inMemoryUow: InMemoryUnitOfWork;
 let eventCrawler: BasicEventCrawler;
 let gateways: InMemoryGateways;
-let adminToken: AdminToken;
+let adminToken: BackOfficeJwt;
 
 const convention = new ConventionDtoBuilder()
   .withStatus("IN_REVIEW")
@@ -43,7 +43,7 @@ const initializeSystemUnderTest = async (
   config: AppConfig,
   { withImmersionStored }: { withImmersionStored: boolean },
 ) => {
-  ({ eventCrawler, gateways, request, generateMagicLinkJwt, inMemoryUow } =
+  ({ eventCrawler, gateways, request, generateConventionJwt, inMemoryUow } =
     await buildTestApp(config));
 
   if (withImmersionStored) {
@@ -122,9 +122,9 @@ describe("convention e2e", () => {
             emailHash: stringToMd5(convention.signatories.beneficiary.email),
             iat: Math.round(now.getTime() / 1000),
             exp: Math.round(now.getTime() / 1000) + 31 * 24 * 3600,
-            version: currentJwtVersions.application,
+            version: currentJwtVersions.convention,
           };
-          const jwt = generateMagicLinkJwt(payload);
+          const jwt = generateConventionJwt(payload);
 
           // GETting the created application succeeds.
           await request
@@ -146,7 +146,7 @@ describe("convention e2e", () => {
             now,
             exp: Math.round(now.getTime() / 1000) - 2 * 24 * 3600,
           });
-          const jwt = generateMagicLinkJwt(payload);
+          const jwt = generateConventionJwt(payload);
 
           // GETting the created application 403's and sets needsNewMagicLink flag to inform the front end to go to the link renewal page.
           await request
@@ -177,7 +177,7 @@ describe("convention e2e", () => {
           .withStatus("READY_TO_SIGN")
           .build();
 
-        const jwt = generateMagicLinkJwt(
+        const jwt = generateConventionJwt(
           createConventionMagicLinkPayload({
             id: convention.id,
             role: "beneficiary",
@@ -207,7 +207,7 @@ describe("convention e2e", () => {
 
       it("Fetching unknown application IDs fails with 404 Not Found", async () => {
         const unknownId = "add5c20e-6dd2-45af-affe-927358005251";
-        const jwt = generateMagicLinkJwt(
+        const jwt = generateConventionJwt(
           createConventionMagicLinkPayload({
             id: unknownId,
             role: "beneficiary",
@@ -234,7 +234,7 @@ describe("convention e2e", () => {
         const { externalId, ...createConventionParams } =
           conventionWithUnknownId;
 
-        const jwt = generateMagicLinkJwt(
+        const jwt = generateConventionJwt(
           createConventionMagicLinkPayload({
             id: unknownId,
             role: "beneficiary",
@@ -281,7 +281,7 @@ describe("convention e2e", () => {
 
     it("Succeeds for rejected application and notifies Pole Emploi", async () => {
       // A counsellor rejects the application.
-      const counsellorJwt = generateMagicLinkJwt(
+      const counsellorJwt = generateConventionJwt(
         createConventionMagicLinkPayload({
           id: conventionId,
           role: "counsellor",
@@ -311,7 +311,7 @@ describe("convention e2e", () => {
 
     it("Returns error 403 for unauthorized requests", async () => {
       // A tutor tries to validate the application, but fails.
-      const tutorJwt = generateMagicLinkJwt(
+      const tutorJwt = generateConventionJwt(
         createConventionMagicLinkPayload({
           id: conventionId,
           role: "establishment",
@@ -327,7 +327,7 @@ describe("convention e2e", () => {
     });
 
     it("Returns error 404 for unknown application ids", async () => {
-      const counsellorJwt = generateMagicLinkJwt(
+      const counsellorJwt = generateConventionJwt(
         createConventionMagicLinkPayload({
           id: "unknown_application_id",
           role: "counsellor",

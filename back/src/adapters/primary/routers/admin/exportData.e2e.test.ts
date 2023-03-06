@@ -1,10 +1,10 @@
-import { AdminToken, ExportDataDto, exportRoute } from "shared";
+import { BackOfficeJwt, ExportDataDto, exportRoute } from "shared";
 import { SuperTest, Test } from "supertest";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { AppConfig } from "../../config/appConfig";
 
 describe("/export", () => {
-  let adminToken: AdminToken;
+  let adminToken: BackOfficeJwt;
   let request: SuperTest<Test>;
   let appConfig: AppConfig;
 

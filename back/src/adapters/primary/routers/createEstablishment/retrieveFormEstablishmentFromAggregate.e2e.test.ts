@@ -27,7 +27,8 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
   });
   it("Retrieves form establishment from aggregates when exists and authenticated", async () => {
     // Prepare
-    const { request, generateMagicLinkJwt, inMemoryUow } = await buildTestApp();
+    const { request, generateEditEstablishmentJwt, inMemoryUow } =
+      await buildTestApp();
     const siret = TEST_ESTABLISHMENT1_SIRET;
     await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
       [
@@ -44,7 +45,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
     );
 
     // Act
-    const validJwt = generateMagicLinkJwt(
+    const validJwt = generateEditEstablishmentJwt(
       createEstablishmentMagicLinkPayload({
         siret,
         durationDays: 1,

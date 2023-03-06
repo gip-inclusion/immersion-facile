@@ -1,7 +1,7 @@
 import { from, Observable, Subject } from "rxjs";
 import {
   AbsoluteUrl,
-  AdminToken,
+  BackOfficeJwt,
   AgencyOption,
   ConventionDto,
   ConventionDtoBuilder,
@@ -141,7 +141,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
   }
 
   public async generateMagicLink(
-    _: AdminToken,
+    _: BackOfficeJwt,
     _convention: ConventionId,
     role: Role,
   ): Promise<string> {

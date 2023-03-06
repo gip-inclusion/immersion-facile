@@ -6,7 +6,7 @@ import {
   frontRoutes,
   Role,
 } from "shared";
-import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
+import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import {
@@ -25,7 +25,7 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly emailGateway: EmailGateway,
-    private readonly generateMagicLinkFn: GenerateConventionMagicLink,
+    private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     private readonly timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
@@ -100,11 +100,11 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
             demandeId: convention.id,
             firstName: convention.signatories.beneficiary.firstName,
             lastName: convention.signatories.beneficiary.lastName,
-            magicLink: this.generateMagicLinkFn({
+            magicLink: this.generateConventionMagicLinkUrl({
               ...magicLinkCommonFields,
               targetRoute: frontRoutes.manageConvention,
             }),
-            conventionStatusLink: this.generateMagicLinkFn({
+            conventionStatusLink: this.generateConventionMagicLinkUrl({
               ...magicLinkCommonFields,
               targetRoute: frontRoutes.conventionStatusDashboard,
             }),

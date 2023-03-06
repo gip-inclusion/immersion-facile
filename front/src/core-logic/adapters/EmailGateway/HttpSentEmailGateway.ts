@@ -1,13 +1,18 @@
 import { AxiosInstance } from "axios";
 import { from, map, Observable } from "rxjs";
-import { AdminToken, emailRoute, EmailSentDto, emailsSentSchema } from "shared";
+import {
+  BackOfficeJwt,
+  emailRoute,
+  EmailSentDto,
+  emailsSentSchema,
+} from "shared";
 import { SentEmailGateway } from "src/core-logic/ports/SentEmailGateway";
 
 export class HttpSentEmailGateway implements SentEmailGateway {
   constructor(private readonly httpClient: AxiosInstance) {}
 
   // TODO Mieux identifier l'admin
-  public getLatest(adminToken: AdminToken): Observable<EmailSentDto[]> {
+  public getLatest(adminToken: BackOfficeJwt): Observable<EmailSentDto[]> {
     return from(
       this.httpClient.get<unknown>(`/admin/${emailRoute}`, {
         //this.httpClient.get<EmailSentDto[]>(`/admin/${emailRoute}`, {

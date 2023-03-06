@@ -7,17 +7,10 @@ import {
   Role,
 } from "shared";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
-import {
-  GenerateMagicLinkJwt,
-  makeGenerateJwtES256,
-} from "../../../domain/auth/jwt";
-import { GenerateMagicLink } from "../../../domain/convention/useCases/GenerateMagicLink";
+import { makeGenerateJwtES256 } from "../../auth/jwt";
 import { AppConfigBuilder } from "../../../_testBuilders/AppConfigBuilder";
-
-const generateJwtFn: GenerateMagicLinkJwt = (payload) => {
-  const { applicationId, role, iat } = payload as ConventionMagicLinkPayload;
-  return applicationId + ";" + role + ";" + iat;
-};
+import { GenerateConventionMagicLinkUseCase } from "./GenerateConventionMagicLinkUseCase";
+import { generateConventionJwtTestFn } from "../../../_testBuilders/jwtTestHelper";
 
 describe("Generate magic links", () => {
   describe("Magic link generator use case", () => {
@@ -26,8 +19,8 @@ describe("Generate magic links", () => {
       const role = "validator" as Role;
       const email = "foo@bar.com";
       const timeGateway = new CustomTimeGateway();
-      const result = await new GenerateMagicLink(
-        generateJwtFn,
+      const result = await new GenerateConventionMagicLinkUseCase(
+        generateConventionJwtTestFn,
         timeGateway,
       ).execute({
         applicationId: id,
@@ -36,7 +29,7 @@ describe("Generate magic links", () => {
       });
 
       expect(result).toEqual({
-        jwt: generateJwtFn(
+        jwt: generateConventionJwtTestFn(
           createConventionMagicLinkPayload({
             id,
             role,
@@ -52,8 +45,11 @@ describe("Generate magic links", () => {
         role: "validator",
         expired: false,
       };
-      const result = await new GenerateMagicLink(
-        makeGenerateJwtES256(new AppConfigBuilder({}).build().apiJwtPrivateKey),
+      const result = await new GenerateConventionMagicLinkUseCase(
+        makeGenerateJwtES256<"convention">(
+          new AppConfigBuilder({}).build().apiJwtPrivateKey,
+          undefined,
+        ),
         new CustomTimeGateway(new Date("2022-12-20T00:00:00.000Z")),
       ).execute(request);
 

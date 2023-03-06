@@ -5,7 +5,7 @@ import {
   CreateConventionMagicLinkPayloadProperties,
   frontRoutes,
 } from "shared";
-import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
+import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
 import { createLogger } from "../../../../utils/logger";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import {
@@ -21,7 +21,7 @@ export class ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignatu
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly emailGateway: EmailGateway,
-    private readonly generateMagicLinkFn: GenerateConventionMagicLink,
+    private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     private readonly timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
@@ -74,11 +74,11 @@ export class ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignatu
             beneficiaryRepresentativeName:
               beneficiaryRepresentative &&
               `${beneficiaryRepresentative.firstName} ${beneficiaryRepresentative.lastName}`,
-            magicLink: this.generateMagicLinkFn({
+            magicLink: this.generateConventionMagicLinkUrl({
               ...conventionMagicLinkPayload,
               targetRoute: frontRoutes.conventionToSign,
             }),
-            conventionStatusLink: this.generateMagicLinkFn({
+            conventionStatusLink: this.generateConventionMagicLinkUrl({
               ...conventionMagicLinkPayload,
               targetRoute: frontRoutes.conventionStatusDashboard,
             }),

@@ -4,7 +4,7 @@ import { fromPromise } from "rxjs/internal/observable/innerFrom";
 import {
   AbsoluteUrl,
   absoluteUrlSchema,
-  AdminToken,
+  BackOfficeJwt,
   ConventionDto,
   ConventionId,
   ConventionReadDto,
@@ -136,7 +136,7 @@ export class HttpConventionGateway implements ConventionGateway {
 
   // TODO Mieux identifier l'admin
   public async generateMagicLink(
-    adminToken: AdminToken,
+    adminToken: BackOfficeJwt,
     applicationId: ConventionId,
     role: Role,
     expired: boolean,

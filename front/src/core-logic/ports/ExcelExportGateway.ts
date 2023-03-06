@@ -1,5 +1,5 @@
-import { AdminToken, ExportDataDto } from "shared";
+import { BackOfficeJwt, ExportDataDto } from "shared";
 
 export interface ExcelExportGateway {
-  exportData: (adminToken: AdminToken, exportDataDto: ExportDataDto) => void;
+  exportData: (adminToken: BackOfficeJwt, exportDataDto: ExportDataDto) => void;
 }

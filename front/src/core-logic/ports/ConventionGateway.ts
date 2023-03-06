@@ -1,7 +1,7 @@
 import { Observable } from "rxjs";
 import {
   AbsoluteUrl,
-  AdminToken,
+  BackOfficeJwt,
   ConventionDto,
   ConventionId,
   ConventionReadDto,
@@ -27,7 +27,7 @@ export interface ConventionGateway {
   signConvention$(jwt: string): Observable<void>;
 
   generateMagicLink(
-    adminToken: AdminToken,
+    adminToken: BackOfficeJwt,
     applicationId: ConventionId,
     role: Role,
     expired: boolean,

@@ -7,7 +7,7 @@ import {
   SignatoryRole,
   TemplatedEmail,
 } from "shared";
-import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
+import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import {
   UnitOfWork,
@@ -29,7 +29,7 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly emailGateway: EmailGateway,
-    private readonly generateMagicLink: GenerateConventionMagicLink,
+    private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     private readonly timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
@@ -92,7 +92,7 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
     lastSignee: { signedAt: string; email: string; role: SignatoryRole },
     agency: AgencyDto,
   ): TemplatedEmail {
-    const conventionStatusLink = this.generateMagicLink({
+    const conventionStatusLink = this.generateConventionMagicLinkUrl({
       targetRoute: frontRoutes.conventionStatusDashboard,
       id: convention.id,
       role: lastSignee.role,

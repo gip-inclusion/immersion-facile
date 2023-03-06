@@ -17,8 +17,8 @@ import {
   NotifyLastSigneeThatConventionHasBeenSigned,
 } from "./NotifyLastSigneeThatConventionHasBeenSigned";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/fakeGenerateMagicLinkUrlFn";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
+import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
 
 describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
   let conventionSignedByNoOne: ConventionDto;

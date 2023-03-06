@@ -5,7 +5,8 @@ import PinoHttp from "pino-http";
 import {
   GenerateApiConsumerJtw,
   GenerateAuthenticatedUserJwt,
-  GenerateMagicLinkJwt,
+  GenerateConventionJwt,
+  GenerateEditFormEstablishmentJwt,
 } from "../../domain/auth/jwt";
 import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
 import { UuidGenerator } from "../../domain/core/ports/UuidGenerator";
@@ -45,7 +46,8 @@ export const createApp = async (
   gateways: Gateways;
   eventCrawler: EventCrawler;
   generateApiJwt: GenerateApiConsumerJtw;
-  generateMagicLinkJwt: GenerateMagicLinkJwt;
+  generateConventionJwt: GenerateConventionJwt;
+  generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt;
   generateAuthenticatedUserJwt: GenerateAuthenticatedUserJwt;
   uuidGenerator: UuidGenerator;
   inMemoryUow?: InMemoryUnitOfWork;
@@ -95,7 +97,8 @@ export const createApp = async (
     gateways: deps.gateways,
     eventCrawler: deps.eventCrawler,
     generateApiJwt: deps.generateApiJwt,
-    generateMagicLinkJwt: deps.generateMagicLinkJwt,
+    generateConventionJwt: deps.generateConventionJwt,
+    generateEditEstablishmentJwt: deps.generateEditEstablishmentJwt,
     generateAuthenticatedUserJwt: deps.generateAuthenticatedUserToken,
     uuidGenerator: deps.uuidGenerator,
     inMemoryUow: deps.inMemoryUow,

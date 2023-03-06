@@ -2,7 +2,7 @@
 import { values } from "ramda";
 import { from, Observable, Subject } from "rxjs";
 import {
-  AdminToken,
+  BackOfficeJwt,
   AgencyDto,
   AgencyId,
   AgencyOption,
@@ -27,7 +27,7 @@ export class TestAgencyGateway implements AgencyGateway {
 
   public updateAgency$(
     _agencyDto: AgencyDto,
-    _adminToken: AdminToken,
+    _adminToken: BackOfficeJwt,
   ): Observable<void> {
     return this.updateAgencyResponse$;
   }
@@ -40,7 +40,7 @@ export class TestAgencyGateway implements AgencyGateway {
 
   getAgencyAdminById$(
     _agencyId: AgencyId,
-    _adminToken: AdminToken,
+    _adminToken: BackOfficeJwt,
   ): Observable<AgencyDto | undefined> {
     return this.fetchedAgency$;
   }
@@ -85,7 +85,7 @@ export class TestAgencyGateway implements AgencyGateway {
   }
 
   listAgenciesNeedingReview$(
-    _adminToken: AdminToken,
+    _adminToken: BackOfficeJwt,
   ): Observable<AgencyOption[]> {
     return this.agencies$;
   }
@@ -95,13 +95,16 @@ export class TestAgencyGateway implements AgencyGateway {
   }
 
   async validateOrRejectAgency(
-    _: AdminToken,
+    _: BackOfficeJwt,
     agencyId: AgencyId,
   ): Promise<void> {
     this._agencies[agencyId].status = "active";
   }
 
-  validateOrRejectAgency$(_: AdminToken, agencyId: AgencyId): Observable<void> {
+  validateOrRejectAgency$(
+    _: BackOfficeJwt,
+    agencyId: AgencyId,
+  ): Observable<void> {
     return from(this.validateOrRejectAgency(_, agencyId));
   }
 

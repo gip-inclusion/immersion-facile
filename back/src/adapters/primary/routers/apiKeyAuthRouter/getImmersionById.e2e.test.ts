@@ -40,7 +40,10 @@ describe("Route to get immersion offer by id", () => {
       .withAuthorizedApiKeyIds([validAuthorizedApiKeyId])
       .build();
     ({ request, inMemoryUow } = await buildTestApp(config));
-    generateApiJwt = makeGenerateJwtES256(config.apiJwtPrivateKey);
+    generateApiJwt = makeGenerateJwtES256<"apiConsumer">(
+      config.apiJwtPrivateKey,
+      3600,
+    );
 
     await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregates(
       [

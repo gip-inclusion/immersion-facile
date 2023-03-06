@@ -1,9 +1,4 @@
-import {
-  ConventionDtoBuilder,
-  ConventionId,
-  expectToEqual,
-  Role,
-} from "shared";
+import { ConventionDtoBuilder, expectToEqual } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { UuidV4Generator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
@@ -12,6 +7,7 @@ import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPer
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { DomainEvent } from "../../../domain/core/eventBus/events";
 import { SendEmailsWithAssessmentCreationLink } from "../../../domain/immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
+import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/jwtTestHelper";
 
 const prepareUseCase = () => {
   const uow = createInMemoryUow();
@@ -27,22 +23,12 @@ const prepareUseCase = () => {
     uuidGenerator,
   });
 
-  const generateConventionMagicLink = ({
-    id,
-    targetRoute,
-  }: {
-    id: ConventionId;
-    role: Role;
-    targetRoute: string;
-    email: string;
-  }) => `www.immersion-facile.fr/${targetRoute}?jwt=jwtOfImmersion[${id}]`;
-
   const sendEmailWithAssessmentCreationLink =
     new SendEmailsWithAssessmentCreationLink(
       new InMemoryUowPerformer(uow),
       emailGateway,
       timeGateway,
-      generateConventionMagicLink,
+      fakeGenerateMagicLinkUrlFn,
       createNewEvent,
     );
 
@@ -103,7 +89,7 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
         ],
         params: {
           internshipKind: immersionApplicationEndingTomorrow.internshipKind,
-          immersionAssessmentCreationLink: `www.immersion-facile.fr/bilan-immersion?jwt=jwtOfImmersion[immersion-ending-tommorow-id]`,
+          immersionAssessmentCreationLink: `http://fake-magic-link/immersion-ending-tommorow-id/bilan-immersion/establishment/2021-05-15T08:00:00.000Z/establishment@example.com`,
           establishmentTutorName: "Tom Cruise",
           beneficiaryFirstName:
             immersionApplicationEndingTomorrow.signatories.beneficiary

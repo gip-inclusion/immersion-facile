@@ -1,5 +1,5 @@
 import { ConventionDto, conventionSchema, frontRoutes } from "shared";
-import { GenerateConventionMagicLink } from "../../../adapters/primary/config/createGenerateConventionMagicLink";
+import { GenerateConventionMagicLinkUrl } from "../../../adapters/primary/config/magicLinkUrl";
 import { EmailGateway } from "../../convention/ports/EmailGateway";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
@@ -9,7 +9,7 @@ export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends Transact
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly emailGateway: EmailGateway,
-    private readonly generateMagicLinkFn: GenerateConventionMagicLink,
+    private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     private readonly timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
@@ -46,7 +46,7 @@ export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends Transact
           beneficiaryLastName: convention.signatories.beneficiary.lastName,
           beneficiaryEmail: convention.signatories.beneficiary.email,
           immersionAddress: conventionFromEvent.immersionAddress,
-          magicLink: this.generateMagicLinkFn({
+          magicLink: this.generateConventionMagicLinkUrl({
             id: conventionFromEvent.id,
             role: "validator",
             targetRoute: frontRoutes.manageConvention,

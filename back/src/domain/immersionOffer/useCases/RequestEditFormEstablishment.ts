@@ -5,7 +5,7 @@ import {
   siretSchema,
 } from "shared";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
-import { GenerateEditFormEstablishmentUrl } from "../../auth/jwt";
+import { GenerateEditFormEstablishmentJwt } from "../../auth/jwt";
 import { EmailGateway } from "../../convention/ports/EmailGateway";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { TimeGateway } from "../../core/ports/TimeGateway";
@@ -19,7 +19,7 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto>
     uowPerformer: UnitOfWorkPerformer,
     private emailGateway: EmailGateway,
     private timeGateway: TimeGateway,
-    private generateEditFormEstablishmentUrl: GenerateEditFormEstablishmentUrl,
+    private generateEditFormEstablishmentUrl: GenerateEditFormEstablishmentJwt,
     private createNewEvent: CreateNewEvent,
   ) {
     super(uowPerformer);

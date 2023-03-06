@@ -1,7 +1,7 @@
 import { Subject } from "rxjs";
 import {
   AbsoluteUrl,
-  AdminToken,
+  BackOfficeJwt,
   FeatureFlags,
   SetFeatureFlagParams,
 } from "shared";
@@ -9,7 +9,10 @@ import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 
 export class TestTechnicalGateway implements TechnicalGateway {
   getAllFeatureFlags = () => this.featureFlags$;
-  setFeatureFlag = (params: SetFeatureFlagParams, _adminToken: AdminToken) => {
+  setFeatureFlag = (
+    params: SetFeatureFlagParams,
+    _adminToken: BackOfficeJwt,
+  ) => {
     this.setFeatureFlagLastCalledWith = params;
     return this.setFeatureFlagResponse$;
   };
