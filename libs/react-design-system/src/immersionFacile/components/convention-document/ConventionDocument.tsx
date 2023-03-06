@@ -9,9 +9,11 @@ const componentName = "im-convention-document";
 export const ConventionDocument = ({
   children,
   title,
+  logos,
 }: {
   children: React.ReactNode;
   title: React.ReactNode;
+  logos: React.ReactNode;
 }) => {
   const { cx } = useStyles();
   return (
@@ -22,12 +24,17 @@ export const ConventionDocument = ({
         </Button>
       </div>
       <article className={cx(`${componentName}__content`)}>
-        <hr className={fr.cx("fr-hr", "fr-mb-4w")} />
-        <h1 className={cx(fr.cx("fr-mb-8w"), `${componentName}__title`)}>
-          {title}
-        </h1>
-        <hr className={fr.cx("fr-hr", "fr-mb-4w")} />
-        {children}
+        <header>
+          <div className={cx(`${componentName}__logos-wrapper`)}>
+            <div>{logos}</div>
+          </div>
+          <hr className={fr.cx("fr-hr", "fr-mb-4w")} />
+          <h1 className={cx(fr.cx("fr-mb-8w"), `${componentName}__title`)}>
+            {title}
+          </h1>
+          <hr className={fr.cx("fr-hr", "fr-mb-4w")} />
+        </header>
+        <main>{children}</main>
       </article>
     </section>
   );

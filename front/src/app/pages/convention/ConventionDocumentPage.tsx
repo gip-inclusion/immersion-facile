@@ -16,6 +16,8 @@ import { useDispatch } from "react-redux";
 import { agencyInfoSlice } from "src/core-logic/domain/agencyInfo/agencyInfo.slice";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { agencyInfoSelectors } from "src/core-logic/domain/agencyInfo/agencyInfo.selectors";
+import logoRf from "/img/logo-rf.svg";
+import logoIf from "/img/logo-immersion-facile.svg";
 
 type ConventionDocumentPageProps = {
   route: Route<typeof routes.conventionDocument>;
@@ -55,11 +57,15 @@ export const ConventionDocumentPage = ({
     beneficiaryRepresentative,
   } = convention.signatories;
   const { internshipKind } = convention;
-
+  const logos = [
+    <img src={logoRf} alt="Logo RF" />,
+    <img src={agencyInfo?.logoUrl ? agencyInfo.logoUrl : logoIf} alt="" />,
+  ];
   return (
     <MainWrapper layout="default" vSpacing={8}>
       {canShowConvention && (
         <ConventionDocument
+          logos={logos}
           title={
             internshipKind === "immersion"
               ? "Convention relative à la mise en œuvre d’une période de mise en situation en milieu professionnel"
@@ -210,6 +216,12 @@ export const ConventionDocumentPage = ({
               : "du mini-stage"}
             , rappelées ci-après.
           </p>
+          {agencyInfo?.logoUrl && (
+            <img
+              src={agencyInfo.logoUrl}
+              alt={`Logo de ${convention.agencyName}`}
+            />
+          )}
           <p>{convention.agencyName}</p>
           {displayEmergencyContactInfos({
             beneficiary: convention.signatories.beneficiary,
