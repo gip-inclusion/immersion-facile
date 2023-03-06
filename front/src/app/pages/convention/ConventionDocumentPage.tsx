@@ -51,11 +51,13 @@ export const ConventionDocumentPage = ({
     beneficiaryRepresentative,
   } = convention.signatories;
   const { internshipKind } = convention;
+
   const agencyAddress = {
     streetNumberAndAddress: "",
     postcode: "",
     city: "",
   };
+
   return (
     <MainWrapper layout="default" vSpacing={8}>
       {canShowConvention && (
