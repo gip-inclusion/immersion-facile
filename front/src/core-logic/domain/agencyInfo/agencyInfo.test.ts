@@ -1,4 +1,4 @@
-import { AgencyDtoBuilder } from "src/../../shared/src";
+import { AgencyDtoBuilder } from "shared";
 import {
   createTestStore,
   TestDependencies,

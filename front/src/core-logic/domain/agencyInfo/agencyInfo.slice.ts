@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AgencyId, AgencyPublicDisplayDto } from "src/../../shared/src";
+import { AgencyId, AgencyPublicDisplayDto } from "shared";
 import { SubmitFeedBack } from "../SubmitFeedback";
 
 export type AgencyInfoState = {

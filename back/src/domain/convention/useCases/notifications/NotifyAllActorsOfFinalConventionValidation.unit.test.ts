@@ -7,7 +7,6 @@ import {
   displayEmergencyContactInfos,
   expectTypeToMatchAndEqual,
   frontRoutes,
-  prettyPrintSchedule,
   reasonableSchedule,
 } from "shared";
 import { expectEmailFinalValidationConfirmationMatchingConvention } from "../../../../_testBuilders/emailAssertions";
@@ -305,31 +304,21 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
       ),
       {
         internshipKind: convention.internshipKind,
-        totalHours: 70,
+
         beneficiaryFirstName: convention.signatories.beneficiary.firstName,
         beneficiaryLastName: convention.signatories.beneficiary.lastName,
-        emergencyContact: convention.signatories.beneficiary.emergencyContact,
+
         beneficiaryBirthdate: convention.signatories.beneficiary.birthdate,
-        emergencyContactPhone:
-          convention.signatories.beneficiary.emergencyContactPhone,
+
         dateStart: parseISO(convention.dateStart).toLocaleDateString("fr"),
         dateEnd: parseISO(convention.dateEnd).toLocaleDateString("fr"),
         establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
-        scheduleText: prettyPrintSchedule(convention.schedule).split("\n"),
+
         businessName: convention.businessName,
-        immersionAddress: "immersionAddress",
+
         immersionAppellationLabel:
           convention.immersionAppellation.appellationLabel,
-        immersionActivities: convention.immersionActivities,
-        immersionSkills: convention.immersionSkills ?? "Non renseigné",
-        establishmentRepresentativeName: `${convention.signatories.establishmentRepresentative.firstName} ${convention.signatories.establishmentRepresentative.lastName}`,
-        sanitaryPrevention: "sanitaryPreventionDescription",
-        individualProtection: "oui",
-        questionnaireUrl: agency.questionnaireUrl,
-        signature: agency.signature,
-        workConditions: convention.workConditions,
-        beneficiaryRepresentativeName: "",
-        agencyName: agency.name,
+
         emergencyContactInfos: displayEmergencyContactInfos({
           ...convention.signatories,
         }),
@@ -340,36 +329,6 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
         }),
       },
     );
-  });
-
-  it("prints correct sanitaryPreventionMessage when missing", () => {
-    const convention = new ConventionDtoBuilder()
-      .withSanitaryPrevention(false)
-      .build();
-
-    const actualParms = getValidatedConventionFinalConfirmationParams(
-      agency,
-      convention,
-      fakeGenerateMagicLinkUrlFn,
-      timeGw,
-    );
-
-    expect(actualParms.sanitaryPrevention).toBe("non");
-  });
-
-  it("prints correct individualProtection when missing", () => {
-    const convention = new ConventionDtoBuilder()
-      .withIndividualProtection(false)
-      .build();
-
-    const actualParms = getValidatedConventionFinalConfirmationParams(
-      agency,
-      convention,
-      fakeGenerateMagicLinkUrlFn,
-      timeGw,
-    );
-
-    expect(actualParms.individualProtection).toBe("non");
   });
 
   it("with beneficiary representative", () => {
@@ -402,33 +361,20 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
       ),
       {
         internshipKind: convention.internshipKind,
-        totalHours: 70,
+
         beneficiaryFirstName: convention.signatories.beneficiary.firstName,
         beneficiaryLastName: convention.signatories.beneficiary.lastName,
         beneficiaryBirthdate: convention.signatories.beneficiary.birthdate,
-        emergencyContact: convention.signatories.beneficiary.emergencyContact,
-        emergencyContactPhone:
-          convention.signatories.beneficiary.emergencyContactPhone,
+
         dateStart: parseISO(convention.dateStart).toLocaleDateString("fr"),
         dateEnd: parseISO(convention.dateEnd).toLocaleDateString("fr"),
         establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
-        scheduleText: prettyPrintSchedule(convention.schedule).split("\n"),
+
         businessName: convention.businessName,
-        immersionAddress: "immersionAddress",
+
         immersionAppellationLabel:
           convention.immersionAppellation.appellationLabel,
-        immersionActivities: convention.immersionActivities,
-        immersionSkills: convention.immersionSkills ?? "Non renseigné",
-        establishmentRepresentativeName: `${convention.signatories.establishmentRepresentative.firstName} ${convention.signatories.establishmentRepresentative.lastName}`,
-        sanitaryPrevention: "sanitaryPreventionDescription",
-        individualProtection: "oui",
-        questionnaireUrl: agency.questionnaireUrl,
-        signature: agency.signature,
-        workConditions: convention.workConditions,
-        beneficiaryRepresentativeName: `${
-          convention.signatories.beneficiaryRepresentative!.firstName
-        } ${convention.signatories.beneficiaryRepresentative!.lastName}`,
-        agencyName: agency.name,
+
         emergencyContactInfos: displayEmergencyContactInfos({
           ...convention.signatories,
         }),

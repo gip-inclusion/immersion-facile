@@ -150,10 +150,14 @@ export const ConventionDocumentPage = ({
             <strong>{convention.immersionAppellation.appellationLabel}</strong>.
           </p>
           <p>Ces activités sont : {convention.immersionActivities}.</p>
-          <p>
-            Les compétences et savoir-être observés sont :{" "}
-            <strong>{convention.immersionSkills}</strong>.
-          </p>
+
+          {convention.immersionSkills && (
+            <p>
+              Les compétences et savoir-être observés sont :{" "}
+              <strong>{convention.immersionSkills}</strong>.
+            </p>
+          )}
+
           <p>L’objet de l’immersion est : {convention.immersionObjective}</p>
           <h3 className={fr.cx("fr-h5")}>
             Conditions de mise en œuvre et d’évaluation
