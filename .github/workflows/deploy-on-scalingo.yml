@@ -1,0 +1,11 @@
+name: "Deploy on scalingo"
+
+on:
+  workflow_dispatch:
+
+job:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Deploy on scalingo"
+        run: echo "this is working"
