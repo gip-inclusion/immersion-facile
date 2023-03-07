@@ -1,12 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import React, { useEffect } from "react";
 import { Loader, MainWrapper } from "react-design-system";
-import {
-  displayEmergencyContactInfos,
-  isStringDate,
-  prettyPrintSchedule,
-  toDisplayedDate,
-} from "shared";
+import { isStringDate, prettyPrintSchedule, toDisplayedDate } from "shared";
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import { routes } from "src/app/routes/routes";
@@ -18,6 +13,11 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { agencyInfoSelectors } from "src/core-logic/domain/agencyInfo/agencyInfo.selectors";
 import logoRf from "/img/logo-rf.svg";
 import logoIf from "/img/logo-if.svg";
+
+const throwOnMissingSignDate = (signedAt: string | undefined): string => {
+  if (!signedAt) throw new Error("Signature date is missing.");
+  return signedAt;
+};
 
 type ConventionDocumentPageProps = {
   route: Route<typeof routes.conventionDocument>;
@@ -61,6 +61,7 @@ export const ConventionDocumentPage = ({
     <img src={logoRf} alt="Logo RF" />,
     <img src={agencyInfo?.logoUrl ? agencyInfo.logoUrl : logoIf} alt="" />,
   ];
+
   return (
     <MainWrapper layout="default" vSpacing={8}>
       {canShowConvention && (
@@ -72,13 +73,15 @@ export const ConventionDocumentPage = ({
               : "Convention de mini-stage"
           }
         >
-          <p>Cette convention est établie entre :</p>
+          <h2 className={fr.cx("fr-h4")}>
+            Cette convention est établie entre :
+          </h2>
           <ul>
             <li>
               <strong>
                 {beneficiary.firstName} {beneficiary.lastName}
               </strong>{" "}
-              né•e le{" "}
+              né(e) le{" "}
               <strong>
                 {isStringDate(beneficiary.birthdate)
                   ? toDisplayedDate(new Date(beneficiary.birthdate))
@@ -94,7 +97,7 @@ export const ConventionDocumentPage = ({
                   {beneficiaryRepresentative.lastName}
                 </strong>{" "}
                 en qualité de{" "}
-                <strong>représentant•e légal•e du bénéficiaire</strong> (tel:{" "}
+                <strong>représentant(e) légal(e) du bénéficiaire</strong> (tel:{" "}
                 {beneficiaryRepresentative.phone})
               </li>
             )}
@@ -106,7 +109,7 @@ export const ConventionDocumentPage = ({
                 </strong>{" "}
                 en qualité de{" "}
                 <strong>
-                  représentant•e de l'entreprise employant actuellement le
+                  représentant(e) de l'entreprise employant actuellement le
                   bénéficiaire
                 </strong>{" "}
                 (tel: {beneficiaryCurrentEmployer.phone})
@@ -118,7 +121,7 @@ export const ConventionDocumentPage = ({
                   {establishmentRepresentative.firstName}{" "}
                   {establishmentRepresentative.lastName}
                 </strong>{" "}
-                en qualité de <strong>représentant•e de l'entreprise</strong>{" "}
+                en qualité de <strong>représentant de l'entreprise</strong>{" "}
                 {convention.businessName} (tel:{" "}
                 {establishmentRepresentative.phone})
               </li>
@@ -133,17 +136,43 @@ export const ConventionDocumentPage = ({
               )}
             </li>
           </ul>
+          <h2 className={fr.cx("fr-h4", "fr-mt-4w")}>
+            Dispositions relatives aux conditions de réalisation{" "}
+            {internshipKind === "immersion"
+              ? "de l’immersion"
+              : "du mini-stage"}
+          </h2>
+          <h3 className={fr.cx("fr-h5")}>Activités confiées</h3>
           <p>
-            Toutes ces parties ont signé cette convention par le moyen d'une
-            signature électronique, dans le cadre d'une téléprocédure créée par
-            l'État.
+            {internshipKind === "immersion" ? "L'immersion" : "Le mini-stage"}{" "}
+            aura pour objectif de découvrir les activités nécessaires en lien
+            avec le métier de{" "}
+            <strong>{convention.immersionAppellation.appellationLabel}</strong>.
           </p>
+          <p>Ces activités sont : {convention.immersionActivities}.</p>
+          <p>
+            Les compétences et savoir-être observés sont :{" "}
+            <strong>{convention.immersionSkills}</strong>.
+          </p>
+          <p>L’objet de l’immersion est : {convention.immersionObjective}</p>
+          <h3 className={fr.cx("fr-h5")}>
+            Conditions de mise en œuvre et d’évaluation
+          </h3>
+          <h4 className={fr.cx("fr-h6")}>Lieu et dates</h4>
           <p>
             {internshipKind === "immersion"
               ? "Cette immersion"
               : "Ce mini-stage"}{" "}
             se déroulera au sein de <strong>{convention.businessName}</strong>,
-            à l'adresse suivante <strong>{convention.immersionAddress}</strong>.
+            (Siret n° :{" "}
+            <a
+              href={`https://annuaire-entreprises.data.gouv.fr/etablissement/${convention.siret}`}
+              target="_blank"
+            >
+              {convention.siret}
+            </a>
+            ) à l'adresse suivante{" "}
+            <strong>{convention.immersionAddress}</strong>.
           </p>
           <p className={fr.cx("fr-text--bold")}>
             {internshipKind === "immersion" ? "L'immersion" : "Le mini-stage"}{" "}
@@ -158,48 +187,53 @@ export const ConventionDocumentPage = ({
             seront :{" "}
             {prettyPrintSchedule(convention.schedule).split("\n").join(", ")}.
           </p>
+          <h4 className={fr.cx("fr-h6")}>
+            Conditions d'observation de l’activité
+          </h4>
+          {(convention.sanitaryPrevention ||
+            convention.individualProtection) && (
+            <>
+              <p>
+                Dans le cadre de{" "}
+                {internshipKind === "immersion"
+                  ? "cette immersion"
+                  : "ce mini-stage"}{" "}
+                :
+              </p>
+              <ul>
+                {convention.sanitaryPreventionDescription && (
+                  <li>
+                    des mesures de prévention sanitaire sont prévues :{" "}
+                    {convention.sanitaryPreventionDescription}
+                  </li>
+                )}
+                {convention.individualProtection && (
+                  <li>un équipement de protection est fourni</li>
+                )}
+              </ul>
+            </>
+          )}
+
+          {convention.workConditions && (
+            <p>
+              Les conditions particulières d'exercice du métier sont :{" "}
+              {convention.workConditions}
+            </p>
+          )}
+
+          <p className={fr.cx("fr-mt-2w")}>Encadrement :</p>
           <p>
-            {internshipKind === "immersion" ? "L'immersion" : "Le mini-stage"}{" "}
-            aura pour objectif de découvrir les activités nécessaires en lien
-            avec le métier de{" "}
-            <strong>{convention.immersionAppellation.appellationLabel}</strong>.
-          </p>
-          <p>Ces activités sont : {convention.immersionActivities}.</p>
-          <p>
-            Les compétences et savoir-être observés sont :{" "}
-            <strong>{convention.immersionSkills}</strong>.
-          </p>
-          <p>
-            {internshipKind === "immersion"
-              ? "Cette immersion"
-              : "Ce mini-stage"}{" "}
-            se déroulera dans les conditions réelles d'exercice de ce métier.
-          </p>
-          <p>
-            Encadrement :{" "}
             <strong>
-              {beneficiary.firstName} {beneficiary.lastName} sera encadré(e) par{" "}
-              {establishmentRepresentative.firstName}{" "}
-              {establishmentRepresentative.lastName}
+              {beneficiary.firstName} {beneficiary.lastName}
+            </strong>{" "}
+            sera encadré(e) par{" "}
+            <strong>
+              {convention.establishmentTutor.firstName}{" "}
+              {convention.establishmentTutor.lastName}
             </strong>
             .
           </p>
-          {convention.sanitaryPrevention && (
-            <p>
-              Dans le cadre de{" "}
-              {internshipKind === "immersion"
-                ? "cette immersion"
-                : "ce mini-stage"}
-              , des mesures de prévention sanitaire sont prévues :{" "}
-              {convention.sanitaryPreventionDescription}.
-            </p>
-          )}
-          {convention.individualProtection && (
-            <p>
-              un équipement de protection est fourni :{" "}
-              {convention.individualProtection}.
-            </p>
-          )}
+
           <p>
             {beneficiary.firstName} {beneficiary.lastName}
             {beneficiaryRepresentative && (
@@ -216,28 +250,95 @@ export const ConventionDocumentPage = ({
               : "du mini-stage"}
             , rappelées ci-après.
           </p>
-          {agencyInfo?.logoUrl && (
-            <img
-              src={agencyInfo.logoUrl}
-              alt={`Logo de ${convention.agencyName}`}
-            />
+
+          <h2 className={fr.cx("fr-h4")}>
+            Toutes les parties ci-dessous ont signé cette convention par le
+            moyen d'une signature électronique :
+          </h2>
+          <div className={fr.cx("fr-card", "fr-p-2w")}>
+            <ul>
+              <li>
+                ✅ Le bénéficiaire,{" "}
+                <strong>
+                  {beneficiary.firstName} {beneficiary.lastName}
+                </strong>{" "}
+                (signé le{" "}
+                {toDisplayedDate(
+                  new Date(throwOnMissingSignDate(beneficiary.signedAt)),
+                )}
+                )
+              </li>
+              {beneficiaryRepresentative && (
+                <li>
+                  ✅ Le représentant légal du bénéficiaire,{" "}
+                  <strong>
+                    {beneficiaryRepresentative.firstName}{" "}
+                    {beneficiaryRepresentative.lastName}
+                  </strong>
+                  (signé le{" "}
+                  {toDisplayedDate(
+                    new Date(
+                      throwOnMissingSignDate(
+                        beneficiaryRepresentative.signedAt,
+                      ),
+                    ),
+                  )}
+                  )
+                </li>
+              )}
+              {beneficiaryCurrentEmployer && (
+                <li>
+                  ✅ Le représentant de l'entreprise employant actuellement le
+                  bénéficiaire,{" "}
+                  <strong>
+                    {beneficiaryCurrentEmployer.firstName}{" "}
+                    {beneficiaryCurrentEmployer.lastName}
+                  </strong>
+                  (signé le{" "}
+                  {toDisplayedDate(
+                    new Date(
+                      throwOnMissingSignDate(
+                        beneficiaryCurrentEmployer.signedAt,
+                      ),
+                    ),
+                  )}
+                  )
+                </li>
+              )}
+              <li>
+                ✅ Le représentant de l'entreprise d'accueil,{" "}
+                <strong>
+                  {establishmentRepresentative.firstName}{" "}
+                  {establishmentRepresentative.lastName}
+                </strong>{" "}
+                (signé le{" "}
+                {toDisplayedDate(
+                  new Date(
+                    throwOnMissingSignDate(
+                      establishmentRepresentative.signedAt,
+                    ),
+                  ),
+                )}
+                )
+              </li>
+              <li>
+                ✅ L'agence prescriptrice{" "}
+                {internshipKind === "immersion"
+                  ? "de l'immersion"
+                  : "du mini-stage"}
+                , <strong>{convention.agencyName}</strong> (validé le{" "}
+                {toDisplayedDate(
+                  new Date(throwOnMissingSignDate(convention.dateValidation)),
+                )}
+                )
+              </li>
+            </ul>
+          </div>
+
+          {agencyInfo && (
+            <p className={fr.cx("fr-mt-4w")}>{agencyInfo.signature}</p>
           )}
-          <p>{convention.agencyName}</p>
-          {displayEmergencyContactInfos({
-            beneficiary: convention.signatories.beneficiary,
-            beneficiaryRepresentative:
-              convention.signatories.beneficiaryRepresentative,
-          }) && (
-            <p>
-              Si la situation l'impose, le contact d'urgence de{" "}
-              {beneficiary.firstName} {beneficiary.lastName} est :{" "}
-              {displayEmergencyContactInfos({
-                beneficiary: convention.signatories.beneficiary,
-                beneficiaryRepresentative:
-                  convention.signatories.beneficiaryRepresentative,
-              })}
-            </p>
-          )}
+
           <hr className={fr.cx("fr-hr", "fr-mb-6w", "fr-mt-10w")} />
           <footer className={fr.cx("fr-text--xs")}>
             {internshipKind === "immersion" && (

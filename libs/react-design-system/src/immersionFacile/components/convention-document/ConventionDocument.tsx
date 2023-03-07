@@ -17,10 +17,11 @@ export const ConventionDocument = ({
 }) => {
   const { cx } = useStyles();
   const renderLogos = () =>
-    logos?.map((logo: React.ReactNode) => {
+    logos?.map((logo: React.ReactNode, index) => {
       const LogoElement = logo as ReactElement;
       const LogoElementWithClassName = React.cloneElement(LogoElement, {
         className: cx(`${componentName}__logo`),
+        key: `${componentName}__logo-${index}`,
       });
       return LogoElementWithClassName;
     });

@@ -191,6 +191,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       dateStart,
       dateEnd,
       businessName,
+      emergencyContactInfos,
       establishmentTutorName,
       immersionAppellationLabel,
       beneficiaryBirthdate,
@@ -214,31 +215,38 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       
       ${
         internshipKind === "immersion" ? "L'immersion" : "Le mini stage"
-      } peut donc démarrer aux dates convenues*.       
-      
+      } peut donc démarrer aux dates convenues.       
+      `,
+      buttons: [
+        {
+          label:
+            internshipKind === "immersion"
+              ? "Voir la convention d'immersion"
+              : "Voir la convention du mini-stage",
+          url: magicLink,
+        },
+      ],
+      subContent: `
       ${
         internshipKind === "immersion"
-          ? `À la fin de l'immersion, nous vous remercions de compléter la fiche d'évaluation de l'immersion <a href="https://immersion.cellar-c2.services.clever-cloud.com/bilan-immersion-professionnelle-inscriptible.pdf">à télécharger ici</a>, et de l'envoyer au conseiller qui a signé la convention (Pôle Emploi, Mission Locale…). Cette évaluation doit être complétée par le tuteur, si possible en présence du bénéficiaire de l'immersion.`
-          : `À la fin du mini stage, nous vous remercions de compléter la fiche d'évaluation du mini stage <a href="??????????">NOTICE BILAN A FOURNIR</a>, et de l'envoyer au conseiller de la Chambre de Commerce et d'Instrustrie - CCI qui a signé la convention. Cette évaluation doit être complétée par le tuteur, si possible en présence du bénéficiaire du mini stage.`
+          ? `À la fin de l'immersion, nous vous remercions de compléter la fiche d'évaluation de l'immersion <a href="https://immersion.cellar-c2.services.clever-cloud.com/bilan-immersion-professionnelle-inscriptible.pdf" target="_blank">à télécharger ici</a>, et de l'envoyer au conseiller qui a signé la convention (Pôle Emploi, Mission Locale…). Cette évaluation doit être complétée par le tuteur, si possible en présence du bénéficiaire de l'immersion.`
+          : `À la fin du mini stage, nous vous remercions de compléter la fiche d'évaluation du mini stage <a href="https://immersion.cellar-c2.services.clever-cloud.com/CCI_MiniStage_Bilan.pdf" target="_blank">à télécharger ici</a>, et de l'envoyer au conseiller de la Chambre de Commerce et d'Instrustrie - CCI qui a signé la convention. Cette évaluation doit être complétée par le tuteur, si possible en présence du bénéficiaire du mini stage.`
       }
-      
+            
+      ${defaultSignature(internshipKind)}
+
+
       En cas de difficulté, prévenez au plus vite votre ${
         internshipKind === "immersion"
           ? "conseiller"
           : "conseiller de la Chambre de Commerce et d'Instrustrie - CCI"
-      } pour qu'il vous conseille au mieux.       
-      ${defaultSignature(internshipKind)}`,
-      buttons: [
-        {
-          label: "Voir la convention",
-          url: magicLink,
-        },
-      ],
-      highlight:
-        internshipKind === "immersion"
-          ? "Convention d'immersion professionnelle"
-          : "Convention de mini stage",
-
+      } pour qu'il vous conseille au mieux. 
+      
+      ${
+        emergencyContactInfos
+          ? `Si la situation l'impose, le contact d'urgence de ${beneficiaryFirstName} ${beneficiaryLastName} : ${emergencyContactInfos}`
+          : ""
+      }`,
       agencyLogoUrl,
     }),
   },

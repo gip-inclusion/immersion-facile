@@ -83,7 +83,6 @@ const Email = ({ email }: { email: EmailSentDto }) => {
                 "editFrontUrl",
                 "immersionAssessmentCreationLink",
                 "magicLink",
-                "questionnaireUrl",
               ];
 
               return (

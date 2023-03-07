@@ -81,7 +81,7 @@ export type PrivateListAgenciesRequestDto = {
 
 export type AgencyPublicDisplayDto = Pick<
   CreateAgencyDto,
-  "id" | "name" | "address" | "position" | "logoUrl"
+  "id" | "name" | "address" | "position" | "logoUrl" | "signature"
 >;
 
 // TODO Rename into UpdateAgencyRequestStatusDto ?

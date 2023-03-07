@@ -31,6 +31,7 @@ describe("Agency info in store", () => {
       name: agency.name,
       address: agency.address,
       position: agency.position,
+      signature: agency.signature,
     };
 
     store.dispatch(
@@ -41,6 +42,7 @@ describe("Agency info in store", () => {
       name: expectedAgencyInfos.name,
       address: expectedAgencyInfos.address,
       position: expectedAgencyInfos.position,
+      signature: expectedAgencyInfos.signature,
     });
 
     expectAgencyInfoToEqual(expectedAgencyInfos);

@@ -11,4 +11,6 @@ export const toAgencyPublicDisplayDto = (
   name: agency.name,
   address: agency.address,
   position: agency.position,
+  signature: agency.signature,
+  logoUrl: agency.logoUrl,
 });

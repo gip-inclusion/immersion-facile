@@ -135,4 +135,5 @@ export const agencyPublicDisplaySchema: z.ZodSchema<AgencyPublicDisplayDto> =
     position: geoPositionSchema,
     agencySiret: siretSchema.optional().or(z.literal("")),
     logoUrl: absoluteUrlSchema.optional(),
+    signature: zString,
   });
