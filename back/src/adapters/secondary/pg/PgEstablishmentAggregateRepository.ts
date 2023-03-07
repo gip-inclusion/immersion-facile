@@ -29,10 +29,6 @@ const logger = createLogger(__filename);
 
 export type PgDataSource = "api_labonneboite" | "form";
 
-type PgSiretQueryResult = {
-  siret: SiretDto;
-};
-
 const offersEqual = (a: ImmersionOfferEntityV2, b: ImmersionOfferEntityV2) =>
   // Only compare romeCode and appellationCode
   a.romeCode === b.romeCode && a.appellationCode == b.appellationCode;
@@ -731,50 +727,30 @@ export class PgEstablishmentAggregateRepository
   }
 
   async markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek(
-    date: Date,
+    since: Date,
   ): Promise<number> {
-    const { rows: siretsWithSomeRecentDiscussionsButLessThanMax } =
-      await this.client.query<PgSiretQueryResult>(
-        `
+    const querySiretsOfEstablishmentsWhichHaveReachedMaxContactPerWeek = `
       SELECT e.siret
-      FROM discussions d
-      LEFT JOIN establishments e ON e.siret = d.siret
-      WHERE d.created_at > $1
-      GROUP BY e.siret HAVING COUNT(*) < e.max_contacts_per_week
-      `,
-        [date],
-      );
+      FROM establishments e
+      LEFT JOIN discussions d ON e.siret = d.siret
+      WHERE is_searchable = false
+        AND max_contacts_per_week > 0
+        AND d.created_at > $1
+      GROUP BY e.siret HAVING COUNT(*) >= e.max_contacts_per_week
+      `;
 
-    const { rows: siretsWithNoOrOldDiscussions } =
-      await this.client.query<PgSiretQueryResult>(
-        `
-        SELECT e.siret
-        FROM establishments e
-        LEFT JOIN discussions d ON d.siret = e.siret
+    const result = await this.client.query(
+      `
+        UPDATE establishments
+        SET is_searchable = true 
         WHERE is_searchable = false
-            AND max_contacts_per_week > 0
-            AND d.created_at < $1
+          AND max_contacts_per_week > 0
+          AND siret NOT IN (${querySiretsOfEstablishmentsWhichHaveReachedMaxContactPerWeek})
         `,
-        [date],
-      );
-
-    const siretsToUpdate: SiretDto[] = Array.from(
-      new Set(
-        [
-          ...siretsWithNoOrOldDiscussions,
-          ...siretsWithSomeRecentDiscussionsButLessThanMax,
-        ].map(({ siret }) => siret),
-      ),
+      [since],
     );
 
-    await this.client.query(
-      format(
-        `UPDATE establishments SET is_searchable = true WHERE siret IN (%L)`,
-        siretsToUpdate,
-      ),
-    );
-
-    return siretsToUpdate.length;
+    return result.rowCount;
   }
 }
 
