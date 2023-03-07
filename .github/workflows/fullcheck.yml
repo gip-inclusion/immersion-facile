@@ -4,13 +4,41 @@ on:
   push:
 
 jobs:
-  fullcheck:
+  validation:
+    name: ""
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        command:
+          [
+            "pnpm front test",
+            "pnpm shared test",
+            "pnpm http-client test",
+            "pnpm includecheck",
+            "pnpm format:check",
+            "pnpm typecheck",
+            "pnpm back test",
+            "pnpm lint",
+          ]
+
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
+      - name: Use Node.js
+        uses: actions/setup-node@v3
         with:
           node-version: "16.x"
           cache: "pnpm"
-      - name: Run pnpm fullcheck
-        run: pnpm fullcheck
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: ${{matrix.command}}
+        env:
+          COMMAND: ${{matrix.command}}
+        run: |
+          STORAGE_FULL_PATH=$(pwd)/back/storage
+          mkdir -p $STORAGE_FULL_PATH/tmp/     
+          STORAGE_ROOT=$STORAGE_FULL_PATH $COMMAND

@@ -1,11 +1,20 @@
 name: "Deploy on scalingo"
 
 on:
+  #  push:
+  #    branches:
+  #      - dev
   workflow_dispatch:
 
 job:
-  deploy:
+  deploy-front:
     runs-on: ubuntu-latest
     steps:
-      - name: "Deploy on scalingo"
-        run: echo "this is working"
+      - name: "Deploy front on scalingo"
+        run: echo "this is should deploy front on scalingo"
+
+  deploy-back:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Deploy back on scalingo"
+        run: echo "this is should deploy front on scalingo"
