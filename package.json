@@ -27,7 +27,8 @@
     "fullcheck": "turbo run includecheck format:check lint typecheck test --concurrency=50%",
     "typecheck": "turbo run typecheck",
     "lint": "turbo run lint",
-    "test": "turbo run test"
+    "test": "turbo run test",
+    "fast-checks": "turbo run includecheck format:check && pnpm front test && pnpm shared test && pnpm http-client test"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.35.1",

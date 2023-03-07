@@ -1,20 +1,83 @@
 name: "Deploy on scalingo"
 
 on:
-  #  push:
-  #    branches:
-  #      - dev
-  workflow_dispatch:
+  push:
+    branches:
+      - dev
+      - staging
+      - main
 
-job:
-  deploy-front:
+jobs:
+  validation:
+    runs-on: ubuntu-latest
+    uses: ./.github/workflows/fullcheck.yml
+
+  build-front-artefact:
     runs-on: ubuntu-latest
     steps:
-      - name: "Deploy front on scalingo"
-        run: echo "this is should deploy front on scalingo"
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16.x"
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build front
+        run: pnpm front build
+      - name: Archive build
+        uses: actions/upload-artifact@v3
+        with:
+          name: front-build-${{github.sha}}
+          path: front/front-build.tar.gz
 
-  deploy-back:
+  build-back-artefact:
     runs-on: ubuntu-latest
     steps:
-      - name: "Deploy back on scalingo"
-        run: echo "this is should deploy front on scalingo"
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16.x"
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build backend
+        run: pnpm back build
+      - name: Archive build
+        uses: actions/upload-artifact@v3
+        with:
+          name: back-build-${{github.sha}}
+          path: back/back-build.tar.gz
+
+  deploy-dev:
+    needs:
+      - validation
+      - build-back-artefact
+      - build-front-artefact
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install scalingo CLI
+        run: |
+          wget -qO- https://cli-dl.scalingo.com/install.sh | bash
+          echo "$HOME/bin" >> $GITHUB_PATH
+      - name: Download back artefact
+        uses: actions/download-artifact@v3
+        with:
+          name: back-build-${{github.sha}}
+      - name: Download front artefact
+        uses: actions/download-artifact@v3
+        with:
+          name: front-build-${{github.sha}}
+      - name: Login to scalingo
+        run: scalingo login --api-token ${{ secrets.SCALINGO_API_TOKEN_V2 }}
+      - name: Deploy back
+        run: scalingo --app if-dev-back deploy back-build.tar.gz
+      - name: Deploy front
+        run: scalingo --app if-dev-front deploy front-build.tar.gz

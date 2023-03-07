@@ -2,6 +2,12 @@ name: "Fullcheck of the project - (except integration tests)"
 
 on:
   push:
+    branches-ignore:
+      - dev
+      - staging
+      - main
+
+  workflow_call:
 
 jobs:
   validation:
@@ -11,16 +17,7 @@ jobs:
       fail-fast: true
       matrix:
         command:
-          [
-            "pnpm front test",
-            "pnpm shared test",
-            "pnpm http-client test",
-            "pnpm includecheck",
-            "pnpm format:check",
-            "pnpm typecheck",
-            "pnpm back test",
-            "pnpm lint",
-          ]
+          ["pnpm fast-checks", "pnpm typecheck", "pnpm back test", "pnpm lint"]
 
     steps:
       - uses: actions/checkout@v3
