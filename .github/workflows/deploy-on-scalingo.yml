@@ -9,7 +9,6 @@ on:
 
 jobs:
   validation:
-    runs-on: ubuntu-latest
     uses: ./.github/workflows/fullcheck.yml
 
   build-front-artefact:

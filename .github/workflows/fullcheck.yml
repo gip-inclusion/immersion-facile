@@ -1,11 +1,12 @@
 name: "Fullcheck of the project - (except integration tests)"
 
 on:
-  push:
-    branches-ignore:
-      - dev
-      - staging
-      - main
+  #  this should be uncommented when we migrate to github
+  #  push:
+  #    branches-ignore:
+  #      - dev
+  #      - staging
+  #      - main
 
   workflow_call:
 
@@ -39,3 +40,43 @@ jobs:
           STORAGE_FULL_PATH=$(pwd)/back/storage
           mkdir -p $STORAGE_FULL_PATH/tmp/     
           STORAGE_ROOT=$STORAGE_FULL_PATH $COMMAND
+
+  back-integration-tests:
+    name: "Back integration tests"
+    runs-on: ubuntu-latest
+    env:
+      PG_TEST_URL: postgresql://immersion:password@localhost:5432/immersion-db
+    services:
+      postgres:
+        image: postgis/postgis:13-master
+        env:
+          POSTGRES_USER: immersion
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: immersion-db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16.x"
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm install
+      - name: Run migrations
+        run: NODE_ENV=test DATABASE_URL=$PG_TEST_URL pnpm back migrate up
+      - name: Run integration tests
+        run: |
+          echo $PG_TEST_URL
+          STORAGE_FULL_PATH=$(pwd)/back/storage
+          mkdir -p $STORAGE_FULL_PATH/tmp/ 
+          PG_URL=$PG_TEST_URL STORAGE_ROOT=$STORAGE_FULL_PATH pnpm back test:integration
