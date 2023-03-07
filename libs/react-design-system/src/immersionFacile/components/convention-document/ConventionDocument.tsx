@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactElement } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import "./ConventionDocument.scss";
 import { useStyles } from "tss-react/dsfr";
@@ -13,9 +13,17 @@ export const ConventionDocument = ({
 }: {
   children: React.ReactNode;
   title: React.ReactNode;
-  logos: React.ReactNode;
+  logos: React.ReactNode[];
 }) => {
   const { cx } = useStyles();
+  const renderLogos = () =>
+    logos?.map((logo: React.ReactNode) => {
+      const LogoElement = logo as ReactElement;
+      const LogoElementWithClassName = React.cloneElement(LogoElement, {
+        className: cx(`${componentName}__logo`),
+      });
+      return LogoElementWithClassName;
+    });
   return (
     <section className={cx(componentName)}>
       <div className={cx(`${componentName}__tools`)}>
@@ -25,8 +33,10 @@ export const ConventionDocument = ({
       </div>
       <article className={cx(`${componentName}__content`)}>
         <header>
-          <div className={cx(`${componentName}__logos-wrapper`)}>
-            <div>{logos}</div>
+          <div
+            className={cx(fr.cx("fr-pb-4w"), `${componentName}__logos-wrapper`)}
+          >
+            {renderLogos()}
           </div>
           <hr className={fr.cx("fr-hr", "fr-mb-4w")} />
           <h1 className={cx(fr.cx("fr-mb-8w"), `${componentName}__title`)}>

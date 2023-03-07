@@ -17,7 +17,7 @@ import { agencyInfoSlice } from "src/core-logic/domain/agencyInfo/agencyInfo.sli
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { agencyInfoSelectors } from "src/core-logic/domain/agencyInfo/agencyInfo.selectors";
 import logoRf from "/img/logo-rf.svg";
-import logoIf from "/img/logo-immersion-facile.svg";
+import logoIf from "/img/logo-if.svg";
 
 type ConventionDocumentPageProps = {
   route: Route<typeof routes.conventionDocument>;
@@ -33,12 +33,12 @@ export const ConventionDocumentPage = ({
   const canShowConvention = convention?.status === "ACCEPTED_BY_VALIDATOR";
   const dispatch = useDispatch();
   useEffect(() => {
-    if (convention) {
+    if (convention?.agencyId) {
       dispatch(
         agencyInfoSlice.actions.fetchAgencyInfoRequested(convention.agencyId),
       );
     }
-  }, [convention]);
+  }, [convention?.agencyId]);
   if (fetchConventionError)
     return (
       <ShowErrorOrRedirectToRenewMagicLink

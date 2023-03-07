@@ -1,4 +1,4 @@
-import immersionFacileLogo from "/img/Logo-immersion-facilitee-01-RVB-reflets-crop.svg";
+import immersionFacileLogo from "/img/logo-if.svg";
 import { makeStyles } from "tss-react/dsfr";
 import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";
 import React from "react";

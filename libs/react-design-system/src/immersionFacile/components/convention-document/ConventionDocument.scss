@@ -25,4 +25,13 @@
   &__title {
     text-align: center;
   }
+  &__logos-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+  }
+  &__logo {
+    max-height: 8rem;
+    max-width: 8rem;
+  }
 }
