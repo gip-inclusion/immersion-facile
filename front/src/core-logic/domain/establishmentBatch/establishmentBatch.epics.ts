@@ -20,6 +20,8 @@ import {
   isCSVCellEmptyString,
   FormEstablishmentDto,
   defaultMaxContactsPerWeek,
+  CSVBoolean,
+  noContactPerWeek,
 } from "shared";
 
 type EstablishmentBatchAction = ActionOfSlice<typeof establishmentBatchSlice>;
@@ -96,15 +98,15 @@ export const candidateEstablishmentMapper = (
       lastName: establishmentRow.businessContact_lastName,
       phone: establishmentRow.businessContact_phone,
     },
-    fitForDisabledWorkers: csvBooleanToBoolean(
-      establishmentRow.fitForDisabledWorkers,
-    ),
+    fitForDisabledWorkers: establishmentRow.fitForDisabledWorkers
+      ? csvBooleanToBoolean(establishmentRow.fitForDisabledWorkers)
+      : false,
     isEngagedEnterprise: csvBooleanToBoolean(
       establishmentRow.isEngagedEnterprise,
     ),
-    maxContactsPerWeek: csvBooleanToBoolean(establishmentRow.isSearchable)
-      ? defaultMaxContactsPerWeek
-      : 0,
+    maxContactsPerWeek: calculateMaxContactsPerWeek(
+      establishmentRow.isSearchable,
+    ),
   };
   try {
     formEstablishmentSchema.parse(mappedEstablishment);
@@ -114,6 +116,13 @@ export const candidateEstablishmentMapper = (
     }
   }
   return { ...mappedEstablishment, zodErrors: errors };
+};
+
+const calculateMaxContactsPerWeek = (isSearchable?: CSVBoolean) => {
+  if (isSearchable === undefined) return defaultMaxContactsPerWeek;
+  return csvBooleanToBoolean(isSearchable)
+    ? defaultMaxContactsPerWeek
+    : noContactPerWeek;
 };
 
 export const establishmentBatchEpics = [

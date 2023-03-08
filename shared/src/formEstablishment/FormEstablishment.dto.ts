@@ -63,10 +63,10 @@ export type EstablishmentCSVRow = {
   businessContact_firstName: string;
   businessContact_contactMethod: ContactMethod;
   businessContact_copyEmails: string;
-  isSearchable: CSVBoolean;
+  isSearchable?: CSVBoolean;
   website: CSVOptionalString;
   additionalInformation: CSVOptionalString;
-  fitForDisabledWorkers: CSVBoolean;
+  fitForDisabledWorkers?: CSVBoolean;
 };
 
 export type EstablishmentGroupName = Flavor<string, "EstablishmentGroupName">;
