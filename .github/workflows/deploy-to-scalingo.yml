@@ -1,0 +1,34 @@
+name: "Generic workflow to deploy to scalingo, given arguments"
+
+on:
+  workflow_call:
+    inputs:
+      envType:
+        required: true
+        type: string
+    secret:
+      SCALINGO_API_TOKEN_V2:
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install scalingo CLI
+        run: |
+          wget -qO- https://cli-dl.scalingo.com/install.sh | bash
+          echo "$HOME/bin" >> $GITHUB_PATH
+      - name: Download back artefact
+        uses: actions/download-artifact@v3
+        with:
+          name: back-build-${{github.sha}}
+      - name: Download front artefact
+        uses: actions/download-artifact@v3
+        with:
+          name: front-build-${{github.sha}}
+      - name: Login to scalingo
+        run: scalingo login --api-token ${{ secrets.SCALINGO_API_TOKEN_V2 }}
+      - name: Deploy back
+        run: scalingo --app if-${{inputs.envType}}-back deploy back-build.tar.gz
+      - name: Deploy front
+        run: scalingo --app if-${{inputs.envType}}-front deploy front-build.tar.gz

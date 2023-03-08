@@ -1,4 +1,4 @@
-name: "Deploy on scalingo"
+name: "Build front, back and deploy"
 
 on:
   push:
@@ -55,28 +55,10 @@ jobs:
           name: back-build-${{github.sha}}
           path: back/back-build.tar.gz
 
-  deploy-dev:
-    needs:
-      - validation
-      - build-back-artefact
-      - build-front-artefact
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install scalingo CLI
-        run: |
-          wget -qO- https://cli-dl.scalingo.com/install.sh | bash
-          echo "$HOME/bin" >> $GITHUB_PATH
-      - name: Download back artefact
-        uses: actions/download-artifact@v3
-        with:
-          name: back-build-${{github.sha}}
-      - name: Download front artefact
-        uses: actions/download-artifact@v3
-        with:
-          name: front-build-${{github.sha}}
-      - name: Login to scalingo
-        run: scalingo login --api-token ${{ secrets.SCALINGO_API_TOKEN_V2 }}
-      - name: Deploy back
-        run: scalingo --app if-dev-back deploy back-build.tar.gz
-      - name: Deploy front
-        run: scalingo --app if-dev-front deploy front-build.tar.gz
+    deploy-dev:
+      if: ${{github.ref}} == "refs/heads/dev"
+      uses: ./.github/workflows/deploy-to-scalingo.yml
+      with:
+        envType: "dev"
+      secrets:
+        SCALINGO_API_TOKEN_V2: ${{ secrets.SCALINGO_API_TOKEN_V2 }}
