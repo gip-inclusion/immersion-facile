@@ -56,6 +56,7 @@ jobs:
           path: back/back-build.tar.gz
 
   deploy-dev:
+    depends-on: [validation, build-front-artefact, build-back-artefact]
     if: ${{github.ref}} == "refs/heads/dev"
     uses: ./.github/workflows/deploy-to-scalingo.yml
     with:
