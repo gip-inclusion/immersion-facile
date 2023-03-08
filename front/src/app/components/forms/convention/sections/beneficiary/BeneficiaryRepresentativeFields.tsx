@@ -1,11 +1,6 @@
 import { useField, useFormikContext } from "formik";
 import React, { useEffect } from "react";
-import {
-  ConventionDto,
-  ConventionField,
-  getConventionFieldName,
-  Role,
-} from "shared";
+import { ConventionDto, ConventionField, getConventionFieldName } from "shared";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
@@ -67,14 +62,14 @@ const useFieldValueStringSetter = (fieldName: ConventionField) => {
 };
 
 const useBeneficiaryRepresentativeRole = () => {
-  const [, , { setValue: setBeneficiaryRepresentative }] = useField(
+  const [field, , { setValue: setBeneficiaryRepresentative }] = useField(
     getConventionFieldName("signatories.beneficiaryRepresentative"),
   );
-  const [, , { setValue: setRole }] = useField<Role>(
-    getConventionFieldName("signatories.beneficiaryRepresentative.role"),
-  );
   useEffect(() => {
-    setRole("beneficiary-representative");
+    setBeneficiaryRepresentative({
+      ...field.value,
+      role: "beneficiary-representative",
+    });
     return () => setBeneficiaryRepresentative(undefined);
   }, []);
 };

@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useFormikContext } from "formik";
 
-import { ConventionDto, getConventionFieldName, Role } from "shared";
+import { ConventionDto, getConventionFieldName } from "shared";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { useField } from "formik";
@@ -22,14 +22,14 @@ export const BeneficiaryCurrentEmployerFields = ({
     formConventionFieldsLabels(values.internshipKind),
   );
   const formFields = getFormFields();
-  const [, , { setValue: setBeneficiaryCurrentEmployer }] = useField(
+  const [field, , { setValue: setBeneficiaryCurrentEmployer }] = useField(
     getConventionFieldName("signatories.beneficiaryCurrentEmployer"),
   );
-  const [, , { setValue: setRole }] = useField<Role>(
-    getConventionFieldName("signatories.beneficiaryCurrentEmployer.role"),
-  );
   useEffect(() => {
-    setRole("beneficiary-current-employer");
+    setBeneficiaryCurrentEmployer({
+      ...field.value,
+      role: "beneficiary-current-employer",
+    });
     return () => setBeneficiaryCurrentEmployer(undefined);
   }, []);
   return (
