@@ -12,4 +12,5 @@ export interface ImmersionSearchGateway {
   contactEstablishment: (
     params: ContactEstablishmentRequestDto,
   ) => Promise<void>;
+  getGroupOffersBySlug(groupSlug: string): Promise<SearchImmersionResultDto[]>; // TODO: Flavor this type
 }

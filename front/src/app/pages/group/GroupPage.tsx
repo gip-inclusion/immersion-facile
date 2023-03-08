@@ -1,37 +1,50 @@
-import React, { useEffect, useState } from "react";
+import { fr } from "@codegouvfr/react-dsfr";
+import { Button } from "@codegouvfr/react-dsfr/Button";
+import { Input } from "@codegouvfr/react-dsfr/Input";
+import React, { useCallback, useEffect, useState } from "react";
 import {
+  Loader,
   MainWrapper,
   PageHeader,
   SectionAccordion,
   SectionTextEmbed,
 } from "react-design-system";
-import { Route } from "type-route";
-import { makeStyles } from "tss-react/dsfr";
-import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
-import { GroupListResults } from "./GroupListResults";
-import { routes } from "src/app/routes/routes";
-import { AuthorizedGroupSlugs } from "src/app/routes/route-params";
-import tempData from "./tempData";
-import { fr } from "@codegouvfr/react-dsfr";
 import { SearchImmersionResultDto } from "shared";
-import { Input } from "@codegouvfr/react-dsfr/Input";
-import { Button } from "@codegouvfr/react-dsfr/Button";
+import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
+import { AuthorizedGroupSlugs } from "src/app/routes/route-params";
+import { routes } from "src/app/routes/routes";
+import { immersionSearchGateway } from "src/config/dependencies";
+import { makeStyles } from "tss-react/dsfr";
+import { Route } from "type-route";
+import { GroupListResults } from "./GroupListResults";
 
 type GroupPageProps = {
   route: Route<typeof routes.group>;
 };
 
+type GroupTheme = Record<
+  AuthorizedGroupSlugs,
+  {
+    name: string;
+    theme: {
+      tintColor: string;
+    };
+  }
+>;
+
+const getFilteredResults = (
+  query: string,
+  results: SearchImmersionResultDto[],
+) =>
+  results.filter((displayedResult: SearchImmersionResultDto) =>
+    JSON.stringify(Object.values(displayedResult))
+      .toLowerCase()
+      .includes(query.toLowerCase()),
+  );
+
 export const GroupPage = ({ route }: GroupPageProps) => {
   const { groupName } = route.params;
-  const groupTheme: Record<
-    AuthorizedGroupSlugs,
-    {
-      name: string;
-      theme: {
-        tintColor: string;
-      };
-    }
-  > = {
+  const groupTheme: GroupTheme = {
     decathlon: {
       name: "Décathlon",
       theme: {
@@ -39,27 +52,44 @@ export const GroupPage = ({ route }: GroupPageProps) => {
       },
     },
   };
+  const [initialResults, setInitialResults] = useState<
+    SearchImmersionResultDto[]
+  >([]);
   const [displayedResults, setDisplayedResults] =
-    useState<SearchImmersionResultDto[]>(tempData);
+    useState<SearchImmersionResultDto[]>(initialResults);
   const [query, setQuery] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const filterResults = useCallback((query: string) => {
+    setDisplayedResults(getFilteredResults(query, initialResults));
+  }, []);
+
   const onFilterSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setDisplayedResults(
-      tempData.filter((displayedResult: SearchImmersionResultDto) =>
-        JSON.stringify(Object.values(displayedResult))
-          .toLowerCase()
-          .includes(query.toLowerCase()),
-      ),
-    );
+    filterResults(query);
   };
-  useEffect(() => {
-    setDisplayedResults(
-      tempData.filter((displayedResult: SearchImmersionResultDto) =>
-        JSON.stringify(Object.values(displayedResult))
-          .toLowerCase()
-          .includes(query.toLowerCase()),
-      ),
+
+  const getInitialOffers = useCallback(async () => {
+    setLoading(true);
+    const initialOffers = await immersionSearchGateway.getGroupOffersBySlug(
+      "decathlon",
     );
+    setInitialResults(initialOffers);
+    setDisplayedResults(initialOffers);
+  }, []);
+
+  useEffect(() => {
+    getInitialOffers()
+      .finally(() => {
+        setLoading(false);
+      })
+      .catch((error) => {
+        // eslint-disable-next-line no-console
+        console.error("Error fetching initialOffers:", error);
+      });
+  }, []);
+  useEffect(() => {
+    filterResults(query);
   }, [query]);
   const { classes } = makeStyles({ name: "GroupPage" })(() => ({
     root: {
@@ -69,6 +99,7 @@ export const GroupPage = ({ route }: GroupPageProps) => {
   return (
     <HeaderFooterLayout>
       <MainWrapper vSpacing={0} layout="fullscreen">
+        {loading && <Loader />}
         <PageHeader
           title={`${groupTheme[groupName].name} : toutes les immersions`}
           theme="establishment"
