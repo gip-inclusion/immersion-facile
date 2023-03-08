@@ -51,6 +51,7 @@ import { ContactEstablishment } from "../../../domain/immersionOffer/useCases/Co
 import { EditFormEstablishment } from "../../../domain/immersionOffer/useCases/EditFormEstablishment";
 import { GetImmersionOfferById } from "../../../domain/immersionOffer/useCases/GetImmersionOfferById";
 import { GetImmersionOfferBySiretAndRome } from "../../../domain/immersionOffer/useCases/GetImmersionOfferBySiretAndRome";
+import { GetOffersByGroupSlug } from "../../../domain/immersionOffer/useCases/GetOffersByGroupSlug";
 import { InsertDiscussionAggregateFromContactRequest } from "../../../domain/immersionOffer/useCases/InsertDiscussionAggregateFromContactRequest";
 import { InsertEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
 import { NotifyConfirmationEstablishmentCreated } from "../../../domain/immersionOffer/useCases/notifications/NotifyConfirmationEstablishmentCreated";
@@ -193,6 +194,7 @@ export const createUseCases = (
 
       // immersionOffer
       searchImmersion: new SearchImmersion(uowPerformer, uuidGenerator),
+      getOffersByGroupSlug: new GetOffersByGroupSlug(uowPerformer),
       getImmersionOfferById: new GetImmersionOfferById(uowPerformer),
       getImmersionOfferBySiretAndRome: new GetImmersionOfferBySiretAndRome(
         uowPerformer,

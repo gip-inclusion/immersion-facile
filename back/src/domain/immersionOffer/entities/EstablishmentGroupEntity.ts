@@ -1,7 +1,11 @@
-import { SiretDto } from "shared";
+import {
+  EstablishmentGroupName,
+  EstablishmentGroupSlug,
+  SiretDto,
+} from "shared";
 
 export type EstablishmentGroupEntity = {
-  slug: string;
-  name: string;
+  slug: EstablishmentGroupSlug;
+  name: EstablishmentGroupName;
   sirets: SiretDto[];
 };

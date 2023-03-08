@@ -13,6 +13,7 @@ import {
 } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import { avenueChampsElyseesDto } from "./addressDtos";
 
+export const defaultNafCode = "7820Z";
 export const validEstablishmentEntityV2: EstablishmentEntity = {
   siret: "78000403200019",
   name: "Company inside repository",
@@ -25,7 +26,7 @@ export const validEstablishmentEntityV2: EstablishmentEntity = {
   sourceProvider: "immersion-facile",
   voluntaryToImmersion: true,
   position: { lat: 35, lon: 50 },
-  nafDto: { code: "8539A", nomenclature: "NAFRev2" },
+  nafDto: { code: defaultNafCode, nomenclature: "NAFRev2" },
   numberEmployeesRange: "10-19",
   updatedAt: new Date("2022-01-05T12:00:00.000"),
   isActive: true,

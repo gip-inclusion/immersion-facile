@@ -19,7 +19,7 @@ import { createAdminRouter } from "./routers/admin/createAdminRouter";
 import { createAgenciesRouter } from "./routers/agencies/createAgenciesRouter";
 import { createApiKeyAuthRouter } from "./routers/apiKeyAuthRouter/createApiKeyAuthRouter";
 import { createApiKeyAuthRouterV1 } from "./routers/apiKeyAuthRouter/createApiKeyAuthRouter.v1";
-import { createSearchImmersionRouter } from "./routers/apiKeyAuthRouter/createSearchImmersionRouter";
+import { createSearchImmersionRouter } from "./routers/searchImmersion/createSearchImmersionRouter";
 import { createConventionRouter } from "./routers/convention/createConventionRouter";
 import { createEstablishmentRouter } from "./routers/createEstablishment/createEstablishmentRouter";
 import { createFormCompletionRouter } from "./routers/formCompletion/createFormCompletionRouter";

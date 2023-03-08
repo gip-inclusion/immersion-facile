@@ -6,7 +6,10 @@ import {
 } from "shared";
 import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
-import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
+import {
+  defaultNafCode,
+  EstablishmentEntityBuilder,
+} from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
@@ -18,8 +21,8 @@ import {
   TEST_ROME_LABEL,
 } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { SearchMadeEntity } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
-import { SearchImmersion } from "../../../domain/immersionOffer/useCases/SearchImmersion";
+import { SearchMadeEntity } from "../entities/SearchMadeEntity";
+import { SearchImmersion } from "./SearchImmersion";
 
 const secretariatRome = "M1607";
 const boulangerRome = "D1102";
@@ -156,7 +159,7 @@ describe("SearchImmersionUseCase", () => {
     expect(response).toHaveLength(2);
     expectSearchImmersionResultDto(response[0], {
       rome: "M1607",
-      naf: "8539A",
+      naf: defaultNafCode,
       siret: "78000403200019",
       name: "Company inside repository",
       voluntaryToImmersion: true,
@@ -212,7 +215,7 @@ describe("SearchImmersionUseCase", () => {
       expectSearchResponseToMatch(authenticatedResponse, [
         {
           rome: secretariatRome,
-          naf: "8539A",
+          naf: defaultNafCode,
           siret: "78000403200019",
           name: "Company inside repository",
           voluntaryToImmersion: true,
@@ -248,7 +251,7 @@ describe("SearchImmersionUseCase", () => {
       expectSearchResponseToMatch(unauthenticatedResponse, [
         {
           rome: "M1607",
-          naf: "8539A",
+          naf: defaultNafCode,
           siret: "78000403200019",
           name: "Company inside repository",
           voluntaryToImmersion: true,

@@ -2,6 +2,8 @@ import { Pool, PoolClient } from "pg";
 import { expectToEqual, SearchImmersionResultDto } from "shared";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
+import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { EstablishmentEntity } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { EstablishmentGroupEntity } from "../../../domain/immersionOffer/entities/EstablishmentGroupEntity";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 import { PgEstablishmentGroupRepository } from "./PgEstablishmentGroupRepository";
@@ -30,6 +32,9 @@ describe("PgEstablishmentGroupRepository", () => {
     );
     await client.query("DELETE FROM establishment_groups__sirets");
     await client.query("DELETE FROM establishment_groups");
+    await client.query("DELETE FROM immersion_contacts");
+    await client.query("DELETE FROM discussions");
+    await client.query("DELETE FROM establishments");
   });
 
   afterAll(async () => {
@@ -77,12 +82,39 @@ describe("PgEstablishmentGroupRepository", () => {
   });
 
   it("finds search immersion results by slug", async () => {
+    const offerBoulanger = new ImmersionOfferEntityV2Builder()
+      .withRomeCode("D1102")
+      .withAppellationCode("11574")
+      .build();
+
+    const offerAideBoulanger = new ImmersionOfferEntityV2Builder()
+      .withRomeCode("D1102")
+      .withAppellationCode("10868")
+      .build();
+
+    const offerBoucher = new ImmersionOfferEntityV2Builder()
+      .withRomeCode("D1101")
+      .withAppellationCode("11564")
+      .build();
+
+    const offerVendeurEnAlimentationGenerale =
+      new ImmersionOfferEntityV2Builder()
+        .withRomeCode("D1106")
+        .withAppellationCode("20540")
+        .build();
+
     const establishmentAggregate1 = new EstablishmentAggregateBuilder()
       .withEstablishmentSiret(group.sirets[0])
+      .withContactId("11111111-1111-4444-1111-111111111111")
+      .withImmersionOffers([offerBoulanger, offerAideBoulanger, offerBoucher])
       .build();
+
     const establishmentAggregate2 = new EstablishmentAggregateBuilder()
       .withEstablishmentSiret(group.sirets[1])
+      .withContactId("22222222-2222-4444-2222-222222222222")
+      .withImmersionOffers([offerVendeurEnAlimentationGenerale])
       .build();
+
     await pgEstablishmentGroupRepository.save(group);
     await pgEstablishmentAggregateRepository.insertEstablishmentAggregates([
       establishmentAggregate1,
@@ -97,28 +129,59 @@ describe("PgEstablishmentGroupRepository", () => {
         group.slug,
       );
 
-    const searchResult1: SearchImmersionResultDto = {
-      additionalInformation: "",
-      address: establishment1.address,
-      appellationLabels: ["Lalal"],
-      contactDetails: undefined,
-      contactMode: undefined,
-      customizedName: "Le nom custom",
+    const createSearchResult = ({
+      establishment,
+      rome,
+      romeLabel,
+      appellationLabels,
+    }: {
+      establishment: EstablishmentEntity;
+      appellationLabels: string[];
+      rome: string;
+      romeLabel: string;
+    }): SearchImmersionResultDto => ({
+      appellationLabels,
+      romeLabel,
+      rome,
+      additionalInformation: establishment.additionalInformation,
+      address: establishment.address,
+      contactMode: "EMAIL",
+      customizedName: establishment.customizedName,
       distance_m: 0,
-      fitForDisabledWorkers: false,
-      naf: "8622B",
-      nafLabel: "Activité des médecins spécialistes",
-      name: "Le nom",
-      numberOfEmployeeRange: "1-2",
-      position: establishment1.position,
-      rome: "M1808",
-      romeLabel: "Médecin généraliste",
-      siret: establishment1.siret,
-      voluntaryToImmersion: true,
-      website: "",
-    };
+      fitForDisabledWorkers: establishment.fitForDisabledWorkers,
+      naf: establishment.nafDto.code,
+      nafLabel: "Activités des agences de travail temporaire", // matches default naf code : 7820Z
+      name: establishment.name,
+      numberOfEmployeeRange: establishment.numberEmployeesRange,
+      position: establishment.position,
+      siret: establishment.siret,
+      voluntaryToImmersion: establishment.voluntaryToImmersion,
+      website: establishment.website,
+    });
 
-    expectToEqual(searchImmersionResults, [searchResult1]);
+    expectToEqual(searchImmersionResults, [
+      createSearchResult({
+        establishment: establishment1,
+        rome: "D1101",
+        romeLabel: "Boucherie",
+        appellationLabels: ["Boucher / Bouchère"],
+      }),
+      createSearchResult({
+        establishment: establishment1,
+        rome: "D1102",
+        romeLabel: "Boulangerie - viennoiserie",
+        appellationLabels: [
+          "Aide-boulanger / Aide-boulangère",
+          "Boulanger-pâtissier / Boulangère-pâtissière",
+        ],
+      }),
+      createSearchResult({
+        establishment: establishment2,
+        rome: "D1106",
+        romeLabel: "Vente en alimentation",
+        appellationLabels: ["Vendeur / Vendeuse en alimentation générale"],
+      }),
+    ]);
   });
 
   const getAllGroups = async () => {

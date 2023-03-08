@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { contactEstablishmentRoute, establishmentTargets } from "shared";
+import { establishmentTargets } from "shared";
 import { AppDependencies } from "../../config/createAppDependencies";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 
@@ -32,12 +32,5 @@ export const establismentRouterWithoutJwt = (deps: AppDependencies): Router => {
       ),
     );
 
-  router
-    .route(`/${contactEstablishmentRoute}`)
-    .post(async (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.contactEstablishment.execute(req.body),
-      ),
-    );
   return router;
 };

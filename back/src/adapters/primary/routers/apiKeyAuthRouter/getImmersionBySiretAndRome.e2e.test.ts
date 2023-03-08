@@ -7,7 +7,10 @@ import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
-import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
+import {
+  defaultNafCode,
+  EstablishmentEntityBuilder,
+} from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { GenerateApiConsumerJtw } from "../../../../domain/auth/jwt";
 import {
@@ -73,7 +76,7 @@ describe(`Route to get ImmersionSearchResultDto by siret and rome - /v1/immersio
     // /!\ Those fields come from Builder (should probably not.)
     const expectedResult: SearchImmersionResultPublicV1 = {
       rome: immersionOfferRome,
-      naf: "8539A",
+      naf: defaultNafCode,
       siret: "78000403200019",
       name: "Company inside repository",
       voluntaryToImmersion: true,

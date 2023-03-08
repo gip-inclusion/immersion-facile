@@ -8,7 +8,10 @@ import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
-import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
+import {
+  defaultNafCode,
+  EstablishmentEntityBuilder,
+} from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { validAuthorizedApiKeyId } from "../../../secondary/InMemoryApiConsumerRepository";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
@@ -67,7 +70,7 @@ describe("Route to get immersion offer by id", () => {
       // /!\ Those fields come from Builder (should probably not.)
       id: "78000403200019-" + immersionOfferRome,
       rome: immersionOfferRome,
-      naf: "8539A",
+      naf: defaultNafCode,
       siret: "78000403200019",
       name: "Company inside repository",
       voluntaryToImmersion: true,
@@ -90,7 +93,7 @@ describe("Route to get immersion offer by id", () => {
     const expectedResult: SearchImmersionResultPublicV0 = {
       id: "78000403200019-" + immersionOfferRome,
       rome: immersionOfferRome,
-      naf: "8539A",
+      naf: defaultNafCode,
       siret: "78000403200019",
       name: "Company inside repository",
       voluntaryToImmersion: true,
