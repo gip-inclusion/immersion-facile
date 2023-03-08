@@ -55,10 +55,10 @@ jobs:
           name: back-build-${{github.sha}}
           path: back/back-build.tar.gz
 
-    deploy-dev:
-      if: ${{github.ref}} == "refs/heads/dev"
-      uses: ./.github/workflows/deploy-to-scalingo.yml
-      with:
-        envType: "dev"
-      secrets:
-        SCALINGO_API_TOKEN_V2: ${{ secrets.SCALINGO_API_TOKEN_V2 }}
+  deploy-dev:
+    if: ${{github.ref}} == "refs/heads/dev"
+    uses: ./.github/workflows/deploy-to-scalingo.yml
+    with:
+      envType: "dev"
+    secrets:
+      SCALINGO_API_TOKEN_V2: ${{ secrets.SCALINGO_API_TOKEN_V2 }}
