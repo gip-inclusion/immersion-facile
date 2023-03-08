@@ -26,7 +26,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: Build front
-        run: pnpm front build
+        run: pnpm front build-scalingo
       - name: Archive build
         uses: actions/upload-artifact@v3
         with:
