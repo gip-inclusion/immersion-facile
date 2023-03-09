@@ -3,7 +3,7 @@
 .im-convention-document {
   &__tools {
     display: flex;
-    justify-content: end;
+    justify-content: flex-end;
     @include for-print {
       display: none;
     }
@@ -28,7 +28,7 @@
   &__logos-wrapper {
     display: flex;
     justify-content: space-between;
-    align-items: start;
+    align-items: flex-start;
   }
   &__logo {
     max-height: 8rem;

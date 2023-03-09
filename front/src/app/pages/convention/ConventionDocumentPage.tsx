@@ -11,8 +11,8 @@ import { useDispatch } from "react-redux";
 import { agencyInfoSlice } from "src/core-logic/domain/agencyInfo/agencyInfo.slice";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { agencyInfoSelectors } from "src/core-logic/domain/agencyInfo/agencyInfo.selectors";
-import logoRf from "/img/logo-rf.svg";
-import logoIf from "/img/logo-if.svg";
+import logoRf from "/assets/img/logo-rf.svg";
+import logoIf from "/assets/img/logo-if.svg";
 
 const throwOnMissingSignDate = (signedAt: string | undefined): string => {
   if (!signedAt) throw new Error("Signature date is missing.");

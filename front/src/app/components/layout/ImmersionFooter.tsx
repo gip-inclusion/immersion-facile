@@ -1,6 +1,6 @@
-import lesEntrepriseSengagent from "/img/les-entreprises-s-engagent.svg";
-import poleEmploiLogo from "/img/pole-emploi-logo.svg";
-import plateformeLogo from "/img/plateforme-inclusion-logo.svg";
+import lesEntrepriseSengagent from "/assets/img/les-entreprises-s-engagent.svg";
+import poleEmploiLogo from "/assets/img/pole-emploi-logo.svg";
+import plateformeLogo from "/assets/img/plateforme-inclusion-logo.svg";
 import React from "react";
 import { makeStyles, useStyles } from "tss-react/dsfr";
 import { fr } from "@codegouvfr/react-dsfr";
