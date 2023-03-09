@@ -49,18 +49,16 @@ export const GroupPage = ({ route }: GroupPageProps) => {
     useState<SearchImmersionResultDto[]>(initialResults);
   const [query, setQuery] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const getFilteredResults = useCallback(
-    (query: string, results: SearchImmersionResultDto[]) =>
-      results.filter((displayedResult: SearchImmersionResultDto) =>
-        JSON.stringify(Object.values(displayedResult))
-          .toLowerCase()
-          .includes(query.toLowerCase()),
-      ),
-    [],
-  );
+
   const filterResults = useCallback(
     (query: string) => {
-      setDisplayedResults(getFilteredResults(query, initialResults));
+      setDisplayedResults(
+        initialResults.filter((displayedResult: SearchImmersionResultDto) =>
+          JSON.stringify(Object.values(displayedResult))
+            .toLowerCase()
+            .includes(query.toLowerCase()),
+        ),
+      );
     },
     [initialResults],
   );
@@ -80,23 +78,21 @@ export const GroupPage = ({ route }: GroupPageProps) => {
   }, []);
 
   useEffect(() => {
-    getInitialOffers()
-      .finally(() => {
-        setLoading(false);
-      })
-      .catch((error) => {
-        // eslint-disable-next-line no-console
-        console.error("Error fetching initialOffers:", error);
-      });
+    getInitialOffers().finally(() => {
+      setLoading(false);
+    });
   }, []);
+
   useEffect(() => {
     filterResults(query);
   }, [query]);
+
   const { classes } = makeStyles({ name: "GroupPage" })(() => ({
     root: {
       backgroundColor: groupTheme[groupName].theme.tintColor,
     },
   }))();
+
   return (
     <HeaderFooterLayout>
       <MainWrapper vSpacing={0} layout="fullscreen">

@@ -23,7 +23,11 @@ import { HttpImmersionAssessmentGateway } from "src/core-logic/adapters/Assessme
 import { HttpConventionGateway } from "src/core-logic/adapters/Convention/HttpConventionGateway";
 import { HttpSentEmailGateway } from "src/core-logic/adapters/EmailGateway/HttpSentEmailGateway";
 import { HttpEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/HttpEstablishmentGateway";
-import { HttpImmersionSearchGateway } from "src/core-logic/adapters/ImmersionSearchGateway/HttpImmersionSearchGateway";
+import {
+  HttpImmersionSearchGateway,
+  SearchResultsTargets,
+  searchResultsTargets,
+} from "src/core-logic/adapters/ImmersionSearchGateway/HttpImmersionSearchGateway";
 import { HttpInclusionConnectedGateway } from "src/core-logic/adapters/InclusionConnected/HttpInclusionConnectedGateway";
 import { HttpRomeAutocompleteGateway } from "src/core-logic/adapters/RomeAutocompleteGateway/HttpRomeAutocompleteGateway";
 import { HttpSiretGatewayThroughBack } from "src/core-logic/adapters/SiretGatewayThroughBack/HttpSiretGatewayThroughBack";
@@ -56,7 +60,9 @@ export const createHttpDependencies = (): Dependencies => {
     immersionAssessmentGateway: new HttpImmersionAssessmentGateway(
       axiosOnSlashApi,
     ),
-    immersionSearchGateway: new HttpImmersionSearchGateway(axiosOnSlashApi),
+    immersionSearchGateway: new HttpImmersionSearchGateway(
+      createHttpClient<SearchResultsTargets>(searchResultsTargets),
+    ),
     romeAutocompleteGateway: new HttpRomeAutocompleteGateway(axiosOnSlashApi),
     sentEmailGateway: new HttpSentEmailGateway(axiosOnSlashApi),
     siretGatewayThroughBack: new HttpSiretGatewayThroughBack(axiosOnSlashApi),
