@@ -1,4 +1,5 @@
 import {
+  expectToEqual,
   immersionOffersRoute,
   SearchImmersionResultDto,
   searchResultsTargets,
@@ -109,8 +110,7 @@ describe("search-immersion route", () => {
         ),
       );
       expect(response.status).toBe(200);
-      expect(response.body).toHaveLength(1);
-      expect(response.body[0]).toEqual(stubSearchResult);
+      expectToEqual(response.body, [stubSearchResult]);
     });
   });
 });

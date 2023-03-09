@@ -1,6 +1,10 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
-import { SearchImmersionResultDto, SiretDto } from "shared";
+import {
+  EstablishmentGroupSlug,
+  SearchImmersionResultDto,
+  SiretDto,
+} from "shared";
 import { EstablishmentGroupEntity } from "../../../domain/immersionOffer/entities/EstablishmentGroupEntity";
 import { EstablishmentGroupRepository } from "../../../domain/immersionOffer/ports/EstablishmentGroupRepository";
 
@@ -30,7 +34,7 @@ export class PgEstablishmentGroupRepository
   }
 
   public async findSearchImmersionResultsBySlug(
-    slug: string,
+    slug: EstablishmentGroupSlug,
   ): Promise<SearchImmersionResultDto[]> {
     const response = await this.client.query(
       `
@@ -92,7 +96,7 @@ export class PgEstablishmentGroupRepository
     );
   }
 
-  private async clearExistingSiretsForGroup(groupSlug: string) {
+  private async clearExistingSiretsForGroup(groupSlug: EstablishmentGroupSlug) {
     await this.client.query(
       `DELETE FROM establishment_groups__sirets WHERE group_slug = $1`,
       [groupSlug],
