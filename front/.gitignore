@@ -9,4 +9,6 @@ front-build.tar.gz
 build
 scalingo/dist
 
-/src/public/dsfr/
+public/dsfr/
+
+/public/dsfr/

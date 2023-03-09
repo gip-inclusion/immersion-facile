@@ -6,5 +6,5 @@ node_modules/
 vite.config.ts
 cypress
 front/src/assets/
-front/public/assets/
-front/public/dsfr/
+public/assets/
+public/dsfr/
