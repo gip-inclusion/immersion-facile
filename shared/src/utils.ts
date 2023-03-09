@@ -96,3 +96,12 @@ export type DotNestedKeys<T> = (
 ) extends infer D
   ? Extract<D, string>
   : never;
+
+export const slugify = (str: string) =>
+  str
+    .trim()
+    .normalize("NFD")
+    .toLowerCase()
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[()]/g, "")
+    .replace(/\W/g, "-");

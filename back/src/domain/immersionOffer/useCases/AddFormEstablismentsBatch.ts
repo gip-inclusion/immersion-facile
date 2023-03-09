@@ -3,21 +3,13 @@ import {
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   formEstablishmentBatchSchema,
+  slugify,
   splitInChunks,
 } from "shared";
 import { UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UseCase } from "../../core/UseCase";
 import { EstablishmentGroupEntity } from "../entities/EstablishmentGroupEntity";
 import { AddFormEstablishment } from "./AddFormEstablishment";
-
-const slugify = (str: string) =>
-  str
-    .trim()
-    .normalize("NFD")
-    .toLowerCase()
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[()]/g, "")
-    .replace(/\W/g, "-");
 
 export class AddFormEstablishmentBatch extends UseCase<
   FormEstablishmentBatchDto,
