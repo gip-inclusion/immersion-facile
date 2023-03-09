@@ -71,7 +71,7 @@ describe("Magic link renewal flow", () => {
     config = new AppConfigBuilder().withTestPresetPreviousKeys().build();
 
     generateConventionJwt = makeGenerateJwtES256<"convention">(
-      config.magicLinkJwtPrivateKey,
+      config.jwtPrivateKey,
       3600 * 24, // one day
     );
 
@@ -128,7 +128,7 @@ describe("Magic link renewal flow", () => {
     expect(ml.startsWith(newUrlStart)).toBeTruthy();
     const jwt = ml.replace(newUrlStart, "");
 
-    const verifyJwt = makeVerifyJwtES256(config.magicLinkJwtPublicKey);
+    const verifyJwt = makeVerifyJwtES256(config.jwtPublicKey);
     expect(verifyJwt(jwt)).toBeDefined();
   });
 });

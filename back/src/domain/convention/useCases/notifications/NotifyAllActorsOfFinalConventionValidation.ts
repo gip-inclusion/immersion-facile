@@ -7,7 +7,7 @@ import {
   displayEmergencyContactInfos,
   frontRoutes,
 } from "shared";
-import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
+import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 
@@ -23,7 +23,7 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly emailGateway: EmailGateway,
-    private readonly generateMagicLinkFn: GenerateConventionMagicLink,
+    private readonly generateMagicLinkFn: GenerateConventionMagicLinkUrl,
     private readonly timeGateway: TimeGateway,
   ) {
     super(uowPerformer);

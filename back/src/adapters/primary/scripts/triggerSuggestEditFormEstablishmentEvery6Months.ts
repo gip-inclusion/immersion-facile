@@ -77,10 +77,7 @@ const triggerSuggestEditFormEstablishmentEvery6Months = async () => {
       : new InMemoryEmailGateway(timeGateway);
 
   const generateEditEstablishmentJwt =
-    makeGenerateJwtES256<"editEstablishment">(
-      config.magicLinkJwtPrivateKey,
-      3600 * 24,
-    );
+    makeGenerateJwtES256<"editEstablishment">(config.jwtPrivateKey, 3600 * 24);
 
   const suggestEditFormEstablishment = new SuggestEditFormEstablishment(
     pgUowPerformer,

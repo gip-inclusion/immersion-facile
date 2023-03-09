@@ -6,7 +6,7 @@ import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellati
 import { scheduleSchema } from "../schedule/Schedule.schema";
 import { calculateWeeklyHoursFromSchedule } from "../schedule/ScheduleUtils";
 import { siretSchema } from "../siret/siret.schema";
-import { allRoles } from "../tokens/MagicLinkPayload";
+import { allRoles } from "../tokens/token.dto";
 import { phoneRegExp } from "../utils";
 import { dateRegExp } from "../utils/date";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";

@@ -1,8 +1,9 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 import jwt, { TokenExpiredError } from "jsonwebtoken";
 import promClient from "prom-client";
 import {
   ApiConsumerName,
+  backOfficeJwtPayloadSchema,
   ConventionMagicLinkPayload,
   currentJwtVersions,
   EstablishmentJwtPayload,
@@ -171,11 +172,11 @@ export const makeApiKeyAuthMiddlewareV1 = (
 export const makeMagicLinkAuthMiddleware = (
   config: AppConfig,
   payloadKey: ExtractFromExisting<PayloadKey, "convention" | "establishment">,
-) => {
+): RequestHandler => {
   const { verifyJwt, verifyDeprecatedJwt } = verifyJwtConfig<
-    "convention" | "editEstablishment"
+    "convention" | "editEstablishment" | "backOffice"
   >(config);
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req, res, next) => {
     const maybeJwt = req.headers.authorization;
     if (!maybeJwt) {
       return responseError(res, "unauthenticated", 401);
@@ -197,7 +198,14 @@ export const makeMagicLinkAuthMiddleware = (
 
       switch (payloadKey) {
         case "convention":
-          req.payloads = { convention: payload as ConventionMagicLinkPayload };
+          if ("role" in payload && payload.role === "backOffice")
+            req.payloads = {
+              backOffice: backOfficeJwtPayloadSchema.parse(payload),
+            };
+          else
+            req.payloads = {
+              convention: payload as ConventionMagicLinkPayload,
+            };
           break;
         case "establishment":
           req.payloads = { establishment: payload as EstablishmentJwtPayload };
@@ -245,17 +253,22 @@ const sendAuthenticationError = (res: Response, err: Error) => {
 const sendNeedsRenewedLinkError = (res: Response, err: Error) => {
   logger.info({ err }, "unsupported or expired magic link used");
   res.status(403);
+  const message =
+    err?.message === "jwt expired"
+      ? "Le lien magique est périmé"
+      : err?.message;
+
   return res.json({
-    message: "Le lien magique est périmé",
+    message,
     needsNewMagicLink: true,
   });
 };
 
 export const verifyJwtConfig = <K extends JwtKind>(config: AppConfig) => {
-  const verifyJwt = makeVerifyJwtES256<K>(config.magicLinkJwtPublicKey);
+  const verifyJwt = makeVerifyJwtES256<K>(config.jwtPublicKey);
 
-  const verifyDeprecatedJwt = config.magicLinkJwtPreviousPublicKey
-    ? makeVerifyJwtES256<K>(config.magicLinkJwtPreviousPublicKey)
+  const verifyDeprecatedJwt = config.previousJwtPublicKey
+    ? makeVerifyJwtES256<K>(config.previousJwtPublicKey)
     : () => {
         throw new Error("No deprecated JWT private key provided");
       };

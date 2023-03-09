@@ -1,8 +1,5 @@
 import { AbsoluteUrl, frontRoutes } from "shared";
-import {
-  makeGenerateJwtES256,
-  makeGenerateJwtHS256,
-} from "../../../domain/auth/jwt";
+import { makeGenerateJwtES256 } from "../../../domain/auth/jwt";
 import { InMemoryEventBus } from "../../secondary/core/InMemoryEventBus";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { makeAdminAuthMiddleware } from "../adminAuthMiddleware";
@@ -40,23 +37,30 @@ export const createAppDependencies = async (config: AppConfig) => {
     config.apiJwtPrivateKey,
     undefined, // no expiration
   );
-  const oneDaysInSecond = 3600 * 24;
+  const oneHourInSeconds = 3600;
+  const oneDayInSecond = oneHourInSeconds * 24;
+  const onYearInSeconds = oneDayInSecond * 365;
+  const thirtyDaysInSecond = oneDayInSecond * 30;
+
   const generateEditEstablishmentJwt =
     makeGenerateJwtES256<"editEstablishment">(
-      config.magicLinkJwtPrivateKey,
-      oneDaysInSecond,
+      config.jwtPrivateKey,
+      oneDayInSecond,
     );
 
-  const generateAdminJwt = makeGenerateJwtHS256<"backOffice">(
-    config.adminJwtSecret,
-    "365d",
+  const generateBackOfficeJwt = makeGenerateJwtES256<"backOffice">(
+    config.jwtPrivateKey,
+    onYearInSeconds,
   );
-  const generateAuthenticatedUserToken =
-    makeGenerateJwtES256<"authenticatedUser">(config.apiJwtPrivateKey, 3600);
 
-  const thirtyDaysInSecond = 3600 * 24 * 30;
+  const generateAuthenticatedUserToken =
+    makeGenerateJwtES256<"authenticatedUser">(
+      config.apiJwtPrivateKey,
+      oneHourInSeconds,
+    );
+
   const generateConventionJwt = makeGenerateJwtES256<"convention">(
-    config.magicLinkJwtPrivateKey,
+    config.jwtPrivateKey,
     thirtyDaysInSecond,
   );
 
@@ -73,7 +77,7 @@ export const createAppDependencies = async (config: AppConfig) => {
     gateways,
     generateConventionJwt,
     generateEditEstablishmentJwt,
-    generateAdminJwt,
+    generateBackOfficeJwt,
     generateAuthenticatedUserToken,
     uowPerformer,
     uuidGenerator,
@@ -103,13 +107,14 @@ export const createAppDependencies = async (config: AppConfig) => {
       config,
     ),
     adminAuthMiddleware: await makeAdminAuthMiddleware(
-      config.adminJwtSecret,
+      config.jwtPublicKey,
       gateways.timeGateway,
     ),
     generateEditEstablishmentJwt,
     generateConventionJwt,
     generateApiJwt,
     generateAuthenticatedUserToken,
+    generateBackOfficeJwt,
     eventBus,
     eventCrawler: createEventCrawler(config, uowPerformer, eventBus),
     uuidGenerator,

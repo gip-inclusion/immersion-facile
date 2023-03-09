@@ -215,7 +215,7 @@ const conventionEmailsByRole = (
   convention: ConventionDto,
   agency: AgencyDto,
 ): Record<Role, string[] | Error> => ({
-  admin: new BadRequestError("L'admin n'a pas de liens magiques."),
+  backOffice: new BadRequestError("Le backoffice n'a pas de liens magiques."),
   beneficiary: [convention.signatories.beneficiary.email],
   "beneficiary-current-employer": convention.signatories
     .beneficiaryCurrentEmployer

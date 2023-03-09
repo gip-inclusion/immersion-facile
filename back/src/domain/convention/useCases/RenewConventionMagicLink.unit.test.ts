@@ -61,7 +61,7 @@ describe("RenewConventionMagicLink use case", () => {
     .withTestPresetPreviousKeys()
     .build();
   const generateConventionJwt = makeGenerateJwtES256<"convention">(
-    config.magicLinkJwtPrivateKey,
+    config.jwtPrivateKey,
     undefined,
   );
   const timeGateway = new CustomTimeGateway(new Date());
@@ -147,7 +147,7 @@ describe("RenewConventionMagicLink use case", () => {
         expect(url).toBe(`${immersionBaseUrl}/verifier-et-signer`);
 
         expectToEqual(
-          makeVerifyJwtES256<"convention">(config.magicLinkJwtPublicKey)(jwt),
+          makeVerifyJwtES256<"convention">(config.jwtPublicKey)(jwt),
           createConventionMagicLinkPayload({
             id: validConvention.id,
             role: expectedRole,
@@ -223,10 +223,10 @@ describe("RenewConventionMagicLink use case", () => {
     });
 
     // Admins use non-magic-link based authentication, so no need to renew these.
-    it("Refuses to generate admin magic links", async () => {
+    it("Refuses to generate backoffice magic links", async () => {
       const payload = createConventionMagicLinkPayload({
         id: validConvention.id,
-        role: "admin",
+        role: "backOffice",
         email,
         now: timeGateway.now(),
       });
@@ -238,7 +238,7 @@ describe("RenewConventionMagicLink use case", () => {
 
       await expectPromiseToFailWithError(
         useCase.execute(request),
-        new BadRequestError("L'admin n'a pas de liens magiques."),
+        new BadRequestError("Le backoffice n'a pas de liens magiques."),
       );
     });
 

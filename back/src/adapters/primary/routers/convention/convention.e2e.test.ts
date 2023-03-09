@@ -1,17 +1,21 @@
 import {
   BackOfficeJwt,
+  BackOfficeJwtPayload,
   ConventionDto,
   ConventionDtoBuilder,
+  ConventionMagicLinkPayload,
   conventionsRoute,
   createConventionMagicLinkPayload,
   currentJwtVersions,
   expectToEqual,
-  Role,
   stringToMd5,
   updateConventionStatusRoute,
 } from "shared";
 import { SuperTest, Test } from "supertest";
-import { GenerateConventionJwt } from "../../../../domain/auth/jwt";
+import {
+  GenerateBackOfficeJwt,
+  GenerateConventionJwt,
+} from "../../../../domain/auth/jwt";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import {
   buildTestApp,
@@ -27,6 +31,7 @@ import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 let request: SuperTest<Test>;
 let generateConventionJwt: GenerateConventionJwt;
+let generateBackOfficeJwt: GenerateBackOfficeJwt;
 let inMemoryUow: InMemoryUnitOfWork;
 let eventCrawler: BasicEventCrawler;
 let gateways: InMemoryGateways;
@@ -43,13 +48,21 @@ const initializeSystemUnderTest = async (
   config: AppConfig,
   { withImmersionStored }: { withImmersionStored: boolean },
 ) => {
-  ({ eventCrawler, gateways, request, generateConventionJwt, inMemoryUow } =
-    await buildTestApp(config));
+  ({
+    eventCrawler,
+    gateways,
+    request,
+    generateConventionJwt,
+    generateBackOfficeJwt,
+    inMemoryUow,
+  } = await buildTestApp(config));
 
   if (withImmersionStored) {
     const conventionRepository = inMemoryUow.conventionRepository;
     conventionRepository.setConventions({ [convention.id]: convention });
   }
+
+  gateways.timeGateway.setNextDate(now);
 
   const response = await request.post("/admin/login").send({
     user: config.backofficeUsername,
@@ -115,10 +128,10 @@ describe("convention e2e", () => {
             .expect(200, { id: convention.id });
         });
 
-        it("succeeds with correct magic link", async () => {
-          const payload = {
+        it("succeeds with JWT ConventionMagicLinkPayload", async () => {
+          const payload: ConventionMagicLinkPayload = {
             applicationId: convention.id,
-            role: "beneficiary" as Role,
+            role: "beneficiary",
             emailHash: stringToMd5(convention.signatories.beneficiary.email),
             iat: Math.round(now.getTime() / 1000),
             exp: Math.round(now.getTime() / 1000) + 31 * 24 * 3600,
@@ -128,13 +141,35 @@ describe("convention e2e", () => {
 
           // GETting the created application succeeds.
           await request
-            .get(`/auth/${conventionsRoute}/${convention.id}`)
+            .get(`/auth/${conventionsRoute}/OSEF`)
             .set("Authorization", jwt)
             .expect(200, {
               ...convention,
               agencyName: TEST_AGENCY_NAME,
               agencyDepartment: TEST_AGENCY_DEPARTMENT,
             });
+        });
+
+        it("succeeds with JWT BackOfficeJwtPayload", async () => {
+          const payload: BackOfficeJwtPayload = {
+            role: "backOffice",
+            sub: "",
+            version: 1,
+            iat: Math.round(now.getTime() / 1000),
+          };
+          const jwt = generateBackOfficeJwt(payload);
+
+          // GETting the created application succeeds.
+          const response = await request
+            .get(`/auth/${conventionsRoute}/${convention.id}`)
+            .set("Authorization", jwt);
+
+          expectToEqual(response.body, {
+            ...convention,
+            agencyName: TEST_AGENCY_NAME,
+            agencyDepartment: TEST_AGENCY_DEPARTMENT,
+          });
+          expectToEqual(response.status, 200);
         });
 
         it("redirects expired magic links to a renewal page", async () => {

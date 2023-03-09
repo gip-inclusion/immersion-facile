@@ -43,7 +43,7 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
   const { uowPerformer } = createUowPerformer(config, () => pool);
 
   const generateConventionJwt = makeGenerateJwtES256<"convention">(
-    config.magicLinkJwtPrivateKey,
+    config.jwtPrivateKey,
     3600 * 24 * 30,
   );
 

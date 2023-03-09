@@ -1,6 +1,6 @@
 import { searchImmersionRoute__v0, immersionOffersRoute } from "shared";
 import { SuperTest, Test } from "supertest";
-import { GenerateApiConsumerJtw } from "../../../../domain/auth/jwt";
+import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
 import {
   avenueChampsElysees,
   avenueChampsElyseesDto,
@@ -20,7 +20,7 @@ describe("search-immersion route", () => {
   let request: SuperTest<Test>;
   let establishmentAggregateRepository: InMemoryEstablishmentAggregateRepository;
 
-  let generateApiJwt: GenerateApiConsumerJtw;
+  let generateApiJwt: GenerateApiConsumerJwt;
 
   beforeEach(async () => {
     const {

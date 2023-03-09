@@ -284,19 +284,19 @@ export class AppConfig {
     return this.throwIfNotDefined("API_JWT_PRIVATE_KEY");
   }
 
-  public get magicLinkJwtPublicKey() {
+  public get jwtPublicKey() {
     return this.throwIfNotDefined("JWT_PUBLIC_KEY");
   }
 
-  public get magicLinkJwtPrivateKey() {
+  public get jwtPrivateKey() {
     return this.throwIfNotDefined("JWT_PRIVATE_KEY");
   }
 
-  public get magicLinkJwtPreviousPublicKey() {
+  public get previousJwtPublicKey() {
     return this.env.JWT_PREVIOUS_PUBLIC_KEY;
   }
 
-  public get magicLinkJwtPreviousPrivateKey() {
+  public get previousJwtPrivateKey() {
     return this.env.JWT_PREVIOUS_PRIVATE_KEY;
   }
 
@@ -307,10 +307,6 @@ export class AppConfig {
   }
   public get backofficePassword() {
     return this.throwIfNotDefined("BACKOFFICE_PASSWORD");
-  }
-
-  public get adminJwtSecret() {
-    return this.throwIfNotDefined("ADMIN_JWT_SECRET");
   }
 
   // == Email notifications ==

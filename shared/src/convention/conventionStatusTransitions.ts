@@ -1,4 +1,4 @@
-import { Role } from "../tokens/MagicLinkPayload";
+import { Role } from "..";
 import { ConventionStatus } from "./convention.dto";
 
 export type StatusTransitionConfig = {
@@ -53,7 +53,7 @@ export const statusTransitionConfigs: Record<
       "PARTIALLY_SIGNED",
       "ACCEPTED_BY_COUNSELLOR",
     ],
-    validRoles: ["counsellor", "validator", "admin"],
+    validRoles: ["counsellor", "validator", "backOffice"],
   },
   CANCELLED: {
     validInitialStatuses: [
@@ -64,7 +64,7 @@ export const statusTransitionConfigs: Record<
       "ACCEPTED_BY_COUNSELLOR",
       "REJECTED",
     ],
-    validRoles: ["counsellor", "validator", "admin"],
+    validRoles: ["counsellor", "validator", "backOffice"],
   },
   // This enables the "require modifications" flow. The agents can put the request
   // back in the draft state for the beneficiary to modify the request and reapply.
@@ -76,6 +76,11 @@ export const statusTransitionConfigs: Record<
       "IN_REVIEW",
       "ACCEPTED_BY_COUNSELLOR",
     ],
-    validRoles: ["counsellor", "validator", "admin", ...validSignatoryRoles],
+    validRoles: [
+      "counsellor",
+      "validator",
+      "backOffice",
+      ...validSignatoryRoles,
+    ],
   },
 };

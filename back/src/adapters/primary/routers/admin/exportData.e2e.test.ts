@@ -1,15 +1,24 @@
 import { BackOfficeJwt, ExportDataDto, exportRoute } from "shared";
 import { SuperTest, Test } from "supertest";
-import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
+import {
+  buildTestApp,
+  InMemoryGateways,
+} from "../../../../_testBuilders/buildTestApp";
 import { AppConfig } from "../../config/appConfig";
+import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 describe("/export", () => {
   let adminToken: BackOfficeJwt;
   let request: SuperTest<Test>;
   let appConfig: AppConfig;
+  let gateways: InMemoryGateways;
+  let inMemoryUow: InMemoryUnitOfWork;
 
   beforeEach(async () => {
-    ({ request, appConfig } = await buildTestApp());
+    ({ request, appConfig, gateways, inMemoryUow } = await buildTestApp());
+
+    gateways.timeGateway.setNextDate(new Date());
+
     const response = await request
       .post("/admin/login")
       .send({
@@ -22,14 +31,11 @@ describe("/export", () => {
   });
 
   it("fails with 401 without authentication", async () => {
-    const { request } = await buildTestApp();
     await request.get(`/admin/${exportRoute}`).expect(401);
   });
 
   it("returns a ZIP file when authenticated", async () => {
     // Prepare
-    const { request, inMemoryUow } = await buildTestApp();
-
     inMemoryUow.exportQueries.exported = {
       Paris: [
         { Siret: "124", "Nom de l'entreprise": "une entreprise" },

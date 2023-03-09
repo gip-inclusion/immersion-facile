@@ -4,7 +4,7 @@ import { DepartmentCodeFromPostcode } from "../../../domain/address/useCases/Dep
 import { LookupLocation } from "../../../domain/address/useCases/LookupLocation";
 import { LookupStreetAddress } from "../../../domain/address/useCases/LookupStreetAddress";
 import {
-  GenerateAdminJwt,
+  GenerateBackOfficeJwt,
   GenerateAuthenticatedUserJwt,
   GenerateConventionJwt,
   GenerateEditFormEstablishmentJwt,
@@ -86,7 +86,7 @@ export const createUseCases = (
   gateways: Gateways,
   generateConventionJwt: GenerateConventionJwt,
   generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt,
-  generateAdminJwt: GenerateAdminJwt,
+  generateBackOfficeJwt: GenerateBackOfficeJwt,
   generateAuthenticatedUserToken: GenerateAuthenticatedUserJwt,
   uowPerformer: UnitOfWorkPerformer,
   uuidGenerator: UuidGenerator,
@@ -149,8 +149,9 @@ export const createUseCases = (
       adminLogin: new AdminLogin(
         config.backofficeUsername,
         config.backofficePassword,
-        generateAdminJwt,
+        generateBackOfficeJwt,
         () => sleep(config.nodeEnv !== "test" ? 500 : 0),
+        gateways.timeGateway,
       ),
       getSentEmails: new GetSentEmails(gateways.email),
       exportData: new ExportData(uowPerformer, gateways.exportGateway),
@@ -158,9 +159,6 @@ export const createUseCases = (
         addFormEstablishment,
         uowPerformer,
       ),
-      // uowPerformer,
-      // createNewEvent,
-      // getSiret,
 
       // Conventions
       createImmersionAssessment: new CreateImmersionAssessment(
@@ -303,7 +301,7 @@ export const createUseCases = (
         new NotifyAllActorsOfFinalConventionValidation(
           uowPerformer,
           gateways.email,
-          makeConventionMagicLink,
+          generateConventionMagicLinkUrl,
           gateways.timeGateway,
         ),
       notifyNewConventionNeedsReview: new NotifyNewApplicationNeedsReview(

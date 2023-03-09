@@ -30,7 +30,7 @@ describe("UpdateConventionStatus", () => {
         "beneficiary-current-employer",
         "counsellor",
         "validator",
-        "admin",
+        "backOffice",
       ],
       allowedInitialStatuses: [
         "READY_TO_SIGN",
@@ -128,7 +128,7 @@ describe("UpdateConventionStatus", () => {
       },
       expectedDomainTopic: "ImmersionApplicationRejected",
       updatedFields: { rejectionJustification: "my rejection justification" },
-      allowedRoles: ["admin", "validator", "counsellor"],
+      allowedRoles: ["backOffice", "validator", "counsellor"],
       allowedInitialStatuses: [
         "PARTIALLY_SIGNED",
         "READY_TO_SIGN",
@@ -144,7 +144,7 @@ describe("UpdateConventionStatus", () => {
         status: "CANCELLED",
       },
       expectedDomainTopic: "ImmersionApplicationCancelled",
-      allowedRoles: ["counsellor", "validator", "admin"],
+      allowedRoles: ["counsellor", "validator", "backOffice"],
       allowedInitialStatuses: [
         "DRAFT",
         "READY_TO_SIGN",

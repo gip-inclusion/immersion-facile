@@ -22,7 +22,7 @@ import {
   TEST_ROME_LABEL,
 } from "../../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import {
-  GenerateApiConsumerJtw,
+  GenerateApiConsumerJwt,
   makeGenerateJwtES256,
 } from "../../../../domain/auth/jwt";
 
@@ -32,7 +32,7 @@ const immersionOfferRome = "B1805";
 describe("Route to get immersion offer by id", () => {
   let request: SuperTest<Test>;
   let inMemoryUow: InMemoryUnitOfWork;
-  let generateApiJwt: GenerateApiConsumerJtw;
+  let generateApiJwt: GenerateApiConsumerJwt;
 
   beforeEach(async () => {
     const config = new AppConfigBuilder()

@@ -52,9 +52,8 @@ export const VerificationActionButton = ({
         nativeButtonProps={{
           id:
             newStatus === "REJECTED"
-              ? domElementIds.conventionToValidate
-                  .conventionValidationRejectButton
-              : domElementIds.conventionToValidate
+              ? domElementIds.manageConvention.conventionValidationRejectButton
+              : domElementIds.manageConvention
                   .conventionValidationValidateButton,
         }}
       >

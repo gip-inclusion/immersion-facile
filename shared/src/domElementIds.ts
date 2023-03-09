@@ -209,7 +209,7 @@ export const domElementIds = {
     },
   },
 
-  conventionToValidate: {
+  manageConvention: {
     conventionValidationRejectButton: "im-convention-validation__reject-button",
     conventionValidationValidateButton:
       "im-convention-validation__validate-button",
@@ -299,4 +299,6 @@ export const domElementIds = {
   error: {},
   conventionMiniStageRoute: {},
   agencyDashboard: {},
+  manageConventionAdmin: {},
+  manageConventionOld: {},
 } satisfies DomElementIds;

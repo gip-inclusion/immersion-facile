@@ -15,7 +15,7 @@ import {
   EmailParamsByEmailType,
   displayEmergencyContactInfos,
 } from "shared";
-import { GenerateConventionMagicLink } from "../adapters/primary/config/createGenerateConventionMagicLink";
+import { GenerateConventionMagicLinkUrl } from "../adapters/primary/config/magicLinkUrl";
 import { TimeGateway } from "../domain/core/ports/TimeGateway";
 import { ContactEntity } from "../domain/immersionOffer/entities/ContactEntity";
 import { EstablishmentEntity } from "../domain/immersionOffer/entities/EstablishmentEntity";
@@ -26,7 +26,7 @@ import { fakeGenerateMagicLinkUrlFn } from "./jwtTestHelper";
 export const getValidatedConventionFinalConfirmationParams = (
   agency: AgencyDto,
   convention: ConventionDto,
-  generateMagicLinkFn: GenerateConventionMagicLink,
+  generateMagicLinkFn: GenerateConventionMagicLinkUrl,
   timeGateway: TimeGateway,
 ): EmailParamsByEmailType["VALIDATED_CONVENTION_FINAL_CONFIRMATION"] => {
   const { beneficiary, beneficiaryRepresentative } = convention.signatories;
@@ -129,7 +129,7 @@ export const expectEmailFinalValidationConfirmationMatchingConvention = (
   templatedEmails: TemplatedEmail[],
   agency: AgencyDto,
   convention: ConventionDto,
-  generateMagicLinkFn: GenerateConventionMagicLink,
+  generateMagicLinkFn: GenerateConventionMagicLinkUrl,
   timeGateway: TimeGateway,
 ) =>
   expectTypeToMatchAndEqual(templatedEmails, [

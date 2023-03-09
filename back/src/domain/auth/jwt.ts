@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import {
   ApiConsumerJwtPayload,
   BackOfficeJwt,
+  BackOfficeJwtPayload,
   ConventionMagicLinkJwt,
   ConventionMagicLinkPayload,
   EstablishmentJwtPayload,
@@ -11,14 +12,13 @@ import {
 type AuthenticatedUserJwtPayload = {
   userId: string;
 };
-type BackOfficeJwtPayload = Record<string, never>;
 
 export type GenerateConventionJwt = GenerateJwtFn<"convention">;
 export type GenerateAuthenticatedUserJwt = GenerateJwtFn<"authenticatedUser">;
 export type GenerateEditFormEstablishmentJwt =
   GenerateJwtFn<"editEstablishment">;
-export type GenerateAdminJwt = GenerateJwtFn<"backOffice">;
-export type GenerateApiConsumerJtw = GenerateJwtFn<"apiConsumer">;
+export type GenerateBackOfficeJwt = GenerateJwtFn<"backOffice">;
+export type GenerateApiConsumerJwt = GenerateJwtFn<"apiConsumer">;
 
 type JwtTokenMapping<K extends string, T extends string, JwtPayload> = {
   token: T;
@@ -72,29 +72,9 @@ export const makeGenerateJwtES256 =
       //noTimestamp: true, //Remove iat on payload
     }) as any;
 
-export const makeGenerateJwtHS256 = <K extends JwtKind = never>(
-  secret: string,
-  expiresIn: string,
-): GenerateJwtFn<K> =>
-  ((payload: any) =>
-    jwt.sign(payload, secret, {
-      algorithm: "HS256",
-      ...(!("exp" in payload) ? { expiresIn } : {}),
-    })) as any;
-
 export type VerifyJwtFn<K extends JwtKind> = (
   jwt: Extract<JwtMap, { kind: K }>["token"],
 ) => JwtPayloadCommonFields & Extract<JwtMap, { kind: K }>["payload"];
-
-export const makeVerifyJwtHS256 = <K extends JwtKind>(
-  secret: string,
-): VerifyJwtFn<K> =>
-  ((jwtString: string) =>
-    jwt.verify(jwtString, secret, {
-      algorithms: ["HS256"],
-      complete: false,
-      ignoreExpiration: false,
-    })) as any;
 
 export const makeVerifyJwtES256 = <K extends JwtKind>(
   jwtPublicKey: string,

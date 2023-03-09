@@ -85,7 +85,7 @@ export const JustificationModal = ({
                   priority: "secondary",
                   onClick: closeModal,
                   nativeButtonProps: {
-                    id: domElementIds.conventionToValidate
+                    id: domElementIds.manageConvention
                       .justificationModalCancelButton,
                   },
                   children: "Annuler",
@@ -93,7 +93,7 @@ export const JustificationModal = ({
                 {
                   type: "submit",
                   nativeButtonProps: {
-                    id: domElementIds.conventionToValidate
+                    id: domElementIds.manageConvention
                       .justificationModalSubmitButton,
                   },
                   children: "Envoyer",

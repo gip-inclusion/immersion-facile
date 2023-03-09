@@ -33,6 +33,7 @@ describe(`/${agenciesRoute} route`, () => {
     ({ request, gateways, eventCrawler, appConfig, inMemoryUow } =
       await buildTestApp());
 
+    gateways.timeGateway.setNextDate(new Date());
     const response = await request.post("/admin/login").send({
       user: appConfig.backofficeUsername,
       password: appConfig.backofficePassword,

@@ -3,8 +3,9 @@ import express, { Express, Router } from "express";
 import expressPrometheusMiddleware from "express-prometheus-middleware";
 import PinoHttp from "pino-http";
 import {
-  GenerateApiConsumerJtw,
+  GenerateApiConsumerJwt,
   GenerateAuthenticatedUserJwt,
+  GenerateBackOfficeJwt,
   GenerateConventionJwt,
   GenerateEditFormEstablishmentJwt,
 } from "../../domain/auth/jwt";
@@ -39,19 +40,22 @@ const metrics = expressPrometheusMiddleware({
   collectDefaultMetrics: true,
 });
 
-export const createApp = async (
-  config: AppConfig,
-): Promise<{
+type CreateAppProperties = {
   app: Express;
   gateways: Gateways;
   eventCrawler: EventCrawler;
-  generateApiJwt: GenerateApiConsumerJtw;
+  generateApiJwt: GenerateApiConsumerJwt;
   generateConventionJwt: GenerateConventionJwt;
   generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt;
   generateAuthenticatedUserJwt: GenerateAuthenticatedUserJwt;
+  generateBackOfficeJwt: GenerateBackOfficeJwt;
   uuidGenerator: UuidGenerator;
   inMemoryUow?: InMemoryUnitOfWork;
-}> => {
+};
+
+export const createApp = async (
+  config: AppConfig,
+): Promise<CreateAppProperties> => {
   const app = express();
   const router = Router();
   app.use(
@@ -73,7 +77,7 @@ export const createApp = async (
 
   // Those routes must be defined BEFORE the others
   app.use(createHelloWorldRouter());
-  app.use("/auth", createMagicLinkRouter(deps));
+  app.use(...createMagicLinkRouter(deps));
   app.use(...createAdminRouter(deps));
   app.use("/v1", createApiKeyAuthRouterV1(deps));
   app.use(...createInclusionConnectedAllowedRouter(deps));
@@ -100,6 +104,7 @@ export const createApp = async (
     generateConventionJwt: deps.generateConventionJwt,
     generateEditEstablishmentJwt: deps.generateEditEstablishmentJwt,
     generateAuthenticatedUserJwt: deps.generateAuthenticatedUserToken,
+    generateBackOfficeJwt: deps.generateBackOfficeJwt,
     uuidGenerator: deps.uuidGenerator,
     inMemoryUow: deps.inMemoryUow,
   };

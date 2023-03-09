@@ -1,6 +1,8 @@
+import { addDays } from "date-fns";
 import { BackOfficeJwt, UserAndPassword, userAndPasswordSchema } from "shared";
 import { ForbiddenError } from "../../../../adapters/primary/helpers/httpErrors";
-import { GenerateAdminJwt } from "../../../auth/jwt";
+import { GenerateBackOfficeJwt } from "../../../auth/jwt";
+import { TimeGateway } from "../../../core/ports/TimeGateway";
 import { UseCase } from "../../../core/UseCase";
 
 export class AdminLogin extends UseCase<UserAndPassword, BackOfficeJwt> {
@@ -9,8 +11,9 @@ export class AdminLogin extends UseCase<UserAndPassword, BackOfficeJwt> {
   constructor(
     private readonly correctUser: string,
     private readonly correctPassword: string,
-    private readonly generateAdminToken: GenerateAdminJwt,
+    private readonly generateAdminToken: GenerateBackOfficeJwt,
     private readonly wait: () => Promise<void>,
+    private readonly timeGateway: TimeGateway,
   ) {
     super();
   }
@@ -24,6 +27,12 @@ export class AdminLogin extends UseCase<UserAndPassword, BackOfficeJwt> {
     if (user !== this.correctUser || password !== this.correctPassword)
       throw new ForbiddenError("Wrong credentials");
 
-    return this.generateAdminToken({});
+    return this.generateAdminToken({
+      role: "backOffice",
+      sub: this.correctUser,
+      version: 1,
+      iat: Math.round(this.timeGateway.now().getTime() / 1000),
+      exp: Math.round(addDays(this.timeGateway.now(), 365).getTime() / 1000),
+    });
   }
 }

@@ -18,8 +18,9 @@ import { InMemoryPeConnectGateway } from "../adapters/secondary/PeConnectGateway
 import { InMemoryExportGateway } from "../adapters/secondary/reporting/InMemoryExportGateway";
 import { InMemorySireneGateway } from "../adapters/secondary/sirene/InMemorySireneGateway";
 import {
-  GenerateApiConsumerJtw,
+  GenerateApiConsumerJwt,
   GenerateAuthenticatedUserJwt,
+  GenerateBackOfficeJwt,
   GenerateConventionJwt,
   GenerateEditFormEstablishmentJwt,
 } from "../domain/auth/jwt";
@@ -50,10 +51,11 @@ export type TestAppAndDeps = {
   gateways: InMemoryGateways;
   eventCrawler: BasicEventCrawler;
   appConfig: AppConfig;
-  generateApiJwt: GenerateApiConsumerJtw;
+  generateApiJwt: GenerateApiConsumerJwt;
   generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt;
   generateConventionJwt: GenerateConventionJwt;
   generateAuthenticatedUserJwt: GenerateAuthenticatedUserJwt;
+  generateBackOfficeJwt: GenerateBackOfficeJwt;
   uuidGenerator: UuidGenerator;
   inMemoryUow: InMemoryUnitOfWork;
 };
@@ -101,6 +103,7 @@ export const buildTestApp = async (
     generateConventionJwt,
     generateEditEstablishmentJwt,
     generateAuthenticatedUserJwt,
+    generateBackOfficeJwt,
     uuidGenerator,
     inMemoryUow: uow,
   } = await createApp(appConfig);
@@ -122,6 +125,7 @@ export const buildTestApp = async (
     generateConventionJwt,
     generateEditEstablishmentJwt,
     generateAuthenticatedUserJwt,
+    generateBackOfficeJwt,
     uuidGenerator,
     inMemoryUow,
   };

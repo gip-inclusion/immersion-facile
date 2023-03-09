@@ -1,21 +1,35 @@
-import { adminLogin } from "shared";
+import {
+  adminLogin,
+  BackOfficeJwt,
+  BackOfficeJwtPayload,
+  expectObjectsToMatch,
+} from "shared";
 import { SuperTest, Test } from "supertest";
+import { makeVerifyJwtES256 } from "../../../../domain/auth/jwt";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
+import { CustomTimeGateway } from "../../../secondary/core/TimeGateway/CustomTimeGateway";
+import { AppConfig } from "../../config/appConfig";
 
 describe("admin login", () => {
   let request: SuperTest<Test>;
+  let appConfig: AppConfig;
+  let timeGateway: CustomTimeGateway;
 
   beforeEach(async () => {
-    const appConfig = new AppConfigBuilder()
+    appConfig = new AppConfigBuilder()
       .withConfigParams({
-        ADMIN_JWT_SECRET: "my-secret",
         BACKOFFICE_USERNAME: "user",
         BACKOFFICE_PASSWORD: "password",
       })
       .build();
 
-    ({ request } = await buildTestApp(appConfig));
+    ({
+      request,
+      gateways: { timeGateway },
+    } = await buildTestApp(appConfig));
+
+    timeGateway.setNextDate(new Date());
   });
 
   it("refuses to connect with wrong credentials", async () => {
@@ -31,12 +45,21 @@ describe("admin login", () => {
 
   it("returns token if credentials are correct", async () => {
     const response = await request.post(`/admin/${adminLogin}`).send({
-      user: "user",
-      password: "password",
+      user: appConfig.backofficeUsername,
+      password: appConfig.backofficePassword,
     });
-    // eslint-disable-next-line no-console
-    console.log("flaky ? response body : ", JSON.stringify(response.body));
-    expect(typeof response.body).toBe("string");
+
+    const token: BackOfficeJwt = response.body;
+
+    expect(typeof token).toBe("string");
     expect(response.status).toBe(200);
+
+    const verify = makeVerifyJwtES256<"backOffice">(appConfig.jwtPublicKey);
+    const payload: BackOfficeJwtPayload = verify(token);
+
+    expectObjectsToMatch(payload, {
+      sub: appConfig.backofficeUsername,
+      role: "backOffice",
+    });
   });
 });

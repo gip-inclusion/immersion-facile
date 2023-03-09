@@ -5,18 +5,20 @@ import {
   InMemoryGateways,
 } from "../../../../_testBuilders/buildTestApp";
 import { AppConfig } from "../../config/appConfig";
-import { TimeGateway } from "../../../../domain/core/ports/TimeGateway";
+import { CustomTimeGateway } from "../../../secondary/core/TimeGateway/CustomTimeGateway";
 
 describe(`/${emailRoute} route`, () => {
   let request: SuperTest<Test>;
   let gateways: InMemoryGateways;
   let adminToken: BackOfficeJwt;
   let appConfig: AppConfig;
-  let timeGateway: TimeGateway;
+  let timeGateway: CustomTimeGateway;
 
   beforeEach(async () => {
     ({ request, gateways, appConfig } = await buildTestApp());
     timeGateway = gateways.timeGateway;
+
+    timeGateway.setNextDate(new Date());
 
     const response = await request.post("/admin/login").send({
       user: appConfig.backofficeUsername,

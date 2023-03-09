@@ -1,15 +1,15 @@
 import { NextFunction, Request, Response } from "express";
-import { makeVerifyJwtHS256 } from "../../domain/auth/jwt";
+import { makeVerifyJwtES256 } from "../../domain/auth/jwt";
 import { TimeGateway } from "../../domain/core/ports/TimeGateway";
 import { createLogger } from "../../utils/logger";
 
 const logger = createLogger(__filename);
 
 export const makeAdminAuthMiddleware = (
-  jwtAdminSecret: string,
+  jwtPublicKey: string,
   timeGateway: TimeGateway,
 ) => {
-  const verifyJwt = makeVerifyJwtHS256<"backOffice">(jwtAdminSecret);
+  const verifyJwt = makeVerifyJwtES256<"backOffice">(jwtPublicKey);
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.headers.authorization) {
       return res.status(401).json({ error: `You need to authenticate first` });
@@ -22,7 +22,7 @@ export const makeAdminAuthMiddleware = (
         return res.status(401).json({ error: "Token is expired" });
       }
 
-      req.payloads = { admin: payload };
+      req.payloads = { backOffice: payload };
       return next();
     } catch (error) {
       logger.error(

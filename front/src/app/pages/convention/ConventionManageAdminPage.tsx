@@ -14,7 +14,7 @@ export const ConventionManageAdminPage = ({
   route,
 }: ConventionManageAdminPageProps) => {
   const _conventionId = route.params.conventionId;
-  const _role: Role = "admin";
+  const _role: Role = "backOffice";
 
   // ... Récupérer le JWT convention ou bien { convention, fetchConventionError, submitFeedback, isLoading } à partir d'un admin qui a le conventionId
 

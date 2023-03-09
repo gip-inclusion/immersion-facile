@@ -102,7 +102,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
 
   describe("Wrong paths", () => {
     it.each<Role>([
-      "admin",
+      "backOffice",
       "beneficiary-current-employer",
       "beneficiary-representative",
       "counsellor",

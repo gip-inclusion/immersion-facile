@@ -1,5 +1,6 @@
 import { expectPromiseToFailWithError } from "shared";
 import { ForbiddenError } from "../../../../adapters/primary/helpers/httpErrors";
+import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { AdminLogin } from "./AdminLogin";
 
 const correctToken = "the-token";
@@ -11,9 +12,11 @@ describe("AdminLogin", () => {
       "user",
       "pwd",
       (_) => correctToken,
+
       async () => {
         /* do not wait in case of unit tests */
       },
+      new CustomTimeGateway(),
     );
   });
 

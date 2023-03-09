@@ -12,7 +12,7 @@ import {
   EstablishmentEntityBuilder,
 } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
-import { GenerateApiConsumerJtw } from "../../../../domain/auth/jwt";
+import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
 import {
   TEST_APPELLATION_LABEL,
   TEST_NAF_LABEL,
@@ -29,7 +29,7 @@ const immersionOfferSiret = "78000403200019";
 describe(`Route to get ImmersionSearchResultDto by siret and rome - /v1/immersion-offers/:siret/:rome`, () => {
   let request: SuperTest<Test>;
   let inMemoryUow: InMemoryUnitOfWork;
-  let generateApiJwt: GenerateApiConsumerJtw;
+  let generateApiJwt: GenerateApiConsumerJwt;
   let authToken: string;
 
   beforeEach(async () => {

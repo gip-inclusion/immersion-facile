@@ -6,22 +6,27 @@ import {
 } from "shared";
 import { SuperTest, Test } from "supertest";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
-import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
+import {
+  buildTestApp,
+  InMemoryGateways,
+} from "../../../../_testBuilders/buildTestApp";
 
 describe("/admin router", () => {
   let request: SuperTest<Test>;
   let token: BackOfficeJwt;
+  let gateways: InMemoryGateways;
 
   beforeEach(async () => {
     const appConfig = new AppConfigBuilder()
       .withConfigParams({
-        ADMIN_JWT_SECRET: "a-secret",
         BACKOFFICE_USERNAME: "user",
         BACKOFFICE_PASSWORD: "pwd",
       })
       .build();
 
-    ({ request } = await buildTestApp(appConfig));
+    ({ request, gateways } = await buildTestApp(appConfig));
+
+    gateways.timeGateway.setNextDate(new Date());
 
     const response = await request
       .post("/admin/login")

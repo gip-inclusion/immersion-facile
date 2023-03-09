@@ -225,7 +225,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
       const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties =
         {
           id: acceptedByValidatorConvention.id,
-          role: "admin" as const,
+          role: "backOffice",
           email: adminEmail,
           now: timeGateway.now(),
         };

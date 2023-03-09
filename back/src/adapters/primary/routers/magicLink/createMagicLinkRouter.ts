@@ -1,6 +1,5 @@
 import { Router } from "express";
 import {
-  ConventionReadDto,
   conventionsRoute,
   getConventionStatusDashboard,
   immersionAssessmentRoute,
@@ -8,10 +7,13 @@ import {
   updateConventionStatusRoute,
 } from "shared";
 import type { AppDependencies } from "../../config/createAppDependencies";
+import { RelativeUrl } from "../../createRemoveRouterPrefix";
 import { UnauthorizedError } from "../../helpers/httpErrors";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 
-export const createMagicLinkRouter = (deps: AppDependencies) => {
+export const createMagicLinkRouter = (
+  deps: AppDependencies,
+): [RelativeUrl, Router] => {
   const authenticatedRouter = Router({ mergeParams: true });
 
   authenticatedRouter.use(deps.applicationMagicLinkAuthMiddleware);
@@ -28,15 +30,18 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
     );
 
   authenticatedRouter
-    .route(`/${conventionsRoute}/:jwt`)
+    .route(`/${conventionsRoute}/:conventionId`)
     .get(async (req, res) =>
       sendHttpResponse(req, res, async () => {
-        if (!req.payloads?.convention) throw new UnauthorizedError();
-        const result: ConventionReadDto =
-          await deps.useCases.getConvention.execute({
-            id: req.payloads.convention.applicationId,
+        if (req.payloads?.backOffice) {
+          return deps.useCases.getConvention.execute({
+            id: req.params.conventionId,
           });
-        return result;
+        }
+        if (!req.payloads?.convention) throw new UnauthorizedError();
+        return deps.useCases.getConvention.execute({
+          id: req.payloads.convention.applicationId,
+        });
       }),
     )
     .post(async (req, res) =>
@@ -86,5 +91,5 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
       }),
     );
 
-  return authenticatedRouter;
+  return ["/auth", authenticatedRouter];
 };

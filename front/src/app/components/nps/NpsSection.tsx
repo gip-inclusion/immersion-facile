@@ -17,7 +17,7 @@ export const NpsSection = ({
   ];
   return (
     <>
-      {role !== "admin" && npsShowStatuses.includes(convention.status) && (
+      {role !== "backOffice" && npsShowStatuses.includes(convention.status) && (
         <NPSForm
           conventionInfos={{
             id: convention.id,

@@ -95,7 +95,7 @@ const emailByRoleForConventionNeedsModification = (
     `Unsupported role for beneficiary/enterprise modification request notification: ${role}`,
   );
   const strategy: Record<Role, string | Error> = {
-    admin: error,
+    backOffice: error,
     "beneficiary-current-employer": error,
     "beneficiary-representative": error,
     "establishment-tutor": error,

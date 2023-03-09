@@ -141,7 +141,7 @@ const determineRecipients = (
         : undefined;
     case "ACCEPTED_BY_VALIDATOR":
       return hasAdminEmails
-        ? { role: "admin", emails: agency.adminEmails }
+        ? { role: "backOffice", emails: agency.adminEmails }
         : undefined;
     default:
       // This notification may fire when using the /debug/populate route, with

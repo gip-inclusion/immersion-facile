@@ -40,7 +40,8 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto>
         siret,
       );
     if (lastPayload) {
-      const editLinkIsExpired = isAfter(new Date(lastPayload.exp), now);
+      const exp = lastPayload.exp;
+      const editLinkIsExpired = !!exp && isAfter(new Date(exp), now);
       if (editLinkIsExpired) {
         const editLinkSentAt = new Date(lastPayload.iat);
         throw new BadRequestError(
