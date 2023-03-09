@@ -2,6 +2,8 @@
 coverage/
 node_modules/
 front/src/assets/
+front/public/assets/
+front/public/dsfr/
 .git/
 .idea/
 .angular/
