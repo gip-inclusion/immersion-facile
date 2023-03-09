@@ -81,15 +81,17 @@ export const AddAgencyForm = (): JSX.Element => {
           submitFeedback={submitFeedback}
           messageByKind={agencySubmitMessageByKind}
         />
-        <Button
-          type="submit"
-          disabled={formState.isSubmitting || submitFeedback.kind !== "idle"}
-          nativeButtonProps={{
-            id: "im-form-add-agency__submit-button",
-          }}
-        >
-          Soumettre
-        </Button>
+        <div className={fr.cx("fr-mt-4w")}>
+          <Button
+            type="submit"
+            disabled={formState.isSubmitting || submitFeedback.kind !== "idle"}
+            nativeButtonProps={{
+              id: "im-form-add-agency__submit-button",
+            }}
+          >
+            Soumettre
+          </Button>
+        </div>
       </form>
     </FormProvider>
   );

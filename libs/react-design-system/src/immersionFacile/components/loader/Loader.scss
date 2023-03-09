@@ -16,12 +16,17 @@
     transform: translate(-50%, -50%);
     z-index: 9999;
     &-icon {
-      &:before {
-        width: 5rem;
-        height: 5rem;
-        color: var(--background-action-high-blue-france);
-        animation: rotate 2s linear infinite;
-        backface-visibility: hidden;
+      display: block;
+      width: 5rem;
+      height: 5rem;
+      animation: rotate 2s linear infinite;
+      // Fix flickering of spinner as mask-image on Firefox
+      background: url("/dsfr/icons/system/refresh-line.svg");
+      background-size: cover;
+      filter: invert(12%) sepia(76%) saturate(5227%) hue-rotate(242deg)
+        brightness(66%) contrast(137%); // match blue-france-sun-113-625
+      html[data-fr-theme="dark"] & {
+        filter: invert(90%);
       }
     }
   }
