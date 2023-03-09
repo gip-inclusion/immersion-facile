@@ -7,10 +7,10 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Footer, NavLink } from "react-design-system";
 import { OverFooter, OverFooterCols } from "react-design-system";
 import { routes } from "src/app/routes/routes";
-import { immersionFacileContactEmail } from "shared";
+import { domElementIds, immersionFacileContactEmail } from "shared";
 import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";
 
-const getFooterNavLinkId = (chunk: string) => `im-footer-nav__${chunk}`;
+const { bottomsLinksIds, linksIds, overFooterColsIds } = domElementIds.footer;
 
 export const MinistereLogo = () => (
   <div className={fr.cx("fr-footer__brand", "fr-enlarge-link")}>
@@ -78,7 +78,7 @@ const overFooterCols: OverFooterCols = [
       label: "Accédez à notre FAQ",
       url: "https://aide.immersion-facile.beta.gouv.fr/fr/",
     },
-    id: getFooterNavLinkId("over-faq"),
+    id: overFooterColsIds.faq,
   },
   {
     title: "Rejoignez la communauté",
@@ -89,7 +89,7 @@ const overFooterCols: OverFooterCols = [
       label: "Rejoignez-nous sur Linkedin",
       url: "https://www.linkedin.com/company/l-immersion-facilitee/",
     },
-    id: getFooterNavLinkId("over-linkedin"),
+    id: overFooterColsIds.linkedin,
   },
   {
     title: "Les chiffres-clé de notre impact",
@@ -100,57 +100,57 @@ const overFooterCols: OverFooterCols = [
       label: "Nos statistiques",
       url: routes.stats().link.href,
     },
-    id: getFooterNavLinkId("over-contact"),
+    id: overFooterColsIds.contact,
   },
 ];
 const links: NavLink[] = [
   {
     label: "gouvernement.fr",
     href: "https://www.gouvernement.fr/",
-    id: getFooterNavLinkId("gouv"),
+    id: linksIds.gouv,
   },
   {
     label: "service-public.fr",
     href: "https://www.service-public.fr/",
-    id: getFooterNavLinkId("service-public"),
+    id: linksIds.civilService,
   },
 ];
 const bottomsLinks: NavLink[] = [
   {
     label: "Accessibilité : partiellement conforme",
     ...routes.standard({ pagePath: "declaration-accessibilite" }).link,
-    id: getFooterNavLinkId("accessibility"),
+    id: bottomsLinksIds.accessibility,
   },
   {
     label: "Mentions légales",
     ...routes.standard({ pagePath: "mentions-legales" }).link,
-    id: getFooterNavLinkId("legals"),
+    id: bottomsLinksIds.legals,
   },
   {
     label: "Politique de confidentialité",
     ...routes.standard({ pagePath: "politique-de-confidentialite" }).link,
-    id: getFooterNavLinkId("privacy"),
+    id: bottomsLinksIds.privacy,
   },
   {
     label: "Conditions générales d'utilisation",
     ...routes.standard({ pagePath: "cgu" }).link,
-    id: getFooterNavLinkId("cgu"),
+    id: bottomsLinksIds.cgu,
   },
   {
     label: "Nous contacter",
     href: `mailto:${immersionFacileContactEmail}`,
-    id: getFooterNavLinkId("contact"),
+    id: bottomsLinksIds.contact,
   },
   {
     label: "Statistiques",
     href: "/stats",
     target: "_blank",
-    id: getFooterNavLinkId("stats"),
+    id: bottomsLinksIds.stats,
   },
   {
     label: "Plan du site",
     ...routes.standard({ pagePath: "plan-du-site" }).link,
-    id: getFooterNavLinkId("sitemap"),
+    id: bottomsLinksIds.sitemap,
   },
 ];
 

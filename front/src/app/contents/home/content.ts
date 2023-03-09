@@ -8,6 +8,7 @@ import heroHeaderCandidateIllustration from "/src/assets/img/illustration-candid
 import heroHeaderEstablishmentIllustration from "/src/assets/img/illustration-establishment-hero.webp";
 import heroHeaderAgencyIllustration from "/src/assets/img/illustration-agency-hero.webp";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
+import { domElementIds } from "shared";
 
 type HeroHeaderInfos = {
   displayName: string;
@@ -16,8 +17,6 @@ type HeroHeaderInfos = {
   icon: string;
   illustration: string;
 };
-
-const getHeroHeaderId = (chunk: string) => `im-hero-header__${chunk}`;
 
 export const heroHeaderContent: Record<UserType, HeroHeaderInfos> = {
   default: {
@@ -67,14 +66,14 @@ export const heroHeaderNavCards: (
       title: "Vous êtes candidat pour une immersion",
       icon: "fr-icon-user-line",
       type: "candidate",
-      id: getHeroHeaderId("home-candidate"),
+      id: domElementIds.home.heroHeadersIds.candidate,
       link: routes.homeCandidates().link,
     },
     {
       overtitle: "Entreprise",
       title: "Vous représentez une entreprise",
       icon: "fr-icon-building-line",
-      id: getHeroHeaderId("home-establishment"),
+      id: domElementIds.home.heroHeadersIds.establishment,
       type: "establishment",
       link: routes.homeEstablishments().link,
     },
@@ -82,7 +81,7 @@ export const heroHeaderNavCards: (
       overtitle: "Prescripteur",
       title: "Vous êtes prescripteur",
       icon: "fr-icon-map-pin-user-line",
-      id: getHeroHeaderId("home-agency"),
+      id: domElementIds.home.heroHeadersIds.agency,
       type: "agency",
       link: routes.homeAgencies().link,
     },
@@ -92,14 +91,14 @@ export const heroHeaderNavCards: (
       title: "Rechercher une entreprise accueillante",
       icon: "fr-icon-search-line",
       type: "candidate",
-      id: getHeroHeaderId("candidate-search"),
+      id: domElementIds.homeCandidates.heroHeadersIds.search,
       link: routes.search().link,
     },
     {
       title: "Remplir la demande de convention",
       icon: "fr-icon-file-line",
       type: "candidate",
-      id: getHeroHeaderId("candidate-form-convention"),
+      id: domElementIds.homeCandidates.heroHeadersIds.formConvention,
       link: routes.conventionImmersion().link,
     },
     // {
@@ -114,7 +113,7 @@ export const heroHeaderNavCards: (
       title: "Référencer mon entreprise",
       icon: "fr-icon-hotel-line",
       type: "establishment",
-      id: getHeroHeaderId("establishment-form-register"),
+      id: domElementIds.homeEstablishments.heroHeadersIds.addEstablishmentForm,
       link: {
         href: "",
         onClick: (event) => {
@@ -133,7 +132,7 @@ export const heroHeaderNavCards: (
       title: "Modifier mes informations",
       icon: "fr-icon-edit-line",
       type: "establishment",
-      id: getHeroHeaderId("establishment-form-edit"),
+      id: domElementIds.homeEstablishments.heroHeadersIds.editEstablishmentForm,
       link: {
         href: "",
         onClick: (event) => {
@@ -152,7 +151,7 @@ export const heroHeaderNavCards: (
       title: "Remplir la demande de convention",
       icon: "fr-icon-file-text-line",
       type: "establishment",
-      id: getHeroHeaderId("establishment-form-convention"),
+      id: domElementIds.homeEstablishments.heroHeadersIds.formConvention,
       link: {
         href: "",
         onClick: (event) => {
@@ -168,13 +167,13 @@ export const heroHeaderNavCards: (
       title: "Référencer mon organisme",
       icon: "fr-icon-hotel-line",
       type: "agency",
-      id: getHeroHeaderId("establishment-form"),
+      id: domElementIds.homeAgencies.heroHeadersIds.addAgencyForm,
       link: routes.addAgency().link,
     },
     {
       title: "Remplir la demande de convention",
       icon: "fr-icon-file-text-line",
-      id: getHeroHeaderId("establishment-form-convention"),
+      id: domElementIds.homeAgencies.heroHeadersIds.formConvention,
       type: "agency",
       link: {
         href: "",

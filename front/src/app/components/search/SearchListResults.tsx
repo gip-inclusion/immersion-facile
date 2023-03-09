@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ContactMethod, SearchImmersionResultDto } from "shared";
+import { ContactMethod, domElementIds, SearchImmersionResultDto } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import { SuccessFeedback } from "src/app/components/SuccessFeedback";
@@ -124,7 +124,7 @@ export const SearchListResults = () => {
                   value: number,
                 })),
               ]}
-              id="im-search-page__results-per-page-dropdown"
+              id={domElementIds.search.resultPerPageDropdown}
               hideLabel
             />
           </div>

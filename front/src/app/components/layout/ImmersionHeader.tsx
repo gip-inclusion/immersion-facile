@@ -13,8 +13,7 @@ import {
   headerFooterDisplayItem,
 } from "@codegouvfr/react-dsfr/Display";
 import { MainNavigationProps } from "@codegouvfr/react-dsfr/MainNavigation";
-
-const getHeaderNavLinkId = (chunk: string) => `im-header-nav__${chunk}`;
+import { domElementIds } from "shared";
 
 export const ImmersionHeader = () => {
   const dispatch = useDispatch();
@@ -27,6 +26,9 @@ export const ImmersionHeader = () => {
       filter: darkModeState.isDark ? "invert(1) grayscale(1)" : "",
     },
   }))();
+
+  const { candidateIds, establishmentIds, agencyIds, adminIds } =
+    domElementIds.header;
 
   const isAdminConnected = useAppSelector(adminSelectors.auth.isAuthenticated);
   const tools: HeaderProps["quickAccessItems"] = [headerFooterDisplayItem];
@@ -53,7 +55,7 @@ export const ImmersionHeader = () => {
       text: "Accueil",
       linkProps: {
         ...routes.home().link,
-        id: getHeaderNavLinkId("home"),
+        id: domElementIds.header.home,
       },
       isActive: currentRoute.name === routes.home().name,
     },
@@ -67,7 +69,7 @@ export const ImmersionHeader = () => {
           isActive: currentRoute.name === routes.homeCandidates().name,
           linkProps: {
             ...routes.homeCandidates().link,
-            id: getHeaderNavLinkId("candidate-home"),
+            id: candidateIds.home,
           },
         },
         {
@@ -75,7 +77,7 @@ export const ImmersionHeader = () => {
           isActive: currentRoute.name === routes.search().name,
           linkProps: {
             ...routes.search().link,
-            id: getHeaderNavLinkId("candidate-search"),
+            id: candidateIds.search,
           },
         },
         {
@@ -83,7 +85,7 @@ export const ImmersionHeader = () => {
           isActive: false,
           linkProps: {
             ...routes.conventionImmersion().link,
-            id: getHeaderNavLinkId("candidate-form-convention"),
+            id: candidateIds.formConvention,
           },
         },
       ],
@@ -98,7 +100,7 @@ export const ImmersionHeader = () => {
           isActive: currentRoute.name === routes.homeEstablishments().name,
           linkProps: {
             ...routes.homeEstablishments().link,
-            id: getHeaderNavLinkId("establishment-home"),
+            id: establishmentIds.home,
           },
         },
         {
@@ -107,7 +109,7 @@ export const ImmersionHeader = () => {
 
           linkProps: {
             ...routes.formEstablishment().link,
-            id: getHeaderNavLinkId("establishment-form"),
+            id: establishmentIds.addEstablishmentForm,
           },
         },
         {
@@ -115,7 +117,7 @@ export const ImmersionHeader = () => {
           isActive: false,
           linkProps: {
             ...routes.conventionImmersion().link,
-            id: getHeaderNavLinkId("establishment-form-convention"),
+            id: establishmentIds.formConvention,
           },
         },
       ],
@@ -130,7 +132,7 @@ export const ImmersionHeader = () => {
           isActive: currentRoute.name === routes.homeAgencies().name,
           linkProps: {
             ...routes.homeAgencies().link,
-            id: getHeaderNavLinkId("agency-home"),
+            id: agencyIds.home,
           },
         },
         {
@@ -138,7 +140,7 @@ export const ImmersionHeader = () => {
           isActive: currentRoute.name === routes.addAgency().name,
           linkProps: {
             ...routes.addAgency().link,
-            id: getHeaderNavLinkId("agency-form"),
+            id: agencyIds.addAgencyForm,
           },
         },
         {
@@ -146,7 +148,7 @@ export const ImmersionHeader = () => {
           isActive: false,
           linkProps: {
             ...routes.conventionImmersion().link,
-            id: getHeaderNavLinkId("agency-form-convention"),
+            id: agencyIds.formConvention,
           },
         },
       ],
@@ -164,7 +166,7 @@ export const ImmersionHeader = () => {
           isActive: false,
           linkProps: {
             ...routes.adminTab({ tab: "conventions" }).link,
-            id: getHeaderNavLinkId("admin-home"),
+            id: adminIds.backOffice,
           },
         },
         {
@@ -172,7 +174,7 @@ export const ImmersionHeader = () => {
           isActive: false,
           linkProps: {
             ...routes.adminTab({ tab: "emails" }).link,
-            id: getHeaderNavLinkId("admin-emails"),
+            id: adminIds.emails,
           },
         },
         {
@@ -180,7 +182,7 @@ export const ImmersionHeader = () => {
           isActive: false,
           linkProps: {
             ...routes.agencyDashboard().link,
-            id: getHeaderNavLinkId("agency-my-dashboard"),
+            id: adminIds.dashboard,
           },
         },
       ],

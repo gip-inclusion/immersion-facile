@@ -5,6 +5,7 @@ import {
   AssessmentStatus,
   assessmentStatuses,
   ConventionReadDto,
+  domElementIds,
   ImmersionAssessmentDto,
   immersionAssessmentSchema,
   InternshipKind,
@@ -70,7 +71,8 @@ export const ImmersionAssessmentForm = ({
                 type="submit"
                 disabled={isDisabled}
                 nativeButtonProps={{
-                  id: "im-assessment-form__submit-button",
+                  id: domElementIds.immersionAssessment
+                    .assessmentFormSubmitButton,
                 }}
               >
                 Envoyer
@@ -99,7 +101,8 @@ export const ImmersionAssessmentForm = ({
                   type="button"
                   onClick={downloadFullImmersionAssessmentPdf}
                   nativeButtonProps={{
-                    id: "im-assessment-form__download-button",
+                    id: domElementIds.immersionAssessment
+                      .assessmentFormdownloadButton,
                   }}
                 >
                   Télécharger le bilan détaillé en PDF

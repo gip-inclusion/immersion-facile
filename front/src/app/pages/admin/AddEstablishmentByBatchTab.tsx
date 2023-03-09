@@ -12,7 +12,7 @@ import { establishmentBatchSlice } from "src/core-logic/domain/establishmentBatc
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { establishmentBatchSelectors } from "src/core-logic/domain/establishmentBatch/establishmentBatch.selectors";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
-import { EstablishmentCSVRow } from "shared";
+import { domElementIds, EstablishmentCSVRow } from "shared";
 
 type AddEstablishmentByBatchTabForm = {
   groupName: string;
@@ -155,7 +155,7 @@ export const AddEstablishmentByBatchTab = () => {
           label="Renseignez un nom de groupe d'entreprises *"
           nativeInputProps={{
             ...register("groupName", { required: true }),
-            id: "groupName-input",
+            id: domElementIds.admin.addEstablishmentByBatchTab.groupNameInput,
             placeholder: "Le nom de votre groupement d'entreprise",
             readOnly: formSubmitted,
           }}
@@ -166,7 +166,7 @@ export const AddEstablishmentByBatchTab = () => {
           label="Uploadez votre CSV *"
           nativeInputProps={{
             ...register("inputFile", { required: true }),
-            id: "inputFile-input",
+            id: domElementIds.admin.addEstablishmentByBatchTab.inputFileInput,
             readOnly: formSubmitted,
             type: "file",
             accept: ".csv",

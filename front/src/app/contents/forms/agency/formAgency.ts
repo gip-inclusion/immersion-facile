@@ -1,4 +1,4 @@
-import { AddressDto, AgencyDto } from "shared";
+import { AddressDto, AgencyDto, domElementIds } from "shared";
 import { FormFieldsObjectForContent } from "src/app/hooks/formContents.hooks";
 import { FormFieldAttributesForContent } from "../types";
 
@@ -14,49 +14,49 @@ export type FormAgencyFieldsLabels = FormFieldsObjectForContent<
 export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
   id: {
     label: "Identifiant",
-    id: "agency-id",
+    id: domElementIds.addAgency.id,
   },
   name: {
     label: "Nom de l'organisme",
     placeholder: "Agence de Boulogne-Billancourt",
     required: true,
-    id: "agency-name",
+    id: domElementIds.addAgency.nameInput,
     autoComplete: "organization",
   },
   address: {
     label: "Adresse de la structure",
     required: true,
-    id: "agency-address",
+    id: domElementIds.addAgency.addressInput.address,
     placeholder: "Ex: 26 rue du labrador, 37000 Tours",
   },
   "address.city": {
     label: "Ville",
-    id: "agency-address-city",
+    id: domElementIds.addAgency.addressInput.city,
   },
   "address.departmentCode": {
     label: "Code de département",
-    id: "agency-address-departementCode",
+    id: domElementIds.addAgency.addressInput.departmentCode,
   },
   "address.postcode": {
     label: "Code postal",
-    id: "agency-address-postCode",
+    id: domElementIds.addAgency.addressInput.postcode,
   },
   "address.streetNumberAndAddress": {
     label: "Numéro et nom de rue",
-    id: "agency-address-streetNumberAndAddress",
+    id: domElementIds.addAgency.addressInput.streetNumberAndAddress,
   },
   position: {
     label: "Coordonnées géographiques de l'organisme",
-    id: "agency-position",
+    id: domElementIds.addAgency.positionInput,
   },
   logoUrl: {
     label: "Téléverser le logo de votre organisme",
-    id: "agency-logoUrl",
+    id: domElementIds.addAgency.logoUrlInput,
     description: "Cela permet de personnaliser les mails automatisés.",
   },
   validatorEmails: {
     required: true,
-    id: "agency-validator-emails",
+    id: domElementIds.addAgency.validatorEmailsInput,
     label: "Emails de validation définitive de la demande de convention",
     placeholder: "valideur.dupont@mail.com",
     description:
@@ -64,11 +64,11 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
   },
   adminEmails: {
     label: "Emails des administrateurs de la structure",
-    id: "agency-adminEmails",
+    id: domElementIds.addAgency.adminEmailsInput,
   },
   signature: {
     label: "Texte de signature",
-    id: "agency-signature",
+    id: domElementIds.addAgency.signatureInput,
     required: true,
     description:
       "Quel texte de signature souhaitez-vous pour les mails automatisés ?",
@@ -76,16 +76,16 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
   },
   status: {
     label: "Statut de la structure",
-    id: "agency-status",
+    id: domElementIds.addAgency.statusInput,
   },
   kind: {
     label: "Type de structure",
-    id: "agency-kind",
+    id: domElementIds.addAgency.kindSelect,
     required: true,
     placeholder: "Veuillez choisir un type de structure",
   },
   counsellorEmails: {
-    id: "agency-counsellor-emails",
+    id: domElementIds.addAgency.counsellorEmailsInput,
     label: "Emails pour examen préalable de la demande de convention",
     placeholder: "Ex : conseiller.dupont@mail.com (optionnel)",
     description:
@@ -93,21 +93,21 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
   },
   codeSafir: {
     label: "Code SAFIR",
-    id: "agency-codeSafir",
+    id: domElementIds.addAgency.codeSafirInput,
   },
   questionnaireUrl: {
-    id: "agency-questionnaireUrl",
+    id: domElementIds.addAgency.questionnaireUrlInput,
     label: "Lien vers le document de support du bilan de fin d’immersion ",
     placeholder:
       "Ex : https://docs.google.com/document/d/mon-document-pour-bilan (optionnel)",
   },
   agencySiret: {
     label: "SIRET de la structure",
-    id: "agency-agencySiret",
+    id: domElementIds.addAgency.agencySiretInput,
     required: true,
   },
   stepsForValidation: {
-    id: "steps-for-validation",
+    id: domElementIds.addAgency.stepsForValidationInput,
     label: "Combien d'étapes de validation des immersions y a-t-il ?",
     required: true,
   },

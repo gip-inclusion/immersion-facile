@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { LinkHome, MainWrapper } from "react-design-system";
-import { ConventionMagicLinkPayload } from "shared";
+import { ConventionMagicLinkPayload, domElementIds } from "shared";
 import { decodeMagicLinkJwtWithoutSignatureCheck } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { routes } from "src/app/routes/routes";
@@ -81,7 +81,7 @@ export const RenewExpiredLinkContent = ({
           disabled={requested}
           onClick={onClick}
           nativeButtonProps={{
-            id: "im-renew-page__renew-link-button",
+            id: domElementIds.magicLinkRenewal.magicLinkRenewalButton,
           }}
         >
           Demander un nouveau lien

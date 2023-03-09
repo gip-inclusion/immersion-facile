@@ -1,8 +1,19 @@
 import React from "react";
-import { NavLink } from "../tabLinks";
+// import { NavLink } from "../tabLinks";
 import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
 import "./Footer.css";
+
+export type NavLink = {
+  onClick?: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void;
+  label: string;
+  href?: string;
+  active?: boolean;
+  target?: string;
+  children?: NavLink[];
+  index?: number;
+  id: string;
+};
 
 export type FooterProps = {
   links?: NavLink[];

@@ -10,6 +10,7 @@ import { agencyAdminSlice } from "src/core-logic/domain/agenciesAdmin/agencyAdmi
 import { useAppSelector } from "../../hooks/reduxHooks";
 import { AgencyDetails } from "../admin/AgencyDetails";
 import { ActiveOrRejectedStatus } from "../../../core-logic/ports/AgencyGateway";
+import { domElementIds } from "shared";
 
 const toSelectOption = (option: AgencyOption): SelectOption => ({
   label: option.name,
@@ -59,7 +60,7 @@ export const ActivateAgency = () => {
         <Select
           placeholder="Veuillez sélectionner une agence"
           label={`${agencyNeedingReviewOptions.length} agence(s) en attente de revue`}
-          id={"agency-selector"}
+          id={domElementIds.admin.agencyTab.activateAgencySelector}
           options={agencyNeedingReviewOptions.map(toSelectOption)}
           onChange={(event) =>
             dispatch(

@@ -9,6 +9,7 @@ import {
   AgencyKind,
   CreateAgencyDto,
   createAgencySchema,
+  domElementIds,
   toDotNotation,
 } from "shared";
 import {
@@ -86,7 +87,7 @@ export const AddAgencyForm = (): JSX.Element => {
             type="submit"
             disabled={formState.isSubmitting || submitFeedback.kind !== "idle"}
             nativeButtonProps={{
-              id: "im-form-add-agency__submit-button",
+              id: domElementIds.addAgency.submitButton,
             }}
           >
             Soumettre

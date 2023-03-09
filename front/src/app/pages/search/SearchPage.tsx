@@ -14,7 +14,7 @@ import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import { useSearchUseCase } from "src/app/hooks/search.hooks";
 import "./SearchPage.scss";
 import { SearchListResults } from "src/app/components/search/SearchListResults";
-import { SearchSortedBy } from "shared";
+import { domElementIds, SearchSortedBy } from "shared";
 
 import {
   SearchPageParams,
@@ -144,7 +144,7 @@ export const SearchPage = ({
                         appellationLabel: values.appellationLabel ?? "",
                       },
                     ]}
-                    id={"im-search-page__appellation-autocomplete"}
+                    id={domElementIds.search.appellationAutocomplete}
                   />
                 </div>
                 <div
@@ -169,7 +169,7 @@ export const SearchPage = ({
                         place: label,
                       });
                     }}
-                    id="im-search-page__address-autocomplete"
+                    id={domElementIds.search.placeAutocompleteInput}
                   />
                 </div>
                 <div
@@ -208,7 +208,7 @@ export const SearchPage = ({
                         value: index,
                       })),
                     ]}
-                    id="im-search-page__distance-dropdown"
+                    id={domElementIds.search.distanceSelect}
                   />
                 </div>
 
@@ -222,7 +222,7 @@ export const SearchPage = ({
                     disabled={!availableForSearchRequest(searchStatus, values)}
                     type="submit"
                     nativeButtonProps={{
-                      id: "im-search__submit-search",
+                      id: domElementIds.search.searchButton,
                     }}
                   >
                     Rechercher
@@ -256,7 +256,7 @@ export const SearchPage = ({
                           "fr-fieldset__legend",
                           "fr-text--regular",
                         )}
-                        id="radio-inline-legend"
+                        id={domElementIds.search.sortRadioInlineLegend}
                       >
                         Trier les résultats :
                       </legend>
@@ -264,11 +264,11 @@ export const SearchPage = ({
                         {sortedByOptions.map((option, index) => (
                           <div
                             className={fr.cx("fr-radio-group")}
-                            key={`search-sort-option-${index}`}
+                            key={`${domElementIds.search.searchSortOption}${index}`}
                           >
                             <input
                               type="radio"
-                              id={`search-sort-option-${index}`}
+                              id={`${domElementIds.search.searchSortOption}${index}`}
                               name="search-sort-option"
                               value={option.value}
                               checked={formikValues.sortedBy === option.value}
@@ -285,7 +285,7 @@ export const SearchPage = ({
                             />
                             <label
                               className={fr.cx("fr-label")}
-                              htmlFor={`search-sort-option-${index}`}
+                              htmlFor={`${domElementIds.search.searchSortOption}${index}`}
                             >
                               {option.label}
                             </label>

@@ -3,6 +3,7 @@ import { ImmersionTextField } from "react-design-system";
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import { domElementIds } from "shared";
 
 type SiretFetcherInputProps = {
   placeholder: string;
@@ -29,7 +30,7 @@ export const SiretFetcherInput = ({
   return (
     <>
       <ImmersionTextField
-        id="siret-fetcher-input"
+        id={domElementIds.homeEstablishments.siretModal.siretFetcherInput}
         name="siret"
         label={label}
         value={currentSiret}

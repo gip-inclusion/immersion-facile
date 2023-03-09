@@ -8,6 +8,7 @@ import {
 } from "react-design-system";
 import {
   ConventionStatusWithJustification,
+  domElementIds,
   UpdateConventionStatusRequestDto,
   WithJustification,
   withJustificationSchema,
@@ -84,14 +85,16 @@ export const JustificationModal = ({
                   priority: "secondary",
                   onClick: closeModal,
                   nativeButtonProps: {
-                    id: `im-justification-modal__cancel-button`,
+                    id: domElementIds.conventionToValidate
+                      .justificationModalCancelBtn,
                   },
                   children: "Annuler",
                 },
                 {
                   type: "submit",
                   nativeButtonProps: {
-                    id: `im-justification-modal__send-button`,
+                    id: domElementIds.conventionToValidate
+                      .justificationModalSendBtn,
                   },
                   children: "Envoyer",
                 },

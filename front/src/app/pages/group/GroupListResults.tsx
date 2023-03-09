@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
-import { ContactMethod, SearchImmersionResultDto } from "shared";
+import { ContactMethod, domElementIds, SearchImmersionResultDto } from "shared";
 import {
   ContactEstablishmentModal,
   useContactEstablishmentModal,
@@ -120,7 +120,7 @@ export const GroupListResults = ({ results }: GroupListResultsProps) => {
                   value: number,
                 })),
               ]}
-              id="im-search-page__results-per-page-dropdown"
+              id={domElementIds.search.resultPerPageDropdown}
               hideLabel
             />
           </div>

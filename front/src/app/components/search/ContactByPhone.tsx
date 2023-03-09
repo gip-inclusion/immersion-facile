@@ -3,6 +3,7 @@ import { ModalTitle } from "react-design-system";
 import {
   ContactEstablishmentByPhoneDto,
   contactEstablishmentByPhoneSchema,
+  domElementIds,
   RomeDto,
   SiretDto,
 } from "shared";
@@ -94,7 +95,7 @@ export const ContactByPhone = ({
           type="submit"
           disabled={isSubmitting}
           nativeButtonProps={{
-            id: "im-contact-establishment__contact-phone-button",
+            id: domElementIds.search.contactByPhoneButton,
           }}
         >
           Envoyer

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import {
   addressDtoToString,
   defaultMaxContactsPerWeek,
+  domElementIds,
   FormEstablishmentDto,
   FormEstablishmentSource,
   OmitFromExistingKeys,
@@ -108,7 +109,7 @@ const CreationSiretRelatedInputs = () => {
               }}
               nativeButtonProps={{
                 disabled: requestEmailToEditFormSucceed,
-                id: "im-form-add-establishment__edit-establishment-button",
+                id: domElementIds.establishment.errorSiretAlreadyExistButton,
               }}
             >
               Demande de modification du formulaire de référencement
@@ -147,7 +148,7 @@ const CreationSiretRelatedInputs = () => {
         setFormValue={({ address }) =>
           setAddressValue(addressDtoToString(address))
         }
-        id="autocomplete-address-creation-establishment-form"
+        id={domElementIds.establishment.establishmentFormAddressAutocomplete}
         disabled={isFetchingSiret}
       />
     </>

@@ -4,6 +4,7 @@ import { ModalTitle } from "react-design-system";
 import {
   ContactEstablishmentByMailDto,
   contactEstablishmentByMailSchema,
+  domElementIds,
   RomeDto,
   SiretDto,
 } from "shared";
@@ -105,7 +106,7 @@ export const ContactByEmail = ({
           type="submit"
           disabled={isSubmitting}
           nativeButtonProps={{
-            id: "im-contact-establishment__contact-email-button",
+            id: domElementIds.search.contactByMailButton,
           }}
         >
           Envoyer

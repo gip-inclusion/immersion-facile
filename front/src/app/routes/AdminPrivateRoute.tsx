@@ -2,7 +2,7 @@ import { Form, Formik } from "formik";
 import React, { useEffect } from "react";
 import { MainWrapper } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { UserAndPassword, userAndPasswordSchema } from "shared";
+import { domElementIds, UserAndPassword, userAndPasswordSchema } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
@@ -71,7 +71,7 @@ export const LoginForm = ({
                   disabled={isLoading}
                   type="submit"
                   nativeButtonProps={{
-                    id: "im-login__submit-button",
+                    id: domElementIds.admin.adminPrivateRoute.loginButton,
                   }}
                 >
                   Se connecter

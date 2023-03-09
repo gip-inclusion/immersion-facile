@@ -5,7 +5,6 @@ export * from "./inputs";
 export * from "./label";
 export * from "./link";
 export * from "./text";
-export * from "./tabLinks";
 export * from "./footer";
 export * from "./main-wrapper";
 export * from "./file";

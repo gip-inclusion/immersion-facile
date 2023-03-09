@@ -1,4 +1,8 @@
-import { BusinessContactDto, FormEstablishmentDto } from "shared";
+import {
+  BusinessContactDto,
+  domElementIds,
+  FormEstablishmentDto,
+} from "shared";
 import { FormFieldsObjectForContent } from "src/app/hooks/formContents.hooks";
 import { FormFieldAttributesForContent } from "../types";
 
@@ -17,19 +21,19 @@ export type FormEstablishmentFieldsLabels = FormFieldsObjectForContent<
 export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
   siret: {
     label: "Indiquez le SIRET de la structure d'accueil",
-    id: "establishment-siret",
+    id: domElementIds.establishment.siret,
     required: true,
   },
 
   businessName: {
     label: "Vérifiez le nom (raison sociale) de votre établissement",
-    id: "establishment-businessName",
+    id: domElementIds.establishment.businessName,
     required: true,
   },
   businessNameCustomized: {
     label:
       "Indiquez le nom de l'enseigne de l'établissement d'accueil, si elle diffère de la raison sociale",
-    id: "establishment-businessNameCustomized",
+    id: domElementIds.establishment.businessNameCustomized,
     autoComplete: "organization",
     description:
       "Nom sous lequel vous souhaitez apparaitre dans les résultats de recherche",
@@ -38,67 +42,67 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
   businessAddress: {
     label: "Vérifiez l'adresse de votre établissement",
     required: true,
-    id: "establishment-businessAddress",
+    id: domElementIds.establishment.businessAddress,
     placeholder: "Ex : 26 rue du labrador, 37000 Tours",
   },
   "businessContact.lastName": {
     label: "Nom du référent",
     required: true,
-    id: "establishment-businessContact-lastName",
+    id: domElementIds.establishment.businessContact.lastName,
   },
   "businessContact.firstName": {
     label: "Prénom du référent",
     required: true,
-    id: "establishment-businessContact-firstName",
+    id: domElementIds.establishment.businessContact.firstName,
   },
   "businessContact.job": {
     label: "Fonction du référent",
     required: true,
-    id: "establishment-businessContact-job",
+    id: domElementIds.establishment.businessContact.job,
   },
   "businessContact.phone": {
     label: "Numéro de téléphone (ne sera pas communiqué directement)",
     required: true,
-    id: "establishment-businessContact-phone",
+    id: domElementIds.establishment.businessContact.phone,
   },
   "businessContact.email": {
     label: "E-mail",
     required: true,
-    id: "establishment-businessContact-email",
+    id: domElementIds.establishment.businessContact.email,
   },
   "businessContact.copyEmails": {
     label: "Autres destinataires",
     description: "Adresses mail à mettre en copie",
     placeholder: "Ex : cc1@mail.com, cc2@mail.com (optionnel)",
-    id: "establishment-businessContact-copyEmails",
+    id: domElementIds.establishment.businessContact.copyEmails,
   },
   "businessContact.contactMethod": {
     label: "Comment souhaitez-vous que les candidats vous contactent ?",
     required: true,
-    id: "establishment-businessContact-contactMethod",
+    id: domElementIds.establishment.businessContact.contactMethod,
   },
   isEngagedEnterprise: {
     label:
       "Mon entreprise est membre de la communauté « Les entreprises s'engagent »",
-    id: "establishment-isEngagedEnterprise",
+    id: domElementIds.establishment.isEngagedEnterprise,
   },
   fitForDisabledWorkers: {
     label:
       "Mon entreprise accueille en priorité des personnes en situation de handicap",
-    id: "establishment-fitForDisabledWorkers",
+    id: domElementIds.establishment.fitForDisabledWorkers,
   },
   appellations: {
     label: "",
-    id: "establishment-appellations",
+    id: domElementIds.establishment.appellations,
   },
   website: {
     label: "URL vers votre site internet",
-    id: "establishment-website",
+    id: domElementIds.establishment.website,
     placeholder: "Ex : https://mon-site-internet.fr (optionnel)",
   },
   additionalInformation: {
     label: "Informations complémentaires",
-    id: "establishment-additionalInformation",
+    id: domElementIds.establishment.additionalInformation,
     description:
       "En information complémentaire, nous vous conseillons de valoriser votre histoire afin de donner envie à un candidat de découvrir un métier au sein de votre établissement.",
     placeholder:
@@ -110,6 +114,6 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
     description:
       "Par exemple, en renseignant 5 : si vous avez déjà reçu 5 demandes cette semaine, vous n'apparaîtrez plus dans la liste des entreprises accueillantes jusqu'à la semaine suivante.",
     required: true,
-    id: "establishment-maxContactPerWeek",
+    id: domElementIds.establishment.maxContactsPerWeek,
   },
 };

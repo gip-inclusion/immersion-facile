@@ -8,6 +8,7 @@ import { keys } from "ramda";
 import React, { useEffect, useState } from "react";
 import { DsfrTitle, ImmersionTextField, Select } from "react-design-system";
 import {
+  domElementIds,
   immersionFacileContactEmail,
   internshipKinds,
   templatesByName,
@@ -58,12 +59,19 @@ export const EmailPreviewTab = () => {
         <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
           <aside className={fr.cx("fr-col-12", "fr-col-lg-4")}>
             <div className={fr.cx("fr-select-group")}>
-              <label className={fr.cx("fr-label")} htmlFor="selectTemplateName">
+              <label
+                className={fr.cx("fr-label")}
+                htmlFor={
+                  domElementIds.admin.emailsPreviewTab.emailTemplateNameSelect
+                }
+              >
                 Liste de templates email :
               </label>
               <select
                 className={fr.cx("fr-select")}
-                id="selectTemplateName"
+                id={
+                  domElementIds.admin.emailsPreviewTab.emailTemplateNameSelect
+                }
                 name="templateName"
                 onChange={(event) =>
                   setCurrentTemplate(event.currentTarget.value as TemplateName)
@@ -160,7 +168,7 @@ const EmailVariableField = ({
   if (variableName === "internshipKind")
     return (
       <Select
-        id=""
+        id={domElementIds.admin.emailsPreviewTab.internshipKindSelect}
         label={variableName}
         name={variableName}
         options={internshipKinds.map((internshipKind) => ({

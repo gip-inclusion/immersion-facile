@@ -4,6 +4,7 @@ import { ModalTitle } from "react-design-system";
 import {
   ContactEstablishmentInPersonDto,
   contactEstablishmentInPersonSchema,
+  domElementIds,
   RomeDto,
   SiretDto,
 } from "shared";
@@ -91,7 +92,7 @@ export const ContactInPerson = ({
           type="submit"
           disabled={isSubmitting}
           nativeButtonProps={{
-            id: "im-contact-establishment__contact-in-person-button",
+            id: domElementIds.search.contactInPersonButton,
           }}
         >
           Envoyer

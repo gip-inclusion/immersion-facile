@@ -2,6 +2,7 @@ import * as React from "react";
 import { File } from "react-design-system";
 import { AbsoluteUrl } from "shared";
 import { technicalGateway } from "src/config/dependencies";
+import { domElementIds } from "shared";
 
 interface UploadLogoProps {
   label: string;
@@ -38,7 +39,7 @@ export const UploadLogo = ({
       label={label}
       hint={hint}
       errorMessage={error}
-      id="file-upload-logo"
+      id={domElementIds.addAgency.uploadLogoInput}
     />
   );
 };

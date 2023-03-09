@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import {
   ConventionStatus,
   doesStatusNeedsJustification,
+  domElementIds,
   UpdateConventionStatusRequestDto,
 } from "shared";
 import { JustificationModal } from "src/app/components/forms/convention/JustificationModal";
@@ -49,7 +50,12 @@ export const VerificationActionButton = ({
         className={className}
         disabled={disabled}
         nativeButtonProps={{
-          id: "im-convention-validation__submit-button",
+          id:
+            newStatus === "REJECTED"
+              ? domElementIds.conventionToValidate
+                  .conventionValidationRejectButton
+              : domElementIds.conventionToValidate
+                  .conventionValidationValidateButton,
         }}
       >
         {children}

@@ -29,6 +29,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import "src/assets/admin.css";
 import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
 import { agencyAdminSlice } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
+import { domElementIds } from "shared";
 
 type EditAgencyFormProperties = {
   agency: AgencyDto;
@@ -89,7 +90,7 @@ export const EditAgencyForm = ({
           />
 
           <Select
-            id="agency-status"
+            id={domElementIds.admin.agencyTab.editAgencyformStatusSelector}
             label="⚠️Statut de l'agence ⚠️"
             options={statusListOfOptions}
             name={register("status").name}
@@ -101,6 +102,7 @@ export const EditAgencyForm = ({
             nativeInputProps={{
               ...register("codeSafir"),
               placeholder: "Code Safir ",
+              id: domElementIds.admin.agencyTab.editAgencyformSafirCodeInput,
             }}
             {...getFieldError("codeSafir")}
           />
@@ -118,7 +120,7 @@ export const EditAgencyForm = ({
             type="submit"
             disabled={agencyState.isUpdating}
             nativeButtonProps={{
-              id: `im-form-edit-agency__submit-button`,
+              id: domElementIds.admin.agencyTab.editAgencyFormEditButton,
             }}
           >
             Mettre à jour
