@@ -32,16 +32,6 @@ type GroupTheme = Record<
   }
 >;
 
-const getFilteredResults = (
-  query: string,
-  results: SearchImmersionResultDto[],
-) =>
-  results.filter((displayedResult: SearchImmersionResultDto) =>
-    JSON.stringify(Object.values(displayedResult))
-      .toLowerCase()
-      .includes(query.toLowerCase()),
-  );
-
 export const GroupPage = ({ route }: GroupPageProps) => {
   const { groupName } = route.params;
   const groupTheme: GroupTheme = {
@@ -59,10 +49,21 @@ export const GroupPage = ({ route }: GroupPageProps) => {
     useState<SearchImmersionResultDto[]>(initialResults);
   const [query, setQuery] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-
-  const filterResults = useCallback((query: string) => {
-    setDisplayedResults(getFilteredResults(query, initialResults));
-  }, []);
+  const getFilteredResults = useCallback(
+    (query: string, results: SearchImmersionResultDto[]) =>
+      results.filter((displayedResult: SearchImmersionResultDto) =>
+        JSON.stringify(Object.values(displayedResult))
+          .toLowerCase()
+          .includes(query.toLowerCase()),
+      ),
+    [],
+  );
+  const filterResults = useCallback(
+    (query: string) => {
+      setDisplayedResults(getFilteredResults(query, initialResults));
+    },
+    [initialResults],
+  );
 
   const onFilterSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -116,7 +117,7 @@ export const GroupPage = ({ route }: GroupPageProps) => {
                 nativeInputProps={{
                   onChange: (event) => setQuery(event.currentTarget.value),
                   placeholder:
-                    "Filtrer les résultats en tapant un métier ou une ville",
+                    "Filtrer les résultats en tapant le nom d'un métier ou d'une ville",
                 }}
               />
             </div>
