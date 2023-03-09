@@ -89,7 +89,7 @@ const InitialSubmitSuccessMessageBase = ({
         Pensez à vérifier votre boîte mail et vos spams.
       </p>
       <p className={cx(fr.cx("fr-my-2w"), "fr-text")}>
-        Si vous ne recevez rien, alertez nous:&nbsp;
+        Si vous ne recevez rien, alertez-nous&nbsp;:&nbsp;
         <a href={`mailto:${immersionFacileContactEmail}`}>
           {immersionFacileContactEmail}
         </a>
