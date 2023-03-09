@@ -63,9 +63,11 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
         Il vous informera par mail de la validation ou non ${
           internshipKind === "immersion" ? "de l'immersion" : "du mini stage"
         }. Le tuteur qui vous encadrera pendant cette période recevra aussi la réponse.`,
-      highlight: `Attention, ne démarrez pas ${
-        internshipKind === "immersion" ? "cette immersion" : "ce mini stage"
-      } tant que vous n'avez pas reçu cette validation !`,
+      highlight: {
+        content: `Attention, ne démarrez pas ${
+          internshipKind === "immersion" ? "cette immersion" : "ce mini stage"
+        } tant que vous n'avez pas reçu cette validation !`,
+      },
       subContent: defaultSignature(internshipKind),
       attachmentUrls:
         internshipKind === "immersion"
@@ -110,9 +112,11 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
         internshipKind === "immersion" ? "de l'immersion" : "du mini stage"
       }. 
       `,
-      highlight: `Attention, ne démarrez pas ${
-        internshipKind === "immersion" ? "cette immersion" : "ce mini stage"
-      } tant que vous n'avez pas reçu la validation !`,
+      highlight: {
+        content: `Attention, ne démarrez pas ${
+          internshipKind === "immersion" ? "cette immersion" : "ce mini stage"
+        } tant que vous n'avez pas reçu la validation !`,
+      },
       subContent: defaultSignature(internshipKind),
       agencyLogoUrl,
     }),
@@ -171,7 +175,9 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       <strong>Structure d'accompagnement :</strong>
       ${agencyName}
       `,
-      highlight: warning,
+      highlight: {
+        content: warning,
+      },
       subContent: defaultSignature(internshipKind),
       attachmentUrls:
         internshipKind === "immersion"
@@ -520,8 +526,10 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
         createConventionStatusButton(conventionStatusLink),
       ],
       subContent: defaultSignature(internshipKind),
-      highlight:
-        "Si vous n'êtes pas à l'origine de cette demande, veuillez contacter notre équipe.",
+      highlight: {
+        content:
+          "Si vous n'êtes pas à l'origine de cette demande, veuillez contacter notre équipe.",
+      },
     }),
   },
   BENEFICIARY_OR_ESTABLISHMENT_REPRESENTATIVE_ALREADY_SIGNED_NOTIFICATION: {
@@ -616,9 +624,11 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
         { url: magicLink, label: "Confirmer ma demande" },
         createConventionStatusButton(conventionStatusLink),
       ],
-      highlight: `Attention, ne démarrez pas votre ${
-        internshipKind === "immersion" ? "immersion" : "mini stage"
-      } tant que vous n'avez pas reçu cette validation ! Vous n'auriez pas de couverture en cas d'accident.`,
+      highlight: {
+        content: `Attention, ne démarrez pas votre ${
+          internshipKind === "immersion" ? "immersion" : "mini stage"
+        } tant que vous n'avez pas reçu cette validation ! Vous n'auriez pas de couverture en cas d'accident.`,
+      },
       subContent: `La décision de votre ${
         internshipKind === "immersion"
           ? "conseiller"
@@ -731,8 +741,10 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
     - Personne à contacter : <strong>${contactFirstName} ${contactLastName}</strong>
     - Adresse de l'entreprise : <strong>${businessAddress}</strong>
     `,
-      highlight:
-        "Ces informations sont personnelles et confidentielles. Elles ne peuvent pas être communiquées à d’autres personnes. ",
+      highlight: {
+        content:
+          "Ces informations sont personnelles et confidentielles. Elles ne peuvent pas être communiquées à d’autres personnes. ",
+      },
       subContent: defaultSignature("immersion"),
     }),
   },
@@ -787,7 +799,9 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       buttons: [
         { label: "Mettre à jour ma fiche établissement", url: editFrontUrl },
       ],
-      highlight: `Nouveauté ! Il est maintenant possible d'informer que votre entreprise peut accueillir en immersion des personnes en situation de handicap *`,
+      highlight: {
+        content: `Nouveauté ! Il est maintenant possible d'informer que votre entreprise peut accueillir en immersion des personnes en situation de handicap *`,
+      },
     }),
   },
   EDIT_FORM_ESTABLISHMENT_LINK: {
@@ -803,7 +817,9 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       Vous pouvez ajouter ou supprimer des métiers, modifier l'adresse de l'entreprise,  les coordonnées du référent “Immersion” dans votre entreprise ou le mode de contact souhaité, etc.  
       `,
       buttons: [{ label: "Modifier ma fiche entreprise", url: editFrontUrl }],
-      highlight: `Si vous n'êtes pas à l'origine de cette demande, nous vous recommandons de nous contacter rapidement par mail : ${immersionFacileContactEmail}.`,
+      highlight: {
+        content: `Si vous n'êtes pas à l'origine de cette demande, nous vous recommandons de nous contacter rapidement par mail : ${immersionFacileContactEmail}.`,
+      },
       subContent: defaultSignature("immersion"),
     }),
   },
@@ -935,9 +951,11 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       
       ${defaultSignature(internshipKind)}
       `,
-      highlight: `Attention, ne démarrez pas ${
-        internshipKind === "immersion" ? "cette immersion" : "ce mini stage"
-      } tant que vous n'avez pas reçu cette validation !`,
+      highlight: {
+        content: `Attention, ne démarrez pas ${
+          internshipKind === "immersion" ? "cette immersion" : "ce mini stage"
+        } tant que vous n'avez pas reçu cette validation !`,
+      },
       agencyLogoUrl,
     }),
   },
@@ -966,17 +984,19 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
           : "DATE INVALIDE"
       }.
       `,
-      highlight: `
-      Attention. Votre convention est en cours d'examen.
-      Avant de débuter ${
-        internshipKind === "immersion" ? "l'immersion" : "le mini stage"
-      }, veuillez vous assurer que la convention a bien été validée par un conseiller${
-        internshipKind === "immersion"
-          ? ""
-          : " de la chambre de commerce et d'instrustrie - CCI"
-      }.
-      Vous recevrez une notification lorsque ce sera fait.
-      `,
+      highlight: {
+        content: `
+        Attention. Votre convention est en cours d'examen.
+        Avant de débuter ${
+          internshipKind === "immersion" ? "l'immersion" : "le mini stage"
+        }, veuillez vous assurer que la convention a bien été validée par un conseiller${
+          internshipKind === "immersion"
+            ? ""
+            : " de la chambre de commerce et d'instrustrie - CCI"
+        }.
+        Vous recevrez une notification lorsque ce sera fait.
+        `,
+      },
       subContent: defaultSignature(internshipKind),
       buttons: [createConventionStatusButton(conventionStatusLink)],
       agencyLogoUrl,

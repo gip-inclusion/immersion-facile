@@ -4,7 +4,10 @@ type CreateEmailVariable<P> = (params: P) => {
   subject: string;
   greetings?: string;
   content?: string;
-  highlight?: string;
+  highlight?: {
+    kind?: "success" | "error" | "warning" | "info";
+    content?: string;
+  };
   subContent?: string;
   legals?: string;
   agencyLogoUrl?: string;
