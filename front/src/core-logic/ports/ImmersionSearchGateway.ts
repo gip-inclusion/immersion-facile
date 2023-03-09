@@ -1,6 +1,7 @@
 import { Observable } from "rxjs";
 import {
   ContactEstablishmentRequestDto,
+  EstablishmentGroupSlug,
   SearchImmersionQueryParamsDto,
   SearchImmersionResultDto,
 } from "shared";
@@ -12,5 +13,7 @@ export interface ImmersionSearchGateway {
   contactEstablishment: (
     params: ContactEstablishmentRequestDto,
   ) => Promise<void>;
-  getGroupOffersBySlug(groupSlug: string): Promise<SearchImmersionResultDto[]>; // TODO: Flavor this type
+  getGroupOffersBySlug(
+    groupSlug: EstablishmentGroupSlug,
+  ): Promise<SearchImmersionResultDto[]>; // TODO: Flavor this type
 }

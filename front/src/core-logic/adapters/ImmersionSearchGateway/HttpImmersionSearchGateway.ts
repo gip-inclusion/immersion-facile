@@ -2,6 +2,7 @@ import { from, map, Observable } from "rxjs";
 import {
   ContactEstablishmentRequestDto,
   contactEstablishmentRoute,
+  EstablishmentGroupSlug,
   immersionOffersRoute,
   SearchImmersionQueryParamsDto,
   SearchImmersionResultDto,
@@ -38,7 +39,7 @@ export class HttpImmersionSearchGateway implements ImmersionSearchGateway {
   }
 
   public async getGroupOffersBySlug(
-    groupSlug: string,
+    groupSlug: EstablishmentGroupSlug,
   ): Promise<SearchImmersionResultDto[]> {
     const response = await this.httpClient.getOffersByGroupSlug({
       urlParams: { slug: groupSlug },

@@ -3,6 +3,7 @@ import { BehaviorSubject, delay, map, Observable, Subject } from "rxjs";
 import {
   AddressDto,
   ContactEstablishmentRequestDto,
+  EstablishmentGroupSlug,
   SearchImmersionQueryParamsDto,
   SearchImmersionResultDto,
   sleep,
@@ -41,7 +42,7 @@ export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {
     return;
   }
   public async getGroupOffersBySlug(
-    _groupName: string,
+    _groupName: EstablishmentGroupSlug,
   ): Promise<SearchImmersionResultDto[]> {
     this.simulatedLatency && (await sleep(this.simulatedLatency));
     return groupOffersBySlugStub;
