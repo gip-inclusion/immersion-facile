@@ -1,6 +1,3 @@
-import "src/assets/css/index.css";
-import "src/assets/dsfr/dsfr.min.css";
-import "src/assets/dsfr/utility/icons/icons.min.css";
 import React from "react";
 import { startReactDsfr } from "@codegouvfr/react-dsfr/spa";
 import { createRoot } from "react-dom/client";
