@@ -1,3 +1,4 @@
+import { parseISO } from "date-fns";
 import {
   addressDtoToString,
   AgencyDto,
@@ -11,14 +12,56 @@ import {
   TemplatedEmail,
   expectTypeToMatchAndEqual,
   CreateConventionMagicLinkPayloadProperties,
+  EmailParamsByEmailType,
+  displayEmergencyContactInfos,
 } from "shared";
 import { GenerateConventionMagicLink } from "../adapters/primary/config/createGenerateConventionMagicLink";
-import { getValidatedConventionFinalConfirmationParams } from "../domain/convention/useCases/notifications/NotifyAllActorsOfFinalConventionValidation";
 import { TimeGateway } from "../domain/core/ports/TimeGateway";
 import { ContactEntity } from "../domain/immersionOffer/entities/ContactEntity";
 import { EstablishmentEntity } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import { AnnotatedImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { fakeGenerateMagicLinkUrlFn } from "./fakeGenerateMagicLinkUrlFn";
+
+// TODO: we should use hardcoded values instead of relying on the getValidatedConventionFinalConfirmationParams
+export const getValidatedConventionFinalConfirmationParams = (
+  agency: AgencyDto,
+  convention: ConventionDto,
+  generateMagicLinkFn: GenerateConventionMagicLink,
+  timeGateway: TimeGateway,
+): EmailParamsByEmailType["VALIDATED_CONVENTION_FINAL_CONFIRMATION"] => {
+  const { beneficiary, beneficiaryRepresentative } = convention.signatories;
+  const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties = {
+    id: convention.id,
+    // role and email should not be valid
+    role: beneficiary.role,
+    email: beneficiary.email,
+    now: timeGateway.now(),
+    exp: timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365, // 1 year
+  };
+  return {
+    internshipKind: convention.internshipKind,
+
+    beneficiaryFirstName: beneficiary.firstName,
+    beneficiaryLastName: beneficiary.lastName,
+    beneficiaryBirthdate: beneficiary.birthdate,
+
+    dateStart: parseISO(convention.dateStart).toLocaleDateString("fr"),
+    dateEnd: parseISO(convention.dateEnd).toLocaleDateString("fr"),
+    establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
+    businessName: convention.businessName,
+    immersionAppellationLabel: convention.immersionAppellation.appellationLabel,
+
+    emergencyContactInfos: displayEmergencyContactInfos({
+      beneficiaryRepresentative,
+      beneficiary,
+    }),
+    agencyLogoUrl: agency.logoUrl,
+    magicLink: generateMagicLinkFn({
+      ...magicLinkCommonFields,
+      targetRoute: frontRoutes.conventionDocument,
+    }),
+  };
+};
 
 export const expectEmaiSignatoryConfirmationSignatureRequestMatchingConvention =
   ({

@@ -1,10 +1,13 @@
+import { createSelector } from "@reduxjs/toolkit";
 import { createRootSelector } from "src/core-logic/storeConfig/store";
 
-const feedback = createRootSelector((state) => state.agencyInfo.feedback);
+const agencyInfos = createRootSelector((state) => state.agencyInfo);
 
-const isLoading = createRootSelector((state) => state.agencyInfo.isLoading);
+const feedback = createSelector(agencyInfos, ({ feedback }) => feedback);
 
-const details = createRootSelector((state) => state.agencyInfo.details);
+const isLoading = createSelector(agencyInfos, ({ isLoading }) => isLoading);
+
+const details = createSelector(agencyInfos, ({ details }) => details);
 
 export const agencyInfoSelectors = {
   feedback,

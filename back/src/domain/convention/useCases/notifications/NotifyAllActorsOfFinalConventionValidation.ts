@@ -5,7 +5,6 @@ import {
   conventionSchema,
   CreateConventionMagicLinkPayloadProperties,
   displayEmergencyContactInfos,
-  EmailParamsByEmailType,
   frontRoutes,
 } from "shared";
 import { GenerateConventionMagicLink } from "../../../../adapters/primary/config/createGenerateConventionMagicLink";
@@ -60,56 +59,51 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
           ? [convention.establishmentTutor.email]
           : []),
       ],
-      params: getValidatedConventionFinalConfirmationParams(
+      params: this.getValidatedConventionFinalConfirmationParams(
         agency,
         convention,
-        this.generateMagicLinkFn,
-        this.timeGateway,
       ),
     });
   }
+  private getValidatedConventionFinalConfirmationParams(
+    agency: AgencyDto,
+    convention: ConventionDto,
+  ) {
+    const { beneficiary, beneficiaryRepresentative } = convention.signatories;
+    const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties = {
+      id: convention.id,
+      // role and email should not be valid
+      role: beneficiary.role,
+      email: beneficiary.email,
+      now: this.timeGateway.now(),
+      exp: this.timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365, // 1 year
+    };
+    return {
+      internshipKind: convention.internshipKind,
+
+      beneficiaryFirstName: beneficiary.firstName,
+      beneficiaryLastName: beneficiary.lastName,
+      beneficiaryBirthdate: beneficiary.birthdate,
+
+      dateStart: parseISO(convention.dateStart).toLocaleDateString("fr"),
+      dateEnd: parseISO(convention.dateEnd).toLocaleDateString("fr"),
+      establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
+      businessName: convention.businessName,
+      immersionAppellationLabel:
+        convention.immersionAppellation.appellationLabel,
+
+      emergencyContactInfos: displayEmergencyContactInfos({
+        beneficiaryRepresentative,
+        beneficiary,
+      }),
+      agencyLogoUrl: agency.logoUrl,
+      magicLink: this.generateMagicLinkFn({
+        ...magicLinkCommonFields,
+        targetRoute: frontRoutes.conventionDocument,
+      }),
+    };
+  }
 }
-
-// Visible for testing.
-export const getValidatedConventionFinalConfirmationParams = (
-  agency: AgencyDto,
-  convention: ConventionDto,
-  generateMagicLinkFn: GenerateConventionMagicLink,
-  timeGateway: TimeGateway,
-): EmailParamsByEmailType["VALIDATED_CONVENTION_FINAL_CONFIRMATION"] => {
-  const { beneficiary, beneficiaryRepresentative } = convention.signatories;
-  const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties = {
-    id: convention.id,
-    // role and email should not be valid
-    role: beneficiary.role,
-    email: beneficiary.email,
-    now: timeGateway.now(),
-    exp: timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365, // 1 year
-  };
-  return {
-    internshipKind: convention.internshipKind,
-
-    beneficiaryFirstName: beneficiary.firstName,
-    beneficiaryLastName: beneficiary.lastName,
-    beneficiaryBirthdate: beneficiary.birthdate,
-
-    dateStart: parseISO(convention.dateStart).toLocaleDateString("fr"),
-    dateEnd: parseISO(convention.dateEnd).toLocaleDateString("fr"),
-    establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
-    businessName: convention.businessName,
-    immersionAppellationLabel: convention.immersionAppellation.appellationLabel,
-
-    emergencyContactInfos: displayEmergencyContactInfos({
-      beneficiaryRepresentative,
-      beneficiary,
-    }),
-    agencyLogoUrl: agency.logoUrl,
-    magicLink: generateMagicLinkFn({
-      ...magicLinkCommonFields,
-      targetRoute: frontRoutes.conventionDocument,
-    }),
-  };
-};
 
 const getPeAdvisorEmailIfExist = (
   conventionPeUserAdvisor: ConventionPoleEmploiUserAdvisorEntity | undefined,

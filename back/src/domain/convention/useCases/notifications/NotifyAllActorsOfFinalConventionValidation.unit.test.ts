@@ -9,7 +9,10 @@ import {
   frontRoutes,
   reasonableSchedule,
 } from "shared";
-import { expectEmailFinalValidationConfirmationMatchingConvention } from "../../../../_testBuilders/emailAssertions";
+import {
+  expectEmailFinalValidationConfirmationMatchingConvention,
+  getValidatedConventionFinalConfirmationParams,
+} from "../../../../_testBuilders/emailAssertions";
 
 import {
   createInMemoryUow,
@@ -18,10 +21,7 @@ import {
 import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../peConnect/dto/PeConnect.dto";
-import {
-  getValidatedConventionFinalConfirmationParams,
-  NotifyAllActorsOfFinalConventionValidation,
-} from "./NotifyAllActorsOfFinalConventionValidation";
+import { NotifyAllActorsOfFinalConventionValidation } from "./NotifyAllActorsOfFinalConventionValidation";
 
 import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/fakeGenerateMagicLinkUrlFn";
 import { RealTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/RealTimeGateway";
