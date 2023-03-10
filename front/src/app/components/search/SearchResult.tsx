@@ -23,173 +23,183 @@ export type EnterpriseSearchResultProps = {
 
 const componentName = "im-search-result";
 
-export const SearchResult = memo(
-  ({
-    onButtonClick,
-    establishment,
-    preview,
-    layout = "fr-col-md-4",
-    showDistance = true,
-  }: EnterpriseSearchResultProps) => {
-    const { cx } = useStyles();
-    const {
-      name,
-      customizedName,
-      distance_m,
-      address,
-      contactMode,
-      numberOfEmployeeRange,
-      nafLabel,
-      romeLabel,
-      appellationLabels,
-      voluntaryToImmersion,
-      website,
-      fitForDisabledWorkers,
-      additionalInformation,
-    } = establishment;
-    const distanceKm = ((distance_m ?? 0) / 1000).toFixed(1);
-    const establishmentRawName =
-      customizedName && customizedName.length > 0 ? customizedName : name;
-    const [establismentNameFirstLetter, ...establismentNameOtherLetters] =
-      establishmentRawName;
-    const [additionalInformationClamped, setAdditionalInformationClamped] =
-      useState<boolean>(true);
-    const [additionalInformationIsTooLong, setAdditionalInformationIsTooLong] =
-      useState<boolean>(false);
-    const [
-      shouldUpdateAdditionalInformationState,
-      setShouldUpdateAdditionalInformationState,
-    ] = useState<boolean>(true);
-    const establismentName = [
-      establismentNameFirstLetter.toLocaleUpperCase(),
-      establismentNameOtherLetters.join("").toLocaleLowerCase(),
-    ].join("");
-    const onAdditionalInformationClick = () => {
-      setAdditionalInformationClamped((prevValue) => !prevValue);
-    };
-    const onAdditionalInformationReflow = (additionalInformationDisplayState: {
-      clamped: boolean;
-      text: string;
-    }) => {
-      if (shouldUpdateAdditionalInformationState) {
-        setAdditionalInformationIsTooLong(
-          additionalInformationDisplayState.clamped,
-        );
-        setShouldUpdateAdditionalInformationState(false);
-      }
-    };
-    return (
-      <div className={fr.cx("fr-col-12", layout)}>
-        <div className={cx(fr.cx("fr-card"), componentName)}>
-          <div className={fr.cx("fr-card__body")}>
-            <div className={fr.cx("fr-card__content")}>
-              <h3 className={fr.cx("fr-card__title")}>{establismentName}</h3>
-              <p className={fr.cx("fr-card__desc")}>
-                {" "}
-                {appellationLabels.length > 0
-                  ? appellationLabels.join(", ")
-                  : romeLabel}
-              </p>
-              <ul className={fr.cx("fr-card__desc", "fr-text--xs")}>
-                {nafLabel && nafLabel !== "" && <li>{nafLabel}</li>}
-                {numberOfEmployeeRange && (
-                  <li>
-                    {numberOfEmployeeRange}{" "}
-                    {numberOfEmployeeRange === "0" ? "salarié" : "salariés"}
-                  </li>
-                )}
+const SearchResultComponent = ({
+  onButtonClick,
+  establishment,
+  preview,
+  layout = "fr-col-md-4",
+  showDistance = true,
+}: EnterpriseSearchResultProps) => {
+  const { cx } = useStyles();
+
+  const {
+    name,
+    customizedName,
+    distance_m,
+    address,
+    contactMode,
+    numberOfEmployeeRange,
+    nafLabel,
+    romeLabel,
+    appellationLabels,
+    voluntaryToImmersion,
+    website,
+    fitForDisabledWorkers,
+    additionalInformation,
+  } = establishment;
+
+  const distanceKm = ((distance_m ?? 0) / 1000).toFixed(1);
+
+  const establishmentRawName =
+    customizedName && customizedName.length > 0 ? customizedName : name;
+
+  const [establismentNameFirstLetter, ...establismentNameOtherLetters] =
+    establishmentRawName;
+
+  const [additionalInformationClamped, setAdditionalInformationClamped] =
+    useState<boolean>(true);
+
+  const [additionalInformationIsTooLong, setAdditionalInformationIsTooLong] =
+    useState<boolean>(false);
+
+  const [
+    shouldUpdateAdditionalInformationState,
+    setShouldUpdateAdditionalInformationState,
+  ] = useState<boolean>(true);
+
+  const establismentName = [
+    establismentNameFirstLetter.toLocaleUpperCase(),
+    establismentNameOtherLetters.join("").toLocaleLowerCase(),
+  ].join("");
+
+  const onAdditionalInformationClick = () => {
+    setAdditionalInformationClamped((prevValue) => !prevValue);
+  };
+
+  const onAdditionalInformationReflow = (additionalInformationDisplayState: {
+    clamped: boolean;
+    text: string;
+  }) => {
+    if (shouldUpdateAdditionalInformationState) {
+      setAdditionalInformationIsTooLong(
+        additionalInformationDisplayState.clamped,
+      );
+      setShouldUpdateAdditionalInformationState(false);
+    }
+  };
+
+  return (
+    <div className={fr.cx("fr-col-12", layout)}>
+      <div className={cx(fr.cx("fr-card"), componentName)}>
+        <div className={fr.cx("fr-card__body")}>
+          <div className={fr.cx("fr-card__content")}>
+            <h3 className={fr.cx("fr-card__title")}>{establismentName}</h3>
+            <p className={fr.cx("fr-card__desc")}>
+              {" "}
+              {appellationLabels.length > 0
+                ? appellationLabels.join(", ")
+                : romeLabel}
+            </p>
+            <ul className={fr.cx("fr-card__desc", "fr-text--xs")}>
+              {nafLabel && nafLabel !== "" && <li>{nafLabel}</li>}
+              {numberOfEmployeeRange && (
                 <li>
-                  <a
-                    href={getMapsLink(establishment)}
-                    target="_blank"
-                    className={cx(`${componentName}__location-link`)}
-                  >
-                    {addressDtoToString(address).toLocaleLowerCase()}
-                  </a>{" "}
-                  {showDistance && (
-                    <span>
-                      <strong>
-                        {distanceKm}
-                        km
-                      </strong>{" "}
-                      de votre position
-                    </span>
+                  {numberOfEmployeeRange}{" "}
+                  {numberOfEmployeeRange === "0" ? "salarié" : "salariés"}
+                </li>
+              )}
+              <li>
+                <a
+                  href={getMapsLink(establishment)}
+                  target="_blank"
+                  className={cx(`${componentName}__location-link`)}
+                >
+                  {addressDtoToString(address).toLocaleLowerCase()}
+                </a>{" "}
+                {showDistance && (
+                  <span>
+                    <strong>
+                      {distanceKm}
+                      km
+                    </strong>{" "}
+                    de votre position
+                  </span>
+                )}
+              </li>
+              {website && (
+                <li>
+                  <a href={toAbsoluteUrl(website)} target="_blank">
+                    Voir le site de l'entreprise
+                  </a>
+                </li>
+              )}
+              {additionalInformation && (
+                <li>
+                  <LinesEllipsis
+                    text={additionalInformation}
+                    maxLine={additionalInformationClamped ? 2 : 10}
+                    basedOn="letters"
+                    ellipsis={"..."}
+                    onReflow={onAdditionalInformationReflow}
+                  />
+                  {additionalInformationIsTooLong && (
+                    <button
+                      className={fr.cx("fr-tag", "fr-tag--sm", "fr-mt-1w")}
+                      onClick={onAdditionalInformationClick}
+                    >
+                      {additionalInformationClamped
+                        ? "Voir plus"
+                        : "Voir moins"}
+                    </button>
                   )}
                 </li>
-                {website && (
-                  <li>
-                    <a href={toAbsoluteUrl(website)} target="_blank">
-                      Voir le site de l'entreprise
-                    </a>
-                  </li>
-                )}
-                {additionalInformation && (
-                  <li>
-                    <LinesEllipsis
-                      text={additionalInformation}
-                      maxLine={additionalInformationClamped ? 2 : 10}
-                      basedOn="letters"
-                      ellipsis={"..."}
-                      onReflow={onAdditionalInformationReflow}
-                    />
-                    {additionalInformationIsTooLong && (
-                      <button
-                        className={fr.cx("fr-tag", "fr-tag--sm", "fr-mt-1w")}
-                        onClick={onAdditionalInformationClick}
-                      >
-                        {additionalInformationClamped
-                          ? "Voir plus"
-                          : "Voir moins"}
-                      </button>
-                    )}
-                  </li>
-                )}
-              </ul>
-              <ul className={fr.cx("fr-card__desc", "fr-badges-group")}>
+              )}
+            </ul>
+            <ul className={fr.cx("fr-card__desc", "fr-badges-group")}>
+              <li>
+                <InfoLabel
+                  contactMode={contactMode}
+                  voluntaryToImmersion={voluntaryToImmersion}
+                />
+              </li>
+              {fitForDisabledWorkers && (
                 <li>
-                  <InfoLabel
-                    contactMode={contactMode}
-                    voluntaryToImmersion={voluntaryToImmersion}
-                  />
+                  <Label className={fr.cx("fr-badge--yellow-moutarde")}>
+                    Priorité aux personnes en situation de handicap
+                  </Label>
                 </li>
-                {fitForDisabledWorkers && (
-                  <li>
-                    <Label className={fr.cx("fr-badge--yellow-moutarde")}>
-                      Priorité aux personnes en situation de handicap
-                    </Label>
-                  </li>
-                )}
-              </ul>
-            </div>
-            <div className={fr.cx("fr-card__footer")}>
-              <Button
-                size="small"
-                type="button"
-                iconId="fr-icon-mail-fill"
-                disabled={preview}
-                onClick={
-                  preview
-                    ? () => {
-                        //
-                      }
-                    : onButtonClick
-                }
-              >
-                {contactMode === "PHONE" ||
-                contactMode === "EMAIL" ||
-                contactMode === "IN_PERSON" ||
+              )}
+            </ul>
+          </div>
+          <div className={fr.cx("fr-card__footer")}>
+            <Button
+              size="small"
+              type="button"
+              iconId="fr-icon-mail-fill"
+              disabled={preview}
+              onClick={
                 preview
-                  ? "Contacter l'entreprise"
-                  : "Tentez votre chance"}
-              </Button>
-            </div>
+                  ? () => {
+                      //
+                    }
+                  : onButtonClick
+              }
+            >
+              {contactMode === "PHONE" ||
+              contactMode === "EMAIL" ||
+              contactMode === "IN_PERSON" ||
+              preview
+                ? "Contacter l'entreprise"
+                : "Tentez votre chance"}
+            </Button>
           </div>
         </div>
       </div>
-    );
-  },
-  () => true,
-);
+    </div>
+  );
+};
+
+export const SearchResult = memo(SearchResultComponent, () => true);
 
 type InfoLabelProps = {
   voluntaryToImmersion?: boolean;
