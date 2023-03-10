@@ -19,7 +19,7 @@ import {
   LookupSearchResult,
   lookupSearchResultsSchema,
   OpenCageGeoSearchKey,
-  toFeatureCollection,
+  toGeoJsonFeatureCollection,
 } from "shared";
 import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
 
@@ -125,6 +125,7 @@ export class HttpAddressGateway implements AddressGateway {
     private geocodingApiKey: string,
     private geosearchApiKey: OpenCageGeoSearchKey,
   ) {}
+
   public async getDepartmentCodeFromAddressAPI(
     postCode: string,
   ): Promise<DepartmentCode | null> {
@@ -133,12 +134,17 @@ export class HttpAddressGateway implements AddressGateway {
         q: postCode,
       },
     });
-    const feature = toFeatureCollection(response.responseBody).features.at(0);
+
+    const feature = toGeoJsonFeatureCollection(
+      response.responseBody,
+    ).features.at(0);
+
     if (!feature) {
       throw new Error(`No feature on Address API for postCode ${postCode}`);
     }
     return featureToAddressDto(feature).departmentCode;
   }
+
   public async findDepartmentCodeFromPostCode(
     postCode: string,
   ): Promise<DepartmentCode | null> {
@@ -185,6 +191,7 @@ export class HttpAddressGateway implements AddressGateway {
     );
     return feature && this.featureToAddress(feature);
   }
+
   public async lookupStreetAddress(
     query: string,
   ): Promise<AddressAndPosition[]> {
@@ -270,8 +277,9 @@ export class HttpAddressGateway implements AddressGateway {
     const streetName: string | undefined = getStreetNameFromAliases(components);
     const streetNumber: string | undefined =
       getStreetNumberFromAliases(components);
+    const postcode = getPostcodeFromAliases(components);
 
-    if (!(city && department)) return undefined;
+    if (!(city && department && postcode)) return undefined;
 
     // OpenCageData gives the department name but not the code.
     const departmentCode = departmentNameToDepartmentCode[department];
@@ -283,7 +291,7 @@ export class HttpAddressGateway implements AddressGateway {
 
     return {
       streetNumberAndAddress,
-      postcode: components.postcode ?? "",
+      postcode,
       departmentCode,
       city,
     };
@@ -341,6 +349,10 @@ type OpenCageDataAddressComponents = {
   township?: string;
   village?: string;
 };
+
+const getPostcodeFromAliases = (
+  components: OpenCageDataAddressComponents,
+): string | undefined => components.postcode;
 
 const getStreetNumberFromAliases = (
   components: OpenCageDataAddressComponents,

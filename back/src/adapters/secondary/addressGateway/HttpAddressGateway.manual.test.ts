@@ -62,7 +62,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
     );
   });
 
-  describe("lookupStreetAddress", () => {
+  describe("lookupStreetAddress, postcode is now mandatory", () => {
     it.each([
       {
         candidateQuery: "111 Meinglazou 29260 Lesneven",
@@ -121,12 +121,12 @@ describe("HttpOpenCageDataAddressGateway", () => {
         },
       },
       {
-        candidateQuery: "Paris",
+        candidateQuery: "Avenue des Champs élyssés Paris",
         expectedAddress: {
-          city: "Paris",
+          city: "Paris 8e Arrondissement",
           departmentCode: "75",
-          postcode: "",
-          streetNumberAndAddress: "",
+          postcode: "75008",
+          streetNumberAndAddress: "Avenue des Champs-Élysées",
         },
       },
       {

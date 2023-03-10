@@ -45,5 +45,6 @@ export const geoJsonFeatureCollectionSchema: z.Schema<GeoJsonFeatureCollection> 
     features: z.array(geoJsonFeatureSchema),
   });
 
-export const toFeatureCollection = (data: unknown): GeoJsonFeatureCollection =>
-  geoJsonFeatureCollectionSchema.parse(data);
+export const toGeoJsonFeatureCollection = (
+  data: unknown,
+): GeoJsonFeatureCollection => geoJsonFeatureCollectionSchema.parse(data);
