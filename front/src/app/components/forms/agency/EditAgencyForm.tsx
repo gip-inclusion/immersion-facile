@@ -18,7 +18,7 @@ import {
   AgencyFormCommonFields,
   AgencyLogoUpload,
 } from "src/app/components/forms/agency/AgencyFormCommonFields";
-import { FillableList } from "src/app/components/forms/commons/FillableList";
+import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
 import { formAgencyFieldsLabels } from "src/app/contents/forms/agency/formAgency";
 import {
   formErrorsToFlatErrors,
@@ -78,7 +78,7 @@ export const EditAgencyForm = ({
       >
         <div className={fr.cx("fr-mb-4w")}>
           <AgencyFormCommonFields addressInitialValue={agency.address} />
-          <FillableList
+          <MultipleEmailsInput
             name="agency-admin-emails"
             label="⚠️Emails administrateur de l'agence ⚠️"
             description="Ces emails auront le droit d'accéder aux tableaux de bord et d'éditer les informations et accès du personnel de l'agence"

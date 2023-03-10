@@ -1,8 +1,5 @@
-import MuiChip from "@mui/material/Chip";
-import { styled } from "@mui/material/styles";
-import React, { useEffect, useState } from "react";
-import { Button } from "@codegouvfr/react-dsfr/Button";
 import { fr } from "@codegouvfr/react-dsfr";
+import React, { useEffect, useState } from "react";
 import { useStyles } from "tss-react/dsfr";
 
 import {
@@ -12,34 +9,33 @@ import {
 } from "shared";
 import { z } from "zod";
 
-const immersionBlue = "#3458a2";
-
-const Chip = styled(MuiChip)({
-  borderColor: immersionBlue,
-  color: immersionBlue,
-  fontWeight: "bold",
-  backgroundColor: "white",
-});
 const componentName = "im-fillable-list";
-export const FillableList = (
-  props: OmitFromExistingKeys<AddToListProps, "onAdd"> & {
+
+export const MultipleEmailsInput = (
+  props: OmitFromExistingKeys<InputContainerProps, "onInputChange"> & {
     valuesInList: string[];
     setValues: (values: string[]) => void;
   },
 ) => {
   const { valuesInList, setValues, ...addToListProps } = props;
   const { cx } = useStyles();
+  const getEmailValuesFromString = (stringToParse: string) => {
+    const regex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/g;
+    const matches = stringToParse.match(regex);
+    return matches?.map((match) => match.trim()) || [];
+  };
 
+  const onInputChange = (inputValue: string) => {
+    const updatedValues = [
+      ...new Set([...getEmailValuesFromString(inputValue)]),
+    ];
+    setValues(updatedValues);
+  };
   return (
     <div className={cx(fr.cx("fr-input-group"), componentName)}>
-      <AddToList
-        {...addToListProps}
-        onAdd={(inputValue) => {
-          setValues([...valuesInList, inputValue]);
-        }}
-      />
+      <InputContainer {...addToListProps} onInputChange={onInputChange} />
       {valuesInList.length > 0 && (
-        <ListOfChip
+        <EmailsValuesSummary
           values={valuesInList}
           onDelete={(valueToDelete) => {
             setValues(valuesInList.filter(notEqual(valueToDelete)));
@@ -50,9 +46,9 @@ export const FillableList = (
   );
 };
 
-type AddToListProps = {
+type InputContainerProps = {
   name: string;
-  onAdd: (inputValue: string) => void;
+  onInputChange: (inputValue: string) => void;
   label?: string;
   placeholder?: string;
   description?: string;
@@ -73,32 +69,23 @@ const createGetInputError =
     }
   };
 
-const AddToList = ({
+const InputContainer = ({
   name,
   label,
   placeholder,
   description,
-  onAdd,
+  onInputChange,
   validationSchema,
-}: AddToListProps) => {
+}: InputContainerProps) => {
   const [inputValue, setInputValue] = useState("");
   const [error, setError] = useState<string | null>(null);
   const getInputError = createGetInputError(validationSchema);
 
   useEffect(() => {
+    onInputChange(inputValue);
     if (!inputValue || !error) return;
     setError(getInputError(inputValue));
   }, [error, inputValue]);
-
-  const onAddClick = () => {
-    if (!inputValue) return;
-
-    const inputError = getInputError(inputValue);
-    if (inputError) return setError(inputError);
-
-    onAdd(inputValue);
-    setInputValue("");
-  };
 
   return (
     <div
@@ -122,21 +109,12 @@ const AddToList = ({
             value={inputValue}
             type="text"
             name={name}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                onAddClick();
-              }
-            }}
-            onChange={(e) => setInputValue(e.target.value)}
+            onChange={(event) => setInputValue(event.target.value)}
             className={fr.cx("fr-input", error ? "fr-input--error" : undefined)}
             placeholder={placeholder || ""}
             aria-describedby="text-input-error-desc-error"
           />
         </div>
-        <Button type="button" onClick={onAddClick}>
-          Ajouter
-        </Button>
       </div>
       {error && (
         <p
@@ -150,21 +128,32 @@ const AddToList = ({
   );
 };
 
-type ListOfChipProps = {
+type EmailsValuesSummaryProps = {
   values: string[];
   onDelete: (valueToDelete: string) => void;
 };
 
-const ListOfChip = ({ values, onDelete }: ListOfChipProps) => (
+const EmailsValuesSummary = ({
+  values,
+  onDelete,
+}: EmailsValuesSummaryProps) => (
   <div className={`${componentName}__list-of-chip`}>
-    {values.map((value, index) => (
-      <span key={value} className={index ? "fr-px-1w" : ""}>
-        <Chip
-          variant="outlined"
-          label={value}
-          onDelete={() => onDelete(value)}
-        />
-      </span>
-    ))}
+    <span className={fr.cx("fr-hint-text")}>
+      Voici les adresses emails qui seront ajoutées en copie :
+    </span>
+    <ul className={fr.cx("fr-tags-group", "fr-mt-1w")}>
+      <li>
+        {values.map((value) => (
+          <button
+            className={fr.cx("fr-tag", "fr-tag--dismiss")}
+            onClick={() => onDelete(value)}
+            key={value}
+            arial-label={`Supprimer l'adresse email ${value}`}
+          >
+            {value}
+          </button>
+        ))}
+      </li>
+    </ul>
   </div>
 );

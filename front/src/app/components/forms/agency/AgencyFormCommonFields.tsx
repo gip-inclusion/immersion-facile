@@ -18,7 +18,7 @@ import {
 } from "src/app/contents/forms/agency/formAgency";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
-import { FillableList } from "src/app/components/forms/commons/FillableList";
+import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
 import {
   makeFieldError,
   useFormContents,
@@ -103,7 +103,7 @@ export const AgencyFormCommonFields = ({
         groupLabel={fieldsContent.stepsForValidation.label}
       />
       {validationSteps === "twoSteps" && (
-        <FillableList
+        <MultipleEmailsInput
           {...fieldsContent.counsellorEmails}
           valuesInList={watch("counsellorEmails")}
           setValues={(values) => setValue("counsellorEmails", values)}
@@ -111,7 +111,7 @@ export const AgencyFormCommonFields = ({
         />
       )}
 
-      <FillableList
+      <MultipleEmailsInput
         {...fieldsContent.validatorEmails}
         description={descriptionByValidationSteps[validationSteps]}
         valuesInList={watch("validatorEmails")}

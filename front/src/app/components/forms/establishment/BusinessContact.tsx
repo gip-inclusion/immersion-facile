@@ -2,7 +2,7 @@ import { useFormikContext } from "formik";
 import React from "react";
 import { ContactMethod, FormEstablishmentDto, zEmail } from "shared";
 import { RadioGroupForField } from "src/app/components/forms/commons/RadioGroup";
-import { FillableList } from "src/app/components/forms/commons/FillableList";
+import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
@@ -45,7 +45,7 @@ export const BusinessContact = () => {
       <TextInput {...formContents["businessContact.job"]} />
       <TextInput {...formContents["businessContact.phone"]} />
       <TextInput {...formContents["businessContact.email"]} />
-      <FillableList
+      <MultipleEmailsInput
         {...formContents["businessContact.copyEmails"]}
         valuesInList={values.businessContact.copyEmails}
         setValues={(newValues) => {
