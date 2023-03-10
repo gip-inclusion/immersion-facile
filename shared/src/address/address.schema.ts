@@ -15,7 +15,7 @@ export const departmentCodeSchema: z.Schema<DepartmentCode> = z.string();
 
 export const addressSchema: z.Schema<AddressDto> = z.object({
   streetNumberAndAddress: zStringCanBeEmpty,
-  postcode: zStringCanBeEmpty,
+  postcode: zString,
   departmentCode: zString,
   city: zString,
 });

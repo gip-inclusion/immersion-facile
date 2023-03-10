@@ -48,7 +48,7 @@ const SearchResultComponent = ({
     additionalInformation,
   } = establishment;
 
-  const distanceKm = ((distance_m ?? 0) / 1000).toFixed(1);
+  const distanceKm = ((distance_m ?? 0) * 0.001).toFixed(1);
 
   const establishmentRawName =
     customizedName && customizedName.length > 0 ? customizedName : name;

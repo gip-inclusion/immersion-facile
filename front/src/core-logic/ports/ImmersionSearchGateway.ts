@@ -15,5 +15,5 @@ export interface ImmersionSearchGateway {
   ) => Promise<void>;
   getGroupOffersBySlug(
     groupSlug: EstablishmentGroupSlug,
-  ): Promise<SearchImmersionResultDto[]>; // TODO: Flavor this type
+  ): Promise<SearchImmersionResultDto[]>;
 }
