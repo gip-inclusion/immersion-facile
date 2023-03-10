@@ -22,7 +22,7 @@ export const MultipleEmailsInput = (
   const getEmailValuesFromString = (stringToParse: string) => {
     const regex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/g;
     const matches = stringToParse.match(regex);
-    return matches?.map((match) => match.trim()) || [];
+    return (matches || []).map((match) => match.trim());
   };
 
   const onInputChange = (inputValue: string) => {
