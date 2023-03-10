@@ -659,49 +659,103 @@ export class PgEstablishmentAggregateRepository
   ): Promise<EstablishmentAggregate | undefined> {
     const aggregateWithStringDates = (
       await this.client.query(
-        `WITH 
-          unique_establishments__immersion_contacts AS ( SELECT DISTINCT ON (establishment_siret) establishment_siret, contact_uuid FROM establishments__immersion_contacts ),
-          filtered_immersion_offers AS (SELECT siret, JSON_AGG(JSON_BUILD_OBJECT('romeCode', rome_code, 'score', score, 'appellationCode', rome_appellation::text, 'createdAt',  to_char(created_at::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'))) as immersionOffers
-             FROM immersion_offers WHERE siret = $1 GROUP BY siret)
-        SELECT JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
-          'establishment', JSON_BUILD_OBJECT(
-            'siret', e.siret, 
-            'name', e.name, 
-            'customizedName', e.customized_name, 
-            'website', e.website, 
-            'additionalInformation', e.additional_information, 
-            'address', JSON_BUILD_OBJECT('streetNumberAndAddress', e.street_number_and_address, 
-                                         'postcode', e.post_code,
-                                         'city', e.city,
-                                         'departmentCode', e.department_code),
-            'voluntaryToImmersion', e.data_source = 'form',
-            'dataSource', e.data_source, 
-            'sourceProvider', e.source_provider, 
-            'position', JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat), 
-            'nafDto',JSON_BUILD_OBJECT('code', e.naf_code, 'nomenclature', e.naf_nomenclature), 
-            'numberEmployeesRange', e.number_employees, 
-            'updatedAt', to_char(e.update_date::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'), 
-            'isActive', e.is_active, 
-            'isSearchable', e.is_searchable, 
-            'isCommited', e.is_commited,
-            'maxContactsPerWeek', e.max_contacts_per_week
-            ),
-          'immersionOffers', io.immersionOffers,
-          'contact', JSON_BUILD_OBJECT(
-            'id', ic.uuid,
-            'firstName', ic.firstname,
-            'lastName', ic.lastname,
-            'job', ic.job,
-            'contactMethod', ic.contact_mode,
-            'phone', ic.phone,
-            'email', ic.email,
-            'copyEmails', ic.copy_emails
+        `WITH unique_establishments__immersion_contacts AS (
+          SELECT 
+            DISTINCT ON (establishment_siret) establishment_siret, 
+            contact_uuid 
+          FROM 
+            establishments__immersion_contacts
+        ), 
+        filtered_immersion_offers AS (
+          SELECT 
+            siret, 
+            JSON_AGG(
+              JSON_BUILD_OBJECT(
+                'romeCode', rome_code, 
+                'score', score, 
+                'appellationCode', rome_appellation::text, 
+                'appellationLabel', pad.libelle_appellation_long::text,
+                'createdAt', 
+                to_char(
+                  created_at::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
+                )
+              )
+            ) as immersionOffers 
+          FROM 
+            immersion_offers
+          LEFT JOIN public_appellations_data AS pad ON pad.code_rome = immersion_offers.rome_code
+          WHERE 
+            siret = $1 
+          GROUP BY 
+            siret
+        ) 
+        SELECT 
+          JSON_STRIP_NULLS(
+            JSON_BUILD_OBJECT(
+              'establishment', 
+              JSON_BUILD_OBJECT(
+                'siret', 
+                e.siret, 
+                'name', 
+                e.name, 
+                'customizedName', 
+                e.customized_name, 
+                'website', 
+                e.website, 
+                'additionalInformation', 
+                e.additional_information, 
+                'address', 
+                JSON_BUILD_OBJECT(
+                  'streetNumberAndAddress', e.street_number_and_address, 
+                  'postcode', e.post_code, 'city', 
+                  e.city, 'departmentCode', e.department_code
+                ), 
+                'voluntaryToImmersion', 
+                e.data_source = 'form', 
+                'dataSource', 
+                e.data_source, 
+                'sourceProvider', 
+                e.source_provider, 
+                'position', 
+                JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat), 
+                'nafDto', 
+                JSON_BUILD_OBJECT(
+                  'code', e.naf_code, 'nomenclature', 
+                  e.naf_nomenclature
+                ), 
+                'numberEmployeesRange', 
+                e.number_employees, 
+                'updatedAt', 
+                to_char(
+                  e.update_date::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
+                ), 
+                'isActive', 
+                e.is_active, 
+                'isSearchable', 
+                e.is_searchable, 
+                'isCommited', 
+                e.is_commited, 
+                'maxContactsPerWeek', 
+                e.max_contacts_per_week
+              ), 
+              'immersionOffers', 
+              io.immersionOffers, 
+              'contact', 
+              JSON_BUILD_OBJECT(
+                'id', ic.uuid, 'firstName', ic.firstname, 
+                'lastName', ic.lastname, 'job', ic.job, 
+                'contactMethod', ic.contact_mode, 
+                'phone', ic.phone, 'email', ic.email, 
+                'copyEmails', ic.copy_emails
+              )
             )
-          )) AS aggregate
-          FROM filtered_immersion_offers AS io
-          LEFT JOIN establishments AS e ON e.siret = io.siret
-          LEFT JOIN unique_establishments__immersion_contacts AS eic ON e.siret = eic.establishment_siret
-          LEFT JOIN immersion_contacts AS ic ON eic.contact_uuid = ic.uuid; 
+          ) AS aggregate 
+        FROM 
+          filtered_immersion_offers AS io 
+          LEFT JOIN establishments AS e ON e.siret = io.siret 
+          LEFT JOIN unique_establishments__immersion_contacts AS eic ON e.siret = eic.establishment_siret 
+          LEFT JOIN immersion_contacts AS ic ON eic.contact_uuid = ic.uuid;
+        
         `,
         [siret],
       )

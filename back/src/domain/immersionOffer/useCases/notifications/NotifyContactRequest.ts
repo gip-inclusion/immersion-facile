@@ -54,7 +54,9 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
             businessName: establishmentAggregate.establishment.name,
             contactFirstName: contact.firstName,
             contactLastName: contact.lastName,
-            jobLabel: rome.romeLabel,
+            appellationLabel:
+              establishmentAggregate.immersionOffers.at(0)?.appellationLabel ??
+              rome.romeLabel,
             potentialBeneficiaryFirstName:
               payload.potentialBeneficiaryFirstName,
             potentialBeneficiaryLastName: payload.potentialBeneficiaryLastName,

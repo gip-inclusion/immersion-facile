@@ -233,7 +233,7 @@ export const expectContactByEmailRequest = (
       businessName: establishment.name,
       contactFirstName: contact.firstName,
       contactLastName: contact.lastName,
-      jobLabel: annotatedImmersionOffer.romeLabel,
+      appellationLabel: annotatedImmersionOffer.romeLabel,
       potentialBeneficiaryFirstName: payload.potentialBeneficiaryFirstName,
       potentialBeneficiaryLastName: payload.potentialBeneficiaryLastName,
       potentialBeneficiaryEmail: payload.potentialBeneficiaryEmail,

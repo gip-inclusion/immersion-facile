@@ -147,7 +147,7 @@ export type EmailParamsByEmailType = {
     businessName: string;
     contactFirstName: string;
     contactLastName: string;
-    jobLabel: string;
+    appellationLabel: string;
     potentialBeneficiaryFirstName: string;
     potentialBeneficiaryLastName: string;
     potentialBeneficiaryEmail: string;
