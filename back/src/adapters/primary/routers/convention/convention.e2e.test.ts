@@ -83,25 +83,25 @@ describe("convention e2e", () => {
         });
       });
 
-      it("Creating an invalid application fails", async () => {
+      it("Creating an invalid convention fails", async () => {
         await request
           .post(`/${conventionsRoute}`)
           .send({ invalid_params: true })
           .expect(400);
       });
 
-      it("Creating a valid application succeeds", async () => {
+      it("Creating a valid convention succeeds", async () => {
         const convention = new ConventionDtoBuilder().build();
         const { externalId, ...createConventionParams } = convention;
         expectToEqual(inMemoryUow.conventionRepository.conventions, []);
 
-        // POSTing a valid application succeeds.
+        // POSTing a valid convention succeeds.
         await request
           .post(`/${conventionsRoute}`)
           .send(createConventionParams)
           .expect(200, { id: convention.id });
 
-        // GETting the created application succeeds.
+        // GETting the created convention succeeds.
         await request
           .get(`/admin/${conventionsRoute}/${convention.id}`)
           .set("Authorization", adminToken)
@@ -112,7 +112,7 @@ describe("convention e2e", () => {
           });
       });
 
-      describe("Getting an application", () => {
+      describe("Getting an convention", () => {
         const convention = new ConventionDtoBuilder().build();
         const { externalId, ...createConventionParams } =
           new ConventionDtoBuilder().build();
@@ -121,7 +121,7 @@ describe("convention e2e", () => {
           // GET /demandes-immersion returns an empty list.
           expectToEqual(inMemoryUow.conventionRepository.conventions, []);
 
-          // POSTing a valid application succeeds.
+          // POSTing a valid convention succeeds.
           await request
             .post(`/${conventionsRoute}`)
             .send(createConventionParams)
@@ -139,7 +139,7 @@ describe("convention e2e", () => {
           };
           const jwt = generateConventionJwt(payload);
 
-          // GETting the created application succeeds.
+          // GETting the created convention succeeds.
           await request
             .get(`/auth/${conventionsRoute}/OSEF`)
             .set("Authorization", jwt)
@@ -159,7 +159,7 @@ describe("convention e2e", () => {
           };
           const jwt = generateBackOfficeJwt(payload);
 
-          // GETting the created application succeeds.
+          // GETting the created convention succeeds.
           const response = await request
             .get(`/auth/${conventionsRoute}/${convention.id}`)
             .set("Authorization", jwt);
@@ -183,7 +183,7 @@ describe("convention e2e", () => {
           });
           const jwt = generateConventionJwt(payload);
 
-          // GETting the created application 403's and sets needsNewMagicLink flag to inform the front end to go to the link renewal page.
+          // GETting the created convention 403's and sets needsNewMagicLink flag to inform the front end to go to the link renewal page.
           await request
             .get(`/auth/${conventionsRoute}/${convention.id}`)
             .set("Authorization", jwt)
@@ -194,17 +194,17 @@ describe("convention e2e", () => {
         });
       });
 
-      it("Updating an existing application succeeds", async () => {
+      it("Updating an existing convention succeeds", async () => {
         const convention = new ConventionDtoBuilder().build();
         const { externalId, ...createConventionParams } = convention;
 
-        // POSTing a valid application succeeds.
+        // POSTing a valid convention succeeds.
         await request
           .post(`/${conventionsRoute}`)
           .send(createConventionParams)
           .expect(200, { id: convention.id });
 
-        // POSTing an updated application to the same id succeeds.
+        // POSTing an updated convention to the same id succeeds.
         const updatedConvention: ConventionDto = new ConventionDtoBuilder(
           convention,
         )
@@ -227,7 +227,7 @@ describe("convention e2e", () => {
           .send(updatedConvention)
           .expect(200);
 
-        // GETting the updated application succeeds.
+        // GETting the updated convention succeeds.
         const result = await request
           .get(`/admin/${conventionsRoute}/${convention.id}`)
           .set("Authorization", adminToken);
@@ -240,7 +240,7 @@ describe("convention e2e", () => {
         expect(result.status).toBe(200);
       });
 
-      it("Fetching unknown application IDs fails with 404 Not Found", async () => {
+      it("Fetching unknown convention IDs fails with 404 Not Found", async () => {
         const unknownId = "add5c20e-6dd2-45af-affe-927358005251";
         const jwt = generateConventionJwt(
           createConventionMagicLinkPayload({
@@ -261,7 +261,7 @@ describe("convention e2e", () => {
           .expect(404);
       });
 
-      it("Updating an unknown application IDs fails with 404 Not Found", async () => {
+      it("Updating an unknown convention IDs fails with 404 Not Found", async () => {
         const unknownId = "unknown-demande-immersion-id";
         const conventionWithUnknownId = new ConventionDtoBuilder()
           .withId(unknownId)
@@ -285,17 +285,17 @@ describe("convention e2e", () => {
           .expect(404);
       });
 
-      it("Creating an application with an existing ID fails with 409 Conflict", async () => {
+      it("Creating an convention with an existing ID fails with 409 Conflict", async () => {
         const convention = new ConventionDtoBuilder().build();
         const { externalId, ...createConventionParams } = convention;
 
-        // POSTing a valid application succeeds.
+        // POSTing a valid convention succeeds.
         await request
           .post(`/${conventionsRoute}`)
           .send(createConventionParams)
           .expect(200, { id: convention.id });
 
-        // POSTing a another valid application with the same ID fails.
+        // POSTing a another valid convention with the same ID fails.
         await request
           .post(`/${conventionsRoute}`)
           .send({
@@ -314,8 +314,8 @@ describe("convention e2e", () => {
       });
     });
 
-    it("Succeeds for rejected application and notifies Pole Emploi", async () => {
-      // A counsellor rejects the application.
+    it("Succeeds for rejected convention and notifies Pole Emploi", async () => {
+      // A counsellor rejects the convention.
       const counsellorJwt = generateConventionJwt(
         createConventionMagicLinkPayload({
           id: conventionId,
@@ -337,6 +337,22 @@ describe("convention e2e", () => {
       expect(notifications[0].status).toBe("REJETÉ");
     });
 
+    it("Succeeds for BackOfficeJwt", async () => {
+      // A counsellor rejects the convention.
+      const payload: BackOfficeJwtPayload = {
+        role: "backOffice",
+        sub: "",
+        version: 1,
+        iat: Math.round(now.getTime() / 1000),
+      };
+      const backOfficeJwt = generateBackOfficeJwt(payload);
+      await request
+        .post(`/auth/${updateConventionStatusRoute}/${conventionId}`)
+        .set("Authorization", backOfficeJwt)
+        .send({ status: "REJECTED", justification: "test-justification" })
+        .expect(200);
+    });
+
     it("Returns error 401 if no JWT", async () => {
       await request
         .post(`/auth/${updateConventionStatusRoute}/${conventionId}`)
@@ -345,7 +361,7 @@ describe("convention e2e", () => {
     });
 
     it("Returns error 403 for unauthorized requests", async () => {
-      // A tutor tries to validate the application, but fails.
+      // A tutor tries to validate the convention, but fails.
       const tutorJwt = generateConventionJwt(
         createConventionMagicLinkPayload({
           id: conventionId,
@@ -361,7 +377,7 @@ describe("convention e2e", () => {
         .expect(403);
     });
 
-    it("Returns error 404 for unknown application ids", async () => {
+    it("Returns error 404 for unknown convention ids", async () => {
       const counsellorJwt = generateConventionJwt(
         createConventionMagicLinkPayload({
           id: "unknown_application_id",

@@ -104,15 +104,16 @@ export const executeUpdateConventionStatusUseCase = async ({
   updateConventionStatus,
   conventionRepository,
 }: ExecuteUseCaseParams): Promise<ConventionDto> => {
-  const response = await updateConventionStatus.execute(
-    updateStatusParams,
-    createConventionMagicLinkPayload({
-      id: conventionId,
-      role,
-      email,
-      now: new Date(),
-    }),
-  );
+  const payload = createConventionMagicLinkPayload({
+    id: conventionId,
+    role,
+    email,
+    now: new Date(),
+  });
+  const response = await updateConventionStatus.execute(updateStatusParams, {
+    conventionId: payload.applicationId,
+    role: payload.role,
+  });
   expect(response.id).toEqual(conventionId);
   const storedConvention = await conventionRepository.getById(conventionId);
   return storedConvention;

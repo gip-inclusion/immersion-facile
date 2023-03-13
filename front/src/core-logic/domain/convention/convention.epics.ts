@@ -91,7 +91,11 @@ const conventionStatusChangeEpic: ConventionEpic = (
     filter(conventionSlice.actions.statusChangeRequested.match),
     switchMap(({ payload }) =>
       conventionGateway
-        .updateStatus$(payload.updateStatusParams, payload.jwt)
+        .updateStatus$(
+          payload.updateStatusParams,
+          payload.conventionId,
+          payload.jwt,
+        )
         .pipe(
           map(() =>
             conventionSlice.actions.statusChangeSucceeded(payload.feedbackKind),

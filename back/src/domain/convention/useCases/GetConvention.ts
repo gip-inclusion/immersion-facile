@@ -22,7 +22,10 @@ export class GetConvention extends TransactionalUseCase<
     uow: UnitOfWork,
   ): Promise<ConventionReadDto> {
     const convention = await uow.conventionQueries.getConventionById(id);
-    if (!convention || convention.status === "CANCELLED")
+    if (
+      !convention
+      //|| convention.status === "CANCELLED"
+    )
       throw new NotFoundError(id);
     return convention;
   }

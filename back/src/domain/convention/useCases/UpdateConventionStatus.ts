@@ -1,8 +1,9 @@
 import {
   ConventionDto,
   ConventionDtoBuilder,
-  ConventionMagicLinkPayload,
+  ConventionId,
   ConventionStatus,
+  Role,
   UpdateConventionStatusRequestDto,
   updateConventionStatusRequestSchema,
   validatedConventionStatuses,
@@ -33,9 +34,15 @@ const domainTopicByTargetStatusMap: Record<
   DRAFT: "ImmersionApplicationRequiresModification",
 };
 
+type UpdateConventionStatusPayload = {
+  conventionId: ConventionId;
+  role: Role;
+};
+
 export class UpdateConventionStatus extends TransactionalUseCase<
   UpdateConventionStatusRequestDto,
-  WithConventionId
+  WithConventionId,
+  UpdateConventionStatusPayload
 > {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
@@ -50,17 +57,17 @@ export class UpdateConventionStatus extends TransactionalUseCase<
   public async _execute(
     params: UpdateConventionStatusRequestDto,
     uow: UnitOfWork,
-    { applicationId, role }: ConventionMagicLinkPayload,
+    { conventionId, role }: UpdateConventionStatusPayload,
   ): Promise<WithConventionId> {
     const { status } = params;
-    logger.debug({ status, applicationId, role });
+    logger.debug({ status, conventionId, role });
 
     const conventionUpdatedAt = this.timeGateway.now().toISOString();
 
     const conventionBuilder = new ConventionDtoBuilder(
       await makeGetStoredConventionOrThrowIfNotAllowed(
         uow.conventionRepository,
-      )(status, role, applicationId),
+      )(status, role, conventionId),
     )
       .withStatus(status)
       .withDateValidation(

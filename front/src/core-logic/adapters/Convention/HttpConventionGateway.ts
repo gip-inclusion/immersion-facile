@@ -102,10 +102,11 @@ export class HttpConventionGateway implements ConventionGateway {
 
   private async updateStatus(
     params: UpdateConventionStatusRequestDto,
+    conventionId: ConventionId,
     jwt: string,
   ): Promise<WithConventionId> {
     const { data } = await this.httpClient.post(
-      `/auth/${updateConventionStatusRoute}/${jwt}`,
+      `/auth/${updateConventionStatusRoute}/${conventionId}`,
       params,
       { headers: { Authorization: jwt } },
     );
@@ -117,9 +118,12 @@ export class HttpConventionGateway implements ConventionGateway {
 
   public updateStatus$(
     params: UpdateConventionStatusRequestDto,
+    conventionId: ConventionId,
     jwt: string,
   ): Observable<void> {
-    return fromPromise(this.updateStatus(params, jwt).then(() => undefined));
+    return fromPromise(
+      this.updateStatus(params, conventionId, jwt).then(() => undefined),
+    );
   }
 
   private async signApplication(jwt: string): Promise<WithConventionId> {

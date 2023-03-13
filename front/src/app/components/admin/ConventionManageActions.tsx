@@ -1,6 +1,8 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 import {
+  BackOfficeJwt,
+  ConventionMagicLinkJwt,
   ConventionReadDto,
   ConventionStatus,
   Role,
@@ -17,6 +19,7 @@ import {
 import { VerificationActionButton } from "src/app/components/forms/convention/VerificationActionButton";
 
 type ConventionManageActionsProps = {
+  jwt: ConventionMagicLinkJwt | BackOfficeJwt;
   convention: ConventionReadDto;
   role: Role;
   submitFeedback: ConventionSubmitFeedback;
@@ -26,6 +29,7 @@ export const ConventionManageActions = ({
   convention,
   role,
   submitFeedback,
+  jwt,
 }: ConventionManageActionsProps): JSX.Element => {
   const dispatch = useDispatch();
   const createOnSubmitWithFeedbackKind =
@@ -33,7 +37,8 @@ export const ConventionManageActions = ({
     (updateStatusParams: UpdateConventionStatusRequestDto) =>
       dispatch(
         conventionSlice.actions.statusChangeRequested({
-          jwt: convention.id,
+          conventionId: convention.id,
+          jwt,
           feedbackKind,
           updateStatusParams,
         }),

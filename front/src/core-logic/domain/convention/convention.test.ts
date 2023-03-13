@@ -455,6 +455,7 @@ describe("Convention slice", () => {
           },
           feedbackKind: "modificationsAskedFromSignatory",
           jwt,
+          conventionId: "some-id",
         }),
       );
       expectConventionState({
@@ -477,6 +478,7 @@ describe("Convention slice", () => {
           },
           feedbackKind: "modificationsAskedFromSignatory",
           jwt,
+          conventionId: "some-id",
         }),
       );
       expectConventionState({

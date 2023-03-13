@@ -55,14 +55,21 @@ export const createMagicLinkRouter = (
     );
 
   authenticatedRouter
-    .route(`/${updateConventionStatusRoute}/:jwt`)
+    .route(`/${updateConventionStatusRoute}/:conventionId`)
     .post(async (req, res) =>
       sendHttpResponse(req, res, () => {
+        if (req.payloads?.backOffice)
+          return deps.useCases.updateConventionStatus.execute(req.body, {
+            conventionId: req.params.conventionId,
+            role: req.payloads.backOffice.role,
+          });
+
         if (!req?.payloads?.convention) throw new UnauthorizedError();
-        return deps.useCases.updateConventionStatus.execute(
-          req.body,
-          req.payloads.convention,
-        );
+
+        return deps.useCases.updateConventionStatus.execute(req.body, {
+          conventionId: req.payloads.convention.applicationId,
+          role: req.payloads.convention.role,
+        });
       }),
     );
 

@@ -4,6 +4,7 @@ import {
   BackOfficeJwt,
   ConventionDto,
   ConventionId,
+  ConventionMagicLinkJwt,
   ConventionReadDto,
   Role,
   ShareLinkByEmailDto,
@@ -24,7 +25,8 @@ export interface ConventionGateway {
 
   updateStatus$(
     params: UpdateConventionStatusRequestDto,
-    jwt: string,
+    conventionId: ConventionId,
+    jwt: ConventionMagicLinkJwt | BackOfficeJwt,
   ): Observable<void>;
 
   signConvention$(jwt: string): Observable<void>;

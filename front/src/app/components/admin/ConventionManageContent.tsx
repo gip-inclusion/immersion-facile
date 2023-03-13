@@ -48,6 +48,7 @@ export const ConventionManageContent = ({
         <>
           <ConventionValidation convention={convention} />
           <ConventionManageActions
+            jwt={jwt}
             convention={convention}
             role={role}
             submitFeedback={submitFeedback}

@@ -142,8 +142,10 @@ describe("UpdateConventionStatus", () => {
     testForAllRolesAndInitialStatusCases({
       updateStatusParams: {
         status: "CANCELLED",
+        justification: "Cancelled justification",
       },
       expectedDomainTopic: "ImmersionApplicationCancelled",
+      updatedFields: { rejectionJustification: "Cancelled justification" },
       allowedRoles: ["validator", "backOffice"],
       allowedInitialStatuses: ["ACCEPTED_BY_VALIDATOR"],
     });

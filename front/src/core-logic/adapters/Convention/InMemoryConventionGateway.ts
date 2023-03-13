@@ -118,6 +118,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
 
   public updateStatus$(
     _params: UpdateConventionStatusRequestDto,
+    _conventionId: ConventionId,
     _jwt: string,
   ): Observable<void> {
     return this.conventionModificationResult$;
