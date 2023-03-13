@@ -327,7 +327,7 @@ export const updateConventionStatusRequestSchema: z.Schema<UpdateConventionStatu
     .or(
       z.object({
         status: z.enum(conventionStatusesWithJustification),
-        justification: justificationSchema,
+        statusJustification: justificationSchema,
       }),
     );
 

@@ -451,7 +451,7 @@ describe("Convention slice", () => {
         conventionSlice.actions.statusChangeRequested({
           updateStatusParams: {
             status: "DRAFT",
-            justification: "There is a mistake in my last name",
+            statusJustification: "There is a mistake in my last name",
           },
           feedbackKind: "modificationsAskedFromSignatory",
           jwt,
@@ -474,7 +474,7 @@ describe("Convention slice", () => {
         conventionSlice.actions.statusChangeRequested({
           updateStatusParams: {
             status: "DRAFT",
-            justification: "There is a mistake in my last name",
+            statusJustification: "There is a mistake in my last name",
           },
           feedbackKind: "modificationsAskedFromSignatory",
           jwt,

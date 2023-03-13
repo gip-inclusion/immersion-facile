@@ -14,7 +14,7 @@ describe("UpdateConventionStatus", () => {
     testForAllRolesAndInitialStatusCases({
       updateStatusParams: {
         status: "DRAFT",
-        justification: "test justification",
+        statusJustification: "test justification",
       },
       expectedDomainTopic: "ImmersionApplicationRequiresModification",
       updatedFields: {
@@ -125,7 +125,7 @@ describe("UpdateConventionStatus", () => {
     testForAllRolesAndInitialStatusCases({
       updateStatusParams: {
         status: "REJECTED",
-        justification: "my rejection justification",
+        statusJustification: "my rejection justification",
       },
       expectedDomainTopic: "ImmersionApplicationRejected",
       updatedFields: { statusJustification: "my rejection justification" },
@@ -143,7 +143,7 @@ describe("UpdateConventionStatus", () => {
     testForAllRolesAndInitialStatusCases({
       updateStatusParams: {
         status: "CANCELLED",
-        justification: "Cancelled justification",
+        statusJustification: "Cancelled justification",
       },
       expectedDomainTopic: "ImmersionApplicationCancelled",
       updatedFields: { statusJustification: "Cancelled justification" },

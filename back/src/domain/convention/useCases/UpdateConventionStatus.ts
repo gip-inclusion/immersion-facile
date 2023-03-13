@@ -77,7 +77,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
       )
       .withStatusJustification(
         status === "CANCELLED" || status === "REJECTED"
-          ? params.justification
+          ? params.statusJustification
           : undefined,
       );
 
@@ -95,7 +95,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
           updatedDto,
           domainTopic,
           params.status === "REJECTED" || params.status === "DRAFT"
-            ? params.justification
+            ? params.statusJustification
             : undefined,
         ),
         occurredAt: conventionUpdatedAt,

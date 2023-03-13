@@ -71,7 +71,7 @@ export const JustificationModal = ({
           />
         )}
         <Formik
-          initialValues={{ justification: "" }}
+          initialValues={{ statusJustification: "" }}
           validationSchema={toFormikValidationSchema(
             withStatusJustificationSchema,
           )}

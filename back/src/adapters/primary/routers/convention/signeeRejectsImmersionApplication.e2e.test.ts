@@ -36,7 +36,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       tutorJwt,
       validConvention.id,
       {
-        justification: "change something which is wrong",
+        statusJustification: "change something which is wrong",
         status: "DRAFT",
       },
     );

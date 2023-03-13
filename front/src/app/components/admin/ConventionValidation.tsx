@@ -17,7 +17,7 @@ const beforeAfterString = (date: string) => {
 const labelByStatus: Record<ConventionStatus, string> = {
   ACCEPTED_BY_COUNSELLOR: "[📗 DEMANDE ÉLIGIBLE]",
   ACCEPTED_BY_VALIDATOR: "[✅ DEMANDE VALIDÉE]",
-  CANCELLED: "[🗑️ CONVENTION ANNULÉE PAR ADMIN]",
+  CANCELLED: "[🗑️ CONVENTION ANNULÉE]",
   DRAFT: "[📕 BROUILLON]",
   IN_REVIEW: "[📙 DEMANDE À ETUDIER]",
   PARTIALLY_SIGNED: "[✍️ Partiellement signée]",

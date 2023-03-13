@@ -220,7 +220,7 @@ const makeTestAcceptsStatusUpdate =
         convention: expectedConvention,
         justification:
           updateStatusParams.status === "DRAFT"
-            ? updateStatusParams.justification
+            ? updateStatusParams.statusJustification
             : "was not provided",
         roles: ["beneficiary", "establishment"],
       };
@@ -271,7 +271,7 @@ const makeTestRejectsStatusUpdate =
         conventionId: originalConvention.id,
         role,
         updateStatusParams: doesStatusNeedsJustification(targetStatus)
-          ? { status: targetStatus, justification: "fake justification" }
+          ? { status: targetStatus, statusJustification: "fake justification" }
           : { status: targetStatus },
         email: "test@test.fr",
         updateConventionStatus,

@@ -232,7 +232,7 @@ export type ListConventionsRequestDto = {
 
 export type UpdateConventionStatusRequestDto =
   | { status: ConventionStatusWithoutJustification }
-  | { status: ConventionStatusWithJustification; justification: string };
+  | { status: ConventionStatusWithJustification; statusJustification: string };
 
 // prettier-ignore
 const _isAssignable = (isValid: UpdateConventionStatusRequestDto): { status: ConventionStatus } => isValid;

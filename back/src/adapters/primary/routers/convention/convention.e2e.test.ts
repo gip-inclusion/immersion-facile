@@ -327,7 +327,7 @@ describe("convention e2e", () => {
       await request
         .post(`/auth/${updateConventionStatusRoute}/${counsellorJwt}`)
         .set("Authorization", counsellorJwt)
-        .send({ status: "REJECTED", justification: "test-justification" })
+        .send({ status: "REJECTED", statusJustification: "test-justification" })
         .expect(200);
 
       await eventCrawler.processNewEvents();
@@ -349,7 +349,7 @@ describe("convention e2e", () => {
       await request
         .post(`/auth/${updateConventionStatusRoute}/${conventionId}`)
         .set("Authorization", backOfficeJwt)
-        .send({ status: "REJECTED", justification: "test-justification" })
+        .send({ status: "REJECTED", statusJustification: "test-justification" })
         .expect(200);
     });
 

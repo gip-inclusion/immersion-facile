@@ -37,17 +37,18 @@ export const ConventionSignForm = ({
     conventionSelectors.signatoryData,
   );
   const askFormModificationWithMessageForm = async (): Promise<void> => {
-    const justification = prompt(
+    const statusJustification = prompt(
       "Précisez la raison et la modification nécessaire *",
     )?.trim();
 
-    if (justification === null || justification === undefined) return;
-    if (justification === "") return askFormModificationWithMessageForm();
+    if (statusJustification === null || statusJustification === undefined)
+      return;
+    if (statusJustification === "") return askFormModificationWithMessageForm();
 
     dispatch(
       conventionSlice.actions.statusChangeRequested({
         conventionId: convention.id,
-        updateStatusParams: { status: "DRAFT", justification },
+        updateStatusParams: { status: "DRAFT", statusJustification },
         feedbackKind: "modificationsAskedFromSignatory",
         jwt,
       }),
