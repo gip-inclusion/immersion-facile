@@ -68,6 +68,7 @@ export const createConventionFeedbackMessageByKind = (
         ))}
     </InitialSubmitSuccessMessageBase>
   ),
+  cancelled: "Succès. La convention a bien été annulée.",
 });
 
 const InitialSubmitSuccessMessageBase = ({

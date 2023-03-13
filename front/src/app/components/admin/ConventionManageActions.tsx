@@ -112,6 +112,18 @@ export const ConventionManageActions = ({
         </VerificationActionButton>
       )}
 
+      {isAllowedTransition(convention.status, "CANCELLED", role) && (
+        <VerificationActionButton
+          newStatus="CANCELLED"
+          onSubmit={createOnSubmitWithFeedbackKind("cancelled")}
+          disabled={disabled || convention.status != "ACCEPTED_BY_VALIDATOR"}
+        >
+          {convention.status === "CANCELLED"
+            ? t.verification.conventionAlreadyCancelled
+            : t.verification.markAsCancelled}
+        </VerificationActionButton>
+      )}
+
       <ConventionFeedbackNotification
         submitFeedback={submitFeedback}
         signatories={convention.signatories}

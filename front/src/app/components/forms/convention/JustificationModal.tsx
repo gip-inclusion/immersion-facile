@@ -62,6 +62,14 @@ export const JustificationModal = ({
           signataire manquant, le contacter par mail."
           />
         )}
+        {newStatus === "CANCELLED" && (
+          <Alert
+            severity="warning"
+            title="Attention ! Cette opération est irréversible!"
+            className={fr.cx("fr-mb-2w")}
+            description="Vous souhaitez annuler une convention qui a déjà été validée. Veuillez indiquer votre nom et prénom afin de garantir un suivi des annulations de convention."
+          />
+        )}
         <Formik
           initialValues={{ justification: "" }}
           validationSchema={toFormikValidationSchema(withJustificationSchema)}
@@ -96,7 +104,7 @@ export const JustificationModal = ({
                     id: domElementIds.manageConvention
                       .justificationModalSubmitButton,
                   },
-                  children: "Envoyer",
+                  children: confirmByStatus[newStatus],
                 },
               ]}
             />
@@ -110,4 +118,11 @@ export const JustificationModal = ({
 const inputLabelByStatus: Record<ConventionStatusWithJustification, string> = {
   DRAFT: "Précisez la raison et la modification nécessaire",
   REJECTED: "Pourquoi l'immersion est-elle refusée ?",
+  CANCELLED: "Pourquoi souhaitez-vous annuler cette convention?",
+};
+
+const confirmByStatus: Record<ConventionStatusWithJustification, string> = {
+  DRAFT: "Confirmer la demande de modification",
+  REJECTED: "Confirmer le refus",
+  CANCELLED: "Confirmer l'annulation",
 };

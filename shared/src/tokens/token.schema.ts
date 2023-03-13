@@ -1,8 +1,15 @@
 import { z } from "zod";
 import { zStringCanBeEmpty } from "../zodUtils";
-import { AppJwtPayload, BackOfficeJwtPayload, JwtDto } from "./token.dto";
+import {
+  AppJwtPayload,
+  BackOfficeJwt,
+  BackOfficeJwtPayload,
+  JwtDto,
+} from "./token.dto";
 
 export const jwtSchema: z.Schema<JwtDto> = z.object({ jwt: z.string() });
+
+export const adminTokenSchema: z.Schema<BackOfficeJwt> = z.string();
 
 export const appJwtPayloadSchema: z.Schema<AppJwtPayload> = z.object({
   iat: z.number(),

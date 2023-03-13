@@ -17,6 +17,7 @@ import {
   WithConventionId,
 } from "shared";
 import { decodeMagicLinkJwtWithoutSignatureCheck } from "shared";
+import { FetchConventionRequestedPayload } from "src/core-logic/domain/convention/convention.slice";
 import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 
 const CONVENTION_DRAFT_TEST = new ConventionDtoBuilder()
@@ -46,9 +47,11 @@ export class InMemoryConventionGateway implements ConventionGateway {
 
   public constructor(private simulatedLatency?: number) {}
 
-  retrieveFromToken$(jwt: string): Observable<ConventionReadDto | undefined> {
+  retrieveFromToken$(
+    payload: FetchConventionRequestedPayload,
+  ): Observable<ConventionReadDto | undefined> {
     return this.simulatedLatency
-      ? from(this.getMagicLink(jwt))
+      ? from(this.getMagicLink(payload))
       : this.convention$;
   }
 
@@ -70,13 +73,11 @@ export class InMemoryConventionGateway implements ConventionGateway {
   }
 
   // Same as GET above, but using a magic link
-  private async getMagicLink(jwt: string): Promise<ConventionReadDto> {
+  private async getMagicLink({
+    conventionId,
+  }: FetchConventionRequestedPayload): Promise<ConventionReadDto> {
     this.simulatedLatency && (await sleep(this.simulatedLatency));
-    const payload =
-      decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(jwt);
-    return this.inferConventionReadDto(
-      this._conventions[payload.applicationId],
-    );
+    return this.inferConventionReadDto(this._conventions[conventionId]);
   }
 
   // not used anymore, kept for inspiration for a simulated gateway

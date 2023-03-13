@@ -9,9 +9,12 @@ import {
   ShareLinkByEmailDto,
   UpdateConventionStatusRequestDto,
 } from "shared";
+import { FetchConventionRequestedPayload } from "../domain/convention/convention.slice";
 
 export interface ConventionGateway {
-  retrieveFromToken$(jwt: string): Observable<ConventionReadDto | undefined>;
+  retrieveFromToken$(
+    payload: FetchConventionRequestedPayload,
+  ): Observable<ConventionReadDto | undefined>;
   add$(conventionDto: ConventionDto): Observable<void>;
 
   // Get an immersion application through backoffice, password-protected route.

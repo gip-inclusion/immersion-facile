@@ -164,6 +164,8 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
     markAsEligible: "Marquer la demande comme éligible",
     conventionAlreadyValidated: "Demande déjà validée",
     markAsValidated: "Valider la demande",
+    markAsCancelled: "Annuler la demande",
+    conventionAlreadyCancelled: "Demande déjà annulée.",
   },
   sign: {
     title:

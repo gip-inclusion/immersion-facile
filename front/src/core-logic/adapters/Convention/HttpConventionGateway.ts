@@ -25,6 +25,7 @@ import {
   WithConventionId,
   withConventionIdSchema,
 } from "shared";
+import { FetchConventionRequestedPayload } from "src/core-logic/domain/convention/convention.slice";
 import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 
 export class HttpConventionGateway implements ConventionGateway {
@@ -41,7 +42,7 @@ export class HttpConventionGateway implements ConventionGateway {
   }
 
   retrieveFromToken$(
-    payload: string,
+    payload: FetchConventionRequestedPayload,
   ): Observable<ConventionReadDto | undefined> {
     return from(this.getMagicLink(payload));
   }
@@ -67,11 +68,13 @@ export class HttpConventionGateway implements ConventionGateway {
     return conventionReadDto;
   }
 
-  private async getMagicLink(jwt: string): Promise<ConventionReadDto> {
+  private async getMagicLink(
+    payload: FetchConventionRequestedPayload,
+  ): Promise<ConventionReadDto> {
     const { data } = await this.httpClient.get<unknown>(
-      `/auth/${conventionsRoute}/id`,
+      `/auth/${conventionsRoute}/${payload.conventionId}`,
       {
-        headers: { Authorization: jwt },
+        headers: { Authorization: payload.jwt },
       },
     );
     const conventionReadDto = conventionReadSchema.parse(data);

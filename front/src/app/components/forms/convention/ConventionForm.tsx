@@ -4,8 +4,10 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { useDispatch } from "react-redux";
 import {
   ConventionDto,
+  ConventionMagicLinkPayload,
   ConventionReadDto,
   conventionWithoutExternalIdSchema,
+  decodeMagicLinkJwtWithoutSignatureCheck,
   isBeneficiaryMinor,
   isEstablishmentTutorIsEstablishmentRepresentative,
   isPeConnectIdentity,
@@ -111,7 +113,16 @@ export const ConventionForm = ({
       return;
     }
     dispatch(conventionSlice.actions.jwtProvided(routeParams.jwt));
-    dispatch(conventionSlice.actions.fetchConventionRequested(routeParams.jwt));
+    const { applicationId: conventionId } =
+      decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(
+        routeParams.jwt,
+      );
+    dispatch(
+      conventionSlice.actions.fetchConventionRequested({
+        jwt: routeParams.jwt,
+        conventionId,
+      }),
+    );
   }, []);
 
   const reduxFormUiReady =

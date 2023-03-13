@@ -42,6 +42,7 @@ export type ConventionStatusWithJustification =
 export const conventionStatusesWithJustification = [
   "REJECTED",
   "DRAFT",
+  "CANCELLED",
 ] as const;
 export const conventionStatuses = [
   ...conventionStatusesWithoutJustification,

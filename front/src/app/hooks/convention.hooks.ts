@@ -9,9 +9,12 @@ import {
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
-import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
+import {
+  conventionSlice,
+  FetchConventionRequestedPayload,
+} from "src/core-logic/domain/convention/convention.slice";
 
-export const useConvention = (jwt: string) => {
+export const useConvention = (payload: FetchConventionRequestedPayload) => {
   const convention = useAppSelector(conventionSelectors.convention);
   const submitFeedback = useAppSelector(conventionSelectors.feedback);
   const fetchConventionError = useAppSelector(conventionSelectors.fetchError);
@@ -19,7 +22,7 @@ export const useConvention = (jwt: string) => {
 
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(conventionSlice.actions.fetchConventionRequested(jwt));
+    dispatch(conventionSlice.actions.fetchConventionRequested(payload));
     return () => {
       dispatch(conventionSlice.actions.clearFeedbackTriggered());
     };

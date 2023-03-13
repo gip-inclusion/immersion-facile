@@ -1,8 +1,6 @@
 import { z } from "zod";
 import { zTrimmedString } from "../zodUtils";
-import { BackOfficeJwt, UserAndPassword } from "./admin.dto";
-
-export const adminTokenSchema: z.Schema<BackOfficeJwt> = z.string();
+import { UserAndPassword } from "./admin.dto";
 
 export const userAndPasswordSchema: z.Schema<UserAndPassword> = z.object({
   user: zTrimmedString,

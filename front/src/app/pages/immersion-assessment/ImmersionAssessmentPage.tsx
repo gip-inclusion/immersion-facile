@@ -22,13 +22,14 @@ interface ImmersionAssessmentPageProps {
 export const ImmersionAssessmentPage = ({
   route,
 }: ImmersionAssessmentPageProps) => {
-  const { role } =
+  const { role, applicationId: conventionId } =
     decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(
       route.params.jwt,
     );
-  const { convention, fetchConventionError, isLoading } = useConvention(
-    route.params.jwt,
-  );
+  const { convention, fetchConventionError, isLoading } = useConvention({
+    jwt: route.params.jwt,
+    conventionId,
+  });
   const canCreateAssessment = convention?.status === "ACCEPTED_BY_VALIDATOR";
   const hasRight =
     role === "establishment" || role === "establishment-representative";

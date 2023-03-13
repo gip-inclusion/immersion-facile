@@ -2,7 +2,10 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   AbsoluteUrl,
   AgencyId,
+  BackOfficeJwt,
   ConventionDto,
+  ConventionId,
+  ConventionMagicLinkJwt,
   ConventionReadDto,
   Signatories,
   SignatoryRole,
@@ -14,7 +17,8 @@ type ConventionValidationFeedbackKind =
   | "rejected"
   | "modificationAskedFromCounsellorOrValidator"
   | "markedAsEligible"
-  | "markedAsValidated";
+  | "markedAsValidated"
+  | "cancelled";
 
 type ConventionSignatoryFeedbackKind =
   | "justSubmitted"
@@ -59,13 +63,17 @@ const initialState: ConventionState = {
   currentSignatoryRole: null,
 };
 
+export type FetchConventionRequestedPayload = {
+  jwt: ConventionMagicLinkJwt | BackOfficeJwt;
+  conventionId: ConventionId;
+};
+
 type StatusChangePayload = {
   feedbackKind: ConventionFeedbackKind;
   jwt: string;
   updateStatusParams: UpdateConventionStatusRequestDto;
 };
 
-type Jwt = string;
 type DateIsoStr = string;
 
 const setFeedbackAsErrored = (
@@ -91,7 +99,10 @@ export const conventionSlice = createSlice({
     saveConventionFailed: setFeedbackAsErrored,
 
     // Get convention from token
-    fetchConventionRequested: (state, _action: PayloadAction<Jwt>) => {
+    fetchConventionRequested: (
+      state,
+      _action: PayloadAction<FetchConventionRequestedPayload>,
+    ) => {
       state.isLoading = true;
       state.feedback = { kind: "idle" };
     },
@@ -111,7 +122,7 @@ export const conventionSlice = createSlice({
     signConventionRequested: (
       state,
       _action: PayloadAction<{
-        jwt: Jwt;
+        jwt: ConventionMagicLinkJwt;
         role: SignatoryRole;
         signedAt: DateIsoStr;
       }>,
@@ -153,7 +164,7 @@ export const conventionSlice = createSlice({
     // get convention status dashboard
     conventionStatusDashboardRequested: (
       state,
-      _action: PayloadAction<Jwt>,
+      _action: PayloadAction<ConventionMagicLinkJwt>,
     ) => {
       state.feedback = { kind: "idle" };
       state.isLoading = true;

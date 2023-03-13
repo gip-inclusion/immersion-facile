@@ -108,7 +108,10 @@ describe("Convention slice", () => {
         convention: null,
       });
       store.dispatch(
-        conventionSlice.actions.fetchConventionRequested("my-jwt"),
+        conventionSlice.actions.fetchConventionRequested({
+          jwt: "my-jwt",
+          conventionId: "some-convention-id",
+        }),
       );
       expectConventionState({ isLoading: true });
       feedGatewayWithConvention(undefined);
@@ -118,7 +121,7 @@ describe("Convention slice", () => {
       });
     });
 
-    it("stores the Convention if one matches in backend", () => {
+    it("stores the Convention if one matches in backend with magicLinkJwt", () => {
       const convention = new ConventionDtoBuilder().build();
       const conventionRead = {
         ...convention,
@@ -130,7 +133,10 @@ describe("Convention slice", () => {
         convention: null,
       });
       store.dispatch(
-        conventionSlice.actions.fetchConventionRequested("my-jwt"),
+        conventionSlice.actions.fetchConventionRequested({
+          jwt: "my-jwt",
+          conventionId: "some-convention-id",
+        }),
       );
       expectConventionState({ isLoading: true });
       feedGatewayWithConvention(conventionRead);
@@ -147,7 +153,10 @@ describe("Convention slice", () => {
         fetchError: null,
       });
       store.dispatch(
-        conventionSlice.actions.fetchConventionRequested("my-jwt"),
+        conventionSlice.actions.fetchConventionRequested({
+          jwt: "my-jwt",
+          conventionId: "some-convention-id",
+        }),
       );
       expectConventionState({ isLoading: true });
       feedGatewayWithErrorOnConventionFetch(new Error("I failed !"));
@@ -182,7 +191,10 @@ describe("Convention slice", () => {
         },
       }));
       store.dispatch(
-        conventionSlice.actions.fetchConventionRequested("my-jwt"),
+        conventionSlice.actions.fetchConventionRequested({
+          jwt: "my-jwt",
+          conventionId: "some-convention-id",
+        }),
       );
       expectConventionState({ isLoading: true, feedback: { kind: "idle" } });
     });
@@ -201,7 +213,10 @@ describe("Convention slice", () => {
         convention: null,
       });
       store.dispatch(
-        conventionSlice.actions.fetchConventionRequested("my-jwt"),
+        conventionSlice.actions.fetchConventionRequested({
+          jwt: "my-jwt",
+          conventionId: "some-convention-id",
+        }),
       );
       expectConventionState({ isLoading: true });
       feedGatewayWithConvention(conventionRead);
@@ -237,7 +252,10 @@ describe("Convention slice", () => {
         convention: null,
       });
       store.dispatch(
-        conventionSlice.actions.fetchConventionRequested("my-jwt"),
+        conventionSlice.actions.fetchConventionRequested({
+          jwt: "my-jwt",
+          conventionId: "some-convention-id",
+        }),
       );
       expectConventionState({ isLoading: true });
       feedGatewayWithConvention(conventionRead);

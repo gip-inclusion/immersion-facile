@@ -89,6 +89,7 @@ export const allRoles = [
 ] as const;
 
 export type ConventionMagicLinkJwt = Flavor<string, "ConventionMagicLinkJwt">;
+export type BackOfficeJwt = Flavor<string, "BackOfficeJwt">;
 
 export type JwtPayloads = {
   convention?: ConventionMagicLinkPayload;

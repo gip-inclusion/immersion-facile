@@ -144,15 +144,8 @@ describe("UpdateConventionStatus", () => {
         status: "CANCELLED",
       },
       expectedDomainTopic: "ImmersionApplicationCancelled",
-      allowedRoles: ["counsellor", "validator", "backOffice"],
-      allowedInitialStatuses: [
-        "DRAFT",
-        "READY_TO_SIGN",
-        "PARTIALLY_SIGNED",
-        "IN_REVIEW",
-        "ACCEPTED_BY_COUNSELLOR",
-        "REJECTED",
-      ],
+      allowedRoles: ["validator", "backOffice"],
+      allowedInitialStatuses: ["ACCEPTED_BY_VALIDATOR"],
     });
   });
 

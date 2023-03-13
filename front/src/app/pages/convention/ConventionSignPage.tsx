@@ -78,8 +78,10 @@ const ConventionSignPageContent = ({
   jwt,
 }: ConventionSignPageContentProperties): JSX.Element => {
   const dispatch = useDispatch();
+  const { applicationId: conventionId } =
+    decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(jwt);
   const { convention, fetchConventionError, submitFeedback, isLoading } =
-    useConvention(jwt);
+    useConvention({ jwt, conventionId });
 
   useEffect(() => {
     dispatch(

@@ -7,6 +7,7 @@ import {
 } from "shared";
 import { JustificationModal } from "src/app/components/forms/convention/JustificationModal";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import { fr, FrIconClassName } from "@codegouvfr/react-dsfr";
 
 export type VerificationActionButtonProps = {
   onSubmit: (params: UpdateConventionStatusRequestDto) => void;
@@ -21,33 +22,26 @@ export const VerificationActionButton = ({
   children,
   onSubmit,
 }: VerificationActionButtonProps) => {
-  let className = "fr-btn fr-m-1w";
-  switch (newStatus) {
-    case "REJECTED":
-      // cross icon
-      className += " fr-fi-close-circle-line fr-btn--icon-left";
-      break;
-    case "DRAFT":
-      // pencil icon
-      className += " fr-fi-edit-fill fr-btn--icon-left";
-      break;
-    default:
-      // checkbox icon
-      className += " fr-fi-checkbox-circle-line fr-btn--icon-left";
-      break;
-  }
+  const iconByStatus: Partial<Record<ConventionStatus, FrIconClassName>> = {
+    REJECTED: "fr-icon-close-circle-line",
+    DRAFT: "fr-icon-edit-line",
+    CANCELLED: "fr-icon-delete-bin-line",
+  };
+
+  const selectedIcon = iconByStatus[newStatus];
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
       <Button
+        iconId={selectedIcon ?? "fr-icon-checkbox-circle-line"}
         priority={newStatus === "REJECTED" ? "secondary" : "primary"}
         onClick={() => {
           doesStatusNeedsJustification(newStatus)
             ? setIsOpen(true)
             : onSubmit({ status: newStatus });
         }}
-        className={className}
+        className={fr.cx("fr-m-1w")}
         disabled={disabled}
         nativeButtonProps={{
           id:
@@ -59,6 +53,7 @@ export const VerificationActionButton = ({
       >
         {children}
       </Button>
+
       {doesStatusNeedsJustification(newStatus) && (
         <JustificationModal
           title={children}
