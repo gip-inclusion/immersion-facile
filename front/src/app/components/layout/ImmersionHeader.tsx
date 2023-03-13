@@ -27,8 +27,12 @@ export const ImmersionHeader = () => {
     },
   }))();
 
-  const { candidateIds, establishmentIds, agencyIds, adminIds } =
-    domElementIds.header;
+  const {
+    candidate: candidateIds,
+    establishment: establishmentIds,
+    agency: agencyIds,
+    admin: adminIds,
+  } = domElementIds.header.navLinks;
 
   const isAdminConnected = useAppSelector(adminSelectors.auth.isAuthenticated);
   const tools: HeaderProps["quickAccessItems"] = [headerFooterDisplayItem];
@@ -55,7 +59,7 @@ export const ImmersionHeader = () => {
       text: "Accueil",
       linkProps: {
         ...routes.home().link,
-        id: domElementIds.header.home,
+        id: domElementIds.header.navLinks.home,
       },
       isActive: currentRoute.name === routes.home().name,
     },

@@ -66,14 +66,14 @@ export const heroHeaderNavCards: (
       title: "Vous êtes candidat pour une immersion",
       icon: "fr-icon-user-line",
       type: "candidate",
-      id: domElementIds.home.heroHeadersIds.candidate,
+      id: domElementIds.home.heroHeaders.candidate,
       link: routes.homeCandidates().link,
     },
     {
       overtitle: "Entreprise",
       title: "Vous représentez une entreprise",
       icon: "fr-icon-building-line",
-      id: domElementIds.home.heroHeadersIds.establishment,
+      id: domElementIds.home.heroHeaders.establishment,
       type: "establishment",
       link: routes.homeEstablishments().link,
     },
@@ -81,7 +81,7 @@ export const heroHeaderNavCards: (
       overtitle: "Prescripteur",
       title: "Vous êtes prescripteur",
       icon: "fr-icon-map-pin-user-line",
-      id: domElementIds.home.heroHeadersIds.agency,
+      id: domElementIds.home.heroHeaders.agency,
       type: "agency",
       link: routes.homeAgencies().link,
     },
@@ -91,14 +91,14 @@ export const heroHeaderNavCards: (
       title: "Rechercher une entreprise accueillante",
       icon: "fr-icon-search-line",
       type: "candidate",
-      id: domElementIds.homeCandidates.heroHeadersIds.search,
+      id: domElementIds.homeCandidates.heroHeaders.search,
       link: routes.search().link,
     },
     {
       title: "Remplir la demande de convention",
       icon: "fr-icon-file-line",
       type: "candidate",
-      id: domElementIds.homeCandidates.heroHeadersIds.formConvention,
+      id: domElementIds.homeCandidates.heroHeaders.formConvention,
       link: routes.conventionImmersion().link,
     },
     // {
@@ -113,7 +113,7 @@ export const heroHeaderNavCards: (
       title: "Référencer mon entreprise",
       icon: "fr-icon-hotel-line",
       type: "establishment",
-      id: domElementIds.homeEstablishments.heroHeadersIds.addEstablishmentForm,
+      id: domElementIds.homeEstablishments.heroHeaders.addEstablishmentForm,
       link: {
         href: "",
         onClick: (event) => {
@@ -132,7 +132,7 @@ export const heroHeaderNavCards: (
       title: "Modifier mes informations",
       icon: "fr-icon-edit-line",
       type: "establishment",
-      id: domElementIds.homeEstablishments.heroHeadersIds.editEstablishmentForm,
+      id: domElementIds.homeEstablishments.heroHeaders.editEstablishmentForm,
       link: {
         href: "",
         onClick: (event) => {
@@ -151,7 +151,7 @@ export const heroHeaderNavCards: (
       title: "Remplir la demande de convention",
       icon: "fr-icon-file-text-line",
       type: "establishment",
-      id: domElementIds.homeEstablishments.heroHeadersIds.formConvention,
+      id: domElementIds.homeEstablishments.heroHeaders.formConvention,
       link: {
         href: "",
         onClick: (event) => {
@@ -167,13 +167,13 @@ export const heroHeaderNavCards: (
       title: "Référencer mon organisme",
       icon: "fr-icon-hotel-line",
       type: "agency",
-      id: domElementIds.homeAgencies.heroHeadersIds.addAgencyForm,
+      id: domElementIds.homeAgencies.heroHeaders.addAgencyForm,
       link: routes.addAgency().link,
     },
     {
       title: "Remplir la demande de convention",
       icon: "fr-icon-file-text-line",
-      id: domElementIds.homeAgencies.heroHeadersIds.formConvention,
+      id: domElementIds.homeAgencies.heroHeaders.formConvention,
       type: "agency",
       link: {
         href: "",

@@ -21,13 +21,12 @@ export type FormConventionFieldsLabels = FormFieldsObjectForContent<
 >;
 
 const {
-  conventionSectionIds,
-  beneficiarySectionIds,
-  establishmentTutorSectionIds,
-  beneficiaryRepresentativeSectionIds,
-  beneficiaryCurrentEmployerSectionIds,
-  establishmentRepresentativeSectionIds,
-  fieldsToExcludeIds,
+  conventionSection: conventionSectionIds,
+  beneficiarySection: beneficiarySectionIds,
+  establishmentTutorSection: establishmentTutorSectionIds,
+  beneficiaryRepresentativeSection: beneficiaryRepresentativeSectionIds,
+  beneficiaryCurrentEmployerSection: beneficiaryCurrentEmployerSectionIds,
+  establishmentRepresentativeSection: establishmentRepresentativeSectionIds,
 } = domElementIds.conventionImmersionRoute;
 
 export const formConventionFieldsLabels: (
@@ -419,63 +418,63 @@ const fieldsToExclude = {
     label: "",
     description: undefined,
     placeholder: undefined,
-    id: fieldsToExcludeIds.agencyName,
+    id: "",
     required: undefined,
     autoComplete: undefined,
   },
   "establishmentTutor.role": {
     // to exclude
     label: "",
-    id: fieldsToExcludeIds.establishmentTutorRole,
+    id: "",
   },
   "signatories.beneficiary.signedAt": {
     // to exclude
     label: "",
-    id: fieldsToExcludeIds.beneficiarySignedAt,
+    id: "",
   },
   "signatories.beneficiary.role": {
     // to exclude
     label: "",
-    id: fieldsToExcludeIds.beneficiaryRole,
+    id: "",
   },
   signatories: {
     label: "",
-    id: fieldsToExcludeIds.signatories,
+    id: "",
   },
 
   establishmentTutor: {
     label: "",
-    id: fieldsToExcludeIds.establishmentTutor,
+    id: "",
   },
   externalId: {
     label: "",
-    id: fieldsToExcludeIds.externalId,
+    id: "",
   },
   internshipKind: {
     label: "",
-    id: fieldsToExcludeIds.internshipKind,
+    id: "",
   },
   id: {
     label: "",
-    id: fieldsToExcludeIds.id,
+    id: "",
   },
   status: {
     label: "",
-    id: fieldsToExcludeIds.status,
+    id: "",
   },
   rejectionJustification: {
     label: "",
-    id: fieldsToExcludeIds.rejectionJustification,
+    id: "",
   },
   dateSubmission: {
     label: "",
-    id: fieldsToExcludeIds.dateSubmission,
+    id: "",
   },
   "signatories.establishmentRepresentative.signedAt": {
     label: "",
     description: undefined,
     placeholder: undefined,
-    id: fieldsToExcludeIds.establishmentRepresentativeSignedAt,
+    id: "",
     required: undefined,
     autoComplete: undefined,
   },
@@ -483,7 +482,7 @@ const fieldsToExclude = {
     label: "",
     description: undefined,
     placeholder: undefined,
-    id: fieldsToExcludeIds.establishmentRepresentativeRole,
+    id: "",
     required: undefined,
     autoComplete: undefined,
   },
@@ -492,7 +491,7 @@ const fieldsToExclude = {
     label: "",
     description: undefined,
     placeholder: undefined,
-    id: fieldsToExcludeIds.beneficiaryCurrentEmployerSignedAt,
+    id: "",
     required: undefined,
     autoComplete: undefined,
   },
@@ -500,7 +499,7 @@ const fieldsToExclude = {
     label: "",
     description: undefined,
     placeholder: undefined,
-    id: fieldsToExcludeIds.beneficiaryCurrentEmployerRole,
+    id: "",
     required: undefined,
     autoComplete: undefined,
   },
@@ -508,7 +507,7 @@ const fieldsToExclude = {
     label: "",
     description: undefined,
     placeholder: undefined,
-    id: fieldsToExcludeIds.beneficiaryRepresentativeSignedAt,
+    id: "",
     required: undefined,
     autoComplete: undefined,
   },
@@ -516,7 +515,7 @@ const fieldsToExclude = {
     label: "",
     description: undefined,
     placeholder: undefined,
-    id: fieldsToExcludeIds.beneficiaryRepresentativeRole,
+    id: "",
     required: undefined,
     autoComplete: undefined,
   },
@@ -524,12 +523,12 @@ const fieldsToExclude = {
     label: "",
     description: undefined,
     placeholder: undefined,
-    id: fieldsToExcludeIds.dateValidation,
+    id: "",
     required: undefined,
     autoComplete: undefined,
   },
   schedule: {
     label: "",
-    id: fieldsToExcludeIds.schedule,
+    id: "",
   },
 };

@@ -10,7 +10,11 @@ import { routes } from "src/app/routes/routes";
 import { domElementIds, immersionFacileContactEmail } from "shared";
 import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";
 
-const { bottomsLinksIds, linksIds, overFooterColsIds } = domElementIds.footer;
+const {
+  bottomsLinks: bottomsLinksIds,
+  links: linksIds,
+  overFooterCols: overFooterColsIds,
+} = domElementIds.footer;
 
 export const MinistereLogo = () => (
   <div className={fr.cx("fr-footer__brand", "fr-enlarge-link")}>

@@ -10,7 +10,7 @@ type SiteMapLink = {
   };
 };
 
-const { siteMapIds } = domElementIds.standard;
+const { siteMap: siteMapIds } = domElementIds.standard;
 
 const siteMapLinks: SiteMapLink[] = [
   {

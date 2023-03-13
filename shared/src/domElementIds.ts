@@ -1,58 +1,60 @@
 import { frontRoutes } from "./routes/routes";
 
 type FrontRoutesKeys = keyof typeof frontRoutes | "home" | "header" | "footer";
-type FrontRouteValue = string | Record<string, string>;
+type FrontRouteValue = string | Record<string, string | Record<string, string>>;
 type FrontRoutesValues = Record<string, FrontRouteValue>;
 
 type DomElementIds = Record<FrontRoutesKeys, FrontRoutesValues>;
 
-const getHeaderNavLinkId = (chunk: string) => `im-header-nav__${chunk}`;
-const getHeroHeaderId = (chunk: string) => `im-hero-header__${chunk}`;
-const getSitemapNavLinkId = (chunk: string) => `im-sitemap-nav__${chunk}`;
-const getFooterNavLinkId = (chunk: string) => `im-footer-nav__${chunk}`;
+const buildHeaderNavLinkId = (chunk: string) => `im-header-nav__${chunk}`;
+const buildHeroHeaderId = (chunk: string) => `im-hero-header__${chunk}`;
+const buildSitemapNavLinkId = (chunk: string) => `im-sitemap-nav__${chunk}`;
+const buildFooterNavLinkId = (chunk: string) => `im-footer-nav__${chunk}`;
 
 export const domElementIds = {
   header: {
-    home: getHeaderNavLinkId("home"),
-    candidateIds: {
-      home: getHeaderNavLinkId("candidate-home"),
-      search: getHeaderNavLinkId("candidate-search"),
-      formConvention: getHeaderNavLinkId("candidate-form-convention"),
-    },
-    establishmentIds: {
-      home: getHeaderNavLinkId("establishment-home"),
-      addEstablishmentForm: getHeaderNavLinkId("establishment-form"),
-      formConvention: getHeaderNavLinkId("establishment-form-convention"),
-    },
-    agencyIds: {
-      home: getHeaderNavLinkId("agency-home"),
-      addAgencyForm: getHeaderNavLinkId("agency-form"),
-      formConvention: getHeaderNavLinkId("agency-form-convention"),
-    },
-    adminIds: {
-      backOffice: getHeaderNavLinkId("admin-home"),
-      emails: getHeaderNavLinkId("admin-emails"),
-      dashboard: getHeaderNavLinkId("agency-my-dashboard"),
+    navLinks: {
+      home: buildHeaderNavLinkId("home"),
+      candidate: {
+        home: buildHeaderNavLinkId("candidate-home"),
+        search: buildHeaderNavLinkId("candidate-search"),
+        formConvention: buildHeaderNavLinkId("candidate-form-convention"),
+      },
+      establishment: {
+        home: buildHeaderNavLinkId("establishment-home"),
+        addEstablishmentForm: buildHeaderNavLinkId("establishment-form"),
+        formConvention: buildHeaderNavLinkId("establishment-form-convention"),
+      },
+      agency: {
+        home: buildHeaderNavLinkId("agency-home"),
+        addAgencyForm: buildHeaderNavLinkId("agency-form"),
+        formConvention: buildHeaderNavLinkId("agency-form-convention"),
+      },
+      admin: {
+        backOffice: buildHeaderNavLinkId("admin-home"),
+        emails: buildHeaderNavLinkId("admin-emails"),
+        dashboard: buildHeaderNavLinkId("agency-my-dashboard"),
+      },
     },
   },
   footer: {
-    overFooterColsIds: {
-      faq: getFooterNavLinkId("over-faq"),
-      linkedin: getFooterNavLinkId("over-linkedin"),
-      contact: getFooterNavLinkId("over-contact"),
+    overFooterCols: {
+      faq: buildFooterNavLinkId("over-faq"),
+      linkedin: buildFooterNavLinkId("over-linkedin"),
+      contact: buildFooterNavLinkId("over-contact"),
     },
-    linksIds: {
-      gouv: getFooterNavLinkId("gouv"),
-      civilService: getFooterNavLinkId("service-public"),
+    links: {
+      gouv: buildFooterNavLinkId("gouv"),
+      civilService: buildFooterNavLinkId("service-public"),
     },
-    bottomsLinksIds: {
-      accessibility: getFooterNavLinkId("accessibility"),
-      legals: getFooterNavLinkId("legals"),
-      privacy: getFooterNavLinkId("privacy"),
-      cgu: getFooterNavLinkId("cgu"),
-      contact: getFooterNavLinkId("contact"),
-      stats: getFooterNavLinkId("stats"),
-      sitemap: getFooterNavLinkId("sitemap"),
+    bottomsLinks: {
+      accessibility: buildFooterNavLinkId("accessibility"),
+      legals: buildFooterNavLinkId("legals"),
+      privacy: buildFooterNavLinkId("privacy"),
+      cgu: buildFooterNavLinkId("cgu"),
+      contact: buildFooterNavLinkId("contact"),
+      stats: buildFooterNavLinkId("stats"),
+      sitemap: buildFooterNavLinkId("sitemap"),
     },
   },
   admin: {
@@ -101,7 +103,7 @@ export const domElementIds = {
   },
   agencyDashboard: {},
   conventionImmersionRoute: {
-    conventionSectionIds: {
+    conventionSection: {
       agencyDepartment: "form-convention-agencyDepartement",
       agencyId: "form-convention-agencyId",
       dateStart: "form-convention-dateStart",
@@ -124,7 +126,7 @@ export const domElementIds = {
       businessAdvantages: "form-convention-businessAdvantages",
       isMinor: "form-convention-isMinor",
     },
-    beneficiarySectionIds: {
+    beneficiarySection: {
       firstName: "form-convention-signatories-beneficiary-firstName",
       lastName: "form-convention-signatories-beneficiary-lastName",
       birthdate: "form-convention-signatories-beneficiary-birthdate",
@@ -143,7 +145,7 @@ export const domElementIds = {
         "form-convention-signatories-beneficiary-emergencyContactEmail",
     },
 
-    establishmentTutorSectionIds: {
+    establishmentTutorSection: {
       firstName: "form-convention-establishmentTutor-firstName",
       lastName: "form-convention-establishmentTutor-lastName",
       email: "form-convention-establishmentTutor-email",
@@ -151,7 +153,7 @@ export const domElementIds = {
       job: "form-convention-establishmentTutor-job",
     },
 
-    beneficiaryRepresentativeSectionIds: {
+    beneficiaryRepresentativeSection: {
       firstName:
         "form-convention-signatories-beneficiaryRepresentative-firstName",
       lastName:
@@ -160,7 +162,7 @@ export const domElementIds = {
       phone: "form-convention-signatories-beneficiaryRepresentative-phone",
     },
 
-    beneficiaryCurrentEmployerSectionIds: {
+    beneficiaryCurrentEmployerSection: {
       businessName:
         "form-convention-signatories-beneficiaryCurrentEmployer-businessName",
       job: "form-convention-signatories-beneficiaryCurrentEmployer-job",
@@ -174,36 +176,13 @@ export const domElementIds = {
         "form-convention-signatories-beneficiaryCurrentEmployer-businessSiret",
     },
 
-    establishmentRepresentativeSectionIds: {
+    establishmentRepresentativeSection: {
       firstName:
         "form-convention-signatories-establishmentRepresentative-firstName",
       lastName:
         "form-convention-signatories-establishmentRepresentative-lastName",
       email: "form-convention-signatories-establishmentRepresentative-email",
       phone: "form-convention-signatories-establishmentRepresentative-phone",
-    },
-
-    fieldsToExcludeIds: {
-      agencyName: "",
-      establishmentTutorRole: "",
-      beneficiarySignedAt: "",
-      beneficiaryRole: "",
-      signatories: "",
-      establishmentTutor: "",
-      externalId: "",
-      internshipKind: "",
-      id: "",
-      status: "",
-      rejectionJustification: "",
-      dateSubmission: "",
-      establishmentRepresentativeSignedAt: "",
-      establishmentRepresentativeRole: "",
-      beneficiaryCurrentEmployerSignedAt: "",
-      beneficiaryCurrentEmployerRole: "",
-      beneficiaryRepresentativeSignedAt: "",
-      beneficiaryRepresentativeRole: "",
-      dateValidation: "",
-      schedule: "",
     },
   },
   conventionMiniStageRoute: {},
@@ -251,32 +230,32 @@ export const domElementIds = {
     magicLinkRenewalButton: "im-renew-page__renew-link-button",
   },
   home: {
-    heroHeadersIds: {
-      candidate: getHeroHeaderId("home-candidate"),
-      establishment: getHeroHeaderId("home-establishment"),
-      agency: getHeroHeaderId("home-agency"),
+    heroHeaders: {
+      candidate: buildHeroHeaderId("home-candidate"),
+      establishment: buildHeroHeaderId("home-establishment"),
+      agency: buildHeroHeaderId("home-agency"),
     },
   },
   homeEstablishments: {
     siretModal: {
       siretFetcherInput: "siret-fetcher-input",
     },
-    heroHeadersIds: {
-      addEstablishmentForm: getHeroHeaderId("establishment-form-register"),
-      editEstablishmentForm: getHeroHeaderId("establishment-form-edit"),
-      formConvention: getHeroHeaderId("establishment-form-convention"),
+    heroHeaders: {
+      addEstablishmentForm: buildHeroHeaderId("establishment-form-register"),
+      editEstablishmentForm: buildHeroHeaderId("establishment-form-edit"),
+      formConvention: buildHeroHeaderId("establishment-form-convention"),
     },
   },
   homeAgencies: {
-    heroHeadersIds: {
-      addAgencyForm: getHeroHeaderId("agency-form-register"),
-      formConvention: getHeroHeaderId("agency-form-convention"),
+    heroHeaders: {
+      addAgencyForm: buildHeroHeaderId("agency-form-register"),
+      formConvention: buildHeroHeaderId("agency-form-convention"),
     },
   },
   homeCandidates: {
-    heroHeadersIds: {
-      search: getHeroHeaderId("candidate-search"),
-      formConvention: getHeroHeaderId("candidate-form-convention"),
+    heroHeaders: {
+      search: buildHeroHeaderId("candidate-search"),
+      formConvention: buildHeroHeaderId("candidate-form-convention"),
     },
   },
   search: {
@@ -292,22 +271,23 @@ export const domElementIds = {
     contactInPersonButton: "im-contact-establishment__contact-in-person-button",
   },
   standard: {
-    siteMapIds: {
-      home: getSitemapNavLinkId("home"),
-      candidateHome: getSitemapNavLinkId("candidate-home"),
-      establishmentHome: getSitemapNavLinkId("establishment-home"),
-      agencyHome: getSitemapNavLinkId("agency-home"),
-      search: getSitemapNavLinkId("search"),
-      coventionForm: getSitemapNavLinkId("covention-form"),
-      establishmentForm: getSitemapNavLinkId("establishment-form"),
-      agencyForm: getSitemapNavLinkId("agency-form"),
-      accessibility: getSitemapNavLinkId("accessibility"),
-      legals: getSitemapNavLinkId("legals"),
-      privacy: getSitemapNavLinkId("privacy"),
-      cgu: getSitemapNavLinkId("cgu"),
-      stats: getSitemapNavLinkId("stats"),
+    siteMap: {
+      home: buildSitemapNavLinkId("home"),
+      candidateHome: buildSitemapNavLinkId("candidate-home"),
+      establishmentHome: buildSitemapNavLinkId("establishment-home"),
+      agencyHome: buildSitemapNavLinkId("agency-home"),
+      search: buildSitemapNavLinkId("search"),
+      coventionForm: buildSitemapNavLinkId("covention-form"),
+      establishmentForm: buildSitemapNavLinkId("establishment-form"),
+      agencyForm: buildSitemapNavLinkId("agency-form"),
+      accessibility: buildSitemapNavLinkId("accessibility"),
+      legals: buildSitemapNavLinkId("legals"),
+      privacy: buildSitemapNavLinkId("privacy"),
+      cgu: buildSitemapNavLinkId("cgu"),
+      stats: buildSitemapNavLinkId("stats"),
     },
   },
   conventionStatusDashboard: {},
   group: {},
+  conventionDocument: {},
 } satisfies DomElementIds;
