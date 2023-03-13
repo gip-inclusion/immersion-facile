@@ -683,7 +683,7 @@ export class PgEstablishmentAggregateRepository
             ) as immersionOffers 
           FROM 
             immersion_offers
-          LEFT JOIN public_appellations_data AS pad ON pad.code_rome = immersion_offers.rome_code
+          LEFT JOIN public_appellations_data AS pad ON pad.ogr_appellation = immersion_offers.rome_appellation
           WHERE 
             siret = $1 
           GROUP BY 

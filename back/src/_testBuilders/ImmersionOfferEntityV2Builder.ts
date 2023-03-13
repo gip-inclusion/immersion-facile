@@ -29,6 +29,12 @@ export class ImmersionOfferEntityV2Builder
       appellationCode,
     });
   }
+  withAppellationLabel(appellationLabel: string | undefined) {
+    return new ImmersionOfferEntityV2Builder({
+      ...this.entity,
+      appellationLabel,
+    });
+  }
   withCreatedAt(createdAt: Date) {
     return new ImmersionOfferEntityV2Builder({
       ...this.entity,

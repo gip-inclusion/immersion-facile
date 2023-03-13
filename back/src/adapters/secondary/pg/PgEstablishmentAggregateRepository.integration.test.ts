@@ -1467,6 +1467,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           .withImmersionOffers([
             new ImmersionOfferEntityV2Builder()
               .withAppellationCode("10900") // Appellation given
+              .withAppellationLabel("Aide-viticulteur / Aide-viticultrice")
               .withRomeCode("A1401")
               .build(),
             new ImmersionOfferEntityV2Builder().withRomeCode("A1402").build(), // No appellation
@@ -1498,10 +1499,12 @@ describe("Postgres implementation of immersion offer repository", () => {
             .build(),
           new ImmersionOfferEntityV2Builder() // Offer with code A1401 and an appellation
             .withAppellationCode("10806")
+            .withAppellationLabel("Aide agricole en arboriculture")
             .withRomeCode("A1401")
             .build(),
           new ImmersionOfferEntityV2Builder() // Offer with code A1401 and an appellation
             .withAppellationCode("10900")
+            .withAppellationLabel("Aide-viticulteur / Aide-viticultrice")
             .withRomeCode("A1401")
             .build(),
         ])
@@ -1534,6 +1537,7 @@ describe("Postgres implementation of immersion offer repository", () => {
             existingEstablishmentAggregate.immersionOffers[2], // Existing offer to keep
             new ImmersionOfferEntityV2Builder() // New offer to create
               .withAppellationCode("17892")
+              .withAppellationLabel("Porteur / Porteuse de hottes")
               .withRomeCode("A1401")
               .build(),
           ],
