@@ -10,8 +10,8 @@ import {
   ConventionStatusWithJustification,
   domElementIds,
   UpdateConventionStatusRequestDto,
-  WithJustification,
-  withJustificationSchema,
+  WithStatusJustification,
+  withStatusJustificationSchema,
 } from "shared";
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
@@ -35,7 +35,7 @@ export const JustificationModal = ({
   newStatus,
 }: JustificationModalProps) => {
   const closeModal = () => setIsOpen(false);
-  const name: keyof WithJustification = "justification";
+  const name: keyof WithStatusJustification = "statusJustification";
 
   return (
     <ModalDialog isOpen={isOpen} hide={closeModal}>
@@ -72,7 +72,9 @@ export const JustificationModal = ({
         )}
         <Formik
           initialValues={{ justification: "" }}
-          validationSchema={toFormikValidationSchema(withJustificationSchema)}
+          validationSchema={toFormikValidationSchema(
+            withStatusJustificationSchema,
+          )}
           onSubmit={(values) => {
             onSubmit({ ...values, status: newStatus });
             closeModal();

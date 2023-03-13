@@ -208,7 +208,7 @@ export const expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected = (
       beneficiaryFirstName: convention.signatories.beneficiary.firstName,
       beneficiaryLastName: convention.signatories.beneficiary.lastName,
       businessName: convention.businessName,
-      rejectionReason: convention.rejectionJustification || "",
+      rejectionReason: convention.statusJustification || "",
       signature: agency.signature,
       agency: agency.name,
       immersionProfession: convention.immersionAppellation.appellationLabel,

@@ -51,7 +51,7 @@ type WithIntershipKind = {
 
 export type ConventionPresentation = OmitFromExistingKeys<
   Partial<ConventionDto>,
-  "rejectionJustification"
+  "statusJustification"
 > &
   WithSignatures &
   WithEstablishmentTutor &

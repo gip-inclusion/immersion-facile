@@ -195,10 +195,10 @@ const makeTestAcceptsStatusUpdate =
       ...originalConvention,
       ...restOfUpdatedFields,
     })
-      .withRejectionJustification(
-        updateStatusParams.status === "REJECTED"
-          ? updateStatusParams.justification
-          : originalConvention.rejectionJustification,
+      .withStatusJustification(
+        restOfUpdatedFields.statusJustification
+          ? restOfUpdatedFields.statusJustification
+          : originalConvention.statusJustification,
       )
       .withStatus(updateStatusParams.status)
       .signedByBeneficiary(
@@ -219,7 +219,6 @@ const makeTestAcceptsStatusUpdate =
       const payload: ConventionRequiresModificationPayload = {
         convention: expectedConvention,
         justification:
-          updateStatusParams.status === "REJECTED" ||
           updateStatusParams.status === "DRAFT"
             ? updateStatusParams.justification
             : "was not provided",
@@ -311,15 +310,12 @@ export const testForAllRolesAndInitialStatusCases = ({
   const someValidInitialStatus = authorizedInitialStatuses[0];
   const someValidRole = allowToRejectRoles[0];
 
+  //RIGHT PATHS
   const testAcceptsStatusUpdate = makeTestAcceptsStatusUpdate({
     updateStatusParams,
     expectedDomainTopic,
     updatedFields,
     nextDate,
-  });
-
-  const testRejectsStatusUpdate = makeTestRejectsStatusUpdate({
-    targetStatus: updateStatusParams.status,
   });
 
   it.each(allowedRoles.map((role) => ({ role })))(
@@ -339,6 +335,12 @@ export const testForAllRolesAndInitialStatusCases = ({
         initialStatus: status,
       }),
   );
+
+  //WRONG PATHS
+
+  const testRejectsStatusUpdate = makeTestRejectsStatusUpdate({
+    targetStatus: updateStatusParams.status,
+  });
 
   if (notAllowedToRejectRoles.length) {
     it.each(notAllowedToRejectRoles.map((role) => ({ role })))(

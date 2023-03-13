@@ -38,7 +38,7 @@ export class PgConventionRepository implements ConventionRepository {
     convention: ConventionDtoWithoutExternalId,
   ): Promise<ConventionExternalId> {
     // prettier-ignore
-    const { signatories: { beneficiary, beneficiaryRepresentative, establishmentRepresentative,beneficiaryCurrentEmployer }, id: conventionId, status, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation, immersionActivities, immersionSkills, postalCode, workConditions, internshipKind,establishmentTutor,businessAdvantages } =
+    const { signatories: { beneficiary, beneficiaryRepresentative, establishmentRepresentative,beneficiaryCurrentEmployer }, id: conventionId, status, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation, immersionActivities, immersionSkills, postalCode, workConditions, internshipKind,establishmentTutor,businessAdvantages, statusJustification } =
         convention
 
     // Insert signatories and remember their id
@@ -65,12 +65,12 @@ export class PgConventionRepository implements ConventionRepository {
     const query_insert_convention = `INSERT INTO conventions(
           id, status, agency_id, date_submission, date_start, date_end, date_validation, siret, business_name, schedule, individual_protection,
           sanitary_prevention, sanitary_prevention_description, immersion_address, immersion_objective, immersion_appellation, immersion_activities, immersion_skills, postal_code, work_conditions, internship_kind, business_advantages,
-          beneficiary_id, establishment_tutor_id, establishment_representative_id, beneficiary_representative_id, ${beneficiaryCurrentEmployerIdColumnName}
-        ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27)`;
+          beneficiary_id, establishment_tutor_id, establishment_representative_id, beneficiary_representative_id, ${beneficiaryCurrentEmployerIdColumnName}, status_justification
+        ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28)`;
 
     // prettier-ignore
     await this.client.query(query_insert_convention, [conventionId, status, agencyId, dateSubmission, dateStart, dateEnd, dateValidation, siret, businessName, schedule, individualProtection, sanitaryPrevention, sanitaryPreventionDescription, immersionAddress, immersionObjective, immersionAppellation.appellationCode, immersionActivities, immersionSkills, postalCode, workConditions, internshipKind, businessAdvantages,
-                                                      beneficiaryId, establishmentTutorId, establishmentRepresentativeId, beneficiaryRepresentativeId,beneficiaryCurrentEmployerId
+                                                      beneficiaryId, establishmentTutorId, establishmentRepresentativeId, beneficiaryRepresentativeId,beneficiaryCurrentEmployerId, statusJustification
     ]);
 
     const query_insert_external_id = `INSERT INTO convention_external_ids(convention_id) VALUES($1) RETURNING external_id;`;
@@ -237,12 +237,12 @@ export class PgConventionRepository implements ConventionRepository {
             siret=$8,
             business_name=$9, 
             schedule=$10, individual_protection=$11, sanitary_prevention=$12, sanitary_prevention_description=$13, immersion_address=$14,
-            immersion_objective=$15, immersion_appellation=$16, immersion_activities=$17, immersion_skills=$18, work_conditions=$19, 
+            immersion_objective=$15, immersion_appellation=$16, immersion_activities=$17, immersion_skills=$18, work_conditions=$19, status_justification=$25,
             updated_at=now(),
             establishment_tutor_id=$20, establishment_representative_id=$21, ${beneficiaryCurrentEmployerIdColumnName}=$22, ${beneficiaryRepresentativeIdColumnName}=$23, business_advantages=$24
       WHERE id=$1`;
     // prettier-ignore
-    await this.client.query(updateConventionQuery, [ convention.id, convention.status, convention.agencyId, convention.dateSubmission, convention.dateStart, convention.dateEnd, convention.dateValidation, convention.siret, convention.businessName, convention.schedule, convention.individualProtection, convention.sanitaryPrevention, convention.sanitaryPreventionDescription, convention.immersionAddress, convention.immersionObjective, convention.immersionAppellation.appellationCode, convention.immersionActivities, convention.immersionSkills, convention.workConditions, establishment_tutor_id,establishment_representative_id,beneficiary_current_employer_id, beneficiary_representative_id,convention.businessAdvantages ]);
+    await this.client.query(updateConventionQuery, [ convention.id, convention.status, convention.agencyId, convention.dateSubmission, convention.dateStart, convention.dateEnd, convention.dateValidation, convention.siret, convention.businessName, convention.schedule, convention.individualProtection, convention.sanitaryPrevention, convention.sanitaryPreventionDescription, convention.immersionAddress, convention.immersionObjective, convention.immersionAppellation.appellationCode, convention.immersionActivities, convention.immersionSkills, convention.workConditions, establishment_tutor_id,establishment_representative_id,beneficiary_current_employer_id, beneficiary_representative_id,convention.businessAdvantages,convention.statusJustification ]);
   }
 
   private async updateBeneficiaryRepresentative(

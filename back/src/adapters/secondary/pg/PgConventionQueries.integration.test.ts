@@ -17,8 +17,8 @@ import { PgConventionQueries } from "./PgConventionQueries";
 import { PgConventionRepository } from "./PgConventionRepository";
 import { PgOutboxRepository } from "./PgOutboxRepository";
 
-const idA: ConventionId = "aaaaac99-9c0b-aaaa-aa6d-6bb9bd38aaaa";
-const idB: ConventionId = "bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb";
+const idA: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
+const idB: ConventionId = "bbbbbc99-9c0b-1bbb-bb6d-6bb9bd38bbbb";
 
 describe("Pg implementation of ConventionQueries", () => {
   let pool: Pool;
@@ -115,20 +115,20 @@ describe("Pg implementation of ConventionQueries", () => {
       const dateEnd14 = new Date("2022-05-14").toISOString();
       const dateEnd15 = new Date("2022-05-15").toISOString();
       const validatedImmersionEndingThe14th = new ConventionDtoBuilder()
-        .withId("aaaaac14-9c0a-aaaa-aa6d-6aa9ad38aaaa")
+        .withId("aaaaac14-9c0a-1aaa-aa6d-6aa9ad38aaaa")
         .validated()
         .withDateStart(dateStart)
         .withDateEnd(dateEnd14)
         .build();
       const validatedImmersionEndingThe15thThatAlreadyReceivedAnEmail =
         new ConventionDtoBuilder()
-          .withId("aaaaac15-9c0a-aaaa-aa6d-6aa9ad38aaaa")
+          .withId("aaaaac15-9c0a-1aaa-aa6d-6aa9ad38aaaa")
           .validated()
           .withDateStart(dateStart)
           .withDateEnd(dateEnd15)
           .build();
       const validatedImmersionEndingThe15th = new ConventionDtoBuilder()
-        .withId("bbbbbc15-9c0a-aaaa-aa6d-6aa9ad38aaaa")
+        .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aaaa")
         .validated()
         .withDateStart(dateStart)
         .withDateEnd(dateEnd15)
@@ -137,7 +137,7 @@ describe("Pg implementation of ConventionQueries", () => {
         .withExternalId("3")
         .build();
       const ongoingImmersionEndingThe15th = new ConventionDtoBuilder()
-        .withId("cccccc15-9c0a-aaaa-aa6d-6aa9ad38aaaa")
+        .withId("cccccc15-9c0a-1aaa-aa6d-6aa9ad38aaaa")
         .withDateStart("2022-05-10")
         .withDateEnd("2022-05-15")
         .withStatus("IN_REVIEW")
@@ -199,6 +199,8 @@ describe("Pg implementation of ConventionQueries", () => {
     const convention = new ConventionDtoBuilder()
       .withAgencyId(agencyId)
       .withId(conventionId)
+      .withStatus("DRAFT")
+      .withStatusJustification("JUSTIF...")
       .notSigned()
       .withBeneficiary({
         firstName: "benef",

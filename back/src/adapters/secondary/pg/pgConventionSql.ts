@@ -1,5 +1,11 @@
 import { PoolClient } from "pg";
-import { ConventionId, ConventionReadDto, conventionReadSchema } from "shared";
+import {
+  ConventionId,
+  ConventionReadDto,
+  conventionReadSchema,
+  parseZodSchemaAndLogErrorOnParsingFailure,
+} from "shared";
+import { createLogger } from "../../../utils/logger";
 
 const buildSignatoriesObject = `JSON_BUILD_OBJECT(
       'beneficiary' , JSON_BUILD_OBJECT(
@@ -79,6 +85,7 @@ const buildDto = `JSON_STRIP_NULLS(
     'immersionSkills', immersion_skills,
     'internshipKind', internship_kind,
     'businessAdvantages', business_advantages,
+    'statusJustification', status_justification,
     'establishmentTutor' , JSON_BUILD_OBJECT(
       'role', 'establishment-tutor',
       'firstName', et.first_name,
@@ -86,7 +93,7 @@ const buildDto = `JSON_STRIP_NULLS(
       'email', et.email,
       'phone', et.phone,
       'job', et.extra_fields ->> 'job'
-)
+    )
 ))`;
 
 export const selectAllConventionDtosById = `SELECT conventions.id, ${buildDto} as dto 
@@ -114,5 +121,14 @@ export const getReadConventionById = async (
     [conventionId],
   );
   const pgConvention = pgResult.rows.at(0);
-  return pgConvention && conventionReadSchema.parse(pgConvention.dto);
+
+  return (
+    pgConvention &&
+    parseZodSchemaAndLogErrorOnParsingFailure(
+      conventionReadSchema,
+      pgConvention.dto,
+      createLogger(__filename),
+      {},
+    )
+  );
 };

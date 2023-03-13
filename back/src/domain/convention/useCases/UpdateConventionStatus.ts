@@ -75,9 +75,12 @@ export class UpdateConventionStatus extends TransactionalUseCase<
           ? conventionUpdatedAt
           : undefined,
       )
-      .withRejectionJustification(
-        status === "REJECTED" ? params.justification : undefined,
+      .withStatusJustification(
+        status === "CANCELLED" || status === "REJECTED"
+          ? params.justification
+          : undefined,
       );
+
     if (status === "DRAFT") conventionBuilder.notSigned();
 
     const updatedDto: ConventionDto = conventionBuilder.build();

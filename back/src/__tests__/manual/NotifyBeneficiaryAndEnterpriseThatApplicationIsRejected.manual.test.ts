@@ -21,7 +21,7 @@ const rejectionJustification = "Risque d'emploi de main d'oeuvre gratuite";
 
 const rejectedConvention = new ConventionDtoBuilder()
   .withStatus("REJECTED")
-  .withRejectionJustification(rejectionJustification)
+  .withStatusJustification(rejectionJustification)
   .withEstablishmentTutorEmail(
     "recette+test-establishmentTutor@immersion-facile.beta.gouv.fr",
   )

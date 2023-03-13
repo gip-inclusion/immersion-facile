@@ -35,6 +35,7 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected extends Tra
       establishmentRepresentative.email,
       ...agency.counsellorEmails,
     ];
+
     await this.emailGateway.sendEmail({
       type: "REJECTED_CONVENTION_NOTIFICATION",
       recipients,
@@ -43,7 +44,7 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected extends Tra
         beneficiaryFirstName: beneficiary.firstName,
         beneficiaryLastName: beneficiary.lastName,
         businessName: convention.businessName,
-        rejectionReason: convention.rejectionJustification || "",
+        rejectionReason: convention.statusJustification || "",
         signature: agency.signature,
         agency: agency.name,
         immersionProfession: convention.immersionAppellation.appellationLabel,

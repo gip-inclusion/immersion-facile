@@ -12,7 +12,7 @@ import { PgAgencyRepository } from "./PgAgencyRepository";
 import { PgConventionRepository } from "./PgConventionRepository";
 import { PgImmersionAssessmentRepository } from "./PgImmersionAssessmentRepository";
 
-const conventionId = "aaaaac99-9c0b-bbbb-bb6d-6bb9bd38aaaa";
+const conventionId = "aaaaac99-9c0b-1bbb-bb6d-6bb9bd38aaaa";
 
 const convention = new ConventionDtoBuilder().withId(conventionId).build();
 

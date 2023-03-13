@@ -55,7 +55,7 @@ describe("PgConventionRepository", () => {
 
   it("Adds a new convention", async () => {
     const convention = new ConventionDtoBuilder()
-      .withId("aaaaac99-9c0b-bbbb-bb6d-6bb9bd38aaaa")
+      .withId("aaaaac99-9c0b-1bbb-bb6d-6bb9bd38aaaa")
       .build();
     const { externalId, ...createConventionParams } = convention;
 
@@ -73,7 +73,7 @@ describe("PgConventionRepository", () => {
   it("Adds/Update a new CCI convention", async () => {
     const convention = new ConventionDtoBuilder()
       .withInternshipKind("mini-stage-cci")
-      .withId("aaaaac99-9c0b-bbbb-bb6d-6bb9bd38aaaa")
+      .withId("aaaaac99-9c0b-1bbb-bb6d-6bb9bd38aaaa")
       .withDateStart(new Date("2023-01-02").toISOString())
       .withDateEnd(new Date("2023-01-06").toISOString())
       .withSchedule(reasonableSchedule)
@@ -328,15 +328,19 @@ describe("PgConventionRepository", () => {
   });
 
   it("Updates an already saved immersion", async () => {
-    const idA: ConventionId = "aaaaac99-9c0b-aaaa-aa6d-6bb9bd38aaaa";
-    const convention = new ConventionDtoBuilder().withId(idA).build();
+    const idA: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
+    const convention = new ConventionDtoBuilder()
+      .withId(idA)
+      .withStatus("ACCEPTED_BY_VALIDATOR")
+      .build();
     const externalId = await conventionRepository.save(convention);
 
     const updatedConvention = new ConventionDtoBuilder()
       .withId(idA)
       .withExternalId(externalId)
-      .withStatus("ACCEPTED_BY_VALIDATOR")
+      .withStatus("CANCELLED")
       .withBeneficiaryEmail("someUpdated@email.com")
+      .withStatusJustification("some justification")
       .withDateEnd(new Date("2021-01-20").toISOString())
       .build();
 
@@ -347,7 +351,7 @@ describe("PgConventionRepository", () => {
 
   it("Adds a new convention with a beneficiary representative", async () => {
     const convention = new ConventionDtoBuilder()
-      .withId("aaaaac99-9c0b-bbbb-bb6d-6bb9bd38aaaa")
+      .withId("aaaaac99-9c0b-1bbb-bb6d-6bb9bd38aaaa")
       .withBeneficiaryRepresentative(beneficiaryRepresentative)
       .build();
 
@@ -364,7 +368,7 @@ describe("PgConventionRepository", () => {
   });
 
   it("Updates an already saved immersion with a beneficiary representative", async () => {
-    const idA: ConventionId = "aaaaac99-9c0b-aaaa-aa6d-6bb9bd38aaaa";
+    const idA: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
     const convention = new ConventionDtoBuilder()
       .withId(idA)
       .withBeneficiaryRepresentative(beneficiaryRepresentative)
@@ -392,7 +396,7 @@ describe("PgConventionRepository", () => {
   });
 
   it("Updates an already saved immersion if the beneficiary representative is removed", async () => {
-    const idA: ConventionId = "aaaaac99-9c0b-aaaa-aa6d-6bb9bd38aaaa";
+    const idA: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
     const convention = new ConventionDtoBuilder()
       .withId(idA)
       .withBeneficiaryRepresentative(beneficiaryRepresentative)
@@ -411,7 +415,7 @@ describe("PgConventionRepository", () => {
   });
 
   it("Updates an already saved immersion without beneficiary representative with a beneficiary representative", async () => {
-    const idA: ConventionId = "aaaaac99-9c0b-aaaa-aa6d-6bb9bd38aaaa";
+    const idA: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
     const convention = new ConventionDtoBuilder().withId(idA).build();
     const externalId = await conventionRepository.save(convention);
 

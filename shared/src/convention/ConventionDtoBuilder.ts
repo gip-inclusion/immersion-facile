@@ -427,12 +427,10 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     });
   }
 
-  public withRejectionJustification(
-    rejectionJustification: string | undefined,
-  ) {
+  public withStatusJustification(statusJustification: string | undefined) {
     return new ConventionDtoBuilder({
       ...this.dto,
-      rejectionJustification,
+      statusJustification,
     });
   }
 

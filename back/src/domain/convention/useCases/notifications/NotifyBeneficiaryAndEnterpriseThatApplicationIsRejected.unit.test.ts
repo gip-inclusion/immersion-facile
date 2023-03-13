@@ -7,7 +7,7 @@ import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "./Notif
 
 const rejectedConvention = new ConventionDtoBuilder()
   .withStatus("REJECTED")
-  .withRejectionJustification("test-rejection-justification")
+  .withStatusJustification("test-rejection-justification")
   .build();
 const counsellorEmails = ["counsellor1@email.fr", "counsellor2@email.fr"];
 const signature = "test-signature";

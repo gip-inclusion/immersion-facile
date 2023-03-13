@@ -50,6 +50,9 @@ export const ConventionValidation = ({
   return (
     <>
       <h3>{title}</h3>
+      {convention.statusJustification && (
+        <p>Justification : {convention.statusJustification}</p>
+      )}
       <ConventionValidationDetails convention={convention} />
     </>
   );

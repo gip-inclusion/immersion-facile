@@ -27,7 +27,6 @@ export const conventionStatusesWithoutJustification = [
   "IN_REVIEW",
   "ACCEPTED_BY_COUNSELLOR",
   "ACCEPTED_BY_VALIDATOR",
-  "CANCELLED",
 ] as const;
 
 export const doesStatusNeedsJustification = (
@@ -75,7 +74,7 @@ export const conventionObjectiveOptions = [
 
 export type ImmersionObjective = (typeof conventionObjectiveOptions)[number];
 
-export type WithJustification = { justification: string };
+export type WithStatusJustification = { statusJustification: string };
 
 export const internshipKinds = ["immersion", "mini-stage-cci"] as const;
 export type InternshipKind = (typeof internshipKinds)[number];
@@ -83,7 +82,7 @@ export type InternshipKind = (typeof internshipKinds)[number];
 export type ConventionCommon = {
   id: ConventionId;
   status: ConventionStatus;
-  rejectionJustification?: string;
+  statusJustification?: string;
   postalCode?: string;
   agencyId: AgencyId;
   dateSubmission: string; // Date iso string

@@ -18,6 +18,7 @@ describe("UpdateConventionStatus", () => {
       },
       expectedDomainTopic: "ImmersionApplicationRequiresModification",
       updatedFields: {
+        statusJustification: undefined,
         establishmentRepresentativeSignedAt: undefined,
         beneficiarySignedAt: undefined,
       },
@@ -127,7 +128,7 @@ describe("UpdateConventionStatus", () => {
         justification: "my rejection justification",
       },
       expectedDomainTopic: "ImmersionApplicationRejected",
-      updatedFields: { rejectionJustification: "my rejection justification" },
+      updatedFields: { statusJustification: "my rejection justification" },
       allowedRoles: ["backOffice", "validator", "counsellor"],
       allowedInitialStatuses: [
         "PARTIALLY_SIGNED",
@@ -145,7 +146,7 @@ describe("UpdateConventionStatus", () => {
         justification: "Cancelled justification",
       },
       expectedDomainTopic: "ImmersionApplicationCancelled",
-      updatedFields: { rejectionJustification: "Cancelled justification" },
+      updatedFields: { statusJustification: "Cancelled justification" },
       allowedRoles: ["validator", "backOffice"],
       allowedInitialStatuses: ["ACCEPTED_BY_VALIDATOR"],
     });

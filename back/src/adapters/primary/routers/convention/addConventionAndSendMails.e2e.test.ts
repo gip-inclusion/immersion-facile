@@ -305,7 +305,7 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
         establishmentRepresentativeSignedAt:
           establishmentRepresentativeSignDate.toISOString(),
       }),
-      rejectionJustification: undefined,
+      statusJustification: undefined,
     },
   );
 

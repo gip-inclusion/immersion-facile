@@ -462,7 +462,7 @@ const fieldsToExclude = {
     label: "",
     id: "",
   },
-  rejectionJustification: {
+  statusJustification: {
     label: "",
     id: "",
   },

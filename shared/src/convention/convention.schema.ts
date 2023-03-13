@@ -53,7 +53,7 @@ import {
   UpdateConventionRequestDto,
   UpdateConventionStatusRequestDto,
   WithConventionId,
-  WithJustification,
+  WithStatusJustification,
 } from "./convention.dto";
 import {
   getConventionTooLongMessageAndPath,
@@ -149,7 +149,7 @@ const conventionCommonSchema: z.Schema<ConventionCommon> = z.object({
   id: conventionIdSchema,
   externalId: externalConventionIdSchema.optional(),
   status: z.enum(conventionStatuses),
-  rejectionJustification: z.string().optional(),
+  statusJustification: z.string().optional(),
   agencyId: agencyIdSchema,
   dateSubmission: zString.regex(dateRegExp, localization.invalidDate),
   dateStart: zString.regex(dateRegExp, localization.invalidDateStart),
@@ -314,9 +314,10 @@ export const updateConventionRequestSchema: z.Schema<UpdateConventionRequestDto>
     );
 
 const justificationSchema = zTrimmedString;
-export const withJustificationSchema: z.Schema<WithJustification> = z.object({
-  justification: justificationSchema,
-});
+export const withStatusJustificationSchema: z.Schema<WithStatusJustification> =
+  z.object({
+    statusJustification: justificationSchema,
+  });
 
 export const updateConventionStatusRequestSchema: z.Schema<UpdateConventionStatusRequestDto> =
   z
