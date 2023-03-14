@@ -1,6 +1,7 @@
 import { Pool } from "pg";
 import { createLogger } from "../../../utils/logger";
 import { AppConfig } from "../config/appConfig";
+import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
 const logger = createLogger(__filename);
 
@@ -29,13 +30,9 @@ const triggerRefreshMaterializedViews = async () => {
   await pool.end();
 };
 
-/* eslint-disable no-console */
-triggerRefreshMaterializedViews()
-  .then(() => {
-    logger.info("Finished successfully");
-    process.exit(0);
-  })
-  .catch((error) => {
-    logger.error("Script failed with error : ", error);
-    process.exit(1);
-  });
+/* eslint-disable @typescript-eslint/no-floating-promises */
+handleEndOfScriptNotification(
+  "refresh materialized views",
+  triggerRefreshMaterializedViews,
+  () => "Materialized views refreshed successfully",
+);

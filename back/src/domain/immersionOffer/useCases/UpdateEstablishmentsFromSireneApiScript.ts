@@ -13,7 +13,10 @@ const SIRENE_NB_DAYS_BEFORE_REFRESH = 7;
 
 const logger = createLogger(__filename);
 
-export class UpdateEstablishmentsFromSireneApiScript extends UseCase<void> {
+export class UpdateEstablishmentsFromSireneApiScript extends UseCase<
+  void,
+  number
+> {
   constructor(
     private readonly establishmentAggregateRepository: EstablishmentAggregateRepository,
     private readonly sireneGateway: SireneGateway,
@@ -51,6 +54,8 @@ export class UpdateEstablishmentsFromSireneApiScript extends UseCase<void> {
         );
       }
     }
+
+    return establishmentSiretsToUpdate.length;
   }
 
   private async updateEstablishmentWithSiret(siret: string) {

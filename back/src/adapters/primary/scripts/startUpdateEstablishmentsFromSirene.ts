@@ -19,6 +19,7 @@ import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGatewa
 import { PgEstablishmentAggregateRepository } from "../../secondary/pg/PgEstablishmentAggregateRepository";
 import { HttpsSireneGateway } from "../../secondary/sirene/HttpsSireneGateway";
 import { AppConfig } from "../config/appConfig";
+import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
 const logger = createLogger(__filename);
 const MAX_QPS_SIRENE__AND_ADDRESS_API = 0.49;
@@ -76,27 +77,18 @@ const main = async () => {
       new RealTimeGateway(),
     );
 
-  let errorCode;
-  try {
-    await updateEstablishmentsFromSireneAPI.execute();
-    logger.info("Execution completed successfully.");
-    errorCode = 0;
-  } catch (e: any) {
-    logger.error(e, "Execution failed.");
-    errorCode = 1;
-  }
   stats.stopTimer("total_runtime");
+  const numberOfEstablishmentsToUpdate =
+    await updateEstablishmentsFromSireneAPI.execute();
   client.release();
-  process.exit(errorCode);
+  return { numberOfEstablishmentsToUpdate };
 };
 
-main().then(
-  () => {
-    logger.info(`Script finished success`);
-    process.exit(0);
-  },
-  (error: any) => {
-    logger.error(error, `Script failed`);
-    process.exit(1);
-  },
+/* eslint-disable @typescript-eslint/no-floating-promises */
+handleEndOfScriptNotification(
+  "update-establishments-from-sirene",
+  main,
+  ({ numberOfEstablishmentsToUpdate }) =>
+    `Script finished with success. Updated ${numberOfEstablishmentsToUpdate} establishments`,
+  logger,
 );
