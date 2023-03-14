@@ -1,8 +1,15 @@
-import { ApiConsumer, SearchImmersionResultDto, zString } from "shared";
+import {
+  ApiConsumer,
+  RomeCode,
+  SearchImmersionResultDto,
+  SiretDto,
+  zString,
+} from "shared";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
+type LegacyImmersionOfferId = `${SiretDto}-${RomeCode}`;
 export class GetImmersionOfferById extends TransactionalUseCase<
   string,
   SearchImmersionResultDto,
@@ -15,9 +22,9 @@ export class GetImmersionOfferById extends TransactionalUseCase<
   inputSchema = zString;
 
   public async _execute(
-    immersionOfferId: string,
+    immersionOfferId: LegacyImmersionOfferId,
     uow: UnitOfWork,
-    apiConsumer?: ApiConsumer,
+    _apiConsumer?: ApiConsumer,
   ): Promise<SearchImmersionResultDto> {
     const [siret, romeCode] = immersionOfferId.split("-");
     const searchImmersionResultDto =
@@ -25,13 +32,11 @@ export class GetImmersionOfferById extends TransactionalUseCase<
         siret,
         romeCode,
       );
-    if (!searchImmersionResultDto) throw new NotFoundError(immersionOfferId);
+    if (!searchImmersionResultDto)
+      throw new NotFoundError(
+        `No offer found for siret ${siret} and rome ${romeCode}`,
+      );
 
-    return {
-      ...searchImmersionResultDto,
-      contactDetails: apiConsumer
-        ? searchImmersionResultDto.contactDetails
-        : undefined,
-    };
+    return searchImmersionResultDto;
   }
 }

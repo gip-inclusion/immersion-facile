@@ -228,14 +228,6 @@ export class InMemoryEstablishmentAggregateRepository
       position: aggregate?.establishment.position,
       address: aggregate.establishment.address,
       contactMode: aggregate.contact?.contactMethod,
-      contactDetails: aggregate.contact && {
-        id: aggregate.contact.id,
-        lastName: aggregate.contact.lastName,
-        firstName: aggregate.contact.firstName,
-        email: aggregate.contact.email,
-        phone: aggregate.contact.phone,
-        job: aggregate.contact.job,
-      },
     };
   }
   async getSiretsOfEstablishmentsWithRomeCode(

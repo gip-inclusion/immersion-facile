@@ -570,7 +570,10 @@ export class PgEstablishmentAggregateRepository
         GROUP BY (siret, io.rome_code, prd.libelle_rome)`,
         [siret, rome],
       );
-    return immersionSearchResultDtos[0];
+    if (!immersionSearchResultDtos.length) return;
+    const { contactDetails, ...searchResultWithoutContactDetails } =
+      immersionSearchResultDtos[0];
+    return searchResultWithoutContactDetails;
   }
 
   public async groupEstablishmentSiretsByDataSource(

@@ -13,6 +13,7 @@ import {
   expectPromiseToFailWith,
   expectObjectsToMatch,
   defaultMaxContactsPerWeek,
+  expectToEqual,
 } from "shared";
 import { createDiscussionAggregate } from "../../../_testBuilders/DiscussionAggregateBuilder";
 import {
@@ -1363,7 +1364,7 @@ describe("Postgres implementation of immersion offer repository", () => {
           boulangerRome,
         );
       // Assert
-      expectTypeToMatchAndEqual(actualSearchResultDto, {
+      expectToEqual(actualSearchResultDto, {
         rome: boulangerRome,
         romeLabel: "Boulangerie - viennoiserie",
         appellationLabels: [
@@ -1384,14 +1385,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         numberOfEmployeeRange: establishment.numberEmployeesRange,
         contactMode: contact.contactMethod,
         distance_m: undefined,
-        contactDetails: {
-          id: contact.id,
-          firstName: contact.firstName,
-          lastName: contact.lastName,
-          job: contact.job,
-          email: contact.email,
-          phone: contact.phone,
-        },
+        // contactDetails: undefined,
       });
     });
     it("Returns reconstructed SearchImmersionResultDto for given siret and rome when no appellation and no contact is specified", async () => {
