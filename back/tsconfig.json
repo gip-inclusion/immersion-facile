@@ -16,5 +16,8 @@
       "html-templates": ["../libs/html-templates/src/index.ts"],
       "http-client": ["../libs/http-client/src/index.ts"]
     }
+  },
+  "ts-node": {
+    "swc": true
   }
 }

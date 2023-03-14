@@ -22,5 +22,8 @@
       "http-client": ["../libs/http-client/src/index.ts"]
     }
   },
-  "include": ["./src"]
+  "include": ["./src"],
+  "ts-node": {
+    "swc": true
+  }
 }

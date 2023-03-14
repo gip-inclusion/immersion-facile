@@ -11,5 +11,8 @@
     "forceConsistentCasingInFileNames": true /* Disallow inconsistently-cased references to the same file. */,
     "typeRoots": ["./src/types", "./node_modules/@types"]
   },
-  "exclude": ["*.png", "*.jpg"]
+  "exclude": ["*.png", "*.jpg"],
+  "ts-node": {
+    "swc": true
+  }
 }
