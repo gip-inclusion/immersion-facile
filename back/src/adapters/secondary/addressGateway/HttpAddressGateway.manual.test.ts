@@ -14,7 +14,7 @@ import { AppConfig } from "../../primary/config/appConfig";
 import {
   createHttpAddressClient,
   HttpAddressGateway,
-  minimumCharErrorMessage,
+  errorMessage,
   AddressesTargets,
   addressesExternalTargets,
 } from "./HttpAddressGateway";
@@ -139,7 +139,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
         },
       },
     ])(
-      "should work if searching for $candidateQuery postcode expect $expectedAddress",
+      "Should work if searching for '$candidateQuery' postcode expect '$expectedAddress'.",
       async ({
         candidateQuery,
         expectedAddress,
@@ -177,7 +177,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
     it("Should not support lookup address with only one char.", async () => {
       await expectPromiseToFailWithError(
         httpAddressGateway.lookupStreetAddress("R"),
-        new Error(minimumCharErrorMessage(2)),
+        new Error(errorMessage.minimumCharErrorMessage(2)),
       );
     });
     it("Should support lookup address with two char.", async () => {
@@ -371,7 +371,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
         ],
       },
     ])(
-      "should work if searching for $candidateQuery location query expect $expectedSearchResult",
+      "Should work if searching for '$candidateQuery' location query expect '$expectedSearchResult.length' results.",
       async ({
         candidateQuery,
         expectedSearchResult,
@@ -390,7 +390,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
 
 describe("HttpOpenCageDataAddressGateway check parrarel call", () => {
   const parallelCalls = 10;
-  it(`Should support ${parallelCalls} of parallel calls`, async () => {
+  it(`Should support ${parallelCalls} of /getAddressFromPosition parallel calls`, async () => {
     const httpAddressGateway: AddressGateway = new HttpAddressGateway(
       createHttpAddressClient<AddressesTargets>(addressesExternalTargets),
       geocodingApiKey,

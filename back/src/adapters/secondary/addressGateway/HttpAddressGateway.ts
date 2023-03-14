@@ -17,8 +17,17 @@ import {
   LookupSearchResult,
   lookupSearchResultsSchema,
   OpenCageGeoSearchKey,
+  City,
+  DepartmentName,
+  StreetNumberAndAddress,
+  Postcode,
 } from "shared";
 import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
+
+export const errorMessage = {
+  minimumCharErrorMessage: (minLength: number) =>
+    `Lookup street address require a minimum of ${minLength} char.`,
+};
 
 // https://github.com/OpenCageData/opencagedata-misc-docs/blob/master/countrycode.md
 // On prends la france et toutes ses territoires dépendants.
@@ -110,11 +119,10 @@ export const addressesExternalTargets = createTargets<AddressesTargets>({
 });
 
 const AXIOS_TIMEOUT_MS = 10_000;
+
 export const createHttpAddressClient = configureHttpClient(
   createAxiosHandlerCreator(axios.create({ timeout: AXIOS_TIMEOUT_MS })),
 );
-export const minimumCharErrorMessage = (minLength: number) =>
-  `Lookup street address require a minimum of ${minLength} char.`;
 
 export class HttpAddressGateway implements AddressGateway {
   constructor(
@@ -153,7 +161,7 @@ export class HttpAddressGateway implements AddressGateway {
     const queryMinLength = 2;
     try {
       if (query.length < queryMinLength)
-        throw new Error(minimumCharErrorMessage(queryMinLength));
+        throw new Error(errorMessage.minimumCharErrorMessage(queryMinLength));
       const { responseBody } = await this.httpClient.geocoding({
         queryParams: {
           countrycode: franceAndAttachedTerritoryCountryCodes,
@@ -180,7 +188,7 @@ export class HttpAddressGateway implements AddressGateway {
     const queryMinLength = 3;
     try {
       if (query.length < queryMinLength)
-        throw new Error(minimumCharErrorMessage(queryMinLength));
+        throw new Error(errorMessage.minimumCharErrorMessage(queryMinLength));
 
       const { responseBody } = await this.httpClient.geosearch({
         headers: {
@@ -225,29 +233,26 @@ export class HttpAddressGateway implements AddressGateway {
     feature: GeoJSON.Feature<Point, OpenCageDataProperties>,
   ): AddressDto | undefined {
     const components = feature.properties.components;
-    const department: string | undefined = getDepartmentFromAliases(components);
-    const city: string | undefined = getCityFromAliases(components);
-    const streetName: string | undefined = getStreetNameFromAliases(components);
-    const streetNumber: string | undefined =
-      getStreetNumberFromAliases(components);
+    const city = getCityFromAliases(components);
     const postcode = getPostcodeFromAliases(components);
-
-    if (!(city && department && postcode)) return undefined;
-
+    const departmentName = getDepartmentNameFromAliases(components);
     // OpenCageData gives the department name but not the code.
-    const departmentCode = departmentNameToDepartmentCode[department];
-    if (!departmentCode) return undefined;
+    const departmentCode =
+      departmentName && departmentNameToDepartmentCode[departmentName];
 
-    const streetNumberAndAddress = `${streetNumber ?? ""} ${
-      streetName ?? ""
-    }`.trim();
-
-    return {
-      streetNumberAndAddress,
-      postcode,
-      departmentCode,
-      city,
-    };
+    return (
+      city &&
+      departmentCode &&
+      postcode && {
+        streetNumberAndAddress: makeStreetNumberAndAddress(
+          getStreetNumberFromAliases(components),
+          getStreetNameFromAliases(components),
+        ),
+        postcode,
+        departmentCode,
+        city,
+      }
+    );
   }
 }
 
@@ -257,7 +262,12 @@ type OpenCageDataFeatureCollection = GeoJSON.FeatureCollection<
   OpenCageDataProperties
 >;
 
-export type OpenCageDataSearchResultCollection = {
+type OpenCageDataProperties = {
+  components: OpenCageDataAddressComponents; // The address component
+  confidence: number; // 10 is the best match inferior is less good
+};
+
+type OpenCageDataSearchResultCollection = {
   // move to shared ?
   documentation: string;
   licenses: object[];
@@ -267,11 +277,6 @@ export type OpenCageDataSearchResultCollection = {
   thanks: string;
   timestamp: object;
   total_results: number;
-};
-
-type OpenCageDataProperties = {
-  components: OpenCageDataAddressComponents; // The address component
-  confidence: number; // 10 is the best match inferior is less good
 };
 
 //Aliases Reference : https://github.com/OpenCageData/address-formatting/blob/master/conf/components.yaml
@@ -305,7 +310,7 @@ type OpenCageDataAddressComponents = {
 
 const getPostcodeFromAliases = (
   components: OpenCageDataAddressComponents,
-): string | undefined => components.postcode;
+): Postcode | undefined => components.postcode;
 
 const getStreetNumberFromAliases = (
   components: OpenCageDataAddressComponents,
@@ -329,29 +334,21 @@ const getStreetNameFromAliases = (
 
 const getCityFromAliases = (
   components: OpenCageDataAddressComponents,
-): string | undefined =>
+): City | undefined =>
   components.city ??
   components.town ??
   components.township ??
   components.village;
 
 // We have the best results for department when merging 'county' and 'state' related keys
-const getDepartmentFromAliases = (components: OpenCageDataAddressComponents) =>
+const getDepartmentNameFromAliases = (
+  components: OpenCageDataAddressComponents,
+): DepartmentName | undefined =>
   components.county ??
   components.county_code ??
   components.department ??
   components.state_district ??
   components.state;
-
-export const missingFeatureForPostcode = (postCode: string) =>
-  `No OCD feature found for postCode ${postCode}.`;
-export const missingDepartmentOnFeatureForPostcode = (
-  postCode: string,
-  components: any,
-) =>
-  `No department provided for postcode ${postCode}. OCD Components: ${JSON.stringify(
-    components,
-  )}`;
 
 const toLookupSearchResults = (
   input: OpenCageDataSearchResultCollection,
@@ -363,3 +360,112 @@ const toLookupSearchResults = (
       lon: parseFloat(result.geometry.lng),
     },
   }));
+
+const makeStreetNumberAndAddress = (
+  streetNumber: string | undefined,
+  streetName: string | undefined,
+): StreetNumberAndAddress => `${streetNumber ?? ""} ${streetName ?? ""}`.trim();
+
+// ============================= Declared previously on shared but not used anymore / inspiration to create GEOJSON Zod Schemas
+// export type GeoJsonFeatureCollection = {
+//   type: "FeatureCollection";
+//   features: GeoJsonFeature[];
+// };
+
+// export type GeoJsonGeometry = Record<string, unknown>;
+
+// export type GeoJsonFeature = {
+//   type: "Feature";
+//   geometry: GeoJsonGeometry;
+//   properties: GeoJsonFeatureApiAddressProperties;
+// };
+
+// export type GeoJsonFeatureApiAddressProperties = {
+//   label: string;
+//   score: number;
+//   housenumber?: string;
+//   id: string;
+//   type: string;
+//   name: string;
+//   postcode?: string;
+//   citycode: string;
+//   x: number;
+//   y: number;
+//   city: string;
+//   context: string;
+//   importance: number;
+//   street?: string;
+// };
+
+// export const featureToAddressDto = (feature: GeoJsonFeature): AddressDto =>
+//   feature.properties.postcode
+//     ? {
+//         streetNumberAndAddress: feature.properties.name,
+//         city: feature.properties.city,
+//         departmentCode: feature.properties.context.split(", ")[0],
+//         postcode: feature.properties.postcode,
+//       }
+//     : unknownAddress;
+
+// export const featureToAddressWithPosition = (
+//   feature: GeoJsonFeature,
+// ): AddressAndPosition | undefined =>
+//   Array.isArray(feature.geometry.coordinates)
+//     ? {
+//         address: featureToAddressDto(feature),
+//         position: {
+//           lat: feature.geometry.coordinates[1],
+//           lon: feature.geometry.coordinates[0],
+//         },
+//       }
+//     : undefined;
+
+// const unknownAddress: AddressDto = {
+//   city: "Inconnu",
+//   departmentCode: "Inconnu",
+//   postcode: "Inconnu",
+//   streetNumberAndAddress: "Inconnu",
+// };
+
+// export const featuresSchemaResponse: z.Schema<{ features: unknown[] }> =
+//   z.object({
+//     features: z.array(z.unknown()),
+//   });
+
+// const geoJsonGeometrySchema: z.Schema<GeoJsonGeometry> = z.record(
+//   z.string(),
+//   z.unknown(),
+// );
+
+// const geoJsonFeatureProperties: z.Schema<GeoJsonFeatureApiAddressProperties> =
+//   z.object({
+//     label: z.string(),
+//     score: z.number(),
+//     housenumber: z.string().optional(),
+//     id: z.string(),
+//     type: z.string(),
+//     name: z.string(),
+//     postcode: z.string().optional(),
+//     citycode: z.string(),
+//     x: z.number(),
+//     y: z.number(),
+//     city: z.string(),
+//     context: z.string(),
+//     importance: z.number(),
+//     street: z.string().optional(),
+//   });
+// export const geoJsonFeatureSchema: z.Schema<GeoJsonFeature> = z.object({
+//   type: z.literal("Feature"),
+//   geometry: geoJsonGeometrySchema,
+//   properties: geoJsonFeatureProperties,
+// });
+
+// export const geoJsonFeatureCollectionSchema: z.Schema<GeoJsonFeatureCollection> =
+//   z.object({
+//     type: z.literal("FeatureCollection"),
+//     features: z.array(geoJsonFeatureSchema),
+//   });
+
+// export const toGeoJsonFeatureCollection = (
+//   data: unknown,
+// ): GeoJsonFeatureCollection => geoJsonFeatureCollectionSchema.parse(data);

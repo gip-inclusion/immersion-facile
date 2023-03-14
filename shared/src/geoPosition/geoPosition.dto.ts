@@ -1,6 +1,11 @@
+import { Flavor } from "../typeFlavors";
+
+type Latitude = Flavor<number, "Latitude">;
+type Longitude = Flavor<number, "Longitude">;
+
 export type GeoPositionDto = {
-  lat: number;
-  lon: number;
+  lat: Latitude;
+  lon: Longitude;
 };
 export type WithGeoPosition = {
   position: GeoPositionDto;
