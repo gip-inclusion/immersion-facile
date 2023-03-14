@@ -74,7 +74,7 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
       title={
         isSharedConvention
           ? "Une demande de convention d'immersion a été partagée avec vous."
-          : "Activer une demande de convention"
+          : "Remplir la demande de convention"
       }
       peConnectNotice="Je suis demandeur d’emploi et je connais mes identifiants à mon compte Pôle emploi. J'accède au formulaire ici :"
       otherCaseNotice="Je suis dans une autre situation (candidat à une immersion sans identifiant Pôle emploi, entreprise ou conseiller emploi). J'accède au formulaire partagé ici :"

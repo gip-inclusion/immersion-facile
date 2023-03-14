@@ -1,6 +1,6 @@
 import { keys } from "ramda";
 import React from "react";
-import { PeConnectButton } from "react-design-system";
+import { ConventionRequirements, PeConnectButton } from "react-design-system";
 import { loginPeConnect } from "shared";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
@@ -41,9 +41,12 @@ export const InitiateConventionCard = ({
     <div>
       {enablePeConnectApi ? (
         <>
-          <div className={fr.cx("fr-btns-group--center")}>
+          <div>
+            <p className={fr.cx("fr-h6", "fr-mb-2w")}>
+              J’ai des identifiants Pôle emploi
+            </p>
             <p dangerouslySetInnerHTML={{ __html: peConnectNotice }}></p>
-            <div className={fr.cx("fr-btns-group--center", "fr-mb-4w")}>
+            <div className={fr.cx("fr-mb-4w")}>
               <PeConnectButton
                 onClick={() => {
                   if (currentRoute.name === "conventionImmersion")
@@ -62,7 +65,10 @@ export const InitiateConventionCard = ({
           </div>
 
           <strong className={fr.cx("fr-text--lead", "fr-hr-or")}>ou</strong>
-          <div className={fr.cx("fr-btns-group--center")}>
+          <div>
+            <p className={fr.cx("fr-h6", "fr-mb-2w")}>
+              Je suis dans une autre situation
+            </p>
             <p dangerouslySetInnerHTML={{ __html: otherCaseNotice }}></p>
 
             <Button type="button" onClick={onNotPeConnectButtonClick}>
@@ -79,19 +85,22 @@ export const InitiateConventionCard = ({
   );
   const section = (
     <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
-      <div className={fr.cx("fr-col-12", "fr-col-md-8")}>
+      <div className={fr.cx("fr-col-12", "fr-col-lg-7")}>
         <div
           className={fr.cx(
             "fr-card",
             "fr-card--grey",
             "fr-card--no-border",
-            "fr-px-8w",
-            "fr-py-4w",
+            "fr-px-12w",
+            "fr-py-8w",
           )}
         >
-          <span className={fr.cx("fr-h5")}>{title}</span>
+          <p className={fr.cx("fr-h4", "fr-mb-5w")}>{title}</p>
           {cardContent}
         </div>
+      </div>
+      <div className={fr.cx("fr-col-12", "fr-col-lg-5")}>
+        <ConventionRequirements />
       </div>
     </div>
   );

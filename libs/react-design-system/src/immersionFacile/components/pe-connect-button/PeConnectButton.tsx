@@ -1,6 +1,7 @@
 import React from "react";
 import "./PeConnectButton.scss";
 import { useStyles } from "tss-react/dsfr";
+import { fr } from "@codegouvfr/react-dsfr";
 
 export type PeConnectButtonProps = {
   onClick: (e: React.MouseEvent<HTMLAnchorElement>) => void;
@@ -13,7 +14,7 @@ export const PeConnectButton = ({
 }: PeConnectButtonProps) => {
   const { cx } = useStyles();
   return (
-    <div className={cx("pe-connect")}>
+    <div className={cx(fr.cx("fr-my-2w"), "pe-connect")}>
       <a
         onClick={onClick}
         href={`/api/${peConnectEndpoint}`}
