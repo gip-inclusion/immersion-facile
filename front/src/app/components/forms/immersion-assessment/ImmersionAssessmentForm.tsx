@@ -102,7 +102,7 @@ export const ImmersionAssessmentForm = ({
                   onClick={downloadFullImmersionAssessmentPdf}
                   nativeButtonProps={{
                     id: domElementIds.immersionAssessment
-                      .assessmentFormdownloadButton,
+                      .assessmentFormDownloadButton,
                   }}
                 >
                   Télécharger le bilan détaillé en PDF

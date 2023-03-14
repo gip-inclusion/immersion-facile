@@ -11,7 +11,7 @@ import { domElementIds, immersionFacileContactEmail } from "shared";
 import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";
 
 const {
-  bottomsLinks: bottomsLinksIds,
+  bottomLinks: bottomsLinksIds,
   links: linksIds,
   overFooterCols: overFooterColsIds,
 } = domElementIds.footer;

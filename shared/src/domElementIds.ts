@@ -37,6 +37,7 @@ export const domElementIds = {
       },
     },
   },
+
   footer: {
     overFooterCols: {
       faq: buildFooterNavLinkId("over-faq"),
@@ -47,7 +48,7 @@ export const domElementIds = {
       gouv: buildFooterNavLinkId("gouv"),
       civilService: buildFooterNavLinkId("service-public"),
     },
-    bottomsLinks: {
+    bottomLinks: {
       accessibility: buildFooterNavLinkId("accessibility"),
       legals: buildFooterNavLinkId("legals"),
       privacy: buildFooterNavLinkId("privacy"),
@@ -57,25 +58,51 @@ export const domElementIds = {
       sitemap: buildFooterNavLinkId("sitemap"),
     },
   },
-  admin: {
-    agencyTab: {
-      activateAgencySelector: "agency-selector",
-      editAgencyformStatusSelector: "im-form-edit-agency__status-select",
-      editAgencyformSafirCodeInput: "im-form-edit-agency__safir-code-input",
-      editAgencyFormEditButton: "im-form-edit-agency__submit-button",
-    },
-    emailsPreviewTab: {
-      emailTemplateNameSelect: "selectTemplateName",
-      internshipKindSelect: "email-preview-internshipKind-select",
-    },
-    addEstablishmentByBatchTab: {
-      groupNameInput: "groupName-input",
-      inputFileInput: "inputFile-input",
-    },
-    adminPrivateRoute: {
-      loginButton: "im-login__submit-button",
+
+  home: {
+    heroHeader: {
+      candidate: buildHeroHeaderId("home-candidate"),
+      establishment: buildHeroHeaderId("home-establishment"),
+      agency: buildHeroHeaderId("home-agency"),
     },
   },
+
+  homeEstablishments: {
+    siretModal: {
+      siretFetcherInput: "siret-fetcher-input",
+    },
+    heroHeader: {
+      addEstablishmentForm: buildHeroHeaderId("establishment-form-register"),
+      editEstablishmentForm: buildHeroHeaderId("establishment-form-edit"),
+      formConvention: buildHeroHeaderId("establishment-form-convention"),
+    },
+  },
+  homeAgencies: {
+    heroHeader: {
+      addAgencyForm: buildHeroHeaderId("agency-form-register"),
+      formConvention: buildHeroHeaderId("agency-form-convention"),
+    },
+  },
+  homeCandidates: {
+    heroHeader: {
+      search: buildHeroHeaderId("candidate-search"),
+      formConvention: buildHeroHeaderId("candidate-form-convention"),
+    },
+  },
+
+  search: {
+    placeAutocompleteInput: "im-search-page__address-autocomplete",
+    resultPerPageDropdown: "im-search-page__results-per-page-dropdown",
+    appellationAutocomplete: "im-search-page__appellation-autocomplete",
+    distanceSelect: "im-search-page__distance-dropdown",
+    sortFilter: "radio-inline-legend",
+    searchSubmitButton: "im-search__submit-search",
+    searchSortOptionBase: "search-sort-option-",
+    contactByMailButton: "im-contact-establishment__contact-email-button",
+    contactByPhoneButton: "im-contact-establishment__contact-phone-button",
+    contactInPersonButton: "im-contact-establishment__contact-in-person-button",
+  },
+
   addAgency: {
     uploadLogoInput: "file-upload-logo",
     id: "agency-id",
@@ -88,7 +115,7 @@ export const domElementIds = {
       streetNumberAndAddress: "agency-address-streetNumberAndAddress",
     },
     positionInput: "agency-position",
-    logoUrlInput: "Cela permet de personnaliser les mails automatisés.",
+    logoUrlInput: "agency-logo-url",
     validatorEmailsInput: "agency-validator-emails",
     adminEmailsInput: "agency-adminEmails",
     signatureInput: "agency-signature",
@@ -101,7 +128,7 @@ export const domElementIds = {
     stepsForValidationInput: "steps-for-validation",
     submitButton: "im-form-add-agency__submit-button",
   },
-  agencyDashboard: {},
+
   conventionImmersionRoute: {
     conventionSection: {
       agencyDepartment: "form-convention-agencyDepartement",
@@ -144,7 +171,6 @@ export const domElementIds = {
       emergencyContactEmail:
         "form-convention-signatories-beneficiary-emergencyContactEmail",
     },
-
     establishmentTutorSection: {
       firstName: "form-convention-establishmentTutor-firstName",
       lastName: "form-convention-establishmentTutor-lastName",
@@ -152,7 +178,6 @@ export const domElementIds = {
       phone: "form-convention-establishmentTutor-phone",
       job: "form-convention-establishmentTutor-job",
     },
-
     beneficiaryRepresentativeSection: {
       firstName:
         "form-convention-signatories-beneficiaryRepresentative-firstName",
@@ -161,7 +186,6 @@ export const domElementIds = {
       email: "form-convention-signatories-beneficiaryRepresentative-email",
       phone: "form-convention-signatories-beneficiaryRepresentative-phone",
     },
-
     beneficiaryCurrentEmployerSection: {
       businessName:
         "form-convention-signatories-beneficiaryCurrentEmployer-businessName",
@@ -175,7 +199,6 @@ export const domElementIds = {
       businessSiret:
         "form-convention-signatories-beneficiaryCurrentEmployer-businessSiret",
     },
-
     establishmentRepresentativeSection: {
       firstName:
         "form-convention-signatories-establishmentRepresentative-firstName",
@@ -185,17 +208,15 @@ export const domElementIds = {
       phone: "form-convention-signatories-establishmentRepresentative-phone",
     },
   },
-  conventionMiniStageRoute: {},
+
   conventionToValidate: {
     conventionValidationRejectButton: "im-convention-validation__reject-button",
     conventionValidationValidateButton:
       "im-convention-validation__validate-button",
-    justificationModalCancelBtn: "im-justification-modal__cancel-button",
-    justificationModalSendBtn: "im-justification-modal__send-button",
+    justificationModalCancelButton: "im-justification-modal__cancel-button",
+    justificationModalSubmitButton: "im-justification-modal__submit-button",
   },
-  conventionToSign: {},
-  editFormEstablishmentRoute: {},
-  error: {},
+
   establishment: {
     establishmentFormAddressAutocomplete:
       "autocomplete-address-creation-establishment-form",
@@ -221,55 +242,16 @@ export const domElementIds = {
     errorSiretAlreadyExistButton:
       "im-form-add-establishment__edit-establishment-button",
   },
+
   immersionAssessment: {
     assessmentFormSubmitButton: "im-assessment-form__submit-button",
-    assessmentFormdownloadButton: "im-assessment-form__download-button",
+    assessmentFormDownloadButton: "im-assessment-form__download-button",
   },
-  landingEstablishment: {},
+
   magicLinkRenewal: {
     magicLinkRenewalButton: "im-renew-page__renew-link-button",
   },
-  home: {
-    heroHeaders: {
-      candidate: buildHeroHeaderId("home-candidate"),
-      establishment: buildHeroHeaderId("home-establishment"),
-      agency: buildHeroHeaderId("home-agency"),
-    },
-  },
-  homeEstablishments: {
-    siretModal: {
-      siretFetcherInput: "siret-fetcher-input",
-    },
-    heroHeaders: {
-      addEstablishmentForm: buildHeroHeaderId("establishment-form-register"),
-      editEstablishmentForm: buildHeroHeaderId("establishment-form-edit"),
-      formConvention: buildHeroHeaderId("establishment-form-convention"),
-    },
-  },
-  homeAgencies: {
-    heroHeaders: {
-      addAgencyForm: buildHeroHeaderId("agency-form-register"),
-      formConvention: buildHeroHeaderId("agency-form-convention"),
-    },
-  },
-  homeCandidates: {
-    heroHeaders: {
-      search: buildHeroHeaderId("candidate-search"),
-      formConvention: buildHeroHeaderId("candidate-form-convention"),
-    },
-  },
-  search: {
-    placeAutocompleteInput: "im-search-page__address-autocomplete",
-    resultPerPageDropdown: "im-search-page__results-per-page-dropdown",
-    appellationAutocomplete: "im-search-page__appellation-autocomplete",
-    distanceSelect: "im-search-page__distance-dropdown",
-    sortRadioInlineLegend: "radio-inline-legend",
-    searchButton: "im-search__submit-search",
-    searchSortOption: "search-sort-option-",
-    contactByMailButton: "im-contact-establishment__contact-email-button",
-    contactByPhoneButton: "im-contact-establishment__contact-phone-button",
-    contactInPersonButton: "im-contact-establishment__contact-in-person-button",
-  },
+
   standard: {
     siteMap: {
       home: buildSitemapNavLinkId("home"),
@@ -287,7 +269,34 @@ export const domElementIds = {
       stats: buildSitemapNavLinkId("stats"),
     },
   },
+
+  admin: {
+    agencyTab: {
+      activateAgencySelector: "agency-selector",
+      editAgencyFormStatusSelector: "im-form-edit-agency__status-select",
+      editAgencyFormSafirCodeInput: "im-form-edit-agency__safir-code-input",
+      editAgencyFormEditSubmitButton: "im-form-edit-agency__submit-button",
+    },
+    emailPreviewTab: {
+      emailTemplateNameSelect: "selectTemplateName",
+      internshipKindSelect: "email-preview-internshipKind-select",
+    },
+    addEstablishmentByBatchTab: {
+      groupNameInput: "groupName-input",
+      inputFileInput: "inputFile-input",
+    },
+    adminPrivateRoute: {
+      formLoginSubmitButton: "im-login__submit-button",
+    },
+  },
+
   conventionStatusDashboard: {},
   group: {},
   conventionDocument: {},
+  landingEstablishment: {},
+  conventionToSign: {},
+  editFormEstablishmentRoute: {},
+  error: {},
+  conventionMiniStageRoute: {},
+  agencyDashboard: {},
 } satisfies DomElementIds;

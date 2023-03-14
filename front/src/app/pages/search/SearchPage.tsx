@@ -222,7 +222,7 @@ export const SearchPage = ({
                     disabled={!availableForSearchRequest(searchStatus, values)}
                     type="submit"
                     nativeButtonProps={{
-                      id: domElementIds.search.searchButton,
+                      id: domElementIds.search.searchSubmitButton,
                     }}
                   >
                     Rechercher
@@ -256,7 +256,7 @@ export const SearchPage = ({
                           "fr-fieldset__legend",
                           "fr-text--regular",
                         )}
-                        id={domElementIds.search.sortRadioInlineLegend}
+                        id={domElementIds.search.sortFilter}
                       >
                         Trier les résultats :
                       </legend>
@@ -264,11 +264,11 @@ export const SearchPage = ({
                         {sortedByOptions.map((option, index) => (
                           <div
                             className={fr.cx("fr-radio-group")}
-                            key={`${domElementIds.search.searchSortOption}${index}`}
+                            key={`${domElementIds.search.searchSortOptionBase}${index}`}
                           >
                             <input
                               type="radio"
-                              id={`${domElementIds.search.searchSortOption}${index}`}
+                              id={`${domElementIds.search.searchSortOptionBase}${index}`}
                               name="search-sort-option"
                               value={option.value}
                               checked={formikValues.sortedBy === option.value}
@@ -285,7 +285,7 @@ export const SearchPage = ({
                             />
                             <label
                               className={fr.cx("fr-label")}
-                              htmlFor={`${domElementIds.search.searchSortOption}${index}`}
+                              htmlFor={`${domElementIds.search.searchSortOptionBase}${index}`}
                             >
                               {option.label}
                             </label>

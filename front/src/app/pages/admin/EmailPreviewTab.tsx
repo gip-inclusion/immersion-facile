@@ -62,16 +62,14 @@ export const EmailPreviewTab = () => {
               <label
                 className={fr.cx("fr-label")}
                 htmlFor={
-                  domElementIds.admin.emailsPreviewTab.emailTemplateNameSelect
+                  domElementIds.admin.emailPreviewTab.emailTemplateNameSelect
                 }
               >
                 Liste de templates email :
               </label>
               <select
                 className={fr.cx("fr-select")}
-                id={
-                  domElementIds.admin.emailsPreviewTab.emailTemplateNameSelect
-                }
+                id={domElementIds.admin.emailPreviewTab.emailTemplateNameSelect}
                 name="templateName"
                 onChange={(event) =>
                   setCurrentTemplate(event.currentTarget.value as TemplateName)
@@ -168,7 +166,7 @@ const EmailVariableField = ({
   if (variableName === "internshipKind")
     return (
       <Select
-        id={domElementIds.admin.emailsPreviewTab.internshipKindSelect}
+        id={domElementIds.admin.emailPreviewTab.internshipKindSelect}
         label={variableName}
         name={variableName}
         options={internshipKinds.map((internshipKind) => ({

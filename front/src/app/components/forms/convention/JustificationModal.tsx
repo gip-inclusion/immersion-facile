@@ -86,7 +86,7 @@ export const JustificationModal = ({
                   onClick: closeModal,
                   nativeButtonProps: {
                     id: domElementIds.conventionToValidate
-                      .justificationModalCancelBtn,
+                      .justificationModalCancelButton,
                   },
                   children: "Annuler",
                 },
@@ -94,7 +94,7 @@ export const JustificationModal = ({
                   type: "submit",
                   nativeButtonProps: {
                     id: domElementIds.conventionToValidate
-                      .justificationModalSendBtn,
+                      .justificationModalSubmitButton,
                   },
                   children: "Envoyer",
                 },

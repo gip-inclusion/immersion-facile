@@ -1,5 +1,4 @@
 import React from "react";
-// import { NavLink } from "../tabLinks";
 import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
 import "./Footer.css";

@@ -71,7 +71,8 @@ export const LoginForm = ({
                   disabled={isLoading}
                   type="submit"
                   nativeButtonProps={{
-                    id: domElementIds.admin.adminPrivateRoute.loginButton,
+                    id: domElementIds.admin.adminPrivateRoute
+                      .formLoginSubmitButton,
                   }}
                 >
                   Se connecter
