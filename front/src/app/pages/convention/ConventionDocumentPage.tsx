@@ -1,7 +1,14 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import React, { useEffect } from "react";
 import { Loader, MainWrapper } from "react-design-system";
-import { isStringDate, prettyPrintSchedule, toDisplayedDate } from "shared";
+import {
+  ConventionMagicLinkJwt,
+  ConventionMagicLinkPayload,
+  decodeMagicLinkJwtWithoutSignatureCheck,
+  isStringDate,
+  prettyPrintSchedule,
+  toDisplayedDate,
+} from "shared";
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import { routes } from "src/app/routes/routes";
@@ -26,8 +33,13 @@ type ConventionDocumentPageProps = {
 export const ConventionDocumentPage = ({
   route,
 }: ConventionDocumentPageProps) => {
-  const jwt = route.params.jwt;
-  const { convention, fetchConventionError, isLoading } = useConvention(jwt);
+  const jwt: ConventionMagicLinkJwt = route.params.jwt;
+  const { applicationId } =
+    decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(jwt);
+  const { convention, fetchConventionError, isLoading } = useConvention({
+    jwt,
+    conventionId: applicationId,
+  });
   const agencyInfo = useAppSelector(agencyInfoSelectors.details);
   const agencyFeedback = useAppSelector(agencyInfoSelectors.feedback);
   const canShowConvention = convention?.status === "ACCEPTED_BY_VALIDATOR";
