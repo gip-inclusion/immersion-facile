@@ -1,4 +1,3 @@
-import { fr } from "@codegouvfr/react-dsfr";
 import React, { useEffect, useState } from "react";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
@@ -71,25 +70,17 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
       routeParams={route.params}
     />
   ) : (
-    <div
-      className={fr.cx(
-        "fr-grid-row",
-        "fr-grid-row--center",
-        "fr-grid-row--gutters",
-      )}
-    >
-      <InitiateConventionCard
-        title={
-          isSharedConvention
-            ? "Une demande de convention d'immersion a été partagée avec vous."
-            : "Activer une demande de convention"
-        }
-        peConnectNotice="Je suis demandeur d’emploi et je connais mes identifiants à mon compte Pôle emploi. J'accède au formulaire ici :"
-        otherCaseNotice="Je suis dans une autre situation (candidat à une immersion sans identifiant Pôle emploi, entreprise ou conseiller emploi). J'accède au formulaire partagé ici :"
-        showFormButtonLabel="Ouvrir le formulaire"
-        onNotPeConnectButtonClick={() => setShouldShowForm(true)}
-      />
-    </div>
+    <InitiateConventionCard
+      title={
+        isSharedConvention
+          ? "Une demande de convention d'immersion a été partagée avec vous."
+          : "Activer une demande de convention"
+      }
+      peConnectNotice="Je suis demandeur d’emploi et je connais mes identifiants à mon compte Pôle emploi. J'accède au formulaire ici :"
+      otherCaseNotice="Je suis dans une autre situation (candidat à une immersion sans identifiant Pôle emploi, entreprise ou conseiller emploi). J'accède au formulaire partagé ici :"
+      showFormButtonLabel="Ouvrir le formulaire"
+      onNotPeConnectButtonClick={() => setShouldShowForm(true)}
+    />
   );
 };
 

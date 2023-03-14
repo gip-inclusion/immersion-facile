@@ -78,16 +78,16 @@ export const InitiateConventionCard = ({
     </div>
   );
   const section = (
-    <div
-      className={fr.cx(
-        "fr-grid-row",
-        "fr-grid-row--gutters",
-        "fr-grid-row--center",
-      )}
-    >
+    <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
       <div className={fr.cx("fr-col-12", "fr-col-md-8")}>
         <div
-          className={fr.cx("fr-card", "fr-card--grey", "fr-px-8w", "fr-py-4w")}
+          className={fr.cx(
+            "fr-card",
+            "fr-card--grey",
+            "fr-card--no-border",
+            "fr-px-8w",
+            "fr-py-4w",
+          )}
         >
           <span className={fr.cx("fr-h5")}>{title}</span>
           {cardContent}

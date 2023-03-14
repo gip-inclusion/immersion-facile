@@ -10,7 +10,7 @@ export const ConventionFormContainerLayout = ({
 }: ConventionFormContainerLayoutProps) => (
   <>
     <MainWrapper
-      layout={"boxed"}
+      layout={"default"}
       pageHeader={
         <PageHeader
           centered
