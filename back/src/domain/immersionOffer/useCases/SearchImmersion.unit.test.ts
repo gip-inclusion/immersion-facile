@@ -204,7 +204,7 @@ describe("SearchImmersionUseCase", () => {
   });
 
   describe("authenticated with api key", () => {
-    it("Search immersion, and provide contact details", async () => {
+    it("Search immersion, and DO NOT provide contact details", async () => {
       const { searchImmersion } = await prepareSearchableData();
 
       const authenticatedResponse = await searchImmersion.execute(
@@ -226,17 +226,10 @@ describe("SearchImmersionUseCase", () => {
           nafLabel: TEST_NAF_LABEL,
           romeLabel: TEST_ROME_LABEL,
           appellationLabels: [TEST_APPELLATION_LABEL],
-          contactDetails: {
-            id: "3ca6e619-d654-4d0d-8fa6-2febefbe953d",
-            firstName: "Alain",
-            lastName: "Prost",
-            email: "alain.prost@email.fr",
-            job: "le big boss",
-            phone: "0612345678",
-          },
           numberOfEmployeeRange: "20-49",
         },
       ]);
+      expect(authenticatedResponse[0].contactDetails).toBeUndefined();
     });
   });
 

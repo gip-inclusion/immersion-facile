@@ -68,7 +68,7 @@ export class SearchImmersion extends TransactionalUseCase<
       await uow.establishmentAggregateRepository.getSearchImmersionResultDtoFromSearchMade(
         {
           searchMade,
-          withContactDetails: apiConsumerName !== undefined,
+          withContactDetails: false,
           maxResults: 100,
         },
       );

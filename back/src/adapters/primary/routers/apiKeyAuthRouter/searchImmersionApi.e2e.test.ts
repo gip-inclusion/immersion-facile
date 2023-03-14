@@ -174,14 +174,6 @@ describe("search-immersion route", () => {
             distance_m: 719436,
             position: { lat: 43.8666, lon: 8.3333 },
             city: avenueChampsElyseesDto.city,
-            contactDetails: {
-              id: "3ca6e619-d654-4d0d-8fa6-2febefbe953d",
-              firstName: "Alain",
-              lastName: "Prost",
-              email: "alain.prost@email.fr",
-              phone: "0612345678",
-              job: "le big boss",
-            },
           },
         ];
         const response = await request
