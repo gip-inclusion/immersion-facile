@@ -267,8 +267,8 @@ export const ConventionDocumentPage = ({
           </p>
 
           <h2 className={fr.cx("fr-h4")}>
-            Toutes les parties ci-dessous ont signé cette convention par le
-            moyen d'une signature électronique :
+            Toutes les parties ci-dessus ont signé cette convention par le moyen
+            d'une signature électronique&nbsp;:
           </h2>
           <div className={fr.cx("fr-card", "fr-p-2w")}>
             <ul>

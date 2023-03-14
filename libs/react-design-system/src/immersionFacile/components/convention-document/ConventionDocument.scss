@@ -20,6 +20,28 @@
       padding: 0;
       box-shadow: none;
       max-width: 100%;
+      h1 {
+        font-size: 18pt !important;
+      }
+      .fr-h4 {
+        font-size: 14pt !important;
+      }
+      .fr-h5 {
+        font-size: 13pt !important;
+      }
+      .fr-h6 {
+        font-size: 12pt !important;
+      }
+      p,
+      ul,
+      li {
+        font-size: 11pt !important;
+      }
+      footer p,
+      footer ul,
+      footer li {
+        font-size: 9pt !important;
+      }
     }
   }
   &__title {
