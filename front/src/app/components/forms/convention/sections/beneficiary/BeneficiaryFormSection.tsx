@@ -1,6 +1,7 @@
 import { useFormikContext } from "formik";
 import React, { useEffect } from "react";
-import { SectionTitle, Select, SelectOption } from "react-design-system";
+import { SectionTitle, SelectOption } from "react-design-system";
+import { Select } from "@codegouvfr/react-dsfr/Select";
 import { useDispatch } from "react-redux";
 import {
   ConventionDto,
@@ -104,18 +105,17 @@ export const BeneficiaryFormSection = ({
         <Select
           {...formContents["signatories.beneficiary.levelOfEducation"]}
           disabled={isFrozen}
-          value={
-            isBeneficiaryStudent(values.signatories.beneficiary)
-              ? values.signatories.beneficiary.levelOfEducation
-              : ""
-          }
-          onChange={(event) =>
-            setFieldValue(
-              formContents["signatories.beneficiary.levelOfEducation"].name,
-              event.currentTarget.value,
-            )
-          }
           options={levelsOfEducationToSelectOption}
+          nativeSelectProps={{
+            onChange: (event) =>
+              setFieldValue(
+                formContents["signatories.beneficiary.levelOfEducation"].name,
+                event.currentTarget.value,
+              ),
+            value: isBeneficiaryStudent(values.signatories.beneficiary)
+              ? values.signatories.beneficiary.levelOfEducation
+              : "",
+          }}
         />
       )}
       <TextInput

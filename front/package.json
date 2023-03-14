@@ -20,7 +20,7 @@
     "prebuild": "only-include-used-icons"
   },
   "dependencies": {
-    "@codegouvfr/react-dsfr": "^0.32.0",
+    "@codegouvfr/react-dsfr": "^0.37.1-rc.0",
     "@gouvfr/dsfr": "1.8.5",
     "@hookform/resolvers": "^2.9.11",
     "@mui/icons-material": "^5.5.1",

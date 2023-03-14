@@ -170,7 +170,7 @@ importers:
       '@babel/core': ^7.20.12
       '@babel/preset-env': ^7.16.11
       '@babel/preset-typescript': ^7.18.6
-      '@codegouvfr/react-dsfr': ^0.32.0
+      '@codegouvfr/react-dsfr': ^0.37.1-rc.0
       '@emotion/react': ^11.9.0
       '@emotion/styled': ^11.8.1
       '@gouvfr/dsfr': 1.8.5
@@ -221,7 +221,7 @@ importers:
       vite: ^4.1.4
       zod: 3.14.2
     dependencies:
-      '@codegouvfr/react-dsfr': 0.32.0_react@18.2.0
+      '@codegouvfr/react-dsfr': 0.37.1-rc.0_react@18.2.0
       '@gouvfr/dsfr': 1.8.5
       '@hookform/resolvers': 2.9.11_react-hook-form@7.42.1
       '@mui/icons-material': 5.8.0_agg4gj4teu3mtdwwc44pgjorny
@@ -311,7 +311,7 @@ importers:
   libs/react-design-system:
     specifiers:
       '@babel/core': ^7.20.12
-      '@codegouvfr/react-dsfr': ^0.32.0
+      '@codegouvfr/react-dsfr': ^0.37.1-rc.0
       '@emotion/react': ^11.9.0
       '@emotion/styled': ^11.8.1
       '@gouvfr/dsfr': ^1.5.1
@@ -341,7 +341,7 @@ importers:
       typescript: ^4.9.5
       webpack: '>=2.0.0'
     dependencies:
-      '@codegouvfr/react-dsfr': 0.32.0_react@18.2.0
+      '@codegouvfr/react-dsfr': 0.37.1-rc.0_react@18.2.0
       react-modal: 3.16.1_biqbaboplfbrettd7655fr4n2y
       react-player: 2.11.0_react@18.2.0
       tss-react: 4.5.2_hp5f5nkljdiwilp4rgxyefcplu
@@ -2869,8 +2869,8 @@ packages:
       minimist: 1.2.7
     dev: true
 
-  /@codegouvfr/react-dsfr/0.32.0_react@18.2.0:
-    resolution: {integrity: sha512-O5cN1VHkD+NkuTEBYVUeWDOPnqZQIbWyNDcJHab+8JYlj9+2GeWmuCugGYMwv/3X1NQEdeEAQwrnLAFQEzrEkw==}
+  /@codegouvfr/react-dsfr/0.37.1-rc.0_react@18.2.0:
+    resolution: {integrity: sha512-2q8vSmuq2kA2D/h7CVwmb0FA9Myq91/ft80UBuCjG7iDd75tKcqOKdsmAIi8tKG0arDtC89+x4P2kg4TdC349w==}
     hasBin: true
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
@@ -2916,11 +2916,13 @@ packages:
       uuid: 8.3.2
     dev: true
 
-  /@cypress/xvfb/1.2.4:
+  /@cypress/xvfb/1.2.4_supports-color@8.1.1:
     resolution: {integrity: sha512-skbBzPggOVYCbnGgV+0dmBdW/s77ZkAOXIC1knS8NagwDjBrNC1LuXtQJeiN6l+m7lzmHtaoUw/ctJKdqkG57Q==}
     dependencies:
-      debug: 3.2.7
+      debug: 3.2.7_supports-color@8.1.1
       lodash.once: 4.1.1
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /@design-systems/utils/2.12.0_zula6vjvt3wdocc4mwcxqa6nzi:
@@ -4767,7 +4769,7 @@ packages:
       css-loader: 3.6.0_webpack@4.46.0
       file-loader: 6.2.0_webpack@4.46.0
       find-up: 5.0.0
-      fork-ts-checker-webpack-plugin: 4.1.6
+      fork-ts-checker-webpack-plugin: 4.1.6_evijigonbo4skk2vlqtwtdqibu
       glob: 7.2.3
       glob-promise: 3.4.0_glob@7.2.3
       global: 4.4.0
@@ -4792,6 +4794,7 @@ packages:
       webpack-hot-middleware: 2.25.3
       webpack-virtual-modules: 0.2.2
     transitivePeerDependencies:
+      - bluebird
       - eslint
       - supports-color
       - vue-template-compiler
@@ -5101,6 +5104,7 @@ packages:
       x-default-browser: 0.4.0
     transitivePeerDependencies:
       - '@storybook/mdx2-csf'
+      - bluebird
       - bufferutil
       - encoding
       - eslint
@@ -5136,6 +5140,7 @@ packages:
       webpack: 5.75.0
     transitivePeerDependencies:
       - '@storybook/mdx2-csf'
+      - bluebird
       - bufferutil
       - encoding
       - eslint
@@ -5256,6 +5261,7 @@ packages:
       webpack-dev-middleware: 3.7.3_webpack@4.46.0
       webpack-virtual-modules: 0.2.2
     transitivePeerDependencies:
+      - bluebird
       - encoding
       - eslint
       - supports-color
@@ -5418,6 +5424,7 @@ packages:
       - '@storybook/mdx2-csf'
       - '@swc/core'
       - '@types/webpack'
+      - bluebird
       - bufferutil
       - encoding
       - esbuild
@@ -6772,6 +6779,8 @@ packages:
     dependencies:
       micromatch: 3.1.10
       normalize-path: 2.1.1
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /anymatch/3.1.3:
@@ -7526,6 +7535,8 @@ packages:
       snapdragon-node: 2.1.1
       split-string: 3.1.0
       to-regex: 3.0.2
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /braces/3.0.2:
@@ -7729,7 +7740,7 @@ packages:
       mississippi: 3.0.0
       mkdirp: 0.5.6
       move-concurrently: 1.0.1
-      promise-inflight: 1.0.1
+      promise-inflight: 1.0.1_bluebird@3.7.2
       rimraf: 2.7.1
       ssri: 6.0.2
       unique-filename: 1.1.1
@@ -7758,6 +7769,8 @@ packages:
       ssri: 8.0.1
       tar: 6.1.13
       unique-filename: 1.1.1
+    transitivePeerDependencies:
+      - bluebird
     dev: true
 
   /cache-base/1.0.1:
@@ -7923,6 +7936,8 @@ packages:
       upath: 1.2.0
     optionalDependencies:
       fsevents: 1.2.13
+    transitivePeerDependencies:
+      - supports-color
     dev: true
     optional: true
 
@@ -8187,6 +8202,8 @@ packages:
       on-headers: 1.0.2
       safe-buffer: 5.1.2
       vary: 1.1.2
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /concat-map/0.0.1:
@@ -8331,6 +8348,8 @@ packages:
       p-all: 2.1.0
       p-filter: 2.1.0
       p-map: 3.0.0
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /crc-32/1.2.2:
@@ -8512,7 +8531,7 @@ packages:
     requiresBuild: true
     dependencies:
       '@cypress/request': 2.88.10
-      '@cypress/xvfb': 1.2.4
+      '@cypress/xvfb': 1.2.4_supports-color@8.1.1
       '@types/node': 14.18.36
       '@types/sinonjs__fake-timers': 8.1.1
       '@types/sizzle': 2.3.3
@@ -8582,13 +8601,35 @@ packages:
 
   /debug/2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
     dependencies:
       ms: 2.0.0
 
   /debug/3.2.7:
     resolution: {integrity: sha512-CFjzYYAi4ThfiQvizrFQevTTXHtnCqWfe7x1AhgEscTz6ZbLbfoLRLPugTQyBth6f8ZERVUSyWHFD/7Wu4t1XQ==}
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
     dependencies:
       ms: 2.1.3
+    dev: true
+
+  /debug/3.2.7_supports-color@8.1.1:
+    resolution: {integrity: sha512-CFjzYYAi4ThfiQvizrFQevTTXHtnCqWfe7x1AhgEscTz6ZbLbfoLRLPugTQyBth6f8ZERVUSyWHFD/7Wu4t1XQ==}
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
+    dependencies:
+      ms: 2.1.3
+      supports-color: 8.1.1
     dev: true
 
   /debug/4.3.4:
@@ -9602,6 +9643,8 @@ packages:
       regex-not: 1.0.2
       snapdragon: 0.8.2
       to-regex: 3.0.2
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /expect/27.5.1:
@@ -9694,6 +9737,8 @@ packages:
       regex-not: 1.0.2
       snapdragon: 0.8.2
       to-regex: 3.0.2
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /extract-zip/2.0.1:
@@ -9750,6 +9795,8 @@ packages:
       is-glob: 4.0.3
       merge2: 1.4.1
       micromatch: 3.1.10
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /fast-glob/3.2.12:
@@ -9981,9 +10028,19 @@ packages:
     resolution: {integrity: sha512-j0KLYPhm6zeac4lz3oJ3o65qvgQCcPubiyotZrXqEaG4hNagNYO8qdlUrX5vwqv9ohqeT/Z3j6+yW067yWWdUw==}
     dev: true
 
-  /fork-ts-checker-webpack-plugin/4.1.6:
+  /fork-ts-checker-webpack-plugin/4.1.6_evijigonbo4skk2vlqtwtdqibu:
     resolution: {integrity: sha512-DUxuQaKoqfNne8iikd14SAkh5uw4+8vNifp6gmA73yYNS6ywLIWSLD/n/mBzHQRpW3J7rbATEakmiA8JvkTyZw==}
     engines: {node: '>=6.11.5', yarn: '>=1.0.0'}
+    peerDependencies:
+      eslint: '>= 6'
+      typescript: '>= 2.7'
+      vue-template-compiler: '*'
+      webpack: '>= 4'
+    peerDependenciesMeta:
+      eslint:
+        optional: true
+      vue-template-compiler:
+        optional: true
     dependencies:
       '@babel/code-frame': 7.18.6
       chalk: 2.4.2
@@ -9991,7 +10048,11 @@ packages:
       minimatch: 3.1.2
       semver: 5.7.1
       tapable: 1.1.3
+      typescript: 4.9.5
+      webpack: 4.46.0
       worker-rpc: 0.1.1
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /fork-ts-checker-webpack-plugin/6.5.2_evijigonbo4skk2vlqtwtdqibu:
@@ -10423,6 +10484,8 @@ packages:
       ignore: 4.0.6
       pify: 4.0.1
       slash: 2.0.0
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /gopd/1.0.1:
@@ -11708,6 +11771,8 @@ packages:
       walker: 1.0.8
     optionalDependencies:
       fsevents: 2.3.2
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /jest-haste-map/27.5.1:
@@ -12786,6 +12851,8 @@ packages:
       regex-not: 1.0.2
       snapdragon: 0.8.2
       to-regex: 3.0.2
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /micromatch/4.0.5:
@@ -13012,6 +13079,8 @@ packages:
       regex-not: 1.0.2
       snapdragon: 0.8.2
       to-regex: 3.0.2
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /natural-compare-lite/1.4.0:
@@ -14051,6 +14120,22 @@ packages:
 
   /promise-inflight/1.0.1:
     resolution: {integrity: sha512-6zWPyEOFaQBJYcGMHBKTKJ3u6TBsnMFOIZSa6ce1e/ZrrsOlnHRHbabMjLiBYKp+n44X9eUI6VUPaukCXHuG4g==}
+    peerDependencies:
+      bluebird: '*'
+    peerDependenciesMeta:
+      bluebird:
+        optional: true
+    dev: true
+
+  /promise-inflight/1.0.1_bluebird@3.7.2:
+    resolution: {integrity: sha512-6zWPyEOFaQBJYcGMHBKTKJ3u6TBsnMFOIZSa6ce1e/ZrrsOlnHRHbabMjLiBYKp+n44X9eUI6VUPaukCXHuG4g==}
+    peerDependencies:
+      bluebird: '*'
+    peerDependenciesMeta:
+      bluebird:
+        optional: true
+    dependencies:
+      bluebird: 3.7.2
     dev: true
 
   /promise.allsettled/1.0.6:
@@ -14515,6 +14600,8 @@ packages:
       graceful-fs: 4.2.10
       micromatch: 3.1.10
       readable-stream: 2.3.7
+    transitivePeerDependencies:
+      - supports-color
     dev: true
     optional: true
 
@@ -14947,6 +15034,8 @@ packages:
       micromatch: 3.1.10
       minimist: 1.2.7
       walker: 1.0.8
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /sass/1.55.0:
@@ -15226,6 +15315,8 @@ packages:
       source-map: 0.5.7
       source-map-resolve: 0.5.3
       use: 3.1.1
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /sonic-boom/2.8.0:
@@ -15772,6 +15863,8 @@ packages:
       terser: 5.16.1
       webpack: 4.46.0
       webpack-sources: 1.4.3
+    transitivePeerDependencies:
+      - bluebird
     dev: true
 
   /terser-webpack-plugin/5.3.6_webpack@5.75.0:
@@ -16801,6 +16894,8 @@ packages:
     requiresBuild: true
     dependencies:
       chokidar: 2.1.8
+    transitivePeerDependencies:
+      - supports-color
     dev: true
     optional: true
 
@@ -16812,6 +16907,8 @@ packages:
     optionalDependencies:
       chokidar: 3.5.3
       watchpack-chokidar2: 2.0.1
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /watchpack/2.4.0:
@@ -16893,6 +16990,8 @@ packages:
     resolution: {integrity: sha512-kDUmfm3BZrei0y+1NTHJInejzxfhtU8eDj2M7OKb2IWrPFAeO1SOH2KuQ68MSZu9IGEHcxbkKKR1v18FrUSOmA==}
     dependencies:
       debug: 3.2.7
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /webpack/4.46.0:
@@ -16931,6 +17030,8 @@ packages:
       terser-webpack-plugin: 1.4.5_webpack@4.46.0
       watchpack: 1.7.5
       webpack-sources: 1.4.3
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /webpack/5.75.0:

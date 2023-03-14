@@ -7,8 +7,9 @@ import {
 } from "src/app/components/search/ContactEstablishmentModal";
 import { SearchResult } from "src/app/components/search/SearchResult";
 import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
-import { Select } from "react-design-system";
 import { SuccessFeedback } from "src/app/components/SuccessFeedback";
+import { Select } from "@codegouvfr/react-dsfr/Select";
+
 const getFeedBackMessage = (contactMethod?: ContactMethod) => {
   switch (contactMethod) {
     case "EMAIL":
@@ -107,21 +108,22 @@ export const GroupListResults = ({ results }: GroupListResultsProps) => {
           >
             <Select
               label="Nombre de résultats par page"
-              onChange={(event) => {
-                const value = parseInt(event.currentTarget?.value);
-                if (isResultPerPageOption(value)) {
-                  setResultsPerPage(value);
-                }
-              }}
-              value={resultsPerPage}
               options={[
                 ...resultsPerPageOptions.map((number) => ({
                   label: `${number} résultats / page`,
                   value: number,
                 })),
               ]}
-              id={domElementIds.search.resultPerPageDropdown}
-              hideLabel
+              nativeSelectProps={{
+                id: domElementIds.search.resultPerPageDropdown,
+                onChange: (event) => {
+                  const value = parseInt(event.currentTarget?.value);
+                  if (isResultPerPageOption(value)) {
+                    setResultsPerPage(value);
+                  }
+                },
+                value: resultsPerPage,
+              }}
             />
           </div>
         </div>

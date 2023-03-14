@@ -6,7 +6,8 @@ import {
 } from "html-templates/src/components/email";
 import { keys } from "ramda";
 import React, { useEffect, useState } from "react";
-import { DsfrTitle, ImmersionTextField, Select } from "react-design-system";
+import { DsfrTitle, ImmersionTextField } from "react-design-system";
+import { Select } from "@codegouvfr/react-dsfr/Select";
 import {
   domElementIds,
   immersionFacileContactEmail,
@@ -58,30 +59,19 @@ export const EmailPreviewTab = () => {
       <div>
         <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
           <aside className={fr.cx("fr-col-12", "fr-col-lg-4")}>
-            <div className={fr.cx("fr-select-group")}>
-              <label
-                className={fr.cx("fr-label")}
-                htmlFor={
-                  domElementIds.admin.emailPreviewTab.emailTemplateNameSelect
-                }
-              >
-                Liste de templates email :
-              </label>
-              <select
-                className={fr.cx("fr-select")}
-                id={domElementIds.admin.emailPreviewTab.emailTemplateNameSelect}
-                name="templateName"
-                onChange={(event) =>
-                  setCurrentTemplate(event.currentTarget.value as TemplateName)
-                }
-              >
-                {keys(templatesByName).map((templateName) => (
-                  <option key={templateName} value={templateName}>
-                    {templatesByName[templateName].niceName}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <Select
+              label="Liste de templates email :"
+              options={keys(templatesByName).map((templateName) => ({
+                label: templatesByName[templateName].niceName,
+                value: templateName,
+              }))}
+              nativeSelectProps={{
+                id: domElementIds.admin.emailPreviewTab.emailTemplateNameSelect,
+                name: "templateName",
+                onChange: (event) =>
+                  setCurrentTemplate(event.currentTarget.value as TemplateName),
+              }}
+            />
 
             <h6>Métadonnées</h6>
             <ul className={fr.cx("fr-badge-group")}>
@@ -166,16 +156,18 @@ const EmailVariableField = ({
   if (variableName === "internshipKind")
     return (
       <Select
-        id={domElementIds.admin.emailPreviewTab.internshipKindSelect}
         label={variableName}
-        name={variableName}
         options={internshipKinds.map((internshipKind) => ({
           label: internshipKind,
           value: internshipKind,
         }))}
         className={fr.cx("fr-mb-2w")}
-        onChange={(e) => onChange(e.target.value)}
-        value={variableValue}
+        nativeSelectProps={{
+          id: domElementIds.admin.emailPreviewTab.internshipKindSelect,
+          name: variableName,
+          onChange: (e) => onChange(e.target.value),
+          value: variableValue,
+        }}
       />
     );
   if (["string", "number", "undefined"].includes(typeof variableValue))

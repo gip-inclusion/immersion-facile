@@ -1,6 +1,7 @@
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
-import { Loader, Select, SelectOption } from "react-design-system";
+import { Loader, SelectOption } from "react-design-system";
+import { Select } from "@codegouvfr/react-dsfr/Select";
 import {
   AgencyId,
   AgencyOption,
@@ -94,6 +95,7 @@ export const AgencySelector = ({
       className={`fr-input-group${showError ? " fr-input-group--error" : ""}`}
     >
       <Select
+        label={agencyDepartmentField.label}
         options={
           internshipKind === "immersion"
             ? departmentOptions
@@ -101,24 +103,27 @@ export const AgencySelector = ({
                 miniStageRestrictedDepartments.includes(department.value),
               )
         }
-        {...agencyDepartmentField}
-        onChange={(event) => setAgencyDepartment(event.currentTarget.value)}
-        value={agencyDepartment as string}
+        nativeSelectProps={{
+          value: agencyDepartment as string,
+          onChange: (event) => setAgencyDepartment(event.currentTarget.value),
+          ...agencyDepartmentField,
+        }}
       />
 
       <Select
+        label={agencyIdField.label}
         options={agencies.map(
           ({ id, name }): SelectOption => ({ label: name, value: id }),
         )}
-        {...agencyIdField}
-        onChange={(event) => setValue(event.currentTarget.value)}
-        value={value}
-        disabled={disabled || isLoading || !agencyDepartment}
-        placeholder={
-          agencyDepartment
+        nativeSelectProps={{
+          onChange: (event) => setValue(event.currentTarget.value),
+          value,
+          disabled: disabled || isLoading || !agencyDepartment,
+          placeholder: agencyDepartment
             ? "Veuillez sélectionner une structure"
-            : "Veuillez sélectionner un département"
-        }
+            : "Veuillez sélectionner un département",
+          ...agencyIdField,
+        }}
       />
       {showError && (
         <AgencyErrorText

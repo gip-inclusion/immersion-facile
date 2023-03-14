@@ -9,8 +9,8 @@ import {
 } from "./ContactEstablishmentModal";
 import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 import { SearchResult } from "./SearchResult";
-import { Select } from "react-design-system";
 import { fr } from "@codegouvfr/react-dsfr";
+import { Select } from "@codegouvfr/react-dsfr/Select";
 
 const getFeedBackMessage = (contactMethod?: ContactMethod) => {
   switch (contactMethod) {
@@ -111,21 +111,22 @@ export const SearchListResults = () => {
           >
             <Select
               label="Nombre de résultats par page"
-              onChange={(event) => {
-                const value = parseInt(event.currentTarget.value);
-                if (isResultPerPageOption(value)) {
-                  setResultsPerPage(value);
-                }
-              }}
-              value={resultsPerPage}
               options={[
                 ...resultsPerPageOptions.map((number) => ({
                   label: `${number} résultats / page`,
                   value: number,
                 })),
               ]}
-              id={domElementIds.search.resultPerPageDropdown}
-              hideLabel
+              nativeSelectProps={{
+                id: domElementIds.search.resultPerPageDropdown,
+                onChange: (event) => {
+                  const value = parseInt(event.currentTarget.value);
+                  if (isResultPerPageOption(value)) {
+                    setResultsPerPage(value);
+                  }
+                },
+                value: resultsPerPage,
+              }}
             />
           </div>
         </div>

@@ -3,7 +3,8 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
-import { ErrorNotifications, Select } from "react-design-system";
+import { ErrorNotifications } from "react-design-system";
+import { Select } from "@codegouvfr/react-dsfr/Select";
 import { FormProvider, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
@@ -90,11 +91,13 @@ export const EditAgencyForm = ({
           />
 
           <Select
-            id={domElementIds.admin.agencyTab.editAgencyFormStatusSelector}
             label="⚠️Statut de l'agence ⚠️"
             options={statusListOfOptions}
-            name={register("status").name}
-            onChange={register("status").onChange}
+            nativeSelectProps={{
+              id: domElementIds.admin.agencyTab.editAgencyFormStatusSelector,
+              name: register("status").name,
+              onChange: register("status").onChange,
+            }}
           />
 
           <Input

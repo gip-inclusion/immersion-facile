@@ -5,9 +5,9 @@ import {
   PageHeader,
   SectionTextEmbed,
   SectionAccordion,
-  Select,
   Loader,
 } from "react-design-system";
+import { Select } from "@codegouvfr/react-dsfr/Select";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
@@ -180,23 +180,6 @@ export const SearchPage = ({
                 >
                   <Select
                     label="Distance maximum"
-                    onChange={(event: React.ChangeEvent) => {
-                      //_newValue: string, selectedIndex: number
-                      const selectedIndex =
-                        (event.currentTarget as HTMLSelectElement)
-                          .selectedIndex - 1;
-                      setFieldValue(
-                        "distance_km",
-                        radiusOptions[selectedIndex],
-                      );
-                      setFormikValues({
-                        ...values,
-                        distance_km: radiusOptions[selectedIndex],
-                      });
-                    }}
-                    value={radiusOptions.findIndex(
-                      (option) => option === values.distance_km,
-                    )}
                     options={[
                       {
                         label: "Distance",
@@ -208,7 +191,26 @@ export const SearchPage = ({
                         value: index,
                       })),
                     ]}
-                    id={domElementIds.search.distanceSelect}
+                    nativeSelectProps={{
+                      id: domElementIds.search.distanceSelect,
+                      onChange: (event: React.ChangeEvent) => {
+                        //_newValue: string, selectedIndex: number
+                        const selectedIndex =
+                          (event.currentTarget as HTMLSelectElement)
+                            .selectedIndex - 1;
+                        setFieldValue(
+                          "distance_km",
+                          radiusOptions[selectedIndex],
+                        );
+                        setFormikValues({
+                          ...values,
+                          distance_km: radiusOptions[selectedIndex],
+                        });
+                      },
+                      value: radiusOptions.findIndex(
+                        (option) => option === values.distance_km,
+                      ),
+                    }}
                   />
                 </div>
 
