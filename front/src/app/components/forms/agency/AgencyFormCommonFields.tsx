@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Select } from "react-design-system";
 import { useFormContext } from "react-hook-form";
@@ -59,6 +59,11 @@ export const AgencyFormCommonFields = ({
   const [validationSteps, setValidationSteps] = useState<
     "oneStep" | "twoSteps"
   >(defaultValidationStepsValue);
+
+  useEffect(() => {
+    if (validationSteps === "oneStep") setValue("counsellorEmails", []);
+  }, [validationSteps]);
+
   const { getFormFields } = useFormContents(formAgencyFieldsLabels);
   const fieldsContent = getFormFields();
   const getFieldError = makeFieldError(formState);
@@ -105,6 +110,7 @@ export const AgencyFormCommonFields = ({
       {validationSteps === "twoSteps" && (
         <MultipleEmailsInput
           {...fieldsContent.counsellorEmails}
+          initialValue={formValues.counsellorEmails.join(", ")}
           valuesInList={watch("counsellorEmails")}
           setValues={(values) => setValue("counsellorEmails", values)}
           validationSchema={zEmail}
@@ -113,6 +119,7 @@ export const AgencyFormCommonFields = ({
 
       <MultipleEmailsInput
         {...fieldsContent.validatorEmails}
+        initialValue={formValues.validatorEmails.join(", ")}
         description={descriptionByValidationSteps[validationSteps]}
         valuesInList={watch("validatorEmails")}
         setValues={(values) => setValue("validatorEmails", values)}

@@ -12,7 +12,11 @@ import { z } from "zod";
 const componentName = "im-fillable-list";
 
 export const MultipleEmailsInput = (
-  props: OmitFromExistingKeys<InputContainerProps, "onInputChange"> & {
+  props: OmitFromExistingKeys<
+    InputContainerProps,
+    "onInputChange" | "value"
+  > & {
+    initialValue?: string;
     valuesInList: string[];
     setValues: (values: string[]) => void;
   },
@@ -25,20 +29,31 @@ export const MultipleEmailsInput = (
     return (matches || []).map((match) => match.trim());
   };
 
-  const onInputChange = (inputValue: string) => {
-    const updatedValues = [
-      ...new Set([...getEmailValuesFromString(inputValue)]),
-    ];
+  const [inputValue, setInputValue] = useState(
+    addToListProps.initialValue ?? "",
+  );
+
+  const onInputChange: OnInputChange = (event) => {
+    const { value } = event.target;
+    const updatedValues = [...new Set([...getEmailValuesFromString(value)])];
     setValues(updatedValues);
+    setInputValue(value);
   };
+
   return (
     <div className={cx(fr.cx("fr-input-group"), componentName)}>
-      <InputContainer {...addToListProps} onInputChange={onInputChange} />
+      <InputContainer
+        {...addToListProps}
+        value={inputValue}
+        onInputChange={onInputChange}
+      />
       {valuesInList.length > 0 && (
         <EmailsValuesSummary
           values={valuesInList}
           onDelete={(valueToDelete) => {
-            setValues(valuesInList.filter(notEqual(valueToDelete)));
+            const newEmails = valuesInList.filter(notEqual(valueToDelete));
+            setValues(newEmails);
+            setInputValue(newEmails.join(", "));
           }}
         />
       )}
@@ -46,9 +61,12 @@ export const MultipleEmailsInput = (
   );
 };
 
+type OnInputChange = (event: React.ChangeEvent<HTMLInputElement>) => void;
+
 type InputContainerProps = {
   name: string;
-  onInputChange: (inputValue: string) => void;
+  value: string;
+  onInputChange: OnInputChange;
   label?: string;
   placeholder?: string;
   description?: string;
@@ -71,21 +89,20 @@ const createGetInputError =
 
 const InputContainer = ({
   name,
+  value,
   label,
   placeholder,
   description,
   onInputChange,
   validationSchema,
 }: InputContainerProps) => {
-  const [inputValue, setInputValue] = useState("");
   const [error, setError] = useState<string | null>(null);
   const getInputError = createGetInputError(validationSchema);
 
   useEffect(() => {
-    onInputChange(inputValue);
-    if (!inputValue || !error) return;
-    setError(getInputError(inputValue));
-  }, [error, inputValue]);
+    if (!value || !error) return;
+    setError(getInputError(value));
+  }, [error, value]);
 
   return (
     <div
@@ -106,10 +123,10 @@ const InputContainer = ({
         <div className={fr.cx("fr-col")}>
           <input
             id={cleanStringToHTMLAttribute(name)}
-            value={inputValue}
+            value={value}
             type="text"
             name={name}
-            onChange={(event) => setInputValue(event.target.value)}
+            onChange={onInputChange}
             className={fr.cx("fr-input", error ? "fr-input--error" : undefined)}
             placeholder={placeholder || ""}
             aria-describedby="text-input-error-desc-error"
