@@ -1,6 +1,6 @@
 import React, { ChangeEvent } from "react";
 import { weekdays } from "shared";
-import { fr } from "@codegouvfr/react-dsfr";
+import { Select } from "@codegouvfr/react-dsfr/Select";
 
 type WeekdayDropdownProps = {
   name: string;
@@ -26,22 +26,22 @@ export const WeekdayDropdown = ({
   };
 
   return (
-    <select
-      className={fr.cx("fr-select")}
-      id={id}
-      name={name}
-      value={selected}
-      onChange={onChangeHandler}
-      disabled={disabled}
-      aria-label="Choisissez un jour de la semaine"
-    >
-      {weekdays
+    <Select
+      label=""
+      options={weekdays
         .filter((_, index) => index >= minDay && index <= maxDay)
-        .map((day, index) => (
-          <option value={index + minDay} key={name + day}>
-            {day}
-          </option>
-        ))}
-    </select>
+        .map((day, index) => ({
+          label: day,
+          value: index + minDay,
+        }))}
+      nativeSelectProps={{
+        id,
+        name,
+        value: selected,
+        onChange: onChangeHandler,
+        disabled,
+        "aria-label": "Choisissez un jour de la semaine",
+      }}
+    />
   );
 };

@@ -2,7 +2,7 @@ import { useField, useFormikContext } from "formik";
 import React, { useEffect, useState } from "react";
 import type { ConventionDto } from "shared";
 import { AgencyId, AgencyOption } from "shared";
-import { Loader, SelectOption } from "react-design-system";
+import { Loader } from "react-design-system";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { agencyGateway } from "src/config/dependencies";
@@ -68,9 +68,7 @@ export const AgencyDisplayReadOnly = ({ agencyId }: AgencyDisplayProps) => {
     >
       <Select
         label={formContents["agencyId"].label}
-        options={agencies.map(
-          ({ id, name }): SelectOption => ({ label: name, value: id }),
-        )}
+        options={agencies.map(({ id, name }) => ({ label: name, value: id }))}
         nativeSelectProps={{
           onChange: (event) => setValue(event.currentTarget.value),
           value,

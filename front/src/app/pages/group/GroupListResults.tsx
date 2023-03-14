@@ -107,7 +107,7 @@ export const GroupListResults = ({ results }: GroupListResultsProps) => {
             className={fr.cx("fr-col-2", "fr-grid-row", "fr-grid-row--right")}
           >
             <Select
-              label="Nombre de résultats par page"
+              label=""
               options={[
                 ...resultsPerPageOptions.map((number) => ({
                   label: `${number} résultats / page`,
@@ -123,6 +123,7 @@ export const GroupListResults = ({ results }: GroupListResultsProps) => {
                   }
                 },
                 value: resultsPerPage,
+                "aria-label": "Nombre de résultats par page",
               }}
             />
           </div>

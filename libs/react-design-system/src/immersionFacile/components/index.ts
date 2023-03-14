@@ -22,7 +22,6 @@ export * from "./section-faq";
 export * from "./section-accordion";
 export * from "./skip-links";
 export * from "./error-notifications";
-export * from "./select";
 export * from "./loader";
 export * from "./section-title";
 export * from "./nps-form";

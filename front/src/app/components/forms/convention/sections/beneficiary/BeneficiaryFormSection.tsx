@@ -1,6 +1,6 @@
 import { useFormikContext } from "formik";
 import React, { useEffect } from "react";
-import { SectionTitle, SelectOption } from "react-design-system";
+import { SectionTitle } from "react-design-system";
 import { Select } from "@codegouvfr/react-dsfr/Select";
 import { useDispatch } from "react-redux";
 import {
@@ -60,7 +60,7 @@ export const BeneficiaryFormSection = ({
   // const isFilledField = (fieldValue: string) => fieldValue.length > 0;
   // const shouldDisableField = (fieldValue: string) =>
   //   isPEConnected && isFilledField(fieldValue);
-  const levelsOfEducationToSelectOption: SelectOption[] = levelsOfEducation.map(
+  const levelsOfEducationToSelectOption = levelsOfEducation.map(
     (level: string) => ({ label: level, value: level }),
   );
 

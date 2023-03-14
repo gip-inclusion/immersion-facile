@@ -1,6 +1,6 @@
 import { useField } from "formik";
 import React, { useEffect, useState } from "react";
-import { Loader, SelectOption } from "react-design-system";
+import { Loader } from "react-design-system";
 import { Select } from "@codegouvfr/react-dsfr/Select";
 import {
   AgencyId,
@@ -112,9 +112,7 @@ export const AgencySelector = ({
 
       <Select
         label={agencyIdField.label}
-        options={agencies.map(
-          ({ id, name }): SelectOption => ({ label: name, value: id }),
-        )}
+        options={agencies.map(({ id, name }) => ({ label: name, value: id }))}
         nativeSelectProps={{
           onChange: (event) => setValue(event.currentTarget.value),
           value,

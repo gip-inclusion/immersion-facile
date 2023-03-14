@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { Select } from "react-design-system";
-// import { Select } from "@codegouvfr/react-dsfr/Select";
+import { Select } from "@codegouvfr/react-dsfr/Select";
 import { useFormContext } from "react-hook-form";
 import {
   AddressDto,
@@ -72,30 +71,18 @@ export const AgencyFormCommonFields = ({
   return (
     <>
       <Select
-        id={fieldsContent.kind.id}
         label={fieldsContent.kind.label}
-        placeholder={fieldsContent.kind.placeholder}
         options={agencyListOfOptions.sort((a, b) =>
           a.label < b.label ? -1 : 0,
         )}
-        name={register("kind").name}
-        onChange={(e) => setValue("kind", e.currentTarget.value as AgencyKind)}
-        value={watch("kind")}
-      />
-      {/* <Select
-      label={fieldsContent.kind.label}
-      placeholder={fieldsContent.kind.placeholder}
-      options={agencyListOfOptions.sort((a, b) =>
-        a.label < b.label ? -1 : 0,
-      )}
         nativeSelectProps={{
           id: fieldsContent.kind.id,
           name: register("kind").name,
           onChange: (e) =>
             setValue("kind", e.currentTarget.value as AgencyKind),
-          value: watch("kind"),
+          placeholder: fieldsContent.kind.placeholder,
         }}
-      /> */}
+      />
 
       <Input
         label={fieldsContent.name.label}

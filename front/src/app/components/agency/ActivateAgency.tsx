@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import React, { useEffect } from "react";
-import { DsfrTitle, SelectOption } from "react-design-system";
+import { DsfrTitle } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { AgencyOption } from "shared";
 import "src/assets/admin.css";
@@ -13,7 +13,7 @@ import { ActiveOrRejectedStatus } from "../../../core-logic/ports/AgencyGateway"
 import { domElementIds } from "shared";
 import { Select } from "@codegouvfr/react-dsfr/Select";
 
-const toSelectOption = (option: AgencyOption): SelectOption => ({
+const toSelectOption = (option: AgencyOption) => ({
   label: option.name,
   value: option.id,
 });
@@ -61,6 +61,7 @@ export const ActivateAgency = () => {
         <Select
           label={`${agencyNeedingReviewOptions.length} agence(s) en attente de revue`}
           options={agencyNeedingReviewOptions.map(toSelectOption)}
+          placeholder="Veuillez sélectionner une agence"
           nativeSelectProps={{
             id: domElementIds.admin.agencyTab.activateAgencySelector,
             onChange: (event) =>
@@ -69,7 +70,6 @@ export const ActivateAgency = () => {
                   event.currentTarget.value,
                 ),
               ),
-            placeholder: "Veuillez sélectionner une agence",
           }}
         />
 

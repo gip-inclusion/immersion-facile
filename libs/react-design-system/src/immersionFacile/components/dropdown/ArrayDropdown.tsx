@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { fr } from "@codegouvfr/react-dsfr";
+import { Select } from "@codegouvfr/react-dsfr/Select";
 
 export interface ArrayDropdownProps<T extends string> {
   options: T[];
@@ -29,25 +29,21 @@ export const ArrayDropdown = <T extends string>({
   };
   return (
     <div>
-      {label && <label className={fr.cx("fr-label")}>{label}</label>}
-      <select
-        className={fr.cx("fr-select")}
-        id="roles-dropdown"
-        name="select"
-        onChange={onChange}
-        style={{ width: "200px" }}
-        onEmptied={() => setSelectedOption("")}
-      >
-        {displayOptions.map((option) => (
-          <option
-            value={option}
-            key={option}
-            selected={selectedOption === option}
-          >
-            {option}
-          </option>
-        ))}
-      </select>
+      <Select
+        label={label}
+        options={displayOptions.map((option) => ({
+          label: option,
+          value: option,
+          selected: selectedOption === option,
+        }))}
+        nativeSelectProps={{
+          id: "roles-dropdown",
+          name: "select",
+          onChange,
+          style: { width: "200px" },
+          onEmptied: () => setSelectedOption(""),
+        }}
+      />
     </div>
   );
 };
