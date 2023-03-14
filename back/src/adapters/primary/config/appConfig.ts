@@ -328,6 +328,10 @@ export class AppConfig {
     return this.env.DISCORD_WEBHOOK_URL;
   }
 
+  public get discordPipelineReportsWebhookUrl() {
+    return this.env.DISCORD_PIPELINE_REPORTS_WEBHOOK_URL;
+  }
+
   // == Event Bus ==
   public get eventCrawlerPeriodMs() {
     return parseInteger(this.env.EVENT_CRAWLER_PERIOD_MS, 0);

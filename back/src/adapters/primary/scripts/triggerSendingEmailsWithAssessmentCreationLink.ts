@@ -1,5 +1,6 @@
 import axios from "axios";
 import { Pool } from "pg";
+import { keys } from "ramda";
 import { immersionFacileContactEmail } from "shared";
 import { makeGenerateJwtES256 } from "../../../domain/auth/jwt";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
@@ -12,6 +13,8 @@ import { SendinblueHtmlEmailGateway } from "../../secondary/emailGateway/Sendinb
 import { AppConfig, makeEmailAllowListPredicate } from "../config/appConfig";
 import { makeGenerateConventionMagicLinkUrl } from "../config/magicLinkUrl";
 import { createUowPerformer } from "../config/uowConfig";
+import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
+
 const logger = createLogger(__filename);
 
 const sendEmailsWithAssessmentCreationLinkScript = async () => {
@@ -59,16 +62,31 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
       }),
     );
 
-  await sendEmailsWithAssessmentCreationLink.execute();
+  return sendEmailsWithAssessmentCreationLink.execute();
 };
 
-/* eslint-disable no-console */
-sendEmailsWithAssessmentCreationLinkScript()
-  .then(() => {
-    logger.info("Finished successfully");
-    process.exit(0);
-  })
-  .catch((error) => {
-    logger.error("Script failed with error : ", error);
-    process.exit(1);
-  });
+/* eslint-disable @typescript-eslint/no-floating-promises */
+handleEndOfScriptNotification(
+  "sendEmailsWithAssessmentCreationLinkScript",
+  sendEmailsWithAssessmentCreationLinkScript,
+  ({ numberOfImmersionEndingTomorrow, errors = {} }) => {
+    const failures = keys(errors);
+    const numberOfFailures = failures.length;
+    const numberOfSuccess = numberOfImmersionEndingTomorrow - numberOfFailures;
+
+    const errorsAsString = failures
+      .map(
+        (conventionId) =>
+          `For immersion ids ${conventionId} : ${errors[conventionId]} `,
+      )
+      .join("\n");
+
+    return [
+      `Total of immersion ending tomorrow : ${numberOfSuccess}`,
+      `Number of successfully sent Assessments : ${numberOfSuccess}`,
+      `Number of failures : ${numberOfFailures}`,
+      ...(numberOfFailures > 0 ? [`Failures : ${errorsAsString}`] : [""]),
+    ].join("\n");
+  },
+  logger,
+);

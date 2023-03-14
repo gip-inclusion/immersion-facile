@@ -3,7 +3,6 @@ import { ConventionDto, ConventionId, frontRoutes } from "shared";
 import { z } from "zod";
 import { GenerateConventionMagicLinkUrl } from "../../../adapters/primary/config/magicLinkUrl";
 import { createLogger } from "../../../utils/logger";
-import { notifyDiscord } from "../../../utils/notifyDiscord";
 import { EmailGateway } from "../../convention/ports/EmailGateway";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { TimeGateway } from "../../core/ports/TimeGateway";
@@ -12,7 +11,15 @@ import { TransactionalUseCase } from "../../core/UseCase";
 
 const logger = createLogger(__filename);
 
-export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<void> {
+type SendEmailsWithAssessmentCreationLinkOutput = {
+  errors?: Record<ConventionId, any>;
+  numberOfImmersionEndingTomorrow: number;
+};
+
+export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
+  void,
+  SendEmailsWithAssessmentCreationLinkOutput
+> {
   inputSchema = z.void();
 
   constructor(
@@ -25,7 +32,10 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<v
     super(uowPerformer);
   }
 
-  protected async _execute(_: void, uow: UnitOfWork): Promise<void> {
+  protected async _execute(
+    _: void,
+    uow: UnitOfWork,
+  ): Promise<SendEmailsWithAssessmentCreationLinkOutput> {
     const now = this.timeGateway.now();
     const tomorrow = addDays(now, 1);
     const conventions =
@@ -38,7 +48,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<v
         conventions.length
       } establishments`,
     );
-    if (conventions.length === 0) return;
+    if (conventions.length === 0) return { numberOfImmersionEndingTomorrow: 0 };
 
     const errors: Record<ConventionId, any> = {};
     await Promise.all(
@@ -52,8 +62,10 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<v
       }),
     );
 
-    // Notify discord with a
-    this.notifyDiscord(errors, conventions.length);
+    return {
+      numberOfImmersionEndingTomorrow: conventions.length,
+      errors,
+    };
   }
 
   private async _sendOneEmailWithImmersionAssessmentCreationLink(
@@ -92,26 +104,5 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<v
         payload: { id: convention.id },
       }),
     );
-  }
-
-  private notifyDiscord(
-    errors: Record<ConventionId, any>,
-    numberOfAssessmentEndingTomorrow: number,
-  ) {
-    const nSendingEmailFailures = Object.keys(errors).length;
-    const nSendingEmailSuccess =
-      numberOfAssessmentEndingTomorrow - nSendingEmailFailures;
-
-    const scriptSummaryMessage = `[triggerSendingEmailWithImmersionAssessmentCreationLinkOneDayBeforeItEnds] Script summary: Succeed: ${nSendingEmailSuccess}; Failed: ${nSendingEmailFailures}\nErrors were: ${Object.keys(
-      errors,
-    )
-      .map(
-        (immersionId) =>
-          `For immersion ids ${immersionId} : ${errors[immersionId]} `,
-      )
-      .join("\n")}`;
-
-    notifyDiscord(scriptSummaryMessage);
-    logger.info(scriptSummaryMessage);
   }
 }
