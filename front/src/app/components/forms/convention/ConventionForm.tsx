@@ -147,44 +147,47 @@ export const ConventionForm = ({
     );
 
   return (
-    <>
-      <div className={cx("fr-text")}>{t.intro.welcome}</div>
-      <Alert
-        severity="info"
-        small
-        description={t.intro.conventionWelcomeNotification}
-      />
+    <div className={fr.cx("fr-grid-row", "fr-grid-row--center")}>
+      <div className={fr.cx("fr-col-12", "fr-col-lg-7")}>
+        {/* Should be removed on accordion form */}
+        <div className={cx("fr-text")}>{t.intro.welcome}</div>
+        <Alert
+          severity="info"
+          small
+          description={t.intro.conventionWelcomeNotification}
+        />
 
-      <p className={fr.cx("fr-text--xs", "fr-mt-3w")}>
-        Tous les champs marqués d'une astérisque (*) sont obligatoires.
-      </p>
+        <p className={fr.cx("fr-text--xs", "fr-mt-3w")}>
+          Tous les champs marqués d'une astérisque (*) sont obligatoires.
+        </p>
 
-      <Formik
-        enableReinitialize={true}
-        initialValues={fetchedConvention ?? initialValues}
-        validationSchema={toFormikValidationSchema(
-          conventionWithoutExternalIdSchema,
-        )}
-        onSubmit={(values) => {
-          const conventionToSave = {
-            ...values,
-            workConditions: undefinedIfEmptyString(values.workConditions),
-          } as ConventionDto;
-          dispatch(
-            conventionSlice.actions.saveConventionRequested(conventionToSave),
-          );
-        }}
-      >
-        {(props) => (
-          <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
-            <ConventionFormFields isFrozen={isFrozen} />
-            <ConventionFeedbackNotification
-              submitFeedback={submitFeedback}
-              signatories={props.values.signatories}
-            />
-          </form>
-        )}
-      </Formik>
-    </>
+        <Formik
+          enableReinitialize={true}
+          initialValues={fetchedConvention ?? initialValues}
+          validationSchema={toFormikValidationSchema(
+            conventionWithoutExternalIdSchema,
+          )}
+          onSubmit={(values) => {
+            const conventionToSave = {
+              ...values,
+              workConditions: undefinedIfEmptyString(values.workConditions),
+            } as ConventionDto;
+            dispatch(
+              conventionSlice.actions.saveConventionRequested(conventionToSave),
+            );
+          }}
+        >
+          {(props) => (
+            <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
+              <ConventionFormFields isFrozen={isFrozen} />
+              <ConventionFeedbackNotification
+                submitFeedback={submitFeedback}
+                signatories={props.values.signatories}
+              />
+            </form>
+          )}
+        </Formik>
+      </div>
+    </div>
   );
 };
