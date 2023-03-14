@@ -26,12 +26,6 @@ export class InMemoryAddressGateway implements AddressGateway {
     return this.lookupSearchResults;
   }
 
-  public async findDepartmentCodeFromPostCode(
-    _query: string,
-  ): Promise<DepartmentCode | null> {
-    return this.departmentCode;
-  }
-
   public async getAddressFromPosition(
     position: GeoPositionDto,
   ): Promise<AddressDto | undefined> {

@@ -2,7 +2,6 @@ import { createTargets, CreateTargets, Target } from "http-client";
 
 const lookupLocationUrl = "/address/lookup-location/";
 const lookupStreetAddressUrl = "/address/lookupStreetAddress";
-const departmentCodeFromPostcodeUrl = "/address/findDepartmentCodeFromPostCode";
 
 export type AddressTargets = CreateTargets<{
   lookupLocation: Target<
@@ -16,12 +15,6 @@ export type AddressTargets = CreateTargets<{
     LookupStreetAddressQueryParams,
     void,
     typeof lookupStreetAddressUrl
-  >;
-  departmentCodeFromPostcode: Target<
-    void,
-    DepartmentCodeFromPostcodeQueryParams,
-    void,
-    typeof departmentCodeFromPostcodeUrl
   >;
 }>;
 
@@ -40,8 +33,4 @@ export type DepartmentCodeFromPostcodeQueryParams = {
 export const addressTargets = createTargets<AddressTargets>({
   lookupLocation: { method: "GET", url: lookupLocationUrl },
   lookupStreetAddress: { method: "GET", url: lookupStreetAddressUrl },
-  departmentCodeFromPostcode: {
-    method: "GET",
-    url: departmentCodeFromPostcodeUrl,
-  },
 });

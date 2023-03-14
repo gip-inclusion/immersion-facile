@@ -1,7 +1,6 @@
 import { from, Observable } from "rxjs";
 import {
   AddressAndPosition,
-  DepartmentCode,
   LookupLocationInput,
   LookupSearchResult,
   sleep,
@@ -112,18 +111,5 @@ export class InMemoryAddressGateway implements AddressGateway {
         position: { lat: 45.5, lon: 1.9 },
       },
     ];
-  }
-
-  public async findDepartmentCodeFromPostCode(
-    query: string,
-  ): Promise<DepartmentCode | null> {
-    //eslint-disable-next-line no-console
-    console.log("InMemoryApiAddresseGateway.lookupPostCode", query);
-    if (this.simulatedLatencyMs) await sleep(this.simulatedLatencyMs);
-
-    if (query === "00000") return null;
-    if (query === "99999") throw new Error("418 I'm a teapot");
-    if (query === "21200") return "21";
-    return query.slice(0, 2);
   }
 }

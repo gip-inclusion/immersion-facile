@@ -1,7 +1,6 @@
 import {
   AddressAndPosition,
   AddressDto,
-  DepartmentCode,
   GeoPositionDto,
   LookupLocationInput,
   LookupSearchResult,
@@ -10,9 +9,6 @@ import {
 export interface AddressGateway {
   lookupStreetAddress(query: string): Promise<AddressAndPosition[]>;
   lookupLocationName(query: LookupLocationInput): Promise<LookupSearchResult[]>;
-  findDepartmentCodeFromPostCode(
-    postCode: string,
-  ): Promise<DepartmentCode | null>;
   getAddressFromPosition(
     position: GeoPositionDto,
   ): Promise<AddressDto | undefined>;

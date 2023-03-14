@@ -3,8 +3,6 @@ import {
   AddressAndPosition,
   addressAndPositionListSchema,
   AddressTargets,
-  DepartmentCode,
-  findDepartmentCodeFromPostcodeResponseSchema,
   LookupLocationInput,
   LookupSearchResult,
   lookupSearchResultsSchema,
@@ -41,25 +39,5 @@ export class HttpAddressGateway implements AddressGateway {
       },
     });
     return addressAndPositionListSchema.parse(response.responseBody);
-  }
-
-  public async findDepartmentCodeFromPostCode(
-    postcode: string,
-  ): Promise<DepartmentCode | null> {
-    //TODO Remove catch to differentiate between http & domain errors
-    try {
-      const response = await this.httpClient.departmentCodeFromPostcode({
-        queryParams: {
-          postcode,
-        },
-      });
-      return findDepartmentCodeFromPostcodeResponseSchema.parse(
-        response.responseBody,
-      ).departmentCode;
-    } catch (e) {
-      //eslint-disable-next-line no-console
-      console.error("Api Adresse Search Error", e);
-      return null;
-    }
   }
 }

@@ -1,7 +1,5 @@
 import { keys } from "ramda";
 import { AgencyId, ApiConsumerId, SiretDto, sleep } from "shared";
-import { DepartmentCodeFromPostcode } from "../../../domain/address/useCases/DepartmentCodeFromPostCode";
-import { LookupLocation } from "../../../domain/address/useCases/LookupLocation";
 import { LookupStreetAddress } from "../../../domain/address/useCases/LookupStreetAddress";
 import {
   GenerateBackOfficeJwt,
@@ -80,6 +78,7 @@ import {
   makeGenerateConventionMagicLinkUrl,
   makeGenerateEditFormEstablishmentUrl,
 } from "./magicLinkUrl";
+import { LookupLocation } from "../../../domain/address/useCases/LookupLocation";
 
 export const createUseCases = (
   config: AppConfig,
@@ -141,9 +140,6 @@ export const createUseCases = (
       // Address
       lookupStreetAddress: new LookupStreetAddress(gateways.addressApi),
       lookupLocation: new LookupLocation(gateways.addressApi),
-      departmentCodeFromPostcode: new DepartmentCodeFromPostcode(
-        gateways.addressApi,
-      ),
 
       // Admin
       adminLogin: new AdminLogin(

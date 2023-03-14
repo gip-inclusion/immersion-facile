@@ -250,6 +250,41 @@ describe("HttpOpenCageDataAddressGateway", () => {
               lon: 2.31765,
             },
           },
+          {
+            label: "Paris 15e Arrondissement, Paris, Île-de-France, France",
+            position: {
+              lat: 48.84137,
+              lon: 2.30038,
+            },
+          },
+          {
+            label: "Paris 7e Arrondissement, Paris, Île-de-France, France",
+            position: {
+              lat: 48.85703,
+              lon: 2.3202,
+            },
+          },
+          {
+            label: "Paris 6e Arrondissement, Paris, Île-de-France, France",
+            position: {
+              lat: 48.85043,
+              lon: 2.33295,
+            },
+          },
+          {
+            label: "Paris 9e Arrondissement, Paris, Île-de-France, France",
+            position: {
+              lat: 48.87602,
+              lon: 2.33996,
+            },
+          },
+          {
+            label: "Paris 14e Arrondissement, Paris, Île-de-France, France",
+            position: {
+              lat: 48.82957,
+              lon: 2.32396,
+            },
+          },
         ],
       },
       {
@@ -298,6 +333,41 @@ describe("HttpOpenCageDataAddressGateway", () => {
               lon: 5.16238,
             },
           },
+          {
+            label: "Barenton-sur-Serre, Aisne, France",
+            position: {
+              lat: 49.66996,
+              lon: 3.68137,
+            },
+          },
+          {
+            label: "Barenton-Bugny, Aisne, France",
+            position: {
+              lat: 49.6335,
+              lon: 3.6524,
+            },
+          },
+          {
+            label: "Barenton-Cel, Aisne, France",
+            position: {
+              lat: 49.6425,
+              lon: 3.6536,
+            },
+          },
+          {
+            label: "Barzy-en-Thiérache, Aisne, France",
+            position: {
+              lat: 50.04389,
+              lon: 3.74694,
+            },
+          },
+          {
+            label: "Barzy-sur-Marne, Aisne, France",
+            position: {
+              lat: 49.08648,
+              lon: 3.55282,
+            },
+          },
         ],
       },
     ])(
@@ -315,136 +385,6 @@ describe("HttpOpenCageDataAddressGateway", () => {
       },
       10000,
     );
-  });
-  describe("findDepartmentCodeFromPostCode", () => {
-    it.each([
-      ["01240", "01"],
-      ["02200", "02"],
-      ["03200", "03"],
-      ["04200", "04"],
-      ["05200", "05"],
-      ["06200", "06"],
-      ["07200", "07"],
-      ["08200", "08"],
-      ["09200", "09"],
-      ["10200", "10"],
-      ["11200", "11"],
-      ["12200", "12"],
-      ["13200", "13"],
-      ["14200", "14"],
-      ["15200", "15"],
-      ["16200", "16"],
-      ["17200", "17"],
-      ["18200", "18"],
-      ["19200", "19"],
-      ["21200", "21"],
-      ["22200", "22"],
-      ["23200", "23"],
-      ["24200", "24"],
-      ["25200", "25"],
-      ["26200", "26"],
-      ["27200", "27"],
-      ["28200", "28"],
-      ["29200", "29"],
-      ["20000", "2A"],
-      ["20200", "2B"],
-      ["30200", "30"],
-      ["31200", "31"],
-      ["32200", "32"],
-      ["33200", "33"],
-      ["34200", "34"],
-      ["35200", "35"],
-      ["36200", "36"],
-      ["37200", "37"],
-      ["38200", "38"],
-      ["39200", "39"],
-      ["40200", "40"],
-      ["41200", "41"],
-      ["42800", "42"],
-      ["43200", "43"],
-      ["44200", "44"],
-      ["45200", "45"],
-      ["46200", "46"],
-      ["47200", "47"],
-      ["48200", "48"],
-      ["49000", "49"],
-      ["50200", "50"],
-      ["51200", "51"],
-      ["52200", "52"],
-      ["53200", "53"],
-      ["54200", "54"],
-      ["55200", "55"],
-      ["56200", "56"],
-      ["57200", "57"],
-      ["58200", "58"],
-      ["59200", "59"],
-      ["60200", "60"],
-      ["61200", "61"],
-      ["62200", "62"],
-      ["63200", "63"],
-      ["64160", "64"],
-      ["65000", "65"],
-      ["66000", "66"],
-      ["67200", "67"],
-      ["68200", "68"],
-      ["69120", "69"],
-      ["70200", "70"],
-      ["71200", "71"],
-      ["72200", "72"],
-      ["73200", "73"],
-      ["74200", "74"],
-      ["75001", "75"],
-      ["76200", "76"],
-      ["77200", "77"],
-      ["78200", "78"],
-      ["79000", "79"],
-      ["80200", "80"],
-      ["81200", "81"],
-      ["82200", "82"],
-      ["83200", "83"],
-      ["84200", "84"],
-      ["85200", "85"],
-      ["86200", "86"],
-      ["87200", "87"],
-      ["88200", "88"],
-      ["89200", "89"],
-      ["90000", "90"],
-      ["91200", "91"],
-      ["92200", "92"],
-      ["93200", "93"],
-      ["94200", "94"],
-      ["95200", "95"],
-      ["97120", "971"],
-      ["97200", "972"],
-      ["97300", "973"],
-      ["97400", "974"],
-      ["97600", "976"],
-      ["69210", "69"],
-      ["69530", "69"],
-      ["69530", "69"],
-      ["69120", "69"],
-      ["69970", "69"],
-      ["86000", "86"],
-      ["01590", "39"],
-      ["20137", "2A"],
-      ["29120", "29"],
-    ])(
-      "findDepartmentCodeFromPostCode: postal code %s should return %s",
-      async (postcode: string, expected: string) => {
-        const result = await httpAddressGateway.findDepartmentCodeFromPostCode(
-          postcode,
-        );
-        expectTypeToMatchAndEqual(result, expected);
-      },
-      5000,
-    );
-
-    it("findDepartmentCodeFromPostCode : should return department code from existing postcode", async () => {
-      const result = await httpAddressGateway.findDepartmentCodeFromPostCode(
-        "06500",
-      );
-      expectTypeToMatchAndEqual(result, "06");
-    }, 5000);
   });
 });
 

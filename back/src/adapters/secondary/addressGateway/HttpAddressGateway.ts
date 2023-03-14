@@ -12,14 +12,11 @@ import {
   AbsoluteUrl,
   AddressAndPosition,
   AddressDto,
-  DepartmentCode,
   departmentNameToDepartmentCode,
-  featureToAddressDto,
   GeoPositionDto,
   LookupSearchResult,
   lookupSearchResultsSchema,
   OpenCageGeoSearchKey,
-  toGeoJsonFeatureCollection,
 } from "shared";
 import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
 
@@ -126,53 +123,6 @@ export class HttpAddressGateway implements AddressGateway {
     private geosearchApiKey: OpenCageGeoSearchKey,
   ) {}
 
-  public async getDepartmentCodeFromAddressAPI(
-    postCode: string,
-  ): Promise<DepartmentCode | null> {
-    const response = await this.httpClient.getDepartmentCode({
-      queryParams: {
-        q: postCode,
-      },
-    });
-
-    const feature = toGeoJsonFeatureCollection(
-      response.responseBody,
-    ).features.at(0);
-
-    if (!feature) {
-      throw new Error(`No feature on Address API for postCode ${postCode}`);
-    }
-    return featureToAddressDto(feature).departmentCode;
-  }
-
-  public async findDepartmentCodeFromPostCode(
-    postCode: string,
-  ): Promise<DepartmentCode | null> {
-    const response = await this.httpClient.geocoding({
-      queryParams: {
-        countrycode: franceAndAttachedTerritoryCountryCodes,
-        key: this.geocodingApiKey,
-        language,
-        limit: "1",
-        q: postCode,
-      },
-    });
-
-    const feature = (
-      response.responseBody as OpenCageDataFeatureCollection
-    ).features.at(0);
-    if (!feature) throw new Error(missingFeatureForPostcode(postCode));
-    const department = getDepartmentFromAliases(feature.properties.components);
-    if (!department) return this.getDepartmentCodeFromAddressAPI(postCode);
-
-    const departmentCode = departmentNameToDepartmentCode[department];
-    if (!departmentCode)
-      throw new Error(
-        `Department '${department}' not found on departmentNameToDepartmentCode mapping.`,
-      );
-    return departmentCode;
-  }
-
   public async getAddressFromPosition(
     position: GeoPositionDto,
   ): Promise<AddressDto | undefined> {
@@ -181,15 +131,18 @@ export class HttpAddressGateway implements AddressGateway {
         countrycode: franceAndAttachedTerritoryCountryCodes,
         key: this.geocodingApiKey,
         language,
-        limit: "1",
+        limit: "5",
         q: `${position.lat}+${position.lon}`,
       },
     });
 
-    const feature = (responseBody as OpenCageDataFeatureCollection).features.at(
-      0,
-    );
-    return feature && this.featureToAddress(feature);
+    const addresses: AddressDto[] = (
+      responseBody as OpenCageDataFeatureCollection
+    ).features
+      .map(this.featureToAddress)
+      .filter((feature): feature is AddressDto => !!feature);
+
+    return addresses.at(0);
   }
 
   public async lookupStreetAddress(

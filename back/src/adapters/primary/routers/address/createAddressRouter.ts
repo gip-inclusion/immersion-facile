@@ -21,13 +21,6 @@ export const createAddressRouter = (deps: AppDependencies) => {
         deps.useCases.lookupLocation.execute(req.query as any),
       ),
     );
-  addressRouter
-    .route(addressTargets.departmentCodeFromPostcode.url)
-    .get(async (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.departmentCodeFromPostcode.execute(req.query as any),
-      ),
-    );
 
   return addressRouter;
 };

@@ -3,7 +3,6 @@ import {
   LookupAddress,
   LookupLocationInput,
   LookupSearchResult,
-  Postcode,
 } from "shared";
 import { SuperTest, Test } from "supertest";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
@@ -14,13 +13,10 @@ import {
 } from "../../../secondary/addressGateway/testUtils";
 
 const lookupAddressQueryParam = "lookup";
-const postCodeQueryParam = "postcode";
 const lookupLocationQueryParam = "query";
 
 const lookupStreetAddressUrl = (lookup: LookupAddress): string =>
   `${addressTargets.lookupStreetAddress.url}?${lookupAddressQueryParam}=${lookup}`;
-const departmentCodeFromPostcodeUrl = (postcode: Postcode): string =>
-  `${addressTargets.departmentCodeFromPostcode.url}?${postCodeQueryParam}=${postcode}`;
 
 const lookupLocationUrl = (lookupLocationInput: LookupLocationInput): string =>
   `${addressTargets.lookupLocation.url}?${lookupLocationQueryParam}=${lookupLocationInput}`;
@@ -64,19 +60,6 @@ describe("addressRouter", () => {
       const response = await request.get(lookupLocationUrl(exampleQuery));
       expect(response.body).toEqual(expectedLookupSearchResults);
       expect(response.status).toBe(200);
-    });
-  });
-
-  describe(`${addressTargets.departmentCodeFromPostcode.url}  route`, () => {
-    it(`GET ${departmentCodeFromPostcodeUrl("75001")}`, async () => {
-      addressGateway.setDepartmentCode("75");
-      const response = await request.get(
-        departmentCodeFromPostcodeUrl("75001"),
-      );
-      expect(response.status).toBe(200);
-      expect(response.body).toEqual({
-        departmentCode: "75",
-      });
     });
   });
 });
