@@ -70,7 +70,7 @@ export const ActivateAgency = () => {
                   event.currentTarget.value,
                 ),
               ),
-            value: "",
+            defaultValue: "",
           }}
         />
 
