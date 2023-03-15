@@ -185,7 +185,10 @@ const conventionSection = (internshipKind: InternshipKind) => ({
   },
   isEstablishmentTutorIsEstablishmentRepresentative: {
     label:
-      "Est-ce que le tuteur de l'entreprise est le représentant de l'entreprise, signataire de la convention ?",
+      internshipKind === "immersion"
+        ? "Est-ce que le tuteur de l'immersion est le représentant de l'entreprise, signataire de la convention ?"
+        : "Est-ce que le tuteur de stage est le représentant de l'entreprise, signataire de la convention ?",
+
     id: conventionSectionIds.isEstablishmentTutorIsEstablishmentRepresentative,
     required: true,
   },
