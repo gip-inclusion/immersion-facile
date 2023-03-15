@@ -112,11 +112,19 @@ const links: NavLink[] = [
     label: "gouvernement.fr",
     href: "https://www.gouvernement.fr/",
     id: linksIds.gouv,
+    target: "_blank",
   },
   {
     label: "service-public.fr",
     href: "https://www.service-public.fr/",
     id: linksIds.civilService,
+    target: "_blank",
+  },
+  {
+    label: "La plateforme de l'inclusion",
+    href: "https://inclusion-experimentation.beta.gouv.fr/",
+    id: linksIds.inclusion,
+    target: "_blank",
   },
 ];
 const bottomsLinks: NavLink[] = [

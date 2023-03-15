@@ -47,6 +47,7 @@ export const domElementIds = {
     links: {
       gouv: buildFooterNavLinkId("gouv"),
       civilService: buildFooterNavLinkId("service-public"),
+      inclusion: buildFooterNavLinkId("plateforme-inclusion"),
     },
     bottomLinks: {
       accessibility: buildFooterNavLinkId("accessibility"),

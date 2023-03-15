@@ -1,5 +1,5 @@
 export default {
-  title: "CGU",
+  title: "CONDITIONS GENERALES D’UTILISATION D’IMMERSION FACILITEE",
   content: `<strong>Les présentes conditions générales d’utilisation (dites « CGU ») fixent le cadre juridique de la Plateforme “Immersion Facilitée” et définissent les conditions d’accès et d’utilisation des services par l’Utilisateur.</strong>
   
   <strong>Article 1 - Champ d’application</strong>
@@ -16,7 +16,7 @@ export default {
   « L'Entreprise » est toute structure d’accueil en immersion pouvant être contactée par l’Utilisateur pour une demande d’immersion et pouvant compléter un formulaire de demande, aux côtés de l’Utilisateur. 
   « Le Prescripteur » est tout agent prescripteur, utilisant « Immersion Facilitée », autorisé par la loi, à accéder ou non à une demande d’immersion professionnelle. 
   Les « Services » sont les fonctionnalités offertes par la plateforme pour répondre à ses finalités. 
-  « Le responsable de traitement » est la personne qui, au sens de l’article 4 du règlement (UE) n°2016/679 du Parlement européen et du Conseil du 27 avril 2016 relatif à la protection des personnes physiques à l’égard du traitement des données à caractère personnel et à la libre circulation de ces données détermine les finalités et les moyens des traitements de données à caractère personnel. 
+   
 
   <strong>Article 4 - Fonctionnalités </strong>
 
@@ -47,13 +47,19 @@ export default {
   Toute information transmise par l'Entreprise est de sa seule responsabilité.  
   Il est rappelé que toute personne procédant à une fausse déclaration pour elle-même ou pour autrui s’expose, notamment, aux sanctions prévues à l’article 441-1 du code pénal, prévoyant des peines pouvant aller jusqu’à trois ans d’emprisonnement et  45 000 euros d’amende.                                                                                      L'Entreprise s'engage à ne pas mettre en ligne de contenus ou informations contraires aux dispositions légales et réglementaires en vigueur. En particulier, l’Entreprise s’engage à ne pas publier de message raciste, sexiste, injurieux, insultant ou contraire à l’ordre public.                                                                                             Toute question ou propos peut être supprimé s’il est redondant, s’il contrevient à une disposition des présentes CGU, s’il est contraire à des dispositions légales ou pour n’importe quelle raison jugée opportune par l’équipe de la plateforme, et ce, sans préavis.
 
-  <strong>5.3 Le prescripteur </strong>
+  <strong>5.4 Le prescripteur </strong>
   Le prescripteur s’engage à ne pas commercialiser les données reçues et à ne pas les communiquer à des tiers en dehors des cas prévus par la loi. La violation de cet engagement engage sa seule responsabilité.                                                            
   Toute information transmise par le prescripteur est de sa seule responsabilité.
   Il est rappelé que toute personne procédant à une fausse déclaration pour elle-même ou pour autrui s’expose, notamment, aux sanctions prévues à l’article 441-1 du code pénal, prévoyant des peines pouvant aller jusqu’à trois ans d’emprisonnement et 45 000 euros d’amende.
   Le prescripteur s'engage à ne pas mettre en ligne de contenus ou informations contraires aux dispositions légales et réglementaires en vigueur. En particulier, le prescripteur s’engage à ne pas publier de message racistes, sexistes, injurieux, insultants ou contraires à l’ordre public.  
   De tels propos peuvent être supprimés, s’ils contreviennent à une disposition des présentes CGU, s’ils sont contraires à des dispositions légales ou pour n’importe quelle raison jugée opportune par l’équipe de la plateforme, et ce, sans préavis.
+
+  Enfin, toute donnée ou information illégalement transférée fera l’objet d’une exclusion du service.
+
   
 
+  <strong>Article 6 - Mise à jour des conditions d’utilisation</strong>
+
+  Les termes des présentes conditions d’utilisation peuvent être amendés à tout moment, sans préavis, en fonction des modifications apportées à la plateforme, de l’évolution de la législation ou pour tout autre motif jugé nécessaire. Chaque modification donne lieu à une nouvelle version acceptée par les parties.
   `,
 };
