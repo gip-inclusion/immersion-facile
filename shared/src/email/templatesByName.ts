@@ -865,6 +865,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       immersionAssessmentCreationLink,
       internshipKind,
       agencyLogoUrl,
+      agencyValidatorEmail,
     }) => ({
       subject:
         internshipKind === "immersion"
@@ -898,8 +899,11 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
         internshipKind === "immersion"
           ? `<a href="https://immersion.cellar-c2.services.clever-cloud.com/PMSMP_Bilan.pdf">bilan de l'immersion en PDF</a>`
           : `<a href="https://immersion.cellar-c2.services.clever-cloud.com/CCI_MiniStage_Bilan.pdf">bilan du mini stage en PDF</a>`
-      }. 
+      }.
+      Envoyez-le à <a href= "mailto:${agencyValidatorEmail}" target="_blank">${agencyValidatorEmail}</a> 
 
+      En cas de difficulté, prévenez au plus vite la structure d’accompagnement pour que vous soyez conseillé au mieux.
+       
       Merci  !      
       ${defaultSignature(internshipKind)}
       `,

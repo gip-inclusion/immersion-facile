@@ -196,6 +196,7 @@ export type EmailParamsByEmailType = {
     establishmentTutorName: string;
     immersionAssessmentCreationLink: string;
     agencyLogoUrl: AbsoluteUrl | undefined;
+    agencyValidatorEmail: string;
   };
   FULL_PREVIEW_EMAIL: {
     internshipKind: InternshipKind;

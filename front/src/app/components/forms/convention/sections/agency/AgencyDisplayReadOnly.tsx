@@ -69,6 +69,7 @@ export const AgencyDisplayReadOnly = ({ agencyId }: AgencyDisplayProps) => {
       <Select
         label={formContents["agencyId"].label}
         options={agencies.map(({ id, name }) => ({ label: name, value: id }))}
+        placeholder={formContents["agencyId"].placeholder}
         nativeSelectProps={{
           onChange: (event) => setValue(event.currentTarget.value),
           value,

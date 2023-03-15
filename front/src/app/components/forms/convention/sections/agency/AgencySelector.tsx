@@ -103,6 +103,7 @@ export const AgencySelector = ({
                 miniStageRestrictedDepartments.includes(department.value),
               )
         }
+        placeholder={agencyDepartmentField.placeholder}
         nativeSelectProps={{
           value: agencyDepartment as string,
           onChange: (event) => setAgencyDepartment(event.currentTarget.value),
@@ -113,13 +114,15 @@ export const AgencySelector = ({
       <Select
         label={agencyIdField.label}
         options={agencies.map(({ id, name }) => ({ label: name, value: id }))}
+        placeholder={
+          agencyDepartment
+            ? "Veuillez sélectionner une structure"
+            : "Veuillez sélectionner un département"
+        }
         nativeSelectProps={{
           onChange: (event) => setValue(event.currentTarget.value),
           value,
           disabled: disabled || isLoading || !agencyDepartment,
-          placeholder: agencyDepartment
-            ? "Veuillez sélectionner une structure"
-            : "Veuillez sélectionner un département",
           ...agencyIdField,
         }}
       />

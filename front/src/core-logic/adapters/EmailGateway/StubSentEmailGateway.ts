@@ -36,6 +36,7 @@ export class StubSentEmailGateway implements StubSentEmailGateway {
             establishmentTutorName: "Erika Grandjean",
             immersionAssessmentCreationLink: "http://immersion/dsndjedfdj",
             agencyLogoUrl: "http://a",
+            agencyValidatorEmail: "toto@gmail.com",
           },
         },
         sentAt: "2022-01-07T20:00:00.000",

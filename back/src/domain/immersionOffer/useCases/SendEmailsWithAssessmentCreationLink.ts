@@ -95,6 +95,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
         beneficiaryFirstName: convention.signatories.beneficiary.firstName,
         beneficiaryLastName: convention.signatories.beneficiary.lastName,
         agencyLogoUrl: agency.logoUrl,
+        agencyValidatorEmail: agency.validatorEmails[0],
       },
     });
 

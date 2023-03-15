@@ -97,6 +97,7 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
           beneficiaryLastName:
             immersionApplicationEndingTomorrow.signatories.beneficiary.lastName,
           agencyLogoUrl: expectedAgency.logoUrl,
+          agencyValidatorEmail: expectedAgency.validatorEmails[0],
         },
       },
     ]);

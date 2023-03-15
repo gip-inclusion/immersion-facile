@@ -75,12 +75,12 @@ export const AgencyFormCommonFields = ({
         options={agencyListOfOptions.sort((a, b) =>
           a.label < b.label ? -1 : 0,
         )}
+        placeholder={fieldsContent.kind.placeholder}
         nativeSelectProps={{
           id: fieldsContent.kind.id,
           name: register("kind").name,
           onChange: (e) =>
             setValue("kind", e.currentTarget.value as AgencyKind),
-          placeholder: fieldsContent.kind.placeholder,
         }}
       />
 

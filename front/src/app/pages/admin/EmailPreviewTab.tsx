@@ -383,6 +383,7 @@ export const defaultEmailValueByEmailKind: {
     establishmentTutorName: "ESTABLISHMENT_TUTOR_NAME",
     immersionAssessmentCreationLink: "IMMERSION_ASSESSMENT_CREATION_LINK",
     agencyLogoUrl: defaultEmailPreviewUrl,
+    agencyValidatorEmail: "VALIDATOR_EMAIL",
   },
   FULL_PREVIEW_EMAIL: {
     internshipKind: "immersion",
