@@ -15,6 +15,7 @@ stages:
   - deploy
 
 validations:
+  resource_group: ci
   stage: test
   before_script:
     - curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm
@@ -51,6 +52,7 @@ validations:
 #    - dev
 
 deploy_on_dev:
+  resource_group: ci
   cache: []
   only:
     - dev
@@ -99,6 +101,7 @@ deploy_on_dev:
       curl --fail --output /dev/null http://localhost:80/api/"
 
 deploy_on_staging:
+  resource_group: ci
   cache: []
   only:
     - staging
@@ -147,6 +150,7 @@ deploy_on_staging:
       curl --fail --output /dev/null http://localhost:3000/api/"
 
 deploy_on_prod:
+  resource_group: ci
   cache: []
   only:
     - main
@@ -195,6 +199,7 @@ deploy_on_prod:
       curl --fail --output /dev/null http://localhost:80/api/"
 
 notify-staging-deployed:
+  resource_group: ci
   image: alpine:latest
   only:
     - staging
@@ -207,6 +212,7 @@ notify-staging-deployed:
     - curl --header "Content-Type:application/json" -d '{"username":"Gitlab deployer", "content":"La STAGING a été déployée https://immersion-staging.beta.pole-emploi.fr.\nEst-ce que le CHANGELOG est à jour ? ici -> https://www.notion.so/gip-inclusion/CHANGELOG-3831ee7ed3ba48e6bd29aac47c0a7f78"}' $DISCORD_WEBHOOK_STAGING_DEPLOYED
 
 notify-prod-deployed:
+  resource_group: ci
   image: alpine:latest
   only:
     - main
