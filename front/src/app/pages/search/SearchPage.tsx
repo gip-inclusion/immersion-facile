@@ -77,6 +77,14 @@ export const SearchPage = ({
       searchUseCase(route.params as SearchPageParams);
     }
   }, []);
+  const getSearchResultsSummary = (resultsNumber: number) => {
+    const plural = resultsNumber > 1 ? "s" : "";
+    return (
+      <>
+        <strong>{resultsNumber}</strong> résultat{plural} trouvé{plural}
+      </>
+    );
+  };
   return (
     <HeaderFooterLayout>
       <MainWrapper vSpacing={0} layout="fullscreen">
@@ -310,8 +318,7 @@ export const SearchPage = ({
                     {searchStatus === "ok" && (
                       <>
                         <h2 className={fr.cx("fr-h5", "fr-mb-0")}>
-                          <strong>{searchResults.length}</strong> résultats
-                          trouvés
+                          {getSearchResultsSummary(searchResults.length)}
                         </h2>
                         {route.params.rome && route.params.romeLabel && (
                           <span

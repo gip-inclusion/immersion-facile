@@ -60,29 +60,43 @@ export const SearchListResults = () => {
     <>
       <div className={fr.cx("fr-container")}>
         <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
-          {displayedResults.map((searchResult) => (
-            <SearchResult
-              key={searchResult.siret + "-" + searchResult.rome} // Should be unique !
-              establishment={searchResult}
-              onButtonClick={() =>
-                dispatch({
-                  type: "CLICKED_OPEN",
-                  payload: {
-                    immersionOfferRome: searchResult.rome,
-                    immersionOfferSiret: searchResult.siret,
-                    siret: searchResult.siret,
-                    offer: {
-                      romeCode: searchResult.rome,
-                      romeLabel: searchResult.romeLabel,
+          {displayedResults.length === 0 && (
+            <div className={fr.cx("fr-col-12", "fr-py-6w")}>
+              <div className={fr.cx("fr-alert", "fr-alert--info")}>
+                <p className={fr.cx("fr-alert__title")}>
+                  Aucun résultat ne correspond à votre recherche 😓
+                </p>
+                <p>
+                  Vous pouvez essayer d'élargir votre recherche en augmentant le
+                  rayon de recherche ou en ne séléctionnant pas de métier.
+                </p>
+              </div>
+            </div>
+          )}
+          {displayedResults.length > 0 &&
+            displayedResults.map((searchResult) => (
+              <SearchResult
+                key={searchResult.siret + "-" + searchResult.rome} // Should be unique !
+                establishment={searchResult}
+                onButtonClick={() =>
+                  dispatch({
+                    type: "CLICKED_OPEN",
+                    payload: {
+                      immersionOfferRome: searchResult.rome,
+                      immersionOfferSiret: searchResult.siret,
+                      siret: searchResult.siret,
+                      offer: {
+                        romeCode: searchResult.rome,
+                        romeLabel: searchResult.romeLabel,
+                      },
+                      contactMethod: searchResult.contactMode,
+                      searchResultData: searchResult,
                     },
-                    contactMethod: searchResult.contactMode,
-                    searchResultData: searchResult,
-                  },
-                })
-              }
-              disableButton={modalState.isValidating}
-            />
-          ))}
+                  })
+                }
+                disableButton={modalState.isValidating}
+              />
+            ))}
         </div>
       </div>
       <div className={fr.cx("fr-container", "fr-mb-10w")}>
