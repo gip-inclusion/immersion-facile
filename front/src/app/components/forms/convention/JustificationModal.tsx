@@ -65,7 +65,7 @@ export const JustificationModal = ({
         {newStatus === "CANCELLED" && (
           <Alert
             severity="warning"
-            title="Attention ! Cette opération est irréversible!"
+            title="Attention ! Cette opération est irréversible !"
             className={fr.cx("fr-mb-2w")}
             description="Vous souhaitez annuler une convention qui a déjà été validée. Veuillez indiquer votre nom et prénom afin de garantir un suivi des annulations de convention."
           />

@@ -22,7 +22,7 @@ export const ConventionRequirements = () => {
               )}
             ></span>
             <span className={cx(`${componentName}__item-content`)}>
-              D’environ <strong>10 minutes</strong> de temps libre.
+              D’environ <strong>5 minutes</strong> de temps libre.
             </span>
           </li>
           <li className={cx(fr.cx("fr-my-2w"), `${componentName}__item`)}>
