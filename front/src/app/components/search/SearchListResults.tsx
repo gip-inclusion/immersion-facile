@@ -72,7 +72,7 @@ export const SearchListResults = () => {
             <div
               className={cx(
                 fr.cx("fr-col-6", "fr-py-6w"),
-                classes.textCentered,
+                classes["text-centered"],
               )}
             >
               <p className={fr.cx("fr-h6")}>
