@@ -1,8 +1,4 @@
-import { MainWrapper } from "react-design-system";
 import { routes } from "src/app/routes/routes";
-import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
-import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import React from "react";
 
 export const ShowErrorOrRedirectToRenewMagicLink = ({
   errorMessage,
@@ -19,17 +15,15 @@ export const ShowErrorOrRedirectToRenewMagicLink = ({
         originalURL: window.location.href,
       })
       .replace();
+    return null;
   }
 
-  return (
-    <HeaderFooterLayout>
-      <MainWrapper layout="boxed">
-        <Alert
-          title="Erreur lors de la récupération de la convention"
-          severity="error"
-          description={errorMessage}
-        />
-      </MainWrapper>
-    </HeaderFooterLayout>
-  );
+  routes
+    .errorRedirect({
+      title: "Erreur lors de la récupération de la convention",
+      message: errorMessage,
+      kind: "",
+    })
+    .push();
+  return null;
 };
