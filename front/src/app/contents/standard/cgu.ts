@@ -1,5 +1,5 @@
 export default {
-  title: "CONDITIONS GENERALES D’UTILISATION D’IMMERSION FACILITEE",
+  title: "Conditions générales d'utilisation d'Immersion Facilitée",
   content: `<strong>Les présentes conditions générales d’utilisation (dites « CGU ») fixent le cadre juridique de la Plateforme “Immersion Facilitée” et définissent les conditions d’accès et d’utilisation des services par l’Utilisateur.</strong>
   
   <strong>Article 1 - Champ d’application</strong>
