@@ -22,8 +22,5 @@
     },
     "noImplicitOverride": true
   },
-  "include": ["./src"],
-  "ts-node": {
-    "swc": true
-  }
+  "include": ["./src"]
 }

@@ -13,8 +13,5 @@
     "paths": {
       "http-client": ["../libs/http-client/src/index.ts"]
     }
-  },
-  "ts-node": {
-    "swc": true
   }
 }
