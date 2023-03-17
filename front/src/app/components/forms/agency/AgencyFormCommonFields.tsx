@@ -78,9 +78,7 @@ export const AgencyFormCommonFields = ({
         placeholder={fieldsContent.kind.placeholder}
         nativeSelectProps={{
           ...fieldsContent.kind,
-          name: register("kind").name,
-          onChange: (e) =>
-            setValue("kind", e.currentTarget.value as AgencyKind),
+          ...register("kind"),
         }}
       />
 

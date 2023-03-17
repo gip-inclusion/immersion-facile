@@ -70,6 +70,7 @@ export const EditAgencyForm = ({
   } = methods;
 
   const getFieldError = makeFieldError(formState);
+
   return (
     <FormProvider {...methods}>
       <form
@@ -95,9 +96,8 @@ export const EditAgencyForm = ({
             options={statusListOfOptions}
             placeholder="Sélectionner un statut"
             nativeSelectProps={{
+              ...register("status"),
               id: domElementIds.admin.agencyTab.editAgencyFormStatusSelector,
-              name: register("status").name,
-              onChange: register("status").onChange,
             }}
           />
 
