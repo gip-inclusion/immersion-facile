@@ -188,17 +188,11 @@ export const SearchPage = ({
                 >
                   <Select
                     label="Distance maximum"
-                    options={[
-                      {
-                        label: "Distance",
-                        value: undefined,
-                        disabled: true,
-                      },
-                      ...radiusOptions.map((n, index) => ({
-                        label: `${n} km`,
-                        value: index,
-                      })),
-                    ]}
+                    placeholder="Distance"
+                    options={radiusOptions.map((n, index) => ({
+                      label: `${n} km`,
+                      value: index,
+                    }))}
                     nativeSelectProps={{
                       id: domElementIds.search.distanceSelect,
                       onChange: (event: React.ChangeEvent) => {

@@ -93,6 +93,7 @@ export const EditAgencyForm = ({
           <Select
             label="⚠️Statut de l'agence ⚠️"
             options={statusListOfOptions}
+            placeholder="Sélectionner un statut"
             nativeSelectProps={{
               id: domElementIds.admin.agencyTab.editAgencyFormStatusSelector,
               name: register("status").name,

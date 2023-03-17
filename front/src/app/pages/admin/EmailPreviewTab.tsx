@@ -61,6 +61,7 @@ export const EmailPreviewTab = () => {
           <aside className={fr.cx("fr-col-12", "fr-col-lg-4")}>
             <Select
               label="Liste de templates email :"
+              placeholder="Veuillez sélectionner un template email"
               options={keys(templatesByName).map((templateName) => ({
                 label: templatesByName[templateName].niceName,
                 value: templateName,

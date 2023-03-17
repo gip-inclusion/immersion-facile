@@ -95,7 +95,7 @@ export const AgencySelector = ({
       className={`fr-input-group${showError ? " fr-input-group--error" : ""}`}
     >
       <Select
-        label={agencyDepartmentField.label}
+        {...agencyDepartmentField}
         options={
           internshipKind === "immersion"
             ? departmentOptions
@@ -105,14 +105,14 @@ export const AgencySelector = ({
         }
         placeholder={agencyDepartmentField.placeholder}
         nativeSelectProps={{
+          ...agencyDepartmentField,
           value: agencyDepartment as string,
           onChange: (event) => setAgencyDepartment(event.currentTarget.value),
-          ...agencyDepartmentField,
         }}
       />
 
       <Select
-        label={agencyIdField.label}
+        {...agencyIdField}
         options={agencies.map(({ id, name }) => ({ label: name, value: id }))}
         placeholder={
           agencyDepartment

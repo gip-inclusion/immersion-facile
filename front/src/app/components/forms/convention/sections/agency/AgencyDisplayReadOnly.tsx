@@ -67,13 +67,13 @@ export const AgencyDisplayReadOnly = ({ agencyId }: AgencyDisplayProps) => {
       className={`fr-input-group${showError ? " fr-input-group--error" : ""}`}
     >
       <Select
-        label={formContents["agencyId"].label}
+        {...formContents["agencyId"]}
         options={agencies.map(({ id, name }) => ({ label: name, value: id }))}
         placeholder={formContents["agencyId"].placeholder}
         nativeSelectProps={{
+          ...formContents["agencyId"],
           onChange: (event) => setValue(event.currentTarget.value),
           value,
-          ...formContents["agencyId"],
         }}
       />
 
