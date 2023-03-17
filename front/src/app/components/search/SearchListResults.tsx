@@ -11,6 +11,7 @@ import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 import { SearchResult } from "./SearchResult";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Select } from "@codegouvfr/react-dsfr/Select";
+import { useStyleUtils } from "react-design-system";
 
 const getFeedBackMessage = (contactMethod?: ContactMethod) => {
   switch (contactMethod) {
@@ -44,6 +45,7 @@ export const SearchListResults = () => {
   const [resultsPerPage, setResultsPerPage] = useState<ResultsPerPageOptions>(
     defaultResultsPerPage,
   );
+  const { cx, classes } = useStyleUtils();
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
   const totalPages = Math.ceil(searchResults.length / resultsPerPage);
   const getSearchResultsForPage = (currentPage: number) => {
@@ -55,25 +57,34 @@ export const SearchListResults = () => {
   useEffect(() => {
     setDisplayedResults(getSearchResultsForPage(currentPage));
   }, [currentPage, resultsPerPage]);
-
+  const hasResults = displayedResults.length > 0;
   return (
     <>
       <div className={fr.cx("fr-container")}>
-        <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
-          {displayedResults.length === 0 && (
-            <div className={fr.cx("fr-col-12", "fr-py-6w")}>
-              <div className={fr.cx("fr-alert", "fr-alert--info")}>
-                <p className={fr.cx("fr-alert__title")}>
-                  Aucun résultat ne correspond à votre recherche 😓
-                </p>
-                <p>
-                  Vous pouvez essayer d'élargir votre recherche en augmentant le
-                  rayon de recherche ou en ne séléctionnant pas de métier.
-                </p>
-              </div>
+        <div
+          className={fr.cx(
+            "fr-grid-row",
+            "fr-grid-row--gutters",
+            !hasResults && "fr-grid-row--center",
+          )}
+        >
+          {!hasResults && (
+            <div
+              className={cx(
+                fr.cx("fr-col-6", "fr-py-6w"),
+                classes.textCentered,
+              )}
+            >
+              <p className={fr.cx("fr-h6")}>
+                Aucun résultat ne correspond à votre recherche 😓
+              </p>
+              <p>
+                Vous pouvez essayer d'élargir votre recherche en augmentant le
+                rayon de recherche ou en ne séléctionnant pas de métier.
+              </p>
             </div>
           )}
-          {displayedResults.length > 0 &&
+          {hasResults &&
             displayedResults.map((searchResult) => (
               <SearchResult
                 key={searchResult.siret + "-" + searchResult.rome} // Should be unique !
