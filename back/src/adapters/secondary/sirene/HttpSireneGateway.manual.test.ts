@@ -3,7 +3,7 @@ import { AppConfig } from "../../primary/config/appConfig";
 
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
-import { HttpsSirenGateway } from "./HttpsSirenGateway";
+import { HttpSirenGateway } from "./HttpSirenGateway";
 import { RealTimeGateway } from "../core/TimeGateway/RealTimeGateway";
 
 // These tests are not hermetic and not meant for automated testing. They will make requests to the
@@ -13,13 +13,13 @@ import { RealTimeGateway } from "../core/TimeGateway/RealTimeGateway";
 // Requires the following environment variables to be set for the tests to pass:
 // - SIRENE_ENDPOINT
 // - SIRENE_BEARER_TOKEN
-describe("HttpsSireneGateway", () => {
+describe("HttpSirenGateway", () => {
   let sirenGateway: SirenGateway;
 
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
-    sirenGateway = new HttpsSirenGateway(
-      config.sirenHttpsConfig,
+    sirenGateway = new HttpSirenGateway(
+      config.sirenHttpConfig,
       new RealTimeGateway(),
       noRateLimit,
       noRetries,

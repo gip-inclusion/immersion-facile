@@ -42,7 +42,7 @@ import { makePeConnectHttpClient } from "../../secondary/PeConnectGateway/peConn
 import { ExcelExportGateway } from "../../secondary/reporting/ExcelExportGateway";
 import { InMemoryExportGateway } from "../../secondary/reporting/InMemoryExportGateway";
 import { S3DocumentGateway } from "../../secondary/S3DocumentGateway";
-import { HttpsSirenGateway } from "../../secondary/sirene/HttpsSirenGateway";
+import { HttpSirenGateway } from "../../secondary/sirene/HttpSirenGateway";
 import { InMemorySirenGateway } from "../../secondary/sirene/InMemorySirenGateway";
 import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
 import { CustomTimeGateway } from "../../secondary/core/TimeGateway/CustomTimeGateway";
@@ -148,8 +148,8 @@ export const createGateways = async (config: AppConfig) => {
     timeGateway,
     siren:
       config.sirenGateway === "HTTPS"
-        ? new HttpsSirenGateway(
-            config.sirenHttpsConfig,
+        ? new HttpSirenGateway(
+            config.sirenHttpConfig,
             timeGateway,
             noRateLimit,
             noRetries,

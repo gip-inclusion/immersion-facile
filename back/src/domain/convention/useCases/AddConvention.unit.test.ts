@@ -130,16 +130,16 @@ describe("Add Convention", () => {
   });
 
   describe("SIRET validation", () => {
-    const sireRawEstablishmentBuilder = new SirenApiRawEstablishmentBuilder()
+    const sirenRawEstablishmentBuilder = new SirenApiRawEstablishmentBuilder()
       .withSiret(validConventionParams.siret)
       .withNafDto({ code: "78.3Z", nomenclature: "Ref2" });
 
-    const sirenRawInactiveEstablishment = sireRawEstablishmentBuilder
+    const sirenRawInactiveEstablishment = sirenRawEstablishmentBuilder
       .withBusinessName("INACTIVE BUSINESS")
       .withIsActive(false)
       .build();
 
-    const sirenRawActiveEstablishment = sireRawEstablishmentBuilder
+    const sirenRawActiveEstablishment = sirenRawEstablishmentBuilder
       .withBusinessName("Active BUSINESS")
       .withIsActive(true)
       .build();

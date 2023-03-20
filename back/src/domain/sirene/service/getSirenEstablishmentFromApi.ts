@@ -1,5 +1,5 @@
 import {
-  EstablishmentFromSirenApiDto,
+  SirenEstablishmentDto,
   GetSiretRequestDto,
   NafDto,
   NumberEmployeesRange,
@@ -11,7 +11,7 @@ import { SirenApiRawEstablishment, SirenGateway } from "../ports/SirenGateway";
 export const getSirenEstablishmentFromApi = async (
   { siret, includeClosedEstablishments }: GetSiretRequestDto,
   sirenGateway: SirenGateway,
-): Promise<EstablishmentFromSirenApiDto> => {
+): Promise<SirenEstablishmentDto> => {
   const response = await sirenGateway.getEstablishmentBySiret(
     siret,
     includeClosedEstablishments,
@@ -32,7 +32,7 @@ export const getSirenEstablishmentFromApi = async (
 
 const convertSirenEstablishmentToResponse = (
   sirenEstablishment: SirenApiRawEstablishment,
-): EstablishmentFromSirenApiDto => ({
+): SirenEstablishmentDto => ({
   siret: sirenEstablishment.siret,
   businessName: getBusinessName(sirenEstablishment),
   businessAddress: getFormattedAddress(sirenEstablishment),

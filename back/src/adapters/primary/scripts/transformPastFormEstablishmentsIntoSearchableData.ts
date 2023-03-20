@@ -15,7 +15,7 @@ import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementatio
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { AppConfig } from "../config/appConfig";
 import { createPgUow } from "../config/uowConfig";
-import { HttpsSirenGateway } from "../../secondary/sirene/HttpsSirenGateway";
+import { HttpSirenGateway } from "../../secondary/sirene/HttpSirenGateway";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import {
   createHttpAddressClient,
@@ -54,8 +54,8 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
     config.apiKeyOpenCageDataGeocoding,
     config.apiKeyOpenCageDataGeosearch,
   );
-  const sireneGateway = new HttpsSirenGateway(
-    config.sirenHttpsConfig,
+  const sirenGateway = new HttpSirenGateway(
+    config.sirenHttpConfig,
     timeGateway,
     new QpsRateLimiter(maxQpsSireneApi, timeGateway, sleep),
     new ExponentialBackoffRetryStrategy(
@@ -71,7 +71,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
   const uuidGenerator = new UuidV4Generator();
   const upsertAggregateFromForm = new InsertEstablishmentAggregateFromForm(
     pgUowPerformer,
-    sireneGateway,
+    sirenGateway,
     addressAPI,
     new UuidV4Generator(),
     timeGateway,

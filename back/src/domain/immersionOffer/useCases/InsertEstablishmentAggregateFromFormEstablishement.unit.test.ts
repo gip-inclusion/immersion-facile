@@ -35,12 +35,12 @@ const fakeBusinessContact = new ContactEntityBuilder().build();
 
 const expectedNafDto: NafDto = { code: "8559A", nomenclature: "nomencl" };
 
-const prepareSireneRepo = (
+const prepareSirenGateway = (
   sirenGateway: InMemorySirenGateway,
   siret: string,
   trancheEffectifsUniteLegale?: string,
 ) => {
-  const sireneEstablishmentFromAPI: SirenApiRawEstablishment = {
+  const sirenEstablishmentFromAPI: SirenApiRawEstablishment = {
     ...TEST_ESTABLISHMENT1,
     siret,
     uniteLegale: {
@@ -51,11 +51,11 @@ const prepareSireneRepo = (
     },
   };
 
-  sirenGateway.setRawEstablishment(sireneEstablishmentFromAPI);
+  sirenGateway.setRawEstablishment(sirenEstablishmentFromAPI);
 };
 
 describe("Insert Establishment aggregate from form data", () => {
-  let sireneRepo: InMemorySirenGateway;
+  let sirenGateway: InMemorySirenGateway;
   let establishmentAggregateRepo: InMemoryEstablishmentAggregateRepository;
   let outboxRepo: InMemoryOutboxRepository;
   let addressAPI: InMemoryAddressGateway;
@@ -63,7 +63,7 @@ describe("Insert Establishment aggregate from form data", () => {
   let uuidGenerator: TestUuidGenerator;
 
   beforeEach(() => {
-    sireneRepo = new InMemorySirenGateway();
+    sirenGateway = new InMemorySirenGateway();
     establishmentAggregateRepo = new InMemoryEstablishmentAggregateRepository();
     outboxRepo = new InMemoryOutboxRepository();
     addressAPI = new InMemoryAddressGateway();
@@ -84,7 +84,7 @@ describe("Insert Establishment aggregate from form data", () => {
 
     useCase = new InsertEstablishmentAggregateFromForm(
       uowPerformer,
-      sireneRepo,
+      sirenGateway,
       addressAPI,
       uuidGenerator,
       timeGateway,
@@ -115,7 +115,7 @@ describe("Insert Establishment aggregate from form data", () => {
       .withBusinessContact(fakeBusinessContact)
       .build();
 
-    prepareSireneRepo(sireneRepo, fakeSiret);
+    prepareSirenGateway(sirenGateway, fakeSiret);
 
     // Act
     await useCase.execute(formEstablishment);
@@ -178,7 +178,7 @@ describe("Insert Establishment aggregate from form data", () => {
       .withSiret(fakeSiret)
       .build();
 
-    prepareSireneRepo(sireneRepo, fakeSiret, "00");
+    prepareSirenGateway(sirenGateway, fakeSiret, "00");
 
     await useCase.execute(formEstablishment);
 
@@ -228,7 +228,7 @@ describe("Insert Establishment aggregate from form data", () => {
       )
       .build();
 
-    prepareSireneRepo(sireneRepo, siret);
+    prepareSirenGateway(sirenGateway, siret);
 
     addressAPI.setAddressAndPosition([
       {
@@ -276,7 +276,7 @@ describe("Insert Establishment aggregate from form data", () => {
       .withSiret(fakeSiret)
       .build();
 
-    prepareSireneRepo(sireneRepo, fakeSiret, "00");
+    prepareSirenGateway(sirenGateway, fakeSiret, "00");
 
     await useCase.execute(formEstablishment);
 

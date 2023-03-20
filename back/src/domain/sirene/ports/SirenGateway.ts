@@ -4,9 +4,10 @@ export interface SirenGateway {
   getEstablishmentBySiret(
     siret: SiretDto,
     includeClosedEstablishments?: boolean,
-  ): Promise<SireneGatewayAnswer | undefined>;
+  ): Promise<SirenGatewayAnswer | undefined>; // TODO : return should be SirenEstablishmentDto;
 }
 
+// TODO : should go in HttpSirenGateway adapter
 export type SirenApiRawEstablishment = {
   siret: string;
   uniteLegale: Partial<{
@@ -34,7 +35,7 @@ export type SirenApiRawEstablishment = {
   >;
 };
 
-export type SireneGatewayAnswer = {
+export type SirenGatewayAnswer = {
   header: {
     statut: number;
     message: string;

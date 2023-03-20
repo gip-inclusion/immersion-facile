@@ -17,7 +17,7 @@ import {
 import { QpsRateLimiter } from "../../secondary/core/QpsRateLimiter";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { PgEstablishmentAggregateRepository } from "../../secondary/pg/PgEstablishmentAggregateRepository";
-import { HttpsSirenGateway } from "../../secondary/sirene/HttpsSirenGateway";
+import { HttpSirenGateway } from "../../secondary/sirene/HttpSirenGateway";
 import { AppConfig } from "../config/appConfig";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
@@ -48,8 +48,8 @@ const main = async () => {
     timeGateway,
     sleep,
   );
-  const sireneGateway = new HttpsSirenGateway(
-    config.sirenHttpsConfig,
+  const sirenGateway = new HttpSirenGateway(
+    config.sirenHttpConfig,
     timeGateway,
     rateLimiter,
     retryStrategy,
@@ -69,17 +69,17 @@ const main = async () => {
   const establishmentAggregateRepository =
     new PgEstablishmentAggregateRepository(client);
 
-  const updateEstablishmentsFromSireneAPI =
+  const updateEstablishmentsFromSirenAPI =
     new UpdateEstablishmentsFromSirenApiScript(
       establishmentAggregateRepository,
-      sireneGateway,
+      sirenGateway,
       addressAPI,
       new RealTimeGateway(),
     );
 
   stats.stopTimer("total_runtime");
   const numberOfEstablishmentsToUpdate =
-    await updateEstablishmentsFromSireneAPI.execute();
+    await updateEstablishmentsFromSirenAPI.execute();
   client.release();
   return { numberOfEstablishmentsToUpdate };
 };

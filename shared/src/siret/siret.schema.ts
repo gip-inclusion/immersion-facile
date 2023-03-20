@@ -1,10 +1,11 @@
 import { z } from "zod";
-import { zString } from "../zodUtils";
 import { nafSchema } from "../naf";
+import { zString } from "../zodUtils";
 import {
   GetSiretInfo,
   GetSiretRequestDto,
-  EstablishmentFromSirenApiDto,
+  numberEmployeesRanges,
+  SirenEstablishmentDto,
   SiretDto,
   siretInfoErrors,
   siretRegex,
@@ -16,16 +17,14 @@ export const siretSchema: z.Schema<SiretDto> = zString
   .regex(siretRegex, "SIRET doit être composé de 14 chiffres")
   .transform(normalizeSiret);
 
-const getSiretResponseSchema: z.Schema<EstablishmentFromSirenApiDto> = z.object(
-  {
-    siret: siretSchema,
-    businessName: z.string(),
-    businessAddress: z.string(),
-    naf: nafSchema.optional(),
-    // true if the office is currently open for business.
-    isOpen: z.boolean(),
-  },
-);
+const getSiretResponseSchema: z.Schema<SirenEstablishmentDto> = z.object({
+  siret: siretSchema,
+  businessName: z.string(),
+  businessAddress: z.string(),
+  isOpen: z.boolean(), // true if the office is currently open for business.
+  nafDto: nafSchema.optional(),
+  numberEmployeesRange: z.enum(numberEmployeesRanges).optional(),
+});
 
 export const getSiretInfoSchema: z.Schema<GetSiretInfo> = z.union([
   getSiretResponseSchema,

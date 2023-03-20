@@ -1,5 +1,5 @@
 import {
-  EstablishmentFromSirenApiDto,
+  SirenEstablishmentDto,
   GetSiretRequestDto,
   getSiretRequestSchema,
 } from "shared";
@@ -11,7 +11,7 @@ import { getSirenEstablishmentFromApi } from "../service/getSirenEstablishmentFr
 
 export class GetSiretIfNotAlreadySaved extends TransactionalUseCase<
   GetSiretRequestDto,
-  EstablishmentFromSirenApiDto
+  SirenEstablishmentDto
 > {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
@@ -25,7 +25,7 @@ export class GetSiretIfNotAlreadySaved extends TransactionalUseCase<
   public async _execute(
     params: GetSiretRequestDto,
     uow: UnitOfWork,
-  ): Promise<EstablishmentFromSirenApiDto> {
+  ): Promise<SirenEstablishmentDto> {
     const { siret } = params;
     const isEstablishmentWithProvidedSiretAlreadyInDb =
       await uow.establishmentAggregateRepository.hasEstablishmentFromFormWithSiret(

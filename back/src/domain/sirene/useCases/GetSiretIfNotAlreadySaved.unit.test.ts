@@ -9,13 +9,13 @@ import { InMemorySirenGateway } from "../../../adapters/secondary/sirene/InMemor
 import { GetSiretIfNotAlreadySaved } from "./GetSiretIfNotAlreadySaved";
 
 describe("GetSiretIfNotAlreadySaved", () => {
-  let sireneGateway: InMemorySirenGateway;
+  let sirenGateway: InMemorySirenGateway;
   let getSiretIfNotAlreadySaved: GetSiretIfNotAlreadySaved;
   let uowPerformer: InMemoryUowPerformer;
   let establishmentAggregateRepo: InMemoryEstablishmentAggregateRepository;
 
   beforeEach(() => {
-    sireneGateway = new InMemorySirenGateway();
+    sirenGateway = new InMemorySirenGateway();
     establishmentAggregateRepo = new InMemoryEstablishmentAggregateRepository();
     uowPerformer = new InMemoryUowPerformer({
       ...createInMemoryUow(),
@@ -23,7 +23,7 @@ describe("GetSiretIfNotAlreadySaved", () => {
     });
     getSiretIfNotAlreadySaved = new GetSiretIfNotAlreadySaved(
       uowPerformer,
-      sireneGateway,
+      sirenGateway,
     );
   });
 
@@ -61,7 +61,7 @@ describe("GetSiretIfNotAlreadySaved", () => {
       .withNafDto({ code: "8559A", nomenclature: "Ref2" })
       .withIsActive(true)
       .build();
-    sireneGateway.setRawEstablishment(sirenRawEstablishment);
+    sirenGateway.setRawEstablishment(sirenRawEstablishment);
 
     const response = await getSiretIfNotAlreadySaved.execute({
       siret: siretAlreadyInDb,

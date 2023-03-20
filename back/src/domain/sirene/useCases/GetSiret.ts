@@ -1,5 +1,5 @@
 import {
-  EstablishmentFromSirenApiDto,
+  SirenEstablishmentDto,
   GetSiretRequestDto,
   getSiretRequestSchema,
 } from "shared";
@@ -9,7 +9,7 @@ import { getSirenEstablishmentFromApi } from "../service/getSirenEstablishmentFr
 
 export class GetSiret extends UseCase<
   GetSiretRequestDto,
-  EstablishmentFromSirenApiDto
+  SirenEstablishmentDto
 > {
   constructor(private readonly sirenGateway: SirenGateway) {
     super();
@@ -19,7 +19,7 @@ export class GetSiret extends UseCase<
 
   public async _execute(
     params: GetSiretRequestDto,
-  ): Promise<EstablishmentFromSirenApiDto> {
+  ): Promise<SirenEstablishmentDto> {
     return getSirenEstablishmentFromApi(params, this.sirenGateway);
   }
 }

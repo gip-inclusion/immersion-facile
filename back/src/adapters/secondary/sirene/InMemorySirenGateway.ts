@@ -6,7 +6,7 @@ import {
 } from "shared";
 import {
   SirenApiRawEstablishment,
-  SireneGatewayAnswer,
+  SirenGatewayAnswer,
   SirenGateway,
 } from "../../../domain/sirene/ports/SirenGateway";
 import { createLogger } from "../../../utils/logger";
@@ -137,7 +137,7 @@ export class InMemorySirenGateway implements SirenGateway {
   public async getEstablishmentBySiret(
     siret: SiretDto,
     includeClosedEstablishments = false,
-  ): Promise<SireneGatewayAnswer | undefined> {
+  ): Promise<SirenGatewayAnswer | undefined> {
     try {
       if (this._error) throw this._error;
       if (siret === apiSirenUnexpectedError)

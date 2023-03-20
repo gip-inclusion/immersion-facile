@@ -11,20 +11,20 @@ import { InMemorySirenGateway } from "../../../adapters/secondary/sirene/InMemor
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 
 const prepareUseCase = () => {
-  const sireneRepo = new InMemorySirenGateway();
+  const sirenGateway = new InMemorySirenGateway();
   const uow = createInMemoryUow();
   const establishmentAggregateRepository = uow.establishmentAggregateRepository;
   const timeGateway = new CustomTimeGateway();
   const addressAPI = new InMemoryAddressGateway();
   const useCase = new UpdateEstablishmentsFromSirenApiScript(
     establishmentAggregateRepository,
-    sireneRepo,
+    sirenGateway,
     addressAPI,
     timeGateway,
   );
 
   return {
-    sireneRepo,
+    sirenGateway,
     establishmentAggregateRepository,
     addressAPI,
     timeGateway,
@@ -58,7 +58,7 @@ describe("Update establishments from Sirene API", () => {
   it("Should update modification date of establishments that have not been modified since one week", async () => {
     const {
       timeGateway,
-      sireneRepo,
+      sirenGateway,
       establishmentAggregateRepository,
       useCase,
     } = prepareUseCase();
@@ -67,7 +67,7 @@ describe("Update establishments from Sirene API", () => {
       makeEstablishmentWithUpdatedAt("oldSiret", moreThanAWeekAgo),
       makeEstablishmentWithUpdatedAt("recentSiret", lessThanAWeekAgo),
     ];
-    sireneRepo.setRawEstablishment(
+    sirenGateway.setRawEstablishment(
       new SirenApiRawEstablishmentBuilder().withSiret("recentSiret").build(),
     );
     timeGateway.setNextDate(now);
@@ -96,7 +96,7 @@ describe("Update establishments from Sirene API", () => {
       prepareUseCase();
     establishmentAggregateRepository.establishmentAggregates = [
       makeEstablishmentWithUpdatedAt(
-        "closedEstablishmentSiret", // This siret is not referenced in sireneRepo
+        "closedEstablishmentSiret", // This siret is not referenced in sirenGateway
         moreThanAWeekAgo,
       ),
     ];
@@ -118,14 +118,14 @@ describe("Update establishments from Sirene API", () => {
     // Prepare
     const {
       timeGateway,
-      sireneRepo,
+      sirenGateway,
       establishmentAggregateRepository,
       useCase,
     } = prepareUseCase();
     establishmentAggregateRepository.establishmentAggregates = [
       makeEstablishmentWithUpdatedAt("establishmentToUpdate", moreThanAWeekAgo),
     ];
-    sireneRepo.setRawEstablishment(
+    sirenGateway.setRawEstablishment(
       new SirenApiRawEstablishmentBuilder()
         .withSiret("establishmentToUpdate")
         .withUniteLegale({
@@ -160,7 +160,7 @@ describe("Update establishments from Sirene API", () => {
       // Prepare
       const {
         timeGateway,
-        sireneRepo,
+        sirenGateway,
         establishmentAggregateRepository,
         addressAPI,
         useCase,
@@ -171,7 +171,7 @@ describe("Update establishments from Sirene API", () => {
           moreThanAWeekAgo,
         ),
       ];
-      sireneRepo.setRawEstablishment(
+      sirenGateway.setRawEstablishment(
         new SirenApiRawEstablishmentBuilder()
           .withSiret("establishmentToUpdate")
           .withAdresseEtablissement({
@@ -222,7 +222,7 @@ describe("Update establishments from Sirene API", () => {
       // Prepare
       const {
         timeGateway,
-        sireneRepo,
+        sirenGateway,
         establishmentAggregateRepository,
         addressAPI,
         useCase,
@@ -234,7 +234,7 @@ describe("Update establishments from Sirene API", () => {
       establishmentAggregateRepository.establishmentAggregates = [
         initialEstablishmentAggregate,
       ];
-      sireneRepo.setRawEstablishment(
+      sirenGateway.setRawEstablishment(
         new SirenApiRawEstablishmentBuilder()
           .withSiret("establishmentToUpdate")
           .withAdresseEtablissement({
@@ -285,7 +285,7 @@ describe("Update establishments from Sirene API", () => {
       // Prepare
       const {
         timeGateway,
-        sireneRepo,
+        sirenGateway,
         establishmentAggregateRepository,
         addressAPI,
         useCase,
@@ -297,7 +297,7 @@ describe("Update establishments from Sirene API", () => {
       establishmentAggregateRepository.establishmentAggregates = [
         establishmentToUpdate,
       ];
-      sireneRepo.setRawEstablishment(
+      sirenGateway.setRawEstablishment(
         new SirenApiRawEstablishmentBuilder()
           .withSiret("establishmentToUpdate")
           .withAdresseEtablissement({ libelleVoieEtablissement: "" })

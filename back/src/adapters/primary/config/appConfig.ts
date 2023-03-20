@@ -133,7 +133,7 @@ export class AppConfig {
     return this.throwIfNotDefined("PASS_EMPLOI_URL");
   }
 
-  public get sirenHttpsConfig(): AxiosConfig {
+  public get sirenHttpConfig(): AxiosConfig {
     return {
       endpoint: this.throwIfNotDefined("SIRENE_ENDPOINT"),
       bearerToken: this.throwIfNotDefined("SIRENE_BEARER_TOKEN"),

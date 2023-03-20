@@ -19,8 +19,11 @@ import { UpdateEstablishmentAggregateFromForm } from "./UpdateEstablishmentAggre
 import { InMemorySirenGateway } from "../../../adapters/secondary/sirene/InMemorySirenGateway";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 
-const prepareSireneRepo = (sireneRepo: InMemorySirenGateway, siret: string) => {
-  const sireneEstablishmentFromAPI: SirenApiRawEstablishment = {
+const prepareSirenGateway = (
+  sirenGateway: InMemorySirenGateway,
+  siret: string,
+) => {
+  const sirenEstablishmentFromAPI: SirenApiRawEstablishment = {
     siret,
     uniteLegale: {
       activitePrincipaleUniteLegale: "85.59A",
@@ -29,18 +32,18 @@ const prepareSireneRepo = (sireneRepo: InMemorySirenGateway, siret: string) => {
     },
   } as SirenApiRawEstablishment;
 
-  sireneRepo.setRawEstablishment(sireneEstablishmentFromAPI);
+  sirenGateway.setRawEstablishment(sirenEstablishmentFromAPI);
 };
 
 describe("Update Establishment aggregate from form data", () => {
-  let sireneRepo: InMemorySirenGateway;
+  let sirenGateway: InMemorySirenGateway;
   let establishmentAggregateRepo: InMemoryEstablishmentAggregateRepository;
   let addressAPI: InMemoryAddressGateway;
   let updateEstablishmentAggregateFromFormUseCase: UpdateEstablishmentAggregateFromForm;
   let uuidGenerator: TestUuidGenerator;
 
   beforeEach(() => {
-    sireneRepo = new InMemorySirenGateway();
+    sirenGateway = new InMemorySirenGateway();
     establishmentAggregateRepo = new InMemoryEstablishmentAggregateRepository();
     addressAPI = new InMemoryAddressGateway();
     uuidGenerator = new TestUuidGenerator();
@@ -72,7 +75,7 @@ describe("Update Establishment aggregate from form data", () => {
     const siret = "12345678911234";
     const newPosition = { lon: 1, lat: 2 };
     const newAddress = rueGuillaumeTellDto;
-    prepareSireneRepo(sireneRepo, siret);
+    prepareSirenGateway(sirenGateway, siret);
 
     addressAPI.setAddressAndPosition([
       {

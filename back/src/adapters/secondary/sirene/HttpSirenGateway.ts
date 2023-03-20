@@ -8,7 +8,7 @@ import {
 } from "../../../domain/core/ports/RetryStrategy";
 import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
 import {
-  SireneGatewayAnswer,
+  SirenGatewayAnswer,
   SirenGateway,
 } from "../../../domain/sirene/ports/SirenGateway";
 import {
@@ -25,7 +25,7 @@ import {
 
 const logger = createLogger(__filename);
 
-export class HttpsSirenGateway implements SirenGateway {
+export class HttpSirenGateway implements SirenGateway {
   public constructor(
     private readonly axiosConfig: AxiosConfig,
     private readonly timeGateway: TimeGateway,
@@ -47,7 +47,7 @@ export class HttpsSirenGateway implements SirenGateway {
   public async getEstablishmentBySiret(
     siret: SiretDto,
     includeClosedEstablishments = false,
-  ): Promise<SireneGatewayAnswer | undefined> {
+  ): Promise<SirenGatewayAnswer | undefined> {
     logger.debug({ siret, includeClosedEstablishments }, "get");
 
     return this.retryStrategy
