@@ -1,12 +1,16 @@
 import { propEq } from "ramda";
 import {
+  ConventionDto,
   ConventionId,
   ConventionReadDto,
   ListConventionsRequestDto,
   validatedConventionStatuses,
   WithConventionId,
 } from "shared";
-import { ConventionQueries } from "../../domain/convention/ports/ConventionQueries";
+import {
+  ConventionQueries,
+  GetConventionByFiltersQueries,
+} from "../../domain/convention/ports/ConventionQueries";
 import { createLogger } from "../../utils/logger";
 import { InMemoryOutboxRepository } from "./core/InMemoryOutboxRepository";
 import { InMemoryConventionRepository } from "./InMemoryConventionRepository";
@@ -20,6 +24,29 @@ export class InMemoryConventionQueries implements ConventionQueries {
     private readonly conventionRepository: InMemoryConventionRepository,
     private readonly outboxRepository?: InMemoryOutboxRepository,
   ) {}
+
+  async getConventionsByFilters({
+    startDateGreater,
+    startDateLessOrEqual,
+    withStatuses,
+  }: GetConventionByFiltersQueries): Promise<ConventionDto[]> {
+    return Object.values(this.conventionRepository._conventions)
+      .filter((convention) =>
+        startDateLessOrEqual
+          ? new Date(convention.dateStart) <= startDateLessOrEqual
+          : true,
+      )
+      .filter((convention) =>
+        startDateGreater
+          ? new Date(convention.dateStart) > startDateGreater
+          : true,
+      )
+      .filter((convention) =>
+        withStatuses && withStatuses.length > 0
+          ? withStatuses.includes(convention.status)
+          : true,
+      );
+  }
 
   public async getLatestConventions({
     status,

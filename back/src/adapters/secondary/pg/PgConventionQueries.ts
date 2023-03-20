@@ -1,13 +1,17 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
 import {
+  ConventionDto,
   ConventionId,
   ConventionReadDto,
   conventionReadSchema,
   ListConventionsRequestDto,
   validatedConventionStatuses,
 } from "shared";
-import { ConventionQueries } from "../../../domain/convention/ports/ConventionQueries";
+import {
+  ConventionQueries,
+  GetConventionByFiltersQueries,
+} from "../../../domain/convention/ports/ConventionQueries";
 import {
   getReadConventionById,
   selectAllConventionDtosById,
@@ -15,6 +19,11 @@ import {
 
 export class PgConventionQueries implements ConventionQueries {
   constructor(private client: PoolClient) {}
+  getConventionsByFilters(
+    _filters: GetConventionByFiltersQueries,
+  ): Promise<ConventionDto[]> {
+    throw new Error("Method not implemented.");
+  }
 
   public async getLatestConventions({
     status,
@@ -46,6 +55,7 @@ export class PgConventionQueries implements ConventionQueries {
       this.whereConventionsAreValidated(),
       this.whereConventionsAssessmentEmailHasNotBeenAlreadySent(),
     ];
+
     return this.getConventionsWhere(`WHERE ${filtersSQL.join(" AND ")}`);
   }
 
