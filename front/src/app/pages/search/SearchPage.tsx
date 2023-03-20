@@ -16,6 +16,7 @@ import { domElementIds, GeoPositionDto, SearchSortedBy } from "shared";
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
 import { PlaceAutocomplete } from "src/app/components/forms/autocomplete/PlaceAutocomplete";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
+import Styles from "./SearchPage.styles";
 import { SearchListResults } from "src/app/components/search/SearchListResults";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useSearchUseCase } from "src/app/hooks/search.hooks";
@@ -38,6 +39,7 @@ const sortedByOptions: { value: SearchSortedBy; label: string }[] = [
   { value: "distance", label: "Par proximité" },
   { value: "date", label: "Par date de publication" },
 ];
+
 export const SearchPage = ({
   route,
 }: {
@@ -126,16 +128,11 @@ export const SearchPage = ({
             )}
             className={cx(
               fr.cx("fr-grid-row", "fr-grid-row--gutters"),
-              "im-search-page__form",
-              "im-search-page__form--v2",
+              Styles.form,
+              Styles.formV2,
             )}
           >
-            <div
-              className={cx(
-                fr.cx("fr-col-12", "fr-col-lg-4"),
-                "im-search-page__form-input-wrapper",
-              )}
-            >
+            <div className={cx(fr.cx("fr-col-12", "fr-col-lg-4"))}>
               <AppellationAutocomplete
                 label="Je recherche le métier :"
                 initialValue={{
@@ -161,12 +158,7 @@ export const SearchPage = ({
                 id={domElementIds.search.appellationAutocomplete}
               />
             </div>
-            <div
-              className={cx(
-                fr.cx("fr-col-12", "fr-col-lg-4"),
-                "im-search-page__form-input-wrapper",
-              )}
-            >
+            <div className={cx(fr.cx("fr-col-12", "fr-col-lg-4"))}>
               <PlaceAutocomplete
                 label="Je me situe dans la ville de :"
                 initialInputValue={formValues.place}
@@ -184,12 +176,7 @@ export const SearchPage = ({
                 }}
               />
             </div>
-            <div
-              className={cx(
-                fr.cx("fr-col-12", "fr-col-lg-2"),
-                "im-search-page__form-input-wrapper",
-              )}
-            >
+            <div className={cx(fr.cx("fr-col-12", "fr-col-lg-2"))}>
               <Select
                 label="Distance maximum"
                 placeholder="Distance"
@@ -201,12 +188,7 @@ export const SearchPage = ({
               />
             </div>
 
-            <div
-              className={cx(
-                fr.cx("fr-col-12", "fr-col-lg-2"),
-                "im-search-page__form-input-wrapper",
-              )}
-            >
+            <div className={cx(fr.cx("fr-col-12", "fr-col-lg-2"))}>
               <Button
                 disabled={
                   !availableForSearchRequest(searchStatus, { lat, lon })
@@ -269,7 +251,7 @@ export const SearchPage = ({
                               }}
                             />
                             <label
-                              className={fr.cx("fr-label")}
+                              className={cx(fr.cx("fr-label"))}
                               htmlFor={`${domElementIds.search.searchSortOptionBase}${index}`}
                             >
                               {option.label}
@@ -287,7 +269,7 @@ export const SearchPage = ({
                         "fr-grid-row",
                         "fr-grid-row--right",
                       ),
-                      "im-search-page__results-summary",
+                      Styles.resultsSummary,
                     )}
                   >
                     {searchStatus === "ok" && (
@@ -295,13 +277,8 @@ export const SearchPage = ({
                         <h2 className={fr.cx("fr-h5", "fr-mb-0")}>
                           {getSearchResultsSummary(searchResults.length)}
                         </h2>
-                        {routeParams.rome && routeParams.romeLabel && (
-                          <span
-                            className={cx(
-                              fr.cx("fr-text--xs"),
-                              "im-search-page__results-summary-description",
-                            )}
-                          >
+                        {route.params.rome && route.params.romeLabel && (
+                          <span className={cx(fr.cx("fr-text--xs"))}>
                             pour la recherche{" "}
                             <strong className={fr.cx("fr-text--bold")}>
                               {routeParams.appellationLabel}

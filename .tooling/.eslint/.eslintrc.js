@@ -24,7 +24,7 @@ module.exports = {
         //'plugin:rxjs/recommended',
         "prettier",
       ],
-      files: ["**/*.ts", "**/*.tsx"],
+      files: ["**/*.ts", "**/*.styles.ts", "**/*.tsx"],
       parser: "@typescript-eslint/parser",
       parserOptions: {
         tsconfigRootDir: __dirname,

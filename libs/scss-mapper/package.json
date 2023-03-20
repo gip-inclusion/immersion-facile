@@ -1,0 +1,24 @@
+{
+  "name": "scss-mapper",
+  "version": "1.0.0",
+  "description": "SCSS Mapping classname to JS/TS object",
+  "main": "index.ts",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bin": {
+    "scss-to-ts": "./bin/cli.js"
+  },
+  "dependencies": {
+    "camelcase": "^7.0.1",
+    "commander": "^10.0.0",
+    "fs": "0.0.1-security",
+    "path": "^0.12.7",
+    "sass": "^1.55.0",
+    "string-extract-class-names": "6.1.0"
+  }
+}
