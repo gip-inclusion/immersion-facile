@@ -1,0 +1,9 @@
+{
+  "env": {
+    "node": true
+  },
+  "parserOptions": {
+    "sourceType": "module"
+  },
+  "ignorePatterns": ["bin/cli.js", "index.js"]
+}
