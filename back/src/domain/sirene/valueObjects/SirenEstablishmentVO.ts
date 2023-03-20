@@ -6,40 +6,13 @@ import {
 } from "shared";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { NumberEmployeesRange } from "../../immersionOffer/entities/EstablishmentEntity";
-import { GetSiretCall } from "../ports/SireneGateway";
+import { GetSiretCall, SireneApiEstablishment } from "../ports/SirenGateway";
 
-export type SireneEstablishmentProps = {
-  siret: string;
-  uniteLegale: Partial<{
-    denominationUniteLegale?: string;
-    nomUniteLegale?: string;
-    prenomUsuelUniteLegale?: string;
-    activitePrincipaleUniteLegale?: string;
-    nomenclatureActivitePrincipaleUniteLegale?: string;
-    trancheEffectifsUniteLegale?: string;
-    etatAdministratifUniteLegale?: string;
-  }>;
-  adresseEtablissement: Partial<{
-    numeroVoieEtablissement?: string;
-    typeVoieEtablissement?: string;
-    libelleVoieEtablissement?: string;
-    codePostalEtablissement?: string;
-    libelleCommuneEtablissement?: string;
-  }>;
-  periodesEtablissement: Array<
-    Partial<{
-      dateFin: string | null;
-      dateDebut: string | null;
-      etatAdministratifEtablissement: "A" | "F";
-    }>
-  >;
-};
-
-export class SireneEstablishmentVO {
+export class SirenEstablishmentVO {
   static async getFromApi(
     { siret, includeClosedEstablishments }: GetSiretRequestDto,
     callGetSiret: GetSiretCall,
-  ): Promise<SireneEstablishmentVO> {
+  ): Promise<SirenEstablishmentVO> {
     const response = await callGetSiret(siret, includeClosedEstablishments);
     if (
       !response ||
@@ -49,10 +22,10 @@ export class SireneEstablishmentVO {
       throw new NotFoundError("Did not find siret : " + siret);
     }
 
-    return new SireneEstablishmentVO(response.etablissements[0]);
+    return new SirenEstablishmentVO(response.etablissements[0]);
   }
 
-  constructor(public readonly props: SireneEstablishmentProps) {}
+  constructor(public readonly props: SireneApiEstablishment) {}
 
   public get siret() {
     return this.props.siret;
@@ -126,8 +99,8 @@ export class SireneEstablishmentVO {
   }
 }
 
-export const convertSireneEtablissementToResponse = (
-  sireneEstablishment: SireneEstablishmentVO,
+export const convertSirenEtablissementToResponse = (
+  sireneEstablishment: SirenEstablishmentVO,
 ): GetSiretResponseDto => ({
   siret: sireneEstablishment.siret,
   businessName: sireneEstablishment.businessName,

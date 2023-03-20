@@ -42,8 +42,8 @@ import { makePeConnectHttpClient } from "../../secondary/PeConnectGateway/peConn
 import { ExcelExportGateway } from "../../secondary/reporting/ExcelExportGateway";
 import { InMemoryExportGateway } from "../../secondary/reporting/InMemoryExportGateway";
 import { S3DocumentGateway } from "../../secondary/S3DocumentGateway";
-import { HttpsSireneGateway } from "../../secondary/sirene/HttpsSireneGateway";
-import { InMemorySireneGateway } from "../../secondary/sirene/InMemorySireneGateway";
+import { HttpsSirenGateway } from "../../secondary/sirene/HttpsSirenGateway";
+import { InMemorySirenGateway } from "../../secondary/sirene/InMemorySirenGateway";
 import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
 import { CustomTimeGateway } from "../../secondary/core/TimeGateway/CustomTimeGateway";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
@@ -88,7 +88,7 @@ export const createGateways = async (config: AppConfig) => {
     emailGateway: config.emailGateway,
     repositories: config.repositories,
     romeRepository: config.romeRepository,
-    sireneGateway: config.sireneGateway,
+    sirenGateway: config.sirenGateway,
     apiAddress: config.apiAddress,
   });
 
@@ -146,15 +146,15 @@ export const createGateways = async (config: AppConfig) => {
           )
         : new InMemoryPoleEmploiGateway(),
     timeGateway,
-    sirene:
-      config.sireneGateway === "HTTPS"
-        ? new HttpsSireneGateway(
-            config.sireneHttpsConfig,
+    siren:
+      config.sirenGateway === "HTTPS"
+        ? new HttpsSirenGateway(
+            config.sirenHttpsConfig,
             timeGateway,
             noRateLimit,
             noRetries,
           )
-        : new InMemorySireneGateway(),
+        : new InMemorySirenGateway(),
   };
 };
 

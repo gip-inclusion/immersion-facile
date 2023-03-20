@@ -1,10 +1,8 @@
 import { Builder } from "shared";
-import {
-  SireneEstablishmentProps,
-  SireneEstablishmentVO,
-} from "../domain/sirene/valueObjects/SireneEstablishmentVO";
+import { SireneApiEstablishment } from "../domain/sirene/ports/SirenGateway";
+import { SirenEstablishmentVO } from "../domain/sirene/valueObjects/SirenEstablishmentVO";
 
-const validSireneEstablishmentProps: SireneEstablishmentProps = {
+const validSireneEstablishmentProps: SireneApiEstablishment = {
   siret: "20006765000016",
   uniteLegale: {
     denominationUniteLegale: "MA P'TITE BOITE 2",
@@ -29,10 +27,10 @@ const validSireneEstablishmentProps: SireneEstablishmentProps = {
 };
 
 export class SireneEstablishmentVOBuilder
-  implements Builder<SireneEstablishmentVO>
+  implements Builder<SirenEstablishmentVO>
 {
   public constructor(
-    private props: SireneEstablishmentProps = validSireneEstablishmentProps,
+    private props: SireneApiEstablishment = validSireneEstablishmentProps,
   ) {}
 
   public withSiret(siret: string): SireneEstablishmentVOBuilder {
@@ -42,7 +40,7 @@ export class SireneEstablishmentVOBuilder
     });
   }
   public withUniteLegale(
-    uniteLegale: SireneEstablishmentProps["uniteLegale"],
+    uniteLegale: SireneApiEstablishment["uniteLegale"],
   ): SireneEstablishmentVOBuilder {
     return new SireneEstablishmentVOBuilder({
       ...this.props,
@@ -50,14 +48,14 @@ export class SireneEstablishmentVOBuilder
     });
   }
   public withAdresseEtablissement(
-    adresseEtablissement: SireneEstablishmentProps["adresseEtablissement"],
+    adresseEtablissement: SireneApiEstablishment["adresseEtablissement"],
   ): SireneEstablishmentVOBuilder {
     return new SireneEstablishmentVOBuilder({
       ...this.props,
       adresseEtablissement,
     });
   }
-  build(): SireneEstablishmentVO {
-    return new SireneEstablishmentVO(this.props);
+  build(): SirenEstablishmentVO {
+    return new SirenEstablishmentVO(this.props);
   }
 }

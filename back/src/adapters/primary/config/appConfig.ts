@@ -92,7 +92,7 @@ export class AppConfig {
 
   // == Sirene repository ==
 
-  public get sireneGateway() {
+  public get sirenGateway() {
     return this.throwIfNotInArray({
       variableName: "SIRENE_REPOSITORY",
       authorizedValues: ["IN_MEMORY", "HTTPS"],
@@ -133,7 +133,7 @@ export class AppConfig {
     return this.throwIfNotDefined("PASS_EMPLOI_URL");
   }
 
-  public get sireneHttpsConfig(): AxiosConfig {
+  public get sirenHttpsConfig(): AxiosConfig {
     return {
       endpoint: this.throwIfNotDefined("SIRENE_ENDPOINT"),
       bearerToken: this.throwIfNotDefined("SIRENE_BEARER_TOKEN"),

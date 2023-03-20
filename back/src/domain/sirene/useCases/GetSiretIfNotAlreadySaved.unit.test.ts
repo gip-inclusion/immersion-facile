@@ -9,16 +9,16 @@ import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { GetSiretIfNotAlreadySaved } from "../../../domain/sirene/useCases/GetSiretIfNotAlreadySaved";
-import { InMemorySireneGateway } from "../../../adapters/secondary/sirene/InMemorySireneGateway";
+import { InMemorySirenGateway } from "../../../adapters/secondary/sirene/InMemorySirenGateway";
 
 describe("GetSiretIfNotAlreadySaved", () => {
-  let sireneGateway: InMemorySireneGateway;
+  let sireneGateway: InMemorySirenGateway;
   let getSiretIfNotAlreadySaved: GetSiretIfNotAlreadySaved;
   let uowPerformer: InMemoryUowPerformer;
   let establishmentAggregateRepo: InMemoryEstablishmentAggregateRepository;
 
   beforeEach(() => {
-    sireneGateway = new InMemorySireneGateway();
+    sireneGateway = new InMemorySirenGateway();
     establishmentAggregateRepo = new InMemoryEstablishmentAggregateRepository();
     uowPerformer = new InMemoryUowPerformer({
       ...createInMemoryUow(),

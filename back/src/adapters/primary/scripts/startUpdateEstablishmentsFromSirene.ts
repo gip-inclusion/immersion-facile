@@ -17,7 +17,7 @@ import {
 import { QpsRateLimiter } from "../../secondary/core/QpsRateLimiter";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { PgEstablishmentAggregateRepository } from "../../secondary/pg/PgEstablishmentAggregateRepository";
-import { HttpsSireneGateway } from "../../secondary/sirene/HttpsSireneGateway";
+import { HttpsSirenGateway } from "../../secondary/sirene/HttpsSirenGateway";
 import { AppConfig } from "../config/appConfig";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
@@ -48,8 +48,8 @@ const main = async () => {
     timeGateway,
     sleep,
   );
-  const sireneGateway = new HttpsSireneGateway(
-    config.sireneHttpsConfig,
+  const sireneGateway = new HttpsSirenGateway(
+    config.sirenHttpsConfig,
     timeGateway,
     rateLimiter,
     retryStrategy,

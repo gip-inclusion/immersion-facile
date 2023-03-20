@@ -4,8 +4,8 @@ import { z } from "zod";
 import { createLogger } from "../../../utils/logger";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UseCase } from "../../core/UseCase";
-import { SireneGateway } from "../../sirene/ports/SireneGateway";
-import { SireneEstablishmentVO } from "../../sirene/valueObjects/SireneEstablishmentVO";
+import { SirenGateway } from "../../sirene/ports/SirenGateway";
+import { SirenEstablishmentVO } from "../../sirene/valueObjects/SirenEstablishmentVO";
 import { AddressGateway } from "../ports/AddressGateway";
 import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
 
@@ -19,7 +19,7 @@ export class UpdateEstablishmentsFromSireneApiScript extends UseCase<
 > {
   constructor(
     private readonly establishmentAggregateRepository: EstablishmentAggregateRepository,
-    private readonly sireneGateway: SireneGateway,
+    private readonly sirenGateway: SirenGateway,
     private readonly addressAPI: AddressGateway,
     private readonly timeGateway: TimeGateway,
   ) {
@@ -60,12 +60,12 @@ export class UpdateEstablishmentsFromSireneApiScript extends UseCase<
 
   private async updateEstablishmentWithSiret(siret: string) {
     const includeClosedEstablishments = false;
-    const sireneAnswer = await this.sireneGateway.get(
+    const sirenAnswer = await this.sirenGateway.getEstablishmentBySiret(
       siret,
       includeClosedEstablishments,
     );
 
-    if (!sireneAnswer || sireneAnswer.etablissements.length === 0) {
+    if (!sirenAnswer || sirenAnswer.etablissements.length === 0) {
       await this.establishmentAggregateRepository.updateEstablishment({
         siret,
         updatedAt: this.timeGateway.now(),
@@ -74,8 +74,8 @@ export class UpdateEstablishmentsFromSireneApiScript extends UseCase<
       return;
     }
 
-    const sireneEstablishmentProps = sireneAnswer.etablissements[0];
-    const sireneEstablishment = new SireneEstablishmentVO(
+    const sireneEstablishmentProps = sirenAnswer.etablissements[0];
+    const sireneEstablishment = new SirenEstablishmentVO(
       sireneEstablishmentProps,
     );
     const nafDto = sireneEstablishment.nafAndNomenclature;

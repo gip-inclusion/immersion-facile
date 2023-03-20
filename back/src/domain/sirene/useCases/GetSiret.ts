@@ -5,16 +5,16 @@ import {
   pipeWithValue,
 } from "shared";
 import { UseCase } from "../../core/UseCase";
-import { SireneGateway } from "../ports/SireneGateway";
+import { SirenGateway } from "../ports/SirenGateway";
 import {
-  convertSireneEtablissementToResponse,
-  SireneEstablishmentVO,
-} from "../valueObjects/SireneEstablishmentVO";
+  convertSirenEtablissementToResponse,
+  SirenEstablishmentVO,
+} from "../valueObjects/SirenEstablishmentVO";
 
 export type GetSiretUseCase = UseCase<GetSiretRequestDto, GetSiretResponseDto>;
 
 export class GetSiret extends UseCase<GetSiretRequestDto, GetSiretResponseDto> {
-  constructor(private readonly sireneGateway: SireneGateway) {
+  constructor(private readonly sirenGateway: SirenGateway) {
     super();
   }
 
@@ -25,11 +25,11 @@ export class GetSiret extends UseCase<GetSiretRequestDto, GetSiretResponseDto> {
     includeClosedEstablishments = false,
   }: GetSiretRequestDto): Promise<GetSiretResponseDto> {
     return pipeWithValue(
-      await SireneEstablishmentVO.getFromApi(
+      await SirenEstablishmentVO.getFromApi(
         { siret, includeClosedEstablishments },
-        (...args) => this.sireneGateway.get(...args),
+        (...args) => this.sirenGateway.getEstablishmentBySiret(...args),
       ),
-      convertSireneEtablissementToResponse,
+      convertSirenEtablissementToResponse,
     );
   }
 }

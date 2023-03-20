@@ -8,7 +8,7 @@ import {
 } from "../../secondary/core/ExponentialBackoffRetryStrategy";
 import { QpsRateLimiter } from "../../secondary/core/QpsRateLimiter";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
-import { HttpsSireneGateway } from "../../secondary/sirene/HttpsSireneGateway";
+import { HttpsSirenGateway } from "../../secondary/sirene/HttpsSirenGateway";
 import { AppConfig } from "../config/appConfig";
 
 const maxQpsSireneApi = 0.25;
@@ -30,8 +30,8 @@ const freeQuarantinedFormEstablishmentsWithCorrectSiret = async () => {
   });
   const client = await pool.connect();
 
-  const sireneGateway = new HttpsSireneGateway(
-    config.sireneHttpsConfig,
+  const sireneGateway = new HttpsSirenGateway(
+    config.sirenHttpsConfig,
     timeGateway,
     new QpsRateLimiter(maxQpsSireneApi, timeGateway, sleep),
     new ExponentialBackoffRetryStrategy(
@@ -50,7 +50,9 @@ const freeQuarantinedFormEstablishmentsWithCorrectSiret = async () => {
     `Found ${quarantinedFormEstablishmentAddedResult.rowCount} events with topic 'FormEstablishmentAdded' in quarantined.`,
   );
   for (const { payload, id } of quarantinedFormEstablishmentAddedResult.rows) {
-    const siretIsCorrect = !!(await sireneGateway.get(payload.siret));
+    const siretIsCorrect = !!(await sireneGateway.getEstablishmentBySiret(
+      payload.siret,
+    ));
     if (siretIsCorrect) {
       await client.query(
         "UPDATE outbox SET was_quarantined=false WHERE id=$1; ",

@@ -16,7 +16,7 @@ import { InMemoryInclusionConnectGateway } from "../adapters/secondary/Inclusion
 import { NotImplementedDocumentGateway } from "../adapters/secondary/NotImplementedDocumentGateway";
 import { InMemoryPeConnectGateway } from "../adapters/secondary/PeConnectGateway/InMemoryPeConnectGateway";
 import { InMemoryExportGateway } from "../adapters/secondary/reporting/InMemoryExportGateway";
-import { InMemorySireneGateway } from "../adapters/secondary/sirene/InMemorySireneGateway";
+import { InMemorySirenGateway } from "../adapters/secondary/sirene/InMemorySirenGateway";
 import {
   GenerateApiConsumerJwt,
   GenerateAuthenticatedUserJwt,
@@ -30,7 +30,7 @@ import { AppConfigBuilder } from "./AppConfigBuilder";
 export type InMemoryGateways = {
   email: InMemoryEmailGateway;
   peConnectGateway: InMemoryPeConnectGateway;
-  sirene: InMemorySireneGateway;
+  siren: InMemorySirenGateway;
   laBonneBoiteAPI: InMemoryLaBonneBoiteAPI;
   passEmploiGateway: InMemoryPassEmploiGateway;
   poleEmploiGateway: InMemoryPoleEmploiGateway;
@@ -92,7 +92,7 @@ export const buildTestApp = async (
 
   if (appConfig.emailGateway !== "IN_MEMORY") throwNotSupportedError();
   if (appConfig.repositories !== "IN_MEMORY") throwNotSupportedError();
-  if (appConfig.sireneGateway !== "IN_MEMORY") throwNotSupportedError();
+  if (appConfig.sirenGateway !== "IN_MEMORY") throwNotSupportedError();
   if (appConfig.timeGateway !== "CUSTOM") throwNotSupportedError();
 
   const {

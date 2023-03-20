@@ -11,7 +11,7 @@ import {
 } from "../../../../_testBuilders/buildTestApp";
 import { FormEstablishmentDtoPublicV0 } from "../DtoAndSchemas/v0/input/FormEstablishmentPublicV0.dto";
 import { FormEstablishmentDtoPublicV1 } from "../DtoAndSchemas/v1/input/FormEstablishmentPublicV1.dto";
-import { TEST_ESTABLISHMENT1_SIRET } from "../../../secondary/sirene/InMemorySireneGateway";
+import { TEST_ESTABLISHMENT1_SIRET } from "../../../secondary/sirene/InMemorySirenGateway";
 
 describe("Route to post form establishments from front (hence, without API key)", () => {
   // from front

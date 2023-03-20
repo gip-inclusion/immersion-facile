@@ -2,12 +2,12 @@ import {
   NotFoundError,
   TooManyRequestApiError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { GetSiret } from "../../../domain/sirene/useCases/GetSiret";
-import { SireneEstablishmentVO } from "../../../domain/sirene/valueObjects/SireneEstablishmentVO";
-import { InMemorySireneGateway } from "../../../adapters/secondary/sirene/InMemorySireneGateway";
+import { GetSiret } from "./GetSiret";
+import { SirenEstablishmentVO } from "../valueObjects/SirenEstablishmentVO";
+import { InMemorySirenGateway } from "../../../adapters/secondary/sirene/InMemorySirenGateway";
 import { expectPromiseToFailWithError } from "shared";
 
-const validEstablishment = new SireneEstablishmentVO({
+const validEstablishment = new SirenEstablishmentVO({
   siret: "12345678901234",
   uniteLegale: {
     denominationUniteLegale: "MA P'TITE BOITE",
@@ -32,16 +32,16 @@ const validEstablishment = new SireneEstablishmentVO({
 });
 
 describe("GetSiret", () => {
-  let sireneGateway: InMemorySireneGateway;
+  let sirenGateway: InMemorySirenGateway;
   let getSiret: GetSiret;
 
   beforeEach(() => {
-    sireneGateway = new InMemorySireneGateway();
-    getSiret = new GetSiret(sireneGateway);
+    sirenGateway = new InMemorySirenGateway();
+    getSiret = new GetSiret(sirenGateway);
   });
 
   describe("checking for business being opened", () => {
-    const closedEstablishment = new SireneEstablishmentVO({
+    const closedEstablishment = new SirenEstablishmentVO({
       ...validEstablishment.props,
       siret: "11111111111111",
       uniteLegale: {
@@ -50,8 +50,8 @@ describe("GetSiret", () => {
     });
 
     beforeEach(() => {
-      sireneGateway.setEstablishment(validEstablishment);
-      sireneGateway.setEstablishment(closedEstablishment);
+      sirenGateway.setEstablishment(validEstablishment);
+      sirenGateway.setEstablishment(closedEstablishment);
     });
 
     it("marks an open establishment as open, regardless of the period count", async () => {
@@ -77,7 +77,7 @@ describe("GetSiret", () => {
   });
 
   it("returns the parsed info when siret found", async () => {
-    sireneGateway.setEstablishment(validEstablishment);
+    sirenGateway.setEstablishment(validEstablishment);
     const response = await getSiret.execute({
       siret: validEstablishment.siret,
     });
@@ -91,8 +91,8 @@ describe("GetSiret", () => {
   });
 
   it("populates businessName from nom/prenom when denomination not available", async () => {
-    sireneGateway.setEstablishment(
-      new SireneEstablishmentVO({
+    sirenGateway.setEstablishment(
+      new SirenEstablishmentVO({
         ...validEstablishment.props,
         uniteLegale: {
           prenomUsuelUniteLegale: "ALAIN",
@@ -107,8 +107,8 @@ describe("GetSiret", () => {
   });
 
   it("skips missing parts of adresseEtablissment", async () => {
-    sireneGateway.setEstablishment(
-      new SireneEstablishmentVO({
+    sirenGateway.setEstablishment(
+      new SirenEstablishmentVO({
         ...validEstablishment.props,
         adresseEtablissement: {
           // No numeroVoieEtablissement
@@ -126,8 +126,8 @@ describe("GetSiret", () => {
   });
 
   it("skips naf when not available", async () => {
-    sireneGateway.setEstablishment(
-      new SireneEstablishmentVO({
+    sirenGateway.setEstablishment(
+      new SirenEstablishmentVO({
         ...validEstablishment.props,
         uniteLegale: {
           denominationUniteLegale: "MA P'TITE BOITE",
@@ -143,7 +143,7 @@ describe("GetSiret", () => {
   });
 
   it("returns unavailable Api error if it gets a 429 from API", async () => {
-    sireneGateway.setError({
+    sirenGateway.setError({
       initialError: {
         message: "Request failed with status code 429",
         status: 429,
@@ -157,8 +157,8 @@ describe("GetSiret", () => {
   });
 
   it("returns establishment as not Open if it is not at the current period", async () => {
-    sireneGateway.setEstablishment(
-      new SireneEstablishmentVO({
+    sirenGateway.setEstablishment(
+      new SirenEstablishmentVO({
         ...validEstablishment.props,
         periodesEtablissement: [
           {

@@ -95,7 +95,7 @@ export const createUseCases = (
     uuidGenerator,
     quarantinedTopics: config.quarantinedTopics,
   });
-  const getSiret = new GetSiret(gateways.sirene);
+  const getSiret = new GetSiret(gateways.siren);
   const addFormEstablishment = new AddFormEstablishment(
     uowPerformer,
     createNewEvent,
@@ -220,7 +220,7 @@ export const createUseCases = (
       insertEstablishmentAggregateFromForm:
         new InsertEstablishmentAggregateFromForm(
           uowPerformer,
-          gateways.sirene,
+          gateways.siren,
           gateways.addressApi,
           uuidGenerator,
           gateways.timeGateway,
@@ -262,7 +262,7 @@ export const createUseCases = (
       getSiret,
       getSiretIfNotAlreadySaved: new GetSiretIfNotAlreadySaved(
         uowPerformer,
-        gateways.sirene,
+        gateways.siren,
       ),
 
       // romes

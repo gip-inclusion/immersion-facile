@@ -7,11 +7,11 @@ import {
 import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { SireneGateway } from "../ports/SireneGateway";
+import { SirenGateway } from "../ports/SirenGateway";
 import {
-  convertSireneEtablissementToResponse,
-  SireneEstablishmentVO,
-} from "../valueObjects/SireneEstablishmentVO";
+  convertSirenEtablissementToResponse,
+  SirenEstablishmentVO,
+} from "../valueObjects/SirenEstablishmentVO";
 
 export class GetSiretIfNotAlreadySaved extends TransactionalUseCase<
   GetSiretRequestDto,
@@ -19,7 +19,7 @@ export class GetSiretIfNotAlreadySaved extends TransactionalUseCase<
 > {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly sireneGateway: SireneGateway,
+    private readonly sirenGateway: SirenGateway,
   ) {
     super(uowPerformer);
   }
@@ -42,11 +42,11 @@ export class GetSiretIfNotAlreadySaved extends TransactionalUseCase<
     }
 
     return pipeWithValue(
-      await SireneEstablishmentVO.getFromApi(
+      await SirenEstablishmentVO.getFromApi(
         { siret, includeClosedEstablishments },
-        (...args) => this.sireneGateway.get(...args),
+        (...args) => this.sirenGateway.getEstablishmentBySiret(...args),
       ),
-      convertSireneEtablissementToResponse,
+      convertSirenEtablissementToResponse,
     );
   }
 }

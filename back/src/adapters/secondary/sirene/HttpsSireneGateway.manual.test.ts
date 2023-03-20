@@ -1,9 +1,9 @@
+import { SirenGateway } from "../../../domain/sirene/ports/SirenGateway";
 import { AppConfig } from "../../primary/config/appConfig";
 
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
-import { SireneGateway } from "../../../domain/sirene/ports/SireneGateway";
-import { HttpsSireneGateway } from "./HttpsSireneGateway";
+import { HttpsSirenGateway } from "./HttpsSirenGateway";
 import { RealTimeGateway } from "../core/TimeGateway/RealTimeGateway";
 
 // These tests are not hermetic and not meant for automated testing. They will make requests to the
@@ -14,12 +14,12 @@ import { RealTimeGateway } from "../core/TimeGateway/RealTimeGateway";
 // - SIRENE_ENDPOINT
 // - SIRENE_BEARER_TOKEN
 describe("HttpsSireneGateway", () => {
-  let sireneGateway: SireneGateway;
+  let sirenGateway: SirenGateway;
 
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
-    sireneGateway = new HttpsSireneGateway(
-      config.sireneHttpsConfig,
+    sirenGateway = new HttpsSirenGateway(
+      config.sirenHttpsConfig,
       new RealTimeGateway(),
       noRateLimit,
       noRetries,
@@ -28,13 +28,17 @@ describe("HttpsSireneGateway", () => {
 
   it("returns open establishments", async () => {
     // ETABLISSEMENT PUBLIC DU MUSEE DU LOUVRE (should be active)
-    const response = await sireneGateway.get("18004623700012");
+    const response = await sirenGateway.getEstablishmentBySiret(
+      "18004623700012",
+    );
     expect(response?.etablissements).toHaveLength(1);
   });
 
   it("filters out closed establishments", async () => {
     // SOCIETE TEXTILE D'HENIN LIETARD, closed in 1966.
-    const response = await sireneGateway.get("38961161700017");
+    const response = await sirenGateway.getEstablishmentBySiret(
+      "38961161700017",
+    );
     expect(response).toBeUndefined();
   });
 });

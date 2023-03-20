@@ -7,11 +7,11 @@ import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGatew
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import { UpdateEstablishmentsFromSireneApiScript } from "./UpdateEstablishmentsFromSireneApiScript";
-import { InMemorySireneGateway } from "../../../adapters/secondary/sirene/InMemorySireneGateway";
+import { InMemorySirenGateway } from "../../../adapters/secondary/sirene/InMemorySirenGateway";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 
 const prepareUseCase = () => {
-  const sireneRepo = new InMemorySireneGateway();
+  const sireneRepo = new InMemorySirenGateway();
   const uow = createInMemoryUow();
   const establishmentAggregateRepository = uow.establishmentAggregateRepository;
   const timeGateway = new CustomTimeGateway();

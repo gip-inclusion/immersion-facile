@@ -2,7 +2,7 @@ import {
   createEstablishmentMagicLinkPayload,
   establishmentTargets,
 } from "shared";
-import { TEST_ESTABLISHMENT1_SIRET } from "../../../secondary/sirene/InMemorySireneGateway";
+import { TEST_ESTABLISHMENT1_SIRET } from "../../../secondary/sirene/InMemorySirenGateway";
 import {
   rueSaintHonore,
   rueSaintHonoreDto,

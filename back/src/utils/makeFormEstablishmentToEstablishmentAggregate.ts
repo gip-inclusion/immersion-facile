@@ -16,8 +16,8 @@ import {
 } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import { ImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { AddressGateway } from "../domain/immersionOffer/ports/AddressGateway";
-import { SireneGateway } from "../domain/sirene/ports/SireneGateway";
-import { SireneEstablishmentVO } from "../domain/sirene/valueObjects/SireneEstablishmentVO";
+import { SirenGateway } from "../domain/sirene/ports/SirenGateway";
+import { SirenEstablishmentVO } from "../domain/sirene/valueObjects/SirenEstablishmentVO";
 
 const offerFromFormScore = 10;
 
@@ -34,12 +34,12 @@ export const makeFormEstablishmentToEstablishmentAggregate = ({
   uuidGenerator,
   timeGateway,
   addressGateway,
-  sireneGateway,
+  sirenGateway,
 }: {
   uuidGenerator: UuidGenerator;
   timeGateway: TimeGateway;
   addressGateway: AddressGateway;
-  sireneGateway: SireneGateway;
+  sirenGateway: SirenGateway;
 }) => {
   const createEstablishmentAggregate = makeCreateEstablishmentAggregate({
     uuidGenerator,
@@ -55,7 +55,7 @@ export const makeFormEstablishmentToEstablishmentAggregate = ({
     );
 
     const nafAndNumberOfEmployee = await getNafAndNumberOfEmployee(
-      sireneGateway,
+      sirenGateway,
       formEstablishment,
     );
 
@@ -128,16 +128,18 @@ type NafAndNumberOfEmpolyee = {
 };
 
 const getNafAndNumberOfEmployee = async (
-  sireneGateway: SireneGateway,
+  sirenGateway: SirenGateway,
   formEstablishment: FormEstablishmentDto,
 ): Promise<NafAndNumberOfEmpolyee> => {
-  const sireneRepoAnswer = await sireneGateway.get(formEstablishment.siret);
+  const sireneRepoAnswer = await sirenGateway.getEstablishmentBySiret(
+    formEstablishment.siret,
+  );
   if (!sireneRepoAnswer || !sireneRepoAnswer.etablissements[0])
     throw new Error(
       `Could not get siret ${formEstablishment.siret} from siren gateway`,
     );
 
-  const sireneEstablishmentVo = new SireneEstablishmentVO(
+  const sireneEstablishmentVo = new SirenEstablishmentVO(
     sireneRepoAnswer.etablissements[0],
   );
 

@@ -8,9 +8,9 @@ import {
 } from "../../../domain/core/ports/RetryStrategy";
 import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
 import {
-  SireneGateway,
   SireneGatewayAnswer,
-} from "../../../domain/sirene/ports/SireneGateway";
+  SirenGateway,
+} from "../../../domain/sirene/ports/SirenGateway";
 import {
   createAxiosInstance,
   isRetryableError,
@@ -18,18 +18,20 @@ import {
 } from "../../../utils/axiosUtils";
 import { createLogger } from "../../../utils/logger";
 import { AxiosConfig } from "../../primary/config/appConfig";
+import {
+  TooManyRequestApiError,
+  UnavailableApiError,
+} from "../../primary/helpers/httpErrors";
 
 const logger = createLogger(__filename);
 
-export class HttpsSireneGateway extends SireneGateway {
+export class HttpsSirenGateway implements SirenGateway {
   public constructor(
     private readonly axiosConfig: AxiosConfig,
     private readonly timeGateway: TimeGateway,
     private readonly rateLimiter: RateLimiter,
     private readonly retryStrategy: RetryStrategy,
-  ) {
-    super();
-  }
+  ) {}
 
   private createAxiosInstance() {
     return createAxiosInstance(logger, {
@@ -42,34 +44,42 @@ export class HttpsSireneGateway extends SireneGateway {
     });
   }
 
-  protected _get = async (
+  public async getEstablishmentBySiret(
     siret: SiretDto,
     includeClosedEstablishments = false,
-  ): Promise<SireneGatewayAnswer | undefined> => {
+  ): Promise<SireneGatewayAnswer | undefined> {
     logger.debug({ siret, includeClosedEstablishments }, "get");
 
-    return this.retryStrategy.apply(async () => {
-      try {
-        const axios = this.createAxiosInstance();
-        const response = await this.rateLimiter.whenReady(() =>
-          axios.get("/siret", {
-            params: this.createSiretQueryParams(
-              siret,
-              includeClosedEstablishments,
-            ),
-          }),
-        );
-        return response?.data;
-      } catch (error: any) {
-        if (error.response?.status === 404) {
-          return undefined;
+    return this.retryStrategy
+      .apply(async () => {
+        try {
+          const axios = this.createAxiosInstance();
+          const response = await this.rateLimiter.whenReady(() =>
+            axios.get("/siret", {
+              params: this.createSiretQueryParams(
+                siret,
+                includeClosedEstablishments,
+              ),
+            }),
+          );
+          return response?.data;
+        } catch (error: any) {
+          if (error.response?.status === 404) {
+            return;
+          }
+          if (isRetryableError(logger, error)) throw new RetryableError(error);
+          logAxiosError(logger, error);
+          throw error;
         }
-        if (isRetryableError(logger, error)) throw new RetryableError(error);
-        logAxiosError(logger, error);
-        throw error;
-      }
-    });
-  };
+      })
+      .catch((error) => {
+        const serviceName = "Sirene API";
+        logger.error({ siret, error }, "Error fetching siret");
+        if (error?.initialError?.status === 429)
+          throw new TooManyRequestApiError(serviceName);
+        throw new UnavailableApiError(serviceName);
+      });
+  }
 
   private createSiretQueryParams(
     siret: SiretDto,
