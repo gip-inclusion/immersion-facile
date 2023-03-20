@@ -1,14 +1,16 @@
 import { useField } from "formik";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { GetSiretResponseDto, SiretDto } from "shared";
+import { EstablishmentFromSirenApiDto, SiretDto } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
 import { useSendModifyEstablishmentLink } from "src/app/hooks/establishment.hooks";
 
-export const useSiretRelatedField = <K extends keyof GetSiretResponseDto>(
+export const useSiretRelatedField = <
+  K extends keyof EstablishmentFromSirenApiDto,
+>(
   fieldFromInfo: K,
   options?: {
     fieldToUpdate?: string;
@@ -17,7 +19,7 @@ export const useSiretRelatedField = <K extends keyof GetSiretResponseDto>(
 ) => {
   const establishmentInfos = useAppSelector(siretSelectors.establishmentInfos);
   const [{ value: _ }, { touched }, { setValue }] = useField<
-    GetSiretResponseDto[K]
+    EstablishmentFromSirenApiDto[K]
   >({
     name: options?.fieldToUpdate ?? fieldFromInfo,
   });

@@ -5,7 +5,7 @@ import {
   FormEstablishmentDtoBuilder,
   defaultValidFormEstablishment,
 } from "shared";
-import { StubGetSiret } from "../../../_testBuilders/StubGetSiret";
+import { SirenApiRawEstablishmentBuilder } from "../../../_testBuilders/SirenApiRawEstablishmentBuilder";
 
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
@@ -18,6 +18,10 @@ import { InMemoryFeatureFlagRepository } from "../../../adapters/secondary/InMem
 import { InMemoryFormEstablishmentRepository } from "../../../adapters/secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryRomeRepository } from "../../../adapters/secondary/InMemoryRomeRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import {
+  InMemorySirenGateway,
+  TEST_ESTABLISHMENT1,
+} from "../../../adapters/secondary/sirene/InMemorySirenGateway";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { AddFormEstablishment } from "./AddFormEstablishment";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
@@ -27,15 +31,19 @@ describe("Add FormEstablishment", () => {
   let formEstablishmentRepo: InMemoryFormEstablishmentRepository;
   let outboxRepo: InMemoryOutboxRepository;
   let romeRepository: InMemoryRomeRepository;
-  let stubGetSiret: StubGetSiret;
+  let sirenGateway: InMemorySirenGateway;
   let uowPerformer: InMemoryUowPerformer;
 
   beforeEach(() => {
-    stubGetSiret = new StubGetSiret();
+    sirenGateway = new InMemorySirenGateway();
     const uow = createInMemoryUow();
     formEstablishmentRepo = uow.formEstablishmentRepository;
     outboxRepo = uow.outboxRepository;
     romeRepository = uow.romeRepository;
+    sirenGateway.setRawEstablishment({
+      ...TEST_ESTABLISHMENT1,
+      siret: defaultValidFormEstablishment.siret,
+    });
     romeRepository.appellations = defaultValidFormEstablishment.appellations;
     uow.featureFlagRepository = new InMemoryFeatureFlagRepository({
       enableInseeApi: true,
@@ -52,7 +60,7 @@ describe("Add FormEstablishment", () => {
     addFormEstablishment = new AddFormEstablishment(
       uowPerformer,
       createNewEvent,
-      stubGetSiret,
+      sirenGateway,
     );
   });
 
@@ -158,7 +166,23 @@ describe("Add FormEstablishment", () => {
   });
 
   describe("SIRET validation", () => {
-    const formEstablishment = FormEstablishmentDtoBuilder.valid().build();
+    const formEstablishment = FormEstablishmentDtoBuilder.valid()
+      .withSiret(TEST_ESTABLISHMENT1.siret)
+      .build();
+
+    const sirenRawInactiveEstablishment = new SirenApiRawEstablishmentBuilder()
+      .withSiret(formEstablishment.siret)
+      .withIsActive(false)
+      .withBusinessName("INACTIVE BUSINESS")
+      .withAdresseEtablissement({
+        numeroVoieEtablissement: "20",
+        typeVoieEtablissement: "AVENUE",
+        libelleVoieEtablissement: "DE SEGUR",
+        codePostalEtablissement: "75007",
+        libelleCommuneEtablissement: "PARIS 7",
+      })
+      .withNafDto({ code: "78.3Z", nomenclature: "Ref2" })
+      .build();
 
     describe("when feature flag to do siret validation is OFF", () => {
       it("accepts formEstablishment with SIRETs that don't correspond to active businesses and quarantines events", async () => {
@@ -168,12 +192,23 @@ describe("Add FormEstablishment", () => {
         uowPerformer.setUow({
           featureFlagRepository,
         });
-        stubGetSiret.setNextResponse({
-          siret: formEstablishment.siret,
-          businessName: "INACTIVE BUSINESS",
-          businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
-          naf: { code: "78.3Z", nomenclature: "Ref2" },
-          isOpen: false,
+        sirenGateway.setRawEstablishment({
+          ...TEST_ESTABLISHMENT1,
+          uniteLegale: {
+            ...TEST_ESTABLISHMENT1.uniteLegale,
+            denominationUniteLegale: "INACTIVE BUSINESS",
+            activitePrincipaleUniteLegale: "78.3Z",
+            nomenclatureActivitePrincipaleUniteLegale: "Ref2",
+            etatAdministratifUniteLegale: "A",
+          },
+          adresseEtablissement: {
+            numeroVoieEtablissement: "20",
+            typeVoieEtablissement: "AVENUE",
+            libelleVoieEtablissement: "DE SEGUR",
+            codePostalEtablissement: "75007",
+            libelleCommuneEtablissement: "PARIS 7",
+          },
+          periodesEtablissement: [{ dateFin: null }],
         });
 
         const response = await addFormEstablishment.execute(formEstablishment);
@@ -189,13 +224,7 @@ describe("Add FormEstablishment", () => {
     });
 
     it("rejects formEstablishment with SIRETs that don't correspond to active businesses", async () => {
-      stubGetSiret.setNextResponse({
-        siret: formEstablishment.siret,
-        businessName: "INACTIVE BUSINESS",
-        businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
-        naf: { code: "78.3Z", nomenclature: "Ref2" },
-        isOpen: false,
-      });
+      sirenGateway.setRawEstablishment(sirenRawInactiveEstablishment);
 
       await expectPromiseToFailWithError(
         addFormEstablishment.execute(formEstablishment),
@@ -206,13 +235,9 @@ describe("Add FormEstablishment", () => {
     });
 
     it("accepts formEstablishment with SIRETs that  correspond to active businesses", async () => {
-      stubGetSiret.setNextResponse({
-        siret: formEstablishment.siret,
-        businessName: "ACTIVE BUSINESS",
-        businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
-        naf: { code: "78.3Z", nomenclature: "Ref2" },
-        isOpen: true,
-      });
+      const sirenRawEstablishment =
+        new SirenApiRawEstablishmentBuilder().build();
+      sirenGateway.setRawEstablishment(sirenRawEstablishment);
 
       expect(await addFormEstablishment.execute(formEstablishment)).toBe(
         formEstablishment.siret,
@@ -221,11 +246,11 @@ describe("Add FormEstablishment", () => {
 
     it("Throws errors when the SIRET endpoint throws erorrs", async () => {
       const error = new Error("test error");
-      stubGetSiret.setErrorForNextCall(error);
+      sirenGateway.setError(error);
 
       await expectPromiseToFailWithError(
         addFormEstablishment.execute(formEstablishment),
-        error,
+        new Error("Le service Sirene API n'est pas disponible"),
       );
     });
   });

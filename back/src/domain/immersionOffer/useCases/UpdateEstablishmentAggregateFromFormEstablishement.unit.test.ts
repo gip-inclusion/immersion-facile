@@ -13,24 +13,23 @@ import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGatew
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { SireneApiEstablishment } from "../../sirene/ports/SirenGateway";
+import { SirenApiRawEstablishment } from "../../sirene/ports/SirenGateway";
 import { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import { UpdateEstablishmentAggregateFromForm } from "./UpdateEstablishmentAggregateFromFormEstablishement";
-import { SirenEstablishmentVO } from "../../sirene/valueObjects/SirenEstablishmentVO";
 import { InMemorySirenGateway } from "../../../adapters/secondary/sirene/InMemorySirenGateway";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 
 const prepareSireneRepo = (sireneRepo: InMemorySirenGateway, siret: string) => {
-  const sireneEstablishmentFromAPI = new SirenEstablishmentVO({
+  const sireneEstablishmentFromAPI: SirenApiRawEstablishment = {
     siret,
     uniteLegale: {
       activitePrincipaleUniteLegale: "85.59A",
       trancheEffectifsUniteLegale: "01",
       nomenclatureActivitePrincipaleUniteLegale: "nomencl",
     },
-  } as SireneApiEstablishment);
+  } as SirenApiRawEstablishment;
 
-  sireneRepo.setEstablishment(sireneEstablishmentFromAPI);
+  sireneRepo.setRawEstablishment(sireneEstablishmentFromAPI);
 };
 
 describe("Update Establishment aggregate from form data", () => {

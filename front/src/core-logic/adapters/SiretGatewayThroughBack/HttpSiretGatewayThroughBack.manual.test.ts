@@ -16,7 +16,7 @@ const simulated = new SimulatedSiretGatewayThroughBack(0, {
     businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
     businessName: "MA P'TITE BOITE",
     isOpen: true,
-    naf: {
+    nafDto: {
       code: "7112B",
       nomenclature: "Ref2",
     },
@@ -59,7 +59,7 @@ siretGatewaysThroughBack.forEach((siretGatewayThroughBack) => {
         businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
         businessName: "MA P'TITE BOITE",
         isOpen: true,
-        naf: {
+        nafDto: {
           code: "7112B",
           nomenclature: "Ref2",
         },

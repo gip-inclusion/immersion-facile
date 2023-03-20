@@ -7,6 +7,11 @@ import {
   FormEstablishmentDtoBuilder,
 } from "shared";
 import { InMemoryEstablishmentGroupRepository } from "../../../adapters/secondary/immersionOffer/inMemoryEstablishmentGroupRepository";
+import {
+  InMemorySirenGateway,
+  TEST_ESTABLISHMENT1,
+  TEST_ESTABLISHMENT3,
+} from "../../../adapters/secondary/sirene/InMemorySirenGateway";
 import { AddFormEstablishment } from "./AddFormEstablishment";
 import { AddFormEstablishmentBatch } from "./AddFormEstablismentsBatch";
 import {
@@ -16,11 +21,28 @@ import {
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemoryFormEstablishmentRepository } from "../../../adapters/secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
-import { StubGetSiret } from "../../../_testBuilders/StubGetSiret";
 import { InMemoryFeatureFlagRepository } from "../../../adapters/secondary/InMemoryFeatureFlagRepository";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
+
+const createFormEstablishmentBatchDto = (): FormEstablishmentBatchDto => {
+  const formEstablishment1: FormEstablishmentDto =
+    FormEstablishmentDtoBuilder.valid()
+      .withSiret(TEST_ESTABLISHMENT1.siret)
+      .build();
+
+  const formEstablishment2: FormEstablishmentDto =
+    FormEstablishmentDtoBuilder.valid()
+      .withSiret(TEST_ESTABLISHMENT3.siret)
+      .withBusinessName("michelin")
+      .build();
+
+  return {
+    groupName: "L'amie caliné",
+    formEstablishments: [formEstablishment1, formEstablishment2],
+  };
+};
 
 describe("AddFormEstablishmentsBatch Use Case", () => {
   let uow: InMemoryUnitOfWork;
@@ -28,13 +50,15 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
   let formEstablishmentRepo: InMemoryFormEstablishmentRepository;
   let outboxRepo: InMemoryOutboxRepository;
   let establishmentGroupRepository: InMemoryEstablishmentGroupRepository;
-  let stubGetSiret: StubGetSiret;
+  let sirenGateway: InMemorySirenGateway;
   let uowPerformer: InMemoryUowPerformer;
   let uuidGenerator: TestUuidGenerator;
 
+  const formEstablishmentBatch = createFormEstablishmentBatchDto();
+
   beforeEach(() => {
     uow = createInMemoryUow();
-    stubGetSiret = new StubGetSiret();
+    sirenGateway = new InMemorySirenGateway();
     formEstablishmentRepo = uow.formEstablishmentRepository;
     establishmentGroupRepository = uow.establishmentGroupRepository;
     outboxRepo = uow.outboxRepository;
@@ -55,7 +79,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
     const addFormEstablishment = new AddFormEstablishment(
       uowPerformer,
       createNewEvent,
-      stubGetSiret,
+      sirenGateway,
     );
 
     addFormEstablishmentBatch = new AddFormEstablishmentBatch(
@@ -65,8 +89,6 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
   });
 
   it("Adds two formEstablishments successfully and returns report", async () => {
-    const formEstablishmentBatch = createFormEstablishmentBatchDto();
-
     const report = await addFormEstablishmentBatch.execute(
       formEstablishmentBatch,
     );
@@ -89,7 +111,6 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
   });
 
   it("reports the errors when something goes wrong with an addition", async () => {
-    const formEstablishmentBatch = createFormEstablishmentBatchDto();
     const existingFormEstablishment =
       formEstablishmentBatch.formEstablishments[0];
     formEstablishmentRepo.setFormEstablishments([existingFormEstablishment]);
@@ -104,7 +125,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
       failures: [
         {
           errorMessage:
-            "Establishment with siret 01234567890123 already exists",
+            "Establishment with siret 12345678901234 already exists",
           siret: existingFormEstablishment.siret,
         },
       ],
@@ -112,7 +133,6 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
   });
 
   it("Saves an event with topic : 'FormEstablishmentAdded'", async () => {
-    const formEstablishmentBatch = createFormEstablishmentBatchDto();
     uuidGenerator.setNextUuids(["event1-id", "event2-id"]);
 
     await addFormEstablishmentBatch.execute(formEstablishmentBatch);
@@ -131,7 +151,6 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
   });
 
   it("creates the establishmentGroup with the sirets of the establishments", async () => {
-    const formEstablishmentBatch = createFormEstablishmentBatchDto();
     uuidGenerator.setNextUuids(["event1-id", "event2-id"]);
 
     await addFormEstablishmentBatch.execute(formEstablishmentBatch);
@@ -148,7 +167,6 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
   });
 
   it("updates Group if it already exists", async () => {
-    const formEstablishmentBatch = createFormEstablishmentBatchDto();
     await establishmentGroupRepository.save({
       slug: "l'amie-caline",
       name: formEstablishmentBatch.groupName,
@@ -170,7 +188,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
         {
           siret: formEstablishmentBatch.formEstablishments[0].siret,
           errorMessage:
-            "Establishment with siret 01234567890123 already exists",
+            "Establishment with siret 12345678901234 already exists",
         },
       ],
     });
@@ -186,19 +204,3 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
     });
   });
 });
-
-const createFormEstablishmentBatchDto = (): FormEstablishmentBatchDto => {
-  const formEstablishment1: FormEstablishmentDto =
-    FormEstablishmentDtoBuilder.valid().build();
-
-  const formEstablishment2: FormEstablishmentDto =
-    FormEstablishmentDtoBuilder.valid()
-      .withSiret("11112222333344")
-      .withBusinessName("michelin")
-      .build();
-
-  return {
-    groupName: "L'amie caliné",
-    formEstablishments: [formEstablishment1, formEstablishment2],
-  };
-};

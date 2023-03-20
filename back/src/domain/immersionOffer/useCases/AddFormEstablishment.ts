@@ -7,8 +7,8 @@ import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { SirenGateway } from "../../sirene/ports/SirenGateway";
 import { rejectsSiretIfNotAnOpenCompany } from "../../sirene/rejectsSiretIfNotAnOpenCompany";
-import { GetSiretUseCase } from "../../sirene/useCases/GetSiret";
 
 export class AddFormEstablishment extends TransactionalUseCase<
   FormEstablishmentDto,
@@ -17,7 +17,7 @@ export class AddFormEstablishment extends TransactionalUseCase<
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private createNewEvent: CreateNewEvent,
-    private readonly getSiret: GetSiretUseCase,
+    private readonly sirenGateway: SirenGateway,
   ) {
     super(uowPerformer);
   }
@@ -40,7 +40,7 @@ export class AddFormEstablishment extends TransactionalUseCase<
     }
 
     if (featureFlags.enableInseeApi) {
-      await rejectsSiretIfNotAnOpenCompany(this.getSiret, dto.siret);
+      await rejectsSiretIfNotAnOpenCompany(this.sirenGateway, dto.siret);
     }
 
     const appellations = await uow.romeRepository.getFullAppellationsFromCodes(

@@ -95,11 +95,10 @@ export const createUseCases = (
     uuidGenerator,
     quarantinedTopics: config.quarantinedTopics,
   });
-  const getSiret = new GetSiret(gateways.siren);
   const addFormEstablishment = new AddFormEstablishment(
     uowPerformer,
     createNewEvent,
-    getSiret,
+    gateways.siren,
   );
 
   const generateConventionMagicLinkUrl = makeGenerateConventionMagicLinkUrl(
@@ -161,7 +160,11 @@ export const createUseCases = (
         uowPerformer,
         createNewEvent,
       ),
-      addConvention: new AddConvention(uowPerformer, createNewEvent, getSiret),
+      addConvention: new AddConvention(
+        uowPerformer,
+        createNewEvent,
+        gateways.siren,
+      ),
       getConvention: new GetConvention(uowPerformer),
       linkPoleEmploiAdvisorAndRedirectToConvention:
         new LinkPoleEmploiAdvisorAndRedirectToConvention(
@@ -259,7 +262,7 @@ export const createUseCases = (
         ),
 
       // siret
-      getSiret,
+      getSiret: new GetSiret(gateways.siren),
       getSiretIfNotAlreadySaved: new GetSiretIfNotAlreadySaved(
         uowPerformer,
         gateways.siren,

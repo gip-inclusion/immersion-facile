@@ -1,6 +1,6 @@
 import { Pool } from "pg";
 import { random, sleep } from "shared";
-import { UpdateEstablishmentsFromSireneApiScript } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentsFromSireneApiScript";
+import { UpdateEstablishmentsFromSirenApiScript } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentsFromSirenApiScript";
 import { createLogger } from "../../../utils/logger";
 import { PipelineStats } from "../../../utils/pipelineStats";
 import {
@@ -70,7 +70,7 @@ const main = async () => {
     new PgEstablishmentAggregateRepository(client);
 
   const updateEstablishmentsFromSireneAPI =
-    new UpdateEstablishmentsFromSireneApiScript(
+    new UpdateEstablishmentsFromSirenApiScript(
       establishmentAggregateRepository,
       sireneGateway,
       addressAPI,

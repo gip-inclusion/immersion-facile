@@ -3,8 +3,7 @@ import {
   ConventionDtoBuilder,
   expectPromiseToFailWithError,
 } from "shared";
-import { StubGetSiret } from "../../../_testBuilders/StubGetSiret";
-
+import { SirenApiRawEstablishmentBuilder } from "../../../_testBuilders/SirenApiRawEstablishmentBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,
@@ -16,12 +15,13 @@ import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGenerato
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryFeatureFlagRepository } from "../../../adapters/secondary/InMemoryFeatureFlagRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { AddConvention } from "../../../domain/convention/useCases/AddConvention";
+import { InMemorySirenGateway } from "../../../adapters/secondary/sirene/InMemorySirenGateway";
+import { AddConvention } from "./AddConvention";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
-} from "../../../domain/core/eventBus/EventBus";
-import { DomainEvent } from "../../../domain/core/eventBus/events";
+} from "../../core/eventBus/EventBus";
+import { DomainEvent } from "../../core/eventBus/events";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 
 describe("Add Convention", () => {
@@ -34,7 +34,7 @@ describe("Add Convention", () => {
   const validConvention = new ConventionDtoBuilder().build();
   const { externalId, ...validConventionParams } = validConvention;
 
-  let stubGetSiret: StubGetSiret;
+  let sirenGateway: InMemorySirenGateway;
   let uowPerformer: InMemoryUowPerformer;
 
   beforeEach(() => {
@@ -50,12 +50,12 @@ describe("Add Convention", () => {
       timeGateway,
       uuidGenerator,
     });
-    stubGetSiret = new StubGetSiret();
+    sirenGateway = new InMemorySirenGateway();
     uowPerformer = new InMemoryUowPerformer(uow);
     addConvention = new AddConvention(
       uowPerformer,
       createNewEvent,
-      stubGetSiret,
+      sirenGateway,
     );
   });
 
@@ -130,6 +130,20 @@ describe("Add Convention", () => {
   });
 
   describe("SIRET validation", () => {
+    const sireRawEstablishmentBuilder = new SirenApiRawEstablishmentBuilder()
+      .withSiret(validConventionParams.siret)
+      .withNafDto({ code: "78.3Z", nomenclature: "Ref2" });
+
+    const sirenRawInactiveEstablishment = sireRawEstablishmentBuilder
+      .withBusinessName("INACTIVE BUSINESS")
+      .withIsActive(false)
+      .build();
+
+    const sirenRawActiveEstablishment = sireRawEstablishmentBuilder
+      .withBusinessName("Active BUSINESS")
+      .withIsActive(true)
+      .build();
+
     describe("if feature flag to do siret validation is OFF", () => {
       it("accepts applications with SIRETs that don't correspond to active businesses", async () => {
         uowPerformer.setUow({
@@ -137,13 +151,7 @@ describe("Add Convention", () => {
             enableInseeApi: false,
           }),
         });
-        stubGetSiret.setNextResponse({
-          siret: validConventionParams.siret,
-          businessName: "INACTIVE BUSINESS",
-          businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
-          naf: { code: "78.3Z", nomenclature: "Ref2" },
-          isOpen: false,
-        });
+        sirenGateway.setRawEstablishment(sirenRawInactiveEstablishment);
 
         expect(await addConvention.execute(validConventionParams)).toEqual({
           id: validConventionParams.id,
@@ -152,13 +160,7 @@ describe("Add Convention", () => {
     });
 
     it("rejects applications with SIRETs that don't correspond to active businesses", async () => {
-      stubGetSiret.setNextResponse({
-        siret: validConventionParams.siret,
-        businessName: "INACTIVE BUSINESS",
-        businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
-        naf: { code: "78.3Z", nomenclature: "Ref2" },
-        isOpen: false,
-      });
+      sirenGateway.setRawEstablishment(sirenRawInactiveEstablishment);
 
       await expectPromiseToFailWithError(
         addConvention.execute(validConventionParams),
@@ -169,13 +171,7 @@ describe("Add Convention", () => {
     });
 
     it("accepts applications with SIRETs that  correspond to active businesses", async () => {
-      stubGetSiret.setNextResponse({
-        siret: validConventionParams.siret,
-        businessName: "ACTIVE BUSINESS",
-        businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
-        naf: { code: "78.3Z", nomenclature: "Ref2" },
-        isOpen: true,
-      });
+      sirenGateway.setRawEstablishment(sirenRawActiveEstablishment);
 
       expect(await addConvention.execute(validConventionParams)).toEqual({
         id: validConventionParams.id,
@@ -184,11 +180,11 @@ describe("Add Convention", () => {
 
     it("Throws errors when the SIRET endpoint throws erorrs", async () => {
       const error = new Error("test error");
-      stubGetSiret.setErrorForNextCall(error);
+      sirenGateway.setError(error);
 
       await expectPromiseToFailWithError(
         addConvention.execute(validConventionParams),
-        error,
+        new Error("Le service Sirene API n'est pas disponible"),
       );
     });
   });

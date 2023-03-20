@@ -1,16 +1,13 @@
 import { SiretDto } from "shared";
 
-export type GetSiretCall = (
-  siret: SiretDto,
-  includeClosedEstablishments?: boolean,
-) => Promise<SireneGatewayAnswer | undefined>;
-
 export interface SirenGateway {
-  getEstablishmentBySiret: GetSiretCall;
-  // getEstablishmentsUpdatedSince(): Promise<SireneGatewayAnswer | undefined>;
+  getEstablishmentBySiret(
+    siret: SiretDto,
+    includeClosedEstablishments?: boolean,
+  ): Promise<SireneGatewayAnswer | undefined>;
 }
 
-export type SireneApiEstablishment = {
+export type SirenApiRawEstablishment = {
   siret: string;
   uniteLegale: Partial<{
     denominationUniteLegale?: string;
@@ -45,5 +42,5 @@ export type SireneGatewayAnswer = {
     debut: number;
     nombre: number;
   };
-  etablissements: SireneApiEstablishment[];
+  etablissements: SirenApiRawEstablishment[];
 };

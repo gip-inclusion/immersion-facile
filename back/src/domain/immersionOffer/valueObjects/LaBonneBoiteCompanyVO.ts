@@ -2,6 +2,7 @@ import {
   addressStringToDto,
   defaultMaxContactsPerWeek,
   NafDto,
+  NumberEmployeesRange,
   SiretDto,
 } from "shared";
 import { createLogger } from "../../../utils/logger";
@@ -9,7 +10,6 @@ import { TimeGateway } from "../../core/ports/TimeGateway";
 import {
   EstablishmentAggregate,
   EstablishmentEntity,
-  NumberEmployeesRange,
 } from "../entities/EstablishmentEntity";
 
 const logger = createLogger(__filename);

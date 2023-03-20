@@ -1,4 +1,4 @@
-import { getSiretIfNotSavedRoute, siretRoute } from "shared";
+import { expectToEqual, getSiretIfNotSavedRoute, siretRoute } from "shared";
 import { SuperTest, Test } from "supertest";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
@@ -18,15 +18,19 @@ describe("/siret route", () => {
   });
 
   it("processes valid requests", async () => {
-    await request
-      .get(`/${siretRoute}/${TEST_ESTABLISHMENT1.siret}`)
-      .expect(200, {
-        siret: "12345678901234",
-        businessName: "MA P'TITE BOITE",
-        businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
-        naf: { code: "7112B", nomenclature: "Ref2" },
-        isOpen: true,
-      });
+    const response = await request.get(
+      `/${siretRoute}/${TEST_ESTABLISHMENT1.siret}`,
+    );
+
+    expect(response.status).toBe(200);
+    expectToEqual(response.body, {
+      siret: "12345678901234",
+      businessName: "MA P'TITE BOITE",
+      businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
+      nafDto: { code: "7112B", nomenclature: "Ref2" },
+      numberEmployeesRange: "1-2",
+      isOpen: true,
+    });
   });
 
   it("returns 400 Bad Request for invalid request", async () => {

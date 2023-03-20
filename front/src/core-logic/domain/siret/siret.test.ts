@@ -1,6 +1,6 @@
 import {
   GetSiretInfo,
-  GetSiretResponseDto,
+  EstablishmentFromSirenApiDto,
   tooManiSirenRequestsSiretErrorMessage,
 } from "shared";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
@@ -60,7 +60,9 @@ describe("Siret validation and fetching", () => {
 
     it("when the current siret is modified the establishments and api errors are dropped", () => {
       setStoreWithInitialSiretState({
-        establishment: { siret: "11110000111100" } as GetSiretResponseDto,
+        establishment: {
+          siret: "11110000111100",
+        } as EstablishmentFromSirenApiDto,
         error: "Missing establishment on SIRENE API.",
       });
 
@@ -115,7 +117,7 @@ describe("Siret validation and fetching", () => {
       setStoreWithInitialSiretState({
         currentSiret: "10002000300040",
         error: "Establishment with this siret is already in our DB",
-        establishment: { siret: "yolo" } as GetSiretResponseDto,
+        establishment: { siret: "yolo" } as EstablishmentFromSirenApiDto,
       });
       expectShouldFetchEvenIfAlreadySavedToBe(true);
       store.dispatch(
@@ -174,7 +176,9 @@ describe("Siret validation and fetching", () => {
     expect(siretSelectors.isFetching(store.getState())).toBe(expected);
   };
 
-  const expectEstablishmentToEqual = (expected: GetSiretResponseDto | null) => {
+  const expectEstablishmentToEqual = (
+    expected: EstablishmentFromSirenApiDto | null,
+  ) => {
     expect(siretSelectors.establishmentInfos(store.getState())).toBe(expected);
   };
 

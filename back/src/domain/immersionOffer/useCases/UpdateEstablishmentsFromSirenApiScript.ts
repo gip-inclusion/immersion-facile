@@ -1,11 +1,12 @@
 import { addDays } from "date-fns";
 import { AddressAndPosition } from "shared";
 import { z } from "zod";
+import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { createLogger } from "../../../utils/logger";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UseCase } from "../../core/UseCase";
 import { SirenGateway } from "../../sirene/ports/SirenGateway";
-import { SirenEstablishmentVO } from "../../sirene/valueObjects/SirenEstablishmentVO";
+import { getSirenEstablishmentFromApi } from "../../sirene/service/getSirenEstablishmentFromApi";
 import { AddressGateway } from "../ports/AddressGateway";
 import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
 
@@ -13,7 +14,7 @@ const SIRENE_NB_DAYS_BEFORE_REFRESH = 7;
 
 const logger = createLogger(__filename);
 
-export class UpdateEstablishmentsFromSireneApiScript extends UseCase<
+export class UpdateEstablishmentsFromSirenApiScript extends UseCase<
   void,
   number
 > {
@@ -59,32 +60,28 @@ export class UpdateEstablishmentsFromSireneApiScript extends UseCase<
   }
 
   private async updateEstablishmentWithSiret(siret: string) {
-    const includeClosedEstablishments = false;
-    const sirenAnswer = await this.sirenGateway.getEstablishmentBySiret(
-      siret,
-      includeClosedEstablishments,
-    );
+    const sirenEstablishmentDto = await getSirenEstablishmentFromApi(
+      { siret, includeClosedEstablishments: false },
+      this.sirenGateway,
+    ).catch(async (error) => {
+      if (error instanceof NotFoundError) {
+        await this.establishmentAggregateRepository.updateEstablishment({
+          siret,
+          updatedAt: this.timeGateway.now(),
+          isActive: false,
+        });
+        return;
+      }
+      throw error;
+    });
+    if (!sirenEstablishmentDto) return;
 
-    if (!sirenAnswer || sirenAnswer.etablissements.length === 0) {
-      await this.establishmentAggregateRepository.updateEstablishment({
-        siret,
-        updatedAt: this.timeGateway.now(),
-        isActive: false,
-      });
-      return;
-    }
-
-    const sireneEstablishmentProps = sirenAnswer.etablissements[0];
-    const sireneEstablishment = new SirenEstablishmentVO(
-      sireneEstablishmentProps,
-    );
-    const nafDto = sireneEstablishment.nafAndNomenclature;
-    const numberEmployeesRange = sireneEstablishment.numberEmployeesRange;
-    const formattedAddress = sireneEstablishment.formatedAddress;
+    const { nafDto, numberEmployeesRange, businessAddress } =
+      sirenEstablishmentDto;
 
     const positionAndAddress = await this.getPositionAndAddressIfNeeded(
       siret,
-      formattedAddress,
+      businessAddress,
     );
 
     await this.establishmentAggregateRepository.updateEstablishment({

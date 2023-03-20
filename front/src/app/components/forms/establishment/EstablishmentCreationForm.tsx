@@ -75,7 +75,7 @@ const CreationSiretRelatedInputs = () => {
   const formContents = getFormFields();
   useSiretRelatedField("businessName");
   useSiretRelatedField("businessAddress");
-  useSiretRelatedField("naf");
+  useSiretRelatedField("nafDto");
   const featureFlags = useFeatureFlags();
 
   const [_, __, { setValue: setAddressValue }] = useField<string>(

@@ -5,6 +5,8 @@ import {
   GeoPositionDto,
   NafDto,
   noContactPerWeek,
+  NumberEmployeesRange,
+  SiretDto,
 } from "shared";
 import { TimeGateway } from "../domain/core/ports/TimeGateway";
 import { UuidGenerator } from "../domain/core/ports/UuidGenerator";
@@ -12,12 +14,11 @@ import { ContactEntity } from "../domain/immersionOffer/entities/ContactEntity";
 import {
   EstablishmentAggregate,
   EstablishmentEntity,
-  NumberEmployeesRange,
 } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import { ImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { AddressGateway } from "../domain/immersionOffer/ports/AddressGateway";
 import { SirenGateway } from "../domain/sirene/ports/SirenGateway";
-import { SirenEstablishmentVO } from "../domain/sirene/valueObjects/SirenEstablishmentVO";
+import { getSirenEstablishmentFromApi } from "../domain/sirene/service/getSirenEstablishmentFromApi";
 
 const offerFromFormScore = 10;
 
@@ -56,7 +57,7 @@ export const makeFormEstablishmentToEstablishmentAggregate = ({
 
     const nafAndNumberOfEmployee = await getNafAndNumberOfEmployee(
       sirenGateway,
-      formEstablishment,
+      formEstablishment.siret,
     );
 
     return createEstablishmentAggregate({
@@ -129,29 +130,22 @@ type NafAndNumberOfEmpolyee = {
 
 const getNafAndNumberOfEmployee = async (
   sirenGateway: SirenGateway,
-  formEstablishment: FormEstablishmentDto,
+  siret: SiretDto,
 ): Promise<NafAndNumberOfEmpolyee> => {
-  const sireneRepoAnswer = await sirenGateway.getEstablishmentBySiret(
-    formEstablishment.siret,
+  const { nafDto, numberEmployeesRange } = await getSirenEstablishmentFromApi(
+    { siret },
+    sirenGateway,
   );
-  if (!sireneRepoAnswer || !sireneRepoAnswer.etablissements[0])
-    throw new Error(
-      `Could not get siret ${formEstablishment.siret} from siren gateway`,
-    );
-
-  const sireneEstablishmentVo = new SirenEstablishmentVO(
-    sireneRepoAnswer.etablissements[0],
-  );
-
-  const nafDto = sireneEstablishmentVo.nafAndNomenclature;
-  const numberEmployeesRange = sireneEstablishmentVo.numberEmployeesRange;
 
   if (!nafDto || numberEmployeesRange === undefined)
     throw new Error(
-      `Some field from siren gateway are missing for establishment with siret ${formEstablishment.siret} : nafDto=${nafDto}; numberEmployeesRange=${numberEmployeesRange}`,
+      `Some field from siren gateway are missing for establishment with siret ${siret} : nafDto=${nafDto}; numberEmployeesRange=${numberEmployeesRange}`,
     );
 
-  return { nafDto, numberEmployeesRange };
+  return {
+    nafDto,
+    numberEmployeesRange,
+  };
 };
 
 const makeCreateEstablishmentAggregate =

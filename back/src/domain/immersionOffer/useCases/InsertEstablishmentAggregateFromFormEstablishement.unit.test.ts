@@ -19,11 +19,13 @@ import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGenerato
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
-import { SireneApiEstablishment } from "../../sirene/ports/SirenGateway";
+import { SirenApiRawEstablishment } from "../../sirene/ports/SirenGateway";
 import { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import { InsertEstablishmentAggregateFromForm } from "./InsertEstablishmentAggregateFromFormEstablishement";
-import { SirenEstablishmentVO } from "../../sirene/valueObjects/SirenEstablishmentVO";
-import { InMemorySirenGateway } from "../../../adapters/secondary/sirene/InMemorySirenGateway";
+import {
+  InMemorySirenGateway,
+  TEST_ESTABLISHMENT1,
+} from "../../../adapters/secondary/sirene/InMemorySirenGateway";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 
 const fakeSiret = "90040893100013";
@@ -38,16 +40,18 @@ const prepareSireneRepo = (
   siret: string,
   trancheEffectifsUniteLegale?: string,
 ) => {
-  const sireneEstablishmentFromAPI = new SirenEstablishmentVO({
+  const sireneEstablishmentFromAPI: SirenApiRawEstablishment = {
+    ...TEST_ESTABLISHMENT1,
     siret,
     uniteLegale: {
-      activitePrincipaleUniteLegale: "85.59A",
+      ...TEST_ESTABLISHMENT1.uniteLegale,
       trancheEffectifsUniteLegale: trancheEffectifsUniteLegale ?? "01",
+      activitePrincipaleUniteLegale: "85.59A",
       nomenclatureActivitePrincipaleUniteLegale: "nomencl",
     },
-  } as SireneApiEstablishment);
+  };
 
-  sirenGateway.setEstablishment(sireneEstablishmentFromAPI);
+  sirenGateway.setRawEstablishment(sireneEstablishmentFromAPI);
 };
 
 describe("Insert Establishment aggregate from form data", () => {

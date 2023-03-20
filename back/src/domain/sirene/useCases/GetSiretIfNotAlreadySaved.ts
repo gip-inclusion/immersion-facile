@@ -1,21 +1,17 @@
 import {
+  EstablishmentFromSirenApiDto,
   GetSiretRequestDto,
   getSiretRequestSchema,
-  GetSiretResponseDto,
-  pipeWithValue,
 } from "shared";
 import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { SirenGateway } from "../ports/SirenGateway";
-import {
-  convertSirenEtablissementToResponse,
-  SirenEstablishmentVO,
-} from "../valueObjects/SirenEstablishmentVO";
+import { getSirenEstablishmentFromApi } from "../service/getSirenEstablishmentFromApi";
 
 export class GetSiretIfNotAlreadySaved extends TransactionalUseCase<
   GetSiretRequestDto,
-  GetSiretResponseDto
+  EstablishmentFromSirenApiDto
 > {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
@@ -27,9 +23,10 @@ export class GetSiretIfNotAlreadySaved extends TransactionalUseCase<
   inputSchema = getSiretRequestSchema;
 
   public async _execute(
-    { siret, includeClosedEstablishments = false }: GetSiretRequestDto,
+    params: GetSiretRequestDto,
     uow: UnitOfWork,
-  ): Promise<GetSiretResponseDto> {
+  ): Promise<EstablishmentFromSirenApiDto> {
+    const { siret } = params;
     const isEstablishmentWithProvidedSiretAlreadyInDb =
       await uow.establishmentAggregateRepository.hasEstablishmentFromFormWithSiret(
         siret,
@@ -41,12 +38,6 @@ export class GetSiretIfNotAlreadySaved extends TransactionalUseCase<
       );
     }
 
-    return pipeWithValue(
-      await SirenEstablishmentVO.getFromApi(
-        { siret, includeClosedEstablishments },
-        (...args) => this.sirenGateway.getEstablishmentBySiret(...args),
-      ),
-      convertSirenEtablissementToResponse,
-    );
+    return getSirenEstablishmentFromApi(params, this.sirenGateway);
   }
 }

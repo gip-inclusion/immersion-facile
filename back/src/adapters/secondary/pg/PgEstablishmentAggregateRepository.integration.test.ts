@@ -14,10 +14,10 @@ import {
   expectObjectsToMatch,
   defaultMaxContactsPerWeek,
   expectToEqual,
+  NumberEmployeesRange,
 } from "shared";
 import { createDiscussionAggregate } from "../../../_testBuilders/DiscussionAggregateBuilder";
 import {
-  NumberEmployeesRange,
   EstablishmentEntity,
   EstablishmentAggregate,
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";

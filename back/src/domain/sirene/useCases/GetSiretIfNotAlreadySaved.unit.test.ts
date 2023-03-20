@@ -1,15 +1,12 @@
+import { expectPromiseToFailWithError, expectToEqual } from "shared";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
-import { SireneEstablishmentVOBuilder } from "../../../_testBuilders/SireneEstablishmentVOBuilder";
-import {
-  expectPromiseToFailWithError,
-  expectTypeToMatchAndEqual,
-} from "shared";
+import { SirenApiRawEstablishmentBuilder } from "../../../_testBuilders/SirenApiRawEstablishmentBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { GetSiretIfNotAlreadySaved } from "../../../domain/sirene/useCases/GetSiretIfNotAlreadySaved";
 import { InMemorySirenGateway } from "../../../adapters/secondary/sirene/InMemorySirenGateway";
+import { GetSiretIfNotAlreadySaved } from "./GetSiretIfNotAlreadySaved";
 
 describe("GetSiretIfNotAlreadySaved", () => {
   let sireneGateway: InMemorySirenGateway;
@@ -51,19 +48,31 @@ describe("GetSiretIfNotAlreadySaved", () => {
   it("returns the establishment info if not already in DB", async () => {
     const siretAlreadyInDb = "11112222000033";
     establishmentAggregateRepo.establishmentAggregates = [];
-    sireneGateway.setEstablishment(
-      new SireneEstablishmentVOBuilder().withSiret(siretAlreadyInDb).build(),
-    );
+    const sirenRawEstablishment = new SirenApiRawEstablishmentBuilder()
+      .withSiret(siretAlreadyInDb)
+      .withAdresseEtablissement({
+        numeroVoieEtablissement: "20",
+        typeVoieEtablissement: "AVENUE",
+        libelleVoieEtablissement: "DE SEGUR",
+        codePostalEtablissement: "75007",
+        libelleCommuneEtablissement: "PARIS 7",
+      })
+      .withBusinessName("MA P'TITE BOITE 2")
+      .withNafDto({ code: "8559A", nomenclature: "Ref2" })
+      .withIsActive(true)
+      .build();
+    sireneGateway.setRawEstablishment(sirenRawEstablishment);
 
     const response = await getSiretIfNotAlreadySaved.execute({
       siret: siretAlreadyInDb,
     });
-    expectTypeToMatchAndEqual(response, {
+    expectToEqual(response, {
       businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
       businessName: "MA P'TITE BOITE 2",
-      isOpen: false,
-      naf: { code: "8559A", nomenclature: "Ref2" },
-      siret: "11112222000033",
+      isOpen: true,
+      nafDto: { code: "8559A", nomenclature: "Ref2" },
+      numberEmployeesRange: "1-2",
+      siret: siretAlreadyInDb,
     });
   });
 });

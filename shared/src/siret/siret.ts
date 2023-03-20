@@ -23,16 +23,21 @@ export const siretInfoErrors = [
 ] as const;
 
 export type SiretDto = Flavor<string, "SiretDto">;
-export type GetSiretResponseDto = {
+export type EstablishmentFromSirenApiDto = {
   siret: SiretDto;
   businessName: string;
   businessAddress: string;
-  naf?: NafDto;
+  nafDto?: NafDto;
+  numberEmployeesRange?: NumberEmployeesRange;
   // true if the office is currently open for business.
   isOpen: boolean;
 };
+
+// prettier-ignore
+export type NumberEmployeesRange = ""| "0"| "1-2"| "3-5"| "6-9"| "10-19"| "20-49"| "50-99"| "100-199"| "200-249"| "250-499"| "500-999"| "1000-1999"| "2000-4999"| "5000-9999"| "+10000";
+
 export type GetSiretInfoError = (typeof siretInfoErrors)[number];
-export type GetSiretInfo = GetSiretResponseDto | GetSiretInfoError;
+export type GetSiretInfo = EstablishmentFromSirenApiDto | GetSiretInfoError;
 export type GetSiretRequestDto = {
   siret: SiretDto;
   includeClosedEstablishments?: boolean;

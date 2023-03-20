@@ -5,10 +5,10 @@ import {
   tooManySirenRequestsSiret,
 } from "shared";
 import {
+  SirenApiRawEstablishment,
   SireneGatewayAnswer,
   SirenGateway,
 } from "../../../domain/sirene/ports/SirenGateway";
-import { SirenEstablishmentVO } from "../../../domain/sirene/valueObjects/SirenEstablishmentVO";
 import { createLogger } from "../../../utils/logger";
 import {
   TooManyRequestApiError,
@@ -23,7 +23,7 @@ export const TEST_ESTABLISHMENT3_SIRET = "77561959600155";
 export const TEST_ESTABLISHMENT4_SIRET = "24570135400111";
 export const TEST_ESTABLISHMENT5_SIRET = "01234567890123";
 
-export const TEST_ESTABLISHMENT1 = new SirenEstablishmentVO({
+export const TEST_ESTABLISHMENT1: SirenApiRawEstablishment = {
   siret: TEST_ESTABLISHMENT1_SIRET,
   uniteLegale: {
     denominationUniteLegale: "MA P'TITE BOITE",
@@ -46,9 +46,9 @@ export const TEST_ESTABLISHMENT1 = new SirenEstablishmentVO({
       etatAdministratifEtablissement: "A",
     },
   ],
-});
+};
 
-export const TEST_ESTABLISHMENT2 = new SirenEstablishmentVO({
+export const TEST_ESTABLISHMENT2: SirenApiRawEstablishment = {
   siret: TEST_ESTABLISHMENT2_SIRET,
   uniteLegale: {
     denominationUniteLegale: "MA P'TITE BOITE 2",
@@ -71,9 +71,9 @@ export const TEST_ESTABLISHMENT2 = new SirenEstablishmentVO({
       etatAdministratifEtablissement: "F",
     },
   ],
-});
+};
 
-export const TEST_ESTABLISHMENT3 = new SirenEstablishmentVO({
+export const TEST_ESTABLISHMENT3: SirenApiRawEstablishment = {
   siret: TEST_ESTABLISHMENT3_SIRET,
   uniteLegale: {
     denominationUniteLegale: "MA P'TITE BOITE 2",
@@ -96,9 +96,9 @@ export const TEST_ESTABLISHMENT3 = new SirenEstablishmentVO({
       etatAdministratifEtablissement: "A",
     },
   ],
-});
+};
 
-export const TEST_ESTABLISHMENT4 = new SirenEstablishmentVO({
+export const TEST_ESTABLISHMENT4: SirenApiRawEstablishment = {
   siret: TEST_ESTABLISHMENT4_SIRET,
   uniteLegale: {
     denominationUniteLegale: "MA P'TITE BOITE 2",
@@ -120,9 +120,9 @@ export const TEST_ESTABLISHMENT4 = new SirenEstablishmentVO({
       etatAdministratifEtablissement: "A",
     },
   ],
-});
+};
 
-type EstablishmentBySiret = { [siret: string]: SirenEstablishmentVO };
+type EstablishmentBySiret = { [siret: string]: SirenApiRawEstablishment };
 
 export class InMemorySirenGateway implements SirenGateway {
   private _error: any = null;
@@ -183,7 +183,7 @@ export class InMemorySirenGateway implements SirenGateway {
           debut: 1,
           nombre: 1,
         },
-        etablissements: [establishment.props],
+        etablissements: [establishment],
       };
     } catch (error: any) {
       const serviceName = "Sirene API";
@@ -195,7 +195,7 @@ export class InMemorySirenGateway implements SirenGateway {
   }
 
   // Visible for testing
-  public setEstablishment(establishment: SirenEstablishmentVO) {
+  public setRawEstablishment(establishment: SirenApiRawEstablishment) {
     this._repo[establishment.siret] = establishment;
   }
 

@@ -1,12 +1,12 @@
 import { AddressDto, pathEq } from "shared";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
-import { SireneEstablishmentVOBuilder } from "../../../_testBuilders/SireneEstablishmentVOBuilder";
+import { SirenApiRawEstablishmentBuilder } from "../../../_testBuilders/SirenApiRawEstablishmentBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { EstablishmentEntity } from "../entities/EstablishmentEntity";
-import { UpdateEstablishmentsFromSireneApiScript } from "./UpdateEstablishmentsFromSireneApiScript";
+import { UpdateEstablishmentsFromSirenApiScript } from "./UpdateEstablishmentsFromSirenApiScript";
 import { InMemorySirenGateway } from "../../../adapters/secondary/sirene/InMemorySirenGateway";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 
@@ -16,7 +16,7 @@ const prepareUseCase = () => {
   const establishmentAggregateRepository = uow.establishmentAggregateRepository;
   const timeGateway = new CustomTimeGateway();
   const addressAPI = new InMemoryAddressGateway();
-  const useCase = new UpdateEstablishmentsFromSireneApiScript(
+  const useCase = new UpdateEstablishmentsFromSirenApiScript(
     establishmentAggregateRepository,
     sireneRepo,
     addressAPI,
@@ -67,8 +67,8 @@ describe("Update establishments from Sirene API", () => {
       makeEstablishmentWithUpdatedAt("oldSiret", moreThanAWeekAgo),
       makeEstablishmentWithUpdatedAt("recentSiret", lessThanAWeekAgo),
     ];
-    sireneRepo.setEstablishment(
-      new SireneEstablishmentVOBuilder().withSiret("recentSiret").build(),
+    sireneRepo.setRawEstablishment(
+      new SirenApiRawEstablishmentBuilder().withSiret("recentSiret").build(),
     );
     timeGateway.setNextDate(now);
 
@@ -125,8 +125,8 @@ describe("Update establishments from Sirene API", () => {
     establishmentAggregateRepository.establishmentAggregates = [
       makeEstablishmentWithUpdatedAt("establishmentToUpdate", moreThanAWeekAgo),
     ];
-    sireneRepo.setEstablishment(
-      new SireneEstablishmentVOBuilder()
+    sireneRepo.setRawEstablishment(
+      new SirenApiRawEstablishmentBuilder()
         .withSiret("establishmentToUpdate")
         .withUniteLegale({
           activitePrincipaleUniteLegale: "85.59A",
@@ -171,8 +171,8 @@ describe("Update establishments from Sirene API", () => {
           moreThanAWeekAgo,
         ),
       ];
-      sireneRepo.setEstablishment(
-        new SireneEstablishmentVOBuilder()
+      sireneRepo.setRawEstablishment(
+        new SirenApiRawEstablishmentBuilder()
           .withSiret("establishmentToUpdate")
           .withAdresseEtablissement({
             numeroVoieEtablissement: "25",
@@ -234,8 +234,8 @@ describe("Update establishments from Sirene API", () => {
       establishmentAggregateRepository.establishmentAggregates = [
         initialEstablishmentAggregate,
       ];
-      sireneRepo.setEstablishment(
-        new SireneEstablishmentVOBuilder()
+      sireneRepo.setRawEstablishment(
+        new SirenApiRawEstablishmentBuilder()
           .withSiret("establishmentToUpdate")
           .withAdresseEtablissement({
             numeroVoieEtablissement: "7",
@@ -297,8 +297,8 @@ describe("Update establishments from Sirene API", () => {
       establishmentAggregateRepository.establishmentAggregates = [
         establishmentToUpdate,
       ];
-      sireneRepo.setEstablishment(
-        new SireneEstablishmentVOBuilder()
+      sireneRepo.setRawEstablishment(
+        new SirenApiRawEstablishmentBuilder()
           .withSiret("establishmentToUpdate")
           .withAdresseEtablissement({ libelleVoieEtablissement: "" })
           .build(),

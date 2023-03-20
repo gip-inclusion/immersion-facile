@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { GetSiretInfoError, GetSiretResponseDto } from "shared";
+import { GetSiretInfoError, EstablishmentFromSirenApiDto } from "shared";
 import { ActionOfSlice } from "src/core-logic/storeConfig/redux.helpers";
 
 export type InvalidSiretError = "SIRET must be 14 digits";
@@ -8,7 +8,7 @@ export interface SiretState {
   currentSiret: string;
   isSearching: boolean;
   shouldFetchEvenIfAlreadySaved: boolean;
-  establishment: GetSiretResponseDto | null;
+  establishment: EstablishmentFromSirenApiDto | null;
   error: GetSiretInfoError | InvalidSiretError | null;
 }
 
@@ -41,7 +41,10 @@ export const siretSlice = createSlice({
     siretInfoRequested: (state, _action: PayloadAction<string>) => {
       state.isSearching = true;
     },
-    siretInfoSucceeded: (state, action: PayloadAction<GetSiretResponseDto>) => {
+    siretInfoSucceeded: (
+      state,
+      action: PayloadAction<EstablishmentFromSirenApiDto>,
+    ) => {
       state.isSearching = false;
       state.establishment = action.payload;
     },

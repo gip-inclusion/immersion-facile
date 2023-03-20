@@ -1,16 +1,17 @@
 import { BadRequestError } from "../../adapters/primary/helpers/httpErrors";
-import { GetSiretUseCase } from "./useCases/GetSiret";
+import { SirenGateway } from "./ports/SirenGateway";
+import { getSirenEstablishmentFromApi } from "./service/getSirenEstablishmentFromApi";
 
 export const rejectsSiretIfNotAnOpenCompany = async (
-  getSiret: GetSiretUseCase,
+  sirenGateway: SirenGateway,
   siret: string,
 ) => {
-  const siretLookupRes = await getSiret.execute({
-    siret,
-    includeClosedEstablishments: true,
-  });
+  const sirenEstablishment = await getSirenEstablishmentFromApi(
+    { siret, includeClosedEstablishments: true },
+    sirenGateway,
+  );
 
-  if (!siretLookupRes.isOpen) {
+  if (!sirenEstablishment.isOpen) {
     throw new BadRequestError(
       `Ce SIRET (${siret}) n'est pas attribué ou correspond à un établissement fermé. Veuillez le corriger.`,
     );

@@ -11,8 +11,8 @@ import {
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { SirenGateway } from "../../sirene/ports/SirenGateway";
 import { rejectsSiretIfNotAnOpenCompany } from "../../sirene/rejectsSiretIfNotAnOpenCompany";
-import { GetSiretUseCase } from "../../sirene/useCases/GetSiret";
 
 export class AddConvention extends TransactionalUseCase<
   ConventionDtoWithoutExternalId,
@@ -21,7 +21,7 @@ export class AddConvention extends TransactionalUseCase<
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly createNewEvent: CreateNewEvent,
-    private readonly getSiret: GetSiretUseCase,
+    private readonly sirenGateway: SirenGateway,
   ) {
     super(uowPerformer);
   }
@@ -44,7 +44,7 @@ export class AddConvention extends TransactionalUseCase<
     const featureFlags = await uow.featureFlagRepository.getAll();
     if (featureFlags.enableInseeApi) {
       await rejectsSiretIfNotAnOpenCompany(
-        this.getSiret,
+        this.sirenGateway,
         createConventionParams.siret,
       );
     }

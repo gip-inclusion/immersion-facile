@@ -11,7 +11,7 @@ import {
 } from "../../../../_testBuilders/buildTestApp";
 import { SuperTest, Test } from "supertest";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
-import { defaultSiretResponse } from "../../../../_testBuilders/StubGetSiret";
+import { TEST_ESTABLISHMENT1 } from "../../../secondary/sirene/InMemorySirenGateway";
 
 const addFormEstablishmentBatchUrl = adminTargets.addFormEstablishmentBatch.url;
 
@@ -46,9 +46,12 @@ describe("POST /add-form-establishment-batch", () => {
 
   it("returns 200 if everything work", async () => {
     const formEstablishment1: FormEstablishmentDto =
-      FormEstablishmentDtoBuilder.valid()
-        .withSiret(defaultSiretResponse.siret)
-        .build();
+      FormEstablishmentDtoBuilder.valid().build();
+
+    gateways.siren.setRawEstablishment({
+      ...TEST_ESTABLISHMENT1,
+      siret: formEstablishment1.siret,
+    });
 
     const payload: FormEstablishmentBatchDto = {
       groupName: "Tesla",

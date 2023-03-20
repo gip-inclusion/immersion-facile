@@ -4,7 +4,7 @@ import { nafSchema } from "../naf";
 import {
   GetSiretInfo,
   GetSiretRequestDto,
-  GetSiretResponseDto,
+  EstablishmentFromSirenApiDto,
   SiretDto,
   siretInfoErrors,
   siretRegex,
@@ -16,14 +16,16 @@ export const siretSchema: z.Schema<SiretDto> = zString
   .regex(siretRegex, "SIRET doit être composé de 14 chiffres")
   .transform(normalizeSiret);
 
-const getSiretResponseSchema: z.Schema<GetSiretResponseDto> = z.object({
-  siret: siretSchema,
-  businessName: z.string(),
-  businessAddress: z.string(),
-  naf: nafSchema.optional(),
-  // true if the office is currently open for business.
-  isOpen: z.boolean(),
-});
+const getSiretResponseSchema: z.Schema<EstablishmentFromSirenApiDto> = z.object(
+  {
+    siret: siretSchema,
+    businessName: z.string(),
+    businessAddress: z.string(),
+    naf: nafSchema.optional(),
+    // true if the office is currently open for business.
+    isOpen: z.boolean(),
+  },
+);
 
 export const getSiretInfoSchema: z.Schema<GetSiretInfo> = z.union([
   getSiretResponseSchema,

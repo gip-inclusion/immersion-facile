@@ -5,11 +5,11 @@ import {
   FormEstablishmentSource,
   GeoPositionDto,
   NafDto,
+  NumberEmployeesRange,
 } from "shared";
 import {
   DataSource,
   EstablishmentEntity,
-  NumberEmployeesRange,
 } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import { avenueChampsElyseesDto } from "./addressDtos";
 
