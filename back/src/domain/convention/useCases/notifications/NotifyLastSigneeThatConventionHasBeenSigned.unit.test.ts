@@ -138,7 +138,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
 
     await expectPromiseToFailWithError(
       usecase.execute(conventionSignedByNoOne),
-      new Error(missingConventionMessage(conventionSignedByNoOne)),
+      new Error(missingConventionMessage(conventionSignedByNoOne.id)),
     );
 
     expectToEqual(emailGw.getSentEmails(), []);

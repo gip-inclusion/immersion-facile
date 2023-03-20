@@ -198,7 +198,12 @@ export const createUseCases = (
         config.immersionFacileBaseUrl,
       ),
       notifyThatConventionStillNeedToBeSigned:
-        new NotifyThatConventionStillNeedToBeSigned(uowPerformer),
+        new NotifyThatConventionStillNeedToBeSigned(
+          uowPerformer,
+          gateways.email,
+          gateways.timeGateway,
+          generateConventionMagicLinkUrl,
+        ),
 
       // immersionOffer
       searchImmersion: new SearchImmersion(uowPerformer, uuidGenerator),

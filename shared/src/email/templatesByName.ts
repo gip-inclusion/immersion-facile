@@ -25,6 +25,65 @@ const createConventionStatusButton = (link: string): EmailButtonProps => ({
 
 // to add a new EmailType, or changes the params of one, edit first EmailParamsByEmailType and let types guide you
 export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
+  AGENCY_FIRST_REMINDER: {
+    niceName: "Agence - Premier rappel",
+    tags: [""],
+    createEmailVariables: ({
+      agencyMagicLinkUrl,
+      beneficiaryFirstName,
+      beneficiaryLastName,
+      businessName,
+      agencyName,
+      dateStart,
+      dateEnd,
+    }) => ({
+      subject:
+        "RAPPEL - Une demande de convention d'immersion démarrant d'ici 3 jours ouvrés doit être vérifiée",
+      greetings: "Bonjour,",
+      content: `
+      Merci de ne pas oublier de traiter la demande de convention d'immersion qui concerne :
+
+      Bénéficiaire : ${beneficiaryFirstName} ${beneficiaryLastName}
+
+      Entreprise : ${businessName}
+
+      Structure d'accompagnement : ${agencyName}
+
+      Dates de l'immersion :
+      - du ${dateStart}
+      - au ${dateEnd}
+
+      Cette demande d'immersion a bien été signée par le bénéficiaire et l'entreprise d'accueil.
+
+      Vous pouvez prendre connaissance de la demande pour la traiter en <a href="${agencyMagicLinkUrl}" target="_blank">cliquant ici</a>.
+
+      Bonne journée,
+      L'équipe Immersion Facilitée
+      `,
+    }),
+  },
+  AGENCY_LAST_REMINDER: {
+    niceName: "Agence - Dernier rappel",
+    tags: [""],
+    createEmailVariables: ({
+      agencyMagicLinkUrl,
+      beneficiaryFirstName,
+      beneficiaryLastName,
+      businessName,
+    }) => ({
+      subject:
+        "RAPPEL URGENT - Une demande de convention d'immersion démarrant demain doit être vérifiée",
+      greetings: "Urgent !",
+      content: `
+      L'immersion demandée par Bénéficiaire <strong>${beneficiaryFirstName} ${beneficiaryLastName}</strong> au sein de l'entreprise <strong>${businessName}</strong> doit démarrer demain.
+
+      Nous vous remercions d'examiner rapidement la demande de convention qui vous a été envoyée afin que votre décision soit transmise au bénéficiaire et à l'entreprise.
+      Vous pouvez prendre connaissance de la demande pour la traiter en <a href="${agencyMagicLinkUrl}" target="_blank">cliquant ici</a>.
+      
+      Pour rappel, nous vous transmettons tous les renseignements nécessaires pour examiner la demande. Si vous la validez, la convention est automatiquement établie.
+      `,
+    }),
+  },
   AGENCY_WAS_ACTIVATED: {
     niceName: "Activation agence",
     tags: ["activation prescripteur"],

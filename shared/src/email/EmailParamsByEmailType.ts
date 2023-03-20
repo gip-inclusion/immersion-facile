@@ -3,6 +3,22 @@ import { InternshipKind } from "../convention/convention.dto";
 import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 
 export type EmailParamsByEmailType = {
+  AGENCY_FIRST_REMINDER: {
+    agencyMagicLinkUrl: string;
+    beneficiaryFirstName: string;
+    beneficiaryLastName: string;
+    businessName: string;
+    agencyName: string;
+    dateStart: string;
+    dateEnd: string;
+  };
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  AGENCY_LAST_REMINDER: {
+    agencyMagicLinkUrl: string;
+    beneficiaryFirstName: string;
+    beneficiaryLastName: string;
+    businessName: string;
+  };
   SIGNEE_HAS_SIGNED_CONVENTION: {
     internshipKind: InternshipKind;
     demandeId: string;

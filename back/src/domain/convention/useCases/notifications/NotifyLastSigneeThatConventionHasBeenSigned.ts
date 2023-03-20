@@ -1,6 +1,7 @@
 import {
   AgencyDto,
   ConventionDto,
+  ConventionId,
   conventionSchema,
   frontRoutes,
   Signatory,
@@ -16,8 +17,8 @@ import {
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { EmailGateway } from "../../ports/EmailGateway";
 
-export const missingConventionMessage = (convention: ConventionDto) =>
-  `Missing convention ${convention.id} on convention repository.`;
+export const missingConventionMessage = (conventionId: ConventionId) =>
+  `Missing convention ${conventionId} on convention repository.`;
 
 export const missingAgencyMessage = (convention: ConventionDto) =>
   `Missing agency '${convention.agencyId}' on agency repository.`;
@@ -45,7 +46,7 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
       convention.id,
     );
     if (!repositoryConvention)
-      throw new Error(missingConventionMessage(convention));
+      throw new Error(missingConventionMessage(convention.id));
     const agency = await uow.agencyRepository.getById(
       repositoryConvention.agencyId,
     );

@@ -194,6 +194,21 @@ const EmailVariableField = ({
 export const defaultEmailValueByEmailKind: {
   [K in TemplateName]: Parameters<TemplateByName[K]["createEmailVariables"]>[0];
 } = {
+  AGENCY_FIRST_REMINDER: {
+    agencyMagicLinkUrl: "CONVENTION_VERIFICATION_LINK",
+    agencyName: "AGENCY_NAME",
+    beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
+    beneficiaryLastName: "BENEFICIARY_LAST_NAME",
+    businessName: "BUSINESS_NAME",
+    dateStart: "DATE_START",
+    dateEnd: "DATE_END",
+  },
+  AGENCY_LAST_REMINDER: {
+    agencyMagicLinkUrl: "CONVENTION_VERIFICATION_LINK",
+    beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
+    beneficiaryLastName: "BENEFICIARY_LAST_NAME",
+    businessName: "BUSINESS_NAME",
+  },
   NEW_CONVENTION_BENEFICIARY_CONFIRMATION: {
     internshipKind: "immersion",
     demandeId: "DEMANDE_ID",
