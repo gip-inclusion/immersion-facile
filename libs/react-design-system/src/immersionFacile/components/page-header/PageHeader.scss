@@ -1,6 +1,9 @@
 $patternSizes: 80px, 160px, 130px;
 .im-page-header {
   position: relative;
+  &__inner {
+    /*!*/
+  }
   &--default {
     background-color: var(--blue-france-sun-113-625);
   }
@@ -18,6 +21,9 @@ $patternSizes: 80px, 160px, 130px;
     &--centered {
       text-align: center;
     }
+  }
+  &__patterns {
+    /*!*/
   }
   &__pattern {
     background: var(--grey-1000-100);

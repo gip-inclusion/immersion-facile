@@ -12,10 +12,12 @@ export const getScssData = (componentName, filename) => {
     .map((className) => className.replace(".", ""));
   const keys = [
     ...new Set(
-      filteredClasses.map((className) => {
-        const element = className.replace(componentName, "");
-        return camelCase(element);
-      }),
+      filteredClasses
+        .map((className) => {
+          const element = className.replace(componentName, "");
+          return camelCase(element);
+        })
+        .filter((className) => className !== ""),
     ),
   ];
   return {
@@ -31,13 +33,20 @@ export const makeTsFileContent = (componentName, filePath) => {
     componentName,
     filePath,
   );
+  console.log({
+    filename,
+    filteredClasses,
+    keys,
+  });
   const fileBaseName = path.basename(filename);
   return `import './${fileBaseName}';
   
     export default {
       root: '${componentName}',
       ${keys
-        .map((className, index) => `${className}: '${filteredClasses[index]}'`)
+        .map(
+          (className, index) => `${className}: '${filteredClasses[index + 1]}'`,
+        )
         .join(",\n")}
     }
   `;

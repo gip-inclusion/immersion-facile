@@ -1,7 +1,7 @@
 import React from "react";
-import "./PageHeader.scss";
 import { useStyles } from "tss-react/dsfr";
 import { fr } from "@codegouvfr/react-dsfr";
+import Styles from "./PageHeader.styles";
 
 type PageHeaderProps = {
   title: string;
@@ -12,8 +12,6 @@ type PageHeaderProps = {
   theme?: "default" | "candidate" | "establishment" | "agency";
   classes?: Partial<Record<"root" | "inner" | "title", string>>;
 };
-
-const componentName = "im-page-header";
 
 export const PageHeader = ({
   title,
@@ -29,19 +27,17 @@ export const PageHeader = ({
     <section
       className={cx(
         fr.cx("fr-py-7w"),
-        componentName,
-        `${componentName}--${theme}`,
+        Styles.root,
+        Styles[theme],
         ` ${className ?? ""}`,
         classes.root,
       )}
     >
-      <div
-        className={cx(`${componentName}__inner fr-container`, classes.inner)}
-      >
+      <div className={cx(fr.cx("fr-container"), Styles.inner, classes.inner)}>
         <h1
           className={cx(
-            `${componentName}__title`,
-            centered && `${componentName}__title--centered`,
+            Styles.title,
+            centered && Styles.titleCentered,
             children ? "" : "fr-my-auto",
             classes.title,
           )}
@@ -50,25 +46,10 @@ export const PageHeader = ({
         </h1>
         {children}
         {usePatterns && (
-          <div className={cx("im-page-header__patterns")}>
-            <div
-              className={cx(
-                "im-page-header__pattern",
-                "im-hero-header__pattern--0",
-              )}
-            ></div>
-            <div
-              className={cx(
-                "im-page-header__pattern",
-                "im-hero-header__pattern--1",
-              )}
-            ></div>
-            <div
-              className={cx(
-                "im-page-header__pattern",
-                "im-hero-header__pattern--2",
-              )}
-            ></div>
+          <div className={cx(Styles.patterns)}>
+            <div className={cx(Styles.pattern, Styles.pattern0)}></div>
+            <div className={cx(Styles.pattern, Styles.pattern1)}></div>
+            <div className={cx(Styles.pattern, Styles.pattern2)}></div>
           </div>
         )}
       </div>

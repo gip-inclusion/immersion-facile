@@ -9,7 +9,8 @@
     "typecheck": "tsc --noEmit",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
-    "lint": "pnpm -w lintconfig:glob ./libs/react-design-system/src"
+    "lint": "pnpm -w lintconfig:glob ./libs/react-design-system/src",
+    "make-styles": "scss-to-ts update"
   },
   "author": "",
   "license": "ISC",
@@ -39,7 +40,8 @@
     "require-from-string": "^2.0.2",
     "type-route": "^1.0.0",
     "typescript": "^4.9.5",
-    "webpack": ">=2.0.0"
+    "webpack": ">=2.0.0",
+    "scss-mapper": "workspace:*"
   },
   "dependencies": {
     "@codegouvfr/react-dsfr": "^0.37.1-rc.0",
