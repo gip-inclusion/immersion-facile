@@ -30,7 +30,6 @@
     "lint": "pnpm -w lintconfig:glob ./back/src",
     "typecheck": "tsc --noEmit",
     "migrate": "ts-node node_modules/node-pg-migrate/bin/node-pg-migrate -j ts -m src/adapters/secondary/pg/migrations",
-    "migrate-prod": "node node_modules/node-pg-migrate/bin/node-pg-migrate -m src/adapters/secondary/pg/migrations up",
     "fullcheck": "pnpm -w fullcheck --filter=back"
   },
   "keywords": [],

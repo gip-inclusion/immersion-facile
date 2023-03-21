@@ -34,6 +34,11 @@ sed -i "/\"types\": \"src\/index.ts\"/d" build/libs/html-templates/package.json
 sed -i "s/\"main\": \"src\/index.ts\"/\"main\": \"src\/index.js\"/"  build/libs/html-templates/package.json
 sed -i "/\"types\": \"src\/index.ts\"/d" build/shared/package.json
 sed -i "s/\"main\": \"src\/index.ts\"/\"main\": \"src\/index.js\"/"  build/shared/package.json
+# change ts-node scripts to node scripts
+sed -i "s/\"ts-node /\"node /g"  build/back/package.json
+sed -i -r "s/(\"node .*)(\.ts)/\1\.js/g"  build/back/package.json
+# change migration script from ts source files to js
+sed -i "s/node_modules\/node-pg-migrate\/bin\/node-pg-migrate -j ts/node_modules\/node-pg-migrate\/bin\/node-pg-migrate/"  build/back/package.json
 
 # For mac
 #sed -i "" -e "/\"types\": \"src\/index.ts\"/d" build/libs/http-client/package.json
@@ -42,8 +47,13 @@ sed -i "s/\"main\": \"src\/index.ts\"/\"main\": \"src\/index.js\"/"  build/share
 #sed -i "" -e "s/\"main\": \"src\/index.ts\"/\"main\": \"src\/index.js\"/"  build/libs/html-templates/package.json
 #sed -i "" -e "/\"types\": \"src\/index.ts\"/d" build/shared/package.json
 #sed -i "" -e "s/\"main\": \"src\/index.ts\"/\"main\": \"src\/index.js\"/"  build/shared/package.json
+## change ts-node scripts to node scripts
+#sed -i "" -e "s/\"ts-node /\"node /g"  build/back/package.json
+#sed -i "" -E "s/(\"node .*)(\.ts)/\1\.js/g"  build/back/package.json
+## change migration script from ts source files to js
+#sed -i "" -e "s/node_modules\/node-pg-migrate\/bin\/node-pg-migrate -j ts/node_modules\/node-pg-migrate\/bin\/node-pg-migrate/"  build/back/package.json
 
-echo "web: cd back && pnpm prod-tsc\npostdeploy: cd back && pnpm migrate-prod" > build/Procfile
+echo "web: cd back && pnpm prod-tsc\npostdeploy: cd back && pnpm migrate up" > build/Procfile
 echo "https://github.com/unfold/heroku-buildpack-pnpm" > build/.buildpacks
 
 echo "Making tar.gz from transpiled code"
