@@ -18,7 +18,7 @@ export type EnterpriseSearchResultProps = {
   disableButton?: boolean;
   preview?: boolean;
   showDistance?: boolean;
-  layout?: "fr-col-md-4" | "fr-col-md-6";
+  layout?: "fr-col-lg-4" | "fr-col-md-6";
 };
 
 const componentName = "im-search-result";
@@ -27,7 +27,7 @@ const SearchResultComponent = ({
   onButtonClick,
   establishment,
   preview,
-  layout = "fr-col-md-4",
+  layout = "fr-col-lg-4",
   showDistance = true,
 }: EnterpriseSearchResultProps) => {
   const { cx } = useStyles();
@@ -89,7 +89,7 @@ const SearchResultComponent = ({
   };
 
   return (
-    <div className={fr.cx("fr-col-12", layout)}>
+    <div className={fr.cx("fr-col-12", "fr-col-md-6", layout)}>
       <div className={cx(fr.cx("fr-card"), componentName)}>
         <div className={fr.cx("fr-card__body")}>
           <div className={fr.cx("fr-card__content")}>

@@ -20,6 +20,7 @@ export type PlaceAutocompleteProps = {
   inputValue?: string;
   initialInputValue?: string;
   onValueChange: (value: LookupSearchResult | null) => void;
+  onInputClear: () => void;
 };
 
 export const PlaceAutocomplete = ({
@@ -30,6 +31,7 @@ export const PlaceAutocomplete = ({
   placeholder = "Ex : Saint-Denis, La Réunion, France",
   description,
   onValueChange,
+  onInputClear,
   initialInputValue,
   id = "im-place-autocomplete",
 }: PlaceAutocompleteProps) => {
@@ -79,6 +81,8 @@ export const PlaceAutocomplete = ({
         }}
         onInputChange={(_, newInputValue, reason) => {
           if (inputValue !== newInputValue && reason === "input") {
+            if (newInputValue === "") onInputClear();
+
             dispatch(geosearchSlice.actions.queryHasChanged(newInputValue));
             setInputHasChanged(true);
           }

@@ -1,34 +1,38 @@
-import { Form, Formik } from "formik";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
+import { Route } from "type-route";
+import { useForm } from "react-hook-form";
+import { fr } from "@codegouvfr/react-dsfr";
+import { Button } from "@codegouvfr/react-dsfr/Button";
+import { useStyles } from "tss-react/dsfr";
+import { GenericOption, Select } from "@codegouvfr/react-dsfr/Select";
 import {
+  Loader,
   MainWrapper,
   PageHeader,
-  SectionTextEmbed,
   SectionAccordion,
-  Loader,
+  SectionTextEmbed,
 } from "react-design-system";
-import { Select } from "@codegouvfr/react-dsfr/Select";
-import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
-import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
-import { useSearchUseCase } from "src/app/hooks/search.hooks";
-import "./SearchPage.scss";
-import { SearchListResults } from "src/app/components/search/SearchListResults";
 import { domElementIds, SearchSortedBy } from "shared";
-
+import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
+import { PlaceAutocomplete } from "src/app/components/forms/autocomplete/PlaceAutocomplete";
+import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
+import { SearchListResults } from "src/app/components/search/SearchListResults";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { useSearchUseCase } from "src/app/hooks/search.hooks";
+import { routes } from "src/app/routes/routes";
+import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import {
   SearchPageParams,
   SearchStatus,
 } from "src/core-logic/domain/search/search.slice";
-import { Route } from "type-route";
-import { routes } from "src/app/routes/routes";
-import { PlaceAutocomplete } from "src/app/components/forms/autocomplete/PlaceAutocomplete";
-import { fr } from "@codegouvfr/react-dsfr";
-import { useStyles } from "tss-react/dsfr";
-import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
-import { Button } from "@codegouvfr/react-dsfr/Button";
+import "./SearchPage.scss";
 
-const radiusOptions = [1, 2, 5, 10, 20, 50, 100];
+const radiusOptions: GenericOption<number>[] = [1, 2, 5, 10, 20, 50, 100].map(
+  (distance) => ({
+    label: `${distance} km`,
+    value: distance,
+  }),
+);
 const sortedByOptions: { value: SearchSortedBy; label: string }[] = [
   { value: "distance", label: "Par proximité" },
   { value: "date", label: "Par date de publication" },
@@ -49,14 +53,16 @@ export const SearchPage = ({
     longitude: 0,
     distance_km: 10,
     place: "",
-    sortedBy: undefined,
+    sortedBy: "distance",
+    appellationCode: "",
+    appellationLabel: "",
+    rome: "",
+    romeLabel: "",
   };
-  const [formikValues, setFormikValues] =
-    useState<SearchPageParams>(initialValues);
 
   const availableForSearchRequest = (
     searchStatus: SearchStatus,
-    values: SearchPageParams,
+    values: Partial<SearchPageParams>,
   ): boolean => {
     const check =
       searchStatus !== "initialFetch" &&
@@ -68,15 +74,26 @@ export const SearchPage = ({
     return !!check;
   };
 
-  useEffect(() => {
-    if (
-      route &&
-      availableForSearchRequest(searchStatus, route.params as SearchPageParams)
-    ) {
-      setFormikValues(route.params as SearchPageParams);
-      searchUseCase(route.params as SearchPageParams);
-    }
-  }, []);
+  const routeParams = route.params as Partial<SearchPageParams>;
+  const methods = useForm<SearchPageParams>({
+    defaultValues: {
+      latitude: routeParams.latitude ?? initialValues.latitude,
+      longitude: routeParams.longitude ?? initialValues.longitude,
+      distance_km: routeParams.distance_km ?? initialValues.distance_km,
+      place: routeParams.place ?? initialValues.place,
+      appellationCode:
+        routeParams.appellationCode ?? initialValues.appellationCode,
+      appellationLabel:
+        routeParams.appellationLabel ?? initialValues.appellationLabel,
+      rome: routeParams.rome ?? initialValues.rome,
+      romeLabel: routeParams.romeLabel ?? initialValues.romeLabel,
+      sortedBy: routeParams.sortedBy ?? initialValues.sortedBy,
+    },
+    mode: "onTouched",
+  });
+  const { handleSubmit, setValue, register, watch } = methods;
+  const currentFormValues = watch();
+
   const getSearchResultsSummary = (resultsNumber: number) => {
     const plural = resultsNumber > 1 ? "s" : "";
     return (
@@ -85,6 +102,13 @@ export const SearchPage = ({
       </>
     );
   };
+
+  useEffect(() => {
+    if (availableForSearchRequest(searchStatus, currentFormValues)) {
+      searchUseCase(currentFormValues);
+    }
+  }, []);
+
   return (
     <HeaderFooterLayout>
       <MainWrapper vSpacing={0} layout="fullscreen">
@@ -92,149 +116,104 @@ export const SearchPage = ({
           title="Je trouve une entreprise pour réaliser mon immersion professionnelle"
           theme="candidate"
         >
-          <Formik<SearchPageParams>
-            initialValues={formikValues}
-            onSubmit={searchUseCase}
-            enableReinitialize={availableForSearchRequest(
-              searchStatus,
-              route.params as SearchPageParams,
+          <form
+            onSubmit={handleSubmit(searchUseCase)}
+            className={cx(
+              fr.cx("fr-grid-row", "fr-grid-row--gutters"),
+              "im-search-page__form",
+              "im-search-page__form--v2",
             )}
           >
-            {({ setFieldValue, values }) => (
-              <Form
-                className={cx(
-                  fr.cx("fr-grid-row", "fr-grid-row--gutters"),
-                  "im-search-page__form",
-                  "im-search-page__form--v2",
-                )}
-              >
-                <div
-                  className={cx(
-                    fr.cx("fr-col-12", "fr-col-lg-4"),
-                    "im-search-page__form-input-wrapper",
-                  )}
-                >
-                  <AppellationAutocomplete
-                    label="Je recherche le métier :"
-                    initialValue={{
-                      romeCode: route.params.rome ?? "",
-                      romeLabel: route.params.romeLabel ?? "",
-                      appellationLabel: route.params.appellationLabel ?? "",
-                      appellationCode: route.params.appellationCode ?? "",
-                    }}
-                    setFormValue={(newValue) => {
-                      const newAppellationValue = {
-                        romeLabel: newValue.romeLabel,
-                        rome: newValue.romeCode,
-                        appellationLabel: newValue.appellationLabel,
-                        appellationCode: newValue.appellationCode,
-                      };
-                      setFieldValue("rome", newAppellationValue.rome);
-                      setFieldValue("romeLabel", newAppellationValue.romeLabel);
-                      setFieldValue(
-                        "appellationCode",
-                        newAppellationValue.appellationCode,
-                      );
-                      setFieldValue(
-                        "appellationLabel",
-                        newAppellationValue.appellationLabel,
-                      );
-                      setFormikValues({
-                        ...values,
-                        ...newAppellationValue,
-                      });
-                    }}
-                    selectedAppellations={[
-                      {
-                        romeLabel: values.romeLabel ?? "",
-                        romeCode: values.rome ?? "",
-                        appellationCode: values.appellationCode ?? "",
-                        appellationLabel: values.appellationLabel ?? "",
-                      },
-                    ]}
-                    id={domElementIds.search.appellationAutocomplete}
-                  />
-                </div>
-                <div
-                  className={cx(
-                    fr.cx("fr-col-12", "fr-col-lg-4"),
-                    "im-search-page__form-input-wrapper",
-                  )}
-                >
-                  <PlaceAutocomplete
-                    label="Je me situe dans la ville de :"
-                    initialInputValue={formikValues.place}
-                    onValueChange={(lookupSearchResult) => {
-                      if (!lookupSearchResult) return;
-                      const { position, label } = lookupSearchResult;
-                      setFieldValue("latitude", position.lat);
-                      setFieldValue("longitude", position.lon);
-                      setFieldValue("place", label);
-                      setFormikValues({
-                        ...values,
-                        latitude: position.lat,
-                        longitude: position.lon,
-                        place: label,
-                      });
-                    }}
-                    id={domElementIds.search.placeAutocompleteInput}
-                  />
-                </div>
-                <div
-                  className={cx(
-                    fr.cx("fr-col-12", "fr-col-lg-2"),
-                    "im-search-page__form-input-wrapper",
-                  )}
-                >
-                  <Select
-                    label="Distance maximum"
-                    placeholder="Distance"
-                    options={radiusOptions.map((n, index) => ({
-                      label: `${n} km`,
-                      value: index,
-                    }))}
-                    nativeSelectProps={{
-                      id: domElementIds.search.distanceSelect,
-                      onChange: (event: React.ChangeEvent) => {
-                        //_newValue: string, selectedIndex: number
-                        const selectedIndex =
-                          (event.currentTarget as HTMLSelectElement)
-                            .selectedIndex - 1;
-                        setFieldValue(
-                          "distance_km",
-                          radiusOptions[selectedIndex],
-                        );
-                        setFormikValues({
-                          ...values,
-                          distance_km: radiusOptions[selectedIndex],
-                        });
-                      },
-                      value: radiusOptions.findIndex(
-                        (option) => option === values.distance_km,
-                      ),
-                    }}
-                  />
-                </div>
+            <div
+              className={cx(
+                fr.cx("fr-col-12", "fr-col-lg-4"),
+                "im-search-page__form-input-wrapper",
+              )}
+            >
+              <AppellationAutocomplete
+                label="Je recherche le métier :"
+                initialValue={{
+                  romeCode: routeParams.rome ?? "",
+                  romeLabel: routeParams.romeLabel ?? "",
+                  appellationLabel: routeParams.appellationLabel ?? "",
+                  appellationCode: routeParams.appellationCode ?? "",
+                }}
+                setFormValue={(newValue) => {
+                  setValue("rome", newValue.romeCode);
+                  setValue("romeLabel", newValue.romeLabel);
+                  setValue("appellationCode", newValue.appellationCode);
+                  setValue("appellationLabel", newValue.appellationLabel);
+                }}
+                selectedAppellations={[
+                  {
+                    romeLabel: currentFormValues.romeLabel ?? "",
+                    romeCode: currentFormValues.rome ?? "",
+                    appellationCode: currentFormValues.appellationCode ?? "",
+                    appellationLabel: currentFormValues.appellationLabel ?? "",
+                  },
+                ]}
+                id={domElementIds.search.appellationAutocomplete}
+              />
+            </div>
+            <div
+              className={cx(
+                fr.cx("fr-col-12", "fr-col-lg-4"),
+                "im-search-page__form-input-wrapper",
+              )}
+            >
+              <PlaceAutocomplete
+                label="Je me situe dans la ville de :"
+                initialInputValue={currentFormValues.place}
+                onValueChange={(lookupSearchResult) => {
+                  if (!lookupSearchResult) return;
+                  setValue("latitude", lookupSearchResult.position.lat);
+                  setValue("longitude", lookupSearchResult.position.lon);
+                  setValue("place", lookupSearchResult.label);
+                }}
+                id={domElementIds.search.placeAutocompleteInput}
+                onInputClear={() => {
+                  setValue("latitude", initialValues.latitude);
+                  setValue("longitude", initialValues.latitude);
+                  setValue("place", initialValues.place);
+                }}
+              />
+            </div>
+            <div
+              className={cx(
+                fr.cx("fr-col-12", "fr-col-lg-2"),
+                "im-search-page__form-input-wrapper",
+              )}
+            >
+              <Select
+                label="Distance maximum"
+                placeholder="Distance"
+                options={radiusOptions}
+                nativeSelectProps={{
+                  ...register("distance_km"),
+                  id: domElementIds.search.distanceSelect,
+                }}
+              />
+            </div>
 
-                <div
-                  className={cx(
-                    fr.cx("fr-col-12", "fr-col-lg-2"),
-                    "im-search-page__form-input-wrapper",
-                  )}
-                >
-                  <Button
-                    disabled={!availableForSearchRequest(searchStatus, values)}
-                    type="submit"
-                    nativeButtonProps={{
-                      id: domElementIds.search.searchSubmitButton,
-                    }}
-                  >
-                    Rechercher
-                  </Button>
-                </div>
-              </Form>
-            )}
-          </Formik>
+            <div
+              className={cx(
+                fr.cx("fr-col-12", "fr-col-lg-2"),
+                "im-search-page__form-input-wrapper",
+              )}
+            >
+              <Button
+                disabled={
+                  !availableForSearchRequest(searchStatus, currentFormValues)
+                }
+                type="submit"
+                nativeButtonProps={{
+                  id: domElementIds.search.searchSubmitButton,
+                }}
+              >
+                Rechercher
+              </Button>
+            </div>
+          </form>
         </PageHeader>
         <div className={fr.cx("fr-pt-6w")} ref={searchResultsWrapper}>
           {searchStatus === "ok" && (
@@ -275,16 +254,12 @@ export const SearchPage = ({
                               id={`${domElementIds.search.searchSortOptionBase}${index}`}
                               name="search-sort-option"
                               value={option.value}
-                              checked={formikValues.sortedBy === option.value}
-                              onChange={(_event) => {
-                                const selectedIndex = index;
-                                const newFormikValues = {
-                                  ...formikValues,
-                                  sortedBy:
-                                    sortedByOptions[selectedIndex]?.value,
-                                };
-                                setFormikValues(newFormikValues);
-                                searchUseCase(newFormikValues);
+                              checked={routeParams.sortedBy === option.value}
+                              onChange={() => {
+                                searchUseCase({
+                                  ...currentFormValues,
+                                  sortedBy: option.value,
+                                });
                               }}
                             />
                             <label
@@ -314,7 +289,7 @@ export const SearchPage = ({
                         <h2 className={fr.cx("fr-h5", "fr-mb-0")}>
                           {getSearchResultsSummary(searchResults.length)}
                         </h2>
-                        {route.params.rome && route.params.romeLabel && (
+                        {routeParams.rome && routeParams.romeLabel && (
                           <span
                             className={cx(
                               fr.cx("fr-text--xs"),
@@ -323,15 +298,15 @@ export const SearchPage = ({
                           >
                             pour la recherche{" "}
                             <strong className={fr.cx("fr-text--bold")}>
-                              {route.params.appellationLabel}
+                              {routeParams.appellationLabel}
                             </strong>
                             , étendue au secteur{" "}
                             <a
-                              href={`https://candidat.pole-emploi.fr/marche-du-travail/fichemetierrome?codeRome=${route.params.rome}`}
+                              href={`https://candidat.pole-emploi.fr/marche-du-travail/fichemetierrome?codeRome=${routeParams.rome}`}
                               target="_blank"
                               className={fr.cx("fr-text--bold")}
                             >
-                              {route.params.romeLabel}
+                              {routeParams.romeLabel}
                             </a>
                           </span>
                         )}
