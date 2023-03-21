@@ -96,7 +96,6 @@ const EditionSiretRelatedInputs = ({
   const featureFlags = useFeatureFlags();
   const { getFormFields } = useFormContents(formEstablishmentFieldsLabels);
   const formContents = getFormFields();
-
   const { register, setValue } = useFormContext();
   return (
     <>

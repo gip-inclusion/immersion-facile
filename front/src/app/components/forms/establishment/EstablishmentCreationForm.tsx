@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { useFormContext } from "react-hook-form";
 import { Input } from "@codegouvfr/react-dsfr/Input";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 import {
   addressDtoToString,
   defaultMaxContactsPerWeek,
@@ -9,19 +12,15 @@ import {
   OmitFromExistingKeys,
   SiretDto,
 } from "shared";
+import { defaultInitialValue } from "./defaultInitialValue";
+import { EstablishmentForm } from "./EstablishmentForm";
 import { establishmentGateway } from "src/config/dependencies";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { ENV } from "src/config/environmentVariables";
 import { useInitialSiret, useSiretFetcher } from "src/app/hooks/siret.hooks";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
-
-import { defaultInitialValue } from "./defaultInitialValue";
-import { EstablishmentForm } from "./EstablishmentForm";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
-import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import { Button } from "@codegouvfr/react-dsfr/Button";
-import { useFormContext } from "react-hook-form";
 
 type EstablishmentCreationFormProps = {
   source: FormEstablishmentSource;
@@ -137,15 +136,12 @@ const CreationSiretRelatedInputs = () => {
         />
       )}
       {requestEmailToEditFormError && (
-        <>
-          <Alert
-            severity="info"
-            title="La demande de modification n'a pas aboutie."
-            description={requestEmailToEditFormError}
-          />
-        </>
+        <Alert
+          severity="info"
+          title="La demande de modification n'a pas aboutie."
+          description={requestEmailToEditFormError}
+        />
       )}
-
       <Input
         {...formContents.businessName}
         nativeInputProps={{

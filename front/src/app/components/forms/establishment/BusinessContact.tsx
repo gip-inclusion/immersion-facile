@@ -10,9 +10,8 @@ import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishm
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 
 const preferredContactMethodOptions = (
-  register: UseFormRegisterReturn,
-): // register:UseFormRegister<FormEstablishmentDto>
-RadioButtonOption[] => [
+  register: UseFormRegisterReturn<string>,
+): RadioButtonOption[] => [
   {
     label:
       "Par mail (la demande passera par un formulaire afin de ne pas exposer l'adresse mail)",
@@ -42,7 +41,6 @@ export const BusinessContact = () => {
   const { getFormFields } = useFormContents(formEstablishmentFieldsLabels);
   const formContents = getFormFields();
   const { setValue, register, watch } = useFormContext<FormEstablishmentDto>();
-
   return (
     <div className={fr.cx("fr-input-group")}>
       <div>

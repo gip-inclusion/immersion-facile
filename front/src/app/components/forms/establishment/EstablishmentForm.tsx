@@ -1,14 +1,15 @@
 import React, { useState } from "react";
-import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { keys } from "ramda";
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Button from "@codegouvfr/react-dsfr/Button";
-import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
-import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { fr } from "@codegouvfr/react-dsfr";
+import { Button } from "@codegouvfr/react-dsfr/Button";
+import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
+import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { ErrorNotifications } from "react-design-system";
+
 import {
   AppellationDto,
   defaultMaxContactsPerWeek,
@@ -67,7 +68,6 @@ export const EstablishmentForm = ({
   if (getErrorsFromResponseData(submitError)) {
     errorMessage = submitError["response"]["data"]["errors"];
   }
-
   const methods = useForm<FormEstablishmentDto>({
     defaultValues: initialValues,
     resolver: zodResolver(formEstablishmentSchema),
@@ -256,7 +256,6 @@ export const EstablishmentForm = ({
               </p>
             </>
           )}
-
           {keys(errors).length === 0 && keys(touchedFields).length > 0 && (
             <SearchResultPreview establishment={getValues()} />
           )}
@@ -266,13 +265,11 @@ export const EstablishmentForm = ({
             visible={submitCount !== 0 && Object.values(errors).length > 0}
           />
           {submitError && (
-            <>
-              <Alert
-                severity="error"
-                title="Veuillez nous excuser. Un problème est survenu qui a compromis l'enregistrement de vos informations. "
-                description={errorMessage}
-              />
-            </>
+            <Alert
+              severity="error"
+              title="Veuillez nous excuser. Un problème est survenu qui a compromis l'enregistrement de vos informations. "
+              description={errorMessage}
+            />
           )}
           {isSuccess && (
             <Alert
