@@ -1,37 +1,57 @@
-import { useFormikContext } from "formik";
-import React from "react";
-import { ContactMethod, FormEstablishmentDto, zEmail } from "shared";
-import { RadioGroupForField } from "src/app/components/forms/commons/RadioGroup";
+import { fr } from "@codegouvfr/react-dsfr";
+import { Input } from "@codegouvfr/react-dsfr/Input";
+import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
+import React, {
+  DetailedHTMLProps,
+  InputHTMLAttributes,
+  ReactNode,
+} from "react";
+import { useFormContext } from "react-hook-form";
+import { FormEstablishmentDto, zEmail } from "shared";
 import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
-import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
-import { fr } from "@codegouvfr/react-dsfr";
-
-const preferredContactMethodOptions: Array<{
-  label?: string;
-  value: ContactMethod;
-}> = [
-  {
-    value: "EMAIL",
-    label:
-      "Par mail (la demande passera par un formulaire afin de ne pas exposer l'adresse mail)",
-  },
-  {
-    value: "PHONE",
-    label:
-      "Par téléphone (seuls les candidats identifiés auront accès au numéro de téléphone)",
-  },
-  {
-    value: "IN_PERSON",
-    label: "Se présenter en personne à votre établissement",
-  },
-];
 
 export const BusinessContact = () => {
   const { getFormFields } = useFormContents(formEstablishmentFieldsLabels);
   const formContents = getFormFields();
-  const { values, setFieldValue } = useFormikContext<FormEstablishmentDto>();
+  const { setValue, register, watch } = useFormContext<FormEstablishmentDto>();
+  //const { values, setFieldValue } = useFor<FormEstablishmentDto>();
+
+  const preferredContactMethodOptions =
+    (): // register:UseFormRegister<FormEstablishmentDto>
+    {
+      label: ReactNode;
+      hintText?: ReactNode;
+      nativeInputProps: DetailedHTMLProps<
+        InputHTMLAttributes<HTMLInputElement>,
+        HTMLInputElement
+      >;
+    }[] => [
+      {
+        label:
+          "Par mail (la demande passera par un formulaire afin de ne pas exposer l'adresse mail)",
+        nativeInputProps: {
+          value: "EMAIL",
+          // ...register
+        },
+      },
+      {
+        label:
+          "Par téléphone (seuls les candidats identifiés auront accès au numéro de téléphone)",
+        nativeInputProps: {
+          value: "PHONE",
+          // ...register
+        },
+      },
+      {
+        label: "Se présenter en personne à votre établissement",
+        nativeInputProps: {
+          value: "IN_PERSON",
+          //  ...register
+        },
+      },
+    ];
   return (
     <div className={fr.cx("fr-input-group")}>
       <div>
@@ -40,25 +60,41 @@ export const BusinessContact = () => {
         </h2>
         <p>Le correspondant reçoit les demandes et les traite.</p>
       </div>
-      <TextInput {...formContents["businessContact.lastName"]} />
-      <TextInput {...formContents["businessContact.firstName"]} />
-      <TextInput {...formContents["businessContact.job"]} />
-      <TextInput {...formContents["businessContact.phone"]} />
-      <TextInput {...formContents["businessContact.email"]} />
+      <Input
+        {...formContents["businessContact.lastName"]}
+        nativeInputProps={register("businessContact.lastName")}
+      />
+      <Input
+        {...formContents["businessContact.firstName"]}
+        nativeInputProps={register("businessContact.firstName")}
+      />
+      <Input
+        {...formContents["businessContact.job"]}
+        nativeInputProps={register("businessContact.job")}
+      />
+      <Input
+        {...formContents["businessContact.phone"]}
+        nativeInputProps={register("businessContact.phone")}
+      />
+      <Input
+        {...formContents["businessContact.email"]}
+        nativeInputProps={register("businessContact.email")}
+      />
       <MultipleEmailsInput
         {...formContents["businessContact.copyEmails"]}
-        valuesInList={values.businessContact.copyEmails}
+        valuesInList={watch().businessContact.copyEmails}
         setValues={(newValues) => {
-          setFieldValue("businessContact.copyEmails", newValues);
+          setValue("businessContact.copyEmails", newValues);
         }}
         validationSchema={zEmail}
       />
       <h2 className={fr.cx("fr-text--lead")}>
         Mises en relation avec les candidats :
       </h2>
-      <RadioGroupForField
+      <RadioButtons
         {...formContents["businessContact.contactMethod"]}
-        options={preferredContactMethodOptions}
+        {...register("businessContact.contactMethod")}
+        options={preferredContactMethodOptions()}
       />
     </div>
   );

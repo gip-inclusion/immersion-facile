@@ -11,7 +11,14 @@ export const defaultInitialValue = (
   siret: siret || "",
   businessName: "",
   businessAddress: "",
-  appellations: [],
+  appellations: [
+    {
+      appellationCode: "",
+      appellationLabel: "",
+      romeCode: "",
+      romeLabel: "",
+    },
+  ],
   businessContact: {
     firstName: "",
     lastName: "",

@@ -2,12 +2,7 @@ import {
   FormFieldAttributes,
   FormFieldAttributesForContent,
 } from "../contents/forms/types";
-import {
-  type FormState,
-  type FieldValues,
-  FieldErrorsImpl,
-} from "react-hook-form";
-import { keys } from "ramda";
+import { type FormState, type FieldValues } from "react-hook-form";
 
 export type FormFieldsObject<T> = Record<keyof T, FormFieldAttributes>;
 export type FormFieldsObjectForContent<T> = Record<
@@ -86,12 +81,16 @@ export const makeFieldError =
       : null;
 
 export const formErrorsToFlatErrors = (
-  formErrors: Partial<FieldErrorsImpl<any>>,
-) =>
-  keys(formErrors).reduce(
-    (acc, errorKey) => ({
-      ...acc,
-      [errorKey]: formErrors[errorKey as string]?.message,
-    }),
-    {},
-  );
+  obj: Record<string, any>,
+): Record<string, any> => {
+  for (const key in obj) {
+    if (key in obj) {
+      if (typeof obj[key] === "object" && "message" in obj[key]) {
+        obj[key] = obj[key].message;
+      } else if (typeof obj[key] === "object" && obj[key] !== null) {
+        formErrorsToFlatErrors(obj[key]);
+      }
+    }
+  }
+  return obj;
+};

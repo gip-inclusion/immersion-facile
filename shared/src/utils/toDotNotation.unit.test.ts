@@ -43,4 +43,64 @@ describe("toDotNotation utils", () => {
     };
     expect(toDotNotation(sample)).toStrictEqual(expected);
   });
+
+  it("should flatten react-hook-form errors object", () => {
+    const data = {
+      appellations: {
+        message: "Vous devez renseigner au moins un métier",
+        type: "too_small",
+      },
+      businessContact: {
+        firstName: {
+          message: "Obligatoire",
+          type: "too_small",
+          ref: {},
+        },
+        job: {
+          message: "Obligatoire",
+          type: "too_small",
+          ref: {},
+        },
+        phone: {
+          message: "Obligatoire",
+          type: "too_small",
+          ref: {},
+        },
+        contactMethod: {
+          message:
+            "Invalid enum value. Expected 'EMAIL' | 'PHONE' | 'IN_PERSON'",
+          type: "invalid_enum_value",
+          ref: {
+            type: "radio",
+            name: "businessContact.contactMethod",
+          },
+        },
+        email: {
+          message: "Veuillez saisir une adresse e-mail valide",
+          type: "invalid_string",
+          ref: {},
+        },
+      },
+    };
+
+    const expected = {
+      "appellations.message": "Vous devez renseigner au moins un métier",
+      "appellations.type": "too_small",
+      "businessContact.firstName.message": "Obligatoire",
+      "businessContact.firstName.type": "too_small",
+      "businessContact.job.message": "Obligatoire",
+      "businessContact.job.type": "too_small",
+      "businessContact.phone.message": "Obligatoire",
+      "businessContact.phone.type": "too_small",
+      "businessContact.contactMethod.message":
+        "Invalid enum value. Expected 'EMAIL' | 'PHONE' | 'IN_PERSON'",
+      "businessContact.contactMethod.type": "invalid_enum_value",
+      "businessContact.contactMethod.ref.type": "radio",
+      "businessContact.contactMethod.ref.name": "businessContact.contactMethod",
+      "businessContact.email.message":
+        "Veuillez saisir une adresse e-mail valide",
+      "businessContact.email.type": "invalid_string",
+    };
+    expect(toDotNotation(data)).toStrictEqual(expected);
+  });
 });

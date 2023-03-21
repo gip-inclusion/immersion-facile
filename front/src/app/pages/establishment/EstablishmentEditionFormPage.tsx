@@ -15,7 +15,7 @@ import { AddressAutocomplete } from "src/app/components/forms/autocomplete/Addre
 import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { Route } from "type-route";
 import { ApiDataContainer } from "../admin/ApiDataContainer";
-import { EstablishmentFormikForm } from "src/app/components/forms/establishment/EstablishmentFormikForm";
+import { EstablishmentForm } from "src/app/components/forms/establishment/EstablishmentForm";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 
@@ -62,7 +62,7 @@ export const EstablishmentEditionFormPage = ({
             ) : !route.params.jwt ? (
               <p>Lien non valide</p>
             ) : (
-              <EstablishmentFormikForm
+              <EstablishmentForm
                 initialValues={formEstablishment}
                 saveForm={onSaveForm(route)}
                 isEditing
@@ -70,7 +70,7 @@ export const EstablishmentEditionFormPage = ({
                 <EditionSiretRelatedInputs
                   businessAddress={formEstablishment.businessAddress}
                 />
-              </EstablishmentFormikForm>
+              </EstablishmentForm>
             )
           }
         </ApiDataContainer>

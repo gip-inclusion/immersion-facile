@@ -3,6 +3,8 @@ export const toDotNotation = (input: object, parentKey?: string) =>
     const value = input[key as keyof typeof input];
     const outputKey = parentKey ? `${parentKey}.${key}` : `${key}`;
     return value && typeof value === "object"
-      ? { ...acc, ...toDotNotation(value, outputKey) }
+      ? Object.keys(value).length > 0
+        ? { ...acc, ...toDotNotation(value, outputKey) }
+        : acc
       : { ...acc, [outputKey]: value };
   }, {});

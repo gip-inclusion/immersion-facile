@@ -1,35 +1,41 @@
-import { useField } from "formik";
+import { fr } from "@codegouvfr/react-dsfr";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 import React from "react";
 import { AppellationDto, removeAtIndex } from "shared";
-import { FormEstablishmentAppellation } from "./FormEstablishmentAppellation";
-import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
-import { Button } from "@codegouvfr/react-dsfr/Button";
+import { AppellationAutocomplete } from "../autocomplete/AppellationAutocomplete";
 
 type AppellationListProps = {
   name: string;
   title?: string;
+  value: AppellationDto[];
+  onChange: (value: AppellationDto[]) => void;
+  error?: string;
 };
 
-export const AppellationList = ({ name, title }: AppellationListProps) => {
+export const AppellationList = ({
+  name,
+  title,
+  value,
+  onChange,
+  error,
+}: AppellationListProps) => {
   const { cx } = useStyles();
-  const [field, { touched, error }, { setValue }] = useField<AppellationDto[]>({
-    name,
-  });
-
-  const appellations = field.value.length
-    ? field.value
-    : [
-        {
-          appellationCode: "",
-          appellationLabel: "",
-          romeCode: "",
-          romeLabel: "",
-        },
-      ];
+  const appellations = value;
 
   const onDelete = (index: number) => {
-    setValue(removeAtIndex(appellations, index));
+    const newAppellations =
+      appellations.length > 1
+        ? removeAtIndex(appellations, index)
+        : [
+            {
+              appellationCode: "",
+              appellationLabel: "",
+              romeCode: "",
+              romeLabel: "",
+            },
+          ];
+    onChange(newAppellations);
   };
 
   return (
@@ -37,12 +43,29 @@ export const AppellationList = ({ name, title }: AppellationListProps) => {
       <>
         {title && <h2 className={fr.cx("fr-text--lead")}>{title}</h2>}
         {appellations.map(({ appellationCode }, index) => (
-          <FormEstablishmentAppellation
-            name={`${name}[${index}]`}
-            onDelete={() => onDelete(index)}
+          <div
+            className={fr.cx("fr-grid-row", "fr-grid-row--bottom")}
             key={`${appellationCode}-${index}`}
-            selectedAppellations={appellations}
-          />
+          >
+            <div className={fr.cx("fr-col", "fr-mt-2w")}>
+              <AppellationAutocomplete
+                label={`Rechercher un métier * ${index}`}
+                initialValue={value[index]}
+                setFormValue={(selectedAppellation) => {
+                  onChange([...value, selectedAppellation]);
+                }}
+                selectedAppellations={appellations}
+              />
+            </div>
+            <Button
+              type="button"
+              iconId="fr-icon-delete-bin-line"
+              title="Suppression"
+              onClick={() => {
+                onDelete(index);
+              }}
+            />
+          </div>
         ))}
       </>
 
@@ -52,22 +75,22 @@ export const AppellationList = ({ name, title }: AppellationListProps) => {
         iconId="fr-icon-add-line"
         title="Ajouter un métier"
         priority="secondary"
-        onClick={() =>
-          setValue([
-            ...field.value,
+        onClick={() => {
+          onChange([
+            ...value,
             {
               romeCode: "",
               appellationCode: "",
               romeLabel: "",
               appellationLabel: "",
             },
-          ])
-        }
+          ]);
+        }}
       >
         Ajouter un métier
       </Button>
 
-      {touched && error && (
+      {error && error.length && (
         <div
           id={name + "-error-description"}
           className={fr.cx("fr-error-text")}

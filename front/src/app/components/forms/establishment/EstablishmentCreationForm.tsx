@@ -1,5 +1,5 @@
-import { useField } from "formik";
 import React, { useState, useEffect } from "react";
+import { Input } from "@codegouvfr/react-dsfr/Input";
 import {
   addressDtoToString,
   defaultMaxContactsPerWeek,
@@ -12,23 +12,16 @@ import {
 import { establishmentGateway } from "src/config/dependencies";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { ENV } from "src/config/environmentVariables";
-import {
-  useInitialSiret,
-  useSiretFetcher,
-  useSiretRelatedField,
-} from "src/app/hooks/siret.hooks";
+import { useInitialSiret, useSiretFetcher } from "src/app/hooks/siret.hooks";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 
-import {
-  TextInput,
-  TextInputControlled,
-} from "src/app/components/forms/commons/TextInput";
 import { defaultInitialValue } from "./defaultInitialValue";
-import { EstablishmentFormikForm } from "./EstablishmentFormikForm";
+import { EstablishmentForm } from "./EstablishmentForm";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import { useFormContext } from "react-hook-form";
 
 type EstablishmentCreationFormProps = {
   source: FormEstablishmentSource;
@@ -46,14 +39,14 @@ export const EstablishmentCreationForm = ({
     isSearchable: true,
   };
   return (
-    <EstablishmentFormikForm
+    <EstablishmentForm
       initialValues={creationInitialValues}
       saveForm={async (data) => {
         await establishmentGateway.addFormEstablishment(data);
       }}
     >
       <CreationSiretRelatedInputs />
-    </EstablishmentFormikForm>
+    </EstablishmentForm>
   );
 };
 
@@ -68,28 +61,47 @@ const CreationSiretRelatedInputs = () => {
   } = useSiretFetcher({ shouldFetchEvenIfAlreadySaved: false });
   const [requestEmailToEditFormSucceed, setRequestEmailToEditFormSucceed] =
     useState(false);
-
+  const {
+    setValue,
+    register,
+    formState: { touchedFields },
+  } = useFormContext<FormEstablishmentDto>();
   const [requestEmailToEditFormError, setRequestEmailToEditFormError] =
     useState<string | null>(null);
   const { getFormFields } = useFormContents(formEstablishmentFieldsLabels);
   const formContents = getFormFields();
-  useSiretRelatedField("businessName");
-  useSiretRelatedField("businessAddress");
-  useSiretRelatedField("nafDto");
+
+  useEffect(() => {
+    if (isFetchingSiret) return;
+    setValue(
+      "businessName",
+      establishmentInfos ? establishmentInfos.businessName : "",
+    );
+    setValue(
+      "businessAddress",
+      establishmentInfos ? establishmentInfos.businessAddress : "",
+    );
+    setValue("naf", establishmentInfos ? establishmentInfos.nafDto : undefined);
+  }, [establishmentInfos]);
+
   const featureFlags = useFeatureFlags();
 
-  const [_, __, { setValue: setAddressValue }] = useField<string>(
-    formContents.businessAddress.name,
-  );
-  useEffect(() => () => updateSiret(""), []);
   return (
     <>
-      <TextInputControlled
+      <Input
         {...formContents.siret}
-        value={currentSiret}
-        setValue={updateSiret}
-        error={siretErrorToDisplay}
-        placeholder="362 521 879 00034"
+        nativeInputProps={{
+          ...formContents.siret,
+          ...register("siret"),
+          onChange: (event) => {
+            updateSiret(event.target.value);
+            setValue("siret", event.target.value);
+          },
+        }}
+        state={siretErrorToDisplay && touchedFields.siret ? "error" : "default"}
+        stateRelatedMessage={
+          touchedFields.siret && siretErrorToDisplay ? siretErrorToDisplay : ""
+        }
         disabled={isFetchingSiret}
       />
       {siretRawError === "Establishment with this siret is already in our DB" &&
@@ -134,19 +146,27 @@ const CreationSiretRelatedInputs = () => {
         </>
       )}
 
-      <TextInput
+      <Input
         {...formContents.businessName}
-        readOnly={featureFlags.enableInseeApi}
+        nativeInputProps={{
+          ...formContents.businessName,
+          ...register("businessName"),
+          readOnly: featureFlags.enableInseeApi,
+        }}
       />
-      <TextInput
+      <Input
         {...formContents.businessNameCustomized}
-        disabled={isFetchingSiret}
+        nativeInputProps={{
+          ...formContents.businessNameCustomized,
+          ...register("businessNameCustomized"),
+          readOnly: isFetchingSiret,
+        }}
       />
       <AddressAutocomplete
         initialSearchTerm={establishmentInfos?.businessAddress}
         {...formContents.businessAddress}
         setFormValue={({ address }) =>
-          setAddressValue(addressDtoToString(address))
+          setValue("businessAddress", addressDtoToString(address))
         }
         id={domElementIds.establishment.establishmentFormAddressAutocomplete}
         disabled={isFetchingSiret}
