@@ -54,7 +54,7 @@ pnpm generate-front-envfile
 Le `.env` permet de configurer le mode de fonctionnement de l'application.
 Par défaut tous les services sont IN_MEMORY.
 On peut lancer avec une base de données postgres simplement en mettant `REPOSITORIES="PG"`.
-Le conteneur faisant parti du docker-compose et la PG_URL étant fourni, cela devrait fonctionner sans autre configuration.
+Le conteneur faisant parti du docker-compose et la DATABASE_URL étant fourni, cela devrait fonctionner sans autre configuration.
 
 Les autres services ont une implémentation IN_MEMORY mais pour fonctionner avec les véritables services il faut fournir les secrets /clés API.
 Ce n'est pas censé être nécessaire en local, si jamais c'était le cas, veuillez vous rapprocher de l'équipe.

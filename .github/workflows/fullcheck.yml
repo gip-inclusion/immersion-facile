@@ -79,4 +79,4 @@ jobs:
           echo $PG_TEST_URL
           STORAGE_FULL_PATH=$(pwd)/back/storage
           mkdir -p $STORAGE_FULL_PATH/tmp/ 
-          PG_URL=$PG_TEST_URL STORAGE_ROOT=$STORAGE_FULL_PATH pnpm back test:integration
+          DATABASE_URL=$PG_TEST_URL STORAGE_ROOT=$STORAGE_FULL_PATH pnpm back test:integration

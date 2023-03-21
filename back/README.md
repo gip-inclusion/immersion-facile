@@ -3,6 +3,7 @@ You need node 12+ to use the app :
 **Install**
 
 The install is done with pnpm from the **root of the project**
+
 ```
 pnpm install
 ```
@@ -28,27 +29,32 @@ npm run test:unit
 ```
 
 Integration tests :
-  1. Ensure that you have a docker daemon/agent running on your machine.
 
-  1. Clear out any old data to ensure you initialize the database with the latest schema and test data.
-     ```sh
-     immersion-facile$ rm -rf docker-data/
-     ```
+1. Ensure that you have a docker daemon/agent running on your machine.
 
-  1. At the very least you will need to run the `postgres` container as well as the `back` container which initializes the database at startup:
-     ```sh
-     immersion-facile$ docker-compose -f docker-compose.resources.yml up --build
-     ```
-     Observe the log output to ensure the database has been properly initialized.
-  1. Run DB migration : 
+1. Clear out any old data to ensure you initialize the database with the latest schema and test data.
+
+   ```sh
+   immersion-facile$ rm -rf docker-data/
+   ```
+
+1. At the very least you will need to run the `postgres` container as well as the `back` container which initializes the database at startup:
+   ```sh
+   immersion-facile$ docker-compose -f docker-compose.resources.yml up --build
+   ```
+   Observe the log output to ensure the database has been properly initialized.
+1. Run DB migration :
+
+
     ```sh
     npm run migrate up
     ```
-  1. Execute the integration tests in a separate shell"
-     ```
-     immersion-facile$ cd back
-     back$ npm run test:integration
-     ```
+
+1. Execute the integration tests in a separate shell"
+   ```
+   immersion-facile$ cd back
+   back$ npm run test:integration
+   ```
 
 End to end tests :
 
@@ -64,15 +70,14 @@ The simplest way to get a back-end up and running is using the command:
 immersion-facile$ cd back/
 back$ npm start
 ```
-If you're using PG repositories and you're running locally, you need to set PG_URL host to `localhost` (see commented lines in .env.sample file) 
 
+If you're using PG repositories and you're running locally, you need to set DATABASE_URL host to `localhost` (see commented lines in .env.sample file)
 
 The back-end will be accessible on `http://localhost:1234`. The default behaviour when no environment variables are specified (see below) is as follows:
 
 - fake in-memory versions of all secondary adapters are used
 - event crawling is disabled
 - all log messages of level `info` or higher are printed to the console
-
 
 ### Generating JWT keys
 
@@ -82,7 +87,7 @@ A pair of asymmetric keys is used for signing JWTs. These are kept in JWT_PRIVAT
 openssl ecparam -name prime256v1 -genkey -noout -out private.ec.key && openssl ec -in private.ec.key -pubout -out public.pem
 ```
 
-Note that this requires OpenSSL (`brew install openssl`);  you can generate an EC key pair through any other cryptographic tool.
+Note that this requires OpenSSL (`brew install openssl`); you can generate an EC key pair through any other cryptographic tool.
 
 You can then copy-paste the variable contents into `.env`, or export it:
 
@@ -93,9 +98,9 @@ export JWT_PRIVATE_KEY=$(cat ./private.ec.key) JWT_PUBLIC_KEY=$(cat ./public.pem
 ### Rotation of JWT keys
 
 If the JWT keys need to be changed, it should be done by :
-- setting the old keys in the variables `JWT_PREVIOUS_PUBLIC_KEY` and `JWT_PREVIOUS_PRIVATE_KEY`,
-- creating a new pair of keys (like explained just before), and putting them in the variables : `JWT_PUBLIC_KEY` and `JWT_PRIVATE_KEY` 
 
+- setting the old keys in the variables `JWT_PREVIOUS_PUBLIC_KEY` and `JWT_PREVIOUS_PRIVATE_KEY`,
+- creating a new pair of keys (like explained just before), and putting them in the variables : `JWT_PUBLIC_KEY` and `JWT_PRIVATE_KEY`
 
 ### Specifying environment variables
 
@@ -211,7 +216,7 @@ An [AppConfig](src/adapters/primary/config/appConfig.ts) instance must be provid
 
    ```ts
    const appConfig = AppConfig.createFromEnv();
-   const { app } = await createApp(appConfig)
+   const { app } = await createApp(appConfig);
    app.listen(port);
    ```
 
@@ -221,9 +226,9 @@ An [AppConfig](src/adapters/primary/config/appConfig.ts) instance must be provid
 
    ```ts
    beforeEach(async () => {
-      const config = new AppConfigBuilder().enableAdminUi().build();
-      const { app } = await createApp(config);
-      request = supertest(app);
+     const config = new AppConfigBuilder().enableAdminUi().build();
+     const { app } = await createApp(config);
+     request = supertest(app);
    });
    ```
 
@@ -267,7 +272,6 @@ beforeEach(async () => {
 });
 ```
 
-
 # Asynchronous Event Processing
 
 This section describes the workings of our event processing setup and explains how to perform various operations relating to it.
@@ -279,36 +283,40 @@ TODO(jburkhard/jfmacresy): Describe the architecture and how to schedule events.
 Quarantined events are recorded in the outbox just like regular events, but the EventBus will make no attempt to publish them.
 
 There is currently only one way to quarantine events:
-* If the event's domain topic is included in the `QUARANTINED_TOPICS` environment variable, all newly created events will automatically be marked as quarantined.
+
+- If the event's domain topic is included in the `QUARANTINED_TOPICS` environment variable, all newly created events will automatically be marked as quarantined.
 
   This is meant for dealing with production issues: if we find that certain events causes bugs crashes, we can quickly disable their processing until we have fixed the bug.
 
- Quarantining could be used in other scenarios in the future, e.g. individual events could be quarantined after 3 unsuccessful processing attempts.
+Quarantining could be used in other scenarios in the future, e.g. individual events could be quarantined after 3 unsuccessful processing attempts.
 
 # Data Processing Pipelines
 
-This section describes how to work with our pipelines, both locally and remotely. We will use the *start-update-establishments-from-sirene* pipeline (currently our only pipeline) as an example throughout this section:
+This section describes how to work with our pipelines, both locally and remotely. We will use the _start-update-establishments-from-sirene_ pipeline (currently our only pipeline) as an example throughout this section:
 
 ## Code structure
+
 The source code is located in `back/src` so that it can take advantage of the adapters and other helpers implemented there.
 
 ## Production setup
 
 We use a docker container that is running [cron](https://en.wikipedia.org/wiki/Cron) to schedule the execution of the pipelines. The main configuration files are
-  * [docker-compose.yml](../docker-compose.yml)
-    * defines the `pipelines` docker container
-  * [back/Dockerfile.pipelines](../Dockerfile.pipelines)
-    * creates the docker image
-  * [back/bin/start_pipelines_cron.sh](./bin/start_pipelines_cron.sh):
-    * initializes the docker container
-    * defines the execution schedule (crontab)
-    * runs cron
+
+- [docker-compose.yml](../docker-compose.yml)
+  - defines the `pipelines` docker container
+- [back/Dockerfile.pipelines](../Dockerfile.pipelines)
+  - creates the docker image
+- [back/bin/start_pipelines_cron.sh](./bin/start_pipelines_cron.sh):
+  - initializes the docker container
+  - defines the execution schedule (crontab)
+  - runs cron
 
 Each pipeline has its own log file, to which log output will be appended by every new run (e.g. `docker-data/pipelines/logs/start-update-establishments-from-sirene.log`). The log directory is mapped to a filesystem volume in order to persist across restarts of the docker container.
 
 ## Running a pipeline locally
 
 Each pipeline has its own `npm start` script with which it can be started:
+
 ```
 back$ npm run start-update-establishments-from-sirene
 ```
@@ -318,17 +326,19 @@ As with the back-end, we use environment variables for parametrization.
 ## Running the pipelines docker container
 
 Alternatively, you can execute it inside a local docker container:
+
 ```
 immersion-facile$ docker-compose up --build pipelines
 ```
-If you're using PG repositories and you're running with docker, you need to set PG_URL host to `postgres` (see commented lines in .env.sample file) 
 
+If you're using PG repositories and you're running with docker, you need to set DATABASE_URL host to `postgres` (see commented lines in .env.sample file)
 
-Doing this will start `cron`, which will execute all registered pipelines according to their default schedules (e.g. *establishmentBackfill* is run every day at midnight).
+Doing this will start `cron`, which will execute all registered pipelines according to their default schedules (e.g. _establishmentBackfill_ is run every day at midnight).
 
 You can **override the default schedule** by explicitly setting the `$ESTABLISHMENT_UPDATE_FROM_SIRENE` environment variable (see [Specifying environment variables](#Specifying-environment-variables)).
 
-Example: To start a container that schedules a run of *update-establishments-from-sirene* every 10 minutes:
+Example: To start a container that schedules a run of _update-establishments-from-sirene_ every 10 minutes:
+
 ```
 immersion-facile$ $ESTABLISHMENT_UPDATE_FROM_SIRENE="*/10 * * * *" docker-compose up --build pipelines
 ```

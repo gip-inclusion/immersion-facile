@@ -50,13 +50,6 @@ export class AppConfigBuilder implements Builder<AppConfig> {
     });
   }
 
-  public withPgUrl(PG_URL: string) {
-    return new AppConfigBuilder({
-      ...this.configParams,
-      PG_URL,
-    });
-  }
-
   public withAuthorizedApiKeyIds(authorizedApiKeyIds: string[]) {
     return new AppConfigBuilder({
       ...this.configParams,
