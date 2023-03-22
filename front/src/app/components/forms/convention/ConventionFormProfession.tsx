@@ -44,7 +44,9 @@ export const ConventionFormProfession = ({
         <AppellationAutocomplete
           label={label}
           initialValue={initialFieldValue}
-          setFormValue={setValue}
+          onAppellationSelected={(appellation) => {
+            setValue(appellation);
+          }}
           description={description}
         />
         {error && <TextInputError errorMessage={error} />}

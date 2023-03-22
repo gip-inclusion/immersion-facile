@@ -144,7 +144,7 @@ export const SearchPage = ({
                   appellationLabel: formValues.appellationLabel ?? "",
                   appellationCode: formValues.appellationCode ?? "",
                 }}
-                setFormValue={(newValue) => {
+                onAppellationSelected={(newValue) => {
                   setValue("rome", newValue.romeCode);
                   setValue("romeLabel", newValue.romeLabel);
                   setValue("appellationCode", newValue.appellationCode);

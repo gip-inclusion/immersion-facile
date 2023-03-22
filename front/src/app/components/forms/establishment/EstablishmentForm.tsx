@@ -1,14 +1,15 @@
-//import { Form, Formik } from "formik";
+import React, { useState } from "react";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
-import React, { useState } from "react";
+import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { ErrorNotifications } from "react-design-system";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
-import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { keys } from "ramda";
 import {
   AppellationDto,
   defaultMaxContactsPerWeek,
@@ -26,13 +27,12 @@ import {
   useFormContents,
 } from "src/app/hooks/formContents.hooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
+import { BusinessContact } from "./BusinessContact";
 import {
   emptyAppellation,
   MultipleAppellationInput,
 } from "./MultipleAppellationInput";
-import { BusinessContact } from "./BusinessContact";
 import { SearchResultPreview } from "./SearchResultPreview";
-import { zodResolver } from "@hookform/resolvers/zod";
 
 type EstablishmentFormProps = {
   initialValues: FormEstablishmentDto;
@@ -76,17 +76,13 @@ export const EstablishmentForm = ({
   const {
     handleSubmit,
     register,
-    watch,
     setValue,
     getValues,
-    formState: { errors, submitCount, isSubmitting },
+    formState: { errors, submitCount, isSubmitting, touchedFields },
   } = methods;
   const onSubmit: SubmitHandler<FormEstablishmentDto> = async (data) => {
     setIsSuccess(false);
     setSubmitError(null);
-
-    //formEstablishmentSchema.parse(data);
-    console.log({ data });
     return saveForm(data)
       .then(() => {
         setIsSuccess(true);
@@ -234,7 +230,9 @@ export const EstablishmentForm = ({
               hintText={formContents.maxContactsPerWeek.description}
               nativeInputProps={{
                 ...formContents.maxContactsPerWeek,
-                ...register("maxContactsPerWeek"),
+                ...register("maxContactsPerWeek", {
+                  valueAsNumber: true,
+                }),
                 type: "number",
                 min: 0,
                 pattern: "\\d*",
@@ -256,8 +254,8 @@ export const EstablishmentForm = ({
             </>
           )}
 
-          {Object.values(errors).length === 0 && (
-            <SearchResultPreview establishment={watch()} />
+          {keys(errors).length === 0 && keys(touchedFields).length > 0 && (
+            <SearchResultPreview establishment={getValues()} />
           )}
           <ErrorNotifications
             labels={getFormErrors()}
