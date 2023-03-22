@@ -1,23 +1,23 @@
-import { useField } from "formik";
 import React from "react";
+import { Input } from "@codegouvfr/react-dsfr/Input";
+import { MainWrapper, PageHeader } from "react-design-system";
+import { useFormContext } from "react-hook-form";
 import {
   addressDtoToString,
+  decodeMagicLinkJwtWithoutSignatureCheck,
   EstablishmentJwtPayload,
   FormEstablishmentDto,
 } from "shared";
-import { MainWrapper, PageHeader } from "react-design-system";
-import { decodeMagicLinkJwtWithoutSignatureCheck } from "shared";
-import { establishmentGateway } from "src/config/dependencies";
-import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
-import { routes } from "src/app/routes/routes";
-import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
-import { TextInput } from "src/app/components/forms/commons/TextInput";
+import { EstablishmentForm } from "src/app/components/forms/establishment/EstablishmentForm";
+import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
+import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
+import { useFormContents } from "src/app/hooks/formContents.hooks";
+import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
+import { routes } from "src/app/routes/routes";
+import { establishmentGateway } from "src/config/dependencies";
 import { Route } from "type-route";
 import { ApiDataContainer } from "../admin/ApiDataContainer";
-import { EstablishmentForm } from "src/app/components/forms/establishment/EstablishmentForm";
-import { useFormContents } from "src/app/hooks/formContents.hooks";
-import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 
 export const EstablishmentEditionFormPage = ({
   route,
@@ -87,23 +87,35 @@ const EditionSiretRelatedInputs = ({
   const featureFlags = useFeatureFlags();
   const { getFormFields } = useFormContents(formEstablishmentFieldsLabels);
   const formContents = getFormFields();
-  const [_, __, { setValue: setAddressValue }] = useField<string>(
-    formContents.businessAddress.name,
-  );
 
+  const { register, setValue } = useFormContext();
   return (
     <>
-      <TextInput {...formContents.siret} disabled={true} />
-      <TextInput
-        {...formContents.businessName}
-        readOnly={featureFlags.enableInseeApi}
+      <Input
+        {...formContents.siret}
+        disabled={true}
+        nativeInputProps={{
+          ...register("siret"),
+        }}
       />
-      <TextInput {...formContents.businessNameCustomized} />
+      <Input
+        {...formContents.businessName}
+        nativeInputProps={{
+          ...register("businessName"),
+          readOnly: featureFlags.enableInseeApi,
+        }}
+      />
+      <Input
+        {...formContents.businessNameCustomized}
+        nativeInputProps={{
+          ...register("businessNameCustomized"),
+        }}
+      />
       <AddressAutocomplete
         initialSearchTerm={businessAddress}
         {...formContents.businessAddress}
         setFormValue={({ address }) =>
-          setAddressValue(addressDtoToString(address))
+          setValue("businessAddress", addressDtoToString(address))
         }
       />
     </>
