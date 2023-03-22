@@ -24,7 +24,7 @@ const romeSearchMatchToProposal = ({
 type AppellationAutocompleteProps = {
   label: string;
   initialValue?: AppellationDto | undefined;
-  setFormValue: (p: AppellationDto) => void;
+  onAppellationSelected: (p: AppellationDto) => void;
   className?: string;
   selectedAppellations?: AppellationDto[];
   description?: string;
@@ -36,7 +36,7 @@ type Option = Proposal<AppellationDto>;
 
 export const AppellationAutocomplete = ({
   initialValue,
-  setFormValue,
+  onAppellationSelected,
   label,
   className,
   selectedAppellations = [],
@@ -123,7 +123,7 @@ export const AppellationAutocomplete = ({
         onChange={(_, selectedOption: Option | null) => {
           if (selectedOption) {
             setSelectedOption(selectedOption);
-            setFormValue(
+            onAppellationSelected(
               selectedOption
                 ? selectedOption.value
                 : {

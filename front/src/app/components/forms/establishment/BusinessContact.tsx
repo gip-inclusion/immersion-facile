@@ -6,11 +6,47 @@ import React, {
   InputHTMLAttributes,
   ReactNode,
 } from "react";
-import { useFormContext } from "react-hook-form";
+import { useFormContext, UseFormRegisterReturn } from "react-hook-form";
 import { FormEstablishmentDto, zEmail } from "shared";
 import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
+
+const preferredContactMethodOptions = (
+  register: UseFormRegisterReturn,
+): // register:UseFormRegister<FormEstablishmentDto>
+{
+  label: ReactNode;
+  hintText?: ReactNode;
+  nativeInputProps: DetailedHTMLProps<
+    InputHTMLAttributes<HTMLInputElement>,
+    HTMLInputElement
+  >;
+}[] => [
+  {
+    label:
+      "Par mail (la demande passera par un formulaire afin de ne pas exposer l'adresse mail)",
+    nativeInputProps: {
+      value: "EMAIL",
+      ...register,
+    },
+  },
+  {
+    label:
+      "Par téléphone (seuls les candidats identifiés auront accès au numéro de téléphone)",
+    nativeInputProps: {
+      value: "PHONE",
+      ...register,
+    },
+  },
+  {
+    label: "Se présenter en personne à votre établissement",
+    nativeInputProps: {
+      value: "IN_PERSON",
+      ...register,
+    },
+  },
+];
 
 export const BusinessContact = () => {
   const { getFormFields } = useFormContents(formEstablishmentFieldsLabels);
@@ -18,40 +54,6 @@ export const BusinessContact = () => {
   const { setValue, register, watch } = useFormContext<FormEstablishmentDto>();
   //const { values, setFieldValue } = useFor<FormEstablishmentDto>();
 
-  const preferredContactMethodOptions =
-    (): // register:UseFormRegister<FormEstablishmentDto>
-    {
-      label: ReactNode;
-      hintText?: ReactNode;
-      nativeInputProps: DetailedHTMLProps<
-        InputHTMLAttributes<HTMLInputElement>,
-        HTMLInputElement
-      >;
-    }[] => [
-      {
-        label:
-          "Par mail (la demande passera par un formulaire afin de ne pas exposer l'adresse mail)",
-        nativeInputProps: {
-          value: "EMAIL",
-          // ...register
-        },
-      },
-      {
-        label:
-          "Par téléphone (seuls les candidats identifiés auront accès au numéro de téléphone)",
-        nativeInputProps: {
-          value: "PHONE",
-          // ...register
-        },
-      },
-      {
-        label: "Se présenter en personne à votre établissement",
-        nativeInputProps: {
-          value: "IN_PERSON",
-          //  ...register
-        },
-      },
-    ];
   return (
     <div className={fr.cx("fr-input-group")}>
       <div>
@@ -94,7 +96,9 @@ export const BusinessContact = () => {
       <RadioButtons
         {...formContents["businessContact.contactMethod"]}
         {...register("businessContact.contactMethod")}
-        options={preferredContactMethodOptions()}
+        options={preferredContactMethodOptions(
+          register("businessContact.contactMethod"),
+        )}
       />
     </div>
   );

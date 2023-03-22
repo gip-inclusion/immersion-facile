@@ -10,11 +10,13 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import {
+  AppellationDto,
   defaultMaxContactsPerWeek,
   FormEstablishmentDto,
   formEstablishmentSchema,
   immersionFacileContactEmail,
   noContactPerWeek,
+  removeAtIndex,
   SiretDto,
   toDotNotation,
 } from "shared";
@@ -24,7 +26,10 @@ import {
   useFormContents,
 } from "src/app/hooks/formContents.hooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
-import { AppellationList } from "./AppellationList";
+import {
+  emptyAppellation,
+  MultipleAppellationInput,
+} from "./MultipleAppellationInput";
 import { BusinessContact } from "./BusinessContact";
 import { SearchResultPreview } from "./SearchResultPreview";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -81,7 +86,7 @@ export const EstablishmentForm = ({
     setSubmitError(null);
 
     //formEstablishmentSchema.parse(data);
-
+    console.log({ data });
     return saveForm(data)
       .then(() => {
         setIsSuccess(true);
@@ -175,13 +180,22 @@ export const EstablishmentForm = ({
           <h2 className={fr.cx("fr-text--lead", "fr-mb-2w")}>
             Les métiers que vous proposez à l'immersion :
           </h2>
-          <AppellationList
-            name={formContents.appellations.name}
-            title={formContents.appellations.label}
-            onChange={(appellations) => {
-              setValue("appellations", appellations);
+          <MultipleAppellationInput
+            {...formContents.appellations}
+            onAppellationAdd={(appellation, index) => {
+              const appellationsToUpdate = getValues("appellations");
+              appellationsToUpdate[index] = appellation;
+              setValue("appellations", appellationsToUpdate);
             }}
-            value={getValues("appellations")}
+            onAppellationDelete={(appellationIndex) => {
+              const appellationsToUpdate = getValues("appellations");
+              const newAppellations: AppellationDto[] =
+                appellationIndex === 0 && appellationsToUpdate.length === 1
+                  ? [emptyAppellation]
+                  : removeAtIndex(getValues("appellations"), appellationIndex);
+              setValue("appellations", newAppellations);
+            }}
+            currentAppellations={getValues("appellations")}
             error={errors?.appellations?.message}
           />
           <BusinessContact />
@@ -190,7 +204,7 @@ export const EstablishmentForm = ({
             <Checkbox
               hintText={`${
                 isSearchable
-                  ? "(décochez la case si vous ne  voulez pas être visible sur la recherche)."
+                  ? "(décochez la case si vous ne voulez pas être visible sur la recherche)."
                   : "(cochez la case si vous voulez être visible sur la recherche)."
               } Vous pourrez réactiver la visibilité à tout moment`}
               legend="L'entreprise est-elle recherchable par les utilisateurs ?"
