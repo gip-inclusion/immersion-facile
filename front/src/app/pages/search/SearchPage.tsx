@@ -26,6 +26,7 @@ import {
   SearchStatus,
 } from "src/core-logic/domain/search/search.slice";
 import "./SearchPage.scss";
+import { keys } from "ramda";
 
 const radiusOptions: GenericOption<number>[] = [1, 2, 5, 10, 20, 50, 100].map(
   (distance) => ({
@@ -76,19 +77,13 @@ export const SearchPage = ({
 
   const routeParams = route.params as Partial<SearchPageParams>;
   const methods = useForm<SearchPageParams>({
-    defaultValues: {
-      latitude: routeParams.latitude ?? initialValues.latitude,
-      longitude: routeParams.longitude ?? initialValues.longitude,
-      distance_km: routeParams.distance_km ?? initialValues.distance_km,
-      place: routeParams.place ?? initialValues.place,
-      appellationCode:
-        routeParams.appellationCode ?? initialValues.appellationCode,
-      appellationLabel:
-        routeParams.appellationLabel ?? initialValues.appellationLabel,
-      rome: routeParams.rome ?? initialValues.rome,
-      romeLabel: routeParams.romeLabel ?? initialValues.romeLabel,
-      sortedBy: routeParams.sortedBy ?? initialValues.sortedBy,
-    },
+    defaultValues: keys(initialValues).reduce(
+      (acc, currentKey) => ({
+        ...acc,
+        [currentKey]: routeParams[currentKey] ?? initialValues[currentKey],
+      }),
+      {},
+    ),
     mode: "onTouched",
   });
   const { handleSubmit, setValue, register, watch } = methods;
@@ -133,10 +128,10 @@ export const SearchPage = ({
               <AppellationAutocomplete
                 label="Je recherche le métier :"
                 initialValue={{
-                  romeCode: routeParams.rome ?? "",
-                  romeLabel: routeParams.romeLabel ?? "",
-                  appellationLabel: routeParams.appellationLabel ?? "",
-                  appellationCode: routeParams.appellationCode ?? "",
+                  romeCode: currentFormValues.rome ?? "",
+                  romeLabel: currentFormValues.romeLabel ?? "",
+                  appellationLabel: currentFormValues.appellationLabel ?? "",
+                  appellationCode: currentFormValues.appellationCode ?? "",
                 }}
                 setFormValue={(newValue) => {
                   setValue("rome", newValue.romeCode);
