@@ -194,6 +194,19 @@ const EmailVariableField = ({
 export const defaultEmailValueByEmailKind: {
   [K in TemplateName]: Parameters<TemplateByName[K]["createEmailVariables"]>[0];
 } = {
+  SIGNATORY_FIRST_REMINDER: {
+    actorFirstName: "ACTOR_FIRSTNAME",
+    actorLastName: "ACTOR_LASTNAME",
+    beneficiaryFirstName: "BENEFICIARY_FIRSTNAME",
+    beneficiaryLastName: "BENEFICIARY_LASTNAME",
+    businessName: "BUSINESS_NAME",
+    signatoriesSummary: [
+      `- ✔️  - A signé le 19/03/2023 - BENEFICIARY_FIRSTNAME BENEFICIARY_LASTNAME, bénéficiaire`,
+      `- ❌ - N'as pas signé - BENEFICIARY_CURRENT_EMPLOYER_FIRSTNAME BENEFICIARY_CURRENT_EMPLOYER_FIRSTNAME, employeur actuel du bénéficiaire`,
+      `- ❌ - N'as pas signé - ESTABLISHMENT_REPRESENTATIVE_FIRSTNAME ESTABLISHMENT_REPRESENTATIVE_FIRSTNAME, représentant l'entreprise BUSINESS_NAME`,
+    ].join("\n"),
+    magicLinkUrl: "http://----MAGICLINK----",
+  },
   AGENCY_FIRST_REMINDER: {
     agencyMagicLinkUrl: "CONVENTION_VERIFICATION_LINK",
     agencyName: "AGENCY_NAME",

@@ -126,6 +126,9 @@ export type Signatories<T extends InternshipKind = InternshipKind> = {
 export type SignatoryRole =
   Required<Signatories>[keyof Required<Signatories>]["role"];
 
+export const isSignatoryRole = (role: Role): role is SignatoryRole =>
+  signatoryRoles.includes(role as SignatoryRole);
+
 export type Signatory = GenericSignatory<SignatoryRole>;
 
 export const signatoryRoles: SignatoryRole[] = [
@@ -137,7 +140,7 @@ export const signatoryRoles: SignatoryRole[] = [
   "establishment-representative",
 ];
 
-type GenericActor<R extends Role> = {
+export type GenericActor<R extends Role> = {
   role: R;
   email: string;
   phone: string;

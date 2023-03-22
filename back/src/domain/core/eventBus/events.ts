@@ -12,7 +12,7 @@ import { RenewMagicLinkPayload } from "../../convention/useCases/notifications/D
 import { ConventionRequiresModificationPayload } from "../../convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 import { IdentityProvider } from "../../generic/OAuth/entities/OngoingOAuth";
 import { EstablishmentAggregate } from "../../immersionOffer/entities/EstablishmentEntity";
-import { ConventionSignReminderPayload } from "../eventsPayloads/ConventionSignReminderPayload";
+import { ConventionReminderPayload } from "../eventsPayloads/ConventionReminderPayload";
 import type { DateStr } from "../ports/TimeGateway";
 
 export type SubscriptionId = Flavor<string, "SubscriptionId">;
@@ -46,7 +46,7 @@ export type DomainEvent =
   | GenericEvent<"ImmersionApplicationFullySigned", ConventionDto>
   | GenericEvent<"ImmersionApplicationAcceptedByCounsellor", ConventionDto>
   | GenericEvent<"ImmersionApplicationAcceptedByValidator", ConventionDto>
-  | GenericEvent<"ConventionSignReminder",ConventionSignReminderPayload>
+  | GenericEvent<"ConventionReminder",ConventionReminderPayload>
 
   // UNHAPPY PATHS
   | GenericEvent<"ImmersionApplicationRejected", ConventionDto>

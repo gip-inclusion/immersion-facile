@@ -25,6 +25,43 @@ const createConventionStatusButton = (link: string): EmailButtonProps => ({
 
 // to add a new EmailType, or changes the params of one, edit first EmailParamsByEmailType and let types guide you
 export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
+  SIGNATORY_FIRST_REMINDER: {
+    niceName: "Signataire - Premier rappel",
+    tags: [""],
+    createEmailVariables: ({
+      actorFirstName,
+      actorLastName,
+      beneficiaryFirstName,
+      beneficiaryLastName,
+      businessName,
+      signatoriesSummary,
+      magicLinkUrl,
+    }) => ({
+      subject:
+        "RAPPEL - La convention démarrant d'ici 3 jours n'est pas complètement signée",
+      greetings: `Bonjour ${actorFirstName} ${actorLastName},`,
+      content: `
+      Certain signataires n'ont pas encore signé la demande de convention d'immersion en milieu professionnel pour ${beneficiaryFirstName} ${beneficiaryLastName}.
+      
+      Voici à date l'état des signatures:
+      ${signatoriesSummary}
+
+      <strong>Sans toutes les signatures, la convention ne peut être établie et l'établissement ${businessName} ne pourra pas accueillir en immersion ${beneficiaryFirstName} ${beneficiaryLastName}.</strong>
+
+      Nous vous remercions de confirmer au plus vite cette demande.
+
+      Bonne journée,
+
+      L'équipe Immersion Facilitée
+      `,
+      buttons: magicLinkUrl && [
+        {
+          label: "Ouvrir la demande de convention",
+          url: `${magicLinkUrl}`,
+        },
+      ],
+    }),
+  },
   AGENCY_FIRST_REMINDER: {
     niceName: "Agence - Premier rappel",
     tags: [""],

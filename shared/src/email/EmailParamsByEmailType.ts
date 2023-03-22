@@ -13,6 +13,15 @@ export type EmailParamsByEmailType = {
     dateEnd: string;
   };
   // eslint-disable-next-line @typescript-eslint/ban-types
+  SIGNATORY_FIRST_REMINDER: {
+    actorFirstName: string;
+    actorLastName: string;
+    businessName: string;
+    beneficiaryFirstName: string;
+    beneficiaryLastName: string;
+    signatoriesSummary: string;
+    magicLinkUrl?: AbsoluteUrl;
+  };
   AGENCY_LAST_REMINDER: {
     agencyMagicLinkUrl: string;
     beneficiaryFirstName: string;

@@ -3,7 +3,7 @@ import { ConventionDto, ConventionId, ConventionStatus } from "shared";
 import { z } from "zod";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainEvent } from "../../core/eventBus/events";
-import { ReminderType } from "../../core/eventsPayloads/ConventionSignReminderPayload";
+import { ReminderType } from "../../core/eventsPayloads/ConventionReminderPayload";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -124,10 +124,10 @@ export class ConventionsReminder extends TransactionalUseCase<
           {
             id: conventionId,
             event: this.createNewEvent({
-              topic: "ConventionSignReminder",
+              topic: "ConventionReminder",
               payload: {
                 conventionId,
-                type: reminderType,
+                reminderType,
               },
             }),
           },

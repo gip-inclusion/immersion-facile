@@ -164,6 +164,13 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     );
   }
 
+  public withBeneficiarySignedAt(signedAt?: Date) {
+    return this.withBeneficiary({
+      ...this.dto.signatories.beneficiary,
+      signedAt: signedAt && signedAt.toISOString(),
+    });
+  }
+
   public withBeneficiaryRepresentative(
     beneficiaryRepresentative: BeneficiaryRepresentative | undefined,
   ): ConventionDtoBuilder {
@@ -268,10 +275,30 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     );
   }
 
+  public withEstablishmentRepresentativeFirstName(firstName: string) {
+    return this.withEstablishmentRepresentative({
+      ...this.dto.signatories.establishmentRepresentative,
+      firstName,
+    });
+  }
+  public withEstablishmentRepresentativeLastName(lastName: string) {
+    return this.withEstablishmentRepresentative({
+      ...this.dto.signatories.establishmentRepresentative,
+      lastName,
+    });
+  }
+
   public withEstablishmentRepresentativeEmail(email: string) {
     return this.withEstablishmentRepresentative({
       ...this.establishmentRepresentative,
       email,
+    });
+  }
+
+  public withEstablishmentRepresentativeSignedAt(signedAt?: Date) {
+    return this.withEstablishmentRepresentative({
+      ...this.establishmentRepresentative,
+      signedAt: signedAt && signedAt.toISOString(),
     });
   }
 

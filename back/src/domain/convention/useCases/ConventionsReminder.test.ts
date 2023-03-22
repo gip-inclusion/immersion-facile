@@ -22,6 +22,7 @@ import { ConventionsReminder } from "./ConventionsReminder";
 describe("RemindConventionsNeedSignature use case", () => {
   const now = new Date("2023-03-17");
   const eventIds = ["event-1", "event-2", "event-3", "event-4"];
+  const topic = "ConventionReminder";
   let uow: InMemoryUnitOfWork;
   let useCase: ConventionsReminder;
   let outboxRepository: InMemoryOutboxRepository;
@@ -133,13 +134,14 @@ describe("RemindConventionsNeedSignature use case", () => {
       const conventionsForAgencies = conventions.filter((convention) =>
         (["IN_REVIEW"] as ConventionStatus[]).includes(convention.status),
       );
+
       const expectedEvents: DomainEvent[] = [
         {
           id: eventIds[0],
           occurredAt: now.toISOString(),
-          topic: "ConventionSignReminder",
+          topic,
           payload: {
-            type: "FirstReminderForSignatories",
+            reminderType: "FirstReminderForSignatories",
             conventionId: conventionsForActors[0].id,
           },
           publications: [],
@@ -148,9 +150,9 @@ describe("RemindConventionsNeedSignature use case", () => {
         {
           id: eventIds[1],
           occurredAt: now.toISOString(),
-          topic: "ConventionSignReminder",
+          topic,
           payload: {
-            type: "FirstReminderForSignatories",
+            reminderType: "FirstReminderForSignatories",
             conventionId: conventionsForActors[1].id,
           },
           publications: [],
@@ -159,9 +161,9 @@ describe("RemindConventionsNeedSignature use case", () => {
         {
           id: eventIds[2],
           occurredAt: now.toISOString(),
-          topic: "ConventionSignReminder",
+          topic,
           payload: {
-            type: "FirstReminderForAgency",
+            reminderType: "FirstReminderForAgency",
             conventionId: conventionsForAgencies[0].id,
           },
           publications: [],
@@ -212,9 +214,9 @@ describe("RemindConventionsNeedSignature use case", () => {
         .map((convention, index) => ({
           id: eventIds[index],
           occurredAt: now.toISOString(),
-          topic: "ConventionSignReminder",
+          topic,
           payload: {
-            type: "LastReminderForSignatories",
+            reminderType: "LastReminderForSignatories",
             conventionId: convention.id,
           },
           publications: [],
@@ -263,9 +265,9 @@ describe("RemindConventionsNeedSignature use case", () => {
         {
           id: eventIds[0],
           occurredAt: now.toISOString(),
-          topic: "ConventionSignReminder",
+          topic,
           payload: {
-            type: "LastReminderForSignatories",
+            reminderType: "LastReminderForSignatories",
             conventionId: conventionsNeeds48[0].id,
           },
           publications: [],
@@ -274,9 +276,9 @@ describe("RemindConventionsNeedSignature use case", () => {
         {
           id: eventIds[1],
           occurredAt: now.toISOString(),
-          topic: "ConventionSignReminder",
+          topic,
           payload: {
-            type: "LastReminderForSignatories",
+            reminderType: "LastReminderForSignatories",
             conventionId: conventionsNeeds48[1].id,
           },
           publications: [],
@@ -285,9 +287,9 @@ describe("RemindConventionsNeedSignature use case", () => {
         {
           id: eventIds[2],
           occurredAt: now.toISOString(),
-          topic: "ConventionSignReminder",
+          topic,
           payload: {
-            type: "LastReminderForAgency",
+            reminderType: "LastReminderForAgency",
             conventionId: conventionsNeeds24[0].id,
           },
           publications: [],

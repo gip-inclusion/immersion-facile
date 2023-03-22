@@ -10,13 +10,13 @@ const reminderTypes = [
 
 export type ReminderType = (typeof reminderTypes)[number];
 
-export type ConventionSignReminderPayload = {
-  type: ReminderType;
+export type ConventionReminderPayload = {
+  reminderType: ReminderType;
   conventionId: ConventionId;
 };
 
-export const conventionSignReminderPayloadSchema: z.Schema<ConventionSignReminderPayload> =
+export const conventionReminderPayloadSchema: z.Schema<ConventionReminderPayload> =
   z.object({
-    type: z.enum(reminderTypes),
+    reminderType: z.enum(reminderTypes),
     conventionId: z.string(),
   });

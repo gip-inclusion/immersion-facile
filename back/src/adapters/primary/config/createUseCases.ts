@@ -79,7 +79,7 @@ import {
   makeGenerateEditFormEstablishmentUrl,
 } from "./magicLinkUrl";
 import { LookupLocation } from "../../../domain/address/useCases/LookupLocation";
-import { NotifyThatConventionStillNeedToBeSigned } from "../../../domain/convention/useCases/notifications/NotifyThatConventionStillNeedToBeSigned";
+import { NotifyConventionReminder } from "../../../domain/convention/useCases/notifications/NotifyConventionReminder";
 
 export const createUseCases = (
   config: AppConfig,
@@ -197,13 +197,12 @@ export const createUseCases = (
         gateways.timeGateway,
         config.immersionFacileBaseUrl,
       ),
-      notifyThatConventionStillNeedToBeSigned:
-        new NotifyThatConventionStillNeedToBeSigned(
-          uowPerformer,
-          gateways.email,
-          gateways.timeGateway,
-          generateConventionMagicLinkUrl,
-        ),
+      notifyConventionReminder: new NotifyConventionReminder(
+        uowPerformer,
+        gateways.email,
+        gateways.timeGateway,
+        generateConventionMagicLinkUrl,
+      ),
 
       // immersionOffer
       searchImmersion: new SearchImmersion(uowPerformer, uuidGenerator),
