@@ -55,10 +55,10 @@ export const SearchPage = ({
     distance_km: 10,
     place: "",
     sortedBy: "distance",
-    appellationCode: "",
-    appellationLabel: "",
-    rome: "",
-    romeLabel: "",
+    appellationCode: undefined,
+    appellationLabel: undefined,
+    rome: undefined,
+    romeLabel: undefined,
   };
 
   const availableForSearchRequest = (
@@ -74,7 +74,14 @@ export const SearchPage = ({
       values.latitude !== 0;
     return !!check;
   };
-
+  const filterFormValues = (values: SearchPageParams) =>
+    keys(values).reduce(
+      (acc, key) => ({
+        ...acc,
+        ...(values[key] ? { [key]: values[key] } : {}),
+      }),
+      {} as SearchPageParams,
+    );
   const routeParams = route.params as Partial<SearchPageParams>;
   const methods = useForm<SearchPageParams>({
     defaultValues: keys(initialValues).reduce(
@@ -100,7 +107,7 @@ export const SearchPage = ({
 
   useEffect(() => {
     if (availableForSearchRequest(searchStatus, currentFormValues)) {
-      searchUseCase(currentFormValues);
+      searchUseCase(filterFormValues(currentFormValues));
     }
   }, []);
 
@@ -112,7 +119,9 @@ export const SearchPage = ({
           theme="candidate"
         >
           <form
-            onSubmit={handleSubmit(searchUseCase)}
+            onSubmit={handleSubmit(() =>
+              searchUseCase(filterFormValues(currentFormValues)),
+            )}
             className={cx(
               fr.cx("fr-grid-row", "fr-grid-row--gutters"),
               "im-search-page__form",

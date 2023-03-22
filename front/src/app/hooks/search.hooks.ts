@@ -7,7 +7,6 @@ import {
 
 export const useSearchUseCase = () => {
   const dispatch = useDispatch();
-
   return (values: SearchPageParams) => {
     dispatch(searchSlice.actions.searchRequested(values));
     routes.search(values).replace();
