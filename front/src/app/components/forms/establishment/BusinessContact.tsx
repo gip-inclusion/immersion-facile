@@ -63,12 +63,12 @@ export const BusinessContact = () => {
         <p>Le correspondant reçoit les demandes et les traite.</p>
       </div>
       <Input
-        {...formContents["businessContact.lastName"]}
-        nativeInputProps={register("businessContact.lastName")}
-      />
-      <Input
         {...formContents["businessContact.firstName"]}
         nativeInputProps={register("businessContact.firstName")}
+      />
+      <Input
+        {...formContents["businessContact.lastName"]}
+        nativeInputProps={register("businessContact.lastName")}
       />
       <Input
         {...formContents["businessContact.job"]}
