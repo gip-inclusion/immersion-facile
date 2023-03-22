@@ -52,7 +52,6 @@ export const BusinessContact = () => {
   const { getFormFields } = useFormContents(formEstablishmentFieldsLabels);
   const formContents = getFormFields();
   const { setValue, register, watch } = useFormContext<FormEstablishmentDto>();
-  //const { values, setFieldValue } = useFor<FormEstablishmentDto>();
 
   return (
     <div className={fr.cx("fr-input-group")}>
