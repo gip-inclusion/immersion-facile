@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { keys } from "ramda";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import { keys } from "ramda";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
@@ -9,7 +9,6 @@ import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { ErrorNotifications } from "react-design-system";
-
 import {
   AppellationDto,
   defaultMaxContactsPerWeek,
@@ -102,7 +101,6 @@ export const EstablishmentForm = ({
         Bienvenue sur l'espace de référencement des entreprises volontaires pour
         l'accueil des immersions professionnelles.
       </p>
-
       <p>
         En référençant votre entreprise, vous rejoignez la communauté{" "}
         <a href={"https://lesentreprises-sengagent.gouv.fr/"} target={"_blank"}>
@@ -116,7 +114,6 @@ export const EstablishmentForm = ({
         établissements, il convient de renseigner un formulaire pour chaque
         établissement (Siret différent).
       </p>
-
       <p className={fr.cx("fr-text--xs")}>
         Tous les champs marqués d'une astérisque (*) sont obligatoires.
       </p>

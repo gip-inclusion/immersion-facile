@@ -1,9 +1,11 @@
 import React, { useEffect, useRef } from "react";
+import { keys } from "ramda";
 import { Route } from "type-route";
+import { domElementIds, GeoPositionDto, SearchSortedBy } from "shared";
 import { useForm, useWatch } from "react-hook-form";
+import { useStyles } from "tss-react/dsfr";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import { useStyles } from "tss-react/dsfr";
 import { GenericOption, Select } from "@codegouvfr/react-dsfr/Select";
 import {
   Loader,
@@ -12,22 +14,20 @@ import {
   SectionAccordion,
   SectionTextEmbed,
 } from "react-design-system";
-import { domElementIds, GeoPositionDto, SearchSortedBy } from "shared";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { useSearchUseCase } from "src/app/hooks/search.hooks";
+import { routes } from "src/app/routes/routes";
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
 import { PlaceAutocomplete } from "src/app/components/forms/autocomplete/PlaceAutocomplete";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import Styles from "./SearchPage.styles";
 import { SearchListResults } from "src/app/components/search/SearchListResults";
-import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { useSearchUseCase } from "src/app/hooks/search.hooks";
-import { routes } from "src/app/routes/routes";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import {
   SearchPageParams,
   SearchStatus,
 } from "src/core-logic/domain/search/search.slice";
 import "./SearchPage.scss";
-import { keys } from "ramda";
 
 const radiusOptions: GenericOption<number>[] = [1, 2, 5, 10, 20, 50, 100].map(
   (distance) => ({
@@ -35,6 +35,7 @@ const radiusOptions: GenericOption<number>[] = [1, 2, 5, 10, 20, 50, 100].map(
     value: distance,
   }),
 );
+
 const sortedByOptions: { value: SearchSortedBy; label: string }[] = [
   { value: "distance", label: "Par proximité" },
   { value: "date", label: "Par date de publication" },
@@ -48,7 +49,6 @@ export const SearchPage = ({
   const { cx } = useStyles();
   const searchStatus = useAppSelector(searchSelectors.searchStatus);
   const searchResults = useAppSelector(searchSelectors.searchResults);
-
   const searchUseCase = useSearchUseCase();
   const searchResultsWrapper = useRef<HTMLDivElement>(null);
   const initialValues: SearchPageParams = {
@@ -62,7 +62,6 @@ export const SearchPage = ({
     rome: undefined,
     romeLabel: undefined,
   };
-
   const availableForSearchRequest = (
     searchStatus: SearchStatus,
     { lat, lon }: GeoPositionDto,
@@ -306,7 +305,7 @@ export const SearchPage = ({
 
           <SectionAccordion />
           <SectionTextEmbed
-            videoUrl=" https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise.mp4"
+            videoUrl="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise.mp4"
             videoPosterUrl="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise_poster.webp"
             videoDescription="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise_transcript.vtt"
             videoTranscription="https://immersion.cellar-c2.services.clever-cloud.com/video_immersion_en_entreprise_transcript.txt"
