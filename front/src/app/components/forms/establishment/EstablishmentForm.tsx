@@ -33,6 +33,7 @@ import {
   MultipleAppellationInput,
 } from "./MultipleAppellationInput";
 import { SearchResultPreview } from "./SearchResultPreview";
+import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 
 type EstablishmentFormProps = {
   initialValues: FormEstablishmentDto;
@@ -128,39 +129,13 @@ export const EstablishmentForm = ({
           <RadioButtons
             {...formContents.isEngagedEnterprise}
             legend={formContents.isEngagedEnterprise.label}
-            options={[
-              {
-                label: "Oui",
-                nativeInputProps: {
-                  value: 1,
-                },
-              },
-              {
-                label: "Non",
-                nativeInputProps: {
-                  value: 0,
-                },
-              },
-            ]}
+            options={booleanSelectOptions}
             disabled={false}
           />
           <RadioButtons
             {...formContents.fitForDisabledWorkers}
             legend={formContents.fitForDisabledWorkers.label}
-            options={[
-              {
-                label: "Oui",
-                nativeInputProps: {
-                  value: 1,
-                },
-              },
-              {
-                label: "Non",
-                nativeInputProps: {
-                  value: 0,
-                },
-              },
-            ]}
+            options={booleanSelectOptions}
             disabled={false}
           />
           <Input

@@ -4,6 +4,7 @@ import {
   OmitFromExistingKeys,
   SiretDto,
 } from "shared";
+import { emptyAppellation } from "./MultipleAppellationInput";
 
 export const defaultInitialValue = (
   siret?: SiretDto,
@@ -11,14 +12,7 @@ export const defaultInitialValue = (
   siret: siret || "",
   businessName: "",
   businessAddress: "",
-  appellations: [
-    {
-      appellationCode: "",
-      appellationLabel: "",
-      romeCode: "",
-      romeLabel: "",
-    },
-  ],
+  appellations: [emptyAppellation],
   businessContact: {
     firstName: "",
     lastName: "",
