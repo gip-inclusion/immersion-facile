@@ -7,7 +7,7 @@ on:
         required: true
         type: string
     secrets:
-      SCALINGO_API_TOKEN_V2:
+      SCALINGO_API_TOKEN:
         required: true
 
 jobs:
@@ -27,7 +27,7 @@ jobs:
         with:
           name: front-build-${{github.sha}}
       - name: Login to scalingo
-        run: scalingo login --api-token ${{ secrets.SCALINGO_API_TOKEN_V2 }}
+        run: scalingo login --api-token ${{ secrets.SCALINGO_API_TOKEN }}
       - name: Deploy back
         run: scalingo --app if-${{inputs.envType}}-back deploy back-build.tar.gz
       - name: Deploy front

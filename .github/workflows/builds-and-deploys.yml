@@ -62,4 +62,13 @@ jobs:
     with:
       envType: "dev"
     secrets:
-      SCALINGO_API_TOKEN_V2: ${{ secrets.SCALINGO_API_TOKEN_V2 }}
+      SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN_V2 }}
+
+  deploy-staging:
+    needs: [deploy-dev, build-front-artefact, build-back-artefact]
+    if: ${{github.ref}} == "refs/heads/staging"
+    uses: ./.github/workflows/deploy-to-scalingo.yml
+    with:
+      envType: "staging"
+    secrets:
+      SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN_V2 }}
