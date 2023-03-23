@@ -56,8 +56,7 @@ jobs:
           path: back/back-build.tar.gz
 
   deploy-dev:
-    branches:
-      - dev
+    if: github.ref == 'refs/heads/dev'
     needs: [validation, build-front-artefact, build-back-artefact]
     uses: ./.github/workflows/deploy-to-scalingo.yml
     with:
@@ -66,8 +65,7 @@ jobs:
       SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN_V2 }}
 
   deploy-staging:
-    branches:
-      - staging
+    if: github.ref == 'refs/heads/staging'
     needs: [build-front-artefact, build-back-artefact]
     uses: ./.github/workflows/deploy-to-scalingo.yml
     with:
