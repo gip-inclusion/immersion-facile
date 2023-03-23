@@ -5,7 +5,7 @@ variables:
   POSTGRES_PASSWORD: pg_password
   POSTGRES_PORT: 5432
   POSTGRES_HOST_AUTH_METHOD: trust
-  PG_TEST_URL: postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:$POSTGRES_PORT/$POSTGRES_DB
+  TEST_DATABASE_URL: postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:$POSTGRES_PORT/$POSTGRES_DB
   STORAGE_ROOT_RELATIVE: /back/storage
 
 image: node:16.15-buster
@@ -27,8 +27,8 @@ validations:
     - pnpm install --frozen-lockfile --ignore-scripts
     - STORAGE_FULL_PATH=$(pwd)$STORAGE_ROOT_RELATIVE
     - mkdir -p $STORAGE_FULL_PATH/tmp/
-    - NODE_ENV=test DATABASE_URL=$PG_TEST_URL pnpm back migrate up
-    - DATABASE_URL=$PG_TEST_URL STORAGE_ROOT=$STORAGE_FULL_PATH pnpm back test:integration
+    - NODE_ENV=test DATABASE_URL=$TEST_DATABASE_URL pnpm back migrate up
+    - DATABASE_URL=$TEST_DATABASE_URL STORAGE_ROOT=$STORAGE_FULL_PATH pnpm back test:integration
     - STORAGE_ROOT=$STORAGE_FULL_PATH pnpm fullcheck --concurrency=2
 
 #sonarqube-check:

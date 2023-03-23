@@ -85,9 +85,7 @@ export class AppConfig {
   }
 
   public get pgImmersionDbUrl() {
-    if (this.nodeEnv === "production")
-      return this.throwIfNotDefined("DATABASE_URL");
-    return `postgresql://immersion:pg_password@localhost:5432/immersion-db`;
+    return this.throwIfNotDefined("DATABASE_URL");
   }
 
   // == Sirene repository ==
