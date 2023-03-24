@@ -1,0 +1,2 @@
+web: cd back && pnpm prod-tsc
+postdeploy: cd back && pnpm migrate up
