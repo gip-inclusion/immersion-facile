@@ -1,0 +1,27 @@
+name: "Build front"
+
+on:
+  workflow_call:
+
+jobs:
+  build-front-artefact:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16.x"
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build front
+        run: pnpm front build-scalingo
+      - name: Archive build
+        uses: actions/upload-artifact@v3
+        with:
+          name: front-build-${{github.sha}}
+          path: front/front-build.tar.gz

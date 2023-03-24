@@ -1,0 +1,27 @@
+name: "Build back"
+
+on:
+  workflow_call:
+
+jobs:
+  build-back-artefact:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16.x"
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build backend
+        run: pnpm back build
+      - name: Archive build
+        uses: actions/upload-artifact@v3
+        with:
+          name: back-build-${{github.sha}}
+          path: back/back-build.tar.gz
