@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { Route } from "type-route";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { useStyles } from "tss-react/dsfr";
@@ -12,7 +12,7 @@ import {
   SectionAccordion,
   SectionTextEmbed,
 } from "react-design-system";
-import { domElementIds, SearchSortedBy } from "shared";
+import { domElementIds, GeoPositionDto, SearchSortedBy } from "shared";
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
 import { PlaceAutocomplete } from "src/app/components/forms/autocomplete/PlaceAutocomplete";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
@@ -63,15 +63,13 @@ export const SearchPage = ({
 
   const availableForSearchRequest = (
     searchStatus: SearchStatus,
-    values: Partial<SearchPageParams>,
+    { lat, lon }: GeoPositionDto,
   ): boolean => {
     const check =
       searchStatus !== "initialFetch" &&
       searchStatus !== "extraFetch" &&
-      values.longitude &&
-      values.latitude &&
-      values.longitude !== 0 &&
-      values.latitude !== 0;
+      lon !== 0 &&
+      lat !== 0;
     return !!check;
   };
   const filterFormValues = (values: SearchPageParams) =>
@@ -93,8 +91,12 @@ export const SearchPage = ({
     ),
     mode: "onTouched",
   });
-  const { handleSubmit, setValue, register, watch } = methods;
-  const currentFormValues = watch();
+  const { handleSubmit, setValue, register, control, getValues } = methods;
+  const formValues = getValues();
+  const [lat, lon] = useWatch({
+    control,
+    name: ["latitude", "longitude"],
+  });
 
   const getSearchResultsSummary = (resultsNumber: number) => {
     const plural = resultsNumber > 1 ? "s" : "";
@@ -106,8 +108,8 @@ export const SearchPage = ({
   };
 
   useEffect(() => {
-    if (availableForSearchRequest(searchStatus, currentFormValues)) {
-      searchUseCase(filterFormValues(currentFormValues));
+    if (availableForSearchRequest(searchStatus, { lat, lon })) {
+      searchUseCase(filterFormValues(formValues));
     }
   }, []);
 
@@ -119,8 +121,8 @@ export const SearchPage = ({
           theme="candidate"
         >
           <form
-            onSubmit={handleSubmit(() =>
-              searchUseCase(filterFormValues(currentFormValues)),
+            onSubmit={handleSubmit((value) =>
+              searchUseCase(filterFormValues(value)),
             )}
             className={cx(
               fr.cx("fr-grid-row", "fr-grid-row--gutters"),
@@ -137,10 +139,10 @@ export const SearchPage = ({
               <AppellationAutocomplete
                 label="Je recherche le métier :"
                 initialValue={{
-                  romeCode: currentFormValues.rome ?? "",
-                  romeLabel: currentFormValues.romeLabel ?? "",
-                  appellationLabel: currentFormValues.appellationLabel ?? "",
-                  appellationCode: currentFormValues.appellationCode ?? "",
+                  romeCode: formValues.rome ?? "",
+                  romeLabel: formValues.romeLabel ?? "",
+                  appellationLabel: formValues.appellationLabel ?? "",
+                  appellationCode: formValues.appellationCode ?? "",
                 }}
                 setFormValue={(newValue) => {
                   setValue("rome", newValue.romeCode);
@@ -150,10 +152,10 @@ export const SearchPage = ({
                 }}
                 selectedAppellations={[
                   {
-                    romeLabel: currentFormValues.romeLabel ?? "",
-                    romeCode: currentFormValues.rome ?? "",
-                    appellationCode: currentFormValues.appellationCode ?? "",
-                    appellationLabel: currentFormValues.appellationLabel ?? "",
+                    romeLabel: formValues.romeLabel ?? "",
+                    romeCode: formValues.rome ?? "",
+                    appellationCode: formValues.appellationCode ?? "",
+                    appellationLabel: formValues.appellationLabel ?? "",
                   },
                 ]}
                 id={domElementIds.search.appellationAutocomplete}
@@ -167,7 +169,7 @@ export const SearchPage = ({
             >
               <PlaceAutocomplete
                 label="Je me situe dans la ville de :"
-                initialInputValue={currentFormValues.place}
+                initialInputValue={formValues.place}
                 onValueChange={(lookupSearchResult) => {
                   if (!lookupSearchResult) return;
                   setValue("latitude", lookupSearchResult.position.lat);
@@ -207,7 +209,7 @@ export const SearchPage = ({
             >
               <Button
                 disabled={
-                  !availableForSearchRequest(searchStatus, currentFormValues)
+                  !availableForSearchRequest(searchStatus, { lat, lon })
                 }
                 type="submit"
                 nativeButtonProps={{
@@ -261,7 +263,7 @@ export const SearchPage = ({
                               checked={routeParams.sortedBy === option.value}
                               onChange={() => {
                                 searchUseCase({
-                                  ...currentFormValues,
+                                  ...formValues,
                                   sortedBy: option.value,
                                 });
                               }}

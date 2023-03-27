@@ -80,11 +80,12 @@ export const PlaceAutocomplete = ({
           },
         }}
         onInputChange={(_, newInputValue, reason) => {
-          if (inputValue !== newInputValue && reason === "input") {
+          if (reason === "input") {
             if (newInputValue === "") onInputClear();
-
-            dispatch(geosearchSlice.actions.queryHasChanged(newInputValue));
-            setInputHasChanged(true);
+            if (inputValue !== newInputValue) {
+              dispatch(geosearchSlice.actions.queryHasChanged(newInputValue));
+              setInputHasChanged(true);
+            }
           }
         }}
         filterOptions={(option) => option}
