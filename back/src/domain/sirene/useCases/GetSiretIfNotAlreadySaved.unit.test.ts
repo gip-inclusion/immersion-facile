@@ -1,6 +1,6 @@
 import { expectPromiseToFailWithError, expectToEqual } from "shared";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
-import { SirenApiRawEstablishmentBuilder } from "../../../_testBuilders/SirenApiRawEstablishmentBuilder";
+import { SirenEstablishmentDtoBuilder } from "../../../_testBuilders/SirenEstablishmentDtoBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
@@ -48,20 +48,15 @@ describe("GetSiretIfNotAlreadySaved", () => {
   it("returns the establishment info if not already in DB", async () => {
     const siretAlreadyInDb = "11112222000033";
     establishmentAggregateRepo.establishmentAggregates = [];
-    const sirenRawEstablishment = new SirenApiRawEstablishmentBuilder()
+    const sirenRawEstablishment = new SirenEstablishmentDtoBuilder()
       .withSiret(siretAlreadyInDb)
-      .withAdresseEtablissement({
-        numeroVoieEtablissement: "20",
-        typeVoieEtablissement: "AVENUE",
-        libelleVoieEtablissement: "DE SEGUR",
-        codePostalEtablissement: "75007",
-        libelleCommuneEtablissement: "PARIS 7",
-      })
+      .withBusinessAddress("20 AVENUE DE SEGUR 75007 PARIS 7")
       .withBusinessName("MA P'TITE BOITE 2")
       .withNafDto({ code: "8559A", nomenclature: "Ref2" })
       .withIsActive(true)
+      .withNumberEmployeesRange("1-2")
       .build();
-    sirenGateway.setRawEstablishment(sirenRawEstablishment);
+    sirenGateway.setSirenEstablishment(sirenRawEstablishment);
 
     const response = await getSiretIfNotAlreadySaved.execute({
       siret: siretAlreadyInDb,

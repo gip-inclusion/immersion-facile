@@ -3,6 +3,8 @@ import {
   FormEstablishmentDtoBuilder,
   GeoPositionDto,
   NafDto,
+  NumberEmployeesRange,
+  SirenEstablishmentDto,
 } from "shared";
 import {
   avenueChampsElyseesDto,
@@ -19,7 +21,6 @@ import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGenerato
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
-import { SirenApiRawEstablishment } from "../../sirene/ports/SirenGateway";
 import { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import { InsertEstablishmentAggregateFromForm } from "./InsertEstablishmentAggregateFromFormEstablishement";
 import {
@@ -38,20 +39,19 @@ const expectedNafDto: NafDto = { code: "8559A", nomenclature: "nomencl" };
 const prepareSirenGateway = (
   sirenGateway: InMemorySirenGateway,
   siret: string,
-  trancheEffectifsUniteLegale?: string,
+  numberEmployeesRange?: NumberEmployeesRange,
 ) => {
-  const sirenEstablishmentFromAPI: SirenApiRawEstablishment = {
+  const sirenEstablishmentFromAPI: SirenEstablishmentDto = {
     ...TEST_ESTABLISHMENT1,
     siret,
-    uniteLegale: {
-      ...TEST_ESTABLISHMENT1.uniteLegale,
-      trancheEffectifsUniteLegale: trancheEffectifsUniteLegale ?? "01",
-      activitePrincipaleUniteLegale: "85.59A",
-      nomenclatureActivitePrincipaleUniteLegale: "nomencl",
+    nafDto: {
+      code: "8559A",
+      nomenclature: "nomencl",
     },
+    numberEmployeesRange,
   };
 
-  sirenGateway.setRawEstablishment(sirenEstablishmentFromAPI);
+  sirenGateway.setSirenEstablishment(sirenEstablishmentFromAPI);
 };
 
 describe("Insert Establishment aggregate from form data", () => {
@@ -115,7 +115,8 @@ describe("Insert Establishment aggregate from form data", () => {
       .withBusinessContact(fakeBusinessContact)
       .build();
 
-    prepareSirenGateway(sirenGateway, fakeSiret);
+    const numberEmployeesRanges: NumberEmployeesRange = "6-9";
+    prepareSirenGateway(sirenGateway, fakeSiret, numberEmployeesRanges);
 
     // Act
     await useCase.execute(formEstablishment);
@@ -178,7 +179,7 @@ describe("Insert Establishment aggregate from form data", () => {
       .withSiret(fakeSiret)
       .build();
 
-    prepareSirenGateway(sirenGateway, fakeSiret, "00");
+    prepareSirenGateway(sirenGateway, fakeSiret, "0");
 
     await useCase.execute(formEstablishment);
 
@@ -228,7 +229,9 @@ describe("Insert Establishment aggregate from form data", () => {
       )
       .build();
 
-    prepareSirenGateway(sirenGateway, siret);
+    const numberEmployeesRanges: NumberEmployeesRange = "6-9";
+
+    prepareSirenGateway(sirenGateway, siret, numberEmployeesRanges);
 
     addressAPI.setAddressAndPosition([
       {
@@ -276,7 +279,7 @@ describe("Insert Establishment aggregate from form data", () => {
       .withSiret(fakeSiret)
       .build();
 
-    prepareSirenGateway(sirenGateway, fakeSiret, "00");
+    prepareSirenGateway(sirenGateway, fakeSiret, "0");
 
     await useCase.execute(formEstablishment);
 

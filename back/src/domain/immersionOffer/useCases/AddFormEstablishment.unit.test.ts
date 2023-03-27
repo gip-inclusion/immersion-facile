@@ -5,7 +5,7 @@ import {
   FormEstablishmentDtoBuilder,
   defaultValidFormEstablishment,
 } from "shared";
-import { SirenApiRawEstablishmentBuilder } from "../../../_testBuilders/SirenApiRawEstablishmentBuilder";
+import { SirenEstablishmentDtoBuilder } from "../../../_testBuilders/SirenEstablishmentDtoBuilder";
 
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
@@ -40,7 +40,7 @@ describe("Add FormEstablishment", () => {
     formEstablishmentRepo = uow.formEstablishmentRepository;
     outboxRepo = uow.outboxRepository;
     romeRepository = uow.romeRepository;
-    sirenGateway.setRawEstablishment({
+    sirenGateway.setSirenEstablishment({
       ...TEST_ESTABLISHMENT1,
       siret: defaultValidFormEstablishment.siret,
     });
@@ -170,17 +170,11 @@ describe("Add FormEstablishment", () => {
       .withSiret(TEST_ESTABLISHMENT1.siret)
       .build();
 
-    const sirenRawInactiveEstablishment = new SirenApiRawEstablishmentBuilder()
+    const sirenRawInactiveEstablishment = new SirenEstablishmentDtoBuilder()
       .withSiret(formEstablishment.siret)
       .withIsActive(false)
       .withBusinessName("INACTIVE BUSINESS")
-      .withAdresseEtablissement({
-        numeroVoieEtablissement: "20",
-        typeVoieEtablissement: "AVENUE",
-        libelleVoieEtablissement: "DE SEGUR",
-        codePostalEtablissement: "75007",
-        libelleCommuneEtablissement: "PARIS 7",
-      })
+      .withBusinessAddress("20 AVENUE DE SEGUR 75007 PARIS 7")
       .withNafDto({ code: "78.3Z", nomenclature: "Ref2" })
       .build();
 
@@ -192,23 +186,11 @@ describe("Add FormEstablishment", () => {
         uowPerformer.setUow({
           featureFlagRepository,
         });
-        sirenGateway.setRawEstablishment({
+        sirenGateway.setSirenEstablishment({
           ...TEST_ESTABLISHMENT1,
-          uniteLegale: {
-            ...TEST_ESTABLISHMENT1.uniteLegale,
-            denominationUniteLegale: "INACTIVE BUSINESS",
-            activitePrincipaleUniteLegale: "78.3Z",
-            nomenclatureActivitePrincipaleUniteLegale: "Ref2",
-            etatAdministratifUniteLegale: "A",
-          },
-          adresseEtablissement: {
-            numeroVoieEtablissement: "20",
-            typeVoieEtablissement: "AVENUE",
-            libelleVoieEtablissement: "DE SEGUR",
-            codePostalEtablissement: "75007",
-            libelleCommuneEtablissement: "PARIS 7",
-          },
-          periodesEtablissement: [{ dateFin: null }],
+          nafDto: { code: "78.3Z", nomenclature: "Ref2" },
+          businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
+          isOpen: true,
         });
 
         const response = await addFormEstablishment.execute(formEstablishment);
@@ -224,7 +206,7 @@ describe("Add FormEstablishment", () => {
     });
 
     it("rejects formEstablishment with SIRETs that don't correspond to active businesses", async () => {
-      sirenGateway.setRawEstablishment(sirenRawInactiveEstablishment);
+      sirenGateway.setSirenEstablishment(sirenRawInactiveEstablishment);
 
       await expectPromiseToFailWithError(
         addFormEstablishment.execute(formEstablishment),
@@ -235,9 +217,8 @@ describe("Add FormEstablishment", () => {
     });
 
     it("accepts formEstablishment with SIRETs that  correspond to active businesses", async () => {
-      const sirenRawEstablishment =
-        new SirenApiRawEstablishmentBuilder().build();
-      sirenGateway.setRawEstablishment(sirenRawEstablishment);
+      const sirenRawEstablishment = new SirenEstablishmentDtoBuilder().build();
+      sirenGateway.setSirenEstablishment(sirenRawEstablishment);
 
       expect(await addFormEstablishment.execute(formEstablishment)).toBe(
         formEstablishment.siret,

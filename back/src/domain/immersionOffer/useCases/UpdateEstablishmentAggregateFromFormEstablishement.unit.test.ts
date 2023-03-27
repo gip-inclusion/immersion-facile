@@ -2,6 +2,7 @@ import {
   addressDtoToString,
   FormEstablishmentDtoBuilder,
   expectPromiseToFailWith,
+  SirenEstablishmentDto,
 } from "shared";
 import { rueGuillaumeTellDto } from "../../../_testBuilders/addressDtos";
 import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
@@ -13,7 +14,6 @@ import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGatew
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { SirenApiRawEstablishment } from "../../sirene/ports/SirenGateway";
 import { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import { UpdateEstablishmentAggregateFromForm } from "./UpdateEstablishmentAggregateFromFormEstablishement";
 import { InMemorySirenGateway } from "../../../adapters/secondary/sirene/InMemorySirenGateway";
@@ -23,16 +23,16 @@ const prepareSirenGateway = (
   sirenGateway: InMemorySirenGateway,
   siret: string,
 ) => {
-  const sirenEstablishmentFromAPI: SirenApiRawEstablishment = {
+  const sirenEstablishmentFromAPI: SirenEstablishmentDto = {
     siret,
-    uniteLegale: {
-      activitePrincipaleUniteLegale: "85.59A",
-      trancheEffectifsUniteLegale: "01",
-      nomenclatureActivitePrincipaleUniteLegale: "nomencl",
-    },
-  } as SirenApiRawEstablishment;
+    businessAddress: "1 rue Guillaume Tell, 75017 Paris",
+    businessName: "My establishment",
+    nafDto: { code: "1234Z", nomenclature: "Ref2" },
+    isOpen: true,
+    numberEmployeesRange: "10-19",
+  };
 
-  sirenGateway.setRawEstablishment(sirenEstablishmentFromAPI);
+  sirenGateway.setSirenEstablishment(sirenEstablishmentFromAPI);
 };
 
 describe("Update Establishment aggregate from form data", () => {

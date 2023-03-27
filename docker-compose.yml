@@ -76,6 +76,7 @@ services:
     image: postgis/postgis:13-master
     shm_size: 256m
     environment:
+      POSTGRES_LOG_STATEMENT: all
       POSTGRES_DB: immersion-db
       POSTGRES_USER: immersion
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pg_password}

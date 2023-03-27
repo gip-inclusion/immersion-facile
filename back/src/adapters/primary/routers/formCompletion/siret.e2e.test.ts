@@ -28,7 +28,7 @@ describe("/siret route", () => {
       businessName: "MA P'TITE BOITE",
       businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
       nafDto: { code: "7112B", nomenclature: "Ref2" },
-      numberEmployeesRange: "1-2",
+      numberEmployeesRange: "3-5",
       isOpen: true,
     });
   });

@@ -1,7 +1,7 @@
 import { AddressDto, pathEq } from "shared";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
-import { SirenApiRawEstablishmentBuilder } from "../../../_testBuilders/SirenApiRawEstablishmentBuilder";
+import { SirenEstablishmentDtoBuilder } from "../../../_testBuilders/SirenEstablishmentDtoBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
@@ -67,8 +67,8 @@ describe("Update establishments from Sirene API", () => {
       makeEstablishmentWithUpdatedAt("oldSiret", moreThanAWeekAgo),
       makeEstablishmentWithUpdatedAt("recentSiret", lessThanAWeekAgo),
     ];
-    sirenGateway.setRawEstablishment(
-      new SirenApiRawEstablishmentBuilder().withSiret("recentSiret").build(),
+    sirenGateway.setSirenEstablishment(
+      new SirenEstablishmentDtoBuilder().withSiret("recentSiret").build(),
     );
     timeGateway.setNextDate(now);
 
@@ -125,14 +125,11 @@ describe("Update establishments from Sirene API", () => {
     establishmentAggregateRepository.establishmentAggregates = [
       makeEstablishmentWithUpdatedAt("establishmentToUpdate", moreThanAWeekAgo),
     ];
-    sirenGateway.setRawEstablishment(
-      new SirenApiRawEstablishmentBuilder()
+    sirenGateway.setSirenEstablishment(
+      new SirenEstablishmentDtoBuilder()
         .withSiret("establishmentToUpdate")
-        .withUniteLegale({
-          activitePrincipaleUniteLegale: "85.59A",
-          trancheEffectifsUniteLegale: "01",
-          nomenclatureActivitePrincipaleUniteLegale: "nafNom",
-        })
+        .withNafDto({ code: "8559A", nomenclature: "nafNom" })
+        .withNumberEmployeesRange("1-2")
         .build(),
     );
 
@@ -171,16 +168,10 @@ describe("Update establishments from Sirene API", () => {
           moreThanAWeekAgo,
         ),
       ];
-      sirenGateway.setRawEstablishment(
-        new SirenApiRawEstablishmentBuilder()
+      sirenGateway.setSirenEstablishment(
+        new SirenEstablishmentDtoBuilder()
           .withSiret("establishmentToUpdate")
-          .withAdresseEtablissement({
-            numeroVoieEtablissement: "25",
-            typeVoieEtablissement: "rue",
-            libelleVoieEtablissement: "du Premier Film",
-            codePostalEtablissement: "69008",
-            libelleCommuneEtablissement: "Lyon",
-          })
+          .withBusinessAddress("25 rue du Premier Film 69008 Lyon")
           .build(),
       );
       const newEstablishmentPosition = { lon: 2.2931917, lat: 48.8840654 };
@@ -234,16 +225,10 @@ describe("Update establishments from Sirene API", () => {
       establishmentAggregateRepository.establishmentAggregates = [
         initialEstablishmentAggregate,
       ];
-      sirenGateway.setRawEstablishment(
-        new SirenApiRawEstablishmentBuilder()
+      sirenGateway.setSirenEstablishment(
+        new SirenEstablishmentDtoBuilder()
           .withSiret("establishmentToUpdate")
-          .withAdresseEtablissement({
-            numeroVoieEtablissement: "7",
-            typeVoieEtablissement: "rue",
-            libelleVoieEtablissement: "Guillaume Tell",
-            codePostalEtablissement: "75017",
-            libelleCommuneEtablissement: "Paris",
-          })
+          .withBusinessAddress("7 rue Guillaume Tell 75017 Paris")
           .build(),
       );
       const newEstablishmentPosition = { lon: 2.2931917, lat: 48.8840654 };
@@ -297,10 +282,10 @@ describe("Update establishments from Sirene API", () => {
       establishmentAggregateRepository.establishmentAggregates = [
         establishmentToUpdate,
       ];
-      sirenGateway.setRawEstablishment(
-        new SirenApiRawEstablishmentBuilder()
+      sirenGateway.setSirenEstablishment(
+        new SirenEstablishmentDtoBuilder()
           .withSiret("establishmentToUpdate")
-          .withAdresseEtablissement({ libelleVoieEtablissement: "" })
+          .withBusinessAddress("75007 PARIS")
           .build(),
       );
       addressAPI.setNextPosition(undefined);

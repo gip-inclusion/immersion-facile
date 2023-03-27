@@ -1,14 +1,10 @@
 import {
   apiSirenNotAvailableSiret,
-  apiSirenUnexpectedError,
+  SirenEstablishmentDto,
   SiretDto,
   tooManySirenRequestsSiret,
 } from "shared";
-import {
-  SirenApiRawEstablishment,
-  SirenGatewayAnswer,
-  SirenGateway,
-} from "../../../domain/sirene/ports/SirenGateway";
+import { SirenGateway } from "../../../domain/sirene/ports/SirenGateway";
 import { createLogger } from "../../../utils/logger";
 import {
   TooManyRequestApiError,
@@ -21,108 +17,58 @@ export const TEST_ESTABLISHMENT1_SIRET = "12345678901234";
 export const TEST_ESTABLISHMENT2_SIRET = "20006765000016";
 export const TEST_ESTABLISHMENT3_SIRET = "77561959600155";
 export const TEST_ESTABLISHMENT4_SIRET = "24570135400111";
-export const TEST_ESTABLISHMENT5_SIRET = "01234567890123";
 
-export const TEST_ESTABLISHMENT1: SirenApiRawEstablishment = {
+export const TEST_ESTABLISHMENT1: SirenEstablishmentDto = {
   siret: TEST_ESTABLISHMENT1_SIRET,
-  uniteLegale: {
-    denominationUniteLegale: "MA P'TITE BOITE",
-    activitePrincipaleUniteLegale: "71.12B",
-    nomenclatureActivitePrincipaleUniteLegale: "Ref2",
-    trancheEffectifsUniteLegale: "01",
-    etatAdministratifUniteLegale: "A",
+  businessName: "MA P'TITE BOITE",
+  businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
+  nafDto: {
+    code: "7112B",
+    nomenclature: "Ref2",
   },
-  adresseEtablissement: {
-    numeroVoieEtablissement: "20",
-    typeVoieEtablissement: "AVENUE",
-    libelleVoieEtablissement: "DE SEGUR",
-    codePostalEtablissement: "75007",
-    libelleCommuneEtablissement: "PARIS 7",
-  },
-  periodesEtablissement: [
-    {
-      dateFin: null,
-      dateDebut: "2022-01-01",
-      etatAdministratifEtablissement: "A",
-    },
-  ],
+  numberEmployeesRange: "3-5",
+  isOpen: true,
 };
 
-export const TEST_ESTABLISHMENT2: SirenApiRawEstablishment = {
+export const TEST_ESTABLISHMENT2: SirenEstablishmentDto = {
   siret: TEST_ESTABLISHMENT2_SIRET,
-  uniteLegale: {
-    denominationUniteLegale: "MA P'TITE BOITE 2",
-    activitePrincipaleUniteLegale: "85.59A",
-    nomenclatureActivitePrincipaleUniteLegale: "Ref2",
-    trancheEffectifsUniteLegale: "01",
-    etatAdministratifUniteLegale: "A",
+  businessName: "MA P'TITE BOITE 2",
+  businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
+  nafDto: {
+    code: "8559A",
+    nomenclature: "Ref2",
   },
-  adresseEtablissement: {
-    numeroVoieEtablissement: "20",
-    typeVoieEtablissement: "AVENUE",
-    libelleVoieEtablissement: "DE SEGUR",
-    codePostalEtablissement: "75007",
-    libelleCommuneEtablissement: "PARIS 7",
-  },
-  periodesEtablissement: [
-    {
-      dateFin: null,
-      dateDebut: "2022-01-01",
-      etatAdministratifEtablissement: "F",
-    },
-  ],
+  numberEmployeesRange: "3-5",
+  isOpen: false,
 };
 
-export const TEST_ESTABLISHMENT3: SirenApiRawEstablishment = {
+export const TEST_ESTABLISHMENT3: SirenEstablishmentDto = {
   siret: TEST_ESTABLISHMENT3_SIRET,
-  uniteLegale: {
-    denominationUniteLegale: "MA P'TITE BOITE 2",
-    activitePrincipaleUniteLegale: "85.59A",
-    nomenclatureActivitePrincipaleUniteLegale: "Ref2",
-    trancheEffectifsUniteLegale: "01",
-    etatAdministratifUniteLegale: "A",
+  businessName: "MA P'TITE BOITE 2",
+  businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
+  nafDto: {
+    code: "8559A",
+    nomenclature: "Ref2",
   },
-  adresseEtablissement: {
-    numeroVoieEtablissement: "20",
-    typeVoieEtablissement: "AVENUE",
-    libelleVoieEtablissement: "DE SEGUR",
-    codePostalEtablissement: "75007",
-    libelleCommuneEtablissement: "PARIS 7",
-  },
-  periodesEtablissement: [
-    {
-      dateFin: null,
-      dateDebut: "2022-01-01",
-      etatAdministratifEtablissement: "A",
-    },
-  ],
+  numberEmployeesRange: "3-5",
+  isOpen: true,
 };
 
-export const TEST_ESTABLISHMENT4: SirenApiRawEstablishment = {
+export const TEST_ESTABLISHMENT4: SirenEstablishmentDto = {
   siret: TEST_ESTABLISHMENT4_SIRET,
-  uniteLegale: {
-    denominationUniteLegale: "MA P'TITE BOITE 2",
-    activitePrincipaleUniteLegale: "85.59A",
-    nomenclatureActivitePrincipaleUniteLegale: "Ref2",
-    trancheEffectifsUniteLegale: "01",
+  businessName: "MA P'TITE BOITE 2",
+  businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
+  nafDto: {
+    code: "8559A",
+    nomenclature: "Ref2",
   },
-  adresseEtablissement: {
-    numeroVoieEtablissement: "20",
-    typeVoieEtablissement: "AVENUE",
-    libelleVoieEtablissement: "DE SEGUR",
-    codePostalEtablissement: "75007",
-    libelleCommuneEtablissement: "PARIS 7",
-  },
-  periodesEtablissement: [
-    {
-      dateFin: null,
-      dateDebut: "2022-01-01",
-      etatAdministratifEtablissement: "A",
-    },
-  ],
+  numberEmployeesRange: "3-5",
+  isOpen: true,
 };
 
-type EstablishmentBySiret = { [siret: string]: SirenApiRawEstablishment };
+export const apiSirenUnexpectedError = "apiSirenUnexpectedError";
+
+type EstablishmentBySiret = { [siret: string]: SirenEstablishmentDto };
 
 export class InMemorySirenGateway implements SirenGateway {
   private _error: any = null;
@@ -137,7 +83,7 @@ export class InMemorySirenGateway implements SirenGateway {
   public async getEstablishmentBySiret(
     siret: SiretDto,
     includeClosedEstablishments = false,
-  ): Promise<SirenGatewayAnswer | undefined> {
+  ): Promise<SirenEstablishmentDto | undefined> {
     try {
       if (this._error) throw this._error;
       if (siret === apiSirenUnexpectedError)
@@ -168,23 +114,9 @@ export class InMemorySirenGateway implements SirenGateway {
       logger.info({ siret, includeClosedEstablishments }, "get");
       const establishment = this._repo[siret];
       if (!establishment) return;
-      if (
-        establishment.uniteLegale.etatAdministratifUniteLegale === "F" &&
-        !includeClosedEstablishments
-      ) {
-        return;
-      }
+      if (!establishment.isOpen && !includeClosedEstablishments) return;
 
-      return {
-        header: {
-          statut: 400,
-          message: "itsgood",
-          total: 1,
-          debut: 1,
-          nombre: 1,
-        },
-        etablissements: [establishment],
-      };
+      return establishment;
     } catch (error: any) {
       const serviceName = "Sirene API";
       logger.error({ siret, error }, "Error fetching siret");
@@ -195,7 +127,7 @@ export class InMemorySirenGateway implements SirenGateway {
   }
 
   // Visible for testing
-  public setRawEstablishment(establishment: SirenApiRawEstablishment) {
+  public setSirenEstablishment(establishment: SirenEstablishmentDto) {
     this._repo[establishment.siret] = establishment;
   }
 

@@ -2,33 +2,19 @@ import {
   NotFoundError,
   TooManyRequestApiError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { SirenApiRawEstablishment } from "../ports/SirenGateway";
 import { GetSiret } from "./GetSiret";
 import { InMemorySirenGateway } from "../../../adapters/secondary/sirene/InMemorySirenGateway";
-import { expectPromiseToFailWithError, expectToEqual } from "shared";
+import {
+  expectPromiseToFailWithError,
+  expectToEqual,
+  SirenEstablishmentDto,
+} from "shared";
 
-const validEstablishment: SirenApiRawEstablishment = {
+const validEstablishment: SirenEstablishmentDto = {
   siret: "12345678901234",
-  uniteLegale: {
-    denominationUniteLegale: "MA P'TITE BOITE",
-    activitePrincipaleUniteLegale: "78.3Z",
-    nomenclatureActivitePrincipaleUniteLegale: "Ref2",
-    etatAdministratifUniteLegale: "A",
-  },
-  adresseEtablissement: {
-    numeroVoieEtablissement: "20",
-    typeVoieEtablissement: "AVENUE",
-    libelleVoieEtablissement: "DE SEGUR",
-    codePostalEtablissement: "75007",
-    libelleCommuneEtablissement: "PARIS 7",
-  },
-  periodesEtablissement: [
-    {
-      dateFin: null,
-      dateDebut: "2022-01-01",
-      etatAdministratifEtablissement: "A",
-    },
-  ],
+  businessName: "MA P'TITE BOITE",
+  businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
+  isOpen: true,
 };
 
 describe("GetSiret", () => {
@@ -41,17 +27,15 @@ describe("GetSiret", () => {
   });
 
   describe("checking for business being opened", () => {
-    const closedEstablishment: SirenApiRawEstablishment = {
+    const closedEstablishment: SirenEstablishmentDto = {
       ...validEstablishment,
       siret: "11111111111111",
-      uniteLegale: {
-        etatAdministratifUniteLegale: "F",
-      },
+      isOpen: false,
     };
 
     beforeEach(() => {
-      sirenGateway.setRawEstablishment(validEstablishment);
-      sirenGateway.setRawEstablishment(closedEstablishment);
+      sirenGateway.setSirenEstablishment(validEstablishment);
+      sirenGateway.setSirenEstablishment(closedEstablishment);
     });
 
     it("marks an open establishment as open, regardless of the period count", async () => {
@@ -63,7 +47,6 @@ describe("GetSiret", () => {
         siret: "12345678901234",
         businessName: "MA P'TITE BOITE",
         businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
-        nafDto: { code: "783Z", nomenclature: "Ref2" },
         isOpen: true,
       });
     });
@@ -79,7 +62,7 @@ describe("GetSiret", () => {
   });
 
   it("returns the parsed info when siret found", async () => {
-    sirenGateway.setRawEstablishment(validEstablishment);
+    sirenGateway.setSirenEstablishment(validEstablishment);
     const response = await getSiret.execute({
       siret: validEstablishment.siret,
     });
@@ -87,18 +70,14 @@ describe("GetSiret", () => {
       siret: "12345678901234",
       businessName: "MA P'TITE BOITE",
       businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
-      nafDto: { code: "783Z", nomenclature: "Ref2" },
       isOpen: true,
     });
   });
 
   it("populates businessName from nom/prenom when denomination not available", async () => {
-    sirenGateway.setRawEstablishment({
+    sirenGateway.setSirenEstablishment({
       ...validEstablishment,
-      uniteLegale: {
-        prenomUsuelUniteLegale: "ALAIN",
-        nomUniteLegale: "PROST",
-      },
+      businessName: "ALAIN PROST",
     });
     const response = await getSiret.execute({
       siret: validEstablishment.siret,
@@ -107,15 +86,9 @@ describe("GetSiret", () => {
   });
 
   it("skips missing parts of adresseEtablissment", async () => {
-    sirenGateway.setRawEstablishment({
+    sirenGateway.setSirenEstablishment({
       ...validEstablishment,
-      adresseEtablissement: {
-        // No numeroVoieEtablissement
-        typeVoieEtablissement: "L'ESPLANADE",
-        // No libelleVoieEtablissement
-        codePostalEtablissement: "30430",
-        libelleCommuneEtablissement: "BARJAC",
-      },
+      businessAddress: "L'ESPLANADE 30430 BARJAC",
     });
     const response = await getSiret.execute({
       siret: validEstablishment.siret,
@@ -124,13 +97,9 @@ describe("GetSiret", () => {
   });
 
   it("skips naf when not available", async () => {
-    sirenGateway.setRawEstablishment({
+    sirenGateway.setSirenEstablishment({
       ...validEstablishment,
-      uniteLegale: {
-        denominationUniteLegale: "MA P'TITE BOITE",
-        // no activitePrincipaleUniteLegale
-        // no nomenclatureActivitePrincipaleUniteLegale
-      },
+      businessName: "MA P'TITE BOITE",
     });
     const response = await getSiret.execute({
       siret: validEstablishment.siret,
@@ -153,18 +122,14 @@ describe("GetSiret", () => {
   });
 
   it("returns establishment as not Open if it is not at the current period", async () => {
-    sirenGateway.setRawEstablishment({
+    sirenGateway.setSirenEstablishment({
       ...validEstablishment,
-      periodesEtablissement: [
-        {
-          dateFin: null,
-          dateDebut: "2022-01-01",
-          etatAdministratifEtablissement: "F",
-        },
-      ],
+      isOpen: false,
     });
+
     const response = await getSiret.execute({
       siret: validEstablishment.siret,
+      includeClosedEstablishments: true,
     });
     expect(response).toMatchObject({ isOpen: false });
   });

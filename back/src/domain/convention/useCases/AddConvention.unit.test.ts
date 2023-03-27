@@ -3,7 +3,7 @@ import {
   ConventionDtoBuilder,
   expectPromiseToFailWithError,
 } from "shared";
-import { SirenApiRawEstablishmentBuilder } from "../../../_testBuilders/SirenApiRawEstablishmentBuilder";
+import { SirenEstablishmentDtoBuilder } from "../../../_testBuilders/SirenEstablishmentDtoBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,
@@ -130,7 +130,7 @@ describe("Add Convention", () => {
   });
 
   describe("SIRET validation", () => {
-    const sirenRawEstablishmentBuilder = new SirenApiRawEstablishmentBuilder()
+    const sirenRawEstablishmentBuilder = new SirenEstablishmentDtoBuilder()
       .withSiret(validConventionParams.siret)
       .withNafDto({ code: "78.3Z", nomenclature: "Ref2" });
 
@@ -151,7 +151,7 @@ describe("Add Convention", () => {
             enableInseeApi: false,
           }),
         });
-        sirenGateway.setRawEstablishment(sirenRawInactiveEstablishment);
+        sirenGateway.setSirenEstablishment(sirenRawInactiveEstablishment);
 
         expect(await addConvention.execute(validConventionParams)).toEqual({
           id: validConventionParams.id,
@@ -160,7 +160,7 @@ describe("Add Convention", () => {
     });
 
     it("rejects applications with SIRETs that don't correspond to active businesses", async () => {
-      sirenGateway.setRawEstablishment(sirenRawInactiveEstablishment);
+      sirenGateway.setSirenEstablishment(sirenRawInactiveEstablishment);
 
       await expectPromiseToFailWithError(
         addConvention.execute(validConventionParams),
@@ -171,7 +171,7 @@ describe("Add Convention", () => {
     });
 
     it("accepts applications with SIRETs that  correspond to active businesses", async () => {
-      sirenGateway.setRawEstablishment(sirenRawActiveEstablishment);
+      sirenGateway.setSirenEstablishment(sirenRawActiveEstablishment);
 
       expect(await addConvention.execute(validConventionParams)).toEqual({
         id: validConventionParams.id,

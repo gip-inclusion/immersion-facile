@@ -1,3 +1,4 @@
+import { expectObjectsToMatch } from "shared";
 import { SirenGateway } from "../../../domain/sirene/ports/SirenGateway";
 import { AppConfig } from "../../primary/config/appConfig";
 
@@ -31,7 +32,7 @@ describe("HttpSirenGateway", () => {
     const response = await sirenGateway.getEstablishmentBySiret(
       "18004623700012",
     );
-    expect(response?.etablissements).toHaveLength(1);
+    expectObjectsToMatch(response, { siret: "18004623700012" });
   });
 
   it("filters out closed establishments", async () => {
