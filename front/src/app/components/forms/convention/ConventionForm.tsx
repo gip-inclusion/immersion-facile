@@ -100,6 +100,12 @@ export const ConventionForm = ({
   );
   const fetchConventionError = useAppSelector(conventionSelectors.fetchError);
   const dispatch = useDispatch();
+  const methods = useForm<ConventionReadDto>({
+    defaultValues: fetchedConvention || initialValues,
+    resolver: zodResolver(conventionWithoutExternalIdSchema),
+    mode: "onTouched",
+  });
+  const { getValues, reset } = methods;
 
   useMatomo(properties.internshipKind);
 
@@ -124,13 +130,12 @@ export const ConventionForm = ({
       }),
     );
   }, []);
-  const methods = useForm<ConventionReadDto>({
-    defaultValues: initialValues,
-    resolver: zodResolver(conventionWithoutExternalIdSchema),
-    mode: "onTouched",
-  });
-  const { handleSubmit, getValues } = methods;
 
+  useEffect(() => {
+    if (fetchedConvention) {
+      reset(fetchedConvention);
+    }
+  }, [fetchedConvention]);
   const onSubmit: SubmitHandler<ConventionReadDto> = (values) => {
     const conventionToSave = {
       ...values,
@@ -174,8 +179,10 @@ export const ConventionForm = ({
           Tous les champs marqués d'une astérisque (*) sont obligatoires.
         </p>
         <FormProvider {...methods}>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <ConventionFormFields isFrozen={isFrozen} />
+          <form
+          // onSubmit={handleSubmit(onSubmit, (errors) => console.error(errors))}
+          >
+            <ConventionFormFields onSubmit={onSubmit} isFrozen={isFrozen} />
             <ConventionFeedbackNotification
               submitFeedback={submitFeedback}
               signatories={getValues("signatories")}

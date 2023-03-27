@@ -17,19 +17,17 @@ export const useSiretRelatedField = <K extends keyof SirenEstablishmentDto>(
 ) => {
   const fieldNameToUpdate = options?.fieldToUpdate ?? fieldFromInfo;
   const establishmentInfos = useAppSelector(siretSelectors.establishmentInfos);
-  const { formState, setValue } = useFormContext();
-  const touched = formState.touchedFields[fieldNameToUpdate];
+  const { setValue } = useFormContext();
   useEffect(() => {
     if (options?.disabled) return;
     if (!establishmentInfos) return;
-    if (!touched)
-      setValue(
-        fieldNameToUpdate,
-        establishmentInfos && establishmentInfos[fieldFromInfo],
-        {
-          shouldValidate: true,
-        },
-      );
+    setValue(
+      fieldNameToUpdate,
+      establishmentInfos && establishmentInfos[fieldFromInfo],
+      {
+        shouldValidate: true,
+      },
+    );
   }, [establishmentInfos]);
 };
 

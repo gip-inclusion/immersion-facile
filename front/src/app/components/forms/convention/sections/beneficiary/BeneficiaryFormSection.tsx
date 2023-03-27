@@ -71,7 +71,7 @@ export const BeneficiaryFormSection = ({
 
   useEffect(() => {
     // TODO : do this in Redux ?
-    const initialValues = getValues().signatories.beneficiaryRepresentative;
+    const initialValues = values.signatories.beneficiaryRepresentative;
     setValue(
       "signatories.beneficiaryRepresentative",
       isMinor && initialValues
@@ -80,25 +80,27 @@ export const BeneficiaryFormSection = ({
             role: "beneficiary-representative",
           }
         : undefined,
+      {
+        shouldValidate: true,
+      },
     );
   }, [isMinor]);
 
   useEffect(() => {
     // TODO : do this in Redux ?
     const initialValues = values.signatories.beneficiaryCurrentEmployer;
-    if (initialValues) {
-      setValue(
-        "signatories.beneficiaryCurrentEmployer",
-        hasCurrentEmployer
-          ? {
-              ...initialValues,
-              role: "beneficiary-current-employer",
-            }
-          : undefined,
-      );
-    }
-
-    return () => setValue("signatories.beneficiaryCurrentEmployer", undefined);
+    setValue(
+      "signatories.beneficiaryCurrentEmployer",
+      hasCurrentEmployer && initialValues
+        ? {
+            ...initialValues,
+            role: "beneficiary-current-employer",
+          }
+        : undefined,
+      {
+        shouldValidate: true,
+      },
+    );
   }, [hasCurrentEmployer]);
 
   const levelsOfEducationToSelectOption = levelsOfEducation.map(
@@ -200,7 +202,7 @@ export const BeneficiaryFormSection = ({
             onChange: () => {
               dispatch(
                 conventionSlice.actions.isMinorChanged(
-                  option.nativeInputProps.value === 1,
+                  Boolean(option.nativeInputProps.value),
                 ),
               );
             },
@@ -228,7 +230,7 @@ export const BeneficiaryFormSection = ({
                 onChange: () => {
                   dispatch(
                     conventionSlice.actions.isCurrentEmployerChanged(
-                      option.nativeInputProps.value === 1,
+                      Boolean(option.nativeInputProps.value),
                     ),
                   );
                 },

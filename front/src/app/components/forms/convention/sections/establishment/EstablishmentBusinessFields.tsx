@@ -16,9 +16,10 @@ export const EstablishmentBusinessFields = ({
   disabled: undefined | boolean;
 }): JSX.Element => {
   const { enableInseeApi } = useFeatureFlags();
-  const { currentSiret, updateSiret, siretErrorToDisplay } = useSiretFetcher({
-    shouldFetchEvenIfAlreadySaved: true,
-  });
+  const { currentSiret, updateSiret, siretErrorToDisplay, establishmentInfos } =
+    useSiretFetcher({
+      shouldFetchEvenIfAlreadySaved: true,
+    });
 
   const { getValues, register, setValue } = useFormContext<ConventionDto>();
   const values = getValues();
@@ -52,6 +53,7 @@ export const EstablishmentBusinessFields = ({
         nativeInputProps={{
           ...formContents.businessName,
           ...register("businessName"),
+          value: establishmentInfos?.businessName,
         }}
         disabled={enableInseeApi}
       />

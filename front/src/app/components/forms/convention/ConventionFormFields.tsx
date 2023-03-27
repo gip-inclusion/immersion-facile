@@ -1,13 +1,14 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 import React, { useEffect } from "react";
 import { ErrorNotifications } from "react-design-system";
-import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { useFormContext, type SubmitHandler } from "react-hook-form";
 import { ConventionReadDto, Signatory, toDotNotation } from "shared";
 import { ConventionFrozenMessage } from "src/app/components/forms/convention/ConventionFrozenMessage";
 import { ConventionSignOnlyMessage } from "src/app/components/forms/convention/ConventionSignOnlyMessage";
 import { makeValuesToWatchInUrl } from "src/app/components/forms/convention/makeValuesToWatchInUrl";
 import { SignatureActions } from "src/app/components/forms/convention/SignatureActions";
-import { SubmitButton } from "src/app/components/forms/convention/SubmitButton";
 import { useConventionWatchValuesInUrl } from "src/app/components/forms/convention/useConventionWatchValuesInUrl";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
@@ -24,10 +25,10 @@ import { AgencyFormSection } from "./sections/agency/AgencyFormSection";
 import { BeneficiaryFormSection } from "./sections/beneficiary/BeneficiaryFormSection";
 import { EstablishmentFormSection } from "./sections/establishment/EstablishmentFormSection";
 import { ImmersionConditionFormSection } from "./sections/immersion-conditions/ImmersionConditionFormSection";
-import { useFormContext } from "react-hook-form";
 
 type ConventionFieldsProps = {
   isFrozen?: boolean;
+  onSubmit: SubmitHandler<ConventionReadDto>;
   onModificationsRequired?: () => Promise<void>; //< called when the form is sent back for modifications in signature mode
 } & (
   | { isSignOnly: true; signatory: Signatory }
@@ -36,6 +37,7 @@ type ConventionFieldsProps = {
 
 export const ConventionFormFields = ({
   isFrozen,
+  onSubmit,
   isSignOnly: isSignatureMode,
   signatory,
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -45,7 +47,7 @@ export const ConventionFormFields = ({
     setValue,
     getValues,
     handleSubmit,
-    formState: { errors, submitCount, isSubmitting },
+    formState: { errors, submitCount, isSubmitting, isSubmitted, isValidating },
   } = useFormContext<ConventionReadDto>();
   const conventionValues = getValues();
   const preselectedAgencyId = useAppSelector(
@@ -75,6 +77,10 @@ export const ConventionFormFields = ({
   const federatedIdentity =
     conventionValues.signatories.beneficiary.federatedIdentity;
   const t = useConventionTexts(conventionValues.internshipKind);
+  const shouldSubmitButtonBeDisabled =
+    isSubmitting ||
+    isValidating ||
+    (isSubmitted && Object.values(errors).length === 0);
   return (
     <>
       {isFrozen && !isSignatureMode && <ConventionFrozenMessage />}
@@ -139,17 +145,32 @@ export const ConventionFormFields = ({
           visible={submitCount !== 0 && Object.values(errors).length > 0}
         />
       )}
-
+      {JSON.stringify({
+        isSubmitting,
+        isValidating,
+        isSubmitted,
+        isValid: Object.values(errors).length === 0,
+      })}
       {!isFrozen && !isSignatureMode && (
         <div className={fr.cx("fr-mt-4w")}>
-          <SubmitButton
-            isSubmitting={isSubmitting}
-            disabled={isFrozen || isSignatureMode}
-            onSubmit={handleSubmit(
-              () => console.log("valid"),
-              (errors) => console.error(getValues(), errors),
+          <Button
+            disabled={shouldSubmitButtonBeDisabled}
+            iconId="fr-icon-checkbox-circle-line"
+            iconPosition="left"
+            type="button"
+            onClick={handleSubmit(
+              (values) => {
+                setValue("status", "READY_TO_SIGN");
+                onSubmit(values);
+              },
+              (errors) => {
+                // eslint-disable-next-line no-console
+                console.error(getValues(), errors);
+              },
             )}
-          />
+          >
+            Envoyer la demande
+          </Button>
         </div>
       )}
       {isSignatureMode && (
@@ -162,10 +183,7 @@ export const ConventionFormFields = ({
               alreadySigned={alreadySigned}
               signatory={signatory}
               isSubmitting={isSubmitting}
-              onSubmit={handleSubmit(
-                () => console.log("valid"),
-                () => console.error("invalid"),
-              )}
+              onSubmit={handleSubmit(onSubmit)}
               onModificationRequired={onModificationsRequired}
             />
           )}

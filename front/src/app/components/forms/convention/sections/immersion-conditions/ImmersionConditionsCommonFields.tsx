@@ -166,7 +166,9 @@ export const ImmersionConditionsCommonFields = ({
           ...option,
           nativeInputProps: {
             ...option.nativeInputProps,
-            defaultChecked: option.nativeInputProps.value === 0,
+            defaultChecked:
+              Boolean(option.nativeInputProps.value) ===
+              values.individualProtection,
             onChange: () => {
               setValue(
                 "individualProtection",
@@ -201,11 +203,16 @@ export const ImmersionConditionsCommonFields = ({
           ...option,
           nativeInputProps: {
             ...option.nativeInputProps,
-            defaultChecked: option.nativeInputProps.value === 0,
+            defaultChecked:
+              Boolean(option.nativeInputProps.value) ===
+              values.sanitaryPrevention,
             onChange: () => {
               setValue(
-                "individualProtection",
+                "sanitaryPrevention",
                 option.nativeInputProps.value === 1,
+                {
+                  shouldValidate: true,
+                },
               );
             },
           },
