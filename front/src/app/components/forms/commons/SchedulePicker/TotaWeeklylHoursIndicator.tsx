@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import { useFormikContext } from "formik";
 import React from "react";
-import { ConventionDto } from "shared";
+import { useFormContext } from "react-hook-form";
+import { ConventionReadDto } from "shared";
 import { HourIndicator } from "./HourIndicator";
 
 // ex: Formats 16.5 to 16h30
@@ -24,7 +24,8 @@ export const TotalWeeklyHoursIndicator = ({
   week,
   totalHours,
 }: TotalWeeklyHoursIndicatorProps) => {
-  const { values } = useFormikContext<ConventionDto>();
+  const { getValues } = useFormContext<ConventionReadDto>();
+  const values = getValues();
   return (
     <li className={fr.cx("fr-text--xs", "fr-my-auto")}>
       Semaine {week}: &nbsp;

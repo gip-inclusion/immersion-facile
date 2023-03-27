@@ -1,13 +1,15 @@
-import React, { useEffect } from "react";
-import { useFormikContext } from "formik";
+import { Input } from "@codegouvfr/react-dsfr/Input";
+import React from "react";
 
-import { ConventionDto, getConventionFieldName } from "shared";
-import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import { TextInput } from "src/app/components/forms/commons/TextInput";
-import { useField } from "formik";
-import { useFormContents } from "src/app/hooks/formContents.hooks";
-import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { fr } from "@codegouvfr/react-dsfr";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { useFormContext } from "react-hook-form";
+import { ConventionDto } from "shared";
+import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
+import {
+  makeFieldError,
+  useFormContents,
+} from "src/app/hooks/formContents.hooks";
 
 type BeneficiaryCurrentEmployerFieldsProperties = {
   disabled: boolean | undefined;
@@ -16,22 +18,14 @@ type BeneficiaryCurrentEmployerFieldsProperties = {
 export const BeneficiaryCurrentEmployerFields = ({
   disabled,
 }: BeneficiaryCurrentEmployerFieldsProperties): JSX.Element => {
-  const { values } = useFormikContext<ConventionDto>();
-
+  const { getValues, register, formState } = useFormContext<ConventionDto>();
+  const values = getValues();
   const { getFormFields } = useFormContents(
     formConventionFieldsLabels(values.internshipKind),
   );
   const formFields = getFormFields();
-  const [field, , { setValue: setBeneficiaryCurrentEmployer }] = useField(
-    getConventionFieldName("signatories.beneficiaryCurrentEmployer"),
-  );
-  useEffect(() => {
-    setBeneficiaryCurrentEmployer({
-      ...field.value,
-      role: "beneficiary-current-employer",
-    });
-    return () => setBeneficiaryCurrentEmployer(undefined);
-  }, []);
+  const getFieldError = makeFieldError(formState);
+
   return (
     <>
       <Alert
@@ -57,33 +51,72 @@ export const BeneficiaryCurrentEmployerFields = ({
         }
       />
 
-      <TextInput
+      <Input
         {...formFields["signatories.beneficiaryCurrentEmployer.businessSiret"]}
+        nativeInputProps={{
+          ...formFields["signatories.beneficiaryCurrentEmployer.businessSiret"],
+          ...register("signatories.beneficiaryCurrentEmployer.businessSiret"),
+        }}
         disabled={disabled}
+        {...getFieldError(
+          "signatories.beneficiaryCurrentEmployer.businessSiret",
+        )}
       />
-      <TextInput
+      <Input
         {...formFields["signatories.beneficiaryCurrentEmployer.businessName"]}
+        nativeInputProps={{
+          ...formFields["signatories.beneficiaryCurrentEmployer.businessName"],
+          ...register("signatories.beneficiaryCurrentEmployer.businessName"),
+        }}
         disabled={disabled}
+        {...getFieldError(
+          "signatories.beneficiaryCurrentEmployer.businessName",
+        )}
       />
-      <TextInput
+      <Input
         {...formFields["signatories.beneficiaryCurrentEmployer.firstName"]}
+        nativeInputProps={{
+          ...formFields["signatories.beneficiaryCurrentEmployer.firstName"],
+          ...register("signatories.beneficiaryCurrentEmployer.firstName"),
+        }}
         disabled={disabled}
+        {...getFieldError("signatories.beneficiaryCurrentEmployer.firstName")}
       />
-      <TextInput
+      <Input
         {...formFields["signatories.beneficiaryCurrentEmployer.lastName"]}
+        nativeInputProps={{
+          ...formFields["signatories.beneficiaryCurrentEmployer.lastName"],
+          ...register("signatories.beneficiaryCurrentEmployer.lastName"),
+        }}
         disabled={disabled}
+        {...getFieldError("signatories.beneficiaryCurrentEmployer.lastName")}
       />
-      <TextInput
+      <Input
         {...formFields["signatories.beneficiaryCurrentEmployer.job"]}
+        nativeInputProps={{
+          ...formFields["signatories.beneficiaryCurrentEmployer.job"],
+          ...register("signatories.beneficiaryCurrentEmployer.job"),
+        }}
         disabled={disabled}
+        {...getFieldError("signatories.beneficiaryCurrentEmployer.job")}
       />
-      <TextInput
+      <Input
         {...formFields["signatories.beneficiaryCurrentEmployer.phone"]}
+        nativeInputProps={{
+          ...formFields["signatories.beneficiaryCurrentEmployer.phone"],
+          ...register("signatories.beneficiaryCurrentEmployer.phone"),
+        }}
         disabled={disabled}
+        {...getFieldError("signatories.beneficiaryCurrentEmployer.phone")}
       />
-      <TextInput
+      <Input
         {...formFields["signatories.beneficiaryCurrentEmployer.email"]}
+        nativeInputProps={{
+          ...formFields["signatories.beneficiaryCurrentEmployer.email"],
+          ...register("signatories.beneficiaryCurrentEmployer.email"),
+        }}
         disabled={disabled}
+        {...getFieldError("signatories.beneficiaryCurrentEmployer.email")}
       />
     </>
   );

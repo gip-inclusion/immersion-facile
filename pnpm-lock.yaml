@@ -245,6 +245,9 @@ importers:
       '@gouvfr/dsfr':
         specifier: 1.8.5
         version: 1.8.5
+      '@hookform/error-message':
+        specifier: ^2.0.1
+        version: 2.0.1(react-dom@18.2.0)(react-hook-form@7.42.1)(react@18.2.0)
       '@hookform/resolvers':
         specifier: ^2.9.11
         version: 2.9.11(react-hook-form@7.42.1)
@@ -3686,6 +3689,18 @@ packages:
   /@gouvfr/dsfr@1.8.5:
     resolution: {integrity: sha512-29L+THvWmYJXztPa0Os5TS9yD2WQbrH7VnCKxkyUXQZQ+6lsGebtz0GdCnLexOWDfCn1y53Mh7+/ihxI/z0Vjw==}
     engines: {node: '>=14.18.0'}
+
+  /@hookform/error-message@2.0.1(react-dom@18.2.0)(react-hook-form@7.42.1)(react@18.2.0):
+    resolution: {integrity: sha512-U410sAr92xgxT1idlu9WWOVjndxLdgPUHEB8Schr27C9eh7/xUnITWpCMF93s+lGiG++D4JnbSnrb5A21AdSNg==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
+      react-hook-form: ^7.0.0
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+      react-hook-form: 7.42.1(react@18.2.0)
+    dev: false
 
   /@hookform/resolvers@2.9.11(react-hook-form@7.42.1):
     resolution: {integrity: sha512-bA3aZ79UgcHj7tFV7RlgThzwSSHZgvfbt2wprldRkYBcMopdMvHyO17Wwp/twcJasNFischFfS7oz8Katz8DdQ==}

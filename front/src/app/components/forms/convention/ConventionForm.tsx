@@ -1,6 +1,8 @@
-import { Formik } from "formik";
 import React, { useEffect, useState } from "react";
+import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   ConventionDto,
@@ -13,6 +15,7 @@ import {
   isPeConnectIdentity,
 } from "shared";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
+import { ConventionFormFields } from "src/app/components/forms/convention/ConventionFormFields";
 import {
   ConventionPresentation,
   isConventionFrozen,
@@ -20,16 +23,13 @@ import {
 } from "src/app/components/forms/convention/conventionHelpers";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { useExistingSiret } from "src/app/hooks/siret.hooks";
+import { useMatomo } from "src/app/hooks/useMatomo";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
-import { useExistingSiret } from "src/app/hooks/siret.hooks";
-import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
-import { ConventionFormFields } from "src/app/components/forms/convention/ConventionFormFields";
-import { useMatomo } from "src/app/hooks/useMatomo";
 import { useStyles } from "tss-react/dsfr";
-import { fr } from "@codegouvfr/react-dsfr";
 
 const useClearConventionSubmitFeedbackOnUnmount = () => {
   const dispatch = useDispatch();
@@ -124,7 +124,20 @@ export const ConventionForm = ({
       }),
     );
   }, []);
+  const methods = useForm<ConventionReadDto>({
+    defaultValues: initialValues,
+    resolver: zodResolver(conventionWithoutExternalIdSchema),
+    mode: "onTouched",
+  });
+  const { handleSubmit, getValues } = methods;
 
+  const onSubmit: SubmitHandler<ConventionReadDto> = (values) => {
+    const conventionToSave = {
+      ...values,
+      workConditions: undefinedIfEmptyString(values.workConditions),
+    } as ConventionDto;
+    dispatch(conventionSlice.actions.saveConventionRequested(conventionToSave));
+  };
   const reduxFormUiReady =
     useWaitForReduxFormUiReadyBeforeFormikInitialisation(initialValues);
 
@@ -160,33 +173,15 @@ export const ConventionForm = ({
         <p className={fr.cx("fr-text--xs", "fr-mt-3w")}>
           Tous les champs marqués d'une astérisque (*) sont obligatoires.
         </p>
-
-        <Formik
-          enableReinitialize={true}
-          initialValues={fetchedConvention ?? initialValues}
-          validationSchema={toFormikValidationSchema(
-            conventionWithoutExternalIdSchema,
-          )}
-          onSubmit={(values) => {
-            const conventionToSave = {
-              ...values,
-              workConditions: undefinedIfEmptyString(values.workConditions),
-            } as ConventionDto;
-            dispatch(
-              conventionSlice.actions.saveConventionRequested(conventionToSave),
-            );
-          }}
-        >
-          {(props) => (
-            <form onReset={props.handleReset} onSubmit={props.handleSubmit}>
-              <ConventionFormFields isFrozen={isFrozen} />
-              <ConventionFeedbackNotification
-                submitFeedback={submitFeedback}
-                signatories={props.values.signatories}
-              />
-            </form>
-          )}
-        </Formik>
+        <FormProvider {...methods}>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <ConventionFormFields isFrozen={isFrozen} />
+            <ConventionFeedbackNotification
+              submitFeedback={submitFeedback}
+              signatories={getValues("signatories")}
+            />
+          </form>
+        </FormProvider>
       </div>
     </div>
   );

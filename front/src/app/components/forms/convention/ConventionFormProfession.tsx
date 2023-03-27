@@ -1,10 +1,11 @@
-import { useField } from "formik";
 import React from "react";
-import { TextInputError } from "react-design-system";
-import { AppellationDto, ConventionDto } from "shared";
-import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
-import { TextInput } from "src/app/components/forms/commons/TextInput";
+import { useFormContext } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
+import { Input } from "@codegouvfr/react-dsfr/Input";
+import { TextInputError } from "react-design-system";
+import { AppellationDto, ConventionReadDto } from "shared";
+import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
+import { emptyAppellation } from "../establishment/MultipleAppellationInput";
 
 type ConventionFormProfessionProps = {
   label: string;
@@ -19,22 +20,26 @@ export const ConventionFormProfession = ({
   disabled,
   initialFieldValue,
 }: ConventionFormProfessionProps) => {
-  const name: keyof ConventionDto = "immersionAppellation";
-
-  const [{ value }, meta, { setValue }] = useField<
-    ConventionDto["immersionAppellation"] | undefined
-  >(name);
+  const name: keyof ConventionReadDto = "immersionAppellation";
+  const {
+    setValue,
+    formState: { errors, touchedFields },
+    getValues,
+  } = useFormContext<ConventionReadDto>();
 
   const error =
-    meta.touched && (meta.error as Partial<AppellationDto>)?.appellationLabel;
+    touchedFields[name] &&
+    (errors[name] as Partial<AppellationDto>)?.appellationLabel;
 
   if (disabled)
     return (
-      <TextInput
+      <Input
         label={label}
-        name={name}
+        nativeInputProps={{
+          name,
+          value: getValues()[name]?.appellationLabel,
+        }}
         disabled
-        value={value?.appellationLabel}
       />
     );
 
@@ -46,6 +51,9 @@ export const ConventionFormProfession = ({
           initialValue={initialFieldValue}
           onAppellationSelected={setValue}
           description={description}
+          onInputClear={() => {
+            setValue(name, emptyAppellation);
+          }}
         />
         {error && <TextInputError errorMessage={error} />}
       </div>

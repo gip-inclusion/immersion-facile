@@ -1,9 +1,13 @@
+import { Input } from "@codegouvfr/react-dsfr/Input";
 import React from "react";
-import { ConventionDto } from "shared";
-import { TextInput } from "src/app/components/forms/commons/TextInput";
-import { useFormContents } from "src/app/hooks/formContents.hooks";
+
+import { useFormContext } from "react-hook-form";
+import { ConventionReadDto } from "shared";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
-import { useFormikContext } from "formik";
+import {
+  useFormContents,
+  makeFieldError,
+} from "src/app/hooks/formContents.hooks";
 
 export type BeneficiaryEmergencyContactFieldsProperties = {
   disabled: boolean | undefined;
@@ -12,28 +16,41 @@ export type BeneficiaryEmergencyContactFieldsProperties = {
 export const BeneficiaryEmergencyContactFields = ({
   disabled,
 }: BeneficiaryEmergencyContactFieldsProperties): JSX.Element => {
-  const { values } = useFormikContext<ConventionDto>();
+  const { watch, register, formState } = useFormContext<ConventionReadDto>();
 
   const { getFormFields } = useFormContents(
-    formConventionFieldsLabels(values.internshipKind),
+    formConventionFieldsLabels(watch().internshipKind),
   );
+  const getFieldError = makeFieldError(formState);
   const formContents = getFormFields();
   return (
     <>
-      <TextInput
+      <Input
         {...formContents["signatories.beneficiary.emergencyContact"]}
-        type="text"
+        nativeInputProps={{
+          ...formContents["signatories.beneficiary.emergencyContact"],
+          ...register("signatories.beneficiary.emergencyContact"),
+        }}
         disabled={disabled}
+        {...getFieldError("signatories.beneficiary.emergencyContact")}
       />
-      <TextInput
+      <Input
         {...formContents["signatories.beneficiary.emergencyContactPhone"]}
-        type="tel"
+        nativeInputProps={{
+          ...formContents["signatories.beneficiary.emergencyContactPhone"],
+          ...register("signatories.beneficiary.emergencyContactPhone"),
+        }}
         disabled={disabled}
+        {...getFieldError("signatories.beneficiary.emergencyContactPhone")}
       />
-      <TextInput
+      <Input
         {...formContents["signatories.beneficiary.emergencyContactEmail"]}
-        type="text"
+        nativeInputProps={{
+          ...formContents["signatories.beneficiary.emergencyContactEmail"],
+          ...register("signatories.beneficiary.emergencyContactEmail"),
+        }}
         disabled={disabled}
+        {...getFieldError("signatories.beneficiary.emergencyContactEmail")}
       />
     </>
   );

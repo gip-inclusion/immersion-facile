@@ -3,17 +3,20 @@ import { IconButton, Tooltip } from "@mui/material";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 import React, { useState } from "react";
-import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
+import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import {
   ElementModalContainer,
   useElementContainerModal,
 } from "src/app/components/forms/commons/FormModal/ElementModalContainer";
 import { ShareForm } from "./ShareForm";
+import { useFormContext } from "react-hook-form";
+import { ConventionReadDto } from "src/../../shared/src";
 
 const iconColor = "#3458a2";
 
 export const ShareLinkByEmail = () => {
-  const t = useConventionTextsFromFormikContext();
+  const { getValues } = useFormContext<ConventionReadDto>();
+  const t = useConventionTexts(getValues().internshipKind);
   const { modalState, dispatch } = useElementContainerModal();
   const [emailSent, setEmailSent] = useState<boolean | null>(null);
   const shareLinkByEmail = t.shareLinkByMail.share;

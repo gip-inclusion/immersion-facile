@@ -2,14 +2,14 @@ import { parseISO } from "date-fns";
 import React from "react";
 import {
   calculateWeeklyHours,
-  ConventionDto,
+  ConventionReadDto,
   WeeklyImmersionTimetableDto,
 } from "shared";
 import { DayCircle } from "./DayCircle";
 import { HourIndicator } from "./HourIndicator";
 import { getDayStatus } from "./utils/getDayStatus";
 import { fr } from "@codegouvfr/react-dsfr";
-import { useFormikContext } from "formik";
+import { useFormContext } from "react-hook-form";
 
 type WeeklyRowProperties = {
   weeklyCalendar: WeeklyImmersionTimetableDto;
@@ -28,7 +28,8 @@ export const WeeklyRow = ({
   disabled,
   onChange,
 }: WeeklyRowProperties) => {
-  const { values } = useFormikContext<ConventionDto>();
+  const { getValues } = useFormContext<ConventionReadDto>();
+  const values = getValues();
   return (
     <div className={fr.cx("fr-grid-row", "fr-mt-1w", "fr-grid-row--middle")}>
       {weeklyCalendar.map((dayOfWeek) =>

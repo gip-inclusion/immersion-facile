@@ -1,10 +1,11 @@
-import { useFormikContext } from "formik";
+import { Input } from "@codegouvfr/react-dsfr/Input";
+
 import React from "react";
+import { useFormContext } from "react-hook-form";
 import { ConventionDto } from "shared";
-import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
-import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
+import { useFormContents } from "src/app/hooks/formContents.hooks";
 
 type EstablishmentRepresentativeFieldsProperties = {
   disabled: boolean | undefined;
@@ -13,31 +14,46 @@ type EstablishmentRepresentativeFieldsProperties = {
 export const EstablishmentRepresentativeFields = ({
   disabled,
 }: EstablishmentRepresentativeFieldsProperties): JSX.Element => {
-  const { values } = useFormikContext<ConventionDto>();
+  const { getValues, register } = useFormContext<ConventionDto>();
+  const values = getValues();
   const { getFormFields } = useFormContents(
     formConventionFieldsLabels(values.internshipKind),
   );
   const formContents = getFormFields();
   return (
     <>
-      <TextInput
+      <Input
         {...formContents["signatories.establishmentRepresentative.firstName"]}
-        type="text"
+        nativeInputProps={{
+          ...formContents["signatories.establishmentRepresentative.firstName"],
+          ...register("signatories.establishmentRepresentative.firstName"),
+        }}
         disabled={disabled}
       />
-      <TextInput
+      <Input
         {...formContents["signatories.establishmentRepresentative.lastName"]}
-        type="text"
+        nativeInputProps={{
+          ...formContents["signatories.establishmentRepresentative.lastName"],
+          ...register("signatories.establishmentRepresentative.lastName"),
+        }}
         disabled={disabled}
       />
-      <TextInput
+      <Input
         {...formContents["signatories.establishmentRepresentative.phone"]}
-        type="tel"
+        nativeInputProps={{
+          ...formContents["signatories.establishmentRepresentative.phone"],
+          ...register("signatories.establishmentRepresentative.phone"),
+          type: "tel",
+        }}
         disabled={disabled}
       />
-      <TextInput
+      <Input
         {...formContents["signatories.establishmentRepresentative.email"]}
-        type="email"
+        nativeInputProps={{
+          ...formContents["signatories.establishmentRepresentative.email"],
+          ...register("signatories.establishmentRepresentative.email"),
+          type: "email",
+        }}
         disabled={disabled}
       />
       {values.signatories.establishmentRepresentative?.email && (

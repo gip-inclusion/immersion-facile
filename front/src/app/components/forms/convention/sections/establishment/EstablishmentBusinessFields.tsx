@@ -1,17 +1,14 @@
+import { Input } from "@codegouvfr/react-dsfr/Input";
 import React from "react";
-import { useField, useFormikContext } from "formik";
-import { ConventionDto, ConventionStatus } from "shared";
-import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
+import { useFormContext } from "react-hook-form";
+import { ConventionDto } from "shared";
+import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
+import { useFormContents } from "src/app/hooks/formContents.hooks";
 import {
   useSiretFetcher,
   useSiretRelatedField,
 } from "src/app/hooks/siret.hooks";
-import {
-  TextInputControlled,
-  TextInput,
-} from "src/app/components/forms/commons/TextInput";
-import { useFormContents } from "src/app/hooks/formContents.hooks";
-import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
+import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 
 export const EstablishmentBusinessFields = ({
   disabled,
@@ -19,30 +16,43 @@ export const EstablishmentBusinessFields = ({
   disabled: undefined | boolean;
 }): JSX.Element => {
   const { enableInseeApi } = useFeatureFlags();
-  const { updateSiret, currentSiret, siretErrorToDisplay } = useSiretFetcher({
+  const { currentSiret, updateSiret, siretErrorToDisplay } = useSiretFetcher({
     shouldFetchEvenIfAlreadySaved: true,
   });
-  const [conventionStatus] = useField<ConventionStatus>("status");
+
+  const { getValues, register, setValue } = useFormContext<ConventionDto>();
+  const values = getValues();
+  const conventionStatus = values.status;
   useSiretRelatedField("businessName", {
-    disabled: conventionStatus.value !== "DRAFT",
+    disabled: conventionStatus !== "DRAFT",
   });
-  const { values } = useFormikContext<ConventionDto>();
   const { getFormFields } = useFormContents(
     formConventionFieldsLabels(values.internshipKind),
   );
   const formContents = getFormFields();
   return (
     <>
-      <TextInputControlled
+      <Input
         {...formContents.siret}
-        value={currentSiret}
-        setValue={updateSiret}
-        error={siretErrorToDisplay}
+        nativeInputProps={{
+          ...formContents.siret,
+          ...register("siret"),
+          value: currentSiret,
+          onChange: (event) => {
+            setValue("siret", event.currentTarget.value);
+            updateSiret(event.currentTarget.value);
+          },
+        }}
         disabled={disabled}
+        state={siretErrorToDisplay ? "error" : undefined}
+        stateRelatedMessage={siretErrorToDisplay}
       />
-      <TextInput
+      <Input
         {...formContents.businessName}
-        type="text"
+        nativeInputProps={{
+          ...formContents.businessName,
+          ...register("businessName"),
+        }}
         disabled={enableInseeApi}
       />
     </>

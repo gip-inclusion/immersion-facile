@@ -1,38 +1,41 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import { Input } from "@codegouvfr/react-dsfr/Input";
+import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { addMonths } from "date-fns";
-import { useFormikContext } from "formik";
-import React, { useState } from "react";
+
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import React, { useState } from "react";
+import { useFormContext } from "react-hook-form";
 import {
   addressDtoToString,
-  ConventionDto,
   conventionObjectiveOptions,
+  ConventionReadDto,
   DateIntervalDto,
   isStringDate,
   reasonableSchedule,
   scheduleWithFirstDayActivity,
 } from "shared";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
-import { DateInput } from "src/app/components/forms/commons/DateInput";
-import {
-  BoolRadioGroup,
-  RadioGroupForField,
-} from "src/app/components/forms/commons/RadioGroup";
 import { SchedulePicker } from "src/app/components/forms/commons/SchedulePicker/SchedulePicker";
-import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { ConventionFormProfession } from "src/app/components/forms/convention/ConventionFormProfession";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
-import { useFormContents } from "src/app/hooks/formContents.hooks";
+import {
+  makeFieldError,
+  useFormContents,
+} from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useSiretRelatedField } from "src/app/hooks/siret.hooks";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
+import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 
 export const ImmersionConditionsCommonFields = ({
   disabled,
 }: {
   disabled?: boolean;
 }) => {
-  const { setFieldValue, values } = useFormikContext<ConventionDto>();
+  const { setValue, getValues, register, formState } =
+    useFormContext<ConventionReadDto>();
+  const values = getValues();
   const establishmentInfos = useAppSelector(siretSelectors.establishmentInfos);
   const isFetchingSiret = useAppSelector(siretSelectors.isFetching);
   const isSiretFetcherDisabled = values.status !== "DRAFT";
@@ -52,10 +55,11 @@ export const ImmersionConditionsCommonFields = ({
   const { getFormFields } = useFormContents(
     formConventionFieldsLabels(values.internshipKind),
   );
+  const getFieldError = makeFieldError(formState);
   const formContents = getFormFields();
 
   const resetSchedule = (interval: DateIntervalDto) => {
-    setFieldValue(
+    setValue(
       "schedule",
       values.schedule.isSimple
         ? reasonableSchedule(interval)
@@ -91,32 +95,52 @@ export const ImmersionConditionsCommonFields = ({
           />
         </>
       )}
-      <DateInput
+      <Input
         {...formContents["dateStart"]}
         disabled={disabled}
-        onDateChange={(dateStart) => {
-          resetSchedule({
-            start: new Date(dateStart),
-            end: new Date(values.dateEnd),
-          });
-          setFieldValue("dateStart", dateStart);
-          if (isStringDate(dateStart)) {
-            setDateMax(addMonths(new Date(dateStart), 1).toISOString());
-          }
+        nativeInputProps={{
+          ...register("dateStart"),
+          onChange: (event) => {
+            const dateStart = event.target.value;
+            resetSchedule({
+              start: new Date(dateStart),
+              end: new Date(values.dateEnd),
+            });
+            setValue("dateStart", dateStart, {
+              shouldValidate: true,
+            });
+            setValue("dateEnd", values.dateEnd, {
+              shouldValidate: true,
+            });
+            if (isStringDate(dateStart)) {
+              setDateMax(addMonths(new Date(dateStart), 1).toISOString());
+            }
+          },
+          type: "date",
         }}
+        {...getFieldError("dateStart")}
       />
-      <DateInput
+      <Input
         {...formContents["dateEnd"]}
         disabled={disabled}
-        max={dateMax}
-        onDateChange={(dateEnd) => {
-          resetSchedule({
-            start: new Date(values.dateStart),
-            end: new Date(dateEnd),
-          });
-          setFieldValue("dateEnd", dateEnd);
+        nativeInputProps={{
+          ...register("dateEnd"),
+          onChange: (event) => {
+            const dateEnd = event.target.value;
+            resetSchedule({
+              start: new Date(values.dateStart),
+              end: new Date(dateEnd),
+            });
+            setValue("dateEnd", dateEnd, {
+              shouldValidate: true,
+            });
+          },
+          type: "date",
+          max: dateMax,
         }}
+        {...getFieldError("dateEnd")}
       />
+
       <SchedulePicker
         disabled={disabled}
         interval={{
@@ -130,14 +154,30 @@ export const ImmersionConditionsCommonFields = ({
           values.immersionAddress ?? establishmentInfos?.businessAddress
         }
         setFormValue={({ address }) =>
-          setFieldValue("immersionAddress", addressDtoToString(address))
+          setValue("immersionAddress", addressDtoToString(address))
         }
         disabled={disabled || isFetchingSiret}
       />
-      <BoolRadioGroup
+      <RadioButtons
         {...formContents["individualProtection"]}
+        legend={formContents["individualProtection"].label}
+        hintText={formContents["individualProtection"].description}
+        options={booleanSelectOptions.map((option) => ({
+          ...option,
+          nativeInputProps: {
+            ...option.nativeInputProps,
+            defaultChecked: option.nativeInputProps.value === 0,
+            onChange: () => {
+              setValue(
+                "individualProtection",
+                option.nativeInputProps.value === 1,
+              );
+            },
+          },
+        }))}
         disabled={disabled}
       />
+
       {values.internshipKind === "mini-stage-cci" && (
         <Alert
           small
@@ -152,13 +192,33 @@ export const ImmersionConditionsCommonFields = ({
         mineurs par le même code."
         />
       )}
-      <BoolRadioGroup
+
+      <RadioButtons
         {...formContents["sanitaryPrevention"]}
+        legend={formContents["sanitaryPrevention"].label}
+        hintText={formContents["sanitaryPrevention"].description}
+        options={booleanSelectOptions.map((option) => ({
+          ...option,
+          nativeInputProps: {
+            ...option.nativeInputProps,
+            defaultChecked: option.nativeInputProps.value === 0,
+            onChange: () => {
+              setValue(
+                "individualProtection",
+                option.nativeInputProps.value === 1,
+              );
+            },
+          },
+        }))}
         disabled={disabled}
       />
-      <TextInput
+
+      <Input
         {...formContents["sanitaryPreventionDescription"]}
-        type="text"
+        nativeInputProps={{
+          ...formContents["sanitaryPreventionDescription"],
+          ...register("sanitaryPreventionDescription"),
+        }}
         disabled={disabled}
       />
       {values.internshipKind === "mini-stage-cci" && (
@@ -172,38 +232,59 @@ export const ImmersionConditionsCommonFields = ({
         prévention des risques de contamination en matière sanitaire."
         />
       )}
-      <RadioGroupForField
+
+      <RadioButtons
         {...formContents["immersionObjective"]}
+        legend={formContents["immersionObjective"].label}
+        hintText={formContents["immersionObjective"].description}
         options={conventionObjectiveOptions
-          .filter((value) =>
+          .filter((option) =>
             values.internshipKind !== "mini-stage-cci"
               ? true
-              : value !== "Initier une démarche de recrutement",
+              : option !== "Initier une démarche de recrutement",
           )
-          .map((value) => ({
-            value,
+          .map((option) => ({
+            value: option,
+            label: option,
+            nativeInputProps: {
+              onChange: () => setValue("immersionObjective", option),
+              defaultChecked: option === values.immersionObjective,
+              value: option,
+            },
           }))}
         disabled={disabled}
       />
+
       <ConventionFormProfession
         {...formContents["immersionAppellation"]}
         disabled={disabled}
         initialFieldValue={values.immersionAppellation}
       />
-      <TextInput
+      <Input
         {...formContents["workConditions"]}
+        textArea
+        nativeTextAreaProps={{
+          ...formContents["workConditions"],
+          ...register("workConditions"),
+        }}
         disabled={disabled}
-        multiline={true}
       />
-      <TextInput
+      <Input
         {...formContents["businessAdvantages"]}
-        disabled={disabled}
-        multiline={true}
+        textArea
+        nativeTextAreaProps={{
+          ...formContents["businessAdvantages"],
+          ...register("businessAdvantages"),
+        }}
       />
-      <TextInput
+      <Input
         {...formContents["immersionActivities"]}
+        textArea
+        nativeTextAreaProps={{
+          ...formContents["immersionActivities"],
+          ...register("immersionActivities"),
+        }}
         disabled={disabled}
-        multiline={true}
       />
       {values.internshipKind === "mini-stage-cci" && (
         <Alert
@@ -219,9 +300,12 @@ export const ImmersionConditionsCommonFields = ({
         Le jeune est tenu au respect du secret professionnel."
         />
       )}
-      <TextInput
+      <Input
         {...formContents["immersionSkills"]}
-        type="text"
+        nativeInputProps={{
+          ...formContents["immersionSkills"],
+          ...register("immersionSkills"),
+        }}
         disabled={disabled}
       />
     </>

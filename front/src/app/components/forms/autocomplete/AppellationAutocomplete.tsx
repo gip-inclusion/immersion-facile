@@ -25,6 +25,7 @@ type AppellationAutocompleteProps = {
   label: string;
   initialValue?: AppellationDto | undefined;
   onAppellationSelected: (p: AppellationDto) => void;
+  onInputClear?: () => void;
   className?: string;
   selectedAppellations?: AppellationDto[];
   description?: string;
@@ -37,6 +38,7 @@ type Option = Proposal<AppellationDto>;
 export const AppellationAutocomplete = ({
   initialValue,
   onAppellationSelected,
+  onInputClear,
   label,
   className,
   selectedAppellations = [],
@@ -135,8 +137,11 @@ export const AppellationAutocomplete = ({
             );
           }
         }}
-        onInputChange={(_, newSearchTerm) => {
-          if (searchTerm !== newSearchTerm) {
+        onInputChange={(_, newSearchTerm, reason) => {
+          if (searchTerm !== newSearchTerm && reason === "input") {
+            if (newSearchTerm === "") {
+              onInputClear?.();
+            }
             setSearchTerm(newSearchTerm);
             setInputHasChanged(true);
           }

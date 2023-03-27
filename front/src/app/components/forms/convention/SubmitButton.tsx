@@ -1,7 +1,7 @@
-import { useField } from "formik";
 import React from "react";
-import { ConventionStatus } from "shared";
+import { ConventionReadDto } from "shared";
 import { fr } from "@codegouvfr/react-dsfr";
+import { useFormContext } from "react-hook-form";
 
 type SubmitButtonProps = {
   isSubmitting: boolean;
@@ -15,10 +15,9 @@ export const SubmitButton = ({
   isSubmitting,
   id = "im-submit-button",
 }: SubmitButtonProps) => {
-  const [_, __, { setValue }] = useField<ConventionStatus>({ name: "status" });
-
+  const { setValue } = useFormContext<ConventionReadDto>();
   const makeInReviewAndSubmit = () => {
-    setValue("READY_TO_SIGN");
+    setValue("status", "READY_TO_SIGN");
     return onSubmit();
   };
 

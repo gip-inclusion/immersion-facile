@@ -1,13 +1,13 @@
-import { useField, useFormikContext } from "formik";
+import { Select } from "@codegouvfr/react-dsfr/Select";
 import React, { useEffect, useState } from "react";
-import type { ConventionDto } from "shared";
-import { AgencyId, AgencyOption } from "shared";
 import { Loader } from "react-design-system";
+import { useFormContext } from "react-hook-form";
+import type { ConventionDto, ConventionReadDto } from "shared";
+import { AgencyOption } from "shared";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { agencyGateway } from "src/config/dependencies";
 import { AgencyErrorText } from "./AgencyErrorText";
-import { Select } from "@codegouvfr/react-dsfr/Select";
 
 const placeholderAgency: AgencyOption = {
   id: "",
@@ -19,19 +19,22 @@ type AgencyDisplayProps = {
 
 export const AgencyDisplayReadOnly = ({ agencyId }: AgencyDisplayProps) => {
   const name: keyof ConventionDto = "agencyId";
-  const [{ value }, { touched, error }, { setValue }] = useField<AgencyId>({
-    name,
-  });
-  const { values } = useFormikContext<ConventionDto>();
+  const {
+    register,
+    getValues,
+    setValue,
+    formState: { errors, touchedFields },
+  } = useFormContext<ConventionReadDto>();
 
   const [isLoading, setIsLoading] = useState(false);
   const [loadingError, setLoadingError] = useState(false);
   const [agencies, setAgencies] = useState([placeholderAgency]);
   const { getFormFields } = useFormContents(
-    formConventionFieldsLabels(values.internshipKind),
+    formConventionFieldsLabels(getValues().internshipKind),
   );
   const formContents = getFormFields();
-
+  const error = errors[name];
+  const touched = touchedFields[name];
   useEffect(() => {
     if (!agencyId) return;
     agencyGateway
@@ -45,7 +48,7 @@ export const AgencyDisplayReadOnly = ({ agencyId }: AgencyDisplayProps) => {
           { ...agency },
         ]);
         if (agencyId && agencies.map((agency) => agency.id).includes(agencyId))
-          setValue(agencyId);
+          setValue(name, agencyId);
         setLoadingError(false);
       })
       .catch((e) => {
@@ -72,16 +75,16 @@ export const AgencyDisplayReadOnly = ({ agencyId }: AgencyDisplayProps) => {
         placeholder={formContents["agencyId"].placeholder}
         nativeSelectProps={{
           ...formContents["agencyId"],
-          onChange: (event) => setValue(event.currentTarget.value),
-          value,
+          ...register(name),
+          onChange: (event) => setValue(name, event.currentTarget.value),
         }}
       />
 
       {showError && (
         <AgencyErrorText
           loadingError={loadingError}
-          userError={userError}
-          error={error}
+          userError={userError?.message}
+          error={error?.message}
         />
       )}
       {isLoading && <Loader />}

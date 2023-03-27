@@ -1,11 +1,15 @@
-import { useFormikContext } from "formik";
+import { Input } from "@codegouvfr/react-dsfr/Input";
 import React from "react";
+
+import { useFormContext } from "react-hook-form";
 import { ConventionDto } from "shared";
-import { useSiretFetcher } from "src/app/hooks/siret.hooks";
-import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
-import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
+import {
+  useFormContents,
+  makeFieldError,
+} from "src/app/hooks/formContents.hooks";
+import { useSiretFetcher } from "src/app/hooks/siret.hooks";
 
 type EstablishementTutorFieldsProperties = {
   disabled: boolean | undefined;
@@ -17,37 +21,61 @@ export const EstablishementTutorFields = ({
   const { isFetchingSiret } = useSiretFetcher({
     shouldFetchEvenIfAlreadySaved: true,
   });
-  const { values } = useFormikContext<ConventionDto>();
+  const { register, getValues, formState } = useFormContext<ConventionDto>();
+  const values = getValues();
+  const getFieldError = makeFieldError(formState);
   const { getFormFields } = useFormContents(
     formConventionFieldsLabels(values.internshipKind),
   );
   const formContents = getFormFields();
   return (
     <>
-      <TextInput
+      <Input
         {...formContents["establishmentTutor.firstName"]}
-        type="text"
+        nativeInputProps={{
+          ...formContents["establishmentTutor.firstName"],
+          ...register("establishmentTutor.firstName"),
+        }}
         disabled={disabled || isFetchingSiret}
+        {...getFieldError("establishmentTutor.firstName")}
       />
-      <TextInput
+      <Input
         {...formContents["establishmentTutor.lastName"]}
-        type="text"
+        nativeInputProps={{
+          ...formContents["establishmentTutor.lastName"],
+          ...register("establishmentTutor.lastName"),
+        }}
         disabled={disabled || isFetchingSiret}
+        {...getFieldError("establishmentTutor.lastName")}
       />
-      <TextInput
+      <Input
         {...formContents["establishmentTutor.job"]}
-        type="text"
+        nativeInputProps={{
+          ...formContents["establishmentTutor.job"],
+          ...register("establishmentTutor.job"),
+        }}
         disabled={disabled || isFetchingSiret}
+        {...getFieldError("establishmentTutor.job")}
       />
-      <TextInput
+      <Input
         {...formContents["establishmentTutor.phone"]}
-        type="tel"
+        nativeInputProps={{
+          ...formContents["establishmentTutor.phone"],
+          ...register("establishmentTutor.phone"),
+          type: "tel",
+        }}
         disabled={disabled}
+        {...getFieldError("establishmentTutor.phone")}
       />
-      <TextInput
+      <Input
         {...formContents["establishmentTutor.email"]}
-        type="email"
+        nativeInputProps={{
+          ...formContents["establishmentTutor.email"],
+          ...register("establishmentTutor.email"),
+          type: "email",
+        }}
         disabled={disabled}
+        {...getFieldError("establishmentTutor.email")}
       />
       {values.establishmentTutor?.email && <ConventionEmailWarning />}
     </>

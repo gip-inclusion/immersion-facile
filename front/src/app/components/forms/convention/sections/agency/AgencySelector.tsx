@@ -1,17 +1,17 @@
-import { useField } from "formik";
+import { Select } from "@codegouvfr/react-dsfr/Select";
 import React, { useEffect, useState } from "react";
 import { Loader } from "react-design-system";
-import { Select } from "@codegouvfr/react-dsfr/Select";
+import { useFormContext } from "react-hook-form";
 import {
-  AgencyId,
   AgencyOption,
+  ConventionReadDto,
   DepartmentCode,
   departmentNameToDepartmentCode,
-  miniStageRestrictedDepartments,
   FederatedIdentity,
   InternshipKind,
   isPeConnectIdentity,
   keys,
+  miniStageRestrictedDepartments,
 } from "shared";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
@@ -38,11 +38,15 @@ export const AgencySelector = ({
   );
   const { agencyId: agencyIdField, agencyDepartment: agencyDepartmentField } =
     getFormFields();
-  const [{ value }, { touched, error }, { setValue }] = useField<AgencyId>(
-    agencyIdField.name || "agencyId",
-  );
-  const [{ value: agencyDepartment }, _, { setValue: setAgencyDepartment }] =
-    useField<DepartmentCode | null>(agencyDepartmentField.name);
+  const {
+    register,
+    getValues,
+    setValue,
+    formState: { errors, touchedFields },
+  } = useFormContext<ConventionReadDto>();
+  // const [{ value: agencyDepartment }, _, { setValue: setAgencyDepartment }] =
+  //   useField<DepartmentCode | null>(agencyDepartmentField.name);
+  const agencyDepartment = getValues().agencyDepartment;
   const [isLoading, setIsLoading] = useState(false);
   const [loadingError, setLoadingError] = useState(false);
 
@@ -53,6 +57,9 @@ export const AgencySelector = ({
     },
   ]);
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
+  const agencyIdName = agencyIdField.name as keyof ConventionReadDto;
+  const agencyDepartmentName =
+    agencyDepartmentField.name as keyof ConventionReadDto;
 
   useEffect(() => {
     if (!agencyDepartment) return;
@@ -74,8 +81,8 @@ export const AgencySelector = ({
             agencies,
           )
         )
-          setValue(defaultAgencyId);
-        else setValue("");
+          setValue(agencyIdName, defaultAgencyId);
+        else setValue(agencyIdName, "");
         setLoadingError(false);
       })
       .catch((e: any) => {
@@ -88,6 +95,8 @@ export const AgencySelector = ({
         setIsLoading(false);
       });
   }, [agencyDepartment]);
+  const error = errors[agencyIdName];
+  const touched = touchedFields[agencyIdName];
   const userError = touched && error;
   const showError = userError || loadingError;
   return (
@@ -107,7 +116,8 @@ export const AgencySelector = ({
         nativeSelectProps={{
           ...agencyDepartmentField,
           value: agencyDepartment as string,
-          onChange: (event) => setAgencyDepartment(event.currentTarget.value),
+          onChange: (event) =>
+            setValue(agencyDepartmentName, event.currentTarget.value),
         }}
       />
 
@@ -120,17 +130,16 @@ export const AgencySelector = ({
             : "Veuillez sélectionner un département"
         }
         nativeSelectProps={{
-          onChange: (event) => setValue(event.currentTarget.value),
-          value,
-          disabled: disabled || isLoading || !agencyDepartment,
           ...agencyIdField,
+          ...register(agencyIdName),
+          disabled: disabled || isLoading || !agencyDepartment,
         }}
       />
       {showError && (
         <AgencyErrorText
           loadingError={loadingError}
-          userError={userError}
-          error={error}
+          userError={userError ? "Veuillez sélectionner une structure" : ""} // @TODO userError.message
+          error={error?.message}
         />
       )}
       {isLoading && <Loader />}

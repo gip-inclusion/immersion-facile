@@ -1,9 +1,9 @@
-import { ErrorMessage } from "formik";
 import React from "react";
 import { removeAtIndex, replaceArrayElement, TimePeriodDto } from "shared";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
+import { ErrorMessage } from "@hookform/error-message";
 
 type HourPickerProps = {
   name: string;
@@ -83,7 +83,7 @@ export const HourPicker = ({
                   />
                   <ErrorMessage
                     name={`hours.${index}.start`}
-                    component="div"
+                    as={"div"}
                     className={cx("field-error")}
                   />
                 </div>
@@ -102,7 +102,7 @@ export const HourPicker = ({
                   />
                   <ErrorMessage
                     name={`hours.${index}.end`}
-                    component="div"
+                    as="div"
                     className={cx("field-error")}
                   />
                 </div>

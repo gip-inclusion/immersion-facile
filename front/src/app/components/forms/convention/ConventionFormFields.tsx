@@ -1,5 +1,4 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import { useFormikContext } from "formik";
 import React, { useEffect } from "react";
 import { ErrorNotifications } from "react-design-system";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
@@ -11,8 +10,11 @@ import { SignatureActions } from "src/app/components/forms/convention/SignatureA
 import { SubmitButton } from "src/app/components/forms/convention/SubmitButton";
 import { useConventionWatchValuesInUrl } from "src/app/components/forms/convention/useConventionWatchValuesInUrl";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
-import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
-import { useFormContents } from "src/app/hooks/formContents.hooks";
+import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
+import {
+  formErrorsToFlatErrors,
+  useFormContents,
+} from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { useRoute } from "src/app/routes/routes";
@@ -22,6 +24,7 @@ import { AgencyFormSection } from "./sections/agency/AgencyFormSection";
 import { BeneficiaryFormSection } from "./sections/beneficiary/BeneficiaryFormSection";
 import { EstablishmentFormSection } from "./sections/establishment/EstablishmentFormSection";
 import { ImmersionConditionFormSection } from "./sections/immersion-conditions/ImmersionConditionFormSection";
+import { useFormContext } from "react-hook-form";
 
 type ConventionFieldsProps = {
   isFrozen?: boolean;
@@ -39,13 +42,12 @@ export const ConventionFormFields = ({
   onModificationsRequired = async () => {},
 }: ConventionFieldsProps): JSX.Element => {
   const {
-    errors,
-    submitCount,
-    isSubmitting,
-    submitForm,
-    setFieldValue,
-    values: conventionValues,
-  } = useFormikContext<ConventionReadDto>();
+    setValue,
+    getValues,
+    handleSubmit,
+    formState: { errors, submitCount, isSubmitting },
+  } = useFormContext<ConventionReadDto>();
+  const conventionValues = getValues();
   const preselectedAgencyId = useAppSelector(
     conventionSelectors.preselectedAgencyId,
   );
@@ -57,7 +59,7 @@ export const ConventionFormFields = ({
 
   useEffect(() => {
     if (route.name === "conventionCustomAgency" && preselectedAgencyId) {
-      setFieldValue("agencyId", preselectedAgencyId);
+      setValue("agencyId", preselectedAgencyId);
     }
   }, [preselectedAgencyId]);
 
@@ -70,10 +72,9 @@ export const ConventionFormFields = ({
     formConventionFieldsLabels(conventionValues.internshipKind),
   );
   const formContents = getFormFields();
-  const t = useConventionTextsFromFormikContext();
   const federatedIdentity =
     conventionValues.signatories.beneficiary.federatedIdentity;
-
+  const t = useConventionTexts(conventionValues.internshipKind);
   return (
     <>
       {isFrozen && !isSignatureMode && <ConventionFrozenMessage />}
@@ -134,7 +135,7 @@ export const ConventionFormFields = ({
       {!isSignatureMode && (
         <ErrorNotifications
           labels={getFormErrors()}
-          errors={toDotNotation(errors)}
+          errors={toDotNotation(formErrorsToFlatErrors(errors))}
           visible={submitCount !== 0 && Object.values(errors).length > 0}
         />
       )}
@@ -144,7 +145,10 @@ export const ConventionFormFields = ({
           <SubmitButton
             isSubmitting={isSubmitting}
             disabled={isFrozen || isSignatureMode}
-            onSubmit={submitForm}
+            onSubmit={handleSubmit(
+              () => console.log("valid"),
+              (errors) => console.error(getValues(), errors),
+            )}
           />
         </div>
       )}
@@ -158,7 +162,10 @@ export const ConventionFormFields = ({
               alreadySigned={alreadySigned}
               signatory={signatory}
               isSubmitting={isSubmitting}
-              onSubmit={submitForm}
+              onSubmit={handleSubmit(
+                () => console.log("valid"),
+                () => console.error("invalid"),
+              )}
               onModificationRequired={onModificationsRequired}
             />
           )}

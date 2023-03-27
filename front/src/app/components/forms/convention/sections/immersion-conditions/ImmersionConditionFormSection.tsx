@@ -1,9 +1,10 @@
 import React from "react";
-import { FederatedIdentity } from "shared";
+import { ConventionReadDto, FederatedIdentity } from "shared";
 import { SectionTitle } from "react-design-system";
-import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
+import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { ImmersionConditionsCommonFields } from "./ImmersionConditionsCommonFields";
 import { ShareActions } from "../../ShareActions";
+import { useFormContext } from "react-hook-form";
 
 type ImmersionConditionFormSectionProperties = {
   federatedIdentity: FederatedIdentity | undefined;
@@ -14,7 +15,8 @@ export const ImmersionConditionFormSection = ({
   federatedIdentity,
   isFrozen,
 }: ImmersionConditionFormSectionProperties): JSX.Element => {
-  const t = useConventionTextsFromFormikContext();
+  const { getValues } = useFormContext<ConventionReadDto>();
+  const t = useConventionTexts(getValues().internshipKind);
   return (
     <>
       <SectionTitle>

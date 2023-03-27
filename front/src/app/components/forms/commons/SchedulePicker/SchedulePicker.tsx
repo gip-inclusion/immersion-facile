@@ -1,16 +1,17 @@
-import { useField } from "formik";
+import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import React from "react";
 import {
   ConventionDto,
+  ConventionReadDto,
   DateIntervalDto,
   reasonableSchedule,
-  ScheduleDto,
   scheduleWithFirstDayActivity,
 } from "shared";
-import { BoolRadioPicker } from "./BoolRadioPicker";
+
+import { fr } from "@codegouvfr/react-dsfr";
+import { useFormContext } from "react-hook-form";
 import { ComplexSchedulePicker } from "./ComplexSchedulePicker";
 import { RegularSchedulePicker } from "./RegularSchedulePicker";
-import { fr } from "@codegouvfr/react-dsfr";
 import "./SchedulePicker.css";
 
 type SchedulePickerProps = {
@@ -23,32 +24,47 @@ export const SchedulePicker = ({
   disabled,
 }: SchedulePickerProps): JSX.Element => {
   const name: keyof ConventionDto = "schedule";
-  const [field, meta, { setValue }] = useField<ScheduleDto>({ name });
-
+  const {
+    setValue,
+    formState: { errors },
+    getValues,
+  } = useFormContext<ConventionReadDto>();
+  const values = getValues();
   const onBoolRadioPickerChange = (isSimple: boolean): void => {
-    setValue(
-      isSimple
-        ? reasonableSchedule(interval)
-        : scheduleWithFirstDayActivity(interval),
-    );
+    const newScheduleValue = isSimple
+      ? reasonableSchedule(interval)
+      : scheduleWithFirstDayActivity(interval);
+    setValue(name, newScheduleValue);
   };
-
-  const scheduleErrors = meta.error ? toArrayOfScheduleErrors(meta.error) : [];
-
+  const error = errors[name];
+  const scheduleErrors = error?.message
+    ? toArrayOfScheduleErrors(error.message)
+    : [];
   return (
     <>
-      <BoolRadioPicker
-        name="schedule.isSimple"
-        label="Les horaires quotidiens sont-ils réguliers ? *"
-        description="Ex : (Non) chaque jour a des horaires bien spécifiques, (Oui) “Du lundi au vendredi de 8h00 à 17h00”"
-        yesLabel="Oui"
-        noLabel="Non, irréguliers"
-        checked={field.value.isSimple}
-        setFieldValue={onBoolRadioPickerChange}
+      <RadioButtons
+        legend="Les horaires quotidiens sont-ils réguliers ? *"
+        hintText="Ex : (Non) chaque jour a des horaires bien spécifiques, (Oui) “Du lundi au vendredi de 8h00 à 17h00”"
+        options={[
+          {
+            label: "Oui",
+            nativeInputProps: {
+              onChange: () => onBoolRadioPickerChange(true),
+              defaultChecked: true,
+            },
+          },
+          {
+            label: "Non, irréguliers",
+            nativeInputProps: {
+              onChange: () => onBoolRadioPickerChange(false),
+            },
+          },
+        ]}
         disabled={disabled}
       />
+
       <p className={fr.cx("fr-h4", "fr-mt-4w")}>
-        {field.value.isSimple
+        {values[name].isSimple
           ? "Sélectionnez la période des jours *"
           : "Sélectionnez les horaires de travail jour par jour *"}
       </p>
@@ -61,7 +77,7 @@ export const SchedulePicker = ({
           {value}
         </div>
       ))}
-      {field.value.isSimple ? (
+      {values[name].isSimple ? (
         <RegularSchedulePicker interval={interval} disabled={disabled} />
       ) : (
         <ComplexSchedulePicker disabled={disabled} />

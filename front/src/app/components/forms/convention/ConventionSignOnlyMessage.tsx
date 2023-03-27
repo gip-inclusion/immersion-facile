@@ -1,6 +1,8 @@
 import React from "react";
-import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
+import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { fr } from "@codegouvfr/react-dsfr";
+import { useFormContext } from "react-hook-form";
+import { ConventionReadDto } from "src/../../shared/src";
 
 type SignOnlyMessageProps = {
   isAlreadySigned: boolean;
@@ -9,7 +11,8 @@ type SignOnlyMessageProps = {
 export const ConventionSignOnlyMessage = ({
   isAlreadySigned,
 }: SignOnlyMessageProps) => {
-  const t = useConventionTextsFromFormikContext();
+  const { getValues } = useFormContext<ConventionReadDto>();
+  const t = useConventionTexts(getValues().internshipKind);
 
   return (
     <div role="alert" className={fr.cx("fr-alert", "fr-alert--info")}>

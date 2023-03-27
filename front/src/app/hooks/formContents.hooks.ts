@@ -2,7 +2,8 @@ import {
   FormFieldAttributes,
   FormFieldAttributesForContent,
 } from "../contents/forms/types";
-import { type FormState, type FieldValues } from "react-hook-form";
+import { type FormState, type FieldValues, get } from "react-hook-form";
+import { DotNestedKeys } from "src/../../shared/src";
 
 export type FormFieldsObject<T> = Record<keyof T, FormFieldAttributes>;
 export type FormFieldsObjectForContent<T> = Record<
@@ -68,29 +69,34 @@ const getFormFieldAttributes = <T>(
 export const makeFieldError =
   <Context extends FieldValues>(context: FormState<Context>) =>
   (
-    name: keyof Context,
+    name: keyof Context | DotNestedKeys<Context>,
   ): {
     state: "error" | "default";
     stateRelatedMessage: string | undefined;
-  } | null =>
-    name in context.errors
+  } | null => {
+    const error = get(context.errors, name.toString());
+    return error
       ? {
           state: "error" as const,
-          stateRelatedMessage: context.errors[name]?.message as string,
+          stateRelatedMessage: "message" in error ? error.message : error,
         }
       : null;
+  };
 
 export const formErrorsToFlatErrors = (
   obj: Record<string, any>,
 ): Record<string, any> => {
+  const errorObj: Record<string, any> = {};
   for (const key in obj) {
     if (key in obj) {
       if (typeof obj[key] === "object" && "message" in obj[key]) {
-        obj[key] = obj[key].message;
+        errorObj[key] = obj[key].message;
       } else if (typeof obj[key] === "object" && obj[key] !== null) {
-        formErrorsToFlatErrors(obj[key]);
+        errorObj[key] = formErrorsToFlatErrors(obj[key]);
+      } else {
+        errorObj[key] = obj[key];
       }
     }
   }
-  return obj;
+  return errorObj;
 };

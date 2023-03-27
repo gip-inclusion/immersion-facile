@@ -1,10 +1,10 @@
-import { useField } from "formik";
 import React from "react";
 import {
   calculateNumberOfWorkedDays,
   calculateTotalImmersionHoursFromComplexSchedule,
   calculateWeeklyHoursFromSchedule,
   ConventionDto,
+  ConventionReadDto,
   DailyScheduleDto,
   DateIntervalDto,
   DayPeriodsDto,
@@ -14,11 +14,12 @@ import {
   ScheduleDtoBuilder,
 } from "shared";
 
+import { fr } from "@codegouvfr/react-dsfr";
+import { useFormContext } from "react-hook-form";
+import { useStyles } from "tss-react/dsfr";
 import { HourPicker } from "./HourPicker";
 import { TotalWeeklyHoursIndicator } from "./TotaWeeklylHoursIndicator";
 import { WeekdayPicker } from "./WeekdayPicker";
-import { fr } from "@codegouvfr/react-dsfr";
-import { useStyles } from "tss-react/dsfr";
 
 export type RegularSchedulePickerProps = {
   interval: DateIntervalDto;
@@ -28,7 +29,8 @@ export type RegularSchedulePickerProps = {
 export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
   const { cx } = useStyles();
   const name: keyof ConventionDto = "schedule";
-  const [field, _, { setValue }] = useField<ScheduleDto>({ name });
+  const { setValue, getValues } = useFormContext<ConventionReadDto>();
+  const values = getValues();
   return (
     <>
       <div
@@ -47,18 +49,18 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
           <WeekdayPicker
             name={name}
             dayPeriods={dayPeriodsFromComplexSchedule(
-              field.value.complexSchedule,
+              values.schedule.complexSchedule,
               props.interval.start,
             )}
             onValueChange={(dayPeriods: DayPeriodsDto) => {
-              field.value = new ScheduleDtoBuilder(field.value)
+              values.schedule = new ScheduleDtoBuilder(values.schedule)
                 .withDateInterval(props.interval)
                 .withRegularSchedule({
                   dayPeriods,
-                  timePeriods: regularTimePeriods(field.value),
+                  timePeriods: regularTimePeriods(values.schedule),
                 })
                 .build();
-              setValue(field.value);
+              setValue(name, values.schedule);
             }}
             interval={props.interval}
             disabled={props.disabled}
@@ -70,15 +72,18 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
 
           <HourPicker
             name={name}
-            timePeriods={regularTimePeriods(field.value)}
+            timePeriods={regularTimePeriods(values.schedule)}
             onValueChange={(newHours) => {
-              const complexSchedule = field.value.complexSchedule.map(
+              const complexSchedule = values.schedule.complexSchedule.map(
                 (dailySchedule): DailyScheduleDto => ({
                   date: dailySchedule.date,
                   timePeriods: newHours,
                 }),
               );
-              const schedule: ScheduleDto = { ...field.value, complexSchedule };
+              const schedule: ScheduleDto = {
+                ...values.schedule,
+                complexSchedule,
+              };
               schedule.totalHours =
                 calculateTotalImmersionHoursFromComplexSchedule(
                   schedule.complexSchedule,
@@ -86,7 +91,9 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
               schedule.workedDays = calculateNumberOfWorkedDays(
                 schedule.complexSchedule,
               );
-              setValue(schedule);
+              setValue(name, schedule, {
+                shouldValidate: true,
+              });
             }}
             disabled={props.disabled}
           />
@@ -101,7 +108,7 @@ export const RegularSchedulePicker = (props: RegularSchedulePickerProps) => {
             <strong>Récapitulatif hebdomadaire</strong>
           </p>
           <hr className={fr.cx("fr-hr", "fr-pb-1w")} />
-          <WeeksHoursIndicator schedule={field.value} />
+          <WeeksHoursIndicator schedule={values.schedule} />
         </div>
       </div>
     </>

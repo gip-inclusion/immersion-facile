@@ -1,99 +1,38 @@
-import { useField, useFormikContext } from "formik";
+import { Input } from "@codegouvfr/react-dsfr/Input";
 import React, { useEffect } from "react";
-import { ConventionDto, ConventionField, getConventionFieldName } from "shared";
-import { TextInput } from "src/app/components/forms/commons/TextInput";
+import { useFormContext } from "react-hook-form";
+
+import { ConventionReadDto } from "shared";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
-import { useFormContents } from "src/app/hooks/formContents.hooks";
+import {
+  makeFieldError,
+  useFormContents,
+} from "src/app/hooks/formContents.hooks";
 
 type BeneficiaryRepresentativeFieldsProps = { disabled?: boolean };
 
 export const BeneficiaryRepresentativeFields = ({
   disabled,
 }: BeneficiaryRepresentativeFieldsProps) => {
-  useBeneficiaryRepresentativeAsEmergencyContact();
-  useBeneficiaryRepresentativeRole();
-  const { values } = useFormikContext<ConventionDto>();
+  const { register, getValues, setValue, watch, formState } =
+    useFormContext<ConventionReadDto>();
+  const values = getValues();
+  const currentValues = watch();
   const { getFormFields } = useFormContents(
     formConventionFieldsLabels(values.internshipKind),
   );
-  const formContents = getFormFields();
-  return (
-    <>
-      <TextInput
-        {...formContents["signatories.beneficiaryRepresentative.firstName"]}
-        type="text"
-        disabled={disabled}
-      />
-      <TextInput
-        {...formContents["signatories.beneficiaryRepresentative.lastName"]}
-        type="text"
-        disabled={disabled}
-      />
-      <TextInput
-        {...formContents["signatories.beneficiaryRepresentative.email"]}
-        type="email"
-        disabled={disabled}
-      />
-      {values.signatories.beneficiaryRepresentative?.email && (
-        <ConventionEmailWarning />
-      )}
-      <TextInput
-        {...formContents["signatories.beneficiaryRepresentative.phone"]}
-        type="tel"
-        disabled={disabled}
-      />
-    </>
-  );
-};
-
-const useFieldValueString = (fieldName: ConventionField) => {
-  const [{ value }] = useField<string | undefined>(
-    getConventionFieldName(fieldName),
-  );
-  return value;
-};
-
-const useFieldValueStringSetter = (fieldName: ConventionField) => {
-  const [, , { setValue }] = useField<string | undefined>(
-    getConventionFieldName(fieldName),
-  );
-  return setValue;
-};
-
-const useBeneficiaryRepresentativeRole = () => {
-  const [field, , { setValue: setBeneficiaryRepresentative }] = useField(
-    getConventionFieldName("signatories.beneficiaryRepresentative"),
-  );
-  useEffect(() => {
-    setBeneficiaryRepresentative({
-      ...field.value,
-      role: "beneficiary-representative",
-    });
-    return () => setBeneficiaryRepresentative(undefined);
-  }, []);
-};
-
-const useBeneficiaryRepresentativeAsEmergencyContact = () => {
-  const beneficiaryRepresentativeFirstName = useFieldValueString(
-    "signatories.beneficiaryRepresentative.firstName",
-  );
-  const beneficiaryRepresentativeLastName = useFieldValueString(
-    "signatories.beneficiaryRepresentative.lastName",
-  );
-  const beneficiaryRepresentativePhone = useFieldValueString(
-    "signatories.beneficiaryRepresentative.phone",
-  );
-
-  const setEmergencyContact = useFieldValueStringSetter(
-    "signatories.beneficiary.emergencyContact",
-  );
-  const setEmergencyContactPhone = useFieldValueStringSetter(
-    "signatories.beneficiary.emergencyContactPhone",
-  );
+  const beneficiaryRepresentativeFirstName =
+    currentValues.signatories.beneficiaryRepresentative?.firstName;
+  const beneficiaryRepresentativeLastName =
+    currentValues.signatories.beneficiaryRepresentative?.lastName;
+  const beneficiaryRepresentativePhone =
+    currentValues.signatories.beneficiaryRepresentative?.phone;
+  const getFieldError = makeFieldError(formState);
 
   useEffect(() => {
-    setEmergencyContact(
+    setValue(
+      "signatories.beneficiary.emergencyContact",
       [beneficiaryRepresentativeFirstName, beneficiaryRepresentativeLastName]
         .filter((v) => !!v)
         .join(" ") || undefined,
@@ -101,6 +40,55 @@ const useBeneficiaryRepresentativeAsEmergencyContact = () => {
   }, [beneficiaryRepresentativeFirstName, beneficiaryRepresentativeLastName]);
 
   useEffect(() => {
-    setEmergencyContactPhone(beneficiaryRepresentativePhone);
+    setValue(
+      "signatories.beneficiary.emergencyContactPhone",
+      beneficiaryRepresentativePhone || "",
+    );
   }, [beneficiaryRepresentativePhone]);
+
+  const formContents = getFormFields();
+  return (
+    <>
+      <Input
+        {...formContents["signatories.beneficiaryRepresentative.firstName"]}
+        nativeInputProps={{
+          ...formContents["signatories.beneficiaryRepresentative.firstName"],
+          ...register("signatories.beneficiaryRepresentative.firstName"),
+        }}
+        disabled={disabled}
+        {...getFieldError("signatories.beneficiaryRepresentative.firstName")}
+      />
+      <Input
+        {...formContents["signatories.beneficiaryRepresentative.lastName"]}
+        nativeInputProps={{
+          ...formContents["signatories.beneficiaryRepresentative.lastName"],
+          ...register("signatories.beneficiaryRepresentative.lastName"),
+        }}
+        disabled={disabled}
+        {...getFieldError("signatories.beneficiaryRepresentative.lastName")}
+      />
+      <Input
+        {...formContents["signatories.beneficiaryRepresentative.email"]}
+        nativeInputProps={{
+          ...formContents["signatories.beneficiaryRepresentative.email"],
+          ...register("signatories.beneficiaryRepresentative.email"),
+        }}
+        disabled={disabled}
+        {...getFieldError("signatories.beneficiaryRepresentative.email")}
+      />
+      {values.signatories.beneficiaryRepresentative?.email && (
+        <ConventionEmailWarning />
+      )}
+      <Input
+        {...formContents["signatories.beneficiaryRepresentative.phone"]}
+        nativeInputProps={{
+          ...formContents["signatories.beneficiaryRepresentative.phone"],
+          ...register("signatories.beneficiaryRepresentative.phone"),
+          type: "tel",
+        }}
+        disabled={disabled}
+        {...getFieldError("signatories.beneficiaryRepresentative.phone")}
+      />
+    </>
+  );
 };

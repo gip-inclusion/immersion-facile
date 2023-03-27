@@ -1,17 +1,9 @@
 import React from "react";
-import { useField } from "formik";
-import { getConventionFieldName, InternshipKind } from "shared";
+import { InternshipKind } from "shared";
 import { fr } from "@codegouvfr/react-dsfr";
 
 export const useConventionTexts = (internshipKind: InternshipKind) =>
   immersionTexts(internshipKind);
-
-export const useConventionTextsFromFormikContext = () => {
-  const [{ value }] = useField<InternshipKind>(
-    getConventionFieldName("internshipKind"),
-  );
-  return useConventionTexts(value);
-};
 
 const immersionTexts = (internshipKind: InternshipKind) => ({
   intro: {

@@ -1,12 +1,15 @@
 import ShareIcon from "@mui/icons-material/Share";
 import { IconButton, Tooltip } from "@mui/material";
 import React, { useState } from "react";
-import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
+import { useFormContext } from "react-hook-form";
+import { ConventionReadDto } from "src/../../shared/src";
+import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 
 const iconColor = "#3458a2";
 
 export const CopyLink = () => {
-  const t = useConventionTextsFromFormikContext();
+  const { getValues } = useFormContext<ConventionReadDto>();
+  const t = useConventionTexts(getValues().internshipKind);
   const [tooltipText, setTooltipText] = useState<string>(t.copyLinkTooltip);
 
   return (

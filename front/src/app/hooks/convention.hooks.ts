@@ -1,8 +1,8 @@
-import { useFormikContext } from "formik";
 import { useEffect } from "react";
+import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  ConventionDto,
+  ConventionReadDto,
   EstablishmentRepresentative,
   getSignatoryKey,
   isEstablishmentTutorIsEstablishmentRepresentative,
@@ -36,11 +36,13 @@ export const useTutorIsEstablishmentRepresentative = () => {
     conventionSelectors.isTutorEstablishmentRepresentative,
   );
   const convention = useAppSelector(conventionSelectors.convention);
-  const { values, setFieldValue } = useFormikContext<ConventionDto>();
+  //const { values, setFieldValue } = useFormikContext<ConventionDto>();
+  const { getValues, setValue } = useFormContext<ConventionReadDto>();
+  const values = getValues();
   const setEstablishmentRepresentative = (
     establishmentRepresentative: EstablishmentRepresentative,
   ) =>
-    setFieldValue(
+    setValue(
       getSignatoryKey("signatories.establishmentRepresentative"),
       establishmentRepresentative,
     );

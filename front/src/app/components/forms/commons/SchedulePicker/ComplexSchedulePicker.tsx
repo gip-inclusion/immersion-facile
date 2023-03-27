@@ -1,16 +1,17 @@
-import { useField } from "formik";
+import { fr } from "@codegouvfr/react-dsfr";
+import { clone } from "ramda";
 import React from "react";
+import { useFormContext } from "react-hook-form";
 import {
   calculateNumberOfWorkedDays,
   calculateTotalImmersionHoursFromComplexSchedule,
   ConventionDto,
+  ConventionReadDto,
   ScheduleDto,
 } from "shared";
+import { useStyles } from "tss-react/dsfr";
 import { DayPicker } from "./DayPicker";
 import { HourPicker } from "./HourPicker";
-import { fr } from "@codegouvfr/react-dsfr";
-import { useStyles } from "tss-react/dsfr";
-import { clone } from "ramda";
 
 type ComplexSchedulePickerProps = {
   disabled?: boolean;
@@ -21,8 +22,8 @@ export const ComplexSchedulePicker = ({
 }: ComplexSchedulePickerProps) => {
   const { cx } = useStyles();
   const name: keyof ConventionDto = "schedule";
-  const [field, _, { setValue }] = useField<ScheduleDto>({ name });
-
+  const { setValue, getValues } = useFormContext<ConventionReadDto>();
+  const values = getValues();
   return (
     <div
       className={cx(
@@ -32,24 +33,25 @@ export const ComplexSchedulePicker = ({
       )}
     >
       <DayPicker
-        complexSchedule={field.value.complexSchedule}
-        selectedIndex={field.value.selectedIndex}
+        complexSchedule={values.schedule.complexSchedule}
+        selectedIndex={values.schedule.selectedIndex}
         onChange={(lastClickedIndex) => {
-          const updatedSchedule = clone(field.value);
+          const updatedSchedule = clone(values.schedule);
           updatedSchedule.selectedIndex = lastClickedIndex;
-          setValue(updatedSchedule);
+          setValue(name, updatedSchedule);
         }}
       />
       <HourPicker
         name={name}
         timePeriods={
-          field.value.complexSchedule[field.value.selectedIndex]
-            ? field.value.complexSchedule[field.value.selectedIndex].timePeriods
+          values.schedule.complexSchedule[values.schedule.selectedIndex]
+            ? values.schedule.complexSchedule[values.schedule.selectedIndex]
+                .timePeriods
             : []
         }
         onValueChange={(newHours) => {
           const updatedSchedule: ScheduleDto = JSON.parse(
-            JSON.stringify(field.value),
+            JSON.stringify(values.schedule),
           );
           updatedSchedule.complexSchedule[
             updatedSchedule.selectedIndex
@@ -61,7 +63,9 @@ export const ComplexSchedulePicker = ({
           updatedSchedule.workedDays = calculateNumberOfWorkedDays(
             updatedSchedule.complexSchedule,
           );
-          setValue(updatedSchedule);
+          setValue(name, updatedSchedule, {
+            shouldValidate: true,
+          });
         }}
         disabled={disabled}
       />

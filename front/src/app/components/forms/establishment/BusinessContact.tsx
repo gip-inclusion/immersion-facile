@@ -82,6 +82,8 @@ export const BusinessContact = () => {
       </h2>
       <RadioButtons
         {...formContents["businessContact.contactMethod"]}
+        legend={formContents["businessContact.contactMethod"].label}
+        hintText={formContents["businessContact.contactMethod"].description}
         {...register("businessContact.contactMethod")}
         options={preferredContactMethodOptions(
           register("businessContact.contactMethod"),

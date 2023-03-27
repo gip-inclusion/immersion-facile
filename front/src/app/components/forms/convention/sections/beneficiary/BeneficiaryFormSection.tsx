@@ -1,21 +1,26 @@
-import { useFormikContext } from "formik";
+import { Input } from "@codegouvfr/react-dsfr/Input";
+import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
+import { Select } from "@codegouvfr/react-dsfr/Select";
+import { keys } from "ramda";
 import React, { useEffect } from "react";
 import { SectionTitle } from "react-design-system";
-import { Select } from "@codegouvfr/react-dsfr/Select";
+import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  ConventionDto,
+  cleanStringToHTMLAttribute,
+  ConventionReadDto,
   InternshipKind,
   isBeneficiaryStudent,
   levelsOfEducation,
 } from "shared";
-import { DateInput } from "src/app/components/forms/commons/DateInput";
-import { RadioGroup } from "src/app/components/forms/commons/RadioGroup";
-import { TextInput } from "src/app/components/forms/commons/TextInput";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
+import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
-import { useConventionTextsFromFormikContext } from "src/app/contents/forms/convention/textSetup";
-import { useFormContents } from "src/app/hooks/formContents.hooks";
+import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
+import {
+  useFormContents,
+  makeFieldError,
+} from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
@@ -41,63 +46,121 @@ export const BeneficiaryFormSection = ({
   );
   const connectedUser = useAppSelector(authSelectors.connectedUser);
   const userFieldsAreFilled = isSuccessfullyPeConnected && !!connectedUser;
+  const { register, getValues, setValue, formState } =
+    useFormContext<ConventionReadDto>();
 
-  const { setFieldValue, values } = useFormikContext<ConventionDto>();
+  const values = getValues();
   const dispatch = useDispatch();
-  const t = useConventionTextsFromFormikContext();
+  const t = useConventionTexts(values.internshipKind);
+  const getFieldError = makeFieldError(formState);
   const { getFormFields } = useFormContents(
     formConventionFieldsLabels(values.internshipKind),
   );
   const formContents = getFormFields();
+
   useEffect(() => {
-    if (userFieldsAreFilled)
-      Object.entries({
+    if (userFieldsAreFilled) {
+      const valuesToUpdate = {
         "signatories.beneficiary.firstName": connectedUser.firstName,
         "signatories.beneficiary.lastName": connectedUser.lastName,
         "signatories.beneficiary.email": connectedUser.email,
-      }).forEach(([key, value]) => setFieldValue(key, value));
+      };
+      keys(valuesToUpdate).forEach((key) => setValue(key, valuesToUpdate[key]));
+    }
   }, [userFieldsAreFilled]);
+
+  useEffect(() => {
+    // TODO : do this in Redux ?
+    const initialValues = getValues().signatories.beneficiaryRepresentative;
+    setValue(
+      "signatories.beneficiaryRepresentative",
+      isMinor && initialValues
+        ? {
+            ...initialValues,
+            role: "beneficiary-representative",
+          }
+        : undefined,
+    );
+  }, [isMinor]);
+
+  useEffect(() => {
+    // TODO : do this in Redux ?
+    const initialValues = values.signatories.beneficiaryCurrentEmployer;
+    if (initialValues) {
+      setValue(
+        "signatories.beneficiaryCurrentEmployer",
+        hasCurrentEmployer
+          ? {
+              ...initialValues,
+              role: "beneficiary-current-employer",
+            }
+          : undefined,
+      );
+    }
+
+    return () => setValue("signatories.beneficiaryCurrentEmployer", undefined);
+  }, [hasCurrentEmployer]);
 
   const levelsOfEducationToSelectOption = levelsOfEducation.map(
     (level: string) => ({ label: level, value: level }),
   );
-
   return (
     <>
       <SectionTitle>{t.beneficiarySection.title}</SectionTitle>
-      <TextInput
+      <Input
         {...formContents["signatories.beneficiary.firstName"]}
-        {...(userFieldsAreFilled ? { value: connectedUser.firstName } : {})}
-        type="text"
+        nativeInputProps={{
+          ...formContents["signatories.beneficiary.firstName"],
+          ...register("signatories.beneficiary.firstName"),
+          ...(userFieldsAreFilled ? { value: connectedUser.firstName } : {}),
+        }}
         disabled={isFrozen || userFieldsAreFilled}
+        {...getFieldError("signatories.beneficiary.firstName")}
       />
-      <TextInput
+      <Input
         {...formContents["signatories.beneficiary.lastName"]}
-        {...(userFieldsAreFilled ? { value: connectedUser.lastName } : {})}
-        type="text"
+        nativeInputProps={{
+          ...formContents["signatories.beneficiary.lastName"],
+          ...register("signatories.beneficiary.lastName"),
+          ...(userFieldsAreFilled ? { value: connectedUser.lastName } : {}),
+        }}
         disabled={isFrozen || userFieldsAreFilled}
+        {...getFieldError("signatories.beneficiary.lastName")}
       />
-      <DateInput
+
+      <Input
         {...formContents["signatories.beneficiary.birthdate"]}
         disabled={isFrozen}
-        onDateChange={(date) => {
-          setFieldValue(
-            "signatories.beneficiary.birthdate",
-            new Date(date).toISOString(),
-          );
+        nativeInputProps={{
+          ...formContents["signatories.beneficiary.birthdate"],
+          ...register("signatories.beneficiary.birthdate"),
+          type: "date",
+          max: "9999-12-31",
+          id: cleanStringToHTMLAttribute("signatories.beneficiary.birthdate"),
         }}
+        {...getFieldError("signatories.beneficiary.birthdate")}
       />
-      <TextInput
+      <Input
         {...formContents["signatories.beneficiary.email"]}
-        {...(userFieldsAreFilled ? { value: connectedUser.email } : {})}
-        type="email"
         disabled={isFrozen || userFieldsAreFilled}
+        nativeInputProps={{
+          ...formContents["signatories.beneficiary.email"],
+          ...register("signatories.beneficiary.email"),
+          ...(userFieldsAreFilled ? { value: connectedUser.email } : {}),
+          type: "email",
+        }}
+        {...getFieldError("signatories.beneficiary.email")}
       />
       {values.signatories.beneficiary.email && <ConventionEmailWarning />}
-      <TextInput
+      <Input
         {...formContents["signatories.beneficiary.phone"]}
-        type="tel"
+        nativeInputProps={{
+          ...formContents["signatories.beneficiary.phone"],
+          ...register("signatories.beneficiary.phone"),
+          type: "tel",
+        }}
         disabled={isFrozen}
+        {...getFieldError("signatories.beneficiary.phone")}
       />
       {values.internshipKind === "mini-stage-cci" && (
         <Select
@@ -105,35 +168,44 @@ export const BeneficiaryFormSection = ({
           disabled={isFrozen}
           options={levelsOfEducationToSelectOption}
           nativeSelectProps={{
-            onChange: (event) =>
-              setFieldValue(
-                formContents["signatories.beneficiary.levelOfEducation"].name,
-                event.currentTarget.value,
-              ),
+            ...formContents["signatories.beneficiary.levelOfEducation"],
+            ...register("signatories.beneficiary.levelOfEducation"),
             value: isBeneficiaryStudent(values.signatories.beneficiary)
               ? values.signatories.beneficiary.levelOfEducation
               : "",
           }}
+          {...getFieldError("signatories.beneficiary.levelOfEducation")}
         />
       )}
-      <TextInput
+      <Input
         {...formContents["signatories.beneficiary.financiaryHelp"]}
-        type="text"
-        multiline={true}
+        textArea
+        nativeTextAreaProps={{
+          ...formContents["signatories.beneficiary.financiaryHelp"],
+          ...register("signatories.beneficiary.financiaryHelp"),
+        }}
         disabled={isFrozen}
+        {...getFieldError("signatories.beneficiary.financiaryHelp")}
       />
-      <RadioGroup
+      <RadioButtons
         {...formContents.isMinor}
+        legend={formContents.isMinor.label}
+        hintText={formContents.isMinor.description}
         disabled={isFrozen}
-        currentValue={isMinor}
-        setCurrentValue={(value) =>
-          dispatch(conventionSlice.actions.isMinorChanged(value))
-        }
-        groupLabel={formContents.isMinor.label}
-        options={[
-          { label: t.yes, value: true },
-          { label: t.no, value: false },
-        ]}
+        options={booleanSelectOptions.map((option) => ({
+          ...option,
+          nativeInputProps: {
+            ...option.nativeInputProps,
+            defaultChecked: Boolean(option.nativeInputProps.value) === isMinor,
+            onChange: () => {
+              dispatch(
+                conventionSlice.actions.isMinorChanged(
+                  option.nativeInputProps.value === 1,
+                ),
+              );
+            },
+          },
+        }))}
       />
       {isMinor ? (
         <BeneficiaryRepresentativeFields disabled={isFrozen} />
@@ -142,19 +214,28 @@ export const BeneficiaryFormSection = ({
       )}
       {internshipKind !== "mini-stage-cci" && (
         <>
-          <RadioGroup
+          <RadioButtons
             {...formContents.isCurrentEmployer}
             disabled={isFrozen}
-            currentValue={hasCurrentEmployer}
-            setCurrentValue={(value) =>
-              dispatch(conventionSlice.actions.isCurrentEmployerChanged(value))
-            }
-            groupLabel={formContents.isCurrentEmployer.label}
-            options={[
-              { label: t.yes, value: true },
-              { label: t.no, value: false },
-            ]}
+            legend={formContents.isCurrentEmployer.label}
+            hintText={formContents.isCurrentEmployer.description}
+            options={booleanSelectOptions.map((option) => ({
+              ...option,
+              nativeInputProps: {
+                ...option.nativeInputProps,
+                defaultChecked:
+                  Boolean(option.nativeInputProps.value) === hasCurrentEmployer,
+                onChange: () => {
+                  dispatch(
+                    conventionSlice.actions.isCurrentEmployerChanged(
+                      option.nativeInputProps.value === 1,
+                    ),
+                  );
+                },
+              },
+            }))}
           />
+
           {hasCurrentEmployer && (
             <BeneficiaryCurrentEmployerFields disabled={isFrozen} />
           )}

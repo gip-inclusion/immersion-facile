@@ -1,12 +1,12 @@
-import { useField } from "formik";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { SirenEstablishmentDto, SiretDto } from "shared";
+import { useFormContext } from "react-hook-form";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { useSendModifyEstablishmentLink } from "src/app/hooks/establishment.hooks";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
-import { useSendModifyEstablishmentLink } from "src/app/hooks/establishment.hooks";
 
 export const useSiretRelatedField = <K extends keyof SirenEstablishmentDto>(
   fieldFromInfo: K,
@@ -15,18 +15,21 @@ export const useSiretRelatedField = <K extends keyof SirenEstablishmentDto>(
     disabled?: boolean;
   },
 ) => {
+  const fieldNameToUpdate = options?.fieldToUpdate ?? fieldFromInfo;
   const establishmentInfos = useAppSelector(siretSelectors.establishmentInfos);
-  const [{ value: _ }, { touched }, { setValue }] = useField<
-    SirenEstablishmentDto[K]
-  >({
-    name: options?.fieldToUpdate ?? fieldFromInfo,
-  });
-
+  const { formState, setValue } = useFormContext();
+  const touched = formState.touchedFields[fieldNameToUpdate];
   useEffect(() => {
     if (options?.disabled) return;
     if (!establishmentInfos) return;
     if (!touched)
-      setValue(establishmentInfos && establishmentInfos[fieldFromInfo]);
+      setValue(
+        fieldNameToUpdate,
+        establishmentInfos && establishmentInfos[fieldFromInfo],
+        {
+          shouldValidate: true,
+        },
+      );
   }, [establishmentInfos]);
 };
 
