@@ -3,7 +3,7 @@ import {
   FormFieldAttributesForContent,
 } from "../contents/forms/types";
 import { type FormState, type FieldValues, get } from "react-hook-form";
-import { DotNestedKeys } from "src/../../shared/src";
+import { DotNestedKeys } from "shared";
 
 export type FormFieldsObject<T> = Record<keyof T, FormFieldAttributes>;
 export type FormFieldsObjectForContent<T> = Record<

@@ -10,7 +10,7 @@ import {
 } from "src/app/components/forms/commons/FormModal/ElementModalContainer";
 import { ShareForm } from "./ShareForm";
 import { useFormContext } from "react-hook-form";
-import { ConventionReadDto } from "src/../../shared/src";
+import { ConventionReadDto } from "shared";
 
 const iconColor = "#3458a2";
 

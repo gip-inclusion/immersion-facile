@@ -2,7 +2,7 @@ import ShareIcon from "@mui/icons-material/Share";
 import { IconButton, Tooltip } from "@mui/material";
 import React, { useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { ConventionReadDto } from "src/../../shared/src";
+import { ConventionReadDto } from "shared";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 
 const iconColor = "#3458a2";

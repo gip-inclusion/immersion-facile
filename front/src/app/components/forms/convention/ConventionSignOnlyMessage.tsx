@@ -2,7 +2,7 @@ import React from "react";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { fr } from "@codegouvfr/react-dsfr";
 import { useFormContext } from "react-hook-form";
-import { ConventionReadDto } from "src/../../shared/src";
+import { ConventionReadDto } from "shared";
 
 type SignOnlyMessageProps = {
   isAlreadySigned: boolean;
