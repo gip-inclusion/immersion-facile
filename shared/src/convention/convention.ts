@@ -126,3 +126,7 @@ export const signatoryKeyFromRole: Record<SignatoryRole, keyof Signatories> = {
   beneficiary: "beneficiary",
   establishment: "establishmentRepresentative",
 };
+
+export const hasBeneficiaryCurrentEmployer = (
+  convention: Pick<ConventionDto, "signatories">,
+): boolean => !!convention.signatories.beneficiaryCurrentEmployer;

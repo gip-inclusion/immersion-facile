@@ -9,10 +9,6 @@ import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { agencyGateway } from "src/config/dependencies";
 import { AgencyErrorText } from "./AgencyErrorText";
 
-const placeholderAgency: AgencyOption = {
-  id: "",
-  name: "Veuillez indiquer un code postal",
-};
 type AgencyDisplayProps = {
   agencyId?: string;
 };
@@ -20,7 +16,6 @@ type AgencyDisplayProps = {
 export const AgencyDisplayReadOnly = ({ agencyId }: AgencyDisplayProps) => {
   const name: keyof ConventionDto = "agencyId";
   const {
-    register,
     getValues,
     setValue,
     formState: { errors, touchedFields },
@@ -28,7 +23,7 @@ export const AgencyDisplayReadOnly = ({ agencyId }: AgencyDisplayProps) => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [loadingError, setLoadingError] = useState(false);
-  const [agencies, setAgencies] = useState([placeholderAgency]);
+  const [agencies, setAgencies] = useState<AgencyOption[]>([]);
   const { getFormFields } = useFormContents(
     formConventionFieldsLabels(getValues().internshipKind),
   );
@@ -40,13 +35,7 @@ export const AgencyDisplayReadOnly = ({ agencyId }: AgencyDisplayProps) => {
     agencyGateway
       .getAgencyPublicInfoById({ id: agencyId })
       .then((agency) => {
-        setAgencies([
-          {
-            id: "",
-            name: "",
-          },
-          { ...agency },
-        ]);
+        setAgencies([{ ...agency }]);
         if (agencyId && agencies.map((agency) => agency.id).includes(agencyId))
           setValue(name, agencyId);
         setLoadingError(false);
@@ -71,13 +60,15 @@ export const AgencyDisplayReadOnly = ({ agencyId }: AgencyDisplayProps) => {
     >
       <Select
         {...formContents["agencyId"]}
-        options={agencies.map(({ id, name }) => ({ label: name, value: id }))}
-        placeholder={formContents["agencyId"].placeholder}
+        options={agencies.map(({ id, name }) => ({
+          label: name,
+          value: id,
+        }))}
         nativeSelectProps={{
           ...formContents["agencyId"],
-          ...register(name),
-          onChange: (event) => setValue(name, event.currentTarget.value),
+          value: agencyId,
         }}
+        disabled={true}
       />
 
       {showError && (

@@ -50,6 +50,7 @@ export const ConventionFormFields = ({
     formState: { errors, submitCount, isSubmitting, isSubmitted, isValidating },
   } = useFormContext<ConventionReadDto>();
   const conventionValues = getValues();
+  const conventionSubmitFeedback = useAppSelector(conventionSelectors.feedback);
   const preselectedAgencyId = useAppSelector(
     conventionSelectors.preselectedAgencyId,
   );
@@ -80,7 +81,8 @@ export const ConventionFormFields = ({
   const shouldSubmitButtonBeDisabled =
     isSubmitting ||
     isValidating ||
-    (isSubmitted && Object.values(errors).length === 0);
+    (isSubmitted && conventionSubmitFeedback.kind === "justSubmitted");
+
   return (
     <>
       {isFrozen && !isSignatureMode && <ConventionFrozenMessage />}
@@ -145,12 +147,7 @@ export const ConventionFormFields = ({
           visible={submitCount !== 0 && Object.values(errors).length > 0}
         />
       )}
-      {JSON.stringify({
-        isSubmitting,
-        isValidating,
-        isSubmitted,
-        isValid: Object.values(errors).length === 0,
-      })}
+
       {!isFrozen && !isSignatureMode && (
         <div className={fr.cx("fr-mt-4w")}>
           <Button
@@ -161,7 +158,7 @@ export const ConventionFormFields = ({
             onClick={handleSubmit(
               (values) => {
                 setValue("status", "READY_TO_SIGN");
-                onSubmit(values);
+                onSubmit({ ...values, status: "READY_TO_SIGN" });
               },
               (errors) => {
                 // eslint-disable-next-line no-console

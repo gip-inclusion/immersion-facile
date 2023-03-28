@@ -5,7 +5,6 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import { TextInputError } from "react-design-system";
 import { AppellationDto, ConventionReadDto } from "shared";
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
-import { emptyAppellation } from "../establishment/MultipleAppellationInput";
 
 type ConventionFormProfessionProps = {
   label: string;
@@ -20,7 +19,6 @@ export const ConventionFormProfession = ({
   disabled,
   initialFieldValue,
 }: ConventionFormProfessionProps) => {
-  const name: keyof ConventionReadDto = "immersionAppellation";
   const {
     setValue,
     formState: { errors, touchedFields },
@@ -28,16 +26,16 @@ export const ConventionFormProfession = ({
   } = useFormContext<ConventionReadDto>();
 
   const error =
-    touchedFields[name] &&
-    (errors[name] as Partial<AppellationDto>)?.appellationLabel;
+    touchedFields.immersionAppellation &&
+    (errors.immersionAppellation as Partial<AppellationDto>)?.appellationLabel;
 
   if (disabled)
     return (
       <Input
         label={label}
         nativeInputProps={{
-          name,
-          value: getValues()[name]?.appellationLabel,
+          name: "immersionAppellation",
+          value: getValues().immersionAppellation?.appellationLabel,
         }}
         disabled
       />
@@ -49,10 +47,34 @@ export const ConventionFormProfession = ({
         <AppellationAutocomplete
           label={label}
           initialValue={initialFieldValue}
-          onAppellationSelected={setValue}
+          onAppellationSelected={(appellation) => {
+            setValue("immersionAppellation.romeCode", appellation.romeCode);
+            setValue("immersionAppellation.romeLabel", appellation.romeLabel);
+            setValue(
+              "immersionAppellation.appellationCode",
+              appellation.appellationCode,
+            );
+            setValue(
+              "immersionAppellation.appellationLabel",
+              appellation.appellationLabel,
+            );
+          }}
+          selectedAppellations={[
+            {
+              romeLabel: getValues().immersionAppellation?.romeLabel ?? "",
+              romeCode: getValues().immersionAppellation?.romeCode ?? "",
+              appellationCode:
+                getValues().immersionAppellation?.appellationCode ?? "",
+              appellationLabel:
+                getValues().immersionAppellation?.appellationLabel ?? "",
+            },
+          ]}
           description={description}
           onInputClear={() => {
-            setValue(name, emptyAppellation);
+            setValue("immersionAppellation.romeCode", "");
+            setValue("immersionAppellation.romeLabel", "");
+            setValue("immersionAppellation.appellationCode", "");
+            setValue("immersionAppellation.appellationLabel", "");
           }}
         />
         {error && <TextInputError errorMessage={error} />}

@@ -38,7 +38,7 @@ export const EstablishmentBusinessFields = ({
         nativeInputProps={{
           ...formContents.siret,
           ...register("siret"),
-          value: currentSiret,
+          value: currentSiret || values?.siret,
           onChange: (event) => {
             setValue("siret", event.currentTarget.value);
             updateSiret(event.currentTarget.value);
@@ -53,7 +53,7 @@ export const EstablishmentBusinessFields = ({
         nativeInputProps={{
           ...formContents.businessName,
           ...register("businessName"),
-          value: establishmentInfos?.businessName,
+          value: establishmentInfos ? establishmentInfos.businessName : "",
         }}
         disabled={enableInseeApi}
       />

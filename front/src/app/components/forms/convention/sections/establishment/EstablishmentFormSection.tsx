@@ -76,7 +76,7 @@ export const EstablishmentFormSection = ({
         options={booleanSelectOptions.map((option) => ({
           ...option,
           nativeInputProps: {
-            defaultChecked:
+            checked:
               Boolean(option.nativeInputProps.value) ===
               isTutorEstablishmentRepresentative,
             onChange: () => {

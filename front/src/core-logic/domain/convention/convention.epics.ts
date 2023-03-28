@@ -58,6 +58,11 @@ const reflectFetchedConventionOnFormUi: ConventionEpic = (action$, state$) =>
           ? !!action.payload.signatories.beneficiaryRepresentative
           : state$.value.convention.formUi.isMinor,
       ),
+      conventionSlice.actions.isCurrentEmployerChanged(
+        action.payload
+          ? !!action.payload.signatories.beneficiaryCurrentEmployer
+          : state$.value.convention.formUi.hasCurrentEmployer,
+      ),
     ]),
   );
 

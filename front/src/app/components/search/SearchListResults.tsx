@@ -80,7 +80,7 @@ export const SearchListResults = () => {
               </p>
               <p>
                 Vous pouvez essayer d'élargir votre recherche en augmentant le
-                rayon de recherche ou en ne séléctionnant pas de métier.
+                rayon de recherche ou en ne sélectionnant pas de métier.
               </p>
             </div>
           )}

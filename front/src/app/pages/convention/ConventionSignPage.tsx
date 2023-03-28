@@ -1,4 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import React, { useEffect } from "react";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
@@ -14,7 +15,6 @@ import { ConventionFormContainerLayout } from "src/app/components/forms/conventi
 import { Route } from "type-route";
 import { conventionSlice } from "../../../core-logic/domain/convention/convention.slice";
 import { ConventionSignForm } from "../../components/forms/convention/ConventionSignForm";
-import { ConventionSignFormIntro } from "../../components/forms/convention/ConventionSignFormIntro";
 import { HeaderFooterLayout } from "../../components/layout/HeaderFooterLayout";
 import { commonContent } from "../../contents/commonContent";
 import { useConventionTexts } from "../../contents/forms/convention/textSetup";
@@ -22,7 +22,6 @@ import { useConvention } from "../../hooks/convention.hooks";
 import { useExistingSiret } from "../../hooks/siret.hooks";
 import { routes } from "../../routes/routes";
 import { ShowErrorOrRedirectToRenewMagicLink } from "./ShowErrorOrRedirectToRenewMagicLink";
-import { Alert } from "@codegouvfr/react-dsfr/Alert";
 
 interface ConventionSignPageProperties {
   route: Route<typeof routes.conventionToSign>;
@@ -104,7 +103,7 @@ const ConventionSignPageContent = ({
   const t = useConventionTexts(convention.internshipKind);
 
   return (
-    <ConventionFormContainerLayout>
+    <ConventionFormContainerLayout internshipKind={convention.internshipKind}>
       <>
         {convention.status === "REJECTED" && (
           <Alert
@@ -143,7 +142,6 @@ const ConventionSignPageContent = ({
         )}
         {convention.status !== "DRAFT" && convention.status !== "REJECTED" && (
           <>
-            <ConventionSignFormIntro convention={convention} />
             <ConventionSignForm
               jwt={jwt}
               submitFeedback={submitFeedback}

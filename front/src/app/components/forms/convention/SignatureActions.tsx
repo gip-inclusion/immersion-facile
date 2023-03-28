@@ -7,7 +7,8 @@ import {
   Signatory,
   SignatoryRole,
 } from "shared";
-import { DateCheckboxGroup } from "src/app/components/forms/commons/CheckboxGroup";
+import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
+import { useFormContext } from "react-hook-form";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 
@@ -85,9 +86,10 @@ export const SignatureActions = ({
   const submitFeedback = useAppSelector(conventionSelectors.feedback);
   const { fieldName, signatoryFullName, signatoryFunction } =
     getSignatoryProcessedData(signatory);
+  const { setValue } = useFormContext();
   return (
     <>
-      <DateCheckboxGroup
+      {/* <DateCheckboxGroup
         name={fieldName}
         label={`Je, soussigné ${signatoryFullName} (${signatoryFunction})
          m'engage à avoir pris connaissance des dispositions réglementaires ${
@@ -100,7 +102,42 @@ export const SignatureActions = ({
             : "https://immersion.cellar-c2.services.clever-cloud.com/annexe_mini_stage_CCI.pdf"
         }
         disabled={alreadySigned}
+      /> */}
+      <Checkbox
+        options={[
+          {
+            label: `Je, soussigné ${signatoryFullName} (${signatoryFunction})
+            m'engage à avoir pris connaissance des dispositions réglementaires ${
+              internshipKind === "immersion" ? "de la PMSMP" : "du mini stage"
+            } et à les respecter *`,
+            nativeInputProps: {
+              name: fieldName,
+              value: "",
+              defaultChecked: false,
+              onChange: (event) => {
+                setValue(
+                  fieldName,
+                  event.target.checked ? new Date().toISOString() : undefined,
+                );
+              },
+            },
+          },
+        ]}
+        hintText={
+          <a
+            target="_blank"
+            href={
+              internshipKind === "immersion"
+                ? "https://docs.google.com/document/d/1siwGSE4fQB5hGWoppXLMoUYX42r9N-mGZbM_Gz_iS7c/edit?usp=sharing"
+                : "https://immersion.cellar-c2.services.clever-cloud.com/annexe_mini_stage_CCI.pdf"
+            }
+          >
+            Avant de répondre, consultez ces dispositions ici
+          </a>
+        }
+        disabled={alreadySigned}
       />
+
       <ButtonsGroup
         alignment="center"
         buttonsEquisized={true}

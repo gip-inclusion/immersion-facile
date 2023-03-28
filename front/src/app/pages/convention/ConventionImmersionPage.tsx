@@ -26,7 +26,7 @@ export const ConventionImmersionPage = ({
   route,
 }: ConventionImmersionPageProps) => (
   <HeaderFooterLayout>
-    <ConventionFormContainerLayout>
+    <ConventionFormContainerLayout internshipKind="immersion">
       <PageContent route={route} />
     </ConventionFormContainerLayout>
   </HeaderFooterLayout>

@@ -50,13 +50,13 @@ export const SchedulePicker = ({
             label: "Oui",
             nativeInputProps: {
               onChange: () => onBoolRadioPickerChange(true),
-              defaultChecked: values.schedule.isSimple,
+              checked: values.schedule.isSimple,
             },
           },
           {
             label: "Non, irréguliers",
             nativeInputProps: {
-              defaultChecked: !values.schedule.isSimple,
+              checked: !values.schedule.isSimple,
               onChange: () => onBoolRadioPickerChange(false),
             },
           },

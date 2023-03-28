@@ -16,7 +16,7 @@ interface ConventionMiniStagePageProps {
 export const ConventionMiniStagePage = ({
   route,
 }: ConventionMiniStagePageProps) => (
-  <ConventionFormContainerLayout>
+  <ConventionFormContainerLayout internshipKind="mini-stage-cci">
     <ConventionForm
       properties={conventionInitialValuesFromUrl({
         route,

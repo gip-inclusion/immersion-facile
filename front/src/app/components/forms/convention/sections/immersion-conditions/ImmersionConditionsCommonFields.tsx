@@ -14,6 +14,7 @@ import {
   isStringDate,
   reasonableSchedule,
   scheduleWithFirstDayActivity,
+  toDateString,
 } from "shared";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { SchedulePicker } from "src/app/components/forms/commons/SchedulePicker/SchedulePicker";
@@ -100,6 +101,7 @@ export const ImmersionConditionsCommonFields = ({
         disabled={disabled}
         nativeInputProps={{
           ...register("dateStart"),
+          value: toDateString(new Date(values.dateStart)),
           onChange: (event) => {
             const dateStart = event.target.value;
             resetSchedule({
@@ -137,6 +139,7 @@ export const ImmersionConditionsCommonFields = ({
           },
           type: "date",
           max: dateMax,
+          value: toDateString(new Date(values.dateEnd)),
         }}
         {...getFieldError("dateEnd")}
       />
@@ -166,7 +169,7 @@ export const ImmersionConditionsCommonFields = ({
           ...option,
           nativeInputProps: {
             ...option.nativeInputProps,
-            defaultChecked:
+            checked:
               Boolean(option.nativeInputProps.value) ===
               values.individualProtection,
             onChange: () => {
@@ -203,7 +206,7 @@ export const ImmersionConditionsCommonFields = ({
           ...option,
           nativeInputProps: {
             ...option.nativeInputProps,
-            defaultChecked:
+            checked:
               Boolean(option.nativeInputProps.value) ===
               values.sanitaryPrevention,
             onChange: () => {
@@ -255,7 +258,7 @@ export const ImmersionConditionsCommonFields = ({
             label: option,
             nativeInputProps: {
               onChange: () => setValue("immersionObjective", option),
-              defaultChecked: option === values.immersionObjective,
+              checked: option === values.immersionObjective,
               value: option,
             },
           }))}
@@ -283,6 +286,7 @@ export const ImmersionConditionsCommonFields = ({
           ...formContents["businessAdvantages"],
           ...register("businessAdvantages"),
         }}
+        disabled={disabled}
       />
       <Input
         {...formContents["immersionActivities"]}

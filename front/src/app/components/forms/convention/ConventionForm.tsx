@@ -10,6 +10,7 @@ import {
   ConventionReadDto,
   conventionWithoutExternalIdSchema,
   decodeMagicLinkJwtWithoutSignatureCheck,
+  hasBeneficiaryCurrentEmployer,
   isBeneficiaryMinor,
   isEstablishmentTutorIsEstablishmentRepresentative,
   isPeConnectIdentity,
@@ -50,6 +51,11 @@ const useWaitForReduxFormUiReadyBeforeFormikInitialisation = (
   useEffect(() => {
     dispatch(
       conventionSlice.actions.isMinorChanged(isBeneficiaryMinor(initialValues)),
+    );
+    dispatch(
+      conventionSlice.actions.isCurrentEmployerChanged(
+        hasBeneficiaryCurrentEmployer(initialValues),
+      ),
     );
     dispatch(
       conventionSlice.actions.isTutorEstablishmentRepresentativeChanged(
@@ -179,9 +185,7 @@ export const ConventionForm = ({
           Tous les champs marqués d'une astérisque (*) sont obligatoires.
         </p>
         <FormProvider {...methods}>
-          <form
-          // onSubmit={handleSubmit(onSubmit, (errors) => console.error(errors))}
-          >
+          <form>
             <ConventionFormFields onSubmit={onSubmit} isFrozen={isFrozen} />
             <ConventionFeedbackNotification
               submitFeedback={submitFeedback}

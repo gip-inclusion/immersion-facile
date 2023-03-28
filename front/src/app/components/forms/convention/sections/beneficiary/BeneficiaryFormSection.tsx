@@ -71,6 +71,7 @@ export const BeneficiaryFormSection = ({
 
   useEffect(() => {
     // TODO : do this in Redux ?
+
     const initialValues = values.signatories.beneficiaryRepresentative;
     setValue(
       "signatories.beneficiaryRepresentative",
@@ -80,9 +81,6 @@ export const BeneficiaryFormSection = ({
             role: "beneficiary-representative",
           }
         : undefined,
-      {
-        shouldValidate: true,
-      },
     );
   }, [isMinor]);
 
@@ -97,9 +95,6 @@ export const BeneficiaryFormSection = ({
             role: "beneficiary-current-employer",
           }
         : undefined,
-      {
-        shouldValidate: true,
-      },
     );
   }, [hasCurrentEmployer]);
 
@@ -198,7 +193,7 @@ export const BeneficiaryFormSection = ({
           ...option,
           nativeInputProps: {
             ...option.nativeInputProps,
-            defaultChecked: Boolean(option.nativeInputProps.value) === isMinor,
+            checked: Boolean(option.nativeInputProps.value) === isMinor,
             onChange: () => {
               dispatch(
                 conventionSlice.actions.isMinorChanged(
@@ -225,7 +220,7 @@ export const BeneficiaryFormSection = ({
               ...option,
               nativeInputProps: {
                 ...option.nativeInputProps,
-                defaultChecked:
+                checked:
                   Boolean(option.nativeInputProps.value) === hasCurrentEmployer,
                 onChange: () => {
                   dispatch(

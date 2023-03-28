@@ -74,6 +74,7 @@ export const conventionValuesFromUrl = {
   firstName: param.query.optional.string,
   lastName: param.query.optional.string,
   phone: param.query.optional.string,
+  financiaryHelp: param.query.optional.string,
   led: param.query.optional.string,
   emergencyContact: param.query.optional.string,
   emergencyContactPhone: param.query.optional.string,
@@ -96,6 +97,7 @@ export const conventionValuesFromUrl = {
 
   siret: param.query.optional.string,
   businessName: param.query.optional.string,
+  businessAdvantages: param.query.optional.string,
   etFirstName: param.query.optional.string,
   etLastName: param.query.optional.string,
   etJob: param.query.optional.string,

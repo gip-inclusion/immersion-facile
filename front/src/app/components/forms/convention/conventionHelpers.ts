@@ -122,6 +122,7 @@ export const conventionInitialValuesFromUrl = ({
         emergencyContactPhone: params.emergencyContactPhone ?? "",
         emergencyContactEmail: params.emergencyContactEmail ?? "",
         levelOfEducation: (params.led as LevelOfEducation) ?? "",
+        financiaryHelp: params.financiaryHelp ?? "",
         birthdate: params.birthdate ?? "",
         ...(params.fedId && params.fedIdProvider
           ? {
@@ -177,6 +178,7 @@ export const conventionInitialValuesFromUrl = ({
     immersionAddress: params.immersionAddress ?? "",
     agencyId: params.agencyId ?? undefined,
     workConditions: params.workConditions ?? "",
+    businessAdvantages: params.businessAdvantages ?? "",
 
     // Covid
     individualProtection: params.individualProtection ?? undefined,
