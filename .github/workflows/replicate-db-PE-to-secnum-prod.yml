@@ -22,7 +22,7 @@ jobs:
           echo "$HOME/bin" >> $GITHUB_PATH
 
       - name: Login with api-token
-        run: scalingo login --api-token=${{ secrets.SCALINGO_API_TOKEN }}
+        run: scalingo login --api-token=${{ secrets.SCALINGO_API_TOKEN_SECNUM }}
 
       - name: Dump the remote database data and restore it to the local database.
         run: >-
@@ -31,5 +31,5 @@ jobs:
           echo 'Dumping data' &&
           pg_dump --clean --format c --no-owner --no-privileges --no-comments --exclude-schema 'information_schema' --exclude-schema '^pg_*' --dbname $REMOTE_DATABASE_URL --file dump.pgsql &&
           echo 'Finished dumping data' &&
-          pg_restore --clean --verbo  se --no-owner --no-privileges --no-comments --dbname "$DATABASE_VAR" dump.pgsql; 
+          pg_restore --clean --verbose --no-owner --no-privileges --no-comments --dbname "$DATABASE_VAR" dump.pgsql; 
           exit 0"
