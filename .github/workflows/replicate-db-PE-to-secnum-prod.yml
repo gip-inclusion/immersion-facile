@@ -1,7 +1,11 @@
-name: Cron - Réplique BDD sur scalingo et maj des identifiants liés sur le metabase
+name: Copy DB PE vers sur scalingo prod secnum
 
 on:
   workflow_dispatch:
+    inputs:
+      application-name:
+        required: true
+        type: string
 
 jobs:
   dump-from-PE-and-restore-to-secnum-prod:
@@ -22,10 +26,10 @@ jobs:
 
       - name: Dump the remote database data and restore it to the local database.
         run: >-
-          scalingo --app ${{ inputs.application-name }} run bash -c "echo 'Installing pgsql-client' &&
+          scalingo --region osc-secnum-fr1 --app ${{ inputs.application-name }} run bash -c "echo 'Installing pgsql-client' &&
           dbclient-fetcher pgsql &&
           echo 'Dumping data' &&
           pg_dump --clean --format c --no-owner --no-privileges --no-comments --exclude-schema 'information_schema' --exclude-schema '^pg_*' --dbname $REMOTE_DATABASE_URL --file dump.pgsql &&
           echo 'Finished dumping data' &&
-          pg_restore --clean --verbose --no-owner --no-privileges --no-comments --dbname "$DATABASE_VAR" dump.pgsql; 
+          pg_restore --clean --verbo  se --no-owner --no-privileges --no-comments --dbname "$DATABASE_VAR" dump.pgsql; 
           exit 0"
