@@ -40,7 +40,7 @@ PATH=$PATH
 NODE_ENV=production
 
 # Pipeline: update-establishments-from-sirene
-$ESTABLISHMENT_UPDATE_FROM_SIRENE cd /app/back && pnpm start-update-establishments-from-sirene >> $LOGDIR/update-establishments-from-sirene.log 2>&1
+# $ESTABLISHMENT_UPDATE_FROM_SIRENE cd /app/back && pnpm start-update-establishments-from-sirene >> $LOGDIR/update-establishments-from-sirene.log 2>&1
 
 # Pipeline: trigger-suggest-edit-form-establishment-every-6-months
 $ESTABLISHMENT_SUGGEST_FORM_EDITION cd /app/back && pnpm trigger-suggest-edit-form-establishment-every-6-months >> $LOGDIR/trigger-suggest-edit-form-establishment-every-6-months.log 2>&1
