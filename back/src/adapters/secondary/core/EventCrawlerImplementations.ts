@@ -72,13 +72,14 @@ export class BasicEventCrawler implements EventCrawler {
       //eslint-disable-next-line no-console
       //console.timeEnd("__metrics : getAllUnpublishedEvents query duration");
       return events;
-    } catch (error) {
+    } catch (error: any) {
       const message = `Event Crawler failed to process ${type} events.`;
       // eslint-disable-next-line no-console
       //console.timeEnd("__metrics : getAllUnpublishedEvents query duration");
-      logger.error({ error }, message);
+      logger.error({ errorMessage: error?.message, error }, message);
       notifyObjectDiscord({
         message,
+        errorMessage: error?.message,
         error,
       });
       return [];
