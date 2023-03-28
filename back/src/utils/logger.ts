@@ -10,17 +10,19 @@ const getLogLevel = () => {
   return "info";
 };
 
+const devTransport = {
+  target: "pino-pretty",
+  options: {
+    colorize: true,
+    singleLine: !process.env.LOGGER_MULTI_LINE,
+    translateTime: "yyyy-mm-dd HH:MM:ss.l Z",
+    ignore: "pid,hostname",
+  },
+};
+
 const rootLogger = pino({
   level: getLogLevel(),
-  transport: {
-    target: "pino-pretty",
-    options: {
-      colorize: true,
-      singleLine: !process.env.LOGGER_MULTI_LINE,
-      translateTime: "yyyy-mm-dd HH:MM:ss.l Z",
-      ignore: "pid,hostname",
-    },
-  },
+  ...(process.env.NODE_ENV !== "production" ? { transport: devTransport } : {}),
 });
 
 // Example use: const logger = createLogger(__filename);
