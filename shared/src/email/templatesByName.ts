@@ -43,23 +43,20 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       content: `
       Certain signataires n'ont pas encore signé la demande de convention d'immersion en milieu professionnel pour ${beneficiaryFirstName} ${beneficiaryLastName}.
       
-      Voici à date l'état des signatures:
+      Voici à date l'état des signatures :
       ${signatoriesSummary}
 
       <strong>Sans toutes les signatures, la convention ne peut être établie et l'établissement ${businessName} ne pourra pas accueillir en immersion ${beneficiaryFirstName} ${beneficiaryLastName}.</strong>
 
-      Nous vous remercions de confirmer au plus vite cette demande.
-
-      Bonne journée,
-
-      L'équipe Immersion Facilitée
-      `,
+      Nous vous remercions de confirmer au plus vite cette demande.`,
       buttons: magicLinkUrl && [
         {
           label: "Ouvrir la demande de convention",
           url: `${magicLinkUrl}`,
         },
       ],
+      subContent: `Bonne journée,
+      L'équipe Immersion Facilitée`,
     }),
   },
   AGENCY_FIRST_REMINDER: {
@@ -90,13 +87,15 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       - du ${dateStart}
       - au ${dateEnd}
 
-      Cette demande d'immersion a bien été signée par le bénéficiaire et l'entreprise d'accueil.
-
-      Vous pouvez prendre connaissance de la demande pour la traiter en <a href="${agencyMagicLinkUrl}" target="_blank">cliquant ici</a>.
-
-      Bonne journée,
-      L'équipe Immersion Facilitée
-      `,
+      Cette demande d'immersion a bien été signée par le bénéficiaire et l'entreprise d'accueil.`,
+      buttons: [
+        {
+          label: "Voir la convention",
+          url: agencyMagicLinkUrl,
+        },
+      ],
+      subContent: `Bonne journée,
+      L'équipe Immersion Facilitée`,
     }),
   },
   AGENCY_LAST_REMINDER: {
@@ -114,10 +113,18 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       content: `
       L'immersion demandée par Bénéficiaire <strong>${beneficiaryFirstName} ${beneficiaryLastName}</strong> au sein de l'entreprise <strong>${businessName}</strong> doit démarrer demain.
 
-      Nous vous remercions d'examiner rapidement la demande de convention qui vous a été envoyée afin que votre décision soit transmise au bénéficiaire et à l'entreprise.
-      Vous pouvez prendre connaissance de la demande pour la traiter en <a href="${agencyMagicLinkUrl}" target="_blank">cliquant ici</a>.
-      
+      Nous vous remercions d'examiner rapidement la demande de convention qui vous a été envoyée afin que votre décision soit transmise au bénéficiaire et à l'entreprise.`,
+      buttons: [
+        {
+          label: "Voir la convention",
+          url: agencyMagicLinkUrl,
+        },
+      ],
+      subContent: `
       Pour rappel, nous vous transmettons tous les renseignements nécessaires pour examiner la demande. Si vous la validez, la convention est automatiquement établie.
+
+      Bonne journée,
+      L'équipe Immersion Facilitée
       `,
     }),
   },

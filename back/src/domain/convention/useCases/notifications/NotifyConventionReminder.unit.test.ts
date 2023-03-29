@@ -473,7 +473,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
 
       const expected: string[] = [
         `- ✔️  - A signé le 15/03/2023 - Jean Valjean, bénéficiaire`,
-        `- ❌ - N'as pas signé - Louis de la Valière, représentant l'entreprise Paris Corp`,
+        `- ❌ - N'a pas signé - Louis de la Valière, représentant l'entreprise Paris Corp`,
       ];
 
       expect(toSignatoriesSummary(convention)).toStrictEqual(expected);
@@ -501,7 +501,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       const expected: string[] = [
         `- ✔️  - A signé le 19/03/2023 - Jean Valjean, bénéficiaire`,
         `- ✔️  - A signé le 19/03/2023 - Révérent Balec, représentant légal du bénéficiaire`,
-        `- ❌ - N'as pas signé - Louis de la Valière, représentant l'entreprise Paris Corp`,
+        `- ❌ - N'a pas signé - Louis de la Valière, représentant l'entreprise Paris Corp`,
       ];
 
       expect(toSignatoriesSummary(convention)).toStrictEqual(expected);
@@ -531,8 +531,8 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
 
       const expected: string[] = [
         `- ✔️  - A signé le 19/03/2023 - Jean Valjean, bénéficiaire`,
-        `- ❌ - N'as pas signé - Robert Thénardier, employeur actuel du bénéficiaire`,
-        `- ❌ - N'as pas signé - Louis de la Valière, représentant l'entreprise Paris Corp`,
+        `- ❌ - N'a pas signé - Robert Thénardier, employeur actuel du bénéficiaire`,
+        `- ❌ - N'a pas signé - Louis de la Valière, représentant l'entreprise Paris Corp`,
       ];
 
       expect(toSignatoriesSummary(convention)).toStrictEqual(expected);

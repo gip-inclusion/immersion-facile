@@ -265,4 +265,4 @@ const establishmentSummary = (
 const signStatus = (signAt: string | undefined): string =>
   signAt
     ? `✔️  - A signé le ${format(new Date(signAt), "dd/MM/yyyy")}`
-    : `❌ - N'as pas signé`;
+    : `❌ - N'a pas signé`;
