@@ -1,4 +1,4 @@
-import { Form, Formik } from "formik";
+import { useForm, SubmitHandler } from "react-hook-form";
 import React, { useEffect } from "react";
 import { MainWrapper } from "react-design-system";
 import { useDispatch } from "react-redux";
@@ -7,13 +7,13 @@ import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { adminAuthSlice } from "src/core-logic/domain/admin/adminAuth/adminAuth.slice";
-import { TextInput } from "src/app/components/forms/commons/TextInput";
-import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
+import { Input } from "@codegouvfr/react-dsfr/Input";
 import { fr } from "@codegouvfr/react-dsfr";
 import { routes } from "./routes";
 import { AdminTab } from "./route-params";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export const AdminPrivateRoute = ({
   children,
@@ -36,6 +36,16 @@ export const LoginForm = ({
   const isLoading = useAppSelector(adminSelectors.auth.isLoading);
   const isAuthenticated = useAppSelector(adminSelectors.auth.isAuthenticated);
   const initialValues: UserAndPassword = { user: "", password: "" };
+
+  const { register, handleSubmit } = useForm<UserAndPassword>({
+    resolver: zodResolver(userAndPasswordSchema),
+    mode: "onTouched",
+    defaultValues: initialValues,
+  });
+  const onSubmit: SubmitHandler<UserAndPassword> = (values) => {
+    dispatch(adminAuthSlice.actions.loginRequested(values));
+  };
+
   useEffect(() => {
     if (isAuthenticated) {
       routes
@@ -48,47 +58,41 @@ export const LoginForm = ({
   return (
     <HeaderFooterLayout>
       <MainWrapper layout="boxed">
-        <Formik
-          initialValues={initialValues}
-          validationSchema={toFormikValidationSchema(userAndPasswordSchema)}
-          onSubmit={(values) => {
-            dispatch(adminAuthSlice.actions.loginRequested(values));
-          }}
-        >
-          {() => (
-            <Form>
-              <span className={fr.cx("fr-h5")}>Veuillez vous connecter</span>
-              <div
-                className={fr.cx("fr-card", "fr-py-4w", "fr-px-8w", "fr-mt-2w")}
-              >
-                <TextInput label="Utilisateur" name="user" />
-                <TextInput
-                  label="Mot de passe"
-                  name="password"
-                  type="password"
-                />
-                <Button
-                  disabled={isLoading}
-                  type="submit"
-                  nativeButtonProps={{
-                    id: domElementIds.admin.adminPrivateRoute
-                      .formLoginSubmitButton,
-                  }}
-                >
-                  Se connecter
-                </Button>
-                {error && (
-                  <Alert
-                    severity="error"
-                    title="Une erreur est survenue"
-                    className={fr.cx("fr-mt-2w")}
-                    description={error}
-                  />
-                )}
-              </div>
-            </Form>
-          )}
-        </Formik>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <span className={fr.cx("fr-h5")}>Veuillez vous connecter</span>
+          <div className={fr.cx("fr-card", "fr-py-4w", "fr-px-8w", "fr-mt-2w")}>
+            <Input
+              label="Utilisateur"
+              nativeInputProps={{
+                ...register("user"),
+              }}
+            />
+            <Input
+              label="Mot de passe"
+              nativeInputProps={{
+                type: "password",
+                ...register("password"),
+              }}
+            />
+            <Button
+              disabled={isLoading}
+              type="submit"
+              nativeButtonProps={{
+                id: domElementIds.admin.adminPrivateRoute.formLoginSubmitButton,
+              }}
+            >
+              Se connecter
+            </Button>
+            {error && (
+              <Alert
+                severity="error"
+                title="Une erreur est survenue"
+                className={fr.cx("fr-mt-2w")}
+                description={error}
+              />
+            )}
+          </div>
+        </form>
       </MainWrapper>
     </HeaderFooterLayout>
   );
