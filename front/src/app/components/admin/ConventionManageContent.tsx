@@ -21,21 +21,20 @@ export const ConventionManageContent = ({
     useConvention({ jwt, conventionId });
 
   if (fetchConventionError) {
-    if (fetchConventionError.includes("Le lien magique est périmé")) {
-      routes
-        .renewConventionMagicLink({
-          expiredJwt: jwt,
-          originalURL: window.location.href,
-        })
-        .replace();
-    }
-    routes
-      .errorRedirect({
-        title: "Erreur lors de la récupération de la convention",
-        message: fetchConventionError,
-        kind: "",
-      })
-      .push();
+    fetchConventionError.includes("Le lien magique est périmé")
+      ? routes
+          .renewConventionMagicLink({
+            expiredJwt: jwt,
+            originalURL: window.location.href,
+          })
+          .replace()
+      : routes
+          .errorRedirect({
+            title: "Erreur lors de la récupération de la convention",
+            message: fetchConventionError,
+            kind: "",
+          })
+          .push();
   }
 
   return (
