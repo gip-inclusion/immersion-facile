@@ -1,15 +1,14 @@
 import React, { useState } from "react";
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import { keys } from "ramda";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
-import { ErrorNotifications } from "react-design-system";
-import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
-
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { keys } from "ramda";
+import { ErrorNotifications } from "react-design-system";
 import {
   AppellationDto,
   defaultMaxContactsPerWeek,
@@ -21,12 +20,6 @@ import {
   SiretDto,
   toDotNotation,
 } from "shared";
-import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
-import {
-  formErrorsToFlatErrors,
-  useFormContents,
-} from "src/app/hooks/formContents.hooks";
-import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { BusinessContact } from "./BusinessContact";
 import {
   emptyAppellation,
@@ -34,6 +27,12 @@ import {
 } from "./MultipleAppellationInput";
 import { SearchResultPreview } from "./SearchResultPreview";
 import { booleanSelectOptions } from "src/app/contents/forms/common/values";
+import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
+import {
+  formErrorsToFlatErrors,
+  useFormContents,
+} from "src/app/hooks/formContents.hooks";
+import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 
 type EstablishmentFormProps = {
   initialValues: FormEstablishmentDto;
@@ -68,12 +67,12 @@ export const EstablishmentForm = ({
   if (getErrorsFromResponseData(submitError)) {
     errorMessage = submitError["response"]["data"]["errors"];
   }
+
   const methods = useForm<FormEstablishmentDto>({
     defaultValues: initialValues,
     resolver: zodResolver(formEstablishmentSchema),
     mode: "onTouched",
   });
-
   const {
     handleSubmit,
     register,
@@ -81,6 +80,7 @@ export const EstablishmentForm = ({
     getValues,
     formState: { errors, submitCount, isSubmitting, touchedFields },
   } = methods;
+
   const onSubmit: SubmitHandler<FormEstablishmentDto> = async (data) => {
     setIsSuccess(false);
     setSubmitError(null);
@@ -127,15 +127,43 @@ export const EstablishmentForm = ({
           </h2>
           {children}
           <RadioButtons
-            {...formContents.isEngagedEnterprise}
-            legend={formContents.isEngagedEnterprise.label}
-            options={booleanSelectOptions}
+            {...formContents["isEngagedEnterprise"]}
+            legend={formContents["isEngagedEnterprise"].label}
+            options={booleanSelectOptions.map((option) => ({
+              ...option,
+              nativeInputProps: {
+                ...option.nativeInputProps,
+                checked:
+                  Boolean(option.nativeInputProps.value) ===
+                  getValues()["isEngagedEnterprise"],
+                onChange: () => {
+                  setValue(
+                    "isEngagedEnterprise",
+                    option.nativeInputProps.value === 1,
+                  );
+                },
+              },
+            }))}
             disabled={false}
           />
           <RadioButtons
-            {...formContents.fitForDisabledWorkers}
-            legend={formContents.fitForDisabledWorkers.label}
-            options={booleanSelectOptions}
+            {...formContents["fitForDisabledWorkers"]}
+            legend={formContents["fitForDisabledWorkers"].label}
+            options={booleanSelectOptions.map((option) => ({
+              ...option,
+              nativeInputProps: {
+                ...option.nativeInputProps,
+                checked:
+                  Boolean(option.nativeInputProps.value) ===
+                  getValues()["fitForDisabledWorkers"],
+                onChange: () => {
+                  setValue(
+                    "fitForDisabledWorkers",
+                    option.nativeInputProps.value === 1,
+                  );
+                },
+              },
+            }))}
             disabled={false}
           />
           <Input

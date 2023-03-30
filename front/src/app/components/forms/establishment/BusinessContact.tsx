@@ -1,28 +1,18 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
-import React, {
-  DetailedHTMLProps,
-  InputHTMLAttributes,
-  ReactNode,
-} from "react";
+import React from "react";
 import { useFormContext, UseFormRegisterReturn } from "react-hook-form";
 import { FormEstablishmentDto, zEmail } from "shared";
 import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
+import { RadioButtonOption } from "src/app/contents/forms/common/values";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 
 const preferredContactMethodOptions = (
   register: UseFormRegisterReturn,
 ): // register:UseFormRegister<FormEstablishmentDto>
-{
-  label: ReactNode;
-  hintText?: ReactNode;
-  nativeInputProps: DetailedHTMLProps<
-    InputHTMLAttributes<HTMLInputElement>,
-    HTMLInputElement
-  >;
-}[] => [
+RadioButtonOption[] => [
   {
     label:
       "Par mail (la demande passera par un formulaire afin de ne pas exposer l'adresse mail)",
