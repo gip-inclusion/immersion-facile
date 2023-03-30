@@ -68,7 +68,9 @@ export class HttpSirenGateway implements SirenGateway {
           const dataFromApi: SirenGatewayAnswer | undefined = response?.data;
           const establishment = dataFromApi?.etablissements[0];
           if (!establishment) return;
-          return convertSirenEstablishmentToResponse(establishment);
+          return convertSirenRawEstablishmentToSirenEstablishmentDto(
+            establishment,
+          );
         } catch (error: any) {
           if (error.response?.status === 404) {
             return;
@@ -149,7 +151,7 @@ export type SirenGatewayAnswer = {
   etablissements: SirenApiRawEstablishment[];
 };
 
-const convertSirenEstablishmentToResponse = (
+export const convertSirenRawEstablishmentToSirenEstablishmentDto = (
   sirenEstablishment: SirenApiRawEstablishment,
 ): SirenEstablishmentDto => ({
   siret: sirenEstablishment.siret,

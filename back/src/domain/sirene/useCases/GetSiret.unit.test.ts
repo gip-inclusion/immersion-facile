@@ -61,52 +61,6 @@ describe("GetSiret", () => {
     );
   });
 
-  it("returns the parsed info when siret found", async () => {
-    sirenGateway.setSirenEstablishment(validEstablishment);
-    const response = await getSiret.execute({
-      siret: validEstablishment.siret,
-    });
-    expectToEqual(response, {
-      siret: "12345678901234",
-      businessName: "MA P'TITE BOITE",
-      businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
-      isOpen: true,
-    });
-  });
-
-  it("populates businessName from nom/prenom when denomination not available", async () => {
-    sirenGateway.setSirenEstablishment({
-      ...validEstablishment,
-      businessName: "ALAIN PROST",
-    });
-    const response = await getSiret.execute({
-      siret: validEstablishment.siret,
-    });
-    expect(response.businessName).toBe("ALAIN PROST");
-  });
-
-  it("skips missing parts of adresseEtablissment", async () => {
-    sirenGateway.setSirenEstablishment({
-      ...validEstablishment,
-      businessAddress: "L'ESPLANADE 30430 BARJAC",
-    });
-    const response = await getSiret.execute({
-      siret: validEstablishment.siret,
-    });
-    expect(response.businessAddress).toBe("L'ESPLANADE 30430 BARJAC");
-  });
-
-  it("skips naf when not available", async () => {
-    sirenGateway.setSirenEstablishment({
-      ...validEstablishment,
-      businessName: "MA P'TITE BOITE",
-    });
-    const response = await getSiret.execute({
-      siret: validEstablishment.siret,
-    });
-    expect(response.nafDto).toBeUndefined();
-  });
-
   it("returns unavailable Api error if it gets a 429 from API", async () => {
     sirenGateway.setError({
       initialError: {
@@ -119,18 +73,5 @@ describe("GetSiret", () => {
       getSiret.execute({ siret: "42942942942900" }),
       new TooManyRequestApiError("Sirene API"),
     );
-  });
-
-  it("returns establishment as not Open if it is not at the current period", async () => {
-    sirenGateway.setSirenEstablishment({
-      ...validEstablishment,
-      isOpen: false,
-    });
-
-    const response = await getSiret.execute({
-      siret: validEstablishment.siret,
-      includeClosedEstablishments: true,
-    });
-    expect(response).toMatchObject({ isOpen: false });
   });
 });
