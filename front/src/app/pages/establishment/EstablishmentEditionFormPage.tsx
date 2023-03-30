@@ -1,6 +1,6 @@
-import React from "react";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { MainWrapper, PageHeader } from "react-design-system";
+import React, { useEffect, useState } from "react";
+import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import { useFormContext } from "react-hook-form";
 import {
   addressDtoToString,
@@ -17,7 +17,6 @@ import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { routes } from "src/app/routes/routes";
 import { establishmentGateway } from "src/config/dependencies";
 import { Route } from "type-route";
-import { ApiDataContainer } from "../admin/ApiDataContainer";
 
 export const EstablishmentEditionFormPage = ({
   route,
@@ -33,6 +32,33 @@ export const EstablishmentEditionFormPage = ({
         { ...data },
         route.params.jwt,
       );
+  const [formInitialValues, setFormInitialValues] =
+    useState<FormEstablishmentDto | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  useEffect(() => {
+    const formEstablishmentInitialValues =
+      establishmentGateway.getFormEstablishmentFromJwt(
+        decodeMagicLinkJwtWithoutSignatureCheck<EstablishmentJwtPayload>(
+          route.params.jwt,
+        ).siret,
+        route.params.jwt,
+      );
+    formEstablishmentInitialValues
+      .then((formEstablishment) => {
+        setFormInitialValues(formEstablishment);
+      })
+      .catch((error) =>
+        routes
+          .errorRedirect({
+            kind: error.kind,
+            message: error.message,
+            title:
+              "Problème lors de la récupération des données de l'entreprise",
+          })
+          .push(),
+      )
+      .finally(() => setIsLoading(false));
+  }, []);
   return (
     <HeaderFooterLayout>
       <MainWrapper
@@ -45,35 +71,18 @@ export const EstablishmentEditionFormPage = ({
           />
         }
       >
-        <ApiDataContainer
-          callApi={() =>
-            establishmentGateway.getFormEstablishmentFromJwt(
-              decodeMagicLinkJwtWithoutSignatureCheck<EstablishmentJwtPayload>(
-                route.params.jwt,
-              ).siret,
-              route.params.jwt,
-            )
-          }
-          jwt={route.params.jwt}
-        >
-          {(formEstablishment) =>
-            !formEstablishment ? (
-              <p>Données de formulaire d'établissement indisponibles</p>
-            ) : !route.params.jwt ? (
-              <p>Lien non valide</p>
-            ) : (
-              <EstablishmentForm
-                initialValues={formEstablishment}
-                saveForm={onSaveForm(route)}
-                isEditing
-              >
-                <EditionSiretRelatedInputs
-                  businessAddress={formEstablishment.businessAddress}
-                />
-              </EstablishmentForm>
-            )
-          }
-        </ApiDataContainer>
+        {isLoading && <Loader />}
+        {!isLoading && formInitialValues && (
+          <EstablishmentForm
+            initialValues={formInitialValues}
+            saveForm={onSaveForm(route)}
+            isEditing
+          >
+            <EditionSiretRelatedInputs
+              businessAddress={formInitialValues.businessAddress}
+            />
+          </EstablishmentForm>
+        )}
       </MainWrapper>
     </HeaderFooterLayout>
   );
