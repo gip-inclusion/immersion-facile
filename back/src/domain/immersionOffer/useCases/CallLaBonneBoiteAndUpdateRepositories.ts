@@ -55,8 +55,7 @@ export class CallLaBonneBoiteAndUpdateRepositories extends TransactionalUseCase<
   ): Promise<void> {
     const { rome, latitude, longitude, distance_km } =
       searchImmersionRequestDto;
-    // eslint-disable-next-line no-console
-    console.time(`updateReposFromLBBduration-${rome}-${latitude}-${longitude}`);
+
     if (!rome) return;
 
     const requestParams: LaBonneBoiteRequestParams = {
@@ -129,10 +128,6 @@ export class CallLaBonneBoiteAndUpdateRepositories extends TransactionalUseCase<
       });
     await uow.establishmentAggregateRepository.createImmersionOffersToEstablishments(
       immersionOffersWithSiretsToAdd,
-    );
-    // eslint-disable-next-line no-console
-    console.timeEnd(
-      `updateReposFromLBBduration-${rome}-${latitude}-${longitude}`,
     );
   }
 

@@ -5,13 +5,10 @@ import {
   searchImmersionQueryParamsSchema,
   SearchImmersionResultDto,
 } from "shared";
-import { createLogger } from "../../../utils/logger";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { SearchMade, SearchMadeEntity } from "../entities/SearchMadeEntity";
-
-const logger = createLogger(__filename);
 
 const histogramSearchImmersionStoredCount = new promClient.Histogram({
   name: "search_immersion_stored_result_count",
@@ -38,10 +35,6 @@ export class SearchImmersion extends TransactionalUseCase<
     uow: UnitOfWork,
     apiConsumer: ApiConsumer,
   ): Promise<SearchImmersionResultDto[]> {
-    // eslint-disable-next-line no-console
-    console.time(
-      `searchImmersionDuration-${params.rome}-${params.latitude}-${params.longitude}`,
-    );
     const apiConsumerName = apiConsumer?.consumer;
 
     const searchMade: SearchMade = {
@@ -63,7 +56,6 @@ export class SearchImmersion extends TransactionalUseCase<
 
     await uow.searchMadeRepository.insertSearchMade(searchMadeEntity);
 
-    const dateStartQuery = new Date();
     const resultsFromStorage =
       await uow.establishmentAggregateRepository.getSearchImmersionResultDtoFromSearchMade(
         {
@@ -72,19 +64,8 @@ export class SearchImmersion extends TransactionalUseCase<
           maxResults: 100,
         },
       );
-    const dateEndQuery = new Date();
-
-    logger.debug(
-      { duration_ms: dateEndQuery.getTime() - dateStartQuery.getTime() },
-      "searchImmersionQueryDuration",
-    );
 
     histogramSearchImmersionStoredCount.observe(resultsFromStorage.length);
-
-    // eslint-disable-next-line no-console
-    console.timeEnd(
-      `searchImmersionDuration-${params.rome}-${params.latitude}-${params.longitude}`,
-    );
 
     return resultsFromStorage;
   }

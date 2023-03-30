@@ -1,4 +1,4 @@
-import { ConventionMagicLinkPayload } from "shared";
+import { ConventionMagicLinkPayload, stringToMd5 } from "shared";
 import { z } from "zod";
 import {
   BadRequestError,
@@ -8,6 +8,21 @@ import { createLogger } from "../../utils/logger";
 import { UnitOfWork, UnitOfWorkPerformer } from "./ports/UnitOfWork";
 
 const logger = createLogger(__filename);
+
+const calculateDurationInSecondsFrom = (start: Date): number => {
+  const end = new Date();
+  return (end.getTime() - start.getTime()) / 1000;
+};
+const createParamsHash = (
+  useCaseName: string,
+  params: unknown,
+): string | undefined => {
+  if (
+    useCaseName === "CallLaBonneBoiteAndUpdateRepositories" ||
+    useCaseName === "SearchImmersion"
+  )
+    return stringToMd5(JSON.stringify(params));
+};
 
 export abstract class UseCase<
   Input,
@@ -21,17 +36,19 @@ export abstract class UseCase<
     params: Input,
     jwtPayload?: JWTPayload,
   ): Promise<Output> {
+    const startDate = new Date();
     const useCaseName = this.constructor.name;
-    logger.info(`UseCase execution start - ${useCaseName}`);
     let validParams: Input;
     try {
       validParams = validateAndParseZodSchema(this.inputSchema, params);
     } catch (e) {
       throw new BadRequestError(e);
     }
-    const result = this._execute(validParams, jwtPayload);
-
-    logger.info(`UseCase execution Finished - ${useCaseName}`);
+    const result = await this._execute(validParams, jwtPayload);
+    const durationInSeconds = calculateDurationInSecondsFrom(startDate);
+    logger.info(
+      `UseCase Finished - ${useCaseName} - Duration: ${durationInSeconds}s`,
+    );
     return result;
   }
 
@@ -55,21 +72,32 @@ export abstract class TransactionalUseCase<
     params: Input,
     jwtPayload?: JWTPayload,
   ): Promise<Output> {
+    const startDate = new Date();
     const useCaseName = this.constructor.name;
-    logger.info(`UseCase execution start - ${useCaseName}`);
     const validParams = validateAndParseZodSchema(this.inputSchema, params);
+    const paramsHash = createParamsHash(useCaseName, validParams);
 
     try {
-      return await this.uowPerformer.perform((uow) =>
+      const result = await this.uowPerformer.perform((uow) =>
         this._execute(validParams, uow, jwtPayload),
       );
+      const durationInSeconds = calculateDurationInSecondsFrom(startDate);
+      logger.info(
+        `${
+          paramsHash ? `${paramsHash} - ` : ""
+        }TransactionalUseCase Succeeded - ${useCaseName} - Duration: ${durationInSeconds}s`,
+      );
+      return result;
     } catch (error: any) {
+      const durationInSeconds = calculateDurationInSecondsFrom(startDate);
       logger.error(
-        `UseCase execution Errored - ${useCaseName} : ${error?.message}`,
+        `${
+          paramsHash ? `${paramsHash} - ` : ""
+        }TransactionalUseCase Failed - ${useCaseName} - Duration: ${durationInSeconds}s - Error: ${
+          error?.message
+        }`,
       );
       throw error;
-    } finally {
-      logger.info(`UseCase execution Finished - ${useCaseName}`);
     }
   }
 
