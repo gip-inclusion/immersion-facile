@@ -57,9 +57,7 @@ export const BeneficiaryFormSection = ({
         "signatories.beneficiary.email": connectedUser.email,
       }).forEach(([key, value]) => setFieldValue(key, value));
   }, [userFieldsAreFilled]);
-  // const isFilledField = (fieldValue: string) => fieldValue.length > 0;
-  // const shouldDisableField = (fieldValue: string) =>
-  //   isPEConnected && isFilledField(fieldValue);
+
   const levelsOfEducationToSelectOption = levelsOfEducation.map(
     (level: string) => ({ label: level, value: level }),
   );
