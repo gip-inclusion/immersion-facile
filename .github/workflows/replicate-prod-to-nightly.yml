@@ -2,6 +2,8 @@ name: Copy prod (secnum) DB to nightly (secnum-nightly) DB
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "15 3 * * *"
 
 jobs:
   duplicate-prod-db-to-nightly:
