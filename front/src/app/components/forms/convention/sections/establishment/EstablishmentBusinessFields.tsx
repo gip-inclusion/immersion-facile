@@ -1,6 +1,6 @@
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import React from "react";
-import { useFormContext } from "react-hook-form";
+import React, { useEffect } from "react";
+import { useFormContext, useWatch } from "react-hook-form";
 import { ConventionDto } from "shared";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
@@ -21,11 +21,19 @@ export const EstablishmentBusinessFields = ({
       shouldFetchEvenIfAlreadySaved: true,
     });
 
-  const { getValues, register, setValue } = useFormContext<ConventionDto>();
+  const { getValues, register, control } = useFormContext<ConventionDto>();
+
+  const siret = useWatch({
+    control,
+    name: "siret",
+  });
+  useEffect(() => {
+    updateSiret(siret);
+  }, [siret]);
+
   const values = getValues();
-  const conventionStatus = values.status;
   useSiretRelatedField("businessName", {
-    disabled: conventionStatus !== "DRAFT",
+    disabled: values.status !== "DRAFT",
   });
   const { getFormFields } = useFormContents(
     formConventionFieldsLabels(values.internshipKind),
@@ -38,11 +46,7 @@ export const EstablishmentBusinessFields = ({
         nativeInputProps={{
           ...formContents.siret,
           ...register("siret"),
-          value: currentSiret || values?.siret,
-          onChange: (event) => {
-            setValue("siret", event.currentTarget.value);
-            updateSiret(event.currentTarget.value);
-          },
+          value: currentSiret || values.siret,
         }}
         disabled={disabled}
         state={siretErrorToDisplay ? "error" : undefined}

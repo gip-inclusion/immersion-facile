@@ -1,21 +1,21 @@
-import { mergeDeepRight } from "ramda";
 import React from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { mergeDeepRight } from "ramda";
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
-import { ConventionDto, ConventionReadDto, keys } from "shared";
+import { ConventionDto, ConventionReadDto } from "shared";
+import { fr } from "@codegouvfr/react-dsfr";
+import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
+import { ConventionFormFields } from "src/app/components/forms/convention/ConventionFormFields";
+import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import {
   conventionSelectors,
   signatoryDataFromConvention,
-} from "../../../../core-logic/domain/convention/convention.selectors";
+} from "src/core-logic/domain/convention/convention.selectors";
 import {
   conventionSlice,
   ConventionSubmitFeedback,
-} from "../../../../core-logic/domain/convention/convention.slice";
-import { ConventionFeedbackNotification } from "../../../components/forms/convention/ConventionFeedbackNotification";
-import { ConventionFormFields } from "../../../components/forms/convention/ConventionFormFields";
-import { useAppSelector } from "../../../hooks/reduxHooks";
-import { fr } from "@codegouvfr/react-dsfr";
-import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
+} from "src/core-logic/domain/convention/convention.slice";
 
 type ConventionSignFormProperties = {
   jwt: string;
@@ -34,8 +34,45 @@ export const ConventionSignForm = ({
   );
   const methods = useForm<ConventionReadDto>({
     defaultValues: convention,
+    mode: "onTouched",
   });
   const t = useConventionTexts(convention.internshipKind);
+
+  const onSignFormSubmit: SubmitHandler<ConventionReadDto> = (
+    values,
+  ): Promise<void> => {
+    if (!currentSignatory)
+      return Promise.reject("Il n'y a pas de signataire identifié.");
+
+    // Confirm checkbox
+    const { signedAtFieldName, signatory } = signatoryDataFromConvention(
+      mergeDeepRight(
+        convention as ConventionDto,
+        values as ConventionDto,
+      ) as ConventionDto,
+      currentSignatory.role,
+    );
+
+    const conditionsAccepted = !!signatory?.signedAt;
+    const { setError } = methods;
+    if (!conditionsAccepted) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      setError(signedAtFieldName! as keyof ConventionReadDto, {
+        type: "required",
+        message: "La signature est obligatoire",
+      });
+      return Promise.reject("La signature est obligatoire");
+    }
+
+    dispatch(
+      conventionSlice.actions.signConventionRequested({
+        jwt,
+        role: signatory.role,
+        signedAt: new Date().toISOString(),
+      }),
+    );
+    return Promise.resolve();
+  };
 
   const askFormModificationWithMessageForm = async (): Promise<void> => {
     const statusJustification = prompt(
@@ -56,28 +93,6 @@ export const ConventionSignForm = ({
     );
   };
   return (
-    // <Formik
-    //   enableReinitialize={true}
-    //   initialValues={convention}
-    //   validationSchema={toFormikValidationSchema(conventionSchema)}
-    //   onSubmit={(values, formikHelpers) =>
-    //     onConventionSignFormSubmit(
-    //       values,
-    //       formikHelpers,
-    //       currentSignatory,
-    //       convention,
-    //       dispatch,
-    //       jwt,
-    //     )
-    //   }
-    // >
-    //   {(props) => {
-    //     if (Object.values(props.errors).length > 0) {
-    //       // eslint-disable-next-line no-console
-    //       console.log("Erros in form : ", props.errors);
-    //     }
-
-    //     return (
     <div className={fr.cx("fr-grid-row", "fr-grid-row--center")}>
       <div className={fr.cx("fr-col-12", "fr-col-lg-7")}>
         <div className={fr.cx("fr-text--regular")}>
@@ -95,48 +110,11 @@ export const ConventionSignForm = ({
             {currentSignatory && (
               <ConventionFormFields
                 isFrozen={true}
-                onSubmit={(values) => {
-                  if (!currentSignatory) return;
-
-                  // Confirm checkbox
-                  const { signedAtFieldName, signatory } =
-                    signatoryDataFromConvention(
-                      mergeDeepRight(
-                        convention as ConventionDto,
-                        values as ConventionDto,
-                      ) as ConventionDto,
-                      currentSignatory.role,
-                    );
-
-                  const conditionsAccepted = !!signatory?.signedAt;
-                  const { setError } = methods;
-                  if (!conditionsAccepted) {
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    setError(signedAtFieldName! as keyof ConventionReadDto, {
-                      type: "required",
-                      message: "La signature est obligatoire",
-                    });
-                    return Promise.reject("La signature est obligatoire");
-                  }
-
-                  dispatch(
-                    conventionSlice.actions.signConventionRequested({
-                      jwt,
-                      role: signatory.role,
-                      signedAt: new Date().toISOString(),
-                    }),
-                  );
-                  return Promise.resolve();
-                }}
+                onSubmit={onSignFormSubmit}
                 isSignOnly={true}
                 signatory={currentSignatory}
                 onModificationsRequired={askFormModificationWithMessageForm}
               />
-            )}
-            {keys(methods.formState.errors).length > 0 && (
-              <div style={{ color: "red" }}>
-                Veuillez corriger les champs erronés
-              </div>
             )}
 
             <ConventionFeedbackNotification
@@ -149,43 +127,3 @@ export const ConventionSignForm = ({
     </div>
   );
 };
-
-// const onConventionSignFormSubmit: SubmitHandler<ConventionReadDto> = (
-//   values: ConventionDto,
-//   { setErrors, setSubmitting }: FormikHelpers<ConventionReadDto>,
-//   currentSignatory: Signatory | null,
-//   convention: ConventionReadDto,
-//   dispatch: Dispatch<any>,
-//   jwt: string,
-// ) => {
-//   if (!currentSignatory) return;
-
-//   // Confirm checkbox
-//   const { signedAtFieldName, signatory } = signatoryDataFromConvention(
-//     mergeDeepRight(
-//       convention as ConventionDto,
-//       values as ConventionDto,
-//     ) as ConventionDto,
-//     currentSignatory.role,
-//   );
-
-//   const conditionsAccepted = !!signatory?.signedAt;
-
-//   if (!conditionsAccepted) {
-//     setErrors({
-//       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-//       [signedAtFieldName!]: "La signature est obligatoire",
-//     });
-
-//     setSubmitting(false);
-//     return;
-//   }
-
-//   dispatch(
-//     conventionSlice.actions.signConventionRequested({
-//       jwt,
-//       role: signatory.role,
-//       signedAt: new Date().toISOString(),
-//     }),
-//   );
-// };

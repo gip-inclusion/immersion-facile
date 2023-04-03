@@ -1,14 +1,16 @@
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
+import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 import React from "react";
+import { useFormContext } from "react-hook-form";
 import {
   ConventionField,
   getConventionFieldName,
   InternshipKind,
+  keys,
   Signatory,
   SignatoryRole,
 } from "shared";
-import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
-import { useFormContext } from "react-hook-form";
+import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 
@@ -70,39 +72,25 @@ type SignatureActionsProperties = {
   signatory: Signatory;
   internshipKind: InternshipKind;
   alreadySigned: boolean;
-  isSubmitting: boolean;
-  onSubmit: () => Promise<void>;
-  onModificationRequired: () => Promise<void>;
+  onSubmitClick: React.MouseEventHandler<HTMLButtonElement>;
+  onModificationRequired: React.MouseEventHandler<HTMLButtonElement>;
 };
 
 export const SignatureActions = ({
   alreadySigned,
-  isSubmitting,
   onModificationRequired,
-  onSubmit,
+  onSubmitClick,
   signatory,
   internshipKind,
 }: SignatureActionsProperties) => {
   const submitFeedback = useAppSelector(conventionSelectors.feedback);
+  const isLoading = useAppSelector(conventionSelectors.isLoading);
   const { fieldName, signatoryFullName, signatoryFunction } =
     getSignatoryProcessedData(signatory);
-  const { setValue } = useFormContext();
+  const { setValue, formState, register } = useFormContext();
+  const getFieldError = makeFieldError(formState);
   return (
     <>
-      {/* <DateCheckboxGroup
-        name={fieldName}
-        label={`Je, soussigné ${signatoryFullName} (${signatoryFunction})
-         m'engage à avoir pris connaissance des dispositions réglementaires ${
-           internshipKind === "immersion" ? "de la PMSMP" : "du mini stage"
-         } et à les respecter *`}
-        description="Avant de répondre, consultez ces dispositions ici"
-        descriptionLink={
-          internshipKind === "immersion"
-            ? "https://docs.google.com/document/d/1siwGSE4fQB5hGWoppXLMoUYX42r9N-mGZbM_Gz_iS7c/edit?usp=sharing"
-            : "https://immersion.cellar-c2.services.clever-cloud.com/annexe_mini_stage_CCI.pdf"
-        }
-        disabled={alreadySigned}
-      /> */}
       <Checkbox
         options={[
           {
@@ -111,13 +99,15 @@ export const SignatureActions = ({
               internshipKind === "immersion" ? "de la PMSMP" : "du mini stage"
             } et à les respecter *`,
             nativeInputProps: {
-              name: fieldName,
-              value: "",
+              ...register(fieldName),
               defaultChecked: false,
               onChange: (event) => {
                 setValue(
                   fieldName,
                   event.target.checked ? new Date().toISOString() : undefined,
+                  {
+                    shouldValidate: true,
+                  },
                 );
               },
             },
@@ -136,6 +126,7 @@ export const SignatureActions = ({
           </a>
         }
         disabled={alreadySigned}
+        {...getFieldError(fieldName)}
       />
 
       <ButtonsGroup
@@ -145,8 +136,11 @@ export const SignatureActions = ({
           {
             priority: "primary",
             children: "Confirmer et signer",
-            disabled: isSubmitting || submitFeedback.kind !== "idle",
-            onClick: onSubmit,
+            disabled:
+              keys(formState.errors).length > 0 ||
+              isLoading ||
+              submitFeedback.kind !== "idle",
+            onClick: onSubmitClick,
             type: "button",
             iconId: "fr-icon-checkbox-circle-line",
             iconPosition: "left",
@@ -154,7 +148,7 @@ export const SignatureActions = ({
           {
             priority: "secondary",
             children: "Annuler les signatures et demander des modifications",
-            disabled: isSubmitting || submitFeedback.kind !== "idle",
+            disabled: isLoading || submitFeedback.kind !== "idle",
             onClick: onModificationRequired,
             type: "button",
             iconId: "fr-icon-edit-fill",

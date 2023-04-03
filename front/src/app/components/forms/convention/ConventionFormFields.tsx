@@ -47,7 +47,7 @@ export const ConventionFormFields = ({
     setValue,
     getValues,
     handleSubmit,
-    formState: { errors, submitCount, isSubmitting, isSubmitted, isValidating },
+    formState: { errors, submitCount, isSubmitted },
   } = useFormContext<ConventionReadDto>();
   const conventionValues = getValues();
   const conventionSubmitFeedback = useAppSelector(conventionSelectors.feedback);
@@ -55,6 +55,7 @@ export const ConventionFormFields = ({
     conventionSelectors.preselectedAgencyId,
   );
   const route = useRoute();
+  const isLoading = useAppSelector(conventionSelectors.isLoading);
 
   useEffect(() => {
     deviceRepository.delete("partialConventionInUrl");
@@ -79,8 +80,7 @@ export const ConventionFormFields = ({
     conventionValues.signatories.beneficiary.federatedIdentity;
   const t = useConventionTexts(conventionValues.internshipKind);
   const shouldSubmitButtonBeDisabled =
-    isSubmitting ||
-    isValidating ||
+    isLoading ||
     (isSubmitted && conventionSubmitFeedback.kind === "justSubmitted");
 
   return (
@@ -158,7 +158,7 @@ export const ConventionFormFields = ({
             onClick={handleSubmit(
               (values) => {
                 setValue("status", "READY_TO_SIGN");
-                onSubmit({ ...values, status: "READY_TO_SIGN" });
+                return onSubmit({ ...values, status: "READY_TO_SIGN" });
               },
               (errors) => {
                 // eslint-disable-next-line no-console
@@ -179,8 +179,10 @@ export const ConventionFormFields = ({
               internshipKind={conventionValues.internshipKind}
               alreadySigned={alreadySigned}
               signatory={signatory}
-              isSubmitting={isSubmitting}
-              onSubmit={handleSubmit(onSubmit)}
+              onSubmitClick={handleSubmit(onSubmit, (errors) => {
+                // eslint-disable-next-line no-console
+                console.error(getValues(), errors);
+              })}
               onModificationRequired={onModificationsRequired}
             />
           )}

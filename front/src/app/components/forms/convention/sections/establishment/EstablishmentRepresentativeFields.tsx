@@ -1,6 +1,6 @@
-import { Input } from "@codegouvfr/react-dsfr/Input";
-
 import React from "react";
+import { Input } from "@codegouvfr/react-dsfr/Input";
+import { fr } from "@codegouvfr/react-dsfr";
 import { useFormContext } from "react-hook-form";
 import { ConventionDto } from "shared";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
@@ -22,6 +22,7 @@ export const EstablishmentRepresentativeFields = ({
   const formContents = getFormFields();
   return (
     <>
+      <hr className={fr.cx("fr-hr")} />
       <Input
         {...formContents["signatories.establishmentRepresentative.firstName"]}
         nativeInputProps={{
