@@ -51,23 +51,43 @@ export const BusinessContact = () => {
       </div>
       <Input
         {...formContents["businessContact.firstName"]}
-        nativeInputProps={register("businessContact.firstName")}
+        hintText={formContents["businessContact.firstName"].description}
+        nativeInputProps={{
+          ...formContents["businessContact.firstName"],
+          ...register("businessContact.firstName"),
+        }}
       />
       <Input
         {...formContents["businessContact.lastName"]}
-        nativeInputProps={register("businessContact.lastName")}
+        hintText={formContents["businessContact.lastName"].description}
+        nativeInputProps={{
+          ...formContents["businessContact.lastName"],
+          ...register("businessContact.lastName"),
+        }}
       />
       <Input
         {...formContents["businessContact.job"]}
-        nativeInputProps={register("businessContact.job")}
+        hintText={formContents["businessContact.job"].description}
+        nativeInputProps={{
+          ...formContents["businessContact.job"],
+          ...register("businessContact.job"),
+        }}
       />
       <Input
         {...formContents["businessContact.phone"]}
-        nativeInputProps={register("businessContact.phone")}
+        hintText={formContents["businessContact.phone"].description}
+        nativeInputProps={{
+          ...formContents["businessContact.phone"],
+          ...register("businessContact.phone"),
+        }}
       />
       <Input
         {...formContents["businessContact.email"]}
-        nativeInputProps={register("businessContact.email")}
+        hintText={formContents["businessContact.email"].description}
+        nativeInputProps={{
+          ...formContents["businessContact.email"],
+          ...register("businessContact.email"),
+        }}
       />
       <MultipleEmailsInput
         {...formContents["businessContact.copyEmails"]}
