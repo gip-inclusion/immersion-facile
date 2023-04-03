@@ -113,7 +113,7 @@ describe("conventionDtoSchema", () => {
 
     it("rejects equal beneficiary current employer and other signatories", () => {
       const convention = new ConventionDtoBuilder()
-        .withBeneficiaryCurentEmployer(currentEmployer)
+        .withBeneficiaryCurrentEmployer(currentEmployer)
         .build();
       expectConventionDtoToBeInvalid(
         new ConventionDtoBuilder(convention)

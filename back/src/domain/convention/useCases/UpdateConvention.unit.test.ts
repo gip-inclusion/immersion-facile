@@ -170,7 +170,7 @@ describe("Update Convention", () => {
       //we would expect READY_TO_SIGN to be the most frequent case of previous state that we want to prevent here. Not testing all the possible statuses.
       const updatedConvention = new ConventionDtoBuilder(storedConvention)
         .withStatus("READY_TO_SIGN")
-        .withBeneficiaryCurentEmployer({
+        .withBeneficiaryCurrentEmployer({
           role: "beneficiary-current-employer",
           firstName: "Danny",
           lastName: "Clover",

@@ -206,8 +206,8 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     throw new Error("beneficiaryRepresentative is undefined.");
   }
 
-  public withBeneficiaryCurentEmployer(
-    beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer,
+  public withBeneficiaryCurrentEmployer(
+    beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer | undefined,
   ): ConventionDtoBuilder {
     if (
       this.dto.internshipKind === "immersion" &&

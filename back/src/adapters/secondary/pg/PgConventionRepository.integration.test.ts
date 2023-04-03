@@ -258,7 +258,7 @@ describe("PgConventionRepository", () => {
     const conventionWithBeneficiaryCurrentEmployer = new ConventionDtoBuilder(
       conventionWithoutBeneficiaryCurrentEmployer,
     )
-      .withBeneficiaryCurentEmployer(beneficiaryCurrentEmployer)
+      .withBeneficiaryCurrentEmployer(beneficiaryCurrentEmployer)
       .build();
 
     //SAVE CONVENTION WITHOUT BENEFICIARY CURRENT EMPLOYER
@@ -290,7 +290,7 @@ describe("PgConventionRepository", () => {
     };
     await conventionRepository.update(
       new ConventionDtoBuilder(conventionWithBeneficiaryCurrentEmployer)
-        .withBeneficiaryCurentEmployer(newBeneficiaryCurrentEmployer)
+        .withBeneficiaryCurrentEmployer(newBeneficiaryCurrentEmployer)
         .build(),
     );
     await expectConventionHaveBeneficiaryCurrentEmployer(

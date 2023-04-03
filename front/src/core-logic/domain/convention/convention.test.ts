@@ -6,6 +6,8 @@ import {
   ConventionDto,
   ConventionDtoBuilder,
   ConventionReadDto,
+  EstablishmentRepresentative,
+  EstablishmentTutor,
   expectObjectsToMatch,
   expectToEqual,
   SignatoryRole,
@@ -199,75 +201,262 @@ describe("Convention slice", () => {
       expectConventionState({ isLoading: true, feedback: { kind: "idle" } });
     });
 
-    it("reflects formUi when get convention with tutor different from establishment representative", () => {
-      const convention = new ConventionDtoBuilder()
-        .withEstablishmentRepresentativeEmail("a-different@email.com")
-        .build();
-      const conventionRead = {
-        ...convention,
-        agencyName: "agency",
-        agencyDepartment: "75",
-      };
-      expectConventionState({
-        isLoading: false,
-        convention: null,
+    describe("Convention formUi update based on convention data", () => {
+      describe("Getting custom agency id for convention form", () => {
+        it("changes loading state when fetches custom agency id", () => {
+          store.dispatch(
+            conventionSlice.actions.preselectedAgencyIdRequested(),
+          );
+          expectIsLoadingToBe(true);
+        });
+        it("fetches agency id successfully", () => {
+          const agency = new AgencyDtoBuilder().build();
+          store.dispatch(
+            conventionSlice.actions.preselectedAgencyIdRequested(),
+          );
+          dependencies.agencyGateway.customAgencyId$.next(agency.id);
+          expectIsLoadingToBe(false);
+          expectPreselectedAgencyIdToBe(agency.id);
+        });
+        it("returns an error if fetches fail", () => {
+          store.dispatch(
+            conventionSlice.actions.preselectedAgencyIdRequested(),
+          );
+          dependencies.agencyGateway.customAgencyId$.error(
+            new Error("Failed fetch preselectedAgencyId"),
+          );
+          expectIsLoadingToBe(false);
+          expectPreselectedAgencyIdToBe(null);
+        });
       });
-      store.dispatch(
-        conventionSlice.actions.fetchConventionRequested({
-          jwt: "my-jwt",
-          conventionId: "some-convention-id",
-        }),
-      );
-      expectConventionState({ isLoading: true });
-      feedGatewayWithConvention(conventionRead);
-      expectConventionState({
-        convention: conventionRead,
-        isLoading: false,
-        formUi: {
-          preselectedAgencyId: null,
-          isMinor: false,
-          isTutorEstablishmentRepresentative: false,
-          hasCurrentEmployer: false,
-        },
-      });
-    });
+      describe("isTutorEstablishmentRepresentative", () => {
+        it("reflects formUi when get convention with tutor different from establishment representative", () => {
+          const convention = new ConventionDtoBuilder()
+            .withEstablishmentRepresentativeEmail("a-different@email.com")
+            .build();
+          const conventionRead = {
+            ...convention,
+            agencyName: "agency",
+            agencyDepartment: "75",
+          };
+          expectConventionState({
+            isLoading: false,
+            convention: null,
+          });
+          store.dispatch(
+            conventionSlice.actions.fetchConventionRequested({
+              jwt: "my-jwt",
+              conventionId: "some-convention-id",
+            }),
+          );
+          expectConventionState({ isLoading: true });
+          feedGatewayWithConvention(conventionRead);
+          expectConventionState({
+            convention: conventionRead,
+            isLoading: false,
+            formUi: {
+              preselectedAgencyId: null,
+              isMinor: false,
+              isTutorEstablishmentRepresentative: false,
+              hasCurrentEmployer: false,
+            },
+          });
+        });
+        it("reflects formUi when get convention with tutor same as establishment representative", () => {
+          const tutor: EstablishmentTutor = {
+            email: "tutor@email.com",
+            firstName: "tutorName",
+            lastName: "tutorLastName",
+            job: "Tutor",
+            phone: "0611223344",
+            role: "establishment-tutor",
+          };
+          const establishmentRepresentative: EstablishmentRepresentative = {
+            ...tutor,
+            role: "establishment-representative",
+          };
 
-    it("reflects formUi when get convention with minor", () => {
-      const convention = new ConventionDtoBuilder()
-        .withBeneficiaryRepresentative({
-          email: "benef-rep@rep.com",
-          phone: "0102",
-          firstName: "yo",
-          lastName: "lo",
-          role: "beneficiary-representative",
-        })
-        .build();
-      const conventionRead = {
-        ...convention,
-        agencyName: "agency",
-        agencyDepartment: "75",
-      };
-      expectConventionState({
-        isLoading: false,
-        convention: null,
+          const convention = new ConventionDtoBuilder()
+            .withEstablishmentTutor(tutor)
+            .withEstablishmentRepresentative(establishmentRepresentative)
+            .build();
+          const conventionRead = {
+            ...convention,
+            agencyName: "agency",
+            agencyDepartment: "75",
+          };
+          expectConventionState({
+            isLoading: false,
+            convention: null,
+          });
+          store.dispatch(
+            conventionSlice.actions.fetchConventionRequested({
+              jwt: "my-jwt",
+              conventionId: "some-convention-id",
+            }),
+          );
+          expectConventionState({ isLoading: true });
+          feedGatewayWithConvention(conventionRead);
+          expectConventionState({
+            convention: conventionRead,
+            isLoading: false,
+            formUi: {
+              preselectedAgencyId: null,
+              isMinor: false,
+              isTutorEstablishmentRepresentative: true,
+              hasCurrentEmployer: false,
+            },
+          });
+        });
       });
-      store.dispatch(
-        conventionSlice.actions.fetchConventionRequested({
-          jwt: "my-jwt",
-          conventionId: "some-convention-id",
-        }),
-      );
-      expectConventionState({ isLoading: true });
-      feedGatewayWithConvention(conventionRead);
-      expectConventionState({
-        convention: conventionRead,
-        isLoading: false,
-        formUi: {
-          preselectedAgencyId: null,
-          isMinor: true,
-          isTutorEstablishmentRepresentative: false,
-          hasCurrentEmployer: false,
-        },
+      describe("isMinor", () => {
+        it("reflects formUi when get convention with minor", () => {
+          const convention = new ConventionDtoBuilder()
+            .withBeneficiaryRepresentative({
+              email: "benef-rep@rep.com",
+              phone: "0102",
+              firstName: "yo",
+              lastName: "lo",
+              role: "beneficiary-representative",
+            })
+            .build();
+          const conventionRead = {
+            ...convention,
+            agencyName: "agency",
+            agencyDepartment: "75",
+          };
+          expectConventionState({
+            isLoading: false,
+            convention: null,
+          });
+          store.dispatch(
+            conventionSlice.actions.fetchConventionRequested({
+              jwt: "my-jwt",
+              conventionId: "some-convention-id",
+            }),
+          );
+          expectConventionState({ isLoading: true });
+          feedGatewayWithConvention(conventionRead);
+          expectConventionState({
+            convention: conventionRead,
+            isLoading: false,
+            formUi: {
+              preselectedAgencyId: null,
+              isMinor: true,
+              isTutorEstablishmentRepresentative: false,
+              hasCurrentEmployer: false,
+            },
+          });
+        });
+
+        it("reflects formUi when get convention with not minor", () => {
+          const convention = new ConventionDtoBuilder()
+            .withBeneficiaryRepresentative(undefined)
+            .build();
+          const conventionRead = {
+            ...convention,
+            agencyName: "agency",
+            agencyDepartment: "75",
+          };
+          expectConventionState({
+            isLoading: false,
+            convention: null,
+          });
+          store.dispatch(
+            conventionSlice.actions.fetchConventionRequested({
+              jwt: "my-jwt",
+              conventionId: "some-convention-id",
+            }),
+          );
+          expectConventionState({ isLoading: true });
+          feedGatewayWithConvention(conventionRead);
+          expectConventionState({
+            convention: conventionRead,
+            isLoading: false,
+            formUi: {
+              preselectedAgencyId: null,
+              isMinor: false,
+              isTutorEstablishmentRepresentative: false,
+              hasCurrentEmployer: false,
+            },
+          });
+        });
+      });
+      describe("hasCurrentEmployer", () => {
+        it("reflects formUi when we fetch a convention without current employer", () => {
+          const convention = new ConventionDtoBuilder()
+            .withBeneficiaryCurrentEmployer(undefined)
+            .build();
+          const conventionRead = {
+            ...convention,
+            agencyName: "agency",
+            agencyDepartment: "75",
+          };
+          expectConventionState({
+            isLoading: false,
+            convention: null,
+          });
+          store.dispatch(
+            conventionSlice.actions.fetchConventionRequested({
+              jwt: "my-jwt",
+              conventionId: "some-convention-id",
+            }),
+          );
+          expectConventionState({ isLoading: true });
+          feedGatewayWithConvention(conventionRead);
+          expectConventionState({
+            convention: conventionRead,
+            isLoading: false,
+            formUi: {
+              preselectedAgencyId: null,
+              isMinor: false,
+              isTutorEstablishmentRepresentative: false,
+              hasCurrentEmployer: false,
+            },
+          });
+        });
+
+        it("reflects formUi when we fetch a convention with current employer", () => {
+          const convention = new ConventionDtoBuilder()
+            .withBeneficiaryCurrentEmployer({
+              businessName: "France Merguez",
+              businessSiret: "12345678901234",
+              email: "currentEmployer@gmail.com",
+              firstName: "Current",
+              lastName: "LastName",
+              job: "job",
+              phone: "0011223344",
+              role: "beneficiary-current-employer",
+            })
+            .build();
+          const conventionRead = {
+            ...convention,
+            agencyName: "agency",
+            agencyDepartment: "75",
+          };
+          expectConventionState({
+            isLoading: false,
+            convention: null,
+          });
+          store.dispatch(
+            conventionSlice.actions.fetchConventionRequested({
+              jwt: "my-jwt",
+              conventionId: "some-convention-id",
+            }),
+          );
+          expectConventionState({ isLoading: true });
+          feedGatewayWithConvention(conventionRead);
+          expectConventionState({
+            convention: conventionRead,
+            isLoading: false,
+            formUi: {
+              preselectedAgencyId: null,
+              isMinor: false,
+              isTutorEstablishmentRepresentative: false,
+              hasCurrentEmployer: true,
+            },
+          });
+        });
       });
     });
   });
@@ -598,28 +787,6 @@ describe("Convention slice", () => {
     expectConventionState({ convention });
     store.dispatch(conventionSlice.actions.clearFetchedConvention());
     expectConventionState({ convention: null });
-  });
-
-  describe("Getting custom agency id for convention form", () => {
-    it("changes loading state when fetches custom agency id", () => {
-      store.dispatch(conventionSlice.actions.preselectedAgencyIdRequested());
-      expectIsLoadingToBe(true);
-    });
-    it("fetches agency id successfully", () => {
-      const agency = new AgencyDtoBuilder().build();
-      store.dispatch(conventionSlice.actions.preselectedAgencyIdRequested());
-      dependencies.agencyGateway.customAgencyId$.next(agency.id);
-      expectIsLoadingToBe(false);
-      expectPreselectedAgencyIdToBe(agency.id);
-    });
-    it("returns an error if fetches fail", () => {
-      store.dispatch(conventionSlice.actions.preselectedAgencyIdRequested());
-      dependencies.agencyGateway.customAgencyId$.error(
-        new Error("Failed fetch preselectedAgencyId"),
-      );
-      expectIsLoadingToBe(false);
-      expectPreselectedAgencyIdToBe(null);
-    });
   });
 
   const expectConventionState = (conventionState: Partial<ConventionState>) => {

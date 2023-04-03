@@ -91,7 +91,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
     const conventionWithBeneficiaryCurrentEmployer = new ConventionDtoBuilder(
       validConvention,
     )
-      .withBeneficiaryCurentEmployer({
+      .withBeneficiaryCurrentEmployer({
         businessName: "boss",
         role: "beneficiary-current-employer",
         email: "current@employer.com",

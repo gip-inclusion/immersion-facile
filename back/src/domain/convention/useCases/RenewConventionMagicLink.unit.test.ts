@@ -48,7 +48,7 @@ const beneficiaryRepresentative: BeneficiaryRepresentative = {
   role: "beneficiary-representative",
 };
 const validConvention: ConventionDto = new ConventionDtoBuilder()
-  .withBeneficiaryCurentEmployer(currentEmployer)
+  .withBeneficiaryCurrentEmployer(currentEmployer)
   .withBeneficiaryRepresentative(beneficiaryRepresentative)
   .build();
 

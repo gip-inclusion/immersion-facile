@@ -214,7 +214,7 @@ describe("Pg implementation of ConventionQueries", () => {
         emergencyContactEmail: "billy@emergencycontact.com",
         signedAt: new Date().toISOString(),
       })
-      .withBeneficiaryCurentEmployer({
+      .withBeneficiaryCurrentEmployer({
         firstName: "a",
         lastName: "a",
         businessName: "business",
