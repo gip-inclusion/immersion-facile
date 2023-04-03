@@ -1,4 +1,8 @@
-import { ConventionMagicLinkPayload, stringToMd5 } from "shared";
+import {
+  calculateDurationInSecondsFrom,
+  ConventionMagicLinkPayload,
+  stringToMd5,
+} from "shared";
 import { z } from "zod";
 import {
   BadRequestError,
@@ -9,10 +13,6 @@ import { UnitOfWork, UnitOfWorkPerformer } from "./ports/UnitOfWork";
 
 const logger = createLogger(__filename);
 
-const calculateDurationInSecondsFrom = (start: Date): number => {
-  const end = new Date();
-  return (end.getTime() - start.getTime()) / 1000;
-};
 const createParamsHash = (
   useCaseName: string,
   params: unknown,
@@ -46,9 +46,11 @@ export abstract class UseCase<
     }
     const result = await this._execute(validParams, jwtPayload);
     const durationInSeconds = calculateDurationInSecondsFrom(startDate);
-    logger.info(
-      `UseCase Finished - ${useCaseName} - Duration: ${durationInSeconds}s`,
-    );
+    logger.info({
+      useCaseName,
+      durationInSeconds,
+    });
+
     return result;
   }
 
@@ -82,21 +84,22 @@ export abstract class TransactionalUseCase<
         this._execute(validParams, uow, jwtPayload),
       );
       const durationInSeconds = calculateDurationInSecondsFrom(startDate);
-      logger.info(
-        `${
-          paramsHash ? `${paramsHash} - ` : ""
-        }TransactionalUseCase Succeeded - ${useCaseName} - Duration: ${durationInSeconds}s`,
-      );
+      logger.info({
+        useCaseName,
+        durationInSeconds,
+        status: "success",
+        ...(paramsHash ? { paramsHash } : {}),
+      });
       return result;
     } catch (error: any) {
       const durationInSeconds = calculateDurationInSecondsFrom(startDate);
-      logger.error(
-        `${
-          paramsHash ? `${paramsHash} - ` : ""
-        }TransactionalUseCase Failed - ${useCaseName} - Duration: ${durationInSeconds}s - Error: ${
-          error?.message
-        }`,
-      );
+      logger.error({
+        useCaseName,
+        status: "error",
+        durationInSeconds,
+        ...(paramsHash ? { paramsHash } : {}),
+        errorMessage: error?.message,
+      });
       throw error;
     }
   }

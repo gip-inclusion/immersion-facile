@@ -1,4 +1,5 @@
 import { splitEvery } from "ramda";
+import { calculateDurationInSecondsFrom } from "shared";
 import { EventBus } from "../../../domain/core/eventBus/EventBus";
 import { EventCrawler } from "../../../domain/core/eventBus/EventCrawler";
 import {
@@ -61,24 +62,35 @@ export class BasicEventCrawler implements EventCrawler {
   private async retrieveEvents(
     type: "unpublished" | "failed",
   ): Promise<DomainEvent[]> {
-    //eslint-disable-next-line no-console
-    //console.time("__metrics : getAllUnpublishedEvents query duration");
+    const startDate = new Date();
     try {
       const events = await this.uowPerformer.perform((uow) =>
         type === "unpublished"
           ? uow.outboxQueries.getAllUnpublishedEvents()
           : uow.outboxQueries.getAllFailedEvents(),
       );
-      //eslint-disable-next-line no-console
-      //console.timeEnd("__metrics : getAllUnpublishedEvents query duration");
+      const durationInSeconds = calculateDurationInSecondsFrom(startDate);
+      logger.info({
+        method: "Crawler retrieveEvents",
+        status: "success",
+        durationInSeconds,
+        typeOfEvents: type,
+        numberOfEvents: events.length,
+      });
       return events;
     } catch (error: any) {
-      const message = `Event Crawler failed to process ${type} events.`;
-      // eslint-disable-next-line no-console
-      //console.timeEnd("__metrics : getAllUnpublishedEvents query duration");
-      logger.error({ errorMessage: error?.message, error }, message);
+      const durationInSeconds = calculateDurationInSecondsFrom(startDate);
+
+      logger.error({
+        error,
+        method: "Crawler retrieveEvents",
+        status: "error",
+        durationInSeconds,
+        typeOfEvents: type,
+        errorMessage: error?.message,
+      });
+
       notifyObjectDiscord({
-        message,
         errorMessage: error?.message,
         error,
       });

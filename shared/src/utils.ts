@@ -105,3 +105,8 @@ export const slugify = (str: string) =>
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[()]/g, "")
     .replace(/\W/g, "-");
+
+export const calculateDurationInSecondsFrom = (start: Date): number => {
+  const end = new Date();
+  return (end.getTime() - start.getTime()) / 1000;
+};
