@@ -35,7 +35,7 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
       "Indiquez le nom de l'enseigne de l'établissement d'accueil, si elle diffère de la raison sociale",
     id: domElementIds.establishment.businessNameCustomized,
     autoComplete: "organization",
-    description:
+    hintText:
       "Nom sous lequel vous souhaitez apparaitre dans les résultats de recherche",
     placeholder: "Ex : Nom de mon enseigne (optionnel)",
   },
@@ -72,7 +72,7 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
   },
   "businessContact.copyEmails": {
     label: "Autres destinataires",
-    description: "Adresses mail à mettre en copie",
+    hintText: "Adresses mail à mettre en copie",
     placeholder: "Ex : cc1@mail.com, cc2@mail.com (optionnel)",
     id: domElementIds.establishment.businessContact.copyEmails,
   },
@@ -103,7 +103,7 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
   additionalInformation: {
     label: "Informations complémentaires",
     id: domElementIds.establishment.additionalInformation,
-    description:
+    hintText:
       "En information complémentaire, nous vous conseillons de valoriser votre histoire afin de donner envie à un candidat de découvrir un métier au sein de votre établissement.",
     placeholder:
       "Ex : ma biographie d’entreprise (valeurs, écosystème, projections), mon potentiel d’embauche ou toute autre information essentielle pour l’accueil du bénéficiaire au sein de mon établissement (optionnel)",
@@ -111,7 +111,7 @@ export const formEstablishmentFieldsLabels: FormEstablishmentFieldsLabels = {
   maxContactsPerWeek: {
     label:
       "Au maximum, combien de mises en relation souhaitez-vous recevoir par semaine ?",
-    description:
+    hintText:
       "Par exemple, en renseignant 5 : si vous avez déjà reçu 5 demandes cette semaine, vous n'apparaîtrez plus dans la liste des entreprises accueillantes jusqu'à la semaine suivante.",
     required: true,
     id: domElementIds.establishment.maxContactsPerWeek,

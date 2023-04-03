@@ -172,7 +172,6 @@ export const EstablishmentForm = ({
           />
           <Input
             {...formContents.additionalInformation}
-            hintText={formContents.additionalInformation.description}
             textArea
             nativeTextAreaProps={{
               ...formContents.additionalInformation,
@@ -234,7 +233,6 @@ export const EstablishmentForm = ({
           {enableMaxContactPerWeek && isSearchable && (
             <Input
               label={formContents.maxContactsPerWeek.label}
-              hintText={formContents.maxContactsPerWeek.description}
               nativeInputProps={{
                 ...formContents.maxContactsPerWeek,
                 ...register("maxContactsPerWeek", {

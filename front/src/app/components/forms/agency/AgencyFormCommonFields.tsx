@@ -43,8 +43,8 @@ const numberOfStepsOptions: { label: string; value: ValidationSteps }[] = [
 ];
 
 const descriptionByValidationSteps = {
-  oneStep: formAgencyFieldsLabels.counsellorEmails.description,
-  twoSteps: formAgencyFieldsLabels.validatorEmails.description,
+  oneStep: formAgencyFieldsLabels.counsellorEmails.hintText,
+  twoSteps: formAgencyFieldsLabels.validatorEmails.hintText,
 };
 
 export const AgencyFormCommonFields = ({
@@ -172,7 +172,7 @@ export const AgencyLogoUpload = () => {
         setFileUrl={(value) => setValue("logoUrl", value)}
         maxSize_Mo={2}
         {...formAgencyFieldsLabels.logoUrl}
-        hint={fieldsContent.logoUrl.description}
+        hint={fieldsContent.logoUrl.hintText}
       />
       {formValues.logoUrl && (
         <img src={formValues.logoUrl} alt="uploaded-logo" width="100px" />

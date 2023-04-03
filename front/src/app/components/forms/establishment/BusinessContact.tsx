@@ -51,7 +51,6 @@ export const BusinessContact = () => {
       </div>
       <Input
         {...formContents["businessContact.firstName"]}
-        hintText={formContents["businessContact.firstName"].description}
         nativeInputProps={{
           ...formContents["businessContact.firstName"],
           ...register("businessContact.firstName"),
@@ -59,7 +58,6 @@ export const BusinessContact = () => {
       />
       <Input
         {...formContents["businessContact.lastName"]}
-        hintText={formContents["businessContact.lastName"].description}
         nativeInputProps={{
           ...formContents["businessContact.lastName"],
           ...register("businessContact.lastName"),
@@ -67,7 +65,6 @@ export const BusinessContact = () => {
       />
       <Input
         {...formContents["businessContact.job"]}
-        hintText={formContents["businessContact.job"].description}
         nativeInputProps={{
           ...formContents["businessContact.job"],
           ...register("businessContact.job"),
@@ -75,7 +72,6 @@ export const BusinessContact = () => {
       />
       <Input
         {...formContents["businessContact.phone"]}
-        hintText={formContents["businessContact.phone"].description}
         nativeInputProps={{
           ...formContents["businessContact.phone"],
           ...register("businessContact.phone"),
@@ -83,7 +79,6 @@ export const BusinessContact = () => {
       />
       <Input
         {...formContents["businessContact.email"]}
-        hintText={formContents["businessContact.email"].description}
         nativeInputProps={{
           ...formContents["businessContact.email"],
           ...register("businessContact.email"),
@@ -103,7 +98,7 @@ export const BusinessContact = () => {
       <RadioButtons
         {...formContents["businessContact.contactMethod"]}
         legend={formContents["businessContact.contactMethod"].label}
-        hintText={formContents["businessContact.contactMethod"].description}
+        hintText={formContents["businessContact.contactMethod"].hintText}
         {...register("businessContact.contactMethod")}
         options={preferredContactMethodOptions(
           register("businessContact.contactMethod"),

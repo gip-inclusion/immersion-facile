@@ -52,14 +52,14 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
   logoUrl: {
     label: "Téléverser le logo de votre organisme",
     id: domElementIds.addAgency.logoUrlInput,
-    description: "Cela permet de personnaliser les mails automatisés.",
+    hintText: "Cela permet de personnaliser les mails automatisés.",
   },
   validatorEmails: {
     required: true,
     id: domElementIds.addAgency.validatorEmailsInput,
     label: "Emails de validation définitive de la demande de convention",
     placeholder: "valideur.dupont@mail.com",
-    description:
+    hintText:
       "Les personnes ou emails génériques suivants valideront les conventions préalablement examinées.",
   },
   adminEmails: {
@@ -70,7 +70,7 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
     label: "Texte de signature",
     id: domElementIds.addAgency.signatureInput,
     required: true,
-    description:
+    hintText:
       "Quel texte de signature souhaitez-vous pour les mails automatisés ?",
     placeholder: "L’équipe de l’agence de Boulogne-Billancourt",
   },
@@ -88,7 +88,7 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
     id: domElementIds.addAgency.counsellorEmailsInput,
     label: "Emails pour examen préalable de la demande de convention",
     placeholder: "Ex : conseiller.dupont@mail.com (optionnel)",
-    description:
+    hintText:
       "Les personnes ou emails génériques suivants recevront en premier les demandes de convention à examiner.",
   },
   codeSafir: {
