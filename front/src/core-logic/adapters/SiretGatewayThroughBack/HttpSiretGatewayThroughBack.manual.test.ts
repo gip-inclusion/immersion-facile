@@ -21,18 +21,21 @@ const simulated = new SimulatedSiretGatewayThroughBack(0, {
       nomenclature: "Ref2",
     },
     siret: "12345678901234",
+    numberEmployeesRange: "",
   },
   [tooManySirenRequestsSiret]: {
     businessAddress: "",
     businessName: "",
     isOpen: false,
     siret: tooManySirenRequestsSiret,
+    numberEmployeesRange: "1-2",
   },
   [apiSirenNotAvailableSiret]: {
     businessAddress: "",
     businessName: "",
     isOpen: false,
     siret: apiSirenNotAvailableSiret,
+    numberEmployeesRange: "3-5",
   },
 });
 
@@ -64,6 +67,7 @@ siretGatewaysThroughBack.forEach((siretGatewayThroughBack) => {
           nomenclature: "Ref2",
         },
         siret: "12345678901234",
+        numberEmployeesRange: "10-19",
       });
     });
 

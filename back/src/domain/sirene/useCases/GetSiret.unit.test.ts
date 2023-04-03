@@ -15,6 +15,7 @@ const validEstablishment: SirenEstablishmentDto = {
   businessName: "MA P'TITE BOITE",
   businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
   isOpen: true,
+  numberEmployeesRange: "",
 };
 
 describe("GetSiret", () => {
@@ -48,6 +49,7 @@ describe("GetSiret", () => {
         businessName: "MA P'TITE BOITE",
         businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
         isOpen: true,
+        numberEmployeesRange: "",
       });
     });
   });

@@ -39,7 +39,7 @@ const expectedNafDto: NafDto = { code: "8559A", nomenclature: "nomencl" };
 const prepareSirenGateway = (
   sirenGateway: InMemorySirenGateway,
   siret: string,
-  numberEmployeesRange?: NumberEmployeesRange,
+  numberEmployeesRange: NumberEmployeesRange = "",
 ) => {
   const sirenEstablishmentFromAPI: SirenEstablishmentDto = {
     ...TEST_ESTABLISHMENT1,

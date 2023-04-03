@@ -9,11 +9,12 @@ import {
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 import { establishmentSlice, EstablishmentState } from "./establishment.slice";
 
-const establishmentFetched = {
+const establishmentFetched: SirenEstablishmentDto = {
   siret: "11110000111100",
   businessName: "Existing open business on Sirene Corp.",
   businessAddress: "",
   isOpen: true,
+  numberEmployeesRange: "",
 };
 
 describe("Establishment", () => {

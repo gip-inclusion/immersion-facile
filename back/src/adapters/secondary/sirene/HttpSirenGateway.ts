@@ -6,7 +6,6 @@ import {
   SirenEstablishmentDto,
   SiretDto,
 } from "shared";
-
 import { RateLimiter } from "../../../domain/core/ports/RateLimiter";
 import {
   RetryableError,
@@ -210,10 +209,9 @@ const getIsActive = ({
 
 const getNumberEmployeesRange = ({
   uniteLegale,
-}: SirenApiRawEstablishment): NumberEmployeesRange | undefined => {
+}: SirenApiRawEstablishment): NumberEmployeesRange => {
   const tefenCode = uniteLegale.trancheEffectifsUniteLegale;
-  if (!tefenCode) return;
-  if (tefenCode === "NN") return "";
+  if (!tefenCode || tefenCode === "NN") return "";
   return employeeRangeByTefenCode[<TefenCode>+tefenCode];
 };
 

@@ -30,7 +30,7 @@ export type SirenEstablishmentDto = {
   // true if the office is currently open for business.
   isOpen: boolean;
   nafDto?: NafDto;
-  numberEmployeesRange?: NumberEmployeesRange;
+  numberEmployeesRange: NumberEmployeesRange;
 };
 
 export type NumberEmployeesRange = (typeof numberEmployeesRanges)[number];

@@ -23,7 +23,7 @@ const getSiretResponseSchema: z.Schema<SirenEstablishmentDto> = z.object({
   businessAddress: z.string(),
   isOpen: z.boolean(), // true if the office is currently open for business.
   nafDto: nafSchema.optional(),
-  numberEmployeesRange: z.enum(numberEmployeesRanges).optional(),
+  numberEmployeesRange: z.enum(numberEmployeesRanges),
 });
 
 export const getSiretInfoSchema: z.Schema<GetSiretInfo> = z.union([

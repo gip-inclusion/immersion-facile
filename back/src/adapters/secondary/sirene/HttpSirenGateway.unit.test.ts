@@ -48,6 +48,7 @@ describe("convertSirenRawEstablishmentToSirenEstablishmentDto", () => {
       businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
       nafDto: { code: "783Z", nomenclature: "Ref2" },
       isOpen: false,
+      numberEmployeesRange: "",
     });
   });
 
@@ -61,6 +62,7 @@ describe("convertSirenRawEstablishmentToSirenEstablishmentDto", () => {
       businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
       nafDto: { code: "783Z", nomenclature: "Ref2" },
       isOpen: true,
+      numberEmployeesRange: "",
     });
   });
 

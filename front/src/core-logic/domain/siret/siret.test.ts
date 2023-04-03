@@ -72,11 +72,12 @@ describe("Siret validation and fetching", () => {
     });
   });
 
-  const establishmentFetched = {
+  const establishmentFetched: SirenEstablishmentDto = {
     siret: "11110000111100",
     businessName: "Existing open business on Sirene Corp.",
     businessAddress: "2 avenue Karl Marx, 75018 Paris",
     isOpen: true,
+    numberEmployeesRange: "",
   };
 
   describe("Siret fetching when a 14 digit siret is provided", () => {
