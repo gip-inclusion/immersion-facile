@@ -165,12 +165,19 @@ export const EstablishmentForm = ({
           />
           <Input
             {...formContents.website}
-            nativeInputProps={register("website")}
+            nativeInputProps={{
+              ...formContents.website,
+              ...register("website"),
+            }}
           />
           <Input
             {...formContents.additionalInformation}
+            hintText={formContents.additionalInformation.description}
             textArea
-            nativeTextAreaProps={register("additionalInformation")}
+            nativeTextAreaProps={{
+              ...formContents.additionalInformation,
+              ...register("additionalInformation"),
+            }}
           />
 
           <h2 className={fr.cx("fr-text--lead", "fr-mb-2w")}>
