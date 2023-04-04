@@ -29,7 +29,7 @@ import { ImmersionConditionFormSection } from "./sections/immersion-conditions/I
 type ConventionFieldsProps = {
   isFrozen?: boolean;
   onSubmit: SubmitHandler<ConventionReadDto>;
-  onModificationsRequired?: () => Promise<void>; //< called when the form is sent back for modifications in signature mode
+  onModificationsRequired?: () => void; //< called when the form is sent back for modifications in signature mode
 } & (
   | { isSignOnly: true; signatory: Signatory }
   | { isSignOnly?: false; signatory?: undefined }

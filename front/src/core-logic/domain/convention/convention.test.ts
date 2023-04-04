@@ -18,7 +18,11 @@ import {
   TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
-import { conventionSlice, ConventionState } from "./convention.slice";
+import {
+  conventionSlice,
+  ConventionState,
+  ConventionSubmitFeedback,
+} from "./convention.slice";
 
 describe("Convention slice", () => {
   let store: ReduxStore;
@@ -217,6 +221,9 @@ describe("Convention slice", () => {
           dependencies.agencyGateway.customAgencyId$.next(agency.id);
           expectIsLoadingToBe(false);
           expectPreselectedAgencyIdToBe(agency.id);
+          expectFeedbackToBe({
+            kind: "idle",
+          });
         });
         it("returns an error if fetches fail", () => {
           store.dispatch(
@@ -227,6 +234,10 @@ describe("Convention slice", () => {
           );
           expectIsLoadingToBe(false);
           expectPreselectedAgencyIdToBe(null);
+          expectFeedbackToBe({
+            kind: "errored",
+            errorMessage: "Failed fetch preselectedAgencyId",
+          });
         });
       });
       describe("isTutorEstablishmentRepresentative", () => {
@@ -875,5 +886,8 @@ describe("Convention slice", () => {
       conventionSelectors.isTutorEstablishmentRepresentative(store.getState()),
       expected,
     );
+  };
+  const expectFeedbackToBe = (expected: ConventionSubmitFeedback) => {
+    expectToEqual(conventionSelectors.feedback(store.getState()), expected);
   };
 });

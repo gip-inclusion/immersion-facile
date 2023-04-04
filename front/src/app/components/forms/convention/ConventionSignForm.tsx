@@ -1,9 +1,9 @@
-import React from "react";
+import { fr } from "@codegouvfr/react-dsfr";
 import { mergeDeepRight } from "ramda";
+import React from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { ConventionDto, ConventionReadDto } from "shared";
-import { fr } from "@codegouvfr/react-dsfr";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { ConventionFormFields } from "src/app/components/forms/convention/ConventionFormFields";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
@@ -38,11 +38,9 @@ export const ConventionSignForm = ({
   });
   const t = useConventionTexts(convention.internshipKind);
 
-  const onSignFormSubmit: SubmitHandler<ConventionReadDto> = (
-    values,
-  ): Promise<void> => {
+  const onSignFormSubmit: SubmitHandler<ConventionReadDto> = (values): void => {
     if (!currentSignatory)
-      return Promise.reject("Il n'y a pas de signataire identifié.");
+      throw new Error("Il n'y a pas de signataire identifié.");
 
     // Confirm checkbox
     const { signedAtFieldName, signatory } = signatoryDataFromConvention(
@@ -61,7 +59,7 @@ export const ConventionSignForm = ({
         type: "required",
         message: "La signature est obligatoire",
       });
-      return Promise.reject("La signature est obligatoire");
+      throw new Error("La signature est obligatoire");
     }
 
     dispatch(
@@ -71,10 +69,9 @@ export const ConventionSignForm = ({
         signedAt: new Date().toISOString(),
       }),
     );
-    return Promise.resolve();
   };
 
-  const askFormModificationWithMessageForm = async (): Promise<void> => {
+  const askFormModificationWithMessageForm = (): void => {
     const statusJustification = prompt(
       "Précisez la raison et la modification nécessaire *",
     )?.trim();

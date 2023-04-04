@@ -1,24 +1,23 @@
-import { FieldHookConfig } from "formik";
+import { fr } from "@codegouvfr/react-dsfr";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 import React from "react";
 import {
   DateIntervalDto,
   DayPeriodsDto,
-  ScheduleDto,
   WeekdayNumber,
   WeekDayRangeSchemaDTO,
 } from "shared";
-import { Button } from "@codegouvfr/react-dsfr/Button";
-import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
 
 import { WeekdayDropdown } from "./WeekdayDropdown";
 
 type WeekdayPickerProps = {
+  name: string;
   dayPeriods: DayPeriodsDto;
   onValueChange: (dayPeriods: DayPeriodsDto) => void;
   disabled?: boolean;
   interval: DateIntervalDto;
-} & FieldHookConfig<ScheduleDto>;
+};
 
 export const WeekdayPicker = ({
   name,

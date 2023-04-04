@@ -90,24 +90,6 @@ export const EstablishmentFormSection = ({
         }))}
         disabled={isFrozen || isFetchingSiret}
       />
-      {/* <RadioGroup
-        disabled={isFrozen || isFetchingSiret}
-        currentValue={isTutorEstablishmentRepresentative}
-        setCurrentValue={(value) => {
-          dispatch(
-            conventionSlice.actions.isTutorEstablishmentRepresentativeChanged(
-              value,
-            ),
-          );
-        }}
-        groupLabel={
-          formContents.isEstablishmentTutorIsEstablishmentRepresentative.label
-        }
-        options={[
-          { label: t.yes, value: true },
-          { label: t.no, value: false },
-        ]}
-      /> */}
       <EstablishementTutorFields disabled={isFrozen} />
       {!isTutorEstablishmentRepresentative && (
         <EstablishmentRepresentativeFields

@@ -36,7 +36,6 @@ export const useTutorIsEstablishmentRepresentative = () => {
     conventionSelectors.isTutorEstablishmentRepresentative,
   );
   const convention = useAppSelector(conventionSelectors.convention);
-  //const { values, setFieldValue } = useFormikContext<ConventionDto>();
   const { getValues, setValue } = useFormContext<ConventionReadDto>();
   const values = getValues();
   const setEstablishmentRepresentative = (
