@@ -27,7 +27,7 @@ const createConventionStatusButton = (link: string): EmailButtonProps => ({
 export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
   SIGNATORY_FIRST_REMINDER: {
     niceName: "Signataire - Premier rappel",
-    tags: [""],
+    tags: ["relance signatures manquantes"],
     createEmailVariables: ({
       actorFirstName,
       actorLastName,
@@ -41,9 +41,9 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
         "RAPPEL - La convention démarrant d'ici 3 jours n'est pas complètement signée",
       greetings: `Bonjour ${actorFirstName} ${actorLastName},`,
       content: `
-      Certain signataires n'ont pas encore signé la demande de convention d'immersion en milieu professionnel pour ${beneficiaryFirstName} ${beneficiaryLastName}.
+      Certains signataires n'ont pas encore signé la demande de convention d'immersion en milieu professionnel pour ${beneficiaryFirstName} ${beneficiaryLastName}.
       
-      Voici à date l'état des signatures :
+      Voici, à date, l'état des signatures :
       ${signatoriesSummary}
 
       <strong>Sans toutes les signatures, la convention ne peut être établie et l'établissement ${businessName} ne pourra pas accueillir en immersion ${beneficiaryFirstName} ${beneficiaryLastName}.</strong>
@@ -61,7 +61,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
   },
   SIGNATORY_LAST_REMINDER: {
     niceName: "Signataire - Dernier rappel",
-    tags: [""],
+    tags: ["relance signatures manquantes"],
     createEmailVariables: ({
       actorFirstName,
       actorLastName,
@@ -75,9 +75,9 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
         "RAPPEL URGENT - La convention démarrant dans moins de 24h n'est pas complètement signée",
       greetings: `Bonjour ${actorFirstName} ${actorLastName},`,
       content: `
-      Certain signataires n'ont pas encore signé la demande de convention d'immersion en milieu professionnel pour ${beneficiaryFirstName} ${beneficiaryLastName}.
+      Certains signataires n'ont pas encore signé la demande de convention d'immersion en milieu professionnel pour ${beneficiaryFirstName} ${beneficiaryLastName}.
       
-      Voici à date l'état des signatures :
+      Voici, à date, l'état des signatures :
       ${signatoriesSummary}
 
       <strong>Sans toutes les signatures, la convention ne peut être établie et l'établissement ${businessName} ne pourra pas accueillir en immersion ${beneficiaryFirstName} ${beneficiaryLastName}.</strong>
@@ -95,7 +95,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
   },
   AGENCY_FIRST_REMINDER: {
     niceName: "Agence - Premier rappel",
-    tags: [""],
+    tags: ["relance vérification manquante"],
     createEmailVariables: ({
       agencyMagicLinkUrl,
       beneficiaryFirstName,
@@ -134,7 +134,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
   },
   AGENCY_LAST_REMINDER: {
     niceName: "Agence - Dernier rappel",
-    tags: [""],
+    tags: ["relance vérification manquante"],
     createEmailVariables: ({
       agencyMagicLinkUrl,
       beneficiaryFirstName,
