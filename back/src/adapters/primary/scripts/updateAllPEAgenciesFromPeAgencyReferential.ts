@@ -3,7 +3,6 @@ import { UpdateAllPeAgencies } from "../../../domain/convention/useCases/agencie
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import {
-  createHttpAddressClient,
   HttpAddressGateway,
 } from "../../secondary/addressGateway/HttpAddressGateway";
 import {
@@ -15,6 +14,7 @@ import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementatio
 import { HttpPeAgenciesReferential } from "../../secondary/immersionOffer/peAgenciesReferential/HttpPeAgenciesReferential";
 import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { AppConfig } from "../config/appConfig";
+import { createExternalHttpClient } from "../config/createGateways";
 import { createUowPerformer } from "../config/uowConfig";
 
 const updateAllPeAgenciesScript = async () => {
@@ -32,7 +32,7 @@ const updateAllPeAgenciesScript = async () => {
   );
 
   const adressAPI = new HttpAddressGateway(
-    createHttpAddressClient<AddressesTargets>(addressesExternalTargets),
+    createExternalHttpClient<AddressesTargets>(addressesExternalTargets),
     config.apiKeyOpenCageDataGeocoding,
     config.apiKeyOpenCageDataGeosearch,
   );
