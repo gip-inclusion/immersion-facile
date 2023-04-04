@@ -1,3 +1,4 @@
+import { addDays } from "date-fns";
 import { Pool, PoolClient } from "pg";
 import {
   AgencyDtoBuilder,
@@ -98,6 +99,151 @@ describe("Pg implementation of ConventionQueries", () => {
     });
   });
 
+  describe("PG implementation of method getConventionsByFilters", () => {
+    const agencyId = "bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aaff";
+    const conventionCancelledAndDateStart20230327 = new ConventionDtoBuilder()
+      .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa01")
+      .withDateStart(new Date("2023-03-27").toISOString())
+      .withDateEnd(new Date("2023-03-28").toISOString())
+      .withStatus("READY_TO_SIGN")
+      .withExternalId("1")
+      .withAgencyId(agencyId)
+      .build();
+    const conventionDraftAndDateStart20230330 = new ConventionDtoBuilder()
+      .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa02")
+      .withDateStart(new Date("2023-03-30").toISOString())
+      .withDateEnd(new Date("2023-03-31").toISOString())
+      .withStatus("DRAFT")
+      .withExternalId("2")
+      .withAgencyId(agencyId)
+      .build();
+
+    beforeEach(async () => {
+      await agencyRepo.insert(
+        AgencyDtoBuilder.create().withId(agencyId).build(),
+      );
+
+      await Promise.all(
+        [
+          conventionCancelledAndDateStart20230327,
+          conventionDraftAndDateStart20230330,
+        ].map((params) => conventionRepository.save(params)),
+      );
+    });
+
+    it(`getConventionsByFilters with filters :
+          - withStatuses '[${conventionCancelledAndDateStart20230327.status}]'
+        > expect 1 convention retreived`, async () => {
+      // Act
+      const resultAll = await conventionQueries.getConventionsByFilters({
+        withStatuses: [conventionCancelledAndDateStart20230327.status],
+      });
+
+      // Assert
+      expectToEqual(resultAll, [
+        {
+          ...conventionCancelledAndDateStart20230327,
+          agencyDepartment: "86",
+          agencyName: "empty-name",
+        },
+      ]);
+    });
+
+    it(`getConventionsByFilters with filters :
+          - startDateGreater '${addDays(
+            new Date(conventionCancelledAndDateStart20230327.dateStart),
+            -1,
+          ).toISOString()}'
+        > expect 2 convention retreived`, async () => {
+      // Act
+      const resultAll = await conventionQueries.getConventionsByFilters({
+        startDateGreater: addDays(
+          new Date(conventionCancelledAndDateStart20230327.dateStart),
+          -1,
+        ),
+      });
+
+      // Assert
+      expectToEqual(resultAll, [
+        {
+          ...conventionCancelledAndDateStart20230327,
+          agencyDepartment: "86",
+          agencyName: "empty-name",
+        },
+        {
+          ...conventionDraftAndDateStart20230330,
+          agencyDepartment: "86",
+          agencyName: "empty-name",
+        },
+      ]);
+    });
+
+    it(`getConventionsByFilters with filters :
+          - startDateLessOrEqual '${conventionCancelledAndDateStart20230327.dateStart}'
+        > expect 1 convention retreived`, async () => {
+      // Act
+      const resultAll = await conventionQueries.getConventionsByFilters({
+        startDateLessOrEqual: new Date(
+          conventionCancelledAndDateStart20230327.dateStart,
+        ),
+      });
+
+      // Assert
+      expectToEqual(resultAll, [
+        {
+          ...conventionCancelledAndDateStart20230327,
+          agencyDepartment: "86",
+          agencyName: "empty-name",
+        },
+      ]);
+    });
+    it(`getConventionsByFilters with filters:
+          - startDateGreater '${addDays(
+            new Date(conventionCancelledAndDateStart20230327.dateStart),
+            -1,
+          ).toISOString()}'
+          - startDateLessOrEqual '${
+            conventionCancelledAndDateStart20230327.dateStart
+          }
+          - withStatuses ['${conventionCancelledAndDateStart20230327.status}']
+        > expect 1 convention retreived'
+    `, async () => {
+      // Act
+      const resultAll = await conventionQueries.getConventionsByFilters({
+        startDateGreater: addDays(
+          new Date(conventionCancelledAndDateStart20230327.dateStart),
+          -1,
+        ),
+        startDateLessOrEqual: new Date(
+          conventionCancelledAndDateStart20230327.dateStart,
+        ),
+        withStatuses: [conventionCancelledAndDateStart20230327.status],
+      });
+
+      // Assert
+      expectToEqual(resultAll, [
+        {
+          ...conventionCancelledAndDateStart20230327,
+          agencyDepartment: "86",
+          agencyName: "empty-name",
+        },
+      ]);
+    });
+    it(`getConventionsByFilters with:
+          - startDateGreater '${new Date("2023-03-30")}'
+          - startDateLessOrEqual '${new Date("2023-03-31")}'
+        > expect 0 convention retreived`, async () => {
+      // Act
+      const resultAll = await conventionQueries.getConventionsByFilters({
+        startDateGreater: new Date("2023-03-30"),
+        startDateLessOrEqual: new Date("2023-03-31"),
+      });
+
+      // Assert
+      expectToEqual(resultAll, []);
+    });
+  });
+
   describe("PG implementation of method getAllConventionsForThoseEndingThatDidntReceivedAssessmentLink", () => {
     const agency = AgencyDtoBuilder.create().build();
     beforeEach(async () => {
@@ -186,16 +332,6 @@ describe("Pg implementation of ConventionQueries", () => {
     agencyName: string,
     agencyDepartment: string,
   ): Promise<ConventionReadDto> => {
-    const agency = AgencyDtoBuilder.create()
-      .withId(agencyId)
-      .withName(agencyName)
-      .withAddress({
-        city: "Paris",
-        departmentCode: agencyDepartment,
-        postcode: "75017",
-        streetNumberAndAddress: "Avenue des champs Elysées",
-      })
-      .build();
     const convention = new ConventionDtoBuilder()
       .withAgencyId(agencyId)
       .withId(conventionId)
@@ -243,7 +379,19 @@ describe("Pg implementation of ConventionQueries", () => {
       })
       .build();
 
-    await agencyRepo.insert(agency);
+    await agencyRepo.insert(
+      AgencyDtoBuilder.create()
+        .withId(agencyId)
+        .withName(agencyName)
+        .withAddress({
+          city: "Paris",
+          departmentCode: agencyDepartment,
+          postcode: "75017",
+          streetNumberAndAddress: "Avenue des champs Elysées",
+        })
+        .build(),
+    );
+
     const externalId = await conventionRepository.save(convention);
     return { ...convention, externalId, agencyName, agencyDepartment };
   };

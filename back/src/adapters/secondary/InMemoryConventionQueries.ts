@@ -1,6 +1,5 @@
 import { propEq } from "ramda";
 import {
-  ConventionDto,
   ConventionId,
   ConventionReadDto,
   ListConventionsRequestDto,
@@ -29,7 +28,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
     startDateGreater,
     startDateLessOrEqual,
     withStatuses,
-  }: GetConventionByFiltersQueries): Promise<ConventionDto[]> {
+  }: GetConventionByFiltersQueries): Promise<ConventionReadDto[]> {
     return Object.values(this.conventionRepository._conventions)
       .filter((convention) =>
         startDateLessOrEqual
@@ -45,7 +44,12 @@ export class InMemoryConventionQueries implements ConventionQueries {
         withStatuses && withStatuses.length > 0
           ? withStatuses.includes(convention.status)
           : true,
-      );
+      )
+      .map((convention) => ({
+        ...convention,
+        agencyName: TEST_AGENCY_NAME,
+        agencyDepartment: TEST_AGENCY_DEPARTMENT,
+      }));
   }
 
   public async getLatestConventions({

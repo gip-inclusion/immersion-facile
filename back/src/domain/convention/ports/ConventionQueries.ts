@@ -1,5 +1,4 @@
 import {
-  ConventionDto,
   ConventionId,
   ConventionReadDto,
   ConventionStatus,
@@ -15,7 +14,7 @@ export type GetConventionByFiltersQueries = {
 export interface ConventionQueries {
   getConventionsByFilters(
     filters: GetConventionByFiltersQueries,
-  ): Promise<ConventionDto[]>;
+  ): Promise<ConventionReadDto[]>;
   getLatestConventions: (
     requestDto: ListConventionsRequestDto,
   ) => Promise<ConventionReadDto[]>;
