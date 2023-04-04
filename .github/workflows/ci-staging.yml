@@ -1,4 +1,4 @@
-name: "Build front, back and deploy"
+name: "Staging - Build front, back and deploy"
 
 on:
   push:

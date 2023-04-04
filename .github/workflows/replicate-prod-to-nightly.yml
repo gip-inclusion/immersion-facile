@@ -27,11 +27,11 @@ jobs:
                   dbclient-fetcher pgsql &&
                   scalingo login --api-token ${{ secrets.SCALINGO_API_TOKEN_SECNUM }} &&
                 echo '> Getting PG Addon ID' &&
-                  ADDON_ID_LINE=\$(scalingo --region osc-secnum-fr1 --app if-prod-nightly-db addons | grep 'PostgreSQL') &&
+                  ADDON_ID_LINE=\$(scalingo --region osc-secnum-fr1 --app if-prod-back addons | grep 'PostgreSQL') &&
                   regex='PostgreSQL \| (.*) \| postgresql' &&
                   [[ \$ADDON_ID_LINE =~ \$regex ]] &&
                 echo '> Downloading last DB backup' &&
-                  scalingo --region osc-secnum-fr1 --app if-prod-nightly-db --addon=\${BASH_REMATCH[1]} backups-download --output=dump.tar.gz &&
+                  scalingo --region osc-secnum-fr1 --app if-prod-back --addon=\${BASH_REMATCH[1]} backups-download --output=dump.tar.gz &&
                   tar --to-stdout -xzf dump.tar.gz > dump.pgsql &&
                 echo '> Create a Table of content for restore, ignore postgis related schemas and tables:' &&
                   pg_restore -l dump.pgsql | grep -v tiger | grep -v spatial_ref_sys | grep -v topology > list.txt &&

@@ -1,24 +1,21 @@
-name: "Dev - Build front, back and deploy"
+name: "Production - Build front, back and deploy"
 
 on:
   push:
     branches:
-      - dev
+      - main
 
 jobs:
-  validation:
-    uses: ./.github/workflows/fullcheck.yml
-
   build-front-artefact:
     uses: ./.github/workflows/build-front-artefact.yml
 
   build-back-artefact:
     uses: ./.github/workflows/build-back-artefact.yml
 
-  deploy-dev:
-    needs: [validation, build-front-artefact, build-back-artefact]
+  deploy-prod:
+    needs: [build-front-artefact, build-back-artefact]
     uses: ./.github/workflows/deploy-to-scalingo.yml
     with:
-      envType: "dev"
+      envType: "prod"
     secrets:
       SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN_V2 }}
