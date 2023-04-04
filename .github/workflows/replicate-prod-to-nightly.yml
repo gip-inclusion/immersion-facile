@@ -9,9 +9,6 @@ jobs:
   duplicate-prod-db-to-nightly:
     runs-on: ubuntu-latest
     name: Dump and restore the remote database data.
-    env:
-      DATABASE_VAR: "$DATABASE_URL"
-      SOURCE_PROD_DATABASE_VAR: "$SOURCE_PROD_DATABASE_URL"
 
     steps:
       - name: Install scalingo CLI
@@ -24,10 +21,36 @@ jobs:
 
       - name: Dump the remote database data and restore it to the local database.
         run: >-
-          scalingo --region osc-secnum-fr1 --app if-prod-nightly-db run bash -c "echo 'Installing pgsql-client' &&
-          dbclient-fetcher pgsql &&
-          echo 'Dumping data' &&
-          pg_dump --clean --format c --no-owner --no-privileges --no-comments --exclude-schema 'information_schema' --exclude-schema '^pg_*' --dbname "$SOURCE_PROD_DATABASE_VAR" --file dump.pgsql &&
-          echo 'Finished dumping data' &&
-          pg_restore --clean --verbose --no-owner --no-privileges --no-comments --dbname "$DATABASE_VAR" dump.pgsql && 
-          exit 0"
+          scalingo\
+            --region osc-secnum-fr1\
+            --app if-prod-nightly-db\
+             bash -c "
+                echo 'activate Scalingo CLI and PG' &&
+                install-scalingo-cli &&
+                dbclient-fetcher pgsql &&
+                scalingo login --api-token ${{ secrets.SCALINGO_API_TOKEN_SECNUM }} &&
+                ADDON_ID_LINE=\$(scalingo --region osc-secnum-fr1 --app if-prod-nightly-db addons | grep 'PostgreSQL') &&
+                regex='PostgreSQL \| (.*) \| postgresql' &&
+                [[ \$ADDON_ID_LINE =~ \$regex ]] &&
+                scalingo --region osc-secnum-fr1 --app if-prod-nightly-db --addon=\${BASH_REMATCH[1]} backups-download --output=dump.tar.gz &&
+                ls -lh &&
+                tar --to-stdout -xzf dump.tar.gz > dump.pgsql &&
+                ls -lh &&
+                echo '> Create a Table of content for restore, ignore postgis related schemas and tables:' &&
+                  pg_restore -l dump.pgsql | grep -v tiger | grep -v spatial_ref_sys | grep -v topology > list.txt &&
+                echo '> Dropping data and schema owned by current user' &&
+                  psql \$SCALINGO_POSTGRESQL_URL -c 'DROP OWNED BY CURRENT_USER CASCADE;'
+                echo '> Add Postgis extension if not exists' &&
+                  psql \$SCALINGO_POSTGRESQL_URL -c 'CREATE EXTENSION IF NOT EXISTS postgis;' &&
+                echo '> Start pg_restore' &&\
+                  pg_restore\
+                    --use-list=list.txt\
+                    --verbose\
+                    --no-owner\
+                    --no-privileges\
+                    --no-comments\
+                    --exit-on-error\
+                    --dbname \$SCALINGO_POSTGRESQL_URL dump.pgsql &&
+                echo '> Finished restoring schema' &&
+                  exit 0
+                "
