@@ -160,6 +160,20 @@ export class AppConfig {
     return this.throwIfNotDefined("SENDINBLUE_API_KEY");
   }
 
+  // == Email vaidation gateway ==
+  public get emailValidationGateway() {
+    return this.throwIfNotInArray({
+      variableName: "EMAIL_VALIDATION_GATEWAY",
+      authorizedValues: ["IN_MEMORY", "EMAILABLE"],
+      defaultValue: "IN_MEMORY",
+    });
+  }
+
+  // == Email gateway provider api keys ==
+  public get apiKeyEmailable() {
+    return this.throwIfNotDefined("EMAILABLE_API_KEY");
+  }
+
   // == PE Connect gateway ==
   public get peConnectGateway() {
     return this.throwIfNotInArray({

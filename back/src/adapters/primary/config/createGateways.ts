@@ -53,6 +53,7 @@ import { InMemorySirenGateway } from "../../secondary/sirene/InMemorySirenGatewa
 import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
 import { CustomTimeGateway } from "../../secondary/core/TimeGateway/CustomTimeGateway";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
+import { InMemoryEmailValidationGateway } from "../../secondary/emailValidationGateway/InMemoryEmailValidationStatusGateway";
 
 const logger = createLogger(__filename);
 
@@ -129,6 +130,7 @@ export const createGateways = async (config: AppConfig) => {
     dashboardGateway: createDashboardGateway(config),
     documentGateway: createDocumentGateway(config),
     email: createEmailGateway(config, timeGateway),
+    emailValidationGateway: createEmailValidationGateway(config),
     exportGateway:
       config.reporting === "EXCEL"
         ? new ExcelExportGateway()
@@ -251,6 +253,17 @@ const createAddressGateway = (config: AppConfig) =>
         config.apiKeyOpenCageDataGeosearch,
       ),
   }[config.apiAddress]());
+
+const createEmailValidationGateway = (config: AppConfig) =>
+  ({
+    IN_MEMORY: () => new InMemoryEmailValidationGateway(),
+    EMAILABLE: () =>
+      new EmailableValidationGateway(
+        createHttpAddressClient<AddressesTargets>(addressesExternalTargets),
+        config.apiKeyOpenCageDataGeocoding,
+        config.apiKeyOpenCageDataGeosearch,
+      ),
+  }[config.emailValidationGateway]());
 
 const createDocumentGateway = (config: AppConfig): DocumentGateway => {
   switch (config.documentGateway) {

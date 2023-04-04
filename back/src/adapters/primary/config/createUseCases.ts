@@ -81,6 +81,7 @@ import {
 } from "./magicLinkUrl";
 import { LookupLocation } from "../../../domain/address/useCases/LookupLocation";
 import { NotifyConventionReminder } from "../../../domain/convention/useCases/notifications/NotifyConventionReminder";
+import { GetEmailValidationStatus } from "../../../domain/emailValidation/useCases/GetEmailValidationStatus";
 
 export const createUseCases = (
   config: AppConfig,
@@ -281,6 +282,11 @@ export const createUseCases = (
       // romes
       appellationSearch: new AppellationSearch(uowPerformer),
       romeSearch: new RomeSearch(uowPerformer),
+
+      // email validation
+      emailValidation: new GetEmailValidationStatus(
+        gateways.emailValidationGateway,
+      ),
 
       // agencies
       listAgenciesByFilter: new ListAgenciesByFilter(uowPerformer),
