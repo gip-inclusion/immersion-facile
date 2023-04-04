@@ -4,6 +4,7 @@ import { useStyles } from "tss-react/dsfr";
 
 import {
   cleanStringToHTMLAttribute,
+  emailValidationRegex,
   notEqual,
   OmitFromExistingKeys,
 } from "shared";
@@ -24,8 +25,7 @@ export const MultipleEmailsInput = (
   const { valuesInList, setValues, ...addToListProps } = props;
   const { cx } = useStyles();
   const getEmailValuesFromString = (stringToParse: string) => {
-    const regex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/g;
-    const matches = stringToParse.match(regex);
+    const matches = stringToParse.match(emailValidationRegex);
     return (matches || []).map((match) => match.trim());
   };
 

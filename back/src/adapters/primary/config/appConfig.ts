@@ -12,6 +12,7 @@ import {
 } from "shared";
 import { DomainTopic } from "../../../domain/core/eventBus/events";
 import { InclusionConnectConfig } from "../../../domain/inclusionConnect/useCases/InitiateInclusionConnect";
+import { EmailableApiKey } from "../../secondary/emailValidationGateway/EmailableEmailValidationGateway";
 import { S3Params } from "../../secondary/S3DocumentGateway";
 
 export type AccessTokenConfig = {
@@ -170,7 +171,7 @@ export class AppConfig {
   }
 
   // == Email gateway provider api keys ==
-  public get apiKeyEmailable() {
+  public get emailableApiKey(): EmailableApiKey {
     return this.throwIfNotDefined("EMAILABLE_API_KEY");
   }
 

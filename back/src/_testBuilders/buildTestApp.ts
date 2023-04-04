@@ -9,6 +9,7 @@ import { BasicEventCrawler } from "../adapters/secondary/core/EventCrawlerImplem
 import { CustomTimeGateway } from "../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { StubDashboardGateway } from "../adapters/secondary/dashboardGateway/StubDashboardGateway";
 import type { InMemoryEmailGateway } from "../adapters/secondary/emailGateway/InMemoryEmailGateway";
+import { InMemoryEmailValidationGateway } from "../adapters/secondary/emailValidationGateway/InMemoryEmailValidationStatusGateway";
 import { InMemoryLaBonneBoiteAPI } from "../adapters/secondary/immersionOffer/laBonneBoite/InMemoryLaBonneBoiteAPI";
 import { InMemoryPassEmploiGateway } from "../adapters/secondary/immersionOffer/passEmploi/InMemoryPassEmploiGateway";
 import { InMemoryPoleEmploiGateway } from "../adapters/secondary/immersionOffer/poleEmploi/InMemoryPoleEmploiGateway";
@@ -40,6 +41,7 @@ export type InMemoryGateways = {
   addressApi: InMemoryAddressGateway;
   exportGateway: InMemoryExportGateway;
   timeGateway: CustomTimeGateway;
+  emailValidationGateway: InMemoryEmailValidationGateway;
 };
 
 // following function only to type check that InMemoryRepositories is assignable to Repositories :
@@ -87,6 +89,7 @@ export const buildTestApp = async (
     SKIP_EMAIL_ALLOW_LIST: "TRUE",
     SIRENE_REPOSITORY: "IN_MEMORY",
     TIME_GATEWAY: "CUSTOM",
+    EMAIL_VALIDATION_GATEWAY: "IN_MEMORY",
     ...appConfigOverrides?.configParams,
   }).build();
 

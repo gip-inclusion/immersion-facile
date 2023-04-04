@@ -1,10 +1,5 @@
-import axios from "axios";
 import { Point } from "geojson";
-import {
-  configureHttpClient,
-  createAxiosHandlerCreator,
-  HttpClient,
-} from "http-client";
+import { HttpClient } from "http-client";
 import {
   AddressAndPosition,
   AddressDto,
@@ -39,12 +34,6 @@ export const errorMessage = {
 const franceAndAttachedTerritoryCountryCodes =
   "fr,bl,gf,gp,mf,mq,nc,pf,pm,re,tf,wf,yt";
 const language = "fr";
-
-const AXIOS_TIMEOUT_MS = 10_000;
-
-export const createHttpAddressClient = configureHttpClient(
-  createAxiosHandlerCreator(axios.create({ timeout: AXIOS_TIMEOUT_MS })),
-);
 
 const logger = createLogger(__filename);
 

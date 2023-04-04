@@ -17,6 +17,7 @@ import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroug
 import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 import { createStore } from "src/core-logic/storeConfig/store";
 import { ENV } from "src/config/environmentVariables";
+import { EmailValidationGateway } from "src/core-logic/ports/EmailValidationGateway";
 
 export type Dependencies = {
   adminGateway: AdminGateway;
@@ -35,6 +36,7 @@ export type Dependencies = {
   sentEmailGateway: SentEmailGateway;
   minSearchResultsToPreventRefetch: number;
   scheduler: SchedulerLike;
+  emailValidationGateway: EmailValidationGateway;
 };
 
 const dependencies =

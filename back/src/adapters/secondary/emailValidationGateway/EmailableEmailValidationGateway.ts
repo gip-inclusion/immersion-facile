@@ -7,15 +7,14 @@ import {
   type Target,
   createTargets,
 } from "http-client";
-import { EmailValidationStatus } from "shared";
+import { EmailValidationReason, EmailValidationStatus, Flavor } from "shared";
 import { EmailValidationGetaway } from "../../../domain/emailValidation/ports/EmailValidationGateway";
 
 const AXIOS_TIMEOUT_MS = 10_000;
-const emailableVerifyApiUrl = "https://api.emailable.com/v1/verify" as const;
 
 type EmailableEmailValidationStatus = {
   accept_all: boolean;
-  did_you_mean: string | null;
+  did_you_mean: string;
   disposable: boolean;
   domain: string;
   duration: number;
@@ -28,23 +27,25 @@ type EmailableEmailValidationStatus = {
   mailbox_full: boolean;
   mx_record: string;
   no_reply: boolean;
-  reason: string;
+  reason: EmailValidationReason;
   role: boolean;
   score: number;
   smtp_provider: string | null;
-  state: string;
+  state: "deliverable" | "undeliverable" | "unknown" | "risky";
   tag: string | null;
   user: string;
 };
 
-export type EmailableApiKey = `${"test" | "live"}_${string}`;
+export type EmailableApiKey = Flavor<string, "EmailableApiKey">;
 
 type EmailValidationParams = {
   email: string;
   api_key: EmailableApiKey;
 };
+export const emailableVerifyApiUrl =
+  "https://api.emailable.com/v1/verify" as const;
 
-export type EmailValidationTargets = CreateTargets<{
+export type EmailableValidationTargets = CreateTargets<{
   getEmailStatus: Target<
     void,
     EmailValidationParams,
@@ -53,12 +54,13 @@ export type EmailValidationTargets = CreateTargets<{
   >;
 }>;
 
-export const emailableExternalTargets = createTargets<EmailValidationTargets>({
-  getEmailStatus: {
-    method: "GET",
-    url: emailableVerifyApiUrl,
-  },
-});
+export const emailableExternalTargets =
+  createTargets<EmailableValidationTargets>({
+    getEmailStatus: {
+      method: "GET",
+      url: emailableVerifyApiUrl,
+    },
+  });
 
 export const createHttpAddressClient = configureHttpClient(
   createAxiosHandlerCreator(axios.create({ timeout: AXIOS_TIMEOUT_MS })),
@@ -66,7 +68,7 @@ export const createHttpAddressClient = configureHttpClient(
 
 export class EmailableEmailValidationGateway implements EmailValidationGetaway {
   constructor(
-    private readonly httpClient: HttpClient<EmailValidationTargets>,
+    private readonly httpClient: HttpClient<EmailableValidationTargets>,
     private emailableApiKey: EmailableApiKey,
   ) {}
 
@@ -77,6 +79,15 @@ export class EmailableEmailValidationGateway implements EmailValidationGetaway {
         api_key: this.emailableApiKey,
       },
     });
-    return responseBody as EmailableEmailValidationStatus;
+    const emailableEmailValidationStatus =
+      responseBody as EmailableEmailValidationStatus;
+    return {
+      isFree: emailableEmailValidationStatus.free,
+      isValid:
+        emailableEmailValidationStatus.state === "deliverable" ||
+        emailableEmailValidationStatus.reason === "accepted_email",
+      reason: emailableEmailValidationStatus.reason,
+      proposal: emailableEmailValidationStatus.did_you_mean,
+    };
   }
 }

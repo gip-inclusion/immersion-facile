@@ -7,21 +7,15 @@ import {
   pipeWithValue,
 } from "shared";
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
-import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
+import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
 import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
 import { DocumentGateway } from "../../../domain/generic/fileManagement/port/DocumentGateway";
 import { InclusionConnectGateway } from "../../../domain/inclusionConnect/port/InclusionConnectGateway";
 import { createLogger } from "../../../utils/logger";
-import {
-  createHttpAddressClient,
-  HttpAddressGateway,
-} from "../../secondary/addressGateway/HttpAddressGateway";
-import {
-  addressesExternalTargets,
-  AddressesTargets,
-} from "../../secondary/addressGateway/HttpAddressGateway.targets";
+import { HttpAddressGateway } from "../../secondary/addressGateway/HttpAddressGateway";
+import { addressesExternalTargets } from "../../secondary/addressGateway/HttpAddressGateway.targets";
 import { InMemoryAddressGateway } from "../../secondary/addressGateway/InMemoryAddressGateway";
 import { CachingAccessTokenGateway } from "../../secondary/core/CachingAccessTokenGateway";
 import { MetabaseDashboardGateway } from "../../secondary/dashboardGateway/MetabaseDashboardGateway";
@@ -30,6 +24,13 @@ import { HybridEmailGateway } from "../../secondary/emailGateway/HybridEmailGate
 import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmailGateway";
 import { SendinblueHtmlEmailGateway } from "../../secondary/emailGateway/SendinblueHtmlEmailGateway";
 
+import { CustomTimeGateway } from "../../secondary/core/TimeGateway/CustomTimeGateway";
+import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
+import {
+  EmailableEmailValidationGateway,
+  emailableExternalTargets,
+} from "../../secondary/emailValidationGateway/EmailableEmailValidationGateway";
+import { InMemoryEmailValidationGateway } from "../../secondary/emailValidationGateway/InMemoryEmailValidationStatusGateway";
 import { InMemoryAccessTokenGateway } from "../../secondary/immersionOffer/InMemoryAccessTokenGateway";
 import { HttpLaBonneBoiteAPI } from "../../secondary/immersionOffer/laBonneBoite/HttpLaBonneBoiteAPI";
 import { InMemoryLaBonneBoiteAPI } from "../../secondary/immersionOffer/laBonneBoite/InMemoryLaBonneBoiteAPI";
@@ -51,9 +52,6 @@ import { S3DocumentGateway } from "../../secondary/S3DocumentGateway";
 import { HttpSirenGateway } from "../../secondary/sirene/HttpSirenGateway";
 import { InMemorySirenGateway } from "../../secondary/sirene/InMemorySirenGateway";
 import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
-import { CustomTimeGateway } from "../../secondary/core/TimeGateway/CustomTimeGateway";
-import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
-import { InMemoryEmailValidationGateway } from "../../secondary/emailValidationGateway/InMemoryEmailValidationStatusGateway";
 
 const logger = createLogger(__filename);
 
@@ -248,7 +246,7 @@ const createAddressGateway = (config: AppConfig) =>
     IN_MEMORY: () => new InMemoryAddressGateway(),
     OPEN_CAGE_DATA: () =>
       new HttpAddressGateway(
-        createHttpAddressClient<AddressesTargets>(addressesExternalTargets),
+        createHttpClientForExternalApi(addressesExternalTargets),
         config.apiKeyOpenCageDataGeocoding,
         config.apiKeyOpenCageDataGeosearch,
       ),
@@ -258,10 +256,9 @@ const createEmailValidationGateway = (config: AppConfig) =>
   ({
     IN_MEMORY: () => new InMemoryEmailValidationGateway(),
     EMAILABLE: () =>
-      new EmailableValidationGateway(
-        createHttpAddressClient<AddressesTargets>(addressesExternalTargets),
-        config.apiKeyOpenCageDataGeocoding,
-        config.apiKeyOpenCageDataGeosearch,
+      new EmailableEmailValidationGateway(
+        createHttpClientForExternalApi(emailableExternalTargets),
+        config.emailableApiKey,
       ),
   }[config.emailValidationGateway]());
 

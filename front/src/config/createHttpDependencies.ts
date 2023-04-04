@@ -7,6 +7,8 @@ import {
   inclusionConnectedAllowedTargets,
   searchTargets,
   agencyTargets,
+  EmailValidationTargets,
+  emailValidationTargets,
 } from "shared";
 import { createCommonDependencies } from "src/config/createCommonDependencies";
 import type { Dependencies } from "src/config/dependencies";
@@ -16,6 +18,7 @@ import { HttpAgencyGateway } from "src/core-logic/adapters/AgencyGateway/HttpAge
 import { HttpImmersionAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/HttpImmersionAssessmentGateway";
 import { HttpConventionGateway } from "src/core-logic/adapters/Convention/HttpConventionGateway";
 import { HttpSentEmailGateway } from "src/core-logic/adapters/EmailGateway/HttpSentEmailGateway";
+import { HttpEmailValidationGateway } from "src/core-logic/adapters/EmailValidation/HttpEmailValidationGateway";
 import { HttpEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/HttpEstablishmentGateway";
 import { HttpImmersionSearchGateway } from "src/core-logic/adapters/ImmersionSearchGateway/HttpImmersionSearchGateway";
 import { HttpInclusionConnectedGateway } from "src/core-logic/adapters/InclusionConnected/HttpInclusionConnectedGateway";
@@ -49,6 +52,9 @@ export const createHttpDependencies = (): Dependencies => {
     sentEmailGateway: new HttpSentEmailGateway(axiosOnSlashApi),
     siretGatewayThroughBack: new HttpSiretGatewayThroughBack(axiosOnSlashApi),
     technicalGateway: new HttpTechnicalGateway(axiosOnSlashApi),
+    emailValidationGateway: new HttpEmailValidationGateway(
+      createHttpClient<EmailValidationTargets>(emailValidationTargets),
+    ),
     ...createCommonDependencies(),
   };
 };
