@@ -3,7 +3,7 @@ name: Copy prod (secnum) DB to nightly (secnum-nightly) DB
 on:
   workflow_dispatch:
   schedule:
-    - cron: "27 2 * * *"
+    - cron: "57 2 * * *"
 
 jobs:
   duplicate-prod-db-to-nightly:
@@ -49,5 +49,4 @@ jobs:
                     --exit-on-error\
                     --dbname \$SCALINGO_POSTGRESQL_URL dump.pgsql &&
                 echo '> Finished restoring schema' &&
-                  exit 0
-                "
+                  exit 0"
