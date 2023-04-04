@@ -28,7 +28,7 @@ import { CustomTimeGateway } from "../../secondary/core/TimeGateway/CustomTimeGa
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import {
   EmailableEmailValidationGateway,
-  emailableExternalTargets,
+  emailableValidationTargets,
 } from "../../secondary/emailValidationGateway/EmailableEmailValidationGateway";
 import { InMemoryEmailValidationGateway } from "../../secondary/emailValidationGateway/InMemoryEmailValidationStatusGateway";
 import { InMemoryAccessTokenGateway } from "../../secondary/immersionOffer/InMemoryAccessTokenGateway";
@@ -257,7 +257,7 @@ const createEmailValidationGateway = (config: AppConfig) =>
     IN_MEMORY: () => new InMemoryEmailValidationGateway(),
     EMAILABLE: () =>
       new EmailableEmailValidationGateway(
-        createHttpClientForExternalApi(emailableExternalTargets),
+        createHttpClientForExternalApi(emailableValidationTargets),
         config.emailableApiKey,
       ),
   }[config.emailValidationGateway]());

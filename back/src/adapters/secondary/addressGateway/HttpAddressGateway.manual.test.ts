@@ -10,9 +10,9 @@ import {
 
 import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
 import { AppConfig } from "../../primary/config/appConfig";
+import { createExternalHttpClient } from "../../primary/config/createGateways";
 
 import {
-  createHttpAddressClient,
   HttpAddressGateway,
   errorMessage,
 } from "./HttpAddressGateway";
@@ -58,7 +58,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
 
   beforeEach(() => {
     httpAddressGateway = new HttpAddressGateway(
-      createHttpAddressClient<AddressesTargets>(addressesExternalTargets),
+      createExternalHttpClient<AddressesTargets>(addressesExternalTargets),
       geocodingApiKey,
       geosearchApiKey,
     );
@@ -394,7 +394,7 @@ describe("HttpOpenCageDataAddressGateway check parrarel call", () => {
   const parallelCalls = 10;
   it(`Should support ${parallelCalls} of /getAddressFromPosition parallel calls`, async () => {
     const httpAddressGateway: AddressGateway = new HttpAddressGateway(
-      createHttpAddressClient<AddressesTargets>(addressesExternalTargets),
+      createExternalHttpClient<AddressesTargets>(addressesExternalTargets),
       geocodingApiKey,
       geosearchApiKey,
     );

@@ -54,7 +54,7 @@ export type EmailableValidationTargets = CreateTargets<{
   >;
 }>;
 
-export const emailableExternalTargets =
+export const emailableValidationTargets =
   createTargets<EmailableValidationTargets>({
     getEmailStatus: {
       method: "GET",

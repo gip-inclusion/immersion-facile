@@ -1,12 +1,12 @@
-import {
-  emailValidationTargets,
-  EmailValidationStatus,
-  EmailValidationTargets,
-} from "shared";
+import { EmailValidationStatus } from "shared";
 import { EmailValidationGetaway } from "../../../domain/emailValidation/ports/EmailValidationGateway";
 import { AppConfig } from "../../primary/config/appConfig";
 import { createExternalHttpClient } from "../../primary/config/createGateways";
-import { EmailableEmailValidationGateway } from "./EmailableEmailValidationGateway";
+import {
+  EmailableEmailValidationGateway,
+  emailableValidationTargets,
+  EmailableValidationTargets,
+} from "./EmailableEmailValidationGateway";
 
 const apiKeyEmailable = AppConfig.createFromEnv().emailableApiKey;
 describe("Emailable email validation gateway", () => {
@@ -14,7 +14,9 @@ describe("Emailable email validation gateway", () => {
 
   beforeEach(() => {
     emailableEmailValidationGateway = new EmailableEmailValidationGateway(
-      createExternalHttpClient<EmailValidationTargets>(emailValidationTargets),
+      createExternalHttpClient<EmailableValidationTargets>(
+        emailableValidationTargets,
+      ),
       apiKeyEmailable,
     );
   });
@@ -66,7 +68,7 @@ describe("Emailable email validation gateway", () => {
           isValid: false,
           proposal: null,
           isFree: false,
-          reason: "invalid_email",
+          reason: "rejected_email",
         },
       },
       {
