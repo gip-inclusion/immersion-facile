@@ -42,6 +42,13 @@ export const ShareLinkByEmail = () => {
             dispatch({ type: "CLICKED_CLOSE" });
             setEmailSent(false);
           }}
+          conventionFormData={{
+            establishmentRepresentativeEmail:
+              getValues().signatories.establishmentRepresentative.email,
+            firstName: getValues().signatories.beneficiary.firstName,
+            lastName: getValues().signatories.beneficiary.lastName,
+            internshipKind: getValues().internshipKind,
+          }}
         />
       </ElementModalContainer>
       {emailSent != null && (

@@ -1,19 +1,24 @@
-import { Form, Formik, useField } from "formik";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 import React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  getConventionFieldName,
   InternshipKind,
   ShareLinkByEmailDto,
   shareLinkByEmailSchema,
 } from "shared";
 import { conventionGateway } from "src/config/dependencies";
-import { TextInput } from "src/app/components/forms/commons/TextInput";
-import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
-import { Button } from "@codegouvfr/react-dsfr/Button";
+import { Input } from "@codegouvfr/react-dsfr/Input";
 
 type ShareFormProps = {
   onSuccess: () => void;
   onError: () => void;
+  conventionFormData: {
+    internshipKind: InternshipKind;
+    establishmentRepresentativeEmail: string;
+    firstName: string;
+    lastName: string;
+  };
 };
 
 const makeInitialValues = ({
@@ -37,10 +42,12 @@ const makeInitialValues = ({
   } vous invite à prendre connaissance de cette demande de convention d’immersion déjà partiellement remplie afin que vous la complétiez.  Merci !`,
 });
 
-const getName = (name: keyof ShareLinkByEmailDto) => name;
-
-export const ShareForm = ({ onSuccess, onError }: ShareFormProps) => {
-  const submit = async (values: {
+export const ShareForm = ({
+  conventionFormData,
+  onSuccess,
+  onError,
+}: ShareFormProps) => {
+  const onSubmit = async (values: {
     email: string;
     details: string;
     internshipKind: InternshipKind;
@@ -51,54 +58,39 @@ export const ShareForm = ({ onSuccess, onError }: ShareFormProps) => {
     });
     result ? onSuccess() : onError();
   };
-
-  const [establishmentRepresentativeEmail] = useField<string>({
-    name: getConventionFieldName(
-      "signatories.establishmentRepresentative.email",
-    ),
+  const methods = useForm<ShareLinkByEmailDto>({
+    mode: "onTouched",
+    defaultValues: makeInitialValues({
+      ...conventionFormData,
+      link: window.location.href,
+    }),
+    resolver: zodResolver(shareLinkByEmailSchema),
   });
-  const [firstName] = useField<string>({
-    name: getConventionFieldName("signatories.beneficiary.firstName"),
-  });
-  const [lastName] = useField<string>({
-    name: getConventionFieldName("signatories.beneficiary.lastName"),
-  });
-  const [internshipKind] = useField<InternshipKind>({
-    name: getConventionFieldName("internshipKind"),
-  });
+  const { register, handleSubmit, formState } = methods;
 
   return (
-    <Formik
-      initialValues={makeInitialValues({
-        internshipKind: internshipKind.value,
-        establishmentRepresentativeEmail:
-          establishmentRepresentativeEmail.value,
-        firstName: firstName.value,
-        lastName: lastName.value,
-        link: window.location.href,
-      })}
-      validationSchema={toFormikValidationSchema(shareLinkByEmailSchema)}
-      onSubmit={submit}
-    >
-      {() => (
-        <Form>
-          <input type="hidden" name={getName("conventionLink")} />
-          <TextInput
-            label="Adresse mail à qui partager la demande"
-            name={getName("email")}
-            type="email"
-            placeholder="nom@exemple.com"
-          />
-          <TextInput
-            label="Votre message (pour expliquer ce qui reste à compléter)"
-            name={getName("details")}
-            multiline={true}
-          />
-          <Button type="submit" title="Envoyer">
-            Envoyer
-          </Button>
-        </Form>
-      )}
-    </Formik>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input type="hidden" {...register("conventionLink")} />
+      <Input
+        label="Adresse mail à qui partager la demande"
+        nativeInputProps={{
+          ...register("email"),
+          type: "email",
+          placeholder: "nom@exemple.com",
+        }}
+        state={formState.errors.email ? "error" : "default"}
+        stateRelatedMessage={formState.errors.email?.message}
+      />
+      <Input
+        label="Votre message (pour expliquer ce qui reste à compléter)"
+        nativeTextAreaProps={{ ...register("details") }}
+        textArea
+        state={formState.errors.details ? "error" : "default"}
+        stateRelatedMessage={formState.errors.details?.message}
+      />
+      <Button type="submit" title="Envoyer" disabled={!formState.isValid}>
+        Envoyer
+      </Button>
+    </form>
   );
 };
