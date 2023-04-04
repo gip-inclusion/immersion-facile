@@ -22,9 +22,9 @@ import { createPgUow } from "../config/uowConfig";
 import { HttpSirenGateway } from "../../secondary/sirene/HttpSirenGateway";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import {
-  createHttpAddressClient,
   HttpAddressGateway,
 } from "../../secondary/addressGateway/HttpAddressGateway";
+import { createExternalHttpClient } from "../config/createGateways";
 
 const maxQpsSireneApi = 0.25;
 
@@ -52,7 +52,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
   });
   const clientDestination = await poolDestination.connect();
   const addressAPI = new HttpAddressGateway(
-    createHttpAddressClient<AddressesTargets>(addressesExternalTargets),
+    createExternalHttpClient<AddressesTargets>(addressesExternalTargets),
     config.apiKeyOpenCageDataGeocoding,
     config.apiKeyOpenCageDataGeosearch,
   );

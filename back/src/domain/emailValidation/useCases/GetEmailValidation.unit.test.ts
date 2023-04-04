@@ -13,27 +13,10 @@ describe("Email validation status", () => {
 
   it("retrieve email validation status from queried email", async () => {
     const expectedEmailValidationStatus: EmailValidationStatus = {
-      accept_all: false,
-      did_you_mean: null,
-      disposable: false,
-      domain: "jedusor.com",
-      duration: 0.0,
-      email: "tom@jedusor.com",
-      first_name: null,
-      free: false,
-      full_name: null,
-      gender: null,
-      last_name: null,
-      mailbox_full: false,
-      mx_record: "mx.zoho.com",
-      no_reply: false,
+      isValid: true,
+      proposal: null,
+      isFree: false,
       reason: "invalid_smtp",
-      role: false,
-      score: 0,
-      smtp_provider: "Zoho",
-      state: "undeliverable",
-      tag: null,
-      user: "tom",
     };
     emailValidationGateway.setEmailValidationStatusResponse(
       expectedEmailValidationStatus,
