@@ -1,16 +1,16 @@
-import axios from "axios";
 import {
-  configureHttpClient,
-  createAxiosHandlerCreator,
-  type HttpClient,
-  type CreateTargets,
-  type Target,
   createTargets,
+  type CreateTargets,
+  type HttpClient,
+  type Target,
 } from "http-client";
-import { EmailValidationReason, EmailValidationStatus, Flavor } from "shared";
+import {
+  EmailValidationReason,
+  EmailValidationStatus,
+  Flavor,
+  isValidEmail,
+} from "shared";
 import { EmailValidationGetaway } from "../../../domain/emailValidation/ports/EmailValidationGateway";
-
-const AXIOS_TIMEOUT_MS = 10_000;
 
 type EmailableEmailValidationStatus = {
   accept_all: boolean;
@@ -62,10 +62,6 @@ export const emailableExternalTargets =
     },
   });
 
-export const createHttpAddressClient = configureHttpClient(
-  createAxiosHandlerCreator(axios.create({ timeout: AXIOS_TIMEOUT_MS })),
-);
-
 export class EmailableEmailValidationGateway implements EmailValidationGetaway {
   constructor(
     private readonly httpClient: HttpClient<EmailableValidationTargets>,
@@ -73,6 +69,14 @@ export class EmailableEmailValidationGateway implements EmailValidationGetaway {
   ) {}
 
   public async getEmailStatus(email: string): Promise<EmailValidationStatus> {
+    if (email === "" || !isValidEmail(email))
+      return {
+        isFree: false,
+        isValid: false,
+        proposal: null,
+        reason: "invalid_email",
+      };
+
     const { responseBody } = await this.httpClient.getEmailStatus({
       queryParams: {
         email,

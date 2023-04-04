@@ -2,7 +2,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { Select } from "@codegouvfr/react-dsfr/Select";
 import { keys } from "ramda";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { SectionTitle } from "react-design-system";
 import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -11,6 +11,7 @@ import {
   ConventionReadDto,
   InternshipKind,
   isBeneficiaryStudent,
+  isValidEmail,
   levelsOfEducation,
 } from "shared";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
@@ -28,6 +29,7 @@ import { conventionSlice } from "src/core-logic/domain/convention/convention.sli
 import { BeneficiaryCurrentEmployerFields } from "./BeneficiaryCurrentEmployerFields";
 import { BeneficiaryEmergencyContactFields } from "./BeneficiaryEmergencyContactFields";
 import { BeneficiaryRepresentativeFields } from "./BeneficiaryRepresentativeFields";
+import { emailValidationGateway } from "src/config/dependencies";
 
 type beneficiaryFormSectionProperties = {
   isFrozen: boolean | undefined;
@@ -46,9 +48,9 @@ export const BeneficiaryFormSection = ({
   );
   const connectedUser = useAppSelector(authSelectors.connectedUser);
   const userFieldsAreFilled = isSuccessfullyPeConnected && !!connectedUser;
-  const { register, getValues, setValue, formState } =
+  const { register, getValues, setValue, formState, setError, clearErrors } =
     useFormContext<ConventionReadDto>();
-
+  const [_emailInputLoading, setEmailInputLoading] = useState(false);
   const values = getValues();
   const dispatch = useDispatch();
   const t = useConventionTexts(values.internshipKind);
@@ -145,6 +147,31 @@ export const BeneficiaryFormSection = ({
           ...register("signatories.beneficiary.email"),
           ...(userFieldsAreFilled ? { value: connectedUser.email } : {}),
           type: "email",
+          onBlur: (event) => {
+            clearErrors("signatories.beneficiary.email");
+            const email = event.target.value;
+            if (email === "" || !isValidEmail(email))
+              setError("signatories.beneficiary.email", {
+                type: "invalid",
+                message: "Email invalide",
+              });
+            setEmailInputLoading(true);
+            emailValidationGateway
+              .getEmailStatus(email)
+              .then((status) => {
+                setEmailInputLoading(false);
+                if (!status.isValid) {
+                  setError("signatories.beneficiary.email", {
+                    type: "invalid_email",
+                    message: status.reason,
+                  });
+                }
+              })
+              .catch((error) => {
+                // eslint-disable-next-line no-console
+                console.error(error);
+              });
+          },
         }}
         {...getFieldError("signatories.beneficiary.email")}
       />

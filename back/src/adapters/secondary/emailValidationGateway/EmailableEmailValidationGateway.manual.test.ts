@@ -1,24 +1,20 @@
 import {
-  EmailableApiKey,
   emailValidationTargets,
   EmailValidationStatus,
   EmailValidationTargets,
 } from "shared";
 import { EmailValidationGetaway } from "../../../domain/emailValidation/ports/EmailValidationGateway";
 import { AppConfig } from "../../primary/config/appConfig";
-import {
-  createHttpAddressClient,
-  EmailableEmailValidationGateway,
-} from "./EmailableEmailValidationGateway";
+import { createExternalHttpClient } from "../../primary/config/createGateways";
+import { EmailableEmailValidationGateway } from "./EmailableEmailValidationGateway";
 
-const apiKeyEmailable = AppConfig.createFromEnv()
-  .emailableApiKey as EmailableApiKey;
+const apiKeyEmailable = AppConfig.createFromEnv().emailableApiKey;
 describe("Emailable email validation gateway", () => {
   let emailableEmailValidationGateway: EmailValidationGetaway;
 
   beforeEach(() => {
     emailableEmailValidationGateway = new EmailableEmailValidationGateway(
-      createHttpAddressClient<EmailValidationTargets>(emailValidationTargets),
+      createExternalHttpClient<EmailValidationTargets>(emailValidationTargets),
       apiKeyEmailable,
     );
   });
@@ -38,12 +34,39 @@ describe("Emailable email validation gateway", () => {
         },
       },
       {
+        candidateEmail: "",
+        expectedStatus: {
+          isFree: false,
+          isValid: false,
+          proposal: null,
+          reason: "invalid_email",
+        },
+      },
+      {
+        candidateEmail: "ezflmafmkazflmkazf",
+        expectedStatus: {
+          isFree: false,
+          isValid: false,
+          proposal: null,
+          reason: "invalid_email",
+        },
+      },
+      {
+        candidateEmail: "enguerran.weiss@beta.gouv.fr",
+        expectedStatus: {
+          isValid: true,
+          proposal: null,
+          isFree: false,
+          reason: "accepted_email",
+        },
+      },
+      {
         candidateEmail: "enguerranweiss@beta.gouv.fr",
         expectedStatus: {
           isValid: false,
           proposal: null,
           isFree: false,
-          reason: "rejected_email",
+          reason: "invalid_email",
         },
       },
       {

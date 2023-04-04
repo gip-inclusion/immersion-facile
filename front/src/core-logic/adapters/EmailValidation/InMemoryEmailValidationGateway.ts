@@ -2,6 +2,7 @@ import { from, Observable } from "rxjs";
 import {
   EmailValidationQueryInput,
   EmailValidationStatus,
+  isValidEmail,
   sleep,
 } from "shared";
 import { EmailValidationGateway } from "src/core-logic/ports/EmailValidationGateway";
@@ -19,12 +20,20 @@ export class InMemoryEmailValidationGateway implements EmailValidationGateway {
       proposal: "",
       reason: "invalid_email",
     };
+    const emailWithDomainErrorStatus: EmailValidationStatus = {
+      isFree: false,
+      isValid: false,
+      proposal: "",
+      reason: "invalid_domain",
+    };
     const emailWithTypoStatus: EmailValidationStatus = {
       isFree: false,
       isValid: false,
       proposal: "email-with-typo@gmail.com",
       reason: "invalid_email",
     };
+    if (email === "") return emailWithErrorStatus;
+    if (!isValidEmail(email)) return emailWithDomainErrorStatus;
     if (email === "email-with-error@example.com") return emailWithErrorStatus;
     if (email === "email-with-typo@gamil.com") return emailWithTypoStatus;
     return {
