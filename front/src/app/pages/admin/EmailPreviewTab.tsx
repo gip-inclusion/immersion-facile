@@ -207,6 +207,19 @@ export const defaultEmailValueByEmailKind: {
     ].join("\n"),
     magicLinkUrl: "http://----MAGICLINK----",
   },
+  SIGNATORY_LAST_REMINDER: {
+    actorFirstName: "ACTOR_FIRSTNAME",
+    actorLastName: "ACTOR_LASTNAME",
+    beneficiaryFirstName: "BENEFICIARY_FIRSTNAME",
+    beneficiaryLastName: "BENEFICIARY_LASTNAME",
+    businessName: "BUSINESS_NAME",
+    signatoriesSummary: [
+      `- ✔️  - A signé le 19/03/2023 - BENEFICIARY_FIRSTNAME BENEFICIARY_LASTNAME, bénéficiaire`,
+      `- ❌ - N'a pas signé - BENEFICIARY_CURRENT_EMPLOYER_FIRSTNAME BENEFICIARY_CURRENT_EMPLOYER_FIRSTNAME, employeur actuel du bénéficiaire`,
+      `- ❌ - N'a pas signé - ESTABLISHMENT_REPRESENTATIVE_FIRSTNAME ESTABLISHMENT_REPRESENTATIVE_FIRSTNAME, représentant l'entreprise BUSINESS_NAME`,
+    ].join("\n"),
+    magicLinkUrl: "http://----MAGICLINK----",
+  },
   AGENCY_FIRST_REMINDER: {
     agencyMagicLinkUrl: "CONVENTION_VERIFICATION_LINK",
     agencyName: "AGENCY_NAME",

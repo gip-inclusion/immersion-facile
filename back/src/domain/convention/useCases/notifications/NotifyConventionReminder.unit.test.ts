@@ -366,8 +366,80 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
     });
   });
 
-  // eslint-disable-next-line jest/no-disabled-tests
-  describe.skip("LastReminderForSignatories", () => {
+  describe("LastReminderForSignatories", () => {
+    const type: ReminderType = "LastReminderForSignatories";
+    it.each(["PARTIALLY_SIGNED", "READY_TO_SIGN"] satisfies ConventionStatus[])(
+      `Send email LAST_FIRST_REMINDER to signatories when status is '%s'`,
+      async (status) => {
+        //Arrange
+        const agency = new AgencyDtoBuilder().withId("agencyId").build();
+
+        const convention = new ConventionDtoBuilder()
+          .withAgencyId(agency.id)
+          .withStatus(status)
+          .build();
+        uow.conventionRepository.setConventions({
+          [convention.id]: convention,
+        });
+        uow.agencyRepository.setAgencies([agency]);
+
+        //Act
+        await useCase.execute({
+          conventionId: convention.id,
+          reminderType: type,
+        });
+
+        //Assert
+        expectToEqual(emailGateway.getSentEmails(), [
+          ...Object.values(convention.signatories).map((signatory) =>
+            makeSignatoriesLastReminderEmail({
+              actor: signatory,
+              convention,
+              timeGateway,
+            }),
+          ),
+          makeSignatoriesLastReminderEmail({
+            actor: convention.establishmentTutor,
+            convention,
+            timeGateway,
+          }),
+        ]);
+      },
+    );
+
+    describe("Forbidden cases on convention bad status", () => {
+      it.each([
+        "CANCELLED",
+        "DRAFT",
+        "IN_REVIEW",
+        "REJECTED",
+        "ACCEPTED_BY_VALIDATOR",
+        "ACCEPTED_BY_COUNSELLOR",
+      ] satisfies ConventionStatus[])("status '%s'", async (status) => {
+        //Arrange
+        const agency = new AgencyDtoBuilder().withId("agencyId").build();
+        const convention = new ConventionDtoBuilder()
+          .withAgencyId(agency.id)
+          .withStatus(status)
+          .build();
+        uow.conventionRepository.setConventions({
+          [convention.id]: convention,
+        });
+        uow.agencyRepository.setAgencies([agency]);
+
+        //Act & Assert
+        await expectPromiseToFailWithError(
+          useCase.execute({
+            conventionId: convention.id,
+            reminderType: type,
+          }),
+          new ForbiddenError(
+            forbiddenUnsupportedStatusMessage(convention, type),
+          ),
+        );
+        expectToEqual(emailGateway.getSentEmails(), []);
+      });
+    });
     // const type: ReminderType = "LastReminderForSignatories";
     // it.each(["PARTIALLY_SIGNED", "READY_TO_SIGN"] satisfies ConventionStatus[])(
     //   `Send email SIGNATORY_LAST_REMINDER to signatories when status is '%s'`,
@@ -610,6 +682,36 @@ const makeSignatoriesFirstReminderEmail = ({
   timeGateway: TimeGateway;
 }): TemplatedEmail => ({
   type: "SIGNATORY_FIRST_REMINDER",
+  recipients: [actor.email],
+  params: {
+    actorFirstName: actor.firstName,
+    actorLastName: actor.lastName,
+    beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+    beneficiaryLastName: convention.signatories.beneficiary.lastName,
+    businessName: convention.businessName,
+    signatoriesSummary: toSignatoriesSummary(convention).join("\n"),
+    magicLinkUrl: isSignatoryRole(actor.role)
+      ? fakeGenerateMagicLinkUrlFn({
+          id: convention.id,
+          role: actor.role,
+          targetRoute: frontRoutes.conventionToSign,
+          email: actor.email,
+          now: timeGateway.now(),
+        })
+      : undefined,
+  },
+});
+
+const makeSignatoriesLastReminderEmail = ({
+  actor,
+  convention,
+  timeGateway,
+}: {
+  actor: GenericActor<Role>;
+  convention: ConventionDto;
+  timeGateway: TimeGateway;
+}): TemplatedEmail => ({
+  type: "SIGNATORY_LAST_REMINDER",
   recipients: [actor.email],
   params: {
     actorFirstName: actor.firstName,

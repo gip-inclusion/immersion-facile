@@ -53,9 +53,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
   inputSchema = conventionReminderPayloadSchema;
 
   protected async _execute(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     { conventionId, reminderType: type }: ConventionReminderPayload,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     uow: UnitOfWork,
   ) {
     const conventionRead = await uow.conventionQueries.getConventionById(
@@ -71,14 +69,18 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     if (type === "FirstReminderForAgency" || type === "LastReminderForAgency")
       return this.onAgencyReminder(type, conventionRead, agency);
 
-    if (type === "FirstReminderForSignatories")
+    if (
+      type === "FirstReminderForSignatories" ||
+      type === "LastReminderForSignatories"
+    )
       return this.onSignatoriesReminder(type, conventionRead);
-
-    throw new Error("Not supported.");
   }
 
   private onSignatoriesReminder(
-    type: ReminderType,
+    type: Extract<
+      ReminderType,
+      "FirstReminderForSignatories" | "LastReminderForSignatories"
+    >,
     conventionRead: ConventionReadDto,
   ): Promise<void> {
     if (!["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(conventionRead.status))
@@ -88,46 +90,58 @@ export class NotifyConventionReminder extends TransactionalUseCase<
       ...Object.values(conventionRead.signatories),
       conventionRead.establishmentTutor,
     ];
+
+    const emails: TemplatedEmail[] = [
+      ...(type === "FirstReminderForSignatories"
+        ? this.makeSignatoryFirstReminderEmails(actors, conventionRead)
+        : []),
+      ...(type === "LastReminderForSignatories"
+        ? this.makeSignatoryLastReminderEmails(actors, conventionRead)
+        : []),
+    ];
     return Promise.all(
-      this.makeSignatoryReminderEmails(actors, conventionRead).map((email) =>
-        this.emailGateway.sendEmail(email),
-      ),
+      emails.map((email) => this.emailGateway.sendEmail(email)),
     ).then(() => Promise.resolve());
   }
 
   private onAgencyReminder(
-    type: ReminderType,
+    type: Extract<
+      ReminderType,
+      "FirstReminderForAgency" | "LastReminderForAgency"
+    >,
     conventionRead: ConventionReadDto,
     agency: AgencyDto,
   ): Promise<void> {
     if (conventionRead.status !== "IN_REVIEW")
       throw new Error(forbiddenUnsupportedStatusMessage(conventionRead, type));
 
-    const consellorEmails: EmailWithRole[] = agency.counsellorEmails.map(
-      (email) => ({
-        role: "counsellor",
-        email,
-      }),
-    );
-    const validatorEmails: EmailWithRole[] = agency.validatorEmails.map(
-      (email) => ({
-        role: "validator",
-        email,
-      }),
-    );
     const emailsWithRole: EmailWithRole[] = [
-      ...consellorEmails,
-      ...validatorEmails,
+      ...agency.counsellorEmails.map(
+        (email) =>
+          ({
+            role: "counsellor",
+            email,
+          } satisfies EmailWithRole),
+      ),
+      ...agency.validatorEmails.map(
+        (email) =>
+          ({
+            role: "validator",
+            email,
+          } satisfies EmailWithRole),
+      ),
     ];
-
-    const { agencyDepartment, agencyName, ...convention } = conventionRead;
 
     const emails: TemplatedEmail[] = [
       ...(type === "FirstReminderForAgency"
-        ? this.makeAgencyFirstReminderEmails(emailsWithRole, convention, agency)
+        ? this.makeAgencyFirstReminderEmails(
+            emailsWithRole,
+            conventionRead,
+            agency,
+          )
         : []),
       ...(type === "LastReminderForAgency"
-        ? this.makeAgencyLastReminderEmails(emailsWithRole, convention)
+        ? this.makeAgencyLastReminderEmails(emailsWithRole, conventionRead)
         : []),
     ];
 
@@ -138,7 +152,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
 
   private makeAgencyFirstReminderEmails(
     emailsWithRole: EmailWithRole[],
-    convention: ConventionDto,
+    convention: ConventionReadDto,
     agency: AgencyDto,
   ): TemplatedEmail[] {
     return emailsWithRole.map(({ email, role }) => ({
@@ -184,12 +198,38 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     }));
   }
 
-  private makeSignatoryReminderEmails(
+  private makeSignatoryFirstReminderEmails(
     actors: GenericActor<Role>[],
     convention: ConventionDto,
   ): TemplatedEmail[] {
     return actors.map((actor) => ({
       type: "SIGNATORY_FIRST_REMINDER",
+      recipients: [actor.email],
+      params: {
+        actorFirstName: actor.firstName,
+        actorLastName: actor.lastName,
+        beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+        beneficiaryLastName: convention.signatories.beneficiary.lastName,
+        businessName: convention.businessName,
+        signatoriesSummary: toSignatoriesSummary(convention).join("\n"),
+        magicLinkUrl: isSignatoryRole(actor.role)
+          ? this.generateConventionMagicLinkUrl({
+              id: convention.id,
+              role: actor.role,
+              email: actor.email,
+              now: this.timeGateway.now(),
+              targetRoute: frontRoutes.conventionToSign,
+            })
+          : undefined,
+      },
+    }));
+  }
+  private makeSignatoryLastReminderEmails(
+    actors: GenericActor<Role>[],
+    convention: ConventionDto,
+  ): TemplatedEmail[] {
+    return actors.map((actor) => ({
+      type: "SIGNATORY_LAST_REMINDER",
       recipients: [actor.email],
       params: {
         actorFirstName: actor.firstName,

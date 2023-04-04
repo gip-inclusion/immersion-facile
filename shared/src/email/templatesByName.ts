@@ -59,6 +59,40 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       L'équipe Immersion Facilitée`,
     }),
   },
+  SIGNATORY_LAST_REMINDER: {
+    niceName: "Signataire - Dernier rappel",
+    tags: [""],
+    createEmailVariables: ({
+      actorFirstName,
+      actorLastName,
+      beneficiaryFirstName,
+      beneficiaryLastName,
+      businessName,
+      signatoriesSummary,
+      magicLinkUrl,
+    }) => ({
+      subject:
+        "RAPPEL URGENT - La convention démarrant dans moins de 24h n'est pas complètement signée",
+      greetings: `Bonjour ${actorFirstName} ${actorLastName},`,
+      content: `
+      Certain signataires n'ont pas encore signé la demande de convention d'immersion en milieu professionnel pour ${beneficiaryFirstName} ${beneficiaryLastName}.
+      
+      Voici à date l'état des signatures :
+      ${signatoriesSummary}
+
+      <strong>Sans toutes les signatures, la convention ne peut être établie et l'établissement ${businessName} ne pourra pas accueillir en immersion ${beneficiaryFirstName} ${beneficiaryLastName}.</strong>
+
+      Nous vous remercions de confirmer au plus vite cette demande.`,
+      buttons: magicLinkUrl && [
+        {
+          label: "Ouvrir la demande de convention",
+          url: `${magicLinkUrl}`,
+        },
+      ],
+      subContent: `Bonne journée,
+      L'équipe Immersion Facilitée`,
+    }),
+  },
   AGENCY_FIRST_REMINDER: {
     niceName: "Agence - Premier rappel",
     tags: [""],

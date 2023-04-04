@@ -12,7 +12,12 @@ export type EmailParamsByEmailType = {
     dateStart: string;
     dateEnd: string;
   };
-  // eslint-disable-next-line @typescript-eslint/ban-types
+  AGENCY_LAST_REMINDER: {
+    agencyMagicLinkUrl: string;
+    beneficiaryFirstName: string;
+    beneficiaryLastName: string;
+    businessName: string;
+  };
   SIGNATORY_FIRST_REMINDER: {
     actorFirstName: string;
     actorLastName: string;
@@ -22,11 +27,14 @@ export type EmailParamsByEmailType = {
     signatoriesSummary: string;
     magicLinkUrl?: AbsoluteUrl;
   };
-  AGENCY_LAST_REMINDER: {
-    agencyMagicLinkUrl: string;
+  SIGNATORY_LAST_REMINDER: {
+    actorFirstName: string;
+    actorLastName: string;
+    businessName: string;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
-    businessName: string;
+    signatoriesSummary: string;
+    magicLinkUrl?: AbsoluteUrl;
   };
   SIGNEE_HAS_SIGNED_CONVENTION: {
     internshipKind: InternshipKind;
