@@ -60,9 +60,8 @@ export const configureGenerateHtmlFromTemplate =
     const doctype =
       '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
 
-    return {
-      subject,
-      htmlContent: ignoreTabs(`${options.skipHead ? "" : doctype}
+    const htmlContent = ignoreTabs(
+      `${options.skipHead ? "" : doctype}
         <html lang="fr">${options.skipHead ? "" : renderHead(subject)}
           <body>
             <table width="600" align="center" style="margin-top: 20px">
@@ -81,7 +80,21 @@ export const configureGenerateHtmlFromTemplate =
             </table>
           </body>
         </html>
-      `),
+      `,
+    );
+
+    const emailSupportedHtmlConcent = htmlContent
+      .replaceAll("href=", "\nhref=")
+      .replaceAll("src=", "\nsrc=")
+      .replaceAll("target=", "\ntarget=")
+      .replaceAll("width=", "\nwidth=")
+      .replaceAll("alt=", "\nalt=")
+      .replaceAll("<br/>", "\n<br/>")
+      .replaceAll("\n\n", "\n");
+
+    return {
+      subject,
+      htmlContent: emailSupportedHtmlConcent,
       ...(tags ? { tags } : {}),
       ...(attachmentUrls
         ? {
