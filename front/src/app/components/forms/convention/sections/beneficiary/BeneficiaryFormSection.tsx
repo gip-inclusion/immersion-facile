@@ -187,7 +187,7 @@ export const BeneficiaryFormSection = ({
       <RadioButtons
         {...formContents.isMinor}
         legend={formContents.isMinor.label}
-        hintText={formContents.isMinor.description}
+        hintText={formContents.isMinor.hintText}
         disabled={isFrozen}
         options={booleanSelectOptions.map((option) => ({
           ...option,
@@ -215,7 +215,7 @@ export const BeneficiaryFormSection = ({
             {...formContents.isCurrentEmployer}
             disabled={isFrozen}
             legend={formContents.isCurrentEmployer.label}
-            hintText={formContents.isCurrentEmployer.description}
+            hintText={formContents.isCurrentEmployer.hintText}
             options={booleanSelectOptions.map((option) => ({
               ...option,
               nativeInputProps: {

@@ -164,7 +164,7 @@ export const ImmersionConditionsCommonFields = ({
       <RadioButtons
         {...formContents["individualProtection"]}
         legend={formContents["individualProtection"].label}
-        hintText={formContents["individualProtection"].description}
+        hintText={formContents["individualProtection"].hintText}
         options={booleanSelectOptions.map((option) => ({
           ...option,
           nativeInputProps: {
@@ -201,7 +201,7 @@ export const ImmersionConditionsCommonFields = ({
       <RadioButtons
         {...formContents["sanitaryPrevention"]}
         legend={formContents["sanitaryPrevention"].label}
-        hintText={formContents["sanitaryPrevention"].description}
+        hintText={formContents["sanitaryPrevention"].hintText}
         options={booleanSelectOptions.map((option) => ({
           ...option,
           nativeInputProps: {
@@ -246,7 +246,7 @@ export const ImmersionConditionsCommonFields = ({
       <RadioButtons
         {...formContents["immersionObjective"]}
         legend={formContents["immersionObjective"].label}
-        hintText={formContents["immersionObjective"].description}
+        hintText={formContents["immersionObjective"].hintText}
         options={conventionObjectiveOptions
           .filter((option) =>
             values.internshipKind !== "mini-stage-cci"

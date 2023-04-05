@@ -71,7 +71,7 @@ export const EstablishmentFormSection = ({
         }
         hintText={
           formContents.isEstablishmentTutorIsEstablishmentRepresentative
-            .description
+            .hintText
         }
         options={booleanSelectOptions.map((option) => ({
           ...option,
