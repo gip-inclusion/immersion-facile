@@ -12,8 +12,8 @@ export const notifyDiscord = (
   rawContent: string,
   options: DiscordOptions = { skipCodeFormatting: false },
 ) => {
-  const discordWebhookUrl: string | undefined =
-    AppConfig.createFromEnv()?.discordWebhookUrl;
+  const config = AppConfig.createFromEnv();
+  const discordWebhookUrl = config.discordWebhookUrl;
 
   if (!discordWebhookUrl) return;
 
@@ -25,7 +25,7 @@ export const notifyDiscord = (
     .post(
       discordWebhookUrl,
       {
-        username: "Immersion Facile Bot",
+        username: `${config.envType} - ${config.immersionFacileBaseUrl}`,
         content: options.skipCodeFormatting ? content : format(content),
       },
       {

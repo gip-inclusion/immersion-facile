@@ -322,7 +322,7 @@ export class AppConfig {
   }
 
   // == Discord notifications ==
-  public get discordWebhookUrl() {
+  public get discordWebhookUrl(): string | undefined {
     return this.env.DISCORD_WEBHOOK_URL;
   }
 
