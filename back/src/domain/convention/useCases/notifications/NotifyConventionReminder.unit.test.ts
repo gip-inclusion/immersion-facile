@@ -588,7 +588,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         .withEstablishmentRepresentativeLastName("de la Valière")
         .withEstablishmentRepresentativeSignedAt(undefined)
         .withBusinessName("Paris Corp")
-        .withBeneficiaryCurentEmployer({
+        .withBeneficiaryCurrentEmployer({
           email: "",
           firstName: "Robert",
           lastName: "Thénardier",
