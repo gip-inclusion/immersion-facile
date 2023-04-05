@@ -30,6 +30,7 @@ const startScript = async () => {
 /* eslint-disable-next-line @typescript-eslint/no-floating-promises */
 handleEndOfScriptNotification(
   "markEstablishmentsAsSearchableWhenMaxContactsAllows",
+  config,
   startScript,
   ({ numberOfEstablishmentsUpdated }) =>
     `${numberOfEstablishmentsUpdated} establishments have been marked as searchable again`,

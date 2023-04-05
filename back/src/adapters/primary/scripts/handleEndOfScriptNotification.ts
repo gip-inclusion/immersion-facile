@@ -5,17 +5,19 @@ import { AppConfig } from "../config/appConfig";
 
 export const handleEndOfScriptNotification = async <T>(
   name: string,
+  config: AppConfig,
   script: () => Promise<T>,
   handleResults: (results: T) => string,
   logger: Logger = createLogger(__filename),
 ) => {
+  const context = `${config.envType} - ${config.immersionFacileBaseUrl}\nScript [${name}]`;
   const start = new Date();
   return script()
     .then((results) => {
       const end = new Date();
       const durationInSeconds = (end.getTime() - start.getTime()) / 1000;
 
-      const reportTitle = `Script [${name}] finished successfully at ${end.toISOString()}`;
+      const reportTitle = `✅Success at ${end.toISOString()} - ${context}`;
       const reportContent = handleResults({ ...results, durationInSeconds });
 
       logger.info({ reportContent, durationInSeconds }, reportTitle);
@@ -23,8 +25,9 @@ export const handleEndOfScriptNotification = async <T>(
       const report = [
         reportTitle,
         `Script duration : ${durationInSeconds} seconds`,
-        "\n-> Report content :",
+        "-> Report content :",
         reportContent,
+        "----------------------------------------",
       ].join("\n");
 
       return notifyDiscordPipelineReport(report).finally(() => process.exit(0));
@@ -32,7 +35,7 @@ export const handleEndOfScriptNotification = async <T>(
     .catch((error) => {
       const end = new Date();
       const durationInSeconds = (end.getTime() - start.getTime()) / 1000;
-      const reportTitle = `Script [${name}] failed with error at ${end.toISOString()}`;
+      const reportTitle = `❌Failure at ${end.toISOString()} - ${context}`;
 
       logger.error({ error, durationInSeconds }, reportTitle);
       return notifyDiscordPipelineReport(
@@ -40,6 +43,7 @@ export const handleEndOfScriptNotification = async <T>(
           reportTitle,
           `Duration : ${durationInSeconds} seconds`,
           `Error message :${error.message}`,
+          "----------------------------------------",
         ].join("\n"),
       ).finally(() => process.exit(1));
     });

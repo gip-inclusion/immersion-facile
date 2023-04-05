@@ -123,6 +123,7 @@ const triggerSuggestEditFormEstablishmentEvery6Months =
 /* eslint-disable @typescript-eslint/no-floating-promises */
 handleEndOfScriptNotification(
   "triggerSuggestEditFormEstablishmentEvery6Months",
+  config,
   triggerSuggestEditFormEstablishmentEvery6Months,
   ({ numberOfEstablishmentsToContact, errors = {} }) => {
     const nSiretFailed = Object.keys(errors).length;

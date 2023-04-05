@@ -17,9 +17,9 @@ import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
 const logger = createLogger(__filename);
 
+const config = AppConfig.createFromEnv();
 const sendEmailsWithAssessmentCreationLinkScript = async () => {
   logger.info("Starting to send Emails with assessment link");
-  const config = AppConfig.createFromEnv();
 
   const dbUrl = config.pgImmersionDbUrl;
   const pool = new Pool({
@@ -68,6 +68,7 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
 /* eslint-disable @typescript-eslint/no-floating-promises */
 handleEndOfScriptNotification(
   "sendEmailsWithAssessmentCreationLinkScript",
+  config,
   sendEmailsWithAssessmentCreationLinkScript,
   ({ numberOfImmersionEndingTomorrow, errors = {} }) => {
     const failures = keys(errors);

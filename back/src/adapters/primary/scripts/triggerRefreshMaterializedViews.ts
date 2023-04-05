@@ -5,9 +5,9 @@ import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
 const logger = createLogger(__filename);
 
+const config = AppConfig.createFromEnv();
 const triggerRefreshMaterializedViews = async () => {
   logger.info("Starting to refresh materialized views");
-  const config = AppConfig.createFromEnv();
 
   const dbUrl = config.pgImmersionDbUrl;
 
@@ -33,6 +33,7 @@ const triggerRefreshMaterializedViews = async () => {
 /* eslint-disable @typescript-eslint/no-floating-promises */
 handleEndOfScriptNotification(
   "refresh materialized views",
+  config,
   triggerRefreshMaterializedViews,
   () => "Materialized views refreshed successfully",
 );

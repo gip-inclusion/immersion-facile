@@ -28,11 +28,11 @@ const stats: PipelineStats = new PipelineStats(
   "startUpdateEstablishmentsFromSirene",
 );
 
+const config = AppConfig.createFromEnv();
+
 const main = async () => {
   logger.info(`Executing pipeline: update-establishments-from-sirene`);
   stats.startTimer("total_runtime");
-
-  const config = AppConfig.createFromEnv();
 
   const timeGateway = new RealTimeGateway();
 
@@ -87,6 +87,7 @@ const main = async () => {
 /* eslint-disable @typescript-eslint/no-floating-promises */
 handleEndOfScriptNotification(
   "update-establishments-from-sirene",
+  config,
   main,
   ({ numberOfEstablishmentsToUpdate }) =>
     `Script finished with success. Updated ${numberOfEstablishmentsToUpdate} establishments`,
