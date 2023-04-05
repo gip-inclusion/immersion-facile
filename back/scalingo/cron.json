@@ -1,11 +1,11 @@
 {
   "jobs": [
     {
-      "command": "53 0 * * * pnpm back run trigger-refresh-materialized-views",
+      "command": "01 23 * * * pnpm back run trigger-convention-reminder",
       "size": "M"
     },
     {
-      "command": "10 0 * * * pnpm back run trigger-suggest-edit-form-establishment-every-6-months",
+      "command": "27 23 * * * pnpm back run mark-establishments-as-searchable-when-max-contacts-allows",
       "size": "M"
     },
     {
@@ -13,7 +13,11 @@
       "size": "M"
     },
     {
-      "command": "27 23 * * * pnpm back run mark-establishments-as-searchable-when-max-contacts-allows",
+      "command": "10 0 * * * pnpm back run trigger-suggest-edit-form-establishment-every-6-months",
+      "size": "M"
+    },
+    {
+      "command": "53 0 * * * pnpm back run trigger-refresh-materialized-views",
       "size": "M"
     }
   ]

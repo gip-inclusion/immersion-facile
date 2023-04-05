@@ -18,6 +18,8 @@ echo "Running $0 $@ (pwd: $(pwd))"
 #  pipeline in cron format. Default: daily at 00:08
 : "${ESTABLISHMENT_SUGGEST_FORM_EDITION:=8 0 * * *}"
 
+#  pipeline in cron format. Default: daily at 23:01
+: "${CONVENTION_REMINDER:=01 23 * * *}"
 
 #  pipeline in cron format. Default: daily at 23h53
 : "${EMAIL_WITH_ASSESSMENT_CREATION_LINK:=53 23 * * *}"
@@ -53,6 +55,9 @@ $REFRESH_MATERIALIZED_VIEWS cd /app/back && pnpm trigger-refresh-materialized-vi
 
 # Pipeline: mark-establishments-as-searchable-when-max-contacts-allows
 $MARK_ESTABLISHMENTS_AS_SEARCHABLE cd /app/back && pnpm mark-establishments-as-searchable-when-max-contacts-allows >> $LOGDIR/mark-establishments-as-searchable-when-max-contatcs-allows.log 2>&1
+
+# Pipeline: convention-reminder
+$CONVENTION_REMINDER cd /app/back && pnpm trigger-convention-reminder >> $LOGDIR/trigger-convention-reminder.log 2>&1
 
 EOT
 
