@@ -55,7 +55,7 @@ export const createAppDependencies = async (config: AppConfig) => {
 
   const generateAuthenticatedUserToken =
     makeGenerateJwtES256<"authenticatedUser">(
-      config.apiJwtPrivateKey,
+      config.jwtPrivateKey,
       oneHourInSeconds,
     );
 

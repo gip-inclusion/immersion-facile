@@ -16,7 +16,7 @@ export const createInclusionConnectedAllowedRouter = (
     "/inclusion-connected",
   );
   inclusionConnectedRouter.use(
-    createInclusionConnectedMiddleware(deps.config.apiJwtPublicKey),
+    createInclusionConnectedMiddleware(deps.config.jwtPublicKey),
   );
 
   inclusionConnectedRouter.get(
@@ -31,9 +31,11 @@ export const createInclusionConnectedAllowedRouter = (
   );
 
   inclusionConnectedRouter.post(
-    inclusionConnectedAllowedTargets.registerAgencyToUser.url,
+    removeRouterPrefix(
+      inclusionConnectedAllowedTargets.registerAgencyToUser.url,
+    ),
     (req, res) =>
-      sendHttpResponse(req, res, async () =>
+      sendHttpResponse(req, res, () =>
         deps.useCases.registerAgencyToInclusionConnectUser.execute(
           req.body,
           req.payloads?.inclusion,

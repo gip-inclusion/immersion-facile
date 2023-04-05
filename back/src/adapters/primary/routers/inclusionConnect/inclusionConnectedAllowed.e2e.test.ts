@@ -1,5 +1,10 @@
-import { AgencyDtoBuilder, inclusionConnectedAllowedTargets } from "shared";
+import {
+  AgencyDtoBuilder,
+  expectToEqual,
+  inclusionConnectedAllowedTargets,
+} from "shared";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
+import { InclusionConnectedUser } from "../../../../domain/dashboard/entities/InclusionConnectedUser";
 
 describe("Router for users authenticated with Inclusion Connect", () => {
   it("throws unauthorized if no token provided", async () => {
@@ -69,28 +74,36 @@ describe("Router for users authenticated with Inclusion Connect", () => {
       expect(response.status).toBe(401);
     });
 
-    it("should work", async () => {
+    it("add an agency as registered to an Inclusion Connected user", async () => {
       const { request, inMemoryUow, generateAuthenticatedUserJwt } =
         await buildTestApp();
-      const userId = "123";
+      const userId = "123456ab";
       const agency = new AgencyDtoBuilder().build();
+      const user: InclusionConnectedUser = {
+        id: userId,
+        email: "joe@mail.com",
+        firstName: "Joe",
+        lastName: "Doe",
+        agencyRights: [],
+      };
       inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
-        {
-          id: userId,
-          email: "joe@mail.com",
-          firstName: "Joe",
-          lastName: "Doe",
-          agencyRights: [{ agency, role: "validator" }],
-        },
+        user,
       ]);
+      inMemoryUow.agencyRepository.setAgencies([agency]);
       const token = generateAuthenticatedUserJwt({ userId });
       const response = await request
         .post(inclusionConnectedAllowedTargets.registerAgencyToUser.url)
-        .set("Authorization", token);
+        .set("Authorization", token)
+        .send({ agencyId: agency.id });
+
       expect(response.body).toEqual({
-        yolo: "work in progress",
+        success: true,
       });
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(200);
+      expectToEqual(
+        await inMemoryUow.inclusionConnectedUserRepository.getById(userId),
+        { ...user, agencyRights: [{ agency, role: "toReview" }] },
+      );
     });
   });
 });
