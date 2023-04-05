@@ -2,7 +2,6 @@ import {
   conventionStatuses,
   ConventionDtoBuilder,
   ConventionMagicLinkPayload,
-  ConventionStatus,
   expectObjectsToMatch,
   ImmersionAssessmentDto,
   expectArraysToEqual,
@@ -22,8 +21,8 @@ import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGenerato
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryImmersionAssessmentRepository } from "../../../adapters/secondary/InMemoryImmersionAssessmentRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { ImmersionAssessmentEntity } from "../../../domain/convention/entities/ImmersionAssessmentEntity";
-import { CreateImmersionAssessment } from "../../../domain/convention/useCases/CreateImmersionAssessment";
+import { ImmersionAssessmentEntity } from "../entities/ImmersionAssessmentEntity";
+import { CreateImmersionAssessment } from "./CreateImmersionAssessment";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 
 const conventionId = "conventionId";
@@ -125,10 +124,10 @@ describe("CreateImmersionAssessment", () => {
     );
   });
 
-  const [passingStatuses, failingStatuses] =
-    splitCasesBetweenPassingAndFailing<ConventionStatus>(conventionStatuses, [
-      "ACCEPTED_BY_VALIDATOR",
-    ]);
+  const [passingStatuses, failingStatuses] = splitCasesBetweenPassingAndFailing(
+    conventionStatuses,
+    ["ACCEPTED_BY_VALIDATOR"],
+  );
 
   it.each(failingStatuses.map((status) => ({ status })))(
     "throws bad request if the Convention status is $status",

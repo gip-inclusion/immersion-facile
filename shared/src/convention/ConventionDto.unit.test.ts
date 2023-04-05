@@ -9,7 +9,6 @@ import {
   ConventionDto,
   ConventionInternshipKindSpecific,
   ConventionReadDto,
-  ConventionStatus,
   conventionStatuses,
   EstablishmentRepresentative,
   InternshipKind,
@@ -296,16 +295,13 @@ describe("conventionDtoSchema", () => {
     });
     describe("status that are available without signatures", () => {
       const [allowWithoutSignature, failingWithoutSignature] =
-        splitCasesBetweenPassingAndFailing<ConventionStatus>(
-          conventionStatuses,
-          [
-            "DRAFT",
-            "READY_TO_SIGN",
-            "PARTIALLY_SIGNED",
-            "REJECTED",
-            "CANCELLED",
-          ],
-        );
+        splitCasesBetweenPassingAndFailing(conventionStatuses, [
+          "DRAFT",
+          "READY_TO_SIGN",
+          "PARTIALLY_SIGNED",
+          "REJECTED",
+          "CANCELLED",
+        ]);
 
       it.each(allowWithoutSignature.map((status) => ({ status })))(
         "WITHOUT signatures, a Convention CAN be $status",

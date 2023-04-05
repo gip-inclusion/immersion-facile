@@ -299,10 +299,10 @@ export const testForAllRolesAndInitialStatusCases = ({
   updateStatusParams,
 }: TestAllCaseProps) => {
   const [allowToRejectRoles, notAllowedToRejectRoles] =
-    splitCasesBetweenPassingAndFailing<Role>(allRoles, allowedRoles);
+    splitCasesBetweenPassingAndFailing(allRoles, allowedRoles);
 
   const [authorizedInitialStatuses, forbiddenInitalStatuses] =
-    splitCasesBetweenPassingAndFailing<ConventionStatus>(
+    splitCasesBetweenPassingAndFailing(
       conventionStatuses,
       allowedInitialStatuses,
     );

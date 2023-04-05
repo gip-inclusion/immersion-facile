@@ -1,16 +1,15 @@
 import {
-  conventionStatuses,
   allRoles,
+  BeneficiaryRepresentative,
   ConventionDto,
   ConventionDtoBuilder,
   ConventionMagicLinkPayload,
   ConventionStatus,
-  expectToEqual,
-  BeneficiaryRepresentative,
-  Role,
-  Signatories,
+  conventionStatuses,
   EstablishmentRepresentative,
   expectPromiseToFailWithError,
+  expectToEqual,
+  Signatories,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
@@ -70,7 +69,7 @@ describe("Sign convention", () => {
   });
 
   const [allowedToSignRoles, forbiddenToSignRoles] =
-    splitCasesBetweenPassingAndFailing<Role>(allRoles, [
+    splitCasesBetweenPassingAndFailing(allRoles, [
       "beneficiary",
       "beneficiary-current-employer",
       "establishment-representative",
@@ -105,7 +104,7 @@ describe("Sign convention", () => {
   });
 
   const [allowedInitialStatuses, forbiddenInitialStatuses] =
-    splitCasesBetweenPassingAndFailing<ConventionStatus>(conventionStatuses, [
+    splitCasesBetweenPassingAndFailing(conventionStatuses, [
       "READY_TO_SIGN",
       "PARTIALLY_SIGNED",
     ]);

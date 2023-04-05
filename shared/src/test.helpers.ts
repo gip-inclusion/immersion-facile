@@ -55,10 +55,14 @@ export const expectArraysToEqualIgnoringOrder = <T>(
   expect(actual).toEqual(expect.arrayContaining(expected));
 };
 
-export const splitCasesBetweenPassingAndFailing = <T>(
+export const splitCasesBetweenPassingAndFailing = <
+  T extends string,
+  P extends T,
+>(
   cases: readonly T[],
-  passing: readonly T[],
-): [T[], T[]] => partition((status: T) => passing.includes(status), cases);
+  passing: readonly P[],
+): [T[], T[]] =>
+  partition((someCase: T) => passing.includes(someCase as P), cases);
 
 export const expectEmailOfType = <
   T extends EmailType,
