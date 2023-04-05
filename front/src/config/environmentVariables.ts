@@ -1,7 +1,11 @@
 import { makeGetBooleanVariable, makeThrowIfNotInArray } from "shared";
 
-const throwIfNotInArray = makeThrowIfNotInArray(import.meta.env);
-const getBoolean = makeGetBooleanVariable(import.meta.env);
+const windowEnv: Record<string, string | undefined> = (window as any)._env_;
+if (!windowEnv)
+  throw new Error("window._env_ is not defined, you need to run env.sh first");
+
+const throwIfNotInArray = makeThrowIfNotInArray(windowEnv);
+const getBoolean = makeGetBooleanVariable(windowEnv);
 
 export const ENV = {
   envType: throwIfNotInArray({
@@ -15,7 +19,7 @@ export const ENV = {
     defaultValue: "HTTP",
   }),
   prefilledForms: getBoolean("VITE_PREFILLED_FORMS"),
-  crispWebSiteId: import.meta.env.VITE_CRISP_WEBSITE_ID,
+  crispWebSiteId: windowEnv.VITE_CRISP_WEBSITE_ID,
 };
 
 Object.entries(ENV).forEach(([key, value]) =>

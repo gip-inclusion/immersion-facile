@@ -37,7 +37,7 @@ WORKDIR /app/front
 RUN pnpm postinstall
 
 RUN pnpm build
-CMD npm run serve -- --host 0.0.0.0
+CMD pnpm setup-env-vars dist/env-config.js && npm run serve -- --host 0.0.0.0
 
 # pipeline only
 FROM builder as pipelines

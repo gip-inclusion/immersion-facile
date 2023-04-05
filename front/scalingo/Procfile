@@ -1,0 +1,1 @@
+web: chmod +x dist/env.sh && dist/env.sh dist/env-config.js && bin/run
