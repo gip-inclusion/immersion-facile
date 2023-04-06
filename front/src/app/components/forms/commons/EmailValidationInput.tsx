@@ -4,7 +4,7 @@ import {
   EmailValidationReason,
   EmailValidationStatus,
   isValidEmail,
-} from "src/../../shared/src";
+} from "shared";
 import { emailValidationGateway } from "src/config/dependencies";
 
 type EmailValidationInputProps = InputProps.RegularInput & {
