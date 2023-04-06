@@ -9,6 +9,7 @@ import {
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
 import { useSiretFetcher } from "src/app/hooks/siret.hooks";
+import { EmailValidationInput } from "../../../commons/EmailValidationInput";
 
 type EstablishementTutorFieldsProperties = {
   disabled: boolean | undefined;
@@ -66,15 +67,18 @@ export const EstablishementTutorFields = ({
         disabled={disabled}
         {...getFieldError("establishmentTutor.phone")}
       />
-      <Input
+      <EmailValidationInput
         {...formContents["establishmentTutor.email"]}
         nativeInputProps={{
           ...formContents["establishmentTutor.email"],
           ...register("establishmentTutor.email"),
-          type: "email",
+        }}
+        {...getFieldError("establishmentTutor.email")}
+        onEmailValidationFeedback={(emailStatus) => {
+          // eslint-disable-next-line no-console
+          console.log({ emailStatus });
         }}
         disabled={disabled}
-        {...getFieldError("establishmentTutor.email")}
       />
       {values.establishmentTutor?.email && <ConventionEmailWarning />}
     </>

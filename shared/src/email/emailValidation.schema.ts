@@ -12,7 +12,7 @@ export const emailValidationInputSchema: z.Schema<WithEmailInput> = z.object({
 export const emailValidationResponseSchema: z.Schema<EmailValidationStatus> =
   z.object({
     isValid: z.boolean(),
-    proposal: z.string().nullable(),
-    isFree: z.boolean(),
+    proposal: z.string().nullable().optional(),
+    isFree: z.boolean().optional(),
     reason: z.enum(emailValidationReason),
   });

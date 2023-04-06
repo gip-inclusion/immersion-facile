@@ -45,7 +45,9 @@ export const createInMemoryDependencies = (): Dependencies => ({
   siretGatewayThroughBack: getSimulatedSiretGatewayThroughBack(),
   technicalGateway: new SimulatedTechnicalGateway(),
   inclusionConnectedGateway: new SimulatedInclusionConnectedGateway(),
-  emailValidationGateway: new InMemoryEmailValidationGateway(),
+  emailValidationGateway: new InMemoryEmailValidationGateway(
+    SIMULATED_LATENCY_MS,
+  ),
   ...createCommonDependencies(),
 });
 

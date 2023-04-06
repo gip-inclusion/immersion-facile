@@ -11,6 +11,7 @@ import {
   isValidEmail,
 } from "shared";
 import { EmailValidationGetaway } from "../../../domain/emailValidation/ports/EmailValidationGateway";
+import { createLogger } from "../../../utils/logger";
 
 type EmailableEmailValidationStatus = {
   accept_all: boolean;
@@ -62,6 +63,27 @@ export const emailableValidationTargets =
     },
   });
 
+const logger = createLogger(__filename);
+
+const getEmailValidityStatus = (
+  state: EmailableEmailValidationStatus["state"],
+  reason: EmailableEmailValidationStatus["reason"],
+) => {
+  const unacceptableStates: EmailableEmailValidationStatus["state"][] = [
+    "undeliverable",
+  ];
+  const unacceptableReasons: EmailableEmailValidationStatus["reason"][] = [
+    "invalid_domain",
+    "invalid_email",
+    "invalid_smtp",
+    "rejected_email",
+    "unexpected_error",
+  ];
+  return unacceptableStates.includes(state) ||
+    unacceptableReasons.includes(reason)
+    ? false
+    : true;
+};
 export class EmailableEmailValidationGateway implements EmailValidationGetaway {
   constructor(
     private readonly httpClient: HttpClient<EmailableValidationTargets>,
@@ -77,21 +99,33 @@ export class EmailableEmailValidationGateway implements EmailValidationGetaway {
         reason: "invalid_email",
       };
 
-    const { responseBody } = await this.httpClient.getEmailStatus({
-      queryParams: {
-        email,
-        api_key: this.emailableApiKey,
-      },
-    });
+    const { responseBody } = await this.httpClient
+      .getEmailStatus({
+        queryParams: {
+          email,
+          api_key: this.emailableApiKey,
+        },
+      })
+      .catch((error) => {
+        logger.error("Error while calling emailable API", { error });
+        throw error;
+      });
+
     const emailableEmailValidationStatus =
       responseBody as EmailableEmailValidationStatus;
-    return {
-      isFree: emailableEmailValidationStatus.free,
-      isValid:
-        emailableEmailValidationStatus.state === "deliverable" ||
-        emailableEmailValidationStatus.reason === "accepted_email",
+    const response: EmailValidationStatus = {
+      isValid: getEmailValidityStatus(
+        emailableEmailValidationStatus.state,
+        emailableEmailValidationStatus.reason,
+      ),
       reason: emailableEmailValidationStatus.reason,
-      proposal: emailableEmailValidationStatus.did_you_mean,
     };
+    if (emailableEmailValidationStatus.free) {
+      response.isFree = true;
+    }
+    if (emailableEmailValidationStatus.did_you_mean) {
+      response.proposal = emailableEmailValidationStatus.did_you_mean;
+    }
+    return response;
   }
 }

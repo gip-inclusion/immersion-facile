@@ -2,7 +2,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { Select } from "@codegouvfr/react-dsfr/Select";
 import { keys } from "ramda";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { SectionTitle } from "react-design-system";
 import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -11,7 +11,6 @@ import {
   ConventionReadDto,
   InternshipKind,
   isBeneficiaryStudent,
-  isValidEmail,
   levelsOfEducation,
 } from "shared";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
@@ -19,17 +18,17 @@ import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import {
-  useFormContents,
   makeFieldError,
+  useFormContents,
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
+import { EmailValidationInput } from "../../../commons/EmailValidationInput";
 import { BeneficiaryCurrentEmployerFields } from "./BeneficiaryCurrentEmployerFields";
 import { BeneficiaryEmergencyContactFields } from "./BeneficiaryEmergencyContactFields";
 import { BeneficiaryRepresentativeFields } from "./BeneficiaryRepresentativeFields";
-import { emailValidationGateway } from "src/config/dependencies";
 
 type beneficiaryFormSectionProperties = {
   isFrozen: boolean | undefined;
@@ -48,9 +47,8 @@ export const BeneficiaryFormSection = ({
   );
   const connectedUser = useAppSelector(authSelectors.connectedUser);
   const userFieldsAreFilled = isSuccessfullyPeConnected && !!connectedUser;
-  const { register, getValues, setValue, formState, setError, clearErrors } =
+  const { register, getValues, setValue, formState } =
     useFormContext<ConventionReadDto>();
-  const [_emailInputLoading, setEmailInputLoading] = useState(false);
   const values = getValues();
   const dispatch = useDispatch();
   const t = useConventionTexts(values.internshipKind);
@@ -139,42 +137,21 @@ export const BeneficiaryFormSection = ({
         }}
         {...getFieldError("signatories.beneficiary.birthdate")}
       />
-      <Input
+      <EmailValidationInput
         {...formContents["signatories.beneficiary.email"]}
         disabled={isFrozen || userFieldsAreFilled}
         nativeInputProps={{
           ...formContents["signatories.beneficiary.email"],
           ...register("signatories.beneficiary.email"),
           ...(userFieldsAreFilled ? { value: connectedUser.email } : {}),
-          type: "email",
-          onBlur: (event) => {
-            clearErrors("signatories.beneficiary.email");
-            const email = event.target.value;
-            if (email === "" || !isValidEmail(email))
-              setError("signatories.beneficiary.email", {
-                type: "invalid",
-                message: "Email invalide",
-              });
-            setEmailInputLoading(true);
-            emailValidationGateway
-              .getEmailStatus(email)
-              .then((status) => {
-                setEmailInputLoading(false);
-                if (!status.isValid) {
-                  setError("signatories.beneficiary.email", {
-                    type: "invalid_email",
-                    message: status.reason,
-                  });
-                }
-              })
-              .catch((error) => {
-                // eslint-disable-next-line no-console
-                console.error(error);
-              });
-          },
         }}
         {...getFieldError("signatories.beneficiary.email")}
+        onEmailValidationFeedback={(emailStatus) => {
+          // eslint-disable-next-line no-console
+          console.log({ emailStatus });
+        }}
       />
+
       {values.signatories.beneficiary.email && <ConventionEmailWarning />}
       <Input
         {...formContents["signatories.beneficiary.phone"]}

@@ -6,6 +6,7 @@ import { ConventionDto } from "shared";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
+import { EmailValidationInput } from "../../../commons/EmailValidationInput";
 
 type EstablishmentRepresentativeFieldsProperties = {
   disabled: boolean | undefined;
@@ -48,12 +49,15 @@ export const EstablishmentRepresentativeFields = ({
         }}
         disabled={disabled}
       />
-      <Input
+      <EmailValidationInput
         {...formContents["signatories.establishmentRepresentative.email"]}
         nativeInputProps={{
           ...formContents["signatories.establishmentRepresentative.email"],
           ...register("signatories.establishmentRepresentative.email"),
-          type: "email",
+        }}
+        onEmailValidationFeedback={(emailStatus) => {
+          // eslint-disable-next-line no-console
+          console.log({ emailStatus });
         }}
         disabled={disabled}
       />

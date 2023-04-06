@@ -9,6 +9,7 @@ import {
   makeFieldError,
   useFormContents,
 } from "src/app/hooks/formContents.hooks";
+import { EmailValidationInput } from "../../../commons/EmailValidationInput";
 
 type BeneficiaryRepresentativeFieldsProps = { disabled?: boolean };
 
@@ -67,14 +68,17 @@ export const BeneficiaryRepresentativeFields = ({
         disabled={disabled}
         {...getFieldError("signatories.beneficiaryRepresentative.lastName")}
       />
-      <Input
+      <EmailValidationInput
         {...formContents["signatories.beneficiaryRepresentative.email"]}
         nativeInputProps={{
           ...formContents["signatories.beneficiaryRepresentative.email"],
           ...register("signatories.beneficiaryRepresentative.email"),
         }}
-        disabled={disabled}
         {...getFieldError("signatories.beneficiaryRepresentative.email")}
+        onEmailValidationFeedback={(emailStatus) => {
+          // eslint-disable-next-line no-console
+          console.log({ emailStatus });
+        }}
       />
       {values.signatories.beneficiaryRepresentative?.email && (
         <ConventionEmailWarning />
