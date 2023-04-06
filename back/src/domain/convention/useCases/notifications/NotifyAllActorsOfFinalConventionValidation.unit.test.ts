@@ -345,12 +345,14 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
         phone: "0011223344",
       })
       .build();
+
     const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties = {
       id: convention.id,
       role: convention.signatories.beneficiary.role,
       email: convention.signatories.beneficiary.email,
       now: timeGw.now(),
     };
+
     expectTypeToMatchAndEqual(
       getValidatedConventionFinalConfirmationParams(
         agency,

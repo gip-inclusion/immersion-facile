@@ -51,8 +51,9 @@ export const handleEndOfScriptNotification = async <T>(
 
 const discordSizeLimit = 1950;
 const notifyDiscordPipelineReport = async (rawContent: string) => {
+  const config = AppConfig.createFromEnv();
   const discordPipelineReportsWebhookUrl: string | undefined =
-    AppConfig.createFromEnv()?.discordPipelineReportsWebhookUrl;
+    config.discordPipelineReportsWebhookUrl;
 
   if (!discordPipelineReportsWebhookUrl) return;
 
@@ -63,7 +64,7 @@ const notifyDiscordPipelineReport = async (rawContent: string) => {
   await axios.post(
     discordPipelineReportsWebhookUrl,
     {
-      username: "Immersion Facile Bot",
+      username: `${config.envType} - ${config.immersionFacileBaseUrl}`,
       content,
     },
     {
