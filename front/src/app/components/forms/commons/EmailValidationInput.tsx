@@ -19,22 +19,26 @@ type StateRelated = {
 const defaultErrorMessage =
   "L'adresse email ne semble pas valide. Si vous êtes sûr de ne pas avoir fait d'erreur, vous pouvez tout de même faire une demande de convention.";
 
-const feedbackMessages: Record<EmailValidationReason, string> = {
-  invalid_domain: defaultErrorMessage,
-  invalid_email: defaultErrorMessage,
+const feedbackMessages = (
+  proposal: string | null | undefined,
+): Record<EmailValidationReason, string> => ({
   accepted_email: "L'adresse email a l'air valide",
   disposable_email: "L'adresse email semble être une adresse jetable",
-  rejected_email: defaultErrorMessage,
-  invalid_smtp: defaultErrorMessage,
   low_deliverability: "L'adresse email a l'air valide",
   low_quality: "L'adresse email a l'air valide",
   unexpected_error: defaultErrorMessage,
-};
+  invalid_domain: defaultErrorMessage,
+  invalid_email: defaultErrorMessage,
+  rejected_email: proposal
+    ? `Cette adresse email ne semble pas valide, avez-vous voulu taper : ${proposal} ?`
+    : defaultErrorMessage,
+  invalid_smtp: defaultErrorMessage,
+});
 
 export const EmailValidationInput = (props: EmailValidationInputProps) => {
   const [stateRelated, setStateRelated] = useState<StateRelated>({
-    state: "default",
-    stateRelatedMessage: "",
+    state: props.state,
+    stateRelatedMessage: props.stateRelatedMessage,
   });
   const onInputBlur = (event: React.FocusEvent<HTMLInputElement, Element>) => {
     const email = event.target.value;
@@ -68,14 +72,17 @@ export const EmailValidationInput = (props: EmailValidationInputProps) => {
   };
   const getStateRelatedFromStatus = (
     status: EmailValidationStatus,
-  ): StateRelated => ({
-    state: status.isValid ? "success" : "error",
-    stateRelatedMessage:
-      feedbackMessages[status.reason] +
-      (status.proposal
-        ? `, est-ce que vous avez voulu taper : ${status.proposal} ?`
-        : ""),
-  });
+  ): StateRelated => {
+    if (props.state === "error")
+      return {
+        state: props.state,
+        stateRelatedMessage: props.stateRelatedMessage || "",
+      };
+    return {
+      state: status.isValid ? "success" : "error",
+      stateRelatedMessage: feedbackMessages(status.proposal)[status.reason],
+    };
+  };
   return (
     <Input
       {...props}
