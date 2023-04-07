@@ -137,8 +137,8 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
   },
   conventionAlreadySigned:
     internshipKind === "immersion"
-      ? "Vous avez déjà signé cette convention."
-      : "Vous avez déjà signé cette demande de stage.",
+      ? "Vous avez signé cette convention."
+      : "Vous avez signé cette demande de stage.",
   conventionReadyToBeSigned:
     internshipKind === "immersion"
       ? "Cette demande d'immersion est prête à être signée."

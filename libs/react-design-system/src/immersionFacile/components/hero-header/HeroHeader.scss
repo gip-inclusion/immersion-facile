@@ -93,7 +93,9 @@ $typesTints: (
   &__patterns {
     display: none;
     @include for-screen-min($bp-lg) {
-      display: block;
+      [data-fr-theme="light"] & {
+        display: block;
+      }
     }
   }
   &__pattern {
