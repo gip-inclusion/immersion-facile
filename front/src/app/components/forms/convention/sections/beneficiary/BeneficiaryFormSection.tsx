@@ -146,10 +146,6 @@ export const BeneficiaryFormSection = ({
           ...(userFieldsAreFilled ? { value: connectedUser.email } : {}),
         }}
         {...getFieldError("signatories.beneficiary.email")}
-        onEmailValidationFeedback={(emailStatus) => {
-          // eslint-disable-next-line no-console
-          console.log({ emailStatus });
-        }}
       />
 
       {values.signatories.beneficiary.email && <ConventionEmailWarning />}

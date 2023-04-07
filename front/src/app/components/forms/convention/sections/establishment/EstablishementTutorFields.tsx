@@ -74,10 +74,6 @@ export const EstablishementTutorFields = ({
           ...register("establishmentTutor.email"),
         }}
         {...getFieldError("establishmentTutor.email")}
-        onEmailValidationFeedback={(emailStatus) => {
-          // eslint-disable-next-line no-console
-          console.log({ emailStatus });
-        }}
         disabled={disabled}
       />
       {values.establishmentTutor?.email && <ConventionEmailWarning />}

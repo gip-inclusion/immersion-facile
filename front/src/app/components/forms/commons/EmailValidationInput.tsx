@@ -8,7 +8,7 @@ import {
 import { emailValidationGateway } from "src/config/dependencies";
 
 type EmailValidationInputProps = InputProps.RegularInput & {
-  onEmailValidationFeedback: (status: EmailValidationStatus) => void;
+  onEmailValidationFeedback?: (status: EmailValidationStatus) => void;
 };
 
 type StateRelated = {
@@ -43,7 +43,7 @@ export const EmailValidationInput = (props: EmailValidationInputProps) => {
   const onInputBlur = (event: React.FocusEvent<HTMLInputElement, Element>) => {
     const email = event.target.value;
     if (email === "" || !isValidEmail(email))
-      props.onEmailValidationFeedback({
+      props.onEmailValidationFeedback?.({
         isValid: false,
         reason: "invalid_domain",
         isFree: false,
@@ -54,7 +54,7 @@ export const EmailValidationInput = (props: EmailValidationInputProps) => {
       .getEmailStatus(email)
       .then((status) => {
         props.nativeInputProps?.onBlur?.(event);
-        props.onEmailValidationFeedback(status);
+        props.onEmailValidationFeedback?.(status);
         setStateRelated(getStateRelatedFromStatus(status));
       })
       .catch((error) => {

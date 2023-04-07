@@ -75,10 +75,6 @@ export const BeneficiaryRepresentativeFields = ({
           ...register("signatories.beneficiaryRepresentative.email"),
         }}
         {...getFieldError("signatories.beneficiaryRepresentative.email")}
-        onEmailValidationFeedback={(emailStatus) => {
-          // eslint-disable-next-line no-console
-          console.log({ emailStatus });
-        }}
       />
       {values.signatories.beneficiaryRepresentative?.email && (
         <ConventionEmailWarning />

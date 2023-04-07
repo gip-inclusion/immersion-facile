@@ -55,10 +55,6 @@ export const EstablishmentRepresentativeFields = ({
           ...formContents["signatories.establishmentRepresentative.email"],
           ...register("signatories.establishmentRepresentative.email"),
         }}
-        onEmailValidationFeedback={(emailStatus) => {
-          // eslint-disable-next-line no-console
-          console.log({ emailStatus });
-        }}
         disabled={disabled}
       />
       {values.signatories.establishmentRepresentative?.email && (
