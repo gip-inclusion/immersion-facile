@@ -111,9 +111,9 @@ export class TestAgencyGateway implements AgencyGateway {
   async getAgencyPublicInfoById(
     withAgencyId: WithAgencyId,
   ): Promise<AgencyPublicDisplayDto> {
-    const agency = this._agencies[withAgencyId.id];
+    const agency = this._agencies[withAgencyId.agencyId];
     if (agency) return toAgencyPublicDisplayDto(agency);
-    throw new Error(`Missing agency with id ${withAgencyId.id}.`);
+    throw new Error(`Missing agency with id ${withAgencyId.agencyId}.`);
   }
 
   getAgencyPublicInfoById$(

@@ -31,7 +31,7 @@ import {
 export const agencyIdSchema: z.ZodSchema<AgencyId> = zTrimmedString;
 
 export const withAgencyIdSchema: z.Schema<WithAgencyId> = z.object({
-  id: agencyIdSchema,
+  agencyId: agencyIdSchema,
 });
 
 export const agencyIdResponseSchema: z.ZodSchema<AgencyIdResponse> =

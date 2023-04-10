@@ -16,7 +16,7 @@ const agencyInfoGetByIdEpic: AppEpic<AgencyInfoAction> = (
   action$.pipe(
     filter(agencyInfoSlice.actions.fetchAgencyInfoRequested.match),
     switchMap((action) =>
-      agencyGateway.getAgencyPublicInfoById$({ id: action.payload }),
+      agencyGateway.getAgencyPublicInfoById$({ agencyId: action.payload }),
     ),
     map((agencyInfo) =>
       agencyInfoSlice.actions.fetchAgencyInfoSucceeded(agencyInfo),

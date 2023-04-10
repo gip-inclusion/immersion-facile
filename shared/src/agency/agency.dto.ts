@@ -30,7 +30,7 @@ export type PartialAgencyDto = Partial<AgencyDto> & { id: AgencyId };
 export type AgencyId = Flavor<string, "AgencyId">;
 export type AgencyIdResponse = AgencyId | undefined;
 export type WithAgencyId = {
-  id: AgencyId;
+  agencyId: AgencyId;
 };
 
 export const agencyKindList = [

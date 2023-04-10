@@ -19,11 +19,11 @@ export class GetAgencyPublicInfoById extends TransactionalUseCase<
   inputSchema = withAgencyIdSchema;
 
   public async _execute(
-    { id }: WithAgencyId,
+    { agencyId }: WithAgencyId,
     uow: UnitOfWork,
   ): Promise<AgencyPublicDisplayDto> {
-    const agencyEntity = await uow.agencyRepository.getById(id);
-    if (!agencyEntity) throw new NotFoundError(id);
+    const agencyEntity = await uow.agencyRepository.getById(agencyId);
+    if (!agencyEntity) throw new NotFoundError(agencyId);
     return toAgencyPublicDisplayDto(agencyEntity);
   }
 }

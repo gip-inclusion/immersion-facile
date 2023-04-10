@@ -34,7 +34,7 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
   agenciesRouter.route(`/${agencyPublicInfoByIdRoute}`).get(async (req, res) =>
     sendHttpResponse(req, res, async () =>
       deps.useCases.getAgencyPublicInfoById.execute({
-        id: req.query.id as string,
+        agencyId: req.query.id as string,
       }),
     ),
   );

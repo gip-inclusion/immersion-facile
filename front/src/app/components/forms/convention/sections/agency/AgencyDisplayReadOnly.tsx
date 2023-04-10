@@ -33,7 +33,7 @@ export const AgencyDisplayReadOnly = ({ agencyId }: AgencyDisplayProps) => {
   useEffect(() => {
     if (!agencyId) return;
     agencyGateway
-      .getAgencyPublicInfoById({ id: agencyId })
+      .getAgencyPublicInfoById({ agencyId })
       .then((agency) => {
         setAgencies([{ ...agency }]);
         if (agencyId && agencies.map((agency) => agency.id).includes(agencyId))
