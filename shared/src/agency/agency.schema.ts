@@ -7,6 +7,7 @@ import {
   localization,
   zEmail,
   zEnumValidation,
+  zSchemaForType,
   zString,
   zStringPossiblyEmpty,
   zTrimmedString,
@@ -30,9 +31,11 @@ import {
 
 export const agencyIdSchema: z.ZodSchema<AgencyId> = zTrimmedString;
 
-export const withAgencyIdSchema: z.Schema<WithAgencyId> = z.object({
-  agencyId: agencyIdSchema,
-});
+export const withAgencyIdSchema = zSchemaForType<WithAgencyId>()(
+  z.object({
+    agencyId: agencyIdSchema,
+  }),
+);
 
 export const agencyIdResponseSchema: z.ZodSchema<AgencyIdResponse> =
   agencyIdSchema.optional();

@@ -2,11 +2,12 @@ import type {
   HandlerCreator,
   HandlerParams,
   HttpResponse,
+  UnknownTarget,
 } from "../configureHttpClient";
 
 type Call = {
   targetName: string;
-  callParams: HandlerParams;
+  callParams: Partial<HandlerParams<UnknownTarget>>;
 };
 
 export const createInMemoryHandlerCreator = () => {
@@ -19,15 +20,13 @@ export const createInMemoryHandlerCreator = () => {
     response = newResponse;
   };
 
-  const handlerCreator: HandlerCreator =
-    (target) =>
-    (params = {}) => {
-      calls.push({
-        callParams: params,
-        targetName: `${target.method} ${target.url}`,
-      });
-      return Promise.resolve(response);
-    };
+  const handlerCreator: HandlerCreator = (target) => (params) => {
+    calls.push({
+      callParams: params,
+      targetName: `${target.method} ${target.url}`,
+    });
+    return Promise.resolve(response as any);
+  };
 
   return {
     calls,

@@ -133,3 +133,9 @@ export const zEnumValidation = <T extends string>(
   z.custom((val: unknown): val is T => values.includes(val as T), {
     message: errorMessage,
   });
+
+// Following is from https://github.com/colinhacks/zod/issues/372#issuecomment-826380330
+export const zSchemaForType =
+  <T>() =>
+  <S extends z.ZodType<T, any, any>>(arg: S) =>
+    arg;

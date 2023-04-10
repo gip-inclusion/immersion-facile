@@ -1,26 +1,68 @@
 import axios from "axios";
 import { createAxiosHandlerCreator } from "./adapters/createAxiosHandlerCreator";
 import {
-  CreateTargets,
   configureHttpClient,
-  Target,
+  createTarget,
+  createTargets,
 } from "./configureHttpClient";
 
-type AddressApiTargets = CreateTargets<{
-  // prettier-ignore
-  forwardGeocoding: Target<void, { q: string; limit: number }>;
-}>;
+type QueryParams = { q: string; limit: number };
+
+const validateQueryParams = (queryParams: any) => {
+  if (
+    typeof queryParams?.q === "string" &&
+    typeof queryParams?.limit === "number"
+  )
+    return queryParams as QueryParams;
+  throw new Error("Missing query params");
+};
+
+type Feature = {
+  type: "Feature";
+  geometry: any;
+  id?: string | number | undefined;
+  properties: any;
+};
+
+type FeatureCollection = {
+  type: "FeatureCollection";
+  features: Feature[];
+};
+
+const isFeatureCollection = (data: unknown): FeatureCollection => {
+  if (
+    data !== null &&
+    typeof data === "object" &&
+    "type" in data &&
+    "features" in data &&
+    data.features instanceof Array &&
+    data.features.every(
+      (feature) =>
+        feature !== null &&
+        typeof feature === "object" &&
+        "type" in feature &&
+        "geometry" in feature &&
+        "properties" in feature,
+    )
+  )
+    return data as FeatureCollection;
+
+  throw new Error("Wrong");
+};
+
+const targets = createTargets({
+  forwardGeocoding: createTarget({
+    url: "https://api-adresse.data.gouv.fr/search/",
+    method: "GET",
+    validateQueryParams,
+    validateResponseBody: isFeatureCollection,
+  }),
+});
 
 describe("Manual - Call an actual api endpoint", () => {
   const axiosHandlerCreator = createAxiosHandlerCreator(axios);
   const createHttpClient = configureHttpClient(axiosHandlerCreator);
-
-  const httpClient = createHttpClient<AddressApiTargets>({
-    forwardGeocoding: {
-      url: "https://api-adresse.data.gouv.fr/search/",
-      method: "GET",
-    },
-  });
+  const httpClient = createHttpClient(targets);
 
   it("calls correctly the endpoint", async () => {
     const response = await httpClient.forwardGeocoding({
@@ -33,17 +75,6 @@ describe("Manual - Call an actual api endpoint", () => {
 });
 
 // Faking GeoJson standard which could be found here: https://geojson.org/
-type Feature = {
-  type: "Feature";
-  geometry: any;
-  id?: string | number | undefined;
-  properties: any;
-};
-
-type FeatureCollection = {
-  type: "FeatureCollection";
-  features: Feature[];
-};
 
 const expectedData: FeatureCollection = {
   features: [
@@ -73,27 +104,3 @@ const expectedData: FeatureCollection = {
   ],
   type: "FeatureCollection",
 };
-
-// const isFeatureCollection = (data: unknown): FeatureCollection => {
-//   if (
-//     data != null &&
-//     typeof data === "object" &&
-//     "city" in data &&
-//     "citycode" in data &&
-//     "context" in data &&
-//     "housenumber" in data &&
-//     "id" in data &&
-//     "importance" in data &&
-//     "label" in data &&
-//     "name" in data &&
-//     "postcode" in data &&
-//     "score" in data &&
-//     "street" in data &&
-//     "type" in data &&
-//     "x" in data &&
-//     "y" in data
-//   ) {
-//     return data as FeatureCollection;
-//   }
-//   throw new Error("Wrong");
-// };

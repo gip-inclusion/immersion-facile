@@ -1,67 +1,100 @@
 import { createInMemoryHandlerCreator } from "./adapters/createInMemoryHandlerCreator";
-import type { CreateTargets, HttpClient, Target } from "./configureHttpClient";
-import { configureHttpClient } from "./configureHttpClient";
+import type { HttpClient } from "./configureHttpClient";
+import {
+  configureHttpClient,
+  createTarget,
+  createTargets,
+} from "./configureHttpClient";
 
-type Book = {
-  name: string;
+type Book = { name: string };
+type Car = { horsePower: number };
+
+const isBook = (obj: unknown): Book => {
+  if (
+    typeof obj === "object" &&
+    obj !== null &&
+    "name" in obj &&
+    typeof obj.name === "string"
+  )
+    return { name: obj.name };
+
+  throw new Error("Not a Book");
+};
+const isBookArray = (obj: unknown): Book[] => {
+  if (obj instanceof Array) return obj.map(isBook);
+  throw new Error("Not a Book Array");
+};
+const isCar = (obj: unknown): Car => {
+  if (
+    typeof obj === "object" &&
+    obj !== null &&
+    "horsePower" in obj &&
+    typeof obj.horsePower === "number"
+  )
+    return { horsePower: obj.horsePower };
+
+  throw new Error("Not a Car");
+};
+const hasAuthorizationHeader = (
+  headers: unknown,
+): { authorization: string } => {
+  if (
+    typeof headers === "object" &&
+    headers !== null &&
+    "authorization" in headers &&
+    typeof headers.authorization === "string"
+  )
+    return { authorization: headers.authorization };
+  throw new Error("No valid authorization header");
+};
+const hasMax = (queryParams: unknown): { max?: number } => {
+  if (
+    typeof queryParams === "object" &&
+    queryParams !== null &&
+    "max" in queryParams &&
+    typeof queryParams.max === "number"
+  )
+    return { max: queryParams.max };
+  return {};
 };
 
-type Car = {
-  horsePower: number;
-};
-
-type MyBookEndpoints = CreateTargets<{
-  addBook: Target<Book, void, { authorization: string }>;
-  getBooks: Target<void, { max?: number }>;
-  getBook: Target<void, void, void, "https://www.truc.com/book/:bookId">;
-  getCar: Target<void, void, void, "/car/:carId">;
-  getSomethingWithNoParams: Target;
-}>;
-
-// const isBook = (book: any): Book | never => {
-//   if (typeof book?.name !== "string") {
-//     throw new Error("Is not a book");
-//   }
-//   return book;
-// };
-//
-// const isCar = (car: any): Car | never => {
-//   if (typeof car?.horsePower !== "number") {
-//     throw new Error("Is not a car");
-//   }
-//   return car;
-// };
+const targets = createTargets({
+  addBook: createTarget({
+    method: "POST",
+    url: "https://www.truc.com",
+    validateRequestBody: isBook,
+    validateHeaders: hasAuthorizationHeader,
+  }),
+  getBooks: createTarget({
+    method: "GET",
+    url: "https://www.truc.com",
+    validateQueryParams: hasMax,
+    validateResponseBody: isBookArray,
+  }),
+  getBook: createTarget({
+    method: "GET",
+    url: "https://www.truc.com/book/:bookId",
+    validateResponseBody: isBook,
+  }),
+  getCar: createTarget({
+    method: "GET",
+    url: "/car/:carId",
+    validateResponseBody: isCar,
+  }),
+  getSomethingWithNoParams: createTarget({
+    method: "GET",
+    url: "/i-have-no-params",
+  }),
+});
 
 describe("http-client", () => {
-  let httpClient: HttpClient<MyBookEndpoints>;
+  let httpClient: HttpClient<typeof targets>;
   let inMemory: ReturnType<typeof createInMemoryHandlerCreator>;
 
   beforeEach(() => {
     inMemory = createInMemoryHandlerCreator();
     const createHttpClient = configureHttpClient(inMemory.handlerCreator);
-
-    httpClient = createHttpClient<MyBookEndpoints>({
-      addBook: {
-        method: "POST",
-        url: "https://www.truc.com",
-      },
-      getBooks: {
-        method: "GET",
-        url: "https://www.truc.com",
-      },
-      getBook: {
-        method: "GET",
-        url: "https://www.truc.com/book/:bookId",
-      },
-      getCar: {
-        method: "GET",
-        url: "/car/:carId",
-      },
-      getSomethingWithNoParams: {
-        method: "GET",
-        url: "/yolo",
-      },
-    });
+    httpClient = createHttpClient(targets);
   });
 
   it("calls the api targets with a typed interface", async () => {
@@ -138,7 +171,7 @@ describe("http-client", () => {
   });
 
   it("gets something without params", async () => {
-    const givenResponse = { responseBody: "worked", status: 200 };
+    const givenResponse = { responseBody: undefined, status: 200 };
     inMemory.setResponse(givenResponse);
     const response = await httpClient.getSomethingWithNoParams();
     expectToEqual(response, givenResponse);
