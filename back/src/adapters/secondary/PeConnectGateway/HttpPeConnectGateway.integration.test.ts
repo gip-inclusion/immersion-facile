@@ -9,7 +9,6 @@ import {
   testManagedRedirectError,
   testRawRedirectError,
 } from "shared";
-import { AppConfig } from "../../primary/config/appConfig";
 import { HttpPeConnectGateway } from "./HttpPeConnectGateway";
 import {
   makePeConnectExternalTargets,
@@ -23,13 +22,21 @@ import {
 } from "./peConnectApi.dto";
 
 describe("HttpPeConnectGateway", () => {
-  const appConfig = {} as AppConfig;
-  const targets = makePeConnectExternalTargets(appConfig);
+  const targets = makePeConnectExternalTargets({
+    peApiUrl: "https://fake-pe.fr",
+    peAuthCandidatUrl: "https://fake-pe.fr/auth/candidat",
+  });
+
   const httpClient = configureHttpClient(createAxiosHandlerCreator(axios))(
     targets,
   );
 
-  const peConnectGateway = new HttpPeConnectGateway(httpClient, appConfig);
+  const peConnectGateway = new HttpPeConnectGateway(httpClient, {
+    immersionFacileBaseUrl: "https://fake-immersion.fr",
+    poleEmploiClientId: "pe-client-id",
+    poleEmploiClientSecret: "pe-client-secret",
+  });
+
   const mock = new MockAdapter(axios);
   const peExternalUser: ExternalPeConnectUser = {
     email: "maurice.chevalier@gmail.com",
@@ -64,7 +71,7 @@ describe("HttpPeConnectGateway", () => {
 
   const accessToken = {
     expiresIn: 50,
-    value: "",
+    value: "my-access-token",
   };
 
   describe("getAccessToken", () => {

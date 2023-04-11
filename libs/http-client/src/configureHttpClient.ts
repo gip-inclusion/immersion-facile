@@ -96,7 +96,7 @@ export const createTarget = <
   validateRequestBody: createThrowIfNotVoid("requestBody"),
   validateQueryParams: createThrowIfNotVoid("queryParams"),
   validateHeaders: (headers) => headers as Headers,
-  validateResponseBody: (responseBody) => responseBody as ResponseBody,
+  validateResponseBody: createThrowIfNotVoid("responseBody"),
   ...target,
 });
 
@@ -116,11 +116,11 @@ export const configureHttpClient =
         const target = targets[targetName];
 
         const handler: Handler<any> = async (handlerParams) => {
-          const configuredHandler = handlerCreator({
+          const handlerWithParams = handlerCreator({
             ...target,
             url: replaceParamsInUrl(target.url, handlerParams?.urlParams),
           });
-          return configuredHandler(handlerParams as any);
+          return handlerWithParams(handlerParams as any);
         };
 
         return {

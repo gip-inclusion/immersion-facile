@@ -33,18 +33,3 @@ export const makeInclusionConnectExternalTargets = (
       validateQueryParams: inclusionConnectLogoutQueryParamsSchema.parse,
     }),
   });
-
-// export const makeInclusionConnectHttpClient = (
-//   axiosInstance: AxiosInstance,
-//   inclusionConnectBaseUrl: AbsoluteUrl,
-// ) => {
-//   const inclusionConnectApiTargets = createInclusionConnectApiTargets(
-//     inclusionConnectBaseUrl,
-//   );
-//
-//   const createHttpClient = configureHttpClient(
-//     createAxiosHandlerCreator(axiosInstance),
-//   );
-//
-//   return createHttpClient(inclusionConnectApiTargets);
-// };
