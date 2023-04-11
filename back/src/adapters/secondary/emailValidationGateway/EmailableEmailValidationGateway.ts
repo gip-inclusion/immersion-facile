@@ -103,16 +103,16 @@ export class EmailableEmailValidationGateway implements EmailValidationGetaway {
 
     const emailableEmailValidationStatus =
       responseBody as EmailableEmailValidationStatus;
-    const response: ValidateEmailStatus = {
+
+    return {
       isValid: this.isEmailValid(
         emailableEmailValidationStatus.state,
         emailableEmailValidationStatus.reason,
       ),
       reason: emailableEmailValidationStatus.reason,
+      ...(emailableEmailValidationStatus.did_you_mean && {
+        proposal: emailableEmailValidationStatus.did_you_mean,
+      }),
     };
-    if (emailableEmailValidationStatus.did_you_mean) {
-      response.proposal = emailableEmailValidationStatus.did_you_mean;
-    }
-    return response;
   }
 }
