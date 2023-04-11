@@ -1,16 +1,16 @@
 import { Router } from "express";
-import { emailValidationTargets } from "shared";
+import { validateEmailsTargets } from "shared";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 
-export const createEmailValidationRouter = (deps: AppDependencies) => {
+export const createValidateEmailRouter = (deps: AppDependencies) => {
   const emailValidationRouter = Router();
 
   emailValidationRouter
-    .route(emailValidationTargets.getEmailStatus.url)
+    .route(validateEmailsTargets.validateEmail.url)
     .get(async (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.emailValidation.execute(req.query as any),
+        deps.useCases.validateEmail.execute(req.query as any),
       ),
     );
   return emailValidationRouter;

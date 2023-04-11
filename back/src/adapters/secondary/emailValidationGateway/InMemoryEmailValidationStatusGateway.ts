@@ -1,16 +1,11 @@
-import {
-  defaultErrorStatus,
-  EmailValidationStatus,
-  isValidEmail,
-} from "shared";
+import { ValidateEmailStatus } from "shared";
 import { EmailValidationGetaway } from "../../../domain/emailValidation/ports/EmailValidationGateway";
 
 export class InMemoryEmailValidationGateway implements EmailValidationGetaway {
-  private emailValidationStatus: EmailValidationStatus | undefined;
+  private emailValidationStatus: ValidateEmailStatus | undefined;
 
-  public async getEmailStatus(email: string): Promise<EmailValidationStatus> {
+  public async validateEmail(email: string): Promise<ValidateEmailStatus> {
     if (this.emailValidationStatus) return this.emailValidationStatus;
-    if (email === "" || !isValidEmail(email)) return defaultErrorStatus;
     if (email === "email-with-typo@gamil.com")
       return {
         isValid: false,
@@ -20,13 +15,12 @@ export class InMemoryEmailValidationGateway implements EmailValidationGetaway {
     return {
       isValid: true,
       reason: "accepted_email",
-      isFree: true,
     };
   }
 
   // for test purposes only
   public setEmailValidationStatusResponse(
-    emailValidationStatus: EmailValidationStatus,
+    emailValidationStatus: ValidateEmailStatus,
   ) {
     this.emailValidationStatus = emailValidationStatus;
   }

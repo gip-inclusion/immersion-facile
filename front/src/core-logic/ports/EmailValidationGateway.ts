@@ -1,7 +1,7 @@
 import { Observable } from "rxjs";
-import { EmailValidationStatus } from "shared";
+import { Email, ValidateEmailStatus } from "shared";
 
 export interface EmailValidationGateway {
-  getEmailStatus(email: string): Promise<EmailValidationStatus>;
-  getEmailStatus$(email: string): Observable<EmailValidationStatus>;
+  getEmailStatus(email: Email): Promise<ValidateEmailStatus>;
+  getEmailStatus$(email: Email): Observable<ValidateEmailStatus>;
 }

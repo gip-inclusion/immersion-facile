@@ -1,5 +1,5 @@
-import { EmailValidationStatus } from "shared";
+import { ValidateEmailStatus } from "shared";
 
 export interface EmailValidationGetaway {
-  getEmailStatus(email: string): Promise<EmailValidationStatus>;
+  validateEmail(email: string): Promise<ValidateEmailStatus>;
 }

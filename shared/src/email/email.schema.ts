@@ -1,5 +1,7 @@
 import { z } from "zod";
+import { zEmail } from "../zodUtils";
 import type { EmailType, TemplatedEmail } from "./email";
+import { Email } from "./email.dto";
 
 const emailTypeSchema = z.string() as z.Schema<EmailType>;
 
@@ -17,3 +19,5 @@ const emailSentSchema = z.object({
 });
 
 export const emailsSentSchema = z.array(emailSentSchema);
+
+export const emailSchema: z.Schema<Email> = zEmail;

@@ -1,4 +1,4 @@
-import { EmailValidationStatus } from "shared";
+import { ValidateEmailStatus } from "shared";
 import { EmailValidationGetaway } from "../../../domain/emailValidation/ports/EmailValidationGateway";
 import { AppConfig } from "../../primary/config/appConfig";
 import { createExternalHttpClient } from "../../primary/config/createGateways";
@@ -8,11 +8,12 @@ import {
   EmailableValidationTargets,
 } from "./EmailableEmailValidationGateway";
 
-const apiKeyEmailable = AppConfig.createFromEnv().emailableApiKey;
 describe("Emailable email validation gateway", () => {
   let emailableEmailValidationGateway: EmailValidationGetaway;
 
   beforeEach(() => {
+    const apiKeyEmailable = AppConfig.createFromEnv().emailableApiKey;
+
     emailableEmailValidationGateway = new EmailableEmailValidationGateway(
       createExternalHttpClient<EmailableValidationTargets>(
         emailableValidationTargets,
@@ -24,21 +25,19 @@ describe("Emailable email validation gateway", () => {
   describe("Emailable getEmailStatus", () => {
     const candidates: {
       candidateEmail: string;
-      expectedStatus: EmailValidationStatus;
+      expectedStatus: ValidateEmailStatus;
     }[] = [
       {
         candidateEmail: "enguerran.weiss@beta.gouv.fr",
         expectedStatus: {
           isValid: true,
           proposal: null,
-          isFree: false,
           reason: "accepted_email",
         },
       },
       {
         candidateEmail: "",
         expectedStatus: {
-          isFree: false,
           isValid: false,
           proposal: null,
           reason: "invalid_email",
@@ -47,7 +46,6 @@ describe("Emailable email validation gateway", () => {
       {
         candidateEmail: "ezflmafmkazflmkazf",
         expectedStatus: {
-          isFree: false,
           isValid: false,
           proposal: null,
           reason: "invalid_email",
@@ -58,7 +56,6 @@ describe("Emailable email validation gateway", () => {
         expectedStatus: {
           isValid: true,
           proposal: null,
-          isFree: false,
           reason: "accepted_email",
         },
       },
@@ -67,7 +64,6 @@ describe("Emailable email validation gateway", () => {
         expectedStatus: {
           isValid: false,
           proposal: null,
-          isFree: false,
           reason: "rejected_email",
         },
       },
@@ -76,7 +72,6 @@ describe("Emailable email validation gateway", () => {
         expectedStatus: {
           isValid: false,
           proposal: "this-email-doesnt-exist@gmail.com",
-          isFree: false,
           reason: "rejected_email",
         },
       },
@@ -88,10 +83,11 @@ describe("Emailable email validation gateway", () => {
         expectedStatus,
       }: {
         candidateEmail: string;
-        expectedStatus: EmailValidationStatus;
+        expectedStatus: ValidateEmailStatus;
       }) => {
-        const emailStatus =
-          await emailableEmailValidationGateway.getEmailStatus(candidateEmail);
+        const emailStatus = await emailableEmailValidationGateway.validateEmail(
+          candidateEmail,
+        );
         expect(emailStatus).toEqual(expectedStatus);
       },
       10000,

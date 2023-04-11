@@ -1,26 +1,18 @@
 import { from, Observable } from "rxjs";
-import {
-  EmailValidationQueryInput,
-  EmailValidationStatus,
-  sleep,
-} from "shared";
+import { type ValidateEmailStatus, sleep, type Email } from "shared";
 import { EmailValidationGateway } from "src/core-logic/ports/EmailValidationGateway";
 
 export class InMemoryEmailValidationGateway implements EmailValidationGateway {
   constructor(private simulatedLatencyMs: number | undefined = undefined) {}
 
-  public async getEmailStatus(
-    email: EmailValidationQueryInput,
-  ): Promise<EmailValidationStatus> {
+  public async getEmailStatus(email: Email): Promise<ValidateEmailStatus> {
     if (this.simulatedLatencyMs) await sleep(this.simulatedLatencyMs);
-    const emailWithErrorStatus: EmailValidationStatus = {
-      isFree: false,
+    const emailWithErrorStatus: ValidateEmailStatus = {
       isValid: false,
       proposal: "",
       reason: "invalid_email",
     };
-    const emailWithTypoStatus: EmailValidationStatus = {
-      isFree: false,
+    const emailWithTypoStatus: ValidateEmailStatus = {
       isValid: false,
       proposal: "email-with-typo@gmail.com",
       reason: "invalid_email",
@@ -28,15 +20,12 @@ export class InMemoryEmailValidationGateway implements EmailValidationGateway {
     if (email === "email-with-error@example.com") return emailWithErrorStatus;
     if (email === "email-with-typo@gamil.com") return emailWithTypoStatus;
     return {
-      isFree: true,
       isValid: true,
       reason: "accepted_email",
       proposal: null,
     };
   }
-  public getEmailStatus$(
-    query: EmailValidationQueryInput,
-  ): Observable<EmailValidationStatus> {
+  public getEmailStatus$(query: Email): Observable<ValidateEmailStatus> {
     return from(this.getEmailStatus(query));
   }
 }

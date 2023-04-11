@@ -1,21 +1,23 @@
 import {
-  emailValidationInputSchema,
-  WithEmailInput,
-  type EmailValidationStatus,
+  validateEmailInputSchema,
+  ValidateEmailInput,
+  type ValidateEmailStatus,
 } from "shared";
 import { UseCase } from "../../core/UseCase";
 import { EmailValidationGetaway } from "../ports/EmailValidationGateway";
 
-export class GetEmailValidationStatus extends UseCase<
-  WithEmailInput,
-  EmailValidationStatus
+export class ValidateEmail extends UseCase<
+  ValidateEmailInput,
+  ValidateEmailStatus
 > {
   constructor(private emailValidationGateway: EmailValidationGetaway) {
     super();
   }
-  protected inputSchema = emailValidationInputSchema;
+  protected inputSchema = validateEmailInputSchema;
 
-  protected _execute(params: WithEmailInput): Promise<EmailValidationStatus> {
-    return this.emailValidationGateway.getEmailStatus(params.email);
+  protected _execute({
+    email,
+  }: ValidateEmailInput): Promise<ValidateEmailStatus> {
+    return this.emailValidationGateway.validateEmail(email);
   }
 }

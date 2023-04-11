@@ -7,8 +7,8 @@ import {
   inclusionConnectedAllowedTargets,
   searchTargets,
   agencyTargets,
-  EmailValidationTargets,
-  emailValidationTargets,
+  ValidateEmailTargets,
+  validateEmailsTargets,
 } from "shared";
 import { createCommonDependencies } from "src/config/createCommonDependencies";
 import type { Dependencies } from "src/config/dependencies";
@@ -53,7 +53,7 @@ export const createHttpDependencies = (): Dependencies => {
     siretGatewayThroughBack: new HttpSiretGatewayThroughBack(axiosOnSlashApi),
     technicalGateway: new HttpTechnicalGateway(axiosOnSlashApi),
     emailValidationGateway: new HttpEmailValidationGateway(
-      createHttpClient<EmailValidationTargets>(emailValidationTargets),
+      createHttpClient<ValidateEmailTargets>(validateEmailsTargets),
     ),
     ...createCommonDependencies(),
   };

@@ -4,7 +4,7 @@ import {
   type HttpClient,
   type Target,
 } from "http-client";
-import { EmailValidationReason, EmailValidationStatus, Flavor } from "shared";
+import { ValidateEmailReason, ValidateEmailStatus, Flavor } from "shared";
 import { EmailValidationGetaway } from "../../../domain/emailValidation/ports/EmailValidationGateway";
 import { createLogger } from "../../../utils/logger";
 
@@ -23,7 +23,7 @@ type EmailableEmailValidationStatus = {
   mailbox_full: boolean;
   mx_record: string;
   no_reply: boolean;
-  reason: EmailValidationReason;
+  reason: ValidateEmailReason;
   role: boolean;
   score: number;
   smtp_provider: string | null;
@@ -34,7 +34,7 @@ type EmailableEmailValidationStatus = {
 
 export type EmailableApiKey = Flavor<string, "EmailableApiKey">;
 
-type EmailValidationParams = {
+type EmailableEmailValidationParams = {
   email: string;
   api_key: EmailableApiKey;
 };
@@ -44,7 +44,7 @@ export const emailableVerifyApiUrl =
 export type EmailableValidationTargets = CreateTargets<{
   getEmailStatus: Target<
     void,
-    EmailValidationParams,
+    EmailableEmailValidationParams,
     void,
     typeof emailableVerifyApiUrl
   >;
@@ -60,32 +60,33 @@ export const emailableValidationTargets =
 
 const logger = createLogger(__filename);
 
-const getEmailValidityStatus = (
-  state: EmailableEmailValidationStatus["state"],
-  reason: EmailableEmailValidationStatus["reason"],
-) => {
-  const unacceptableStates: EmailableEmailValidationStatus["state"][] = [
-    "undeliverable",
-  ];
-  const unacceptableReasons: EmailableEmailValidationStatus["reason"][] = [
-    "invalid_domain",
-    "invalid_email",
-    "invalid_smtp",
-    "rejected_email",
-    "unexpected_error",
-  ];
-  return unacceptableStates.includes(state) ||
-    unacceptableReasons.includes(reason)
-    ? false
-    : true;
-};
 export class EmailableEmailValidationGateway implements EmailValidationGetaway {
   constructor(
     private readonly httpClient: HttpClient<EmailableValidationTargets>,
     private emailableApiKey: EmailableApiKey,
   ) {}
 
-  public async getEmailStatus(email: string): Promise<EmailValidationStatus> {
+  private isEmailValid(
+    state: EmailableEmailValidationStatus["state"],
+    reason: EmailableEmailValidationStatus["reason"],
+  ): boolean {
+    const unacceptableStates: EmailableEmailValidationStatus["state"][] = [
+      "undeliverable",
+    ];
+    const unacceptableReasons: EmailableEmailValidationStatus["reason"][] = [
+      "invalid_domain",
+      "invalid_email",
+      "invalid_smtp",
+      "rejected_email",
+      "unexpected_error",
+    ];
+    return unacceptableStates.includes(state) ||
+      unacceptableReasons.includes(reason)
+      ? false
+      : true;
+  }
+
+  public async validateEmail(email: string): Promise<ValidateEmailStatus> {
     const { responseBody } = await this.httpClient
       .getEmailStatus({
         queryParams: {
@@ -94,22 +95,21 @@ export class EmailableEmailValidationGateway implements EmailValidationGetaway {
         },
       })
       .catch((error) => {
-        logger.error("Error while calling emailable API", { error });
+        logger.error("getEmailStatus => Error while calling emailable API ", {
+          error,
+        });
         throw error;
       });
 
     const emailableEmailValidationStatus =
       responseBody as EmailableEmailValidationStatus;
-    const response: EmailValidationStatus = {
-      isValid: getEmailValidityStatus(
+    const response: ValidateEmailStatus = {
+      isValid: this.isEmailValid(
         emailableEmailValidationStatus.state,
         emailableEmailValidationStatus.reason,
       ),
       reason: emailableEmailValidationStatus.reason,
     };
-    if (emailableEmailValidationStatus.free) {
-      response.isFree = true;
-    }
     if (emailableEmailValidationStatus.did_you_mean) {
       response.proposal = emailableEmailValidationStatus.did_you_mean;
     }

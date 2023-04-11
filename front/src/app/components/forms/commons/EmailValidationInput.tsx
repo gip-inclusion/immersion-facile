@@ -1,10 +1,10 @@
 import { Input, InputProps } from "@codegouvfr/react-dsfr/Input";
 import React, { useState } from "react";
-import { EmailValidationReason, EmailValidationStatus } from "shared";
+import { ValidateEmailReason, ValidateEmailStatus } from "shared";
 import { emailValidationGateway } from "src/config/dependencies";
 
 type EmailValidationInputProps = InputProps.RegularInput & {
-  onEmailValidationFeedback?: (status: EmailValidationStatus) => void;
+  onEmailValidationFeedback?: (status: ValidateEmailStatus) => void;
 };
 
 type StateRelated = {
@@ -17,7 +17,7 @@ const defaultErrorMessage =
 
 const feedbackMessages = (
   proposal: string | null | undefined,
-): Record<EmailValidationReason, string> => ({
+): Record<ValidateEmailReason, string> => ({
   accepted_email: "L'adresse email a l'air valide",
   disposable_email: "L'adresse email semble être une adresse jetable",
   low_deliverability: "L'adresse email a l'air valide",
@@ -31,17 +31,34 @@ const feedbackMessages = (
   invalid_smtp: defaultErrorMessage,
 });
 
+const getStateRelatedFromStatus = (
+  status: ValidateEmailStatus,
+  stateRelated: StateRelated,
+): StateRelated => {
+  if (stateRelated.state === "error")
+    return {
+      state: stateRelated.state,
+      stateRelatedMessage: stateRelated.stateRelatedMessage,
+    };
+  return {
+    state: status.isValid ? "success" : "error",
+    stateRelatedMessage: feedbackMessages(status.proposal)[status.reason],
+  };
+};
+
 export const EmailValidationInput = (props: EmailValidationInputProps) => {
   const [stateRelated, setStateRelated] = useState<StateRelated>({
     state: props.state,
     stateRelatedMessage: props.stateRelatedMessage,
   });
-  const onInputBlur = (event: React.FocusEvent<HTMLInputElement, Element>) => {
+  const onInputBlur = (
+    event: React.FocusEvent<HTMLInputElement, Element>,
+  ): void => {
     const email = event.target.value;
     if (props.state === "error") {
       setStateRelated({
         state: props.state,
-        stateRelatedMessage: props.stateRelatedMessage || "",
+        stateRelatedMessage: props.stateRelatedMessage,
       });
       return;
     }
@@ -51,7 +68,12 @@ export const EmailValidationInput = (props: EmailValidationInputProps) => {
       .then((status) => {
         props.nativeInputProps?.onBlur?.(event);
         props.onEmailValidationFeedback?.(status);
-        setStateRelated(getStateRelatedFromStatus(status));
+        setStateRelated(
+          getStateRelatedFromStatus(status, {
+            state: props.state,
+            stateRelatedMessage: props.stateRelatedMessage,
+          }),
+        );
       })
       .catch((error) => {
         // do nothing on HTTP request error
@@ -66,19 +88,7 @@ export const EmailValidationInput = (props: EmailValidationInputProps) => {
     });
     props.nativeInputProps?.onChange?.(event);
   };
-  const getStateRelatedFromStatus = (
-    status: EmailValidationStatus,
-  ): StateRelated => {
-    if (props.state === "error")
-      return {
-        state: props.state,
-        stateRelatedMessage: props.stateRelatedMessage || "",
-      };
-    return {
-      state: status.isValid ? "success" : "error",
-      stateRelatedMessage: feedbackMessages(status.proposal)[status.reason],
-    };
-  };
+
   return (
     <Input
       {...props}

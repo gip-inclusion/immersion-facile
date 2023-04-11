@@ -32,7 +32,7 @@ import { createMagicLinkRouter } from "./routers/magicLink/createMagicLinkRouter
 import { createPeConnectRouter } from "./routers/peConnect/createPeConnectRouter";
 import { createTechnicalRouter } from "./routers/technical/createTechnicalRouter";
 import { subscribeToEvents } from "./subscribeToEvents";
-import { createEmailValidationRouter } from "./routers/emailValidation/createEmailValidationRouter";
+import { createValidateEmailRouter } from "./routers/emailValidation/createEmailValidationRouter";
 
 const logger = createLogger(__filename);
 
@@ -91,7 +91,7 @@ export const createApp = async (
   app.use(createPeConnectRouter(deps));
   app.use(createInclusionConnectRouter(deps));
   app.use(createApiKeyAuthRouter(deps));
-  app.use(createEmailValidationRouter(deps));
+  app.use(createValidateEmailRouter(deps));
   // Auth issues below this last router
   app.use(createEstablishmentRouter(deps));
 
