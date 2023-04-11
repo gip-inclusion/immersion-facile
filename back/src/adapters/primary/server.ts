@@ -32,7 +32,7 @@ import { createMagicLinkRouter } from "./routers/magicLink/createMagicLinkRouter
 import { createPeConnectRouter } from "./routers/peConnect/createPeConnectRouter";
 import { createTechnicalRouter } from "./routers/technical/createTechnicalRouter";
 import { subscribeToEvents } from "./subscribeToEvents";
-import { createValidateEmailRouter } from "./routers/emailValidation/createEmailValidationRouter";
+import { createValidateEmailRouter } from "./routers/emailValidation/createValidateEmailRouter";
 
 const logger = createLogger(__filename);
 

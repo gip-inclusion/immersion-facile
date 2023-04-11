@@ -1,5 +1,6 @@
 import { Logger } from "pino";
 import { preprocess, z } from "zod";
+import { validateEmailRegex } from "./email/validateEmail.dto";
 import { timeHHmmRegExp } from "./utils/date";
 
 export const localization = {
@@ -79,8 +80,7 @@ export const zEmail = z.preprocess(
     .string(requiredText)
     .email(localization.invalidEmailFormat)
     .refine(
-      (email) =>
-        email.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/), // emails patterns without underscore in the domain part
+      (email) => email.match(validateEmailRegex), // emails patterns without underscore in the domain part
       localization.invalidEmailFormat,
     ),
 );

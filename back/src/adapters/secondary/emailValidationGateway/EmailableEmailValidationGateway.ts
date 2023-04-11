@@ -42,7 +42,7 @@ export const emailableVerifyApiUrl =
   "https://api.emailable.com/v1/verify" as const;
 
 export type EmailableValidationTargets = CreateTargets<{
-  getEmailStatus: Target<
+  validateEmail: Target<
     void,
     EmailableEmailValidationParams,
     void,
@@ -52,7 +52,7 @@ export type EmailableValidationTargets = CreateTargets<{
 
 export const emailableValidationTargets =
   createTargets<EmailableValidationTargets>({
-    getEmailStatus: {
+    validateEmail: {
       method: "GET",
       url: emailableVerifyApiUrl,
     },
@@ -88,7 +88,7 @@ export class EmailableEmailValidationGateway implements EmailValidationGetaway {
 
   public async validateEmail(email: string): Promise<ValidateEmailStatus> {
     const { responseBody } = await this.httpClient
-      .getEmailStatus({
+      .validateEmail({
         queryParams: {
           email,
           api_key: this.emailableApiKey,

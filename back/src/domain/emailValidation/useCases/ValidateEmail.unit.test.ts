@@ -1,14 +1,18 @@
-import { ValidateEmailStatus, ValidateEmailInput } from "shared";
+import {
+  expectPromiseToFail,
+  ValidateEmailInput,
+  ValidateEmailStatus,
+} from "shared";
 import { InMemoryEmailValidationGateway } from "../../../adapters/secondary/emailValidationGateway/InMemoryEmailValidationStatusGateway";
-import { ValidateEmail } from "./GetEmailValidationStatus";
+import { ValidateEmail } from "./ValidateEmail";
 
 describe("Email validation status", () => {
-  let useCase: ValidateEmail;
+  let validateEmail: ValidateEmail;
   let emailValidationGateway: InMemoryEmailValidationGateway;
 
   beforeEach(() => {
     emailValidationGateway = new InMemoryEmailValidationGateway();
-    useCase = new ValidateEmail(emailValidationGateway);
+    validateEmail = new ValidateEmail(emailValidationGateway);
   });
 
   it("retrieve email validation status from queried email", async () => {
@@ -23,7 +27,13 @@ describe("Email validation status", () => {
     const emailValidationInput: ValidateEmailInput = {
       email: "tom@jedusor.com",
     };
-    const response = await useCase.execute(emailValidationInput);
+    const response = await validateEmail.execute(emailValidationInput);
     expect(response).toEqual(expectedEmailValidationStatus);
+  });
+  it("should throw an error", async () => {
+    const emailValidationInput: ValidateEmailInput = {
+      email: "ezfzemflkzmle",
+    };
+    await expectPromiseToFail(validateEmail.execute(emailValidationInput));
   });
 });

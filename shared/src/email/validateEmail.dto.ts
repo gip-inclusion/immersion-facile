@@ -21,6 +21,6 @@ export type ValidateEmailStatus = {
 };
 
 export const validateEmailRegex =
-  /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/g;
+  /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 export type ValidateEmailInput = { email: Email };

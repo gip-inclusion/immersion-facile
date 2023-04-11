@@ -9,7 +9,7 @@ import { InMemoryEmailValidationGateway } from "../../../secondary/emailValidati
 
 const emailValidationUrl = (emailInput: Email): string =>
   `${validateEmailsTargets.validateEmail.url}?email=${emailInput}`;
-describe("emailValidationRouter", () => {
+describe("validateEmailRouter", () => {
   let request: SuperTest<Test>;
   let emailValidationGateway: InMemoryEmailValidationGateway;
 

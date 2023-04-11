@@ -22,40 +22,15 @@ describe("Emailable email validation gateway", () => {
     );
   });
 
-  describe("Emailable getEmailStatus", () => {
+  describe("Emailable validateEmail", () => {
     const candidates: {
       candidateEmail: string;
-      expectedStatus: ValidateEmailStatus;
+      expectedStatus: ValidateEmailStatus | Error;
     }[] = [
       {
         candidateEmail: "enguerran.weiss@beta.gouv.fr",
         expectedStatus: {
           isValid: true,
-          proposal: null,
-          reason: "accepted_email",
-        },
-      },
-      {
-        candidateEmail: "",
-        expectedStatus: {
-          isValid: false,
-          proposal: null,
-          reason: "invalid_email",
-        },
-      },
-      {
-        candidateEmail: "ezflmafmkazflmkazf",
-        expectedStatus: {
-          isValid: false,
-          proposal: null,
-          reason: "invalid_email",
-        },
-      },
-      {
-        candidateEmail: "enguerran.weiss@beta.gouv.fr",
-        expectedStatus: {
-          isValid: true,
-          proposal: null,
           reason: "accepted_email",
         },
       },
@@ -63,7 +38,6 @@ describe("Emailable email validation gateway", () => {
         candidateEmail: "enguerranweiss@beta.gouv.fr",
         expectedStatus: {
           isValid: false,
-          proposal: null,
           reason: "rejected_email",
         },
       },
@@ -77,14 +51,8 @@ describe("Emailable email validation gateway", () => {
       },
     ];
     it.each(candidates)(
-      "Candidate email should match expected given status",
-      async ({
-        candidateEmail,
-        expectedStatus,
-      }: {
-        candidateEmail: string;
-        expectedStatus: ValidateEmailStatus;
-      }) => {
+      "Candidate email '$candidateEmail' should match expected given status",
+      async ({ candidateEmail, expectedStatus }) => {
         const emailStatus = await emailableEmailValidationGateway.validateEmail(
           candidateEmail,
         );

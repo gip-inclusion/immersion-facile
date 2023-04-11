@@ -81,7 +81,7 @@ import {
 } from "./magicLinkUrl";
 import { LookupLocation } from "../../../domain/address/useCases/LookupLocation";
 import { NotifyConventionReminder } from "../../../domain/convention/useCases/notifications/NotifyConventionReminder";
-import { ValidateEmail } from "../../../domain/emailValidation/useCases/GetEmailValidationStatus";
+import { ValidateEmail } from "../../../domain/emailValidation/useCases/ValidateEmail";
 
 export const createUseCases = (
   config: AppConfig,
