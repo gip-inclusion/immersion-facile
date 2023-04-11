@@ -6,6 +6,10 @@ on:
       envType:
         required: true
         type: string
+      region:
+        required: false
+        type: string
+        default: "osc-fr1"
     secrets:
       SCALINGO_API_TOKEN:
         required: true
@@ -29,6 +33,6 @@ jobs:
       - name: Login to scalingo
         run: scalingo login --api-token ${{ secrets.SCALINGO_API_TOKEN }}
       - name: Deploy back
-        run: scalingo --app if-${{inputs.envType}}-back deploy back-build.tar.gz
+        run: scalingo --app if-${{inputs.envType}}-back --region ${{ inputs.region }} deploy back-build.tar.gz
       - name: Deploy front
-        run: scalingo --app if-${{inputs.envType}}-front deploy front-build.tar.gz
+        run: scalingo --app if-${{inputs.envType}}-front --region ${{ inputs.region }} deploy front-build.tar.gz
