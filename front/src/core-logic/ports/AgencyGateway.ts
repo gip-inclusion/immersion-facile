@@ -1,24 +1,16 @@
 import { Observable } from "rxjs";
 import {
-  BackOfficeJwt,
+  ActiveOrRejectedStatus,
   AgencyDto,
   AgencyId,
   AgencyOption,
   AgencyPublicDisplayDto,
-  AgencyStatus,
+  BackOfficeJwt,
   CreateAgencyDto,
   DepartmentCode,
-  ExtractFromExisting,
   ListAgenciesRequestDto,
   WithAgencyId,
 } from "shared";
-
-export type WithAgencyStatus = { status: AgencyStatus };
-export type ActiveOrRejectedStatus = ExtractFromExisting<
-  AgencyStatus,
-  "active" | "rejected"
->;
-export type WithActiveOrRejectedStatus = { status: ActiveOrRejectedStatus };
 
 export interface AgencyGateway {
   addAgency(agency: CreateAgencyDto): Promise<void>;

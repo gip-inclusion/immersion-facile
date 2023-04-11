@@ -83,7 +83,7 @@ export const createTarget = <
   QueryParams = void,
   Headers = void,
   UrlWithParams extends Url = Url,
-  ResponseBody = unknown,
+  ResponseBody = void,
 >(
   target: TargetWithOptionalFields<
     Body,

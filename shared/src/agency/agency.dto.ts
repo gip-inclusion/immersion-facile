@@ -1,9 +1,9 @@
-import { RequireField } from "../utils";
 import { AbsoluteUrl } from "../AbsoluteUrl";
 import { AddressDto, DepartmentCode } from "../address/address.dto";
 import { GeoPositionDto } from "../geoPosition/geoPosition.dto";
-import { Flavor } from "../typeFlavors";
 import { SiretDto } from "../siret/siret";
+import { Flavor } from "../typeFlavors";
+import { ExtractFromExisting, RequireField } from "../utils";
 
 export type AgencyStatus = (typeof allAgencyStatuses)[number];
 export const allAgencyStatuses = [
@@ -104,6 +104,14 @@ export type CreateAgencyDto = {
   logoUrl?: AbsoluteUrl;
   signature: string;
 };
+
+export type WithAgencyStatus = { status: AgencyStatus };
+
+export type ActiveOrRejectedStatus = ExtractFromExisting<
+  AgencyStatus,
+  "active" | "rejected"
+>;
+export type WithActiveOrRejectedStatus = { status: ActiveOrRejectedStatus };
 
 export type RegisterAgencyToInclusionConnectUserParams = {
   agencyId: AgencyId;

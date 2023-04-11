@@ -3,7 +3,7 @@ import {
   AgencyDto,
   AgencyOption,
   ListAgenciesRequestDto,
-  listAgenciesByDepartmentCodeRequestSchema,
+  listFilteredAgenciesRequestSchema,
 } from "shared";
 import {
   UnitOfWork,
@@ -19,7 +19,7 @@ export class ListAgenciesByFilter extends TransactionalUseCase<
     super(uowPerformer);
   }
 
-  inputSchema = listAgenciesByDepartmentCodeRequestSchema;
+  inputSchema = listFilteredAgenciesRequestSchema;
 
   public async _execute(
     { departmentCode, nameIncludes, kind }: ListAgenciesRequestDto,

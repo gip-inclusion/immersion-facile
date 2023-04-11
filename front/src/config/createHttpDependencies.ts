@@ -6,15 +6,13 @@ import {
   establishmentTargets,
   inclusionConnectedAllowedTargets,
   searchTargets,
+  agencyTargets,
 } from "shared";
 import { createCommonDependencies } from "src/config/createCommonDependencies";
 import type { Dependencies } from "src/config/dependencies";
 import { HttpAddressGateway } from "src/core-logic/adapters/AddressGateway/HttpAddressGateway";
 import { HttpAdminGateway } from "src/core-logic/adapters/AdminGateway/HttpAdminGateway";
-import {
-  agencyTargets,
-  HttpAgencyGateway,
-} from "src/core-logic/adapters/AgencyGateway/HttpAgencyGateway";
+import { HttpAgencyGateway } from "src/core-logic/adapters/AgencyGateway/HttpAgencyGateway";
 import { HttpImmersionAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/HttpImmersionAssessmentGateway";
 import { HttpConventionGateway } from "src/core-logic/adapters/Convention/HttpConventionGateway";
 import { HttpSentEmailGateway } from "src/core-logic/adapters/EmailGateway/HttpSentEmailGateway";

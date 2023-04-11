@@ -1,90 +1,21 @@
-import { createTargets, CreateTargets, HttpClient, Target } from "http-client";
+import { HttpClient } from "http-client";
 import { from, Observable } from "rxjs";
 import {
-  BackOfficeJwt,
+  ActiveOrRejectedStatus,
   agenciesIdAndNameSchema,
-  agenciesRoute,
   AgencyDto,
   AgencyId,
-  agencyIdResponseSchema,
-  agencyImmersionFacileIdRoute,
   AgencyOption,
   AgencyPublicDisplayDto,
-  agencyPublicDisplaySchema,
-  agencyPublicInfoByIdRoute,
   agencySchema,
+  BackOfficeJwt,
   CreateAgencyDto,
   DepartmentCode,
   ListAgenciesRequestDto,
   WithAgencyId,
+  AgencyTargets,
 } from "shared";
-import {
-  ActiveOrRejectedStatus,
-  AgencyGateway,
-  WithActiveOrRejectedStatus,
-  WithAgencyStatus,
-} from "src/core-logic/ports/AgencyGateway";
-
-export type AgencyTargets = CreateTargets<{
-  getAgencyAdminById: Target<
-    void,
-    void,
-    WithAuthorization,
-    `/admin/${typeof agenciesRoute}/:agencyId`
-  >;
-  updateAgencyStatus: Target<
-    WithActiveOrRejectedStatus,
-    void,
-    WithAuthorization,
-    `/admin/${typeof agenciesRoute}/:agencyId`
-  >;
-  updateAgency: Target<
-    AgencyDto,
-    void,
-    WithAuthorization,
-    `/admin/${typeof agenciesRoute}/:agencyId`
-  >;
-  getImmersionFacileAgencyId: Target;
-  addAgency: Target<CreateAgencyDto>;
-  getAgencyPublicInfoById: Target<void, WithAgencyId>;
-  listAgenciesNeedingReview: Target<void, WithAgencyStatus, WithAuthorization>;
-  getFilteredAgencies: Target<void, ListAgenciesRequestDto>;
-}>;
-
-export const agencyTargets = createTargets<AgencyTargets>({
-  getAgencyAdminById: {
-    method: "GET",
-    url: `/admin/${agenciesRoute}/:agencyId`,
-  },
-  updateAgencyStatus: {
-    method: "PATCH",
-    url: `/admin/${agenciesRoute}/:agencyId`,
-  },
-  updateAgency: {
-    method: "PUT",
-    url: `/admin/${agenciesRoute}/:agencyId`,
-  },
-  getImmersionFacileAgencyId: {
-    method: "GET",
-    url: `/${agencyImmersionFacileIdRoute}`,
-  },
-  addAgency: {
-    method: "POST",
-    url: `/${agenciesRoute}`,
-  },
-  getAgencyPublicInfoById: {
-    method: "GET",
-    url: `/${agencyPublicInfoByIdRoute}`,
-  },
-  listAgenciesNeedingReview: {
-    method: "GET",
-    url: `/admin/${agenciesRoute}`,
-  },
-  getFilteredAgencies: {
-    method: "GET",
-    url: `/${agenciesRoute}`,
-  },
-});
+import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
 export class HttpAgencyGateway implements AgencyGateway {
   constructor(private readonly httpClient: HttpClient<AgencyTargets>) {}
@@ -93,7 +24,7 @@ export class HttpAgencyGateway implements AgencyGateway {
     return from(
       this.httpClient
         .getImmersionFacileAgencyId()
-        .then(({ responseBody }) => agencyIdResponseSchema.parse(responseBody)),
+        .then(({ responseBody }) => responseBody),
     );
   }
 
@@ -115,9 +46,7 @@ export class HttpAgencyGateway implements AgencyGateway {
           headers: { authorization: adminToken },
           urlParams: { agencyId: agencyDto.id },
         })
-        .then(() => {
-          /* void if success */
-        }),
+        .then(({ responseBody }) => responseBody),
     );
   }
 
@@ -142,9 +71,7 @@ export class HttpAgencyGateway implements AgencyGateway {
   ): Promise<AgencyPublicDisplayDto> {
     return this.httpClient
       .getAgencyPublicInfoById({ queryParams: withAgencyId })
-      .then(({ responseBody }) =>
-        agencyPublicDisplaySchema.parse(responseBody),
-      );
+      .then(({ responseBody }) => responseBody);
   }
 
   getAgencyPublicInfoById$(
@@ -210,11 +137,11 @@ export class HttpAgencyGateway implements AgencyGateway {
     adminToken: BackOfficeJwt,
   ): Promise<AgencyOption[]> {
     return this.httpClient
-      .listAgenciesNeedingReview({
+      .listAgenciesWithStatus({
         queryParams: { status: "needsReview" },
         headers: { authorization: adminToken },
       })
-      .then(({ responseBody }) => agenciesIdAndNameSchema.parse(responseBody));
+      .then(({ responseBody }) => responseBody);
   }
 
   // TODO Mieux identifier l'admin

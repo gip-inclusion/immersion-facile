@@ -2,9 +2,9 @@ import { Router } from "express";
 import {
   adminLogin,
   adminTargets,
-  agenciesRoute,
   AgencyDto,
   AgencyId,
+  agencyTargets,
   conventionsRoute,
   emailRoute,
   ExportDataDto,
@@ -62,12 +62,15 @@ export const createAdminRouter = (
   // PUT Full update following admin edit
   // admin/agencies/:id
   adminRouter
-    .route(`/${agenciesRoute}/:agencyId`)
+    .route(removeRouterPrefix(agencyTargets.getAgencyAdminById.url))
     .get(async (req, res) =>
       sendHttpResponse(req, res, async () =>
         deps.useCases.getAgencyById.execute(req.params.agencyId),
       ),
-    )
+    );
+
+  adminRouter
+    .route(removeRouterPrefix(agencyTargets.updateAgencyStatus.url))
     .patch(async (req, res) =>
       sendHttpResponse(req, res, () => {
         const useCaseParams: Partial<Pick<AgencyDto, "status">> & {
@@ -75,7 +78,10 @@ export const createAdminRouter = (
         } = { id: req.params.agencyId, ...req.body };
         return deps.useCases.updateAgencyStatus.execute(useCaseParams);
       }),
-    )
+    );
+
+  adminRouter
+    .route(removeRouterPrefix(agencyTargets.updateAgency.url))
     .put(async (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.updateAgencyAdmin.execute(req.body),
@@ -84,7 +90,7 @@ export const createAdminRouter = (
 
   // GET admin/agencies?status=needsReview
   adminRouter
-    .route(`/${agenciesRoute}`)
+    .route(removeRouterPrefix(agencyTargets.listAgenciesWithStatus.url))
     .get(async (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.privateListAgencies.execute(req.query),

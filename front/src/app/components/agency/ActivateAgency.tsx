@@ -3,13 +3,12 @@ import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import React, { useEffect } from "react";
 import { DsfrTitle } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { AgencyOption } from "shared";
+import { ActiveOrRejectedStatus, AgencyOption } from "shared";
 import "src/assets/admin.css";
 import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
 import { agencyAdminSlice } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
 import { useAppSelector } from "../../hooks/reduxHooks";
 import { AgencyDetails } from "../admin/AgencyDetails";
-import { ActiveOrRejectedStatus } from "../../../core-logic/ports/AgencyGateway";
 import { domElementIds } from "shared";
 import { Select } from "@codegouvfr/react-dsfr/Select";
 

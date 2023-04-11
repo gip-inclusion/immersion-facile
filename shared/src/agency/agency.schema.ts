@@ -25,7 +25,9 @@ import {
   ListAgenciesRequestDto,
   PrivateListAgenciesRequestDto,
   UpdateAgencyRequestDto,
+  WithActiveOrRejectedStatus,
   WithAgencyId,
+  WithAgencyStatus,
   RegisterAgencyToInclusionConnectUserParams,
 } from "./agency.dto";
 
@@ -54,7 +56,7 @@ const agencyKindSchema: z.ZodSchema<AgencyKind> = zEnumValidation(
   "Ce type de structure n'est pas supporté",
 );
 
-export const listAgenciesByDepartmentCodeRequestSchema: z.ZodSchema<ListAgenciesRequestDto> =
+export const listFilteredAgenciesRequestSchema: z.ZodSchema<ListAgenciesRequestDto> =
   z.object({
     departmentCode: z.string().optional(),
     nameIncludes: z.string().optional(),
@@ -141,6 +143,15 @@ export const agencyPublicDisplaySchema: z.ZodSchema<AgencyPublicDisplayDto> =
     logoUrl: absoluteUrlSchema.optional(),
     signature: zString,
   });
+
+export const withActiveOrRejectedAgencyStatusSchema: z.Schema<WithActiveOrRejectedStatus> =
+  z.object({
+    status: z.enum(["active", "rejected"]),
+  });
+
+export const withAgencyStatus: z.Schema<WithAgencyStatus> = z.object({
+  status: agencyStatusSchema,
+});
 
 export const registerAgencyToInclusionConnectUserParamsSchema: z.Schema<RegisterAgencyToInclusionConnectUserParams> =
   z.object({

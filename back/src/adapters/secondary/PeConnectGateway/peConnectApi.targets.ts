@@ -43,6 +43,12 @@ type PeConnectTargetsConfig = {
 export type PeConnectExternalTargets = ReturnType<
   typeof makePeConnectExternalTargets
 >;
+
+const forceUnknownResponseBody = (responseBody: unknown): unknown =>
+  responseBody;
+// forceUnknownResponseBody is to avoid changing all the behavior related to peResponses being validated in the gateways
+// TODO : move the validation here, and adapt the gateways
+
 export const makePeConnectExternalTargets = ({
   peApiUrl,
   peAuthCandidatUrl,
@@ -52,22 +58,26 @@ export const makePeConnectExternalTargets = ({
       method: "GET",
       url: `${peApiUrl}/partenaire/peconnect-conseillers/v1/contactspe/conseillers`,
       validateHeaders: peConnectHeadersSchema.parse,
+      validateResponseBody: forceUnknownResponseBody,
     }),
     getUserInfo: createTarget({
       method: "GET",
       url: `${peApiUrl}/partenaire/peconnect-individu/v1/userinfo`,
       validateHeaders: peConnectHeadersSchema.parse,
+      validateResponseBody: forceUnknownResponseBody,
     }),
     getUserStatutInfo: createTarget({
       method: "GET",
       url: `${peApiUrl}/partenaire/peconnect-statut/v1/statut`,
       validateHeaders: peConnectHeadersSchema.parse,
+      validateResponseBody: forceUnknownResponseBody,
     }),
     exchangeCodeForAccessToken: createTarget({
       method: "POST",
       url: `${peAuthCandidatUrl}/connexion/oauth2/access_token?realm=%2Findividu`,
       validateHeaders: peConnectAccessTokenHeadersSchema.parse,
       validateRequestBody: z.string().parse,
+      validateResponseBody: forceUnknownResponseBody,
     }),
   });
 
