@@ -1,10 +1,6 @@
 import { Input, InputProps } from "@codegouvfr/react-dsfr/Input";
 import React, { useState } from "react";
-import {
-  EmailValidationReason,
-  EmailValidationStatus,
-  isValidEmail,
-} from "shared";
+import { EmailValidationReason, EmailValidationStatus } from "shared";
 import { emailValidationGateway } from "src/config/dependencies";
 
 type EmailValidationInputProps = InputProps.RegularInput & {
@@ -42,13 +38,13 @@ export const EmailValidationInput = (props: EmailValidationInputProps) => {
   });
   const onInputBlur = (event: React.FocusEvent<HTMLInputElement, Element>) => {
     const email = event.target.value;
-    if (email === "" || !isValidEmail(email))
-      props.onEmailValidationFeedback?.({
-        isValid: false,
-        reason: "invalid_domain",
-        isFree: false,
-        proposal: null,
+    if (props.state === "error") {
+      setStateRelated({
+        state: props.state,
+        stateRelatedMessage: props.stateRelatedMessage || "",
       });
+      return;
+    }
 
     emailValidationGateway
       .getEmailStatus(email)

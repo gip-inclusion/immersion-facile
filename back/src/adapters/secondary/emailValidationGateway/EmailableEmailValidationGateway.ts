@@ -4,12 +4,7 @@ import {
   type HttpClient,
   type Target,
 } from "http-client";
-import {
-  EmailValidationReason,
-  EmailValidationStatus,
-  Flavor,
-  isValidEmail,
-} from "shared";
+import { EmailValidationReason, EmailValidationStatus, Flavor } from "shared";
 import { EmailValidationGetaway } from "../../../domain/emailValidation/ports/EmailValidationGateway";
 import { createLogger } from "../../../utils/logger";
 
@@ -91,14 +86,6 @@ export class EmailableEmailValidationGateway implements EmailValidationGetaway {
   ) {}
 
   public async getEmailStatus(email: string): Promise<EmailValidationStatus> {
-    if (email === "" || !isValidEmail(email))
-      return {
-        isFree: false,
-        isValid: false,
-        proposal: null,
-        reason: "invalid_email",
-      };
-
     const { responseBody } = await this.httpClient
       .getEmailStatus({
         queryParams: {

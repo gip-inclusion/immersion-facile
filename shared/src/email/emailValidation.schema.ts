@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { zEmail } from "../zodUtils";
 import {
   emailValidationReason,
   EmailValidationStatus,
@@ -6,7 +7,7 @@ import {
 import { WithEmailInput } from "./emailValidation.dto";
 
 export const emailValidationInputSchema: z.Schema<WithEmailInput> = z.object({
-  email: z.string(),
+  email: zEmail,
 });
 
 export const emailValidationResponseSchema: z.Schema<EmailValidationStatus> =

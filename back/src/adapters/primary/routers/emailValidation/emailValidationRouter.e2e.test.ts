@@ -34,5 +34,11 @@ describe("emailValidationRouter", () => {
       expect(response.body).toEqual(expectedStatus);
       expect(response.status).toBe(200);
     });
+
+    it('GET /email/validation?email="invalid-email"', async () => {
+      const invalidEmail = "invalid-email";
+      const response = await request.get(emailValidationUrl(invalidEmail));
+      expect(response.status).toBe(400);
+    });
   });
 });
