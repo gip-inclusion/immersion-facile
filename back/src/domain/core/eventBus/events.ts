@@ -46,7 +46,7 @@ export type DomainEvent =
   | GenericEvent<"ImmersionApplicationFullySigned", ConventionDto>
   | GenericEvent<"ImmersionApplicationAcceptedByCounsellor", ConventionDto>
   | GenericEvent<"ImmersionApplicationAcceptedByValidator", ConventionDto>
-  | GenericEvent<"ConventionReminder",ConventionReminderPayload>
+  | GenericEvent<"ConventionReminderRequired",ConventionReminderPayload>
 
   // UNHAPPY PATHS
   | GenericEvent<"ImmersionApplicationRejected", ConventionDto>

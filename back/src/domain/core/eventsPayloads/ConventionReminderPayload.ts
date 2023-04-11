@@ -1,22 +1,22 @@
 import { ConventionId } from "shared";
 import { z } from "zod";
 
-const reminderTypes = [
+const reminderKinds = [
   "FirstReminderForSignatories",
   "LastReminderForSignatories",
   "FirstReminderForAgency",
   "LastReminderForAgency",
 ] as const;
 
-export type ReminderType = (typeof reminderTypes)[number];
+export type ReminderKind = (typeof reminderKinds)[number];
 
 export type ConventionReminderPayload = {
-  reminderType: ReminderType;
+  reminderKind: ReminderKind;
   conventionId: ConventionId;
 };
 
 export const conventionReminderPayloadSchema: z.Schema<ConventionReminderPayload> =
   z.object({
-    reminderType: z.enum(reminderTypes),
+    reminderKind: z.enum(reminderKinds),
     conventionId: z.string(),
   });

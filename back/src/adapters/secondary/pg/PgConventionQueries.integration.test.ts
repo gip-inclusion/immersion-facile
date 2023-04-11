@@ -132,11 +132,11 @@ describe("Pg implementation of ConventionQueries", () => {
     });
 
     it(`getConventionsByFilters with filters :
-          - withStatuses '[${conventionCancelledAndDateStart20230327.status}]'
+          - withStatuses [READY_TO_SIGN]
         > expect 1 convention retreived`, async () => {
       // Act
       const resultAll = await conventionQueries.getConventionsByFilters({
-        withStatuses: [conventionCancelledAndDateStart20230327.status],
+        withStatuses: ["READY_TO_SIGN"],
       });
 
       // Assert
@@ -150,10 +150,7 @@ describe("Pg implementation of ConventionQueries", () => {
     });
 
     it(`getConventionsByFilters with filters :
-          - startDateGreater '${addDays(
-            new Date(conventionCancelledAndDateStart20230327.dateStart),
-            -1,
-          ).toISOString()}'
+          - startDateGreater 2023-03-26
         > expect 2 convention retreived`, async () => {
       // Act
       const resultAll = await conventionQueries.getConventionsByFilters({
@@ -179,7 +176,7 @@ describe("Pg implementation of ConventionQueries", () => {
     });
 
     it(`getConventionsByFilters with filters :
-          - startDateLessOrEqual '${conventionCancelledAndDateStart20230327.dateStart}'
+          - startDateLessOrEqual 2023-03-27
         > expect 1 convention retreived`, async () => {
       // Act
       const resultAll = await conventionQueries.getConventionsByFilters({
@@ -198,16 +195,10 @@ describe("Pg implementation of ConventionQueries", () => {
       ]);
     });
     it(`getConventionsByFilters with filters:
-          - startDateGreater '${addDays(
-            new Date(conventionCancelledAndDateStart20230327.dateStart),
-            -1,
-          ).toISOString()}'
-          - startDateLessOrEqual '${
-            conventionCancelledAndDateStart20230327.dateStart
-          }
-          - withStatuses ['${conventionCancelledAndDateStart20230327.status}']
-        > expect 1 convention retreived'
-    `, async () => {
+          - startDateGreater 2023-03-26
+          - startDateLessOrEqual 2023-03-27
+          - withStatuses ["READY_TO_SIGN"]
+        > expect 1 convention retreived`, async () => {
       // Act
       const resultAll = await conventionQueries.getConventionsByFilters({
         startDateGreater: addDays(
@@ -230,8 +221,8 @@ describe("Pg implementation of ConventionQueries", () => {
       ]);
     });
     it(`getConventionsByFilters with:
-          - startDateGreater '${new Date("2023-03-30")}'
-          - startDateLessOrEqual '${new Date("2023-03-31")}'
+          - startDateGreater 2023-03-30'
+          - startDateLessOrEqual 2023-03-31
         > expect 0 convention retreived`, async () => {
       // Act
       const resultAll = await conventionQueries.getConventionsByFilters({

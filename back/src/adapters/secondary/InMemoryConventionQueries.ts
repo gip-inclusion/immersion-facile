@@ -30,21 +30,25 @@ export class InMemoryConventionQueries implements ConventionQueries {
     withStatuses,
   }: GetConventionByFiltersQueries): Promise<ConventionReadDto[]> {
     return Object.values(this.conventionRepository._conventions)
-      .filter((convention) =>
-        startDateLessOrEqual
-          ? new Date(convention.dateStart) <= startDateLessOrEqual
-          : true,
-      )
-      .filter((convention) =>
-        startDateGreater
-          ? new Date(convention.dateStart) > startDateGreater
-          : true,
-      )
-      .filter((convention) =>
-        withStatuses && withStatuses.length > 0
-          ? withStatuses.includes(convention.status)
-          : true,
-      )
+      .filter((convention) => {
+        if (
+          startDateLessOrEqual &&
+          new Date(convention.dateStart) > startDateLessOrEqual
+        )
+          return false;
+        if (
+          startDateGreater &&
+          new Date(convention.dateStart) <= startDateGreater
+        )
+          return false;
+        if (
+          withStatuses &&
+          withStatuses.length > 0 &&
+          !withStatuses.includes(convention.status)
+        )
+          return false;
+        return true;
+      })
       .map((convention) => ({
         ...convention,
         agencyName: TEST_AGENCY_NAME,

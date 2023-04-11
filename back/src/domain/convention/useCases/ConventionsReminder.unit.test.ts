@@ -22,7 +22,7 @@ import { ConventionsReminder } from "./ConventionsReminder";
 describe("RemindConventionsNeedSignature use case", () => {
   const now = new Date("2023-03-17");
   const eventIds = ["event-1", "event-2", "event-3", "event-4"];
-  const topic = "ConventionReminder";
+  const topic = "ConventionReminderRequired";
   let uow: InMemoryUnitOfWork;
   let useCase: ConventionsReminder;
   let outboxRepository: InMemoryOutboxRepository;
@@ -141,7 +141,7 @@ describe("RemindConventionsNeedSignature use case", () => {
           occurredAt: now.toISOString(),
           topic,
           payload: {
-            reminderType: "FirstReminderForSignatories",
+            reminderKind: "FirstReminderForSignatories",
             conventionId: conventionsForActors[0].id,
           },
           publications: [],
@@ -152,7 +152,7 @@ describe("RemindConventionsNeedSignature use case", () => {
           occurredAt: now.toISOString(),
           topic,
           payload: {
-            reminderType: "FirstReminderForSignatories",
+            reminderKind: "FirstReminderForSignatories",
             conventionId: conventionsForActors[1].id,
           },
           publications: [],
@@ -163,7 +163,7 @@ describe("RemindConventionsNeedSignature use case", () => {
           occurredAt: now.toISOString(),
           topic,
           payload: {
-            reminderType: "FirstReminderForAgency",
+            reminderKind: "FirstReminderForAgency",
             conventionId: conventionsForAgencies[0].id,
           },
           publications: [],
@@ -216,7 +216,7 @@ describe("RemindConventionsNeedSignature use case", () => {
           occurredAt: now.toISOString(),
           topic,
           payload: {
-            reminderType: "LastReminderForSignatories",
+            reminderKind: "LastReminderForSignatories",
             conventionId: convention.id,
           },
           publications: [],
@@ -267,7 +267,7 @@ describe("RemindConventionsNeedSignature use case", () => {
           occurredAt: now.toISOString(),
           topic,
           payload: {
-            reminderType: "LastReminderForSignatories",
+            reminderKind: "LastReminderForSignatories",
             conventionId: conventionsNeeds48[0].id,
           },
           publications: [],
@@ -278,7 +278,7 @@ describe("RemindConventionsNeedSignature use case", () => {
           occurredAt: now.toISOString(),
           topic,
           payload: {
-            reminderType: "LastReminderForSignatories",
+            reminderKind: "LastReminderForSignatories",
             conventionId: conventionsNeeds48[1].id,
           },
           publications: [],
@@ -289,7 +289,7 @@ describe("RemindConventionsNeedSignature use case", () => {
           occurredAt: now.toISOString(),
           topic,
           payload: {
-            reminderType: "LastReminderForAgency",
+            reminderKind: "LastReminderForAgency",
             conventionId: conventionsNeeds24[0].id,
           },
           publications: [],

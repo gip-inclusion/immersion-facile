@@ -3,13 +3,14 @@ import {
   AgencyDtoBuilder,
   ConventionDto,
   ConventionDtoBuilder,
-  ConventionStatus,
+  conventionStatuses,
   expectPromiseToFailWithError,
   expectToEqual,
   frontRoutes,
   GenericActor,
   isSignatoryRole,
   Role,
+  splitCasesBetweenPassingAndFailing,
   TemplatedEmail,
 } from "shared";
 import {
@@ -24,7 +25,7 @@ import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGatew
 import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
-import { ReminderType } from "../../../core/eventsPayloads/ConventionReminderPayload";
+import { ReminderKind } from "../../../core/eventsPayloads/ConventionReminderPayload";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import {
   forbiddenUnsupportedStatusMessage,
@@ -37,8 +38,6 @@ import {
 } from "./NotifyLastSigneeThatConventionHasBeenSigned";
 
 describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
-  const supportedConventionStatus: ConventionStatus = "IN_REVIEW";
-
   let useCase: NotifyConventionReminder;
   let emailGateway: InMemoryEmailGateway;
   let uow: InMemoryUnitOfWork;
@@ -66,7 +65,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       await expectPromiseToFailWithError(
         useCase.execute({
           conventionId: convention.id,
-          reminderType: "FirstReminderForAgency",
+          reminderKind: "FirstReminderForAgency",
         }),
         new NotFoundError(missingConventionMessage(convention.id)),
       );
@@ -86,7 +85,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       await expectPromiseToFailWithError(
         useCase.execute({
           conventionId: convention.id,
-          reminderType: "FirstReminderForAgency",
+          reminderKind: "FirstReminderForAgency",
         }),
         new NotFoundError(missingAgencyMessage(convention)),
       );
@@ -96,75 +95,75 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
     });
   });
 
+  const [authorizedAgencyStatuses, forbiddenAgencyStatuses] =
+    splitCasesBetweenPassingAndFailing(conventionStatuses, ["IN_REVIEW"]);
+
   describe("FirstReminderForAgency", () => {
-    it(`Send email AGENCY_FIRST_REMINDER to counsellors and validators when status is '${supportedConventionStatus}'`, async () => {
-      //Arrange
-      const councellor1Email = "councellor1@email.com";
-      const councellor2Email = "councellor2@email.com";
-      const validator1Email = "validator1@email.com";
-      const validator2Email = "validator2@email.com";
-      const agency = new AgencyDtoBuilder()
-        .withId("agencyId")
-        .withCounsellorEmails([councellor1Email, councellor2Email])
-        .withValidatorEmails([validator1Email, validator2Email])
-        .build();
+    it.each(authorizedAgencyStatuses)(
+      `Send email AGENCY_FIRST_REMINDER to counsellors and validators when status is '%s'`,
+      async (status) => {
+        //Arrange
+        const councellor1Email = "councellor1@email.com";
+        const councellor2Email = "councellor2@email.com";
+        const validator1Email = "validator1@email.com";
+        const validator2Email = "validator2@email.com";
+        const agency = new AgencyDtoBuilder()
+          .withId("agencyId")
+          .withCounsellorEmails([councellor1Email, councellor2Email])
+          .withValidatorEmails([validator1Email, validator2Email])
+          .build();
 
-      const convention = new ConventionDtoBuilder()
-        .withAgencyId(agency.id)
-        .withStatus(supportedConventionStatus)
-        .build();
-      uow.conventionRepository.setConventions({ [convention.id]: convention });
-      uow.agencyRepository.setAgencies([agency]);
+        const convention = new ConventionDtoBuilder()
+          .withAgencyId(agency.id)
+          .withStatus(status)
+          .build();
+        uow.conventionRepository.setConventions({
+          [convention.id]: convention,
+        });
+        uow.agencyRepository.setAgencies([agency]);
 
-      //Act
-      await useCase.execute({
-        conventionId: convention.id,
-        reminderType: "FirstReminderForAgency",
-      });
+        //Act
+        await useCase.execute({
+          conventionId: convention.id,
+          reminderKind: "FirstReminderForAgency",
+        });
 
-      //Assert
-      expectToEqual(emailGateway.getSentEmails(), [
-        makeAgencyFirstReminderEmail({
-          email: councellor1Email,
-          role: "counsellor",
-          agency,
-          convention,
-          timeGateway,
-        }),
-        makeAgencyFirstReminderEmail({
-          email: councellor2Email,
-          role: "counsellor",
-          agency,
-          convention,
-          timeGateway,
-        }),
-        makeAgencyFirstReminderEmail({
-          email: validator1Email,
-          role: "validator",
-          agency,
-          convention,
-          timeGateway,
-        }),
-        makeAgencyFirstReminderEmail({
-          email: validator2Email,
-          role: "validator",
-          agency,
-          convention,
-          timeGateway,
-        }),
-      ]);
-    });
+        //Assert
+        expectToEqual(emailGateway.getSentEmails(), [
+          makeAgencyFirstReminderEmail({
+            email: councellor1Email,
+            role: "counsellor",
+            agency,
+            convention,
+            timeGateway,
+          }),
+          makeAgencyFirstReminderEmail({
+            email: councellor2Email,
+            role: "counsellor",
+            agency,
+            convention,
+            timeGateway,
+          }),
+          makeAgencyFirstReminderEmail({
+            email: validator1Email,
+            role: "validator",
+            agency,
+            convention,
+            timeGateway,
+          }),
+          makeAgencyFirstReminderEmail({
+            email: validator2Email,
+            role: "validator",
+            agency,
+            convention,
+            timeGateway,
+          }),
+        ]);
+      },
+    );
 
     describe("Forbidden cases on convention bad status", () => {
-      it.each([
-        "CANCELLED",
-        "DRAFT",
-        "PARTIALLY_SIGNED",
-        "READY_TO_SIGN",
-        "REJECTED",
-        "ACCEPTED_BY_VALIDATOR",
-        "ACCEPTED_BY_COUNSELLOR",
-      ] satisfies ConventionStatus[])("status '%s'", async (status) => {
+      it.each(forbiddenAgencyStatuses)("status '%s'", async (status) => {
         //Arrange
         const agency = new AgencyDtoBuilder().withId("agencyId").build();
         const convention = new ConventionDtoBuilder()
@@ -176,13 +175,13 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         });
         uow.agencyRepository.setAgencies([agency]);
 
-        const type: ReminderType = "FirstReminderForAgency";
+        const type: ReminderKind = "FirstReminderForAgency";
 
         //Act & Assert
         await expectPromiseToFailWithError(
           useCase.execute({
             conventionId: convention.id,
-            reminderType: type,
+            reminderKind: type,
           }),
           new ForbiddenError(
             forbiddenUnsupportedStatusMessage(convention, type),
@@ -194,73 +193,70 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
   });
 
   describe("LastReminderForAgency", () => {
-    it("Send email AGENCY_LAST_REMINDER to counsellors and validators when status is 'IN_REVIEW'", async () => {
-      //Arrange
-      const councellor1Email = "councellor1@email.com";
-      const councellor2Email = "councellor2@email.com";
-      const validator1Email = "validator1@email.com";
-      const validator2Email = "validator2@email.com";
-      const agency = new AgencyDtoBuilder()
-        .withId("agencyId")
-        .withCounsellorEmails([councellor1Email, councellor2Email])
-        .withValidatorEmails([validator1Email, validator2Email])
-        .build();
-      const convention = new ConventionDtoBuilder()
-        .withAgencyId(agency.id)
-        .withStatus("IN_REVIEW")
-        .build();
-      uow.conventionRepository.setConventions({ [convention.id]: convention });
-      uow.agencyRepository.setAgencies([agency]);
+    it.each(authorizedAgencyStatuses)(
+      "Send email AGENCY_LAST_REMINDER to counsellors and validators when status is '%s'",
+      async (status) => {
+        //Arrange
+        const councellor1Email = "councellor1@email.com";
+        const councellor2Email = "councellor2@email.com";
+        const validator1Email = "validator1@email.com";
+        const validator2Email = "validator2@email.com";
+        const agency = new AgencyDtoBuilder()
+          .withId("agencyId")
+          .withCounsellorEmails([councellor1Email, councellor2Email])
+          .withValidatorEmails([validator1Email, validator2Email])
+          .build();
+        const convention = new ConventionDtoBuilder()
+          .withAgencyId(agency.id)
+          .withStatus(status)
+          .build();
+        uow.conventionRepository.setConventions({
+          [convention.id]: convention,
+        });
+        uow.agencyRepository.setAgencies([agency]);
 
-      //Act
-      await useCase.execute({
-        conventionId: convention.id,
-        reminderType: "LastReminderForAgency",
-      });
+        //Act
+        await useCase.execute({
+          conventionId: convention.id,
+          reminderKind: "LastReminderForAgency",
+        });
 
-      //Assert
-      expectToEqual(emailGateway.getSentEmails(), [
-        makeAgencyLastReminderEmail({
-          email: councellor1Email,
-          role: "counsellor",
-          agency,
-          convention,
-          timeGateway,
-        }),
-        makeAgencyLastReminderEmail({
-          email: councellor2Email,
-          role: "counsellor",
-          agency,
-          convention,
-          timeGateway,
-        }),
-        makeAgencyLastReminderEmail({
-          email: validator1Email,
-          role: "validator",
-          agency,
-          convention,
-          timeGateway,
-        }),
-        makeAgencyLastReminderEmail({
-          email: validator2Email,
-          role: "validator",
-          agency,
-          convention,
-          timeGateway,
-        }),
-      ]);
-    });
+        //Assert
+        expectToEqual(emailGateway.getSentEmails(), [
+          makeAgencyLastReminderEmail({
+            email: councellor1Email,
+            role: "counsellor",
+            agency,
+            convention,
+            timeGateway,
+          }),
+          makeAgencyLastReminderEmail({
+            email: councellor2Email,
+            role: "counsellor",
+            agency,
+            convention,
+            timeGateway,
+          }),
+          makeAgencyLastReminderEmail({
+            email: validator1Email,
+            role: "validator",
+            agency,
+            convention,
+            timeGateway,
+          }),
+          makeAgencyLastReminderEmail({
+            email: validator2Email,
+            role: "validator",
+            agency,
+            convention,
+            timeGateway,
+          }),
+        ]);
+      },
+    );
 
     describe("Forbidden cases on convention bad status", () => {
-      it.each([
-        "CANCELLED",
-        "DRAFT",
-        "PARTIALLY_SIGNED",
-        "READY_TO_SIGN",
-        "REJECTED",
-        "ACCEPTED_BY_VALIDATOR",
-        "ACCEPTED_BY_COUNSELLOR",
-      ] satisfies ConventionStatus[])("status '%s'", async (status) => {
+      it.each(forbiddenAgencyStatuses)("status '%s'", async (status) => {
         //Arrange
         const agency = new AgencyDtoBuilder().withId("agencyId").build();
         const convention = new ConventionDtoBuilder()
@@ -272,12 +268,12 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         });
         uow.agencyRepository.setAgencies([agency]);
 
-        const type: ReminderType = "FirstReminderForAgency";
+        const type: ReminderKind = "FirstReminderForAgency";
         //Act
         await expectPromiseToFailWithError(
           useCase.execute({
             conventionId: convention.id,
-            reminderType: type,
+            reminderKind: type,
           }),
           new ForbiddenError(
             forbiddenUnsupportedStatusMessage(convention, type),
@@ -290,9 +286,16 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
     });
   });
 
+  const [authorizedSignatoryStatuses, forbiddenSignatoryStatuses] =
+    splitCasesBetweenPassingAndFailing(conventionStatuses, [
+      "PARTIALLY_SIGNED",
+      "READY_TO_SIGN",
+    ]);
+
   describe("FirstReminderForSignatories", () => {
-    const type: ReminderType = "FirstReminderForSignatories";
-    it.each(["PARTIALLY_SIGNED", "READY_TO_SIGN"] satisfies ConventionStatus[])(
+    const type: ReminderKind = "FirstReminderForSignatories";
+
+    it.each(authorizedSignatoryStatuses)(
       `Send email SIGNATORY_FIRST_REMINDER to signatories when status is '%s'`,
       async (status) => {
         //Arrange
@@ -310,7 +313,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         //Act
         await useCase.execute({
           conventionId: convention.id,
-          reminderType: type,
+          reminderKind: type,
         });
 
         //Assert
@@ -332,14 +335,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
     );
 
     describe("Forbidden cases on convention bad status", () => {
-      it.each([
-        "CANCELLED",
-        "DRAFT",
-        "IN_REVIEW",
-        "REJECTED",
-        "ACCEPTED_BY_VALIDATOR",
-        "ACCEPTED_BY_COUNSELLOR",
-      ] satisfies ConventionStatus[])("status '%s'", async (status) => {
+      it.each(forbiddenSignatoryStatuses)("status '%s'", async (status) => {
         //Arrange
         const agency = new AgencyDtoBuilder().withId("agencyId").build();
         const convention = new ConventionDtoBuilder()
@@ -355,7 +351,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         await expectPromiseToFailWithError(
           useCase.execute({
             conventionId: convention.id,
-            reminderType: type,
+            reminderKind: type,
           }),
           new ForbiddenError(
             forbiddenUnsupportedStatusMessage(convention, type),
@@ -367,8 +363,8 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
   });
 
   describe("LastReminderForSignatories", () => {
-    const type: ReminderType = "LastReminderForSignatories";
-    it.each(["PARTIALLY_SIGNED", "READY_TO_SIGN"] satisfies ConventionStatus[])(
+    const type: ReminderKind = "LastReminderForSignatories";
+    it.each(authorizedSignatoryStatuses)(
       `Send email LAST_FIRST_REMINDER to signatories when status is '%s'`,
       async (status) => {
         //Arrange
@@ -386,7 +382,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         //Act
         await useCase.execute({
           conventionId: convention.id,
-          reminderType: type,
+          reminderKind: type,
         });
 
         //Assert
@@ -408,14 +404,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
     );
 
     describe("Forbidden cases on convention bad status", () => {
-      it.each([
-        "CANCELLED",
-        "DRAFT",
-        "IN_REVIEW",
-        "REJECTED",
-        "ACCEPTED_BY_VALIDATOR",
-        "ACCEPTED_BY_COUNSELLOR",
-      ] satisfies ConventionStatus[])("status '%s'", async (status) => {
+      it.each(forbiddenSignatoryStatuses)("status '%s'", async (status) => {
         //Arrange
         const agency = new AgencyDtoBuilder().withId("agencyId").build();
         const convention = new ConventionDtoBuilder()
@@ -431,7 +420,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         await expectPromiseToFailWithError(
           useCase.execute({
             conventionId: convention.id,
-            reminderType: type,
+            reminderKind: type,
           }),
           new ForbiddenError(
             forbiddenUnsupportedStatusMessage(convention, type),

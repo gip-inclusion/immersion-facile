@@ -18,7 +18,7 @@ import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
 import {
   ConventionReminderPayload,
   conventionReminderPayloadSchema,
-  ReminderType,
+  ReminderKind,
 } from "../../../core/eventsPayloads/ConventionReminderPayload";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import {
@@ -53,7 +53,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
   inputSchema = conventionReminderPayloadSchema;
 
   protected async _execute(
-    { conventionId, reminderType: type }: ConventionReminderPayload,
+    { conventionId, reminderKind }: ConventionReminderPayload,
     uow: UnitOfWork,
   ) {
     const conventionRead = await uow.conventionQueries.getConventionById(
@@ -66,25 +66,28 @@ export class NotifyConventionReminder extends TransactionalUseCase<
 
     if (!agency) throw new NotFoundError(missingAgencyMessage(conventionRead));
 
-    if (type === "FirstReminderForAgency" || type === "LastReminderForAgency")
-      return this.onAgencyReminder(type, conventionRead, agency);
+    if (
+      reminderKind === "FirstReminderForAgency" ||
+      reminderKind === "LastReminderForAgency"
+    )
+      return this.onAgencyReminder(reminderKind, conventionRead, agency);
 
     if (
-      type === "FirstReminderForSignatories" ||
-      type === "LastReminderForSignatories"
+      reminderKind === "FirstReminderForSignatories" ||
+      reminderKind === "LastReminderForSignatories"
     )
-      return this.onSignatoriesReminder(type, conventionRead);
+      return this.onSignatoriesReminder(reminderKind, conventionRead);
   }
 
-  private onSignatoriesReminder(
-    type: Extract<
-      ReminderType,
+  private async onSignatoriesReminder(
+    kind: Extract<
+      ReminderKind,
       "FirstReminderForSignatories" | "LastReminderForSignatories"
     >,
     conventionRead: ConventionReadDto,
   ): Promise<void> {
     if (!["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(conventionRead.status))
-      throw new Error(forbiddenUnsupportedStatusMessage(conventionRead, type));
+      throw new Error(forbiddenUnsupportedStatusMessage(conventionRead, kind));
 
     const actors = [
       ...Object.values(conventionRead.signatories),
@@ -92,28 +95,30 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     ];
 
     const emails: TemplatedEmail[] = [
-      ...(type === "FirstReminderForSignatories"
+      ...(kind === "FirstReminderForSignatories"
         ? this.makeSignatoryFirstReminderEmails(actors, conventionRead)
         : []),
-      ...(type === "LastReminderForSignatories"
+      ...(kind === "LastReminderForSignatories"
         ? this.makeSignatoryLastReminderEmails(actors, conventionRead)
         : []),
     ];
-    return Promise.all(
+    await Promise.all(
       emails.map((email) => this.emailGateway.sendEmail(email)),
-    ).then(() => Promise.resolve());
+    );
   }
 
-  private onAgencyReminder(
-    type: Extract<
-      ReminderType,
+  private async onAgencyReminder(
+    reminderKind: Extract<
+      ReminderKind,
       "FirstReminderForAgency" | "LastReminderForAgency"
     >,
     conventionRead: ConventionReadDto,
     agency: AgencyDto,
   ): Promise<void> {
     if (conventionRead.status !== "IN_REVIEW")
-      throw new Error(forbiddenUnsupportedStatusMessage(conventionRead, type));
+      throw new Error(
+        forbiddenUnsupportedStatusMessage(conventionRead, reminderKind),
+      );
 
     const emailsWithRole: EmailWithRole[] = [
       ...agency.counsellorEmails.map(
@@ -133,21 +138,21 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     ];
 
     const emails: TemplatedEmail[] = [
-      ...(type === "FirstReminderForAgency"
+      ...(reminderKind === "FirstReminderForAgency"
         ? this.makeAgencyFirstReminderEmails(
             emailsWithRole,
             conventionRead,
             agency,
           )
         : []),
-      ...(type === "LastReminderForAgency"
+      ...(reminderKind === "LastReminderForAgency"
         ? this.makeAgencyLastReminderEmails(emailsWithRole, conventionRead)
         : []),
     ];
 
-    return Promise.all(
+    await Promise.all(
       emails.map((email) => this.emailGateway.sendEmail(email)),
-    ).then(() => Promise.resolve());
+    );
   }
 
   private makeAgencyFirstReminderEmails(
@@ -254,9 +259,9 @@ export class NotifyConventionReminder extends TransactionalUseCase<
 
 export const forbiddenUnsupportedStatusMessage = (
   convention: ConventionDto,
-  type: ReminderType,
+  kind: ReminderKind,
 ): string =>
-  `Convention status ${convention.status} is not supported for reminder ${type}.`;
+  `Convention status ${convention.status} is not supported for reminder ${kind}.`;
 
 export const toSignatoriesSummary = ({
   signatories,

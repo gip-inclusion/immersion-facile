@@ -3,7 +3,7 @@ import { ConventionDto, ConventionId, ConventionStatus } from "shared";
 import { z } from "zod";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainEvent } from "../../core/eventBus/events";
-import { ReminderType } from "../../core/eventsPayloads/ConventionReminderPayload";
+import { ReminderKind } from "../../core/eventsPayloads/ConventionReminderPayload";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -43,24 +43,21 @@ export class ConventionsReminder extends TransactionalUseCase<
   protected async _execute(
     _: void,
     uow: UnitOfWork,
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
   ): Promise<ConventionsReminderSummary> {
     const supportedConventions = await this.getSupportedConventions(uow);
 
-    const results: { id: ConventionId; error: Error | null }[] =
-      await Promise.all(
-        supportedConventions
-          .map((convention) =>
-            this.prepareReminderEventsByConvention(convention),
-          )
-          .flat()
-          .map((eventWithConvention) =>
-            uow.outboxRepository
-              .save(eventWithConvention.event)
-              .then((_result) => ({ id: eventWithConvention.id, error: null }))
-              .catch((error: Error) => ({ id: eventWithConvention.id, error })),
-          ),
-      );
+    const results: { id: ConventionId; error?: Error }[] = await Promise.all(
+      supportedConventions
+        .flatMap((convention) =>
+          this.prepareReminderEventsByConvention(convention),
+        )
+        .map((eventWithConvention) =>
+          uow.outboxRepository
+            .save(eventWithConvention.event)
+            .then(() => ({ id: eventWithConvention.id }))
+            .catch((error: Error) => ({ id: eventWithConvention.id, error })),
+        ),
+    );
 
     return {
       success: results.filter(
@@ -68,8 +65,7 @@ export class ConventionsReminder extends TransactionalUseCase<
           result,
         ): result is {
           id: ConventionId;
-          error: null;
-        } => result.error === null,
+        } => result.error === undefined,
       ).length,
       failures: results.filter(
         (
@@ -115,7 +111,7 @@ export class ConventionsReminder extends TransactionalUseCase<
   }
 
   private addReminderTypeForConventionOnMatchCase(
-    reminderType: ReminderType,
+    reminderType: ReminderKind,
     conventionId: ConventionId,
     supportedCondition: boolean,
   ): { id: ConventionId; event: DomainEvent }[] {
@@ -124,10 +120,10 @@ export class ConventionsReminder extends TransactionalUseCase<
           {
             id: conventionId,
             event: this.createNewEvent({
-              topic: "ConventionReminder",
+              topic: "ConventionReminderRequired",
               payload: {
                 conventionId,
-                reminderType,
+                reminderKind: reminderType,
               },
             }),
           },
