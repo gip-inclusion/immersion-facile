@@ -89,4 +89,4 @@ export const formEstablishmentBatchSchema: z.Schema<FormEstablishmentBatchDto> =
   });
 
 export const withEstablishmentGroupSlugSchema: z.Schema<WithEstablishmentGroupSlug> =
-  z.object({ slug: zString });
+  z.object({ groupSlug: zString });

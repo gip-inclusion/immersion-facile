@@ -11,10 +11,10 @@ export type WithDepartmentCodeFromPostcodeQuery = { postcode: LookupAddress };
 export type Postcode = Flavor<string, "Postcode">;
 
 export type LookupAddress = Flavor<string, "LookupAddress">;
-export type WithLookupAddress = { lookup: LookupAddress };
+export type WithLookupStreetAddressQueryParams = { lookup: LookupAddress };
 
 export type LookupLocationInput = Flavor<string, "LookupLocation">;
-export type WithLookupLocationInput = { query: LookupLocationInput };
+export type WithLookupLocationInputQueryParams = { query: LookupLocationInput };
 
 export type StreetNumberAndAddress = Flavor<string, "StreetNumberAndAddress">;
 export type City = Flavor<string, "City">;

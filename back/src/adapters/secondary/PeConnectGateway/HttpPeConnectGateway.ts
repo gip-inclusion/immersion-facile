@@ -13,17 +13,16 @@ import { PeConnectGateway } from "../../../domain/peConnect/port/PeConnectGatewa
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { UnhandledError } from "../../primary/helpers/unhandledError";
 import {
+  PeConnectExternalTargets,
   toAccessToken,
   toPeConnectAdvisorDto,
   toPeConnectUserDto,
-} from "./peConnectApi.client";
+} from "./peConnectApi.targets";
 import {
   ExternalPeConnectAdvisor,
   ExternalPeConnectUser,
   PeConnectHeaders,
   PeConnectOauthConfig,
-  PeConnectTargets,
-  PeConnectTargetsKind,
 } from "./peConnectApi.dto";
 import {
   externalPeConnectAdvisorsSchema,
@@ -44,7 +43,7 @@ import { peConnectErrorStrategy as peConnectAxiosErrorStrategy } from "./peConne
 const logger = createLogger(__filename);
 export class HttpPeConnectGateway implements PeConnectGateway {
   constructor(
-    private httpClient: HttpClient<PeConnectTargets>,
+    private httpClient: HttpClient<PeConnectExternalTargets>,
     private configs: PeConnectOauthConfig,
   ) {}
 
@@ -275,7 +274,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
 
 export const managePeConnectError = (
   error: unknown,
-  targetKind: PeConnectTargetsKind,
+  targetKind: keyof PeConnectExternalTargets,
   context: Record<string, string>,
 ): never => {
   if (!(error instanceof Error))

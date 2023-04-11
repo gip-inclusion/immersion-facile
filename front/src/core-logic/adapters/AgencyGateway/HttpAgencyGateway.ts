@@ -17,7 +17,6 @@ import {
   DepartmentCode,
   ListAgenciesRequestDto,
   WithAgencyId,
-  WithAuthorization,
 } from "shared";
 import {
   ActiveOrRejectedStatus,

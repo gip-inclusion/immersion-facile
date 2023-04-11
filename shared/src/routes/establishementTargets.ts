@@ -1,55 +1,36 @@
-import { createTargets, CreateTargets, Target } from "http-client";
-import { FormEstablishmentDto } from "../formEstablishment/FormEstablishment.dto";
-
-type WithAuthorization = {
-  Authorization: string;
-};
+import { createTarget, createTargets } from "http-client";
+import { z } from "zod";
+import { formEstablishmentSchema } from "../formEstablishment/FormEstablishment.schema";
+import { withValidateHeadersAuthorization } from "./withAuthorization";
 
 const formEstablishmentsUrl = "/form-establishments";
-const formEstablishmentFromSiretUrl = "/form-establishments/:siret";
-const formEstablishmentAlreadyExitsUrl = "/form-already-exists/:siret";
-const requestEmailToUpdateFormUrl = "/request-email-to-update-form/:siret";
 
-export type EstablishmentTargets = CreateTargets<{
-  addFormEstablishment: Target<FormEstablishmentDto>;
-  updateFormEstablishment: Target<
-    FormEstablishmentDto,
-    void,
-    WithAuthorization
-  >;
-  getFormEstablishment: Target<
-    void,
-    void,
-    WithAuthorization,
-    typeof formEstablishmentFromSiretUrl
-  >;
-  isEstablishmentWithSiretAlreadyRegistered: Target<
-    void,
-    void,
-    void,
-    typeof formEstablishmentAlreadyExitsUrl
-  >;
-  requestEmailToUpdateFormRoute: Target<
-    void,
-    void,
-    void,
-    typeof requestEmailToUpdateFormUrl
-  >;
-}>;
-
-export const establishmentTargets = createTargets<EstablishmentTargets>({
-  addFormEstablishment: { method: "POST", url: formEstablishmentsUrl },
-  updateFormEstablishment: {
+export type EstablishmentTargets = typeof establishmentTargets;
+export const establishmentTargets = createTargets({
+  addFormEstablishment: createTarget({
+    method: "POST",
+    url: formEstablishmentsUrl,
+    validateRequestBody: formEstablishmentSchema.parse,
+  }),
+  updateFormEstablishment: createTarget({
     method: "PUT",
     url: formEstablishmentsUrl,
-  },
-  getFormEstablishment: { method: "GET", url: formEstablishmentFromSiretUrl },
-  isEstablishmentWithSiretAlreadyRegistered: {
+    validateRequestBody: formEstablishmentSchema.parse,
+    ...withValidateHeadersAuthorization,
+  }),
+  getFormEstablishment: createTarget({
     method: "GET",
-    url: formEstablishmentAlreadyExitsUrl,
-  },
-  requestEmailToUpdateFormRoute: {
+    url: "/form-establishments/:siret",
+    ...withValidateHeadersAuthorization,
+    validateResponseBody: formEstablishmentSchema.parse,
+  }),
+  isEstablishmentWithSiretAlreadyRegistered: createTarget({
+    method: "GET",
+    url: "/form-already-exists/:siret",
+    validateResponseBody: z.boolean().parse,
+  }),
+  requestEmailToUpdateFormRoute: createTarget({
     method: "POST",
-    url: requestEmailToUpdateFormUrl,
-  },
+    url: "/request-email-to-update-form/:siret",
+  }),
 });

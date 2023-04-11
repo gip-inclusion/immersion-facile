@@ -5,9 +5,11 @@ import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import {
   createHttpAddressClient,
   HttpAddressGateway,
+} from "../../secondary/addressGateway/HttpAddressGateway";
+import {
   addressesExternalTargets,
   AddressesTargets,
-} from "../../secondary/addressGateway/HttpAddressGateway";
+} from "../../secondary/addressGateway/HttpAddressGateway.targets";
 import { ConsoleAppLogger } from "../../secondary/core/ConsoleAppLogger";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { HttpPeAgenciesReferential } from "../../secondary/immersionOffer/peAgenciesReferential/HttpPeAgenciesReferential";

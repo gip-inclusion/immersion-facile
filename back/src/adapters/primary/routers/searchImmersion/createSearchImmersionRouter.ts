@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { searchResultsTargets } from "shared";
+import { searchTargets } from "shared";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 
@@ -7,7 +7,7 @@ export const createSearchImmersionRouter = (deps: AppDependencies) => {
   const searchImmersionRouter = Router();
 
   searchImmersionRouter
-    .route(searchResultsTargets.searchImmersion.url)
+    .route(searchTargets.searchImmersion.url)
     .get(async (req, res) =>
       sendHttpResponse(req, res, async () => {
         await deps.useCases.callLaBonneBoiteAndUpdateRepositories.execute(
@@ -21,7 +21,7 @@ export const createSearchImmersionRouter = (deps: AppDependencies) => {
     );
 
   searchImmersionRouter
-    .route(searchResultsTargets.contactEstablishment.url)
+    .route(searchTargets.contactEstablishment.url)
     .post(async (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.contactEstablishment.execute(req.body),
@@ -29,7 +29,7 @@ export const createSearchImmersionRouter = (deps: AppDependencies) => {
     );
 
   searchImmersionRouter
-    .route(searchResultsTargets.getOffersByGroupSlug.url)
+    .route(searchTargets.getOffersByGroupSlug.url)
     .get(async (req, res) =>
       sendHttpResponse(req, res, async () =>
         deps.useCases.getOffersByGroupSlug.execute(req.params),

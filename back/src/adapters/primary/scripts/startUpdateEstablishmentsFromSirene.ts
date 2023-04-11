@@ -6,9 +6,11 @@ import { PipelineStats } from "../../../utils/pipelineStats";
 import {
   createHttpAddressClient,
   HttpAddressGateway,
+} from "../../secondary/addressGateway/HttpAddressGateway";
+import {
   addressesExternalTargets,
   AddressesTargets,
-} from "../../secondary/addressGateway/HttpAddressGateway";
+} from "../../secondary/addressGateway/HttpAddressGateway.targets";
 import {
   defaultMaxBackoffPeriodMs,
   defaultRetryDeadlineMs,

@@ -1,33 +1,22 @@
-import { createTargets, CreateTargets, Target } from "http-client";
-import { WithAuthorization } from "../admin/admin.dto";
-import { RegisterAgencyToInclusionConnectUserParams } from "../agency/agency.dto";
+import { createTarget, createTargets } from "http-client";
+import { absoluteUrlSchema } from "../AbsoluteUrl";
+import {registerAgencyToInclusionConnectUserParamsSchema} from "../agency/agency.schema";
+import { withValidateHeadersAuthorization } from "./withAuthorization";
 
-const getAgencyDashboardUrl = "/inclusion-connected/agency-dashboard";
-const registerAgencyUrl = "/inclusion-connected/register-agency";
-
-export type InclusionConnectedAllowedTargets = CreateTargets<{
-  getAgencyDashboard: Target<
-    void,
-    void,
-    WithAuthorization,
-    typeof getAgencyDashboardUrl
-  >;
-  registerAgencyToUser: Target<
-    RegisterAgencyToInclusionConnectUserParams,
-    void,
-    WithAuthorization,
-    typeof registerAgencyUrl
-  >;
-}>;
-
-export const inclusionConnectedAllowedTargets =
-  createTargets<InclusionConnectedAllowedTargets>({
-    getAgencyDashboard: {
-      method: "GET",
-      url: getAgencyDashboardUrl,
-    },
-    registerAgencyToUser: {
-      method: "POST",
-      url: registerAgencyUrl,
-    },
-  });
+export type InclusionConnectedAllowedTargets =
+  typeof inclusionConnectedAllowedTargets;
+export const inclusionConnectedAllowedTargets = createTargets({
+  getAgencyDashboard: createTarget({
+    method: "GET",
+    url: "/inclusion-connected/agency-dashboard",
+    ...withValidateHeadersAuthorization,
+    validateResponseBody: absoluteUrlSchema.parse,
+  }),
+  registerAgencyToUser: createTarget({
+    method: "POST",
+    url: "/inclusion-connected/register-agency",
+    ...withValidateHeadersAuthorization,
+    validateRequestBody: registerAgencyToInclusionConnectUserParamsSchema.parse,
+    validateResponseBody: responseBody => responseBody
+  }),
+});

@@ -1,6 +1,6 @@
 import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
-import { createAxiosHandlerCreator } from "http-client";
+import { configureHttpClient, createAxiosHandlerCreator } from "http-client";
 import {
   expectObjectsToMatch,
   expectPromiseToFailWithError,
@@ -12,11 +12,10 @@ import {
 import { AppConfig } from "../../primary/config/appConfig";
 import { HttpPeConnectGateway } from "./HttpPeConnectGateway";
 import {
-  makePeConnectHttpClient,
-  peConnectTargets,
+  makePeConnectExternalTargets,
   toPeConnectAdvisorDto,
   toPeConnectUserDto,
-} from "./peConnectApi.client";
+} from "./peConnectApi.targets";
 import {
   ExternalAccessToken,
   ExternalPeConnectAdvisor,
@@ -25,11 +24,12 @@ import {
 
 describe("HttpPeConnectGateway", () => {
   const appConfig = {} as AppConfig;
-
-  const adapter = new HttpPeConnectGateway(
-    makePeConnectHttpClient(createAxiosHandlerCreator(axios), appConfig),
-    appConfig,
+  const targets = makePeConnectExternalTargets(appConfig);
+  const httpClient = configureHttpClient(createAxiosHandlerCreator(axios))(
+    targets,
   );
+
+  const peConnectGateway = new HttpPeConnectGateway(httpClient, appConfig);
   const mock = new MockAdapter(axios);
   const peExternalUser: ExternalPeConnectUser = {
     email: "maurice.chevalier@gmail.com",
@@ -75,9 +75,9 @@ describe("HttpPeConnectGateway", () => {
           expires_in: 50,
         };
         mock
-          .onPost(peConnectTargets(appConfig).exchangeCodeForAccessToken.url)
+          .onPost(targets.exchangeCodeForAccessToken.url)
           .reply(200, expectedResponse);
-        expectObjectsToMatch(await adapter.getAccessToken(""), {
+        expectObjectsToMatch(await peConnectGateway.getAccessToken(""), {
           expiresIn: expectedResponse.expires_in,
           value: expectedResponse.access_token,
         });
@@ -85,24 +85,20 @@ describe("HttpPeConnectGateway", () => {
     });
     describe("Wrong path", () => {
       it("Invalid grant -> ManagedRedirectError kind peConnectInvalidGrant", async () => {
-        mock
-          .onPost(peConnectTargets(appConfig).exchangeCodeForAccessToken.url)
-          .reply(400, {
-            error_description:
-              "The provided access grant is invalid, expired, or revoked.",
-            error: "invalid_grant",
-          });
+        mock.onPost(targets.exchangeCodeForAccessToken.url).reply(400, {
+          error_description:
+            "The provided access grant is invalid, expired, or revoked.",
+          error: "invalid_grant",
+        });
         await expectPromiseToFailWithError(
-          adapter.getAccessToken(""),
+          peConnectGateway.getAccessToken(""),
           new ManagedRedirectError("peConnectInvalidGrant", new Error()),
         );
       });
       it("request aborted -> ManagedRedirectError kind peConnectConnectionAborted", async () => {
-        mock
-          .onPost(peConnectTargets(appConfig).exchangeCodeForAccessToken.url)
-          .abortRequest();
+        mock.onPost(targets.exchangeCodeForAccessToken.url).abortRequest();
         await testManagedRedirectError(
-          () => adapter.getAccessToken(""),
+          () => peConnectGateway.getAccessToken(""),
           new ManagedRedirectError("peConnectConnectionAborted", new Error()),
         );
       });
@@ -113,51 +109,61 @@ describe("HttpPeConnectGateway", () => {
     describe("Right path", () => {
       it(`OK with ${peExternalUser.email} user and ${peExternalAdvisorPlacement.mail} advisor`, async () => {
         mock
-          .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+          .onGet(targets.getAdvisorsInfo.url)
           .reply(200, [peExternalAdvisorPlacement])
-          .onGet(peConnectTargets(appConfig).getUserInfo.url)
+          .onGet(targets.getUserInfo.url)
           .reply(200, peExternalUser)
-          .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
-          .reply(200, {
-            codeStatutIndividu: "1",
-            libelleStatutIndividu: "Demandeur d’emploi",
-          });
-        expectObjectsToMatch(await adapter.getUserAndAdvisors(accessToken), {
-          advisors: [peConnectAdvisorPlacement],
-          user: peConnectUser(true),
-        });
-      });
-      it(`OK with ${peExternalUser.email} user and ${peExternalAdvisorCapemploi.mail} advisor`, async () => {
-        mock
-          .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
-          .reply(200, [peExternalAdvisorCapemploi])
-          .onGet(peConnectTargets(appConfig).getUserInfo.url)
-          .reply(200, peExternalUser)
-          .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
+          .onGet(targets.getUserStatutInfo.url)
           .reply(200, {
             codeStatutIndividu: "1",
             libelleStatutIndividu: "Demandeur d’emploi",
           });
 
-        expectObjectsToMatch(await adapter.getUserAndAdvisors(accessToken), {
-          advisors: [peConnectAdvisorCapEmploi],
-          user: peConnectUser(true),
-        });
+        expectObjectsToMatch(
+          await peConnectGateway.getUserAndAdvisors(accessToken),
+          {
+            advisors: [peConnectAdvisorPlacement],
+            user: peConnectUser(true),
+          },
+        );
+      });
+      it(`OK with ${peExternalUser.email} user and ${peExternalAdvisorCapemploi.mail} advisor`, async () => {
+        mock
+          .onGet(targets.getAdvisorsInfo.url)
+          .reply(200, [peExternalAdvisorCapemploi])
+          .onGet(targets.getUserInfo.url)
+          .reply(200, peExternalUser)
+          .onGet(targets.getUserStatutInfo.url)
+          .reply(200, {
+            codeStatutIndividu: "1",
+            libelleStatutIndividu: "Demandeur d’emploi",
+          });
+
+        expectObjectsToMatch(
+          await peConnectGateway.getUserAndAdvisors(accessToken),
+          {
+            advisors: [peConnectAdvisorCapEmploi],
+            user: peConnectUser(true),
+          },
+        );
       });
       it(`OK with user not jobseeker -> no advisors`, async () => {
         mock
-          .onGet(peConnectTargets(appConfig).getUserInfo.url)
+          .onGet(targets.getUserInfo.url)
           .reply(200, peExternalUser)
-          .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
+          .onGet(targets.getUserStatutInfo.url)
           .reply(200, {
             codeStatutIndividu: "0",
             libelleStatutIndividu: "Non demandeur d’emploi",
           });
 
-        expectObjectsToMatch(await adapter.getUserAndAdvisors(accessToken), {
-          advisors: [],
-          user: peConnectUser(false),
-        });
+        expectObjectsToMatch(
+          await peConnectGateway.getUserAndAdvisors(accessToken),
+          {
+            advisors: [],
+            user: peConnectUser(false),
+          },
+        );
       });
     });
     describe("Wrong path", () => {
@@ -176,7 +182,7 @@ describe("HttpPeConnectGateway", () => {
         //       codeStatutIndividu: "1",
         //       libelleStatutIndividu: "Demandeur d’emploi",
         //     });
-        //   expectObjectsToMatch(await adapter.getUserAndAdvisors(accessToken), {
+        //   expectObjectsToMatch(await peConnectGateway.getUserAndAdvisors(accessToken), {
         //     advisors: [peConnectAdvisorCapEmploi],
         //     user: peConnectUser(true),
         //   });
@@ -186,51 +192,55 @@ describe("HttpPeConnectGateway", () => {
 
         it("Zod Error -> OK with undefined", async () => {
           mock
-            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+            .onGet(targets.getAdvisorsInfo.url)
             .reply(200, [peExternalAdvisorPlacement])
-            .onGet(peConnectTargets(appConfig).getUserInfo.url)
+            .onGet(targets.getUserInfo.url)
             .reply(200, "UNSUPPORTED RESPONSE")
-            .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
+            .onGet(targets.getUserStatutInfo.url)
             .reply(200, {
               codeStatutIndividu: "1",
               libelleStatutIndividu: "Demandeur d’emploi",
             });
-          expect(await adapter.getUserAndAdvisors(accessToken)).toBeUndefined();
+          expect(
+            await peConnectGateway.getUserAndAdvisors(accessToken),
+          ).toBeUndefined();
         });
 
         it("Bad status code -> OK with undefined", async () => {
           mock
-            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+            .onGet(targets.getAdvisorsInfo.url)
             .reply(200, [peExternalAdvisorCapemploi])
-            .onGet(peConnectTargets(appConfig).getUserInfo.url)
+            .onGet(targets.getUserInfo.url)
             .reply(201, peExternalUser)
-            .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
+            .onGet(targets.getUserStatutInfo.url)
             .reply(200, {
               codeStatutIndividu: "1",
               libelleStatutIndividu: "Demandeur d’emploi",
             });
-          expect(await adapter.getUserAndAdvisors(accessToken)).toBeUndefined();
+          expect(
+            await peConnectGateway.getUserAndAdvisors(accessToken),
+          ).toBeUndefined();
         });
 
         it(`Connection aborted -> ManagedRedirectError kind peConnectConnectionAborted`, async () => {
           mock
-            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+            .onGet(targets.getAdvisorsInfo.url)
             .reply(200, [peExternalAdvisorPlacement])
-            .onGet(peConnectTargets(appConfig).getUserInfo.url)
+            .onGet(targets.getUserInfo.url)
             .abortRequest();
           await expectPromiseToFailWithError(
-            adapter.getUserAndAdvisors(accessToken),
+            peConnectGateway.getUserAndAdvisors(accessToken),
             new ManagedRedirectError("peConnectConnectionAborted", new Error()),
           );
         });
         it(`Network error -> RawRedirectError`, async () => {
           mock
-            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+            .onGet(targets.getAdvisorsInfo.url)
             .reply(200, [peExternalAdvisorPlacement])
-            .onGet(peConnectTargets(appConfig).getUserInfo.url)
+            .onGet(targets.getUserInfo.url)
             .networkError();
           await testRawRedirectError(
-            () => adapter.getUserAndAdvisors(accessToken),
+            () => peConnectGateway.getUserAndAdvisors(accessToken),
             new RawRedirectError(
               "Une erreur est survenue - Erreur réseau",
               "Nous n’avons pas réussi à joindre pôle emploi connect.",
@@ -240,12 +250,12 @@ describe("HttpPeConnectGateway", () => {
         });
         it(`Error 401 -> ManagedRedirectError kind peConnectUserForbiddenAccess`, async () => {
           mock
-            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+            .onGet(targets.getAdvisorsInfo.url)
             .reply(200, [peExternalAdvisorPlacement])
-            .onGet(peConnectTargets(appConfig).getUserInfo.url)
+            .onGet(targets.getUserInfo.url)
             .reply(401);
           await expectPromiseToFailWithError(
-            adapter.getUserAndAdvisors(accessToken),
+            peConnectGateway.getUserAndAdvisors(accessToken),
             new ManagedRedirectError(
               "peConnectGetUserInfoForbiddenAccess",
               new Error(),
@@ -254,12 +264,12 @@ describe("HttpPeConnectGateway", () => {
         });
         it(`Error 500 -> RawRedirectError`, async () => {
           mock
-            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+            .onGet(targets.getAdvisorsInfo.url)
             .reply(200, [peExternalAdvisorPlacement])
-            .onGet(peConnectTargets(appConfig).getUserInfo.url)
+            .onGet(targets.getUserInfo.url)
             .reply(500);
           await testRawRedirectError(
-            () => adapter.getUserAndAdvisors(accessToken),
+            () => peConnectGateway.getUserAndAdvisors(accessToken),
             new RawRedirectError(
               "Une erreur est survenue - 500",
               "Nous n’avons pas réussi à récupérer vos informations personnelles pôle emploi connect.",
@@ -284,7 +294,7 @@ describe("HttpPeConnectGateway", () => {
         //       codeStatutIndividu: "1",
         //       libelleStatutIndividu: "Demandeur d’emploi",
         //     });
-        //   expectObjectsToMatch(await adapter.getUserAndAdvisors(accessToken), {
+        //   expectObjectsToMatch(await peConnectGateway.getUserAndAdvisors(accessToken), {
         //     advisors: [peConnectAdvisorCapEmploi],
         //     user: peConnectUser(true),
         //   });
@@ -292,67 +302,73 @@ describe("HttpPeConnectGateway", () => {
 
         it("Zod Error -> OK with No advisors", async () => {
           mock
-            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+            .onGet(targets.getAdvisorsInfo.url)
             .reply(200, "UNSUPPORTED RESPONSE")
-            .onGet(peConnectTargets(appConfig).getUserInfo.url)
+            .onGet(targets.getUserInfo.url)
             .reply(200, peExternalUser)
-            .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
+            .onGet(targets.getUserStatutInfo.url)
             .reply(200, {
               codeStatutIndividu: "1",
               libelleStatutIndividu: "Demandeur d’emploi",
             });
-          expectObjectsToMatch(await adapter.getUserAndAdvisors(accessToken), {
-            advisors: [],
-            user: peConnectUser(true),
-          });
+          expectObjectsToMatch(
+            await peConnectGateway.getUserAndAdvisors(accessToken),
+            {
+              advisors: [],
+              user: peConnectUser(true),
+            },
+          );
         });
 
         it("Bad status code -> OK with No advisors", async () => {
           mock
-            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+            .onGet(targets.getAdvisorsInfo.url)
             .reply(201, [peExternalAdvisorCapemploi])
-            .onGet(peConnectTargets(appConfig).getUserInfo.url)
+            .onGet(targets.getUserInfo.url)
             .reply(200, peExternalUser)
-            .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
+            .onGet(targets.getUserStatutInfo.url)
             .reply(200, {
               codeStatutIndividu: "1",
               libelleStatutIndividu: "Demandeur d’emploi",
             });
-          expectObjectsToMatch(await adapter.getUserAndAdvisors(accessToken), {
-            advisors: [],
-            user: peConnectUser(true),
-          });
+          expectObjectsToMatch(
+            await peConnectGateway.getUserAndAdvisors(accessToken),
+            {
+              advisors: [],
+              user: peConnectUser(true),
+            },
+          );
         });
 
         it(`Connection aborted -> ManagedRedirectError kind peConnectConnectionAborted`, async () => {
           mock
-            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+            .onGet(targets.getAdvisorsInfo.url)
             .abortRequest()
-            .onGet(peConnectTargets(appConfig).getUserInfo.url)
+            .onGet(targets.getUserInfo.url)
             .reply(200, peExternalUser)
-            .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
+            .onGet(targets.getUserStatutInfo.url)
             .reply(200, {
               codeStatutIndividu: "1",
               libelleStatutIndividu: "Demandeur d’emploi",
             });
           await testManagedRedirectError(
-            () => adapter.getUserAndAdvisors(accessToken),
+            () => peConnectGateway.getUserAndAdvisors(accessToken),
             new ManagedRedirectError("peConnectConnectionAborted", new Error()),
           );
         });
         it(`Network error -> RawRedirectError`, async () => {
           mock
-            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+            .onGet(targets.getAdvisorsInfo.url)
             .networkError()
-            .onGet(peConnectTargets(appConfig).getUserInfo.url)
+            .onGet(targets.getUserInfo.url)
             .reply(200, peExternalUser)
-            .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
+            .onGet(targets.getUserStatutInfo.url)
             .reply(200, {
               codeStatutIndividu: "1",
               libelleStatutIndividu: "Demandeur d’emploi",
             });
           await testRawRedirectError(
-            () => adapter.getUserAndAdvisors(accessToken),
+            () => peConnectGateway.getUserAndAdvisors(accessToken),
             new RawRedirectError(
               "Une erreur est survenue - Erreur réseau",
               "Nous n’avons pas réussi à joindre pôle emploi connect.",
@@ -362,17 +378,17 @@ describe("HttpPeConnectGateway", () => {
         });
         it(`Error 401 -> ManagedRedirectError kind peConnectAdvisorForbiddenAccess`, async () => {
           mock
-            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+            .onGet(targets.getAdvisorsInfo.url)
             .reply(401)
-            .onGet(peConnectTargets(appConfig).getUserInfo.url)
+            .onGet(targets.getUserInfo.url)
             .reply(200, peExternalUser)
-            .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
+            .onGet(targets.getUserStatutInfo.url)
             .reply(200, {
               codeStatutIndividu: "1",
               libelleStatutIndividu: "Demandeur d’emploi",
             });
           await testManagedRedirectError(
-            () => adapter.getUserAndAdvisors(accessToken),
+            () => peConnectGateway.getUserAndAdvisors(accessToken),
             new ManagedRedirectError(
               "peConnectAdvisorForbiddenAccess",
               new Error(),
@@ -381,17 +397,17 @@ describe("HttpPeConnectGateway", () => {
         });
         it(`Error 500 -> OK with no advisors`, async () => {
           mock
-            .onGet(peConnectTargets(appConfig).getUserInfo.url)
+            .onGet(targets.getUserInfo.url)
             .reply(200, peExternalUser)
-            .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
+            .onGet(targets.getUserStatutInfo.url)
             .reply(200, {
               codeStatutIndividu: "1",
               libelleStatutIndividu: "Demandeur d’emploi",
             })
-            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+            .onGet(targets.getAdvisorsInfo.url)
             .reply(500);
           await expectObjectsToMatch(
-            await adapter.getUserAndAdvisors(accessToken),
+            await peConnectGateway.getUserAndAdvisors(accessToken),
             {
               advisors: [],
               user: peConnectUser(true),
@@ -403,56 +419,62 @@ describe("HttpPeConnectGateway", () => {
       describe("Errors on getUserStatutInfo", () => {
         it("Zod Error getUserStatutInfo -> OK with No advisors and not jobseeker", async () => {
           mock
-            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+            .onGet(targets.getAdvisorsInfo.url)
             .reply(200, [peExternalAdvisorPlacement])
-            .onGet(peConnectTargets(appConfig).getUserInfo.url)
+            .onGet(targets.getUserInfo.url)
             .reply(200, peExternalUser)
-            .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
+            .onGet(targets.getUserStatutInfo.url)
             .reply(200, "UNSUPPORTED RESPONSE");
-          expectObjectsToMatch(await adapter.getUserAndAdvisors(accessToken), {
-            advisors: [],
-            user: peConnectUser(false),
-          });
+          expectObjectsToMatch(
+            await peConnectGateway.getUserAndAdvisors(accessToken),
+            {
+              advisors: [],
+              user: peConnectUser(false),
+            },
+          );
         });
         it("Bad status code -> OK with No advisors and not jobseeker", async () => {
           mock
-            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+            .onGet(targets.getAdvisorsInfo.url)
             .reply(200, [peExternalAdvisorCapemploi])
-            .onGet(peConnectTargets(appConfig).getUserInfo.url)
+            .onGet(targets.getUserInfo.url)
             .reply(200, peExternalUser)
-            .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
+            .onGet(targets.getUserStatutInfo.url)
             .reply(201, {
               codeStatutIndividu: "1",
               libelleStatutIndividu: "Demandeur d’emploi",
             });
-          expectObjectsToMatch(await adapter.getUserAndAdvisors(accessToken), {
-            advisors: [],
-            user: peConnectUser(false),
-          });
+          expectObjectsToMatch(
+            await peConnectGateway.getUserAndAdvisors(accessToken),
+            {
+              advisors: [],
+              user: peConnectUser(false),
+            },
+          );
         });
         it(`Connection aborted -> ManagedRedirectError kind peConnectConnectionAborted`, async () => {
           mock
-            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+            .onGet(targets.getAdvisorsInfo.url)
             .reply(200, [peExternalAdvisorPlacement])
-            .onGet(peConnectTargets(appConfig).getUserInfo.url)
+            .onGet(targets.getUserInfo.url)
             .reply(200, peExternalUser)
-            .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
+            .onGet(targets.getUserStatutInfo.url)
             .abortRequest();
           await expectPromiseToFailWithError(
-            adapter.getUserAndAdvisors(accessToken),
+            peConnectGateway.getUserAndAdvisors(accessToken),
             new ManagedRedirectError("peConnectConnectionAborted", new Error()),
           );
         });
         it(`Network error -> RawRedirectError`, async () => {
           mock
-            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+            .onGet(targets.getAdvisorsInfo.url)
             .reply(200, [peExternalAdvisorPlacement])
-            .onGet(peConnectTargets(appConfig).getUserInfo.url)
+            .onGet(targets.getUserInfo.url)
             .reply(200, peExternalUser)
-            .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
+            .onGet(targets.getUserStatutInfo.url)
             .networkError();
           await testRawRedirectError(
-            () => adapter.getUserAndAdvisors(accessToken),
+            () => peConnectGateway.getUserAndAdvisors(accessToken),
             new RawRedirectError(
               "Une erreur est survenue - Erreur réseau",
               "Nous n’avons pas réussi à joindre pôle emploi connect.",
@@ -462,14 +484,14 @@ describe("HttpPeConnectGateway", () => {
         });
         it(`Error 401 -> ManagedRedirectError kind peConnectUserForbiddenAccess`, async () => {
           mock
-            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+            .onGet(targets.getAdvisorsInfo.url)
             .reply(200, [peExternalAdvisorPlacement])
-            .onGet(peConnectTargets(appConfig).getUserInfo.url)
+            .onGet(targets.getUserInfo.url)
             .reply(200, peExternalUser)
-            .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
+            .onGet(targets.getUserStatutInfo.url)
             .reply(401);
           await expectPromiseToFailWithError(
-            adapter.getUserAndAdvisors(accessToken),
+            peConnectGateway.getUserAndAdvisors(accessToken),
             new ManagedRedirectError(
               "peConnectGetUserStatusInfoForbiddenAccess",
               new Error(),
@@ -478,14 +500,14 @@ describe("HttpPeConnectGateway", () => {
         });
         it(`Error 500 -> RawRedirectError`, async () => {
           mock
-            .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
+            .onGet(targets.getAdvisorsInfo.url)
             .reply(200, [peExternalAdvisorPlacement])
-            .onGet(peConnectTargets(appConfig).getUserInfo.url)
+            .onGet(targets.getUserInfo.url)
             .reply(200, peExternalUser)
-            .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
+            .onGet(targets.getUserStatutInfo.url)
             .reply(500);
           await testRawRedirectError(
-            () => adapter.getUserAndAdvisors(accessToken),
+            () => peConnectGateway.getUserAndAdvisors(accessToken),
             new RawRedirectError(
               "Une erreur est survenue - 500",
               "Nous n’avons pas réussi à récupérer votre status pôle emploi connect.",

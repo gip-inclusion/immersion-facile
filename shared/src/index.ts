@@ -55,7 +55,7 @@ export * from "./routes/adminTargets";
 export * from "./routes/inclusionConnectedAllowedTargets";
 export * from "./routes/inclusionConnectTargets";
 export * from "./routes/establishementTargets";
-export * from "./routes/searchResultsTargets";
+export * from "./routes/searchTargets";
 export * from "./schedule/Schedule.dto";
 export * from "./schedule/Schedule.schema";
 export * from "./schedule/ScheduleDtoBuilder";

@@ -1,5 +1,6 @@
 import { zString, zTrimmedString } from "shared";
 import { z } from "zod";
+import { BearerToken } from "../../../domain/peConnect/dto/BearerToken";
 import {
   peAdvisorKinds,
   PeConnectAdvisorsKind,
@@ -9,6 +10,7 @@ import {
   ExternalPeConnectAdvisors,
   ExternalPeConnectStatut,
   ExternalPeConnectUser,
+  PeConnectHeaders,
 } from "./peConnectApi.dto";
 
 export const externalPeConnectUserSchema: z.Schema<ExternalPeConnectUser> =
@@ -35,6 +37,7 @@ export const externalPeConnectUserStatutSchema: z.Schema<ExternalPeConnectStatut
 
 const peAdvisorKindSchema: z.Schema<PeConnectAdvisorsKind> =
   z.enum(peAdvisorKinds);
+
 export const externalPeConnectAdvisorSchema: z.Schema<ExternalPeConnectAdvisor> =
   z.object({
     nom: zTrimmedString,
@@ -46,3 +49,11 @@ export const externalPeConnectAdvisorSchema: z.Schema<ExternalPeConnectAdvisor> 
 
 export const externalPeConnectAdvisorsSchema: z.Schema<ExternalPeConnectAdvisors> =
   z.array(externalPeConnectAdvisorSchema);
+
+const bearerSchema = z.string().regex(/^Bearer .+$/) as z.Schema<BearerToken>;
+
+export const peConnectHeadersSchema: z.Schema<PeConnectHeaders> = z.object({
+  "Content-Type": z.literal("application/json"),
+  Accept: z.literal("application/json"),
+  Authorization: bearerSchema,
+});

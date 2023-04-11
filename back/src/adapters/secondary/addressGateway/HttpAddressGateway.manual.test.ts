@@ -15,9 +15,11 @@ import {
   createHttpAddressClient,
   HttpAddressGateway,
   errorMessage,
-  AddressesTargets,
-  addressesExternalTargets,
 } from "./HttpAddressGateway";
+import {
+  addressesExternalTargets,
+  AddressesTargets,
+} from "./HttpAddressGateway.targets";
 
 const resultFromApiAddress = {
   type: "FeatureCollection",

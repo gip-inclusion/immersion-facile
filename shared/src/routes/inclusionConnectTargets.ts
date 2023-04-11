@@ -1,23 +1,23 @@
-import { createTargets, CreateTargets, Target } from "http-client";
+import { createTarget, createTargets } from "http-client";
+import { absoluteUrlSchema } from "../AbsoluteUrl";
+import { authenticateWithInclusionCodeSchema } from "../inclusionConnect/inclusionConnect.schema";
 
 // inclusion connect documentation is here : https://github.com/betagouv/itou-inclusion-connect/blob/master/docs/openid_connect.md#d%C3%A9tail-des-flux
 
-export type InclusionConnectImmersionTargets = CreateTargets<{
-  startInclusionConnectLogin: Target;
-  afterLoginRedirection: Target<void, { code: string; state: string }>;
-}>;
-
-export const inclusionConnectImmersionTargets =
-  createTargets<InclusionConnectImmersionTargets>({
-    startInclusionConnectLogin: {
-      method: "GET",
-      url: "/inclusion-connect-start-login",
-    },
-    afterLoginRedirection: {
-      method: "GET",
-      url: "/inclusion-connect-after-login",
-    },
-  });
+export type InclusionConnectImmersionTargets =
+  typeof inclusionConnectImmersionTargets;
+export const inclusionConnectImmersionTargets = createTargets({
+  startInclusionConnectLogin: createTarget({
+    method: "GET",
+    url: "/inclusion-connect-start-login",
+    validateResponseBody: absoluteUrlSchema.parse,
+  }),
+  afterLoginRedirection: createTarget({
+    method: "GET",
+    url: "/inclusion-connect-after-login",
+    validateQueryParams: authenticateWithInclusionCodeSchema.parse,
+  }),
+});
 
 // -> inclusionConnect button calls startInclusionConnectLogin (immersion)
 // -> redirects to inclusionConnect (inclusion)

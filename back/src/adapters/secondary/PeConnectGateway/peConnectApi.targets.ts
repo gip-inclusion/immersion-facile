@@ -1,10 +1,6 @@
-import {
-  configureHttpClient,
-  createTargets,
-  HandlerCreator,
-  HttpClient,
-} from "http-client";
+import { createTarget, createTargets } from "http-client";
 import { AbsoluteUrl, queryParamsAsString } from "shared";
+import { z } from "zod";
 import { AccessTokenDto } from "../../../domain/peConnect/dto/AccessToken.dto";
 import { PeConnectAdvisorDto } from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
 import { PeConnectUserDto } from "../../../domain/peConnect/dto/PeConnectUser.dto";
@@ -14,17 +10,17 @@ import {
   ExternalPeConnectAdvisor,
   ExternalPeConnectOAuthGrantPayload,
   ExternalPeConnectUser,
-  PeConnectHeaders,
-  PeConnectTargets,
+  peConnectAccessTokenHeadersSchema,
 } from "./peConnectApi.dto";
+import { peConnectHeadersSchema } from "./peConnectApi.schema";
 
-export const makePeConnectHttpClient = (
-  handlerCreator: HandlerCreator,
-  appConfig: PeConnectTargetsConfig,
-): HttpClient<PeConnectTargets> =>
-  configureHttpClient(handlerCreator)<PeConnectTargets>(
-    peConnectTargets(appConfig),
-  );
+// export const makePeConnectHttpClient = (
+//   handlerCreator: HandlerCreator,
+//   peConnectConfig: PeConnectTargetsConfig,
+// ): HttpClient<PeConnectTargets> =>
+//   configureHttpClient(handlerCreator)<PeConnectTargets>(
+//     createPeConnectTargets(peConnectConfig),
+//   );
 
 export const peConnectNeededScopesForAllUsedApi = (clientId: string): string =>
   [
@@ -44,33 +40,36 @@ type PeConnectTargetsConfig = {
   peAuthCandidatUrl: AbsoluteUrl;
 };
 
-export const peConnectTargets = (config: PeConnectTargetsConfig) =>
-  createTargets<PeConnectTargets>({
-    getAdvisorsInfo: {
+export type PeConnectExternalTargets = ReturnType<
+  typeof makePeConnectExternalTargets
+>;
+export const makePeConnectExternalTargets = ({
+  peApiUrl,
+  peAuthCandidatUrl,
+}: PeConnectTargetsConfig) =>
+  createTargets({
+    getAdvisorsInfo: createTarget({
       method: "GET",
-      url: `${config.peApiUrl}/partenaire/peconnect-conseillers/v1/contactspe/conseillers`,
-    },
-    getUserInfo: {
+      url: `${peApiUrl}/partenaire/peconnect-conseillers/v1/contactspe/conseillers`,
+      validateHeaders: peConnectHeadersSchema.parse,
+    }),
+    getUserInfo: createTarget({
       method: "GET",
-      url: `${config.peApiUrl}/partenaire/peconnect-individu/v1/userinfo`,
-    },
-    getUserStatutInfo: {
+      url: `${peApiUrl}/partenaire/peconnect-individu/v1/userinfo`,
+      validateHeaders: peConnectHeadersSchema.parse,
+    }),
+    getUserStatutInfo: createTarget({
       method: "GET",
-      url: `${config.peApiUrl}/partenaire/peconnect-statut/v1/statut`,
-    },
-    exchangeCodeForAccessToken: {
+      url: `${peApiUrl}/partenaire/peconnect-statut/v1/statut`,
+      validateHeaders: peConnectHeadersSchema.parse,
+    }),
+    exchangeCodeForAccessToken: createTarget({
       method: "POST",
-      url: `${config.peAuthCandidatUrl}/connexion/oauth2/access_token?realm=%2Findividu`,
-    },
+      url: `${peAuthCandidatUrl}/connexion/oauth2/access_token?realm=%2Findividu`,
+      validateHeaders: peConnectAccessTokenHeadersSchema.parse,
+      validateRequestBody: z.string().parse,
+    }),
   });
-
-export const peConnectheadersWithBearerAuthToken = (
-  accessToken: AccessTokenDto,
-): PeConnectHeaders => ({
-  "Content-Type": "application/json",
-  Accept: "application/json",
-  Authorization: `Bearer ${accessToken.value}`,
-});
 
 export const makePeConnectLoginPageUrl = (appConfig: AppConfig): AbsoluteUrl =>
   makeOauthGetAuthorizationCodeRedirectUrl(appConfig.peAuthCandidatUrl, {

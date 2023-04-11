@@ -1,14 +1,11 @@
 import { configureHttpClient, createAxiosHandlerCreator } from "http-client";
 import {
-  createManagedAxiosInstance,
-  AdminTargets,
-  adminTargets,
-  establishmentTargets,
-  EstablishmentTargets,
-  AddressTargets,
   addressTargets,
+  adminTargets,
+  createManagedAxiosInstance,
+  establishmentTargets,
   inclusionConnectedAllowedTargets,
-  InclusionConnectedAllowedTargets,
+  searchTargets,
 } from "shared";
 import { createCommonDependencies } from "src/config/createCommonDependencies";
 import type { Dependencies } from "src/config/dependencies";
@@ -16,18 +13,13 @@ import { HttpAddressGateway } from "src/core-logic/adapters/AddressGateway/HttpA
 import { HttpAdminGateway } from "src/core-logic/adapters/AdminGateway/HttpAdminGateway";
 import {
   agencyTargets,
-  AgencyTargets,
   HttpAgencyGateway,
 } from "src/core-logic/adapters/AgencyGateway/HttpAgencyGateway";
 import { HttpImmersionAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/HttpImmersionAssessmentGateway";
 import { HttpConventionGateway } from "src/core-logic/adapters/Convention/HttpConventionGateway";
 import { HttpSentEmailGateway } from "src/core-logic/adapters/EmailGateway/HttpSentEmailGateway";
 import { HttpEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/HttpEstablishmentGateway";
-import {
-  HttpImmersionSearchGateway,
-  SearchResultsTargets,
-  searchResultsTargets,
-} from "src/core-logic/adapters/ImmersionSearchGateway/HttpImmersionSearchGateway";
+import { HttpImmersionSearchGateway } from "src/core-logic/adapters/ImmersionSearchGateway/HttpImmersionSearchGateway";
 import { HttpInclusionConnectedGateway } from "src/core-logic/adapters/InclusionConnected/HttpInclusionConnectedGateway";
 import { HttpRomeAutocompleteGateway } from "src/core-logic/adapters/RomeAutocompleteGateway/HttpRomeAutocompleteGateway";
 import { HttpSiretGatewayThroughBack } from "src/core-logic/adapters/SiretGatewayThroughBack/HttpSiretGatewayThroughBack";
@@ -39,29 +31,21 @@ export const createHttpDependencies = (): Dependencies => {
   const createHttpClient = configureHttpClient(handlerCreator);
 
   return {
-    addressGateway: new HttpAddressGateway(
-      createHttpClient<AddressTargets>(addressTargets),
-    ),
-    adminGateway: new HttpAdminGateway(
-      createHttpClient<AdminTargets>(adminTargets),
-    ),
-    agencyGateway: new HttpAgencyGateway(
-      createHttpClient<AgencyTargets>(agencyTargets),
-    ),
+    addressGateway: new HttpAddressGateway(createHttpClient(addressTargets)),
+    adminGateway: new HttpAdminGateway(createHttpClient(adminTargets)),
+    agencyGateway: new HttpAgencyGateway(createHttpClient(agencyTargets)),
     inclusionConnectedGateway: new HttpInclusionConnectedGateway(
-      createHttpClient<InclusionConnectedAllowedTargets>(
-        inclusionConnectedAllowedTargets,
-      ),
+      createHttpClient(inclusionConnectedAllowedTargets),
     ),
     establishmentGateway: new HttpEstablishmentGateway(
-      createHttpClient<EstablishmentTargets>(establishmentTargets),
+      createHttpClient(establishmentTargets),
     ),
     conventionGateway: new HttpConventionGateway(axiosOnSlashApi),
     immersionAssessmentGateway: new HttpImmersionAssessmentGateway(
       axiosOnSlashApi,
     ),
     immersionSearchGateway: new HttpImmersionSearchGateway(
-      createHttpClient<SearchResultsTargets>(searchResultsTargets),
+      createHttpClient(searchTargets),
     ),
     romeAutocompleteGateway: new HttpRomeAutocompleteGateway(axiosOnSlashApi),
     sentEmailGateway: new HttpSentEmailGateway(axiosOnSlashApi),

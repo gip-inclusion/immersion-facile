@@ -139,3 +139,5 @@ export const zSchemaForType =
   <T>() =>
   <S extends z.ZodType<T, any, any>>(arg: S) =>
     arg;
+
+export const zAnyObj = z.object({}).passthrough();

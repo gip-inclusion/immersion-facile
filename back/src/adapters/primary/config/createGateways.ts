@@ -1,7 +1,11 @@
 import axios from "axios";
-import { createAxiosHandlerCreator } from "http-client";
+import { configureHttpClient, createAxiosHandlerCreator } from "http-client";
 import { Pool } from "pg";
-import { exhaustiveCheck, immersionFacileContactEmail } from "shared";
+import {
+  exhaustiveCheck,
+  immersionFacileContactEmail,
+  pipeWithValue,
+} from "shared";
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
 import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
@@ -13,9 +17,11 @@ import { createLogger } from "../../../utils/logger";
 import {
   createHttpAddressClient,
   HttpAddressGateway,
-  AddressesTargets,
-  addressesExternalTargets,
 } from "../../secondary/addressGateway/HttpAddressGateway";
+import {
+  addressesExternalTargets,
+  AddressesTargets,
+} from "../../secondary/addressGateway/HttpAddressGateway.targets";
 import { InMemoryAddressGateway } from "../../secondary/addressGateway/InMemoryAddressGateway";
 import { CachingAccessTokenGateway } from "../../secondary/core/CachingAccessTokenGateway";
 import { MetabaseDashboardGateway } from "../../secondary/dashboardGateway/MetabaseDashboardGateway";
@@ -33,12 +39,12 @@ import { HttpPoleEmploiGateway } from "../../secondary/immersionOffer/poleEmploi
 import { InMemoryPoleEmploiGateway } from "../../secondary/immersionOffer/poleEmploi/InMemoryPoleEmploiGateway";
 import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { HttpInclusionConnectGateway } from "../../secondary/InclusionConnectGateway/HttpInclusionConnectGateway";
-import { makeInclusionConnectHttpClient } from "../../secondary/InclusionConnectGateway/inclusionConnectApi.client";
+import { makeInclusionConnectExternalTargets } from "../../secondary/InclusionConnectGateway/inclusionConnectExternal.targets";
 import { InMemoryInclusionConnectGateway } from "../../secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
 import { NotImplementedDocumentGateway } from "../../secondary/NotImplementedDocumentGateway";
 import { HttpPeConnectGateway } from "../../secondary/PeConnectGateway/HttpPeConnectGateway";
 import { InMemoryPeConnectGateway } from "../../secondary/PeConnectGateway/InMemoryPeConnectGateway";
-import { makePeConnectHttpClient } from "../../secondary/PeConnectGateway/peConnectApi.client";
+import { makePeConnectExternalTargets } from "../../secondary/PeConnectGateway/peConnectApi.targets";
 import { ExcelExportGateway } from "../../secondary/reporting/ExcelExportGateway";
 import { InMemoryExportGateway } from "../../secondary/reporting/InMemoryExportGateway";
 import { S3DocumentGateway } from "../../secondary/S3DocumentGateway";
@@ -51,6 +57,14 @@ import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGatewa
 const logger = createLogger(__filename);
 
 const AXIOS_TIMEOUT_MS = 10_000;
+
+const axiosHandlerCreator = createAxiosHandlerCreator(
+  axios.create({
+    timeout: AXIOS_TIMEOUT_MS,
+  }),
+);
+
+const createHttpClientForExternalApi = configureHttpClient(axiosHandlerCreator);
 
 export type GetPgPoolFn = () => Pool;
 export const createGetPgPoolFn = (config: AppConfig): GetPgPoolFn => {
@@ -197,13 +211,13 @@ const createEmailGateway = (
 const createPoleEmploiConnectGateway = (config: AppConfig) =>
   config.peConnectGateway === "HTTPS"
     ? new HttpPeConnectGateway(
-        makePeConnectHttpClient(
-          createAxiosHandlerCreator(
-            axios.create({
-              timeout: AXIOS_TIMEOUT_MS,
-            }),
-          ),
-          config,
+        pipeWithValue(
+          {
+            peApiUrl: config.peApiUrl,
+            peAuthCandidatUrl: config.peAuthCandidatUrl,
+          },
+          makePeConnectExternalTargets,
+          createHttpClientForExternalApi,
         ),
         {
           immersionFacileBaseUrl: config.immersionFacileBaseUrl,
@@ -218,14 +232,10 @@ const createInclusionConnectGateway = (
 ): InclusionConnectGateway =>
   config.inclusionConnectGateway === "HTTPS"
     ? new HttpInclusionConnectGateway(
-        makeInclusionConnectHttpClient(
-          axios.create({
-            timeout: AXIOS_TIMEOUT_MS,
-          }),
-          {
-            inclusionConnectBaseUrl:
-              config.inclusionConnectConfig.inclusionConnectBaseUri,
-          },
+        pipeWithValue(
+          config.inclusionConnectConfig.inclusionConnectBaseUri,
+          makeInclusionConnectExternalTargets,
+          createHttpClientForExternalApi,
         ),
         config.inclusionConnectConfig,
       )

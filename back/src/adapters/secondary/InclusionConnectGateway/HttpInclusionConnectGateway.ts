@@ -1,14 +1,10 @@
 import { HttpClient } from "http-client";
 import { queryParamsAsString } from "shared";
+import { InclusionAccessTokenResponse } from "../../../domain/inclusionConnect/port/InclusionAccessTokenResponse";
 import { InclusionConnectGateway } from "../../../domain/inclusionConnect/port/InclusionConnectGateway";
-import {
-  InclusionAccessTokenResponse,
-  inclusionAccessTokenResponseSchema,
-} from "../../../domain/inclusionConnect/port/InclusionAccessTokenResponse";
 import { InclusionConnectConfig } from "../../../domain/inclusionConnect/useCases/InitiateInclusionConnect";
 import { createLogger } from "../../../utils/logger";
-import { validateAndParseZodSchema } from "../../primary/helpers/httpErrors";
-import { InclusionConnectExternalTargets } from "./inclusionConnectApi.client";
+import { InclusionConnectExternalTargets } from "./inclusionConnectExternal.targets";
 
 const logger = createLogger(__filename);
 
@@ -19,7 +15,7 @@ export class HttpInclusionConnectGateway implements InclusionConnectGateway {
   ) {}
 
   async getAccessToken(code: string): Promise<InclusionAccessTokenResponse> {
-    const { responseBody } = await this.httpClient
+    const response = await this.httpClient
       .inclusionConnectGetAccessToken({
         body: queryParamsAsString({
           code,
@@ -40,10 +36,7 @@ export class HttpInclusionConnectGateway implements InclusionConnectGateway {
         throw error;
       });
 
-    return validateAndParseZodSchema(
-      inclusionAccessTokenResponseSchema,
-      responseBody,
-    );
+    return response.responseBody;
   }
 }
 

@@ -17,11 +17,11 @@ export class GetOffersByGroupSlug extends TransactionalUseCase<
   inputSchema = withEstablishmentGroupSlugSchema;
 
   public async _execute(
-    { slug }: WithEstablishmentGroupSlug,
+    { groupSlug }: WithEstablishmentGroupSlug,
     uow: UnitOfWork,
   ): Promise<SearchImmersionResultDto[]> {
     return uow.establishmentGroupRepository.findSearchImmersionResultsBySlug(
-      slug,
+      groupSlug,
     );
   }
 }

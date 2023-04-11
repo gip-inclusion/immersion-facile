@@ -3,26 +3,29 @@ import { Point } from "geojson";
 import {
   configureHttpClient,
   createAxiosHandlerCreator,
-  createTargets,
-  CreateTargets,
   HttpClient,
-  Target,
 } from "http-client";
 import {
-  AbsoluteUrl,
   AddressAndPosition,
   AddressDto,
+  City,
+  DepartmentName,
   departmentNameToDepartmentCode,
   GeoPositionDto,
   LookupSearchResult,
   lookupSearchResultsSchema,
   OpenCageGeoSearchKey,
-  City,
-  DepartmentName,
-  StreetNumberAndAddress,
   Postcode,
+  StreetNumberAndAddress,
 } from "shared";
 import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
+import {
+  OpenCageDataAddressComponents,
+  OpenCageDataFeatureCollection,
+  OpenCageDataProperties,
+  OpenCageDataSearchResultCollection,
+} from "./HttpAddressGateway.dto";
+import { AddressesTargets } from "./HttpAddressGateway.targets";
 
 export const errorMessage = {
   minimumCharErrorMessage: (minLength: number) =>
@@ -30,93 +33,10 @@ export const errorMessage = {
 };
 
 // https://github.com/OpenCageData/opencagedata-misc-docs/blob/master/countrycode.md
-// On prends la france et toutes ses territoires dépendants.
-const openCageDataBaseUrl = "https://api.opencagedata.com" as const;
-
-// https://api.gouv.fr/les-api/base-adresse-nationale
-const apiAddressBaseUrl: AbsoluteUrl = `https://api-adresse.data.gouv.fr`;
-
-const getDepartmentCodeUrl = `${apiAddressBaseUrl}/search` as const;
-const geoCodingUrl = `${openCageDataBaseUrl}/geocode/v1/geojson` as const;
-const geoSearchUrl = `${openCageDataBaseUrl}/geosearch` as const;
-
+// On prend la france et tous ses territoires dépendants.
 const franceAndAttachedTerritoryCountryCodes =
   "fr,bl,gf,gp,mf,mq,nc,pf,pm,re,tf,wf,yt";
 const language = "fr";
-
-type DepartmentCodeQueryParams = {
-  q: string;
-};
-
-type GeoCodingQueryParams = {
-  q: string;
-  key: string;
-  language?: string;
-  countrycode?: string;
-  limit?: string;
-};
-
-type GeoSearchQueryParams = {
-  q: string;
-  language?: string;
-  countrycode?: string;
-  limit?: string;
-};
-
-type GeoSearchHeaders = {
-  "OpenCage-Geosearch-Key": OpenCageGeoSearchKey;
-  Origin: string;
-};
-
-type OpenCageDataLookupSearchResult = {
-  bounds: {
-    northeast: {
-      lat: string;
-      lng: string;
-    };
-    southwest: {
-      lat: string;
-      lng: string;
-    };
-  };
-  formatted: string;
-  geometry: {
-    lat: string;
-    lng: string;
-  };
-  name: string;
-};
-
-export type AddressesTargets = CreateTargets<{
-  getDepartmentCode: Target<
-    void,
-    DepartmentCodeQueryParams,
-    void,
-    typeof getDepartmentCodeUrl
-  >;
-  geocoding: Target<void, GeoCodingQueryParams, void, typeof geoCodingUrl>;
-  geosearch: Target<
-    void,
-    GeoSearchQueryParams,
-    GeoSearchHeaders,
-    typeof geoSearchUrl
-  >;
-}>;
-
-export const addressesExternalTargets = createTargets<AddressesTargets>({
-  getDepartmentCode: {
-    method: "GET",
-    url: getDepartmentCodeUrl,
-  },
-  geocoding: {
-    method: "GET",
-    url: geoCodingUrl,
-  },
-  geosearch: {
-    method: "GET",
-    url: geoSearchUrl,
-  },
-});
 
 const AXIOS_TIMEOUT_MS = 10_000;
 
@@ -255,58 +175,6 @@ export class HttpAddressGateway implements AddressGateway {
     );
   }
 }
-
-// Using the GeoJson standard: https://geojson.org/
-type OpenCageDataFeatureCollection = GeoJSON.FeatureCollection<
-  Point,
-  OpenCageDataProperties
->;
-
-type OpenCageDataProperties = {
-  components: OpenCageDataAddressComponents; // The address component
-  confidence: number; // 10 is the best match inferior is less good
-};
-
-type OpenCageDataSearchResultCollection = {
-  // move to shared ?
-  documentation: string;
-  licenses: object[];
-  results: OpenCageDataLookupSearchResult[];
-  status: object;
-  stay_informed: object;
-  thanks: string;
-  timestamp: object;
-  total_results: number;
-};
-
-//Aliases Reference : https://github.com/OpenCageData/address-formatting/blob/master/conf/components.yaml
-type OpenCageDataAddressComponents = {
-  city?: string;
-  county?: string;
-  county_code?: string;
-  department?: string;
-  footway?: string;
-  house_number?: string;
-  housenumber?: string;
-  path?: string;
-  pedestrian?: string;
-  place?: string;
-  postcode: string;
-  region: string;
-  residential?: string;
-  road?: string;
-  road_reference?: string;
-  road_reference_intl?: string;
-  square?: string;
-  state?: string;
-  state_district?: string;
-  street?: string;
-  street_name?: string;
-  street_number?: string;
-  town?: string;
-  township?: string;
-  village?: string;
-};
 
 const getPostcodeFromAliases = (
   components: OpenCageDataAddressComponents,

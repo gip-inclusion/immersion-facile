@@ -2,7 +2,7 @@ import {
   expectToEqual,
   immersionOffersRoute,
   SearchImmersionResultDto,
-  searchResultsTargets,
+  searchTargets,
 } from "shared";
 import { SuperTest, Test } from "supertest";
 import { avenueChampsElyseesDto } from "../../../../_testBuilders/addressDtos";
@@ -104,7 +104,7 @@ describe("search-immersion route", () => {
   describe("GET getOffersByGroupSlug", () => {
     it("should get the stubbed data", async () => {
       const response = await request.get(
-        searchResultsTargets.getOffersByGroupSlug.url.replace(
+        searchTargets.getOffersByGroupSlug.url.replace(
           ":slug",
           "some-group-slug",
         ),

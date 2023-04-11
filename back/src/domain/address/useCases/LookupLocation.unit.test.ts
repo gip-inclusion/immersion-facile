@@ -1,4 +1,4 @@
-import { LookupSearchResult, WithLookupLocationInput } from "shared";
+import { LookupSearchResult, WithLookupLocationInputQueryParams } from "shared";
 import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { LookupLocation } from "./LookupLocation";
 
@@ -23,7 +23,9 @@ describe("Lookup Street Address", () => {
     ];
     addressApiGateway.setLookupSearchResults(expectedLookupSearchResults);
 
-    const lookupLocationInput: WithLookupLocationInput = { query: "Barb" };
+    const lookupLocationInput: WithLookupLocationInputQueryParams = {
+      query: "Barb",
+    };
     expect(await useCase.execute(lookupLocationInput)).toEqual(
       expectedLookupSearchResults,
     );

@@ -5,19 +5,23 @@ export const createAxiosHandlerCreator =
   (axios: AxiosInstance): HandlerCreator =>
   (target) =>
   async (params) => {
+    const body = target.validateRequestBody(params.body);
+    const queryParams = target.validateQueryParams(params.queryParams);
+    const headers = target.validateHeaders(params.headers);
+
     const response = await axios.request({
       method: target.method,
       url: target.url,
-      data: params.body,
-      params: params.queryParams,
+      data: body,
+      params: queryParams,
       headers: {
         ...axios.defaults.headers.common,
-        ...(params.headers ?? {}),
+        ...(headers ?? {}),
       },
     });
 
     return {
       status: response.status,
-      responseBody: response.data,
+      responseBody: target.validateResponseBody(response.data) as any,
     };
   };

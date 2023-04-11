@@ -6,7 +6,9 @@ import {
   RawRedirectError,
 } from "shared";
 import { UnhandledError } from "../../primary/helpers/unhandledError";
-import { PeConnectTargetsKind } from "./peConnectApi.dto";
+import { PeConnectExternalTargets } from "./peConnectApi.targets";
+
+type PeConnectTargetsKind = keyof PeConnectExternalTargets;
 
 // ! In a map the highest priority is given to the lasted entry
 export const peConnectErrorStrategy = (

@@ -6,6 +6,10 @@ import { InsertEstablishmentAggregateFromForm } from "../../../domain/immersionO
 import { createLogger } from "../../../utils/logger";
 import { notifyDiscord } from "../../../utils/notifyDiscord";
 import {
+  addressesExternalTargets,
+  AddressesTargets,
+} from "../../secondary/addressGateway/HttpAddressGateway.targets";
+import {
   defaultMaxBackoffPeriodMs,
   defaultRetryDeadlineMs,
   ExponentialBackoffRetryStrategy,
@@ -20,8 +24,6 @@ import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGatewa
 import {
   createHttpAddressClient,
   HttpAddressGateway,
-  addressesExternalTargets,
-  AddressesTargets,
 } from "../../secondary/addressGateway/HttpAddressGateway";
 
 const maxQpsSireneApi = 0.25;

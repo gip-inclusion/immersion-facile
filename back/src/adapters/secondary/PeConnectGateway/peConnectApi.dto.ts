@@ -1,16 +1,7 @@
-import { CreateTargets, Target } from "http-client";
 import { AbsoluteUrl } from "shared";
+import { z } from "zod";
 import { BearerToken } from "../../../domain/peConnect/dto/BearerToken";
 import { PeConnectAdvisorsKind } from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
-
-export type PeConnectTargets = CreateTargets<{
-  getUserInfo: Target<void, void, PeConnectHeaders>;
-  getAdvisorsInfo: Target<void, void, PeConnectHeaders>;
-  getUserStatutInfo: Target<void, void, PeConnectHeaders>;
-  exchangeCodeForAccessToken: Target<string, void, PeConnectAccessTokenHeaders>;
-}>;
-
-export type PeConnectTargetsKind = keyof PeConnectTargets;
 
 export type ExternalAccessToken = {
   access_token: string;
@@ -53,15 +44,6 @@ export type ExternalPeConnectOAuthGrantPayload = {
   scope: string;
 };
 
-// External Contract from https://pole-emploi.io/data/documentation/comprendre-dispositif-pole-emploi-connect/open-id-connect/generer-access-token
-export type ExternalPeConnectOAuthGetTokenWithCodeGrantPayload = {
-  grant_type: string;
-  code: string;
-  client_id: string;
-  client_secret: string;
-  redirect_uri: string;
-};
-
 export type PeConnectHeaders = {
   "Content-Type": "application/json";
   Accept: "application/json";
@@ -71,6 +53,10 @@ export type PeConnectHeaders = {
 export type PeConnectAccessTokenHeaders = {
   "Content-Type": "application/x-www-form-urlencoded";
 };
+export const peConnectAccessTokenHeadersSchema: z.Schema<PeConnectAccessTokenHeaders> =
+  z.object({
+    "Content-Type": z.literal("application/x-www-form-urlencoded"),
+  });
 
 export type PeConnectOauthConfig = {
   poleEmploiClientId: string;

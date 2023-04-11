@@ -54,7 +54,7 @@ export class HttpAdminGateway implements AdminGateway {
           },
           body: establishmentBatch,
         })
-        .then((response) => response.responseBody as EstablishmentBatchReport),
+        .then(({ responseBody }) => responseBody),
     );
   }
 }

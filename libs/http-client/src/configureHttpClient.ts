@@ -68,9 +68,7 @@ export type HttpClient<Targets extends Record<string, UnknownTarget>> = {
     HttpResponse<ReturnType<Targets[TargetName]["validateResponseBody"]>>
   >;
 };
-export type HandlerCreator = <T extends UnknownTarget>(
-  target: MethodAndUrl,
-) => Handler<T>;
+export type HandlerCreator = <T extends UnknownTarget>(target: T) => Handler<T>;
 
 const createThrowIfNotVoid =
   <T>(paramName: string) =>
@@ -85,7 +83,7 @@ export const createTarget = <
   QueryParams = void,
   Headers = void,
   UrlWithParams extends Url = Url,
-  ResponseBody = void,
+  ResponseBody = unknown,
 >(
   target: TargetWithOptionalFields<
     Body,
@@ -97,8 +95,8 @@ export const createTarget = <
 ): Target<Body, QueryParams, Headers, UrlWithParams, ResponseBody> => ({
   validateRequestBody: createThrowIfNotVoid("requestBody"),
   validateQueryParams: createThrowIfNotVoid("queryParams"),
-  validateResponseBody: createThrowIfNotVoid("responseBody"),
   validateHeaders: (headers) => headers as Headers,
+  validateResponseBody: (responseBody) => responseBody as ResponseBody,
   ...target,
 });
 
@@ -118,11 +116,11 @@ export const configureHttpClient =
         const target = targets[targetName];
 
         const handler: Handler<any> = async (handlerParams) => {
-          const handler = handlerCreator({
+          const configuredHandler = handlerCreator({
             ...target,
             url: replaceParamsInUrl(target.url, handlerParams?.urlParams),
           });
-          return handler(handlerParams as any);
+          return configuredHandler(handlerParams as any);
         };
 
         return {

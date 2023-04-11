@@ -3,7 +3,6 @@ import { from, Observable } from "rxjs";
 import {
   EstablishmentTargets,
   FormEstablishmentDto,
-  formEstablishmentSchema,
   isSiretExistResponseSchema,
   SiretDto,
   siretSchema,
@@ -50,9 +49,9 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
   ): Promise<FormEstablishmentDto> {
     const { responseBody } = await this.httpClient.getFormEstablishment({
       urlParams: { siret },
-      headers: { Authorization: jwt },
+      headers: { authorization: jwt },
     });
-    return formEstablishmentSchema.parse(responseBody);
+    return responseBody;
   }
 
   public async updateFormEstablishment(
@@ -62,7 +61,7 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
     await this.httpClient.updateFormEstablishment({
       body: establishment,
       headers: {
-        Authorization: jwt,
+        authorization: jwt,
       },
     });
   }
