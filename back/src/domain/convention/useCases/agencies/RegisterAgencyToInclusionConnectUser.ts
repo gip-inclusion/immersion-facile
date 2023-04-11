@@ -1,7 +1,7 @@
 import {
   InclusionConnectDomainJwtPayload,
   RegisterAgencyToInclusionConnectUserParams,
-  matchUserAndAgencySchema,
+  registerAgencyToInclusionConnectUserParamsSchema,
 } from "shared";
 import {
   ForbiddenError,
@@ -26,7 +26,7 @@ export class RegisterAgencyToInclusionConnectUser extends TransactionalUseCase<
     super(uowPerformer);
   }
 
-  inputSchema = matchUserAndAgencySchema;
+  inputSchema = registerAgencyToInclusionConnectUserParamsSchema;
 
   protected async _execute(
     dto: RegisterAgencyToInclusionConnectUserParams,

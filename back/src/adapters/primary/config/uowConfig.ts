@@ -57,8 +57,6 @@ export const createInMemoryUow = () => {
   const outboxQueries = new InMemoryOutboxQueries(outboxRepository);
   const conventionRepository = new InMemoryConventionRepository();
   const authenticatedUserRepository = new InMemoryAuthenticatedUserRepository();
-  const inclusionConnectedUserQueries =
-    new InMemoryInclusionConnectedUserRepository(authenticatedUserRepository);
 
   return {
     agencyRepository: new InMemoryAgencyRepository(),
@@ -79,7 +77,8 @@ export const createInMemoryUow = () => {
     featureFlagRepository: new InMemoryFeatureFlagRepository(),
     formEstablishmentRepository: new InMemoryFormEstablishmentRepository(),
     immersionAssessmentRepository: new InMemoryImmersionAssessmentRepository(),
-    inclusionConnectedUserRepository: inclusionConnectedUserQueries,
+    inclusionConnectedUserRepository:
+      new InMemoryInclusionConnectedUserRepository(authenticatedUserRepository),
     laBonneBoiteRequestRepository: new InMemoryLaBonneBoiteRequestRepository(),
     ongoingOAuthRepository: new InMemoryOngoingOAuthRepository(),
     outboxRepository,

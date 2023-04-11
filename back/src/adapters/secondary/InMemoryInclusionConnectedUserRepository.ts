@@ -40,7 +40,7 @@ export class InMemoryInclusionConnectedUserRepository
         ...acc,
         [icUser.id]: icUser.agencyRights,
       }),
-      {} as AgencyRightsByUserId,
+      {} satisfies AgencyRightsByUserId,
     );
   }
 }

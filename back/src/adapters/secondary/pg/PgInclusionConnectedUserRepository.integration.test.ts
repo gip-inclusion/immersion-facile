@@ -16,10 +16,10 @@ const authenticatedUser: AuthenticatedUser = {
   email: "john.doe@mail.com",
 };
 
-describe("PgInclusionConnectedUserQueries", () => {
+describe("PgInclusionConnectedUserRepository", () => {
   let pool: Pool;
   let client: PoolClient;
-  let inclusionConnectQueries: PgInclusionConnectedUserRepository;
+  let inclusionConnectRepository: PgInclusionConnectedUserRepository;
   let agencyRepository: PgAgencyRepository;
 
   beforeAll(async () => {
@@ -36,14 +36,14 @@ describe("PgInclusionConnectedUserQueries", () => {
     await client.query("DELETE FROM authenticated_users");
     await client.query("DELETE FROM conventions");
     await client.query("DELETE FROM agencies");
-    inclusionConnectQueries = new PgInclusionConnectedUserRepository(client);
+    inclusionConnectRepository = new PgInclusionConnectedUserRepository(client);
     agencyRepository = new PgAgencyRepository(client);
   });
 
   describe("getById", () => {
     it("gets the Inclusion Connected User from its Id when no agency is connected", async () => {
       await insertAuthenticatedUser(authenticatedUser);
-      const inclusionConnectedUser = await inclusionConnectQueries.getById(
+      const inclusionConnectedUser = await inclusionConnectRepository.getById(
         authenticatedUser.id,
       );
       expectToEqual(inclusionConnectedUser, {
@@ -78,7 +78,7 @@ describe("PgInclusionConnectedUserQueries", () => {
         `,
       );
 
-      const inclusionConnectedUser = await inclusionConnectQueries.getById(
+      const inclusionConnectedUser = await inclusionConnectRepository.getById(
         authenticatedUser.id,
       );
       expectToEqual(inclusionConnectedUser, {
@@ -100,9 +100,9 @@ describe("PgInclusionConnectedUserQueries", () => {
           agencyRights: [{ role: "counsellor", agency }],
         };
 
-        await inclusionConnectQueries.update(icUserToSave);
+        await inclusionConnectRepository.update(icUserToSave);
 
-        const savedIcUser = await inclusionConnectQueries.getById(
+        const savedIcUser = await inclusionConnectRepository.getById(
           authenticatedUser.id,
         );
         expectToEqual(savedIcUser, icUserToSave);

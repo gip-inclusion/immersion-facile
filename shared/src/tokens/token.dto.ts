@@ -62,7 +62,8 @@ export type AppJwtPayload = {
 };
 
 export type InclusionConnectDomainJwtPayload = { userId: string };
-export type InclusionConnectJwtPayload = AppJwtPayload & { userId: string };
+export type InclusionConnectJwtPayload = AppJwtPayload &
+  InclusionConnectDomainJwtPayload;
 
 export type EstablishmentJwtPayload = AppJwtPayload & {
   siret: string;

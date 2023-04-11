@@ -2,6 +2,7 @@ import {
   AgencyDtoBuilder,
   expectPromiseToFailWith,
   InclusionConnectJwtPayload,
+  splitCasesBetweenPassingAndFailing,
 } from "shared";
 import { AuthenticatedUser } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
@@ -9,7 +10,7 @@ import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/
 import { StubDashboardGateway } from "../../../adapters/secondary/dashboardGateway/StubDashboardGateway";
 import { InMemoryInclusionConnectedUserRepository } from "../../../adapters/secondary/InMemoryInclusionConnectedUserRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { AgencyRole } from "../entities/InclusionConnectedUser";
+import { allAgencyRoles } from "../entities/InclusionConnectedUser";
 import { GetUserAgencyDashboardUrl } from "./GetUserAgencyDashboardUrl";
 
 const userId = "123";
@@ -69,28 +70,15 @@ describe("GetUserAgencyDashboardUrl", () => {
     );
   });
 
-  it("throws Forbidden if the user has not sufficient rights (councellor at least)", async () => {
-    inclusionConnectedUserRepository.setInclusionConnectedUsers([
-      {
-        ...john,
-        agencyRights: [
-          { agency: new AgencyDtoBuilder().build(), role: "toReview" },
-        ],
-      },
+  const [agencyRolesAllowedToGetDashboard, agencyRolesForbiddenToGetDashboard] =
+    splitCasesBetweenPassingAndFailing(allAgencyRoles, [
+      "agencyOwner",
+      "validator",
+      "counsellor",
     ]);
-    await expectPromiseToFailWith(
-      getUserAgencyDashboardUrl.execute(undefined, inclusionConnectJwtPayload),
-      `User with ID : ${userId} has not sufficient rights to access this dashboard`,
-    );
-  });
 
-  const agencyRolesAllowedToGetDashboard: AgencyRole[] = [
-    "counsellor",
-    "validator",
-    "agencyOwner",
-  ];
   it.each(agencyRolesAllowedToGetDashboard)(
-    "returns the dashboard url for the first agency of the %s",
+    "returns the dashboard url for the first agency for role '%s'",
     async (agencyUserRole) => {
       const agency = new AgencyDtoBuilder().build();
       inclusionConnectedUserRepository.setInclusionConnectedUsers([
@@ -101,6 +89,27 @@ describe("GetUserAgencyDashboardUrl", () => {
         inclusionConnectJwtPayload,
       );
       expect(url).toBe(`http://stubAgencyDashboard/${agency.id}`); // coming from StubDashboardGateway
+    },
+  );
+
+  it.each(agencyRolesForbiddenToGetDashboard)(
+    "fails to get the dashboard url for role '%s'",
+    async (agencyUserRole) => {
+      inclusionConnectedUserRepository.setInclusionConnectedUsers([
+        {
+          ...john,
+          agencyRights: [
+            { agency: new AgencyDtoBuilder().build(), role: agencyUserRole },
+          ],
+        },
+      ]);
+      await expectPromiseToFailWith(
+        getUserAgencyDashboardUrl.execute(
+          undefined,
+          inclusionConnectJwtPayload,
+        ),
+        `User with ID : ${userId} has not sufficient rights to access this dashboard`,
+      );
     },
   );
 });

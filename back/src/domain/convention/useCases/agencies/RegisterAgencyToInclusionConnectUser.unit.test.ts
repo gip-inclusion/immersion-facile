@@ -83,25 +83,19 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
       agencyRepository.setAgencies([agency]);
     });
 
-    it("makes the link between user and provided agency id", async () => {
+    it("makes the link between user and provided agency id, and saves the corresponding event", async () => {
       await registerAgencyToInclusionConnectUser.execute(
         { agencyId },
         { userId },
       );
+
       const inclusionConnectedUser =
         await inclusionConnectedUserRepository.getById(userId);
+
       expectToEqual(inclusionConnectedUser, {
         ...user,
         agencyRights: [{ agency, role: "toReview" }],
       });
-    });
-
-    it("save an event when registration goes well", async () => {
-      await registerAgencyToInclusionConnectUser.execute(
-        { agencyId },
-        { userId },
-      );
-
       expect(outboxRepository.events).toHaveLength(1);
       expectObjectsToMatch(outboxRepository.events[0], {
         topic: "AgencyRegisteredToInclusionConnectedUser",

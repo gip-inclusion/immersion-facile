@@ -139,7 +139,7 @@ export const agencyPublicDisplaySchema: z.ZodSchema<AgencyPublicDisplayDto> =
     signature: zString,
   });
 
-export const matchUserAndAgencySchema: z.Schema<RegisterAgencyToInclusionConnectUserParams> =
+export const registerAgencyToInclusionConnectUserParamsSchema: z.Schema<RegisterAgencyToInclusionConnectUserParams> =
   z.object({
     agencyId: agencyIdSchema,
   });
