@@ -1,7 +1,6 @@
 import {
   AddressAndPosition,
   AddressDto,
-  DepartmentCode,
   GeoPositionDto,
   LookupSearchResult,
 } from "shared";
@@ -10,7 +9,6 @@ import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGate
 export class InMemoryAddressGateway implements AddressGateway {
   private streetAndAddresses: AddressAndPosition[] = [];
   private lookupSearchResults: LookupSearchResult[] = [];
-  private departmentCode: DepartmentCode = "";
   private _address?: AddressDto;
   private _position?: GeoPositionDto;
 
@@ -44,9 +42,6 @@ export class InMemoryAddressGateway implements AddressGateway {
 
   public setAddressAndPosition(streetAndAddresses: AddressAndPosition[]) {
     this.streetAndAddresses = streetAndAddresses;
-  }
-  public setDepartmentCode(departmentCode: DepartmentCode) {
-    this.departmentCode = departmentCode;
   }
   public setLookupSearchResults(lookupSearchResults: LookupSearchResult[]) {
     this.lookupSearchResults = lookupSearchResults;

@@ -1,7 +1,7 @@
 import { createTarget, createTargets } from "http-client";
 import { z } from "zod";
 import { formEstablishmentSchema } from "../formEstablishment/FormEstablishment.schema";
-import { withValidateHeadersAuthorization } from "./withAuthorization";
+import { withValidateHeadersAuthorization } from "../headers";
 
 const formEstablishmentsUrl = "/form-establishments";
 

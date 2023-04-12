@@ -135,6 +135,11 @@ export const zEnumValidation = <T extends string>(
   });
 
 // Following is from https://github.com/colinhacks/zod/issues/372#issuecomment-826380330
+
+// the difference with z.Schema<T> is that you keep the original type of the schema
+// and you keep access to the methodes of that schema
+// for example you can use .passthrough() for a z.object() which you could not do with z.Schema<T>
+
 export const zSchemaForType =
   <T>() =>
   <S extends z.ZodType<T, any, any>>(arg: S) =>

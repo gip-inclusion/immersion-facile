@@ -48,11 +48,6 @@ const openCageDataBaseUrl = "https://api.opencagedata.com" as const;
 
 export type AddressesTargets = typeof addressesExternalTargets;
 export const addressesExternalTargets = createTargets({
-  // getDepartmentCode: createTarget({
-  //   method: "GET",
-  //   url: getDepartmentCodeUrl,
-  //   validateQueryParams: departmentCodeQueryParamsSchema.parse,
-  // }),
   geocoding: createTarget({
     method: "GET",
     url: `${openCageDataBaseUrl}/geocode/v1/geojson`,

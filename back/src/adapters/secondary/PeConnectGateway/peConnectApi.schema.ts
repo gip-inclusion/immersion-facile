@@ -52,8 +52,10 @@ export const externalPeConnectAdvisorsSchema: z.Schema<ExternalPeConnectAdvisors
 
 const bearerSchema = z.string().regex(/^Bearer .+$/) as z.Schema<BearerToken>;
 
-export const peConnectHeadersSchema: z.Schema<PeConnectHeaders> = z.object({
-  "Content-Type": z.literal("application/json"),
-  Accept: z.literal("application/json"),
-  Authorization: bearerSchema,
-});
+export const peConnectHeadersSchema: z.Schema<PeConnectHeaders> = z
+  .object({
+    "Content-Type": z.literal("application/json"),
+    Accept: z.literal("application/json"),
+    Authorization: bearerSchema,
+  })
+  .passthrough();

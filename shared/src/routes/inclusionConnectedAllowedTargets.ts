@@ -1,10 +1,11 @@
 import { createTarget, createTargets } from "http-client";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
-import {registerAgencyToInclusionConnectUserParamsSchema} from "../agency/agency.schema";
-import { withValidateHeadersAuthorization } from "./withAuthorization";
+import { registerAgencyToInclusionConnectUserParamsSchema } from "../agency/agency.schema";
+import { withValidateHeadersAuthorization } from "../headers";
 
 export type InclusionConnectedAllowedTargets =
   typeof inclusionConnectedAllowedTargets;
+
 export const inclusionConnectedAllowedTargets = createTargets({
   getAgencyDashboard: createTarget({
     method: "GET",
@@ -15,8 +16,7 @@ export const inclusionConnectedAllowedTargets = createTargets({
   registerAgencyToUser: createTarget({
     method: "POST",
     url: "/inclusion-connected/register-agency",
-    ...withValidateHeadersAuthorization,
     validateRequestBody: registerAgencyToInclusionConnectUserParamsSchema.parse,
-    validateResponseBody: responseBody => responseBody
+    ...withValidateHeadersAuthorization,
   }),
 });

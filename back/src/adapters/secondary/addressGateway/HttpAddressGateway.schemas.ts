@@ -11,16 +11,18 @@ export const openCageDataSearchResultCollectionSchema: z.Schema<OpenCageDataSear
     licenses: z.array(z.any()),
     results: z.array(
       z.object({
-        bounds: z.object({
-          northeast: z.object({
-            lat: z.string(),
-            lng: z.string(),
-          }),
-          southwest: z.object({
-            lat: z.string(),
-            lng: z.string(),
-          }),
-        }),
+        bounds: z
+          .object({
+            northeast: z.object({
+              lat: z.string(),
+              lng: z.string(),
+            }),
+            southwest: z.object({
+              lat: z.string(),
+              lng: z.string(),
+            }),
+          })
+          .optional(),
         formatted: z.string(),
         geometry: z.object({
           lat: z.string(),

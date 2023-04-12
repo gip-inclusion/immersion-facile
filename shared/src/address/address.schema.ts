@@ -6,7 +6,7 @@ import {
   AddressDto,
   DepartmentCode,
   LookupSearchResult,
-  WithLookupStreetAddressQueryParams,
+  WithLookupAddressQueryParams,
   WithLookupLocationInputQueryParams,
 } from "./address.dto";
 
@@ -35,7 +35,7 @@ export const addressAndPositionListSchema: z.ZodSchema<AddressAndPosition[]> =
 export const lookupSearchResultsSchema: z.ZodSchema<LookupSearchResult[]> =
   z.array(lookupSearchResultSchema);
 
-export const withLookupStreetAddressQueryParamsSchema: z.Schema<WithLookupStreetAddressQueryParams> =
+export const withLookupStreetAddressQueryParamsSchema: z.Schema<WithLookupAddressQueryParams> =
   z.object({
     lookup: z.string(),
   });

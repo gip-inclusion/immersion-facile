@@ -56,7 +56,7 @@ const agencyKindSchema: z.ZodSchema<AgencyKind> = zEnumValidation(
   "Ce type de structure n'est pas supporté",
 );
 
-export const listFilteredAgenciesRequestSchema: z.ZodSchema<ListAgenciesRequestDto> =
+export const listAgenciesRequestSchema: z.ZodSchema<ListAgenciesRequestDto> =
   z.object({
     departmentCode: z.string().optional(),
     nameIncludes: z.string().optional(),
@@ -149,7 +149,7 @@ export const withActiveOrRejectedAgencyStatusSchema: z.Schema<WithActiveOrReject
     status: z.enum(["active", "rejected"]),
   });
 
-export const withAgencyStatus: z.Schema<WithAgencyStatus> = z.object({
+export const withAgencyStatusSchema: z.Schema<WithAgencyStatus> = z.object({
   status: agencyStatusSchema,
 });
 

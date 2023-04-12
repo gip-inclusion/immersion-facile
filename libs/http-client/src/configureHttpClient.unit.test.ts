@@ -20,10 +20,12 @@ const isBook = (obj: unknown): Book => {
 
   throw new Error("Not a Book");
 };
+
 const isBookArray = (obj: unknown): Book[] => {
   if (obj instanceof Array) return obj.map(isBook);
   throw new Error("Not a Book Array");
 };
+
 const isCar = (obj: unknown): Car => {
   if (
     typeof obj === "object" &&
@@ -35,6 +37,7 @@ const isCar = (obj: unknown): Car => {
 
   throw new Error("Not a Car");
 };
+
 const hasAuthorizationHeader = (
   headers: unknown,
 ): { authorization: string } => {
@@ -47,6 +50,7 @@ const hasAuthorizationHeader = (
     return { authorization: headers.authorization };
   throw new Error("No valid authorization header");
 };
+
 const hasMax = (queryParams: unknown): { max?: number } => {
   if (
     typeof queryParams === "object" &&

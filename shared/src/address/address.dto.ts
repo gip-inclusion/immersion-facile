@@ -6,12 +6,11 @@ import { Flavor } from "../typeFlavors";
 
 export type DepartmentName = Flavor<string, "DepartmentName">;
 export type DepartmentCode = Flavor<string, "DepartmentCode">;
-export type WithDepartmentCodeFromPostcodeQuery = { postcode: LookupAddress };
 
 export type Postcode = Flavor<string, "Postcode">;
 
 export type LookupAddress = Flavor<string, "LookupAddress">;
-export type WithLookupStreetAddressQueryParams = { lookup: LookupAddress };
+export type WithLookupAddressQueryParams = { lookup: LookupAddress };
 
 export type LookupLocationInput = Flavor<string, "LookupLocation">;
 export type WithLookupLocationInputQueryParams = { query: LookupLocationInput };
@@ -34,15 +33,6 @@ export type AddressAndPosition = {
   position: GeoPositionDto;
   address: AddressDto;
 };
-
-export const isAddressIdentical = (
-  address: AddressDto,
-  addressToCompare: AddressDto,
-): boolean =>
-  address.city === addressToCompare.city &&
-  address.postcode === addressToCompare.postcode &&
-  address.streetNumberAndAddress === addressToCompare.streetNumberAndAddress &&
-  address.departmentCode === addressToCompare.departmentCode;
 
 export const departmentNameToDepartmentCode: Record<
   DepartmentName,

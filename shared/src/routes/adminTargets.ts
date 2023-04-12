@@ -5,7 +5,7 @@ import { EstablishmentBatchReport } from "../formEstablishment/FormEstablishment
 import { formEstablishmentBatchSchema } from "../formEstablishment/FormEstablishment.schema";
 import { adminTokenSchema } from "../tokens/token.schema";
 import { adminLogin } from "./routes";
-import { withValidateHeadersAuthorization } from "./withAuthorization";
+import { withValidateHeadersAuthorization } from "../headers";
 
 export type AdminTargets = typeof adminTargets;
 export const adminTargets = createTargets({

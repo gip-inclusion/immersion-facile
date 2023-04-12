@@ -1,7 +1,7 @@
 import { Point } from "geojson";
 
 type OpenCageDataLookupSearchResult = {
-  bounds: {
+  bounds?: {
     northeast: {
       lat: string;
       lng: string;

@@ -8,6 +8,7 @@ import {
 import {
   AddressAndPosition,
   AddressDto,
+  calculateDurationInSecondsFrom,
   City,
   DepartmentName,
   departmentNameToDepartmentCode,
@@ -19,6 +20,7 @@ import {
   StreetNumberAndAddress,
 } from "shared";
 import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
+import { createLogger } from "../../../utils/logger";
 import {
   OpenCageDataAddressComponents,
   OpenCageDataFeatureCollection,
@@ -43,6 +45,8 @@ const AXIOS_TIMEOUT_MS = 10_000;
 export const createHttpAddressClient = configureHttpClient(
   createAxiosHandlerCreator(axios.create({ timeout: AXIOS_TIMEOUT_MS })),
 );
+
+const logger = createLogger(__filename);
 
 export class HttpAddressGateway implements AddressGateway {
   constructor(
@@ -76,8 +80,7 @@ export class HttpAddressGateway implements AddressGateway {
   public async lookupStreetAddress(
     query: string,
   ): Promise<AddressAndPosition[]> {
-    // eslint-disable-next-line no-console
-    console.time(`lookupStreetAddress Duration - ${query}`);
+    const startDate = new Date();
     const queryMinLength = 2;
     try {
       if (query.length < queryMinLength)
@@ -95,16 +98,19 @@ export class HttpAddressGateway implements AddressGateway {
         .map((feature) => this.toAddressAndPosition(feature))
         .filter((feature): feature is AddressAndPosition => !!feature);
     } finally {
-      // eslint-disable-next-line no-console
-      console.timeEnd(`lookupStreetAddress Duration - ${query}`);
+      calculateDurationInSecondsFrom(startDate);
+      logger.info({
+        method: "lookupStreetAddress",
+        query,
+        durationInSeconds: calculateDurationInSecondsFrom(startDate),
+      });
     }
   }
 
   public async lookupLocationName(
     query: string,
   ): Promise<LookupSearchResult[]> {
-    // eslint-disable-next-line no-console
-    console.time(`lookupLocationName Duration - ${query}`);
+    const startDate = new Date();
     const queryMinLength = 3;
     try {
       if (query.length < queryMinLength)
@@ -123,14 +129,19 @@ export class HttpAddressGateway implements AddressGateway {
           q: query,
         },
       });
+
       return lookupSearchResultsSchema.parse(
         toLookupSearchResults(
           responseBody as OpenCageDataSearchResultCollection,
         ),
       );
     } finally {
-      // eslint-disable-next-line no-console
-      console.timeEnd(`lookupStreetAddress Duration - ${query}`);
+      calculateDurationInSecondsFrom(startDate);
+      logger.info({
+        method: "lookupLocationName",
+        query,
+        durationInSeconds: calculateDurationInSecondsFrom(startDate),
+      });
     }
   }
 

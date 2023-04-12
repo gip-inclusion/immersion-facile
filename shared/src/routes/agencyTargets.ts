@@ -5,13 +5,13 @@ import {
   agencyPublicDisplaySchema,
   agencySchema,
   createAgencySchema,
-  listFilteredAgenciesRequestSchema,
+  listAgenciesRequestSchema,
   withActiveOrRejectedAgencyStatusSchema,
   withAgencyIdSchema,
-  withAgencyStatus,
+  withAgencyStatusSchema,
 } from "../agency/agency.schema";
 import { agenciesRoute } from "./routes";
-import { withValidateHeadersAuthorization } from "./withAuthorization";
+import { withValidateHeadersAuthorization } from "../headers";
 
 const agencyWithIdForAdminUrl = `/admin/${agenciesRoute}/:agencyId` as const;
 
@@ -54,14 +54,14 @@ export const agencyTargets = createTargets({
   listAgenciesWithStatus: createTarget({
     method: "GET",
     url: `/admin/${agenciesRoute}`,
-    validateQueryParams: withAgencyStatus.parse,
+    validateQueryParams: withAgencyStatusSchema.parse,
     ...withValidateHeadersAuthorization,
     validateResponseBody: agenciesIdAndNameSchema.parse,
   }),
   getFilteredAgencies: createTarget({
     method: "GET",
     url: `/${agenciesRoute}`,
-    validateQueryParams: listFilteredAgenciesRequestSchema.parse,
+    validateQueryParams: listAgenciesRequestSchema.parse,
     validateResponseBody: agenciesIdAndNameSchema.parse,
   }),
 });

@@ -2,13 +2,13 @@ import {
   AddressAndPosition,
   ConventionMagicLinkPayload,
   withLookupStreetAddressQueryParamsSchema,
-  WithLookupStreetAddressQueryParams,
+  WithLookupAddressQueryParams,
 } from "shared";
 import { UseCase } from "../../core/UseCase";
 import { AddressGateway } from "../../immersionOffer/ports/AddressGateway";
 
 export class LookupStreetAddress extends UseCase<
-  WithLookupStreetAddressQueryParams,
+  WithLookupAddressQueryParams,
   AddressAndPosition[]
 > {
   constructor(private addressApiGateway: AddressGateway) {
@@ -17,7 +17,7 @@ export class LookupStreetAddress extends UseCase<
   protected inputSchema = withLookupStreetAddressQueryParamsSchema;
 
   protected _execute(
-    params: WithLookupStreetAddressQueryParams,
+    params: WithLookupAddressQueryParams,
     _jwtPayload?: ConventionMagicLinkPayload | undefined,
   ): Promise<AddressAndPosition[]> {
     return this.addressApiGateway.lookupStreetAddress(params.lookup);

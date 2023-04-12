@@ -50,9 +50,6 @@ export class HttpPeConnectGateway implements PeConnectGateway {
   public async getAccessToken(
     authorizationCode: string,
   ): Promise<AccessTokenDto | undefined> {
-    // const timerFlag = `${authorizationCode} - PeConnect getAccessToken duration`;
-    // eslint-disable-next-line no-console
-    // console.time(timerFlag);
     const counter = exchangeCodeForAccessTokenCounter;
     try {
       counter.total.inc();
@@ -97,9 +94,6 @@ export class HttpPeConnectGateway implements PeConnectGateway {
       return managePeConnectError(error, "exchangeCodeForAccessToken", {
         authorization: authorizationCode,
       });
-    } finally {
-      // eslint-disable-next-line no-console
-      // console.timeEnd(timerFlag);
     }
   }
 
@@ -131,9 +125,6 @@ export class HttpPeConnectGateway implements PeConnectGateway {
   private async getUserInfo(
     headers: PeConnectHeaders,
   ): Promise<ExternalPeConnectUser | undefined> {
-    // const timerFlag = `${headers.Authorization} - PeConnect getUserInfo duration`;
-    // eslint-disable-next-line no-console
-    // console.time(timerFlag);
     const counter = getUserInfoCounter;
     try {
       counter.total.inc();
@@ -167,16 +158,10 @@ export class HttpPeConnectGateway implements PeConnectGateway {
       return managePeConnectError(error, "getUserInfo", {
         authorization: headers.Authorization,
       });
-    } finally {
-      // eslint-disable-next-line no-console
-      // console.timeEnd(timerFlag);
     }
   }
 
   private async userIsJobseeker(headers: PeConnectHeaders): Promise<boolean> {
-    // const timerFlag = `${headers.Authorization} - PeConnect userIsJobseeker duration`;
-    // eslint-disable-next-line no-console
-    // console.time(timerFlag);
     const counter = getUserStatutInfoCounter;
     try {
       counter.total.inc();
@@ -210,18 +195,12 @@ export class HttpPeConnectGateway implements PeConnectGateway {
       return managePeConnectError(error, "getUserStatutInfo", {
         authorization: headers.Authorization,
       });
-    } finally {
-      // eslint-disable-next-line no-console
-      // console.timeEnd(timerFlag);
     }
   }
 
   private async getAdvisorsInfo(
     headers: PeConnectHeaders,
   ): Promise<ExternalPeConnectAdvisor[]> {
-    // const timerFlag = `${headers.Authorization} - PeConnect getAdvisorsInfo duration`;
-    // eslint-disable-next-line no-console
-    // console.time(timerFlag);
     const counter = getAdvisorsInfoCounter;
     try {
       counter.total.inc();
@@ -265,9 +244,6 @@ export class HttpPeConnectGateway implements PeConnectGateway {
       return managePeConnectError(error, "getAdvisorsInfo", {
         authorization: headers.Authorization,
       });
-    } finally {
-      // eslint-disable-next-line no-console
-      // console.timeEnd(timerFlag);
     }
   }
 }

@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { zSchemaForType } from "../zodUtils";
+import { zSchemaForType } from "./zodUtils";
 
-export type WithAuthorization = { authorization: string };
+export type Headers = { authorization: string };
 
-export const withAuthorizationSchema = zSchemaForType<WithAuthorization>()(
+export const withAuthorizationSchema = zSchemaForType<Headers>()(
   z.object({
     authorization: z.string(),
   }),

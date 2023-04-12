@@ -54,9 +54,11 @@ export type PeConnectAccessTokenHeaders = {
   "Content-Type": "application/x-www-form-urlencoded";
 };
 export const peConnectAccessTokenHeadersSchema: z.Schema<PeConnectAccessTokenHeaders> =
-  z.object({
-    "Content-Type": z.literal("application/x-www-form-urlencoded"),
-  });
+  z
+    .object({
+      "Content-Type": z.literal("application/x-www-form-urlencoded"),
+    })
+    .passthrough();
 
 export type PeConnectOauthConfig = {
   poleEmploiClientId: string;
