@@ -6,7 +6,7 @@ import {
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { expectEmaiSignatoryConfirmationSignatureRequestMatchingConvention } from "../../../../_testBuilders/emailAssertions";
+import { expectEmailSignatoryConfirmationSignatureRequestMatchingConvention } from "../../../../_testBuilders/emailAssertions";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
 import { ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature } from "./ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature";
 
@@ -53,7 +53,7 @@ describe("Add Convention Notifications", () => {
 
     expect(sentEmails).toHaveLength(3);
 
-    expectEmaiSignatoryConfirmationSignatureRequestMatchingConvention({
+    expectEmailSignatoryConfirmationSignatureRequestMatchingConvention({
       templatedEmail: sentEmails[0],
       convention: validConvention,
       signatory: validConvention.signatories.beneficiary,
@@ -61,7 +61,7 @@ describe("Add Convention Notifications", () => {
       now,
       agency,
     });
-    expectEmaiSignatoryConfirmationSignatureRequestMatchingConvention({
+    expectEmailSignatoryConfirmationSignatureRequestMatchingConvention({
       templatedEmail: sentEmails[1],
       convention: validConvention,
       signatory: validConvention.signatories.establishmentRepresentative,
@@ -69,7 +69,7 @@ describe("Add Convention Notifications", () => {
       now,
       agency,
     });
-    expectEmaiSignatoryConfirmationSignatureRequestMatchingConvention({
+    expectEmailSignatoryConfirmationSignatureRequestMatchingConvention({
       templatedEmail: sentEmails[2],
       convention: validConvention,
       signatory: validConvention.signatories.beneficiaryRepresentative!,

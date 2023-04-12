@@ -30,13 +30,14 @@ export const getValidatedConventionFinalConfirmationParams = (
   timeGateway: TimeGateway,
 ): EmailParamsByEmailType["VALIDATED_CONVENTION_FINAL_CONFIRMATION"] => {
   const { beneficiary, beneficiaryRepresentative } = convention.signatories;
+  const now = timeGateway.now();
   const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties = {
     id: convention.id,
     // role and email should not be valid
     role: beneficiary.role,
     email: beneficiary.email,
-    now: timeGateway.now(),
-    exp: timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365, // 1 year
+    now,
+    exp: now.getTime() + 1000 * 60 * 60 * 24 * 365, // 1 year
   };
   return {
     internshipKind: convention.internshipKind,
@@ -63,7 +64,7 @@ export const getValidatedConventionFinalConfirmationParams = (
   };
 };
 
-export const expectEmaiSignatoryConfirmationSignatureRequestMatchingConvention =
+export const expectEmailSignatoryConfirmationSignatureRequestMatchingConvention =
   ({
     templatedEmail,
     convention,

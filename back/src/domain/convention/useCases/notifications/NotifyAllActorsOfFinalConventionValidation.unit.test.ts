@@ -5,6 +5,7 @@ import {
   ConventionDtoBuilder,
   CreateConventionMagicLinkPayloadProperties,
   displayEmergencyContactInfos,
+  expectToEqual,
   expectTypeToMatchAndEqual,
   frontRoutes,
   reasonableSchedule,
@@ -13,18 +14,17 @@ import {
   expectEmailFinalValidationConfirmationMatchingConvention,
   getValidatedConventionFinalConfirmationParams,
 } from "../../../../_testBuilders/emailAssertions";
+import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
 
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
 } from "../../../../adapters/primary/config/uowConfig";
+import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../peConnect/dto/PeConnect.dto";
 import { NotifyAllActorsOfFinalConventionValidation } from "./NotifyAllActorsOfFinalConventionValidation";
-import { RealTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/RealTimeGateway";
-import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
-import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
 
 const establishmentTutorEmail = "boss@mail.com";
 const validConvention: ConventionDto = new ConventionDtoBuilder()
@@ -274,7 +274,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
 });
 
 describe("getValidatedApplicationFinalConfirmationParams", () => {
-  const timeGw = new RealTimeGateway();
+  const timeGw = new CustomTimeGateway();
   const agency = new AgencyDtoBuilder(defaultAgency)
     .withQuestionnaireUrl("testQuestionnaireUrl")
     .withSignature("testSignature")
@@ -288,13 +288,18 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
       .withIndividualProtection(true)
       .withSchedule(reasonableSchedule)
       .build();
+
+    const magicLinkNow = new Date("2023-04-12T10:00:00.000Z");
+    timeGw.setNextDate(magicLinkNow);
+
     const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties = {
       id: convention.id,
       role: convention.signatories.beneficiary.role,
       email: convention.signatories.beneficiary.email,
-      now: timeGw.now(),
+      now: magicLinkNow,
     };
-    expectTypeToMatchAndEqual(
+
+    expectToEqual(
       getValidatedConventionFinalConfirmationParams(
         agency,
         convention,
