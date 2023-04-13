@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
-
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
-
 import { handleHttpJsonResponseError } from "./handleHttpJsonResponseError";
 
 const logger = createLogger(__filename);

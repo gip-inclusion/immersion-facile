@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
 import { Link } from "type-route";
-
 import "./HeroHeader.scss";
 
 type UserType = "default" | "candidate" | "establishment" | "agency";

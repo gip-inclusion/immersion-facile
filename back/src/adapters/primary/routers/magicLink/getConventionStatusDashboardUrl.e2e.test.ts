@@ -3,7 +3,6 @@ import {
   createConventionMagicLinkPayload,
   getConventionStatusDashboard,
 } from "shared";
-
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 
 describe("getConventionStatusDashboardUrl", () => {

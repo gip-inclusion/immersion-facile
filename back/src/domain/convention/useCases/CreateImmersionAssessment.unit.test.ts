@@ -8,7 +8,6 @@ import {
   ImmersionAssessmentDto,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
-
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,
@@ -24,7 +23,6 @@ import { InMemoryImmersionAssessmentRepository } from "../../../adapters/seconda
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { ImmersionAssessmentEntity } from "../entities/ImmersionAssessmentEntity";
-
 import { CreateImmersionAssessment } from "./CreateImmersionAssessment";
 
 const conventionId = "conventionId";

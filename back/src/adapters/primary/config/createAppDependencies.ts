@@ -1,5 +1,4 @@
 import { AbsoluteUrl, frontRoutes } from "shared";
-
 import { makeGenerateJwtES256 } from "../../../domain/auth/jwt";
 import { InMemoryEventBus } from "../../secondary/core/InMemoryEventBus";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
@@ -13,7 +12,6 @@ import {
   makeHandleManagedRedirectResponseError,
   makeHandleRawRedirectResponseError,
 } from "../helpers/handleRedirectResponseError";
-
 import { AppConfig } from "./appConfig";
 import { createEventCrawler } from "./createEventCrawler";
 import { createGateways, createGetPgPoolFn } from "./createGateways";

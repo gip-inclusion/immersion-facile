@@ -1,16 +1,11 @@
 import React from "react";
-
 import { Role } from "shared";
-
 import { Loader } from "react-design-system";
-
 import { ConventionValidation } from "src/app/components/admin/ConventionValidation";
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { routes } from "src/app/routes/routes";
 import { FetchConventionRequestedPayload } from "src/core-logic/domain/convention/convention.slice";
-
 import { NpsSection } from "../nps/NpsSection";
-
 import { ConventionManageActions } from "./ConventionManageActions";
 
 type ConventionManageContentProps = {

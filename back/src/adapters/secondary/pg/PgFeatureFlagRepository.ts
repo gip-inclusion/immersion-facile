@@ -1,7 +1,5 @@
 import { PoolClient } from "pg";
-
 import { FeatureFlag, FeatureFlags } from "shared";
-
 import { FeatureFlagRepository } from "../../../domain/core/ports/FeatureFlagRepository";
 
 const rawPgToFeatureFlags = (raw: any[]): FeatureFlags =>

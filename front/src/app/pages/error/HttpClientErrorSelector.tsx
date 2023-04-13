@@ -1,9 +1,6 @@
 import React from "react";
-
 import { LegacyHttpClientError } from "shared";
-
 import { RenewExpiredLinkContent } from "src/app/routes/RenewExpiredLinkPage";
-
 import { ErrorPage } from "./ErrorPage";
 
 type HttpClientErrorProperties = {

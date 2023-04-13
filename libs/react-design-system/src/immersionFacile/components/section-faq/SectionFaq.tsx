@@ -2,7 +2,6 @@ import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { useStyles } from "tss-react/dsfr";
-
 import "./SectionFaq.scss";
 
 export type SectionFaqProps = {

@@ -1,5 +1,4 @@
 import { CreateConventionMagicLinkPayloadProperties } from "shared";
-
 import { GenerateConventionMagicLinkUrl } from "../adapters/primary/config/magicLinkUrl";
 import {
   GenerateConventionJwt,

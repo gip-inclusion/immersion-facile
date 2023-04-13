@@ -2,13 +2,9 @@ import React, { useEffect, useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import Autocomplete from "@mui/material/Autocomplete";
 import { useStyles } from "tss-react/dsfr";
-
 import { AddressAndPosition, addressDtoToString } from "shared";
-
 import { AutocompleteInput } from "react-design-system";
-
 import { useDebounce } from "src/app/hooks/useDebounce";
-
 import { getAddressesFromApi } from "./getAddressesFromApi";
 export type AddressAutocompleteProps = {
   label: string;

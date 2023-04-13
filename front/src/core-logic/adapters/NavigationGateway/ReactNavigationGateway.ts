@@ -1,5 +1,4 @@
 import { SiretDto } from "shared";
-
 import { routes } from "src/app/routes/routes";
 import { NavigationGateway } from "src/core-logic/ports/NavigationGateway";
 

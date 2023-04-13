@@ -1,6 +1,5 @@
 import React from "react";
 import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
-
 import { Label, LabelProperties } from "./Label";
 import { labelPrefix } from ".";
 

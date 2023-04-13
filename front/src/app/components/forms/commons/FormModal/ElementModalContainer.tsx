@@ -1,7 +1,5 @@
 import React, { useReducer } from "react";
-
 import { ModalClose, ModalContent, ModalDialog } from "react-design-system";
-
 import ModalTitle from "src/app/components/forms/convention/ModalTitleOverride";
 
 type ModalState = {

@@ -1,5 +1,4 @@
 import { StandardPageSlugs } from "src/app/routes/route-params";
-
 import cguContent from "./cgu";
 import accessibilityContent from "./declaration-accessibilite";
 import legalsContent from "./mentions-legales";

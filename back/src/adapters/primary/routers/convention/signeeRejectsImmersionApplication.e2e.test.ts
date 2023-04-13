@@ -9,7 +9,6 @@ import {
   UpdateConventionStatusRequestDto,
   updateConventionStatusRoute,
 } from "shared";
-
 import {
   buildTestApp,
   TestAppAndDeps,

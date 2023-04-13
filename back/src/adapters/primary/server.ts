@@ -2,7 +2,6 @@ import bodyParser from "body-parser";
 import express, { Express, Router } from "express";
 import expressPrometheusMiddleware from "express-prometheus-middleware";
 import PinoHttp from "pino-http";
-
 import {
   GenerateApiConsumerJwt,
   GenerateAuthenticatedUserJwt,
@@ -13,7 +12,6 @@ import {
 import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
 import { UuidGenerator } from "../../domain/core/ports/UuidGenerator";
 import { createLogger } from "../../utils/logger";
-
 import { AppConfig } from "./config/appConfig";
 import { createAppDependencies } from "./config/createAppDependencies";
 import { Gateways } from "./config/createGateways";

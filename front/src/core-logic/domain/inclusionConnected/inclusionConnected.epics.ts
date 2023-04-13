@@ -1,5 +1,4 @@
 import { filter, map, switchMap } from "rxjs";
-
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";

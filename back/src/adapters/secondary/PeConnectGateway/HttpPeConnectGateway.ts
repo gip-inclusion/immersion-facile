@@ -1,14 +1,11 @@
 import axios from "axios";
 import { ZodError } from "zod";
-
 import {
   HTTP_STATUS,
   parseZodSchemaAndLogErrorOnParsingFailure,
   queryParamsAsString,
 } from "shared";
-
 import { HttpClient } from "http-client";
-
 import { AccessTokenDto } from "../../../domain/peConnect/dto/AccessToken.dto";
 import { PeConnectAdvisorDto } from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
 import { PeConnectUserDto } from "../../../domain/peConnect/dto/PeConnectUser.dto";
@@ -17,7 +14,6 @@ import { PeConnectGateway } from "../../../domain/peConnect/port/PeConnectGatewa
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { UnhandledError } from "../../primary/helpers/unhandledError";
-
 import {
   exchangeCodeForAccessTokenCounter,
   getAdvisorsInfoCounter,

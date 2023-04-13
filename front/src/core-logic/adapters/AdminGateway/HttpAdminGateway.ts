@@ -1,5 +1,4 @@
 import { from, Observable } from "rxjs";
-
 import {
   AbsoluteUrl,
   absoluteUrlSchema,
@@ -11,9 +10,7 @@ import {
   GetDashboardParams,
   UserAndPassword,
 } from "shared";
-
 import { HttpClient } from "http-client";
-
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
 export class HttpAdminGateway implements AdminGateway {

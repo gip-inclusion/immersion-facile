@@ -1,13 +1,11 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
-
 import {
   displayEmergencyContactInfos,
   prettyPrintSchedule,
   ScheduleDto,
   toDisplayedDate,
 } from "shared";
-
 import { ColField, FieldsAndTitle } from "./types";
 
 export const signToBooleanDisplay = (value: string | undefined) =>

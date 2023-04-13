@@ -1,8 +1,6 @@
 import { addBusinessDays, differenceInBusinessDays } from "date-fns";
 import { z } from "zod";
-
 import { ConventionDto, ConventionId, ConventionStatus } from "shared";
-
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainEvent } from "../../core/eventBus/events";
 import { ReminderKind } from "../../core/eventsPayloads/ConventionReminderPayload";

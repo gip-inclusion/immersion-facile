@@ -4,7 +4,6 @@ import {
   conventionWithoutExternalIdSchema,
   WithConventionId,
 } from "shared";
-
 import {
   ConflictError,
   ForbiddenError,

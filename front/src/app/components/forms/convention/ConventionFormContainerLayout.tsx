@@ -1,9 +1,6 @@
 import React, { ReactNode } from "react";
-
 import { InternshipKind } from "shared";
-
 import { MainWrapper, PageHeader } from "react-design-system";
-
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 
 type ConventionFormContainerLayoutProps = {

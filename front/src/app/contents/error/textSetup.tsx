@@ -1,7 +1,5 @@
 import { immersionFacileContactEmail, ManagedErrorKind } from "shared";
-
 import { routes } from "src/app/routes/routes";
-
 import { ErrorButton, HTTPFrontErrorContents } from "./types";
 
 export const unexpectedErrorContent = (

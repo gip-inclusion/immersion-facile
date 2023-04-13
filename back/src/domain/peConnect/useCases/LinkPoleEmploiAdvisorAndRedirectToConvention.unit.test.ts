@@ -1,5 +1,4 @@
 import { expectTypeToMatchAndEqual } from "shared";
-
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
@@ -14,7 +13,6 @@ import {
 } from "../dto/PeConnectAdvisor.dto";
 import { PeConnectUserDto } from "../dto/PeConnectUser.dto";
 import { conventionPoleEmploiUserAdvisorFromDto } from "../entities/ConventionPoleEmploiAdvisorEntity";
-
 import { LinkPoleEmploiAdvisorAndRedirectToConvention } from "./LinkPoleEmploiAdvisorAndRedirectToConvention";
 
 describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {

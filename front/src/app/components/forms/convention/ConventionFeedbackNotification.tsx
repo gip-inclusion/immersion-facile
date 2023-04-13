@@ -2,14 +2,12 @@ import React, { ReactNode } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { values } from "ramda";
 import { useStyles } from "tss-react/dsfr";
-
 import {
   immersionFacileContactEmail,
   Signatories,
   Signatory,
   SignatoryRole,
 } from "shared";
-
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import {
   ConventionFeedbackKind,

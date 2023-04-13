@@ -5,9 +5,7 @@ import { Tooltip } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import { prop } from "ramda";
 import { useStyles } from "tss-react/dsfr";
-
 import { RomeDto } from "shared";
-
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useRomeAutocompleteUseCase } from "src/app/hooks/romeAutocomplete.hook";
 import { romeAutocompleteSelector } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.selectors";

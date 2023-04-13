@@ -1,5 +1,4 @@
 import { Pool, PoolClient } from "pg";
-
 import {
   activeAgencyStatuses,
   AgencyDto,
@@ -7,9 +6,7 @@ import {
   expectTypeToMatchAndEqual,
   GeoPositionDto,
 } from "shared";
-
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
-
 import { PgAgencyRepository } from "./PgAgencyRepository";
 
 const agency1builder = AgencyDtoBuilder.create(

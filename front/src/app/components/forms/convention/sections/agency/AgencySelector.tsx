@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Select } from "@codegouvfr/react-dsfr/Select";
-
 import {
   AgencyOption,
   ConventionReadDto,
@@ -13,15 +12,12 @@ import {
   keys,
   miniStageRestrictedDepartments,
 } from "shared";
-
 import { Loader } from "react-design-system";
-
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { agencyGateway } from "src/config/dependencies";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
-
 import { AgencyErrorText } from "./AgencyErrorText";
 
 type AgencySelectorProps = {

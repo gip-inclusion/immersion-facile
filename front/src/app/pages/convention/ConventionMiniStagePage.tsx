@@ -1,6 +1,5 @@
 import React from "react";
 import { Route } from "type-route";
-
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
 import { ConventionFormContainerLayout } from "src/app/components/forms/convention/ConventionFormContainerLayout";
 import { conventionInitialValuesFromUrl } from "src/app/components/forms/convention/conventionHelpers";

@@ -1,6 +1,5 @@
 import promClient from "prom-client";
 import { keys, prop } from "ramda";
-
 import {
   EventBus,
   EventCallback,

@@ -1,5 +1,4 @@
 import { SiretDto } from "shared";
-
 import {
   DiscussionAggregate,
   DiscussionId,

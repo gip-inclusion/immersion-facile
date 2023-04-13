@@ -2,13 +2,11 @@ import React, { useEffect, useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import Autocomplete from "@mui/material/Autocomplete";
 import { useStyles } from "tss-react/dsfr";
-
 import {
   AppellationDto,
   AppellationMatchDto,
   cleanStringToHTMLAttribute,
 } from "shared";
-
 import { Proposal } from "src/app/components/forms/establishment/Proposal";
 import { StringWithHighlights } from "src/app/components/forms/establishment/StringWithHighlights";
 import { useDebounce } from "src/app/hooks/useDebounce";

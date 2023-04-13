@@ -1,7 +1,5 @@
 import { SuperTest, Test } from "supertest";
-
 import { BackOfficeJwt, emailRoute, EmailSentDto } from "shared";
-
 import {
   buildTestApp,
   InMemoryGateways,

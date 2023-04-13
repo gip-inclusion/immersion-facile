@@ -1,5 +1,4 @@
 import { Observable } from "rxjs";
-
 import { FormEstablishmentDto, SiretDto } from "shared";
 
 export interface EstablishmentGateway {

@@ -4,7 +4,6 @@ import {
   FormEstablishmentDtoBuilder,
   SirenEstablishmentDto,
 } from "shared";
-
 import { rueGuillaumeTellDto } from "../../../_testBuilders/addressDtos";
 import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
@@ -18,7 +17,6 @@ import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/seco
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemorySirenGateway } from "../../../adapters/secondary/sirene/InMemorySirenGateway";
 import { EstablishmentEntity } from "../entities/EstablishmentEntity";
-
 import { UpdateEstablishmentAggregateFromForm } from "./UpdateEstablishmentAggregateFromFormEstablishement";
 
 const prepareSirenGateway = (

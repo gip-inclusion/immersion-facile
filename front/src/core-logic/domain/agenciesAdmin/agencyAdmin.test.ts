@@ -4,7 +4,6 @@ import {
   AgencyOption,
   expectToEqual,
 } from "shared";
-
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
 import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
 import {
@@ -18,7 +17,6 @@ import {
   TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
-
 import {
   AGENCY_NEEDING_REVIEW_1,
   AGENCY_NEEDING_REVIEW_2,

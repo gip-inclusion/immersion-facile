@@ -3,7 +3,6 @@ import {
   ConventionStatus,
   ImmersionAssessmentDto,
 } from "shared";
-
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { EntityFromDto } from "../../core/EntityFromDto";
 

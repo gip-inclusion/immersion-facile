@@ -1,7 +1,5 @@
 import { z } from "zod";
-
 import { zAnyObj } from "shared";
-
 import {
   OpenCageDataFeatureCollection,
   OpenCageDataSearchResultCollection,

@@ -1,6 +1,5 @@
 import React from "react";
 import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
-
 import { SubTitle } from "./SubTitle";
 import { TitleProps } from "./Title";
 import { textPrefix } from ".";

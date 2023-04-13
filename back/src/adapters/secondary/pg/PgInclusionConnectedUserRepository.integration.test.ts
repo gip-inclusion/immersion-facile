@@ -1,14 +1,11 @@
 import { Pool, PoolClient } from "pg";
-
 import { AgencyDtoBuilder, expectToEqual } from "shared";
 import { AuthenticatedUser } from "shared";
-
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import {
   AgencyRight,
   InclusionConnectedUser,
 } from "../../../domain/dashboard/entities/InclusionConnectedUser";
-
 import { PgAgencyRepository } from "./PgAgencyRepository";
 import { PgInclusionConnectedUserRepository } from "./PgInclusionConnectedUserRepository";
 

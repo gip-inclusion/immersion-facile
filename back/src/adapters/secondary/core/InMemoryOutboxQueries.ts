@@ -1,12 +1,10 @@
 import { EstablishmentJwtPayload } from "shared";
-
 import {
   DomainEvent,
   eventsToDebugInfo,
 } from "../../../domain/core/eventBus/events";
 import { OutboxQueries } from "../../../domain/core/ports/OutboxQueries";
 import { createLogger } from "../../../utils/logger";
-
 import { InMemoryOutboxRepository } from "./InMemoryOutboxRepository";
 
 const logger = createLogger(__filename);

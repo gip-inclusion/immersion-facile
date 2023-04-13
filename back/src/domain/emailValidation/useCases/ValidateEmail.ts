@@ -3,7 +3,6 @@ import {
   validateEmailInputSchema,
   type ValidateEmailStatus,
 } from "shared";
-
 import { UseCase } from "../../core/UseCase";
 import { EmailValidationGetaway } from "../ports/EmailValidationGateway";
 

@@ -1,5 +1,4 @@
 import { ConventionDto, conventionSchema, frontRoutes } from "shared";
-
 import { GenerateConventionMagicLinkUrl } from "../../../adapters/primary/config/magicLinkUrl";
 import { EmailGateway } from "../../convention/ports/EmailGateway";
 import { TimeGateway } from "../../core/ports/TimeGateway";

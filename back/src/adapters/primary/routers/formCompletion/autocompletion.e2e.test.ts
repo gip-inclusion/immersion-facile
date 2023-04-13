@@ -1,7 +1,5 @@
 import { SuperTest, Test } from "supertest";
-
 import { appellationRoute, romeRoute } from "shared";
-
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 
 describe(`/${appellationRoute} route`, () => {

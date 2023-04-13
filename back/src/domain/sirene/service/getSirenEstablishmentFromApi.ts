@@ -1,5 +1,4 @@
 import { GetSiretRequestDto, SirenEstablishmentDto } from "shared";
-
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { SirenGateway } from "../ports/SirenGateway";
 

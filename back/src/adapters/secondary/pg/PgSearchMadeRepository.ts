@@ -1,11 +1,9 @@
 import { PoolClient } from "pg";
-
 import {
   SearchMadeEntity,
   SearchMadeId,
 } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
 import { SearchMadeRepository } from "../../../domain/immersionOffer/ports/SearchMadeRepository";
-
 import { optional } from "./pgUtils";
 
 export class PgSearchMadeRepository implements SearchMadeRepository {

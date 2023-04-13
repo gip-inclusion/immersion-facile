@@ -1,6 +1,5 @@
 import React from "react";
 import { useStyles } from "tss-react/dsfr";
-
 import "./InclusionConnectButton.scss";
 
 export interface InclusionConnectButtonProps {

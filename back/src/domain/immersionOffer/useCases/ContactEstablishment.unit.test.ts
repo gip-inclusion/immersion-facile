@@ -3,7 +3,6 @@ import {
   expectArraysToEqual,
   expectPromiseToFailWithError,
 } from "shared";
-
 import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";

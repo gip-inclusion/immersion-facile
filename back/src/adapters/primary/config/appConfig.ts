@@ -1,6 +1,5 @@
 import * as dotenv from "dotenv";
 import { trim } from "ramda";
-
 import {
   AbsoluteUrl,
   inclusionConnectImmersionTargets,
@@ -11,7 +10,6 @@ import {
   makeThrowIfNotOpenCageGeosearchKey,
   ProcessEnv,
 } from "shared";
-
 import { DomainTopic } from "../../../domain/core/eventBus/events";
 import { InclusionConnectConfig } from "../../../domain/inclusionConnect/useCases/InitiateInclusionConnect";
 import { EmailableApiKey } from "../../secondary/emailValidationGateway/EmailableEmailValidationGateway";

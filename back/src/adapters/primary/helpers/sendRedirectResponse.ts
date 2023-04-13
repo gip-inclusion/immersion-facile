@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-
 import { AbsoluteUrl } from "shared";
 
 export const sendRedirectResponse = async (

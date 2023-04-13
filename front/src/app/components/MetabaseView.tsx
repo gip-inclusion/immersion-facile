@@ -2,11 +2,8 @@ import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { useStyles } from "tss-react/dsfr";
-
 import { AbsoluteUrl } from "shared";
-
 import { DsfrTitle } from "react-design-system";
-
 import { ENV } from "src/config/environmentVariables";
 
 const TitleButton = ({ url }: { url: AbsoluteUrl }) => (

@@ -3,16 +3,13 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Select } from "@codegouvfr/react-dsfr/Select";
 import { keys } from "ramda";
 import { useStyles } from "tss-react/dsfr";
-
 import {
   domElementIds,
   immersionFacileContactEmail,
   internshipKinds,
   templatesByName,
 } from "shared";
-
 import { DsfrTitle, ImmersionTextField } from "react-design-system";
-
 import { configureGenerateHtmlFromTemplate } from "html-templates";
 import {
   cciCustomHtmlFooter,

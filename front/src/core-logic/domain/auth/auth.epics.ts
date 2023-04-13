@@ -1,12 +1,9 @@
 import { filter, map, tap } from "rxjs";
-
 import {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
-
 import { appIsReadyAction } from "../actions";
-
 import { authSlice } from "./auth.slice";
 
 type AuthAction = ActionOfSlice<typeof authSlice>;

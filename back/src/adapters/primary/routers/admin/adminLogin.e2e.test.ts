@@ -1,12 +1,10 @@
 import { SuperTest, Test } from "supertest";
-
 import {
   adminLogin,
   BackOfficeJwt,
   BackOfficeJwtPayload,
   expectObjectsToMatch,
 } from "shared";
-
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { makeVerifyJwtES256 } from "../../../../domain/auth/jwt";

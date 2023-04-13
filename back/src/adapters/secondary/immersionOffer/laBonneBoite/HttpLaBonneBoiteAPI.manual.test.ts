@@ -1,12 +1,10 @@
 import axios, { AxiosResponse } from "axios";
-
 import { noRateLimit } from "../../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../../domain/core/ports/RetryStrategy";
 import { LaBonneBoiteRequestParams } from "../../../../domain/immersionOffer/ports/LaBonneBoiteAPI";
 import { distanceBetweenCoordinatesInMeters } from "../../../../utils/distanceBetweenCoordinatesInMeters";
 import { AppConfig } from "../../../primary/config/appConfig";
 import { PoleEmploiAccessTokenGateway } from "../PoleEmploiAccessTokenGateway";
-
 import { HttpLaBonneBoiteAPI } from "./HttpLaBonneBoiteAPI";
 
 const config = AppConfig.createFromEnv();

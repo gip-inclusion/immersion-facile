@@ -4,7 +4,6 @@ import {
   expectPromiseToFail,
   expectTypeToMatchAndEqual,
 } from "shared";
-
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import { InMemoryOutboxRepository } from "../../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
@@ -12,7 +11,6 @@ import { TestUuidGenerator } from "../../../../adapters/secondary/core/UuidGener
 import { InMemoryAgencyRepository } from "../../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../../core/eventBus/EventBus";
-
 import { AddAgency, defaultQuestionnaireUrl } from "./AddAgency";
 
 const defaultAdminEmail = "myAdmin@mail.com";

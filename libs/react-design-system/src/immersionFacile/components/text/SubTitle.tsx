@@ -1,5 +1,4 @@
 import React from "react";
-
 import { TitleProps } from "./Title";
 
 export const SubTitle = ({ children, red }: TitleProps) => (

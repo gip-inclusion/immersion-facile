@@ -1,11 +1,9 @@
 import { expectObjectsToMatch } from "shared";
-
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { SirenGateway } from "../../../domain/sirene/ports/SirenGateway";
 import { AppConfig } from "../../primary/config/appConfig";
 import { RealTimeGateway } from "../core/TimeGateway/RealTimeGateway";
-
 import { HttpSirenGateway } from "./HttpSirenGateway";
 
 // These tests are not hermetic and not meant for automated testing. They will make requests to the

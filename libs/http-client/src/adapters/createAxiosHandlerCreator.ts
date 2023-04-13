@@ -1,5 +1,4 @@
 import type { AxiosInstance } from "axios";
-
 import { HandlerCreator } from "../configureHttpClient";
 
 export const createAxiosHandlerCreator =

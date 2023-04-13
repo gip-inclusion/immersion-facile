@@ -3,13 +3,11 @@ import {
   expectToEqual,
   SirenEstablishmentDto,
 } from "shared";
-
 import {
   NotFoundError,
   TooManyRequestApiError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemorySirenGateway } from "../../../adapters/secondary/sirene/InMemorySirenGateway";
-
 import { GetSiret } from "./GetSiret";
 
 const validEstablishment: SirenEstablishmentDto = {

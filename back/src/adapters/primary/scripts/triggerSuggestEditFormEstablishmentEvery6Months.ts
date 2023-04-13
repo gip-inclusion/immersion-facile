@@ -1,9 +1,7 @@
 import axios from "axios";
 import { addMonths } from "date-fns";
 import { Pool } from "pg";
-
 import { immersionFacileContactEmail, SiretDto } from "shared";
-
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { makeGenerateJwtES256 } from "../../../domain/auth/jwt";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
@@ -17,7 +15,6 @@ import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { AppConfig, makeEmailAllowListPredicate } from "../config/appConfig";
 import { makeGenerateEditFormEstablishmentUrl } from "../config/magicLinkUrl";
 import { createPgUow } from "../config/uowConfig";
-
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
 const NB_MONTHS_BEFORE_SUGGEST = 6;

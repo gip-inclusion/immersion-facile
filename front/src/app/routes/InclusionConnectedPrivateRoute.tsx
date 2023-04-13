@@ -1,11 +1,8 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Route } from "type-route";
-
 import { inclusionConnectImmersionTargets } from "shared";
-
 import { InclusionConnectButton, MainWrapper } from "react-design-system";
-
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";

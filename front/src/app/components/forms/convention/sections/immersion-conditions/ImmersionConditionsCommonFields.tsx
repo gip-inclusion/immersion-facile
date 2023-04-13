@@ -5,7 +5,6 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { addMonths } from "date-fns";
-
 import {
   addressDtoToString,
   conventionObjectiveOptions,
@@ -16,7 +15,6 @@ import {
   scheduleWithFirstDayActivity,
   toDateString,
 } from "shared";
-
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { SchedulePicker } from "src/app/components/forms/commons/SchedulePicker/SchedulePicker";
 import { ConventionFormProfession } from "src/app/components/forms/convention/ConventionFormProfession";

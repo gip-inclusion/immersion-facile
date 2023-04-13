@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { Input, InputProps } from "@codegouvfr/react-dsfr/Input";
-
 import { ValidateEmailReason, ValidateEmailStatus } from "shared";
-
 import { emailValidationGateway } from "src/config/dependencies";
 
 type EmailValidationInputProps = InputProps.RegularInput & {

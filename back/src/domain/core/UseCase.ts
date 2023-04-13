@@ -1,17 +1,14 @@
 import { z } from "zod";
-
 import {
   calculateDurationInSecondsFrom,
   ConventionMagicLinkPayload,
   stringToMd5,
 } from "shared";
-
 import {
   BadRequestError,
   validateAndParseZodSchema,
 } from "../../adapters/primary/helpers/httpErrors";
 import { createLogger } from "../../utils/logger";
-
 import { UnitOfWork, UnitOfWorkPerformer } from "./ports/UnitOfWork";
 
 const logger = createLogger(__filename);

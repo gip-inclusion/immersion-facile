@@ -1,12 +1,10 @@
 import { PoolClient } from "pg";
-
 import {
   ConventionId,
   ConventionReadDto,
   conventionReadSchema,
   parseZodSchemaAndLogErrorOnParsingFailure,
 } from "shared";
-
 import { createLogger } from "../../../utils/logger";
 
 const buildSignatoriesObject = `JSON_BUILD_OBJECT(

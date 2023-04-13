@@ -1,6 +1,5 @@
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
-
 import { HttpGeoApi } from "./HttpGeoApi";
 
 describe("HttpGeoAPI", () => {

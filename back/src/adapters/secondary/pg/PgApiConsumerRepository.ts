@@ -1,9 +1,6 @@
 import { PoolClient } from "pg";
-
 import { ApiConsumer, ApiConsumerId } from "shared";
-
 import { ApiConsumerRepository } from "../../../domain/auth/ports/ApiConsumerRepository";
-
 import { optional } from "./pgUtils";
 
 export class PgApiConsumerRepository implements ApiConsumerRepository {

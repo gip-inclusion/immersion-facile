@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Select } from "@codegouvfr/react-dsfr/Select";
-
 import {
   AddressDto,
   addressDtoToString,
@@ -11,7 +10,6 @@ import {
   CreateAgencyDto,
   zEmail,
 } from "shared";
-
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
 import { RadioGroup } from "src/app/components/forms/commons/RadioGroup";

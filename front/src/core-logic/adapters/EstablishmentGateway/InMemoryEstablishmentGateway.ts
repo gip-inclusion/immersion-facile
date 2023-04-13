@@ -1,12 +1,10 @@
 import { Observable, of, Subject } from "rxjs";
-
 import {
   defaultMaxContactsPerWeek,
   FormEstablishmentDto,
   SiretDto,
   sleep,
 } from "shared";
-
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
 
 export class InMemoryEstablishmentGateway implements EstablishmentGateway {

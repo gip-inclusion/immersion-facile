@@ -1,8 +1,6 @@
 import React, { useEffect } from "react";
 import { useField } from "formik";
-
 import { cleanStringToHTMLAttribute } from "shared";
-
 import {
   AutocompleteAttributeValue,
   ImmersionTextField,

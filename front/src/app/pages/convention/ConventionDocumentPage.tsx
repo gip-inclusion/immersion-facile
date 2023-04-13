@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Route } from "type-route";
-
 import {
   ConventionMagicLinkJwt,
   ConventionMagicLinkPayload,
@@ -11,10 +10,8 @@ import {
   prettyPrintSchedule,
   toDisplayedDate,
 } from "shared";
-
 import { Loader, MainWrapper } from "react-design-system";
 import { ConventionDocument } from "react-design-system";
-
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";

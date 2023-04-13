@@ -1,11 +1,9 @@
 import { Pool, PoolClient } from "pg";
-
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   expectObjectsToMatch,
 } from "shared";
-
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import {
   ConventionPoleEmploiUserAdvisorEntity,
@@ -13,7 +11,6 @@ import {
 } from "../../../domain/peConnect/dto/PeConnect.dto";
 import { PeConnectImmersionAdvisorDto } from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
 import { PeConnectUserDto } from "../../../domain/peConnect/dto/PeConnectUser.dto";
-
 import { PgAgencyRepository } from "./PgAgencyRepository";
 import {
   PgConventionPoleEmploiAdvisorRepository,

@@ -1,5 +1,4 @@
 import { createSelector } from "@reduxjs/toolkit";
-
 import { createRootSelector } from "src/core-logic/storeConfig/store";
 
 const agencyInfos = createRootSelector((state) => state.agencyInfo);

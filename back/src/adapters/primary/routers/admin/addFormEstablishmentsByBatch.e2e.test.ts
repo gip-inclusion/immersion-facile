@@ -1,5 +1,4 @@
 import { SuperTest, Test } from "supertest";
-
 import {
   adminTargets,
   BackOfficeJwt,
@@ -7,7 +6,6 @@ import {
   FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
 } from "shared";
-
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import {
   buildTestApp,

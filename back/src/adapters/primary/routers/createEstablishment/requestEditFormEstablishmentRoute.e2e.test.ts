@@ -1,8 +1,6 @@
 import { addHours } from "date-fns";
 import { SuperTest, Test } from "supertest";
-
 import { EstablishmentJwtPayload, requestEmailToUpdateFormRoute } from "shared";
-
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";

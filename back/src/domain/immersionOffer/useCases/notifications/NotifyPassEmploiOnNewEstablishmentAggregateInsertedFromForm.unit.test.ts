@@ -1,12 +1,10 @@
 import { expectArraysToEqual } from "shared";
-
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import { InMemoryPassEmploiGateway } from "../../../../adapters/secondary/immersionOffer/passEmploi/InMemoryPassEmploiGateway";
 import { PassEmploiNotificationParams } from "../../ports/PassEmploiGateway";
-
 import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "./NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
 
 const prepareUseCase = () => {

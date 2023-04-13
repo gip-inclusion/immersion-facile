@@ -1,5 +1,4 @@
 import { ConventionDtoBuilder, expectToEqual } from "shared";
-
 import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/jwtTestHelper";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";

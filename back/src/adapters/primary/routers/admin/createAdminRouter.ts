@@ -1,5 +1,4 @@
 import { Router } from "express";
-
 import {
   adminLogin,
   adminTargets,
@@ -14,7 +13,6 @@ import {
   generateMagicLinkRoute,
   GetDashboardParams,
 } from "shared";
-
 import type { AppDependencies } from "../../config/createAppDependencies";
 import {
   createRemoveRouterPrefix,

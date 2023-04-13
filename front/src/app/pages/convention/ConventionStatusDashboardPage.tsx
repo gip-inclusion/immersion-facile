@@ -2,9 +2,7 @@ import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Route } from "type-route";
-
 import { MainWrapper } from "react-design-system";
-
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { useAppSelector } from "src/app/hooks/reduxHooks";

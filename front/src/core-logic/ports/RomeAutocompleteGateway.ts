@@ -1,5 +1,4 @@
 import { Observable } from "rxjs";
-
 import { AppellationMatchDto, RomeDto } from "shared";
 
 export interface RomeAutocompleteGateway {

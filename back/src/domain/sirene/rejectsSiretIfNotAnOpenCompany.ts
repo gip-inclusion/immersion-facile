@@ -1,5 +1,4 @@
 import { BadRequestError } from "../../adapters/primary/helpers/httpErrors";
-
 import { SirenGateway } from "./ports/SirenGateway";
 import { getSirenEstablishmentFromApi } from "./service/getSirenEstablishmentFromApi";
 

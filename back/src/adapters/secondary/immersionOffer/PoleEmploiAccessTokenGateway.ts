@@ -1,6 +1,5 @@
 import { secondsToMilliseconds } from "date-fns";
 import querystring from "querystring";
-
 import {
   AccessTokenGateway,
   GetAccessTokenResponse,

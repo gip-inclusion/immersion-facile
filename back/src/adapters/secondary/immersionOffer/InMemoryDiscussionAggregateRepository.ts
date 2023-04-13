@@ -1,7 +1,5 @@
 import isAfter from "date-fns/isAfter";
-
 import { SiretDto } from "shared";
-
 import {
   DiscussionAggregate,
   DiscussionId,

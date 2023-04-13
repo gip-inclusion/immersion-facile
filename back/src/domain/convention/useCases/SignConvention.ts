@@ -1,5 +1,4 @@
 import { z } from "zod";
-
 import {
   ConventionMagicLinkPayload,
   ConventionStatus,
@@ -8,7 +7,6 @@ import {
   signConventionDtoWithRole,
   WithConventionId,
 } from "shared";
-
 import {
   ForbiddenError,
   NotFoundError,

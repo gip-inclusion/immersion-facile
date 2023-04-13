@@ -1,14 +1,11 @@
 import { Router } from "express";
-
 import { inclusionConnectedAllowedTargets } from "shared";
-
 import { AppDependencies } from "../../config/createAppDependencies";
 import {
   createRemoveRouterPrefix,
   RelativeUrl,
 } from "../../createRemoveRouterPrefix";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
-
 import { createInclusionConnectedMiddleware } from "./createInclusionConnectedMiddleware";
 
 export const createInclusionConnectedAllowedRouter = (

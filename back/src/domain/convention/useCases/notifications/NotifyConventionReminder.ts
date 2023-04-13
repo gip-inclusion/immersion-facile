@@ -1,5 +1,4 @@
 import { format } from "date-fns";
-
 import {
   AgencyDto,
   Beneficiary,
@@ -14,7 +13,6 @@ import {
   Role,
   TemplatedEmail,
 } from "shared";
-
 import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
 import {
@@ -29,7 +27,6 @@ import {
 } from "../../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { EmailGateway } from "../../ports/EmailGateway";
-
 import {
   missingAgencyMessage,
   missingConventionMessage,

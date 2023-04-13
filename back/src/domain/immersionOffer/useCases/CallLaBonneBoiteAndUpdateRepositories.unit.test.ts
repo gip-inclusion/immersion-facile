@@ -2,7 +2,6 @@ import {
   expectTypeToMatchAndEqual,
   SearchImmersionQueryParamsDto,
 } from "shared";
-
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";

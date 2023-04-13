@@ -1,7 +1,5 @@
 import React from "react";
-
 import { ConventionReadDto, Role } from "shared";
-
 import { NPSForm } from "react-design-system";
 
 type NpsSectionProps = {

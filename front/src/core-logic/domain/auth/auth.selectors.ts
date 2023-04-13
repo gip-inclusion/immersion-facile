@@ -1,7 +1,5 @@
 import { createSelector } from "@reduxjs/toolkit";
-
 import { authFailed } from "shared";
-
 import { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 import { createRootSelector } from "src/core-logic/storeConfig/store";
 

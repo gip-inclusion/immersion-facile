@@ -2,7 +2,6 @@ import {
   createEstablishmentMagicLinkPayload,
   establishmentTargets,
 } from "shared";
-
 import {
   rueSaintHonore,
   rueSaintHonoreDto,

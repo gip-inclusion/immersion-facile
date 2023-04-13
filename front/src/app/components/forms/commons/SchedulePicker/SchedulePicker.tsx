@@ -2,7 +2,6 @@ import React from "react";
 import { useFormContext } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
-
 import {
   ConventionDto,
   ConventionReadDto,
@@ -10,10 +9,8 @@ import {
   reasonableSchedule,
   scheduleWithFirstDayActivity,
 } from "shared";
-
 import { ComplexSchedulePicker } from "./ComplexSchedulePicker";
 import { RegularSchedulePicker } from "./RegularSchedulePicker";
-
 import "./SchedulePicker.css";
 
 type SchedulePickerProps = {

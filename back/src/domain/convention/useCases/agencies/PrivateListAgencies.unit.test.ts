@@ -1,9 +1,7 @@
 import { AgencyDto, expectToEqual } from "shared";
-
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import { InMemoryAgencyRepository } from "../../../../adapters/secondary/InMemoryAgencyRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-
 import { PrivateListAgencies } from "./PrivateListAgencies";
 
 describe("PrivateListAgencies use case", () => {

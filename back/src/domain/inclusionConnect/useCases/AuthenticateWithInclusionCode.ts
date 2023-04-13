@@ -8,7 +8,6 @@ import {
   frontRoutes,
   queryParamsAsString,
 } from "shared";
-
 import { ForbiddenError } from "../../../adapters/primary/helpers/httpErrors";
 import { GenerateAuthenticatedUserJwt } from "../../auth/jwt";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";

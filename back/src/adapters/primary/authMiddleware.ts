@@ -1,7 +1,6 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import jwt, { TokenExpiredError } from "jsonwebtoken";
 import promClient from "prom-client";
-
 import {
   ApiConsumerName,
   backOfficeJwtPayloadSchema,
@@ -11,12 +10,10 @@ import {
   ExtractFromExisting,
   PayloadKey,
 } from "shared";
-
 import { JwtKind, makeVerifyJwtES256 } from "../../domain/auth/jwt";
 import { GetApiConsumerById } from "../../domain/core/ports/GetApiConsumerById";
 import { TimeGateway } from "../../domain/core/ports/TimeGateway";
 import { createLogger } from "../../utils/logger";
-
 import { AppConfig } from "./config/appConfig";
 
 const logger = createLogger(__filename);

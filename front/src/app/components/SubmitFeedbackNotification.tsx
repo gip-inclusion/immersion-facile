@@ -1,7 +1,6 @@
 import React, { ReactNode } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-
 import {
   isFeedbackError,
   SubmitFeedBack,

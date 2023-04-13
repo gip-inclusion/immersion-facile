@@ -1,5 +1,4 @@
 import { SuperTest, Test } from "supertest";
-
 import { rueSaintHonoreDto } from "../../../../_testBuilders/addressDtos";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";

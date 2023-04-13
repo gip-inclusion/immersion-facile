@@ -1,9 +1,6 @@
 import { Pool, PoolClient } from "pg";
-
 import { ApiConsumer, expectTypeToMatchAndEqual } from "shared";
-
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
-
 import { PgApiConsumerRepository } from "./PgApiConsumerRepository";
 
 describe("PG GetApiConsumerById", () => {

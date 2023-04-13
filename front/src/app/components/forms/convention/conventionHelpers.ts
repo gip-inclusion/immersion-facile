@@ -1,6 +1,5 @@
 import { addDays, startOfToday } from "date-fns";
 import { v4 as uuidV4 } from "uuid";
-
 import {
   ConventionDto,
   ConventionId,
@@ -17,7 +16,6 @@ import {
   Signatories,
   toDateString,
 } from "shared";
-
 import { ConventionCustomAgencyPageRoute } from "src/app/pages/convention/ConventionCustomAgencyPage";
 import { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
 import { ConventionMiniStagePageRoute } from "src/app/pages/convention/ConventionMiniStagePage";

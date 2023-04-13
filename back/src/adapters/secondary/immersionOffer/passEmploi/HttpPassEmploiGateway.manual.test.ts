@@ -1,5 +1,4 @@
 import { AppConfig } from "../../../primary/config/appConfig";
-
 import { HttpPassEmploiGateway } from "./HttpPassEmploiGateway";
 
 describe("HttpPassEmploiGateway", () => {

@@ -1,6 +1,5 @@
 import React from "react";
 import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
-
 import { Image, ImageProps } from "./Image";
 import { imagePrefix } from ".";
 

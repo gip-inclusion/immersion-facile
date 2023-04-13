@@ -1,7 +1,6 @@
 import { DataSource } from "aws-sdk/clients/discovery";
 import { Pool, PoolClient } from "pg";
 import { prop, sortBy } from "ramda";
-
 import {
   AddressDto,
   AppellationDto,
@@ -17,7 +16,6 @@ import {
   NumberEmployeesRange,
   SearchImmersionResultDto,
 } from "shared";
-
 import {
   rueBitcheDto,
   rueGuillaumeTellDto,
@@ -34,7 +32,6 @@ import {
   EstablishmentEntity,
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
-
 import { PgDiscussionAggregateRepository } from "./PgDiscussionAggregateRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 

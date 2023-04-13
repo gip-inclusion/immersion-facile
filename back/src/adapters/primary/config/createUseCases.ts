@@ -1,7 +1,5 @@
 import { keys } from "ramda";
-
 import { AgencyId, ApiConsumerId, SiretDto, sleep } from "shared";
-
 import { LookupLocation } from "../../../domain/address/useCases/LookupLocation";
 import { LookupStreetAddress } from "../../../domain/address/useCases/LookupStreetAddress";
 import {
@@ -78,7 +76,6 @@ import { RomeSearch } from "../../../domain/rome/useCases/RomeSearch";
 import { GetSiret } from "../../../domain/sirene/useCases/GetSiret";
 import { GetSiretIfNotAlreadySaved } from "../../../domain/sirene/useCases/GetSiretIfNotAlreadySaved";
 import { NotFoundError } from "../helpers/httpErrors";
-
 import { AppConfig } from "./appConfig";
 import { Gateways } from "./createGateways";
 import {

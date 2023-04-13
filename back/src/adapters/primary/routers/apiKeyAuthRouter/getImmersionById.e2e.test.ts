@@ -1,7 +1,5 @@
 import { SuperTest, Test } from "supertest";
-
 import { getImmersionOfferByIdRoute__v0 } from "shared";
-
 import {
   rueSaintHonore,
   rueSaintHonoreDto,

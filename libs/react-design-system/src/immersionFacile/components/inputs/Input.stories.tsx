@@ -1,6 +1,5 @@
 import React from "react";
 import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
-
 import { Input, InputProperties } from "./Input";
 import { inputPrefix } from ".";
 

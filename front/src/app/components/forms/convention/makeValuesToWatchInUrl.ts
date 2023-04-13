@@ -1,5 +1,4 @@
 import { ConventionDto, isBeneficiaryStudent } from "shared";
-
 import {
   ConventionFormKeysInUrl,
   ConventionInUrl,

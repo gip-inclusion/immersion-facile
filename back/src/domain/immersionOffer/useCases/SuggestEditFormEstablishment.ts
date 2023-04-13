@@ -3,7 +3,6 @@ import {
   SiretDto,
   siretSchema,
 } from "shared";
-
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { GenerateEditFormEstablishmentJwt } from "../../auth/jwt";
 import { EmailGateway } from "../../convention/ports/EmailGateway";

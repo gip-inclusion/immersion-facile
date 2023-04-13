@@ -1,12 +1,10 @@
 import promClient from "prom-client";
-
 import {
   ApiConsumer,
   SearchImmersionQueryParamsDto,
   searchImmersionQueryParamsSchema,
   SearchImmersionResultDto,
 } from "shared";
-
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../core/UseCase";

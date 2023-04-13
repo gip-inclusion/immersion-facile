@@ -1,5 +1,4 @@
 import { from, Observable } from "rxjs";
-
 import {
   AddressAndPosition,
   addressAndPositionListSchema,
@@ -8,9 +7,7 @@ import {
   LookupSearchResult,
   lookupSearchResultsSchema,
 } from "shared";
-
 import { HttpClient } from "http-client";
-
 import { AddressGateway } from "src/core-logic/ports/AddressGateway";
 
 export class HttpAddressGateway implements AddressGateway {

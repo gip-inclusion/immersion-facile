@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
 import {
   AbsoluteUrl,
   AgencyId,
@@ -12,7 +11,6 @@ import {
   SignatoryRole,
   UpdateConventionStatusRequestDto,
 } from "shared";
-
 import { SubmitFeedBack } from "../SubmitFeedback";
 
 type ConventionValidationFeedbackKind =

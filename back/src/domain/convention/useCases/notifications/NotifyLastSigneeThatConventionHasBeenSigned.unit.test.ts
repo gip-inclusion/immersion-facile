@@ -6,7 +6,6 @@ import {
   expectToEqual,
   frontRoutes,
 } from "shared";
-
 import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
 import {
   createInMemoryUow,
@@ -15,7 +14,6 @@ import {
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-
 import {
   missingConventionMessage,
   noSignatoryMessage,

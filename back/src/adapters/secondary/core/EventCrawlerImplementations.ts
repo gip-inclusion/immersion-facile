@@ -1,7 +1,5 @@
 import { splitEvery } from "ramda";
-
 import { calculateDurationInSecondsFrom } from "shared";
-
 import { EventBus } from "../../../domain/core/eventBus/EventBus";
 import { EventCrawler } from "../../../domain/core/eventBus/EventCrawler";
 import {

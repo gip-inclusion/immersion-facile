@@ -1,12 +1,10 @@
 import axios from "axios";
-
 import {
   AgencyDtoBuilder,
   ConventionDto,
   ConventionDtoBuilder,
   immersionFacileContactEmail,
 } from "shared";
-
 import { generateConventionJwtTestFn } from "../../_testBuilders/jwtTestHelper";
 import {
   AppConfig,

@@ -1,7 +1,6 @@
 /* eslint-disable  @typescript-eslint/require-await */
 import { values } from "ramda";
 import { from, Observable, Subject } from "rxjs";
-
 import {
   AgencyDto,
   AgencyId,
@@ -16,7 +15,6 @@ import {
   toAgencyPublicDisplayDto,
   WithAgencyId,
 } from "shared";
-
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
 export class TestAgencyGateway implements AgencyGateway {

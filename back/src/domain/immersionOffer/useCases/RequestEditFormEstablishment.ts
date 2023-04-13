@@ -1,11 +1,9 @@
 import { isAfter } from "date-fns";
-
 import {
   createEstablishmentMagicLinkPayload,
   SiretDto,
   siretSchema,
 } from "shared";
-
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { GenerateEditFormEstablishmentJwt } from "../../auth/jwt";
 import { EmailGateway } from "../../convention/ports/EmailGateway";

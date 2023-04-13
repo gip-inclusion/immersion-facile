@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
 import { SiretDto } from "shared";
 
 type EstablishmentUiStatus =

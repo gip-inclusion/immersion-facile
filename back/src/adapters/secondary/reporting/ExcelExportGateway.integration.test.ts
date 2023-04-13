@@ -2,9 +2,7 @@ import { Workbook } from "exceljs";
 import extract from "extract-zip";
 import fs from "fs";
 import * as path from "path";
-
 import { makeTemporaryStorageFolder } from "../../../utils/filesystemUtils";
-
 import { ExcelExportGateway } from "./ExcelExportGateway";
 
 describe("ExcelExportGateway", () => {

@@ -1,5 +1,4 @@
 import { FormEstablishmentDto, propEq, SiretDto } from "shared";
-
 import { FormEstablishmentRepository } from "../../domain/immersionOffer/ports/FormEstablishmentRepository";
 import { createLogger } from "../../utils/logger";
 import { ConflictError } from "../primary/helpers/httpErrors";

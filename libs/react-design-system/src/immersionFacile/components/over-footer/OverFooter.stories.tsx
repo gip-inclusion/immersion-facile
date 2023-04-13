@@ -1,6 +1,5 @@
 import React from "react";
 import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
-
 import { OverFooter, OverFooterProps } from "./OverFooter";
 import { overFooterPrefix } from ".";
 

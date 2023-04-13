@@ -1,6 +1,5 @@
 import React from "react";
 import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
-
 import { File, FileProperties } from "./File";
 import { filePrefix } from ".";
 

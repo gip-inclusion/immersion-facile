@@ -3,9 +3,7 @@ import { useFormContext } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-
 import { ConventionDto } from "shared";
-
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import {
   makeFieldError,

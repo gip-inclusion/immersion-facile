@@ -1,7 +1,5 @@
 import React from "react";
-
 import { AddressAndPosition } from "shared";
-
 import { apiAddressGateway } from "src/config/dependencies";
 
 export const getAddressesFromApi = async (

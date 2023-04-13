@@ -1,10 +1,8 @@
 import { AppellationMatchDto } from "shared";
-
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryRomeRepository } from "../../../adapters/secondary/InMemoryRomeRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { RomeRepository } from "../ports/RomeRepository";
-
 import { AppellationSearch } from "./AppellationSearch";
 
 describe("AppellationSearch", () => {

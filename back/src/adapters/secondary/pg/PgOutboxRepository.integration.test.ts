@@ -1,13 +1,10 @@
 import { Pool, PoolClient } from "pg";
-
 import { ConventionDtoBuilder, expectArraysToEqualIgnoringOrder } from "shared";
-
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { DomainEvent, DomainTopic } from "../../../domain/core/eventBus/events";
 import { CustomTimeGateway } from "../core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../core/UuidGeneratorImplementations";
-
 import { PgOutboxRepository, StoredEventRow } from "./PgOutboxRepository";
 
 describe("PgOutboxRepository", () => {

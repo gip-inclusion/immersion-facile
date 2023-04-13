@@ -2,7 +2,6 @@ import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Tabs } from "@codegouvfr/react-dsfr/Tabs";
 import { Route } from "type-route";
-
 import { ImmersionHeader } from "src/app/components/layout/ImmersionHeader";
 import { AddEstablishmentByBatchTab } from "src/app/pages/admin/AddEstablishmentByBatchTab";
 import { AgencyTab } from "src/app/pages/admin/AgencyTab";

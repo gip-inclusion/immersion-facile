@@ -1,11 +1,9 @@
 import axios from "axios";
-
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   immersionFacileContactEmail,
 } from "shared";
-
 import { AppConfig } from "../../adapters/primary/config/appConfig";
 import { createInMemoryUow } from "../../adapters/primary/config/uowConfig";
 import { SendinblueHtmlEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueHtmlEmailGateway";

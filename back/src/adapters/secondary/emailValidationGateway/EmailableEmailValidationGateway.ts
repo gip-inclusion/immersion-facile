@@ -1,7 +1,5 @@
 import { Flavor, ValidateEmailReason, ValidateEmailStatus } from "shared";
-
 import { createTarget, createTargets, type HttpClient } from "http-client";
-
 import { EmailValidationGetaway } from "../../../domain/emailValidation/ports/EmailValidationGateway";
 import { createLogger } from "../../../utils/logger";
 

@@ -1,14 +1,11 @@
 import React from "react";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Route } from "type-route";
-
 import {
   ConventionMagicLinkPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
 } from "shared";
-
 import { Loader, MainWrapper } from "react-design-system";
-
 import { ImmersionAssessmentForm } from "src/app/components/forms/immersion-assessment/ImmersionAssessmentForm";
 import { ImmersionDescription } from "src/app/components/forms/immersion-assessment/ImmersionDescription";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";

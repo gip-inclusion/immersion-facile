@@ -2,7 +2,6 @@ import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
 import { Link } from "type-route";
-
 import "./FixedStamp.scss";
 
 type FixedStampProps = {

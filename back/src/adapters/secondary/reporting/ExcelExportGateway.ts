@@ -1,5 +1,4 @@
 import { keys } from "ramda";
-
 import { ExportGateway } from "../../../domain/backoffice/ports/ExportGateway";
 import {
   ExportedRow,

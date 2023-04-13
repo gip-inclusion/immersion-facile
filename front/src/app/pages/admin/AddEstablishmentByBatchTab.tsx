@@ -7,11 +7,8 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import Papa from "papaparse";
 import { keys, values } from "ramda";
 import { makeStyles } from "tss-react/dsfr";
-
 import { domElementIds, EstablishmentCSVRow } from "shared";
-
 import { DsfrTitle, Loader } from "react-design-system";
-
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { establishmentBatchSelectors } from "src/core-logic/domain/establishmentBatch/establishmentBatch.selectors";

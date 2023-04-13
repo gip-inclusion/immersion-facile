@@ -1,5 +1,4 @@
 import { AgencyDto, agencySchema } from "shared";
-
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
 import { CreateNewEvent } from "../../../core/eventBus/EventBus";
 import {

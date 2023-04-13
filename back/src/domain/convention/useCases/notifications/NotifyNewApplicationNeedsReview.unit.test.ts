@@ -5,7 +5,6 @@ import {
   CreateConventionMagicLinkPayloadProperties,
   frontRoutes,
 } from "shared";
-
 import { expectedEmailConventionReviewMatchingConvention } from "../../../../_testBuilders/emailAssertions";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
 import {
@@ -15,7 +14,6 @@ import {
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-
 import { NotifyNewApplicationNeedsReview } from "./NotifyNewApplicationNeedsReview";
 
 const defaultConvention = new ConventionDtoBuilder().build();

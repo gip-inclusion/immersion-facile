@@ -2,9 +2,7 @@
 /* eslint-disable jest/consistent-test-it */
 
 import { expectPromiseToFailWithError } from "shared";
-
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
-
 import {
   executeUpdateConventionStatusUseCase,
   setupInitialState,

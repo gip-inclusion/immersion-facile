@@ -2,7 +2,6 @@ import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
 import { useStyles } from "tss-react/dsfr";
-
 import "./SectionAccordion.scss";
 
 const componentName = "im-section-accordion";

@@ -1,15 +1,12 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { debounceTime, distinctUntilChanged, filter } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
-
 import { AgencyId } from "shared";
-
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
-
 import { agencyAdminSlice } from "./agencyAdmin.slice";
 
 type AgencyAction = ActionOfSlice<typeof agencyAdminSlice>;

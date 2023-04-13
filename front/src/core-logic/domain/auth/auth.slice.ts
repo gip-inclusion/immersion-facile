@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
 import { FederatedIdentity } from "shared";
 
 export type FederatedIdentityWithUser = FederatedIdentity & {

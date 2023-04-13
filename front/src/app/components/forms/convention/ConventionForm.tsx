@@ -5,7 +5,6 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useStyles } from "tss-react/dsfr";
-
 import {
   ConventionDto,
   ConventionMagicLinkPayload,
@@ -17,7 +16,6 @@ import {
   isEstablishmentTutorIsEstablishmentRepresentative,
   isPeConnectIdentity,
 } from "shared";
-
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { ConventionFormFields } from "src/app/components/forms/convention/ConventionFormFields";
 import {

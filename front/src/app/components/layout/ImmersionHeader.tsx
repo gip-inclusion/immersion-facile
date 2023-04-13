@@ -8,9 +8,7 @@ import { Header, HeaderProps } from "@codegouvfr/react-dsfr/Header";
 import { MainNavigationProps } from "@codegouvfr/react-dsfr/MainNavigation";
 import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";
 import { makeStyles } from "tss-react/dsfr";
-
 import { domElementIds } from "shared";
-
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes, useRoute } from "src/app/routes/routes";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";

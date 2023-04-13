@@ -4,7 +4,6 @@ import {
   SiretAndRomeDto,
   siretAndRomeSchema,
 } from "shared";
-
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";

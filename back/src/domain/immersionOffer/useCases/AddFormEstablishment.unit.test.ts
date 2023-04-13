@@ -5,7 +5,6 @@ import {
   expectPromiseToFailWithError,
   FormEstablishmentDtoBuilder,
 } from "shared";
-
 import { SirenEstablishmentDtoBuilder } from "../../../_testBuilders/SirenEstablishmentDtoBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
@@ -24,7 +23,6 @@ import {
   TEST_ESTABLISHMENT1,
 } from "../../../adapters/secondary/sirene/InMemorySirenGateway";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
-
 import { AddFormEstablishment } from "./AddFormEstablishment";
 
 describe("Add FormEstablishment", () => {

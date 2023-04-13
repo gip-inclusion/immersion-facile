@@ -1,6 +1,5 @@
 import React from "react";
 import { Route } from "type-route";
-
 import { AdminPage } from "src/app/pages/admin/AdminPage";
 import { AddAgencyPage } from "src/app/pages/agency/AddAgencyPage";
 import { AgencyDashboardPage } from "src/app/pages/AgencyDashboardPage";
@@ -16,7 +15,6 @@ import { StatsPage } from "src/app/pages/StatsPage";
 import { AdminPrivateRoute, LoginForm } from "src/app/routes/AdminPrivateRoute";
 import { InclusionConnectedPrivateRoute } from "src/app/routes/InclusionConnectedPrivateRoute";
 import { RenewExpiredLinkPage } from "src/app/routes/RenewExpiredLinkPage";
-
 import { StandardLayout } from "../components/layout/StandardLayout";
 import { ConventionCustomAgencyPage } from "../pages/convention/ConventionCustomAgencyPage";
 import { ConventionDocumentPage } from "../pages/convention/ConventionDocumentPage";
@@ -28,7 +26,6 @@ import { EstablishmentFormPage } from "../pages/establishment/EstablishmentFormP
 import { GroupPage } from "../pages/group/GroupPage";
 import { HomePage } from "../pages/home/HomePage";
 import { ImmersionAssessmentPage } from "../pages/immersion-assessment/ImmersionAssessmentPage";
-
 import {
   AdminTab,
   adminTabs,

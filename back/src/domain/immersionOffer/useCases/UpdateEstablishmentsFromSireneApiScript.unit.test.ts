@@ -1,5 +1,4 @@
 import { AddressDto, pathEq } from "shared";
-
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { SirenEstablishmentDtoBuilder } from "../../../_testBuilders/SirenEstablishmentDtoBuilder";
@@ -9,7 +8,6 @@ import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemorySirenGateway } from "../../../adapters/secondary/sirene/InMemorySirenGateway";
 import { EstablishmentEntity } from "../entities/EstablishmentEntity";
-
 import { UpdateEstablishmentsFromSirenApiScript } from "./UpdateEstablishmentsFromSirenApiScript";
 
 const prepareUseCase = () => {

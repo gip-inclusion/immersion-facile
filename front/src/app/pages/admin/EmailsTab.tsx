@@ -4,11 +4,8 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { keys } from "ramda";
-
 import { EmailSentDto, EmailVariables } from "shared";
-
 import { DsfrTitle } from "react-design-system";
-
 import { TextCell } from "src/app/components/admin/TextCell";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ENV } from "src/config/environmentVariables";

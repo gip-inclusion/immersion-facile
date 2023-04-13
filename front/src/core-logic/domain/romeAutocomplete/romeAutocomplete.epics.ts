@@ -7,7 +7,6 @@ import {
   of,
   switchMap,
 } from "rxjs";
-
 import { romeAutocompleteSlice } from "src/core-logic/domain/romeAutocomplete/romeAutocomplete.slice";
 import {
   ActionOfSlice,

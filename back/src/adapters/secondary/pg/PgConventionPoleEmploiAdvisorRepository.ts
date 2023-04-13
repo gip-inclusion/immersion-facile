@@ -1,11 +1,9 @@
 import { PoolClient } from "pg";
-
 import {
   ConventionId,
   parseZodSchemaAndLogErrorOnParsingFailure,
   PeExternalId,
 } from "shared";
-
 import {
   ConventionPoleEmploiUserAdvisorDto,
   ConventionPoleEmploiUserAdvisorEntity,

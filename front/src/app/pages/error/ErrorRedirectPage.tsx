@@ -1,10 +1,7 @@
 import React from "react";
 import { Route } from "type-route";
-
 import { isManagedError } from "shared";
-
 import { routes } from "src/app/routes/routes";
-
 import { ErrorPage } from "./ErrorPage";
 
 export type ErrorRedirectRoute = Route<typeof routes.errorRedirect>;

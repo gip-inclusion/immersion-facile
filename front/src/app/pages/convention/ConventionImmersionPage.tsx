@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Route } from "type-route";
-
 import { FederatedIdentityProvider, isPeConnectIdentity } from "shared";
-
 import { Loader } from "react-design-system";
-
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
 import { ConventionFormContainerLayout } from "src/app/components/forms/convention/ConventionFormContainerLayout";
 import { conventionInitialValuesFromUrl } from "src/app/components/forms/convention/conventionHelpers";

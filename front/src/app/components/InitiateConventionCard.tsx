@@ -2,11 +2,8 @@ import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { keys } from "ramda";
-
 import { loginPeConnect } from "shared";
-
 import { ConventionRequirements, PeConnectButton } from "react-design-system";
-
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
 import { useRoute } from "src/app/routes/routes";

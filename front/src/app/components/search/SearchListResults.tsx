@@ -2,15 +2,11 @@ import React, { useEffect, useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 import { Select } from "@codegouvfr/react-dsfr/Select";
-
 import { ContactMethod, domElementIds, SearchImmersionResultDto } from "shared";
-
 import { useStyleUtils } from "react-design-system";
-
 import { SuccessFeedback } from "src/app/components/SuccessFeedback";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
-
 import {
   ContactEstablishmentModal,
   useContactEstablishmentModal,

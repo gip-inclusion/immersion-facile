@@ -4,7 +4,6 @@ import {
   generateMagicLinkRequestSchema,
   GenerateMagicLinkResponseDto,
 } from "shared";
-
 import { GenerateConventionJwt } from "../../auth/jwt";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UseCase } from "../../core/UseCase";

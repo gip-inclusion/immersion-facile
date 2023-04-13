@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import DownloadIcon from "@mui/icons-material/Download";
 import { Checkbox, CircularProgress } from "@mui/material";
-
 import {
   AgenciesExportableParams,
   ContactRequestsExportableParams,
@@ -11,13 +10,11 @@ import {
   EstablishmentsWithAggregatedOffersExportableParams,
   EstablishmentsWithFlattenOffersExportableParams,
 } from "shared";
-
 import {
   ArrayDropdown,
   DsfrTitle,
   ImmersionTextField,
 } from "react-design-system";
-
 import { useAdminToken } from "src/app/hooks/useAdminToken";
 import { HttpExcelExportGateway } from "src/core-logic/adapters/ExcelExportGateway/HttpExcelExportGateway";
 

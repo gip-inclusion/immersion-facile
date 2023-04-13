@@ -1,13 +1,11 @@
 import React from "react";
 import { differenceInCalendarYears } from "date-fns";
-
 import {
   CCI_WEEKLY_LIMITED_SCHEDULE_AGE,
   CCI_WEEKLY_LIMITED_SCHEDULE_HOURS,
   InternshipKind,
   maxPermittedHoursPerWeek,
 } from "shared";
-
 import { formatHoursString } from "./TotaWeeklylHoursIndicator";
 
 type HourIndicatorProperties = {

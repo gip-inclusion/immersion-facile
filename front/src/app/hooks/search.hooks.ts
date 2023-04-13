@@ -1,5 +1,4 @@
 import { useDispatch } from "react-redux";
-
 import { routes } from "src/app/routes/routes";
 import {
   SearchPageParams,

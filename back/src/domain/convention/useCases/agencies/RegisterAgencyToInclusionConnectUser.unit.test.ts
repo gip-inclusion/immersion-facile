@@ -5,7 +5,6 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import {
   ForbiddenError,
@@ -19,7 +18,6 @@ import { InMemoryAuthenticatedUserRepository } from "../../../../adapters/second
 import { InMemoryInclusionConnectedUserRepository } from "../../../../adapters/secondary/InMemoryInclusionConnectedUserRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../../core/eventBus/EventBus";
-
 import { RegisterAgencyToInclusionConnectUser } from "./RegisterAgencyToInclusionConnectUser";
 
 const userId = "456";

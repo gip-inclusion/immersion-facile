@@ -1,7 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
 import { LookupLocationInput, LookupSearchResult } from "shared";
-
 import { SubmitFeedBack } from "../SubmitFeedback";
 
 export type GeoSearchFeedback = SubmitFeedBack<"success">;

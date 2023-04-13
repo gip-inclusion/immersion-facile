@@ -1,12 +1,10 @@
 import { z } from "zod";
-
 import {
   calculateTotalImmersionHoursBetweenDate,
   ConventionDto,
   ConventionStatus,
   ImmersionObjective,
 } from "shared";
-
 import {
   UnitOfWork,
   UnitOfWorkPerformer,

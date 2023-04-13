@@ -1,5 +1,4 @@
 import { groupBy } from "ramda";
-
 import {
   AppellationDto,
   conflictErrorSiret,
@@ -11,7 +10,6 @@ import {
   SearchImmersionResultDto,
   SiretDto,
 } from "shared";
-
 import { ContactEntity } from "../../../domain/immersionOffer/entities/ContactEntity";
 import {
   DataSource,

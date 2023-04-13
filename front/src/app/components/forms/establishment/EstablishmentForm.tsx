@@ -8,7 +8,6 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
-
 import {
   AppellationDto,
   defaultMaxContactsPerWeek,
@@ -20,9 +19,7 @@ import {
   SiretDto,
   toDotNotation,
 } from "shared";
-
 import { ErrorNotifications } from "react-design-system";
-
 import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 import {
@@ -30,7 +27,6 @@ import {
   useFormContents,
 } from "src/app/hooks/formContents.hooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
-
 import { BusinessContact } from "./BusinessContact";
 import {
   emptyAppellation,

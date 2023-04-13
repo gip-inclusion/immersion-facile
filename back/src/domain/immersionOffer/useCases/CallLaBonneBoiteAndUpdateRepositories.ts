@@ -1,12 +1,10 @@
 import { addDays } from "date-fns";
 import promClient from "prom-client";
 import { prop, propEq } from "ramda";
-
 import {
   SearchImmersionQueryParamsDto,
   searchImmersionQueryParamsSchema,
 } from "shared";
-
 import { createLogger } from "../../../utils/logger";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";

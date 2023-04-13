@@ -1,7 +1,5 @@
 import { useEffect } from "react";
-
 import { InternshipKind } from "shared";
-
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 

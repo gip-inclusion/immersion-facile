@@ -3,9 +3,7 @@ import {
   domElementIds,
   FormEstablishmentDto,
 } from "shared";
-
 import { FormFieldsObjectForContent } from "src/app/hooks/formContents.hooks";
-
 import { FormFieldAttributesForContent } from "../types";
 
 type FormEstablishmentField = Partial<

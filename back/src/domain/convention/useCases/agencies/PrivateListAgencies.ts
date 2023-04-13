@@ -1,12 +1,10 @@
 import { map } from "ramda";
-
 import {
   AgencyDto,
   AgencyOption,
   PrivateListAgenciesRequestDto,
   privateListAgenciesRequestSchema,
 } from "shared";
-
 import {
   UnitOfWork,
   UnitOfWorkPerformer,

@@ -1,14 +1,12 @@
 import React, { useState } from "react";
 import { fr, FrIconClassName } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-
 import {
   ConventionStatus,
   doesStatusNeedsJustification,
   domElementIds,
   UpdateConventionStatusRequestDto,
 } from "shared";
-
 import { JustificationModal } from "src/app/components/forms/convention/JustificationModal";
 
 export type VerificationActionButtonProps = {

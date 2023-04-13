@@ -1,7 +1,6 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
 import { groupBy, keys, prop } from "ramda";
-
 import {
   calculateTotalImmersionHoursFromComplexSchedule,
   DailyScheduleDto,
@@ -9,7 +8,6 @@ import {
   GetExportableParams,
   prettyPrintComplexSchedule,
 } from "shared";
-
 import {
   ExportedRow,
   ExportQueries,

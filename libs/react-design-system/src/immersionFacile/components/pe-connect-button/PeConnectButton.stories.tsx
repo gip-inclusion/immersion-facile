@@ -1,6 +1,5 @@
 import React from "react";
 import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
-
 import { PeConnectButton, PeConnectButtonProps } from "./PeConnectButton";
 import { peConnectButtonPrefix } from ".";
 

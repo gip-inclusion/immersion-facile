@@ -3,9 +3,7 @@ import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { mergeDeepRight } from "ramda";
-
 import { ConventionDto, ConventionReadDto } from "shared";
-
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { ConventionFormFields } from "src/app/components/forms/convention/ConventionFormFields";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";

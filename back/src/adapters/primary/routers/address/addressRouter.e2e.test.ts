@@ -1,12 +1,10 @@
 import { SuperTest, Test } from "supertest";
-
 import {
   addressTargets,
   LookupAddress,
   LookupLocationInput,
   LookupSearchResult,
 } from "shared";
-
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { InMemoryAddressGateway } from "../../../secondary/addressGateway/InMemoryAddressGateway";
 import {

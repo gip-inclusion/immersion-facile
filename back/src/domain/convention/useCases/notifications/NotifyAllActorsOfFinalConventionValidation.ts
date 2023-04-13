@@ -1,5 +1,4 @@
 import { parseISO } from "date-fns";
-
 import {
   AgencyDto,
   ConventionDto,
@@ -8,7 +7,6 @@ import {
   displayEmergencyContactInfos,
   frontRoutes,
 } from "shared";
-
 import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
 import { TimeGateway } from "../../../core/ports/TimeGateway";

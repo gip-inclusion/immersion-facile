@@ -1,5 +1,4 @@
 import supertest from "supertest";
-
 import {
   ConventionDto,
   ConventionDtoBuilder,
@@ -15,7 +14,6 @@ import {
   updateConventionStatusRoute,
   VALID_EMAILS,
 } from "shared";
-
 import {
   buildTestApp,
   TestAppAndDeps,

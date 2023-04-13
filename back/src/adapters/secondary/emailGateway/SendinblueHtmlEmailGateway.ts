@@ -1,12 +1,10 @@
 import type { AxiosInstance } from "axios";
 import promClient from "prom-client";
-
 import {
   immersionFacileContactEmail,
   TemplatedEmail,
   templatesByName,
 } from "shared";
-
 import {
   configureGenerateHtmlFromTemplate,
   GenerateHtmlOptions,
@@ -15,7 +13,6 @@ import {
   cciCustomHtmlFooter,
   cciCustomHtmlHeader,
 } from "html-templates/src/components/email";
-
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
 import { createLogger } from "../../../utils/logger";
 import { BadRequestError } from "../../primary/helpers/httpErrors";

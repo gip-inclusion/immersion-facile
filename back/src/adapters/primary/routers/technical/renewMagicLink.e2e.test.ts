@@ -7,7 +7,6 @@ import {
   RenewMagicLinkRequestDto,
   TemplatedEmail,
 } from "shared";
-
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import {
   GenerateConventionJwt,

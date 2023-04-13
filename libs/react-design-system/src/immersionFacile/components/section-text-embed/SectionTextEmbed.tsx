@@ -1,7 +1,6 @@
 import React from "react";
 import ReactPlayer from "react-player";
 import { fr } from "@codegouvfr/react-dsfr";
-
 import "./SectionTextEmbed.scss";
 
 type SectionTextEmbedProps = {

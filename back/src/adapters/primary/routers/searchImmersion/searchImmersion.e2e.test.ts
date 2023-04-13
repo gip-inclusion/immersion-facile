@@ -1,12 +1,10 @@
 import { SuperTest, Test } from "supertest";
-
 import {
   expectToEqual,
   immersionOffersRoute,
   SearchImmersionResultDto,
   searchTargets,
 } from "shared";
-
 import { avenueChampsElyseesDto } from "../../../../_testBuilders/addressDtos";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";

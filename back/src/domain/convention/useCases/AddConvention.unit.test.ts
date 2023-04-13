@@ -3,7 +3,6 @@ import {
   conventionStatuses,
   expectPromiseToFailWithError,
 } from "shared";
-
 import { SirenEstablishmentDtoBuilder } from "../../../_testBuilders/SirenEstablishmentDtoBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
@@ -23,7 +22,6 @@ import {
   makeCreateNewEvent,
 } from "../../core/eventBus/EventBus";
 import { DomainEvent } from "../../core/eventBus/events";
-
 import { AddConvention } from "./AddConvention";
 
 describe("Add Convention", () => {

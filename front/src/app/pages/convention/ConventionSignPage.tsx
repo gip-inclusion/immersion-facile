@@ -3,7 +3,6 @@ import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Route } from "type-route";
-
 import {
   ConventionMagicLinkPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
@@ -12,11 +11,8 @@ import {
   SignatoryRole,
   signatoryRoles,
 } from "shared";
-
 import { Loader } from "react-design-system";
-
 import { ConventionFormContainerLayout } from "src/app/components/forms/convention/ConventionFormContainerLayout";
-
 import { conventionSlice } from "../../../core-logic/domain/convention/convention.slice";
 import { ConventionSignForm } from "../../components/forms/convention/ConventionSignForm";
 import { HeaderFooterLayout } from "../../components/layout/HeaderFooterLayout";
@@ -25,7 +21,6 @@ import { useConventionTexts } from "../../contents/forms/convention/textSetup";
 import { useConvention } from "../../hooks/convention.hooks";
 import { useExistingSiret } from "../../hooks/siret.hooks";
 import { routes } from "../../routes/routes";
-
 import { ShowErrorOrRedirectToRenewMagicLink } from "./ShowErrorOrRedirectToRenewMagicLink";
 
 interface ConventionSignPageProperties {

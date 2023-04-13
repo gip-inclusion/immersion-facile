@@ -3,7 +3,6 @@ import { noRateLimit } from "../../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../../domain/core/ports/RetryStrategy";
 import { AppConfig } from "../../../primary/config/appConfig";
 import { PoleEmploiAccessTokenGateway } from "../PoleEmploiAccessTokenGateway";
-
 import { HttpPoleEmploiGateway } from "./HttpPoleEmploiGateway";
 
 const config = AppConfig.createFromEnv();

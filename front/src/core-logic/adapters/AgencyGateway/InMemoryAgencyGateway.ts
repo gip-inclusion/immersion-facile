@@ -1,7 +1,6 @@
 /* eslint-disable  @typescript-eslint/require-await */
 import { values } from "ramda";
 import { from, Observable, of, Subject } from "rxjs";
-
 import {
   AgencyDto,
   AgencyDtoBuilder,
@@ -17,7 +16,6 @@ import {
   toAgencyPublicDisplayDto,
   WithAgencyId,
 } from "shared";
-
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
 const MISSION_LOCAL_AGENCY_ACTIVE = new AgencyDtoBuilder()

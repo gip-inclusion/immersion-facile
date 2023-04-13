@@ -1,6 +1,5 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
-
 import {
   AgencyDto,
   AgencyId,
@@ -13,11 +12,9 @@ import {
   GetAgenciesFilter,
   PartialAgencyDto,
 } from "shared";
-
 import { AgencyRepository } from "../../../domain/convention/ports/AgencyRepository";
 import { createLogger } from "../../../utils/logger";
 import { validateAndParseZodSchema } from "../../primary/helpers/httpErrors";
-
 import { optional } from "./pgUtils";
 
 const logger = createLogger(__filename);

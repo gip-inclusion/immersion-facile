@@ -1,6 +1,5 @@
 // TODO : create a DiscussionAggregateBuilder
 import { SiretDto } from "shared";
-
 import { DiscussionAggregate } from "../domain/immersionOffer/entities/DiscussionAggregate";
 
 // TODO transform this function into a DiscussionAggregateBuilder

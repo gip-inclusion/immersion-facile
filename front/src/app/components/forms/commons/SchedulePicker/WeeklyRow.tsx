@@ -2,13 +2,11 @@ import React from "react";
 import { useFormContext } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { parseISO } from "date-fns";
-
 import {
   calculateWeeklyHours,
   ConventionReadDto,
   WeeklyImmersionTimetableDto,
 } from "shared";
-
 import { getDayStatus } from "./utils/getDayStatus";
 import { DayCircle } from "./DayCircle";
 import { HourIndicator } from "./HourIndicator";

@@ -1,5 +1,4 @@
 import { SuperTest, Test } from "supertest";
-
 import {
   AddressDto,
   agenciesRoute,
@@ -7,7 +6,6 @@ import {
   BackOfficeJwt,
   expectToEqual,
 } from "shared";
-
 import {
   buildTestApp,
   InMemoryGateways,

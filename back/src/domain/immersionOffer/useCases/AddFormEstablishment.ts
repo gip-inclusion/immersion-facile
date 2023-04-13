@@ -3,7 +3,6 @@ import {
   formEstablishmentSchema,
   SiretDto,
 } from "shared";
-
 import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";

@@ -1,5 +1,4 @@
 import { createSelector } from "@reduxjs/toolkit";
-
 import { RootState } from "src/core-logic/storeConfig/store";
 
 const searchResults = (state: RootState) => state.search.searchResults;

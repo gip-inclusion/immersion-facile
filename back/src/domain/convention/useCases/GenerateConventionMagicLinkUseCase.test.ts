@@ -6,12 +6,10 @@ import {
   GenerateMagicLinkRequestDto,
   Role,
 } from "shared";
-
 import { AppConfigBuilder } from "../../../_testBuilders/AppConfigBuilder";
 import { generateConventionJwtTestFn } from "../../../_testBuilders/jwtTestHelper";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { makeGenerateJwtES256 } from "../../auth/jwt";
-
 import { GenerateConventionMagicLinkUseCase } from "./GenerateConventionMagicLinkUseCase";
 
 describe("Generate magic links", () => {

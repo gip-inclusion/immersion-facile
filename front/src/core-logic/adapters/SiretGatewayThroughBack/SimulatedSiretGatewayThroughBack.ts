@@ -1,5 +1,4 @@
 import { delay, Observable, of } from "rxjs";
-
 import {
   apiSirenNotAvailableSiret,
   apiSirenUnexpectedError,
@@ -14,7 +13,6 @@ import {
   tooManiSirenRequestsSiretErrorMessage,
   tooManySirenRequestsSiret,
 } from "shared";
-
 import { SiretGatewayThroughBack } from "../../ports/SiretGatewayThroughBack";
 
 export class SimulatedSiretGatewayThroughBack

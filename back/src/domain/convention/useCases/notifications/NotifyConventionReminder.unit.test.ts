@@ -13,7 +13,6 @@ import {
   splitCasesBetweenPassingAndFailing,
   TemplatedEmail,
 } from "shared";
-
 import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
 import {
   createInMemoryUow,
@@ -28,7 +27,6 @@ import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGatewa
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { ReminderKind } from "../../../core/eventsPayloads/ConventionReminderPayload";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
-
 import {
   forbiddenUnsupportedStatusMessage,
   NotifyConventionReminder,

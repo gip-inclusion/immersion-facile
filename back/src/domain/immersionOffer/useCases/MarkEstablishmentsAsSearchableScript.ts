@@ -1,6 +1,5 @@
 import subDays from "date-fns/subDays";
 import { z } from "zod";
-
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UseCase } from "../../core/UseCase";
 import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";

@@ -1,7 +1,5 @@
 import { Router } from "express";
-
 import { searchTargets } from "shared";
-
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 

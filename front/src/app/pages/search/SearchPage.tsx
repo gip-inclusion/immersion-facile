@@ -6,9 +6,7 @@ import { GenericOption, Select } from "@codegouvfr/react-dsfr/Select";
 import { keys } from "ramda";
 import { useStyles } from "tss-react/dsfr";
 import { Route } from "type-route";
-
 import { domElementIds, GeoPositionDto, SearchSortedBy } from "shared";
-
 import {
   Loader,
   MainWrapper,
@@ -16,7 +14,6 @@ import {
   SectionAccordion,
   SectionTextEmbed,
 } from "react-design-system";
-
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
 import { PlaceAutocomplete } from "src/app/components/forms/autocomplete/PlaceAutocomplete";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
@@ -29,9 +26,7 @@ import {
   SearchPageParams,
   SearchStatus,
 } from "src/core-logic/domain/search/search.slice";
-
 import Styles from "./SearchPage.styles";
-
 import "./SearchPage.scss";
 
 const radiusOptions: GenericOption<number>[] = [1, 2, 5, 10, 20, 50, 100].map(

@@ -1,5 +1,4 @@
 import { z } from "zod";
-
 import { UseCase } from "../../../core/UseCase";
 import { EstablishmentAggregate } from "../../entities/EstablishmentEntity";
 import {

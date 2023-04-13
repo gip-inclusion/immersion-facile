@@ -1,7 +1,6 @@
 import React from "react";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { Route } from "type-route";
-
 import {
   adminMetaContent,
   defaultMetaContents,

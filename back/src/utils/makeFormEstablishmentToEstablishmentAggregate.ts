@@ -8,7 +8,6 @@ import {
   NumberEmployeesRange,
   SiretDto,
 } from "shared";
-
 import { TimeGateway } from "../domain/core/ports/TimeGateway";
 import { UuidGenerator } from "../domain/core/ports/UuidGenerator";
 import { ContactEntity } from "../domain/immersionOffer/entities/ContactEntity";

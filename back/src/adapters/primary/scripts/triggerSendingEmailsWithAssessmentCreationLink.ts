@@ -1,9 +1,7 @@
 import axios from "axios";
 import { Pool } from "pg";
 import { keys } from "ramda";
-
 import { immersionFacileContactEmail } from "shared";
-
 import { makeGenerateJwtES256 } from "../../../domain/auth/jwt";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { SendEmailsWithAssessmentCreationLink } from "../../../domain/immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
@@ -15,7 +13,6 @@ import { SendinblueHtmlEmailGateway } from "../../secondary/emailGateway/Sendinb
 import { AppConfig, makeEmailAllowListPredicate } from "../config/appConfig";
 import { makeGenerateConventionMagicLinkUrl } from "../config/magicLinkUrl";
 import { createUowPerformer } from "../config/uowConfig";
-
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
 const logger = createLogger(__filename);

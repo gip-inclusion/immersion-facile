@@ -3,7 +3,6 @@ import { useFormContext } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { clone } from "ramda";
 import { useStyles } from "tss-react/dsfr";
-
 import {
   calculateNumberOfWorkedDays,
   calculateTotalImmersionHoursFromComplexSchedule,
@@ -11,7 +10,6 @@ import {
   ConventionReadDto,
   ScheduleDto,
 } from "shared";
-
 import { DayPicker } from "./DayPicker";
 import { HourPicker } from "./HourPicker";
 

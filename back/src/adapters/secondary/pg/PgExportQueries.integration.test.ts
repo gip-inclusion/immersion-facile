@@ -1,11 +1,9 @@
 import { Pool, PoolClient } from "pg";
-
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   expectObjectsToMatch,
 } from "shared";
-
 import {
   avenueChampsElyseesDto,
   rueBitcheDto,
@@ -19,7 +17,6 @@ import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionO
 import { DiscussionAggregate } from "../../../domain/immersionOffer/entities/DiscussionAggregate";
 import { EstablishmentAggregate } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { UuidV4Generator } from "../core/UuidGeneratorImplementations";
-
 import { PgAgencyRepository } from "./PgAgencyRepository";
 import { PgConventionRepository } from "./PgConventionRepository";
 import { PgDiscussionAggregateRepository } from "./PgDiscussionAggregateRepository";

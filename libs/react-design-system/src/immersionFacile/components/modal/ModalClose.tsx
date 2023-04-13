@@ -1,6 +1,5 @@
 import React from "react";
 import classNames, { ArgumentArray } from "classnames";
-
 import { HideCallback } from "./Modal";
 
 type ModalCloseProperties = {

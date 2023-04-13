@@ -1,11 +1,9 @@
 import { expectToEqual } from "shared";
-
 import {
   createTestStore,
   TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
-
 import {
   immersionAssessmentErrorSelector,
   immersionAssessmentStatusSelector,

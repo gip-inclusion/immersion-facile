@@ -3,7 +3,6 @@ import {
   expectObjectsToMatch,
   expectTypeToMatchAndEqual,
 } from "shared";
-
 import { spyOnTopic } from "../../../_testBuilders/spyOnTopic";
 import type {
   DomainEvent,
@@ -11,7 +10,6 @@ import type {
 } from "../../../domain/core/eventBus/events";
 import { createInMemoryUow } from "../../primary/config/uowConfig";
 import { InMemoryUowPerformer } from "../InMemoryUowPerformer";
-
 import { CustomTimeGateway } from "./TimeGateway/CustomTimeGateway";
 import { InMemoryEventBus } from "./InMemoryEventBus";
 import { InMemoryOutboxRepository } from "./InMemoryOutboxRepository";

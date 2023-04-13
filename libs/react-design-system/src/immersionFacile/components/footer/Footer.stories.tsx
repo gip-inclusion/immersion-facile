@@ -1,6 +1,5 @@
 import React from "react";
 import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
-
 import { Footer, FooterProps } from "./Footer";
 import { footerPrefix } from ".";
 

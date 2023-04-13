@@ -4,7 +4,6 @@ import {
   AgencyId,
   ConventionId,
 } from "shared";
-
 import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
 import { createLogger } from "../../../utils/logger";
 

@@ -1,11 +1,9 @@
 import { AuthenticatedUserId } from "shared";
-
 import {
   AgencyRight,
   InclusionConnectedUser,
 } from "../../domain/dashboard/entities/InclusionConnectedUser";
 import { InclusionConnectedUserRepository } from "../../domain/dashboard/port/InclusionConnectedUserRepository";
-
 import { InMemoryAuthenticatedUserRepository } from "./InMemoryAuthenticatedUserRepository";
 
 type AgencyRightsByUserId = Record<AuthenticatedUserId, AgencyRight[]>;

@@ -4,7 +4,6 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { v4 as uuidV4 } from "uuid";
-
 import {
   AgencyDto,
   AgencyKind,
@@ -13,9 +12,7 @@ import {
   domElementIds,
   toDotNotation,
 } from "shared";
-
 import { ErrorNotifications } from "react-design-system";
-
 import { agencySubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
 import {
   AgencyFormCommonFields,

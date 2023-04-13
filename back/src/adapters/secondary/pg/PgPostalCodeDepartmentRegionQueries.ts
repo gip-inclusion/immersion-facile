@@ -1,5 +1,4 @@
 import { PoolClient } from "pg";
-
 import {
   DepartmentAndRegion,
   PostalCodeDepartmentRegionQueries,

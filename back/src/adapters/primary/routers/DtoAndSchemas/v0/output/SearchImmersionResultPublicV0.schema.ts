@@ -1,5 +1,4 @@
 import { z } from "zod";
-
 import {
   appellationDtoSchema,
   geoPositionSchema,
@@ -10,7 +9,6 @@ import {
   zString,
   zTrimmedString,
 } from "shared";
-
 import { SearchImmersionResultPublicV0 } from "./SearchImmersionResultPublicV0.dto";
 
 export const immersionContactInEstablishmentIdSchema: z.ZodSchema<string> =

@@ -1,7 +1,5 @@
 import { PoolClient } from "pg";
-
 import { SiretDto } from "shared";
-
 import {
   DiscussionAggregate,
   DiscussionId,

@@ -1,5 +1,4 @@
 import { Builder } from "shared";
-
 import { UuidV4Generator } from "../adapters/secondary/core/UuidGeneratorImplementations";
 import { ContactEntity } from "../domain/immersionOffer/entities/ContactEntity";
 import {
@@ -7,7 +6,6 @@ import {
   EstablishmentEntity,
 } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import { ImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
-
 import { ContactEntityBuilder } from "./ContactEntityBuilder";
 import { EstablishmentEntityBuilder } from "./EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "./ImmersionOfferEntityV2Builder";

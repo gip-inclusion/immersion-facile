@@ -1,8 +1,6 @@
 import { keys } from "shared";
-
 import { NarrowEvent } from "../../domain/core/eventBus/EventBus";
 import { DomainTopic } from "../../domain/core/eventBus/events";
-
 import type { AppDependencies } from "./config/createAppDependencies";
 import { InstantiatedUseCase, UseCases } from "./config/createUseCases";
 

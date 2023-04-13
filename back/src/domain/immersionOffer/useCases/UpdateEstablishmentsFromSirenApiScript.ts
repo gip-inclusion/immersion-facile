@@ -1,8 +1,6 @@
 import { addDays } from "date-fns";
 import { z } from "zod";
-
 import { AddressAndPosition } from "shared";
-
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { createLogger } from "../../../utils/logger";
 import { TimeGateway } from "../../core/ports/TimeGateway";

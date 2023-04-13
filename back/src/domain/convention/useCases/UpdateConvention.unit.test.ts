@@ -7,7 +7,6 @@ import {
   expectPromiseToFailWithError,
   expectTypeToMatchAndEqual,
 } from "shared";
-
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,
@@ -24,7 +23,6 @@ import {
   CreateNewEvent,
   makeCreateNewEvent,
 } from "../../core/eventBus/EventBus";
-
 import { UpdateConvention } from "./UpdateConvention";
 
 describe("Update Convention", () => {

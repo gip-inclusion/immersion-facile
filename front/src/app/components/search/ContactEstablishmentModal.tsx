@@ -1,6 +1,5 @@
 import React, { ReactNode, useReducer } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
-
 import {
   ContactMethod,
   RomeCode,
@@ -8,7 +7,6 @@ import {
   SearchImmersionResultDto,
   SiretDto,
 } from "shared";
-
 import {
   ModalClose,
   ModalContent,
@@ -16,7 +14,6 @@ import {
   ModalTitle,
   SubTitle,
 } from "react-design-system";
-
 import { ContactByEmail } from "./ContactByEmail";
 import { ContactByPhone } from "./ContactByPhone";
 import { ContactInPerson } from "./ContactInPerson";

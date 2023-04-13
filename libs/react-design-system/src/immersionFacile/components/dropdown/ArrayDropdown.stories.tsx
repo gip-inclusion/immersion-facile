@@ -1,6 +1,5 @@
 import React from "react";
 import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
-
 import { ArrayDropdown, ArrayDropdownProps } from "./ArrayDropdown";
 import { dropdownPrefix } from ".";
 

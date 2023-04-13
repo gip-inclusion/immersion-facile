@@ -3,7 +3,6 @@ import {
   SirenEstablishmentDto,
   tooManiSirenRequestsSiretErrorMessage,
 } from "shared";
-
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import {
   siretSlice,

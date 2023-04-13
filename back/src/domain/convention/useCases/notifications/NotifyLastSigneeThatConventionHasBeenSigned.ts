@@ -8,7 +8,6 @@ import {
   SignatoryRole,
   TemplatedEmail,
 } from "shared";
-
 import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import {

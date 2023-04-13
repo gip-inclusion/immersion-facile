@@ -1,5 +1,4 @@
 import React from "react";
-
 import { AutocompleteAttributeValue } from "./AutocompleteAttributeValue.type";
 
 export type InputProperties = {

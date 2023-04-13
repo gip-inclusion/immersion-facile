@@ -1,7 +1,5 @@
 import type { AxiosInstance } from "axios";
-
 import { AbsoluteUrl } from "shared";
-
 import { AccessTokenGateway } from "../../../../domain/core/ports/AccessTokenGateway";
 import {
   PeAgenciesReferential,

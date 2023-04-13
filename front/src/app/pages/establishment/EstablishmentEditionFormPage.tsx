@@ -2,16 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Route } from "type-route";
-
 import {
   addressDtoToString,
   decodeMagicLinkJwtWithoutSignatureCheck,
   EstablishmentJwtPayload,
   FormEstablishmentDto,
 } from "shared";
-
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
-
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { EstablishmentForm } from "src/app/components/forms/establishment/EstablishmentForm";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";

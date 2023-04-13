@@ -4,7 +4,6 @@ import {
   FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
 } from "shared";
-
 import { avenueChampsElysees } from "../../../../_testBuilders/addressDtos";
 import {
   buildTestApp,

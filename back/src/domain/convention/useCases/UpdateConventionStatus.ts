@@ -9,7 +9,6 @@ import {
   validatedConventionStatuses,
   WithConventionId,
 } from "shared";
-
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { createLogger } from "../../../utils/logger";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";

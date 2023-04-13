@@ -1,10 +1,7 @@
 import * as React from "react";
-
 import { AbsoluteUrl } from "shared";
 import { domElementIds } from "shared";
-
 import { File } from "react-design-system";
-
 import { technicalGateway } from "src/config/dependencies";
 
 interface UploadLogoProps {

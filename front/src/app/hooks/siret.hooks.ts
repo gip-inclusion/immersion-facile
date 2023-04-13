@@ -1,9 +1,7 @@
 import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
-
 import { SirenEstablishmentDto, SiretDto } from "shared";
-
 import { useSendModifyEstablishmentLink } from "src/app/hooks/establishment.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";

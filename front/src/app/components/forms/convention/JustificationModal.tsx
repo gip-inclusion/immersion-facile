@@ -5,7 +5,6 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import {
   ConventionStatusWithJustification,
   domElementIds,
@@ -13,7 +12,6 @@ import {
   WithStatusJustification,
   withStatusJustificationSchema,
 } from "shared";
-
 import {
   ModalClose,
   ModalContent,

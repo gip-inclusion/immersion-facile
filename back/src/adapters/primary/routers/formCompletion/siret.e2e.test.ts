@@ -1,7 +1,5 @@
 import { SuperTest, Test } from "supertest";
-
 import { expectToEqual, getSiretIfNotSavedRoute, siretRoute } from "shared";
-
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
 import { InMemoryEstablishmentAggregateRepository } from "../../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";

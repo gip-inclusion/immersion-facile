@@ -1,8 +1,6 @@
 import { AxiosResponse } from "axios";
 import secondsToMilliseconds from "date-fns/secondsToMilliseconds";
-
 import { AbsoluteUrl } from "shared";
-
 import {
   PoleEmploiConvention,
   PoleEmploiGateway,

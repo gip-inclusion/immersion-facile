@@ -1,5 +1,4 @@
 import { filter, map, switchMap } from "rxjs";
-
 import { sentEmailsSlice } from "src/core-logic/domain/admin/sentEmails/sentEmails.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {

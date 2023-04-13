@@ -1,15 +1,10 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
-
 import { DsfrTitle } from "react-design-system";
-
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
-
 import { EditAgencyForm } from "../forms/agency/EditAgencyForm";
-
 import { AgencyAutocomplete } from "./AgencyAutocomplete";
-
 import "src/assets/admin.css";
 
 export const EditAgency = () => {

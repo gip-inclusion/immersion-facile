@@ -1,5 +1,4 @@
 import { AppellationMatchDto, zTrimmedString } from "shared";
-
 import { createLogger } from "../../../utils/logger";
 import { findMatchRanges } from "../../../utils/textSearch";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";

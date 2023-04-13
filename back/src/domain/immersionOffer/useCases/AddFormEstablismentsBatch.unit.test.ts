@@ -6,7 +6,6 @@ import {
   FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
 } from "shared";
-
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
@@ -24,7 +23,6 @@ import {
   TEST_ESTABLISHMENT3,
 } from "../../../adapters/secondary/sirene/InMemorySirenGateway";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
-
 import { AddFormEstablishment } from "./AddFormEstablishment";
 import { AddFormEstablishmentBatch } from "./AddFormEstablismentsBatch";
 

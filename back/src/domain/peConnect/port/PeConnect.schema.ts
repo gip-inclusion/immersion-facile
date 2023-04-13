@@ -1,7 +1,5 @@
 import { z } from "zod";
-
 import { makezTrimmedString, zUuidLike } from "shared";
-
 import { ConventionPoleEmploiUserAdvisorDto } from "../dto/PeConnect.dto";
 import { immersionPoleEmploiAdvisors } from "../dto/PeConnectAdvisor.dto";
 

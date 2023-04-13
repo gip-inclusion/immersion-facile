@@ -1,5 +1,4 @@
 import { addBusinessDays, differenceInBusinessDays } from "date-fns";
-
 import {
   ConventionDto,
   ConventionDtoBuilder,
@@ -7,7 +6,6 @@ import {
   conventionStatuses,
   expectToEqual,
 } from "shared";
-
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
@@ -19,7 +17,6 @@ import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemo
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { DomainEvent } from "../../core/eventBus/events";
-
 import { ConventionsReminder } from "./ConventionsReminder";
 
 describe("RemindConventionsNeedSignature use case", () => {

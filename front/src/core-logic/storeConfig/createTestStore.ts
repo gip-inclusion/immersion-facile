@@ -1,5 +1,4 @@
 import { VirtualTimeScheduler } from "rxjs";
-
 import { Dependencies } from "src/config/dependencies";
 import { TestAdminGateway } from "src/core-logic/adapters/AdminGateway/TestAdminGateway";
 import { InMemoryConventionGateway } from "src/core-logic/adapters/Convention/InMemoryConventionGateway";
@@ -12,7 +11,6 @@ import { InMemoryNavigationGateway } from "src/core-logic/adapters/NavigationGat
 import { InMemoryRomeAutocompleteGateway } from "src/core-logic/adapters/RomeAutocompleteGateway/InMemoryRomeAutocompleteGateway";
 import { TestTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/TestTechnicalGateway";
 import { createStore, RootState } from "src/core-logic/storeConfig/store";
-
 import { TestAddressGateway } from "../adapters/AddressGateway/TestAddressGateway";
 import { TestAgencyGateway } from "../adapters/AgencyGateway/TestAgencyGateway";
 import { TestImmersionAssessmentGateway } from "../adapters/AssessmentGateway/TestImmersionAssessmentGateway";

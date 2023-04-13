@@ -3,11 +3,8 @@ import { type SubmitHandler, useFormContext } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-
 import { ConventionReadDto, Signatory, toDotNotation } from "shared";
-
 import { ErrorNotifications } from "react-design-system";
-
 import { ConventionFrozenMessage } from "src/app/components/forms/convention/ConventionFrozenMessage";
 import { ConventionSignOnlyMessage } from "src/app/components/forms/convention/ConventionSignOnlyMessage";
 import { makeValuesToWatchInUrl } from "src/app/components/forms/convention/makeValuesToWatchInUrl";
@@ -24,7 +21,6 @@ import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { useRoute } from "src/app/routes/routes";
 import { deviceRepository } from "src/config/dependencies";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
-
 import { AgencyFormSection } from "./sections/agency/AgencyFormSection";
 import { BeneficiaryFormSection } from "./sections/beneficiary/BeneficiaryFormSection";
 import { EstablishmentFormSection } from "./sections/establishment/EstablishmentFormSection";

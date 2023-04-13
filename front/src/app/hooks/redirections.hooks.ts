@@ -1,5 +1,4 @@
 import { useDispatch } from "react-redux";
-
 import { routes, useRoute } from "src/app/routes/routes";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 

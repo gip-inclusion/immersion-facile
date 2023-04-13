@@ -1,10 +1,8 @@
 import { AgencyDto, AgencyDtoBuilder, ConventionDtoBuilder } from "shared";
-
 import { expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../../../_testBuilders/emailAssertions";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-
 import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "./NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
 
 const rejectedConvention = new ConventionDtoBuilder()

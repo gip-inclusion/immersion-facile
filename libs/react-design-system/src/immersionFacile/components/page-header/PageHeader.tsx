@@ -1,7 +1,6 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
-
 import Styles from "./PageHeader.styles";
 
 type PageHeaderProps = {

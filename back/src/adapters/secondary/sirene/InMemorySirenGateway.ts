@@ -4,7 +4,6 @@ import {
   SiretDto,
   tooManySirenRequestsSiret,
 } from "shared";
-
 import { SirenGateway } from "../../../domain/sirene/ports/SirenGateway";
 import { createLogger } from "../../../utils/logger";
 import {

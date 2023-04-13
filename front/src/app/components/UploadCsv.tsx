@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import { File } from "react-design-system";
 
 interface UploadCsvProps {

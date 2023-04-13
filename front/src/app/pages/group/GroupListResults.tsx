@@ -2,9 +2,7 @@ import React, { useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 import { Select } from "@codegouvfr/react-dsfr/Select";
-
 import { ContactMethod, domElementIds, SearchImmersionResultDto } from "shared";
-
 import {
   ContactEstablishmentModal,
   useContactEstablishmentModal,

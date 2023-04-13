@@ -1,7 +1,5 @@
 import { GeoPositionDto } from "shared";
-
 import { LaBonneBoiteRequestEntity } from "../entities/LaBonneBoiteRequestEntity";
-
 import { LaBonneBoiteRequestParams } from "./LaBonneBoiteAPI";
 
 export interface LaBonneBoiteRequestRepository {

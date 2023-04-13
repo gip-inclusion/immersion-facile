@@ -1,9 +1,7 @@
 import React from "react";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { useAdminDashboard } from "src/app/pages/admin/useAdminDashboard";
-
 import { ManageConventionAdminFormSection } from "./ManageConventionAdminFormSection";
 
 export const ConventionTab = () => {

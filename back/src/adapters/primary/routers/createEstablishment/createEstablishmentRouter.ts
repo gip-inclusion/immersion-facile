@@ -1,7 +1,5 @@
 import { Router } from "express";
-
 import type { AppDependencies } from "../../config/createAppDependencies";
-
 import { establishmentRouterWithMagicLinkJwt } from "./establishmentRouterWithMagicLinkJwt";
 import { establismentRouterWithoutJwt } from "./establismentRouterWithoutJwt";
 

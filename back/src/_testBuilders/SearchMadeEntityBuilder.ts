@@ -1,5 +1,4 @@
 import { Builder } from "shared";
-
 import {
   SearchMadeEntity,
   SearchMadeId,

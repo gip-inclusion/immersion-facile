@@ -1,11 +1,9 @@
 import { Pool, PoolClient } from "pg";
-
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { DomainEvent, DomainTopic } from "../../../domain/core/eventBus/events";
 import { CustomTimeGateway } from "../core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../core/UuidGeneratorImplementations";
-
 import { PgOutboxQueries } from "./PgOutboxQueries";
 import { PgOutboxRepository } from "./PgOutboxRepository";
 

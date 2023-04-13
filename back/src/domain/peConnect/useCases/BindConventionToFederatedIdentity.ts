@@ -4,7 +4,6 @@ import {
   isPeConnectIdentity,
   PeConnectIdentity,
 } from "shared";
-
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";

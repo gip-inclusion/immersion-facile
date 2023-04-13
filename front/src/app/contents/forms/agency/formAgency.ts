@@ -1,7 +1,5 @@
 import { AddressDto, AgencyDto, domElementIds } from "shared";
-
 import { FormFieldsObjectForContent } from "src/app/hooks/formContents.hooks";
-
 import { FormFieldAttributesForContent } from "../types";
 
 export type FormAgencyFieldsLabels = FormFieldsObjectForContent<

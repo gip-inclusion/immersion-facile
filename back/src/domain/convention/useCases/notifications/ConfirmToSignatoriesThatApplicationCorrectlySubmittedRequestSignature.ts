@@ -1,12 +1,10 @@
 import { values } from "ramda";
-
 import {
   ConventionDto,
   conventionSchema,
   CreateConventionMagicLinkPayloadProperties,
   frontRoutes,
 } from "shared";
-
 import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
 import { createLogger } from "../../../../utils/logger";
 import { TimeGateway } from "../../../core/ports/TimeGateway";

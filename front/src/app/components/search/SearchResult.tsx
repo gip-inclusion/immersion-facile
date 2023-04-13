@@ -3,16 +3,13 @@ import LinesEllipsis from "react-lines-ellipsis";
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { useStyles } from "tss-react/dsfr";
-
 import {
   addressDtoToString,
   ContactMethod,
   SearchImmersionResultDto,
 } from "shared";
 import { toAbsoluteUrl } from "shared";
-
 import { getMapsLink } from "./ContactEstablishmentModal";
-
 import "./SearchResult.scss";
 
 export type EnterpriseSearchResultProps = {

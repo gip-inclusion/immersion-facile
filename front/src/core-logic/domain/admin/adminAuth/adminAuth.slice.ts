@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
 import { BackOfficeJwt } from "shared";
 
 export type AdminAuthState = {

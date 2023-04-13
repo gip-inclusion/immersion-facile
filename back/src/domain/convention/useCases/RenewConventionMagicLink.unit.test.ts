@@ -11,7 +11,6 @@ import {
   RenewMagicLinkRequestDto,
   Role,
 } from "shared";
-
 import { AppConfigBuilder } from "../../../_testBuilders/AppConfigBuilder";
 import { AppConfig } from "../../../adapters/primary/config/appConfig";
 import {
@@ -27,7 +26,6 @@ import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGenerato
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeGenerateJwtES256, makeVerifyJwtES256 } from "../../auth/jwt";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
-
 import { RenewMagicLinkPayload } from "./notifications/DeliverRenewedMagicLink";
 import { RenewConventionMagicLink } from "./RenewConventionMagicLink";
 

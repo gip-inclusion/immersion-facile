@@ -1,11 +1,7 @@
 import React, { ReactNode } from "react";
-
 import { AgencyDto, AgencyStatus, keys } from "shared";
-
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-
 import { agencyAdminSelectors } from "../../../core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
-
 import { TextCell } from "./TextCell";
 
 type AgencyField = keyof AgencyDto;

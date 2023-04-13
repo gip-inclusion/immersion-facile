@@ -1,7 +1,6 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 import { AnyAction, Dispatch } from "@reduxjs/toolkit";
-
 import {
   FixedStamp,
   HeroHeader,
@@ -11,7 +10,6 @@ import {
   SectionStats,
   SectionTextEmbed,
 } from "react-design-system";
-
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { SiretModal, useSiretModal } from "src/app/components/SiretModal";
 import {

@@ -1,6 +1,5 @@
 import { AxiosInstance, AxiosResponse } from "axios";
 import { from, map, Observable } from "rxjs";
-
 import {
   AbsoluteUrl,
   BackOfficeJwt,
@@ -10,7 +9,6 @@ import {
   SetFeatureFlagParams,
   uploadFileRoute,
 } from "shared";
-
 import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 
 export class HttpTechnicalGateway implements TechnicalGateway {

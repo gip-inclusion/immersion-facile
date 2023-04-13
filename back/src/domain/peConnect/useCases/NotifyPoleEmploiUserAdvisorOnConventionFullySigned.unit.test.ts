@@ -5,7 +5,6 @@ import {
   expectTypeToMatchAndEqual,
   frontRoutes,
 } from "shared";
-
 import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/jwtTestHelper";
 import {
   createInMemoryUow,
@@ -16,7 +15,6 @@ import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/I
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { PeUserAndAdvisor } from "../dto/PeConnect.dto";
 import { PeConnectImmersionAdvisorDto } from "../dto/PeConnectAdvisor.dto";
-
 import { NotifyPoleEmploiUserAdvisorOnConventionFullySigned } from "./NotifyPoleEmploiUserAdvisorOnConventionFullySigned";
 
 describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {

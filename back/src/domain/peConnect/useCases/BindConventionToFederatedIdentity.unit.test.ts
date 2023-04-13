@@ -3,7 +3,6 @@ import {
   expectObjectsToMatch,
   expectToEqual,
 } from "shared";
-
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
@@ -19,7 +18,6 @@ import {
 } from "../../core/eventBus/EventBus";
 import { PeUserAndAdvisor } from "../dto/PeConnect.dto";
 import { conventionPoleEmploiUserAdvisorFromDto } from "../entities/ConventionPoleEmploiAdvisorEntity";
-
 import { BindConventionToFederatedIdentity } from "./BindConventionToFederatedIdentity";
 
 describe("AssociatePeConnectFederatedIdentity", () => {

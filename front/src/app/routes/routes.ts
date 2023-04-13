@@ -1,7 +1,5 @@
 import { createRouter, defineRoute, param } from "type-route";
-
 import { AuthenticatedUserQueryParams, frontRoutes } from "shared";
-
 import {
   adminTabSerializer,
   conventionValuesFromUrl,

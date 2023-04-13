@@ -1,8 +1,6 @@
 import { FormEstablishmentDtoBuilder } from "shared";
-
 import { expectedEmailEstablishmentCreatedReviewMatchingEstablisment } from "../../../../_testBuilders/emailAssertions";
 import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
-
 import { NotifyConfirmationEstablishmentCreated } from "./NotifyConfirmationEstablishmentCreated";
 
 describe("NotifyConfirmationEstablismentCreated", () => {

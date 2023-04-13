@@ -1,5 +1,4 @@
 import { z } from "zod";
-
 import {
   addressWithPostalCodeSchema,
   appellationSchema,
@@ -13,7 +12,6 @@ import {
   zString,
   zTrimmedString,
 } from "shared";
-
 import {
   BusinessContactDtoPublicV0,
   FormEstablishmentDtoPublicV0,

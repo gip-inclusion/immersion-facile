@@ -1,12 +1,9 @@
 import { queryParamsAsString } from "shared";
-
 import { HttpClient } from "http-client";
-
 import { InclusionAccessTokenResponse } from "../../../domain/inclusionConnect/port/InclusionAccessTokenResponse";
 import { InclusionConnectGateway } from "../../../domain/inclusionConnect/port/InclusionConnectGateway";
 import { InclusionConnectConfig } from "../../../domain/inclusionConnect/useCases/InitiateInclusionConnect";
 import { createLogger } from "../../../utils/logger";
-
 import { InclusionConnectExternalTargets } from "./inclusionConnectExternal.targets";
 
 const logger = createLogger(__filename);

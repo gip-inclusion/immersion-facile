@@ -1,9 +1,7 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
-
 import { FormEstablishmentDto, SearchImmersionResultDto } from "shared";
-
 import { SearchResult } from "../../search/SearchResult";
 
 const establishmentToSearchResultPreview = ({

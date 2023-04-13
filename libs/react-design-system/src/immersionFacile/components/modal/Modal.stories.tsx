@@ -1,6 +1,5 @@
 import React from "react";
 import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
-
 import { ModalDialog, ModalDialogProperties } from "./Modal";
 import { ModalContent } from "./ModalContent";
 import { ModalFooter } from "./ModalFooter";

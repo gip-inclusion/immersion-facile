@@ -1,7 +1,5 @@
 import { AxiosInstance } from "axios";
-
 import { BackOfficeJwt, ExportDataDto, exportRoute } from "shared";
-
 import { ExcelExportGateway } from "src/core-logic/ports/ExcelExportGateway";
 
 export class HttpExcelExportGateway implements ExcelExportGateway {

@@ -1,7 +1,5 @@
 import minutesToSeconds from "date-fns/minutesToSeconds";
-
 import { GetAccessTokenResponse } from "../../../domain/core/ports/AccessTokenGateway";
-
 import { CustomTimeGateway } from "./TimeGateway/CustomTimeGateway";
 import { CachingAccessTokenGateway } from "./CachingAccessTokenGateway";
 

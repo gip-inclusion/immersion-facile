@@ -1,9 +1,6 @@
 import { firstValueFrom } from "rxjs";
-
 import { createManagedAxiosInstance, ImmersionAssessmentDto } from "shared";
-
 import { ImmersionAssessmentGateway } from "src/core-logic/ports/ImmersionAssessmentGateway";
-
 import { HttpImmersionAssessmentGateway } from "./HttpImmersionAssessmentGateway";
 import {
   failedId,

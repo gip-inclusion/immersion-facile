@@ -1,5 +1,4 @@
 import { propEq } from "ramda";
-
 import {
   ConventionId,
   ConventionReadDto,
@@ -7,13 +6,11 @@ import {
   validatedConventionStatuses,
   WithConventionId,
 } from "shared";
-
 import {
   ConventionQueries,
   GetConventionByFiltersQueries,
 } from "../../domain/convention/ports/ConventionQueries";
 import { createLogger } from "../../utils/logger";
-
 import { InMemoryOutboxRepository } from "./core/InMemoryOutboxRepository";
 import { InMemoryConventionRepository } from "./InMemoryConventionRepository";
 

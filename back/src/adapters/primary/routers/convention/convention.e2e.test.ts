@@ -1,5 +1,4 @@
 import { SuperTest, Test } from "supertest";
-
 import {
   BackOfficeJwt,
   BackOfficeJwtPayload,
@@ -13,7 +12,6 @@ import {
   stringToMd5,
   updateConventionStatusRoute,
 } from "shared";
-
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import {
   buildTestApp,

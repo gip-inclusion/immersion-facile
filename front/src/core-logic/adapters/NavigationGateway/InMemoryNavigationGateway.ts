@@ -1,5 +1,4 @@
 import { SiretDto } from "shared";
-
 import { NavigationGateway } from "src/core-logic/ports/NavigationGateway";
 
 export class InMemoryNavigationGateway implements NavigationGateway {

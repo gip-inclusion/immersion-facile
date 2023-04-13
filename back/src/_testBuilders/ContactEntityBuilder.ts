@@ -1,5 +1,4 @@
 import { Builder } from "shared";
-
 import { UuidV4Generator } from "../adapters/secondary/core/UuidGeneratorImplementations";
 import {
   ContactEntity as ContactEntity,

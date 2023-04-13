@@ -1,11 +1,9 @@
 import { SuperTest, Test } from "supertest";
-
 import {
   ContactEstablishmentRequestDto,
   contactEstablishmentRoute,
   expectArraysToMatch,
 } from "shared";
-
 import {
   buildTestApp,
   InMemoryGateways,

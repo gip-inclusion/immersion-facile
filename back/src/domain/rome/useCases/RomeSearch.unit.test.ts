@@ -1,9 +1,7 @@
 import { RomeDto } from "shared";
-
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryRomeRepository } from "../../../adapters/secondary/InMemoryRomeRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-
 import { RomeSearch } from "./RomeSearch";
 
 const prepareUseCase = () => {

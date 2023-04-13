@@ -1,5 +1,4 @@
 import { ContactEstablishmentRequestDto } from "shared";
-
 import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBuilder";
 import {
   expectContactByEmailRequest,
@@ -16,7 +15,6 @@ import {
   TEST_ROME_LABEL,
 } from "../../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-
 import { NotifyContactRequest } from "./NotifyContactRequest";
 
 const immersionOffer = new ImmersionOfferEntityV2Builder().build();

@@ -1,8 +1,6 @@
 import React, { Fragment } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
-
 import { MatchRangeDto } from "shared";
-
 import { Proposal } from "./Proposal";
 
 type SliceOfString = {

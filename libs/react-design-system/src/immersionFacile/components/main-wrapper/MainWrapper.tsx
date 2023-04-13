@@ -1,6 +1,5 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
-
 import "./MainWrapper.scss";
 
 type MainWrapperProps = {

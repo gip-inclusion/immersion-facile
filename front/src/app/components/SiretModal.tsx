@@ -1,14 +1,11 @@
 import React, { useEffect, useReducer } from "react";
-
 import {
   ModalClose,
   ModalContent,
   ModalDialog,
   ModalTitle,
 } from "react-design-system";
-
 import { useEstablishmentSiret } from "src/app/hooks/siret.hooks";
-
 import { SiretFetcherInput } from "./SiretFetcherInput";
 
 type ActionOnEstablishment = "register" | "edit";

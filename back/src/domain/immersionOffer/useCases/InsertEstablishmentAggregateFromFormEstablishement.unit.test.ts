@@ -6,7 +6,6 @@ import {
   NumberEmployeesRange,
   SirenEstablishmentDto,
 } from "shared";
-
 import {
   avenueChampsElyseesDto,
   rueGuillaumeTellDto,
@@ -28,7 +27,6 @@ import {
 } from "../../../adapters/secondary/sirene/InMemorySirenGateway";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { EstablishmentEntity } from "../entities/EstablishmentEntity";
-
 import { InsertEstablishmentAggregateFromForm } from "./InsertEstablishmentAggregateFromFormEstablishement";
 
 const fakeSiret = "90040893100013";

@@ -3,9 +3,7 @@ import ReactDOM from "react-dom";
 import Modal from "react-modal";
 import { fr } from "@codegouvfr/react-dsfr";
 import classNames, { ArgumentArray } from "classnames";
-
 import { ModalClose } from "./ModalClose";
-
 import "./Modal.css";
 
 /**

@@ -1,7 +1,5 @@
 import { Pool } from "pg";
-
 import { FormEstablishmentDto, random, sleep } from "shared";
-
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { InsertEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/InsertEstablishmentAggregateFromFormEstablishement";

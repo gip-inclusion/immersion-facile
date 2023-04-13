@@ -3,11 +3,8 @@ import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import Autocomplete from "@mui/material/Autocomplete";
 import { useStyles } from "tss-react/dsfr";
-
 import { LookupSearchResult } from "shared";
-
 import { AutocompleteInput } from "react-design-system";
-
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { geosearchSelectors } from "src/core-logic/domain/geosearch/geosearch.selectors";
 import { geosearchSlice } from "src/core-logic/domain/geosearch/geosearch.slice";

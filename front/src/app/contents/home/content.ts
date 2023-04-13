@@ -1,9 +1,6 @@
 import { Dispatch } from "@reduxjs/toolkit";
-
 import { domElementIds } from "shared";
-
 import { FaqCardProps, HeroHeaderNavCard, Stat } from "react-design-system";
-
 import type { UserType } from "src/app/pages/home/HomePage";
 import { routes } from "src/app/routes/routes";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";

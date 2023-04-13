@@ -1,5 +1,4 @@
 import React from "react";
-
 import { ConventionReadDto, toDisplayedDate } from "shared";
 
 export const ImmersionDescription = ({

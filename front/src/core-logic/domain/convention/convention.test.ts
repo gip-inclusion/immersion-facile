@@ -12,14 +12,12 @@ import {
   expectToEqual,
   SignatoryRole,
 } from "shared";
-
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {
   createTestStore,
   TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
-
 import {
   conventionSlice,
   ConventionState,

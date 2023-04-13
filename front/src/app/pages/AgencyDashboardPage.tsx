@@ -3,7 +3,6 @@ import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { useAppSelector } from "src/app/hooks/reduxHooks";

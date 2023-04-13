@@ -4,15 +4,12 @@ import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import { IconButton, Tooltip } from "@mui/material";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
-
 import { ConventionReadDto } from "shared";
-
 import {
   ElementModalContainer,
   useElementContainerModal,
 } from "src/app/components/forms/commons/FormModal/ElementModalContainer";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
-
 import { ShareForm } from "./ShareForm";
 
 const iconColor = "#3458a2";

@@ -1,5 +1,4 @@
 import { GeoPositionDto } from "shared";
-
 import { LaBonneBoiteRequestEntity } from "../../../domain/immersionOffer/entities/LaBonneBoiteRequestEntity";
 import { LaBonneBoiteRequestParams } from "../../../domain/immersionOffer/ports/LaBonneBoiteAPI";
 import { LaBonneBoiteRequestRepository } from "../../../domain/immersionOffer/ports/LaBonneBoiteRequestRepository";

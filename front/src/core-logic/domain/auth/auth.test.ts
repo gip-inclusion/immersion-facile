@@ -1,5 +1,4 @@
 import { expectToEqual, FederatedIdentity } from "shared";
-
 import { Dependencies } from "src/config/dependencies";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import {
@@ -8,7 +7,6 @@ import {
 } from "src/core-logic/domain/auth/auth.slice";
 import { createTestStore } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
-
 import { appIsReadyAction } from "../actions";
 
 const peConnectedFederatedIdentity: FederatedIdentityWithUser = {

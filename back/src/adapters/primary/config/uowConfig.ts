@@ -1,5 +1,4 @@
 import { PoolClient } from "pg";
-
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
@@ -48,7 +47,6 @@ import { PgRomeRepository } from "../../secondary/pg/PgRomeRepository";
 import { PgSearchMadeRepository } from "../../secondary/pg/PgSearchMadeRepository";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { stubPostalCodeDepartmentRegionQueries } from "../../secondary/StubPostalCodeDepartmentRegionQueries";
-
 import { AppConfig } from "./appConfig";
 import { GetPgPoolFn } from "./createGateways";
 

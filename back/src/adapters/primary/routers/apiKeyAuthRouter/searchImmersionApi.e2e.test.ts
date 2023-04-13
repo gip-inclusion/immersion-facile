@@ -1,7 +1,5 @@
 import { SuperTest, Test } from "supertest";
-
 import { immersionOffersRoute, searchImmersionRoute__v0 } from "shared";
-
 import {
   avenueChampsElysees,
   avenueChampsElyseesDto,

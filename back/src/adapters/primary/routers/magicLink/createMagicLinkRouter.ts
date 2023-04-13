@@ -1,5 +1,4 @@
 import { Router } from "express";
-
 import {
   conventionsRoute,
   getConventionStatusDashboard,
@@ -7,7 +6,6 @@ import {
   signConventionRoute,
   updateConventionStatusRoute,
 } from "shared";
-
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { RelativeUrl } from "../../createRemoveRouterPrefix";
 import { UnauthorizedError } from "../../helpers/httpErrors";

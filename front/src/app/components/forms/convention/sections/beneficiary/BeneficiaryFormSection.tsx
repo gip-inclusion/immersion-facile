@@ -5,7 +5,6 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { Select } from "@codegouvfr/react-dsfr/Select";
 import { keys } from "ramda";
-
 import {
   cleanStringToHTMLAttribute,
   ConventionReadDto,
@@ -13,9 +12,7 @@ import {
   isBeneficiaryStudent,
   levelsOfEducation,
 } from "shared";
-
 import { SectionTitle } from "react-design-system";
-
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
 import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
@@ -28,9 +25,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
-
 import { EmailValidationInput } from "../../../commons/EmailValidationInput";
-
 import { BeneficiaryCurrentEmployerFields } from "./BeneficiaryCurrentEmployerFields";
 import { BeneficiaryEmergencyContactFields } from "./BeneficiaryEmergencyContactFields";
 import { BeneficiaryRepresentativeFields } from "./BeneficiaryRepresentativeFields";

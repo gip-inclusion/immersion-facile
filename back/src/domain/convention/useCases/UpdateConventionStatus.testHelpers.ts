@@ -13,7 +13,6 @@ import {
   splitCasesBetweenPassingAndFailing,
   UpdateConventionStatusRequestDto,
 } from "shared";
-
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,
