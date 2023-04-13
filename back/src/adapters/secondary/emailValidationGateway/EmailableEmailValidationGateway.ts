@@ -95,12 +95,11 @@ export class EmailableEmailValidationGateway implements EmailValidationGetaway {
         },
       })
       .catch((error) => {
-        logger.error("getEmailStatus => Error while calling emailable API ", {
+        logger.error("validateEmail => Error while calling emailable API ", {
           error,
         });
         throw error;
       });
-
     const emailableEmailValidationStatus =
       responseBody as EmailableEmailValidationStatus;
 
