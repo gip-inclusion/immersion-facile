@@ -1,7 +1,8 @@
-import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
 import React from "react";
-import { overFooterPrefix } from ".";
+import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
+
 import { OverFooter, OverFooterProps } from "./OverFooter";
+import { overFooterPrefix } from ".";
 
 const Component = OverFooter;
 const argTypes: Partial<ArgTypes<OverFooterProps>> | undefined = {};

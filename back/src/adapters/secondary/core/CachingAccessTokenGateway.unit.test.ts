@@ -1,7 +1,9 @@
 import minutesToSeconds from "date-fns/minutesToSeconds";
-import { CachingAccessTokenGateway } from "./CachingAccessTokenGateway";
+
 import { GetAccessTokenResponse } from "../../../domain/core/ports/AccessTokenGateway";
+
 import { CustomTimeGateway } from "./TimeGateway/CustomTimeGateway";
+import { CachingAccessTokenGateway } from "./CachingAccessTokenGateway";
 
 const testResponse1: GetAccessTokenResponse = {
   access_token: "token1",

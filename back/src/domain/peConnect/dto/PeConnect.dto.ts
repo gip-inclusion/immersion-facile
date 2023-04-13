@@ -1,5 +1,7 @@
 import { Beneficiary, FederatedIdentityProvider, InternshipKind } from "shared";
+
 import { EntityFromDto } from "../../core/EntityFromDto";
+
 import { PeConnectImmersionAdvisorDto } from "./PeConnectAdvisor.dto";
 import { PeConnectUserDto } from "./PeConnectUser.dto";
 

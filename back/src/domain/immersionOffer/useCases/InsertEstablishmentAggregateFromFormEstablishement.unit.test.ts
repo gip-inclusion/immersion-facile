@@ -6,6 +6,7 @@ import {
   NumberEmployeesRange,
   SirenEstablishmentDto,
 } from "shared";
+
 import {
   avenueChampsElyseesDto,
   rueGuillaumeTellDto,
@@ -17,17 +18,18 @@ import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionO
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
+import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
-import { EstablishmentEntity } from "../entities/EstablishmentEntity";
-import { InsertEstablishmentAggregateFromForm } from "./InsertEstablishmentAggregateFromFormEstablishement";
 import {
   InMemorySirenGateway,
   TEST_ESTABLISHMENT1,
 } from "../../../adapters/secondary/sirene/InMemorySirenGateway";
-import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
+import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
+import { EstablishmentEntity } from "../entities/EstablishmentEntity";
+
+import { InsertEstablishmentAggregateFromForm } from "./InsertEstablishmentAggregateFromFormEstablishement";
 
 const fakeSiret = "90040893100013";
 const fakePosition: GeoPositionDto = { lat: 49.119146, lon: 6.17602 };

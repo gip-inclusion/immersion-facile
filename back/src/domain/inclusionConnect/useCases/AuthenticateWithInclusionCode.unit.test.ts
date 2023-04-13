@@ -6,6 +6,7 @@ import {
   expectToEqual,
   frontRoutes,
 } from "shared";
+
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
@@ -21,6 +22,7 @@ import {
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { OngoingOAuth } from "../../generic/OAuth/entities/OngoingOAuth";
+
 import { AuthenticateWithInclusionCode } from "./AuthenticateWithInclusionCode";
 
 const immersionBaseUrl: AbsoluteUrl = "http://my-immersion-domain.com";

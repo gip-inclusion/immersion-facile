@@ -15,11 +15,17 @@ module.exports = {
     es6: true,
     node: true,
   },
+  settings: {
+    react: {
+      version: "detect",
+    },
+  },
   overrides: [
     {
       extends: [
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended",
+        "plugin:react/recommended",
         //'plugin:@typescript-eslint/recommended-requiring-type-checking',
         //'plugin:rxjs/recommended',
         "prettier",
@@ -32,15 +38,13 @@ module.exports = {
         ecmaVersion: 2020,
         sourceType: "module",
       },
-      plugins: ["@typescript-eslint" /*'rxjs'*/],
+      plugins: ["@typescript-eslint", "simple-import-sort"],
       rules: {
         ...require("./eslint.rules"),
         ...require("./typescript-eslint.rules"),
         //...require('./.eslint/eslint.rules'),
         //...require('./.eslint/typescript-eslint.rules'),
-        //...require('./.eslint/angular-eslint.rules'),
         //...require('./.eslint/rxjs-eslint.rules'),
-        //...require('./.eslint/rxjs-angular-eslint.rules')
       },
     },
     {

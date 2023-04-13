@@ -1,7 +1,10 @@
 import { Pool, PoolClient } from "pg";
+
 import { expectToEqual } from "shared";
+
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { OngoingOAuth } from "../../../domain/generic/OAuth/entities/OngoingOAuth";
+
 import { PgOngoingOAuthRepository } from "./PgOngoingOAuthRepository";
 
 describe("PgOngoingOAuthRepository", () => {

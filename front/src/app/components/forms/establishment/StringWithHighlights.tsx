@@ -1,7 +1,9 @@
 import React, { Fragment } from "react";
-import { MatchRangeDto } from "shared";
-import { Proposal } from "./Proposal";
 import { fr } from "@codegouvfr/react-dsfr";
+
+import { MatchRangeDto } from "shared";
+
+import { Proposal } from "./Proposal";
 
 type SliceOfString = {
   startIndexInclusive: number;

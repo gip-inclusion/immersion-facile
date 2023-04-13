@@ -1,6 +1,7 @@
 import React, { ChangeEvent } from "react";
-import { weekdays } from "shared";
 import { Select } from "@codegouvfr/react-dsfr/Select";
+
+import { weekdays } from "shared";
 
 type WeekdayDropdownProps = {
   name: string;

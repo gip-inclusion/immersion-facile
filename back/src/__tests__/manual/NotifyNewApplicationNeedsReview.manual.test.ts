@@ -1,10 +1,13 @@
 import axios from "axios";
+
 import {
   AgencyDtoBuilder,
   ConventionDto,
   ConventionDtoBuilder,
   immersionFacileContactEmail,
 } from "shared";
+
+import { generateConventionJwtTestFn } from "../../_testBuilders/jwtTestHelper";
 import {
   AppConfig,
   makeEmailAllowListPredicate,
@@ -13,14 +16,12 @@ import {
   GenerateConventionMagicLinkUrl,
   makeGenerateConventionMagicLinkUrl,
 } from "../../adapters/primary/config/magicLinkUrl";
-
 import { createInMemoryUow } from "../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { SendinblueHtmlEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueHtmlEmailGateway";
 import { InMemoryUowPerformer } from "../../adapters/secondary/InMemoryUowPerformer";
 import { NotifyNewApplicationNeedsReview } from "../../domain/convention/useCases/notifications/NotifyNewApplicationNeedsReview";
 import { TimeGateway } from "../../domain/core/ports/TimeGateway";
-import { generateConventionJwtTestFn } from "../../_testBuilders/jwtTestHelper";
 
 // These tests are not hermetic and not meant for automated testing. They will send emails using
 // sendinblue, use up production quota, and fail for uncontrollable reasons such as quota

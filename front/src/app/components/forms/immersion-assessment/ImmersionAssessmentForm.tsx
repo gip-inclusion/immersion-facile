@@ -1,6 +1,10 @@
 import React from "react";
+import { fr } from "@codegouvfr/react-dsfr";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Form, Formik } from "formik";
 import { identity } from "ramda";
+
 import {
   AssessmentStatus,
   assessmentStatuses,
@@ -10,18 +14,16 @@ import {
   immersionAssessmentSchema,
   InternshipKind,
 } from "shared";
+
 import { RadioGroupForField } from "src/app/components/forms/commons/RadioGroup";
+import { TextInput } from "src/app/components/forms/commons/TextInput";
+import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
+import { useImmersionAssessment } from "src/app/hooks/immersionAssessment";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import {
   immersionAssessmentErrorSelector,
   immersionAssessmentStatusSelector,
 } from "src/core-logic/domain/immersionAssessment/immersionAssessment.selectors";
-import { useImmersionAssessment } from "src/app/hooks/immersionAssessment";
-import { TextInput } from "src/app/components/forms/commons/TextInput";
-import { toFormikValidationSchema } from "src/app/components/forms/commons/zodValidate";
-import { fr } from "@codegouvfr/react-dsfr";
-import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import { Button } from "@codegouvfr/react-dsfr/Button";
 
 type ImmersionAssessmentFormProperties = {
   convention: ConventionReadDto;

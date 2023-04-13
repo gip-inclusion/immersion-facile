@@ -1,9 +1,11 @@
 import { AgencyDtoBuilder } from "shared";
+
 import {
   createTestStore,
   TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
+
 import { agencyInfoSlice, AgencyInfoState } from "./agencyInfo.slice";
 
 describe("Agency info in store", () => {

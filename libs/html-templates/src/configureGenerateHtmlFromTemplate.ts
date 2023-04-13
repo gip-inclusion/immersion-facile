@@ -1,16 +1,15 @@
-import { HtmlTemplateEmailData } from "./createTemplatesByName";
 import {
-  renderHeader,
   renderButton,
   renderContent,
-  renderGreetings,
-  renderHighlight,
   renderFooter,
+  renderGreetings,
   renderHead,
+  renderHeader,
+  renderHighlight,
   renderLegals,
 } from "./components/email";
-
 import { ignoreTabs } from "./helpers/formatters";
+import { HtmlTemplateEmailData } from "./createTemplatesByName";
 
 export type GenerateHtmlOptions = { skipHead?: boolean };
 

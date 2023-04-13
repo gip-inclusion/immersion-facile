@@ -1,13 +1,14 @@
+import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import React from "react";
+import { useStyles } from "tss-react/dsfr";
+
 import {
   DateIntervalDto,
   DayPeriodsDto,
   WeekdayNumber,
   WeekDayRangeSchemaDTO,
 } from "shared";
-import { useStyles } from "tss-react/dsfr";
 
 import { WeekdayDropdown } from "./WeekdayDropdown";
 

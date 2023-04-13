@@ -1,14 +1,18 @@
-import lesEntrepriseSengagent from "/assets/img/les-entreprises-s-engagent.svg";
-import poleEmploiLogo from "/assets/img/pole-emploi-logo.svg";
-import plateformeLogo from "/assets/img/plateforme-inclusion-logo.svg";
 import React from "react";
-import { makeStyles, useStyles } from "tss-react/dsfr";
 import { fr } from "@codegouvfr/react-dsfr";
+import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";
+import { makeStyles, useStyles } from "tss-react/dsfr";
+
+import { domElementIds, immersionFacileContactEmail } from "shared";
+
 import { Footer, NavLink } from "react-design-system";
 import { OverFooter, OverFooterCols } from "react-design-system";
+
 import { routes } from "src/app/routes/routes";
-import { domElementIds, immersionFacileContactEmail } from "shared";
-import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";
+
+import lesEntrepriseSengagent from "/assets/img/les-entreprises-s-engagent.svg";
+import plateformeLogo from "/assets/img/plateforme-inclusion-logo.svg";
+import poleEmploiLogo from "/assets/img/pole-emploi-logo.svg";
 
 const {
   bottomLinks: bottomsLinksIds,

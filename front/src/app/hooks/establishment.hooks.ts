@@ -1,4 +1,5 @@
 import { useDispatch } from "react-redux";
+
 import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
 
 export const useSendModifyEstablishmentLink = () => {

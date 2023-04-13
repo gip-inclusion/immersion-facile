@@ -1,10 +1,11 @@
-import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
 import React from "react";
-import { inclusionConnectButtonPrefix } from ".";
+import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
+
 import {
   InclusionConnectButton,
   InclusionConnectButtonProps,
 } from "./InclusionConnectButton";
+import { inclusionConnectButtonPrefix } from ".";
 
 const Component = InclusionConnectButton;
 const argTypes: Partial<ArgTypes<InclusionConnectButtonProps>> | undefined = {};

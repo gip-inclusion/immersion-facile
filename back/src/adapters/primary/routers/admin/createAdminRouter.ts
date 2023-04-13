@@ -1,4 +1,5 @@
 import { Router } from "express";
+
 import {
   adminLogin,
   adminTargets,
@@ -13,14 +14,15 @@ import {
   generateMagicLinkRoute,
   GetDashboardParams,
 } from "shared";
+
 import type { AppDependencies } from "../../config/createAppDependencies";
-import { BadRequestError } from "../../helpers/httpErrors";
-import { sendHttpResponse } from "../../helpers/sendHttpResponse";
-import { sendZipResponse } from "../../helpers/sendZipResponse";
 import {
   createRemoveRouterPrefix,
   RelativeUrl,
 } from "../../createRemoveRouterPrefix";
+import { BadRequestError } from "../../helpers/httpErrors";
+import { sendHttpResponse } from "../../helpers/sendHttpResponse";
+import { sendZipResponse } from "../../helpers/sendZipResponse";
 
 export const createAdminRouter = (
   deps: AppDependencies,

@@ -1,4 +1,4 @@
-import { AnyObj, EmptyObj, Url, PathParameters } from "./utilityTypes";
+import { AnyObj, EmptyObj, PathParameters, Url } from "./utilityTypes";
 
 type HttpMethod = "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
 

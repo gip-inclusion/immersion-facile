@@ -1,9 +1,10 @@
 import {
   AddressAndPosition,
   ConventionMagicLinkPayload,
-  withLookupStreetAddressQueryParamsSchema,
   WithLookupAddressQueryParams,
+  withLookupStreetAddressQueryParamsSchema,
 } from "shared";
+
 import { UseCase } from "../../core/UseCase";
 import { AddressGateway } from "../../immersionOffer/ports/AddressGateway";
 

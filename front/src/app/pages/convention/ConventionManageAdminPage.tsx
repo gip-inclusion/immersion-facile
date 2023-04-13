@@ -1,9 +1,12 @@
 import React from "react";
+import { Route } from "type-route";
+
 import { MainWrapper } from "react-design-system";
+
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAdminToken } from "src/app/hooks/useAdminToken";
 import { routes } from "src/app/routes/routes";
-import { Route } from "type-route";
+
 import { ConventionManageContent } from "../../components/admin/ConventionManageContent";
 
 type ConventionManageAdminPageProps = {

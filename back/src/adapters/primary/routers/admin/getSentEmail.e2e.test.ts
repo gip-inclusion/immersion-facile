@@ -1,11 +1,13 @@
-import { BackOfficeJwt, emailRoute, EmailSentDto } from "shared";
 import { SuperTest, Test } from "supertest";
+
+import { BackOfficeJwt, emailRoute, EmailSentDto } from "shared";
+
 import {
   buildTestApp,
   InMemoryGateways,
 } from "../../../../_testBuilders/buildTestApp";
-import { AppConfig } from "../../config/appConfig";
 import { CustomTimeGateway } from "../../../secondary/core/TimeGateway/CustomTimeGateway";
+import { AppConfig } from "../../config/appConfig";
 
 describe(`/${emailRoute} route`, () => {
   let request: SuperTest<Test>;

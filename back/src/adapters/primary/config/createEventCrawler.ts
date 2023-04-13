@@ -5,6 +5,7 @@ import {
   BasicEventCrawler,
   RealEventCrawler,
 } from "../../secondary/core/EventCrawlerImplementations";
+
 import { AppConfig } from "./appConfig";
 
 export const createEventCrawler = (

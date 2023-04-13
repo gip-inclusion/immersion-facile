@@ -1,6 +1,7 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
+
 import "./Footer.css";
 
 export type NavLink = {
@@ -89,6 +90,7 @@ export const Footer = ({
               <a
                 href="https://github.com/etalab/licence-ouverte/blob/master/LO.md"
                 target="_blank"
+                rel="noreferrer"
               >
                 licence etalab-2.0
               </a>

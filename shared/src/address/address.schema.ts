@@ -1,6 +1,8 @@
 import { z } from "zod";
+
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { zString, zStringCanBeEmpty } from "../zodUtils";
+
 import {
   AddressAndPosition,
   AddressDto,

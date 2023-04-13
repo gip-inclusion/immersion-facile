@@ -1,8 +1,9 @@
 import React, { ReactElement } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
-import "./ConventionDocument.scss";
-import { useStyles } from "tss-react/dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
+import { useStyles } from "tss-react/dsfr";
+
+import "./ConventionDocument.scss";
 
 const componentName = "im-convention-document";
 

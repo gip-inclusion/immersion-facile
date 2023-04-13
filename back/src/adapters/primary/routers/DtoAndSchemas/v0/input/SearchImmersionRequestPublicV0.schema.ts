@@ -1,5 +1,7 @@
-import { geoPositionSchema, romeCodeSchema } from "shared";
 import { z } from "zod";
+
+import { geoPositionSchema, romeCodeSchema } from "shared";
+
 import { SearchImmersionRequestPublicV0 } from "./SearchImmersionRequestPublicV0.dto";
 
 export const searchImmersionRequestSchemaPublivV0: z.Schema<SearchImmersionRequestPublicV0> =

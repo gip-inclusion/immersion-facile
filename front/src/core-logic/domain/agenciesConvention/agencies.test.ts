@@ -1,11 +1,12 @@
 import { AgencyOption, expectToEqual } from "shared";
+
 import {
   createTestStore,
   TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
-import { agenciesSelector } from "./agencies.selector";
 
+import { agenciesSelector } from "./agencies.selector";
 import { agenciesSlice } from "./agencies.slice";
 
 describe("Agencies in store", () => {

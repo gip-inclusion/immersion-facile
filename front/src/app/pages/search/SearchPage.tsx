@@ -1,12 +1,14 @@
 import React, { useEffect, useRef } from "react";
-import { keys } from "ramda";
-import { Route } from "type-route";
-import { domElementIds, GeoPositionDto, SearchSortedBy } from "shared";
 import { useForm, useWatch } from "react-hook-form";
-import { useStyles } from "tss-react/dsfr";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { GenericOption, Select } from "@codegouvfr/react-dsfr/Select";
+import { keys } from "ramda";
+import { useStyles } from "tss-react/dsfr";
+import { Route } from "type-route";
+
+import { domElementIds, GeoPositionDto, SearchSortedBy } from "shared";
+
 import {
   Loader,
   MainWrapper,
@@ -14,19 +16,22 @@ import {
   SectionAccordion,
   SectionTextEmbed,
 } from "react-design-system";
-import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { useSearchUseCase } from "src/app/hooks/search.hooks";
-import { routes } from "src/app/routes/routes";
+
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
 import { PlaceAutocomplete } from "src/app/components/forms/autocomplete/PlaceAutocomplete";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
-import Styles from "./SearchPage.styles";
 import { SearchListResults } from "src/app/components/search/SearchListResults";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { useSearchUseCase } from "src/app/hooks/search.hooks";
+import { routes } from "src/app/routes/routes";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import {
   SearchPageParams,
   SearchStatus,
 } from "src/core-logic/domain/search/search.slice";
+
+import Styles from "./SearchPage.styles";
+
 import "./SearchPage.scss";
 
 const radiusOptions: GenericOption<number>[] = [1, 2, 5, 10, 20, 50, 100].map(
@@ -287,6 +292,7 @@ export const SearchPage = ({
                               href={`https://candidat.pole-emploi.fr/marche-du-travail/fichemetierrome?codeRome=${routeParams.rome}`}
                               target="_blank"
                               className={fr.cx("fr-text--bold")}
+                              rel="noreferrer"
                             >
                               {routeParams.romeLabel}
                             </a>

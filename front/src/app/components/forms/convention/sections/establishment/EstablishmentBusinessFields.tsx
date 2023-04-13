@@ -1,7 +1,9 @@
-import { Input } from "@codegouvfr/react-dsfr/Input";
 import React, { useEffect } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
+import { Input } from "@codegouvfr/react-dsfr/Input";
+
 import { ConventionDto } from "shared";
+
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import {

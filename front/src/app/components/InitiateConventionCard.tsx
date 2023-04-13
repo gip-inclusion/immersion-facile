@@ -1,13 +1,16 @@
-import { keys } from "ramda";
 import React from "react";
-import { ConventionRequirements, PeConnectButton } from "react-design-system";
+import { fr } from "@codegouvfr/react-dsfr";
+import { Button } from "@codegouvfr/react-dsfr/Button";
+import { keys } from "ramda";
+
 import { loginPeConnect } from "shared";
+
+import { ConventionRequirements, PeConnectButton } from "react-design-system";
+
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
 import { useRoute } from "src/app/routes/routes";
 import { deviceRepository } from "src/config/dependencies";
-import { fr } from "@codegouvfr/react-dsfr";
-import { Button } from "@codegouvfr/react-dsfr/Button";
 
 const storeConventionRouteParamsOnDevice = (
   routeParams: ConventionImmersionPageRoute["params"],
@@ -58,6 +61,7 @@ export const InitiateConventionCard = ({
                 className={fr.cx("fr-text--sm", "fr-mt-1v")}
                 href="https://candidat.pole-emploi.fr/compte/identifiant/saisieinformations"
                 target="_blank"
+                rel="noreferrer"
               >
                 Je ne connais pas mes identifiants
               </a>

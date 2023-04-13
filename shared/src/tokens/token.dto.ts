@@ -1,5 +1,6 @@
 import * as crypto from "crypto";
 import { decode } from "js-base64";
+
 import { ConventionId } from "../convention/convention.dto";
 import { SiretDto } from "../siret/siret";
 import { Flavor } from "../typeFlavors";

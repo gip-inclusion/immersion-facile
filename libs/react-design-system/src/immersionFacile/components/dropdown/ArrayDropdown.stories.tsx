@@ -1,7 +1,8 @@
-import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
 import React from "react";
-import { dropdownPrefix } from ".";
+import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
+
 import { ArrayDropdown, ArrayDropdownProps } from "./ArrayDropdown";
+import { dropdownPrefix } from ".";
 
 const Component = ArrayDropdown;
 const argTypes: Partial<ArgTypes<ArrayDropdownProps<string>>> | undefined = {};

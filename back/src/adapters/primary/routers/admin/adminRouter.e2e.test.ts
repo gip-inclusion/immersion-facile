@@ -1,10 +1,12 @@
+import { SuperTest, Test } from "supertest";
+
 import {
   adminTargets,
   BackOfficeJwt,
   featureFlagsRoute,
   SetFeatureFlagParams,
 } from "shared";
-import { SuperTest, Test } from "supertest";
+
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import {
   buildTestApp,

@@ -1,8 +1,10 @@
 import { z } from "zod";
+
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { romeCodeSchema } from "../rome";
 import { siretSchema } from "../siret/siret.schema";
 import { zString, zStringCanBeEmpty, zStringPossiblyEmpty } from "../zodUtils";
+
 import {
   SearchContactDto,
   SearchImmersionResultDto,

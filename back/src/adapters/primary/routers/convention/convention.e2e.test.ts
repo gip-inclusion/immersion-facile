@@ -1,3 +1,5 @@
+import { SuperTest, Test } from "supertest";
+
 import {
   BackOfficeJwt,
   BackOfficeJwtPayload,
@@ -11,16 +13,16 @@ import {
   stringToMd5,
   updateConventionStatusRoute,
 } from "shared";
-import { SuperTest, Test } from "supertest";
-import {
-  GenerateBackOfficeJwt,
-  GenerateConventionJwt,
-} from "../../../../domain/auth/jwt";
+
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import {
   buildTestApp,
   InMemoryGateways,
 } from "../../../../_testBuilders/buildTestApp";
+import {
+  GenerateBackOfficeJwt,
+  GenerateConventionJwt,
+} from "../../../../domain/auth/jwt";
 import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
 import {
   TEST_AGENCY_DEPARTMENT,

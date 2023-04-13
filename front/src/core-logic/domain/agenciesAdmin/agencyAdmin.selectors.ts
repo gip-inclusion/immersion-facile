@@ -1,4 +1,5 @@
 import { createSelector } from "@reduxjs/toolkit";
+
 import { RootState } from "src/core-logic/storeConfig/store";
 
 const agencyState = ({ admin }: RootState) => admin.agencyAdmin;

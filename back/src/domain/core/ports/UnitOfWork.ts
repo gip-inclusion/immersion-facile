@@ -16,6 +16,7 @@ import { LaBonneBoiteRequestRepository } from "../../immersionOffer/ports/LaBonn
 import { SearchMadeRepository } from "../../immersionOffer/ports/SearchMadeRepository";
 import { ConventionPoleEmploiAdvisorRepository } from "../../peConnect/port/ConventionPoleEmploiAdvisorRepository";
 import { RomeRepository } from "../../rome/ports/RomeRepository";
+
 import { FeatureFlagRepository } from "./FeatureFlagRepository";
 import { OutboxQueries } from "./OutboxQueries";
 import { OutboxRepository } from "./OutboxRepository";

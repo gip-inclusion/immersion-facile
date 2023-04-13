@@ -1,7 +1,8 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
-import { useStyles } from "tss-react/dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import { useStyles } from "tss-react/dsfr";
+
 import "./SectionFaq.scss";
 
 export type SectionFaqProps = {
@@ -76,6 +77,7 @@ const FaqCard = ({ title, description, url, index }: FaqCardProps) => (
               href={url}
               target="_blank"
               id={`im-section-faq__card-${index ? index + 1 : ""}`}
+              rel="noreferrer"
             >
               {title}
             </a>

@@ -1,4 +1,5 @@
 import { propEq } from "shared";
+
 import { RootState } from "src/core-logic/storeConfig/store";
 
 export const romeAutocompleteSelector = (state: RootState) => ({

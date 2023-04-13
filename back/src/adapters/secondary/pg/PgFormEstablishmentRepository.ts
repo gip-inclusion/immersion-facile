@@ -1,9 +1,12 @@
 import { PoolClient } from "pg";
+
 import { FormEstablishmentDto, SiretDto } from "shared";
+
 import { FormEstablishmentRepository } from "../../../domain/immersionOffer/ports/FormEstablishmentRepository";
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { ConflictError } from "../../primary/helpers/httpErrors";
+
 import { optional } from "./pgUtils";
 
 const logger = createLogger(__filename);

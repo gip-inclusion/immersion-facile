@@ -1,5 +1,7 @@
 import { Router } from "express";
+
 import { validateEmailsTargets } from "shared";
+
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 

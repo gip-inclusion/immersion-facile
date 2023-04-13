@@ -1,5 +1,7 @@
-import { getImmersionOfferByIdRoute__v0 } from "shared";
 import { SuperTest, Test } from "supertest";
+
+import { getImmersionOfferByIdRoute__v0 } from "shared";
+
 import {
   rueSaintHonore,
   rueSaintHonoreDto,
@@ -13,18 +15,18 @@ import {
   EstablishmentEntityBuilder,
 } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
-import { validAuthorizedApiKeyId } from "../../../secondary/InMemoryApiConsumerRepository";
-import { InMemoryUnitOfWork } from "../../config/uowConfig";
-import { SearchImmersionResultPublicV0 } from "../DtoAndSchemas/v0/output/SearchImmersionResultPublicV0.dto";
+import {
+  GenerateApiConsumerJwt,
+  makeGenerateJwtES256,
+} from "../../../../domain/auth/jwt";
 import {
   TEST_NAF_LABEL,
   TEST_POSITION,
   TEST_ROME_LABEL,
 } from "../../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
-import {
-  GenerateApiConsumerJwt,
-  makeGenerateJwtES256,
-} from "../../../../domain/auth/jwt";
+import { validAuthorizedApiKeyId } from "../../../secondary/InMemoryApiConsumerRepository";
+import { InMemoryUnitOfWork } from "../../config/uowConfig";
+import { SearchImmersionResultPublicV0 } from "../DtoAndSchemas/v0/output/SearchImmersionResultPublicV0.dto";
 
 const immersionOfferId = "78000403200019-B1805";
 const immersionOfferRome = "B1805";

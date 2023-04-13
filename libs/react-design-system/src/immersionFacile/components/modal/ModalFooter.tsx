@@ -1,5 +1,5 @@
-import classNames, { ArgumentArray } from "classnames";
 import React from "react";
+import classNames, { ArgumentArray } from "classnames";
 
 type ModalFooterProperties = {
   children: JSX.Element;

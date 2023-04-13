@@ -1,7 +1,8 @@
 import React from "react";
-import "./PeConnectButton.scss";
-import { useStyles } from "tss-react/dsfr";
 import { fr } from "@codegouvfr/react-dsfr";
+import { useStyles } from "tss-react/dsfr";
+
+import "./PeConnectButton.scss";
 
 export type PeConnectButtonProps = {
   onClick: (e: React.MouseEvent<HTMLAnchorElement>) => void;

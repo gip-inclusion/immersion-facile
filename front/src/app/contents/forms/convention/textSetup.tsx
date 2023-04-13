@@ -1,6 +1,7 @@
 import React from "react";
-import { InternshipKind } from "shared";
 import { fr } from "@codegouvfr/react-dsfr";
+
+import { InternshipKind } from "shared";
 
 export const useConventionTexts = (internshipKind: InternshipKind) =>
   immersionTexts(internshipKind);
@@ -52,6 +53,7 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
               <a
                 href="https://aide.immersion-facile.beta.gouv.fr/fr/article/je-nai-pas-de-structure-daccompagnement-et-je-veux-faire-une-immersion-1x15rdp"
                 target="_blank"
+                rel="noreferrer"
               >
                 nos conseils ici
               </a>

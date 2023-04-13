@@ -1,14 +1,18 @@
 import { Dispatch } from "@reduxjs/toolkit";
-import { HeroHeaderNavCard, Stat, FaqCardProps } from "react-design-system";
-import { routes } from "src/app/routes/routes";
-import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
-import type { UserType } from "src/app/pages/home/HomePage";
-import heroHeaderDefaultIllustration from "/src/assets/img/illustration-default-hero.webp";
-import heroHeaderCandidateIllustration from "/src/assets/img/illustration-candidate-hero.webp";
-import heroHeaderEstablishmentIllustration from "/src/assets/img/illustration-establishment-hero.webp";
-import heroHeaderAgencyIllustration from "/src/assets/img/illustration-agency-hero.webp";
-import { authSlice } from "src/core-logic/domain/auth/auth.slice";
+
 import { domElementIds } from "shared";
+
+import { FaqCardProps, HeroHeaderNavCard, Stat } from "react-design-system";
+
+import type { UserType } from "src/app/pages/home/HomePage";
+import { routes } from "src/app/routes/routes";
+import { authSlice } from "src/core-logic/domain/auth/auth.slice";
+import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
+
+import heroHeaderAgencyIllustration from "/src/assets/img/illustration-agency-hero.webp";
+import heroHeaderCandidateIllustration from "/src/assets/img/illustration-candidate-hero.webp";
+import heroHeaderDefaultIllustration from "/src/assets/img/illustration-default-hero.webp";
+import heroHeaderEstablishmentIllustration from "/src/assets/img/illustration-establishment-hero.webp";
 
 type HeroHeaderInfos = {
   displayName: string;

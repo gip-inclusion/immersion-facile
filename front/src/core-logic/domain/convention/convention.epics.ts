@@ -1,10 +1,13 @@
 import { concatMap, filter, map, switchMap } from "rxjs";
+
 import { isEstablishmentTutorIsEstablishmentRepresentative } from "shared";
+
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
+
 import { conventionSlice } from "./convention.slice";
 
 type ConventionAction = ActionOfSlice<typeof conventionSlice>;

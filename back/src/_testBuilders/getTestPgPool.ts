@@ -1,4 +1,5 @@
 import { Pool } from "pg";
+
 import { AppConfig } from "../adapters/primary/config/appConfig";
 
 export const getTestPgPool = () => {

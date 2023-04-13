@@ -1,10 +1,12 @@
 import {
+  AgencyDto,
   ConventionDto,
   ConventionDtoBuilder,
-  frontRoutes,
   expectTypeToMatchAndEqual,
-  AgencyDto,
+  frontRoutes,
 } from "shared";
+
+import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/jwtTestHelper";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
@@ -13,9 +15,9 @@ import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/
 import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { PeUserAndAdvisor } from "../dto/PeConnect.dto";
-import { NotifyPoleEmploiUserAdvisorOnConventionFullySigned } from "./NotifyPoleEmploiUserAdvisorOnConventionFullySigned";
 import { PeConnectImmersionAdvisorDto } from "../dto/PeConnectAdvisor.dto";
-import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/jwtTestHelper";
+
+import { NotifyPoleEmploiUserAdvisorOnConventionFullySigned } from "./NotifyPoleEmploiUserAdvisorOnConventionFullySigned";
 
 describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
   let uow: InMemoryUnitOfWork;

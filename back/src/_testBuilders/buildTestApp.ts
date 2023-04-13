@@ -1,5 +1,7 @@
-import { AgencyDtoBuilder, ConventionDtoBuilder } from "shared";
 import supertest from "supertest";
+
+import { AgencyDtoBuilder, ConventionDtoBuilder } from "shared";
+
 import { AppConfig } from "../adapters/primary/config/appConfig";
 import { Gateways } from "../adapters/primary/config/createGateways";
 import { InMemoryUnitOfWork } from "../adapters/primary/config/uowConfig";
@@ -26,6 +28,7 @@ import {
   GenerateEditFormEstablishmentJwt,
 } from "../domain/auth/jwt";
 import { UuidGenerator } from "../domain/core/ports/UuidGenerator";
+
 import { AppConfigBuilder } from "./AppConfigBuilder";
 
 export type InMemoryGateways = {

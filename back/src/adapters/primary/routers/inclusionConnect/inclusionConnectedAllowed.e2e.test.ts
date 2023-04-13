@@ -3,6 +3,7 @@ import {
   expectToEqual,
   inclusionConnectedAllowedTargets,
 } from "shared";
+
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { InclusionConnectedUser } from "../../../../domain/dashboard/entities/InclusionConnectedUser";
 

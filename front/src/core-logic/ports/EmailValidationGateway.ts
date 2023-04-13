@@ -1,4 +1,5 @@
 import { Observable } from "rxjs";
+
 import { Email, ValidateEmailStatus } from "shared";
 
 export interface EmailValidationGateway {

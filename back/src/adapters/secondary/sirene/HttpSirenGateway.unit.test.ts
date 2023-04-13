@@ -1,4 +1,5 @@
 import { expectToEqual } from "shared";
+
 import {
   convertSirenRawEstablishmentToSirenEstablishmentDto,
   SirenApiRawEstablishment,

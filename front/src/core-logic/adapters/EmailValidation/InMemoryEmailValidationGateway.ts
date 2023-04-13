@@ -1,5 +1,7 @@
 import { from, Observable } from "rxjs";
-import { type ValidateEmailStatus, sleep, type Email } from "shared";
+
+import { type Email, sleep, type ValidateEmailStatus } from "shared";
+
 import { EmailValidationGateway } from "src/core-logic/ports/EmailValidationGateway";
 
 export class InMemoryEmailValidationGateway implements EmailValidationGateway {

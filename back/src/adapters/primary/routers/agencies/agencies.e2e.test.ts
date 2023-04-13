@@ -1,14 +1,16 @@
+import { SuperTest, Test } from "supertest";
+
 import {
   AddressDto,
-  BackOfficeJwt,
   agenciesRoute,
   AgencyDtoBuilder,
+  BackOfficeJwt,
   expectToEqual,
 } from "shared";
-import { SuperTest, Test } from "supertest";
+
 import {
-  InMemoryGateways,
   buildTestApp,
+  InMemoryGateways,
 } from "../../../../_testBuilders/buildTestApp";
 import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
 import { AppConfig } from "../../config/appConfig";

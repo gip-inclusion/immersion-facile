@@ -1,6 +1,7 @@
-import { searchImmersionRoute__v0, immersionOffersRoute } from "shared";
 import { SuperTest, Test } from "supertest";
-import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
+
+import { immersionOffersRoute, searchImmersionRoute__v0 } from "shared";
+
 import {
   avenueChampsElysees,
   avenueChampsElyseesDto,
@@ -12,6 +13,7 @@ import {
   EstablishmentEntityBuilder,
 } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { GenerateApiConsumerJwt } from "../../../../domain/auth/jwt";
 import { InMemoryEstablishmentAggregateRepository } from "../../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { SearchImmersionResultPublicV0 } from "../DtoAndSchemas/v0/output/SearchImmersionResultPublicV0.dto";
 import { SearchImmersionResultPublicV1 } from "../DtoAndSchemas/v1/output/SearchImmersionResultPublicV1.dto";

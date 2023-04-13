@@ -1,7 +1,9 @@
 import React from "react";
-import { OverFooterCol, OverFooterColProps } from "./OverFooterCol";
-import { useStyles } from "tss-react/dsfr";
 import { fr } from "@codegouvfr/react-dsfr";
+import { useStyles } from "tss-react/dsfr";
+
+import { OverFooterCol, OverFooterColProps } from "./OverFooterCol";
+
 import "./OverFooter.css";
 export type OverFooterCols = OverFooterColProps[];
 export type OverFooterProps = {

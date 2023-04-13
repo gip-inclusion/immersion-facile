@@ -1,16 +1,19 @@
+import React, { useState } from "react";
+import { useFormContext } from "react-hook-form";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import { IconButton, Tooltip } from "@mui/material";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
-import React, { useState } from "react";
-import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
+
+import { ConventionReadDto } from "shared";
+
 import {
   ElementModalContainer,
   useElementContainerModal,
 } from "src/app/components/forms/commons/FormModal/ElementModalContainer";
+import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
+
 import { ShareForm } from "./ShareForm";
-import { useFormContext } from "react-hook-form";
-import { ConventionReadDto } from "shared";
 
 const iconColor = "#3458a2";
 

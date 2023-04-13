@@ -5,10 +5,12 @@ import {
   EstablishmentJwtPayload,
   frontRoutes,
 } from "shared";
+
 import {
   GenerateConventionJwt,
   GenerateEditFormEstablishmentJwt,
 } from "../../../domain/auth/jwt";
+
 import { AppConfig } from "./appConfig";
 
 export const makeGenerateEditFormEstablishmentUrl =

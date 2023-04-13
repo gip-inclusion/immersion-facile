@@ -1,16 +1,18 @@
-import Autocomplete from "@mui/material/Autocomplete";
 import React, { useEffect, useState } from "react";
+import { fr } from "@codegouvfr/react-dsfr";
+import Autocomplete from "@mui/material/Autocomplete";
+import { useStyles } from "tss-react/dsfr";
+
 import {
   AppellationDto,
   AppellationMatchDto,
   cleanStringToHTMLAttribute,
 } from "shared";
-import { romeAutocompleteGateway } from "src/config/dependencies";
-import { useDebounce } from "src/app/hooks/useDebounce";
+
 import { Proposal } from "src/app/components/forms/establishment/Proposal";
 import { StringWithHighlights } from "src/app/components/forms/establishment/StringWithHighlights";
-import { fr } from "@codegouvfr/react-dsfr";
-import { useStyles } from "tss-react/dsfr";
+import { useDebounce } from "src/app/hooks/useDebounce";
+import { romeAutocompleteGateway } from "src/config/dependencies";
 
 const romeSearchMatchToProposal = ({
   matchRanges,

@@ -1,5 +1,6 @@
 import { filter as ramdaFilter } from "ramda";
 import { BehaviorSubject, delay, map, Observable, Subject } from "rxjs";
+
 import {
   AddressDto,
   ContactEstablishmentRequestDto,
@@ -8,6 +9,7 @@ import {
   SearchImmersionResultDto,
   sleep,
 } from "shared";
+
 import { ImmersionSearchGateway } from "src/core-logic/ports/ImmersionSearchGateway";
 
 export class InMemoryImmersionSearchGateway implements ImmersionSearchGateway {

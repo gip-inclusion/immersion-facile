@@ -1,7 +1,7 @@
 import React from "react";
+import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { useStyles } from "tss-react/dsfr";
-import { fr } from "@codegouvfr/react-dsfr";
 
 const componentName = "im-notification-errors";
 

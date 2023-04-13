@@ -1,5 +1,6 @@
-import { createRootSelector } from "src/core-logic/storeConfig/store";
 import { createSelector } from "@reduxjs/toolkit";
+
+import { createRootSelector } from "src/core-logic/storeConfig/store";
 
 const feedback = createRootSelector(
   (state) => state.establishmentBatch.feedback,

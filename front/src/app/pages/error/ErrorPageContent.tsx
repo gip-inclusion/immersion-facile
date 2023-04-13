@@ -1,7 +1,11 @@
+import React from "react";
+import { fr } from "@codegouvfr/react-dsfr";
 import ovoidSprite from "@gouvfr/dsfr/dist/artwork/background/ovoid.svg";
 import technicalErrorSprite from "@gouvfr/dsfr/dist/artwork/pictograms/system/technical-error.svg";
-import React from "react";
+import { useStyles } from "tss-react/dsfr";
+
 import { ManagedErrorKind } from "shared";
+
 import {
   contentsMapper,
   unexpectedErrorContent,
@@ -11,8 +15,6 @@ import {
   HTTPFrontErrorContents,
 } from "src/app/contents/error/types";
 import { useRedirectToConventionWithoutIdentityProvider } from "src/app/hooks/redirections.hooks";
-import { fr } from "@codegouvfr/react-dsfr";
-import { useStyles } from "tss-react/dsfr";
 
 type ErrorPageContentProps = {
   type?: ManagedErrorKind;

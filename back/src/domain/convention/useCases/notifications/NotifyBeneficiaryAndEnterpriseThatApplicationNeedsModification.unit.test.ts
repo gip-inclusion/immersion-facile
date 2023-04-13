@@ -7,6 +7,8 @@ import {
   frontRoutes,
   Role,
 } from "shared";
+
+import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
@@ -14,8 +16,8 @@ import {
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
+
 import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "./NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 
 describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () => {

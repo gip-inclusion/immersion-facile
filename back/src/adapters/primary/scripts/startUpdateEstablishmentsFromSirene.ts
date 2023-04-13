@@ -1,5 +1,7 @@
 import { Pool } from "pg";
+
 import { random, sleep } from "shared";
+
 import { UpdateEstablishmentsFromSirenApiScript } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentsFromSirenApiScript";
 import { createLogger } from "../../../utils/logger";
 import { PipelineStats } from "../../../utils/pipelineStats";
@@ -16,6 +18,7 @@ import { PgEstablishmentAggregateRepository } from "../../secondary/pg/PgEstabli
 import { HttpSirenGateway } from "../../secondary/sirene/HttpSirenGateway";
 import { AppConfig } from "../config/appConfig";
 import { createHttpClientForExternalApi } from "../config/createGateways";
+
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
 const logger = createLogger(__filename);

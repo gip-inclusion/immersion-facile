@@ -1,6 +1,8 @@
 import { keys, values } from "ramda";
+
 import { Role } from "../tokens/token.dto";
 import { DotNestedKeys, ExtractFromExisting } from "../utils";
+
 import {
   ConventionDto,
   ConventionStatus,

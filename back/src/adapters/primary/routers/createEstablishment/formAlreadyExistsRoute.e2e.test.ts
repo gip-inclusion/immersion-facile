@@ -1,9 +1,11 @@
 import { SuperTest, Test } from "supertest";
+
+import { establishmentTargets } from "shared";
+
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
-import { establishmentTargets } from "shared";
 
 describe("route to check if a form's siret already exists", () => {
   let request: SuperTest<Test>;

@@ -1,7 +1,9 @@
 import React, { ReactNode } from "react";
+
+import { SkipLink, SkipLinks } from "react-design-system";
+
 import { ImmersionFooter } from "./ImmersionFooter";
 import { ImmersionHeader } from "./ImmersionHeader";
-import { SkipLinks, SkipLink } from "react-design-system";
 
 const skipLinks: SkipLink[] = [
   {

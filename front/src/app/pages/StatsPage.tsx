@@ -1,5 +1,7 @@
-import { MainWrapper } from "react-design-system";
 import React from "react";
+
+import { MainWrapper } from "react-design-system";
+
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 
 const statsPageUrl =

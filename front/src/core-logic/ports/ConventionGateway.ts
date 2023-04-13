@@ -1,4 +1,5 @@
 import { Observable } from "rxjs";
+
 import {
   AbsoluteUrl,
   BackOfficeJwt,
@@ -10,6 +11,7 @@ import {
   ShareLinkByEmailDto,
   UpdateConventionStatusRequestDto,
 } from "shared";
+
 import { FetchConventionRequestedPayload } from "../domain/convention/convention.slice";
 
 export interface ConventionGateway {

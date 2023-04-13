@@ -1,8 +1,12 @@
 import React from "react";
-import { SectionTitle } from "react-design-system";
 import { useFormContext } from "react-hook-form";
+
 import { ConventionReadDto, InternshipKind } from "shared";
+
+import { SectionTitle } from "react-design-system";
+
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
+
 import { AgencyDisplayReadOnly } from "./AgencyDisplayReadOnly";
 import { AgencySelector } from "./AgencySelector";
 

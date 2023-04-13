@@ -1,6 +1,8 @@
-import { fr } from "@codegouvfr/react-dsfr";
 import React from "react";
+import { fr } from "@codegouvfr/react-dsfr";
+
 import { ConventionReadDto } from "shared";
+
 import { useConventionTexts } from "../../../contents/forms/convention/textSetup";
 
 type ConventionSignFormIntroProperties = {

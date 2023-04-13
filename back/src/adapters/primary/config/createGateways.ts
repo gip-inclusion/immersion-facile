@@ -1,11 +1,14 @@
 import axios from "axios";
-import { configureHttpClient, createAxiosHandlerCreator } from "http-client";
 import { Pool } from "pg";
+
 import {
   exhaustiveCheck,
   immersionFacileContactEmail,
   pipeWithValue,
 } from "shared";
+
+import { configureHttpClient, createAxiosHandlerCreator } from "http-client";
+
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
@@ -18,14 +21,13 @@ import { HttpAddressGateway } from "../../secondary/addressGateway/HttpAddressGa
 import { addressesExternalTargets } from "../../secondary/addressGateway/HttpAddressGateway.targets";
 import { InMemoryAddressGateway } from "../../secondary/addressGateway/InMemoryAddressGateway";
 import { CachingAccessTokenGateway } from "../../secondary/core/CachingAccessTokenGateway";
+import { CustomTimeGateway } from "../../secondary/core/TimeGateway/CustomTimeGateway";
+import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { MetabaseDashboardGateway } from "../../secondary/dashboardGateway/MetabaseDashboardGateway";
 import { StubDashboardGateway } from "../../secondary/dashboardGateway/StubDashboardGateway";
 import { HybridEmailGateway } from "../../secondary/emailGateway/HybridEmailGateway";
 import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmailGateway";
 import { SendinblueHtmlEmailGateway } from "../../secondary/emailGateway/SendinblueHtmlEmailGateway";
-
-import { CustomTimeGateway } from "../../secondary/core/TimeGateway/CustomTimeGateway";
-import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import {
   EmailableEmailValidationGateway,
   emailableValidationTargets,
@@ -51,6 +53,7 @@ import { InMemoryExportGateway } from "../../secondary/reporting/InMemoryExportG
 import { S3DocumentGateway } from "../../secondary/S3DocumentGateway";
 import { HttpSirenGateway } from "../../secondary/sirene/HttpSirenGateway";
 import { InMemorySirenGateway } from "../../secondary/sirene/InMemorySirenGateway";
+
 import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
 
 const logger = createLogger(__filename);

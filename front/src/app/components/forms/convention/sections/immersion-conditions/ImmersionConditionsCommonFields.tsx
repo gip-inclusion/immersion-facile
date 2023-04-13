@@ -1,11 +1,11 @@
+import React, { useState } from "react";
+import { useFormContext } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { addMonths } from "date-fns";
 
-import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import React, { useState } from "react";
-import { useFormContext } from "react-hook-form";
 import {
   addressDtoToString,
   conventionObjectiveOptions,
@@ -16,9 +16,11 @@ import {
   scheduleWithFirstDayActivity,
   toDateString,
 } from "shared";
+
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { SchedulePicker } from "src/app/components/forms/commons/SchedulePicker/SchedulePicker";
 import { ConventionFormProfession } from "src/app/components/forms/convention/ConventionFormProfession";
+import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import {
   makeFieldError,
@@ -27,7 +29,6 @@ import {
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useSiretRelatedField } from "src/app/hooks/siret.hooks";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
-import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 
 export const ImmersionConditionsCommonFields = ({
   disabled,

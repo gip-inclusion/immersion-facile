@@ -1,7 +1,10 @@
 import { Pool, PoolClient } from "pg";
+
 import { expectToEqual } from "shared";
 import { AuthenticatedUser } from "shared";
+
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
+
 import { PgAuthenticatedUserRepository } from "./PgAuthenticatedUserRepository";
 
 describe("PgAuthenticatedUserRepository", () => {

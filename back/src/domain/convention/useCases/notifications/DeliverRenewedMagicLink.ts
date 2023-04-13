@@ -1,5 +1,7 @@
-import { InternshipKind, internshipKindSchema } from "shared";
 import { z } from "zod";
+
+import { InternshipKind, internshipKindSchema } from "shared";
+
 import { UseCase } from "../../../core/UseCase";
 import { EmailGateway } from "../../ports/EmailGateway";
 

@@ -1,8 +1,10 @@
 import { PoolClient } from "pg";
+
 import { SiretDto } from "shared";
+
 import {
-  DiscussionId,
   DiscussionAggregate,
+  DiscussionId,
 } from "../../../domain/immersionOffer/entities/DiscussionAggregate";
 import { DiscussionAggregateRepository } from "../../../domain/immersionOffer/ports/DiscussionAggregateRepository";
 

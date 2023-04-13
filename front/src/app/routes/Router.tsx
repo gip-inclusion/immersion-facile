@@ -1,4 +1,6 @@
 import React from "react";
+import { Route } from "type-route";
+
 import { AdminPage } from "src/app/pages/admin/AdminPage";
 import { AddAgencyPage } from "src/app/pages/agency/AddAgencyPage";
 import { AgencyDashboardPage } from "src/app/pages/AgencyDashboardPage";
@@ -14,12 +16,19 @@ import { StatsPage } from "src/app/pages/StatsPage";
 import { AdminPrivateRoute, LoginForm } from "src/app/routes/AdminPrivateRoute";
 import { InclusionConnectedPrivateRoute } from "src/app/routes/InclusionConnectedPrivateRoute";
 import { RenewExpiredLinkPage } from "src/app/routes/RenewExpiredLinkPage";
-import { Route } from "type-route";
+
 import { StandardLayout } from "../components/layout/StandardLayout";
+import { ConventionCustomAgencyPage } from "../pages/convention/ConventionCustomAgencyPage";
+import { ConventionDocumentPage } from "../pages/convention/ConventionDocumentPage";
+import { ConventionManageAdminPage } from "../pages/convention/ConventionManageAdminPage";
+import { ConventionManagePage } from "../pages/convention/ConventionManagePage";
+import { ConventionPageForExternals } from "../pages/convention/ConventionPageForExternals";
 import { ErrorPage } from "../pages/error/ErrorPage";
 import { EstablishmentFormPage } from "../pages/establishment/EstablishmentFormPage";
+import { GroupPage } from "../pages/group/GroupPage";
 import { HomePage } from "../pages/home/HomePage";
 import { ImmersionAssessmentPage } from "../pages/immersion-assessment/ImmersionAssessmentPage";
+
 import {
   AdminTab,
   adminTabs,
@@ -29,12 +38,6 @@ import {
   standardPageSlugs,
 } from "./route-params";
 import { routes, useRoute } from "./routes";
-import { ConventionPageForExternals } from "../pages/convention/ConventionPageForExternals";
-import { ConventionCustomAgencyPage } from "../pages/convention/ConventionCustomAgencyPage";
-import { GroupPage } from "../pages/group/GroupPage";
-import { ConventionDocumentPage } from "../pages/convention/ConventionDocumentPage";
-import { ConventionManageAdminPage } from "../pages/convention/ConventionManageAdminPage";
-import { ConventionManagePage } from "../pages/convention/ConventionManagePage";
 
 type Routes = typeof routes;
 

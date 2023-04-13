@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
+import { Route } from "type-route";
+
 import { FederatedIdentityProvider, isPeConnectIdentity } from "shared";
+
+import { Loader } from "react-design-system";
+
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
 import { ConventionFormContainerLayout } from "src/app/components/forms/convention/ConventionFormContainerLayout";
 import { conventionInitialValuesFromUrl } from "src/app/components/forms/convention/conventionHelpers";
@@ -12,7 +16,6 @@ import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
-import { Route } from "type-route";
 
 export type ConventionImmersionPageRoute = Route<
   typeof routes.conventionImmersion

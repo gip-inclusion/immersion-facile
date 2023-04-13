@@ -1,5 +1,7 @@
 import { addYears, subYears } from "date-fns";
-import { ApiConsumerId, ApiConsumer } from "shared";
+
+import { ApiConsumer, ApiConsumerId } from "shared";
+
 import { ApiConsumerRepository } from "../../domain/auth/ports/ApiConsumerRepository";
 
 /**

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { useFormContext } from "react-hook-form";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Select } from "@codegouvfr/react-dsfr/Select";
-import { useFormContext } from "react-hook-form";
+
 import {
   AddressDto,
   addressDtoToString,
@@ -10,19 +11,20 @@ import {
   CreateAgencyDto,
   zEmail,
 } from "shared";
+
+import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
+import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
 import { RadioGroup } from "src/app/components/forms/commons/RadioGroup";
 import { UploadLogo } from "src/app/components/UploadLogo";
 import {
   FormAgencyFieldsLabels,
   formAgencyFieldsLabels,
 } from "src/app/contents/forms/agency/formAgency";
-import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
-import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
-import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
 import {
   makeFieldError,
   useFormContents,
 } from "src/app/hooks/formContents.hooks";
+import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 
 type AgencyFormCommonFieldsProps = {
   addressInitialValue?: AddressDto;

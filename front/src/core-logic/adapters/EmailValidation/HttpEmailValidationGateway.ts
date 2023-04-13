@@ -1,11 +1,14 @@
-import { HttpClient } from "http-client";
 import { from, Observable } from "rxjs";
+
 import {
   type Email,
   validateEmailResponseSchema,
   ValidateEmailStatus,
   ValidateEmailTargets,
 } from "shared";
+
+import { HttpClient } from "http-client";
+
 import { EmailValidationGateway } from "src/core-logic/ports/EmailValidationGateway";
 
 export class HttpEmailValidationGateway implements EmailValidationGateway {

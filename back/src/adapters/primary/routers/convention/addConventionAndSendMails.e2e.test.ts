@@ -1,3 +1,5 @@
+import supertest from "supertest";
+
 import {
   ConventionDto,
   ConventionDtoBuilder,
@@ -13,12 +15,11 @@ import {
   updateConventionStatusRoute,
   VALID_EMAILS,
 } from "shared";
-import supertest from "supertest";
+
 import {
   buildTestApp,
   TestAppAndDeps,
 } from "../../../../_testBuilders/buildTestApp";
-
 import { DomainEvent } from "../../../../domain/core/eventBus/events";
 import { InMemoryOutboxRepository } from "../../../secondary/core/InMemoryOutboxRepository";
 import { InMemoryEmailGateway } from "../../../secondary/emailGateway/InMemoryEmailGateway";

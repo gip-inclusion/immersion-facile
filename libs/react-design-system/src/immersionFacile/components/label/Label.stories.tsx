@@ -1,7 +1,8 @@
-import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
 import React from "react";
-import { labelPrefix } from ".";
+import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
+
 import { Label, LabelProperties } from "./Label";
+import { labelPrefix } from ".";
 
 const Component = Label;
 const argTypes: Partial<ArgTypes<LabelProperties>> | undefined = {};

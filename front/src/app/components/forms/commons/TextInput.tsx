@@ -1,10 +1,12 @@
-import { useField } from "formik";
 import React, { useEffect } from "react";
-import {
-  ImmersionTextField,
-  AutocompleteAttributeValue,
-} from "react-design-system";
+import { useField } from "formik";
+
 import { cleanStringToHTMLAttribute } from "shared";
+
+import {
+  AutocompleteAttributeValue,
+  ImmersionTextField,
+} from "react-design-system";
 
 type TextInputProps = {
   label: string;

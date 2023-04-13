@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 import {
   addressWithPostalCodeSchema,
   appellationDtoSchema,
@@ -9,7 +11,7 @@ import {
   zStringPossiblyEmpty,
   zTrimmedString,
 } from "shared";
-import { z } from "zod";
+
 import { FormEstablishmentDtoPublicV1 } from "./FormEstablishmentPublicV1.dto";
 
 export const formEstablishmentPublicV1Schema: z.Schema<FormEstablishmentDtoPublicV1> =

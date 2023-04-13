@@ -1,13 +1,15 @@
 import {
   ConventionDtoBuilder,
   ConventionId,
-  reasonableSchedule,
   expectObjectsToMatch,
+  reasonableSchedule,
 } from "shared";
+
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
-import { InMemoryFeatureFlagRepository } from "../../../../adapters/secondary/InMemoryFeatureFlagRepository";
 import { InMemoryPoleEmploiGateway } from "../../../../adapters/secondary/immersionOffer/poleEmploi/InMemoryPoleEmploiGateway";
+import { InMemoryFeatureFlagRepository } from "../../../../adapters/secondary/InMemoryFeatureFlagRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+
 import { BroadcastToPoleEmploiOnConventionUpdates } from "./BroadcastToPoleEmploiOnConventionUpdates";
 
 const prepareUseCase = ({

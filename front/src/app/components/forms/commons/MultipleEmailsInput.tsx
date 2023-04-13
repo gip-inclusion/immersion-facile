@@ -1,14 +1,14 @@
-import { fr } from "@codegouvfr/react-dsfr";
 import React, { useEffect, useState } from "react";
+import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
+import { z } from "zod";
 
 import {
   cleanStringToHTMLAttribute,
-  validateEmailRegex,
   notEqual,
   OmitFromExistingKeys,
+  validateEmailRegex,
 } from "shared";
-import { z } from "zod";
 
 const componentName = "im-fillable-list";
 
@@ -165,7 +165,7 @@ const EmailsValuesSummary = ({
             className={fr.cx("fr-tag", "fr-tag--dismiss")}
             onClick={() => onDelete(value)}
             key={value}
-            arial-label={`Supprimer l'adresse email ${value}`}
+            aria-label={`Supprimer l'adresse email ${value}`}
           >
             {value}
           </button>

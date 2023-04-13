@@ -1,4 +1,5 @@
 import { filter, map, switchMap, tap } from "rxjs";
+
 import { establishmentSlice } from "src/core-logic/domain/establishmentPath/establishment.slice";
 import {
   SiretAction,

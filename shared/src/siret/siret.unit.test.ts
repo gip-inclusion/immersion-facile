@@ -1,4 +1,5 @@
 import { zTrimmedString } from "../zodUtils";
+
 import { siretSchema } from "./siret.schema";
 
 describe("siretSchema", () => {

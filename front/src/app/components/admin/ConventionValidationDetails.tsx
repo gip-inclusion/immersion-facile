@@ -1,14 +1,17 @@
 import React, { ReactNode, useRef, useState } from "react";
+import { fr } from "@codegouvfr/react-dsfr";
+import { useStyles } from "tss-react/dsfr";
+
 import { ConventionReadDto, path } from "shared";
-import type { ConventionValidationProps } from "./ConventionValidation";
+
 import { sections } from "src/app/contents/admin/conventionValidation";
 import {
   ColField,
   FieldsAndTitle,
   RowFields,
 } from "src/app/contents/admin/types";
-import { fr } from "@codegouvfr/react-dsfr";
-import { useStyles } from "tss-react/dsfr";
+
+import type { ConventionValidationProps } from "./ConventionValidation";
 
 const cellStyles = {
   overflow: "hidden",

@@ -1,4 +1,5 @@
 import { Pool } from "pg";
+
 import { ConventionsReminder } from "../../../domain/convention/useCases/ConventionsReminder";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { createLogger } from "../../../utils/logger";
@@ -6,6 +7,7 @@ import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGatewa
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { AppConfig } from "../config/appConfig";
 import { createUowPerformer } from "../config/uowConfig";
+
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
 const logger = createLogger(__filename);

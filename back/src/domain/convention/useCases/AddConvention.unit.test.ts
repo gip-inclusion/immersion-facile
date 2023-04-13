@@ -1,8 +1,9 @@
 import {
-  conventionStatuses,
   ConventionDtoBuilder,
+  conventionStatuses,
   expectPromiseToFailWithError,
 } from "shared";
+
 import { SirenEstablishmentDtoBuilder } from "../../../_testBuilders/SirenEstablishmentDtoBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
@@ -11,18 +12,19 @@ import {
   ForbiddenError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
+import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryFeatureFlagRepository } from "../../../adapters/secondary/InMemoryFeatureFlagRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemorySirenGateway } from "../../../adapters/secondary/sirene/InMemorySirenGateway";
-import { AddConvention } from "./AddConvention";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
 } from "../../core/eventBus/EventBus";
 import { DomainEvent } from "../../core/eventBus/events";
-import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
+
+import { AddConvention } from "./AddConvention";
 
 describe("Add Convention", () => {
   let addConvention: AddConvention;

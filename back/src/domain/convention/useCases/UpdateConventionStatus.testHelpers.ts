@@ -1,18 +1,19 @@
 import {
-  conventionStatuses,
   allRoles,
   ConventionDto,
   ConventionDtoBuilder,
   ConventionId,
   ConventionStatus,
+  conventionStatuses,
   createConventionMagicLinkPayload,
-  Role,
+  doesStatusNeedsJustification,
   expectPromiseToFailWithError,
+  expectToEqual,
+  Role,
   splitCasesBetweenPassingAndFailing,
   UpdateConventionStatusRequestDto,
-  expectToEqual,
-  doesStatusNeedsJustification,
 } from "shared";
+
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,

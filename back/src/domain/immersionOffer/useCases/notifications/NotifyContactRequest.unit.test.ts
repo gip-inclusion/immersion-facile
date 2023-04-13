@@ -1,11 +1,5 @@
 import { ContactEstablishmentRequestDto } from "shared";
-import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
-import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
-import {
-  InMemoryEstablishmentAggregateRepository,
-  TEST_ROME_LABEL,
-} from "../../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
-import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+
 import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBuilder";
 import {
   expectContactByEmailRequest,
@@ -15,6 +9,14 @@ import {
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
+import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
+import {
+  InMemoryEstablishmentAggregateRepository,
+  TEST_ROME_LABEL,
+} from "../../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
+import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+
 import { NotifyContactRequest } from "./NotifyContactRequest";
 
 const immersionOffer = new ImmersionOfferEntityV2Builder().build();

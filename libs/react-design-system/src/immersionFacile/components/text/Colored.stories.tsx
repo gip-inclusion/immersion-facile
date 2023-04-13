@@ -1,7 +1,8 @@
-import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
 import React from "react";
-import { textPrefix } from ".";
+import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
+
 import { Colored, ColoredProps } from "./Colored";
+import { textPrefix } from ".";
 
 const Component = Colored;
 const argTypes: Partial<ArgTypes<ColoredProps>> | undefined = {};

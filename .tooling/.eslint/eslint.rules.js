@@ -4,6 +4,36 @@ module.exports = {
   "no-return-await": "off",
   "require-await": "off",
   "no-console": "error",
+  "react/no-unescaped-entities": "off",
+  "import/no-unresolved": "off",
+  "import/named": "off",
+  "react/no-array-index-key": "warn",
+  "simple-import-sort/imports": [
+    "error",
+    {
+      groups: [
+        // Packages `react` related packages come first.
+        ["^react", "^@?\\w"],
+        // Internal packages.
+        ["^(@|components)(/.*|$)"],
+        // Our own packages
+        ["shared"],
+        ["react-design-system"],
+        ["html-templates"],
+        ["http-client"],
+        ["^src/"],
+        // Side effect imports.
+        ["^\\u0000"],
+        // Parent imports. Put `..` last.
+        ["^\\.\\.(?!/?$)", "^\\.\\./?$"],
+        // Other relative imports. Put same-folder imports and `.` last.
+        ["^\\./(?=.*/)(?!/?$)", "^\\.(?!/?$)", "^\\./?$"],
+        // Style imports.
+        ["^.+\\.?((c|sc)ss)$"],
+      ],
+    },
+  ],
+  "simple-import-sort/exports": "error",
 };
 
 const toAdd = {

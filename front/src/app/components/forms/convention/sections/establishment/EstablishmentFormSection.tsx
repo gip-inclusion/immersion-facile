@@ -1,11 +1,14 @@
+import React from "react";
+import { useFormContext } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
-import React from "react";
-import { SectionTitle } from "react-design-system";
-import { useFormContext } from "react-hook-form";
-import { useDispatch } from "react-redux";
+
 import { ConventionDto, FederatedIdentity } from "shared";
+
+import { SectionTitle } from "react-design-system";
+
 import { ShareActions } from "src/app/components/forms/convention/ShareActions";
 import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
@@ -16,6 +19,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useSiretFetcher } from "src/app/hooks/siret.hooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
+
 import { EstablishementTutorFields } from "./EstablishementTutorFields";
 import { EstablishmentBusinessFields } from "./EstablishmentBusinessFields";
 import { EstablishmentRepresentativeFields } from "./EstablishmentRepresentativeFields";

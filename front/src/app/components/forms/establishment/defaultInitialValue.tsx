@@ -4,6 +4,7 @@ import {
   OmitFromExistingKeys,
   SiretDto,
 } from "shared";
+
 import { emptyAppellation } from "./MultipleAppellationInput";
 
 export const defaultInitialValue = (

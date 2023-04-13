@@ -1,6 +1,8 @@
 import { createTemplatesByName, EmailButtonProps } from "html-templates";
+
 import { InternshipKind } from "../convention/convention.dto";
 import { isStringDate, toDisplayedDate } from "../utils/date";
+
 import { advices } from "./advices";
 import { defaultConventionFinalLegals } from "./defaultConventionFinalLegals";
 import { EmailParamsByEmailType } from "./EmailParamsByEmailType";

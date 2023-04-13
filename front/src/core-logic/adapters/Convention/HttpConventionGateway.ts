@@ -1,6 +1,7 @@
 import { AxiosInstance } from "axios";
 import { from, Observable } from "rxjs";
 import { fromPromise } from "rxjs/internal/observable/innerFrom";
+
 import {
   AbsoluteUrl,
   absoluteUrlSchema,
@@ -25,6 +26,7 @@ import {
   WithConventionId,
   withConventionIdSchema,
 } from "shared";
+
 import { FetchConventionRequestedPayload } from "src/core-logic/domain/convention/convention.slice";
 import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 

@@ -5,11 +5,13 @@ import {
   map,
   switchMap,
 } from "rxjs";
+
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
+
 import { geosearchSlice } from "./geosearch.slice";
 
 type GeosearchAction = ActionOfSlice<typeof geosearchSlice>;

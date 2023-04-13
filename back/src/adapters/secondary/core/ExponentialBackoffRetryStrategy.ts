@@ -3,12 +3,14 @@ import {
   minutesToMilliseconds,
   secondsToMilliseconds,
 } from "date-fns";
+
 import { RandomFn, SleepFn } from "shared";
-import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
+
 import {
   RetryableError,
   RetryStrategy,
 } from "../../../domain/core/ports/RetryStrategy";
+import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
 import { createLogger } from "../../../utils/logger";
 
 export const defaultMaxBackoffPeriodMs = minutesToMilliseconds(1);

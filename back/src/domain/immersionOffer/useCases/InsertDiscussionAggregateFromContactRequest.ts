@@ -1,14 +1,16 @@
+import subDays from "date-fns/subDays";
+
 import {
   ContactEstablishmentRequestDto,
   contactEstablishmentRequestSchema,
 } from "shared";
+
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { DiscussionAggregate } from "../entities/DiscussionAggregate";
-import subDays from "date-fns/subDays";
 
 export class InsertDiscussionAggregateFromContactRequest extends TransactionalUseCase<
   ContactEstablishmentRequestDto,

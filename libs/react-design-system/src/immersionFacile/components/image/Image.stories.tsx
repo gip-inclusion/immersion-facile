@@ -1,7 +1,8 @@
-import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
 import React from "react";
-import { imagePrefix } from ".";
+import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
+
 import { Image, ImageProps } from "./Image";
+import { imagePrefix } from ".";
 
 const Component = Image;
 const argTypes: Partial<ArgTypes<ImageProps>> | undefined = {};

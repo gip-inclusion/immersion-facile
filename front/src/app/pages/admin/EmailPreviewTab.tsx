@@ -1,20 +1,23 @@
-import { fr } from "@codegouvfr/react-dsfr";
-import { configureGenerateHtmlFromTemplate } from "html-templates";
-import {
-  cciCustomHtmlFooter,
-  cciCustomHtmlHeader,
-} from "html-templates/src/components/email";
-import { keys } from "ramda";
 import React, { useEffect, useState } from "react";
-import { DsfrTitle, ImmersionTextField } from "react-design-system";
+import { fr } from "@codegouvfr/react-dsfr";
 import { Select } from "@codegouvfr/react-dsfr/Select";
+import { keys } from "ramda";
+import { useStyles } from "tss-react/dsfr";
+
 import {
   domElementIds,
   immersionFacileContactEmail,
   internshipKinds,
   templatesByName,
 } from "shared";
-import { useStyles } from "tss-react/dsfr";
+
+import { DsfrTitle, ImmersionTextField } from "react-design-system";
+
+import { configureGenerateHtmlFromTemplate } from "html-templates";
+import {
+  cciCustomHtmlFooter,
+  cciCustomHtmlHeader,
+} from "html-templates/src/components/email";
 
 const defaultEmailPreviewUrl =
   "https://upload.wikimedia.org/wikipedia/en/9/9a/Trollface_non-free.png";
@@ -121,8 +124,8 @@ export const EmailPreviewTab = () => {
             {fakeContent.attachment ? (
               <ul>
                 {fakeContent.attachment.map((att) => (
-                  <li>
-                    <a target={"_blank"} href={att.url}>
+                  <li key={att.url}>
+                    <a target={"_blank"} href={att.url} rel="noreferrer">
                       {att.url}
                     </a>
                   </li>

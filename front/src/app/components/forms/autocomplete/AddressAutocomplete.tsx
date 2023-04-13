@@ -1,11 +1,15 @@
-import Autocomplete from "@mui/material/Autocomplete";
 import React, { useEffect, useState } from "react";
-import { AutocompleteInput } from "react-design-system";
-import { AddressAndPosition, addressDtoToString } from "shared";
-import { useDebounce } from "src/app/hooks/useDebounce";
-import { getAddressesFromApi } from "./getAddressesFromApi";
-import { useStyles } from "tss-react/dsfr";
 import { fr } from "@codegouvfr/react-dsfr";
+import Autocomplete from "@mui/material/Autocomplete";
+import { useStyles } from "tss-react/dsfr";
+
+import { AddressAndPosition, addressDtoToString } from "shared";
+
+import { AutocompleteInput } from "react-design-system";
+
+import { useDebounce } from "src/app/hooks/useDebounce";
+
+import { getAddressesFromApi } from "./getAddressesFromApi";
 export type AddressAutocompleteProps = {
   label: string;
   initialSearchTerm?: string;
@@ -81,13 +85,16 @@ export const AddressAutocomplete = ({
         onChange={onAutocompleteChange(setSelectedOption, setFormValue)}
         onInputChange={onAutocompleteInput(setSearchTerm)}
         filterOptions={(option) => option} // https://mui.com/material-ui/react-autocomplete/#search-as-you-type
-        renderInput={AutocompleteInput(
-          headerClassName,
-          label,
-          inputStyle,
-          disabled,
-          placeholder,
-          id,
+        renderInput={(params) => (
+          <AutocompleteInput
+            headerClassName={headerClassName}
+            label={label}
+            inputStyle={inputStyle}
+            disabled={disabled}
+            placeholder={placeholder}
+            id={id}
+            params={params}
+          />
         )}
       />
       {notice && (

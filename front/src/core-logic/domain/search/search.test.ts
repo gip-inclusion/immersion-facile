@@ -1,4 +1,5 @@
 import { expectToEqual, SearchImmersionResultDto } from "shared";
+
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import {
   searchSlice,

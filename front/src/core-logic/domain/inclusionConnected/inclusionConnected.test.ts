@@ -1,4 +1,5 @@
 import { expectToEqual } from "shared";
+
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import {
   InclusionConnectedFeedback,

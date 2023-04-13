@@ -1,4 +1,8 @@
 import React from "react";
+import { useFormContext } from "react-hook-form";
+import { fr } from "@codegouvfr/react-dsfr";
+import { useStyles } from "tss-react/dsfr";
+
 import {
   calculateNumberOfWorkedDays,
   calculateTotalImmersionHoursFromComplexSchedule,
@@ -14,9 +18,6 @@ import {
   ScheduleDtoBuilder,
 } from "shared";
 
-import { fr } from "@codegouvfr/react-dsfr";
-import { useFormContext } from "react-hook-form";
-import { useStyles } from "tss-react/dsfr";
 import { HourPicker } from "./HourPicker";
 import { TotalWeeklyHoursIndicator } from "./TotaWeeklylHoursIndicator";
 import { WeekdayPicker } from "./WeekdayPicker";

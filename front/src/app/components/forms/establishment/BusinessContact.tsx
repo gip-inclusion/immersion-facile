@@ -1,9 +1,11 @@
+import React from "react";
+import { useFormContext, UseFormRegisterReturn } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
-import React from "react";
-import { useFormContext, UseFormRegisterReturn } from "react-hook-form";
+
 import { FormEstablishmentDto, zEmail } from "shared";
+
 import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
 import { RadioButtonOption } from "src/app/contents/forms/common/values";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";

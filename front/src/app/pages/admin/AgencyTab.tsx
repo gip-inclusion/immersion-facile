@@ -1,15 +1,16 @@
 import React from "react";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
+
 import { AgencyDto } from "shared";
 
 import { ActivateAgency } from "src/app/components/agency/ActivateAgency";
+import { agencySubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
 import { EditAgency } from "src/app/components/agency/EditAgency";
 import { MetabaseView } from "src/app/components/MetabaseView";
-import { useAdminDashboard } from "src/app/pages/admin/useAdminDashboard";
-import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
-import { agencySubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { useAdminDashboard } from "src/app/pages/admin/useAdminDashboard";
+import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
 
 export const AgencyTab = () => {
   const agency = useAppSelector(agencyAdminSelectors.agency);

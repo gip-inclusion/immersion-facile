@@ -1,6 +1,6 @@
 import React from "react";
-import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { fr } from "@codegouvfr/react-dsfr";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 
 export const ConventionEmailWarning = () => (
   <Alert

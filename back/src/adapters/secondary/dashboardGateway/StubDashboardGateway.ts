@@ -1,9 +1,10 @@
 import {
   AbsoluteUrl,
+  AdminDashboardName,
   AgencyId,
   ConventionId,
-  AdminDashboardName,
 } from "shared";
+
 import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
 import { createLogger } from "../../../utils/logger";
 

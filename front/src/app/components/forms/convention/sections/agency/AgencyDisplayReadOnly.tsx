@@ -1,12 +1,16 @@
-import { Select } from "@codegouvfr/react-dsfr/Select";
 import React, { useEffect, useState } from "react";
-import { Loader } from "react-design-system";
 import { useFormContext } from "react-hook-form";
+import { Select } from "@codegouvfr/react-dsfr/Select";
+
 import type { ConventionDto, ConventionReadDto } from "shared";
 import { AgencyOption } from "shared";
+
+import { Loader } from "react-design-system";
+
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { agencyGateway } from "src/config/dependencies";
+
 import { AgencyErrorText } from "./AgencyErrorText";
 
 type AgencyDisplayProps = {

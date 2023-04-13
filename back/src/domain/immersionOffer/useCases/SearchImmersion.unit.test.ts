@@ -4,6 +4,7 @@ import {
   SearchImmersionQueryParamsDto,
   SearchImmersionResultDto,
 } from "shared";
+
 import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import {
@@ -22,6 +23,7 @@ import {
 } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { SearchMadeEntity } from "../entities/SearchMadeEntity";
+
 import { SearchImmersion } from "./SearchImmersion";
 
 const secretariatRome = "M1607";

@@ -1,4 +1,5 @@
 import { FeatureFlag, FeatureFlags } from "shared";
+
 import { FeatureFlagRepository } from "../../domain/core/ports/FeatureFlagRepository";
 
 const defaultFlags: FeatureFlags = {

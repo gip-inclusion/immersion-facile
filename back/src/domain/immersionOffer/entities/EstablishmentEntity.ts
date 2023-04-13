@@ -6,6 +6,7 @@ import {
   NumberEmployeesRange,
   SiretDto,
 } from "shared";
+
 import { ContactEntity } from "./ContactEntity";
 import { ImmersionOfferEntityV2 } from "./ImmersionOfferEntity";
 

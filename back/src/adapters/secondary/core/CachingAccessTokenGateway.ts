@@ -1,10 +1,12 @@
 import { addSeconds } from "date-fns";
 import isAfter from "date-fns/isAfter";
+
 import {
   AccessTokenGateway,
   GetAccessTokenResponse,
 } from "../../../domain/core/ports/AccessTokenGateway";
 import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
+
 import { RealTimeGateway } from "./TimeGateway/RealTimeGateway";
 
 type Scope = string;

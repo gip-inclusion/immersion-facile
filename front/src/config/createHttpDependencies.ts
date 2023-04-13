@@ -1,14 +1,16 @@
-import { configureHttpClient, createAxiosHandlerCreator } from "http-client";
 import {
   addressTargets,
   adminTargets,
+  agencyTargets,
   createManagedAxiosInstance,
   establishmentTargets,
   inclusionConnectedAllowedTargets,
   searchTargets,
-  agencyTargets,
   validateEmailsTargets,
 } from "shared";
+
+import { configureHttpClient, createAxiosHandlerCreator } from "http-client";
+
 import { createCommonDependencies } from "src/config/createCommonDependencies";
 import type { Dependencies } from "src/config/dependencies";
 import { HttpAddressGateway } from "src/core-logic/adapters/AddressGateway/HttpAddressGateway";

@@ -1,8 +1,10 @@
 import React from "react";
+import { fr } from "@codegouvfr/react-dsfr";
+
 import { DailyScheduleDto, makeImmersionTimetable } from "shared";
+
 import { DayCircle } from "./DayCircle";
 import { WeeklyRow } from "./WeeklyRow";
-import { fr } from "@codegouvfr/react-dsfr";
 
 type DayPickerProps = {
   complexSchedule: DailyScheduleDto[];

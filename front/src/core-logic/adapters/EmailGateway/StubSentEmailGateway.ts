@@ -1,4 +1,5 @@
 import { Observable, of } from "rxjs";
+
 import { BackOfficeJwt, EmailSentDto } from "shared";
 
 export class StubSentEmailGateway implements StubSentEmailGateway {

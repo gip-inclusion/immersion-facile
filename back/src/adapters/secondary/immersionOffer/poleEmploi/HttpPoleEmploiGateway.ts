@@ -1,9 +1,11 @@
 import { AxiosResponse } from "axios";
 import secondsToMilliseconds from "date-fns/secondsToMilliseconds";
+
 import { AbsoluteUrl } from "shared";
+
 import {
-  PoleEmploiGateway,
   PoleEmploiConvention,
+  PoleEmploiGateway,
 } from "../../../../domain/convention/ports/PoleEmploiGateway";
 import { AccessTokenGateway } from "../../../../domain/core/ports/AccessTokenGateway";
 import { RateLimiter } from "../../../../domain/core/ports/RateLimiter";

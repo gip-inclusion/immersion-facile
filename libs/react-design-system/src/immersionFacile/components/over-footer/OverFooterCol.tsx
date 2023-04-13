@@ -50,6 +50,7 @@ export const OverFooterCol = ({
                     "fr-icon-arrow-right-line",
                     "fr-link--icon-right",
                   )}
+                  rel="noreferrer"
                 >
                   {link.label}
                 </a>

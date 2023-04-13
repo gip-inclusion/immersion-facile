@@ -1,8 +1,9 @@
 import {
-  SirenEstablishmentDto,
   GetSiretRequestDto,
   getSiretRequestSchema,
+  SirenEstablishmentDto,
 } from "shared";
+
 import { UseCase } from "../../core/UseCase";
 import { SirenGateway } from "../ports/SirenGateway";
 import { getSirenEstablishmentFromApi } from "../service/getSirenEstablishmentFromApi";

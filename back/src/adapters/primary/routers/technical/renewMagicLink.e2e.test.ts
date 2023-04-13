@@ -7,6 +7,8 @@ import {
   RenewMagicLinkRequestDto,
   TemplatedEmail,
 } from "shared";
+
+import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import {
   GenerateConventionJwt,
   makeGenerateJwtES256,
@@ -18,7 +20,6 @@ import {
   EventBus,
   makeCreateNewEvent,
 } from "../../../../domain/core/eventBus/EventBus";
-import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
 import { InMemoryEventBus } from "../../../secondary/core/InMemoryEventBus";
 import { CustomTimeGateway } from "../../../secondary/core/TimeGateway/CustomTimeGateway";

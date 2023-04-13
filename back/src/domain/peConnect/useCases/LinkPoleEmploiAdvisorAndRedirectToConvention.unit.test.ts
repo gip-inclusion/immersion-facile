@@ -1,4 +1,5 @@
 import { expectTypeToMatchAndEqual } from "shared";
+
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
@@ -6,14 +7,15 @@ import {
 import { CONVENTION_ID_DEFAULT_UUID } from "../../../adapters/secondary/InMemoryConventionPoleEmploiAdvisorRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemoryPeConnectGateway } from "../../../adapters/secondary/PeConnectGateway/InMemoryPeConnectGateway";
-import { conventionPoleEmploiUserAdvisorFromDto } from "../entities/ConventionPoleEmploiAdvisorEntity";
-import { LinkPoleEmploiAdvisorAndRedirectToConvention } from "./LinkPoleEmploiAdvisorAndRedirectToConvention";
 import { AccessTokenDto } from "../dto/AccessToken.dto";
 import {
   PeConnectAdvisorDto,
   PeConnectImmersionAdvisorDto,
 } from "../dto/PeConnectAdvisor.dto";
 import { PeConnectUserDto } from "../dto/PeConnectUser.dto";
+import { conventionPoleEmploiUserAdvisorFromDto } from "../entities/ConventionPoleEmploiAdvisorEntity";
+
+import { LinkPoleEmploiAdvisorAndRedirectToConvention } from "./LinkPoleEmploiAdvisorAndRedirectToConvention";
 
 describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
   let uow: InMemoryUnitOfWork;

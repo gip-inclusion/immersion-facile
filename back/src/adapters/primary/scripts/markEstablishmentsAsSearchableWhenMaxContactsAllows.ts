@@ -1,8 +1,10 @@
 import { Pool } from "pg";
+
 import { MarkEstablishmentsAsSearchableScript } from "../../../domain/immersionOffer/useCases/MarkEstablishmentsAsSearchableScript";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { PgEstablishmentAggregateRepository } from "../../secondary/pg/PgEstablishmentAggregateRepository";
 import { AppConfig } from "../config/appConfig";
+
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
 const config = AppConfig.createFromEnv();

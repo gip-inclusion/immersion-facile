@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 import {
   allRoles,
   ConventionDto,
@@ -7,7 +9,7 @@ import {
   Role,
   zTrimmedString,
 } from "shared";
-import { z } from "zod";
+
 import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import {

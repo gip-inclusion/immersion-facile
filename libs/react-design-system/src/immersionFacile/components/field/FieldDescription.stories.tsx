@@ -1,10 +1,11 @@
-import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
 import React from "react";
-import { fieldPrefix } from ".";
+import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
+
 import {
   FieldDescription,
   FieldDescriptionProperties,
 } from "./FieldDescription";
+import { fieldPrefix } from ".";
 
 const Component = FieldDescription;
 const argTypes: Partial<ArgTypes<FieldDescriptionProperties>> | undefined = {};

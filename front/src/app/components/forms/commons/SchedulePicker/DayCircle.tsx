@@ -1,7 +1,8 @@
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import React from "react";
-import { DayStatus } from "./utils/getDayStatus";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useStyles } from "tss-react/dsfr";
+
+import { DayStatus } from "./utils/getDayStatus";
 
 type DayCircleProps = {
   dayStatus: DayStatus;

@@ -2,8 +2,10 @@ import { Workbook } from "exceljs";
 import extract from "extract-zip";
 import fs from "fs";
 import * as path from "path";
-import { ExcelExportGateway } from "./ExcelExportGateway";
+
 import { makeTemporaryStorageFolder } from "../../../utils/filesystemUtils";
+
+import { ExcelExportGateway } from "./ExcelExportGateway";
 
 describe("ExcelExportGateway", () => {
   it("Saves a record of multiple sheets into an ZIP file", async () => {

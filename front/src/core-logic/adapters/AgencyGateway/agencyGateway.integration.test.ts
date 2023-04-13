@@ -1,5 +1,7 @@
 import { firstValueFrom, Observable } from "rxjs";
+
 import { AgencyId } from "shared";
+
 import { InMemoryAgencyGateway } from "src/core-logic/adapters/AgencyGateway/InMemoryAgencyGateway";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 

@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { keys } from "ramda";
 import { fr } from "@codegouvfr/react-dsfr";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
-import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
-import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { ErrorNotifications } from "react-design-system";
+import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { keys } from "ramda";
+
 import {
   AppellationDto,
   defaultMaxContactsPerWeek,
@@ -20,12 +20,9 @@ import {
   SiretDto,
   toDotNotation,
 } from "shared";
-import { BusinessContact } from "./BusinessContact";
-import {
-  emptyAppellation,
-  MultipleAppellationInput,
-} from "./MultipleAppellationInput";
-import { SearchResultPreview } from "./SearchResultPreview";
+
+import { ErrorNotifications } from "react-design-system";
+
 import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 import {
@@ -33,6 +30,13 @@ import {
   useFormContents,
 } from "src/app/hooks/formContents.hooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
+
+import { BusinessContact } from "./BusinessContact";
+import {
+  emptyAppellation,
+  MultipleAppellationInput,
+} from "./MultipleAppellationInput";
+import { SearchResultPreview } from "./SearchResultPreview";
 
 type EstablishmentFormProps = {
   initialValues: FormEstablishmentDto;
@@ -103,7 +107,11 @@ export const EstablishmentForm = ({
       </p>
       <p>
         En référençant votre entreprise, vous rejoignez la communauté{" "}
-        <a href={"https://lesentreprises-sengagent.gouv.fr/"} target={"_blank"}>
+        <a
+          href={"https://lesentreprises-sengagent.gouv.fr/"}
+          target={"_blank"}
+          rel="noreferrer"
+        >
           « Les entreprises s'engagent »
         </a>
         .

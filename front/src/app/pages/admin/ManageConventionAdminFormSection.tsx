@@ -1,16 +1,19 @@
 import React from "react";
-import { DsfrTitle } from "react-design-system";
-import { Input } from "@codegouvfr/react-dsfr/Input";
-import Button from "@codegouvfr/react-dsfr/Button";
-import { fr } from "@codegouvfr/react-dsfr";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { routes } from "src/app/routes/routes";
+import { fr } from "@codegouvfr/react-dsfr";
+import Button from "@codegouvfr/react-dsfr/Button";
+import { Input } from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
+
 import {
   ManageConventionAdminForm,
   manageConventionAdminFormSchema,
 } from "shared";
+
+import { DsfrTitle } from "react-design-system";
+
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
+import { routes } from "src/app/routes/routes";
 
 export const ManageConventionAdminFormSection = (): JSX.Element => {
   const { register, handleSubmit, formState } =

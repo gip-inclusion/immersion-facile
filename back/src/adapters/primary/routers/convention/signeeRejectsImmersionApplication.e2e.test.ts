@@ -9,11 +9,11 @@ import {
   UpdateConventionStatusRequestDto,
   updateConventionStatusRoute,
 } from "shared";
+
 import {
   buildTestApp,
   TestAppAndDeps,
 } from "../../../../_testBuilders/buildTestApp";
-
 import { InMemoryConventionRepository } from "../../../secondary/InMemoryConventionRepository";
 
 describe("Add Convention Notifications, then checks the mails are sent (trigerred by events)", () => {

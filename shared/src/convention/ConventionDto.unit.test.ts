@@ -1,7 +1,9 @@
 import { addDays, subYears } from "date-fns";
 import { keys } from "ramda";
+
 import { reasonableSchedule } from "../schedule/ScheduleUtils";
 import { splitCasesBetweenPassingAndFailing } from "../test.helpers";
+
 import {
   Beneficiary,
   BeneficiaryCurrentEmployer,

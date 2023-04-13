@@ -1,9 +1,10 @@
+import { filter, join } from "ramda";
+
 import {
   Beneficiary,
   BeneficiaryRepresentative,
   InternshipKind,
 } from "../convention/convention.dto";
-import { filter, join } from "ramda";
 import { pipeWithValue } from "../pipeWithValue";
 
 const isTruthy = <T>(t: T | null | undefined): t is T => !!t;

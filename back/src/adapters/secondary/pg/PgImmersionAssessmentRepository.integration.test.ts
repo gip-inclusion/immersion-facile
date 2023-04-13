@@ -1,4 +1,5 @@
 import { Pool, PoolClient } from "pg";
+
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
@@ -6,8 +7,10 @@ import {
   expectPromiseToFailWithError,
   expectTypeToMatchAndEqual,
 } from "shared";
-import { ImmersionAssessmentEntity } from "../../../domain/convention/entities/ImmersionAssessmentEntity";
+
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
+import { ImmersionAssessmentEntity } from "../../../domain/convention/entities/ImmersionAssessmentEntity";
+
 import { PgAgencyRepository } from "./PgAgencyRepository";
 import { PgConventionRepository } from "./PgConventionRepository";
 import { PgImmersionAssessmentRepository } from "./PgImmersionAssessmentRepository";

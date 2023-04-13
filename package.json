@@ -44,5 +44,9 @@
   },
   "engines": {
     "node": "^16.15.0"
+  },
+  "dependencies": {
+    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-simple-import-sort": "^10.0.0"
   }
 }

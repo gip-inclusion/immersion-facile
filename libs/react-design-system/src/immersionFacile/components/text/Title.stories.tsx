@@ -1,7 +1,8 @@
-import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
 import React from "react";
-import { textPrefix } from ".";
+import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
+
 import { Title, TitleProps } from "./Title";
+import { textPrefix } from ".";
 
 const Component = Title;
 const argTypes: Partial<ArgTypes<TitleProps>> | undefined = {};

@@ -1,4 +1,5 @@
 import { Observable } from "rxjs";
+
 import { GetSiretInfo, SiretDto } from "shared";
 
 export interface SiretGatewayThroughBack {

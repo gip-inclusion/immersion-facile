@@ -1,16 +1,19 @@
+import React, { memo, useState } from "react";
+import LinesEllipsis from "react-lines-ellipsis";
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
-import React, { useState, memo } from "react";
+import { useStyles } from "tss-react/dsfr";
+
 import {
   addressDtoToString,
   ContactMethod,
   SearchImmersionResultDto,
 } from "shared";
-import { getMapsLink } from "./ContactEstablishmentModal";
-import LinesEllipsis from "react-lines-ellipsis";
-import "./SearchResult.scss";
-import { useStyles } from "tss-react/dsfr";
 import { toAbsoluteUrl } from "shared";
+
+import { getMapsLink } from "./ContactEstablishmentModal";
+
+import "./SearchResult.scss";
 
 export type EnterpriseSearchResultProps = {
   establishment: SearchImmersionResultDto;
@@ -113,6 +116,7 @@ const SearchResultComponent = ({
                   href={getMapsLink(establishment)}
                   target="_blank"
                   className={cx(`${componentName}__location-link`)}
+                  rel="noreferrer"
                 >
                   {addressDtoToString(address).toLocaleLowerCase()}
                 </a>{" "}
@@ -128,7 +132,11 @@ const SearchResultComponent = ({
               </li>
               {website && (
                 <li>
-                  <a href={toAbsoluteUrl(website)} target="_blank">
+                  <a
+                    href={toAbsoluteUrl(website)}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     Voir le site de l'entreprise
                   </a>
                 </li>

@@ -1,7 +1,12 @@
+import React, { useCallback, useEffect, useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import React, { useCallback, useEffect, useState } from "react";
+import { makeStyles } from "tss-react/dsfr";
+import { Route } from "type-route";
+
+import { SearchImmersionResultDto } from "shared";
+
 import {
   Loader,
   MainWrapper,
@@ -9,13 +14,12 @@ import {
   SectionAccordion,
   SectionTextEmbed,
 } from "react-design-system";
-import { SearchImmersionResultDto } from "shared";
+
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { AuthorizedGroupSlugs } from "src/app/routes/route-params";
 import { routes } from "src/app/routes/routes";
 import { immersionSearchGateway } from "src/config/dependencies";
-import { makeStyles } from "tss-react/dsfr";
-import { Route } from "type-route";
+
 import { GroupListResults } from "./GroupListResults";
 
 type GroupPageProps = {

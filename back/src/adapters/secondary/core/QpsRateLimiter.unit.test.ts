@@ -1,5 +1,5 @@
-import { QpsRateLimiter } from "./QpsRateLimiter";
 import { CustomTimeGateway } from "./TimeGateway/CustomTimeGateway";
+import { QpsRateLimiter } from "./QpsRateLimiter";
 
 describe("QpsRateLimiter", () => {
   let fakeClock: CustomTimeGateway;

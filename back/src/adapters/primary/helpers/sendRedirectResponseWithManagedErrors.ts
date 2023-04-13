@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
+
 import { AbsoluteUrl, ManagedRedirectError, RawRedirectError } from "shared";
+
 import { createLogger } from "../../../utils/logger";
+
 import { handleHttpJsonResponseError } from "./handleHttpJsonResponseError";
 
 const logger = createLogger(__filename);

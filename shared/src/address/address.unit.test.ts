@@ -1,7 +1,7 @@
 import {
   captureAddressGroups,
-  inferDepartmentCode,
   CaptureAddressGroupsResult,
+  inferDepartmentCode,
 } from "../utils/address";
 
 describe("address", () => {

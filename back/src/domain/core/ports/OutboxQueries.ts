@@ -1,4 +1,5 @@
 import { EstablishmentJwtPayload } from "shared";
+
 import { DomainEvent } from "../eventBus/events";
 
 export interface OutboxQueries {

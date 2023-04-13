@@ -1,5 +1,6 @@
 import * as fse from "fs-extra";
 import * as path from "path";
+
 import { AppConfig } from "../adapters/primary/config/appConfig";
 
 export const makeTemporaryStorageFolder = async (): Promise<string> => {

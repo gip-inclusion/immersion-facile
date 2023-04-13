@@ -1,19 +1,22 @@
-import immersionFacileLogo from "/assets/img/logo-if.svg";
-import { makeStyles } from "tss-react/dsfr";
-import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";
 import React from "react";
 import { useDispatch } from "react-redux";
-import { routes, useRoute } from "src/app/routes/routes";
-import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
-import { adminAuthSlice } from "src/core-logic/domain/admin/adminAuth/adminAuth.slice";
-import { Header, HeaderProps } from "@codegouvfr/react-dsfr/Header";
 import {
   Display,
   headerFooterDisplayItem,
 } from "@codegouvfr/react-dsfr/Display";
+import { Header, HeaderProps } from "@codegouvfr/react-dsfr/Header";
 import { MainNavigationProps } from "@codegouvfr/react-dsfr/MainNavigation";
+import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";
+import { makeStyles } from "tss-react/dsfr";
+
 import { domElementIds } from "shared";
+
+import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { routes, useRoute } from "src/app/routes/routes";
+import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
+import { adminAuthSlice } from "src/core-logic/domain/admin/adminAuth/adminAuth.slice";
+
+import immersionFacileLogo from "/assets/img/logo-if.svg";
 
 export const ImmersionHeader = () => {
   const dispatch = useDispatch();

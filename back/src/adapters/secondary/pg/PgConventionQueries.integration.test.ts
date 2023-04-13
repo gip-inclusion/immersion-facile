@@ -1,18 +1,21 @@
 import { addDays } from "date-fns";
 import { Pool, PoolClient } from "pg";
+
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   ConventionId,
   ConventionReadDto,
-  expectTypeToMatchAndEqual,
   expectArraysToEqualIgnoringOrder,
   expectToEqual,
+  expectTypeToMatchAndEqual,
 } from "shared";
-import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
+
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
+import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { RealTimeGateway } from "../core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../core/UuidGeneratorImplementations";
+
 import { PgAgencyRepository } from "./PgAgencyRepository";
 import { PgConventionQueries } from "./PgConventionQueries";
 import { PgConventionRepository } from "./PgConventionRepository";

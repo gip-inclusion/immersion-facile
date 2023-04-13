@@ -1,4 +1,6 @@
 import { addDays, startOfToday } from "date-fns";
+import { v4 as uuidV4 } from "uuid";
+
 import {
   ConventionDto,
   ConventionId,
@@ -15,6 +17,7 @@ import {
   Signatories,
   toDateString,
 } from "shared";
+
 import { ConventionCustomAgencyPageRoute } from "src/app/pages/convention/ConventionCustomAgencyPage";
 import { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
 import { ConventionMiniStagePageRoute } from "src/app/pages/convention/ConventionMiniStagePage";
@@ -22,7 +25,6 @@ import { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/C
 import { ConventionInUrl } from "src/app/routes/route-params";
 import { deviceRepository } from "src/config/dependencies";
 import { ENV } from "src/config/environmentVariables";
-import { v4 as uuidV4 } from "uuid";
 
 export const isConventionFrozen = (
   status: ConventionStatus | undefined,

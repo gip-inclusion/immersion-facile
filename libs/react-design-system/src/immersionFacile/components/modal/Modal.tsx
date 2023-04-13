@@ -1,11 +1,12 @@
-import { fr } from "@codegouvfr/react-dsfr";
-import classNames, { ArgumentArray } from "classnames";
 import React, { Children, cloneElement, useEffect } from "react";
-
 import ReactDOM from "react-dom";
 import Modal from "react-modal";
-import "./Modal.css";
+import { fr } from "@codegouvfr/react-dsfr";
+import classNames, { ArgumentArray } from "classnames";
+
 import { ModalClose } from "./ModalClose";
+
+import "./Modal.css";
 
 /**
  *

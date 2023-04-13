@@ -1,9 +1,12 @@
 import { keys } from "ramda";
+
 import { AgencyId, ApiConsumerId, SiretDto, sleep } from "shared";
+
+import { LookupLocation } from "../../../domain/address/useCases/LookupLocation";
 import { LookupStreetAddress } from "../../../domain/address/useCases/LookupStreetAddress";
 import {
-  GenerateBackOfficeJwt,
   GenerateAuthenticatedUserJwt,
+  GenerateBackOfficeJwt,
   GenerateConventionJwt,
   GenerateEditFormEstablishmentJwt,
 } from "../../../domain/auth/jwt";
@@ -26,6 +29,7 @@ import { DeliverRenewedMagicLink } from "../../../domain/convention/useCases/not
 import { NotifyAllActorsOfFinalConventionValidation } from "../../../domain/convention/useCases/notifications/NotifyAllActorsOfFinalConventionValidation";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
+import { NotifyConventionReminder } from "../../../domain/convention/useCases/notifications/NotifyConventionReminder";
 import { NotifyLastSigneeThatConventionHasBeenSigned } from "../../../domain/convention/useCases/notifications/NotifyLastSigneeThatConventionHasBeenSigned";
 import { NotifyNewApplicationNeedsReview } from "../../../domain/convention/useCases/notifications/NotifyNewApplicationNeedsReview";
 import { NotifyToAgencyApplicationSubmitted } from "../../../domain/convention/useCases/notifications/NotifyToAgencyApplicationSubmitted";
@@ -43,6 +47,7 @@ import { TransactionalUseCase, UseCase } from "../../../domain/core/UseCase";
 import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
 import { GetDashboardUrl } from "../../../domain/dashboard/useCases/GetDashboardUrl";
 import { GetUserAgencyDashboardUrl } from "../../../domain/dashboard/useCases/GetUserAgencyDashboardUrl";
+import { ValidateEmail } from "../../../domain/emailValidation/useCases/ValidateEmail";
 import { AdminLogin } from "../../../domain/generic/authentication/useCases/AdminLogin";
 import { UploadLogo } from "../../../domain/generic/fileManagement/useCases/UploadLogo";
 import { GetSentEmails } from "../../../domain/generic/notifications/useCases/GetSentEmails";
@@ -73,15 +78,13 @@ import { RomeSearch } from "../../../domain/rome/useCases/RomeSearch";
 import { GetSiret } from "../../../domain/sirene/useCases/GetSiret";
 import { GetSiretIfNotAlreadySaved } from "../../../domain/sirene/useCases/GetSiretIfNotAlreadySaved";
 import { NotFoundError } from "../helpers/httpErrors";
+
 import { AppConfig } from "./appConfig";
 import { Gateways } from "./createGateways";
 import {
   makeGenerateConventionMagicLinkUrl,
   makeGenerateEditFormEstablishmentUrl,
 } from "./magicLinkUrl";
-import { LookupLocation } from "../../../domain/address/useCases/LookupLocation";
-import { NotifyConventionReminder } from "../../../domain/convention/useCases/notifications/NotifyConventionReminder";
-import { ValidateEmail } from "../../../domain/emailValidation/useCases/ValidateEmail";
 
 export const createUseCases = (
   config: AppConfig,

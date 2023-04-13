@@ -1,8 +1,11 @@
 import { Pool, PoolClient } from "pg";
+
 import { GeoPositionDto } from "shared";
+
+import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { LaBonneBoiteRequestEntity } from "../../../domain/immersionOffer/entities/LaBonneBoiteRequestEntity";
 import { LaBonneBoiteRequestParams } from "../../../domain/immersionOffer/ports/LaBonneBoiteAPI";
-import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
+
 import { PgLaBonneBoiteRequestRepository } from "./PgLaBonneBoiteRequestRepository";
 
 describe("PgLaBonneBoiteRequestRepository", () => {

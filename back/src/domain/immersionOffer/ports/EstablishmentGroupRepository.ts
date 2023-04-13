@@ -1,4 +1,5 @@
 import { EstablishmentGroupSlug, SearchImmersionResultDto } from "shared";
+
 import { EstablishmentGroupEntity } from "../entities/EstablishmentGroupEntity";
 
 export interface EstablishmentGroupRepository {

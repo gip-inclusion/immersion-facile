@@ -1,4 +1,5 @@
 import { PoolClient, QueryResult } from "pg";
+
 import {
   Beneficiary,
   BeneficiaryCurrentEmployer,
@@ -13,7 +14,9 @@ import {
   isBeneficiaryStudent,
   isEstablishmentTutorIsEstablishmentRepresentative,
 } from "shared";
+
 import { ConventionRepository } from "../../../domain/convention/ports/ConventionRepository";
+
 import { getReadConventionById } from "./pgConventionSql";
 
 export const beneficiaryCurrentEmployerIdColumnName =

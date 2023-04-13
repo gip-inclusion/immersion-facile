@@ -1,10 +1,13 @@
 import { Pool } from "pg";
+
 import { FormEstablishmentDto, random, sleep } from "shared";
+
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { InsertEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
 import { createLogger } from "../../../utils/logger";
 import { notifyDiscord } from "../../../utils/notifyDiscord";
+import { HttpAddressGateway } from "../../secondary/addressGateway/HttpAddressGateway";
 import { addressesExternalTargets } from "../../secondary/addressGateway/HttpAddressGateway.targets";
 import {
   defaultMaxBackoffPeriodMs,
@@ -12,14 +15,13 @@ import {
   ExponentialBackoffRetryStrategy,
 } from "../../secondary/core/ExponentialBackoffRetryStrategy";
 import { QpsRateLimiter } from "../../secondary/core/QpsRateLimiter";
+import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
-import { AppConfig } from "../config/appConfig";
-import { createPgUow } from "../config/uowConfig";
 import { HttpSirenGateway } from "../../secondary/sirene/HttpSirenGateway";
-import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
-import { HttpAddressGateway } from "../../secondary/addressGateway/HttpAddressGateway";
+import { AppConfig } from "../config/appConfig";
 import { createHttpClientForExternalApi } from "../config/createGateways";
+import { createPgUow } from "../config/uowConfig";
 
 const maxQpsSireneApi = 0.25;
 

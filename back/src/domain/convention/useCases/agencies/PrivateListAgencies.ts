@@ -1,15 +1,17 @@
+import { map } from "ramda";
+
 import {
   AgencyDto,
   AgencyOption,
   PrivateListAgenciesRequestDto,
   privateListAgenciesRequestSchema,
 } from "shared";
+
 import {
-  UnitOfWorkPerformer,
   UnitOfWork,
+  UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { map } from "ramda";
 
 export class PrivateListAgencies extends TransactionalUseCase<
   PrivateListAgenciesRequestDto,

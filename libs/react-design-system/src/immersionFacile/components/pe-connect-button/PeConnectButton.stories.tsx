@@ -1,7 +1,8 @@
-import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
 import React from "react";
-import { peConnectButtonPrefix } from ".";
+import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
+
 import { PeConnectButton, PeConnectButtonProps } from "./PeConnectButton";
+import { peConnectButtonPrefix } from ".";
 
 const Component = PeConnectButton;
 const argTypes: Partial<ArgTypes<PeConnectButtonProps>> | undefined = {};

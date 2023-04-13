@@ -1,15 +1,17 @@
 import { PoolClient } from "pg";
 import promClient from "prom-client";
 import { differenceWith } from "ramda";
+
 import { propEq, replaceArrayElement } from "shared";
+
 import {
   DomainEvent,
   DomainTopic,
   EventFailure,
   EventPublication,
 } from "../../../domain/core/eventBus/events";
-import { DateStr } from "../../../domain/core/ports/TimeGateway";
 import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
+import { DateStr } from "../../../domain/core/ports/TimeGateway";
 
 const counterEventsSavedBeforePublish = new promClient.Counter({
   name: "pg_outbox_repository_events_saved_before_publish",

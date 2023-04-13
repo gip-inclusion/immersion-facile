@@ -1,12 +1,13 @@
 import { subYears } from "date-fns";
+
 import {
   createEstablishmentMagicLinkPayload,
   establishmentTargets,
   FormEstablishmentDtoBuilder,
 } from "shared";
+
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
-
 import { makeGenerateJwtES256 } from "../../../../domain/auth/jwt";
 import { TEST_ESTABLISHMENT1_SIRET } from "../../../secondary/sirene/InMemorySirenGateway";
 

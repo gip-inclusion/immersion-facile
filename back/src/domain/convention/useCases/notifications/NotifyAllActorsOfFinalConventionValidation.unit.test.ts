@@ -1,4 +1,5 @@
 import { parseISO } from "date-fns";
+
 import {
   AgencyDtoBuilder,
   ConventionDto,
@@ -10,12 +11,12 @@ import {
   frontRoutes,
   reasonableSchedule,
 } from "shared";
+
 import {
   expectEmailFinalValidationConfirmationMatchingConvention,
   getValidatedConventionFinalConfirmationParams,
 } from "../../../../_testBuilders/emailAssertions";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
-
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
@@ -24,6 +25,7 @@ import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGatew
 import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../peConnect/dto/PeConnect.dto";
+
 import { NotifyAllActorsOfFinalConventionValidation } from "./NotifyAllActorsOfFinalConventionValidation";
 
 const establishmentTutorEmail = "boss@mail.com";

@@ -5,6 +5,7 @@ import {
   SearchImmersionResultDto,
   SiretDto,
 } from "shared";
+
 import { ContactMethod } from "../../../../../../domain/immersionOffer/entities/ContactEntity";
 
 export type SearchContactDto = {

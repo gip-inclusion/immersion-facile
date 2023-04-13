@@ -1,6 +1,8 @@
-import { fr } from "@codegouvfr/react-dsfr";
 import React, { useEffect } from "react";
-import { Loader, MainWrapper } from "react-design-system";
+import { useDispatch } from "react-redux";
+import { fr } from "@codegouvfr/react-dsfr";
+import { Route } from "type-route";
+
 import {
   ConventionMagicLinkJwt,
   ConventionMagicLinkPayload,
@@ -9,17 +11,19 @@ import {
   prettyPrintSchedule,
   toDisplayedDate,
 } from "shared";
+
+import { Loader, MainWrapper } from "react-design-system";
+import { ConventionDocument } from "react-design-system";
+
 import { useConvention } from "src/app/hooks/convention.hooks";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import { routes } from "src/app/routes/routes";
-import { Route } from "type-route";
-import { ConventionDocument } from "react-design-system";
-import { useDispatch } from "react-redux";
-import { agencyInfoSlice } from "src/core-logic/domain/agencyInfo/agencyInfo.slice";
-import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { agencyInfoSelectors } from "src/core-logic/domain/agencyInfo/agencyInfo.selectors";
-import logoRf from "/assets/img/logo-rf.svg";
+import { agencyInfoSlice } from "src/core-logic/domain/agencyInfo/agencyInfo.slice";
+
 import logoIf from "/assets/img/logo-if.svg";
+import logoRf from "/assets/img/logo-rf.svg";
 
 const throwOnMissingSignDate = (signedAt: string | undefined): string => {
   if (!signedAt) throw new Error("Signature date is missing.");
@@ -70,8 +74,12 @@ export const ConventionDocumentPage = ({
   } = convention.signatories;
   const { internshipKind } = convention;
   const logos = [
-    <img src={logoRf} alt="Logo RF" />,
-    <img src={agencyInfo?.logoUrl ? agencyInfo.logoUrl : logoIf} alt="" />,
+    <img key="logo-rf" src={logoRf} alt="Logo RF" />,
+    <img
+      key={`logo-${agencyInfo?.name}`}
+      src={agencyInfo?.logoUrl ? agencyInfo.logoUrl : logoIf}
+      alt=""
+    />,
   ];
 
   return (
@@ -183,6 +191,7 @@ export const ConventionDocumentPage = ({
             <a
               href={`https://annuaire-entreprises.data.gouv.fr/etablissement/${convention.siret}`}
               target="_blank"
+              rel="noreferrer"
             >
               {convention.siret}
             </a>

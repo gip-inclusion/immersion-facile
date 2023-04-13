@@ -1,5 +1,6 @@
 import promClient from "prom-client";
 import { keys, prop } from "ramda";
+
 import {
   EventBus,
   EventCallback,
@@ -11,7 +12,7 @@ import {
   EventPublication,
   SubscriptionId,
 } from "../../../domain/core/eventBus/events";
-import { TimeGateway, DateStr } from "../../../domain/core/ports/TimeGateway";
+import { DateStr, TimeGateway } from "../../../domain/core/ports/TimeGateway";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";

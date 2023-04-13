@@ -1,5 +1,7 @@
 import jwt from "jsonwebtoken";
+
 import { AbsoluteUrl, AgencyId, ConventionId, DashboardName } from "shared";
+
 import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
 
 type DashboardKind = "dashboard" | "question";

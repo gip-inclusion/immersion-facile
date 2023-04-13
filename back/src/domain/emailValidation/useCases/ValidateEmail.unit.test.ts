@@ -3,7 +3,9 @@ import {
   ValidateEmailInput,
   ValidateEmailStatus,
 } from "shared";
+
 import { InMemoryEmailValidationGateway } from "../../../adapters/secondary/emailValidationGateway/InMemoryEmailValidationStatusGateway";
+
 import { ValidateEmail } from "./ValidateEmail";
 
 describe("Email validation status", () => {

@@ -1,5 +1,6 @@
-import { templatesByName } from "./templatesByName";
 import { ValueOf } from "../utils";
+
+import { templatesByName } from "./templatesByName";
 
 export type GenericTemplatedEmail<
   T extends string,

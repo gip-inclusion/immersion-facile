@@ -1,4 +1,4 @@
-import { zString, localization } from "../zodUtils";
+import { localization, zString } from "../zodUtils";
 
 // Matches strings that contain at least one 5-digit number.
 const postalCodeRegex = /(^|\s|,)\d{5}(\s|$|,)/;

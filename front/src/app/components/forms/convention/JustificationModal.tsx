@@ -1,11 +1,11 @@
-import { useForm, SubmitHandler } from "react-hook-form";
 import React from "react";
-import {
-  ModalClose,
-  ModalContent,
-  ModalDialog,
-  ModalTitle,
-} from "react-design-system";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { fr } from "@codegouvfr/react-dsfr";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
+import { Input } from "@codegouvfr/react-dsfr/Input";
+import { zodResolver } from "@hookform/resolvers/zod";
+
 import {
   ConventionStatusWithJustification,
   domElementIds,
@@ -13,11 +13,13 @@ import {
   WithStatusJustification,
   withStatusJustificationSchema,
 } from "shared";
-import { Input } from "@codegouvfr/react-dsfr/Input";
-import { fr } from "@codegouvfr/react-dsfr";
-import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
-import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import { zodResolver } from "@hookform/resolvers/zod";
+
+import {
+  ModalClose,
+  ModalContent,
+  ModalDialog,
+  ModalTitle,
+} from "react-design-system";
 
 type JustificationModalProps = {
   title: React.ReactNode;

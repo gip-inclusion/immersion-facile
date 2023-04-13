@@ -1,8 +1,9 @@
 import { UpdateAgencyRequestDto, updateAgencyRequestSchema } from "shared";
+
 import { CreateNewEvent } from "../../../core/eventBus/EventBus";
 import {
-  UnitOfWorkPerformer,
   UnitOfWork,
+  UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../../core/UseCase";
 

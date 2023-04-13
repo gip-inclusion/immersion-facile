@@ -2,6 +2,7 @@ import bodyParser from "body-parser";
 import express, { Express, Router } from "express";
 import expressPrometheusMiddleware from "express-prometheus-middleware";
 import PinoHttp from "pino-http";
+
 import {
   GenerateApiConsumerJwt,
   GenerateAuthenticatedUserJwt,
@@ -12,6 +13,7 @@ import {
 import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
 import { UuidGenerator } from "../../domain/core/ports/UuidGenerator";
 import { createLogger } from "../../utils/logger";
+
 import { AppConfig } from "./config/appConfig";
 import { createAppDependencies } from "./config/createAppDependencies";
 import { Gateways } from "./config/createGateways";
@@ -21,18 +23,18 @@ import { createAdminRouter } from "./routers/admin/createAdminRouter";
 import { createAgenciesRouter } from "./routers/agencies/createAgenciesRouter";
 import { createApiKeyAuthRouter } from "./routers/apiKeyAuthRouter/createApiKeyAuthRouter";
 import { createApiKeyAuthRouterV1 } from "./routers/apiKeyAuthRouter/createApiKeyAuthRouter.v1";
-import { createSearchImmersionRouter } from "./routers/searchImmersion/createSearchImmersionRouter";
 import { createConventionRouter } from "./routers/convention/createConventionRouter";
 import { createEstablishmentRouter } from "./routers/createEstablishment/createEstablishmentRouter";
+import { createValidateEmailRouter } from "./routers/emailValidation/createValidateEmailRouter";
 import { createFormCompletionRouter } from "./routers/formCompletion/createFormCompletionRouter";
 import { createHelloWorldRouter } from "./routers/helloWorld/createHelloWorldRouter";
 import { createInclusionConnectedAllowedRouter } from "./routers/inclusionConnect/createInclusionConnectedAllowedRouter";
 import { createInclusionConnectRouter } from "./routers/inclusionConnect/createInclusionConnectRouter";
 import { createMagicLinkRouter } from "./routers/magicLink/createMagicLinkRouter";
 import { createPeConnectRouter } from "./routers/peConnect/createPeConnectRouter";
+import { createSearchImmersionRouter } from "./routers/searchImmersion/createSearchImmersionRouter";
 import { createTechnicalRouter } from "./routers/technical/createTechnicalRouter";
 import { subscribeToEvents } from "./subscribeToEvents";
-import { createValidateEmailRouter } from "./routers/emailValidation/createValidateEmailRouter";
 
 const logger = createLogger(__filename);
 

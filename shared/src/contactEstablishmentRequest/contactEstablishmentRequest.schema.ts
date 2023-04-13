@@ -1,7 +1,9 @@
 import { z } from "zod";
-import { zEmail, zTrimmedString } from "../zodUtils";
+
 import { romeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
+import { zEmail, zTrimmedString } from "../zodUtils";
+
 import {
   ContactEstablishmentByMailDto,
   ContactEstablishmentByPhoneDto,

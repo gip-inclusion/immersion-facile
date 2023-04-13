@@ -4,6 +4,7 @@ import {
   GeoPositionDto,
   LookupSearchResult,
 } from "shared";
+
 import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
 
 export class InMemoryAddressGateway implements AddressGateway {

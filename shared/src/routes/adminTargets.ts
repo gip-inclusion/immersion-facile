@@ -1,11 +1,13 @@
-import { createTargets, createTarget } from "http-client";
+import { createTarget, createTargets } from "http-client";
+
 import { userAndPasswordSchema } from "../admin/admin.schema";
 import { withAgencyIdSchema } from "../agency/agency.schema";
 import { EstablishmentBatchReport } from "../formEstablishment/FormEstablishment.dto";
 import { formEstablishmentBatchSchema } from "../formEstablishment/FormEstablishment.schema";
-import { adminTokenSchema } from "../tokens/token.schema";
-import { adminLogin } from "./routes";
 import { withValidateHeadersAuthorization } from "../headers";
+import { adminTokenSchema } from "../tokens/token.schema";
+
+import { adminLogin } from "./routes";
 
 export type AdminTargets = typeof adminTargets;
 export const adminTargets = createTargets({

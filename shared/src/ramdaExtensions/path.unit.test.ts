@@ -1,5 +1,6 @@
-import { path, pathEq } from "./path";
 import { expectTypeToMatchAndEqual } from "../test.helpers";
+
+import { path, pathEq } from "./path";
 
 type Address = {
   postCode: string;

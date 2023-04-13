@@ -1,9 +1,10 @@
 import { values } from "ramda";
+
 import {
   AgencyDto,
   AgencyId,
-  AgencyOption,
   AgencyKindFilter,
+  AgencyOption,
   AgencyPositionFilter,
   AgencyStatus,
   DepartmentCode,
@@ -12,6 +13,7 @@ import {
   PartialAgencyDto,
   WithGeoPosition,
 } from "shared";
+
 import { AgencyRepository } from "../../domain/convention/ports/AgencyRepository";
 import { distanceBetweenCoordinatesInMeters } from "../../utils/distanceBetweenCoordinatesInMeters";
 import { createLogger } from "../../utils/logger";

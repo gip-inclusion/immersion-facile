@@ -1,9 +1,11 @@
 import { PoolClient } from "pg";
+
 import {
   IdentityProvider,
   OngoingOAuth,
 } from "../../../domain/generic/OAuth/entities/OngoingOAuth";
 import { OngoingOAuthRepository } from "../../../domain/generic/OAuth/ports/OngoingOAuthRepositiory";
+
 import { optional } from "./pgUtils";
 
 type PersistenceOngoingOAuth = {

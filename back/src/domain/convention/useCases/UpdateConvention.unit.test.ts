@@ -1,12 +1,13 @@
 import {
-  conventionStatuses,
   ConventionDto,
   ConventionDtoBuilder,
   ConventionId,
+  conventionStatuses,
   EstablishmentTutor,
   expectPromiseToFailWithError,
   expectTypeToMatchAndEqual,
 } from "shared";
+
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,
@@ -14,16 +15,17 @@ import {
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
+import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryFeatureFlagRepository } from "../../../adapters/secondary/InMemoryFeatureFlagRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { UpdateConvention } from "./UpdateConvention";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
 } from "../../core/eventBus/EventBus";
-import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
+
+import { UpdateConvention } from "./UpdateConvention";
 
 describe("Update Convention", () => {
   let updateConvention: UpdateConvention;

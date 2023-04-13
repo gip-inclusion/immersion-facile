@@ -1,6 +1,6 @@
 import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
-import { configureHttpClient, createAxiosHandlerCreator } from "http-client";
+
 import {
   expectObjectsToMatch,
   expectPromiseToFailWithError,
@@ -9,17 +9,20 @@ import {
   testManagedRedirectError,
   testRawRedirectError,
 } from "shared";
+
+import { configureHttpClient, createAxiosHandlerCreator } from "http-client";
+
 import { HttpPeConnectGateway } from "./HttpPeConnectGateway";
-import {
-  makePeConnectExternalTargets,
-  toPeConnectAdvisorDto,
-  toPeConnectUserDto,
-} from "./peConnectApi.targets";
 import {
   ExternalAccessToken,
   ExternalPeConnectAdvisor,
   ExternalPeConnectUser,
 } from "./peConnectApi.dto";
+import {
+  makePeConnectExternalTargets,
+  toPeConnectAdvisorDto,
+  toPeConnectUserDto,
+} from "./peConnectApi.targets";
 
 describe("HttpPeConnectGateway", () => {
   const targets = makePeConnectExternalTargets({

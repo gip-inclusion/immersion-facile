@@ -1,21 +1,24 @@
 import axios from "axios";
 import { addMonths } from "date-fns";
 import { Pool } from "pg";
+
 import { immersionFacileContactEmail, SiretDto } from "shared";
+
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
+import { makeGenerateJwtES256 } from "../../../domain/auth/jwt";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { SuggestEditFormEstablishment } from "../../../domain/immersionOffer/useCases/SuggestEditFormEstablishment";
 import { createLogger } from "../../../utils/logger";
+import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmailGateway";
+import { SendinblueHtmlEmailGateway } from "../../secondary/emailGateway/SendinblueHtmlEmailGateway";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { AppConfig, makeEmailAllowListPredicate } from "../config/appConfig";
 import { makeGenerateEditFormEstablishmentUrl } from "../config/magicLinkUrl";
 import { createPgUow } from "../config/uowConfig";
-import { SendinblueHtmlEmailGateway } from "../../secondary/emailGateway/SendinblueHtmlEmailGateway";
-import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
+
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
-import { makeGenerateJwtES256 } from "../../../domain/auth/jwt";
 
 const NB_MONTHS_BEFORE_SUGGEST = 6;
 

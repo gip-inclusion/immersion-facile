@@ -1,11 +1,12 @@
 import { expectObjectsToMatch } from "shared";
-import { SirenGateway } from "../../../domain/sirene/ports/SirenGateway";
-import { AppConfig } from "../../primary/config/appConfig";
 
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
-import { HttpSirenGateway } from "./HttpSirenGateway";
+import { SirenGateway } from "../../../domain/sirene/ports/SirenGateway";
+import { AppConfig } from "../../primary/config/appConfig";
 import { RealTimeGateway } from "../core/TimeGateway/RealTimeGateway";
+
+import { HttpSirenGateway } from "./HttpSirenGateway";
 
 // These tests are not hermetic and not meant for automated testing. They will make requests to the
 // real SIRENE API, use up production quota, and fail for uncontrollable reasons such as quota

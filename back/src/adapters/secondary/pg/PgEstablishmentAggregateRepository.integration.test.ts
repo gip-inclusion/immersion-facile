@@ -1,37 +1,40 @@
 import { DataSource } from "aws-sdk/clients/discovery";
 import { Pool, PoolClient } from "pg";
 import { prop, sortBy } from "ramda";
+
 import {
   AddressDto,
   AppellationDto,
   ContactMethod,
+  defaultMaxContactsPerWeek,
+  expectArraysToEqualIgnoringOrder,
+  expectObjectsToMatch,
+  expectPromiseToFailWith,
+  expectToEqual,
+  expectTypeToMatchAndEqual,
   FormEstablishmentSource,
   GeoPositionDto,
-  SearchImmersionResultDto,
-  expectArraysToEqualIgnoringOrder,
-  expectTypeToMatchAndEqual,
-  expectPromiseToFailWith,
-  expectObjectsToMatch,
-  defaultMaxContactsPerWeek,
-  expectToEqual,
   NumberEmployeesRange,
+  SearchImmersionResultDto,
 } from "shared";
-import { createDiscussionAggregate } from "../../../_testBuilders/DiscussionAggregateBuilder";
-import {
-  EstablishmentEntity,
-  EstablishmentAggregate,
-} from "../../../domain/immersionOffer/entities/EstablishmentEntity";
-import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
+
 import {
   rueBitcheDto,
   rueGuillaumeTellDto,
   rueJacquardDto,
 } from "../../../_testBuilders/addressDtos";
 import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
+import { createDiscussionAggregate } from "../../../_testBuilders/DiscussionAggregateBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import {
+  EstablishmentAggregate,
+  EstablishmentEntity,
+} from "../../../domain/immersionOffer/entities/EstablishmentEntity";
+import { SearchMade } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
+
 import { PgDiscussionAggregateRepository } from "./PgDiscussionAggregateRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 

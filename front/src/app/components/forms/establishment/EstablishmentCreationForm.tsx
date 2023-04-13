@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import { Input } from "@codegouvfr/react-dsfr/Input";
+
 import {
   addressDtoToString,
   defaultMaxContactsPerWeek,
@@ -12,15 +13,17 @@ import {
   OmitFromExistingKeys,
   SiretDto,
 } from "shared";
+
+import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
+import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
+import { useFormContents } from "src/app/hooks/formContents.hooks";
+import { useInitialSiret, useSiretFetcher } from "src/app/hooks/siret.hooks";
+import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
+import { establishmentGateway } from "src/config/dependencies";
+import { ENV } from "src/config/environmentVariables";
+
 import { defaultInitialValue } from "./defaultInitialValue";
 import { EstablishmentForm } from "./EstablishmentForm";
-import { establishmentGateway } from "src/config/dependencies";
-import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
-import { ENV } from "src/config/environmentVariables";
-import { useInitialSiret, useSiretFetcher } from "src/app/hooks/siret.hooks";
-import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
-import { useFormContents } from "src/app/hooks/formContents.hooks";
-import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 
 type EstablishmentCreationFormProps = {
   source: FormEstablishmentSource;

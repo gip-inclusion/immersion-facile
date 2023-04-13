@@ -1,4 +1,5 @@
 import { ConventionId } from "shared";
+
 import { ImmersionAssessmentEntity } from "../entities/ImmersionAssessmentEntity";
 
 export interface ImmersionAssessmentRepository {

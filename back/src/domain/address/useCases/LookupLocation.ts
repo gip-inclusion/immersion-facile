@@ -1,9 +1,10 @@
 import {
   ConventionMagicLinkPayload,
-  withLookupLocationInputQueryParamsSchema,
   LookupSearchResult,
   WithLookupLocationInputQueryParams,
+  withLookupLocationInputQueryParamsSchema,
 } from "shared";
+
 import { UseCase } from "../../core/UseCase";
 import { AddressGateway } from "../../immersionOffer/ports/AddressGateway";
 

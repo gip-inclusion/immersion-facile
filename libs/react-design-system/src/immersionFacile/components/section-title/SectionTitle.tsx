@@ -1,6 +1,7 @@
-import { fr } from "@codegouvfr/react-dsfr";
 import React, { ReactNode } from "react";
+import { fr } from "@codegouvfr/react-dsfr";
 import { makeStyles } from "tss-react/dsfr";
+
 import "./SectionTitle.scss";
 
 type FormSectionTitleProps = {

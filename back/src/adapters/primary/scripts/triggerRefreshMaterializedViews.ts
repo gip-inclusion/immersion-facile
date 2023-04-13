@@ -1,6 +1,8 @@
 import { Pool } from "pg";
+
 import { createLogger } from "../../../utils/logger";
 import { AppConfig } from "../config/appConfig";
+
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
 const logger = createLogger(__filename);

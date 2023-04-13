@@ -1,6 +1,7 @@
 // This test need the env var DISCORD_WEBHOOK_URL to be set.
 
 import { DomainEvent } from "../domain/core/eventBus/events";
+
 import {
   notifyAndThrowErrorDiscord,
   notifyObjectDiscord,

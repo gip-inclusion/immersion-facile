@@ -1,12 +1,15 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
+
 import { AgencyDto } from "shared";
+
 import {
   AgencyRight,
   AgencyRole,
   InclusionConnectedUser,
 } from "../../../domain/dashboard/entities/InclusionConnectedUser";
 import { InclusionConnectedUserRepository } from "../../../domain/dashboard/port/InclusionConnectedUserRepository";
+
 import {
   PersistenceAgency,
   persistenceAgencyToAgencyDto,

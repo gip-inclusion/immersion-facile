@@ -1,12 +1,14 @@
 import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
+
 import {
   ConventionReadDto,
   EstablishmentRepresentative,
   getSignatoryKey,
   isEstablishmentTutorIsEstablishmentRepresentative,
 } from "shared";
+
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {

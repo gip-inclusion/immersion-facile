@@ -1,5 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+
 import { AbsoluteUrl } from "shared";
+
 import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
 
 export type InclusionConnectedFeedback = SubmitFeedBack<"success">;

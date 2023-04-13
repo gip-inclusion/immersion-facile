@@ -2,6 +2,7 @@ import {
   Beneficiary,
   BeneficiaryRepresentative,
 } from "../convention/convention.dto";
+
 import { displayEmergencyContactInfos } from "./beneficiary";
 
 describe("Beneficiary utils", () => {

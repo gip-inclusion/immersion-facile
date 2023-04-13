@@ -3,16 +3,18 @@ import {
   expectObjectsToMatch,
   expectTypeToMatchAndEqual,
 } from "shared";
-import { createInMemoryUow } from "../../primary/config/uowConfig";
-import { InMemoryEventBus } from "./InMemoryEventBus";
-import { InMemoryOutboxRepository } from "./InMemoryOutboxRepository";
-import { InMemoryUowPerformer } from "../InMemoryUowPerformer";
+
+import { spyOnTopic } from "../../../_testBuilders/spyOnTopic";
 import type {
   DomainEvent,
   EventFailure,
 } from "../../../domain/core/eventBus/events";
-import { spyOnTopic } from "../../../_testBuilders/spyOnTopic";
+import { createInMemoryUow } from "../../primary/config/uowConfig";
+import { InMemoryUowPerformer } from "../InMemoryUowPerformer";
+
 import { CustomTimeGateway } from "./TimeGateway/CustomTimeGateway";
+import { InMemoryEventBus } from "./InMemoryEventBus";
+import { InMemoryOutboxRepository } from "./InMemoryOutboxRepository";
 
 const domainEvt: DomainEvent = {
   id: "anId",

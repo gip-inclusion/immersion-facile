@@ -1,7 +1,8 @@
-import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
 import React from "react";
-import { footerPrefix } from ".";
+import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
+
 import { Footer, FooterProps } from "./Footer";
+import { footerPrefix } from ".";
 
 const Component = Footer;
 const argTypes: Partial<ArgTypes<FooterProps>> | undefined = {};

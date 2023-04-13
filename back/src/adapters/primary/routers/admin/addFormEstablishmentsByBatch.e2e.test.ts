@@ -1,3 +1,5 @@
+import { SuperTest, Test } from "supertest";
+
 import {
   adminTargets,
   BackOfficeJwt,
@@ -5,12 +7,12 @@ import {
   FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
 } from "shared";
+
+import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import {
   buildTestApp,
   InMemoryGateways,
 } from "../../../../_testBuilders/buildTestApp";
-import { SuperTest, Test } from "supertest";
-import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { TEST_ESTABLISHMENT1 } from "../../../secondary/sirene/InMemorySirenGateway";
 
 const addFormEstablishmentBatchUrl = adminTargets.addFormEstablishmentBatch.url;

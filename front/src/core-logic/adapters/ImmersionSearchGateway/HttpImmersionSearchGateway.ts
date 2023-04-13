@@ -1,5 +1,5 @@
-import { HttpClient } from "http-client";
 import { from, Observable } from "rxjs";
+
 import {
   ContactEstablishmentRequestDto,
   EstablishmentGroupSlug,
@@ -7,6 +7,9 @@ import {
   SearchImmersionResultDto,
   SearchTargets,
 } from "shared";
+
+import { HttpClient } from "http-client";
+
 import { ImmersionSearchGateway } from "src/core-logic/ports/ImmersionSearchGateway";
 
 export class HttpImmersionSearchGateway implements ImmersionSearchGateway {

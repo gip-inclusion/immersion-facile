@@ -1,16 +1,19 @@
-import { keys } from "ramda";
 import React, { useEffect } from "react";
-import { DsfrTitle } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { EmailSentDto, EmailVariables } from "shared";
-import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
-import { sentEmailsSlice } from "src/core-logic/domain/admin/sentEmails/sentEmails.slice";
-import { ENV } from "src/config/environmentVariables";
-import { TextCell } from "src/app/components/admin/TextCell";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { keys } from "ramda";
+
+import { EmailSentDto, EmailVariables } from "shared";
+
+import { DsfrTitle } from "react-design-system";
+
+import { TextCell } from "src/app/components/admin/TextCell";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { ENV } from "src/config/environmentVariables";
+import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
+import { sentEmailsSlice } from "src/core-logic/domain/admin/sentEmails/sentEmails.slice";
 
 export const EmailsTab = () => {
   const dispatch = useDispatch();

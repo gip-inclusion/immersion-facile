@@ -1,6 +1,8 @@
 import { z } from "zod";
+
 import { nafSchema } from "../naf";
 import { zString } from "../zodUtils";
+
 import {
   GetSiretInfo,
   GetSiretRequestDto,

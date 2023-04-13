@@ -1,8 +1,8 @@
 import {
   AbsoluteUrl,
+  AdminDashboardName,
   AgencyId,
   ConventionId,
-  AdminDashboardName,
 } from "shared";
 
 export interface DashboardGateway {

@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 import {
   addressWithPostalCodeSchema,
   appellationSchema,
@@ -6,12 +7,13 @@ import {
   NotEmptyArray,
   phoneRegExp,
   romeCodeSchema,
+  siretSchema,
   zBoolean,
   zEmail,
   zString,
   zTrimmedString,
-  siretSchema,
 } from "shared";
+
 import {
   BusinessContactDtoPublicV0,
   FormEstablishmentDtoPublicV0,

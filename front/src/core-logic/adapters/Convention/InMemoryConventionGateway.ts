@@ -1,8 +1,9 @@
 import { from, Observable, Subject } from "rxjs";
+
 import {
   AbsoluteUrl,
-  BackOfficeJwt,
   AgencyOption,
+  BackOfficeJwt,
   ConventionDto,
   ConventionDtoBuilder,
   ConventionId,
@@ -17,6 +18,7 @@ import {
   WithConventionId,
 } from "shared";
 import { decodeMagicLinkJwtWithoutSignatureCheck } from "shared";
+
 import { FetchConventionRequestedPayload } from "src/core-logic/domain/convention/convention.slice";
 import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 

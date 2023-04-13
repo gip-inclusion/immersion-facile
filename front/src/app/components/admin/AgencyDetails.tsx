@@ -1,8 +1,12 @@
 import React, { ReactNode } from "react";
+
 import { AgencyDto, AgencyStatus, keys } from "shared";
-import { TextCell } from "./TextCell";
-import { agencyAdminSelectors } from "../../../core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
+
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+
+import { agencyAdminSelectors } from "../../../core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
+
+import { TextCell } from "./TextCell";
 
 type AgencyField = keyof AgencyDto;
 type FieldsToLabel = Partial<Record<AgencyField, string>>;

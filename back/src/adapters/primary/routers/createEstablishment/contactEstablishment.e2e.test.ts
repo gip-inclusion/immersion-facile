@@ -1,12 +1,14 @@
+import { SuperTest, Test } from "supertest";
+
 import {
   ContactEstablishmentRequestDto,
   contactEstablishmentRoute,
   expectArraysToMatch,
 } from "shared";
-import { SuperTest, Test } from "supertest";
+
 import {
-  InMemoryGateways,
   buildTestApp,
+  InMemoryGateways,
 } from "../../../../_testBuilders/buildTestApp";
 import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";

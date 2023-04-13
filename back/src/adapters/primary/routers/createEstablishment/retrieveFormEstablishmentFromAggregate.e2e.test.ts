@@ -2,7 +2,7 @@ import {
   createEstablishmentMagicLinkPayload,
   establishmentTargets,
 } from "shared";
-import { TEST_ESTABLISHMENT1_SIRET } from "../../../secondary/sirene/InMemorySirenGateway";
+
 import {
   rueSaintHonore,
   rueSaintHonoreDto,
@@ -10,6 +10,7 @@ import {
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
+import { TEST_ESTABLISHMENT1_SIRET } from "../../../secondary/sirene/InMemorySirenGateway";
 
 describe("Route to retrieve form establishment given an establishment JWT", () => {
   it("Throws 401 if not authenticated", async () => {

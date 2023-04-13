@@ -1,4 +1,5 @@
 import { Builder, ProcessEnv } from "shared";
+
 import { AppConfig } from "../adapters/primary/config/appConfig";
 
 const defaultConfigParams = {

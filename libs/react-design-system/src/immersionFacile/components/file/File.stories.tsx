@@ -1,7 +1,8 @@
-import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
 import React from "react";
-import { filePrefix } from ".";
+import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
+
 import { File, FileProperties } from "./File";
+import { filePrefix } from ".";
 
 const Component = File;
 const argTypes: Partial<ArgTypes<FileProperties>> | undefined = {};

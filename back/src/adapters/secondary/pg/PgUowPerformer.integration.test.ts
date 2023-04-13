@@ -1,11 +1,14 @@
 import { Pool, PoolClient } from "pg";
+
 import { FormEstablishmentDtoBuilder } from "shared";
+
+import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { UnitOfWork } from "../../../domain/core/ports/UnitOfWork";
-import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { createPgUow } from "../../primary/config/uowConfig";
 import { CustomTimeGateway } from "../core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../core/UuidGeneratorImplementations";
+
 import { PgUowPerformer } from "./PgUowPerformer";
 
 const someSiret = "12345678901234";

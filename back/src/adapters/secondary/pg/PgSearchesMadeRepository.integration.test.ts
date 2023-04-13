@@ -1,7 +1,9 @@
 import { Pool, PoolClient } from "pg";
-import { SearchMadeEntity } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
+
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { SearchMadeEntityBuilder } from "../../../_testBuilders/SearchMadeEntityBuilder";
+import { SearchMadeEntity } from "../../../domain/immersionOffer/entities/SearchMadeEntity";
+
 import { PgSearchMadeRepository } from "./PgSearchMadeRepository";
 import { optional } from "./pgUtils";
 

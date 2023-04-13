@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+
 import { EmailSentDto } from "shared";
 
 export type SentEmailsState = {

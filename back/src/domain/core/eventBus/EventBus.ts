@@ -1,5 +1,6 @@
 import { TimeGateway } from "../ports/TimeGateway";
 import { UuidGenerator } from "../ports/UuidGenerator";
+
 import type {
   DomainEvent,
   DomainTopic,

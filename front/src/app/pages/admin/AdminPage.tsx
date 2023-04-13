@@ -1,4 +1,8 @@
 import React from "react";
+import { fr } from "@codegouvfr/react-dsfr";
+import { Tabs } from "@codegouvfr/react-dsfr/Tabs";
+import { Route } from "type-route";
+
 import { ImmersionHeader } from "src/app/components/layout/ImmersionHeader";
 import { AddEstablishmentByBatchTab } from "src/app/pages/admin/AddEstablishmentByBatchTab";
 import { AgencyTab } from "src/app/pages/admin/AgencyTab";
@@ -7,11 +11,8 @@ import { DataExportTab } from "src/app/pages/admin/DataExportTab";
 import { EmailPreviewTab } from "src/app/pages/admin/EmailPreviewTab";
 import { EmailsTab } from "src/app/pages/admin/EmailsTab";
 import { TechnicalOptions } from "src/app/pages/admin/TechnicalOptions";
-import { routes } from "src/app/routes/routes";
-import { Route } from "type-route";
-import { fr } from "@codegouvfr/react-dsfr";
-import { Tabs } from "@codegouvfr/react-dsfr/Tabs";
 import { AdminTab, isAdminTab } from "src/app/routes/route-params";
+import { routes } from "src/app/routes/routes";
 import { ENV } from "src/config/environmentVariables";
 
 type Tab = {

@@ -1,13 +1,14 @@
 import React from "react";
+import { fr } from "@codegouvfr/react-dsfr";
 
 import {
+  displayEmergencyContactInfos,
+  prettyPrintSchedule,
   ScheduleDto,
   toDisplayedDate,
-  prettyPrintSchedule,
-  displayEmergencyContactInfos,
 } from "shared";
+
 import { ColField, FieldsAndTitle } from "./types";
-import { fr } from "@codegouvfr/react-dsfr";
 
 export const signToBooleanDisplay = (value: string | undefined) =>
   value ? `✅ (${toDisplayedDate(new Date(value))})` : "❌";
@@ -25,6 +26,7 @@ const renderSiret = (siret: string) => (
     href={`https://annuaire-entreprises.data.gouv.fr/etablissement/${siret}`}
     title={"Voir sur l'annuaire des entreprises"}
     target="_blank"
+    rel="noreferrer"
   >
     {siret}
   </a>

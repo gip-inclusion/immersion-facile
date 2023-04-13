@@ -1,11 +1,13 @@
+import isAfter from "date-fns/isAfter";
+
 import { SiretDto } from "shared";
+
 import {
-  DiscussionId,
   DiscussionAggregate,
+  DiscussionId,
 } from "../../../domain/immersionOffer/entities/DiscussionAggregate";
 import { DiscussionAggregateRepository } from "../../../domain/immersionOffer/ports/DiscussionAggregateRepository";
 import { createLogger } from "../../../utils/logger";
-import isAfter from "date-fns/isAfter";
 
 const logger = createLogger(__filename);
 

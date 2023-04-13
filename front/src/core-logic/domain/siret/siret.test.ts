@@ -3,13 +3,13 @@ import {
   SirenEstablishmentDto,
   tooManiSirenRequestsSiretErrorMessage,
 } from "shared";
+
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import {
   siretSlice,
   SiretState,
 } from "src/core-logic/domain/siret/siret.slice";
 import { makeStubFeatureFlags } from "src/core-logic/domain/testHelpers/test.helpers";
-
 import {
   createTestStore,
   TestDependencies,

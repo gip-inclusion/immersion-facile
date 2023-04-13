@@ -1,11 +1,13 @@
-import { keys } from "ramda";
 import React from "react";
 import { useDispatch } from "react-redux";
-import { FeatureFlag } from "shared";
-import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
-import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFlags.slice";
 import { fr } from "@codegouvfr/react-dsfr";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
+import { keys } from "ramda";
+
+import { FeatureFlag } from "shared";
+
+import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
+import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFlags.slice";
 
 const labelsByFeatureFlag: Record<FeatureFlag, string> = {
   enableInseeApi: "API insee (siret)",

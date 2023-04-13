@@ -1,6 +1,7 @@
-import "./InclusionConnectButton.scss";
 import React from "react";
 import { useStyles } from "tss-react/dsfr";
+
+import "./InclusionConnectButton.scss";
 
 export interface InclusionConnectButtonProps {
   onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;

@@ -1,5 +1,7 @@
 import axios from "axios";
+
 import { AppConfig } from "../adapters/primary/config/appConfig";
+
 import { createLogger } from "./logger";
 
 const logger = createLogger(__filename);

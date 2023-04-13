@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+
 import { FeatureFlag, FeatureFlags } from "shared";
 
 export type FeatureFlagsState = FeatureFlags & {

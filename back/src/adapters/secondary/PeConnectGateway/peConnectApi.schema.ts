@@ -1,10 +1,13 @@
-import { zString, zTrimmedString } from "shared";
 import { z } from "zod";
+
+import { zString, zTrimmedString } from "shared";
+
 import { BearerToken } from "../../../domain/peConnect/dto/BearerToken";
 import {
   peAdvisorKinds,
   PeConnectAdvisorsKind,
 } from "../../../domain/peConnect/dto/PeConnectAdvisor.dto";
+
 import {
   ExternalPeConnectAdvisor,
   ExternalPeConnectAdvisors,

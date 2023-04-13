@@ -1,11 +1,13 @@
 import { Pool, PoolClient } from "pg";
+
 import {
   activeAgencyStatuses,
   AgencyDto,
   AgencyDtoBuilder,
-  GeoPositionDto,
   expectTypeToMatchAndEqual,
+  GeoPositionDto,
 } from "shared";
+
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 
 import { PgAgencyRepository } from "./PgAgencyRepository";

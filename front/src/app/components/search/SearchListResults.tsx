@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from "react";
+import { fr } from "@codegouvfr/react-dsfr";
+import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
+import { Select } from "@codegouvfr/react-dsfr/Select";
+
 import { ContactMethod, domElementIds, SearchImmersionResultDto } from "shared";
+
+import { useStyleUtils } from "react-design-system";
+
+import { SuccessFeedback } from "src/app/components/SuccessFeedback";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
-import { SuccessFeedback } from "src/app/components/SuccessFeedback";
+
 import {
   ContactEstablishmentModal,
   useContactEstablishmentModal,
 } from "./ContactEstablishmentModal";
-import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 import { SearchResult } from "./SearchResult";
-import { fr } from "@codegouvfr/react-dsfr";
-import { Select } from "@codegouvfr/react-dsfr/Select";
-import { useStyleUtils } from "react-design-system";
 
 const getFeedBackMessage = (contactMethod?: ContactMethod) => {
   switch (contactMethod) {

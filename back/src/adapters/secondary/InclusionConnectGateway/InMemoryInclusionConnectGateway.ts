@@ -1,5 +1,5 @@
-import { InclusionConnectGateway } from "../../../domain/inclusionConnect/port/InclusionConnectGateway";
 import { InclusionAccessTokenResponse } from "../../../domain/inclusionConnect/port/InclusionAccessTokenResponse";
+import { InclusionConnectGateway } from "../../../domain/inclusionConnect/port/InclusionConnectGateway";
 
 // this token is for test purpose :
 

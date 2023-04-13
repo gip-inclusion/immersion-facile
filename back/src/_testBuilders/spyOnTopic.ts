@@ -1,5 +1,5 @@
 import { EventBus } from "../domain/core/eventBus/EventBus";
-import { DomainTopic, DomainEvent } from "../domain/core/eventBus/events";
+import { DomainEvent, DomainTopic } from "../domain/core/eventBus/events";
 
 export const spyOnTopic = (
   eventBus: EventBus,

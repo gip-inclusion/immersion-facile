@@ -1,22 +1,25 @@
 import { Pool, PoolClient } from "pg";
+
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   expectObjectsToMatch,
 } from "shared";
-import { DiscussionAggregate } from "../../../domain/immersionOffer/entities/DiscussionAggregate";
-import { EstablishmentAggregate } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
+
 import {
-  rueJacquardDto,
   avenueChampsElyseesDto,
   rueBitcheDto,
+  rueJacquardDto,
 } from "../../../_testBuilders/addressDtos";
 import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { DiscussionAggregate } from "../../../domain/immersionOffer/entities/DiscussionAggregate";
+import { EstablishmentAggregate } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
 import { UuidV4Generator } from "../core/UuidGeneratorImplementations";
+
 import { PgAgencyRepository } from "./PgAgencyRepository";
 import { PgConventionRepository } from "./PgConventionRepository";
 import { PgDiscussionAggregateRepository } from "./PgDiscussionAggregateRepository";

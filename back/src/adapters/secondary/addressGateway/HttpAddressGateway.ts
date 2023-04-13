@@ -1,5 +1,5 @@
 import { Point } from "geojson";
-import { HttpClient } from "http-client";
+
 import {
   AddressAndPosition,
   AddressDto,
@@ -14,8 +14,12 @@ import {
   Postcode,
   StreetNumberAndAddress,
 } from "shared";
+
+import { HttpClient } from "http-client";
+
 import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
 import { createLogger } from "../../../utils/logger";
+
 import {
   OpenCageDataAddressComponents,
   OpenCageDataFeatureCollection,

@@ -1,5 +1,7 @@
-import { TemplatedEmail, expectArraysToMatch } from "shared";
+import { expectArraysToMatch, TemplatedEmail } from "shared";
+
 import { CustomTimeGateway } from "../core/TimeGateway/CustomTimeGateway";
+
 import { InMemoryEmailGateway } from "./InMemoryEmailGateway";
 
 describe("In memory EmailGateway", () => {

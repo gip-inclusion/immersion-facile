@@ -1,7 +1,9 @@
 import React from "react";
+
 import { Input, InputGroup, TextArea, TextInputError } from "../inputs";
 import { AutocompleteAttributeValue } from "../inputs/AutocompleteAttributeValue.type";
 import { Label } from "../label";
+
 import { FieldDescription } from "./FieldDescription";
 
 export interface ImmersionTextFieldProps {

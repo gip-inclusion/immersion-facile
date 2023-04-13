@@ -1,7 +1,8 @@
 import { SiretDto } from "shared";
+
 import {
-  DiscussionId,
   DiscussionAggregate,
+  DiscussionId,
 } from "../entities/DiscussionAggregate";
 
 export interface DiscussionAggregateRepository {

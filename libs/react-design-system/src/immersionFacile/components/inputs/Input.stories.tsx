@@ -1,7 +1,8 @@
-import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
 import React from "react";
-import { inputPrefix } from ".";
+import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
+
 import { Input, InputProperties } from "./Input";
+import { inputPrefix } from ".";
 
 const Component = Input;
 const argTypes: Partial<ArgTypes<InputProperties>> | undefined = {};

@@ -1,4 +1,5 @@
 import { ConventionId } from "shared";
+
 import { ImmersionAssessmentEntity } from "../../domain/convention/entities/ImmersionAssessmentEntity";
 import { ImmersionAssessmentRepository } from "../../domain/convention/ports/ImmersionAssessmentRepository";
 

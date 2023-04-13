@@ -1,5 +1,7 @@
 import { values } from "ramda";
+
 import { AuthenticatedUser, AuthenticatedUserId } from "shared";
+
 import { AuthenticatedUserRepository } from "../../domain/generic/OAuth/ports/AuthenticatedUserRepositiory";
 
 export class InMemoryAuthenticatedUserRepository

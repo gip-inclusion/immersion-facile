@@ -1,6 +1,9 @@
-import { configureHttpClient, createAxiosHandlerCreator } from "http-client";
 import { firstValueFrom } from "rxjs";
-import { createManagedAxiosInstance, AdminTargets, adminTargets } from "shared";
+
+import { AdminTargets, adminTargets, createManagedAxiosInstance } from "shared";
+
+import { configureHttpClient, createAxiosHandlerCreator } from "http-client";
+
 import { HttpAdminGateway } from "src/core-logic/adapters/AdminGateway/HttpAdminGateway";
 
 describe("HttpAdminGateway", () => {

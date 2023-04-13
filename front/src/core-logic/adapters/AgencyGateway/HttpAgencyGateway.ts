@@ -1,5 +1,5 @@
-import { HttpClient } from "http-client";
 import { from, Observable } from "rxjs";
+
 import {
   ActiveOrRejectedStatus,
   agenciesIdAndNameSchema,
@@ -8,13 +8,16 @@ import {
   AgencyOption,
   AgencyPublicDisplayDto,
   agencySchema,
+  AgencyTargets,
   BackOfficeJwt,
   CreateAgencyDto,
   DepartmentCode,
   ListAgenciesRequestDto,
   WithAgencyId,
-  AgencyTargets,
 } from "shared";
+
+import { HttpClient } from "http-client";
+
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
 export class HttpAgencyGateway implements AgencyGateway {

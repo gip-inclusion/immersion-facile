@@ -1,7 +1,8 @@
-import { useField } from "formik";
 import React from "react";
-import { cleanStringToHTMLAttribute } from "shared";
 import { fr } from "@codegouvfr/react-dsfr";
+import { useField } from "formik";
+
+import { cleanStringToHTMLAttribute } from "shared";
 
 type BoolRadioProps = {
   name: string;

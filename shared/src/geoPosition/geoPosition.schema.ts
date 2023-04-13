@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 import { GeoPositionDto } from "./geoPosition.dto";
 
 export const geoPositionSchema: z.Schema<GeoPositionDto> = z.object({

@@ -1,9 +1,11 @@
+import { type SuperTest, type Test } from "supertest";
+
 import {
   type Email,
-  type ValidateEmailStatus,
   validateEmailsTargets,
+  type ValidateEmailStatus,
 } from "shared";
-import { type SuperTest, type Test } from "supertest";
+
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { InMemoryEmailValidationGateway } from "../../../secondary/emailValidationGateway/InMemoryEmailValidationStatusGateway";
 

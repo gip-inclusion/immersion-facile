@@ -4,9 +4,11 @@ import {
   max,
   secondsToMilliseconds,
 } from "date-fns";
+
 import { SleepFn } from "shared";
-import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
+
 import { RateLimiter } from "../../../domain/core/ports/RateLimiter";
+import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
 
 // Simple rate limiter that limits the output to the specified queries per second (QPS) rate.
 //

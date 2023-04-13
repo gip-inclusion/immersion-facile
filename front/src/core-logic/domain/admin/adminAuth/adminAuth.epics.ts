@@ -1,10 +1,12 @@
 import { filter, map, switchMap, tap } from "rxjs";
+
 import { adminAuthSlice } from "src/core-logic/domain/admin/adminAuth/adminAuth.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
+
 import { appIsReadyAction } from "../../actions";
 
 type AdminAuthAction = ActionOfSlice<typeof adminAuthSlice>;

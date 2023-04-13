@@ -1,13 +1,14 @@
 import {
-  conventionStatuses,
   ConventionDtoBuilder,
   ConventionMagicLinkPayload,
-  expectObjectsToMatch,
-  ImmersionAssessmentDto,
+  conventionStatuses,
   expectArraysToEqual,
+  expectObjectsToMatch,
   expectPromiseToFailWithError,
+  ImmersionAssessmentDto,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
+
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
   BadRequestError,
@@ -21,9 +22,10 @@ import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGenerato
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryImmersionAssessmentRepository } from "../../../adapters/secondary/InMemoryImmersionAssessmentRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { ImmersionAssessmentEntity } from "../entities/ImmersionAssessmentEntity";
-import { CreateImmersionAssessment } from "./CreateImmersionAssessment";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
+import { ImmersionAssessmentEntity } from "../entities/ImmersionAssessmentEntity";
+
+import { CreateImmersionAssessment } from "./CreateImmersionAssessment";
 
 const conventionId = "conventionId";
 

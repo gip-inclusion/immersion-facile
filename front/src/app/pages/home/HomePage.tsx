@@ -1,4 +1,7 @@
 import React from "react";
+import { useDispatch } from "react-redux";
+import { AnyAction, Dispatch } from "@reduxjs/toolkit";
+
 import {
   FixedStamp,
   HeroHeader,
@@ -8,19 +11,17 @@ import {
   SectionStats,
   SectionTextEmbed,
 } from "react-design-system";
-import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
-import { routes } from "src/app/routes/routes";
+
+import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
+import { SiretModal, useSiretModal } from "src/app/components/SiretModal";
 import {
   heroHeaderContent,
   heroHeaderNavCards,
   sectionFaqData,
   sectionStatsData,
 } from "src/app/contents/home/content";
-import { useDispatch } from "react-redux";
-import { SiretModal, useSiretModal } from "src/app/components/SiretModal";
-
-import { AnyAction, Dispatch } from "@reduxjs/toolkit";
-import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
+import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
+import { routes } from "src/app/routes/routes";
 
 export type UserType = "default" | "candidate" | "establishment" | "agency";
 

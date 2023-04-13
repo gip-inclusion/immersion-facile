@@ -1,6 +1,7 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
 import { equals } from "ramda";
+
 import {
   AppellationDto,
   GeoPositionDto,
@@ -8,6 +9,7 @@ import {
   SearchSortedBy,
   SiretDto,
 } from "shared";
+
 import { ContactEntity } from "../../../domain/immersionOffer/entities/ContactEntity";
 import {
   DataSource,
@@ -20,9 +22,9 @@ import {
   EstablishmentAggregateRepository,
   OfferWithSiret,
 } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
-
 import { createLogger } from "../../../utils/logger";
 import { NotFoundError } from "../../primary/helpers/httpErrors";
+
 import { optional } from "./pgUtils";
 
 const logger = createLogger(__filename);

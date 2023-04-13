@@ -1,4 +1,5 @@
 import { domElementIds, InternshipKind } from "shared";
+
 import { ConventionField } from "../../admin/types";
 import { FormFieldAttributesForContent } from "../types";
 

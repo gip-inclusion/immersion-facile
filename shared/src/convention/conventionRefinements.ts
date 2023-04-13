@@ -1,4 +1,5 @@
 import differenceInDays from "date-fns/differenceInDays";
+
 import { allSignatoriesSigned, getConventionFieldName } from "./convention";
 import {
   ConventionDtoWithoutExternalId,

@@ -1,14 +1,16 @@
-import { Button } from "@codegouvfr/react-dsfr/Button";
 import React from "react";
 import { useForm } from "react-hook-form";
+import { Button } from "@codegouvfr/react-dsfr/Button";
+import { Input } from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
+
 import {
   InternshipKind,
   ShareLinkByEmailDto,
   shareLinkByEmailSchema,
 } from "shared";
+
 import { conventionGateway } from "src/config/dependencies";
-import { Input } from "@codegouvfr/react-dsfr/Input";
 
 type ShareFormProps = {
   onSuccess: () => void;

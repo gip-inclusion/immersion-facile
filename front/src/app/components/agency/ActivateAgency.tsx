@@ -1,16 +1,21 @@
+import React, { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
-import React, { useEffect } from "react";
-import { DsfrTitle } from "react-design-system";
-import { useDispatch } from "react-redux";
+import { Select } from "@codegouvfr/react-dsfr/Select";
+
 import { ActiveOrRejectedStatus, AgencyOption } from "shared";
-import "src/assets/admin.css";
+import { domElementIds } from "shared";
+
+import { DsfrTitle } from "react-design-system";
+
 import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
 import { agencyAdminSlice } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
+
 import { useAppSelector } from "../../hooks/reduxHooks";
 import { AgencyDetails } from "../admin/AgencyDetails";
-import { domElementIds } from "shared";
-import { Select } from "@codegouvfr/react-dsfr/Select";
+
+import "src/assets/admin.css";
 
 const toSelectOption = (option: AgencyOption) => ({
   label: option.name,

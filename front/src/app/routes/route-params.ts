@@ -1,5 +1,6 @@
-import { AppellationDto, ScheduleDto } from "shared";
 import { param, ValueSerializer } from "type-route";
+
+import { AppellationDto, ScheduleDto } from "shared";
 
 export type AuthorizedGroupSlugs = (typeof authorizedGroupSlugs)[number];
 
