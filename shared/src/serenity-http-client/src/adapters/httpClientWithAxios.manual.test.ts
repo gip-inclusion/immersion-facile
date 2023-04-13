@@ -6,7 +6,6 @@ import {
   HttpResponse,
   TargetUrlsMapper,
 } from "../httpClient";
-
 import { ManagedAxios } from "./axios.adapter";
 
 describe("httpClient with axios concrete adapter", () => {

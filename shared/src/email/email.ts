@@ -1,5 +1,4 @@
 import { ValueOf } from "../utils";
-
 import { templatesByName } from "./templatesByName";
 
 export type GenericTemplatedEmail<

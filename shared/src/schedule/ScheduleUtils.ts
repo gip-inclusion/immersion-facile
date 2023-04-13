@@ -7,7 +7,6 @@ import {
   parseISO,
 } from "date-fns";
 import { clone, prop } from "ramda";
-
 import {
   DailyScheduleDto,
   DateIntervalDto,

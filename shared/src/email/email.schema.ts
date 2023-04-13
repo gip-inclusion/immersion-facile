@@ -1,7 +1,5 @@
 import { z } from "zod";
-
 import { zEmail } from "../zodUtils";
-
 import type { EmailType, TemplatedEmail } from "./email";
 import { Email } from "./email.dto";
 

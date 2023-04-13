@@ -1,5 +1,4 @@
 import { z } from "zod";
-
 import { zSchemaForType } from "./zodUtils";
 
 export type Headers = { authorization: string };

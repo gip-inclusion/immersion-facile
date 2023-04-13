@@ -1,5 +1,4 @@
 import { z } from "zod";
-
 import { emailSchema } from "./email.schema";
 import {
   ValidateEmailInput,

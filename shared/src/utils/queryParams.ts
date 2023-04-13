@@ -1,5 +1,4 @@
 import { join, keys, reduce } from "ramda";
-
 import { pipeWithValue } from "../pipeWithValue";
 
 type RawQueryParams = { [key: string]: string | boolean | number };

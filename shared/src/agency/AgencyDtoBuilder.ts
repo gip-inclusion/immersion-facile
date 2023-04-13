@@ -1,7 +1,6 @@
 import { AbsoluteUrl } from "../AbsoluteUrl";
 import { AddressDto } from "../address/address.dto";
 import { Builder } from "../Builder";
-
 import { AgencyDto, AgencyId, AgencyKind, AgencyStatus } from "./agency.dto";
 
 const emptyAddress: AddressDto = {

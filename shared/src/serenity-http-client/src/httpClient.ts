@@ -1,5 +1,4 @@
 import { AxiosRequestConfig } from "axios";
-
 import { ConfigurationError, HttpClientError, HttpServerError } from "./errors";
 
 export interface HttpClient {

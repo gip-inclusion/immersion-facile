@@ -1,7 +1,6 @@
 import { Builder } from "../Builder";
 import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret/siret";
-
 import {
   BusinessContactDto,
   EstablishmentCSVRow,

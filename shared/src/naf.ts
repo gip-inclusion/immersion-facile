@@ -1,5 +1,4 @@
 import { z } from "zod";
-
 import { keys } from "./utils";
 
 export type NafSectorCode = keyof typeof nafSectorLabels;

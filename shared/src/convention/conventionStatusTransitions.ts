@@ -1,5 +1,4 @@
 import { Role } from "..";
-
 import { ConventionStatus } from "./convention.dto";
 
 export type StatusTransitionConfig = {

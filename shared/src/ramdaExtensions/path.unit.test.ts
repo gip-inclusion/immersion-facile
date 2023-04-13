@@ -1,5 +1,4 @@
 import { expectTypeToMatchAndEqual } from "../test.helpers";
-
 import { path, pathEq } from "./path";
 
 type Address = {

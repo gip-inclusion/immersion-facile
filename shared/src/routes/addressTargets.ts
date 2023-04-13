@@ -1,5 +1,4 @@
 import { createTarget, createTargets } from "http-client";
-
 import {
   addressAndPositionListSchema,
   lookupSearchResultsSchema,

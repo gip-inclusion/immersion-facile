@@ -1,5 +1,4 @@
 import { localization } from "../zodUtils";
-
 import { toDotNotation } from "./toDotNotation";
 
 describe("toDotNotation utils", () => {

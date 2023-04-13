@@ -4,7 +4,6 @@ import axios, {
   AxiosRequestConfig,
   AxiosResponse,
 } from "axios";
-
 import {
   AbsoluteUrl,
   AdapterConfig,
@@ -15,7 +14,6 @@ import {
   HttpClientPostConfig,
   HttpResponse,
 } from "../httpClient";
-
 import {
   onFullfilledDefaultResponseInterceptorMaker,
   onRejectDefaultResponseInterceptorMaker,

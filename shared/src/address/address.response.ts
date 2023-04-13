@@ -1,5 +1,4 @@
 import { z } from "zod";
-
 import { DepartmentCode } from "./address.dto";
 import { departmentCodeSchema } from "./address.schema";
 

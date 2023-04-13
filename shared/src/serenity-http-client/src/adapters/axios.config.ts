@@ -1,8 +1,6 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
-
 import { ErrorMapper, isHttpError } from "../httpClient";
 import { toMappedErrorMaker, toUnhandledError } from "../httpClient.mappers";
-
 import { AxiosErrorWithResponse } from "./axios.adapter";
 import { toHttpError, toInfrastructureError } from "./axios.mappers";
 import { InfrastructureErrorKinds } from "./errors";

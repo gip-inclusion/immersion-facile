@@ -1,8 +1,6 @@
 // Details: https://www.pole-emploi.fr/employeur/vos-recrutements/le-rome-et-les-fiches-metiers.html
 import { z } from "zod";
-
 import { zTrimmedString } from "../zodUtils";
-
 import type {
   AppellationCode,
   AppellationDto,

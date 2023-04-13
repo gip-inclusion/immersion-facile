@@ -6,7 +6,6 @@ import axios, {
   AxiosRequestConfig,
   AxiosResponse,
 } from "axios";
-
 import { HttpClientError } from "../errors/4xxClientError.error";
 import { HttpServerError } from "../errors/5xxServerError.error";
 import {

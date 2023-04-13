@@ -1,5 +1,4 @@
 import { z } from "zod";
-
 import { nafSchema } from "../naf";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
@@ -13,7 +12,6 @@ import {
   zStringPossiblyEmpty,
   zTrimmedString,
 } from "../zodUtils";
-
 import {
   BusinessContactDto,
   ContactMethod,
