@@ -19,7 +19,7 @@ import { optional } from "./pgUtils";
 
 const logger = createLogger(__filename);
 
-const MAX_AGENCIES_RETURNED = 100;
+const MAX_AGENCIES_RETURNED = 200;
 
 type AgencyColumns =
   | "admin_emails"
