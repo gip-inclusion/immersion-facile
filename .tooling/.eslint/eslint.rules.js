@@ -13,23 +13,23 @@ module.exports = {
     {
       groups: [
         // Packages `react` related packages come first.
-        ["^react", "^@?\\w"],
-        // Internal packages.
-        ["^(@|components)(/.*|$)"],
-        // Our own packages
-        ["shared"],
-        ["react-design-system"],
-        ["html-templates"],
-        ["http-client"],
-        ["^src/"],
-        // Side effect imports.
-        ["^\\u0000"],
-        // Parent imports. Put `..` last.
-        ["^\\.\\.(?!/?$)", "^\\.\\./?$"],
-        // Other relative imports. Put same-folder imports and `.` last.
-        ["^\\./(?=.*/)(?!/?$)", "^\\.(?!/?$)", "^\\./?$"],
-        // Style imports.
-        ["^.+\\.?((c|sc)ss)$"],
+        [
+          "^react",
+          "^@?\\w",
+          "^(@|components)(/.*|$)",
+          "shared",
+          "react-design-system",
+          "html-templates",
+          "http-client",
+          "^src/",
+          "^\\u0000",
+          "^\\.\\.(?!/?$)",
+          "^\\.\\./?$",
+          "^\\./(?=.*/)(?!/?$)",
+          "^\\.(?!/?$)",
+          "^\\./?$",
+          "^.+\\.?((c|sc)ss)$",
+        ],
       ],
     },
   ],
