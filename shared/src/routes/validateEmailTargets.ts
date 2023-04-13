@@ -1,20 +1,16 @@
-import { createTargets, CreateTargets, Target } from "http-client";
+import { createTargets, createTarget } from "http-client";
+import {
+  validateEmailInputSchema,
+  validateEmailResponseSchema,
+} from "../email/validateEmail.schema";
 
-const validateEmailUrl = "/validate-email";
+export type ValidateEmailTargets = typeof validateEmailsTargets;
 
-type ValidateEmailParams = {
-  email: string;
-};
-
-export type ValidateEmailTargets = CreateTargets<{
-  validateEmail: Target<
-    void,
-    ValidateEmailParams,
-    void,
-    typeof validateEmailUrl
-  >;
-}>;
-
-export const validateEmailsTargets = createTargets<ValidateEmailTargets>({
-  validateEmail: { method: "GET", url: validateEmailUrl },
+export const validateEmailsTargets = createTargets({
+  validateEmail: createTarget({
+    method: "GET",
+    url: "/validate-email",
+    validateQueryParams: validateEmailInputSchema.parse,
+    validateResponseBody: validateEmailResponseSchema.parse,
+  }),
 });

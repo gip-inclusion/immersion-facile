@@ -2,19 +2,14 @@ import { Pool } from "pg";
 import { UpdateAllPeAgencies } from "../../../domain/convention/useCases/agencies/UpdateAllPeAgencies";
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
-import {
-  HttpAddressGateway,
-} from "../../secondary/addressGateway/HttpAddressGateway";
-import {
-  addressesExternalTargets,
-  AddressesTargets,
-} from "../../secondary/addressGateway/HttpAddressGateway.targets";
+import { HttpAddressGateway } from "../../secondary/addressGateway/HttpAddressGateway";
+import { addressesExternalTargets } from "../../secondary/addressGateway/HttpAddressGateway.targets";
 import { ConsoleAppLogger } from "../../secondary/core/ConsoleAppLogger";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { HttpPeAgenciesReferential } from "../../secondary/immersionOffer/peAgenciesReferential/HttpPeAgenciesReferential";
 import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { AppConfig } from "../config/appConfig";
-import { createExternalHttpClient } from "../config/createGateways";
+import { createHttpClientForExternalApi } from "../config/createGateways";
 import { createUowPerformer } from "../config/uowConfig";
 
 const updateAllPeAgenciesScript = async () => {
@@ -32,7 +27,7 @@ const updateAllPeAgenciesScript = async () => {
   );
 
   const adressAPI = new HttpAddressGateway(
-    createExternalHttpClient<AddressesTargets>(addressesExternalTargets),
+    createHttpClientForExternalApi(addressesExternalTargets),
     config.apiKeyOpenCageDataGeocoding,
     config.apiKeyOpenCageDataGeosearch,
   );

@@ -1,9 +1,4 @@
-import {
-  createTargets,
-  type CreateTargets,
-  type HttpClient,
-  type Target,
-} from "http-client";
+import { createTargets, type HttpClient, createTarget } from "http-client";
 import { ValidateEmailReason, ValidateEmailStatus, Flavor } from "shared";
 import { EmailValidationGetaway } from "../../../domain/emailValidation/ports/EmailValidationGateway";
 import { createLogger } from "../../../utils/logger";
@@ -38,25 +33,18 @@ type EmailableEmailValidationParams = {
   email: string;
   api_key: EmailableApiKey;
 };
-export const emailableVerifyApiUrl =
-  "https://api.emailable.com/v1/verify" as const;
 
-export type EmailableValidationTargets = CreateTargets<{
-  validateEmail: Target<
-    void,
-    EmailableEmailValidationParams,
-    void,
-    typeof emailableVerifyApiUrl
-  >;
-}>;
+export type EmailableValidationTargets = typeof emailableValidationTargets;
 
-export const emailableValidationTargets =
-  createTargets<EmailableValidationTargets>({
-    validateEmail: {
-      method: "GET",
-      url: emailableVerifyApiUrl,
-    },
-  });
+export const emailableValidationTargets = createTargets({
+  validateEmail: createTarget({
+    method: "GET",
+    url: "https://api.emailable.com/v1/verify",
+    validateQueryParams: (queryParams) =>
+      queryParams as EmailableEmailValidationParams,
+    validateResponseBody: (responseBody) => responseBody,
+  }),
+});
 
 const logger = createLogger(__filename);
 

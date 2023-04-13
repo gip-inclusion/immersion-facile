@@ -10,16 +10,10 @@ import {
 
 import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
 import { AppConfig } from "../../primary/config/appConfig";
-import { createExternalHttpClient } from "../../primary/config/createGateways";
+import { createHttpClientForExternalApi } from "../../primary/config/createGateways";
 
-import {
-  HttpAddressGateway,
-  errorMessage,
-} from "./HttpAddressGateway";
-import {
-  addressesExternalTargets,
-  AddressesTargets,
-} from "./HttpAddressGateway.targets";
+import { HttpAddressGateway, errorMessage } from "./HttpAddressGateway";
+import { addressesExternalTargets } from "./HttpAddressGateway.targets";
 
 const resultFromApiAddress = {
   type: "FeatureCollection",
@@ -58,7 +52,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
 
   beforeEach(() => {
     httpAddressGateway = new HttpAddressGateway(
-      createExternalHttpClient<AddressesTargets>(addressesExternalTargets),
+      createHttpClientForExternalApi(addressesExternalTargets),
       geocodingApiKey,
       geosearchApiKey,
     );
@@ -394,7 +388,7 @@ describe("HttpOpenCageDataAddressGateway check parrarel call", () => {
   const parallelCalls = 10;
   it(`Should support ${parallelCalls} of /getAddressFromPosition parallel calls`, async () => {
     const httpAddressGateway: AddressGateway = new HttpAddressGateway(
-      createExternalHttpClient<AddressesTargets>(addressesExternalTargets),
+      createHttpClientForExternalApi(addressesExternalTargets),
       geocodingApiKey,
       geosearchApiKey,
     );

@@ -3,13 +3,8 @@ import { random, sleep } from "shared";
 import { UpdateEstablishmentsFromSirenApiScript } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentsFromSirenApiScript";
 import { createLogger } from "../../../utils/logger";
 import { PipelineStats } from "../../../utils/pipelineStats";
-import {
-  HttpAddressGateway,
-} from "../../secondary/addressGateway/HttpAddressGateway";
-import {
-  addressesExternalTargets,
-  AddressesTargets,
-} from "../../secondary/addressGateway/HttpAddressGateway.targets";
+import { HttpAddressGateway } from "../../secondary/addressGateway/HttpAddressGateway";
+import { addressesExternalTargets } from "../../secondary/addressGateway/HttpAddressGateway.targets";
 import {
   defaultMaxBackoffPeriodMs,
   defaultRetryDeadlineMs,
@@ -20,7 +15,7 @@ import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGatewa
 import { PgEstablishmentAggregateRepository } from "../../secondary/pg/PgEstablishmentAggregateRepository";
 import { HttpSirenGateway } from "../../secondary/sirene/HttpSirenGateway";
 import { AppConfig } from "../config/appConfig";
-import { createExternalHttpClient } from "../config/createGateways";
+import { createHttpClientForExternalApi } from "../config/createGateways";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
 const logger = createLogger(__filename);
@@ -58,7 +53,7 @@ const main = async () => {
   );
 
   const addressAPI = new HttpAddressGateway(
-    createExternalHttpClient<AddressesTargets>(addressesExternalTargets),
+    createHttpClientForExternalApi(addressesExternalTargets),
     config.apiKeyOpenCageDataGeocoding,
     config.apiKeyOpenCageDataGeosearch,
   );

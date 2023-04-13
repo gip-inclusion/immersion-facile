@@ -5,10 +5,7 @@ import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { InsertEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/InsertEstablishmentAggregateFromFormEstablishement";
 import { createLogger } from "../../../utils/logger";
 import { notifyDiscord } from "../../../utils/notifyDiscord";
-import {
-  addressesExternalTargets,
-  AddressesTargets,
-} from "../../secondary/addressGateway/HttpAddressGateway.targets";
+import { addressesExternalTargets } from "../../secondary/addressGateway/HttpAddressGateway.targets";
 import {
   defaultMaxBackoffPeriodMs,
   defaultRetryDeadlineMs,
@@ -21,10 +18,8 @@ import { AppConfig } from "../config/appConfig";
 import { createPgUow } from "../config/uowConfig";
 import { HttpSirenGateway } from "../../secondary/sirene/HttpSirenGateway";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
-import {
-  HttpAddressGateway,
-} from "../../secondary/addressGateway/HttpAddressGateway";
-import { createExternalHttpClient } from "../config/createGateways";
+import { HttpAddressGateway } from "../../secondary/addressGateway/HttpAddressGateway";
+import { createHttpClientForExternalApi } from "../config/createGateways";
 
 const maxQpsSireneApi = 0.25;
 
@@ -52,7 +47,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
   });
   const clientDestination = await poolDestination.connect();
   const addressAPI = new HttpAddressGateway(
-    createExternalHttpClient<AddressesTargets>(addressesExternalTargets),
+    createHttpClientForExternalApi(addressesExternalTargets),
     config.apiKeyOpenCageDataGeocoding,
     config.apiKeyOpenCageDataGeosearch,
   );

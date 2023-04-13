@@ -63,7 +63,8 @@ const axiosHandlerCreator = createAxiosHandlerCreator(
   }),
 );
 
-const createHttpClientForExternalApi = configureHttpClient(axiosHandlerCreator);
+export const createHttpClientForExternalApi =
+  configureHttpClient(axiosHandlerCreator);
 
 export type GetPgPoolFn = () => Pool;
 export const createGetPgPoolFn = (config: AppConfig): GetPgPoolFn => {
