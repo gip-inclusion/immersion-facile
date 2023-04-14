@@ -1,7 +1,6 @@
 import { from, Observable } from "rxjs";
 import {
   AbsoluteUrl,
-  absoluteUrlSchema,
   AdminTargets,
   adminTokenSchema,
   BackOfficeJwt,
@@ -39,7 +38,7 @@ export class HttpAdminGateway implements AdminGateway {
             authorization: token,
           },
         })
-        .then(({ responseBody }) => absoluteUrlSchema.parse(responseBody)),
+        .then(({ responseBody }) => responseBody),
     );
   }
   public addEstablishmentBatch$(

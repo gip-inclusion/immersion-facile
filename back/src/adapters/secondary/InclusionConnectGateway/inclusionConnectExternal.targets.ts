@@ -25,6 +25,7 @@ export const makeInclusionConnectExternalTargets = (
       method: "POST",
       url: `${inclusionConnectBaseUrl}/token`,
       validateHeaders: withContentTypeUrlEncodedSchema.passthrough().parse,
+      validateRequestBody: z.string().parse,
       validateResponseBody: inclusionAccessTokenResponseSchema.parse,
     }),
     inclusionConnectLogout: createTarget({

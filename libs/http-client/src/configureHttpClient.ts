@@ -71,12 +71,20 @@ export type HttpClient<Targets extends Record<string, UnknownTarget>> = {
 export type HandlerCreator = <T extends UnknownTarget>(target: T) => Handler<T>;
 
 const createThrowIfNotVoid =
-  <T>(paramName: string) =>
+  <T>(paramName: string, { method, url }: MethodAndUrl) =>
   (param: unknown): T => {
     if (param === undefined) return undefined as T;
-    throw new Error(
-      `No validation function provided for ${paramName} validation`,
-    );
+    const message = `In route ${method} ${url} : No validation function provided for ${paramName} validation.`;
+    const error = new Error(message);
+
+    error.cause = {
+      message,
+      method,
+      url,
+      paramName,
+    };
+
+    throw error;
   };
 export const createTarget = <
   Body = void,
@@ -93,10 +101,10 @@ export const createTarget = <
     ResponseBody
   >,
 ): Target<Body, QueryParams, Headers, UrlWithParams, ResponseBody> => ({
-  validateRequestBody: createThrowIfNotVoid("requestBody"),
-  validateQueryParams: createThrowIfNotVoid("queryParams"),
+  validateRequestBody: createThrowIfNotVoid("requestBody", target),
+  validateQueryParams: createThrowIfNotVoid("queryParams", target),
   validateHeaders: (headers) => headers as Headers,
-  validateResponseBody: createThrowIfNotVoid("responseBody"),
+  validateResponseBody: createThrowIfNotVoid("responseBody", target),
   ...target,
 });
 

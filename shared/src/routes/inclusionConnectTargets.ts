@@ -4,8 +4,6 @@ import { authenticateWithInclusionCodeSchema } from "../inclusionConnect/inclusi
 
 // inclusion connect documentation is here : https://github.com/betagouv/itou-inclusion-connect/blob/master/docs/openid_connect.md#d%C3%A9tail-des-flux
 
-export type InclusionConnectImmersionTargets =
-  typeof inclusionConnectImmersionTargets;
 export const inclusionConnectImmersionTargets = createTargets({
   startInclusionConnectLogin: createTarget({
     method: "GET",
