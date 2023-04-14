@@ -69,13 +69,15 @@ const useWaitForReduxFormUiReadyBeforeFormikInitialisation = (
 };
 
 type ConventionFormProps = {
-  properties: ConventionPresentation;
+  convention: ConventionPresentation;
   routeParams?: { jwt?: string };
+  mode: "create" | "edit";
 };
 
 export const ConventionForm = ({
-  properties,
+  convention,
   routeParams = {},
+  mode,
 }: ConventionFormProps) => {
   const { cx } = useStyles();
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
@@ -86,14 +88,14 @@ export const ConventionForm = ({
       : undefined;
 
   const [initialValues] = useState<ConventionPresentation>({
-    ...properties,
+    ...convention,
 
     signatories: {
-      ...properties.signatories,
+      ...convention.signatories,
       beneficiary: {
-        ...properties.signatories.beneficiary,
+        ...convention.signatories.beneficiary,
         federatedIdentity:
-          properties.signatories.beneficiary.federatedIdentity ??
+          convention.signatories.beneficiary.federatedIdentity ??
           peConnectIdentity,
       },
     },
@@ -113,28 +115,27 @@ export const ConventionForm = ({
   });
   const { getValues, reset } = methods;
 
-  useMatomo(properties.internshipKind);
+  useMatomo(convention.internshipKind);
 
   useEffect(() => {
-    if (
-      (!("demandeId" in routeParams) && !("jwt" in routeParams)) ||
-      !("jwt" in routeParams) ||
-      routeParams.jwt === undefined
-    ) {
+    if (mode === "create") {
       dispatch(conventionSlice.actions.clearFetchedConvention());
       return;
     }
-    dispatch(conventionSlice.actions.jwtProvided(routeParams.jwt));
-    const { applicationId: conventionId } =
-      decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(
-        routeParams.jwt,
+
+    if (mode === "edit" && routeParams.jwt) {
+      dispatch(conventionSlice.actions.jwtProvided(routeParams.jwt));
+      const { applicationId: conventionId } =
+        decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(
+          routeParams.jwt,
+        );
+      dispatch(
+        conventionSlice.actions.fetchConventionRequested({
+          jwt: routeParams.jwt,
+          conventionId,
+        }),
       );
-    dispatch(
-      conventionSlice.actions.fetchConventionRequested({
-        jwt: routeParams.jwt,
-        conventionId,
-      }),
-    );
+    }
   }, []);
 
   useEffect(() => {

@@ -106,7 +106,7 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
       params: {
         agencyLogoUrl: agency.logoUrl,
         internshipKind: convention.internshipKind,
-        demandeId: convention.id,
+        conventionId: convention.id,
         signedAt: lastSignee.signedAt,
         conventionStatusLink,
       },

@@ -38,21 +38,21 @@ export type EmailParamsByEmailType = {
   };
   SIGNEE_HAS_SIGNED_CONVENTION: {
     internshipKind: InternshipKind;
-    demandeId: string;
+    conventionId: string;
     signedAt: string;
     conventionStatusLink: string;
     agencyLogoUrl: AbsoluteUrl | undefined;
   };
   NEW_CONVENTION_BENEFICIARY_CONFIRMATION: {
     internshipKind: InternshipKind;
-    demandeId: string;
+    conventionId: string;
     firstName: string;
     lastName: string;
     agencyLogoUrl: AbsoluteUrl | undefined;
   };
   NEW_CONVENTION_AGENCY_NOTIFICATION: {
     internshipKind: InternshipKind;
-    demandeId: string;
+    conventionId: string;
     firstName: string;
     lastName: string;
     dateStart: string;
@@ -66,7 +66,7 @@ export type EmailParamsByEmailType = {
   };
   NEW_CONVENTION_ESTABLISHMENT_TUTOR_CONFIRMATION: {
     internshipKind: InternshipKind;
-    demandeId: string;
+    conventionId: string;
     establishmentTutorName: string;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;

@@ -71,7 +71,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
       {
         params: {
           internshipKind: signedConvention.internshipKind,
-          demandeId: signedConvention.id,
+          conventionId: signedConvention.id,
           signedAt: signedConvention.signatories.beneficiary.signedAt!,
           conventionStatusLink,
           agencyLogoUrl: agency.logoUrl,
@@ -101,7 +101,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
           internshipKind: signedConvention.internshipKind,
           signedAt:
             signedConvention.signatories.establishmentRepresentative.signedAt!,
-          demandeId: signedConvention.id,
+          conventionId: signedConvention.id,
           conventionStatusLink: fakeGenerateMagicLinkUrlFn({
             targetRoute: frontRoutes.conventionStatusDashboard,
             id: signedConvention.id,

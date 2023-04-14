@@ -184,7 +184,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       firstName,
       lastName,
       internshipKind,
-      demandeId,
+      conventionId,
       agencyLogoUrl,
     }) => ({
       subject: `${
@@ -195,7 +195,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       greetings: `Bonjour ${firstName} ${lastName},`,
       content: `
         Merci d'avoir confirmé votre demande de convention. Elle va être transmise à votre conseiller référent.
-        La convention est enregistrée avec le numéro: ${demandeId}.
+        La convention est enregistrée avec le numéro: ${conventionId}.
 
         Il vous informera par mail de la validation ou non ${
           internshipKind === "immersion" ? "de l'immersion" : "du mini stage"
@@ -224,7 +224,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       beneficiaryLastName,
       internshipKind,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      demandeId,
+      conventionId,
       agencyLogoUrl,
     }) => ({
       subject: `${
@@ -273,7 +273,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       internshipKind,
       warning,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      demandeId,
+      conventionId,
       agencyLogoUrl,
     }) => ({
       subject:
@@ -1092,7 +1092,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
   SIGNEE_HAS_SIGNED_CONVENTION: {
     niceName: "Confirmation de signature de l'immersion",
     createEmailVariables: ({
-      demandeId,
+      conventionId,
       signedAt,
       conventionStatusLink,
       internshipKind,
@@ -1100,15 +1100,15 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
     }) => ({
       subject:
         internshipKind === "immersion"
-          ? `Confirmation de signature de l'immersion - ${demandeId}`
-          : `Mini Stage - Confirmation de signature du mini stage - ${demandeId}`,
+          ? `Confirmation de signature de l'immersion - ${conventionId}`
+          : `Mini Stage - Confirmation de signature du mini stage - ${conventionId}`,
       greetings: `Bonjour,`,
       content: `
       Nous confirmons que vous avez signé ${
         internshipKind === "immersion"
           ? "la convention d'immersion professionnelle"
           : "le mini stage"
-      } ${demandeId} le ${
+      } ${conventionId} le ${
         isStringDate(signedAt)
           ? toDisplayedDate(new Date(signedAt), true)
           : "DATE INVALIDE"

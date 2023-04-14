@@ -31,7 +31,7 @@ export const ConventionPageForExternals = ({
 
   return externalConsumer.isIframe ? (
     <ConventionForm
-      properties={conventionInitialValuesFromUrl({
+      convention={conventionInitialValuesFromUrl({
         route,
         internshipKind: "immersion",
       })}
@@ -40,7 +40,7 @@ export const ConventionPageForExternals = ({
   ) : (
     <HeaderFooterLayout>
       <ConventionForm
-        properties={conventionInitialValuesFromUrl({
+        convention={conventionInitialValuesFromUrl({
           route,
           internshipKind: "immersion",
         })}

@@ -49,7 +49,7 @@ export class StubSentEmailGateway implements StubSentEmailGateway {
           cc: ["erika.grandjean@immersion.fr"],
           params: {
             internshipKind: "immersion",
-            demandeId: "55c4872f-9537-4e8e-8102-71bd9380a0f7",
+            conventionId: "55c4872f-9537-4e8e-8102-71bd9380a0f7",
             firstName: "fgfsdgsdfg",
             lastName: "fgdfgdf",
             dateStart: "2023-01-27",

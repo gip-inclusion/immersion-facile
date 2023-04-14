@@ -97,7 +97,7 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
             businessName: convention.businessName,
             dateEnd: convention.dateEnd,
             dateStart: convention.dateStart,
-            demandeId: convention.id,
+            conventionId: convention.id,
             firstName: convention.signatories.beneficiary.firstName,
             lastName: convention.signatories.beneficiary.lastName,
             magicLink: this.generateConventionMagicLinkUrl({

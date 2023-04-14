@@ -37,7 +37,7 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
   const [shouldShowForm, setShouldShowForm] = useState(false);
   const isSharedConvention = Object.keys(route.params).length > 0;
-
+  const mode = "jwt" in route.params ? "edit" : "create";
   useFederatedIdentityFromUrl(route);
 
   useEffect(() => {
@@ -50,24 +50,26 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
 
   if (isLoading) return <Loader />;
 
-  if ("jwt" in route.params)
+  if (mode === "edit")
     return (
       <ConventionForm
-        properties={conventionInitialValuesFromUrl({
+        convention={conventionInitialValuesFromUrl({
           route,
           internshipKind: "immersion",
         })}
         routeParams={route.params}
+        mode={mode}
       />
     );
 
   return shouldShowForm ? (
     <ConventionForm
-      properties={conventionInitialValuesFromUrl({
+      convention={conventionInitialValuesFromUrl({
         route,
         internshipKind: "immersion",
       })}
       routeParams={route.params}
+      mode={mode}
     />
   ) : (
     <InitiateConventionCard
