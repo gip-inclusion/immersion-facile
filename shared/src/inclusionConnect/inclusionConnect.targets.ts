@@ -1,6 +1,6 @@
 import { createTarget, createTargets } from "http-client";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
-import { authenticateWithInclusionCodeSchema } from "../inclusionConnect/inclusionConnect.schema";
+import { authenticateWithInclusionCodeSchema } from "./inclusionConnect.schema";
 
 // inclusion connect documentation is here : https://github.com/betagouv/itou-inclusion-connect/blob/master/docs/openid_connect.md#d%C3%A9tail-des-flux
 
