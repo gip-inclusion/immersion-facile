@@ -15,7 +15,13 @@ export const ConventionSignOnlyMessage = ({
   const t = useConventionTexts(getValues().internshipKind);
 
   return (
-    <div role="alert" className={fr.cx("fr-alert", "fr-alert--info")}>
+    <div
+      role="alert"
+      className={fr.cx(
+        "fr-alert",
+        isAlreadySigned ? "fr-alert--success" : "fr-alert--info",
+      )}
+    >
       <p className={fr.cx("fr-alert__title")}>
         {isAlreadySigned
           ? t.conventionAlreadySigned

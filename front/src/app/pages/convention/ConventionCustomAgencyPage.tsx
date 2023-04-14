@@ -30,6 +30,7 @@ export const ConventionCustomAgencyPage = ({
             internshipKind: "immersion",
           })}
           routeParams={route.params}
+          mode="create"
         />
       </MainWrapper>
     </HeaderFooterLayout>

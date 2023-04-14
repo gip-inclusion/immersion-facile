@@ -91,7 +91,7 @@ export const validateAndParseZodSchema = <T>(
     return inputSchema.parse(params);
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.error("ValidateAndParseZodSchema provided params : ", params);
+    console.error("ValidateAndParseZodSchema failed with: ", params);
     throw new BadRequestError(e);
   }
 };

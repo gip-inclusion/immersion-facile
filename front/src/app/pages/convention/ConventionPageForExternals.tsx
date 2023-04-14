@@ -36,6 +36,7 @@ export const ConventionPageForExternals = ({
         internshipKind: "immersion",
       })}
       routeParams={route.params}
+      mode="create"
     />
   ) : (
     <HeaderFooterLayout>
@@ -45,6 +46,7 @@ export const ConventionPageForExternals = ({
           internshipKind: "immersion",
         })}
         routeParams={route.params}
+        mode="create"
       />
     </HeaderFooterLayout>
   );

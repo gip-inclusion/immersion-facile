@@ -3,6 +3,7 @@ import {
   AddressDto,
   agenciesRoute,
   AgencyDtoBuilder,
+  agencyTargets,
   BackOfficeJwt,
   expectToEqual,
 } from "shared";
@@ -172,6 +173,33 @@ describe(`/${agenciesRoute} route`, () => {
       );
 
       expect(inMemoryUow.outboxRepository.events).toHaveLength(1);
+    });
+  });
+  describe("Public route to get agency public info by id", () => {
+    it("Returns agency public info", async () => {
+      // Prepare
+      await inMemoryUow.agencyRepository.insert(agency1ActiveNearBy);
+
+      // Act and assert
+      const response = await request.get(
+        `${agencyTargets.getAgencyPublicInfoById.url}/?agencyId=${agency1ActiveNearBy.id}`,
+      );
+
+      expect(response.body).toEqual({
+        city: "Paris",
+        departmentCode: "20",
+        address: {
+          postcode: "75002",
+          streetNumberAndAddress: "",
+        },
+        id: "test-agency-1",
+        name: "Test Agency 1",
+        position: {
+          lat: 10.11,
+          lon: 10.12,
+        },
+        signature: "empty-signature",
+      });
     });
   });
 });

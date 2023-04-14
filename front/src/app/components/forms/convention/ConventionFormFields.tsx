@@ -83,6 +83,11 @@ export const ConventionFormFields = ({
     isLoading ||
     (isSubmitted && conventionSubmitFeedback.kind === "justSubmitted");
 
+  // Signature mode: hide the form and only show the success alert
+  if (conventionSubmitFeedback.kind === "signedSuccessfully") {
+    return <ConventionSignOnlyMessage isAlreadySigned={true} />;
+  }
+
   return (
     <>
       {isFrozen && !isSignatureMode && <ConventionFrozenMessage />}

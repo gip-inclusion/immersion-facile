@@ -23,6 +23,7 @@ export const ConventionMiniStagePage = ({
         internshipKind: "mini-stage-cci",
       })}
       routeParams={route.params}
+      mode="create"
     />
   </ConventionFormContainerLayout>
 );

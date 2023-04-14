@@ -107,9 +107,7 @@ export const createAdminRouter = (
           );
         const useCaseParams: GetDashboardParams = {
           name: req.params.dashboardName as any,
-          ...((req.query.agencyId as string | undefined)
-            ? { agencyId: req.query.agencyId }
-            : {}),
+          ...((req.query.agencyId as string | undefined) ? req.query : {}),
         };
 
         return deps.useCases.getDashboard.execute(useCaseParams);
