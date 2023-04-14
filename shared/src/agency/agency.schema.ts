@@ -24,7 +24,6 @@ import {
   CreateAgencyDto,
   ListAgenciesRequestDto,
   PrivateListAgenciesRequestDto,
-  RegisterAgencyToInclusionConnectUserParams,
   UpdateAgencyRequestDto,
   WithActiveOrRejectedStatus,
   WithAgencyId,
@@ -153,7 +152,6 @@ export const withAgencyStatusSchema: z.Schema<WithAgencyStatus> = z.object({
   status: agencyStatusSchema,
 });
 
-export const registerAgencyToInclusionConnectUserParamsSchema: z.Schema<RegisterAgencyToInclusionConnectUserParams> =
-  z.object({
-    agencyId: agencyIdSchema,
-  });
+export const agencyIdsSchema: z.Schema<AgencyId[]> = z
+  .array(agencyIdSchema)
+  .nonempty();

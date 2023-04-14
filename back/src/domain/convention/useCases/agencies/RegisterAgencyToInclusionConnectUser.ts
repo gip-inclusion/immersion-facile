@@ -1,7 +1,7 @@
 import {
+  AgencyId,
+  agencyIdsSchema,
   InclusionConnectDomainJwtPayload,
-  RegisterAgencyToInclusionConnectUserParams,
-  registerAgencyToInclusionConnectUserParamsSchema,
 } from "shared";
 import {
   ForbiddenError,
@@ -15,7 +15,7 @@ import {
 import { TransactionalUseCase } from "../../../core/UseCase";
 
 export class RegisterAgencyToInclusionConnectUser extends TransactionalUseCase<
-  RegisterAgencyToInclusionConnectUserParams,
+  AgencyId[],
   void,
   InclusionConnectDomainJwtPayload
 > {
@@ -26,10 +26,10 @@ export class RegisterAgencyToInclusionConnectUser extends TransactionalUseCase<
     super(uowPerformer);
   }
 
-  inputSchema = registerAgencyToInclusionConnectUserParamsSchema;
+  inputSchema = agencyIdsSchema;
 
   protected async _execute(
-    dto: RegisterAgencyToInclusionConnectUserParams,
+    agencyIds: AgencyId[],
     uow: UnitOfWork,
     inclusionConnectedPayload: InclusionConnectDomainJwtPayload,
   ): Promise<void> {
@@ -43,10 +43,10 @@ export class RegisterAgencyToInclusionConnectUser extends TransactionalUseCase<
       throw new NotFoundError(
         `User not found with id: ${inclusionConnectedPayload.userId}`,
       );
-
-    const agency = await uow.agencyRepository.getById(dto.agencyId);
+    const agencyId = agencyIds[0];
+    const agency = await uow.agencyRepository.getById(agencyId);
     if (!agency)
-      throw new NotFoundError(`Agency not found with id: ${dto.agencyId}`);
+      throw new NotFoundError(`Agency not found with id: ${agencyId}`);
 
     user.agencyRights.push({ agency, role: "toReview" });
 

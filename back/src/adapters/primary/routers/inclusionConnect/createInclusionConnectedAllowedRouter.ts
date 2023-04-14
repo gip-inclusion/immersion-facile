@@ -32,7 +32,7 @@ export const createInclusionConnectedAllowedRouter = (
 
   inclusionConnectedRouter.post(
     removeRouterPrefix(
-      inclusionConnectedAllowedTargets.registerAgencyToUser.url,
+      inclusionConnectedAllowedTargets.registerAgenciesToUser.url,
     ),
     (req, res) =>
       sendHttpResponse(req, res, () =>

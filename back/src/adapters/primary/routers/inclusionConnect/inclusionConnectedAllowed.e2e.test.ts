@@ -66,7 +66,7 @@ describe("Router for users authenticated with Inclusion Connect", () => {
     it("throws without Inclusion Token", async () => {
       const { request } = await buildTestApp();
       const response = await request.post(
-        inclusionConnectedAllowedTargets.registerAgencyToUser.url,
+        inclusionConnectedAllowedTargets.registerAgenciesToUser.url,
       );
       expect(response.body).toEqual({
         error: "You need to authenticate first",
@@ -92,9 +92,9 @@ describe("Router for users authenticated with Inclusion Connect", () => {
       inMemoryUow.agencyRepository.setAgencies([agency]);
       const token = generateAuthenticatedUserJwt({ userId });
       const response = await request
-        .post(inclusionConnectedAllowedTargets.registerAgencyToUser.url)
+        .post(inclusionConnectedAllowedTargets.registerAgenciesToUser.url)
         .set("Authorization", token)
-        .send({ agencyId: agency.id });
+        .send([agency.id]);
 
       expect(response.body).toEqual({
         success: true,

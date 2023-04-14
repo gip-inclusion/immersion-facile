@@ -57,14 +57,14 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
 
   it("fails if no Jwt Token provided", async () => {
     await expectPromiseToFailWithError(
-      registerAgencyToInclusionConnectUser.execute({ agencyId }),
+      registerAgencyToInclusionConnectUser.execute([agencyId]),
       new ForbiddenError("No JWT token provided"),
     );
   });
 
   it("fails if user does not exist", async () => {
     await expectPromiseToFailWithError(
-      registerAgencyToInclusionConnectUser.execute({ agencyId }, { userId }),
+      registerAgencyToInclusionConnectUser.execute([agencyId], { userId }),
       new NotFoundError(`User not found with id: ${userId}`),
     );
   });
@@ -72,7 +72,7 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
   it("fails if agency does not exist", async () => {
     userRepository.users = [user];
     await expectPromiseToFailWithError(
-      registerAgencyToInclusionConnectUser.execute({ agencyId }, { userId }),
+      registerAgencyToInclusionConnectUser.execute([agencyId], { userId }),
       new NotFoundError(`Agency not found with id: ${agencyId}`),
     );
   });
@@ -84,10 +84,9 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
     });
 
     it("makes the link between user and provided agency id, and saves the corresponding event", async () => {
-      await registerAgencyToInclusionConnectUser.execute(
-        { agencyId },
-        { userId },
-      );
+      await registerAgencyToInclusionConnectUser.execute([agencyId], {
+        userId,
+      });
 
       const inclusionConnectedUser =
         await inclusionConnectedUserRepository.getById(userId);

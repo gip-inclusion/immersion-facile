@@ -112,7 +112,3 @@ export type ActiveOrRejectedStatus = ExtractFromExisting<
   "active" | "rejected"
 >;
 export type WithActiveOrRejectedStatus = { status: ActiveOrRejectedStatus };
-
-export type RegisterAgencyToInclusionConnectUserParams = {
-  agencyId: AgencyId;
-};
