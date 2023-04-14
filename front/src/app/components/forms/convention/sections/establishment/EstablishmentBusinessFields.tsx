@@ -22,16 +22,17 @@ export const EstablishmentBusinessFields = ({
     });
 
   const { getValues, register, control } = useFormContext<ConventionDto>();
-
+  const values = getValues();
   const siret = useWatch({
     control,
     name: "siret",
   });
   useEffect(() => {
-    updateSiret(siret);
+    if (values.siret !== siret) {
+      updateSiret(siret);
+    }
   }, [siret]);
 
-  const values = getValues();
   useSiretRelatedField("businessName", {
     disabled: values.status !== "DRAFT",
   });
