@@ -189,7 +189,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
     }) => ({
       subject: `${
         internshipKind === "immersion"
-          ? "Immersion Facilitée - Votre confirmation pour votre demande de convention est enregistrée"
+          ? "Votre confirmation pour votre demande de convention est enregistrée"
           : "Mini Stage - Votre confirmation pour votre demande de mini stage est enregistrée"
       }`,
       greetings: `Bonjour ${firstName} ${lastName},`,
@@ -229,7 +229,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
     }) => ({
       subject: `${
         internshipKind === "immersion"
-          ? "Immersion Facilitée - Demande de convention confirmée"
+          ? "Demande de convention confirmée"
           : "Mini Stage - Demande de mini stage confirmée"
       }`,
       greetings: `Bonjour ${establishmentTutorName},`,
@@ -278,7 +278,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
     }) => ({
       subject:
         internshipKind === "immersion"
-          ? `Immersion Facilitée - une demande de convention d'immersion est déposée : ${firstName}, ${lastName} - ${businessName} - ${agencyName}.`
+          ? `Une demande de convention d'immersion est déposée : ${firstName}, ${lastName} - ${businessName} - ${agencyName}.`
           : `Mini Stage - une demande de convention de mini stage est déposée : ${firstName}, ${lastName} - ${businessName} - ${agencyName}.`,
       greetings: "Bonjour,",
       content: `
@@ -344,7 +344,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
     }) => ({
       subject:
         internshipKind === "immersion"
-          ? `Immersion Facilitée - Validation et convention de l'immersion pour observer l'activité de ${immersionAppellationLabel} au sein de ${businessName}`
+          ? `Validation et convention de l'immersion pour observer l'activité de ${immersionAppellationLabel} au sein de ${businessName}`
           : `Mini Stage - Validation et convention du mini stage pour observer l'activité de ${immersionAppellationLabel} au sein de ${businessName}`,
       greetings: "Bonjour,",
       content: `
@@ -409,11 +409,11 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       immersionAddress,
       agencyLogoUrl,
     }) => ({
-      subject: `Immersion Facilitée - la demande de convention d'immersion envoyée par ${beneficiaryFirstName} ${beneficiaryLastName} est totalement signée. A vous de la valider !`,
+      subject: `Pour action : la demande de convention d'immersion envoyée par ${beneficiaryFirstName} ${beneficiaryLastName} est totalement signée. À vous de la valider !`,
       greetings: `Bonjour ${advisorFirstName} ${advisorLastName},`,
       content: `
       <strong>La demande d'immersion de ${beneficiaryFirstName} ${beneficiaryLastName} est signée. 
-      A vous de l'étudier !</strong>`,
+      À vous de l'étudier !</strong>`,
       buttons: [
         {
           url: magicLink,
@@ -459,7 +459,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       immersionAddress,
       agencyLogoUrl,
     }) => ({
-      subject: `Immersion Facilitée - une demande de convention d'immersion vous est directement adressée par: ${beneficiaryFirstName} ${beneficiaryLastName}`,
+      subject: `Une demande de convention d'immersion vous est directement adressée par: ${beneficiaryFirstName} ${beneficiaryLastName}`,
       greetings: `Bonjour ${advisorFirstName} ${advisorLastName},`,
       content: `
       <strong>Une nouvelle demande d'immersion a été enregistrée.</strong>
@@ -522,7 +522,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
     }) => ({
       subject:
         internshipKind === "immersion"
-          ? `Immersion Facilitée - Refus de la demande d'immersion pour observer l'activité de ${immersionProfession} au sein de ${businessName}`
+          ? `Refus de la demande d'immersion pour observer l'activité de ${immersionProfession} au sein de ${businessName}`
           : `Mini Stage - Refus de la demande de mini stage pour l'activité de ${immersionProfession} au sein de ${businessName}`,
       greetings: "Bonjour,",
       content: `
@@ -565,8 +565,8 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
     }) => ({
       subject:
         internshipKind === "immersion"
-          ? "Immersion Facilitée - veuillez modifier cette demande d'immersion professionnelle"
-          : "Mini Stage - veuillez modifier cette demande de mini stage",
+          ? "Pour action : veuillez modifier cette demande d'immersion professionnelle"
+          : "Pour action : mini Stage - veuillez modifier cette demande de mini stage",
       greetings: "Bonjour,",
       content: `${agency} vous informe que la demande ${
         internshipKind === "immersion" ? "d'immersion" : "de mini stage"
@@ -605,7 +605,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
     }) => ({
       subject:
         internshipKind === "immersion"
-          ? `Immersion Facilitée - Demande d'immersion à étudier: ${beneficiaryFirstName} ${beneficiaryLastName} - ${businessName}`
+          ? `Demande d'immersion à étudier: ${beneficiaryFirstName} ${beneficiaryLastName} - ${businessName}`
           : `Mini Stage - Demande de mini stage à étudier: ${beneficiaryFirstName} ${beneficiaryLastName} - ${businessName}`,
       greetings: "Bonjour,",
       content: `
@@ -647,7 +647,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
     }) => ({
       subject:
         internshipKind === "immersion"
-          ? "Immersion Facilitée - Voici votre nouveau lien magique pour accéder à la demande d'immersion"
+          ? "Voici votre nouveau lien magique pour accéder à la demande d'immersion"
           : `Mini Stage - Voici votre nouveau lien magique pour accéder à la demande de mini stage`,
       greetings: "Bonjour,",
       content: `
@@ -686,18 +686,20 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
     }) => ({
       subject:
         internshipKind === "immersion"
-          ? "Immersion Facilitée - À vous de confirmer votre demande de convention"
-          : "Mini Stage - À vous de confirmer votre demande de mini stage",
+          ? "Pour action : à vous de signer votre demande de convention"
+          : "Pour action : à vous de confirmer votre demande de mini stage",
       greetings: "Bonjour,",
       content: `
       La demande de convention pour ${
         internshipKind === "immersion" ? "l'immersion" : "le mini stage"
       } de ${beneficiaryFirstName} ${beneficiaryLastName} pour le métier de ${immersionProfession} dans l'entreprise ${businessName} encadré par ${establishmentRepresentativeName} vient d'être signée par ${existingSignatureName}.
 
-      <strong>À vous maintenant de la confirmer !</strong>
+      <strong>Ouvrez la demande via le bouton ci-dessous puis vérifiez les informations :</strong>
+        - Si les informations sont correctes, cochez la case "Je soussigné..." tout en bas du formulaire et cliquez sur le bouton "Confirmer et signer".
+        - Si les informations ne sont pas correctes, cliquez sur le bouton "Annuler les signatures et demander des modifications".
       `,
       buttons: [
-        { url: magicLink, label: "Confirmer ma demande de convention" },
+        { url: magicLink, label: "Ouvrir ma demande" },
         createConventionStatusButton(conventionStatusLink),
       ],
       subContent: `
@@ -730,8 +732,8 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
     }) => ({
       subject:
         internshipKind === "immersion"
-          ? "Immersion Facilitée - Confirmez une demande d'immersion"
-          : "Mini Stage - Confirmez une demande de mini stage",
+          ? "Pour action : signez votre demande de convention"
+          : "Pour action : signez votre demande de mini stage",
       greetings: `Bonjour ${signatoryName},`,
       content: `Une demande de convention ${
         internshipKind === "immersion" ? "d'immersion" : "de mini stage"
@@ -750,15 +752,17 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
            - L'entreprise ${businessName} représentée par ${establishmentRepresentativeName}
            - Le tuteur dans l'entreprise ${establishmentTutorName}
         
-          <strong>Votre confirmation est obligatoire</strong> pour permettre à votre ${
+          <strong>Votre signature est obligatoire</strong> pour permettre à votre ${
             internshipKind === "immersion"
               ? "conseiller"
               : "conseiller de la Chambre de Commerce et d'Instrustrie - CCI"
           } de valider la convention. Merci !
         
-        Vous devez maintenant confirmer votre demande.`,
+        <strong>Ouvrez la demande via le bouton ci-dessous puis vérifiez les informations :</strong>
+        - Si les informations sont correctes, cochez la case "Je soussigné..." tout en bas du formulaire et cliquez sur le bouton "Confirmer et signer".
+        - Si les informations ne sont pas correctes, cliquez sur le bouton "Annuler les signatures et demander des modifications".`,
       buttons: [
-        { url: magicLink, label: "Confirmer ma demande" },
+        { url: magicLink, label: "Ouvrir ma demande" },
         createConventionStatusButton(conventionStatusLink),
       ],
       highlight: {
@@ -796,35 +800,18 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       businessName,
       message,
     }) => ({
-      subject: `Immersion Facilitée - Un candidat vous contacte pour une demande d'immersion pour le métier de ${appellationLabel}`,
+      subject: `${potentialBeneficiaryFirstName} ${potentialBeneficiaryLastName} vous contacte pour une demande d'immersion sur le métier de ${appellationLabel}`,
       greetings: `Bonjour ${contactFirstName} ${contactLastName},`,
       content: `
-      ${potentialBeneficiaryFirstName} ${potentialBeneficiaryLastName} cherche à vous contacter pour une demande d'immersion. 
-
-      L'immersion souhaitée porte sur le métier de ${appellationLabel} dans votre entreprise ${businessName}
-
-      <strong>Voici son message :</strong>
+      ${potentialBeneficiaryFirstName} ${potentialBeneficiaryLastName} vous écrit :
       ${message}
 
-      Vous pouvez le joindre par mail : ${potentialBeneficiaryEmail}
+      L'immersion souhaitée porte sur le métier de ${appellationLabel} dans votre entreprise ${businessName}.
 
-      <strong>Les points essentiels pour étudier une demande d'immersion professionnelle&nbsp:</strong>
-      - Vérifiez avec qu'elle/il est bien suivi/e par un conseiller emploi (ex: Pôle emploi, Mission Locale, Cap Emploi, Chargé d'Insertion Professionnelle) ou un conseiller en évolution professionnelle.
-      - Échangez sur vos objectifs réciproques, vos besoins, votre calendrier possible.
-      - Il est possible de faire une immersion pour découvrir un métier, confirmer un projet professionnel ou initier un recrutement. 
-      - Une immersion se fait en général pendant une à deux semaines et ne peut jamais dépasser un mois. 
-      - Ce n'est pas un stage d'application fait pendant une formation. 
-      - Si vous mettez d'accord, complétez la demande de convention. Elle sera adressée automatiquement à la structure d'accompagnement du bénéficiaire.
-      - Vous souhaitez suspendre votre visibilité sur la plateforme, le temps d'étudier sereinement cette demande ? Cliquer sur <a href="https://immersion-facile.beta.gouv.fr/">“modifier votre entreprise”</a>.
-
-      Voici quelques conseils pour préparer ce premier échange :
+      <strong>Sa candidature vous intéresse ? Voici les étapes à suivre :</strong>
+      - Préparez votre échange grâce à notre <a href="https://aide.immersion-facile.beta.gouv.fr/fr/article/etudier-une-demande-dimmersion-professionnelle-1ehkehm/">page d'aide</a>.
+      - Prenez contact avec le candidat : <a href="mailto:${potentialBeneficiaryEmail}?subject=Suite à votre demande d'immersion chez ${businessName}">${potentialBeneficiaryEmail}</a>
       `,
-      buttons: [
-        {
-          url: "https://immersion.cellar-c2.services.clever-cloud.com/les_bons_conseils_entreprise.pdf",
-          label: "Nos bons conseils",
-        },
-      ],
       subContent: defaultSignature("immersion"),
     }),
   },
@@ -839,7 +826,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       potentialBeneficiaryFirstName,
       potentialBeneficiaryLastName,
     }) => ({
-      subject: `Immersion Facilitée - Coordonnées téléphoniques pour faire votre demande d'immersion`,
+      subject: `Coordonnées téléphoniques pour faire votre demande d'immersion`,
       greetings: `Bonjour ${potentialBeneficiaryFirstName} ${potentialBeneficiaryLastName},`,
       content: `
       Vous avez manifesté de l’intérêt pour réaliser une immersion professionnelle au sein de l’entreprise ${businessName}.
@@ -868,7 +855,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       businessName,
     }) => ({
       subject:
-        "Immersion Facilitée - Coordonnées de l'entreprise pour faire votre demande d'immersion",
+        "Coordonnées de l'entreprise pour faire votre demande d'immersion",
       greetings: `Bonjour ${potentialBeneficiaryFirstName} ${potentialBeneficiaryLastName},`,
       content: `Vous avez manifesté de l’intérêt pour réaliser une immersion professionnelle au sein de l’entreprise ${businessName}.
 
@@ -895,7 +882,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
     }) => ({
       subject: `${
         internshipKind ? "Immersion Facilitée" : "Mini Stage"
-      } - Une demande de convention préremplie vous est transmise pour que vous la complétiez`,
+      } - Pour action : une demande de convention préremplie vous est transmise pour que vous la complétiez`,
       greetings: "Bonjour,",
       content: `
         <strong>Une demande de convention ${
@@ -908,11 +895,11 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
     }),
   },
   SUGGEST_EDIT_FORM_ESTABLISHMENT: {
-    niceName: "Suggestion de mise à jour d'etablissement",
+    niceName: "Suggestion de mise à jour d'établissement",
     tags: ["mise à jour fiche entreprise"],
     createEmailVariables: ({ editFrontUrl }) => ({
       subject:
-        "Immersion Facilitée - Mettez à jour les informations de votre entreprise accueillante",
+        "Mettez à jour votre fiche entreprise sur le site Immersion Facilitée",
       greetings: "Bonjour,",
       content: `Votre entreprise est inscrite dans l'annuaire des entreprises accueillantes d'Immersion Facilitée depuis au moins 6 mois. Merci !
 
@@ -937,7 +924,9 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
         { label: "Mettre à jour ma fiche établissement", url: editFrontUrl },
       ],
       highlight: {
-        content: `Nouveauté ! Il est maintenant possible d'informer que votre entreprise peut accueillir en immersion des personnes en situation de handicap *`,
+        content: `Nouveautés ! Il est maintenant possible de :
+        • limiter le nombre de mises en relations reçues par semaine,
+        • informer que votre entreprise peut accueillir en immersion des personnes en situation de handicap *.`,
       },
     }),
   },
@@ -968,7 +957,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       contactFirstName,
       contactLastName,
     }) => ({
-      subject: `Immersion Facilitée - Confirmation de création de votre établissement ${businessName} pour accueillir des immersions`,
+      subject: `Confirmation de création de votre établissement ${businessName} pour accueillir des immersions`,
       greetings: "Bonjour,",
       content: `
       <strong>Félicitations !</strong>
@@ -1006,7 +995,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
     }) => ({
       subject:
         internshipKind === "immersion"
-          ? "Immersion Facilitée - Comment s'est déroulée l'immersion ?"
+          ? "Comment s'est déroulée l'immersion ?"
           : "Mini Stage - Comment s'est déroulée le mini stage ?",
       greetings: `Bonjour ${establishmentTutorName},`,
       content: `
@@ -1111,7 +1100,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
     }) => ({
       subject:
         internshipKind === "immersion"
-          ? `Immersion Facilitée - Confirmation de signature de l'immersion - ${demandeId}`
+          ? `Confirmation de signature de l'immersion - ${demandeId}`
           : `Mini Stage - Confirmation de signature du mini stage - ${demandeId}`,
       greetings: `Bonjour,`,
       content: `
