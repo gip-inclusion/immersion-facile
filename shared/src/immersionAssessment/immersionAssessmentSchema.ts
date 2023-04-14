@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { zString } from "../zodUtils";
+import { zString, zEnumValidation } from "../zodUtils";
 import {
   assessmentStatuses,
   ImmersionAssessmentDto,
@@ -8,6 +8,6 @@ import {
 export const immersionAssessmentSchema: z.Schema<ImmersionAssessmentDto> =
   z.object({
     conventionId: z.string(),
-    status: z.enum(assessmentStatuses),
+    status: zEnumValidation(assessmentStatuses, "obligatoire"),
     establishmentFeedback: zString,
   });
