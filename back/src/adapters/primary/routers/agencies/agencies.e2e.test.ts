@@ -186,9 +186,9 @@ describe(`/${agenciesRoute} route`, () => {
       );
 
       expect(response.body).toEqual({
-        city: "Paris",
-        departmentCode: "20",
         address: {
+          city: "Paris",
+          departmentCode: "20",
           postcode: "75002",
           streetNumberAndAddress: "",
         },
