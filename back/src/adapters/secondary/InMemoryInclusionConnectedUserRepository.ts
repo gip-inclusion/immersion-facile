@@ -1,8 +1,8 @@
-import { AuthenticatedUserId } from "shared";
 import {
   AgencyRight,
+  AuthenticatedUserId,
   InclusionConnectedUser,
-} from "../../domain/dashboard/entities/InclusionConnectedUser";
+} from "shared";
 import { InclusionConnectedUserRepository } from "../../domain/dashboard/port/InclusionConnectedUserRepository";
 import { InMemoryAuthenticatedUserRepository } from "./InMemoryAuthenticatedUserRepository";
 

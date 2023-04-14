@@ -1,4 +1,4 @@
-import { AuthenticatedUser } from "../AuthenticatedUser";
+import { AuthenticatedUser } from "../inclusionConnectedUser/inclusionConnectedUser.dto";
 
 export type AuthenticateWithInclusionCodeConnectParams = {
   code: string;

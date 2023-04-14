@@ -3,8 +3,8 @@ import {
   expectToEqual,
   inclusionConnectedAllowedTargets,
 } from "shared";
+import { InclusionConnectedUser } from "shared";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
-import { InclusionConnectedUser } from "../../../../domain/dashboard/entities/InclusionConnectedUser";
 
 describe("Router for users authenticated with Inclusion Connect", () => {
   it("throws unauthorized if no token provided", async () => {
