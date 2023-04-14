@@ -25,7 +25,7 @@ export const ConventionCustomAgencyPage = ({
     <HeaderFooterLayout>
       <MainWrapper layout="boxed">
         <ConventionForm
-          convention={conventionInitialValuesFromUrl({
+          conventionProperties={conventionInitialValuesFromUrl({
             route,
             internshipKind: "immersion",
           })}

@@ -70,12 +70,10 @@ export const conventionInitialValuesFromUrl = ({
   internshipKind: InternshipKind;
 }): ConventionPresentation => {
   const dataFromDevice = deviceRepository.get("partialConventionInUrl") ?? {};
-
   const params = mergeObjectsExceptFalsyValues(
     dataFromDevice,
     route.params as Partial<ConventionInUrl>,
   );
-
   const dateStart =
     params.dateStart ?? toDateString(addDays(startOfToday(), 2));
   const dateEnd = params.dateEnd ?? toDateString(addDays(startOfToday(), 3));
@@ -197,8 +195,9 @@ export const conventionInitialValuesFromUrl = ({
     internshipKind,
   };
 
-  if (ENV.prefilledForms)
+  if (ENV.prefilledForms) {
     return devPrefilledValues(initialFormWithStoredAndUrlParams);
+  }
 
   return initialFormWithStoredAndUrlParams;
 };

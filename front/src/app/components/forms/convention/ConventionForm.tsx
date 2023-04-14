@@ -69,13 +69,13 @@ const useWaitForReduxFormUiReadyBeforeFormikInitialisation = (
 };
 
 type ConventionFormProps = {
-  convention: ConventionPresentation;
+  conventionProperties: ConventionPresentation;
   routeParams?: { jwt?: string };
   mode: "create" | "edit";
 };
 
 export const ConventionForm = ({
-  convention,
+  conventionProperties,
   routeParams = {},
   mode,
 }: ConventionFormProps) => {
@@ -88,14 +88,14 @@ export const ConventionForm = ({
       : undefined;
 
   const [initialValues] = useState<ConventionPresentation>({
-    ...convention,
+    ...conventionProperties,
 
     signatories: {
-      ...convention.signatories,
+      ...conventionProperties.signatories,
       beneficiary: {
-        ...convention.signatories.beneficiary,
+        ...conventionProperties.signatories.beneficiary,
         federatedIdentity:
-          convention.signatories.beneficiary.federatedIdentity ??
+          conventionProperties.signatories.beneficiary.federatedIdentity ??
           peConnectIdentity,
       },
     },
@@ -108,14 +108,18 @@ export const ConventionForm = ({
   );
   const fetchConventionError = useAppSelector(conventionSelectors.fetchError);
   const dispatch = useDispatch();
+  const getInitialFormValues = (mode: ConventionFormProps["mode"]) => {
+    if (mode === "create") return initialValues;
+    return fetchedConvention || initialValues;
+  };
   const methods = useForm<ConventionReadDto>({
-    defaultValues: fetchedConvention || initialValues,
+    defaultValues: getInitialFormValues(mode),
     resolver: zodResolver(conventionWithoutExternalIdSchema),
     mode: "onTouched",
   });
   const { getValues, reset } = methods;
 
-  useMatomo(convention.internshipKind);
+  useMatomo(conventionProperties.internshipKind);
 
   useEffect(() => {
     if (mode === "create") {

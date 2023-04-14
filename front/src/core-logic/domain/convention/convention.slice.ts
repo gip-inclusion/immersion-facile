@@ -7,7 +7,6 @@ import {
   ConventionId,
   ConventionMagicLinkJwt,
   ConventionReadDto,
-  Signatories,
   SignatoryRole,
   UpdateConventionStatusRequestDto,
 } from "shared";
@@ -47,7 +46,7 @@ export interface ConventionState {
   currentSignatoryRole: SignatoryRole | null;
 }
 
-const initialState: ConventionState = {
+export const initialConventionState: ConventionState = {
   formUi: {
     preselectedAgencyId: null,
     isMinor: false,
@@ -87,7 +86,7 @@ const setFeedbackAsErrored = (
 
 export const conventionSlice = createSlice({
   name: "convention",
-  initialState,
+  initialState: initialConventionState,
   reducers: {
     // Save convention
     saveConventionRequested: (state, _action: PayloadAction<ConventionDto>) => {
@@ -132,17 +131,11 @@ export const conventionSlice = createSlice({
     },
     signConventionSucceeded: (
       state,
-      action: PayloadAction<{ role: SignatoryRole; signedAt: DateIsoStr }>,
+      _action: PayloadAction<{ role: SignatoryRole; signedAt: DateIsoStr }>,
     ) => {
       state.isLoading = false;
       state.feedback = { kind: "signedSuccessfully" };
-      if (state.convention) {
-        const signatoryKey = signatoryRoleToKey[action.payload.role];
-        const signatory = state.convention.signatories[signatoryKey];
-        if (signatory) {
-          signatory.signedAt = action.payload.signedAt;
-        }
-      }
+      state.convention = null;
     },
     signConventionFailed: setFeedbackAsErrored,
 
@@ -228,12 +221,3 @@ export const conventionSlice = createSlice({
     preselectedAgencyIdFailed: setFeedbackAsErrored,
   },
 });
-
-const signatoryRoleToKey: Record<SignatoryRole, keyof Signatories> = {
-  "establishment-representative": "establishmentRepresentative",
-  beneficiary: "beneficiary",
-  "beneficiary-current-employer": "beneficiaryCurrentEmployer",
-  establishment: "establishmentRepresentative",
-  "legal-representative": "beneficiaryRepresentative",
-  "beneficiary-representative": "beneficiaryRepresentative",
-};

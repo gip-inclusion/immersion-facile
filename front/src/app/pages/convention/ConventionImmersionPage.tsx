@@ -53,7 +53,7 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
   if (mode === "edit")
     return (
       <ConventionForm
-        convention={conventionInitialValuesFromUrl({
+        conventionProperties={conventionInitialValuesFromUrl({
           route,
           internshipKind: "immersion",
         })}
@@ -64,7 +64,7 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
 
   return shouldShowForm ? (
     <ConventionForm
-      convention={conventionInitialValuesFromUrl({
+      conventionProperties={conventionInitialValuesFromUrl({
         route,
         internshipKind: "immersion",
       })}

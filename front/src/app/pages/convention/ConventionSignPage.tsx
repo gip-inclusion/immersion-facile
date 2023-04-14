@@ -11,7 +11,7 @@ import {
   SignatoryRole,
   signatoryRoles,
 } from "shared";
-import { Loader } from "react-design-system";
+import { Loader, MainWrapper } from "react-design-system";
 import { ConventionFormContainerLayout } from "src/app/components/forms/convention/ConventionFormContainerLayout";
 import { conventionSlice } from "../../../core-logic/domain/convention/convention.slice";
 import { ConventionSignForm } from "../../components/forms/convention/ConventionSignForm";
@@ -27,47 +27,60 @@ interface ConventionSignPageProperties {
   route: Route<typeof routes.conventionToSign>;
 }
 
-export const ConventionSignPage = ({ route }: ConventionSignPageProperties) => (
-  <HeaderFooterLayout>
-    {!route.params.jwt ? (
-      <SignPageLayout>
-        <Alert
-          title={commonContent.invalidLinkNotification.title}
-          severity="error"
-          description={commonContent.invalidLinkNotification.details}
-        />
-      </SignPageLayout>
-    ) : (
-      <>
-        {isSignatory(
-          decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(
-            route.params.jwt,
-          ).role,
-        ) ? (
-          <ConventionSignPageContent jwt={route.params.jwt} />
-        ) : (
-          <SignPageLayout>
-            <Alert
-              title={commonContent.incorrectUserNotification.title}
-              severity="error"
-              description={
-                <>
-                  <p>{commonContent.incorrectUserNotification.detail}</p>
-                  <p>
-                    {commonContent.incorrectUserNotification.contact}{" "}
-                    <a href={`mailto:${immersionFacileContactEmail}`}>
-                      {immersionFacileContactEmail}
-                    </a>
-                  </p>
-                </>
-              }
-            />
-          </SignPageLayout>
-        )}
-      </>
-    )}
-  </HeaderFooterLayout>
-);
+const useClearConventionOnUnmount = () => {
+  const dispatch = useDispatch();
+  return useEffect(
+    () => () => {
+      dispatch(conventionSlice.actions.clearFetchedConvention());
+    },
+    [],
+  );
+};
+
+export const ConventionSignPage = ({ route }: ConventionSignPageProperties) => {
+  useClearConventionOnUnmount();
+  return (
+    <HeaderFooterLayout>
+      {!route.params.jwt ? (
+        <SignPageLayout>
+          <Alert
+            title={commonContent.invalidLinkNotification.title}
+            severity="error"
+            description={commonContent.invalidLinkNotification.details}
+          />
+        </SignPageLayout>
+      ) : (
+        <>
+          {isSignatory(
+            decodeMagicLinkJwtWithoutSignatureCheck<ConventionMagicLinkPayload>(
+              route.params.jwt,
+            ).role,
+          ) ? (
+            <ConventionSignPageContent jwt={route.params.jwt} />
+          ) : (
+            <SignPageLayout>
+              <Alert
+                title={commonContent.incorrectUserNotification.title}
+                severity="error"
+                description={
+                  <>
+                    <p>{commonContent.incorrectUserNotification.detail}</p>
+                    <p>
+                      {commonContent.incorrectUserNotification.contact}{" "}
+                      <a href={`mailto:${immersionFacileContactEmail}`}>
+                        {immersionFacileContactEmail}
+                      </a>
+                    </p>
+                  </>
+                }
+              />
+            </SignPageLayout>
+          )}
+        </>
+      )}
+    </HeaderFooterLayout>
+  );
+};
 
 type ConventionSignPageContentProperties = {
   jwt: string;
@@ -98,6 +111,17 @@ const ConventionSignPageContent = ({
         jwt={jwt}
       />
     );
+  if (submitFeedback.kind === "signedSuccessfully")
+    return (
+      <MainWrapper layout="boxed">
+        <Alert
+          severity="success"
+          title="Convention signée"
+          description="Votre convention a bien été signée, merci. Quand toutes les parties l'auront signée et qu'elle aura été validée, vous la recevrez par email."
+        />
+      </MainWrapper>
+    );
+
   if (!convention) return <p>{commonContent.conventionNotFound}</p>;
 
   const t = useConventionTexts(convention.internshipKind);

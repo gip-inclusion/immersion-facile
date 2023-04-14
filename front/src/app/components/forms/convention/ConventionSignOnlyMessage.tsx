@@ -1,18 +1,17 @@
 import React from "react";
-import { useFormContext } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
-import { ConventionReadDto } from "shared";
+import { InternshipKind } from "shared";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 
 type SignOnlyMessageProps = {
   isAlreadySigned: boolean;
+  internshipKind: InternshipKind;
 };
 
 export const ConventionSignOnlyMessage = ({
   isAlreadySigned,
 }: SignOnlyMessageProps) => {
-  const { getValues } = useFormContext<ConventionReadDto>();
-  const t = useConventionTexts(getValues().internshipKind);
+  const t = useConventionTexts("immersion");
 
   return (
     <div
