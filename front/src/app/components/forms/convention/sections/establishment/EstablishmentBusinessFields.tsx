@@ -28,9 +28,7 @@ export const EstablishmentBusinessFields = ({
     name: "siret",
   });
   useEffect(() => {
-    if (values.siret !== siret) {
-      updateSiret(siret);
-    }
+    updateSiret(siret);
   }, [siret]);
 
   useSiretRelatedField("businessName", {
