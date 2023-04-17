@@ -271,7 +271,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
         recipients: [councellorEmail],
         params: {
           internshipKind: validConvention.internshipKind,
-          warning: `Attention: aucun conseiller référent Pôle emploi ne semble être associé à ce bénéficiaire.`,
+          warning: `Merci de vérifier le conseiller référent associé à ce bénéficiaire.`,
           ...expectedParams(agencyWithConsellorsAndValidator, validConvention),
           magicLink: fakeGenerateMagicLinkUrlFn({
             id: validConvention.id,
@@ -311,7 +311,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
             now: timeGateway.now(),
           }),
           agencyLogoUrl: agencyWithConsellorsAndValidator.logoUrl,
-          warning: `Attention: aucun conseiller référent Pôle emploi ne semble être associé à ce bénéficiaire.`,
+          warning: `Merci de vérifier le conseiller référent associé à ce bénéficiaire.`,
         },
       },
     ]);

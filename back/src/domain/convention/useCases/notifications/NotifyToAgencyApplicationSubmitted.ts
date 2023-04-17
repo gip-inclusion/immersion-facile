@@ -127,7 +127,7 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
       );
     const advisor = conventionAdsivorEntity?.advisor;
     return !advisor
-      ? "Attention: aucun conseiller référent Pôle emploi ne semble être associé à ce bénéficiaire."
+      ? "Merci de vérifier le conseiller référent associé à ce bénéficiaire."
       : `Un mail a également été envoyé au conseiller référent (${advisor.firstName} ${advisor.lastName} - ${advisor.email})`;
   }
 }
