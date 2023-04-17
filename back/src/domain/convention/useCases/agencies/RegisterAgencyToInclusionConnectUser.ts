@@ -4,6 +4,7 @@ import {
   InclusionConnectDomainJwtPayload,
 } from "shared";
 import {
+  BadRequestError,
   ForbiddenError,
   NotFoundError,
 } from "../../../../adapters/primary/helpers/httpErrors";
@@ -43,16 +44,34 @@ export class RegisterAgencyToInclusionConnectUser extends TransactionalUseCase<
       throw new NotFoundError(
         `User not found with id: ${inclusionConnectedPayload.userId}`,
       );
-    const agencyId = agencyIds[0];
-    const [agency] = await uow.agencyRepository.getByIds([agencyId]);
-    if (!agency)
-      throw new NotFoundError(`Agency not found with id: ${agencyId}`);
+    if (user.agencyRights.length > 0) {
+      throw new BadRequestError(
+        `This user (userId: ${user.id}), already has agencies rights.`,
+      );
+    }
 
-    user.agencyRights.push({ agency, role: "toReview" });
+    const agencies = await uow.agencyRepository.getByIds(agencyIds);
+    if (agencies.length !== agencyIds.length) {
+      const agenciesFoundMessage = agencies.length
+        ? `Found only : ${agencies.map((agency) => agency.id).join(", ")}.`
+        : "No agencies found.";
+
+      throw new BadRequestError(
+        [
+          `Some agencies not found with ids : ${agencyIds.join(", ")}. `,
+          agenciesFoundMessage,
+        ].join(""),
+      );
+    }
+
+    user.agencyRights = agencies.map((agency) => ({
+      agency,
+      role: "toReview",
+    }));
 
     const event = this.createNewEvent({
       topic: "AgencyRegisteredToInclusionConnectedUser",
-      payload: { userId: user.id, agencyId: agency.id },
+      payload: { userId: user.id, agencyIds },
     });
 
     await Promise.all([

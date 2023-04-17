@@ -80,7 +80,7 @@ export type DomainEvent =
   // USER CONNECTED related (only inclusion connect for now).
   // We don't put full OAuth in payload to avoid private data in logs etc...
   | GenericEvent<"UserAuthenticatedSuccessfully", { userId: string, provider: IdentityProvider }>
-  | GenericEvent<"AgencyRegisteredToInclusionConnectedUser", { userId: AuthenticatedUserId, agencyId: AgencyId }>;
+  | GenericEvent<"AgencyRegisteredToInclusionConnectedUser", { userId: AuthenticatedUserId, agencyIds: AgencyId[] }>;
 
 export type DomainTopic = DomainEvent["topic"];
 
