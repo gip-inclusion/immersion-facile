@@ -1,3 +1,4 @@
+import { AbsoluteUrl } from "../AbsoluteUrl";
 import { AgencyDto } from "../agency/agency.dto";
 import { Flavor } from "../typeFlavors";
 
@@ -23,6 +24,14 @@ export type AuthenticatedUser = {
   lastName: string;
 };
 
-export type InclusionConnectedUser = AuthenticatedUser & {
+type WithAgencyRights = {
   agencyRights: AgencyRight[];
 };
+
+type WithDashboardUrl = {
+  dashboardUrl?: AbsoluteUrl;
+};
+
+export type InclusionConnectedUser = AuthenticatedUser &
+  WithAgencyRights &
+  WithDashboardUrl;
