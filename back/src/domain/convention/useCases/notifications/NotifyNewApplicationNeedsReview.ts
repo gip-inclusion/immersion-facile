@@ -35,7 +35,9 @@ export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<Conven
     conventionDto: ConventionDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    const agency = await uow.agencyRepository.getById(conventionDto.agencyId);
+    const [agency] = await uow.agencyRepository.getByIds([
+      conventionDto.agencyId,
+    ]);
 
     if (!agency) {
       logger.error(

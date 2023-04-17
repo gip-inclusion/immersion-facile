@@ -376,7 +376,10 @@ export const createUseCases = (
       getApiConsumerById: (id: ApiConsumerId) =>
         uowPerformer.perform((uow) => uow.apiConsumerRepository.getById(id)),
       getAgencyById: (id: AgencyId) =>
-        uowPerformer.perform((uow) => uow.agencyRepository.getById(id)),
+        uowPerformer.perform(async (uow) => {
+          const [agency] = await uow.agencyRepository.getByIds([id]);
+          return agency;
+        }),
       isFormEstablishmentWithSiretAlreadySaved: (siret: SiretDto) =>
         uowPerformer.perform((uow) =>
           uow.establishmentAggregateRepository.hasEstablishmentFromFormWithSiret(

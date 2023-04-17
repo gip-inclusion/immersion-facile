@@ -113,7 +113,7 @@ export class PgAgencyRepository implements AgencyRepository {
       : "";
 
     const query = [
-      "SELECT *, ST_AsGeoJSON(position) AS position FROM public.agencies",
+      "SELECT *, ST_AsGeoJSON(position) AS position FROM agencies",
       ...(whereClause ? [whereClause] : []),
       ...(sortClause ? [sortClause] : []),
       ...(limitClause ? [limitClause] : []),
@@ -144,24 +144,24 @@ export class PgAgencyRepository implements AgencyRepository {
     return persistenceAgencyToAgencyDto(first);
   }
 
-  public async getById(id: AgencyId): Promise<AgencyDto | undefined> {
-    const pgResult = await this.client.query(
-      "SELECT id, name, status, kind, counsellor_emails, validator_emails, \
-        admin_emails, questionnaire_url, email_signature, logo_url, ST_AsGeoJSON(position) AS position, \
-        street_number_and_address, post_code, city, department_code, agency_siret, code_safir \
-      FROM public.agencies\
-      WHERE id = $1",
-      [id],
+  public async getByIds(ids: AgencyId[]): Promise<AgencyDto[]> {
+    const query = format(
+      `SELECT id, name, status, kind, counsellor_emails, validator_emails,
+        admin_emails, questionnaire_url, email_signature, logo_url, ST_AsGeoJSON(position) AS position,
+        street_number_and_address, post_code, city, department_code, agency_siret, code_safir
+      FROM agencies
+      WHERE id IN (%L)`,
+      ids,
     );
 
-    const pgAgency = pgResult.rows[0];
-    if (!pgAgency) return;
+    const pgResult = await this.client.query(query);
 
-    return persistenceAgencyToAgencyDto(pgAgency);
+    if (pgResult.rows.length === 0) return [];
+    return pgResult.rows.map(persistenceAgencyToAgencyDto);
   }
 
   public async insert(agency: AgencyDto): Promise<AgencyId | undefined> {
-    const query = `INSERT INTO public.agencies(
+    const query = `INSERT INTO agencies(
       id, name, status, kind, counsellor_emails, validator_emails, admin_emails, 
       questionnaire_url, email_signature, logo_url, position, agency_siret, code_safir,
       street_number_and_address, post_code, city, department_code
@@ -181,7 +181,7 @@ export class PgAgencyRepository implements AgencyRepository {
   }
 
   public async update(agency: PartialAgencyDto): Promise<void> {
-    const query = `UPDATE public.agencies SET
+    const query = `UPDATE agencies SET
       name = COALESCE(%2$L, name),
       status = COALESCE(%3$L, status),
       kind= COALESCE(%4$L, kind),

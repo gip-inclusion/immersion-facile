@@ -30,7 +30,7 @@ export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends Transact
 
     if (!convention) return;
 
-    const agency = await uow.agencyRepository.getById(convention.agencyId);
+    const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);
 
     if (conventionPeAdvisor && conventionPeAdvisor.advisor && agency)
       await this.emailGateway.sendEmail({

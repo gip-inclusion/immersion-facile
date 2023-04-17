@@ -133,7 +133,8 @@ describe(`/${agenciesRoute} route`, () => {
         .expect(200);
 
       expect(
-        (await inMemoryUow.agencyRepository.getById("test-agency-4"))?.status,
+        (await inMemoryUow.agencyRepository.getByIds(["test-agency-4"]))[0]
+          ?.status,
       ).toBe("active");
       expect(inMemoryUow.outboxRepository.events).toHaveLength(1);
 
@@ -168,8 +169,8 @@ describe(`/${agenciesRoute} route`, () => {
         .expect(200);
 
       expectToEqual(
-        await inMemoryUow.agencyRepository.getById("test-agency-4"),
-        updatedAgency,
+        await inMemoryUow.agencyRepository.getByIds(["test-agency-4"]),
+        [updatedAgency],
       );
 
       expect(inMemoryUow.outboxRepository.events).toHaveLength(1);

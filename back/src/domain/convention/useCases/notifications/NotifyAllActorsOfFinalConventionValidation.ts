@@ -34,7 +34,7 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
     convention: ConventionDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    const agency = await uow.agencyRepository.getById(convention.agencyId);
+    const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);
 
     if (!agency)
       throw new NotFoundError(

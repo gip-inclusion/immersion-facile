@@ -47,9 +47,9 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
     );
     if (!repositoryConvention)
       throw new Error(missingConventionMessage(convention.id));
-    const agency = await uow.agencyRepository.getById(
+    const [agency] = await uow.agencyRepository.getByIds([
       repositoryConvention.agencyId,
-    );
+    ]);
     if (!agency) throw new Error(missingAgencyMessage(repositoryConvention));
     return this.onRepositoryConvention(repositoryConvention, agency);
   }

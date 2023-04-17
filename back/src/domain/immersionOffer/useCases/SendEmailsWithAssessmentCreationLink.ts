@@ -72,7 +72,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
     uow: UnitOfWork,
     convention: ConventionDto,
   ) {
-    const agency = await uow.agencyRepository.getById(convention.agencyId);
+    const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);
     if (!agency)
       throw new Error(`Missing agency ${convention.agencyId} on repository.`);
 

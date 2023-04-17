@@ -3,6 +3,7 @@ import {
   activeAgencyStatuses,
   AgencyDto,
   AgencyDtoBuilder,
+  expectToEqual,
   expectTypeToMatchAndEqual,
   GeoPositionDto,
 } from "shared";
@@ -10,7 +11,7 @@ import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { PgAgencyRepository } from "./PgAgencyRepository";
 
 const agency1builder = AgencyDtoBuilder.create(
-  "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+  "aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa",
 )
   .withName("agency1")
   .withKind("pole-emploi")
@@ -72,22 +73,48 @@ describe("PgAgencyRepository", () => {
     agencyRepository = new PgAgencyRepository(client);
   });
 
-  describe("getById", () => {
+  describe("getByIds", () => {
     const agency1 = agency1builder
+      .withId("aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa")
       .withAgencySiret("01234567890123")
-      .withCodeSafir("AZERTY")
+      .withCodeSafir("AAAAAA")
       .build();
 
     it("returns existing agency", async () => {
       await agencyRepository.insert(agency1);
 
-      const agency = await agencyRepository.getById(agency1.id);
-      expect(agency).toEqual(agency1);
+      const agencies = await agencyRepository.getByIds([agency1.id]);
+      expectToEqual(agencies, [agency1]);
     });
 
-    it("returns undefined for missing agency", async () => {
-      const agency = await agencyRepository.getById(agency1.id);
-      expect(agency).toBeUndefined();
+    it("returns all agencies matching ids", async () => {
+      const agency2 = agency1builder
+        .withId("bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb")
+        .withAgencySiret("00000000000000")
+        .withCodeSafir("BBBBBB")
+        .build();
+      const agency3 = agency1builder
+        .withId("cccccccc-cccc-4ccc-cccc-cccccccccccc")
+        .withAgencySiret("11111111111111")
+        .withCodeSafir("CCCCCC")
+        .build();
+
+      await Promise.all([
+        agencyRepository.insert(agency1),
+        agencyRepository.insert(agency2),
+        agencyRepository.insert(agency3),
+      ]);
+
+      const agencies = await agencyRepository.getByIds([
+        agency1.id,
+        agency3.id,
+      ]);
+      expectToEqual(agencies, [agency1, agency3]);
+    });
+
+    it("returns empty array when no agencies are found", async () => {
+      const agencies = await agencyRepository.getByIds([agency1.id]);
+      expectToEqual(agencies, []);
     });
   });
 
@@ -535,7 +562,7 @@ describe("PgAgencyRepository", () => {
     const id1b = await agencyRepository.insert(agency1b);
     expect(id1b).toBeUndefined();
 
-    const storedAgency = await agencyRepository.getById(agency1a.id);
+    const [storedAgency] = await agencyRepository.getByIds([agency1a.id]);
     expect(storedAgency?.name).toEqual(agency1a.name);
   });
 });

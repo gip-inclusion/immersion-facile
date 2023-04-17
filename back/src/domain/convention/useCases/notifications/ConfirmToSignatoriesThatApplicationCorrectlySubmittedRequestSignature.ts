@@ -42,7 +42,7 @@ export class ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignatu
 
     const { id, businessName, agencyId } = convention;
 
-    const agency = await uow.agencyRepository.getById(agencyId);
+    const [agency] = await uow.agencyRepository.getByIds([agencyId]);
     if (!agency) throw new Error(`Missing agency with id ${agencyId}`);
 
     const {

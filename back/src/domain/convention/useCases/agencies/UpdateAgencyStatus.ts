@@ -25,7 +25,7 @@ export class UpdateAgencyStatus extends TransactionalUseCase<
   ): Promise<void> {
     if (status) await uow.agencyRepository.update({ id, status });
     if (status === "active") {
-      const agency = await uow.agencyRepository.getById(id);
+      const [agency] = await uow.agencyRepository.getByIds([id]);
       if (agency)
         await uow.outboxRepository.save(
           this.createNewEvent({

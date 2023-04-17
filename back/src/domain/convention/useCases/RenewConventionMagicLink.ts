@@ -128,7 +128,7 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
   }
 
   private async getAgency(uow: UnitOfWork, convention: ConventionDto) {
-    const agency = await uow.agencyRepository.getById(convention.agencyId);
+    const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);
     if (agency) return agency;
     logger.error(
       { agencyId: convention.agencyId },

@@ -8,7 +8,7 @@ import {
 export interface AgencyRepository {
   insert: (config: AgencyDto) => Promise<AgencyId | undefined>;
   update: (config: PartialAgencyDto) => Promise<void>;
-  getById: (id: AgencyId) => Promise<AgencyDto | undefined>;
+  getByIds: (ids: AgencyId[]) => Promise<AgencyDto[]>;
   getImmersionFacileAgencyId: () => Promise<AgencyId | undefined>;
   getAgencies: (props: {
     filters?: GetAgenciesFilter;

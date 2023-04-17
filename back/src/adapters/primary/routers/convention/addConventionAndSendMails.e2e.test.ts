@@ -85,9 +85,9 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       .withFederatedIdentity({ provider: "peConnect", token: "fake" })
       .build();
     const appAndDeps = await buildTestApp();
-    const agency = await appAndDeps.inMemoryUow.agencyRepository.getById(
+    const [agency] = await appAndDeps.inMemoryUow.agencyRepository.getByIds([
       initialConvention.agencyId,
-    );
+    ]);
 
     if (!agency) throw new Error("Test agency not found with this id");
 

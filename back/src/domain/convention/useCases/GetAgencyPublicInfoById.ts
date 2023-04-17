@@ -22,8 +22,8 @@ export class GetAgencyPublicInfoById extends TransactionalUseCase<
     { agencyId }: WithAgencyId,
     uow: UnitOfWork,
   ): Promise<AgencyPublicDisplayDto> {
-    const agencyEntity = await uow.agencyRepository.getById(agencyId);
-    if (!agencyEntity) throw new NotFoundError(agencyId);
-    return toAgencyPublicDisplayDto(agencyEntity);
+    const [agencyDto] = await uow.agencyRepository.getByIds([agencyId]);
+    if (!agencyDto) throw new NotFoundError(agencyId);
+    return toAgencyPublicDisplayDto(agencyDto);
   }
 }

@@ -44,7 +44,7 @@ export class RegisterAgencyToInclusionConnectUser extends TransactionalUseCase<
         `User not found with id: ${inclusionConnectedPayload.userId}`,
       );
     const agencyId = agencyIds[0];
-    const agency = await uow.agencyRepository.getById(agencyId);
+    const [agency] = await uow.agencyRepository.getByIds([agencyId]);
     if (!agency)
       throw new NotFoundError(`Agency not found with id: ${agencyId}`);
 

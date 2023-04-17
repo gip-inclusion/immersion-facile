@@ -62,7 +62,9 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     if (!conventionRead)
       throw new NotFoundError(missingConventionMessage(conventionId));
 
-    const agency = await uow.agencyRepository.getById(conventionRead.agencyId);
+    const [agency] = await uow.agencyRepository.getByIds([
+      conventionRead.agencyId,
+    ]);
 
     if (!agency) throw new NotFoundError(missingAgencyMessage(conventionRead));
 
