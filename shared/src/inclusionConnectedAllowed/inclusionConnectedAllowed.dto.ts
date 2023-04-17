@@ -1,5 +1,5 @@
 import { AbsoluteUrl } from "../AbsoluteUrl";
-import { AgencyDto } from "../agency/agency.dto";
+import { AgencyDto, AgencyId } from "../agency/agency.dto";
 import { Flavor } from "../typeFlavors";
 
 export type AgencyRole = (typeof allAgencyRoles)[number];
@@ -35,3 +35,7 @@ type WithDashboardUrl = {
 export type InclusionConnectedUser = AuthenticatedUser &
   WithAgencyRights &
   WithDashboardUrl;
+
+export type WithAgencyIds = {
+  agencies: AgencyId[];
+};

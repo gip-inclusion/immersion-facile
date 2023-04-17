@@ -102,7 +102,6 @@ export const AgencyAutocomplete = ({
               value={getNameFromAgencyId(params.inputProps.value?.toString())}
               className={fr.cx("fr-input")}
               placeholder={placeholder}
-              style={{ backgroundColor: "#fff" }}
               type="text"
             />
           </div>

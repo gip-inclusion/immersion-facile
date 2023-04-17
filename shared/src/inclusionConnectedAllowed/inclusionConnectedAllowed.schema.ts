@@ -1,12 +1,13 @@
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
-import { agencySchema } from "../agency/agency.schema";
+import { agencyIdSchema, agencySchema } from "../agency/agency.schema";
 import { zEmail, zString, zTrimmedString } from "../zodUtils";
 import {
   AgencyRight,
   allAgencyRoles,
   AuthenticatedUserId,
   InclusionConnectedUser,
+  WithAgencyIds,
 } from "./inclusionConnectedAllowed.dto";
 
 const agencyRoleSchema = z.enum(allAgencyRoles);
@@ -27,3 +28,7 @@ export const inclusionConnectedUserSchema: z.Schema<InclusionConnectedUser> =
     agencyRights: z.array(agencyRightSchema),
     dashboardUrl: absoluteUrlSchema.optional(),
   });
+
+export const withAgencyIdsSchema: z.Schema<WithAgencyIds> = z.object({
+  agencies: z.array(agencyIdSchema).nonempty(),
+});

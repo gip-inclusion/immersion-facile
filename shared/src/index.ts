@@ -49,6 +49,7 @@ export * from "./inclusionConnect/inclusionConnect.dto";
 export * from "./inclusionConnect/inclusionConnect.schema";
 export * from "./inclusionConnect/inclusionConnect.targets";
 export * from "./inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
+export * from "./inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
 export * from "./inclusionConnectedAllowed/inclusionConnectedAllowed.targets";
 export * from "./naf";
 export * from "./pipeWithValue";

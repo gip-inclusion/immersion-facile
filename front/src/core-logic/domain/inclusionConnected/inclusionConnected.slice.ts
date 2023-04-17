@@ -1,17 +1,17 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AbsoluteUrl } from "shared";
+import { InclusionConnectedUser, WithAgencyIds } from "shared";
 import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
 
 export type InclusionConnectedFeedback = SubmitFeedBack<"success">;
 
 type InclusionConnectedState = {
-  dashboardUrl: AbsoluteUrl | null;
+  currentUser: InclusionConnectedUser | null;
   isLoading: boolean;
   feedback: InclusionConnectedFeedback;
 };
 
 const initialState: InclusionConnectedState = {
-  dashboardUrl: null,
+  currentUser: null,
   isLoading: false,
   feedback: { kind: "idle" },
 };
@@ -20,18 +20,36 @@ export const inclusionConnectedSlice = createSlice({
   name: "inclusionConnected",
   initialState,
   reducers: {
-    agencyDashboardUrlFetchRequested: (state) => {
+    currentUserFetchRequested: (state) => {
       state.isLoading = true;
     },
-    agencyDashboardUrlFetchSucceeded: (
+    currentUserFetchSucceeded: (
       state,
-      action: PayloadAction<AbsoluteUrl>,
+      action: PayloadAction<InclusionConnectedUser>,
     ) => {
       state.isLoading = false;
-      state.dashboardUrl = action.payload;
+      state.currentUser = action.payload;
       state.feedback = { kind: "success" };
     },
-    agencyDashboardUrlFetchFailed: (state, action: PayloadAction<string>) => {
+    currentUserFetchFailed: (state, action: PayloadAction<string>) => {
+      state.isLoading = false;
+      state.feedback = { kind: "errored", errorMessage: action.payload };
+    },
+    registerAgenciesRequested: (
+      state,
+      _payload: PayloadAction<WithAgencyIds>,
+    ) => {
+      state.isLoading = true;
+    },
+    registerAgenciesSucceeded: (
+      state,
+      action: PayloadAction<InclusionConnectedUser>,
+    ) => {
+      state.isLoading = false;
+      state.feedback = { kind: "success" };
+      state.currentUser = action.payload;
+    },
+    registerAgenciesFailed: (state, action: PayloadAction<string>) => {
       state.isLoading = false;
       state.feedback = { kind: "errored", errorMessage: action.payload };
     },

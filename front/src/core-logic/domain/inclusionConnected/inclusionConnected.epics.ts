@@ -9,27 +9,44 @@ import {
 
 type InclusionConnectedAction = ActionOfSlice<typeof inclusionConnectedSlice>;
 
-const getAgencyDashboardEpic: AppEpic<InclusionConnectedAction> = (
+const getCurrentUserEpic: AppEpic<InclusionConnectedAction> = (
   action$,
   state$,
   { inclusionConnectedGateway },
 ) =>
   action$.pipe(
-    filter(
-      inclusionConnectedSlice.actions.agencyDashboardUrlFetchRequested.match,
-    ),
+    filter(inclusionConnectedSlice.actions.currentUserFetchRequested.match),
     switchMap(() =>
-      inclusionConnectedGateway.getMyAgencyDashboardUrl$(
+      inclusionConnectedGateway.getCurrentUser$(
         state$.value.auth.federatedIdentityWithUser?.token ?? "",
       ),
     ),
-    map(inclusionConnectedSlice.actions.agencyDashboardUrlFetchSucceeded),
+    map(inclusionConnectedSlice.actions.currentUserFetchSucceeded),
     catchEpicError((error) =>
       error?.message.includes("jwt expired")
         ? authSlice.actions.federatedIdentityDeletionTriggered()
-        : inclusionConnectedSlice.actions.agencyDashboardUrlFetchFailed(
+        : inclusionConnectedSlice.actions.currentUserFetchFailed(
             error?.message,
           ),
     ),
   );
-export const inclusionConnectedEpics = [getAgencyDashboardEpic];
+
+const registerAgenciesEpic: AppEpic<InclusionConnectedAction> = (
+  action$,
+  state$,
+  { inclusionConnectedGateway },
+) =>
+  action$.pipe(
+    filter(inclusionConnectedSlice.actions.registerAgenciesRequested.match),
+    switchMap((action) =>
+      inclusionConnectedGateway.registerAgenciesToCurrentUser$(
+        state$.value.auth.federatedIdentityWithUser?.token ?? "",
+        action.payload.agencies,
+      ),
+    ),
+    map(inclusionConnectedSlice.actions.registerAgenciesSucceeded),
+  );
+export const inclusionConnectedEpics = [
+  getCurrentUserEpic,
+  registerAgenciesEpic,
+];

@@ -1,4 +1,9 @@
-import { expectToEqual } from "shared";
+import {
+  AgencyDtoBuilder,
+  expectToEqual,
+  InclusionConnectedUser,
+  WithAgencyIds,
+} from "shared";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import {
   InclusionConnectedFeedback,
@@ -18,36 +23,44 @@ describe("InclusionConnected", () => {
     ({ store, dependencies } = createTestStore());
   });
 
-  it("fetches the Agency Dashboard", () => {
+  it("fetches the current IC user", () => {
     expectIsLoadingToBe(false);
-    expectDashboardUrlToBe(null);
+    expectCurrentUserToBe(null);
     expectFeedbackToEqual({ kind: "idle" });
-    store.dispatch(
-      inclusionConnectedSlice.actions.agencyDashboardUrlFetchRequested(),
-    );
+    store.dispatch(inclusionConnectedSlice.actions.currentUserFetchRequested());
     expectIsLoadingToBe(true);
 
-    const dashboardUrl = "https://example.com";
-    dependencies.inclusionConnectedGateway.dashboardUrl$.next(dashboardUrl);
+    const expectedUser: InclusionConnectedUser = {
+      email: "fake-user@inclusion-connect.fr",
+      firstName: "Fake",
+      lastName: "User",
+      id: "fake-user-id",
+      dashboardUrl: "https://placeholder.com/",
+      agencyRights: [
+        {
+          role: "agencyOwner",
+          agency: new AgencyDtoBuilder().build(),
+        },
+      ],
+    };
+    dependencies.inclusionConnectedGateway.currentUser$.next(expectedUser);
     expectIsLoadingToBe(false);
-    expectDashboardUrlToBe(dashboardUrl);
+    expectCurrentUserToBe(expectedUser);
     expectFeedbackToEqual({ kind: "success" });
   });
 
-  it("stores error on failure when trying to fetch agency dashboard", () => {
+  it("stores error on failure when trying to fetch current IC user", () => {
     expectIsLoadingToBe(false);
-    expectDashboardUrlToBe(null);
-    store.dispatch(
-      inclusionConnectedSlice.actions.agencyDashboardUrlFetchRequested(),
-    );
+    expectCurrentUserToBe(null);
+    store.dispatch(inclusionConnectedSlice.actions.currentUserFetchRequested());
     expectIsLoadingToBe(true);
 
     const errorMessage = "Something went wrong";
-    dependencies.inclusionConnectedGateway.dashboardUrl$.error(
+    dependencies.inclusionConnectedGateway.currentUser$.error(
       new Error(errorMessage),
     );
     expectIsLoadingToBe(false);
-    expectDashboardUrlToBe(null);
+    expectCurrentUserToBe(null);
     expectFeedbackToEqual({ kind: "errored", errorMessage });
   });
 
@@ -63,17 +76,45 @@ describe("InclusionConnected", () => {
         },
       },
     }));
-    store.dispatch(
-      inclusionConnectedSlice.actions.agencyDashboardUrlFetchRequested(),
-    );
+    store.dispatch(inclusionConnectedSlice.actions.currentUserFetchRequested());
     expectIsLoadingToBe(true);
 
     const errorMessage = "Something went wrong : jwt expired";
-    dependencies.inclusionConnectedGateway.dashboardUrl$.error(
+    dependencies.inclusionConnectedGateway.currentUser$.error(
       new Error(errorMessage),
     );
-    expectDashboardUrlToBe(null);
+    expectCurrentUserToBe(null);
     expectFeedbackToEqual({ kind: "idle" });
+  });
+
+  it("request agencies registration on the current user", () => {
+    const agency1 = new AgencyDtoBuilder().withId("agency-1").build();
+    const payload: WithAgencyIds = {
+      agencies: [agency1.id],
+    };
+    const expectedUserWithAgencies: InclusionConnectedUser = {
+      email: "fake-user@inclusion-connect.fr",
+      firstName: "Fake",
+      lastName: "User",
+      id: "fake-user-id",
+      dashboardUrl: "https://placeholder.com/",
+      agencyRights: [
+        {
+          role: "toReview",
+          agency: agency1,
+        },
+      ],
+    };
+    store.dispatch(
+      inclusionConnectedSlice.actions.registerAgenciesRequested(payload),
+    );
+    expectIsLoadingToBe(true);
+    dependencies.inclusionConnectedGateway.currentUser$.next(
+      expectedUserWithAgencies,
+    );
+    expectIsLoadingToBe(false);
+    expectCurrentUserToBe(expectedUserWithAgencies);
+    expectFeedbackToEqual({ kind: "success" });
   });
 
   const expectIsLoadingToBe = (expected: boolean) => {
@@ -89,9 +130,9 @@ describe("InclusionConnected", () => {
     );
   };
 
-  const expectDashboardUrlToBe = (expected: string | null) => {
-    expect(
-      inclusionConnectedSelectors.agencyDashboardUrl(store.getState()),
-    ).toBe(expected);
+  const expectCurrentUserToBe = (expected: InclusionConnectedUser | null) => {
+    expect(inclusionConnectedSelectors.currentUser(store.getState())).toBe(
+      expected,
+    );
   };
 });

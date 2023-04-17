@@ -1,6 +1,10 @@
 import { Observable } from "rxjs";
-import { AbsoluteUrl } from "shared";
+import { AgencyId, InclusionConnectedUser } from "shared";
 
 export interface InclusionConnectedGateway {
-  getMyAgencyDashboardUrl$(token: string): Observable<AbsoluteUrl>;
+  getCurrentUser$(token: string): Observable<InclusionConnectedUser>;
+  registerAgenciesToCurrentUser$(
+    token: string,
+    agencyIds: AgencyId[],
+  ): Observable<InclusionConnectedUser>;
 }

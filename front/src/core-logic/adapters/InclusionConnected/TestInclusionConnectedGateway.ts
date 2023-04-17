@@ -1,14 +1,19 @@
 import { Observable, Subject } from "rxjs";
-import { AbsoluteUrl } from "shared";
+import { AgencyId, InclusionConnectedUser } from "shared";
 import { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
 
 export class TestInclusionConnectedGateway
   implements InclusionConnectedGateway
 {
-  getMyAgencyDashboardUrl$(_token: string): Observable<AbsoluteUrl> {
-    return this.dashboardUrl$;
+  getCurrentUser$(_token: string): Observable<InclusionConnectedUser> {
+    return this.currentUser$;
   }
-
+  registerAgenciesToCurrentUser$(
+    _token: string,
+    _agencyIds: AgencyId[],
+  ): Observable<InclusionConnectedUser> {
+    return this.currentUser$;
+  }
   // for test purpose
-  public dashboardUrl$ = new Subject<AbsoluteUrl>();
+  public currentUser$ = new Subject<InclusionConnectedUser>();
 }

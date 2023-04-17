@@ -9,9 +9,9 @@ const isLoading = createSelector(
   (state) => state.isLoading,
 );
 
-const agencyDashboardUrl = createSelector(
+const currentUser = createSelector(
   inclusionConnectedState,
-  (state) => state.dashboardUrl,
+  (state) => state.currentUser,
 );
 
 const feedback = createSelector(
@@ -21,6 +21,6 @@ const feedback = createSelector(
 
 export const inclusionConnectedSelectors = {
   isLoading,
-  agencyDashboardUrl,
+  currentUser,
   feedback,
 };
