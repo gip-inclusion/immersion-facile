@@ -197,7 +197,7 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
 
   const peNotification = gateways.poleEmploiGateway.notifications[0];
   expect(peNotification.id).toBe("00000000001");
-  expectToEqual(peNotification.status, "A_SIGNER");
+  expectToEqual(peNotification.statut, "DEMANDE_A_SIGNER");
   expect(peNotification.originalId).toBe(convention.id);
   expect(peNotification.email).toBe(convention.signatories.beneficiary.email);
   const sentEmails = gateways.notification.getSentEmails();

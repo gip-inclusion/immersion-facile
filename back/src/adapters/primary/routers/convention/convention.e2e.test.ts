@@ -334,7 +334,7 @@ describe("convention e2e", () => {
 
       const notifications = gateways.poleEmploiGateway.notifications;
       expect(notifications).toHaveLength(1);
-      expect(notifications[0].status).toBe("REJETÉ");
+      expect(notifications[0].statut).toBe("REJETÉ");
     });
 
     it("Succeeds for BackOfficeJwt", async () => {

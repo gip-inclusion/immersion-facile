@@ -20,18 +20,18 @@ const prepareUseCase = ({
   uow.featureFlagRepository = new InMemoryFeatureFlagRepository({
     enablePeConventionBroadcast,
   });
-  const useCase = new BroadcastToPoleEmploiOnConventionUpdates(
+  const broadcastToPe = new BroadcastToPoleEmploiOnConventionUpdates(
     new InMemoryUowPerformer(uow),
     poleEmploiGateWay,
   );
 
-  return { useCase, poleEmploiGateWay };
+  return { broadcastToPe, poleEmploiGateWay };
 };
 
 describe("Broadcasts events to pole-emploi", () => {
   it("Skips conventions without federated id", async () => {
     // Prepare
-    const { useCase, poleEmploiGateWay } = prepareUseCase({
+    const { broadcastToPe, poleEmploiGateWay } = prepareUseCase({
       enablePeConventionBroadcast: true,
     });
 
@@ -40,7 +40,7 @@ describe("Broadcasts events to pole-emploi", () => {
       .withoutFederatedIdentity()
       .build();
 
-    await useCase.execute(convention);
+    await broadcastToPe.execute(convention);
 
     // Assert
     expect(poleEmploiGateWay.notifications).toHaveLength(0);
@@ -48,7 +48,7 @@ describe("Broadcasts events to pole-emploi", () => {
 
   it("doesn't send notification if feature flag is OFF", async () => {
     // Prepare
-    const { useCase, poleEmploiGateWay } = prepareUseCase({
+    const { broadcastToPe, poleEmploiGateWay } = prepareUseCase({
       enablePeConventionBroadcast: false,
     });
 
@@ -65,7 +65,7 @@ describe("Broadcasts events to pole-emploi", () => {
       .withImmersionObjective("Confirmer un projet professionnel")
       .build();
 
-    await useCase.execute(convention);
+    await broadcastToPe.execute(convention);
 
     // Assert
     expect(poleEmploiGateWay.notifications).toHaveLength(0);
@@ -73,7 +73,7 @@ describe("Broadcasts events to pole-emploi", () => {
 
   it("Converts and sends conventions with federated id if featureFlag is ON", async () => {
     // Prepare
-    const { useCase, poleEmploiGateWay } = prepareUseCase({
+    const { broadcastToPe, poleEmploiGateWay } = prepareUseCase({
       enablePeConventionBroadcast: true,
     });
 
@@ -97,7 +97,7 @@ describe("Broadcasts events to pole-emploi", () => {
       .withImmersionObjective("Initier une démarche de recrutement")
       .build();
 
-    await useCase.execute(convention);
+    await broadcastToPe.execute(convention);
 
     // Assert
     expect(poleEmploiGateWay.notifications).toHaveLength(1);
@@ -106,10 +106,10 @@ describe("Broadcasts events to pole-emploi", () => {
       peConnectId: "some-id",
       originalId: immersionConventionId,
       objectifDeImmersion: 3,
-      dureeImmersion: "21",
+      dureeImmersion: 21,
       dateDebut: "2021-05-12T00:00:00.000Z",
       dateFin: "2021-05-14T00:30:00.000Z",
-      status: "DEMANDE_VALIDÉE",
+      statut: "DEMANDE_VALIDÉE",
       codeAppellation: "011111",
     });
   });
