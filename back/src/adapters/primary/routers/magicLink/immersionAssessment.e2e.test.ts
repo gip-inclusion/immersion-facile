@@ -43,8 +43,8 @@ describe("Immersion assessment routes", () => {
         .set("Authorization", jwt)
         .send(assessment);
 
-      expect(response.body).toEqual({ success: true });
       expect(response.status).toBe(200);
+      expect(response.body).toBe("");
     });
 
     it("fails with 401 if jwt is not valid", async () => {

@@ -89,6 +89,6 @@ describe("POST contact-establishment public V1 route", () => {
       .send(contactEstablishment);
 
     expect(response.status).toBe(200);
-    expect(response.body).toEqual({ success: true });
+    expect(response.body).toBe("");
   });
 });

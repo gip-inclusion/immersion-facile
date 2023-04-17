@@ -116,8 +116,8 @@ describe("/admin router", () => {
         .send(params)
         .set("authorization", token);
 
-      expect(response.body).toEqual({ success: true });
       expect(response.status).toBe(200);
+      expect(response.body).toBe("");
 
       const updatedFeatureFlagsResponse = await request.get(
         `/${featureFlagsRoute}`,

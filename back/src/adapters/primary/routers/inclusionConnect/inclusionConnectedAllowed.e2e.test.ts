@@ -96,9 +96,7 @@ describe("Router for users authenticated with Inclusion Connect", () => {
         .set("Authorization", token)
         .send([agency.id]);
 
-      expect(response.body).toEqual({
-        success: true,
-      });
+      expect(response.body).toBe("");
       expect(response.status).toBe(200);
       expectToEqual(
         await inMemoryUow.inclusionConnectedUserRepository.getById(userId),

@@ -49,6 +49,6 @@ describe("Route to generate an establishment edition link", () => {
   it("Returns 200  if an edit link for this siret is still valid", async () => {
     await request
       .post(`/${requestEmailToUpdateFormRoute}/11111111111111`)
-      .expect(200, '{"success":true}');
+      .expect(200);
   });
 });

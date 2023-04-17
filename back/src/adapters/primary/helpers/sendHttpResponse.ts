@@ -12,7 +12,7 @@ export const sendHttpResponse = async (
     if (method === "GET" && !useCaseResult) {
       return response.status(200).json(useCaseResult);
     }
-    return response.status(200).json(useCaseResult ?? { success: true });
+    return response.status(200).json(useCaseResult);
   } catch (error: any) {
     handleHttpJsonResponseError(request, response, error);
   }

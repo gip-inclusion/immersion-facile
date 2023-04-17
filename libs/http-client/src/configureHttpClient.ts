@@ -73,7 +73,7 @@ export type HandlerCreator = <T extends UnknownTarget>(target: T) => Handler<T>;
 const createThrowIfNotVoid =
   <T>(paramName: string, { method, url }: MethodAndUrl) =>
   (param: unknown): T => {
-    if (param === undefined) return undefined as T;
+    if (!param && param !== false) return undefined as T;
     const message = `In route ${method} ${url} : No validation function provided for ${paramName} validation.`;
     const error = new Error(message);
 
