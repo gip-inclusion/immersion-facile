@@ -34,38 +34,37 @@ export const RegisterAgenciesForm = () => {
 
   return (
     <>
-      {feedback.kind === "idle" ||
-        (feedback.kind === "errored" && (
-          <>
-            <p>
-              C'est votre première connexion sur Immersion Facilitée avec votre
-              compte Inclusion Connect, choisissez l'organisme auquel nous
-              devons vous associer.
-            </p>
-            <form
-              onSubmit={handleSubmit((values) =>
-                dispatch(
-                  inclusionConnectedSlice.actions.registerAgenciesRequested(
-                    values,
-                  ),
+      {feedback.kind !== "agencyRegistrationSuccess" && (
+        <>
+          <p>
+            C'est votre première connexion sur Immersion Facilitée avec votre
+            compte Inclusion Connect, choisissez l'organisme auquel nous devons
+            vous associer.
+          </p>
+          <form
+            onSubmit={handleSubmit((values) =>
+              dispatch(
+                inclusionConnectedSlice.actions.registerAgenciesRequested(
+                  values,
                 ),
-              )}
-            >
-              <AgencyAutocomplete
-                title="Commencez à taper le nom de votre organisme"
-                placeholder="Ex: Agence de Berry"
-              />
-              <ErrorNotifications
-                errors={toDotNotation(formErrorsToFlatErrors(formState.errors))}
-                visible={keys(formState.errors).length > 0}
-              />
-              <div className={fr.cx("fr-mt-2w")}>
-                <Button>M'associer à cet organisme</Button>
-              </div>
-            </form>
-          </>
-        ))}
-      {feedback.kind === "success" && (
+              ),
+            )}
+          >
+            <AgencyAutocomplete
+              title="Commencez à taper le nom de votre organisme"
+              placeholder="Ex: Agence de Berry"
+            />
+            <ErrorNotifications
+              errors={toDotNotation(formErrorsToFlatErrors(formState.errors))}
+              visible={keys(formState.errors).length > 0}
+            />
+            <div className={fr.cx("fr-mt-2w")}>
+              <Button>M'associer à cet organisme</Button>
+            </div>
+          </form>
+        </>
+      )}
+      {feedback.kind === "agencyRegistrationSuccess" && (
         <Alert
           severity="success"
           title="Bravo !"

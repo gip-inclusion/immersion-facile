@@ -2,7 +2,9 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { InclusionConnectedUser, WithAgencyIds } from "shared";
 import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
 
-export type InclusionConnectedFeedback = SubmitFeedBack<"success">;
+export type InclusionConnectedFeedback = SubmitFeedBack<
+  "success" | "agencyRegistrationSuccess"
+>;
 
 type InclusionConnectedState = {
   currentUser: InclusionConnectedUser | null;
@@ -46,7 +48,7 @@ export const inclusionConnectedSlice = createSlice({
       action: PayloadAction<InclusionConnectedUser>,
     ) => {
       state.isLoading = false;
-      state.feedback = { kind: "success" };
+      state.feedback = { kind: "agencyRegistrationSuccess" };
       state.currentUser = action.payload;
     },
     registerAgenciesFailed: (state, action: PayloadAction<string>) => {

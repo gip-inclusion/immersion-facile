@@ -114,7 +114,7 @@ describe("InclusionConnected", () => {
     );
     expectIsLoadingToBe(false);
     expectCurrentUserToBe(expectedUserWithAgencies);
-    expectFeedbackToEqual({ kind: "success" });
+    expectFeedbackToEqual({ kind: "agencyRegistrationSuccess" });
   });
 
   const expectIsLoadingToBe = (expected: boolean) => {
