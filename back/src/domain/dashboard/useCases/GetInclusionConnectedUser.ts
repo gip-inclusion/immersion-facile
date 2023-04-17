@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { AbsoluteUrl, InclusionConnectJwtPayload } from "shared";
+import { InclusionConnectedUser, InclusionConnectJwtPayload } from "shared";
 import {
   ForbiddenError,
   NotFoundError,
@@ -9,9 +9,9 @@ import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { DashboardGateway } from "../port/DashboardGateway";
 
-export class GetUserAgencyDashboardUrl extends TransactionalUseCase<
+export class GetInclusionConnectedUser extends TransactionalUseCase<
   void,
-  AbsoluteUrl,
+  InclusionConnectedUser,
   InclusionConnectJwtPayload
 > {
   constructor(
@@ -28,7 +28,7 @@ export class GetUserAgencyDashboardUrl extends TransactionalUseCase<
     _: void,
     uow: UnitOfWork,
     jwtPayload?: InclusionConnectJwtPayload,
-  ): Promise<AbsoluteUrl> {
+  ): Promise<InclusionConnectedUser> {
     if (!jwtPayload) throw new ForbiddenError("No JWT token provided");
     const { userId } = jwtPayload;
     const user = await uow.inclusionConnectedUserRepository.getById(userId);
@@ -45,9 +45,14 @@ export class GetUserAgencyDashboardUrl extends TransactionalUseCase<
       );
     }
 
-    return this.dashboardGateway.getAgencyUserUrl(
+    const dashboardUrl = await this.dashboardGateway.getAgencyUserUrl(
       agencyIdsWithEnoughPrivileges,
       this.timeGateway.now(),
     );
+
+    return {
+      ...user,
+      dashboardUrl,
+    };
   }
 }
