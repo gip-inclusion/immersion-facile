@@ -2,7 +2,6 @@ import { z } from "zod";
 import {
   calculateTotalImmersionHoursBetweenDate,
   ConventionDto,
-  ConventionStatus,
   ImmersionObjective,
 } from "shared";
 import {
@@ -11,6 +10,7 @@ import {
 } from "../../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import {
+  conventionStatusToPoleEmploiStatus,
   PoleEmploiConvention,
   PoleEmploiGateway,
 } from "../../ports/PoleEmploiGateway";
@@ -22,25 +22,6 @@ const conventionObjectiveToObjectifDeImmersion: Record<
   "Découvrir un métier ou un secteur d'activité": 1,
   "Confirmer un projet professionnel": 2,
   "Initier une démarche de recrutement": 3,
-};
-
-const conventionStatusToPoleEmploiStatus: Record<ConventionStatus, string> = {
-  READY_TO_SIGN: "A_SIGNER",
-  PARTIALLY_SIGNED: "PARTIELLEMENT_SIGNÉ",
-  IN_REVIEW: "DEMANDE_A_ETUDIER",
-  ACCEPTED_BY_COUNSELLOR: "DEMANDE_ELIGIBLE",
-  ACCEPTED_BY_VALIDATOR: "DEMANDE_VALIDÉE",
-
-  // si demande de modifications
-  DRAFT: "BROUILLON",
-
-  // si rejeté
-  REJECTED: "REJETÉ",
-  CANCELLED: "DEMANDE_ANNULEE",
-
-  // // à venir potentiellement
-  // ABANDONNED: "ABANDONNÉ",
-  // CONVENTION_SENT: "CONVENTION_ENVOYÉE",
 };
 
 export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCase<
@@ -79,15 +60,18 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
         : "no-external-id",
       originalId: convention.id,
       peConnectId: beneficiary.federatedIdentity.token,
-      status: conventionStatusToPoleEmploiStatus[convention.status],
+      statut: conventionStatusToPoleEmploiStatus[convention.status],
       email: beneficiary.email,
       telephone: beneficiary.phone,
       prenom: beneficiary.firstName,
       nom: beneficiary.lastName,
+      dateNaissance: new Date(
+        convention.signatories.beneficiary.birthdate,
+      ).toISOString(),
       dateDemande: new Date(convention.dateSubmission).toISOString(),
       dateDebut: new Date(convention.dateStart).toISOString(),
       dateFin: new Date(convention.dateEnd).toISOString(),
-      dureeImmersion: totalHours.toString(),
+      dureeImmersion: totalHours,
       raisonSociale: convention.businessName,
       siret: convention.siret,
       nomPrenomFonctionTuteur: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName} ${convention.establishmentTutor.job}`,
@@ -110,7 +94,6 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
       signatureEntreprise: !!establishmentRepresentative.signedAt,
 
       descriptionProtectionIndividuelle: "",
-      enseigne: "", // TODO : decide whether to remove this field, to add agency name to our conventionDTO, or make a request to retrieve it here.
     };
 
     await this.poleEmploiGateway.notifyOnConventionUpdated(
