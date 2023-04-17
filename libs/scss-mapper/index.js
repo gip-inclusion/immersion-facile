@@ -10,6 +10,9 @@ export const getScssData = (componentName, filename) => {
   const filteredClasses = classes
     .filter((result) => result.includes(componentName))
     .map((className) => className.replace(".", ""));
+  if (filteredClasses.at(0) !== componentName) {
+    filteredClasses.unshift(componentName);
+  }
   const keys = [
     ...new Set(
       filteredClasses
@@ -33,7 +36,7 @@ export const makeTsFileContent = (componentName, filePath) => {
     componentName,
     filePath,
   );
-  console.log({
+  console.info({
     filename,
     filteredClasses,
     keys,
@@ -73,6 +76,10 @@ export const writeTsFile = (componentName, filePath) => {
 export const processScssFiles = (componentName, folder = "./") => {
   fs.readdirSync(folder).forEach((filePath) => {
     if (!filePath.includes(".scss")) return;
-    writeTsFile(componentName, folder + filePath);
+    console.log(filePath);
+    fs.watch(folder + filePath, (_, filename) => {
+      console.log(`${filename} file changed`);
+      writeTsFile(componentName, folder + filePath);
+    });
   });
 };

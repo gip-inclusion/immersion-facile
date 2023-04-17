@@ -2,7 +2,12 @@ import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Route } from "type-route";
 import { inclusionConnectImmersionTargets } from "shared";
-import { InclusionConnectButton, MainWrapper } from "react-design-system";
+import {
+  InclusionConnectButton,
+  LoginForm,
+  MainWrapper,
+  PageHeader,
+} from "react-design-system";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
@@ -41,12 +46,32 @@ export const InclusionConnectedPrivateRoute = ({
   if (!isInclusionConnected)
     return (
       <HeaderFooterLayout>
-        <MainWrapper layout="boxed">
-          <InclusionConnectButton
-            inclusionConnectEndpoint={
-              inclusionConnectImmersionTargets.startInclusionConnectLogin.url
-            }
-            layout="2-lines"
+        <MainWrapper
+          layout="boxed"
+          pageHeader={
+            <PageHeader
+              title="Retrouvez vos conventions en tant que prescripteur"
+              theme="agency"
+              centered
+            />
+          }
+        >
+          <LoginForm
+            sections={[
+              {
+                title: "Se connecter avec Inclusion Connect",
+                description:
+                  "Inclusion Connect est la solution proposée par l'État pour sécuriser et simplifier la connexion aux services en ligne de l'inclusion.",
+                authComponent: (
+                  <InclusionConnectButton
+                    inclusionConnectEndpoint={
+                      inclusionConnectImmersionTargets
+                        .startInclusionConnectLogin.url
+                    }
+                  />
+                ),
+              },
+            ]}
           />
         </MainWrapper>
       </HeaderFooterLayout>
