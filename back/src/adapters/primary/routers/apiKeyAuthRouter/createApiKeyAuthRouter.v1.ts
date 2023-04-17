@@ -1,5 +1,4 @@
 import { Router } from "express";
-import promClient from "prom-client";
 import {
   contactEstablishmentRoute,
   establishmentTargets,
@@ -7,6 +6,8 @@ import {
   pipeWithValue,
   SiretAndRomeDto,
 } from "shared";
+import { counterFormEstablishmentCallerV1 } from "../../../../utils/counters";
+import { createLogger } from "../../../../utils/logger";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import {
   ForbiddenError,
@@ -19,11 +20,7 @@ import { formEstablishmentDtoPublicV1ToDomain } from "../DtoAndSchemas/v1/input/
 import { formEstablishmentPublicV1Schema } from "../DtoAndSchemas/v1/input/FormEstablishmentPublicV1.schema";
 import { domainToSearchImmersionResultPublicV1 } from "../DtoAndSchemas/v1/output/SearchImmersionResultPublicV1.dto";
 
-const counterFormEstablishmentCaller = new promClient.Counter({
-  name: "form_establishment_v1_callers_counter",
-  help: "The total count form establishment adds, broken down by referer.",
-  labelNames: ["referer"],
-});
+const logger = createLogger(__filename);
 
 export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
   const publicV1Router = Router({ mergeParams: true });
@@ -34,9 +31,15 @@ export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
   publicV1Router
     .route(establishmentTargets.addFormEstablishment.url)
     .post(async (req, res) => {
-      counterFormEstablishmentCaller.inc({
+      counterFormEstablishmentCallerV1.inc({
         referer: req.get("Referrer"),
       });
+      logger.info(
+        {
+          referer: req.get("Referrer"),
+        },
+        "formEstablishmentCallerV1",
+      );
       return sendHttpResponse(req, res, () => {
         if (!req.apiConsumer?.isAuthorized) throw new ForbiddenError();
 

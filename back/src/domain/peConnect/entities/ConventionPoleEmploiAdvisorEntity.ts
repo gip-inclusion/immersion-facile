@@ -1,4 +1,5 @@
-import { getAdvisorsInfoCounter } from "../../../adapters/secondary/PeConnectGateway/peConnectApi.counter";
+import { getAdvisorsInfoCounter } from "../../../utils/counters";
+import { createLogger } from "../../../utils/logger";
 import {
   ConventionPoleEmploiUserAdvisorEntity,
   PeUserAndAdvisor,
@@ -27,6 +28,8 @@ const onlyValidAdvisorsForImmersion = (
   advisor: PeConnectAdvisorDto,
 ): advisor is PeConnectImmersionAdvisorDto => advisor.type != "INDEMNISATION";
 
+const logger = createLogger(__filename);
+
 export const chooseValidAdvisor = (
   advisors: PeConnectAdvisorDto[],
 ): PeConnectImmersionAdvisorDto | undefined => {
@@ -37,6 +40,7 @@ export const chooseValidAdvisor = (
   const preferredAdvisor = sortedValidAdvisors.at(0);
   if (!preferredAdvisor) {
     getAdvisorsInfoCounter.error.inc({ errorType: "peConnectNoValidAdvisor" });
+    logger.error({ errorType: "peConnectNoValidAdvisor" }, "getAdvisorsInfo");
     return undefined;
   }
 

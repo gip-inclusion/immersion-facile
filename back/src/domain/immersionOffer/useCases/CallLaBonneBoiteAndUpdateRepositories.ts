@@ -1,10 +1,14 @@
 import { addDays } from "date-fns";
-import promClient from "prom-client";
 import { prop, propEq } from "ramda";
 import {
   SearchImmersionQueryParamsDto,
   searchImmersionQueryParamsSchema,
 } from "shared";
+import {
+  counterSearchImmersionLBBRequestsError,
+  counterSearchImmersionLBBRequestsSkipped,
+  counterSearchImmersionLBBRequestsTotal,
+} from "../../../utils/counters";
 import { createLogger } from "../../../utils/logger";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
@@ -18,21 +22,6 @@ import {
 import { LaBonneBoiteCompanyVO } from "../valueObjects/LaBonneBoiteCompanyVO";
 
 const logger = createLogger(__filename);
-
-const counterSearchImmersionLBBRequestsTotal = new promClient.Counter({
-  name: "search_immersion_lbb_requests_total",
-  help: "The total count of LBB request made in the search immersions use case",
-});
-
-const counterSearchImmersionLBBRequestsError = new promClient.Counter({
-  name: "search_immersion_lbb_requests_error",
-  help: "The total count of failed LBB request made in the search immersions use case",
-});
-
-const counterSearchImmersionLBBRequestsSkipped = new promClient.Counter({
-  name: "search_immersion_lbb_requests_skipped",
-  help: "The total count of skipped LBB request made in the search immersions use case",
-});
 
 const LBB_DISTANCE_KM_REQUEST_PARAM = 50;
 export class CallLaBonneBoiteAndUpdateRepositories extends TransactionalUseCase<
@@ -73,6 +62,15 @@ export class CallLaBonneBoiteAndUpdateRepositories extends TransactionalUseCase<
 
     if (!shouldCallLaBonneBoite) {
       counterSearchImmersionLBBRequestsSkipped.inc();
+      logger.info(
+        {
+          rome,
+          latitude,
+          longitude,
+          distance_km,
+        },
+        "searchImmersionLBBRequestsSkipped",
+      );
       return;
     }
 
@@ -137,18 +135,31 @@ export class CallLaBonneBoiteAndUpdateRepositories extends TransactionalUseCase<
     lbbRequestEntity: LaBonneBoiteRequestEntity;
     relevantCompanies?: LaBonneBoiteCompanyVO[];
   }> {
+    const requestedAt = this.timeGateway.now();
     try {
       counterSearchImmersionLBBRequestsTotal.inc();
+      logger.info({ requestParams }, "searchImmersionLBBRequestsTotal");
       const laBonneBoiteCompanies = await this.laBonneBoiteAPI.searchCompanies(
         requestParams,
       );
+
       const laBonneBoiteRelevantCompanies = laBonneBoiteCompanies.filter(
         (company) => company.isCompanyRelevant(),
       );
+      logger.info(
+        {
+          requestParams,
+          requestedAt,
+          laBonneBoiteRelevantCompaniesQty:
+            laBonneBoiteRelevantCompanies.length,
+        },
+        "searchImmersionLBBRequestsSuccess",
+      );
+
       return {
         relevantCompanies: laBonneBoiteRelevantCompanies,
         lbbRequestEntity: {
-          requestedAt: this.timeGateway.now(),
+          requestedAt,
           params: requestParams,
           result: {
             error: null,
@@ -159,14 +170,19 @@ export class CallLaBonneBoiteAndUpdateRepositories extends TransactionalUseCase<
         },
       };
     } catch (e: any) {
-      logger.warn(e, "LBB fetch error");
+      const error = e?.message ?? "error without message";
       counterSearchImmersionLBBRequestsError.inc();
+      logger.warn(
+        { requestParams, requestedAt, error },
+        "searchImmersionLBBRequestsError",
+      );
+
       return {
         lbbRequestEntity: {
           requestedAt: this.timeGateway.now(),
           params: requestParams,
           result: {
-            error: e?.message ?? "erorr without message",
+            error,
             number0fEstablishments: null,
             numberOfRelevantEstablishments: null,
           },

@@ -1,5 +1,4 @@
 import type { AxiosInstance } from "axios";
-import promClient from "prom-client";
 import {
   immersionFacileContactEmail,
   TemplatedEmail,
@@ -14,6 +13,11 @@ import {
   cciCustomHtmlHeader,
 } from "html-templates/src/components/email";
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
+import {
+  counterSendTransactEmailError,
+  counterSendTransactEmailSuccess,
+  counterSendTransactEmailTotal,
+} from "../../../utils/counters";
 import { createLogger } from "../../../utils/logger";
 import { BadRequestError } from "../../primary/helpers/httpErrors";
 
@@ -90,7 +94,7 @@ export class SendinblueHtmlEmailGateway implements EmailGateway {
         cc: emailData.cc,
         params: email.params,
       },
-      "Sending email",
+      "sendTransactEmailTotal",
     );
 
     return this.sendTransacEmail(emailData)
@@ -98,14 +102,19 @@ export class SendinblueHtmlEmailGateway implements EmailGateway {
         counterSendTransactEmailSuccess.inc({ emailType });
         logger.info(
           { to: emailData.to, type: email.type },
-          "Email sending succeeded",
+          "sendTransactEmailSuccess",
         );
       })
       .catch((error) => {
         counterSendTransactEmailError.inc({ emailType });
         logger.error(
-          { errorMessage: error.message, errorBody: error?.response?.data },
-          "Email sending failed",
+          {
+            to: emailData.to,
+            type: email.type,
+            errorMessage: error.message,
+            errorBody: error?.response?.data,
+          },
+          "sendTransactEmailError",
         );
         throw error;
       });
@@ -139,21 +148,3 @@ export class SendinblueHtmlEmailGateway implements EmailGateway {
     );
   }
 }
-
-const counterSendTransactEmailTotal = new promClient.Counter({
-  name: "sendinblue_send_transac_email_total",
-  help: "The total count of sendTransacEmail requests, broken down by email type.",
-  labelNames: ["emailType"],
-});
-
-const counterSendTransactEmailSuccess = new promClient.Counter({
-  name: "sendinblue_send_transac_email_success",
-  help: "The success count of sendTransacEmail requests, broken down by email type.",
-  labelNames: ["emailType"],
-});
-
-const counterSendTransactEmailError = new promClient.Counter({
-  name: "sendinblue_send_transac_email_error",
-  help: "The error count of sendTransacEmail requests, broken down by email type.",
-  labelNames: ["emailType", "errorType"],
-});

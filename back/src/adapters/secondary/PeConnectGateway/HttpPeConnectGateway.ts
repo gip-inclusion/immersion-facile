@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Logger } from "pino";
 import { ZodError } from "zod";
 import {
   HTTP_STATUS,
@@ -11,15 +12,16 @@ import { PeConnectAdvisorDto } from "../../../domain/peConnect/dto/PeConnectAdvi
 import { PeConnectUserDto } from "../../../domain/peConnect/dto/PeConnectUser.dto";
 import { externalAccessTokenSchema } from "../../../domain/peConnect/port/AccessToken.schema";
 import { PeConnectGateway } from "../../../domain/peConnect/port/PeConnectGateway";
-import { createLogger } from "../../../utils/logger";
-import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
-import { UnhandledError } from "../../primary/helpers/unhandledError";
 import {
+  CounterType,
   exchangeCodeForAccessTokenCounter,
   getAdvisorsInfoCounter,
   getUserInfoCounter,
   getUserStatutInfoCounter,
-} from "./peConnectApi.counter";
+} from "../../../utils/counters";
+import { createLogger } from "../../../utils/logger";
+import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
+import { UnhandledError } from "../../primary/helpers/unhandledError";
 import {
   ExternalPeConnectAdvisor,
   ExternalPeConnectUser,
@@ -40,6 +42,46 @@ import {
 } from "./peConnectApi.targets";
 
 const logger = createLogger(__filename);
+
+const counterApiKind = "peConnect";
+const makePeConnectLogger = (logger: Logger, counterType: CounterType) => ({
+  success: (contents: object) =>
+    logger.info({
+      ...contents,
+      status: "success",
+      api: counterApiKind,
+      counterType,
+    }),
+  total: (contents: object) =>
+    logger.info({
+      ...contents,
+      status: "total",
+      api: counterApiKind,
+      counterType,
+    }),
+  error: (contents: object) =>
+    logger.error({
+      ...contents,
+      status: "error",
+      api: counterApiKind,
+      counterType,
+    }),
+});
+
+const getUserStatutInfoLogger = makePeConnectLogger(
+  logger,
+  "getUserStatutInfo",
+);
+
+const getAdvisorsInfoLogger = makePeConnectLogger(logger, "getAdvisorsInfo");
+
+const getUserInfoLogger = makePeConnectLogger(logger, "getUserInfo");
+
+const exchangeCodeForAccessTokenLogger = makePeConnectLogger(
+  logger,
+  "exchangeCodeForAccessToken",
+);
+
 export class HttpPeConnectGateway implements PeConnectGateway {
   constructor(
     private httpClient: HttpClient<PeConnectExternalTargets>,
@@ -50,8 +92,10 @@ export class HttpPeConnectGateway implements PeConnectGateway {
     authorizationCode: string,
   ): Promise<AccessTokenDto | undefined> {
     const counter = exchangeCodeForAccessTokenCounter;
+    const log = exchangeCodeForAccessTokenLogger;
     try {
       counter.total.inc();
+      log.total({});
       const response = await this.httpClient.exchangeCodeForAccessToken({
         body: queryParamsAsString({
           client_id: this.configs.poleEmploiClientId,
@@ -68,7 +112,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         counter.error.inc({
           errorType: `Bad response status code ${response.status}`,
         });
-        logger.error(response, "getAccessToken - Response status is not 200.");
+        log.error({ response, errorKind: "Response status is not 200." });
         return undefined;
       }
       const externalAccessToken = parseZodSchemaAndLogErrorOnParsingFailure(
@@ -80,14 +124,17 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         },
       );
       counter.success.inc();
+      log.success({});
       return toAccessToken(externalAccessToken);
     } catch (error) {
       errorChecker(
         error,
-        (error) =>
+        (error) => {
           counter.error.inc({
             errorType: error.message,
-          }),
+          });
+          log.error({ errorType: error.message });
+        },
         (payload) => notifyDiscordOnNotError(payload),
       );
       return managePeConnectError(error, "exchangeCodeForAccessToken", {
@@ -125,8 +172,10 @@ export class HttpPeConnectGateway implements PeConnectGateway {
     headers: PeConnectHeaders,
   ): Promise<ExternalPeConnectUser | undefined> {
     const counter = getUserInfoCounter;
+    const log = getUserInfoLogger;
     try {
       counter.total.inc();
+      log.total({});
       const response = await this.httpClient.getUserInfo({
         headers,
       });
@@ -134,7 +183,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         counter.error.inc({
           errorType: `Bad response status code ${response.status}`,
         });
-        logger.error(response, "getUserInfo - Response status is not 200.");
+        log.error({ response, errorKind: "Response status is not 200." });
         return undefined;
       }
       const externalPeConnectUser = parseZodSchemaAndLogErrorOnParsingFailure(
@@ -146,11 +195,15 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         },
       );
       counter.success.inc();
+      log.success({});
       return externalPeConnectUser;
     } catch (error) {
       errorChecker(
         error,
-        (error) => counter.error.inc({ errorType: error.message }),
+        (error) => {
+          counter.error.inc({ errorType: error.message });
+          log.error({ errorType: error.message });
+        },
         (payload) => notifyDiscordOnNotError(payload),
       );
       if (error instanceof ZodError) return undefined;
@@ -162,8 +215,10 @@ export class HttpPeConnectGateway implements PeConnectGateway {
 
   private async userIsJobseeker(headers: PeConnectHeaders): Promise<boolean> {
     const counter = getUserStatutInfoCounter;
+    const log = getUserStatutInfoLogger;
     try {
       counter.total.inc();
+      log.total({});
       const response = await this.httpClient.getUserStatutInfo({
         headers,
       });
@@ -171,7 +226,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         counter.error.inc({
           errorType: `Bad response status code ${response.status}`,
         });
-        logger.error(response, "userIsJobseeker - Response status is not 200.");
+        log.error({ response, errorKind: "Response status is not 200." });
         return false;
       }
       const externalPeConnectStatut = parseZodSchemaAndLogErrorOnParsingFailure(
@@ -183,11 +238,15 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         },
       );
       counter.success.inc();
+      log.success({});
       return isJobSeekerFromStatus(externalPeConnectStatut.codeStatutIndividu);
     } catch (error) {
       errorChecker(
         error,
-        (error) => counter.error.inc({ errorType: error.message }),
+        (error) => {
+          counter.error.inc({ errorType: error.message });
+          log.error({ errorType: error.message });
+        },
         (payload) => notifyDiscordOnNotError(payload),
       );
       if (error instanceof ZodError) return false;
@@ -201,8 +260,10 @@ export class HttpPeConnectGateway implements PeConnectGateway {
     headers: PeConnectHeaders,
   ): Promise<ExternalPeConnectAdvisor[]> {
     const counter = getAdvisorsInfoCounter;
+    const log = getAdvisorsInfoLogger;
     try {
       counter.total.inc();
+      log.total({});
       const response = await this.httpClient.getAdvisorsInfo({
         headers,
       });
@@ -210,7 +271,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         counter.error.inc({
           errorType: `Bad response status code ${response.status}`,
         });
-        logger.error(response, "getAdvisorsInfo - Response status is not 200.");
+        log.error({ response, errorKind: "Response status is not 200." });
         return [];
       }
       const externalPeConnectAdvisors =
@@ -223,11 +284,15 @@ export class HttpPeConnectGateway implements PeConnectGateway {
           },
         );
       counter.success.inc();
+      log.success({});
       return externalPeConnectAdvisors;
     } catch (error) {
       errorChecker(
         error,
-        (error) => counter.error.inc({ errorType: error.message }),
+        (error) => {
+          counter.error.inc({ errorType: error.message });
+          log.error({ errorType: error.message });
+        },
         (payload) => notifyDiscordOnNotError(payload),
       );
       if (error instanceof ZodError) return [];

@@ -1,5 +1,4 @@
 import { PoolClient } from "pg";
-import promClient from "prom-client";
 import { differenceWith } from "ramda";
 import { propEq, replaceArrayElement } from "shared";
 import {
@@ -10,12 +9,8 @@ import {
 } from "../../../domain/core/eventBus/events";
 import { OutboxRepository } from "../../../domain/core/ports/OutboxRepository";
 import { DateStr } from "../../../domain/core/ports/TimeGateway";
-
-const counterEventsSavedBeforePublish = new promClient.Counter({
-  name: "pg_outbox_repository_events_saved_before_publish",
-  help: "The total count of events saved by PgOutboxRepository with no publication.",
-  labelNames: ["topic", "wasQuarantined"],
-});
+import { counterEventsSavedBeforePublish } from "../../../utils/counters";
+import { createLogger } from "../../../utils/logger";
 
 export type StoredEventRow = {
   id: string;
@@ -27,6 +22,8 @@ export type StoredEventRow = {
   subscription_id: string | null;
   error_message: string | null;
 };
+
+const logger = createLogger(__filename);
 
 export class PgOutboxRepository implements OutboxRepository {
   constructor(private client: PoolClient) {}
@@ -48,11 +45,16 @@ export class PgOutboxRepository implements OutboxRepository {
       ),
     );
 
-    if (event.publications.length === 0)
+    if (event.publications.length === 0) {
       counterEventsSavedBeforePublish.inc({
         topic: event.topic,
         wasQuarantined: event.wasQuarantined.toString(),
       });
+      logger.info(
+        { topic: event.topic, wasQuarantined: event.wasQuarantined.toString() },
+        "eventsSavedBeforePublish",
+      );
+    }
   }
 
   private async storeEventInOutboxOrRecoverItIfAlreadyThere(

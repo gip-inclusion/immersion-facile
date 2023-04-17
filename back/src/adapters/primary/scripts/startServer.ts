@@ -1,4 +1,8 @@
 import { createLogger } from "../../../utils/logger";
+import {
+  startPeriodicNodeProcessReport,
+  startSamplingEventLoopLag,
+} from "../../../utils/nodeProcessReport";
 import { AppConfig } from "../config/appConfig";
 import { createApp } from "../server";
 
@@ -12,10 +16,24 @@ const getPort = (): number => {
 const appConfig = AppConfig.createFromEnv();
 
 createApp(appConfig).then(
-  ({ app }) => {
+  ({ app, gateways }) => {
     const port = getPort();
     app.listen(port, "0.0.0.0", () => {
       logger.info(`server started at http://localhost:${port}`);
+      const intervalMs = appConfig.nodeProcessReportInterval;
+      const eventLoopSamples: number[] = [];
+      const maxSampleSize = Math.max(
+        5,
+        Math.min(500, Math.ceil(intervalMs / 100)),
+      );
+      startSamplingEventLoopLag(eventLoopSamples, maxSampleSize);
+      startPeriodicNodeProcessReport(
+        intervalMs,
+        gateways.timeGateway,
+        logger,
+        eventLoopSamples,
+        maxSampleSize,
+      );
     });
   },
   (error: any) => {

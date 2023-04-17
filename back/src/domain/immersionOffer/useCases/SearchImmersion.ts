@@ -1,20 +1,17 @@
-import promClient from "prom-client";
 import {
   ApiConsumer,
   SearchImmersionQueryParamsDto,
   searchImmersionQueryParamsSchema,
   SearchImmersionResultDto,
 } from "shared";
+import { histogramSearchImmersionStoredCount } from "../../../utils/counters";
+import { createLogger } from "../../../utils/logger";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { SearchMade, SearchMadeEntity } from "../entities/SearchMadeEntity";
 
-const histogramSearchImmersionStoredCount = new promClient.Histogram({
-  name: "search_immersion_stored_result_count",
-  help: "Histogram of the number of result returned from storage",
-  buckets: [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50],
-});
+const logger = createLogger(__filename);
 
 export class SearchImmersion extends TransactionalUseCase<
   SearchImmersionQueryParamsDto,
@@ -66,6 +63,10 @@ export class SearchImmersion extends TransactionalUseCase<
       );
 
     histogramSearchImmersionStoredCount.observe(resultsFromStorage.length);
+    logger.info(
+      { resultsFromStorage: resultsFromStorage.length },
+      "searchImmersionStored",
+    );
 
     return resultsFromStorage;
   }

@@ -1,6 +1,5 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import jwt, { TokenExpiredError } from "jsonwebtoken";
-import promClient from "prom-client";
 import {
   ApiConsumerName,
   backOfficeJwtPayloadSchema,
@@ -13,16 +12,11 @@ import {
 import { JwtKind, makeVerifyJwtES256 } from "../../domain/auth/jwt";
 import { GetApiConsumerById } from "../../domain/core/ports/GetApiConsumerById";
 import { TimeGateway } from "../../domain/core/ports/TimeGateway";
+import { apiKeyAuthMiddlewareRequestsTotal } from "../../utils/counters";
 import { createLogger } from "../../utils/logger";
 import { AppConfig } from "./config/appConfig";
 
 const logger = createLogger(__filename);
-
-const apiKeyAuthMiddlewareRequestsTotal = new promClient.Counter({
-  name: "api_key_auth_middleware_requests_total",
-  help: "The total count each api keys that tried to use the api",
-  labelNames: ["route", "method", "consumerName", "authorisationStatus"],
-});
 
 const convertRouteToLog = (originalUrl: string) =>
   "/" + originalUrl.split("/")[1];
@@ -40,13 +34,24 @@ type TotalCountProps = {
 
 const createIncTotalCountForRequest =
   (req: Request) =>
-  ({ consumerName, authorisationStatus }: TotalCountProps) =>
+  ({ consumerName, authorisationStatus }: TotalCountProps) => {
+    const route = convertRouteToLog(req.originalUrl);
     apiKeyAuthMiddlewareRequestsTotal.inc({
-      route: convertRouteToLog(req.originalUrl),
+      route,
       method: req.method,
       consumerName,
       authorisationStatus,
     });
+    logger.info(
+      {
+        route,
+        method: req.method,
+        consumerName,
+        authorisationStatus,
+      },
+      "apiKeyAuthMiddlewareRequestsTotal",
+    );
+  };
 
 // should be deleted when all consumer migrate to v1
 export const createApiKeyAuthMiddlewareV0 = (

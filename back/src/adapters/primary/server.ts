@@ -1,6 +1,5 @@
 import bodyParser from "body-parser";
 import express, { Express, Router } from "express";
-import expressPrometheusMiddleware from "express-prometheus-middleware";
 import PinoHttp from "pino-http";
 import {
   GenerateApiConsumerJwt,
@@ -11,6 +10,7 @@ import {
 } from "../../domain/auth/jwt";
 import { EventCrawler } from "../../domain/core/eventBus/EventCrawler";
 import { UuidGenerator } from "../../domain/core/ports/UuidGenerator";
+import { prometheusMetricsMiddleware } from "../../utils/counters";
 import { createLogger } from "../../utils/logger";
 import { AppConfig } from "./config/appConfig";
 import { createAppDependencies } from "./config/createAppDependencies";
@@ -36,10 +36,7 @@ import { subscribeToEvents } from "./subscribeToEvents";
 
 const logger = createLogger(__filename);
 
-const metrics = expressPrometheusMiddleware({
-  metricsPath: "/__metrics",
-  collectDefaultMetrics: true,
-});
+export const metricsPageUrl = "__metrics";
 
 type CreateAppProperties = {
   app: Express;
@@ -63,11 +60,11 @@ export const createApp = async (
     PinoHttp({
       logger,
       autoLogging: {
-        ignore: (req) => req.url?.includes("__metrics") ?? false,
+        ignore: (req) => req.url?.includes(metricsPageUrl) ?? false,
       },
     }),
   );
-  app.use(metrics);
+  app.use(prometheusMetricsMiddleware);
   app.use(bodyParser.json({ limit: "800kb" }));
 
   const deps = await createAppDependencies(config);

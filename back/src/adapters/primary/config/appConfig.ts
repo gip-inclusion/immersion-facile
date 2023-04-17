@@ -53,6 +53,12 @@ export class AppConfig {
     this.throwIfNotGeosearchApiKey = makeThrowIfNotOpenCageGeosearchKey(env);
   }
 
+  public get nodeProcessReportInterval(): number {
+    return parseInt(
+      this.throwIfNotDefined("NODE_PROCESS_REPORT_INTERVAL", "30000"),
+    );
+  }
+
   public get reporting() {
     return this.throwIfNotInArray({
       variableName: "REPORTING_GATEWAY",

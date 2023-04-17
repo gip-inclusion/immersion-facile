@@ -1,4 +1,3 @@
-import promClient from "prom-client";
 import { keys, prop } from "ramda";
 import {
   EventBus,
@@ -13,6 +12,11 @@ import {
 } from "../../../domain/core/eventBus/events";
 import { DateStr, TimeGateway } from "../../../domain/core/ports/TimeGateway";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
+import {
+  counterPublishedEventsError,
+  counterPublishedEventsSuccess,
+  counterPublishedEventsTotal,
+} from "../../../utils/counters";
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 
@@ -84,6 +88,7 @@ export class InMemoryEventBus implements EventBus {
 
     const topic = event.topic;
     counterPublishedEventsTotal.inc({ topic });
+    logger.info({ topic }, "publishedEventsTotal");
 
     const callbacksById: SubscriptionsForTopic | undefined =
       this.subscriptions[topic];
@@ -109,6 +114,7 @@ export class InMemoryEventBus implements EventBus {
 
     if (failures.length === 0) {
       counterPublishedEventsSuccess.inc({ topic });
+      logger.info({ topic }, "publishedEventsSuccess");
       return {
         ...event,
         publications,
@@ -190,30 +196,16 @@ const monitorAbsenceOfCallback = (event: DomainEvent) => {
 };
 
 const monitorErrorInCallback = (error: any, event: DomainEvent) => {
-  logger.error(
-    { event, error: error.message || JSON.stringify(error) },
-    "Error when publishing event",
-  );
   counterPublishedEventsError.inc({
     topic: event.topic,
     errorType: "callback_failed",
   });
+  logger.error(
+    {
+      topic: event.topic,
+      event,
+      error: error.message || JSON.stringify(error),
+    },
+    "publishedEventsError",
+  );
 };
-
-const counterPublishedEventsTotal = new promClient.Counter({
-  name: "in_memory_event_bus_published_events_total",
-  help: "The total count of events published by InMemoryEventBus.",
-  labelNames: ["topic"],
-});
-
-const counterPublishedEventsSuccess = new promClient.Counter({
-  name: "in_memory_event_bus_published_events_success",
-  help: "The success count of events published by InMemoryEventBus.",
-  labelNames: ["topic"],
-});
-
-const counterPublishedEventsError = new promClient.Counter({
-  name: "in_memory_event_bus_published_events_error",
-  help: "The error count of events published by InMemoryEventBus.",
-  labelNames: ["topic", "errorType"],
-});
