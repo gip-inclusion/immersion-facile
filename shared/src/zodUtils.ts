@@ -10,6 +10,7 @@ export const localization = {
     "Le mail du tuteur doit être différent des mails du bénéficiaire, de son représentant légal et de son employeur actuel.",
   expectedBoolean: "La sélection d'une valeur (oui/non) est obligatoire",
   expectText: "Une chaine de caractères est attendue",
+  expectRadioButtonSelected: "Veuillez sélectionner une option.",
   invalidDate: "Le format de la date saisie est invalide",
   invalidDateEnd: "Le format de la date de fin est invalide",
   invalidDateStart: "Le format de la date de début est invalide",

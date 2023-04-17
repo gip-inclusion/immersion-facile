@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { zString, zEnumValidation } from "../zodUtils";
+import { localization, zEnumValidation, zString } from "../zodUtils";
 import {
   assessmentStatuses,
   ImmersionAssessmentDto,
@@ -8,6 +8,9 @@ import {
 export const immersionAssessmentSchema: z.Schema<ImmersionAssessmentDto> =
   z.object({
     conventionId: z.string(),
-    status: zEnumValidation(assessmentStatuses, "obligatoire"),
+    status: zEnumValidation(
+      assessmentStatuses,
+      localization.expectRadioButtonSelected,
+    ),
     establishmentFeedback: zString,
   });
