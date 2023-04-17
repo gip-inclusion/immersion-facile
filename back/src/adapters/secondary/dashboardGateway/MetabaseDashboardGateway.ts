@@ -38,11 +38,11 @@ export class MetabaseDashboardGateway implements DashboardGateway {
     return this.makeUrl(token, dashboard);
   }
 
-  public getAgencyUrl(agencyId: AgencyId, now: Date): AbsoluteUrl {
+  public getAgencyUserUrl(agencyIds: AgencyId[], now: Date): AbsoluteUrl {
     const dashboard = dashboardByName.agency;
     const token = this.createToken({
       dashboard,
-      params: { filtrer_par_structure: [agencyId] },
+      params: { filtrer_par_structure: agencyIds },
       now,
     });
     return this.makeUrl(token, dashboard);

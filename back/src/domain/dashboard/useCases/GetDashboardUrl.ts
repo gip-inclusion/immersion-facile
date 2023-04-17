@@ -16,8 +16,8 @@ export class GetDashboardUrl extends UseCase<GetDashboardParams, AbsoluteUrl> {
   // eslint-disable-next-line @typescript-eslint/require-await
   public async _execute(params: GetDashboardParams): Promise<AbsoluteUrl> {
     if (params.name === "agency")
-      return this.dashboardGateway.getAgencyUrl(
-        params.agencyId,
+      return this.dashboardGateway.getAgencyUserUrl(
+        [params.agencyId],
         this.timeGateway.now(),
       );
     if (params.name === "conventionStatus")

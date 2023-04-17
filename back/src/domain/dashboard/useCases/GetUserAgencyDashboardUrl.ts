@@ -35,17 +35,18 @@ export class GetUserAgencyDashboardUrl extends TransactionalUseCase<
     if (!user)
       throw new NotFoundError(`No user found with provided ID : ${userId}`);
 
-    const agencyRight = user.agencyRights.at(0);
-    if (!agencyRight)
-      throw new NotFoundError(`No agency found for user with ID : ${userId}`);
+    const agencyIdsWithEnoughPrivileges = user.agencyRights
+      .filter(({ role }) => role !== "toReview")
+      .map(({ agency }) => agency.id);
 
-    if (agencyRight.role === "toReview")
+    if (agencyIdsWithEnoughPrivileges.length < 1) {
       throw new ForbiddenError(
-        `User with ID : ${userId} has not sufficient rights to access this dashboard`,
+        `User with ID : ${userId} has no agencies with enough privileges to access a corresponding dashboard`,
       );
+    }
 
-    return this.dashboardGateway.getAgencyUrl(
-      agencyRight.agency.id,
+    return this.dashboardGateway.getAgencyUserUrl(
+      agencyIdsWithEnoughPrivileges,
       this.timeGateway.now(),
     );
   }

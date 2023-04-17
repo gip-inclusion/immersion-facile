@@ -59,7 +59,7 @@ describe("GetUserAgencyDashboardUrl", () => {
     ]);
     await expectPromiseToFailWith(
       getUserAgencyDashboardUrl.execute(undefined, inclusionConnectJwtPayload),
-      `No agency found for user with ID : ${userId}`,
+      `User with ID : ${userId} has no agencies with enough privileges to access a corresponding dashboard`,
     );
   });
 
@@ -108,7 +108,7 @@ describe("GetUserAgencyDashboardUrl", () => {
           undefined,
           inclusionConnectJwtPayload,
         ),
-        `User with ID : ${userId} has not sufficient rights to access this dashboard`,
+        `User with ID : ${userId} has no agencies with enough privileges to access a corresponding dashboard`,
       );
     },
   );

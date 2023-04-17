@@ -10,9 +10,9 @@ import { createLogger } from "../../../utils/logger";
 const logger = createLogger(__filename);
 
 export class StubDashboardGateway implements DashboardGateway {
-  getAgencyUrl(id: AgencyId): AbsoluteUrl {
+  getAgencyUserUrl(agencyIds: AgencyId[]): AbsoluteUrl {
     logger.warn("Dashboard gateway not implemented, getAgencyUrl method");
-    return `http://stubAgencyDashboard/${id as string}`;
+    return `http://stubAgencyDashboard/${agencyIds.join("_")}`;
   }
 
   getDashboardUrl(dashboardName: AdminDashboardName): AbsoluteUrl {

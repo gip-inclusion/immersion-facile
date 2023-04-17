@@ -10,6 +10,6 @@ export interface DashboardGateway {
     dashboardName: AdminDashboardName,
     now: Date,
   ) => AbsoluteUrl;
-  getAgencyUrl: (id: AgencyId, now: Date) => AbsoluteUrl;
+  getAgencyUserUrl: (agencyIds: AgencyId[], now: Date) => AbsoluteUrl;
   getConventionStatusUrl: (id: ConventionId, now: Date) => AbsoluteUrl;
 }
