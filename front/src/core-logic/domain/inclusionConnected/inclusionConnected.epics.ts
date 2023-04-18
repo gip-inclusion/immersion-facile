@@ -40,8 +40,8 @@ const registerAgenciesEpic: AppEpic<InclusionConnectedAction> = (
     filter(inclusionConnectedSlice.actions.registerAgenciesRequested.match),
     switchMap((action) =>
       inclusionConnectedGateway.registerAgenciesToCurrentUser$(
-        state$.value.auth.federatedIdentityWithUser?.token ?? "",
         action.payload.agencies,
+        state$.value.auth.federatedIdentityWithUser?.token ?? "",
       ),
     ),
     map(inclusionConnectedSlice.actions.registerAgenciesSucceeded),

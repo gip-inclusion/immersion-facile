@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
@@ -6,32 +6,33 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
-import { toDotNotation, WithAgencyIds, withAgencyIdsSchema } from "shared";
+import { z } from "zod";
+import { agencyIdAndNameSchema, AgencyOption, toDotNotation } from "shared";
 import { ErrorNotifications } from "react-design-system";
 import { formErrorsToFlatErrors } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
-import { AgencyAutocomplete } from "../../agency/AgencyAutocomplete";
+import { MultipleAgencyInput } from "./MultipleAgencyInput";
+
+type WithAgenciesOptions = {
+  agencies: AgencyOption[];
+};
+
+const registerAgenciesFormSchema: z.Schema<WithAgenciesOptions> = z.object({
+  agencies: z.array(agencyIdAndNameSchema).nonempty(),
+});
 
 export const RegisterAgenciesForm = () => {
-  const { handleSubmit, setValue, formState } = useForm<WithAgencyIds>({
-    defaultValues: {
-      agencies: [],
-    },
-    resolver: zodResolver(withAgencyIdsSchema),
-  });
+  const { handleSubmit, setValue, formState, getValues, watch } =
+    useForm<WithAgenciesOptions>({
+      defaultValues: {
+        agencies: [],
+      },
+      resolver: zodResolver(registerAgenciesFormSchema),
+    });
   const dispatch = useDispatch();
-  const { agency } = useAppSelector(agencyAdminSelectors.agencyState);
   const feedback = useAppSelector(inclusionConnectedSelectors.feedback);
-
-  useEffect(() => {
-    if (agency) {
-      setValue("agencies", [agency.id]);
-    }
-  }, [agency?.id]);
-
   return (
     <>
       {feedback.kind !== "agencyRegistrationSuccess" && (
@@ -44,22 +45,33 @@ export const RegisterAgenciesForm = () => {
           <form
             onSubmit={handleSubmit((values) =>
               dispatch(
-                inclusionConnectedSlice.actions.registerAgenciesRequested(
-                  values,
-                ),
+                inclusionConnectedSlice.actions.registerAgenciesRequested({
+                  agencies: values.agencies.map((agency) => agency.id),
+                }),
               ),
             )}
           >
-            <AgencyAutocomplete
-              title="Commencez à taper le nom de votre organisme"
-              placeholder="Ex: Agence de Berry"
+            <MultipleAgencyInput
+              initialAgencies={watch("agencies")}
+              label="Organisme(s) au(x)quel(s) vous êtes rattaché(s)"
+              onAgencyAdd={(agency) => {
+                setValue("agencies", [...getValues("agencies"), agency]);
+              }}
+              onAgencyDelete={(agency) => {
+                setValue(
+                  "agencies",
+                  getValues("agencies").filter(
+                    (agencyOption) => agencyOption.id !== agency.id,
+                  ),
+                );
+              }}
             />
             <ErrorNotifications
               errors={toDotNotation(formErrorsToFlatErrors(formState.errors))}
               visible={keys(formState.errors).length > 0}
             />
             <div className={fr.cx("fr-mt-2w")}>
-              <Button>M'associer à cet organisme</Button>
+              <Button>Demander à être relié à ces organismes</Button>
             </div>
           </form>
         </>

@@ -59,4 +59,6 @@ export interface AgencyGateway {
     agencyDto: AgencyDto,
     adminToken: BackOfficeJwt,
   ): Observable<void>;
+
+  getFilteredAgencies(filter: ListAgenciesRequestDto): Promise<AgencyOption[]>;
 }

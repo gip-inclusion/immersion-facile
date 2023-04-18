@@ -97,7 +97,6 @@ describe("InclusionConnected", () => {
       firstName: "Fake",
       lastName: "User",
       id: "fake-user-id",
-      dashboardUrl: "https://placeholder.com/",
       agencyRights: [
         {
           role: "toReview",
@@ -113,7 +112,6 @@ describe("InclusionConnected", () => {
       expectedUserWithAgencies,
     );
     expectIsLoadingToBe(false);
-    expectCurrentUserToBe(expectedUserWithAgencies);
     expectFeedbackToEqual({ kind: "agencyRegistrationSuccess" });
   });
 

@@ -22,7 +22,7 @@ export const useAgencyAdminAutocomplete = () => {
   };
 };
 
-type AgencyAutocompleteProps = {
+type AgencyAdminAutocompleteProps = {
   title: string;
   initialValue?: AgencyOption | undefined;
   className?: string;
@@ -33,12 +33,12 @@ type AgencyAutocompleteProps = {
 const isOneOfTheOptionsLabel = (options: AgencyOption[], searchTerm: string) =>
   options.map(prop("name")).includes(searchTerm);
 
-export const AgencyAutocomplete = ({
+export const AgencyAdminAutocomplete = ({
   title,
   className,
   placeholder = "Ex : boulangère, infirmier",
   tooltip,
-}: AgencyAutocompleteProps): JSX.Element => {
+}: AgencyAdminAutocompleteProps): JSX.Element => {
   // TODO Mutualiser juste l'autocomplete avec les conventions ? Ou passer le selecteur en param du composant
   const { agencySearchText, isSearching, agencyOptions, agency } =
     useAppSelector(agencyAdminSelectors.agencyState);

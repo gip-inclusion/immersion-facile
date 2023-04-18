@@ -18,6 +18,10 @@ export const AgencyDashboardPage = () => {
   );
   const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
   const feedback = useAppSelector(inclusionConnectedSelectors.feedback);
+  const shouldShowDashboard =
+    currentUser?.agencyRights &&
+    currentUser?.agencyRights.length > 0 &&
+    currentUser.dashboardUrl;
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -31,7 +35,6 @@ export const AgencyDashboardPage = () => {
         InclusionConnectedPrivateRoute
       </p>
     );
-
   return (
     <>
       <div className={fr.cx("fr-grid-row")}>
@@ -48,7 +51,7 @@ export const AgencyDashboardPage = () => {
           </Button>
         </div>
       </div>
-      {currentUser?.dashboardUrl ? (
+      {shouldShowDashboard ? (
         <MetabaseView
           title="Tableau de bord agence"
           url={currentUser?.dashboardUrl}

@@ -1,7 +1,6 @@
 import { from, Observable } from "rxjs";
 import {
   ActiveOrRejectedStatus,
-  agenciesIdAndNameSchema,
   AgencyDto,
   AgencyId,
   AgencyOption,
@@ -165,11 +164,11 @@ export class HttpAgencyGateway implements AgencyGateway {
     return from(this.validateOrRejectAgency(adminToken, agencyId, status));
   }
 
-  private getFilteredAgencies(
+  public getFilteredAgencies(
     request: ListAgenciesRequestDto,
   ): Promise<AgencyOption[]> {
     return this.httpClient
       .getFilteredAgencies({ queryParams: request })
-      .then(({ responseBody }) => agenciesIdAndNameSchema.parse(responseBody));
+      .then(({ responseBody }) => responseBody);
   }
 }

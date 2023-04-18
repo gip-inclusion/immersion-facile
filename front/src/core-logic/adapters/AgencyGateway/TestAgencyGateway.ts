@@ -121,4 +121,9 @@ export class TestAgencyGateway implements AgencyGateway {
   ): Observable<AgencyPublicDisplayDto> {
     return this.agencyInfo$;
   }
+  async getFilteredAgencies(
+    _filter: ListAgenciesRequestDto,
+  ): Promise<AgencyOption[]> {
+    throw new Error(`Not implemented`);
+  }
 }

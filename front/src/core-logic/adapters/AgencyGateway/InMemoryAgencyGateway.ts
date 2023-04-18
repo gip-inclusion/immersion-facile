@@ -177,4 +177,12 @@ export class InMemoryAgencyGateway implements AgencyGateway {
         .map((agency) => ({ id: agency.id, name: agency.name })),
     );
   }
+
+  async getFilteredAgencies(
+    filter: ListAgenciesRequestDto,
+  ): Promise<AgencyOption[]> {
+    return values(this._agencies)
+      .filter((agency) => filter.status?.includes(agency.status) ?? true)
+      .map((agency) => ({ id: agency.id, name: agency.name }));
+  }
 }

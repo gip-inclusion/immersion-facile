@@ -4,7 +4,7 @@ import { DsfrTitle } from "react-design-system";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
 import { EditAgencyForm } from "../forms/agency/EditAgencyForm";
-import { AgencyAutocomplete } from "./AgencyAutocomplete";
+import { AgencyAdminAutocomplete } from "./AgencyAdminAutocomplete";
 import "src/assets/admin.css";
 
 export const EditAgency = () => {
@@ -18,7 +18,7 @@ export const EditAgency = () => {
         className={fr.cx("fr-mt-4w")}
       />
       <div className={fr.cx("fr-px-6w", "fr-py-4w", "fr-card")}>
-        <AgencyAutocomplete
+        <AgencyAdminAutocomplete
           title="Je sélectionne une agence"
           placeholder={"Ex : Agence de Berry"}
         />

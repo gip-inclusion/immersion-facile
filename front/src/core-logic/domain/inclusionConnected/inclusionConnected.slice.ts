@@ -43,13 +43,9 @@ export const inclusionConnectedSlice = createSlice({
     ) => {
       state.isLoading = true;
     },
-    registerAgenciesSucceeded: (
-      state,
-      action: PayloadAction<InclusionConnectedUser>,
-    ) => {
+    registerAgenciesSucceeded: (state) => {
       state.isLoading = false;
       state.feedback = { kind: "agencyRegistrationSuccess" };
-      state.currentUser = action.payload;
     },
     registerAgenciesFailed: (state, action: PayloadAction<string>) => {
       state.isLoading = false;

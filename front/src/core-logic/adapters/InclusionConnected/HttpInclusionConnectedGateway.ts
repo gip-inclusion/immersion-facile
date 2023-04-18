@@ -24,12 +24,14 @@ export class HttpInclusionConnectedGateway
   }
 
   public registerAgenciesToCurrentUser$(
-    token: string,
     agencyIds: AgencyId[],
-  ): Observable<InclusionConnectedUser> {
-    return from(this.registerAgenciesToCurrentUser(token, agencyIds)).pipe(
-      map(({ responseBody }) =>
-        inclusionConnectedUserSchema.parse(responseBody),
+    token: string,
+  ): Observable<void> {
+    return from(
+      this.registerAgenciesToCurrentUser(agencyIds, token).then(
+        (responseBody) => {
+          responseBody;
+        },
       ),
     );
   }
@@ -39,7 +41,7 @@ export class HttpInclusionConnectedGateway
       headers: { authorization: token },
     });
   }
-  private registerAgenciesToCurrentUser(token: string, agencyIds: AgencyId[]) {
+  private registerAgenciesToCurrentUser(agencyIds: AgencyId[], token: string) {
     return this.httpClient.registerAgenciesToUser({
       headers: { authorization: token },
       body: agencyIds,
