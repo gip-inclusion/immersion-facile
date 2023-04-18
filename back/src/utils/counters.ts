@@ -1,11 +1,4 @@
-import expressPrometheusMiddleware from "express-prometheus-middleware";
 import { Counter, Histogram } from "prom-client";
-import { metricsPageUrl } from "../adapters/primary/server";
-
-export const prometheusMetricsMiddleware = expressPrometheusMiddleware({
-  metricsPath: `/${metricsPageUrl}`,
-  collectDefaultMetrics: true,
-});
 
 // AUTH MIDDLEWARE
 export const apiKeyAuthMiddlewareRequestsTotal = new Counter({
