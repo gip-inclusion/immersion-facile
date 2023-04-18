@@ -125,6 +125,7 @@ export const AppellationAutocomplete = ({
         onChange={(_, selectedOption: Option | null) => {
           if (selectedOption) {
             setSelectedOption(selectedOption);
+            setSearchTerm(selectedOption.description);
             onAppellationSelected(
               selectedOption
                 ? selectedOption.value
