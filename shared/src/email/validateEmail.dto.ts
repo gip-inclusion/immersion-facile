@@ -20,7 +20,10 @@ export type ValidateEmailStatus = {
   reason: ValidateEmailReason;
 };
 
-export const validateEmailRegex =
+export const validateSingleEmailRegex =
   /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+export const validateMultipleEmailRegex =
+  /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g;
 
 export type ValidateEmailInput = { email: Email };

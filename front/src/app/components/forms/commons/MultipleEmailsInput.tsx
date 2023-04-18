@@ -6,7 +6,7 @@ import {
   cleanStringToHTMLAttribute,
   notEqual,
   OmitFromExistingKeys,
-  validateEmailRegex,
+  validateMultipleEmailRegex,
 } from "shared";
 
 const componentName = "im-fillable-list";
@@ -24,7 +24,7 @@ export const MultipleEmailsInput = (
   const { valuesInList, setValues, ...addToListProps } = props;
   const { cx } = useStyles();
   const getEmailValuesFromString = (stringToParse: string) => {
-    const matches = stringToParse.match(validateEmailRegex);
+    const matches = stringToParse.match(validateMultipleEmailRegex);
     return (matches || []).map((match) => match.trim());
   };
 

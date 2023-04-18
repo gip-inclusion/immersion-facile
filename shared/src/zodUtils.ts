@@ -1,6 +1,6 @@
 import { Logger } from "pino";
 import { preprocess, z } from "zod";
-import { validateEmailRegex } from "./email/validateEmail.dto";
+import { validateSingleEmailRegex } from "./email/validateEmail.dto";
 import { timeHHmmRegExp } from "./utils/date";
 
 export const localization = {
@@ -69,24 +69,27 @@ export const zTimeString = z
 export const makezTrimmedString = (message: string) =>
   zString.transform((s) => s.trim()).refine((s) => s.length > 0, message);
 
-const removeAccents = (value: unknown) => {
+const removeAccentsAndTrim = (value: unknown) => {
   if (typeof value !== "string") return value;
-  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  return value
+    .trim()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 };
 
 export const zEmail = z.preprocess(
-  removeAccents,
+  removeAccentsAndTrim,
   z
     .string(requiredText)
     .email(localization.invalidEmailFormat)
     .refine(
-      (email) => email.match(validateEmailRegex), // emails patterns without underscore in the domain part
+      (email) => email.match(validateSingleEmailRegex), // emails patterns without underscore in the domain part
       localization.invalidEmailFormat,
     ),
 );
 
 export const zEmailPossiblyEmpty = z.preprocess(
-  removeAccents,
+  removeAccentsAndTrim,
   zEmail.optional().or(z.literal("")),
 );
 
