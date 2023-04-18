@@ -1,5 +1,8 @@
 import { createLogger } from "../../../utils/logger";
-import { startPeriodicNodeProcessReport } from "../../../utils/nodeProcessReport";
+import {
+  startPeriodicNodeProcessReport,
+  startSamplingEventLoopLag,
+} from "../../../utils/nodeProcessReport";
 import { AppConfig } from "../config/appConfig";
 import { createApp } from "../server";
 
@@ -21,9 +24,14 @@ createApp(appConfig).then(
       const eventLoopSamples: number[] = [];
       const maxSampleSize = Math.max(
         5,
-        Math.min(500, Math.ceil(intervalMs / 100)),
+        Math.min(1000, Math.ceil(intervalMs / 50)),
       );
-      // startSamplingEventLoopLag(eventLoopSamples, maxSampleSize);
+      startSamplingEventLoopLag(
+        eventLoopSamples,
+        maxSampleSize,
+        Math.floor(intervalMs / maxSampleSize),
+        logger,
+      );
       startPeriodicNodeProcessReport(
         intervalMs,
         gateways.timeGateway,

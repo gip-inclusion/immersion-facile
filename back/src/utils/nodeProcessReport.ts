@@ -6,7 +6,12 @@ import { TimeGateway } from "../domain/core/ports/TimeGateway";
 export const startSamplingEventLoopLag = (
   eventLoopLagSamples: number[],
   maxSampleSize: number,
+  eventLoopSampleIntervalMs: number,
+  logger: Logger,
 ) => {
+  logger.info(
+    `Start sampling event loop lag at a frequency of ${eventLoopSampleIntervalMs}ms.`,
+  );
   const measureLag = () => {
     const start = process.hrtime();
     setImmediate(() => {
@@ -15,7 +20,7 @@ export const startSamplingEventLoopLag = (
         const deltaMs = end[0] * 1e3 + end[1] / 1e6;
         eventLoopLagSamples.push(deltaMs);
       }
-      measureLag();
+      setTimeout(measureLag, eventLoopSampleIntervalMs);
     });
   };
   measureLag();
