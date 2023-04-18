@@ -7,3 +7,4 @@ public/dsfr/
 .git/
 .idea/
 .angular/
+back/transpile-back-and-prepare-for-prod.js

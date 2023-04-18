@@ -4,8 +4,7 @@
   "description": "",
   "scripts": {
     "prod-tsc": "NODE_ENV=production node src/adapters/primary/scripts/startServer.js",
-    "build-tsc": "tsc -b tsconfig.prod.json",
-    "build": "sh transpile-backend-and-prepare-for-prod.sh",
+    "build": "node ./transpile-back-and-prepare-for-prod.js",
     "dev": "NODE_ENV=local ts-node-dev src/adapters/primary/scripts/startServer.ts",
     "start": "NODE_ENV=local node -r ts-node/register --max-old-space-size=1536 src/adapters/primary/scripts/startServer.ts",
     "start-prod": "NODE_ENV=production node -r ts-node/register --max-old-space-size=1536 src/adapters/primary/scripts/startServer.ts",
