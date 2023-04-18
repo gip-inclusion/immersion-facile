@@ -39,20 +39,16 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
       .filter(({ role }) => role !== "toReview")
       .map(({ agency }) => agency.id);
 
-    if (agencyIdsWithEnoughPrivileges.length < 1) {
-      throw new ForbiddenError(
-        `User with ID : ${userId} has no agencies with enough privileges to access a corresponding dashboard`,
-      );
-    }
-
-    const dashboardUrl = await this.dashboardGateway.getAgencyUserUrl(
-      agencyIdsWithEnoughPrivileges,
-      this.timeGateway.now(),
-    );
-
     return {
       ...user,
-      dashboardUrl,
+      ...(agencyIdsWithEnoughPrivileges.length < 1
+        ? {}
+        : {
+            dashboardUrl: await this.dashboardGateway.getAgencyUserUrl(
+              agencyIdsWithEnoughPrivileges,
+              this.timeGateway.now(),
+            ),
+          }),
     };
   }
 }

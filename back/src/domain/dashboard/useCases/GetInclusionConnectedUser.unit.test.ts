@@ -4,6 +4,7 @@ import {
   AuthenticatedUser,
   expectPromiseToFailWith,
   expectToEqual,
+  InclusionConnectedUser,
   InclusionConnectJwtPayload,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
@@ -51,19 +52,6 @@ describe("GetUserAgencyDashboardUrl", () => {
     );
   });
 
-  it("throws NotFoundError if the user has no agency attached", async () => {
-    inclusionConnectedUserRepository.setInclusionConnectedUsers([
-      {
-        ...john,
-        agencyRights: [],
-      },
-    ]);
-    await expectPromiseToFailWith(
-      getInclusionConnectedUser.execute(undefined, inclusionConnectJwtPayload),
-      `User with ID : ${userId} has no agencies with enough privileges to access a corresponding dashboard`,
-    );
-  });
-
   it("throws Forbidden if no jwt token provided", async () => {
     await expectPromiseToFailWith(
       getInclusionConnectedUser.execute(),
@@ -99,24 +87,23 @@ describe("GetUserAgencyDashboardUrl", () => {
   );
 
   it.each(agencyRolesForbiddenToGetDashboard)(
-    "fails to get the dashboard url for role '%s'",
+    "gets the user without dashboard url for role '%s'",
     async (agencyUserRole) => {
+      const storedInclusionConnectedUser: InclusionConnectedUser = {
+        ...john,
+        agencyRights: [
+          { agency: new AgencyDtoBuilder().build(), role: agencyUserRole },
+        ],
+      };
       inclusionConnectedUserRepository.setInclusionConnectedUsers([
-        {
-          ...john,
-          agencyRights: [
-            { agency: new AgencyDtoBuilder().build(), role: agencyUserRole },
-          ],
-        },
+        storedInclusionConnectedUser,
       ]);
-
-      await expectPromiseToFailWith(
-        getInclusionConnectedUser.execute(
-          undefined,
-          inclusionConnectJwtPayload,
-        ),
-        `User with ID : ${userId} has no agencies with enough privileges to access a corresponding dashboard`,
+      const inclusionConnectedUser = await getInclusionConnectedUser.execute(
+        undefined,
+        inclusionConnectJwtPayload,
       );
+
+      expectToEqual(inclusionConnectedUser, storedInclusionConnectedUser);
     },
   );
 
