@@ -42,8 +42,7 @@ export const startPeriodicNodeProcessReport = (
       makeReport(
         currentCpuUsage,
         (currentTime.getTime() - previousTime.getTime()) * 10 * cpus().length,
-        eventLoopLagSamples.reduce((acc, val) => acc + val, 0) /
-          eventLoopLagSamples.length,
+        makeEventLoopLagMeanMs(eventLoopLagSamples),
       ),
       "nodeRessourcesReport",
     );
@@ -75,3 +74,9 @@ const makeReport = (
   },
   memoryUsage: memoryUsage(),
 });
+
+const makeEventLoopLagMeanMs = (eventLoopLagSamples: number[]): number =>
+  eventLoopLagSamples.length > 0
+    ? eventLoopLagSamples.reduce((acc, val) => acc + val, 0) /
+      eventLoopLagSamples.length
+    : 0;
