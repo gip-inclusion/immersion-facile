@@ -1,6 +1,11 @@
 import { Observable } from "rxjs";
 import {
   AbsoluteUrl,
+  AgencyDto,
+  AgencyId,
+  AgencyRole,
+  AuthenticatedUser,
+  AuthenticatedUserId,
   BackOfficeJwt,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
@@ -18,4 +23,17 @@ export interface AdminGateway {
     establishmentBatch: FormEstablishmentBatchDto,
     token: BackOfficeJwt,
   ) => Observable<EstablishmentBatchReport>;
+  getAgencyUsersToReview$: (
+    token: BackOfficeJwt,
+  ) => Observable<AuthenticatedUser[]>;
+  getAgenciesToReviewForUser$(
+    userId: AuthenticatedUserId,
+    token: BackOfficeJwt,
+  ): Observable<AgencyDto[]>;
+  updateAgencyRoleForUser$(
+    agencyId: AgencyId,
+    role: AgencyRole,
+    userId: AuthenticatedUserId,
+    token: BackOfficeJwt,
+  ): Observable<void>;
 }

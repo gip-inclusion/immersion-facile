@@ -2,6 +2,7 @@ import {
   AgencyDto,
   AgencyDtoBuilder,
   AgencyOption,
+  AuthenticatedUser,
   expectToEqual,
 } from "shared";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
@@ -11,6 +12,7 @@ import {
   agencyAdminSlice,
   AgencyAdminState,
   AgencySubmitFeedback,
+  RegisterAgencyWithRoleToUserPayload,
 } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
 import {
   createTestStore,
@@ -22,6 +24,27 @@ import {
   AGENCY_NEEDING_REVIEW_2,
   PE_AGENCY_ACTIVE,
 } from "../../adapters/AgencyGateway/InMemoryAgencyGateway";
+
+const agency1 = new AgencyDtoBuilder().withId("agency-1").build();
+const agency2 = new AgencyDtoBuilder().withId("agency-2").build();
+const agency3 = new AgencyDtoBuilder().withId("agency-3").build();
+const agency4 = new AgencyDtoBuilder().withId("agency-4").build();
+const testAgencySet = [agency1, agency2, agency3, agency4];
+
+const testUserSet: AuthenticatedUser[] = [
+  {
+    id: "user-id",
+    email: "user-email",
+    firstName: "user-first-name",
+    lastName: "user-last-name",
+  },
+  {
+    id: "user-id-2",
+    email: "user-email-2",
+    firstName: "user-first-name-2",
+    lastName: "user-last-name-2",
+  },
+];
 
 describe("agencyAdmin", () => {
   let store: ReduxStore;
@@ -112,6 +135,10 @@ describe("agencyAdmin", () => {
           isUpdating: false,
           feedback: { kind: "idle" },
           error: null,
+          agenciesNeedingReviewForUser: [],
+          isFetchingAgenciesNeedingReviewForUser: false,
+          usersNeedingReview: [],
+          isUpdatingUserAgencies: false,
         };
 
         beforeEach(() => {
@@ -138,7 +165,7 @@ describe("agencyAdmin", () => {
 
         it("remove from agencyNeedingReviewOptions on update success and remove displayed agency", () => {
           store.dispatch(
-            agencyAdminSlice.actions.updateAgencyNeedingReviewStatusSucceded(
+            agencyAdminSlice.actions.updateAgencyNeedingReviewStatusSucceeded(
               AGENCY_NEEDING_REVIEW_2.id,
             ),
           );
@@ -223,9 +250,13 @@ describe("agencyAdmin", () => {
               agencySearchText,
               agency: null,
               agencyNeedingReview: null,
+              usersNeedingReview: [],
               isSearching: false,
               isFetchingAgenciesNeedingReview: false,
               isUpdating: false,
+              agenciesNeedingReviewForUser: [],
+              isFetchingAgenciesNeedingReviewForUser: false,
+              isUpdatingUserAgencies: false,
               feedback: { kind: "idle" },
               error: null,
             },
@@ -313,7 +344,133 @@ describe("agencyAdmin", () => {
       });
     });
   });
+  describe("Agency registration for authenticated users", () => {
+    it("request agencies'users to review for registration and role", () => {
+      store.dispatch(
+        agencyAdminSlice.actions.fetchAgencyUsersToReviewRequested(),
+      );
+      expectIsFetchingAgenciesNeedingReviewForUserToBe(true);
+      dependencies.adminGateway.getAgencyUsersToReviewResponse$.next(
+        testUserSet,
+      );
+      expectIsFetchingAgenciesNeedingReviewForUserToBe(false);
+      expect(store.getState().admin.agencyAdmin.usersNeedingReview).toEqual(
+        testUserSet,
+      );
+      expectFeedbackToEqual({ kind: "usersToReviewFetchSuccess" });
+    });
 
+    it("request agencies'users to review for registration and role to throw on error", () => {
+      store.dispatch(
+        agencyAdminSlice.actions.fetchAgencyUsersToReviewRequested(),
+      );
+      const errorMessage = "Error fetching users to review";
+      expectIsFetchingAgenciesNeedingReviewForUserToBe(true);
+      dependencies.adminGateway.getAgencyUsersToReviewResponse$.error(
+        new Error(errorMessage),
+      );
+      expectIsFetchingAgenciesNeedingReviewForUserToBe(false);
+      expectFeedbackToEqual({ kind: "errored", errorMessage });
+    });
+    it("request agencies to review for given authenticated user", () => {
+      store.dispatch(
+        agencyAdminSlice.actions.fetchAgenciesToReviewForUserRequested(
+          "user-id",
+        ),
+      );
+      expectIsFetchingAgenciesNeedingReviewForUserToBe(true);
+      dependencies.adminGateway.getAgenciesToReviewForUserResponse$.next(
+        testAgencySet,
+      );
+      expectIsFetchingAgenciesNeedingReviewForUserToBe(false);
+      expect(
+        store.getState().admin.agencyAdmin.agenciesNeedingReviewForUser,
+      ).toEqual(testAgencySet);
+      expectFeedbackToEqual({ kind: "agenciesToReviewForUserFetchSuccess" });
+    });
+
+    it("request agencies to review for given authenticated to throw on error", () => {
+      store.dispatch(
+        agencyAdminSlice.actions.fetchAgenciesToReviewForUserRequested(
+          "user-id",
+        ),
+      );
+      const errorMessage = "Error fetching user agencies to review";
+      expectIsFetchingAgenciesNeedingReviewForUserToBe(true);
+      dependencies.adminGateway.getAgenciesToReviewForUserResponse$.error(
+        new Error(errorMessage),
+      );
+      expectIsFetchingAgenciesNeedingReviewForUserToBe(false);
+      expectFeedbackToEqual({ kind: "errored", errorMessage });
+    });
+
+    it("request agency to be registered to an user with a role", () => {
+      ({ store, dependencies } = createTestStore({
+        admin: adminPreloadedState({
+          agencyAdmin: {
+            ...agencyAdminInitialState,
+            agenciesNeedingReviewForUser: testAgencySet,
+          },
+        }),
+      }));
+      const payload: RegisterAgencyWithRoleToUserPayload = {
+        agencyId: "agency-3",
+        userId: "user-id",
+        role: "validator",
+      };
+      const expectedAgencies = testAgencySet.filter(
+        (agency) => agency.id !== payload.agencyId,
+      );
+
+      expect(
+        store.getState().admin.agencyAdmin.agenciesNeedingReviewForUser,
+      ).toEqual(testAgencySet);
+      store.dispatch(
+        agencyAdminSlice.actions.registerAgencyWithRoleToUserRequested(payload),
+      );
+      expectIsUpdatingUserAgenciesToBe(true);
+      dependencies.adminGateway.updateAgencyRoleForUserResponse$.next(
+        undefined,
+      );
+      expectIsUpdatingUserAgenciesToBe(false);
+      expect(
+        store.getState().admin.agencyAdmin.agenciesNeedingReviewForUser,
+      ).toEqual(expectedAgencies);
+      expectFeedbackToEqual({ kind: "agencyRegisterToUserSuccess" });
+    });
+
+    it("request agency to be registered to an user with a role should throw on an error", () => {
+      const payload: RegisterAgencyWithRoleToUserPayload = {
+        agencyId: "agency-3",
+        userId: "user-id",
+        role: "validator",
+      };
+      const errorMessage = `Error registering user ${payload.userId} to agency ${payload.agencyId} with role ${payload.role}`;
+
+      store.dispatch(
+        agencyAdminSlice.actions.registerAgencyWithRoleToUserRequested(payload),
+      );
+      expectIsUpdatingUserAgenciesToBe(true);
+      dependencies.adminGateway.updateAgencyRoleForUserResponse$.error(
+        new Error(errorMessage),
+      );
+      expectIsUpdatingUserAgenciesToBe(false);
+      expectFeedbackToEqual({ kind: "errored", errorMessage });
+    });
+  });
+  const expectIsUpdatingUserAgenciesToBe = (expected: boolean) => {
+    expect(store.getState().admin.agencyAdmin.isUpdatingUserAgencies).toBe(
+      expected,
+    );
+  };
+
+  const expectIsFetchingAgenciesNeedingReviewForUserToBe = (
+    expected: boolean,
+  ) => {
+    expect(
+      store.getState().admin.agencyAdmin.isFetchingAgenciesNeedingReviewForUser,
+    ).toBe(expected);
+  };
   const expectAgencyAdminStateToMatch = (params: Partial<AgencyAdminState>) => {
     expectToEqual(agencyAdminSelectors.agencyState(store.getState()), {
       ...agencyAdminInitialState,
@@ -350,5 +507,9 @@ describe("agencyAdmin", () => {
 
   const whenSearchTextIsProvided = (searchedText: string) => {
     store.dispatch(agencyAdminSlice.actions.setAgencySearchText(searchedText));
+  };
+
+  const expectFeedbackToEqual = (expected: AgencySubmitFeedback) => {
+    expectToEqual(agencyAdminSelectors.feedback(store.getState()), expected);
   };
 });

@@ -1,21 +1,23 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { InclusionConnectedUser, WithAgencyIds } from "shared";
+import { AgencyDto, InclusionConnectedUser, WithAgencyIds } from "shared";
 import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
 
 export type InclusionConnectedFeedback = SubmitFeedBack<
-  "success" | "agencyRegistrationSuccess"
+  "success" | "agencyRegistrationSuccess" | "agenciesToReviewFetchSuccess"
 >;
 
 type InclusionConnectedState = {
   currentUser: InclusionConnectedUser | null;
   isLoading: boolean;
   feedback: InclusionConnectedFeedback;
+  agenciesToReview: AgencyDto[];
 };
 
 const initialState: InclusionConnectedState = {
   currentUser: null,
   isLoading: false,
   feedback: { kind: "idle" },
+  agenciesToReview: [],
 };
 
 export const inclusionConnectedSlice = createSlice({

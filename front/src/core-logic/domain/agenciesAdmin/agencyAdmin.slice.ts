@@ -4,10 +4,18 @@ import {
   AgencyDto,
   AgencyId,
   AgencyOption,
+  AgencyRole,
+  AuthenticatedUser,
+  AuthenticatedUserId,
 } from "shared";
 import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
 
-export type AgencySuccessFeedbackKind = "agencyAdded" | "agencyUpdated";
+export type AgencySuccessFeedbackKind =
+  | "agencyAdded"
+  | "agencyUpdated"
+  | "agenciesToReviewForUserFetchSuccess"
+  | "usersToReviewFetchSuccess"
+  | "agencyRegisterToUserSuccess";
 export type AgencySubmitFeedback = SubmitFeedBack<AgencySuccessFeedbackKind>;
 
 export interface AgencyAdminState {
@@ -16,12 +24,24 @@ export interface AgencyAdminState {
   agencyNeedingReviewOptions: AgencyOption[];
   agency: AgencyDto | null;
   agencyNeedingReview: AgencyDto | null;
+  agenciesNeedingReviewForUser: AgencyDto[];
+  usersNeedingReview: AuthenticatedUser[];
+
   isSearching: boolean;
   isFetchingAgenciesNeedingReview: boolean;
+  isFetchingAgenciesNeedingReviewForUser: boolean;
   isUpdating: boolean;
+  isUpdatingUserAgencies: boolean;
+
   error: string | null;
   feedback: AgencySubmitFeedback;
 }
+
+export type RegisterAgencyWithRoleToUserPayload = {
+  agencyId: AgencyId;
+  role: AgencyRole;
+  userId: AuthenticatedUserId;
+};
 
 export const agencyAdminInitialState: AgencyAdminState = {
   agencyNeedingReviewOptions: [],
@@ -29,9 +49,15 @@ export const agencyAdminInitialState: AgencyAdminState = {
   agencyOptions: [],
   agency: null,
   agencyNeedingReview: null,
+  agenciesNeedingReviewForUser: [],
+  usersNeedingReview: [],
+
   isSearching: false,
   isFetchingAgenciesNeedingReview: false,
   isUpdating: false,
+  isFetchingAgenciesNeedingReviewForUser: false,
+  isUpdatingUserAgencies: false,
+
   feedback: { kind: "idle" },
   error: null,
 };
@@ -102,7 +128,7 @@ export const agencyAdminSlice = createSlice({
       state.isUpdating = true;
       state.feedback = { kind: "idle" };
     },
-    updateAgencyNeedingReviewStatusSucceded: (
+    updateAgencyNeedingReviewStatusSucceeded: (
       state,
       _action: PayloadAction<AgencyId>,
     ) => {
@@ -127,6 +153,66 @@ export const agencyAdminSlice = createSlice({
       state.agencyNeedingReviewOptions =
         action.payload.agencyNeedingReviewOptions;
       state.agencyNeedingReview = action.payload.agencyNeedingReview;
+    },
+    fetchAgencyUsersToReviewRequested: (state) => {
+      state.isFetchingAgenciesNeedingReviewForUser = true;
+    },
+    fetchAgencyUsersToReviewSucceeded: (
+      state,
+      action: PayloadAction<AuthenticatedUser[]>,
+    ) => {
+      state.isFetchingAgenciesNeedingReviewForUser = false;
+      state.usersNeedingReview = action.payload;
+      state.feedback.kind = "usersToReviewFetchSuccess";
+    },
+    fetchAgencyUsersToReviewFailed: (state, action: PayloadAction<string>) => {
+      state.isFetchingAgenciesNeedingReviewForUser = false;
+      state.feedback = { kind: "errored", errorMessage: action.payload };
+    },
+    fetchAgenciesToReviewForUserRequested: (
+      state,
+      _action: PayloadAction<AuthenticatedUserId>,
+    ) => {
+      state.isFetchingAgenciesNeedingReviewForUser = true;
+    },
+    fetchAgenciesToReviewForUserSucceeded: (
+      state,
+      action: PayloadAction<AgencyDto[]>,
+    ) => {
+      state.isFetchingAgenciesNeedingReviewForUser = false;
+      state.agenciesNeedingReviewForUser = action.payload;
+      state.feedback.kind = "agenciesToReviewForUserFetchSuccess";
+    },
+    fetchAgenciesToReviewForUserFailed: (
+      state,
+      action: PayloadAction<string>,
+    ) => {
+      state.isFetchingAgenciesNeedingReviewForUser = false;
+      state.feedback = { kind: "errored", errorMessage: action.payload };
+    },
+    registerAgencyWithRoleToUserRequested: (
+      state,
+      _action: PayloadAction<RegisterAgencyWithRoleToUserPayload>,
+    ) => {
+      state.isUpdatingUserAgencies = true;
+    },
+    registerAgencyWithRoleToUserSucceeded: (
+      state,
+      action: PayloadAction<AgencyId>,
+    ) => {
+      state.isUpdatingUserAgencies = false;
+      state.agenciesNeedingReviewForUser =
+        state.agenciesNeedingReviewForUser.filter(
+          (agency) => agency.id !== action.payload,
+        );
+      state.feedback.kind = "agencyRegisterToUserSuccess";
+    },
+    registerAgencyWithRoleToUserFailed: (
+      state,
+      action: PayloadAction<string>,
+    ) => {
+      state.isUpdatingUserAgencies = false;
+      state.feedback = { kind: "errored", errorMessage: action.payload };
     },
   },
 });

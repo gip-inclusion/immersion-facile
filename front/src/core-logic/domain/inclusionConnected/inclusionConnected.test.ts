@@ -15,6 +15,7 @@ import {
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 
+const agency1 = new AgencyDtoBuilder().withId("agency-1").build();
 describe("InclusionConnected", () => {
   let store: ReduxStore;
   let dependencies: TestDependencies;
@@ -102,6 +103,22 @@ describe("InclusionConnected", () => {
     );
     expectIsLoadingToBe(false);
     expectFeedbackToEqual({ kind: "agencyRegistrationSuccess" });
+  });
+
+  it("request agencies registration on the current user to throw on error", () => {
+    const payload: WithAgencyIds = {
+      agencies: [agency1.id],
+    };
+    const errorMessage = "Error registering user to agencies to review";
+    store.dispatch(
+      inclusionConnectedSlice.actions.registerAgenciesRequested(payload),
+    );
+    expectIsLoadingToBe(true);
+    dependencies.inclusionConnectedGateway.registerAgenciesToCurrentUserResponse$.error(
+      new Error(errorMessage),
+    );
+    expectIsLoadingToBe(false);
+    expectFeedbackToEqual({ kind: "errored", errorMessage });
   });
 
   const expectIsLoadingToBe = (expected: boolean) => {

@@ -1,6 +1,11 @@
 import { Observable, Subject } from "rxjs";
 import {
   AbsoluteUrl,
+  AgencyDto,
+  AgencyId,
+  AgencyRole,
+  AuthenticatedUser,
+  AuthenticatedUserId,
   BackOfficeJwt,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
@@ -22,7 +27,27 @@ export class TestAdminGateway implements AdminGateway {
   ): Observable<EstablishmentBatchReport> {
     return this.establishmentBatchResponse$;
   }
+  updateAgencyRoleForUser$(
+    _agencyId: AgencyId,
+    _role: AgencyRole,
+    _userId: AuthenticatedUserId,
+    _token: string,
+  ): Observable<void> {
+    return this.updateAgencyRoleForUserResponse$;
+  }
+  getAgencyUsersToReview$(): Observable<AuthenticatedUser[]> {
+    return this.getAgencyUsersToReviewResponse$;
+  }
+  getAgenciesToReviewForUser$(
+    _userId: AuthenticatedUserId,
+    _token: string,
+  ): Observable<AgencyDto[]> {
+    return this.getAgenciesToReviewForUserResponse$;
+  }
 
+  public getAgencyUsersToReviewResponse$ = new Subject<AuthenticatedUser[]>();
+  public updateAgencyRoleForUserResponse$ = new Subject<undefined>();
+  public getAgenciesToReviewForUserResponse$ = new Subject<AgencyDto[]>();
   public token$ = new Subject<string>();
   public dashboardUrl$ = new Subject<AbsoluteUrl>();
   public establishmentBatchResponse$ = new Subject<EstablishmentBatchReport>();

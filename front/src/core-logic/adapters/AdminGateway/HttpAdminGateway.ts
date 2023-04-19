@@ -3,6 +3,11 @@ import {
   AbsoluteUrl,
   AdminTargets,
   adminTokenSchema,
+  AgencyDto,
+  AgencyId,
+  AgencyRole,
+  AuthenticatedUser,
+  AuthenticatedUserId,
   BackOfficeJwt,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
@@ -55,5 +60,26 @@ export class HttpAdminGateway implements AdminGateway {
         })
         .then(({ responseBody }) => responseBody),
     );
+  }
+
+  public updateAgencyRoleForUser$(
+    _agencyId: AgencyId,
+    _role: AgencyRole,
+    _userId: AuthenticatedUserId,
+    _token: string,
+  ): Observable<void> {
+    throw new Error("Method not implemented.");
+  }
+
+  public getAgenciesToReviewForUser$(
+    _userId: AuthenticatedUserId,
+    _token: string,
+  ): Observable<AgencyDto[]> {
+    throw new Error("Method not implemented.");
+  }
+  public getAgencyUsersToReview$(
+    _token: BackOfficeJwt,
+  ): Observable<AuthenticatedUser[]> {
+    throw new Error("Method not implemented.");
   }
 }

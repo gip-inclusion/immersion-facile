@@ -10,5 +10,13 @@ export const agencyAdminSelectors = {
     agencyState,
     ({ agencyNeedingReview }) => agencyNeedingReview,
   ),
+  usersNeedingReview: createSelector(
+    agencyState,
+    ({ usersNeedingReview }) => usersNeedingReview,
+  ),
+  agenciesNeedingReviewForUser: createSelector(
+    agencyState,
+    ({ agenciesNeedingReviewForUser }) => agenciesNeedingReviewForUser,
+  ),
   feedback: createSelector(agencyState, ({ feedback }) => feedback),
 };

@@ -7,7 +7,10 @@ import {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
-import { agencyAdminSlice } from "./agencyAdmin.slice";
+import {
+  agencyAdminSlice,
+  RegisterAgencyWithRoleToUserPayload,
+} from "./agencyAdmin.slice";
 
 type AgencyAction = ActionOfSlice<typeof agencyAdminSlice>;
 
@@ -113,7 +116,7 @@ const updateAgencyNeedingReviewStatusEpic: AgencyEpic = (
         )
         .pipe(
           map(() =>
-            agencyAdminSlice.actions.updateAgencyNeedingReviewStatusSucceded(
+            agencyAdminSlice.actions.updateAgencyNeedingReviewStatusSucceeded(
               payload.id,
             ),
           ),
@@ -127,7 +130,7 @@ const updateAgencyNeedingReviewStatusEpic: AgencyEpic = (
 const agencyDoesNotNeedReviewAnymoreEpic: AgencyEpic = (action$, state$) =>
   action$.pipe(
     filter(
-      agencyAdminSlice.actions.updateAgencyNeedingReviewStatusSucceded.match,
+      agencyAdminSlice.actions.updateAgencyNeedingReviewStatusSucceeded.match,
     ),
     map(({ payload }) => {
       const agencyAdminState = state$.value.admin.agencyAdmin;
@@ -146,6 +149,76 @@ const agencyDoesNotNeedReviewAnymoreEpic: AgencyEpic = (action$, state$) =>
       });
     }),
   );
+const fetchAgencyUsersNeedingReviewEpic: AppEpic<AgencyAction> = (
+  action$,
+  state$,
+  { adminGateway },
+) =>
+  action$.pipe(
+    filter(agencyAdminSlice.actions.fetchAgencyUsersToReviewRequested.match),
+    switchMap((_action) =>
+      adminGateway.getAgencyUsersToReview$(
+        state$.value.auth.federatedIdentityWithUser?.token ?? "",
+      ),
+    ),
+    map(agencyAdminSlice.actions.fetchAgencyUsersToReviewSucceeded),
+    catchEpicError((error) =>
+      agencyAdminSlice.actions.fetchAgencyUsersToReviewFailed(error?.message),
+    ),
+  );
+const fetchAgenciesNeedingReviewEpic: AppEpic<AgencyAction> = (
+  action$,
+  state$,
+  { adminGateway },
+) =>
+  action$.pipe(
+    filter(
+      agencyAdminSlice.actions.fetchAgenciesToReviewForUserRequested.match,
+    ),
+    switchMap((action) =>
+      adminGateway.getAgenciesToReviewForUser$(
+        action.payload,
+        state$.value.auth.federatedIdentityWithUser?.token ?? "",
+      ),
+    ),
+    map(agencyAdminSlice.actions.fetchAgenciesToReviewForUserSucceeded),
+    catchEpicError((error) =>
+      agencyAdminSlice.actions.fetchAgenciesToReviewForUserFailed(
+        error?.message,
+      ),
+    ),
+  );
+const registerAgencyToUserEpic: AppEpic<AgencyAction> = (
+  action$,
+  state$,
+  { adminGateway },
+) =>
+  action$.pipe(
+    filter(
+      agencyAdminSlice.actions.registerAgencyWithRoleToUserRequested.match,
+    ),
+    switchMap((action: PayloadAction<RegisterAgencyWithRoleToUserPayload>) =>
+      adminGateway
+        .updateAgencyRoleForUser$(
+          action.payload.agencyId,
+          action.payload.role,
+          action.payload.userId,
+          state$.value.auth.federatedIdentityWithUser?.token ?? "",
+        )
+        .pipe(
+          map(() =>
+            agencyAdminSlice.actions.registerAgencyWithRoleToUserSucceeded(
+              action.payload.agencyId,
+            ),
+          ),
+        ),
+    ),
+    catchEpicError((error) =>
+      agencyAdminSlice.actions.registerAgencyWithRoleToUserFailed(
+        error?.message,
+      ),
+    ),
+  );
 
 export const agenciesAdminEpics = [
   agencyAdminGetByNameEpic,
@@ -155,4 +228,7 @@ export const agenciesAdminEpics = [
   updateAgencyEpic,
   updateAgencyNeedingReviewStatusEpic,
   agencyDoesNotNeedReviewAnymoreEpic,
+  fetchAgenciesNeedingReviewEpic,
+  fetchAgencyUsersNeedingReviewEpic,
+  registerAgencyToUserEpic,
 ];
