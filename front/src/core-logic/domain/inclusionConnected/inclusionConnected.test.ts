@@ -92,24 +92,13 @@ describe("InclusionConnected", () => {
     const payload: WithAgencyIds = {
       agencies: [agency1.id],
     };
-    const expectedUserWithAgencies: InclusionConnectedUser = {
-      email: "fake-user@inclusion-connect.fr",
-      firstName: "Fake",
-      lastName: "User",
-      id: "fake-user-id",
-      agencyRights: [
-        {
-          role: "toReview",
-          agency: agency1,
-        },
-      ],
-    };
+
     store.dispatch(
       inclusionConnectedSlice.actions.registerAgenciesRequested(payload),
     );
     expectIsLoadingToBe(true);
-    dependencies.inclusionConnectedGateway.currentUser$.next(
-      expectedUserWithAgencies,
+    dependencies.inclusionConnectedGateway.registerAgenciesToCurrentUserResponse$.next(
+      undefined,
     );
     expectIsLoadingToBe(false);
     expectFeedbackToEqual({ kind: "agencyRegistrationSuccess" });
