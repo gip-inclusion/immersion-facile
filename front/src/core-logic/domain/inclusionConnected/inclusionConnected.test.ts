@@ -117,8 +117,8 @@ describe("InclusionConnected", () => {
     dependencies.inclusionConnectedGateway.registerAgenciesToCurrentUserResponse$.error(
       new Error(errorMessage),
     );
-    expectIsLoadingToBe(false);
     expectFeedbackToEqual({ kind: "errored", errorMessage });
+    expectIsLoadingToBe(false);
   });
 
   const expectIsLoadingToBe = (expected: boolean) => {

@@ -45,6 +45,9 @@ const registerAgenciesEpic: AppEpic<InclusionConnectedAction> = (
       ),
     ),
     map(inclusionConnectedSlice.actions.registerAgenciesSucceeded),
+    catchEpicError((error) =>
+      inclusionConnectedSlice.actions.registerAgenciesFailed(error?.message),
+    ),
   );
 export const inclusionConnectedEpics = [
   getCurrentUserEpic,
