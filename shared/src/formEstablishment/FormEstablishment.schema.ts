@@ -15,10 +15,12 @@ import {
 import {
   BusinessContactDto,
   ContactMethod,
+  EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   FormEstablishmentDto,
   FormEstablishmentSource,
   ImmersionContactInEstablishmentId,
+  SiretAdditionFailure,
   WithEstablishmentGroupSlug,
 } from "./FormEstablishment.dto";
 
@@ -90,3 +92,14 @@ export const formEstablishmentBatchSchema: z.Schema<FormEstablishmentBatchDto> =
 
 export const withEstablishmentGroupSlugSchema: z.Schema<WithEstablishmentGroupSlug> =
   z.object({ groupSlug: zString });
+
+const siretAdditionFailure: z.Schema<SiretAdditionFailure> = z.object({
+  siret: siretSchema,
+  errorMessage: z.string(),
+});
+export const establishmentBatchReportSchema: z.Schema<EstablishmentBatchReport> =
+  z.object({
+    numberOfEstablishmentsProcessed: z.number(),
+    numberOfSuccess: z.number(),
+    failures: z.array(siretAdditionFailure),
+  });

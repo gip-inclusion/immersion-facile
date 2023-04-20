@@ -1,14 +1,12 @@
 import { Observable, Subject } from "rxjs";
 import {
   AbsoluteUrl,
-  AgencyDto,
-  AuthenticatedUser,
-  AuthenticatedUserId,
   BackOfficeJwt,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
+  InclusionConnectedUser,
+  RegisterAgencyWithRoleToUserDto,
 } from "shared";
-import { RegisterAgencyWithRoleToUserPayload } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
 export class TestAdminGateway implements AdminGateway {
@@ -28,26 +26,20 @@ export class TestAdminGateway implements AdminGateway {
   }
 
   updateAgencyRoleForUser$(
-    _params: RegisterAgencyWithRoleToUserPayload,
+    _params: RegisterAgencyWithRoleToUserDto,
     _token: string,
   ): Observable<void> {
     return this.updateAgencyRoleForUserResponse$;
   }
 
-  getAgencyUsersToReview$(): Observable<AuthenticatedUser[]> {
+  getInclusionConnectedUsersToReview$(): Observable<InclusionConnectedUser[]> {
     return this.getAgencyUsersToReviewResponse$;
   }
 
-  getAgenciesToReviewForUser$(
-    _userId: AuthenticatedUserId,
-    _token: string,
-  ): Observable<AgencyDto[]> {
-    return this.getAgenciesToReviewForUserResponse$;
-  }
-
-  public getAgencyUsersToReviewResponse$ = new Subject<AuthenticatedUser[]>();
+  public getAgencyUsersToReviewResponse$ = new Subject<
+    InclusionConnectedUser[]
+  >();
   public updateAgencyRoleForUserResponse$ = new Subject<undefined>();
-  public getAgenciesToReviewForUserResponse$ = new Subject<AgencyDto[]>();
   public token$ = new Subject<string>();
   public dashboardUrl$ = new Subject<AbsoluteUrl>();
   public establishmentBatchResponse$ = new Subject<EstablishmentBatchReport>();

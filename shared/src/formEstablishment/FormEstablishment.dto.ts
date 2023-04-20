@@ -80,7 +80,7 @@ export type FormEstablishmentBatchDto = {
   formEstablishments: FormEstablishmentDto[];
 };
 
-type SiretAdditionFailure = { siret: SiretDto; errorMessage: string };
+export type SiretAdditionFailure = { siret: SiretDto; errorMessage: string };
 
 export type EstablishmentBatchReport = {
   numberOfEstablishmentsProcessed: number;

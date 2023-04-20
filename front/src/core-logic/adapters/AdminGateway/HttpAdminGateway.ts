@@ -2,17 +2,15 @@ import { from, Observable } from "rxjs";
 import {
   AbsoluteUrl,
   AdminTargets,
-  AgencyDto,
-  AuthenticatedUser,
-  AuthenticatedUserId,
   BackOfficeJwt,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetDashboardParams,
+  InclusionConnectedUser,
+  RegisterAgencyWithRoleToUserDto,
   UserAndPassword,
 } from "shared";
 import { HttpClient } from "http-client";
-import { RegisterAgencyWithRoleToUserPayload } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
 export class HttpAdminGateway implements AdminGateway {
@@ -61,22 +59,28 @@ export class HttpAdminGateway implements AdminGateway {
   }
 
   public updateAgencyRoleForUser$(
-    _params: RegisterAgencyWithRoleToUserPayload,
-    _token: string,
+    body: RegisterAgencyWithRoleToUserDto,
+    token: string,
   ): Observable<void> {
-    throw new Error("Method not implemented.");
+    return from(
+      this.httpClient
+        .updateAgencyRoleForUser({
+          body,
+          headers: { authorization: token },
+        })
+        .then(({ responseBody }) => responseBody),
+    );
   }
 
-  public getAgenciesToReviewForUser$(
-    _userId: AuthenticatedUserId,
-    _token: string,
-  ): Observable<AgencyDto[]> {
-    throw new Error("Method not implemented.");
-  }
-
-  public getAgencyUsersToReview$(
-    _token: BackOfficeJwt,
-  ): Observable<AuthenticatedUser[]> {
-    throw new Error("Method not implemented.");
+  public getInclusionConnectedUsersToReview$(
+    token: BackOfficeJwt,
+  ): Observable<InclusionConnectedUser[]> {
+    return from(
+      this.httpClient
+        .getInclusionConnectedUsersToReview$({
+          headers: { authorization: token },
+        })
+        .then(({ responseBody }) => responseBody),
+    );
   }
 }

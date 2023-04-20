@@ -1,16 +1,14 @@
 import { Observable } from "rxjs";
 import {
   AbsoluteUrl,
-  AgencyDto,
-  AuthenticatedUser,
-  AuthenticatedUserId,
   BackOfficeJwt,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetDashboardParams,
+  InclusionConnectedUser,
+  RegisterAgencyWithRoleToUserDto,
   UserAndPassword,
 } from "shared";
-import { RegisterAgencyWithRoleToUserPayload } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
 
 export interface AdminGateway {
   login: (params: UserAndPassword) => Observable<BackOfficeJwt>;
@@ -22,15 +20,11 @@ export interface AdminGateway {
     establishmentBatch: FormEstablishmentBatchDto,
     token: BackOfficeJwt,
   ) => Observable<EstablishmentBatchReport>;
-  getAgencyUsersToReview$: (
+  getInclusionConnectedUsersToReview$: (
     token: BackOfficeJwt,
-  ) => Observable<AuthenticatedUser[]>;
-  getAgenciesToReviewForUser$(
-    userId: AuthenticatedUserId,
-    token: BackOfficeJwt,
-  ): Observable<AgencyDto[]>;
+  ) => Observable<InclusionConnectedUser[]>;
   updateAgencyRoleForUser$(
-    params: RegisterAgencyWithRoleToUserPayload,
+    params: RegisterAgencyWithRoleToUserDto,
     token: BackOfficeJwt,
   ): Observable<void>;
 }

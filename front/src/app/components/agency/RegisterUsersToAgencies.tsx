@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Select } from "@codegouvfr/react-dsfr/Select";
 import { match, P } from "ts-pattern";
-import { AuthenticatedUserId } from "shared";
+import { AgencyRole, allAgencyRoles, AuthenticatedUserId } from "shared";
 import { DsfrTitle } from "react-design-system";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
@@ -17,14 +17,19 @@ export const RegisterUsersToAgencies = () => {
     agencyAdminSelectors.usersNeedingReview,
   );
   const agenciesNeedingReviewForUser = useAppSelector(
-    agencyAdminSelectors.agenciesNeedingReviewForUser,
+    agencyAdminSelectors.agenciesNeedingReviewForSelectedUser,
   );
-  const [selectedUserId, setSelectedUserId] =
-    useState<AuthenticatedUserId | null>(null);
+  const selectedUserId = useAppSelector(agencyAdminSelectors.selectedUserId);
   const feedback = useAppSelector(agencyAdminSelectors.feedback);
+
   useEffect(() => {
-    dispatch(agencyAdminSlice.actions.fetchAgencyUsersToReviewRequested());
+    dispatch(
+      agencyAdminSlice.actions.fetchInclusionConnectedUsersToReviewRequested(),
+    );
   }, []);
+
+  const defaultRoleOnAssociation: AgencyRole = "validator";
+
   return (
     <>
       <DsfrTitle
@@ -34,6 +39,7 @@ export const RegisterUsersToAgencies = () => {
       />
       <div className={fr.cx("fr-px-6w", "fr-py-4w", "fr-card")}>
         <>
+          {feedback.kind}
           <Select
             label={`Sélectionner un utilisateur (${usersNeedingReview.length} en attente de validation)`}
             options={[
@@ -50,12 +56,9 @@ export const RegisterUsersToAgencies = () => {
             nativeSelectProps={{
               defaultValue: "",
               onChange: (event) => {
-                setSelectedUserId(
-                  event.currentTarget.value as AuthenticatedUserId,
-                );
                 dispatch(
-                  agencyAdminSlice.actions.fetchAgenciesToReviewForUserRequested(
-                    event.currentTarget.value,
+                  agencyAdminSlice.actions.inclusionConnectedUserSelected(
+                    event.currentTarget.value as AuthenticatedUserId,
                   ),
                 );
               },
@@ -70,13 +73,13 @@ export const RegisterUsersToAgencies = () => {
                 ),
                 feedback: P.when(
                   (feedback) =>
-                    feedback.kind === "agenciesToReviewForUserFetchSuccess" ||
-                    feedback.kind === "agencyRegisterToUserSuccess",
+                    feedback.kind === "agencyRegisterToUserSuccess" ||
+                    feedback.kind === "usersToReviewFetchSuccess",
                 ),
               },
               () => (
                 <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
-                  {agenciesNeedingReviewForUser.map((agency) => (
+                  {agenciesNeedingReviewForUser.map(({ agency }) => (
                     <div key={agency.id} className={fr.cx("fr-col-4")}>
                       <div className={fr.cx("fr-card")}>
                         <div className={fr.cx("fr-card__body")}>
@@ -98,13 +101,13 @@ export const RegisterUsersToAgencies = () => {
                                     label: "Sélectionner un rôle",
                                     disabled: true,
                                   },
-                                  {
-                                    value: "validator",
-                                    label: "Validateur",
-                                  },
+                                  ...allAgencyRoles.map((roleValue) => ({
+                                    value: roleValue,
+                                    label: labelByRole[roleValue],
+                                  })),
                                 ]}
                                 nativeSelectProps={{
-                                  defaultValue: "validator",
+                                  value: defaultRoleOnAssociation, // change to role when feature ready
                                 }}
                               />
                             </div>
@@ -120,7 +123,7 @@ export const RegisterUsersToAgencies = () => {
                                     {
                                       agencyId: agency.id,
                                       userId: selectedUserId,
-                                      role: "validator",
+                                      role: defaultRoleOnAssociation,
                                     },
                                   ),
                                 );
@@ -143,9 +146,7 @@ export const RegisterUsersToAgencies = () => {
                     agenciesNeedingReviewForUser.length === 0,
                 ),
                 feedback: P.when(
-                  (feedback) =>
-                    feedback.kind === "agenciesToReviewForUserFetchSuccess" ||
-                    feedback.kind === "agencyRegisterToUserSuccess",
+                  (feedback) => feedback.kind === "agencyRegisterToUserSuccess",
                 ),
               },
               () => (
@@ -199,4 +200,11 @@ export const RegisterUsersToAgencies = () => {
       </div>
     </>
   );
+};
+
+const labelByRole: Record<AgencyRole, string> = {
+  counsellor: "Conseiller",
+  validator: "Validateur",
+  agencyOwner: "Administrateur d'agence",
+  toReview: "À valider",
 };

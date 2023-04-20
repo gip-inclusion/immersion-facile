@@ -1,12 +1,19 @@
+import { z } from "zod";
 import { createTarget, createTargets } from "http-client";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
-import { userAndPasswordSchema } from "../admin/admin.schema";
 import { withAgencyIdSchema } from "../agency/agency.schema";
-import { EstablishmentBatchReport } from "../formEstablishment/FormEstablishment.dto";
-import { formEstablishmentBatchSchema } from "../formEstablishment/FormEstablishment.schema";
+import {
+  establishmentBatchReportSchema,
+  formEstablishmentBatchSchema,
+} from "../formEstablishment/FormEstablishment.schema";
 import { withValidateHeadersAuthorization } from "../headers";
+import { inclusionConnectedUserSchema } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
+import { adminLogin } from "../routes/routes";
 import { adminTokenSchema } from "../tokens/token.schema";
-import { adminLogin } from "./routes";
+import {
+  registerAgencyWithRoleToUserSchema,
+  userAndPasswordSchema,
+} from "./admin.schema";
 
 export type AdminTargets = typeof adminTargets;
 export const adminTargets = createTargets({
@@ -28,7 +35,18 @@ export const adminTargets = createTargets({
     url: "/admin/add-form-establishment-batch",
     validateRequestBody: formEstablishmentBatchSchema.parse,
     ...withValidateHeadersAuthorization,
-    validateResponseBody: (responseBody) =>
-      responseBody as EstablishmentBatchReport, // TODO add validation schema,
+    validateResponseBody: establishmentBatchReportSchema.parse,
+  }),
+  updateAgencyRoleForUser: createTarget({
+    method: "PATCH",
+    url: "/admin/inclusion-connected/users",
+    validateRequestBody: registerAgencyWithRoleToUserSchema.parse,
+    ...withValidateHeadersAuthorization,
+  }),
+  getInclusionConnectedUsersToReview$: createTarget({
+    method: "GET",
+    url: "/admin/inclusion-connected/users",
+    ...withValidateHeadersAuthorization,
+    validateResponseBody: z.array(inclusionConnectedUserSchema).parse,
   }),
 });

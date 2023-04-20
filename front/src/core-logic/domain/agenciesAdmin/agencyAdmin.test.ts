@@ -1,9 +1,13 @@
+import { values } from "ramda";
 import {
   AgencyDto,
   AgencyDtoBuilder,
+  AgencyId,
   AgencyOption,
+  AgencyRight,
   AuthenticatedUser,
   expectToEqual,
+  RegisterAgencyWithRoleToUserDto,
 } from "shared";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
 import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
@@ -12,7 +16,7 @@ import {
   agencyAdminSlice,
   AgencyAdminState,
   AgencySubmitFeedback,
-  RegisterAgencyWithRoleToUserPayload,
+  NormalizedInclusionConnectedUserById,
 } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
 import {
   createTestStore,
@@ -29,22 +33,47 @@ const agency1 = new AgencyDtoBuilder().withId("agency-1").build();
 const agency2 = new AgencyDtoBuilder().withId("agency-2").build();
 const agency3 = new AgencyDtoBuilder().withId("agency-3").build();
 const agency4 = new AgencyDtoBuilder().withId("agency-4").build();
-const testAgencySet = [agency1, agency2, agency3, agency4];
 
-const testUserSet: AuthenticatedUser[] = [
-  {
-    id: "user-id",
-    email: "user-email",
-    firstName: "user-first-name",
-    lastName: "user-last-name",
+const agency1Right: AgencyRight = { agency: agency1, role: "toReview" };
+const agency2Right: AgencyRight = { agency: agency2, role: "validator" };
+const user1AgencyRights: Record<AgencyId, AgencyRight> = {
+  [agency1.id]: agency1Right,
+  [agency2.id]: agency2Right,
+};
+
+const agency3Right: AgencyRight = { agency: agency3, role: "toReview" };
+const agency4Right: AgencyRight = { agency: agency4, role: "toReview" };
+const user2AgencyRights: Record<AgencyId, AgencyRight> = {
+  [agency3.id]: agency3Right,
+  [agency4.id]: agency4Right,
+};
+
+const user1Id = "user-id-1";
+const authUser1: AuthenticatedUser = {
+  id: user1Id,
+  email: "user-email",
+  firstName: "user-first-name",
+  lastName: "user-last-name",
+};
+
+const user2Id = "user-id-2";
+const authUser2: AuthenticatedUser = {
+  id: user2Id,
+  email: "user-email-2",
+  firstName: "user-first-name-2",
+  lastName: "user-last-name-2",
+};
+
+const testUserSet: NormalizedInclusionConnectedUserById = {
+  [user1Id]: {
+    ...authUser1,
+    agencyRights: user1AgencyRights,
   },
-  {
-    id: "user-id-2",
-    email: "user-email-2",
-    firstName: "user-first-name-2",
-    lastName: "user-last-name-2",
+  [user2Id]: {
+    ...authUser2,
+    agencyRights: user2AgencyRights,
   },
-];
+};
 
 describe("agencyAdmin", () => {
   let store: ReduxStore;
@@ -116,7 +145,7 @@ describe("agencyAdmin", () => {
 
       describe("Needing review related", () => {
         const preloadedAgencyAdminState: AgencyAdminState = {
-          agencyOptions: [],
+          ...agencyAdminInitialState,
           agencyNeedingReviewOptions: [
             {
               id: AGENCY_NEEDING_REVIEW_1.id,
@@ -127,18 +156,7 @@ describe("agencyAdmin", () => {
               name: AGENCY_NEEDING_REVIEW_2.name,
             },
           ],
-          agencySearchText: "",
-          agency: null,
           agencyNeedingReview: AGENCY_NEEDING_REVIEW_2,
-          isSearching: false,
-          isFetchingAgenciesNeedingReview: false,
-          isUpdating: false,
-          feedback: { kind: "idle" },
-          error: null,
-          agenciesNeedingReviewForUser: [],
-          isFetchingAgenciesNeedingReviewForUser: false,
-          usersNeedingReview: [],
-          isUpdatingUserAgencies: false,
         };
 
         beforeEach(() => {
@@ -245,20 +263,9 @@ describe("agencyAdmin", () => {
         ({ store, dependencies } = createTestStore({
           admin: adminPreloadedState({
             agencyAdmin: {
+              ...agencyAdminInitialState,
               agencyOptions,
-              agencyNeedingReviewOptions: [],
               agencySearchText,
-              agency: null,
-              agencyNeedingReview: null,
-              usersNeedingReview: [],
-              isSearching: false,
-              isFetchingAgenciesNeedingReview: false,
-              isUpdating: false,
-              agenciesNeedingReviewForUser: [],
-              isFetchingAgenciesNeedingReviewForUser: false,
-              isUpdatingUserAgencies: false,
-              feedback: { kind: "idle" },
-              error: null,
             },
           }),
         }));
@@ -344,25 +351,58 @@ describe("agencyAdmin", () => {
       });
     });
   });
+
   describe("Agency registration for authenticated users", () => {
+    it("selects the user to review", () => {
+      ({ store, dependencies } = createTestStore({
+        admin: adminPreloadedState({
+          agencyAdmin: {
+            ...agencyAdminInitialState,
+            inclusionConnectedUsersNeedingReview: testUserSet,
+            selectedUserId: null,
+            feedback: { kind: "agencyUpdated" },
+          },
+        }),
+      }));
+
+      store.dispatch(
+        agencyAdminSlice.actions.inclusionConnectedUserSelected(user2Id),
+      );
+
+      expectAgencyAdminStateToMatch({
+        inclusionConnectedUsersNeedingReview: testUserSet,
+        selectedUserId: user2Id,
+        feedback: { kind: "agencyUpdated" },
+      });
+    });
+
     it("request agencies'users to review for registration and role", () => {
       store.dispatch(
-        agencyAdminSlice.actions.fetchAgencyUsersToReviewRequested(),
+        agencyAdminSlice.actions.fetchInclusionConnectedUsersToReviewRequested(),
       );
       expectIsFetchingAgenciesNeedingReviewForUserToBe(true);
-      dependencies.adminGateway.getAgencyUsersToReviewResponse$.next(
-        testUserSet,
-      );
+
+      dependencies.adminGateway.getAgencyUsersToReviewResponse$.next([
+        {
+          ...authUser1,
+          agencyRights: [agency1Right, agency2Right],
+        },
+        {
+          ...authUser2,
+          agencyRights: [agency3Right, agency4Right],
+        },
+      ]);
       expectIsFetchingAgenciesNeedingReviewForUserToBe(false);
-      expect(store.getState().admin.agencyAdmin.usersNeedingReview).toEqual(
-        testUserSet,
-      );
+      expectToEqual(agencyAdminSelectors.usersNeedingReview(store.getState()), [
+        authUser1,
+        authUser2,
+      ]);
       expectFeedbackToEqual({ kind: "usersToReviewFetchSuccess" });
     });
 
     it("request agencies'users to review for registration and role to throw on error", () => {
       store.dispatch(
-        agencyAdminSlice.actions.fetchAgencyUsersToReviewRequested(),
+        agencyAdminSlice.actions.fetchInclusionConnectedUsersToReviewRequested(),
       );
       const errorMessage = "Error fetching users to review";
       expectIsFetchingAgenciesNeedingReviewForUserToBe(true);
@@ -372,59 +412,30 @@ describe("agencyAdmin", () => {
       expectIsFetchingAgenciesNeedingReviewForUserToBe(false);
       expectFeedbackToEqual({ kind: "errored", errorMessage });
     });
-    it("request agencies to review for given authenticated user", () => {
-      store.dispatch(
-        agencyAdminSlice.actions.fetchAgenciesToReviewForUserRequested(
-          "user-id",
-        ),
-      );
-      expectIsFetchingAgenciesNeedingReviewForUserToBe(true);
-      dependencies.adminGateway.getAgenciesToReviewForUserResponse$.next(
-        testAgencySet,
-      );
-      expectIsFetchingAgenciesNeedingReviewForUserToBe(false);
-      expect(
-        store.getState().admin.agencyAdmin.agenciesNeedingReviewForUser,
-      ).toEqual(testAgencySet);
-      expectFeedbackToEqual({ kind: "agenciesToReviewForUserFetchSuccess" });
-    });
 
-    it("request agencies to review for given authenticated to throw on error", () => {
-      store.dispatch(
-        agencyAdminSlice.actions.fetchAgenciesToReviewForUserRequested(
-          "user-id",
-        ),
-      );
-      const errorMessage = "Error fetching user agencies to review";
-      expectIsFetchingAgenciesNeedingReviewForUserToBe(true);
-      dependencies.adminGateway.getAgenciesToReviewForUserResponse$.error(
-        new Error(errorMessage),
-      );
-      expectIsFetchingAgenciesNeedingReviewForUserToBe(false);
-      expectFeedbackToEqual({ kind: "errored", errorMessage });
-    });
-
-    it("request agency to be registered to an user with a role", () => {
+    it("request agency to be registered to a user with a role", () => {
       ({ store, dependencies } = createTestStore({
         admin: adminPreloadedState({
           agencyAdmin: {
             ...agencyAdminInitialState,
-            agenciesNeedingReviewForUser: testAgencySet,
+            inclusionConnectedUsersNeedingReview: testUserSet,
+            selectedUserId: user2Id,
           },
         }),
       }));
-      const payload: RegisterAgencyWithRoleToUserPayload = {
+
+      const payload: RegisterAgencyWithRoleToUserDto = {
         agencyId: "agency-3",
-        userId: "user-id",
+        userId: user2Id,
         role: "validator",
       };
-      const expectedAgencies = testAgencySet.filter(
-        (agency) => agency.id !== payload.agencyId,
-      );
 
-      expect(
-        store.getState().admin.agencyAdmin.agenciesNeedingReviewForUser,
-      ).toEqual(testAgencySet);
+      expectToEqual(
+        agencyAdminSelectors.agenciesNeedingReviewForSelectedUser(
+          store.getState(),
+        ),
+        values(user2AgencyRights),
+      );
       store.dispatch(
         agencyAdminSlice.actions.registerAgencyWithRoleToUserRequested(payload),
       );
@@ -433,14 +444,18 @@ describe("agencyAdmin", () => {
         undefined,
       );
       expectIsUpdatingUserAgenciesToBe(false);
-      expect(
-        store.getState().admin.agencyAdmin.agenciesNeedingReviewForUser,
-      ).toEqual(expectedAgencies);
+
+      expectToEqual(
+        agencyAdminSelectors.agenciesNeedingReviewForSelectedUser(
+          store.getState(),
+        ),
+        [agency4Right],
+      );
       expectFeedbackToEqual({ kind: "agencyRegisterToUserSuccess" });
     });
 
     it("request agency to be registered to an user with a role should throw on an error", () => {
-      const payload: RegisterAgencyWithRoleToUserPayload = {
+      const payload: RegisterAgencyWithRoleToUserDto = {
         agencyId: "agency-3",
         userId: "user-id",
         role: "validator",

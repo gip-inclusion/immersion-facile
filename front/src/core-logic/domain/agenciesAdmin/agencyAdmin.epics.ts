@@ -1,7 +1,12 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { debounceTime, distinctUntilChanged, filter } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
-import { AgencyId } from "shared";
+import type {
+  AgencyId,
+  AgencyRight,
+  InclusionConnectedUser,
+  RegisterAgencyWithRoleToUserDto,
+} from "shared";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import {
   ActionOfSlice,
@@ -9,7 +14,7 @@ import {
 } from "src/core-logic/storeConfig/redux.helpers";
 import {
   agencyAdminSlice,
-  RegisterAgencyWithRoleToUserPayload,
+  NormalizedInclusionConnectedUserById,
 } from "./agencyAdmin.slice";
 
 type AgencyAction = ActionOfSlice<typeof agencyAdminSlice>;
@@ -150,42 +155,23 @@ const agencyDoesNotNeedReviewAnymoreEpic: AgencyEpic = (action$, state$) =>
     }),
   );
 
-const fetchAgencyUsersNeedingReviewEpic: AppEpic<AgencyAction> = (
-  action$,
-  state$,
-  { adminGateway },
-) =>
-  action$.pipe(
-    filter(agencyAdminSlice.actions.fetchAgencyUsersToReviewRequested.match),
-    switchMap((_action) =>
-      adminGateway.getAgencyUsersToReview$(
-        state$.value.auth.federatedIdentityWithUser?.token ?? "",
-      ),
-    ),
-    map(agencyAdminSlice.actions.fetchAgencyUsersToReviewSucceeded),
-    catchEpicError((error) =>
-      agencyAdminSlice.actions.fetchAgencyUsersToReviewFailed(error?.message),
-    ),
-  );
-
-const fetchAgenciesNeedingReviewEpic: AppEpic<AgencyAction> = (
-  action$,
-  state$,
-  { adminGateway },
-) =>
+const fetchInclusionConnectedUsersWithAgencyNeedingReviewEpic: AppEpic<
+  AgencyAction
+> = (action$, state$, { adminGateway }) =>
   action$.pipe(
     filter(
-      agencyAdminSlice.actions.fetchAgenciesToReviewForUserRequested.match,
+      agencyAdminSlice.actions.fetchInclusionConnectedUsersToReviewRequested
+        .match,
     ),
-    switchMap((action) =>
-      adminGateway.getAgenciesToReviewForUser$(
-        action.payload,
+    switchMap((_action) =>
+      adminGateway.getInclusionConnectedUsersToReview$(
         state$.value.auth.federatedIdentityWithUser?.token ?? "",
       ),
     ),
-    map(agencyAdminSlice.actions.fetchAgenciesToReviewForUserSucceeded),
+    map(normalizeUsers),
+    map(agencyAdminSlice.actions.fetchInclusionConnectedUsersToReviewSucceeded),
     catchEpicError((error) =>
-      agencyAdminSlice.actions.fetchAgenciesToReviewForUserFailed(
+      agencyAdminSlice.actions.fetchInclusionConnectedUsersToReviewFailed(
         error?.message,
       ),
     ),
@@ -200,7 +186,7 @@ const registerAgencyToUserEpic: AppEpic<AgencyAction> = (
     filter(
       agencyAdminSlice.actions.registerAgencyWithRoleToUserRequested.match,
     ),
-    switchMap((action: PayloadAction<RegisterAgencyWithRoleToUserPayload>) =>
+    switchMap((action: PayloadAction<RegisterAgencyWithRoleToUserDto>) =>
       adminGateway
         .updateAgencyRoleForUser$(
           action.payload,
@@ -209,7 +195,7 @@ const registerAgencyToUserEpic: AppEpic<AgencyAction> = (
         .pipe(
           map(() =>
             agencyAdminSlice.actions.registerAgencyWithRoleToUserSucceeded(
-              action.payload.agencyId,
+              action.payload,
             ),
           ),
         ),
@@ -221,6 +207,25 @@ const registerAgencyToUserEpic: AppEpic<AgencyAction> = (
     ),
   );
 
+const normalizeUsers = (
+  users: InclusionConnectedUser[],
+): NormalizedInclusionConnectedUserById =>
+  users.reduce(
+    (acc, user) => ({
+      ...acc,
+      [user.id]: {
+        ...user,
+        agencyRights: user.agencyRights.reduce(
+          (agenciesAcc, agencyRight) => ({
+            ...agenciesAcc,
+            [agencyRight.agency.id]: agencyRight,
+          }),
+          {} as Record<AgencyId, AgencyRight>,
+        ),
+      },
+    }),
+    {} as NormalizedInclusionConnectedUserById,
+  );
 export const agenciesAdminEpics = [
   agencyAdminGetByNameEpic,
   agencyAdminGetNeedingReviewEpic,
@@ -229,7 +234,6 @@ export const agenciesAdminEpics = [
   updateAgencyEpic,
   updateAgencyNeedingReviewStatusEpic,
   agencyDoesNotNeedReviewAnymoreEpic,
-  fetchAgenciesNeedingReviewEpic,
-  fetchAgencyUsersNeedingReviewEpic,
+  fetchInclusionConnectedUsersWithAgencyNeedingReviewEpic,
   registerAgencyToUserEpic,
 ];

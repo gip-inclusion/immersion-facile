@@ -10,14 +10,15 @@ import {
   WithAgencyIds,
 } from "./inclusionConnectedAllowed.dto";
 
-const agencyRoleSchema = z.enum(allAgencyRoles);
+export const agencyRoleSchema = z.enum(allAgencyRoles);
 
 const agencyRightSchema: z.Schema<AgencyRight> = z.object({
   agency: agencySchema,
   role: agencyRoleSchema,
 });
 
-const authenticatedUserIdSchema: z.Schema<AuthenticatedUserId> = zTrimmedString;
+export const authenticatedUserIdSchema: z.Schema<AuthenticatedUserId> =
+  zTrimmedString;
 
 export const inclusionConnectedUserSchema: z.Schema<InclusionConnectedUser> =
   z.object({

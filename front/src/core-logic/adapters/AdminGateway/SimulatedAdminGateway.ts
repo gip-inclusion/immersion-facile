@@ -1,32 +1,40 @@
 import { Observable, of, throwError } from "rxjs";
 import {
   AbsoluteUrl,
-  AgencyDto,
   AgencyDtoBuilder,
-  AuthenticatedUser,
-  AuthenticatedUserId,
+  AgencyRight,
   BackOfficeJwt,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetDashboardParams,
+  InclusionConnectedUser,
+  RegisterAgencyWithRoleToUserDto,
   UserAndPassword,
 } from "shared";
-import { RegisterAgencyWithRoleToUserPayload } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
-const simulatedAgencyDtosResponse: AgencyDto[] = [
-  new AgencyDtoBuilder()
-    .withName("Agence de Bourg en Bresse")
-    .withId("fake-agency-id-1")
-    .build(),
-  new AgencyDtoBuilder()
-    .withName("Mission locale du Berry")
-    .withId("fake-agency-id-2")
-    .build(),
-  new AgencyDtoBuilder()
-    .withName("CCI de Quimper")
-    .withId("fake-agency-id-3")
-    .build(),
+const simulatedAgencyDtos: AgencyRight[] = [
+  {
+    role: "toReview",
+    agency: new AgencyDtoBuilder()
+      .withName("Agence de Bourg en Bresse")
+      .withId("fake-agency-id-1")
+      .build(),
+  },
+  {
+    role: "validator",
+    agency: new AgencyDtoBuilder()
+      .withName("Mission locale qu'on ne devrait pas voir")
+      .withId("fake-agency-id-not-shown")
+      .build(),
+  },
+  {
+    role: "toReview",
+    agency: new AgencyDtoBuilder()
+      .withName("CCI de Quimper")
+      .withId("fake-agency-id-3")
+      .build(),
+  },
 ];
 export class SimulatedAdminGateway implements AdminGateway {
   login({ user }: UserAndPassword): Observable<BackOfficeJwt> {
@@ -69,48 +77,42 @@ export class SimulatedAdminGateway implements AdminGateway {
     });
   }
 
-  getAgencyUsersToReview$(): Observable<AuthenticatedUser[]> {
+  getInclusionConnectedUsersToReview$(): Observable<InclusionConnectedUser[]> {
     return of([
       {
         id: "fake-user-id-1",
         email: "jbon8745@wanadoo.fr",
         firstName: "Jean",
         lastName: "Bon",
+        agencyRights: simulatedAgencyDtos,
       },
       {
         id: "fake-user-id-2",
         email: "remi@sanfamille.fr",
         firstName: "Rémi",
         lastName: "Sanfamille",
-      },
-      {
-        id: "fake-user-id-3",
-        email: "bob@bikinibottom.com",
-        firstName: "Spongebob",
-        lastName: "Squarepants",
+        agencyRights: [],
       },
       {
         id: "user-in-error",
         email: "fake-user-email-4@test.fr",
         firstName: "Jean-Michel",
         lastName: "Jeplante",
+        agencyRights: [
+          {
+            role: "toReview",
+            agency: new AgencyDtoBuilder()
+              .withName("Mission locale qui plante")
+              .withId("non-existing-agency-id")
+              .build(),
+          },
+        ],
       },
     ]);
   }
 
-  getAgenciesToReviewForUser$(
-    userId: AuthenticatedUserId,
-    _token: string,
-  ): Observable<AgencyDto[]> {
-    return userId === "user-in-error"
-      ? throwError(
-          () => new Error(`User Id ${userId} has errored getting agencies`),
-        )
-      : of(simulatedAgencyDtosResponse);
-  }
-
   updateAgencyRoleForUser$(
-    { agencyId }: RegisterAgencyWithRoleToUserPayload,
+    { agencyId }: RegisterAgencyWithRoleToUserDto,
     _token: string,
   ): Observable<void> {
     return agencyId === "non-existing-agency-id"
