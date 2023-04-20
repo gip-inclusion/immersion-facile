@@ -41,6 +41,7 @@ export class HttpInclusionConnectedGateway
       headers: { authorization: token },
     });
   }
+
   private registerAgenciesToCurrentUser(agencyIds: AgencyId[], token: string) {
     return this.httpClient.registerAgenciesToUser({
       headers: { authorization: token },

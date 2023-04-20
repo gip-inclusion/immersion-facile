@@ -8,7 +8,6 @@
     "lint": "pnpm -w lintconfig:glob ./libs/http-client/src",
     "typecheck": "tsc --noEmit",
     "test": "jest --testRegex=.unit.test.ts",
-    "make-styles": "scss-to-ts update",
     "fullcheck": "pnpm -w fullcheck --filter=http-client"
   },
   "devDependencies": {

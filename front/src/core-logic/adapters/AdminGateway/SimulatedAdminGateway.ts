@@ -3,8 +3,6 @@ import {
   AbsoluteUrl,
   AgencyDto,
   AgencyDtoBuilder,
-  AgencyId,
-  AgencyRole,
   AuthenticatedUser,
   AuthenticatedUserId,
   BackOfficeJwt,
@@ -13,6 +11,7 @@ import {
   GetDashboardParams,
   UserAndPassword,
 } from "shared";
+import { RegisterAgencyWithRoleToUserPayload } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
 const simulatedAgencyDtosResponse: AgencyDto[] = [
@@ -94,7 +93,7 @@ export class SimulatedAdminGateway implements AdminGateway {
         id: "user-in-error",
         email: "fake-user-email-4@test.fr",
         firstName: "Jean-Michel",
-        lastName: "Ayraure",
+        lastName: "Jeplante",
       },
     ]);
   }
@@ -104,18 +103,18 @@ export class SimulatedAdminGateway implements AdminGateway {
     _token: string,
   ): Observable<AgencyDto[]> {
     return userId === "user-in-error"
-      ? throwError(new Error(`User Id ${userId} has errored getting agencies`))
+      ? throwError(
+          () => new Error(`User Id ${userId} has errored getting agencies`),
+        )
       : of(simulatedAgencyDtosResponse);
   }
 
   updateAgencyRoleForUser$(
-    agencyId: AgencyId,
-    _role: AgencyRole,
-    _userId: AuthenticatedUserId,
+    { agencyId }: RegisterAgencyWithRoleToUserPayload,
     _token: string,
   ): Observable<void> {
     return agencyId === "non-existing-agency-id"
-      ? throwError(new Error(`Agency Id ${agencyId} not found`))
+      ? throwError(() => new Error(`Agency Id ${agencyId} not found`))
       : of(undefined);
   }
 }

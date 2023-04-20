@@ -16,9 +16,11 @@ export class SimulatedInclusionConnectedGateway
   implements InclusionConnectedGateway
 {
   constructor(private simulatedLatency: number = 0) {}
+
   getCurrentUser$(_token: string): Observable<InclusionConnectedUser> {
     return of(simulatedUserConnected);
   }
+
   registerAgenciesToCurrentUser$(
     agencyIds: AgencyId[],
     _token: string,

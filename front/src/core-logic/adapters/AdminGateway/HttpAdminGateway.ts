@@ -2,10 +2,7 @@ import { from, Observable } from "rxjs";
 import {
   AbsoluteUrl,
   AdminTargets,
-  adminTokenSchema,
   AgencyDto,
-  AgencyId,
-  AgencyRole,
   AuthenticatedUser,
   AuthenticatedUserId,
   BackOfficeJwt,
@@ -15,6 +12,7 @@ import {
   UserAndPassword,
 } from "shared";
 import { HttpClient } from "http-client";
+import { RegisterAgencyWithRoleToUserPayload } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
 export class HttpAdminGateway implements AdminGateway {
@@ -24,7 +22,7 @@ export class HttpAdminGateway implements AdminGateway {
     return from(
       this.httpClient
         .login({ body: userAndPassword })
-        .then(({ responseBody }) => adminTokenSchema.parse(responseBody)),
+        .then(({ responseBody }) => responseBody),
     );
   }
 
@@ -63,9 +61,7 @@ export class HttpAdminGateway implements AdminGateway {
   }
 
   public updateAgencyRoleForUser$(
-    _agencyId: AgencyId,
-    _role: AgencyRole,
-    _userId: AuthenticatedUserId,
+    _params: RegisterAgencyWithRoleToUserPayload,
     _token: string,
   ): Observable<void> {
     throw new Error("Method not implemented.");
@@ -77,6 +73,7 @@ export class HttpAdminGateway implements AdminGateway {
   ): Observable<AgencyDto[]> {
     throw new Error("Method not implemented.");
   }
+
   public getAgencyUsersToReview$(
     _token: BackOfficeJwt,
   ): Observable<AuthenticatedUser[]> {

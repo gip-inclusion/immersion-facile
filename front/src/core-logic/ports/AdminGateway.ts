@@ -2,8 +2,6 @@ import { Observable } from "rxjs";
 import {
   AbsoluteUrl,
   AgencyDto,
-  AgencyId,
-  AgencyRole,
   AuthenticatedUser,
   AuthenticatedUserId,
   BackOfficeJwt,
@@ -12,6 +10,7 @@ import {
   GetDashboardParams,
   UserAndPassword,
 } from "shared";
+import { RegisterAgencyWithRoleToUserPayload } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
 
 export interface AdminGateway {
   login: (params: UserAndPassword) => Observable<BackOfficeJwt>;
@@ -31,9 +30,7 @@ export interface AdminGateway {
     token: BackOfficeJwt,
   ): Observable<AgencyDto[]>;
   updateAgencyRoleForUser$(
-    agencyId: AgencyId,
-    role: AgencyRole,
-    userId: AuthenticatedUserId,
+    params: RegisterAgencyWithRoleToUserPayload,
     token: BackOfficeJwt,
   ): Observable<void>;
 }

@@ -149,6 +149,7 @@ const agencyDoesNotNeedReviewAnymoreEpic: AgencyEpic = (action$, state$) =>
       });
     }),
   );
+
 const fetchAgencyUsersNeedingReviewEpic: AppEpic<AgencyAction> = (
   action$,
   state$,
@@ -166,6 +167,7 @@ const fetchAgencyUsersNeedingReviewEpic: AppEpic<AgencyAction> = (
       agencyAdminSlice.actions.fetchAgencyUsersToReviewFailed(error?.message),
     ),
   );
+
 const fetchAgenciesNeedingReviewEpic: AppEpic<AgencyAction> = (
   action$,
   state$,
@@ -188,6 +190,7 @@ const fetchAgenciesNeedingReviewEpic: AppEpic<AgencyAction> = (
       ),
     ),
   );
+
 const registerAgencyToUserEpic: AppEpic<AgencyAction> = (
   action$,
   state$,
@@ -200,9 +203,7 @@ const registerAgencyToUserEpic: AppEpic<AgencyAction> = (
     switchMap((action: PayloadAction<RegisterAgencyWithRoleToUserPayload>) =>
       adminGateway
         .updateAgencyRoleForUser$(
-          action.payload.agencyId,
-          action.payload.role,
-          action.payload.userId,
+          action.payload,
           state$.value.auth.federatedIdentityWithUser?.token ?? "",
         )
         .pipe(

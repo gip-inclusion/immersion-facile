@@ -2,14 +2,13 @@ import { Observable, Subject } from "rxjs";
 import {
   AbsoluteUrl,
   AgencyDto,
-  AgencyId,
-  AgencyRole,
   AuthenticatedUser,
   AuthenticatedUserId,
   BackOfficeJwt,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
 } from "shared";
+import { RegisterAgencyWithRoleToUserPayload } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
 export class TestAdminGateway implements AdminGateway {
@@ -27,17 +26,18 @@ export class TestAdminGateway implements AdminGateway {
   ): Observable<EstablishmentBatchReport> {
     return this.establishmentBatchResponse$;
   }
+
   updateAgencyRoleForUser$(
-    _agencyId: AgencyId,
-    _role: AgencyRole,
-    _userId: AuthenticatedUserId,
+    _params: RegisterAgencyWithRoleToUserPayload,
     _token: string,
   ): Observable<void> {
     return this.updateAgencyRoleForUserResponse$;
   }
+
   getAgencyUsersToReview$(): Observable<AuthenticatedUser[]> {
     return this.getAgencyUsersToReviewResponse$;
   }
+
   getAgenciesToReviewForUser$(
     _userId: AuthenticatedUserId,
     _token: string,
