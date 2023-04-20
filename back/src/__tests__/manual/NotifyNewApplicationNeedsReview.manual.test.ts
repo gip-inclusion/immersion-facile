@@ -1,4 +1,3 @@
-import axios from "axios";
 import {
   AgencyDtoBuilder,
   ConventionDto,
@@ -10,6 +9,7 @@ import {
   AppConfig,
   makeEmailAllowListPredicate,
 } from "../../adapters/primary/config/appConfig";
+import { createHttpClientForExternalApi } from "../../adapters/primary/config/createGateways";
 import {
   GenerateConventionMagicLinkUrl,
   makeGenerateConventionMagicLinkUrl,
@@ -17,6 +17,7 @@ import {
 import { createInMemoryUow } from "../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { SendinblueHtmlEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueHtmlEmailGateway";
+import { sendinblueHtmlEmailGatewayTargets } from "../../adapters/secondary/emailGateway/SendinblueHtmlEmailGateway.targets";
 import { InMemoryUowPerformer } from "../../adapters/secondary/InMemoryUowPerformer";
 import { NotifyNewApplicationNeedsReview } from "../../domain/convention/useCases/notifications/NotifyNewApplicationNeedsReview";
 import { TimeGateway } from "../../domain/core/ports/TimeGateway";
@@ -45,7 +46,7 @@ describe("Notify To 2 Counsellors that an application is available", () => {
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
     emailGw = new SendinblueHtmlEmailGateway(
-      axios,
+      createHttpClientForExternalApi(sendinblueHtmlEmailGatewayTargets),
       makeEmailAllowListPredicate({
         skipEmailAllowList: config.skipEmailAllowlist,
         emailAllowList: config.emailAllowList,

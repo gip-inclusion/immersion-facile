@@ -1,5 +1,5 @@
-import type { AxiosInstance } from "axios";
 import {
+  EmailSentDto,
   immersionFacileContactEmail,
   TemplatedEmail,
   templatesByName,
@@ -12,6 +12,7 @@ import {
   cciCustomHtmlFooter,
   cciCustomHtmlHeader,
 } from "html-templates/src/components/email";
+import { HttpClient } from "http-client";
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
 import {
   counterSendTransactEmailError,
@@ -20,35 +21,20 @@ import {
 } from "../../../utils/counters";
 import { createLogger } from "../../../utils/logger";
 import { BadRequestError } from "../../primary/helpers/httpErrors";
-
-export type EmailSentDto = {
-  templatedEmail: TemplatedEmail;
-  sentAt: string;
-  error?: string;
-};
+import {
+  ApiKey,
+  RecipientOrSender,
+  SendTransactEmailRequestBody,
+} from "./SendinblueHtmlEmailGateway.schemas";
+import { SendinblueHtmlEmailGatewayTargets } from "./SendinblueHtmlEmailGateway.targets";
 
 const logger = createLogger(__filename);
 
-type RecipientOrSender = {
-  name?: string;
-  email: string;
-};
-
-export type HtmlEmailData = {
-  to: RecipientOrSender[];
-  cc?: RecipientOrSender[];
-  htmlContent: string;
-  sender: RecipientOrSender;
-  subject: string;
-  tags?: string[];
-  attachment?: { url: string }[];
-};
-
 export class SendinblueHtmlEmailGateway implements EmailGateway {
   constructor(
-    private axiosInstance: AxiosInstance,
+    private readonly httpClient: HttpClient<SendinblueHtmlEmailGatewayTargets>,
     private emailAllowListPredicate: (recipient: string) => boolean,
-    private apiKey: string,
+    private apiKey: ApiKey,
     private sender: RecipientOrSender,
     private generateHtmlOptions: GenerateHtmlOptions = {},
   ) {}
@@ -63,7 +49,7 @@ export class SendinblueHtmlEmailGateway implements EmailGateway {
     }
     const cc = this.filterAllowListAndConvertToRecipients(email.cc);
 
-    const emailData: HtmlEmailData = {
+    const emailData: SendTransactEmailRequestBody = {
       to: this.filterAllowListAndConvertToRecipients(email.recipients),
       ...(cc.length ? { cc } : {}),
       ...configureGenerateHtmlFromTemplate(
@@ -134,17 +120,14 @@ export class SendinblueHtmlEmailGateway implements EmailGateway {
       .map((email) => ({ email }));
   }
 
-  private async sendTransacEmail(emailData: HtmlEmailData) {
-    const headers = {
-      accept: "application/json",
-      "content-type": "application/json",
-      "api-key": this.apiKey,
-    };
-
-    await this.axiosInstance.post(
-      "https://api.sendinblue.com/v3/smtp/email",
-      emailData,
-      { headers },
-    );
+  private async sendTransacEmail(body: SendTransactEmailRequestBody) {
+    await this.httpClient.sendTransactEmail({
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        "api-key": this.apiKey,
+      },
+      body,
+    });
   }
 }

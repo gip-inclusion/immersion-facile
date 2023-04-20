@@ -1,4 +1,3 @@
-import axios from "axios";
 import { Pool } from "pg";
 import { keys } from "ramda";
 import { immersionFacileContactEmail } from "shared";
@@ -10,7 +9,9 @@ import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGatewa
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmailGateway";
 import { SendinblueHtmlEmailGateway } from "../../secondary/emailGateway/SendinblueHtmlEmailGateway";
+import { sendinblueHtmlEmailGatewayTargets } from "../../secondary/emailGateway/SendinblueHtmlEmailGateway.targets";
 import { AppConfig, makeEmailAllowListPredicate } from "../config/appConfig";
+import { createHttpClientForExternalApi } from "../config/createGateways";
 import { makeGenerateConventionMagicLinkUrl } from "../config/magicLinkUrl";
 import { createUowPerformer } from "../config/uowConfig";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
@@ -30,7 +31,7 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
   const emailGateway =
     config.emailGateway === "SENDINBLUE_HTML"
       ? new SendinblueHtmlEmailGateway(
-          axios,
+          createHttpClientForExternalApi(sendinblueHtmlEmailGatewayTargets),
           makeEmailAllowListPredicate({
             skipEmailAllowList: config.skipEmailAllowlist,
             emailAllowList: config.emailAllowList,

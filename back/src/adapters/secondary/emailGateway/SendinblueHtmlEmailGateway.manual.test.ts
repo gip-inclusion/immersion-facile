@@ -1,6 +1,7 @@
-import axios from "axios";
 import { AppConfig } from "../../primary/config/appConfig";
+import { createHttpClientForExternalApi } from "../../primary/config/createGateways";
 import { SendinblueHtmlEmailGateway } from "./SendinblueHtmlEmailGateway";
+import { sendinblueHtmlEmailGatewayTargets } from "./SendinblueHtmlEmailGateway.targets";
 
 describe("SendingBlueHtmlEmailGateway manual", () => {
   let sibGateway: SendinblueHtmlEmailGateway;
@@ -8,7 +9,7 @@ describe("SendingBlueHtmlEmailGateway manual", () => {
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
     sibGateway = new SendinblueHtmlEmailGateway(
-      axios,
+      createHttpClientForExternalApi(sendinblueHtmlEmailGatewayTargets),
       (_) => true,
       config.apiKeySendinblue,
       { email: "bob@fake.mail", name: "Bob" },

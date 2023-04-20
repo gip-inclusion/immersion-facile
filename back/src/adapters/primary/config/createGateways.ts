@@ -25,6 +25,7 @@ import { StubDashboardGateway } from "../../secondary/dashboardGateway/StubDashb
 import { HybridEmailGateway } from "../../secondary/emailGateway/HybridEmailGateway";
 import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmailGateway";
 import { SendinblueHtmlEmailGateway } from "../../secondary/emailGateway/SendinblueHtmlEmailGateway";
+import { sendinblueHtmlEmailGatewayTargets } from "../../secondary/emailGateway/SendinblueHtmlEmailGateway.targets";
 import {
   EmailableEmailValidationGateway,
   emailableValidationTargets,
@@ -180,7 +181,7 @@ const createEmailGateway = (
     return new InMemoryEmailGateway(timeGateway);
 
   const sendinblueHtmlEmailGateway = new SendinblueHtmlEmailGateway(
-    axios,
+    createHttpClientForExternalApi(sendinblueHtmlEmailGatewayTargets),
     makeEmailAllowListPredicate({
       skipEmailAllowList: config.skipEmailAllowlist,
       emailAllowList: config.emailAllowList,

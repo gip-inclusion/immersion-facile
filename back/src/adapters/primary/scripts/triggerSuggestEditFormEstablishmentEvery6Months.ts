@@ -1,4 +1,3 @@
-import axios from "axios";
 import { addMonths } from "date-fns";
 import { Pool } from "pg";
 import { immersionFacileContactEmail, SiretDto } from "shared";
@@ -11,8 +10,10 @@ import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGatewa
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmailGateway";
 import { SendinblueHtmlEmailGateway } from "../../secondary/emailGateway/SendinblueHtmlEmailGateway";
+import { sendinblueHtmlEmailGatewayTargets } from "../../secondary/emailGateway/SendinblueHtmlEmailGateway.targets";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { AppConfig, makeEmailAllowListPredicate } from "../config/appConfig";
+import { createHttpClientForExternalApi } from "../config/createGateways";
 import { makeGenerateEditFormEstablishmentUrl } from "../config/magicLinkUrl";
 import { createPgUow } from "../config/uowConfig";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
@@ -70,7 +71,7 @@ const triggerSuggestEditFormEstablishmentEvery6Months =
     const emailGateway =
       config.emailGateway === "SENDINBLUE_HTML"
         ? new SendinblueHtmlEmailGateway(
-            axios,
+            createHttpClientForExternalApi(sendinblueHtmlEmailGatewayTargets),
             makeEmailAllowListPredicate({
               skipEmailAllowList: config.skipEmailAllowlist,
               emailAllowList: config.emailAllowList,

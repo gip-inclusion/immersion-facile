@@ -1,12 +1,13 @@
-import axios from "axios";
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   immersionFacileContactEmail,
 } from "shared";
 import { AppConfig } from "../../adapters/primary/config/appConfig";
+import { createHttpClientForExternalApi } from "../../adapters/primary/config/createGateways";
 import { createInMemoryUow } from "../../adapters/primary/config/uowConfig";
 import { SendinblueHtmlEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueHtmlEmailGateway";
+import { sendinblueHtmlEmailGatewayTargets } from "../../adapters/secondary/emailGateway/SendinblueHtmlEmailGateway.targets";
 import { InMemoryUowPerformer } from "../../adapters/secondary/InMemoryUowPerformer";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
 
@@ -36,7 +37,7 @@ describe("NotifyApplicationRejectedToBeneficiaryAndEnterprise", () => {
   it("Sends rejection email", async () => {
     const config = AppConfig.createFromEnv();
     const emailGw = new SendinblueHtmlEmailGateway(
-      axios,
+      createHttpClientForExternalApi(sendinblueHtmlEmailGatewayTargets),
       (_) => true,
       config.apiKeySendinblue,
       {

@@ -1,37 +1,38 @@
-import type { AxiosInstance } from "axios";
 import {
   expectPromiseToFailWithError,
   expectToEqual,
   immersionFacileContactEmail,
 } from "shared";
 import { ignoreTabs } from "html-templates";
+import { HttpClient } from "http-client";
 import { makeEmailAllowListPredicate } from "../../primary/config/appConfig";
 import { BadRequestError } from "../../primary/helpers/httpErrors";
+import { SendinblueHtmlEmailGateway } from "./SendinblueHtmlEmailGateway";
 import {
-  HtmlEmailData,
-  SendinblueHtmlEmailGateway,
-} from "./SendinblueHtmlEmailGateway";
+  SendTransactEmailHeader,
+  SendTransactEmailRequestBody,
+} from "./SendinblueHtmlEmailGateway.schemas";
+import { SendinblueHtmlEmailGatewayTargets } from "./SendinblueHtmlEmailGateway.targets";
 
 const sender = { name: "bob", email: "Machin@mail.com" };
 
 describe("SendingBlueHtmlEmailGateway unit", () => {
-  let fakeAxiosInstance: AxiosInstance;
+  let fakeHttpClient: HttpClient<SendinblueHtmlEmailGatewayTargets>;
   let allowListPredicate;
   let sibGateway: SendinblueHtmlEmailGateway;
-  let sentEmails: HtmlEmailData[];
+  let sentEmails: {
+    headers: SendTransactEmailHeader;
+    body: SendTransactEmailRequestBody;
+  }[];
 
   beforeEach(() => {
     sentEmails = [];
 
-    fakeAxiosInstance = {
-      post(
-        _url: string,
-        emailData: HtmlEmailData,
-        _config?: { headers: Record<string, string> },
-      ) {
-        sentEmails.push(emailData);
+    fakeHttpClient = {
+      sendTransactEmail(email: any) {
+        sentEmails.push(email);
       },
-    } as unknown as AxiosInstance;
+    } as unknown as HttpClient<SendinblueHtmlEmailGatewayTargets>;
 
     allowListPredicate = makeEmailAllowListPredicate({
       emailAllowList: [
@@ -44,7 +45,7 @@ describe("SendingBlueHtmlEmailGateway unit", () => {
     });
 
     sibGateway = new SendinblueHtmlEmailGateway(
-      fakeAxiosInstance,
+      fakeHttpClient,
       allowListPredicate,
       "fake-api-key",
       sender,
@@ -93,7 +94,7 @@ describe("SendingBlueHtmlEmailGateway unit", () => {
       } as any,
     });
 
-    expect(sentEmails[0].to).toEqual([
+    expect(sentEmails[0].body.to).toEqual([
       { email: "beneficiary@gmail.com" },
       { email: "advisor@gmail.com" },
     ]);
@@ -116,19 +117,25 @@ describe("SendingBlueHtmlEmailGateway unit", () => {
     });
 
     expectToEqual(sentEmails[0], {
-      cc: [
-        {
-          email: "establishment-cto@gmail.com",
-        },
-      ],
-      to: [
-        {
-          email: "establishment-ceo@gmail.com",
-        },
-      ],
-      tags: ["activation prescripteur"],
-      subject: "Immersion Facilitée - Votre structure a été activée",
-      htmlContent: ignoreTabs(`
+      headers: {
+        "api-key": "fake-api-key",
+        "content-type": "application/json",
+        accept: "application/json",
+      },
+      body: {
+        cc: [
+          {
+            email: "establishment-cto@gmail.com",
+          },
+        ],
+        to: [
+          {
+            email: "establishment-ceo@gmail.com",
+          },
+        ],
+        tags: ["activation prescripteur"],
+        subject: "Immersion Facilitée - Votre structure a été activée",
+        htmlContent: ignoreTabs(`
       <html lang="fr">
       <body>
       <table 
@@ -234,7 +241,8 @@ describe("SendingBlueHtmlEmailGateway unit", () => {
       </body>
       </html>
       `),
-      sender,
+        sender,
+      },
     });
   });
 
