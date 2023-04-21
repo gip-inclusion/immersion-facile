@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react";
 import { AgencyDto, AgencyStatus, keys } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
+import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import { TextCell } from "./TextCell";
 
 type AgencyField = keyof AgencyDto;

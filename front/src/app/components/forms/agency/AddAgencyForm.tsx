@@ -25,7 +25,7 @@ import {
   useFormContents,
 } from "src/app/hooks/formContents.hooks";
 import { agencyGateway } from "src/config/dependencies";
-import { AgencySubmitFeedback } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
+import { AgencySubmitFeedback } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 
 type CreateAgencyInitialValues = Omit<CreateAgencyDto, "kind"> & {
   kind: AgencyKind | "";

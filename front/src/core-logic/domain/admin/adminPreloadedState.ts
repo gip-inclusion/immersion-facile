@@ -1,7 +1,7 @@
 import { adminAuthInitialState } from "src/core-logic/domain/admin/adminAuth/adminAuth.slice";
+import { agencyAdminInitialState } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import { dashboardInitialState } from "src/core-logic/domain/admin/dashboardUrls/dashboardUrls.slice";
 import { sentEmailInitialState } from "src/core-logic/domain/admin/sentEmails/sentEmails.slice";
-import { agencyAdminInitialState } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
 import { RootState } from "src/core-logic/storeConfig/store";
 
 type AdminState = RootState["admin"];

@@ -9,7 +9,7 @@ import { MetabaseView } from "src/app/components/MetabaseView";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useAdminDashboard } from "src/app/pages/admin/useAdminDashboard";
-import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
+import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 
 export const AgencyTab = () => {
   const agency = useAppSelector(agencyAdminSelectors.agency);

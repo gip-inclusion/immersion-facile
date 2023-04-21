@@ -8,8 +8,8 @@ import { match, P } from "ts-pattern";
 import { AgencyRole, allAgencyRoles, AuthenticatedUserId } from "shared";
 import { DsfrTitle } from "react-design-system";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
-import { agencyAdminSlice } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
+import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
+import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 
 export const RegisterUsersToAgencies = () => {
   const dispatch = useDispatch();

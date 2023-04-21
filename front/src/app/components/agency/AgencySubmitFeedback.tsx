@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { AgencySuccessFeedbackKind } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
+import { AgencySuccessFeedbackKind } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 
 export const agencySubmitMessageByKind: Record<
   AgencySuccessFeedbackKind,

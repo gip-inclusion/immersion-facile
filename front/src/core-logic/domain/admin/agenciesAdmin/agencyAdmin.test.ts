@@ -10,14 +10,14 @@ import {
   RegisterAgencyWithRoleToUserDto,
 } from "shared";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
-import { agencyAdminSelectors } from "src/core-logic/domain/agenciesAdmin/agencyAdmin.selectors";
+import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import {
   agencyAdminInitialState,
   agencyAdminSlice,
   AgencyAdminState,
   AgencySubmitFeedback,
   NormalizedInclusionConnectedUserById,
-} from "src/core-logic/domain/agenciesAdmin/agencyAdmin.slice";
+} from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import {
   createTestStore,
   TestDependencies,
@@ -27,7 +27,7 @@ import {
   AGENCY_NEEDING_REVIEW_1,
   AGENCY_NEEDING_REVIEW_2,
   PE_AGENCY_ACTIVE,
-} from "../../adapters/AgencyGateway/InMemoryAgencyGateway";
+} from "../../../adapters/AgencyGateway/InMemoryAgencyGateway";
 
 const agency1 = new AgencyDtoBuilder().withId("agency-1").build();
 const agency2 = new AgencyDtoBuilder().withId("agency-2").build();
