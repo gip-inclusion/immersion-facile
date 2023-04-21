@@ -150,5 +150,16 @@ export const createAdminRouter = (
       ),
     );
 
+  adminRouter
+    .route(removeRouterPrefix(adminTargets.getInclusionConnectedUsers.url))
+    .get(async (req, res) =>
+      sendHttpResponse(req, res, async () =>
+        deps.useCases.getIcUsers.execute(
+          req.query as any,
+          req.payloads?.backOffice,
+        ),
+      ),
+    );
+
   return [routerPrefix, adminRouter];
 };

@@ -44,7 +44,6 @@ import { UuidGenerator } from "../../../domain/core/ports/UuidGenerator";
 import { TransactionalUseCase, UseCase } from "../../../domain/core/UseCase";
 import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
 import { GetDashboardUrl } from "../../../domain/dashboard/useCases/GetDashboardUrl";
-import { GetInclusionConnectedUser } from "../../../domain/dashboard/useCases/GetInclusionConnectedUser";
 import { ValidateEmail } from "../../../domain/emailValidation/useCases/ValidateEmail";
 import { AdminLogin } from "../../../domain/generic/authentication/useCases/AdminLogin";
 import { UploadLogo } from "../../../domain/generic/fileManagement/useCases/UploadLogo";
@@ -68,6 +67,8 @@ import { SearchImmersion } from "../../../domain/immersionOffer/useCases/SearchI
 import { UpdateEstablishmentAggregateFromForm } from "../../../domain/immersionOffer/useCases/UpdateEstablishmentAggregateFromFormEstablishement";
 import { AuthenticateWithInclusionCode } from "../../../domain/inclusionConnect/useCases/AuthenticateWithInclusionCode";
 import { InitiateInclusionConnect } from "../../../domain/inclusionConnect/useCases/InitiateInclusionConnect";
+import { GetInclusionConnectedUser } from "../../../domain/inclusionConnectedUsers/useCases/GetInclusionConnectedUser";
+import { GetInclusionConnectedUsers } from "../../../domain/inclusionConnectedUsers/useCases/GetInclusionConnectedUsers";
 import { BindConventionToFederatedIdentity } from "../../../domain/peConnect/useCases/BindConventionToFederatedIdentity";
 import { LinkPoleEmploiAdvisorAndRedirectToConvention } from "../../../domain/peConnect/useCases/LinkPoleEmploiAdvisorAndRedirectToConvention";
 import { NotifyPoleEmploiUserAdvisorOnConventionFullySigned } from "../../../domain/peConnect/useCases/NotifyPoleEmploiUserAdvisorOnConventionFullySigned";
@@ -113,6 +114,7 @@ export const createUseCases = (
     ...instantiatedUseCasesFromClasses({
       registerAgencyToInclusionConnectUser:
         new RegisterAgencyToInclusionConnectUser(uowPerformer, createNewEvent),
+      getIcUsers: new GetInclusionConnectedUsers(uowPerformer),
       getUserAgencyDashboardUrl: new GetInclusionConnectedUser(
         uowPerformer,
         gateways.dashboardGateway,

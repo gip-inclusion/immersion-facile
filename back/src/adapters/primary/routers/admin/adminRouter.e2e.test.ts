@@ -2,6 +2,7 @@ import { SuperTest, Test } from "supertest";
 import {
   adminTargets,
   BackOfficeJwt,
+  expectToEqual,
   featureFlagsRoute,
   SetFeatureFlagParams,
 } from "shared";
@@ -37,11 +38,11 @@ describe("/admin router", () => {
 
   describe(`GET ${adminTargets.getDashboardUrl.url}`, () => {
     it("Fails with 401 Unauthorized without admin token", async () => {
-      const response = await request.get(adminTargets.getDashboardUrl.url);
-      expect(response.body).toEqual({
-        error: "You need to authenticate first",
-      });
-      expect(response.status).toBe(401);
+      const { body, status } = await request.get(
+        adminTargets.getDashboardUrl.url,
+      );
+      expectToEqual(body, { error: "You need to authenticate first" });
+      expect(status).toBe(401);
     });
 
     it("Fails if token is not valid", async () => {
@@ -92,7 +93,7 @@ describe("/admin router", () => {
   });
 
   describe(`set feature flags route`, () => {
-    it("fails with 401 without admin token", async () => {
+    it("fails with 401 with wrong admin token", async () => {
       const response = await request
         .post(`/admin/${featureFlagsRoute}`)
         .set("authorization", "wrong-tokend");
@@ -123,6 +124,26 @@ describe("/admin router", () => {
         `/${featureFlagsRoute}`,
       );
       expect(updatedFeatureFlagsResponse.body.enableLogoUpload).toBe(false);
+    });
+  });
+
+  describe(`GET ${adminTargets.getInclusionConnectedUsers.url}`, () => {
+    it("Fails with 401 Unauthorized without admin token", async () => {
+      const { body, status } = await request.get(
+        adminTargets.getInclusionConnectedUsers.url,
+      );
+      expect(body).toEqual({ error: "You need to authenticate first" });
+      expect(status).toBe(401);
+    });
+
+    it("Gets the list of connected users with role 'toReview'", async () => {
+      const response = await request
+        .get(
+          `${adminTargets.getInclusionConnectedUsers.url}?agencyRole=toReview`,
+        )
+        .set("authorization", token);
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual([]);
     });
   });
 });

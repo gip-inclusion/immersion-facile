@@ -7,7 +7,7 @@ import {
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { DashboardGateway } from "../port/DashboardGateway";
+import { DashboardGateway } from "../../dashboard/port/DashboardGateway";
 
 export class GetInclusionConnectedUser extends TransactionalUseCase<
   void,
