@@ -147,7 +147,7 @@ describe("PgConventionRepository", () => {
     const commonFields = {
       firstName: "Rep",
       lastName: "Rep",
-      email: "Rep@rep.com",
+      email: "rep@rep.com",
       phone: "0584548754",
     };
 
@@ -339,7 +339,7 @@ describe("PgConventionRepository", () => {
       .withId(idA)
       .withExternalId(externalId)
       .withStatus("CANCELLED")
-      .withBeneficiaryEmail("someUpdated@email.com")
+      .withBeneficiaryEmail("some.updated@email.com")
       .withStatusJustification("some justification")
       .withDateEnd(new Date("2021-01-20").toISOString())
       .build();
@@ -379,7 +379,7 @@ describe("PgConventionRepository", () => {
       .withId(idA)
       .withExternalId(externalId)
       .withStatus("ACCEPTED_BY_VALIDATOR")
-      .withBeneficiaryEmail("someUpdated@email.com")
+      .withBeneficiaryEmail("some.updated@email.com")
       .withBeneficiaryRepresentative({
         ...beneficiaryRepresentative,
         email: "some@new-representative.com",

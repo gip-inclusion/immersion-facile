@@ -69,16 +69,17 @@ export const zTimeString = z
 export const makezTrimmedString = (message: string) =>
   zString.transform((s) => s.trim()).refine((s) => s.length > 0, message);
 
-const removeAccentsAndTrim = (value: unknown) => {
+const removeAccentsTrimAndLowerCase = (value: unknown) => {
   if (typeof value !== "string") return value;
   return value
     .trim()
+    .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
 };
 
 export const zEmail = z.preprocess(
-  removeAccentsAndTrim,
+  removeAccentsTrimAndLowerCase,
   z
     .string(requiredText)
     .email(localization.invalidEmailFormat)
@@ -89,7 +90,7 @@ export const zEmail = z.preprocess(
 );
 
 export const zEmailPossiblyEmpty = z.preprocess(
-  removeAccentsAndTrim,
+  removeAccentsTrimAndLowerCase,
   zEmail.optional().or(z.literal("")),
 );
 

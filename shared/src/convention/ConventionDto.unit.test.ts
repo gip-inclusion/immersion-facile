@@ -46,13 +46,13 @@ describe("conventionDtoSchema", () => {
   });
 
   describe("email validations", () => {
-    it("ignores accents on emails", () => {
+    it("ignores accents and case on emails", () => {
       const convention = new ConventionDtoBuilder()
         .withBeneficiaryEmail("Jérôme_Truc@associés.fr")
         .build();
       const parsedConvention = conventionSchema.parse(convention);
       expect(parsedConvention.signatories.beneficiary.email).toBe(
-        "Jerome_Truc@associes.fr",
+        "jerome_truc@associes.fr",
       );
     });
     it("allow empty emergency contact email", () => {
@@ -71,7 +71,7 @@ describe("conventionDtoSchema", () => {
       const parsedConvention = conventionSchema.parse(convention);
       expect(
         parsedConvention.signatories.beneficiary.emergencyContactEmail,
-      ).toBe("Jerome_Truc@associes.fr");
+      ).toBe("jerome_truc@associes.fr");
     });
 
     it("rejects equal beneficiary and establishment tutor emails", () => {

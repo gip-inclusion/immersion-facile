@@ -21,8 +21,8 @@ const agency1builder = AgencyDtoBuilder.create(
     postcode: "75001",
     departmentCode: "75",
   })
-  .withCounsellorEmails(["counsellorA@agency1.fr", "counsellorB@agency1.fr"])
-  .withValidatorEmails(["validatorA@agency1.fr", "validatorB@agency1.fr"])
+  .withCounsellorEmails(["counsellor1@agency1.fr", "counsellor2@agency1.fr"])
+  .withValidatorEmails(["validator1@agency1.fr", "validator2@agency1.fr"])
   .withAdminEmails(["adminA@agency1.fr", "adminB@agency1.fr"])
   .withQuestionnaireUrl("http://questionnaire.agency1.fr")
   .withSignature("The team of agency1")
@@ -39,9 +39,9 @@ const agency2builder = AgencyDtoBuilder.create(
     postcode: "75001",
     departmentCode: "75",
   })
-  .withCounsellorEmails(["counsellorA@agency2.fr", "counsellorB@agency2.fr"])
+  .withCounsellorEmails(["counsellor1@agency2.fr", "counsellor2@agency2.fr"])
   .withValidatorEmails(["agency2@validator.com"]) // no validators
-  .withAdminEmails(["adminA@agency2.fr", "adminB@agency2.fr"])
+  .withAdminEmails(["admin1@agency2.fr", "admin2@agency2.fr"])
   .withQuestionnaireUrl("http://questionnaire.agency2.fr")
   .withSignature("The team of agency2");
 
@@ -281,7 +281,7 @@ describe("PgAgencyRepository", () => {
 
     it("returns the first agency matching the validator email", async () => {
       const agencyWithMatchingValidator = agency2builder
-        .withValidatorEmails(["matchingValidator@mail.com"])
+        .withValidatorEmails(["matching.validator@mail.com"])
         .build();
 
       await Promise.all([
@@ -290,14 +290,14 @@ describe("PgAgencyRepository", () => {
       ]);
 
       const matched = await agencyRepository.getAgencyWhereEmailMatches(
-        "matchingValidator@mail.com",
+        "matching.validator@mail.com",
       );
       expect(matched).toEqual(agencyWithMatchingValidator);
     });
 
     it("returns the first agency matching the counsellor email", async () => {
       const agencyWithMatchingCounsellor = agency2builder
-        .withCounsellorEmails(["matchingCounsellor@mail.com"])
+        .withCounsellorEmails(["matching.counsellor@mail.com"])
         .build();
 
       await Promise.all([
@@ -306,7 +306,7 @@ describe("PgAgencyRepository", () => {
       ]);
 
       const matched = await agencyRepository.getAgencyWhereEmailMatches(
-        "matchingCounsellor@mail.com",
+        "matching.counsellor@mail.com",
       );
       expect(matched).toEqual(agencyWithMatchingCounsellor);
     });
