@@ -44,6 +44,10 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
       );
     }
 
+    const businessName =
+      establishmentAggregate.establishment.customizedName ??
+      establishmentAggregate.establishment.name;
+
     switch (payload.contactMode) {
       case "EMAIL": {
         await this.emailGateway.sendEmail({
@@ -51,7 +55,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
           recipients: [contact.email],
           cc: contact.copyEmails,
           params: {
-            businessName: establishmentAggregate.establishment.name,
+            businessName,
             contactFirstName: contact.firstName,
             contactLastName: contact.lastName,
             appellationLabel:
@@ -72,7 +76,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
           type: "CONTACT_BY_PHONE_INSTRUCTIONS",
           recipients: [payload.potentialBeneficiaryEmail],
           params: {
-            businessName: establishmentAggregate.establishment.name,
+            businessName,
             contactFirstName: contact.firstName,
             contactLastName: contact.lastName,
             contactPhone: contact.phone,
@@ -88,7 +92,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
           type: "CONTACT_IN_PERSON_INSTRUCTIONS",
           recipients: [payload.potentialBeneficiaryEmail],
           params: {
-            businessName: establishmentAggregate.establishment.name,
+            businessName,
             contactFirstName: contact.firstName,
             contactLastName: contact.lastName,
             businessAddress: addressDtoToString(
