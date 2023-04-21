@@ -43,7 +43,7 @@ export const adminTargets = createTargets({
     validateRequestBody: registerAgencyWithRoleToUserSchema.parse,
     ...withValidateHeadersAuthorization,
   }),
-  getInclusionConnectedUsersToReview$: createTarget({
+  getInclusionConnectedUsersToReview: createTarget({
     method: "GET",
     url: "/admin/inclusion-connected/users",
     ...withValidateHeadersAuthorization,
