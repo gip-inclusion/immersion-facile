@@ -39,7 +39,6 @@ export const RegisterUsersToAgencies = () => {
       />
       <div className={fr.cx("fr-px-6w", "fr-py-4w", "fr-card")}>
         <>
-          {feedback.kind}
           <Select
             label={`Sélectionner un utilisateur (${icUsersNeedingReview.length} en attente de validation)`}
             options={[

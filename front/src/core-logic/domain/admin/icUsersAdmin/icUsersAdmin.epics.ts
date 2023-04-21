@@ -28,7 +28,7 @@ const fetchInclusionConnectedUsersWithAgencyNeedingReviewEpic: AppEpic<
     ),
     switchMap((_action) =>
       adminGateway.getInclusionConnectedUsersToReview$(
-        state$.value.auth.federatedIdentityWithUser?.token ?? "",
+        state$.value.admin.adminAuth.adminToken ?? "",
       ),
     ),
     map(normalizeUsers),
@@ -55,7 +55,7 @@ const registerAgencyToUserEpic: AppEpic<IcUsersAdminAction> = (
       adminGateway
         .updateUserRoleForAgency$(
           action.payload,
-          state$.value.auth.federatedIdentityWithUser?.token ?? "",
+          state$.value.admin.adminAuth.adminToken ?? "",
         )
         .pipe(
           map(() =>
