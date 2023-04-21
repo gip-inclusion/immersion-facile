@@ -4,33 +4,12 @@ import type {
   AgencyDto,
   AgencyId,
   AgencyOption,
-  AgencyRight,
-  AuthenticatedUserId,
-  InclusionConnectedUser,
-  OmitFromExistingKeys,
-  RegisterAgencyWithRoleToUserDto,
 } from "shared";
 import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
 
-export type AgencySuccessFeedbackKind =
-  | "agencyAdded"
-  | "agencyUpdated"
-  | "usersToReviewFetchSuccess"
-  | "agencyRegisterToUserSuccess";
+export type AgencySuccessFeedbackKind = "agencyAdded" | "agencyUpdated";
 
 export type AgencySubmitFeedback = SubmitFeedBack<AgencySuccessFeedbackKind>;
-
-type NormalizedInclusionConnectedUser = OmitFromExistingKeys<
-  InclusionConnectedUser,
-  "agencyRights"
-> & {
-  agencyRights: Record<AgencyId, AgencyRight>;
-};
-
-export type NormalizedInclusionConnectedUserById = Record<
-  AuthenticatedUserId,
-  NormalizedInclusionConnectedUser
->;
 
 export interface AgencyAdminState {
   agencySearchText: string;
@@ -38,14 +17,13 @@ export interface AgencyAdminState {
   agencyNeedingReviewOptions: AgencyOption[];
   agency: AgencyDto | null;
   agencyNeedingReview: AgencyDto | null;
-  inclusionConnectedUsersNeedingReview: NormalizedInclusionConnectedUserById;
-  selectedUserId: AuthenticatedUserId | null;
+  // inclusionConnectedUsersNeedingReview: NormalizedInclusionConnectedUserById;
+  // selectedUserId: AuthenticatedUserId | null;
 
   isSearching: boolean;
   isFetchingAgenciesNeedingReview: boolean;
-  isFetchingAgenciesNeedingReviewForUser: boolean;
+
   isUpdating: boolean;
-  isUpdatingUserAgencies: boolean;
 
   error: string | null;
   feedback: AgencySubmitFeedback;
@@ -57,14 +35,10 @@ export const agencyAdminInitialState: AgencyAdminState = {
   agencyOptions: [],
   agency: null,
   agencyNeedingReview: null,
-  inclusionConnectedUsersNeedingReview: {},
-  selectedUserId: null,
 
   isSearching: false,
   isFetchingAgenciesNeedingReview: false,
   isUpdating: false,
-  isFetchingAgenciesNeedingReviewForUser: false,
-  isUpdatingUserAgencies: false,
 
   feedback: { kind: "idle" },
   error: null,
@@ -161,54 +135,6 @@ export const agencyAdminSlice = createSlice({
       state.agencyNeedingReviewOptions =
         action.payload.agencyNeedingReviewOptions;
       state.agencyNeedingReview = action.payload.agencyNeedingReview;
-    },
-    fetchInclusionConnectedUsersToReviewRequested: (state) => {
-      state.isFetchingAgenciesNeedingReviewForUser = true;
-    },
-    fetchInclusionConnectedUsersToReviewSucceeded: (
-      state,
-      action: PayloadAction<NormalizedInclusionConnectedUserById>,
-    ) => {
-      state.isFetchingAgenciesNeedingReviewForUser = false;
-      state.inclusionConnectedUsersNeedingReview = action.payload;
-      state.feedback.kind = "usersToReviewFetchSuccess";
-    },
-    fetchInclusionConnectedUsersToReviewFailed: (
-      state,
-      action: PayloadAction<string>,
-    ) => {
-      state.isFetchingAgenciesNeedingReviewForUser = false;
-      state.feedback = { kind: "errored", errorMessage: action.payload };
-    },
-    inclusionConnectedUserSelected: (
-      state,
-      action: PayloadAction<AuthenticatedUserId | null>,
-    ) => {
-      state.selectedUserId = action.payload;
-    },
-    registerAgencyWithRoleToUserRequested: (
-      state,
-      _action: PayloadAction<RegisterAgencyWithRoleToUserDto>,
-    ) => {
-      state.isUpdatingUserAgencies = true;
-    },
-    registerAgencyWithRoleToUserSucceeded: (
-      state,
-      action: PayloadAction<RegisterAgencyWithRoleToUserDto>,
-    ) => {
-      const { userId, agencyId, role } = action.payload;
-      state.isUpdatingUserAgencies = false;
-      state.feedback.kind = "agencyRegisterToUserSuccess";
-      state.inclusionConnectedUsersNeedingReview[userId].agencyRights[
-        agencyId
-      ].role = role;
-    },
-    registerAgencyWithRoleToUserFailed: (
-      state,
-      action: PayloadAction<string>,
-    ) => {
-      state.isUpdatingUserAgencies = false;
-      state.feedback = { kind: "errored", errorMessage: action.payload };
     },
   },
 });

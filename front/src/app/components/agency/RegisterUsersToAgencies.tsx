@@ -8,23 +8,23 @@ import { match, P } from "ts-pattern";
 import { AgencyRole, allAgencyRoles, AuthenticatedUserId } from "shared";
 import { DsfrTitle } from "react-design-system";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
-import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
+import { icUsersAdminSelectors } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.selectors";
+import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 
 export const RegisterUsersToAgencies = () => {
   const dispatch = useDispatch();
-  const usersNeedingReview = useAppSelector(
-    agencyAdminSelectors.usersNeedingReview,
+  const icUsersNeedingReview = useAppSelector(
+    icUsersAdminSelectors.icUsersNeedingReview,
   );
   const agenciesNeedingReviewForUser = useAppSelector(
-    agencyAdminSelectors.agenciesNeedingReviewForSelectedUser,
+    icUsersAdminSelectors.agenciesNeedingReviewForSelectedUser,
   );
-  const selectedUserId = useAppSelector(agencyAdminSelectors.selectedUserId);
-  const feedback = useAppSelector(agencyAdminSelectors.feedback);
+  const selectedUserId = useAppSelector(icUsersAdminSelectors.selectedUserId);
+  const feedback = useAppSelector(icUsersAdminSelectors.feedback);
 
   useEffect(() => {
     dispatch(
-      agencyAdminSlice.actions.fetchInclusionConnectedUsersToReviewRequested(),
+      icUsersAdminSlice.actions.fetchInclusionConnectedUsersToReviewRequested(),
     );
   }, []);
 
@@ -41,14 +41,14 @@ export const RegisterUsersToAgencies = () => {
         <>
           {feedback.kind}
           <Select
-            label={`Sélectionner un utilisateur (${usersNeedingReview.length} en attente de validation)`}
+            label={`Sélectionner un utilisateur (${icUsersNeedingReview.length} en attente de validation)`}
             options={[
               {
                 value: "",
                 label: "Sélectionner un utilisateur",
                 disabled: true,
               },
-              ...usersNeedingReview.map((user) => ({
+              ...icUsersNeedingReview.map((user) => ({
                 value: user.id,
                 label: `${user.firstName} ${user.lastName}`,
               })),
@@ -57,7 +57,7 @@ export const RegisterUsersToAgencies = () => {
               defaultValue: "",
               onChange: (event) => {
                 dispatch(
-                  agencyAdminSlice.actions.inclusionConnectedUserSelected(
+                  icUsersAdminSlice.actions.inclusionConnectedUserSelected(
                     event.currentTarget.value as AuthenticatedUserId,
                   ),
                 );
@@ -119,7 +119,7 @@ export const RegisterUsersToAgencies = () => {
                               onClick={() => {
                                 if (!selectedUserId) return;
                                 dispatch(
-                                  agencyAdminSlice.actions.registerAgencyWithRoleToUserRequested(
+                                  icUsersAdminSlice.actions.registerAgencyWithRoleToUserRequested(
                                     {
                                       agencyId: agency.id,
                                       userId: selectedUserId,

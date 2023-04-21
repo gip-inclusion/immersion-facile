@@ -8,6 +8,8 @@ import { agenciesAdminEpics } from "src/core-logic/domain/admin/agenciesAdmin/ag
 import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import { dashboardUrlsEpics } from "src/core-logic/domain/admin/dashboardUrls/dashboardUrls.epics";
 import { dashboardUrlsSlice } from "src/core-logic/domain/admin/dashboardUrls/dashboardUrls.slice";
+import { icUsersAdminEpics } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.epics";
+import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 import { sentEmailsEpics } from "src/core-logic/domain/admin/sentEmails/sentEmails.epics";
 import { sentEmailsSlice } from "src/core-logic/domain/admin/sentEmails/sentEmails.slice";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
@@ -55,6 +57,7 @@ const allEpics: any[] = [
   ...immersionAssessmentEpics,
   ...inclusionConnectedEpics,
   ...agencyInfoEpics,
+  ...icUsersAdminEpics,
 ];
 
 const rootReducer = combineReducers({
@@ -72,10 +75,11 @@ const rootReducer = combineReducers({
   [establishmentBatchSlice.name]: establishmentBatchSlice.reducer,
   [inclusionConnectedSlice.name]: inclusionConnectedSlice.reducer,
   admin: combineReducers({
+    [agencyAdminSlice.name]: agencyAdminSlice.reducer,
+    [icUsersAdminSlice.name]: icUsersAdminSlice.reducer,
     [adminAuthSlice.name]: adminAuthSlice.reducer,
     [dashboardUrlsSlice.name]: dashboardUrlsSlice.reducer,
     [sentEmailsSlice.name]: sentEmailsSlice.reducer,
-    [agencyAdminSlice.name]: agencyAdminSlice.reducer,
   }),
 });
 
