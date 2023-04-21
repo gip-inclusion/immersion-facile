@@ -13,6 +13,7 @@ import { adminTokenSchema } from "../tokens/token.schema";
 import {
   registerAgencyWithRoleToUserSchema,
   userAndPasswordSchema,
+  withAgencyRoleSchema,
 } from "./admin.schema";
 
 export type AdminTargets = typeof adminTargets;
@@ -43,9 +44,10 @@ export const adminTargets = createTargets({
     validateRequestBody: registerAgencyWithRoleToUserSchema.parse,
     ...withValidateHeadersAuthorization,
   }),
-  getInclusionConnectedUsersToReview: createTarget({
+  getInclusionConnectedUsers: createTarget({
     method: "GET",
     url: "/admin/inclusion-connected/users",
+    validateQueryParams: withAgencyRoleSchema.parse,
     ...withValidateHeadersAuthorization,
     validateResponseBody: z.array(inclusionConnectedUserSchema).parse,
   }),

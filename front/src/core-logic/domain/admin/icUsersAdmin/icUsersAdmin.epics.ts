@@ -27,7 +27,7 @@ const fetchInclusionConnectedUsersWithAgencyNeedingReviewEpic: AppEpic<
         .match,
     ),
     switchMap((_action) =>
-      adminGateway.getInclusionConnectedUsersToReview(
+      adminGateway.getInclusionConnectedUsersToReview$(
         state$.value.auth.federatedIdentityWithUser?.token ?? "",
       ),
     ),

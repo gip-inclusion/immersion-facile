@@ -14,3 +14,7 @@ export type RegisterAgencyWithRoleToUserDto = {
   role: AgencyRole;
   userId: AuthenticatedUserId;
 };
+
+export type WithAgencyRole = {
+  agencyRole: AgencyRole;
+};

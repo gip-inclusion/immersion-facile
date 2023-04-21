@@ -77,7 +77,8 @@ export class HttpAdminGateway implements AdminGateway {
   ): Observable<InclusionConnectedUser[]> {
     return from(
       this.httpClient
-        .getInclusionConnectedUsersToReview({
+        .getInclusionConnectedUsers({
+          queryParams: { agencyRole: "toReview" },
           headers: { authorization: token },
         })
         .then(({ responseBody }) => responseBody),

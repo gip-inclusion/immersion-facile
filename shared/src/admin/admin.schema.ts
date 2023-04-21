@@ -5,7 +5,11 @@ import {
   authenticatedUserIdSchema,
 } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
 import { zTrimmedString } from "../zodUtils";
-import { RegisterAgencyWithRoleToUserDto, UserAndPassword } from "./admin.dto";
+import {
+  RegisterAgencyWithRoleToUserDto,
+  UserAndPassword,
+  WithAgencyRole,
+} from "./admin.dto";
 
 export const userAndPasswordSchema: z.Schema<UserAndPassword> = z.object({
   user: zTrimmedString,
@@ -18,3 +22,7 @@ export const registerAgencyWithRoleToUserSchema: z.Schema<RegisterAgencyWithRole
     userId: authenticatedUserIdSchema,
     role: agencyRoleSchema,
   });
+
+export const withAgencyRoleSchema: z.Schema<WithAgencyRole> = z.object({
+  agencyRole: agencyRoleSchema,
+});
