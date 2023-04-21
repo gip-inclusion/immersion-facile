@@ -7,8 +7,8 @@ import {
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetDashboardParams,
+  IcUserRoleForAgencyParams,
   InclusionConnectedUser,
-  RegisterAgencyWithRoleToUserDto,
   UserAndPassword,
 } from "shared";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
@@ -111,8 +111,8 @@ export class SimulatedAdminGateway implements AdminGateway {
     ]);
   }
 
-  updateAgencyRoleForUser$(
-    { agencyId }: RegisterAgencyWithRoleToUserDto,
+  updateUserRoleForAgency$(
+    { agencyId }: IcUserRoleForAgencyParams,
     _token: string,
   ): Observable<void> {
     return agencyId === "non-existing-agency-id"

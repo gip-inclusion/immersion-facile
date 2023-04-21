@@ -5,8 +5,8 @@ import {
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetDashboardParams,
+  IcUserRoleForAgencyParams,
   InclusionConnectedUser,
-  RegisterAgencyWithRoleToUserDto,
   UserAndPassword,
 } from "shared";
 
@@ -23,8 +23,8 @@ export interface AdminGateway {
   getInclusionConnectedUsersToReview$: (
     token: BackOfficeJwt,
   ) => Observable<InclusionConnectedUser[]>;
-  updateAgencyRoleForUser$(
-    params: RegisterAgencyWithRoleToUserDto,
+  updateUserRoleForAgency$(
+    params: IcUserRoleForAgencyParams,
     token: BackOfficeJwt,
   ): Observable<void>;
 }

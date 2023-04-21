@@ -5,7 +5,7 @@ import {
   AgencyRight,
   AuthenticatedUser,
   expectToEqual,
-  RegisterAgencyWithRoleToUserDto,
+  IcUserRoleForAgencyParams,
 } from "shared";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
 import { icUsersAdminSelectors } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.selectors";
@@ -175,7 +175,7 @@ describe("Agency registration for authenticated users", () => {
         }),
       }));
 
-      const payload: RegisterAgencyWithRoleToUserDto = {
+      const payload: IcUserRoleForAgencyParams = {
         agencyId: "agency-3",
         userId: user2Id,
         role: "validator",
@@ -208,7 +208,7 @@ describe("Agency registration for authenticated users", () => {
     });
 
     it("stores error message when something goes wrong in the update", () => {
-      const payload: RegisterAgencyWithRoleToUserDto = {
+      const payload: IcUserRoleForAgencyParams = {
         agencyId: "agency-3",
         userId: "user-id",
         role: "validator",

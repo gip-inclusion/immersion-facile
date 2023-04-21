@@ -4,8 +4,8 @@ import { map, switchMap } from "rxjs/operators";
 import {
   AgencyId,
   AgencyRight,
+  IcUserRoleForAgencyParams,
   InclusionConnectedUser,
-  RegisterAgencyWithRoleToUserDto,
 } from "shared";
 import {
   icUsersAdminSlice,
@@ -51,9 +51,9 @@ const registerAgencyToUserEpic: AppEpic<IcUsersAdminAction> = (
     filter(
       icUsersAdminSlice.actions.registerAgencyWithRoleToUserRequested.match,
     ),
-    switchMap((action: PayloadAction<RegisterAgencyWithRoleToUserDto>) =>
+    switchMap((action: PayloadAction<IcUserRoleForAgencyParams>) =>
       adminGateway
-        .updateAgencyRoleForUser$(
+        .updateUserRoleForAgency$(
           action.payload,
           state$.value.auth.federatedIdentityWithUser?.token ?? "",
         )

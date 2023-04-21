@@ -9,7 +9,7 @@ export type UserAndPassword = {
   password: string;
 };
 
-export type RegisterAgencyWithRoleToUserDto = {
+export type IcUserRoleForAgencyParams = {
   agencyId: AgencyId;
   role: AgencyRole;
   userId: AuthenticatedUserId;

@@ -6,8 +6,8 @@ import {
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetDashboardParams,
+  IcUserRoleForAgencyParams,
   InclusionConnectedUser,
-  RegisterAgencyWithRoleToUserDto,
   UserAndPassword,
 } from "shared";
 import { HttpClient } from "http-client";
@@ -58,13 +58,13 @@ export class HttpAdminGateway implements AdminGateway {
     );
   }
 
-  public updateAgencyRoleForUser$(
-    body: RegisterAgencyWithRoleToUserDto,
+  public updateUserRoleForAgency$(
+    body: IcUserRoleForAgencyParams,
     token: string,
   ): Observable<void> {
     return from(
       this.httpClient
-        .updateAgencyRoleForUser({
+        .updateUserRoleForAgency({
           body,
           headers: { authorization: token },
         })

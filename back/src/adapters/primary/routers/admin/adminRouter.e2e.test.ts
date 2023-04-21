@@ -1,9 +1,11 @@
 import { SuperTest, Test } from "supertest";
 import {
   adminTargets,
+  AgencyDtoBuilder,
   BackOfficeJwt,
   expectToEqual,
   featureFlagsRoute,
+  IcUserRoleForAgencyParams,
   SetFeatureFlagParams,
 } from "shared";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
@@ -11,11 +13,13 @@ import {
   buildTestApp,
   InMemoryGateways,
 } from "../../../../_testBuilders/buildTestApp";
+import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 describe("/admin router", () => {
   let request: SuperTest<Test>;
   let token: BackOfficeJwt;
   let gateways: InMemoryGateways;
+  let inMemoryUow: InMemoryUnitOfWork;
 
   beforeEach(async () => {
     const appConfig = new AppConfigBuilder()
@@ -25,7 +29,7 @@ describe("/admin router", () => {
       })
       .build();
 
-    ({ request, gateways } = await buildTestApp(appConfig));
+    ({ request, gateways, inMemoryUow } = await buildTestApp(appConfig));
 
     gateways.timeGateway.setNextDate(new Date());
 
@@ -144,6 +148,44 @@ describe("/admin router", () => {
         .set("authorization", token);
       expect(response.status).toBe(200);
       expect(response.body).toEqual([]);
+    });
+  });
+
+  describe(`GET ${adminTargets.updateUserRoleForAgency.url}`, () => {
+    it("Fails with 401 Unauthorized without admin token", async () => {
+      const { body, status } = await request.patch(
+        adminTargets.updateUserRoleForAgency.url,
+      );
+      expect(body).toEqual({ error: "You need to authenticate first" });
+      expect(status).toBe(401);
+    });
+
+    it("Updates role of user form 'toReview' to 'counsellor' for given agency", async () => {
+      const body: IcUserRoleForAgencyParams = {
+        agencyId: "my-agency-id",
+        userId: "my-user-id",
+        role: "counsellor",
+      };
+
+      const agency = new AgencyDtoBuilder().withId(body.agencyId).build();
+
+      inMemoryUow.inclusionConnectedUserRepository.setInclusionConnectedUsers([
+        {
+          id: body.userId,
+          email: "john@mail.com",
+          firstName: "John",
+          lastName: "Doe",
+          agencyRights: [{ agency, role: "toReview" }],
+        },
+      ]);
+
+      const response = await request
+        .patch(`${adminTargets.updateUserRoleForAgency.url}`)
+        .send(body)
+        .set("authorization", token);
+
+      expect(response.body).toBe("");
+      expect(response.status).toBe(200);
     });
   });
 });

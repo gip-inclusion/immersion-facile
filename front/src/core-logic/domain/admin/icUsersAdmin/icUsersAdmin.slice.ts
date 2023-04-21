@@ -3,9 +3,9 @@ import {
   AgencyId,
   AgencyRight,
   AuthenticatedUserId,
+  IcUserRoleForAgencyParams,
   InclusionConnectedUser,
   OmitFromExistingKeys,
-  RegisterAgencyWithRoleToUserDto,
 } from "shared";
 import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
 
@@ -75,13 +75,13 @@ export const icUsersAdminSlice = createSlice({
     },
     registerAgencyWithRoleToUserRequested: (
       state,
-      _action: PayloadAction<RegisterAgencyWithRoleToUserDto>,
+      _action: PayloadAction<IcUserRoleForAgencyParams>,
     ) => {
       state.isUpdatingIcUserAgency = true;
     },
     registerAgencyWithRoleToUserSucceeded: (
       state,
-      action: PayloadAction<RegisterAgencyWithRoleToUserDto>,
+      action: PayloadAction<IcUserRoleForAgencyParams>,
     ) => {
       const { userId, agencyId, role } = action.payload;
       state.isUpdatingIcUserAgency = false;

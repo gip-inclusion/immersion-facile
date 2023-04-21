@@ -161,5 +161,16 @@ export const createAdminRouter = (
       ),
     );
 
+  adminRouter
+    .route(removeRouterPrefix(adminTargets.updateUserRoleForAgency.url))
+    .patch(async (req, res) =>
+      sendHttpResponse(req, res, async () =>
+        deps.useCases.updateIcUserRoleForAgency.execute(
+          req.body as any,
+          req.payloads?.backOffice,
+        ),
+      ),
+    );
+
   return [routerPrefix, adminRouter];
 };

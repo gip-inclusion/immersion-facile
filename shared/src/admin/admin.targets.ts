@@ -11,7 +11,7 @@ import { inclusionConnectedUserSchema } from "../inclusionConnectedAllowed/inclu
 import { adminLogin } from "../routes/routes";
 import { adminTokenSchema } from "../tokens/token.schema";
 import {
-  registerAgencyWithRoleToUserSchema,
+  icUserRoleForAgencyParamsSchema,
   userAndPasswordSchema,
   withAgencyRoleSchema,
 } from "./admin.schema";
@@ -38,10 +38,10 @@ export const adminTargets = createTargets({
     ...withValidateHeadersAuthorization,
     validateResponseBody: establishmentBatchReportSchema.parse,
   }),
-  updateAgencyRoleForUser: createTarget({
+  updateUserRoleForAgency: createTarget({
     method: "PATCH",
     url: "/admin/inclusion-connected/users",
-    validateRequestBody: registerAgencyWithRoleToUserSchema.parse,
+    validateRequestBody: icUserRoleForAgencyParamsSchema.parse,
     ...withValidateHeadersAuthorization,
   }),
   getInclusionConnectedUsers: createTarget({

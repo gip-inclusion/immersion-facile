@@ -4,8 +4,8 @@ import {
   BackOfficeJwt,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
+  IcUserRoleForAgencyParams,
   InclusionConnectedUser,
-  RegisterAgencyWithRoleToUserDto,
 } from "shared";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
@@ -25,8 +25,8 @@ export class TestAdminGateway implements AdminGateway {
     return this.establishmentBatchResponse$;
   }
 
-  updateAgencyRoleForUser$(
-    _params: RegisterAgencyWithRoleToUserDto,
+  updateUserRoleForAgency$(
+    _params: IcUserRoleForAgencyParams,
     _token: string,
   ): Observable<void> {
     return this.updateAgencyRoleForUserResponse$;
