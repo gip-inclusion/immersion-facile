@@ -1,8 +1,12 @@
 import { Pool, PoolClient } from "pg";
 import {
   AgencyDtoBuilder,
+  AgencyId,
   AgencyRight,
+  AgencyRole,
   AuthenticatedUser,
+  AuthenticatedUserId,
+  expectArraysToEqualIgnoringOrder,
   expectToEqual,
   InclusionConnectedUser,
 } from "shared";
@@ -10,17 +14,34 @@ import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { PgAgencyRepository } from "./PgAgencyRepository";
 import { PgInclusionConnectedUserRepository } from "./PgInclusionConnectedUserRepository";
 
-const authenticatedUser: AuthenticatedUser = {
+const authenticatedUser1: AuthenticatedUser = {
   id: "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
   firstName: "John",
   lastName: "Doe",
   email: "john.doe@mail.com",
 };
 
+const authenticatedUser2: AuthenticatedUser = {
+  id: "44444444-4444-4444-4444-444444444444",
+  firstName: "Jane",
+  lastName: "Doe",
+  email: "jane.doe@mail.com",
+};
+
+const agency1 = new AgencyDtoBuilder()
+  .withId("11111111-1111-4bbb-1111-111111111111")
+  .withName("Agence 1")
+  .build();
+
+const agency2 = new AgencyDtoBuilder()
+  .withId("22222222-2222-4bbb-2222-222222222222")
+  .withName("Agence 2")
+  .build();
+
 describe("PgInclusionConnectedUserRepository", () => {
   let pool: Pool;
   let client: PoolClient;
-  let inclusionConnectRepository: PgInclusionConnectedUserRepository;
+  let icUserRepository: PgInclusionConnectedUserRepository;
   let agencyRepository: PgAgencyRepository;
 
   beforeAll(async () => {
@@ -37,39 +58,30 @@ describe("PgInclusionConnectedUserRepository", () => {
     await client.query("DELETE FROM authenticated_users");
     await client.query("DELETE FROM conventions");
     await client.query("DELETE FROM agencies");
-    inclusionConnectRepository = new PgInclusionConnectedUserRepository(client);
+    icUserRepository = new PgInclusionConnectedUserRepository(client);
     agencyRepository = new PgAgencyRepository(client);
   });
 
   describe("getById", () => {
     it("gets the Inclusion Connected User from its Id when no agency is connected", async () => {
-      await insertAuthenticatedUser(authenticatedUser);
-      const inclusionConnectedUser = await inclusionConnectRepository.getById(
-        authenticatedUser.id,
+      await insertAuthenticatedUser(authenticatedUser1);
+      const inclusionConnectedUser = await icUserRepository.getById(
+        authenticatedUser1.id,
       );
       expectToEqual(inclusionConnectedUser, {
-        ...authenticatedUser,
+        ...authenticatedUser1,
         agencyRights: [],
       });
     });
 
     it("gets the Inclusion Connected User from its Id with the connected agencies", async () => {
-      const agency1 = new AgencyDtoBuilder()
-        .withId("1111aaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
-        .withName("Agence 1")
-        .build();
-      const agency2 = new AgencyDtoBuilder()
-        .withId("2222aaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
-        .withName("Agence 2")
-        .build();
-
       await Promise.all([
         await agencyRepository.insert(agency1),
         await agencyRepository.insert(agency2),
-        await insertAuthenticatedUser(authenticatedUser),
+        await insertAuthenticatedUser(authenticatedUser1),
       ]);
 
-      const userId = authenticatedUser.id;
+      const userId = authenticatedUser1.id;
 
       // create the link between the user and the agencies
       await client.query(
@@ -79,11 +91,11 @@ describe("PgInclusionConnectedUserRepository", () => {
         `,
       );
 
-      const inclusionConnectedUser = await inclusionConnectRepository.getById(
-        authenticatedUser.id,
+      const inclusionConnectedUser = await icUserRepository.getById(
+        authenticatedUser1.id,
       );
       expectToEqual(inclusionConnectedUser, {
-        ...authenticatedUser,
+        ...authenticatedUser1,
         agencyRights: [
           { agency: agency1, role: "toReview" },
           { agency: agency2, role: "validator" },
@@ -93,21 +105,83 @@ describe("PgInclusionConnectedUserRepository", () => {
 
     describe("addAgencyToUser", () => {
       it("adds an element in users__agencies table", async () => {
-        const agency = new AgencyDtoBuilder().withName("Agence 1").build();
-        await agencyRepository.insert(agency);
-        await insertAuthenticatedUser(authenticatedUser);
+        await agencyRepository.insert(agency1);
+        await insertAuthenticatedUser(authenticatedUser1);
         const icUserToSave: InclusionConnectedUser = {
-          ...authenticatedUser,
-          agencyRights: [{ role: "counsellor", agency }],
+          ...authenticatedUser1,
+          agencyRights: [{ role: "counsellor", agency: agency1 }],
         };
 
-        await inclusionConnectRepository.update(icUserToSave);
+        await icUserRepository.update(icUserToSave);
 
-        const savedIcUser = await inclusionConnectRepository.getById(
-          authenticatedUser.id,
+        const savedIcUser = await icUserRepository.getById(
+          authenticatedUser1.id,
         );
         expectToEqual(savedIcUser, icUserToSave);
       });
+    });
+  });
+
+  describe("getWithFilters", () => {
+    it("returns empty array if no filters are given", async () => {
+      await Promise.all([
+        agencyRepository.insert(agency1),
+        insertAuthenticatedUser(authenticatedUser1),
+      ]);
+
+      await insertAgencyRegistrationToUser({
+        agencyId: agency1.id,
+        userId: authenticatedUser1.id,
+        role: "toReview",
+      });
+
+      const icUsers = await icUserRepository.getWithFilter({});
+      expect(icUsers).toEqual([]);
+    });
+
+    it("fetches Inclusion Connected Users with status 'toReview'", async () => {
+      await Promise.all([
+        agencyRepository.insert(agency1),
+        agencyRepository.insert(agency2),
+        insertAuthenticatedUser(authenticatedUser1),
+        insertAuthenticatedUser(authenticatedUser2),
+      ]);
+
+      await Promise.all([
+        insertAgencyRegistrationToUser({
+          agencyId: agency1.id,
+          userId: authenticatedUser1.id,
+          role: "toReview",
+        }),
+        insertAgencyRegistrationToUser({
+          agencyId: agency2.id,
+          userId: authenticatedUser1.id,
+          role: "validator",
+        }),
+        insertAgencyRegistrationToUser({
+          agencyId: agency2.id,
+          userId: authenticatedUser2.id,
+          role: "toReview",
+        }),
+      ]);
+
+      const icUsers = await icUserRepository.getWithFilter({
+        agencyRole: "toReview",
+      });
+
+      expectArraysToEqualIgnoringOrder(icUsers, [
+        {
+          ...authenticatedUser1,
+          agencyRights: [
+            { agency: agency1, role: "toReview" },
+            { agency: agency2, role: "validator" },
+          ],
+        },
+        {
+          ...authenticatedUser2,
+          agencyRights: [{ agency: agency2, role: "toReview" }],
+        },
+      ]);
     });
   });
 
@@ -122,5 +196,21 @@ describe("PgInclusionConnectedUserRepository", () => {
       INSERT INTO authenticated_users(id, email, first_name, last_name) VALUES ($1, $2, $3, $4 )
       `,
       [id, email, firstName, lastName],
+    );
+
+  const insertAgencyRegistrationToUser = async ({
+    userId,
+    agencyId,
+    role,
+  }: {
+    userId: AuthenticatedUserId;
+    agencyId: AgencyId;
+    role: AgencyRole;
+  }) =>
+    client.query(
+      `
+      INSERT INTO users__agencies(user_id, agency_id, role) VALUES ($1, $2, $3)
+      `,
+      [userId, agencyId, role],
     );
 });

@@ -18,7 +18,7 @@ export class InMemoryInclusionConnectedUserRepository
 
   async getWithFilter({
     agencyRole,
-  }: WithAgencyRole): Promise<InclusionConnectedUser[]> {
+  }: Partial<WithAgencyRole>): Promise<InclusionConnectedUser[]> {
     return this.authenticatedUsersRepository.users
       .filter((user) =>
         this.agencyRightsByUserId[user.id].some(
