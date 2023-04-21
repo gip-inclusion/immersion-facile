@@ -1,6 +1,7 @@
-import { InclusionConnectedUser } from "shared";
+import { InclusionConnectedUser, WithAgencyRole } from "shared";
 
 export interface InclusionConnectedUserRepository {
+  getWithFilter(filter: WithAgencyRole): Promise<InclusionConnectedUser[]>;
   getById(userId: string): Promise<InclusionConnectedUser | undefined>;
   update(user: InclusionConnectedUser): Promise<void>;
 }

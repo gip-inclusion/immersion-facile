@@ -20,8 +20,8 @@ export class GetInclusionConnectedUsers extends TransactionalUseCase<
   inputSchema = withAgencyRoleSchema;
 
   protected async _execute(
-    _: WithAgencyRole,
-    _uow: UnitOfWork,
+    { agencyRole }: WithAgencyRole,
+    uow: UnitOfWork,
     jwtPayload?: BackOfficeJwtPayload,
   ): Promise<InclusionConnectedUser[]> {
     if (!jwtPayload) throw new ForbiddenError("No JWT token provided");
@@ -30,8 +30,6 @@ export class GetInclusionConnectedUsers extends TransactionalUseCase<
         `This user is not a backOffice user, role was : '${jwtPayload?.role}'`,
       );
 
-    await "";
-
-    return [];
+    return uow.inclusionConnectedUserRepository.getWithFilter({ agencyRole });
   }
 }
