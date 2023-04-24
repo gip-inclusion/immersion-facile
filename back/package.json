@@ -78,7 +78,7 @@
     "@types/jest": "^27.4.1",
     "@types/jsonwebtoken": "^8.5.8",
     "@types/multer": "^1.4.7",
-    "@types/node": "^16",
+    "@types/node": "^16.18.12",
     "@types/pg": "^8.6.5",
     "@types/pg-format": "^1.0.2",
     "@types/pino": "^7.0.4",
