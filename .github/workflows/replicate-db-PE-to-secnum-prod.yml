@@ -18,6 +18,9 @@ jobs:
       - name: Login with api-token
         run: scalingo login --api-token=${{ secrets.SCALINGO_API_TOKEN_SECNUM }}
 
+      - name: Stop the app
+        run: scalingo --region osc-secnum-fr1 --app if-prod-back scale web:0
+
       - name: Dump the remote database data and restore it to the local database.
         run: >-
           scalingo --region osc-secnum-fr1 --app if-prod-back run bash -c "echo 'Setting up pgsql-client' &&
@@ -54,3 +57,6 @@ jobs:
                   --dbname \$SCALINGO_POSTGRESQL_URL dump.pgsql &&
               echo '> Finished restoring schema' &&
                 exit 0"
+
+      - name: Restart the app
+        run: scalingo --region osc-secnum-fr1 --app if-prod-back scale web:1
