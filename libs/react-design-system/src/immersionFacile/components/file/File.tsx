@@ -58,7 +58,7 @@ export const File = ({
 };
 
 File.defaultProps = {
-  className: "",
+  className: [""],
   hint: "",
   errorMessage: "",
   multiple: false,

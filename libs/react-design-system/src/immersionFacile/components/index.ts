@@ -8,7 +8,6 @@ export * from "./file";
 export * from "./fixed-stamp";
 export * from "./footer";
 export * from "./hero-header";
-export * from "./image";
 export * from "./inclusion-connect-button";
 export * from "./inputs";
 export * from "./label";
