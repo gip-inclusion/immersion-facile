@@ -72,14 +72,14 @@
     "@types/react-dom": "^18.0.10",
     "@types/react-redux": "^7.1.23",
     "@types/uuid": "^8.3.4",
-    "@vitejs/plugin-react": "^2.1.0",
+    "@vitejs/plugin-react": "^4.0.0",
     "autoprefixer": "^10.4.4",
     "babel-jest": "^27.5.1",
     "jest": "^27.5.1",
     "postcss": "^8.4.12",
     "sass": "^1.55.0",
     "typescript": "^4.9.5",
-    "vite": "^4.1.4"
+    "vite": "^4.2.0"
   },
   "peerDependencies": {
     "@emotion/react": "^11.9.0",
