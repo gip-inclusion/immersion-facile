@@ -10,8 +10,6 @@ import { PeAgencyFromReferenciel } from "../../../immersionOffer/ports/PeAgencie
 import { defaultQuestionnaireUrl } from "./AddAgency";
 import { UpdateAllPeAgencies } from "./UpdateAllPeAgencies";
 
-const adminMail = "admin@mail.com";
-
 const address: AddressDto = {
   city: "Molsheim",
   departmentCode: "67",
@@ -36,7 +34,6 @@ describe("UpdateAllPeAgencies use case", () => {
       new InMemoryUowPerformer(uow),
       peAgenciesReferential,
       addressApi,
-      adminMail,
       uuid,
       new ConsoleAppLogger(),
     );
@@ -54,7 +51,7 @@ describe("UpdateAllPeAgencies use case", () => {
         name: "Agence Pôle emploi MOLSHEIM",
         counsellorEmails: [],
         validatorEmails: ["molsheim@pole-emploi.fr"],
-        adminEmails: [adminMail],
+        adminEmails: [],
         address,
         position: {
           lon: 7.511,
@@ -229,7 +226,7 @@ describe("UpdateAllPeAgencies use case", () => {
         name: "Agence Pôle emploi MOLSHEIM",
         counsellorEmails: [],
         validatorEmails: ["molsheim@pole-emploi.fr"],
-        adminEmails: [adminMail],
+        adminEmails: [],
         address,
         position: {
           lon: 7.511,

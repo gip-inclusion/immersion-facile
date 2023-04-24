@@ -43,7 +43,6 @@ const updateAllPeAgenciesScript = async () => {
     uowPerformer,
     httpPeAgenciesReferential,
     adressAPI,
-    config.defaultAdminEmail,
     new UuidV4Generator(),
     new ConsoleAppLogger(),
   );

@@ -15,7 +15,6 @@ export class AddAgency extends TransactionalUseCase<CreateAgencyDto, void> {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private createNewEvent: CreateNewEvent,
-    private defaultAdminEmail: string,
   ) {
     super(uowPerformer);
   }
@@ -26,7 +25,7 @@ export class AddAgency extends TransactionalUseCase<CreateAgencyDto, void> {
   ): Promise<void> {
     const agency: AgencyDto = {
       ...params,
-      adminEmails: [this.defaultAdminEmail],
+      adminEmails: [],
       status: "needsReview",
       questionnaireUrl: params.questionnaireUrl || defaultQuestionnaireUrl,
     };

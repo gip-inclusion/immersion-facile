@@ -361,11 +361,7 @@ export const createUseCases = (
           gateways.poleEmploiGateway,
         ),
       shareConventionByEmail: new ShareApplicationLinkByEmail(gateways.email),
-      addAgency: new AddAgency(
-        uowPerformer,
-        createNewEvent,
-        config.defaultAdminEmail,
-      ),
+      addAgency: new AddAgency(uowPerformer, createNewEvent),
       updateAgencyStatus: new UpdateAgencyStatus(uowPerformer, createNewEvent),
       updateAgencyAdmin: new UpdateAgency(uowPerformer, createNewEvent),
       setFeatureFlag: new SetFeatureFlag(uowPerformer),

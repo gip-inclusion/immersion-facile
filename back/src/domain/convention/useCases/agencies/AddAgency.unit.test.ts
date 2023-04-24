@@ -13,8 +13,6 @@ import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUow
 import { makeCreateNewEvent } from "../../../core/eventBus/EventBus";
 import { AddAgency, defaultQuestionnaireUrl } from "./AddAgency";
 
-const defaultAdminEmail = "myAdmin@mail.com";
-
 const parisMissionLocaleParams: CreateAgencyDto = {
   id: "some-id",
   address: {
@@ -52,7 +50,7 @@ describe("AddAgency use case", () => {
       uuidGenerator,
     });
 
-    addAgency = new AddAgency(uowPerformer, createNewEvent, defaultAdminEmail);
+    addAgency = new AddAgency(uowPerformer, createNewEvent);
   });
 
   it("save the agency in repo, with the default admin mail and the status to be reviewed", async () => {
@@ -62,7 +60,7 @@ describe("AddAgency use case", () => {
       {
         ...parisMissionLocaleParams,
         questionnaireUrl: parisMissionLocaleParams.questionnaireUrl!,
-        adminEmails: [defaultAdminEmail],
+        adminEmails: [],
         status: "needsReview",
       },
     ]);
@@ -76,7 +74,7 @@ describe("AddAgency use case", () => {
       payload: {
         ...parisMissionLocaleParams,
         questionnaireUrl: parisMissionLocaleParams.questionnaireUrl!,
-        adminEmails: [defaultAdminEmail],
+        adminEmails: [],
         status: "needsReview",
       },
     });
@@ -94,7 +92,7 @@ describe("AddAgency use case", () => {
     expectTypeToMatchAndEqual(agencyRepo.agencies, [
       {
         ...poleEmploiParis,
-        adminEmails: [defaultAdminEmail],
+        adminEmails: [],
         status: "needsReview",
         questionnaireUrl: defaultQuestionnaireUrl,
       },

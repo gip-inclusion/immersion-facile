@@ -35,7 +35,6 @@ export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
     uowPerformer: UnitOfWorkPerformer,
     private referencielAgencesPe: PeAgenciesReferential,
     private adresseAPI: AddressGateway,
-    private defaultAdminEmail: string,
     private uuid: UuidGenerator,
     private logger: AppLogger,
   ) {
@@ -149,7 +148,7 @@ export class UpdateAllPeAgencies extends TransactionalUseCase<void, void> {
       validatorEmails: peReferentialAgency.contact?.email
         ? [peReferentialAgency.contact.email]
         : [],
-      adminEmails: [this.defaultAdminEmail],
+      adminEmails: [],
       ...normalizePosition(peReferentialAgency),
       signature: `L'équipe de l'${peReferentialAgency.libelleEtendu}`,
       address: geocodedAddress,

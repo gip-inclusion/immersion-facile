@@ -7,7 +7,7 @@ import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 
 describe("Route to add Agency", () => {
   it("support posting valid agency", async () => {
-    const { request, inMemoryUow, appConfig } = await buildTestApp();
+    const { request, inMemoryUow } = await buildTestApp();
     inMemoryUow.agencyRepository.setAgencies([]);
     const parisMissionLocaleParams: CreateAgencyDto = {
       id: "some-id",
@@ -38,7 +38,7 @@ describe("Route to add Agency", () => {
       {
         ...parisMissionLocaleParams,
         questionnaireUrl: parisMissionLocaleParams.questionnaireUrl!,
-        adminEmails: [appConfig.defaultAdminEmail],
+        adminEmails: [],
         status: "needsReview",
       },
     ]);
