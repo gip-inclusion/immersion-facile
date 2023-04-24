@@ -134,10 +134,6 @@ export class AppConfig {
     });
   }
 
-  public get poleEmploiUrl() {
-    return this.throwIfNotDefined("PASS_EMPLOI_URL");
-  }
-
   public get sirenHttpConfig(): AxiosConfig {
     return {
       endpoint: this.throwIfNotDefined("SIRENE_ENDPOINT"),
