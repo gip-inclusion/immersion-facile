@@ -27,23 +27,35 @@ export class BasicEventCrawler implements EventCrawler {
   }
 
   public async processNewEvents(): Promise<void> {
+    const startDate = new Date();
     const events = await this.retrieveEvents("unpublished");
+    const durationInSeconds = calculateDurationInSecondsFrom(startDate);
 
     if (events.length) {
-      logger.info(
-        { events: eventsToDebugInfo(events) },
-        `processNewEvents | ${events.length} events to process`,
-      );
+      logger.info({
+        durationInSeconds,
+        typeOfEvents: "unpublished",
+        numberOfEvent: events.length,
+        events: eventsToDebugInfo(events),
+      });
     }
 
     await this.publishEvents(events);
   }
 
   public async retryFailedEvents(): Promise<void> {
+    const startDate = new Date();
     const events = await this.retrieveEvents("failed");
+    const durationInSeconds = calculateDurationInSecondsFrom(startDate);
+
     if (events.length) {
       logger.warn(
-        { events: eventsToDebugInfo(events) },
+        {
+          durationInSeconds,
+          typeOfEvents: "failed",
+          numberOfEvent: events.length,
+          events: eventsToDebugInfo(events),
+        },
         `retryFailedEvents | ${events.length} events to process`,
       );
     }
@@ -62,30 +74,18 @@ export class BasicEventCrawler implements EventCrawler {
   private async retrieveEvents(
     type: "unpublished" | "failed",
   ): Promise<DomainEvent[]> {
-    const startDate = new Date();
     try {
       const events = await this.uowPerformer.perform((uow) =>
         type === "unpublished"
           ? uow.outboxQueries.getAllUnpublishedEvents()
           : uow.outboxQueries.getAllFailedEvents(),
       );
-      const durationInSeconds = calculateDurationInSecondsFrom(startDate);
-      logger.info({
-        method: "Crawler retrieveEvents",
-        status: "success",
-        durationInSeconds,
-        typeOfEvents: type,
-        numberOfEvents: events.length,
-      });
       return events;
     } catch (error: any) {
-      const durationInSeconds = calculateDurationInSecondsFrom(startDate);
-
       logger.error({
         error,
         method: "Crawler retrieveEvents",
         status: "error",
-        durationInSeconds,
         typeOfEvents: type,
         errorMessage: error?.message,
       });
