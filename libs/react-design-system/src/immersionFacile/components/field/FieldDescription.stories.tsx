@@ -4,13 +4,12 @@ import {
   FieldDescription,
   FieldDescriptionProperties,
 } from "./FieldDescription";
-import { fieldPrefix } from ".";
 
 const Component = FieldDescription;
 const argTypes: Partial<ArgTypes<FieldDescriptionProperties>> | undefined = {};
 
 export default {
-  title: `${fieldPrefix}${Component.name}`,
+  title: "FieldDescription",
   component: Component,
   argTypes,
 } as ComponentMeta<typeof Component>;

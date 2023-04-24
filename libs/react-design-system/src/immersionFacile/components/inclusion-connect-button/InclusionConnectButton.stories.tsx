@@ -4,13 +4,12 @@ import {
   InclusionConnectButton,
   InclusionConnectButtonProps,
 } from "./InclusionConnectButton";
-import { inclusionConnectButtonPrefix } from ".";
 
 const Component = InclusionConnectButton;
 const argTypes: Partial<ArgTypes<InclusionConnectButtonProps>> | undefined = {};
 
 export default {
-  title: `${inclusionConnectButtonPrefix}${Component.name}`,
+  title: "InclusionConnectButton",
   component: Component,
   argTypes,
 } as ComponentMeta<typeof Component>;

@@ -4,13 +4,12 @@ import {
   ImmersionTextField,
   ImmersionTextFieldProps,
 } from "./ImmersionTextField";
-import { fieldPrefix } from ".";
 
 const Component = ImmersionTextField;
 const argTypes: Partial<ArgTypes<ImmersionTextFieldProps>> | undefined = {};
 
 export default {
-  title: `${fieldPrefix}${Component.name}`,
+  title: "ImmersionTextField",
   component: Component,
   argTypes,
 } as ComponentMeta<typeof Component>;

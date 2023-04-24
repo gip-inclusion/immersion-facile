@@ -1,13 +1,12 @@
 import React from "react";
 import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
 import { OverFooter, OverFooterProps } from "./OverFooter";
-import { overFooterPrefix } from ".";
 
 const Component = OverFooter;
 const argTypes: Partial<ArgTypes<OverFooterProps>> | undefined = {};
 
 export default {
-  title: `${overFooterPrefix}${Component.name}`,
+  title: "OverFooter",
   component: Component,
   argTypes,
 } as ComponentMeta<typeof Component>;

@@ -1,13 +1,12 @@
 import React from "react";
 import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
 import { InputGroup, InputGroupProperties } from "./InputGroup";
-import { inputPrefix } from ".";
 
 const Component = InputGroup;
 const argTypes: Partial<ArgTypes<InputGroupProperties>> | undefined = {};
 
 export default {
-  title: `${inputPrefix}${Component.name}`,
+  title: "InputGroup",
   component: Component,
   argTypes,
 } as ComponentMeta<typeof Component>;

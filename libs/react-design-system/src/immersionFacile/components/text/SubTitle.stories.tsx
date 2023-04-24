@@ -2,13 +2,12 @@ import React from "react";
 import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
 import { SubTitle } from "./SubTitle";
 import { TitleProps } from "./Title";
-import { textPrefix } from ".";
 
 const Component = SubTitle;
 const argTypes: Partial<ArgTypes<TitleProps>> | undefined = {};
 
 export default {
-  title: `${textPrefix}${Component.name}`,
+  title: "SubTitle",
   component: Component,
   argTypes,
 } as ComponentMeta<typeof Component>;

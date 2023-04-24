@@ -1,13 +1,12 @@
 import React from "react";
 import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
 import { TextArea, TextAreaProperties } from "./TextArea";
-import { inputPrefix } from ".";
 
 const Component = TextArea;
 const argTypes: Partial<ArgTypes<TextAreaProperties>> | undefined = {};
 
 export default {
-  title: `${inputPrefix}${Component.name}`,
+  title: "TextArea",
   component: Component,
   argTypes,
 } as ComponentMeta<typeof Component>;

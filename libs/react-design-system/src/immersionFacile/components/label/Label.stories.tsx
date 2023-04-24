@@ -1,13 +1,12 @@
 import React from "react";
 import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
 import { Label, LabelProperties } from "./Label";
-import { labelPrefix } from ".";
 
 const Component = Label;
 const argTypes: Partial<ArgTypes<LabelProperties>> | undefined = {};
 
 export default {
-  title: `${labelPrefix}${Component.name}`,
+  title: "Label",
   component: Component,
   argTypes,
 } as ComponentMeta<typeof Component>;

@@ -1,13 +1,12 @@
 import React from "react";
 import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
 import { TextInputError, TextInputErrorProperties } from "./TextInputError";
-import { inputPrefix } from ".";
 
 const Component = TextInputError;
 const argTypes: Partial<ArgTypes<TextInputErrorProperties>> | undefined = {};
 
 export default {
-  title: `${inputPrefix}${Component.name}`,
+  title: "TextInputError",
   component: Component,
   argTypes,
 } as ComponentMeta<typeof Component>;

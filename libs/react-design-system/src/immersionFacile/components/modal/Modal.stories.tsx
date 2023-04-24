@@ -4,13 +4,12 @@ import { ModalDialog, ModalDialogProperties } from "./Modal";
 import { ModalContent } from "./ModalContent";
 import { ModalFooter } from "./ModalFooter";
 import { ModalTitle } from "./ModalTitle";
-import { modalPrefix } from ".";
 
 const Component = ModalDialog;
 const argTypes: Partial<ArgTypes<ModalDialogProperties>> | undefined = {};
 
 export default {
-  title: `${modalPrefix}${Component.name}`,
+  title: "ModalDialog",
   component: Component,
   argTypes,
 } as ComponentMeta<typeof Component>;

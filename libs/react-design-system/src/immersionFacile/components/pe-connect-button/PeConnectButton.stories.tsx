@@ -1,13 +1,12 @@
 import React from "react";
 import { ArgTypes, ComponentMeta, ComponentStory } from "@storybook/react";
 import { PeConnectButton, PeConnectButtonProps } from "./PeConnectButton";
-import { peConnectButtonPrefix } from ".";
 
 const Component = PeConnectButton;
 const argTypes: Partial<ArgTypes<PeConnectButtonProps>> | undefined = {};
 
 export default {
-  title: `${peConnectButtonPrefix}${Component.name}`,
+  title: "PeConnectButton",
   component: Component,
   argTypes,
 } as ComponentMeta<typeof Component>;
