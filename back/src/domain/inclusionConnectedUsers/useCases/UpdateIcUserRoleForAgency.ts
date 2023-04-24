@@ -1,7 +1,9 @@
 import {
+  AgencyRight,
   BackOfficeJwtPayload,
   IcUserRoleForAgencyParams,
   icUserRoleForAgencyParamsSchema,
+  replaceElementWhere,
 } from "shared";
 import {
   ForbiddenError,
@@ -47,7 +49,20 @@ export class UpdateIcUserRoleForAgency extends TransactionalUseCase<
         `Agency with id ${params.agencyId} is not registered for user with id ${params.userId}`,
       );
 
-    agencyRightToUpdate.role = params.role;
-    await uow.inclusionConnectedUserRepository.update(user);
+    const updatedAgencyRight: AgencyRight = {
+      ...agencyRightToUpdate,
+      role: params.role,
+    };
+
+    const updatedUser = {
+      ...user,
+      agencyRights: replaceElementWhere(
+        user.agencyRights,
+        updatedAgencyRight,
+        ({ agency }) => agency.id === params.agencyId,
+      ),
+    };
+
+    await uow.inclusionConnectedUserRepository.update(updatedUser);
   }
 }

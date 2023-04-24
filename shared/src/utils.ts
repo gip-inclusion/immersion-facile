@@ -52,6 +52,18 @@ export const replaceArrayElement = <T>(
   ...original.slice(replaceAt + 1),
 ];
 
+/*
+ * replaces the first element that matches the predicate
+ */
+export const replaceElementWhere = <T>(
+  original: T[],
+  replaceBy: T,
+  predicate: (t: T) => boolean,
+): T[] => {
+  const indexToReplace = original.findIndex(predicate);
+  return replaceArrayElement(original, indexToReplace, replaceBy);
+};
+
 export const exhaustiveCheck = (
   shouldBeNever: never,
   options: { variableName?: string; throwIfReached: boolean },

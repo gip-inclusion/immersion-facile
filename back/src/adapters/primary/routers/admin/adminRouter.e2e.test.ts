@@ -52,7 +52,7 @@ describe("/admin router", () => {
     it("Fails if token is not valid", async () => {
       const response = await request
         .get(adminTargets.getDashboardUrl.url)
-        .set("authorization", "wrong-tokend");
+        .set("authorization", "wrong-token");
       expect(response.body).toEqual({ error: "Provided token is invalid" });
       expect(response.status).toBe(401);
     });
@@ -100,7 +100,7 @@ describe("/admin router", () => {
     it("fails with 401 with wrong admin token", async () => {
       const response = await request
         .post(`/admin/${featureFlagsRoute}`)
-        .set("authorization", "wrong-tokend");
+        .set("authorization", "wrong-token");
       expect(response.body).toEqual({ error: "Provided token is invalid" });
       expect(response.status).toBe(401);
     });

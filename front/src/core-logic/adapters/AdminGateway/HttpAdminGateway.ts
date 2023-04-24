@@ -59,13 +59,13 @@ export class HttpAdminGateway implements AdminGateway {
   }
 
   public updateUserRoleForAgency$(
-    body: IcUserRoleForAgencyParams,
+    params: IcUserRoleForAgencyParams,
     token: string,
   ): Observable<void> {
     return from(
       this.httpClient
         .updateUserRoleForAgency({
-          body,
+          body: params,
           headers: { authorization: token },
         })
         .then(({ responseBody }) => responseBody),
