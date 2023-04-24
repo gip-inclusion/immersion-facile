@@ -4,6 +4,7 @@ import * as path from "path";
 import {
   featureFlagsRoute,
   renewMagicLinkRoute,
+  shortLinkRoute,
   uploadFileRoute,
 } from "shared";
 import type { AppDependencies } from "../../config/createAppDependencies";
@@ -12,6 +13,7 @@ import {
   FeatureDisabledError,
 } from "../../helpers/httpErrors";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
+import { sendRedirectResponse } from "../../helpers/sendRedirectResponse";
 
 export const createTechnicalRouter = (deps: AppDependencies) => {
   const technicalRouter = Router();
@@ -41,6 +43,14 @@ export const createTechnicalRouter = (deps: AppDependencies) => {
 
         return deps.useCases.uploadLogo.execute(req.file);
       }),
+    );
+
+  technicalRouter
+    .route(`/${shortLinkRoute}/:shortLinkId`)
+    .get(async (req, res) =>
+      sendRedirectResponse(req, res, () =>
+        deps.useCases.getLink.execute(req.params.shortLinkId),
+      ),
     );
 
   return technicalRouter;

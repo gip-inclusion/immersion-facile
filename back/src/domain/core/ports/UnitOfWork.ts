@@ -19,6 +19,7 @@ import { RomeRepository } from "../../rome/ports/RomeRepository";
 import { FeatureFlagRepository } from "./FeatureFlagRepository";
 import { OutboxQueries } from "./OutboxQueries";
 import { OutboxRepository } from "./OutboxRepository";
+import { ShortLinkQuery } from "./ShortLinkQuery";
 
 export type UnitOfWork = {
   conventionPoleEmploiAdvisorRepository: ConventionPoleEmploiAdvisorRepository;
@@ -42,6 +43,7 @@ export type UnitOfWork = {
   discussionAggregateRepository: DiscussionAggregateRepository;
   authenticatedUserRepository: AuthenticatedUserRepository;
   ongoingOAuthRepository: OngoingOAuthRepository;
+  shortLinkQuery: ShortLinkQuery;
 };
 
 export interface UnitOfWorkPerformer {

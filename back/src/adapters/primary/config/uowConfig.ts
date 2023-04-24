@@ -23,6 +23,7 @@ import { InMemoryImmersionAssessmentRepository } from "../../secondary/InMemoryI
 import { InMemoryInclusionConnectedUserRepository } from "../../secondary/InMemoryInclusionConnectedUserRepository";
 import { InMemoryOngoingOAuthRepository } from "../../secondary/InMemoryOngoingOAuthRepository";
 import { InMemoryRomeRepository } from "../../secondary/InMemoryRomeRepository";
+import { InMemoryShortLinkQuery } from "../../secondary/InMemoryShortLinkQuery";
 import { InMemoryUowPerformer } from "../../secondary/InMemoryUowPerformer";
 import { PgAgencyRepository } from "../../secondary/pg/PgAgencyRepository";
 import { PgApiConsumerRepository } from "../../secondary/pg/PgApiConsumerRepository";
@@ -45,6 +46,7 @@ import { PgOutboxRepository } from "../../secondary/pg/PgOutboxRepository";
 import { PgPostalCodeDepartmentRegionQueries } from "../../secondary/pg/PgPostalCodeDepartmentRegionQueries";
 import { PgRomeRepository } from "../../secondary/pg/PgRomeRepository";
 import { PgSearchMadeRepository } from "../../secondary/pg/PgSearchMadeRepository";
+import { PgShortLinkQuery } from "../../secondary/pg/PgShortLinkQuery";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { stubPostalCodeDepartmentRegionQueries } from "../../secondary/StubPostalCodeDepartmentRegionQueries";
 import { AppConfig } from "./appConfig";
@@ -86,6 +88,7 @@ export const createInMemoryUow = () => {
     postalCodeDepartmentRegionQueries: stubPostalCodeDepartmentRegionQueries,
     romeRepository: new InMemoryRomeRepository(),
     searchMadeRepository: new InMemorySearchMadeRepository(),
+    shortLinkQuery: new InMemoryShortLinkQuery(),
   } satisfies UnitOfWork;
 };
 
@@ -118,6 +121,7 @@ export const createPgUow = (client: PoolClient): UnitOfWork => ({
   ),
   romeRepository: new PgRomeRepository(client),
   searchMadeRepository: new PgSearchMadeRepository(client),
+  shortLinkQuery: new PgShortLinkQuery(),
 });
 
 export const createUowPerformer = (

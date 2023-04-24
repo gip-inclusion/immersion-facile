@@ -38,6 +38,7 @@ import { SignConvention } from "../../../domain/convention/useCases/SignConventi
 import { UpdateConvention } from "../../../domain/convention/useCases/UpdateConvention";
 import { UpdateConventionStatus } from "../../../domain/convention/useCases/UpdateConventionStatus";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
+import { ShortLinkId } from "../../../domain/core/ports/ShortLinkQuery";
 import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
 import { UnitOfWorkPerformer } from "../../../domain/core/ports/UnitOfWork";
 import { UuidGenerator } from "../../../domain/core/ports/UuidGenerator";
@@ -373,6 +374,8 @@ export const createUseCases = (
     ...instantiatedUseCasesFromFunctions({
       getFeatureFlags: (_: void) =>
         uowPerformer.perform((uow) => uow.featureFlagRepository.getAll()),
+      getLink: (shortLinkId: ShortLinkId) =>
+        uowPerformer.perform((uow) => uow.shortLinkQuery.getById(shortLinkId)),
       getApiConsumerById: (id: ApiConsumerId) =>
         uowPerformer.perform((uow) => uow.apiConsumerRepository.getById(id)),
       getAgencyById: (id: AgencyId) =>
