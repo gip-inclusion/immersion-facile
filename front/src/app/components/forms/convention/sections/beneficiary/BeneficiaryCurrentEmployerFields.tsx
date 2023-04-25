@@ -51,7 +51,14 @@ export const BeneficiaryCurrentEmployerFields = ({
       />
 
       <Input
-        {...formFields["signatories.beneficiaryCurrentEmployer.businessSiret"]}
+        label={
+          formFields["signatories.beneficiaryCurrentEmployer.businessSiret"]
+            .label
+        }
+        hintText={
+          formFields["signatories.beneficiaryCurrentEmployer.businessSiret"]
+            .hintText
+        }
         nativeInputProps={{
           ...formFields["signatories.beneficiaryCurrentEmployer.businessSiret"],
           ...register("signatories.beneficiaryCurrentEmployer.businessSiret"),
@@ -62,7 +69,14 @@ export const BeneficiaryCurrentEmployerFields = ({
         )}
       />
       <Input
-        {...formFields["signatories.beneficiaryCurrentEmployer.businessName"]}
+        label={
+          formFields["signatories.beneficiaryCurrentEmployer.businessName"]
+            .label
+        }
+        hintText={
+          formFields["signatories.beneficiaryCurrentEmployer.businessName"]
+            .hintText
+        }
         nativeInputProps={{
           ...formFields["signatories.beneficiaryCurrentEmployer.businessName"],
           ...register("signatories.beneficiaryCurrentEmployer.businessName"),
@@ -73,7 +87,13 @@ export const BeneficiaryCurrentEmployerFields = ({
         )}
       />
       <Input
-        {...formFields["signatories.beneficiaryCurrentEmployer.firstName"]}
+        label={
+          formFields["signatories.beneficiaryCurrentEmployer.firstName"].label
+        }
+        hintText={
+          formFields["signatories.beneficiaryCurrentEmployer.firstName"]
+            .hintText
+        }
         nativeInputProps={{
           ...formFields["signatories.beneficiaryCurrentEmployer.firstName"],
           ...register("signatories.beneficiaryCurrentEmployer.firstName"),
@@ -83,6 +103,12 @@ export const BeneficiaryCurrentEmployerFields = ({
       />
       <Input
         {...formFields["signatories.beneficiaryCurrentEmployer.lastName"]}
+        label={
+          formFields["signatories.beneficiaryCurrentEmployer.lastName"].label
+        }
+        hintText={
+          formFields["signatories.beneficiaryCurrentEmployer.lastName"].hintText
+        }
         nativeInputProps={{
           ...formFields["signatories.beneficiaryCurrentEmployer.lastName"],
           ...register("signatories.beneficiaryCurrentEmployer.lastName"),
@@ -91,7 +117,10 @@ export const BeneficiaryCurrentEmployerFields = ({
         {...getFieldError("signatories.beneficiaryCurrentEmployer.lastName")}
       />
       <Input
-        {...formFields["signatories.beneficiaryCurrentEmployer.job"]}
+        label={formFields["signatories.beneficiaryCurrentEmployer.job"].label}
+        hintText={
+          formFields["signatories.beneficiaryCurrentEmployer.job"].hintText
+        }
         nativeInputProps={{
           ...formFields["signatories.beneficiaryCurrentEmployer.job"],
           ...register("signatories.beneficiaryCurrentEmployer.job"),
@@ -100,7 +129,10 @@ export const BeneficiaryCurrentEmployerFields = ({
         {...getFieldError("signatories.beneficiaryCurrentEmployer.job")}
       />
       <Input
-        {...formFields["signatories.beneficiaryCurrentEmployer.phone"]}
+        label={formFields["signatories.beneficiaryCurrentEmployer.phone"].label}
+        hintText={
+          formFields["signatories.beneficiaryCurrentEmployer.phone"].hintText
+        }
         nativeInputProps={{
           ...formFields["signatories.beneficiaryCurrentEmployer.phone"],
           ...register("signatories.beneficiaryCurrentEmployer.phone"),
@@ -109,7 +141,10 @@ export const BeneficiaryCurrentEmployerFields = ({
         {...getFieldError("signatories.beneficiaryCurrentEmployer.phone")}
       />
       <Input
-        {...formFields["signatories.beneficiaryCurrentEmployer.email"]}
+        label={formFields["signatories.beneficiaryCurrentEmployer.email"].label}
+        hintText={
+          formFields["signatories.beneficiaryCurrentEmployer.email"].hintText
+        }
         nativeInputProps={{
           ...formFields["signatories.beneficiaryCurrentEmployer.email"],
           ...register("signatories.beneficiaryCurrentEmployer.email"),

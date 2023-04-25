@@ -104,7 +104,8 @@ export const AgencySelector = ({
       className={`fr-input-group${showError ? " fr-input-group--error" : ""}`}
     >
       <Select
-        {...agencyDepartmentField}
+        label={agencyDepartmentField.label}
+        hint={agencyDepartmentField.hintText}
         options={
           internshipKind === "immersion"
             ? departmentOptions
@@ -122,7 +123,8 @@ export const AgencySelector = ({
       />
 
       <Select
-        {...agencyIdField}
+        label={agencyIdField.label}
+        hint={agencyIdField.hintText}
         options={agencies.map(({ id, name }) => ({ label: name, value: id }))}
         placeholder={
           agencyDepartment

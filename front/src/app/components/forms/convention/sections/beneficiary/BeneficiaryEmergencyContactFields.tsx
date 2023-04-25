@@ -25,7 +25,10 @@ export const BeneficiaryEmergencyContactFields = ({
   return (
     <>
       <Input
-        {...formContents["signatories.beneficiary.emergencyContact"]}
+        label={formContents["signatories.beneficiary.emergencyContact"].label}
+        hintText={
+          formContents["signatories.beneficiary.emergencyContact"].hintText
+        }
         nativeInputProps={{
           ...formContents["signatories.beneficiary.emergencyContact"],
           ...register("signatories.beneficiary.emergencyContact"),
@@ -34,7 +37,12 @@ export const BeneficiaryEmergencyContactFields = ({
         {...getFieldError("signatories.beneficiary.emergencyContact")}
       />
       <Input
-        {...formContents["signatories.beneficiary.emergencyContactPhone"]}
+        label={
+          formContents["signatories.beneficiary.emergencyContactPhone"].label
+        }
+        hintText={
+          formContents["signatories.beneficiary.emergencyContactPhone"].hintText
+        }
         nativeInputProps={{
           ...formContents["signatories.beneficiary.emergencyContactPhone"],
           ...register("signatories.beneficiary.emergencyContactPhone"),
@@ -43,7 +51,12 @@ export const BeneficiaryEmergencyContactFields = ({
         {...getFieldError("signatories.beneficiary.emergencyContactPhone")}
       />
       <Input
-        {...formContents["signatories.beneficiary.emergencyContactEmail"]}
+        label={
+          formContents["signatories.beneficiary.emergencyContactEmail"].label
+        }
+        hintText={
+          formContents["signatories.beneficiary.emergencyContactEmail"].hintText
+        }
         nativeInputProps={{
           ...formContents["signatories.beneficiary.emergencyContactEmail"],
           ...register("signatories.beneficiary.emergencyContactEmail"),

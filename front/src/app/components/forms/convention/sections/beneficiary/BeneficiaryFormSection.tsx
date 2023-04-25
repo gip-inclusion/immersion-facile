@@ -6,7 +6,6 @@ import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { Select } from "@codegouvfr/react-dsfr/Select";
 import { keys } from "ramda";
 import {
-  cleanStringToHTMLAttribute,
   ConventionReadDto,
   InternshipKind,
   isBeneficiaryStudent,
@@ -101,11 +100,13 @@ export const BeneficiaryFormSection = ({
   const levelsOfEducationToSelectOption = levelsOfEducation.map(
     (level: string) => ({ label: level, value: level }),
   );
+
   return (
     <>
       <SectionTitle>{t.beneficiarySection.title}</SectionTitle>
       <Input
-        {...formContents["signatories.beneficiary.firstName"]}
+        hintText={formContents["signatories.beneficiary.firstName"].hintText}
+        label={formContents["signatories.beneficiary.firstName"].label}
         nativeInputProps={{
           ...formContents["signatories.beneficiary.firstName"],
           ...register("signatories.beneficiary.firstName"),
@@ -115,7 +116,8 @@ export const BeneficiaryFormSection = ({
         {...getFieldError("signatories.beneficiary.firstName")}
       />
       <Input
-        {...formContents["signatories.beneficiary.lastName"]}
+        hintText={formContents["signatories.beneficiary.lastName"].hintText}
+        label={formContents["signatories.beneficiary.lastName"].label}
         nativeInputProps={{
           ...formContents["signatories.beneficiary.lastName"],
           ...register("signatories.beneficiary.lastName"),
@@ -126,19 +128,20 @@ export const BeneficiaryFormSection = ({
       />
 
       <Input
-        {...formContents["signatories.beneficiary.birthdate"]}
+        hintText={formContents["signatories.beneficiary.birthdate"].hintText}
+        label={formContents["signatories.beneficiary.birthdate"].label}
         disabled={isFrozen}
         nativeInputProps={{
           ...formContents["signatories.beneficiary.birthdate"],
           ...register("signatories.beneficiary.birthdate"),
           type: "date",
           max: "9999-12-31",
-          id: cleanStringToHTMLAttribute("signatories.beneficiary.birthdate"),
         }}
         {...getFieldError("signatories.beneficiary.birthdate")}
       />
       <EmailValidationInput
-        {...formContents["signatories.beneficiary.email"]}
+        hintText={formContents["signatories.beneficiary.email"].hintText}
+        label={formContents["signatories.beneficiary.email"].label}
         disabled={isFrozen || userFieldsAreFilled}
         nativeInputProps={{
           ...formContents["signatories.beneficiary.email"],
@@ -150,7 +153,8 @@ export const BeneficiaryFormSection = ({
 
       {values.signatories.beneficiary.email && <ConventionEmailWarning />}
       <Input
-        {...formContents["signatories.beneficiary.phone"]}
+        label={formContents["signatories.beneficiary.phone"].label}
+        hintText={formContents["signatories.beneficiary.phone"].hintText}
         nativeInputProps={{
           ...formContents["signatories.beneficiary.phone"],
           ...register("signatories.beneficiary.phone"),
@@ -161,7 +165,10 @@ export const BeneficiaryFormSection = ({
       />
       {values.internshipKind === "mini-stage-cci" && (
         <Select
-          {...formContents["signatories.beneficiary.levelOfEducation"]}
+          label={formContents["signatories.beneficiary.levelOfEducation"].label}
+          hint={
+            formContents["signatories.beneficiary.levelOfEducation"].hintText
+          }
           disabled={isFrozen}
           options={levelsOfEducationToSelectOption}
           nativeSelectProps={{
@@ -175,7 +182,10 @@ export const BeneficiaryFormSection = ({
         />
       )}
       <Input
-        {...formContents["signatories.beneficiary.financiaryHelp"]}
+        label={formContents["signatories.beneficiary.financiaryHelp"].label}
+        hintText={
+          formContents["signatories.beneficiary.financiaryHelp"].hintText
+        }
         textArea
         nativeTextAreaProps={{
           ...formContents["signatories.beneficiary.financiaryHelp"],
@@ -185,7 +195,6 @@ export const BeneficiaryFormSection = ({
         {...getFieldError("signatories.beneficiary.financiaryHelp")}
       />
       <RadioButtons
-        {...formContents.isMinor}
         legend={formContents.isMinor.label}
         hintText={formContents.isMinor.hintText}
         disabled={isFrozen}
@@ -212,7 +221,6 @@ export const BeneficiaryFormSection = ({
       {internshipKind !== "mini-stage-cci" && (
         <>
           <RadioButtons
-            {...formContents.isCurrentEmployer}
             disabled={isFrozen}
             legend={formContents.isCurrentEmployer.label}
             hintText={formContents.isCurrentEmployer.hintText}

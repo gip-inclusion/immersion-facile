@@ -31,7 +31,8 @@ export const EstablishementTutorFields = ({
   return (
     <>
       <Input
-        {...formContents["establishmentTutor.firstName"]}
+        label={formContents["establishmentTutor.firstName"].label}
+        hintText={formContents["establishmentTutor.firstName"].hintText}
         nativeInputProps={{
           ...formContents["establishmentTutor.firstName"],
           ...register("establishmentTutor.firstName"),
@@ -40,7 +41,8 @@ export const EstablishementTutorFields = ({
         {...getFieldError("establishmentTutor.firstName")}
       />
       <Input
-        {...formContents["establishmentTutor.lastName"]}
+        label={formContents["establishmentTutor.lastName"].label}
+        hintText={formContents["establishmentTutor.lastName"].hintText}
         nativeInputProps={{
           ...formContents["establishmentTutor.lastName"],
           ...register("establishmentTutor.lastName"),
@@ -49,7 +51,8 @@ export const EstablishementTutorFields = ({
         {...getFieldError("establishmentTutor.lastName")}
       />
       <Input
-        {...formContents["establishmentTutor.job"]}
+        label={formContents["establishmentTutor.job"].label}
+        hintText={formContents["establishmentTutor.job"].hintText}
         nativeInputProps={{
           ...formContents["establishmentTutor.job"],
           ...register("establishmentTutor.job"),
@@ -58,7 +61,8 @@ export const EstablishementTutorFields = ({
         {...getFieldError("establishmentTutor.job")}
       />
       <Input
-        {...formContents["establishmentTutor.phone"]}
+        label={formContents["establishmentTutor.phone"].label}
+        hintText={formContents["establishmentTutor.phone"].hintText}
         nativeInputProps={{
           ...formContents["establishmentTutor.phone"],
           ...register("establishmentTutor.phone"),
@@ -68,7 +72,8 @@ export const EstablishementTutorFields = ({
         {...getFieldError("establishmentTutor.phone")}
       />
       <EmailValidationInput
-        {...formContents["establishmentTutor.email"]}
+        label={formContents["establishmentTutor.email"].label}
+        hintText={formContents["establishmentTutor.email"].hintText}
         nativeInputProps={{
           ...formContents["establishmentTutor.email"],
           ...register("establishmentTutor.email"),

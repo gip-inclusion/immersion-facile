@@ -65,7 +65,6 @@ export const EstablishmentFormSection = ({
 
       <EstablishmentBusinessFields disabled={isFrozen || isFetchingSiret} />
       <RadioButtons
-        {...formContents.isEstablishmentTutorIsEstablishmentRepresentative}
         legend={
           formContents.isEstablishmentTutorIsEstablishmentRepresentative.label
         }

@@ -2,11 +2,7 @@ import React, { useEffect, useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import Autocomplete from "@mui/material/Autocomplete";
 import { useStyles } from "tss-react/dsfr";
-import {
-  AppellationDto,
-  AppellationMatchDto,
-  cleanStringToHTMLAttribute,
-} from "shared";
+import { AppellationDto, AppellationMatchDto } from "shared";
 import { Proposal } from "src/app/components/forms/establishment/Proposal";
 import { StringWithHighlights } from "src/app/components/forms/establishment/StringWithHighlights";
 import { useDebounce } from "src/app/hooks/useDebounce";
@@ -149,14 +145,10 @@ export const AppellationAutocomplete = ({
         }}
         renderInput={(params) => {
           const { id } = params;
-          const inputId = cleanStringToHTMLAttribute(id, null);
 
           return (
             <div ref={params.InputProps.ref}>
-              <label
-                className={cx(fr.cx("fr-label"), className)}
-                htmlFor={inputId}
-              >
+              <label className={cx(fr.cx("fr-label"), className)} htmlFor={id}>
                 {label}
               </label>
               {description && (
@@ -164,7 +156,7 @@ export const AppellationAutocomplete = ({
               )}
               <input
                 {...params.inputProps}
-                id={inputId}
+                id={id}
                 className={fr.cx("fr-input")}
                 placeholder={placeholder ?? "Ex: boulanger, styliste, etc."}
               />

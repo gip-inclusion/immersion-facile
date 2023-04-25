@@ -131,82 +131,86 @@ export const domElementIds = {
   },
 
   conventionImmersionRoute: {
+    showFormButton: "im-convention-immersion__show-form-button",
     conventionSection: {
-      agencyDepartment: "form-convention-agencyDepartement",
-      agencyId: "form-convention-agencyId",
-      dateStart: "form-convention-dateStart",
-      dateEnd: "form-convention-dateStart",
-      siret: "form-convention-siret",
-      businessName: "form-convention-businessName",
-      workConditions: "form-convention-workConditions",
-      individualProtection: "form-convention-individualProtection",
-      sanitaryPrevention: "form-convention-sanitaryPrevention",
+      agencyDepartment: "im-convention-form__agencyDepartement",
+      agencyId: "im-convention-form__agencyId",
+      dateStart: "im-convention-form__dateStart",
+      dateEnd: "im-convention-form__dateStart",
+      siret: "im-convention-form__siret",
+      businessName: "im-convention-form__businessName",
+      workConditions: "im-convention-form__workConditions",
+      individualProtection: "im-convention-form__individualProtection",
+      sanitaryPrevention: "im-convention-form__sanitaryPrevention",
       sanitaryPreventionDescription:
-        "form-convention-sanitaryPreventionDescription",
-      immersionAddress: "form-convention-immersionAddress",
-      immersionObjective: "form-convention-immersionObjective",
-      immersionAppellation: "form-convention-immersionAppellation",
-      immersionActivities: "form-convention-immersionActivities",
-      immersionSkills: "form-convention-immersionSkills",
-      isCurrentEmployer: "form-convention-isCurrentEmployer",
+        "im-convention-form__sanitaryPreventionDescription",
+      immersionAddress: "im-convention-form__immersionAddress",
+      immersionObjective: "im-convention-form__immersionObjective",
+      immersionAppellation: "im-convention-form__immersionAppellation",
+      immersionActivities: "im-convention-form__immersionActivities",
+      immersionSkills: "im-convention-form__immersionSkills",
+      isCurrentEmployer: "im-convention-form__isCurrentEmployer",
       isEstablishmentTutorIsEstablishmentRepresentative:
-        "form-convention-isEstablishmentTutorIsEstablishmentRepresentative",
-      businessAdvantages: "form-convention-businessAdvantages",
-      isMinor: "form-convention-isMinor",
+        "im-convention-form__isEstablishmentTutorIsEstablishmentRepresentative",
+      businessAdvantages: "im-convention-form__businessAdvantages",
+      isMinor: "im-convention-form__isMinor",
     },
     beneficiarySection: {
-      firstName: "form-convention-signatories-beneficiary-firstName",
-      lastName: "form-convention-signatories-beneficiary-lastName",
-      birthdate: "form-convention-signatories-beneficiary-birthdate",
-      email: "form-convention-signatories-beneficiary-email",
-      phone: "form-convention-signatories-beneficiary-phone",
+      firstName: "im-convention-form__signatories-beneficiary-firstName",
+      lastName: "im-convention-form__signatories-beneficiary-lastName",
+      birthdate: "im-convention-form__signatories-beneficiary-birthdate",
+      email: "im-convention-form__signatories-beneficiary-email",
+      phone: "im-convention-form__signatories-beneficiary-phone",
       levelOfEducation:
-        "form-convention-signatories-beneficiary-level-of-education",
-      financiaryHelp: "form-convention-signatories-beneficiary-financiary-help",
+        "im-convention-form__signatories-beneficiary-level-of-education",
+      financiaryHelp:
+        "im-convention-form__signatories-beneficiary-financiary-help",
       federatedIdentity:
-        "form-convention-signatories-beneficiary-federatedIdentity",
+        "im-convention-form__signatories-beneficiary-federatedIdentity",
       emergencyContact:
-        "form-convention-signatories-beneficiary-emergencyContact",
+        "im-convention-form__signatories-beneficiary-emergencyContact",
       emergencyContactPhone:
-        "form-convention-signatories-beneficiary-emergencyContactPhone",
+        "im-convention-form__signatories-beneficiary-emergencyContactPhone",
       emergencyContactEmail:
-        "form-convention-signatories-beneficiary-emergencyContactEmail",
+        "im-convention-form__signatories-beneficiary-emergencyContactEmail",
     },
     establishmentTutorSection: {
-      firstName: "form-convention-establishmentTutor-firstName",
-      lastName: "form-convention-establishmentTutor-lastName",
-      email: "form-convention-establishmentTutor-email",
-      phone: "form-convention-establishmentTutor-phone",
-      job: "form-convention-establishmentTutor-job",
+      firstName: "im-convention-form__establishmentTutor-firstName",
+      lastName: "im-convention-form__establishmentTutor-lastName",
+      email: "im-convention-form__establishmentTutor-email",
+      phone: "im-convention-form__establishmentTutor-phone",
+      job: "im-convention-form__establishmentTutor-job",
     },
     beneficiaryRepresentativeSection: {
       firstName:
-        "form-convention-signatories-beneficiaryRepresentative-firstName",
+        "im-convention-form__signatories-beneficiaryRepresentative-firstName",
       lastName:
-        "form-convention-signatories-beneficiaryRepresentative-lastName",
-      email: "form-convention-signatories-beneficiaryRepresentative-email",
-      phone: "form-convention-signatories-beneficiaryRepresentative-phone",
+        "im-convention-form__signatories-beneficiaryRepresentative-lastName",
+      email: "im-convention-form__signatories-beneficiaryRepresentative-email",
+      phone: "im-convention-form__signatories-beneficiaryRepresentative-phone",
     },
     beneficiaryCurrentEmployerSection: {
       businessName:
-        "form-convention-signatories-beneficiaryCurrentEmployer-businessName",
-      job: "form-convention-signatories-beneficiaryCurrentEmployer-job",
-      email: "form-convention-signatories-beneficiaryCurrentEmployer-email",
-      phone: "form-convention-signatories-beneficiaryCurrentEmployer-phone",
+        "im-convention-form__signatories-beneficiaryCurrentEmployer-businessName",
+      job: "im-convention-form__signatories-beneficiaryCurrentEmployer-job",
+      email: "im-convention-form__signatories-beneficiaryCurrentEmployer-email",
+      phone: "im-convention-form__signatories-beneficiaryCurrentEmployer-phone",
       firstName:
-        "form-convention-signatories-beneficiaryCurrentEmployer-firstName",
+        "im-convention-form__signatories-beneficiaryCurrentEmployer-firstName",
       lastName:
-        "form-convention-signatories-beneficiaryCurrentEmployer-lastName",
+        "im-convention-form__signatories-beneficiaryCurrentEmployer-lastName",
       businessSiret:
-        "form-convention-signatories-beneficiaryCurrentEmployer-businessSiret",
+        "im-convention-form__signatories-beneficiaryCurrentEmployer-businessSiret",
     },
     establishmentRepresentativeSection: {
       firstName:
-        "form-convention-signatories-establishmentRepresentative-firstName",
+        "im-convention-form__signatories-establishmentRepresentative-firstName",
       lastName:
-        "form-convention-signatories-establishmentRepresentative-lastName",
-      email: "form-convention-signatories-establishmentRepresentative-email",
-      phone: "form-convention-signatories-establishmentRepresentative-phone",
+        "im-convention-form__signatories-establishmentRepresentative-lastName",
+      email:
+        "im-convention-form__signatories-establishmentRepresentative-email",
+      phone:
+        "im-convention-form__signatories-establishmentRepresentative-phone",
     },
   },
 

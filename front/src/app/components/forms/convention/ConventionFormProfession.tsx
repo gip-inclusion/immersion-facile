@@ -2,7 +2,7 @@ import React from "react";
 import { useFormContext } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { AppellationDto, ConventionReadDto } from "shared";
+import { AppellationDto, ConventionReadDto, domElementIds } from "shared";
 import { TextInputError } from "react-design-system";
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
 
@@ -47,6 +47,10 @@ export const ConventionFormProfession = ({
         <AppellationAutocomplete
           label={label}
           initialValue={initialFieldValue}
+          id={
+            domElementIds.conventionImmersionRoute.conventionSection
+              .immersionAppellation
+          }
           onAppellationSelected={(appellation) => {
             setValue("immersionAppellation.romeCode", appellation.romeCode);
             setValue("immersionAppellation.romeLabel", appellation.romeLabel);

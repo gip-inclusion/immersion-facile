@@ -50,7 +50,13 @@ export const BeneficiaryRepresentativeFields = ({
   return (
     <>
       <Input
-        {...formContents["signatories.beneficiaryRepresentative.firstName"]}
+        label={
+          formContents["signatories.beneficiaryRepresentative.firstName"].label
+        }
+        hintText={
+          formContents["signatories.beneficiaryRepresentative.firstName"]
+            .hintText
+        }
         nativeInputProps={{
           ...formContents["signatories.beneficiaryRepresentative.firstName"],
           ...register("signatories.beneficiaryRepresentative.firstName"),
@@ -59,7 +65,13 @@ export const BeneficiaryRepresentativeFields = ({
         {...getFieldError("signatories.beneficiaryRepresentative.firstName")}
       />
       <Input
-        {...formContents["signatories.beneficiaryRepresentative.lastName"]}
+        label={
+          formContents["signatories.beneficiaryRepresentative.lastName"].label
+        }
+        hintText={
+          formContents["signatories.beneficiaryRepresentative.lastName"]
+            .hintText
+        }
         nativeInputProps={{
           ...formContents["signatories.beneficiaryRepresentative.lastName"],
           ...register("signatories.beneficiaryRepresentative.lastName"),
@@ -68,7 +80,12 @@ export const BeneficiaryRepresentativeFields = ({
         {...getFieldError("signatories.beneficiaryRepresentative.lastName")}
       />
       <EmailValidationInput
-        {...formContents["signatories.beneficiaryRepresentative.email"]}
+        label={
+          formContents["signatories.beneficiaryRepresentative.email"].label
+        }
+        hintText={
+          formContents["signatories.beneficiaryRepresentative.email"].hintText
+        }
         nativeInputProps={{
           ...formContents["signatories.beneficiaryRepresentative.email"],
           ...register("signatories.beneficiaryRepresentative.email"),
@@ -79,7 +96,12 @@ export const BeneficiaryRepresentativeFields = ({
         <ConventionEmailWarning />
       )}
       <Input
-        {...formContents["signatories.beneficiaryRepresentative.phone"]}
+        label={
+          formContents["signatories.beneficiaryRepresentative.phone"].label
+        }
+        hintText={
+          formContents["signatories.beneficiaryRepresentative.phone"].hintText
+        }
         nativeInputProps={{
           ...formContents["signatories.beneficiaryRepresentative.phone"],
           ...register("signatories.beneficiaryRepresentative.phone"),

@@ -90,6 +90,12 @@ Pour le frontend se référer ensuite ici:
 
 ### Outillage
 
+#### Cypress
+
+- `pnpm cypress install` pour installer le binaire de l'app de votre OS
+- `pnpm front dev-http` & `pnpm back dev` : Cypress va écouter les requêtes XHR et a donc besoin du serveur back qui tourne et du front en mode HTTP
+- `pnpm cypress open` pour lancer l'app et démarrer les tests manuellement (End-to-end testing)
+
 #### CLI
 
 ##### Husky

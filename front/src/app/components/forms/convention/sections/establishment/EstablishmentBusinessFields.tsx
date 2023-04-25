@@ -41,7 +41,8 @@ export const EstablishmentBusinessFields = ({
   return (
     <>
       <Input
-        {...formContents.siret}
+        label={formContents.siret.label}
+        hintText={formContents.siret.hintText}
         nativeInputProps={{
           ...formContents.siret,
           ...register("siret"),
@@ -52,7 +53,8 @@ export const EstablishmentBusinessFields = ({
         stateRelatedMessage={siretErrorToDisplay}
       />
       <Input
-        {...formContents.businessName}
+        label={formContents.businessName.label}
+        hintText={formContents.businessName.hintText}
         nativeInputProps={{
           ...formContents.businessName,
           ...register("businessName"),
