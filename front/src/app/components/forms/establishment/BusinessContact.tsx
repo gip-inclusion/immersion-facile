@@ -40,7 +40,8 @@ const preferredContactMethodOptions = (
 export const BusinessContact = () => {
   const { getFormFields } = useFormContents(formEstablishmentFieldsLabels);
   const formContents = getFormFields();
-  const { setValue, register, watch } = useFormContext<FormEstablishmentDto>();
+  const { setValue, register, watch, getValues } =
+    useFormContext<FormEstablishmentDto>();
   return (
     <div className={fr.cx("fr-input-group")}>
       <div>
@@ -87,6 +88,7 @@ export const BusinessContact = () => {
       <MultipleEmailsInput
         {...formContents["businessContact.copyEmails"]}
         valuesInList={watch().businessContact.copyEmails}
+        initialValue={getValues().businessContact.copyEmails.join(", ")}
         setValues={(newValues) => {
           setValue("businessContact.copyEmails", newValues);
         }}
