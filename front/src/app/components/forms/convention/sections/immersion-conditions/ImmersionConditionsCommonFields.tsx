@@ -4,7 +4,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
-import { addMonths } from "date-fns";
+import { addDays, addMonths } from "date-fns";
 import {
   addressDtoToString,
   conventionObjectiveOptions,
@@ -100,20 +100,19 @@ export const ImmersionConditionsCommonFields = ({
         disabled={disabled}
         nativeInputProps={{
           ...register("dateStart"),
+          id: formContents["dateStart"].id,
           value: toDateString(new Date(values.dateStart)),
-          onChange: (event) => {
+          onBlur: (event) => {
             const dateStart = event.target.value;
-            resetSchedule({
-              start: new Date(dateStart),
-              end: new Date(values.dateEnd),
-            });
-            setValue("dateStart", dateStart, {
-              shouldValidate: true,
-            });
-            setValue("dateEnd", values.dateEnd, {
-              shouldValidate: true,
-            });
-            if (isStringDate(dateStart)) {
+            if (isStringDate(dateStart) && dateStart !== "") {
+              const newDateEnd = addDays(new Date(values.dateStart), 1);
+              resetSchedule({
+                start: new Date(dateStart),
+                end: newDateEnd,
+              });
+              setValue("dateEnd", newDateEnd.toISOString(), {
+                shouldValidate: true,
+              });
               setDateMax(addMonths(new Date(dateStart), 1).toISOString());
             }
           },
@@ -126,14 +125,12 @@ export const ImmersionConditionsCommonFields = ({
         disabled={disabled}
         nativeInputProps={{
           ...register("dateEnd"),
-          onChange: (event) => {
+          id: formContents["dateEnd"].id,
+          onBlur: (event) => {
             const dateEnd = event.target.value;
             resetSchedule({
               start: new Date(values.dateStart),
               end: new Date(dateEnd),
-            });
-            setValue("dateEnd", dateEnd, {
-              shouldValidate: true,
             });
           },
           type: "date",
