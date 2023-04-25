@@ -3,7 +3,12 @@ import { type SubmitHandler, useFormContext } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import { ConventionReadDto, Signatory, toDotNotation } from "shared";
+import {
+  ConventionReadDto,
+  domElementIds,
+  Signatory,
+  toDotNotation,
+} from "shared";
 import { ErrorNotifications } from "react-design-system";
 import { ConventionFrozenMessage } from "src/app/components/forms/convention/ConventionFrozenMessage";
 import { ConventionSignOnlyMessage } from "src/app/components/forms/convention/ConventionSignOnlyMessage";
@@ -158,6 +163,9 @@ export const ConventionFormFields = ({
             iconId="fr-icon-checkbox-circle-line"
             iconPosition="left"
             type="button"
+            nativeButtonProps={{
+              id: domElementIds.conventionImmersionRoute.submitFormButton,
+            }}
             onClick={handleSubmit(
               (values) => {
                 setValue("status", "READY_TO_SIGN");

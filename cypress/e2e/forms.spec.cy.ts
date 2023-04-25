@@ -23,7 +23,6 @@ describe("Convention Form (on dev http, prefilled forms false)", () => {
   const baseApiRoute = "/api/";
 
   it("can submit form with basic infos", () => {
-    console.log("getCurrentDate ===>", getCurrentDate());
     cy.intercept("GET", `${baseApiRoute}${featureFlagsRoute}`).as(
       "featureFlagsRequest",
     );
@@ -156,18 +155,24 @@ describe("Convention Form (on dev http, prefilled forms false)", () => {
     ).check({
       force: true, // DSFR, label:before is covering the input
     });
-    cy.get("[id^=appellation-autocomplete]").type("Boulangerie");
+    cy.get(
+      `#${domElementIds.conventionImmersionRoute.conventionSection.immersionAppellation}`,
+    ).type("Boulangerie");
     cy.wait("@autocompleteAppellationRequest");
-    cy.get("[id^=appellation-autocomplete]").then(($element) => {
+    cy.get(
+      `#${domElementIds.conventionImmersionRoute.conventionSection.immersionAppellation}`,
+    ).then(($element) => {
       const listboxId = $element.attr("aria-controls");
       cy.get(`#${listboxId} .MuiAutocomplete-option`).then((options) => {
         options.eq(0).trigger("click");
       });
     });
-    cy.get(getIdFromConventionDTO("immersionActivities"))
+    cy.get(
+      `#${domElementIds.conventionImmersionRoute.conventionSection.immersionActivities}`,
+    )
       .clear()
       .type("Regarder le pain");
-    cy.get("#im-submit-button")
+    cy.get(`#${domElementIds.conventionImmersionRoute.submitFormButton}`)
       .click()
       .then(() => {
         cy.get(".fr-alert--error").should("not.exist");
@@ -179,7 +184,7 @@ describe("Convention Form (on dev http, prefilled forms false)", () => {
   it.skip("can't submit form if immersion duration exceeds 1 month", () => {});
   it.skip("can submit form with a complex schedule", () => {});
   it.skip("can edit multiple jobs dropdown", () => {});
-  it.skip("can edit input date with null / 0 value", () => {
+  it("can edit input date with null / 0 value", () => {
     cy.visit(conventionFormUrl);
     cy.get(domElementIds.conventionImmersionRoute.showFormButton).click();
     cy.get(getIdFromConventionDTO("dateStart"))
@@ -193,5 +198,5 @@ describe("Convention Form (on dev http, prefilled forms false)", () => {
   });
 });
 
-const getCurrentDate = () => format(new Date(), "dd/MM/yyyy");
-const getTomorrowDate = () => format(addDays(new Date(), 1), "dd/MM/yyyy");
+const getCurrentDate = () => format(new Date(), "yyyy-MM-dd");
+const getTomorrowDate = () => format(addDays(new Date(), 1), "yyyy-MM-dd");

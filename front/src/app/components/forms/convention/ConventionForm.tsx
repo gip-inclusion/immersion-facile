@@ -120,7 +120,7 @@ export const ConventionForm = ({
   const { getValues, reset } = methods;
 
   useMatomo(conventionProperties.internshipKind);
-  console.log("ConventionForm dateStart ==>", getValues().dateStart);
+
   useEffect(() => {
     if (mode === "create") {
       dispatch(conventionSlice.actions.clearFetchedConvention());

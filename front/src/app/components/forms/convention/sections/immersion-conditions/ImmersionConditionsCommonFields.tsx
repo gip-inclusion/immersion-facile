@@ -96,7 +96,8 @@ export const ImmersionConditionsCommonFields = ({
         </>
       )}
       <Input
-        {...formContents["dateStart"]}
+        label={formContents["dateStart"].label}
+        hintText={formContents["dateStart"].hintText}
         disabled={disabled}
         nativeInputProps={{
           name: register("dateStart").name,
@@ -130,7 +131,8 @@ export const ImmersionConditionsCommonFields = ({
         {...getFieldError("dateStart")}
       />
       <Input
-        {...formContents["dateEnd"]}
+        label={formContents["dateEnd"].label}
+        hintText={formContents["dateEnd"].hintText}
         disabled={disabled}
         nativeInputProps={{
           name: register("dateEnd").name,
