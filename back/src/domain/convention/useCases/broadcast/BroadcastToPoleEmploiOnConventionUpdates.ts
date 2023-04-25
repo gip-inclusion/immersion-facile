@@ -95,8 +95,6 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
       competencesObservees: convention.immersionSkills,
       signatureBeneficiaire: !!beneficiary.signedAt,
       signatureEntreprise: !!establishmentRepresentative.signedAt,
-
-      descriptionProtectionIndividuelle: "",
     };
 
     await this.poleEmploiGateway.notifyOnConventionUpdated(
