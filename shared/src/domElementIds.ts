@@ -292,6 +292,8 @@ export const domElementIds = {
       inputFileInput: "inputFile-input",
     },
     adminPrivateRoute: {
+      formLoginUserInput: "im-login__user-input",
+      formLoginPasswordInput: "im-login__password-input",
       formLoginSubmitButton: "im-login__submit-button",
     },
   },

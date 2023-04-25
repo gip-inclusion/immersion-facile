@@ -65,6 +65,7 @@ export const LoginForm = ({
               label="Utilisateur"
               nativeInputProps={{
                 ...register("user"),
+                id: domElementIds.admin.adminPrivateRoute.formLoginUserInput,
               }}
             />
             <Input
@@ -72,6 +73,8 @@ export const LoginForm = ({
               nativeInputProps={{
                 type: "password",
                 ...register("password"),
+                id: domElementIds.admin.adminPrivateRoute
+                  .formLoginPasswordInput,
               }}
             />
             <Button
