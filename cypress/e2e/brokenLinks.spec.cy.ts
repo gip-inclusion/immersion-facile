@@ -5,7 +5,6 @@ describe("Check for broken links", () => {
     links.each(($link) => {
       const href = $link.attr("href");
       cy.request($link.attr("href")).should((response) => {
-        cy.log(`${href}: ${response.status}`);
         expect(response.status).to.be.greaterThan(199).and.lessThan(400);
       });
     });

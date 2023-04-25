@@ -1,4 +1,4 @@
-import { frontRoutes } from "shared";
+import { domElementIds, frontRoutes } from "shared";
 
 describe("Home user flow", () => {
   const userTypes = ["candidate", "establishment", "agency"];
@@ -6,45 +6,51 @@ describe("Home user flow", () => {
   it("Should change theme based on user type", () => {
     cy.wrap(userTypes).each((type) => {
       cy.visit("/");
-      cy.get(`.im-hero-header__nav-card--${type}`).click();
+      cy.get(
+        `#${domElementIds.home.heroHeader[type as unknown as string]}`,
+      ).click();
       cy.get(".im-hero-header").should("have.class", `im-hero-header--${type}`);
     });
   });
   it("User flow: Candidate -> search", () => {
     cy.visit("/");
-    cy.get(".im-hero-header__nav-card--candidate").click();
-    cy.get(".im-hero-header__nav-card--candidate").eq(0).click();
+    cy.get(`#${domElementIds.home.heroHeader.candidate}`).click();
+    cy.get(`#${domElementIds.homeCandidates.heroHeader.search}`).click();
     expectLocationToBe(`/${frontRoutes.search}`);
   });
   it("User flow: Candidate -> convention form", () => {
     cy.visit("/");
-    cy.get(".im-hero-header__nav-card--candidate").click();
-    cy.get(".im-hero-header__nav-card--candidate").eq(1).click();
-    cy.get(".fr-modal__content .fr-btn").click();
+    cy.get(`#${domElementIds.home.heroHeader.candidate}`).click();
+    cy.get(
+      `#${domElementIds.homeCandidates.heroHeader.formConvention}`,
+    ).click();
+    cy.get(`#${domElementIds.conventionImmersionRoute.showFormButton}`).click();
     expectLocationToBe(`/${frontRoutes.conventionImmersionRoute}`);
   });
   it("User flow: Establishment -> convention form", () => {
     cy.visit("/");
-    cy.get(".im-hero-header__nav-card--establishment").click();
-    cy.get(".im-hero-header__nav-card--establishment").eq(2).click();
+    cy.get(`#${domElementIds.home.heroHeader.establishment}`).click();
+    cy.get(
+      `#${domElementIds.homeEstablishments.heroHeader.formConvention}`,
+    ).click();
     expectLocationToBe(`/${frontRoutes.conventionImmersionRoute}`);
   });
   it("User flow: Agency -> register form", () => {
     cy.visit("/");
-    cy.get(".im-hero-header__nav-card--agency").click();
-    cy.get(".im-hero-header__nav-card--agency").eq(0).click();
+    cy.get(`#${domElementIds.home.heroHeader.agency}`).click();
+    cy.get(`#${domElementIds.homeAgencies.heroHeader.addAgencyForm}`).click();
     expectLocationToBe(`/${frontRoutes.addAgency}`);
   });
   it.skip("User flow: Agency -> edit form", () => {
     cy.visit("/");
-    cy.get(".im-hero-header__nav-card--agency").click();
-    cy.get(".im-hero-header__nav-card--agency").eq(1).click();
+    cy.get(`#${domElementIds.home.heroHeader.agency}`).click();
+    cy.get(`#${domElementIds.homeAgencies.heroHeader.addAgencyForm}`).click();
     expectLocationToBe(`/${frontRoutes.addAgency}`);
   });
   it("User flow: Agency -> convention form", () => {
     cy.visit("/");
-    cy.get(".im-hero-header__nav-card--agency").click();
-    cy.get(".im-hero-header__nav-card--agency").eq(1).click();
+    cy.get(`#${domElementIds.home.heroHeader.agency}`).click();
+    cy.get(`#${domElementIds.homeAgencies.heroHeader.formConvention}`).click();
     expectLocationToBe(`/${frontRoutes.conventionImmersionRoute}`);
   });
   const expectLocationToBe = (route: string) => {

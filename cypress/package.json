@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "scripts": {
     "open": "CYPRESS_ADMIN_USER=admin CYPRESS_ADMIN_PASSWORD=admin node_modules/.bin/cypress open",
-    "install": "CYPRESS_ADMIN_USER=admin CYPRESS_ADMIN_PASSWORD=admin node_modules/.bin/cypress install"
+    "install": "CYPRESS_ADMIN_USER=admin CYPRESS_ADMIN_PASSWORD=admin node_modules/.bin/cypress install",
+    "run-cloud": "CYPRESS_ADMIN_USER=admin CYPRESS_ADMIN_PASSWORD=admin node_modules/.bin/cypress run --record --key 3932863b-a093-4dd6-84f0-98b4846e11f1"
   },
   "devDependencies": {
     "axe-core": "^4.5.2",

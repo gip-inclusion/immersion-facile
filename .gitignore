@@ -9,4 +9,6 @@ backup/**/*.bz2
 .pnpm-debug.log
 dumps
 cypress/cypress/downloads
+cypress/cypress/videos
+cypress/cypress/screenshots
 .turbo
