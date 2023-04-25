@@ -99,9 +99,18 @@ export const ImmersionConditionsCommonFields = ({
         {...formContents["dateStart"]}
         disabled={disabled}
         nativeInputProps={{
-          ...register("dateStart"),
+          name: register("dateStart").name,
+          ref: register("dateStart").ref,
           id: formContents["dateStart"].id,
           value: toDateString(new Date(values.dateStart)),
+          onChange: (event) => {
+            const newDateStart = event.target.value;
+            if (isStringDate(newDateStart) && newDateStart !== "") {
+              setValue("dateStart", newDateStart, {
+                shouldValidate: true,
+              });
+            }
+          },
           onBlur: (event) => {
             const dateStart = event.target.value;
             if (isStringDate(dateStart) && dateStart !== "") {
@@ -124,8 +133,17 @@ export const ImmersionConditionsCommonFields = ({
         {...formContents["dateEnd"]}
         disabled={disabled}
         nativeInputProps={{
-          ...register("dateEnd"),
+          name: register("dateEnd").name,
+          ref: register("dateEnd").ref,
           id: formContents["dateEnd"].id,
+          onChange: (event) => {
+            const newDateEnd = event.target.value;
+            if (isStringDate(newDateEnd) && newDateEnd !== "") {
+              setValue("dateEnd", newDateEnd, {
+                shouldValidate: true,
+              });
+            }
+          },
           onBlur: (event) => {
             const dateEnd = event.target.value;
             resetSchedule({
