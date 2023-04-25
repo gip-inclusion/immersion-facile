@@ -31,7 +31,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
     private readonly rateLimiter: RateLimiter,
     private readonly retryStrategy: RetryStrategy,
   ) {
-    this.peConventionBroadcastUrl = `${peApiUrl}/partenaire/immersion-pro/v1/demandes-immersion`;
+    this.peConventionBroadcastUrl = `${peApiUrl}/partenaire/immersion-pro/v2/demandes-immersion`;
   }
 
   public async notifyOnConventionUpdated(
