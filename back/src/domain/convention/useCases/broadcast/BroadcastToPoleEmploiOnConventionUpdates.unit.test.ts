@@ -1,4 +1,5 @@
 import {
+  AgencyDtoBuilder,
   ConventionDtoBuilder,
   ConventionId,
   expectObjectsToMatch,
@@ -10,7 +11,7 @@ import { InMemoryFeatureFlagRepository } from "../../../../adapters/secondary/In
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { BroadcastToPoleEmploiOnConventionUpdates } from "./BroadcastToPoleEmploiOnConventionUpdates";
 
-const prepareUseCase = ({
+const prepareUseCase = async ({
   enablePeConventionBroadcast,
 }: {
   enablePeConventionBroadcast: boolean;
@@ -25,19 +26,31 @@ const prepareUseCase = ({
     poleEmploiGateWay,
   );
 
-  return { broadcastToPe, poleEmploiGateWay };
+  const agencyRepository = uow.agencyRepository;
+  const peAgency = new AgencyDtoBuilder()
+    .withId("some-pe-agency")
+    .withKind("pole-emploi")
+    .build();
+  await agencyRepository.setAgencies([peAgency]);
+
+  return { broadcastToPe, poleEmploiGateWay, agencyRepository, peAgency };
 };
 
 describe("Broadcasts events to pole-emploi", () => {
-  it("Skips conventions without federated id", async () => {
+  it("Skips convention if not linked to an agency of kind pole-emploi", async () => {
     // Prepare
-    const { broadcastToPe, poleEmploiGateWay } = prepareUseCase({
-      enablePeConventionBroadcast: true,
-    });
+    const { broadcastToPe, poleEmploiGateWay, agencyRepository } =
+      await prepareUseCase({
+        enablePeConventionBroadcast: true,
+      });
+
+    const agency = new AgencyDtoBuilder().withKind("mission-locale").build();
+    await agencyRepository.setAgencies([agency]);
 
     // Act
     const convention = new ConventionDtoBuilder()
-      .withoutFederatedIdentity()
+      .withAgencyId(agency.id)
+      .withFederatedIdentity({ provider: "peConnect", token: "some-id" })
       .build();
 
     await broadcastToPe.execute(convention);
@@ -45,18 +58,40 @@ describe("Broadcasts events to pole-emploi", () => {
     // Assert
     expect(poleEmploiGateWay.notifications).toHaveLength(0);
   });
+  it("Conventions without federated id are still sent", async () => {
+    // Prepare
+    const { broadcastToPe, poleEmploiGateWay, peAgency } = await prepareUseCase(
+      {
+        enablePeConventionBroadcast: true,
+      },
+    );
+
+    // Act
+    const convention = new ConventionDtoBuilder()
+      .withAgencyId(peAgency.id)
+      .withoutFederatedIdentity()
+      .build();
+
+    await broadcastToPe.execute(convention);
+
+    // Assert
+    expect(poleEmploiGateWay.notifications).toHaveLength(1);
+  });
 
   it("doesn't send notification if feature flag is OFF", async () => {
     // Prepare
-    const { broadcastToPe, poleEmploiGateWay } = prepareUseCase({
-      enablePeConventionBroadcast: false,
-    });
+    const { broadcastToPe, poleEmploiGateWay, peAgency } = await prepareUseCase(
+      {
+        enablePeConventionBroadcast: false,
+      },
+    );
 
     const peExternalId = "peExternalId";
     const immersionConventionId: ConventionId = "immersionConventionId";
 
     // Act
     const convention = new ConventionDtoBuilder()
+      .withAgencyId(peAgency.id)
       .withId(immersionConventionId)
       .withExternalId(peExternalId)
       .withFederatedIdentity({ provider: "peConnect", token: "some-id" })
@@ -73,14 +108,17 @@ describe("Broadcasts events to pole-emploi", () => {
 
   it("Converts and sends conventions with federated id if featureFlag is ON", async () => {
     // Prepare
-    const { broadcastToPe, poleEmploiGateWay } = prepareUseCase({
-      enablePeConventionBroadcast: true,
-    });
+    const { broadcastToPe, poleEmploiGateWay, peAgency } = await prepareUseCase(
+      {
+        enablePeConventionBroadcast: true,
+      },
+    );
 
     const immersionConventionId: ConventionId = "immersionConventionId";
 
     // Act
     const convention = new ConventionDtoBuilder()
+      .withAgencyId(peAgency.id)
       .withId(immersionConventionId)
       .withExternalId("1")
       .withImmersionAppelation({

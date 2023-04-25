@@ -29,9 +29,9 @@ type PeConventionStatus =
   ConventionStatusToPeStatus[keyof ConventionStatusToPeStatus];
 
 export type PoleEmploiConvention = {
-  id: string; // id numérique sur 11 caratères
+  id: string; // id numérique sur 11 caractères
   originalId: string; // exemple: 31bd445d-54fa-4b53-8875-0ada1673fe3c
-  peConnectId: string; // nécessaire pour se connecter avec PE-UX
+  peConnectId?: string; // nécessaire pour se connecter avec PE-UX
   statut: PeConventionStatus;
   email: string;
   telephone?: string;
