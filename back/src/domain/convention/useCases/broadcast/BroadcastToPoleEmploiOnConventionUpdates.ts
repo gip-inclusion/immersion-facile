@@ -43,10 +43,11 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
   ): Promise<void> {
     const { enablePeConventionBroadcast } =
       await uow.featureFlagRepository.getAll();
-    const { beneficiary, establishmentRepresentative } = convention.signatories;
 
     if (!enablePeConventionBroadcast) return;
-    if (!beneficiary.federatedIdentity) return;
+
+    const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);
+    if (!agency || agency.kind !== "pole-emploi") return;
 
     const totalHours = calculateTotalImmersionHoursBetweenDate({
       schedule: convention.schedule,
@@ -54,12 +55,14 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
       dateEnd: convention.dateEnd,
     });
 
+    const { beneficiary, establishmentRepresentative } = convention.signatories;
+
     const poleEmploiConvention: PoleEmploiConvention = {
       id: convention.externalId
         ? convention.externalId.padStart(11, "0")
         : "no-external-id",
       originalId: convention.id,
-      peConnectId: beneficiary.federatedIdentity.token,
+      peConnectId: beneficiary.federatedIdentity?.token,
       statut: conventionStatusToPoleEmploiStatus[convention.status],
       email: beneficiary.email,
       telephone: beneficiary.phone,

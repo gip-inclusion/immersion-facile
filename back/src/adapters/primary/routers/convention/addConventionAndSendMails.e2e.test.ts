@@ -89,15 +89,18 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
 
   // eslint-disable-next-line jest/expect-expect
   it("Scenario: application submitted, then signed, then validated", async () => {
+
+    const peAgency = new AgencyDtoBuilder()
+      .withKind("pole-emploi")
+      .withValidatorEmails(["validator@mail.com"])
+      .build();
+
     const initialConvention = new ConventionDtoBuilder()
+      .withAgencyId(peAgency.id)
       .notSigned()
       .withStatus("READY_TO_SIGN")
       .withoutDateValidation()
       .withFederatedIdentity({ provider: "peConnect", token: "fake" })
-      .build();
-    const agency = new AgencyDtoBuilder()
-      .withId(initialConvention.agencyId)
-      .withValidatorEmails(["validator@mail.com"])
       .build();
 
     const appAndDeps = await buildTestApp();
@@ -112,7 +115,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       "link8",
     ]);
 
-    appAndDeps.inMemoryUow.agencyRepository.setAgencies([agency]);
+    appAndDeps.inMemoryUow.agencyRepository.setAgencies([peAgency]);
 
     const { beneficiarySignJwt, establishmentSignJwt } =
       await beneficiarySubmitsApplicationForTheFirstTime(
