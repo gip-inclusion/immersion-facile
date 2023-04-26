@@ -51,35 +51,40 @@ export const BusinessContact = () => {
         <p>Le correspondant reçoit les demandes et les traite.</p>
       </div>
       <Input
-        {...formContents["businessContact.firstName"]}
+        label={formContents["businessContact.firstName"].label}
+        hintText={formContents["businessContact.firstName"].hintText}
         nativeInputProps={{
           ...formContents["businessContact.firstName"],
           ...register("businessContact.firstName"),
         }}
       />
       <Input
-        {...formContents["businessContact.lastName"]}
+        label={formContents["businessContact.lastName"].label}
+        hintText={formContents["businessContact.lastName"].hintText}
         nativeInputProps={{
           ...formContents["businessContact.lastName"],
           ...register("businessContact.lastName"),
         }}
       />
       <Input
-        {...formContents["businessContact.job"]}
+        label={formContents["businessContact.job"].label}
+        hintText={formContents["businessContact.job"].hintText}
         nativeInputProps={{
           ...formContents["businessContact.job"],
           ...register("businessContact.job"),
         }}
       />
       <Input
-        {...formContents["businessContact.phone"]}
+        label={formContents["businessContact.phone"].label}
+        hintText={formContents["businessContact.phone"].hintText}
         nativeInputProps={{
           ...formContents["businessContact.phone"],
           ...register("businessContact.phone"),
         }}
       />
       <Input
-        {...formContents["businessContact.email"]}
+        label={formContents["businessContact.email"].label}
+        hintText={formContents["businessContact.email"].hintText}
         nativeInputProps={{
           ...formContents["businessContact.email"],
           ...register("businessContact.email"),

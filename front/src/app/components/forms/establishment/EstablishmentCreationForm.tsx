@@ -88,7 +88,8 @@ const CreationSiretRelatedInputs = () => {
   return (
     <>
       <Input
-        {...formContents.siret}
+        label={formContents.siret.label}
+        hintText={formContents.siret.hintText}
         nativeInputProps={{
           ...formContents.siret,
           ...register("siret"),
@@ -143,7 +144,8 @@ const CreationSiretRelatedInputs = () => {
         />
       )}
       <Input
-        {...formContents.businessName}
+        label={formContents.businessName.label}
+        hintText={formContents.businessName.hintText}
         nativeInputProps={{
           ...formContents.businessName,
           ...register("businessName"),
@@ -151,7 +153,8 @@ const CreationSiretRelatedInputs = () => {
         }}
       />
       <Input
-        {...formContents.businessNameCustomized}
+        label={formContents.businessNameCustomized.label}
+        hintText={formContents.businessNameCustomized.hintText}
         nativeInputProps={{
           ...formContents.businessNameCustomized,
           ...register("businessNameCustomized"),

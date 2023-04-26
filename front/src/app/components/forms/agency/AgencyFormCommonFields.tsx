@@ -71,7 +71,8 @@ export const AgencyFormCommonFields = ({
   return (
     <>
       <Select
-        {...fieldsContent.kind}
+        label={fieldsContent.kind.label}
+        hint={fieldsContent.kind.hintText}
         options={agencyListOfOptions.sort((a, b) =>
           a.label < b.label ? -1 : 0,
         )}
@@ -84,6 +85,7 @@ export const AgencyFormCommonFields = ({
 
       <Input
         label={fieldsContent.name.label}
+        hintText={fieldsContent.name.hintText}
         nativeInputProps={{
           ...register("name"),
           ...fieldsContent.name,
@@ -129,6 +131,7 @@ export const AgencyFormCommonFields = ({
       {formValues.kind !== "pole-emploi" && (
         <Input
           label={fieldsContent.questionnaireUrl.label}
+          hintText={fieldsContent.questionnaireUrl.hintText}
           nativeInputProps={{
             ...register("questionnaireUrl"),
             ...fieldsContent.questionnaireUrl,
@@ -139,6 +142,7 @@ export const AgencyFormCommonFields = ({
 
       <Input
         label={fieldsContent.signature.label}
+        hintText={fieldsContent.signature.hintText}
         nativeInputProps={{
           ...register("signature"),
           ...fieldsContent.signature,
@@ -148,6 +152,7 @@ export const AgencyFormCommonFields = ({
 
       <Input
         label={fieldsContent.agencySiret.label}
+        hintText={fieldsContent.agencySiret.hintText}
         nativeInputProps={{
           ...register("agencySiret"),
           placeholder: "n° de siret",

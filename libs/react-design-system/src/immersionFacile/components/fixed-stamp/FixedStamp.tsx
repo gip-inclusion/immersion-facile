@@ -21,7 +21,11 @@ export const FixedStamp = ({
 }: FixedStampProps) => {
   const { cx } = useStyles();
   return (
-    <aside className={cx("fixed-stamp")}>
+    <aside
+      className={cx("fixed-stamp")}
+      role="complementary"
+      aria-label="Mise en avant temporaire"
+    >
       {image && <div className={cx("fixed-stamp__image-wrapper")}>{image}</div>}
       <div className={cx("fixed-stamp__content")}>
         {overtitle && (
@@ -36,7 +40,13 @@ export const FixedStamp = ({
           <span className={cx("fixed-stamp__subtitle")}>{subtitle}</span>
         )}
       </div>
-      {link && <a className={cx("fixed-stamp__overlay-link")} {...link} />}
+      {link && (
+        <a
+          className={cx("fixed-stamp__overlay-link")}
+          {...link}
+          aria-label="Lien associé à la mise en avant temporaire"
+        />
+      )}
     </aside>
   );
 };

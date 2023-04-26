@@ -168,14 +168,16 @@ export const EstablishmentForm = ({
             disabled={false}
           />
           <Input
-            {...formContents.website}
+            label={formContents.website.label}
+            hintText={formContents.website.hintText}
             nativeInputProps={{
               ...formContents.website,
               ...register("website"),
             }}
           />
           <Input
-            {...formContents.additionalInformation}
+            label={formContents.additionalInformation.label}
+            hintText={formContents.additionalInformation.hintText}
             textArea
             nativeTextAreaProps={{
               ...formContents.additionalInformation,

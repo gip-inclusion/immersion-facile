@@ -137,7 +137,7 @@ export const domElementIds = {
       agencyDepartment: "im-convention-form__agencyDepartement",
       agencyId: "im-convention-form__agencyId",
       dateStart: "im-convention-form__dateStart",
-      dateEnd: "im-convention-form__dateStart",
+      dateEnd: "im-convention-form__dateEnd",
       siret: "im-convention-form__siret",
       businessName: "im-convention-form__businessName",
       workConditions: "im-convention-form__workConditions",

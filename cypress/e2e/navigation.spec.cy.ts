@@ -1,4 +1,5 @@
 import { domElementIds, frontRoutes } from "shared";
+import { disableNewUrlLog } from "../utils";
 
 describe("Simple navigation", () => {
   // TODO: do separate test for admin navigation
@@ -21,57 +22,66 @@ describe("Simple navigation", () => {
     });
   });
 
-  // it("Goes to home candidates", () => {
-  //   goToTab({
-  //     tabLabel: "Accueil candidat",
-  //     expectedRoute: `/${frontRoutes.homeCandidates}`,
-  //   });
-  // });
-  // it("Goes to home establishment", () => {
-  //   goToTab({
-  //     tabLabel: "Accueil entreprise",
-  //     expectedRoute: `/${frontRoutes.homeEstablishments}`,
-  //   });
-  // });
-  // it("Goes to home agency", () => {
-  //   goToTab({
-  //     tabLabel: "Accueil prescripteurs",
-  //     expectedRoute: `/${frontRoutes.homeAgencies}`,
-  //   });
-  // });
+  it("Goes to home candidates", () => {
+    cy.visit("/");
+    goToTab({
+      selector: `#${domElementIds.header.navLinks.candidate.home}`,
+      expectedRoute: `/${frontRoutes.homeCandidates}`,
+    });
+  });
+  it("Goes to home establishment", () => {
+    cy.visit("/");
+    goToTab({
+      selector: `#${domElementIds.header.navLinks.establishment.home}`,
+      expectedRoute: `/${frontRoutes.homeEstablishments}`,
+    });
+  });
+  it("Goes to home agency", () => {
+    cy.visit("/");
+    goToTab({
+      selector: `#${domElementIds.header.navLinks.agency.home}`,
+      expectedRoute: `/${frontRoutes.homeAgencies}`,
+    });
+  });
 
-  // it("Goes to convention page", () => {
-  //   goToTab({
-  //     tabLabel: "Remplir la demande de convention",
-  //     expectedRoute: `/${frontRoutes.conventionImmersionRoute}`,
-  //   });
-  // });
+  it("Goes to convention page", () => {
+    disableNewUrlLog();
+    cy.visit("/");
+    goToTab({
+      selector: `#${domElementIds.header.navLinks.candidate.formConvention}`,
+      expectedRoute: `/${frontRoutes.conventionImmersionRoute}`,
+    });
+  });
 
-  // it("Goes to Establishment form", () => {
-  //   goToTab({
-  //     tabLabel: "Référencer mon entreprise",
-  //     expectedRoute: `/${frontRoutes.establishment}`,
-  //   });
-  // });
+  it("Goes to Establishment form", () => {
+    cy.visit("/");
+    goToTab({
+      selector: `#${domElementIds.header.navLinks.establishment.addEstablishmentForm}`,
+      expectedRoute: `/${frontRoutes.establishment}`,
+    });
+  });
 
-  // it("Goes to search page", () => {
-  //   goToTab({
-  //     tabLabel: "Trouver une entreprise accueillante",
-  //     expectedRoute: `/${frontRoutes.search}`,
-  //   });
-  // });
+  it("Goes to search page", () => {
+    cy.visit("/");
+    goToTab({
+      selector: `#${domElementIds.header.navLinks.candidate.search}`,
+      expectedRoute: `/${frontRoutes.search}`,
+    });
+  });
 
-  // it("Goes to add agency page", () => {
-  //   goToTab({
-  //     tabLabel: "Référencer mon organisme",
-  //     expectedRoute: `/${frontRoutes.addAgency}`,
-  //   });
-  // });
+  it("Goes to add agency page", () => {
+    cy.visit("/");
+    goToTab({
+      selector: `#${domElementIds.header.navLinks.agency.addAgencyForm}`,
+      expectedRoute: `/${frontRoutes.addAgency}`,
+    });
+  });
 
-  // it("Back to home on header logo click", () => {
-  //   cy.get(".fr-header__brand").click();
-  //   expectLocationToBe("/");
-  // });
+  it("Back to home on header logo click", () => {
+    cy.visit("/");
+    cy.get(".fr-header__brand").click();
+    expectLocationToBe("/");
+  });
 
   const goToTab = ({
     selector,

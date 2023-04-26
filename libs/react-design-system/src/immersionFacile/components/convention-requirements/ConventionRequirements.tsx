@@ -7,7 +7,10 @@ const componentName = "im-convention-requirements";
 export const ConventionRequirements = () => {
   const { cx } = useStyles();
   return (
-    <aside className={cx(fr.cx("fr-px-6w", "fr-py-8w"), componentName)}>
+    <aside
+      className={cx(fr.cx("fr-px-6w", "fr-py-8w"), componentName)}
+      aria-label="Prérequis au formulaire de demande de convention"
+    >
       <div className={`${componentName}__content`}>
         <h2 className={cx(cx(fr.cx("fr-h4"), `${componentName}__title`))}>
           Avant de commencer !

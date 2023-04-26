@@ -240,7 +240,8 @@ export const ImmersionConditionsCommonFields = ({
       />
 
       <Input
-        {...formContents["sanitaryPreventionDescription"]}
+        label={formContents["sanitaryPreventionDescription"].label}
+        hintText={formContents["sanitaryPreventionDescription"].hintText}
         nativeInputProps={{
           ...formContents["sanitaryPreventionDescription"],
           ...register("sanitaryPreventionDescription"),
@@ -287,7 +288,8 @@ export const ImmersionConditionsCommonFields = ({
         initialFieldValue={values.immersionAppellation}
       />
       <Input
-        {...formContents["workConditions"]}
+        label={formContents["workConditions"].label}
+        hintText={formContents["workConditions"].hintText}
         textArea
         nativeTextAreaProps={{
           ...formContents["workConditions"],
@@ -296,7 +298,8 @@ export const ImmersionConditionsCommonFields = ({
         disabled={disabled}
       />
       <Input
-        {...formContents["businessAdvantages"]}
+        label={formContents["businessAdvantages"].label}
+        hintText={formContents["businessAdvantages"].hintText}
         textArea
         nativeTextAreaProps={{
           ...formContents["businessAdvantages"],
@@ -305,7 +308,8 @@ export const ImmersionConditionsCommonFields = ({
         disabled={disabled}
       />
       <Input
-        {...formContents["immersionActivities"]}
+        label={formContents["immersionActivities"].label}
+        hintText={formContents["immersionActivities"].hintText}
         textArea
         nativeTextAreaProps={{
           ...formContents["immersionActivities"],
@@ -328,7 +332,8 @@ export const ImmersionConditionsCommonFields = ({
         />
       )}
       <Input
-        {...formContents["immersionSkills"]}
+        label={formContents["immersionSkills"].label}
+        hintText={formContents["immersionSkills"].hintText}
         nativeInputProps={{
           ...formContents["immersionSkills"],
           ...register("immersionSkills"),

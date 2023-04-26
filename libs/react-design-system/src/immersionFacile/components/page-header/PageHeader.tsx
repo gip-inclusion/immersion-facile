@@ -32,6 +32,8 @@ export const PageHeader = ({
         ` ${className ?? ""}`,
         classes.root,
       )}
+      role="region"
+      aria-label="En-tête de page"
     >
       <div className={cx(fr.cx("fr-container"), Styles.inner, classes.inner)}>
         <h1

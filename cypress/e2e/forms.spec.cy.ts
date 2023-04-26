@@ -13,7 +13,11 @@ import {
 } from "shared";
 import { addDays, format } from "date-fns";
 
-import { cypressDoIfElementExists, fillSelectRandomly } from "../utils";
+import {
+  cypressDoIfElementExists,
+  disableNewUrlLog,
+  fillSelectRandomly,
+} from "../utils";
 
 const getIdFromConventionDTO = (field: DotNestedKeys<ConventionDto>) =>
   `#${cleanStringToHTMLAttribute(getConventionFieldName(field))}`;
@@ -21,8 +25,10 @@ const getIdFromConventionDTO = (field: DotNestedKeys<ConventionDto>) =>
 describe("Convention Form (on dev http, prefilled forms false)", () => {
   const conventionFormUrl = `${frontRoutes.conventionImmersionRoute}`;
   const baseApiRoute = "/api/";
-
-  it.skip("can submit form with basic infos", () => {
+  beforeEach(() => {
+    disableNewUrlLog();
+  });
+  it("can submit form with basic infos", () => {
     cy.intercept("GET", `${baseApiRoute}${featureFlagsRoute}`).as(
       "featureFlagsRequest",
     );

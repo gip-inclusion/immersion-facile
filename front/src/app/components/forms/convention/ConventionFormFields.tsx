@@ -110,7 +110,6 @@ export const ConventionFormFields = ({
         />
       )}
 
-      <input type="hidden" {...formContents.agencyId} />
       <BeneficiaryFormSection
         isFrozen={isFrozen}
         internshipKind={conventionValues.internshipKind}
