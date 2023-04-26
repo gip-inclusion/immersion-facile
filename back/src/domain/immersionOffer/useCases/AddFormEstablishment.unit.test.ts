@@ -69,9 +69,7 @@ describe("Add FormEstablishment", () => {
       .withMaxContactsPerWeek(9)
       .build();
 
-    expect(await addFormEstablishment.execute(formEstablishment)).toEqual(
-      formEstablishment.siret,
-    );
+    await addFormEstablishment.execute(formEstablishment);
 
     const storedInRepo = await formEstablishmentRepo.getAll();
     expect(storedInRepo).toHaveLength(1);
@@ -112,11 +110,9 @@ describe("Add FormEstablishment", () => {
       .withAppellations([correctAppellationDto])
       .build();
 
-    expect(
-      await addFormEstablishment.execute(
-        formEstablishmentWithWeirdAppellationDto,
-      ),
-    ).toEqual(formEstablishmentWithWeirdAppellationDto.siret);
+    await addFormEstablishment.execute(
+      formEstablishmentWithWeirdAppellationDto,
+    );
 
     const storedInRepo = await formEstablishmentRepo.getAll();
     expect(storedInRepo).toHaveLength(1);
@@ -192,9 +188,8 @@ describe("Add FormEstablishment", () => {
           isOpen: true,
         });
 
-        const response = await addFormEstablishment.execute(formEstablishment);
+        await addFormEstablishment.execute(formEstablishment);
 
-        expect(response).toBe(formEstablishment.siret);
         expect(outboxRepo.events).toHaveLength(1);
         expectObjectsToMatch(outboxRepo.events[0], {
           topic: "FormEstablishmentAdded",
@@ -218,10 +213,9 @@ describe("Add FormEstablishment", () => {
     it("accepts formEstablishment with SIRETs that  correspond to active businesses", async () => {
       const sirenRawEstablishment = new SirenEstablishmentDtoBuilder().build();
       sirenGateway.setSirenEstablishment(sirenRawEstablishment);
-
-      expect(await addFormEstablishment.execute(formEstablishment)).toBe(
-        formEstablishment.siret,
-      );
+      await addFormEstablishment.execute(formEstablishment);
+      expect(outboxRepo.events).toHaveLength(1);
+      expect(await formEstablishmentRepo.getAll()).toHaveLength(1);
     });
 
     it("Throws errors when the SIRET endpoint throws erorrs", async () => {

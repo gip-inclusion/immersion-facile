@@ -1,8 +1,4 @@
-import {
-  FormEstablishmentDto,
-  formEstablishmentSchema,
-  SiretDto,
-} from "shared";
+import { FormEstablishmentDto, formEstablishmentSchema } from "shared";
 import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
@@ -12,7 +8,7 @@ import { rejectsSiretIfNotAnOpenCompany } from "../../sirene/rejectsSiretIfNotAn
 
 export class AddFormEstablishment extends TransactionalUseCase<
   FormEstablishmentDto,
-  SiretDto
+  void
 > {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
@@ -27,7 +23,7 @@ export class AddFormEstablishment extends TransactionalUseCase<
   public async _execute(
     dto: FormEstablishmentDto,
     uow: UnitOfWork,
-  ): Promise<SiretDto> {
+  ): Promise<void> {
     const featureFlags = await uow.featureFlagRepository.getAll();
 
     const existingFormEstablishment =
@@ -62,7 +58,5 @@ export class AddFormEstablishment extends TransactionalUseCase<
       uow.formEstablishmentRepository.create(correctFormEstablishement),
       uow.outboxRepository.save(event),
     ]);
-
-    return dto.siret;
   }
 }
