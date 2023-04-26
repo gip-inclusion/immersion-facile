@@ -23,7 +23,7 @@ import { InMemoryImmersionAssessmentRepository } from "../../secondary/InMemoryI
 import { InMemoryInclusionConnectedUserRepository } from "../../secondary/InMemoryInclusionConnectedUserRepository";
 import { InMemoryOngoingOAuthRepository } from "../../secondary/InMemoryOngoingOAuthRepository";
 import { InMemoryRomeRepository } from "../../secondary/InMemoryRomeRepository";
-import { InMemoryShortLinkQuery } from "../../secondary/InMemoryShortLinkQuery";
+import { InMemoryShortLinkRepository } from "../../secondary/InMemoryShortLinkRepository";
 import { InMemoryUowPerformer } from "../../secondary/InMemoryUowPerformer";
 import { PgAgencyRepository } from "../../secondary/pg/PgAgencyRepository";
 import { PgApiConsumerRepository } from "../../secondary/pg/PgApiConsumerRepository";
@@ -46,7 +46,7 @@ import { PgOutboxRepository } from "../../secondary/pg/PgOutboxRepository";
 import { PgPostalCodeDepartmentRegionQueries } from "../../secondary/pg/PgPostalCodeDepartmentRegionQueries";
 import { PgRomeRepository } from "../../secondary/pg/PgRomeRepository";
 import { PgSearchMadeRepository } from "../../secondary/pg/PgSearchMadeRepository";
-import { PgShortLinkQuery } from "../../secondary/pg/PgShortLinkQuery";
+import { PgShortLinkRepository } from "../../secondary/pg/PgShortLinkRepository";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { stubPostalCodeDepartmentRegionQueries } from "../../secondary/StubPostalCodeDepartmentRegionQueries";
 import { AppConfig } from "./appConfig";
@@ -59,6 +59,7 @@ export const createInMemoryUow = () => {
   const outboxQueries = new InMemoryOutboxQueries(outboxRepository);
   const conventionRepository = new InMemoryConventionRepository();
   const authenticatedUserRepository = new InMemoryAuthenticatedUserRepository();
+  const shortLinkRepository = new InMemoryShortLinkRepository();
 
   return {
     agencyRepository: new InMemoryAgencyRepository(),
@@ -88,41 +89,46 @@ export const createInMemoryUow = () => {
     postalCodeDepartmentRegionQueries: stubPostalCodeDepartmentRegionQueries,
     romeRepository: new InMemoryRomeRepository(),
     searchMadeRepository: new InMemorySearchMadeRepository(),
-    shortLinkQuery: new InMemoryShortLinkQuery(),
+    shortLinkQuery: shortLinkRepository,
+    shortLinkRepository,
   } satisfies UnitOfWork;
 };
 
-export const createPgUow = (client: PoolClient): UnitOfWork => ({
-  agencyRepository: new PgAgencyRepository(client),
-  apiConsumerRepository: new PgApiConsumerRepository(client),
-  authenticatedUserRepository: new PgAuthenticatedUserRepository(client),
-  conventionRepository: new PgConventionRepository(client),
-  conventionQueries: new PgConventionQueries(client),
-  conventionPoleEmploiAdvisorRepository:
-    new PgConventionPoleEmploiAdvisorRepository(client),
-  discussionAggregateRepository: new PgDiscussionAggregateRepository(client),
-  establishmentAggregateRepository: new PgEstablishmentAggregateRepository(
-    client,
-  ),
-  establishmentGroupRepository: new PgEstablishmentGroupRepository(client),
-  exportQueries: new PgExportQueries(client),
-  featureFlagRepository: new PgFeatureFlagRepository(client),
-  formEstablishmentRepository: new PgFormEstablishmentRepository(client),
-  immersionAssessmentRepository: new PgImmersionAssessmentRepository(client),
-  inclusionConnectedUserRepository: new PgInclusionConnectedUserRepository(
-    client,
-  ),
-  laBonneBoiteRequestRepository: new PgLaBonneBoiteRequestRepository(client),
-  ongoingOAuthRepository: new PgOngoingOAuthRepository(client),
-  outboxRepository: new PgOutboxRepository(client),
-  outboxQueries: new PgOutboxQueries(client),
-  postalCodeDepartmentRegionQueries: new PgPostalCodeDepartmentRegionQueries(
-    client,
-  ),
-  romeRepository: new PgRomeRepository(client),
-  searchMadeRepository: new PgSearchMadeRepository(client),
-  shortLinkQuery: new PgShortLinkQuery(),
-});
+export const createPgUow = (client: PoolClient): UnitOfWork => {
+  const shortLinkRepository = new PgShortLinkRepository();
+  return {
+    agencyRepository: new PgAgencyRepository(client),
+    apiConsumerRepository: new PgApiConsumerRepository(client),
+    authenticatedUserRepository: new PgAuthenticatedUserRepository(client),
+    conventionRepository: new PgConventionRepository(client),
+    conventionQueries: new PgConventionQueries(client),
+    conventionPoleEmploiAdvisorRepository:
+      new PgConventionPoleEmploiAdvisorRepository(client),
+    discussionAggregateRepository: new PgDiscussionAggregateRepository(client),
+    establishmentAggregateRepository: new PgEstablishmentAggregateRepository(
+      client,
+    ),
+    establishmentGroupRepository: new PgEstablishmentGroupRepository(client),
+    exportQueries: new PgExportQueries(client),
+    featureFlagRepository: new PgFeatureFlagRepository(client),
+    formEstablishmentRepository: new PgFormEstablishmentRepository(client),
+    immersionAssessmentRepository: new PgImmersionAssessmentRepository(client),
+    inclusionConnectedUserRepository: new PgInclusionConnectedUserRepository(
+      client,
+    ),
+    laBonneBoiteRequestRepository: new PgLaBonneBoiteRequestRepository(client),
+    ongoingOAuthRepository: new PgOngoingOAuthRepository(client),
+    outboxRepository: new PgOutboxRepository(client),
+    outboxQueries: new PgOutboxQueries(client),
+    postalCodeDepartmentRegionQueries: new PgPostalCodeDepartmentRegionQueries(
+      client,
+    ),
+    romeRepository: new PgRomeRepository(client),
+    searchMadeRepository: new PgSearchMadeRepository(client),
+    shortLinkRepository,
+    shortLinkQuery: shortLinkRepository,
+  };
+};
 
 export const createUowPerformer = (
   config: AppConfig,

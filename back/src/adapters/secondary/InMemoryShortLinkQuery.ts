@@ -18,5 +18,9 @@ export class InMemoryShortLinkQuery implements ShortLinkQuery {
     this.shortLinks = shortLinks;
   }
 
-  private shortLinks: Partial<Record<ShortLinkId, AbsoluteUrl>> = {};
+  public getShortLinks(): Partial<Record<ShortLinkId, AbsoluteUrl>> {
+    return this.shortLinks;
+  }
+
+  protected shortLinks: Partial<Record<ShortLinkId, AbsoluteUrl>> = {};
 }

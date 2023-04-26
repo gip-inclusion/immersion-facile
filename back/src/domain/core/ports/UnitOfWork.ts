@@ -20,6 +20,7 @@ import { FeatureFlagRepository } from "./FeatureFlagRepository";
 import { OutboxQueries } from "./OutboxQueries";
 import { OutboxRepository } from "./OutboxRepository";
 import { ShortLinkQuery } from "./ShortLinkQuery";
+import { ShortLinkRepository } from "./ShortLinkRepository";
 
 export type UnitOfWork = {
   conventionPoleEmploiAdvisorRepository: ConventionPoleEmploiAdvisorRepository;
@@ -44,6 +45,7 @@ export type UnitOfWork = {
   authenticatedUserRepository: AuthenticatedUserRepository;
   ongoingOAuthRepository: OngoingOAuthRepository;
   shortLinkQuery: ShortLinkQuery;
+  shortLinkRepository: ShortLinkRepository;
 };
 
 export interface UnitOfWorkPerformer {
