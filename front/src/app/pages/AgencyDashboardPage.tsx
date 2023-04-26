@@ -47,7 +47,6 @@ export const AgencyDashboardPage = () => {
       {match({ currentUser, feedback })
         .with(
           {
-            currentUser: null,
             feedback: {
               kind: "idle",
             },
@@ -124,7 +123,13 @@ export const AgencyDashboardPage = () => {
             />
           ),
         )
-        .run()}
+        .with(
+          { feedback: { kind: "errored", errorMessage: P.select() } },
+          (errorMessage) => (
+            <Alert severity="error" title="Erreur" description={errorMessage} />
+          ),
+        )
+        .otherwise(() => null)}
 
       {feedback.kind === "errored" && (
         <SubmitFeedbackNotification
