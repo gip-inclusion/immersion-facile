@@ -3,6 +3,9 @@
   "editor.insertSpaces": true,
   "editor.detectIndentation": false,
   "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true
+  },
   "terminal.integrated.scrollback": 100000,
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
