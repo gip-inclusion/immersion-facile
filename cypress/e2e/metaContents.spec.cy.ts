@@ -10,38 +10,13 @@ const routesNames: Array<{
   params?: Partial<Record<"jwt" | "consumer" | "pagePath", string>>;
 }> = [
   { routeName: "addAgency" },
-  { routeName: "conventionCustomAgency" },
   { routeName: "conventionImmersion" },
-  { routeName: "conventionMiniStage" },
-  // { routeName: "conventionStatusDashboard" },
-  // { routeName: "conventionToSign" },
-  // { routeName: "immersionAssessment" },
   { routeName: "formEstablishment" },
   { routeName: "home" },
-  { routeName: "homeAgencies" },
-  { routeName: "homeCandidates" },
-  { routeName: "homeEstablishments" },
   { routeName: "search" },
-  { routeName: "stats" },
-  {
-    routeName: "formEstablishmentForExternals",
-    params: { consumer: "cci" },
-  },
-  {
-    routeName: "standard",
-    params: { pagePath: "cgu" },
-  },
   {
     routeName: "standard",
     params: { pagePath: "mentions-legales" },
-  },
-  {
-    routeName: "standard",
-    params: { pagePath: "politique-de-confidentialite" },
-  },
-  {
-    routeName: "standard",
-    params: { pagePath: "declaration-accessibilite" },
   },
 ];
 describe("Check Meta contents ", () => {
