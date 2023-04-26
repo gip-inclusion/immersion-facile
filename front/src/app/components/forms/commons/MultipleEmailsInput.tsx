@@ -122,6 +122,12 @@ const InputContainer = ({
         <div className={fr.cx("fr-col")}>
           <input
             id={cleanStringToHTMLAttribute(name)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.preventDefault();
+                event.currentTarget.blur();
+              }
+            }}
             value={value}
             type="text"
             name={name}
