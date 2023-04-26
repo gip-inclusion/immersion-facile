@@ -4,7 +4,6 @@ import {
   FormEstablishmentDto,
   isSiretExistResponseSchema,
   SiretDto,
-  siretSchema,
 } from "shared";
 import { HttpClient } from "http-client";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
@@ -14,11 +13,10 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
 
   public async addFormEstablishment(
     establishment: FormEstablishmentDto,
-  ): Promise<SiretDto> {
-    const response = await this.httpClient.addFormEstablishment({
+  ): Promise<void> {
+    await this.httpClient.addFormEstablishment({
       body: establishment,
     });
-    return siretSchema.parse(response.responseBody);
   }
 
   public async isEstablishmentAlreadyRegisteredBySiret(

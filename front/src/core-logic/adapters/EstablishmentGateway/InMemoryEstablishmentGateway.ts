@@ -19,13 +19,12 @@ export class InMemoryEstablishmentGateway implements EstablishmentGateway {
 
   public async addFormEstablishment(
     immersionOffer: FormEstablishmentDto,
-  ): Promise<SiretDto> {
+  ): Promise<void> {
     //eslint-disable-next-line no-console
     console.log("addFormEstablishment", immersionOffer);
     await sleep(2000);
     if (immersionOffer.businessName === "givemeanerrorplease")
       throw new Error("418 I'm a teapot");
-    return immersionOffer.siret;
   }
 
   public async isEstablishmentAlreadyRegisteredBySiret(
