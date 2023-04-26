@@ -44,7 +44,11 @@ export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
         if (!req.apiConsumer?.isAuthorized) throw new ForbiddenError();
 
         return pipeWithValue(
-          validateAndParseZodSchema(formEstablishmentPublicV1Schema, req.body),
+          validateAndParseZodSchema(
+            formEstablishmentPublicV1Schema,
+            req.body,
+            logger,
+          ),
           formEstablishmentDtoPublicV1ToDomain,
           (domainFormEstablishmentWithoutSource) =>
             deps.useCases.addFormEstablishment.execute({
@@ -94,7 +98,11 @@ export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
     sendHttpResponse(req, res, () => {
       if (!req.apiConsumer?.isAuthorized) throw new ForbiddenError();
       return pipeWithValue(
-        validateAndParseZodSchema(contactEstablishmentPublicV1Schema, req.body),
+        validateAndParseZodSchema(
+          contactEstablishmentPublicV1Schema,
+          req.body,
+          logger,
+        ),
         contactEstablishmentPublicV1ToDomain,
         (contactRequest) =>
           deps.useCases.contactEstablishment.execute(contactRequest),

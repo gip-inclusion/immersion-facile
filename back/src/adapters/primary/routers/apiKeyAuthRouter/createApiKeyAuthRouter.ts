@@ -73,10 +73,14 @@ export const createApiKeyAuthRouter = (deps: AppDependencies) => {
         if (!req.apiConsumer?.isAuthorized) throw new ForbiddenError();
 
         return pipeWithValue(
-          validateAndParseZodSchema(formEstablishmentSchemaPublicV0, {
-            ...req.body,
-            isSearchable: true,
-          }),
+          validateAndParseZodSchema(
+            formEstablishmentSchemaPublicV0,
+            {
+              ...req.body,
+              isSearchable: true,
+            },
+            logger,
+          ),
           formEstablishmentDtoPublicV0ToDomain,
           (domainFormEstablishmentWithoutSource) =>
             deps.useCases.addFormEstablishment.execute({

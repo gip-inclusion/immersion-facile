@@ -245,27 +245,31 @@ const entityToPgArray = (agency: Partial<AgencyDto>): any[] => [
 export const persistenceAgencyToAgencyDto = (
   params: PersistenceAgency,
 ): AgencyDto =>
-  validateAndParseZodSchema(agencySchema, {
-    address: {
-      streetNumberAndAddress: params.street_number_and_address,
-      postcode: params.post_code,
-      departmentCode: params.department_code,
-      city: params.city,
+  validateAndParseZodSchema(
+    agencySchema,
+    {
+      address: {
+        streetNumberAndAddress: params.street_number_and_address,
+        postcode: params.post_code,
+        departmentCode: params.department_code,
+        city: params.city,
+      },
+      adminEmails: params.admin_emails,
+      agencySiret: optional(params.agency_siret),
+      codeSafir: optional(params.code_safir),
+      counsellorEmails: params.counsellor_emails,
+      id: params.id,
+      kind: params.kind,
+      logoUrl: optional(params.logo_url),
+      name: params.name,
+      position: parseGeoJson(params.position),
+      questionnaireUrl: params.questionnaire_url,
+      signature: params.email_signature,
+      status: params.status,
+      validatorEmails: params.validator_emails,
     },
-    adminEmails: params.admin_emails,
-    agencySiret: optional(params.agency_siret),
-    codeSafir: optional(params.code_safir),
-    counsellorEmails: params.counsellor_emails,
-    id: params.id,
-    kind: params.kind,
-    logoUrl: optional(params.logo_url),
-    name: params.name,
-    position: parseGeoJson(params.position),
-    questionnaireUrl: params.questionnaire_url,
-    signature: params.email_signature,
-    status: params.status,
-    validatorEmails: params.validator_emails,
-  });
+    logger,
+  );
 
 export const parseGeoJson = (raw: string): GeoPositionDto => {
   const json = JSON.parse(raw);

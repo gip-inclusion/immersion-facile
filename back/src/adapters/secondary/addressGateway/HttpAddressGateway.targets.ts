@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { OpenCageGeoSearchKey } from "shared";
 import { createTarget, createTargets } from "http-client";
+import { createLogger } from "../../../utils/logger";
 import { validateAndParseZodSchema } from "../../primary/helpers/httpErrors";
 import { GeoCodingQueryParams } from "./HttpAddressGateway.dto";
 import {
@@ -46,6 +47,8 @@ const geoSearchHeadersSchema: z.Schema<GeoSearchHeaders> = z.object({
 
 const openCageDataBaseUrl = "https://api.opencagedata.com" as const;
 
+const logger = createLogger(__filename);
+
 export type AddressesTargets = typeof addressesExternalTargets;
 export const addressesExternalTargets = createTargets({
   geocoding: createTarget({
@@ -56,6 +59,7 @@ export const addressesExternalTargets = createTargets({
       validateAndParseZodSchema(
         openCageDataFeatureCollectionSchema,
         responseBody,
+        logger,
       ),
   }),
   geosearch: createTarget({
@@ -67,6 +71,7 @@ export const addressesExternalTargets = createTargets({
       validateAndParseZodSchema(
         openCageDataSearchResultCollectionSchema,
         responseBody,
+        logger,
       ),
   }),
 });

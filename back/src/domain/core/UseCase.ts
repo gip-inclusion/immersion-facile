@@ -40,7 +40,7 @@ export abstract class UseCase<
     const useCaseName = this.constructor.name;
     let validParams: Input;
     try {
-      validParams = validateAndParseZodSchema(this.inputSchema, params);
+      validParams = validateAndParseZodSchema(this.inputSchema, params, logger);
     } catch (e) {
       throw new BadRequestError(e);
     }
@@ -76,7 +76,11 @@ export abstract class TransactionalUseCase<
   ): Promise<Output> {
     const startDate = new Date();
     const useCaseName = this.constructor.name;
-    const validParams = validateAndParseZodSchema(this.inputSchema, params);
+    const validParams = validateAndParseZodSchema(
+      this.inputSchema,
+      params,
+      logger,
+    );
     const paramsHash = createParamsHash(useCaseName, validParams);
 
     try {

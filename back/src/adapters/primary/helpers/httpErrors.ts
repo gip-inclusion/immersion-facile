@@ -1,3 +1,4 @@
+import { Logger } from "pino";
 import { z } from "zod";
 
 export abstract class HttpError extends Error {
@@ -86,12 +87,12 @@ export class UnavailableApiError extends HttpError {
 export const validateAndParseZodSchema = <T>(
   inputSchema: z.Schema<T>,
   params: any,
+  logger: Logger,
 ): T => {
   try {
     return inputSchema.parse(params);
   } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error("ValidateAndParseZodSchema failed with: ", params);
+    logger.error("ValidateAndParseZodSchema failed with: ", params);
     throw new BadRequestError(e);
   }
 };

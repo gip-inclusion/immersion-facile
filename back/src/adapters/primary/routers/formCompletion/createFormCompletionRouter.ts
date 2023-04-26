@@ -6,9 +6,12 @@ import {
   romeRoute,
   siretRoute,
 } from "shared";
+import { createLogger } from "../../../../utils/logger";
 import type { AppDependencies } from "../../config/createAppDependencies";
 import { validateAndParseZodSchema } from "../../helpers/httpErrors";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
+
+const logger = createLogger(__filename);
 
 export const createFormCompletionRouter = (deps: AppDependencies) => {
   const formCompletionRouter = Router();
@@ -26,6 +29,7 @@ export const createFormCompletionRouter = (deps: AppDependencies) => {
       const query = validateAndParseZodSchema(
         romeAutocompleteInputSchema,
         req.query,
+        logger,
       );
       return deps.useCases.romeSearch.execute(query.searchText);
     }),

@@ -1,4 +1,5 @@
 import { createTarget, createTargets } from "http-client";
+import { createLogger } from "../../../utils/logger";
 import { validateAndParseZodSchema } from "../../primary/helpers/httpErrors";
 import {
   sendTransactEmailHeaderSchema,
@@ -9,6 +10,7 @@ import {
 export type SendinblueHtmlEmailGatewayTargets =
   typeof sendinblueHtmlEmailGatewayTargets;
 
+const logger = createLogger(__filename);
 export const sendinblueHtmlEmailGatewayTargets = createTargets({
   sendTransactEmail: createTarget({
     method: "POST",
@@ -16,6 +18,10 @@ export const sendinblueHtmlEmailGatewayTargets = createTargets({
     validateHeaders: sendTransactEmailHeaderSchema.parse,
     validateRequestBody: sendTransactEmailRequestBodySchema.parse,
     validateResponseBody: (responseBody) =>
-      validateAndParseZodSchema(sendTransactEmailResponseSchema, responseBody),
+      validateAndParseZodSchema(
+        sendTransactEmailResponseSchema,
+        responseBody,
+        logger,
+      ),
   }),
 });
