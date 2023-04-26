@@ -36,7 +36,7 @@ jobs:
                 echo '> Create a Table of content for restore, ignore postgis related schemas and tables:' &&
                   pg_restore -l dump.pgsql | grep -v tiger | grep -v spatial_ref_sys | grep -v topology > list.txt &&
                 echo '> Dropping data and schema owned by current user' &&
-                  psql \$SCALINGO_POSTGRESQL_URL -c 'DROP OWNED BY CURRENT_USER CASCADE;'
+                  psql \$SCALINGO_POSTGRESQL_URL -c 'DROP OWNED BY CURRENT_USER CASCADE;' &&
                 echo '> Add Postgis extension if not exists' &&
                   psql \$SCALINGO_POSTGRESQL_URL -c 'CREATE EXTENSION IF NOT EXISTS postgis;' &&
                 echo '> Start pg_restore' &&\
