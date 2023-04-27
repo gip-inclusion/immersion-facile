@@ -35,6 +35,7 @@ import {
   standardPageSlugs,
 } from "./route-params";
 import { routes, useRoute } from "./routes";
+import { ConventionSubmitedConfirmationPage } from "../pages/convention/ConventionSubmitedConfirmationPage";
 
 type Routes = typeof routes;
 
@@ -68,6 +69,7 @@ const getPageByRouteName: {
   conventionStatusDashboard: (route) => (
     <ConventionStatusDashboardPage route={route} />
   ),
+  conventionSubmited: (route) => <ConventionSubmitedConfirmationPage route={route}/>,
   conventionToSign: (route) => <ConventionSignPage route={route} />,
   debugPopulateDB: () => undefined,
   editFormEstablishment: (route) => (

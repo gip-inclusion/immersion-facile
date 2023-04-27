@@ -31,6 +31,7 @@ import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/Sh
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
+import { routes } from "src/app/routes/routes";
 
 const useClearConventionSubmitFeedbackOnUnmount = () => {
   const dispatch = useDispatch();
@@ -153,6 +154,7 @@ export const ConventionForm = ({
       workConditions: undefinedIfEmptyString(values.workConditions),
     } as ConventionDto;
     dispatch(conventionSlice.actions.saveConventionRequested(conventionToSave));
+    routes.conventionSubmited({ conventionId: conventionToSave.id }).push();
   };
   const reduxFormUiReady =
     useWaitForReduxFormUiReadyBeforeFormikInitialisation(initialValues);

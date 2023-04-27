@@ -18,7 +18,6 @@ const cellStyles = {
 export const ConventionValidationDetails = ({
   convention,
 }: ConventionValidationProps) => {
-  const copyButton = useRef<HTMLButtonElement>(null);
   const [isCopied, setIsCopied] = useState(false);
   const onCopyButtonClick = () => {
     navigator.clipboard
@@ -42,7 +41,6 @@ export const ConventionValidationDetails = ({
         </span>
         <button
           disabled={isCopied}
-          ref={copyButton}
           onClick={onCopyButtonClick}
           className={fr.cx(
             "fr-btn",
