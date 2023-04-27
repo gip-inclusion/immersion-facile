@@ -1,0 +1,15 @@
+$bp-sm: 32rem;
+$bp-md: 48rem;
+$bp-lg: 62rem;
+
+@mixin for-screen-min($size) {
+  @media (min-width: #{$size}) {
+    @content;
+  }
+}
+
+@mixin for-print() {
+  @media print {
+    @content;
+  }
+}

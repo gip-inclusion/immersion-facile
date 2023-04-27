@@ -1,0 +1,36 @@
+@import "./responsive";
+
+.im-section-convention-next-steps {
+  $section: &;
+  &__col {
+    &:first-of-type {
+      #{$section}__illustration {
+        padding-top: 0;
+        @include for-screen-min($bp-md) {
+          padding-top: 4rem;
+        }
+      }
+    }
+  }
+  &__illustration {
+    max-width: 8rem;
+    max-height: 8rem;
+    height: 100%;
+    width: 100%;
+  }
+  &__illustration-wrapper {
+    display: flex;
+    height: 8rem;
+    align-items: end;
+    justify-content: center;
+    &--left {
+      justify-content: flex-start;
+    }
+  }
+  &__title {
+    text-align: center;
+  }
+  &-selector {
+    text-emphasis: none;
+  }
+}

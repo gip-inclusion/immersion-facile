@@ -8,7 +8,11 @@
   "author": "",
   "license": "ISC",
   "bin": {
-    "scss-to-ts": "./bin/cli.js"
+    "scss-to-ts": "./dist/bin/cli.js"
+  },
+  "scripts": {
+    "test": "jest --testRegex=.unit.test.ts",
+    "build": "tsc"
   },
   "dependencies": {
     "camelcase": "^7.0.1",
@@ -17,5 +21,21 @@
     "path": "^0.12.7",
     "sass": "^1.55.0",
     "string-extract-class-names": "6.1.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.12",
+    "@babel/preset-env": "^7.16.11",
+    "@babel/preset-typescript": "^7.18.6",
+    "@types/jest": "^27.4.1",
+    "@types/node": "^16.18.12",
+    "@types/ramda": "^0.28.1",
+    "babel-jest": "^27.5.1",
+    "jest": "^27.5.1",
+    "jest-environment-node-single-context": "^27.0.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.5"
+  },
+  "jest": {
+    "testEnvironment": "jest-environment-node-single-context"
   }
 }

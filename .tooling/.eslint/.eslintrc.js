@@ -5,6 +5,7 @@ const projects = [
   "./../../libs/react-design-system/tsconfig.json",
   "./../../libs/html-templates/tsconfig.json",
   "./../../libs/http-client/tsconfig.json",
+  "./../../libs/scss-mapper/tsconfig.json",
   "./../../cypress/tsconfig.json",
 ];
 

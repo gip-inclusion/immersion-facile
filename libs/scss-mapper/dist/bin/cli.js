@@ -1,7 +1,6 @@
 #! /usr/bin/env node
-import { processScssFiles } from "../index.js";
 import { program } from "commander";
-
+import { processScssFiles } from "../index.js";
 program
   .command("update")
   .description("Create a .styles.ts for scss files in the folder")
