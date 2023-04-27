@@ -15,12 +15,16 @@ import {
   Signatory,
   TemplatedEmail,
 } from "shared";
+import { AppConfig } from "../adapters/primary/config/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../adapters/primary/config/magicLinkUrl";
+import {
+  makeShortLinkUrl,
+  ShortLinkId,
+} from "../domain/core/ports/ShortLinkQuery";
 import { TimeGateway } from "../domain/core/ports/TimeGateway";
 import { ContactEntity } from "../domain/immersionOffer/entities/ContactEntity";
 import { EstablishmentEntity } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import { AnnotatedImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
-import { fakeGenerateMagicLinkUrlFn } from "./jwtTestHelper";
 
 // TODO: we should use hardcoded values instead of relying on the getValidatedConventionFinalConfirmationParams
 export const getValidatedConventionFinalConfirmationParams = (
@@ -70,31 +74,28 @@ export const expectEmailSignatoryConfirmationSignatureRequestMatchingConvention 
     convention,
     signatory,
     recipient,
-    now,
     agency,
+    conventionStatusLinkId,
+    convetionToSignLinkId,
+    config,
   }: {
+    config: AppConfig;
     templatedEmail: TemplatedEmail;
     convention: ConventionDto;
     signatory: Signatory;
     recipient: string;
     now: Date;
     agency: AgencyDto;
+    convetionToSignLinkId: ShortLinkId;
+    conventionStatusLinkId: ShortLinkId;
   }) => {
-    const { id, businessName } = convention;
+    const { businessName } = convention;
     const {
       beneficiary,
       establishmentRepresentative,
       beneficiaryRepresentative,
       beneficiaryCurrentEmployer,
     } = convention.signatories;
-
-    const generateMagicLinkCommonFields: CreateConventionMagicLinkPayloadProperties =
-      {
-        id,
-        role: signatory.role,
-        email: signatory.email,
-        now,
-      };
 
     expectTypeToMatchAndEqual(templatedEmail, {
       type: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
@@ -111,14 +112,8 @@ export const expectEmailSignatoryConfirmationSignatureRequestMatchingConvention 
         beneficiaryCurrentEmployerName:
           beneficiaryCurrentEmployer &&
           `${beneficiaryCurrentEmployer.firstName} ${beneficiaryCurrentEmployer.lastName}`,
-        magicLink: fakeGenerateMagicLinkUrlFn({
-          ...generateMagicLinkCommonFields,
-          targetRoute: frontRoutes.conventionToSign,
-        }),
-        conventionStatusLink: fakeGenerateMagicLinkUrlFn({
-          ...generateMagicLinkCommonFields,
-          targetRoute: frontRoutes.conventionStatusDashboard,
-        }),
+        magicLink: makeShortLinkUrl(config, convetionToSignLinkId),
+        conventionStatusLink: makeShortLinkUrl(config, conventionStatusLinkId),
         businessName,
         agencyLogoUrl: agency.logoUrl,
       },

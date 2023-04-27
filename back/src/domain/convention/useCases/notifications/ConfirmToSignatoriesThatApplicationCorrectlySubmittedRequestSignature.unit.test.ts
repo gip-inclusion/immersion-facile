@@ -1,28 +1,40 @@
-import { AgencyDto, ConventionDto, ConventionDtoBuilder } from "shared";
+import {
+  AgencyDto,
+  ConventionDto,
+  ConventionDtoBuilder,
+  expectToEqual,
+  frontRoutes,
+} from "shared";
+import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { expectEmailSignatoryConfirmationSignatureRequestMatchingConvention } from "../../../../_testBuilders/emailAssertions";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
-import {
-  createInMemoryUow,
-  InMemoryUnitOfWork,
-} from "../../../../adapters/primary/config/uowConfig";
+import { AppConfig } from "../../../../adapters/primary/config/appConfig";
+import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
+import { InMemoryShortLinkQuery } from "../../../../adapters/secondary/InMemoryShortLinkQuery";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+import { DeterministShortLinkGenerator } from "../../../../adapters/secondary/shortLinkGenerator/DeterministShortLinkGenerator";
+import { ShortLinkId } from "../../../core/ports/ShortLinkQuery";
 import { ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature } from "./ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature";
 
 describe("Add Convention Notifications", () => {
-  let confirmSignatoryConventionCorrectlySubmitted: ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature;
+  let useCase: ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature;
   let emailGw: InMemoryEmailGateway;
   let timeGateway: CustomTimeGateway;
-  let uow: InMemoryUnitOfWork;
   let validConvention: ConventionDto;
   let agency: AgencyDto;
+  let shortLinkQuery: InMemoryShortLinkQuery;
+  let config: AppConfig;
+  let shortLinkGenerator: DeterministShortLinkGenerator;
 
   beforeEach(() => {
+    config = new AppConfigBuilder({}).build();
     emailGw = new InMemoryEmailGateway();
-    timeGateway = new CustomTimeGateway();
-    uow = createInMemoryUow();
+    timeGateway = new CustomTimeGateway(new Date());
+    const uow = createInMemoryUow();
     agency = uow.agencyRepository.agencies[0];
+    shortLinkQuery = uow.shortLinkQuery;
     validConvention = new ConventionDtoBuilder()
       .withBeneficiaryRepresentative({
         firstName: "Tom",
@@ -33,21 +45,75 @@ describe("Add Convention Notifications", () => {
       })
       .withAgencyId(agency.id)
       .build();
-
-    confirmSignatoryConventionCorrectlySubmitted =
+    shortLinkGenerator = new DeterministShortLinkGenerator();
+    useCase =
       new ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature(
         new InMemoryUowPerformer(uow),
         emailGw,
-        fakeGenerateMagicLinkUrlFn,
         timeGateway,
+        shortLinkGenerator,
+        fakeGenerateMagicLinkUrlFn,
+        config,
       );
   });
 
   it("Sends confirmation email to all signatories", async () => {
-    const now = new Date();
-    timeGateway.setNextDate(now);
-    const agency = uow.agencyRepository.agencies[0];
-    await confirmSignatoryConventionCorrectlySubmitted.execute(validConvention);
+    const deterministicShortLinks: ShortLinkId[] = [
+      "shortLink1",
+      "shortLink2",
+      "shortLink3",
+      "shortLink4",
+      "shortLink5",
+      "shortLink6",
+    ];
+    shortLinkGenerator.addMoreShortLinkIds(deterministicShortLinks);
+
+    await useCase.execute(validConvention);
+
+    expectToEqual(shortLinkQuery.getShortLinks(), {
+      [deterministicShortLinks[0]]: fakeGenerateMagicLinkUrlFn({
+        id: validConvention.id,
+        role: validConvention.signatories.beneficiary.role,
+        email: validConvention.signatories.beneficiary.email,
+        now: timeGateway.now(),
+        targetRoute: frontRoutes.conventionToSign,
+      }),
+      [deterministicShortLinks[1]]: fakeGenerateMagicLinkUrlFn({
+        id: validConvention.id,
+        role: validConvention.signatories.beneficiary.role,
+        email: validConvention.signatories.beneficiary.email,
+        now: timeGateway.now(),
+        targetRoute: frontRoutes.conventionStatusDashboard,
+      }),
+      [deterministicShortLinks[2]]: fakeGenerateMagicLinkUrlFn({
+        id: validConvention.id,
+        role: validConvention.signatories.establishmentRepresentative!.role,
+        email: validConvention.signatories.establishmentRepresentative!.email,
+        now: timeGateway.now(),
+        targetRoute: frontRoutes.conventionToSign,
+      }),
+      [deterministicShortLinks[3]]: fakeGenerateMagicLinkUrlFn({
+        id: validConvention.id,
+        role: validConvention.signatories.establishmentRepresentative!.role,
+        email: validConvention.signatories.establishmentRepresentative!.email,
+        now: timeGateway.now(),
+        targetRoute: frontRoutes.conventionStatusDashboard,
+      }),
+      [deterministicShortLinks[4]]: fakeGenerateMagicLinkUrlFn({
+        id: validConvention.id,
+        role: validConvention.signatories.beneficiaryRepresentative!.role,
+        email: validConvention.signatories.beneficiaryRepresentative!.email,
+        now: timeGateway.now(),
+        targetRoute: frontRoutes.conventionToSign,
+      }),
+      [deterministicShortLinks[5]]: fakeGenerateMagicLinkUrlFn({
+        id: validConvention.id,
+        role: validConvention.signatories.beneficiaryRepresentative!.role,
+        email: validConvention.signatories.beneficiaryRepresentative!.email,
+        now: timeGateway.now(),
+        targetRoute: frontRoutes.conventionStatusDashboard,
+      }),
+    });
 
     const sentEmails = emailGw.getSentEmails();
 
@@ -58,24 +124,33 @@ describe("Add Convention Notifications", () => {
       convention: validConvention,
       signatory: validConvention.signatories.beneficiary,
       recipient: validConvention.signatories.beneficiary.email,
-      now,
+      now: timeGateway.now(),
       agency,
+      config,
+      convetionToSignLinkId: deterministicShortLinks[0],
+      conventionStatusLinkId: deterministicShortLinks[1],
     });
     expectEmailSignatoryConfirmationSignatureRequestMatchingConvention({
       templatedEmail: sentEmails[1],
       convention: validConvention,
       signatory: validConvention.signatories.establishmentRepresentative,
       recipient: validConvention.signatories.establishmentRepresentative.email,
-      now,
+      now: timeGateway.now(),
       agency,
+      config,
+      convetionToSignLinkId: deterministicShortLinks[2],
+      conventionStatusLinkId: deterministicShortLinks[3],
     });
     expectEmailSignatoryConfirmationSignatureRequestMatchingConvention({
       templatedEmail: sentEmails[2],
       convention: validConvention,
       signatory: validConvention.signatories.beneficiaryRepresentative!,
       recipient: validConvention.signatories.beneficiaryRepresentative!.email,
-      now,
+      now: timeGateway.now(),
       agency,
+      config,
+      convetionToSignLinkId: deterministicShortLinks[4],
+      conventionStatusLinkId: deterministicShortLinks[5],
     });
   });
 });

@@ -305,8 +305,10 @@ export const createUseCases = (
         new ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature(
           uowPerformer,
           gateways.email,
-          generateConventionMagicLinkUrl,
           gateways.timeGateway,
+          gateways.shortLinkGenerator,
+          generateConventionMagicLinkUrl,
+          config,
         ),
       notifyLastSigneeThatConventionHasBeenSigned:
         new NotifyLastSigneeThatConventionHasBeenSigned(

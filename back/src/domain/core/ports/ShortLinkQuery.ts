@@ -11,7 +11,7 @@ export const makeShortLinkUrl = (
   config: AppConfig,
   shortLinkId: ShortLinkId,
 ): AbsoluteUrl =>
-  `${config.immersionFacileBaseUrl}/${shortLinkRoute}/${shortLinkId}`;
+  `${config.immersionFacileBaseUrl}/api/${shortLinkRoute}/${shortLinkId}`;
 
 export const shortLinkNotFoundMessage = (shortLinkId: ShortLinkId): string =>
   `Short link '${shortLinkId}' not found.`;
