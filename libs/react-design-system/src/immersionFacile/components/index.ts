@@ -23,6 +23,7 @@ export * from "./pe-connect-button";
 export * from "./section-accordion";
 export * from "./section-faq";
 export * from "./section-stats";
+export * from "./section-convention-next-steps";
 export * from "./section-text-embed";
 export * from "./section-title";
 export * from "./skip-links";
