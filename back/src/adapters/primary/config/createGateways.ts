@@ -49,6 +49,8 @@ import { makePeConnectExternalTargets } from "../../secondary/PeConnectGateway/p
 import { ExcelExportGateway } from "../../secondary/reporting/ExcelExportGateway";
 import { InMemoryExportGateway } from "../../secondary/reporting/InMemoryExportGateway";
 import { S3DocumentGateway } from "../../secondary/S3DocumentGateway";
+import { DeterministShortLinkGenerator } from "../../secondary/shortLinkGenerator/DeterministShortLinkGenerator";
+import { NanoIdShortLinkGenerator } from "../../secondary/shortLinkGenerator/NanoIdShortLinkGenerator";
 import { HttpSirenGateway } from "../../secondary/sirene/HttpSirenGateway";
 import { InMemorySirenGateway } from "../../secondary/sirene/InMemorySirenGateway";
 import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
@@ -170,6 +172,10 @@ export const createGateways = async (config: AppConfig) => {
             noRetries,
           )
         : new InMemorySirenGateway(),
+    shortLinkGenerator:
+      config.shortLinkGenerator === "NANO_ID"
+        ? new NanoIdShortLinkGenerator()
+        : new DeterministShortLinkGenerator(),
   };
 };
 

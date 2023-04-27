@@ -59,6 +59,13 @@ export class AppConfig {
     );
   }
 
+  public get shortLinkGenerator() {
+    return this.throwIfNotInArray({
+      variableName: "SHORT_LINK_GENERATOR",
+      authorizedValues: ["NANO_ID", "DETERMINIST"],
+    });
+  }
+
   public get reporting() {
     return this.throwIfNotInArray({
       variableName: "REPORTING_GATEWAY",

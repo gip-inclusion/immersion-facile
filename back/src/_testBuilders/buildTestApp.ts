@@ -17,6 +17,7 @@ import { InMemoryInclusionConnectGateway } from "../adapters/secondary/Inclusion
 import { NotImplementedDocumentGateway } from "../adapters/secondary/NotImplementedDocumentGateway";
 import { InMemoryPeConnectGateway } from "../adapters/secondary/PeConnectGateway/InMemoryPeConnectGateway";
 import { InMemoryExportGateway } from "../adapters/secondary/reporting/InMemoryExportGateway";
+import { DeterministShortLinkGenerator } from "../adapters/secondary/shortLinkGenerator/DeterministShortLinkGenerator";
 import { InMemorySirenGateway } from "../adapters/secondary/sirene/InMemorySirenGateway";
 import {
   GenerateApiConsumerJwt,
@@ -42,6 +43,7 @@ export type InMemoryGateways = {
   exportGateway: InMemoryExportGateway;
   timeGateway: CustomTimeGateway;
   emailValidationGateway: InMemoryEmailValidationGateway;
+  shortLinkGenerator: DeterministShortLinkGenerator;
 };
 
 // following function only to type check that InMemoryRepositories is assignable to Repositories :
@@ -90,9 +92,11 @@ export const buildTestApp = async (
     SIRENE_REPOSITORY: "IN_MEMORY",
     TIME_GATEWAY: "CUSTOM",
     EMAIL_VALIDATION_GATEWAY: "IN_MEMORY",
+    SHORT_LINK_GENERATOR: "DETERMINIST",
     ...appConfigOverrides?.configParams,
   }).build();
 
+  if (appConfig.shortLinkGenerator !== "DETERMINIST") throwNotSupportedError();
   if (appConfig.emailGateway !== "IN_MEMORY") throwNotSupportedError();
   if (appConfig.repositories !== "IN_MEMORY") throwNotSupportedError();
   if (appConfig.sirenGateway !== "IN_MEMORY") throwNotSupportedError();
