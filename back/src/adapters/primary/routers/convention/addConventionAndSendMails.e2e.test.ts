@@ -19,6 +19,7 @@ import {
   TestAppAndDeps,
 } from "../../../../_testBuilders/buildTestApp";
 import { DomainEvent } from "../../../../domain/core/eventBus/events";
+import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";
 import { InMemoryOutboxRepository } from "../../../secondary/core/InMemoryOutboxRepository";
 import { InMemoryEmailGateway } from "../../../secondary/emailGateway/InMemoryEmailGateway";
 
@@ -39,6 +40,13 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
     const { externalId, ...validConventionParams } = validConvention;
     const { request, gateways, eventCrawler, inMemoryUow } =
       await buildTestApp();
+
+    gateways.shortLinkGenerator.addMoreShortLinkIds([
+      "shortLink1",
+      "shortLink2",
+      "shortLink3",
+      "shortLink4",
+    ]);
 
     const res = await request
       .post(`/${conventionsRoute}`)
@@ -61,6 +69,9 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
 
     expectSentEmails(gateways.email, [
       {
+        type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
+      },
+      {
         type: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
         recipients: [validConvention.signatories.beneficiary.email],
       },
@@ -69,9 +80,6 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
         recipients: [
           validConvention.signatories.establishmentRepresentative.email,
         ],
-      },
-      {
-        type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
       },
     ]);
   });
@@ -154,6 +162,12 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   submitDate: Date,
 ) => {
   gateways.timeGateway.setNextDate(submitDate);
+  gateways.shortLinkGenerator.addMoreShortLinkIds([
+    "shortLink1",
+    "shortLink2",
+    "shortLink3",
+    "shortLink4",
+  ]);
   const { externalId, ...createConventionParams } = convention;
   const result = await request
     .post(`/${conventionsRoute}`)
@@ -178,25 +192,33 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   const sentEmails = gateways.email.getSentEmails();
   expect(sentEmails).toHaveLength(numberOfEmailInitialySent - 1);
   expect(sentEmails.map((e) => e.recipients)).toEqual([
+    [VALID_EMAILS[2]],
     [VALID_EMAILS[0]],
     [VALID_EMAILS[1]],
-    [VALID_EMAILS[2]],
   ]);
 
-  const beneficiarySignEmail = expectEmailOfType(
-    sentEmails[0],
-    "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
-  );
-  const establishmentSignEmail = expectEmailOfType(
+  const beneficiaryShortLinkSignEmail = expectEmailOfType(
     sentEmails[1],
     "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
   );
-
-  const beneficiarySignJwt = expectJwtInMagicLinkAndGetIt(
-    beneficiarySignEmail.params.magicLink,
+  const establishmentShortLinkSignEmail = expectEmailOfType(
+    sentEmails[2],
+    "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
   );
+
+  const beneficiarySignLink = await shortLinkRedirectToLinkWithValidation(
+    beneficiaryShortLinkSignEmail.params.magicLink,
+    request,
+  );
+
+  const establishmentSignLink = await shortLinkRedirectToLinkWithValidation(
+    establishmentShortLinkSignEmail.params.magicLink,
+    request,
+  );
+
+  const beneficiarySignJwt = expectJwtInMagicLinkAndGetIt(beneficiarySignLink);
   const establishmentSignJwt = expectJwtInMagicLinkAndGetIt(
-    establishmentSignEmail.params.magicLink,
+    establishmentSignLink,
   );
 
   return {

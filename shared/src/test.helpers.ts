@@ -41,6 +41,7 @@ export const expectTypeToMatchAndEqual = <T>(actual: T, expected: T) => {
 
 export const expectJwtInMagicLinkAndGetIt = (link: string | unknown) => {
   expect(typeof link).toBe("string");
+  expect((link as string).includes("jwt=")).toBeTruthy();
   const split = (link as string).split("jwt=");
   const last = split[split.length - 1];
   expect(last).toBeTruthy();

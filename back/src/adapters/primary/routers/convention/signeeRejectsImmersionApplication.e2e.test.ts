@@ -13,6 +13,7 @@ import {
   buildTestApp,
   TestAppAndDeps,
 } from "../../../../_testBuilders/buildTestApp";
+import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";
 import { InMemoryConventionRepository } from "../../../secondary/InMemoryConventionRepository";
 
 describe("Add Convention Notifications, then checks the mails are sent (trigerred by events)", () => {
@@ -24,15 +25,22 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
     const appAndDeps = await buildTestApp();
 
     appAndDeps.gateways.timeGateway.setNextDate(new Date());
+    appAndDeps.gateways.shortLinkGenerator.addMoreShortLinkIds([
+      "shortLink1",
+      "shortLink2",
+      "shortLink3",
+      "shortLink4",
+    ]);
 
-    const { tutorJwt } = await beneficiarySubmitsApplicationForTheFirstTime(
-      appAndDeps,
-      createConventionParams,
-    );
+    const { establishmentRepJwt } =
+      await beneficiarySubmitsApplicationForTheFirstTime(
+        appAndDeps,
+        createConventionParams,
+      );
 
     await expectEstablishmentRequiresChanges(
       appAndDeps,
-      tutorJwt,
+      establishmentRepJwt,
       validConvention.id,
       {
         statusJustification: "change something which is wrong",
@@ -64,30 +72,38 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   const sentEmails = gateways.email.getSentEmails();
   expect(sentEmails).toHaveLength(3);
   expect(sentEmails.map((e) => e.recipients)).toEqual([
+    ["validator@mail.com"],
     [createConventionParams.signatories.beneficiary.email],
     [createConventionParams.signatories.establishmentRepresentative.email],
-    ["validator@mail.com"],
   ]);
 
   const beneficiarySignEmail = expectEmailOfType(
-    sentEmails[0],
-    "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
-  );
-  const establishmentSignEmail = expectEmailOfType(
     sentEmails[1],
     "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
   );
-
-  const beneficiaryJwt = expectJwtInMagicLinkAndGetIt(
-    beneficiarySignEmail.params.magicLink,
+  const establishmentSignEmail = expectEmailOfType(
+    sentEmails[2],
+    "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
   );
-  const tutorJwt = expectJwtInMagicLinkAndGetIt(
+
+  const beneficiarySignLink = await shortLinkRedirectToLinkWithValidation(
+    beneficiarySignEmail.params.magicLink,
+    request,
+  );
+
+  const establishmentSignLink = await shortLinkRedirectToLinkWithValidation(
     establishmentSignEmail.params.magicLink,
+    request,
+  );
+
+  const beneficiaryJwt = expectJwtInMagicLinkAndGetIt(beneficiarySignLink);
+  const establishmentRepJwt = expectJwtInMagicLinkAndGetIt(
+    establishmentSignLink,
   );
 
   return {
     beneficiaryJwt,
-    tutorJwt,
+    establishmentRepJwt,
   };
 };
 
