@@ -3,7 +3,7 @@ name: Copy DB PE vers Prod Scalingo (secnum)
 on:
   workflow_dispatch:
   schedule:
-    - cron: "02 1 * * *"
+    - cron: "16 23 * * *"
 
 jobs:
   dump-from-PE-and-restore-to-secnum-prod:
