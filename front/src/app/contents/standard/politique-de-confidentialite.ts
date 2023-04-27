@@ -23,7 +23,7 @@ La plateforme Immersion Facilitée peut traiter les données à caractère perso
 
 • Données relatives au formulaire de demande d’immersion (nom, prénom, numéro de téléphone) ;
 
-• Données relatives aux représentants des entreprises structures d’accueil de l’immersion, signataires de la convention et aux tuteurs ou tutrices des des structures d’accueil d’immersion (nom, prénom, fonction du tuteur, adresse e-mail, téléphone professionnel). Ces données sont susceptibles d'être partagées avec la Mission Interministérielle pour l'Apprentissage et le Groupement d’Intérêt Public Les entreprises s’engagent à des fins de proposition de recueil d’offres de recrutement en alternance ou d’actions pour renforcer l’inclusion dans les entreprises ;
+• Données relatives aux représentants des entreprises structures d’accueil de l’immersion, signataires de la convention et aux tuteurs ou tutrices des structures d’accueil d’immersion (nom, prénom, fonction du tuteur, adresse e-mail, téléphone professionnel). Ces données sont susceptibles d'être partagées avec la Mission Interministérielle pour l'Apprentissage et le Groupement d’Intérêt Public Les entreprises s’engagent à des fins de proposition de recueil d’offres de recrutement en alternance ou d’actions pour renforcer l’inclusion dans les entreprises ;
 
 • Données d’identification Pôle Emploi (nom, date de naissance).
 
