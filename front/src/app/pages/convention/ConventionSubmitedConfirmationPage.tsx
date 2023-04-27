@@ -1,10 +1,11 @@
-import React, { useRef, useState } from "react";
-import { MainWrapper, SectionConventionNextSteps } from "react-design-system";
-import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
-import { Route } from "type-route";
-import { routes } from "src/app/routes/routes";
+import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import { Route } from "type-route";
+import { MainWrapper, SectionConventionNextSteps } from "react-design-system";
+import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
+import { useCopyButton } from "src/app/hooks/useCopyButton";
+import { routes } from "src/app/routes/routes";
 
 interface ConventionSubmitedConfirmationPageProperties {
   route: Route<typeof routes.conventionSubmited>;
@@ -13,24 +14,9 @@ interface ConventionSubmitedConfirmationPageProperties {
 export const ConventionSubmitedConfirmationPage = ({
   route,
 }: ConventionSubmitedConfirmationPageProperties) => {
-  const [isCopied, setIsCopied] = useState(false);
-  const {
-    onCopyButtonClick,
-    copyButtonLabel,
-    copyButtonIsDisabled,
-  } = useCopyButton();
-  const onCopyButtonClick = () => {
-    navigator.clipboard
-      .writeText(route.params.conventionId)
-      .then(() => {
-        setIsCopied(true);
-        setTimeout(() => {
-          setIsCopied(false);
-        }, 3_000);
-      })
-      // eslint-disable-next-line no-console
-      .catch((error) => console.error(error));
-  };
+  const { onCopyButtonClick, copyButtonLabel, copyButtonIsDisabled } =
+    useCopyButton();
+
   return (
     <HeaderFooterLayout>
       <MainWrapper
@@ -61,8 +47,8 @@ export const ConventionSubmitedConfirmationPage = ({
                 {route.params.conventionId}
               </strong>
               <Button
-                disabled={isCopied}
-                onClick={onCopyButtonClick}
+                disabled={copyButtonIsDisabled}
+                onClick={() => onCopyButtonClick(route.params.conventionId)}
                 priority="secondary"
                 size="large"
                 className={fr.cx(
@@ -76,7 +62,7 @@ export const ConventionSubmitedConfirmationPage = ({
                   "fr-mt-md-0",
                 )}
               >
-                {isCopied ? "Copié !" : "Copier cet ID"}
+                {copyButtonLabel}
               </Button>
             </div>
           </div>

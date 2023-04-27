@@ -21,6 +21,7 @@ import { ConventionDocumentPage } from "../pages/convention/ConventionDocumentPa
 import { ConventionManageAdminPage } from "../pages/convention/ConventionManageAdminPage";
 import { ConventionManagePage } from "../pages/convention/ConventionManagePage";
 import { ConventionPageForExternals } from "../pages/convention/ConventionPageForExternals";
+import { ConventionSubmitedConfirmationPage } from "../pages/convention/ConventionSubmitedConfirmationPage";
 import { ErrorPage } from "../pages/error/ErrorPage";
 import { EstablishmentFormPage } from "../pages/establishment/EstablishmentFormPage";
 import { GroupPage } from "../pages/group/GroupPage";
@@ -35,7 +36,6 @@ import {
   standardPageSlugs,
 } from "./route-params";
 import { routes, useRoute } from "./routes";
-import { ConventionSubmitedConfirmationPage } from "../pages/convention/ConventionSubmitedConfirmationPage";
 
 type Routes = typeof routes;
 
@@ -69,7 +69,9 @@ const getPageByRouteName: {
   conventionStatusDashboard: (route) => (
     <ConventionStatusDashboardPage route={route} />
   ),
-  conventionSubmited: (route) => <ConventionSubmitedConfirmationPage route={route}/>,
+  conventionSubmited: (route) => (
+    <ConventionSubmitedConfirmationPage route={route} />
+  ),
   conventionToSign: (route) => <ConventionSignPage route={route} />,
   debugPopulateDB: () => undefined,
   editFormEstablishment: (route) => (
