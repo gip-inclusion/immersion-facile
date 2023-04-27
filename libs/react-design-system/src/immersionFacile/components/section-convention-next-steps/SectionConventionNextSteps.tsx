@@ -1,20 +1,17 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
-
-import "./SectionConventionNextSteps.scss";
-
-const componentName = "im-section-convention-next-steps";
+import Styles from "./SectionConventionNextSteps.styles";
 
 export const SectionConventionNextSteps = () => {
   const { cx } = useStyles();
   return (
-    <section className={cx(fr.cx("fr-mt-5w", "fr-mb-10w"), `${componentName}`)}>
+    <section className={cx(fr.cx("fr-mt-5w", "fr-mb-10w"), Styles.root)}>
       <div className={fr.cx("fr-container")}>
         <h2
           className={cx(
             fr.cx("fr-mb-7w", "fr-text--lg"),
-            `${componentName}__title`,
+            `${Styles.root}__title`,
           )}
         >
           Quelles sont les prochaines étapes ?
@@ -24,13 +21,13 @@ export const SectionConventionNextSteps = () => {
           <div
             className={cx(
               fr.cx("fr-col-12", "fr-col-md-4"),
-              `${componentName}__step`,
+              `${Styles.root}__step`,
             )}
           >
             <div
               className={cx(
                 fr.cx("fr-m-auto", "fr-mb-5w", "fr-pt-md-4w"),
-                `${componentName}__illustration-wrapper`,
+                `${Styles.root}__illustration-wrapper`,
               )}
             >
               <EmailSentIllustration />
@@ -43,6 +40,7 @@ export const SectionConventionNextSteps = () => {
               className={fr.cx("fr-download__link", "fr-link--icon-right")}
               href="https://aide.immersion-facile.beta.gouv.fr/fr/"
               target="_blank"
+              rel="noreferrer"
             >
               Vous n'avez pas reçu l'email ? Accédez a notre centre d'aide
             </a>
@@ -51,13 +49,13 @@ export const SectionConventionNextSteps = () => {
           <div
             className={cx(
               fr.cx("fr-col-12", "fr-col-md-4"),
-              `${componentName}__step`,
+              `${Styles.root}__step`,
             )}
           >
             <div
               className={cx(
                 fr.cx("fr-m-auto", "fr-mb-5w"),
-                `${componentName}__illustration-wrapper`,
+                `${Styles.root}__illustration-wrapper`,
               )}
             >
               <TermsIllustration />
@@ -72,13 +70,13 @@ export const SectionConventionNextSteps = () => {
           <div
             className={cx(
               fr.cx("fr-col-12", "fr-col-md-4"),
-              `${componentName}__step`,
+              `${Styles.root}__step`,
             )}
           >
             <div
               className={cx(
                 fr.cx("fr-m-auto", "fr-mb-5w"),
-                `${componentName}__illustration-wrapper`,
+                `${Styles.root}__illustration-wrapper`,
               )}
             >
               <NotifyIllustration />
@@ -91,7 +89,7 @@ export const SectionConventionNextSteps = () => {
             </p>
           </div>
 
-          <div className={cx(`${componentName}__custom-background`)}></div>
+          <div className={cx(`${Styles.root}__custom-background`)}></div>
         </div>
       </div>
     </section>
@@ -106,8 +104,9 @@ const EmailSentIllustration = () => {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 570 511.67482"
       xmlnsXlink="http://www.w3.org/1999/xlink"
-      className={cx(`${componentName}__illustration`)}
+      className={cx(`${Styles.root}__illustration`)}
       preserveAspectRatio="xMidYMax"
+      aria-hidden
     >
       <path
         d="M879.99927,389.83741a.99678.99678,0,0,1-.5708-.1792L602.86963,197.05469a5.01548,5.01548,0,0,0-5.72852.00977L322.57434,389.65626a1.00019,1.00019,0,0,1-1.14868-1.6377l274.567-192.5918a7.02216,7.02216,0,0,1,8.02-.01318l276.55883,192.603a1.00019,1.00019,0,0,1-.57226,1.8208Z"
@@ -160,8 +159,9 @@ const TermsIllustration = () => {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 634.38742 584.34971"
       xmlnsXlink="http://www.w3.org/1999/xlink"
-      className={cx(`${componentName}__illustration`)}
+      className={cx(`${Styles.root}__illustration`)}
       preserveAspectRatio="xMidYMax"
+      aria-hidden
     >
       <path
         d="M574.10044,479.32759c-.11329,0-.18457-.00293-.20948-.0044l-13.56445.00147v-2H573.94c.31518.01123,6.74584.19287,12.67089-6.99659,8.82959-10.71484,16.08057-37.23974.48145-102.75586-20.9751-88.0957-3.481-165.92334,5.01392-195.29541a9.75245,9.75245,0,0,0-9.38306-12.45166H380.1478a9.79616,9.79616,0,0,0-7.89966,4.021c-3.59863,4.9502-8.53711,14.46-11.62744,31.65527l-1.96826-.35351c3.15722-17.56885,8.25635-27.3584,11.978-32.47754a11.801,11.801,0,0,1,9.51734-4.84522H582.72324a11.75275,11.75275,0,0,1,11.30444,15.00733c-8.45117,29.21972-25.85473,106.64355-4.9895,194.27685,15.81836,66.4375,8.21387,93.53711-.95068,104.57178C582.04257,478.95893,575.38217,479.32759,574.10044,479.32759Z"
@@ -307,8 +307,9 @@ const NotifyIllustration = () => {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 790 512.20805"
       xmlnsXlink="http://www.w3.org/1999/xlink"
-      className={cx(`${componentName}__illustration`)}
+      className={cx(`${Styles.root}__illustration`)}
       preserveAspectRatio="xMidYMax"
+      aria-hidden
     >
       <path
         d="M925.56335,704.58909,903,636.49819s24.81818,24.81818,24.81818,45.18181l-4.45454-47.09091s12.72727,17.18182,11.45454,43.27273S925.56335,704.58909,925.56335,704.58909Z"
