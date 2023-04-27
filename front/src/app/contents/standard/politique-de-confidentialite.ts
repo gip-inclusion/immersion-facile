@@ -21,7 +21,7 @@ Elle peut traiter des données à caractère personnel pour les finalités suiva
 
 La plateforme Immersion Facilitée peut traiter les données à caractère personnel suivantes :
 • Données relatives au formulaire de demande d’immersion (nom, prénom, numéro de téléphone) ;
-• Données relatives aux tuteurs et tutrices des structures d’immersion (nom, prénom, fonction du tuteur, adresse e-mail, téléphone professionnel) ;
+• Données relatives aux représentants des entreprises structures d'accueil de l'immersion, signataires de la convention y compris les tuteurs ou tutrices des structures d'accueil d'immersion (nom, prénom, fonctions, adresse e-mail, numéro de téléphone professionnel). Ces données sont susceptibles d'être partagées avec la "Mission interministérielle pour l'apprentissage" et le Groupement d'intérêt public "Les entreprises s'engagent" à des fins de prospection de recueil d'offres de recrutement en alternance ou d'actions pour renforcer l'inclusion dans les entreprises ; ;
 • Données d’identification Pôle Emploi (nom, date de naissance).
 
 <strong>Qu’est-ce qui nous autorise à manipuler ces données ?</strong>
@@ -41,7 +41,7 @@ Données relatives au formulaire de demande d’immersion professionnelle:
 
 • Si la personne concernée n’a pas signé de convention d’immersion professionnelle, mais qu’elle avait reçu une réponse négative du prescripteur, <strong>dans un délai de 2 ans à compter du refus</strong> de la demande d’immersion professionnelle. 
 
- Données relatives aux tuteurs et tutrices des structures d’immersion professionnelle
+ Données relatives aux représentants des entreprises structures d'accueil de l'immersion, signataires de la convention y compris les tuteurs ou tutrices des structures d'accueil d'immersion :
 
 • <strong>Jusqu’à la fin du contrat du tuteur ou de la tutrice avec la structure d’immersion professionnelle</strong> ou le cas échéant, jusqu’à la dissolution de la structure, dès lors qu’Immersion Facilitée en prend connaissance.
 
@@ -83,6 +83,8 @@ Ces derniers sont :
 • Les organismes de « Prépa Apprentissage » ;
 • Inclusion Connect ;
 • Des prescripteurs mandatés à cet effet par un prescripteur de plein droit : organismes employant ou accompagnant des personnes éligibles aux PMSMP et liés soit à Pôle emploi, soit à une mission locale, soit à un Cap Emploi, par une convention les autorisant à prescrire des PMSMP sur un périmètre donné.
+• La mission interministérielle pour l'apprentissage ;
+• Le Groupement d'intérêt public "Les entreprises s'engagent".
 
 <strong>Quelles mesures de sécurité mettons-nous en place ?</strong>
 
