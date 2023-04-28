@@ -4,6 +4,7 @@ import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 import {
   ConventionField,
+  domElementIds,
   getConventionFieldName,
   InternshipKind,
   keys,
@@ -92,6 +93,7 @@ export const SignatureActions = ({
   return (
     <>
       <Checkbox
+        className="im-signature-actions__checkbox"
         options={[
           {
             label: `Je, soussigné ${signatoryFullName} (${signatoryFunction})
@@ -145,6 +147,9 @@ export const SignatureActions = ({
             type: "button",
             iconId: "fr-icon-checkbox-circle-line",
             iconPosition: "left",
+            nativeButtonProps: {
+              id: domElementIds.conventionToSign.submitButton,
+            },
           },
           {
             priority: "secondary",

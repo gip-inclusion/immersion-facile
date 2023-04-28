@@ -1,19 +1,11 @@
 import { domElementIds, frontRoutes } from "shared";
 import { disableNewUrlLog } from "../utils";
+import { connectToAdmin } from "../utils/admin";
 
 describe("Simple navigation", () => {
   // TODO: do separate test for admin navigation
   it("Go to admin and log in", () => {
-    cy.visit("/admin");
-    cy.get(`#${domElementIds.admin.adminPrivateRoute.formLoginUserInput}`).type(
-      Cypress.env("ADMIN_USER"),
-    );
-    cy.get(
-      `#${domElementIds.admin.adminPrivateRoute.formLoginPasswordInput}`,
-    ).type(Cypress.env("ADMIN_PASSWORD"));
-    cy.get(
-      `#${domElementIds.admin.adminPrivateRoute.formLoginSubmitButton}`,
-    ).click();
+    connectToAdmin();
     it("Go to home page", () => {
       goToTab({
         selector: `#${domElementIds.header.navLinks.home}`,

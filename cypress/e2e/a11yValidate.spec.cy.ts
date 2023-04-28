@@ -14,6 +14,7 @@ const axeConf = {
 
 describe("Validate a11y with axe on main pages", () => {
   it(`Axe should pass on home`, () => {
+    console.log(Cypress.env());
     cy.visit("/");
     runCheckA11y();
   });

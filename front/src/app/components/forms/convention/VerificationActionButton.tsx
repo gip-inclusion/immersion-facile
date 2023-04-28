@@ -12,9 +12,14 @@ import { JustificationModal } from "src/app/components/forms/convention/Justific
 export type VerificationActionButtonProps = {
   onSubmit: (params: UpdateConventionStatusRequestDto) => void;
   disabled?: boolean;
-  newStatus: ConventionStatus;
+  newStatus: VerificationActions;
   children: string;
 };
+
+type VerificationActions = Exclude<
+  ConventionStatus,
+  "READY_TO_SIGN" | "PARTIALLY_SIGNED" | "IN_REVIEW" | "CANCELLED"
+>;
 
 export const VerificationActionButton = ({
   newStatus,
@@ -30,6 +35,14 @@ export const VerificationActionButton = ({
 
   const selectedIcon = iconByStatus[newStatus];
   const [isOpen, setIsOpen] = useState(false);
+  const actionButtonStatusId: Record<VerificationActions, string> = {
+    DRAFT: domElementIds.manageConvention.conventionValidationRequestEditButton,
+    REJECTED: domElementIds.manageConvention.conventionValidationRejectButton,
+    ACCEPTED_BY_VALIDATOR:
+      domElementIds.manageConvention.conventionValidationValidateButton,
+    ACCEPTED_BY_COUNSELLOR:
+      domElementIds.manageConvention.conventionValidationValidateButton,
+  };
 
   return (
     <>
@@ -44,11 +57,7 @@ export const VerificationActionButton = ({
         className={fr.cx("fr-m-1w")}
         disabled={disabled}
         nativeButtonProps={{
-          id:
-            newStatus === "REJECTED"
-              ? domElementIds.manageConvention.conventionValidationRejectButton
-              : domElementIds.manageConvention
-                  .conventionValidationValidateButton,
+          id: actionButtonStatusId[newStatus],
         }}
       >
         {children}

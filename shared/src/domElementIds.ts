@@ -219,6 +219,8 @@ export const domElementIds = {
     conventionValidationRejectButton: "im-convention-validation__reject-button",
     conventionValidationValidateButton:
       "im-convention-validation__validate-button",
+    conventionValidationRequestEditButton:
+      "im-convention-validation__request-edit-button",
     justificationModalCancelButton: "im-justification-modal__cancel-button",
     justificationModalSubmitButton: "im-justification-modal__submit-button",
   },
@@ -302,7 +304,9 @@ export const domElementIds = {
   group: {},
   conventionDocument: {},
   landingEstablishment: {},
-  conventionToSign: {},
+  conventionToSign: {
+    submitButton: "im-convention-to-sign__submit-button",
+  },
   editFormEstablishmentRoute: {},
   error: {},
   conventionMiniStageRoute: {},

@@ -60,6 +60,11 @@ const Email = ({ email }: { email: EmailSentDto }) => {
       } envoyé le ${sentAtDate.toLocaleDateString(
         "fr",
       )} à ${sentAtDate.toLocaleTimeString("fr")}`}
+      className={`im-email-info-container ${
+        "conventionId" in email.templatedEmail.params
+          ? `im-email-info-container--convention-${email.templatedEmail.params.conventionId}`
+          : ""
+      }`}
     >
       <TextCell title="Type" contents={email.templatedEmail.type} />
       <TextCell
