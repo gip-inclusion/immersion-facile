@@ -1,5 +1,5 @@
 import { ShortLinkId } from "./ShortLinkQuery";
 
-export interface ShortLinkGenerator {
+export interface ShortLinkIdGeneratorGateway {
   generate(): ShortLinkId;
 }

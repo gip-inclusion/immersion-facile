@@ -1,7 +1,9 @@
-import { ShortLinkGenerator } from "../../../domain/core/ports/ShortLinkGenerator";
+import { ShortLinkIdGeneratorGateway } from "../../../domain/core/ports/ShortLinkIdGeneratorGateway";
 import { ShortLinkId } from "../../../domain/core/ports/ShortLinkQuery";
 
-export class DeterministShortLinkGenerator implements ShortLinkGenerator {
+export class DeterministShortLinkIdGeneratorGateway
+  implements ShortLinkIdGeneratorGateway
+{
   generate(): ShortLinkId {
     const nextShortLink = this.nextShortLinkIds.shift();
     if (nextShortLink) return nextShortLink;

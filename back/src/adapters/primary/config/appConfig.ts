@@ -59,9 +59,9 @@ export class AppConfig {
     );
   }
 
-  public get shortLinkGenerator() {
+  public get shortLinkIdGeneratorGateway() {
     return this.throwIfNotInArray({
-      variableName: "SHORT_LINK_GENERATOR",
+      variableName: "SHORT_LINK_ID_GENERATOR_GATEWAY",
       authorizedValues: ["NANO_ID", "DETERMINIST"],
     });
   }

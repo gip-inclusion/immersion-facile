@@ -14,7 +14,7 @@ import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGatew
 import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryShortLinkQuery } from "../../../../adapters/secondary/InMemoryShortLinkQuery";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { DeterministShortLinkGenerator } from "../../../../adapters/secondary/shortLinkGenerator/DeterministShortLinkGenerator";
+import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { ShortLinkId } from "../../../core/ports/ShortLinkQuery";
 import { ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature } from "./ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature";
 
@@ -26,7 +26,7 @@ describe("Add Convention Notifications", () => {
   let agency: AgencyDto;
   let shortLinkQuery: InMemoryShortLinkQuery;
   let config: AppConfig;
-  let shortLinkGenerator: DeterministShortLinkGenerator;
+  let shortLinkGenerator: DeterministShortLinkIdGeneratorGateway;
 
   beforeEach(() => {
     config = new AppConfigBuilder({}).build();
@@ -45,7 +45,7 @@ describe("Add Convention Notifications", () => {
       })
       .withAgencyId(agency.id)
       .build();
-    shortLinkGenerator = new DeterministShortLinkGenerator();
+    shortLinkGenerator = new DeterministShortLinkIdGeneratorGateway();
     useCase =
       new ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature(
         new InMemoryUowPerformer(uow),

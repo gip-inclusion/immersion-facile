@@ -35,9 +35,6 @@ describe("PgShortLinkRepository", () => {
   });
 
   it("save", async () => {
-    const originalUrl: AbsoluteUrl =
-      "https://dev.immersion-facile.beta.gouv.fr/verylonglink?queryParams=dfmklghdrfsmgldkrfjhfgdfmkljfghjdfsmfghedrlmkfghdsrflkfghdflkjghdflkjghdfglskjghdlskfghdfgovilèdfsèuyvhberfgvlqermçiufgyeriftuyhrelifgrhdfklwjghdfkljgbndflkjghrdfkljghdfliughdqsfilugheqrtrhrjfkhnskljxbchQSDGFROZERUIGTHERTGHBFS5H455GH23SDF4GD4GDF5G4DF54G2D4GDF4HFYHJ544NX4CFFGDFTG4SETU4YFTGGB54DGWF54TSERD5YH74DFYHGHN4QSD54T7RDFG";
-
     await pgShortLinkRepository.save(testShortLinkId, originalUrl);
 
     const { rows } = await client.query<PgShortLinkRepositoryDto>(

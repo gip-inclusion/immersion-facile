@@ -1,10 +1,10 @@
 import { ShortLinkId } from "../../../domain/core/ports/ShortLinkQuery";
-import { NanoIdShortLinkGenerator } from "./NanoIdShortLinkGenerator";
+import { NanoIdShortLinkIdGeneratorGateway } from "./NanoIdShortLinkIdGeneratorGateway";
 
 describe("shortLinkGenerator manual test", () => {
   const shortLinkQty = 100000;
   const shortLinkIds: ShortLinkId[] = [];
-  const shortLinkGenerator = new NanoIdShortLinkGenerator();
+  const shortLinkGenerator = new NanoIdShortLinkIdGeneratorGateway();
 
   it(`generate ${shortLinkQty} ids`, () => {
     for (let index = 0; index < shortLinkQty; index++) {

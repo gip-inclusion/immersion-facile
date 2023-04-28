@@ -19,7 +19,7 @@ describe("shortLink routes", () => {
 
   describe(`GET /${shortLinkRoute}/:shortLinkId`, () => {
     const expectedShortLinkId: ShortLinkId = "shortLinkId";
-    it("301 - Redirect on existing short link", async () => {
+    it("302 - Redirect on existing short link", async () => {
       const expectedLongLink: AbsoluteUrl = "http://longLink";
       shortLinkQuery.setShortLinks({
         [expectedShortLinkId]: expectedLongLink,

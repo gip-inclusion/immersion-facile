@@ -11,7 +11,7 @@ import {
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
 import { createLogger } from "../../../../utils/logger";
-import { ShortLinkGenerator } from "../../../core/ports/ShortLinkGenerator";
+import { ShortLinkIdGeneratorGateway } from "../../../core/ports/ShortLinkIdGeneratorGateway";
 import {
   makeShortLinkUrl,
   ShortLinkId,
@@ -31,7 +31,7 @@ export class ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignatu
     uowPerformer: UnitOfWorkPerformer,
     private readonly emailGateway: EmailGateway,
     private readonly timeGateway: TimeGateway,
-    private readonly shortLinkGenerator: ShortLinkGenerator,
+    private readonly shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
     private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     private readonly config: AppConfig,
   ) {
@@ -127,7 +127,7 @@ export class ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignatu
     });
 
     const conventionSignShortLinkId: ShortLinkId =
-      await this.shortLinkGenerator.generate();
+      await this.shortLinkIdGeneratorGateway.generate();
 
     await uow.shortLinkRepository.save(
       conventionSignShortLinkId,

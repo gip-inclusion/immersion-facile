@@ -52,4 +52,4 @@ export const signConventionRoute = "sign-application";
 export const siretRoute = "siret";
 export const updateConventionStatusRoute = "update-application-status";
 export const uploadFileRoute = "upload-file";
-export const shortLinkRoute = "slnk";
+export const shortLinkRoute = "to";
