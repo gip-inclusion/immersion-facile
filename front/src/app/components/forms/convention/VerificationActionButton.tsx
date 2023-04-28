@@ -18,7 +18,7 @@ export type VerificationActionButtonProps = {
 
 type VerificationActions = Exclude<
   ConventionStatus,
-  "READY_TO_SIGN" | "PARTIALLY_SIGNED" | "IN_REVIEW" | "CANCELLED"
+  "READY_TO_SIGN" | "PARTIALLY_SIGNED" | "IN_REVIEW"
 >;
 
 export const VerificationActionButton = ({
@@ -42,6 +42,7 @@ export const VerificationActionButton = ({
       domElementIds.manageConvention.conventionValidationValidateButton,
     ACCEPTED_BY_COUNSELLOR:
       domElementIds.manageConvention.conventionValidationValidateButton,
+    CANCELLED: domElementIds.manageConvention.conventionValidationCancelButton,
   };
 
   return (
