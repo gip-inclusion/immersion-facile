@@ -95,7 +95,7 @@ export const createInMemoryUow = () => {
 };
 
 export const createPgUow = (client: PoolClient): UnitOfWork => {
-  const shortLinkRepository = new PgShortLinkRepository();
+  const shortLinkRepository = new PgShortLinkRepository(client);
   return {
     agencyRepository: new PgAgencyRepository(client),
     apiConsumerRepository: new PgApiConsumerRepository(client),
