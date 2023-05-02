@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
@@ -68,6 +68,14 @@ export const ShareForm = ({
   });
   const { register, handleSubmit, formState } = methods;
 
+  useEffect(() => {
+    methods.reset(
+      makeInitialValues({
+        ...conventionFormData,
+        link: window.location.href,
+      }),
+    );
+  }, [conventionFormData]);
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <input type="hidden" {...register("conventionLink")} />
