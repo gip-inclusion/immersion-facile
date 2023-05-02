@@ -314,7 +314,7 @@ export const seedSearchResults: SearchImmersionResultDto[] = [
     fitForDisabledWorkers: true,
     position: { lat: 48.8666, lon: 2.3333 },
     address: defaultAddress,
-    contactMode: "EMAIL",
+    contactMode: "PHONE",
     romeLabel: "Super métier",
     appellationLabels: ["Facteur", "Développeuse"],
     nafLabel: "Métallurgie",
