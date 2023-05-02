@@ -253,8 +253,8 @@ importers:
   front:
     dependencies:
       '@codegouvfr/react-dsfr':
-        specifier: ^0.37.1-rc.0
-        version: 0.37.1-rc.0(react@18.2.0)
+        specifier: ^0.52.0
+        version: 0.52.0(react@18.2.0)
       '@gouvfr/dsfr':
         specifier: 1.8.5
         version: 1.8.5
@@ -467,8 +467,8 @@ importers:
   libs/react-design-system:
     dependencies:
       '@codegouvfr/react-dsfr':
-        specifier: ^0.37.1-rc.0
-        version: 0.37.1-rc.0(react@18.2.0)
+        specifier: ^0.52.0
+        version: 0.52.0(react@18.2.0)
       react-modal:
         specifier: ^3.15.1
         version: 3.16.1(react-dom@18.2.0)(react@18.2.0)
@@ -3985,14 +3985,14 @@ packages:
   /@bcoe/v8-coverage@0.2.3:
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
 
-  /@codegouvfr/react-dsfr@0.37.1-rc.0(react@18.2.0):
-    resolution: {integrity: sha512-2q8vSmuq2kA2D/h7CVwmb0FA9Myq91/ft80UBuCjG7iDd75tKcqOKdsmAIi8tKG0arDtC89+x4P2kg4TdC349w==}
+  /@codegouvfr/react-dsfr@0.52.0(react@18.2.0):
+    resolution: {integrity: sha512-5xuBIPdBz39EpT61FFroP3piFVoe984M9ZEBktLiHqE6TTEKTGkSZ2s4aeTwr1fHvL27Z1a0sC2QGEc1RXpM7g==}
     hasBin: true
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
     dependencies:
       react: 18.2.0
-      tsafe: 1.4.1
+      tsafe: 1.6.0
     dev: false
 
   /@colors/colors@1.5.0:
@@ -14718,8 +14718,8 @@ packages:
     resolution: {integrity: sha512-FZIXf1ksVyLcfr7M317jbB67XFJhOO1YqdTcuGaq9q5jLUoTikukZ+98TPjKiP2jC5CgmYdWWYs0s2nLSU0/1A==}
     dev: true
 
-  /tsafe@1.4.1:
-    resolution: {integrity: sha512-3IDBalvf6SyvHFS14UiwCWzqdSdo+Q0k2J7DZyJYaHW/iraW9DJpaBKDJpry3yQs3o/t/A+oGaRW3iVt2lKxzA==}
+  /tsafe@1.6.0:
+    resolution: {integrity: sha512-wlUeRBnyN3EN2chXznpLm7vBEvJLEOziDU+MN6NRlD99AkwmXgtChNQhp+V97VyRa3Bp05IaL4Cocsc7JlyEUg==}
     dev: false
 
   /tsconfig@7.0.0:

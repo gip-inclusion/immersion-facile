@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
-import { Select } from "@codegouvfr/react-dsfr/Select";
+import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { ContactMethod, domElementIds, SearchImmersionResultDto } from "shared";
 import {
   ContactEstablishmentModal,
@@ -26,21 +26,22 @@ type GroupListResultsProps = {
 };
 
 export const GroupListResults = ({ results }: GroupListResultsProps) => {
-  const resultsPerPageOptions = [6, 12, 24, 48] as const;
+  const resultsPerPageOptions = ["6", "12", "24", "48"] as const;
   type ResultsPerPageOptions = (typeof resultsPerPageOptions)[number];
 
-  const defaultResultsPerPage: ResultsPerPageOptions = 12;
+  const defaultResultsPerPage: ResultsPerPageOptions = "12";
   const initialPage = 0;
   const isResultPerPageOption = (
-    value: number,
+    value: string,
   ): value is ResultsPerPageOptions =>
     resultsPerPageOptions.includes(value as ResultsPerPageOptions);
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
   const [resultsPerPage, setResultsPerPage] = useState<ResultsPerPageOptions>(
     defaultResultsPerPage,
   );
+  const resultsPerPageValue = parseInt(resultsPerPage);
   const { modalState, dispatch } = useContactEstablishmentModal();
-  const totalPages = Math.ceil(results.length / resultsPerPage);
+  const totalPages = Math.ceil(results.length / resultsPerPageValue);
   const [successfulValidationMessage, setSuccessfulValidatedMessage] = useState<
     string | null
   >(null);
@@ -48,8 +49,8 @@ export const GroupListResults = ({ results }: GroupListResultsProps) => {
   const getSearchResultsForPage = (
     currentPage: number,
   ): SearchImmersionResultDto[] => {
-    const start = currentPage * resultsPerPage;
-    const end = start + resultsPerPage;
+    const start = currentPage * resultsPerPageValue;
+    const end = start + resultsPerPageValue;
     return results.slice(start, end);
   };
   return (
@@ -117,7 +118,7 @@ export const GroupListResults = ({ results }: GroupListResultsProps) => {
               nativeSelectProps={{
                 id: domElementIds.search.resultPerPageDropdown,
                 onChange: (event) => {
-                  const value = parseInt(event.currentTarget?.value);
+                  const value = event.currentTarget?.value;
                   if (isResultPerPageOption(value)) {
                     setResultsPerPage(value);
                   }

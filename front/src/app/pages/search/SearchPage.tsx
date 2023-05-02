@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import { GenericOption, Select } from "@codegouvfr/react-dsfr/Select";
+import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { keys } from "ramda";
 import { useStyles } from "tss-react/dsfr";
 import { Route } from "type-route";
@@ -29,7 +29,7 @@ import {
 import Styles from "./SearchPage.styles";
 import "./SearchPage.scss";
 
-const radiusOptions: GenericOption<number>[] = [1, 2, 5, 10, 20, 50, 100].map(
+const radiusOptions = ["1", "2", "5", "10", "20", "50", "100"].map(
   (distance) => ({
     label: `${distance} km`,
     value: distance,

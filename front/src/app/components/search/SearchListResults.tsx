@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
-import { Select } from "@codegouvfr/react-dsfr/Select";
+import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { ContactMethod, domElementIds, SearchImmersionResultDto } from "shared";
 import { useStyleUtils } from "react-design-system";
 import { SuccessFeedback } from "src/app/components/SuccessFeedback";
@@ -27,11 +27,11 @@ const getFeedBackMessage = (contactMethod?: ContactMethod) => {
 
 type ResultsPerPageOptions = (typeof resultsPerPageOptions)[number];
 
-const resultsPerPageOptions = [6, 12, 24, 48] as const;
-const defaultResultsPerPage: ResultsPerPageOptions = 12;
+const resultsPerPageOptions = ["6", "12", "24", "48"] as const;
+const defaultResultsPerPage: ResultsPerPageOptions = "12";
 const initialPage = 0;
 
-const isResultPerPageOption = (value: number): value is ResultsPerPageOptions =>
+const isResultPerPageOption = (value: string): value is ResultsPerPageOptions =>
   resultsPerPageOptions.includes(value as ResultsPerPageOptions);
 
 export const SearchListResults = () => {
@@ -47,10 +47,11 @@ export const SearchListResults = () => {
   );
   const { cx, classes } = useStyleUtils();
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
-  const totalPages = Math.ceil(searchResults.length / resultsPerPage);
+  const resultsPerPageValue = parseInt(resultsPerPage);
+  const totalPages = Math.ceil(searchResults.length / resultsPerPageValue);
   const getSearchResultsForPage = (currentPage: number) => {
-    const start = currentPage * resultsPerPage;
-    const end = start + resultsPerPage;
+    const start = currentPage * resultsPerPageValue;
+    const end = start + resultsPerPageValue;
     return searchResults.slice(start, end);
   };
 
@@ -137,15 +138,15 @@ export const SearchListResults = () => {
             <Select
               label=""
               options={[
-                ...resultsPerPageOptions.map((number) => ({
-                  label: `${number} résultats / page`,
-                  value: number,
+                ...resultsPerPageOptions.map((numberAsString) => ({
+                  label: `${numberAsString} résultats / page`,
+                  value: numberAsString,
                 })),
               ]}
               nativeSelectProps={{
                 id: domElementIds.search.resultPerPageDropdown,
                 onChange: (event) => {
-                  const value = parseInt(event.currentTarget.value);
+                  const value = event.currentTarget.value;
                   if (isResultPerPageOption(value)) {
                     setResultsPerPage(value);
                   }
