@@ -56,10 +56,10 @@ export const heroHeaderContent: Record<UserType, HeroHeaderInfos> = {
 
 export const heroHeaderNavCards: (
   storeDispatch: Dispatch,
-  siretModalDispatch: Dispatch,
+  openSiretModal: () => void,
 ) => Record<UserType, HeroHeaderNavCard[]> = (
   storeDispatch: Dispatch,
-  siretModalDispatch: Dispatch,
+  openSiretModal,
 ) => ({
   default: [
     {
@@ -102,12 +102,6 @@ export const heroHeaderNavCards: (
       id: domElementIds.homeCandidates.heroHeader.formConvention,
       link: routes.conventionImmersion().link,
     },
-    // {
-    //   title: "Conseils utiles pour l’immersion",
-    //   icon: "fr-icon-info-line",
-    //   type: "candidate",
-    //   link: "@TODO",
-    // },
   ],
   establishment: [
     {
@@ -119,12 +113,7 @@ export const heroHeaderNavCards: (
         href: "",
         onClick: (event) => {
           event.preventDefault();
-          siretModalDispatch({
-            type: "CLICKED_OPEN",
-            payload: {
-              mode: "register",
-            },
-          });
+          openSiretModal();
           storeDispatch(establishmentSlice.actions.gotReady());
         },
       },
@@ -138,12 +127,7 @@ export const heroHeaderNavCards: (
         href: "",
         onClick: (event) => {
           event.preventDefault();
-          siretModalDispatch({
-            type: "CLICKED_OPEN",
-            payload: {
-              mode: "edit",
-            },
-          });
+          openSiretModal();
           storeDispatch(establishmentSlice.actions.gotReady());
         },
       },

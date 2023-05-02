@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { AnyAction, Dispatch } from "@reduxjs/toolkit";
+import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import {
   FixedStamp,
   HeroHeader,
@@ -11,7 +11,7 @@ import {
   SectionTextEmbed,
 } from "react-design-system";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
-import { SiretModal, useSiretModal } from "src/app/components/SiretModal";
+import { SiretModalContent } from "src/app/components/SiretModalContent";
 import {
   heroHeaderContent,
   heroHeaderNavCards,
@@ -27,14 +27,18 @@ type HomePageProps = {
   type: UserType;
 };
 
+const { SiretModal, openSiretModal } = createModal({
+  isOpenedByDefault: false,
+  name: "siret",
+});
+
 export const HomePage = ({ type }: HomePageProps) => {
   const featureFlags = useFeatureFlags();
   const storeDispatch = useDispatch();
-  const { modalState: siretModalState, dispatch: siretModalDispatch } =
-    useSiretModal();
+
   const heroHeaderNavCardsWithDispatch = heroHeaderNavCards(
     storeDispatch,
-    siretModalDispatch as Dispatch<AnyAction>,
+    openSiretModal,
   );
   const { title, subtitle, displayName, icon, illustration } =
     heroHeaderContent[type];
@@ -54,10 +58,9 @@ export const HomePage = ({ type }: HomePageProps) => {
           navCards={heroHeaderNavCardsWithDispatch[type] as HeroHeaderNavCard[]}
           parallax
           siretModal={
-            <SiretModal
-              modalState={siretModalState}
-              dispatch={siretModalDispatch}
-            />
+            <SiretModal title="Créer ou modifier votre établissement">
+              <SiretModalContent />
+            </SiretModal>
           }
         />
         <SectionStats stats={sectionStatsDataForType} />
