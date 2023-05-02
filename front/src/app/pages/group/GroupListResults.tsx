@@ -1,14 +1,20 @@
 import React, { useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
+import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { ContactMethod, domElementIds, SearchImmersionResultDto } from "shared";
-import {
-  ContactEstablishmentModal,
-  useContactEstablishmentModal,
-} from "src/app/components/search/ContactEstablishmentModal";
 import { SearchResult } from "src/app/components/search/SearchResult";
 import { SuccessFeedback } from "src/app/components/SuccessFeedback";
+import {
+  ContactModalContentProps,
+  ModalContactContent,
+} from "../../components/search/ContactModalContent";
+
+const { ContactModal, openContactModal, closeContactModal } = createModal({
+  isOpenedByDefault: false,
+  name: "contact",
+});
 
 const getFeedBackMessage = (contactMethod?: ContactMethod) => {
   switch (contactMethod) {
@@ -40,12 +46,13 @@ export const GroupListResults = ({ results }: GroupListResultsProps) => {
     defaultResultsPerPage,
   );
   const resultsPerPageValue = parseInt(resultsPerPage);
-  const { modalState, dispatch } = useContactEstablishmentModal();
   const totalPages = Math.ceil(results.length / resultsPerPageValue);
   const [successfulValidationMessage, setSuccessfulValidatedMessage] = useState<
     string | null
   >(null);
   const [successFullyValidated, setSuccessfullyValidated] = useState(false);
+  const [modalContent, setModalContent] =
+    useState<Omit<ContactModalContentProps, "onSuccess">>();
   const getSearchResultsForPage = (
     currentPage: number,
   ): SearchImmersionResultDto[] => {
@@ -57,28 +64,22 @@ export const GroupListResults = ({ results }: GroupListResultsProps) => {
     <>
       <div className={fr.cx("fr-container")}>
         <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
-          {getSearchResultsForPage(currentPage).map((result) => (
+          {getSearchResultsForPage(currentPage).map((searchResult) => (
             <SearchResult
-              key={result.siret + "-" + result.rome} // Should be unique !
-              establishment={result}
-              onButtonClick={() =>
-                dispatch({
-                  type: "CLICKED_OPEN",
-                  payload: {
-                    immersionOfferRome: result.rome,
-                    immersionOfferSiret: result.siret,
-                    siret: result.siret,
-                    offer: {
-                      romeCode: result.rome,
-                      romeLabel: result.romeLabel,
-                    },
-                    contactMethod: result.contactMode,
-                    searchResultData: result,
+              key={searchResult.siret + "-" + searchResult.rome} // Should be unique !
+              establishment={searchResult}
+              onButtonClick={() => {
+                setModalContent({
+                  siret: searchResult.siret,
+                  offer: {
+                    romeCode: searchResult.rome,
+                    romeLabel: searchResult.romeLabel,
                   },
-                })
-              }
-              showDistance={false}
-              disableButton={modalState.isValidating}
+                  contactMethod: searchResult.contactMode,
+                  searchResultData: searchResult,
+                });
+                openContactModal();
+              }}
             />
           ))}
         </div>
@@ -130,16 +131,26 @@ export const GroupListResults = ({ results }: GroupListResultsProps) => {
           </div>
         </div>
       </div>
-      <ContactEstablishmentModal
-        modalState={modalState}
-        dispatch={dispatch}
-        onSuccess={() => {
-          setSuccessfulValidatedMessage(
-            getFeedBackMessage(modalState.contactMethod),
-          );
-          setSuccessfullyValidated(true);
-        }}
-      />
+      <ContactModal
+        title={
+          modalContent?.contactMethod
+            ? "Contactez l'entreprise"
+            : "Tentez votre chance !"
+        }
+      >
+        {modalContent && (
+          <ModalContactContent
+            {...modalContent}
+            onSuccess={() => {
+              setSuccessfulValidatedMessage(
+                getFeedBackMessage(modalContent.contactMethod),
+              );
+              setSuccessfullyValidated(true);
+              closeContactModal();
+            }}
+          />
+        )}
+      </ContactModal>
       {successfulValidationMessage && (
         <SuccessFeedback
           open={successFullyValidated}

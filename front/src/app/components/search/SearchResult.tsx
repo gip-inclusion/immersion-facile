@@ -9,7 +9,7 @@ import {
   SearchImmersionResultDto,
 } from "shared";
 import { toAbsoluteUrl } from "shared";
-import { getMapsLink } from "./ContactEstablishmentModal";
+import { getMapsLink } from "../search/ContactModalContent";
 import "./SearchResult.scss";
 
 export type EnterpriseSearchResultProps = {

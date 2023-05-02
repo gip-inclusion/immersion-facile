@@ -79,7 +79,7 @@ const defaultAddress: AddressDto = {
   departmentCode: "75",
 };
 
-const groupOffersBySlugStub = [
+const groupOffersBySlugStub: SearchImmersionResultDto[] = [
   {
     rome: "H1204",
     siret: "30613890003613",
@@ -103,6 +103,7 @@ const groupOffersBySlugStub = [
       departmentCode: "59",
     },
     numberOfEmployeeRange: "2000-4999",
+    contactMode: "PHONE",
   },
   {
     rome: "G1204",
@@ -247,6 +248,7 @@ const groupOffersBySlugStub = [
       departmentCode: "85",
     },
     numberOfEmployeeRange: "+10000",
+    contactMode: "PHONE",
   },
   {
     rome: "D1211",
