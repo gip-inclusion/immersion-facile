@@ -1,10 +1,8 @@
 import { SuperTest, Test } from "supertest";
 import { AbsoluteUrl, expectObjectsToMatch, shortLinkRoute } from "shared";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
-import {
-  ShortLinkId,
-  shortLinkNotFoundMessage,
-} from "../../../../domain/core/ports/ShortLinkQuery";
+import { ShortLinkId } from "../../../../domain/core/ports/ShortLinkQuery";
+import { shortLinkNotFoundMessage } from "../../../../domain/core/ShortLink";
 import { InMemoryShortLinkQuery } from "../../../secondary/InMemoryShortLinkQuery";
 
 describe("shortLink routes", () => {

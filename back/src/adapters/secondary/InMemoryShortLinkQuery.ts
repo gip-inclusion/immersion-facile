@@ -1,9 +1,9 @@
 import { AbsoluteUrl } from "shared";
 import {
   ShortLinkId,
-  shortLinkNotFoundMessage,
   ShortLinkQuery,
 } from "../../domain/core/ports/ShortLinkQuery";
+import { shortLinkNotFoundMessage } from "../../domain/core/ShortLink";
 import { NotFoundError } from "../primary/helpers/httpErrors";
 
 export class InMemoryShortLinkQuery implements ShortLinkQuery {

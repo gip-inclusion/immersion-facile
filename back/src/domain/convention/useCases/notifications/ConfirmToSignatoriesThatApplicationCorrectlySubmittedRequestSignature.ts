@@ -12,15 +12,12 @@ import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
 import { createLogger } from "../../../../utils/logger";
 import { ShortLinkIdGeneratorGateway } from "../../../core/ports/ShortLinkIdGeneratorGateway";
-import {
-  makeShortLinkUrl,
-  ShortLinkId,
-} from "../../../core/ports/ShortLinkQuery";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
+import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { EmailGateway } from "../../ports/EmailGateway";
 
@@ -88,6 +85,14 @@ export class ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignatu
         now: this.timeGateway.now(),
       };
 
+    const makeMagicShortLink = prepareMagicShortLinkMaker({
+      conventionMagicLinkPayload,
+      uow,
+      config: this.config,
+      generateConventionMagicLinkUrl: this.generateConventionMagicLinkUrl,
+      shortLinkIdGeneratorGateway: this.shortLinkIdGeneratorGateway,
+    });
+
     return {
       type: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
       recipients: [signatory.email],
@@ -100,40 +105,14 @@ export class ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignatu
         beneficiaryRepresentativeName:
           beneficiaryRepresentative &&
           `${beneficiaryRepresentative.firstName} ${beneficiaryRepresentative.lastName}`,
-        magicLink: await this.makeMagicLinkAndProvidesShortLink(
-          conventionMagicLinkPayload,
-          uow,
-          frontRoutes.conventionToSign,
-        ),
-        conventionStatusLink: await this.makeMagicLinkAndProvidesShortLink(
-          conventionMagicLinkPayload,
-          uow,
+        magicLink: await makeMagicShortLink(frontRoutes.conventionToSign),
+        conventionStatusLink: await makeMagicShortLink(
           frontRoutes.conventionStatusDashboard,
         ),
         businessName,
         agencyLogoUrl: agency.logoUrl,
       },
     };
-  }
-
-  private async makeMagicLinkAndProvidesShortLink(
-    conventionMagicLinkPayload: CreateConventionMagicLinkPayloadProperties,
-    uow: UnitOfWork,
-    targetRoute: string,
-  ) {
-    const conventionSignLink = this.generateConventionMagicLinkUrl({
-      ...conventionMagicLinkPayload,
-      targetRoute,
-    });
-
-    const conventionSignShortLinkId: ShortLinkId =
-      await this.shortLinkIdGeneratorGateway.generate();
-
-    await uow.shortLinkRepository.save(
-      conventionSignShortLinkId,
-      conventionSignLink,
-    );
-    return makeShortLinkUrl(this.config, conventionSignShortLinkId);
   }
 }
 

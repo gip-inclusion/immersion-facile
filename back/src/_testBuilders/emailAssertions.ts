@@ -17,11 +17,9 @@ import {
 } from "shared";
 import { AppConfig } from "../adapters/primary/config/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../adapters/primary/config/magicLinkUrl";
-import {
-  makeShortLinkUrl,
-  ShortLinkId,
-} from "../domain/core/ports/ShortLinkQuery";
+import { ShortLinkId } from "../domain/core/ports/ShortLinkQuery";
 import { TimeGateway } from "../domain/core/ports/TimeGateway";
+import { makeShortLinkUrl } from "../domain/core/ShortLink";
 import { ContactEntity } from "../domain/immersionOffer/entities/ContactEntity";
 import { EstablishmentEntity } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import { AnnotatedImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
