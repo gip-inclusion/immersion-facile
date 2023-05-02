@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { Select } from "@codegouvfr/react-dsfr/Select";
+import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 
 export interface ArrayDropdownProps<T extends string> {
   options: T[];
-  onSelect: (option?: T) => void;
+  onSelect: (option?: string) => void;
   defaultSelectedOption?: T;
   allowEmpty: boolean;
   label?: string;
@@ -16,17 +16,11 @@ export const ArrayDropdown = <T extends string>({
   allowEmpty,
   label,
 }: ArrayDropdownProps<T>) => {
-  const displayOptions: (T | "")[] = allowEmpty ? ["", ...options] : options;
+  const displayOptions: string[] = allowEmpty ? ["", ...options] : options;
 
-  const [selectedOption, setSelectedOption] = useState<T | "">(
+  const [selectedOption, setSelectedOption] = useState<string | undefined>(
     defaultSelectedOption ?? "",
   );
-  const onChange: React.ChangeEventHandler<HTMLSelectElement> = (event) => {
-    const index = event.currentTarget.selectedIndex;
-    const option = displayOptions.at(index);
-    setSelectedOption(option ?? "");
-    return onSelect(option ? option : undefined);
-  };
   return (
     <div>
       <Select
@@ -39,7 +33,13 @@ export const ArrayDropdown = <T extends string>({
         nativeSelectProps={{
           id: "roles-dropdown",
           name: "select",
-          onChange,
+          onChange: (event) => {
+            const index = (event.currentTarget as unknown as HTMLSelectElement)
+              .selectedIndex;
+            const option = displayOptions.at(index);
+            setSelectedOption(option ?? "");
+            return onSelect(option ? option : undefined);
+          },
           style: { width: "200px" },
           onEmptied: () => setSelectedOption(""),
         }}

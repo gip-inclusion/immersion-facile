@@ -67,7 +67,9 @@ const ExportEntreprises = () => {
                 if (selectedGroupKey) {
                   setExportableParams({
                     ...exportableParams,
-                    keyToGroupBy: selectedGroupKey,
+                    keyToGroupBy: selectedGroupKey as
+                      | EstablishmentsWithFlattenOffersExportableParams["keyToGroupBy"]
+                      | EstablishmentsWithAggregatedOffersExportableParams["keyToGroupBy"],
                   });
                 }
               }}
@@ -174,7 +176,8 @@ const ExportConventions = () => {
                 if (selectedGroupKey) {
                   setExportableParams({
                     ...exportableParams,
-                    keyToGroupBy: selectedGroupKey,
+                    keyToGroupBy:
+                      selectedGroupKey as ConventionsExportableParams["keyToGroupBy"],
                   });
                 }
               }}
@@ -309,7 +312,8 @@ const ExportAgencies = () => {
                 if (selectedGroupKey) {
                   setExportableParams({
                     ...exportableParams,
-                    keyToGroupBy: selectedGroupKey,
+                    keyToGroupBy:
+                      selectedGroupKey as AgenciesExportableParams["keyToGroupBy"],
                   });
                 }
               }}
@@ -372,7 +376,8 @@ const ExportContactRequests = () => {
               if (selectedGroupKey) {
                 setExportableParams({
                   ...exportableParams,
-                  keyToGroupBy: selectedGroupKey,
+                  keyToGroupBy:
+                    selectedGroupKey as ContactRequestsExportableParams["keyToGroupBy"],
                 });
               }
             }}
