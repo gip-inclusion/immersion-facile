@@ -30,6 +30,10 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       "shortLink2",
       "shortLink3",
       "shortLink4",
+      "shortLink5",
+      "shortLink6",
+      "shortLink7",
+      "shortLink8",
     ]);
 
     const { establishmentRepJwt } =
@@ -139,11 +143,19 @@ const expectEstablishmentRequiresChanges = async (
     "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
   );
 
-  const beneficiaryEditJwt = expectJwtInMagicLinkAndGetIt(
+  const beneficiarySignLink = await shortLinkRedirectToLinkWithValidation(
     beneficiaryEditEmail.params.magicLink,
+    request,
   );
-  const establishmentEditJwt = expectJwtInMagicLinkAndGetIt(
+
+  const establishmentSignLink = await shortLinkRedirectToLinkWithValidation(
     establishmentEditEmail.params.magicLink,
+    request,
+  );
+
+  const beneficiaryEditJwt = expectJwtInMagicLinkAndGetIt(beneficiarySignLink);
+  const establishmentEditJwt = expectJwtInMagicLinkAndGetIt(
+    establishmentSignLink,
   );
 
   return {

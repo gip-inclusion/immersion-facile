@@ -7,7 +7,9 @@ import {
   frontRoutes,
   Role,
 } from "shared";
+import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
+import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
@@ -15,7 +17,9 @@ import {
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
+import { makeShortLinkUrl } from "../../../core/ShortLink";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "./NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 
 describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () => {
@@ -23,21 +27,27 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
   let uow: InMemoryUnitOfWork;
   let emailGateway: InMemoryEmailGateway;
   let timeGateway: TimeGateway;
+  let config: AppConfig;
+  let shortLinkIdGateway: DeterministShortLinkIdGeneratorGateway;
   const convention = new ConventionDtoBuilder().build();
   const agency = new AgencyDtoBuilder().withId(convention.agencyId).build();
 
   beforeEach(() => {
+    config = new AppConfigBuilder({}).build();
     uow = createInMemoryUow();
     uow.conventionRepository.setConventions({ [convention.id]: convention });
     uow.agencyRepository.setAgencies([agency]);
     emailGateway = new InMemoryEmailGateway();
     timeGateway = new CustomTimeGateway();
+    shortLinkIdGateway = new DeterministShortLinkIdGeneratorGateway();
     usecase =
       new NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification(
         new InMemoryUowPerformer(uow),
         emailGateway,
         fakeGenerateMagicLinkUrlFn,
         timeGateway,
+        shortLinkIdGateway,
+        config,
       );
   });
 
@@ -55,6 +65,8 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
     ])(
       "Notify %s that application needs modification.",
       async (role, expectedRecipient) => {
+        const shortLinkIds = ["shortLinkId1", "shortLinkId2"];
+        shortLinkIdGateway.addMoreShortLinkIds(shortLinkIds);
         const justification = "Change required.";
         const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties =
           {
@@ -70,6 +82,17 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
           roles: [role],
         });
 
+        expectToEqual(uow.shortLinkQuery.getShortLinks(), {
+          [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
+            ...magicLinkCommonFields,
+            targetRoute: frontRoutes.conventionImmersionRoute,
+          }),
+          [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
+            ...magicLinkCommonFields,
+            targetRoute: frontRoutes.conventionStatusDashboard,
+          }),
+        });
+
         expectToEqual(emailGateway.getSentEmails(), [
           {
             type: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
@@ -81,16 +104,10 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
                 convention.signatories.beneficiary.firstName,
               beneficiaryLastName: convention.signatories.beneficiary.lastName,
               businessName: convention.businessName,
-              conventionStatusLink: fakeGenerateMagicLinkUrlFn({
-                ...magicLinkCommonFields,
-                targetRoute: frontRoutes.conventionStatusDashboard,
-              }),
               immersionAppellation: convention.immersionAppellation,
               justification,
-              magicLink: fakeGenerateMagicLinkUrlFn({
-                ...magicLinkCommonFields,
-                targetRoute: frontRoutes.conventionImmersionRoute,
-              }),
+              magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
+              conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[1]),
               signature: agency.signature,
               agencyLogoUrl: agency.logoUrl,
             },

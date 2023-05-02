@@ -8,12 +8,15 @@ import {
   Role,
   zTrimmedString,
 } from "shared";
+import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
+import { ShortLinkIdGeneratorGateway } from "../../../core/ports/ShortLinkIdGeneratorGateway";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
+import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { EmailGateway } from "../../ports/EmailGateway";
 
@@ -31,6 +34,8 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
     private readonly emailGateway: EmailGateway,
     private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     private readonly timeGateway: TimeGateway,
+    private readonly shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
+    private readonly config: AppConfig,
   ) {
     super(uowPerformer);
   }
@@ -52,13 +57,21 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
       const email = emailByRoleForConventionNeedsModification(role, convention);
       if (email instanceof Error) throw email;
 
-      const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties =
+      const conventionMagicLinkPayload: CreateConventionMagicLinkPayloadProperties =
         {
           id: convention.id,
           role,
           email,
           now: this.timeGateway.now(),
         };
+
+      const makeShortMagicLink = prepareMagicShortLinkMaker({
+        config: this.config,
+        conventionMagicLinkPayload,
+        generateConventionMagicLinkUrl: this.generateConventionMagicLinkUrl,
+        shortLinkIdGeneratorGateway: this.shortLinkIdGeneratorGateway,
+        uow,
+      });
 
       await this.emailGateway.sendEmail({
         type: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
@@ -72,14 +85,12 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
           signature: agency.signature,
           agency: agency.name,
           immersionAppellation: convention.immersionAppellation,
-          magicLink: this.generateConventionMagicLinkUrl({
-            ...magicLinkCommonFields,
-            targetRoute: frontRoutes.conventionImmersionRoute,
-          }),
-          conventionStatusLink: this.generateConventionMagicLinkUrl({
-            ...magicLinkCommonFields,
-            targetRoute: frontRoutes.conventionStatusDashboard,
-          }),
+          magicLink: await makeShortMagicLink(
+            frontRoutes.conventionImmersionRoute,
+          ),
+          conventionStatusLink: await makeShortMagicLink(
+            frontRoutes.conventionStatusDashboard,
+          ),
           agencyLogoUrl: agency.logoUrl,
         },
       });
