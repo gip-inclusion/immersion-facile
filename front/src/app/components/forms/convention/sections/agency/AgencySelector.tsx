@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { Select } from "@codegouvfr/react-dsfr/Select";
+import { Select, type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import {
   AgencyOption,
   ConventionReadDto,
@@ -44,8 +44,6 @@ export const AgencySelector = ({
     setValue,
     formState: { errors, touchedFields },
   } = useFormContext<ConventionReadDto>();
-  // const [{ value: agencyDepartment }, _, { setValue: setAgencyDepartment }] =
-  //   useField<DepartmentCode | null>(agencyDepartmentField.name);
   const agencyDepartment = getValues().agencyDepartment;
   const [isLoading, setIsLoading] = useState(false);
   const [loadingError, setLoadingError] = useState(false);
@@ -149,13 +147,8 @@ export const AgencySelector = ({
   );
 };
 
-type DepartmentOption = {
-  label: string;
-  value: string;
-}; //satisfies SelectOption
-
 const departmentOptions = keys(departmentNameToDepartmentCode).map(
-  (departmentName: string): DepartmentOption => ({
+  (departmentName: string): SelectProps.Option<string> => ({
     label: `${departmentNameToDepartmentCode[departmentName]} - ${departmentName}`,
     value: departmentNameToDepartmentCode[departmentName],
   }),

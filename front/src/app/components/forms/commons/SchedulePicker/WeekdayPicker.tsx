@@ -57,12 +57,12 @@ export const WeekdayPicker = ({
     <div className={cx("schedule-picker__section")}>
       {dayPeriods.length > 0 &&
         dayPeriods.map((dayRange, index) => {
-          const onStartChange = (value: number) => {
-            dayRange[0] = value as WeekdayNumber;
+          const onStartChange = (value: WeekdayNumber) => {
+            dayRange[0] = value;
             onValueChange(dayPeriods);
           };
-          const onEndChange = (value: number) => {
-            dayRange[1] = value as WeekdayNumber;
+          const onEndChange = (value: WeekdayNumber) => {
+            dayRange[1] = value;
             onValueChange(dayPeriods);
           };
 
@@ -84,7 +84,7 @@ export const WeekdayPicker = ({
                     minDay={0}
                     maxDay={dayRange[1]}
                     selected={dayRange[0]}
-                    onValueChange={(x) => onStartChange(x)}
+                    onValueChange={(x) => onStartChange(x as WeekdayNumber)}
                     disabled={disabled}
                   />
                 </div>
@@ -97,7 +97,7 @@ export const WeekdayPicker = ({
                     minDay={dayRange[0]}
                     maxDay={6}
                     selected={dayRange[1]}
-                    onValueChange={(x) => onEndChange(x)}
+                    onValueChange={(x) => onEndChange(x as WeekdayNumber)}
                     disabled={disabled}
                   />
                 </div>
