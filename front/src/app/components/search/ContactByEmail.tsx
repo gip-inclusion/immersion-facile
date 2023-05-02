@@ -11,7 +11,6 @@ import {
   RomeDto,
   SiretDto,
 } from "shared";
-import { ModalTitle } from "react-design-system";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { immersionSearchGateway } from "src/config/dependencies";
 
@@ -67,8 +66,6 @@ export const ContactByEmail = ({
   return (
     <form onSubmit={handleSubmit(onFormValid)}>
       <>
-        <ModalTitle>Contacter l'entreprise</ModalTitle>
-
         <p className={fr.cx("fr-pb-3w")}>
           Cette entreprise a choisi d'être contactée par mail. Veuillez
           compléter ce formulaire qui sera transmis à l'entreprise.
