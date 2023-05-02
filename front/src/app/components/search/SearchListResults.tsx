@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
+import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { ContactMethod, domElementIds, SearchImmersionResultDto } from "shared";
@@ -8,10 +9,15 @@ import { SuccessFeedback } from "src/app/components/SuccessFeedback";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import {
-  ContactEstablishmentModal,
-  useContactEstablishmentModal,
-} from "./ContactEstablishmentModal";
+  ContactModalContentProps,
+  ModalContactContent,
+} from "./ContactModalContent";
 import { SearchResult } from "./SearchResult";
+
+const { ContactModal, openContactModal, closeContactModal } = createModal({
+  isOpenedByDefault: false,
+  name: "contact",
+});
 
 const getFeedBackMessage = (contactMethod?: ContactMethod) => {
   switch (contactMethod) {
@@ -39,12 +45,13 @@ export const SearchListResults = () => {
   // prettier-ignore
   const [successfulValidationMessage, setSuccessfulValidatedMessage] = useState<string | null>(null);
   const [successFullyValidated, setSuccessfullyValidated] = useState(false);
-  const { modalState, dispatch } = useContactEstablishmentModal();
   const [displayedResults, setDisplayedResults] =
     useState<SearchImmersionResultDto[]>(searchResults);
   const [resultsPerPage, setResultsPerPage] = useState<ResultsPerPageOptions>(
     defaultResultsPerPage,
   );
+  const [modalContent, setModalContent] =
+    useState<Omit<ContactModalContentProps, "onSuccess">>();
   const { cx, classes } = useStyleUtils();
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
   const resultsPerPageValue = parseInt(resultsPerPage);
@@ -90,23 +97,18 @@ export const SearchListResults = () => {
               <SearchResult
                 key={searchResult.siret + "-" + searchResult.rome} // Should be unique !
                 establishment={searchResult}
-                onButtonClick={() =>
-                  dispatch({
-                    type: "CLICKED_OPEN",
-                    payload: {
-                      immersionOfferRome: searchResult.rome,
-                      immersionOfferSiret: searchResult.siret,
-                      siret: searchResult.siret,
-                      offer: {
-                        romeCode: searchResult.rome,
-                        romeLabel: searchResult.romeLabel,
-                      },
-                      contactMethod: searchResult.contactMode,
-                      searchResultData: searchResult,
+                onButtonClick={() => {
+                  setModalContent({
+                    siret: searchResult.siret,
+                    offer: {
+                      romeCode: searchResult.rome,
+                      romeLabel: searchResult.romeLabel,
                     },
-                  })
-                }
-                disableButton={modalState.isValidating}
+                    contactMethod: searchResult.contactMode,
+                    searchResultData: searchResult,
+                  });
+                  openContactModal();
+                }}
               />
             ))}
         </div>
@@ -158,16 +160,28 @@ export const SearchListResults = () => {
           </div>
         </div>
       </div>
-      <ContactEstablishmentModal
-        modalState={modalState}
-        dispatch={dispatch}
-        onSuccess={() => {
-          setSuccessfulValidatedMessage(
-            getFeedBackMessage(modalState.contactMethod),
-          );
-          setSuccessfullyValidated(true);
-        }}
-      />
+
+      <ContactModal
+        title={
+          modalContent?.contactMethod
+            ? "Contactez l'entreprise"
+            : "Tentez votre chance !"
+        }
+      >
+        {modalContent && (
+          <ModalContactContent
+            {...modalContent}
+            onSuccess={() => {
+              setSuccessfulValidatedMessage(
+                getFeedBackMessage(modalContent.contactMethod),
+              );
+              setSuccessfullyValidated(true);
+              closeContactModal();
+            }}
+          />
+        )}
+      </ContactModal>
+
       {successfulValidationMessage && (
         <SuccessFeedback
           open={successFullyValidated}
