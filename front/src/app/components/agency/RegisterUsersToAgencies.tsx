@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import { Select } from "@codegouvfr/react-dsfr/Select";
+import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { match, P } from "ts-pattern";
 import { AgencyRole, allAgencyRoles, AuthenticatedUserId } from "shared";
 import { DsfrTitle } from "react-design-system";

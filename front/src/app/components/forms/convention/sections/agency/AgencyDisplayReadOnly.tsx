@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { Select } from "@codegouvfr/react-dsfr/Select";
+import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import type { ConventionDto, ConventionReadDto } from "shared";
 import { AgencyOption } from "shared";
 import { Loader } from "react-design-system";

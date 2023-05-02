@@ -8,7 +8,6 @@ import {
   addressTargets,
   domElementIds,
 } from "shared";
-import { cypressDoIfElementExists } from "./conditional";
 import { fillSelectRandomly } from "./input";
 
 const conventionFormUrl = `${frontRoutes.conventionImmersionRoute}`;
