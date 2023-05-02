@@ -10,7 +10,6 @@ import {
   RomeDto,
   SiretDto,
 } from "shared";
-import { ModalTitle } from "react-design-system";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { immersionSearchGateway } from "src/config/dependencies";
 
@@ -55,7 +54,6 @@ export const ContactInPerson = ({
   return (
     <form onSubmit={handleSubmit(onFormValid)}>
       <>
-        <ModalTitle>Contacter l'entreprise</ModalTitle>
         <p className={"fr-my-2w"}>
           Cette entreprise souhaite que vous vous présentiez directement pour
           candidater.
