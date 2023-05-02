@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
-import { Select } from "@codegouvfr/react-dsfr/Select";
+import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { keys } from "ramda";
 import { useStyles } from "tss-react/dsfr";
 import {
@@ -70,7 +70,7 @@ export const EmailPreviewTab = () => {
                 id: domElementIds.admin.emailPreviewTab.emailTemplateNameSelect,
                 name: "templateName",
                 onChange: (event) =>
-                  setCurrentTemplate(event.currentTarget.value as TemplateName),
+                  setCurrentTemplate(event.currentTarget.value),
               }}
             />
 

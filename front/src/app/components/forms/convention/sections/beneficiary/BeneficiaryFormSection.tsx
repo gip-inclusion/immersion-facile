@@ -3,7 +3,7 @@ import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
-import { Select } from "@codegouvfr/react-dsfr/Select";
+import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { keys } from "ramda";
 import {
   ConventionReadDto,
