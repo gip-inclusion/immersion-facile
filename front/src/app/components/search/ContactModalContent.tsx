@@ -1,174 +1,46 @@
-import React, { ReactNode, useReducer } from "react";
+import React, { ReactNode } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import {
   ContactMethod,
-  RomeCode,
   RomeDto,
   SearchImmersionResultDto,
   SiretDto,
 } from "shared";
-import {
-  ModalClose,
-  ModalContent,
-  ModalDialog,
-  ModalTitle,
-  SubTitle,
-} from "react-design-system";
+import { SubTitle } from "src/../../libs/react-design-system";
 import { ContactByEmail } from "./ContactByEmail";
 import { ContactByPhone } from "./ContactByPhone";
-import { ContactInPerson } from "./ContactInPerson";
 
-type ModalState = {
-  isOpen: boolean;
-  isValidating: boolean;
+export type ContactModalContentProps = {
+  contactMethod?: ContactMethod;
   siret: SiretDto;
   offer: RomeDto;
-  contactMethod?: ContactMethod;
   searchResultData?: SearchImmersionResultDto;
-};
-
-type ModalAction =
-  | {
-      type: "CLICKED_OPEN";
-      payload: {
-        immersionOfferRome: RomeCode;
-        immersionOfferSiret: SiretDto;
-        siret: SiretDto;
-        offer: RomeDto;
-        contactMethod?: ContactMethod;
-        searchResultData?: SearchImmersionResultDto;
-      };
-    }
-  | { type: "CLICKED_CLOSE" }
-  | { type: "CLICKED_VALIDATE" }
-  | { type: "VALIDATION_HANDLED" };
-
-const modalReducer = (state: ModalState, action: ModalAction): ModalState => {
-  switch (action.type) {
-    case "CLICKED_OPEN":
-      return { ...state, isOpen: true, ...action.payload };
-    case "CLICKED_CLOSE":
-      return {
-        offer: { romeCode: "", romeLabel: "" },
-        siret: "",
-        isOpen: false,
-        isValidating: false,
-      };
-    case "CLICKED_VALIDATE":
-      return { ...state, isOpen: false, isValidating: true };
-    case "VALIDATION_HANDLED":
-      return {
-        offer: { romeCode: "", romeLabel: "" },
-        siret: "",
-        isOpen: false,
-        isValidating: false,
-      };
-    default: {
-      const shouldNeverBeAssigned: never = action;
-      return shouldNeverBeAssigned;
-    }
-  }
-};
-
-export const useContactEstablishmentModal = () => {
-  const initialModalState: ModalState = {
-    offer: { romeCode: "", romeLabel: "" },
-    siret: "",
-    isOpen: false,
-    isValidating: false,
-  };
-
-  const [modalState, dispatch] = useReducer(modalReducer, initialModalState);
-
-  return { modalState, dispatch };
-};
-
-type ContactEstablishmentModalProps = {
-  modalState: ModalState;
-  dispatch: React.Dispatch<ModalAction>;
   onSuccess: () => void;
 };
 
-export const ContactEstablishmentModal = ({
-  modalState,
-  dispatch,
+export const ModalContactContent = ({
+  contactMethod,
+  siret,
+  offer,
   onSuccess,
-}: ContactEstablishmentModalProps) => {
-  const hide = () => dispatch({ type: "CLICKED_CLOSE" });
-
-  const hideAndShowSuccess = () => {
-    hide();
-    onSuccess();
-  };
-  return (
-    <ModalDialog isOpen={modalState.isOpen} hide={hide}>
-      <ModalClose hide={hide} title="Fermer la fenêtre" />
-      <ModalContent>
-        <ModalContactContent
-          modalState={modalState}
-          onSuccess={hideAndShowSuccess}
-        />
-      </ModalContent>
-    </ModalDialog>
-  );
-};
-
-type ModalContactContentProps = {
-  modalState: ModalState;
-  onSuccess: () => void;
-};
-
-const ModalContactContent = ({
-  modalState,
-  onSuccess,
-}: ModalContactContentProps) => {
-  switch (modalState.contactMethod) {
+  searchResultData,
+}: ContactModalContentProps) => {
+  switch (contactMethod) {
     case "EMAIL":
       return (
-        <ContactByEmail
-          siret={modalState.siret}
-          offer={modalState.offer}
-          onSuccess={onSuccess}
-        />
+        <ContactByEmail siret={siret} offer={offer} onSuccess={onSuccess} />
       );
     case "PHONE":
       return (
-        <ContactByPhone
-          siret={modalState.siret}
-          offer={modalState.offer}
-          onSuccess={onSuccess}
-        />
+        <ContactByPhone siret={siret} offer={offer} onSuccess={onSuccess} />
       );
     case "IN_PERSON":
       return (
-        <ContactInPerson
-          siret={modalState.siret}
-          offer={modalState.offer}
-          onSuccess={onSuccess}
-        />
+        <ContactByEmail siret={siret} offer={offer} onSuccess={onSuccess} />
       );
     default:
-      return <AdvisesForContact data={modalState.searchResultData} />;
+      return <AdvisesForContact data={searchResultData} />;
   }
-};
-
-const Paragraph = ({ children }: { children: ReactNode }) => (
-  <p className={fr.cx("fr-mb-2w")}>{children}</p>
-);
-
-const Bold = ({ children }: { children: string }) => (
-  <strong>{children}</strong>
-);
-
-export const getMapsLink = (
-  searchResultData: SearchImmersionResultDto | undefined,
-) => {
-  if (!searchResultData) return;
-  const { address, name } = searchResultData;
-  const queryString = `${address.streetNumberAndAddress} ${address.postcode} ${address.city} ${name}`;
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURI(
-    queryString,
-  )}`;
 };
 
 const AdvisesForContact = ({
@@ -177,7 +49,6 @@ const AdvisesForContact = ({
   data: SearchImmersionResultDto | undefined;
 }) => (
   <div>
-    <ModalTitle>Tentez votre chance</ModalTitle>
     <Paragraph>
       Cette entreprise peut recruter sur ce métier et être intéressée pour vous
       recevoir en immersion. Tentez votre chance en la contactant !
@@ -207,9 +78,9 @@ const AdvisesForContact = ({
       </li>
     </ul>
     <hr className={fr.cx("fr-hr", "fr-mt-2w")} />
-    <ModalTitle>
-      Nos conseils pour cette première prise de contact !{" "}
-    </ModalTitle>
+    <h2 className={fr.cx("fr-h5")}>
+      Nos conseils pour cette première prise de contact&nbsp;!{" "}
+    </h2>
 
     <SubTitle>Comment présenter votre demande ? </SubTitle>
     <Paragraph>
@@ -285,3 +156,22 @@ const AdvisesForContact = ({
     </Paragraph>
   </div>
 );
+
+const Paragraph = ({ children }: { children: ReactNode }) => (
+  <p className={fr.cx("fr-mb-2w")}>{children}</p>
+);
+
+const Bold = ({ children }: { children: string }) => (
+  <strong>{children}</strong>
+);
+
+export const getMapsLink = (
+  searchResultData: SearchImmersionResultDto | undefined,
+) => {
+  if (!searchResultData) return;
+  const { address, name } = searchResultData;
+  const queryString = `${address.streetNumberAndAddress} ${address.postcode} ${address.city} ${name}`;
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURI(
+    queryString,
+  )}`;
+};
