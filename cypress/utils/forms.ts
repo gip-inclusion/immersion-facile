@@ -71,14 +71,6 @@ export function basicFormConvention() {
   cy.get(`#${domElementIds.conventionImmersionRoute.conventionSection.siret}`)
     .clear()
     .type("78886997200026");
-  cypressDoIfElementExists(
-    `#${domElementIds.conventionImmersionRoute.conventionSection.siret}:not([disabled])`,
-    () => {
-      cy.get(
-        `#${domElementIds.conventionImmersionRoute.conventionSection.siret}:not([disabled])`,
-      ).type("Entreprise de test");
-    },
-  );
   cy.get(
     `#${domElementIds.conventionImmersionRoute.establishmentTutorSection.firstName}`,
   )
