@@ -1,11 +1,9 @@
 import jwt, { TokenExpiredError } from "jsonwebtoken";
 import {
-  AbsoluteUrl,
   AgencyDto,
   ConventionDto,
   ConventionId,
   ConventionMagicLinkPayload,
-  createConventionMagicLinkPayload,
   frontRoutes,
   InternshipKind,
   RenewMagicLinkRequestDto,
@@ -15,16 +13,18 @@ import {
 } from "shared";
 import { verifyJwtConfig } from "../../../adapters/primary/authMiddleware";
 import { AppConfig } from "../../../adapters/primary/config/appConfig";
+import { GenerateConventionMagicLinkUrl } from "../../../adapters/primary/config/magicLinkUrl";
 import {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
 import { createLogger } from "../../../utils/logger";
-import { GenerateConventionJwt } from "../../auth/jwt";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
+import { ShortLinkIdGeneratorGateway } from "../../core/ports/ShortLinkIdGeneratorGateway";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
+import { prepareMagicShortLinkMaker } from "../../core/ShortLink";
 import { TransactionalUseCase } from "../../core/UseCase";
 
 const logger = createLogger(__filename);
@@ -36,10 +36,10 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly createNewEvent: CreateNewEvent,
-    private readonly generateMagicLinkJwt: GenerateConventionJwt,
+    private readonly makeGenerateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     private readonly config: AppConfig,
     private readonly timeGateway: TimeGateway,
-    private readonly immersionBaseUrl: AbsoluteUrl,
+    private readonly shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
   ) {
     super(uowPerformer);
   }
@@ -89,17 +89,20 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
     for (const email of emails) {
       if (!emailHash || stringToMd5(email) === emailHash) {
         foundHit = true;
-        const jwt = this.generateMagicLinkJwt(
-          createConventionMagicLinkPayload({
+
+        const makeMagicShortLink = prepareMagicShortLinkMaker({
+          conventionMagicLinkPayload: {
             id: applicationId,
             role,
             email,
             now: this.timeGateway.now(),
-          }),
-        );
-
-        const magicLink = `${this.immersionBaseUrl}/${route}?jwt=${jwt}`;
-        const conventionStatusLink = `${this.immersionBaseUrl}/${frontRoutes.conventionStatusDashboard}?jwt=${jwt}`;
+          },
+          uow,
+          config: this.config,
+          generateConventionMagicLinkUrl:
+            this.makeGenerateConventionMagicLinkUrl,
+          shortLinkIdGeneratorGateway: this.shortLinkIdGeneratorGateway,
+        });
 
         await uow.outboxRepository.save(
           this.createNewEvent({
@@ -107,8 +110,10 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
             payload: {
               internshipKind,
               emails,
-              magicLink,
-              conventionStatusLink,
+              magicLink: await makeMagicShortLink(route),
+              conventionStatusLink: await makeMagicShortLink(
+                frontRoutes.conventionStatusDashboard,
+              ),
             },
           }),
         );
