@@ -25,14 +25,14 @@ export const SubmitConfirmationSection = ({
         <h1 className={cx(fr.cx("fr-mb-md-7w"), Styles.title)}>
           Votre demande de convention a bien été envoyée !
         </h1>
-        <p className={cx(fr.cx("fr-mb-4w", "fr-mb-md-7w"), Styles.text)}>
+        <p className={cx(fr.cx("fr-mb-4w", "fr-mb-md-7w"), Styles.description)}>
           Conservez précieusement l'identifiant de votre convention, il vous
           permettra de la retrouver en cas de problème :
         </p>
         <div
           className={cx(
             fr.cx("fr-grid-row", "fr-grid-row--center", "fr-grid-row--middle"),
-            Styles.copy,
+            Styles.copyContent,
           )}
         >
           <strong className={fr.cx("fr-h2", "fr-mb-0")}>{idToCopy}</strong>

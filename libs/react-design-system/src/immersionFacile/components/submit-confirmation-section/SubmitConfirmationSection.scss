@@ -1,11 +1,7 @@
 .im-submit-confirmation-section {
-  &__text {
-    text-align: center;
-  }
-  &__copy {
-    text-align: center;
-  }
-  &__title {
+  &__title,
+  &__description,
+  &__copy-content {
     text-align: center;
   }
 }
