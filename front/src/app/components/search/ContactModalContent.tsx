@@ -6,7 +6,7 @@ import {
   SearchImmersionResultDto,
   SiretDto,
 } from "shared";
-import { SubTitle } from "src/../../libs/react-design-system";
+import { SubTitle } from "react-design-system";
 import { ContactByEmail } from "./ContactByEmail";
 import { ContactByPhone } from "./ContactByPhone";
 
