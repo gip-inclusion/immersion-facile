@@ -9,7 +9,7 @@ import {
 } from "shared";
 import { AddressGateway } from "../../../domain/immersionOffer/ports/AddressGateway";
 import { AppConfig } from "../../primary/config/appConfig";
-import { createHttpClientForExternalApi } from "../../primary/config/createGateways";
+import { createHttpClientForExternalApi } from "../../primary/config/createHttpClientForExternalApi";
 import { errorMessage, HttpAddressGateway } from "./HttpAddressGateway";
 import { addressesExternalTargets } from "./HttpAddressGateway.targets";
 

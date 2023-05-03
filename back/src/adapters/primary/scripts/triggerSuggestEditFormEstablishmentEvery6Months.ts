@@ -13,7 +13,7 @@ import { SendinblueHtmlEmailGateway } from "../../secondary/emailGateway/Sendinb
 import { sendinblueHtmlEmailGatewayTargets } from "../../secondary/emailGateway/SendinblueHtmlEmailGateway.targets";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { AppConfig, makeEmailAllowListPredicate } from "../config/appConfig";
-import { createHttpClientForExternalApi } from "../config/createGateways";
+import { createHttpClientForExternalApi } from "../config/createHttpClientForExternalApi";
 import { makeGenerateEditFormEstablishmentUrl } from "../config/magicLinkUrl";
 import { createPgUow } from "../config/uowConfig";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";

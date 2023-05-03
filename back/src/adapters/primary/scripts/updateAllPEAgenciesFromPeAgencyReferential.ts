@@ -9,7 +9,7 @@ import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementatio
 import { HttpPeAgenciesReferential } from "../../secondary/immersionOffer/peAgenciesReferential/HttpPeAgenciesReferential";
 import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { AppConfig } from "../config/appConfig";
-import { createHttpClientForExternalApi } from "../config/createGateways";
+import { createHttpClientForExternalApi } from "../config/createHttpClientForExternalApi";
 import { createUowPerformer } from "../config/uowConfig";
 
 const updateAllPeAgenciesScript = async () => {

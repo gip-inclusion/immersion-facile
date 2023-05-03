@@ -9,7 +9,7 @@ import {
   AppConfig,
   makeEmailAllowListPredicate,
 } from "../../adapters/primary/config/appConfig";
-import { createHttpClientForExternalApi } from "../../adapters/primary/config/createGateways";
+import { createHttpClientForExternalApi } from "../../adapters/primary/config/createHttpClientForExternalApi";
 import {
   GenerateConventionMagicLinkUrl,
   makeGenerateConventionMagicLinkUrl,
@@ -51,7 +51,7 @@ describe("Notify To 2 Counsellors that an application is available", () => {
         skipEmailAllowList: config.skipEmailAllowlist,
         emailAllowList: config.emailAllowList,
       }),
-      config.apiKeySendinblue,
+      config.apiKeySendinblue + "wrong",
       {
         name: "Immersion Facilitée",
         email: immersionFacileContactEmail,
