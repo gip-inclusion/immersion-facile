@@ -314,5 +314,4 @@ export const domElementIds = {
   agencyDashboard: {},
   manageConventionAdmin: {},
   manageConventionOld: {},
-  conventionSubmited: {},
 } satisfies DomElementIds;

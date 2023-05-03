@@ -21,7 +21,6 @@ import { ConventionDocumentPage } from "../pages/convention/ConventionDocumentPa
 import { ConventionManageAdminPage } from "../pages/convention/ConventionManageAdminPage";
 import { ConventionManagePage } from "../pages/convention/ConventionManagePage";
 import { ConventionPageForExternals } from "../pages/convention/ConventionPageForExternals";
-import { ConventionSubmitedConfirmationPage } from "../pages/convention/ConventionSubmitedConfirmationPage";
 import { ErrorPage } from "../pages/error/ErrorPage";
 import { EstablishmentFormPage } from "../pages/establishment/EstablishmentFormPage";
 import { GroupPage } from "../pages/group/GroupPage";
@@ -68,9 +67,6 @@ const getPageByRouteName: {
   conventionMiniStage: (route) => <ConventionMiniStagePage route={route} />,
   conventionStatusDashboard: (route) => (
     <ConventionStatusDashboardPage route={route} />
-  ),
-  conventionSubmited: (route) => (
-    <ConventionSubmitedConfirmationPage route={route} />
   ),
   conventionToSign: (route) => <ConventionSignPage route={route} />,
   debugPopulateDB: () => undefined,
