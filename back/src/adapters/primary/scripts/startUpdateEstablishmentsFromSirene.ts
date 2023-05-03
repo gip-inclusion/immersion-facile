@@ -15,7 +15,7 @@ import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGatewa
 import { PgEstablishmentAggregateRepository } from "../../secondary/pg/PgEstablishmentAggregateRepository";
 import { HttpSirenGateway } from "../../secondary/sirene/HttpSirenGateway";
 import { AppConfig } from "../config/appConfig";
-import { configureCreateHttpClientForExternalApi } from "../config/createGateways";
+import { configureCreateHttpClientForExternalApi } from "../config/createHttpClientForExternalApi";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
 const logger = createLogger(__filename);

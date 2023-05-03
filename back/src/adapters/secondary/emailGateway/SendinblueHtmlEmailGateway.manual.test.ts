@@ -1,5 +1,5 @@
 import { AppConfig } from "../../primary/config/appConfig";
-import { configureCreateHttpClientForExternalApi } from "../../primary/config/createGateways";
+import { configureCreateHttpClientForExternalApi } from "../../primary/config/createHttpClientForExternalApi";
 import { SendinblueHtmlEmailGateway } from "./SendinblueHtmlEmailGateway";
 import { sendinblueHtmlEmailGatewayTargets } from "./SendinblueHtmlEmailGateway.targets";
 

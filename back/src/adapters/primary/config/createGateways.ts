@@ -1,11 +1,10 @@
-import axios, { AxiosInstance } from "axios";
+import axios from "axios";
 import { Pool } from "pg";
 import {
   exhaustiveCheck,
   immersionFacileContactEmail,
   pipeWithValue,
 } from "shared";
-import { configureHttpClient, createAxiosHandlerCreator } from "http-client";
 import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
@@ -54,14 +53,9 @@ import { NanoIdShortLinkIdGeneratorGateway } from "../../secondary/shortLinkIdGe
 import { HttpSirenGateway } from "../../secondary/sirene/HttpSirenGateway";
 import { InMemorySirenGateway } from "../../secondary/sirene/InMemorySirenGateway";
 import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
+import { configureCreateHttpClientForExternalApi } from "./createHttpClientForExternalApi";
 
 const logger = createLogger(__filename);
-
-export const configureCreateHttpClientForExternalApi = (
-  axiosInstance: AxiosInstance = axios.create({
-    timeout: 10_000,
-  }),
-) => configureHttpClient(createAxiosHandlerCreator(axiosInstance));
 
 export type GetPgPoolFn = () => Pool;
 export const createGetPgPoolFn = (config: AppConfig): GetPgPoolFn => {
