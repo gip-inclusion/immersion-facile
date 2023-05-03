@@ -58,10 +58,6 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { jwt: param.query.string },
     () => `/${frontRoutes.conventionStatusDashboard}`,
   ),
-  conventionSubmited: defineRoute(
-    { conventionId: param.path.string },
-    (params) => `/${frontRoutes.conventionSubmited}/${params.conventionId}`,
-  ),
   conventionToSign: defineRoute(
     { jwt: param.query.string },
     () => `/${frontRoutes.conventionToSign}`,

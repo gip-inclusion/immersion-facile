@@ -12,13 +12,13 @@ type MainWrapperCommonProps = {
   pageHeader?: React.ReactNode;
 };
 
-type WithBackground = {
+export type WithBackground = {
   useBackground: true;
   backgroundStyles?: React.CSSProperties;
 };
 
-type WithoutBackground = {
-  useBackground: undefined | false;
+export type WithoutBackground = {
+  useBackground?: undefined | false;
   backgroundStyles?: never;
 };
 
@@ -47,6 +47,7 @@ export const MainWrapper = ({
   if (layout !== "fullscreen") {
     classNameValue += "fr-container fr-grid--center";
   }
+
   return (
     <>
       {pageHeader}
