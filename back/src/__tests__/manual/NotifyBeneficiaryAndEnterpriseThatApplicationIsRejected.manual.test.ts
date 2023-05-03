@@ -4,7 +4,7 @@ import {
   immersionFacileContactEmail,
 } from "shared";
 import { AppConfig } from "../../adapters/primary/config/appConfig";
-import { configureCreateHttpClientForExternalApi } from "../../adapters/primary/config/createGateways";
+import { configureCreateHttpClientForExternalApi } from "../../adapters/primary/config/createHttpClientForExternalApi";
 import { createInMemoryUow } from "../../adapters/primary/config/uowConfig";
 import { SendinblueHtmlEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueHtmlEmailGateway";
 import { sendinblueHtmlEmailGatewayTargets } from "../../adapters/secondary/emailGateway/SendinblueHtmlEmailGateway.targets";

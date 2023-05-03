@@ -1,7 +1,7 @@
 import { ValidateEmailStatus } from "shared";
 import { EmailValidationGetaway } from "../../../domain/emailValidation/ports/EmailValidationGateway";
 import { AppConfig } from "../../primary/config/appConfig";
-import { configureCreateHttpClientForExternalApi } from "../../primary/config/createGateways";
+import { configureCreateHttpClientForExternalApi } from "../../primary/config/createHttpClientForExternalApi";
 import {
   EmailableEmailValidationGateway,
   emailableValidationTargets,
