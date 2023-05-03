@@ -22,7 +22,6 @@ export const frontRoutes = {
   manageConventionAdmin: "pilotage-convention-admin",
   search: "recherche",
   standard: "pages",
-  conventionSubmited: "succes-demande-initiale",
 };
 
 export const getConventionStatusDashboard = "status-convention";

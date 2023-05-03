@@ -8,26 +8,16 @@ export const SectionConventionNextSteps = () => {
   return (
     <section className={cx(fr.cx("fr-mt-5w", "fr-mb-10w"), Styles.root)}>
       <div className={fr.cx("fr-container")}>
-        <h2
-          className={cx(
-            fr.cx("fr-mb-7w", "fr-text--lg"),
-            `${Styles.root}__title`,
-          )}
-        >
+        <h2 className={cx(fr.cx("fr-mb-7w", "fr-text--lg"), Styles.title)}>
           Quelles sont les prochaines étapes ?
         </h2>
 
         <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
-          <div
-            className={cx(
-              fr.cx("fr-col-12", "fr-col-md-4"),
-              `${Styles.root}__step`,
-            )}
-          >
+          <div className={fr.cx("fr-col-12", "fr-col-md-4")}>
             <div
               className={cx(
                 fr.cx("fr-m-auto", "fr-mb-5w", "fr-pt-md-4w"),
-                `${Styles.root}__illustration-wrapper`,
+                Styles.illustrationWrapper,
               )}
             >
               <EmailSentIllustration />
@@ -38,24 +28,19 @@ export const SectionConventionNextSteps = () => {
             </p>
             <a
               className={fr.cx("fr-download__link", "fr-link--icon-right")}
-              href="https://aide.immersion-facile.beta.gouv.fr/fr/"
+              href="https://aide.immersion-facile.beta.gouv.fr/fr/article/le-beneficiaire-lentreprise-ou-le-prescripteur-na-pas-recu-la-convention-a-signer-125bxxd/"
               target="_blank"
               rel="noreferrer"
             >
-              Vous n'avez pas reçu l'email ? Accédez a notre centre d'aide
+              Vous n'avez pas reçu l'email ? Accédez à notre centre d'aide
             </a>
           </div>
 
-          <div
-            className={cx(
-              fr.cx("fr-col-12", "fr-col-md-4"),
-              `${Styles.root}__step`,
-            )}
-          >
+          <div className={fr.cx("fr-col-12", "fr-col-md-4")}>
             <div
               className={cx(
                 fr.cx("fr-m-auto", "fr-mb-5w"),
-                `${Styles.root}__illustration-wrapper`,
+                Styles.illustrationWrapper,
               )}
             >
               <TermsIllustration />
@@ -67,16 +52,11 @@ export const SectionConventionNextSteps = () => {
             </p>
           </div>
 
-          <div
-            className={cx(
-              fr.cx("fr-col-12", "fr-col-md-4"),
-              `${Styles.root}__step`,
-            )}
-          >
+          <div className={fr.cx("fr-col-12", "fr-col-md-4")}>
             <div
               className={cx(
                 fr.cx("fr-m-auto", "fr-mb-5w"),
-                `${Styles.root}__illustration-wrapper`,
+                Styles.illustrationWrapper,
               )}
             >
               <NotifyIllustration />
@@ -88,8 +68,6 @@ export const SectionConventionNextSteps = () => {
               de spams.
             </p>
           </div>
-
-          <div className={cx(`${Styles.root}__custom-background`)}></div>
         </div>
       </div>
     </section>
@@ -104,7 +82,7 @@ const EmailSentIllustration = () => {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 570 511.67482"
       xmlnsXlink="http://www.w3.org/1999/xlink"
-      className={cx(`${Styles.root}__illustration`)}
+      className={cx(Styles.illustration)}
       preserveAspectRatio="xMidYMax"
       aria-hidden
     >
@@ -159,7 +137,7 @@ const TermsIllustration = () => {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 634.38742 584.34971"
       xmlnsXlink="http://www.w3.org/1999/xlink"
-      className={cx(`${Styles.root}__illustration`)}
+      className={cx(Styles.illustration)}
       preserveAspectRatio="xMidYMax"
       aria-hidden
     >
@@ -307,7 +285,7 @@ const NotifyIllustration = () => {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 790 512.20805"
       xmlnsXlink="http://www.w3.org/1999/xlink"
-      className={cx(`${Styles.root}__illustration`)}
+      className={cx(Styles.illustration)}
       preserveAspectRatio="xMidYMax"
       aria-hidden
     >
