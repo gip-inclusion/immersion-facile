@@ -58,7 +58,7 @@ describe("Notify To 2 Counsellors that an application is available", () => {
         skipEmailAllowList: config.skipEmailAllowlist,
         emailAllowList: config.emailAllowList,
       }),
-      config.apiKeySendinblue,
+      config.apiKeySendinblue + "wrong",
       {
         name: "Immersion Facilitée",
         email: immersionFacileContactEmail,
