@@ -2,6 +2,14 @@ name: Copy DB PE vers Prod Scalingo (secnum)
 
 on:
   workflow_dispatch:
+    input:
+      stop-start-app:
+        required: true
+        type: string
+        description: "Should the app stop before dumping the database, and be restarted after the copy is done"
+        options:
+          - "yes"
+          - "no"
 
 jobs:
   dump-from-PE-and-restore-to-secnum-prod:
@@ -17,6 +25,7 @@ jobs:
         run: scalingo login --api-token=${{ secrets.SCALINGO_API_TOKEN_SECNUM }}
 
       - name: Stop the app
+        if: inputs.stop-start-app == "yes"
         run: scalingo --region osc-secnum-fr1 --app if-prod-back scale web:0
 
       - name: Dump the remote database data and restore it to the local database.
@@ -57,4 +66,5 @@ jobs:
                 exit 0"
 
       - name: Restart the app
+        if: inputs.stop-start-app == "yes"
         run: scalingo --region osc-secnum-fr1 --app if-prod-back scale web:1
