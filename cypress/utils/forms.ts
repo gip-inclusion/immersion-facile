@@ -9,6 +9,7 @@ import {
   domElementIds,
 } from "shared";
 import { fillSelectRandomly } from "./input";
+import { faker } from "@faker-js/faker/locale/fr";
 
 const conventionFormUrl = `${frontRoutes.conventionImmersionRoute}`;
 const baseApiRoute = "/api/";
@@ -50,51 +51,51 @@ export function basicFormConvention() {
     `#${domElementIds.conventionImmersionRoute.beneficiarySection.firstName}`,
   )
     .clear()
-    .type("Archibald");
+    .type(faker.name.firstName());
   cy.get(
     `#${domElementIds.conventionImmersionRoute.beneficiarySection.lastName}`,
   )
     .clear()
-    .type("Haddock");
+    .type(faker.name.lastName());
   cy.get(`#${domElementIds.conventionImmersionRoute.beneficiarySection.email}`)
     .clear()
-    .type("ahaddock@moulinsart.be");
+    .type(faker.internet.email());
   cy.get(`#${domElementIds.conventionImmersionRoute.beneficiarySection.phone}`)
     .clear()
-    .type("0585968574");
+    .type(faker.phone.number("06########"));
   cy.get(
     `#${domElementIds.conventionImmersionRoute.beneficiarySection.birthdate}`,
   )
     .clear()
-    .type("1985-05-25");
+    .type(faker.date.past(20, "2000-01-01").toISOString().split("T")[0]);
   cy.get(`#${domElementIds.conventionImmersionRoute.conventionSection.siret}`)
     .clear()
-    .type("78886997200026");
+    .type(faker.datatype.number(14).toString());
   cy.get(
     `#${domElementIds.conventionImmersionRoute.establishmentTutorSection.firstName}`,
   )
     .clear()
-    .type("Jean");
+    .type(faker.name.firstName());
   cy.get(
     `#${domElementIds.conventionImmersionRoute.establishmentTutorSection.lastName}`,
   )
     .clear()
-    .type("Bono");
+    .type(faker.name.lastName());
   cy.get(
     `#${domElementIds.conventionImmersionRoute.establishmentTutorSection.job}`,
   )
     .clear()
-    .type("Développeur web");
+    .type(faker.name.jobTitle());
   cy.get(
     `#${domElementIds.conventionImmersionRoute.establishmentTutorSection.phone}`,
   )
     .clear()
-    .type("0836656565");
+    .type(faker.phone.number("05########"));
   cy.get(
     `#${domElementIds.conventionImmersionRoute.establishmentTutorSection.email}`,
   )
     .clear()
-    .type("establishmentTutor@example.com");
+    .type(faker.internet.email());
   cy.get(
     `#${domElementIds.conventionImmersionRoute.conventionSection.dateStart}`,
   )
@@ -107,7 +108,7 @@ export function basicFormConvention() {
     `#${domElementIds.conventionImmersionRoute.conventionSection.immersionAddress}`,
   )
     .clear()
-    .type("71 Bd Saint-Michel 75005 Paris");
+    .type(faker.address.streetAddress(true));
   cy.wait("@autocompleteAddressRequest");
   cy.get(
     `#${domElementIds.conventionImmersionRoute.conventionSection.immersionAddress}`,
@@ -134,7 +135,7 @@ export function basicFormConvention() {
   });
   cy.get(
     `#${domElementIds.conventionImmersionRoute.conventionSection.immersionAppellation}`,
-  ).type("Boulangerie");
+  ).type(faker.name.jobType());
   cy.wait("@autocompleteAppellationRequest");
   cy.get(
     `#${domElementIds.conventionImmersionRoute.conventionSection.immersionAppellation}`,
@@ -148,7 +149,7 @@ export function basicFormConvention() {
     `#${domElementIds.conventionImmersionRoute.conventionSection.immersionActivities}`,
   )
     .clear()
-    .type("Regarder le pain");
+    .type(faker.random.words(12));
   cy.get(`#${domElementIds.conventionImmersionRoute.submitFormButton}`)
     .click()
     .then(() => {
