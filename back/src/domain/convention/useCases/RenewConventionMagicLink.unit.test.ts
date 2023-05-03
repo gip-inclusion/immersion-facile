@@ -1,5 +1,4 @@
 import {
-  AbsoluteUrl,
   AgencyDtoBuilder,
   BeneficiaryCurrentEmployer,
   BeneficiaryRepresentative,
@@ -8,10 +7,13 @@ import {
   createConventionMagicLinkPayload,
   expectPromiseToFailWithError,
   expectToEqual,
+  frontRoutes,
   RenewMagicLinkRequestDto,
   Role,
+  shortLinkRoute,
 } from "shared";
 import { AppConfigBuilder } from "../../../_testBuilders/AppConfigBuilder";
+import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/jwtTestHelper";
 import { AppConfig } from "../../../adapters/primary/config/appConfig";
 import {
   createInMemoryUow,
@@ -24,7 +26,8 @@ import {
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { makeGenerateJwtES256, makeVerifyJwtES256 } from "../../auth/jwt";
+import { DeterministShortLinkIdGeneratorGateway } from "../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
+import { makeGenerateJwtES256 } from "../../auth/jwt";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { RenewMagicLinkPayload } from "./notifications/DeliverRenewedMagicLink";
 import { RenewConventionMagicLink } from "./RenewConventionMagicLink";
@@ -52,7 +55,6 @@ const validConvention: ConventionDto = new ConventionDtoBuilder()
   .build();
 
 const defaultAgency = AgencyDtoBuilder.create(validConvention.agencyId).build();
-const immersionBaseUrl: AbsoluteUrl = "http://immersion-fake.com";
 const email = "some email";
 
 describe("RenewConventionMagicLink use case", () => {
@@ -67,6 +69,7 @@ describe("RenewConventionMagicLink use case", () => {
 
   let uow: InMemoryUnitOfWork;
   let useCase: RenewConventionMagicLink;
+  let shortLinkIdGeneratorGateway: DeterministShortLinkIdGeneratorGateway;
 
   beforeEach(() => {
     uow = createInMemoryUow();
@@ -74,16 +77,17 @@ describe("RenewConventionMagicLink use case", () => {
     uow.conventionRepository.setConventions({
       [validConvention.id]: validConvention,
     });
+    shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
     useCase = new RenewConventionMagicLink(
       new InMemoryUowPerformer(uow),
       makeCreateNewEvent({
         timeGateway,
         uuidGenerator: new TestUuidGenerator(),
       }),
-      generateConventionJwt,
+      fakeGenerateMagicLinkUrlFn,
       config,
       timeGateway,
-      immersionBaseUrl,
+      shortLinkIdGeneratorGateway,
     );
   });
 
@@ -132,6 +136,9 @@ describe("RenewConventionMagicLink use case", () => {
           expiredJwt: generateConventionJwt(expiredPayload),
         };
 
+        const shortLinks = ["shortLink1", "shortLink2"];
+        shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinks);
+
         await useCase.execute(request);
 
         expect(uow.outboxRepository.events).toHaveLength(1);
@@ -142,22 +149,32 @@ describe("RenewConventionMagicLink use case", () => {
         const dispatchedPayload = renewalEvent.payload as RenewMagicLinkPayload;
         expect(dispatchedPayload.emails).toEqual([expectedEmails]);
 
-        const [url, jwt] = dispatchedPayload.magicLink.split("?jwt=");
-        expect(url).toBe(`${immersionBaseUrl}/verifier-et-signer`);
+        expectToEqual(
+          [dispatchedPayload.magicLink, dispatchedPayload.conventionStatusLink],
+          [
+            `${config.immersionFacileBaseUrl}/api/${shortLinkRoute}/${shortLinks[0]}`,
+            `${config.immersionFacileBaseUrl}/api/${shortLinkRoute}/${shortLinks[1]}`,
+          ],
+        );
 
         expectToEqual(
-          makeVerifyJwtES256<"convention">(config.jwtPublicKey)(jwt),
-          createConventionMagicLinkPayload({
+          uow.shortLinkQuery.getShortLinks()[shortLinks[0]],
+          fakeGenerateMagicLinkUrlFn({
             id: validConvention.id,
             role: expectedRole,
             email: expectedEmails,
             now: timeGateway.now(),
+            targetRoute: frontRoutes.conventionToSign,
           }),
         );
       },
     );
 
     it("Also work when using encoded Url", async () => {
+      shortLinkIdGeneratorGateway.addMoreShortLinkIds([
+        "shortLink1",
+        "shortLink2",
+      ]);
       const expiredPayload = createConventionMagicLinkPayload({
         id: validConvention.id,
         role: "beneficiary",

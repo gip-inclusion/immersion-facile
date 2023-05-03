@@ -201,10 +201,10 @@ export const createUseCases = (
       renewConventionMagicLink: new RenewConventionMagicLink(
         uowPerformer,
         createNewEvent,
-        generateConventionJwt,
+        generateConventionMagicLinkUrl,
         config,
         gateways.timeGateway,
-        config.immersionFacileBaseUrl,
+        gateways.shortLinkGenerator,
       ),
       notifyConventionReminder: new NotifyConventionReminder(
         uowPerformer,
