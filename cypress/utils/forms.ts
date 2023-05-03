@@ -70,7 +70,7 @@ export function basicFormConvention() {
     .type(faker.date.past(20, "2000-01-01").toISOString().split("T")[0]);
   cy.get(`#${domElementIds.conventionImmersionRoute.conventionSection.siret}`)
     .clear()
-    .type(faker.datatype.number(14).toString());
+    .type(getRandomSiret());
   cy.get(
     `#${domElementIds.conventionImmersionRoute.establishmentTutorSection.firstName}`,
   )
@@ -149,7 +149,7 @@ export function basicFormConvention() {
     `#${domElementIds.conventionImmersionRoute.conventionSection.immersionActivities}`,
   )
     .clear()
-    .type(faker.random.words(12));
+    .type(faker.random.words(8));
   cy.get(`#${domElementIds.conventionImmersionRoute.submitFormButton}`)
     .click()
     .then(() => {
@@ -163,3 +163,11 @@ export function basicFormConvention() {
 const getCurrentDate = () => format(new Date(), "yyyy-MM-dd");
 const getTomorrowDate = () =>
   format(addBusinessDays(new Date(), 1), "yyyy-MM-dd");
+
+const getRandomSiret = () =>
+  [
+    "722 003 936 02320",
+    "39334140999998",
+    "44229377500031",
+    "130 005 481 00010",
+  ][Math.floor(Math.random() * 4)];
