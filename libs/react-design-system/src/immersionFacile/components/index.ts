@@ -15,7 +15,6 @@ export * from "./link";
 export * from "./loader";
 export * from "./login-form";
 export * from "./main-wrapper";
-export * from "./modal";
 export * from "./nps-form";
 export * from "./over-footer";
 export * from "./page-header";
