@@ -16,7 +16,7 @@ import {
   isEstablishmentTutorIsEstablishmentRepresentative,
   isPeConnectIdentity,
 } from "shared";
-import { SubmitConfirmationSection } from "src/../../libs/react-design-system";
+import { SubmitConfirmationSection } from "react-design-system";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { ConventionFormFields } from "src/app/components/forms/convention/ConventionFormFields";
 import {
