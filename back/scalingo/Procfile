@@ -1,2 +1,3 @@
-web: cd back && pnpm prod-tsc
+web: cd back && NODE_ENV=production exec node src/adapters/primary/scripts/startServer.js
+crawler: cd back && NODE_ENV=production exec node src/adapters/primary/scripts/startCrawlerScript.js
 postdeploy: cd back && pnpm migrate up
