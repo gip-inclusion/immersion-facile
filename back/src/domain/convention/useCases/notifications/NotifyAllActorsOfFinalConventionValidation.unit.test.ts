@@ -10,11 +10,13 @@ import {
   frontRoutes,
   reasonableSchedule,
 } from "shared";
+import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import {
   expectEmailFinalValidationConfirmationMatchingConvention,
   getValidatedConventionFinalConfirmationParams,
 } from "../../../../_testBuilders/emailAssertions";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
+import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
@@ -22,6 +24,7 @@ import {
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../peConnect/dto/PeConnect.dto";
 import { NotifyAllActorsOfFinalConventionValidation } from "./NotifyAllActorsOfFinalConventionValidation";
 
@@ -38,21 +41,29 @@ const defaultAgency = AgencyDtoBuilder.create(validConvention.agencyId)
   .build();
 
 describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email to all actors", () => {
+  const shortLinkId = "shortLink1";
   let uow: InMemoryUnitOfWork;
-  let emailGw: InMemoryEmailGateway;
-  let timeGw: CustomTimeGateway;
+  let emailGateway: InMemoryEmailGateway;
+  let timeGateway: CustomTimeGateway;
   let notifyAllActorsOfFinalConventionValidation: NotifyAllActorsOfFinalConventionValidation;
+  let config: AppConfig;
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    emailGw = new InMemoryEmailGateway();
-    timeGw = new CustomTimeGateway();
+    emailGateway = new InMemoryEmailGateway();
+    timeGateway = new CustomTimeGateway();
+    const shortLinkIdGeneratorGateway =
+      new DeterministShortLinkIdGeneratorGateway();
+    shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
+    config = new AppConfigBuilder({}).build();
     notifyAllActorsOfFinalConventionValidation =
       new NotifyAllActorsOfFinalConventionValidation(
         new InMemoryUowPerformer(uow),
-        emailGw,
+        emailGateway,
         fakeGenerateMagicLinkUrlFn,
-        timeGw,
+        timeGateway,
+        shortLinkIdGeneratorGateway,
+        config,
       );
   });
 
@@ -72,11 +83,11 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
         counsellorEmail,
         validatorEmail,
       ],
-      emailGw.getSentEmails(),
+      emailGateway.getSentEmails(),
       agency,
       validConvention,
       fakeGenerateMagicLinkUrlFn,
-      timeGw,
+      timeGateway,
     );
   });
 
@@ -116,11 +127,11 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
         counsellorEmail,
         validatorEmail,
       ],
-      emailGw.getSentEmails(),
+      emailGateway.getSentEmails(),
       agency,
       conventionWithBeneficiaryCurrentEmployer,
       fakeGenerateMagicLinkUrlFn,
-      timeGw,
+      timeGateway,
     );
   });
 
@@ -148,11 +159,11 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
         validatorEmail,
         conventionWithSpecificEstablishementEmail.establishmentTutor.email,
       ],
-      emailGw.getSentEmails(),
+      emailGateway.getSentEmails(),
       agency,
       validConvention,
       fakeGenerateMagicLinkUrlFn,
-      timeGw,
+      timeGateway,
     );
   });
 
@@ -187,11 +198,11 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
         counsellorEmail,
         validatorEmail,
       ],
-      emailGw.getSentEmails(),
+      emailGateway.getSentEmails(),
       agency,
       conventionWithBeneficiaryRepresentative,
       fakeGenerateMagicLinkUrlFn,
-      timeGw,
+      timeGateway,
     );
   });
   it("With PeConnect Federated identity: beneficiary, establishment tutor, agency counsellor & validator, and dedicated advisor", async () => {
@@ -228,11 +239,11 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
         validatorEmail,
         userConventionAdvisor.advisor!.email,
       ],
-      emailGw.getSentEmails(),
+      emailGateway.getSentEmails(),
       agency,
       validConvention,
       fakeGenerateMagicLinkUrlFn,
-      timeGw,
+      timeGateway,
     );
   });
   it("With PeConnect Federated identity: beneficiary, establishment tutor, agency counsellor & validator, and no advisor", async () => {
@@ -263,11 +274,11 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
         counsellorEmail,
         validatorEmail,
       ],
-      emailGw.getSentEmails(),
+      emailGateway.getSentEmails(),
       agency,
       validConvention,
       fakeGenerateMagicLinkUrlFn,
-      timeGw,
+      timeGateway,
     );
   });
 });
