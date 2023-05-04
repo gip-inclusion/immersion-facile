@@ -13,7 +13,7 @@ import { SendinblueHtmlEmailGateway } from "../../secondary/emailGateway/Sendinb
 import { sendinblueHtmlEmailGatewayTargets } from "../../secondary/emailGateway/SendinblueHtmlEmailGateway.targets";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { AppConfig, makeEmailAllowListPredicate } from "../config/appConfig";
-import { createHttpClientForExternalApi } from "../config/createGateways";
+import { configureCreateHttpClientForExternalApi } from "../config/createGateways";
 import { makeGenerateEditFormEstablishmentUrl } from "../config/magicLinkUrl";
 import { createPgUow } from "../config/uowConfig";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
@@ -71,7 +71,9 @@ const triggerSuggestEditFormEstablishmentEvery6Months =
     const emailGateway =
       config.emailGateway === "SENDINBLUE_HTML"
         ? new SendinblueHtmlEmailGateway(
-            createHttpClientForExternalApi(sendinblueHtmlEmailGatewayTargets),
+            configureCreateHttpClientForExternalApi()(
+              sendinblueHtmlEmailGatewayTargets,
+            ),
             makeEmailAllowListPredicate({
               skipEmailAllowList: config.skipEmailAllowlist,
               emailAllowList: config.emailAllowList,

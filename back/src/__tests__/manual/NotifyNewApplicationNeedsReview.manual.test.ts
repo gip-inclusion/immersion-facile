@@ -9,7 +9,7 @@ import {
   AppConfig,
   makeEmailAllowListPredicate,
 } from "../../adapters/primary/config/appConfig";
-import { createHttpClientForExternalApi } from "../../adapters/primary/config/createGateways";
+import { configureCreateHttpClientForExternalApi } from "../../adapters/primary/config/createGateways";
 import {
   GenerateConventionMagicLinkUrl,
   makeGenerateConventionMagicLinkUrl,
@@ -46,7 +46,9 @@ describe("Notify To 2 Counsellors that an application is available", () => {
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
     emailGw = new SendinblueHtmlEmailGateway(
-      createHttpClientForExternalApi(sendinblueHtmlEmailGatewayTargets),
+      configureCreateHttpClientForExternalApi()(
+        sendinblueHtmlEmailGatewayTargets,
+      ),
       makeEmailAllowListPredicate({
         skipEmailAllowList: config.skipEmailAllowlist,
         emailAllowList: config.emailAllowList,

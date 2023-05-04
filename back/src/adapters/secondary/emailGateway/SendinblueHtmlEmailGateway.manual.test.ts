@@ -1,5 +1,5 @@
 import { AppConfig } from "../../primary/config/appConfig";
-import { createHttpClientForExternalApi } from "../../primary/config/createGateways";
+import { configureCreateHttpClientForExternalApi } from "../../primary/config/createGateways";
 import { SendinblueHtmlEmailGateway } from "./SendinblueHtmlEmailGateway";
 import { sendinblueHtmlEmailGatewayTargets } from "./SendinblueHtmlEmailGateway.targets";
 
@@ -9,7 +9,9 @@ describe("SendingBlueHtmlEmailGateway manual", () => {
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
     sibGateway = new SendinblueHtmlEmailGateway(
-      createHttpClientForExternalApi(sendinblueHtmlEmailGatewayTargets),
+      configureCreateHttpClientForExternalApi()(
+        sendinblueHtmlEmailGatewayTargets,
+      ),
       (_) => true,
       config.apiKeySendinblue,
       { email: "bob@fake.mail", name: "Bob" },

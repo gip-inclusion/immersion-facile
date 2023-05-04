@@ -1,7 +1,7 @@
 import { ValidateEmailStatus } from "shared";
 import { EmailValidationGetaway } from "../../../domain/emailValidation/ports/EmailValidationGateway";
 import { AppConfig } from "../../primary/config/appConfig";
-import { createHttpClientForExternalApi } from "../../primary/config/createGateways";
+import { configureCreateHttpClientForExternalApi } from "../../primary/config/createGateways";
 import {
   EmailableEmailValidationGateway,
   emailableValidationTargets,
@@ -14,7 +14,7 @@ describe("Emailable email validation gateway", () => {
     const apiKeyEmailable = AppConfig.createFromEnv().emailableApiKey;
 
     emailableEmailValidationGateway = new EmailableEmailValidationGateway(
-      createHttpClientForExternalApi(emailableValidationTargets),
+      configureCreateHttpClientForExternalApi()(emailableValidationTargets),
       apiKeyEmailable,
     );
   });
