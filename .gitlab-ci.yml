@@ -156,54 +156,54 @@ deploy_on_staging:
       echo \"Checking server health...\";
       curl --fail --output /dev/null http://localhost:3000/api/"
 
-deploy_on_prod:
-  resource_group: ci
-  cache: []
-  only:
-    - main
-  image: alpine:latest
-  stage: deploy
-  environment:
-    name: prod
-  script:
-    - chmod og= $DEPLOYER_PRIVATE_KEY
-    - echo $SERVER_USER
-    - apk update && apk add openssh-client
-    - scp -i $DEPLOYER_PRIVATE_KEY -o StrictHostKeyChecking=no $SECRETS $SERVER_USER@$DEPLOYER_SERVER_IP:/home/docker/immersion-facile/.env.secrets
-    - scp -i $DEPLOYER_PRIVATE_KEY -o StrictHostKeyChecking=no $VARIABLES $SERVER_USER@$DEPLOYER_SERVER_IP:/home/docker/immersion-facile/.env.variables
-    - ssh -i $DEPLOYER_PRIVATE_KEY -o StrictHostKeyChecking=no $SERVER_USER@$DEPLOYER_SERVER_IP "cd /home/docker/immersion-facile &&
-      chmod 600 .env.secrets;
-      chmod 600 .env.variables;
-
-      git checkout main &&
-      git fetch origin main &&
-      git reset --hard origin/main;
-      retVal=\$?;
-      if [ \$retVal -ne 0 ]; then
-      echo \"FATAL:Source code fetch failed. Aborting.\";
-      exit \$retVal;
-      fi;
-
-      touch .env &&
-      chmod 600 .env &&
-      cat .env.variables <(echo) .env.secrets <(echo) > .env &&
-      grep 'VITE_' .env > ./front/.env &&
-      rm -f .env.variables .env.secrets;
-
-      docker-compose build &&
-      docker-compose -f docker-compose.yml -f docker-compose.logging-loki-plugin.yml down --remove-orphans &&
-      docker-compose -f docker-compose.yml -f docker-compose.logging-loki-plugin.yml up -d;
-
-      retVal=\$?;
-      if [ \$retVal -ne 0 ]; then
-      echo \"FATAL ERROR Docker image creation and server restart failed. Aborting.\";
-      exit \$retVal;
-      fi;
-
-      echo \"Waiting 2m ...\";
-      sleep 120;
-      echo \"Checking server health...\";
-      curl --fail --output /dev/null http://localhost:80/api/"
+#deploy_on_prod:
+#  resource_group: ci
+#  cache: []
+#  only:
+#    - main
+#  image: alpine:latest
+#  stage: deploy
+#  environment:
+#    name: prod
+#  script:
+#    - chmod og= $DEPLOYER_PRIVATE_KEY
+#    - echo $SERVER_USER
+#    - apk update && apk add openssh-client
+#    - scp -i $DEPLOYER_PRIVATE_KEY -o StrictHostKeyChecking=no $SECRETS $SERVER_USER@$DEPLOYER_SERVER_IP:/home/docker/immersion-facile/.env.secrets
+#    - scp -i $DEPLOYER_PRIVATE_KEY -o StrictHostKeyChecking=no $VARIABLES $SERVER_USER@$DEPLOYER_SERVER_IP:/home/docker/immersion-facile/.env.variables
+#    - ssh -i $DEPLOYER_PRIVATE_KEY -o StrictHostKeyChecking=no $SERVER_USER@$DEPLOYER_SERVER_IP "cd /home/docker/immersion-facile &&
+#      chmod 600 .env.secrets;
+#      chmod 600 .env.variables;
+#
+#      git checkout main &&
+#      git fetch origin main &&
+#      git reset --hard origin/main;
+#      retVal=\$?;
+#      if [ \$retVal -ne 0 ]; then
+#      echo \"FATAL:Source code fetch failed. Aborting.\";
+#      exit \$retVal;
+#      fi;
+#
+#      touch .env &&
+#      chmod 600 .env &&
+#      cat .env.variables <(echo) .env.secrets <(echo) > .env &&
+#      grep 'VITE_' .env > ./front/.env &&
+#      rm -f .env.variables .env.secrets;
+#
+#      docker-compose build &&
+#      docker-compose -f docker-compose.yml -f docker-compose.logging-loki-plugin.yml down --remove-orphans &&
+#      docker-compose -f docker-compose.yml -f docker-compose.logging-loki-plugin.yml up -d;
+#
+#      retVal=\$?;
+#      if [ \$retVal -ne 0 ]; then
+#      echo \"FATAL ERROR Docker image creation and server restart failed. Aborting.\";
+#      exit \$retVal;
+#      fi;
+#
+#      echo \"Waiting 2m ...\";
+#      sleep 120;
+#      echo \"Checking server health...\";
+#      curl --fail --output /dev/null http://localhost:80/api/"
 
 notify-staging-deployed:
   resource_group: ci
@@ -217,16 +217,15 @@ notify-staging-deployed:
     - apk add --update curl && rm -rf /var/cache/apk/*
   script:
     - curl --header "Content-Type:application/json" -d '{"username":"Gitlab deployer", "content":"La STAGING a été déployée https://staging.immersion-facile.beta.gouv.fr.\nEst-ce que le CHANGELOG est à jour ? ici -> https://www.notion.so/gip-inclusion/CHANGELOG-3831ee7ed3ba48e6bd29aac47c0a7f78"}' $DISCORD_WEBHOOK_STAGING_DEPLOYED
-
-notify-prod-deployed:
-  resource_group: ci
-  image: alpine:latest
-  only:
-    - main
-  stage: deploy
-  needs:
-    - deploy_on_prod
-  before_script:
-    - apk add --update curl && rm -rf /var/cache/apk/*
-  script:
-    - curl --header "Content-Type:application/json" -d '{"username":"Gitlab deployer", "content":"La PRODUCTION a été déployée https://immersion-facile.beta.gouv.fr.\nEst-ce que le CHANGELOG est à jour ? ici -> https://www.notion.so/gip-inclusion/CHANGELOG-3831ee7ed3ba48e6bd29aac47c0a7f78"}' $DISCORD_WEBHOOK_PROD_DEPLOYED
+#notify-prod-deployed:
+#  resource_group: ci
+#  image: alpine:latest
+#  only:
+#    - main
+#  stage: deploy
+#  needs:
+#    - deploy_on_prod
+#  before_script:
+#    - apk add --update curl && rm -rf /var/cache/apk/*
+#  script:
+#    - curl --header "Content-Type:application/json" -d '{"username":"Gitlab deployer", "content":"La PRODUCTION a été déployée https://immersion-facile.beta.gouv.fr.\nEst-ce que le CHANGELOG est à jour ? ici -> https://www.notion.so/gip-inclusion/CHANGELOG-3831ee7ed3ba48e6bd29aac47c0a7f78"}' $DISCORD_WEBHOOK_PROD_DEPLOYED

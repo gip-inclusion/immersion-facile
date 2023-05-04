@@ -1,4 +1,4 @@
-import React, { ReactNode, useRef, useState } from "react";
+import React, { ReactNode, useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { useStyles } from "tss-react/dsfr";
 import { ConventionReadDto, path } from "shared";
@@ -8,6 +8,7 @@ import {
   FieldsAndTitle,
   RowFields,
 } from "src/app/contents/admin/types";
+import { useCopyButton } from "src/app/hooks/useCopyButton";
 import type { ConventionValidationProps } from "./ConventionValidation";
 
 const cellStyles = {
@@ -18,20 +19,8 @@ const cellStyles = {
 export const ConventionValidationDetails = ({
   convention,
 }: ConventionValidationProps) => {
-  const copyButton = useRef<HTMLButtonElement>(null);
-  const [isCopied, setIsCopied] = useState(false);
-  const onCopyButtonClick = () => {
-    navigator.clipboard
-      .writeText(convention.id)
-      .then(() => {
-        setIsCopied(true);
-        setTimeout(() => {
-          setIsCopied(false);
-        }, 3_000);
-      })
-      // eslint-disable-next-line no-console
-      .catch((error) => console.error(error));
-  };
+  const { onCopyButtonClick, copyButtonLabel, copyButtonIsDisabled } =
+    useCopyButton();
 
   return (
     <>
@@ -41,9 +30,8 @@ export const ConventionValidationDetails = ({
           {convention.id}
         </span>
         <button
-          disabled={isCopied}
-          ref={copyButton}
-          onClick={onCopyButtonClick}
+          disabled={copyButtonIsDisabled}
+          onClick={() => onCopyButtonClick(convention.id)}
           className={fr.cx(
             "fr-btn",
             "fr-btn--sm",
@@ -53,7 +41,7 @@ export const ConventionValidationDetails = ({
             "fr-ml-1w",
           )}
         >
-          {isCopied ? "Copié !" : "Copier cet ID"}
+          {copyButtonLabel}
         </button>
       </h4>
       {sections.map((list, index) => (

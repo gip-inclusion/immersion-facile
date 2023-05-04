@@ -11,7 +11,7 @@ import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmail
 import { SendinblueHtmlEmailGateway } from "../../secondary/emailGateway/SendinblueHtmlEmailGateway";
 import { sendinblueHtmlEmailGatewayTargets } from "../../secondary/emailGateway/SendinblueHtmlEmailGateway.targets";
 import { AppConfig, makeEmailAllowListPredicate } from "../config/appConfig";
-import { createHttpClientForExternalApi } from "../config/createGateways";
+import { createHttpClientForExternalApi } from "../config/createHttpClientForExternalApi";
 import { makeGenerateConventionMagicLinkUrl } from "../config/magicLinkUrl";
 import { createUowPerformer } from "../config/uowConfig";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";

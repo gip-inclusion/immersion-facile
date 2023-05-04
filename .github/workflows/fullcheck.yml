@@ -1,12 +1,11 @@
 name: "Fullcheck of the project - (except integration tests)"
 
 on:
-  #  this should be uncommented when we migrate to github
-  #  push:
-  #    branches-ignore:
-  #      - dev
-  #      - staging
-  #      - main
+  push:
+    branches-ignore:
+      - dev
+      - staging
+      - main
 
   workflow_call:
 

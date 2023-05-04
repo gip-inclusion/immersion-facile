@@ -16,6 +16,7 @@ import {
   isEstablishmentTutorIsEstablishmentRepresentative,
   isPeConnectIdentity,
 } from "shared";
+import { SubmitConfirmationSection } from "react-design-system";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { ConventionFormFields } from "src/app/components/forms/convention/ConventionFormFields";
 import {
@@ -26,6 +27,7 @@ import {
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useExistingSiret } from "src/app/hooks/siret.hooks";
+import { useCopyButton } from "src/app/hooks/useCopyButton";
 import { useMatomo } from "src/app/hooks/useMatomo";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
@@ -117,7 +119,10 @@ export const ConventionForm = ({
     resolver: zodResolver(conventionWithoutExternalIdSchema),
     mode: "onTouched",
   });
-  const { getValues, reset } = methods;
+  const { getValues, reset, formState } = methods;
+
+  const formSuccessfullySubmitted =
+    formState.isSubmitted && submitFeedback.kind === "justSubmitted";
 
   useMatomo(conventionProperties.internshipKind);
 
@@ -165,6 +170,9 @@ export const ConventionForm = ({
     fetchedConvention ? fetchedConvention.status : initialValues.status,
   );
 
+  const { copyButtonIsDisabled, copyButtonLabel, onCopyButtonClick } =
+    useCopyButton();
+
   if (!reduxFormUiReady) return null;
 
   if (routeParams.jwt && fetchConventionError)
@@ -172,6 +180,16 @@ export const ConventionForm = ({
       <ShowErrorOrRedirectToRenewMagicLink
         errorMessage={fetchConventionError}
         jwt={routeParams.jwt}
+      />
+    );
+
+  if (formSuccessfullySubmitted)
+    return (
+      <SubmitConfirmationSection
+        idToCopy={getValues().id}
+        copyButtonIsDisabled={copyButtonIsDisabled}
+        copyButtonLabel={copyButtonLabel}
+        onCopyButtonClick={onCopyButtonClick}
       />
     );
 

@@ -18,7 +18,7 @@ import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementatio
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { HttpSirenGateway } from "../../secondary/sirene/HttpSirenGateway";
 import { AppConfig } from "../config/appConfig";
-import { createHttpClientForExternalApi } from "../config/createGateways";
+import { createHttpClientForExternalApi } from "../config/createHttpClientForExternalApi";
 import { createPgUow } from "../config/uowConfig";
 
 const maxQpsSireneApi = 0.25;

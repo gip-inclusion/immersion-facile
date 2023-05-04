@@ -32,12 +32,14 @@ export const startPeriodicNodeProcessReport = (
   logger: Logger,
   eventLoopLagSamples: number[],
   maxSampleSize: number,
-  previousCpuUsage: NodeJS.CpuUsage = cpuUsage(),
   previousTime: Date = timeGateway.now(),
-) =>
-  setTimeout(() => {
+) => {
+  const previousCpuUsage = cpuUsage();
+
+  return setTimeout(() => {
     const currentTime = timeGateway.now();
     const currentCpuUsage = cpuUsage(previousCpuUsage);
+
     logger.info(
       makeReport(
         currentCpuUsage,
@@ -56,10 +58,10 @@ export const startPeriodicNodeProcessReport = (
       logger,
       eventLoopLagSamples,
       maxSampleSize,
-      currentCpuUsage,
       currentTime,
     );
   }, intervalMs);
+};
 
 const makeReport = (
   { system, user }: NodeJS.CpuUsage,
@@ -68,9 +70,9 @@ const makeReport = (
 ) => ({
   eventLoopMeanLagMs: eventLoopMeanLagMs.toFixed(5),
   cpuUsage: {
-    system: system / deltaTime,
-    total: (system + user) / deltaTime,
-    user: user / deltaTime,
+    system: (system / deltaTime) * 100,
+    total: ((system + user) / deltaTime) * 100,
+    user: (user / deltaTime) * 100,
   },
   memoryUsage: memoryUsage(),
 });

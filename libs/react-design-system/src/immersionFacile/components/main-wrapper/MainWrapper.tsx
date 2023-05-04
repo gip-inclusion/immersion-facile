@@ -1,16 +1,29 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
+import { makeStyles } from "tss-react/dsfr";
 import "./MainWrapper.scss";
 
-type MainWrapperProps = {
+type MainWrapperCommonProps = {
   vSpacing?: number;
   hSpacing?: number;
   children: React.ReactNode;
   className?: string;
   layout: "default" | "boxed" | "fullscreen";
-  useBackground?: boolean;
   pageHeader?: React.ReactNode;
 };
+
+export type WithBackground = {
+  useBackground: true;
+  backgroundStyles?: React.CSSProperties;
+};
+
+export type WithoutBackground = {
+  useBackground?: undefined | false;
+  backgroundStyles?: never;
+};
+
+type MainWrapperProps = MainWrapperCommonProps &
+  (WithBackground | WithoutBackground);
 
 export const MainWrapper = ({
   vSpacing = 8,
@@ -18,9 +31,15 @@ export const MainWrapper = ({
   className,
   children,
   layout,
-  useBackground,
   pageHeader,
+  useBackground,
+  backgroundStyles,
 }: MainWrapperProps) => {
+  const { cx, classes } = makeStyles()(() => ({
+    customBackground: {
+      ...backgroundStyles,
+    },
+  }))();
   const spacing = `${vSpacing ? `fr-py-${vSpacing}w` : ""} ${
     hSpacing ? `fr-px-${hSpacing}w` : ""
   }`;
@@ -28,6 +47,7 @@ export const MainWrapper = ({
   if (layout !== "fullscreen") {
     classNameValue += "fr-container fr-grid--center";
   }
+
   return (
     <>
       {pageHeader}
@@ -39,7 +59,12 @@ export const MainWrapper = ({
         )}
         {layout !== "boxed" && children}
         {useBackground && (
-          <div className={"im-main-wrapper__custom-background"}></div>
+          <div
+            className={cx(
+              "im-main-wrapper__custom-background",
+              classes.customBackground,
+            )}
+          ></div>
         )}
       </main>
     </>
