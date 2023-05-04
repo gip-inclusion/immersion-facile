@@ -32,7 +32,7 @@ import { createMagicLinkRouter } from "./routers/magicLink/createMagicLinkRouter
 import { createPeConnectRouter } from "./routers/peConnect/createPeConnectRouter";
 import { createSearchImmersionRouter } from "./routers/searchImmersion/createSearchImmersionRouter";
 import { createTechnicalRouter } from "./routers/technical/createTechnicalRouter";
-import { subscribeToEvents } from "./subscribeToEvents";
+import { startCrawler } from "./startCrawler";
 
 const logger = createLogger(__filename);
 
@@ -96,9 +96,7 @@ export const createApp = async (
   // Auth issues below this last router
   app.use(createEstablishmentRouter(deps));
 
-  subscribeToEvents(deps);
-
-  deps.eventCrawler.startCrawler();
+  if (config.nodeEnv !== "production") startCrawler(deps);
 
   return {
     app,
