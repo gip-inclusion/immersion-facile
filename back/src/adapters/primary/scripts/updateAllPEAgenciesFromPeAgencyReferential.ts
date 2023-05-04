@@ -9,7 +9,7 @@ import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementatio
 import { HttpPeAgenciesReferential } from "../../secondary/immersionOffer/peAgenciesReferential/HttpPeAgenciesReferential";
 import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { AppConfig } from "../config/appConfig";
-import { createHttpClientForExternalApi } from "../config/createGateways";
+import { configureCreateHttpClientForExternalApi } from "../config/createGateways";
 import { createUowPerformer } from "../config/uowConfig";
 
 const updateAllPeAgenciesScript = async () => {
@@ -27,7 +27,7 @@ const updateAllPeAgenciesScript = async () => {
   );
 
   const adressAPI = new HttpAddressGateway(
-    createHttpClientForExternalApi(addressesExternalTargets),
+    configureCreateHttpClientForExternalApi()(addressesExternalTargets),
     config.apiKeyOpenCageDataGeocoding,
     config.apiKeyOpenCageDataGeosearch,
   );

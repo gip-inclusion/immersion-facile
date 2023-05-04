@@ -11,7 +11,7 @@ import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmail
 import { SendinblueHtmlEmailGateway } from "../../secondary/emailGateway/SendinblueHtmlEmailGateway";
 import { sendinblueHtmlEmailGatewayTargets } from "../../secondary/emailGateway/SendinblueHtmlEmailGateway.targets";
 import { AppConfig, makeEmailAllowListPredicate } from "../config/appConfig";
-import { createHttpClientForExternalApi } from "../config/createGateways";
+import { configureCreateHttpClientForExternalApi } from "../config/createGateways";
 import { makeGenerateConventionMagicLinkUrl } from "../config/magicLinkUrl";
 import { createUowPerformer } from "../config/uowConfig";
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
@@ -31,7 +31,9 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
   const emailGateway =
     config.emailGateway === "SENDINBLUE_HTML"
       ? new SendinblueHtmlEmailGateway(
-          createHttpClientForExternalApi(sendinblueHtmlEmailGatewayTargets),
+          configureCreateHttpClientForExternalApi()(
+            sendinblueHtmlEmailGatewayTargets,
+          ),
           makeEmailAllowListPredicate({
             skipEmailAllowList: config.skipEmailAllowlist,
             emailAllowList: config.emailAllowList,
