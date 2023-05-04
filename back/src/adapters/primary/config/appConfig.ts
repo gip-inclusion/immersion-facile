@@ -59,6 +59,10 @@ export class AppConfig {
     );
   }
 
+  public get externalAxiosTimeout(): number {
+    return parseInt(this.throwIfNotDefined("EXTERNAL_AXIOS_TIMEOUT", "10000"));
+  }
+
   public get shortLinkIdGeneratorGateway() {
     return this.throwIfNotInArray({
       variableName: "SHORT_LINK_ID_GENERATOR_GATEWAY",

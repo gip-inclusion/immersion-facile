@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosInstance } from "axios";
 import { Pool } from "pg";
 import {
   exhaustiveCheck,
@@ -57,16 +57,11 @@ import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
 
 const logger = createLogger(__filename);
 
-const AXIOS_TIMEOUT_MS = 10_000;
-
-const axiosHandlerCreator = createAxiosHandlerCreator(
-  axios.create({
-    timeout: AXIOS_TIMEOUT_MS,
+export const configureCreateHttpClientForExternalApi = (
+  axiosInstance: AxiosInstance = axios.create({
+    timeout: 10_000,
   }),
-);
-
-export const createHttpClientForExternalApi =
-  configureHttpClient(axiosHandlerCreator);
+) => configureHttpClient(createAxiosHandlerCreator(axiosInstance));
 
 export type GetPgPoolFn = () => Pool;
 export const createGetPgPoolFn = (config: AppConfig): GetPgPoolFn => {
@@ -187,7 +182,11 @@ const createEmailGateway = (
     return new InMemoryEmailGateway(timeGateway);
 
   const sendinblueHtmlEmailGateway = new SendinblueHtmlEmailGateway(
-    createHttpClientForExternalApi(sendinblueHtmlEmailGatewayTargets),
+    configureCreateHttpClientForExternalApi(
+      axios.create({
+        timeout: config.externalAxiosTimeout,
+      }),
+    )(sendinblueHtmlEmailGatewayTargets),
     makeEmailAllowListPredicate({
       skipEmailAllowList: config.skipEmailAllowlist,
       emailAllowList: config.emailAllowList,
@@ -224,7 +223,11 @@ const createPoleEmploiConnectGateway = (config: AppConfig) =>
             peAuthCandidatUrl: config.peAuthCandidatUrl,
           },
           makePeConnectExternalTargets,
-          createHttpClientForExternalApi,
+          configureCreateHttpClientForExternalApi(
+            axios.create({
+              timeout: config.externalAxiosTimeout,
+            }),
+          ),
         ),
         {
           immersionFacileBaseUrl: config.immersionFacileBaseUrl,
@@ -242,7 +245,11 @@ const createInclusionConnectGateway = (
         pipeWithValue(
           config.inclusionConnectConfig.inclusionConnectBaseUri,
           makeInclusionConnectExternalTargets,
-          createHttpClientForExternalApi,
+          configureCreateHttpClientForExternalApi(
+            axios.create({
+              timeout: config.externalAxiosTimeout,
+            }),
+          ),
         ),
         config.inclusionConnectConfig,
       )
@@ -253,7 +260,11 @@ const createAddressGateway = (config: AppConfig) =>
     IN_MEMORY: () => new InMemoryAddressGateway(),
     OPEN_CAGE_DATA: () =>
       new HttpAddressGateway(
-        createHttpClientForExternalApi(addressesExternalTargets),
+        configureCreateHttpClientForExternalApi(
+          axios.create({
+            timeout: config.externalAxiosTimeout,
+          }),
+        )(addressesExternalTargets),
         config.apiKeyOpenCageDataGeocoding,
         config.apiKeyOpenCageDataGeosearch,
       ),
@@ -264,7 +275,11 @@ const createEmailValidationGateway = (config: AppConfig) =>
     IN_MEMORY: () => new InMemoryEmailValidationGateway(),
     EMAILABLE: () =>
       new EmailableEmailValidationGateway(
-        createHttpClientForExternalApi(emailableValidationTargets),
+        configureCreateHttpClientForExternalApi(
+          axios.create({
+            timeout: config.externalAxiosTimeout,
+          }),
+        )(emailableValidationTargets),
         config.emailableApiKey,
       ),
   }[config.emailValidationGateway]());

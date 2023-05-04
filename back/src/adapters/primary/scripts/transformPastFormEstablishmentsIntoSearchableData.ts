@@ -18,7 +18,7 @@ import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementatio
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { HttpSirenGateway } from "../../secondary/sirene/HttpSirenGateway";
 import { AppConfig } from "../config/appConfig";
-import { createHttpClientForExternalApi } from "../config/createGateways";
+import { configureCreateHttpClientForExternalApi } from "../config/createGateways";
 import { createPgUow } from "../config/uowConfig";
 
 const maxQpsSireneApi = 0.25;
@@ -47,7 +47,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
   });
   const clientDestination = await poolDestination.connect();
   const addressAPI = new HttpAddressGateway(
-    createHttpClientForExternalApi(addressesExternalTargets),
+    configureCreateHttpClientForExternalApi()(addressesExternalTargets),
     config.apiKeyOpenCageDataGeocoding,
     config.apiKeyOpenCageDataGeosearch,
   );

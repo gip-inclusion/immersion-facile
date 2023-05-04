@@ -4,7 +4,7 @@ import {
   immersionFacileContactEmail,
 } from "shared";
 import { AppConfig } from "../../adapters/primary/config/appConfig";
-import { createHttpClientForExternalApi } from "../../adapters/primary/config/createGateways";
+import { configureCreateHttpClientForExternalApi } from "../../adapters/primary/config/createGateways";
 import { createInMemoryUow } from "../../adapters/primary/config/uowConfig";
 import { SendinblueHtmlEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueHtmlEmailGateway";
 import { sendinblueHtmlEmailGatewayTargets } from "../../adapters/secondary/emailGateway/SendinblueHtmlEmailGateway.targets";
@@ -37,7 +37,9 @@ describe("NotifyApplicationRejectedToBeneficiaryAndEnterprise", () => {
   it("Sends rejection email", async () => {
     const config = AppConfig.createFromEnv();
     const emailGw = new SendinblueHtmlEmailGateway(
-      createHttpClientForExternalApi(sendinblueHtmlEmailGatewayTargets),
+      configureCreateHttpClientForExternalApi()(
+        sendinblueHtmlEmailGatewayTargets,
+      ),
       (_) => true,
       config.apiKeySendinblue,
       {
