@@ -5,18 +5,18 @@ import {
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityBuilder } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
-import { LaBonneBoiteCompanyBuilder } from "../../../_testBuilders/LaBonneBoiteResponseBuilder";
+import { LaBonneBoiteCompanyVOBuilder } from "../../../_testBuilders/LaBonneBoiteCompanyVOBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryLaBonneBoiteAPI } from "../../../adapters/secondary/immersionOffer/laBonneBoite/InMemoryLaBonneBoiteAPI";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { LaBonneBoiteRequestEntity } from "../../../domain/immersionOffer/entities/LaBonneBoiteRequestEntity";
-import { CallLaBonneBoiteAndUpdateRepositories } from "../../../domain/immersionOffer/useCases/CallLaBonneBoiteAndUpdateRepositories";
+import { LaBonneBoiteRequestEntity } from "../entities/LaBonneBoiteRequestEntity";
 import {
   LaBonneBoiteCompanyProps,
   LaBonneBoiteCompanyVO,
-} from "../../../domain/immersionOffer/valueObjects/LaBonneBoiteCompanyVO";
+} from "../valueObjects/LaBonneBoiteCompanyVO";
+import { CallLaBonneBoiteAndUpdateRepositories } from "./CallLaBonneBoiteAndUpdateRepositories";
 
 const prepareUseCase = () => {
   const uow = createInMemoryUow();
@@ -27,7 +27,7 @@ const prepareUseCase = () => {
   const uuidGenerator = new TestUuidGenerator();
   const timeGateway = new CustomTimeGateway();
 
-  const lbbCompany = new LaBonneBoiteCompanyBuilder()
+  const lbbCompany = new LaBonneBoiteCompanyVOBuilder()
     .withRome("M1607")
     .withSiret("11112222333344")
     .withNaf("8500A")
@@ -176,7 +176,7 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
       ];
 
       laBonneBoiteAPI.setNextResults([
-        new LaBonneBoiteCompanyBuilder().withSiret(conflictSiret).build(),
+        new LaBonneBoiteCompanyVOBuilder().withSiret(conflictSiret).build(),
       ]);
 
       // Act : this establishment is referenced in LBB
@@ -215,7 +215,7 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
       ];
 
       laBonneBoiteAPI.setNextResults([
-        new LaBonneBoiteCompanyBuilder()
+        new LaBonneBoiteCompanyVOBuilder()
           .withSiret(existingSiret)
           .withRome(existingRome)
           .build(),
@@ -261,7 +261,7 @@ describe("Eventually requests LBB and adds offers and partial establishments in 
       ];
 
       laBonneBoiteAPI.setNextResults([
-        new LaBonneBoiteCompanyBuilder()
+        new LaBonneBoiteCompanyVOBuilder()
           .withSiret(existingSiret)
           .withRome(newRome)
           .withStars(5)
