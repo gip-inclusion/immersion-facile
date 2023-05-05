@@ -50,7 +50,8 @@ const findEstablishmentEntityGivenSiret = (
     pathEq("establishment.siret", siret),
   )?.establishment;
 
-describe("Update establishments from Sirene API", () => {
+// This use case is kept as inspiration for when we'll need to update establishments from SIREN API (ours not LBB)
+describe.skip("Update establishments from Sirene API", () => {
   const now = new Date("2020-01-13T00:00:00");
   const lessThanAWeekAgo = new Date("2020-01-07T00:00:00");
   const moreThanAWeekAgo = new Date("2020-01-06T00:00:00");

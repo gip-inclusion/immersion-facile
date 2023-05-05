@@ -1,4 +1,3 @@
-import { groupBy } from "ramda";
 import {
   AppellationDto,
   conflictErrorSiret,
@@ -12,7 +11,6 @@ import {
 } from "shared";
 import { ContactEntity } from "../../../domain/immersionOffer/entities/ContactEntity";
 import {
-  DataSource,
   EstablishmentAggregate,
   EstablishmentEntity,
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
@@ -133,20 +131,6 @@ export class InMemoryEstablishmentAggregateRepository
       .slice(0, maxResults);
   }
 
-  public async getActiveEstablishmentSiretsFromLaBonneBoiteNotUpdatedSince(
-    since: Date,
-  ): Promise<string[]> {
-    return this._establishmentAggregates
-      .filter(
-        (aggregate) =>
-          aggregate.establishment.isActive &&
-          (aggregate.establishment.updatedAt
-            ? aggregate.establishment.updatedAt <= since
-            : true),
-      )
-      .map((aggregate) => aggregate.establishment.siret);
-  }
-
   public async updateEstablishment(
     propertiesToUpdate: Partial<EstablishmentEntity> & {
       updatedAt: Date;
@@ -239,24 +223,6 @@ export class InMemoryEstablishmentAggregateRepository
           !!aggregate.immersionOffers.find((offer) => offer.romeCode === rome),
       )
       .map(path("establishment.siret"));
-  }
-  async groupEstablishmentSiretsByDataSource(
-    sirets: SiretDto[],
-  ): Promise<Record<DataSource, SiretDto[]>> {
-    const kwnownSirets = sirets.filter(
-      (siret) =>
-        !!this._establishmentAggregates.find(
-          (aggregate) => aggregate.establishment.siret === siret,
-        ),
-    );
-    return groupBy(
-      (siret) =>
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- we already filtered siret of existing establishments
-        this._establishmentAggregates.find(
-          (aggregate) => aggregate.establishment.siret === siret,
-        )!.establishment.dataSource,
-      kwnownSirets,
-    );
   }
 
   // for test purposes only :
