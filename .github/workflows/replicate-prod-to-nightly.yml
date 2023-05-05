@@ -50,3 +50,5 @@ jobs:
                     --dbname \$SCALINGO_POSTGRESQL_URL dump.pgsql &&
                 echo '> Finished restoring schema' &&
                   exit 0"
+
+# yolo
