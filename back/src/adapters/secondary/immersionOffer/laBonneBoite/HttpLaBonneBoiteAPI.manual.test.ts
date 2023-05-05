@@ -100,7 +100,7 @@ describe("HttpLaBonneBoiteAPI", () => {
     );
   });
 
-  it("Should not last more than 3 seconds even for search with many results", async () => {
+  it("Should not last more than 5 seconds even for search with many results", async () => {
     const api = getAPI();
 
     const startTime = new Date();
@@ -109,6 +109,6 @@ describe("HttpLaBonneBoiteAPI", () => {
     );
     const executionDurationMs = new Date().getTime() - startTime.getTime();
     expect(actualSearchedCompanies.length).toBeGreaterThan(500);
-    expect(executionDurationMs).toBeLessThan(3000);
+    expect(executionDurationMs).toBeLessThan(5000);
   });
 });
