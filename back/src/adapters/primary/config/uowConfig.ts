@@ -8,7 +8,6 @@ import { InMemoryOutboxRepository } from "../../secondary/core/InMemoryOutboxRep
 import { InMemoryDiscussionAggregateRepository } from "../../secondary/immersionOffer/InMemoryDiscussionAggregateRepository";
 import { InMemoryEstablishmentAggregateRepository } from "../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryEstablishmentGroupRepository } from "../../secondary/immersionOffer/inMemoryEstablishmentGroupRepository";
-import { InMemoryLaBonneBoiteRequestRepository } from "../../secondary/immersionOffer/InMemoryLaBonneBoiteRequestRepository";
 import { InMemorySearchMadeRepository } from "../../secondary/immersionOffer/InMemorySearchMadeRepository";
 import { InMemoryAgencyRepository } from "../../secondary/InMemoryAgencyRepository";
 import { InMemoryApiConsumerRepository } from "../../secondary/InMemoryApiConsumerRepository";
@@ -39,7 +38,6 @@ import { PgFeatureFlagRepository } from "../../secondary/pg/PgFeatureFlagReposit
 import { PgFormEstablishmentRepository } from "../../secondary/pg/PgFormEstablishmentRepository";
 import { PgImmersionAssessmentRepository } from "../../secondary/pg/PgImmersionAssessmentRepository";
 import { PgInclusionConnectedUserRepository } from "../../secondary/pg/PgInclusionConnectedUserRepository";
-import { PgLaBonneBoiteRequestRepository } from "../../secondary/pg/PgLaBonneBoiteRequestRepository";
 import { PgOngoingOAuthRepository } from "../../secondary/pg/PgOngoingOAuthRepository";
 import { PgOutboxQueries } from "../../secondary/pg/PgOutboxQueries";
 import { PgOutboxRepository } from "../../secondary/pg/PgOutboxRepository";
@@ -82,7 +80,6 @@ export const createInMemoryUow = () => {
     immersionAssessmentRepository: new InMemoryImmersionAssessmentRepository(),
     inclusionConnectedUserRepository:
       new InMemoryInclusionConnectedUserRepository(authenticatedUserRepository),
-    laBonneBoiteRequestRepository: new InMemoryLaBonneBoiteRequestRepository(),
     ongoingOAuthRepository: new InMemoryOngoingOAuthRepository(),
     outboxRepository,
     outboxQueries,
@@ -116,7 +113,6 @@ export const createPgUow = (client: PoolClient): UnitOfWork => {
     inclusionConnectedUserRepository: new PgInclusionConnectedUserRepository(
       client,
     ),
-    laBonneBoiteRequestRepository: new PgLaBonneBoiteRequestRepository(client),
     ongoingOAuthRepository: new PgOngoingOAuthRepository(client),
     outboxRepository: new PgOutboxRepository(client),
     outboxQueries: new PgOutboxQueries(client),

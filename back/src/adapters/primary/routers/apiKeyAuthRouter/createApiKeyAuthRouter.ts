@@ -32,9 +32,6 @@ export const createApiKeyAuthRouter = (deps: AppDependencies) => {
         const searchImmersionRequest = searchImmersionRequestPublicV0ToDomain(
           req.body,
         );
-        await deps.useCases.callLaBonneBoiteAndUpdateRepositories.execute(
-          searchImmersionRequest,
-        );
         return (
           await deps.useCases.searchImmersion.execute(
             searchImmersionRequest,
