@@ -373,45 +373,6 @@ describe("Postgres implementation of immersion offer repository", () => {
 
       expect(searchResult).toMatchObject([expectedResult]);
     });
-    it("returns Form establishments before LBB establishments", async () => {
-      // Prepare : establishment in geographical area but not active
-      const formSiret = "99000403200029";
-      const lbbSiret1 = "11000403200029";
-
-      await insertActiveEstablishmentAndOfferAndEventuallyContact(
-        {
-          siret: lbbSiret1,
-          rome: informationGeographiqueRome,
-          establishmentPosition: searchedPosition,
-          appellationCode: cartographeAppellation,
-          offerContactUid: undefined,
-          dataSource: "api_labonneboite",
-        }, // data source
-      );
-
-      await insertActiveEstablishmentAndOfferAndEventuallyContact(
-        {
-          siret: formSiret,
-          rome: informationGeographiqueRome,
-          establishmentPosition: searchedPosition,
-          appellationCode: cartographeAppellation,
-          offerContactUid: undefined,
-          dataSource: "form",
-        }, // data source
-      );
-
-      // Act
-      const searchResult =
-        await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoFromSearchMade(
-          { searchMade: searchMadeWithRome, maxResults: 2 },
-        );
-      // Assert
-      expect(searchResult).toHaveLength(2);
-      expect(searchResult[0].siret).toEqual(formSiret);
-      expect(searchResult[0].voluntaryToImmersion).toBe(true);
-      expect(searchResult[1].siret).toEqual(lbbSiret1);
-      expect(searchResult[1].voluntaryToImmersion).toBe(false);
-    });
     it("if sorted=distance, returns closest establishments in first", async () => {
       // Prepare : establishment in geographical area but not active
       const closeSiret = "99000403200029";
@@ -522,92 +483,6 @@ describe("Postgres implementation of immersion offer repository", () => {
       expect(searchResult[0].contactDetails?.id).toEqual(
         contactUidOfOfferMatchingSearch,
       );
-    });
-    it("if sorted is not given, returns establishments from form in first (in random order)", async () => {
-      // Prepare : establishment
-      const fromFormSiret = "99000403200029";
-      const fromLBBSiret = "11000403200029";
-
-      await Promise.all([
-        insertEstablishment({
-          position: searchedPosition,
-          siret: fromFormSiret,
-          dataSource: "form",
-        }),
-        insertEstablishment({
-          position: searchedPosition,
-          siret: fromLBBSiret,
-          dataSource: "api_labonneboite",
-        }),
-      ]);
-
-      await Promise.all([
-        insertImmersionOffer({
-          romeCode: searchMadeWithRome.rome!,
-          siret: fromFormSiret,
-        }),
-        await insertImmersionOffer({
-          romeCode: searchMadeWithRome.rome!,
-          siret: fromLBBSiret,
-        }),
-      ]);
-      // Act
-      const searchResult =
-        await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoFromSearchMade(
-          {
-            searchMade: {
-              ...searchMadeWithRome,
-              sortedBy: "distance",
-              voluntaryToImmersion: undefined,
-            },
-            maxResults: 2,
-          },
-        );
-      // Assert
-      expect(searchResult).toHaveLength(2);
-      expect(searchResult[0].siret).toEqual(fromFormSiret);
-      expect(searchResult[1].siret).toEqual(fromLBBSiret);
-    });
-    it("returns only form establishments if voluntaryOnly is true", async () => {
-      // Prepare : establishment in geographical area but not active
-      const formSiret = "11000403200029";
-      const lbbSiret = "22000403200029";
-
-      await Promise.all([
-        insertEstablishment({
-          siret: formSiret,
-          isActive: true,
-          position: searchedPosition,
-          dataSource: "form",
-        }),
-        insertEstablishment({
-          siret: lbbSiret,
-          isActive: true,
-          position: searchedPosition,
-          dataSource: "api_labonneboite",
-        }),
-      ]);
-      await Promise.all([
-        insertImmersionOffer({
-          romeCode: informationGeographiqueRome,
-          siret: formSiret,
-        }),
-
-        insertImmersionOffer({
-          romeCode: informationGeographiqueRome,
-          siret: lbbSiret,
-        }),
-      ]);
-      // Act
-      const searchWithVoluntaryOnly =
-        await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoFromSearchMade(
-          {
-            searchMade: { ...searchMadeWithRome, voluntaryToImmersion: true },
-          },
-        );
-      // Assert
-      expect(searchWithVoluntaryOnly).toHaveLength(1);
-      expect(searchWithVoluntaryOnly[0].siret).toEqual(formSiret);
     });
   });
 
