@@ -51,7 +51,6 @@ import { UploadLogo } from "../../../domain/generic/fileManagement/useCases/Uplo
 import { GetSentEmails } from "../../../domain/generic/notifications/useCases/GetSentEmails";
 import { AddFormEstablishment } from "../../../domain/immersionOffer/useCases/AddFormEstablishment";
 import { AddFormEstablishmentBatch } from "../../../domain/immersionOffer/useCases/AddFormEstablismentsBatch";
-import { CallLaBonneBoiteAndUpdateRepositories } from "../../../domain/immersionOffer/useCases/CallLaBonneBoiteAndUpdateRepositories";
 import { ContactEstablishment } from "../../../domain/immersionOffer/useCases/ContactEstablishment";
 import { EditFormEstablishment } from "../../../domain/immersionOffer/useCases/EditFormEstablishment";
 import { GetImmersionOfferById } from "../../../domain/immersionOffer/useCases/GetImmersionOfferById";
@@ -258,12 +257,6 @@ export const createUseCases = (
           uowPerformer,
           gateways.timeGateway,
           uuidGenerator,
-        ),
-      callLaBonneBoiteAndUpdateRepositories:
-        new CallLaBonneBoiteAndUpdateRepositories(
-          uowPerformer,
-          gateways.laBonneBoiteAPI,
-          gateways.timeGateway,
         ),
       requestEditFormEstablishment: new RequestEditFormEstablishment(
         uowPerformer,
