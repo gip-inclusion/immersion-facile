@@ -3,6 +3,7 @@ import {
   defaultMaxContactsPerWeek,
   NafDto,
   NumberEmployeesRange,
+  SearchImmersionResultDto,
   SiretDto,
 } from "shared";
 import { createLogger } from "../../../utils/logger";
@@ -20,6 +21,7 @@ export type LaBonneBoiteCompanyProps = {
   lat: number;
   lon: number;
   matched_rome_code: string;
+  matched_rome_label: string;
   naf: string;
   naf_text: string;
   name: string;
@@ -44,6 +46,35 @@ export class LaBonneBoiteCompanyVO {
     return this.props.siret;
   }
 
+  public toSearchResult(): SearchImmersionResultDto {
+    return {
+      siret: this.props.siret,
+      name: this.props.name,
+      address: addressStringToDto(this.props.address),
+      additionalInformation: "",
+      appellationLabels: [],
+      customizedName: "",
+      distance_m: this.props.distance * 1000,
+      fitForDisabledWorkers: false,
+      naf: this.props.naf,
+      nafLabel: this.props.naf_text,
+      numberOfEmployeeRange: this.props.headcount_text
+        .replace("salariés", "")
+        .replace("salarié", "")
+        .trim(),
+      position: {
+        lat: this.props.lat,
+        lon: this.props.lon,
+      },
+      rome: this.props.matched_rome_code,
+      romeLabel: this.props.matched_rome_label,
+      urlOfPartner: this.props.url,
+      voluntaryToImmersion: false,
+      website: "",
+    };
+  }
+
+  // to be deleted in next commit :
   public toEstablishmentAggregate(
     timeGateway: TimeGateway,
     extraData?: {

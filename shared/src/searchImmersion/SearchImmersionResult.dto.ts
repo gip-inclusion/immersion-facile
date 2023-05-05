@@ -32,4 +32,5 @@ export type SearchImmersionResultDto = {
   numberOfEmployeeRange?: string;
   website?: string;
   additionalInformation?: string;
+  urlOfPartner?: string;
 };

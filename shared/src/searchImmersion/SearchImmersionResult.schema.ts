@@ -42,6 +42,7 @@ export const searchImmersionResultSchema: z.Schema<SearchImmersionResultDto> =
     website: zStringPossiblyEmpty.optional(),
     additionalInformation: zStringPossiblyEmpty.optional(),
     fitForDisabledWorkers: z.boolean().optional(),
+    urlOfPartner: z.string().optional(),
   });
 
 export const searchImmersionsSchema = z.array(searchImmersionResultSchema);

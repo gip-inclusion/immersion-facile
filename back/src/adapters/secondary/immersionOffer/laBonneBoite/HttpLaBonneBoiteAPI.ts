@@ -84,6 +84,7 @@ export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
       page: 1,
       page_size: MAX_PAGE_SIZE,
       rome_codes: searchParams.rome,
+      sort: "distance",
     };
     const allCompaniesProps = await this.recursivelyGetAllCompanies(
       requestParams,
