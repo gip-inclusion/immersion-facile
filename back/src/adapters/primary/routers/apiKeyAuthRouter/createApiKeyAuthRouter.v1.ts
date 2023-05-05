@@ -63,9 +63,6 @@ export const createApiKeyAuthRouterV1 = (deps: AppDependencies) => {
   // Immersion offers routes
   publicV1Router.route(`/${immersionOffersRoute}`).get(async (req, res) =>
     sendHttpResponse(req, res, async () => {
-      await deps.useCases.callLaBonneBoiteAndUpdateRepositories.execute(
-        req.query as any,
-      );
       const searchImmersionResultDtos =
         await deps.useCases.searchImmersion.execute(
           req.query as any,
