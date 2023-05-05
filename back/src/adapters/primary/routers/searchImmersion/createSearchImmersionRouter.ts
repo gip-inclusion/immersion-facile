@@ -9,15 +9,12 @@ export const createSearchImmersionRouter = (deps: AppDependencies) => {
   searchImmersionRouter
     .route(searchTargets.searchImmersion.url)
     .get(async (req, res) =>
-      sendHttpResponse(req, res, async () => {
-        await deps.useCases.callLaBonneBoiteAndUpdateRepositories.execute(
-          req.query as any,
-        );
-        return deps.useCases.searchImmersion.execute(
+      sendHttpResponse(req, res, () =>
+        deps.useCases.searchImmersion.execute(
           req.query as any,
           req.apiConsumer,
-        );
-      }),
+        ),
+      ),
     );
 
   searchImmersionRouter
