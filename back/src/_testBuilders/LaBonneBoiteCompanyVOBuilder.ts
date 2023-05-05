@@ -11,6 +11,7 @@ const validEstablishmentFromLaBonneBoite: LaBonneBoiteCompanyProps = {
   lat: 49.3225,
   lon: 6.08067,
   matched_rome_code: "M1607",
+  matched_rome_label: "Some label",
   naf: "8810C",
   name: "BLANCHISSERIE LA FENSCH",
   siret: "77561959600155",
@@ -27,44 +28,44 @@ const validEstablishmentFromLaBonneBoite: LaBonneBoiteCompanyProps = {
   website: "",
 };
 
-export class LaBonneBoiteCompanyBuilder
+export class LaBonneBoiteCompanyVOBuilder
   implements Builder<LaBonneBoiteCompanyVO>
 {
   public constructor(
     private props: LaBonneBoiteCompanyProps = validEstablishmentFromLaBonneBoite,
   ) {}
 
-  public withSiret(siret: string): LaBonneBoiteCompanyBuilder {
-    return new LaBonneBoiteCompanyBuilder({
+  public withSiret(siret: string): LaBonneBoiteCompanyVOBuilder {
+    return new LaBonneBoiteCompanyVOBuilder({
       ...this.props,
       siret,
     });
   }
 
-  public withNaf(naf: string): LaBonneBoiteCompanyBuilder {
-    return new LaBonneBoiteCompanyBuilder({
+  public withNaf(naf: string): LaBonneBoiteCompanyVOBuilder {
+    return new LaBonneBoiteCompanyVOBuilder({
       ...this.props,
       naf,
     });
   }
 
-  public withRome(rome: string): LaBonneBoiteCompanyBuilder {
-    return new LaBonneBoiteCompanyBuilder({
+  public withRome(rome: string): LaBonneBoiteCompanyVOBuilder {
+    return new LaBonneBoiteCompanyVOBuilder({
       ...this.props,
       matched_rome_code: rome,
     });
   }
 
-  public withStars(stars: number): LaBonneBoiteCompanyBuilder {
-    return new LaBonneBoiteCompanyBuilder({
+  public withStars(stars: number): LaBonneBoiteCompanyVOBuilder {
+    return new LaBonneBoiteCompanyVOBuilder({
       ...this.props,
       stars,
     });
   }
   public withMatchedRomeCode(
     matchedRomeCode: string,
-  ): LaBonneBoiteCompanyBuilder {
-    return new LaBonneBoiteCompanyBuilder({
+  ): LaBonneBoiteCompanyVOBuilder {
+    return new LaBonneBoiteCompanyVOBuilder({
       ...this.props,
       matched_rome_code: matchedRomeCode,
     });

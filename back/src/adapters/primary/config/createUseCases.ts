@@ -214,7 +214,11 @@ export const createUseCases = (
       ),
 
       // immersionOffer
-      searchImmersion: new SearchImmersion(uowPerformer, uuidGenerator),
+      searchImmersion: new SearchImmersion(
+        uowPerformer,
+        gateways.laBonneBoiteAPI,
+        uuidGenerator,
+      ),
       getOffersByGroupSlug: new GetOffersByGroupSlug(uowPerformer),
       getImmersionOfferById: new GetImmersionOfferById(uowPerformer),
       getImmersionOfferBySiretAndRome: new GetImmersionOfferBySiretAndRome(
