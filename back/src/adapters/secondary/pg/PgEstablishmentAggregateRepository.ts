@@ -10,7 +10,6 @@ import {
 } from "shared";
 import { ContactEntity } from "../../../domain/immersionOffer/entities/ContactEntity";
 import {
-  DataSource,
   EstablishmentAggregate,
   EstablishmentEntity,
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
@@ -390,19 +389,6 @@ export class PgEstablishmentAggregateRepository
     }));
   }
 
-  public async getActiveEstablishmentSiretsFromLaBonneBoiteNotUpdatedSince(
-    since: Date,
-  ): Promise<string[]> {
-    const query = `
-      SELECT siret FROM establishments
-      WHERE is_active AND 
-      data_source = 'api_labonneboite' AND
-      (update_date IS NULL OR 
-       update_date < $1)`;
-    const pgResult = await this.client.query(query, [since.toISOString()]);
-    return pgResult.rows.map((row) => row.siret);
-  }
-
   public async getSiretsOfEstablishmentsWithRomeCode(
     rome: string,
   ): Promise<string[]> {
@@ -573,32 +559,6 @@ export class PgEstablishmentAggregateRepository
     const { contactDetails, ...searchResultWithoutContactDetails } =
       immersionSearchResultDtos[0];
     return searchResultWithoutContactDetails;
-  }
-
-  public async groupEstablishmentSiretsByDataSource(
-    sirets: SiretDto[],
-  ): Promise<Record<DataSource, SiretDto[]>> {
-    if (!sirets.length)
-      return {
-        api_labonneboite: [],
-        form: [],
-      };
-
-    const query = format(
-      `
-      WITH grouped_sirets AS (SELECT data_source, JSONB_AGG(siret) AS sirets
-              FROM establishments
-              WHERE siret IN (%1$L)
-              GROUP BY data_source) 
-      SELECT JSONB_OBJECT_AGG(data_source, sirets) AS sirets_by_data_source FROM grouped_sirets`,
-      sirets,
-    );
-    const pgResult = await this.client.query(query);
-    const row = pgResult.rows[0].sirets_by_data_source;
-    return {
-      api_labonneboite: row?.api_labonneboite ?? [],
-      form: row?.form ?? [],
-    };
   }
 
   public async createImmersionOffersToEstablishments(

@@ -1,6 +1,5 @@
 import { AppellationDto, SearchImmersionResultDto, SiretDto } from "shared";
 import {
-  DataSource,
   EstablishmentAggregate,
   EstablishmentEntity,
 } from "../entities/EstablishmentEntity";
@@ -27,10 +26,6 @@ export interface EstablishmentAggregateRepository {
     maxResults?: number;
   }) => Promise<SearchImmersionResultDto[]>;
 
-  getActiveEstablishmentSiretsFromLaBonneBoiteNotUpdatedSince: (
-    since: Date,
-  ) => Promise<SiretDto[]>;
-
   updateEstablishment: (
     propertiesToUpdate: Partial<EstablishmentEntity> & {
       updatedAt: Date;
@@ -54,9 +49,6 @@ export interface EstablishmentAggregateRepository {
     rome: string,
   ) => Promise<SearchImmersionResultDto | undefined>;
   getSiretsOfEstablishmentsWithRomeCode: (rome: string) => Promise<SiretDto[]>;
-  groupEstablishmentSiretsByDataSource: (
-    sirets: SiretDto[],
-  ) => Promise<Record<DataSource, SiretDto[]>>;
 
   markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerWeek: (
     fromDate: Date,
