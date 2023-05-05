@@ -25,8 +25,6 @@ import { optional } from "./pgUtils";
 
 const logger = createLogger(__filename);
 
-export type PgDataSource = "api_labonneboite" | "form";
-
 const offersEqual = (a: ImmersionOfferEntityV2, b: ImmersionOfferEntityV2) =>
   // Only compare romeCode and appellationCode
   a.romeCode === b.romeCode && a.appellationCode == b.appellationCode;
@@ -353,9 +351,7 @@ export class PgEstablishmentAggregateRepository
     const selectedOffersSubQuery = format(
       `WITH active_establishments_within_area AS 
         (SELECT siret, fit_for_disabled_workers, (data_source = 'form')::boolean AS voluntary_to_immersion, gps
-         FROM establishments WHERE is_active AND is_searchable AND ST_DWithin(gps, ST_GeographyFromText($1), $2) ${filterOnVoluntaryToImmersion(
-           searchMade.voluntaryToImmersion,
-         )}),
+         FROM establishments WHERE is_active AND is_searchable AND ST_DWithin(gps, ST_GeographyFromText($1), $2)),
         matching_offers AS (
           SELECT 
             aewa.siret, rome_code, prd.libelle_rome AS rome_label, ST_Distance(gps, ST_GeographyFromText($1)) AS distance_m,
@@ -386,6 +382,7 @@ export class PgEstablishmentAggregateRepository
     return immersionSearchResultDtos.map((dto) => ({
       ...dto,
       contactDetails: withContactDetails ? dto.contactDetails : undefined,
+      voluntaryToImmersion: true,
     }));
   }
 
@@ -612,6 +609,7 @@ export class PgEstablishmentAggregateRepository
         fitForDisabledWorkers: optional(
           row.search_immersion_result.fitForDisabledWorkers,
         ),
+        voluntaryToImmersion: true,
       }),
     );
   }
@@ -654,56 +652,36 @@ export class PgEstablishmentAggregateRepository
         SELECT 
           JSON_STRIP_NULLS(
             JSON_BUILD_OBJECT(
-              'establishment', 
-              JSON_BUILD_OBJECT(
-                'siret', 
-                e.siret, 
-                'name', 
-                e.name, 
-                'customizedName', 
-                e.customized_name, 
-                'website', 
-                e.website, 
-                'additionalInformation', 
-                e.additional_information, 
-                'address', 
-                JSON_BUILD_OBJECT(
+              'establishment', JSON_BUILD_OBJECT(
+                'siret', e.siret, 
+                'name', e.name, 
+                'customizedName', e.customized_name, 
+                'website', e.website, 
+                'additionalInformation', e.additional_information, 
+                'address', JSON_BUILD_OBJECT(
                   'streetNumberAndAddress', e.street_number_and_address, 
-                  'postcode', e.post_code, 'city', 
-                  e.city, 'departmentCode', e.department_code
+                  'postcode', e.post_code,
+                  'city', e.city,
+                  'departmentCode', e.department_code
+                ),  
+                'dataSource', e.data_source, 
+                'sourceProvider', e.source_provider, 
+                'position', JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat), 
+                'nafDto', JSON_BUILD_OBJECT(
+                  'code', e.naf_code, 
+                  'nomenclature', e.naf_nomenclature
                 ), 
-                'voluntaryToImmersion', 
-                e.data_source = 'form', 
-                'dataSource', 
-                e.data_source, 
-                'sourceProvider', 
-                e.source_provider, 
-                'position', 
-                JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat), 
-                'nafDto', 
-                JSON_BUILD_OBJECT(
-                  'code', e.naf_code, 'nomenclature', 
-                  e.naf_nomenclature
-                ), 
-                'numberEmployeesRange', 
-                e.number_employees, 
-                'updatedAt', 
-                to_char(
+                'numberEmployeesRange', e.number_employees, 
+                'updatedAt', to_char(
                   e.update_date::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
                 ), 
-                'isActive', 
-                e.is_active, 
-                'isSearchable', 
-                e.is_searchable, 
-                'isCommited', 
-                e.is_commited, 
-                'maxContactsPerWeek', 
-                e.max_contacts_per_week
+                'isActive', e.is_active, 
+                'isSearchable', e.is_searchable, 
+                'isCommited', e.is_commited, 
+                'maxContactsPerWeek', e.max_contacts_per_week
               ), 
-              'immersionOffers', 
-              io.immersionOffers, 
-              'contact', 
-              JSON_BUILD_OBJECT(
+              'immersionOffers', io.immersionOffers, 
+              'contact', JSON_BUILD_OBJECT(
                 'id', ic.uuid, 'firstName', ic.firstname, 
                 'lastName', ic.lastname, 'job', ic.job, 
                 'contactMethod', ic.contact_mode, 
@@ -730,6 +708,7 @@ export class PgEstablishmentAggregateRepository
           updatedAt: aggregateWithStringDates.establishment.updatedAt
             ? new Date(aggregateWithStringDates.establishment.updatedAt)
             : undefined,
+          voluntaryToImmersion: true,
         },
         immersionOffers: aggregateWithStringDates.immersionOffers.map(
           (immersionOfferWithStringDate: any) => ({
@@ -781,21 +760,14 @@ const reStGeographyFromText =
 const fixStGeographyEscapingInQuery = (query: string) =>
   query.replace(reStGeographyFromText, "ST_GeographyFromText('POINT($1 $3)')");
 
-const filterOnVoluntaryToImmersion = (voluntaryToImmersion?: boolean) => {
-  if (voluntaryToImmersion === undefined) return "";
-
-  return voluntaryToImmersion
-    ? "AND data_source = 'form'"
-    : "AND data_source != 'form'";
-};
 const makeOrderByStatement = (sortedBy?: SearchSortedBy): string => {
   switch (sortedBy) {
     case "distance":
-      return "ORDER BY voluntary_to_immersion DESC, distance_m ASC, RANDOM()";
+      return "ORDER BY distance_m ASC, RANDOM()";
     case "date":
-      return "ORDER BY voluntary_to_immersion DESC, max_created_at DESC, RANDOM()";
+      return "ORDER BY max_created_at DESC, RANDOM()";
     default: // undefined
-      return "ORDER BY voluntary_to_immersion DESC, RANDOM()";
+      return "ORDER BY RANDOM()";
   }
 };
 const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
@@ -813,7 +785,6 @@ const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
       'website', e.website, 
       'additionalInformation', e.additional_information, 
       'customizedName', e.customized_name, 
-      'voluntaryToImmersion', e.data_source = 'form',
       'fitForDisabledWorkers', e.fit_for_disabled_workers,
       'position', JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat), 
       'romeLabel', io.rome_label,
