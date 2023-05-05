@@ -41,26 +41,11 @@ type HttpGetLaBonneBoiteCompanyParams = {
 
 type HttpGetLaBonneBoiteCompanyResponse = {
   companies: LaBonneBoiteCompanyProps[];
-  match_rome_code: string;
-  match_rome_label: string;
-  match_rome_slug: string;
-  companies_count: number;
-  url: string;
-  rome_code: string;
-  rome_label: string;
-};
-
-const deduplicateLaBonneBoiteCompanies = (
-  companies: LaBonneBoiteCompanyProps[],
-): LaBonneBoiteCompanyProps[] => {
-  const companieSirets = companies.map((company) => company.siret);
-  return companies.filter(
-    (company, companyIndex) =>
-      companieSirets.indexOf(company.siret) === companyIndex,
-  );
 };
 
 const MAX_PAGE_SIZE = 100;
+const MAX_DISTANCE_IN_KM = 100;
+
 export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
   private urlGetCompany: AbsoluteUrl;
 
@@ -78,7 +63,7 @@ export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
     searchParams: LaBonneBoiteRequestParams,
   ): Promise<LaBonneBoiteCompanyVO[]> {
     const requestParams: HttpGetLaBonneBoiteCompanyParams = {
-      distance: searchParams.distance_km,
+      distance: MAX_DISTANCE_IN_KM,
       longitude: searchParams.lon,
       latitude: searchParams.lat,
       page: 1,
@@ -86,16 +71,9 @@ export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
       rome_codes: searchParams.rome,
       sort: "distance",
     };
-    const allCompaniesProps = await this.recursivelyGetAllCompanies(
-      requestParams,
-      [],
-    );
-    const deduplicatedCompaniesProps =
-      deduplicateLaBonneBoiteCompanies(allCompaniesProps);
-    logger.info(
-      `LBB fetched ${allCompaniesProps.length} companies, amongst which ${deduplicatedCompaniesProps.length} only are different.`,
-    );
-    return deduplicatedCompaniesProps.map(
+    const response = await this.getCompanyResponse(requestParams);
+
+    return response.data.companies.map(
       (props: LaBonneBoiteCompanyProps) => new LaBonneBoiteCompanyVO(props),
     );
   }
@@ -124,38 +102,6 @@ export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
         throw error;
       }
     });
-  }
-
-  private async recursivelyGetAllCompanies(
-    params: HttpGetLaBonneBoiteCompanyParams,
-    allCompanies: LaBonneBoiteCompanyProps[],
-  ): Promise<LaBonneBoiteCompanyProps[]> {
-    try {
-      const companyResponse = await this.getCompanyResponse(params);
-
-      const updatedAllCompanies = [
-        ...allCompanies,
-        ...companyResponse.data.companies,
-      ];
-
-      const wasLastPage =
-        companyResponse.data.companies_count === updatedAllCompanies.length;
-
-      return wasLastPage
-        ? updatedAllCompanies
-        : await this.recursivelyGetAllCompanies(
-            { ...params, page: params.page + 1 },
-            updatedAllCompanies,
-          );
-    } catch (error: any) {
-      logger.error(
-        "Error while recursively calling LBB API with params ",
-        params,
-        " : ",
-        error,
-      );
-      return allCompanies;
-    }
   }
 }
 

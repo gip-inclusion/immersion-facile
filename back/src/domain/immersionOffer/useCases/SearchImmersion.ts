@@ -70,7 +70,6 @@ export class SearchImmersion extends TransactionalUseCase<
           rome: params.rome,
           lat: params.latitude,
           lon: params.longitude,
-          distance_km: params.distance_km,
         })
       : [];
 
