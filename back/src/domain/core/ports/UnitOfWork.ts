@@ -12,7 +12,6 @@ import { DiscussionAggregateRepository } from "../../immersionOffer/ports/Discus
 import { EstablishmentAggregateRepository } from "../../immersionOffer/ports/EstablishmentAggregateRepository";
 import { EstablishmentGroupRepository } from "../../immersionOffer/ports/EstablishmentGroupRepository";
 import { FormEstablishmentRepository } from "../../immersionOffer/ports/FormEstablishmentRepository";
-import { LaBonneBoiteRequestRepository } from "../../immersionOffer/ports/LaBonneBoiteRequestRepository";
 import { SearchMadeRepository } from "../../immersionOffer/ports/SearchMadeRepository";
 import { ConventionPoleEmploiAdvisorRepository } from "../../peConnect/port/ConventionPoleEmploiAdvisorRepository";
 import { RomeRepository } from "../../rome/ports/RomeRepository";
@@ -37,7 +36,6 @@ export type UnitOfWork = {
   conventionQueries: ConventionQueries;
   postalCodeDepartmentRegionQueries: PostalCodeDepartmentRegionQueries;
   featureFlagRepository: FeatureFlagRepository;
-  laBonneBoiteRequestRepository: LaBonneBoiteRequestRepository;
   searchMadeRepository: SearchMadeRepository;
   apiConsumerRepository: ApiConsumerRepository;
   exportQueries: ExportQueries;
