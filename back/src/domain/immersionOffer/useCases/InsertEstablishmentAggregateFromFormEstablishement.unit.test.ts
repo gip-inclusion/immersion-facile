@@ -4,7 +4,7 @@ import {
   GeoPositionDto,
   NafDto,
   NumberEmployeesRange,
-  SirenEstablishmentDto,
+  SiretEstablishmentDto,
 } from "shared";
 import {
   avenueChampsElyseesDto,
@@ -24,7 +24,7 @@ import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPer
 import {
   InMemorySirenGateway,
   TEST_ESTABLISHMENT1,
-} from "../../../adapters/secondary/sirene/InMemorySirenGateway";
+} from "../../../adapters/secondary/siret/InMemorySiretGateway";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import { InsertEstablishmentAggregateFromForm } from "./InsertEstablishmentAggregateFromFormEstablishement";
@@ -41,7 +41,7 @@ const prepareSirenGateway = (
   siret: string,
   numberEmployeesRange: NumberEmployeesRange = "",
 ) => {
-  const sirenEstablishmentFromAPI: SirenEstablishmentDto = {
+  const sirenEstablishmentFromAPI: SiretEstablishmentDto = {
     ...TEST_ESTABLISHMENT1,
     siret,
     nafDto: {

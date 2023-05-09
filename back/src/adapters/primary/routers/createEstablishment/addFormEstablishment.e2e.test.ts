@@ -9,7 +9,7 @@ import {
   buildTestApp,
   TestAppAndDeps,
 } from "../../../../_testBuilders/buildTestApp";
-import { TEST_ESTABLISHMENT1_SIRET } from "../../../secondary/sirene/InMemorySirenGateway";
+import { TEST_ESTABLISHMENT1_SIRET } from "../../../secondary/siret/InMemorySiretGateway";
 import { FormEstablishmentDtoPublicV0 } from "../DtoAndSchemas/v0/input/FormEstablishmentPublicV0.dto";
 import { FormEstablishmentDtoPublicV1 } from "../DtoAndSchemas/v1/input/FormEstablishmentPublicV1.dto";
 

@@ -3,7 +3,7 @@ import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { SirenGateway } from "../../sirene/ports/SirenGateway";
+import { SiretGateway } from "../../sirene/ports/SirenGateway";
 import { rejectsSiretIfNotAnOpenCompany } from "../../sirene/rejectsSiretIfNotAnOpenCompany";
 
 export class AddFormEstablishment extends TransactionalUseCase<
@@ -13,7 +13,7 @@ export class AddFormEstablishment extends TransactionalUseCase<
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private createNewEvent: CreateNewEvent,
-    private readonly sirenGateway: SirenGateway,
+    private readonly sirenGateway: SiretGateway,
   ) {
     super(uowPerformer);
   }

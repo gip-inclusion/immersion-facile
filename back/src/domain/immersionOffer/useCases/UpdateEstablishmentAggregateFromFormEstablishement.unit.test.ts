@@ -2,7 +2,7 @@ import {
   addressDtoToString,
   expectPromiseToFailWith,
   FormEstablishmentDtoBuilder,
-  SirenEstablishmentDto,
+  SiretEstablishmentDto,
 } from "shared";
 import { rueGuillaumeTellDto } from "../../../_testBuilders/addressDtos";
 import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
@@ -15,7 +15,7 @@ import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { InMemorySirenGateway } from "../../../adapters/secondary/sirene/InMemorySirenGateway";
+import { InMemorySirenGateway } from "../../../adapters/secondary/siret/InMemorySiretGateway";
 import { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import { UpdateEstablishmentAggregateFromForm } from "./UpdateEstablishmentAggregateFromFormEstablishement";
 
@@ -23,7 +23,7 @@ const prepareSirenGateway = (
   sirenGateway: InMemorySirenGateway,
   siret: string,
 ) => {
-  const sirenEstablishmentFromAPI: SirenEstablishmentDto = {
+  const sirenEstablishmentFromAPI: SiretEstablishmentDto = {
     siret,
     businessAddress: "1 rue Guillaume Tell, 75017 Paris",
     businessName: "My establishment",

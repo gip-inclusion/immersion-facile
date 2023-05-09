@@ -17,7 +17,7 @@ import {
 } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import { ImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { AddressGateway } from "../domain/immersionOffer/ports/AddressGateway";
-import { SirenGateway } from "../domain/sirene/ports/SirenGateway";
+import { SiretGateway } from "../domain/sirene/ports/SirenGateway";
 import { getSirenEstablishmentFromApi } from "../domain/sirene/service/getSirenEstablishmentFromApi";
 
 const offerFromFormScore = 10;
@@ -40,7 +40,7 @@ export const makeFormEstablishmentToEstablishmentAggregate = ({
   uuidGenerator: UuidGenerator;
   timeGateway: TimeGateway;
   addressGateway: AddressGateway;
-  sirenGateway: SirenGateway;
+  sirenGateway: SiretGateway;
 }) => {
   const createEstablishmentAggregate = makeCreateEstablishmentAggregate({
     uuidGenerator,
@@ -129,7 +129,7 @@ type NafAndNumberOfEmpolyee = {
 };
 
 const getNafAndNumberOfEmployee = async (
-  sirenGateway: SirenGateway,
+  sirenGateway: SiretGateway,
   siret: SiretDto,
 ): Promise<NafAndNumberOfEmpolyee> => {
   const { nafDto, numberEmployeesRange } = await getSirenEstablishmentFromApi(
