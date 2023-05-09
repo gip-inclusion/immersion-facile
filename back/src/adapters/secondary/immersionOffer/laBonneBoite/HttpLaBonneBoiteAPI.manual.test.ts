@@ -2,8 +2,10 @@ import { noRateLimit } from "../../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../../domain/core/ports/RetryStrategy";
 import { LaBonneBoiteRequestParams } from "../../../../domain/immersionOffer/ports/LaBonneBoiteAPI";
 import { AppConfig } from "../../../primary/config/appConfig";
+import { configureCreateHttpClientForExternalApi } from "../../../primary/config/createHttpClientForExternalApi";
 import { PoleEmploiAccessTokenGateway } from "../PoleEmploiAccessTokenGateway";
 import { HttpLaBonneBoiteAPI } from "./HttpLaBonneBoiteAPI";
+import { createLbbTargets } from "./LaBonneBoiteTargets";
 
 const config = AppConfig.createFromEnv();
 const accessTokenGateway = new PoleEmploiAccessTokenGateway(
@@ -14,7 +16,9 @@ const accessTokenGateway = new PoleEmploiAccessTokenGateway(
 
 const getAPI = () =>
   new HttpLaBonneBoiteAPI(
-    config.peApiUrl,
+    configureCreateHttpClientForExternalApi()(
+      createLbbTargets(config.peApiUrl),
+    ),
     accessTokenGateway,
     config.poleEmploiClientId,
   );
@@ -73,5 +77,5 @@ describe("HttpLaBonneBoiteAPI", () => {
     );
 
     expect(results).toHaveLength(searches.length);
-  }, 13_000);
+  }, 15_000);
 });
