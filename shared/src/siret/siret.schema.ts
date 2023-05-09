@@ -5,8 +5,8 @@ import {
   GetSiretInfo,
   GetSiretRequestDto,
   numberEmployeesRanges,
-  SirenEstablishmentDto,
   SiretDto,
+  SiretEstablishmentDto,
   siretInfoErrors,
   siretRegex,
 } from "./siret";
@@ -17,7 +17,7 @@ export const siretSchema: z.Schema<SiretDto> = zString
   .regex(siretRegex, "SIRET doit être composé de 14 chiffres")
   .transform(normalizeSiret);
 
-const getSiretResponseSchema: z.Schema<SirenEstablishmentDto> = z.object({
+const getSiretResponseSchema: z.Schema<SiretEstablishmentDto> = z.object({
   siret: siretSchema,
   businessName: z.string(),
   businessAddress: z.string(),

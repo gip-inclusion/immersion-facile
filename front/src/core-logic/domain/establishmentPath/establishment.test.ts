@@ -1,4 +1,4 @@
-import { expectObjectsToMatch, SirenEstablishmentDto, SiretDto } from "shared";
+import { expectObjectsToMatch, SiretDto, SiretEstablishmentDto } from "shared";
 import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import { makeStubFeatureFlags } from "src/core-logic/domain/testHelpers/test.helpers";
@@ -9,7 +9,7 @@ import {
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 import { establishmentSlice, EstablishmentState } from "./establishment.slice";
 
-const establishmentFetched: SirenEstablishmentDto = {
+const establishmentFetched: SiretEstablishmentDto = {
   siret: "11110000111100",
   businessName: "Existing open business on Sirene Corp.",
   businessAddress: "",
@@ -37,7 +37,7 @@ describe("Establishment", () => {
     store.dispatch(
       siretSlice.actions.siretInfoSucceeded({
         siret: "123",
-      } as SirenEstablishmentDto),
+      } as SiretEstablishmentDto),
     );
     expectNavigationToEstablishmentFormPageToHaveBeenTriggered(null);
   });

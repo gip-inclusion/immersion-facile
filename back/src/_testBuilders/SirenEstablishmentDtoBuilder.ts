@@ -2,10 +2,10 @@ import {
   Builder,
   NafDto,
   NumberEmployeesRange,
-  SirenEstablishmentDto,
+  SiretEstablishmentDto,
 } from "shared";
 
-const validSirenEstablishmentDto: SirenEstablishmentDto = {
+const validSirenEstablishmentDto: SiretEstablishmentDto = {
   siret: "20006765000016",
   businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
   businessName: "MA P'TITE BOITE 2",
@@ -18,10 +18,10 @@ const validSirenEstablishmentDto: SirenEstablishmentDto = {
 };
 
 export class SirenEstablishmentDtoBuilder
-  implements Builder<SirenEstablishmentDto>
+  implements Builder<SiretEstablishmentDto>
 {
   public constructor(
-    private dto: SirenEstablishmentDto = validSirenEstablishmentDto,
+    private dto: SiretEstablishmentDto = validSirenEstablishmentDto,
   ) {}
 
   public withSiret(siret: string): SirenEstablishmentDtoBuilder {
@@ -67,7 +67,7 @@ export class SirenEstablishmentDtoBuilder
       businessAddress,
     });
   }
-  build(): SirenEstablishmentDto {
+  build(): SiretEstablishmentDto {
     return this.dto;
   }
 }

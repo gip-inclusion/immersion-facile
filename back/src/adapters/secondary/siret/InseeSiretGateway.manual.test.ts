@@ -1,10 +1,10 @@
 import { expectObjectsToMatch } from "shared";
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
-import { SirenGateway } from "../../../domain/sirene/ports/SirenGateway";
+import { SiretGateway } from "../../../domain/sirene/ports/SirenGateway";
 import { AppConfig } from "../../primary/config/appConfig";
 import { RealTimeGateway } from "../core/TimeGateway/RealTimeGateway";
-import { HttpSirenGateway } from "./HttpSirenGateway";
+import { InseeSiretGateway } from "./InseeSiretGateway";
 
 // These tests are not hermetic and not meant for automated testing. They will make requests to the
 // real SIRENE API, use up production quota, and fail for uncontrollable reasons such as quota
@@ -14,11 +14,11 @@ import { HttpSirenGateway } from "./HttpSirenGateway";
 // - SIRENE_ENDPOINT
 // - SIRENE_BEARER_TOKEN
 describe("HttpSirenGateway", () => {
-  let sirenGateway: SirenGateway;
+  let sirenGateway: SiretGateway;
 
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
-    sirenGateway = new HttpSirenGateway(
+    sirenGateway = new InseeSiretGateway(
       config.sirenHttpConfig,
       new RealTimeGateway(),
       noRateLimit,

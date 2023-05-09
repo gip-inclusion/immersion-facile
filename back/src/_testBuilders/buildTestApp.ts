@@ -18,7 +18,7 @@ import { NotImplementedDocumentGateway } from "../adapters/secondary/NotImplemen
 import { InMemoryPeConnectGateway } from "../adapters/secondary/PeConnectGateway/InMemoryPeConnectGateway";
 import { InMemoryExportGateway } from "../adapters/secondary/reporting/InMemoryExportGateway";
 import { DeterministShortLinkIdGeneratorGateway } from "../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
-import { InMemorySirenGateway } from "../adapters/secondary/sirene/InMemorySirenGateway";
+import { InMemorySirenGateway } from "../adapters/secondary/siret/InMemorySiretGateway";
 import {
   GenerateApiConsumerJwt,
   GenerateAuthenticatedUserJwt,

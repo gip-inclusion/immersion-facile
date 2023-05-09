@@ -112,7 +112,12 @@ export class AppConfig {
   public get sirenGateway() {
     return this.throwIfNotInArray({
       variableName: "SIRENE_REPOSITORY",
-      authorizedValues: ["IN_MEMORY", "HTTPS"],
+      authorizedValues: [
+        "IN_MEMORY",
+        //"HTTPS", // Deprecated, use Insee instead
+        "INSEE",
+        "ANNUAIRE_DES_ENTREPRISES",
+      ],
       defaultValue: "IN_MEMORY",
     });
   }
