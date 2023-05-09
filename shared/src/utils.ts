@@ -38,9 +38,11 @@ export const keys = <T extends string | number | symbol>(
   obj: Partial<Record<T, unknown>>,
 ): T[] => Object.keys(obj) as T[];
 
+export const filterNotUndefined = <T>(arg: T | undefined): arg is T => !!arg;
+
 export const removeUndefinedElements = <T>(
   unfilteredList: (T | undefined)[],
-): T[] => unfilteredList.filter((el) => !!el) as T[];
+): T[] => unfilteredList.filter(filterNotUndefined);
 
 export const replaceArrayElement = <T>(
   original: Array<T>,

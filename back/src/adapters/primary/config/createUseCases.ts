@@ -322,6 +322,8 @@ export const createUseCases = (
           gateways.email,
           generateConventionMagicLinkUrl,
           gateways.timeGateway,
+          gateways.shortLinkGenerator,
+          config,
         ),
       notifyNewConventionNeedsReview: new NotifyNewApplicationNeedsReview(
         uowPerformer,

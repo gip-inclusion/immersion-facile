@@ -323,6 +323,7 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
   };
 
   gateways.timeGateway.setNextDate(validationDate);
+  gateways.shortLinkGenerator.addMoreShortLinkIds(["shortlinkId"]);
 
   await request
     .post(`/auth/${updateConventionStatusRoute}/${initialConvention.id}`)
@@ -348,16 +349,23 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
   await eventCrawler.processNewEvents();
   const sentEmails = gateways.email.getSentEmails();
   expect(sentEmails).toHaveLength(numberOfEmailInitialySent + 2);
-  const needsToTriggerConventionSentEmail = sentEmails[sentEmails.length - 1];
-  expectTypeToMatchAndEqual(
-    needsToTriggerConventionSentEmail.type,
+  const needsToTriggerConventionSentEmail = expectEmailOfType(
+    sentEmails[sentEmails.length - 1],
     "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
   );
+
   expect(needsToTriggerConventionSentEmail.recipients).toEqual([
     "beneficiary@email.fr",
     "establishment@example.com",
     validatorEmail,
   ]);
+
+  const conventionDocumentLink = await shortLinkRedirectToLinkWithValidation(
+    needsToTriggerConventionSentEmail.params.magicLink,
+    request,
+  );
+
+  expectJwtInMagicLinkAndGetIt(conventionDocumentLink);
 };
 
 const makeSignatories = (

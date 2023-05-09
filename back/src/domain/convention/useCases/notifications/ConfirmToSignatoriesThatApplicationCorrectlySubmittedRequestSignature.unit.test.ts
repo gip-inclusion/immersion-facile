@@ -127,7 +127,7 @@ describe("Add Convention Notifications", () => {
       now: timeGateway.now(),
       agency,
       config,
-      convetionToSignLinkId: deterministicShortLinks[0],
+      conventionToSignLinkId: deterministicShortLinks[0],
       conventionStatusLinkId: deterministicShortLinks[1],
     });
     expectEmailSignatoryConfirmationSignatureRequestMatchingConvention({
@@ -138,7 +138,7 @@ describe("Add Convention Notifications", () => {
       now: timeGateway.now(),
       agency,
       config,
-      convetionToSignLinkId: deterministicShortLinks[2],
+      conventionToSignLinkId: deterministicShortLinks[2],
       conventionStatusLinkId: deterministicShortLinks[3],
     });
     expectEmailSignatoryConfirmationSignatureRequestMatchingConvention({
@@ -149,7 +149,7 @@ describe("Add Convention Notifications", () => {
       now: timeGateway.now(),
       agency,
       config,
-      convetionToSignLinkId: deterministicShortLinks[4],
+      conventionToSignLinkId: deterministicShortLinks[4],
       conventionStatusLinkId: deterministicShortLinks[5],
     });
   });
