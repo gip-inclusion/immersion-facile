@@ -132,8 +132,6 @@ export const createGateways = async (config: AppConfig) => {
             config.peApiUrl,
             cachingAccessTokenGateway,
             config.poleEmploiClientId,
-            noRateLimit,
-            noRetries,
           )
         : new InMemoryLaBonneBoiteAPI(),
     passEmploiGateway:

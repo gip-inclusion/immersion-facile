@@ -17,8 +17,6 @@ const getAPI = () =>
     config.peApiUrl,
     accessTokenGateway,
     config.poleEmploiClientId,
-    noRateLimit,
-    noRetries,
   );
 
 const benodetLonLat = { lat: 47.8667, lon: -4.1167 };
@@ -40,4 +38,40 @@ describe("HttpLaBonneBoiteAPI", () => {
 
     expect(actualSearchedCompanies).toHaveLength(100);
   });
+
+  it(`Should support several of parallel calls, and queue the calls if over accepted rate`, async () => {
+    const api = getAPI();
+
+    const searches: LaBonneBoiteRequestParams[] = [
+      searchParamsBoulangerAroundBenodet,
+      { ...benodetLonLat, rome: "A1201" },
+      { ...benodetLonLat, rome: "A1205" },
+      { ...benodetLonLat, rome: "A1404" },
+      { ...benodetLonLat, rome: "A1411" },
+      { ...benodetLonLat, rome: "B1601" },
+      { ...benodetLonLat, rome: "D1408" },
+      { ...benodetLonLat, rome: "E1104" },
+      { ...benodetLonLat, rome: "F1101" },
+      { ...benodetLonLat, rome: "B1601" },
+      { ...benodetLonLat, rome: "D1408" },
+      { ...benodetLonLat, rome: "E1104" },
+      { ...benodetLonLat, rome: "F1101" },
+    ];
+
+    const results = await Promise.all(
+      searches.map((searchParams) =>
+        api.searchCompanies(searchParams).catch((error) => {
+          const responseBodyAsString = error.response?.data
+            ? ` Body : ${JSON.stringify(error.response?.data)}`
+            : "";
+
+          throw new Error(
+            `Could not call api correctly, status: ${error.response.status}.${responseBodyAsString}`,
+          );
+        }),
+      ),
+    );
+
+    expect(results).toHaveLength(searches.length);
+  }, 13_000);
 });
