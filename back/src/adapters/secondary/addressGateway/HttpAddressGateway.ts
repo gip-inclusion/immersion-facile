@@ -5,6 +5,7 @@ import {
   calculateDurationInSecondsFrom,
   City,
   DepartmentName,
+  filterNotUndefined,
   GeoPositionDto,
   getDepartmentCodeFromDepartmentNameOrCity,
   LookupSearchResult,
@@ -61,7 +62,7 @@ export class HttpAddressGateway implements AddressGateway {
       responseBody as OpenCageDataFeatureCollection
     ).features
       .map(this.featureToAddress)
-      .filter((feature): feature is AddressDto => !!feature);
+      .filter(filterNotUndefined);
 
     return addresses.at(0);
   }
@@ -85,7 +86,7 @@ export class HttpAddressGateway implements AddressGateway {
 
       return (responseBody as OpenCageDataFeatureCollection).features
         .map((feature) => this.toAddressAndPosition(feature))
-        .filter((feature): feature is AddressAndPosition => !!feature);
+        .filter(filterNotUndefined);
     } finally {
       calculateDurationInSecondsFrom(startDate);
       logger.info({
