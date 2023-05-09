@@ -8,8 +8,15 @@ import {
   InclusionConnectedUser,
 } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
+import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
+import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
+import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryInclusionConnectedUserRepository } from "../../../adapters/secondary/InMemoryInclusionConnectedUserRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import {
+  CreateNewEvent,
+  makeCreateNewEvent,
+} from "../../core/eventBus/EventBus";
 import { UpdateIcUserRoleForAgency } from "./UpdateIcUserRoleForAgency";
 
 const user: AuthenticatedUser = {
@@ -22,12 +29,28 @@ describe("GetInclusionConnectedUsers", () => {
   let updateIcUserRoleForAgency: UpdateIcUserRoleForAgency;
   let uowPerformer: InMemoryUowPerformer;
   let inclusionConnectedUserRepository: InMemoryInclusionConnectedUserRepository;
+  let timeGateway: CustomTimeGateway;
+  let outboxRepo: InMemoryOutboxRepository;
+  let createNewEvent: CreateNewEvent;
 
   beforeEach(() => {
     const uow = createInMemoryUow();
+
+    outboxRepo = uow.outboxRepository;
+
+    timeGateway = new CustomTimeGateway();
+
+    createNewEvent = makeCreateNewEvent({
+      timeGateway,
+      uuidGenerator: new TestUuidGenerator(),
+    });
+
     inclusionConnectedUserRepository = uow.inclusionConnectedUserRepository;
     uowPerformer = new InMemoryUowPerformer(uow);
-    updateIcUserRoleForAgency = new UpdateIcUserRoleForAgency(uowPerformer);
+    updateIcUserRoleForAgency = new UpdateIcUserRoleForAgency(
+      uowPerformer,
+      createNewEvent,
+    );
   });
 
   it("throws Forbidden if no jwt token provided", async () => {
@@ -108,5 +131,39 @@ describe("GetInclusionConnectedUsers", () => {
       ...user,
       agencyRights: [{ agency, role: newRole }],
     });
+  });
+
+  it("should save IcUserAgencyRightChanged event when successful", async () => {
+    const agency = new AgencyDtoBuilder().build();
+    const icUser: InclusionConnectedUser = {
+      ...user,
+      agencyRights: [{ agency, role: "toReview" }],
+    };
+
+    inclusionConnectedUserRepository.setInclusionConnectedUsers([icUser]);
+    const newRole: AgencyRole = "validator";
+
+    await updateIcUserRoleForAgency.execute(
+      {
+        userId: user.id,
+        agencyId: agency.id,
+        role: newRole,
+      },
+      { role: "backOffice" } as BackOfficeJwtPayload,
+    );
+
+    expect(outboxRepo.events).toHaveLength(1);
+
+    expectToEqual(
+      outboxRepo.events[0],
+      createNewEvent({
+        topic: "IcUserAgencyRightChanged",
+        payload: {
+          userId: user.id,
+          agencyId: agency.id,
+          role: newRole,
+        },
+      }),
+    );
   });
 });
