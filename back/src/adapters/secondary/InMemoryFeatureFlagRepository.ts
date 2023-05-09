@@ -8,6 +8,7 @@ const defaultFlags: FeatureFlags = {
   enablePeConventionBroadcast: true,
   enableTemporaryOperation: false,
   enableMaxContactPerWeek: false,
+  enableMaintenance: false,
 };
 
 export class InMemoryFeatureFlagRepository implements FeatureFlagRepository {

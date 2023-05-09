@@ -1,0 +1,8 @@
+.im-maintenance-callout {
+  background: var(--background-flat-warning);
+  box-shadow: inset 0 -10px 2rem -10px rgba(0, 0, 0, 0.3);
+  &__message {
+    text-align: center;
+    color: var(--grey-1000-100);
+  }
+}
