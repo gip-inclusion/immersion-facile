@@ -5,8 +5,8 @@ import {
   calculateDurationInSecondsFrom,
   City,
   DepartmentName,
-  departmentNameToDepartmentCode,
   GeoPositionDto,
+  getDepartmentCodeFromDepartmentNameOrCity,
   LookupSearchResult,
   lookupSearchResultsSchema,
   OpenCageGeoSearchKey,
@@ -158,7 +158,8 @@ export class HttpAddressGateway implements AddressGateway {
     const departmentName = getDepartmentNameFromAliases(components);
     // OpenCageData gives the department name but not the code.
     const departmentCode =
-      departmentName && departmentNameToDepartmentCode[departmentName];
+      departmentName &&
+      getDepartmentCodeFromDepartmentNameOrCity[departmentName];
 
     return (
       city &&
