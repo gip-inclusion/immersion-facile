@@ -11,7 +11,7 @@ import {
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { SirenGateway } from "../../sirene/ports/SirenGateway";
+import { SiretGateway } from "../../sirene/ports/SirenGateway";
 import { rejectsSiretIfNotAnOpenCompany } from "../../sirene/rejectsSiretIfNotAnOpenCompany";
 
 export class AddConvention extends TransactionalUseCase<
@@ -21,7 +21,7 @@ export class AddConvention extends TransactionalUseCase<
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly createNewEvent: CreateNewEvent,
-    private readonly sirenGateway: SirenGateway,
+    private readonly sirenGateway: SiretGateway,
   ) {
     super(uowPerformer);
   }

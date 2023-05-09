@@ -23,7 +23,7 @@ export const siretInfoErrors = [
 ] as const;
 
 export type SiretDto = Flavor<string, "SiretDto">;
-export type SirenEstablishmentDto = {
+export type SiretEstablishmentDto = {
   siret: SiretDto;
   businessName: string;
   businessAddress: string;
@@ -38,7 +38,7 @@ export type NumberEmployeesRange = (typeof numberEmployeesRanges)[number];
 export const  numberEmployeesRanges = ["", "0", "1-2", "3-5", "6-9", "10-19", "20-49", "50-99", "100-199", "200-249", "250-499", "500-999", "1000-1999", "2000-4999", "5000-9999", "+10000"] as const;
 
 export type GetSiretInfoError = (typeof siretInfoErrors)[number];
-export type GetSiretInfo = SirenEstablishmentDto | GetSiretInfoError;
+export type GetSiretInfo = SiretEstablishmentDto | GetSiretInfoError;
 export type GetSiretRequestDto = {
   siret: SiretDto;
   includeClosedEstablishments?: boolean;

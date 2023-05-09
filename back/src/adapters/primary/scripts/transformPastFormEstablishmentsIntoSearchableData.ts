@@ -16,7 +16,7 @@ import { QpsRateLimiter } from "../../secondary/core/QpsRateLimiter";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
-import { HttpSirenGateway } from "../../secondary/sirene/HttpSirenGateway";
+import { InseeSiretGateway } from "../../secondary/siret/InseeSiretGateway";
 import { AppConfig } from "../config/appConfig";
 import { configureCreateHttpClientForExternalApi } from "../config/createHttpClientForExternalApi";
 import { createPgUow } from "../config/uowConfig";
@@ -51,7 +51,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
     config.apiKeyOpenCageDataGeocoding,
     config.apiKeyOpenCageDataGeosearch,
   );
-  const sirenGateway = new HttpSirenGateway(
+  const sirenGateway = new InseeSiretGateway(
     config.sirenHttpConfig,
     timeGateway,
     new QpsRateLimiter(maxQpsSireneApi, timeGateway, sleep),

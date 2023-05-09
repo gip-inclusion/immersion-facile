@@ -3,7 +3,7 @@ import { expectToEqual, getSiretIfNotSavedRoute, siretRoute } from "shared";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
 import { InMemoryEstablishmentAggregateRepository } from "../../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
-import { TEST_ESTABLISHMENT1 } from "../../../secondary/sirene/InMemorySirenGateway";
+import { TEST_ESTABLISHMENT1 } from "../../../secondary/siret/InMemorySiretGateway";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 describe("/siret route", () => {

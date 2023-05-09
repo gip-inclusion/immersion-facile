@@ -1,10 +1,9 @@
 import {
-  apiSirenNotAvailableSiret,
-  SirenEstablishmentDto,
   SiretDto,
+  SiretEstablishmentDto,
   tooManySirenRequestsSiret,
 } from "shared";
-import { SirenGateway } from "../../../domain/sirene/ports/SirenGateway";
+import { SiretGateway } from "../../../domain/sirene/ports/SirenGateway";
 import { createLogger } from "../../../utils/logger";
 import {
   TooManyRequestApiError,
@@ -18,7 +17,7 @@ export const TEST_ESTABLISHMENT2_SIRET = "20006765000016";
 export const TEST_ESTABLISHMENT3_SIRET = "77561959600155";
 export const TEST_ESTABLISHMENT4_SIRET = "24570135400111";
 
-export const TEST_ESTABLISHMENT1: SirenEstablishmentDto = {
+export const TEST_ESTABLISHMENT1: SiretEstablishmentDto = {
   siret: TEST_ESTABLISHMENT1_SIRET,
   businessName: "MA P'TITE BOITE",
   businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
@@ -30,7 +29,7 @@ export const TEST_ESTABLISHMENT1: SirenEstablishmentDto = {
   isOpen: true,
 };
 
-export const TEST_ESTABLISHMENT2: SirenEstablishmentDto = {
+export const TEST_ESTABLISHMENT2: SiretEstablishmentDto = {
   siret: TEST_ESTABLISHMENT2_SIRET,
   businessName: "MA P'TITE BOITE 2",
   businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
@@ -42,7 +41,7 @@ export const TEST_ESTABLISHMENT2: SirenEstablishmentDto = {
   isOpen: false,
 };
 
-export const TEST_ESTABLISHMENT3: SirenEstablishmentDto = {
+export const TEST_ESTABLISHMENT3: SiretEstablishmentDto = {
   siret: TEST_ESTABLISHMENT3_SIRET,
   businessName: "MA P'TITE BOITE 2",
   businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
@@ -54,7 +53,7 @@ export const TEST_ESTABLISHMENT3: SirenEstablishmentDto = {
   isOpen: true,
 };
 
-export const TEST_ESTABLISHMENT4: SirenEstablishmentDto = {
+export const TEST_ESTABLISHMENT4: SiretEstablishmentDto = {
   siret: TEST_ESTABLISHMENT4_SIRET,
   businessName: "MA P'TITE BOITE 2",
   businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
@@ -68,9 +67,9 @@ export const TEST_ESTABLISHMENT4: SirenEstablishmentDto = {
 
 export const apiSirenUnexpectedError = "apiSirenUnexpectedError";
 
-type EstablishmentBySiret = { [siret: string]: SirenEstablishmentDto };
+type EstablishmentBySiret = { [siret: string]: SiretEstablishmentDto };
 
-export class InMemorySirenGateway implements SirenGateway {
+export class InMemorySiretGateway implements SiretGateway {
   private _error: any = null;
 
   private readonly _repo: EstablishmentBySiret = {
@@ -83,7 +82,7 @@ export class InMemorySirenGateway implements SirenGateway {
   public async getEstablishmentBySiret(
     siret: SiretDto,
     includeClosedEstablishments = false,
-  ): Promise<SirenEstablishmentDto | undefined> {
+  ): Promise<SiretEstablishmentDto | undefined> {
     try {
       if (this._error) throw this._error;
       if (siret === apiSirenUnexpectedError)
@@ -99,14 +98,6 @@ export class InMemorySirenGateway implements SirenGateway {
           initialError: {
             message: "Request failed with status code 429",
             status: 429,
-            data: "some error",
-          },
-        };
-      if (siret === apiSirenNotAvailableSiret)
-        throw {
-          initialError: {
-            message: "Api down",
-            status: 503,
             data: "some error",
           },
         };
@@ -127,7 +118,7 @@ export class InMemorySirenGateway implements SirenGateway {
   }
 
   // Visible for testing
-  public setSirenEstablishment(establishment: SirenEstablishmentDto) {
+  public setSirenEstablishment(establishment: SiretEstablishmentDto) {
     this._repo[establishment.siret] = establishment;
   }
 

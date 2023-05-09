@@ -1,9 +1,9 @@
 import { BadRequestError } from "../../adapters/primary/helpers/httpErrors";
-import { SirenGateway } from "./ports/SirenGateway";
+import { SiretGateway } from "./ports/SirenGateway";
 import { getSirenEstablishmentFromApi } from "./service/getSirenEstablishmentFromApi";
 
 export const rejectsSiretIfNotAnOpenCompany = async (
-  sirenGateway: SirenGateway,
+  sirenGateway: SiretGateway,
   siret: string,
 ) => {
   const sirenEstablishment = await getSirenEstablishmentFromApi(

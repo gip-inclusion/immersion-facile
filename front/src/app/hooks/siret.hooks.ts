@@ -1,14 +1,14 @@
 import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
-import { SirenEstablishmentDto, SiretDto } from "shared";
+import { SiretDto, SiretEstablishmentDto } from "shared";
 import { useSendModifyEstablishmentLink } from "src/app/hooks/establishment.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { establishmentSelectors } from "src/core-logic/domain/establishmentPath/establishment.selectors";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 
-export const useSiretRelatedField = <K extends keyof SirenEstablishmentDto>(
+export const useSiretRelatedField = <K extends keyof SiretEstablishmentDto>(
   fieldFromInfo: K,
   options?: {
     fieldToUpdate?: string;

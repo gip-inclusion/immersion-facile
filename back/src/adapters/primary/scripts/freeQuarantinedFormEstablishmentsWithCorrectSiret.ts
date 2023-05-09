@@ -8,7 +8,7 @@ import {
 } from "../../secondary/core/ExponentialBackoffRetryStrategy";
 import { QpsRateLimiter } from "../../secondary/core/QpsRateLimiter";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
-import { HttpSirenGateway } from "../../secondary/sirene/HttpSirenGateway";
+import { InseeSiretGateway } from "../../secondary/siret/InseeSiretGateway";
 import { AppConfig } from "../config/appConfig";
 
 const maxQpsSireneApi = 0.25;
@@ -30,7 +30,7 @@ const freeQuarantinedFormEstablishmentsWithCorrectSiret = async () => {
   });
   const client = await pool.connect();
 
-  const sirenGateway = new HttpSirenGateway(
+  const sirenGateway = new InseeSiretGateway(
     config.sirenHttpConfig,
     timeGateway,
     new QpsRateLimiter(maxQpsSireneApi, timeGateway, sleep),

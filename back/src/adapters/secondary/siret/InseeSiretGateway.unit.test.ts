@@ -2,7 +2,7 @@ import { expectToEqual } from "shared";
 import {
   convertSirenRawEstablishmentToSirenEstablishmentDto,
   SirenApiRawEstablishment,
-} from "./HttpSirenGateway";
+} from "./InseeSiretGateway";
 
 const validEstablishment: SirenApiRawEstablishment = {
   siret: "12345678901234",

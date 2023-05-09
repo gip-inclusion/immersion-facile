@@ -1,8 +1,8 @@
-import { SirenEstablishmentDto, SiretDto } from "shared";
+import { SiretDto, SiretEstablishmentDto } from "shared";
 
-export interface SirenGateway {
+export interface SiretGateway {
   getEstablishmentBySiret(
     siret: SiretDto,
     includeClosedEstablishments?: boolean,
-  ): Promise<SirenEstablishmentDto | undefined>;
+  ): Promise<SiretEstablishmentDto | undefined>;
 }

@@ -4,8 +4,8 @@ import {
   NafDto,
   NumberEmployeesRange,
   propEq,
-  SirenEstablishmentDto,
   SiretDto,
+  SiretEstablishmentDto,
 } from "shared";
 import { RateLimiter } from "../../../domain/core/ports/RateLimiter";
 import {
@@ -13,7 +13,7 @@ import {
   RetryStrategy,
 } from "../../../domain/core/ports/RetryStrategy";
 import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
-import { SirenGateway } from "../../../domain/sirene/ports/SirenGateway";
+import { SiretGateway } from "../../../domain/sirene/ports/SirenGateway";
 import {
   createAxiosInstance,
   isRetryableError,
@@ -28,7 +28,7 @@ import {
 
 const logger = createLogger(__filename);
 
-export class HttpSirenGateway implements SirenGateway {
+export class InseeSiretGateway implements SiretGateway {
   public constructor(
     private readonly axiosConfig: AxiosConfig,
     private readonly timeGateway: TimeGateway,
@@ -50,7 +50,7 @@ export class HttpSirenGateway implements SirenGateway {
   public async getEstablishmentBySiret(
     siret: SiretDto,
     includeClosedEstablishments = false,
-  ): Promise<SirenEstablishmentDto | undefined> {
+  ): Promise<SiretEstablishmentDto | undefined> {
     logger.debug({ siret, includeClosedEstablishments }, "get");
 
     return this.retryStrategy
@@ -153,7 +153,7 @@ export type SirenGatewayAnswer = {
 
 export const convertSirenRawEstablishmentToSirenEstablishmentDto = (
   sirenEstablishment: SirenApiRawEstablishment,
-): SirenEstablishmentDto => ({
+): SiretEstablishmentDto => ({
   siret: sirenEstablishment.siret,
   businessName: getBusinessName(sirenEstablishment),
   businessAddress: getFormattedAddress(sirenEstablishment),
