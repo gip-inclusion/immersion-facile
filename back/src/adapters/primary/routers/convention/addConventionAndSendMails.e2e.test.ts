@@ -1,5 +1,6 @@
 import supertest from "supertest";
 import {
+  AgencyDtoBuilder,
   ConventionDto,
   ConventionDtoBuilder,
   conventionsRoute,
@@ -46,6 +47,8 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       "shortLink2",
       "shortLink3",
       "shortLink4",
+      "shortLink5",
+      "shortLink6",
     ]);
 
     const res = await request
@@ -92,12 +95,12 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       .withoutDateValidation()
       .withFederatedIdentity({ provider: "peConnect", token: "fake" })
       .build();
-    const appAndDeps = await buildTestApp();
-    const [agency] = await appAndDeps.inMemoryUow.agencyRepository.getByIds([
-      initialConvention.agencyId,
-    ]);
+    const agency = new AgencyDtoBuilder()
+      .withId(initialConvention.agencyId)
+      .withValidatorEmails(["validator@mail.com"])
+      .build();
 
-    if (!agency) throw new Error("Test agency not found with this id");
+    const appAndDeps = await buildTestApp();
     appAndDeps.gateways.shortLinkGenerator.addMoreShortLinkIds([
       "link1",
       "link2",
@@ -109,9 +112,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       "link8",
     ]);
 
-    appAndDeps.inMemoryUow.agencyRepository.setAgencies([
-      { ...agency, validatorEmails: ["validator@mail.com"] },
-    ]);
+    appAndDeps.inMemoryUow.agencyRepository.setAgencies([agency]);
 
     const { beneficiarySignJwt, establishmentSignJwt } =
       await beneficiarySubmitsApplicationForTheFirstTime(
