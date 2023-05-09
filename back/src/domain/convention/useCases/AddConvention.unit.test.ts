@@ -16,7 +16,7 @@ import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGenerato
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryFeatureFlagRepository } from "../../../adapters/secondary/InMemoryFeatureFlagRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { InMemorySirenGateway } from "../../../adapters/secondary/sirene/InMemorySirenGateway";
+import { InMemorySirenGateway } from "../../../adapters/secondary/siret/InMemorySiretGateway";
 import {
   CreateNewEvent,
   makeCreateNewEvent,

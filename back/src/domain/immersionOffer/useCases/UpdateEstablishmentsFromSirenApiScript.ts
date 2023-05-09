@@ -5,7 +5,7 @@ import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { createLogger } from "../../../utils/logger";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UseCase } from "../../core/UseCase";
-import { SirenGateway } from "../../sirene/ports/SirenGateway";
+import { SiretGateway } from "../../sirene/ports/SirenGateway";
 import { getSirenEstablishmentFromApi } from "../../sirene/service/getSirenEstablishmentFromApi";
 import { AddressGateway } from "../ports/AddressGateway";
 import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
@@ -21,7 +21,7 @@ export class UpdateEstablishmentsFromSirenApiScript extends UseCase<
 > {
   constructor(
     private readonly establishmentAggregateRepository: EstablishmentAggregateRepository,
-    private readonly sirenGateway: SirenGateway,
+    private readonly sirenGateway: SiretGateway,
     private readonly addressAPI: AddressGateway,
     private readonly timeGateway: TimeGateway,
   ) {

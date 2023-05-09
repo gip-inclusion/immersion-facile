@@ -1,11 +1,11 @@
-import { GetSiretRequestDto, SirenEstablishmentDto } from "shared";
+import { GetSiretRequestDto, SiretEstablishmentDto } from "shared";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
-import { SirenGateway } from "../ports/SirenGateway";
+import { SiretGateway } from "../ports/SirenGateway";
 
 export const getSirenEstablishmentFromApi = async (
   { siret, includeClosedEstablishments }: GetSiretRequestDto,
-  sirenGateway: SirenGateway,
-): Promise<SirenEstablishmentDto> => {
+  sirenGateway: SiretGateway,
+): Promise<SiretEstablishmentDto> => {
   const sirenEstablishment = await sirenGateway.getEstablishmentBySiret(
     siret,
     includeClosedEstablishments,
