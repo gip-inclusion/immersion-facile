@@ -1,39 +1,47 @@
 # Immersion Facile
 
 Le but du projet immersion facile est de faciliter les immersions professionnelles.
-Il y pour cela plusieurs axes de travail :
+Il y a pour cela plusieurs axes de travail :
 
-- Dématérialiser entièrement les demandes d'immersion et les interactions des conseillers pôle emploi ou mission locale
+- Dématérialiser entièrement les demandes d'immersion et les interactions des conseillers pôle emploi, missions locales, etc.
 - Constituer un annuaire des entreprises qui sont susceptible d'accueillir en immersion
 - Rendre les immersions recherchables par les bénéficiaires
 
 ### Prérequis
 
-Pour démarrer le projet il vous faut `git`, `docker` et `node` (version > 12 )installée sur la machine.
-Nous utilions également `pnpm` comme gestionnaire de paquets (pour l'installer : `npm install -g pnpm`).
+Pour démarrer le projet il vous faut `git`, `docker` et `node` (version 16 ) installée sur la machine.
+Nous utilisons `pnpm` comme gestionnaire de paquets (pour l'installer : `npm install -g pnpm`).
 
 ### Démarrer le projet
 
-Il faut demander d'être ajouté au projet sur le gitlab de pole-emploi. L'url du projet est la suivante :
-[https://git.beta.pole-emploi.fr/jburkard/immersion-facile](https://git.beta.pole-emploi.fr/jburkard/immersion-facile)
+- Demander à être ajouté comme contributeur au projet `gip-inclusion/immersion-facile`
+- Cloner le projet
 
-Récupérer ou pousser du code sur gitlab, il faut également avoir (ou générer) une paire de clé ssh et **donner la clé public à l'équipe pole-emploi**.
-Le but étant de donner les droits sur gitlab et sur la machines de recette.
-
-#### Exemple de création de clé ssh (en général à la racine de l'utilisateur) :
+#### Cloner le projet
 
 ```sh
-ssh-keygen -t ed25519 -C "your_email@example.com"
+git clone ssh://git@github.com:gip-inclusion/immersion-facile.git immersion-facile
+cd immersion-facile
 ```
 
-#### Cloner le projet :
+#### Aperçu du projet
 
-```sh
-git clone ssh://git@git.beta.pole-emploi.fr:23/jburkard/immersion-facile.git immersion-facile;
-cd immersion-facile;
-```
+Le projet Immersion Facilitée est un monorepo composé des projets suivants :
+
+- back/ : le back-end de l'application
+- front/ : le front-end de l'application
+- shared/ : les éléments partagés (types, schemas, utilitaires, etc)
+- libs/ :
+  - react-design-system : les composants d'interfaces spécifiques Immersion Facilitée (hors DSFR)
+  - html-templates : lib maison de génération de contenus HTML (pour les emails par ex)
+  - http-client : le client HTTP de l'app
+  - scss-mapper : un générateur de fichier TS à partir de fichier Sass (\*.scss)
 
 #### Installer les dépendances nodes
+
+Chaque projet (front, back) du repo décrit ses dépendances, mais elles sont managées globalement via PNPM.
+
+Pour installer les dépendances nécessaires à tous les projets :
 
 ```shell
 pnpm install
@@ -86,21 +94,19 @@ Pour le backend se référer ensuite ici:
 Pour le frontend se référer ensuite ici:
 [Documentation frontend](./front/README.md)
 
--
-
 ### Outillage
 
 #### Cypress
 
-- `pnpm cypress install` pour installer le binaire de l'app de votre OS
-- `pnpm front dev-http` & `pnpm back dev` : Cypress va écouter les requêtes XHR et a donc besoin du serveur back qui tourne et du front en mode HTTP
-- `pnpm cypress open` pour lancer l'app et démarrer les tests manuellement (End-to-end testing)
+Voir [Documentation frontend - Cypress](./front/README.md#e2e-tests-with-cypress)
 
 #### CLI
 
 ##### Husky
 
-Husky sert à automatiser des executions de commandes projet avant les commits et les push (format, lint, test... )
+Husky sert à automatiser des executions de commandes projet avant les commits et les push (format, lint, test...).
+En amont des commandes de commit et de push, des tests sont effectués pour vérifier que le commit ou le push peut être effectué (ex: typecheck)
+
 La configuration husky est présente ici [.husky](.husky)  
 Documentation locale [.husky.md](.husky/husky.md)  
 [Documentation officielle](https://typicode.github.io/husky/#/)
@@ -110,6 +116,10 @@ Documentation locale [.husky.md](.husky/husky.md)
 Lint stage permet de ne jouer le lint et le prettier que sur les fichiers qui ont été stage dans Git
 La configuration lint-stage est présente ici [.tooling/.lint-staged/.lintstagedrc](.tooling/.lint-staged/.lintstagedrc)
 [Documentation officielle](https://github.com/okonet/lint-staged)
+
+##### Sass to TS
+
+Voir [Documentation frontend - Sass to TS](./front/README.md#sass-to-ts)
 
 #### Turbo
 
