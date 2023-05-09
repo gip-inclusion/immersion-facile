@@ -4,6 +4,7 @@ import {
   ConventionDto,
   conventionSchema,
   CreateConventionMagicLinkPayloadProperties,
+  filterNotUndefined,
   frontRoutes,
   Signatory,
   TemplatedEmail,
@@ -115,5 +116,3 @@ export class ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignatu
     };
   }
 }
-
-const filterNotUndefined = <T>(arg: T | undefined): arg is T => !!arg;

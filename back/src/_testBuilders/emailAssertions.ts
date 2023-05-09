@@ -6,19 +6,15 @@ import {
   ContactEstablishmentByPhoneDto,
   ContactEstablishmentInPersonDto,
   ConventionDto,
-  CreateConventionMagicLinkPayloadProperties,
   displayEmergencyContactInfos,
   EmailParamsByEmailType,
   expectTypeToMatchAndEqual,
   FormEstablishmentDto,
-  frontRoutes,
   Signatory,
   TemplatedEmail,
 } from "shared";
 import { AppConfig } from "../adapters/primary/config/appConfig";
-import { GenerateConventionMagicLinkUrl } from "../adapters/primary/config/magicLinkUrl";
 import { ShortLinkId } from "../domain/core/ports/ShortLinkQuery";
-import { TimeGateway } from "../domain/core/ports/TimeGateway";
 import { makeShortLinkUrl } from "../domain/core/ShortLink";
 import { ContactEntity } from "../domain/immersionOffer/entities/ContactEntity";
 import { EstablishmentEntity } from "../domain/immersionOffer/entities/EstablishmentEntity";
@@ -28,19 +24,10 @@ import { AnnotatedImmersionOfferEntityV2 } from "../domain/immersionOffer/entiti
 export const getValidatedConventionFinalConfirmationParams = (
   agency: AgencyDto,
   convention: ConventionDto,
-  generateMagicLinkFn: GenerateConventionMagicLinkUrl,
-  timeGateway: TimeGateway,
+  config: AppConfig,
+  conventionDocumentShortlinkId: ShortLinkId,
 ): EmailParamsByEmailType["VALIDATED_CONVENTION_FINAL_CONFIRMATION"] => {
   const { beneficiary, beneficiaryRepresentative } = convention.signatories;
-  const now = timeGateway.now();
-  const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties = {
-    id: convention.id,
-    // role and email should not be valid
-    role: beneficiary.role,
-    email: beneficiary.email,
-    now,
-    exp: now.getTime() + 1000 * 60 * 60 * 24 * 365, // 1 year
-  };
   return {
     internshipKind: convention.internshipKind,
 
@@ -59,10 +46,7 @@ export const getValidatedConventionFinalConfirmationParams = (
       beneficiary,
     }),
     agencyLogoUrl: agency.logoUrl,
-    magicLink: generateMagicLinkFn({
-      ...magicLinkCommonFields,
-      targetRoute: frontRoutes.conventionDocument,
-    }),
+    magicLink: makeShortLinkUrl(config, conventionDocumentShortlinkId),
   };
 };
 
@@ -74,7 +58,7 @@ export const expectEmailSignatoryConfirmationSignatureRequestMatchingConvention 
     recipient,
     agency,
     conventionStatusLinkId,
-    convetionToSignLinkId,
+    conventionToSignLinkId,
     config,
   }: {
     config: AppConfig;
@@ -84,7 +68,7 @@ export const expectEmailSignatoryConfirmationSignatureRequestMatchingConvention 
     recipient: string;
     now: Date;
     agency: AgencyDto;
-    convetionToSignLinkId: ShortLinkId;
+    conventionToSignLinkId: ShortLinkId;
     conventionStatusLinkId: ShortLinkId;
   }) => {
     const { businessName } = convention;
@@ -110,7 +94,7 @@ export const expectEmailSignatoryConfirmationSignatureRequestMatchingConvention 
         beneficiaryCurrentEmployerName:
           beneficiaryCurrentEmployer &&
           `${beneficiaryCurrentEmployer.firstName} ${beneficiaryCurrentEmployer.lastName}`,
-        magicLink: makeShortLinkUrl(config, convetionToSignLinkId),
+        magicLink: makeShortLinkUrl(config, conventionToSignLinkId),
         conventionStatusLink: makeShortLinkUrl(config, conventionStatusLinkId),
         businessName,
         agencyLogoUrl: agency.logoUrl,
@@ -123,8 +107,8 @@ export const expectEmailFinalValidationConfirmationMatchingConvention = (
   templatedEmails: TemplatedEmail[],
   agency: AgencyDto,
   convention: ConventionDto,
-  generateMagicLinkFn: GenerateConventionMagicLinkUrl,
-  timeGateway: TimeGateway,
+  config: AppConfig,
+  conventionToSignLinkId: ShortLinkId,
 ) =>
   expectTypeToMatchAndEqual(templatedEmails, [
     {
@@ -133,8 +117,8 @@ export const expectEmailFinalValidationConfirmationMatchingConvention = (
       params: getValidatedConventionFinalConfirmationParams(
         agency,
         convention,
-        generateMagicLinkFn,
-        timeGateway,
+        config,
+        conventionToSignLinkId,
       ),
     },
   ]);
