@@ -34,6 +34,8 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       "shortLink6",
       "shortLink7",
       "shortLink8",
+      "shortLink9",
+      "shortLink10",
     ]);
 
     const { establishmentRepJwt } =
