@@ -30,6 +30,7 @@ describe("PG getFeatureFlags", () => {
       enablePeConventionBroadcast: true,
       enableTemporaryOperation: false,
       enableMaxContactPerWeek: false,
+      enableMaintenance: false,
     };
 
     await insertFeatureFlagsInTable(expectedFeatureFlags);
@@ -43,6 +44,7 @@ describe("PG getFeatureFlags", () => {
       enablePeConventionBroadcast: true,
       enableTemporaryOperation: false,
       enableMaxContactPerWeek: false,
+      enableMaintenance: false,
     });
   });
 
@@ -54,6 +56,7 @@ describe("PG getFeatureFlags", () => {
       enableLogoUpload: false,
       enableTemporaryOperation: false,
       enableMaxContactPerWeek: false,
+      enableMaintenance: false,
     };
 
     await insertFeatureFlagsInTable(initialFeatureFlags);
@@ -72,6 +75,7 @@ describe("PG getFeatureFlags", () => {
       enableLogoUpload: true,
       enableTemporaryOperation: false,
       enableMaxContactPerWeek: false,
+      enableMaintenance: false,
     });
   });
 
