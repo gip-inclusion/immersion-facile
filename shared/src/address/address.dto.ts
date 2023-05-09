@@ -107,7 +107,6 @@ export const departmentNameToDepartmentCode: Record<
   "Pyrénées-Orientales": "66",
   "Bas-Rhin": "67",
   "Haut-Rhin": "68",
-  "Auvergne-Rhône-Alpes": "69",
   Rhône: "69",
   "Haute-Saône": "70",
   "Saône-et-Loire": "71",
@@ -140,6 +139,16 @@ export const departmentNameToDepartmentCode: Record<
   Guyane: "973",
   "La Réunion": "974",
   Mayotte: "976",
+};
+
+export const getDepartmentCodeFromDepartmentNameOrCity: Record<
+  DepartmentName,
+  DepartmentCode
+> = {
+  ...departmentNameToDepartmentCode,
+  "Île-de-France": "75",
+  "Métropole de Lyon": "69",
+  "Auvergne-Rhône-Alpes": "69",
 };
 
 // prettier-ignore
