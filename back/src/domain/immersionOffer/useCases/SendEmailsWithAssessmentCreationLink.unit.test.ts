@@ -89,7 +89,7 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
         ],
         params: {
           internshipKind: immersionApplicationEndingTomorrow.internshipKind,
-          immersionAssessmentCreationLink: `http://fake-magic-link/immersion-ending-tommorow-id/bilan-immersion/establishment/2021-05-15T08:00:00.000Z/establishment@example.com`,
+          immersionAssessmentCreationLink: `http://fake-magic-link/bilan-immersion/immersion-ending-tommorow-id/establishment/2021-05-15T08:00:00.000Z/establishment@example.com`,
           establishmentTutorName: "Tom Cruise",
           beneficiaryFirstName:
             immersionApplicationEndingTomorrow.signatories.beneficiary
