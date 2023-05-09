@@ -115,7 +115,7 @@ export const createUseCases = (
     ...instantiatedUseCasesFromClasses({
       registerAgencyToInclusionConnectUser:
         new RegisterAgencyToInclusionConnectUser(uowPerformer, createNewEvent),
-      updateIcUserRoleForAgency: new UpdateIcUserRoleForAgency(uowPerformer),
+      updateIcUserRoleForAgency: new UpdateIcUserRoleForAgency(uowPerformer, createNewEvent),
       getIcUsers: new GetInclusionConnectedUsers(uowPerformer),
       getUserAgencyDashboardUrl: new GetInclusionConnectedUser(
         uowPerformer,
