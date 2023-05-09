@@ -5,7 +5,7 @@ import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { InMemorySirenGateway } from "../../../adapters/secondary/sirene/InMemorySirenGateway";
+import { InMemorySirenGateway } from "../../../adapters/secondary/siret/InMemorySiretGateway";
 import { GetSiretIfNotAlreadySaved } from "./GetSiretIfNotAlreadySaved";
 
 describe("GetSiretIfNotAlreadySaved", () => {

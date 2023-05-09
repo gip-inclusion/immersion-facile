@@ -7,7 +7,7 @@ import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { SirenGateway } from "../../sirene/ports/SirenGateway";
+import { SiretGateway } from "../../sirene/ports/SirenGateway";
 import { AddressGateway } from "../ports/AddressGateway";
 
 const logger = createLogger(__filename);
@@ -22,7 +22,7 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
 > {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly sirenGateway: SirenGateway,
+    private readonly sirenGateway: SiretGateway,
     private readonly addressAPI: AddressGateway,
     private readonly uuidGenerator: UuidGenerator,
     private readonly timeGateway: TimeGateway,

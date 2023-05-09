@@ -1,16 +1,16 @@
 import {
   expectPromiseToFailWithError,
   expectToEqual,
-  SirenEstablishmentDto,
+  SiretEstablishmentDto,
 } from "shared";
 import {
   NotFoundError,
   TooManyRequestApiError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { InMemorySirenGateway } from "../../../adapters/secondary/sirene/InMemorySirenGateway";
+import { InMemorySirenGateway } from "../../../adapters/secondary/siret/InMemorySiretGateway";
 import { GetSiret } from "./GetSiret";
 
-const validEstablishment: SirenEstablishmentDto = {
+const validEstablishment: SiretEstablishmentDto = {
   siret: "12345678901234",
   businessName: "MA P'TITE BOITE",
   businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
@@ -28,7 +28,7 @@ describe("GetSiret", () => {
   });
 
   describe("checking for business being opened", () => {
-    const closedEstablishment: SirenEstablishmentDto = {
+    const closedEstablishment: SiretEstablishmentDto = {
       ...validEstablishment,
       siret: "11111111111111",
       isOpen: false,

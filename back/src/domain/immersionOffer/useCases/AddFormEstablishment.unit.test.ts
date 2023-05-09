@@ -21,7 +21,7 @@ import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPer
 import {
   InMemorySirenGateway,
   TEST_ESTABLISHMENT1,
-} from "../../../adapters/secondary/sirene/InMemorySirenGateway";
+} from "../../../adapters/secondary/siret/InMemorySiretGateway";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { AddFormEstablishment } from "./AddFormEstablishment";
 

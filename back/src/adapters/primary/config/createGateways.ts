@@ -51,8 +51,9 @@ import { InMemoryExportGateway } from "../../secondary/reporting/InMemoryExportG
 import { S3DocumentGateway } from "../../secondary/S3DocumentGateway";
 import { DeterministShortLinkIdGeneratorGateway } from "../../secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { NanoIdShortLinkIdGeneratorGateway } from "../../secondary/shortLinkIdGeneratorGateway/NanoIdShortLinkIdGeneratorGateway";
-import { HttpSirenGateway } from "../../secondary/sirene/HttpSirenGateway";
-import { InMemorySirenGateway } from "../../secondary/sirene/InMemorySirenGateway";
+import { AnnuaireDesEntreprisesSiretGateway } from "../../secondary/siret/AnnuaireDesEntreprisesSiretGateway";
+import { InMemorySiretGateway } from "../../secondary/siret/InMemorySiretGateway";
+import { InseeSiretGateway } from "../../secondary/siret/InseeSiretGateway";
 import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
 import { configureCreateHttpClientForExternalApi } from "./createHttpClientForExternalApi";
 
@@ -155,20 +156,31 @@ export const createGateways = async (config: AppConfig) => {
           )
         : new InMemoryPoleEmploiGateway(),
     timeGateway,
-    siren:
-      config.sirenGateway === "HTTPS"
-        ? new HttpSirenGateway(
-            config.sirenHttpConfig,
-            timeGateway,
-            noRateLimit,
-            noRetries,
-          )
-        : new InMemorySirenGateway(),
+    siren: getSiretGateway(config.sirenGateway, config, timeGateway),
     shortLinkGenerator:
       config.shortLinkIdGeneratorGateway === "NANO_ID"
         ? new NanoIdShortLinkIdGeneratorGateway()
         : new DeterministShortLinkIdGeneratorGateway(),
   };
+};
+
+const getSiretGateway = (
+  provider: AppConfig["sirenGateway"],
+  config: AppConfig,
+  timeGateway: TimeGateway,
+) => {
+  const gatewayByProvider = {
+    INSEE: () =>
+      new InseeSiretGateway(
+        config.sirenHttpConfig,
+        timeGateway,
+        noRateLimit,
+        noRetries,
+      ),
+    IN_MEMORY: () => new InMemorySiretGateway(),
+    ANNUAIRE_DES_ENTREPRISES: () => new AnnuaireDesEntreprisesSiretGateway(),
+  };
+  return gatewayByProvider[provider]();
 };
 
 const createEmailGateway = (

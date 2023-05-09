@@ -7,8 +7,8 @@ import {
   sirenApiMissingEstablishmentMessage,
   sirenApiUnavailableSiretErrorMessage,
   sirenApiUnexpectedErrorErrorMessage,
-  SirenEstablishmentDto,
   SiretDto,
+  SiretEstablishmentDto,
   siretSchema,
   tooManiSirenRequestsSiretErrorMessage,
   tooManySirenRequestsSiret,
@@ -21,7 +21,7 @@ export class SimulatedSiretGatewayThroughBack
   public constructor(
     private readonly simulatedLatency = 0,
     public sireneEstablishments: {
-      [siret: SiretDto]: SirenEstablishmentDto;
+      [siret: SiretDto]: SiretEstablishmentDto;
     } = {},
   ) {}
 

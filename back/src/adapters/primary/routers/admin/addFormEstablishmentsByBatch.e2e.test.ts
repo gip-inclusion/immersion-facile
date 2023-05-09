@@ -11,7 +11,7 @@ import {
   buildTestApp,
   InMemoryGateways,
 } from "../../../../_testBuilders/buildTestApp";
-import { TEST_ESTABLISHMENT1 } from "../../../secondary/sirene/InMemorySirenGateway";
+import { TEST_ESTABLISHMENT1 } from "../../../secondary/siret/InMemorySiretGateway";
 
 const addFormEstablishmentBatchUrl = adminTargets.addFormEstablishmentBatch.url;
 
