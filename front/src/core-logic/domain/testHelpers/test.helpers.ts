@@ -30,6 +30,7 @@ const defaultFlagsInFront: FeatureFlags = {
   enablePeConventionBroadcast: true,
   enableTemporaryOperation: false,
   enableMaxContactPerWeek: false,
+  enableMaintenance: false,
 };
 
 export const makeStubFeatureFlags = (
