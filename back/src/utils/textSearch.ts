@@ -1,4 +1,4 @@
-import { MatchRangeDto } from "shared";
+import { filterNotUndefined, MatchRangeDto } from "shared";
 
 export const normalize = (s: string): string =>
   s
@@ -37,7 +37,7 @@ export const findMatchRanges = (
   const strNorm = normalize(str);
   return normalize(searchTerms)
     .split(/\s+/)
-    .filter((el) => !!el)
+    .filter(filterNotUndefined)
     .map((searchTerm) => findMatchRangesInternal(searchTerm, strNorm))
     .reduce((acc, lst) => [...acc, ...lst], []);
 };
