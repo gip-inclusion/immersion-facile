@@ -7,6 +7,7 @@ import {
   ConventionDto,
   ConventionReadDto,
   EstablishmentRepresentative,
+  filterNotUndefined,
   frontRoutes,
   GenericActor,
   isSignatoryRole,
@@ -342,7 +343,7 @@ export const toSignatoriesSummary = ({
     beneficiaryRepresentativeSummary(signatories.beneficiaryRepresentative),
     beneficiaryCurrentEmployer(signatories.beneficiaryCurrentEmployer),
     establishmentSummary(signatories.establishmentRepresentative, businessName),
-  ].filter((element): element is string => !!element);
+  ].filter(filterNotUndefined);
 
 const beneficiarySummary = (
   beneficiary: Beneficiary<"immersion" | "mini-stage-cci">,
