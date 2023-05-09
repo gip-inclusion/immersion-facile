@@ -9,6 +9,8 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "../../../adapters/primary/helpers/httpErrors";
+import { CreateNewEvent } from "../../core/eventBus/EventBus";
+import { DomainEvent } from "../../core/eventBus/events";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 
@@ -17,7 +19,10 @@ export class UpdateIcUserRoleForAgency extends TransactionalUseCase<
   void,
   BackOfficeJwtPayload
 > {
-  constructor(uowPerformer: UnitOfWorkPerformer) {
+  constructor(
+    uowPerformer: UnitOfWorkPerformer,
+    private readonly createNewEvent: CreateNewEvent,
+  ) {
     super(uowPerformer);
   }
 
@@ -64,5 +69,11 @@ export class UpdateIcUserRoleForAgency extends TransactionalUseCase<
     };
 
     await uow.inclusionConnectedUserRepository.update(updatedUser);
+
+    const event: DomainEvent = this.createNewEvent({
+      topic: "IcUserAgencyRightChanged",
+      payload: params,
+    });
+    await uow.outboxRepository.save(event);
   }
 }
