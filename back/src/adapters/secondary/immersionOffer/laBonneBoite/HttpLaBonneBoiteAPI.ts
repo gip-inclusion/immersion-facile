@@ -1,12 +1,8 @@
 import { AxiosResponse } from "axios";
+import Bottleneck from "bottleneck";
 import { secondsToMilliseconds } from "date-fns";
 import { AbsoluteUrl } from "shared";
 import { AccessTokenGateway } from "../../../../domain/core/ports/AccessTokenGateway";
-import { RateLimiter } from "../../../../domain/core/ports/RateLimiter";
-import {
-  RetryableError,
-  RetryStrategy,
-} from "../../../../domain/core/ports/RetryStrategy";
 import {
   LaBonneBoiteAPI,
   LaBonneBoiteRequestParams,
@@ -15,11 +11,7 @@ import {
   LaBonneBoiteCompanyProps,
   LaBonneBoiteCompanyVO,
 } from "../../../../domain/immersionOffer/valueObjects/LaBonneBoiteCompanyVO";
-import {
-  createAxiosInstance,
-  isRetryableError,
-  logAxiosError,
-} from "../../../../utils/axiosUtils";
+import { createAxiosInstance } from "../../../../utils/axiosUtils";
 import { createLogger } from "../../../../utils/logger";
 
 const logger = createLogger(__filename);
@@ -46,6 +38,8 @@ type HttpGetLaBonneBoiteCompanyResponse = {
 const MAX_PAGE_SIZE = 100;
 const MAX_DISTANCE_IN_KM = 100;
 
+const lbbMaxQueryPerSeconds = 1;
+
 export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
   private urlGetCompany: AbsoluteUrl;
 
@@ -53,8 +47,6 @@ export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
     readonly peApiUrl: AbsoluteUrl,
     private readonly accessTokenGateway: AccessTokenGateway,
     private readonly poleEmploiClientId: string,
-    private readonly rateLimiter: RateLimiter,
-    private readonly retryStrategy: RetryStrategy,
   ) {
     this.urlGetCompany = `${peApiUrl}/partenaire/labonneboite/v1/company/`;
   }
@@ -80,29 +72,28 @@ export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
   private async getCompanyResponse(
     params: HttpGetLaBonneBoiteCompanyParams,
   ): Promise<AxiosResponse<HttpGetLaBonneBoiteCompanyResponse>> {
-    return this.retryStrategy.apply(async () => {
-      try {
-        const axios = createAxiosInstance(logger);
-        const response = await this.rateLimiter.whenReady(async () => {
-          const accessToken = await this.accessTokenGateway.getAccessToken(
-            `application_${this.poleEmploiClientId} api_labonneboitev1`,
-          );
-          return axios.get(this.urlGetCompany, {
-            headers: {
-              Authorization: createAuthorization(accessToken.access_token),
-            },
-            timeout: secondsToMilliseconds(10),
-            params,
-          });
-        });
-        return response;
-      } catch (error: any) {
-        if (isRetryableError(logger, error)) throw new RetryableError(error);
-        logAxiosError(logger, error);
-        throw error;
-      }
+    const axios = createAxiosInstance(logger);
+
+    return this.limiter.schedule(async () => {
+      const accessToken = await this.accessTokenGateway.getAccessToken(
+        `application_${this.poleEmploiClientId} api_labonneboitev1`,
+      );
+
+      return axios.get(this.urlGetCompany, {
+        headers: {
+          Authorization: createAuthorization(accessToken.access_token),
+        },
+        timeout: secondsToMilliseconds(10),
+        params,
+      });
     });
   }
+
+  private limiter = new Bottleneck({
+    reservoir: lbbMaxQueryPerSeconds,
+    reservoirIncreaseInterval: 1000, // number of ms
+    reservoirRefreshAmount: lbbMaxQueryPerSeconds,
+  });
 }
 
 const createAuthorization = (accessToken: string) => `Bearer ${accessToken}`;
