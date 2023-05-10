@@ -98,6 +98,16 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
     ]);
 
     if (!agency) throw new Error("Test agency not found with this id");
+    appAndDeps.gateways.shortLinkGenerator.addMoreShortLinkIds([
+      "link1",
+      "link2",
+      "link3",
+      "link4",
+      "link5",
+      "link6",
+      "link7",
+      "link8",
+    ]);
 
     appAndDeps.inMemoryUow.agencyRepository.setAgencies([
       { ...agency, validatorEmails: ["validator@mail.com"] },
@@ -291,10 +301,14 @@ const establishmentSignsApplication = async (
     "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
   );
   expect(needsReviewEmail.recipients).toEqual([validatorEmail]);
+
+  const validateMagicLink = await shortLinkRedirectToLinkWithValidation(
+    needsReviewEmail.params.magicLink,
+    request,
+  );
+
   return {
-    validatorReviewJwt: expectJwtInMagicLinkAndGetIt(
-      needsReviewEmail.params.magicLink,
-    ),
+    validatorReviewJwt: expectJwtInMagicLinkAndGetIt(validateMagicLink),
   };
 };
 
