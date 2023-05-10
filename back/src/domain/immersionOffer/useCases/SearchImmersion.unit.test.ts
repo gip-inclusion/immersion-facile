@@ -72,7 +72,6 @@ const prepareSearchableData = async () => {
       city: "Paris",
       departmentCode: "75",
     })
-    .withDataSource("form")
     .withNumberOfEmployeeRange("20-49")
     .withWebsite("www.website.com")
     .build();

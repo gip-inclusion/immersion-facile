@@ -8,7 +8,7 @@ import { SearchMade } from "../entities/SearchMadeEntity";
 
 export type OfferWithSiret = ImmersionOfferEntityV2 & { siret: SiretDto };
 export interface EstablishmentAggregateRepository {
-  hasEstablishmentFromFormWithSiret: (siret: string) => Promise<boolean>;
+  hasEstablishmentWithSiret: (siret: string) => Promise<boolean>;
   insertEstablishmentAggregates: (
     establishmentAggregates: EstablishmentAggregate[],
   ) => Promise<void>;
@@ -41,7 +41,7 @@ export interface EstablishmentAggregateRepository {
     siret: string,
   ) => Promise<EstablishmentAggregate | undefined>;
 
-  getOffersAsAppelationDtoForFormEstablishment: (
+  getOffersAsAppellationDtoEstablishment: (
     siret: string,
   ) => Promise<AppellationDto[]>;
   getSearchImmersionResultDtoBySiretAndRome: (

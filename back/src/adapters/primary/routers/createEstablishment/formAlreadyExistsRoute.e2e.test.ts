@@ -24,10 +24,7 @@ describe("route to check if a form's siret already exists", () => {
       [
         new EstablishmentAggregateBuilder()
           .withEstablishment(
-            new EstablishmentEntityBuilder()
-              .withDataSource("form")
-              .withSiret(siret)
-              .build(),
+            new EstablishmentEntityBuilder().withSiret(siret).build(),
           )
           .build(),
       ],
