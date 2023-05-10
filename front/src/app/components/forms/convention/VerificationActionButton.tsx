@@ -1,4 +1,5 @@
 import React from "react";
+import { createPortal } from "react-dom";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { fr, FrIconClassName } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
@@ -134,7 +135,8 @@ const ModalWrapper = ({
 
   const Modal = ModalByStatus(newStatus).modal;
   const closeModal = ModalByStatus(newStatus).closeModal;
-  return (
+
+  return createPortal(
     <Modal title={title}>
       <>
         <JustificationModalContent
@@ -143,7 +145,8 @@ const ModalWrapper = ({
           newStatus={newStatus}
         />
       </>
-    </Modal>
+    </Modal>,
+    document.body,
   );
 };
 
