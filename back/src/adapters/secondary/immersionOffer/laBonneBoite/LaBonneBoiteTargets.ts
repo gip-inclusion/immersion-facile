@@ -23,6 +23,7 @@ type HttpGetLaBonneBoiteCompanyResponse = {
 };
 
 export type LaBonneBoiteTargets = ReturnType<typeof createLbbTargets>;
+
 export const createLbbTargets = (peApiUrl: AbsoluteUrl) => {
   const url: AbsoluteUrl = `${peApiUrl}/partenaire/labonneboite/v1/company/`;
 

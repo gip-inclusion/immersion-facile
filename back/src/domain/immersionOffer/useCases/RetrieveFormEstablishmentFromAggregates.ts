@@ -35,19 +35,14 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
         siret,
       );
 
-    if (
-      !establishmentAggregate ||
-      establishmentAggregate?.establishment?.dataSource !== "form"
-    )
-      throw new BadRequestError(
-        `No establishment found with siret ${siret} and form data source. `,
-      );
+    if (!establishmentAggregate)
+      throw new BadRequestError(`No establishment found with siret ${siret}.`);
 
     if (!establishmentAggregate.contact)
       throw new BadRequestError("No contact ");
 
     const offersAsAppellationDto =
-      await uow.establishmentAggregateRepository.getOffersAsAppelationDtoForFormEstablishment(
+      await uow.establishmentAggregateRepository.getOffersAsAppellationDtoEstablishment(
         siret,
       );
 

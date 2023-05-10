@@ -38,37 +38,22 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
     const { useCase } = prepareUseCase();
     await expectPromiseToFailWithError(
       useCase.execute(jwtPayload.siret, jwtPayload),
-      new BadRequestError(
-        "No establishment found with siret 12345678901234 and form data source. ",
-      ),
+      new BadRequestError("No establishment found with siret 12345678901234."),
     );
   });
   it("throws an error if there is no establishment from form with this siret", async () => {
     // Prepare : there is an establishment with the siret, but from LBB
-    const { useCase, establishmentAggregateRepository } = prepareUseCase();
-    await establishmentAggregateRepository.insertEstablishmentAggregates([
-      new EstablishmentAggregateBuilder()
-        .withEstablishment(
-          new EstablishmentEntityBuilder()
-            .withSiret(siret)
-            .withDataSource("api_labonneboite")
-            .build(),
-        )
-        .build(),
-    ]);
+    const { useCase } = prepareUseCase();
     // Act and assert
     await expectPromiseToFailWithError(
       useCase.execute(jwtPayload.siret, jwtPayload),
-      new BadRequestError(
-        "No establishment found with siret 12345678901234 and form data source. ",
-      ),
+      new BadRequestError("No establishment found with siret 12345678901234."),
     );
   });
   it("returns a reconstructed form if establishment with siret exists with dataSource=form", async () => {
     const { useCase, establishmentAggregateRepository } = prepareUseCase();
     const establishment = new EstablishmentEntityBuilder()
       .withSiret(siret)
-      .withDataSource("form")
       .build();
     const contact = new ContactEntityBuilder().build();
     const offer = new ImmersionOfferEntityV2Builder()

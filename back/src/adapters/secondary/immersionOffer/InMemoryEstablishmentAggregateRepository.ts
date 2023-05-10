@@ -152,17 +152,13 @@ export class InMemoryEstablishmentAggregateRepository
     );
   }
 
-  public async hasEstablishmentFromFormWithSiret(
-    siret: string,
-  ): Promise<boolean> {
+  public async hasEstablishmentWithSiret(siret: string): Promise<boolean> {
     if (siret === conflictErrorSiret)
       throw new ConflictError(
         `Establishment with siret ${siret} already in db`,
       );
     return !!this._establishmentAggregates.find(
-      (aggregate) =>
-        aggregate.establishment.siret === siret &&
-        aggregate.establishment.dataSource === "form",
+      (aggregate) => aggregate.establishment.siret === siret,
     );
   }
 
@@ -174,7 +170,7 @@ export class InMemoryEstablishmentAggregateRepository
     );
   }
 
-  public async getOffersAsAppelationDtoForFormEstablishment(
+  public async getOffersAsAppellationDtoEstablishment(
     siret: string,
   ): Promise<AppellationDto[]> {
     return (

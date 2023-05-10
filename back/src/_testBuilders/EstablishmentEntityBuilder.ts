@@ -7,10 +7,7 @@ import {
   NafDto,
   NumberEmployeesRange,
 } from "shared";
-import {
-  DataSource,
-  EstablishmentEntity,
-} from "../domain/immersionOffer/entities/EstablishmentEntity";
+import { EstablishmentEntity } from "../domain/immersionOffer/entities/EstablishmentEntity";
 import { avenueChampsElyseesDto } from "./addressDtos";
 
 export const defaultNafCode = "7820Z";
@@ -22,7 +19,6 @@ export const validEstablishmentEntityV2: EstablishmentEntity = {
   additionalInformation: "",
   customizedName: undefined,
   isCommited: undefined,
-  dataSource: "form",
   sourceProvider: "immersion-facile",
   voluntaryToImmersion: true,
   position: { lat: 35, lon: 50 },
@@ -59,13 +55,6 @@ export class EstablishmentEntityBuilder
   }
   withCustomizedName(customizedName: string) {
     return new EstablishmentEntityBuilder({ ...this.entity, customizedName });
-  }
-  withDataSource(dataSource: DataSource) {
-    return new EstablishmentEntityBuilder({
-      ...this.entity,
-      dataSource,
-      voluntaryToImmersion: dataSource === "form",
-    });
   }
 
   withNafDto(nafDto: NafDto) {

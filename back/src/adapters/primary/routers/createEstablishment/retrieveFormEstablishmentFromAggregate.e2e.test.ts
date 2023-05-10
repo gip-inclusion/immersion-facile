@@ -36,7 +36,6 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
           .withEstablishment(
             new EstablishmentEntityBuilder()
               .withSiret(siret)
-              .withDataSource("form")
               .withAddress(rueSaintHonoreDto)
               .build(),
           )
