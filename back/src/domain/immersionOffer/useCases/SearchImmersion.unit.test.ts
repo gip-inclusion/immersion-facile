@@ -2,6 +2,7 @@ import {
   AddressDto,
   ApiConsumer,
   expectArraysToEqualIgnoringOrder,
+  expectArraysToMatch,
   SearchImmersionQueryParamsDto,
   SearchImmersionResultDto,
 } from "shared";
@@ -46,6 +47,7 @@ const rueSaintHonore: AddressDto = {
 const lbbCompanyVO = new LaBonneBoiteCompanyVOBuilder()
   .withSiret("11114444222233")
   .withRome(secretariatRome)
+  .withDistance(1)
   .build();
 
 const siretOfFormCompany = "78000403200019";
@@ -216,7 +218,7 @@ describe("SearchImmersionUseCase", () => {
         },
         appellationLabels: [],
         customizedName: "",
-        distance_m: 10000,
+        distance_m: 1000,
         fitForDisabledWorkers: false,
         naf: "8810C",
         nafLabel: "",
@@ -248,17 +250,50 @@ describe("SearchImmersionUseCase", () => {
   });
 
   it("gets only the closest LBB establishments if voluntaryToImmersion is false, and do not query results from DB", async () => {
-    const { searchImmersion } = await prepareSearchableData();
+    const { searchImmersion, laBonneBoiteAPI } = await prepareSearchableData();
+
+    const range = 10;
+    const companyInRange = new LaBonneBoiteCompanyVOBuilder()
+      .withSiret("22220000000022")
+      .withRome(secretariatRome)
+      .withDistance(range - 5)
+      .build();
+    const companyJustInRange = new LaBonneBoiteCompanyVOBuilder()
+      .withSiret("33330000000033")
+      .withRome(secretariatRome)
+      .withDistance(range)
+      .build();
+    const companyJustOutOfRange = new LaBonneBoiteCompanyVOBuilder()
+      .withSiret("44440000000044")
+      .withRome(secretariatRome)
+      .withDistance(range + 1)
+      .build();
+    const companyFarAway = new LaBonneBoiteCompanyVOBuilder()
+      .withSiret("55550000000055")
+      .withRome(secretariatRome)
+      .withDistance(range + 80)
+      .build();
+
+    laBonneBoiteAPI.setNextResults([
+      companyInRange,
+      companyJustInRange,
+      companyJustOutOfRange,
+      companyFarAway,
+    ]);
 
     const response = await searchImmersion.execute({
       ...searchInMetzParams,
       rome: secretariatRome,
       sortedBy: "distance",
       voluntaryToImmersion: false,
+      distance_km: range,
     });
 
-    expect(response).toHaveLength(1);
-    expect(response[0].voluntaryToImmersion).toBe(false);
+    expect(response).toHaveLength(2);
+    expectArraysToMatch(
+      response.map(({ siret }) => siret),
+      [companyInRange.siret, companyJustInRange.siret],
+    );
   });
 
   it("gets only the form result if a company with same siret is also in LBB results", async () => {
