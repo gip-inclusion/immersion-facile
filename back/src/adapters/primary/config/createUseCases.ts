@@ -211,6 +211,8 @@ export const createUseCases = (
         gateways.email,
         gateways.timeGateway,
         generateConventionMagicLinkUrl,
+        gateways.shortLinkGenerator,
+        config,
       ),
 
       // immersionOffer
