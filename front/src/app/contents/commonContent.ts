@@ -13,5 +13,5 @@ export const commonContent = {
       "N'hésitez pas à nous contacter pour nous signaler comment ce lien vous est parvenu :",
   },
   maintenanceMessage:
-    "⚠️ Le site est actuellement en maintenance, il est possible que le service soit dégradé. Nous vous prions de nous excuser pour la gêne occasionnée.",
+    "⚠️ Le site est actuellement en maintenance. Il est possible que le service soit dégradé. Nous vous prions de nous excuser pour la gêne occasionnée.",
 };
