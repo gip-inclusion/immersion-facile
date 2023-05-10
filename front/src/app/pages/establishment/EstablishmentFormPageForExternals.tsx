@@ -48,7 +48,9 @@ export const EstablishmentFormPageForExternals = ({
 
   return (
     <HeaderFooterLayout>
-      <EstablishmentCreationForm source={consumer} />
+      <MainWrapper layout="boxed">
+        <EstablishmentCreationForm source={consumer} />
+      </MainWrapper>
     </HeaderFooterLayout>
   );
 };

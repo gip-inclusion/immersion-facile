@@ -46,7 +46,7 @@ const triggerSuggestEditFormEstablishmentEvery6Months =
 
     const establishmentsToContact = (
       await client.query(
-        `SELECT DISTINCT siret FROM establishments WHERE data_source = 'form' AND update_date < $1 
+        `SELECT DISTINCT siret FROM establishments WHERE update_date < $1 
           AND siret NOT IN (
             SELECT payload ->> 'siret' as siret  FROM outbox WHERE topic='FormEstablishmentEditLinkSent' 
             AND occurred_at > $2)`,

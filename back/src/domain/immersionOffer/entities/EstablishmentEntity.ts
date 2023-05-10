@@ -9,7 +9,6 @@ import {
 import { ContactEntity } from "./ContactEntity";
 import { ImmersionOfferEntityV2 } from "./ImmersionOfferEntity";
 
-export type DataSource = "api_labonneboite" | "form";
 type ApiSource = "api_labonneboite";
 export type SourceProvider = FormEstablishmentSource | ApiSource;
 
@@ -19,7 +18,6 @@ export type EstablishmentEntity = {
   customizedName?: string;
   address: AddressDto;
   voluntaryToImmersion: boolean;
-  dataSource: DataSource;
   sourceProvider: SourceProvider;
   position: GeoPositionDto;
   nafDto: NafDto;

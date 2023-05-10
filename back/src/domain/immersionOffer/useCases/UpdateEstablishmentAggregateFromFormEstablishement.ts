@@ -25,23 +25,20 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
     formEstablishment: FormEstablishmentDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    const initialEstablishementAggregate =
+    const initialEstablishmentAggregate =
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
         formEstablishment.siret,
       );
-    const establishmentAlreadyExists =
-      initialEstablishementAggregate?.establishment?.dataSource === "form";
-    if (!establishmentAlreadyExists)
-      throw new Error(
-        "Cannot update establishment from form that does not exist.",
-      );
+
+    if (!initialEstablishmentAggregate)
+      throw new Error("Cannot update establishment that does not exist.");
 
     const establishmentAggregate =
       await makeUpdateEstablishmentAggregateFromFormEstablishment({
         addressGateway: this.addressAPI,
         uuidGenerator: this.uuidGenerator,
         timeGateway: this.timeGateway,
-      })(initialEstablishementAggregate, formEstablishment);
+      })(initialEstablishmentAggregate, formEstablishment);
 
     if (!establishmentAggregate) return;
 
