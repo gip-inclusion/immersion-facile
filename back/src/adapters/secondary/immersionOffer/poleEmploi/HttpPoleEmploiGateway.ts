@@ -30,8 +30,9 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
     private readonly poleEmploiClientId: string,
     private readonly rateLimiter: RateLimiter,
     private readonly retryStrategy: RetryStrategy,
+    private readonly version: number,
   ) {
-    this.peConventionBroadcastUrl = `${peApiUrl}/partenaire/immersion-pro/v2/demandes-immersion`;
+    this.peConventionBroadcastUrl = `${peApiUrl}/partenaire/immersion-pro/v${version}/demandes-immersion`;
   }
 
   public async notifyOnConventionUpdated(
@@ -97,3 +98,9 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
     });
   }
 }
+
+// https://staging.immersion-facile.beta.gouv.fr/api/to/_gf8jq7G6fP1YbpZFu9jrCazPHCEZNYkhYIk
+//
+// https://staging.immersion-facile.beta.gouv.fr/api/to/M1KJBhJt9YloMbrQfQ1144MMOE8zNMtjJ0SH
+//
+// https://staging.immersion-facile.beta.gouv.fr/pilotage-convention?jwt=eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2ZXJzaW9uIjoxLCJhcHBsaWNhdGlvbklkIjoiNzg3NjJlMTQtN2Y2MC00MWFlLThhYTctYjgxNWZlMGFiNGE4Iiwicm9sZSI6InZhbGlkYXRvciIsImlhdCI6MTY4MzcyMzQ4NSwiZXhwIjoxNjg2NDAxODg1LCJlbWFpbEhhc2giOiJlYmEwNTJiYjk0YzA4MmYwNjQ0MDA1NzEzZjMxYWNiMSJ9.xvsq0UXKgPkyEuvsEhATkkY0VcO_cnplMtxSX9lkFXCQGwS9qP-yVKQm0jrstQBVOKeLILL5XTNcZFwSBRsXLA
