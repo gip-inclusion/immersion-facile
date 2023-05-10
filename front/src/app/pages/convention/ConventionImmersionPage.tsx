@@ -10,6 +10,7 @@ import { InitiateConventionCard } from "src/app/components/InitiateConventionCar
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
+import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
@@ -39,7 +40,7 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
   const isSharedConvention = Object.keys(route.params).length > 0;
   const mode = "jwt" in route.params ? "edit" : "create";
   useFederatedIdentityFromUrl(route);
-
+  useScrollToTop(shouldShowForm);
   useEffect(() => {
     setShouldShowForm(
       enablePeConnectApi &&

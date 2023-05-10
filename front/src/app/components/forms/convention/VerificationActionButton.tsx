@@ -29,11 +29,46 @@ type VerificationActions = Exclude<
   "READY_TO_SIGN" | "PARTIALLY_SIGNED" | "IN_REVIEW"
 >;
 
-const { JustificationModal, openJustificationModal, closeJustificationModal } =
-  createModal({
-    name: "justification",
-    isOpenedByDefault: false,
-  });
+type VerificationActionsModal = Exclude<
+  VerificationActions,
+  "ACCEPTED_BY_COUNSELLOR" | "ACCEPTED_BY_VALIDATOR"
+>;
+
+const { RejectModal, openRejectModal, closeRejectModal } = createModal({
+  name: "reject",
+  isOpenedByDefault: false,
+});
+
+const { DraftModal, openDraftModal, closeDraftModal } = createModal({
+  name: "draft",
+  isOpenedByDefault: false,
+});
+
+const { CancelModal, openCancelModal, closeCancelModal } = createModal({
+  name: "cancel",
+  isOpenedByDefault: false,
+});
+
+const ModalByStatus = (status: VerificationActionsModal) => {
+  const modals = {
+    DRAFT: {
+      modal: DraftModal,
+      openModal: openDraftModal,
+      closeModal: closeDraftModal,
+    },
+    REJECTED: {
+      modal: RejectModal,
+      openModal: openRejectModal,
+      closeModal: closeRejectModal,
+    },
+    CANCELLED: {
+      modal: CancelModal,
+      openModal: openCancelModal,
+      closeModal: closeCancelModal,
+    },
+  };
+  return modals[status];
+};
 
 export const VerificationActionButton = ({
   newStatus,
@@ -64,7 +99,7 @@ export const VerificationActionButton = ({
         priority={newStatus === "REJECTED" ? "secondary" : "primary"}
         onClick={() => {
           doesStatusNeedsJustification(newStatus)
-            ? openJustificationModal()
+            ? ModalByStatus(newStatus).openModal()
             : onSubmit({ status: newStatus });
         }}
         className={fr.cx("fr-m-1w")}
@@ -75,17 +110,40 @@ export const VerificationActionButton = ({
       >
         {children}
       </Button>
-
       {doesStatusNeedsJustification(newStatus) && (
-        <JustificationModal title={children}>
-          <JustificationModalContent
-            onSubmit={onSubmit}
-            closeModal={closeJustificationModal}
-            newStatus={newStatus}
-          />
-        </JustificationModal>
+        <ModalWrapper
+          title={children}
+          newStatus={newStatus}
+          onSubmit={onSubmit}
+        />
       )}
     </>
+  );
+};
+
+const ModalWrapper = ({
+  title,
+  newStatus,
+  onSubmit,
+}: {
+  title: string;
+  newStatus: VerificationActionsModal;
+  onSubmit: VerificationActionButtonProps["onSubmit"];
+}) => {
+  if (!doesStatusNeedsJustification(newStatus)) return null;
+
+  const Modal = ModalByStatus(newStatus).modal;
+  const closeModal = ModalByStatus(newStatus).closeModal;
+  return (
+    <Modal title={title}>
+      <>
+        <JustificationModalContent
+          onSubmit={onSubmit}
+          closeModal={closeModal}
+          newStatus={newStatus}
+        />
+      </>
+    </Modal>
   );
 };
 
@@ -107,6 +165,7 @@ const JustificationModalContent = ({
     onSubmit({ ...values, status: newStatus });
     closeModal();
   };
+
   return (
     <>
       {newStatus === "DRAFT" && (
