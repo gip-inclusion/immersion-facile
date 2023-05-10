@@ -184,7 +184,6 @@ const makeCreateEstablishmentAggregate =
       isCommited: formEstablishment.isEngagedEnterprise,
       address,
       voluntaryToImmersion: true,
-      dataSource: "form",
       sourceProvider: formEstablishment.source,
       nafDto,
       position,

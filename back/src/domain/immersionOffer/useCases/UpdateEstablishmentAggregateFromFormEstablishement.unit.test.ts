@@ -67,7 +67,7 @@ describe("Update Establishment aggregate from form data", () => {
       updateEstablishmentAggregateFromFormUseCase.execute(
         FormEstablishmentDtoBuilder.valid().build(),
       ),
-      "Cannot update establishment from form that does not exist.",
+      "Cannot update establishment that does not exist.",
     );
   });
 
@@ -91,7 +91,6 @@ describe("Update Establishment aggregate from form data", () => {
 
     const previousEstablishment = new EstablishmentEntityBuilder()
       .withSiret(siret)
-      .withDataSource("form")
       .build();
 
     const previousAggregate = new EstablishmentAggregateBuilder()
@@ -136,7 +135,6 @@ describe("Update Establishment aggregate from form data", () => {
       siret,
       address: newAddress,
       position: newPosition,
-      dataSource: "form",
       isActive: true,
       name: formEstablishment.businessName,
     };
