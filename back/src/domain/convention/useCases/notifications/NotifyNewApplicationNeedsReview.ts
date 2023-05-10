@@ -3,17 +3,20 @@ import {
   ConventionDto,
   conventionSchema,
   ConventionStatus,
-  CreateConventionMagicLinkPayloadProperties,
   frontRoutes,
   Role,
+  TemplatedEmail,
 } from "shared";
+import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
 import { createLogger } from "../../../../utils/logger";
+import { ShortLinkIdGeneratorGateway } from "../../../core/ports/ShortLinkIdGeneratorGateway";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
+import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { EmailGateway } from "../../ports/EmailGateway";
 
@@ -23,8 +26,10 @@ export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<Conven
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly emailGateway: EmailGateway,
-    private readonly generateMagicLinkFn: GenerateConventionMagicLinkUrl,
+    private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     private readonly timeGateway: TimeGateway,
+    private readonly shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
+    private readonly config: AppConfig,
   ) {
     super(uowPerformer);
   }
@@ -70,29 +75,31 @@ export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<Conven
       "Sending Mail to review an immersion",
     );
 
-    await Promise.all(
-      recipients.emails.map((email) => {
-        const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties =
-          {
+    const emails: TemplatedEmail[] = await Promise.all(
+      recipients.emails.map(async (recipientEmail) => {
+        const makeShortMagicLink = prepareMagicShortLinkMaker({
+          config: this.config,
+          conventionMagicLinkPayload: {
             id: conventionDto.id,
             role: recipients.role,
-            email,
+            email: recipientEmail,
             now: this.timeGateway.now(),
-          };
-        return this.emailGateway.sendEmail({
+          },
+          generateConventionMagicLinkUrl: this.generateConventionMagicLinkUrl,
+          shortLinkIdGeneratorGateway: this.shortLinkIdGeneratorGateway,
+          uow,
+        });
+
+        return {
           type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
-          recipients: [email],
+          recipients: [recipientEmail],
           params: {
             internshipKind: conventionDto.internshipKind,
             businessName: conventionDto.businessName,
-            magicLink: this.generateMagicLinkFn({
-              ...magicLinkCommonFields,
-              targetRoute: frontRoutes.manageConvention,
-            }),
-            conventionStatusLink: this.generateMagicLinkFn({
-              ...magicLinkCommonFields,
-              targetRoute: frontRoutes.conventionStatusDashboard,
-            }),
+            magicLink: await makeShortMagicLink(frontRoutes.manageConvention),
+            conventionStatusLink: await makeShortMagicLink(
+              frontRoutes.conventionStatusDashboard,
+            ),
             beneficiaryFirstName:
               conventionDto.signatories.beneficiary.firstName,
             beneficiaryLastName: conventionDto.signatories.beneficiary.lastName,
@@ -102,8 +109,12 @@ export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<Conven
                 : "en considérer la validation",
             agencyLogoUrl: agency.logoUrl,
           },
-        });
+        };
       }),
+    );
+
+    await Promise.all(
+      emails.map((email) => this.emailGateway.sendEmail(email)),
     );
 
     logger.info(
