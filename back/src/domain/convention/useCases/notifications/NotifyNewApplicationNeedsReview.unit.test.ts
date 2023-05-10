@@ -2,11 +2,12 @@ import {
   AgencyDtoBuilder,
   ConventionDto,
   ConventionDtoBuilder,
-  CreateConventionMagicLinkPayloadProperties,
+  expectToEqual,
   frontRoutes,
 } from "shared";
-import { expectedEmailConventionReviewMatchingConvention } from "../../../../_testBuilders/emailAssertions";
+import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
+import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
@@ -14,6 +15,8 @@ import {
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
+import { makeShortLinkUrl } from "../../../core/ShortLink";
 import { NotifyNewApplicationNeedsReview } from "./NotifyNewApplicationNeedsReview";
 
 const defaultConvention = new ConventionDtoBuilder().build();
@@ -26,17 +29,22 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
   let uow: InMemoryUnitOfWork;
   let emailGw: InMemoryEmailGateway;
   let notifyNewConventionNeedsReview: NotifyNewApplicationNeedsReview;
+  let shortLinkIdGeneratorGateway: DeterministShortLinkIdGeneratorGateway;
+  let config: AppConfig;
   const timeGateway = new CustomTimeGateway();
 
   beforeEach(() => {
+    config = new AppConfigBuilder().build();
     emailGw = new InMemoryEmailGateway();
     uow = createInMemoryUow();
-
+    shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
     notifyNewConventionNeedsReview = new NotifyNewApplicationNeedsReview(
       new InMemoryUowPerformer(uow),
       emailGw,
       fakeGenerateMagicLinkUrlFn,
       timeGateway,
+      shortLinkIdGeneratorGateway,
+      config,
     );
   });
 
@@ -49,6 +57,13 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
     });
 
     it("Nominal case: Sends notification email to councellor, with 2 existing councellors", async () => {
+      const shortLinkIds = [
+        "shortlink1",
+        "shortlink2",
+        "shortlink3",
+        "shortlink4",
+      ];
+      shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
       const counsellorEmails = [
         "aCouncellor@unmail.com",
         "anotherCouncellor@unmail.com",
@@ -61,34 +76,71 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
 
       await notifyNewConventionNeedsReview.execute(conventionInReview);
 
-      const sentEmails = emailGw.getSentEmails();
-      expect(sentEmails).toHaveLength(2);
+      expectToEqual(uow.shortLinkQuery.getShortLinks(), {
+        [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
+          id: conventionInReview.id,
+          email: counsellorEmails[0],
+          now: timeGateway.now(),
+          role: "counsellor",
+          targetRoute: frontRoutes.manageConvention,
+        }),
+        [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
+          id: conventionInReview.id,
+          email: counsellorEmails[1],
+          now: timeGateway.now(),
+          role: "counsellor",
+          targetRoute: frontRoutes.manageConvention,
+        }),
+        [shortLinkIds[2]]: fakeGenerateMagicLinkUrlFn({
+          id: conventionInReview.id,
+          email: counsellorEmails[0],
+          now: timeGateway.now(),
+          role: "counsellor",
+          targetRoute: frontRoutes.conventionStatusDashboard,
+        }),
 
-      for (let i = 0; i < 2; i++) {
-        const email = counsellorEmails[i];
-        const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties =
-          {
-            id: conventionInReview.id,
-            role: "counsellor" as const,
-            email,
-            now: timeGateway.now(),
-          };
-        expectedEmailConventionReviewMatchingConvention({
-          templatedEmail: sentEmails[i],
-          recipient: email,
-          convention: conventionInReview,
-          magicLink: fakeGenerateMagicLinkUrlFn({
-            ...magicLinkCommonFields,
-            targetRoute: frontRoutes.manageConvention,
-          }),
-          conventionStatusLink: fakeGenerateMagicLinkUrlFn({
-            ...magicLinkCommonFields,
-            targetRoute: frontRoutes.conventionStatusDashboard,
-          }),
-          possibleRoleAction: "en vérifier l'éligibilité",
-          agency,
-        });
-      }
+        [shortLinkIds[3]]: fakeGenerateMagicLinkUrlFn({
+          id: conventionInReview.id,
+          email: counsellorEmails[1],
+          now: timeGateway.now(),
+          role: "counsellor",
+          targetRoute: frontRoutes.conventionStatusDashboard,
+        }),
+      });
+      expectToEqual(emailGw.getSentEmails(), [
+        {
+          type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+          recipients: [counsellorEmails[0]],
+          params: {
+            internshipKind: conventionInReview.internshipKind,
+            beneficiaryFirstName:
+              conventionInReview.signatories.beneficiary.firstName,
+            beneficiaryLastName:
+              conventionInReview.signatories.beneficiary.lastName,
+            businessName: conventionInReview.businessName,
+            magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
+            conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[2]),
+            possibleRoleAction: "en vérifier l'éligibilité",
+            agencyLogoUrl: agency.logoUrl,
+          },
+        },
+        {
+          type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+          recipients: [counsellorEmails[1]],
+          params: {
+            internshipKind: conventionInReview.internshipKind,
+            beneficiaryFirstName:
+              conventionInReview.signatories.beneficiary.firstName,
+            beneficiaryLastName:
+              conventionInReview.signatories.beneficiary.lastName,
+            businessName: conventionInReview.businessName,
+            magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
+            conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[3]),
+            possibleRoleAction: "en vérifier l'éligibilité",
+            agencyLogoUrl: agency.logoUrl,
+          },
+        },
+      ]);
     });
 
     it("No counsellors available: we fall back to validators: Sends notification email to those validators (using 2 of them)", async () => {
@@ -100,36 +152,81 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
         .withValidatorEmails(validatorEmails)
         .build();
       uow.agencyRepository.setAgencies([agency]);
+      const shortLinkIds = [
+        "shortlink1",
+        "shortlink2",
+        "shortlink3",
+        "shortlink4",
+      ];
+      shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
+
       await notifyNewConventionNeedsReview.execute(conventionInReview);
 
-      const sentEmails = emailGw.getSentEmails();
-      expect(sentEmails).toHaveLength(2);
+      expectToEqual(uow.shortLinkQuery.getShortLinks(), {
+        [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
+          id: conventionInReview.id,
+          email: validatorEmails[0],
+          now: timeGateway.now(),
+          role: "validator",
+          targetRoute: frontRoutes.manageConvention,
+        }),
+        [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
+          id: conventionInReview.id,
+          email: validatorEmails[1],
+          now: timeGateway.now(),
+          role: "validator",
+          targetRoute: frontRoutes.manageConvention,
+        }),
+        [shortLinkIds[2]]: fakeGenerateMagicLinkUrlFn({
+          id: conventionInReview.id,
+          email: validatorEmails[0],
+          now: timeGateway.now(),
+          role: "validator",
+          targetRoute: frontRoutes.conventionStatusDashboard,
+        }),
 
-      for (let i = 0; i < 2; i++) {
-        const email = validatorEmails[i];
-        const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties =
-          {
-            id: conventionInReview.id,
-            role: "validator" as const,
-            email,
-            now: timeGateway.now(),
-          };
-        expectedEmailConventionReviewMatchingConvention({
-          templatedEmail: sentEmails[i],
-          recipient: email,
-          convention: conventionInReview,
-          magicLink: fakeGenerateMagicLinkUrlFn({
-            ...magicLinkCommonFields,
-            targetRoute: frontRoutes.manageConvention,
-          }),
-          conventionStatusLink: fakeGenerateMagicLinkUrlFn({
-            ...magicLinkCommonFields,
-            targetRoute: frontRoutes.conventionStatusDashboard,
-          }),
-          possibleRoleAction: "en considérer la validation",
-          agency,
-        });
-      }
+        [shortLinkIds[3]]: fakeGenerateMagicLinkUrlFn({
+          id: conventionInReview.id,
+          email: validatorEmails[1],
+          now: timeGateway.now(),
+          role: "validator",
+          targetRoute: frontRoutes.conventionStatusDashboard,
+        }),
+      });
+      expectToEqual(emailGw.getSentEmails(), [
+        {
+          type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+          recipients: [validatorEmails[0]],
+          params: {
+            internshipKind: conventionInReview.internshipKind,
+            beneficiaryFirstName:
+              conventionInReview.signatories.beneficiary.firstName,
+            beneficiaryLastName:
+              conventionInReview.signatories.beneficiary.lastName,
+            businessName: conventionInReview.businessName,
+            magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
+            conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[2]),
+            possibleRoleAction: "en considérer la validation",
+            agencyLogoUrl: agency.logoUrl,
+          },
+        },
+        {
+          type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+          recipients: [validatorEmails[1]],
+          params: {
+            internshipKind: conventionInReview.internshipKind,
+            beneficiaryFirstName:
+              conventionInReview.signatories.beneficiary.firstName,
+            beneficiaryLastName:
+              conventionInReview.signatories.beneficiary.lastName,
+            businessName: conventionInReview.businessName,
+            magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
+            conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[3]),
+            possibleRoleAction: "en considérer la validation",
+            agencyLogoUrl: agency.logoUrl,
+          },
+        },
+      ]);
     });
 
     it("No counsellors available, neither validators => ensure no mail is sent", async () => {
@@ -150,6 +247,8 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
     });
 
     it("Nominal case: Sends notification email to validators", async () => {
+      const shortLinkIds = ["link1", "link2", "link3", "link4"];
+      shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
       const validatorEmails = [
         "aValidator@unmail.com",
         "anotherValidator@unmail.com",
@@ -158,38 +257,77 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
         .withValidatorEmails(validatorEmails)
         .build();
       uow.agencyRepository.setAgencies([agency]);
+
       await notifyNewConventionNeedsReview.execute(
         acceptedByCounsellorConvention,
       );
 
-      const sentEmails = emailGw.getSentEmails();
-      expect(sentEmails).toHaveLength(2);
+      expectToEqual(uow.shortLinkQuery.getShortLinks(), {
+        [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
+          id: acceptedByCounsellorConvention.id,
+          email: validatorEmails[0],
+          now: timeGateway.now(),
+          role: "validator",
+          targetRoute: frontRoutes.manageConvention,
+        }),
+        [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
+          id: acceptedByCounsellorConvention.id,
+          email: validatorEmails[1],
+          now: timeGateway.now(),
+          role: "validator",
+          targetRoute: frontRoutes.manageConvention,
+        }),
+        [shortLinkIds[2]]: fakeGenerateMagicLinkUrlFn({
+          id: acceptedByCounsellorConvention.id,
+          email: validatorEmails[0],
+          now: timeGateway.now(),
+          role: "validator",
+          targetRoute: frontRoutes.conventionStatusDashboard,
+        }),
 
-      for (let i = 0; i < 2; i++) {
-        const email = validatorEmails[i];
-        const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties =
-          {
-            id: acceptedByCounsellorConvention.id,
-            role: "validator" as const,
-            email,
-            now: timeGateway.now(),
-          };
-        expectedEmailConventionReviewMatchingConvention({
-          templatedEmail: sentEmails[i],
-          recipient: email,
-          convention: acceptedByCounsellorConvention,
-          magicLink: fakeGenerateMagicLinkUrlFn({
-            ...magicLinkCommonFields,
-            targetRoute: frontRoutes.manageConvention,
-          }),
-          conventionStatusLink: fakeGenerateMagicLinkUrlFn({
-            ...magicLinkCommonFields,
-            targetRoute: frontRoutes.conventionStatusDashboard,
-          }),
-          possibleRoleAction: "en considérer la validation",
-          agency,
-        });
-      }
+        [shortLinkIds[3]]: fakeGenerateMagicLinkUrlFn({
+          id: acceptedByCounsellorConvention.id,
+          email: validatorEmails[1],
+          now: timeGateway.now(),
+          role: "validator",
+          targetRoute: frontRoutes.conventionStatusDashboard,
+        }),
+      });
+
+      expectToEqual(emailGw.getSentEmails(), [
+        {
+          type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+          recipients: [validatorEmails[0]],
+          params: {
+            internshipKind: acceptedByCounsellorConvention.internshipKind,
+            beneficiaryFirstName:
+              acceptedByCounsellorConvention.signatories.beneficiary.firstName,
+            beneficiaryLastName:
+              acceptedByCounsellorConvention.signatories.beneficiary.lastName,
+            businessName: acceptedByCounsellorConvention.businessName,
+            magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
+            conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[2]),
+            possibleRoleAction: "en considérer la validation",
+            agencyLogoUrl: agency.logoUrl,
+          },
+        },
+        {
+          type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+          recipients: [validatorEmails[1]],
+          params: {
+            internshipKind: acceptedByCounsellorConvention.internshipKind,
+            beneficiaryFirstName:
+              acceptedByCounsellorConvention.signatories.beneficiary.firstName,
+            beneficiaryLastName:
+              acceptedByCounsellorConvention.signatories.beneficiary.lastName,
+            businessName: acceptedByCounsellorConvention.businessName,
+            magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
+            conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[3]),
+            possibleRoleAction: "en considérer la validation",
+            agencyLogoUrl: agency.logoUrl,
+          },
+        },
+      ]);
     });
 
     it("No validators available => ensure no mail is sent", async () => {
@@ -210,6 +348,8 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
     });
 
     it("Nominal case: Sends notification email to admins", async () => {
+      const shortLinkIds = ["link1", "link2"];
+      shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
       const adminEmail = "anAdmin@unmail.com";
       const agency = new AgencyDtoBuilder(defaultAgency)
         .withAdminEmails([adminEmail])
@@ -220,30 +360,41 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
         acceptedByValidatorConvention,
       );
 
-      const sentEmails = emailGw.getSentEmails();
-      expect(sentEmails).toHaveLength(1);
-      const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties =
-        {
+      expectToEqual(uow.shortLinkQuery.getShortLinks(), {
+        [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
           id: acceptedByValidatorConvention.id,
-          role: "backOffice",
           email: adminEmail,
           now: timeGateway.now(),
-        };
-      expectedEmailConventionReviewMatchingConvention({
-        templatedEmail: sentEmails[0],
-        recipient: adminEmail,
-        convention: acceptedByValidatorConvention,
-        magicLink: fakeGenerateMagicLinkUrlFn({
-          ...magicLinkCommonFields,
+          role: "backOffice",
           targetRoute: frontRoutes.manageConvention,
         }),
-        conventionStatusLink: fakeGenerateMagicLinkUrlFn({
-          ...magicLinkCommonFields,
+        [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
+          id: acceptedByValidatorConvention.id,
+          email: adminEmail,
+          now: timeGateway.now(),
+          role: "backOffice",
           targetRoute: frontRoutes.conventionStatusDashboard,
         }),
-        possibleRoleAction: "en considérer la validation",
-        agency,
       });
+
+      expectToEqual(emailGw.getSentEmails(), [
+        {
+          type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+          recipients: [adminEmail],
+          params: {
+            internshipKind: acceptedByValidatorConvention.internshipKind,
+            beneficiaryFirstName:
+              acceptedByValidatorConvention.signatories.beneficiary.firstName,
+            beneficiaryLastName:
+              acceptedByValidatorConvention.signatories.beneficiary.lastName,
+            businessName: acceptedByValidatorConvention.businessName,
+            magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
+            conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[1]),
+            possibleRoleAction: "en considérer la validation",
+            agencyLogoUrl: agency.logoUrl,
+          },
+        },
+      ]);
     });
 
     it("No admin available => ensure no mail is sent", async () => {
