@@ -152,6 +152,7 @@ export const createGateways = async (config: AppConfig) => {
             config.poleEmploiClientId,
             noRateLimit,
             noRetries,
+            config.peApiVersion,
           )
         : new InMemoryPoleEmploiGateway(),
     timeGateway,
