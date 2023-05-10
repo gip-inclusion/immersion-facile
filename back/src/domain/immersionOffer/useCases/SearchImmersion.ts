@@ -70,6 +70,7 @@ export class SearchImmersion extends TransactionalUseCase<
           rome: params.rome,
           lat: params.latitude,
           lon: params.longitude,
+          distanceKm: params.distance_km,
         })
       : [];
 
@@ -101,11 +102,15 @@ export class SearchImmersion extends TransactionalUseCase<
   }
 
   private async getSearchResultsFromLBB(
-    params: LaBonneBoiteRequestParams,
+    params: LaBonneBoiteRequestParams & { distanceKm: number },
   ): Promise<SearchImmersionResultDto[]> {
     return pipeWithValue(
       await this.laBonneBoiteAPI.searchCompanies(params),
-      filter<LaBonneBoiteCompanyVO>((company) => company.isCompanyRelevant()),
+      filter<LaBonneBoiteCompanyVO>(
+        (company) =>
+          company.isCompanyRelevant() &&
+          company.props.distance <= params.distanceKm,
+      ),
       deduplicateOnSiret,
       map((company) => company.toSearchResult()),
     );
