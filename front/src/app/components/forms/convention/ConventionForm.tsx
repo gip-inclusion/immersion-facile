@@ -29,6 +29,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useExistingSiret } from "src/app/hooks/siret.hooks";
 import { useCopyButton } from "src/app/hooks/useCopyButton";
 import { useMatomo } from "src/app/hooks/useMatomo";
+import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
@@ -126,6 +127,8 @@ export const ConventionForm = ({
 
   useMatomo(conventionProperties.internshipKind);
 
+  useScrollToTop(formSuccessfullySubmitted);
+
   useEffect(() => {
     if (mode === "create") {
       dispatch(conventionSlice.actions.clearFetchedConvention());
@@ -152,6 +155,7 @@ export const ConventionForm = ({
       reset(fetchedConvention);
     }
   }, [fetchedConvention]);
+
   const onSubmit: SubmitHandler<ConventionReadDto> = (values) => {
     const conventionToSave = {
       ...values,
