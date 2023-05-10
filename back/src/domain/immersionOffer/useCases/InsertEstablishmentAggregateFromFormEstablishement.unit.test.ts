@@ -154,7 +154,6 @@ describe("Insert Establishment aggregate from form data", () => {
     expect(repoEstablishmentAggregate.establishment.nafDto).toEqual(
       expected.nafDto,
     );
-    expect(repoEstablishmentAggregate.establishment.dataSource).toBe("form");
     expect(repoEstablishmentAggregate.establishment.fitForDisabledWorkers).toBe(
       expected.fitForDisabledWorkers,
     );
@@ -200,7 +199,7 @@ describe("Insert Establishment aggregate from form data", () => {
       .build();
     const previousEstablishment = new EstablishmentEntityBuilder()
       .withSiret(siret)
-      .withDataSource("api_labonneboite")
+      .withName("Previous name")
       .build();
 
     const previousAggregate = new EstablishmentAggregateBuilder()
@@ -251,7 +250,6 @@ describe("Insert Establishment aggregate from form data", () => {
     const partialExpectedEstablishment: Partial<EstablishmentEntity> = {
       siret,
       address: rueGuillaumeTellDto,
-      dataSource: "form",
       isActive: true,
       name: formEstablishment.businessName,
     };
