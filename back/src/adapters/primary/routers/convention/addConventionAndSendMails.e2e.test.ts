@@ -89,7 +89,6 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
 
   // eslint-disable-next-line jest/expect-expect
   it("Scenario: application submitted, then signed, then validated", async () => {
-
     const peAgency = new AgencyDtoBuilder()
       .withKind("pole-emploi")
       .withValidatorEmails(["validator@mail.com"])
@@ -206,13 +205,13 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   const sentEmails = gateways.notification.getSentEmails();
   expect(sentEmails).toHaveLength(numberOfEmailInitialySent - 1);
   expect(sentEmails.map((e) => e.recipients)).toEqual([
-    [VALID_EMAILS[2]],
     [VALID_EMAILS[0]],
+    [VALID_EMAILS[2]],
     [VALID_EMAILS[1]],
   ]);
 
   const beneficiaryShortLinkSignEmail = expectEmailOfType(
-    sentEmails[1],
+    sentEmails[0],
     "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
   );
   const establishmentShortLinkSignEmail = expectEmailOfType(
