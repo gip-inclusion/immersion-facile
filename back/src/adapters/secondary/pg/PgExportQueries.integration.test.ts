@@ -64,7 +64,7 @@ describe("PgExportQueries", () => {
 
   describe("Export view_establishments_with_flatten_offers", () => {
     describe("No filter specified", () => {
-      it("Retrieves all establishments exports where data_source = form", async () => {
+      it("Retrieves all establishments exports", async () => {
         // Prepare
         const aggregates = [
           establishmentAggregateArtusInterim(),
