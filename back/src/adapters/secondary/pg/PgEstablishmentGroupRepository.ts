@@ -46,7 +46,7 @@ export class PgEstablishmentGroupRepository
         'website', e.website, 
         'additionalInformation', e.additional_information, 
         'customizedName', e.customized_name, 
-        'voluntaryToImmersion', e.data_source = 'form',
+        'voluntaryToImmersion', true,
         'fitForDisabledWorkers', e.fit_for_disabled_workers,
         'position', JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat), 
         'romeLabel', r.libelle_rome,
