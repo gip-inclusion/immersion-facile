@@ -42,6 +42,13 @@ export class LaBonneBoiteCompanyVOBuilder
     });
   }
 
+  public withDistance(distance: number): LaBonneBoiteCompanyVOBuilder {
+    return new LaBonneBoiteCompanyVOBuilder({
+      ...this.props,
+      distance,
+    });
+  }
+
   public withNaf(naf: string): LaBonneBoiteCompanyVOBuilder {
     return new LaBonneBoiteCompanyVOBuilder({
       ...this.props,
