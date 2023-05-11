@@ -244,7 +244,7 @@ const beneficiarySection = (internshipKind: InternshipKind) => ({
     required: true,
   },
   "signatories.beneficiary.levelOfEducation": {
-    label: "Niveau d'étude",
+    label: "Classe actuelle fréquentée",
     id: beneficiarySectionIds.levelOfEducation,
     placeholder: "Précisez votre statut",
     required: true,
