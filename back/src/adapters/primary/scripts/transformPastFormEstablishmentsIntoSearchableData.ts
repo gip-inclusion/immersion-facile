@@ -51,7 +51,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
     config.apiKeyOpenCageDataGeocoding,
     config.apiKeyOpenCageDataGeosearch,
   );
-  const sirenGateway = new InseeSiretGateway(
+  const siretGateway = new InseeSiretGateway(
     config.inseeHttpConfig,
     timeGateway,
     new QpsRateLimiter(maxQpsSireneApi, timeGateway, sleep),
@@ -68,7 +68,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
   const uuidGenerator = new UuidV4Generator();
   const upsertAggregateFromForm = new InsertEstablishmentAggregateFromForm(
     pgUowPerformer,
-    sirenGateway,
+    siretGateway,
     addressAPI,
     new UuidV4Generator(),
     timeGateway,

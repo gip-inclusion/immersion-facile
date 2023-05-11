@@ -6,7 +6,7 @@ import { createLogger } from "../../../utils/logger";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UseCase } from "../../core/UseCase";
 import { SiretGateway } from "../../sirene/ports/SirenGateway";
-import { getSirenEstablishmentFromApi } from "../../sirene/service/getSirenEstablishmentFromApi";
+import { getSiretEstablishmentFromApi } from "../../sirene/service/getSirenEstablishmentFromApi";
 import { AddressGateway } from "../ports/AddressGateway";
 import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
 
@@ -21,7 +21,7 @@ export class UpdateEstablishmentsFromSirenApiScript extends UseCase<
 > {
   constructor(
     private readonly establishmentAggregateRepository: EstablishmentAggregateRepository,
-    private readonly sirenGateway: SiretGateway,
+    private readonly siretGateway: SiretGateway,
     private readonly addressAPI: AddressGateway,
     private readonly timeGateway: TimeGateway,
   ) {
@@ -61,9 +61,9 @@ export class UpdateEstablishmentsFromSirenApiScript extends UseCase<
   }
 
   private async updateEstablishmentWithSiret(siret: string) {
-    const sirenEstablishmentDto = await getSirenEstablishmentFromApi(
+    const siretEstablishmentDto = await getSiretEstablishmentFromApi(
       { siret, includeClosedEstablishments: false },
-      this.sirenGateway,
+      this.siretGateway,
     ).catch(async (error) => {
       if (error instanceof NotFoundError) {
         await this.establishmentAggregateRepository.updateEstablishment({
@@ -75,10 +75,10 @@ export class UpdateEstablishmentsFromSirenApiScript extends UseCase<
       }
       throw error;
     });
-    if (!sirenEstablishmentDto) return;
+    if (!siretEstablishmentDto) return;
 
     const { nafDto, numberEmployeesRange, businessAddress } =
-      sirenEstablishmentDto;
+      siretEstablishmentDto;
 
     const positionAndAddress = await this.getPositionAndAddressIfNeeded(
       siret,

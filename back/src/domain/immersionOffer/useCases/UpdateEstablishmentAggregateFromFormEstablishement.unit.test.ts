@@ -20,10 +20,10 @@ import { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import { UpdateEstablishmentAggregateFromForm } from "./UpdateEstablishmentAggregateFromFormEstablishement";
 
 const prepareSirenGateway = (
-  sirenGateway: InMemorySiretGateway,
+  siretGateway: InMemorySiretGateway,
   siret: string,
 ) => {
-  const sirenEstablishmentFromAPI: SiretEstablishmentDto = {
+  const siretEstablishmentFromAPI: SiretEstablishmentDto = {
     siret,
     businessAddress: "1 rue Guillaume Tell, 75017 Paris",
     businessName: "My establishment",
@@ -32,18 +32,18 @@ const prepareSirenGateway = (
     numberEmployeesRange: "10-19",
   };
 
-  sirenGateway.setSirenEstablishment(sirenEstablishmentFromAPI);
+  siretGateway.setSirenEstablishment(siretEstablishmentFromAPI);
 };
 
 describe("Update Establishment aggregate from form data", () => {
-  let sirenGateway: InMemorySiretGateway;
+  let siretGateway: InMemorySiretGateway;
   let establishmentAggregateRepo: InMemoryEstablishmentAggregateRepository;
   let addressAPI: InMemoryAddressGateway;
   let updateEstablishmentAggregateFromFormUseCase: UpdateEstablishmentAggregateFromForm;
   let uuidGenerator: TestUuidGenerator;
 
   beforeEach(() => {
-    sirenGateway = new InMemorySiretGateway();
+    siretGateway = new InMemorySiretGateway();
     establishmentAggregateRepo = new InMemoryEstablishmentAggregateRepository();
     addressAPI = new InMemoryAddressGateway();
     uuidGenerator = new TestUuidGenerator();
@@ -75,7 +75,7 @@ describe("Update Establishment aggregate from form data", () => {
     const siret = "12345678911234";
     const newPosition = { lon: 1, lat: 2 };
     const newAddress = rueGuillaumeTellDto;
-    prepareSirenGateway(sirenGateway, siret);
+    prepareSirenGateway(siretGateway, siret);
 
     addressAPI.setAddressAndPosition([
       {
