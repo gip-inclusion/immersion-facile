@@ -54,7 +54,7 @@ export class HttpLaBonneBoiteAPI implements LaBonneBoiteAPI {
 
   private limiter = new Bottleneck({
     reservoir: lbbMaxQueryPerSeconds,
-    reservoirIncreaseInterval: 1000, // number of ms
+    reservoirRefreshInterval: 1000, // number of ms
     reservoirRefreshAmount: lbbMaxQueryPerSeconds,
   });
 }

@@ -52,6 +52,7 @@ import { S3DocumentGateway } from "../../secondary/S3DocumentGateway";
 import { DeterministShortLinkIdGeneratorGateway } from "../../secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { NanoIdShortLinkIdGeneratorGateway } from "../../secondary/shortLinkIdGeneratorGateway/NanoIdShortLinkIdGeneratorGateway";
 import { AnnuaireDesEntreprisesSiretGateway } from "../../secondary/siret/AnnuaireDesEntreprisesSiretGateway";
+import { annuaireDesEntreprisesSiretTargets } from "../../secondary/siret/AnnuaireDesEntreprisesSiretGateway.targets";
 import { InMemorySiretGateway } from "../../secondary/siret/InMemorySiretGateway";
 import { InseeSiretGateway } from "../../secondary/siret/InseeSiretGateway";
 import { AppConfig, makeEmailAllowListPredicate } from "./appConfig";
@@ -178,7 +179,14 @@ const getSiretGateway = (
         noRetries,
       ),
     IN_MEMORY: () => new InMemorySiretGateway(),
-    ANNUAIRE_DES_ENTREPRISES: () => new AnnuaireDesEntreprisesSiretGateway(),
+    ANNUAIRE_DES_ENTREPRISES: () =>
+      new AnnuaireDesEntreprisesSiretGateway(
+        configureCreateHttpClientForExternalApi(
+          axios.create({
+            timeout: config.externalAxiosTimeout,
+          }),
+        )(annuaireDesEntreprisesSiretTargets),
+      ),
   };
   return gatewayByProvider[provider]();
 };
