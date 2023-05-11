@@ -30,9 +30,8 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
     private readonly poleEmploiClientId: string,
     private readonly rateLimiter: RateLimiter,
     private readonly retryStrategy: RetryStrategy,
-    private readonly version: number,
   ) {
-    this.peConventionBroadcastUrl = `${peApiUrl}/partenaire/immersion-pro/v${version}/demandes-immersion`;
+    this.peConventionBroadcastUrl = `${peApiUrl}/partenaire/immersion-pro/v2/demandes-immersion`;
   }
 
   public async notifyOnConventionUpdated(
@@ -58,7 +57,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
         logger.info({ poleEmploiConvention }, "Sending convention to PE");
         const response = await this.rateLimiter.whenReady(async () => {
           const accessToken = await this.accessTokenGateway.getAccessToken(
-            `echangespmsmp api_immersion-prov1`,
+            `echangespmsmp api_immersion-prov2`,
           );
 
           const peResponse = await axios.post(

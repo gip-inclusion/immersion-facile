@@ -19,7 +19,6 @@ const getAPI = () =>
     config.poleEmploiClientId,
     noRateLimit,
     noRetries,
-    2,
   );
 
 const peConvention: PoleEmploiConvention = {
