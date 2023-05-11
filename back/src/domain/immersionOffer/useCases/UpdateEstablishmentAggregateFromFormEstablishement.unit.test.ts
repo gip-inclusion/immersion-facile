@@ -15,12 +15,12 @@ import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { InMemorySirenGateway } from "../../../adapters/secondary/siret/InMemorySiretGateway";
+import { InMemorySiretGateway } from "../../../adapters/secondary/siret/InMemorySiretGateway";
 import { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import { UpdateEstablishmentAggregateFromForm } from "./UpdateEstablishmentAggregateFromFormEstablishement";
 
 const prepareSirenGateway = (
-  sirenGateway: InMemorySirenGateway,
+  sirenGateway: InMemorySiretGateway,
   siret: string,
 ) => {
   const sirenEstablishmentFromAPI: SiretEstablishmentDto = {
@@ -36,14 +36,14 @@ const prepareSirenGateway = (
 };
 
 describe("Update Establishment aggregate from form data", () => {
-  let sirenGateway: InMemorySirenGateway;
+  let sirenGateway: InMemorySiretGateway;
   let establishmentAggregateRepo: InMemoryEstablishmentAggregateRepository;
   let addressAPI: InMemoryAddressGateway;
   let updateEstablishmentAggregateFromFormUseCase: UpdateEstablishmentAggregateFromForm;
   let uuidGenerator: TestUuidGenerator;
 
   beforeEach(() => {
-    sirenGateway = new InMemorySirenGateway();
+    sirenGateway = new InMemorySiretGateway();
     establishmentAggregateRepo = new InMemoryEstablishmentAggregateRepository();
     addressAPI = new InMemoryAddressGateway();
     uuidGenerator = new TestUuidGenerator();

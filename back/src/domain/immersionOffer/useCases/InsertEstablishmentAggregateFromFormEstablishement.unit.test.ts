@@ -22,7 +22,7 @@ import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGenerato
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import {
-  InMemorySirenGateway,
+  InMemorySiretGateway,
   TEST_ESTABLISHMENT1,
 } from "../../../adapters/secondary/siret/InMemorySiretGateway";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
@@ -37,7 +37,7 @@ const fakeBusinessContact = new ContactEntityBuilder().build();
 const expectedNafDto: NafDto = { code: "8559A", nomenclature: "nomencl" };
 
 const prepareSirenGateway = (
-  sirenGateway: InMemorySirenGateway,
+  sirenGateway: InMemorySiretGateway,
   siret: string,
   numberEmployeesRange: NumberEmployeesRange = "",
 ) => {
@@ -55,7 +55,7 @@ const prepareSirenGateway = (
 };
 
 describe("Insert Establishment aggregate from form data", () => {
-  let sirenGateway: InMemorySirenGateway;
+  let sirenGateway: InMemorySiretGateway;
   let establishmentAggregateRepo: InMemoryEstablishmentAggregateRepository;
   let outboxRepo: InMemoryOutboxRepository;
   let addressAPI: InMemoryAddressGateway;
@@ -63,7 +63,7 @@ describe("Insert Establishment aggregate from form data", () => {
   let uuidGenerator: TestUuidGenerator;
 
   beforeEach(() => {
-    sirenGateway = new InMemorySirenGateway();
+    sirenGateway = new InMemorySiretGateway();
     establishmentAggregateRepo = new InMemoryEstablishmentAggregateRepository();
     outboxRepo = new InMemoryOutboxRepository();
     addressAPI = new InMemoryAddressGateway();

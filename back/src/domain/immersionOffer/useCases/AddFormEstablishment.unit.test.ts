@@ -19,7 +19,7 @@ import { InMemoryFormEstablishmentRepository } from "../../../adapters/secondary
 import { InMemoryRomeRepository } from "../../../adapters/secondary/InMemoryRomeRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import {
-  InMemorySirenGateway,
+  InMemorySiretGateway,
   TEST_ESTABLISHMENT1,
 } from "../../../adapters/secondary/siret/InMemorySiretGateway";
 import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
@@ -30,11 +30,11 @@ describe("Add FormEstablishment", () => {
   let formEstablishmentRepo: InMemoryFormEstablishmentRepository;
   let outboxRepo: InMemoryOutboxRepository;
   let romeRepository: InMemoryRomeRepository;
-  let sirenGateway: InMemorySirenGateway;
+  let sirenGateway: InMemorySiretGateway;
   let uowPerformer: InMemoryUowPerformer;
 
   beforeEach(() => {
-    sirenGateway = new InMemorySirenGateway();
+    sirenGateway = new InMemorySiretGateway();
     const uow = createInMemoryUow();
     formEstablishmentRepo = uow.formEstablishmentRepository;
     outboxRepo = uow.outboxRepository;

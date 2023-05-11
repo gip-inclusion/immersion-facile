@@ -18,7 +18,7 @@ import { InMemoryFeatureFlagRepository } from "../../../adapters/secondary/InMem
 import { InMemoryFormEstablishmentRepository } from "../../../adapters/secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import {
-  InMemorySirenGateway,
+  InMemorySiretGateway,
   TEST_ESTABLISHMENT1,
   TEST_ESTABLISHMENT3,
 } from "../../../adapters/secondary/siret/InMemorySiretGateway";
@@ -50,7 +50,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
   let formEstablishmentRepo: InMemoryFormEstablishmentRepository;
   let outboxRepo: InMemoryOutboxRepository;
   let establishmentGroupRepository: InMemoryEstablishmentGroupRepository;
-  let sirenGateway: InMemorySirenGateway;
+  let sirenGateway: InMemorySiretGateway;
   let uowPerformer: InMemoryUowPerformer;
   let uuidGenerator: TestUuidGenerator;
 
@@ -58,7 +58,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    sirenGateway = new InMemorySirenGateway();
+    sirenGateway = new InMemorySiretGateway();
     formEstablishmentRepo = uow.formEstablishmentRepository;
     establishmentGroupRepository = uow.establishmentGroupRepository;
     outboxRepo = uow.outboxRepository;
