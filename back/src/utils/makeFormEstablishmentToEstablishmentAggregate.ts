@@ -18,7 +18,7 @@ import {
 import { ImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
 import { AddressGateway } from "../domain/immersionOffer/ports/AddressGateway";
 import { SiretGateway } from "../domain/sirene/ports/SirenGateway";
-import { getSirenEstablishmentFromApi } from "../domain/sirene/service/getSirenEstablishmentFromApi";
+import { getSiretEstablishmentFromApi } from "../domain/sirene/service/getSirenEstablishmentFromApi";
 
 const offerFromFormScore = 10;
 
@@ -35,12 +35,12 @@ export const makeFormEstablishmentToEstablishmentAggregate = ({
   uuidGenerator,
   timeGateway,
   addressGateway,
-  sirenGateway,
+  siretGateway,
 }: {
   uuidGenerator: UuidGenerator;
   timeGateway: TimeGateway;
   addressGateway: AddressGateway;
-  sirenGateway: SiretGateway;
+  siretGateway: SiretGateway;
 }) => {
   const createEstablishmentAggregate = makeCreateEstablishmentAggregate({
     uuidGenerator,
@@ -56,7 +56,7 @@ export const makeFormEstablishmentToEstablishmentAggregate = ({
     );
 
     const nafAndNumberOfEmployee = await getNafAndNumberOfEmployee(
-      sirenGateway,
+      siretGateway,
       formEstablishment.siret,
     );
 
@@ -129,17 +129,17 @@ type NafAndNumberOfEmpolyee = {
 };
 
 const getNafAndNumberOfEmployee = async (
-  sirenGateway: SiretGateway,
+  siretGateway: SiretGateway,
   siret: SiretDto,
 ): Promise<NafAndNumberOfEmpolyee> => {
-  const { nafDto, numberEmployeesRange } = await getSirenEstablishmentFromApi(
+  const { nafDto, numberEmployeesRange } = await getSiretEstablishmentFromApi(
     { siret },
-    sirenGateway,
+    siretGateway,
   );
 
   if (!nafDto || numberEmployeesRange === undefined)
     throw new Error(
-      `Some field from siren gateway are missing for establishment with siret ${siret} : nafDto=${nafDto}; numberEmployeesRange=${numberEmployeesRange}`,
+      `Some field from siret gateway are missing for establishment with siret ${siret} : nafDto=${nafDto}; numberEmployeesRange=${numberEmployeesRange}`,
     );
 
   return {

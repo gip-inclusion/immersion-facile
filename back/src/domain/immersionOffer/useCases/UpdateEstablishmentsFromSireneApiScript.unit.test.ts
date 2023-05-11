@@ -11,20 +11,20 @@ import { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import { UpdateEstablishmentsFromSirenApiScript } from "./UpdateEstablishmentsFromSirenApiScript";
 
 const prepareUseCase = () => {
-  const sirenGateway = new InMemorySiretGateway();
+  const siretGateway = new InMemorySiretGateway();
   const uow = createInMemoryUow();
   const establishmentAggregateRepository = uow.establishmentAggregateRepository;
   const timeGateway = new CustomTimeGateway();
   const addressAPI = new InMemoryAddressGateway();
   const useCase = new UpdateEstablishmentsFromSirenApiScript(
     establishmentAggregateRepository,
-    sirenGateway,
+    siretGateway,
     addressAPI,
     timeGateway,
   );
 
   return {
-    sirenGateway,
+    siretGateway,
     establishmentAggregateRepository,
     addressAPI,
     timeGateway,
@@ -59,7 +59,7 @@ describe.skip("Update establishments from Sirene API", () => {
   it("Should update modification date of establishments that have not been modified since one week", async () => {
     const {
       timeGateway,
-      sirenGateway,
+      siretGateway,
       establishmentAggregateRepository,
       useCase,
     } = prepareUseCase();
@@ -68,7 +68,7 @@ describe.skip("Update establishments from Sirene API", () => {
       makeEstablishmentWithUpdatedAt("oldSiret", moreThanAWeekAgo),
       makeEstablishmentWithUpdatedAt("recentSiret", lessThanAWeekAgo),
     ];
-    sirenGateway.setSirenEstablishment(
+    siretGateway.setSirenEstablishment(
       new SirenEstablishmentDtoBuilder().withSiret("recentSiret").build(),
     );
     timeGateway.setNextDate(now);
@@ -97,7 +97,7 @@ describe.skip("Update establishments from Sirene API", () => {
       prepareUseCase();
     establishmentAggregateRepository.establishmentAggregates = [
       makeEstablishmentWithUpdatedAt(
-        "closedEstablishmentSiret", // This siret is not referenced in sirenGateway
+        "closedEstablishmentSiret", // This siret is not referenced in siretGateway
         moreThanAWeekAgo,
       ),
     ];
@@ -119,14 +119,14 @@ describe.skip("Update establishments from Sirene API", () => {
     // Prepare
     const {
       timeGateway,
-      sirenGateway,
+      siretGateway,
       establishmentAggregateRepository,
       useCase,
     } = prepareUseCase();
     establishmentAggregateRepository.establishmentAggregates = [
       makeEstablishmentWithUpdatedAt("establishmentToUpdate", moreThanAWeekAgo),
     ];
-    sirenGateway.setSirenEstablishment(
+    siretGateway.setSirenEstablishment(
       new SirenEstablishmentDtoBuilder()
         .withSiret("establishmentToUpdate")
         .withNafDto({ code: "8559A", nomenclature: "nafNom" })
@@ -158,7 +158,7 @@ describe.skip("Update establishments from Sirene API", () => {
       // Prepare
       const {
         timeGateway,
-        sirenGateway,
+        siretGateway,
         establishmentAggregateRepository,
         addressAPI,
         useCase,
@@ -169,7 +169,7 @@ describe.skip("Update establishments from Sirene API", () => {
           moreThanAWeekAgo,
         ),
       ];
-      sirenGateway.setSirenEstablishment(
+      siretGateway.setSirenEstablishment(
         new SirenEstablishmentDtoBuilder()
           .withSiret("establishmentToUpdate")
           .withBusinessAddress("25 rue du Premier Film 69008 Lyon")
@@ -214,7 +214,7 @@ describe.skip("Update establishments from Sirene API", () => {
       // Prepare
       const {
         timeGateway,
-        sirenGateway,
+        siretGateway,
         establishmentAggregateRepository,
         addressAPI,
         useCase,
@@ -226,7 +226,7 @@ describe.skip("Update establishments from Sirene API", () => {
       establishmentAggregateRepository.establishmentAggregates = [
         initialEstablishmentAggregate,
       ];
-      sirenGateway.setSirenEstablishment(
+      siretGateway.setSirenEstablishment(
         new SirenEstablishmentDtoBuilder()
           .withSiret("establishmentToUpdate")
           .withBusinessAddress("7 rue Guillaume Tell 75017 Paris")
@@ -271,7 +271,7 @@ describe.skip("Update establishments from Sirene API", () => {
       // Prepare
       const {
         timeGateway,
-        sirenGateway,
+        siretGateway,
         establishmentAggregateRepository,
         addressAPI,
         useCase,
@@ -283,7 +283,7 @@ describe.skip("Update establishments from Sirene API", () => {
       establishmentAggregateRepository.establishmentAggregates = [
         establishmentToUpdate,
       ];
-      sirenGateway.setSirenEstablishment(
+      siretGateway.setSirenEstablishment(
         new SirenEstablishmentDtoBuilder()
           .withSiret("establishmentToUpdate")
           .withBusinessAddress("75007 PARIS")
