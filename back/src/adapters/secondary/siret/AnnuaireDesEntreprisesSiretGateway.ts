@@ -8,9 +8,11 @@ import {
 } from "./AnnuaireDesEntreprisesSiretGateway.targets";
 
 const adeMaxQueryPerSeconds = 7;
+export const nonDiffusibleEstablishmentName = "NON-DIFFUSIBLE";
 export class AnnuaireDesEntreprisesSiretGateway implements SiretGateway {
   constructor(
     private httpClient: HttpClient<AnnuaireDesEntreprisesSiretTargets>,
+    private fallbackGateway: SiretGateway,
   ) {}
 
   private limiter = new Bottleneck({
@@ -34,6 +36,14 @@ export class AnnuaireDesEntreprisesSiretGateway implements SiretGateway {
     const formattedResult = convertAdeEstablishmentToSirenEstablishmentDto(
       response.responseBody.results[0],
     );
+    if (
+      formattedResult.businessName
+        .trim()
+        .toUpperCase()
+        .includes(nonDiffusibleEstablishmentName)
+    ) {
+      return this.fallbackGateway.getEstablishmentBySiret(siret);
+    }
     if (includeClosedEstablishments) return formattedResult;
     if (formattedResult.isOpen) return formattedResult;
   }
@@ -43,7 +53,7 @@ export const convertAdeEstablishmentToSirenEstablishmentDto = (
   adeEstablishment: AnnuaireDesEntreprisesSiretEstablishment,
 ): SiretEstablishmentDto => ({
   siret: adeEstablishment.matching_etablissements[0].siret,
-  businessName: adeEstablishment.nom_complet,
+  businessName: adeEstablishment.matching_etablissements[0].nom_commercial,
   businessAddress: adeEstablishment.matching_etablissements[0].adresse,
   nafDto: {
     code: adeEstablishment.activite_principale.replace(".", ""),

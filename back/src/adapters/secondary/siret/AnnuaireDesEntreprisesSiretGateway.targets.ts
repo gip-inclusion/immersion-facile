@@ -2,13 +2,13 @@ import { z } from "zod";
 import { createTarget, createTargets } from "http-client";
 
 const adeEstablishmentSchema = z.object({
-  nom_complet: z.string(),
   matching_etablissements: z
     .array(
       z.object({
         siret: z.string(),
         etat_administratif: z.enum(["A", "F"]),
         adresse: z.string(),
+        nom_commercial: z.string(),
       }),
     )
     .min(1),
@@ -26,11 +26,11 @@ const annuaireDesEntreprisesSiretGatewayResponseSchema = z.object({
 
 export type AnnuaireDesEntreprisesSiretEstablishment = {
   // cf. https://api.gouv.fr/documentation/api-recherche-entreprises
-  nom_complet: string;
   matching_etablissements: {
     siret: string;
     etat_administratif: "A" | "F";
     adresse: string;
+    nom_commercial: string;
   }[];
   activite_principale: string;
   tranche_effectif_salarie: string | null;
