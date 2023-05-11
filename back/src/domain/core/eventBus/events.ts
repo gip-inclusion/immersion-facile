@@ -7,9 +7,9 @@ import {
   EstablishmentJwtPayload,
   Flavor,
   FormEstablishmentDto,
+  IcUserRoleForAgencyParams,
   ImmersionAssessmentDto,
   WithConventionId,
-  AgencyRole,
 } from "shared";
 import { RenewMagicLinkPayload } from "../../convention/useCases/notifications/DeliverRenewedMagicLink";
 import { ConventionRequiresModificationPayload } from "../../convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
@@ -82,7 +82,7 @@ export type DomainEvent =
   // We don't put full OAuth in payload to avoid private data in logs etc...
   | GenericEvent<"UserAuthenticatedSuccessfully", { userId: string, provider: IdentityProvider }>
   | GenericEvent<"AgencyRegisteredToInclusionConnectedUser", { userId: AuthenticatedUserId, agencyIds: AgencyId[] }>
-  | GenericEvent<"IcUserAgencyRightChanged", { userId: AuthenticatedUserId, agencyId: AgencyId, role: AgencyRole}>;
+  | GenericEvent<"IcUserAgencyRightChanged", IcUserRoleForAgencyParams>;
 
 export type DomainTopic = DomainEvent["topic"];
 

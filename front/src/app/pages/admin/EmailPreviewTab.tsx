@@ -445,4 +445,7 @@ export const defaultEmailValueByEmailKind: {
     conventionStatusLink: "CONVENTION_STATUS_LINK",
     agencyLogoUrl: defaultEmailPreviewUrl,
   },
+  IC_USER_RIGHTS_HAS_CHANGED: {
+    agencyName: "AGENCY_NAME",
+  },
 };
