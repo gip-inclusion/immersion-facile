@@ -64,4 +64,22 @@ describe("HttpSirenGateway", () => {
     );
     expectToEqual(response, undefined);
   });
+
+  it("Should support several of parallel calls, and queue the calls if over accepted rate", async () => {
+    const siretsPromises = Array(20).fill("34493368400021");
+    const results = await Promise.all(
+      siretsPromises.map((siret) =>
+        siretGateway.getEstablishmentBySiret(siret).catch((error) => {
+          const responseBodyAsString = error.response?.data
+            ? ` Body : ${JSON.stringify(error.response?.data)}`
+            : "";
+
+          throw new Error(
+            `Could not call api correctly, status: ${error.response.status}.${responseBodyAsString}`,
+          );
+        }),
+      ),
+    );
+    expect(results).toHaveLength(siretsPromises.length);
+  });
 });
