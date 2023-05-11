@@ -1135,15 +1135,18 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
   },
   IC_USER_RIGHTS_HAS_CHANGED: {
     niceName: "Notification de changement de droit (Utilisateur IC)",
-    tags: ["notification changement de droit utilisateur ic"],
+    tags: ["activation BO prescripteur"],
     createEmailVariables: ({ agencyName }) => ({
-      subject: `Immersion Facilitée - Vos droits ont été modifiés `,
+      subject: `Immersion Facilitée - Activation de l’accès au back office de votre structure`,
       greetings: "Bonjour,",
-      content: `
+      content: `<strong>Vous pouvez désormais accéder au back office de votre structure.</strong>
 
-        Nous vous confirmons que vous venez d'être rattaché a l'agence : ${agencyName}. 
-        
-        Merci à vous !`,
+        Nous avons bien activé votre accès au back office de votre structure : ${agencyName}.
+
+        Vous avez ainsi la possibilité de consulter l’ensemble des conventions d’immersion établies et à traiter et de les exporter sous format excel ou csv.
+
+        Nous allons progressivement enrichir ce back office et vous proposer de nouvelles fonctionnalités.
+      `,
       subContent: defaultSignature("immersion"),
     }),
   },
