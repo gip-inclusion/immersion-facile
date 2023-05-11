@@ -10,6 +10,9 @@
     "lint": {
       "outputs": []
     },
+    "dev": {
+      "outputs": []
+    },
     "typecheck": {
       "dependsOn": ["^typecheck"],
       "outputs": []
