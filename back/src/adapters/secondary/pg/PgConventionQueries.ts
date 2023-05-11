@@ -4,7 +4,7 @@ import {
   ConventionId,
   ConventionReadDto,
   conventionReadSchema,
-  filterNotUndefined,
+  filterNotFalsy,
   Flavor,
   ListConventionsRequestDto,
   validatedConventionStatuses,
@@ -45,7 +45,7 @@ export class PgConventionQueries implements ConventionQueries {
         startDateGreater
           ? format("conventions.date_start::date > %1$L", startDateGreater)
           : undefined,
-      ].filter(filterNotUndefined),
+      ].filter(filterNotFalsy),
     });
   }
 
@@ -57,7 +57,7 @@ export class PgConventionQueries implements ConventionQueries {
       whereClauses: [
         status && format("conventions.status = %1$L", status),
         agencyId && format("conventions.agency_id::text = %1$L", agencyId),
-      ].filter(filterNotUndefined),
+      ].filter(filterNotFalsy),
       orderByClause: "ORDER BY date_validation DESC",
       limit: 10,
     });
@@ -94,7 +94,7 @@ export class PgConventionQueries implements ConventionQueries {
       orderByClause,
       limit && `LIMIT ${limit}`,
     ]
-      .filter(filterNotUndefined)
+      .filter(filterNotFalsy)
       .join("\n");
 
     const pgResult = await this.client.query<{ dto: unknown }>(query);

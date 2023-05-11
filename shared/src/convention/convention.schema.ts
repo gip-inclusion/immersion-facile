@@ -7,7 +7,7 @@ import { scheduleSchema } from "../schedule/Schedule.schema";
 import { calculateWeeklyHoursFromSchedule } from "../schedule/ScheduleUtils";
 import { siretSchema } from "../siret/siret.schema";
 import { allRoles } from "../tokens/token.dto";
-import { filterNotUndefined, phoneRegExp } from "../utils";
+import { phoneRegExp } from "../utils";
 import { dateRegExp } from "../utils/date";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import {
@@ -224,7 +224,7 @@ export const conventionWithoutExternalIdSchema: z.Schema<ConventionDtoWithoutExt
       };
 
       const signatoriesWithEmail = Object.entries(convention.signatories)
-        .filter(([_, value]) => filterNotUndefined(value))
+        .filter(([_, value]) => !!value)
         .map(([key, value]) => ({
           key: key as keyof Signatories,
           email: value.email,
