@@ -108,7 +108,7 @@ const getUseCasesByTopics = (
   EmailWithLinkToCreateAssessmentSent: [],
 
   UserAuthenticatedSuccessfully: [],
-  IcUserAgencyRightChanged:[]
+  IcUserAgencyRightChanged: [useCases.notifyIcUserAgencyRightChanged],
 });
 
 export const subscribeToEvents = (deps: AppDependencies) => {

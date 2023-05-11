@@ -200,7 +200,7 @@ export const storedEventOutboxToDomainEvent = (
   row: StoredEventRow,
 ): DomainEvent => ({
   id: row.id,
-  topic: row.topic,
+  topic: row.topic as any, //this is to avoid the error due to : https://github.com/microsoft/TypeScript/issues/42518
   occurredAt: row.occurred_at.toISOString(),
   payload: row.payload,
   wasQuarantined: row.was_quarantined,

@@ -1133,4 +1133,18 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
     }),
     tags: ["confirmation de signature de convention"],
   },
+  IC_USER_RIGHTS_HAS_CHANGED: {
+    niceName: "Notification de changement de droit (Utilisateur IC)",
+    tags: ["notification changement de droit utilisateur ic"],
+    createEmailVariables: ({ agencyName }) => ({
+      subject: `Immersion Facilitée - Vos droits ont été modifiés `,
+      greetings: "Bonjour,",
+      content: `
+
+        Nous vous confirmons que vous venez d'être rattaché a l'agence : ${agencyName}. 
+        
+        Merci à vous !`,
+      subContent: defaultSignature("immersion"),
+    }),
+  },
 });
