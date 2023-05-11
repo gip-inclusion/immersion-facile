@@ -52,7 +52,7 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
     config.apiKeyOpenCageDataGeosearch,
   );
   const sirenGateway = new InseeSiretGateway(
-    config.sirenHttpConfig,
+    config.inseeHttpConfig,
     timeGateway,
     new QpsRateLimiter(maxQpsSireneApi, timeGateway, sleep),
     new ExponentialBackoffRetryStrategy(

@@ -173,7 +173,7 @@ const getSiretGateway = (
   const gatewayByProvider = {
     INSEE: () =>
       new InseeSiretGateway(
-        config.sirenHttpConfig,
+        config.inseeHttpConfig,
         timeGateway,
         noRateLimit,
         noRetries,
@@ -186,6 +186,12 @@ const getSiretGateway = (
             timeout: config.externalAxiosTimeout,
           }),
         )(annuaireDesEntreprisesSiretTargets),
+        new InseeSiretGateway(
+          config.inseeHttpConfig,
+          timeGateway,
+          noRateLimit,
+          noRetries,
+        ),
       ),
   };
   return gatewayByProvider[provider]();

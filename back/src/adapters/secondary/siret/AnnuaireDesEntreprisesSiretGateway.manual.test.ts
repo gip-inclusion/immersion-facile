@@ -1,7 +1,15 @@
 import { expectToEqual } from "shared";
+import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
+import { noRetries } from "../../../domain/core/ports/RetryStrategy";
+import { AppConfig } from "../../primary/config/appConfig";
 import { configureCreateHttpClientForExternalApi } from "../../primary/config/createHttpClientForExternalApi";
-import { AnnuaireDesEntreprisesSiretGateway } from "./AnnuaireDesEntreprisesSiretGateway";
+import { RealTimeGateway } from "../core/TimeGateway/RealTimeGateway";
+import {
+  AnnuaireDesEntreprisesSiretGateway,
+  nonDiffusibleEstablishmentName,
+} from "./AnnuaireDesEntreprisesSiretGateway";
 import { annuaireDesEntreprisesSiretTargets } from "./AnnuaireDesEntreprisesSiretGateway.targets";
+import { InseeSiretGateway } from "./InseeSiretGateway";
 
 // These tests are not hermetic and not meant for automated testing. They will make requests to the
 // real SIRENE API, use up production quota, and fail for uncontrollable reasons such as quota
@@ -12,11 +20,17 @@ import { annuaireDesEntreprisesSiretTargets } from "./AnnuaireDesEntreprisesSire
 // - SIRENE_BEARER_TOKEN
 describe("HttpSirenGateway", () => {
   let siretGateway: AnnuaireDesEntreprisesSiretGateway;
-
+  const config = AppConfig.createFromEnv();
   beforeEach(() => {
     siretGateway = new AnnuaireDesEntreprisesSiretGateway(
       configureCreateHttpClientForExternalApi()(
         annuaireDesEntreprisesSiretTargets,
+      ),
+      new InseeSiretGateway(
+        config.inseeHttpConfig,
+        new RealTimeGateway(),
+        noRateLimit,
+        noRetries,
       ),
     );
   });
@@ -81,5 +95,15 @@ describe("HttpSirenGateway", () => {
       ),
     );
     expect(results).toHaveLength(siretsPromises.length);
+  });
+
+  it("Should return a non diffusible establishment using fallback API", async () => {
+    const nonDiffusibleEstablishment =
+      await siretGateway.getEstablishmentBySiret("44117926400078");
+    expect(
+      nonDiffusibleEstablishment?.businessName.includes(
+        nonDiffusibleEstablishmentName,
+      ),
+    ).toBe(false);
   });
 });

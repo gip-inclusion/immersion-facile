@@ -46,7 +46,7 @@ const main = async () => {
     sleep,
   );
   const sirenGateway = new InseeSiretGateway(
-    config.sirenHttpConfig,
+    config.inseeHttpConfig,
     timeGateway,
     rateLimiter,
     retryStrategy,

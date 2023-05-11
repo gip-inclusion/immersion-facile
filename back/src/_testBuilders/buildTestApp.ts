@@ -18,7 +18,7 @@ import { NotImplementedDocumentGateway } from "../adapters/secondary/NotImplemen
 import { InMemoryPeConnectGateway } from "../adapters/secondary/PeConnectGateway/InMemoryPeConnectGateway";
 import { InMemoryExportGateway } from "../adapters/secondary/reporting/InMemoryExportGateway";
 import { DeterministShortLinkIdGeneratorGateway } from "../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
-import { InMemorySirenGateway } from "../adapters/secondary/siret/InMemorySiretGateway";
+import { InMemorySiretGateway } from "../adapters/secondary/siret/InMemorySiretGateway";
 import {
   GenerateApiConsumerJwt,
   GenerateAuthenticatedUserJwt,
@@ -32,7 +32,7 @@ import { AppConfigBuilder } from "./AppConfigBuilder";
 export type InMemoryGateways = {
   email: InMemoryEmailGateway;
   peConnectGateway: InMemoryPeConnectGateway;
-  siren: InMemorySirenGateway;
+  siren: InMemorySiretGateway;
   laBonneBoiteAPI: InMemoryLaBonneBoiteAPI;
   passEmploiGateway: InMemoryPassEmploiGateway;
   poleEmploiGateway: InMemoryPoleEmploiGateway;

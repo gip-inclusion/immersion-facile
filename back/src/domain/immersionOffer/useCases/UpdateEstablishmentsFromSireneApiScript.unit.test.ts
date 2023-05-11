@@ -6,12 +6,12 @@ import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { InMemoryAddressGateway } from "../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { InMemoryEstablishmentAggregateRepository } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
-import { InMemorySirenGateway } from "../../../adapters/secondary/siret/InMemorySiretGateway";
+import { InMemorySiretGateway } from "../../../adapters/secondary/siret/InMemorySiretGateway";
 import { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import { UpdateEstablishmentsFromSirenApiScript } from "./UpdateEstablishmentsFromSirenApiScript";
 
 const prepareUseCase = () => {
-  const sirenGateway = new InMemorySirenGateway();
+  const sirenGateway = new InMemorySiretGateway();
   const uow = createInMemoryUow();
   const establishmentAggregateRepository = uow.establishmentAggregateRepository;
   const timeGateway = new CustomTimeGateway();

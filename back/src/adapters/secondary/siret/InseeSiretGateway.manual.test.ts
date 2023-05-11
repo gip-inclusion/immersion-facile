@@ -19,7 +19,7 @@ describe("HttpSirenGateway", () => {
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
     sirenGateway = new InseeSiretGateway(
-      config.sirenHttpConfig,
+      config.inseeHttpConfig,
       new RealTimeGateway(),
       noRateLimit,
       noRetries,
