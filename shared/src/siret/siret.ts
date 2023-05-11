@@ -11,14 +11,14 @@ export const apiSirenUnexpectedError = "66600666600666";
 
 export const tooManiSirenRequestsSiretErrorMessage =
   "Too many requests on SIRENE API.";
-export const sirenApiUnavailableSiretErrorMessage = "SIRENE API not available.";
-export const sirenApiUnexpectedErrorErrorMessage = "Unexpected Error";
-export const sirenApiMissingEstablishmentMessage =
+export const siretApiUnavailableSiretErrorMessage = "SIRENE API not available.";
+export const siretApiUnexpectedErrorErrorMessage = "Unexpected Error";
+export const siretApiMissingEstablishmentMessage =
   "Missing establishment on SIRENE API.";
 export const siretInfoErrors = [
   tooManiSirenRequestsSiretErrorMessage,
-  sirenApiUnavailableSiretErrorMessage,
-  sirenApiMissingEstablishmentMessage,
+  siretApiUnavailableSiretErrorMessage,
+  siretApiMissingEstablishmentMessage,
   "Establishment with this siret is already in our DB",
 ] as const;
 

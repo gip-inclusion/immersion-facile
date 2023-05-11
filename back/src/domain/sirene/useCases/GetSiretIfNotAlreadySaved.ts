@@ -7,7 +7,7 @@ import { ConflictError } from "../../../adapters/primary/helpers/httpErrors";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { SiretGateway } from "../ports/SirenGateway";
-import { getSirenEstablishmentFromApi } from "../service/getSirenEstablishmentFromApi";
+import { getSiretEstablishmentFromApi } from "../service/getSirenEstablishmentFromApi";
 
 export class GetSiretIfNotAlreadySaved extends TransactionalUseCase<
   GetSiretRequestDto,
@@ -15,7 +15,7 @@ export class GetSiretIfNotAlreadySaved extends TransactionalUseCase<
 > {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly sirenGateway: SiretGateway,
+    private readonly siretGateway: SiretGateway,
   ) {
     super(uowPerformer);
   }
@@ -38,6 +38,6 @@ export class GetSiretIfNotAlreadySaved extends TransactionalUseCase<
       );
     }
 
-    return getSirenEstablishmentFromApi(params, this.sirenGateway);
+    return getSiretEstablishmentFromApi(params, this.siretGateway);
   }
 }

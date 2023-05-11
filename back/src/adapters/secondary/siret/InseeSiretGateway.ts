@@ -113,7 +113,7 @@ export class InseeSiretGateway implements SiretGateway {
   }
 }
 
-export type SirenApiRawEstablishment = {
+export type InseeApiRawEstablishment = {
   siret: string;
   uniteLegale: Partial<{
     denominationUniteLegale?: string;
@@ -148,21 +148,21 @@ export type SirenGatewayAnswer = {
     debut: number;
     nombre: number;
   };
-  etablissements: SirenApiRawEstablishment[];
+  etablissements: InseeApiRawEstablishment[];
 };
 
 export const convertSirenRawEstablishmentToSirenEstablishmentDto = (
-  sirenEstablishment: SirenApiRawEstablishment,
+  siretEstablishment: InseeApiRawEstablishment,
 ): SiretEstablishmentDto => ({
-  siret: sirenEstablishment.siret,
-  businessName: getBusinessName(sirenEstablishment),
-  businessAddress: getFormattedAddress(sirenEstablishment),
-  nafDto: getNafAndNomenclature(sirenEstablishment),
-  numberEmployeesRange: getNumberEmployeesRange(sirenEstablishment),
-  isOpen: getIsActive(sirenEstablishment),
+  siret: siretEstablishment.siret,
+  businessName: getBusinessName(siretEstablishment),
+  businessAddress: getFormattedAddress(siretEstablishment),
+  nafDto: getNafAndNomenclature(siretEstablishment),
+  numberEmployeesRange: getNumberEmployeesRange(siretEstablishment),
+  isOpen: getIsActive(siretEstablishment),
 });
 
-const getBusinessName = ({ uniteLegale }: SirenApiRawEstablishment): string => {
+const getBusinessName = ({ uniteLegale }: InseeApiRawEstablishment): string => {
   const denomination = uniteLegale.denominationUniteLegale;
   if (denomination) return denomination;
 
@@ -173,7 +173,7 @@ const getBusinessName = ({ uniteLegale }: SirenApiRawEstablishment): string => {
 
 const getNafAndNomenclature = ({
   uniteLegale,
-}: SirenApiRawEstablishment): NafDto | undefined => {
+}: InseeApiRawEstablishment): NafDto | undefined => {
   const naf = uniteLegale.activitePrincipaleUniteLegale?.replace(".", "");
   if (!naf || !uniteLegale.nomenclatureActivitePrincipaleUniteLegale) return;
 
@@ -184,7 +184,7 @@ const getNafAndNomenclature = ({
 };
 const getFormattedAddress = ({
   adresseEtablissement,
-}: SirenApiRawEstablishment): string =>
+}: InseeApiRawEstablishment): string =>
   [
     adresseEtablissement.numeroVoieEtablissement,
     adresseEtablissement.typeVoieEtablissement,
@@ -198,7 +198,7 @@ const getFormattedAddress = ({
 const getIsActive = ({
   uniteLegale,
   periodesEtablissement,
-}: SirenApiRawEstablishment) => {
+}: InseeApiRawEstablishment) => {
   const lastPeriod = periodesEtablissement.find(propEq("dateFin", null));
   if (!lastPeriod) return false;
 
@@ -210,7 +210,7 @@ const getIsActive = ({
 
 const getNumberEmployeesRange = ({
   uniteLegale,
-}: SirenApiRawEstablishment): NumberEmployeesRange => {
+}: InseeApiRawEstablishment): NumberEmployeesRange => {
   const tefenCode = uniteLegale.trancheEffectifsUniteLegale;
   if (!tefenCode || tefenCode === "NN") return "";
   return employeeRangeByTefenCode[<TefenCode>+tefenCode];

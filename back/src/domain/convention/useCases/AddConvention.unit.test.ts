@@ -34,7 +34,7 @@ describe("Add Convention", () => {
   const validConvention = new ConventionDtoBuilder().build();
   const { externalId, ...validConventionParams } = validConvention;
 
-  let sirenGateway: InMemorySiretGateway;
+  let siretGateway: InMemorySiretGateway;
   let uowPerformer: InMemoryUowPerformer;
 
   beforeEach(() => {
@@ -50,12 +50,12 @@ describe("Add Convention", () => {
       timeGateway,
       uuidGenerator,
     });
-    sirenGateway = new InMemorySiretGateway();
+    siretGateway = new InMemorySiretGateway();
     uowPerformer = new InMemoryUowPerformer(uow);
     addConvention = new AddConvention(
       uowPerformer,
       createNewEvent,
-      sirenGateway,
+      siretGateway,
     );
   });
 
@@ -130,16 +130,16 @@ describe("Add Convention", () => {
   });
 
   describe("SIRET validation", () => {
-    const sirenRawEstablishmentBuilder = new SirenEstablishmentDtoBuilder()
+    const siretRawEstablishmentBuilder = new SirenEstablishmentDtoBuilder()
       .withSiret(validConventionParams.siret)
       .withNafDto({ code: "78.3Z", nomenclature: "Ref2" });
 
-    const sirenRawInactiveEstablishment = sirenRawEstablishmentBuilder
+    const siretRawInactiveEstablishment = siretRawEstablishmentBuilder
       .withBusinessName("INACTIVE BUSINESS")
       .withIsActive(false)
       .build();
 
-    const sirenRawActiveEstablishment = sirenRawEstablishmentBuilder
+    const siretRawActiveEstablishment = siretRawEstablishmentBuilder
       .withBusinessName("Active BUSINESS")
       .withIsActive(true)
       .build();
@@ -151,7 +151,7 @@ describe("Add Convention", () => {
             enableInseeApi: false,
           }),
         });
-        sirenGateway.setSirenEstablishment(sirenRawInactiveEstablishment);
+        siretGateway.setSirenEstablishment(siretRawInactiveEstablishment);
 
         expect(await addConvention.execute(validConventionParams)).toEqual({
           id: validConventionParams.id,
@@ -160,7 +160,7 @@ describe("Add Convention", () => {
     });
 
     it("rejects applications with SIRETs that don't correspond to active businesses", async () => {
-      sirenGateway.setSirenEstablishment(sirenRawInactiveEstablishment);
+      siretGateway.setSirenEstablishment(siretRawInactiveEstablishment);
 
       await expectPromiseToFailWithError(
         addConvention.execute(validConventionParams),
@@ -171,7 +171,7 @@ describe("Add Convention", () => {
     });
 
     it("accepts applications with SIRETs that  correspond to active businesses", async () => {
-      sirenGateway.setSirenEstablishment(sirenRawActiveEstablishment);
+      siretGateway.setSirenEstablishment(siretRawActiveEstablishment);
 
       expect(await addConvention.execute(validConventionParams)).toEqual({
         id: validConventionParams.id,
@@ -180,7 +180,7 @@ describe("Add Convention", () => {
 
     it("Throws errors when the SIRET endpoint throws erorrs", async () => {
       const error = new Error("test error");
-      sirenGateway.setError(error);
+      siretGateway.setError(error);
 
       await expectPromiseToFailWithError(
         addConvention.execute(validConventionParams),

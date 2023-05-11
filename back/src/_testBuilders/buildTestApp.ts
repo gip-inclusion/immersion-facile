@@ -32,7 +32,7 @@ import { AppConfigBuilder } from "./AppConfigBuilder";
 export type InMemoryGateways = {
   email: InMemoryEmailGateway;
   peConnectGateway: InMemoryPeConnectGateway;
-  siren: InMemorySiretGateway;
+  siret: InMemorySiretGateway;
   laBonneBoiteAPI: InMemoryLaBonneBoiteAPI;
   passEmploiGateway: InMemoryPassEmploiGateway;
   poleEmploiGateway: InMemoryPoleEmploiGateway;
@@ -100,7 +100,7 @@ export const buildTestApp = async (
     throwNotSupportedError();
   if (appConfig.emailGateway !== "IN_MEMORY") throwNotSupportedError();
   if (appConfig.repositories !== "IN_MEMORY") throwNotSupportedError();
-  if (appConfig.sirenGateway !== "IN_MEMORY") throwNotSupportedError();
+  if (appConfig.siretGateway !== "IN_MEMORY") throwNotSupportedError();
   if (appConfig.timeGateway !== "CUSTOM") throwNotSupportedError();
 
   const {

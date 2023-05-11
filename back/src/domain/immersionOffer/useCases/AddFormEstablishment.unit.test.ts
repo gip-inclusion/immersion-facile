@@ -30,16 +30,16 @@ describe("Add FormEstablishment", () => {
   let formEstablishmentRepo: InMemoryFormEstablishmentRepository;
   let outboxRepo: InMemoryOutboxRepository;
   let romeRepository: InMemoryRomeRepository;
-  let sirenGateway: InMemorySiretGateway;
+  let siretGateway: InMemorySiretGateway;
   let uowPerformer: InMemoryUowPerformer;
 
   beforeEach(() => {
-    sirenGateway = new InMemorySiretGateway();
+    siretGateway = new InMemorySiretGateway();
     const uow = createInMemoryUow();
     formEstablishmentRepo = uow.formEstablishmentRepository;
     outboxRepo = uow.outboxRepository;
     romeRepository = uow.romeRepository;
-    sirenGateway.setSirenEstablishment({
+    siretGateway.setSirenEstablishment({
       ...TEST_ESTABLISHMENT1,
       siret: defaultValidFormEstablishment.siret,
     });
@@ -59,7 +59,7 @@ describe("Add FormEstablishment", () => {
     addFormEstablishment = new AddFormEstablishment(
       uowPerformer,
       createNewEvent,
-      sirenGateway,
+      siretGateway,
     );
   });
 
@@ -165,7 +165,7 @@ describe("Add FormEstablishment", () => {
       .withSiret(TEST_ESTABLISHMENT1.siret)
       .build();
 
-    const sirenRawInactiveEstablishment = new SirenEstablishmentDtoBuilder()
+    const siretRawInactiveEstablishment = new SirenEstablishmentDtoBuilder()
       .withSiret(formEstablishment.siret)
       .withIsActive(false)
       .withBusinessName("INACTIVE BUSINESS")
@@ -181,7 +181,7 @@ describe("Add FormEstablishment", () => {
         uowPerformer.setUow({
           featureFlagRepository,
         });
-        sirenGateway.setSirenEstablishment({
+        siretGateway.setSirenEstablishment({
           ...TEST_ESTABLISHMENT1,
           nafDto: { code: "78.3Z", nomenclature: "Ref2" },
           businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
@@ -200,7 +200,7 @@ describe("Add FormEstablishment", () => {
     });
 
     it("rejects formEstablishment with SIRETs that don't correspond to active businesses", async () => {
-      sirenGateway.setSirenEstablishment(sirenRawInactiveEstablishment);
+      siretGateway.setSirenEstablishment(siretRawInactiveEstablishment);
 
       await expectPromiseToFailWithError(
         addFormEstablishment.execute(formEstablishment),
@@ -211,8 +211,8 @@ describe("Add FormEstablishment", () => {
     });
 
     it("accepts formEstablishment with SIRETs that  correspond to active businesses", async () => {
-      const sirenRawEstablishment = new SirenEstablishmentDtoBuilder().build();
-      sirenGateway.setSirenEstablishment(sirenRawEstablishment);
+      const siretRawEstablishment = new SirenEstablishmentDtoBuilder().build();
+      siretGateway.setSirenEstablishment(siretRawEstablishment);
       await addFormEstablishment.execute(formEstablishment);
       expect(outboxRepo.events).toHaveLength(1);
       expect(await formEstablishmentRepo.getAll()).toHaveLength(1);
@@ -220,7 +220,7 @@ describe("Add FormEstablishment", () => {
 
     it("Throws errors when the SIRET endpoint throws erorrs", async () => {
       const error = new Error("test error");
-      sirenGateway.setError(error);
+      siretGateway.setError(error);
 
       await expectPromiseToFailWithError(
         addFormEstablishment.execute(formEstablishment),
