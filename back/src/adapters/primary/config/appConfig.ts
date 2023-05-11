@@ -151,7 +151,7 @@ export class AppConfig {
     });
   }
 
-  public get sirenHttpConfig(): AxiosConfig {
+  public get inseeHttpConfig(): AxiosConfig {
     return {
       endpoint: this.throwIfNotDefined("SIRENE_ENDPOINT"),
       bearerToken: this.throwIfNotDefined("SIRENE_BEARER_TOKEN"),

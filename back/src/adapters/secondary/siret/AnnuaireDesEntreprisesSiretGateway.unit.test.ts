@@ -3,10 +3,10 @@ import { convertAdeEstablishmentToSirenEstablishmentDto } from "./AnnuaireDesEnt
 import { AnnuaireDesEntreprisesSiretEstablishment } from "./AnnuaireDesEntreprisesSiretGateway.targets";
 
 const validEstablishment: AnnuaireDesEntreprisesSiretEstablishment = {
-  nom_complet: "MA P'TITE BOITE",
   activite_principale: "78.3Z",
   matching_etablissements: [
     {
+      nom_commercial: "MA P'TITE BOITE",
       siret: "12345678901234",
       adresse: "20 AVENUE DE SEGUR 75007 PARIS 7",
       etat_administratif: "A",
@@ -48,9 +48,9 @@ describe("convertAdeEstablishmentToSirenEstablishmentDto", () => {
       siret: "12345678901234",
       businessName: "MA P'TITE BOITE",
       businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
-      nafDto: { code: "783Z", nomenclature: "Ref2" },
+      nafDto: { code: "783Z", nomenclature: "NAFRev2" },
       isOpen: true,
-      numberEmployeesRange: "",
+      numberEmployeesRange: "1-2",
     });
   });
 });

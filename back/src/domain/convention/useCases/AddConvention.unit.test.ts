@@ -16,7 +16,7 @@ import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGenerato
 import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryFeatureFlagRepository } from "../../../adapters/secondary/InMemoryFeatureFlagRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { InMemorySirenGateway } from "../../../adapters/secondary/siret/InMemorySiretGateway";
+import { InMemorySiretGateway } from "../../../adapters/secondary/siret/InMemorySiretGateway";
 import {
   CreateNewEvent,
   makeCreateNewEvent,
@@ -34,7 +34,7 @@ describe("Add Convention", () => {
   const validConvention = new ConventionDtoBuilder().build();
   const { externalId, ...validConventionParams } = validConvention;
 
-  let sirenGateway: InMemorySirenGateway;
+  let sirenGateway: InMemorySiretGateway;
   let uowPerformer: InMemoryUowPerformer;
 
   beforeEach(() => {
@@ -50,7 +50,7 @@ describe("Add Convention", () => {
       timeGateway,
       uuidGenerator,
     });
-    sirenGateway = new InMemorySirenGateway();
+    sirenGateway = new InMemorySiretGateway();
     uowPerformer = new InMemoryUowPerformer(uow);
     addConvention = new AddConvention(
       uowPerformer,

@@ -7,7 +7,7 @@ import {
   NotFoundError,
   TooManyRequestApiError,
 } from "../../../adapters/primary/helpers/httpErrors";
-import { InMemorySirenGateway } from "../../../adapters/secondary/siret/InMemorySiretGateway";
+import { InMemorySiretGateway } from "../../../adapters/secondary/siret/InMemorySiretGateway";
 import { GetSiret } from "./GetSiret";
 
 const validEstablishment: SiretEstablishmentDto = {
@@ -19,11 +19,11 @@ const validEstablishment: SiretEstablishmentDto = {
 };
 
 describe("GetSiret", () => {
-  let sirenGateway: InMemorySirenGateway;
+  let sirenGateway: InMemorySiretGateway;
   let getSiret: GetSiret;
 
   beforeEach(() => {
-    sirenGateway = new InMemorySirenGateway();
+    sirenGateway = new InMemorySiretGateway();
     getSiret = new GetSiret(sirenGateway);
   });
 
