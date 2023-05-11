@@ -64,7 +64,8 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
         <>
           <strong>
             Attention, le formulaire de demande de convention est déployé
-            uniquement en Bretagne et Pays de Loire
+            uniquement en Bretagne, Pays de Loire, Occitanie et Nouvelle
+            Aquitaine
           </strong>
           <br />
           <p className={fr.cx("fr-text--xs", "fr-mt-1w")}>
@@ -78,14 +79,13 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
             articles L124-3-1, L332-3-1 et L332-3-2 du code de l’éducation et de
             l’article L.4153-1 du code du travail, offrant la possibilité:
             <br />
-            ⦁ aux jeunes des deux derniers niveaux d’enseignement des collèges
-            ou aux jeunes des lycées de réaliser des périodes d’observation en
-            entreprise d’une durée maximale d’une semaine durant les vacances
-            scolaires;
+            ⦁ aux collégiens, à partir de la 4e ou aux jeunes des lycées de
+            réaliser des périodes d’observation en entreprise d’une durée
+            maximale d’une semaine durant les vacances scolaires;
             <br />⦁ aux étudiants de l’enseignement supérieur de réaliser des
-            périodes d’observation en entreprise d’une durée maximale d’une
-            semaine, en dehors des semaines réservées aux cours et au contrôle
-            de connaissances.
+            périodes d’observation en entreprise d’une durée maximale de 5
+            jours, en dehors des semaines réservées aux cours et au contrôle de
+            connaissances.
           </p>
         </>
       ),

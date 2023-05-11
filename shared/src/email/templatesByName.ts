@@ -1107,7 +1107,7 @@ export const templatesByName = createTemplatesByName<EmailParamsByEmailType>({
       Nous confirmons que vous avez signé ${
         internshipKind === "immersion"
           ? "la convention d'immersion professionnelle"
-          : "le mini stage"
+          : "le mini stage dont la référence est :"
       } ${conventionId} le ${
         isStringDate(signedAt)
           ? toDisplayedDate(new Date(signedAt), true)

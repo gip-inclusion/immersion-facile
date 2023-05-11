@@ -636,9 +636,9 @@ export const ConventionDocumentPage = ({
                 <p className={fr.cx("fr-text--xs")}>
                   Article 9 – Durée La présente convention est signée pour la
                   durée de la période d’observation en milieu professionnel, qui
-                  ne peut dépasser une semaine. Article 10 - Protection des
-                  données personnelles Les données personnelles recueillies via
-                  ce formulaire font l'objet, par le Responsable de traitement
+                  ne peut dépasser 5 jours. Article 10 - Protection des données
+                  personnelles Les données personnelles recueillies via ce
+                  formulaire font l'objet, par le Responsable de traitement
                   représenté par la Chambre de Commerce et d’Industrie, d'un
                   traitement informatisé et/ou papier destiné à l’établissement
                   de la convention de stage et à des fins statistiques, et sont
