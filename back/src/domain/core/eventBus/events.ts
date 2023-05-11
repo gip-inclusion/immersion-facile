@@ -1,6 +1,7 @@
 import {
   AgencyDto,
   AgencyId,
+  AgencyRole,
   AuthenticatedUserId,
   ContactEstablishmentRequestDto,
   ConventionDto,
@@ -9,7 +10,6 @@ import {
   FormEstablishmentDto,
   ImmersionAssessmentDto,
   WithConventionId,
-  AgencyRole,
 } from "shared";
 import { RenewMagicLinkPayload } from "../../convention/useCases/notifications/DeliverRenewedMagicLink";
 import { ConventionRequiresModificationPayload } from "../../convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
