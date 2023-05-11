@@ -68,12 +68,14 @@ export class UpdateIcUserRoleForAgency extends TransactionalUseCase<
       ),
     };
 
-    await uow.inclusionConnectedUserRepository.update(updatedUser);
-
     const event: DomainEvent = this.createNewEvent({
       topic: "IcUserAgencyRightChanged",
       payload: params,
     });
-    await uow.outboxRepository.save(event);
+
+    await Promise.all([
+      uow.inclusionConnectedUserRepository.update(updatedUser),
+      uow.outboxRepository.save(event),
+    ]);
   }
 }
