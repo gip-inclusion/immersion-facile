@@ -114,7 +114,7 @@ export class AppConfig {
       variableName: "SIRENE_REPOSITORY",
       authorizedValues: [
         "IN_MEMORY",
-        //"HTTPS", // Deprecated, use Insee instead
+        "HTTPS", // Deprecated, use Insee instead
         "INSEE",
         "ANNUAIRE_DES_ENTREPRISES",
       ],
