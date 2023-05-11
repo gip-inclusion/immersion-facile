@@ -19,12 +19,12 @@ const validEstablishment: SiretEstablishmentDto = {
 };
 
 describe("GetSiret", () => {
-  let sirenGateway: InMemorySiretGateway;
+  let siretGateway: InMemorySiretGateway;
   let getSiret: GetSiret;
 
   beforeEach(() => {
-    sirenGateway = new InMemorySiretGateway();
-    getSiret = new GetSiret(sirenGateway);
+    siretGateway = new InMemorySiretGateway();
+    getSiret = new GetSiret(siretGateway);
   });
 
   describe("checking for business being opened", () => {
@@ -35,8 +35,8 @@ describe("GetSiret", () => {
     };
 
     beforeEach(() => {
-      sirenGateway.setSirenEstablishment(validEstablishment);
-      sirenGateway.setSirenEstablishment(closedEstablishment);
+      siretGateway.setSirenEstablishment(validEstablishment);
+      siretGateway.setSirenEstablishment(closedEstablishment);
     });
 
     it("marks an open establishment as open, regardless of the period count", async () => {
@@ -58,13 +58,13 @@ describe("GetSiret", () => {
     await expectPromiseToFailWithError(
       getSiret.execute({ siret: "40440440440400" }),
       new NotFoundError(
-        "Did not find establishment with siret : 40440440440400 in siren API",
+        "Did not find establishment with siret : 40440440440400 in siret API",
       ),
     );
   });
 
   it("returns unavailable Api error if it gets a 429 from API", async () => {
-    sirenGateway.setError({
+    siretGateway.setError({
       initialError: {
         message: "Request failed with status code 429",
         status: 429,

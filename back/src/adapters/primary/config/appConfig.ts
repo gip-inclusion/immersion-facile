@@ -109,7 +109,7 @@ export class AppConfig {
 
   // == Sirene repository ==
 
-  public get sirenGateway() {
+  public get siretGateway() {
     return this.throwIfNotInArray({
       variableName: "SIRENE_REPOSITORY",
       authorizedValues: [

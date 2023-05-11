@@ -50,7 +50,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
   let formEstablishmentRepo: InMemoryFormEstablishmentRepository;
   let outboxRepo: InMemoryOutboxRepository;
   let establishmentGroupRepository: InMemoryEstablishmentGroupRepository;
-  let sirenGateway: InMemorySiretGateway;
+  let siretGateway: InMemorySiretGateway;
   let uowPerformer: InMemoryUowPerformer;
   let uuidGenerator: TestUuidGenerator;
 
@@ -58,7 +58,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    sirenGateway = new InMemorySiretGateway();
+    siretGateway = new InMemorySiretGateway();
     formEstablishmentRepo = uow.formEstablishmentRepository;
     establishmentGroupRepository = uow.establishmentGroupRepository;
     outboxRepo = uow.outboxRepository;
@@ -79,7 +79,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
     const addFormEstablishment = new AddFormEstablishment(
       uowPerformer,
       createNewEvent,
-      sirenGateway,
+      siretGateway,
     );
 
     addFormEstablishmentBatch = new AddFormEstablishmentBatch(

@@ -45,7 +45,7 @@ const main = async () => {
     timeGateway,
     sleep,
   );
-  const sirenGateway = new InseeSiretGateway(
+  const siretGateway = new InseeSiretGateway(
     config.inseeHttpConfig,
     timeGateway,
     rateLimiter,
@@ -69,7 +69,7 @@ const main = async () => {
   const updateEstablishmentsFromSirenAPI =
     new UpdateEstablishmentsFromSirenApiScript(
       establishmentAggregateRepository,
-      sirenGateway,
+      siretGateway,
       addressAPI,
       new RealTimeGateway(),
     );

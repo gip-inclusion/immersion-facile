@@ -9,8 +9,8 @@ import {
   isSiretExistResponseSchema,
   LegacyHttpClientError,
   LegacyHttpServerError,
-  sirenApiMissingEstablishmentMessage,
-  sirenApiUnavailableSiretErrorMessage,
+  siretApiMissingEstablishmentMessage,
+  siretApiUnavailableSiretErrorMessage,
   SiretDto,
   siretRoute,
   tooManiSirenRequestsSiretErrorMessage,
@@ -103,7 +103,7 @@ export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
 
 const errorMessageByCode: Partial<Record<number, GetSiretInfoError>> = {
   [429]: tooManiSirenRequestsSiretErrorMessage,
-  [503]: sirenApiUnavailableSiretErrorMessage,
-  [404]: sirenApiMissingEstablishmentMessage,
+  [503]: siretApiUnavailableSiretErrorMessage,
+  [404]: siretApiMissingEstablishmentMessage,
   [409]: "Establishment with this siret is already in our DB",
 };
