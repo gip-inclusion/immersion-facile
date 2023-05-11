@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { ConventionReadDto, filterNotUndefined } from "shared";
+import { ConventionReadDto, filterNotFalsy } from "shared";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import {
@@ -34,7 +34,7 @@ export const BeneficiaryRepresentativeFields = ({
     setValue(
       "signatories.beneficiary.emergencyContact",
       [beneficiaryRepresentativeFirstName, beneficiaryRepresentativeLastName]
-        .filter(filterNotUndefined)
+        .filter(filterNotFalsy)
         .join(" ") || undefined,
     );
   }, [beneficiaryRepresentativeFirstName, beneficiaryRepresentativeLastName]);

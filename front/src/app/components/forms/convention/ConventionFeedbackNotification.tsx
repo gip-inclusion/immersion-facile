@@ -3,7 +3,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { values } from "ramda";
 import { useStyles } from "tss-react/dsfr";
 import {
-  filterNotUndefined,
+  filterNotFalsy,
   immersionFacileContactEmail,
   Signatories,
   Signatory,
@@ -60,7 +60,7 @@ export const createConventionFeedbackMessageByKind = (
   justSubmitted: (
     <InitialSubmitSuccessMessageBase>
       {(values(signatories) as Signatory[])
-        .filter(filterNotUndefined)
+        .filter(filterNotFalsy)
         .map(({ role, firstName, lastName }) => (
           <li key={role}>
             {labelByRole[role]}, {firstName} {lastName} doit confirmer et signer
