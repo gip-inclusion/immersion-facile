@@ -1,5 +1,5 @@
 import { Pool } from "pg";
-import { filterNotUndefined } from "shared";
+import { filterNotFalsy } from "shared";
 import { ConventionsReminder } from "../../../domain/convention/useCases/ConventionsReminder";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { createLogger } from "../../../utils/logger";
@@ -50,7 +50,7 @@ handleEndOfScriptNotification(
           ]
         : []),
     ];
-    return reportLines.filter(filterNotUndefined).join("\n");
+    return reportLines.filter(filterNotFalsy).join("\n");
   },
   logger,
 );
