@@ -1,6 +1,6 @@
 import { formatISO, secondsToMilliseconds } from "date-fns";
 import {
-  filterNotUndefined,
+  filterNotFalsy,
   NafDto,
   NumberEmployeesRange,
   propEq,
@@ -167,7 +167,7 @@ const getBusinessName = ({ uniteLegale }: SirenApiRawEstablishment): string => {
   if (denomination) return denomination;
 
   return [uniteLegale.prenomUsuelUniteLegale, uniteLegale.nomUniteLegale]
-    .filter(filterNotUndefined)
+    .filter(filterNotFalsy)
     .join(" ");
 };
 
@@ -192,7 +192,7 @@ const getFormattedAddress = ({
     adresseEtablissement.codePostalEtablissement,
     adresseEtablissement.libelleCommuneEtablissement,
   ]
-    .filter(filterNotUndefined)
+    .filter(filterNotFalsy)
     .join(" ");
 
 const getIsActive = ({

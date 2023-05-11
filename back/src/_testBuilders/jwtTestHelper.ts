@@ -1,6 +1,6 @@
 import {
   CreateConventionMagicLinkPayloadProperties,
-  filterNotUndefined,
+  filterNotFalsy,
 } from "shared";
 import { GenerateConventionMagicLinkUrl } from "../adapters/primary/config/magicLinkUrl";
 import {
@@ -40,7 +40,7 @@ export const fakeGenerateMagicLinkUrlFn: GenerateConventionMagicLinkUrl = ({
     iat,
     version,
   ]
-    .filter(filterNotUndefined)
+    .filter(filterNotFalsy)
     .join("/");
   return `http://fake-magic-link/${targetRoute}/${fakeJwt}`;
 };
