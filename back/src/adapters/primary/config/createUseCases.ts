@@ -28,6 +28,7 @@ import { NotifyAllActorsOfFinalConventionValidation } from "../../../domain/conv
 import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 import { NotifyConventionReminder } from "../../../domain/convention/useCases/notifications/NotifyConventionReminder";
+import { NotifyIcUserAgencyRightChanged } from "../../../domain/convention/useCases/notifications/NotifyIcUserAgencyRightChanged";
 import { NotifyLastSigneeThatConventionHasBeenSigned } from "../../../domain/convention/useCases/notifications/NotifyLastSigneeThatConventionHasBeenSigned";
 import { NotifyNewApplicationNeedsReview } from "../../../domain/convention/useCases/notifications/NotifyNewApplicationNeedsReview";
 import { NotifyToAgencyApplicationSubmitted } from "../../../domain/convention/useCases/notifications/NotifyToAgencyApplicationSubmitted";
@@ -115,7 +116,14 @@ export const createUseCases = (
     ...instantiatedUseCasesFromClasses({
       registerAgencyToInclusionConnectUser:
         new RegisterAgencyToInclusionConnectUser(uowPerformer, createNewEvent),
-      updateIcUserRoleForAgency: new UpdateIcUserRoleForAgency(uowPerformer, createNewEvent),
+      updateIcUserRoleForAgency: new UpdateIcUserRoleForAgency(
+        uowPerformer,
+        createNewEvent,
+      ),
+      notifyIcUserAgencyRightChanged: new NotifyIcUserAgencyRightChanged(
+        uowPerformer,
+        gateways.email,
+      ),
       getIcUsers: new GetInclusionConnectedUsers(uowPerformer),
       getUserAgencyDashboardUrl: new GetInclusionConnectedUser(
         uowPerformer,

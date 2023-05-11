@@ -142,15 +142,14 @@ describe("GetInclusionConnectedUsers", () => {
 
     inclusionConnectedUserRepository.setInclusionConnectedUsers([icUser]);
     const newRole: AgencyRole = "validator";
-
-    await updateIcUserRoleForAgency.execute(
-      {
-        userId: user.id,
-        agencyId: agency.id,
-        role: newRole,
-      },
-      { role: "backOffice" } as BackOfficeJwtPayload,
-    );
+    const IcUserRoleForAgency = {
+      userId: user.id,
+      agencyId: agency.id,
+      role: newRole,
+    };
+    await updateIcUserRoleForAgency.execute(IcUserRoleForAgency, {
+      role: "backOffice",
+    } as BackOfficeJwtPayload);
 
     expect(outboxRepo.events).toHaveLength(1);
 
@@ -158,11 +157,7 @@ describe("GetInclusionConnectedUsers", () => {
       outboxRepo.events[0],
       createNewEvent({
         topic: "IcUserAgencyRightChanged",
-        payload: {
-          userId: user.id,
-          agencyId: agency.id,
-          role: newRole,
-        },
+        payload: IcUserRoleForAgency,
       }),
     );
   });
