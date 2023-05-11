@@ -1,3 +1,4 @@
+import Bottleneck from "bottleneck";
 import { SiretDto, SiretEstablishmentDto } from "shared";
 import { HttpClient } from "http-client";
 import { SiretGateway } from "../../../domain/sirene/ports/SirenGateway";
@@ -6,20 +7,30 @@ import {
   type AnnuaireDesEntreprisesSiretTargets,
 } from "./AnnuaireDesEntreprisesSiretGateway.targets";
 
+const adeMaxQueryPerSeconds = 7;
 export class AnnuaireDesEntreprisesSiretGateway implements SiretGateway {
   constructor(
     private httpClient: HttpClient<AnnuaireDesEntreprisesSiretTargets>,
   ) {}
 
+  private limiter = new Bottleneck({
+    reservoir: adeMaxQueryPerSeconds,
+    reservoirRefreshInterval: 1000, // number of ms
+    reservoirRefreshAmount: adeMaxQueryPerSeconds,
+  });
+
   public async getEstablishmentBySiret(
     siret: SiretDto,
     includeClosedEstablishments = false,
   ): Promise<SiretEstablishmentDto | undefined> {
-    const response = await this.httpClient.search({
-      queryParams: {
-        q: siret,
-      },
-    });
+    // https://api.gouv.fr/les-api/api-recherche-entreprises
+    const response = await this.limiter.schedule(async () =>
+      this.httpClient.search({
+        queryParams: {
+          q: siret,
+        },
+      }),
+    );
     const formattedResult = convertAdeEstablishmentToSirenEstablishmentDto(
       response.responseBody.results[0],
     );
