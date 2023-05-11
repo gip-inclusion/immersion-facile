@@ -5,13 +5,13 @@ import {
 } from "shared";
 import { UseCase } from "../../core/UseCase";
 import { SiretGateway } from "../ports/SirenGateway";
-import { getSirenEstablishmentFromApi } from "../service/getSirenEstablishmentFromApi";
+import { getSiretEstablishmentFromApi } from "../service/getSirenEstablishmentFromApi";
 
 export class GetSiret extends UseCase<
   GetSiretRequestDto,
   SiretEstablishmentDto
 > {
-  constructor(private readonly sirenGateway: SiretGateway) {
+  constructor(private readonly siretGateway: SiretGateway) {
     super();
   }
 
@@ -20,6 +20,6 @@ export class GetSiret extends UseCase<
   public async _execute(
     params: GetSiretRequestDto,
   ): Promise<SiretEstablishmentDto> {
-    return getSirenEstablishmentFromApi(params, this.sirenGateway);
+    return getSiretEstablishmentFromApi(params, this.siretGateway);
   }
 }

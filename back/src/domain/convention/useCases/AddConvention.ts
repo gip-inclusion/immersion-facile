@@ -21,7 +21,7 @@ export class AddConvention extends TransactionalUseCase<
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly createNewEvent: CreateNewEvent,
-    private readonly sirenGateway: SiretGateway,
+    private readonly siretGateway: SiretGateway,
   ) {
     super(uowPerformer);
   }
@@ -44,7 +44,7 @@ export class AddConvention extends TransactionalUseCase<
     const featureFlags = await uow.featureFlagRepository.getAll();
     if (featureFlags.enableInseeApi) {
       await rejectsSiretIfNotAnOpenCompany(
-        this.sirenGateway,
+        this.siretGateway,
         createConventionParams.siret,
       );
     }

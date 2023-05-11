@@ -1,10 +1,10 @@
 import { expectToEqual } from "shared";
 import {
   convertSirenRawEstablishmentToSirenEstablishmentDto,
-  SirenApiRawEstablishment,
+  InseeApiRawEstablishment,
 } from "./InseeSiretGateway";
 
-const validEstablishment: SirenApiRawEstablishment = {
+const validEstablishment: InseeApiRawEstablishment = {
   siret: "12345678901234",
   uniteLegale: {
     denominationUniteLegale: "MA P'TITE BOITE",
@@ -29,7 +29,7 @@ const validEstablishment: SirenApiRawEstablishment = {
 };
 
 describe("convertSirenRawEstablishmentToSirenEstablishmentDto", () => {
-  const closedEstablishment: SirenApiRawEstablishment = {
+  const closedEstablishment: InseeApiRawEstablishment = {
     ...validEstablishment,
     uniteLegale: {
       ...validEstablishment.uniteLegale,

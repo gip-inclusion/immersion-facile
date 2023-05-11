@@ -96,7 +96,7 @@ export const createGateways = async (config: AppConfig) => {
     emailGateway: config.emailGateway,
     repositories: config.repositories,
     romeRepository: config.romeRepository,
-    sirenGateway: config.sirenGateway,
+    siretGateway: config.siretGateway,
     apiAddress: config.apiAddress,
   });
 
@@ -157,7 +157,7 @@ export const createGateways = async (config: AppConfig) => {
           )
         : new InMemoryPoleEmploiGateway(),
     timeGateway,
-    siren: getSiretGateway(config.sirenGateway, config, timeGateway),
+    siret: getSiretGateway(config.siretGateway, config, timeGateway),
     shortLinkGenerator:
       config.shortLinkIdGeneratorGateway === "NANO_ID"
         ? new NanoIdShortLinkIdGeneratorGateway()
@@ -166,7 +166,7 @@ export const createGateways = async (config: AppConfig) => {
 };
 
 const getSiretGateway = (
-  provider: AppConfig["sirenGateway"],
+  provider: AppConfig["siretGateway"],
   config: AppConfig,
   timeGateway: TimeGateway,
 ) => {

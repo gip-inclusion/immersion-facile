@@ -30,7 +30,7 @@ const freeQuarantinedFormEstablishmentsWithCorrectSiret = async () => {
   });
   const client = await pool.connect();
 
-  const sirenGateway = new InseeSiretGateway(
+  const siretGateway = new InseeSiretGateway(
     config.inseeHttpConfig,
     timeGateway,
     new QpsRateLimiter(maxQpsSireneApi, timeGateway, sleep),
@@ -50,7 +50,7 @@ const freeQuarantinedFormEstablishmentsWithCorrectSiret = async () => {
     `Found ${quarantinedFormEstablishmentAddedResult.rowCount} events with topic 'FormEstablishmentAdded' in quarantined.`,
   );
   for (const { payload, id } of quarantinedFormEstablishmentAddedResult.rows) {
-    const siretIsCorrect = !!(await sirenGateway.getEstablishmentBySiret(
+    const siretIsCorrect = !!(await siretGateway.getEstablishmentBySiret(
       payload.siret,
     ));
     if (siretIsCorrect) {

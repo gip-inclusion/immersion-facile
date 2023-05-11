@@ -2,20 +2,20 @@ import { GetSiretRequestDto, SiretEstablishmentDto } from "shared";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { SiretGateway } from "../ports/SirenGateway";
 
-export const getSirenEstablishmentFromApi = async (
+export const getSiretEstablishmentFromApi = async (
   { siret, includeClosedEstablishments }: GetSiretRequestDto,
-  sirenGateway: SiretGateway,
+  siretGateway: SiretGateway,
 ): Promise<SiretEstablishmentDto> => {
-  const sirenEstablishment = await sirenGateway.getEstablishmentBySiret(
+  const siretEstablishment = await siretGateway.getEstablishmentBySiret(
     siret,
     includeClosedEstablishments,
   );
 
-  if (!sirenEstablishment) {
+  if (!siretEstablishment) {
     throw new NotFoundError(
-      `Did not find establishment with siret : ${siret} in siren API`,
+      `Did not find establishment with siret : ${siret} in siret API`,
     );
   }
 
-  return sirenEstablishment;
+  return siretEstablishment;
 };

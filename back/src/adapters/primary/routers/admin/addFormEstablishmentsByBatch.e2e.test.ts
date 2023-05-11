@@ -48,7 +48,7 @@ describe("POST /add-form-establishment-batch", () => {
     const formEstablishment1: FormEstablishmentDto =
       FormEstablishmentDtoBuilder.valid().build();
 
-    gateways.siren.setSirenEstablishment({
+    gateways.siret.setSirenEstablishment({
       ...TEST_ESTABLISHMENT1,
       siret: formEstablishment1.siret,
     });

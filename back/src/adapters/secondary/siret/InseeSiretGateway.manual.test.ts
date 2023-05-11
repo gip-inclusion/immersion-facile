@@ -14,11 +14,11 @@ import { InseeSiretGateway } from "./InseeSiretGateway";
 // - SIRENE_ENDPOINT
 // - SIRENE_BEARER_TOKEN
 describe("HttpSirenGateway", () => {
-  let sirenGateway: SiretGateway;
+  let siretGateway: SiretGateway;
 
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
-    sirenGateway = new InseeSiretGateway(
+    siretGateway = new InseeSiretGateway(
       config.inseeHttpConfig,
       new RealTimeGateway(),
       noRateLimit,
@@ -28,7 +28,7 @@ describe("HttpSirenGateway", () => {
 
   it("returns open establishments", async () => {
     // ETABLISSEMENT PUBLIC DU MUSEE DU LOUVRE (should be active)
-    const response = await sirenGateway.getEstablishmentBySiret(
+    const response = await siretGateway.getEstablishmentBySiret(
       "18004623700012",
     );
     expectObjectsToMatch(response, { siret: "18004623700012" });
@@ -36,7 +36,7 @@ describe("HttpSirenGateway", () => {
 
   it("filters out closed establishments", async () => {
     // SOCIETE TEXTILE D'HENIN LIETARD, closed in 1966.
-    const response = await sirenGateway.getEstablishmentBySiret(
+    const response = await siretGateway.getEstablishmentBySiret(
       "38961161700017",
     );
     expect(response).toBeUndefined();

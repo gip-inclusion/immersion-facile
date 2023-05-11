@@ -4,9 +4,9 @@ import {
   apiSirenUnexpectedError,
   conflictErrorSiret,
   GetSiretInfo,
-  sirenApiMissingEstablishmentMessage,
-  sirenApiUnavailableSiretErrorMessage,
-  sirenApiUnexpectedErrorErrorMessage,
+  siretApiMissingEstablishmentMessage,
+  siretApiUnavailableSiretErrorMessage,
+  siretApiUnexpectedErrorErrorMessage,
   SiretDto,
   SiretEstablishmentDto,
   siretSchema,
@@ -54,12 +54,12 @@ export class SimulatedSiretGatewayThroughBack
     if (siret === tooManySirenRequestsSiret)
       return tooManiSirenRequestsSiretErrorMessage;
     if (siret === apiSirenNotAvailableSiret)
-      return sirenApiUnavailableSiretErrorMessage;
+      return siretApiUnavailableSiretErrorMessage;
     if (siret === conflictErrorSiret)
       return "Establishment with this siret is already in our DB";
     if (siret === apiSirenUnexpectedError)
-      throw new Error(sirenApiUnexpectedErrorErrorMessage);
+      throw new Error(siretApiUnexpectedErrorErrorMessage);
     const establishment = this.sireneEstablishments[siret];
-    return establishment || sirenApiMissingEstablishmentMessage;
+    return establishment || siretApiMissingEstablishmentMessage;
   }
 }

@@ -22,7 +22,7 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
 > {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly sirenGateway: SiretGateway,
+    private readonly siretGateway: SiretGateway,
     private readonly addressAPI: AddressGateway,
     private readonly uuidGenerator: UuidGenerator,
     private readonly timeGateway: TimeGateway,
@@ -48,7 +48,7 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
 
     const establishmentAggregate =
       await makeFormEstablishmentToEstablishmentAggregate({
-        sirenGateway: this.sirenGateway,
+        siretGateway: this.siretGateway,
         addressGateway: this.addressAPI,
         uuidGenerator: this.uuidGenerator,
         timeGateway: this.timeGateway,

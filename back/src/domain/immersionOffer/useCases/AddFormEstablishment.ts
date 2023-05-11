@@ -13,7 +13,7 @@ export class AddFormEstablishment extends TransactionalUseCase<
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private createNewEvent: CreateNewEvent,
-    private readonly sirenGateway: SiretGateway,
+    private readonly siretGateway: SiretGateway,
   ) {
     super(uowPerformer);
   }
@@ -36,7 +36,7 @@ export class AddFormEstablishment extends TransactionalUseCase<
     }
 
     if (featureFlags.enableInseeApi) {
-      await rejectsSiretIfNotAnOpenCompany(this.sirenGateway, dto.siret);
+      await rejectsSiretIfNotAnOpenCompany(this.siretGateway, dto.siret);
     }
 
     const appellations = await uow.romeRepository.getFullAppellationsFromCodes(

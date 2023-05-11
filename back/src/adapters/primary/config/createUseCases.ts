@@ -103,7 +103,7 @@ export const createUseCases = (
   const addFormEstablishment = new AddFormEstablishment(
     uowPerformer,
     createNewEvent,
-    gateways.siren,
+    gateways.siret,
   );
 
   const generateConventionMagicLinkUrl = makeGenerateConventionMagicLinkUrl(
@@ -172,7 +172,7 @@ export const createUseCases = (
       addConvention: new AddConvention(
         uowPerformer,
         createNewEvent,
-        gateways.siren,
+        gateways.siret,
       ),
       getConvention: new GetConvention(uowPerformer),
       linkPoleEmploiAdvisorAndRedirectToConvention:
@@ -244,7 +244,7 @@ export const createUseCases = (
       insertEstablishmentAggregateFromForm:
         new InsertEstablishmentAggregateFromForm(
           uowPerformer,
-          gateways.siren,
+          gateways.siret,
           gateways.addressApi,
           uuidGenerator,
           gateways.timeGateway,
@@ -277,10 +277,10 @@ export const createUseCases = (
         ),
 
       // siret
-      getSiret: new GetSiret(gateways.siren),
+      getSiret: new GetSiret(gateways.siret),
       getSiretIfNotAlreadySaved: new GetSiretIfNotAlreadySaved(
         uowPerformer,
-        gateways.siren,
+        gateways.siret,
       ),
 
       // romes

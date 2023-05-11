@@ -9,13 +9,13 @@ import { InMemorySiretGateway } from "../../../adapters/secondary/siret/InMemory
 import { GetSiretIfNotAlreadySaved } from "./GetSiretIfNotAlreadySaved";
 
 describe("GetSiretIfNotAlreadySaved", () => {
-  let sirenGateway: InMemorySiretGateway;
+  let siretGateway: InMemorySiretGateway;
   let getSiretIfNotAlreadySaved: GetSiretIfNotAlreadySaved;
   let uowPerformer: InMemoryUowPerformer;
   let establishmentAggregateRepo: InMemoryEstablishmentAggregateRepository;
 
   beforeEach(() => {
-    sirenGateway = new InMemorySiretGateway();
+    siretGateway = new InMemorySiretGateway();
     establishmentAggregateRepo = new InMemoryEstablishmentAggregateRepository();
     uowPerformer = new InMemoryUowPerformer({
       ...createInMemoryUow(),
@@ -23,7 +23,7 @@ describe("GetSiretIfNotAlreadySaved", () => {
     });
     getSiretIfNotAlreadySaved = new GetSiretIfNotAlreadySaved(
       uowPerformer,
-      sirenGateway,
+      siretGateway,
     );
   });
 
@@ -48,7 +48,7 @@ describe("GetSiretIfNotAlreadySaved", () => {
   it("returns the establishment info if not already in DB", async () => {
     const siretAlreadyInDb = "11112222000033";
     establishmentAggregateRepo.establishmentAggregates = [];
-    const sirenRawEstablishment = new SirenEstablishmentDtoBuilder()
+    const siretRawEstablishment = new SirenEstablishmentDtoBuilder()
       .withSiret(siretAlreadyInDb)
       .withBusinessAddress("20 AVENUE DE SEGUR 75007 PARIS 7")
       .withBusinessName("MA P'TITE BOITE 2")
@@ -56,7 +56,7 @@ describe("GetSiretIfNotAlreadySaved", () => {
       .withIsActive(true)
       .withNumberEmployeesRange("1-2")
       .build();
-    sirenGateway.setSirenEstablishment(sirenRawEstablishment);
+    siretGateway.setSirenEstablishment(siretRawEstablishment);
 
     const response = await getSiretIfNotAlreadySaved.execute({
       siret: siretAlreadyInDb,
