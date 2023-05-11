@@ -171,6 +171,13 @@ const getSiretGateway = (
   timeGateway: TimeGateway,
 ) => {
   const gatewayByProvider = {
+    HTTPS: () =>
+      new InseeSiretGateway(
+        config.inseeHttpConfig,
+        timeGateway,
+        noRateLimit,
+        noRetries,
+      ),
     INSEE: () =>
       new InseeSiretGateway(
         config.inseeHttpConfig,
