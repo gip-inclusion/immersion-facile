@@ -243,4 +243,7 @@ export type EmailParamsByEmailType = {
     businessName: string;
     agencyLogoUrl: AbsoluteUrl | undefined;
   };
+  IC_USER_RIGHTS_HAS_CHANGED: {
+    agencyName: string;
+  };
 };
