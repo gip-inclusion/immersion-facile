@@ -8,6 +8,7 @@ const featureFlags = [
   "enablePeConventionBroadcast",
   "enableTemporaryOperation",
   "enableMaxContactPerWeek",
+  "enableMaintenance",
 ] as const;
 
 export type FeatureFlags = Record<FeatureFlag, boolean>;
@@ -19,6 +20,7 @@ export const featureFlagsSchema: z.Schema<FeatureFlags> = z.object({
   enablePeConventionBroadcast: z.boolean(),
   enableTemporaryOperation: z.boolean(),
   enableMaxContactPerWeek: z.boolean(),
+  enableMaintenance: z.boolean(),
 });
 
 export type SetFeatureFlagParams = { flagName: FeatureFlag; value: boolean };

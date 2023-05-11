@@ -10,7 +10,6 @@ import {
 } from "shared";
 import { ContactEntity } from "../../../domain/immersionOffer/entities/ContactEntity";
 import {
-  DataSource,
   EstablishmentAggregate,
   EstablishmentEntity,
 } from "../../../domain/immersionOffer/entities/EstablishmentEntity";
@@ -25,8 +24,6 @@ import { NotFoundError } from "../../primary/helpers/httpErrors";
 import { optional } from "./pgUtils";
 
 const logger = createLogger(__filename);
-
-export type PgDataSource = "api_labonneboite" | "form";
 
 const offersEqual = (a: ImmersionOfferEntityV2, b: ImmersionOfferEntityV2) =>
   // Only compare romeCode and appellationCode
@@ -138,7 +135,6 @@ export class PgEstablishmentAggregateRepository
       establishment.numberEmployeesRange,
       establishment.nafDto.code,
       establishment.nafDto.nomenclature,
-      establishment.dataSource,
       establishment.sourceProvider,
       convertPositionToStGeography(establishment.position),
       establishment.position.lon,
@@ -157,7 +153,7 @@ export class PgEstablishmentAggregateRepository
       const query = fixStGeographyEscapingInQuery(
         format(
           `INSERT INTO establishments (
-          siret, name, customized_name, website, additional_information, street_number_and_address, post_code, city, department_code, number_employees, naf_code, naf_nomenclature, data_source, source_provider, gps, lon, lat, update_date, is_active, is_searchable, is_commited, fit_for_disabled_workers, max_contacts_per_week 
+          siret, name, customized_name, website, additional_information, street_number_and_address, post_code, city, department_code, number_employees, naf_code, naf_nomenclature, source_provider, gps, lon, lat, update_date, is_active, is_searchable, is_commited, fit_for_disabled_workers, max_contacts_per_week 
         ) VALUES %L
         ON CONFLICT
           ON CONSTRAINT establishments_pkey
@@ -170,17 +166,9 @@ export class PgEstablishmentAggregateRepository
                 department_code=EXCLUDED.department_code,
                 number_employees=EXCLUDED.number_employees,
                 naf_code=EXCLUDED.naf_code,
-                data_source=EXCLUDED.data_source,
                 fit_for_disabled_workers=EXCLUDED.fit_for_disabled_workers,
                 max_contacts_per_week=EXCLUDED.max_contacts_per_week
-              WHERE
-                EXCLUDED.data_source='form'
-                OR (
-                  establishments.data_source != 'form'
-                  AND (
-                    establishments.data_source = 'api_labonneboite'
-                  )
-                )`,
+              `,
           establishmentFields,
         ),
       );
@@ -353,23 +341,20 @@ export class PgEstablishmentAggregateRepository
 
     const selectedOffersSubQuery = format(
       `WITH active_establishments_within_area AS 
-        (SELECT siret, fit_for_disabled_workers, (data_source = 'form')::boolean AS voluntary_to_immersion, gps
-         FROM establishments WHERE is_active AND is_searchable AND ST_DWithin(gps, ST_GeographyFromText($1), $2) ${filterOnVoluntaryToImmersion(
-           searchMade.voluntaryToImmersion,
-         )}),
+        (SELECT siret, fit_for_disabled_workers, gps
+         FROM establishments WHERE is_active AND is_searchable AND ST_DWithin(gps, ST_GeographyFromText($1), $2)),
         matching_offers AS (
           SELECT 
             aewa.siret, rome_code, prd.libelle_rome AS rome_label, ST_Distance(gps, ST_GeographyFromText($1)) AS distance_m,
             COALESCE(JSON_AGG(DISTINCT libelle_appellation_long) FILTER (WHERE libelle_appellation_long IS NOT NULL), '[]') AS appellation_labels,
             MAX(created_at) AS max_created_at, 
-            voluntary_to_immersion,
             fit_for_disabled_workers
           FROM active_establishments_within_area aewa 
             LEFT JOIN immersion_offers io ON io.siret = aewa.siret 
             LEFT JOIN public_appellations_data pad ON io.rome_appellation = pad.ogr_appellation
             LEFT JOIN public_romes_data prd ON io.rome_code = prd.code_rome
             ${searchMade.rome ? "WHERE rome_code = %1$L" : ""}
-            GROUP BY(aewa.siret, aewa.gps, aewa.voluntary_to_immersion, aewa.fit_for_disabled_workers, io.rome_code, prd.libelle_rome)
+            GROUP BY(aewa.siret, aewa.gps, aewa.fit_for_disabled_workers, io.rome_code, prd.libelle_rome)
           )
         SELECT *, (ROW_NUMBER () OVER (${sortExpression}))::integer as row_number from matching_offers ${sortExpression}
         LIMIT $3`,
@@ -387,20 +372,8 @@ export class PgEstablishmentAggregateRepository
     return immersionSearchResultDtos.map((dto) => ({
       ...dto,
       contactDetails: withContactDetails ? dto.contactDetails : undefined,
+      voluntaryToImmersion: true,
     }));
-  }
-
-  public async getActiveEstablishmentSiretsFromLaBonneBoiteNotUpdatedSince(
-    since: Date,
-  ): Promise<string[]> {
-    const query = `
-      SELECT siret FROM establishments
-      WHERE is_active AND 
-      data_source = 'api_labonneboite' AND
-      (update_date IS NULL OR 
-       update_date < $1)`;
-    const pgResult = await this.client.query(query, [since.toISOString()]);
-    return pgResult.rows.map((row) => row.siret);
   }
 
   public async getSiretsOfEstablishmentsWithRomeCode(
@@ -523,17 +496,15 @@ export class PgEstablishmentAggregateRepository
     await this.client.query(formatedQuery);
   }
 
-  public async hasEstablishmentFromFormWithSiret(
-    siret: string,
-  ): Promise<boolean> {
+  public async hasEstablishmentWithSiret(siret: string): Promise<boolean> {
     const pgResult = await this.client.query(
-      `SELECT EXISTS (SELECT 1 FROM establishments WHERE siret = $1 AND data_source='form');`,
+      `SELECT EXISTS (SELECT 1 FROM establishments WHERE siret = $1);`,
       [siret],
     );
     return pgResult.rows[0].exists;
   }
 
-  public async getOffersAsAppelationDtoForFormEstablishment(
+  public async getOffersAsAppellationDtoEstablishment(
     siret: string,
   ): Promise<AppellationDto[]> {
     const pgResult = await this.client.query(
@@ -573,32 +544,6 @@ export class PgEstablishmentAggregateRepository
     const { contactDetails, ...searchResultWithoutContactDetails } =
       immersionSearchResultDtos[0];
     return searchResultWithoutContactDetails;
-  }
-
-  public async groupEstablishmentSiretsByDataSource(
-    sirets: SiretDto[],
-  ): Promise<Record<DataSource, SiretDto[]>> {
-    if (!sirets.length)
-      return {
-        api_labonneboite: [],
-        form: [],
-      };
-
-    const query = format(
-      `
-      WITH grouped_sirets AS (SELECT data_source, JSONB_AGG(siret) AS sirets
-              FROM establishments
-              WHERE siret IN (%1$L)
-              GROUP BY data_source) 
-      SELECT JSONB_OBJECT_AGG(data_source, sirets) AS sirets_by_data_source FROM grouped_sirets`,
-      sirets,
-    );
-    const pgResult = await this.client.query(query);
-    const row = pgResult.rows[0].sirets_by_data_source;
-    return {
-      api_labonneboite: row?.api_labonneboite ?? [],
-      form: row?.form ?? [],
-    };
   }
 
   public async createImmersionOffersToEstablishments(
@@ -652,6 +597,7 @@ export class PgEstablishmentAggregateRepository
         fitForDisabledWorkers: optional(
           row.search_immersion_result.fitForDisabledWorkers,
         ),
+        voluntaryToImmersion: true,
       }),
     );
   }
@@ -694,56 +640,35 @@ export class PgEstablishmentAggregateRepository
         SELECT 
           JSON_STRIP_NULLS(
             JSON_BUILD_OBJECT(
-              'establishment', 
-              JSON_BUILD_OBJECT(
-                'siret', 
-                e.siret, 
-                'name', 
-                e.name, 
-                'customizedName', 
-                e.customized_name, 
-                'website', 
-                e.website, 
-                'additionalInformation', 
-                e.additional_information, 
-                'address', 
-                JSON_BUILD_OBJECT(
+              'establishment', JSON_BUILD_OBJECT(
+                'siret', e.siret, 
+                'name', e.name, 
+                'customizedName', e.customized_name, 
+                'website', e.website, 
+                'additionalInformation', e.additional_information, 
+                'address', JSON_BUILD_OBJECT(
                   'streetNumberAndAddress', e.street_number_and_address, 
-                  'postcode', e.post_code, 'city', 
-                  e.city, 'departmentCode', e.department_code
+                  'postcode', e.post_code,
+                  'city', e.city,
+                  'departmentCode', e.department_code
+                ),  
+                'sourceProvider', e.source_provider, 
+                'position', JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat), 
+                'nafDto', JSON_BUILD_OBJECT(
+                  'code', e.naf_code, 
+                  'nomenclature', e.naf_nomenclature
                 ), 
-                'voluntaryToImmersion', 
-                e.data_source = 'form', 
-                'dataSource', 
-                e.data_source, 
-                'sourceProvider', 
-                e.source_provider, 
-                'position', 
-                JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat), 
-                'nafDto', 
-                JSON_BUILD_OBJECT(
-                  'code', e.naf_code, 'nomenclature', 
-                  e.naf_nomenclature
-                ), 
-                'numberEmployeesRange', 
-                e.number_employees, 
-                'updatedAt', 
-                to_char(
+                'numberEmployeesRange', e.number_employees, 
+                'updatedAt', to_char(
                   e.update_date::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'
                 ), 
-                'isActive', 
-                e.is_active, 
-                'isSearchable', 
-                e.is_searchable, 
-                'isCommited', 
-                e.is_commited, 
-                'maxContactsPerWeek', 
-                e.max_contacts_per_week
+                'isActive', e.is_active, 
+                'isSearchable', e.is_searchable, 
+                'isCommited', e.is_commited, 
+                'maxContactsPerWeek', e.max_contacts_per_week
               ), 
-              'immersionOffers', 
-              io.immersionOffers, 
-              'contact', 
-              JSON_BUILD_OBJECT(
+              'immersionOffers', io.immersionOffers, 
+              'contact', JSON_BUILD_OBJECT(
                 'id', ic.uuid, 'firstName', ic.firstname, 
                 'lastName', ic.lastname, 'job', ic.job, 
                 'contactMethod', ic.contact_mode, 
@@ -770,6 +695,7 @@ export class PgEstablishmentAggregateRepository
           updatedAt: aggregateWithStringDates.establishment.updatedAt
             ? new Date(aggregateWithStringDates.establishment.updatedAt)
             : undefined,
+          voluntaryToImmersion: true,
         },
         immersionOffers: aggregateWithStringDates.immersionOffers.map(
           (immersionOfferWithStringDate: any) => ({
@@ -821,21 +747,14 @@ const reStGeographyFromText =
 const fixStGeographyEscapingInQuery = (query: string) =>
   query.replace(reStGeographyFromText, "ST_GeographyFromText('POINT($1 $3)')");
 
-const filterOnVoluntaryToImmersion = (voluntaryToImmersion?: boolean) => {
-  if (voluntaryToImmersion === undefined) return "";
-
-  return voluntaryToImmersion
-    ? "AND data_source = 'form'"
-    : "AND data_source != 'form'";
-};
 const makeOrderByStatement = (sortedBy?: SearchSortedBy): string => {
   switch (sortedBy) {
     case "distance":
-      return "ORDER BY voluntary_to_immersion DESC, distance_m ASC, RANDOM()";
+      return "ORDER BY distance_m ASC, RANDOM()";
     case "date":
-      return "ORDER BY voluntary_to_immersion DESC, max_created_at DESC, RANDOM()";
+      return "ORDER BY max_created_at DESC, RANDOM()";
     default: // undefined
-      return "ORDER BY voluntary_to_immersion DESC, RANDOM()";
+      return "ORDER BY RANDOM()";
   }
 };
 const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
@@ -853,7 +772,6 @@ const makeSelectImmersionSearchResultDtoQueryGivenSelectedOffersSubQuery = (
       'website', e.website, 
       'additionalInformation', e.additional_information, 
       'customizedName', e.customized_name, 
-      'voluntaryToImmersion', e.data_source = 'form',
       'fitForDisabledWorkers', e.fit_for_disabled_workers,
       'position', JSON_BUILD_OBJECT('lon', e.lon, 'lat', e.lat), 
       'romeLabel', io.rome_label,

@@ -1,6 +1,8 @@
 import {
   AddressDto,
   ApiConsumer,
+  expectArraysToEqualIgnoringOrder,
+  expectArraysToMatch,
   SearchImmersionQueryParamsDto,
   SearchImmersionResultDto,
 } from "shared";
@@ -11,15 +13,16 @@ import {
   EstablishmentEntityBuilder,
 } from "../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { LaBonneBoiteCompanyVOBuilder } from "../../../_testBuilders/LaBonneBoiteCompanyVOBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import {
-  InMemoryEstablishmentAggregateRepository,
   TEST_APPELLATION_LABEL,
   TEST_NAF_LABEL,
   TEST_POSITION,
   TEST_ROME_LABEL,
 } from "../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
+import { InMemoryLaBonneBoiteAPI } from "../../../adapters/secondary/immersionOffer/laBonneBoite/InMemoryLaBonneBoiteAPI";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { SearchMadeEntity } from "../entities/SearchMadeEntity";
 import { SearchImmersion } from "./SearchImmersion";
@@ -41,20 +44,16 @@ const rueSaintHonore: AddressDto = {
   departmentCode: "75",
 };
 
-const insertLBBAggregate = async (
-  establishmentAggregateRepository: InMemoryEstablishmentAggregateRepository,
-) =>
-  establishmentAggregateRepository.insertEstablishmentAggregates([
-    new EstablishmentAggregateBuilder()
-      .withEstablishment(
-        new EstablishmentEntityBuilder()
-          .withDataSource("api_labonneboite")
-          .build(),
-      )
-      .build(),
-  ]);
+const lbbCompanyVO = new LaBonneBoiteCompanyVOBuilder()
+  .withSiret("11114444222233")
+  .withRome(secretariatRome)
+  .withDistance(1)
+  .build();
+
+const siretOfFormCompany = "78000403200019";
 
 const prepareSearchableData = async () => {
+  const laBonneBoiteAPI = new InMemoryLaBonneBoiteAPI([lbbCompanyVO]);
   const uow = createInMemoryUow();
   const establishmentAggregateRepository = uow.establishmentAggregateRepository;
   const searchMadeRepository = uow.searchMadeRepository;
@@ -63,19 +62,18 @@ const prepareSearchableData = async () => {
 
   const searchImmersion = new SearchImmersion(
     new InMemoryUowPerformer(uow),
+    laBonneBoiteAPI,
     uuidGenerator,
   );
-  const siret = "78000403200019";
 
   const establishment = new EstablishmentEntityBuilder()
-    .withSiret(siret)
+    .withSiret(siretOfFormCompany)
     .withAddress({
       streetNumberAndAddress: "55 Rue du Faubourg Saint-Honoré",
       postcode: "75001",
       city: "Paris",
       departmentCode: "75",
     })
-    .withDataSource("form")
     .withNumberOfEmployeeRange("20-49")
     .withWebsite("www.website.com")
     .build();
@@ -114,6 +112,7 @@ const prepareSearchableData = async () => {
     searchMadeRepository,
     establishmentAggregateRepository,
     uuidGenerator,
+    laBonneBoiteAPI,
   };
 };
 
@@ -172,10 +171,72 @@ describe("SearchImmersionUseCase", () => {
       website: "www.website.com",
     });
   });
+
+  it("gets both form and LBB establishments if voluntaryToImmersion is not provided", async () => {
+    const { searchImmersion } = await prepareSearchableData();
+
+    const response = await searchImmersion.execute({
+      ...searchInMetzParams,
+      sortedBy: "distance",
+      rome: secretariatRome,
+    });
+
+    expect(response).toHaveLength(2);
+
+    expectArraysToEqualIgnoringOrder(response, [
+      {
+        additionalInformation: "",
+        address: {
+          city: "Paris",
+          departmentCode: "75",
+          postcode: "75001",
+          streetNumberAndAddress: "55 Rue du Faubourg Saint-Honoré",
+        },
+        appellationLabels: ["test_appellation_label"],
+        contactMode: "EMAIL",
+        customizedName: undefined,
+        distance_m: 606885,
+        naf: "7820Z",
+        nafLabel: "test_naf_label",
+        name: "Company inside repository",
+        numberOfEmployeeRange: "20-49",
+        position: { lat: 43.8666, lon: 8.3333 },
+        rome: "M1607",
+        romeLabel: "test_rome_label",
+        siret: "78000403200019",
+        voluntaryToImmersion: true,
+        website: "www.website.com",
+      },
+      {
+        additionalInformation: "",
+        address: {
+          city: "SEREMANGE-ERZANGE",
+          departmentCode: "57",
+          postcode: "57290",
+          streetNumberAndAddress:
+            "Service des ressources humaines,  IMPASSE FENDERIE",
+        },
+        appellationLabels: [],
+        customizedName: "",
+        distance_m: 1000,
+        fitForDisabledWorkers: false,
+        naf: "8810C",
+        nafLabel: "",
+        name: "BLANCHISSERIE LA FENSCH",
+        numberOfEmployeeRange: "",
+        position: { lat: 49.3225, lon: 6.08067 },
+        rome: "M1607",
+        romeLabel: "Some label",
+        siret: "11114444222233",
+        urlOfPartner: "",
+        voluntaryToImmersion: false,
+        website: "",
+      },
+    ]);
+  });
+
   it("gets only form establishments if voluntaryToImmersion is true", async () => {
-    const { searchImmersion, establishmentAggregateRepository } =
-      await prepareSearchableData();
-    await insertLBBAggregate(establishmentAggregateRepository);
+    const { searchImmersion } = await prepareSearchableData();
 
     const response = await searchImmersion.execute({
       ...searchInMetzParams,
@@ -187,20 +248,71 @@ describe("SearchImmersionUseCase", () => {
     expect(response[0].voluntaryToImmersion).toBe(true);
     expect(response[1].voluntaryToImmersion).toBe(true);
   });
-  it("gets only lbb establishments if voluntarytoImmersion is false", async () => {
-    const { searchImmersion, establishmentAggregateRepository } =
-      await prepareSearchableData();
 
-    await insertLBBAggregate(establishmentAggregateRepository);
+  it("gets only the closest LBB establishments if voluntaryToImmersion is false, and do not query results from DB", async () => {
+    const { searchImmersion, laBonneBoiteAPI } = await prepareSearchableData();
+
+    const range = 10;
+    const companyInRange = new LaBonneBoiteCompanyVOBuilder()
+      .withSiret("22220000000022")
+      .withRome(secretariatRome)
+      .withDistance(range - 5)
+      .build();
+    const companyJustInRange = new LaBonneBoiteCompanyVOBuilder()
+      .withSiret("33330000000033")
+      .withRome(secretariatRome)
+      .withDistance(range)
+      .build();
+    const companyJustOutOfRange = new LaBonneBoiteCompanyVOBuilder()
+      .withSiret("44440000000044")
+      .withRome(secretariatRome)
+      .withDistance(range + 1)
+      .build();
+    const companyFarAway = new LaBonneBoiteCompanyVOBuilder()
+      .withSiret("55550000000055")
+      .withRome(secretariatRome)
+      .withDistance(range + 80)
+      .build();
+
+    laBonneBoiteAPI.setNextResults([
+      companyInRange,
+      companyJustInRange,
+      companyJustOutOfRange,
+      companyFarAway,
+    ]);
 
     const response = await searchImmersion.execute({
       ...searchInMetzParams,
+      rome: secretariatRome,
       sortedBy: "distance",
       voluntaryToImmersion: false,
+      distance_km: range,
+    });
+
+    expect(response).toHaveLength(2);
+    expectArraysToMatch(
+      response.map(({ siret }) => siret),
+      [companyInRange.siret, companyJustInRange.siret],
+    );
+  });
+
+  it("gets only the form result if a company with same siret is also in LBB results", async () => {
+    const { searchImmersion, laBonneBoiteAPI } = await prepareSearchableData();
+    const lbbCompanyWithSameSiret = new LaBonneBoiteCompanyVOBuilder()
+      .withSiret(siretOfFormCompany)
+      .withRome(secretariatRome)
+      .build();
+
+    laBonneBoiteAPI.setNextResults([lbbCompanyWithSameSiret]);
+
+    const response = await searchImmersion.execute({
+      ...searchInMetzParams,
+      rome: secretariatRome,
+      sortedBy: "distance",
     });
 
     expect(response).toHaveLength(1);
-    expect(response[0].voluntaryToImmersion).toBe(false);
+    expect(response[0].voluntaryToImmersion).toBe(true);
   });
 
   describe("authenticated with api key", () => {
@@ -208,7 +320,7 @@ describe("SearchImmersionUseCase", () => {
       const { searchImmersion } = await prepareSearchableData();
 
       const authenticatedResponse = await searchImmersion.execute(
-        searchSecretariatInMetzRequestDto,
+        { ...searchSecretariatInMetzRequestDto, voluntaryToImmersion: true },
         authenticatedApiConsumerPayload,
       );
 
@@ -237,9 +349,10 @@ describe("SearchImmersionUseCase", () => {
     it("Search immersion, and do NOT provide contact details", async () => {
       const { searchImmersion } = await prepareSearchableData();
 
-      const unauthenticatedResponse = await searchImmersion.execute(
-        searchSecretariatInMetzRequestDto,
-      );
+      const unauthenticatedResponse = await searchImmersion.execute({
+        ...searchSecretariatInMetzRequestDto,
+        voluntaryToImmersion: true,
+      });
 
       expectSearchResponseToMatch(unauthenticatedResponse, [
         {

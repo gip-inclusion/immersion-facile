@@ -4,6 +4,7 @@ import {
   ConventionDto,
   conventionSchema,
   CreateConventionMagicLinkPayloadProperties,
+  filterNotFalsy,
   frontRoutes,
   Signatory,
   TemplatedEmail,
@@ -53,7 +54,7 @@ export class ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignatu
       throw new Error(`Missing agency with id ${convention.agencyId}`);
 
     for (const signatory of values(convention.signatories).filter(
-      filterNotUndefined,
+      filterNotFalsy,
     )) {
       await this.emailGateway.sendEmail(
         await this.makeEmail(signatory, convention, agency, uow),
@@ -115,5 +116,3 @@ export class ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignatu
     };
   }
 }
-
-const filterNotUndefined = <T>(arg: T | undefined): arg is T => !!arg;

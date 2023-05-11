@@ -2,6 +2,7 @@ import * as dotenv from "dotenv";
 import { trim } from "ramda";
 import {
   AbsoluteUrl,
+  filterNotFalsy,
   inclusionConnectImmersionTargets,
   makeGetBooleanVariable,
   makeThrowIfNotAbsoluteUrl,
@@ -361,7 +362,7 @@ export class AppConfig {
 
   public get quarantinedTopics(): DomainTopic[] {
     return parseStringList(this.env.QUARANTINED_TOPICS).filter(
-      (el) => !!el,
+      filterNotFalsy,
     ) as DomainTopic[];
   }
 
@@ -402,10 +403,7 @@ const parseInteger = (str: string | undefined, defaultValue: number): number =>
 
 // Format: <string>,<string>,...
 const parseStringList = (str: string | undefined, separator = ","): string[] =>
-  (str || "")
-    .split(separator)
-    .map(trim)
-    .filter((el) => !!el);
+  (str || "").split(separator).map(trim).filter(filterNotFalsy);
 
 // Email allow list from env variable
 export const makeEmailAllowListPredicate = ({

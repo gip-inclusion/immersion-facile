@@ -15,6 +15,7 @@ const labelsByFeatureFlag: Record<FeatureFlag, string> = {
   enableTemporaryOperation: "Activer l'offre temporaire",
   enableMaxContactPerWeek:
     "Activer le nombre de mise en contact maximum par semaine sur le formulaire entreprise",
+  enableMaintenance: "Activer le mode maintenance",
 };
 
 export const TechnicalOptions = () => {

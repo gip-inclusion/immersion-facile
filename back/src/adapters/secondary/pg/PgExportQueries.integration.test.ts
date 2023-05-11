@@ -64,7 +64,7 @@ describe("PgExportQueries", () => {
 
   describe("Export view_establishments_with_flatten_offers", () => {
     describe("No filter specified", () => {
-      it("Retrieves all establishments exports where data_source = form", async () => {
+      it("Retrieves all establishments exports", async () => {
         // Prepare
         const aggregates = [
           establishmentAggregateArtusInterim(),
@@ -351,7 +351,6 @@ const establishmentAggregateArtusInterim = (): EstablishmentAggregate => ({
       departmentCode: "85",
     })
     .withName("ARTUS INTERIM LA ROCHE SUR YON")
-    .withDataSource("form")
     .withSourceProvider("immersion-facile")
     .withNafDto({ code: "7820Z", nomenclature: "NAFRev2" })
     .withNumberOfEmployeeRange("250-499")
@@ -381,7 +380,6 @@ const establishmentAggregateMiniWorldLyon = (): EstablishmentAggregate => ({
     .withSiret("79341726200037")
     .withAddress(rueJacquardDto)
     .withName("MINI WORLD LYON")
-    .withDataSource("form")
     .withSourceProvider("cci")
     .withNafDto({ code: "9321Z", nomenclature: "NAFRev2" })
     .withNumberOfEmployeeRange("250-499")

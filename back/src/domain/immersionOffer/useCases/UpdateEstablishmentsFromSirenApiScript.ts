@@ -1,6 +1,6 @@
-import { addDays } from "date-fns";
+// import { addDays } from "date-fns";
 import { z } from "zod";
-import { AddressAndPosition } from "shared";
+import { AddressAndPosition, SiretDto } from "shared";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
 import { createLogger } from "../../../utils/logger";
 import { TimeGateway } from "../../core/ports/TimeGateway";
@@ -10,10 +10,11 @@ import { getSirenEstablishmentFromApi } from "../../sirene/service/getSirenEstab
 import { AddressGateway } from "../ports/AddressGateway";
 import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
 
-const SIRENE_NB_DAYS_BEFORE_REFRESH = 7;
+// const SIRENE_NB_DAYS_BEFORE_REFRESH = 7;
 
 const logger = createLogger(__filename);
 
+// This use case is kept as inspiration for when we'll need to update establishments from SIREN API (ours not LBB)
 export class UpdateEstablishmentsFromSirenApiScript extends UseCase<
   void,
   number
@@ -30,14 +31,14 @@ export class UpdateEstablishmentsFromSirenApiScript extends UseCase<
   inputSchema = z.void();
 
   public async _execute() {
-    const since = addDays(
-      this.timeGateway.now(),
-      -SIRENE_NB_DAYS_BEFORE_REFRESH,
-    );
-    const establishmentSiretsToUpdate =
-      await this.establishmentAggregateRepository.getActiveEstablishmentSiretsFromLaBonneBoiteNotUpdatedSince(
-        since,
-      );
+    // const since = addDays(
+    //   this.timeGateway.now(),
+    //   -SIRENE_NB_DAYS_BEFORE_REFRESH,
+    // );
+    const establishmentSiretsToUpdate: SiretDto[] = [];
+    // await this.establishmentAggregateRepository.getActiveEstablishmentSiretsFromLaBonneBoiteNotUpdatedSince(
+    //   since,
+    // );
 
     logger.info(
       `Found ${establishmentSiretsToUpdate.length} establishments to update`,

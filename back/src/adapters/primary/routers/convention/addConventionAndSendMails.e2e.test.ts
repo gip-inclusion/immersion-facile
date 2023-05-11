@@ -1,5 +1,6 @@
 import supertest from "supertest";
 import {
+  AgencyDtoBuilder,
   ConventionDto,
   ConventionDtoBuilder,
   conventionsRoute,
@@ -46,6 +47,8 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       "shortLink2",
       "shortLink3",
       "shortLink4",
+      "shortLink5",
+      "shortLink6",
     ]);
 
     const res = await request
@@ -92,16 +95,24 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       .withoutDateValidation()
       .withFederatedIdentity({ provider: "peConnect", token: "fake" })
       .build();
+    const agency = new AgencyDtoBuilder()
+      .withId(initialConvention.agencyId)
+      .withValidatorEmails(["validator@mail.com"])
+      .build();
+
     const appAndDeps = await buildTestApp();
-    const [agency] = await appAndDeps.inMemoryUow.agencyRepository.getByIds([
-      initialConvention.agencyId,
+    appAndDeps.gateways.shortLinkGenerator.addMoreShortLinkIds([
+      "link1",
+      "link2",
+      "link3",
+      "link4",
+      "link5",
+      "link6",
+      "link7",
+      "link8",
     ]);
 
-    if (!agency) throw new Error("Test agency not found with this id");
-
-    appAndDeps.inMemoryUow.agencyRepository.setAgencies([
-      { ...agency, validatorEmails: ["validator@mail.com"] },
-    ]);
+    appAndDeps.inMemoryUow.agencyRepository.setAgencies([agency]);
 
     const { beneficiarySignJwt, establishmentSignJwt } =
       await beneficiarySubmitsApplicationForTheFirstTime(
@@ -291,10 +302,14 @@ const establishmentSignsApplication = async (
     "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
   );
   expect(needsReviewEmail.recipients).toEqual([validatorEmail]);
+
+  const validateMagicLink = await shortLinkRedirectToLinkWithValidation(
+    needsReviewEmail.params.magicLink,
+    request,
+  );
+
   return {
-    validatorReviewJwt: expectJwtInMagicLinkAndGetIt(
-      needsReviewEmail.params.magicLink,
-    ),
+    validatorReviewJwt: expectJwtInMagicLinkAndGetIt(validateMagicLink),
   };
 };
 
@@ -308,6 +323,7 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
   };
 
   gateways.timeGateway.setNextDate(validationDate);
+  gateways.shortLinkGenerator.addMoreShortLinkIds(["shortlinkId"]);
 
   await request
     .post(`/auth/${updateConventionStatusRoute}/${initialConvention.id}`)
@@ -333,16 +349,23 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
   await eventCrawler.processNewEvents();
   const sentEmails = gateways.email.getSentEmails();
   expect(sentEmails).toHaveLength(numberOfEmailInitialySent + 2);
-  const needsToTriggerConventionSentEmail = sentEmails[sentEmails.length - 1];
-  expectTypeToMatchAndEqual(
-    needsToTriggerConventionSentEmail.type,
+  const needsToTriggerConventionSentEmail = expectEmailOfType(
+    sentEmails[sentEmails.length - 1],
     "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
   );
+
   expect(needsToTriggerConventionSentEmail.recipients).toEqual([
     "beneficiary@email.fr",
     "establishment@example.com",
     validatorEmail,
   ]);
+
+  const conventionDocumentLink = await shortLinkRedirectToLinkWithValidation(
+    needsToTriggerConventionSentEmail.params.magicLink,
+    request,
+  );
+
+  expectJwtInMagicLinkAndGetIt(conventionDocumentLink);
 };
 
 const makeSignatories = (

@@ -8,6 +8,7 @@ import {
   agencySchema,
   AgencyStatus,
   DepartmentCode,
+  filterNotFalsy,
   GeoPositionDto,
   GetAgenciesFilter,
   PartialAgencyDto,
@@ -98,7 +99,7 @@ export class PgAgencyRepository implements AgencyRepository {
       makeAgencyKindFiterSQL(filters.kind),
       makePositionFiterSQL(filters.position),
       makeStatusFilterSQL(filters.status),
-    ].filter((clause) => !!clause);
+    ].filter(filterNotFalsy);
 
     const whereClause =
       filtersSQL.length > 0 ? `WHERE ${filtersSQL.join(" AND ")}` : "";

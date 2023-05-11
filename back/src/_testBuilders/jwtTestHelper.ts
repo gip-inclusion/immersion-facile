@@ -1,4 +1,7 @@
-import { CreateConventionMagicLinkPayloadProperties } from "shared";
+import {
+  CreateConventionMagicLinkPayloadProperties,
+  filterNotFalsy,
+} from "shared";
 import { GenerateConventionMagicLinkUrl } from "../adapters/primary/config/magicLinkUrl";
 import {
   GenerateConventionJwt,
@@ -20,7 +23,24 @@ export const fakeGenerateMagicLinkUrlFn: GenerateConventionMagicLinkUrl = ({
   email,
   id,
   now,
+  exp,
+  durationDays,
+  iat,
+  version,
   role,
   targetRoute,
-}: CreateConventionMagicLinkPayloadProperties & { targetRoute: string }) =>
-  `http://fake-magic-link/${id}/${targetRoute}/${role}/${now.toISOString()}/${email}`;
+}: CreateConventionMagicLinkPayloadProperties & { targetRoute: string }) => {
+  const fakeJwt = [
+    id,
+    role,
+    now.toISOString(),
+    email,
+    exp,
+    durationDays,
+    iat,
+    version,
+  ]
+    .filter(filterNotFalsy)
+    .join("/");
+  return `http://fake-magic-link/${targetRoute}/${fakeJwt}`;
+};

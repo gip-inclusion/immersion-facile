@@ -198,7 +198,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
         candidateQuery: "Uzerche",
         expectedSearchResult: [
           {
-            label: "Uzerche, Corrèze, France",
+            label: "Uzerche, Nouvelle-Aquitaine, France",
             position: {
               lat: 45.42433,
               lon: 1.56373,
@@ -212,8 +212,8 @@ describe("HttpOpenCageDataAddressGateway", () => {
           {
             label: "Paris, Île-de-France, France",
             position: {
-              lat: 48.85889,
-              lon: 2.32004,
+              lat: 48.8535,
+              lon: 2.34839,
             },
           },
           {
@@ -231,7 +231,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
             },
           },
           {
-            label: "Paris-l'Hôpital, Saône-et-Loire, France",
+            label: "Paris-l'Hôpital, Bourgogne-Franche-Comté, France",
             position: {
               lat: 46.91503,
               lon: 4.63302,
@@ -293,28 +293,28 @@ describe("HttpOpenCageDataAddressGateway", () => {
         candidateQuery: "bar",
         expectedSearchResult: [
           {
-            label: "Baralle, Pas-de-Calais, France",
+            label: "Baralle, Hauts-de-France, France",
             position: {
               lat: 50.21132,
               lon: 3.05763,
             },
           },
           {
-            label: "Barastre, Pas-de-Calais, France",
+            label: "Barastre, Hauts-de-France, France",
             position: {
               lat: 50.07605,
               lon: 2.93402,
             },
           },
           {
-            label: "Barly, Pas-de-Calais, France",
+            label: "Barly, Hauts-de-France, France",
             position: {
               lat: 50.25129,
               lon: 2.54786,
             },
           },
           {
-            label: "Barlin, Pas-de-Calais, France",
+            label: "Barlin, Hauts-de-France, France",
             position: {
               lat: 50.45684,
               lon: 2.61748,
@@ -328,35 +328,35 @@ describe("HttpOpenCageDataAddressGateway", () => {
             },
           },
           {
-            label: "Barenton-sur-Serre, Aisne, France",
+            label: "Barenton-sur-Serre, Hauts-de-France, France",
             position: {
               lat: 49.66996,
               lon: 3.68137,
             },
           },
           {
-            label: "Barenton-Bugny, Aisne, France",
+            label: "Barenton-Bugny, Hauts-de-France, France",
             position: {
               lat: 49.6335,
               lon: 3.6524,
             },
           },
           {
-            label: "Barenton-Cel, Aisne, France",
+            label: "Barenton-Cel, Hauts-de-France, France",
             position: {
               lat: 49.6425,
               lon: 3.6536,
             },
           },
           {
-            label: "Barzy-en-Thiérache, Aisne, France",
+            label: "Barzy-en-Thiérache, Hauts-de-France, France",
             position: {
               lat: 50.04389,
               lon: 3.74694,
             },
           },
           {
-            label: "Barzy-sur-Marne, Aisne, France",
+            label: "Barzy-sur-Marne, Hauts-de-France, France",
             position: {
               lat: 49.08648,
               lon: 3.55282,
@@ -400,7 +400,7 @@ describe("HttpOpenCageDataAddressGateway check parrarel call", () => {
         lon: resultFromApiAddress.features[0].position.coordinates[0],
       });
       expectedResults.push({
-        streetNumberAndAddress: "Rue Gaston Romazzotti",
+        streetNumberAndAddress: "14 Rue Gaston Romazzotti",
         city: "Molsheim",
         departmentCode: "67",
         postcode: "67120",

@@ -51,7 +51,6 @@ import { UploadLogo } from "../../../domain/generic/fileManagement/useCases/Uplo
 import { GetSentEmails } from "../../../domain/generic/notifications/useCases/GetSentEmails";
 import { AddFormEstablishment } from "../../../domain/immersionOffer/useCases/AddFormEstablishment";
 import { AddFormEstablishmentBatch } from "../../../domain/immersionOffer/useCases/AddFormEstablismentsBatch";
-import { CallLaBonneBoiteAndUpdateRepositories } from "../../../domain/immersionOffer/useCases/CallLaBonneBoiteAndUpdateRepositories";
 import { ContactEstablishment } from "../../../domain/immersionOffer/useCases/ContactEstablishment";
 import { EditFormEstablishment } from "../../../domain/immersionOffer/useCases/EditFormEstablishment";
 import { GetImmersionOfferById } from "../../../domain/immersionOffer/useCases/GetImmersionOfferById";
@@ -116,7 +115,10 @@ export const createUseCases = (
     ...instantiatedUseCasesFromClasses({
       registerAgencyToInclusionConnectUser:
         new RegisterAgencyToInclusionConnectUser(uowPerformer, createNewEvent),
-      updateIcUserRoleForAgency: new UpdateIcUserRoleForAgency(uowPerformer, createNewEvent),
+      updateIcUserRoleForAgency: new UpdateIcUserRoleForAgency(
+        uowPerformer,
+        createNewEvent,
+      ),
       getIcUsers: new GetInclusionConnectedUsers(uowPerformer),
       getUserAgencyDashboardUrl: new GetInclusionConnectedUser(
         uowPerformer,
@@ -211,10 +213,16 @@ export const createUseCases = (
         gateways.email,
         gateways.timeGateway,
         generateConventionMagicLinkUrl,
+        gateways.shortLinkGenerator,
+        config,
       ),
 
       // immersionOffer
-      searchImmersion: new SearchImmersion(uowPerformer, uuidGenerator),
+      searchImmersion: new SearchImmersion(
+        uowPerformer,
+        gateways.laBonneBoiteAPI,
+        uuidGenerator,
+      ),
       getOffersByGroupSlug: new GetOffersByGroupSlug(uowPerformer),
       getImmersionOfferById: new GetImmersionOfferById(uowPerformer),
       getImmersionOfferBySiretAndRome: new GetImmersionOfferBySiretAndRome(
@@ -254,12 +262,6 @@ export const createUseCases = (
           uowPerformer,
           gateways.timeGateway,
           uuidGenerator,
-        ),
-      callLaBonneBoiteAndUpdateRepositories:
-        new CallLaBonneBoiteAndUpdateRepositories(
-          uowPerformer,
-          gateways.laBonneBoiteAPI,
-          gateways.timeGateway,
         ),
       requestEditFormEstablishment: new RequestEditFormEstablishment(
         uowPerformer,
@@ -323,18 +325,24 @@ export const createUseCases = (
           gateways.email,
           generateConventionMagicLinkUrl,
           gateways.timeGateway,
+          gateways.shortLinkGenerator,
+          config,
         ),
       notifyNewConventionNeedsReview: new NotifyNewApplicationNeedsReview(
         uowPerformer,
         gateways.email,
         generateConventionMagicLinkUrl,
         gateways.timeGateway,
+        gateways.shortLinkGenerator,
+        config,
       ),
       notifyToAgencyConventionSubmitted: new NotifyToAgencyApplicationSubmitted(
         uowPerformer,
         gateways.email,
         generateConventionMagicLinkUrl,
         gateways.timeGateway,
+        gateways.shortLinkGenerator,
+        config,
       ),
       notifyBeneficiaryAndEnterpriseThatConventionIsRejected:
         new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
@@ -389,9 +397,7 @@ export const createUseCases = (
         }),
       isFormEstablishmentWithSiretAlreadySaved: (siret: SiretDto) =>
         uowPerformer.perform((uow) =>
-          uow.establishmentAggregateRepository.hasEstablishmentFromFormWithSiret(
-            siret,
-          ),
+          uow.establishmentAggregateRepository.hasEstablishmentWithSiret(siret),
         ),
       getImmersionFacileAgencyIdByKind: (_: void) =>
         uowPerformer.perform(async (uow) => {

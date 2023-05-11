@@ -1,8 +1,11 @@
+import { filter, map, prop } from "ramda";
 import {
   ApiConsumer,
+  pipeWithValue,
   SearchImmersionQueryParamsDto,
   searchImmersionQueryParamsSchema,
   SearchImmersionResultDto,
+  SiretDto,
 } from "shared";
 import { histogramSearchImmersionStoredCount } from "../../../utils/counters";
 import { createLogger } from "../../../utils/logger";
@@ -10,6 +13,11 @@ import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/ports/UuidGenerator";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { SearchMade, SearchMadeEntity } from "../entities/SearchMadeEntity";
+import {
+  LaBonneBoiteAPI,
+  LaBonneBoiteRequestParams,
+} from "../ports/LaBonneBoiteAPI";
+import { LaBonneBoiteCompanyVO } from "../valueObjects/LaBonneBoiteCompanyVO";
 
 const logger = createLogger(__filename);
 
@@ -20,6 +28,7 @@ export class SearchImmersion extends TransactionalUseCase<
 > {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
+    private readonly laBonneBoiteAPI: LaBonneBoiteAPI,
     private readonly uuidGenerator: UuidGenerator,
   ) {
     super(uowPerformer);
@@ -53,6 +62,20 @@ export class SearchImmersion extends TransactionalUseCase<
 
     await uow.searchMadeRepository.insertSearchMade(searchMadeEntity);
 
+    const lbbSearchResults = shouldFetchLBB(
+      params.rome,
+      params.voluntaryToImmersion,
+    )
+      ? await this.getSearchResultsFromLBB({
+          rome: params.rome,
+          lat: params.latitude,
+          lon: params.longitude,
+          distanceKm: params.distance_km,
+        })
+      : [];
+
+    if (params.voluntaryToImmersion === false) return lbbSearchResults;
+
     const resultsFromStorage =
       await uow.establishmentAggregateRepository.getSearchImmersionResultDtoFromSearchMade(
         {
@@ -68,6 +91,43 @@ export class SearchImmersion extends TransactionalUseCase<
       "searchImmersionStored",
     );
 
-    return resultsFromStorage;
+    const isSiretAlreadyInStoredResults = <T extends { siret: SiretDto }>({
+      siret,
+    }: T) => !resultsFromStorage.map(prop("siret")).includes(siret);
+
+    return [
+      ...resultsFromStorage,
+      ...lbbSearchResults.filter(isSiretAlreadyInStoredResults),
+    ];
+  }
+
+  private async getSearchResultsFromLBB(
+    params: LaBonneBoiteRequestParams & { distanceKm: number },
+  ): Promise<SearchImmersionResultDto[]> {
+    return pipeWithValue(
+      await this.laBonneBoiteAPI.searchCompanies(params),
+      filter<LaBonneBoiteCompanyVO>(
+        (company) =>
+          company.isCompanyRelevant() &&
+          company.props.distance <= params.distanceKm,
+      ),
+      deduplicateOnSiret,
+      map((company) => company.toSearchResult()),
+    );
   }
 }
+
+// first occurrence of a company is kept
+const deduplicateOnSiret = <T extends { siret: SiretDto }>(
+  companies: T[],
+): T[] => {
+  const sirets = companies.map((company) => company.siret);
+  return companies.filter(
+    (company, companyIndex) => sirets.indexOf(company.siret) === companyIndex,
+  );
+};
+
+const shouldFetchLBB = (
+  rome: string | undefined,
+  voluntaryToImmersion?: boolean | undefined,
+): rome is string => !!rome && voluntaryToImmersion !== true;

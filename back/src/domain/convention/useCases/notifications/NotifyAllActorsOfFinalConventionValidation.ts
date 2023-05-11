@@ -3,17 +3,19 @@ import {
   AgencyDto,
   ConventionDto,
   conventionSchema,
-  CreateConventionMagicLinkPayloadProperties,
   displayEmergencyContactInfos,
   frontRoutes,
 } from "shared";
+import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
+import { ShortLinkIdGeneratorGateway } from "../../../core/ports/ShortLinkIdGeneratorGateway";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
+import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../peConnect/dto/PeConnect.dto";
 import { EmailGateway } from "../../ports/EmailGateway";
@@ -22,8 +24,10 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly emailGateway: EmailGateway,
-    private readonly generateMagicLinkFn: GenerateConventionMagicLinkUrl,
+    private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     private readonly timeGateway: TimeGateway,
+    private readonly shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
+    private readonly config: AppConfig,
   ) {
     super(uowPerformer);
   }
@@ -58,25 +62,35 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
           ? [convention.establishmentTutor.email]
           : []),
       ],
-      params: this.getValidatedConventionFinalConfirmationParams(
+      params: await this.getValidatedConventionFinalConfirmationParams(
         agency,
         convention,
+        uow,
       ),
     });
   }
-  private getValidatedConventionFinalConfirmationParams(
+  private async getValidatedConventionFinalConfirmationParams(
     agency: AgencyDto,
     convention: ConventionDto,
+    uow: UnitOfWork,
   ) {
     const { beneficiary, beneficiaryRepresentative } = convention.signatories;
-    const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties = {
-      id: convention.id,
-      // role and email should not be valid
-      role: beneficiary.role,
-      email: beneficiary.email,
-      now: this.timeGateway.now(),
-      exp: this.timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365, // 1 year
-    };
+
+    const makeMagicShortLink = prepareMagicShortLinkMaker({
+      conventionMagicLinkPayload: {
+        id: convention.id,
+        // role and email should not be valid
+        role: beneficiary.role,
+        email: beneficiary.email,
+        now: this.timeGateway.now(),
+        exp: this.timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365, // 1 year
+      },
+      uow,
+      config: this.config,
+      generateConventionMagicLinkUrl: this.generateConventionMagicLinkUrl,
+      shortLinkIdGeneratorGateway: this.shortLinkIdGeneratorGateway,
+    });
+
     return {
       internshipKind: convention.internshipKind,
 
@@ -96,10 +110,7 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
         beneficiary,
       }),
       agencyLogoUrl: agency.logoUrl,
-      magicLink: this.generateMagicLinkFn({
-        ...magicLinkCommonFields,
-        targetRoute: frontRoutes.conventionDocument,
-      }),
+      magicLink: await makeMagicShortLink(frontRoutes.conventionDocument),
     };
   }
 }

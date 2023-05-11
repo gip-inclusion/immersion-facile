@@ -4,6 +4,7 @@ import {
   ConventionDtoBuilder,
   immersionFacileContactEmail,
 } from "shared";
+import { AppConfigBuilder } from "../../_testBuilders/AppConfigBuilder";
 import { generateConventionJwtTestFn } from "../../_testBuilders/jwtTestHelper";
 import {
   AppConfig,
@@ -19,6 +20,7 @@ import { CustomTimeGateway } from "../../adapters/secondary/core/TimeGateway/Cus
 import { SendinblueHtmlEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueHtmlEmailGateway";
 import { sendinblueHtmlEmailGatewayTargets } from "../../adapters/secondary/emailGateway/SendinblueHtmlEmailGateway.targets";
 import { InMemoryUowPerformer } from "../../adapters/secondary/InMemoryUowPerformer";
+import { DeterministShortLinkIdGeneratorGateway } from "../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { NotifyNewApplicationNeedsReview } from "../../domain/convention/useCases/notifications/NotifyNewApplicationNeedsReview";
 import { TimeGateway } from "../../domain/core/ports/TimeGateway";
 
@@ -42,8 +44,11 @@ describe("Notify To 2 Counsellors that an application is available", () => {
   let generateMagicLinkFn: GenerateConventionMagicLinkUrl;
   let agency;
   let timeGateway: TimeGateway;
+  let shortlinkGateway = new DeterministShortLinkIdGeneratorGateway();
+  const config = new AppConfigBuilder().build();
 
   beforeEach(() => {
+    shortlinkGateway = new DeterministShortLinkIdGeneratorGateway();
     const config = AppConfig.createFromEnv();
     emailGw = new SendinblueHtmlEmailGateway(
       configureCreateHttpClientForExternalApi()(
@@ -53,7 +58,7 @@ describe("Notify To 2 Counsellors that an application is available", () => {
         skipEmailAllowList: config.skipEmailAllowlist,
         emailAllowList: config.emailAllowList,
       }),
-      config.apiKeySendinblue,
+      config.apiKeySendinblue + "wrong",
       {
         name: "Immersion Facilitée",
         email: immersionFacileContactEmail,
@@ -85,6 +90,8 @@ describe("Notify To 2 Counsellors that an application is available", () => {
       emailGw,
       generateMagicLinkFn,
       timeGateway,
+      shortlinkGateway,
+      config,
     );
     await notifyNewApplicationNeedsReview.execute(validConvention);
   });
@@ -112,6 +119,8 @@ describe("Notify To 2 Counsellors that an application is available", () => {
       emailGw,
       generateMagicLinkFn,
       timeGateway,
+      shortlinkGateway,
+      config,
     );
     await notifyNewApplicationNeedsReview.execute(validConvention);
   });
@@ -136,6 +145,8 @@ describe("Notify To 2 Counsellors that an application is available", () => {
       emailGw,
       generateMagicLinkFn,
       timeGateway,
+      shortlinkGateway,
+      config,
     );
     await notifyNewApplicationNeedsReview.execute(validConvention);
   });

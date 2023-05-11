@@ -33,6 +33,7 @@ import { InMemoryEmailValidationGateway } from "../../secondary/emailValidationG
 import { InMemoryAccessTokenGateway } from "../../secondary/immersionOffer/InMemoryAccessTokenGateway";
 import { HttpLaBonneBoiteAPI } from "../../secondary/immersionOffer/laBonneBoite/HttpLaBonneBoiteAPI";
 import { InMemoryLaBonneBoiteAPI } from "../../secondary/immersionOffer/laBonneBoite/InMemoryLaBonneBoiteAPI";
+import { createLbbTargets } from "../../secondary/immersionOffer/laBonneBoite/LaBonneBoiteTargets";
 import { HttpPassEmploiGateway } from "../../secondary/immersionOffer/passEmploi/HttpPassEmploiGateway";
 import { InMemoryPassEmploiGateway } from "../../secondary/immersionOffer/passEmploi/InMemoryPassEmploiGateway";
 import { HttpPoleEmploiGateway } from "../../secondary/immersionOffer/poleEmploi/HttpPoleEmploiGateway";
@@ -129,11 +130,13 @@ export const createGateways = async (config: AppConfig) => {
     laBonneBoiteAPI:
       config.laBonneBoiteGateway === "HTTPS"
         ? new HttpLaBonneBoiteAPI(
-            config.peApiUrl,
+            configureCreateHttpClientForExternalApi(
+              axios.create({
+                timeout: config.externalAxiosTimeout,
+              }),
+            )(createLbbTargets(config.peApiUrl)),
             cachingAccessTokenGateway,
             config.poleEmploiClientId,
-            noRateLimit,
-            noRetries,
           )
         : new InMemoryLaBonneBoiteAPI(),
     passEmploiGateway:

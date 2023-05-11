@@ -3,18 +3,19 @@ import {
   AgencyDtoBuilder,
   ConventionDto,
   ConventionDtoBuilder,
-  CreateConventionMagicLinkPayloadProperties,
   displayEmergencyContactInfos,
   expectToEqual,
   expectTypeToMatchAndEqual,
   frontRoutes,
   reasonableSchedule,
 } from "shared";
+import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import {
   expectEmailFinalValidationConfirmationMatchingConvention,
   getValidatedConventionFinalConfirmationParams,
 } from "../../../../_testBuilders/emailAssertions";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
+import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
@@ -22,6 +23,8 @@ import {
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
+import { makeShortLinkUrl } from "../../../core/ShortLink";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../peConnect/dto/PeConnect.dto";
 import { NotifyAllActorsOfFinalConventionValidation } from "./NotifyAllActorsOfFinalConventionValidation";
 
@@ -36,23 +39,31 @@ const validatorEmail = "myValidator@mail.com";
 const defaultAgency = AgencyDtoBuilder.create(validConvention.agencyId)
   .withValidatorEmails([validatorEmail])
   .build();
-
+const shortLinkId = "shortLink1";
 describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email to all actors", () => {
   let uow: InMemoryUnitOfWork;
-  let emailGw: InMemoryEmailGateway;
-  let timeGw: CustomTimeGateway;
+  let emailGateway: InMemoryEmailGateway;
+  let timeGateway: CustomTimeGateway;
   let notifyAllActorsOfFinalConventionValidation: NotifyAllActorsOfFinalConventionValidation;
+  let config: AppConfig;
 
   beforeEach(() => {
+    config = new AppConfigBuilder({}).build();
     uow = createInMemoryUow();
-    emailGw = new InMemoryEmailGateway();
-    timeGw = new CustomTimeGateway();
+    emailGateway = new InMemoryEmailGateway();
+    timeGateway = new CustomTimeGateway();
+    const shortLinkIdGeneratorGateway =
+      new DeterministShortLinkIdGeneratorGateway();
+    shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
+
     notifyAllActorsOfFinalConventionValidation =
       new NotifyAllActorsOfFinalConventionValidation(
         new InMemoryUowPerformer(uow),
-        emailGw,
+        emailGateway,
         fakeGenerateMagicLinkUrlFn,
-        timeGw,
+        timeGateway,
+        shortLinkIdGeneratorGateway,
+        config,
       );
   });
 
@@ -72,11 +83,11 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
         counsellorEmail,
         validatorEmail,
       ],
-      emailGw.getSentEmails(),
+      emailGateway.getSentEmails(),
       agency,
       validConvention,
-      fakeGenerateMagicLinkUrlFn,
-      timeGw,
+      config,
+      shortLinkId,
     );
   });
 
@@ -116,11 +127,11 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
         counsellorEmail,
         validatorEmail,
       ],
-      emailGw.getSentEmails(),
+      emailGateway.getSentEmails(),
       agency,
       conventionWithBeneficiaryCurrentEmployer,
-      fakeGenerateMagicLinkUrlFn,
-      timeGw,
+      config,
+      shortLinkId,
     );
   });
 
@@ -148,11 +159,11 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
         validatorEmail,
         conventionWithSpecificEstablishementEmail.establishmentTutor.email,
       ],
-      emailGw.getSentEmails(),
+      emailGateway.getSentEmails(),
       agency,
       validConvention,
-      fakeGenerateMagicLinkUrlFn,
-      timeGw,
+      config,
+      shortLinkId,
     );
   });
 
@@ -187,11 +198,11 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
         counsellorEmail,
         validatorEmail,
       ],
-      emailGw.getSentEmails(),
+      emailGateway.getSentEmails(),
       agency,
       conventionWithBeneficiaryRepresentative,
-      fakeGenerateMagicLinkUrlFn,
-      timeGw,
+      config,
+      shortLinkId,
     );
   });
   it("With PeConnect Federated identity: beneficiary, establishment tutor, agency counsellor & validator, and dedicated advisor", async () => {
@@ -220,6 +231,17 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
 
     await notifyAllActorsOfFinalConventionValidation.execute(validConvention);
 
+    expectToEqual(uow.shortLinkQuery.getShortLinks(), {
+      [shortLinkId]: fakeGenerateMagicLinkUrlFn({
+        id: validConvention.id,
+        role: validConvention.signatories.beneficiary.role,
+        email: validConvention.signatories.beneficiary.email,
+        now: timeGateway.now(),
+        exp: timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365, // 1 year
+        targetRoute: frontRoutes.conventionDocument,
+      }),
+    });
+
     expectEmailFinalValidationConfirmationMatchingConvention(
       [
         validConvention.signatories.beneficiary.email,
@@ -228,11 +250,11 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
         validatorEmail,
         userConventionAdvisor.advisor!.email,
       ],
-      emailGw.getSentEmails(),
+      emailGateway.getSentEmails(),
       agency,
       validConvention,
-      fakeGenerateMagicLinkUrlFn,
-      timeGw,
+      config,
+      shortLinkId,
     );
   });
   it("With PeConnect Federated identity: beneficiary, establishment tutor, agency counsellor & validator, and no advisor", async () => {
@@ -263,11 +285,11 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
         counsellorEmail,
         validatorEmail,
       ],
-      emailGw.getSentEmails(),
+      emailGateway.getSentEmails(),
       agency,
       validConvention,
-      fakeGenerateMagicLinkUrlFn,
-      timeGw,
+      config,
+      shortLinkId,
     );
   });
 });
@@ -278,6 +300,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
     .withQuestionnaireUrl("testQuestionnaireUrl")
     .withSignature("testSignature")
     .build();
+  const config = new AppConfigBuilder({}).build();
 
   it("simple convention", () => {
     const convention = new ConventionDtoBuilder()
@@ -291,19 +314,12 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
     const magicLinkNow = new Date("2023-04-12T10:00:00.000Z");
     timeGw.setNextDate(magicLinkNow);
 
-    const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties = {
-      id: convention.id,
-      role: convention.signatories.beneficiary.role,
-      email: convention.signatories.beneficiary.email,
-      now: magicLinkNow,
-    };
-
     expectToEqual(
       getValidatedConventionFinalConfirmationParams(
         agency,
         convention,
-        fakeGenerateMagicLinkUrlFn,
-        timeGw,
+        config,
+        shortLinkId,
       ),
       {
         internshipKind: convention.internshipKind,
@@ -326,10 +342,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
           ...convention.signatories,
         }),
         agencyLogoUrl: agency.logoUrl,
-        magicLink: fakeGenerateMagicLinkUrlFn({
-          ...magicLinkCommonFields,
-          targetRoute: frontRoutes.conventionDocument,
-        }),
+        magicLink: makeShortLinkUrl(config, shortLinkId),
       },
     );
   });
@@ -350,19 +363,12 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
       })
       .build();
 
-    const magicLinkCommonFields: CreateConventionMagicLinkPayloadProperties = {
-      id: convention.id,
-      role: convention.signatories.beneficiary.role,
-      email: convention.signatories.beneficiary.email,
-      now: timeGw.now(),
-    };
-
     expectTypeToMatchAndEqual(
       getValidatedConventionFinalConfirmationParams(
         agency,
         convention,
-        fakeGenerateMagicLinkUrlFn,
-        timeGw,
+        config,
+        shortLinkId,
       ),
       {
         internshipKind: convention.internshipKind,
@@ -384,10 +390,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
           ...convention.signatories,
         }),
         agencyLogoUrl: agency.logoUrl,
-        magicLink: fakeGenerateMagicLinkUrlFn({
-          ...magicLinkCommonFields,
-          targetRoute: frontRoutes.conventionDocument,
-        }),
+        magicLink: makeShortLinkUrl(config, shortLinkId),
       },
     );
   });

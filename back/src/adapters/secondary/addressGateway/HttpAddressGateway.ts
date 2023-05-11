@@ -5,8 +5,9 @@ import {
   calculateDurationInSecondsFrom,
   City,
   DepartmentName,
-  departmentNameToDepartmentCode,
+  filterNotFalsy,
   GeoPositionDto,
+  getDepartmentCodeFromDepartmentNameOrCity,
   LookupSearchResult,
   lookupSearchResultsSchema,
   OpenCageGeoSearchKey,
@@ -61,7 +62,7 @@ export class HttpAddressGateway implements AddressGateway {
       responseBody as OpenCageDataFeatureCollection
     ).features
       .map(this.featureToAddress)
-      .filter((feature): feature is AddressDto => !!feature);
+      .filter(filterNotFalsy);
 
     return addresses.at(0);
   }
@@ -85,7 +86,7 @@ export class HttpAddressGateway implements AddressGateway {
 
       return (responseBody as OpenCageDataFeatureCollection).features
         .map((feature) => this.toAddressAndPosition(feature))
-        .filter((feature): feature is AddressAndPosition => !!feature);
+        .filter(filterNotFalsy);
     } finally {
       calculateDurationInSecondsFrom(startDate);
       logger.info({
@@ -158,7 +159,8 @@ export class HttpAddressGateway implements AddressGateway {
     const departmentName = getDepartmentNameFromAliases(components);
     // OpenCageData gives the department name but not the code.
     const departmentCode =
-      departmentName && departmentNameToDepartmentCode[departmentName];
+      departmentName &&
+      getDepartmentCodeFromDepartmentNameOrCity[departmentName];
 
     return (
       city &&
