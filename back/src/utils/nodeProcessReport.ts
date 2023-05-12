@@ -65,14 +65,14 @@ export const startPeriodicNodeProcessReport = (
 
 const makeReport = (
   { system, user }: NodeJS.CpuUsage,
-  deltaTime: number,
+  maxCpuPossibleUsage: number,
   eventLoopMeanLagMs: number,
 ) => ({
   eventLoopMeanLagMs: eventLoopMeanLagMs.toFixed(5),
   cpuUsage: {
-    system: (system / deltaTime) * 100,
-    total: ((system + user) / deltaTime) * 100,
-    user: (user / deltaTime) * 100,
+    system: (system / maxCpuPossibleUsage) * 100,
+    total: ((system + user) / maxCpuPossibleUsage) * 100,
+    user: (user / maxCpuPossibleUsage) * 100,
   },
   memoryUsage: memoryUsage(),
 });
