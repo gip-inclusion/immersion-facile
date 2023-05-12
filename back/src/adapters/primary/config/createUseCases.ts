@@ -315,6 +315,8 @@ export const createUseCases = (
           gateways.email,
           generateConventionMagicLinkUrl,
           gateways.timeGateway,
+          gateways.shortLinkGenerator,
+          config,
         ),
       notifyAllActorsOfFinalConventionValidation:
         new NotifyAllActorsOfFinalConventionValidation(
@@ -374,7 +376,12 @@ export const createUseCases = (
           uowPerformer,
           gateways.poleEmploiGateway,
         ),
-      shareConventionByEmail: new ShareApplicationLinkByEmail(gateways.email),
+      shareConventionByEmail: new ShareApplicationLinkByEmail(
+        uowPerformer,
+        gateways.email,
+        gateways.shortLinkGenerator,
+        config,
+      ),
       addAgency: new AddAgency(uowPerformer, createNewEvent),
       updateAgencyStatus: new UpdateAgencyStatus(uowPerformer, createNewEvent),
       updateAgencyAdmin: new UpdateAgency(uowPerformer, createNewEvent),

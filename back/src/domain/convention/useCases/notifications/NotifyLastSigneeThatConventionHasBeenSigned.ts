@@ -8,12 +8,15 @@ import {
   SignatoryRole,
   TemplatedEmail,
 } from "shared";
+import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
+import { ShortLinkIdGeneratorGateway } from "../../../core/ports/ShortLinkIdGeneratorGateway";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
+import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { EmailGateway } from "../../ports/EmailGateway";
 
@@ -32,6 +35,8 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
     private readonly emailGateway: EmailGateway,
     private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     private readonly timeGateway: TimeGateway,
+    private readonly shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
+    private readonly config: AppConfig,
   ) {
     super(uowPerformer);
   }
@@ -51,19 +56,25 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
       repositoryConvention.agencyId,
     ]);
     if (!agency) throw new Error(missingAgencyMessage(repositoryConvention));
-    return this.onRepositoryConvention(repositoryConvention, agency);
+    return this.onRepositoryConvention(repositoryConvention, agency, uow);
   }
 
-  private onRepositoryConvention(
+  private async onRepositoryConvention(
     repositoryConvention: ConventionDto,
     agency: AgencyDto,
+    uow: UnitOfWork,
   ): Promise<void> {
     const lastSigneeEmail = this.lastSigneeEmail(
       Object.values(repositoryConvention.signatories),
     );
     if (lastSigneeEmail)
       return this.emailGateway.sendEmail(
-        this.emailToSend(repositoryConvention, lastSigneeEmail, agency),
+        await this.emailToSend(
+          repositoryConvention,
+          lastSigneeEmail,
+          agency,
+          uow,
+        ),
       );
     throw new Error(noSignatoryMessage(repositoryConvention));
   }
@@ -88,17 +99,23 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
     return signatoryEmailsOrderedBySignedAt.at(-1);
   }
 
-  private emailToSend(
+  private async emailToSend(
     convention: ConventionDto,
     lastSignee: { signedAt: string; email: string; role: SignatoryRole },
     agency: AgencyDto,
-  ): TemplatedEmail {
-    const conventionStatusLink = this.generateConventionMagicLinkUrl({
-      targetRoute: frontRoutes.conventionStatusDashboard,
-      id: convention.id,
-      role: lastSignee.role,
-      email: lastSignee.email,
-      now: this.timeGateway.now(),
+    uow: UnitOfWork,
+  ): Promise<TemplatedEmail> {
+    const makeMagicShortLink = prepareMagicShortLinkMaker({
+      conventionMagicLinkPayload: {
+        id: convention.id,
+        role: lastSignee.role,
+        email: lastSignee.email,
+        now: this.timeGateway.now(),
+      },
+      config: this.config,
+      generateConventionMagicLinkUrl: this.generateConventionMagicLinkUrl,
+      shortLinkIdGeneratorGateway: this.shortLinkIdGeneratorGateway,
+      uow,
     });
 
     return {
@@ -108,7 +125,9 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
         internshipKind: convention.internshipKind,
         conventionId: convention.id,
         signedAt: lastSignee.signedAt,
-        conventionStatusLink,
+        conventionStatusLink: await makeMagicShortLink(
+          frontRoutes.conventionStatusDashboard,
+        ),
       },
       recipients: [lastSignee.email],
     };

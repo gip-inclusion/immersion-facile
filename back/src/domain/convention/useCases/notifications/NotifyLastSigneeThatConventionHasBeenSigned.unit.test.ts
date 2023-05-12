@@ -6,7 +6,9 @@ import {
   expectToEqual,
   frontRoutes,
 } from "shared";
+import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
+import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
@@ -14,6 +16,8 @@ import {
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
+import { makeShortLinkUrl } from "../../../core/ShortLink";
 import {
   missingConventionMessage,
   noSignatoryMessage,
@@ -27,6 +31,8 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
   let uow: InMemoryUnitOfWork;
   let timeGateway: CustomTimeGateway;
   let agency: AgencyDto;
+  let shortLinkIdGeneratorGateway: DeterministShortLinkIdGeneratorGateway;
+  let config: AppConfig;
 
   beforeEach(() => {
     uow = createInMemoryUow();
@@ -37,6 +43,8 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
       .signedByEstablishmentRepresentative(undefined)
       .build();
     emailGw = new InMemoryEmailGateway();
+    config = new AppConfigBuilder().build();
+    shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
 
     timeGateway = new CustomTimeGateway();
     usecase = new NotifyLastSigneeThatConventionHasBeenSigned(
@@ -44,6 +52,8 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
       emailGw,
       fakeGenerateMagicLinkUrlFn,
       timeGateway,
+      shortLinkIdGeneratorGateway,
+      config,
     );
   });
 
@@ -58,13 +68,19 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
       [signedConvention.id]: signedConvention,
     };
 
+    const shortLinkId = "link1";
+    shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
+
     await usecase.execute(signedConvention);
-    const conventionStatusLink = fakeGenerateMagicLinkUrlFn({
-      targetRoute: frontRoutes.conventionStatusDashboard,
-      id: signedConvention.id,
-      role: "beneficiary",
-      email: signedConvention.signatories.beneficiary.email,
-      now,
+
+    expectToEqual(uow.shortLinkQuery.getShortLinks(), {
+      [shortLinkId]: fakeGenerateMagicLinkUrlFn({
+        targetRoute: frontRoutes.conventionStatusDashboard,
+        id: signedConvention.id,
+        role: "beneficiary",
+        email: signedConvention.signatories.beneficiary.email,
+        now,
+      }),
     });
 
     expectToEqual(emailGw.getSentEmails(), [
@@ -73,7 +89,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
           internshipKind: signedConvention.internshipKind,
           conventionId: signedConvention.id,
           signedAt: signedConvention.signatories.beneficiary.signedAt!,
-          conventionStatusLink,
+          conventionStatusLink: makeShortLinkUrl(config, shortLinkId),
           agencyLogoUrl: agency.logoUrl,
         },
         recipients: [signedConvention.signatories.beneficiary.email],
@@ -92,8 +108,20 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
     uow.conventionRepository._conventions = {
       [signedConvention.id]: signedConvention,
     };
+    const shortLinkId = "link1";
+    shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
 
     await usecase.execute(signedConvention);
+
+    expectToEqual(uow.shortLinkQuery.getShortLinks(), {
+      [shortLinkId]: fakeGenerateMagicLinkUrlFn({
+        targetRoute: frontRoutes.conventionStatusDashboard,
+        id: signedConvention.id,
+        role: "establishment-representative",
+        email: signedConvention.signatories.establishmentRepresentative.email,
+        now,
+      }),
+    });
 
     expectToEqual(emailGw.getSentEmails(), [
       {
@@ -102,14 +130,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
           signedAt:
             signedConvention.signatories.establishmentRepresentative.signedAt!,
           conventionId: signedConvention.id,
-          conventionStatusLink: fakeGenerateMagicLinkUrlFn({
-            targetRoute: frontRoutes.conventionStatusDashboard,
-            id: signedConvention.id,
-            role: "establishment-representative",
-            email:
-              signedConvention.signatories.establishmentRepresentative.email,
-            now,
-          }),
+          conventionStatusLink: makeShortLinkUrl(config, shortLinkId),
           agencyLogoUrl: agency.logoUrl,
         },
         recipients: [

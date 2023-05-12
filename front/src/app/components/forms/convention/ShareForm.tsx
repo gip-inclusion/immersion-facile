@@ -4,6 +4,7 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  AbsoluteUrl,
   InternshipKind,
   ShareLinkByEmailDto,
   shareLinkByEmailSchema,
@@ -25,18 +26,16 @@ const makeInitialValues = ({
   firstName,
   lastName,
   establishmentRepresentativeEmail,
-  link,
   internshipKind,
 }: {
   firstName: string;
   lastName: string;
   establishmentRepresentativeEmail: string;
-  link: string;
   internshipKind: InternshipKind;
 }): Required<ShareLinkByEmailDto> => ({
   internshipKind,
   email: establishmentRepresentativeEmail,
-  conventionLink: link,
+  conventionLink: window.location.href as AbsoluteUrl,
   details: `${firstName || "Prénom"} ${
     lastName || "Nom"
   } vous invite à prendre connaissance de cette demande de convention d’immersion déjà partiellement remplie afin que vous la complétiez.  Merci !`,
@@ -47,34 +46,19 @@ export const ShareForm = ({
   onSuccess,
   onError,
 }: ShareFormProps) => {
-  const onSubmit = async (values: {
-    email: string;
-    details: string;
-    internshipKind: InternshipKind;
-  }) => {
-    const result = await conventionGateway.shareLinkByEmail({
-      ...values,
-      conventionLink: window.location.href,
-    });
+  const onSubmit = async (values: ShareLinkByEmailDto) => {
+    const result = await conventionGateway.shareLinkByEmail(values);
     result ? onSuccess() : onError();
   };
   const methods = useForm<ShareLinkByEmailDto>({
     mode: "onTouched",
-    defaultValues: makeInitialValues({
-      ...conventionFormData,
-      link: window.location.href,
-    }),
+    defaultValues: makeInitialValues(conventionFormData),
     resolver: zodResolver(shareLinkByEmailSchema),
   });
   const { register, handleSubmit, formState } = methods;
 
   useEffect(() => {
-    methods.reset(
-      makeInitialValues({
-        ...conventionFormData,
-        link: window.location.href,
-      }),
-    );
+    methods.reset(makeInitialValues(conventionFormData));
   }, [conventionFormData]);
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
