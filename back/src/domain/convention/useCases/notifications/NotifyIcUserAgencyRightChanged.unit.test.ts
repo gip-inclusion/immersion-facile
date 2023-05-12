@@ -19,12 +19,6 @@ const icUserRoleParams: IcUserRoleForAgencyParams = {
   userId: "jbab-123",
 };
 
-const icUserRoleParamsWithInReviewRole: IcUserRoleForAgencyParams = {
-  role: "toReview",
-  agencyId: "agency-1",
-  userId: "jbab-123",
-};
-
 describe("SendEmailWhenAgencyIsActivated", () => {
   let emailGateway: InMemoryEmailGateway;
   let uow: InMemoryUnitOfWork;
@@ -122,9 +116,11 @@ describe("SendEmailWhenAgencyIsActivated", () => {
     };
     uow.inclusionConnectedUserRepository.setInclusionConnectedUsers([icUser]);
 
-    await notifyIcUserAgencyRightChanged.execute(
-      icUserRoleParamsWithInReviewRole,
-    );
+    await notifyIcUserAgencyRightChanged.execute({
+      role: "toReview",
+      agencyId: "agency-1",
+      userId: "jbab-123",
+    });
 
     const sentEmails = emailGateway.getSentEmails();
     expect(sentEmails).toHaveLength(0);
