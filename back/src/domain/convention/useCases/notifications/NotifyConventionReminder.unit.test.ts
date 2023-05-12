@@ -5,6 +5,7 @@ import {
   ConventionDto,
   ConventionDtoBuilder,
   conventionStatuses,
+  EstablishmentRepresentative,
   expectPromiseToFailWithError,
   expectToEqual,
   frontRoutes,
@@ -42,6 +43,13 @@ import {
 } from "./NotifyLastSigneeThatConventionHasBeenSigned";
 
 describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
+  const establishmentRepresentative: EstablishmentRepresentative = {
+    email: "boss@mail.com",
+    firstName: "lord",
+    lastName: "voldemort",
+    phone: "0688776666",
+    role: "establishment-representative",
+  };
   let useCase: NotifyConventionReminder;
   let emailGateway: InMemoryEmailGateway;
   let uow: InMemoryUnitOfWork;
@@ -358,7 +366,74 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
     const type: ReminderKind = "FirstReminderForSignatories";
 
     it.each(authorizedSignatoryStatuses)(
-      `Send email SIGNATORY_FIRST_REMINDER to signatories when status is '%s'`,
+      `Send email SIGNATORY_FIRST_REMINDER to signatories when status is '%s' - convention with same establishment representative & tutor`,
+      async (status) => {
+        //Arrange
+        const agency = new AgencyDtoBuilder().withId("agencyId").build();
+        const convention = new ConventionDtoBuilder()
+          .withAgencyId(agency.id)
+          .withStatus(status)
+          .withEstablishmentRepresentative(establishmentRepresentative)
+          .withEstablishmentTutor({
+            email: establishmentRepresentative.email,
+            firstName: establishmentRepresentative.firstName,
+            lastName: establishmentRepresentative.lastName,
+            job: "wizard",
+            phone: establishmentRepresentative.phone,
+            role: "establishment-tutor",
+          })
+          .build();
+        uow.conventionRepository.setConventions({
+          [convention.id]: convention,
+        });
+        uow.agencyRepository.setAgencies([agency]);
+
+        const shortLinkIds = ["link1", "link2"];
+        shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
+
+        //Act
+        await useCase.execute({
+          conventionId: convention.id,
+          reminderKind: type,
+        });
+
+        //Assert
+        expectToEqual(uow.shortLinkQuery.getShortLinks(), {
+          [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
+            id: convention.id,
+            role: convention.signatories.beneficiary.role,
+            targetRoute: frontRoutes.conventionToSign,
+            email: convention.signatories.beneficiary.email,
+            now: timeGateway.now(),
+          }),
+          [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
+            id: convention.id,
+            role: convention.signatories.establishmentRepresentative.role,
+            targetRoute: frontRoutes.conventionToSign,
+            email: convention.signatories.establishmentRepresentative.email,
+            now: timeGateway.now(),
+          }),
+        });
+
+        expectToEqual(emailGateway.getSentEmails(), [
+          makeSignatoriesFirstReminderEmail({
+            actor: convention.signatories.beneficiary,
+            convention,
+            timeGateway,
+            shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[0]),
+          }),
+          makeSignatoriesFirstReminderEmail({
+            actor: convention.signatories.establishmentRepresentative,
+            convention,
+            timeGateway,
+            shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[1]),
+          }),
+        ]);
+      },
+    );
+
+    it.each(authorizedSignatoryStatuses)(
+      `Send email SIGNATORY_FIRST_REMINDER to signatories when status is '%s' - convention with different establishment representative & tutor`,
       async (status) => {
         //Arrange
         const agency = new AgencyDtoBuilder().withId("agencyId").build();
@@ -366,6 +441,14 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         const convention = new ConventionDtoBuilder()
           .withAgencyId(agency.id)
           .withStatus(status)
+          .withEstablishmentTutor({
+            email: "tutor@email.com",
+            firstName: "Obiwan",
+            lastName: "Kenobi",
+            job: "Jedi Master",
+            phone: "0688997755",
+            role: "establishment-tutor",
+          })
           .build();
         uow.conventionRepository.setConventions({
           [convention.id]: convention,
@@ -453,7 +536,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
   describe("LastReminderForSignatories", () => {
     const type: ReminderKind = "LastReminderForSignatories";
     it.each(authorizedSignatoryStatuses)(
-      `Send email LAST_FIRST_REMINDER to signatories when status is '%s'`,
+      `Send email LAST_FIRST_REMINDER to signatories when status is '%s' - convention with same establishment representative & tutor`,
       async (status) => {
         //Arrange
         const agency = new AgencyDtoBuilder().withId("agencyId").build();
@@ -461,6 +544,78 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         const convention = new ConventionDtoBuilder()
           .withAgencyId(agency.id)
           .withStatus(status)
+          .withEstablishmentRepresentative(establishmentRepresentative)
+          .withEstablishmentTutor({
+            email: establishmentRepresentative.email,
+            firstName: establishmentRepresentative.firstName,
+            lastName: establishmentRepresentative.lastName,
+            job: "wizard",
+            phone: establishmentRepresentative.phone,
+            role: "establishment-tutor",
+          })
+          .build();
+        uow.conventionRepository.setConventions({
+          [convention.id]: convention,
+        });
+        uow.agencyRepository.setAgencies([agency]);
+        const shortLinkIds = ["link1", "link2"];
+        shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
+
+        //Act
+        await useCase.execute({
+          conventionId: convention.id,
+          reminderKind: type,
+        });
+
+        //Assert
+        expectToEqual(uow.shortLinkQuery.getShortLinks(), {
+          [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
+            id: convention.id,
+            role: convention.signatories.beneficiary.role,
+            targetRoute: frontRoutes.conventionToSign,
+            email: convention.signatories.beneficiary.email,
+            now: timeGateway.now(),
+          }),
+          [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
+            id: convention.id,
+            role: convention.signatories.establishmentRepresentative.role,
+            targetRoute: frontRoutes.conventionToSign,
+            email: convention.signatories.establishmentRepresentative.email,
+            now: timeGateway.now(),
+          }),
+        });
+        expectToEqual(emailGateway.getSentEmails(), [
+          makeSignatoriesLastReminderEmail({
+            actor: convention.signatories.beneficiary,
+            convention,
+            shortlinkUrl: makeShortLinkUrl(config, shortLinkIds[0]),
+          }),
+          makeSignatoriesLastReminderEmail({
+            actor: convention.signatories.establishmentRepresentative,
+            convention,
+            shortlinkUrl: makeShortLinkUrl(config, shortLinkIds[1]),
+          }),
+        ]);
+      },
+    );
+
+    it.each(authorizedSignatoryStatuses)(
+      `Send email LAST_FIRST_REMINDER to signatories when status is '%s' - convention with different establishment representative & tutor`,
+      async (status) => {
+        //Arrange
+        const agency = new AgencyDtoBuilder().withId("agencyId").build();
+
+        const convention = new ConventionDtoBuilder()
+          .withAgencyId(agency.id)
+          .withStatus(status)
+          .withEstablishmentTutor({
+            email: "tutor@email.com",
+            firstName: "Obiwan",
+            lastName: "Kenobi",
+            job: "Jedi Master",
+            phone: "0688997755",
+            role: "establishment-tutor",
+          })
           .build();
         uow.conventionRepository.setConventions({
           [convention.id]: convention,
