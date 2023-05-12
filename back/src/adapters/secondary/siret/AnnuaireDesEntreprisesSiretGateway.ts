@@ -53,7 +53,9 @@ export const convertAdeEstablishmentToSirenEstablishmentDto = (
   adeEstablishment: AnnuaireDesEntreprisesSiretEstablishment,
 ): SiretEstablishmentDto => ({
   siret: adeEstablishment.matching_etablissements[0].siret,
-  businessName: adeEstablishment.matching_etablissements[0].nom_commercial,
+  businessName:
+    adeEstablishment.matching_etablissements[0].nom_commercial ??
+    adeEstablishment.nom_complet,
   businessAddress: adeEstablishment.matching_etablissements[0].adresse,
   nafDto: {
     code: adeEstablishment.activite_principale.replace(".", ""),
