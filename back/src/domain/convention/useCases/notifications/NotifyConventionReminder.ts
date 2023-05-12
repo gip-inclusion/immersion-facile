@@ -10,6 +10,7 @@ import {
   filterNotFalsy,
   frontRoutes,
   GenericActor,
+  isEstablishmentTutorIsEstablishmentRepresentative,
   isSignatoryRole,
   Role,
   TemplatedEmail,
@@ -100,7 +101,9 @@ export class NotifyConventionReminder extends TransactionalUseCase<
 
     const actors = [
       ...Object.values(conventionRead.signatories),
-      conventionRead.establishmentTutor,
+      ...(isEstablishmentTutorIsEstablishmentRepresentative(conventionRead)
+        ? []
+        : [conventionRead.establishmentTutor]),
     ];
 
     const emails: TemplatedEmail[] = [
