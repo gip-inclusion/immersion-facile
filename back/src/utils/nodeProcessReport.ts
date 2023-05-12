@@ -43,7 +43,7 @@ export const startPeriodicNodeProcessReport = (
     logger.info(
       makeReport(
         currentCpuUsage,
-        (currentTime.getTime() - previousTime.getTime()) * 10 * cpus().length,
+        (currentTime.getTime() - previousTime.getTime()) * 1000 * cpus().length,
         makeEventLoopLagMeanMs(eventLoopLagSamples),
       ),
       "nodeRessourcesReport",
