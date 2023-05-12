@@ -21,6 +21,7 @@ import { InseeSiretGateway } from "./InseeSiretGateway";
 describe("HttpSirenGateway", () => {
   let siretGateway: AnnuaireDesEntreprisesSiretGateway;
   const config = AppConfig.createFromEnv();
+
   beforeEach(() => {
     siretGateway = new AnnuaireDesEntreprisesSiretGateway(
       configureCreateHttpClientForExternalApi()(
@@ -52,6 +53,7 @@ describe("HttpSirenGateway", () => {
       siret: "18004623700012",
     });
   });
+
   it("retrieves closed establishments", async () => {
     // SOCIETE TEXTILE D'HENIN LIETARD, closed in 1966.
     const includeClosedEstablishments = true;
@@ -71,6 +73,7 @@ describe("HttpSirenGateway", () => {
       siret: "38961161700017",
     });
   });
+
   it("filters out closed establishments", async () => {
     // SOCIETE TEXTILE D'HENIN LIETARD, closed in 1966.
     const response = await siretGateway.getEstablishmentBySiret(
@@ -105,5 +108,12 @@ describe("HttpSirenGateway", () => {
         nonDiffusibleEstablishmentName,
       ),
     ).toBe(false);
+  });
+
+  it("Should work also with an establishment with no nom_commercial", async () => {
+    const establishment = await siretGateway.getEstablishmentBySiret(
+      "83748116700026",
+    );
+    expect(establishment?.businessName).toBe("P E CONSEIL");
   });
 });
