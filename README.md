@@ -60,9 +60,18 @@ pnpm generate-front-envfile
 ```
 
 Le `.env` permet de configurer le mode de fonctionnement de l'application.
-Par défaut tous les services sont IN_MEMORY.
+
 On peut lancer avec une base de données postgres simplement en mettant `REPOSITORIES="PG"`.
-Le conteneur faisant parti du docker-compose et la DATABASE_URL étant fourni, cela devrait fonctionner sans autre configuration.
+
+On peut démarrer facilement une DB local avec docker-compose :
+
+```sh
+docker-compose -f docker-compose.resources.yml up --build
+```
+
+Il y aura alors une DB postgres accessible sur le port 5432, et un adminer sur le port 8080.
+
+La DATABASE_URL étant fourni, cela devrait fonctionner sans autre configuration.
 
 Les autres services ont une implémentation IN_MEMORY mais pour fonctionner avec les véritables services il faut fournir les secrets /clés API.
 Ce n'est pas censé être nécessaire en local, si jamais c'était le cas, veuillez vous rapprocher de l'équipe.
@@ -73,19 +82,10 @@ Créer le dossier `back/storage/tmp`
 
 #### Lancer le projet avec docker-compose
 
-```sh
-docker-compose up --build
-```
+On peut démarrer le front et le back en même temps (en mode dev) avec la commande (depuis la racine du projet) :
 
-#### Sans docker-compose
-
-Pour utiliser la DB postgres, il faut soit installer postgres sur sa machine, soit lancer postgres dans un container.
-Nous avons un docker-compose prévu à cet effet, qui va uniquement rendre une DB postgres disponible (mais ne lancera aucun autre service).
-
-Pour le lancer :
-
-```sh
-docker-compose -f docker-compose.resources.yml up --build
+```shell
+pnpm dev
 ```
 
 Pour le backend se référer ensuite ici:
