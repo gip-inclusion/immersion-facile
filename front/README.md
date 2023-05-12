@@ -11,13 +11,13 @@ pnpm install
 #### Run local dev, with faked backend
 
 ```shell
-pnpm dev
+pnpm dev-in-memory
 ```
 
 #### Run local dev, calling backend
 
 ```shell
-pnpm dev-http
+pnpm dev
 ```
 
 You can typecheck the project with :
