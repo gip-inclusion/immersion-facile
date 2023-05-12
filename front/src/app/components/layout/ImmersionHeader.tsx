@@ -156,6 +156,14 @@ export const ImmersionHeader = () => {
             id: agencyIds.formConvention,
           },
         },
+        {
+          text: "Piloter mon organisme",
+          isActive: false,
+          linkProps: {
+            ...routes.agencyDashboard().link,
+            id: adminIds.dashboard,
+          },
+        },
       ],
     },
   ];
@@ -180,14 +188,6 @@ export const ImmersionHeader = () => {
           linkProps: {
             ...routes.adminTab({ tab: "emails" }).link,
             id: adminIds.emails,
-          },
-        },
-        {
-          text: "Mon organisme (dashboard agence)",
-          isActive: false,
-          linkProps: {
-            ...routes.agencyDashboard().link,
-            id: adminIds.dashboard,
           },
         },
       ],
