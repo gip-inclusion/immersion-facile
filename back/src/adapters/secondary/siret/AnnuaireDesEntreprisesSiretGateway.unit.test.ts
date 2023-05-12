@@ -4,6 +4,7 @@ import { AnnuaireDesEntreprisesSiretEstablishment } from "./AnnuaireDesEntrepris
 
 const validEstablishment: AnnuaireDesEntreprisesSiretEstablishment = {
   activite_principale: "78.3Z",
+  nom_complet: "MA P'TITE BOITE - nom complet",
   matching_etablissements: [
     {
       nom_commercial: "MA P'TITE BOITE",
@@ -47,6 +48,27 @@ describe("convertAdeEstablishmentToSirenEstablishmentDto", () => {
     expectToEqual(response, {
       siret: "12345678901234",
       businessName: "MA P'TITE BOITE",
+      businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
+      nafDto: { code: "783Z", nomenclature: "NAFRev2" },
+      isOpen: true,
+      numberEmployeesRange: "1-2",
+    });
+  });
+
+  it("falls back to nom_complet if response does not contain nom_commercial", async () => {
+    const response = await convertAdeEstablishmentToSirenEstablishmentDto({
+      ...validEstablishment,
+      matching_etablissements: [
+        {
+          ...validEstablishment.matching_etablissements[0],
+          nom_commercial: null,
+        },
+      ],
+    });
+
+    expectToEqual(response, {
+      siret: "12345678901234",
+      businessName: validEstablishment.nom_complet,
       businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
       nafDto: { code: "783Z", nomenclature: "NAFRev2" },
       isOpen: true,
