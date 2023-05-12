@@ -15,7 +15,6 @@ import {
 } from "../../../../_testBuilders/buildTestApp";
 import {
   GenerateConventionJwt,
-  makeGenerateJwtES256,
   makeVerifyJwtES256,
 } from "../../../../domain/auth/jwt";
 import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";
@@ -41,17 +40,17 @@ describe("Magic link renewal flow", () => {
   let generateConventionJwt: GenerateConventionJwt;
 
   beforeEach(async () => {
-    ({ request, gateways, eventCrawler, inMemoryUow, appConfig } =
-      await buildTestApp());
+    ({
+      request,
+      gateways,
+      eventCrawler,
+      inMemoryUow,
+      appConfig,
+      generateConventionJwt,
+    } = await buildTestApp());
 
     inMemoryUow.agencyRepository.setAgencies([agency]);
-
     gateways.timeGateway.setNextDate(new Date());
-
-    generateConventionJwt = makeGenerateJwtES256<"convention">(
-      appConfig.jwtPrivateKey,
-      3600 * 24, // one day
-    );
 
     const convention = new ConventionDtoBuilder().build();
     inMemoryUow.conventionRepository.setConventions({
