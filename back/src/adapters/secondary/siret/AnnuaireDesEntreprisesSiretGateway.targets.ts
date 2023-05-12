@@ -8,10 +8,11 @@ const adeEstablishmentSchema = z.object({
         siret: z.string(),
         etat_administratif: z.enum(["A", "F"]),
         adresse: z.string(),
-        nom_commercial: z.string(),
+        nom_commercial: z.string().nullable(),
       }),
     )
     .min(1),
+  nom_complet: z.string(),
   activite_principale: z.string(),
   tranche_effectif_salarie: z.string().nullable(),
 });
@@ -30,8 +31,9 @@ export type AnnuaireDesEntreprisesSiretEstablishment = {
     siret: string;
     etat_administratif: "A" | "F";
     adresse: string;
-    nom_commercial: string;
+    nom_commercial: string | null;
   }[];
+  nom_complet: string;
   activite_principale: string;
   tranche_effectif_salarie: string | null;
 };
