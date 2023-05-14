@@ -54,6 +54,13 @@ describe("HttpSirenGateway", () => {
     });
   });
 
+  it("returns undefined when no establishment found", async () => {
+    const response = await siretGateway.getEstablishmentBySiret(
+      "00000000000000",
+    );
+    expect(response).toBeUndefined();
+  });
+
   it("retrieves closed establishments", async () => {
     // SOCIETE TEXTILE D'HENIN LIETARD, closed in 1966.
     const includeClosedEstablishments = true;
