@@ -33,9 +33,12 @@ export class AnnuaireDesEntreprisesSiretGateway implements SiretGateway {
         },
       }),
     );
-    const formattedResult = convertAdeEstablishmentToSirenEstablishmentDto(
-      response.responseBody.results[0],
-    );
+
+    const result = response.responseBody.results[0];
+    if (!result) return;
+    const formattedResult =
+      convertAdeEstablishmentToSirenEstablishmentDto(result);
+
     if (
       formattedResult.businessName
         .trim()
