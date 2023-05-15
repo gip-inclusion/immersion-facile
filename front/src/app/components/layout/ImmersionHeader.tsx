@@ -14,7 +14,8 @@ import { routes, useRoute } from "src/app/routes/routes";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { adminAuthSlice } from "src/core-logic/domain/admin/adminAuth/adminAuth.slice";
 
-import immersionFacileLogo from "/assets/img/logo-if.svg";
+import immersionFacileLightLogo from "/assets/img/logo-if.svg";
+import immersionFacileDarkLogo from "/assets/img/logo-if-dark.svg";
 
 export const ImmersionHeader = () => {
   const dispatch = useDispatch();
@@ -23,11 +24,13 @@ export const ImmersionHeader = () => {
   const { classes } = makeStyles({ name: ImmersionHeader.displayName })(() => ({
     operator: {
       boxSizing: "content-box",
-      width: 95,
-      filter: darkModeState.isDark ? "invert(1) grayscale(1)" : "",
+      width: "10.5rem",
+      maxWidth: "none !important",
     },
   }))();
-
+  const immersionFacileLogo = darkModeState.isDark
+    ? immersionFacileDarkLogo
+    : immersionFacileLightLogo;
   const {
     candidate: candidateIds,
     establishment: establishmentIds,
@@ -212,10 +215,8 @@ export const ImmersionHeader = () => {
         operatorLogo={{
           orientation: "horizontal",
           imgUrl: immersionFacileLogo,
-          alt: "Immersion Facilitée",
+          alt: "Immersion Facilitée - Faciliter la réalisation des immersions professionnelles",
         }}
-        serviceTagline="Faciliter la réalisation des immersions professionnelles"
-        serviceTitle="Immersion Facilitée"
         navigation={links}
         quickAccessItems={tools}
       />
