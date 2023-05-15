@@ -6,7 +6,7 @@ import {
   defaultMaxContactsPerWeek,
   establishmentAppellationsFromCSVToDto,
   establishmentCopyEmailsFromCSVToDto,
-  EstablishmentCSVRow,
+  establishmentCSVRowSchema,
   FormEstablishmentDto,
   formEstablishmentSchema,
   FormEstablishmentSource,
@@ -64,57 +64,60 @@ const addEstablishmentBatchEpic: AppEpic<EstablishmentBatchAction> = (
   );
 
 export const candidateEstablishmentMapper = (
-  establishmentRow: EstablishmentCSVRow,
+  csvRow: unknown,
 ): FormEstablishmentDtoWithErrors => {
   let errors: z.ZodIssue[] = [];
-  const mappedEstablishment: FormEstablishmentDto = {
-    businessAddress: establishmentRow.businessAddress,
-    businessName: establishmentRow.businessName,
-    siret: establishmentRow.siret,
-    businessNameCustomized: establishmentRow.businessNameCustomized,
-    additionalInformation: establishmentRow.additionalInformation,
-    naf: {
-      code: establishmentRow.naf_code,
-      nomenclature: "NAFRev2",
-    },
-    website: establishmentRow.website,
-    source: "immersion-facile" as FormEstablishmentSource,
-    appellations: establishmentAppellationsFromCSVToDto(
-      establishmentRow.appellations_code,
-    ),
-    businessContact: {
-      contactMethod: establishmentRow.businessContact_contactMethod,
-      copyEmails: isCSVCellEmptyString(
-        establishmentRow.businessContact_copyEmails,
-      )
-        ? []
-        : establishmentCopyEmailsFromCSVToDto(
-            establishmentRow.businessContact_copyEmails,
-          ),
-      email: establishmentRow.businessContact_email,
-      firstName: establishmentRow.businessContact_firstName,
-      job: establishmentRow.businessContact_job,
-      lastName: establishmentRow.businessContact_lastName,
-      phone: establishmentRow.businessContact_phone,
-    },
-    fitForDisabledWorkers: establishmentRow.fitForDisabledWorkers
-      ? csvBooleanToBoolean(establishmentRow.fitForDisabledWorkers)
-      : false,
-    isEngagedEnterprise: csvBooleanToBoolean(
-      establishmentRow.isEngagedEnterprise,
-    ),
-    maxContactsPerWeek: calculateMaxContactsPerWeek(
-      establishmentRow.isSearchable,
-    ),
-  };
+  let mappedEstablishment: FormEstablishmentDto | null = null;
   try {
+    const establishmentRow = establishmentCSVRowSchema.parse(csvRow);
+    mappedEstablishment = {
+      businessAddress: establishmentRow.businessAddress,
+      businessName: establishmentRow.businessName,
+      siret: establishmentRow.siret,
+      businessNameCustomized: establishmentRow.businessNameCustomized,
+      additionalInformation: establishmentRow.additionalInformation,
+      naf: {
+        code: establishmentRow.naf_code,
+        nomenclature: "NAFRev2",
+      },
+      website: establishmentRow.website,
+      source: "immersion-facile" as FormEstablishmentSource,
+      appellations: establishmentAppellationsFromCSVToDto(
+        establishmentRow.appellations_code,
+      ),
+      businessContact: {
+        contactMethod: establishmentRow.businessContact_contactMethod,
+        copyEmails: isCSVCellEmptyString(
+          establishmentRow.businessContact_copyEmails,
+        )
+          ? []
+          : establishmentCopyEmailsFromCSVToDto(
+              establishmentRow.businessContact_copyEmails,
+            ),
+        email: establishmentRow.businessContact_email,
+        firstName: establishmentRow.businessContact_firstName,
+        job: establishmentRow.businessContact_job,
+        lastName: establishmentRow.businessContact_lastName,
+        phone: establishmentRow.businessContact_phone,
+      },
+      fitForDisabledWorkers: establishmentRow.fitForDisabledWorkers
+        ? csvBooleanToBoolean(establishmentRow.fitForDisabledWorkers)
+        : false,
+      isEngagedEnterprise: csvBooleanToBoolean(
+        establishmentRow.isEngagedEnterprise,
+      ),
+      maxContactsPerWeek: calculateMaxContactsPerWeek(
+        establishmentRow.isSearchable,
+      ),
+    };
+
     formEstablishmentSchema.parse(mappedEstablishment);
   } catch (error) {
     if (error instanceof z.ZodError) {
       errors = error.issues;
     }
   }
-  return { ...mappedEstablishment, zodErrors: errors };
+  return { formEstablishment: mappedEstablishment, zodErrors: errors };
 };
 
 const calculateMaxContactsPerWeek = (isSearchable?: CSVBoolean) => {

@@ -7,7 +7,11 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import Papa from "papaparse";
 import { keys, values } from "ramda";
 import { makeStyles } from "tss-react/dsfr";
-import { domElementIds, EstablishmentCSVRow } from "shared";
+import {
+  domElementIds,
+  EstablishmentCSVRow,
+  FormEstablishmentDto,
+} from "shared";
 import { DsfrTitle, Loader } from "react-design-system";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -55,13 +59,14 @@ export const AddEstablishmentByBatchTab = () => {
   const dispatch = useDispatch();
   const papaOptions: Papa.ParseRemoteConfig<EstablishmentCSVRow> = {
     header: true,
-    complete: (papaParsedReturn: Papa.ParseResult<EstablishmentCSVRow>) =>
-      setCsvRowsParsed(papaParsedReturn),
+    complete: (papaParsedReturn: Papa.ParseResult<unknown>) => {
+      setCsvRowsParsed(papaParsedReturn.data);
+    },
     download: true,
+    skipEmptyLines: true,
   };
 
-  const [csvRowsParsed, setCsvRowsParsed] =
-    useState<Papa.ParseResult<EstablishmentCSVRow> | null>(null);
+  const [csvRowsParsed, setCsvRowsParsed] = useState<unknown[]>([]);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
 
@@ -79,7 +84,7 @@ export const AddEstablishmentByBatchTab = () => {
     if (csvRowsParsed) {
       dispatch(
         establishmentBatchSlice.actions.candidateEstablishmentBatchProvided(
-          csvRowsParsed.data,
+          csvRowsParsed,
         ),
       );
     }
@@ -139,9 +144,16 @@ export const AddEstablishmentByBatchTab = () => {
       establishmentBatchSlice.actions.addEstablishmentBatchRequested({
         groupName: getValues().groupName,
         formEstablishments:
-          candidateEstablishments.filter(
-            (establishment) => establishment.zodErrors.length === 0,
-          ) ?? [],
+          candidateEstablishments
+            .filter((establishment) => establishment.zodErrors.length === 0)
+            .map(
+              (candidateEstablishment) =>
+                candidateEstablishment.formEstablishment,
+            )
+            .filter(
+              (formEstablishment): formEstablishment is FormEstablishmentDto =>
+                formEstablishment !== null,
+            ) ?? [],
       }),
     );
     setFormSubmitted(false);
@@ -245,33 +257,62 @@ export const AddEstablishmentByBatchTab = () => {
             <table className={cx(fr.cx("fr-mt-2w"), classes.table)}>
               <thead>
                 <tr>
-                  {keys(candidateEstablishments[0]).map((key) => (
-                    <th scope="col" key={key}>
-                      {key}
-                    </th>
-                  ))}
+                  {keys(candidateEstablishments[0].formEstablishment).map(
+                    (key) => (
+                      <th scope="col" key={key}>
+                        {key}
+                      </th>
+                    ),
+                  )}
                 </tr>
               </thead>
               <tbody>
                 {candidateEstablishments.map((establishment, index) => (
-                  <tr
-                    key={`${establishment.siret}-${index}`}
-                    className={cx({})}
-                    style={{
-                      backgroundColor: establishment.zodErrors.length
-                        ? "var(--error-950-100)"
-                        : "",
-                    }}
-                  >
-                    {values(establishment).map((value, index) => (
-                      <td
-                        key={`${establishment.siret}-value-${index}`}
-                        className={fr.cx("fr-text--xs")}
+                  <>
+                    {establishment.formEstablishment && (
+                      <tr
+                        key={`${establishment.formEstablishment.siret}-${index}`}
+                        className={cx({})}
+                        style={{
+                          backgroundColor: establishment.zodErrors.length
+                            ? "var(--error-950-100)"
+                            : "",
+                        }}
                       >
-                        {value ? JSON.stringify(value) : ""}
-                      </td>
-                    ))}
-                  </tr>
+                        {values(establishment.formEstablishment).map(
+                          (value, index) => (
+                            <>
+                              {establishment.formEstablishment && (
+                                <td
+                                  key={`${establishment.formEstablishment.siret}-value-${index}`}
+                                  className={fr.cx("fr-text--xs")}
+                                >
+                                  {value ? JSON.stringify(value) : ""}
+                                </td>
+                              )}
+                            </>
+                          ),
+                        )}
+                      </tr>
+                    )}
+                    {establishment.formEstablishment === null && (
+                      <tr
+                        key={index}
+                        className={cx({})}
+                        style={{
+                          backgroundColor: establishment.zodErrors.length
+                            ? "var(--error-950-100)"
+                            : "",
+                        }}
+                      >
+                        {establishment.zodErrors.map((error, index) => (
+                          <td key={`${error.path}-${index}`}>
+                            {error.path} : {error.message}
+                          </td>
+                        ))}
+                      </tr>
+                    )}
+                  </>
                 ))}
               </tbody>
             </table>

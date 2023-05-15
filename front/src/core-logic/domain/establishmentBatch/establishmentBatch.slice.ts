@@ -2,14 +2,14 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { z } from "zod";
 import {
   EstablishmentBatchReport,
-  EstablishmentCSVRow,
   FormEstablishmentBatchDto,
   FormEstablishmentDto,
 } from "shared";
 import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
 
 export type AddFormEstablishmentBatchFeedback = SubmitFeedBack<"success">;
-export type FormEstablishmentDtoWithErrors = FormEstablishmentDto & {
+export type FormEstablishmentDtoWithErrors = {
+  formEstablishment: FormEstablishmentDto | null;
   zodErrors: z.ZodIssue[];
 };
 export type EstablishmentBatchState = {
@@ -34,7 +34,7 @@ export const establishmentBatchSlice = createSlice({
   reducers: {
     candidateEstablishmentBatchProvided: (
       _state,
-      _action: PayloadAction<EstablishmentCSVRow[]>,
+      _action: PayloadAction<unknown[]>,
     ) => initialState,
     candidateEstablishmentBatchParsed: (
       state,
