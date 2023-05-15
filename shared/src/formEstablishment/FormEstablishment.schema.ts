@@ -15,7 +15,9 @@ import {
 import {
   BusinessContactDto,
   ContactMethod,
+  CSVBoolean,
   EstablishmentBatchReport,
+  EstablishmentCSVRow,
   FormEstablishmentBatchDto,
   FormEstablishmentDto,
   FormEstablishmentSource,
@@ -103,3 +105,30 @@ export const establishmentBatchReportSchema: z.Schema<EstablishmentBatchReport> 
     numberOfSuccess: z.number(),
     failures: z.array(siretAdditionFailure),
   });
+
+const csvBooleanSchema: z.Schema<CSVBoolean> = z.enum(["1", "0", ""]);
+
+export const establishmentCSVRowSchema: z.Schema<EstablishmentCSVRow> =
+  z.object({
+    siret: siretSchema,
+    businessNameCustomized: zStringPossiblyEmpty,
+    businessName: zTrimmedString,
+    businessAddress: addressWithPostalCodeSchema,
+    naf_code: zString,
+    appellations_code: zString,
+    isEngagedEnterprise: csvBooleanSchema,
+    businessContact_job: zString,
+    businessContact_email: zString,
+    businessContact_phone: zString,
+    businessContact_lastName: zString,
+    businessContact_firstName: zString,
+    businessContact_contactMethod: preferredContactMethodSchema,
+    businessContact_copyEmails: zStringPossiblyEmpty,
+    isSearchable: csvBooleanSchema,
+    website: zStringPossiblyEmpty,
+    additionalInformation: zStringPossiblyEmpty,
+    fitForDisabledWorkers: csvBooleanSchema,
+  });
+
+export const establishmentCSVRowsSchema: z.Schema<EstablishmentCSVRow[]> =
+  z.array(establishmentCSVRowSchema);
