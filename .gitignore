@@ -3,6 +3,7 @@
 node_modules
 .env
 .env.local
+.notes
 docker-data
 nginx/etc/letsencrypt
 backup/**/*.bz2
