@@ -11,26 +11,26 @@ import {
   InMemoryUnitOfWork,
 } from "../../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
-import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { InMemoryNotificationGateway } from "../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
 import { PeUserAndAdvisor } from "../dto/PeConnect.dto";
 import { PeConnectImmersionAdvisorDto } from "../dto/PeConnectAdvisor.dto";
 import { NotifyPoleEmploiUserAdvisorOnConventionFullySigned } from "./NotifyPoleEmploiUserAdvisorOnConventionFullySigned";
 
 describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
   let uow: InMemoryUnitOfWork;
-  let emailGateway: InMemoryEmailGateway;
+  let notificationGateway: InMemoryNotificationGateway;
   let usecase: NotifyPoleEmploiUserAdvisorOnConventionFullySigned;
   let agency: AgencyDto;
   const timeGateway = new CustomTimeGateway();
 
   beforeEach(() => {
-    emailGateway = new InMemoryEmailGateway();
+    notificationGateway = new InMemoryNotificationGateway();
     uow = createInMemoryUow();
     agency = uow.agencyRepository.agencies[0];
     usecase = new NotifyPoleEmploiUserAdvisorOnConventionFullySigned(
       new InMemoryUowPerformer(uow),
-      emailGateway,
+      notificationGateway,
       fakeGenerateMagicLinkUrlFn,
       timeGateway,
     );
@@ -75,7 +75,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
 
     await usecase.execute(conventionDtoFromEvent);
 
-    expectTypeToMatchAndEqual(emailGateway.getSentEmails(), [
+    expectTypeToMatchAndEqual(notificationGateway.getSentEmails(), [
       {
         type: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED",
         recipients: [advisor.email],
@@ -134,7 +134,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
 
     await usecase.execute(conventionDtoFromEvent);
 
-    expectTypeToMatchAndEqual(emailGateway.getSentEmails(), []);
+    expectTypeToMatchAndEqual(notificationGateway.getSentEmails(), []);
   });
 });
 

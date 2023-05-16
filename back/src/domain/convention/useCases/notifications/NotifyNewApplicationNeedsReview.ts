@@ -18,14 +18,14 @@ import {
 } from "../../../core/ports/UnitOfWork";
 import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { EmailGateway } from "../../ports/EmailGateway";
+import { NotificationGateway } from "../../ports/NotificationGateway";
 
 const logger = createLogger(__filename);
 
 export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<ConventionDto> {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly emailGateway: EmailGateway,
+    private readonly notificationGateway: NotificationGateway,
     private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     private readonly timeGateway: TimeGateway,
     private readonly shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
@@ -114,7 +114,7 @@ export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<Conven
     );
 
     await Promise.all(
-      emails.map((email) => this.emailGateway.sendEmail(email)),
+      emails.map((email) => this.notificationGateway.sendEmail(email)),
     );
 
     logger.info(

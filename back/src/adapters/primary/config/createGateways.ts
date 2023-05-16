@@ -5,7 +5,7 @@ import {
   immersionFacileContactEmail,
   pipeWithValue,
 } from "shared";
-import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
+import { NotificationGateway } from "../../../domain/convention/ports/NotificationGateway";
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
@@ -21,10 +21,6 @@ import { CustomTimeGateway } from "../../secondary/core/TimeGateway/CustomTimeGa
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { MetabaseDashboardGateway } from "../../secondary/dashboardGateway/MetabaseDashboardGateway";
 import { StubDashboardGateway } from "../../secondary/dashboardGateway/StubDashboardGateway";
-import { HybridEmailGateway } from "../../secondary/emailGateway/HybridEmailGateway";
-import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmailGateway";
-import { SendinblueHtmlEmailGateway } from "../../secondary/emailGateway/SendinblueHtmlEmailGateway";
-import { sendinblueHtmlEmailGatewayTargets } from "../../secondary/emailGateway/SendinblueHtmlEmailGateway.targets";
 import {
   EmailableEmailValidationGateway,
   emailableValidationTargets,
@@ -42,6 +38,10 @@ import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/Pol
 import { HttpInclusionConnectGateway } from "../../secondary/InclusionConnectGateway/HttpInclusionConnectGateway";
 import { makeInclusionConnectExternalTargets } from "../../secondary/InclusionConnectGateway/inclusionConnectExternal.targets";
 import { InMemoryInclusionConnectGateway } from "../../secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
+import { HybridNotificationGateway } from "../../secondary/notificationGateway/HybridNotificationGateway";
+import { InMemoryNotificationGateway } from "../../secondary/notificationGateway/InMemoryNotificationGateway";
+import { SendinblueHtmlNotificationGateway } from "../../secondary/notificationGateway/SendinblueHtmlNotificationGateway";
+import { sendinblueHtmlNotificationGatewayTargets } from "../../secondary/notificationGateway/SendinblueHtmlNotificationGateway.targets";
 import { NotImplementedDocumentGateway } from "../../secondary/NotImplementedDocumentGateway";
 import { HttpPeConnectGateway } from "../../secondary/PeConnectGateway/HttpPeConnectGateway";
 import { InMemoryPeConnectGateway } from "../../secondary/PeConnectGateway/InMemoryPeConnectGateway";
@@ -93,7 +93,7 @@ export type Gateways = ReturnType<typeof createGateways> extends Promise<infer T
 // eslint-disable-next-line @typescript-eslint/require-await
 export const createGateways = async (config: AppConfig) => {
   logger.info({
-    emailGateway: config.emailGateway,
+    notificationGateway: config.notificationGateway,
     repositories: config.repositories,
     romeRepository: config.romeRepository,
     siretGateway: config.siretGateway,
@@ -122,7 +122,7 @@ export const createGateways = async (config: AppConfig) => {
     addressApi: createAddressGateway(config),
     dashboardGateway: createDashboardGateway(config),
     documentGateway: createDocumentGateway(config),
-    email: createEmailGateway(config, timeGateway),
+    email: createNotificationGateway(config, timeGateway),
     emailValidationGateway: createEmailValidationGateway(config),
     exportGateway:
       config.reporting === "EXCEL"
@@ -204,42 +204,43 @@ const getSiretGateway = (
   return gatewayByProvider[provider]();
 };
 
-const createEmailGateway = (
+const createNotificationGateway = (
   config: AppConfig,
   timeGateway: TimeGateway,
-): EmailGateway => {
-  if (config.emailGateway === "IN_MEMORY")
-    return new InMemoryEmailGateway(timeGateway);
+): NotificationGateway => {
+  if (config.notificationGateway === "IN_MEMORY")
+    return new InMemoryNotificationGateway(timeGateway);
 
-  const sendinblueHtmlEmailGateway = new SendinblueHtmlEmailGateway(
-    configureCreateHttpClientForExternalApi(
-      axios.create({
-        timeout: config.externalAxiosTimeout,
+  const sendinblueHtmlNotificationGateway =
+    new SendinblueHtmlNotificationGateway(
+      configureCreateHttpClientForExternalApi(
+        axios.create({
+          timeout: config.externalAxiosTimeout,
+        }),
+      )(sendinblueHtmlNotificationGatewayTargets),
+      makeEmailAllowListPredicate({
+        skipEmailAllowList: config.skipEmailAllowlist,
+        emailAllowList: config.emailAllowList,
       }),
-    )(sendinblueHtmlEmailGatewayTargets),
-    makeEmailAllowListPredicate({
-      skipEmailAllowList: config.skipEmailAllowlist,
-      emailAllowList: config.emailAllowList,
-    }),
-    config.apiKeySendinblue,
-    {
-      name: "Immersion Facilitée",
-      email: immersionFacileContactEmail,
-    },
-  );
-
-  if (config.emailGateway === "SENDINBLUE_HTML") {
-    return sendinblueHtmlEmailGateway;
-  }
-
-  if (config.emailGateway === "HYBRID")
-    return new HybridEmailGateway(
-      sendinblueHtmlEmailGateway,
-      new InMemoryEmailGateway(timeGateway, 15),
+      config.apiKeySendinblue,
+      {
+        name: "Immersion Facilitée",
+        email: immersionFacileContactEmail,
+      },
     );
 
-  return exhaustiveCheck(config.emailGateway, {
-    variableName: "config.emailGateway",
+  if (config.notificationGateway === "SENDINBLUE_HTML") {
+    return sendinblueHtmlNotificationGateway;
+  }
+
+  if (config.notificationGateway === "HYBRID")
+    return new HybridNotificationGateway(
+      sendinblueHtmlNotificationGateway,
+      new InMemoryNotificationGateway(timeGateway, 15),
+    );
+
+  return exhaustiveCheck(config.notificationGateway, {
+    variableName: "config.notificationGateway",
     throwIfReached: true,
   });
 };

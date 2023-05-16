@@ -1,12 +1,12 @@
 import { AgencyDtoBuilder } from "shared";
-import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
+import { InMemoryNotificationGateway } from "../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
 import { SendEmailWhenAgencyIsActivated } from "../../../domain/convention/useCases/SendEmailWhenAgencyIsActivated";
 
 describe("SendEmailWhenAgencyIsActivated", () => {
   it("Sends an email to validators with agency name", async () => {
     // Prepare
-    const emailGateway = new InMemoryEmailGateway();
-    const useCase = new SendEmailWhenAgencyIsActivated(emailGateway);
+    const notificationGateway = new InMemoryNotificationGateway();
+    const useCase = new SendEmailWhenAgencyIsActivated(notificationGateway);
     const updatedAgency = AgencyDtoBuilder.create()
       .withValidatorEmails(["toto@email.com"])
       .withName("just-activated-agency")
@@ -16,7 +16,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
     await useCase.execute({ agency: updatedAgency });
 
     // Assert
-    const sentEmails = emailGateway.getSentEmails();
+    const sentEmails = notificationGateway.getSentEmails();
     expect(sentEmails).toHaveLength(1);
 
     expect(sentEmails[0].type).toBe("AGENCY_WAS_ACTIVATED");

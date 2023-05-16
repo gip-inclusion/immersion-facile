@@ -9,8 +9,8 @@ import {
   createInMemoryUow,
   InMemoryUnitOfWork,
 } from "../../../../adapters/primary/config/uowConfig";
-import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+import { InMemoryNotificationGateway } from "../../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
 import { NotifyIcUserAgencyRightChanged } from "./NotifyIcUserAgencyRightChanged";
 
 const icUserRoleParams: IcUserRoleForAgencyParams = {
@@ -20,18 +20,18 @@ const icUserRoleParams: IcUserRoleForAgencyParams = {
 };
 
 describe("SendEmailWhenAgencyIsActivated", () => {
-  let emailGateway: InMemoryEmailGateway;
+  let notificationGateway: InMemoryNotificationGateway;
   let uow: InMemoryUnitOfWork;
   let uowPerformer: InMemoryUowPerformer;
   let notifyIcUserAgencyRightChanged: NotifyIcUserAgencyRightChanged;
 
   beforeEach(() => {
-    emailGateway = new InMemoryEmailGateway();
+    notificationGateway = new InMemoryNotificationGateway();
     uow = createInMemoryUow();
     uowPerformer = new InMemoryUowPerformer(uow);
     notifyIcUserAgencyRightChanged = new NotifyIcUserAgencyRightChanged(
       uowPerformer,
-      emailGateway,
+      notificationGateway,
     );
   });
   it("throw error when no agency found", async () => {
@@ -40,7 +40,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       `Unable to send mail. No agency config found for ${icUserRoleParams.agencyId}`,
     );
 
-    expectToEqual(emailGateway.getSentEmails(), []);
+    expectToEqual(notificationGateway.getSentEmails(), []);
   });
 
   it("throw error when no user found", async () => {
@@ -56,7 +56,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       `User with id ${icUserRoleParams.userId} not found`,
     );
 
-    expectToEqual(emailGateway.getSentEmails(), []);
+    expectToEqual(notificationGateway.getSentEmails(), []);
   });
 
   it("Sends an email to validators with agency name", async () => {
@@ -84,7 +84,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
 
     await notifyIcUserAgencyRightChanged.execute(icUserRoleParams);
 
-    const sentEmails = emailGateway.getSentEmails();
+    const sentEmails = notificationGateway.getSentEmails();
     expectToEqual(sentEmails, [
       {
         type: "IC_USER_RIGHTS_HAS_CHANGED",
@@ -122,7 +122,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       userId: "jbab-123",
     });
 
-    const sentEmails = emailGateway.getSentEmails();
+    const sentEmails = notificationGateway.getSentEmails();
     expect(sentEmails).toHaveLength(0);
   });
 });

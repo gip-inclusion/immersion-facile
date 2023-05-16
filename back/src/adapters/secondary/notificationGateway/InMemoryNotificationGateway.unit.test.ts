@@ -1,8 +1,8 @@
 import { expectArraysToMatch, TemplatedEmail } from "shared";
 import { CustomTimeGateway } from "../core/TimeGateway/CustomTimeGateway";
-import { InMemoryEmailGateway } from "./InMemoryEmailGateway";
+import { InMemoryNotificationGateway } from "./InMemoryNotificationGateway";
 
-describe("In memory EmailGateway", () => {
+describe("In memory NotificationGateway", () => {
   let timeGateway: CustomTimeGateway;
 
   beforeEach(() => {
@@ -10,7 +10,10 @@ describe("In memory EmailGateway", () => {
   });
 
   it("should be able to retrieve last emails sent in order", async () => {
-    const inMemoryEmailGateway = new InMemoryEmailGateway(timeGateway, 5);
+    const inMemoryNotificationGateway = new InMemoryNotificationGateway(
+      timeGateway,
+      5,
+    );
     const secondDateIso = "2022-02-02T14:00:00.000Z";
     const secondTemplatedEmail: TemplatedEmail = {
       type: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
@@ -18,7 +21,7 @@ describe("In memory EmailGateway", () => {
       params: { editFrontUrl: "plop-second" },
     };
     timeGateway.setNextDate(new Date(secondDateIso));
-    await inMemoryEmailGateway.sendEmail(secondTemplatedEmail);
+    await inMemoryNotificationGateway.sendEmail(secondTemplatedEmail);
 
     const firstDateIso = "2022-01-01T12:00:00.000Z";
     const firstTemplatedEmail: TemplatedEmail = {
@@ -27,35 +30,41 @@ describe("In memory EmailGateway", () => {
       params: { editFrontUrl: "plop" },
     };
     timeGateway.setNextDate(new Date(firstDateIso));
-    await inMemoryEmailGateway.sendEmail(firstTemplatedEmail);
+    await inMemoryNotificationGateway.sendEmail(firstTemplatedEmail);
 
-    await expectArraysToMatch(inMemoryEmailGateway.getLastSentEmailDtos(), [
-      {
-        sentAt: secondDateIso,
-        templatedEmail: secondTemplatedEmail,
-      },
-      {
-        sentAt: firstDateIso,
-        templatedEmail: firstTemplatedEmail,
-      },
-    ]);
+    await expectArraysToMatch(
+      inMemoryNotificationGateway.getLastSentEmailDtos(),
+      [
+        {
+          sentAt: secondDateIso,
+          templatedEmail: secondTemplatedEmail,
+        },
+        {
+          sentAt: firstDateIso,
+          templatedEmail: firstTemplatedEmail,
+        },
+      ],
+    );
   });
 
   it("should be able to retrieve at most the given maximum of emails", async () => {
-    const inMemoryEmailGateway = new InMemoryEmailGateway(timeGateway, 1);
+    const inMemoryNotificationGateway = new InMemoryNotificationGateway(
+      timeGateway,
+      1,
+    );
     timeGateway.setNextDate(new Date("2022-01-01T12:00:00.000Z"));
-    await inMemoryEmailGateway.sendEmail({
+    await inMemoryNotificationGateway.sendEmail({
       type: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
       recipients: ["establishment-ceo@gmail.com"],
       params: { editFrontUrl: "plop" },
     });
-    await inMemoryEmailGateway.sendEmail({
+    await inMemoryNotificationGateway.sendEmail({
       type: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
       recipients: ["other-ceo@gmail.com"],
       params: { editFrontUrl: "other-mail" },
     });
 
-    const sentEmails = inMemoryEmailGateway.getLastSentEmailDtos();
+    const sentEmails = inMemoryNotificationGateway.getLastSentEmailDtos();
     expect(sentEmails).toHaveLength(1);
     await expectArraysToMatch(sentEmails, [
       {

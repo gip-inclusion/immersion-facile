@@ -15,7 +15,7 @@ import {
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { EmailGateway } from "../../ports/EmailGateway";
+import { NotificationGateway } from "../../ports/NotificationGateway";
 
 export const missingConventionMessage = (conventionId: ConventionId) =>
   `Missing convention ${conventionId} on convention repository.`;
@@ -29,7 +29,7 @@ export const noSignatoryMessage = (convention: ConventionDto): string =>
 export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUseCase<ConventionDto> {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly emailGateway: EmailGateway,
+    private readonly notificationGateway: NotificationGateway,
     private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     private readonly timeGateway: TimeGateway,
   ) {
@@ -62,7 +62,7 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
       Object.values(repositoryConvention.signatories),
     );
     if (lastSigneeEmail)
-      return this.emailGateway.sendEmail(
+      return this.notificationGateway.sendEmail(
         this.emailToSend(repositoryConvention, lastSigneeEmail, agency),
       );
     throw new Error(noSignatoryMessage(repositoryConvention));

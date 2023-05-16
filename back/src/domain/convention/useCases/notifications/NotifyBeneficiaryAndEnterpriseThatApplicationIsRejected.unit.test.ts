@@ -1,8 +1,8 @@
 import { AgencyDto, AgencyDtoBuilder, ConventionDtoBuilder } from "shared";
 import { expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../../../_testBuilders/emailAssertions";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
-import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+import { InMemoryNotificationGateway } from "../../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "./NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
 
 const rejectedConvention = new ConventionDtoBuilder()
@@ -19,12 +19,12 @@ const defaultAgency = AgencyDtoBuilder.create(rejectedConvention.agencyId)
   .build();
 
 describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
-  let emailGw: InMemoryEmailGateway;
+  let notificationGateway: InMemoryNotificationGateway;
   let agency: AgencyDto;
 
   beforeEach(() => {
     agency = defaultAgency;
-    emailGw = new InMemoryEmailGateway();
+    notificationGateway = new InMemoryNotificationGateway();
   });
 
   const createUseCase = () => {
@@ -32,14 +32,14 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
     uow.agencyRepository.setAgencies([agency]);
     return new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
       new InMemoryUowPerformer(uow),
-      emailGw,
+      notificationGateway,
     );
   };
 
   it("Sends rejection email to beneficiary, establishment tutor, and counsellor", async () => {
     await createUseCase().execute(rejectedConvention);
 
-    const sentEmails = emailGw.getSentEmails();
+    const sentEmails = notificationGateway.getSentEmails();
     expect(sentEmails).toHaveLength(1);
 
     expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(

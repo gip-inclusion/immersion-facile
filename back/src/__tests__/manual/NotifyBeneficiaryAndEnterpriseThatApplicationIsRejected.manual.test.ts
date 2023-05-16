@@ -6,9 +6,9 @@ import {
 import { AppConfig } from "../../adapters/primary/config/appConfig";
 import { configureCreateHttpClientForExternalApi } from "../../adapters/primary/config/createHttpClientForExternalApi";
 import { createInMemoryUow } from "../../adapters/primary/config/uowConfig";
-import { SendinblueHtmlEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueHtmlEmailGateway";
-import { sendinblueHtmlEmailGatewayTargets } from "../../adapters/secondary/emailGateway/SendinblueHtmlEmailGateway.targets";
 import { InMemoryUowPerformer } from "../../adapters/secondary/InMemoryUowPerformer";
+import { SendinblueHtmlNotificationGateway } from "../../adapters/secondary/notificationGateway/SendinblueHtmlNotificationGateway";
+import { sendinblueHtmlNotificationGatewayTargets } from "../../adapters/secondary/notificationGateway/SendinblueHtmlNotificationGateway.targets";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
 
 // These tests are not hermetic and not meant for automated testing. They will send emails using
@@ -36,9 +36,9 @@ const counsellorEmail = "jean-francois.macresy@beta.gouv.fr";
 describe("NotifyApplicationRejectedToBeneficiaryAndEnterprise", () => {
   it("Sends rejection email", async () => {
     const config = AppConfig.createFromEnv();
-    const emailGw = new SendinblueHtmlEmailGateway(
+    const notificationGateway = new SendinblueHtmlNotificationGateway(
       configureCreateHttpClientForExternalApi()(
-        sendinblueHtmlEmailGatewayTargets,
+        sendinblueHtmlNotificationGatewayTargets,
       ),
       (_) => true,
       config.apiKeySendinblue,
@@ -57,7 +57,7 @@ describe("NotifyApplicationRejectedToBeneficiaryAndEnterprise", () => {
     const notifyBeneficiaryAndEnterpriseThatApplicationIsRejected =
       new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
         new InMemoryUowPerformer(uow),
-        emailGw,
+        notificationGateway,
       );
 
     await notifyBeneficiaryAndEnterpriseThatApplicationIsRejected.execute(

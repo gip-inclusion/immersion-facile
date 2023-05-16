@@ -9,8 +9,8 @@ import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { UuidV4Generator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { InMemoryNotificationGateway } from "../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { EstablishmentAggregateRepository } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
 import { RequestEditFormEstablishment } from "../../../domain/immersionOffer/useCases/RequestEditFormEstablishment";
@@ -43,7 +43,7 @@ const prepareUseCase = () => {
   setMethodGetContactEmailFromSiret(establishmentAggregateRepository); // In most of the tests, we need the contact to be defined
 
   const timeGateway = new CustomTimeGateway();
-  const emailGateway = new InMemoryEmailGateway();
+  const notificationGateway = new InMemoryNotificationGateway();
   const uuidGenerator = new UuidV4Generator();
 
   const generateEditFormEstablishmentUrl = (payload: EstablishmentJwtPayload) =>
@@ -51,7 +51,7 @@ const prepareUseCase = () => {
 
   const useCase = new RequestEditFormEstablishment(
     new InMemoryUowPerformer(uow),
-    emailGateway,
+    notificationGateway,
     timeGateway,
     generateEditFormEstablishmentUrl,
     makeCreateNewEvent({
@@ -64,7 +64,7 @@ const prepareUseCase = () => {
     outboxQueries,
     outboxRepository,
     establishmentAggregateRepository,
-    emailGateway,
+    notificationGateway,
     timeGateway,
   };
 };
@@ -89,13 +89,13 @@ describe("RequestUpdateFormEstablishment", () => {
   describe("If no email has been sent yet.", () => {
     it("Sends an email to the contact of the establishment with eventually email in CC", async () => {
       // Prepare
-      const { useCase, emailGateway } = prepareUseCase();
+      const { useCase, notificationGateway } = prepareUseCase();
 
       // Act
       await useCase.execute(siret);
 
       // Assert
-      const actualSentEmails = emailGateway.getSentEmails();
+      const actualSentEmails = notificationGateway.getSentEmails();
       expect(actualSentEmails).toHaveLength(1);
       const expectedEmail: TemplatedEmail = {
         type: "EDIT_FORM_ESTABLISHMENT_LINK",
@@ -154,7 +154,7 @@ describe("RequestUpdateFormEstablishment", () => {
       useCase,
       outboxRepository,
       outboxQueries,
-      emailGateway,
+      notificationGateway,
       timeGateway,
     } = prepareUseCase();
 
@@ -172,7 +172,7 @@ describe("RequestUpdateFormEstablishment", () => {
     await useCase.execute(siret);
 
     // Assert
-    expect(emailGateway.getSentEmails()).toHaveLength(1);
+    expect(notificationGateway.getSentEmails()).toHaveLength(1);
     expect(outboxRepository.events).toHaveLength(1);
   });
 });

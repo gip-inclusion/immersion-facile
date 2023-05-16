@@ -275,6 +275,13 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     );
   }
 
+  public withEstablishmentRepresentativePhone(phone: string) {
+    return this.withEstablishmentRepresentative({
+      ...this.dto.signatories.establishmentRepresentative,
+      phone,
+    });
+  }
+
   public withEstablishmentRepresentativeFirstName(firstName: string) {
     return this.withEstablishmentRepresentative({
       ...this.dto.signatories.establishmentRepresentative,

@@ -18,12 +18,12 @@ import {
 import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../peConnect/dto/PeConnect.dto";
-import { EmailGateway } from "../../ports/EmailGateway";
+import { NotificationGateway } from "../../ports/NotificationGateway";
 
 export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUseCase<ConventionDto> {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly emailGateway: EmailGateway,
+    private readonly notificationGateway: NotificationGateway,
     private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     private readonly timeGateway: TimeGateway,
     private readonly shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
@@ -44,7 +44,7 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
       throw new NotFoundError(
         `Unable to send mail. No agency config found for ${convention.agencyId}`,
       );
-    await this.emailGateway.sendEmail({
+    await this.notificationGateway.sendEmail({
       type: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
       recipients: [
         ...Object.values(convention.signatories).map(

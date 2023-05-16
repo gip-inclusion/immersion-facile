@@ -21,8 +21,8 @@ import {
   InMemoryUnitOfWork,
 } from "../../../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
-import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+import { InMemoryNotificationGateway } from "../../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { makeShortLinkUrl } from "../../../core/ShortLink";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../peConnect/dto/PeConnect.dto";
@@ -42,7 +42,7 @@ const defaultAgency = AgencyDtoBuilder.create(validConvention.agencyId)
 const shortLinkId = "shortLink1";
 describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email to all actors", () => {
   let uow: InMemoryUnitOfWork;
-  let emailGateway: InMemoryEmailGateway;
+  let notificationGateway: InMemoryNotificationGateway;
   let timeGateway: CustomTimeGateway;
   let notifyAllActorsOfFinalConventionValidation: NotifyAllActorsOfFinalConventionValidation;
   let config: AppConfig;
@@ -50,7 +50,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
   beforeEach(() => {
     config = new AppConfigBuilder({}).build();
     uow = createInMemoryUow();
-    emailGateway = new InMemoryEmailGateway();
+    notificationGateway = new InMemoryNotificationGateway();
     timeGateway = new CustomTimeGateway();
     const shortLinkIdGeneratorGateway =
       new DeterministShortLinkIdGeneratorGateway();
@@ -59,7 +59,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
     notifyAllActorsOfFinalConventionValidation =
       new NotifyAllActorsOfFinalConventionValidation(
         new InMemoryUowPerformer(uow),
-        emailGateway,
+        notificationGateway,
         fakeGenerateMagicLinkUrlFn,
         timeGateway,
         shortLinkIdGeneratorGateway,
@@ -83,7 +83,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
         counsellorEmail,
         validatorEmail,
       ],
-      emailGateway.getSentEmails(),
+      notificationGateway.getSentEmails(),
       agency,
       validConvention,
       config,
@@ -127,7 +127,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
         counsellorEmail,
         validatorEmail,
       ],
-      emailGateway.getSentEmails(),
+      notificationGateway.getSentEmails(),
       agency,
       conventionWithBeneficiaryCurrentEmployer,
       config,
@@ -159,7 +159,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
         validatorEmail,
         conventionWithSpecificEstablishementEmail.establishmentTutor.email,
       ],
-      emailGateway.getSentEmails(),
+      notificationGateway.getSentEmails(),
       agency,
       validConvention,
       config,
@@ -198,7 +198,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
         counsellorEmail,
         validatorEmail,
       ],
-      emailGateway.getSentEmails(),
+      notificationGateway.getSentEmails(),
       agency,
       conventionWithBeneficiaryRepresentative,
       config,
@@ -250,7 +250,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
         validatorEmail,
         userConventionAdvisor.advisor!.email,
       ],
-      emailGateway.getSentEmails(),
+      notificationGateway.getSentEmails(),
       agency,
       validConvention,
       config,
@@ -285,7 +285,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email t
         counsellorEmail,
         validatorEmail,
       ],
-      emailGateway.getSentEmails(),
+      notificationGateway.getSentEmails(),
       agency,
       validConvention,
       config,

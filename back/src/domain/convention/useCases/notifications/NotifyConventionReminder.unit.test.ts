@@ -26,8 +26,8 @@ import {
   NotFoundError,
 } from "../../../../adapters/primary/helpers/httpErrors";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
-import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+import { InMemoryNotificationGateway } from "../../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { ReminderKind } from "../../../core/eventsPayloads/ConventionReminderPayload";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
@@ -43,15 +43,16 @@ import {
 } from "./NotifyLastSigneeThatConventionHasBeenSigned";
 
 describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
-  const establishmentRepresentative: EstablishmentRepresentative = {
-    email: "boss@mail.com",
-    firstName: "lord",
-    lastName: "voldemort",
-    phone: "0688776666",
-    role: "establishment-representative",
-  };
+  const establishmentRepresentativeWithoutMobilePhone: EstablishmentRepresentative =
+    {
+      email: "boss@mail.com",
+      firstName: "lord",
+      lastName: "voldemort",
+      phone: "0188776666",
+      role: "establishment-representative",
+    };
   let useCase: NotifyConventionReminder;
-  let emailGateway: InMemoryEmailGateway;
+  let notificationGateway: InMemoryNotificationGateway;
   let uow: InMemoryUnitOfWork;
   let timeGateway: CustomTimeGateway;
   let shortLinkIdGeneratorGateway: DeterministShortLinkIdGeneratorGateway;
@@ -60,12 +61,12 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
   beforeEach(() => {
     config = new AppConfigBuilder().build();
     timeGateway = new CustomTimeGateway();
-    emailGateway = new InMemoryEmailGateway(timeGateway);
+    notificationGateway = new InMemoryNotificationGateway(timeGateway);
     shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
     uow = createInMemoryUow();
     useCase = new NotifyConventionReminder(
       new InMemoryUowPerformer(uow),
-      emailGateway,
+      notificationGateway,
       timeGateway,
       fakeGenerateMagicLinkUrlFn,
       shortLinkIdGeneratorGateway,
@@ -89,7 +90,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       );
 
       //Assert
-      expectToEqual(emailGateway.getSentEmails(), []);
+      expectToEqual(notificationGateway.getSentEmails(), []);
     });
 
     it("Missing agency", async () => {
@@ -109,7 +110,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       );
 
       //Assert
-      expectToEqual(emailGateway.getSentEmails(), []);
+      expectToEqual(notificationGateway.getSentEmails(), []);
     });
   });
 
@@ -179,7 +180,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             now: timeGateway.now(),
           }),
         });
-        expectToEqual(emailGateway.getSentEmails(), [
+        expectToEqual(notificationGateway.getSentEmails(), [
           makeAgencyFirstReminderEmail({
             email: councellor1Email,
             agency,
@@ -233,7 +234,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             forbiddenUnsupportedStatusMessage(convention, type),
           ),
         );
-        expectToEqual(emailGateway.getSentEmails(), []);
+        expectToEqual(notificationGateway.getSentEmails(), []);
       });
     });
   });
@@ -300,7 +301,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             now: timeGateway.now(),
           }),
         });
-        expectToEqual(emailGateway.getSentEmails(), [
+        expectToEqual(notificationGateway.getSentEmails(), [
           makeAgencyLastReminderEmail({
             email: councellor1Email,
             convention,
@@ -351,7 +352,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         );
 
         //Assert
-        expectToEqual(emailGateway.getSentEmails(), []);
+        expectToEqual(notificationGateway.getSentEmails(), []);
       });
     });
   });
@@ -366,20 +367,23 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
     const type: ReminderKind = "FirstReminderForSignatories";
 
     it.each(authorizedSignatoryStatuses)(
-      `Send email SIGNATORY_FIRST_REMINDER to signatories when status is '%s' - convention with same establishment representative & tutor`,
+      `Send email SIGNATORY_FIRST_REMINDER to signatories when status is '%s'.
+          Convention with same establishment representative & tutor without mobile phone`,
       async (status) => {
         //Arrange
         const agency = new AgencyDtoBuilder().withId("agencyId").build();
         const convention = new ConventionDtoBuilder()
           .withAgencyId(agency.id)
           .withStatus(status)
-          .withEstablishmentRepresentative(establishmentRepresentative)
+          .withEstablishmentRepresentative(
+            establishmentRepresentativeWithoutMobilePhone,
+          )
           .withEstablishmentTutor({
-            email: establishmentRepresentative.email,
-            firstName: establishmentRepresentative.firstName,
-            lastName: establishmentRepresentative.lastName,
+            email: establishmentRepresentativeWithoutMobilePhone.email,
+            firstName: establishmentRepresentativeWithoutMobilePhone.firstName,
+            lastName: establishmentRepresentativeWithoutMobilePhone.lastName,
             job: "wizard",
-            phone: establishmentRepresentative.phone,
+            phone: establishmentRepresentativeWithoutMobilePhone.phone,
             role: "establishment-tutor",
           })
           .build();
@@ -415,7 +419,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           }),
         });
 
-        expectToEqual(emailGateway.getSentEmails(), [
+        expectToEqual(notificationGateway.getSentEmails(), [
           makeSignatoriesFirstReminderEmail({
             actor: convention.signatories.beneficiary,
             convention,
@@ -429,11 +433,15 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[1]),
           }),
         ]);
+
+        expectToEqual(notificationGateway.getSentSms(), []);
       },
     );
 
     it.each(authorizedSignatoryStatuses)(
-      `Send email SIGNATORY_FIRST_REMINDER to signatories when status is '%s' - convention with different establishment representative & tutor`,
+      `Send email and SMS SIGNATORY_FIRST_REMINDER to signatories when status is '%s'.
+          Convention with different establishment representative & tutor.
+          SMS are sent only for signatories that have not signed yet and have mobile phone.`,
       async (status) => {
         //Arrange
         const agency = new AgencyDtoBuilder().withId("agencyId").build();
@@ -441,6 +449,10 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         const convention = new ConventionDtoBuilder()
           .withAgencyId(agency.id)
           .withStatus(status)
+          .withBeneficiaryPhone("0611223344")
+          .withBeneficiarySignedAt(undefined)
+          .withEstablishmentRepresentativePhone("0755667788")
+          .withEstablishmentRepresentativeSignedAt(undefined)
           .withEstablishmentTutor({
             email: "tutor@email.com",
             firstName: "Obiwan",
@@ -482,7 +494,78 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           }),
         });
 
-        expectToEqual(emailGateway.getSentEmails(), [
+        expectToEqual(notificationGateway.getSentEmails(), [
+          makeSignatoriesFirstReminderEmail({
+            actor: convention.establishmentTutor,
+            convention,
+            timeGateway,
+            shortLinkUrl: undefined,
+          }),
+        ]);
+        expectToEqual(notificationGateway.getSentSms(), [
+          {
+            phone: "33" + convention.signatories.beneficiary.phone.substring(1),
+            kind: type,
+            shortLink: makeShortLinkUrl(config, shortLinkIds[0]),
+          },
+          {
+            phone:
+              "33" +
+              convention.signatories.establishmentRepresentative.phone.substring(
+                1,
+              ),
+            kind: type,
+            shortLink: makeShortLinkUrl(config, shortLinkIds[1]),
+          },
+        ]);
+      },
+    );
+
+    it.each(authorizedSignatoryStatuses)(
+      `Send email SIGNATORY_FIRST_REMINDER to signatories when status is '%s' and signatories have no mobile phones`,
+      async (status) => {
+        //Arrange
+        const agency = new AgencyDtoBuilder().withId("agencyId").build();
+
+        const convention = new ConventionDtoBuilder()
+          .withAgencyId(agency.id)
+          .withStatus(status)
+          .withBeneficiaryPhone("0111223344")
+          .withEstablishmentRepresentativePhone("0211223344")
+          .build();
+        uow.conventionRepository.setConventions({
+          [convention.id]: convention,
+        });
+        uow.agencyRepository.setAgencies([agency]);
+
+        const shortLinkIds = ["link1", "link2"];
+        shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
+
+        //Act
+        await useCase.execute({
+          conventionId: convention.id,
+          reminderKind: type,
+        });
+
+        //Assert
+        expectToEqual(uow.shortLinkQuery.getShortLinks(), {
+          [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
+            id: convention.id,
+            role: convention.signatories.beneficiary.role,
+            targetRoute: frontRoutes.conventionToSign,
+            email: convention.signatories.beneficiary.email,
+            now: timeGateway.now(),
+          }),
+          [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
+            id: convention.id,
+            role: convention.signatories.establishmentRepresentative.role,
+            targetRoute: frontRoutes.conventionToSign,
+            email: convention.signatories.establishmentRepresentative.email,
+            now: timeGateway.now(),
+          }),
+        });
+
+        expectToEqual(notificationGateway.getSentEmails(), [
           makeSignatoriesFirstReminderEmail({
             actor: convention.signatories.beneficiary,
             convention,
@@ -528,7 +611,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             forbiddenUnsupportedStatusMessage(convention, type),
           ),
         );
-        expectToEqual(emailGateway.getSentEmails(), []);
+        expectToEqual(notificationGateway.getSentEmails(), []);
       });
     });
   });
@@ -536,7 +619,8 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
   describe("LastReminderForSignatories", () => {
     const type: ReminderKind = "LastReminderForSignatories";
     it.each(authorizedSignatoryStatuses)(
-      `Send email LAST_FIRST_REMINDER to signatories when status is '%s' - convention with same establishment representative & tutor`,
+      `Send email LAST_FIRST_REMINDER to signatories when status is '%s'.
+          Convention with same establishment representative & tutor`,
       async (status) => {
         //Arrange
         const agency = new AgencyDtoBuilder().withId("agencyId").build();
@@ -544,13 +628,15 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         const convention = new ConventionDtoBuilder()
           .withAgencyId(agency.id)
           .withStatus(status)
-          .withEstablishmentRepresentative(establishmentRepresentative)
+          .withEstablishmentRepresentative(
+            establishmentRepresentativeWithoutMobilePhone,
+          )
           .withEstablishmentTutor({
-            email: establishmentRepresentative.email,
-            firstName: establishmentRepresentative.firstName,
-            lastName: establishmentRepresentative.lastName,
+            email: establishmentRepresentativeWithoutMobilePhone.email,
+            firstName: establishmentRepresentativeWithoutMobilePhone.firstName,
+            lastName: establishmentRepresentativeWithoutMobilePhone.lastName,
             job: "wizard",
-            phone: establishmentRepresentative.phone,
+            phone: establishmentRepresentativeWithoutMobilePhone.phone,
             role: "establishment-tutor",
           })
           .build();
@@ -584,7 +670,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             now: timeGateway.now(),
           }),
         });
-        expectToEqual(emailGateway.getSentEmails(), [
+        expectToEqual(notificationGateway.getSentEmails(), [
           makeSignatoriesLastReminderEmail({
             actor: convention.signatories.beneficiary,
             convention,
@@ -600,7 +686,9 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
     );
 
     it.each(authorizedSignatoryStatuses)(
-      `Send email LAST_FIRST_REMINDER to signatories when status is '%s' - convention with different establishment representative & tutor`,
+      `Send email LAST_FIRST_REMINDER to signatories when status is '%s'.
+          Convention with different establishment representative & tutor.
+          SMS are sent only for signatories that have not signed yet and have mobile phone.`,
       async (status) => {
         //Arrange
         const agency = new AgencyDtoBuilder().withId("agencyId").build();
@@ -608,6 +696,8 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         const convention = new ConventionDtoBuilder()
           .withAgencyId(agency.id)
           .withStatus(status)
+          .withEstablishmentRepresentativePhone("0611448866")
+          .withEstablishmentRepresentativeSignedAt(undefined)
           .withEstablishmentTutor({
             email: "tutor@email.com",
             firstName: "Obiwan",
@@ -647,22 +737,28 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             now: timeGateway.now(),
           }),
         });
-        expectToEqual(emailGateway.getSentEmails(), [
+        expectToEqual(notificationGateway.getSentEmails(), [
           makeSignatoriesLastReminderEmail({
             actor: convention.signatories.beneficiary,
             convention,
             shortlinkUrl: makeShortLinkUrl(config, shortLinkIds[0]),
           }),
           makeSignatoriesLastReminderEmail({
-            actor: convention.signatories.establishmentRepresentative,
-            convention,
-            shortlinkUrl: makeShortLinkUrl(config, shortLinkIds[1]),
-          }),
-          makeSignatoriesLastReminderEmail({
             actor: convention.establishmentTutor,
             convention,
             shortlinkUrl: undefined,
           }),
+        ]);
+        expectToEqual(notificationGateway.getSentSms(), [
+          {
+            phone:
+              "33" +
+              convention.signatories.establishmentRepresentative.phone.substring(
+                1,
+              ),
+            kind: type,
+            shortLink: makeShortLinkUrl(config, shortLinkIds[1]),
+          },
         ]);
       },
     );
@@ -690,98 +786,9 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             forbiddenUnsupportedStatusMessage(convention, type),
           ),
         );
-        expectToEqual(emailGateway.getSentEmails(), []);
+        expectToEqual(notificationGateway.getSentEmails(), []);
       });
     });
-    // const type: ReminderType = "LastReminderForSignatories";
-    // it.each(["PARTIALLY_SIGNED", "READY_TO_SIGN"] satisfies ConventionStatus[])(
-    //   `Send email SIGNATORY_LAST_REMINDER to signatories when status is '%s'`,
-    //   async (status) => {
-    //     //Arrange
-    //     const agency = new AgencyDtoBuilder().withId("agencyId").build();
-    //     const convention = new ConventionDtoBuilder()
-    //       .withAgencyId(agency.id)
-    //       .withStatus(status)
-    //       .build();
-    //     uow.conventionRepository.setConventions({
-    //       [convention.id]: convention,
-    //     });
-    //     uow.agencyRepository.setAgencies([agency]);
-    //     //Act
-    //     await useCase.execute({
-    //       conventionId: convention.id,
-    //       type,
-    //     });
-    //     //Assert
-    //     expectToEqual(emailGateway.getSentEmails(), [
-    //       ...Object.values(convention.signatories).map((signatory) =>
-    //         makeSignatoriesFirstReminderEmail({
-    //           actor: signatory,
-    //           convention,
-    //           timeGateway,
-    //         }),
-    //       ),
-    //       makeSignatoriesLastReminderEmail({
-    //         actor: convention.establishmentTutor,
-    //         convention,
-    //         timeGateway,
-    //       }),
-    //     ]);
-    //   },
-    // );
-    // describe("Forbidden cases on convention bad status", () => {
-    //   it.each([
-    //     "CANCELLED",
-    //     "DRAFT",
-    //     "IN_REVIEW",
-    //     "REJECTED",
-    //     "ACCEPTED_BY_VALIDATOR",
-    //     "ACCEPTED_BY_COUNSELLOR",
-    //   ] satisfies ConventionStatus[])("status '%s'", async (status) => {
-    //     //Arrange
-    //     const agency = new AgencyDtoBuilder().withId("agencyId").build();
-    //     const convention = new ConventionDtoBuilder()
-    //       .withAgencyId(agency.id)
-    //       .withStatus(status)
-    //       .build();
-    //     uow.conventionRepository.setConventions({
-    //       [convention.id]: convention,
-    //     });
-    //     uow.agencyRepository.setAgencies([agency]);
-    //     //Act & Assert
-    //     await expectPromiseToFailWithError(
-    //       useCase.execute({
-    //         conventionId: convention.id,
-    //         type,
-    //       }),
-    //       new ForbiddenError(
-    //         forbiddenUnsupportedStatusMessage(convention, type),
-    //       ),
-    //     );
-    //     expectToEqual(emailGateway.getSentEmails(), []);
-    //   });
-    // });
-    // ================  MANAGE SMS =======================
-    // it("For establishment representative by SMS if the beneficiary don't have valid GSM phone number.", async () => {
-    //   await useCase.execute();
-    //   expect(true).toBeFalsy();
-    // });
-    // it("For establishment tutor by SMS if the beneficiary and establishment representative don't have valid GSM phone number.", async () => {
-    //   await useCase.execute();
-    //   expect(true).toBeFalsy();
-    // });
-    // it("For legal representative by SMS if the beneficiary, establishment representative and establishment tutor don't have valid GSM phone number.", async () => {
-    //   await useCase.execute();
-    //   expect(true).toBeFalsy();
-    // });
-    // it("For current employer by SMS if the beneficiary, establishment representative, establishment and legal representative tutor don't have valid GSM phone number.", async () => {
-    //   await useCase.execute();
-    //   expect(true).toBeFalsy();
-    // });
-    // it("For every actors (including agency) by Email if there is no valid GSM phone number", async () => {
-    //   await useCase.execute();
-    //   expect(true).toBeFalsy();
-    // });
   });
 
   describe("toSignatoriesSummary", () => {

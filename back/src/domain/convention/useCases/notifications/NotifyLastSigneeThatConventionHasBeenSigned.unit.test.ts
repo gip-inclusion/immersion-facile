@@ -12,8 +12,8 @@ import {
   InMemoryUnitOfWork,
 } from "../../../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
-import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+import { InMemoryNotificationGateway } from "../../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
 import {
   missingConventionMessage,
   noSignatoryMessage,
@@ -22,7 +22,7 @@ import {
 
 describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
   let conventionSignedByNoOne: ConventionDto;
-  let emailGw: InMemoryEmailGateway;
+  let notificationGateway: InMemoryNotificationGateway;
   let usecase: NotifyLastSigneeThatConventionHasBeenSigned;
   let uow: InMemoryUnitOfWork;
   let timeGateway: CustomTimeGateway;
@@ -36,12 +36,12 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
       .signedByBeneficiary(undefined)
       .signedByEstablishmentRepresentative(undefined)
       .build();
-    emailGw = new InMemoryEmailGateway();
+    notificationGateway = new InMemoryNotificationGateway();
 
     timeGateway = new CustomTimeGateway();
     usecase = new NotifyLastSigneeThatConventionHasBeenSigned(
       new InMemoryUowPerformer(uow),
-      emailGw,
+      notificationGateway,
       fakeGenerateMagicLinkUrlFn,
       timeGateway,
     );
@@ -67,7 +67,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
       now,
     });
 
-    expectToEqual(emailGw.getSentEmails(), [
+    expectToEqual(notificationGateway.getSentEmails(), [
       {
         params: {
           internshipKind: signedConvention.internshipKind,
@@ -95,7 +95,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
 
     await usecase.execute(signedConvention);
 
-    expectToEqual(emailGw.getSentEmails(), [
+    expectToEqual(notificationGateway.getSentEmails(), [
       {
         params: {
           internshipKind: signedConvention.internshipKind,
@@ -130,7 +130,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
       new Error(noSignatoryMessage(conventionSignedByNoOne)),
     );
 
-    expectToEqual(emailGw.getSentEmails(), []);
+    expectToEqual(notificationGateway.getSentEmails(), []);
   });
 
   it("No convention on repository.", async () => {
@@ -141,6 +141,6 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
       new Error(missingConventionMessage(conventionSignedByNoOne.id)),
     );
 
-    expectToEqual(emailGw.getSentEmails(), []);
+    expectToEqual(notificationGateway.getSentEmails(), []);
   });
 });

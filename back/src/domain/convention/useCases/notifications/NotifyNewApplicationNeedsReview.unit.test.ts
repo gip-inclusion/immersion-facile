@@ -13,8 +13,8 @@ import {
   InMemoryUnitOfWork,
 } from "../../../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
-import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+import { InMemoryNotificationGateway } from "../../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { makeShortLinkUrl } from "../../../core/ShortLink";
 import { NotifyNewApplicationNeedsReview } from "./NotifyNewApplicationNeedsReview";
@@ -27,7 +27,7 @@ const defaultAgency = AgencyDtoBuilder.create(defaultConvention.agencyId)
 
 describe("NotifyImmersionApplicationNeedsReview", () => {
   let uow: InMemoryUnitOfWork;
-  let emailGw: InMemoryEmailGateway;
+  let notificationGateway: InMemoryNotificationGateway;
   let notifyNewConventionNeedsReview: NotifyNewApplicationNeedsReview;
   let shortLinkIdGeneratorGateway: DeterministShortLinkIdGeneratorGateway;
   let config: AppConfig;
@@ -35,12 +35,12 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
 
   beforeEach(() => {
     config = new AppConfigBuilder().build();
-    emailGw = new InMemoryEmailGateway();
+    notificationGateway = new InMemoryNotificationGateway();
     uow = createInMemoryUow();
     shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
     notifyNewConventionNeedsReview = new NotifyNewApplicationNeedsReview(
       new InMemoryUowPerformer(uow),
-      emailGw,
+      notificationGateway,
       fakeGenerateMagicLinkUrlFn,
       timeGateway,
       shortLinkIdGeneratorGateway,
@@ -107,7 +107,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
           targetRoute: frontRoutes.conventionStatusDashboard,
         }),
       });
-      expectToEqual(emailGw.getSentEmails(), [
+      expectToEqual(notificationGateway.getSentEmails(), [
         {
           type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
           recipients: [counsellorEmails[0]],
@@ -193,7 +193,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
           targetRoute: frontRoutes.conventionStatusDashboard,
         }),
       });
-      expectToEqual(emailGw.getSentEmails(), [
+      expectToEqual(notificationGateway.getSentEmails(), [
         {
           type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
           recipients: [validatorEmails[0]],
@@ -231,7 +231,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
 
     it("No counsellors available, neither validators => ensure no mail is sent", async () => {
       await notifyNewConventionNeedsReview.execute(conventionInReview);
-      const sentEmails = emailGw.getSentEmails();
+      const sentEmails = notificationGateway.getSentEmails();
       expect(sentEmails).toHaveLength(0);
     });
   });
@@ -294,7 +294,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
         }),
       });
 
-      expectToEqual(emailGw.getSentEmails(), [
+      expectToEqual(notificationGateway.getSentEmails(), [
         {
           type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
           recipients: [validatorEmails[0]],
@@ -334,7 +334,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
       await notifyNewConventionNeedsReview.execute(
         acceptedByCounsellorConvention,
       );
-      const sentEmails = emailGw.getSentEmails();
+      const sentEmails = notificationGateway.getSentEmails();
       expect(sentEmails).toHaveLength(0);
     });
   });
@@ -377,7 +377,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
         }),
       });
 
-      expectToEqual(emailGw.getSentEmails(), [
+      expectToEqual(notificationGateway.getSentEmails(), [
         {
           type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
           recipients: [adminEmail],
@@ -401,7 +401,7 @@ describe("NotifyImmersionApplicationNeedsReview", () => {
       await notifyNewConventionNeedsReview.execute(
         acceptedByValidatorConvention,
       );
-      const sentEmails = emailGw.getSentEmails();
+      const sentEmails = notificationGateway.getSentEmails();
       expect(sentEmails).toHaveLength(0);
     });
   });

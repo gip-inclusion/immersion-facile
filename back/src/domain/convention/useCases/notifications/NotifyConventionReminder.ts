@@ -31,7 +31,11 @@ import {
 } from "../../../core/ports/UnitOfWork";
 import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { EmailGateway } from "../../ports/EmailGateway";
+import {
+  NotificationGateway,
+  Phone,
+  SendSmsParams,
+} from "../../ports/NotificationGateway";
 import {
   missingAgencyMessage,
   missingConventionMessage,
@@ -48,7 +52,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
 > {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private emailGateway: EmailGateway,
+    private notificationGateway: NotificationGateway,
     private timeGateway: TimeGateway,
     private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     private readonly shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
@@ -99,32 +103,60 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     if (!["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(conventionRead.status))
       throw new Error(forbiddenUnsupportedStatusMessage(conventionRead, kind));
 
-    const actors = [
-      ...Object.values(conventionRead.signatories),
+    const signatories = Object.values(conventionRead.signatories);
+
+    const smsSignatories = signatories.filter(
+      (signatory) => !signatory.signedAt && isValidMobilePhone(signatory.phone),
+    );
+
+    const emailActors = [
+      ...signatories.filter((signatory) => !smsSignatories.includes(signatory)),
       ...(isEstablishmentTutorIsEstablishmentRepresentative(conventionRead)
         ? []
         : [conventionRead.establishmentTutor]),
     ];
 
-    const emails: TemplatedEmail[] = [
-      ...(kind === "FirstReminderForSignatories"
-        ? await this.makeSignatoryFirstReminderEmails(
-            actors,
-            conventionRead,
-            uow,
-          )
-        : []),
-      ...(kind === "LastReminderForSignatories"
-        ? await this.makeSignatoryLastReminderEmails(
-            actors,
-            conventionRead,
-            uow,
-          )
-        : []),
-    ];
-    await Promise.all(
-      emails.map((email) => this.emailGateway.sendEmail(email)),
+    const emails: TemplatedEmail[] = await Promise.all(
+      emailActors.map((actor) =>
+        this.makeSignatoryReminderEmail(actor, conventionRead, uow, kind),
+      ),
     );
+    const sms = await Promise.all(
+      smsSignatories.map((signatory) =>
+        this.prepareSmsReminderParams(signatory, conventionRead, uow, kind),
+      ),
+    );
+    await Promise.all([
+      ...[emails.map((email) => this.notificationGateway.sendEmail(email))],
+      ...[sms.map((smsParam) => this.notificationGateway.sendSms(smsParam))],
+    ]);
+  }
+  async prepareSmsReminderParams(
+    { role, email, phone }: GenericActor<Role>,
+    convention: ConventionReadDto,
+    uow: UnitOfWork,
+    kind: Extract<
+      ReminderKind,
+      "FirstReminderForSignatories" | "LastReminderForSignatories"
+    >,
+  ): Promise<SendSmsParams> {
+    const makeShortMagicLink = prepareMagicShortLinkMaker({
+      config: this.config,
+      conventionMagicLinkPayload: {
+        id: convention.id,
+        role,
+        email,
+        now: this.timeGateway.now(),
+      },
+      generateConventionMagicLinkUrl: this.generateConventionMagicLinkUrl,
+      shortLinkIdGeneratorGateway: this.shortLinkIdGeneratorGateway,
+      uow,
+    });
+    return {
+      phone: makeInternationalPhone(phone),
+      kind,
+      shortLink: await makeShortMagicLink(frontRoutes.conventionToSign),
+    };
   }
 
   private async onAgencyReminder(
@@ -140,194 +172,130 @@ export class NotifyConventionReminder extends TransactionalUseCase<
       throw new Error(
         forbiddenUnsupportedStatusMessage(conventionRead, reminderKind),
       );
-
-    const emailsWithRole: EmailWithRole[] = [
-      ...agency.counsellorEmails.map(
-        (email) =>
-          ({
-            role: "counsellor",
-            email,
-          } satisfies EmailWithRole),
-      ),
-      ...agency.validatorEmails.map(
-        (email) =>
-          ({
-            role: "validator",
-            email,
-          } satisfies EmailWithRole),
-      ),
-    ];
-
-    const emails: TemplatedEmail[] = [
-      ...(reminderKind === "FirstReminderForAgency"
-        ? await this.makeAgencyFirstReminderEmails(
-            emailsWithRole,
-            conventionRead,
-            agency,
-            uow,
-          )
-        : []),
-      ...(reminderKind === "LastReminderForAgency"
-        ? await this.makeAgencyLastReminderEmails(
-            emailsWithRole,
-            conventionRead,
-            uow,
-          )
-        : []),
-    ];
-
     await Promise.all(
-      emails.map((email) => this.emailGateway.sendEmail(email)),
+      [
+        ...agency.counsellorEmails.map(
+          (email) =>
+            ({
+              role: "counsellor",
+              email,
+            } satisfies EmailWithRole),
+        ),
+        ...agency.validatorEmails.map(
+          (email) =>
+            ({
+              role: "validator",
+              email,
+            } satisfies EmailWithRole),
+        ),
+      ].map((emailWithRole) =>
+        this.sendAgencyReminderEmails(
+          emailWithRole,
+          conventionRead,
+          agency,
+          uow,
+          reminderKind,
+        ),
+      ),
     );
   }
 
-  private makeAgencyFirstReminderEmails(
-    emailsWithRole: EmailWithRole[],
+  private async sendAgencyReminderEmails(
+    { email, role }: EmailWithRole,
     convention: ConventionReadDto,
     agency: AgencyDto,
     uow: UnitOfWork,
-  ): Promise<TemplatedEmail[]> {
-    return Promise.all(
-      emailsWithRole.map(async ({ email, role }) => {
-        const makeShortMagicLink = prepareMagicShortLinkMaker({
-          config: this.config,
-          conventionMagicLinkPayload: {
-            id: convention.id,
-            role,
-            email,
-            now: this.timeGateway.now(),
+    kind: Extract<
+      ReminderKind,
+      "FirstReminderForAgency" | "LastReminderForAgency"
+    >,
+  ): Promise<void> {
+    const makeShortMagicLink = prepareMagicShortLinkMaker({
+      config: this.config,
+      conventionMagicLinkPayload: {
+        id: convention.id,
+        role,
+        email,
+        now: this.timeGateway.now(),
+      },
+      generateConventionMagicLinkUrl: this.generateConventionMagicLinkUrl,
+      shortLinkIdGeneratorGateway: this.shortLinkIdGeneratorGateway,
+      uow,
+    });
+    return this.notificationGateway.sendEmail(
+      kind === "FirstReminderForAgency"
+        ? {
+            type: "AGENCY_FIRST_REMINDER",
+            recipients: [email],
+            params: {
+              agencyName: agency.name,
+              beneficiaryFirstName:
+                convention.signatories.beneficiary.firstName,
+              beneficiaryLastName: convention.signatories.beneficiary.lastName,
+              businessName: convention.businessName,
+              dateStart: convention.dateStart,
+              dateEnd: convention.dateEnd,
+              agencyMagicLinkUrl: await makeShortMagicLink(
+                frontRoutes.manageConvention,
+              ),
+            },
+          }
+        : {
+            type: "AGENCY_LAST_REMINDER",
+            recipients: [email],
+            params: {
+              beneficiaryFirstName:
+                convention.signatories.beneficiary.firstName,
+              beneficiaryLastName: convention.signatories.beneficiary.lastName,
+              businessName: convention.businessName,
+              agencyMagicLinkUrl: await makeShortMagicLink(
+                frontRoutes.manageConvention,
+              ),
+            },
           },
-          generateConventionMagicLinkUrl: this.generateConventionMagicLinkUrl,
-          shortLinkIdGeneratorGateway: this.shortLinkIdGeneratorGateway,
-          uow,
-        });
-        return {
-          type: "AGENCY_FIRST_REMINDER",
-          recipients: [email],
-          params: {
-            agencyName: agency.name,
-            beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-            beneficiaryLastName: convention.signatories.beneficiary.lastName,
-            businessName: convention.businessName,
-            dateStart: convention.dateStart,
-            dateEnd: convention.dateEnd,
-            agencyMagicLinkUrl: await makeShortMagicLink(
-              frontRoutes.manageConvention,
-            ),
-          },
-        };
-      }),
     );
   }
 
-  private makeAgencyLastReminderEmails(
-    emailsWithRole: EmailWithRole[],
+  private async makeSignatoryReminderEmail(
+    { role, email, firstName, lastName }: GenericActor<Role>,
     convention: ConventionDto,
     uow: UnitOfWork,
-  ): Promise<TemplatedEmail[]> {
-    return Promise.all(
-      emailsWithRole.map(async ({ email, role }) => {
-        const makeShortMagicLink = prepareMagicShortLinkMaker({
-          config: this.config,
-          conventionMagicLinkPayload: {
-            id: convention.id,
-            role,
-            email,
-            now: this.timeGateway.now(),
-          },
-          generateConventionMagicLinkUrl: this.generateConventionMagicLinkUrl,
-          shortLinkIdGeneratorGateway: this.shortLinkIdGeneratorGateway,
-          uow,
-        });
-        return {
-          type: "AGENCY_LAST_REMINDER",
-          recipients: [email],
-          params: {
-            beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-            beneficiaryLastName: convention.signatories.beneficiary.lastName,
-            businessName: convention.businessName,
-            agencyMagicLinkUrl: await makeShortMagicLink(
-              frontRoutes.manageConvention,
-            ),
-          },
-        };
-      }),
-    );
-  }
+    kind: Extract<
+      ReminderKind,
+      "FirstReminderForSignatories" | "LastReminderForSignatories"
+    >,
+  ): Promise<TemplatedEmail> {
+    const makeShortMagicLink = prepareMagicShortLinkMaker({
+      config: this.config,
+      conventionMagicLinkPayload: {
+        id: convention.id,
+        role,
+        email,
+        now: this.timeGateway.now(),
+      },
+      generateConventionMagicLinkUrl: this.generateConventionMagicLinkUrl,
+      shortLinkIdGeneratorGateway: this.shortLinkIdGeneratorGateway,
+      uow,
+    });
 
-  private makeSignatoryFirstReminderEmails(
-    actors: GenericActor<Role>[],
-    convention: ConventionDto,
-    uow: UnitOfWork,
-  ): Promise<TemplatedEmail[]> {
-    return Promise.all(
-      actors.map(async ({ role, email, firstName, lastName }) => {
-        const makeShortMagicLink = prepareMagicShortLinkMaker({
-          config: this.config,
-          conventionMagicLinkPayload: {
-            id: convention.id,
-            role,
-            email,
-            now: this.timeGateway.now(),
-          },
-          generateConventionMagicLinkUrl: this.generateConventionMagicLinkUrl,
-          shortLinkIdGeneratorGateway: this.shortLinkIdGeneratorGateway,
-          uow,
-        });
-        return {
-          type: "SIGNATORY_FIRST_REMINDER",
-          recipients: [email],
-          params: {
-            actorFirstName: firstName,
-            actorLastName: lastName,
-            beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-            beneficiaryLastName: convention.signatories.beneficiary.lastName,
-            businessName: convention.businessName,
-            signatoriesSummary: toSignatoriesSummary(convention).join("\n"),
-            magicLinkUrl: isSignatoryRole(role)
-              ? await makeShortMagicLink(frontRoutes.conventionToSign)
-              : undefined,
-          },
-        };
-      }),
-    );
-  }
-  private makeSignatoryLastReminderEmails(
-    actors: GenericActor<Role>[],
-    convention: ConventionDto,
-    uow: UnitOfWork,
-  ): Promise<TemplatedEmail[]> {
-    return Promise.all(
-      actors.map(async ({ email, role, firstName, lastName }) => {
-        const makeShortMagicLink = prepareMagicShortLinkMaker({
-          config: this.config,
-          conventionMagicLinkPayload: {
-            id: convention.id,
-            role,
-            email,
-            now: this.timeGateway.now(),
-          },
-          generateConventionMagicLinkUrl: this.generateConventionMagicLinkUrl,
-          shortLinkIdGeneratorGateway: this.shortLinkIdGeneratorGateway,
-          uow,
-        });
-        return {
-          type: "SIGNATORY_LAST_REMINDER",
-          recipients: [email],
-          params: {
-            actorFirstName: firstName,
-            actorLastName: lastName,
-            beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-            beneficiaryLastName: convention.signatories.beneficiary.lastName,
-            businessName: convention.businessName,
-            signatoriesSummary: toSignatoriesSummary(convention).join("\n"),
-            magicLinkUrl: isSignatoryRole(role)
-              ? await makeShortMagicLink(frontRoutes.conventionToSign)
-              : undefined,
-          },
-        };
-      }),
-    );
+    return {
+      type:
+        kind === "FirstReminderForSignatories"
+          ? "SIGNATORY_FIRST_REMINDER"
+          : "SIGNATORY_LAST_REMINDER",
+      recipients: [email],
+      params: {
+        actorFirstName: firstName,
+        actorLastName: lastName,
+        beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+        beneficiaryLastName: convention.signatories.beneficiary.lastName,
+        businessName: convention.businessName,
+        signatoriesSummary: toSignatoriesSummary(convention).join("\n"),
+        magicLinkUrl: isSignatoryRole(role)
+          ? await makeShortMagicLink(frontRoutes.conventionToSign)
+          : undefined,
+      },
+    };
   }
 }
 
@@ -385,3 +353,10 @@ const signStatus = (signAt: string | undefined): string =>
   signAt
     ? `✔️  - A signé le ${format(new Date(signAt), "dd/MM/yyyy")}`
     : `❌ - N'a pas signé`;
+
+const isValidMobilePhone = (phone: string): boolean =>
+  (phone.startsWith("06") || phone.startsWith("07")) && phone.length === 10;
+
+function makeInternationalPhone(phone: string): Phone {
+  return "33" + phone.substring(1);
+}

@@ -4,12 +4,12 @@ import {
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { EmailGateway } from "../../ports/EmailGateway";
+import { NotificationGateway } from "../../ports/NotificationGateway";
 
 export class NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected extends TransactionalUseCase<ConventionDto> {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly emailGateway: EmailGateway,
+    private readonly notificationGateway: NotificationGateway,
   ) {
     super(uowPerformer);
   }
@@ -36,7 +36,7 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected extends Tra
       ...agency.counsellorEmails,
     ];
 
-    await this.emailGateway.sendEmail({
+    await this.notificationGateway.sendEmail({
       type: "REJECTED_CONVENTION_NOTIFICATION",
       recipients,
       params: {

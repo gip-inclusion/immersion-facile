@@ -11,16 +11,16 @@ import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHel
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
-import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryShortLinkQuery } from "../../../../adapters/secondary/InMemoryShortLinkQuery";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+import { InMemoryNotificationGateway } from "../../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { ShortLinkId } from "../../../core/ports/ShortLinkQuery";
 import { ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature } from "./ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature";
 
 describe("Add Convention Notifications", () => {
   let useCase: ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature;
-  let emailGw: InMemoryEmailGateway;
+  let notificationGateway: InMemoryNotificationGateway;
   let timeGateway: CustomTimeGateway;
   let validConvention: ConventionDto;
   let agency: AgencyDto;
@@ -30,7 +30,7 @@ describe("Add Convention Notifications", () => {
 
   beforeEach(() => {
     config = new AppConfigBuilder({}).build();
-    emailGw = new InMemoryEmailGateway();
+    notificationGateway = new InMemoryNotificationGateway();
     timeGateway = new CustomTimeGateway(new Date());
     const uow = createInMemoryUow();
     agency = uow.agencyRepository.agencies[0];
@@ -49,7 +49,7 @@ describe("Add Convention Notifications", () => {
     useCase =
       new ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature(
         new InMemoryUowPerformer(uow),
-        emailGw,
+        notificationGateway,
         timeGateway,
         shortLinkGenerator,
         fakeGenerateMagicLinkUrlFn,
@@ -115,7 +115,7 @@ describe("Add Convention Notifications", () => {
       }),
     });
 
-    const sentEmails = emailGw.getSentEmails();
+    const sentEmails = notificationGateway.getSentEmails();
 
     expect(sentEmails).toHaveLength(3);
 

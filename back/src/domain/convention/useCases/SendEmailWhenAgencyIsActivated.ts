@@ -1,19 +1,19 @@
 import { z } from "zod";
 import { AgencyDto, agencySchema } from "shared";
 import { UseCase } from "../../core/UseCase";
-import { EmailGateway } from "../ports/EmailGateway";
+import { NotificationGateway } from "../ports/NotificationGateway";
 
 type WithAgency = { agency: AgencyDto };
 
 export class SendEmailWhenAgencyIsActivated extends UseCase<WithAgency> {
   inputSchema = z.object({ agency: agencySchema });
 
-  constructor(private readonly emailGateway: EmailGateway) {
+  constructor(private readonly notificationGateway: NotificationGateway) {
     super();
   }
 
   public async _execute({ agency }: WithAgency): Promise<void> {
-    await this.emailGateway.sendEmail({
+    await this.notificationGateway.sendEmail({
       type: "AGENCY_WAS_ACTIVATED",
       recipients: agency.validatorEmails,
       params: {
