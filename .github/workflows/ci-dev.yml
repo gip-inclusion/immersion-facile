@@ -16,9 +16,10 @@ jobs:
     uses: ./.github/workflows/build-back-artefact.yml
 
   deploy-dev:
+    environment: dev
     needs: [validation, build-front-artefact, build-back-artefact]
     uses: ./.github/workflows/deploy-to-scalingo.yml
     with:
       envType: "dev"
     secrets:
-      SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN_V2 }}
+      SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
