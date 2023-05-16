@@ -54,7 +54,7 @@ export class SendinblueHtmlNotificationGateway implements NotificationGateway {
     );
     return this.sendTransacSms({
       content: smsContentMaker(kind)(shortLink),
-      sender: "ImmersionFa",
+      sender: "ImmerFacile",
       recipient: phone,
     })
       .then(() =>
@@ -189,7 +189,7 @@ const smsContentMaker =
 
 const smsContentByKind: Partial<Record<ReminderKind, string>> = {
   FirstReminderForSignatories:
-    "Immersion Facilitée - Rappel signature convention",
+    "Immersion Facilitée, veuillez signer la convention",
   LastReminderForSignatories:
-    "Immersion Facilitée - RAPPEL URGENT signature convention",
+    "Urgent Immersion Facilitée, veuillez signer la convention",
 };
