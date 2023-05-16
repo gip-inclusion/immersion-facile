@@ -21,8 +21,14 @@ import { notifyAndThrowErrorDiscord } from "../../../../utils/notifyDiscord";
 
 const logger = createLogger(__filename);
 
+const getTestPrefix = (peApiUrl: AbsoluteUrl) =>
+  ["https://api.peio.pe-qvr.fr", "https://api-r.es-qvr.fr"].includes(peApiUrl)
+    ? "test"
+    : "";
+
 export class HttpPoleEmploiGateway implements PoleEmploiGateway {
   private peConventionBroadcastUrl: AbsoluteUrl;
+  private peTestPrefix: "test" | "";
 
   constructor(
     readonly peApiUrl: AbsoluteUrl,
@@ -31,7 +37,8 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
     private readonly rateLimiter: RateLimiter,
     private readonly retryStrategy: RetryStrategy,
   ) {
-    this.peConventionBroadcastUrl = `${peApiUrl}/partenaire/immersion-pro/v2/demandes-immersion`;
+    this.peTestPrefix = getTestPrefix(peApiUrl);
+    this.peConventionBroadcastUrl = `${peApiUrl}/partenaire/${this.peTestPrefix}immersion-pro/v2/demandes-immersion`;
   }
 
   public async notifyOnConventionUpdated(
@@ -57,7 +64,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
         logger.info({ poleEmploiConvention }, "Sending convention to PE");
         const response = await this.rateLimiter.whenReady(async () => {
           const accessToken = await this.accessTokenGateway.getAccessToken(
-            `echangespmsmp api_immersion-prov2`,
+            `echangespmsmp api_${this.peTestPrefix}immersion-prov2`,
           );
 
           const peResponse = await axios.post(
@@ -97,9 +104,3 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
     });
   }
 }
-
-// https://staging.immersion-facile.beta.gouv.fr/api/to/_gf8jq7G6fP1YbpZFu9jrCazPHCEZNYkhYIk
-//
-// https://staging.immersion-facile.beta.gouv.fr/api/to/M1KJBhJt9YloMbrQfQ1144MMOE8zNMtjJ0SH
-//
-// https://staging.immersion-facile.beta.gouv.fr/pilotage-convention?jwt=eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2ZXJzaW9uIjoxLCJhcHBsaWNhdGlvbklkIjoiNzg3NjJlMTQtN2Y2MC00MWFlLThhYTctYjgxNWZlMGFiNGE4Iiwicm9sZSI6InZhbGlkYXRvciIsImlhdCI6MTY4MzcyMzQ4NSwiZXhwIjoxNjg2NDAxODg1LCJlbWFpbEhhc2giOiJlYmEwNTJiYjk0YzA4MmYwNjQ0MDA1NzEzZjMxYWNiMSJ9.xvsq0UXKgPkyEuvsEhATkkY0VcO_cnplMtxSX9lkFXCQGwS9qP-yVKQm0jrstQBVOKeLILL5XTNcZFwSBRsXLA
