@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { InternshipKind, internshipKindSchema } from "shared";
 import { UseCase } from "../../../core/UseCase";
-import { EmailGateway } from "../../ports/EmailGateway";
+import { NotificationGateway } from "../../ports/NotificationGateway";
 
 // prettier-ignore
 export type RenewMagicLinkPayload  = {
@@ -19,7 +19,7 @@ export const renewMagicLinkPayloadSchema: z.Schema<RenewMagicLinkPayload> =
   });
 
 export class DeliverRenewedMagicLink extends UseCase<RenewMagicLinkPayload> {
-  constructor(private readonly emailGateway: EmailGateway) {
+  constructor(private readonly notificationGateway: NotificationGateway) {
     super();
   }
 
@@ -31,7 +31,7 @@ export class DeliverRenewedMagicLink extends UseCase<RenewMagicLinkPayload> {
     conventionStatusLink,
     internshipKind,
   }: RenewMagicLinkPayload): Promise<void> {
-    await this.emailGateway.sendEmail({
+    await this.notificationGateway.sendEmail({
       type: "MAGIC_LINK_RENEWAL",
       recipients: emails,
       params: { internshipKind, magicLink, conventionStatusLink },

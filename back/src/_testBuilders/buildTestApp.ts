@@ -8,12 +8,12 @@ import { InMemoryAddressGateway } from "../adapters/secondary/addressGateway/InM
 import { BasicEventCrawler } from "../adapters/secondary/core/EventCrawlerImplementations";
 import { CustomTimeGateway } from "../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { StubDashboardGateway } from "../adapters/secondary/dashboardGateway/StubDashboardGateway";
-import type { InMemoryEmailGateway } from "../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryEmailValidationGateway } from "../adapters/secondary/emailValidationGateway/InMemoryEmailValidationStatusGateway";
 import { InMemoryLaBonneBoiteAPI } from "../adapters/secondary/immersionOffer/laBonneBoite/InMemoryLaBonneBoiteAPI";
 import { InMemoryPassEmploiGateway } from "../adapters/secondary/immersionOffer/passEmploi/InMemoryPassEmploiGateway";
 import { InMemoryPoleEmploiGateway } from "../adapters/secondary/immersionOffer/poleEmploi/InMemoryPoleEmploiGateway";
 import { InMemoryInclusionConnectGateway } from "../adapters/secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
+import type { InMemoryNotificationGateway } from "../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
 import { NotImplementedDocumentGateway } from "../adapters/secondary/NotImplementedDocumentGateway";
 import { InMemoryPeConnectGateway } from "../adapters/secondary/PeConnectGateway/InMemoryPeConnectGateway";
 import { InMemoryExportGateway } from "../adapters/secondary/reporting/InMemoryExportGateway";
@@ -30,7 +30,7 @@ import { UuidGenerator } from "../domain/core/ports/UuidGenerator";
 import { AppConfigBuilder } from "./AppConfigBuilder";
 
 export type InMemoryGateways = {
-  email: InMemoryEmailGateway;
+  email: InMemoryNotificationGateway;
   peConnectGateway: InMemoryPeConnectGateway;
   siret: InMemorySiretGateway;
   laBonneBoiteAPI: InMemoryLaBonneBoiteAPI;
@@ -80,7 +80,7 @@ export const buildTestApp = async (
     ADDRESS_API_GATEWAY: "IN_MEMORY",
     EVENT_CRAWLER_PERIOD_MS: "0", // will not crawl automatically
     DOMAIN: "my-domain",
-    EMAIL_GATEWAY: "IN_MEMORY",
+    NOTIFICATION_GATEWAY: "IN_MEMORY",
     ENABLE_ENTERPRISE_SIGNATURE: "TRUE",
     INCLUSION_CONNECT_GATEWAY: "IN_MEMORY",
     LA_BONNE_BOITE_GATEWAY: "IN_MEMORY",
@@ -98,7 +98,7 @@ export const buildTestApp = async (
 
   if (appConfig.shortLinkIdGeneratorGateway !== "DETERMINIST")
     throwNotSupportedError();
-  if (appConfig.emailGateway !== "IN_MEMORY") throwNotSupportedError();
+  if (appConfig.notificationGateway !== "IN_MEMORY") throwNotSupportedError();
   if (appConfig.repositories !== "IN_MEMORY") throwNotSupportedError();
   if (appConfig.siretGateway !== "IN_MEMORY") throwNotSupportedError();
   if (appConfig.timeGateway !== "CUSTOM") throwNotSupportedError();

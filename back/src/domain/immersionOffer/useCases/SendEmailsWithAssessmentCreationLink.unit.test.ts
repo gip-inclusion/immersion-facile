@@ -3,8 +3,8 @@ import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/jwtTestHelper
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { UuidV4Generator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { InMemoryNotificationGateway } from "../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { DomainEvent } from "../../../domain/core/eventBus/events";
 import { SendEmailsWithAssessmentCreationLink } from "../../../domain/immersionOffer/useCases/SendEmailsWithAssessmentCreationLink";
@@ -16,7 +16,7 @@ const prepareUseCase = () => {
   const conventionRepository = uow.conventionRepository;
 
   const timeGateway = new CustomTimeGateway();
-  const emailGateway = new InMemoryEmailGateway();
+  const notificationGateway = new InMemoryNotificationGateway();
   const uuidGenerator = new UuidV4Generator();
   const createNewEvent = makeCreateNewEvent({
     timeGateway,
@@ -26,7 +26,7 @@ const prepareUseCase = () => {
   const sendEmailWithAssessmentCreationLink =
     new SendEmailsWithAssessmentCreationLink(
       new InMemoryUowPerformer(uow),
-      emailGateway,
+      notificationGateway,
       timeGateway,
       fakeGenerateMagicLinkUrlFn,
       createNewEvent,
@@ -36,7 +36,7 @@ const prepareUseCase = () => {
     sendEmailWithAssessmentCreationLink,
     outboxQueries,
     outboxRepository,
-    emailGateway,
+    notificationGateway,
     conventionRepository,
     timeGateway,
     agencyRepository: uow.agencyRepository,
@@ -49,7 +49,7 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
     const {
       sendEmailWithAssessmentCreationLink,
       outboxRepository,
-      emailGateway,
+      notificationGateway,
       conventionRepository,
       timeGateway,
       agencyRepository,
@@ -80,7 +80,7 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
     await sendEmailWithAssessmentCreationLink.execute();
 
     // Assert
-    const sentEmails = emailGateway.getSentEmails();
+    const sentEmails = notificationGateway.getSentEmails();
     expectToEqual(sentEmails, [
       {
         type: "CREATE_IMMERSION_ASSESSMENT",
@@ -112,7 +112,7 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
     const {
       sendEmailWithAssessmentCreationLink,
       outboxRepository,
-      emailGateway,
+      notificationGateway,
       conventionRepository,
       timeGateway,
     } = prepareUseCase();
@@ -134,7 +134,7 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
     await sendEmailWithAssessmentCreationLink.execute();
 
     // Assert
-    const sentEmails = emailGateway.getSentEmails();
+    const sentEmails = notificationGateway.getSentEmails();
     expect(sentEmails).toHaveLength(0);
     expect(outboxRepository.events).toHaveLength(1);
   });

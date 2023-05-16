@@ -16,8 +16,8 @@ import {
   InMemoryUnitOfWork,
 } from "../../../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
-import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+import { InMemoryNotificationGateway } from "../../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { makeShortLinkUrl } from "../../../core/ShortLink";
 import { NotifyToAgencyApplicationSubmitted } from "./NotifyToAgencyApplicationSubmitted";
@@ -66,7 +66,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
     lastName: convention.signatories.beneficiary.lastName,
   });
 
-  let emailGateway: InMemoryEmailGateway;
+  let notificationGateway: InMemoryNotificationGateway;
   let notifyToAgencyApplicationSubmitted: NotifyToAgencyApplicationSubmitted;
   let shortLinkIdGeneratorGateway: DeterministShortLinkIdGeneratorGateway;
   let uow: InMemoryUnitOfWork;
@@ -75,7 +75,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
 
   beforeEach(() => {
     config = new AppConfigBuilder().build();
-    emailGateway = new InMemoryEmailGateway();
+    notificationGateway = new InMemoryNotificationGateway();
     shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
     uow = createInMemoryUow();
     uow.agencyRepository.setAgencies([
@@ -91,7 +91,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
 
     notifyToAgencyApplicationSubmitted = new NotifyToAgencyApplicationSubmitted(
       uowPerformer,
-      emailGateway,
+      notificationGateway,
       fakeGenerateMagicLinkUrlFn,
       timeGateway,
       shortLinkIdGeneratorGateway,
@@ -145,7 +145,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
       }),
     });
 
-    expectTypeToMatchAndEqual(emailGateway.getSentEmails(), [
+    expectTypeToMatchAndEqual(notificationGateway.getSentEmails(), [
       {
         type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
         recipients: [councellorEmail],
@@ -199,7 +199,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
       }),
     });
 
-    expectTypeToMatchAndEqual(emailGateway.getSentEmails(), [
+    expectTypeToMatchAndEqual(notificationGateway.getSentEmails(), [
       {
         type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
         recipients: [validatorEmail],
@@ -260,7 +260,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
       }),
     });
 
-    expectTypeToMatchAndEqual(emailGateway.getSentEmails(), [
+    expectTypeToMatchAndEqual(notificationGateway.getSentEmails(), [
       {
         type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
         recipients: [councellorEmail],
@@ -346,7 +346,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
       }),
     });
 
-    expectTypeToMatchAndEqual(emailGateway.getSentEmails(), [
+    expectTypeToMatchAndEqual(notificationGateway.getSentEmails(), [
       {
         type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
         recipients: [councellorEmail],

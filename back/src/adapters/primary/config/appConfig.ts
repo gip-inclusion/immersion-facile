@@ -166,16 +166,16 @@ export class AppConfig {
     });
   }
 
-  // == Email gateway ==
-  public get emailGateway() {
+  // == Notification gateway ==
+  public get notificationGateway() {
     return this.throwIfNotInArray({
-      variableName: "EMAIL_GATEWAY",
+      variableName: "NOTIFICATION_GATEWAY",
       authorizedValues: ["IN_MEMORY", "HYBRID", "SENDINBLUE_HTML"],
       defaultValue: "IN_MEMORY",
     });
   }
 
-  // == Email gateway provider api keys ==
+  // == Notification gateway provider api keys ==
   public get apiKeySendinblue() {
     return this.throwIfNotDefined("SENDINBLUE_API_KEY");
   }

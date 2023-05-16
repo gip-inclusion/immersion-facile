@@ -1,4 +1,5 @@
 import {
+  AbsoluteUrl,
   EmailSentDto,
   immersionFacileContactEmail,
   TemplatedEmail,
@@ -13,7 +14,11 @@ import {
   cciCustomHtmlHeader,
 } from "html-templates/src/components/email";
 import { HttpClient } from "http-client";
-import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
+import {
+  NotificationGateway,
+  SendSmsParams,
+} from "../../../domain/convention/ports/NotificationGateway";
+import { ReminderKind } from "../../../domain/core/eventsPayloads/ConventionReminderPayload";
 import {
   counterSendTransactEmailError,
   counterSendTransactEmailSuccess,
@@ -25,19 +30,52 @@ import {
   ApiKey,
   RecipientOrSender,
   SendTransactEmailRequestBody,
-} from "./SendinblueHtmlEmailGateway.schemas";
-import { SendinblueHtmlEmailGatewayTargets } from "./SendinblueHtmlEmailGateway.targets";
+  SendTransactSmsRequestBody,
+} from "./SendinblueHtmlNotificationGateway.schemas";
+import { SendinblueHtmlNotificationGatewayTargets } from "./SendinblueHtmlNotificationGateway.targets";
 
 const logger = createLogger(__filename);
 
-export class SendinblueHtmlEmailGateway implements EmailGateway {
+export class SendinblueHtmlNotificationGateway implements NotificationGateway {
   constructor(
-    private readonly httpClient: HttpClient<SendinblueHtmlEmailGatewayTargets>,
+    private readonly httpClient: HttpClient<SendinblueHtmlNotificationGatewayTargets>,
     private emailAllowListPredicate: (recipient: string) => boolean,
     private apiKey: ApiKey,
     private sender: RecipientOrSender,
     private generateHtmlOptions: GenerateHtmlOptions = {},
   ) {}
+
+  sendSms({ phone, kind, shortLink }: SendSmsParams): Promise<void> {
+    logger.info(
+      {
+        phone,
+      },
+      "sendTransactSmsTotal",
+    );
+    return this.sendTransacSms({
+      content: smsContentMaker(kind)(shortLink),
+      sender: "ImmersionFa",
+      recipient: phone,
+    })
+      .then(() =>
+        logger.info(
+          {
+            phone,
+          },
+          "sendTransactSmsSuccess",
+        ),
+      )
+      .catch((error) => {
+        logger.error(
+          {
+            phone,
+            error,
+          },
+          "sendTransactSmsError",
+        );
+        throw error;
+      });
+  }
 
   public async sendEmail(email: TemplatedEmail) {
     if (email.recipients.length === 0) {
@@ -130,4 +168,28 @@ export class SendinblueHtmlEmailGateway implements EmailGateway {
       body,
     });
   }
+  private async sendTransacSms(body: SendTransactSmsRequestBody) {
+    await this.httpClient.sendTransactSms({
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        "api-key": this.apiKey,
+      },
+      body,
+    });
+  }
 }
+const smsContentMaker =
+  (kind: ReminderKind) =>
+  (shortLinkUrl: AbsoluteUrl): string => {
+    const smsContent = smsContentByKind[kind];
+    if (smsContent) return `${smsContent} ${shortLinkUrl}`;
+    throw new Error(`There is no SMS content supported for SMS kind '${kind}'`);
+  };
+
+const smsContentByKind: Partial<Record<ReminderKind, string>> = {
+  FirstReminderForSignatories:
+    "Immersion Facilitée - Rappel signature convention",
+  LastReminderForSignatories:
+    "Immersion Facilitée - RAPPEL URGENT signature convention",
+};

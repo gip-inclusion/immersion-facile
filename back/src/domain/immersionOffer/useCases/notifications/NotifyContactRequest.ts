@@ -3,7 +3,7 @@ import {
   ContactEstablishmentRequestDto,
   contactEstablishmentRequestSchema,
 } from "shared";
-import { EmailGateway } from "../../../convention/ports/EmailGateway";
+import { NotificationGateway } from "../../../convention/ports/NotificationGateway";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
@@ -13,7 +13,7 @@ import { TransactionalUseCase } from "../../../core/UseCase";
 export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishmentRequestDto> {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly emailGateway: EmailGateway,
+    private readonly notificationGateway: NotificationGateway,
   ) {
     super(uowPerformer);
   }
@@ -50,7 +50,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
 
     switch (payload.contactMode) {
       case "EMAIL": {
-        await this.emailGateway.sendEmail({
+        await this.notificationGateway.sendEmail({
           type: "CONTACT_BY_EMAIL_REQUEST",
           recipients: [contact.email],
           cc: contact.copyEmails,
@@ -72,7 +72,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
         break;
       }
       case "PHONE": {
-        await this.emailGateway.sendEmail({
+        await this.notificationGateway.sendEmail({
           type: "CONTACT_BY_PHONE_INSTRUCTIONS",
           recipients: [payload.potentialBeneficiaryEmail],
           params: {
@@ -88,7 +88,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
         break;
       }
       case "IN_PERSON": {
-        await this.emailGateway.sendEmail({
+        await this.notificationGateway.sendEmail({
           type: "CONTACT_IN_PERSON_INSTRUCTIONS",
           recipients: [payload.potentialBeneficiaryEmail],
           params: {

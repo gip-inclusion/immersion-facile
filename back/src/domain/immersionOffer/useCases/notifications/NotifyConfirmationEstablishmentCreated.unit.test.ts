@@ -1,24 +1,24 @@
 import { FormEstablishmentDtoBuilder } from "shared";
 import { expectedEmailEstablishmentCreatedReviewMatchingEstablisment } from "../../../../_testBuilders/emailAssertions";
-import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
+import { InMemoryNotificationGateway } from "../../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
 import { NotifyConfirmationEstablishmentCreated } from "./NotifyConfirmationEstablishmentCreated";
 
 describe("NotifyConfirmationEstablismentCreated", () => {
   const validEstablishment = FormEstablishmentDtoBuilder.valid().build();
-  let emailGw: InMemoryEmailGateway;
+  let notificationGateway: InMemoryNotificationGateway;
 
   beforeEach(() => {
-    emailGw = new InMemoryEmailGateway();
+    notificationGateway = new InMemoryNotificationGateway();
   });
 
   const createUseCase = () =>
-    new NotifyConfirmationEstablishmentCreated(emailGw);
+    new NotifyConfirmationEstablishmentCreated(notificationGateway);
 
   describe("When establishment is valid", () => {
     it("Nominal case: Sends notification email to Establisment contact", async () => {
       await createUseCase().execute(validEstablishment);
 
-      const sentEmails = emailGw.getSentEmails();
+      const sentEmails = notificationGateway.getSentEmails();
       expect(sentEmails).toHaveLength(1);
 
       expectedEmailEstablishmentCreatedReviewMatchingEstablisment(

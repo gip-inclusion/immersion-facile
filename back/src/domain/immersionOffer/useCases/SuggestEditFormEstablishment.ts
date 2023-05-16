@@ -5,7 +5,7 @@ import {
 } from "shared";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
 import { GenerateEditFormEstablishmentJwt } from "../../auth/jwt";
-import { EmailGateway } from "../../convention/ports/EmailGateway";
+import { NotificationGateway } from "../../convention/ports/NotificationGateway";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
@@ -16,7 +16,7 @@ export class SuggestEditFormEstablishment extends TransactionalUseCase<SiretDto>
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private emailGateway: EmailGateway,
+    private notificationGateway: NotificationGateway,
     private timeGateway: TimeGateway,
     private generateEditFormEstablishmentUrl: GenerateEditFormEstablishmentJwt,
     private createNewEvent: CreateNewEvent,
@@ -43,7 +43,7 @@ export class SuggestEditFormEstablishment extends TransactionalUseCase<SiretDto>
     const editFrontUrl = this.generateEditFormEstablishmentUrl(payload);
 
     try {
-      await this.emailGateway.sendEmail({
+      await this.notificationGateway.sendEmail({
         type: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
         recipients: [contact.email],
         cc: contact.copyEmails,

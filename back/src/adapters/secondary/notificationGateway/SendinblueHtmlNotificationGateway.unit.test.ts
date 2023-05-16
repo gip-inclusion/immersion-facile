@@ -7,19 +7,19 @@ import { ignoreTabs } from "html-templates";
 import { HttpClient } from "http-client";
 import { makeEmailAllowListPredicate } from "../../primary/config/appConfig";
 import { BadRequestError } from "../../primary/helpers/httpErrors";
-import { SendinblueHtmlEmailGateway } from "./SendinblueHtmlEmailGateway";
+import { SendinblueHtmlNotificationGateway } from "./SendinblueHtmlNotificationGateway";
 import {
   SendTransactEmailHeader,
   SendTransactEmailRequestBody,
-} from "./SendinblueHtmlEmailGateway.schemas";
-import { SendinblueHtmlEmailGatewayTargets } from "./SendinblueHtmlEmailGateway.targets";
+} from "./SendinblueHtmlNotificationGateway.schemas";
+import { SendinblueHtmlNotificationGatewayTargets } from "./SendinblueHtmlNotificationGateway.targets";
 
 const sender = { name: "bob", email: "Machin@mail.com" };
 
-describe("SendingBlueHtmlEmailGateway unit", () => {
-  let fakeHttpClient: HttpClient<SendinblueHtmlEmailGatewayTargets>;
+describe("SendingBlueHtmlNotificationGateway unit", () => {
+  let fakeHttpClient: HttpClient<SendinblueHtmlNotificationGatewayTargets>;
   let allowListPredicate;
-  let sibGateway: SendinblueHtmlEmailGateway;
+  let sibGateway: SendinblueHtmlNotificationGateway;
   let sentEmails: {
     headers: SendTransactEmailHeader;
     body: SendTransactEmailRequestBody;
@@ -32,7 +32,7 @@ describe("SendingBlueHtmlEmailGateway unit", () => {
       sendTransactEmail(email: any) {
         sentEmails.push(email);
       },
-    } as unknown as HttpClient<SendinblueHtmlEmailGatewayTargets>;
+    } as unknown as HttpClient<SendinblueHtmlNotificationGatewayTargets>;
 
     allowListPredicate = makeEmailAllowListPredicate({
       emailAllowList: [
@@ -44,7 +44,7 @@ describe("SendingBlueHtmlEmailGateway unit", () => {
       skipEmailAllowList: false,
     });
 
-    sibGateway = new SendinblueHtmlEmailGateway(
+    sibGateway = new SendinblueHtmlNotificationGateway(
       fakeHttpClient,
       allowListPredicate,
       "fake-api-key",

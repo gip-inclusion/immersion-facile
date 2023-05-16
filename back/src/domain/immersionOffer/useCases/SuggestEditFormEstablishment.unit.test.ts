@@ -4,8 +4,8 @@ import { EstablishmentAggregateBuilder } from "../../../_testBuilders/Establishm
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { UuidV4Generator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryEmailGateway } from "../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { InMemoryNotificationGateway } from "../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
 import { EstablishmentAggregateRepository } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
 import { SuggestEditFormEstablishment } from "../../../domain/immersionOffer/useCases/SuggestEditFormEstablishment";
@@ -36,7 +36,7 @@ const prepareUseCase = () => {
   setMethodGetContactEmailFromSiret(establishmentAggregateRepository); // In most of the tests, we need the contact to be defined
 
   const timeGateway = new CustomTimeGateway();
-  const emailGateway = new InMemoryEmailGateway(timeGateway);
+  const notificationGateway = new InMemoryNotificationGateway(timeGateway);
   const uuidGenerator = new UuidV4Generator();
   const createNewEvent = makeCreateNewEvent({
     timeGateway,
@@ -50,7 +50,7 @@ const prepareUseCase = () => {
 
   const useCase = new SuggestEditFormEstablishment(
     uowPerformer,
-    emailGateway,
+    notificationGateway,
     timeGateway,
     generateEditFormEstablishmentUrl,
     createNewEvent,
@@ -60,7 +60,7 @@ const prepareUseCase = () => {
     outboxQueries,
     outboxRepository,
     establishmentAggregateRepository,
-    emailGateway,
+    notificationGateway,
   };
 };
 
@@ -83,7 +83,7 @@ describe("SuggestEditFormEstablishment", () => {
 
   it("Sends an email to contact and people in copy", async () => {
     // Prepare
-    const { useCase, outboxRepository, outboxQueries, emailGateway } =
+    const { useCase, outboxRepository, outboxQueries, notificationGateway } =
       prepareUseCase();
 
     outboxQueries.getLastPayloadOfFormEstablishmentEditLinkSentWithSiret =
@@ -99,7 +99,7 @@ describe("SuggestEditFormEstablishment", () => {
     await useCase.execute(siret);
 
     // Assert
-    const sentEmails = emailGateway.getSentEmails();
+    const sentEmails = notificationGateway.getSentEmails();
     expect(sentEmails).toHaveLength(1);
     expect(sentEmails[0].type).toBe("SUGGEST_EDIT_FORM_ESTABLISHMENT");
     expect(outboxRepository.events).toHaveLength(1);

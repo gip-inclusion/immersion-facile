@@ -7,9 +7,9 @@ import { SendEmailsWithAssessmentCreationLink } from "../../../domain/immersionO
 import { createLogger } from "../../../utils/logger";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
-import { InMemoryEmailGateway } from "../../secondary/emailGateway/InMemoryEmailGateway";
-import { SendinblueHtmlEmailGateway } from "../../secondary/emailGateway/SendinblueHtmlEmailGateway";
-import { sendinblueHtmlEmailGatewayTargets } from "../../secondary/emailGateway/SendinblueHtmlEmailGateway.targets";
+import { InMemoryNotificationGateway } from "../../secondary/notificationGateway/InMemoryNotificationGateway";
+import { SendinblueHtmlNotificationGateway } from "../../secondary/notificationGateway/SendinblueHtmlNotificationGateway";
+import { sendinblueHtmlNotificationGatewayTargets } from "../../secondary/notificationGateway/SendinblueHtmlNotificationGateway.targets";
 import { AppConfig, makeEmailAllowListPredicate } from "../config/appConfig";
 import { configureCreateHttpClientForExternalApi } from "../config/createHttpClientForExternalApi";
 import { makeGenerateConventionMagicLinkUrl } from "../config/magicLinkUrl";
@@ -28,11 +28,11 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
   });
   const timeGateway = new RealTimeGateway();
 
-  const emailGateway =
-    config.emailGateway === "SENDINBLUE_HTML"
-      ? new SendinblueHtmlEmailGateway(
+  const notificationGateway =
+    config.notificationGateway === "SENDINBLUE_HTML"
+      ? new SendinblueHtmlNotificationGateway(
           configureCreateHttpClientForExternalApi()(
-            sendinblueHtmlEmailGatewayTargets,
+            sendinblueHtmlNotificationGatewayTargets,
           ),
           makeEmailAllowListPredicate({
             skipEmailAllowList: config.skipEmailAllowlist,
@@ -44,7 +44,7 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
             email: immersionFacileContactEmail,
           },
         )
-      : new InMemoryEmailGateway(timeGateway);
+      : new InMemoryNotificationGateway(timeGateway);
 
   const { uowPerformer } = createUowPerformer(config, () => pool);
 
@@ -56,7 +56,7 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
   const sendEmailsWithAssessmentCreationLink =
     new SendEmailsWithAssessmentCreationLink(
       uowPerformer,
-      emailGateway,
+      notificationGateway,
       timeGateway,
       makeGenerateConventionMagicLinkUrl(config, generateConventionJwt),
       makeCreateNewEvent({

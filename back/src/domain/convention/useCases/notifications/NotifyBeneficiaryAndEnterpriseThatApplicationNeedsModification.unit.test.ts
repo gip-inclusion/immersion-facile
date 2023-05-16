@@ -15,8 +15,8 @@ import {
   InMemoryUnitOfWork,
 } from "../../../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
-import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+import { InMemoryNotificationGateway } from "../../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import { makeShortLinkUrl } from "../../../core/ShortLink";
@@ -25,7 +25,7 @@ import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "
 describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () => {
   let usecase: NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification;
   let uow: InMemoryUnitOfWork;
-  let emailGateway: InMemoryEmailGateway;
+  let notificationGateway: InMemoryNotificationGateway;
   let timeGateway: TimeGateway;
   let config: AppConfig;
   let shortLinkIdGateway: DeterministShortLinkIdGeneratorGateway;
@@ -37,13 +37,13 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
     uow = createInMemoryUow();
     uow.conventionRepository.setConventions({ [convention.id]: convention });
     uow.agencyRepository.setAgencies([agency]);
-    emailGateway = new InMemoryEmailGateway();
+    notificationGateway = new InMemoryNotificationGateway();
     timeGateway = new CustomTimeGateway();
     shortLinkIdGateway = new DeterministShortLinkIdGeneratorGateway();
     usecase =
       new NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification(
         new InMemoryUowPerformer(uow),
-        emailGateway,
+        notificationGateway,
         fakeGenerateMagicLinkUrlFn,
         timeGateway,
         shortLinkIdGateway,
@@ -93,7 +93,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
           }),
         });
 
-        expectToEqual(emailGateway.getSentEmails(), [
+        expectToEqual(notificationGateway.getSentEmails(), [
           {
             type: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
             recipients: [expectedRecipient],

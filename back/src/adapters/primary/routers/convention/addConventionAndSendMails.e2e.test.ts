@@ -22,7 +22,7 @@ import {
 import { DomainEvent } from "../../../../domain/core/eventBus/events";
 import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";
 import { InMemoryOutboxRepository } from "../../../secondary/core/InMemoryOutboxRepository";
-import { InMemoryEmailGateway } from "../../../secondary/emailGateway/InMemoryEmailGateway";
+import { InMemoryNotificationGateway } from "../../../secondary/notificationGateway/InMemoryNotificationGateway";
 
 const validatorEmail = "validator@mail.com";
 const beneficiarySubmitDate = new Date();
@@ -143,10 +143,10 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
   });
 
   const expectSentEmails = (
-    emailGateway: InMemoryEmailGateway,
+    notificationGateway: InMemoryNotificationGateway,
     emails: Partial<TemplatedEmail>[],
   ) => {
-    expect(emailGateway.getSentEmails()).toMatchObject(emails);
+    expect(notificationGateway.getSentEmails()).toMatchObject(emails);
   };
 
   const expectEventsInOutbox = (
