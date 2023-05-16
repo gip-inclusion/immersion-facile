@@ -8,7 +8,7 @@ import {
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { EmailGateway } from "../../ports/EmailGateway";
+import { NotificationGateway } from "../../ports/NotificationGateway";
 
 export class NotifyIcUserAgencyRightChanged extends TransactionalUseCase<
   IcUserRoleForAgencyParams,
@@ -18,7 +18,7 @@ export class NotifyIcUserAgencyRightChanged extends TransactionalUseCase<
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly emailGateway: EmailGateway,
+    private readonly notificationGateway: NotificationGateway,
   ) {
     super(uowPerformer);
   }
@@ -41,7 +41,7 @@ export class NotifyIcUserAgencyRightChanged extends TransactionalUseCase<
       throw new NotFoundError(`User with id ${params.userId} not found`);
 
     if (params.role !== "toReview")
-      await this.emailGateway.sendEmail({
+      await this.notificationGateway.sendEmail({
         type: "IC_USER_RIGHTS_HAS_CHANGED",
         recipients: [user.email],
         params: {

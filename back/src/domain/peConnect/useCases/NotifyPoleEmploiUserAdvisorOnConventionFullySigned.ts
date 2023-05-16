@@ -1,6 +1,6 @@
 import { ConventionDto, conventionSchema, frontRoutes } from "shared";
 import { GenerateConventionMagicLinkUrl } from "../../../adapters/primary/config/magicLinkUrl";
-import { EmailGateway } from "../../convention/ports/EmailGateway";
+import { NotificationGateway } from "../../convention/ports/NotificationGateway";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -8,7 +8,7 @@ import { TransactionalUseCase } from "../../core/UseCase";
 export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends TransactionalUseCase<ConventionDto> {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly emailGateway: EmailGateway,
+    private readonly notificationGateway: NotificationGateway,
     private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     private readonly timeGateway: TimeGateway,
   ) {
@@ -33,7 +33,7 @@ export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends Transact
     const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);
 
     if (conventionPeAdvisor && conventionPeAdvisor.advisor && agency)
-      await this.emailGateway.sendEmail({
+      await this.notificationGateway.sendEmail({
         type: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED",
         recipients: [conventionPeAdvisor.advisor.email],
         params: {

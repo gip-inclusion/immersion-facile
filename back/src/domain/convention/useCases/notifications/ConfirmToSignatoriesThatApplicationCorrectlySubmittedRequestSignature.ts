@@ -20,14 +20,14 @@ import {
 } from "../../../core/ports/UnitOfWork";
 import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { EmailGateway } from "../../ports/EmailGateway";
+import { NotificationGateway } from "../../ports/NotificationGateway";
 
 const logger = createLogger(__filename);
 
 export class ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature extends TransactionalUseCase<ConventionDto> {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly emailGateway: EmailGateway,
+    private readonly notificationGateway: NotificationGateway,
     private readonly timeGateway: TimeGateway,
     private readonly shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
     private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
@@ -56,7 +56,7 @@ export class ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignatu
     for (const signatory of values(convention.signatories).filter(
       filterNotFalsy,
     )) {
-      await this.emailGateway.sendEmail(
+      await this.notificationGateway.sendEmail(
         await this.makeEmail(signatory, convention, agency, uow),
       );
     }

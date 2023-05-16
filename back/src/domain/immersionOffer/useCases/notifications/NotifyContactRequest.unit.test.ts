@@ -9,12 +9,12 @@ import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/Establi
 import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
-import { InMemoryEmailGateway } from "../../../../adapters/secondary/emailGateway/InMemoryEmailGateway";
 import {
   InMemoryEstablishmentAggregateRepository,
   TEST_ROME_LABEL,
 } from "../../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+import { InMemoryNotificationGateway } from "../../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
 import { NotifyContactRequest } from "./NotifyContactRequest";
 
 const immersionOffer = new ImmersionOfferEntityV2Builder().build();
@@ -37,16 +37,16 @@ const allowedCopyEmail = "copy@gmail.com";
 
 describe("NotifyContactRequest", () => {
   let establishmentAggregateRepository: InMemoryEstablishmentAggregateRepository;
-  let emailGw: InMemoryEmailGateway;
+  let notificationGateway: InMemoryNotificationGateway;
   let notifyContactRequest: NotifyContactRequest;
 
   beforeEach(() => {
-    emailGw = new InMemoryEmailGateway();
+    notificationGateway = new InMemoryNotificationGateway();
     const uow = createInMemoryUow();
     establishmentAggregateRepository = uow.establishmentAggregateRepository;
     notifyContactRequest = new NotifyContactRequest(
       new InMemoryUowPerformer(uow),
-      emailGw,
+      notificationGateway,
     );
   });
 
@@ -75,7 +75,7 @@ describe("NotifyContactRequest", () => {
 
     await notifyContactRequest.execute(validEmailPayload);
 
-    const sentEmails = emailGw.getSentEmails();
+    const sentEmails = notificationGateway.getSentEmails();
     expect(sentEmails).toHaveLength(1);
 
     expectContactByEmailRequest(
@@ -114,7 +114,7 @@ describe("NotifyContactRequest", () => {
 
     await notifyContactRequest.execute(validPhonePayload);
 
-    const sentEmails = emailGw.getSentEmails();
+    const sentEmails = notificationGateway.getSentEmails();
     expect(sentEmails).toHaveLength(1);
 
     expectContactByPhoneInstructions(
@@ -148,7 +148,7 @@ describe("NotifyContactRequest", () => {
 
     await notifyContactRequest.execute(validInPersonPayload);
 
-    const sentEmails = emailGw.getSentEmails();
+    const sentEmails = notificationGateway.getSentEmails();
     expect(sentEmails).toHaveLength(1);
 
     expectContactInPersonInstructions(

@@ -17,9 +17,9 @@ import {
 } from "../../adapters/primary/config/magicLinkUrl";
 import { createInMemoryUow } from "../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
-import { SendinblueHtmlEmailGateway } from "../../adapters/secondary/emailGateway/SendinblueHtmlEmailGateway";
-import { sendinblueHtmlEmailGatewayTargets } from "../../adapters/secondary/emailGateway/SendinblueHtmlEmailGateway.targets";
 import { InMemoryUowPerformer } from "../../adapters/secondary/InMemoryUowPerformer";
+import { SendinblueHtmlNotificationGateway } from "../../adapters/secondary/notificationGateway/SendinblueHtmlNotificationGateway";
+import { sendinblueHtmlNotificationGatewayTargets } from "../../adapters/secondary/notificationGateway/SendinblueHtmlNotificationGateway.targets";
 import { DeterministShortLinkIdGeneratorGateway } from "../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { NotifyNewApplicationNeedsReview } from "../../domain/convention/useCases/notifications/NotifyNewApplicationNeedsReview";
 import { TimeGateway } from "../../domain/core/ports/TimeGateway";
@@ -40,7 +40,7 @@ const validConvention: ConventionDto = new ConventionDtoBuilder()
   .build();
 
 describe("Notify To 2 Counsellors that an application is available", () => {
-  let emailGw: SendinblueHtmlEmailGateway;
+  let notificationGateway: SendinblueHtmlNotificationGateway;
   let generateMagicLinkFn: GenerateConventionMagicLinkUrl;
   let agency;
   let timeGateway: TimeGateway;
@@ -50,9 +50,9 @@ describe("Notify To 2 Counsellors that an application is available", () => {
   beforeEach(() => {
     shortlinkGateway = new DeterministShortLinkIdGeneratorGateway();
     const config = AppConfig.createFromEnv();
-    emailGw = new SendinblueHtmlEmailGateway(
+    notificationGateway = new SendinblueHtmlNotificationGateway(
       configureCreateHttpClientForExternalApi()(
-        sendinblueHtmlEmailGatewayTargets,
+        sendinblueHtmlNotificationGatewayTargets,
       ),
       makeEmailAllowListPredicate({
         skipEmailAllowList: config.skipEmailAllowlist,
@@ -87,7 +87,7 @@ describe("Notify To 2 Counsellors that an application is available", () => {
 
     const notifyNewApplicationNeedsReview = new NotifyNewApplicationNeedsReview(
       new InMemoryUowPerformer(uow),
-      emailGw,
+      notificationGateway,
       generateMagicLinkFn,
       timeGateway,
       shortlinkGateway,
@@ -116,7 +116,7 @@ describe("Notify To 2 Counsellors that an application is available", () => {
 
     const notifyNewApplicationNeedsReview = new NotifyNewApplicationNeedsReview(
       new InMemoryUowPerformer(uow),
-      emailGw,
+      notificationGateway,
       generateMagicLinkFn,
       timeGateway,
       shortlinkGateway,
@@ -142,7 +142,7 @@ describe("Notify To 2 Counsellors that an application is available", () => {
 
     const notifyNewApplicationNeedsReview = new NotifyNewApplicationNeedsReview(
       new InMemoryUowPerformer(uow),
-      emailGw,
+      notificationGateway,
       generateMagicLinkFn,
       timeGateway,
       shortlinkGateway,

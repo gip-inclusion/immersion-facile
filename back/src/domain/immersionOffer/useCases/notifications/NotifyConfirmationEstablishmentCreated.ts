@@ -1,9 +1,9 @@
 import { FormEstablishmentDto, formEstablishmentSchema } from "shared";
-import { EmailGateway } from "../../../convention/ports/EmailGateway";
+import { NotificationGateway } from "../../../convention/ports/NotificationGateway";
 import { UseCase } from "../../../core/UseCase";
 
 export class NotifyConfirmationEstablishmentCreated extends UseCase<FormEstablishmentDto> {
-  constructor(private readonly emailGateway: EmailGateway) {
+  constructor(private readonly notificationGateway: NotificationGateway) {
     super();
   }
   inputSchema = formEstablishmentSchema;
@@ -11,7 +11,7 @@ export class NotifyConfirmationEstablishmentCreated extends UseCase<FormEstablis
   public async _execute(
     formEstablishment: FormEstablishmentDto,
   ): Promise<void> {
-    await this.emailGateway.sendEmail({
+    await this.notificationGateway.sendEmail({
       type: "NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION",
       recipients: [formEstablishment.businessContact.email],
       cc: formEstablishment.businessContact.copyEmails,

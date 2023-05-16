@@ -6,7 +6,7 @@ import {
 } from "shared";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { GenerateEditFormEstablishmentJwt } from "../../auth/jwt";
-import { EmailGateway } from "../../convention/ports/EmailGateway";
+import { NotificationGateway } from "../../convention/ports/NotificationGateway";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
@@ -17,7 +17,7 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto>
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private emailGateway: EmailGateway,
+    private notificationGateway: NotificationGateway,
     private timeGateway: TimeGateway,
     private generateEditFormEstablishmentUrl: GenerateEditFormEstablishmentJwt,
     private createNewEvent: CreateNewEvent,
@@ -60,7 +60,7 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto>
 
     const editFrontUrl = this.generateEditFormEstablishmentUrl(payload);
 
-    await this.emailGateway.sendEmail({
+    await this.notificationGateway.sendEmail({
       type: "EDIT_FORM_ESTABLISHMENT_LINK",
       recipients: [contact.email],
       cc: contact.copyEmails,

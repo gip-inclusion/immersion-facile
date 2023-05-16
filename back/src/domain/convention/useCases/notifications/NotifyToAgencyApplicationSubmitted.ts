@@ -16,7 +16,7 @@ import {
 } from "../../../core/ports/UnitOfWork";
 import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { EmailGateway } from "../../ports/EmailGateway";
+import { NotificationGateway } from "../../ports/NotificationGateway";
 
 export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
   ConventionDto,
@@ -26,7 +26,7 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly emailGateway: EmailGateway,
+    private readonly notificationGateway: NotificationGateway,
     private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     private readonly timeGateway: TimeGateway,
     private readonly shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
@@ -100,7 +100,7 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
           shortLinkIdGeneratorGateway: this.shortLinkIdGeneratorGateway,
         });
 
-        return this.emailGateway.sendEmail({
+        return this.notificationGateway.sendEmail({
           type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
           recipients: [email],
           params: {

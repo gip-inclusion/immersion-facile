@@ -1,10 +1,10 @@
 import { z } from "zod";
 import { EmailSentDto } from "shared";
-import { EmailGateway } from "../../../convention/ports/EmailGateway";
+import { NotificationGateway } from "../../../convention/ports/NotificationGateway";
 import { UseCase } from "../../../core/UseCase";
 
 export class GetSentEmails extends UseCase<void, EmailSentDto[]> {
-  constructor(private emailGateway: EmailGateway) {
+  constructor(private notificationGateway: NotificationGateway) {
     super();
   }
 
@@ -12,6 +12,6 @@ export class GetSentEmails extends UseCase<void, EmailSentDto[]> {
 
   // eslint-disable-next-line @typescript-eslint/require-await
   protected async _execute(): Promise<EmailSentDto[]> {
-    return this.emailGateway.getLastSentEmailDtos();
+    return this.notificationGateway.getLastSentEmailDtos();
   }
 }

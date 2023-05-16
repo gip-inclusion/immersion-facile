@@ -3,7 +3,7 @@ import { z } from "zod";
 import { ConventionDto, ConventionId, frontRoutes } from "shared";
 import { GenerateConventionMagicLinkUrl } from "../../../adapters/primary/config/magicLinkUrl";
 import { createLogger } from "../../../utils/logger";
-import { EmailGateway } from "../../convention/ports/EmailGateway";
+import { NotificationGateway } from "../../convention/ports/NotificationGateway";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
@@ -24,7 +24,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private emailGateway: EmailGateway,
+    private notificationGateway: NotificationGateway,
     private timeGateway: TimeGateway,
     private generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     private createNewEvent: CreateNewEvent,
@@ -76,7 +76,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
     if (!agency)
       throw new Error(`Missing agency ${convention.agencyId} on repository.`);
 
-    await this.emailGateway.sendEmail({
+    await this.notificationGateway.sendEmail({
       type: "CREATE_IMMERSION_ASSESSMENT",
       recipients: [convention.establishmentTutor.email],
       params: {

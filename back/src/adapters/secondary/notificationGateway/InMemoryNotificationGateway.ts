@@ -1,21 +1,21 @@
 import { prop } from "ramda";
 import { EmailSentDto, TemplatedEmail } from "shared";
-import { EmailGateway } from "../../../domain/convention/ports/EmailGateway";
+import {
+  NotificationGateway,
+  SendSmsParams,
+} from "../../../domain/convention/ports/NotificationGateway";
 import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
 import { createLogger } from "../../../utils/logger";
 import { CustomTimeGateway } from "../core/TimeGateway/CustomTimeGateway";
 
 const logger = createLogger(__filename);
 
-export class InMemoryEmailGateway implements EmailGateway {
+export class InMemoryNotificationGateway implements NotificationGateway {
   public constructor(
     private readonly timeGateway: TimeGateway = new CustomTimeGateway(),
     private readonly numberOfEmailToKeep: number | null = null,
   ) {}
-
-  private readonly sentEmails: EmailSentDto[] = [];
-
-  public getLastSentEmailDtos() {
+  public getLastSentEmailDtos(): EmailSentDto[] {
     return this.sentEmails.sort((mailA, mailB) =>
       new Date(mailB.sentAt).getTime() - new Date(mailA.sentAt).getTime() >= 0
         ? 1
@@ -23,9 +23,12 @@ export class InMemoryEmailGateway implements EmailGateway {
     );
   }
 
-  public async sendEmail(email: TemplatedEmail) {
-    logger.info(email.params, `sending email : ${email.type}`);
-    this.pushEmail(email);
+  public async sendEmail(templatedEmail: TemplatedEmail): Promise<void> {
+    logger.info(
+      templatedEmail.params,
+      `sending email : ${templatedEmail.type}`,
+    );
+    this.pushEmail(templatedEmail);
   }
 
   private pushEmail(templatedEmail: TemplatedEmail) {
@@ -43,8 +46,18 @@ export class InMemoryEmailGateway implements EmailGateway {
     });
   }
 
+  public async sendSms(sendSmsParams: SendSmsParams): Promise<void> {
+    this.sentSms.push(sendSmsParams);
+  }
+
   // For testing.
   getSentEmails(): TemplatedEmail[] {
     return this.sentEmails.map(prop("templatedEmail"));
   }
+  getSentSms(): SendSmsParams[] {
+    return this.sentSms;
+  }
+
+  private readonly sentEmails: EmailSentDto[] = [];
+  private readonly sentSms: SendSmsParams[] = [];
 }
