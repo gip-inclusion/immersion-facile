@@ -18,7 +18,10 @@ import {
   isPeConnectIdentity,
   notJobSeeker,
 } from "shared";
-import { SubmitConfirmationSection } from "react-design-system";
+import {
+  ConventionFormSidebar,
+  SubmitConfirmationSection,
+} from "react-design-system";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { ConventionFormFields } from "src/app/components/forms/convention/ConventionFormFields";
 import {
@@ -26,6 +29,7 @@ import {
   isConventionFrozen,
   undefinedIfEmptyString,
 } from "src/app/components/forms/convention/conventionHelpers";
+import { sidebarStepContent } from "src/app/contents/forms/convention/formConvention";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useExistingSiret } from "src/app/hooks/siret.hooks";
@@ -87,7 +91,10 @@ export const ConventionForm = ({
 }: ConventionFormProps) => {
   const { cx } = useStyles();
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
-
+  const currentStep = useAppSelector(conventionSelectors.currentStep);
+  const sidebarContent = sidebarStepContent(
+    conventionProperties?.internshipKind ?? "immersion",
+  );
   const [initialValues] = useState<ConventionPresentation>({
     ...conventionProperties,
 
@@ -194,8 +201,8 @@ export const ConventionForm = ({
     );
 
   return (
-    <div className={fr.cx("fr-grid-row", "fr-grid-row--center")}>
-      <div className={fr.cx("fr-col-12", "fr-col-lg-7")}>
+    <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
+      <div className={fr.cx("fr-col-12", "fr-col-lg-8")}>
         {/* Should be removed on accordion form */}
         <div className={cx("fr-text")}>{t.intro.welcome}</div>
         <Alert
@@ -216,6 +223,12 @@ export const ConventionForm = ({
             />
           </form>
         </FormProvider>
+      </div>
+      <div className={fr.cx("fr-col-12", "fr-col-lg-4")}>
+        <ConventionFormSidebar
+          currentStep={currentStep}
+          sidebarContent={sidebarContent}
+        />
       </div>
     </div>
   );

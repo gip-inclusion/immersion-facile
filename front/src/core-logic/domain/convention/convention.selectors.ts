@@ -58,6 +58,11 @@ const preselectedAgencyId = createSelector(
   ({ formUi }) => formUi.preselectedAgencyId,
 );
 
+const currentStep = createSelector(
+  conventionState,
+  ({ formUi }) => formUi.currentStep,
+);
+
 export const conventionSelectors = {
   convention,
   fetchError,
@@ -69,6 +74,7 @@ export const conventionSelectors = {
   hasCurrentEmployer,
   conventionStatusDashboardUrl,
   preselectedAgencyId,
+  currentStep,
 };
 
 export const signatoryDataFromConvention = (

@@ -1,3 +1,4 @@
+import React from "react";
 import { domElementIds, InternshipKind } from "shared";
 import { ConventionField } from "../../admin/types";
 import { FormFieldAttributesForContent } from "../types";
@@ -544,4 +545,93 @@ const fieldsToExclude = {
     label: "",
     id: "",
   },
+};
+
+type SidebarStepContent = {
+  title: string;
+  description: React.ReactNode;
+};
+
+export const sidebarStepContent = (
+  internshipKind: InternshipKind,
+): SidebarStepContent[] => {
+  const contents = {
+    immersion: [
+      {
+        title: "Informations sur la structure d'accompagnement du candidat",
+        description: (
+          <>
+            <p>
+              Vérifiez que votre structure d’accompagnement est disponible dans
+              la liste ci-dessous.{" "}
+              <strong>
+                Si ce n’est pas le cas, contactez votre conseiller.
+              </strong>
+            </p>
+            <p>
+              <strong>
+                Si vous n'avez pas de structure d'accompagnement, retrouvez{" "}
+                <a
+                  href="https://aide.immersion-facile.beta.gouv.fr/fr/article/je-nai-pas-de-structure-daccompagnement-et-je-veux-faire-une-immersion-1x15rdp"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  nos conseils ici
+                </a>
+                .
+              </strong>
+            </p>
+          </>
+        ),
+      },
+      {
+        title: "Informations sur le candidat",
+        description:
+          "Candidats, vérifiez que votre structure d'accompagnement est disponible dans la liste ci-contre. Si ce n'est pas le cas, contactez votre conseiller.",
+      },
+      {
+        title: "Informations sur l'entreprise",
+        description:
+          "Candidats, vérifiez que votre structure d'accompagnement est disponible dans la liste ci-contre. Si ce n'est pas le cas, contactez votre conseiller.",
+      },
+      {
+        title: "Lieu et heures de l'immersion professionnelle",
+        description:
+          "Candidats, vérifiez que votre structure d'accompagnement est disponible dans la liste ci-contre. Si ce n'est pas le cas, contactez votre conseiller.",
+      },
+      {
+        title: "Détails de l'immersion professionnelle",
+        description:
+          "Candidats, vérifiez que votre structure d'accompagnement est disponible dans la liste ci-contre. Si ce n'est pas le cas, contactez votre conseiller.",
+      },
+    ],
+    "mini-stage-cci": [
+      {
+        title: "Informations sur la structure d'accompagnement du candidat",
+        description:
+          "Candidats, vérifiez que votre structure d'accompagnement est disponible dans la liste ci-contre. Si ce n'est pas le cas, contactez votre conseiller.",
+      },
+      {
+        title: "Informations sur le candidat",
+        description:
+          "Candidats, vérifiez que votre structure d'accompagnement est disponible dans la liste ci-contre. Si ce n'est pas le cas, contactez votre conseiller.",
+      },
+      {
+        title: "Informations sur l'entreprise",
+        description:
+          "Candidats, vérifiez que votre structure d'accompagnement est disponible dans la liste ci-contre. Si ce n'est pas le cas, contactez votre conseiller.",
+      },
+      {
+        title: "Lieu et heures de l'immersion professionnelle",
+        description:
+          "Candidats, vérifiez que votre structure d'accompagnement est disponible dans la liste ci-contre. Si ce n'est pas le cas, contactez votre conseiller.",
+      },
+      {
+        title: "Détails de l'immersion professionnelle",
+        description:
+          "Candidats, vérifiez que votre structure d'accompagnement est disponible dans la liste ci-contre. Si ce n'est pas le cas, contactez votre conseiller.",
+      },
+    ],
+  };
+  return contents[internshipKind];
 };

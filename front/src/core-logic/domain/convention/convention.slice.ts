@@ -36,6 +36,7 @@ export interface ConventionState {
     isMinor: boolean;
     isTutorEstablishmentRepresentative: boolean;
     hasCurrentEmployer: boolean;
+    currentStep: number;
   };
   jwt: string | null;
   isLoading: boolean;
@@ -52,6 +53,7 @@ export const initialConventionState: ConventionState = {
     isMinor: false,
     isTutorEstablishmentRepresentative: true,
     hasCurrentEmployer: false,
+    currentStep: 1,
   },
   jwt: null,
   convention: null,
@@ -219,5 +221,8 @@ export const conventionSlice = createSlice({
       state.formUi.preselectedAgencyId = payload;
     },
     preselectedAgencyIdFailed: setFeedbackAsErrored,
+    setCurrentStep: (state, { payload }: PayloadAction<number>) => {
+      state.formUi.currentStep = payload;
+    },
   },
 });

@@ -4,9 +4,7 @@ import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
-import { ConventionDto, FederatedIdentity } from "shared";
-import { SectionTitle } from "react-design-system";
-import { ShareActions } from "src/app/components/forms/convention/ShareActions";
+import { ConventionDto } from "shared";
 import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
@@ -22,12 +20,10 @@ import { EstablishmentRepresentativeFields } from "./EstablishmentRepresentative
 
 type EstablishmentFormSectionParams = {
   isFrozen: boolean | undefined;
-  federatedIdentity: FederatedIdentity | undefined;
 };
 
 export const EstablishmentFormSection = ({
   isFrozen,
-  federatedIdentity,
 }: EstablishmentFormSectionParams): JSX.Element => {
   useTutorIsEstablishmentRepresentative();
 
@@ -49,13 +45,6 @@ export const EstablishmentFormSection = ({
 
   return (
     <>
-      <SectionTitle>
-        {t.establishmentSection.title}
-        <ShareActions
-          isFrozen={isFrozen || isFetchingSiret}
-          federatedIdentity={federatedIdentity}
-        />
-      </SectionTitle>
       <Alert
         severity="info"
         small

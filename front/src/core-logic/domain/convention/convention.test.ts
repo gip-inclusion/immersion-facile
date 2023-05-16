@@ -64,6 +64,7 @@ describe("Convention slice", () => {
             isMinor: false,
             isTutorEstablishmentRepresentative: true,
             hasCurrentEmployer: false,
+            currentStep: 1,
           },
           jwt: "some-correct-jwt",
           convention: null,
@@ -243,6 +244,7 @@ describe("Convention slice", () => {
             isMinor: false,
             isTutorEstablishmentRepresentative: true,
             hasCurrentEmployer: false,
+            currentStep: 1,
           },
           feedback: { kind: "justSubmitted" },
           isLoading: false,
@@ -327,6 +329,7 @@ describe("Convention slice", () => {
               isMinor: false,
               isTutorEstablishmentRepresentative: false,
               hasCurrentEmployer: false,
+              currentStep: 1,
             },
           });
         });
@@ -373,6 +376,7 @@ describe("Convention slice", () => {
               isMinor: false,
               isTutorEstablishmentRepresentative: true,
               hasCurrentEmployer: false,
+              currentStep: 1,
             },
           });
         });
@@ -413,6 +417,7 @@ describe("Convention slice", () => {
               isMinor: true,
               isTutorEstablishmentRepresentative: false,
               hasCurrentEmployer: false,
+              currentStep: 1,
             },
           });
         });
@@ -446,6 +451,7 @@ describe("Convention slice", () => {
               isMinor: false,
               isTutorEstablishmentRepresentative: false,
               hasCurrentEmployer: false,
+              currentStep: 1,
             },
           });
         });
@@ -480,6 +486,7 @@ describe("Convention slice", () => {
               isMinor: false,
               isTutorEstablishmentRepresentative: false,
               hasCurrentEmployer: false,
+              currentStep: 1,
             },
           });
         });
@@ -522,6 +529,7 @@ describe("Convention slice", () => {
               isMinor: false,
               isTutorEstablishmentRepresentative: false,
               hasCurrentEmployer: true,
+              currentStep: 1,
             },
           });
         });
@@ -551,6 +559,7 @@ describe("Convention slice", () => {
             isMinor: false,
             isTutorEstablishmentRepresentative: true,
             hasCurrentEmployer: false,
+            currentStep: 1,
           },
           jwt: null,
           fetchError: null,
@@ -591,6 +600,7 @@ describe("Convention slice", () => {
             isMinor: false,
             isTutorEstablishmentRepresentative: true,
             hasCurrentEmployer: false,
+            currentStep: 1,
           },
           jwt: null,
           fetchError: null,
@@ -751,6 +761,7 @@ describe("Convention slice", () => {
           isMinor: false,
           isTutorEstablishmentRepresentative: true,
           hasCurrentEmployer: false,
+          currentStep: 1,
         },
         jwt: null,
         convention: null,
@@ -763,6 +774,34 @@ describe("Convention slice", () => {
     }));
     store.dispatch(conventionSlice.actions.clearFeedbackTriggered());
     expectConventionState({ feedback: { kind: "idle" } });
+  });
+
+  it("changes the form current step when asked", () => {
+    ({ store } = createTestStore({
+      convention: {
+        formUi: {
+          preselectedAgencyId: null,
+          isMinor: false,
+          isTutorEstablishmentRepresentative: true,
+          hasCurrentEmployer: false,
+          currentStep: 1,
+        },
+        jwt: null,
+        convention: null,
+        conventionStatusDashboardUrl: null,
+        feedback: { kind: "modificationsAskedFromSignatory" },
+        isLoading: false,
+        fetchError: null,
+        currentSignatoryRole: null,
+      },
+    }));
+    expectConventionState({
+      formUi: { ...store.getState().convention.formUi, currentStep: 1 },
+    });
+    store.dispatch(conventionSlice.actions.setCurrentStep(2));
+    expectConventionState({
+      formUi: { ...store.getState().convention.formUi, currentStep: 2 },
+    });
   });
 
   it("Toggle is minor", () => {
@@ -800,6 +839,7 @@ describe("Convention slice", () => {
           isMinor: false,
           isTutorEstablishmentRepresentative: true,
           hasCurrentEmployer: false,
+          currentStep: 1,
         },
         jwt: null,
         convention,

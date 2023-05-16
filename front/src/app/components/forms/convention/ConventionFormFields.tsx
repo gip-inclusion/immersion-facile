@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import { type SubmitHandler, useFormContext } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
+import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import {
@@ -26,10 +28,12 @@ import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { useRoute } from "src/app/routes/routes";
 import { deviceRepository } from "src/config/dependencies";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
+import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { AgencyFormSection } from "./sections/agency/AgencyFormSection";
 import { BeneficiaryFormSection } from "./sections/beneficiary/BeneficiaryFormSection";
 import { EstablishmentFormSection } from "./sections/establishment/EstablishmentFormSection";
-import { ImmersionConditionFormSection } from "./sections/immersion-conditions/ImmersionConditionFormSection";
+import { ImmersionHourLocationSection } from "./sections/hour-location/ImmersionHourLocationSection";
+import { ImmersionDetailsSection } from "./sections/immersion-details/ImmersionDetailsSection";
 
 type ConventionFieldsProps = {
   isFrozen?: boolean;
@@ -54,6 +58,7 @@ export const ConventionFormFields = ({
     handleSubmit,
     formState: { errors, submitCount, isSubmitted },
   } = useFormContext<ConventionReadDto>();
+  const currentStep = useAppSelector(conventionSelectors.currentStep);
   const conventionValues = getValues();
   const conventionSubmitFeedback = useAppSelector(conventionSelectors.feedback);
   const preselectedAgencyId = useAppSelector(
@@ -80,14 +85,24 @@ export const ConventionFormFields = ({
   const { getFormFields, getFormErrors } = useFormContents(
     formConventionFieldsLabels(conventionValues.internshipKind),
   );
+  const dispatch = useDispatch();
   const formContents = getFormFields();
-  const federatedIdentity =
-    conventionValues.signatories.beneficiary.federatedIdentity;
   const t = useConventionTexts(conventionValues.internshipKind);
   const shouldSubmitButtonBeDisabled =
     isLoading ||
     (isSubmitted && conventionSubmitFeedback.kind === "justSubmitted");
-
+  const makeAccordionProps = (step: number) => ({
+    onExpandedChange: () => {
+      dispatch(conventionSlice.actions.setCurrentStep(step));
+    },
+    expanded: currentStep === step,
+  });
+  const renderSectionTitle = (title: string, step: number) => {
+    if (currentStep === step) {
+      return <strong>{title}</strong>;
+    }
+    return title;
+  };
   return (
     <>
       {isFrozen && !isSignatureMode && <ConventionFrozenMessage />}
@@ -101,29 +116,50 @@ export const ConventionFormFields = ({
         type="hidden"
         {...formContents["signatories.beneficiary.federatedIdentity"]}
       />
-      {route.name !== "conventionCustomAgency" && (
-        <AgencyFormSection
-          internshipKind={conventionValues.internshipKind}
-          agencyId={conventionValues.agencyId}
-          enablePeConnectApi={enablePeConnectApi}
-          isFrozen={isFrozen}
-        />
-      )}
+      <div className={fr.cx("fr-accordions-group")}>
+        {route.name !== "conventionCustomAgency" && (
+          <Accordion
+            label={renderSectionTitle(t.agencySection.title, 1)}
+            {...makeAccordionProps(1)}
+          >
+            <AgencyFormSection
+              internshipKind={conventionValues.internshipKind}
+              agencyId={conventionValues.agencyId}
+              enablePeConnectApi={enablePeConnectApi}
+              isFrozen={isFrozen}
+            />
+          </Accordion>
+        )}
 
-      <BeneficiaryFormSection
-        isFrozen={isFrozen}
-        internshipKind={conventionValues.internshipKind}
-      />
+        <Accordion
+          label={renderSectionTitle(t.beneficiarySection.title, 2)}
+          {...makeAccordionProps(2)}
+        >
+          <BeneficiaryFormSection
+            isFrozen={isFrozen}
+            internshipKind={conventionValues.internshipKind}
+          />
+        </Accordion>
+        <Accordion
+          label={renderSectionTitle(t.establishmentSection.title, 3)}
+          {...makeAccordionProps(3)}
+        >
+          <EstablishmentFormSection isFrozen={isFrozen} />
+        </Accordion>
+        <Accordion
+          label={renderSectionTitle(t.immersionHourLocationSection.title, 4)}
+          {...makeAccordionProps(4)}
+        >
+          <ImmersionHourLocationSection />
+        </Accordion>
+        <Accordion
+          label={renderSectionTitle(t.immersionDetailsSection.title, 5)}
+          {...makeAccordionProps(5)}
+        >
+          <ImmersionDetailsSection disabled={isFrozen} />
+        </Accordion>
+      </div>
 
-      <EstablishmentFormSection
-        isFrozen={isFrozen}
-        federatedIdentity={federatedIdentity}
-      />
-
-      <ImmersionConditionFormSection
-        federatedIdentity={federatedIdentity}
-        isFrozen={isFrozen}
-      />
       {!isFrozen && (
         <Alert
           small

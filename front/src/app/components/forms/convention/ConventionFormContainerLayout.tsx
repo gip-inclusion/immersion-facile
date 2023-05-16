@@ -18,11 +18,7 @@ export const ConventionFormContainerLayout = ({
       <MainWrapper
         layout={"default"}
         pageHeader={
-          <PageHeader
-            centered
-            title={t.intro.conventionTitle}
-            theme="candidate"
-          />
+          <PageHeader title={t.intro.conventionTitle} theme="candidate" />
         }
       >
         {children}
