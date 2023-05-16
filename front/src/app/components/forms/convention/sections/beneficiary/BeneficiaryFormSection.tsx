@@ -11,11 +11,9 @@ import {
   isBeneficiaryStudent,
   levelsOfEducation,
 } from "shared";
-import { SectionTitle } from "react-design-system";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
 import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
-import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import {
   makeFieldError,
   useFormContents,
@@ -50,7 +48,6 @@ export const BeneficiaryFormSection = ({
     useFormContext<ConventionReadDto>();
   const values = getValues();
   const dispatch = useDispatch();
-  const t = useConventionTexts(values.internshipKind);
   const getFieldError = makeFieldError(formState);
   const { getFormFields } = useFormContents(
     formConventionFieldsLabels(values.internshipKind),
@@ -103,7 +100,6 @@ export const BeneficiaryFormSection = ({
 
   return (
     <>
-      <SectionTitle>{t.beneficiarySection.title}</SectionTitle>
       <Input
         hintText={formContents["signatories.beneficiary.firstName"].hintText}
         label={formContents["signatories.beneficiary.firstName"].label}
