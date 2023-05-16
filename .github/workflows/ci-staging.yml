@@ -14,9 +14,8 @@ jobs:
 
   deploy-staging:
     needs: [build-front-artefact, build-back-artefact]
-    environment: staging
     uses: ./.github/workflows/deploy-to-scalingo.yml
     with:
-      envType: "staging"
+      environment: staging
     secrets:
       SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
