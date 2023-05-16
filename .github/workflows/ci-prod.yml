@@ -14,10 +14,9 @@ jobs:
 
   deploy-prod:
     needs: [build-front-artefact, build-back-artefact]
-    environment: production
     uses: ./.github/workflows/deploy-to-scalingo.yml
     with:
-      envType: "prod"
+      environment: prod
       region: "osc-secnum-fr1"
     secrets:
       SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}

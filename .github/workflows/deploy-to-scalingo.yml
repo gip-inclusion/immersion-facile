@@ -3,9 +3,10 @@ name: "Generic workflow to deploy to scalingo, given arguments"
 on:
   workflow_call:
     inputs:
-      envType:
-        required: true
+      environment:
         type: string
+        description: environment to deploy to
+        required: true
       region:
         required: false
         type: string
@@ -17,6 +18,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
     steps:
       - name: Install scalingo CLI
         run: |
@@ -33,6 +35,6 @@ jobs:
       - name: Login to scalingo
         run: scalingo login --api-token ${{ secrets.SCALINGO_API_TOKEN }}
       - name: Deploy back
-        run: scalingo --app if-${{inputs.envType}}-back --region ${{ inputs.region }} deploy back-build.tar.gz
+        run: scalingo --app if-${{ inputs.environment }}-back --region ${{ inputs.region }} deploy back-build.tar.gz
       - name: Deploy front
-        run: scalingo --app if-${{inputs.envType}}-front --region ${{ inputs.region }} deploy front-build.tar.gz
+        run: scalingo --app if-${{ inputs.environment }}-front --region ${{ inputs.region }} deploy front-build.tar.gz
