@@ -17,23 +17,27 @@ export class UnhandledError extends Error {
 }
 
 export const unhandledError = (error: any, req: Request, res: Response) => {
+  const axiosErrorBody = error?.response?.data;
+  const withAxiosErrorBody = axiosErrorBody ? { axiosErrorBody } : {};
   const stack = JSON.stringify(error.stack, null, 2);
   logger.error(
     {
       error,
       errorMessage: error.message,
-      stack,
+      ...withAxiosErrorBody,
       request: {
         path: req.path,
         method: req.method,
         body: req.body,
       },
+      stack,
     },
     "Unhandled error",
   );
 
   notifyObjectDiscord({
     _message: `Unhandled Error : ${error.message}`,
+    ...withAxiosErrorBody,
     routePath: req.path,
     routeMethod: req.method,
     stack,
