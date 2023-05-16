@@ -21,7 +21,7 @@ type HeroHeaderInfos = {
 
 export const heroHeaderContent: Record<UserType, HeroHeaderInfos> = {
   default: {
-    title: "La meilleure façon de faire émerger de nouveaux talents",
+    title: "Faciliter la réalisation des immersions professionnelles",
     displayName: "default",
     illustration: heroHeaderDefaultIllustration,
     icon: "",
@@ -29,7 +29,8 @@ export const heroHeaderContent: Record<UserType, HeroHeaderInfos> = {
       "Avec Immersion Facilitée, trouvez un métier à tester, entrez en relation immédiatement avec une entreprise accueillante, remplissez une demande de convention et obtenez une réponse en temps record !",
   },
   candidate: {
-    title: "La meilleure façon de découvrir votre futur métier",
+    title:
+      "L'immersion professionnelle, la meilleure façon de découvrir votre futur métier",
     displayName: "Candidat",
     illustration: heroHeaderCandidateIllustration,
     icon: "fr-icon-user-line",
@@ -37,7 +38,8 @@ export const heroHeaderContent: Record<UserType, HeroHeaderInfos> = {
       "Assurez le succès de votre projet professionnel en découvrant un métier en conditions réelles. Passez quelques jours en entreprise pour vérifier que ce métier vous plaît et vous convient. Profitez-en pour découvrir éventuellement votre futur employeur !",
   },
   establishment: {
-    title: "Rencontrer des candidats motivés ? C’est possible !",
+    title:
+      "Rencontrer des candidats motivés ? C’est possible avec l'immersion professionelle !",
     displayName: "Entreprise",
     illustration: heroHeaderEstablishmentIllustration,
     icon: "fr-icon-building-line",
@@ -45,7 +47,8 @@ export const heroHeaderContent: Record<UserType, HeroHeaderInfos> = {
       "Contribuez au succès de reconversions professionnelles en ouvrant vos entreprises. Permettez à des profils motivés de découvrir le métier de leur choix, en conditions réelles auprès des professionnels en activité et identifiez ceux qui pourraient venir renforcer votre équipe.",
   },
   agency: {
-    title: "La meilleure façon de faire émerger de nouveaux talents",
+    title:
+      "L'immersion professionnelle, la meilleure façon de faire émerger de nouveaux talents",
     displayName: "Prescripteur",
     illustration: heroHeaderAgencyIllustration,
     icon: "fr-icon-map-pin-user-line",
