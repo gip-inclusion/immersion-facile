@@ -1,25 +1,25 @@
 import { AppConfig } from "../../primary/config/appConfig";
 import { configureCreateHttpClientForExternalApi } from "../../primary/config/createHttpClientForExternalApi";
-import { SendinblueHtmlNotificationGateway } from "./SendinblueHtmlNotificationGateway";
-import { sendinblueHtmlNotificationGatewayTargets } from "./SendinblueHtmlNotificationGateway.targets";
+import { BrevoNotificationGateway } from "./BrevoNotificationGateway";
+import { brevoNotificationGatewayTargets } from "./BrevoNotificationGateway.targets";
 
-describe("SendinblueHtmlNotificationGateway manual", () => {
-  let sibGateway: SendinblueHtmlNotificationGateway;
+describe("BrevoNotificationGateway manual", () => {
+  let notificationGateway: BrevoNotificationGateway;
 
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
-    sibGateway = new SendinblueHtmlNotificationGateway(
+    notificationGateway = new BrevoNotificationGateway(
       configureCreateHttpClientForExternalApi()(
-        sendinblueHtmlNotificationGatewayTargets,
+        brevoNotificationGatewayTargets,
       ),
       (_) => true,
-      config.apiKeySendinblue,
+      config.apiKeyBrevo,
       { email: "bob@fake.mail", name: "Bob" },
     );
   });
 
   it("should send email correctly", async () => {
-    await sibGateway.sendEmail({
+    await notificationGateway.sendEmail({
       type: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
       recipients: ["recette@immersion-facile.beta.gouv.fr"],
       params: {
@@ -40,7 +40,7 @@ describe("SendinblueHtmlNotificationGateway manual", () => {
   });
 
   it("should send SMS correctly", async () => {
-    await sibGateway.sendSms({
+    await notificationGateway.sendSms({
       phone: "VALID_INTERNATIONAL_FRENCH_MOBILE_PHONE_NUMBER", // Like 33611223344
       kind: "LastReminderForSignatories",
       shortLink:

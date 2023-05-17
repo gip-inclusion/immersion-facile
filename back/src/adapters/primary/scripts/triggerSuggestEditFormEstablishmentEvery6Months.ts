@@ -8,9 +8,9 @@ import { SuggestEditFormEstablishment } from "../../../domain/immersionOffer/use
 import { createLogger } from "../../../utils/logger";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
+import { BrevoNotificationGateway } from "../../secondary/notificationGateway/BrevoNotificationGateway";
+import { brevoNotificationGatewayTargets } from "../../secondary/notificationGateway/BrevoNotificationGateway.targets";
 import { InMemoryNotificationGateway } from "../../secondary/notificationGateway/InMemoryNotificationGateway";
-import { SendinblueHtmlNotificationGateway } from "../../secondary/notificationGateway/SendinblueHtmlNotificationGateway";
-import { sendinblueHtmlNotificationGatewayTargets } from "../../secondary/notificationGateway/SendinblueHtmlNotificationGateway.targets";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
 import { AppConfig, makeEmailAllowListPredicate } from "../config/appConfig";
 import { configureCreateHttpClientForExternalApi } from "../config/createHttpClientForExternalApi";
@@ -69,16 +69,16 @@ const triggerSuggestEditFormEstablishmentEvery6Months =
     const pgUowPerformer = new PgUowPerformer(testPool, createPgUow);
 
     const notificationGateway =
-      config.notificationGateway === "SENDINBLUE_HTML"
-        ? new SendinblueHtmlNotificationGateway(
+      config.notificationGateway === "BREVO"
+        ? new BrevoNotificationGateway(
             configureCreateHttpClientForExternalApi()(
-              sendinblueHtmlNotificationGatewayTargets,
+              brevoNotificationGatewayTargets,
             ),
             makeEmailAllowListPredicate({
               skipEmailAllowList: config.skipEmailAllowlist,
               emailAllowList: config.emailAllowList,
             }),
-            config.apiKeySendinblue,
+            config.apiKeyBrevo,
             {
               name: "Immersion Facilitée",
               email: immersionFacileContactEmail,

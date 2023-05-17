@@ -48,19 +48,19 @@ export const counterEventsSavedBeforePublish = new Counter({
 
 // EMAIL
 export const counterSendTransactEmailTotal = new Counter({
-  name: "sendinblue_send_transac_email_total",
+  name: "brevo_send_transac_email_total",
   help: "The total count of sendTransacEmail requests, broken down by email type.",
   labelNames: ["emailType"],
 });
 
 export const counterSendTransactEmailSuccess = new Counter({
-  name: "sendinblue_send_transac_email_success",
+  name: "brevo_send_transac_email_success",
   help: "The success count of sendTransacEmail requests, broken down by email type.",
   labelNames: ["emailType"],
 });
 
 export const counterSendTransactEmailError = new Counter({
-  name: "sendinblue_send_transac_email_error",
+  name: "brevo_send_transac_email_error",
   help: "The error count of sendTransacEmail requests, broken down by email type.",
   labelNames: ["emailType", "errorType"],
 });

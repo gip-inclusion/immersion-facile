@@ -7,9 +7,9 @@ import { SendEmailsWithAssessmentCreationLink } from "../../../domain/immersionO
 import { createLogger } from "../../../utils/logger";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
+import { BrevoNotificationGateway } from "../../secondary/notificationGateway/BrevoNotificationGateway";
+import { brevoNotificationGatewayTargets } from "../../secondary/notificationGateway/BrevoNotificationGateway.targets";
 import { InMemoryNotificationGateway } from "../../secondary/notificationGateway/InMemoryNotificationGateway";
-import { SendinblueHtmlNotificationGateway } from "../../secondary/notificationGateway/SendinblueHtmlNotificationGateway";
-import { sendinblueHtmlNotificationGatewayTargets } from "../../secondary/notificationGateway/SendinblueHtmlNotificationGateway.targets";
 import { AppConfig, makeEmailAllowListPredicate } from "../config/appConfig";
 import { configureCreateHttpClientForExternalApi } from "../config/createHttpClientForExternalApi";
 import { makeGenerateConventionMagicLinkUrl } from "../config/magicLinkUrl";
@@ -29,16 +29,16 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
   const timeGateway = new RealTimeGateway();
 
   const notificationGateway =
-    config.notificationGateway === "SENDINBLUE_HTML"
-      ? new SendinblueHtmlNotificationGateway(
+    config.notificationGateway === "BREVO"
+      ? new BrevoNotificationGateway(
           configureCreateHttpClientForExternalApi()(
-            sendinblueHtmlNotificationGatewayTargets,
+            brevoNotificationGatewayTargets,
           ),
           makeEmailAllowListPredicate({
             skipEmailAllowList: config.skipEmailAllowlist,
             emailAllowList: config.emailAllowList,
           }),
-          config.apiKeySendinblue,
+          config.apiKeyBrevo,
           {
             name: "Immersion Facilitée",
             email: immersionFacileContactEmail,

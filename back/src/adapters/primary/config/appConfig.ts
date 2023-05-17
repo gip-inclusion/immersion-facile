@@ -170,14 +170,14 @@ export class AppConfig {
   public get notificationGateway() {
     return this.throwIfNotInArray({
       variableName: "NOTIFICATION_GATEWAY",
-      authorizedValues: ["IN_MEMORY", "HYBRID", "SENDINBLUE_HTML"],
+      authorizedValues: ["IN_MEMORY", "HYBRID", "BREVO"],
       defaultValue: "IN_MEMORY",
     });
   }
 
   // == Notification gateway provider api keys ==
-  public get apiKeySendinblue() {
-    return this.throwIfNotDefined("SENDINBLUE_API_KEY");
+  public get apiKeyBrevo() {
+    return this.throwIfNotDefined("BREVO_API_KEY");
   }
 
   // == Email vaidation gateway ==

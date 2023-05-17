@@ -4,7 +4,7 @@ type Http = "http://" | "https://";
 
 export type AbsoluteUrl = `${Http}${string}`;
 
-export const absoluteUrlSchema = z
+export const absoluteUrlSchema: z.Schema<AbsoluteUrl> = z
   .string()
   .regex(/^https?:\/\/.+?$/) as z.Schema<AbsoluteUrl>;
 

@@ -7,19 +7,19 @@ import { ignoreTabs } from "html-templates";
 import { HttpClient } from "http-client";
 import { makeEmailAllowListPredicate } from "../../primary/config/appConfig";
 import { BadRequestError } from "../../primary/helpers/httpErrors";
-import { SendinblueHtmlNotificationGateway } from "./SendinblueHtmlNotificationGateway";
+import { BrevoNotificationGateway } from "./BrevoNotificationGateway";
 import {
   SendTransactEmailHeader,
   SendTransactEmailRequestBody,
-} from "./SendinblueHtmlNotificationGateway.schemas";
-import { SendinblueHtmlNotificationGatewayTargets } from "./SendinblueHtmlNotificationGateway.targets";
+} from "./BrevoNotificationGateway.schemas";
+import { BrevoNotificationGatewayTargets } from "./BrevoNotificationGateway.targets";
 
 const sender = { name: "bob", email: "Machin@mail.com" };
 
 describe("SendingBlueHtmlNotificationGateway unit", () => {
-  let fakeHttpClient: HttpClient<SendinblueHtmlNotificationGatewayTargets>;
+  let fakeHttpClient: HttpClient<BrevoNotificationGatewayTargets>;
   let allowListPredicate;
-  let sibGateway: SendinblueHtmlNotificationGateway;
+  let notificationGateway: BrevoNotificationGateway;
   let sentEmails: {
     headers: SendTransactEmailHeader;
     body: SendTransactEmailRequestBody;
@@ -32,7 +32,7 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
       sendTransactEmail(email: any) {
         sentEmails.push(email);
       },
-    } as unknown as HttpClient<SendinblueHtmlNotificationGatewayTargets>;
+    } as unknown as HttpClient<BrevoNotificationGatewayTargets>;
 
     allowListPredicate = makeEmailAllowListPredicate({
       emailAllowList: [
@@ -44,7 +44,7 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
       skipEmailAllowList: false,
     });
 
-    sibGateway = new SendinblueHtmlNotificationGateway(
+    notificationGateway = new BrevoNotificationGateway(
       fakeHttpClient,
       allowListPredicate,
       "fake-api-key",
@@ -55,7 +55,7 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
 
   it("should throw if no recipient is provided", async () => {
     const triggerSendEmail = () =>
-      sibGateway.sendEmail({
+      notificationGateway.sendEmail({
         type: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
         recipients: [],
         params: {
@@ -70,7 +70,7 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
   });
 
   it("should not send email if recipient are not in white list", async () => {
-    await sibGateway.sendEmail({
+    await notificationGateway.sendEmail({
       type: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
       recipients: ["i-am-not-allowed@mail.net"],
       params: {
@@ -82,7 +82,7 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
   });
 
   it("should filter emails according to predicate", async () => {
-    await sibGateway.sendEmail({
+    await notificationGateway.sendEmail({
       type: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
       recipients: [
         "beneficiary@gmail.com",
@@ -106,7 +106,7 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
       "establishment-comptable-not-allowed@gmail.com",
     ];
 
-    await sibGateway.sendEmail({
+    await notificationGateway.sendEmail({
       type: "AGENCY_WAS_ACTIVATED",
       recipients: ["establishment-ceo@gmail.com"],
       cc: carbonCopy,
@@ -247,16 +247,16 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
   });
 
   it("should NOT be able to retrieve last emails sent", async () => {
-    await sibGateway.sendEmail({
+    await notificationGateway.sendEmail({
       type: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
       recipients: ["establishment-ceo@gmail.com"],
       cc: [],
       params: { editFrontUrl: "plop" },
     });
 
-    await expect(() => sibGateway.getLastSentEmailDtos()).toThrow(
+    await expect(() => notificationGateway.getLastSentEmailDtos()).toThrow(
       new Error(
-        "It is not possible de get last sent mails from SendInBlue email gateway",
+        "It is not possible de get last sent mails from brevo notification gateway",
       ),
     );
   });
