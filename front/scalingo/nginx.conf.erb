@@ -4,7 +4,8 @@ location / {
 }
 
 location ~* .(woff|woff2)$ {
-  add_header Access-Control-Allow-Origin "aide.immersion-facile.beta.gouv.fr";
+  root /app/dist;
+  add_header Access-Control-Allow-Origin https://aide.immersion-facile.beta.gouv.fr;
 }
 
 location /api {
