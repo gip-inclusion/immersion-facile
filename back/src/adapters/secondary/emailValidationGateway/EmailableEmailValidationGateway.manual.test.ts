@@ -2,10 +2,8 @@ import { ValidateEmailStatus } from "shared";
 import { EmailValidationGetaway } from "../../../domain/emailValidation/ports/EmailValidationGateway";
 import { AppConfig } from "../../primary/config/appConfig";
 import { configureCreateHttpClientForExternalApi } from "../../primary/config/createHttpClientForExternalApi";
-import {
-  EmailableEmailValidationGateway,
-  emailableValidationTargets,
-} from "./EmailableEmailValidationGateway";
+import { EmailableEmailValidationGateway } from "./EmailableEmailValidationGateway";
+import { emailableValidationTargets } from "./EmailableEmailValidationGateway.targets";
 
 describe("Emailable email validation gateway", () => {
   let emailableEmailValidationGateway: EmailValidationGetaway;

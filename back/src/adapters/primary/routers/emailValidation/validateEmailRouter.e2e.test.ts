@@ -5,7 +5,7 @@ import {
   type ValidateEmailStatus,
 } from "shared";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
-import { InMemoryEmailValidationGateway } from "../../../secondary/emailValidationGateway/InMemoryEmailValidationStatusGateway";
+import { InMemoryEmailValidationGateway } from "../../../secondary/emailValidationGateway/InMemoryEmailValidationGateway";
 
 const emailValidationUrl = (emailInput: Email): string =>
   `${validateEmailsTargets.validateEmail.url}?email=${emailInput}`;

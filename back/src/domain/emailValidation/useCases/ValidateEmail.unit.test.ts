@@ -3,7 +3,7 @@ import {
   ValidateEmailInput,
   ValidateEmailStatus,
 } from "shared";
-import { InMemoryEmailValidationGateway } from "../../../adapters/secondary/emailValidationGateway/InMemoryEmailValidationStatusGateway";
+import { InMemoryEmailValidationGateway } from "../../../adapters/secondary/emailValidationGateway/InMemoryEmailValidationGateway";
 import { ValidateEmail } from "./ValidateEmail";
 
 describe("Email validation status", () => {

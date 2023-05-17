@@ -13,7 +13,7 @@ import {
 } from "shared";
 import { DomainTopic } from "../../../domain/core/eventBus/events";
 import { InclusionConnectConfig } from "../../../domain/inclusionConnect/useCases/InitiateInclusionConnect";
-import { EmailableApiKey } from "../../secondary/emailValidationGateway/EmailableEmailValidationGateway";
+import { EmailableApiKey } from "../../secondary/emailValidationGateway/EmailableEmailValidationGateway.dto";
 import { S3Params } from "../../secondary/S3DocumentGateway";
 
 export type AccessTokenConfig = {
