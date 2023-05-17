@@ -38,10 +38,10 @@ import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/Pol
 import { HttpInclusionConnectGateway } from "../../secondary/InclusionConnectGateway/HttpInclusionConnectGateway";
 import { makeInclusionConnectExternalTargets } from "../../secondary/InclusionConnectGateway/inclusionConnectExternal.targets";
 import { InMemoryInclusionConnectGateway } from "../../secondary/InclusionConnectGateway/InMemoryInclusionConnectGateway";
+import { BrevoNotificationGateway } from "../../secondary/notificationGateway/BrevoNotificationGateway";
+import { brevoNotificationGatewayTargets } from "../../secondary/notificationGateway/BrevoNotificationGateway.targets";
 import { HybridNotificationGateway } from "../../secondary/notificationGateway/HybridNotificationGateway";
 import { InMemoryNotificationGateway } from "../../secondary/notificationGateway/InMemoryNotificationGateway";
-import { SendinblueHtmlNotificationGateway } from "../../secondary/notificationGateway/SendinblueHtmlNotificationGateway";
-import { sendinblueHtmlNotificationGatewayTargets } from "../../secondary/notificationGateway/SendinblueHtmlNotificationGateway.targets";
 import { NotImplementedDocumentGateway } from "../../secondary/NotImplementedDocumentGateway";
 import { HttpPeConnectGateway } from "../../secondary/PeConnectGateway/HttpPeConnectGateway";
 import { InMemoryPeConnectGateway } from "../../secondary/PeConnectGateway/InMemoryPeConnectGateway";
@@ -211,31 +211,30 @@ const createNotificationGateway = (
   if (config.notificationGateway === "IN_MEMORY")
     return new InMemoryNotificationGateway(timeGateway);
 
-  const sendinblueHtmlNotificationGateway =
-    new SendinblueHtmlNotificationGateway(
-      configureCreateHttpClientForExternalApi(
-        axios.create({
-          timeout: config.externalAxiosTimeout,
-        }),
-      )(sendinblueHtmlNotificationGatewayTargets),
-      makeEmailAllowListPredicate({
-        skipEmailAllowList: config.skipEmailAllowlist,
-        emailAllowList: config.emailAllowList,
+  const brevoNotificationGateway = new BrevoNotificationGateway(
+    configureCreateHttpClientForExternalApi(
+      axios.create({
+        timeout: config.externalAxiosTimeout,
       }),
-      config.apiKeySendinblue,
-      {
-        name: "Immersion Facilitée",
-        email: immersionFacileContactEmail,
-      },
-    );
+    )(brevoNotificationGatewayTargets),
+    makeEmailAllowListPredicate({
+      skipEmailAllowList: config.skipEmailAllowlist,
+      emailAllowList: config.emailAllowList,
+    }),
+    config.apiKeyBrevo,
+    {
+      name: "Immersion Facilitée",
+      email: immersionFacileContactEmail,
+    },
+  );
 
-  if (config.notificationGateway === "SENDINBLUE_HTML") {
-    return sendinblueHtmlNotificationGateway;
+  if (config.notificationGateway === "BREVO") {
+    return brevoNotificationGateway;
   }
 
   if (config.notificationGateway === "HYBRID")
     return new HybridNotificationGateway(
-      sendinblueHtmlNotificationGateway,
+      brevoNotificationGateway,
       new InMemoryNotificationGateway(timeGateway, 15),
     );
 

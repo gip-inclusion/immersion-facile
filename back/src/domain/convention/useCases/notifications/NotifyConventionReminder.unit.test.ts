@@ -119,7 +119,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
 
   describe("FirstReminderForAgency", () => {
     it.each(authorizedAgencyStatuses)(
-      `Send email AGENCY_FIRST_REMINDER to counsellors and validators when status is '%s'`,
+      `Send email 'FirstReminderForAgency' to counsellors and validators when status is '%s'`,
       async (status) => {
         //Arrange
         const councellor1Email = "councellor1@email.com";
@@ -241,7 +241,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
 
   describe("LastReminderForAgency", () => {
     it.each(authorizedAgencyStatuses)(
-      "Send email AGENCY_LAST_REMINDER to counsellors and validators when status is '%s'",
+      "Send email 'LastReminderForAgency' to counsellors and validators when status is '%s'",
       async (status) => {
         //Arrange
         const councellor1Email = "councellor1@email.com";
@@ -367,7 +367,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
     const type: ReminderKind = "FirstReminderForSignatories";
 
     it.each(authorizedSignatoryStatuses)(
-      `Send email SIGNATORY_FIRST_REMINDER to signatories when status is '%s'.
+      `Send email 'FirstReminderForSignatories' to signatories when status is '%s'.
           Convention with same establishment representative & tutor without mobile phone`,
       async (status) => {
         //Arrange
@@ -439,7 +439,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
     );
 
     it.each(authorizedSignatoryStatuses)(
-      `Send email and SMS SIGNATORY_FIRST_REMINDER to signatories when status is '%s'.
+      `Send email and SMS 'FirstReminderForSignatories' to signatories when status is '%s'.
           Convention with different establishment representative & tutor.
           SMS are sent only for signatories that have not signed yet and have mobile phone.`,
       async (status) => {
@@ -522,7 +522,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
     );
 
     it.each(authorizedSignatoryStatuses)(
-      `Send email SIGNATORY_FIRST_REMINDER to signatories when status is '%s' and signatories have no mobile phones`,
+      `Send email 'FirstReminderForSignatories' to signatories when status is '%s' and signatories have no mobile phones`,
       async (status) => {
         //Arrange
         const agency = new AgencyDtoBuilder().withId("agencyId").build();
@@ -619,7 +619,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
   describe("LastReminderForSignatories", () => {
     const type: ReminderKind = "LastReminderForSignatories";
     it.each(authorizedSignatoryStatuses)(
-      `Send email LAST_FIRST_REMINDER to signatories when status is '%s'.
+      `Send email 'LastReminderForSignatories' to signatories when status is '%s'.
           Convention with same establishment representative & tutor`,
       async (status) => {
         //Arrange
@@ -686,7 +686,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
     );
 
     it.each(authorizedSignatoryStatuses)(
-      `Send email LAST_FIRST_REMINDER to signatories when status is '%s'.
+      `Send email 'LastReminderForSignatories' to signatories when status is '%s'.
           Convention with different establishment representative & tutor.
           SMS are sent only for signatories that have not signed yet and have mobile phone.`,
       async (status) => {

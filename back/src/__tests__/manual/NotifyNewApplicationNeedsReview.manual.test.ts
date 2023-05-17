@@ -18,18 +18,18 @@ import {
 import { createInMemoryUow } from "../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../adapters/secondary/InMemoryUowPerformer";
-import { SendinblueHtmlNotificationGateway } from "../../adapters/secondary/notificationGateway/SendinblueHtmlNotificationGateway";
-import { sendinblueHtmlNotificationGatewayTargets } from "../../adapters/secondary/notificationGateway/SendinblueHtmlNotificationGateway.targets";
+import { BrevoNotificationGateway } from "../../adapters/secondary/notificationGateway/BrevoNotificationGateway";
+import { brevoNotificationGatewayTargets } from "../../adapters/secondary/notificationGateway/BrevoNotificationGateway.targets";
 import { DeterministShortLinkIdGeneratorGateway } from "../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { NotifyNewApplicationNeedsReview } from "../../domain/convention/useCases/notifications/NotifyNewApplicationNeedsReview";
 import { TimeGateway } from "../../domain/core/ports/TimeGateway";
 
 // These tests are not hermetic and not meant for automated testing. They will send emails using
-// sendinblue, use up production quota, and fail for uncontrollable reasons such as quota
+// Brevo, use up production quota, and fail for uncontrollable reasons such as quota
 // errors.
 //
 // Requires the following environment variables to be set for the tests to pass:
-// - SENDINBLUE_API_KEY
+// - BREVO_API_KEY
 
 const validConvention: ConventionDto = new ConventionDtoBuilder()
   .withStatus("IN_REVIEW")
@@ -40,7 +40,7 @@ const validConvention: ConventionDto = new ConventionDtoBuilder()
   .build();
 
 describe("Notify To 2 Counsellors that an application is available", () => {
-  let notificationGateway: SendinblueHtmlNotificationGateway;
+  let notificationGateway: BrevoNotificationGateway;
   let generateMagicLinkFn: GenerateConventionMagicLinkUrl;
   let agency;
   let timeGateway: TimeGateway;
@@ -50,15 +50,15 @@ describe("Notify To 2 Counsellors that an application is available", () => {
   beforeEach(() => {
     shortlinkGateway = new DeterministShortLinkIdGeneratorGateway();
     const config = AppConfig.createFromEnv();
-    notificationGateway = new SendinblueHtmlNotificationGateway(
+    notificationGateway = new BrevoNotificationGateway(
       configureCreateHttpClientForExternalApi()(
-        sendinblueHtmlNotificationGatewayTargets,
+        brevoNotificationGatewayTargets,
       ),
       makeEmailAllowListPredicate({
         skipEmailAllowList: config.skipEmailAllowlist,
         emailAllowList: config.emailAllowList,
       }),
-      config.apiKeySendinblue + "wrong",
+      config.apiKeyBrevo + "wrong",
       {
         name: "Immersion Facilitée",
         email: immersionFacileContactEmail,
