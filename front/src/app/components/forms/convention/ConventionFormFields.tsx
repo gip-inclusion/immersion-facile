@@ -4,7 +4,9 @@ import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import { keys } from "ramda";
 import {
   ConventionReadDto,
   domElementIds,
@@ -17,7 +19,10 @@ import { ConventionSignOnlyMessage } from "src/app/components/forms/convention/C
 import { makeValuesToWatchInUrl } from "src/app/components/forms/convention/makeValuesToWatchInUrl";
 import { SignatureActions } from "src/app/components/forms/convention/SignatureActions";
 import { useConventionWatchValuesInUrl } from "src/app/components/forms/convention/useConventionWatchValuesInUrl";
-import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
+import {
+  formConventionFieldsLabels,
+  formUiSections,
+} from "src/app/contents/forms/convention/formConvention";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import {
   formErrorsToFlatErrors,
@@ -57,6 +62,8 @@ export const ConventionFormFields = ({
     getValues,
     handleSubmit,
     formState: { errors, submitCount, isSubmitted },
+    trigger,
+    getFieldState,
   } = useFormContext<ConventionReadDto>();
   const currentStep = useAppSelector(conventionSelectors.currentStep);
   const conventionValues = getValues();
@@ -93,16 +100,60 @@ export const ConventionFormFields = ({
     (isSubmitted && conventionSubmitFeedback.kind === "justSubmitted");
   const makeAccordionProps = (step: number) => ({
     onExpandedChange: () => {
+      validateStep(currentStep);
       dispatch(conventionSlice.actions.setCurrentStep(step));
     },
     expanded: currentStep === step,
   });
-  const renderSectionTitle = (title: string, step: number) => {
-    if (currentStep === step) {
-      return <strong>{title}</strong>;
-    }
-    return title;
+  const renderStatusBadge = (step: number) => {
+    const stepFields = formUiSections[step - 1];
+    const stepErrors = keys(errors).filter((key) =>
+      stepFields.includes(key),
+    ).length;
+    const stepIsValid = () =>
+      stepFields.filter(
+        (key) => getFieldState(key).isTouched && stepErrors === 0,
+      ).length === stepFields.length;
+    const getSeverity = () => {
+      if (stepErrors) {
+        return "error";
+      }
+      if (stepIsValid()) {
+        return "success";
+      }
+      return "info";
+    };
+    const getLabel = () => {
+      if (stepErrors) {
+        return "Erreur";
+      }
+      if (stepIsValid()) {
+        return "Complet";
+      }
+      return "À compléter";
+    };
+    return (
+      <Badge severity={getSeverity()} className={fr.cx("fr-ml-2w")}>
+        {getLabel()}
+      </Badge>
+    );
   };
+  const renderSectionTitle = (title: string, step: number) => {
+    const baseText = currentStep === step ? <strong>{title}</strong> : title;
+    return (
+      <>
+        {baseText}
+        {renderStatusBadge(step)}
+      </>
+    );
+  };
+  const validateStep = (step: number) => {
+    const stepFields = formUiSections[step - 1];
+    stepFields.forEach(async (field) => {
+      await trigger(field as keyof ConventionReadDto);
+    });
+  };
+  console.log("errors", errors);
   return (
     <>
       {isFrozen && !isSignatureMode && <ConventionFrozenMessage />}

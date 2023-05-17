@@ -83,7 +83,6 @@ export type ConventionCommon = {
   id: ConventionId;
   status: ConventionStatus;
   statusJustification?: string;
-  postalCode?: string;
   agencyId: AgencyId;
   dateSubmission: string; // Date iso string
   dateStart: string; // Date iso string
