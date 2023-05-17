@@ -10,9 +10,11 @@ export const validateEmailInputSchema: z.Schema<ValidateEmailInput> = z.object({
   email: emailSchema,
 });
 
+export const validateEmailReasonSchema = z.enum(validateEmailReason);
+
 export const validateEmailResponseSchema: z.Schema<ValidateEmailStatus> =
   z.object({
     isValid: z.boolean(),
     proposal: z.string().nullable().optional(),
-    reason: z.enum(validateEmailReason),
+    reason: validateEmailReasonSchema,
   });
