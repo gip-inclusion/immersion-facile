@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { AbsoluteUrl, Flavor, zEmail } from "shared";
+import { AbsoluteUrl, absoluteUrlSchema, Flavor, zEmail } from "shared";
 import { Phone } from "../../../domain/convention/ports/NotificationGateway";
 
 export type ApiKey = Flavor<string, "ApiKey">;
@@ -88,10 +88,6 @@ export type SendTransactSmsRequestBody = {
   unicodeEnabled?: boolean;
 };
 
-const zAbsolutUrlSchema: z.Schema<AbsoluteUrl> = z
-  .literal("http://${string}")
-  .or(z.literal("https://${string}"));
-
 //Mobile number to send SMS with the country code - Limited on this gateway to allow only french mobile phones
 const brevoSmsRecipientSchema: z.Schema<Phone> = z
   .string()
@@ -123,7 +119,7 @@ export const sendTransactSmsRequestBodySchema: z.Schema<SendTransactSmsRequestBo
     type: z.enum(["transactional", "marketing"]).optional(),
     tag: z.string().optional(),
     organisationPrefix: z.string().optional(),
-    webUrl: zAbsolutUrlSchema.optional(),
+    webUrl: absoluteUrlSchema.optional(),
     unicodeEnabled: z.boolean().optional(),
   });
 

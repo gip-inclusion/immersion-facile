@@ -7,16 +7,16 @@ import { AppConfig } from "../../adapters/primary/config/appConfig";
 import { configureCreateHttpClientForExternalApi } from "../../adapters/primary/config/createHttpClientForExternalApi";
 import { createInMemoryUow } from "../../adapters/primary/config/uowConfig";
 import { InMemoryUowPerformer } from "../../adapters/secondary/InMemoryUowPerformer";
-import { SendinblueHtmlNotificationGateway } from "../../adapters/secondary/notificationGateway/SendinblueHtmlNotificationGateway";
-import { sendinblueHtmlNotificationGatewayTargets } from "../../adapters/secondary/notificationGateway/SendinblueHtmlNotificationGateway.targets";
+import { BrevoNotificationGateway } from "../../adapters/secondary/notificationGateway/BrevoNotificationGateway";
+import { brevoNotificationGatewayTargets } from "../../adapters/secondary/notificationGateway/BrevoNotificationGateway.targets";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
 
 // These tests are not hermetic and not meant for automated testing. They will send emails using
-// sendinblue, use up production quota, and fail for uncontrollable reasons such as quota
+// Brevo, use up production quota, and fail for uncontrollable reasons such as quota
 // errors.
 //
 // Requires the following environment variables to be set for the tests to pass:
-// - SENDINBLUE_API_KEY
+// - BREVO_API_KEY
 
 const rejectionJustification = "Risque d'emploi de main d'oeuvre gratuite";
 
@@ -36,12 +36,12 @@ const counsellorEmail = "jean-francois.macresy@beta.gouv.fr";
 describe("NotifyApplicationRejectedToBeneficiaryAndEnterprise", () => {
   it("Sends rejection email", async () => {
     const config = AppConfig.createFromEnv();
-    const notificationGateway = new SendinblueHtmlNotificationGateway(
+    const notificationGateway = new BrevoNotificationGateway(
       configureCreateHttpClientForExternalApi()(
-        sendinblueHtmlNotificationGatewayTargets,
+        brevoNotificationGatewayTargets,
       ),
       (_) => true,
-      config.apiKeySendinblue,
+      config.apiKeyBrevo,
       {
         name: "Immersion Facilitée",
         email: immersionFacileContactEmail,

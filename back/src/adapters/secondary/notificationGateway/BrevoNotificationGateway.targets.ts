@@ -9,15 +9,15 @@ import {
   sendTransactSmsHeaderSchema,
   sendTransactSmsRequestBodySchema,
   sendTransactSmsResponseSchema,
-} from "./SendinblueHtmlNotificationGateway.schemas";
+} from "./BrevoNotificationGateway.schemas";
 
-export type SendinblueHtmlNotificationGatewayTargets =
-  typeof sendinblueHtmlNotificationGatewayTargets;
+export type BrevoNotificationGatewayTargets =
+  typeof brevoNotificationGatewayTargets;
 
 const apiBrevoUrl: AbsoluteUrl = "https://api.brevo.com/v3";
 
 const logger = createLogger(__filename);
-export const sendinblueHtmlNotificationGatewayTargets = createTargets({
+export const brevoNotificationGatewayTargets = createTargets({
   sendTransactEmail: createTarget({
     method: "POST",
     url: `${apiBrevoUrl}/smtp/email`,

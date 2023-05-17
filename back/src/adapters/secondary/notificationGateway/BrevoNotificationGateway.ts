@@ -31,14 +31,14 @@ import {
   RecipientOrSender,
   SendTransactEmailRequestBody,
   SendTransactSmsRequestBody,
-} from "./SendinblueHtmlNotificationGateway.schemas";
-import { SendinblueHtmlNotificationGatewayTargets } from "./SendinblueHtmlNotificationGateway.targets";
+} from "./BrevoNotificationGateway.schemas";
+import { BrevoNotificationGatewayTargets } from "./BrevoNotificationGateway.targets";
 
 const logger = createLogger(__filename);
 
-export class SendinblueHtmlNotificationGateway implements NotificationGateway {
+export class BrevoNotificationGateway implements NotificationGateway {
   constructor(
-    private readonly httpClient: HttpClient<SendinblueHtmlNotificationGatewayTargets>,
+    private readonly httpClient: HttpClient<BrevoNotificationGatewayTargets>,
     private emailAllowListPredicate: (recipient: string) => boolean,
     private apiKey: ApiKey,
     private sender: RecipientOrSender,
@@ -146,7 +146,7 @@ export class SendinblueHtmlNotificationGateway implements NotificationGateway {
 
   public getLastSentEmailDtos(): EmailSentDto[] {
     throw new BadRequestError(
-      "It is not possible de get last sent mails from SendInBlue email gateway",
+      "It is not possible de get last sent mails from brevo notification gateway",
     );
   }
 
