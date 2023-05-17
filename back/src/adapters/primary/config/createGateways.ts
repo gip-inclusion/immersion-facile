@@ -21,11 +21,9 @@ import { CustomTimeGateway } from "../../secondary/core/TimeGateway/CustomTimeGa
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { MetabaseDashboardGateway } from "../../secondary/dashboardGateway/MetabaseDashboardGateway";
 import { StubDashboardGateway } from "../../secondary/dashboardGateway/StubDashboardGateway";
-import {
-  EmailableEmailValidationGateway,
-  emailableValidationTargets,
-} from "../../secondary/emailValidationGateway/EmailableEmailValidationGateway";
-import { InMemoryEmailValidationGateway } from "../../secondary/emailValidationGateway/InMemoryEmailValidationStatusGateway";
+import { EmailableEmailValidationGateway } from "../../secondary/emailValidationGateway/EmailableEmailValidationGateway";
+import { emailableValidationTargets } from "../../secondary/emailValidationGateway/EmailableEmailValidationGateway.targets";
+import { InMemoryEmailValidationGateway } from "../../secondary/emailValidationGateway/InMemoryEmailValidationGateway";
 import { InMemoryAccessTokenGateway } from "../../secondary/immersionOffer/InMemoryAccessTokenGateway";
 import { HttpLaBonneBoiteAPI } from "../../secondary/immersionOffer/laBonneBoite/HttpLaBonneBoiteAPI";
 import { InMemoryLaBonneBoiteAPI } from "../../secondary/immersionOffer/laBonneBoite/InMemoryLaBonneBoiteAPI";

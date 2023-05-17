@@ -1,58 +1,48 @@
-import { Flavor, ValidateEmailReason, ValidateEmailStatus } from "shared";
-import { createTarget, createTargets, type HttpClient } from "http-client";
+import Bottleneck from "bottleneck";
+import { ValidateEmailStatus } from "shared";
+import { type HttpClient } from "http-client";
 import { EmailValidationGetaway } from "../../../domain/emailValidation/ports/EmailValidationGateway";
 import { createLogger } from "../../../utils/logger";
-
-type EmailableEmailValidationStatus = {
-  accept_all: boolean;
-  did_you_mean: string;
-  disposable: boolean;
-  domain: string;
-  duration: number;
-  email: string;
-  first_name: string | null;
-  free: boolean;
-  full_name: string | null;
-  gender: string | null;
-  last_name: string | null;
-  mailbox_full: boolean;
-  mx_record: string;
-  no_reply: boolean;
-  reason: ValidateEmailReason;
-  role: boolean;
-  score: number;
-  smtp_provider: string | null;
-  state: "deliverable" | "undeliverable" | "unknown" | "risky";
-  tag: string | null;
-  user: string;
-};
-
-export type EmailableApiKey = Flavor<string, "EmailableApiKey">;
-
-type EmailableEmailValidationParams = {
-  email: string;
-  api_key: EmailableApiKey;
-};
-
-export type EmailableValidationTargets = typeof emailableValidationTargets;
-
-export const emailableValidationTargets = createTargets({
-  validateEmail: createTarget({
-    method: "GET",
-    url: "https://api.emailable.com/v1/verify",
-    validateQueryParams: (queryParams) =>
-      queryParams as EmailableEmailValidationParams,
-    validateResponseBody: (responseBody) => responseBody,
-  }),
-});
+import {
+  EmailableApiKey,
+  EmailableEmailValidationStatus,
+} from "./EmailableEmailValidationGateway.dto";
+import { EmailableValidationTargets } from "./EmailableEmailValidationGateway.targets";
 
 const logger = createLogger(__filename);
+
+const emailableVerifyEmailMaxRatePerSeconds = 25;
 
 export class EmailableEmailValidationGateway implements EmailValidationGetaway {
   constructor(
     private readonly httpClient: HttpClient<EmailableValidationTargets>,
-    private emailableApiKey: EmailableApiKey,
+    private readonly emailableApiKey: EmailableApiKey,
   ) {}
+
+  public async validateEmail(email: string): Promise<ValidateEmailStatus> {
+    return this.limiter
+      .schedule(() =>
+        this.httpClient.validateEmail({
+          queryParams: {
+            email,
+            api_key: this.emailableApiKey,
+          },
+        }),
+      )
+      .then(({ responseBody }) => ({
+        isValid: this.isEmailValid(responseBody.state, responseBody.reason),
+        reason: responseBody.reason,
+        ...(responseBody.did_you_mean && {
+          proposal: responseBody.did_you_mean,
+        }),
+      }))
+      .catch((error) => {
+        logger.error("validateEmail => Error while calling emailable API ", {
+          error,
+        });
+        throw error;
+      });
+  }
 
   private isEmailValid(
     state: EmailableEmailValidationStatus["state"],
@@ -74,32 +64,9 @@ export class EmailableEmailValidationGateway implements EmailValidationGetaway {
       : true;
   }
 
-  public async validateEmail(email: string): Promise<ValidateEmailStatus> {
-    const { responseBody } = await this.httpClient
-      .validateEmail({
-        queryParams: {
-          email,
-          api_key: this.emailableApiKey,
-        },
-      })
-      .catch((error) => {
-        logger.error("validateEmail => Error while calling emailable API ", {
-          error,
-        });
-        throw error;
-      });
-    const emailableEmailValidationStatus =
-      responseBody as EmailableEmailValidationStatus;
-
-    return {
-      isValid: this.isEmailValid(
-        emailableEmailValidationStatus.state,
-        emailableEmailValidationStatus.reason,
-      ),
-      reason: emailableEmailValidationStatus.reason,
-      ...(emailableEmailValidationStatus.did_you_mean && {
-        proposal: emailableEmailValidationStatus.did_you_mean,
-      }),
-    };
-  }
+  private limiter = new Bottleneck({
+    reservoir: emailableVerifyEmailMaxRatePerSeconds,
+    reservoirRefreshInterval: 1000, // number of ms
+    reservoirRefreshAmount: emailableVerifyEmailMaxRatePerSeconds,
+  });
 }

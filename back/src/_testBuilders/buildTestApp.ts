@@ -8,7 +8,7 @@ import { InMemoryAddressGateway } from "../adapters/secondary/addressGateway/InM
 import { BasicEventCrawler } from "../adapters/secondary/core/EventCrawlerImplementations";
 import { CustomTimeGateway } from "../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { StubDashboardGateway } from "../adapters/secondary/dashboardGateway/StubDashboardGateway";
-import { InMemoryEmailValidationGateway } from "../adapters/secondary/emailValidationGateway/InMemoryEmailValidationStatusGateway";
+import { InMemoryEmailValidationGateway } from "../adapters/secondary/emailValidationGateway/InMemoryEmailValidationGateway";
 import { InMemoryLaBonneBoiteAPI } from "../adapters/secondary/immersionOffer/laBonneBoite/InMemoryLaBonneBoiteAPI";
 import { InMemoryPassEmploiGateway } from "../adapters/secondary/immersionOffer/passEmploi/InMemoryPassEmploiGateway";
 import { InMemoryPoleEmploiGateway } from "../adapters/secondary/immersionOffer/poleEmploi/InMemoryPoleEmploiGateway";
