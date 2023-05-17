@@ -12,6 +12,10 @@ jobs:
   build-back-artefact:
     uses: ./.github/workflows/build-back-artefact.yml
 
+  tag-deployment:
+    needs: [build-front-artefact, build-back-artefact]
+    uses: ./.github/workflows/ci-add-tag.yml
+
   deploy-staging:
     needs: [build-front-artefact, build-back-artefact]
     uses: ./.github/workflows/deploy-to-scalingo.yml
