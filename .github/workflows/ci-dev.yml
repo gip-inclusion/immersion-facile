@@ -22,3 +22,16 @@ jobs:
       environment: dev
     secrets:
       SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
+
+  merge-to-staging:
+    needs: [deploy-dev]
+    environment: staging
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Push dev to staging
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git push origin dev:staging
