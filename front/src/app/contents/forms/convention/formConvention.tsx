@@ -1,4 +1,5 @@
 import React from "react";
+import { keys, mergeRight } from "ramda";
 import { domElementIds, InternshipKind } from "shared";
 import { ConventionField } from "../../admin/types";
 import { FormFieldAttributesForContent } from "../types";
@@ -635,3 +636,22 @@ export const sidebarStepContent = (
   };
   return contents[internshipKind];
 };
+
+export const formUiSections: Partial<FormFieldKeys>[][] = [
+  ["agencyId"],
+  keys(beneficiarySection("immersion")),
+  keys(
+    mergeRight(
+      establishmentRepresentativeSection("immersion"),
+      establishmentTutorSection("immersion"),
+    ),
+  ),
+  ["dateStart", "dateEnd", "schedule", "immersionAddress"],
+  [
+    "individualProtection",
+    "sanitaryPrevention",
+    "immersionObjective",
+    "immersionAppellation",
+    "immersionActivities",
+  ],
+];

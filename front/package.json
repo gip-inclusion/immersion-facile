@@ -22,7 +22,7 @@
     "prebuild": "only-include-used-icons"
   },
   "dependencies": {
-    "@codegouvfr/react-dsfr": "^0.52.0",
+    "@codegouvfr/react-dsfr": "^0.54.7",
     "@gouvfr/dsfr": "1.8.5",
     "@hookform/error-message": "^2.0.1",
     "@hookform/resolvers": "^2.9.11",
