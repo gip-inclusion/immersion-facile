@@ -27,14 +27,14 @@
     "babel-loader": "^8.2.3",
     "clean-webpack-plugin": "^4.0.0",
     "core-js": "^3.20.2",
+    "eslint": "^7.31.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",
-    "eslint": "^7.31.0",
     "prettier": "^2.3.2",
     "typescript": "^4.3.5",
+    "webpack": "^5.82.1",
     "webpack-cli": "^4.9.1",
-    "webpack-glob-entries": "^1.0.1",
-    "webpack": "^5.65.0"
+    "webpack-glob-entries": "^1.0.1"
   },
   "dependencies": {
     "date-fns": "^2.23.0",
