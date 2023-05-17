@@ -1,3 +1,4 @@
+import Bottleneck from "bottleneck";
 import { Point } from "geojson";
 import {
   AddressAndPosition,
@@ -30,13 +31,9 @@ export const errorMessage = {
     `Lookup street address require a minimum of ${minLength} char.`,
 };
 
-// https://github.com/OpenCageData/opencagedata-misc-docs/blob/master/countrycode.md
-// On prend la france et tous ses territoires dépendants.
-const franceAndAttachedTerritoryCountryCodes =
-  "fr,bl,gf,gp,mf,mq,nc,pf,pm,re,tf,wf,yt";
-const language = "fr";
-
 const logger = createLogger(__filename);
+
+const openCageDateMaxRequestsPerSeconds = 15;
 
 export class HttpAddressGateway implements AddressGateway {
   constructor(
@@ -48,15 +45,17 @@ export class HttpAddressGateway implements AddressGateway {
   public async getAddressFromPosition(
     position: GeoPositionDto,
   ): Promise<AddressDto | undefined> {
-    const { responseBody } = await this.httpClient.geocoding({
-      queryParams: {
-        countrycode: franceAndAttachedTerritoryCountryCodes,
-        key: this.geocodingApiKey,
-        language,
-        limit: "5",
-        q: `${position.lat}+${position.lon}`,
-      },
-    });
+    const { responseBody } = await this.limiter.schedule(() =>
+      this.httpClient.geocoding({
+        queryParams: {
+          countrycode: franceAndAttachedTerritoryCountryCodes,
+          key: this.geocodingApiKey,
+          language,
+          limit: "5",
+          q: `${position.lat}+${position.lon}`,
+        },
+      }),
+    );
 
     const addresses: AddressDto[] = (
       responseBody as OpenCageDataFeatureCollection
@@ -75,14 +74,16 @@ export class HttpAddressGateway implements AddressGateway {
     try {
       if (query.length < queryMinLength)
         throw new Error(errorMessage.minimumCharErrorMessage(queryMinLength));
-      const { responseBody } = await this.httpClient.geocoding({
-        queryParams: {
-          countrycode: franceAndAttachedTerritoryCountryCodes,
-          key: this.geocodingApiKey,
-          language,
-          q: query,
-        },
-      });
+      const { responseBody } = await this.limiter.schedule(() =>
+        this.httpClient.geocoding({
+          queryParams: {
+            countrycode: franceAndAttachedTerritoryCountryCodes,
+            key: this.geocodingApiKey,
+            language,
+            q: query,
+          },
+        }),
+      );
 
       return (responseBody as OpenCageDataFeatureCollection).features
         .map((feature) => this.toAddressAndPosition(feature))
@@ -106,19 +107,21 @@ export class HttpAddressGateway implements AddressGateway {
       if (query.length < queryMinLength)
         throw new Error(errorMessage.minimumCharErrorMessage(queryMinLength));
 
-      const { responseBody } = await this.httpClient.geosearch({
-        headers: {
-          "OpenCage-Geosearch-Key": this.geosearchApiKey,
-          Origin: "https://immersion-facile.beta.gouv.fr", // OC Geosearch needs an Origin that fits to API key domain (with https://)
-        },
-        mode: "cors",
-        queryParams: {
-          countrycode: "fr",
-          language,
-          limit: "10",
-          q: query,
-        },
-      });
+      const { responseBody } = await this.limiter.schedule(() =>
+        this.httpClient.geosearch({
+          headers: {
+            "OpenCage-Geosearch-Key": this.geosearchApiKey,
+            Origin: "https://immersion-facile.beta.gouv.fr", // OC Geosearch needs an Origin that fits to API key domain (with https://)
+          },
+          mode: "cors",
+          queryParams: {
+            countrycode: "fr",
+            language,
+            limit: "10",
+            q: query,
+          },
+        }),
+      );
 
       return lookupSearchResultsSchema.parse(
         toLookupSearchResults(
@@ -176,6 +179,12 @@ export class HttpAddressGateway implements AddressGateway {
       }
     );
   }
+
+  private limiter = new Bottleneck({
+    reservoir: openCageDateMaxRequestsPerSeconds,
+    reservoirRefreshInterval: 1000, // number of ms
+    reservoirRefreshAmount: openCageDateMaxRequestsPerSeconds,
+  });
 }
 
 const getPostcodeFromAliases = (
@@ -235,3 +244,9 @@ const makeStreetNumberAndAddress = (
   streetNumber: string | undefined,
   streetName: string | undefined,
 ): StreetNumberAndAddress => `${streetNumber ?? ""} ${streetName ?? ""}`.trim();
+
+// https://github.com/OpenCageData/opencagedata-misc-docs/blob/master/countrycode.md
+// On prend la france et tous ses territoires dépendants.
+const franceAndAttachedTerritoryCountryCodes =
+  "fr,bl,gf,gp,mf,mq,nc,pf,pm,re,tf,wf,yt";
+const language = "fr";
