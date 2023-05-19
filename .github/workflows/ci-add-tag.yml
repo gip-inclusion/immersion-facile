@@ -1,7 +1,7 @@
-name: Tag deployment
+name: Tag version
 
 on:
-  workflow_dispatch:
+  workflow_call:
 
 jobs:
   deploy:
