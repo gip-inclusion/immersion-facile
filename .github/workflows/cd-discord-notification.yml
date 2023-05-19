@@ -1,0 +1,46 @@
+name: Discord Notification
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        description: Environment to send notification to. Will change the discord chanel.
+        required: true
+      DISCORD_WEBHOOK_URL:
+        type: string
+        description: Discord webhook URL
+        required: true
+#    secrets:
+#      DISCORD_WEBHOOK_URL:
+#        required: true
+
+jobs:
+  send-notification:
+    #    environment: ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Discord notification
+        run: |
+          curl -X POST -H "Content-Type: application/json" -d '{
+            "content": "Hello from GitHub Actions!",
+            "embeds": [
+              {
+                "title": "URLs",
+                "fields": [
+                  {
+                    "name": "URL 1",
+                    "value": "https://example1.com"
+                  },
+                  {
+                    "name": "URL 2",
+                    "value": "https://example2.com"
+                  },
+                  {
+                    "name": "URL 3",
+                    "value": "https://example3.com"
+                  }
+                ]
+              }
+            ]
+          }' $DISCORD_WEBHOOK_URL
