@@ -6,7 +6,6 @@ import {
 import { InMemoryErrorRepository } from "../../secondary/core/InMemoryErrorRepository";
 import { InMemoryOutboxQueries } from "../../secondary/core/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../secondary/core/InMemoryOutboxRepository";
-import { PgErrorRepository } from "../../secondary/core/PgErrorRepository";
 import { InMemoryDiscussionAggregateRepository } from "../../secondary/immersionOffer/InMemoryDiscussionAggregateRepository";
 import { InMemoryEstablishmentAggregateRepository } from "../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryEstablishmentGroupRepository } from "../../secondary/immersionOffer/inMemoryEstablishmentGroupRepository";
@@ -33,6 +32,7 @@ import { PgConventionPoleEmploiAdvisorRepository } from "../../secondary/pg/PgCo
 import { PgConventionQueries } from "../../secondary/pg/PgConventionQueries";
 import { PgConventionRepository } from "../../secondary/pg/PgConventionRepository";
 import { PgDiscussionAggregateRepository } from "../../secondary/pg/PgDiscussionAggregateRepository";
+import { PgErrorRepository } from "../../secondary/pg/PgErrorRepository";
 import { PgEstablishmentAggregateRepository } from "../../secondary/pg/PgEstablishmentAggregateRepository";
 import { PgEstablishmentGroupRepository } from "../../secondary/pg/PgEstablishmentGroupRepository";
 import { PgExportQueries } from "../../secondary/pg/PgExportQueries";
@@ -109,7 +109,7 @@ export const createPgUow = (client: PoolClient): UnitOfWork => {
       client,
     ),
     establishmentGroupRepository: new PgEstablishmentGroupRepository(client),
-    errorRepository: new PgErrorRepository(),
+    errorRepository: new PgErrorRepository(client),
     exportQueries: new PgExportQueries(client),
     featureFlagRepository: new PgFeatureFlagRepository(client),
     formEstablishmentRepository: new PgFormEstablishmentRepository(client),
