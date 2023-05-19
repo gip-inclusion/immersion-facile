@@ -23,6 +23,13 @@ jobs:
     secrets:
       SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
 
+  notify-discord:
+    needs: [deploy-dev]
+    uses: ./.github/workflows/notify-discord.yml
+    with:
+      environment: dev
+      tag: v404
+
   merge-to-staging:
     needs: [deploy-dev]
     environment: staging
