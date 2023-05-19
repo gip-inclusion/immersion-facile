@@ -5,7 +5,9 @@ on:
     inputs:
       environment:
         type: string
-        description: environment to deploy to
+        required: true
+      tag:
+        type: string
         required: true
       region:
         required: false
@@ -19,6 +21,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
+    concurrency:
+      group: deploy-to-scalingo-${{ inputs.environment }}
+      cancel-in-progress: true
     steps:
       - name: Install scalingo CLI
         run: |
@@ -27,14 +32,14 @@ jobs:
       - name: Download back artefact
         uses: actions/download-artifact@v3
         with:
-          name: back-build-${{github.sha}}
+          name: back-build-${{ inputs.tag }}
       - name: Download front artefact
         uses: actions/download-artifact@v3
         with:
-          name: front-build-${{github.sha}}
+          name: front-build-${{ inputs.tag }}
       - name: Login to scalingo
         run: scalingo login --api-token ${{ secrets.SCALINGO_API_TOKEN }}
       - name: Deploy back
-        run: scalingo --app if-${{ inputs.environment }}-back --region ${{ inputs.region }} deploy back-build.tar.gz
+        run: scalingo --app if-${{ inputs.environment }}-back --region ${{ inputs.region }} deploy back-build.tar.gz ${{ inputs.tag }}
       - name: Deploy front
-        run: scalingo --app if-${{ inputs.environment }}-front --region ${{ inputs.region }} deploy front-build.tar.gz
+        run: scalingo --app if-${{ inputs.environment }}-front --region ${{ inputs.region }} deploy front-build.tar.gz ${{ inputs.tag }}

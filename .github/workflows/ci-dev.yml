@@ -1,9 +1,9 @@
 name: "Dev - Build front, back and deploy"
 
 on:
-  push:
-    branches:
-      - dev
+#  push:
+#    branches:
+#      - dev
 
 jobs:
   validation:

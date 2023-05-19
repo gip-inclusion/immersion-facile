@@ -2,6 +2,10 @@ name: "Build front"
 
 on:
   workflow_call:
+    inputs:
+      tag:
+        type: string
+        required: true
 
 jobs:
   build-front-artefact:
@@ -23,5 +27,5 @@ jobs:
       - name: Archive build
         uses: actions/upload-artifact@v3
         with:
-          name: front-build-${{github.sha}}
+          name: front-build-${{ inputs.tag }}
           path: front/front-build.tar.gz

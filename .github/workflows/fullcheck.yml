@@ -1,4 +1,4 @@
-name: "Fullcheck of the project - (except integration tests)"
+name: "Fullcheck of the project + integration tests"
 
 on:
   push:

@@ -1,0 +1,75 @@
+name: "Continuous Deployment"
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  validation:
+    uses: ./.github/workflows/fullcheck.yml
+
+  build-front-artefact:
+    uses: ./.github/workflows/build-front-artefact.yml
+    with:
+      tag: "v${{ github.run_number }}"
+
+  build-back-artefact:
+    uses: ./.github/workflows/build-back-artefact.yml
+    with:
+      tag: "v${{ github.run_number }}"
+
+  tag:
+    uses: ./.github/workflows/ci-add-tag.yml
+    with:
+      tag: "v${{ github.run_number }}"
+
+  deploy-dev:
+    name: Deploy dev
+    needs: [validation, tag-version, build-front-artefact, build-back-artefact]
+    uses: ./.github/workflows/deploy-to-scalingo.yml
+    with:
+      environment: dev
+      tag: "v${{ github.run_number }}"
+    secrets:
+      SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
+
+  notify-dev-deployed:
+    name: Notify dev deployed
+    needs: deploy-dev
+    uses: ./.github/workflows/cd-discord-notification.yml
+    with:
+      environment: dev
+      tag: "v${{ github.run_number }}"
+    secrets:
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+  deploy-staging:
+    name: Deploy staging
+    needs: deploy-dev
+    uses: ./.github/workflows/deploy-to-scalingo.yml
+    with:
+      environment: staging
+      tag: "v${{ github.run_number }}"
+    secrets:
+      SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
+
+  notify-staging-deployed:
+    name: Notify staging deployed
+    needs: deploy-staging
+    uses: ./.github/workflows/cd-discord-notification.yml
+    with:
+      environment: staging
+      tag: "v${{ github.run_number }}"
+    secrets:
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+  deploy-prod:
+    name: Deploy prod
+    needs: deploy-staging
+    uses: ./.github/workflows/deploy-to-scalingo.yml
+    with:
+      environment: prod
+      tag: "v${{ github.run_number }}"
+    secrets:
+      SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
