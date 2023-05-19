@@ -2,6 +2,10 @@ name: "Build back"
 
 on:
   workflow_call:
+    inputs:
+      tag:
+        type: string
+        required: true
 
 jobs:
   build-back-artefact:
@@ -23,5 +27,5 @@ jobs:
       - name: Archive build
         uses: actions/upload-artifact@v3
         with:
-          name: back-build-${{github.sha}}
+          name: back-build-${{ inputs.tag }}
           path: back/back-build.tar.gz
