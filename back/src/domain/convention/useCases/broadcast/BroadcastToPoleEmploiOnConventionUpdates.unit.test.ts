@@ -3,9 +3,11 @@ import {
   ConventionDtoBuilder,
   ConventionId,
   expectObjectsToMatch,
+  expectToEqual,
   reasonableSchedule,
 } from "shared";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
+import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { InMemoryPoleEmploiGateway } from "../../../../adapters/secondary/immersionOffer/poleEmploi/InMemoryPoleEmploiGateway";
 import { InMemoryFeatureFlagRepository } from "../../../../adapters/secondary/InMemoryFeatureFlagRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
@@ -21,9 +23,11 @@ const prepareUseCase = async ({
   uow.featureFlagRepository = new InMemoryFeatureFlagRepository({
     enablePeConventionBroadcast,
   });
+  const timeGateway = new CustomTimeGateway();
   const broadcastToPe = new BroadcastToPoleEmploiOnConventionUpdates(
     new InMemoryUowPerformer(uow),
     poleEmploiGateWay,
+    timeGateway,
   );
 
   const agencyRepository = uow.agencyRepository;
@@ -33,7 +37,14 @@ const prepareUseCase = async ({
     .build();
   await agencyRepository.setAgencies([peAgency]);
 
-  return { broadcastToPe, poleEmploiGateWay, agencyRepository, peAgency };
+  return {
+    broadcastToPe,
+    poleEmploiGateWay,
+    agencyRepository,
+    peAgency,
+    errorRepository: uow.errorRepository,
+    timeGateway,
+  };
 };
 
 describe("Broadcasts events to pole-emploi", () => {
@@ -58,6 +69,7 @@ describe("Broadcasts events to pole-emploi", () => {
     // Assert
     expect(poleEmploiGateWay.notifications).toHaveLength(0);
   });
+
   it("Conventions without federated id are still sent", async () => {
     // Prepare
     const { broadcastToPe, poleEmploiGateWay, peAgency } = await prepareUseCase(
@@ -76,6 +88,48 @@ describe("Broadcasts events to pole-emploi", () => {
 
     // Assert
     expect(poleEmploiGateWay.notifications).toHaveLength(1);
+  });
+
+  it("If Pe returns a 404 error, we store the error in a repo", async () => {
+    // Prepare
+    const {
+      broadcastToPe,
+      poleEmploiGateWay,
+      peAgency,
+      errorRepository,
+      timeGateway,
+    } = await prepareUseCase({
+      enablePeConventionBroadcast: true,
+    });
+
+    // Act
+    const convention = new ConventionDtoBuilder()
+      .withAgencyId(peAgency.id)
+      .withoutFederatedIdentity()
+      .build();
+
+    poleEmploiGateWay.setNextResponse({
+      status: 404,
+      message: "Ops, something is bad",
+    });
+    const now = new Date();
+    timeGateway.setNextDate(now);
+
+    await broadcastToPe.execute(convention);
+
+    // Assert
+    expect(poleEmploiGateWay.notifications).toHaveLength(1);
+    expectToEqual(errorRepository.savedErrors, [
+      {
+        serviceName: "PoleEmploiGateway.notifyOnConventionUpdated",
+        params: {
+          conventionId: convention.id,
+        },
+        httpStatus: 404,
+        message: "Ops, something is bad",
+        occurredAt: now,
+      },
+    ]);
   });
 
   it("doesn't send notification if feature flag is OFF", async () => {

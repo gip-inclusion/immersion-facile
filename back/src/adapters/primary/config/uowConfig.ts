@@ -3,8 +3,10 @@ import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../domain/core/ports/UnitOfWork";
+import { InMemoryErrorRepository } from "../../secondary/core/InMemoryErrorRepository";
 import { InMemoryOutboxQueries } from "../../secondary/core/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../secondary/core/InMemoryOutboxRepository";
+import { PgErrorRepository } from "../../secondary/core/PgErrorRepository";
 import { InMemoryDiscussionAggregateRepository } from "../../secondary/immersionOffer/InMemoryDiscussionAggregateRepository";
 import { InMemoryEstablishmentAggregateRepository } from "../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryEstablishmentGroupRepository } from "../../secondary/immersionOffer/inMemoryEstablishmentGroupRepository";
@@ -74,6 +76,7 @@ export const createInMemoryUow = () => {
     establishmentAggregateRepository:
       new InMemoryEstablishmentAggregateRepository(),
     establishmentGroupRepository: new InMemoryEstablishmentGroupRepository(),
+    errorRepository: new InMemoryErrorRepository(),
     exportQueries: new InMemoryExportQueries(),
     featureFlagRepository: new InMemoryFeatureFlagRepository(),
     formEstablishmentRepository: new InMemoryFormEstablishmentRepository(),
@@ -106,6 +109,7 @@ export const createPgUow = (client: PoolClient): UnitOfWork => {
       client,
     ),
     establishmentGroupRepository: new PgEstablishmentGroupRepository(client),
+    errorRepository: new PgErrorRepository(),
     exportQueries: new PgExportQueries(client),
     featureFlagRepository: new PgFeatureFlagRepository(client),
     formEstablishmentRepository: new PgFormEstablishmentRepository(client),
