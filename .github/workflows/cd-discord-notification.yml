@@ -1,6 +1,7 @@
 name: Discord Notification
 
 on:
+  workflow_dispatch:
   workflow_call:
     inputs:
       environment:
