@@ -60,8 +60,12 @@ export type PoleEmploiConvention = {
   signatureEntreprise: boolean;
 };
 
+export type PoleEmploiBroadcastResponse =
+  | { status: 200 | 201 }
+  | { status: 404; message: string };
+
 export interface PoleEmploiGateway {
   notifyOnConventionUpdated: (
     poleEmploiConvention: PoleEmploiConvention,
-  ) => Promise<void>;
+  ) => Promise<PoleEmploiBroadcastResponse>;
 }
