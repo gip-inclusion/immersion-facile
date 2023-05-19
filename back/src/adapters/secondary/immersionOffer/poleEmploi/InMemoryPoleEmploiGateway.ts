@@ -9,6 +9,8 @@ const logger = createLogger(__filename);
 export class InMemoryPoleEmploiGateway implements PoleEmploiGateway {
   constructor(public notifications: PoleEmploiConvention[] = []) {}
 
+  private nextResponse: PoleEmploiBroadcastResponse = { status: 200 };
+
   public async notifyOnConventionUpdated(
     convention: PoleEmploiConvention,
   ): Promise<PoleEmploiBroadcastResponse> {
@@ -17,6 +19,10 @@ export class InMemoryPoleEmploiGateway implements PoleEmploiGateway {
       "In Memory - Fake Sending convention to PE",
     );
     this.notifications.push(convention);
-    return { status: 200 };
+    return this.nextResponse;
+  }
+
+  setNextResponse(response: PoleEmploiBroadcastResponse) {
+    this.nextResponse = response;
   }
 }

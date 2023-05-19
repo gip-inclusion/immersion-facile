@@ -60,9 +60,17 @@ export type PoleEmploiConvention = {
   signatureEntreprise: boolean;
 };
 
+type PeBroadcastSuccessResponse = { status: 200 | 201 };
+type PeBroadcastErrorResponse = { status: number; message: string };
+
 export type PoleEmploiBroadcastResponse =
-  | { status: 200 | 201 }
-  | { status: 404; message: string };
+  | PeBroadcastSuccessResponse
+  | PeBroadcastErrorResponse;
+
+export const isBroadcastResponseOk = (
+  response: PoleEmploiBroadcastResponse,
+): response is PeBroadcastSuccessResponse =>
+  [200, 201].includes(response.status);
 
 export interface PoleEmploiGateway {
   notifyOnConventionUpdated: (

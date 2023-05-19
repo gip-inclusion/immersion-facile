@@ -4,6 +4,7 @@ import {
   ConventionDto,
   ImmersionObjective,
 } from "shared";
+import { TimeGateway } from "../../../core/ports/TimeGateway";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
@@ -11,6 +12,7 @@ import {
 import { TransactionalUseCase } from "../../../core/UseCase";
 import {
   conventionStatusToPoleEmploiStatus,
+  isBroadcastResponseOk,
   PoleEmploiConvention,
   PoleEmploiGateway,
 } from "../../ports/PoleEmploiGateway";
@@ -33,6 +35,7 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private poleEmploiGateway: PoleEmploiGateway,
+    private timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
   }
@@ -97,8 +100,18 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
       signatureEntreprise: !!establishmentRepresentative.signedAt,
     };
 
-    await this.poleEmploiGateway.notifyOnConventionUpdated(
+    const response = await this.poleEmploiGateway.notifyOnConventionUpdated(
       poleEmploiConvention,
     );
+
+    if (isBroadcastResponseOk(response)) return;
+
+    uow.errorRepository.save({
+      serviceName: "PoleEmploiGateway.notifyOnConventionUpdated",
+      httpStatus: response.status,
+      message: response.message,
+      params: { conventionId: convention.id },
+      occurredAt: this.timeGateway.now(),
+    });
   }
 }
