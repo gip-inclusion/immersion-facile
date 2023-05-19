@@ -1,4 +1,5 @@
 import {
+  PoleEmploiBroadcastResponse,
   PoleEmploiConvention,
   PoleEmploiGateway,
 } from "../../../../domain/convention/ports/PoleEmploiGateway";
@@ -10,11 +11,12 @@ export class InMemoryPoleEmploiGateway implements PoleEmploiGateway {
 
   public async notifyOnConventionUpdated(
     convention: PoleEmploiConvention,
-  ): Promise<void> {
+  ): Promise<PoleEmploiBroadcastResponse> {
     logger.info(
       { conventionId: convention.id },
       "In Memory - Fake Sending convention to PE",
     );
     this.notifications.push(convention);
+    return { status: 200 };
   }
 }

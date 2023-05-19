@@ -1,106 +1,82 @@
-import { AxiosResponse } from "axios";
-import secondsToMilliseconds from "date-fns/secondsToMilliseconds";
+import Bottleneck from "bottleneck";
 import { AbsoluteUrl } from "shared";
+import { HttpClient, HttpResponse } from "http-client";
 import {
+  PoleEmploiBroadcastResponse,
   PoleEmploiConvention,
   PoleEmploiGateway,
 } from "../../../../domain/convention/ports/PoleEmploiGateway";
 import { AccessTokenGateway } from "../../../../domain/core/ports/AccessTokenGateway";
-import { RateLimiter } from "../../../../domain/core/ports/RateLimiter";
-import {
-  RetryableError,
-  RetryStrategy,
-} from "../../../../domain/core/ports/RetryStrategy";
-import {
-  createAxiosInstance,
-  isRetryableError,
-  logAxiosError,
-} from "../../../../utils/axiosUtils";
 import { createLogger } from "../../../../utils/logger";
 import { notifyAndThrowErrorDiscord } from "../../../../utils/notifyDiscord";
+import { getPeTestPrefix, PoleEmploiTargets } from "./PoleEmploi.targets";
 
 const logger = createLogger(__filename);
 
-const getTestPrefix = (peApiUrl: AbsoluteUrl) =>
-  ["https://api.peio.pe-qvr.fr", "https://api-r.es-qvr.fr"].includes(peApiUrl)
-    ? "test"
-    : "";
+const peBroadcastMaxRatePerSecond = 3;
 
 export class HttpPoleEmploiGateway implements PoleEmploiGateway {
-  private peConventionBroadcastUrl: AbsoluteUrl;
   private peTestPrefix: "test" | "";
 
   constructor(
-    readonly peApiUrl: AbsoluteUrl,
+    private readonly httpClient: HttpClient<PoleEmploiTargets>,
+    private readonly peApiUrl: AbsoluteUrl,
     private readonly accessTokenGateway: AccessTokenGateway,
-    private readonly poleEmploiClientId: string,
-    private readonly rateLimiter: RateLimiter,
-    private readonly retryStrategy: RetryStrategy,
   ) {
-    this.peTestPrefix = getTestPrefix(peApiUrl);
-    this.peConventionBroadcastUrl = `${peApiUrl}/partenaire/${this.peTestPrefix}immersion-pro/v2/demandes-immersion`;
+    this.peTestPrefix = getPeTestPrefix(peApiUrl);
   }
 
   public async notifyOnConventionUpdated(
     poleEmploiConvention: PoleEmploiConvention,
-  ): Promise<void> {
-    const response = await this.postPoleEmploiConvention(poleEmploiConvention);
+  ): Promise<PoleEmploiBroadcastResponse> {
+    return this.postPoleEmploiConvention(poleEmploiConvention)
+      .then((response) => ({ status: response.status as 200 | 201 }))
+      .catch((error) => {
+        if (error?.response?.status === 404) {
+          return {
+            status: 404,
+            message: error?.response?.data?.message,
+          };
+        }
 
-    if (![200, 201].includes(response.status)) {
-      notifyAndThrowErrorDiscord(
-        new Error(
-          `Could not notify Pole-Emploi : ${response.status} ${response.statusText}`,
-        ),
-      );
-    }
+        const errorObject = {
+          _title: "PeBroadcastError",
+          status: "errored",
+          httpStatus: error?.response?.status,
+          message: error.message,
+          axiosBody: error?.response?.data,
+        };
+        logger.error(errorObject);
+        notifyAndThrowErrorDiscord(
+          new Error(
+            `Could not notify Pole-Emploi : ${errorObject.httpStatus} - ${errorObject.message} \n ${errorObject?.axiosBody?.message}`,
+          ),
+        );
+
+        throw error;
+      });
   }
 
   private async postPoleEmploiConvention(
     poleEmploiConvention: PoleEmploiConvention,
-  ): Promise<AxiosResponse<void>> {
-    return this.retryStrategy.apply(async () => {
-      try {
-        const axios = createAxiosInstance(logger);
-        logger.info({ poleEmploiConvention }, "Sending convention to PE");
-        const response = await this.rateLimiter.whenReady(async () => {
-          const accessToken = await this.accessTokenGateway.getAccessToken(
-            `echangespmsmp api_${this.peTestPrefix}immersion-prov2`,
-          );
+  ): Promise<HttpResponse<void>> {
+    const accessTokenResponse = await this.accessTokenGateway.getAccessToken(
+      `echangespmsmp api_${this.peTestPrefix}immersion-prov2`,
+    );
 
-          const peResponse = await axios.post(
-            this.peConventionBroadcastUrl,
-            poleEmploiConvention,
-            {
-              headers: {
-                Authorization: `Bearer ${accessToken.access_token}`,
-              },
-              timeout: secondsToMilliseconds(10),
-            },
-          );
-          logger.info(
-            {
-              conventionId: poleEmploiConvention.originalId,
-              httpStatus: peResponse.status,
-            },
-            "Response status from PE",
-          );
-          return peResponse;
-        });
-        return response;
-      } catch (error: any) {
-        logger.error(
-          {
-            conventionId: poleEmploiConvention.originalId,
-            axiosErrorBody: error?.response?.data,
-            httpStatus: error?.response?.status,
-            error,
-          },
-          "Error from PE",
-        );
-        if (isRetryableError(logger, error)) throw new RetryableError(error);
-        logAxiosError(logger, error);
-        throw error;
-      }
-    });
+    return this.limiter.schedule(() =>
+      this.httpClient.broadcastConvention({
+        body: poleEmploiConvention,
+        headers: {
+          authorization: `Bearer ${accessTokenResponse.access_token}`,
+        },
+      }),
+    );
   }
+
+  private limiter = new Bottleneck({
+    reservoir: peBroadcastMaxRatePerSecond,
+    reservoirRefreshInterval: 1000, // number of ms
+    reservoirRefreshAmount: peBroadcastMaxRatePerSecond,
+  });
 }
