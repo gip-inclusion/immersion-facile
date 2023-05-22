@@ -171,7 +171,6 @@ export class AppConfig {
     return this.throwIfNotInArray({
       variableName: "NOTIFICATION_GATEWAY",
       authorizedValues: ["IN_MEMORY", "HYBRID", "BREVO"],
-      defaultValue: "IN_MEMORY",
     });
   }
 
@@ -180,7 +179,7 @@ export class AppConfig {
     return this.throwIfNotDefined("BREVO_API_KEY");
   }
 
-  // == Email vaidation gateway ==
+  // == Email validation gateway ==
   public get emailValidationGateway() {
     return this.throwIfNotInArray({
       variableName: "EMAIL_VALIDATION_GATEWAY",
