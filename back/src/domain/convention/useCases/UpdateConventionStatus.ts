@@ -94,6 +94,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
         ...this.createEvent(
           updatedDto,
           domainTopic,
+          role,
           params.status === "REJECTED" || params.status === "DRAFT"
             ? params.statusJustification
             : undefined,
@@ -107,6 +108,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
   private createEvent(
     updatedDto: ConventionDto,
     domainTopic: DomainTopic,
+    requesterRole: Role,
     justification?: string,
   ) {
     if (domainTopic === "ImmersionApplicationRequiresModification")
@@ -115,7 +117,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
         payload: {
           convention: updatedDto,
           justification: justification ?? "",
-          roles: ["beneficiary", "establishment-representative"],
+          roles: [requesterRole],
         },
       });
 

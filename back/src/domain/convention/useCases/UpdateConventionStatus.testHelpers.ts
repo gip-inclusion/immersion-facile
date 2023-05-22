@@ -222,7 +222,7 @@ const makeTestAcceptsStatusUpdate =
           updateStatusParams.status === "DRAFT"
             ? updateStatusParams.statusJustification
             : "was not provided",
-        roles: ["beneficiary", "establishment-representative"],
+        roles: [role],
       };
 
       await expectNewEvent(
