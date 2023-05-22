@@ -19,6 +19,7 @@ on:
 
 jobs:
   deploy:
+    name: "Deploy to ${{ inputs.environment }}"
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     concurrency:
@@ -43,3 +44,13 @@ jobs:
         run: scalingo --app if-${{ inputs.environment }}-back --region ${{ inputs.region }} deploy back-build.tar.gz ${{ inputs.tag }}
       - name: Deploy front
         run: scalingo --app if-${{ inputs.environment }}-front --region ${{ inputs.region }} deploy front-build.tar.gz ${{ inputs.tag }}
+
+  notify:
+    name: Notify deployed
+    needs: deploy
+    uses: ./.github/workflows/cd-discord-notification.yml
+    with:
+      environment: ${{ inputs.environment }}
+      tag: "v${{ github.run_number }}"
+    secrets:
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}

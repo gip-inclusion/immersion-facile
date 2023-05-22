@@ -9,7 +9,7 @@ on:
 
 jobs:
   tag-version:
-    name: Tag version
+    name: Tag version ${{ inputs.tag }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
