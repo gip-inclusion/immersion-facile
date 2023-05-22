@@ -1,5 +1,10 @@
 import { z } from "zod";
-import { AbsoluteUrl, frontRoutes, queryParamsAsString } from "shared";
+import {
+  AbsoluteUrl,
+  authFailed,
+  frontRoutes,
+  queryParamsAsString,
+} from "shared";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { AccessTokenDto } from "../dto/AccessToken.dto";
@@ -36,7 +41,7 @@ export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalU
       ? this.onAccessToken(accessToken, uow)
       : this.makeRedirectUrl({
           fedIdProvider: "peConnect",
-          fedId: "AuthFailed",
+          fedId: authFailed,
         });
   }
 
@@ -47,7 +52,7 @@ export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalU
     if (!userAndAdvisors)
       return this.makeRedirectUrl({
         fedIdProvider: "peConnect",
-        fedId: "AuthFailed",
+        fedId: authFailed,
       });
     const { user, advisors } = userAndAdvisors;
 

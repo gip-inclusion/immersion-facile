@@ -1,4 +1,4 @@
-import { expectTypeToMatchAndEqual } from "shared";
+import { authFailed, expectTypeToMatchAndEqual, notJobSeeker } from "shared";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
@@ -104,7 +104,7 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
       const urlWithQueryParams = await usecase.execute(authorizationCode);
 
       expect(urlWithQueryParams).toBe(
-        `${baseurl}/demande-immersion?fedIdProvider=peConnect&fedId=AuthFailed`,
+        `${baseurl}/demande-immersion?fedIdProvider=peConnect&fedId=${authFailed}`,
       );
       expectTypeToMatchAndEqual(
         uow.conventionPoleEmploiAdvisorRepository
@@ -120,7 +120,7 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
       const urlWithQueryParams = await usecase.execute(authorizationCode);
 
       expect(urlWithQueryParams).toBe(
-        `${baseurl}/demande-immersion?fedIdProvider=peConnect&fedId=AuthFailed`,
+        `${baseurl}/demande-immersion?fedIdProvider=peConnect&fedId=${authFailed}`,
       );
       expectTypeToMatchAndEqual(
         uow.conventionPoleEmploiAdvisorRepository
@@ -129,14 +129,14 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
       );
     });
 
-    it("On PeConnected and is not jobseeker should not open slot", async () => {
+    it("On PeConnected and is not jobseeker should not open slot and provide convention url with notJobSeeker peConnect mode", async () => {
       peConnectGateway.setAccessToken(accessToken);
       peConnectGateway.setUser(peNotJobseekerUser);
 
       const urlWithQueryParams = await usecase.execute(authorizationCode);
 
       expect(urlWithQueryParams).toBe(
-        `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&fedId=${peJobseekerUser.peExternalId}&fedIdProvider=peConnect`,
+        `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&fedId=${notJobSeeker}&fedIdProvider=peConnect`,
       );
       expectTypeToMatchAndEqual(
         uow.conventionPoleEmploiAdvisorRepository

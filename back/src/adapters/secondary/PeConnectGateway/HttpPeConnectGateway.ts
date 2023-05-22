@@ -155,15 +155,20 @@ export class HttpPeConnectGateway implements PeConnectGateway {
       Accept: "application/json",
       Authorization: `Bearer ${accessToken.value}`,
     };
-    const isUserJobseeker = await this.userIsJobseeker(headers);
-    const [externalPeUser, externalPeConnectAdvisors] = await Promise.all([
-      this.getUserInfo(headers),
-      isUserJobseeker ? this.getAdvisorsInfo(headers) : [],
-    ]);
+
+    const externalPeUser = await this.getUserInfo(headers);
+    const isUserJobseeker = await this.userIsJobseeker(
+      headers,
+      externalPeUser && externalPeUser.idIdentiteExterne,
+    );
+
     return externalPeUser
       ? {
           user: toPeConnectUserDto({ ...externalPeUser, isUserJobseeker }),
-          advisors: externalPeConnectAdvisors.map(toPeConnectAdvisorDto),
+          advisors: (isUserJobseeker
+            ? await this.getAdvisorsInfo(headers)
+            : []
+          ).map(toPeConnectAdvisorDto),
         }
       : undefined;
   }
@@ -213,12 +218,15 @@ export class HttpPeConnectGateway implements PeConnectGateway {
     }
   }
 
-  private async userIsJobseeker(headers: PeConnectHeaders): Promise<boolean> {
+  private async userIsJobseeker(
+    headers: PeConnectHeaders,
+    peExternalId: string | undefined,
+  ): Promise<boolean> {
     const counter = getUserStatutInfoCounter;
     const log = getUserStatutInfoLogger;
     try {
       counter.total.inc();
-      log.total({});
+      log.total({ peExternalId });
       const response = await this.httpClient.getUserStatutInfo({
         headers,
       });
@@ -226,7 +234,11 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         counter.error.inc({
           errorType: `Bad response status code ${response.status}`,
         });
-        log.error({ response, errorKind: "Response status is not 200." });
+        log.error({
+          response,
+          peExternalId,
+          errorKind: "Response status is not 200.",
+        });
         return false;
       }
       const externalPeConnectStatut = parseZodSchemaAndLogErrorOnParsingFailure(
@@ -237,9 +249,12 @@ export class HttpPeConnectGateway implements PeConnectGateway {
           token: headers.Authorization,
         },
       );
+      const isJobSeeker = isJobSeekerFromStatus(
+        externalPeConnectStatut.codeStatutIndividu,
+      );
       counter.success.inc();
-      log.success({});
-      return isJobSeekerFromStatus(externalPeConnectStatut.codeStatutIndividu);
+      log.success({ peExternalId, isJobSeeker });
+      return isJobSeeker;
     } catch (error) {
       errorChecker(
         error,
@@ -249,10 +264,11 @@ export class HttpPeConnectGateway implements PeConnectGateway {
         },
         (payload) => notifyDiscordOnNotError(payload),
       );
-      if (error instanceof ZodError) return false;
-      return managePeConnectError(error, "getUserStatutInfo", {
-        authorization: headers.Authorization,
-      });
+      return error instanceof ZodError
+        ? false
+        : managePeConnectError(error, "getUserStatutInfo", {
+            authorization: headers.Authorization,
+          });
     }
   }
 
