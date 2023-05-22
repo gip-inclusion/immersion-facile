@@ -4,10 +4,10 @@ import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { match } from "ts-pattern";
 import { useStyles } from "tss-react/dsfr";
 import {
   Beneficiary,
-  ConventionDto,
   ConventionMagicLinkPayload,
   ConventionReadDto,
   conventionWithoutExternalIdSchema,
@@ -42,6 +42,7 @@ import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
+import { ConventionSummary } from "./ConventionSummary";
 import { ShareConventionLink } from "./ShareConventionLink";
 
 const useClearConventionSubmitFeedbackOnUnmount = () => {
@@ -94,6 +95,7 @@ export const ConventionForm = ({
   const { cx } = useStyles();
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
   const currentStep = useAppSelector(conventionSelectors.currentStep);
+  const showSummary = useAppSelector(conventionSelectors.showSummary);
   const sidebarContent = sidebarStepContent(
     conventionProperties?.internshipKind ?? "immersion",
   );
@@ -165,8 +167,10 @@ export const ConventionForm = ({
     const conventionToSave = {
       ...values,
       workConditions: undefinedIfEmptyString(values.workConditions),
-    } as ConventionDto;
-    dispatch(conventionSlice.actions.saveConventionRequested(conventionToSave));
+    };
+    dispatch(
+      conventionSlice.actions.showSummaryChangeRequested(conventionToSave),
+    );
   };
   const reduxFormUiReady =
     useWaitForReduxFormUiReadyBeforeFormikInitialisation(initialValues);
@@ -182,61 +186,99 @@ export const ConventionForm = ({
   const { copyButtonIsDisabled, copyButtonLabel, onCopyButtonClick } =
     useCopyButton();
 
-  if (!reduxFormUiReady) return null;
-
-  if (routeParams.jwt && fetchConventionError)
-    return (
-      <ShowErrorOrRedirectToRenewMagicLink
-        errorMessage={fetchConventionError}
-        jwt={routeParams.jwt}
-      />
-    );
-
-  if (formSuccessfullySubmitted)
-    return (
-      <SubmitConfirmationSection
-        idToCopy={getValues().id}
-        copyButtonIsDisabled={copyButtonIsDisabled}
-        copyButtonLabel={copyButtonLabel}
-        onCopyButtonClick={onCopyButtonClick}
-      />
-    );
-
   return (
     <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
-      <FormProvider {...methods}>
-        <ConventionFormLayout
-          form={
+      {match({
+        showSummary,
+        reduxFormUiReady,
+        formSuccessfullySubmitted,
+        shouldRedirectToError: !!(routeParams.jwt && fetchConventionError),
+      })
+        .with(
+          {
+            reduxFormUiReady: false,
+          },
+          () => null,
+        )
+        .with(
+          {
+            shouldRedirectToError: true,
+          },
+          () => (
             <>
-              <div className={cx("fr-text")}>{t.intro.welcome}</div>
-              <Alert
-                severity="info"
-                small
-                description={t.intro.conventionWelcomeNotification}
-              />
-
-              <p className={fr.cx("fr-text--xs", "fr-mt-3w")}>
-                Tous les champs marqués d'une astérisque (*) sont obligatoires.
-              </p>
-
-              <form>
-                <ConventionFormFields onSubmit={onSubmit} isFrozen={isFrozen} />
-                <ConventionFeedbackNotification
-                  submitFeedback={submitFeedback}
-                  signatories={getValues("signatories")}
+              {routeParams.jwt && fetchConventionError && (
+                <ShowErrorOrRedirectToRenewMagicLink
+                  errorMessage={fetchConventionError}
+                  jwt={routeParams.jwt}
                 />
-              </form>
+              )}
             </>
-          }
-          sidebar={
-            <ConventionFormSidebar
-              currentStep={currentStep}
-              sidebarContent={sidebarContent}
-              sidebarFooter={<ShareConventionLink />}
+          ),
+        )
+        .with(
+          {
+            showSummary: true,
+          },
+          () => <ConventionSummary />,
+        )
+        .with(
+          {
+            showSummary: false,
+          },
+          () => (
+            <FormProvider {...methods}>
+              <ConventionFormLayout
+                form={
+                  <>
+                    <div className={cx("fr-text")}>{t.intro.welcome}</div>
+                    <Alert
+                      severity="info"
+                      small
+                      description={t.intro.conventionWelcomeNotification}
+                    />
+
+                    <p className={fr.cx("fr-text--xs", "fr-mt-3w")}>
+                      Tous les champs marqués d'une astérisque (*) sont
+                      obligatoires.
+                    </p>
+
+                    <form>
+                      <ConventionFormFields
+                        onSubmit={onSubmit}
+                        isFrozen={isFrozen}
+                      />
+                      <ConventionFeedbackNotification
+                        submitFeedback={submitFeedback}
+                        signatories={getValues("signatories")}
+                      />
+                    </form>
+                  </>
+                }
+                sidebar={
+                  <ConventionFormSidebar
+                    currentStep={currentStep}
+                    sidebarContent={sidebarContent}
+                    sidebarFooter={<ShareConventionLink />}
+                  />
+                }
+              />
+            </FormProvider>
+          ),
+        )
+        .with(
+          {
+            formSuccessfullySubmitted: true,
+          },
+          () => (
+            <SubmitConfirmationSection
+              idToCopy={getValues().id}
+              copyButtonIsDisabled={copyButtonIsDisabled}
+              copyButtonLabel={copyButtonLabel}
+              onCopyButtonClick={onCopyButtonClick}
             />
-          }
-        />
-      </FormProvider>
+          ),
+        )
+        .exhaustive()}
     </div>
   );
 };
