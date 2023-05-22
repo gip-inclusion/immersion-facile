@@ -1,7 +1,7 @@
 import React from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { makeStyles } from "tss-react/dsfr";
-import "./MainWrapper.scss";
+import Styles from "./MainWrapper.styles";
 
 type MainWrapperCommonProps = {
   vSpacing?: number;
@@ -40,14 +40,14 @@ export const MainWrapper = ({
       ...backgroundStyles,
     },
   }))();
-  const spacing = `${vSpacing ? `fr-py-${vSpacing}w` : ""} ${
-    hSpacing ? `fr-px-${hSpacing}w` : ""
-  }`;
-  let classNameValue = `im-main-wrapper ${className} ${spacing}`;
-  if (layout !== "fullscreen") {
-    classNameValue += "fr-container fr-grid--center";
-  }
-
+  const classNameValue = cx(
+    vSpacing ? fr.cx(`fr-py-${vSpacing}w`) : "",
+    hSpacing ? fr.cx(`fr-px-${hSpacing}w`) : "",
+    Styles.root,
+    useBackground ? Styles.withBackground : "",
+    className,
+    layout !== "fullscreen" ? fr.cx("fr-container", "fr-grid-row--center") : "",
+  );
   return (
     <>
       {pageHeader}
@@ -60,10 +60,7 @@ export const MainWrapper = ({
         {layout !== "boxed" && children}
         {useBackground && (
           <div
-            className={cx(
-              "im-main-wrapper__custom-background",
-              classes.customBackground,
-            )}
+            className={cx(Styles.customBackground, classes.customBackground)}
           ></div>
         )}
       </main>

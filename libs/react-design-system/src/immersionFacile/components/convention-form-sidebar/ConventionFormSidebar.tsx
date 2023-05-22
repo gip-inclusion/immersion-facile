@@ -7,9 +7,11 @@ import Styles from "./ConventionFormSidebar.styles";
 export const ConventionFormSidebar = ({
   sidebarContent,
   currentStep,
+  sidebarFooter,
 }: {
   currentStep: number;
   sidebarContent: Record<string, React.ReactNode>[];
+  sidebarFooter?: React.ReactNode;
 }) => {
   const { cx } = useStyles();
   const maxSteps = sidebarContent.length;
@@ -22,6 +24,12 @@ export const ConventionFormSidebar = ({
         title={sidebarContent[stepNumberToStepIndex(currentStep)].title}
       />
       {sidebarContent[stepNumberToStepIndex(currentStep)].description}
+      {sidebarFooter && (
+        <>
+          <hr />
+          <div className={cx(fr.cx("fr-mt-2w"))}>{sidebarFooter}</div>
+        </>
+      )}
     </aside>
   );
 };

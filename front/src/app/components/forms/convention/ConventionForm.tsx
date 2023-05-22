@@ -19,6 +19,7 @@ import {
   notJobSeeker,
 } from "shared";
 import {
+  ConventionFormLayout,
   ConventionFormSidebar,
   SubmitConfirmationSection,
 } from "react-design-system";
@@ -41,6 +42,7 @@ import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
+import { ShareConventionLink } from "./ShareConventionLink";
 
 const useClearConventionSubmitFeedbackOnUnmount = () => {
   const dispatch = useDispatch();
@@ -202,34 +204,39 @@ export const ConventionForm = ({
 
   return (
     <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
-      <div className={fr.cx("fr-col-12", "fr-col-lg-8")}>
-        {/* Should be removed on accordion form */}
-        <div className={cx("fr-text")}>{t.intro.welcome}</div>
-        <Alert
-          severity="info"
-          small
-          description={t.intro.conventionWelcomeNotification}
-        />
+      <FormProvider {...methods}>
+        <ConventionFormLayout
+          form={
+            <>
+              <div className={cx("fr-text")}>{t.intro.welcome}</div>
+              <Alert
+                severity="info"
+                small
+                description={t.intro.conventionWelcomeNotification}
+              />
 
-        <p className={fr.cx("fr-text--xs", "fr-mt-3w")}>
-          Tous les champs marqués d'une astérisque (*) sont obligatoires.
-        </p>
-        <FormProvider {...methods}>
-          <form>
-            <ConventionFormFields onSubmit={onSubmit} isFrozen={isFrozen} />
-            <ConventionFeedbackNotification
-              submitFeedback={submitFeedback}
-              signatories={getValues("signatories")}
+              <p className={fr.cx("fr-text--xs", "fr-mt-3w")}>
+                Tous les champs marqués d'une astérisque (*) sont obligatoires.
+              </p>
+
+              <form>
+                <ConventionFormFields onSubmit={onSubmit} isFrozen={isFrozen} />
+                <ConventionFeedbackNotification
+                  submitFeedback={submitFeedback}
+                  signatories={getValues("signatories")}
+                />
+              </form>
+            </>
+          }
+          sidebar={
+            <ConventionFormSidebar
+              currentStep={currentStep}
+              sidebarContent={sidebarContent}
+              sidebarFooter={<ShareConventionLink />}
             />
-          </form>
-        </FormProvider>
-      </div>
-      <div className={fr.cx("fr-col-12", "fr-col-lg-4")}>
-        <ConventionFormSidebar
-          currentStep={currentStep}
-          sidebarContent={sidebarContent}
+          }
         />
-      </div>
+      </FormProvider>
     </div>
   );
 };

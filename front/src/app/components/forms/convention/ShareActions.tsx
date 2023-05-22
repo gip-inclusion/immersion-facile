@@ -1,7 +1,7 @@
 import React from "react";
 import { FederatedIdentity, isPeConnectIdentity } from "shared";
 import { CopyLink } from "src/app/components/forms/convention/CopyLink";
-import { ShareLinkByEmail } from "src/app/components/forms/convention/ShareLinkByEmail";
+import { ShareConventionLink } from "src/app/components/forms/convention/ShareConventionLink";
 
 export const ShareActions = (props: {
   isFrozen?: boolean;
@@ -13,7 +13,7 @@ export const ShareActions = (props: {
   return (
     <>
       <CopyLink />
-      <ShareLinkByEmail />
+      <ShareConventionLink />
     </>
   );
 };

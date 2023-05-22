@@ -20,5 +20,5 @@ export const useCopyButton = () => {
 
   const copyButtonLabel = isCopied ? "Copié !" : "Copier cet ID";
 
-  return { onCopyButtonClick, copyButtonLabel, copyButtonIsDisabled };
+  return { onCopyButtonClick, copyButtonLabel, copyButtonIsDisabled, isCopied };
 };

@@ -2,7 +2,9 @@
 
 .im-main-wrapper {
   position: relative;
-  overflow: hidden;
+  &--with-background {
+    overflow: hidden;
+  }
   &__custom-background {
     position: absolute;
     bottom: -20%;

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { type SubmitHandler, useFormContext } from "react-hook-form";
+import { get, type SubmitHandler, useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
@@ -107,13 +107,18 @@ export const ConventionFormFields = ({
   });
   const renderStatusBadge = (step: number) => {
     const stepFields = formUiSections[step - 1];
-    const stepErrors = keys(errors).filter((key) =>
-      stepFields.includes(key),
+    const stepErrors = stepFields.filter(
+      (stepField) =>
+        keys(errors).filter((errorKey) => stepField.includes(errorKey))
+          .length && get(errors, stepField),
     ).length;
     const stepIsValid = () =>
       stepFields.filter(
-        (key) => getFieldState(key).isTouched && stepErrors === 0,
+        (key) =>
+          getFieldState(key as keyof ConventionReadDto).isTouched &&
+          stepErrors === 0,
       ).length === stepFields.length;
+
     const getSeverity = () => {
       if (stepErrors) {
         return "error";
@@ -153,7 +158,6 @@ export const ConventionFormFields = ({
       await trigger(field as keyof ConventionReadDto);
     });
   };
-  console.log("errors", errors);
   return (
     <>
       {isFrozen && !isSignatureMode && <ConventionFrozenMessage />}
