@@ -16,6 +16,8 @@ on:
     secrets:
       SCALINGO_API_TOKEN:
         required: true
+      DISCORD_WEBHOOK_URL:
+        required: true
 
 jobs:
   deploy:
