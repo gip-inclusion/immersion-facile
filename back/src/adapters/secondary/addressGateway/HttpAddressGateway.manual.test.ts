@@ -85,8 +85,8 @@ describe("HttpOpenCageDataAddressGateway", () => {
               "2 Rue des Anciens Combattants d'Afrique du Nord",
           },
           position: {
-            lat: 48.6712593,
-            lon: 5.8918572,
+            lat: 48.671259,
+            lon: 5.891857,
           },
         },
       },
@@ -112,11 +112,11 @@ describe("HttpOpenCageDataAddressGateway", () => {
             city: "Saint-Denis",
             departmentCode: "974",
             postcode: "97400",
-            streetNumberAndAddress: "Rue Monthyon",
+            streetNumberAndAddress: "21 Rue Monthyon",
           },
           position: {
-            lat: -20.887709,
-            lon: 55.4542288,
+            lat: -20.887292,
+            lon: 55.455501,
           },
         },
       },
@@ -145,8 +145,8 @@ describe("HttpOpenCageDataAddressGateway", () => {
             streetNumberAndAddress: "",
           },
           position: {
-            lat: 48.8523202807309,
-            lon: 2.27127970033223,
+            lat: 48.8523073360927,
+            lon: 2.27125068377483,
           },
         },
       },
@@ -184,14 +184,14 @@ describe("HttpOpenCageDataAddressGateway", () => {
         candidateQuery: "rue Chanzy Lunévile 54300",
         expectedResult: {
           address: {
-            city: "Lunévile",
+            city: "Lunéville",
             departmentCode: "54",
             postcode: "54300",
-            streetNumberAndAddress: "rue Chanzy",
+            streetNumberAndAddress: "Rue du Général Chanzy",
           },
           position: {
-            lat: 0,
-            lon: 0,
+            lat: 48.596289,
+            lon: 6.489476,
           },
         },
       },
@@ -202,11 +202,11 @@ describe("HttpOpenCageDataAddressGateway", () => {
             city: "Remiremont",
             departmentCode: "88",
             postcode: "88200",
-            streetNumberAndAddress: "rue Chanzy",
+            streetNumberAndAddress: "Gros Chatelet",
           },
           position: {
-            lat: 0,
-            lon: 0,
+            lat: 48.01562,
+            lon: 6.600757,
           },
         },
       },
@@ -226,21 +226,35 @@ describe("HttpOpenCageDataAddressGateway", () => {
     );
 
     it("Should return expected address DTO when providing address with special characters.", async () => {
-      const resultPreviousNotFoundWithAddresseAPI =
-        await httpAddressGateway.lookupStreetAddress("Route d’Huez 38750 Huez");
-
-      expectTypeToMatchAndEqual(resultPreviousNotFoundWithAddresseAPI.at(0), {
-        address: {
-          city: "L'Alpe d'Huez",
-          departmentCode: "38",
-          postcode: "38750",
-          streetNumberAndAddress: "Route d'Huez",
-        },
-        position: {
-          lat: 45.0907535,
-          lon: 6.0631237,
-        },
-      });
+      expectTypeToMatchAndEqual(
+        await httpAddressGateway.lookupStreetAddress("Route d’Huez 38750 Huez"),
+        [
+          {
+            address: {
+              city: "Huez",
+              departmentCode: "38",
+              postcode: "38750",
+              streetNumberAndAddress: "",
+            },
+            position: {
+              lat: 45.082085,
+              lon: 6.059645,
+            },
+          },
+          {
+            address: {
+              city: "L'Alpe d'Huez",
+              departmentCode: "38",
+              postcode: "38750",
+              streetNumberAndAddress: "Route d'Huez",
+            },
+            position: {
+              lat: 45.0907535,
+              lon: 6.0631237,
+            },
+          },
+        ],
+      );
     });
     it("Should not support lookup address with only one char.", async () => {
       await expectPromiseToFailWithError(
