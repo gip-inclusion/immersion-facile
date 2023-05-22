@@ -12,7 +12,7 @@ export type FormFieldsObjectForContent<T> = Record<
 // Remove and replace by ConventionField when postalCode is removed from ConventionDTO
 type ConventionFieldWithoutPostalCode = Exclude<ConventionField, "postalCode">;
 
-type FormFieldKeys =
+export type FormFieldKeys =
   | ConventionFieldWithoutPostalCode
   | "isCurrentEmployer"
   | "isEstablishmentTutorIsEstablishmentRepresentative"
@@ -587,50 +587,180 @@ export const sidebarStepContent = (
       },
       {
         title: "Informations sur le candidat",
-        description:
-          "Candidats, vérifiez que votre structure d'accompagnement est disponible dans la liste ci-contre. Si ce n'est pas le cas, contactez votre conseiller.",
+        description: (
+          <>
+            <p>
+              Les informations de contact (email, téléphone) seront uniquement
+              utilisées pour valider la convention avec l’entreprise et
+              l’organisme d’accompagnement.
+            </p>
+            <p>
+              <strong>
+                Renseignez de préférence{" "}
+                <strong>un numéro de téléphone portable</strong> pour recevoir
+                les informations urgentes concernant la convention par SMS.
+              </strong>
+            </p>
+            <hr />
+            <p>
+              Le bouton “Vérifier les informations et envoyer la demande”
+              restera désactivé (en gris) tant que tous les champs obligatoires
+              ne seront pas remplis.
+            </p>
+          </>
+        ),
       },
       {
         title: "Informations sur l'entreprise",
-        description:
-          "Candidats, vérifiez que votre structure d'accompagnement est disponible dans la liste ci-contre. Si ce n'est pas le cas, contactez votre conseiller.",
+        description: (
+          <>
+            <p>
+              Les informations de contact (email, téléphone) seront uniquement
+              utilisées pour valider la convention avec l’entreprise et
+              l’organisme d’accompagnement.
+            </p>
+            <p>
+              <strong>
+                Renseignez de préférence{" "}
+                <strong>un numéro de téléphone portable</strong> pour recevoir
+                les informations urgentes concernant la convention par SMS.
+              </strong>
+            </p>
+            <hr />
+            <p>
+              Le bouton “Vérifier les informations et envoyer la demande”
+              restera désactivé (en gris) tant que tous les champs obligatoires
+              ne seront pas remplis.
+            </p>
+          </>
+        ),
       },
       {
         title: "Lieu et heures de l'immersion professionnelle",
-        description:
-          "Candidats, vérifiez que votre structure d'accompagnement est disponible dans la liste ci-contre. Si ce n'est pas le cas, contactez votre conseiller.",
+        description: (
+          <>
+            <p>
+              Le bouton “Vérifier les informations et envoyer la demande”
+              restera désactivé (en gris) tant que tous les champs obligatoires
+              ne seront pas remplis.
+            </p>
+          </>
+        ),
       },
       {
         title: "Détails de l'immersion professionnelle",
-        description:
-          "Candidats, vérifiez que votre structure d'accompagnement est disponible dans la liste ci-contre. Si ce n'est pas le cas, contactez votre conseiller.",
+        description: (
+          <>
+            <p>
+              Le bouton “Vérifier les informations et envoyer la demande”
+              restera désactivé (en gris) tant que tous les champs obligatoires
+              ne seront pas remplis.
+            </p>
+          </>
+        ),
       },
     ],
     "mini-stage-cci": [
       {
         title: "Informations sur la structure d'accompagnement du candidat",
-        description:
-          "Candidats, vérifiez que votre structure d'accompagnement est disponible dans la liste ci-contre. Si ce n'est pas le cas, contactez votre conseiller.",
+        description: (
+          <>
+            <p>
+              Vérifiez que votre structure d’accompagnement est disponible dans
+              la liste ci-dessous.{" "}
+              <strong>
+                Si ce n’est pas le cas, contactez votre conseiller.
+              </strong>
+            </p>
+            <p>
+              <strong>
+                Si vous n'avez pas de structure d'accompagnement, retrouvez{" "}
+                <a
+                  href="https://aide.immersion-facile.beta.gouv.fr/fr/article/je-nai-pas-de-structure-daccompagnement-et-je-veux-faire-une-immersion-1x15rdp"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  nos conseils ici
+                </a>
+                .
+              </strong>
+            </p>
+          </>
+        ),
       },
       {
         title: "Informations sur le candidat",
-        description:
-          "Candidats, vérifiez que votre structure d'accompagnement est disponible dans la liste ci-contre. Si ce n'est pas le cas, contactez votre conseiller.",
+        description: (
+          <>
+            <p>
+              Les informations de contact (email, téléphone) seront uniquement
+              utilisées pour valider la convention avec l’entreprise et
+              l’organisme d’accompagnement.
+            </p>
+            <p>
+              <strong>
+                Renseignez de préférence{" "}
+                <strong>un numéro de téléphone portable</strong> pour recevoir
+                les informations urgentes concernant la convention par SMS.
+              </strong>
+            </p>
+            <hr />
+            <p>
+              Le bouton “Vérifier les informations et envoyer la demande”
+              restera désactivé (en gris) tant que tous les champs obligatoires
+              ne seront pas remplis.
+            </p>
+          </>
+        ),
       },
       {
         title: "Informations sur l'entreprise",
-        description:
-          "Candidats, vérifiez que votre structure d'accompagnement est disponible dans la liste ci-contre. Si ce n'est pas le cas, contactez votre conseiller.",
+        description: (
+          <>
+            <p>
+              Les informations de contact (email, téléphone) seront uniquement
+              utilisées pour valider la convention avec l’entreprise et
+              l’organisme d’accompagnement.
+            </p>
+            <p>
+              <strong>
+                Renseignez de préférence{" "}
+                <strong>un numéro de téléphone portable</strong> pour recevoir
+                les informations urgentes concernant la convention par SMS.
+              </strong>
+            </p>
+            <hr />
+            <p>
+              Le bouton “Vérifier les informations et envoyer la demande”
+              restera désactivé (en gris) tant que tous les champs obligatoires
+              ne seront pas remplis.
+            </p>
+          </>
+        ),
       },
       {
         title: "Lieu et heures de l'immersion professionnelle",
-        description:
-          "Candidats, vérifiez que votre structure d'accompagnement est disponible dans la liste ci-contre. Si ce n'est pas le cas, contactez votre conseiller.",
+        description: (
+          <>
+            <p>
+              Le bouton “Vérifier les informations et envoyer la demande”
+              restera désactivé (en gris) tant que tous les champs obligatoires
+              ne seront pas remplis.
+            </p>
+          </>
+        ),
       },
       {
         title: "Détails de l'immersion professionnelle",
-        description:
-          "Candidats, vérifiez que votre structure d'accompagnement est disponible dans la liste ci-contre. Si ce n'est pas le cas, contactez votre conseiller.",
+        description: (
+          <>
+            <p>
+              Le bouton “Vérifier les informations et envoyer la demande”
+              restera désactivé (en gris) tant que tous les champs obligatoires
+              ne seront pas remplis.
+            </p>
+          </>
+        ),
       },
     ],
   };
