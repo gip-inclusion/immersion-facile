@@ -30,7 +30,9 @@ jobs:
     uses: ./.github/workflows/cd-discord-notification.yml
     with:
       environment: dev
-      tag: v404
+      tag: vTodo
+    secrets:
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
 
   merge-to-staging:
     needs: [deploy-dev]
