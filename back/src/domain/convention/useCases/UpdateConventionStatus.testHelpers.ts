@@ -298,7 +298,7 @@ export const testForAllRolesAndInitialStatusCases = ({
   nextDate,
   updateStatusParams,
 }: TestAllCaseProps) => {
-  const [allowToRejectRoles, notAllowedToRejectRoles] =
+  const [allowedRolesToUpdate, notAllowedRolesToUpdate] =
     splitCasesBetweenPassingAndFailing(allRoles, allowedRoles);
 
   const [authorizedInitialStatuses, forbiddenInitalStatuses] =
@@ -308,7 +308,7 @@ export const testForAllRolesAndInitialStatusCases = ({
     );
 
   const someValidInitialStatus = authorizedInitialStatuses[0];
-  const someValidRole = allowToRejectRoles[0];
+  const someValidRole = allowedRolesToUpdate[0];
 
   //RIGHT PATHS
   const testAcceptsStatusUpdate = makeTestAcceptsStatusUpdate({
@@ -342,8 +342,8 @@ export const testForAllRolesAndInitialStatusCases = ({
     targetStatus: updateStatusParams.status,
   });
 
-  if (notAllowedToRejectRoles.length) {
-    it.each(notAllowedToRejectRoles.map((role) => ({ role })))(
+  if (notAllowedRolesToUpdate.length) {
+    it.each(notAllowedRolesToUpdate.map((role) => ({ role })))(
       "Rejected from '$role'",
       ({ role }) =>
         testRejectsStatusUpdate({
