@@ -1,8 +1,23 @@
 /* eslint-disable jest/require-top-level-describe */
 /* eslint-disable jest/consistent-test-it */
 
-import { expectPromiseToFailWithError } from "shared";
+import {
+  ConventionDtoBuilder,
+  expectPromiseToFailWithError,
+  expectToEqual,
+} from "shared";
+import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
+import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
+import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
+import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
+import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import {
+  CreateNewEvent,
+  makeCreateNewEvent,
+} from "../../core/eventBus/EventBus";
+import { UpdateConventionStatus } from "./UpdateConventionStatus";
 import {
   executeUpdateConventionStatusUseCase,
   setupInitialState,
@@ -11,6 +26,34 @@ import {
 
 describe("UpdateConventionStatus", () => {
   describe("* -> DRAFT transition", () => {
+    let uowPerformer: InMemoryUowPerformer;
+    let timeGateway: CustomTimeGateway;
+    let outboxRepo: InMemoryOutboxRepository;
+    let createNewEvent: CreateNewEvent;
+    let conventionRepository: InMemoryConventionRepository;
+    let updateConventionStatus: UpdateConventionStatus;
+
+    beforeEach(() => {
+      const uow = createInMemoryUow();
+
+      outboxRepo = uow.outboxRepository;
+
+      timeGateway = new CustomTimeGateway();
+
+      createNewEvent = makeCreateNewEvent({
+        timeGateway,
+        uuidGenerator: new TestUuidGenerator(),
+      });
+
+      conventionRepository = uow.conventionRepository;
+      uowPerformer = new InMemoryUowPerformer(uow);
+      updateConventionStatus = new UpdateConventionStatus(
+        uowPerformer,
+        createNewEvent,
+        timeGateway,
+      );
+    });
+
     testForAllRolesAndInitialStatusCases({
       updateStatusParams: {
         status: "DRAFT",
@@ -39,6 +82,38 @@ describe("UpdateConventionStatus", () => {
         "IN_REVIEW",
         "ACCEPTED_BY_COUNSELLOR",
       ],
+    });
+    it("save a ImmersionApplicationRequiresModification event only with the role of the user that request the change in the payload", async () => {
+      const conventionId = "1111222233334444";
+      const requesterRole = "beneficiary";
+
+      const conventionBuilder = new ConventionDtoBuilder()
+        .withStatus("READY_TO_SIGN")
+        .withId(conventionId)
+        .build();
+
+      await conventionRepository.save(conventionBuilder);
+
+      await updateConventionStatus.execute(
+        { status: "DRAFT", statusJustification: "because" },
+        { conventionId, role: requesterRole },
+      );
+
+      const convention = await conventionRepository.getById(conventionId);
+
+      expect(outboxRepo.events).toHaveLength(1);
+
+      expectToEqual(
+        outboxRepo.events[0],
+        createNewEvent({
+          topic: "ImmersionApplicationRequiresModification",
+          payload: {
+            convention,
+            justification: "because",
+            roles: [requesterRole],
+          },
+        }),
+      );
     });
   });
 
