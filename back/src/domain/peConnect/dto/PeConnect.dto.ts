@@ -1,10 +1,17 @@
-import { Beneficiary, FederatedIdentityProvider, InternshipKind } from "shared";
+import {
+  Beneficiary,
+  FederatedIdentityProvider,
+  InternshipKind,
+  notJobSeeker,
+  PeConnectToken,
+  PeExternalId,
+} from "shared";
 import { EntityFromDto } from "../../core/EntityFromDto";
 import { PeConnectImmersionAdvisorDto } from "./PeConnectAdvisor.dto";
 import { PeConnectUserDto } from "./PeConnectUser.dto";
 
 export type ConventionPoleEmploiUserAdvisorDto = {
-  peExternalId: string;
+  peExternalId: PeExternalId;
   conventionId: string;
   advisor?: PeConnectImmersionAdvisorDto;
 };
@@ -14,11 +21,13 @@ export type ConventionPoleEmploiUserAdvisorEntity = EntityFromDto<
   "ConventionPoleEmploiAdvisor"
 >;
 
-export type ConventionPeConnectFields = Pick<
+type BeneficiaryBasicIdentity = Pick<
   Beneficiary<InternshipKind>,
   "email" | "firstName" | "lastName"
-> & {
-  fedId: string;
+>;
+
+export type ConventionPeConnectFields = BeneficiaryBasicIdentity & {
+  fedId: PeConnectToken;
   fedIdProvider: FederatedIdentityProvider;
 };
 
@@ -33,6 +42,8 @@ export const toPartialConventionDtoWithPeIdentity = (
   email: peConnectUserInfo.email || "",
   firstName: peConnectUserInfo.firstName,
   lastName: peConnectUserInfo.lastName,
-  fedId: peConnectUserInfo.peExternalId,
+  fedId: peConnectUserInfo.isJobseeker
+    ? peConnectUserInfo.peExternalId
+    : notJobSeeker,
   fedIdProvider: "peConnect",
 });

@@ -6,6 +6,7 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useStyles } from "tss-react/dsfr";
 import {
+  Beneficiary,
   ConventionDto,
   ConventionMagicLinkPayload,
   ConventionReadDto,
@@ -15,6 +16,7 @@ import {
   isBeneficiaryMinor,
   isEstablishmentTutorIsEstablishmentRepresentative,
   isPeConnectIdentity,
+  notJobSeeker,
 } from "shared";
 import { SubmitConfirmationSection } from "react-design-system";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
@@ -32,6 +34,7 @@ import { useMatomo } from "src/app/hooks/useMatomo";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 
@@ -85,22 +88,15 @@ export const ConventionForm = ({
   const { cx } = useStyles();
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
 
-  const peConnectIdentity =
-    federatedIdentity && isPeConnectIdentity(federatedIdentity)
-      ? federatedIdentity
-      : undefined;
-
   const [initialValues] = useState<ConventionPresentation>({
     ...conventionProperties,
 
     signatories: {
       ...conventionProperties.signatories,
-      beneficiary: {
-        ...conventionProperties.signatories.beneficiary,
-        federatedIdentity:
-          conventionProperties.signatories.beneficiary.federatedIdentity ??
-          peConnectIdentity,
-      },
+      beneficiary: makeInitialBenefiaryForm(
+        conventionProperties.signatories.beneficiary,
+        federatedIdentity,
+      ),
     },
   });
 
@@ -223,4 +219,23 @@ export const ConventionForm = ({
       </div>
     </div>
   );
+};
+
+const makeInitialBenefiaryForm = (
+  beneficiary: Beneficiary<"immersion" | "mini-stage-cci">,
+  federatedIdentityWithUser: FederatedIdentityWithUser | null,
+): Beneficiary<"immersion" | "mini-stage-cci"> => {
+  const { federatedIdentity, ...beneficiaryOtherProperties } = beneficiary;
+  const peConnectIdentity =
+    federatedIdentityWithUser && isPeConnectIdentity(federatedIdentityWithUser)
+      ? federatedIdentityWithUser
+      : undefined;
+  const federatedIdentityValue = federatedIdentity ?? peConnectIdentity;
+
+  return {
+    ...beneficiaryOtherProperties,
+    ...(federatedIdentityValue?.token !== notJobSeeker && {
+      federatedIdentity: federatedIdentityValue,
+    }),
+  };
 };

@@ -1,4 +1,5 @@
 import {
+  authFailed,
   ConventionDto,
   conventionSchema,
   isPeConnectIdentity,
@@ -26,7 +27,7 @@ export class BindConventionToFederatedIdentity extends TransactionalUseCase<Conv
       convention.signatories.beneficiary.federatedIdentity;
 
     return isPeConnectIdentity(federatedIdentity) &&
-      federatedIdentity.token !== "AuthFailed"
+      federatedIdentity.token !== authFailed
       ? this.associateConventionToFederatedIdentity(
           convention,
           federatedIdentity,

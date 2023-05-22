@@ -1,4 +1,5 @@
 import {
+  authFailed,
   ConventionDtoBuilder,
   expectObjectsToMatch,
   expectToEqual,
@@ -63,7 +64,7 @@ describe("AssociatePeConnectFederatedIdentity", () => {
   it("authfailed", async () => {
     const conventionDtoFromEvent = new ConventionDtoBuilder()
       .withId(conventionId)
-      .withFederatedIdentity({ provider: "peConnect", token: "AuthFailed" })
+      .withFederatedIdentity({ provider: "peConnect", token: authFailed })
       .build();
 
     await associatePeConnectFederatedIdentity.execute(conventionDtoFromEvent);
