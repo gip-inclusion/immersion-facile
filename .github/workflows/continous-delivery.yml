@@ -20,13 +20,14 @@ jobs:
       tag: "v${{ github.run_number }}"
 
   tag:
+    name: "Tag"
     uses: ./.github/workflows/ci-add-tag.yml
     with:
       tag: "v${{ github.run_number }}"
 
   deploy-dev:
     name: Deploy dev
-    needs: [validation, tag-version, build-front-artefact, build-back-artefact]
+    needs: [validation, tag, build-front-artefact, build-back-artefact]
     uses: ./.github/workflows/deploy-to-scalingo.yml
     with:
       environment: dev
