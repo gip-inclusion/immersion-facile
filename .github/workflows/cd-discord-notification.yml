@@ -1,20 +1,6 @@
 name: Discord Notification
 
 on:
-  #  workflow_dispatch:
-  #    inputs:
-  #      tag:
-  #        type: string
-  #        required: true
-  #        description: The version tag
-  #      environment:
-  #        type: string
-  #        description: Environment to send notification to. Will change the discord chanel to notify.
-  #        required: true
-  #      DISCORD_WEBHOOK_URL:
-  #        type: string
-  #        description: Discord webhook URL
-  #        required: true
   workflow_call:
     inputs:
       tag:
@@ -24,6 +10,9 @@ on:
       environment:
         type: string
         description: Environment to send notification to. Will change the discord chanel to notify.
+        required: true
+    secrets:
+      DISCORD_WEBHOOK_URL:
         required: true
 
 jobs:
