@@ -7,17 +7,9 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { keys } from "ramda";
-import {
-  ConventionReadDto,
-  domElementIds,
-  Signatory,
-  toDotNotation,
-} from "shared";
+import { ConventionReadDto, domElementIds, toDotNotation } from "shared";
 import { ErrorNotifications } from "react-design-system";
-import { ConventionFrozenMessage } from "src/app/components/forms/convention/ConventionFrozenMessage";
-import { ConventionSignOnlyMessage } from "src/app/components/forms/convention/ConventionSignOnlyMessage";
 import { makeValuesToWatchInUrl } from "src/app/components/forms/convention/makeValuesToWatchInUrl";
-import { SignatureActions } from "src/app/components/forms/convention/SignatureActions";
 import { useConventionWatchValuesInUrl } from "src/app/components/forms/convention/useConventionWatchValuesInUrl";
 import {
   formConventionFieldsLabels,
@@ -41,21 +33,12 @@ import { ImmersionHourLocationSection } from "./sections/hour-location/Immersion
 import { ImmersionDetailsSection } from "./sections/immersion-details/ImmersionDetailsSection";
 
 type ConventionFieldsProps = {
-  isFrozen?: boolean;
   onSubmit: SubmitHandler<ConventionReadDto>;
   onModificationsRequired?: () => void; //< called when the form is sent back for modifications in signature mode
-} & (
-  | { isSignOnly: true; signatory: Signatory }
-  | { isSignOnly?: false; signatory?: undefined }
-);
+};
 
 export const ConventionFormFields = ({
-  isFrozen,
   onSubmit,
-  isSignOnly: isSignatureMode,
-  signatory,
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  onModificationsRequired = async () => {},
 }: ConventionFieldsProps): JSX.Element => {
   const {
     setValue,
@@ -83,8 +66,6 @@ export const ConventionFormFields = ({
       setValue("agencyId", preselectedAgencyId);
     }
   }, [preselectedAgencyId]);
-
-  const alreadySigned = !!signatory?.signedAt;
 
   const { enablePeConnectApi } = useFeatureFlags();
   const watchedValues = makeValuesToWatchInUrl(conventionValues);
@@ -160,13 +141,6 @@ export const ConventionFormFields = ({
   };
   return (
     <>
-      {isFrozen && !isSignatureMode && <ConventionFrozenMessage />}
-      {isFrozen && isSignatureMode && (
-        <ConventionSignOnlyMessage
-          isAlreadySigned={alreadySigned ?? false}
-          internshipKind={conventionValues.internshipKind}
-        />
-      )}
       <input
         type="hidden"
         {...formContents["signatories.beneficiary.federatedIdentity"]}
@@ -181,7 +155,6 @@ export const ConventionFormFields = ({
               internshipKind={conventionValues.internshipKind}
               agencyId={conventionValues.agencyId}
               enablePeConnectApi={enablePeConnectApi}
-              isFrozen={isFrozen}
             />
           </Accordion>
         )}
@@ -191,7 +164,6 @@ export const ConventionFormFields = ({
           {...makeAccordionProps(2)}
         >
           <BeneficiaryFormSection
-            isFrozen={isFrozen}
             internshipKind={conventionValues.internshipKind}
           />
         </Accordion>
@@ -199,7 +171,7 @@ export const ConventionFormFields = ({
           label={renderSectionTitle(t.establishmentSection.title, 3)}
           {...makeAccordionProps(3)}
         >
-          <EstablishmentFormSection isFrozen={isFrozen} />
+          <EstablishmentFormSection />
         </Accordion>
         <Accordion
           label={renderSectionTitle(t.immersionHourLocationSection.title, 4)}
@@ -211,67 +183,61 @@ export const ConventionFormFields = ({
           label={renderSectionTitle(t.immersionDetailsSection.title, 5)}
           {...makeAccordionProps(5)}
         >
-          <ImmersionDetailsSection disabled={isFrozen} />
+          <ImmersionDetailsSection />
         </Accordion>
       </div>
 
-      {!isFrozen && (
-        <Alert
-          small
-          severity="warning"
-          className={fr.cx("fr-my-2w")}
-          description={
-            <ol>
-              <li>
-                Une fois le formulaire envoyé, chaque signataire de la
-                convention va recevoir un email.
-              </li>
-              <li>
-                Pensez à vérifier votre boîte email et votre dossier de spams.
-              </li>
-              <li>
-                Pensez également à informer les autres signataires de la
-                convention qu'ils devront vérifier leur boîte email et leur
-                dossier de spams.
-              </li>
-            </ol>
-          }
-        />
-      )}
-      {!isSignatureMode && (
-        <ErrorNotifications
-          labels={getFormErrors()}
-          errors={toDotNotation(formErrorsToFlatErrors(errors))}
-          visible={submitCount !== 0 && Object.values(errors).length > 0}
-        />
-      )}
+      <Alert
+        small
+        severity="warning"
+        className={fr.cx("fr-my-2w")}
+        description={
+          <ol>
+            <li>
+              Une fois le formulaire envoyé, chaque signataire de la convention
+              va recevoir un email.
+            </li>
+            <li>
+              Pensez à vérifier votre boîte email et votre dossier de spams.
+            </li>
+            <li>
+              Pensez également à informer les autres signataires de la
+              convention qu'ils devront vérifier leur boîte email et leur
+              dossier de spams.
+            </li>
+          </ol>
+        }
+      />
+      <ErrorNotifications
+        labels={getFormErrors()}
+        errors={toDotNotation(formErrorsToFlatErrors(errors))}
+        visible={submitCount !== 0 && Object.values(errors).length > 0}
+      />
 
-      {!isFrozen && !isSignatureMode && (
-        <div className={fr.cx("fr-mt-4w")}>
-          <Button
-            disabled={shouldSubmitButtonBeDisabled}
-            iconId="fr-icon-checkbox-circle-line"
-            iconPosition="left"
-            type="button"
-            nativeButtonProps={{
-              id: domElementIds.conventionImmersionRoute.submitFormButton,
-            }}
-            onClick={handleSubmit(
-              (values) => {
-                setValue("status", "READY_TO_SIGN");
-                return onSubmit({ ...values, status: "READY_TO_SIGN" });
-              },
-              (errors) => {
-                // eslint-disable-next-line no-console
-                console.error(getValues(), errors);
-              },
-            )}
-          >
-            Envoyer la demande
-          </Button>
-        </div>
-      )}
-      {isSignatureMode && (
+      <div className={fr.cx("fr-mt-4w")}>
+        <Button
+          disabled={shouldSubmitButtonBeDisabled}
+          iconId="fr-icon-checkbox-circle-line"
+          iconPosition="left"
+          type="button"
+          nativeButtonProps={{
+            id: domElementIds.conventionImmersionRoute.submitFormButton,
+          }}
+          onClick={handleSubmit(
+            (values) => {
+              setValue("status", "READY_TO_SIGN");
+              return onSubmit({ ...values, status: "READY_TO_SIGN" });
+            },
+            (errors) => {
+              // eslint-disable-next-line no-console
+              console.error(getValues(), errors);
+            },
+          )}
+        >
+          Envoyer la demande
+        </Button>
+      </div>
+      {/* {isSignatureMode && (
         <>
           {alreadySigned ? (
             <p>{t.conventionAlreadySigned}</p>
@@ -288,7 +254,7 @@ export const ConventionFormFields = ({
             />
           )}
         </>
-      )}
+      )} */}
     </>
   );
 };

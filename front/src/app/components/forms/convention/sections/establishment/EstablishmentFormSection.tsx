@@ -18,13 +18,7 @@ import { EstablishementTutorFields } from "./EstablishementTutorFields";
 import { EstablishmentBusinessFields } from "./EstablishmentBusinessFields";
 import { EstablishmentRepresentativeFields } from "./EstablishmentRepresentativeFields";
 
-type EstablishmentFormSectionParams = {
-  isFrozen: boolean | undefined;
-};
-
-export const EstablishmentFormSection = ({
-  isFrozen,
-}: EstablishmentFormSectionParams): JSX.Element => {
+export const EstablishmentFormSection = (): JSX.Element => {
   useTutorIsEstablishmentRepresentative();
 
   const dispatch = useDispatch();
@@ -52,7 +46,7 @@ export const EstablishmentFormSection = ({
         description={t.establishmentSection.subtitle}
       />
 
-      <EstablishmentBusinessFields disabled={isFrozen || isFetchingSiret} />
+      <EstablishmentBusinessFields disabled={isFetchingSiret} />
       <RadioButtons
         legend={
           formContents.isEstablishmentTutorIsEstablishmentRepresentative.label
@@ -76,13 +70,11 @@ export const EstablishmentFormSection = ({
             },
           },
         }))}
-        disabled={isFrozen || isFetchingSiret}
+        disabled={isFetchingSiret}
       />
-      <EstablishementTutorFields disabled={isFrozen} />
+      <EstablishementTutorFields />
       {!isTutorEstablishmentRepresentative && (
-        <EstablishmentRepresentativeFields
-          disabled={isFrozen || isFetchingSiret}
-        />
+        <EstablishmentRepresentativeFields disabled={isFetchingSiret} />
       )}
     </>
   );

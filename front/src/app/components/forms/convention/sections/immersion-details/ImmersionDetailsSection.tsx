@@ -11,11 +11,7 @@ import { formConventionFieldsLabels } from "src/app/contents/forms/convention/fo
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { useSiretRelatedField } from "src/app/hooks/siret.hooks";
 
-export const ImmersionDetailsSection = ({
-  disabled,
-}: {
-  disabled?: boolean;
-}) => {
+export const ImmersionDetailsSection = () => {
   const { setValue, getValues, register } = useFormContext<ConventionReadDto>();
   const values = getValues();
   const isSiretFetcherDisabled = values.status !== "DRAFT";
@@ -53,7 +49,6 @@ export const ImmersionDetailsSection = ({
             },
           },
         }))}
-        disabled={disabled}
       />
 
       {values.internshipKind === "mini-stage-cci" && (
@@ -93,7 +88,6 @@ export const ImmersionDetailsSection = ({
             },
           },
         }))}
-        disabled={disabled}
       />
 
       <Input
@@ -103,7 +97,6 @@ export const ImmersionDetailsSection = ({
           ...formContents["sanitaryPreventionDescription"],
           ...register("sanitaryPreventionDescription"),
         }}
-        disabled={disabled}
       />
       {values.internshipKind === "mini-stage-cci" && (
         <Alert
@@ -136,12 +129,10 @@ export const ImmersionDetailsSection = ({
               value: option,
             },
           }))}
-        disabled={disabled}
       />
 
       <ConventionFormProfession
         {...formContents["immersionAppellation"]}
-        disabled={disabled}
         initialFieldValue={values.immersionAppellation}
       />
       <Input
@@ -152,7 +143,6 @@ export const ImmersionDetailsSection = ({
           ...formContents["workConditions"],
           ...register("workConditions"),
         }}
-        disabled={disabled}
       />
       <Input
         label={formContents["businessAdvantages"].label}
@@ -162,7 +152,6 @@ export const ImmersionDetailsSection = ({
           ...formContents["businessAdvantages"],
           ...register("businessAdvantages"),
         }}
-        disabled={disabled}
       />
       <Input
         label={formContents["immersionActivities"].label}
@@ -172,7 +161,6 @@ export const ImmersionDetailsSection = ({
           ...formContents["immersionActivities"],
           ...register("immersionActivities"),
         }}
-        disabled={disabled}
       />
       {values.internshipKind === "mini-stage-cci" && (
         <Alert
@@ -195,7 +183,6 @@ export const ImmersionDetailsSection = ({
           ...formContents["immersionSkills"],
           ...register("immersionSkills"),
         }}
-        disabled={disabled}
       />
     </>
   );

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import { Select, type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import {
   AgencyOption,
@@ -18,6 +19,8 @@ import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { agencyGateway } from "src/config/dependencies";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
+import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { AgencyErrorText } from "./AgencyErrorText";
 
 type AgencySelectorProps = {
@@ -44,10 +47,13 @@ export const AgencySelector = ({
     setValue,
     formState: { errors, touchedFields },
   } = useFormContext<ConventionReadDto>();
-  const agencyDepartment = getValues().agencyDepartment;
+  const agencyDepartmentStored = useAppSelector(
+    conventionSelectors.agencyDepartment,
+  );
+  const agencyDepartment = getValues("agencyDepartment");
   const [isLoading, setIsLoading] = useState(false);
   const [loadingError, setLoadingError] = useState(false);
-
+  const dispatch = useDispatch();
   const [agencies, setAgencies] = useState([
     {
       id: "",
@@ -61,7 +67,11 @@ export const AgencySelector = ({
 
   useEffect(() => {
     if (!agencyDepartment) return;
-
+    dispatch(
+      conventionSlice.actions.agencyDepartementChangeRequested(
+        agencyDepartment,
+      ),
+    );
     setIsLoading(true);
     agenciesRetriever({
       internshipKind,
@@ -93,6 +103,13 @@ export const AgencySelector = ({
         setIsLoading(false);
       });
   }, [agencyDepartment]);
+
+  useEffect(() => {
+    if (agencyDepartmentStored) {
+      setValue(agencyDepartmentName, agencyDepartmentStored);
+    }
+  }, [agencyDepartmentStored]);
+
   const error = errors[agencyIdName];
   const touched = touchedFields[agencyIdName];
   const userError = touched && error;

@@ -28,11 +28,9 @@ import { BeneficiaryEmergencyContactFields } from "./BeneficiaryEmergencyContact
 import { BeneficiaryRepresentativeFields } from "./BeneficiaryRepresentativeFields";
 
 type beneficiaryFormSectionProperties = {
-  isFrozen: boolean | undefined;
   internshipKind: InternshipKind;
 };
 export const BeneficiaryFormSection = ({
-  isFrozen,
   internshipKind,
 }: beneficiaryFormSectionProperties): JSX.Element => {
   const isMinor = useAppSelector(conventionSelectors.isMinor);
@@ -108,7 +106,7 @@ export const BeneficiaryFormSection = ({
           ...register("signatories.beneficiary.firstName"),
           ...(userFieldsAreFilled ? { value: connectedUser.firstName } : {}),
         }}
-        disabled={isFrozen || userFieldsAreFilled}
+        disabled={userFieldsAreFilled}
         {...getFieldError("signatories.beneficiary.firstName")}
       />
       <Input
@@ -119,14 +117,13 @@ export const BeneficiaryFormSection = ({
           ...register("signatories.beneficiary.lastName"),
           ...(userFieldsAreFilled ? { value: connectedUser.lastName } : {}),
         }}
-        disabled={isFrozen || userFieldsAreFilled}
+        disabled={userFieldsAreFilled}
         {...getFieldError("signatories.beneficiary.lastName")}
       />
 
       <Input
         hintText={formContents["signatories.beneficiary.birthdate"].hintText}
         label={formContents["signatories.beneficiary.birthdate"].label}
-        disabled={isFrozen}
         nativeInputProps={{
           ...formContents["signatories.beneficiary.birthdate"],
           ...register("signatories.beneficiary.birthdate"),
@@ -138,7 +135,7 @@ export const BeneficiaryFormSection = ({
       <EmailValidationInput
         hintText={formContents["signatories.beneficiary.email"].hintText}
         label={formContents["signatories.beneficiary.email"].label}
-        disabled={isFrozen || userFieldsAreFilled}
+        disabled={userFieldsAreFilled}
         nativeInputProps={{
           ...formContents["signatories.beneficiary.email"],
           ...register("signatories.beneficiary.email"),
@@ -156,7 +153,6 @@ export const BeneficiaryFormSection = ({
           ...register("signatories.beneficiary.phone"),
           type: "tel",
         }}
-        disabled={isFrozen}
         {...getFieldError("signatories.beneficiary.phone")}
       />
       {values.internshipKind === "mini-stage-cci" && (
@@ -165,7 +161,6 @@ export const BeneficiaryFormSection = ({
           hint={
             formContents["signatories.beneficiary.levelOfEducation"].hintText
           }
-          disabled={isFrozen}
           options={levelsOfEducationToSelectOption}
           nativeSelectProps={{
             ...formContents["signatories.beneficiary.levelOfEducation"],
@@ -187,13 +182,11 @@ export const BeneficiaryFormSection = ({
           ...formContents["signatories.beneficiary.financiaryHelp"],
           ...register("signatories.beneficiary.financiaryHelp"),
         }}
-        disabled={isFrozen}
         {...getFieldError("signatories.beneficiary.financiaryHelp")}
       />
       <RadioButtons
         legend={formContents.isMinor.label}
         hintText={formContents.isMinor.hintText}
-        disabled={isFrozen}
         options={booleanSelectOptions.map((option) => ({
           ...option,
           nativeInputProps: {
@@ -209,12 +202,11 @@ export const BeneficiaryFormSection = ({
           },
         }))}
       />
-      {isMinor && <BeneficiaryRepresentativeFields disabled={isFrozen} />}
+      {isMinor && <BeneficiaryRepresentativeFields />}
 
       <RadioButtons
         legend={formContents["signatories.beneficiary.isRqth"].label}
         hintText={formContents["signatories.beneficiary.isRqth"].hintText}
-        disabled={isFrozen}
         options={booleanSelectOptions.map((option) => ({
           ...option,
           nativeInputProps: {
@@ -233,12 +225,11 @@ export const BeneficiaryFormSection = ({
         }))}
       />
 
-      {!isMinor && <BeneficiaryEmergencyContactFields disabled={isFrozen} />}
+      {!isMinor && <BeneficiaryEmergencyContactFields />}
 
       {internshipKind !== "mini-stage-cci" && (
         <>
           <RadioButtons
-            disabled={isFrozen}
             legend={formContents.isCurrentEmployer.label}
             hintText={formContents.isCurrentEmployer.hintText}
             options={booleanSelectOptions.map((option) => ({
@@ -258,9 +249,7 @@ export const BeneficiaryFormSection = ({
             }))}
           />
 
-          {hasCurrentEmployer && (
-            <BeneficiaryCurrentEmployerFields disabled={isFrozen} />
-          )}
+          {hasCurrentEmployer && <BeneficiaryCurrentEmployerFields />}
         </>
       )}
     </>

@@ -161,6 +161,7 @@ export const conventionInitialValuesFromUrl = ({
           }
         : undefined,
     },
+    agencyId: params.agencyId ?? undefined,
     agencyDepartment: params.agencyDepartment ?? "",
     dateStart,
     dateEnd,
@@ -175,7 +176,6 @@ export const conventionInitialValuesFromUrl = ({
         end: new Date(dateEnd),
       }),
     immersionAddress: params.immersionAddress ?? "",
-    agencyId: params.agencyId ?? undefined,
     workConditions: params.workConditions ?? "",
     businessAdvantages: params.businessAdvantages ?? "",
 
@@ -260,9 +260,6 @@ const devPrefilledValues = (
       email: tutor.email || defaultTutor.email,
       job: tutor.job || defaultTutor.job,
     },
-
-    // Participant
-    postalCode: emptyForm.postalCode || "75001",
 
     // Enterprise
     siret: emptyForm.siret || "1234567890123",

@@ -38,6 +38,7 @@ export interface ConventionState {
     hasCurrentEmployer: boolean;
     currentStep: number;
     showSummary: boolean;
+    agencyDepartment: string | null;
   };
   jwt: string | null;
   isLoading: boolean;
@@ -56,6 +57,7 @@ export const initialConventionState: ConventionState = {
     hasCurrentEmployer: false,
     currentStep: 1,
     showSummary: false,
+    agencyDepartment: null,
   },
   jwt: null,
   convention: null,
@@ -94,10 +96,21 @@ export const conventionSlice = createSlice({
   reducers: {
     showSummaryChangeRequested: (
       state,
-      action: PayloadAction<ConventionReadDto>,
+      action: PayloadAction<{
+        showSummary: boolean;
+        convention?: ConventionReadDto;
+      }>,
     ) => {
-      state.formUi.showSummary = true;
-      state.convention = action.payload;
+      state.formUi.showSummary = action.payload.showSummary;
+      if (action.payload.convention) {
+        state.convention = action.payload.convention;
+      }
+    },
+    agencyDepartementChangeRequested: (
+      state,
+      action: PayloadAction<string>,
+    ) => {
+      state.formUi.agencyDepartment = action.payload;
     },
     // Save convention
     saveConventionRequested: (state, _action: PayloadAction<ConventionDto>) => {
