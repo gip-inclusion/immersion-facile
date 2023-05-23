@@ -37,9 +37,10 @@ export class EmailableEmailValidationGateway implements EmailValidationGetaway {
         }),
       }))
       .catch((error) => {
-        logger.error("validateEmail => Error while calling emailable API ", {
-          error,
-        });
+        logger.error(
+          { email, error },
+          "validateEmail => Error while calling emailable API ",
+        );
         throw error;
       });
   }
