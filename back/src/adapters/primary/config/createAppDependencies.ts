@@ -119,5 +119,7 @@ export const createAppDependencies = async (config: AppConfig) => {
     eventCrawler: createEventCrawler(config, uowPerformer, eventBus),
     uuidGenerator,
     inMemoryUow,
+    uowPerformer,
+    getPgPoolFn,
   };
 };
