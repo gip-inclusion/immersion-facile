@@ -1,5 +1,6 @@
 import { z } from "zod";
 import {
+  AgencyDto,
   allRoles,
   ConventionDto,
   conventionSchema,
@@ -54,7 +55,11 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
     }
 
     for (const role of roles) {
-      const email = emailByRoleForConventionNeedsModification(role, convention);
+      const email = emailByRoleForConventionNeedsModification(
+        role,
+        convention,
+        agency,
+      );
       if (email instanceof Error) throw email;
 
       const conventionMagicLinkPayload: CreateConventionMagicLinkPayloadProperties =
@@ -101,18 +106,28 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
 const emailByRoleForConventionNeedsModification = (
   role: Role,
   convention: ConventionDto,
+  agency: AgencyDto,
 ): string | Error => {
   const error = new Error(
     `Unsupported role for beneficiary/enterprise modification request notification: ${role}`,
   );
+  const missingEmailError = new Error(`Email adress not found for: ${role}`);
   const strategy: Record<Role, string | Error> = {
     backOffice: error,
-    "beneficiary-current-employer": error,
-    "beneficiary-representative": error,
+    "beneficiary-current-employer": convention.signatories
+      .beneficiaryCurrentEmployer
+      ? convention.signatories.beneficiaryCurrentEmployer.email
+      : missingEmailError,
+    "beneficiary-representative": convention.signatories
+      .beneficiaryRepresentative
+      ? convention.signatories.beneficiaryRepresentative.email
+      : missingEmailError,
     "establishment-tutor": error,
-    "legal-representative": error,
-    counsellor: error,
-    validator: error,
+    "legal-representative": convention.signatories.beneficiaryRepresentative
+      ? convention.signatories.beneficiaryRepresentative.email
+      : missingEmailError,
+    counsellor: agency.counsellorEmails[0],
+    validator: agency.validatorEmails[0],
     "establishment-representative":
       convention.signatories.establishmentRepresentative.email,
     establishment: convention.signatories.establishmentRepresentative.email,

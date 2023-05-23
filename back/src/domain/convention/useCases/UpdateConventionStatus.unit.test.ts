@@ -83,7 +83,7 @@ describe("UpdateConventionStatus", () => {
         "ACCEPTED_BY_COUNSELLOR",
       ],
     });
-    it("save a ImmersionApplicationRequiresModification event only with the role of the user that request the change in the payload", async () => {
+    it("ImmersionApplicationRequiresModification event only has the role of the user that requested the change", async () => {
       const conventionId = "1111222233334444";
       const requesterRole = "beneficiary";
 
