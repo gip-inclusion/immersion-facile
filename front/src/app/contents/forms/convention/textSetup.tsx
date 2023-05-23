@@ -11,6 +11,10 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
       internshipKind === "immersion"
         ? "Remplir la demande de convention"
         : "S’informer sur les métiers, découvrir l’entreprise",
+    conventionSignTitle:
+      internshipKind === "immersion"
+        ? "Signer la convention d'immersion"
+        : "Signer la convention de stage",
     welcome:
       internshipKind === "immersion" ? (
         <>
@@ -168,7 +172,7 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
       internshipKind === "immersion"
         ? "Formulaire pour conventionner une période de mise en situation professionnelle (PMSMP)"
         : "Formulaire pour conventionner un mini stage",
-    summary: `Voici la demande de convention qui vient d'être complétée. <br />
+    summary: `Voici la demande de convention qui vient d'être complétée.
     Relisez la bien et si cela vous convient, signez la avec le bouton "je
     signe cette demande"`,
     regulations:

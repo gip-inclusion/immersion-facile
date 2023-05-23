@@ -2,12 +2,12 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Route } from "type-route";
 import { FederatedIdentityProvider, isPeConnectIdentity } from "shared";
-import { Loader } from "react-design-system";
+import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
-import { ConventionFormContainerLayout } from "src/app/components/forms/convention/ConventionFormContainerLayout";
 import { conventionInitialValuesFromUrl } from "src/app/components/forms/convention/conventionHelpers";
 import { InitiateConventionCard } from "src/app/components/InitiateConventionCard";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
+import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
@@ -25,13 +25,21 @@ interface ConventionImmersionPageProps {
 
 export const ConventionImmersionPage = ({
   route,
-}: ConventionImmersionPageProps) => (
-  <HeaderFooterLayout>
-    <ConventionFormContainerLayout internshipKind="immersion">
-      <PageContent route={route} />
-    </ConventionFormContainerLayout>
-  </HeaderFooterLayout>
-);
+}: ConventionImmersionPageProps) => {
+  const t = useConventionTexts("immersion");
+  return (
+    <HeaderFooterLayout>
+      <MainWrapper
+        layout={"default"}
+        pageHeader={
+          <PageHeader title={t.intro.conventionTitle} theme="candidate" />
+        }
+      >
+        <PageContent route={route} />
+      </MainWrapper>
+    </HeaderFooterLayout>
+  );
+};
 
 const PageContent = ({ route }: ConventionImmersionPageProps) => {
   const { enablePeConnectApi, isLoading } = useFeatureFlags();
