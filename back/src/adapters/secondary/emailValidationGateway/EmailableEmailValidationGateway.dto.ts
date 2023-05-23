@@ -21,11 +21,11 @@ export type EmailableEmailValidationStatus = {
   mailbox_full?: boolean | null;
   mx_record?: string | null;
   no_reply?: boolean | null;
-  reason: ValidateEmailReason;
+  reason?: ValidateEmailReason | null;
   role?: boolean | null;
   score?: number | null;
   smtp_provider?: string | null;
-  state?: "deliverable" | "undeliverable" | "unknown" | "risky";
+  state?: "deliverable" | "undeliverable" | "unknown" | "risky" | null;
   tag?: string | null;
   user?: string | null;
 };
