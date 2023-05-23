@@ -7,9 +7,9 @@ export type EmailableEmailValidationParams = {
   api_key: EmailableApiKey;
 };
 export type EmailableEmailValidationStatus = {
-  accept_all: boolean;
-  did_you_mean: string | null;
-  disposable: boolean;
+  accept_all?: boolean;
+  did_you_mean?: string | null;
+  disposable?: boolean;
   domain: string;
   duration: number;
   email: string;

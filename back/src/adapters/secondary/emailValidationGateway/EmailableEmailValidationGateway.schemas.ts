@@ -16,9 +16,9 @@ export const emailableValidationTargetsQueryParamsSchema: z.Schema<EmailableEmai
 
 export const emailableEmailValidationStatusSchema: z.Schema<EmailableEmailValidationStatus> =
   z.object({
-    accept_all: z.boolean(),
-    did_you_mean: zString.or(z.null()),
-    disposable: z.boolean(),
+    accept_all: z.boolean().optional(),
+    did_you_mean: zString.or(z.null()).optional(),
+    disposable: z.boolean().optional(),
     domain: zString,
     duration: z.number(),
     email: zString,
