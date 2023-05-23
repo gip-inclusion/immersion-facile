@@ -31,14 +31,16 @@ import { BeneficiaryFormSection } from "./sections/beneficiary/BeneficiaryFormSe
 import { EstablishmentFormSection } from "./sections/establishment/EstablishmentFormSection";
 import { ImmersionHourLocationSection } from "./sections/hour-location/ImmersionHourLocationSection";
 import { ImmersionDetailsSection } from "./sections/immersion-details/ImmersionDetailsSection";
+import { ConventionFormMode } from "./ConventionForm";
 
 type ConventionFieldsProps = {
   onSubmit: SubmitHandler<ConventionReadDto>;
-  onModificationsRequired?: () => void; //< called when the form is sent back for modifications in signature mode
+  mode: ConventionFormMode;
 };
 
 export const ConventionFormFields = ({
   onSubmit,
+  mode,
 }: ConventionFieldsProps): JSX.Element => {
   const {
     setValue,
@@ -59,6 +61,9 @@ export const ConventionFormFields = ({
 
   useEffect(() => {
     deviceRepository.delete("partialConventionInUrl");
+    if (mode === "edit") {
+      validateSteps();
+    }
   }, []);
 
   useEffect(() => {
@@ -94,12 +99,13 @@ export const ConventionFormFields = ({
           .length && get(errors, stepField),
     ).length;
     const stepIsValid = () =>
-      stepFields.filter(
-        (key) =>
-          getFieldState(key as keyof ConventionReadDto).isTouched &&
-          stepErrors === 0,
-      ).length === stepFields.length;
-
+      stepFields.filter((key) => {
+        // We consider a step valid if all its fields are touched and have no errors or none of its fields are touched and 0 errors
+        const isValidUserInteraction =
+          getFieldState(key as keyof ConventionReadDto).isTouched ||
+          mode === "edit";
+        return isValidUserInteraction && stepErrors === 0;
+      }).length === stepFields.length;
     const getSeverity = () => {
       if (stepErrors) {
         return "error";
@@ -132,6 +138,11 @@ export const ConventionFormFields = ({
         {renderStatusBadge(step)}
       </>
     );
+  };
+  const validateSteps = () => {
+    formUiSections.forEach((_, step) => {
+      validateStep(step + 1);
+    });
   };
   const validateStep = (step: number) => {
     const stepFields = formUiSections[step - 1];

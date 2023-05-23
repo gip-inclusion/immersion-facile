@@ -13,8 +13,8 @@ import {
 } from "shared";
 import { Loader, MainWrapper } from "react-design-system";
 import { ConventionFormContainerLayout } from "src/app/components/forms/convention/ConventionFormContainerLayout";
+import { ConventionSummary } from "src/app/components/forms/convention/ConventionSummary";
 import { conventionSlice } from "../../../core-logic/domain/convention/convention.slice";
-import { ConventionSignForm } from "../../components/forms/convention/ConventionSignForm";
 import { HeaderFooterLayout } from "../../components/layout/HeaderFooterLayout";
 import { commonContent } from "../../contents/commonContent";
 import { useConventionTexts } from "../../contents/forms/convention/textSetup";
@@ -165,13 +165,7 @@ const ConventionSignPageContent = ({
           />
         )}
         {convention.status !== "DRAFT" && convention.status !== "REJECTED" && (
-          <>
-            <ConventionSignForm
-              jwt={jwt}
-              submitFeedback={submitFeedback}
-              convention={convention}
-            />
-          </>
+          <ConventionSummary />
         )}
       </>
     </ConventionFormContainerLayout>
