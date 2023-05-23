@@ -12,7 +12,7 @@ export const getRequestInfos = (
   if (!response) {
     return { error: "error.response is not defined, cannot extract infos" };
   }
-  const requestedAt = (response.config as any).metadata.requestedAt;
+  const requestedAt = (response.config as any).metadata?.requestedAt;
 
   return {
     ...(requestedAt
