@@ -21,7 +21,10 @@ export const validEstablishmentEntityV2: EstablishmentEntity = {
   isCommited: undefined,
   sourceProvider: "immersion-facile",
   voluntaryToImmersion: true,
-  position: { lat: 35, lon: 50 },
+  position: {
+    lat: 48.866667, // Paris lat/lon
+    lon: 2.333333,
+  },
   nafDto: { code: defaultNafCode, nomenclature: "NAFRev2" },
   numberEmployeesRange: "10-19",
   updatedAt: new Date("2022-01-05T12:00:00.000"),

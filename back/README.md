@@ -25,7 +25,14 @@ You can run in watch mode individually :
 Unit tests :
 
 ```
-npm run test:unit
+pnpm test:unit
+```
+
+You can run create some data in the database with :
+You will than have the correct featureFlags and an agency in Paris.
+
+```
+pnpm seed
 ```
 
 Integration tests :
@@ -45,10 +52,9 @@ Integration tests :
    Observe the log output to ensure the database has been properly initialized.
 1. Run DB migration :
 
-
-    ```sh
-    npm run migrate up
-    ```
+   ```sh
+   npm run migrate up
+   ```
 
 1. Execute the integration tests in a separate shell"
    ```
