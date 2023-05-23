@@ -17,7 +17,7 @@ export type ValidateEmailReason = (typeof validateEmailReason)[number];
 export type ValidateEmailStatus = {
   isValid: boolean;
   proposal?: string | null;
-  reason: ValidateEmailReason;
+  reason?: ValidateEmailReason | null;
 };
 
 export const validateSingleEmailRegex =

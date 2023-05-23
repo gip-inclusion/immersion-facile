@@ -30,11 +30,13 @@ export const emailableEmailValidationStatusSchema: z.Schema<EmailableEmailValida
     mailbox_full: z.boolean().nullish(),
     mx_record: zString.nullish(),
     no_reply: z.boolean().nullish(),
-    reason: validateEmailReasonSchema,
+    reason: validateEmailReasonSchema.nullish(),
     role: z.boolean().nullish(),
     score: z.number().nullish(),
     smtp_provider: zString.nullish(),
-    state: z.enum(["deliverable", "undeliverable", "unknown", "risky"]),
+    state: z
+      .enum(["deliverable", "undeliverable", "unknown", "risky"])
+      .nullish(),
     tag: zString.nullish(),
     user: zString.nullish(),
   });

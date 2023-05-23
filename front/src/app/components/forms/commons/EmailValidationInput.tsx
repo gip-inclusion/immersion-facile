@@ -14,14 +14,15 @@ type StateRelated = {
 
 const defaultErrorMessage =
   "L'adresse email ne semble pas valide. Si vous êtes sûr de ne pas avoir fait d'erreur, vous pouvez tout de même faire une demande de convention.";
+const emailSeemsValidMessage = "L'adresse email a l'air valide";
 
 const feedbackMessages = (
   proposal: string | null | undefined,
 ): Record<ValidateEmailReason, string> => ({
-  accepted_email: "L'adresse email a l'air valide",
+  accepted_email: emailSeemsValidMessage,
   disposable_email: "L'adresse email semble être une adresse jetable",
-  low_deliverability: "L'adresse email a l'air valide",
-  low_quality: "L'adresse email a l'air valide",
+  low_deliverability: emailSeemsValidMessage,
+  low_quality: emailSeemsValidMessage,
   unexpected_error: defaultErrorMessage,
   invalid_domain: defaultErrorMessage,
   invalid_email: defaultErrorMessage,
@@ -42,7 +43,9 @@ const getStateRelatedFromStatus = (
     };
   return {
     state: status.isValid ? "success" : "error",
-    stateRelatedMessage: feedbackMessages(status.proposal)[status.reason],
+    stateRelatedMessage: status.reason
+      ? feedbackMessages(status.proposal)[status.reason]
+      : defaultErrorMessage,
   };
 };
 
