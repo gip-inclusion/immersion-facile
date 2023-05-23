@@ -65,6 +65,8 @@ describe("Convention slice", () => {
             isTutorEstablishmentRepresentative: true,
             hasCurrentEmployer: false,
             currentStep: 1,
+            agencyDepartment: null,
+            showSummary: false,
           },
           jwt: "some-correct-jwt",
           convention: null,
@@ -245,6 +247,8 @@ describe("Convention slice", () => {
             isTutorEstablishmentRepresentative: true,
             hasCurrentEmployer: false,
             currentStep: 1,
+            agencyDepartment: null,
+            showSummary: false,
           },
           feedback: { kind: "justSubmitted" },
           isLoading: false,
@@ -330,6 +334,8 @@ describe("Convention slice", () => {
               isTutorEstablishmentRepresentative: false,
               hasCurrentEmployer: false,
               currentStep: 1,
+              agencyDepartment: null,
+              showSummary: false,
             },
           });
         });
@@ -377,6 +383,8 @@ describe("Convention slice", () => {
               isTutorEstablishmentRepresentative: true,
               hasCurrentEmployer: false,
               currentStep: 1,
+              agencyDepartment: null,
+              showSummary: false,
             },
           });
         });
@@ -418,6 +426,8 @@ describe("Convention slice", () => {
               isTutorEstablishmentRepresentative: false,
               hasCurrentEmployer: false,
               currentStep: 1,
+              agencyDepartment: null,
+              showSummary: false,
             },
           });
         });
@@ -452,6 +462,8 @@ describe("Convention slice", () => {
               isTutorEstablishmentRepresentative: false,
               hasCurrentEmployer: false,
               currentStep: 1,
+              agencyDepartment: null,
+              showSummary: false,
             },
           });
         });
@@ -487,6 +499,8 @@ describe("Convention slice", () => {
               isTutorEstablishmentRepresentative: false,
               hasCurrentEmployer: false,
               currentStep: 1,
+              agencyDepartment: null,
+              showSummary: false,
             },
           });
         });
@@ -530,6 +544,8 @@ describe("Convention slice", () => {
               isTutorEstablishmentRepresentative: false,
               hasCurrentEmployer: true,
               currentStep: 1,
+              agencyDepartment: null,
+              showSummary: false,
             },
           });
         });
@@ -560,6 +576,8 @@ describe("Convention slice", () => {
             isTutorEstablishmentRepresentative: true,
             hasCurrentEmployer: false,
             currentStep: 1,
+            agencyDepartment: null,
+            showSummary: false,
           },
           jwt: null,
           fetchError: null,
@@ -601,6 +619,8 @@ describe("Convention slice", () => {
             isTutorEstablishmentRepresentative: true,
             hasCurrentEmployer: false,
             currentStep: 1,
+            agencyDepartment: null,
+            showSummary: false,
           },
           jwt: null,
           fetchError: null,
@@ -762,6 +782,8 @@ describe("Convention slice", () => {
           isTutorEstablishmentRepresentative: true,
           hasCurrentEmployer: false,
           currentStep: 1,
+          agencyDepartment: null,
+          showSummary: false,
         },
         jwt: null,
         convention: null,
@@ -785,6 +807,8 @@ describe("Convention slice", () => {
           isTutorEstablishmentRepresentative: true,
           hasCurrentEmployer: false,
           currentStep: 1,
+          agencyDepartment: null,
+          showSummary: false,
         },
         jwt: null,
         convention: null,
@@ -840,6 +864,8 @@ describe("Convention slice", () => {
           isTutorEstablishmentRepresentative: true,
           hasCurrentEmployer: false,
           currentStep: 1,
+          agencyDepartment: null,
+          showSummary: false,
         },
         jwt: null,
         convention,

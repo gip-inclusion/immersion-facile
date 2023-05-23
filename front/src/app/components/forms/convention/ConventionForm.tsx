@@ -81,10 +81,12 @@ const useWaitForReduxFormUiReadyBeforeFormikInitialisation = (
   return reduxFormUiReady;
 };
 
+export type ConventionFormMode = "create" | "edit";
+
 type ConventionFormProps = {
   conventionProperties: ConventionPresentation;
   routeParams?: { jwt?: string };
-  mode: "create" | "edit";
+  mode: ConventionFormMode;
 };
 
 export const ConventionForm = ({
@@ -276,7 +278,7 @@ export const ConventionForm = ({
                     </p>
 
                     <form>
-                      <ConventionFormFields onSubmit={onSubmit} />
+                      <ConventionFormFields onSubmit={onSubmit} mode={mode} />
                       <ConventionFeedbackNotification
                         submitFeedback={submitFeedback}
                         signatories={getValues("signatories")}

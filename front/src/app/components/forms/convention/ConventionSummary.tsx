@@ -12,6 +12,7 @@ import { Loader } from "react-design-system";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { agencyGateway } from "src/config/dependencies";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 
@@ -230,6 +231,7 @@ export const ConventionSummary = ({
   const convention = useAppSelector(conventionSelectors.convention);
   const [agency, setAgency] = useState<AgencyPublicDisplayDto | null>(null);
   if (!convention) return null;
+  if (!agency) return <Loader />;
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     agencyGateway
@@ -238,7 +240,7 @@ export const ConventionSummary = ({
       })
       .then(setAgency);
   }, []);
-  if (!agency) return <Loader />;
+  useScrollToTop(true);
   return (
     <div className={fr.cx("fr-col")}>
       {summarySections(convention, agency).map(({ title, fields }) => (

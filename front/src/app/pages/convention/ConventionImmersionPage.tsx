@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Route } from "type-route";
 import { FederatedIdentityProvider, isPeConnectIdentity } from "shared";
@@ -37,7 +37,11 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
   const { enablePeConnectApi, isLoading } = useFeatureFlags();
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
   const [shouldShowForm, setShouldShowForm] = useState(false);
-  const isSharedConvention = Object.keys(route.params).length > 0;
+  const isSharedConvention = useMemo(
+    // depends on initial (on page load) route params, shouldn't change on re-render
+    () => Object.keys(route.params).length > 0,
+    [],
+  );
   const mode = "jwt" in route.params ? "edit" : "create";
   useFederatedIdentityFromUrl(route);
   useScrollToTop(shouldShowForm);
@@ -70,7 +74,7 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
         internshipKind: "immersion",
       })}
       routeParams={route.params}
-      mode={mode}
+      mode={isSharedConvention ? "edit" : mode}
     />
   ) : (
     <InitiateConventionCard
