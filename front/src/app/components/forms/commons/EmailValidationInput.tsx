@@ -30,6 +30,7 @@ const feedbackMessages = (
     ? `Cette adresse email ne semble pas valide, avez-vous voulu taper : ${proposal} ?`
     : defaultErrorMessage,
   invalid_smtp: defaultErrorMessage,
+  unavailable_smtp: defaultErrorMessage,
 });
 
 const getStateRelatedFromStatus = (
