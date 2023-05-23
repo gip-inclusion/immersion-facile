@@ -230,22 +230,25 @@ export const ConventionSummary = ({
 }) => {
   const convention = useAppSelector(conventionSelectors.convention);
   const [agency, setAgency] = useState<AgencyPublicDisplayDto | null>(null);
-  if (!convention) return null;
-  if (!agency) return <Loader />;
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    agencyGateway
-      .getAgencyPublicInfoById({
-        agencyId: convention.agencyId,
-      })
-      .then(setAgency);
+    if (convention) {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      agencyGateway
+        .getAgencyPublicInfoById({
+          agencyId: convention.agencyId,
+        })
+        .then(setAgency);
+    }
   }, []);
   useScrollToTop(true);
+  if (!convention) return null;
+  if (!agency) return <Loader />;
+
   return (
     <div className={fr.cx("fr-col")}>
       {summarySections(convention, agency).map(({ title, fields }) => (
         <section key={title}>
-          <h2>{title}</h2>
+          <h2 className={fr.cx("fr-h4")}>{title}</h2>
           <Table data={fields} noCaption fixed />
         </section>
       ))}

@@ -3,6 +3,7 @@ import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { match } from "ts-pattern";
@@ -224,33 +225,54 @@ export const ConventionForm = ({
         )
         .with(
           {
+            formSuccessfullySubmitted: true,
+          },
+          () => (
+            <SubmitConfirmationSection
+              idToCopy={getValues().id}
+              copyButtonIsDisabled={copyButtonIsDisabled}
+              copyButtonLabel={copyButtonLabel}
+              onCopyButtonClick={onCopyButtonClick}
+            />
+          ),
+        )
+        .with(
+          {
             showSummary: true,
           },
           () => (
             <>
               <ConventionSummary
                 validationAction={
-                  <ButtonsGroup
-                    inlineLayoutWhen="sm and up"
-                    alignment="center"
-                    buttons={[
-                      {
-                        children: "Modifier la convention",
-                        onClick: () => {
-                          dispatch(
-                            conventionSlice.actions.showSummaryChangeRequested({
-                              showSummary: false,
-                            }),
-                          );
+                  <>
+                    <ConventionFeedbackNotification
+                      submitFeedback={submitFeedback}
+                      signatories={getValues("signatories")}
+                    />
+                    <ButtonsGroup
+                      inlineLayoutWhen="sm and up"
+                      alignment="center"
+                      buttons={[
+                        {
+                          children: "Modifier la convention",
+                          onClick: () => {
+                            dispatch(
+                              conventionSlice.actions.showSummaryChangeRequested(
+                                {
+                                  showSummary: false,
+                                },
+                              ),
+                            );
+                          },
+                          priority: "secondary",
                         },
-                        priority: "secondary",
-                      },
-                      {
-                        children: "Envoyer la convention",
-                        onClick: onConfirmSubmit,
-                      },
-                    ]}
-                  />
+                        {
+                          children: "Envoyer la convention",
+                          onClick: onConfirmSubmit,
+                        },
+                      ]}
+                    />
+                  </>
                 }
               />
             </>
@@ -290,26 +312,31 @@ export const ConventionForm = ({
                   <ConventionFormSidebar
                     currentStep={currentStep}
                     sidebarContent={sidebarContent}
-                    sidebarFooter={<ShareConventionLink />}
+                    sidebarFooter={
+                      <div
+                        className={fr.cx(
+                          "fr-btns-group",
+                          "fr-btns-group--center",
+                          "fr-btns-group--inline",
+                          "fr-btns-group--sm",
+                        )}
+                      >
+                        <ShareConventionLink />
+                        <Button
+                          type="submit"
+                          onClick={methods.handleSubmit(onConfirmSubmit)}
+                        >
+                          Envoyer la convention
+                        </Button>
+                      </div>
+                    }
                   />
                 }
               />
             </FormProvider>
           ),
         )
-        .with(
-          {
-            formSuccessfullySubmitted: true,
-          },
-          () => (
-            <SubmitConfirmationSection
-              idToCopy={getValues().id}
-              copyButtonIsDisabled={copyButtonIsDisabled}
-              copyButtonLabel={copyButtonLabel}
-              onCopyButtonClick={onCopyButtonClick}
-            />
-          ),
-        )
+
         .exhaustive()}
     </div>
   );

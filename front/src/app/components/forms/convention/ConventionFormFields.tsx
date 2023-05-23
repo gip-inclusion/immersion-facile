@@ -248,24 +248,6 @@ export const ConventionFormFields = ({
           Envoyer la demande
         </Button>
       </div>
-      {/* {isSignatureMode && (
-        <>
-          {alreadySigned ? (
-            <p>{t.conventionAlreadySigned}</p>
-          ) : (
-            <SignatureActions
-              internshipKind={conventionValues.internshipKind}
-              alreadySigned={alreadySigned}
-              signatory={signatory}
-              onSubmitClick={handleSubmit(onSubmit, (errors) => {
-                // eslint-disable-next-line no-console
-                console.error(getValues(), errors);
-              })}
-              onModificationRequired={onModificationsRequired}
-            />
-          )}
-        </>
-      )} */}
     </>
   );
 };

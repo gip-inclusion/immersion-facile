@@ -36,10 +36,12 @@ export const ShareConventionLink = () => {
     <>
       <Button
         type="button"
+        size="small"
         onClick={() => {
           openShareLinkModal();
           setIsModalOpened(true);
         }}
+        priority="secondary"
       >
         Partager la convention
       </Button>

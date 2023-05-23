@@ -13,7 +13,11 @@ export const ConventionFormLayout = ({
   const { cx } = useStyles();
   return (
     <>
-      <div className={cx(fr.cx("fr-col-12", "fr-col-lg-8"))}>{form}</div>
+      <div
+        className={cx(fr.cx("fr-col-12", "fr-col-lg-8"), Styles.formWrapper)}
+      >
+        {form}
+      </div>
       <div
         className={cx(fr.cx("fr-col-12", "fr-col-lg-4"), Styles.sidebarWrapper)}
       >
