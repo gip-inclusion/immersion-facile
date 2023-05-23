@@ -2,13 +2,14 @@ import { Email } from "./email.dto";
 
 export const validateEmailReason = [
   "accepted_email",
-  "invalid_email",
-  "rejected_email",
-  "invalid_smtp",
-  "invalid_domain",
   "disposable_email",
+  "invalid_domain",
+  "invalid_email",
+  "invalid_smtp",
   "low_deliverability",
   "low_quality",
+  "rejected_email",
+  "unavailable_smtp",
   "unexpected_error",
 ] as const;
 
