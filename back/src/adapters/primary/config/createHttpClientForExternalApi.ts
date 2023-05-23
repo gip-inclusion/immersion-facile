@@ -5,7 +5,7 @@ import { createLogger } from "../../../utils/logger";
 
 const logger = createLogger(__filename);
 
-const getRequestInfos = (
+export const getRequestInfos = (
   response?: AxiosResponse,
   options: { logRequestBody?: boolean; logResponseBody?: boolean } = {},
 ) => {
@@ -13,12 +13,15 @@ const getRequestInfos = (
     return { error: "error.response is not defined, cannot extract infos" };
   }
   const requestedAt = (response.config as any).metadata.requestedAt;
-  const durationInSeconds = calculateDurationInSecondsFrom(
-    new Date(requestedAt),
-  );
 
   return {
-    durationInSeconds,
+    ...(requestedAt
+      ? {
+          durationInSeconds: calculateDurationInSecondsFrom(
+            new Date(requestedAt),
+          ),
+        }
+      : {}),
     host: response.request?.host,
     httpStatus: response.status,
     method: response.config?.method,
