@@ -3,7 +3,6 @@ import { Request, Response } from "express";
 import { ZodError } from "zod";
 import { createLogger } from "../../../utils/logger";
 import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
-import { getRequestInfos } from "../config/createHttpClientForExternalApi";
 
 const logger = createLogger(__filename);
 const _message = "Unhandled Error";
@@ -22,11 +21,19 @@ export class UnhandledError extends Error {
 
 export const unhandledError = (error: any, req: Request, res: Response) => {
   if (axios.isAxiosError(error)) {
+    const errorResponse = error.response;
     logErrorAndNotifyDiscord("Axios", req, {
-      ...getRequestInfos(error.request, {
-        logRequestBody: true,
-        logResponseBody: true,
-      }),
+      message: error.message,
+      baseUrl: error.config.baseURL,
+      method: error.config.method,
+      url: error.config.url,
+      requestBody: error.config.data,
+      ...(errorResponse
+        ? {
+            httpStatus: errorResponse.status,
+            responseBody: errorResponse.data,
+          }
+        : {}),
     });
   } else if (error instanceof ZodError) {
     logErrorAndNotifyDiscord("Zod", req, {
