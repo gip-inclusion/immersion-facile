@@ -8,13 +8,7 @@ import {
   useFormContents,
 } from "src/app/hooks/formContents.hooks";
 
-export type BeneficiaryEmergencyContactFieldsProperties = {
-  disabled: boolean | undefined;
-};
-
-export const BeneficiaryEmergencyContactFields = ({
-  disabled,
-}: BeneficiaryEmergencyContactFieldsProperties): JSX.Element => {
+export const BeneficiaryEmergencyContactFields = (): JSX.Element => {
   const { watch, register, formState } = useFormContext<ConventionReadDto>();
 
   const { getFormFields } = useFormContents(
@@ -33,7 +27,6 @@ export const BeneficiaryEmergencyContactFields = ({
           ...formContents["signatories.beneficiary.emergencyContact"],
           ...register("signatories.beneficiary.emergencyContact"),
         }}
-        disabled={disabled}
         {...getFieldError("signatories.beneficiary.emergencyContact")}
       />
       <Input
@@ -47,7 +40,6 @@ export const BeneficiaryEmergencyContactFields = ({
           ...formContents["signatories.beneficiary.emergencyContactPhone"],
           ...register("signatories.beneficiary.emergencyContactPhone"),
         }}
-        disabled={disabled}
         {...getFieldError("signatories.beneficiary.emergencyContactPhone")}
       />
       <Input
@@ -61,7 +53,6 @@ export const BeneficiaryEmergencyContactFields = ({
           ...formContents["signatories.beneficiary.emergencyContactEmail"],
           ...register("signatories.beneficiary.emergencyContactEmail"),
         }}
-        disabled={disabled}
         {...getFieldError("signatories.beneficiary.emergencyContactEmail")}
       />
     </>

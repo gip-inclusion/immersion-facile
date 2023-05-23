@@ -3,6 +3,7 @@ import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { match } from "ts-pattern";
 import { useStyles } from "tss-react/dsfr";
@@ -27,7 +28,6 @@ import { ConventionFeedbackNotification } from "src/app/components/forms/convent
 import { ConventionFormFields } from "src/app/components/forms/convention/ConventionFormFields";
 import {
   ConventionPresentation,
-  isConventionFrozen,
   undefinedIfEmptyString,
 } from "src/app/components/forms/convention/conventionHelpers";
 import { sidebarStepContent } from "src/app/contents/forms/convention/formConvention";
@@ -101,7 +101,6 @@ export const ConventionForm = ({
   );
   const [initialValues] = useState<ConventionPresentation>({
     ...conventionProperties,
-
     signatories: {
       ...conventionProperties.signatories,
       beneficiary: makeInitialBenefiaryForm(
@@ -163,13 +162,23 @@ export const ConventionForm = ({
     }
   }, [fetchedConvention]);
 
+  const onConfirmSubmit = () => {
+    const conventionToSave = {
+      ...getValues(),
+      workConditions: undefinedIfEmptyString(getValues().workConditions),
+    };
+    dispatch(conventionSlice.actions.saveConventionRequested(conventionToSave));
+  };
   const onSubmit: SubmitHandler<ConventionReadDto> = (values) => {
     const conventionToSave = {
       ...values,
       workConditions: undefinedIfEmptyString(values.workConditions),
     };
     dispatch(
-      conventionSlice.actions.showSummaryChangeRequested(conventionToSave),
+      conventionSlice.actions.showSummaryChangeRequested({
+        showSummary: true,
+        convention: conventionToSave,
+      }),
     );
   };
   const reduxFormUiReady =
@@ -178,10 +187,6 @@ export const ConventionForm = ({
   useClearConventionSubmitFeedbackOnUnmount();
 
   const t = useConventionTexts(initialValues.internshipKind);
-
-  const isFrozen = isConventionFrozen(
-    fetchedConvention ? fetchedConvention.status : initialValues.status,
-  );
 
   const { copyButtonIsDisabled, copyButtonLabel, onCopyButtonClick } =
     useCopyButton();
@@ -219,7 +224,35 @@ export const ConventionForm = ({
           {
             showSummary: true,
           },
-          () => <ConventionSummary />,
+          () => (
+            <>
+              <ConventionSummary
+                validationAction={
+                  <ButtonsGroup
+                    inlineLayoutWhen="sm and up"
+                    alignment="center"
+                    buttons={[
+                      {
+                        children: "Modifier la convention",
+                        onClick: () => {
+                          dispatch(
+                            conventionSlice.actions.showSummaryChangeRequested({
+                              showSummary: false,
+                            }),
+                          );
+                        },
+                        priority: "secondary",
+                      },
+                      {
+                        children: "Envoyer la convention",
+                        onClick: onConfirmSubmit,
+                      },
+                    ]}
+                  />
+                }
+              />
+            </>
+          ),
         )
         .with(
           {
@@ -243,10 +276,7 @@ export const ConventionForm = ({
                     </p>
 
                     <form>
-                      <ConventionFormFields
-                        onSubmit={onSubmit}
-                        isFrozen={isFrozen}
-                      />
+                      <ConventionFormFields onSubmit={onSubmit} />
                       <ConventionFeedbackNotification
                         submitFeedback={submitFeedback}
                         signatories={getValues("signatories")}

@@ -31,6 +31,11 @@ const showSummary = createSelector(
   ({ formUi }) => formUi.showSummary,
 );
 
+const agencyDepartment = createSelector(
+  conventionState,
+  ({ formUi }) => formUi.agencyDepartment,
+);
+
 const hasCurrentEmployer = createSelector(
   conventionState,
   ({ formUi }) => formUi.hasCurrentEmployer,
@@ -82,6 +87,7 @@ export const conventionSelectors = {
   preselectedAgencyId,
   currentStep,
   showSummary,
+  agencyDepartment,
 };
 
 export const signatoryDataFromConvention = (

@@ -10,13 +10,7 @@ import {
   useFormContents,
 } from "src/app/hooks/formContents.hooks";
 
-type BeneficiaryCurrentEmployerFieldsProperties = {
-  disabled: boolean | undefined;
-};
-
-export const BeneficiaryCurrentEmployerFields = ({
-  disabled,
-}: BeneficiaryCurrentEmployerFieldsProperties): JSX.Element => {
+export const BeneficiaryCurrentEmployerFields = (): JSX.Element => {
   const { getValues, register, formState } = useFormContext<ConventionDto>();
   const values = getValues();
   const { getFormFields } = useFormContents(
@@ -63,7 +57,6 @@ export const BeneficiaryCurrentEmployerFields = ({
           ...formFields["signatories.beneficiaryCurrentEmployer.businessSiret"],
           ...register("signatories.beneficiaryCurrentEmployer.businessSiret"),
         }}
-        disabled={disabled}
         {...getFieldError(
           "signatories.beneficiaryCurrentEmployer.businessSiret",
         )}
@@ -81,7 +74,6 @@ export const BeneficiaryCurrentEmployerFields = ({
           ...formFields["signatories.beneficiaryCurrentEmployer.businessName"],
           ...register("signatories.beneficiaryCurrentEmployer.businessName"),
         }}
-        disabled={disabled}
         {...getFieldError(
           "signatories.beneficiaryCurrentEmployer.businessName",
         )}
@@ -98,7 +90,6 @@ export const BeneficiaryCurrentEmployerFields = ({
           ...formFields["signatories.beneficiaryCurrentEmployer.firstName"],
           ...register("signatories.beneficiaryCurrentEmployer.firstName"),
         }}
-        disabled={disabled}
         {...getFieldError("signatories.beneficiaryCurrentEmployer.firstName")}
       />
       <Input
@@ -113,7 +104,6 @@ export const BeneficiaryCurrentEmployerFields = ({
           ...formFields["signatories.beneficiaryCurrentEmployer.lastName"],
           ...register("signatories.beneficiaryCurrentEmployer.lastName"),
         }}
-        disabled={disabled}
         {...getFieldError("signatories.beneficiaryCurrentEmployer.lastName")}
       />
       <Input
@@ -125,7 +115,6 @@ export const BeneficiaryCurrentEmployerFields = ({
           ...formFields["signatories.beneficiaryCurrentEmployer.job"],
           ...register("signatories.beneficiaryCurrentEmployer.job"),
         }}
-        disabled={disabled}
         {...getFieldError("signatories.beneficiaryCurrentEmployer.job")}
       />
       <Input
@@ -137,7 +126,6 @@ export const BeneficiaryCurrentEmployerFields = ({
           ...formFields["signatories.beneficiaryCurrentEmployer.phone"],
           ...register("signatories.beneficiaryCurrentEmployer.phone"),
         }}
-        disabled={disabled}
         {...getFieldError("signatories.beneficiaryCurrentEmployer.phone")}
       />
       <Input
@@ -149,7 +137,6 @@ export const BeneficiaryCurrentEmployerFields = ({
           ...formFields["signatories.beneficiaryCurrentEmployer.email"],
           ...register("signatories.beneficiaryCurrentEmployer.email"),
         }}
-        disabled={disabled}
         {...getFieldError("signatories.beneficiaryCurrentEmployer.email")}
       />
     </>
