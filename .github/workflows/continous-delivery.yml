@@ -54,6 +54,7 @@ jobs:
     with:
       environment: prod
       tag: "v${{ github.run_number }}"
+      region: "osc-secnum-fr1"
     secrets:
       SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
