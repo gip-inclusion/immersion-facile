@@ -1,5 +1,5 @@
 import { SuperTest, Test } from "supertest";
-import { establishmentTargets } from "shared";
+import { siretTargets } from "shared";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
@@ -15,7 +15,7 @@ describe("route to check if a form's siret already exists", () => {
   });
   it("Returns false if the siret does not exist", async () => {
     await request
-      .get(establishmentTargets.isEstablishmentWithSiretAlreadyRegistered.url)
+      .get(siretTargets.isSiretAlreadySaved.url)
       .expect(200, "false");
   });
 
@@ -30,12 +30,7 @@ describe("route to check if a form's siret already exists", () => {
       ],
     );
     await request
-      .get(
-        establishmentTargets.isEstablishmentWithSiretAlreadyRegistered.url.replace(
-          ":siret",
-          siret,
-        ),
-      )
+      .get(siretTargets.isSiretAlreadySaved.url.replace(":siret", siret))
       .expect(200, "true");
   });
 });

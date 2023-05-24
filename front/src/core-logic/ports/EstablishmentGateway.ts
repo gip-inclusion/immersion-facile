@@ -3,7 +3,6 @@ import { FormEstablishmentDto, SiretDto } from "shared";
 
 export interface EstablishmentGateway {
   addFormEstablishment: (establishment: FormEstablishmentDto) => Promise<void>;
-  isEstablishmentAlreadyRegisteredBySiret(siret: SiretDto): Promise<boolean>;
   requestEstablishmentModification(siret: SiretDto): Promise<void>;
   requestEstablishmentModification$(siret: SiretDto): Observable<void>;
   getFormEstablishmentFromJwt: (

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { establishmentTargets } from "shared";
+import { establishmentTargets, siretTargets } from "shared";
 import { AppDependencies } from "../../config/createAppDependencies";
 import { sendHttpResponse } from "../../helpers/sendHttpResponse";
 
@@ -15,7 +15,7 @@ export const establismentRouterWithoutJwt = (deps: AppDependencies): Router => {
     );
 
   router
-    .route(establishmentTargets.isEstablishmentWithSiretAlreadyRegistered.url)
+    .route(siretTargets.isSiretAlreadySaved.url)
     .get(async (req, res) =>
       sendHttpResponse(req, res, async () =>
         deps.useCases.isFormEstablishmentWithSiretAlreadySaved.execute(

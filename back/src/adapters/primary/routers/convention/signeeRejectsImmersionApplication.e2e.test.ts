@@ -126,28 +126,18 @@ const expectEstablishmentRequiresChanges = async (
 
   await eventCrawler.processNewEvents();
 
-  // Expect two emails sent (to beneficiary and to establishment tutor)
+  // Expect one email sent ( to establishment representative)
   const sentEmails = gateways.email.getSentEmails();
-  expect(sentEmails).toHaveLength(5);
-  expect(sentEmails.slice(3, 5).map((e) => e.recipients)).toEqual([
-    ["beneficiary@email.fr"],
+  expect(sentEmails).toHaveLength(4);
+  expect(sentEmails.slice(3).map((e) => e.recipients)).toEqual([
     ["establishment@example.com"],
   ]);
 
   expectStoreImmersionToHaveStatus(inMemoryUow.conventionRepository, "DRAFT");
 
-  const beneficiaryEditEmail = expectEmailOfType(
+  const establishmentEditEmail = expectEmailOfType(
     sentEmails[3],
     "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
-  );
-  const establishmentEditEmail = expectEmailOfType(
-    sentEmails[4],
-    "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
-  );
-
-  const beneficiarySignLink = await shortLinkRedirectToLinkWithValidation(
-    beneficiaryEditEmail.params.magicLink,
-    request,
   );
 
   const establishmentSignLink = await shortLinkRedirectToLinkWithValidation(
@@ -155,13 +145,11 @@ const expectEstablishmentRequiresChanges = async (
     request,
   );
 
-  const beneficiaryEditJwt = expectJwtInMagicLinkAndGetIt(beneficiarySignLink);
   const establishmentEditJwt = expectJwtInMagicLinkAndGetIt(
     establishmentSignLink,
   );
 
   return {
-    beneficiaryEditJwt,
     establishmentEditJwt,
   };
 };

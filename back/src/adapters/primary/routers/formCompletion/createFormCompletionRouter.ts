@@ -1,10 +1,9 @@
 import { Router } from "express";
 import {
   appellationRoute,
-  getSiretIfNotSavedRoute,
   romeAutocompleteInputSchema,
   romeRoute,
-  siretRoute,
+  siretTargets,
 } from "shared";
 import { createLogger } from "../../../../utils/logger";
 import type { AppDependencies } from "../../config/createAppDependencies";
@@ -36,15 +35,15 @@ export const createFormCompletionRouter = (deps: AppDependencies) => {
   );
 
   formCompletionRouter
-    .route(`/${siretRoute}/:siret`)
+    .route(siretTargets.getSiretInfo.url)
     .get(async (req, res) =>
-      sendHttpResponse(req, res, async () =>
+      sendHttpResponse(req, res, () =>
         deps.useCases.getSiret.execute(req.params),
       ),
     );
 
   formCompletionRouter
-    .route(`/${getSiretIfNotSavedRoute}/:siret`)
+    .route(siretTargets.getSiretInfoIfNotAlreadySaved.url)
     .get(async (req, res) =>
       sendHttpResponse(req, res, async () =>
         deps.useCases.getSiretIfNotAlreadySaved.execute(req.params),

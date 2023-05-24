@@ -3,7 +3,7 @@ import { GetSiretInfo } from "shared";
 import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
 
 export class TestSiretGatewayThroughBack implements SiretGatewayThroughBack {
-  isSiretAlreadyInSaved(): Observable<boolean> {
+  isSiretAlreadySaved(): Observable<boolean> {
     return this.isSiretInDb$;
   }
 

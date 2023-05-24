@@ -6,6 +6,7 @@ import {
   establishmentTargets,
   inclusionConnectedAllowedTargets,
   searchTargets,
+  siretTargets,
   validateEmailsTargets,
 } from "shared";
 import { configureHttpClient, createAxiosHandlerCreator } from "http-client";
@@ -49,7 +50,9 @@ export const createHttpDependencies = (): Dependencies => {
     ),
     romeAutocompleteGateway: new HttpRomeAutocompleteGateway(axiosOnSlashApi),
     sentEmailGateway: new HttpSentEmailGateway(axiosOnSlashApi),
-    siretGatewayThroughBack: new HttpSiretGatewayThroughBack(axiosOnSlashApi),
+    siretGatewayThroughBack: new HttpSiretGatewayThroughBack(
+      createHttpClient(siretTargets),
+    ),
     technicalGateway: new HttpTechnicalGateway(axiosOnSlashApi),
     emailValidationGateway: new HttpEmailValidationGateway(
       createHttpClient(validateEmailsTargets),

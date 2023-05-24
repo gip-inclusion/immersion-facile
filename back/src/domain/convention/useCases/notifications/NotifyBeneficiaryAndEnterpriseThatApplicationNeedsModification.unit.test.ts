@@ -29,7 +29,26 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
   let timeGateway: TimeGateway;
   let config: AppConfig;
   let shortLinkIdGateway: DeterministShortLinkIdGeneratorGateway;
-  const convention = new ConventionDtoBuilder().build();
+  const convention = new ConventionDtoBuilder()
+    .withBeneficiaryRepresentative({
+      firstName: "Tom",
+      lastName: "Cruise",
+      phone: "0665454271",
+      role: "beneficiary-representative",
+      email: "beneficiary@representative.fr",
+    })
+    .withBeneficiaryCurrentEmployer({
+      businessName: "boss",
+      role: "beneficiary-current-employer",
+      email: "current@employer.com",
+      phone: "001223344",
+      firstName: "Harry",
+      lastName: "Potter",
+      job: "Magician",
+      businessSiret: "01234567891234",
+    })
+    .build();
+
   const agency = new AgencyDtoBuilder().withId(convention.agencyId).build();
 
   beforeEach(() => {
@@ -52,7 +71,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
   });
 
   describe("Right paths", () => {
-    it.each<[Role, string]>([
+    it.each<[Role, string | undefined]>([
       ["beneficiary", convention.signatories.beneficiary.email],
       [
         "establishment",
@@ -62,6 +81,20 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
         "establishment-representative",
         convention.signatories.establishmentRepresentative.email,
       ],
+      [
+        "beneficiary-current-employer",
+        convention.signatories.beneficiaryCurrentEmployer?.email,
+      ],
+      [
+        "beneficiary-representative",
+        convention.signatories.beneficiaryRepresentative?.email,
+      ],
+      [
+        "legal-representative",
+        convention.signatories.beneficiaryRepresentative?.email,
+      ],
+      ["counsellor", agency.counsellorEmails[0]],
+      ["validator", agency.validatorEmails[0]],
     ])(
       "Notify %s that application needs modification.",
       async (role, expectedRecipient) => {
@@ -72,7 +105,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
           {
             id: convention.id,
             role,
-            email: expectedRecipient,
+            email: expectedRecipient!,
             now: timeGateway.now(),
           };
 
@@ -96,7 +129,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
         expectToEqual(notificationGateway.getSentEmails(), [
           {
             type: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
-            recipients: [expectedRecipient],
+            recipients: [expectedRecipient!],
             params: {
               internshipKind: convention.internshipKind,
               agency: agency.name,
@@ -118,15 +151,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
   });
 
   describe("Wrong paths", () => {
-    it.each<Role>([
-      "backOffice",
-      "beneficiary-current-employer",
-      "beneficiary-representative",
-      "counsellor",
-      "establishment-tutor",
-      "legal-representative",
-      "validator",
-    ])(
+    it.each<Role>(["backOffice", "establishment-tutor"])(
       "Notify %s that application needs modification is not supported.",
       async (role) => {
         const justification = "Change required.";

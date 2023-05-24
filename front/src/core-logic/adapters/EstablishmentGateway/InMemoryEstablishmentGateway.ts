@@ -27,12 +27,6 @@ export class InMemoryEstablishmentGateway implements EstablishmentGateway {
       throw new Error("418 I'm a teapot");
   }
 
-  public async isEstablishmentAlreadyRegisteredBySiret(
-    siret: SiretDto,
-  ): Promise<boolean> {
-    return this._existingEstablishmentSirets.includes(siret);
-  }
-
   public async requestEstablishmentModification(
     siret: SiretDto,
   ): Promise<void> {
