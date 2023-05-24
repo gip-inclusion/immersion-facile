@@ -90,6 +90,7 @@ export const ConventionFormFields = ({
       dispatch(conventionSlice.actions.setCurrentStep(step));
     },
     expanded: currentStep === step,
+    id: `im-convention-form__step-${step - 1}`,
   });
   const renderStatusBadge = (step: number) => {
     const stepFields = formUiSections[step - 1];

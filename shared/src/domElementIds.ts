@@ -133,6 +133,8 @@ export const domElementIds = {
   conventionImmersionRoute: {
     showFormButton: "im-convention-immersion__show-form-button",
     submitFormButton: "im-convention-immersion__submit-form-button",
+    confirmSubmitFormButton:
+      "im-convention-immersion__confirm-submit-form-button",
     conventionSection: {
       agencyDepartment: "im-convention-form__agencyDepartement",
       agencyId: "im-convention-form__agencyId",
