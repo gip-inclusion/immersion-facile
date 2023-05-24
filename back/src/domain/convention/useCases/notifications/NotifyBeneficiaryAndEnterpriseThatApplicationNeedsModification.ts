@@ -111,21 +111,21 @@ const emailByRoleForConventionNeedsModification = (
   const error = new Error(
     `Unsupported role for beneficiary/enterprise modification request notification: ${role}`,
   );
-  const missingEmailError = new Error(`Email adress not found for: ${role}`);
+  const missingEmailError = new Error(
+    `No actor with role ${role} for convention ${convention.id}`,
+  );
   const strategy: Record<Role, string | Error> = {
     backOffice: error,
-    "beneficiary-current-employer": convention.signatories
-      .beneficiaryCurrentEmployer
-      ? convention.signatories.beneficiaryCurrentEmployer.email
-      : missingEmailError,
-    "beneficiary-representative": convention.signatories
-      .beneficiaryRepresentative
-      ? convention.signatories.beneficiaryRepresentative.email
-      : missingEmailError,
+    "beneficiary-current-employer":
+      convention.signatories.beneficiaryCurrentEmployer?.email ??
+      missingEmailError,
+    "beneficiary-representative":
+      convention.signatories.beneficiaryRepresentative?.email ??
+      missingEmailError,
     "establishment-tutor": error,
-    "legal-representative": convention.signatories.beneficiaryRepresentative
-      ? convention.signatories.beneficiaryRepresentative.email
-      : missingEmailError,
+    "legal-representative":
+      convention.signatories.beneficiaryRepresentative?.email ??
+      missingEmailError,
     counsellor: agency.counsellorEmails[0],
     validator: agency.validatorEmails[0],
     "establishment-representative":

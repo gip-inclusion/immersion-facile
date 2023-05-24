@@ -8,15 +8,10 @@ import {
 } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { NotFoundError } from "../../../adapters/primary/helpers/httpErrors";
-import { InMemoryOutboxRepository } from "../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { TestUuidGenerator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
-import { InMemoryConventionRepository } from "../../../adapters/secondary/InMemoryConventionRepository";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import {
-  CreateNewEvent,
-  makeCreateNewEvent,
-} from "../../core/eventBus/EventBus";
+import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { UpdateConventionStatus } from "./UpdateConventionStatus";
 import {
   executeUpdateConventionStatusUseCase,
@@ -26,34 +21,6 @@ import {
 
 describe("UpdateConventionStatus", () => {
   describe("* -> DRAFT transition", () => {
-    let uowPerformer: InMemoryUowPerformer;
-    let timeGateway: CustomTimeGateway;
-    let outboxRepo: InMemoryOutboxRepository;
-    let createNewEvent: CreateNewEvent;
-    let conventionRepository: InMemoryConventionRepository;
-    let updateConventionStatus: UpdateConventionStatus;
-
-    beforeEach(() => {
-      const uow = createInMemoryUow();
-
-      outboxRepo = uow.outboxRepository;
-
-      timeGateway = new CustomTimeGateway();
-
-      createNewEvent = makeCreateNewEvent({
-        timeGateway,
-        uuidGenerator: new TestUuidGenerator(),
-      });
-
-      conventionRepository = uow.conventionRepository;
-      uowPerformer = new InMemoryUowPerformer(uow);
-      updateConventionStatus = new UpdateConventionStatus(
-        uowPerformer,
-        createNewEvent,
-        timeGateway,
-      );
-    });
-
     testForAllRolesAndInitialStatusCases({
       updateStatusParams: {
         status: "DRAFT",
@@ -84,6 +51,25 @@ describe("UpdateConventionStatus", () => {
       ],
     });
     it("ImmersionApplicationRequiresModification event only has the role of the user that requested the change", async () => {
+      const uow = createInMemoryUow();
+
+      const outboxRepo = uow.outboxRepository;
+
+      const timeGateway = new CustomTimeGateway();
+
+      const createNewEvent = makeCreateNewEvent({
+        timeGateway,
+        uuidGenerator: new TestUuidGenerator(),
+      });
+
+      const conventionRepository = uow.conventionRepository;
+      const uowPerformer = new InMemoryUowPerformer(uow);
+      const updateConventionStatus = new UpdateConventionStatus(
+        uowPerformer,
+        createNewEvent,
+        timeGateway,
+      );
+
       const conventionId = "1111222233334444";
       const requesterRole = "beneficiary";
 
