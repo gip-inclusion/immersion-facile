@@ -84,7 +84,7 @@ const makeGetSiret =
   }): Observable<GetSiretInfo | null> => {
     if (!enableInseeApi) {
       return siretGatewayThroughBack
-        .isSiretAlreadyInSaved(siret)
+        .isSiretAlreadySaved(siret)
         .pipe(
           map((isAlreadySaved) =>
             isAlreadySaved

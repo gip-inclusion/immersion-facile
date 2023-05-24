@@ -25,7 +25,7 @@ export class SimulatedSiretGatewayThroughBack
     } = {},
   ) {}
 
-  public isSiretAlreadyInSaved(siret: SiretDto): Observable<boolean> {
+  public isSiretAlreadySaved(siret: SiretDto): Observable<boolean> {
     const response = this.simulatedResponse(siret);
     const response$ = of(
       response === "Establishment with this siret is already in our DB",

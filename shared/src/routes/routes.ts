@@ -38,7 +38,6 @@ export const exportRoute = "export";
 export const generateMagicLinkRoute = "generate-magic-link";
 export const featureFlagsRoute = "feature-flags";
 export const getImmersionOfferByIdRoute__v0 = "get-immersion-by-id"; // Will be removed.
-export const getSiretIfNotSavedRoute = "siret-if-not-saved";
 export const immersionAssessmentRoute = "immersion-assessment";
 export const immersionOffersApiAuthRoute__v0 = "immersion-offers";
 export const immersionOffersRoute = "immersion-offers";
@@ -49,7 +48,6 @@ export const requestEmailToUpdateFormRoute = "request-email-to-update-form";
 export const romeRoute = "rome";
 export const searchImmersionRoute__v0 = "search-immersion"; // Becomes GET /immersion-offers?rome=A100&position.lon=2.2315&position.lat=48.8531
 export const signConventionRoute = "sign-application";
-export const siretRoute = "siret";
 export const updateConventionStatusRoute = "update-application-status";
 export const uploadFileRoute = "upload-file";
 export const shortLinkRoute = "to";

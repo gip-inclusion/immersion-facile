@@ -1,4 +1,3 @@
-import { z } from "zod";
 import { createTarget, createTargets } from "http-client";
 import { formEstablishmentSchema } from "../formEstablishment/FormEstablishment.schema";
 import { withValidateHeadersAuthorization } from "../headers";
@@ -23,11 +22,6 @@ export const establishmentTargets = createTargets({
     url: "/form-establishments/:siret",
     ...withValidateHeadersAuthorization,
     validateResponseBody: formEstablishmentSchema.parse,
-  }),
-  isEstablishmentWithSiretAlreadyRegistered: createTarget({
-    method: "GET",
-    url: "/form-already-exists/:siret",
-    validateResponseBody: z.boolean().parse,
   }),
   requestEmailToUpdateFormRoute: createTarget({
     method: "POST",

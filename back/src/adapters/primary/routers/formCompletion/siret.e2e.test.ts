@@ -1,5 +1,5 @@
 import { SuperTest, Test } from "supertest";
-import { expectToEqual, getSiretIfNotSavedRoute, siretRoute } from "shared";
+import { expectToEqual, siretTargets } from "shared";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
 import { InMemoryEstablishmentAggregateRepository } from "../../../secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
@@ -19,7 +19,10 @@ describe("/siret route", () => {
 
   it("processes valid requests", async () => {
     const response = await request.get(
-      `/${siretRoute}/${TEST_ESTABLISHMENT1.siret}`,
+      siretTargets.getSiretInfo.url.replace(
+        ":siret",
+        TEST_ESTABLISHMENT1.siret,
+      ),
     );
 
     expect(response.status).toBe(200);
@@ -34,11 +37,15 @@ describe("/siret route", () => {
   });
 
   it("returns 400 Bad Request for invalid request", async () => {
-    await request.get(`/${siretRoute}/not_a_valid_siret`).expect(400);
+    await request
+      .get(siretTargets.getSiretInfo.url.replace(":siret", "not_a_valid_siret"))
+      .expect(400);
   });
 
   it("returns 404 Not Found for unknown siret", async () => {
-    await request.get(`/${siretRoute}/40400000000404`).expect(404);
+    await request
+      .get(siretTargets.getSiretInfo.url.replace(":siret", "40400000000404"))
+      .expect(404);
   });
 
   it("returns 409 Conflict for siret already in db", async () => {
@@ -49,7 +56,10 @@ describe("/siret route", () => {
 
     await request
       .get(
-        `/${getSiretIfNotSavedRoute}/${establishmentAggregate.establishment.siret}`,
+        siretTargets.getSiretInfoIfNotAlreadySaved.url.replace(
+          ":siret",
+          establishmentAggregate.establishment.siret,
+        ),
       )
       .expect(409);
   });

@@ -1,38 +1,27 @@
-import { AxiosError, AxiosInstance, AxiosResponse } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import { from, Observable } from "rxjs";
 import {
-  establishmentTargets,
-  getSiretIfNotSavedRoute,
   GetSiretInfo,
   GetSiretInfoError,
-  getSiretInfoSchema,
-  isSiretExistResponseSchema,
   LegacyHttpClientError,
   LegacyHttpServerError,
   siretApiMissingEstablishmentMessage,
   siretApiUnavailableSiretErrorMessage,
   SiretDto,
-  siretRoute,
+  SiretTargets,
   tooManiSirenRequestsSiretErrorMessage,
 } from "shared";
+import { HttpClient } from "http-client";
 import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
 
 export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
-  constructor(private readonly httpClient: AxiosInstance) {}
+  constructor(private readonly httpClient: HttpClient<SiretTargets>) {}
 
-  isSiretAlreadyInSaved(siret: SiretDto): Observable<boolean> {
+  isSiretAlreadySaved(siret: SiretDto): Observable<boolean> {
     return from(
       this.httpClient
-        .get<unknown>(
-          establishmentTargets.isEstablishmentWithSiretAlreadyRegistered.url.replace(
-            ":siret",
-            siret,
-          ),
-        )
-        .then(({ data }) => {
-          const isSiretAlreadyExist = isSiretExistResponseSchema.parse(data);
-          return isSiretAlreadyExist;
-        }),
+        .isSiretAlreadySaved({ urlParams: { siret } })
+        .then(({ responseBody }) => responseBody),
     );
   }
 
@@ -41,11 +30,8 @@ export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
   public getSiretInfo(siret: SiretDto): Observable<GetSiretInfo> {
     return from(
       this.httpClient
-        .get<unknown>(`/${siretRoute}/${siret}`)
-        .then(({ data }) => {
-          const getSiretInfoDto = getSiretInfoSchema.parse(data);
-          return getSiretInfoDto;
-        })
+        .getSiretInfo({ urlParams: { siret } })
+        .then(({ responseBody }) => responseBody)
         .catch((error) => {
           if (
             error instanceof LegacyHttpClientError ||
@@ -73,11 +59,8 @@ export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
   ): Observable<GetSiretInfo> {
     return from(
       this.httpClient
-        .get<unknown>(`/${getSiretIfNotSavedRoute}/${siret}`)
-        .then(({ data }) => {
-          const getSiretInfoDto = getSiretInfoSchema.parse(data);
-          return getSiretInfoDto;
-        })
+        .getSiretInfoIfNotAlreadySaved({ urlParams: { siret } })
+        .then(({ responseBody }) => responseBody)
         .catch((error) => {
           if (
             error instanceof LegacyHttpClientError ||

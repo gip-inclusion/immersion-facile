@@ -5,8 +5,11 @@ import {
   createManagedAxiosInstance,
   expectToEqual,
   GetSiretInfoError,
+  SiretTargets,
+  siretTargets,
   tooManySirenRequestsSiret,
 } from "shared";
+import { configureHttpClient, createAxiosHandlerCreator } from "http-client";
 import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
 import { HttpSiretGatewayThroughBack } from "./HttpSiretGatewayThroughBack";
 import { SimulatedSiretGatewayThroughBack } from "./SimulatedSiretGatewayThroughBack";
@@ -39,17 +42,28 @@ const simulated = new SimulatedSiretGatewayThroughBack(0, {
   },
 });
 
-const http = new HttpSiretGatewayThroughBack(
-  createManagedAxiosInstance({ baseURL: "http://localhost:1234" }),
+const axiosInstance = createManagedAxiosInstance({
+  baseURL: "http://localhost:1234",
+});
+
+const createHttpClient = configureHttpClient(
+  createAxiosHandlerCreator(axiosInstance),
 );
 
-const siretGatewaysThroughBack: SiretGatewayThroughBack[] = [simulated, http];
+const siretGateway = new HttpSiretGatewayThroughBack(
+  createHttpClient<SiretTargets>(siretTargets),
+);
+
+const siretGatewaysThroughBack: SiretGatewayThroughBack[] = [
+  simulated,
+  siretGateway,
+];
 
 siretGatewaysThroughBack.forEach((siretGatewayThroughBack) => {
   describe(`${siretGatewayThroughBack.constructor.name} - manual`, () => {
     it("isSiretAlreadyInSaved - returns false if establishment with siret is in DB", async () => {
       const isSaved = await firstValueFrom(
-        siretGatewayThroughBack.isSiretAlreadyInSaved("40400000000404"),
+        siretGatewayThroughBack.isSiretAlreadySaved("40400000000404"),
       );
       expect(isSaved).toBe(false);
     });
