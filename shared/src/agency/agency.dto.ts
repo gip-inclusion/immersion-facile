@@ -43,6 +43,7 @@ export const agencyKindList = [
   "cci",
   "autre",
   "immersion-facile",
+  "operateur-cep",
 ] as const;
 
 export type AgencyOption = {

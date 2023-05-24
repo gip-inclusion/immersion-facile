@@ -196,6 +196,7 @@ const agencyKindToLabel: Record<AllowedAgencyKindToAdd, string> = {
   "prepa-apprentissage": "Prépa Apprentissage",
   cci: "Chambres de Commerce et d'Industrie",
   "structure-IAE": "Structure IAE",
+  "operateur-cep": "Opérateur du CEP",
   autre: "Autre",
 };
 
