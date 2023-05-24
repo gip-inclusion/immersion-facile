@@ -66,6 +66,7 @@ export * from "./routes/agencyTargets";
 export * from "./routes/establishementTargets";
 export * from "./routes/routes";
 export * from "./routes/searchTargets";
+export * from "./routes/siretTargets";
 export * from "./routes/validateEmailTargets";
 export * from "./routes/validateEmailTargets";
 export * from "./schedule/Schedule.dto";

@@ -1,10 +1,5 @@
 import { from, Observable } from "rxjs";
-import {
-  EstablishmentTargets,
-  FormEstablishmentDto,
-  isSiretExistResponseSchema,
-  SiretDto,
-} from "shared";
+import { EstablishmentTargets, FormEstablishmentDto, SiretDto } from "shared";
 import { HttpClient } from "http-client";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
 
@@ -17,16 +12,6 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
     await this.httpClient.addFormEstablishment({
       body: establishment,
     });
-  }
-
-  public async isEstablishmentAlreadyRegisteredBySiret(
-    siret: SiretDto,
-  ): Promise<boolean> {
-    const response =
-      await this.httpClient.isEstablishmentWithSiretAlreadyRegistered({
-        urlParams: { siret },
-      });
-    return isSiretExistResponseSchema.parse(response.responseBody);
   }
 
   public async requestEstablishmentModification(
