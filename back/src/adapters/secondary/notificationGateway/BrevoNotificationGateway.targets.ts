@@ -3,10 +3,9 @@ import { createTarget, createTargets } from "http-client";
 import { createLogger } from "../../../utils/logger";
 import { validateAndParseZodSchema } from "../../primary/helpers/httpErrors";
 import {
-  sendTransactEmailHeaderSchema,
+  brevoHeaderSchema,
   sendTransactEmailRequestBodySchema,
   sendTransactEmailResponseSchema,
-  sendTransactSmsHeaderSchema,
   sendTransactSmsRequestBodySchema,
   sendTransactSmsResponseSchema,
 } from "./BrevoNotificationGateway.schemas";
@@ -21,7 +20,7 @@ export const brevoNotificationGatewayTargets = createTargets({
   sendTransactEmail: createTarget({
     method: "POST",
     url: `${apiBrevoUrl}/smtp/email`,
-    validateHeaders: sendTransactEmailHeaderSchema.parse,
+    validateHeaders: brevoHeaderSchema.parse,
     validateRequestBody: sendTransactEmailRequestBodySchema.parse,
     validateResponseBody: (responseBody) =>
       validateAndParseZodSchema(
@@ -33,7 +32,7 @@ export const brevoNotificationGatewayTargets = createTargets({
   sendTransactSms: createTarget({
     method: "POST",
     url: `${apiBrevoUrl}/transactionalSMS/sms`,
-    validateHeaders: sendTransactSmsHeaderSchema.parse,
+    validateHeaders: brevoHeaderSchema.parse,
     validateRequestBody: sendTransactSmsRequestBodySchema.parse,
     validateResponseBody: (responseBody) =>
       validateAndParseZodSchema(

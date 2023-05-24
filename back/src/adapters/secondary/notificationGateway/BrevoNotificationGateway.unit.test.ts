@@ -9,7 +9,7 @@ import { makeEmailAllowListPredicate } from "../../primary/config/appConfig";
 import { BadRequestError } from "../../primary/helpers/httpErrors";
 import { BrevoNotificationGateway } from "./BrevoNotificationGateway";
 import {
-  SendTransactEmailHeader,
+  BrevoHeaders,
   SendTransactEmailRequestBody,
 } from "./BrevoNotificationGateway.schemas";
 import { BrevoNotificationGatewayTargets } from "./BrevoNotificationGateway.targets";
@@ -21,7 +21,7 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
   let allowListPredicate;
   let notificationGateway: BrevoNotificationGateway;
   let sentEmails: {
-    headers: SendTransactEmailHeader;
+    headers: BrevoHeaders;
     body: SendTransactEmailRequestBody;
   }[];
 
