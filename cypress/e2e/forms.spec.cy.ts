@@ -18,6 +18,8 @@ describe("Convention Form (on dev http, prefilled forms false)", () => {
   it("can edit input date with null / 0 value", () => {
     cy.visit(conventionFormUrl);
     cy.get(`#${domElementIds.conventionImmersionRoute.showFormButton}`).click();
+    // Open place / date section
+    cy.get(`#im-convention-form__step-3 .fr-accordion__btn`).click();
     cy.get(
       `#${domElementIds.conventionImmersionRoute.conventionSection.dateStart}`,
     )

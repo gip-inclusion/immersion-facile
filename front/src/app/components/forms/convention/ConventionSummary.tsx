@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Table } from "@codegouvfr/react-dsfr/Table";
+import { useStyles } from "tss-react/dsfr";
 import {
   AgencyPublicDisplayDto,
   ConventionReadDto,
@@ -230,6 +231,7 @@ export const ConventionSummary = ({
 }) => {
   const convention = useAppSelector(conventionSelectors.convention);
   const [agency, setAgency] = useState<AgencyPublicDisplayDto | null>(null);
+  const { cx } = useStyles();
   useEffect(() => {
     if (convention) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -245,9 +247,9 @@ export const ConventionSummary = ({
   if (!agency) return <Loader />;
 
   return (
-    <div className={fr.cx("fr-col")}>
+    <div className={cx(fr.cx("fr-col"), "im-convention-summary")}>
       {summarySections(convention, agency).map(({ title, fields }) => (
-        <section key={title}>
+        <section key={title} className={cx("im-convention-summary__section")}>
           <h2 className={fr.cx("fr-h4")}>{title}</h2>
           <Table data={fields} noCaption fixed />
         </section>

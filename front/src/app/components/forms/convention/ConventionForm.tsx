@@ -14,6 +14,7 @@ import {
   ConventionReadDto,
   conventionWithoutExternalIdSchema,
   decodeMagicLinkJwtWithoutSignatureCheck,
+  domElementIds,
   hasBeneficiaryCurrentEmployer,
   isBeneficiaryMinor,
   isEstablishmentTutorIsEstablishmentRepresentative,
@@ -226,6 +227,7 @@ export const ConventionForm = ({
         .with(
           {
             formSuccessfullySubmitted: true,
+            showSummary: true,
           },
           () => (
             <SubmitConfirmationSection
@@ -239,6 +241,7 @@ export const ConventionForm = ({
         .with(
           {
             showSummary: true,
+            formSuccessfullySubmitted: false,
           },
           () => (
             <>
@@ -268,7 +271,11 @@ export const ConventionForm = ({
                         },
                         {
                           children: "Envoyer la convention",
-                          onClick: onConfirmSubmit,
+                          onClick: methods.handleSubmit(onConfirmSubmit),
+                          nativeButtonProps: {
+                            id: domElementIds.conventionImmersionRoute
+                              .confirmSubmitFormButton,
+                          },
                         },
                       ]}
                     />
@@ -281,6 +288,7 @@ export const ConventionForm = ({
         .with(
           {
             showSummary: false,
+            formSuccessfullySubmitted: false,
           },
           () => (
             <FormProvider {...methods}>
@@ -324,7 +332,7 @@ export const ConventionForm = ({
                         <ShareConventionLink />
                         <Button
                           type="submit"
-                          onClick={methods.handleSubmit(onConfirmSubmit)}
+                          onClick={methods.handleSubmit(onSubmit)}
                         >
                           Envoyer la convention
                         </Button>
@@ -337,7 +345,15 @@ export const ConventionForm = ({
           ),
         )
 
-        .exhaustive()}
+        .otherwise(() => (
+          <>
+            <Alert
+              title="Erreur"
+              severity="error"
+              description="Une erreur est survenue. Veuillez réessayer."
+            />
+          </>
+        ))}
     </div>
   );
 };
