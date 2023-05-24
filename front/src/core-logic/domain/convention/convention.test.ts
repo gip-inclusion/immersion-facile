@@ -828,6 +828,84 @@ describe("Convention slice", () => {
     });
   });
 
+  it("changes the form agencyDepartment when asked", () => {
+    ({ store } = createTestStore({
+      convention: {
+        formUi: {
+          preselectedAgencyId: null,
+          isMinor: false,
+          isTutorEstablishmentRepresentative: true,
+          hasCurrentEmployer: false,
+          currentStep: 1,
+          agencyDepartment: null,
+          showSummary: false,
+        },
+        jwt: null,
+        convention: null,
+        conventionStatusDashboardUrl: null,
+        feedback: { kind: "modificationsAskedFromSignatory" },
+        isLoading: false,
+        fetchError: null,
+        currentSignatoryRole: null,
+      },
+    }));
+    expectConventionState({
+      formUi: { ...store.getState().convention.formUi, agencyDepartment: null },
+    });
+    store.dispatch(
+      conventionSlice.actions.agencyDepartementChangeRequested("86"),
+    );
+    expectConventionState({
+      formUi: { ...store.getState().convention.formUi, agencyDepartment: "86" },
+    });
+  });
+
+  it("changes the form showSummary when asked (and populate convention if provided)", () => {
+    const fakeConvention =
+      new ConventionDtoBuilder().build() as ConventionReadDto;
+    ({ store } = createTestStore({
+      convention: {
+        formUi: {
+          preselectedAgencyId: null,
+          isMinor: false,
+          isTutorEstablishmentRepresentative: true,
+          hasCurrentEmployer: false,
+          currentStep: 1,
+          agencyDepartment: null,
+          showSummary: false,
+        },
+        jwt: null,
+        convention: null,
+        conventionStatusDashboardUrl: null,
+        feedback: { kind: "modificationsAskedFromSignatory" },
+        isLoading: false,
+        fetchError: null,
+        currentSignatoryRole: null,
+      },
+    }));
+    expectConventionState({
+      formUi: { ...store.getState().convention.formUi, showSummary: false },
+    });
+    store.dispatch(
+      conventionSlice.actions.showSummaryChangeRequested({
+        showSummary: true,
+        convention: fakeConvention,
+      }),
+    );
+    expectConventionState({
+      formUi: { ...store.getState().convention.formUi, showSummary: true },
+      convention: fakeConvention,
+    });
+    store.dispatch(
+      conventionSlice.actions.showSummaryChangeRequested({
+        showSummary: false,
+      }),
+    );
+    expectConventionState({
+      formUi: { ...store.getState().convention.formUi, showSummary: false },
+    });
+  });
+
   it("Toggle is minor", () => {
     expectIsMinorToBe(false);
 
