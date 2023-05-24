@@ -1,11 +1,12 @@
 import axios from "axios";
 import Bottleneck from "bottleneck";
-import { formatISO, secondsToMilliseconds } from "date-fns";
+import { format, formatISO, secondsToMilliseconds } from "date-fns";
 import {
   filterNotFalsy,
   NafDto,
   NumberEmployeesRange,
   propEq,
+  queryParamsAsString,
   SiretDto,
   SiretEstablishmentDto,
 } from "shared";
@@ -31,6 +32,9 @@ const logger = createLogger(__filename);
 
 const inseeMaxRequestsPerMinute = 500;
 
+// The documentation can be found here (it is a pdf) :
+// https://api.insee.fr/catalogue/site/themes/wso2/subthemes/insee/templates/api/documentation/download.jag?tenant=carbon.super&resourceUrl=/registry/resource/_system/governance/apimgt/applicationdata/provider/insee/Sirene/V3/documentation/files/INSEE%20Documentation%20API%20Sirene%20Services-V3.9.pdf
+
 export class InseeSiretGateway implements SiretGateway {
   public constructor(
     private readonly axiosConfig: AxiosConfig,
@@ -47,6 +51,54 @@ export class InseeSiretGateway implements SiretGateway {
       },
       timeout: secondsToMilliseconds(10),
     });
+  }
+
+  public async getEstablishmentUpdatedSince(
+    date: Date,
+    sirets: SiretDto[],
+  ): Promise<SiretEstablishmentDto[]> {
+    try {
+      const formattedDate = format(date, "yyyy-MM-dd");
+      const axios = this.createAxiosInstance();
+
+      const requestBody = queryParamsAsString({
+        q: [
+          `dateDernierTraitementEtablissement:${formattedDate}`,
+          `(${sirets.map((siret) => `siret:${siret}`).join(" OR ")})`,
+        ].join(" AND "),
+        champs: [
+          "siret",
+          "denominationUniteLegale",
+          "nomUniteLegale",
+          "prenomUsuelUniteLegale",
+          "activitePrincipaleUniteLegale",
+          "nomenclatureActivitePrincipaleUniteLegale",
+          "trancheEffectifsUniteLegale",
+          "etatAdministratifUniteLegale",
+          "numeroVoieEtablissement",
+          "typeVoieEtablissement",
+          "libelleVoieEtablissement",
+          "codePostalEtablissement",
+          "libelleCommuneEtablissement",
+          "dateDebut",
+          "dateFin",
+          "etatAdministratifEtablissement",
+        ].join(","),
+        nombre: 1000,
+      });
+
+      const response = await axios.post("/siret", requestBody, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      });
+
+      return response.data.etablissements.map(
+        convertSirenRawEstablishmentToSirenEstablishmentDto,
+      );
+    } catch (error: any) {
+      throw error?.response.data;
+    }
   }
 
   public async getEstablishmentBySiret(
