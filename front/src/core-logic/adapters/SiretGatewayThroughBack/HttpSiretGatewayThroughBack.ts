@@ -1,16 +1,5 @@
-import { AxiosError, AxiosResponse } from "axios";
 import { from, Observable } from "rxjs";
-import {
-  GetSiretInfo,
-  GetSiretInfoError,
-  LegacyHttpClientError,
-  LegacyHttpServerError,
-  siretApiMissingEstablishmentMessage,
-  siretApiUnavailableSiretErrorMessage,
-  SiretDto,
-  SiretTargets,
-  tooManiSirenRequestsSiretErrorMessage,
-} from "shared";
+import { GetSiretInfo, SiretDto, SiretTargets } from "shared";
 import { HttpClient } from "http-client";
 import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
 
@@ -31,26 +20,7 @@ export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
     return from(
       this.httpClient
         .getSiretInfo({ urlParams: { siret } })
-        .then(({ responseBody }) => responseBody)
-        .catch((error) => {
-          if (
-            error instanceof LegacyHttpClientError ||
-            error instanceof LegacyHttpServerError
-          ) {
-            //TODO Changer le contract de HttpClientError/HttpServerError pour avoir le status en public sur l'instance directement
-            // (l'info doit être porté par le domaine et forcément définie)
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const err = error.cause! as AxiosError;
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const resp = err.response! as AxiosResponse;
-            //TODO errorMessageByCode[error.status];
-            const errorMessage = errorMessageByCode[resp.status];
-            if (errorMessage) return errorMessage;
-          }
-          throw new Error("Une erreur non managée est survenue", {
-            cause: error,
-          });
-        }),
+        .then(({ responseBody }) => responseBody),
     );
   }
 
@@ -60,33 +30,7 @@ export class HttpSiretGatewayThroughBack implements SiretGatewayThroughBack {
     return from(
       this.httpClient
         .getSiretInfoIfNotAlreadySaved({ urlParams: { siret } })
-        .then(({ responseBody }) => responseBody)
-        .catch((error) => {
-          if (
-            error instanceof LegacyHttpClientError ||
-            error instanceof LegacyHttpServerError
-          ) {
-            //TODO Changer le contract de HttpClientError/HttpServerError pour avoir le status en public sur l'instance directement
-            // (l'info doit être porté par le domaine et forcément définie)
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const err = error.cause! as AxiosError;
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            const resp = err.response! as AxiosResponse;
-            //TODO errorMessageByCode[error.status];
-            const errorMessage = errorMessageByCode[resp.status];
-            if (errorMessage) return errorMessage;
-          }
-          throw new Error("Une erreur non managée est survenue", {
-            cause: error,
-          });
-        }),
+        .then(({ responseBody }) => responseBody),
     );
   }
 }
-
-const errorMessageByCode: Partial<Record<number, GetSiretInfoError>> = {
-  [429]: tooManiSirenRequestsSiretErrorMessage,
-  [503]: siretApiUnavailableSiretErrorMessage,
-  [404]: siretApiMissingEstablishmentMessage,
-  [409]: "Establishment with this siret is already in our DB",
-};

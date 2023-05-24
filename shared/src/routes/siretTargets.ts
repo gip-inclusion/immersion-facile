@@ -4,8 +4,6 @@ import {
   isSiretExistResponseSchema,
 } from "../siret/siret.schema";
 
-const siretRoute = "siret";
-const getSiretIfNotSavedRoute = "siret-if-not-saved";
 export type SiretTargets = typeof siretTargets;
 export const siretTargets = createTargets({
   isSiretAlreadySaved: createTarget({
@@ -15,12 +13,12 @@ export const siretTargets = createTargets({
   }),
   getSiretInfo: createTarget({
     method: "GET",
-    url: `/${siretRoute}/:siret`,
+    url: `/siret/:siret`,
     validateResponseBody: getSiretInfoSchema.parse,
   }),
   getSiretInfoIfNotAlreadySaved: createTarget({
     method: "GET",
-    url: `/${getSiretIfNotSavedRoute}/:siret`,
+    url: `/siret-if-not-saved/:siret`,
     validateResponseBody: getSiretInfoSchema.parse,
   }),
 });

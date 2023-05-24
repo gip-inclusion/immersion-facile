@@ -5,7 +5,6 @@ import {
   createManagedAxiosInstance,
   expectToEqual,
   GetSiretInfoError,
-  SiretTargets,
   siretTargets,
   tooManySirenRequestsSiret,
 } from "shared";
@@ -51,7 +50,7 @@ const createHttpClient = configureHttpClient(
 );
 
 const siretGateway = new HttpSiretGatewayThroughBack(
-  createHttpClient<SiretTargets>(siretTargets),
+  createHttpClient(siretTargets),
 );
 
 const siretGatewaysThroughBack: SiretGatewayThroughBack[] = [
