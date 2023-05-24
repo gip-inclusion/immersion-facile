@@ -27,7 +27,10 @@ import {
 } from "../../../../adapters/primary/helpers/httpErrors";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { InMemoryNotificationGateway } from "../../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
+import {
+  InMemoryNotificationGateway,
+  sendSmsErrorPhoneNumber,
+} from "../../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
 import { ReminderKind } from "../../../core/eventsPayloads/ConventionReminderPayload";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
@@ -111,6 +114,72 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
 
       //Assert
       expectToEqual(notificationGateway.getSentEmails(), []);
+    });
+
+    it("Send SMS failure", async () => {
+      //Arrange
+      const agency = new AgencyDtoBuilder().withId("agencyId").build();
+
+      const convention = new ConventionDtoBuilder()
+        .withStatus("PARTIALLY_SIGNED")
+        .withAgencyId(agency.id)
+        .withBeneficiaryPhone(sendSmsErrorPhoneNumber)
+        .withBeneficiarySignedAt(undefined)
+        .withEstablishmentRepresentative(
+          establishmentRepresentativeWithoutMobilePhone,
+        )
+        .withEstablishmentTutor({
+          email: establishmentRepresentativeWithoutMobilePhone.email,
+          firstName: establishmentRepresentativeWithoutMobilePhone.firstName,
+          job: "Wizard",
+          lastName: establishmentRepresentativeWithoutMobilePhone.lastName,
+          phone: establishmentRepresentativeWithoutMobilePhone.phone,
+          role: "establishment-tutor",
+        })
+        .build();
+
+      uow.conventionRepository.setConventions({
+        [convention.id]: convention,
+      });
+      uow.agencyRepository.setAgencies([agency]);
+      const shortLinkIds = ["shortLink1", "shortLink2"];
+      shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
+
+      //Act
+      await expectPromiseToFailWithError(
+        useCase.execute({
+          conventionId: convention.id,
+          reminderKind: "FirstReminderForSignatories",
+        }),
+        new Error("Send SMS Error with phone number 33699999999."),
+      );
+
+      //Assert
+      expectToEqual(uow.shortLinkRepository.getShortLinks(), {
+        [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
+          id: convention.id,
+          role: convention.signatories.establishmentRepresentative.role,
+          targetRoute: frontRoutes.conventionToSign,
+          email: convention.signatories.establishmentRepresentative.email,
+          now: timeGateway.now(),
+        }),
+        [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
+          id: convention.id,
+          role: convention.signatories.beneficiary.role,
+          targetRoute: frontRoutes.conventionToSign,
+          email: convention.signatories.beneficiary.email,
+          now: timeGateway.now(),
+        }),
+      });
+      expectToEqual(notificationGateway.getSentEmails(), [
+        makeSignatoriesFirstReminderEmail({
+          actor: establishmentRepresentativeWithoutMobilePhone,
+          convention,
+          shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[0]),
+          timeGateway,
+        }),
+      ]);
+      expectToEqual(notificationGateway.getSentSms(), []);
     });
   });
 

@@ -9,7 +9,7 @@ import { createLogger } from "../../../utils/logger";
 import { CustomTimeGateway } from "../core/TimeGateway/CustomTimeGateway";
 
 const logger = createLogger(__filename);
-
+export const sendSmsErrorPhoneNumber = "0699999999";
 export class InMemoryNotificationGateway implements NotificationGateway {
   public constructor(
     private readonly timeGateway: TimeGateway = new CustomTimeGateway(),
@@ -47,6 +47,10 @@ export class InMemoryNotificationGateway implements NotificationGateway {
   }
 
   public async sendSms(sendSmsParams: SendSmsParams): Promise<void> {
+    if (sendSmsParams.phone === "33" + sendSmsErrorPhoneNumber.substring(1))
+      throw new Error(
+        `Send SMS Error with phone number ${sendSmsParams.phone}.`,
+      );
     this.sentSms.push(sendSmsParams);
   }
 
