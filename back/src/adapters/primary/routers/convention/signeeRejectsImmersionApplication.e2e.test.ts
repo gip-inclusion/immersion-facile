@@ -126,7 +126,7 @@ const expectEstablishmentRequiresChanges = async (
 
   await eventCrawler.processNewEvents();
 
-  // Expect one emails sent ( to establishment representative)
+  // Expect one email sent ( to establishment representative)
   const sentEmails = gateways.email.getSentEmails();
   expect(sentEmails).toHaveLength(4);
   expect(sentEmails.slice(3).map((e) => e.recipients)).toEqual([
