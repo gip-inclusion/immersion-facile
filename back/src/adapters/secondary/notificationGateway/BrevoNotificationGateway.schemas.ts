@@ -8,20 +8,17 @@ const apiKeySchema = z.string().nonempty();
 type ApplicationJsonType = "application/json";
 const applicationJsonSchema = z.literal("application/json");
 
-export type SendTransactEmailHeader = {
+export type BrevoHeaders = {
   accept: ApplicationJsonType;
   "content-type": ApplicationJsonType;
   "api-key": ApiKey;
 };
 
-export const sendTransactEmailHeaderSchema: z.Schema<SendTransactEmailHeader> =
-  z.object({
-    accept: applicationJsonSchema,
-    "content-type": applicationJsonSchema,
-    "api-key": apiKeySchema,
-  });
-
-export const sendTransactSmsHeaderSchema = sendTransactEmailHeaderSchema;
+export const brevoHeaderSchema: z.Schema<BrevoHeaders> = z.object({
+  accept: applicationJsonSchema,
+  "content-type": applicationJsonSchema,
+  "api-key": apiKeySchema,
+});
 
 export type RecipientOrSender = {
   name?: string;

@@ -1,3 +1,4 @@
+import Bottleneck from "bottleneck";
 import {
   AbsoluteUrl,
   EmailSentDto,
@@ -28,6 +29,7 @@ import { createLogger } from "../../../utils/logger";
 import { BadRequestError } from "../../primary/helpers/httpErrors";
 import {
   ApiKey,
+  BrevoHeaders,
   RecipientOrSender,
   SendTransactEmailRequestBody,
   SendTransactSmsRequestBody,
@@ -36,14 +38,25 @@ import { BrevoNotificationGatewayTargets } from "./BrevoNotificationGateway.targ
 
 const logger = createLogger(__filename);
 
+const brevoMaxEmailRequestsPerSeconds = 2_000;
+const brevoMaxSmsRequestsPerHour = 200;
+const ONE_HOUR_MS = 3_600_000;
+const ONE_SECOND_MS = 1_000;
+
 export class BrevoNotificationGateway implements NotificationGateway {
   constructor(
     private readonly httpClient: HttpClient<BrevoNotificationGatewayTargets>,
     private emailAllowListPredicate: (recipient: string) => boolean,
-    private apiKey: ApiKey,
+    apiKey: ApiKey,
     private sender: RecipientOrSender,
     private generateHtmlOptions: GenerateHtmlOptions = {},
-  ) {}
+  ) {
+    this.brevoHeaders = {
+      accept: "application/json",
+      "content-type": "application/json",
+      "api-key": apiKey,
+    };
+  }
 
   sendSms({ phone, kind, shortLink }: SendSmsParams): Promise<void> {
     logger.info(
@@ -122,7 +135,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
     );
 
     return this.sendTransacEmail(emailData)
-      .then(() => {
+      .then((_response) => {
         counterSendTransactEmailSuccess.inc({ emailType });
         logger.info(
           { to: emailData.to, type: email.type },
@@ -159,27 +172,38 @@ export class BrevoNotificationGateway implements NotificationGateway {
   }
 
   private async sendTransacEmail(body: SendTransactEmailRequestBody) {
-    await this.httpClient.sendTransactEmail({
-      headers: {
-        accept: "application/json",
-        "content-type": "application/json",
-        "api-key": this.apiKey,
-      },
-      body,
-    });
+    return this.emailLimiter.schedule(() =>
+      this.httpClient.sendTransactEmail({
+        headers: this.brevoHeaders,
+        body,
+      }),
+    );
   }
 
   private sendTransacSms(body: SendTransactSmsRequestBody) {
-    return this.httpClient.sendTransactSms({
-      headers: {
-        accept: "application/json",
-        "content-type": "application/json",
-        "api-key": this.apiKey,
-      },
-      body,
-    });
+    return this.smslimiter.schedule(() =>
+      this.httpClient.sendTransactSms({
+        headers: this.brevoHeaders,
+        body,
+      }),
+    );
   }
+
+  private emailLimiter = new Bottleneck({
+    reservoir: brevoMaxEmailRequestsPerSeconds,
+    reservoirRefreshInterval: ONE_SECOND_MS, // number of ms
+    reservoirRefreshAmount: brevoMaxEmailRequestsPerSeconds,
+  });
+
+  private smslimiter = new Bottleneck({
+    reservoir: brevoMaxSmsRequestsPerHour,
+    reservoirRefreshInterval: ONE_HOUR_MS, // number of ms
+    reservoirRefreshAmount: brevoMaxSmsRequestsPerHour,
+  });
+
+  private readonly brevoHeaders: BrevoHeaders;
 }
+
 const smsContentMaker =
   (kind: ReminderKind) =>
   (shortLinkUrl: AbsoluteUrl): string => {
