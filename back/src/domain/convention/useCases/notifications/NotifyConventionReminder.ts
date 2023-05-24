@@ -127,8 +127,8 @@ export class NotifyConventionReminder extends TransactionalUseCase<
       ),
     );
     await Promise.all([
-      ...[emails.map((email) => this.notificationGateway.sendEmail(email))],
-      ...[sms.map((smsParam) => this.notificationGateway.sendSms(smsParam))],
+      ...emails.map((email) => this.notificationGateway.sendEmail(email)),
+      ...sms.map((smsParam) => this.notificationGateway.sendSms(smsParam)),
     ]);
   }
   async prepareSmsReminderParams(

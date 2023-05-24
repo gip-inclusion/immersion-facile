@@ -57,7 +57,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
       sender: "ImmerFacile",
       recipient: phone,
     })
-      .then(() =>
+      .then((_response) =>
         logger.info(
           {
             phone,
@@ -168,8 +168,9 @@ export class BrevoNotificationGateway implements NotificationGateway {
       body,
     });
   }
-  private async sendTransacSms(body: SendTransactSmsRequestBody) {
-    await this.httpClient.sendTransactSms({
+
+  private sendTransacSms(body: SendTransactSmsRequestBody) {
+    return this.httpClient.sendTransactSms({
       headers: {
         accept: "application/json",
         "content-type": "application/json",
