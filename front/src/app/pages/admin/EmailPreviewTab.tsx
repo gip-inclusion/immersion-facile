@@ -5,9 +5,9 @@ import { keys } from "ramda";
 import { useStyles } from "tss-react/dsfr";
 import {
   domElementIds,
+  emailTemplatesByName,
   immersionFacileContactEmail,
   internshipKinds,
-  templatesByName,
 } from "shared";
 import { DsfrTitle, ImmersionTextField } from "react-design-system";
 import { configureGenerateHtmlFromTemplate } from "html-templates";
@@ -19,7 +19,7 @@ import {
 const defaultEmailPreviewUrl =
   "https://upload.wikimedia.org/wikipedia/en/9/9a/Trollface_non-free.png";
 
-type TemplateByName = typeof templatesByName;
+type TemplateByName = typeof emailTemplatesByName;
 type TemplateName = keyof TemplateByName;
 
 export const EmailPreviewTab = () => {
@@ -40,7 +40,7 @@ export const EmailPreviewTab = () => {
   }, [currentTemplate]);
 
   const fakeContent = configureGenerateHtmlFromTemplate(
-    templatesByName,
+    emailTemplatesByName,
     { contactEmail: immersionFacileContactEmail },
     "internshipKind" in emailVariables &&
       emailVariables.internshipKind === "mini-stage-cci"
@@ -62,8 +62,8 @@ export const EmailPreviewTab = () => {
             <Select
               label="Liste de templates email :"
               placeholder="Veuillez sélectionner un template email"
-              options={keys(templatesByName).map((templateName) => ({
-                label: templatesByName[templateName].niceName,
+              options={keys(emailTemplatesByName).map((templateName) => ({
+                label: emailTemplatesByName[templateName].niceName,
                 value: templateName,
               }))}
               nativeSelectProps={{

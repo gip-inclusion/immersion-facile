@@ -41,10 +41,12 @@ describe("BrevoNotificationGateway manual", () => {
 
   it("should send SMS correctly", async () => {
     await notificationGateway.sendSms({
-      phone: "VALID_INTERNATIONAL_FRENCH_MOBILE_PHONE_NUMBER", // Like 33611223344
+      recipient: "VALID_INTERNATIONAL_FRENCH_MOBILE_PHONE_NUMBER", // Like 33611223344
       kind: "LastReminderForSignatories",
-      shortLink:
-        "https://immersion-facile.beta.gouv.fr/api/to/gygr669PTEQBiTwfNycBl9nq8Pua3h5D9pv2",
+      params: {
+        shortLink:
+          "https://immersion-facile.beta.gouv.fr/api/to/gygr669PTEQBiTwfNycBl9nq8Pua3h5D9pv2",
+      },
     });
 
     // Please check SMS has been received at VALID_INTERNATIONAL_FRENCH_MOBILE_PHONE_NUMBER

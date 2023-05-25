@@ -1,19 +1,22 @@
 import { format } from "date-fns";
 import {
-  AgencyDto,
-  Beneficiary,
-  BeneficiaryCurrentEmployer,
-  BeneficiaryRepresentative,
-  ConventionDto,
-  ConventionReadDto,
-  EstablishmentRepresentative,
+  type AgencyDto,
+  type Beneficiary,
+  type BeneficiaryCurrentEmployer,
+  type BeneficiaryRepresentative,
+  type ConventionDto,
+  type ConventionReadDto,
+  type EstablishmentRepresentative,
+  type ExtractFromExisting,
   filterNotFalsy,
   frontRoutes,
-  GenericActor,
+  type GenericActor,
   isEstablishmentTutorIsEstablishmentRepresentative,
   isSignatoryRole,
-  Role,
-  TemplatedEmail,
+  type Phone,
+  type Role,
+  type TemplatedEmail,
+  type TemplatedSms,
 } from "shared";
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
@@ -31,11 +34,7 @@ import {
 } from "../../../core/ports/UnitOfWork";
 import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import {
-  NotificationGateway,
-  Phone,
-  SendSmsParams,
-} from "../../ports/NotificationGateway";
+import { NotificationGateway } from "../../ports/NotificationGateway";
 import {
   missingAgencyMessage,
   missingConventionMessage,
@@ -45,6 +44,16 @@ type EmailWithRole = {
   email: string;
   role: Role;
 };
+
+type SignatoriesReminderKind = ExtractFromExisting<
+  ReminderKind,
+  "FirstReminderForSignatories" | "LastReminderForSignatories"
+>;
+
+type AgenciesReminderKind = ExtractFromExisting<
+  ReminderKind,
+  "FirstReminderForAgency" | "LastReminderForAgency"
+>;
 
 export class NotifyConventionReminder extends TransactionalUseCase<
   ConventionReminderPayload,
@@ -85,18 +94,11 @@ export class NotifyConventionReminder extends TransactionalUseCase<
 
     if (!agency) throw new NotFoundError(missingAgencyMessage(conventionRead));
 
-    if (
-      reminderKind === "FirstReminderForAgency" ||
-      reminderKind === "LastReminderForAgency"
-    )
-      return this.onAgencyReminder(reminderKind, conventionRead, agency, uow);
+    return this.onAgencyReminder(reminderKind, conventionRead, agency, uow);
   }
 
   private async onSignatoriesReminder(
-    kind: Extract<
-      ReminderKind,
-      "FirstReminderForSignatories" | "LastReminderForSignatories"
-    >,
+    kind: SignatoriesReminderKind,
     conventionRead: ConventionReadDto,
     uow: UnitOfWork,
   ): Promise<void> {
@@ -135,11 +137,8 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     { role, email, phone }: GenericActor<Role>,
     convention: ConventionReadDto,
     uow: UnitOfWork,
-    kind: Extract<
-      ReminderKind,
-      "FirstReminderForSignatories" | "LastReminderForSignatories"
-    >,
-  ): Promise<SendSmsParams> {
+    kind: SignatoriesReminderKind,
+  ): Promise<TemplatedSms> {
     const makeShortMagicLink = prepareMagicShortLinkMaker({
       config: this.config,
       conventionMagicLinkPayload: {
@@ -152,18 +151,18 @@ export class NotifyConventionReminder extends TransactionalUseCase<
       shortLinkIdGeneratorGateway: this.shortLinkIdGeneratorGateway,
       uow,
     });
+
+    const shortLink = await makeShortMagicLink(frontRoutes.conventionToSign);
+
     return {
-      phone: makeInternationalPhone(phone),
       kind,
-      shortLink: await makeShortMagicLink(frontRoutes.conventionToSign),
+      recipient: makeInternationalPhone(phone),
+      params: { shortLink },
     };
   }
 
   private async onAgencyReminder(
-    reminderKind: Extract<
-      ReminderKind,
-      "FirstReminderForAgency" | "LastReminderForAgency"
-    >,
+    reminderKind: AgenciesReminderKind,
     conventionRead: ConventionReadDto,
     agency: AgencyDto,
     uow: UnitOfWork,
@@ -205,10 +204,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     convention: ConventionReadDto,
     agency: AgencyDto,
     uow: UnitOfWork,
-    kind: Extract<
-      ReminderKind,
-      "FirstReminderForAgency" | "LastReminderForAgency"
-    >,
+    kind: AgenciesReminderKind,
   ): Promise<void> {
     const makeShortMagicLink = prepareMagicShortLinkMaker({
       config: this.config,

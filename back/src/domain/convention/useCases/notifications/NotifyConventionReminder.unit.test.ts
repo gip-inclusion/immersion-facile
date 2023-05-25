@@ -433,7 +433,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
     ]);
 
   describe("FirstReminderForSignatories", () => {
-    const type: ReminderKind = "FirstReminderForSignatories";
+    const kind: ReminderKind = "FirstReminderForSignatories";
 
     it.each(authorizedSignatoryStatuses)(
       `Send email 'FirstReminderForSignatories' to signatories when status is '%s'.
@@ -467,7 +467,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         //Act
         await useCase.execute({
           conventionId: convention.id,
-          reminderKind: type,
+          reminderKind: kind,
         });
 
         //Assert
@@ -542,7 +542,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         //Act
         await useCase.execute({
           conventionId: convention.id,
-          reminderKind: type,
+          reminderKind: kind,
         });
 
         //Assert
@@ -573,18 +573,21 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         ]);
         expectToEqual(notificationGateway.getSentSms(), [
           {
-            phone: "33" + convention.signatories.beneficiary.phone.substring(1),
-            kind: type,
-            shortLink: makeShortLinkUrl(config, shortLinkIds[0]),
+            recipient:
+              "33" + convention.signatories.beneficiary.phone.substring(1),
+            kind,
+            params: { shortLink: makeShortLinkUrl(config, shortLinkIds[0]) },
           },
           {
-            phone:
+            recipient:
               "33" +
               convention.signatories.establishmentRepresentative.phone.substring(
                 1,
               ),
-            kind: type,
-            shortLink: makeShortLinkUrl(config, shortLinkIds[1]),
+            kind,
+            params: {
+              shortLink: makeShortLinkUrl(config, shortLinkIds[1]),
+            },
           },
         ]);
       },
@@ -613,7 +616,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         //Act
         await useCase.execute({
           conventionId: convention.id,
-          reminderKind: type,
+          reminderKind: kind,
         });
 
         //Assert
@@ -674,10 +677,10 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         await expectPromiseToFailWithError(
           useCase.execute({
             conventionId: convention.id,
-            reminderKind: type,
+            reminderKind: kind,
           }),
           new ForbiddenError(
-            forbiddenUnsupportedStatusMessage(convention, type),
+            forbiddenUnsupportedStatusMessage(convention, kind),
           ),
         );
         expectToEqual(notificationGateway.getSentEmails(), []);
@@ -820,13 +823,15 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         ]);
         expectToEqual(notificationGateway.getSentSms(), [
           {
-            phone:
+            recipient:
               "33" +
               convention.signatories.establishmentRepresentative.phone.substring(
                 1,
               ),
             kind: type,
-            shortLink: makeShortLinkUrl(config, shortLinkIds[1]),
+            params: {
+              shortLink: makeShortLinkUrl(config, shortLinkIds[1]),
+            },
           },
         ]);
       },

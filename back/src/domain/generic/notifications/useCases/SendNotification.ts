@@ -1,32 +1,27 @@
 import { z } from "zod";
-import { exhaustiveCheck, TemplatedEmail, templatedEmailSchema } from "shared";
+import {
+  exhaustiveCheck,
+  TemplatedEmail,
+  templatedEmailSchema,
+  type TemplatedSms,
+  templatedSmsSchema,
+} from "shared";
 import { NotificationGateway } from "../../../convention/ports/NotificationGateway";
 import { UseCase } from "../../../core/UseCase";
 
-type Sms = {
-  content: string;
-  sender: string;
-  recipient: string;
-};
-const smsSchema: z.Schema<Sms> = z.object({
-  content: z.string(),
-  sender: z.string(),
-  recipient: z.string(),
-});
-
 type Notification =
-  | { kind: "email"; templatedEmail: TemplatedEmail }
-  | { kind: "sms"; sms: Sms };
+  | { kind: "email"; email: TemplatedEmail }
+  | { kind: "sms"; sms: TemplatedSms };
 
 const notificationSchema: z.Schema<Notification> = z
   .object({
     kind: z.literal("email"),
-    templatedEmail: templatedEmailSchema,
+    email: templatedEmailSchema,
   })
   .or(
     z.object({
       kind: z.literal("sms"),
-      sms: smsSchema,
+      sms: templatedSmsSchema,
     }),
   );
 
@@ -40,7 +35,7 @@ export class SendNotification extends UseCase<Notification> {
   protected _execute(notification: Notification): Promise<void> {
     switch (notification.kind) {
       case "email":
-        return this.notificationGateway.sendEmail(notification.templatedEmail);
+        return this.notificationGateway.sendEmail(notification.email);
       case "sms":
         return this.notificationGateway.sendSms(notification.sms);
       default:

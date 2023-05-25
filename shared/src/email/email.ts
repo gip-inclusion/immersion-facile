@@ -1,5 +1,5 @@
 import { ValueOf } from "../utils";
-import { templatesByName } from "./templatesByName";
+import { emailTemplatesByName } from "./emailTemplatesByName";
 
 export type GenericTemplatedEmail<
   T extends string,
@@ -23,11 +23,11 @@ type KeysOfUnion<T> = T extends T ? keyof T : never;
 // https://stackoverflow.com/questions/49401866/all-possible-keys-of-an-union-type
 export type EmailVariables = KeysOfUnion<TemplatedEmail["params"]>;
 
-type TemplateByName = typeof templatesByName;
+type EmailTemplateByName = typeof emailTemplatesByName;
 
 export type TemplatedEmail = ValueOf<{
-  [TemplateName in keyof TemplateByName]: GenericTemplatedEmail<
+  [TemplateName in keyof EmailTemplateByName]: GenericTemplatedEmail<
     TemplateName,
-    Parameters<TemplateByName[TemplateName]["createEmailVariables"]>[0]
+    Parameters<EmailTemplateByName[TemplateName]["createEmailVariables"]>[0]
   >;
 }>;
