@@ -1,3 +1,4 @@
+import { AbsoluteUrl } from "../AbsoluteUrl";
 import { ValueOf } from "../utils";
 import { Phone } from "./sms.schema";
 
@@ -10,7 +11,7 @@ type GenericTemplatedSms<
   recipient: Phone;
 };
 
-type WithShortLink = { shortLink: string };
+type WithShortLink = { shortLink: AbsoluteUrl };
 
 type SmsParamsBySmsType = {
   FirstReminderForSignatories: WithShortLink;
