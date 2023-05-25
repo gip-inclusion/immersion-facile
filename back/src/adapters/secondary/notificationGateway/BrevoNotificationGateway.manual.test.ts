@@ -41,7 +41,7 @@ describe("BrevoNotificationGateway manual", () => {
 
   it("should send SMS correctly", async () => {
     await notificationGateway.sendSms({
-      recipient: "VALID_INTERNATIONAL_FRENCH_MOBILE_PHONE_NUMBER", // Like 33611223344
+      recipientPhone: "VALID_INTERNATIONAL_FRENCH_MOBILE_PHONE_NUMBER", // Like 33611223344
       kind: "LastReminderForSignatories",
       params: {
         shortLink:
@@ -64,7 +64,7 @@ describe("BrevoNotificationGateway manual", () => {
       await Promise.all(
         phones.map((phone, index) =>
           notificationGateway.sendSms({
-            recipient: phone,
+            recipientPhone: phone,
             kind: "LastReminderForSignatories",
             params: {
               shortLink: `https://test-sms-${index + 1}`,

@@ -28,7 +28,7 @@ describe("SendNotification UseCase", () => {
     const sms: TemplatedSms = {
       kind: "FirstReminderForSignatories",
       params: { shortLink: "https://my-link.com" },
-      recipient: "33612345678",
+      recipientPhone: "33612345678",
     };
 
     await sendNotification.execute({ kind: "sms", sms });
