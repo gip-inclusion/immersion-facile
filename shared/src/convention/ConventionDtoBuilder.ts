@@ -51,6 +51,7 @@ const beneficiary: Beneficiary<"immersion"> = {
   emergencyContactEmail: "clariss.ocon@emergencycontact.com",
   financiaryHelp: "Un stage rémunéré au SMIC?",
   birthdate: "2002-10-05T14:48:00.000Z",
+  isRqth: false,
 };
 
 const establishmentTutor: EstablishmentTutor = {
@@ -211,6 +212,34 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
         email,
       });
     throw new Error("beneficiaryRepresentative is undefined.");
+  }
+
+  public withBeneficiaryRqth(
+    beneficiary: Beneficiary<InternshipKind>,
+  ): ConventionDtoBuilder {
+    if (this.dto.internshipKind === "immersion" && isBeneficiary(beneficiary)) {
+      return new ConventionDtoBuilder({
+        ...this.dto,
+        signatories: {
+          ...this.dto.signatories,
+          beneficiary: { ...beneficiary, isRqth: true },
+        },
+      });
+    }
+    if (
+      this.dto.internshipKind === "mini-stage-cci" &&
+      isBeneficiaryStudent(beneficiary)
+    )
+      return new ConventionDtoBuilder({
+        ...this.dto,
+        signatories: {
+          ...this.dto.signatories,
+          beneficiary: { ...beneficiary, isRqth: true },
+        },
+      });
+    throw new Error(
+      `Beneficiary is not compatible with convention internship kind '${this.dto.internshipKind}'.`,
+    );
   }
 
   public withBeneficiaryCurrentEmployer(
