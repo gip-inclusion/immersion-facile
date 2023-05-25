@@ -24,10 +24,10 @@ export const unhandledError = (error: any, req: Request, res: Response) => {
     const errorResponse = error.response;
     logErrorAndNotifyDiscord("Axios", req, {
       message: error.message,
-      baseUrl: error.config.baseURL,
       method: error.config.method,
       url: error.config.url,
-      requestBody: error.config.data,
+      path: errorResponse?.request?.path,
+      ...(error.config.data ? { requestBody: error.config.data } : {}),
       ...(errorResponse
         ? {
             httpStatus: errorResponse.status,
