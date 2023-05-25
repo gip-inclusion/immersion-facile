@@ -7,7 +7,10 @@ const logger = createLogger(__filename);
 
 const getRequestInfos = (
   response?: AxiosResponse,
-  options: { logRequestBody?: boolean; logResponseBody?: boolean } = {},
+  options: {
+    logRequestBodyAndPath?: boolean;
+    logResponseBody?: boolean;
+  } = {},
 ) => {
   if (!response) {
     return { error: "error.response is not defined, cannot extract infos" };
@@ -24,7 +27,9 @@ const getRequestInfos = (
     method: response.config?.method,
     url: response.config?.url,
     ...(options.logResponseBody ? { responseBody: response.data } : {}),
-    ...(options.logRequestBody ? { requestBody: response.config?.data } : {}),
+    ...(options.logRequestBodyAndPath
+      ? { path: response?.request?.path, requestBody: response.config?.data }
+      : {}),
   };
 };
 
@@ -45,7 +50,6 @@ export const configureCreateHttpClientForExternalApi = (
         status: "success",
         ...getRequestInfos(response),
       });
-
       return response;
     },
     (error) => {
@@ -54,7 +58,7 @@ export const configureCreateHttpClientForExternalApi = (
         status: "errored",
         message: error.message,
         ...getRequestInfos(error.response, {
-          logRequestBody: true,
+          logRequestBodyAndPath: true,
           logResponseBody: true,
         }),
       });
