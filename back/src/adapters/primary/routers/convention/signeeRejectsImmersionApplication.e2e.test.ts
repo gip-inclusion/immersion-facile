@@ -75,7 +75,7 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   await eventCrawler.processNewEvents();
   await eventCrawler.processNewEvents();
 
-  const sentEmails = gateways.email.getSentEmails();
+  const sentEmails = gateways.notification.getSentEmails();
   expect(sentEmails).toHaveLength(3);
   expect(sentEmails.map((e) => e.recipients)).toEqual([
     ["validator@mail.com"],
@@ -127,7 +127,7 @@ const expectEstablishmentRequiresChanges = async (
   await eventCrawler.processNewEvents();
 
   // Expect one email sent ( to establishment representative)
-  const sentEmails = gateways.email.getSentEmails();
+  const sentEmails = gateways.notification.getSentEmails();
   expect(sentEmails).toHaveLength(4);
   expect(sentEmails.slice(3).map((e) => e.recipients)).toEqual([
     ["establishment@example.com"],

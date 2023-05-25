@@ -87,7 +87,7 @@ describe("Magic link renewal flow", () => {
 
     await eventCrawler.processNewEvents();
 
-    const sentEmails = gateways.email.getSentEmails();
+    const sentEmails = gateways.notification.getSentEmails();
 
     expect(sentEmails).toHaveLength(1);
 

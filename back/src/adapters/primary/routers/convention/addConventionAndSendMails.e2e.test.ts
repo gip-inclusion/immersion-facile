@@ -70,7 +70,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
     await eventCrawler.processNewEvents();
     await eventCrawler.processNewEvents();
 
-    expectSentEmails(gateways.email, [
+    expectSentEmails(gateways.notification, [
       {
         type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
       },
@@ -200,7 +200,7 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   expectToEqual(peNotification.status, "A_SIGNER");
   expect(peNotification.originalId).toBe(convention.id);
   expect(peNotification.email).toBe(convention.signatories.beneficiary.email);
-  const sentEmails = gateways.email.getSentEmails();
+  const sentEmails = gateways.notification.getSentEmails();
   expect(sentEmails).toHaveLength(numberOfEmailInitialySent - 1);
   expect(sentEmails.map((e) => e.recipients)).toEqual([
     [VALID_EMAILS[2]],
@@ -264,7 +264,7 @@ const beneficiarySignsApplication = async (
 
   await eventCrawler.processNewEvents();
 
-  const sentEmails = gateways.email.getSentEmails();
+  const sentEmails = gateways.notification.getSentEmails();
   expect(sentEmails).toHaveLength(numberOfEmailInitialySent);
 };
 
@@ -295,7 +295,7 @@ const establishmentSignsApplication = async (
 
   await eventCrawler.processNewEvents();
 
-  const sentEmails = gateways.email.getSentEmails();
+  const sentEmails = gateways.notification.getSentEmails();
   expect(sentEmails).toHaveLength(numberOfEmailInitialySent + 1);
   const needsReviewEmail = expectEmailOfType(
     sentEmails[sentEmails.length - 1],
@@ -347,7 +347,7 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
   );
 
   await eventCrawler.processNewEvents();
-  const sentEmails = gateways.email.getSentEmails();
+  const sentEmails = gateways.notification.getSentEmails();
   expect(sentEmails).toHaveLength(numberOfEmailInitialySent + 2);
   const needsToTriggerConventionSentEmail = expectEmailOfType(
     sentEmails[sentEmails.length - 1],

@@ -120,7 +120,7 @@ export const createGateways = async (config: AppConfig) => {
     addressApi: createAddressGateway(config),
     dashboardGateway: createDashboardGateway(config),
     documentGateway: createDocumentGateway(config),
-    email: createNotificationGateway(config, timeGateway),
+    notification: createNotificationGateway(config, timeGateway),
     emailValidationGateway: createEmailValidationGateway(config),
     exportGateway:
       config.reporting === "EXCEL"

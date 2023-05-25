@@ -50,6 +50,7 @@ import { ValidateEmail } from "../../../domain/emailValidation/useCases/Validate
 import { AdminLogin } from "../../../domain/generic/authentication/useCases/AdminLogin";
 import { UploadLogo } from "../../../domain/generic/fileManagement/useCases/UploadLogo";
 import { GetSentEmails } from "../../../domain/generic/notifications/useCases/GetSentEmails";
+import { SendNotification } from "../../../domain/generic/notifications/useCases/SendNotification";
 import { AddFormEstablishment } from "../../../domain/immersionOffer/useCases/AddFormEstablishment";
 import { AddFormEstablishmentBatch } from "../../../domain/immersionOffer/useCases/AddFormEstablismentsBatch";
 import { ContactEstablishment } from "../../../domain/immersionOffer/useCases/ContactEstablishment";
@@ -114,6 +115,7 @@ export const createUseCases = (
 
   return {
     ...instantiatedUseCasesFromClasses({
+      sendNotification: new SendNotification(gateways.notification),
       registerAgencyToInclusionConnectUser:
         new RegisterAgencyToInclusionConnectUser(uowPerformer, createNewEvent),
       updateIcUserRoleForAgency: new UpdateIcUserRoleForAgency(
@@ -122,7 +124,7 @@ export const createUseCases = (
       ),
       notifyIcUserAgencyRightChanged: new NotifyIcUserAgencyRightChanged(
         uowPerformer,
-        gateways.email,
+        gateways.notification,
       ),
       getIcUsers: new GetInclusionConnectedUsers(uowPerformer),
       getUserAgencyDashboardUrl: new GetInclusionConnectedUser(
@@ -165,7 +167,7 @@ export const createUseCases = (
         () => sleep(config.nodeEnv !== "test" ? 500 : 0),
         gateways.timeGateway,
       ),
-      getSentEmails: new GetSentEmails(gateways.email),
+      getSentEmails: new GetSentEmails(gateways.notification),
       exportData: new ExportData(uowPerformer, gateways.exportGateway),
       addFormEstablishmentBatch: new AddFormEstablishmentBatch(
         addFormEstablishment,
@@ -215,7 +217,7 @@ export const createUseCases = (
       ),
       notifyConventionReminder: new NotifyConventionReminder(
         uowPerformer,
-        gateways.email,
+        gateways.notification,
         gateways.timeGateway,
         generateConventionMagicLinkUrl,
         gateways.shortLinkGenerator,
@@ -270,7 +272,7 @@ export const createUseCases = (
         ),
       requestEditFormEstablishment: new RequestEditFormEstablishment(
         uowPerformer,
-        gateways.email,
+        gateways.notification,
         gateways.timeGateway,
         makeGenerateEditFormEstablishmentUrl(
           config,
@@ -303,7 +305,7 @@ export const createUseCases = (
       privateListAgencies: new PrivateListAgencies(uowPerformer),
       getAgencyPublicInfoById: new GetAgencyPublicInfoById(uowPerformer),
       sendEmailWhenAgencyIsActivated: new SendEmailWhenAgencyIsActivated(
-        gateways.email,
+        gateways.notification,
       ),
       // METABASE
       ...dashboardUseCases(gateways.dashboardGateway, gateways.timeGateway),
@@ -311,7 +313,7 @@ export const createUseCases = (
       confirmToSignatoriesThatConventionCorrectlySubmittedRequestSignature:
         new ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature(
           uowPerformer,
-          gateways.email,
+          gateways.notification,
           gateways.timeGateway,
           gateways.shortLinkGenerator,
           generateConventionMagicLinkUrl,
@@ -320,14 +322,14 @@ export const createUseCases = (
       notifyLastSigneeThatConventionHasBeenSigned:
         new NotifyLastSigneeThatConventionHasBeenSigned(
           uowPerformer,
-          gateways.email,
+          gateways.notification,
           generateConventionMagicLinkUrl,
           gateways.timeGateway,
         ),
       notifyAllActorsOfFinalConventionValidation:
         new NotifyAllActorsOfFinalConventionValidation(
           uowPerformer,
-          gateways.email,
+          gateways.notification,
           generateConventionMagicLinkUrl,
           gateways.timeGateway,
           gateways.shortLinkGenerator,
@@ -335,7 +337,7 @@ export const createUseCases = (
         ),
       notifyNewConventionNeedsReview: new NotifyNewApplicationNeedsReview(
         uowPerformer,
-        gateways.email,
+        gateways.notification,
         generateConventionMagicLinkUrl,
         gateways.timeGateway,
         gateways.shortLinkGenerator,
@@ -343,7 +345,7 @@ export const createUseCases = (
       ),
       notifyToAgencyConventionSubmitted: new NotifyToAgencyApplicationSubmitted(
         uowPerformer,
-        gateways.email,
+        gateways.notification,
         generateConventionMagicLinkUrl,
         gateways.timeGateway,
         gateways.shortLinkGenerator,
@@ -352,28 +354,30 @@ export const createUseCases = (
       notifyBeneficiaryAndEnterpriseThatConventionIsRejected:
         new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
           uowPerformer,
-          gateways.email,
+          gateways.notification,
         ),
       notifyBeneficiaryAndEnterpriseThatConventionNeedsModifications:
         new NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification(
           uowPerformer,
-          gateways.email,
+          gateways.notification,
           generateConventionMagicLinkUrl,
           gateways.timeGateway,
           gateways.shortLinkGenerator,
           config,
         ),
-      deliverRenewedMagicLink: new DeliverRenewedMagicLink(gateways.email),
+      deliverRenewedMagicLink: new DeliverRenewedMagicLink(
+        gateways.notification,
+      ),
       notifyConfirmationEstablishmentCreated:
-        new NotifyConfirmationEstablishmentCreated(gateways.email),
+        new NotifyConfirmationEstablishmentCreated(gateways.notification),
       notifyContactRequest: new NotifyContactRequest(
         uowPerformer,
-        gateways.email,
+        gateways.notification,
       ),
       notifyPoleEmploiUserAdvisorOnConventionFullySigned:
         new NotifyPoleEmploiUserAdvisorOnConventionFullySigned(
           uowPerformer,
-          gateways.email,
+          gateways.notification,
           generateConventionMagicLinkUrl,
           gateways.timeGateway,
         ),
@@ -382,7 +386,9 @@ export const createUseCases = (
           uowPerformer,
           gateways.poleEmploiGateway,
         ),
-      shareConventionByEmail: new ShareApplicationLinkByEmail(gateways.email),
+      shareConventionByEmail: new ShareApplicationLinkByEmail(
+        gateways.notification,
+      ),
       addAgency: new AddAgency(uowPerformer, createNewEvent),
       updateAgencyStatus: new UpdateAgencyStatus(uowPerformer, createNewEvent),
       updateAgencyAdmin: new UpdateAgency(uowPerformer, createNewEvent),
