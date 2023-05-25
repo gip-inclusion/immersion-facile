@@ -109,7 +109,7 @@ const getUseCasesByTopics = (
 
   UserAuthenticatedSuccessfully: [],
   IcUserAgencyRightChanged: [useCases.notifyIcUserAgencyRightChanged],
-  NotificationAdded: [],
+  NotificationAdded: [useCases.sendNotification],
 });
 
 export const subscribeToEvents = (deps: AppDependencies) => {

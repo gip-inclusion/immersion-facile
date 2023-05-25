@@ -63,7 +63,7 @@ describe("Add form establishment", () => {
 
       await eventCrawler.processNewEvents();
 
-      const sentEmails = gateways.email.getSentEmails();
+      const sentEmails = gateways.notification.getSentEmails();
       expect(sentEmails).toHaveLength(1);
       expect(sentEmails.map((e) => e.recipients)).toEqual([
         ["tiredofthismess@seriously.com"],

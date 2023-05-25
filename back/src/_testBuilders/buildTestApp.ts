@@ -30,7 +30,7 @@ import { UuidGenerator } from "../domain/core/ports/UuidGenerator";
 import { AppConfigBuilder } from "./AppConfigBuilder";
 
 export type InMemoryGateways = {
-  email: InMemoryNotificationGateway;
+  notification: InMemoryNotificationGateway;
   peConnectGateway: InMemoryPeConnectGateway;
   siret: InMemorySiretGateway;
   laBonneBoiteAPI: InMemoryLaBonneBoiteAPI;

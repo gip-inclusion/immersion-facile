@@ -41,7 +41,7 @@ describe(`/${emailRoute} route`, () => {
       // Prepare
       const dateNow = new Date("2022-01-01T12:00:00.000Z");
       timeGateway.now = () => dateNow;
-      await gateways.email.sendEmail({
+      await gateways.notification.sendEmail({
         type: "AGENCY_WAS_ACTIVATED",
         recipients: ["toto@email.com"],
         params: {

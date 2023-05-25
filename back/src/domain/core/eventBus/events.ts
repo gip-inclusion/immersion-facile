@@ -9,11 +9,11 @@ import {
   FormEstablishmentDto,
   IcUserRoleForAgencyParams,
   ImmersionAssessmentDto,
-  TemplatedEmail,
   WithConventionId,
 } from "shared";
 import { RenewMagicLinkPayload } from "../../convention/useCases/notifications/DeliverRenewedMagicLink";
 import { ConventionRequiresModificationPayload } from "../../convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
+import { Notification } from "../../generic/notifications/useCases/SendNotification";
 import { IdentityProvider } from "../../generic/OAuth/entities/OngoingOAuth";
 import { EstablishmentAggregate } from "../../immersionOffer/entities/EstablishmentEntity";
 import { ConventionReminderPayload } from "../eventsPayloads/ConventionReminderPayload";
@@ -42,7 +42,7 @@ type GenericEvent<T extends string, P> = {
 
 // prettier-ignore
 export type DomainEvent =
-  | GenericEvent<"NotificationAdded", { type: "email", body: TemplatedEmail }>
+  | GenericEvent<"NotificationAdded", Notification>
   // IMMERSION APPLICATION RELATED
   // HAPPY PATH
   | GenericEvent<"ImmersionApplicationSubmittedByBeneficiary", ConventionDto>

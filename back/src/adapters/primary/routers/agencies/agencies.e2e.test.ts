@@ -139,7 +139,7 @@ describe(`/${agenciesRoute} route`, () => {
       expect(inMemoryUow.outboxRepository.events).toHaveLength(1);
 
       await eventCrawler.processNewEvents();
-      expect(gateways.email.getSentEmails()).toHaveLength(1);
+      expect(gateways.notification.getSentEmails()).toHaveLength(1);
     });
   });
   describe("private route to update an agency data", () => {

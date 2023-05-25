@@ -71,8 +71,8 @@ describe(`/${contactEstablishmentRoute} route`, () => {
     ]);
 
     await eventCrawler.processNewEvents();
-    expect(gateways.email.getSentEmails()).toHaveLength(1);
-    expect(gateways.email.getSentEmails()[0].type).toBe(
+    expect(gateways.notification.getSentEmails()).toHaveLength(1);
+    expect(gateways.notification.getSentEmails()[0].type).toBe(
       "CONTACT_BY_EMAIL_REQUEST",
     );
 

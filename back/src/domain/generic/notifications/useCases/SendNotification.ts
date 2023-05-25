@@ -9,7 +9,7 @@ import {
 import { NotificationGateway } from "../../../convention/ports/NotificationGateway";
 import { UseCase } from "../../../core/UseCase";
 
-type Notification =
+export type Notification =
   | { kind: "email"; email: TemplatedEmail }
   | { kind: "sms"; sms: TemplatedSms };
 
