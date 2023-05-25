@@ -122,6 +122,7 @@ export const conventionInitialValuesFromUrl = ({
         levelOfEducation: (params.led as LevelOfEducation) ?? "",
         financiaryHelp: params.financiaryHelp ?? "",
         birthdate: params.birthdate ?? "",
+        isRqth: params.isRqth ?? false,
         ...(params.fedId && params.fedIdProvider
           ? {
               federatedIdentity: {
@@ -239,6 +240,7 @@ const devPrefilledValues = (
           beneficiary.emergencyContactEmail ||
           "eric.durand@emergencycontact.com",
         federatedIdentity: beneficiary.federatedIdentity,
+        isRqth: false,
       },
       beneficiaryRepresentative,
       establishmentRepresentative: {

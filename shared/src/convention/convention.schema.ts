@@ -93,6 +93,7 @@ const beneficiarySchema: z.Schema<Beneficiary<"immersion">> =
       federatedIdentity: peConnectIdentitySchema.optional(),
       financiaryHelp: zStringPossiblyEmpty,
       birthdate: zString.regex(dateRegExp, localization.invalidDate),
+      isRqth: zBoolean,
     }),
   );
 const studentBeneficiarySchema: z.Schema<Beneficiary<"mini-stage-cci">> =

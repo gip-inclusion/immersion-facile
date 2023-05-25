@@ -79,6 +79,7 @@ export const conventionValuesFromUrl = {
   emergencyContact: param.query.optional.string,
   emergencyContactPhone: param.query.optional.string,
   emergencyContactEmail: param.query.optional.string,
+  isRqth: param.query.optional.boolean,
   birthdate: param.query.optional.string,
   agencyDepartment: param.query.optional.string,
 

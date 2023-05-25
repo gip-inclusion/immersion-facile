@@ -519,6 +519,7 @@ describe("Convention slice", () => {
         firstName: "John",
         lastName: "Doe",
         birthdate: "1990-02-21T00:00:00.000Z",
+        isRqth: false,
       };
       const convention = {
         ...new ConventionDtoBuilder().withBeneficiary(beneficiary).build(),
