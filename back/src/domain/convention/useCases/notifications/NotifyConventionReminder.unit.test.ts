@@ -573,13 +573,13 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         ]);
         expectToEqual(notificationGateway.getSentSms(), [
           {
-            recipient:
+            recipientPhone:
               "33" + convention.signatories.beneficiary.phone.substring(1),
             kind,
             params: { shortLink: makeShortLinkUrl(config, shortLinkIds[0]) },
           },
           {
-            recipient:
+            recipientPhone:
               "33" +
               convention.signatories.establishmentRepresentative.phone.substring(
                 1,
@@ -823,7 +823,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         ]);
         expectToEqual(notificationGateway.getSentSms(), [
           {
-            recipient:
+            recipientPhone:
               "33" +
               convention.signatories.establishmentRepresentative.phone.substring(
                 1,

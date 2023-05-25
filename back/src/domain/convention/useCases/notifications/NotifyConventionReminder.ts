@@ -156,7 +156,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
 
     return {
       kind,
-      recipient: makeInternationalPhone(phone),
+      recipientPhone: makeInternationalPhone(phone),
       params: { shortLink },
     };
   }

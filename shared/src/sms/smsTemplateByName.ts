@@ -1,6 +1,8 @@
-import { AbsoluteUrl } from "../AbsoluteUrl";
-import { ValueOf } from "../utils";
-import { Phone } from "./sms.schema";
+import type { AbsoluteUrl } from "../AbsoluteUrl";
+import type { Flavor } from "../typeFlavors";
+import type { ValueOf } from "../utils";
+
+export type Phone = Flavor<string, "Phone">;
 
 type GenericTemplatedSms<
   T extends string,
@@ -8,7 +10,7 @@ type GenericTemplatedSms<
 > = {
   kind: T;
   params: P;
-  recipient: Phone;
+  recipientPhone: Phone;
 };
 
 type WithShortLink = { shortLink: AbsoluteUrl };

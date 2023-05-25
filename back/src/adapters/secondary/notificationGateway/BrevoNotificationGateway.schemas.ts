@@ -4,7 +4,7 @@ import {
   absoluteUrlSchema,
   Flavor,
   Phone,
-  smsRecipientSchema,
+  smsRecipientPhoneSchema,
   zEmail,
 } from "shared";
 
@@ -107,7 +107,7 @@ const brevoSmsSenderSchema: z.Schema<string> = z
 export const sendTransactSmsRequestBodySchema: z.Schema<SendTransactSmsRequestBody> =
   z.object({
     sender: brevoSmsSenderSchema,
-    recipient: smsRecipientSchema,
+    recipient: smsRecipientPhoneSchema,
     content: z.string(),
     type: z.enum(["transactional", "marketing"]).optional(),
     tag: z.string().optional(),

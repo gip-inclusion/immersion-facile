@@ -56,22 +56,22 @@ export class BrevoNotificationGateway implements NotificationGateway {
     };
   }
 
-  sendSms({ kind, params, recipient }: TemplatedSms): Promise<void> {
+  sendSms({ kind, params, recipientPhone }: TemplatedSms): Promise<void> {
     logger.info(
       {
-        phone: recipient,
+        phone: recipientPhone,
       },
       "sendTransactSmsTotal",
     );
     return this.sendTransacSms({
       content: smsTemplatesByName[kind].createContent(params),
       sender: "ImmerFacile",
-      recipient,
+      recipient: recipientPhone,
     })
       .then((_response) =>
         logger.info(
           {
-            phone: recipient,
+            phone: recipientPhone,
           },
           "sendTransactSmsSuccess",
         ),
@@ -79,7 +79,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
       .catch((error) => {
         logger.error(
           {
-            phone: recipient,
+            phone: recipientPhone,
             error,
           },
           "sendTransactSmsError",
