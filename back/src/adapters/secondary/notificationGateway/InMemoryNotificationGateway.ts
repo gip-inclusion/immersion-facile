@@ -1,9 +1,6 @@
 import { prop } from "ramda";
-import { EmailSentDto, TemplatedEmail } from "shared";
-import {
-  NotificationGateway,
-  SendSmsParams,
-} from "../../../domain/convention/ports/NotificationGateway";
+import { EmailSentDto, TemplatedEmail, TemplatedSms } from "shared";
+import { NotificationGateway } from "../../../domain/convention/ports/NotificationGateway";
 import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
 import { createLogger } from "../../../utils/logger";
 import { CustomTimeGateway } from "../core/TimeGateway/CustomTimeGateway";
@@ -46,22 +43,20 @@ export class InMemoryNotificationGateway implements NotificationGateway {
     });
   }
 
-  public async sendSms(sendSmsParams: SendSmsParams): Promise<void> {
-    if (sendSmsParams.phone === "33" + sendSmsErrorPhoneNumber.substring(1))
-      throw new Error(
-        `Send SMS Error with phone number ${sendSmsParams.phone}.`,
-      );
-    this.sentSms.push(sendSmsParams);
+  public async sendSms(sms: TemplatedSms): Promise<void> {
+    if (sms.recipient === "33" + sendSmsErrorPhoneNumber.substring(1))
+      throw new Error(`Send SMS Error with phone number ${sms.recipient}.`);
+    this.sentSms.push(sms);
   }
 
   // For testing.
   getSentEmails(): TemplatedEmail[] {
     return this.sentEmails.map(prop("templatedEmail"));
   }
-  getSentSms(): SendSmsParams[] {
+  getSentSms(): TemplatedSms[] {
     return this.sentSms;
   }
 
   private readonly sentEmails: EmailSentDto[] = [];
-  private readonly sentSms: SendSmsParams[] = [];
+  private readonly sentSms: TemplatedSms[] = [];
 }

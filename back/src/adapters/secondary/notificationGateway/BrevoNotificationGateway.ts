@@ -1,10 +1,11 @@
 import Bottleneck from "bottleneck";
 import {
-  AbsoluteUrl,
-  EmailSentDto,
+  type EmailSentDto,
+  emailTemplatesByName,
   immersionFacileContactEmail,
-  TemplatedEmail,
-  templatesByName,
+  smsTemplatesByName,
+  type TemplatedEmail,
+  type TemplatedSms,
 } from "shared";
 import {
   configureGenerateHtmlFromTemplate,
@@ -15,11 +16,7 @@ import {
   cciCustomHtmlHeader,
 } from "html-templates/src/components/email";
 import { HttpClient } from "http-client";
-import {
-  NotificationGateway,
-  SendSmsParams,
-} from "../../../domain/convention/ports/NotificationGateway";
-import { ReminderKind } from "../../../domain/core/eventsPayloads/ConventionReminderPayload";
+import { NotificationGateway } from "../../../domain/convention/ports/NotificationGateway";
 import {
   counterSendTransactEmailError,
   counterSendTransactEmailSuccess,
@@ -59,22 +56,22 @@ export class BrevoNotificationGateway implements NotificationGateway {
     };
   }
 
-  sendSms({ phone, kind, shortLink }: SendSmsParams): Promise<void> {
+  sendSms({ kind, params, recipient }: TemplatedSms): Promise<void> {
     logger.info(
       {
-        phone,
+        phone: recipient,
       },
       "sendTransactSmsTotal",
     );
     return this.sendTransacSms({
-      content: smsContentMaker(kind)(shortLink),
+      content: smsTemplatesByName[kind].createContent(params),
       sender: "ImmerFacile",
-      recipient: phone,
+      recipient,
     })
       .then((_response) =>
         logger.info(
           {
-            phone,
+            phone: recipient,
           },
           "sendTransactSmsSuccess",
         ),
@@ -82,7 +79,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
       .catch((error) => {
         logger.error(
           {
-            phone,
+            phone: recipient,
             error,
           },
           "sendTransactSmsError",
@@ -105,7 +102,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
       to: this.filterAllowListAndConvertToRecipients(email.recipients),
       ...(cc.length ? { cc } : {}),
       ...configureGenerateHtmlFromTemplate(
-        templatesByName,
+        emailTemplatesByName,
         {
           contactEmail: immersionFacileContactEmail,
         },
@@ -206,18 +203,3 @@ export class BrevoNotificationGateway implements NotificationGateway {
 
   private readonly brevoHeaders: BrevoHeaders;
 }
-
-const smsContentMaker =
-  (kind: ReminderKind) =>
-  (shortLinkUrl: AbsoluteUrl): string => {
-    const smsContent = smsContentByKind[kind];
-    if (smsContent) return `${smsContent} ${shortLinkUrl}`;
-    throw new Error(`There is no SMS content supported for SMS kind '${kind}'`);
-  };
-
-const smsContentByKind: Partial<Record<ReminderKind, string>> = {
-  FirstReminderForSignatories:
-    "Immersion Facilitée, veuillez signer la convention",
-  LastReminderForSignatories:
-    "Urgent Immersion Facilitée, veuillez signer la convention",
-};

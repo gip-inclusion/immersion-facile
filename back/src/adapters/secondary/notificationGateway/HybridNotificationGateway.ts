@@ -1,8 +1,5 @@
-import { EmailSentDto, TemplatedEmail } from "shared";
-import {
-  NotificationGateway,
-  SendSmsParams,
-} from "../../../domain/convention/ports/NotificationGateway";
+import { EmailSentDto, TemplatedEmail, TemplatedSms } from "shared";
+import { NotificationGateway } from "../../../domain/convention/ports/NotificationGateway";
 import { InMemoryNotificationGateway } from "./InMemoryNotificationGateway";
 
 export class HybridNotificationGateway implements NotificationGateway {
@@ -10,11 +7,8 @@ export class HybridNotificationGateway implements NotificationGateway {
     private brevo: NotificationGateway,
     private inMemory: InMemoryNotificationGateway,
   ) {}
-  async sendSms(sendSmsParams: SendSmsParams): Promise<void> {
-    await Promise.all([
-      this.inMemory.sendSms(sendSmsParams),
-      this.brevo.sendSms(sendSmsParams),
-    ]);
+  async sendSms(sms: TemplatedSms): Promise<void> {
+    await Promise.all([this.inMemory.sendSms(sms), this.brevo.sendSms(sms)]);
   }
 
   async sendEmail(templatedEmail: TemplatedEmail): Promise<void> {
