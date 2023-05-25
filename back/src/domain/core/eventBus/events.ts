@@ -9,6 +9,7 @@ import {
   FormEstablishmentDto,
   IcUserRoleForAgencyParams,
   ImmersionAssessmentDto,
+  TemplatedEmail,
   WithConventionId,
 } from "shared";
 import { RenewMagicLinkPayload } from "../../convention/useCases/notifications/DeliverRenewedMagicLink";
@@ -41,6 +42,7 @@ type GenericEvent<T extends string, P> = {
 
 // prettier-ignore
 export type DomainEvent =
+  | GenericEvent<"NotificationAdded", { type: "email", body: TemplatedEmail }>
   // IMMERSION APPLICATION RELATED
   // HAPPY PATH
   | GenericEvent<"ImmersionApplicationSubmittedByBeneficiary", ConventionDto>
@@ -49,7 +51,7 @@ export type DomainEvent =
   | GenericEvent<"ImmersionApplicationFullySigned", ConventionDto>
   | GenericEvent<"ImmersionApplicationAcceptedByCounsellor", ConventionDto>
   | GenericEvent<"ImmersionApplicationAcceptedByValidator", ConventionDto>
-  | GenericEvent<"ConventionReminderRequired",ConventionReminderPayload>
+  | GenericEvent<"ConventionReminderRequired", ConventionReminderPayload>
 
   // UNHAPPY PATHS
   | GenericEvent<"ImmersionApplicationRejected", ConventionDto>
