@@ -39,8 +39,8 @@ import { BrevoNotificationGatewayTargets } from "./BrevoNotificationGateway.targ
 const logger = createLogger(__filename);
 
 const brevoMaxEmailRequestsPerSeconds = 2_000;
-const brevoMaxSmsRequestsPerHour = 200;
-const ONE_HOUR_MS = 3_600_000;
+const brevoMaxSmsRequestsPer30Seconds = 1;
+
 const ONE_SECOND_MS = 1_000;
 
 export class BrevoNotificationGateway implements NotificationGateway {
@@ -196,9 +196,9 @@ export class BrevoNotificationGateway implements NotificationGateway {
   });
 
   private smslimiter = new Bottleneck({
-    reservoir: brevoMaxSmsRequestsPerHour,
-    reservoirRefreshInterval: ONE_HOUR_MS, // number of ms
-    reservoirRefreshAmount: brevoMaxSmsRequestsPerHour,
+    reservoir: brevoMaxSmsRequestsPer30Seconds,
+    reservoirRefreshInterval: ONE_SECOND_MS * 30, // number of ms
+    reservoirRefreshAmount: brevoMaxSmsRequestsPer30Seconds,
   });
 
   private readonly brevoHeaders: BrevoHeaders;
