@@ -46,6 +46,7 @@ const SearchResultComponent = ({
     website,
     fitForDisabledWorkers,
     additionalInformation,
+    urlOfPartner,
   } = establishment;
 
   const distanceKm = ((distance_m ?? 0) * 0.001).toFixed(1);
@@ -127,6 +128,18 @@ const SearchResultComponent = ({
                   </span>
                 )}
               </li>
+              {urlOfPartner && (
+                <li>
+                  <a
+                    href={toAbsoluteUrl(urlOfPartner)}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {/* eslint-disable-next-line no-irregular-whitespace */}
+                    Trouver le contact sur La Bonne Boite
+                  </a>
+                </li>
+              )}
               {website && (
                 <li>
                   <a
