@@ -50,4 +50,28 @@ describe("BrevoNotificationGateway manual", () => {
     // Please check SMS has been received at VALID_INTERNATIONAL_FRENCH_MOBILE_PHONE_NUMBER
     expect("reached").toBe("reached");
   });
+
+  const times = 50;
+  it(
+    `should send ${times} SMS with rate correctly`,
+    async () => {
+      const phones = [];
+
+      for (let i = 0; i < times; i++)
+        phones.push("VALID_INTERNATIONAL_FRENCH_MOBILE_PHONE_NUMBER"); // Like 33611223344
+      await Promise.all(
+        phones.map((phone, index) =>
+          notificationGateway.sendSms({
+            phone,
+            kind: "LastReminderForSignatories",
+            shortLink: `https://test-sms-${index + 1}`,
+          }),
+        ),
+      );
+
+      // Please check SMS has been received at VALID_INTERNATIONAL_FRENCH_MOBILE_PHONE_NUMBER
+      expect("reached").toBe("reached");
+    },
+    1100 * times,
+  );
 });
