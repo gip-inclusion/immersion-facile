@@ -5,6 +5,7 @@ import { keys } from "ramda";
 import { useStyles } from "tss-react/dsfr";
 import {
   domElementIds,
+  type EmailTemplatesByName,
   emailTemplatesByName,
   immersionFacileContactEmail,
   internshipKinds,
@@ -19,8 +20,7 @@ import {
 const defaultEmailPreviewUrl =
   "https://upload.wikimedia.org/wikipedia/en/9/9a/Trollface_non-free.png";
 
-type TemplateByName = typeof emailTemplatesByName;
-type TemplateName = keyof TemplateByName;
+type TemplateName = keyof EmailTemplatesByName;
 
 export const EmailPreviewTab = () => {
   const { cx } = useStyles();
@@ -192,7 +192,9 @@ const EmailVariableField = ({
 };
 
 export const defaultEmailValueByEmailKind: {
-  [K in TemplateName]: Parameters<TemplateByName[K]["createEmailVariables"]>[0];
+  [K in TemplateName]: Parameters<
+    EmailTemplatesByName[K]["createEmailVariables"]
+  >[0];
 } = {
   SIGNATORY_FIRST_REMINDER: {
     actorFirstName: "ACTOR_FIRSTNAME",

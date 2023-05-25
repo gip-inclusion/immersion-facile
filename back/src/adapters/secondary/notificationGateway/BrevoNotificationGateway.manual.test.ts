@@ -64,9 +64,11 @@ describe("BrevoNotificationGateway manual", () => {
       await Promise.all(
         phones.map((phone, index) =>
           notificationGateway.sendSms({
-            phone,
+            recipient: phone,
             kind: "LastReminderForSignatories",
-            shortLink: `https://test-sms-${index + 1}`,
+            params: {
+              shortLink: `https://test-sms-${index + 1}`,
+            },
           }),
         ),
       );
