@@ -127,6 +127,63 @@ describe("Convention slice", () => {
       });
     });
 
+    it("fetch a convention with rqth beneficiary", () => {
+      const beneficiary: Beneficiary<"immersion"> = {
+        email: "benef@mail.com",
+        role: "beneficiary",
+        phone: "0614000000",
+        firstName: "John",
+        lastName: "Doe",
+        birthdate: "1990-02-21T00:00:00.000Z",
+        isRqth: true,
+      };
+      const convention = new ConventionDtoBuilder()
+        .withBeneficiary(beneficiary)
+        .build();
+      const conventionRead: ConventionReadDto = {
+        ...convention,
+        agencyName: "agency",
+        agencyDepartment: "75",
+      };
+      // tester l'état initiale
+      expectConventionState({
+        isLoading: false,
+        convention: null,
+      });
+
+      //dispatch fetch convention
+      store.dispatch(
+        conventionSlice.actions.fetchConventionRequested({
+          jwt: "my-jwt",
+          conventionId: "some-convention-id",
+        }),
+      );
+
+      //test state
+      expectConventionState({
+        isLoading: true,
+        convention: null,
+      });
+
+      //feed gateway
+      feedGatewayWithConvention(conventionRead);
+
+      //test state
+      expectConventionState({
+        isLoading: false,
+        convention: {
+          ...conventionRead,
+          signatories: {
+            ...conventionRead.signatories,
+            beneficiary: {
+              ...beneficiary,
+              isRqth: true,
+            },
+          },
+        } as ConventionReadDto,
+      });
+    });
+
     it("stores the Convention if one matches in backend with magicLinkJwt", () => {
       const convention = new ConventionDtoBuilder().build();
       const conventionRead = {
