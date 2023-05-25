@@ -214,34 +214,6 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     throw new Error("beneficiaryRepresentative is undefined.");
   }
 
-  public withBeneficiaryRqth(
-    beneficiary: Beneficiary<InternshipKind>,
-  ): ConventionDtoBuilder {
-    if (this.dto.internshipKind === "immersion" && isBeneficiary(beneficiary)) {
-      return new ConventionDtoBuilder({
-        ...this.dto,
-        signatories: {
-          ...this.dto.signatories,
-          beneficiary: { ...beneficiary, isRqth: true },
-        },
-      });
-    }
-    if (
-      this.dto.internshipKind === "mini-stage-cci" &&
-      isBeneficiaryStudent(beneficiary)
-    )
-      return new ConventionDtoBuilder({
-        ...this.dto,
-        signatories: {
-          ...this.dto.signatories,
-          beneficiary: { ...beneficiary, isRqth: true },
-        },
-      });
-    throw new Error(
-      `Beneficiary is not compatible with convention internship kind '${this.dto.internshipKind}'.`,
-    );
-  }
-
   public withBeneficiaryCurrentEmployer(
     beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer | undefined,
   ): ConventionDtoBuilder {

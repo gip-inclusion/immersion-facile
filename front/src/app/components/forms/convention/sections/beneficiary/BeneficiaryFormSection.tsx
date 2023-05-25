@@ -213,11 +213,32 @@ export const BeneficiaryFormSection = ({
           },
         }))}
       />
-      {isMinor ? (
-        <BeneficiaryRepresentativeFields disabled={isFrozen} />
-      ) : (
-        <BeneficiaryEmergencyContactFields disabled={isFrozen} />
-      )}
+      {isMinor && <BeneficiaryRepresentativeFields disabled={isFrozen} />}
+
+      <RadioButtons
+        legend={formContents["signatories.beneficiary.isRqth"].label}
+        hintText={formContents["signatories.beneficiary.isRqth"].hintText}
+        disabled={isFrozen}
+        options={booleanSelectOptions.map((option) => ({
+          ...option,
+          nativeInputProps: {
+            ...option.nativeInputProps,
+            checked:
+              Boolean(option.nativeInputProps.value) ===
+              values.signatories.beneficiary.isRqth,
+            onChange: () => {
+              setValue(
+                "signatories.beneficiary.isRqth",
+                Boolean(option.nativeInputProps.value),
+                { shouldValidate: true },
+              );
+            },
+          },
+        }))}
+      />
+
+      {!isMinor && <BeneficiaryEmergencyContactFields disabled={isFrozen} />}
+
       {internshipKind !== "mini-stage-cci" && (
         <>
           <RadioButtons
