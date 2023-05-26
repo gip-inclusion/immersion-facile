@@ -26,7 +26,7 @@ import { useRoute } from "src/app/routes/routes";
 import { deviceRepository } from "src/config/dependencies";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
-import { AgencyFormSection } from "./sections/agency/AgencyFormSection";
+import { AgencySelector } from "./sections/agency/AgencySelector";
 import { BeneficiaryFormSection } from "./sections/beneficiary/BeneficiaryFormSection";
 import { EstablishmentFormSection } from "./sections/establishment/EstablishmentFormSection";
 import { ImmersionHourLocationSection } from "./sections/hour-location/ImmersionHourLocationSection";
@@ -107,27 +107,22 @@ export const ConventionFormFields = ({
           mode === "edit";
         return isValidUserInteraction && stepErrors === 0;
       }).length === stepFields.length;
-    const getSeverity = () => {
+    const getBadgeData = (): {
+      severity: "error" | "success" | "info";
+      label: string;
+    } => {
       if (stepErrors) {
-        return "error";
+        return { severity: "error", label: "Erreur" };
       }
       if (stepIsValid()) {
-        return "success";
+        return { severity: "success", label: "Complet" };
       }
-      return "info";
+      return { severity: "info", label: "À compléter" };
     };
-    const getLabel = () => {
-      if (stepErrors) {
-        return "Erreur";
-      }
-      if (stepIsValid()) {
-        return "Complet";
-      }
-      return "À compléter";
-    };
+    const badgeData = getBadgeData();
     return (
-      <Badge severity={getSeverity()} className={fr.cx("fr-ml-2w")}>
-        {getLabel()}
+      <Badge severity={badgeData.severity} className={fr.cx("fr-ml-2w")}>
+        {badgeData.label}
       </Badge>
     );
   };
@@ -163,10 +158,10 @@ export const ConventionFormFields = ({
             label={renderSectionTitle(t.agencySection.title, 1)}
             {...makeAccordionProps(1)}
           >
-            <AgencyFormSection
+            <AgencySelector
               internshipKind={conventionValues.internshipKind}
-              agencyId={conventionValues.agencyId}
-              enablePeConnectApi={enablePeConnectApi}
+              defaultAgencyId={conventionValues.agencyId}
+              shouldListAll={!enablePeConnectApi}
             />
           </Accordion>
         )}

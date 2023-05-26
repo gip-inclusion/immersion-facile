@@ -49,8 +49,7 @@ export function basicFormConvention() {
     element: `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId}`,
   });
 
-  // Open Beneficiary section
-  openNextSection();
+  openNextSection(); // Open Beneficiary section
   cy.get(
     `#${domElementIds.conventionImmersionRoute.beneficiarySection.firstName}`,
   )
@@ -73,8 +72,7 @@ export function basicFormConvention() {
     .clear()
     .type(faker.date.past(20, "2000-01-01").toISOString().split("T")[0]);
 
-  // Open Establishment section
-  openNextSection();
+  openNextSection(); // Open Establishment section
   cy.get(`#${domElementIds.conventionImmersionRoute.conventionSection.siret}`)
     .clear()
     .type(getRandomSiret());
@@ -104,8 +102,7 @@ export function basicFormConvention() {
     .clear()
     .type(faker.internet.email());
 
-  // Open place / hour section
-  openNextSection();
+  openNextSection(); // Open place / hour section
   cy.get(
     `#${domElementIds.conventionImmersionRoute.conventionSection.dateStart}`,
   )
@@ -129,8 +126,7 @@ export function basicFormConvention() {
     });
   });
 
-  // Open immersion details section
-  openNextSection();
+  openNextSection(); // Open immersion details section
   cy.get(
     `#${domElementIds.conventionImmersionRoute.conventionSection.individualProtection} input:first-of-type`,
   ).check({
@@ -183,7 +179,7 @@ const getTomorrowDate = () =>
 
 const getRandomSiret = () =>
   ["722 003 936 02320", "44229377500031", "130 005 481 00010"][
-    Math.floor(Math.random() * 4)
+    Math.floor(Math.random() * 3)
   ];
 
 const openNextSection = () => {
