@@ -112,6 +112,60 @@ describe("PgConventionRepository", () => {
     });
   });
 
+  it("Adds a new convention with beneficiary extra fields", async () => {
+    const extraFields = {
+      isRqth: false,
+      emergencyContact: "jean bon",
+    };
+    const convention = new ConventionDtoBuilder()
+      .withBeneficiary({
+        birthdate: new Date("2000-05-26").toISOString(),
+        firstName: "Jean",
+        lastName: "Bono",
+        role: "beneficiary",
+        email: "jean@bono.com",
+        phone: "0836656565",
+        ...extraFields,
+      })
+      .build();
+
+    await conventionRepository.save(convention);
+
+    const conventionRetreived = await conventionRepository.getById(
+      convention.id,
+    );
+
+    expectToEqual(conventionRetreived?.signatories.beneficiary, {
+      ...convention.signatories.beneficiary,
+      ...extraFields,
+    });
+  });
+
+  it("Adds a new convention with beneficiary extra fields without isRqth", async () => {
+    const extraFields = {
+      emergencyContact: "jean bon",
+    };
+    const convention = new ConventionDtoBuilder()
+      .withBeneficiary({
+        birthdate: new Date("2000-05-26").toISOString(),
+        firstName: "Jean",
+        lastName: "Bono",
+        role: "beneficiary",
+        email: "jean@bono.com",
+        phone: "0836656565",
+        ...extraFields,
+      })
+      .build();
+
+    await conventionRepository.save(convention);
+
+    const conventionRetreived = await conventionRepository.getById(
+      convention.id,
+    );
+
+    expect(conventionRetreived?.signatories.beneficiary.isRqth).toBeUndefined();
+  });
+
   it("Only one actor when the convention has same establisment tutor and representative", async () => {
     const email = "tutor123w@mail.com";
     const tutor: EstablishmentTutor = {
