@@ -22,6 +22,8 @@ const seed = async () => {
     await agencySeed(uow, client);
     await establishmentAggregateSeed(uow, client);
   });
+
+  client.release();
 };
 
 const featureFlagsSeed = async (uow: UnitOfWork, client: PoolClient) => {
@@ -73,6 +75,7 @@ const establishmentAggregateSeed = async (
   client: PoolClient,
 ) => {
   console.log("seeding establishment aggregates...");
+  await client.query("DELETE FROM discussions");
   await client.query("DELETE FROM immersion_contacts");
   await client.query("DELETE FROM establishments CASCADE");
   const franceMerguez = new EstablishmentAggregateBuilder()
@@ -100,9 +103,9 @@ const establishmentAggregateSeed = async (
 
 seed()
   .then(() => {
-    console.log("Done seeding !");
+    console.log("Seeding script ended !");
   })
   .catch((err) => {
-    console.error("Something went wrong with seed : ", err);
+    console.error("Something went wrong with seed script : ", err);
     process.exit(1);
   });
