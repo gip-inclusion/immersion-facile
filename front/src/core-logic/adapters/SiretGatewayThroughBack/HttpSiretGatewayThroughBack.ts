@@ -54,8 +54,8 @@ const errorMessageByCode: Partial<Record<number, GetSiretInfoError>> = {
 };
 
 const handleSiretApiError = (error: Error) => {
-  if (axios.isAxiosError(error) && error.response?.status) {
-    const errorMessage = errorMessageByCode[error.response?.status];
+  if (axios.isAxiosError(error.cause) && error.cause.response?.status) {
+    const errorMessage = errorMessageByCode[error.cause.response?.status];
     if (errorMessage) return errorMessage;
   }
 
