@@ -32,7 +32,6 @@ import { HttpPassEmploiGateway } from "../../secondary/immersionOffer/passEmploi
 import { InMemoryPassEmploiGateway } from "../../secondary/immersionOffer/passEmploi/InMemoryPassEmploiGateway";
 import { HttpPoleEmploiGateway } from "../../secondary/immersionOffer/poleEmploi/HttpPoleEmploiGateway";
 import { InMemoryPoleEmploiGateway } from "../../secondary/immersionOffer/poleEmploi/InMemoryPoleEmploiGateway";
-import { createPoleEmploiTargets } from "../../secondary/immersionOffer/poleEmploi/PoleEmploi.targets";
 import { PoleEmploiAccessTokenGateway } from "../../secondary/immersionOffer/PoleEmploiAccessTokenGateway";
 import { HttpInclusionConnectGateway } from "../../secondary/InclusionConnectGateway/HttpInclusionConnectGateway";
 import { makeInclusionConnectExternalTargets } from "../../secondary/InclusionConnectGateway/inclusionConnectExternal.targets";
@@ -148,11 +147,11 @@ export const createGateways = async (config: AppConfig) => {
     poleEmploiGateway:
       config.poleEmploiGateway === "HTTPS"
         ? new HttpPoleEmploiGateway(
-            configureCreateHttpClientForExternalApi(
-              axios.create({ timeout: config.externalAxiosTimeout }),
-            )(createPoleEmploiTargets(config.peApiUrl)),
             config.peApiUrl,
             cachingAccessTokenGateway,
+            config.poleEmploiClientId,
+            noRateLimit,
+            noRetries,
           )
         : new InMemoryPoleEmploiGateway(),
     timeGateway,

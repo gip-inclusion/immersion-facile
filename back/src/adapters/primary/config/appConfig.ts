@@ -262,7 +262,6 @@ export class AppConfig {
   public get peApiUrl(): AbsoluteUrl {
     return this.throwIfNotAbsoluteUrl("POLE_EMPLOI_API_URL");
   }
-
   public get peAuthCandidatUrl(): AbsoluteUrl {
     return this.throwIfNotAbsoluteUrl(
       "POLE_EMPLOI_AUTHENTIFICATION_CANDIDAT_URL",

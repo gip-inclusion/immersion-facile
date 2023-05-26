@@ -1,6 +1,5 @@
 import { SuperTest, Test } from "supertest";
 import {
-  AgencyDtoBuilder,
   BackOfficeJwt,
   BackOfficeJwtPayload,
   ConventionDto,
@@ -38,10 +37,7 @@ let eventCrawler: BasicEventCrawler;
 let gateways: InMemoryGateways;
 let adminToken: BackOfficeJwt;
 
-const peAgency = new AgencyDtoBuilder().withKind("pole-emploi").build();
-
 const convention = new ConventionDtoBuilder()
-  .withAgencyId(peAgency.id)
   .withStatus("IN_REVIEW")
   .withFederatedIdentity({ provider: "peConnect", token: "some-id" })
   .build();
@@ -60,8 +56,6 @@ const initializeSystemUnderTest = async (
     generateBackOfficeJwt,
     inMemoryUow,
   } = await buildTestApp(config));
-
-  inMemoryUow.agencyRepository.setAgencies([peAgency]);
 
   if (withImmersionStored) {
     const conventionRepository = inMemoryUow.conventionRepository;
@@ -340,7 +334,7 @@ describe("convention e2e", () => {
 
       const notifications = gateways.poleEmploiGateway.notifications;
       expect(notifications).toHaveLength(1);
-      expect(notifications[0].statut).toBe("REJETÉ");
+      expect(notifications[0].status).toBe("REJETÉ");
     });
 
     it("Succeeds for BackOfficeJwt", async () => {

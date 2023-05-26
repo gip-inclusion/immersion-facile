@@ -385,7 +385,6 @@ export const createUseCases = (
         new BroadcastToPoleEmploiOnConventionUpdates(
           uowPerformer,
           gateways.poleEmploiGateway,
-          gateways.timeGateway,
         ),
       shareConventionByEmail: new ShareApplicationLinkByEmail(
         gateways.notification,

@@ -1,19 +1,16 @@
 import {
-  AgencyDtoBuilder,
   ConventionDtoBuilder,
   ConventionId,
   expectObjectsToMatch,
-  expectToEqual,
   reasonableSchedule,
 } from "shared";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
-import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { InMemoryPoleEmploiGateway } from "../../../../adapters/secondary/immersionOffer/poleEmploi/InMemoryPoleEmploiGateway";
 import { InMemoryFeatureFlagRepository } from "../../../../adapters/secondary/InMemoryFeatureFlagRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { BroadcastToPoleEmploiOnConventionUpdates } from "./BroadcastToPoleEmploiOnConventionUpdates";
 
-const prepareUseCase = async ({
+const prepareUseCase = ({
   enablePeConventionBroadcast,
 }: {
   enablePeConventionBroadcast: boolean;
@@ -23,129 +20,43 @@ const prepareUseCase = async ({
   uow.featureFlagRepository = new InMemoryFeatureFlagRepository({
     enablePeConventionBroadcast,
   });
-  const timeGateway = new CustomTimeGateway();
-  const broadcastToPe = new BroadcastToPoleEmploiOnConventionUpdates(
+  const useCase = new BroadcastToPoleEmploiOnConventionUpdates(
     new InMemoryUowPerformer(uow),
     poleEmploiGateWay,
-    timeGateway,
   );
 
-  const agencyRepository = uow.agencyRepository;
-  const peAgency = new AgencyDtoBuilder()
-    .withId("some-pe-agency")
-    .withKind("pole-emploi")
-    .build();
-  await agencyRepository.setAgencies([peAgency]);
-
-  return {
-    broadcastToPe,
-    poleEmploiGateWay,
-    agencyRepository,
-    peAgency,
-    errorRepository: uow.errorRepository,
-    timeGateway,
-  };
+  return { useCase, poleEmploiGateWay };
 };
 
 describe("Broadcasts events to pole-emploi", () => {
-  it("Skips convention if not linked to an agency of kind pole-emploi", async () => {
+  it("Skips conventions without federated id", async () => {
     // Prepare
-    const { broadcastToPe, poleEmploiGateWay, agencyRepository } =
-      await prepareUseCase({
-        enablePeConventionBroadcast: true,
-      });
-
-    const agency = new AgencyDtoBuilder().withKind("mission-locale").build();
-    await agencyRepository.setAgencies([agency]);
-
-    // Act
-    const convention = new ConventionDtoBuilder()
-      .withAgencyId(agency.id)
-      .withFederatedIdentity({ provider: "peConnect", token: "some-id" })
-      .build();
-
-    await broadcastToPe.execute(convention);
-
-    // Assert
-    expect(poleEmploiGateWay.notifications).toHaveLength(0);
-  });
-
-  it("Conventions without federated id are still sent", async () => {
-    // Prepare
-    const { broadcastToPe, poleEmploiGateWay, peAgency } = await prepareUseCase(
-      {
-        enablePeConventionBroadcast: true,
-      },
-    );
-
-    // Act
-    const convention = new ConventionDtoBuilder()
-      .withAgencyId(peAgency.id)
-      .withoutFederatedIdentity()
-      .build();
-
-    await broadcastToPe.execute(convention);
-
-    // Assert
-    expect(poleEmploiGateWay.notifications).toHaveLength(1);
-  });
-
-  it("If Pe returns a 404 error, we store the error in a repo", async () => {
-    // Prepare
-    const {
-      broadcastToPe,
-      poleEmploiGateWay,
-      peAgency,
-      errorRepository,
-      timeGateway,
-    } = await prepareUseCase({
+    const { useCase, poleEmploiGateWay } = prepareUseCase({
       enablePeConventionBroadcast: true,
     });
 
     // Act
     const convention = new ConventionDtoBuilder()
-      .withAgencyId(peAgency.id)
       .withoutFederatedIdentity()
       .build();
 
-    poleEmploiGateWay.setNextResponse({
-      status: 404,
-      message: "Ops, something is bad",
-    });
-    const now = new Date();
-    timeGateway.setNextDate(now);
-
-    await broadcastToPe.execute(convention);
+    await useCase.execute(convention);
 
     // Assert
-    expect(poleEmploiGateWay.notifications).toHaveLength(1);
-    expectToEqual(errorRepository.savedErrors, [
-      {
-        serviceName: "PoleEmploiGateway.notifyOnConventionUpdated",
-        params: {
-          conventionId: convention.id,
-          httpStatus: 404,
-        },
-        message: "Ops, something is bad",
-        occurredAt: now,
-      },
-    ]);
+    expect(poleEmploiGateWay.notifications).toHaveLength(0);
   });
 
   it("doesn't send notification if feature flag is OFF", async () => {
     // Prepare
-    const { broadcastToPe, poleEmploiGateWay, peAgency } = await prepareUseCase(
-      {
-        enablePeConventionBroadcast: false,
-      },
-    );
+    const { useCase, poleEmploiGateWay } = prepareUseCase({
+      enablePeConventionBroadcast: false,
+    });
 
     const peExternalId = "peExternalId";
     const immersionConventionId: ConventionId = "immersionConventionId";
 
     // Act
     const convention = new ConventionDtoBuilder()
-      .withAgencyId(peAgency.id)
       .withId(immersionConventionId)
       .withExternalId(peExternalId)
       .withFederatedIdentity({ provider: "peConnect", token: "some-id" })
@@ -154,7 +65,7 @@ describe("Broadcasts events to pole-emploi", () => {
       .withImmersionObjective("Confirmer un projet professionnel")
       .build();
 
-    await broadcastToPe.execute(convention);
+    await useCase.execute(convention);
 
     // Assert
     expect(poleEmploiGateWay.notifications).toHaveLength(0);
@@ -162,17 +73,14 @@ describe("Broadcasts events to pole-emploi", () => {
 
   it("Converts and sends conventions with federated id if featureFlag is ON", async () => {
     // Prepare
-    const { broadcastToPe, poleEmploiGateWay, peAgency } = await prepareUseCase(
-      {
-        enablePeConventionBroadcast: true,
-      },
-    );
+    const { useCase, poleEmploiGateWay } = prepareUseCase({
+      enablePeConventionBroadcast: true,
+    });
 
     const immersionConventionId: ConventionId = "immersionConventionId";
 
     // Act
     const convention = new ConventionDtoBuilder()
-      .withAgencyId(peAgency.id)
       .withId(immersionConventionId)
       .withExternalId("1")
       .withImmersionAppelation({
@@ -189,7 +97,7 @@ describe("Broadcasts events to pole-emploi", () => {
       .withImmersionObjective("Initier une démarche de recrutement")
       .build();
 
-    await broadcastToPe.execute(convention);
+    await useCase.execute(convention);
 
     // Assert
     expect(poleEmploiGateWay.notifications).toHaveLength(1);
@@ -198,10 +106,10 @@ describe("Broadcasts events to pole-emploi", () => {
       peConnectId: "some-id",
       originalId: immersionConventionId,
       objectifDeImmersion: 3,
-      dureeImmersion: 21,
+      dureeImmersion: "21",
       dateDebut: "2021-05-12T00:00:00.000Z",
       dateFin: "2021-05-14T00:30:00.000Z",
-      statut: "DEMANDE_VALIDÉE",
+      status: "DEMANDE_VALIDÉE",
       codeAppellation: "011111",
     });
   });

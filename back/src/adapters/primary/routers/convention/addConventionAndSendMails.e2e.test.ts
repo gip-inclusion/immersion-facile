@@ -89,17 +89,15 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
 
   // eslint-disable-next-line jest/expect-expect
   it("Scenario: application submitted, then signed, then validated", async () => {
-    const peAgency = new AgencyDtoBuilder()
-      .withKind("pole-emploi")
-      .withValidatorEmails(["validator@mail.com"])
-      .build();
-
     const initialConvention = new ConventionDtoBuilder()
-      .withAgencyId(peAgency.id)
       .notSigned()
       .withStatus("READY_TO_SIGN")
       .withoutDateValidation()
       .withFederatedIdentity({ provider: "peConnect", token: "fake" })
+      .build();
+    const agency = new AgencyDtoBuilder()
+      .withId(initialConvention.agencyId)
+      .withValidatorEmails(["validator@mail.com"])
       .build();
 
     const appAndDeps = await buildTestApp();
@@ -114,7 +112,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       "link8",
     ]);
 
-    appAndDeps.inMemoryUow.agencyRepository.setAgencies([peAgency]);
+    appAndDeps.inMemoryUow.agencyRepository.setAgencies([agency]);
 
     const { beneficiarySignJwt, establishmentSignJwt } =
       await beneficiarySubmitsApplicationForTheFirstTime(
@@ -199,19 +197,19 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
 
   const peNotification = gateways.poleEmploiGateway.notifications[0];
   expect(peNotification.id).toBe("00000000001");
-  expectToEqual(peNotification.statut, "DEMANDE_A_SIGNER");
+  expectToEqual(peNotification.status, "A_SIGNER");
   expect(peNotification.originalId).toBe(convention.id);
   expect(peNotification.email).toBe(convention.signatories.beneficiary.email);
   const sentEmails = gateways.notification.getSentEmails();
   expect(sentEmails).toHaveLength(numberOfEmailInitialySent - 1);
   expect(sentEmails.map((e) => e.recipients)).toEqual([
-    [VALID_EMAILS[0]],
     [VALID_EMAILS[2]],
+    [VALID_EMAILS[0]],
     [VALID_EMAILS[1]],
   ]);
 
   const beneficiaryShortLinkSignEmail = expectEmailOfType(
-    sentEmails[0],
+    sentEmails[1],
     "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
   );
   const establishmentShortLinkSignEmail = expectEmailOfType(
