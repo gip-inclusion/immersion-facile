@@ -8,13 +8,11 @@ import { useEstablishmentSiret } from "src/app/hooks/siret.hooks";
 type SiretFetcherInputProps = {
   placeholder: string;
   label?: string;
-  shouldFetchEvenIfAlreadySaved: boolean;
 };
 
 export const SiretFetcherInput = ({
   placeholder,
   label,
-  shouldFetchEvenIfAlreadySaved,
 }: SiretFetcherInputProps) => {
   const {
     currentSiret,
@@ -24,7 +22,7 @@ export const SiretFetcherInput = ({
     modifyLinkWasSent,
     sendModifyEstablishmentLink,
   } = useEstablishmentSiret({
-    shouldFetchEvenIfAlreadySaved,
+    shouldFetchEvenIfAlreadySaved: false,
   });
   const shouldShowInputError = !isSiretAlreadySaved && currentSiret !== "";
   return (

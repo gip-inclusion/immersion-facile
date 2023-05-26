@@ -16,10 +16,7 @@ export const SiretModalContent = () => {
         Pour enregistrer ou modifier votre entreprise déjà référencée, veuillez
         entrer votre SIRET
       </p>
-      <SiretFetcherInput
-        placeholder="Entrez le Siret de votre entreprise"
-        shouldFetchEvenIfAlreadySaved={false}
-      />
+      <SiretFetcherInput placeholder="Entrez le Siret de votre entreprise" />
     </>
   );
 };
