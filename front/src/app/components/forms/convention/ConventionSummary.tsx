@@ -224,11 +224,7 @@ const summarySections = (
   },
 ];
 
-export const ConventionSummary = ({
-  validationAction,
-}: {
-  validationAction?: React.ReactNode;
-}) => {
+export const ConventionSummary = () => {
   const convention = useAppSelector(conventionSelectors.convention);
   const [agency, setAgency] = useState<AgencyPublicDisplayDto | null>(null);
   const { cx } = useStyles();
@@ -254,7 +250,6 @@ export const ConventionSummary = ({
           <Table data={fields} noCaption fixed />
         </section>
       ))}
-      {validationAction}
     </div>
   );
 };

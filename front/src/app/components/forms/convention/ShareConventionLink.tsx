@@ -36,7 +36,7 @@ export const ShareConventionLink = () => {
     <>
       <Button
         type="button"
-        size="small"
+        iconId="fr-icon-mail-line"
         onClick={() => {
           openShareLinkModal();
           setIsModalOpened(true);

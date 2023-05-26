@@ -120,7 +120,10 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
       "Est-ce que le tuteur de l'entreprise est le représentant de l'entreprise, signataire de la convention ?",
   },
   immersionHourLocationSection: {
-    title: "4. Lieu et horaires de l'immersion",
+    title:
+      internshipKind === "immersion"
+        ? "4. Lieu et horaires de l'immersion"
+        : "4. Lieu et horaires du stage",
   },
   immersionDetailsSection: {
     title:

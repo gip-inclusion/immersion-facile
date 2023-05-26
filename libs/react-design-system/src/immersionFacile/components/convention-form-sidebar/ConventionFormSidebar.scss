@@ -9,6 +9,7 @@
   padding: 0.7rem 1rem 0 !important;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
   @include for-screen-min($bp-lg) {
+    box-shadow: none;
     position: static;
     padding: 0;
   }

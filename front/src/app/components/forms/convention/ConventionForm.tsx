@@ -227,7 +227,6 @@ export const ConventionForm = ({
         .with(
           {
             formSuccessfullySubmitted: true,
-            showSummary: true,
           },
           () => (
             <SubmitConfirmationSection
@@ -245,43 +244,38 @@ export const ConventionForm = ({
           },
           () => (
             <>
-              <ConventionSummary
-                validationAction={
-                  <>
-                    <ConventionFeedbackNotification
-                      submitFeedback={submitFeedback}
-                      signatories={getValues("signatories")}
-                    />
-                    <ButtonsGroup
-                      inlineLayoutWhen="sm and up"
-                      alignment="center"
-                      buttons={[
-                        {
-                          children: "Modifier la convention",
-                          onClick: () => {
-                            dispatch(
-                              conventionSlice.actions.showSummaryChangeRequested(
-                                {
-                                  showSummary: false,
-                                },
-                              ),
-                            );
-                          },
-                          priority: "secondary",
-                        },
-                        {
-                          children: "Envoyer la convention",
-                          onClick: methods.handleSubmit(onConfirmSubmit),
-                          nativeButtonProps: {
-                            id: domElementIds.conventionImmersionRoute
-                              .confirmSubmitFormButton,
-                          },
-                        },
-                      ]}
-                    />
-                  </>
-                }
-              />
+              <section>
+                <ConventionSummary />
+                <ConventionFeedbackNotification
+                  submitFeedback={submitFeedback}
+                  signatories={getValues("signatories")}
+                />
+                <ButtonsGroup
+                  inlineLayoutWhen="sm and up"
+                  alignment="center"
+                  buttons={[
+                    {
+                      children: "Modifier la convention",
+                      onClick: () => {
+                        dispatch(
+                          conventionSlice.actions.showSummaryChangeRequested({
+                            showSummary: false,
+                          }),
+                        );
+                      },
+                      priority: "secondary",
+                    },
+                    {
+                      children: "Envoyer la convention",
+                      onClick: methods.handleSubmit(onConfirmSubmit),
+                      nativeButtonProps: {
+                        id: domElementIds.conventionImmersionRoute
+                          .confirmSubmitFormButton,
+                      },
+                    },
+                  ]}
+                />
+              </section>
             </>
           ),
         )
@@ -327,6 +321,7 @@ export const ConventionForm = ({
                           "fr-btns-group--center",
                           "fr-btns-group--inline",
                           "fr-btns-group--sm",
+                          "fr-btns-group--icon-left",
                         )}
                       >
                         <ShareConventionLink />
@@ -344,16 +339,7 @@ export const ConventionForm = ({
             </FormProvider>
           ),
         )
-
-        .otherwise(() => (
-          <>
-            <Alert
-              title="Erreur"
-              severity="error"
-              description="Une erreur est survenue. Veuillez réessayer."
-            />
-          </>
-        ))}
+        .exhaustive()}
     </div>
   );
 };
