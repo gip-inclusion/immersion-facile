@@ -1,3 +1,4 @@
+import axios from "axios";
 import Bottleneck from "bottleneck";
 import { AbsoluteUrl } from "shared";
 import { HttpClient, HttpResponse } from "http-client";
@@ -32,19 +33,23 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
     return this.postPoleEmploiConvention(poleEmploiConvention)
       .then((response) => ({ status: response.status as 200 | 201 }))
       .catch((error) => {
-        if (error?.response?.status === 404) {
+        if (!axios.isAxiosError(error) || !error.response) {
+          throw error;
+        }
+
+        if (error.response.status === 404) {
           return {
             status: 404,
-            message: error?.response?.data?.message,
+            message: error.response.data?.message,
           };
         }
 
         const errorObject = {
           _title: "PeBroadcastError",
           status: "errored",
-          httpStatus: error?.response?.status,
+          httpStatus: error.response.status,
           message: error.message,
-          axiosBody: error?.response?.data,
+          axiosBody: error.response.data,
         };
         logger.error(errorObject);
         notifyAndThrowErrorDiscord(
@@ -53,7 +58,10 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
           ),
         );
 
-        throw error;
+        return {
+          status: error.response.status,
+          message: error.response.data?.message,
+        };
       });
   }
 

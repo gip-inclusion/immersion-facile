@@ -3,9 +3,7 @@ import {
   PoleEmploiConvention,
   PoleEmploiGateway,
 } from "../../../../domain/convention/ports/PoleEmploiGateway";
-import { createLogger } from "../../../../utils/logger";
 
-const logger = createLogger(__filename);
 export class InMemoryPoleEmploiGateway implements PoleEmploiGateway {
   constructor(public notifications: PoleEmploiConvention[] = []) {}
 
@@ -14,10 +12,6 @@ export class InMemoryPoleEmploiGateway implements PoleEmploiGateway {
   public async notifyOnConventionUpdated(
     convention: PoleEmploiConvention,
   ): Promise<PoleEmploiBroadcastResponse> {
-    logger.info(
-      { conventionId: convention.id },
-      "In Memory - Fake Sending convention to PE",
-    );
     this.notifications.push(convention);
     return this.nextResponse;
   }

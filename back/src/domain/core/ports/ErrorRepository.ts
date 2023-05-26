@@ -7,5 +7,5 @@ export type SavedError = {
 };
 
 export interface ErrorRepository {
-  save: (savedError: SavedError) => void;
+  save: (savedError: SavedError) => Promise<void>;
 }

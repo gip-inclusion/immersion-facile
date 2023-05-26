@@ -1,9 +1,5 @@
 import { z } from "zod";
-import {
-  calculateTotalImmersionHoursBetweenDate,
-  ConventionDto,
-  ImmersionObjective,
-} from "shared";
+import { ConventionDto, ImmersionObjective } from "shared";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import {
   UnitOfWork,
@@ -52,12 +48,6 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
     const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);
     if (!agency || agency.kind !== "pole-emploi") return;
 
-    const totalHours = calculateTotalImmersionHoursBetweenDate({
-      schedule: convention.schedule,
-      dateStart: convention.dateStart,
-      dateEnd: convention.dateEnd,
-    });
-
     const { beneficiary, establishmentRepresentative } = convention.signatories;
 
     const poleEmploiConvention: PoleEmploiConvention = {
@@ -77,7 +67,7 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
       dateDemande: new Date(convention.dateSubmission).toISOString(),
       dateDebut: new Date(convention.dateStart).toISOString(),
       dateFin: new Date(convention.dateEnd).toISOString(),
-      dureeImmersion: totalHours,
+      dureeImmersion: convention.schedule.totalHours,
       raisonSociale: convention.businessName,
       siret: convention.siret,
       nomPrenomFonctionTuteur: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName} ${convention.establishmentTutor.job}`,
@@ -104,14 +94,14 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
       poleEmploiConvention,
     );
 
-    if (isBroadcastResponseOk(response)) return;
-
-    uow.errorRepository.save({
-      serviceName: "PoleEmploiGateway.notifyOnConventionUpdated",
-      httpStatus: response.status,
-      message: response.message,
-      params: { conventionId: convention.id },
-      occurredAt: this.timeGateway.now(),
-    });
+    if (!isBroadcastResponseOk(response)) {
+      await uow.errorRepository.save({
+        serviceName: "PoleEmploiGateway.notifyOnConventionUpdated",
+        httpStatus: response.status,
+        message: response.message,
+        params: { conventionId: convention.id },
+        occurredAt: this.timeGateway.now(),
+      });
+    }
   }
 }
