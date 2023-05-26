@@ -6,8 +6,7 @@ import { PgErrorRepository } from "./PgErrorRepository";
 const savedError: SavedError = {
   serviceName: "SomeService",
   message: "Some message",
-  params: { someId: "123" },
-  httpStatus: 500,
+  params: { someId: "123", httpStatus: 500 },
   occurredAt: new Date("2021-01-01"),
 };
 describe("PgEstablishmentGroupRepository", () => {
