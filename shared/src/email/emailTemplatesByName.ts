@@ -552,7 +552,6 @@ export const emailTemplatesByName =
       niceName: "Requête demande de modification de convention",
       tags: ["demande de modifications"],
       createEmailVariables: ({
-        agency,
         justification,
         beneficiaryFirstName,
         beneficiaryLastName,
@@ -570,9 +569,9 @@ export const emailTemplatesByName =
             ? "Pour action : veuillez modifier cette demande d'immersion professionnelle"
             : "Pour action : mini Stage - veuillez modifier cette demande de mini stage",
         greetings: "Bonjour,",
-        content: `${agency} vous informe que la demande ${
+        content: `Vous avez fait une demande de modification concernant la demande ${
           internshipKind === "immersion" ? "d'immersion" : "de mini stage"
-        } de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName} nécessite d'être modifiée pour la raison suivante :
+        } de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName} pour la raison suivante :
       ${justification}`,
         buttons: [
           {
@@ -582,7 +581,7 @@ export const emailTemplatesByName =
           createConventionStatusButton(conventionStatusLink),
         ],
         subContent: `
-      Après avoir corrigé votre demande, il vous faudra de nouveau confirmer votre accord. 
+      Après avoir corrigé votre demande, il faudra de nouveau que tous les acteurs de la convention confirment leur accord. 
       
       Pensez à surveiller votre boite mail et à consulter vos spams si vous ne recevez pas le mail de demande de confirmation.      
       

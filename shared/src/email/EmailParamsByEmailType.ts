@@ -131,7 +131,6 @@ export type EmailParamsByEmailType = {
     businessName: string;
     signature: string;
     immersionAppellation: AppellationDto;
-    agency: string;
     magicLink: string;
     conventionStatusLink: string;
     agencyLogoUrl: AbsoluteUrl | undefined;

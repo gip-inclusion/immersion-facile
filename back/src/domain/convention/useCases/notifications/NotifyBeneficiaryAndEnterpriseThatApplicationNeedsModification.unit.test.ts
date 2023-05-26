@@ -95,6 +95,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
       ],
       ["counsellor", agency.counsellorEmails[0]],
       ["validator", agency.validatorEmails[0]],
+      ["backOffice", "admin@immersion-facile.beta.gouv.fr"],
     ])(
       "Notify %s that application needs modification.",
       async (role, expectedRecipient) => {
@@ -132,7 +133,6 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
             recipients: [expectedRecipient!],
             params: {
               internshipKind: convention.internshipKind,
-              agency: agency.name,
               beneficiaryFirstName:
                 convention.signatories.beneficiary.firstName,
               beneficiaryLastName: convention.signatories.beneficiary.lastName,
@@ -151,7 +151,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
   });
 
   describe("Wrong paths", () => {
-    it.each<Role>(["backOffice", "establishment-tutor"])(
+    it.each<Role>(["establishment-tutor"])(
       "Notify %s that application needs modification is not supported.",
       async (role) => {
         const justification = "Change required.";

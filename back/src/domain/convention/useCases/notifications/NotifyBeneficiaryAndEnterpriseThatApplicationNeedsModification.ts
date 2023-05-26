@@ -88,7 +88,6 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
           businessName: convention.businessName,
           justification,
           signature: agency.signature,
-          agency: agency.name,
           immersionAppellation: convention.immersionAppellation,
           magicLink: await makeShortMagicLink(
             frontRoutes.conventionImmersionRoute,
@@ -115,7 +114,7 @@ const emailByRoleForConventionNeedsModification = (
     `No actor with role ${role} for convention ${convention.id}`,
   );
   const strategy: Record<Role, string | Error> = {
-    backOffice: error,
+    backOffice: "admin@immersion-facile.beta.gouv.fr",
     "beneficiary-current-employer":
       convention.signatories.beneficiaryCurrentEmployer?.email ??
       missingEmailError,
