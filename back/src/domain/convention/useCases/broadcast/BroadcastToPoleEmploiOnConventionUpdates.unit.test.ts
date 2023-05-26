@@ -109,7 +109,7 @@ describe("Broadcasts events to pole-emploi", () => {
       .build();
 
     poleEmploiGateWay.setNextResponse({
-      status: 500,
+      status: 404,
       message: "Ops, something is bad",
     });
     const now = new Date();
@@ -124,8 +124,8 @@ describe("Broadcasts events to pole-emploi", () => {
         serviceName: "PoleEmploiGateway.notifyOnConventionUpdated",
         params: {
           conventionId: convention.id,
+          httpStatus: 404,
         },
-        httpStatus: 500,
         message: "Ops, something is bad",
         occurredAt: now,
       },

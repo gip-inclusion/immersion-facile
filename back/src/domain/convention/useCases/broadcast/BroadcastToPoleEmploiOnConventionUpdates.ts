@@ -97,9 +97,8 @@ export class BroadcastToPoleEmploiOnConventionUpdates extends TransactionalUseCa
     if (!isBroadcastResponseOk(response)) {
       await uow.errorRepository.save({
         serviceName: "PoleEmploiGateway.notifyOnConventionUpdated",
-        httpStatus: response.status,
         message: response.message,
-        params: { conventionId: convention.id },
+        params: { conventionId: convention.id, httpStatus: response.status },
         occurredAt: this.timeGateway.now(),
       });
     }
