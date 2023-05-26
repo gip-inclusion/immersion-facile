@@ -330,7 +330,6 @@ export const defaultEmailValueByEmailKind: {
       romeCode: "R1111",
       romeLabel: "MON LABEL ROME",
     },
-    agency: "AGENCY",
     magicLink: "MAGIC_LINK",
     conventionStatusLink: "CONVENTION_STATUS_LINK",
     agencyLogoUrl: defaultEmailPreviewUrl,
