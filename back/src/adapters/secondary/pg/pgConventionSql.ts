@@ -15,6 +15,7 @@ const buildSignatoriesObject = `JSON_BUILD_OBJECT(
         'email', b.email,
         'phone', b.phone,
         'signedAt', date_to_iso(b.signed_at),
+        'isRqth', CASE WHEN (b.extra_fields ->> 'isRqth' IS NOT NULL) THEN (b.extra_fields ->> 'isRqth')::boolean ELSE NULL END,
         'emergencyContact', b.extra_fields ->> 'emergencyContact',
         'emergencyContactPhone', b.extra_fields ->> 'emergencyContactPhone',
         'emergencyContactEmail', b.extra_fields ->> 'emergencyContactEmail',

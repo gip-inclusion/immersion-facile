@@ -51,7 +51,6 @@ const beneficiary: Beneficiary<"immersion"> = {
   emergencyContactEmail: "clariss.ocon@emergencycontact.com",
   financiaryHelp: "Un stage rémunéré au SMIC?",
   birthdate: "2002-10-05T14:48:00.000Z",
-  isRqth: false,
 };
 
 const establishmentTutor: EstablishmentTutor = {
