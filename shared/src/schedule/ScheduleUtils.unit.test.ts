@@ -1,6 +1,6 @@
 import { expectToEqual } from "../expectToEqual";
 import { DayPeriodsDto, ScheduleDto, weekdays } from "./Schedule.dto";
-import { isoStringSchema, scheduleSchema } from "./Schedule.schema";
+import { dateIsoStringSchema, scheduleSchema } from "./Schedule.schema";
 import { ScheduleDtoBuilder } from "./ScheduleDtoBuilder";
 import {
   calculateNumberOfWorkedDays,
@@ -666,16 +666,18 @@ describe("ScheduleUtils", () => {
     });
   });
 
-  describe("schemas", () => {
-    it("isoStringSchema parse", () => {
-      expect(() => isoStringSchema.parse("Not a date")).toThrow(
+  describe("dateIsoStringSchema schema", () => {
+    it.each(["2022-07-05", new Date("2022-07-05")])(
+      "parse '%s' is valid",
+      (date) => {
+        expect(dateIsoStringSchema.parse(date)).toEqual(
+          new Date(date).toISOString(),
+        );
+      },
+    );
+    it.each(["Not a date", "31-07-2022"])("parse '%s' is invalid", (date) => {
+      expect(() => dateIsoStringSchema.parse(date)).toThrow(
         "Invalid time value",
-      );
-      expect(() => isoStringSchema.parse("31-07-2022")).toThrow(
-        "Invalid time value",
-      );
-      expect(isoStringSchema.parse("2022-07-05")).toEqual(
-        new Date("2022-07-05").toISOString(),
       );
     });
   });

@@ -21,13 +21,12 @@ export const timePeriodSchema: z.Schema<TimePeriodDto> = z.object({
 export const timePeriodsSchema: z.Schema<TimePeriodsDto> =
   z.array(timePeriodSchema);
 
-export const isoStringSchema = z.preprocess((arg) => {
-  if (arg instanceof Date) return arg.toISOString();
-  if (typeof arg === "string") return new Date(arg).toISOString();
-}, z.string());
+export const dateIsoStringSchema = z.coerce
+  .string()
+  .transform((arg) => new Date(arg).toISOString());
 
 export const dailyScheduleSchema: z.Schema<DailyScheduleDto> = z.object({
-  date: isoStringSchema,
+  date: dateIsoStringSchema,
   timePeriods: timePeriodsSchema,
 });
 

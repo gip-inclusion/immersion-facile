@@ -2,10 +2,10 @@ import { z } from "zod";
 import {
   AbsoluteUrl,
   absoluteUrlSchema,
+  emailSchema,
   Flavor,
   Phone,
   smsRecipientPhoneSchema,
-  zEmail,
 } from "shared";
 
 export type ApiKey = Flavor<string, "ApiKey">;
@@ -32,7 +32,7 @@ export type RecipientOrSender = {
 };
 const recipientOrSenderSchema: z.Schema<RecipientOrSender> = z.object({
   name: z.string().optional(),
-  email: zEmail,
+  email: emailSchema,
 });
 
 type Attachement = { url: string };

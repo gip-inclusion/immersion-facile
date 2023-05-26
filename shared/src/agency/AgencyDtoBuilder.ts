@@ -1,6 +1,7 @@
 import { AbsoluteUrl } from "../AbsoluteUrl";
 import { AddressDto } from "../address/address.dto";
 import { Builder } from "../Builder";
+import { Email } from "../email/email.dto";
 import { AgencyDto, AgencyId, AgencyKind, AgencyStatus } from "./agency.dto";
 
 const emptyAddress: AddressDto = {
@@ -79,14 +80,14 @@ export class AgencyDtoBuilder implements Builder<AgencyDto> {
     });
   }
 
-  public withCounsellorEmails(counsellorEmails: string[]) {
+  public withCounsellorEmails(counsellorEmails: Email[]) {
     return new AgencyDtoBuilder({
       ...this.agency,
       counsellorEmails,
     });
   }
 
-  public withValidatorEmails(validatorEmails: string[]) {
+  public withValidatorEmails(validatorEmails: Email[]) {
     return new AgencyDtoBuilder({
       ...this.agency,
       validatorEmails,

@@ -1,5 +1,6 @@
 import { AbsoluteUrl } from "../AbsoluteUrl";
 import { AgencyDto, AgencyId } from "../agency/agency.dto";
+import { Email } from "../email/email.dto";
 import { Flavor } from "../typeFlavors";
 
 export type AgencyRole = (typeof allAgencyRoles)[number];
@@ -19,7 +20,7 @@ export type AuthenticatedUserId = Flavor<string, "AuthenticatedUserId">;
 
 export type AuthenticatedUser = {
   id: AuthenticatedUserId;
-  email: string;
+  email: Email;
   firstName: string;
   lastName: string;
 };

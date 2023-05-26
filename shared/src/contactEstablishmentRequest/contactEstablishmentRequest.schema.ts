@@ -1,7 +1,8 @@
 import { z } from "zod";
+import { emailSchema } from "../email/email.schema";
 import { romeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
-import { zEmail, zTrimmedString } from "../zodUtils";
+import { zTrimmedString } from "../zodUtils";
 import {
   ContactEstablishmentByMailDto,
   ContactEstablishmentByPhoneDto,
@@ -14,7 +15,7 @@ const commonFields = {
   siret: siretSchema,
   potentialBeneficiaryFirstName: zTrimmedString,
   potentialBeneficiaryLastName: zTrimmedString,
-  potentialBeneficiaryEmail: zEmail,
+  potentialBeneficiaryEmail: emailSchema,
 };
 
 export const preferEmailContactSchema = z.literal("EMAIL");

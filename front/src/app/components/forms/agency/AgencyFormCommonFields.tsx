@@ -8,7 +8,7 @@ import {
   AgencyKind,
   agencyKindList,
   CreateAgencyDto,
-  zEmail,
+  emailSchema,
 } from "shared";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
@@ -115,7 +115,7 @@ export const AgencyFormCommonFields = ({
           initialValue={formValues.counsellorEmails.join(", ")}
           valuesInList={watch("counsellorEmails")}
           setValues={(values) => setValue("counsellorEmails", values)}
-          validationSchema={zEmail}
+          validationSchema={emailSchema}
         />
       )}
 
@@ -125,7 +125,7 @@ export const AgencyFormCommonFields = ({
         description={descriptionByValidationSteps[validationSteps]}
         valuesInList={watch("validatorEmails")}
         setValues={(values) => setValue("validatorEmails", values)}
-        validationSchema={zEmail}
+        validationSchema={emailSchema}
       />
 
       {formValues.kind !== "pole-emploi" && (
