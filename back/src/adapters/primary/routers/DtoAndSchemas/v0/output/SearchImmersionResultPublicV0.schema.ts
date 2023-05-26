@@ -1,11 +1,11 @@
 import { z } from "zod";
 import {
   appellationDtoSchema,
+  emailSchema,
   geoPositionSchema,
   phoneRegExp,
   romeCodeSchema,
   siretSchema,
-  zEmail,
   zString,
   zTrimmedString,
 } from "shared";
@@ -47,7 +47,7 @@ export const searchImmersionResultPublicV0Schema: z.Schema<SearchImmersionResult
         firstName: zTrimmedString,
         role: zTrimmedString,
         phone: zString.regex(phoneRegExp, "Numero de téléphone incorrect"),
-        email: zEmail,
+        email: emailSchema,
       })
       .optional(),
     numberOfEmployeeRange: z.string().optional(),

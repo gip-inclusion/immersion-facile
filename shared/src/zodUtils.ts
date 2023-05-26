@@ -1,6 +1,5 @@
 import { Logger } from "pino";
-import { preprocess, z } from "zod";
-import { validateSingleEmailRegex } from "./email/validateEmail.dto";
+import { z } from "zod";
 import { timeHHmmRegExp } from "./utils/date";
 
 export const localization = {
@@ -70,47 +69,11 @@ export const zTimeString = z
 export const makezTrimmedString = (message: string) =>
   zString.transform((s) => s.trim()).refine((s) => s.length > 0, message);
 
-const removeAccentsTrimAndLowerCase = (value: unknown) => {
-  if (typeof value !== "string") return value;
-  return value
-    .trim()
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
-};
-
-export const zEmail = z.preprocess(
-  removeAccentsTrimAndLowerCase,
-  z
-    .string(requiredText)
-    .email(localization.invalidEmailFormat)
-    .refine(
-      (email) => email.match(validateSingleEmailRegex), // emails patterns without underscore in the domain part
-      localization.invalidEmailFormat,
-    ),
-);
-
-export const zEmailPossiblyEmpty = z.preprocess(
-  removeAccentsTrimAndLowerCase,
-  zEmail.optional().or(z.literal("")),
-);
-
 export const zBoolean = z.boolean(requiredBoolean);
 
-export const zPreprocessedBoolean = () =>
-  preprocess((candidate) => {
-    if (typeof candidate !== "string") return candidate;
-    return candidate.toLowerCase() === "true";
-  }, z.boolean());
+export const zToBolean = z.coerce.boolean(requiredBoolean);
 
-export const zPreprocessedNumber = (schema = z.number()) =>
-  preprocess((nAsString) => {
-    if (typeof nAsString !== "string") return nAsString;
-    const n = parseFloat(nAsString);
-    if (isNaN(n))
-      throw new Error(`'${nAsString}' cannot be converted to number`);
-    return n;
-  }, schema);
+export const zToNumber = z.coerce.number();
 
 export const zUuidLike = z.string().length(36);
 

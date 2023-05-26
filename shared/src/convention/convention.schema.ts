@@ -1,6 +1,7 @@
 import { differenceInYears } from "date-fns";
 import { z } from "zod";
 import { agencyIdSchema } from "../agency/agency.schema";
+import { emailPossiblyEmptySchema, emailSchema } from "../email/email.schema";
 import { peConnectIdentitySchema } from "../federatedIdentities/federatedIdentity.schema";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { scheduleSchema } from "../schedule/Schedule.schema";
@@ -13,8 +14,6 @@ import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import {
   localization,
   zBoolean,
-  zEmail,
-  zEmailPossiblyEmpty,
   zEnumValidation,
   zString,
   zStringPossiblyEmpty,
@@ -76,7 +75,7 @@ const phoneSchema = zString.regex(phoneRegExp, localization.invalidPhone);
 
 const signatorySchema = z.object({
   role: roleSchema,
-  email: zEmail,
+  email: emailSchema,
   phone: phoneSchema,
   firstName: zTrimmedStringMax255,
   lastName: zTrimmedStringMax255,
@@ -89,7 +88,7 @@ const beneficiarySchema: z.Schema<Beneficiary<"immersion">> =
       role: z.enum(["beneficiary"]),
       emergencyContact: zStringPossiblyEmpty,
       emergencyContactPhone: phoneSchema.optional().or(z.literal("")),
-      emergencyContactEmail: zEmailPossiblyEmpty,
+      emergencyContactEmail: emailPossiblyEmptySchema,
       federatedIdentity: peConnectIdentitySchema.optional(),
       financiaryHelp: zStringPossiblyEmpty,
       birthdate: zString.regex(dateRegExp, localization.invalidDate),

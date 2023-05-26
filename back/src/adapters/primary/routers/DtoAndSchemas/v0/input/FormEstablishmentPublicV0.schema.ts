@@ -2,13 +2,13 @@ import { z } from "zod";
 import {
   addressWithPostalCodeSchema,
   appellationSchema,
+  emailSchema,
   nafSchema,
   NotEmptyArray,
   phoneRegExp,
   romeCodeSchema,
   siretSchema,
   zBoolean,
-  zEmail,
   zString,
   zTrimmedString,
 } from "shared";
@@ -23,7 +23,7 @@ export const businessContactSchemaPublicV0: z.Schema<BusinessContactDtoPublicV0>
     firstName: zTrimmedString,
     job: zTrimmedString,
     phone: zString.regex(phoneRegExp, "Numero de téléphone incorrect"),
-    email: zEmail,
+    email: emailSchema,
   });
 
 export type ContactMethodPublicV0 = "UNKNOWN" | "EMAIL" | "PHONE" | "IN_PERSON";

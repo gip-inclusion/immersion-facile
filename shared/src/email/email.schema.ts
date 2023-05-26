@@ -1,7 +1,8 @@
 import { z } from "zod";
-import { zEmail } from "../zodUtils";
+import { localization, requiredText } from "../zodUtils";
 import type { EmailType, TemplatedEmail } from "./email";
 import { Email } from "./email.dto";
+import { validateSingleEmailRegex } from "./validateEmail.dto";
 
 const emailTypeSchema = z.string() as z.Schema<EmailType>;
 
@@ -20,4 +21,27 @@ const emailSentSchema = z.object({
 
 export const emailsSentSchema = z.array(emailSentSchema);
 
-export const emailSchema: z.Schema<Email> = zEmail;
+export const emailSchema: z.Schema<Email> = z
+  .string(requiredText)
+  .transform((arg) =>
+    arg
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, ""),
+  )
+  .pipe(
+    z
+      .string()
+      .email(localization.invalidEmailFormat)
+      .refine(
+        (email) => email.match(validateSingleEmailRegex), // emails patterns without underscore in the domain part
+        (email) => ({
+          message: `${localization.invalidEmailFormat} - email fourni : ${email}`,
+        }),
+      ),
+  );
+
+export const emailPossiblyEmptySchema = emailSchema
+  .optional()
+  .or(z.literal(""));

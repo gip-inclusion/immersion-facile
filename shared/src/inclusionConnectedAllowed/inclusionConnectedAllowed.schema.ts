@@ -1,7 +1,8 @@
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { agencySchema } from "../agency/agency.schema";
-import { zEmail, zString, zTrimmedString } from "../zodUtils";
+import { emailSchema } from "../email/email.schema";
+import { zString, zTrimmedString } from "../zodUtils";
 import {
   AgencyRight,
   allAgencyRoles,
@@ -22,7 +23,7 @@ export const authenticatedUserIdSchema: z.Schema<AuthenticatedUserId> =
 export const inclusionConnectedUserSchema: z.Schema<InclusionConnectedUser> =
   z.object({
     id: authenticatedUserIdSchema,
-    email: zEmail,
+    email: emailSchema,
     firstName: zString,
     lastName: zString,
     agencyRights: z.array(agencyRightSchema),

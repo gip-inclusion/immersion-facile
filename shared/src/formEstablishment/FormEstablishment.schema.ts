@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { emailSchema } from "../email/email.schema";
 import { nafSchema } from "../naf";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
@@ -7,7 +8,6 @@ import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import {
   localization,
   zBoolean,
-  zEmail,
   zString,
   zStringPossiblyEmpty,
   zTrimmedString,
@@ -45,9 +45,9 @@ export const businessContactSchema: z.Schema<BusinessContactDto> = z.object({
   firstName: zTrimmedString,
   job: zTrimmedString,
   phone: zString.regex(phoneRegExp, localization.invalidPhone),
-  email: zEmail,
+  email: emailSchema,
   contactMethod: preferredContactMethodSchema,
-  copyEmails: z.array(zEmail),
+  copyEmails: z.array(emailSchema),
 });
 
 const formEstablishmentSources: NotEmptyArray<FormEstablishmentSource> = [

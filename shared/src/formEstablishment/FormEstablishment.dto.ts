@@ -1,4 +1,5 @@
 import { ApiConsumerName } from "../apiConsumer/ApiConsumer";
+import { Email } from "../email/email.dto";
 import { NafDto } from "../naf";
 import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret/siret";
@@ -13,9 +14,9 @@ export type BusinessContactDto = {
   firstName: string;
   job: string;
   phone: string; // we have a very permissive regex /^\+?[0-9]+$/
-  email: string; // a valid email
+  email: Email; // a valid email
   contactMethod: ContactMethod;
-  copyEmails: string[];
+  copyEmails: Email[];
 };
 
 export type FormEstablishmentSourceInUrl =

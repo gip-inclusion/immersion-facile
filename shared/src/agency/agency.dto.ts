@@ -1,5 +1,6 @@
 import { AbsoluteUrl } from "../AbsoluteUrl";
 import { AddressDto, DepartmentCode } from "../address/address.dto";
+import { Email } from "../email/email.dto";
 import { GeoPositionDto } from "../geoPosition/geoPosition.dto";
 import { SiretDto } from "../siret/siret";
 import { Flavor } from "../typeFlavors";
@@ -97,8 +98,8 @@ export type CreateAgencyDto = {
   name: string;
   address: AddressDto;
   position: GeoPositionDto;
-  counsellorEmails: string[];
-  validatorEmails: string[];
+  counsellorEmails: Email[];
+  validatorEmails: Email[];
   // adminEmails: string[];
   questionnaireUrl?: string;
   agencySiret: SiretDto;

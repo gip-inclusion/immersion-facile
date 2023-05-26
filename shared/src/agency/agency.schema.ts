@@ -1,11 +1,11 @@
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { addressSchema } from "../address/address.schema";
+import { emailSchema } from "../email/email.schema";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { siretSchema } from "../siret/siret.schema";
 import {
   localization,
-  zEmail,
   zEnumValidation,
   zSchemaForType,
   zString,
@@ -75,8 +75,8 @@ const createAgencyShape = {
   kind: agencyKindSchema,
   address: addressSchema,
   position: geoPositionSchema,
-  counsellorEmails: z.array(zEmail),
-  validatorEmails: z.array(zEmail).refine((emails) => emails.length > 0, {
+  counsellorEmails: z.array(emailSchema),
+  validatorEmails: z.array(emailSchema).refine((emails) => emails.length > 0, {
     message: localization.atLeastOneEmail,
   }),
   questionnaireUrl: z.string().optional(),

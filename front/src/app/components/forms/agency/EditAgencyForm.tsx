@@ -11,8 +11,8 @@ import {
   AgencyStatus,
   allAgencyStatuses,
   editAgencySchema,
+  emailSchema,
   toDotNotation,
-  zEmail,
 } from "shared";
 import { domElementIds } from "shared";
 import { ErrorNotifications } from "react-design-system";
@@ -88,7 +88,7 @@ export const EditAgencyForm = ({
             placeholder="admin.agence@mail.com"
             valuesInList={watch("adminEmails")}
             setValues={(values) => setValue("adminEmails", values)}
-            validationSchema={zEmail}
+            validationSchema={emailSchema}
           />
 
           <Select

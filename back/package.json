@@ -65,7 +65,7 @@
     "shared": "workspace:*",
     "ts-node": "^10.9.1",
     "uuid": "^8.3.2",
-    "zod": "3.14.2"
+    "zod": "3.21.4"
   },
   "devDependencies": {
     "@babel/core": "^7.20.12",

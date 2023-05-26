@@ -1,32 +1,35 @@
-import { zEmail } from "./zodUtils";
+import { zToBolean, zToNumber } from "./zodUtils";
 
-describe("zEmail validation utils", () => {
-  const validEmailsSet = [
-    "capitainehaddock@gmail.com",
-    "capitaine.haddock@gmail.com",
-    "capitaine+haddock@gmail.com",
-    "capitaine+haddock@gmail59.com",
-    "capitaine.haddock@beta.gouv.fr",
-    "capitaine_haddock@beta.go.uv.fr",
-    "capitaine.had.dock@beta.gouv.fr",
-    "capitaine_haddock_99@beta.gouv.fr",
-    "789@haddock.com",
-  ];
-  it.each(validEmailsSet)("email address %s should be valid", (email) => {
-    expect(zEmail.parse(email)).toBeTruthy();
+describe("zToBolean schema validation", () => {
+  it.each([
+    ["true", true],
+    ["TRUE", true],
+    [true, true],
+    ["1", true],
+    [1, true],
+    ["false", true],
+    ["FALSE", true],
+    ["0", true],
+    [undefined, false],
+    [null, false],
+    [false, false],
+    [0, false],
+  ])("boolean '%s' to be parsed to '%s'", (boolean, expectedBoolean) => {
+    expect(zToBolean.parse(boolean)).toBe(expectedBoolean);
+  });
+});
+
+describe("zToNumber schema validation", () => {
+  it.each([
+    [1, 1],
+    [1.2, 1.2],
+    ["0", 0],
+    ["0.1", 0.1],
+  ])("boolean '%s' to be parsed to '%s'", (boolean, expectedNumber) => {
+    expect(zToNumber.parse(boolean)).toBe(expectedNumber);
   });
 
-  const invalidEmailsSet = [
-    "capitaine.haddock@beta_gouv.fr",
-    "capitaine.haddock@beta_go__uv.fr",
-    "capitaine!!haddock@beta!gouv.fr",
-    "capitaine!!haddock@beta!gouv.fr",
-    "capitaine!!haddock@betagouvfr",
-    "yolo_c-pa_un-mail",
-    "cap`pitaine{haddock@gmail.com",
-  ];
-
-  it.each(invalidEmailsSet)("email address %s should not be valid", (email) => {
-    expect(() => zEmail.parse(email)).toThrow();
+  it.each(["0,1", "not a number"])("boolean '%s' to be invalid", (boolean) => {
+    expect(() => zToNumber.parse(boolean)).toThrow();
   });
 });
