@@ -288,6 +288,7 @@ describe("conventionDtoSchema", () => {
             email: "jean@bono.com",
             levelOfEducation: "4ème",
             phone: "0836656565",
+            isRqth: false,
           })
           .build();
         expectConventionDtoToBeInvalid(convention);
@@ -343,6 +344,7 @@ describe("conventionDtoSchema", () => {
       lastName: "student",
       phone: "0011223344",
       role: "beneficiary",
+      isRqth: false,
     };
     const beneficiary: Beneficiary<"immersion"> = {
       birthdate: new Date().toISOString(),
@@ -351,6 +353,7 @@ describe("conventionDtoSchema", () => {
       lastName: "sdfs",
       phone: "0011223344",
       role: "beneficiary",
+      isRqth: false,
     };
 
     it("right path internship immersion", () => {
@@ -421,6 +424,7 @@ describe("conventionDtoSchema", () => {
       lastName: "sdfs",
       phone: "0011223344",
       role: "beneficiary",
+      isRqth: false,
     };
 
     const convention = new ConventionDtoBuilder()

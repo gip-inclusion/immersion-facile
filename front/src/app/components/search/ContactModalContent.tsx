@@ -72,9 +72,22 @@ const AdvisesForContact = ({
           target="_blank"
           rel="noreferrer"
         >
-          Localiser l'entreprise et trouver son contact
+          Localiser l'entreprise
         </a>
       </li>
+      {data?.urlOfPartner && (
+        <li>
+          <a
+            className={fr.cx("fr-btn", "fr-btn--secondary")}
+            href={data.urlOfPartner}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {/* eslint-disable-next-line no-irregular-whitespace */}
+            Trouver le contact sur La Bonne Boite
+          </a>
+        </li>
+      )}
     </ul>
     <hr className={fr.cx("fr-hr", "fr-mt-2w")} />
     <h2 className={fr.cx("fr-h5")}>

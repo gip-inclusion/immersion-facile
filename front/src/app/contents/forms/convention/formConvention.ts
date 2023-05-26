@@ -276,6 +276,13 @@ const beneficiarySection = (internshipKind: InternshipKind) => ({
     id: beneficiarySectionIds.emergencyContactEmail,
     placeholder: "Ex : contact@urgence.com (optionnel)",
   },
+  "signatories.beneficiary.isRqth": {
+    label:
+      "Le candidat a une reconnaissance travailleur handicapé (RQTH) ou équivalent ",
+    id: beneficiarySectionIds.isRqth,
+    hintText:
+      "Il n'est pas obligatoire de le préciser, mais cela peut être utile au candidat et à l'entreprise.",
+  },
 });
 
 const establishmentTutorSection = (internshipKind: InternshipKind) => ({

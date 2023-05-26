@@ -174,6 +174,7 @@ export const domElementIds = {
         "im-convention-form__signatories-beneficiary-emergencyContactPhone",
       emergencyContactEmail:
         "im-convention-form__signatories-beneficiary-emergencyContactEmail",
+      isRqth: "im-convention-form__signatories-beneficiary-isRqth",
     },
     establishmentTutorSection: {
       firstName: "im-convention-form__establishmentTutor-firstName",

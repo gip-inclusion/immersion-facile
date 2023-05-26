@@ -166,6 +166,7 @@ export type Beneficiary<T extends InternshipKind> =
     federatedIdentity?: PeConnectIdentity;
     financiaryHelp?:string;
     birthdate: string; // Date iso string
+    isRqth?: boolean;
   } 
   & (T extends "mini-stage-cci" ? StudentProperties : {});
 /* eslint-enable @typescript-eslint/ban-types */
