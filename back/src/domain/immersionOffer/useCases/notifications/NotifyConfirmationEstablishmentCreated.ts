@@ -1,6 +1,6 @@
 import { FormEstablishmentDto, formEstablishmentSchema } from "shared";
-import { NotificationGateway } from "../../../convention/ports/NotificationGateway";
 import { UseCase } from "../../../core/UseCase";
+import { NotificationGateway } from "../../../generic/notifications/ports/NotificationGateway";
 
 export class NotifyConfirmationEstablishmentCreated extends UseCase<FormEstablishmentDto> {
   constructor(private readonly notificationGateway: NotificationGateway) {

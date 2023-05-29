@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { EmailSentDto } from "shared";
-import { NotificationGateway } from "../../../convention/ports/NotificationGateway";
 import { UseCase } from "../../../core/UseCase";
+import { NotificationGateway } from "../ports/NotificationGateway";
 
 export class GetSentEmails extends UseCase<void, EmailSentDto[]> {
   constructor(private notificationGateway: NotificationGateway) {

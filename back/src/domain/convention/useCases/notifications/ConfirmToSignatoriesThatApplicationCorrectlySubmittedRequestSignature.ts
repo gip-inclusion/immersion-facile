@@ -20,7 +20,7 @@ import {
 } from "../../../core/ports/UnitOfWork";
 import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { NotificationGateway } from "../../ports/NotificationGateway";
+import { NotificationGateway } from "../../../generic/notifications/ports/NotificationGateway";
 
 const logger = createLogger(__filename);
 

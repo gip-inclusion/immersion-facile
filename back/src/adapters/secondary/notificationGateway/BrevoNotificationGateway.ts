@@ -16,7 +16,7 @@ import {
   cciCustomHtmlHeader,
 } from "html-templates/src/components/email";
 import { HttpClient } from "http-client";
-import { NotificationGateway } from "../../../domain/convention/ports/NotificationGateway";
+import { NotificationGateway } from "../../../domain/generic/notifications/ports/NotificationGateway";
 import {
   counterSendTransactEmailError,
   counterSendTransactEmailSuccess,

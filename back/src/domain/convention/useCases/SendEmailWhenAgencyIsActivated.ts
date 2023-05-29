@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { AgencyDto, agencySchema } from "shared";
 import { UseCase } from "../../core/UseCase";
-import { NotificationGateway } from "../ports/NotificationGateway";
+import { NotificationGateway } from "../../generic/notifications/ports/NotificationGateway";
 
 type WithAgency = { agency: AgencyDto };
 

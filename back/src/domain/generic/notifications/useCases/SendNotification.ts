@@ -1,17 +1,12 @@
 import { z } from "zod";
 import {
   exhaustiveCheck,
-  TemplatedEmail,
   templatedEmailSchema,
-  type TemplatedSms,
   templatedSmsSchema,
 } from "shared";
-import { NotificationGateway } from "../../../convention/ports/NotificationGateway";
 import { UseCase } from "../../../core/UseCase";
-
-export type Notification =
-  | { kind: "email"; email: TemplatedEmail }
-  | { kind: "sms"; sms: TemplatedSms };
+import { Notification } from "../entities/Notification";
+import { NotificationGateway } from "../ports/NotificationGateway";
 
 const notificationSchema: z.Schema<Notification> = z
   .object({

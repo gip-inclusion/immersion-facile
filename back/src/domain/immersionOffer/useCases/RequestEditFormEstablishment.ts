@@ -6,11 +6,11 @@ import {
 } from "shared";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { GenerateEditFormEstablishmentJwt } from "../../auth/jwt";
-import { NotificationGateway } from "../../convention/ports/NotificationGateway";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { NotificationGateway } from "../../generic/notifications/ports/NotificationGateway";
 
 export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto> {
   inputSchema = siretSchema;

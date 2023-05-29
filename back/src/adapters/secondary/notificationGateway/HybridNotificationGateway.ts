@@ -1,5 +1,5 @@
 import { EmailSentDto, TemplatedEmail, TemplatedSms } from "shared";
-import { NotificationGateway } from "../../../domain/convention/ports/NotificationGateway";
+import { NotificationGateway } from "../../../domain/generic/notifications/ports/NotificationGateway";
 import { InMemoryNotificationGateway } from "./InMemoryNotificationGateway";
 
 export class HybridNotificationGateway implements NotificationGateway {

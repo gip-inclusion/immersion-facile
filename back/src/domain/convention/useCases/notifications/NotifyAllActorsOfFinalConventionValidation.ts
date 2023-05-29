@@ -17,8 +17,8 @@ import {
 } from "../../../core/ports/UnitOfWork";
 import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
 import { TransactionalUseCase } from "../../../core/UseCase";
+import { NotificationGateway } from "../../../generic/notifications/ports/NotificationGateway";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../peConnect/dto/PeConnect.dto";
-import { NotificationGateway } from "../../ports/NotificationGateway";
 
 export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUseCase<ConventionDto> {
   constructor(
