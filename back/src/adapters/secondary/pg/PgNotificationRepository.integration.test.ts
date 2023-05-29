@@ -38,7 +38,7 @@ describe("PgNotificationRepository", () => {
       kind: "sms",
       createdAt: new Date("2023-01-01").toISOString(),
       followedIds: { conventionId: "cccccccc-1111-4111-1111-cccccccccccc" },
-      sms,
+      templatedContent: sms,
     };
 
     await pgNotificationRepository.save(smsNotification);
@@ -60,7 +60,7 @@ describe("PgNotificationRepository", () => {
       kind: "email",
       createdAt: new Date("2023-01-01").toISOString(),
       followedIds: { conventionId: "cccccccc-1111-4111-1111-cccccccccccc" },
-      email,
+      templatedContent: email,
     };
 
     await pgNotificationRepository.save(emailNotification);

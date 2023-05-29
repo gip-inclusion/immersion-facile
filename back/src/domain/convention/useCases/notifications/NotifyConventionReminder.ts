@@ -21,7 +21,6 @@ import {
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
-import { CreateNewEvent } from "../../../core/eventBus/EventBus";
 import {
   ConventionReminderPayload,
   conventionReminderPayloadSchema,
@@ -33,10 +32,9 @@ import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
-import { UuidGenerator } from "../../../core/ports/UuidGenerator";
 import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { Notification } from "../../../generic/notifications/entities/Notification";
+import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import {
   missingAgencyMessage,
   missingConventionMessage,
@@ -64,8 +62,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private timeGateway: TimeGateway,
-    private uuidGenerator: UuidGenerator,
-    private createNewEvent: CreateNewEvent,
+    private saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
     private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     private readonly shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
     private readonly config: AppConfig,
@@ -132,7 +129,6 @@ export class NotifyConventionReminder extends TransactionalUseCase<
       ),
     );
 
-    const createdAt = this.timeGateway.now().toISOString();
     const followedIds = {
       conventionId: conventionRead.id,
       agencyId: conventionRead.agencyId,
@@ -142,39 +138,18 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     await Promise.all([
       ...templatedEmails.map((email) =>
         this.saveNotificationAndRelatedEvent(uow, {
-          id: this.uuidGenerator.new(),
           kind: "email",
           followedIds,
-          createdAt,
-          email,
+          templatedContent: email,
         }),
       ),
       ...templatedSms.map((sms) =>
         this.saveNotificationAndRelatedEvent(uow, {
-          id: this.uuidGenerator.new(),
           kind: "sms",
           followedIds,
-          createdAt,
-          sms,
+          templatedContent: sms,
         }),
       ),
-    ]);
-  }
-
-  private async saveNotificationAndRelatedEvent(
-    uow: UnitOfWork,
-    notification: Notification,
-  ): Promise<void> {
-    const event = this.createNewEvent({
-      topic: "NotificationAdded",
-      payload: {
-        id: notification.id,
-        kind: notification.kind,
-      },
-    });
-    await Promise.all([
-      uow.notificationRepository.save(notification),
-      uow.outboxRepository.save(event),
     ]);
   }
 
@@ -297,15 +272,13 @@ export class NotifyConventionReminder extends TransactionalUseCase<
           };
 
     return this.saveNotificationAndRelatedEvent(uow, {
-      id: this.uuidGenerator.new(),
       kind: "email",
       followedIds: {
         conventionId: convention.id,
         agencyId: agency.id,
         establishmentSiret: convention.siret,
       },
-      createdAt: this.timeGateway.now().toISOString(),
-      email: templatedEmail,
+      templatedContent: templatedEmail,
     });
   }
 

@@ -19,6 +19,7 @@ type UseCaseSubscriptionsByTopics = {
 const getUseCasesByTopics = (
   useCases: UseCases,
 ): UseCaseSubscriptionsByTopics => ({
+  NotificationAdded: [useCases.sendNotification],
   // "Happy case" for immersion application.
   ImmersionApplicationSubmittedByBeneficiary: [
     useCases.bindConventionToFederatedIdentity,
@@ -109,7 +110,6 @@ const getUseCasesByTopics = (
 
   UserAuthenticatedSuccessfully: [],
   IcUserAgencyRightChanged: [useCases.notifyIcUserAgencyRightChanged],
-  NotificationAdded: [useCases.sendNotification],
 });
 
 export const subscribeToEvents = (deps: AppDependencies) => {

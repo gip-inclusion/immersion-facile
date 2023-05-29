@@ -10,29 +10,39 @@ import { expectEmailSignatoryConfirmationSignatureRequestMatchingConvention } fr
 import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
+import { InMemoryOutboxRepository } from "../../../../adapters/secondary/core/InMemoryOutboxRepository";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
+import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
+import { InMemoryNotificationRepository } from "../../../../adapters/secondary/InMemoryNotificationRepository";
 import { InMemoryShortLinkQuery } from "../../../../adapters/secondary/InMemoryShortLinkQuery";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { InMemoryNotificationGateway } from "../../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
+import { makeCreateNewEvent } from "../../../core/eventBus/EventBus";
 import { ShortLinkId } from "../../../core/ports/ShortLinkQuery";
+import {
+  EmailNotification,
+  makeSaveNotificationAndRelatedEvent,
+  WithNotificationIdAndKind,
+} from "../../../generic/notifications/entities/Notification";
 import { ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature } from "./ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature";
 
 describe("Add Convention Notifications", () => {
   let useCase: ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature;
-  let notificationGateway: InMemoryNotificationGateway;
   let timeGateway: CustomTimeGateway;
   let validConvention: ConventionDto;
   let agency: AgencyDto;
   let shortLinkQuery: InMemoryShortLinkQuery;
   let config: AppConfig;
   let shortLinkGenerator: DeterministShortLinkIdGeneratorGateway;
+  let notificationRepository: InMemoryNotificationRepository;
+  let outboxRepository: InMemoryOutboxRepository;
 
   beforeEach(() => {
     config = new AppConfigBuilder({}).build();
-    notificationGateway = new InMemoryNotificationGateway();
     timeGateway = new CustomTimeGateway(new Date());
     const uow = createInMemoryUow();
+    notificationRepository = uow.notificationRepository;
+    outboxRepository = uow.outboxRepository;
     agency = uow.agencyRepository.agencies[0];
     shortLinkQuery = uow.shortLinkQuery;
     validConvention = new ConventionDtoBuilder()
@@ -46,14 +56,24 @@ describe("Add Convention Notifications", () => {
       .withAgencyId(agency.id)
       .build();
     shortLinkGenerator = new DeterministShortLinkIdGeneratorGateway();
+    const uuidGenerator = new UuidV4Generator();
+    const createNewEvent = makeCreateNewEvent({
+      timeGateway,
+      uuidGenerator,
+    });
+    const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
+      createNewEvent,
+      uuidGenerator,
+      timeGateway,
+    );
     useCase =
       new ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature(
         new InMemoryUowPerformer(uow),
-        notificationGateway,
         timeGateway,
         shortLinkGenerator,
         fakeGenerateMagicLinkUrlFn,
         config,
+        saveNotificationAndRelatedEvent,
       );
   });
 
@@ -115,12 +135,20 @@ describe("Add Convention Notifications", () => {
       }),
     });
 
-    const sentEmails = notificationGateway.getSentEmails();
+    const emailNotifications = notificationRepository.notifications.filter(
+      (notification): notification is EmailNotification =>
+        notification.kind === "email",
+    );
 
-    expect(sentEmails).toHaveLength(3);
+    expect(outboxRepository.events.map(({ payload }) => payload)).toEqual(
+      emailNotifications.map(
+        ({ id }): WithNotificationIdAndKind => ({ id, kind: "email" }),
+      ),
+    );
+    expect(emailNotifications).toHaveLength(3);
 
     expectEmailSignatoryConfirmationSignatureRequestMatchingConvention({
-      templatedEmail: sentEmails[0],
+      templatedEmail: emailNotifications[0].templatedContent,
       convention: validConvention,
       signatory: validConvention.signatories.beneficiary,
       recipient: validConvention.signatories.beneficiary.email,
@@ -131,7 +159,7 @@ describe("Add Convention Notifications", () => {
       conventionStatusLinkId: deterministicShortLinks[1],
     });
     expectEmailSignatoryConfirmationSignatureRequestMatchingConvention({
-      templatedEmail: sentEmails[1],
+      templatedEmail: emailNotifications[1].templatedContent,
       convention: validConvention,
       signatory: validConvention.signatories.establishmentRepresentative,
       recipient: validConvention.signatories.establishmentRepresentative.email,
@@ -142,7 +170,7 @@ describe("Add Convention Notifications", () => {
       conventionStatusLinkId: deterministicShortLinks[3],
     });
     expectEmailSignatoryConfirmationSignatureRequestMatchingConvention({
-      templatedEmail: sentEmails[2],
+      templatedEmail: emailNotifications[2].templatedContent,
       convention: validConvention,
       signatory: validConvention.signatories.beneficiaryRepresentative!,
       recipient: validConvention.signatories.beneficiaryRepresentative!.email,

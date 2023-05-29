@@ -49,6 +49,7 @@ import { GetDashboardUrl } from "../../../domain/dashboard/useCases/GetDashboard
 import { ValidateEmail } from "../../../domain/emailValidation/useCases/ValidateEmail";
 import { AdminLogin } from "../../../domain/generic/authentication/useCases/AdminLogin";
 import { UploadLogo } from "../../../domain/generic/fileManagement/useCases/UploadLogo";
+import { makeSaveNotificationAndRelatedEvent } from "../../../domain/generic/notifications/entities/Notification";
 import { GetSentEmails } from "../../../domain/generic/notifications/useCases/GetSentEmails";
 import { SendNotification } from "../../../domain/generic/notifications/useCases/SendNotification";
 import { AddFormEstablishment } from "../../../domain/immersionOffer/useCases/AddFormEstablishment";
@@ -102,6 +103,11 @@ export const createUseCases = (
     uuidGenerator,
     quarantinedTopics: config.quarantinedTopics,
   });
+  const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
+    createNewEvent,
+    uuidGenerator,
+    gateways.timeGateway,
+  );
   const addFormEstablishment = new AddFormEstablishment(
     uowPerformer,
     createNewEvent,
@@ -221,8 +227,7 @@ export const createUseCases = (
       notifyConventionReminder: new NotifyConventionReminder(
         uowPerformer,
         gateways.timeGateway,
-        uuidGenerator,
-        createNewEvent,
+        saveNotificationAndRelatedEvent,
         generateConventionMagicLinkUrl,
         gateways.shortLinkGenerator,
         config,
@@ -317,11 +322,11 @@ export const createUseCases = (
       confirmToSignatoriesThatConventionCorrectlySubmittedRequestSignature:
         new ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature(
           uowPerformer,
-          gateways.notification,
           gateways.timeGateway,
           gateways.shortLinkGenerator,
           generateConventionMagicLinkUrl,
           config,
+          saveNotificationAndRelatedEvent,
         ),
       notifyLastSigneeThatConventionHasBeenSigned:
         new NotifyLastSigneeThatConventionHasBeenSigned(

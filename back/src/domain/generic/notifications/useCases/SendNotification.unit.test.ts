@@ -44,7 +44,7 @@ describe("SendNotification UseCase", () => {
       {
         id,
         kind: "sms",
-        sms: {
+        templatedContent: {
           kind: "FirstReminderForSignatories",
           params: { shortLink: "https://my-link.com" },
           recipientPhone: `33${sendSmsErrorPhoneNumber.substring(1)}`,
@@ -73,7 +73,7 @@ describe("SendNotification UseCase", () => {
       {
         id,
         kind: "email",
-        email,
+        templatedContent: email,
         createdAt: someDate,
         followedIds: { agencyId: "agency-123" },
       },
@@ -96,7 +96,7 @@ describe("SendNotification UseCase", () => {
       {
         id,
         kind: "sms",
-        sms,
+        templatedContent: sms,
         createdAt: someDate,
         followedIds: { conventionId: "convention-123" },
       },
