@@ -220,8 +220,9 @@ export const createUseCases = (
       ),
       notifyConventionReminder: new NotifyConventionReminder(
         uowPerformer,
-        gateways.notification,
         gateways.timeGateway,
+        uuidGenerator,
+        createNewEvent,
         generateConventionMagicLinkUrl,
         gateways.shortLinkGenerator,
         config,

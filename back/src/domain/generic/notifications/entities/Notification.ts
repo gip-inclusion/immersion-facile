@@ -5,7 +5,7 @@ export type NotificationId = Flavor<string, "NotificationId">;
 
 type FollowedIds = {
   conventionId?: string;
-  establishmentId?: string;
+  establishmentSiret?: string;
   agencyId?: string;
 };
 
@@ -17,6 +17,9 @@ export type Notification = {
   | { kind: "email"; email: TemplatedEmail }
   | { kind: "sms"; sms: TemplatedSms }
 );
+
+export type SmsNotification = Extract<Notification, { kind: "sms" }>;
+export type EmailNotification = Extract<Notification, { kind: "email" }>;
 
 export type NotificationKind = Notification["kind"];
 

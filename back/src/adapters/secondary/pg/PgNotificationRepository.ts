@@ -2,14 +2,13 @@ import { PoolClient } from "pg";
 import format from "pg-format";
 import { exhaustiveCheck } from "shared";
 import {
+  EmailNotification,
   Notification,
   NotificationId,
   NotificationKind,
+  SmsNotification,
 } from "../../../domain/generic/notifications/entities/Notification";
 import { NotificationRepository } from "../../../domain/generic/notifications/ports/NotificationRepository";
-
-type SmsNotification = Extract<Notification, { kind: "sms" }>;
-type EmailNotification = Extract<Notification, { kind: "email" }>;
 
 export class PgNotificationRepository implements NotificationRepository {
   constructor(private client: PoolClient) {}
@@ -61,7 +60,7 @@ export class PgNotificationRepository implements NotificationRepository {
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     `,
       // prettier-ignore
-      [ id, kind, recipientPhone, createdAt, followedIds.conventionId, followedIds.establishmentId, followedIds.agencyId, params ],
+      [ id, kind, recipientPhone, createdAt, followedIds.conventionId, followedIds.establishmentSiret, followedIds.agencyId, params ],
     );
   }
 
@@ -79,7 +78,7 @@ export class PgNotificationRepository implements NotificationRepository {
       VALUES ($1, $2, $3, $4, $5, $6, $7)
     `,
       // prettier-ignore
-      [ id, kind, createdAt, followedIds.conventionId, followedIds.establishmentId, followedIds.agencyId, params ],
+      [ id, kind, createdAt, followedIds.conventionId, followedIds.establishmentSiret, followedIds.agencyId, params ],
     );
 
     const addRecipientsToQuery = format(
