@@ -4,7 +4,7 @@ import {
   ConventionDtoBuilder,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
-  expectTypeToMatchAndEqual,
+  expectToEqual,
 } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { ImmersionAssessmentEntity } from "../../../domain/convention/entities/ImmersionAssessmentEntity";
@@ -91,7 +91,7 @@ describe("PgImmersionAssessmentRepository", () => {
           assessment.conventionId,
         );
 
-      expectTypeToMatchAndEqual(assessmentInDb, assessment);
+      expectToEqual(assessmentInDb, assessment);
     });
   });
 });

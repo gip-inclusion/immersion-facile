@@ -3,7 +3,6 @@ import {
   AddressDto,
   expectPromiseToFailWithError,
   expectToEqual,
-  expectTypeToMatchAndEqual,
   GeoPositionDto,
   LookupSearchResult,
 } from "shared";
@@ -226,7 +225,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
     );
 
     it("Should return expected address DTO when providing address with special characters.", async () => {
-      expectTypeToMatchAndEqual(
+      expectToEqual(
         await httpAddressGateway.lookupStreetAddress("Route d’Huez 38750 Huez"),
         [
           {
@@ -266,7 +265,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
       const resultPreviousNotFoundWithAddresseAPI =
         await httpAddressGateway.lookupStreetAddress("Ro");
 
-      expectTypeToMatchAndEqual(resultPreviousNotFoundWithAddresseAPI.at(0), {
+      expectToEqual(resultPreviousNotFoundWithAddresseAPI.at(0), {
         address: {
           city: "Rots",
           departmentCode: "14",
@@ -500,6 +499,6 @@ describe("HttpOpenCageDataAddressGateway check parrarel call", () => {
       ),
     );
 
-    expectTypeToMatchAndEqual(results, expectedResults);
+    expectToEqual(results, expectedResults);
   }, 15000);
 });

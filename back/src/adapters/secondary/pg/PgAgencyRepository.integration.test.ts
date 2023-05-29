@@ -4,7 +4,6 @@ import {
   AgencyDto,
   AgencyDtoBuilder,
   expectToEqual,
-  expectTypeToMatchAndEqual,
   GeoPositionDto,
 } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
@@ -531,7 +530,7 @@ describe("PgAgencyRepository", () => {
       await agencyRepository.update(updatedAgency1);
       const inDb = await agencyRepository.getAgencies({});
       expect(inDb).toHaveLength(1);
-      expectTypeToMatchAndEqual(inDb[0], updatedAgency1);
+      expectToEqual(inDb[0], updatedAgency1);
     });
     it("updates the only some fields", async () => {
       expect(await agencyRepository.getAgencies({})).toHaveLength(0);
@@ -545,7 +544,7 @@ describe("PgAgencyRepository", () => {
       });
       const inDb = await agencyRepository.getAgencies({});
       expect(inDb).toHaveLength(1);
-      expectTypeToMatchAndEqual(inDb[0], { ...agency1, status: "active" });
+      expectToEqual(inDb[0], { ...agency1, status: "active" });
     });
   });
 

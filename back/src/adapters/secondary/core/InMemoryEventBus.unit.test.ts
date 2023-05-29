@@ -1,7 +1,7 @@
 import {
   ConventionDtoBuilder,
   expectObjectsToMatch,
-  expectTypeToMatchAndEqual,
+  expectToEqual,
 } from "shared";
 import { spyOnTopic } from "../../../_testBuilders/spyOnTopic";
 import type {
@@ -109,7 +109,7 @@ describe("InMemoryEventBus", () => {
     expect(eventsOnSecondHandler).toHaveLength(1);
     expect(eventsOnSecondHandler[0]).toEqual(domainEvt);
 
-    expectTypeToMatchAndEqual(outboxRepository.events[0], {
+    expectToEqual(outboxRepository.events[0], {
       ...domainEvt,
       wasQuarantined: false,
       publications: [{ publishedAt: publishDate.toISOString(), failures: [] }],
@@ -145,7 +145,7 @@ describe("InMemoryEventBus", () => {
         publications: [],
       };
 
-      expectTypeToMatchAndEqual(eventsOnFirstHandler, [expectedEvent]);
+      expectToEqual(eventsOnFirstHandler, [expectedEvent]);
 
       expectObjectsToMatch(outboxRepository.events[0], {
         ...expectedEvent,

@@ -1,4 +1,4 @@
-import { expectToEqual } from "../expectToEqual";
+import { expectToEqual } from "../test.helpers";
 import { DayPeriodsDto, ScheduleDto, weekdays } from "./Schedule.dto";
 import { dateIsoStringSchema, scheduleSchema } from "./Schedule.schema";
 import { ScheduleDtoBuilder } from "./ScheduleDtoBuilder";

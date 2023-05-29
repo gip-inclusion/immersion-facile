@@ -8,7 +8,7 @@ import {
   ConventionDto,
   displayEmergencyContactInfos,
   EmailParamsByEmailType,
-  expectTypeToMatchAndEqual,
+  expectToEqual,
   FormEstablishmentDto,
   Signatory,
   TemplatedEmail,
@@ -79,7 +79,7 @@ export const expectEmailSignatoryConfirmationSignatureRequestMatchingConvention 
       beneficiaryCurrentEmployer,
     } = convention.signatories;
 
-    expectTypeToMatchAndEqual(templatedEmail, {
+    expectToEqual(templatedEmail, {
       type: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
       recipients: [recipient],
       params: {
@@ -110,7 +110,7 @@ export const expectEmailFinalValidationConfirmationMatchingConvention = (
   config: AppConfig,
   conventionToSignLinkId: ShortLinkId,
 ) =>
-  expectTypeToMatchAndEqual(templatedEmails, [
+  expectToEqual(templatedEmails, [
     {
       type: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
       recipients,
@@ -127,7 +127,7 @@ export const expectedEmailEstablishmentCreatedReviewMatchingEstablisment = (
   templatedEmail: TemplatedEmail,
   establishmentDto: FormEstablishmentDto,
 ) =>
-  expectTypeToMatchAndEqual(templatedEmail, {
+  expectToEqual(templatedEmail, {
     type: "NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION",
     recipients: [establishmentDto.businessContact.email],
     params: {
@@ -157,7 +157,7 @@ export const expectedEmailConventionReviewMatchingConvention = ({
   possibleRoleAction,
   agency,
 }: ExpectedEmailConventionReviewMatchingConventionProps) =>
-  expectTypeToMatchAndEqual(templatedEmail, {
+  expectToEqual(templatedEmail, {
     type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
     recipients: [recipient],
     params: {
@@ -178,7 +178,7 @@ export const expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected = (
   convention: ConventionDto,
   agency: AgencyDto,
 ) => {
-  expectTypeToMatchAndEqual(templatedEmail, {
+  expectToEqual(templatedEmail, {
     type: "REJECTED_CONVENTION_NOTIFICATION",
     recipients,
     params: {
@@ -204,7 +204,7 @@ export const expectContactByEmailRequest = (
   payload: ContactEstablishmentByMailDto,
   copy: string[],
 ) => {
-  expectTypeToMatchAndEqual(templatedEmail, {
+  expectToEqual(templatedEmail, {
     type: "CONTACT_BY_EMAIL_REQUEST",
     recipients,
     params: {
@@ -228,7 +228,7 @@ export const expectContactByPhoneInstructions = (
   contact: ContactEntity,
   payload: ContactEstablishmentByPhoneDto,
 ) => {
-  expectTypeToMatchAndEqual(templatedEmail, {
+  expectToEqual(templatedEmail, {
     type: "CONTACT_BY_PHONE_INSTRUCTIONS",
     recipients,
     params: {
@@ -249,7 +249,7 @@ export const expectContactInPersonInstructions = (
   contact: ContactEntity,
   payload: ContactEstablishmentInPersonDto,
 ) => {
-  expectTypeToMatchAndEqual(templatedEmail, {
+  expectToEqual(templatedEmail, {
     type: "CONTACT_IN_PERSON_INSTRUCTIONS",
     recipients,
     params: {

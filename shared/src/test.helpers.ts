@@ -35,10 +35,6 @@ export const expectArraysToEqual = <T>(actual: T[], expected: T[]) => {
   expect(actual).toEqual(expected);
 };
 
-export const expectTypeToMatchAndEqual = <T>(actual: T, expected: T) => {
-  expect(actual).toEqual(expected);
-};
-
 export const expectJwtInMagicLinkAndGetIt = (link: string | unknown) => {
   expect(typeof link).toBe("string");
   expect((link as string).includes("jwt=")).toBeTruthy();
@@ -74,4 +70,12 @@ export const expectEmailOfType = <
 ): Extract<E, { type: T }> => {
   expect(email.type).toBe(expectedEmailType);
   return email as Extract<E, { type: T }>;
+};
+
+export const expectToEqual = <T>(actual: T, expected: T) => {
+  expect(actual).toEqual(expected);
+};
+
+export const expectObjectsToMatch = <T>(actual: T, expected: Partial<T>) => {
+  expect(actual).toMatchObject(expected);
 };

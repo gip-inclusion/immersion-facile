@@ -4,7 +4,6 @@ import {
   ConventionDto,
   ConventionDtoBuilder,
   expectToEqual,
-  expectTypeToMatchAndEqual,
   frontRoutes,
   PeConnectIdentity,
 } from "shared";
@@ -145,7 +144,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
       }),
     });
 
-    expectTypeToMatchAndEqual(notificationGateway.getSentEmails(), [
+    expectToEqual(notificationGateway.getSentEmails(), [
       {
         type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
         recipients: [councellorEmail],
@@ -199,7 +198,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
       }),
     });
 
-    expectTypeToMatchAndEqual(notificationGateway.getSentEmails(), [
+    expectToEqual(notificationGateway.getSentEmails(), [
       {
         type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
         recipients: [validatorEmail],
@@ -260,7 +259,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
       }),
     });
 
-    expectTypeToMatchAndEqual(notificationGateway.getSentEmails(), [
+    expectToEqual(notificationGateway.getSentEmails(), [
       {
         type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
         recipients: [councellorEmail],
@@ -346,7 +345,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
       }),
     });
 
-    expectTypeToMatchAndEqual(notificationGateway.getSentEmails(), [
+    expectToEqual(notificationGateway.getSentEmails(), [
       {
         type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
         recipients: [councellorEmail],

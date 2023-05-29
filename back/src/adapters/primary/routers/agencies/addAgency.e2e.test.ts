@@ -1,8 +1,4 @@
-import {
-  agenciesRoute,
-  CreateAgencyDto,
-  expectTypeToMatchAndEqual,
-} from "shared";
+import { agenciesRoute, CreateAgencyDto, expectToEqual } from "shared";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 
 describe("Route to add Agency", () => {
@@ -34,7 +30,7 @@ describe("Route to add Agency", () => {
     expect(response.status).toBe(200);
 
     const inRepo = inMemoryUow.agencyRepository.agencies;
-    expectTypeToMatchAndEqual(inRepo, [
+    expectToEqual(inRepo, [
       {
         ...parisMissionLocaleParams,
         questionnaireUrl: parisMissionLocaleParams.questionnaireUrl!,

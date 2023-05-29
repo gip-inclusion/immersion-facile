@@ -5,7 +5,6 @@ import {
   ConventionDtoBuilder,
   displayEmergencyContactInfos,
   expectToEqual,
-  expectTypeToMatchAndEqual,
   frontRoutes,
   reasonableSchedule,
 } from "shared";
@@ -363,7 +362,7 @@ describe("getValidatedApplicationFinalConfirmationParams", () => {
       })
       .build();
 
-    expectTypeToMatchAndEqual(
+    expectToEqual(
       getValidatedConventionFinalConfirmationParams(
         agency,
         convention,

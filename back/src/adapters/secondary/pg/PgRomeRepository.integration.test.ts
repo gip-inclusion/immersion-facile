@@ -1,5 +1,5 @@
 import { Pool, PoolClient } from "pg";
-import { expectToEqual, expectTypeToMatchAndEqual } from "shared";
+import { expectToEqual } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { PgRomeRepository } from "./PgRomeRepository";
 
@@ -92,7 +92,7 @@ describe("Postgres implementation of Rome Gateway", () => {
         13,
       );
 
-      expectTypeToMatchAndEqual(
+      expectToEqual(
         await pgRomeRepository.searchAppellation("Aide-boulangère"),
         [
           {
@@ -106,27 +106,24 @@ describe("Postgres implementation of Rome Gateway", () => {
     });
 
     it("Correctly handles search queries with multiple words", async () => {
-      expectTypeToMatchAndEqual(
-        await pgRomeRepository.searchAppellation("Chef de boule"),
-        [
-          {
-            appellationCode: "12071",
-            appellationLabel: "Chef de boule",
-            romeCode: "G1206",
-            romeLabel: "Personnel technique des jeux",
-          },
-          {
-            appellationCode: "12197",
-            appellationLabel: "Chef de partie de boule",
-            romeCode: "G1206",
-            romeLabel: "Personnel technique des jeux",
-          },
-        ],
-      );
+      expectToEqual(await pgRomeRepository.searchAppellation("Chef de boule"), [
+        {
+          appellationCode: "12071",
+          appellationLabel: "Chef de boule",
+          romeCode: "G1206",
+          romeLabel: "Personnel technique des jeux",
+        },
+        {
+          appellationCode: "12197",
+          appellationLabel: "Chef de partie de boule",
+          romeCode: "G1206",
+          romeLabel: "Personnel technique des jeux",
+        },
+      ]);
     });
 
     it("Correctly handles search queries with several words and should be accent insensitive", async () => {
-      expectTypeToMatchAndEqual(
+      expectToEqual(
         await pgRomeRepository.searchAppellation("pret-a-porter enfant"),
         [
           {

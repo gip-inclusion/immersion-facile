@@ -1,5 +1,5 @@
 import { Pool, PoolClient } from "pg";
-import { ApiConsumer, expectTypeToMatchAndEqual } from "shared";
+import { ApiConsumer, expectToEqual } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { PgApiConsumerRepository } from "./PgApiConsumerRepository";
 
@@ -36,7 +36,7 @@ describe("PG GetApiConsumerById", () => {
       apiConsumer.id,
     );
 
-    expectTypeToMatchAndEqual(apiConsumerFetched, apiConsumer);
+    expectToEqual(apiConsumerFetched, apiConsumer);
   });
 
   const insertInTable = async ({

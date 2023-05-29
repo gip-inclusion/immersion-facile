@@ -1,4 +1,4 @@
-import { AddressDto, AgencyDto, expectTypeToMatchAndEqual } from "shared";
+import { AddressDto, AgencyDto, expectToEqual } from "shared";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import { InMemoryAddressGateway } from "../../../../adapters/secondary/addressGateway/InMemoryAddressGateway";
 import { ConsoleAppLogger } from "../../../../adapters/secondary/core/ConsoleAppLogger";
@@ -45,7 +45,7 @@ describe("UpdateAllPeAgencies use case", () => {
     uuid.setNextUuid("some-uuid");
     addressApi.setNextAddress(address);
     await updateAllPeAgencies.execute();
-    expectTypeToMatchAndEqual(agencyRepository.agencies, [
+    expectToEqual(agencyRepository.agencies, [
       {
         id: "some-uuid",
         name: "Agence Pôle emploi MOLSHEIM",
@@ -96,7 +96,7 @@ describe("UpdateAllPeAgencies use case", () => {
       uuid.setNextUuid("other-uuid");
       await updateAllPeAgencies.execute();
 
-      expectTypeToMatchAndEqual(agencyRepository.agencies, [
+      expectToEqual(agencyRepository.agencies, [
         {
           ...initialAgency,
           validatorEmails: [commonEmail],
@@ -139,7 +139,7 @@ describe("UpdateAllPeAgencies use case", () => {
       uuid.setNextUuid("other-uuid");
       await updateAllPeAgencies.execute();
 
-      expectTypeToMatchAndEqual(agencyRepository.agencies, [
+      expectToEqual(agencyRepository.agencies, [
         {
           ...initialAgency,
           counsellorEmails: [commonEmail],
@@ -177,7 +177,7 @@ describe("UpdateAllPeAgencies use case", () => {
       uuid.setNextUuid("other-uuid");
       await updateAllPeAgencies.execute();
 
-      expectTypeToMatchAndEqual(agencyRepository.agencies, [
+      expectToEqual(agencyRepository.agencies, [
         {
           ...initialAgency,
           validatorEmails: [
@@ -219,7 +219,7 @@ describe("UpdateAllPeAgencies use case", () => {
     addressApi.setNextAddress(address);
     await updateAllPeAgencies.execute();
 
-    expectTypeToMatchAndEqual(agencyRepository.agencies, [
+    expectToEqual(agencyRepository.agencies, [
       initialAgency,
       {
         id: "other-uuid",

@@ -1,7 +1,4 @@
-import {
-  ContactEstablishmentRequestDto,
-  expectTypeToMatchAndEqual,
-} from "shared";
+import { ContactEstablishmentRequestDto, expectToEqual } from "shared";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
@@ -67,27 +64,24 @@ describe("Insert discussion aggregate from contact request DTO", () => {
 
     // Assert
     expect(discussionAggregateRepository.discussionAggregates).toHaveLength(1);
-    expectTypeToMatchAndEqual(
-      discussionAggregateRepository.discussionAggregates[0],
-      {
-        id: discussionId,
-        romeCode: "A1289",
-        siret: "01234567891011",
-        potentialBeneficiaryFirstName: "Antoine",
-        potentialBeneficiaryLastName: "Tourasse",
-        potentialBeneficiaryEmail: "antoine.tourasse@email.com",
-        contactMode: "EMAIL",
-        createdAt: connectionDate,
-        exchanges: [
-          {
-            sentAt: connectionDate,
-            message: contactRequestDto.message,
-            recipient: "establishment",
-            sender: "potentialBeneficiary",
-          },
-        ],
-      },
-    );
+    expectToEqual(discussionAggregateRepository.discussionAggregates[0], {
+      id: discussionId,
+      romeCode: "A1289",
+      siret: "01234567891011",
+      potentialBeneficiaryFirstName: "Antoine",
+      potentialBeneficiaryLastName: "Tourasse",
+      potentialBeneficiaryEmail: "antoine.tourasse@email.com",
+      contactMode: "EMAIL",
+      createdAt: connectionDate,
+      exchanges: [
+        {
+          sentAt: connectionDate,
+          message: contactRequestDto.message,
+          recipient: "establishment",
+          sender: "potentialBeneficiary",
+        },
+      ],
+    });
   });
 
   it("switches establishment is searchable to false when the max contacts per week is reached", async () => {
