@@ -18,15 +18,16 @@ const seed = async () => {
   const client = await pool.connect();
 
   await deps.uowPerformer.perform(async (uow) => {
-    await featureFlagsSeed(uow, client);
+    await featureFlagsSeed(client);
     await agencySeed(uow, client);
     await establishmentAggregateSeed(uow, client);
   });
 
   client.release();
+  await pool.end();
 };
 
-const featureFlagsSeed = async (uow: UnitOfWork, client: PoolClient) => {
+const featureFlagsSeed = async (client: PoolClient) => {
   console.log("seeding feature flags...");
   await client.query("DELETE FROM feature_flags");
   const featureFlags: FeatureFlags = {
@@ -40,12 +41,12 @@ const featureFlagsSeed = async (uow: UnitOfWork, client: PoolClient) => {
   };
 
   await Promise.all(
-    keys(featureFlags).map((flagName) =>
-      uow.featureFlagRepository.set({
-        flagName,
-        value: featureFlags[flagName],
-      }),
-    ),
+    keys(featureFlags).map((flagName) => {
+      const isFlagActive = featureFlags[flagName];
+      return client.query(
+        `INSERT INTO feature_flags (flag_name, is_active) VALUES ('${flagName}', ${isFlagActive});`,
+      );
+    }),
   );
   console.log("done");
 };
@@ -56,6 +57,8 @@ const agencySeed = async (uow: UnitOfWork, client: PoolClient) => {
   await client.query("DELETE FROM agencies");
   const peParisAgency = new AgencyDtoBuilder()
     .withName("Agence Pôle Emploi Paris")
+    .withQuestionnaireUrl("https://questionnaire.seed")
+    .withSignature("Seed signature")
     .withKind("pole-emploi")
     .withStatus("active")
     .withAddress({
