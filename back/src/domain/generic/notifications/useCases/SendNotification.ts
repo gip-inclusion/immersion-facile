@@ -45,9 +45,11 @@ export class SendNotification extends TransactionalUseCase<WithNotificationIdAnd
 
     switch (notification.kind) {
       case "email":
-        return this.notificationGateway.sendEmail(notification.email);
+        return this.notificationGateway.sendEmail(
+          notification.templatedContent,
+        );
       case "sms":
-        return this.notificationGateway.sendSms(notification.sms);
+        return this.notificationGateway.sendSms(notification.templatedContent);
       default:
         return exhaustiveCheck(notification, {
           variableName: "notification",

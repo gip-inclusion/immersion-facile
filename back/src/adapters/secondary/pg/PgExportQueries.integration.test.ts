@@ -38,6 +38,7 @@ describe("PgExportQueries", () => {
   });
 
   beforeEach(async () => {
+    // await client.query("DELETE FROM outbox_failures");
     await client.query("DELETE FROM outbox_publications");
     await client.query("DELETE FROM outbox");
     await client.query("DELETE FROM conventions");

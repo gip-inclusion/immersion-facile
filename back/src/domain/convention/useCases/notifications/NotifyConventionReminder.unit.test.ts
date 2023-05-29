@@ -39,6 +39,7 @@ import { TimeGateway } from "../../../core/ports/TimeGateway";
 import { makeShortLinkUrl } from "../../../core/ShortLink";
 import {
   EmailNotification,
+  makeSaveNotificationAndRelatedEvent,
   SmsNotification,
   WithNotificationIdAndKind,
 } from "../../../generic/notifications/entities/Notification";
@@ -78,11 +79,15 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       timeGateway,
       uuidGenerator,
     });
+    const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
+      createNewEvent,
+      uuidGenerator,
+      timeGateway,
+    );
     useCase = new NotifyConventionReminder(
       new InMemoryUowPerformer(uow),
       timeGateway,
-      uuidGenerator,
-      createNewEvent,
+      saveNotificationAndRelatedEvent,
       fakeGenerateMagicLinkUrlFn,
       shortLinkIdGeneratorGateway,
       config,
@@ -900,7 +905,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
     );
 
     expectToEqual(
-      emailNotifications.map(({ email }) => email),
+      emailNotifications.map(({ templatedContent }) => templatedContent),
       expectedEmails,
     );
     expectToEqual(
@@ -919,7 +924,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         notification.kind === "sms",
     );
     expectToEqual(
-      smsNotifications.map(({ sms }) => sms),
+      smsNotifications.map(({ templatedContent }) => templatedContent),
       expectedSms,
     );
 

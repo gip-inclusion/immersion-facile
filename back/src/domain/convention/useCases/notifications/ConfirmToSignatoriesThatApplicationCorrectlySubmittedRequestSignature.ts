@@ -20,18 +20,18 @@ import {
 } from "../../../core/ports/UnitOfWork";
 import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { NotificationGateway } from "../../../generic/notifications/ports/NotificationGateway";
+import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 
 const logger = createLogger(__filename);
 
 export class ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature extends TransactionalUseCase<ConventionDto> {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly notificationGateway: NotificationGateway,
     private readonly timeGateway: TimeGateway,
     private readonly shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
     private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     private readonly config: AppConfig,
+    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
   ) {
     super(uowPerformer);
   }
@@ -56,9 +56,20 @@ export class ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignatu
     for (const signatory of values(convention.signatories).filter(
       filterNotFalsy,
     )) {
-      await this.notificationGateway.sendEmail(
-        await this.makeEmail(signatory, convention, agency, uow),
-      );
+      await this.saveNotificationAndRelatedEvent(uow, {
+        kind: "email",
+        templatedContent: await this.makeEmail(
+          signatory,
+          convention,
+          agency,
+          uow,
+        ),
+        followedIds: {
+          conventionId: convention.id,
+          agencyId: convention.agencyId,
+          establishmentSiret: convention.siret,
+        },
+      });
     }
   }
 

@@ -14,6 +14,7 @@ import {
   TestAppAndDeps,
 } from "../../../../_testBuilders/buildTestApp";
 import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";
+import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
 import { InMemoryConventionRepository } from "../../../secondary/InMemoryConventionRepository";
 
 describe("Add Convention Notifications, then checks the mails are sent (trigerred by events)", () => {
@@ -73,7 +74,7 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
 
   //Need to process events 2 times in order to handle submit & associate events
   await eventCrawler.processNewEvents();
-  await eventCrawler.processNewEvents();
+  await processEventsForEmailToBeSent(eventCrawler);
 
   const sentEmails = gateways.notification.getSentEmails();
   expect(sentEmails).toHaveLength(3);
@@ -124,7 +125,7 @@ const expectEstablishmentRequiresChanges = async (
     .set("Authorization", establishmentJwt)
     .send(params);
 
-  await eventCrawler.processNewEvents();
+  await processEventsForEmailToBeSent(eventCrawler);
 
   // Expect one email sent ( to establishment representative)
   const sentEmails = gateways.notification.getSentEmails();
@@ -163,4 +164,13 @@ const expectStoreImmersionToHaveStatus = (
   expectObjectsToMatch(savedConvention[0], {
     status: expectedStatus,
   });
+};
+
+const processEventsForEmailToBeSent = async (
+  eventCrawler: BasicEventCrawler,
+) => {
+  // 1. Process the convention workflow event
+  await eventCrawler.processNewEvents();
+  // 2. Process the email sending event (NotificationAdded)
+  await eventCrawler.processNewEvents();
 };

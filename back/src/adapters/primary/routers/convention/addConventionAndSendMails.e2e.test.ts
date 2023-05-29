@@ -20,6 +20,7 @@ import {
 } from "../../../../_testBuilders/buildTestApp";
 import { DomainEvent } from "../../../../domain/core/eventBus/events";
 import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";
+import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
 import { InMemoryOutboxRepository } from "../../../secondary/core/InMemoryOutboxRepository";
 import { InMemoryNotificationGateway } from "../../../secondary/notificationGateway/InMemoryNotificationGateway";
 
@@ -66,8 +67,10 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       },
     ]);
 
+    // 1. initial submission, needs PE bind usecase
     await eventCrawler.processNewEvents();
-    await eventCrawler.processNewEvents();
+    // 2. actual processing of the event
+    await processEventsForEmailToBeSent(eventCrawler);
 
     expectSentEmails(gateways.notification, [
       {
@@ -192,10 +195,11 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
     convention,
   );
 
-  //Need to process events 2 times in order to handle submit & associate events
+  // needs extra processing to bind PE connect
   await eventCrawler.processNewEvents();
-  await eventCrawler.processNewEvents();
+  await processEventsForEmailToBeSent(eventCrawler);
 
+  expect(inMemoryUow.notificationRepository.notifications).toHaveLength(2);
   const peNotification = gateways.poleEmploiGateway.notifications[0];
   expect(peNotification.id).toBe("00000000001");
   expectToEqual(peNotification.statut, "DEMANDE_A_SIGNER");
@@ -204,13 +208,13 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   const sentEmails = gateways.notification.getSentEmails();
   expect(sentEmails).toHaveLength(numberOfEmailInitialySent - 1);
   expect(sentEmails.map((e) => e.recipients)).toEqual([
-    [VALID_EMAILS[0]],
     [VALID_EMAILS[2]],
+    [VALID_EMAILS[0]],
     [VALID_EMAILS[1]],
   ]);
 
   const beneficiaryShortLinkSignEmail = expectEmailOfType(
-    sentEmails[0],
+    sentEmails[1],
     "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
   );
   const establishmentShortLinkSignEmail = expectEmailOfType(
@@ -263,7 +267,7 @@ const beneficiarySignsApplication = async (
     },
   );
 
-  await eventCrawler.processNewEvents();
+  await processEventsForEmailToBeSent(eventCrawler);
 
   const sentEmails = gateways.notification.getSentEmails();
   expect(sentEmails).toHaveLength(numberOfEmailInitialySent);
@@ -294,7 +298,7 @@ const establishmentSignsApplication = async (
     },
   );
 
-  await eventCrawler.processNewEvents();
+  await processEventsForEmailToBeSent(eventCrawler);
 
   const sentEmails = gateways.notification.getSentEmails();
   expect(sentEmails).toHaveLength(numberOfEmailInitialySent + 1);
@@ -347,7 +351,7 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
     },
   );
 
-  await eventCrawler.processNewEvents();
+  await processEventsForEmailToBeSent(eventCrawler);
   const sentEmails = gateways.notification.getSentEmails();
   expect(sentEmails).toHaveLength(numberOfEmailInitialySent + 2);
   const needsToTriggerConventionSentEmail = expectEmailOfType(
@@ -388,3 +392,12 @@ const makeSignatories = (
     signedAt: establishmentRepresentativeSignedAt,
   },
 });
+
+const processEventsForEmailToBeSent = async (
+  eventCrawler: BasicEventCrawler,
+) => {
+  // 1. Process the convention workflow event
+  await eventCrawler.processNewEvents();
+  // 2. Process the email sending event (NotificationAdded)
+  await eventCrawler.processNewEvents();
+};
