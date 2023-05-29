@@ -24,7 +24,7 @@ describe("RemindConventionsNeedSignature use case", () => {
   const eventIds = ["event-1", "event-2", "event-3", "event-4"];
   const topic = "ConventionReminderRequired";
   let uow: InMemoryUnitOfWork;
-  let useCase: ConventionsReminder;
+  let conventionsReminder: ConventionsReminder;
   let outboxRepository: InMemoryOutboxRepository;
   let conventionRepository: InMemoryConventionRepository;
 
@@ -37,7 +37,7 @@ describe("RemindConventionsNeedSignature use case", () => {
     conventionRepository = uow.conventionRepository;
     uuidGenerator.setNextUuids([...eventIds]);
 
-    useCase = new ConventionsReminder(
+    conventionsReminder = new ConventionsReminder(
       new InMemoryUowPerformer(uow),
       timeGateway,
       makeCreateNewEvent({
@@ -69,7 +69,7 @@ describe("RemindConventionsNeedSignature use case", () => {
       );
 
       // Act
-      const summary = await useCase.execute();
+      const summary = await conventionsReminder.execute();
 
       //Assert
       expectToEqual(summary, {
@@ -95,7 +95,7 @@ describe("RemindConventionsNeedSignature use case", () => {
       conventionRepository.setConventions(toConventionRepoRecord(conventions));
 
       // Act
-      const summary = await useCase.execute();
+      const summary = await conventionsReminder.execute();
 
       //Assert
       expectToEqual(summary, {
@@ -123,7 +123,7 @@ describe("RemindConventionsNeedSignature use case", () => {
       conventionRepository.setConventions(toConventionRepoRecord(conventions));
 
       // Act
-      const summary = await useCase.execute();
+      const summary = await conventionsReminder.execute();
 
       //Assert
       const conventionsForActors = conventions.filter((convention) =>
@@ -196,7 +196,7 @@ describe("RemindConventionsNeedSignature use case", () => {
       conventionRepository.setConventions(toConventionRepoRecord(conventions));
 
       // Act
-      const summary = await useCase.execute();
+      const summary = await conventionsReminder.execute();
 
       //Assert
 
@@ -243,7 +243,7 @@ describe("RemindConventionsNeedSignature use case", () => {
       conventionRepository.setConventions(toConventionRepoRecord(conventions));
 
       // Act
-      const summary = await useCase.execute();
+      const summary = await conventionsReminder.execute();
 
       //Assert
 

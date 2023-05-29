@@ -1,6 +1,6 @@
 import { ShareLinkByEmailDto, shareLinkByEmailSchema } from "shared";
 import { UseCase } from "../../core/UseCase";
-import { NotificationGateway } from "../ports/NotificationGateway";
+import { NotificationGateway } from "../../generic/notifications/ports/NotificationGateway";
 
 export class ShareApplicationLinkByEmail extends UseCase<ShareLinkByEmailDto> {
   constructor(private readonly notificationGateway: NotificationGateway) {

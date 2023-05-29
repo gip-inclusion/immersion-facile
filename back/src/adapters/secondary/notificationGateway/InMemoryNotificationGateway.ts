@@ -1,7 +1,7 @@
 import { prop } from "ramda";
 import { EmailSentDto, TemplatedEmail, TemplatedSms } from "shared";
-import { NotificationGateway } from "../../../domain/convention/ports/NotificationGateway";
 import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
+import { NotificationGateway } from "../../../domain/generic/notifications/ports/NotificationGateway";
 import { createLogger } from "../../../utils/logger";
 import { CustomTimeGateway } from "../core/TimeGateway/CustomTimeGateway";
 

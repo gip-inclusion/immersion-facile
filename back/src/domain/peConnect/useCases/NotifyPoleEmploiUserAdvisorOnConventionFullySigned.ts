@@ -1,9 +1,9 @@
 import { ConventionDto, conventionSchema, frontRoutes } from "shared";
 import { GenerateConventionMagicLinkUrl } from "../../../adapters/primary/config/magicLinkUrl";
-import { NotificationGateway } from "../../convention/ports/NotificationGateway";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { NotificationGateway } from "../../generic/notifications/ports/NotificationGateway";
 
 export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends TransactionalUseCase<ConventionDto> {
   constructor(

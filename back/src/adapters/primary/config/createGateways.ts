@@ -5,12 +5,12 @@ import {
   immersionFacileContactEmail,
   pipeWithValue,
 } from "shared";
-import { NotificationGateway } from "../../../domain/convention/ports/NotificationGateway";
 import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
 import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
 import { DocumentGateway } from "../../../domain/generic/fileManagement/port/DocumentGateway";
+import { NotificationGateway } from "../../../domain/generic/notifications/ports/NotificationGateway";
 import { InclusionConnectGateway } from "../../../domain/inclusionConnect/port/InclusionConnectGateway";
 import { createLogger } from "../../../utils/logger";
 import { HttpAddressGateway } from "../../secondary/addressGateway/HttpAddressGateway";

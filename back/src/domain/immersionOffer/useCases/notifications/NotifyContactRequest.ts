@@ -3,12 +3,12 @@ import {
   ContactEstablishmentRequestDto,
   contactEstablishmentRequestSchema,
 } from "shared";
-import { NotificationGateway } from "../../../convention/ports/NotificationGateway";
 import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../../core/UseCase";
+import { NotificationGateway } from "../../../generic/notifications/ports/NotificationGateway";
 
 export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishmentRequestDto> {
   constructor(

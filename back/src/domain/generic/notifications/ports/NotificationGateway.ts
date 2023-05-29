@@ -1,4 +1,4 @@
-import type { EmailSentDto, TemplatedEmail, TemplatedSms } from "shared";
+import { EmailSentDto, TemplatedEmail, TemplatedSms } from "shared";
 
 export interface NotificationGateway {
   getLastSentEmailDtos(): EmailSentDto[];

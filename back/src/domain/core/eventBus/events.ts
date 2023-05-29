@@ -13,7 +13,7 @@ import {
 } from "shared";
 import { RenewMagicLinkPayload } from "../../convention/useCases/notifications/DeliverRenewedMagicLink";
 import { ConventionRequiresModificationPayload } from "../../convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
-import { Notification } from "../../generic/notifications/useCases/SendNotification";
+import { Notification } from "../../generic/notifications/entities/Notification";
 import { IdentityProvider } from "../../generic/OAuth/entities/OngoingOAuth";
 import { EstablishmentAggregate } from "../../immersionOffer/entities/EstablishmentEntity";
 import { ConventionReminderPayload } from "../eventsPayloads/ConventionReminderPayload";

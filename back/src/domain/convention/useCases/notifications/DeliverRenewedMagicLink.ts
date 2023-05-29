@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { InternshipKind, internshipKindSchema } from "shared";
 import { UseCase } from "../../../core/UseCase";
-import { NotificationGateway } from "../../ports/NotificationGateway";
+import { NotificationGateway } from "../../../generic/notifications/ports/NotificationGateway";
 
 // prettier-ignore
 export type RenewMagicLinkPayload  = {

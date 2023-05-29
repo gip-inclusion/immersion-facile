@@ -15,7 +15,7 @@ import {
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { NotificationGateway } from "../../ports/NotificationGateway";
+import { NotificationGateway } from "../../../generic/notifications/ports/NotificationGateway";
 
 export const missingConventionMessage = (conventionId: ConventionId) =>
   `Missing convention ${conventionId} on convention repository.`;

@@ -3,11 +3,11 @@ import { z } from "zod";
 import { ConventionDto, ConventionId, frontRoutes } from "shared";
 import { GenerateConventionMagicLinkUrl } from "../../../adapters/primary/config/magicLinkUrl";
 import { createLogger } from "../../../utils/logger";
-import { NotificationGateway } from "../../convention/ports/NotificationGateway";
 import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { NotificationGateway } from "../../generic/notifications/ports/NotificationGateway";
 
 const logger = createLogger(__filename);
 
