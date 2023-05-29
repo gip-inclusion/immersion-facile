@@ -5,6 +5,8 @@ import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUow
 import { InMemoryNotificationGateway } from "../../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
 import { SendNotification } from "./SendNotification";
 
+const someDate = new Date("2023-01-01").toISOString();
+
 describe("SendNotification UseCase", () => {
   let notificationGateway: InMemoryNotificationGateway;
   let notificationRepository: InMemoryNotificationRepository;
@@ -41,6 +43,8 @@ describe("SendNotification UseCase", () => {
         id,
         kind: "email",
         email,
+        createdAt: someDate,
+        followedIds: { agencyId: "agency-123" },
       },
     ];
 
@@ -62,6 +66,8 @@ describe("SendNotification UseCase", () => {
         id,
         kind: "sms",
         sms,
+        createdAt: someDate,
+        followedIds: { conventionId: "convention-123" },
       },
     ];
 
