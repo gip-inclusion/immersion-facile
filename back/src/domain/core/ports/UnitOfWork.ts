@@ -6,6 +6,7 @@ import { ConventionRepository } from "../../convention/ports/ConventionRepositor
 import { ImmersionAssessmentRepository } from "../../convention/ports/ImmersionAssessmentRepository";
 import { InclusionConnectedUserRepository } from "../../dashboard/port/InclusionConnectedUserRepository";
 import { PostalCodeDepartmentRegionQueries } from "../../generic/geo/ports/PostalCodeDepartmentRegionQueries";
+import { NotificationRepository } from "../../generic/notifications/ports/NotificationRepository";
 import { AuthenticatedUserRepository } from "../../generic/OAuth/ports/AuthenticatedUserRepositiory";
 import { OngoingOAuthRepository } from "../../generic/OAuth/ports/OngoingOAuthRepositiory";
 import { DiscussionAggregateRepository } from "../../immersionOffer/ports/DiscussionAggregateRepository";
@@ -38,6 +39,7 @@ export type UnitOfWork = {
   formEstablishmentRepository: FormEstablishmentRepository;
   immersionAssessmentRepository: ImmersionAssessmentRepository;
   inclusionConnectedUserRepository: InclusionConnectedUserRepository;
+  notificationRepository: NotificationRepository;
   ongoingOAuthRepository: OngoingOAuthRepository;
   outboxQueries: OutboxQueries;
   outboxRepository: OutboxRepository;

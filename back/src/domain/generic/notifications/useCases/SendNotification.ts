@@ -1,33 +1,48 @@
 import { z } from "zod";
+import { exhaustiveCheck } from "shared";
+import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
 import {
-  exhaustiveCheck,
-  templatedEmailSchema,
-  templatedSmsSchema,
-} from "shared";
-import { UseCase } from "../../../core/UseCase";
-import { Notification } from "../entities/Notification";
+  UnitOfWork,
+  UnitOfWorkPerformer,
+} from "../../../core/ports/UnitOfWork";
+import { TransactionalUseCase } from "../../../core/UseCase";
+import { WithNotificationIdAndKind } from "../entities/Notification";
 import { NotificationGateway } from "../ports/NotificationGateway";
 
-const notificationSchema: z.Schema<Notification> = z
-  .object({
-    kind: z.literal("email"),
-    email: templatedEmailSchema,
-  })
-  .or(
-    z.object({
-      kind: z.literal("sms"),
-      sms: templatedSmsSchema,
-    }),
-  );
+const withNotificationIdAndKind: z.Schema<WithNotificationIdAndKind> = z.object(
+  {
+    id: z.string(),
+    kind: z.union([z.literal("email"), z.literal("sms")]),
+  },
+);
 
-export class SendNotification extends UseCase<Notification> {
-  constructor(private readonly notificationGateway: NotificationGateway) {
-    super();
+// Careful, this use case is transactional,
+// but it should only do queries and NEVER write anything to the DB.
+export class SendNotification extends TransactionalUseCase<WithNotificationIdAndKind> {
+  constructor(
+    uowPerformer: UnitOfWorkPerformer,
+    private readonly notificationGateway: NotificationGateway,
+  ) {
+    super(uowPerformer);
   }
 
-  protected inputSchema = notificationSchema;
+  protected inputSchema = withNotificationIdAndKind;
 
-  protected _execute(notification: Notification): Promise<void> {
+  protected async _execute(
+    { id, kind }: WithNotificationIdAndKind,
+    uow: UnitOfWork,
+  ): Promise<void> {
+    const notification = await uow.notificationRepository.getByIdAndKind(
+      id,
+      kind,
+    );
+
+    if (!notification) {
+      throw new NotFoundError(
+        `Notification with id ${id} and kind ${kind} not found`,
+      );
+    }
+
     switch (notification.kind) {
       case "email":
         return this.notificationGateway.sendEmail(notification.email);
