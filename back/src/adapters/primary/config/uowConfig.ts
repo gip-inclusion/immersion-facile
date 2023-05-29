@@ -21,6 +21,7 @@ import { InMemoryFeatureFlagRepository } from "../../secondary/InMemoryFeatureFl
 import { InMemoryFormEstablishmentRepository } from "../../secondary/InMemoryFormEstablishmentRepository";
 import { InMemoryImmersionAssessmentRepository } from "../../secondary/InMemoryImmersionAssessmentRepository";
 import { InMemoryInclusionConnectedUserRepository } from "../../secondary/InMemoryInclusionConnectedUserRepository";
+import { InMemoryNotificationRepository } from "../../secondary/InMemoryNotificationRepository";
 import { InMemoryOngoingOAuthRepository } from "../../secondary/InMemoryOngoingOAuthRepository";
 import { InMemoryRomeRepository } from "../../secondary/InMemoryRomeRepository";
 import { InMemoryShortLinkRepository } from "../../secondary/InMemoryShortLinkRepository";
@@ -40,6 +41,7 @@ import { PgFeatureFlagRepository } from "../../secondary/pg/PgFeatureFlagReposit
 import { PgFormEstablishmentRepository } from "../../secondary/pg/PgFormEstablishmentRepository";
 import { PgImmersionAssessmentRepository } from "../../secondary/pg/PgImmersionAssessmentRepository";
 import { PgInclusionConnectedUserRepository } from "../../secondary/pg/PgInclusionConnectedUserRepository";
+import { PgNotificationRepository } from "../../secondary/pg/PgNotificationRepository";
 import { PgOngoingOAuthRepository } from "../../secondary/pg/PgOngoingOAuthRepository";
 import { PgOutboxQueries } from "../../secondary/pg/PgOutboxQueries";
 import { PgOutboxRepository } from "../../secondary/pg/PgOutboxRepository";
@@ -83,6 +85,7 @@ export const createInMemoryUow = () => {
     immersionAssessmentRepository: new InMemoryImmersionAssessmentRepository(),
     inclusionConnectedUserRepository:
       new InMemoryInclusionConnectedUserRepository(authenticatedUserRepository),
+    notificationRepository: new InMemoryNotificationRepository(),
     ongoingOAuthRepository: new InMemoryOngoingOAuthRepository(),
     outboxRepository,
     outboxQueries,
@@ -117,6 +120,7 @@ export const createPgUow = (client: PoolClient): UnitOfWork => {
     inclusionConnectedUserRepository: new PgInclusionConnectedUserRepository(
       client,
     ),
+    notificationRepository: new PgNotificationRepository(client),
     ongoingOAuthRepository: new PgOngoingOAuthRepository(client),
     outboxRepository: new PgOutboxRepository(client),
     outboxQueries: new PgOutboxQueries(client),

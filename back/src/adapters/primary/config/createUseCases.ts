@@ -115,7 +115,10 @@ export const createUseCases = (
 
   return {
     ...instantiatedUseCasesFromClasses({
-      sendNotification: new SendNotification(gateways.notification),
+      sendNotification: new SendNotification(
+        uowPerformer,
+        gateways.notification,
+      ),
       registerAgencyToInclusionConnectUser:
         new RegisterAgencyToInclusionConnectUser(uowPerformer, createNewEvent),
       updateIcUserRoleForAgency: new UpdateIcUserRoleForAgency(
