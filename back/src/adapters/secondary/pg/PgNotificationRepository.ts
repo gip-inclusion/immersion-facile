@@ -56,7 +56,7 @@ export class PgNotificationRepository implements NotificationRepository {
 
     await this.client.query(
       `
-      INSERT INTO notifications_sms (id, sms_kind, recipient_phone, created_at, convention_id, establishment_id, agency_id, params) 
+      INSERT INTO notifications_sms (id, sms_kind, recipient_phone, created_at, convention_id, establishment_siret, agency_id, params) 
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     `,
       // prettier-ignore
@@ -74,7 +74,7 @@ export class PgNotificationRepository implements NotificationRepository {
 
     await this.client.query(
       `
-      INSERT INTO notifications_email (id, email_kind, created_at, convention_id, establishment_id, agency_id, params)
+      INSERT INTO notifications_email (id, email_kind, created_at, convention_id, establishment_siret, agency_id, params)
       VALUES ($1, $2, $3, $4, $5, $6, $7)
     `,
       // prettier-ignore
@@ -107,7 +107,7 @@ export class PgNotificationRepository implements NotificationRepository {
           'createdAt', TO_CHAR(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
           'followedIds', JSON_BUILD_OBJECT(
             'conventionId', convention_id,
-            'establishmentId', establishment_id,
+            'establishmentId', establishment_siret,
             'agencyId', agency_id),
           'templatedContent', JSON_BUILD_OBJECT(
               'kind', sms_kind,
@@ -134,7 +134,7 @@ export class PgNotificationRepository implements NotificationRepository {
           'createdAt', TO_CHAR(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
           'followedIds', JSON_BUILD_OBJECT(
             'conventionId', convention_id,
-            'establishmentId', establishment_id,
+            'establishmentId', establishment_siret,
             'agencyId', agency_id),
           'templatedContent', JSON_BUILD_OBJECT(
               'type', email_kind,

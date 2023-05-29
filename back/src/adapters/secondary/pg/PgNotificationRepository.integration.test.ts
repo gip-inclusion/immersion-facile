@@ -59,7 +59,7 @@ describe("PgNotificationRepository", () => {
       id,
       kind: "email",
       createdAt: new Date("2023-01-01").toISOString(),
-      followedIds: { conventionId: "cccccccc-1111-4111-1111-cccccccccccc" },
+      followedIds: { agencyId: "cccccccc-1111-4111-1111-cccccccccccc" },
       templatedContent: email,
     };
 

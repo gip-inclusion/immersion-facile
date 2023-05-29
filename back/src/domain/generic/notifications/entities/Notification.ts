@@ -1,4 +1,11 @@
-import { Flavor, TemplatedEmail, TemplatedSms } from "shared";
+import {
+  AgencyId,
+  ConventionId,
+  Flavor,
+  SiretDto,
+  TemplatedEmail,
+  TemplatedSms,
+} from "shared";
 import { CreateNewEvent } from "../../../core/eventBus/EventBus";
 import { DateStr, TimeGateway } from "../../../core/ports/TimeGateway";
 import { UnitOfWork } from "../../../core/ports/UnitOfWork";
@@ -7,9 +14,9 @@ import { UuidGenerator } from "../../../core/ports/UuidGenerator";
 export type NotificationId = Flavor<string, "NotificationId">;
 
 export type FollowedIds = {
-  conventionId?: string;
-  establishmentSiret?: string;
-  agencyId?: string;
+  conventionId?: ConventionId;
+  establishmentSiret?: SiretDto;
+  agencyId?: AgencyId;
 };
 
 export type NotificationContent =
