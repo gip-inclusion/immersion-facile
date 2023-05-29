@@ -13,6 +13,7 @@ import {
   Role,
   splitCasesBetweenPassingAndFailing,
   TemplatedEmail,
+  TemplatedSms,
 } from "shared";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
@@ -26,15 +27,21 @@ import {
   NotFoundError,
 } from "../../../../adapters/primary/helpers/httpErrors";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
+import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import {
-  InMemoryNotificationGateway,
-  sendSmsErrorPhoneNumber,
-} from "../../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
+import {
+  CreateNewEvent,
+  makeCreateNewEvent,
+} from "../../../core/eventBus/EventBus";
 import { ReminderKind } from "../../../core/eventsPayloads/ConventionReminderPayload";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import { makeShortLinkUrl } from "../../../core/ShortLink";
+import {
+  EmailNotification,
+  SmsNotification,
+  WithNotificationIdAndKind,
+} from "../../../generic/notifications/entities/Notification";
 import {
   forbiddenUnsupportedStatusMessage,
   NotifyConventionReminder,
@@ -55,22 +62,27 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       role: "establishment-representative",
     };
   let useCase: NotifyConventionReminder;
-  let notificationGateway: InMemoryNotificationGateway;
   let uow: InMemoryUnitOfWork;
   let timeGateway: CustomTimeGateway;
   let shortLinkIdGeneratorGateway: DeterministShortLinkIdGeneratorGateway;
   let config: AppConfig;
+  let createNewEvent: CreateNewEvent;
 
   beforeEach(() => {
     config = new AppConfigBuilder().build();
     timeGateway = new CustomTimeGateway();
-    notificationGateway = new InMemoryNotificationGateway(timeGateway);
+    const uuidGenerator = new UuidV4Generator();
     shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
     uow = createInMemoryUow();
+    createNewEvent = makeCreateNewEvent({
+      timeGateway,
+      uuidGenerator,
+    });
     useCase = new NotifyConventionReminder(
       new InMemoryUowPerformer(uow),
-      notificationGateway,
       timeGateway,
+      uuidGenerator,
+      createNewEvent,
       fakeGenerateMagicLinkUrlFn,
       shortLinkIdGeneratorGateway,
       config,
@@ -93,7 +105,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       );
 
       //Assert
-      expectToEqual(notificationGateway.getSentEmails(), []);
+      expectSavedEmailsNotificationsToEqual([]);
     });
 
     it("Missing agency", async () => {
@@ -113,73 +125,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       );
 
       //Assert
-      expectToEqual(notificationGateway.getSentEmails(), []);
-    });
-
-    it("Send SMS failure", async () => {
-      //Arrange
-      const agency = new AgencyDtoBuilder().withId("agencyId").build();
-
-      const convention = new ConventionDtoBuilder()
-        .withStatus("PARTIALLY_SIGNED")
-        .withAgencyId(agency.id)
-        .withBeneficiaryPhone(sendSmsErrorPhoneNumber)
-        .withBeneficiarySignedAt(undefined)
-        .withEstablishmentRepresentative(
-          establishmentRepresentativeWithoutMobilePhone,
-        )
-        .withEstablishmentTutor({
-          email: establishmentRepresentativeWithoutMobilePhone.email,
-          firstName: establishmentRepresentativeWithoutMobilePhone.firstName,
-          job: "Wizard",
-          lastName: establishmentRepresentativeWithoutMobilePhone.lastName,
-          phone: establishmentRepresentativeWithoutMobilePhone.phone,
-          role: "establishment-tutor",
-        })
-        .build();
-
-      uow.conventionRepository.setConventions({
-        [convention.id]: convention,
-      });
-      uow.agencyRepository.setAgencies([agency]);
-      const shortLinkIds = ["shortLink1", "shortLink2"];
-      shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
-
-      //Act
-      await expectPromiseToFailWithError(
-        useCase.execute({
-          conventionId: convention.id,
-          reminderKind: "FirstReminderForSignatories",
-        }),
-        new Error("Send SMS Error with phone number 33699999999."),
-      );
-
-      //Assert
-      expectToEqual(uow.shortLinkRepository.getShortLinks(), {
-        [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
-          id: convention.id,
-          role: convention.signatories.establishmentRepresentative.role,
-          targetRoute: frontRoutes.conventionToSign,
-          email: convention.signatories.establishmentRepresentative.email,
-          now: timeGateway.now(),
-        }),
-        [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
-          id: convention.id,
-          role: convention.signatories.beneficiary.role,
-          targetRoute: frontRoutes.conventionToSign,
-          email: convention.signatories.beneficiary.email,
-          now: timeGateway.now(),
-        }),
-      });
-      expectToEqual(notificationGateway.getSentEmails(), [
-        makeSignatoriesFirstReminderEmail({
-          actor: establishmentRepresentativeWithoutMobilePhone,
-          convention,
-          shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[0]),
-          timeGateway,
-        }),
-      ]);
-      expectToEqual(notificationGateway.getSentSms(), []);
+      expectSavedEmailsNotificationsToEqual([]);
     });
   });
 
@@ -249,7 +195,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             now: timeGateway.now(),
           }),
         });
-        expectToEqual(notificationGateway.getSentEmails(), [
+        expectSavedEmailsNotificationsToEqual([
           makeAgencyFirstReminderEmail({
             email: councellor1Email,
             agency,
@@ -303,7 +249,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             forbiddenUnsupportedStatusMessage(convention, type),
           ),
         );
-        expectToEqual(notificationGateway.getSentEmails(), []);
+        expectSavedEmailsNotificationsToEqual([]);
       });
     });
   });
@@ -370,7 +316,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             now: timeGateway.now(),
           }),
         });
-        expectToEqual(notificationGateway.getSentEmails(), [
+        expectSavedEmailsNotificationsToEqual([
           makeAgencyLastReminderEmail({
             email: councellor1Email,
             convention,
@@ -421,7 +367,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         );
 
         //Assert
-        expectToEqual(notificationGateway.getSentEmails(), []);
+        expectSavedEmailsNotificationsToEqual([]);
       });
     });
   });
@@ -488,7 +434,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           }),
         });
 
-        expectToEqual(notificationGateway.getSentEmails(), [
+        expectSavedEmailsNotificationsToEqual([
           makeSignatoriesFirstReminderEmail({
             actor: convention.signatories.beneficiary,
             convention,
@@ -503,7 +449,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           }),
         ]);
 
-        expectToEqual(notificationGateway.getSentSms(), []);
+        expectSentSmsToEqual([]);
       },
     );
 
@@ -563,7 +509,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           }),
         });
 
-        expectToEqual(notificationGateway.getSentEmails(), [
+        expectSavedEmailsNotificationsToEqual([
           makeSignatoriesFirstReminderEmail({
             actor: convention.establishmentTutor,
             convention,
@@ -571,7 +517,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             shortLinkUrl: undefined,
           }),
         ]);
-        expectToEqual(notificationGateway.getSentSms(), [
+        expectSentSmsToEqual([
           {
             recipientPhone:
               "33" + convention.signatories.beneficiary.phone.substring(1),
@@ -637,7 +583,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           }),
         });
 
-        expectToEqual(notificationGateway.getSentEmails(), [
+        expectSavedEmailsNotificationsToEqual([
           makeSignatoriesFirstReminderEmail({
             actor: convention.signatories.beneficiary,
             convention,
@@ -683,7 +629,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             forbiddenUnsupportedStatusMessage(convention, kind),
           ),
         );
-        expectToEqual(notificationGateway.getSentEmails(), []);
+        expectSavedEmailsNotificationsToEqual([]);
       });
     });
   });
@@ -742,7 +688,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             now: timeGateway.now(),
           }),
         });
-        expectToEqual(notificationGateway.getSentEmails(), [
+        expectSavedEmailsNotificationsToEqual([
           makeSignatoriesLastReminderEmail({
             actor: convention.signatories.beneficiary,
             convention,
@@ -809,7 +755,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             now: timeGateway.now(),
           }),
         });
-        expectToEqual(notificationGateway.getSentEmails(), [
+        expectSavedEmailsNotificationsToEqual([
           makeSignatoriesLastReminderEmail({
             actor: convention.signatories.beneficiary,
             convention,
@@ -821,7 +767,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             shortlinkUrl: undefined,
           }),
         ]);
-        expectToEqual(notificationGateway.getSentSms(), [
+        expectSentSmsToEqual([
           {
             recipientPhone:
               "33" +
@@ -860,7 +806,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             forbiddenUnsupportedStatusMessage(convention, type),
           ),
         );
-        expectToEqual(notificationGateway.getSentEmails(), []);
+        expectSavedEmailsNotificationsToEqual([]);
       });
     });
   });
@@ -944,6 +890,48 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       expect(toSignatoriesSummary(convention)).toStrictEqual(expected);
     });
   });
+
+  const expectSavedEmailsNotificationsToEqual = (
+    expectedEmails: TemplatedEmail[],
+  ) => {
+    const emailNotifications = uow.notificationRepository.notifications.filter(
+      (notification): notification is EmailNotification =>
+        notification.kind === "email",
+    );
+
+    expectToEqual(
+      emailNotifications.map(({ email }) => email),
+      expectedEmails,
+    );
+    expectToEqual(
+      uow.outboxRepository.events
+        .filter(({ payload }) => (payload as any).kind === "email")
+        .map(({ payload }) => payload),
+      emailNotifications.map(
+        ({ id, kind }): WithNotificationIdAndKind => ({ id, kind }),
+      ),
+    );
+  };
+
+  const expectSentSmsToEqual = (expectedSms: TemplatedSms[]) => {
+    const smsNotifications = uow.notificationRepository.notifications.filter(
+      (notification): notification is SmsNotification =>
+        notification.kind === "sms",
+    );
+    expectToEqual(
+      smsNotifications.map(({ sms }) => sms),
+      expectedSms,
+    );
+
+    expectToEqual(
+      uow.outboxRepository.events
+        .filter(({ payload }) => (payload as any).kind === "sms")
+        .map(({ payload }) => payload),
+      smsNotifications.map(
+        ({ id, kind }): WithNotificationIdAndKind => ({ id, kind }),
+      ),
+    );
+  };
 });
 
 const makeAgencyFirstReminderEmail = ({

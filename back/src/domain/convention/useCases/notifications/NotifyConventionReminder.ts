@@ -21,6 +21,7 @@ import {
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../adapters/primary/config/magicLinkUrl";
 import { NotFoundError } from "../../../../adapters/primary/helpers/httpErrors";
+import { CreateNewEvent } from "../../../core/eventBus/EventBus";
 import {
   ConventionReminderPayload,
   conventionReminderPayloadSchema,
@@ -32,9 +33,10 @@ import {
   UnitOfWork,
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
+import { UuidGenerator } from "../../../core/ports/UuidGenerator";
 import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { NotificationGateway } from "../../../generic/notifications/ports/NotificationGateway";
+import { Notification } from "../../../generic/notifications/entities/Notification";
 import {
   missingAgencyMessage,
   missingConventionMessage,
@@ -61,8 +63,9 @@ export class NotifyConventionReminder extends TransactionalUseCase<
 > {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private notificationGateway: NotificationGateway,
     private timeGateway: TimeGateway,
+    private uuidGenerator: UuidGenerator,
+    private createNewEvent: CreateNewEvent,
     private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     private readonly shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
     private readonly config: AppConfig,
@@ -118,22 +121,64 @@ export class NotifyConventionReminder extends TransactionalUseCase<
         : [conventionRead.establishmentTutor]),
     ];
 
-    const emails: TemplatedEmail[] = await Promise.all(
+    const templatedEmails: TemplatedEmail[] = await Promise.all(
       emailActors.map((actor) =>
         this.makeSignatoryReminderEmail(actor, conventionRead, uow, kind),
       ),
     );
-    const sms = await Promise.all(
+    const templatedSms = await Promise.all(
       smsSignatories.map((signatory) =>
         this.prepareSmsReminderParams(signatory, conventionRead, uow, kind),
       ),
     );
+
+    const createdAt = this.timeGateway.now().toISOString();
+    const followedIds = {
+      conventionId: conventionRead.id,
+      agencyId: conventionRead.agencyId,
+      establishmentSiret: conventionRead.siret,
+    };
+
     await Promise.all([
-      ...emails.map((email) => this.notificationGateway.sendEmail(email)),
-      ...sms.map((smsParam) => this.notificationGateway.sendSms(smsParam)),
+      ...templatedEmails.map((email) =>
+        this.saveNotificationAndRelatedEvent(uow, {
+          id: this.uuidGenerator.new(),
+          kind: "email",
+          followedIds,
+          createdAt,
+          email,
+        }),
+      ),
+      ...templatedSms.map((sms) =>
+        this.saveNotificationAndRelatedEvent(uow, {
+          id: this.uuidGenerator.new(),
+          kind: "sms",
+          followedIds,
+          createdAt,
+          sms,
+        }),
+      ),
     ]);
   }
-  async prepareSmsReminderParams(
+
+  private async saveNotificationAndRelatedEvent(
+    uow: UnitOfWork,
+    notification: Notification,
+  ): Promise<void> {
+    const event = this.createNewEvent({
+      topic: "NotificationAdded",
+      payload: {
+        id: notification.id,
+        kind: notification.kind,
+      },
+    });
+    await Promise.all([
+      uow.notificationRepository.save(notification),
+      uow.outboxRepository.save(event),
+    ]);
+  }
+
+  private async prepareSmsReminderParams(
     { role, email, phone }: GenericActor<Role>,
     convention: ConventionReadDto,
     uow: UnitOfWork,
@@ -218,7 +263,8 @@ export class NotifyConventionReminder extends TransactionalUseCase<
       shortLinkIdGeneratorGateway: this.shortLinkIdGeneratorGateway,
       uow,
     });
-    return this.notificationGateway.sendEmail(
+
+    const templatedEmail: TemplatedEmail =
       kind === "FirstReminderForAgency"
         ? {
             type: "AGENCY_FIRST_REMINDER",
@@ -248,8 +294,19 @@ export class NotifyConventionReminder extends TransactionalUseCase<
                 frontRoutes.manageConvention,
               ),
             },
-          },
-    );
+          };
+
+    return this.saveNotificationAndRelatedEvent(uow, {
+      id: this.uuidGenerator.new(),
+      kind: "email",
+      followedIds: {
+        conventionId: convention.id,
+        agencyId: agency.id,
+        establishmentSiret: convention.siret,
+      },
+      createdAt: this.timeGateway.now().toISOString(),
+      email: templatedEmail,
+    });
   }
 
   private async makeSignatoryReminderEmail(

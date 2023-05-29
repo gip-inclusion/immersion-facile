@@ -1,8 +1,16 @@
-import { expectPromiseToFailWith, TemplatedEmail, TemplatedSms } from "shared";
+import {
+  expectPromiseToFailWith,
+  expectPromiseToFailWithError,
+  TemplatedEmail,
+  TemplatedSms,
+} from "shared";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import { InMemoryNotificationRepository } from "../../../../adapters/secondary/InMemoryNotificationRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { InMemoryNotificationGateway } from "../../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
+import {
+  InMemoryNotificationGateway,
+  sendSmsErrorPhoneNumber,
+} from "../../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
 import { SendNotification } from "./SendNotification";
 
 const someDate = new Date("2023-01-01").toISOString();
@@ -26,6 +34,29 @@ describe("SendNotification UseCase", () => {
     await expectPromiseToFailWith(
       sendNotification.execute({ id, kind }),
       `Notification with id ${id} and kind ${kind} not found`,
+    );
+  });
+
+  it("when error occures when trying to send SMS", async () => {
+    const id = "notif-abc";
+
+    notificationRepository.notifications = [
+      {
+        id,
+        kind: "sms",
+        sms: {
+          kind: "FirstReminderForSignatories",
+          params: { shortLink: "https://my-link.com" },
+          recipientPhone: `33${sendSmsErrorPhoneNumber.substring(1)}`,
+        },
+        createdAt: someDate,
+        followedIds: { conventionId: "convention-123" },
+      },
+    ];
+
+    await expectPromiseToFailWithError(
+      sendNotification.execute({ id, kind: "sms" }),
+      new Error("Send SMS Error with phone number 33699999999."),
     );
   });
 
@@ -71,7 +102,7 @@ describe("SendNotification UseCase", () => {
       },
     ];
 
-    await sendNotification.execute({ id: "notif-abc", kind: "sms" });
+    await sendNotification.execute({ id, kind: "sms" });
 
     expect(notificationGateway.getSentSms()).toEqual([sms]);
   });
