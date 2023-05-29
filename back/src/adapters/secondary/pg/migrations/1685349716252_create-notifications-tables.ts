@@ -2,7 +2,7 @@ import { ColumnDefinitions, MigrationBuilder } from "node-pg-migrate";
 
 const followedIds: ColumnDefinitions = {
   convention_id: { type: "uuid", notNull: false },
-  establishment_id: { type: "uuid", notNull: false },
+  establishment_siret: { type: "char(14)", notNull: false },
   agency_id: { type: "uuid", notNull: false },
 };
 
