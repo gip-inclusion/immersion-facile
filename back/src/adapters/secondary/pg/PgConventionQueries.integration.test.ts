@@ -7,7 +7,6 @@ import {
   ConventionReadDto,
   expectArraysToEqualIgnoringOrder,
   expectToEqual,
-  expectTypeToMatchAndEqual,
 } from "shared";
 import { getTestPgPool } from "../../../_testBuilders/getTestPgPool";
 import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
@@ -66,7 +65,7 @@ describe("Pg implementation of ConventionQueries", () => {
       const result = await conventionQueries.getConventionById(idA);
 
       // Assert
-      expectTypeToMatchAndEqual(result, expectedConventionRead);
+      expectToEqual(result, expectedConventionRead);
     });
   });
   describe("PG implementation of method getLatestUpdated", () => {

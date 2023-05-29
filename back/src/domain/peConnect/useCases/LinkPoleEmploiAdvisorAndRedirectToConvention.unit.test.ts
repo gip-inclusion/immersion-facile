@@ -1,4 +1,4 @@
-import { authFailed, expectTypeToMatchAndEqual, notJobSeeker } from "shared";
+import { authFailed, expectToEqual, notJobSeeker } from "shared";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
@@ -45,7 +45,7 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
 
       await usecase.execute(authorizationCode);
 
-      expectTypeToMatchAndEqual(
+      expectToEqual(
         uow.conventionPoleEmploiAdvisorRepository
           .conventionPoleEmploiUsersAdvisors,
         [
@@ -71,7 +71,7 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
 
       await usecase.execute(authorizationCode);
 
-      expectTypeToMatchAndEqual(
+      expectToEqual(
         uow.conventionPoleEmploiAdvisorRepository
           .conventionPoleEmploiUsersAdvisors,
         [
@@ -106,7 +106,7 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
       expect(urlWithQueryParams).toBe(
         `${baseurl}/demande-immersion?fedIdProvider=peConnect&fedId=${authFailed}`,
       );
-      expectTypeToMatchAndEqual(
+      expectToEqual(
         uow.conventionPoleEmploiAdvisorRepository
           .conventionPoleEmploiUsersAdvisors,
         [],
@@ -122,7 +122,7 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
       expect(urlWithQueryParams).toBe(
         `${baseurl}/demande-immersion?fedIdProvider=peConnect&fedId=${authFailed}`,
       );
-      expectTypeToMatchAndEqual(
+      expectToEqual(
         uow.conventionPoleEmploiAdvisorRepository
           .conventionPoleEmploiUsersAdvisors,
         [],
@@ -138,7 +138,7 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
       expect(urlWithQueryParams).toBe(
         `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&fedId=${notJobSeeker}&fedIdProvider=peConnect`,
       );
-      expectTypeToMatchAndEqual(
+      expectToEqual(
         uow.conventionPoleEmploiAdvisorRepository
           .conventionPoleEmploiUsersAdvisors,
         [],
@@ -155,7 +155,7 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
     expect(urlWithQueryParams).toBe(
       `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&fedId=${peJobseekerUser.peExternalId}&fedIdProvider=peConnect`,
     );
-    expectTypeToMatchAndEqual(
+    expectToEqual(
       uow.conventionPoleEmploiAdvisorRepository
         .conventionPoleEmploiUsersAdvisors,
       [

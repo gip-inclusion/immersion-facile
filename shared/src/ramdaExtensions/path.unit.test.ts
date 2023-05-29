@@ -1,4 +1,4 @@
-import { expectTypeToMatchAndEqual } from "../test.helpers";
+import { expectToEqual } from "../test.helpers";
 import { path, pathEq } from "./path";
 
 type Address = {
@@ -32,13 +32,13 @@ describe("path", () => {
 
   it("gets the value at the path", () => {
     const address = path("address", data);
-    expectTypeToMatchAndEqual(address, data.address);
+    expectToEqual(address, data.address);
 
     const street = path("address.street", data);
-    expectTypeToMatchAndEqual(street, data.address.street);
+    expectToEqual(street, data.address.street);
 
     const line = path("address.street.lines.0", data);
-    expectTypeToMatchAndEqual(line, data.address.street.lines[0]);
+    expectToEqual(line, data.address.street.lines[0]);
   });
 
   it("supports optional values", () => {
@@ -49,7 +49,7 @@ describe("path", () => {
   it("gets the value at the path, and supports curring", () => {
     const getAddress = path<"address", UserInfo>("address");
     const value = getAddress(data);
-    expectTypeToMatchAndEqual(value, data.address);
+    expectToEqual(value, data.address);
   });
 });
 
@@ -61,15 +61,15 @@ describe("pathEq", () => {
 
   it("checks if the value at path matches given one", () => {
     const areNotEqual = pathEq("address.street.floor", 2, data);
-    expectTypeToMatchAndEqual(areNotEqual, false);
+    expectToEqual(areNotEqual, false);
 
     const areEqual = pathEq("address.street.floor", 3, data);
-    expectTypeToMatchAndEqual(areEqual, true);
+    expectToEqual(areEqual, true);
   });
 
   it("supports optional values", () => {
     const areEqual = pathEq("previousAddress.street.floor", 10, data);
-    expectTypeToMatchAndEqual(areEqual, false);
+    expectToEqual(areEqual, false);
   });
 
   it("gets the value at the path, and supports curring", () => {
@@ -77,6 +77,6 @@ describe("pathEq", () => {
       "address.street.floor",
       3,
     );
-    expectTypeToMatchAndEqual(areNumberEqual(data), true);
+    expectToEqual(areNumberEqual(data), true);
   });
 });

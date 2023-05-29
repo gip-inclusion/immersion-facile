@@ -7,7 +7,6 @@ import {
   expectEmailOfType,
   expectJwtInMagicLinkAndGetIt,
   expectToEqual,
-  expectTypeToMatchAndEqual,
   Signatories,
   signConventionRoute,
   TemplatedEmail,
@@ -188,7 +187,7 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
 
   expect(result.status).toBe(200);
 
-  expectTypeToMatchAndEqual(
+  expectToEqual(
     await inMemoryUow.conventionRepository.getById(convention.id),
     convention,
   );
@@ -253,7 +252,7 @@ const beneficiarySignsApplication = async (
 
   expect(response.status).toBe(200);
 
-  expectTypeToMatchAndEqual(
+  expectToEqual(
     await inMemoryUow.conventionRepository.getById(initialConvention.id),
     {
       ...initialConvention,
@@ -282,7 +281,7 @@ const establishmentSignsApplication = async (
     .set("Authorization", establishmentSignJwt)
     .expect(200);
 
-  expectTypeToMatchAndEqual(
+  expectToEqual(
     await inMemoryUow.conventionRepository.getById(initialConvention.id),
     {
       ...initialConvention,
@@ -333,7 +332,7 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
     .send(params)
     .expect(200);
 
-  expectTypeToMatchAndEqual(
+  expectToEqual(
     await inMemoryUow.conventionRepository.getById(initialConvention.id),
     {
       ...initialConvention,

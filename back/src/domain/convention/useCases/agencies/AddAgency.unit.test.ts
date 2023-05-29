@@ -2,7 +2,7 @@ import {
   CreateAgencyDto,
   expectObjectsToMatch,
   expectPromiseToFail,
-  expectTypeToMatchAndEqual,
+  expectToEqual,
 } from "shared";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import { InMemoryOutboxRepository } from "../../../../adapters/secondary/core/InMemoryOutboxRepository";
@@ -56,7 +56,7 @@ describe("AddAgency use case", () => {
   it("save the agency in repo, with the default admin mail and the status to be reviewed", async () => {
     agencyRepo.setAgencies([]);
     await addAgency.execute(parisMissionLocaleParams);
-    expectTypeToMatchAndEqual(agencyRepo.agencies, [
+    expectToEqual(agencyRepo.agencies, [
       {
         ...parisMissionLocaleParams,
         questionnaireUrl: parisMissionLocaleParams.questionnaireUrl!,
@@ -89,7 +89,7 @@ describe("AddAgency use case", () => {
     agencyRepo.setAgencies([]);
     await addAgency.execute(poleEmploiParis);
 
-    expectTypeToMatchAndEqual(agencyRepo.agencies, [
+    expectToEqual(agencyRepo.agencies, [
       {
         ...poleEmploiParis,
         adminEmails: [],

@@ -1,8 +1,4 @@
-import {
-  AddressDto,
-  AgencyDtoBuilder,
-  expectTypeToMatchAndEqual,
-} from "shared";
+import { AddressDto, AgencyDtoBuilder, expectToEqual } from "shared";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { ListAgenciesByFilter, toAgencyOption } from "./ListAgenciesByFilter";
@@ -67,31 +63,31 @@ describe("Query: List agencies by filter", () => {
   describe("No filters", () => {
     it("List all agencies", async () => {
       const result = await useCase.execute({}, undefined);
-      expectTypeToMatchAndEqual(result, allAgencies.map(toAgencyOption));
+      expectToEqual(result, allAgencies.map(toAgencyOption));
     });
   });
 
   describe("With Agency kind filter", () => {
     it("List miniStageOnly agencies", async () => {
-      expectTypeToMatchAndEqual(
+      expectToEqual(
         await useCase.execute({ kind: "miniStageOnly" }, undefined),
         [cciAgency1InCergy, cciAgency2InParis].map(toAgencyOption),
       );
     });
     it("List immersionWithoutPe agencies", async () => {
-      expectTypeToMatchAndEqual(
+      expectToEqual(
         await useCase.execute({ kind: "immersionWithoutPe" }, undefined),
         [otherAgencyInParis].map(toAgencyOption),
       );
     });
     it("List immersionPeOnly agencies", async () => {
-      expectTypeToMatchAndEqual(
+      expectToEqual(
         await useCase.execute({ kind: "immersionPeOnly" }, undefined),
         [peAgency1InParis, peAgency2InParis].map(toAgencyOption),
       );
     });
     it("List miniStageExcluded agencies", async () => {
-      expectTypeToMatchAndEqual(
+      expectToEqual(
         await useCase.execute({ kind: "miniStageExcluded" }, undefined),
         [otherAgencyInParis, peAgency1InParis, peAgency2InParis].map(
           toAgencyOption,
@@ -101,13 +97,13 @@ describe("Query: List agencies by filter", () => {
   });
   describe("With Agency department code filter", () => {
     it("List agencies with department code 95", async () => {
-      expectTypeToMatchAndEqual(
+      expectToEqual(
         await useCase.execute({ departmentCode: "95" }, undefined),
         [cciAgency1InCergy].map(toAgencyOption),
       );
     });
     it("List agencies with department code 75", async () => {
-      expectTypeToMatchAndEqual(
+      expectToEqual(
         await useCase.execute({ departmentCode: "75" }, undefined),
         [
           otherAgencyInParis,
@@ -118,7 +114,7 @@ describe("Query: List agencies by filter", () => {
       );
     });
     it("List agencies with department code 78", async () => {
-      expectTypeToMatchAndEqual(
+      expectToEqual(
         await useCase.execute({ departmentCode: "78" }, undefined),
         [].map(toAgencyOption),
       );
@@ -127,19 +123,19 @@ describe("Query: List agencies by filter", () => {
 
   describe("With Agency name", () => {
     it("List agencies with name 'PE'", async () => {
-      expectTypeToMatchAndEqual(
+      expectToEqual(
         await useCase.execute({ nameIncludes: "PE" }, undefined),
         [peAgency1InParis, peAgency2InParis].map(toAgencyOption),
       );
     });
     it("List agencies with name 'Agence'", async () => {
-      expectTypeToMatchAndEqual(
+      expectToEqual(
         await useCase.execute({ nameIncludes: "Agence" }, undefined),
         allAgencies.map(toAgencyOption),
       );
     });
     it("List agencies with name 'TOTO'", async () => {
-      expectTypeToMatchAndEqual(
+      expectToEqual(
         await useCase.execute({ nameIncludes: "TOTO" }, undefined),
         [].map(toAgencyOption),
       );

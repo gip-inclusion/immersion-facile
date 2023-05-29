@@ -5,7 +5,7 @@ import {
   conventionStatuses,
   EstablishmentTutor,
   expectPromiseToFailWithError,
-  expectTypeToMatchAndEqual,
+  expectToEqual,
 } from "shared";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import {
@@ -251,7 +251,7 @@ describe("Update Convention", () => {
       });
 
       expect(outboxRepo.events).toHaveLength(1);
-      expectTypeToMatchAndEqual(
+      expectToEqual(
         outboxRepo.events[0],
         createNewEvent({
           topic: "ConventionSubmittedAfterModification",
@@ -259,7 +259,7 @@ describe("Update Convention", () => {
         }),
       );
 
-      expectTypeToMatchAndEqual(response, {
+      expectToEqual(response, {
         id: inReviewConvention.id,
       });
     });

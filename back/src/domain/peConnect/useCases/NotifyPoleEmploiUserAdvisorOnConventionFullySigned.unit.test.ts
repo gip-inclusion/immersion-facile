@@ -2,7 +2,7 @@ import {
   AgencyDto,
   ConventionDto,
   ConventionDtoBuilder,
-  expectTypeToMatchAndEqual,
+  expectToEqual,
   frontRoutes,
 } from "shared";
 import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/jwtTestHelper";
@@ -75,7 +75,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
 
     await usecase.execute(conventionDtoFromEvent);
 
-    expectTypeToMatchAndEqual(notificationGateway.getSentEmails(), [
+    expectToEqual(notificationGateway.getSentEmails(), [
       {
         type: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED",
         recipients: [advisor.email],
@@ -134,7 +134,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
 
     await usecase.execute(conventionDtoFromEvent);
 
-    expectTypeToMatchAndEqual(notificationGateway.getSentEmails(), []);
+    expectToEqual(notificationGateway.getSentEmails(), []);
   });
 });
 

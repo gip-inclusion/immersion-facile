@@ -9,7 +9,6 @@ import {
   expectObjectsToMatch,
   expectPromiseToFailWith,
   expectToEqual,
-  expectTypeToMatchAndEqual,
   FormEstablishmentSource,
   GeoPositionDto,
   NumberEmployeesRange,
@@ -988,7 +987,7 @@ describe("Postgres implementation of immersion offer repository", () => {
         );
 
       // Assert
-      expectTypeToMatchAndEqual(actualSearchResultDto, {
+      expectToEqual(actualSearchResultDto, {
         rome: "H2102",
         romeLabel: "Conduite d'équipement de production alimentaire",
         appellationLabels: [],
