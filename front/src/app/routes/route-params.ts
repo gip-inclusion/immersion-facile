@@ -95,6 +95,7 @@ export const conventionValuesFromUrl = {
   bceSiret: param.query.optional.string,
   bceBusinessName: param.query.optional.string,
   bceJob: param.query.optional.string,
+  bceBusinessAddress: param.query.optional.string,
 
   siret: param.query.optional.string,
   businessName: param.query.optional.string,

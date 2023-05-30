@@ -392,6 +392,11 @@ const beneficiaryCurrentEmployerSection = {
     id: beneficiaryCurrentEmployerSectionIds.businessSiret,
     required: true,
   },
+  "signatories.beneficiaryCurrentEmployer.businessAddress": {
+    label: "Addresse de l'entreprise actuelle du candidat",
+    id: beneficiaryCurrentEmployerSectionIds.businessAddress,
+    required: true,
+  },
 };
 
 const establishmentRepresentativeSection = (

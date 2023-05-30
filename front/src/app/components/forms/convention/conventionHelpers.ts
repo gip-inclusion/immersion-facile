@@ -92,7 +92,8 @@ export const conventionInitialValuesFromUrl = ({
     params.bceLastName ||
     params.bceEmail ||
     params.bcePhone ||
-    params.bceJob
+    params.bceJob ||
+    params.bceBusinessAddress
   );
 
   const initialFormWithStoredAndUrlParams: ConventionPresentation & {
@@ -158,6 +159,7 @@ export const conventionInitialValuesFromUrl = ({
             phone: params.bcePhone ?? "",
             job: params.bceJob ?? "",
             role: "beneficiary-current-employer",
+            businessAddress: params.bceBusinessAddress ?? "",
           }
         : undefined,
     },
