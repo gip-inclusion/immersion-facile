@@ -13,6 +13,7 @@ import {
 } from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { immersionSearchGateway } from "src/config/dependencies";
+import { EmailValidationInput } from "../forms/commons/EmailValidationInput";
 
 type ContactByEmailProps = {
   siret: SiretDto;
@@ -70,7 +71,7 @@ export const ContactByEmail = ({
           Cette entreprise a choisi d'être contactée par mail. Veuillez
           compléter ce formulaire qui sera transmis à l'entreprise.
         </p>
-        <Input
+        <EmailValidationInput
           label="Votre email *"
           nativeInputProps={{
             ...register("potentialBeneficiaryEmail"),
