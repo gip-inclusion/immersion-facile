@@ -179,6 +179,7 @@ describe("Update Convention", () => {
           businessName: "business",
           businessSiret: "01234567891234",
           job: "Boss",
+          businessAddress: "Rue des Bouchers 67065 Strasbourg",
         })
         .build();
 

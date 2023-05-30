@@ -30,6 +30,7 @@ const currentEmployer: BeneficiaryCurrentEmployer = {
   job: "",
   businessSiret: "",
   businessName: "",
+  businessAddress: "",
 };
 const beneficiaryRepresentative: BeneficiaryRepresentative = {
   role: "beneficiary-representative",

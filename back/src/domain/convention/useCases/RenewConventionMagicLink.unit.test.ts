@@ -41,6 +41,7 @@ const currentEmployer: BeneficiaryCurrentEmployer = {
   job: "",
   role: "beneficiary-current-employer",
   phone: "",
+  businessAddress: "Rue des Bouchers 67065 Strasbourg",
 };
 const beneficiaryRepresentative: BeneficiaryRepresentative = {
   email: "beneficiaryRepresentative@mail.com",
