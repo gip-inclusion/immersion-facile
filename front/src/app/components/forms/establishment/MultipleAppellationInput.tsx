@@ -12,6 +12,7 @@ type MultipleAppellationInputProps = {
   onAppellationAdd: (appellation: AppellationDto, index: number) => void;
   onAppellationDelete: (index: number) => void;
   error?: string;
+  id: string;
 };
 
 export const emptyAppellation: AppellationDto = {
@@ -28,11 +29,15 @@ export const MultipleAppellationInput = ({
   onAppellationAdd,
   onAppellationDelete,
   error,
+  id,
 }: MultipleAppellationInputProps) => {
   const { cx } = useStyles();
 
   return (
-    <div className={cx(fr.cx("fr-input-group"), "im-appellation-autocomplete")}>
+    <div
+      className={cx(fr.cx("fr-input-group"), "im-appellation-autocomplete")}
+      id={id}
+    >
       <>
         {label && <h2 className={fr.cx("fr-text--lead")}>{label}</h2>}
         {currentAppellations.map(({ appellationCode }, index) => (
