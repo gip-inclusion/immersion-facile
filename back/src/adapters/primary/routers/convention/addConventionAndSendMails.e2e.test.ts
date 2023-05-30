@@ -18,9 +18,9 @@ import {
   buildTestApp,
   TestAppAndDeps,
 } from "../../../../_testBuilders/buildTestApp";
+import { processEventsForEmailToBeSent } from "../../../../_testBuilders/processEventsForEmailToBeSent";
 import { DomainEvent } from "../../../../domain/core/eventBus/events";
 import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";
-import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
 import { InMemoryOutboxRepository } from "../../../secondary/core/InMemoryOutboxRepository";
 import { InMemoryNotificationGateway } from "../../../secondary/notificationGateway/InMemoryNotificationGateway";
 
@@ -392,12 +392,3 @@ const makeSignatories = (
     signedAt: establishmentRepresentativeSignedAt,
   },
 });
-
-const processEventsForEmailToBeSent = async (
-  eventCrawler: BasicEventCrawler,
-) => {
-  // 1. Process the convention workflow event
-  await eventCrawler.processNewEvents();
-  // 2. Process the email sending event (NotificationAdded)
-  await eventCrawler.processNewEvents();
-};
