@@ -33,8 +33,8 @@ const buildSignatoriesObject = `JSON_BUILD_OBJECT(
         'job', bce.extra_fields ->> 'job',
         'businessSiret', bce.extra_fields ->> 'businessSiret',
         'businessName', bce.extra_fields ->> 'businessName',
-        'businessAdress', bce.extra_fields ->> 'businessAddress',
-        'signedAt', date_to_iso(bce.signed_at)
+        'signedAt', date_to_iso(bce.signed_at),
+        'businessAddress', bce.extra_fields ->> 'businessAddress'
       ) END,
       'establishmentRepresentative' , JSON_BUILD_OBJECT(
         'role', 'establishment-representative',
