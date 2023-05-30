@@ -46,6 +46,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
       lastName: "Potter",
       job: "Magician",
       businessSiret: "01234567891234",
+      businessAddress: "Rue des Bouchers 67065 Strasbourg",
     })
     .build();
 

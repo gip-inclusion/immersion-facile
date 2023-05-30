@@ -913,6 +913,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           businessSiret: "",
           job: "",
           signedAt: undefined,
+          businessAddress: "Rue des Bouchers 67065 Strasbourg",
         })
         .build();
 

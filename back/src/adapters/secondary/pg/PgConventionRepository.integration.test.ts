@@ -302,6 +302,7 @@ describe("PgConventionRepository", () => {
       businessName: "Entreprise .Inc",
       businessSiret: "01234567891234",
       job: "Boss",
+      businessAddress: "Rue des Bouchers 67065 Strasbourg",
     };
 
     const conventionId = "40400404-0000-0000-0000-6bb9bd38aaaa";
@@ -341,6 +342,7 @@ describe("PgConventionRepository", () => {
       job: "Boss",
       phone: "0011223344",
       role: "beneficiary-current-employer",
+      businessAddress: "Rue des Bouchers 67065 Strasbourg",
     };
     await conventionRepository.update(
       new ConventionDtoBuilder(conventionWithBeneficiaryCurrentEmployer)
@@ -507,6 +509,7 @@ describe("PgConventionRepository", () => {
         job: string | null;
         businessSiret: string | null;
         businessName: string | null;
+        businessAddress: string | null;
       };
       phone: string | null;
       first_name: string | null;
@@ -535,6 +538,10 @@ describe("PgConventionRepository", () => {
             businessName:
               result.extra_fields.businessName !== null
                 ? result.extra_fields.businessName
+                : "",
+            businessAddress:
+              result.extra_fields.businessAddress !== null
+                ? result.extra_fields.businessAddress
                 : "",
             businessSiret:
               result.extra_fields.businessSiret !== null

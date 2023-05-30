@@ -351,6 +351,7 @@ describe("Pg implementation of ConventionQueries", () => {
         phone: "0011223344",
         role: "beneficiary-current-employer",
         signedAt: new Date().toISOString(),
+        businessAddress: "Rue des Bouchers 67065 Strasbourg",
       })
       .withBeneficiaryRepresentative({
         email: "rep@rep.com",

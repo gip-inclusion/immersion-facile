@@ -388,7 +388,7 @@ export class PgConventionRepository implements ConventionRepository {
   ) {
     const query_insert_beneficiary_current_employer = `
         INSERT into actors (first_name, last_name, email, phone, signed_at, extra_fields)
-        VALUES($1, $2, $3, $4, $5, JSON_STRIP_NULLS(JSON_BUILD_OBJECT('businessName', $6::text,'businessSiret', $7::text,'job', $8::text)))
+        VALUES($1, $2, $3, $4, $5, JSON_STRIP_NULLS(JSON_BUILD_OBJECT('businessName', $6::text,'businessSiret', $7::text,'job', $8::text, 'businessAddress', $9::text)))
         RETURNING id;
       `;
     const insertReturn = await this.client.query<{ id: number }>(
@@ -402,6 +402,7 @@ export class PgConventionRepository implements ConventionRepository {
         beneficiaryCurrentEmployer.businessName,
         beneficiaryCurrentEmployer.businessSiret,
         beneficiaryCurrentEmployer.job,
+        beneficiaryCurrentEmployer.businessAddress,
       ],
     );
     const result = insertReturn.rows.at(0);
@@ -414,7 +415,7 @@ export class PgConventionRepository implements ConventionRepository {
   ): Promise<number> {
     const updateBeneficiaryCurrentEmployerQuery = `  
         UPDATE actors
-          SET first_name=$2,  last_name=$3, email=$4, phone=$5, signed_at=$6, extra_fields=JSON_STRIP_NULLS(JSON_BUILD_OBJECT('businessName', $7::text,'businessSiret', $8::text,'job', $9::text))
+          SET first_name=$2,  last_name=$3, email=$4, phone=$5, signed_at=$6, extra_fields=JSON_STRIP_NULLS(JSON_BUILD_OBJECT('businessName', $7::text,'businessSiret', $8::text,'job', $9::text, 'businessAddress', $10::text))
         FROM conventions 
         WHERE conventions.id=$1 AND actors.id = conventions.${beneficiaryCurrentEmployerIdColumnName}
         RETURNING actors.id
@@ -431,6 +432,7 @@ export class PgConventionRepository implements ConventionRepository {
         beneficiaryCurrentEmployer.businessName,
         beneficiaryCurrentEmployer.businessSiret,
         beneficiaryCurrentEmployer.job,
+        beneficiaryCurrentEmployer.businessAddress,
       ],
     );
     const result = updateReturn.rows.at(0);
