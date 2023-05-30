@@ -1,5 +1,6 @@
 import React from "react";
 import { useDispatch } from "react-redux";
+import { fr } from "@codegouvfr/react-dsfr";
 import {
   Display,
   headerFooterDisplayItem,
@@ -24,7 +25,10 @@ export const ImmersionHeader = () => {
   const { classes } = makeStyles({ name: ImmersionHeader.displayName })(() => ({
     operator: {
       boxSizing: "content-box",
-      width: "100%",
+      width: window.matchMedia(fr.breakpoints.up("md").replace("@media ", ""))
+        .matches
+        ? "10.5rem"
+        : "100%",
       maxWidth: "10.5rem !important",
     },
   }))();
