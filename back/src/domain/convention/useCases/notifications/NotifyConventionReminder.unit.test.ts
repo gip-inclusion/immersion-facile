@@ -13,10 +13,13 @@ import {
   Role,
   splitCasesBetweenPassingAndFailing,
   TemplatedEmail,
-  TemplatedSms,
 } from "shared";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
+import {
+  ExpectSavedNotificationsAndEvents,
+  makeExpectSavedNotificationsAndEvents,
+} from "../../../../_testBuilders/makeExpectSavedNotificationsAndEvents";
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import {
   createInMemoryUow,
@@ -37,12 +40,7 @@ import {
 import { ReminderKind } from "../../../core/eventsPayloads/ConventionReminderPayload";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import { makeShortLinkUrl } from "../../../core/ShortLink";
-import {
-  EmailNotification,
-  makeSaveNotificationAndRelatedEvent,
-  SmsNotification,
-  WithNotificationIdAndKind,
-} from "../../../generic/notifications/entities/Notification";
+import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import {
   forbiddenUnsupportedStatusMessage,
   NotifyConventionReminder,
@@ -68,6 +66,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
   let shortLinkIdGeneratorGateway: DeterministShortLinkIdGeneratorGateway;
   let config: AppConfig;
   let createNewEvent: CreateNewEvent;
+  let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
 
   beforeEach(() => {
     config = new AppConfigBuilder().build();
@@ -84,6 +83,12 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       uuidGenerator,
       timeGateway,
     );
+
+    expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
+      uow.notificationRepository,
+      uow.outboxRepository,
+    );
+
     useCase = new NotifyConventionReminder(
       new InMemoryUowPerformer(uow),
       timeGateway,
@@ -110,7 +115,9 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       );
 
       //Assert
-      expectSavedEmailsNotificationsToEqual([]);
+      expectSavedNotificationsAndEvents({
+        emails: [],
+      });
     });
 
     it("Missing agency", async () => {
@@ -130,7 +137,9 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       );
 
       //Assert
-      expectSavedEmailsNotificationsToEqual([]);
+      expectSavedNotificationsAndEvents({
+        emails: [],
+      });
     });
   });
 
@@ -200,32 +209,35 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             now: timeGateway.now(),
           }),
         });
-        expectSavedEmailsNotificationsToEqual([
-          makeAgencyFirstReminderEmail({
-            email: councellor1Email,
-            agency,
-            convention,
-            shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[0]),
-          }),
-          makeAgencyFirstReminderEmail({
-            email: councellor2Email,
-            agency,
-            convention,
-            shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[1]),
-          }),
-          makeAgencyFirstReminderEmail({
-            email: validator1Email,
-            agency,
-            convention,
-            shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[2]),
-          }),
-          makeAgencyFirstReminderEmail({
-            email: validator2Email,
-            agency,
-            convention,
-            shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[3]),
-          }),
-        ]);
+
+        expectSavedNotificationsAndEvents({
+          emails: [
+            makeAgencyFirstReminderEmail({
+              email: councellor1Email,
+              agency,
+              convention,
+              shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[0]),
+            }),
+            makeAgencyFirstReminderEmail({
+              email: councellor2Email,
+              agency,
+              convention,
+              shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[1]),
+            }),
+            makeAgencyFirstReminderEmail({
+              email: validator1Email,
+              agency,
+              convention,
+              shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[2]),
+            }),
+            makeAgencyFirstReminderEmail({
+              email: validator2Email,
+              agency,
+              convention,
+              shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[3]),
+            }),
+          ],
+        });
       },
     );
 
@@ -254,7 +266,9 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             forbiddenUnsupportedStatusMessage(convention, type),
           ),
         );
-        expectSavedEmailsNotificationsToEqual([]);
+        expectSavedNotificationsAndEvents({
+          emails: [],
+        });
       });
     });
   });
@@ -321,28 +335,31 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             now: timeGateway.now(),
           }),
         });
-        expectSavedEmailsNotificationsToEqual([
-          makeAgencyLastReminderEmail({
-            email: councellor1Email,
-            convention,
-            shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[0]),
-          }),
-          makeAgencyLastReminderEmail({
-            email: councellor2Email,
-            convention,
-            shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[1]),
-          }),
-          makeAgencyLastReminderEmail({
-            email: validator1Email,
-            convention,
-            shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[2]),
-          }),
-          makeAgencyLastReminderEmail({
-            email: validator2Email,
-            convention,
-            shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[3]),
-          }),
-        ]);
+
+        expectSavedNotificationsAndEvents({
+          emails: [
+            makeAgencyLastReminderEmail({
+              email: councellor1Email,
+              convention,
+              shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[0]),
+            }),
+            makeAgencyLastReminderEmail({
+              email: councellor2Email,
+              convention,
+              shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[1]),
+            }),
+            makeAgencyLastReminderEmail({
+              email: validator1Email,
+              convention,
+              shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[2]),
+            }),
+            makeAgencyLastReminderEmail({
+              email: validator2Email,
+              convention,
+              shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[3]),
+            }),
+          ],
+        });
       },
     );
 
@@ -372,7 +389,9 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
         );
 
         //Assert
-        expectSavedEmailsNotificationsToEqual([]);
+        expectSavedNotificationsAndEvents({
+          emails: [],
+        });
       });
     });
   });
@@ -439,22 +458,23 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           }),
         });
 
-        expectSavedEmailsNotificationsToEqual([
-          makeSignatoriesFirstReminderEmail({
-            actor: convention.signatories.beneficiary,
-            convention,
-            timeGateway,
-            shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[0]),
-          }),
-          makeSignatoriesFirstReminderEmail({
-            actor: convention.signatories.establishmentRepresentative,
-            convention,
-            timeGateway,
-            shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[1]),
-          }),
-        ]);
-
-        expectSentSmsToEqual([]);
+        expectSavedNotificationsAndEvents({
+          emails: [
+            makeSignatoriesFirstReminderEmail({
+              actor: convention.signatories.beneficiary,
+              convention,
+              timeGateway,
+              shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[0]),
+            }),
+            makeSignatoriesFirstReminderEmail({
+              actor: convention.signatories.establishmentRepresentative,
+              convention,
+              timeGateway,
+              shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[1]),
+            }),
+          ],
+          sms: [],
+        });
       },
     );
 
@@ -514,33 +534,35 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           }),
         });
 
-        expectSavedEmailsNotificationsToEqual([
-          makeSignatoriesFirstReminderEmail({
-            actor: convention.establishmentTutor,
-            convention,
-            timeGateway,
-            shortLinkUrl: undefined,
-          }),
-        ]);
-        expectSentSmsToEqual([
-          {
-            recipientPhone:
-              "33" + convention.signatories.beneficiary.phone.substring(1),
-            kind,
-            params: { shortLink: makeShortLinkUrl(config, shortLinkIds[0]) },
-          },
-          {
-            recipientPhone:
-              "33" +
-              convention.signatories.establishmentRepresentative.phone.substring(
-                1,
-              ),
-            kind,
-            params: {
-              shortLink: makeShortLinkUrl(config, shortLinkIds[1]),
+        expectSavedNotificationsAndEvents({
+          emails: [
+            makeSignatoriesFirstReminderEmail({
+              actor: convention.establishmentTutor,
+              convention,
+              timeGateway,
+              shortLinkUrl: undefined,
+            }),
+          ],
+          sms: [
+            {
+              recipientPhone:
+                "33" + convention.signatories.beneficiary.phone.substring(1),
+              kind,
+              params: { shortLink: makeShortLinkUrl(config, shortLinkIds[0]) },
             },
-          },
-        ]);
+            {
+              recipientPhone:
+                "33" +
+                convention.signatories.establishmentRepresentative.phone.substring(
+                  1,
+                ),
+              kind,
+              params: {
+                shortLink: makeShortLinkUrl(config, shortLinkIds[1]),
+              },
+            },
+          ],
+        });
       },
     );
 
@@ -588,26 +610,28 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
           }),
         });
 
-        expectSavedEmailsNotificationsToEqual([
-          makeSignatoriesFirstReminderEmail({
-            actor: convention.signatories.beneficiary,
-            convention,
-            timeGateway,
-            shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[0]),
-          }),
-          makeSignatoriesFirstReminderEmail({
-            actor: convention.signatories.establishmentRepresentative,
-            convention,
-            timeGateway,
-            shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[1]),
-          }),
-          makeSignatoriesFirstReminderEmail({
-            actor: convention.establishmentTutor,
-            convention,
-            timeGateway,
-            shortLinkUrl: undefined,
-          }),
-        ]);
+        expectSavedNotificationsAndEvents({
+          emails: [
+            makeSignatoriesFirstReminderEmail({
+              actor: convention.signatories.beneficiary,
+              convention,
+              timeGateway,
+              shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[0]),
+            }),
+            makeSignatoriesFirstReminderEmail({
+              actor: convention.signatories.establishmentRepresentative,
+              convention,
+              timeGateway,
+              shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[1]),
+            }),
+            makeSignatoriesFirstReminderEmail({
+              actor: convention.establishmentTutor,
+              convention,
+              timeGateway,
+              shortLinkUrl: undefined,
+            }),
+          ],
+        });
       },
     );
 
@@ -634,7 +658,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             forbiddenUnsupportedStatusMessage(convention, kind),
           ),
         );
-        expectSavedEmailsNotificationsToEqual([]);
+        expectSavedNotificationsAndEvents({ emails: [] });
       });
     });
   });
@@ -693,18 +717,21 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             now: timeGateway.now(),
           }),
         });
-        expectSavedEmailsNotificationsToEqual([
-          makeSignatoriesLastReminderEmail({
-            actor: convention.signatories.beneficiary,
-            convention,
-            shortlinkUrl: makeShortLinkUrl(config, shortLinkIds[0]),
-          }),
-          makeSignatoriesLastReminderEmail({
-            actor: convention.signatories.establishmentRepresentative,
-            convention,
-            shortlinkUrl: makeShortLinkUrl(config, shortLinkIds[1]),
-          }),
-        ]);
+
+        expectSavedNotificationsAndEvents({
+          emails: [
+            makeSignatoriesLastReminderEmail({
+              actor: convention.signatories.beneficiary,
+              convention,
+              shortlinkUrl: makeShortLinkUrl(config, shortLinkIds[0]),
+            }),
+            makeSignatoriesLastReminderEmail({
+              actor: convention.signatories.establishmentRepresentative,
+              convention,
+              shortlinkUrl: makeShortLinkUrl(config, shortLinkIds[1]),
+            }),
+          ],
+        });
       },
     );
 
@@ -760,31 +787,34 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             now: timeGateway.now(),
           }),
         });
-        expectSavedEmailsNotificationsToEqual([
-          makeSignatoriesLastReminderEmail({
-            actor: convention.signatories.beneficiary,
-            convention,
-            shortlinkUrl: makeShortLinkUrl(config, shortLinkIds[0]),
-          }),
-          makeSignatoriesLastReminderEmail({
-            actor: convention.establishmentTutor,
-            convention,
-            shortlinkUrl: undefined,
-          }),
-        ]);
-        expectSentSmsToEqual([
-          {
-            recipientPhone:
-              "33" +
-              convention.signatories.establishmentRepresentative.phone.substring(
-                1,
-              ),
-            kind: type,
-            params: {
-              shortLink: makeShortLinkUrl(config, shortLinkIds[1]),
+
+        expectSavedNotificationsAndEvents({
+          emails: [
+            makeSignatoriesLastReminderEmail({
+              actor: convention.signatories.beneficiary,
+              convention,
+              shortlinkUrl: makeShortLinkUrl(config, shortLinkIds[0]),
+            }),
+            makeSignatoriesLastReminderEmail({
+              actor: convention.establishmentTutor,
+              convention,
+              shortlinkUrl: undefined,
+            }),
+          ],
+          sms: [
+            {
+              recipientPhone:
+                "33" +
+                convention.signatories.establishmentRepresentative.phone.substring(
+                  1,
+                ),
+              kind: type,
+              params: {
+                shortLink: makeShortLinkUrl(config, shortLinkIds[1]),
+              },
             },
-          },
-        ]);
+          ],
+        });
       },
     );
 
@@ -811,7 +841,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             forbiddenUnsupportedStatusMessage(convention, type),
           ),
         );
-        expectSavedEmailsNotificationsToEqual([]);
+        expectSavedNotificationsAndEvents({ emails: [] });
       });
     });
   });
@@ -895,48 +925,6 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
       expect(toSignatoriesSummary(convention)).toStrictEqual(expected);
     });
   });
-
-  const expectSavedEmailsNotificationsToEqual = (
-    expectedEmails: TemplatedEmail[],
-  ) => {
-    const emailNotifications = uow.notificationRepository.notifications.filter(
-      (notification): notification is EmailNotification =>
-        notification.kind === "email",
-    );
-
-    expectToEqual(
-      emailNotifications.map(({ templatedContent }) => templatedContent),
-      expectedEmails,
-    );
-    expectToEqual(
-      uow.outboxRepository.events
-        .filter(({ payload }) => (payload as any).kind === "email")
-        .map(({ payload }) => payload),
-      emailNotifications.map(
-        ({ id, kind }): WithNotificationIdAndKind => ({ id, kind }),
-      ),
-    );
-  };
-
-  const expectSentSmsToEqual = (expectedSms: TemplatedSms[]) => {
-    const smsNotifications = uow.notificationRepository.notifications.filter(
-      (notification): notification is SmsNotification =>
-        notification.kind === "sms",
-    );
-    expectToEqual(
-      smsNotifications.map(({ templatedContent }) => templatedContent),
-      expectedSms,
-    );
-
-    expectToEqual(
-      uow.outboxRepository.events
-        .filter(({ payload }) => (payload as any).kind === "sms")
-        .map(({ payload }) => payload),
-      smsNotifications.map(
-        ({ id, kind }): WithNotificationIdAndKind => ({ id, kind }),
-      ),
-    );
-  };
 });
 
 const makeAgencyFirstReminderEmail = ({

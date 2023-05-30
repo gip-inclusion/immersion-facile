@@ -40,9 +40,14 @@ type GenericEvent<T extends string, P> = {
   wasQuarantined: boolean;
 };
 
+export type NotificationAddedEvent = GenericEvent<
+  "NotificationAdded",
+  WithNotificationIdAndKind
+>;
+
 // prettier-ignore
 export type DomainEvent =
-  | GenericEvent<"NotificationAdded", WithNotificationIdAndKind>
+  | NotificationAddedEvent
   // IMMERSION APPLICATION RELATED
   // HAPPY PATH
   | GenericEvent<"ImmersionApplicationSubmittedByBeneficiary", ConventionDto>
