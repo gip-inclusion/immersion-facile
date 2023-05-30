@@ -6,6 +6,7 @@ import {
   expectEmailOfType,
   expectJwtInMagicLinkAndGetIt,
   expectObjectsToMatch,
+  expectToEqual,
   UpdateConventionStatusRequestDto,
   updateConventionStatusRoute,
 } from "shared";
@@ -13,8 +14,8 @@ import {
   buildTestApp,
   TestAppAndDeps,
 } from "../../../../_testBuilders/buildTestApp";
+import { processEventsForEmailToBeSent } from "../../../../_testBuilders/processEventsForEmailToBeSent";
 import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";
-import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
 import { InMemoryConventionRepository } from "../../../secondary/InMemoryConventionRepository";
 
 describe("Add Convention Notifications, then checks the mails are sent (trigerred by events)", () => {
@@ -77,12 +78,15 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   await processEventsForEmailToBeSent(eventCrawler);
 
   const sentEmails = gateways.notification.getSentEmails();
-  expect(sentEmails).toHaveLength(3);
-  expect(sentEmails.map((e) => e.recipients)).toEqual([
-    ["validator@mail.com"],
-    [createConventionParams.signatories.beneficiary.email],
-    [createConventionParams.signatories.establishmentRepresentative.email],
-  ]);
+
+  expectToEqual(
+    sentEmails.map((e) => e.recipients),
+    [
+      ["validator@mail.com"],
+      [createConventionParams.signatories.beneficiary.email],
+      [createConventionParams.signatories.establishmentRepresentative.email],
+    ],
+  );
 
   const beneficiarySignEmail = expectEmailOfType(
     sentEmails[1],
@@ -164,13 +168,4 @@ const expectStoreImmersionToHaveStatus = (
   expectObjectsToMatch(savedConvention[0], {
     status: expectedStatus,
   });
-};
-
-const processEventsForEmailToBeSent = async (
-  eventCrawler: BasicEventCrawler,
-) => {
-  // 1. Process the convention workflow event
-  await eventCrawler.processNewEvents();
-  // 2. Process the email sending event (NotificationAdded)
-  await eventCrawler.processNewEvents();
 };

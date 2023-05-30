@@ -28,36 +28,38 @@ describe("SendNotification UseCase", () => {
     sendNotification = new SendNotification(uowPerformer, notificationGateway);
   });
 
-  it("should throw if notification not found", async () => {
-    const id = "notif-404";
-    const kind = "email";
-    await expectPromiseToFailWith(
-      sendNotification.execute({ id, kind }),
-      `Notification with id ${id} and kind ${kind} not found`,
-    );
-  });
+  describe("Wrong paths", () => {
+    it("should throw if notification not found", async () => {
+      const id = "notif-404";
+      const kind = "email";
+      await expectPromiseToFailWith(
+        sendNotification.execute({ id, kind }),
+        `Notification with id ${id} and kind ${kind} not found`,
+      );
+    });
 
-  it("when error occures when trying to send SMS", async () => {
-    const id = "notif-abc";
+    it("when error occurres in SMS sending", async () => {
+      const id = "notif-abc";
 
-    notificationRepository.notifications = [
-      {
-        id,
-        kind: "sms",
-        templatedContent: {
-          kind: "FirstReminderForSignatories",
-          params: { shortLink: "https://my-link.com" },
-          recipientPhone: `33${sendSmsErrorPhoneNumber.substring(1)}`,
+      notificationRepository.notifications = [
+        {
+          id,
+          kind: "sms",
+          templatedContent: {
+            kind: "FirstReminderForSignatories",
+            params: { shortLink: "https://my-link.com" },
+            recipientPhone: `33${sendSmsErrorPhoneNumber.substring(1)}`,
+          },
+          createdAt: someDate,
+          followedIds: { conventionId: "convention-123" },
         },
-        createdAt: someDate,
-        followedIds: { conventionId: "convention-123" },
-      },
-    ];
+      ];
 
-    await expectPromiseToFailWithError(
-      sendNotification.execute({ id, kind: "sms" }),
-      new Error("Send SMS Error with phone number 33699999999."),
-    );
+      await expectPromiseToFailWithError(
+        sendNotification.execute({ id, kind: "sms" }),
+        new Error("Send SMS Error with phone number 33699999999."),
+      );
+    });
   });
 
   it("should send an email", async () => {

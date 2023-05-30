@@ -26,7 +26,7 @@ describe("PgNotificationRepository", () => {
     await pool.end();
   });
 
-  it("saves Sms notification in a dedicated table, than gets it", async () => {
+  it("saves Sms notification in a dedicated table, then gets it", async () => {
     const sms: TemplatedSms = {
       kind: "FirstReminderForSignatories",
       recipientPhone: "33610101010",
@@ -47,7 +47,7 @@ describe("PgNotificationRepository", () => {
     expect(response).toEqual(smsNotification);
   });
 
-  it("saves Email notification in a dedicated table, than gets it", async () => {
+  it("saves Email notification in a dedicated table, then gets it", async () => {
     const email: TemplatedEmail = {
       type: "AGENCY_WAS_ACTIVATED",
       cc: ["copy@mail.com"],
