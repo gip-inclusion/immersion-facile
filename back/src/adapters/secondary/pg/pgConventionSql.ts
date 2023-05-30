@@ -67,7 +67,6 @@ const buildDto = `JSON_STRIP_NULLS(
     'schedule', schedule,
     'businessName', business_name,
     'workConditions', work_conditions,
-    'postalCode', postal_code,
     'agencyId', agency_id,
     'agencyName', agencies.name,
     'agencyDepartment', agencies.department_code,
