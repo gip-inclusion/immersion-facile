@@ -606,12 +606,6 @@ export const sidebarStepContent = (
                 les informations urgentes concernant la convention par SMS.
               </strong>
             </p>
-            <hr />
-            <p>
-              Le bouton “Vérifier les informations et envoyer la demande”
-              restera désactivé (en gris) tant que tous les champs obligatoires
-              ne seront pas remplis.
-            </p>
           </>
         ),
       },
@@ -631,38 +625,16 @@ export const sidebarStepContent = (
                 les informations urgentes concernant la convention par SMS.
               </strong>
             </p>
-            <hr />
-            <p>
-              Le bouton “Vérifier les informations et envoyer la demande”
-              restera désactivé (en gris) tant que tous les champs obligatoires
-              ne seront pas remplis.
-            </p>
           </>
         ),
       },
       {
         title: "Lieu et heures de l'immersion professionnelle",
-        description: (
-          <>
-            <p>
-              Le bouton “Vérifier les informations et envoyer la demande”
-              restera désactivé (en gris) tant que tous les champs obligatoires
-              ne seront pas remplis.
-            </p>
-          </>
-        ),
+        description: <></>,
       },
       {
         title: "Détails de l'immersion professionnelle",
-        description: (
-          <>
-            <p>
-              Le bouton “Vérifier les informations et envoyer la demande”
-              restera désactivé (en gris) tant que tous les champs obligatoires
-              ne seront pas remplis.
-            </p>
-          </>
-        ),
+        description: <></>,
       },
     ],
     "mini-stage-cci": [
@@ -709,12 +681,6 @@ export const sidebarStepContent = (
                 les informations urgentes concernant la convention par SMS.
               </strong>
             </p>
-            <hr />
-            <p>
-              Le bouton “Vérifier les informations et envoyer la demande”
-              restera désactivé (en gris) tant que tous les champs obligatoires
-              ne seront pas remplis.
-            </p>
           </>
         ),
       },
@@ -734,38 +700,16 @@ export const sidebarStepContent = (
                 les informations urgentes concernant la convention par SMS.
               </strong>
             </p>
-            <hr />
-            <p>
-              Le bouton “Vérifier les informations et envoyer la demande”
-              restera désactivé (en gris) tant que tous les champs obligatoires
-              ne seront pas remplis.
-            </p>
           </>
         ),
       },
       {
         title: "Lieu et heures de l'immersion professionnelle",
-        description: (
-          <>
-            <p>
-              Le bouton “Vérifier les informations et envoyer la demande”
-              restera désactivé (en gris) tant que tous les champs obligatoires
-              ne seront pas remplis.
-            </p>
-          </>
-        ),
+        description: <></>,
       },
       {
         title: "Détails de l'immersion professionnelle",
-        description: (
-          <>
-            <p>
-              Le bouton “Vérifier les informations et envoyer la demande”
-              restera désactivé (en gris) tant que tous les champs obligatoires
-              ne seront pas remplis.
-            </p>
-          </>
-        ),
+        description: <></>,
       },
     ],
   };
