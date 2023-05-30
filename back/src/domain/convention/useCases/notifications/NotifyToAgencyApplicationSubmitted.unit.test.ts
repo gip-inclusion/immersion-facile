@@ -9,16 +9,22 @@ import {
 } from "shared";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
+import {
+  ExpectSavedNotificationsAndEvents,
+  makeExpectSavedNotificationsAndEvents,
+} from "../../../../_testBuilders/makeExpectSavedNotificationsAndEvents";
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
 } from "../../../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
+import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { InMemoryNotificationGateway } from "../../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
+import { makeCreateNewEvent } from "../../../core/eventBus/EventBus";
 import { makeShortLinkUrl } from "../../../core/ShortLink";
+import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { NotifyToAgencyApplicationSubmitted } from "./NotifyToAgencyApplicationSubmitted";
 
 describe("NotifyToAgencyApplicationSubmitted", () => {
@@ -65,16 +71,15 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
     lastName: convention.signatories.beneficiary.lastName,
   });
 
-  let notificationGateway: InMemoryNotificationGateway;
   let notifyToAgencyApplicationSubmitted: NotifyToAgencyApplicationSubmitted;
   let shortLinkIdGeneratorGateway: DeterministShortLinkIdGeneratorGateway;
   let uow: InMemoryUnitOfWork;
   let config: AppConfig;
+  let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
   const timeGateway = new CustomTimeGateway();
 
   beforeEach(() => {
     config = new AppConfigBuilder().build();
-    notificationGateway = new InMemoryNotificationGateway();
     shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
     uow = createInMemoryUow();
     uow.agencyRepository.setAgencies([
@@ -83,14 +88,26 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
       agencyWithConsellorsAndValidator,
       agencyPeWithCouncellors,
     ]);
+    expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
+      uow.notificationRepository,
+      uow.outboxRepository,
+    );
 
     const uowPerformer = new InMemoryUowPerformer({
       ...uow,
     });
 
+    const uuidGenerator = new UuidV4Generator();
+    const createNewEvent = makeCreateNewEvent({ uuidGenerator, timeGateway });
+    const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
+      createNewEvent,
+      uuidGenerator,
+      timeGateway,
+    );
+
     notifyToAgencyApplicationSubmitted = new NotifyToAgencyApplicationSubmitted(
       uowPerformer,
-      notificationGateway,
+      saveNotificationAndRelatedEvent,
       fakeGenerateMagicLinkUrlFn,
       timeGateway,
       shortLinkIdGeneratorGateway,
@@ -144,32 +161,34 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
       }),
     });
 
-    expectToEqual(notificationGateway.getSentEmails(), [
-      {
-        type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
-        recipients: [councellorEmail],
-        params: {
-          internshipKind: validConvention.internshipKind,
-          ...expectedParams(agencyWithCounsellors, validConvention),
-          magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
-          conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[2]),
-          agencyLogoUrl: agencyWithCounsellors.logoUrl,
-          warning: undefined,
+    expectSavedNotificationsAndEvents({
+      emails: [
+        {
+          type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
+          recipients: [councellorEmail],
+          params: {
+            internshipKind: validConvention.internshipKind,
+            ...expectedParams(agencyWithCounsellors, validConvention),
+            magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
+            conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[2]),
+            agencyLogoUrl: agencyWithCounsellors.logoUrl,
+            warning: undefined,
+          },
         },
-      },
-      {
-        type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
-        recipients: [councellorEmail2],
-        params: {
-          internshipKind: validConvention.internshipKind,
-          ...expectedParams(agencyWithCounsellors, validConvention),
-          magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
-          conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[3]),
-          agencyLogoUrl: agencyWithCounsellors.logoUrl,
-          warning: undefined,
+        {
+          type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
+          recipients: [councellorEmail2],
+          params: {
+            internshipKind: validConvention.internshipKind,
+            ...expectedParams(agencyWithCounsellors, validConvention),
+            magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
+            conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[3]),
+            agencyLogoUrl: agencyWithCounsellors.logoUrl,
+            warning: undefined,
+          },
         },
-      },
-    ]);
+      ],
+    });
   });
 
   it("Sends notification email to agency validator when it is initially submitted, and agency has no counsellor", async () => {
@@ -198,19 +217,21 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
       }),
     });
 
-    expectToEqual(notificationGateway.getSentEmails(), [
-      {
-        type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
-        recipients: [validatorEmail],
-        params: {
-          internshipKind: validConvention.internshipKind,
-          ...expectedParams(agencyWithCounsellors, validConvention),
-          magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
-          conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[1]),
-          agencyLogoUrl: agencyWithCounsellors.logoUrl,
+    expectSavedNotificationsAndEvents({
+      emails: [
+        {
+          type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
+          recipients: [validatorEmail],
+          params: {
+            internshipKind: validConvention.internshipKind,
+            ...expectedParams(agencyWithCounsellors, validConvention),
+            magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
+            conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[1]),
+            agencyLogoUrl: agencyWithCounsellors.logoUrl,
+          },
         },
-      },
-    ]);
+      ],
+    });
   });
 
   it("Sends notification email only counsellors with agency that have validators and counsellors", async () => {
@@ -259,30 +280,38 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
       }),
     });
 
-    expectToEqual(notificationGateway.getSentEmails(), [
-      {
-        type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
-        recipients: [councellorEmail],
-        params: {
-          internshipKind: validConvention.internshipKind,
-          ...expectedParams(agencyWithConsellorsAndValidator, validConvention),
-          magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
-          conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[2]),
-          agencyLogoUrl: agencyWithConsellorsAndValidator.logoUrl,
+    expectSavedNotificationsAndEvents({
+      emails: [
+        {
+          type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
+          recipients: [councellorEmail],
+          params: {
+            internshipKind: validConvention.internshipKind,
+            ...expectedParams(
+              agencyWithConsellorsAndValidator,
+              validConvention,
+            ),
+            magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
+            conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[2]),
+            agencyLogoUrl: agencyWithConsellorsAndValidator.logoUrl,
+          },
         },
-      },
-      {
-        type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
-        recipients: [councellorEmail2],
-        params: {
-          internshipKind: validConvention.internshipKind,
-          ...expectedParams(agencyWithConsellorsAndValidator, validConvention),
-          magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
-          conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[3]),
-          agencyLogoUrl: agencyWithConsellorsAndValidator.logoUrl,
+        {
+          type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
+          recipients: [councellorEmail2],
+          params: {
+            internshipKind: validConvention.internshipKind,
+            ...expectedParams(
+              agencyWithConsellorsAndValidator,
+              validConvention,
+            ),
+            magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
+            conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[3]),
+            agencyLogoUrl: agencyWithConsellorsAndValidator.logoUrl,
+          },
         },
-      },
-    ]);
+      ],
+    });
   });
   it("Sends notification email to agency with warning when beneficiary is PeConnected and beneficiary has no PE advisor", async () => {
     const shortLinkIds = [
@@ -345,31 +374,39 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
       }),
     });
 
-    expectToEqual(notificationGateway.getSentEmails(), [
-      {
-        type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
-        recipients: [councellorEmail],
-        params: {
-          internshipKind: validConvention.internshipKind,
-          warning: `Merci de vérifier le conseiller référent associé à ce bénéficiaire.`,
-          ...expectedParams(agencyWithConsellorsAndValidator, validConvention),
-          magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
-          conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[2]),
-          agencyLogoUrl: agencyWithConsellorsAndValidator.logoUrl,
+    expectSavedNotificationsAndEvents({
+      emails: [
+        {
+          type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
+          recipients: [councellorEmail],
+          params: {
+            internshipKind: validConvention.internshipKind,
+            warning: `Merci de vérifier le conseiller référent associé à ce bénéficiaire.`,
+            ...expectedParams(
+              agencyWithConsellorsAndValidator,
+              validConvention,
+            ),
+            magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
+            conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[2]),
+            agencyLogoUrl: agencyWithConsellorsAndValidator.logoUrl,
+          },
         },
-      },
-      {
-        type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
-        recipients: [councellorEmail2],
-        params: {
-          internshipKind: validConvention.internshipKind,
-          ...expectedParams(agencyWithConsellorsAndValidator, validConvention),
-          magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
-          conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[3]),
-          agencyLogoUrl: agencyWithConsellorsAndValidator.logoUrl,
-          warning: `Merci de vérifier le conseiller référent associé à ce bénéficiaire.`,
+        {
+          type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
+          recipients: [councellorEmail2],
+          params: {
+            internshipKind: validConvention.internshipKind,
+            ...expectedParams(
+              agencyWithConsellorsAndValidator,
+              validConvention,
+            ),
+            magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
+            conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[3]),
+            agencyLogoUrl: agencyWithConsellorsAndValidator.logoUrl,
+            warning: `Merci de vérifier le conseiller référent associé à ce bénéficiaire.`,
+          },
         },
-      },
-    ]);
+      ],
+    });
   });
 });

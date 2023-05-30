@@ -16,7 +16,7 @@ import {
 } from "../../../core/ports/UnitOfWork";
 import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { NotificationGateway } from "../../../generic/notifications/ports/NotificationGateway";
+import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 
 export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
   ConventionDto,
@@ -26,7 +26,7 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly notificationGateway: NotificationGateway,
+    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
     private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     private readonly timeGateway: TimeGateway,
     private readonly shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
@@ -100,24 +100,32 @@ export class NotifyToAgencyApplicationSubmitted extends TransactionalUseCase<
           shortLinkIdGeneratorGateway: this.shortLinkIdGeneratorGateway,
         });
 
-        return this.notificationGateway.sendEmail({
-          type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
-          recipients: [email],
-          params: {
-            internshipKind: convention.internshipKind,
-            agencyName: agency.name,
-            businessName: convention.businessName,
-            dateEnd: convention.dateEnd,
-            dateStart: convention.dateStart,
+        return this.saveNotificationAndRelatedEvent(uow, {
+          kind: "email",
+          templatedContent: {
+            type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
+            recipients: [email],
+            params: {
+              internshipKind: convention.internshipKind,
+              agencyName: agency.name,
+              businessName: convention.businessName,
+              dateEnd: convention.dateEnd,
+              dateStart: convention.dateStart,
+              conventionId: convention.id,
+              firstName: convention.signatories.beneficiary.firstName,
+              lastName: convention.signatories.beneficiary.lastName,
+              magicLink: await makeMagicShortLink(frontRoutes.manageConvention),
+              conventionStatusLink: await makeMagicShortLink(
+                frontRoutes.conventionStatusDashboard,
+              ),
+              agencyLogoUrl: agency.logoUrl,
+              warning,
+            },
+          },
+          followedIds: {
             conventionId: convention.id,
-            firstName: convention.signatories.beneficiary.firstName,
-            lastName: convention.signatories.beneficiary.lastName,
-            magicLink: await makeMagicShortLink(frontRoutes.manageConvention),
-            conventionStatusLink: await makeMagicShortLink(
-              frontRoutes.conventionStatusDashboard,
-            ),
-            agencyLogoUrl: agency.logoUrl,
-            warning,
+            agencyId: convention.agencyId,
+            establishmentSiret: convention.siret,
           },
         });
       }),

@@ -199,7 +199,7 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   await eventCrawler.processNewEvents();
   await processEventsForEmailToBeSent(eventCrawler);
 
-  expect(inMemoryUow.notificationRepository.notifications).toHaveLength(2);
+  expect(inMemoryUow.notificationRepository.notifications).toHaveLength(3);
   const peNotification = gateways.poleEmploiGateway.notifications[0];
   expect(peNotification.id).toBe("00000000001");
   expectToEqual(peNotification.statut, "DEMANDE_A_SIGNER");
@@ -208,13 +208,13 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
   const sentEmails = gateways.notification.getSentEmails();
   expect(sentEmails).toHaveLength(numberOfEmailInitialySent - 1);
   expect(sentEmails.map((e) => e.recipients)).toEqual([
-    [VALID_EMAILS[2]],
     [VALID_EMAILS[0]],
+    [VALID_EMAILS[2]],
     [VALID_EMAILS[1]],
   ]);
 
   const beneficiaryShortLinkSignEmail = expectEmailOfType(
-    sentEmails[1],
+    sentEmails[0],
     "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
   );
   const establishmentShortLinkSignEmail = expectEmailOfType(

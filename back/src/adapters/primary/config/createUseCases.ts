@@ -354,7 +354,7 @@ export const createUseCases = (
       ),
       notifyToAgencyConventionSubmitted: new NotifyToAgencyApplicationSubmitted(
         uowPerformer,
-        gateways.notification,
+        saveNotificationAndRelatedEvent,
         generateConventionMagicLinkUrl,
         gateways.timeGateway,
         gateways.shortLinkGenerator,
