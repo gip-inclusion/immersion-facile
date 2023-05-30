@@ -8,6 +8,7 @@ import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEm
 import { RadioButtonOption } from "src/app/contents/forms/common/values";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 import { useFormContents } from "src/app/hooks/formContents.hooks";
+import { EmailValidationInput } from "../commons/EmailValidationInput";
 
 const preferredContactMethodOptions = (
   register: UseFormRegisterReturn<string>,
@@ -82,7 +83,7 @@ export const BusinessContact = () => {
           ...register("businessContact.phone"),
         }}
       />
-      <Input
+      <EmailValidationInput
         label={formContents["businessContact.email"].label}
         hintText={formContents["businessContact.email"].hintText}
         nativeInputProps={{
