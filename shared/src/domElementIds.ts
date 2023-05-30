@@ -205,6 +205,8 @@ export const domElementIds = {
         "im-convention-form__signatories-beneficiaryCurrentEmployer-lastName",
       businessSiret:
         "im-convention-form__signatories-beneficiaryCurrentEmployer-businessSiret",
+      businessAddress:
+        "im-convention-form__signatories-beneficiaryCurrentEmployer-businessAddress",
     },
     establishmentRepresentativeSection: {
       firstName:

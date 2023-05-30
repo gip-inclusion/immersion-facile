@@ -3,15 +3,17 @@ import { useFormContext } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { ConventionDto } from "shared";
+import { addressDtoToString, ConventionDto } from "shared";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import {
   makeFieldError,
   useFormContents,
 } from "src/app/hooks/formContents.hooks";
+import { AddressAutocomplete } from "../../../autocomplete/AddressAutocomplete";
 
 export const BeneficiaryCurrentEmployerFields = (): JSX.Element => {
-  const { getValues, register, formState } = useFormContext<ConventionDto>();
+  const { setValue, getValues, register, formState } =
+    useFormContext<ConventionDto>();
   const values = getValues();
   const { getFormFields } = useFormContents(
     formConventionFieldsLabels(values.internshipKind),
@@ -77,6 +79,20 @@ export const BeneficiaryCurrentEmployerFields = (): JSX.Element => {
         {...getFieldError(
           "signatories.beneficiaryCurrentEmployer.businessName",
         )}
+      />
+      <AddressAutocomplete
+        {...formFields[
+          "signatories.beneficiaryCurrentEmployer.businessAddress"
+        ]}
+        initialSearchTerm={
+          values.signatories.beneficiaryCurrentEmployer?.businessAddress
+        }
+        setFormValue={({ address }) =>
+          setValue(
+            "signatories.beneficiaryCurrentEmployer.businessAddress",
+            addressDtoToString(address),
+          )
+        }
       />
       <Input
         label={

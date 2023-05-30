@@ -516,6 +516,7 @@ describe("Convention slice", () => {
               job: "job",
               phone: "0011223344",
               role: "beneficiary-current-employer",
+              businessAddress: "20 rue des merguez ",
             })
             .build();
           const conventionRead = {

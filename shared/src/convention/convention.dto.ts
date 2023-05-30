@@ -199,6 +199,7 @@ export type BeneficiaryCurrentEmployer =
     job: string;
     businessSiret: string;
     businessName: string;
+    businessAddress: string;
   };
 
 export type EstablishmentRepresentative = GenericSignatory<

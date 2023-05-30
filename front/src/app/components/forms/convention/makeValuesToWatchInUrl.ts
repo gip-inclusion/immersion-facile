@@ -34,6 +34,7 @@ const commonKeysToWatch: ConventionFormKeysInUrl[] = [
   "brPhone",
   "bceSiret",
   "bceBusinessName",
+  "bceBusinessAddress",
   "bceFirstName",
   "bceLastName",
   "bceEmail",
@@ -80,6 +81,7 @@ const convertToConventionInUrl = (
     ...(beneficiaryCurrentEmployer && {
       bceSiret: beneficiaryCurrentEmployer.businessSiret,
       bceBusinessName: beneficiaryCurrentEmployer.businessName,
+      bceBusinessAddress: beneficiaryCurrentEmployer.businessAddress,
       bceFirstName: beneficiaryCurrentEmployer.firstName,
       bceLastName: beneficiaryCurrentEmployer.lastName,
       bceEmail: beneficiaryCurrentEmployer.email,
