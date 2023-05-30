@@ -11,10 +11,9 @@ import {
   SignatoryRole,
   signatoryRoles,
 } from "shared";
-import { Loader, MainWrapper } from "react-design-system";
-import { ConventionFormContainerLayout } from "src/app/components/forms/convention/ConventionFormContainerLayout";
+import { Loader, MainWrapper, PageHeader } from "react-design-system";
+import { ConventionSignForm } from "src/app/components/forms/convention/ConventionSignForm";
 import { conventionSlice } from "../../../core-logic/domain/convention/convention.slice";
-import { ConventionSignForm } from "../../components/forms/convention/ConventionSignForm";
 import { HeaderFooterLayout } from "../../components/layout/HeaderFooterLayout";
 import { commonContent } from "../../contents/commonContent";
 import { useConventionTexts } from "../../contents/forms/convention/textSetup";
@@ -127,7 +126,12 @@ const ConventionSignPageContent = ({
   const t = useConventionTexts(convention.internshipKind);
 
   return (
-    <ConventionFormContainerLayout internshipKind={convention.internshipKind}>
+    <MainWrapper
+      layout={"default"}
+      pageHeader={
+        <PageHeader title={t.intro.conventionSignTitle} theme="candidate" />
+      }
+    >
       <>
         {convention.status === "REJECTED" && (
           <Alert
@@ -165,16 +169,14 @@ const ConventionSignPageContent = ({
           />
         )}
         {convention.status !== "DRAFT" && convention.status !== "REJECTED" && (
-          <>
-            <ConventionSignForm
-              jwt={jwt}
-              submitFeedback={submitFeedback}
-              convention={convention}
-            />
-          </>
+          <ConventionSignForm
+            convention={convention}
+            jwt={jwt}
+            submitFeedback={submitFeedback}
+          />
         )}
       </>
-    </ConventionFormContainerLayout>
+    </MainWrapper>
   );
 };
 

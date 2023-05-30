@@ -13,6 +13,7 @@ import { faker } from "@faker-js/faker/locale/fr";
 
 const conventionFormUrl = `${frontRoutes.conventionImmersionRoute}`;
 const baseApiRoute = "/api/";
+let currentStep = 1;
 
 export function basicFormConvention() {
   cy.intercept("GET", `${baseApiRoute}${featureFlagsRoute}`).as(
@@ -47,6 +48,8 @@ export function basicFormConvention() {
   fillSelectRandomly({
     element: `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId}`,
   });
+
+  openNextSection(); // Open Beneficiary section
   cy.get(
     `#${domElementIds.conventionImmersionRoute.beneficiarySection.firstName}`,
   )
@@ -68,6 +71,8 @@ export function basicFormConvention() {
   )
     .clear()
     .type(faker.date.past(20, "2000-01-01").toISOString().split("T")[0]);
+
+  openNextSection(); // Open Establishment section
   cy.get(`#${domElementIds.conventionImmersionRoute.conventionSection.siret}`)
     .clear()
     .type(getRandomSiret());
@@ -96,6 +101,8 @@ export function basicFormConvention() {
   )
     .clear()
     .type(faker.internet.email());
+
+  openNextSection(); // Open place / hour section
   cy.get(
     `#${domElementIds.conventionImmersionRoute.conventionSection.dateStart}`,
   )
@@ -118,6 +125,8 @@ export function basicFormConvention() {
       options.eq(0).trigger("click");
     });
   });
+
+  openNextSection(); // Open immersion details section
   cy.get(
     `#${domElementIds.conventionImmersionRoute.conventionSection.individualProtection} input:first-of-type`,
   ).check({
@@ -153,10 +162,14 @@ export function basicFormConvention() {
   cy.get(`#${domElementIds.conventionImmersionRoute.submitFormButton}`)
     .click()
     .then(() => {
-      cy.get(".fr-alert--error").should("not.exist");
+      cy.get(".im-convention-summary").should("exist");
+      cy.get(
+        `#${domElementIds.conventionImmersionRoute.confirmSubmitFormButton}`,
+      ).click();
       cy.wait("@conventionAddRequest")
         .its("response.statusCode")
         .should("eq", 200);
+      cy.get(".im-submit-confirmation-section").should("exist");
     });
 }
 
@@ -165,9 +178,11 @@ const getTomorrowDate = () =>
   format(addBusinessDays(new Date(), 1), "yyyy-MM-dd");
 
 const getRandomSiret = () =>
-  [
-    "722 003 936 02320",
-    "39334140999998",
-    "44229377500031",
-    "130 005 481 00010",
-  ][Math.floor(Math.random() * 4)];
+  ["722 003 936 02320", "44229377500031", "130 005 481 00010"][
+    Math.floor(Math.random() * 3)
+  ];
+
+const openNextSection = () => {
+  cy.get(`#im-convention-form__step-${currentStep} .fr-accordion__btn`).click();
+  currentStep++;
+};

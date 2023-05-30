@@ -25,6 +25,17 @@ const fetchError = createSelector(
 const isLoading = createSelector(conventionState, ({ isLoading }) => isLoading);
 
 const isMinor = createSelector(conventionState, ({ formUi }) => formUi.isMinor);
+
+const showSummary = createSelector(
+  conventionState,
+  ({ formUi }) => formUi.showSummary,
+);
+
+const agencyDepartment = createSelector(
+  conventionState,
+  ({ formUi }) => formUi.agencyDepartment,
+);
+
 const hasCurrentEmployer = createSelector(
   conventionState,
   ({ formUi }) => formUi.hasCurrentEmployer,
@@ -58,6 +69,11 @@ const preselectedAgencyId = createSelector(
   ({ formUi }) => formUi.preselectedAgencyId,
 );
 
+const currentStep = createSelector(
+  conventionState,
+  ({ formUi }) => formUi.currentStep,
+);
+
 export const conventionSelectors = {
   convention,
   fetchError,
@@ -69,6 +85,9 @@ export const conventionSelectors = {
   hasCurrentEmployer,
   conventionStatusDashboardUrl,
   preselectedAgencyId,
+  currentStep,
+  showSummary,
+  agencyDepartment,
 };
 
 export const signatoryDataFromConvention = (

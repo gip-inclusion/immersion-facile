@@ -1,16 +1,15 @@
 import React, { useState } from "react";
 import { createPortal } from "react-dom";
 import { useFormContext } from "react-hook-form";
+import { fr } from "@codegouvfr/react-dsfr";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
-import { IconButton, Tooltip } from "@mui/material";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 import { ConventionReadDto } from "shared";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
+import { useCopyButton } from "src/app/hooks/useCopyButton";
 import { ShareForm } from "./ShareForm";
-
-const iconColor = "#3458a2";
 
 const { ShareLinkModal, openShareLinkModal, closeShareLinkModal } = createModal(
   {
@@ -19,8 +18,9 @@ const { ShareLinkModal, openShareLinkModal, closeShareLinkModal } = createModal(
   },
 );
 
-export const ShareLinkByEmail = () => {
+export const ShareConventionLink = () => {
   const { getValues } = useFormContext<ConventionReadDto>();
+  const { onCopyButtonClick, isCopied, copyButtonIsDisabled } = useCopyButton();
   const t = useConventionTexts(getValues().internshipKind);
   const [emailSent, setEmailSent] = useState<boolean | null>(null);
   const shareLinkByEmail = t.shareLinkByMail.share;
@@ -34,16 +34,17 @@ export const ShareLinkByEmail = () => {
   const [_isModalOpened, setIsModalOpened] = useState(false);
   return (
     <>
-      <Tooltip title={shareLinkByEmail}>
-        <IconButton
-          onClick={() => {
-            openShareLinkModal();
-            setIsModalOpened(true);
-          }}
-        >
-          <EmailOutlinedIcon sx={{ color: iconColor }} />
-        </IconButton>
-      </Tooltip>
+      <Button
+        type="button"
+        iconId="fr-icon-mail-line"
+        onClick={() => {
+          openShareLinkModal();
+          setIsModalOpened(true);
+        }}
+        priority="secondary"
+      >
+        Partager la convention
+      </Button>
       {createPortal(
         <ShareLinkModal title={shareLinkByEmail}>
           <ShareForm
@@ -59,6 +60,18 @@ export const ShareLinkByEmail = () => {
             }}
             conventionFormData={getConventionFormData()}
           />
+          <p className={fr.cx("fr-hr-or", "fr-mt-3w")}>ou</p>
+          <div className={fr.cx("fr-btns-group", "fr-btns-group--center")}>
+            <Button
+              type="button"
+              disabled={copyButtonIsDisabled}
+              onClick={() => {
+                onCopyButtonClick(window.location.href);
+              }}
+            >
+              {isCopied ? t.linkCopied : t.copyLinkTooltip}
+            </Button>
+          </div>
         </ShareLinkModal>,
         document.body,
       )}

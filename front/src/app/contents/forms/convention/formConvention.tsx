@@ -1,3 +1,5 @@
+import React from "react";
+import { keys, mergeRight } from "ramda";
 import { domElementIds, InternshipKind } from "shared";
 import { ConventionField } from "../../admin/types";
 import { FormFieldAttributesForContent } from "../types";
@@ -10,7 +12,7 @@ export type FormFieldsObjectForContent<T> = Record<
 // Remove and replace by ConventionField when postalCode is removed from ConventionDTO
 type ConventionFieldWithoutPostalCode = Exclude<ConventionField, "postalCode">;
 
-type FormFieldKeys =
+export type FormFieldKeys =
   | ConventionFieldWithoutPostalCode
   | "isCurrentEmployer"
   | "isEstablishmentTutorIsEstablishmentRepresentative"
@@ -85,8 +87,8 @@ const conventionSection = (internshipKind: InternshipKind) => ({
   siret: {
     label:
       internshipKind === "immersion"
-        ? "Indiquez le SIRET de la structure d'accueil"
-        : "Indiquez le SIRET de l’entreprise où vous allez faire votre stage",
+        ? "SIRET de la structure d'accueil"
+        : "SIRET de l’entreprise où vous allez faire votre stage",
     hintText:
       internshipKind === "immersion"
         ? "la structure d'accueil, c'est l'entreprise, le commerce, l'association ... où vous allez faire votre immersion"
@@ -98,8 +100,8 @@ const conventionSection = (internshipKind: InternshipKind) => ({
   businessName: {
     label:
       internshipKind === "immersion"
-        ? "Indiquez le nom (raison sociale) de l'établissement d'accueil"
-        : "Indiquez le nom (raison sociale) de votre entreprise",
+        ? "Nom (raison sociale) de l'établissement d'accueil"
+        : "Nom (raison sociale) de votre entreprise",
     id: conventionSectionIds.businessName,
     required: true,
   },
@@ -131,8 +133,7 @@ const conventionSection = (internshipKind: InternshipKind) => ({
   },
   sanitaryPreventionDescription: {
     label: "Si oui, précisez-les",
-    hintText:
-      "Précisez les mesures de prévention sanitaire prévues pour l’immersion",
+    hintText: "Mesures de prévention sanitaire prévues pour l’immersion",
     id: conventionSectionIds.sanitaryPreventionDescription,
     placeholder: "Ex : fourniture de gel, de masques (optionnel)",
   },
@@ -211,22 +212,22 @@ const conventionSection = (internshipKind: InternshipKind) => ({
 
 const beneficiarySection = (internshipKind: InternshipKind) => ({
   "signatories.beneficiary.firstName": {
-    label: "Prénom",
+    label: "Prénom du candidat",
     id: beneficiarySectionIds.firstName,
     required: true,
   },
   "signatories.beneficiary.lastName": {
-    label: "Nom de famille",
+    label: "Nom de famille du candidat",
     id: beneficiarySectionIds.lastName,
     required: true,
   },
   "signatories.beneficiary.birthdate": {
-    label: "Date de naissance",
+    label: "Date de naissance du candidat",
     id: beneficiarySectionIds.birthdate,
     required: true,
   },
   "signatories.beneficiary.email": {
-    label: "E-mail",
+    label: "E-mail du candidat",
     id: beneficiarySectionIds.email,
     required: true,
     placeholder: "nom@exemple.com",
@@ -234,7 +235,7 @@ const beneficiarySection = (internshipKind: InternshipKind) => ({
       "cela nous permet de vous transmettre la validation de la convention",
   },
   "signatories.beneficiary.phone": {
-    label: "Téléphone",
+    label: "Téléphone du candidat",
     hintText:
       internshipKind === "immersion"
         ? "pour qu’on puisse vous contacter à propos de l’immersion"
@@ -244,7 +245,7 @@ const beneficiarySection = (internshipKind: InternshipKind) => ({
     required: true,
   },
   "signatories.beneficiary.levelOfEducation": {
-    label: "Classe actuelle fréquentée",
+    label: "Classe actuelle fréquentée par le candidat",
     id: beneficiarySectionIds.levelOfEducation,
     placeholder: "Précisez votre statut",
     required: true,
@@ -287,19 +288,19 @@ const beneficiarySection = (internshipKind: InternshipKind) => ({
 
 const establishmentTutorSection = (internshipKind: InternshipKind) => ({
   "establishmentTutor.firstName": {
-    label: "Indiquez le prénom du tuteur",
+    label: "Prénom du tuteur",
     hintText: "Ex : Alain",
     id: establishmentTutorSectionIds.firstName,
     required: true,
   },
   "establishmentTutor.lastName": {
-    label: "Indiquez le nom du tuteur",
+    label: "Nom du tuteur",
     hintText: "Ex : Prost",
     id: establishmentTutorSectionIds.lastName,
     required: true,
   },
   "establishmentTutor.email": {
-    label: "Indiquez l'e-mail du tuteur",
+    label: "Email du tuteur",
     hintText: "pour envoyer la validation de la convention",
     placeholder: "nom@exemple.com",
     id: establishmentTutorSectionIds.email,
@@ -308,8 +309,8 @@ const establishmentTutorSection = (internshipKind: InternshipKind) => ({
   "establishmentTutor.phone": {
     label:
       internshipKind === "immersion"
-        ? "Indiquez le numéro de téléphone du tuteur ou de la structure d'accueil"
-        : "Indiquez le numéro de téléphone du tuteur ou de l’entreprise",
+        ? "Numéro de téléphone du tuteur ou de la structure d'accueil"
+        : "Numéro de téléphone du tuteur ou de l’entreprise",
     hintText:
       internshipKind === "immersion"
         ? "pour qu’on puisse le/la contacter à propos de l’immersion"
@@ -319,7 +320,7 @@ const establishmentTutorSection = (internshipKind: InternshipKind) => ({
     required: true,
   },
   "establishmentTutor.job": {
-    label: "Indiquez la fonction du tuteur",
+    label: "Fonction du tuteur",
     hintText: "Ex : Pilote automobile",
     id: establishmentTutorSectionIds.job,
     required: true,
@@ -345,7 +346,7 @@ const beneficiaryRepresentativeSection = (internshipKind: InternshipKind) => ({
     required: true,
   },
   "signatories.beneficiaryRepresentative.phone": {
-    label: "Téléphone",
+    label: "Téléphone du représentant légal",
     id: beneficiaryRepresentativeSectionIds.phone,
     hintText:
       internshipKind === "immersion"
@@ -357,36 +358,37 @@ const beneficiaryRepresentativeSection = (internshipKind: InternshipKind) => ({
 
 const beneficiaryCurrentEmployerSection = {
   "signatories.beneficiaryCurrentEmployer.businessName": {
-    label: "Raison sociale de l'entreprise",
+    label: "Raison sociale de l'entreprise actuelle du candidat",
     id: beneficiaryCurrentEmployerSectionIds.businessName,
     required: true,
   },
   "signatories.beneficiaryCurrentEmployer.job": {
-    label: "Fonction",
+    label: "Fonction du signataire dans l'entreprise actuelle du candidat",
     id: beneficiaryCurrentEmployerSectionIds.job,
   },
   "signatories.beneficiaryCurrentEmployer.email": {
-    label: "E-mail",
+    label: "E-mail de l'entreprise actuelle du candidat",
     id: beneficiaryCurrentEmployerSectionIds.email,
     required: true,
   },
   "signatories.beneficiaryCurrentEmployer.phone": {
-    label: "Téléphone",
+    label: "Téléphone de l'entreprise actuelle du candidat",
     id: beneficiaryCurrentEmployerSectionIds.phone,
     required: true,
   },
   "signatories.beneficiaryCurrentEmployer.firstName": {
-    label: "Prénom",
+    label: "Prénom du signataire dans l'entreprise actuelle du candidat",
     id: beneficiaryCurrentEmployerSectionIds.firstName,
     required: true,
   },
   "signatories.beneficiaryCurrentEmployer.lastName": {
-    label: "Nom de famille",
+    label:
+      "Nom de famille du signataire dans l'entreprise actuelle du candidat",
     id: beneficiaryCurrentEmployerSectionIds.lastName,
     required: true,
   },
   "signatories.beneficiaryCurrentEmployer.businessSiret": {
-    label: "Siret",
+    label: "Siret de l'entreprise actuelle du candidat",
     id: beneficiaryCurrentEmployerSectionIds.businessSiret,
     required: true,
   },
@@ -545,3 +547,241 @@ const fieldsToExclude = {
     id: "",
   },
 };
+
+type SidebarStepContent = {
+  title: string;
+  description: React.ReactNode;
+};
+
+export const sidebarStepContent = (
+  internshipKind: InternshipKind,
+): SidebarStepContent[] => {
+  const contents = {
+    immersion: [
+      {
+        title: "Informations sur la structure d'accompagnement du candidat",
+        description: (
+          <>
+            <p>
+              Vérifiez que votre structure d’accompagnement est disponible dans
+              la liste ci-dessous.{" "}
+              <strong>
+                Si ce n’est pas le cas, contactez votre conseiller.
+              </strong>
+            </p>
+            <p>
+              <strong>
+                Si vous n'avez pas de structure d'accompagnement, retrouvez{" "}
+                <a
+                  href="https://aide.immersion-facile.beta.gouv.fr/fr/article/je-nai-pas-de-structure-daccompagnement-et-je-veux-faire-une-immersion-1x15rdp"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  nos conseils ici
+                </a>
+                .
+              </strong>
+            </p>
+          </>
+        ),
+      },
+      {
+        title: "Informations sur le candidat",
+        description: (
+          <>
+            <p>
+              Les informations de contact (email, téléphone) seront uniquement
+              utilisées pour valider la convention avec l’entreprise et
+              l’organisme d’accompagnement.
+            </p>
+            <p>
+              <strong>
+                Renseignez de préférence{" "}
+                <strong>un numéro de téléphone portable</strong> pour recevoir
+                les informations urgentes concernant la convention par SMS.
+              </strong>
+            </p>
+            <hr />
+            <p>
+              Le bouton “Vérifier les informations et envoyer la demande”
+              restera désactivé (en gris) tant que tous les champs obligatoires
+              ne seront pas remplis.
+            </p>
+          </>
+        ),
+      },
+      {
+        title: "Informations sur l'entreprise",
+        description: (
+          <>
+            <p>
+              Les informations de contact (email, téléphone) seront uniquement
+              utilisées pour valider la convention avec l’entreprise et
+              l’organisme d’accompagnement.
+            </p>
+            <p>
+              <strong>
+                Renseignez de préférence{" "}
+                <strong>un numéro de téléphone portable</strong> pour recevoir
+                les informations urgentes concernant la convention par SMS.
+              </strong>
+            </p>
+            <hr />
+            <p>
+              Le bouton “Vérifier les informations et envoyer la demande”
+              restera désactivé (en gris) tant que tous les champs obligatoires
+              ne seront pas remplis.
+            </p>
+          </>
+        ),
+      },
+      {
+        title: "Lieu et heures de l'immersion professionnelle",
+        description: (
+          <>
+            <p>
+              Le bouton “Vérifier les informations et envoyer la demande”
+              restera désactivé (en gris) tant que tous les champs obligatoires
+              ne seront pas remplis.
+            </p>
+          </>
+        ),
+      },
+      {
+        title: "Détails de l'immersion professionnelle",
+        description: (
+          <>
+            <p>
+              Le bouton “Vérifier les informations et envoyer la demande”
+              restera désactivé (en gris) tant que tous les champs obligatoires
+              ne seront pas remplis.
+            </p>
+          </>
+        ),
+      },
+    ],
+    "mini-stage-cci": [
+      {
+        title: "Informations sur la structure d'accompagnement du candidat",
+        description: (
+          <>
+            <p>
+              Vérifiez que votre structure d’accompagnement est disponible dans
+              la liste ci-dessous.{" "}
+              <strong>
+                Si ce n’est pas le cas, contactez votre conseiller.
+              </strong>
+            </p>
+            <p>
+              <strong>
+                Si vous n'avez pas de structure d'accompagnement, retrouvez{" "}
+                <a
+                  href="https://aide.immersion-facile.beta.gouv.fr/fr/article/je-nai-pas-de-structure-daccompagnement-et-je-veux-faire-une-immersion-1x15rdp"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  nos conseils ici
+                </a>
+                .
+              </strong>
+            </p>
+          </>
+        ),
+      },
+      {
+        title: "Informations sur le candidat",
+        description: (
+          <>
+            <p>
+              Les informations de contact (email, téléphone) seront uniquement
+              utilisées pour valider la convention avec l’entreprise et
+              l’organisme d’accompagnement.
+            </p>
+            <p>
+              <strong>
+                Renseignez de préférence{" "}
+                <strong>un numéro de téléphone portable</strong> pour recevoir
+                les informations urgentes concernant la convention par SMS.
+              </strong>
+            </p>
+            <hr />
+            <p>
+              Le bouton “Vérifier les informations et envoyer la demande”
+              restera désactivé (en gris) tant que tous les champs obligatoires
+              ne seront pas remplis.
+            </p>
+          </>
+        ),
+      },
+      {
+        title: "Informations sur l'entreprise",
+        description: (
+          <>
+            <p>
+              Les informations de contact (email, téléphone) seront uniquement
+              utilisées pour valider la convention avec l’entreprise et
+              l’organisme d’accompagnement.
+            </p>
+            <p>
+              <strong>
+                Renseignez de préférence{" "}
+                <strong>un numéro de téléphone portable</strong> pour recevoir
+                les informations urgentes concernant la convention par SMS.
+              </strong>
+            </p>
+            <hr />
+            <p>
+              Le bouton “Vérifier les informations et envoyer la demande”
+              restera désactivé (en gris) tant que tous les champs obligatoires
+              ne seront pas remplis.
+            </p>
+          </>
+        ),
+      },
+      {
+        title: "Lieu et heures de l'immersion professionnelle",
+        description: (
+          <>
+            <p>
+              Le bouton “Vérifier les informations et envoyer la demande”
+              restera désactivé (en gris) tant que tous les champs obligatoires
+              ne seront pas remplis.
+            </p>
+          </>
+        ),
+      },
+      {
+        title: "Détails de l'immersion professionnelle",
+        description: (
+          <>
+            <p>
+              Le bouton “Vérifier les informations et envoyer la demande”
+              restera désactivé (en gris) tant que tous les champs obligatoires
+              ne seront pas remplis.
+            </p>
+          </>
+        ),
+      },
+    ],
+  };
+  return contents[internshipKind];
+};
+
+export const formUiSections: Partial<FormFieldKeys>[][] = [
+  ["agencyId"],
+  keys(beneficiarySection("immersion")),
+  keys(
+    mergeRight(
+      establishmentRepresentativeSection("immersion"),
+      establishmentTutorSection("immersion"),
+    ),
+  ),
+  ["dateStart", "dateEnd", "schedule", "immersionAddress"],
+  [
+    "individualProtection",
+    "sanitaryPrevention",
+    "immersionObjective",
+    "immersionAppellation",
+    "immersionActivities",
+  ],
+];

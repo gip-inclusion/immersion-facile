@@ -1,0 +1,43 @@
+@import "../../../config/responsive";
+
+.im-convention-form-sidebar {
+  background: var(--background-alt-blue-france);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.7rem 1rem 0 !important;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  @include for-screen-min($bp-lg) {
+    box-shadow: none;
+    position: static;
+    padding: 0;
+  }
+  &__stepper {
+    display: none;
+    @include for-screen-min($bp-lg) {
+      display: block;
+    }
+  }
+  &__description {
+    display: none;
+    @include for-screen-min($bp-lg) {
+      display: block;
+    }
+  }
+  &__separator {
+    display: none;
+    @include for-screen-min($bp-lg) {
+      display: block;
+    }
+  }
+  &__footer {
+    display: flex;
+    justify-content: center;
+    .fr-btn:last-of-type {
+      @include for-screen-min($bp-lg) {
+        display: none;
+      }
+    }
+  }
+}

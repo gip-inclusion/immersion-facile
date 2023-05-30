@@ -2,10 +2,10 @@ import React from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { mergeDeepRight } from "ramda";
 import { ConventionDto, ConventionReadDto } from "shared";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
-import { ConventionFormFields } from "src/app/components/forms/convention/ConventionFormFields";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import {
@@ -16,6 +16,8 @@ import {
   conventionSlice,
   ConventionSubmitFeedback,
 } from "src/core-logic/domain/convention/convention.slice";
+import { ConventionSummary } from "./ConventionSummary";
+import { SignatureActions } from "./SignatureActions";
 
 type ConventionSignFormProperties = {
   jwt: string;
@@ -32,6 +34,8 @@ export const ConventionSignForm = ({
   const { signatory: currentSignatory } = useAppSelector(
     conventionSelectors.signatoryData,
   );
+  const alreadySigned = !!currentSignatory?.signedAt;
+
   const methods = useForm<ConventionReadDto>({
     defaultValues: convention,
     mode: "onTouched",
@@ -90,37 +94,42 @@ export const ConventionSignForm = ({
     );
   };
   return (
-    <div className={fr.cx("fr-grid-row", "fr-grid-row--center")}>
-      <div className={fr.cx("fr-col-12", "fr-col-lg-7")}>
-        <div className={fr.cx("fr-text--regular")}>
-          <p
-            className={fr.cx("fr-text--md")}
-            dangerouslySetInnerHTML={{ __html: t.sign.summary }}
-          />
+    <FormProvider {...methods}>
+      <Alert
+        severity="info"
+        title={"La convention est prête à être signée !"}
+        description={t.sign.summary}
+      />
+      <p className={fr.cx("fr-text--xs", "fr-mt-1w")}>{t.sign.regulations}</p>
+      <form>
+        {currentSignatory && <ConventionSummary />}
 
-          <p className={fr.cx("fr-text--xs", "fr-mt-1w")}>
-            {t.sign.regulations}
-          </p>
-        </div>
-        <FormProvider {...methods}>
-          <form>
-            {currentSignatory && (
-              <ConventionFormFields
-                isFrozen={true}
-                onSubmit={onSignFormSubmit}
-                isSignOnly={true}
+        <ConventionFeedbackNotification
+          submitFeedback={submitFeedback}
+          signatories={methods.getValues().signatories}
+        />
+        {currentSignatory && (
+          <>
+            {alreadySigned ? (
+              <p>{t.conventionAlreadySigned}</p>
+            ) : (
+              <SignatureActions
+                internshipKind={convention.internshipKind}
+                alreadySigned={false}
                 signatory={currentSignatory}
-                onModificationsRequired={askFormModificationWithMessageForm}
+                onSubmitClick={methods.handleSubmit(
+                  onSignFormSubmit,
+                  (errors) => {
+                    // eslint-disable-next-line no-console
+                    console.error(methods.getValues(), errors);
+                  },
+                )}
+                onModificationRequired={askFormModificationWithMessageForm}
               />
             )}
-
-            <ConventionFeedbackNotification
-              submitFeedback={submitFeedback}
-              signatories={methods.getValues().signatories}
-            />
-          </form>
-        </FormProvider>
-      </div>
-    </div>
+          </>
+        )}
+      </form>
+    </FormProvider>
   );
 };

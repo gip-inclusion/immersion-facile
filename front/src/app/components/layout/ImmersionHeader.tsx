@@ -24,8 +24,8 @@ export const ImmersionHeader = () => {
   const { classes } = makeStyles({ name: ImmersionHeader.displayName })(() => ({
     operator: {
       boxSizing: "content-box",
-      width: "10.5rem",
-      maxWidth: "none !important",
+      width: "100%",
+      maxWidth: "10.5rem !important",
     },
   }))();
   const immersionFacileLogo = darkModeState.isDark

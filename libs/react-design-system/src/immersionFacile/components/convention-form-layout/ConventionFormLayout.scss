@@ -1,0 +1,18 @@
+@import "../../../config/responsive";
+
+.im-convention-form-layout {
+  &__sidebar-wrapper {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    z-index: 100;
+  }
+  &__form-wrapper {
+    #im-convention-immersion__submit-form-button {
+      display: none;
+      @include for-screen-min($bp-lg) {
+        display: inline-flex;
+      }
+    }
+  }
+}

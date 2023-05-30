@@ -9,8 +9,12 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
   intro: {
     conventionTitle:
       internshipKind === "immersion"
-        ? "Formulaire pour conventionner une période de mise en situation professionnelle (PMSMP)"
+        ? "Remplir la demande de convention"
         : "S’informer sur les métiers, découvrir l’entreprise",
+    conventionSignTitle:
+      internshipKind === "immersion"
+        ? "Signer la convention d'immersion"
+        : "Signer la convention de stage",
     welcome:
       internshipKind === "immersion" ? (
         <>
@@ -93,21 +97,21 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
   agencySection: {
     title:
       internshipKind === "immersion"
-        ? "Pour commencer nous avons besoin de"
-        : "Pour commencer",
+        ? "1. Informations sur la structure d'accompagnement du candidat"
+        : "1. Pour commencer",
   },
   beneficiarySection: {
     title:
       internshipKind === "immersion"
-        ? "1. Informations du candidat"
-        : "1. Vos coordonnées",
+        ? "2. Informations sur le candidat"
+        : "2. Vos coordonnées",
     isMinorLabel:
       internshipKind === "immersion"
         ? "La personne qui va faire l'immersion est-elle mineure ?"
         : "Etes vous mineur ou majeur protégé ?",
   },
   establishmentSection: {
-    title: "2. Coordonnées de l'entreprise",
+    title: "3. Coordonnées de l'entreprise",
     subtitle:
       internshipKind === "immersion"
         ? "Les questions suivantes doivent être complétées avec la personne qui vous accueillera pendant votre immersion"
@@ -115,11 +119,17 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
     isEstablishmentTutorIsEstablishmentRepresentative:
       "Est-ce que le tuteur de l'entreprise est le représentant de l'entreprise, signataire de la convention ?",
   },
-  immersionConditionsSection: {
+  immersionHourLocationSection: {
     title:
       internshipKind === "immersion"
-        ? "3. Conditions d’accueil de l’immersion professionnelle"
-        : "3. Conditions d’accueil du stage",
+        ? "4. Lieu et horaires de l'immersion"
+        : "4. Lieu et horaires du stage",
+  },
+  immersionDetailsSection: {
+    title:
+      internshipKind === "immersion"
+        ? "5. Détails de l’immersion professionnelle"
+        : "5. Détails du stage",
   },
   yes: "Oui",
   no: "Non",
@@ -165,7 +175,7 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
       internshipKind === "immersion"
         ? "Formulaire pour conventionner une période de mise en situation professionnelle (PMSMP)"
         : "Formulaire pour conventionner un mini stage",
-    summary: `Voici la demande de convention qui vient d'être complétée. <br />
+    summary: `Voici la demande de convention qui vient d'être complétée.
     Relisez la bien et si cela vous convient, signez la avec le bouton "je
     signe cette demande"`,
     regulations:

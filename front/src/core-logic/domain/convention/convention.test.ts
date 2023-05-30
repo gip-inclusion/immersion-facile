@@ -64,6 +64,9 @@ describe("Convention slice", () => {
             isMinor: false,
             isTutorEstablishmentRepresentative: true,
             hasCurrentEmployer: false,
+            currentStep: 1,
+            agencyDepartment: null,
+            showSummary: false,
           },
           jwt: "some-correct-jwt",
           convention: null,
@@ -243,6 +246,9 @@ describe("Convention slice", () => {
             isMinor: false,
             isTutorEstablishmentRepresentative: true,
             hasCurrentEmployer: false,
+            currentStep: 1,
+            agencyDepartment: null,
+            showSummary: false,
           },
           feedback: { kind: "justSubmitted" },
           isLoading: false,
@@ -327,6 +333,9 @@ describe("Convention slice", () => {
               isMinor: false,
               isTutorEstablishmentRepresentative: false,
               hasCurrentEmployer: false,
+              currentStep: 1,
+              agencyDepartment: null,
+              showSummary: false,
             },
           });
         });
@@ -373,6 +382,9 @@ describe("Convention slice", () => {
               isMinor: false,
               isTutorEstablishmentRepresentative: true,
               hasCurrentEmployer: false,
+              currentStep: 1,
+              agencyDepartment: null,
+              showSummary: false,
             },
           });
         });
@@ -413,6 +425,9 @@ describe("Convention slice", () => {
               isMinor: true,
               isTutorEstablishmentRepresentative: false,
               hasCurrentEmployer: false,
+              currentStep: 1,
+              agencyDepartment: null,
+              showSummary: false,
             },
           });
         });
@@ -446,6 +461,9 @@ describe("Convention slice", () => {
               isMinor: false,
               isTutorEstablishmentRepresentative: false,
               hasCurrentEmployer: false,
+              currentStep: 1,
+              agencyDepartment: null,
+              showSummary: false,
             },
           });
         });
@@ -480,6 +498,9 @@ describe("Convention slice", () => {
               isMinor: false,
               isTutorEstablishmentRepresentative: false,
               hasCurrentEmployer: false,
+              currentStep: 1,
+              agencyDepartment: null,
+              showSummary: false,
             },
           });
         });
@@ -522,6 +543,9 @@ describe("Convention slice", () => {
               isMinor: false,
               isTutorEstablishmentRepresentative: false,
               hasCurrentEmployer: true,
+              currentStep: 1,
+              agencyDepartment: null,
+              showSummary: false,
             },
           });
         });
@@ -551,6 +575,9 @@ describe("Convention slice", () => {
             isMinor: false,
             isTutorEstablishmentRepresentative: true,
             hasCurrentEmployer: false,
+            currentStep: 1,
+            agencyDepartment: null,
+            showSummary: false,
           },
           jwt: null,
           fetchError: null,
@@ -591,6 +618,9 @@ describe("Convention slice", () => {
             isMinor: false,
             isTutorEstablishmentRepresentative: true,
             hasCurrentEmployer: false,
+            currentStep: 1,
+            agencyDepartment: null,
+            showSummary: false,
           },
           jwt: null,
           fetchError: null,
@@ -751,6 +781,9 @@ describe("Convention slice", () => {
           isMinor: false,
           isTutorEstablishmentRepresentative: true,
           hasCurrentEmployer: false,
+          currentStep: 1,
+          agencyDepartment: null,
+          showSummary: false,
         },
         jwt: null,
         convention: null,
@@ -763,6 +796,114 @@ describe("Convention slice", () => {
     }));
     store.dispatch(conventionSlice.actions.clearFeedbackTriggered());
     expectConventionState({ feedback: { kind: "idle" } });
+  });
+
+  it("changes the form current step when asked", () => {
+    ({ store } = createTestStore({
+      convention: {
+        formUi: {
+          preselectedAgencyId: null,
+          isMinor: false,
+          isTutorEstablishmentRepresentative: true,
+          hasCurrentEmployer: false,
+          currentStep: 1,
+          agencyDepartment: null,
+          showSummary: false,
+        },
+        jwt: null,
+        convention: null,
+        conventionStatusDashboardUrl: null,
+        feedback: { kind: "modificationsAskedFromSignatory" },
+        isLoading: false,
+        fetchError: null,
+        currentSignatoryRole: null,
+      },
+    }));
+    expectConventionState({
+      formUi: { ...store.getState().convention.formUi, currentStep: 1 },
+    });
+    store.dispatch(conventionSlice.actions.setCurrentStep(2));
+    expectConventionState({
+      formUi: { ...store.getState().convention.formUi, currentStep: 2 },
+    });
+  });
+
+  it("changes the form agencyDepartment when asked", () => {
+    ({ store } = createTestStore({
+      convention: {
+        formUi: {
+          preselectedAgencyId: null,
+          isMinor: false,
+          isTutorEstablishmentRepresentative: true,
+          hasCurrentEmployer: false,
+          currentStep: 1,
+          agencyDepartment: null,
+          showSummary: false,
+        },
+        jwt: null,
+        convention: null,
+        conventionStatusDashboardUrl: null,
+        feedback: { kind: "modificationsAskedFromSignatory" },
+        isLoading: false,
+        fetchError: null,
+        currentSignatoryRole: null,
+      },
+    }));
+    expectConventionState({
+      formUi: { ...store.getState().convention.formUi, agencyDepartment: null },
+    });
+    store.dispatch(
+      conventionSlice.actions.agencyDepartementChangeRequested("86"),
+    );
+    expectConventionState({
+      formUi: { ...store.getState().convention.formUi, agencyDepartment: "86" },
+    });
+  });
+
+  it("changes the form showSummary when asked (and populate convention if provided)", () => {
+    const fakeConvention =
+      new ConventionDtoBuilder().build() as ConventionReadDto;
+    ({ store } = createTestStore({
+      convention: {
+        formUi: {
+          preselectedAgencyId: null,
+          isMinor: false,
+          isTutorEstablishmentRepresentative: true,
+          hasCurrentEmployer: false,
+          currentStep: 1,
+          agencyDepartment: null,
+          showSummary: false,
+        },
+        jwt: null,
+        convention: null,
+        conventionStatusDashboardUrl: null,
+        feedback: { kind: "modificationsAskedFromSignatory" },
+        isLoading: false,
+        fetchError: null,
+        currentSignatoryRole: null,
+      },
+    }));
+    expectConventionState({
+      formUi: { ...store.getState().convention.formUi, showSummary: false },
+    });
+    store.dispatch(
+      conventionSlice.actions.showSummaryChangeRequested({
+        showSummary: true,
+        convention: fakeConvention,
+      }),
+    );
+    expectConventionState({
+      formUi: { ...store.getState().convention.formUi, showSummary: true },
+      convention: fakeConvention,
+    });
+    store.dispatch(
+      conventionSlice.actions.showSummaryChangeRequested({
+        showSummary: false,
+      }),
+    );
+    expectConventionState({
+      formUi: { ...store.getState().convention.formUi, showSummary: false },
+    });
   });
 
   it("Toggle is minor", () => {
@@ -800,6 +941,9 @@ describe("Convention slice", () => {
           isMinor: false,
           isTutorEstablishmentRepresentative: true,
           hasCurrentEmployer: false,
+          currentStep: 1,
+          agencyDepartment: null,
+          showSummary: false,
         },
         jwt: null,
         convention,

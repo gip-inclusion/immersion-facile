@@ -11,13 +11,7 @@ import {
 import { useSiretFetcher } from "src/app/hooks/siret.hooks";
 import { EmailValidationInput } from "../../../commons/EmailValidationInput";
 
-type EstablishementTutorFieldsProperties = {
-  disabled: boolean | undefined;
-};
-
-export const EstablishementTutorFields = ({
-  disabled,
-}: EstablishementTutorFieldsProperties): JSX.Element => {
+export const EstablishementTutorFields = (): JSX.Element => {
   const { isFetchingSiret } = useSiretFetcher({
     shouldFetchEvenIfAlreadySaved: true,
   });
@@ -37,7 +31,7 @@ export const EstablishementTutorFields = ({
           ...formContents["establishmentTutor.firstName"],
           ...register("establishmentTutor.firstName"),
         }}
-        disabled={disabled || isFetchingSiret}
+        disabled={isFetchingSiret}
         {...getFieldError("establishmentTutor.firstName")}
       />
       <Input
@@ -47,7 +41,7 @@ export const EstablishementTutorFields = ({
           ...formContents["establishmentTutor.lastName"],
           ...register("establishmentTutor.lastName"),
         }}
-        disabled={disabled || isFetchingSiret}
+        disabled={isFetchingSiret}
         {...getFieldError("establishmentTutor.lastName")}
       />
       <Input
@@ -57,7 +51,7 @@ export const EstablishementTutorFields = ({
           ...formContents["establishmentTutor.job"],
           ...register("establishmentTutor.job"),
         }}
-        disabled={disabled || isFetchingSiret}
+        disabled={isFetchingSiret}
         {...getFieldError("establishmentTutor.job")}
       />
       <Input
@@ -68,7 +62,6 @@ export const EstablishementTutorFields = ({
           ...register("establishmentTutor.phone"),
           type: "tel",
         }}
-        disabled={disabled}
         {...getFieldError("establishmentTutor.phone")}
       />
       <EmailValidationInput
@@ -79,7 +72,6 @@ export const EstablishementTutorFields = ({
           ...register("establishmentTutor.email"),
         }}
         {...getFieldError("establishmentTutor.email")}
-        disabled={disabled}
       />
       {values.establishmentTutor?.email && <ConventionEmailWarning />}
     </>

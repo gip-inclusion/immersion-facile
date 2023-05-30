@@ -4,9 +4,7 @@ import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
-import { ConventionDto, FederatedIdentity } from "shared";
-import { SectionTitle } from "react-design-system";
-import { ShareActions } from "src/app/components/forms/convention/ShareActions";
+import { ConventionDto } from "shared";
 import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
@@ -20,15 +18,7 @@ import { EstablishementTutorFields } from "./EstablishementTutorFields";
 import { EstablishmentBusinessFields } from "./EstablishmentBusinessFields";
 import { EstablishmentRepresentativeFields } from "./EstablishmentRepresentativeFields";
 
-type EstablishmentFormSectionParams = {
-  isFrozen: boolean | undefined;
-  federatedIdentity: FederatedIdentity | undefined;
-};
-
-export const EstablishmentFormSection = ({
-  isFrozen,
-  federatedIdentity,
-}: EstablishmentFormSectionParams): JSX.Element => {
+export const EstablishmentFormSection = (): JSX.Element => {
   useTutorIsEstablishmentRepresentative();
 
   const dispatch = useDispatch();
@@ -49,13 +39,6 @@ export const EstablishmentFormSection = ({
 
   return (
     <>
-      <SectionTitle>
-        {t.establishmentSection.title}
-        <ShareActions
-          isFrozen={isFrozen || isFetchingSiret}
-          federatedIdentity={federatedIdentity}
-        />
-      </SectionTitle>
       <Alert
         severity="info"
         small
@@ -63,7 +46,7 @@ export const EstablishmentFormSection = ({
         description={t.establishmentSection.subtitle}
       />
 
-      <EstablishmentBusinessFields disabled={isFrozen || isFetchingSiret} />
+      <EstablishmentBusinessFields disabled={isFetchingSiret} />
       <RadioButtons
         legend={
           formContents.isEstablishmentTutorIsEstablishmentRepresentative.label
@@ -87,13 +70,11 @@ export const EstablishmentFormSection = ({
             },
           },
         }))}
-        disabled={isFrozen || isFetchingSiret}
+        disabled={isFetchingSiret}
       />
-      <EstablishementTutorFields disabled={isFrozen} />
+      <EstablishementTutorFields />
       {!isTutorEstablishmentRepresentative && (
-        <EstablishmentRepresentativeFields
-          disabled={isFrozen || isFetchingSiret}
-        />
+        <EstablishmentRepresentativeFields disabled={isFetchingSiret} />
       )}
     </>
   );

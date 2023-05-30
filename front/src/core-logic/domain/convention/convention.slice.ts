@@ -36,6 +36,9 @@ export interface ConventionState {
     isMinor: boolean;
     isTutorEstablishmentRepresentative: boolean;
     hasCurrentEmployer: boolean;
+    currentStep: number;
+    showSummary: boolean;
+    agencyDepartment: string | null;
   };
   jwt: string | null;
   isLoading: boolean;
@@ -52,6 +55,9 @@ export const initialConventionState: ConventionState = {
     isMinor: false,
     isTutorEstablishmentRepresentative: true,
     hasCurrentEmployer: false,
+    currentStep: 1,
+    showSummary: false,
+    agencyDepartment: null,
   },
   jwt: null,
   convention: null,
@@ -88,6 +94,24 @@ export const conventionSlice = createSlice({
   name: "convention",
   initialState: initialConventionState,
   reducers: {
+    showSummaryChangeRequested: (
+      state,
+      action: PayloadAction<{
+        showSummary: boolean;
+        convention?: ConventionReadDto;
+      }>,
+    ) => {
+      state.formUi.showSummary = action.payload.showSummary;
+      if (action.payload.convention) {
+        state.convention = action.payload.convention;
+      }
+    },
+    agencyDepartementChangeRequested: (
+      state,
+      action: PayloadAction<string>,
+    ) => {
+      state.formUi.agencyDepartment = action.payload;
+    },
     // Save convention
     saveConventionRequested: (state, _action: PayloadAction<ConventionDto>) => {
       state.isLoading = true;
@@ -219,5 +243,8 @@ export const conventionSlice = createSlice({
       state.formUi.preselectedAgencyId = payload;
     },
     preselectedAgencyIdFailed: setFeedbackAsErrored,
+    setCurrentStep: (state, { payload }: PayloadAction<number>) => {
+      state.formUi.currentStep = payload;
+    },
   },
 });

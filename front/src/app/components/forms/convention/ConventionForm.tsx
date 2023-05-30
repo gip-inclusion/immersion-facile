@@ -3,29 +3,36 @@ import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { Button } from "@codegouvfr/react-dsfr/Button";
+import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { match } from "ts-pattern";
 import { useStyles } from "tss-react/dsfr";
 import {
   Beneficiary,
-  ConventionDto,
   ConventionMagicLinkPayload,
   ConventionReadDto,
   conventionWithoutExternalIdSchema,
   decodeMagicLinkJwtWithoutSignatureCheck,
+  domElementIds,
   hasBeneficiaryCurrentEmployer,
   isBeneficiaryMinor,
   isEstablishmentTutorIsEstablishmentRepresentative,
   isPeConnectIdentity,
   notJobSeeker,
 } from "shared";
-import { SubmitConfirmationSection } from "react-design-system";
+import {
+  ConventionFormLayout,
+  ConventionFormSidebar,
+  SubmitConfirmationSection,
+} from "react-design-system";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { ConventionFormFields } from "src/app/components/forms/convention/ConventionFormFields";
 import {
   ConventionPresentation,
-  isConventionFrozen,
   undefinedIfEmptyString,
 } from "src/app/components/forms/convention/conventionHelpers";
+import { sidebarStepContent } from "src/app/contents/forms/convention/formConvention";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useExistingSiret } from "src/app/hooks/siret.hooks";
@@ -37,6 +44,8 @@ import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
+import { ConventionSummary } from "./ConventionSummary";
+import { ShareConventionLink } from "./ShareConventionLink";
 
 const useClearConventionSubmitFeedbackOnUnmount = () => {
   const dispatch = useDispatch();
@@ -74,10 +83,12 @@ const useWaitForReduxFormUiReadyBeforeFormikInitialisation = (
   return reduxFormUiReady;
 };
 
+export type ConventionFormMode = "create" | "edit";
+
 type ConventionFormProps = {
   conventionProperties: ConventionPresentation;
   routeParams?: { jwt?: string };
-  mode: "create" | "edit";
+  mode: ConventionFormMode;
 };
 
 export const ConventionForm = ({
@@ -87,10 +98,13 @@ export const ConventionForm = ({
 }: ConventionFormProps) => {
   const { cx } = useStyles();
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
-
+  const currentStep = useAppSelector(conventionSelectors.currentStep);
+  const showSummary = useAppSelector(conventionSelectors.showSummary);
+  const sidebarContent = sidebarStepContent(
+    conventionProperties?.internshipKind ?? "immersion",
+  );
   const [initialValues] = useState<ConventionPresentation>({
     ...conventionProperties,
-
     signatories: {
       ...conventionProperties.signatories,
       beneficiary: makeInitialBenefiaryForm(
@@ -152,12 +166,24 @@ export const ConventionForm = ({
     }
   }, [fetchedConvention]);
 
+  const onConfirmSubmit = () => {
+    const conventionToSave = {
+      ...getValues(),
+      workConditions: undefinedIfEmptyString(getValues().workConditions),
+    };
+    dispatch(conventionSlice.actions.saveConventionRequested(conventionToSave));
+  };
   const onSubmit: SubmitHandler<ConventionReadDto> = (values) => {
     const conventionToSave = {
       ...values,
       workConditions: undefinedIfEmptyString(values.workConditions),
-    } as ConventionDto;
-    dispatch(conventionSlice.actions.saveConventionRequested(conventionToSave));
+    };
+    dispatch(
+      conventionSlice.actions.showSummaryChangeRequested({
+        showSummary: true,
+        convention: conventionToSave,
+      }),
+    );
   };
   const reduxFormUiReady =
     useWaitForReduxFormUiReadyBeforeFormikInitialisation(initialValues);
@@ -166,57 +192,154 @@ export const ConventionForm = ({
 
   const t = useConventionTexts(initialValues.internshipKind);
 
-  const isFrozen = isConventionFrozen(
-    fetchedConvention ? fetchedConvention.status : initialValues.status,
-  );
-
   const { copyButtonIsDisabled, copyButtonLabel, onCopyButtonClick } =
     useCopyButton();
 
-  if (!reduxFormUiReady) return null;
-
-  if (routeParams.jwt && fetchConventionError)
-    return (
-      <ShowErrorOrRedirectToRenewMagicLink
-        errorMessage={fetchConventionError}
-        jwt={routeParams.jwt}
-      />
-    );
-
-  if (formSuccessfullySubmitted)
-    return (
-      <SubmitConfirmationSection
-        idToCopy={getValues().id}
-        copyButtonIsDisabled={copyButtonIsDisabled}
-        copyButtonLabel={copyButtonLabel}
-        onCopyButtonClick={onCopyButtonClick}
-      />
-    );
-
   return (
-    <div className={fr.cx("fr-grid-row", "fr-grid-row--center")}>
-      <div className={fr.cx("fr-col-12", "fr-col-lg-7")}>
-        {/* Should be removed on accordion form */}
-        <div className={cx("fr-text")}>{t.intro.welcome}</div>
-        <Alert
-          severity="info"
-          small
-          description={t.intro.conventionWelcomeNotification}
-        />
-
-        <p className={fr.cx("fr-text--xs", "fr-mt-3w")}>
-          Tous les champs marqués d'une astérisque (*) sont obligatoires.
-        </p>
-        <FormProvider {...methods}>
-          <form>
-            <ConventionFormFields onSubmit={onSubmit} isFrozen={isFrozen} />
-            <ConventionFeedbackNotification
-              submitFeedback={submitFeedback}
-              signatories={getValues("signatories")}
+    <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
+      {match({
+        showSummary,
+        reduxFormUiReady,
+        formSuccessfullySubmitted,
+        shouldRedirectToError: !!(routeParams.jwt && fetchConventionError),
+      })
+        .with(
+          {
+            reduxFormUiReady: false,
+          },
+          () => null,
+        )
+        .with(
+          {
+            shouldRedirectToError: true,
+          },
+          () => (
+            <>
+              {routeParams.jwt && fetchConventionError && (
+                <ShowErrorOrRedirectToRenewMagicLink
+                  errorMessage={fetchConventionError}
+                  jwt={routeParams.jwt}
+                />
+              )}
+            </>
+          ),
+        )
+        .with(
+          {
+            formSuccessfullySubmitted: true,
+          },
+          () => (
+            <SubmitConfirmationSection
+              idToCopy={getValues().id}
+              copyButtonIsDisabled={copyButtonIsDisabled}
+              copyButtonLabel={copyButtonLabel}
+              onCopyButtonClick={onCopyButtonClick}
             />
-          </form>
-        </FormProvider>
-      </div>
+          ),
+        )
+        .with(
+          {
+            showSummary: true,
+            formSuccessfullySubmitted: false,
+          },
+          () => (
+            <>
+              <section>
+                <ConventionSummary />
+                <ConventionFeedbackNotification
+                  submitFeedback={submitFeedback}
+                  signatories={getValues("signatories")}
+                />
+                <ButtonsGroup
+                  inlineLayoutWhen="sm and up"
+                  alignment="center"
+                  buttons={[
+                    {
+                      children: "Modifier la convention",
+                      onClick: () => {
+                        dispatch(
+                          conventionSlice.actions.showSummaryChangeRequested({
+                            showSummary: false,
+                          }),
+                        );
+                      },
+                      priority: "secondary",
+                    },
+                    {
+                      children: "Envoyer la convention",
+                      onClick: methods.handleSubmit(onConfirmSubmit),
+                      nativeButtonProps: {
+                        id: domElementIds.conventionImmersionRoute
+                          .confirmSubmitFormButton,
+                      },
+                    },
+                  ]}
+                />
+              </section>
+            </>
+          ),
+        )
+        .with(
+          {
+            showSummary: false,
+            formSuccessfullySubmitted: false,
+          },
+          () => (
+            <FormProvider {...methods}>
+              <ConventionFormLayout
+                form={
+                  <>
+                    <div className={cx("fr-text")}>{t.intro.welcome}</div>
+                    <Alert
+                      severity="info"
+                      small
+                      description={t.intro.conventionWelcomeNotification}
+                    />
+
+                    <p className={fr.cx("fr-text--xs", "fr-mt-3w")}>
+                      Tous les champs marqués d'une astérisque (*) sont
+                      obligatoires.
+                    </p>
+
+                    <form>
+                      <ConventionFormFields onSubmit={onSubmit} mode={mode} />
+                      <ConventionFeedbackNotification
+                        submitFeedback={submitFeedback}
+                        signatories={getValues("signatories")}
+                      />
+                    </form>
+                  </>
+                }
+                sidebar={
+                  <ConventionFormSidebar
+                    currentStep={currentStep}
+                    sidebarContent={sidebarContent}
+                    sidebarFooter={
+                      <div
+                        className={fr.cx(
+                          "fr-btns-group",
+                          "fr-btns-group--center",
+                          "fr-btns-group--inline",
+                          "fr-btns-group--sm",
+                          "fr-btns-group--icon-left",
+                        )}
+                      >
+                        <ShareConventionLink />
+                        <Button
+                          type="submit"
+                          onClick={methods.handleSubmit(onSubmit)}
+                        >
+                          Envoyer la convention
+                        </Button>
+                      </div>
+                    }
+                  />
+                }
+              />
+            </FormProvider>
+          ),
+        )
+        .exhaustive()}
     </div>
   );
 };
