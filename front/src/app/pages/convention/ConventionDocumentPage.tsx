@@ -27,6 +27,11 @@ const throwOnMissingSignDate = (signedAt: string | undefined): string => {
   return signedAt;
 };
 
+const isStartingByVowel = (string: string): boolean => {
+  const vowels = ["a", "e", "i", "o", "u", "y"];
+  return Boolean(vowels.find((vowel) => vowel === string.at(0)?.toLowerCase()));
+};
+
 type ConventionDocumentPageProps = {
   route: Route<typeof routes.conventionDocument>;
 };
@@ -104,8 +109,12 @@ export const ConventionDocumentPage = ({
                   ? toDisplayedDate(new Date(beneficiary.birthdate))
                   : "Date invalide"}
               </strong>{" "}
-              en qualité de <strong>bénéficiaire</strong> (tel:{" "}
-              {beneficiary.phone})
+              en qualité de <strong>bénéficiaire</strong> {""}
+              {beneficiary.isRqth && "reconnu en situation de handicape"}
+              <ul>
+                <li>tel: {beneficiary.phone}</li>
+                <li>email: {beneficiary.email}</li>
+              </ul>
             </li>
             {beneficiaryRepresentative && (
               <li>
@@ -114,8 +123,11 @@ export const ConventionDocumentPage = ({
                   {beneficiaryRepresentative.lastName}
                 </strong>{" "}
                 en qualité de{" "}
-                <strong>représentant(e) légal(e) du bénéficiaire</strong> (tel:{" "}
-                {beneficiaryRepresentative.phone})
+                <strong>représentant(e) légal(e) du bénéficiaire</strong>
+                <ul>
+                  <li>tel: {beneficiaryRepresentative.phone}</li>
+                  <li>email: {beneficiaryRepresentative.email}</li>
+                </ul>
               </li>
             )}
             {beneficiaryCurrentEmployer && (
@@ -124,12 +136,14 @@ export const ConventionDocumentPage = ({
                   {beneficiaryCurrentEmployer.firstName}{" "}
                   {beneficiaryCurrentEmployer.lastName}
                 </strong>{" "}
-                en qualité de{" "}
-                <strong>
-                  représentant(e) de l'entreprise employant actuellement le
-                  bénéficiaire
-                </strong>{" "}
-                (tel: {beneficiaryCurrentEmployer.phone})
+                en qualité de <strong>représentant(e) de l'entreprise:</strong>{" "}
+                {beneficiaryCurrentEmployer.businessName}{" "}
+                <strong>employant actuellement le bénéficiaire</strong>
+                <ul>
+                  <li>tel: {beneficiaryCurrentEmployer.phone}</li>
+                  <li>email: {beneficiaryCurrentEmployer.email}</li>
+                  <li>adresse: {beneficiaryCurrentEmployer.businessAddress}</li>
+                </ul>
               </li>
             )}
             {establishmentRepresentative && (
@@ -139,8 +153,11 @@ export const ConventionDocumentPage = ({
                   {establishmentRepresentative.lastName}
                 </strong>{" "}
                 en qualité de <strong>représentant de l'entreprise</strong>{" "}
-                {convention.businessName} (tel:{" "}
-                {establishmentRepresentative.phone})
+                {convention.businessName}
+                <ul>
+                  <li>tel: {establishmentRepresentative.phone}</li>
+                  <li>email: {establishmentRepresentative.email}</li>
+                </ul>
               </li>
             )}
             <li>
@@ -163,7 +180,10 @@ export const ConventionDocumentPage = ({
           <p>
             {internshipKind === "immersion" ? "L'immersion" : "Le mini-stage"}{" "}
             aura pour objectif de découvrir les activités nécessaires en lien
-            avec le métier de{" "}
+            avec le métier{" "}
+            {isStartingByVowel(convention.immersionAppellation.appellationLabel)
+              ? "d'"
+              : "de"}{" "}
             <strong>{convention.immersionAppellation.appellationLabel}</strong>.
           </p>
           <p>Ces activités sont : {convention.immersionActivities}.</p>
@@ -251,8 +271,16 @@ export const ConventionDocumentPage = ({
             <strong>
               {convention.establishmentTutor.firstName}{" "}
               {convention.establishmentTutor.lastName}
-            </strong>
-            .
+            </strong>{" "}
+            occupant la fonction{" "}
+            {isStartingByVowel(convention.establishmentTutor.job)
+              ? `d'${convention.establishmentTutor.job}`
+              : `de ${convention.establishmentTutor.job}`}{" "}
+            (tel: {convention.establishmentTutor.phone}
+            {convention.establishmentTutor.email !==
+              establishmentRepresentative.email &&
+              `, mail: ${convention.establishmentTutor.email}`}
+            ).
           </p>
 
           <p>
