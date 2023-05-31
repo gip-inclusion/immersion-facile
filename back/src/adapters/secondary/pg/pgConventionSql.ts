@@ -34,7 +34,7 @@ const buildSignatoriesObject = `JSON_BUILD_OBJECT(
         'businessSiret', bce.extra_fields ->> 'businessSiret',
         'businessName', bce.extra_fields ->> 'businessName',
         'signedAt', date_to_iso(bce.signed_at),
-        'businessAddress', bce.extra_fields ->> 'businessAddress'
+        'businessAddress', CASE WHEN (bce.extra_fields ->> 'businessAddress' <> '') AND (bce.extra_fields ->> 'businessAddress' IS NOT NULL) THEN bce.extra_fields ->> 'businessAddress' ELSE 'Adresse non fournis' END
       ) END,
       'establishmentRepresentative' , JSON_BUILD_OBJECT(
         'role', 'establishment-representative',
