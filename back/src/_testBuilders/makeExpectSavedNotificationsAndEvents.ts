@@ -10,6 +10,9 @@ import { InMemoryNotificationRepository } from "../adapters/secondary/InMemoryNo
 import { NotificationAddedEvent } from "../domain/core/eventBus/events";
 import {
   EmailNotification,
+  Notification,
+  NotificationKind,
+  notificationKinds,
   SmsNotification,
   WithNotificationIdAndKind,
 } from "../domain/generic/notifications/entities/Notification";
@@ -29,7 +32,7 @@ export const makeExpectSavedNotificationsAndEvents =
     emails?: TemplatedEmail[];
     sms?: TemplatedSms[];
   }) => {
-    const [emailNotification, smsNotification] = partition(({ kind }) => {
+    const [emailNotifications, smsNotifications] = partition(({ kind }) => {
       switch (kind) {
         case "email":
           return true;
@@ -48,29 +51,39 @@ export const makeExpectSavedNotificationsAndEvents =
         event.topic === "NotificationAdded",
     );
 
-    expectToEqual(
-      emailNotification.map(({ templatedContent }) => templatedContent),
-      expectedEmail,
-    );
-    expectToEqual(
-      emailNotification.map(
-        ({ id }): WithNotificationIdAndKind => ({ id, kind: "email" }),
-      ),
-      notificationAddedEvents
-        .filter(({ payload }) => payload.kind === "email")
-        .map(({ payload }) => payload),
-    );
+    const paramsByKind = {
+      email: {
+        notificationsOfKind: emailNotifications,
+        expectedTemplatedContent: expectedEmail,
+      },
+      sms: {
+        notificationsOfKind: smsNotifications,
+        expectedTemplatedContent: expectedSms,
+      },
+    } satisfies {
+      [K in NotificationKind]: {
+        // prettier-ignore
+        expectedTemplatedContent: Array<Extract<Notification, { kind: K }>["templatedContent"]>;
+        notificationsOfKind: Array<Extract<Notification, { kind: K }>>;
+      };
+    };
 
-    expectToEqual(
-      smsNotification.map(({ templatedContent }) => templatedContent),
-      expectedSms,
-    );
-    expectToEqual(
-      smsNotification.map(
-        ({ id }): WithNotificationIdAndKind => ({ id, kind: "sms" }),
-      ),
-      notificationAddedEvents
-        .filter(({ payload }) => payload.kind === "sms")
-        .map(({ payload }) => payload),
-    );
+    const expectNotificationsOfKind = (kind: NotificationKind) => {
+      const { notificationsOfKind, expectedTemplatedContent } =
+        paramsByKind[kind];
+      expectToEqual(
+        notificationsOfKind.map(({ templatedContent }) => templatedContent),
+        expectedTemplatedContent,
+      );
+      expectToEqual(
+        notificationsOfKind.map(
+          ({ id }): WithNotificationIdAndKind => ({ id, kind }),
+        ),
+        notificationAddedEvents
+          .filter(({ payload }) => payload.kind === kind)
+          .map(({ payload }) => payload),
+      );
+    };
+
+    notificationKinds.forEach(expectNotificationsOfKind);
   };
