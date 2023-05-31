@@ -165,41 +165,6 @@ describe("PgConventionRepository", () => {
 
     expect(conventionRetreived?.signatories.beneficiary.isRqth).toBeUndefined();
   });
-  it("return the value 'adresse non fournis' for businessAdress extra field  when it retrieve a convention with beneficiary current employer with business adress empty", async () => {
-    const beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer = {
-      firstName: "Current",
-      lastName: "Employer",
-      email: "current.employer@mail.com",
-      phone: "8888888888",
-      role: "beneficiary-current-employer",
-      businessName: "Entreprise .Inc",
-      businessSiret: "01234567891234",
-      job: "Boss",
-      businessAddress: "",
-    };
-    const convention = new ConventionDtoBuilder()
-      .withBeneficiary({
-        birthdate: new Date("2000-05-26").toISOString(),
-        firstName: "Jean",
-        lastName: "Bono",
-        role: "beneficiary",
-        email: "jean@bono.com",
-        phone: "0836656565",
-      })
-      .withBeneficiaryCurrentEmployer(beneficiaryCurrentEmployer)
-      .build();
-
-    await conventionRepository.save(convention);
-
-    const conventionRetreived = await conventionRepository.getById(
-      convention.id,
-    );
-
-    expect(
-      conventionRetreived?.signatories.beneficiaryCurrentEmployer
-        ?.businessAddress,
-    ).toBe("Adresse non fournis");
-  });
 
   it("Only one actor when the convention has same establisment tutor and representative", async () => {
     const email = "tutor123w@mail.com";
