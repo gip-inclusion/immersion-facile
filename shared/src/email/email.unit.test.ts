@@ -27,7 +27,7 @@ describe("emailSchema validation utils", () => {
   ];
 
   it.each(invalidEmailsSet)("email address %s should not be valid", (email) => {
-    expect(() => emailSchema.parse(email)).toThrow("");
+    expect(() => emailSchema.parse(email)).toThrow();
   });
 
   it("email should be normalized", () => {
