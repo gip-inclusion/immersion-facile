@@ -136,7 +136,7 @@ const beneficiaryCurrentEmployerSchema: z.Schema<BeneficiaryCurrentEmployer> =
       job: zStringPossiblyEmpty,
       businessSiret: siretSchema,
       businessName: zTrimmedStringMax255,
-      businessAddress: zStringPossiblyEmpty,
+      businessAddress: zString,
     }),
   );
 
