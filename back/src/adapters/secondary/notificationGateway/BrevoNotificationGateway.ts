@@ -63,8 +63,9 @@ export class BrevoNotificationGateway implements NotificationGateway {
       },
       "sendTransactSmsTotal",
     );
+
     return this.sendTransacSms({
-      content: smsTemplatesByName[kind].createContent(params),
+      content: smsTemplatesByName[kind].createContent(params as any),
       sender: "ImmerFacile",
       recipient: recipientPhone,
     })

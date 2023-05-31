@@ -841,7 +841,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
             forbiddenUnsupportedStatusMessage(convention, type),
           ),
         );
-        expectSavedNotificationsAndEvents({ emails: [] });
+        expectSavedNotificationsAndEvents({});
       });
     });
   });
@@ -924,6 +924,92 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
 
       expect(toSignatoriesSummary(convention)).toStrictEqual(expected);
     });
+  });
+
+  describe("handle SMS DOM", () => {
+    it.each([
+      ["0600000001", "33600000001"], // Metropole
+      ["0639000001", "262639000001"], // Mayotte
+      ["0690000001", "590690000001"], // Guadeloupe
+      ["0691000001", "590691000001"], // Guadeloupe
+      ["0694000001", "594694000001"], // Guyane
+      ["0696000001", "596696000001"], // Martinique
+      ["0697000001", "596697000001"], // Martinique
+      ["0692000001", "262692000001"], // Réunion
+      ["0693000001", "262693000001"], // Réunion
+    ])(
+      `Should send SMS with mobile phone %s`,
+      async (mobilePhone, internationalMobilePhone) => {
+        //Arrange
+        const agency = new AgencyDtoBuilder().withId("agencyId").build();
+
+        const convention = new ConventionDtoBuilder()
+          .withAgencyId(agency.id)
+          .withStatus("READY_TO_SIGN")
+          .withBeneficiaryPhone(mobilePhone)
+          .withBeneficiarySignedAt(undefined)
+          .withEstablishmentRepresentativePhone("0211223344")
+          .build();
+
+        uow.conventionRepository.setConventions({
+          [convention.id]: convention,
+        });
+        uow.agencyRepository.setAgencies([agency]);
+
+        const shortLinkIds = ["link1", "link2"];
+        shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
+
+        //Act
+        await useCase.execute({
+          conventionId: convention.id,
+          reminderKind: "FirstReminderForSignatories",
+        });
+
+        //Assert
+        expectToEqual(uow.shortLinkQuery.getShortLinks(), {
+          [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
+            id: convention.id,
+            role: convention.signatories.establishmentRepresentative.role,
+            targetRoute: frontRoutes.conventionToSign,
+            email: convention.signatories.establishmentRepresentative.email,
+            now: timeGateway.now(),
+          }),
+          [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
+            id: convention.id,
+            role: convention.signatories.beneficiary.role,
+            targetRoute: frontRoutes.conventionToSign,
+            email: convention.signatories.beneficiary.email,
+            now: timeGateway.now(),
+          }),
+        });
+
+        expectSavedNotificationsAndEvents({
+          emails: [
+            makeSignatoriesFirstReminderEmail({
+              actor: convention.signatories.establishmentRepresentative,
+              convention,
+              timeGateway,
+              shortLinkUrl: makeShortLinkUrl(config, shortLinkIds[0]),
+            }),
+            makeSignatoriesFirstReminderEmail({
+              actor: convention.establishmentTutor,
+              convention,
+              timeGateway,
+              shortLinkUrl: undefined,
+            }),
+          ],
+          sms: [
+            {
+              kind: "FirstReminderForSignatories",
+              recipientPhone: internationalMobilePhone,
+              params: {
+                shortLink: makeShortLinkUrl(config, shortLinkIds[1]),
+              },
+            },
+          ],
+        });
+      },
+    );
   });
 });
 
