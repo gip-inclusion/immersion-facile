@@ -9,7 +9,7 @@ import {
 } from "../../../../domain/convention/ports/PoleEmploiGateway";
 import { AccessTokenGateway } from "../../../../domain/core/ports/AccessTokenGateway";
 import { createLogger } from "../../../../utils/logger";
-import { notifyAndThrowErrorDiscord } from "../../../../utils/notifyDiscord";
+import { notifyObjectDiscord } from "../../../../utils/notifyDiscord";
 import { getPeTestPrefix, PoleEmploiTargets } from "./PoleEmploi.targets";
 
 const logger = createLogger(__filename);
@@ -52,11 +52,7 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
           axiosBody: error.response.data,
         };
         logger.error(errorObject);
-        notifyAndThrowErrorDiscord(
-          new Error(
-            `Could not notify Pole-Emploi : ${errorObject.httpStatus} - ${errorObject.message} \n ${errorObject?.axiosBody?.message}`,
-          ),
-        );
+        notifyObjectDiscord(errorObject);
 
         return {
           status: error.response.status,
