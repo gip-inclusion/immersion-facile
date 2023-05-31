@@ -33,7 +33,7 @@ export const emailSchema: z.Schema<Email> = z
   .pipe(
     z
       .string()
-      .email(localization.invalidEmailFormat)
+      .email()
       .refine(
         (email) => email.match(validateSingleEmailRegex), // emails patterns without underscore in the domain part
         (email) => ({

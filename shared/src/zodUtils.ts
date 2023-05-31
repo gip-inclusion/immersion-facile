@@ -2,6 +2,16 @@ import { Logger } from "pino";
 import { z } from "zod";
 import { timeHHmmRegExp } from "./utils/date";
 
+// Change default error map behavior to provide context
+// https://github.com/colinhacks/zod/blob/master/ERROR_HANDLING.md#global-error-map
+z.setErrorMap((issue, ctx) =>
+  issue.code === "invalid_string" && issue.validation === "email"
+    ? {
+        message: `${localization.invalidEmailFormat} - email fourni : ${ctx.data}`,
+      }
+    : { message: ctx.defaultError },
+);
+
 export const localization = {
   atLeastOneEmail: "Vous devez renseigner au moins un email",
   atLeastOneJob: "Vous devez renseigner au moins un métier",
