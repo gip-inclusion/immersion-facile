@@ -384,5 +384,16 @@ const isValidMobilePhone = (phone: string): boolean =>
   (phone.startsWith("06") || phone.startsWith("07")) && phone.length === 10;
 
 function makeInternationalPhone(phone: string): Phone {
+  if (phone.startsWith("0690") || phone.startsWith("0691"))
+    return "590" + phone.substring(1);
+  if (phone.startsWith("0694")) return "594" + phone.substring(1);
+  if (phone.startsWith("0696") || phone.startsWith("0697"))
+    return "596" + phone.substring(1);
+  if (
+    phone.startsWith("0692") ||
+    phone.startsWith("0693") ||
+    phone.startsWith("0639")
+  )
+    return "262" + phone.substring(1);
   return "33" + phone.substring(1);
 }
