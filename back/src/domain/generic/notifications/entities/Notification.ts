@@ -19,9 +19,20 @@ export type FollowedIds = {
   agencyId?: AgencyId;
 };
 
+export type NotificationKind = (typeof notificationKinds)[number];
+export const notificationKinds = ["email", "sms"] as const;
+
+type GenericNotification<K extends NotificationKind, TemplatedContent> = {
+  kind: K;
+  templatedContent: TemplatedContent;
+};
+
 export type NotificationContent =
-  | { kind: "email"; templatedContent: TemplatedEmail }
-  | { kind: "sms"; templatedContent: TemplatedSms };
+  | GenericNotification<"email", TemplatedEmail>
+  | GenericNotification<"sms", TemplatedSms>;
+
+const _isAssignable = (kind: NotificationKind): NotificationContent["kind"] =>
+  kind;
 
 export type Notification = {
   id: NotificationId;
@@ -31,8 +42,6 @@ export type Notification = {
 
 export type SmsNotification = Extract<Notification, { kind: "sms" }>;
 export type EmailNotification = Extract<Notification, { kind: "email" }>;
-
-export type NotificationKind = Notification["kind"];
 
 export type WithNotificationIdAndKind = {
   id: NotificationId;
