@@ -1,7 +1,7 @@
 {
   "jobs": [
     {
-      "command": "07 15 * * * pnpm back run trigger-convention-reminder",
+      "command": "15 07 * * * pnpm back run trigger-convention-reminder",
       "size": "M"
     },
     {
