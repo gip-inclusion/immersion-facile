@@ -84,6 +84,10 @@ const beneficiaryFields: ColField[] = [
             {convention.signatories.beneficiary.financiaryHelp}
           </div>
         )}
+
+        <div className={fr.cx("fr-text--xs")}>
+          RQTH : {convention.signatories.beneficiary.isRqth ? "Oui" : "Non"}
+        </div>
       </span>
     ),
   },
