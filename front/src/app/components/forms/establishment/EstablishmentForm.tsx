@@ -11,6 +11,7 @@ import { keys } from "ramda";
 import {
   AppellationDto,
   defaultMaxContactsPerWeek,
+  domElementIds,
   FormEstablishmentDto,
   formEstablishmentSchema,
   immersionFacileContactEmail,
@@ -300,6 +301,9 @@ export const EstablishmentForm = ({
                 iconPosition="left"
                 type="submit"
                 disabled={isSubmitting}
+                nativeButtonProps={{
+                  id: domElementIds.establishment.submitButton,
+                }}
               >
                 Enregistrer mes informations
               </Button>
