@@ -3,17 +3,22 @@ import {
   ConventionDto,
   ConventionDtoBuilder,
   expectPromiseToFailWithError,
-  expectToEqual,
   frontRoutes,
 } from "shared";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
+import {
+  ExpectSavedNotificationsAndEvents,
+  makeExpectSavedNotificationsAndEvents,
+} from "../../../../_testBuilders/makeExpectSavedNotificationsAndEvents";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
 } from "../../../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
+import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { InMemoryNotificationGateway } from "../../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
+import { makeCreateNewEvent } from "../../../core/eventBus/EventBus";
+import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import {
   missingConventionMessage,
   noSignatoryMessage,
@@ -22,11 +27,11 @@ import {
 
 describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
   let conventionSignedByNoOne: ConventionDto;
-  let notificationGateway: InMemoryNotificationGateway;
-  let usecase: NotifyLastSigneeThatConventionHasBeenSigned;
+  let notifyLastSignee: NotifyLastSigneeThatConventionHasBeenSigned;
   let uow: InMemoryUnitOfWork;
   let timeGateway: CustomTimeGateway;
   let agency: AgencyDto;
+  let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
 
   beforeEach(() => {
     uow = createInMemoryUow();
@@ -36,12 +41,25 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
       .signedByBeneficiary(undefined)
       .signedByEstablishmentRepresentative(undefined)
       .build();
-    notificationGateway = new InMemoryNotificationGateway();
+
+    expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
+      uow.notificationRepository,
+      uow.outboxRepository,
+    );
 
     timeGateway = new CustomTimeGateway();
-    usecase = new NotifyLastSigneeThatConventionHasBeenSigned(
+
+    const uuidGenerator = new UuidV4Generator();
+    const createNewEvent = makeCreateNewEvent({ uuidGenerator, timeGateway });
+    const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
+      createNewEvent,
+      uuidGenerator,
+      timeGateway,
+    );
+
+    notifyLastSignee = new NotifyLastSigneeThatConventionHasBeenSigned(
       new InMemoryUowPerformer(uow),
-      notificationGateway,
+      saveNotificationAndRelatedEvent,
       fakeGenerateMagicLinkUrlFn,
       timeGateway,
     );
@@ -58,7 +76,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
       [signedConvention.id]: signedConvention,
     };
 
-    await usecase.execute(signedConvention);
+    await notifyLastSignee.execute(signedConvention);
     const conventionStatusLink = fakeGenerateMagicLinkUrlFn({
       targetRoute: frontRoutes.conventionStatusDashboard,
       id: signedConvention.id,
@@ -67,19 +85,21 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
       now,
     });
 
-    expectToEqual(notificationGateway.getSentEmails(), [
-      {
-        params: {
-          internshipKind: signedConvention.internshipKind,
-          conventionId: signedConvention.id,
-          signedAt: signedConvention.signatories.beneficiary.signedAt!,
-          conventionStatusLink,
-          agencyLogoUrl: agency.logoUrl,
+    expectSavedNotificationsAndEvents({
+      emails: [
+        {
+          params: {
+            internshipKind: signedConvention.internshipKind,
+            conventionId: signedConvention.id,
+            signedAt: signedConvention.signatories.beneficiary.signedAt!,
+            conventionStatusLink,
+            agencyLogoUrl: agency.logoUrl,
+          },
+          recipients: [signedConvention.signatories.beneficiary.email],
+          type: "SIGNEE_HAS_SIGNED_CONVENTION",
         },
-        recipients: [signedConvention.signatories.beneficiary.email],
-        type: "SIGNEE_HAS_SIGNED_CONVENTION",
-      },
-    ]);
+      ],
+    });
   });
 
   it("Last signed by establishment representative, beneficiary already signed", async () => {
@@ -93,31 +113,34 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
       [signedConvention.id]: signedConvention,
     };
 
-    await usecase.execute(signedConvention);
+    await notifyLastSignee.execute(signedConvention);
 
-    expectToEqual(notificationGateway.getSentEmails(), [
-      {
-        params: {
-          internshipKind: signedConvention.internshipKind,
-          signedAt:
-            signedConvention.signatories.establishmentRepresentative.signedAt!,
-          conventionId: signedConvention.id,
-          conventionStatusLink: fakeGenerateMagicLinkUrlFn({
-            targetRoute: frontRoutes.conventionStatusDashboard,
-            id: signedConvention.id,
-            role: "establishment-representative",
-            email:
-              signedConvention.signatories.establishmentRepresentative.email,
-            now,
-          }),
-          agencyLogoUrl: agency.logoUrl,
+    expectSavedNotificationsAndEvents({
+      emails: [
+        {
+          params: {
+            internshipKind: signedConvention.internshipKind,
+            signedAt:
+              signedConvention.signatories.establishmentRepresentative
+                .signedAt!,
+            conventionId: signedConvention.id,
+            conventionStatusLink: fakeGenerateMagicLinkUrlFn({
+              targetRoute: frontRoutes.conventionStatusDashboard,
+              id: signedConvention.id,
+              role: "establishment-representative",
+              email:
+                signedConvention.signatories.establishmentRepresentative.email,
+              now,
+            }),
+            agencyLogoUrl: agency.logoUrl,
+          },
+          recipients: [
+            signedConvention.signatories.establishmentRepresentative.email,
+          ],
+          type: "SIGNEE_HAS_SIGNED_CONVENTION",
         },
-        recipients: [
-          signedConvention.signatories.establishmentRepresentative.email,
-        ],
-        type: "SIGNEE_HAS_SIGNED_CONVENTION",
-      },
-    ]);
+      ],
+    });
   });
 
   it("No one has signed the convention.", async () => {
@@ -126,21 +149,21 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
     };
 
     await expectPromiseToFailWithError(
-      usecase.execute(conventionSignedByNoOne),
+      notifyLastSignee.execute(conventionSignedByNoOne),
       new Error(noSignatoryMessage(conventionSignedByNoOne)),
     );
 
-    expectToEqual(notificationGateway.getSentEmails(), []);
+    expectSavedNotificationsAndEvents({ emails: [] });
   });
 
   it("No convention on repository.", async () => {
     uow.conventionRepository._conventions = {};
 
     await expectPromiseToFailWithError(
-      usecase.execute(conventionSignedByNoOne),
+      notifyLastSignee.execute(conventionSignedByNoOne),
       new Error(missingConventionMessage(conventionSignedByNoOne.id)),
     );
 
-    expectToEqual(notificationGateway.getSentEmails(), []);
+    expectSavedNotificationsAndEvents({ emails: [] });
   });
 });
