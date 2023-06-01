@@ -2,35 +2,51 @@ import {
   AgencyDto,
   ConventionDto,
   ConventionDtoBuilder,
-  expectToEqual,
   frontRoutes,
 } from "shared";
 import { fakeGenerateMagicLinkUrlFn } from "../../../_testBuilders/jwtTestHelper";
+import {
+  ExpectSavedNotificationsAndEvents,
+  makeExpectSavedNotificationsAndEvents,
+} from "../../../_testBuilders/makeExpectSavedNotificationsAndEvents";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
 } from "../../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
+import { UuidV4Generator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { InMemoryNotificationGateway } from "../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
+import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
+import { makeSaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 import { PeUserAndAdvisor } from "../dto/PeConnect.dto";
 import { PeConnectImmersionAdvisorDto } from "../dto/PeConnectAdvisor.dto";
 import { NotifyPoleEmploiUserAdvisorOnConventionFullySigned } from "./NotifyPoleEmploiUserAdvisorOnConventionFullySigned";
 
 describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
   let uow: InMemoryUnitOfWork;
-  let notificationGateway: InMemoryNotificationGateway;
   let usecase: NotifyPoleEmploiUserAdvisorOnConventionFullySigned;
   let agency: AgencyDto;
   const timeGateway = new CustomTimeGateway();
+  let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
 
   beforeEach(() => {
-    notificationGateway = new InMemoryNotificationGateway();
     uow = createInMemoryUow();
     agency = uow.agencyRepository.agencies[0];
+    expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
+      uow.notificationRepository,
+      uow.outboxRepository,
+    );
+    const uuidGenerator = new UuidV4Generator();
+    const createNewEvent = makeCreateNewEvent({ uuidGenerator, timeGateway });
+    const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
+      createNewEvent,
+      uuidGenerator,
+      timeGateway,
+    );
+
     usecase = new NotifyPoleEmploiUserAdvisorOnConventionFullySigned(
       new InMemoryUowPerformer(uow),
-      notificationGateway,
+      saveNotificationAndRelatedEvent,
       fakeGenerateMagicLinkUrlFn,
       timeGateway,
     );
@@ -75,34 +91,36 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
 
     await usecase.execute(conventionDtoFromEvent);
 
-    expectToEqual(notificationGateway.getSentEmails(), [
-      {
-        type: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED",
-        recipients: [advisor.email],
-        params: {
-          advisorFirstName: advisor.firstName,
-          advisorLastName: advisor.lastName,
-          immersionAddress: conventionDtoFromEvent.immersionAddress!,
-          beneficiaryFirstName:
-            conventionDtoFromEvent.signatories.beneficiary.firstName,
-          beneficiaryLastName:
-            conventionDtoFromEvent.signatories.beneficiary.lastName,
-          beneficiaryEmail:
-            conventionDtoFromEvent.signatories.beneficiary.email,
-          dateStart: conventionDtoFromEvent.dateStart,
-          dateEnd: conventionDtoFromEvent.dateEnd,
-          businessName: conventionDtoFromEvent.businessName,
-          magicLink: fakeGenerateMagicLinkUrlFn({
-            id: conventionDtoFromEvent.id,
-            role: "validator",
-            targetRoute: frontRoutes.manageConvention,
-            email: advisor.email,
-            now: timeGateway.now(),
-          }),
-          agencyLogoUrl: agency.logoUrl,
+    expectSavedNotificationsAndEvents({
+      emails: [
+        {
+          type: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED",
+          recipients: [advisor.email],
+          params: {
+            advisorFirstName: advisor.firstName,
+            advisorLastName: advisor.lastName,
+            immersionAddress: conventionDtoFromEvent.immersionAddress!,
+            beneficiaryFirstName:
+              conventionDtoFromEvent.signatories.beneficiary.firstName,
+            beneficiaryLastName:
+              conventionDtoFromEvent.signatories.beneficiary.lastName,
+            beneficiaryEmail:
+              conventionDtoFromEvent.signatories.beneficiary.email,
+            dateStart: conventionDtoFromEvent.dateStart,
+            dateEnd: conventionDtoFromEvent.dateEnd,
+            businessName: conventionDtoFromEvent.businessName,
+            magicLink: fakeGenerateMagicLinkUrlFn({
+              id: conventionDtoFromEvent.id,
+              role: "validator",
+              targetRoute: frontRoutes.manageConvention,
+              email: advisor.email,
+              now: timeGateway.now(),
+            }),
+            agencyLogoUrl: agency.logoUrl,
+          },
         },
-      },
-    ]);
+      ],
+    });
   });
   it("peConnected without advisor", async () => {
     const conventionDtoFromEvent = new ConventionDtoBuilder()
@@ -134,7 +152,9 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
 
     await usecase.execute(conventionDtoFromEvent);
 
-    expectToEqual(notificationGateway.getSentEmails(), []);
+    expectSavedNotificationsAndEvents({
+      emails: [],
+    });
   });
 });
 
