@@ -9,61 +9,80 @@ import {
 } from "shared";
 import { AppConfigBuilder } from "../../../../_testBuilders/AppConfigBuilder";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../_testBuilders/jwtTestHelper";
+import {
+  ExpectSavedNotificationsAndEvents,
+  makeExpectSavedNotificationsAndEvents,
+} from "../../../../_testBuilders/makeExpectSavedNotificationsAndEvents";
 import { AppConfig } from "../../../../adapters/primary/config/appConfig";
 import {
   createInMemoryUow,
   InMemoryUnitOfWork,
 } from "../../../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
+import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { InMemoryNotificationGateway } from "../../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
+import { makeCreateNewEvent } from "../../../core/eventBus/EventBus";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import { makeShortLinkUrl } from "../../../core/ShortLink";
+import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "./NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
+
+const convention = new ConventionDtoBuilder()
+  .withBeneficiaryRepresentative({
+    firstName: "Tom",
+    lastName: "Cruise",
+    phone: "0665454271",
+    role: "beneficiary-representative",
+    email: "beneficiary@representative.fr",
+  })
+  .withBeneficiaryCurrentEmployer({
+    businessName: "boss",
+    role: "beneficiary-current-employer",
+    email: "current@employer.com",
+    phone: "001223344",
+    firstName: "Harry",
+    lastName: "Potter",
+    job: "Magician",
+    businessSiret: "01234567891234",
+    businessAddress: "Rue des Bouchers 67065 Strasbourg",
+  })
+  .build();
+
+const agency = new AgencyDtoBuilder().withId(convention.agencyId).build();
 
 describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () => {
   let usecase: NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification;
   let uow: InMemoryUnitOfWork;
-  let notificationGateway: InMemoryNotificationGateway;
   let timeGateway: TimeGateway;
   let config: AppConfig;
   let shortLinkIdGateway: DeterministShortLinkIdGeneratorGateway;
-  const convention = new ConventionDtoBuilder()
-    .withBeneficiaryRepresentative({
-      firstName: "Tom",
-      lastName: "Cruise",
-      phone: "0665454271",
-      role: "beneficiary-representative",
-      email: "beneficiary@representative.fr",
-    })
-    .withBeneficiaryCurrentEmployer({
-      businessName: "boss",
-      role: "beneficiary-current-employer",
-      email: "current@employer.com",
-      phone: "001223344",
-      firstName: "Harry",
-      lastName: "Potter",
-      job: "Magician",
-      businessSiret: "01234567891234",
-      businessAddress: "Rue des Bouchers 67065 Strasbourg",
-    })
-    .build();
-
-  const agency = new AgencyDtoBuilder().withId(convention.agencyId).build();
+  let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
 
   beforeEach(() => {
     config = new AppConfigBuilder({}).build();
     uow = createInMemoryUow();
     uow.conventionRepository.setConventions({ [convention.id]: convention });
     uow.agencyRepository.setAgencies([agency]);
-    notificationGateway = new InMemoryNotificationGateway();
+    expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
+      uow.notificationRepository,
+      uow.outboxRepository,
+    );
     timeGateway = new CustomTimeGateway();
     shortLinkIdGateway = new DeterministShortLinkIdGeneratorGateway();
+
+    const uuidGenerator = new UuidV4Generator();
+    const createNewEvent = makeCreateNewEvent({ uuidGenerator, timeGateway });
+    const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
+      createNewEvent,
+      uuidGenerator,
+      timeGateway,
+    );
+
     usecase =
       new NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification(
         new InMemoryUowPerformer(uow),
-        notificationGateway,
+        saveNotificationAndRelatedEvent,
         fakeGenerateMagicLinkUrlFn,
         timeGateway,
         shortLinkIdGateway,
@@ -128,25 +147,28 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
           }),
         });
 
-        expectToEqual(notificationGateway.getSentEmails(), [
-          {
-            type: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
-            recipients: [expectedRecipient!],
-            params: {
-              internshipKind: convention.internshipKind,
-              beneficiaryFirstName:
-                convention.signatories.beneficiary.firstName,
-              beneficiaryLastName: convention.signatories.beneficiary.lastName,
-              businessName: convention.businessName,
-              immersionAppellation: convention.immersionAppellation,
-              justification,
-              magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
-              conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[1]),
-              signature: agency.signature,
-              agencyLogoUrl: agency.logoUrl,
+        expectSavedNotificationsAndEvents({
+          emails: [
+            {
+              type: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
+              recipients: [expectedRecipient!],
+              params: {
+                internshipKind: convention.internshipKind,
+                beneficiaryFirstName:
+                  convention.signatories.beneficiary.firstName,
+                beneficiaryLastName:
+                  convention.signatories.beneficiary.lastName,
+                businessName: convention.businessName,
+                immersionAppellation: convention.immersionAppellation,
+                justification,
+                magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
+                conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[1]),
+                signature: agency.signature,
+                agencyLogoUrl: agency.logoUrl,
+              },
             },
-          },
-        ]);
+          ],
+        });
       },
     );
   });

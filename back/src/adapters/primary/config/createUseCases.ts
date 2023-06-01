@@ -368,7 +368,7 @@ export const createUseCases = (
       notifyBeneficiaryAndEnterpriseThatConventionNeedsModifications:
         new NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification(
           uowPerformer,
-          gateways.notification,
+          saveNotificationAndRelatedEvent,
           generateConventionMagicLinkUrl,
           gateways.timeGateway,
           gateways.shortLinkGenerator,
