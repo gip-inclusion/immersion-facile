@@ -1,8 +1,17 @@
 import { AgencyDto, AgencyDtoBuilder, ConventionDtoBuilder } from "shared";
 import { expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../../../_testBuilders/emailAssertions";
-import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
+import {
+  createInMemoryUow,
+  InMemoryUnitOfWork,
+} from "../../../../adapters/primary/config/uowConfig";
+import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
+import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { InMemoryNotificationGateway } from "../../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
+import { makeCreateNewEvent } from "../../../core/eventBus/EventBus";
+import {
+  EmailNotification,
+  makeSaveNotificationAndRelatedEvent,
+} from "../../../generic/notifications/entities/Notification";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "./NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
 
 const rejectedConvention = new ConventionDtoBuilder()
@@ -19,31 +28,41 @@ const defaultAgency = AgencyDtoBuilder.create(rejectedConvention.agencyId)
   .build();
 
 describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
-  let notificationGateway: InMemoryNotificationGateway;
   let agency: AgencyDto;
+  let useCase: NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected;
+  let uow: InMemoryUnitOfWork;
 
   beforeEach(() => {
     agency = defaultAgency;
-    notificationGateway = new InMemoryNotificationGateway();
+    uow = createInMemoryUow();
+    uow.agencyRepository.setAgencies([agency]);
+
+    const timeGateway = new CustomTimeGateway();
+    const uuidGenerator = new UuidV4Generator();
+    const createNewEvent = makeCreateNewEvent({ uuidGenerator, timeGateway });
+    const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
+      createNewEvent,
+      uuidGenerator,
+      timeGateway,
+    );
+
+    useCase = new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
+      new InMemoryUowPerformer(uow),
+      saveNotificationAndRelatedEvent,
+    );
   });
 
-  const createUseCase = () => {
-    const uow = createInMemoryUow();
-    uow.agencyRepository.setAgencies([agency]);
-    return new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
-      new InMemoryUowPerformer(uow),
-      notificationGateway,
-    );
-  };
-
   it("Sends rejection email to beneficiary, establishment tutor, and counsellor", async () => {
-    await createUseCase().execute(rejectedConvention);
+    await useCase.execute(rejectedConvention);
 
-    const sentEmails = notificationGateway.getSentEmails();
-    expect(sentEmails).toHaveLength(1);
+    const templatedEmailsSent = uow.notificationRepository.notifications
+      .filter((notif): notif is EmailNotification => notif.kind === "email")
+      .map((notif) => notif.templatedContent);
+
+    expect(templatedEmailsSent).toHaveLength(1);
 
     expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
-      sentEmails[0],
+      templatedEmailsSent[0],
       [
         rejectedConvention.signatories.beneficiary.email,
         rejectedConvention.signatories.establishmentRepresentative.email,

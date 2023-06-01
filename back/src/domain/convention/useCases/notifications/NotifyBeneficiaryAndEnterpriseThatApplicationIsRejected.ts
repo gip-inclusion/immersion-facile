@@ -4,12 +4,12 @@ import {
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { NotificationGateway } from "../../../generic/notifications/ports/NotificationGateway";
+import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 
 export class NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected extends TransactionalUseCase<ConventionDto> {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly notificationGateway: NotificationGateway,
+    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
   ) {
     super(uowPerformer);
   }
@@ -36,19 +36,27 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected extends Tra
       ...agency.counsellorEmails,
     ];
 
-    await this.notificationGateway.sendEmail({
-      type: "REJECTED_CONVENTION_NOTIFICATION",
-      recipients,
-      params: {
-        internshipKind: convention.internshipKind,
-        beneficiaryFirstName: beneficiary.firstName,
-        beneficiaryLastName: beneficiary.lastName,
-        businessName: convention.businessName,
-        rejectionReason: convention.statusJustification || "",
-        signature: agency.signature,
-        agency: agency.name,
-        immersionProfession: convention.immersionAppellation.appellationLabel,
-        agencyLogoUrl: agency.logoUrl,
+    await this.saveNotificationAndRelatedEvent(uow, {
+      kind: "email",
+      templatedContent: {
+        type: "REJECTED_CONVENTION_NOTIFICATION",
+        recipients,
+        params: {
+          internshipKind: convention.internshipKind,
+          beneficiaryFirstName: beneficiary.firstName,
+          beneficiaryLastName: beneficiary.lastName,
+          businessName: convention.businessName,
+          rejectionReason: convention.statusJustification || "",
+          signature: agency.signature,
+          agency: agency.name,
+          immersionProfession: convention.immersionAppellation.appellationLabel,
+          agencyLogoUrl: agency.logoUrl,
+        },
+      },
+      followedIds: {
+        conventionId: convention.id,
+        agencyId: convention.agencyId,
+        establishmentSiret: convention.siret,
       },
     });
   }

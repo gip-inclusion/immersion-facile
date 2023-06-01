@@ -363,7 +363,7 @@ export const createUseCases = (
       notifyBeneficiaryAndEnterpriseThatConventionIsRejected:
         new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
           uowPerformer,
-          gateways.notification,
+          saveNotificationAndRelatedEvent,
         ),
       notifyBeneficiaryAndEnterpriseThatConventionNeedsModifications:
         new NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification(
