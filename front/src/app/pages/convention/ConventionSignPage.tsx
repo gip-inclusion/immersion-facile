@@ -150,21 +150,9 @@ const ConventionSignPageContent = ({
             severity="info"
             title={t.sign.needsModification.title}
             description={
-              <>
-                <p className={fr.cx("fr-mt-1w")}>
-                  {t.sign.needsModification.detail}
-                </p>
-                <span
-                  className={
-                    //fr.cx("block") is not supported
-                    "block"
-                  }
-                >
-                  <a {...routes.conventionImmersion({ jwt }).link}>
-                    {t.sign.needsModification.editionLink}
-                  </a>
-                </span>
-              </>
+              <p className={fr.cx("fr-mt-1w")}>
+                {t.sign.needsModification.detail}
+              </p>
             }
           />
         )}

@@ -166,7 +166,7 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
       : "Cette demande de stage n'est plus modifiable.",
   verification: {
     rejectConvention: "Refuser l'immersion",
-    modifyConvention: "Renvoyer au bénéficiaire pour modification",
+    modifyConvention: "Recevoir un lien de modification",
     conventionAlreadyMarkedAsEligible: "Demande déjà validée.",
     markAsEligible: "Marquer la demande comme éligible",
     conventionAlreadyValidated: "Demande déjà validée",
@@ -198,15 +198,11 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
       contact: "Veuillez contacter votre conseiller pour plus d'informations.",
     },
     needsModification: {
-      title:
-        internshipKind === "immersion"
-          ? "Des modifications ont été demandées sur votre demande"
-          : "Des modifications ont été demandées sur votre demande",
+      title: "Des modifications sont en cours sur votre demande",
       detail:
         internshipKind === "immersion"
-          ? "Vous ne pouvez pas encore signer votre demande d'immersion car des modifications ont été réclamées par votre conseiller (Vous avez reçu un mail précisant les changements à effectuer)."
-          : "Vous ne pouvez pas encore signer votre demande de mini stage car des modifications ont été réclamées par votre conseiller (Vous avez reçu un mail précisant les changements à effectuer).",
-      editionLink: "Cliquez ici pour aller à la page d'édition",
+          ? "Vous ne pouvez pas encore signer votre demande d'immersion car des modifications sont en cours. Vous recevrez un nouveau e-mail de signature lorsque les modifications seront faites."
+          : "Vous ne pouvez pas encore signer votre demande de mini stage car des modifications sont en cours. Vous recevrez un nouveau e-mail de signature lorsque les modifications seront faites.",
     },
   },
 });

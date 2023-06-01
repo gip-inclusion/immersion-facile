@@ -172,14 +172,22 @@ const JustificationModalContent = ({
   return (
     <>
       {newStatus === "DRAFT" && (
-        <Alert
-          severity="warning"
-          title="Attention !"
-          className={fr.cx("fr-mb-2w")}
-          description="Ne surtout pas demander de modification si une signature manque !
-      Cela revient à annuler les signatures déjà enregistrées. Pour
-      relancer un signataire manquant, le contacter par mail."
-        />
+        <>
+          <Alert
+            severity="warning"
+            title="Attention !"
+            className={fr.cx("fr-mb-2w")}
+            description="Ne surtout pas demander de modification pour relancer un signataire manquant. 
+            Cela revient à annuler les signatures déjà enregistrées. 
+            Si vous souhaitez le relancer, contactez-le directement par e-mail ou par téléphone."
+          />
+          <Alert
+            severity="warning"
+            title="Attention !"
+            className={fr.cx("fr-mb-2w")}
+            description="Vous seul allez recevoir par e-mail le lien pour modifier cette demande (peut-être dans une boite générique agence)."
+          />
+        </>
       )}
       {newStatus === "REJECTED" && (
         <Alert
