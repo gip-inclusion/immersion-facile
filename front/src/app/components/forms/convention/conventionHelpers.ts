@@ -173,10 +173,13 @@ export const conventionInitialValuesFromUrl = ({
     businessName: params.businessName ?? "",
     schedule:
       params.schedule ??
-      reasonableSchedule({
-        start: new Date(dateStart),
-        end: new Date(dateEnd),
-      }),
+      reasonableSchedule(
+        {
+          start: new Date(dateStart),
+          end: new Date(dateEnd),
+        },
+        [],
+      ),
     immersionAddress: params.immersionAddress ?? "",
     workConditions: params.workConditions ?? "",
     businessAdvantages: params.businessAdvantages ?? "",

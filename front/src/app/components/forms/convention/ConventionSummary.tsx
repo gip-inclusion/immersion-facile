@@ -142,6 +142,10 @@ const beneficiarySummary = (convention: ConventionReadDto) => {
       fields["signatories.beneficiaryCurrentEmployer.businessSiret"].label,
       convention.signatories.beneficiaryCurrentEmployer?.businessSiret,
     ],
+    [
+      fields["signatories.beneficiary.isRqth"].label,
+      convention.signatories.beneficiary.isRqth ? "✅" : undefined,
+    ],
   ];
   return rows.filter(filterEmptyRows);
 };
