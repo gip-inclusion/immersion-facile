@@ -346,7 +346,7 @@ export const createUseCases = (
         ),
       notifyNewConventionNeedsReview: new NotifyNewApplicationNeedsReview(
         uowPerformer,
-        gateways.notification,
+        saveNotificationAndRelatedEvent,
         generateConventionMagicLinkUrl,
         gateways.timeGateway,
         gateways.shortLinkGenerator,
