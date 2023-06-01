@@ -30,13 +30,15 @@ export type ConventionFeedbackKind =
 
 export type ConventionSubmitFeedback = SubmitFeedBack<ConventionFeedbackKind>;
 
+export type NumberOfSteps = 1 | 2 | 3 | 4 | 5;
+
 export interface ConventionState {
   formUi: {
     preselectedAgencyId: AgencyId | null;
     isMinor: boolean;
     isTutorEstablishmentRepresentative: boolean;
     hasCurrentEmployer: boolean;
-    currentStep: number;
+    currentStep: NumberOfSteps;
     showSummary: boolean;
     agencyDepartment: string | null;
   };
@@ -243,7 +245,7 @@ export const conventionSlice = createSlice({
       state.formUi.preselectedAgencyId = payload;
     },
     preselectedAgencyIdFailed: setFeedbackAsErrored,
-    setCurrentStep: (state, { payload }: PayloadAction<number>) => {
+    setCurrentStep: (state, { payload }: PayloadAction<NumberOfSteps>) => {
       state.formUi.currentStep = payload;
     },
   },
