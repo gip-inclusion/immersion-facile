@@ -110,7 +110,7 @@ export const ConventionDocumentPage = ({
                   : "Date invalide"}
               </strong>{" "}
               en qualité de <strong>bénéficiaire</strong> {""}
-              {beneficiary.isRqth && "reconnu en situation de handicape"}
+              {beneficiary.isRqth && "reconnu en situation de handicap"}
               <ul>
                 <li>tel: {beneficiary.phone}</li>
                 <li>email: {beneficiary.email}</li>

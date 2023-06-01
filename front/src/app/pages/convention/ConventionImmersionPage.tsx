@@ -14,6 +14,7 @@ import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
+import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 
 export type ConventionImmersionPageRoute = Route<
   typeof routes.conventionImmersion
@@ -27,12 +28,20 @@ export const ConventionImmersionPage = ({
   route,
 }: ConventionImmersionPageProps) => {
   const t = useConventionTexts("immersion");
+  const showSummary = useAppSelector(conventionSelectors.showSummary);
   return (
     <HeaderFooterLayout>
       <MainWrapper
         layout={"default"}
         pageHeader={
-          <PageHeader title={t.intro.conventionTitle} theme="candidate" />
+          <PageHeader
+            title={
+              showSummary
+                ? t.intro.conventionSummaryTitle
+                : t.intro.conventionTitle
+            }
+            theme="candidate"
+          />
         }
       >
         <PageContent route={route} />
