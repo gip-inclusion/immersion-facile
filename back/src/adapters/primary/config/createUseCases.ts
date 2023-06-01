@@ -338,7 +338,7 @@ export const createUseCases = (
       notifyAllActorsOfFinalConventionValidation:
         new NotifyAllActorsOfFinalConventionValidation(
           uowPerformer,
-          gateways.notification,
+          saveNotificationAndRelatedEvent,
           generateConventionMagicLinkUrl,
           gateways.timeGateway,
           gateways.shortLinkGenerator,
