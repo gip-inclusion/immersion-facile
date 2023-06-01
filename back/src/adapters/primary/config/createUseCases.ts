@@ -331,7 +331,7 @@ export const createUseCases = (
       notifyLastSigneeThatConventionHasBeenSigned:
         new NotifyLastSigneeThatConventionHasBeenSigned(
           uowPerformer,
-          gateways.notification,
+          saveNotificationAndRelatedEvent,
           generateConventionMagicLinkUrl,
           gateways.timeGateway,
         ),
