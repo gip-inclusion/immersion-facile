@@ -1,10 +1,6 @@
 {
   "jobs": [
     {
-      "command": "15 07 * * * pnpm back run trigger-convention-reminder",
-      "size": "M"
-    },
-    {
       "command": "27 23 * * * pnpm back run mark-establishments-as-searchable-when-max-contacts-allows",
       "size": "M"
     },
@@ -18,6 +14,10 @@
     },
     {
       "command": "53 0 * * * pnpm back run trigger-refresh-materialized-views",
+      "size": "M"
+    },
+    {
+      "command": "15 05 * * * pnpm back run trigger-convention-reminder",
       "size": "M"
     }
   ]
