@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { get, type SubmitHandler, useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { fr } from "@codegouvfr/react-dsfr";
@@ -25,7 +25,10 @@ import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { useRoute } from "src/app/routes/routes";
 import { deviceRepository } from "src/config/dependencies";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
-import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
+import {
+  conventionSlice,
+  NumberOfSteps,
+} from "src/core-logic/domain/convention/convention.slice";
 import { AgencySelector } from "./sections/agency/AgencySelector";
 import { BeneficiaryFormSection } from "./sections/beneficiary/BeneficiaryFormSection";
 import { EstablishmentFormSection } from "./sections/establishment/EstablishmentFormSection";
@@ -38,6 +41,8 @@ type ConventionFieldsProps = {
   mode: ConventionFormMode;
 };
 
+type StepSeverity = "error" | "success" | "info";
+
 export const ConventionFormFields = ({
   onSubmit,
   mode,
@@ -48,6 +53,7 @@ export const ConventionFormFields = ({
     handleSubmit,
     formState: { errors, submitCount, isSubmitted },
     trigger,
+    clearErrors,
     getFieldState,
   } = useFormContext<ConventionReadDto>();
   const currentStep = useAppSelector(conventionSelectors.currentStep);
@@ -58,10 +64,15 @@ export const ConventionFormFields = ({
   );
   const route = useRoute();
   const isLoading = useAppSelector(conventionSelectors.isLoading);
-
+  const [stepsStatus, setStepsStatus] = useState<Record<
+    number,
+    StepSeverity
+  > | null>(null);
   useEffect(() => {
     deviceRepository.delete("partialConventionInUrl");
+    dispatch(conventionSlice.actions.setCurrentStep(1));
     if (mode === "edit") {
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       validateSteps();
     }
   }, []);
@@ -84,48 +95,43 @@ export const ConventionFormFields = ({
   const shouldSubmitButtonBeDisabled =
     isLoading ||
     (isSubmitted && conventionSubmitFeedback.kind === "justSubmitted");
-  const makeAccordionProps = (step: number) => ({
-    onExpandedChange: () => {
-      validateStep(currentStep);
+
+  const makeAccordionProps = (step: NumberOfSteps) => ({
+    onExpandedChange: async () => {
+      await validateSteps();
       dispatch(conventionSlice.actions.setCurrentStep(step));
     },
     expanded: currentStep === step,
     id: `im-convention-form__step-${step - 1}`,
   });
-  const renderStatusBadge = (step: number) => {
-    const stepFields = formUiSections[step - 1];
-    const stepErrors = stepFields.filter(
-      (stepField) =>
-        keys(errors).filter((errorKey) => stepField.includes(errorKey))
-          .length && get(errors, stepField),
-    ).length;
-    const stepIsValid = () =>
-      stepFields.filter((key) => {
-        // We consider a step valid if all its fields are touched and have no errors or none of its fields are touched and 0 errors
-        const isValidUserInteraction =
-          getFieldState(key as keyof ConventionReadDto).isTouched ||
-          mode === "edit";
-        return isValidUserInteraction && stepErrors === 0;
-      }).length === stepFields.length;
-    const getBadgeData = (): {
-      severity: "error" | "success" | "info";
-      label: string;
-    } => {
-      if (stepErrors) {
-        return { severity: "error", label: "Erreur" };
+  const getBadgeData = (
+    step: number,
+  ): {
+    severity: StepSeverity;
+    label: string;
+  } => {
+    const badgeData: Record<
+      StepSeverity,
+      {
+        severity: StepSeverity;
+        label: string;
       }
-      if (stepIsValid()) {
-        return { severity: "success", label: "Complet" };
-      }
-      return { severity: "info", label: "À compléter" };
+    > = {
+      error: { severity: "error", label: "Erreur" },
+      success: { severity: "success", label: "Complet" },
+      info: { severity: "info", label: "À compléter" },
     };
-    const badgeData = getBadgeData();
-    return (
-      <Badge severity={badgeData.severity} className={fr.cx("fr-ml-2w")}>
-        {badgeData.label}
-      </Badge>
-    );
+    return stepsStatus && stepsStatus[step]
+      ? badgeData[stepsStatus[step]]
+      : badgeData.info;
   };
+
+  const renderStatusBadge = (step: number) => (
+    <Badge severity={getBadgeData(step).severity} className={fr.cx("fr-ml-2w")}>
+      {getBadgeData(step).label}
+    </Badge>
+  );
+
   const renderSectionTitle = (title: string, step: number) => {
     const baseText = currentStep === step ? <strong>{title}</strong> : title;
     return (
@@ -135,17 +141,47 @@ export const ConventionFormFields = ({
       </>
     );
   };
-  const validateSteps = () => {
-    formUiSections.forEach((_, step) => {
-      validateStep(step + 1);
-    });
+
+  const validateSteps = async () => {
+    const stepsData = formUiSections.map(async (_, step) =>
+      getStepData(step + 1),
+    );
+    const stepsDataValue = await Promise.all(stepsData);
+    setStepsStatus(stepsDataValue.reduce((acc, curr) => ({ ...acc, ...curr })));
+    clearErrors();
   };
-  const validateStep = (step: number) => {
+
+  const getStepData = async (
+    step: number,
+  ): Promise<Record<number, StepSeverity>> => {
     const stepFields = formUiSections[step - 1];
-    stepFields.forEach(async (field) => {
-      await trigger(field as keyof ConventionReadDto);
-    });
+    const validatedFields = stepFields.map(async (field) => ({
+      [field]: await trigger(field as keyof ConventionReadDto),
+    }));
+    const validatedFieldsValue = await Promise.all(validatedFields);
+    const getStepStatus = () => {
+      const stepHasErrors = stepFields.filter(
+        (stepField) =>
+          keys(errors).filter((errorKey) => stepField.includes(errorKey))
+            .length && get(errors, stepField),
+      ).length;
+      const stepIsTouched = stepFields.filter(
+        (stepField) =>
+          getFieldState(stepField as keyof ConventionReadDto).isTouched,
+      ).length;
+      if (validatedFieldsValue.every((field) => Object.values(field)[0])) {
+        return "success";
+      }
+      if (stepHasErrors && stepIsTouched) {
+        return "error";
+      }
+      return "info";
+    };
+    return {
+      [step]: getStepStatus(),
+    };
   };
+
   return (
     <>
       <input
