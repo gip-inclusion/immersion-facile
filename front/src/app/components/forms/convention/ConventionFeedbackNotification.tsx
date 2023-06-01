@@ -52,7 +52,7 @@ export const createConventionFeedbackMessageByKind = (
   rejected:
     "Succès. La décision de refuser cette immersion est bien enregistrée. Cette décision va être communiquée par mail au bénéficiaire et à l'entreprise.",
   modificationAskedFromCounsellorOrValidator:
-    "Succès. Cette demande de modification va être communiquée par mail au bénéficiaire et à l'entreprise",
+    "Succès. Vous allez recevoir un lien de modification par e-mail (peut-être dans une boite générique agence).",
   markedAsEligible:
     "Succès. L'éligibilité de cette demande est bien enregistrée. Une notification est envoyée au responsable des validations pour qu'elle/il confirme ou non la validation de cette demande et initie la Convention.",
   markedAsValidated:
