@@ -18,14 +18,14 @@ import {
 } from "../../../core/ports/UnitOfWork";
 import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { NotificationGateway } from "../../../generic/notifications/ports/NotificationGateway";
+import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 
 const logger = createLogger(__filename);
 
 export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<ConventionDto> {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly notificationGateway: NotificationGateway,
+    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
     private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     private readonly timeGateway: TimeGateway,
     private readonly shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
@@ -37,30 +37,28 @@ export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<Conven
   inputSchema = conventionSchema;
 
   public async _execute(
-    conventionDto: ConventionDto,
+    convention: ConventionDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    const [agency] = await uow.agencyRepository.getByIds([
-      conventionDto.agencyId,
-    ]);
+    const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);
 
     if (!agency) {
       logger.error(
-        { agencyId: conventionDto.agencyId },
+        { agencyId: convention.agencyId },
         "No Agency Config found for this agency code",
       );
       return;
     }
 
-    const recipients = determineRecipients(conventionDto.status, agency);
-    logger.debug("conventionDto.status : " + conventionDto.status);
+    const recipients = determineRecipients(convention.status, agency);
+    logger.debug("conventionDto.status : " + convention.status);
 
     if (!recipients) {
       logger.error(
         {
-          applicationId: conventionDto.id,
-          status: conventionDto.status,
-          agencyId: conventionDto.agencyId,
+          applicationId: convention.id,
+          status: convention.status,
+          agencyId: convention.agencyId,
         },
         "Unable to find appropriate recipient for validation notification.",
       );
@@ -70,7 +68,7 @@ export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<Conven
     logger.info(
       {
         recipients,
-        applicationId: conventionDto.id,
+        applicationId: convention.id,
       },
       "Sending Mail to review an immersion",
     );
@@ -80,7 +78,7 @@ export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<Conven
         const makeShortMagicLink = prepareMagicShortLinkMaker({
           config: this.config,
           conventionMagicLinkPayload: {
-            id: conventionDto.id,
+            id: convention.id,
             role: recipients.role,
             email: recipientEmail,
             now: this.timeGateway.now(),
@@ -94,15 +92,14 @@ export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<Conven
           type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
           recipients: [recipientEmail],
           params: {
-            internshipKind: conventionDto.internshipKind,
-            businessName: conventionDto.businessName,
+            internshipKind: convention.internshipKind,
+            businessName: convention.businessName,
             magicLink: await makeShortMagicLink(frontRoutes.manageConvention),
             conventionStatusLink: await makeShortMagicLink(
               frontRoutes.conventionStatusDashboard,
             ),
-            beneficiaryFirstName:
-              conventionDto.signatories.beneficiary.firstName,
-            beneficiaryLastName: conventionDto.signatories.beneficiary.lastName,
+            beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+            beneficiaryLastName: convention.signatories.beneficiary.lastName,
             possibleRoleAction:
               recipients.role === "counsellor"
                 ? "en vérifier l'éligibilité"
@@ -114,13 +111,23 @@ export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<Conven
     );
 
     await Promise.all(
-      emails.map((email) => this.notificationGateway.sendEmail(email)),
+      emails.map((email) =>
+        this.saveNotificationAndRelatedEvent(uow, {
+          kind: "email",
+          templatedContent: email,
+          followedIds: {
+            conventionId: convention.id,
+            agencyId: convention.agencyId,
+            establishmentSiret: convention.siret,
+          },
+        }),
+      ),
     );
 
     logger.info(
       {
         recipients,
-        conventionId: conventionDto.id,
+        conventionId: convention.id,
       },
       "Mail to review an immersion sent",
     );
