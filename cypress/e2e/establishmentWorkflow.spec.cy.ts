@@ -1,3 +1,4 @@
+import { faker } from "@faker-js/faker/locale/fr";
 import {
   addressTargets,
   appellationRoute,
@@ -64,10 +65,10 @@ describe("Establishment creation and modification workflow", () => {
     cy.get(
       `#${domElementIds.establishment.establishmentFormAddressAutocomplete}`,
     ).should("not.have.value", "");
-
-    cy.get(`#${domElementIds.establishment.appellations} .fr-input`)
-      // .then((elem) => console.log("ELEM : ", elem))
-      .type("boulang");
+    cy.wait(500); // To avoid typing in disabled input (cf. https://github.com/cypress-io/cypress/issues/5827)
+    cy.get(`#${domElementIds.establishment.appellations} .fr-input`).type(
+      "boulang",
+    );
 
     cy.wait("@autocompleteAppellationRequest");
 
@@ -81,7 +82,21 @@ describe("Establishment creation and modification workflow", () => {
       },
     );
 
-    // cy.get();
+    cy.get(`#${domElementIds.establishment.businessContact.firstName}`).type(
+      faker.name.firstName(),
+    );
+    cy.get(`#${domElementIds.establishment.businessContact.lastName}`).type(
+      faker.name.lastName(),
+    );
+    cy.get(`#${domElementIds.establishment.businessContact.job}`).type(
+      faker.name.jobTitle(),
+    );
+    cy.get(`#${domElementIds.establishment.businessContact.phone}`).type(
+      faker.phone.number("06########"),
+    );
+    cy.get(`#${domElementIds.establishment.businessContact.email}`).type(
+      faker.internet.email(),
+    );
     // certain champs prérempli
     // on rempli le reste
     // on valide

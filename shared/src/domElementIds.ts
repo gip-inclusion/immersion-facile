@@ -258,6 +258,7 @@ export const domElementIds = {
     maxContactsPerWeek: "establishment-maxContactPerWeek",
     errorSiretAlreadyExistButton:
       "im-form-add-establishment__edit-establishment-button",
+    submitButton: "im-form-add-establishment__submit-button",
   },
 
   immersionAssessment: {
