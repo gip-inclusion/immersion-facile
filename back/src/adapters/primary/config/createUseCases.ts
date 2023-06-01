@@ -386,7 +386,7 @@ export const createUseCases = (
       notifyPoleEmploiUserAdvisorOnConventionFullySigned:
         new NotifyPoleEmploiUserAdvisorOnConventionFullySigned(
           uowPerformer,
-          gateways.notification,
+          saveNotificationAndRelatedEvent,
           generateConventionMagicLinkUrl,
           gateways.timeGateway,
         ),
