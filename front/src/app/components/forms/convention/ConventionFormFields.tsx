@@ -277,7 +277,7 @@ export const ConventionFormFields = ({
             },
           )}
         >
-          Envoyer la demande
+          Vérifier la demande
         </Button>
       </div>
     </>
