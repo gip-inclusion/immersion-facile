@@ -142,6 +142,11 @@ export const ConventionForm = ({
   useEffect(() => {
     if (mode === "create") {
       dispatch(conventionSlice.actions.clearFetchedConvention());
+      dispatch(
+        conventionSlice.actions.showSummaryChangeRequested({
+          showSummary: false,
+        }),
+      );
       return;
     }
 

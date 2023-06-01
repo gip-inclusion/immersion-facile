@@ -109,8 +109,11 @@ const reasonableTimePeriods: TimePeriodsDto = [
     end: "16:00",
   },
 ];
-export const reasonableSchedule = (interval: DateIntervalDto): ScheduleDto => {
-  const complexSchedule = makeComplexSchedule(interval, reasonableTimePeriods);
+export const reasonableSchedule = (
+  interval: DateIntervalDto,
+  timePeriods: TimePeriodsDto = reasonableTimePeriods,
+): ScheduleDto => {
+  const complexSchedule = makeComplexSchedule(interval, timePeriods);
   return {
     totalHours:
       calculateTotalImmersionHoursFromComplexSchedule(complexSchedule),

@@ -41,7 +41,7 @@ export const ImmersionHourLocationSection = () => {
     setValue(
       "schedule",
       values.schedule.isSimple
-        ? reasonableSchedule(interval)
+        ? reasonableSchedule(interval, [])
         : scheduleWithFirstDayActivity(interval),
     );
   };
