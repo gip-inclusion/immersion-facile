@@ -5,6 +5,7 @@ import {
   domElementIds,
   featureFlagsRoute,
   siretTargets,
+  establishmentTargets,
 } from "shared";
 
 const baseApiRoute = "/api/";
@@ -31,6 +32,11 @@ describe("Establishment creation and modification workflow", () => {
     cy.intercept("GET", `${baseApiRoute}${appellationRoute}?**`).as(
       "autocompleteAppellationRequest",
     );
+
+    cy.intercept(
+      "POST",
+      `${baseApiRoute}${establishmentTargets.addFormEstablishment.url}`,
+    ).as("addFormEstablishmentRequest");
 
     // home
     cy.visit("/");
@@ -65,9 +71,11 @@ describe("Establishment creation and modification workflow", () => {
     cy.get(
       `#${domElementIds.establishment.establishmentFormAddressAutocomplete}`,
     ).should("not.have.value", "");
-    cy.wait(500); // To avoid typing in disabled input (cf. https://github.com/cypress-io/cypress/issues/5827)
     cy.get(`#${domElementIds.establishment.appellations} .fr-input`).type(
       "boulang",
+      {
+        force: true, // To avoid typing in disabled input (cf. https://github.com/cypress-io/cypress/issues/5827)
+      },
     );
 
     cy.wait("@autocompleteAppellationRequest");
@@ -81,25 +89,41 @@ describe("Establishment creation and modification workflow", () => {
         });
       },
     );
-
     cy.get(`#${domElementIds.establishment.businessContact.firstName}`).type(
       faker.name.firstName(),
+      {
+        force: true,
+      },
     );
     cy.get(`#${domElementIds.establishment.businessContact.lastName}`).type(
       faker.name.lastName(),
+      {
+        force: true,
+      },
     );
     cy.get(`#${domElementIds.establishment.businessContact.job}`).type(
       faker.name.jobTitle(),
+      {
+        force: true,
+      },
     );
     cy.get(`#${domElementIds.establishment.businessContact.phone}`).type(
       faker.phone.number("06########"),
+      {
+        force: true,
+      },
     );
     cy.get(`#${domElementIds.establishment.businessContact.email}`).type(
       faker.internet.email(),
+      {
+        force: true,
+      },
     );
-    // certain champs prérempli
-    // on rempli le reste
-    // on valide
+    cy.get(`#${domElementIds.establishment.submitButton}`).click();
+    cy.wait("@addFormEstablishmentRequest")
+      .its("response.statusCode")
+      .should("eq", 200);
+    cy.get(".fr-alert--success").should("exist");
   });
 });
 
