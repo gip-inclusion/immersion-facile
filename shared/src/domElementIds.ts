@@ -140,6 +140,7 @@ export const domElementIds = {
       agencyId: "im-convention-form__agencyId",
       dateStart: "im-convention-form__dateStart",
       dateEnd: "im-convention-form__dateEnd",
+      addHoursButton: "im-convention-form__add-hours-button",
       siret: "im-convention-form__siret",
       businessName: "im-convention-form__businessName",
       workConditions: "im-convention-form__workConditions",

@@ -68,14 +68,18 @@ export const ConventionFormFields = ({
     number,
     StepSeverity
   > | null>(null);
+
   useEffect(() => {
     deviceRepository.delete("partialConventionInUrl");
     dispatch(conventionSlice.actions.setCurrentStep(1));
+  }, []);
+
+  useEffect(() => {
     if (mode === "edit") {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       validateSteps();
     }
-  }, []);
+  }, [conventionValues.id]);
 
   useEffect(() => {
     if (route.name === "conventionCustomAgency" && preselectedAgencyId) {
@@ -142,13 +146,14 @@ export const ConventionFormFields = ({
     );
   };
 
-  const validateSteps = async () => {
-    const stepsData = formUiSections.map(async (_, step) =>
-      getStepData(step + 1),
+  const validateSteps = async (shouldClearError = true) => {
+    const stepsDataValue = await Promise.all(
+      formUiSections.map((_, step) => getStepData(step + 1)),
     );
-    const stepsDataValue = await Promise.all(stepsData);
     setStepsStatus(stepsDataValue.reduce((acc, curr) => ({ ...acc, ...curr })));
-    clearErrors();
+    if (shouldClearError) {
+      clearErrors();
+    }
   };
 
   const getStepData = async (
@@ -272,6 +277,8 @@ export const ConventionFormFields = ({
               return onSubmit({ ...values, status: "READY_TO_SIGN" });
             },
             (errors) => {
+              // eslint-disable-next-line @typescript-eslint/no-floating-promises
+              validateSteps(false);
               // eslint-disable-next-line no-console
               console.error(getValues(), errors);
             },
