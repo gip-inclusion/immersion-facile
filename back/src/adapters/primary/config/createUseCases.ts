@@ -378,7 +378,10 @@ export const createUseCases = (
         gateways.notification,
       ),
       notifyConfirmationEstablishmentCreated:
-        new NotifyConfirmationEstablishmentCreated(gateways.notification),
+        new NotifyConfirmationEstablishmentCreated(
+          uowPerformer,
+          saveNotificationAndRelatedEvent,
+        ),
       notifyContactRequest: new NotifyContactRequest(
         uowPerformer,
         gateways.notification,
