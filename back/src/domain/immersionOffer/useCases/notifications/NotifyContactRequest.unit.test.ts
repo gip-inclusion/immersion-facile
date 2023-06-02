@@ -1,20 +1,22 @@
-import { ContactEstablishmentRequestDto } from "shared";
+import { addressDtoToString, ContactEstablishmentRequestDto } from "shared";
 import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBuilder";
-import {
-  expectContactByEmailRequest,
-  expectContactByPhoneInstructions,
-  expectContactInPersonInstructions,
-} from "../../../../_testBuilders/emailAssertions";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import {
+  ExpectSavedNotificationsAndEvents,
+  makeExpectSavedNotificationsAndEvents,
+} from "../../../../_testBuilders/makeExpectSavedNotificationsAndEvents";
 import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
+import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
+import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import {
   InMemoryEstablishmentAggregateRepository,
   TEST_ROME_LABEL,
 } from "../../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { InMemoryNotificationGateway } from "../../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
+import { makeCreateNewEvent } from "../../../core/eventBus/EventBus";
+import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { NotifyContactRequest } from "./NotifyContactRequest";
 
 const immersionOffer = new ImmersionOfferEntityV2Builder().build();
@@ -37,16 +39,30 @@ const allowedCopyEmail = "copy@gmail.com";
 
 describe("NotifyContactRequest", () => {
   let establishmentAggregateRepository: InMemoryEstablishmentAggregateRepository;
-  let notificationGateway: InMemoryNotificationGateway;
   let notifyContactRequest: NotifyContactRequest;
+  let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
 
   beforeEach(() => {
-    notificationGateway = new InMemoryNotificationGateway();
     const uow = createInMemoryUow();
     establishmentAggregateRepository = uow.establishmentAggregateRepository;
+
+    expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
+      uow.notificationRepository,
+      uow.outboxRepository,
+    );
+
+    const uuidGenerator = new UuidV4Generator();
+    const timeGateway = new CustomTimeGateway();
+    const createNewEvent = makeCreateNewEvent({ uuidGenerator, timeGateway });
+    const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
+      createNewEvent,
+      uuidGenerator,
+      timeGateway,
+    );
+
     notifyContactRequest = new NotifyContactRequest(
       new InMemoryUowPerformer(uow),
-      notificationGateway,
+      saveNotificationAndRelatedEvent,
     );
   });
 
@@ -75,21 +91,26 @@ describe("NotifyContactRequest", () => {
 
     await notifyContactRequest.execute(validEmailPayload);
 
-    const sentEmails = notificationGateway.getSentEmails();
-    expect(sentEmails).toHaveLength(1);
-
-    expectContactByEmailRequest(
-      sentEmails[0],
-      [contact.email],
-      {
-        ...immersionOffer,
-        romeLabel: TEST_ROME_LABEL,
-      },
-      establishment,
-      contact,
-      validEmailPayload,
-      contact.copyEmails,
-    );
+    expectSavedNotificationsAndEvents({
+      emails: [
+        {
+          type: "CONTACT_BY_EMAIL_REQUEST",
+          recipients: [contact.email],
+          params: {
+            businessName: establishment.name,
+            contactFirstName: contact.firstName,
+            contactLastName: contact.lastName,
+            appellationLabel: TEST_ROME_LABEL,
+            potentialBeneficiaryFirstName:
+              payload.potentialBeneficiaryFirstName,
+            potentialBeneficiaryLastName: payload.potentialBeneficiaryLastName,
+            potentialBeneficiaryEmail: payload.potentialBeneficiaryEmail,
+            message: validEmailPayload.message,
+          },
+          cc: contact.copyEmails,
+        },
+      ],
+    });
   });
 
   it("Sends ContactByPhoneRequest email to potential beneficiary", async () => {
@@ -114,16 +135,23 @@ describe("NotifyContactRequest", () => {
 
     await notifyContactRequest.execute(validPhonePayload);
 
-    const sentEmails = notificationGateway.getSentEmails();
-    expect(sentEmails).toHaveLength(1);
-
-    expectContactByPhoneInstructions(
-      sentEmails[0],
-      [payload.potentialBeneficiaryEmail],
-      establishment,
-      contact,
-      validPhonePayload,
-    );
+    expectSavedNotificationsAndEvents({
+      emails: [
+        {
+          type: "CONTACT_BY_PHONE_INSTRUCTIONS",
+          recipients: [payload.potentialBeneficiaryEmail],
+          params: {
+            businessName: establishment.name,
+            contactFirstName: contact.firstName,
+            contactLastName: contact.lastName,
+            contactPhone: contact.phone,
+            potentialBeneficiaryFirstName:
+              payload.potentialBeneficiaryFirstName,
+            potentialBeneficiaryLastName: payload.potentialBeneficiaryLastName,
+          },
+        },
+      ],
+    });
   });
 
   it("Sends ContactInPersonRequest email to potential beneficiary", async () => {
@@ -148,15 +176,22 @@ describe("NotifyContactRequest", () => {
 
     await notifyContactRequest.execute(validInPersonPayload);
 
-    const sentEmails = notificationGateway.getSentEmails();
-    expect(sentEmails).toHaveLength(1);
-
-    expectContactInPersonInstructions(
-      sentEmails[0],
-      [payload.potentialBeneficiaryEmail],
-      establishment,
-      contact,
-      validInPersonPayload,
-    );
+    expectSavedNotificationsAndEvents({
+      emails: [
+        {
+          type: "CONTACT_IN_PERSON_INSTRUCTIONS",
+          recipients: [payload.potentialBeneficiaryEmail],
+          params: {
+            businessName: establishment.name,
+            contactFirstName: contact.firstName,
+            contactLastName: contact.lastName,
+            businessAddress: addressDtoToString(establishment.address),
+            potentialBeneficiaryFirstName:
+              payload.potentialBeneficiaryFirstName,
+            potentialBeneficiaryLastName: payload.potentialBeneficiaryLastName,
+          },
+        },
+      ],
+    });
   });
 });

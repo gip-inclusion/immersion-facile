@@ -8,12 +8,12 @@ import {
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { NotificationGateway } from "../../../generic/notifications/ports/NotificationGateway";
+import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 
 export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishmentRequestDto> {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly notificationGateway: NotificationGateway,
+    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
   ) {
     super(uowPerformer);
   }
@@ -48,60 +48,79 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
       establishmentAggregate.establishment.customizedName ??
       establishmentAggregate.establishment.name;
 
+    const followedIds = {
+      establishmentSiret: siret,
+    };
+
     switch (payload.contactMode) {
       case "EMAIL": {
-        await this.notificationGateway.sendEmail({
-          type: "CONTACT_BY_EMAIL_REQUEST",
-          recipients: [contact.email],
-          cc: contact.copyEmails,
-          params: {
-            businessName,
-            contactFirstName: contact.firstName,
-            contactLastName: contact.lastName,
-            appellationLabel:
-              establishmentAggregate.immersionOffers.at(0)?.appellationLabel ??
-              rome.romeLabel,
-            potentialBeneficiaryFirstName:
-              payload.potentialBeneficiaryFirstName,
-            potentialBeneficiaryLastName: payload.potentialBeneficiaryLastName,
-            potentialBeneficiaryEmail: payload.potentialBeneficiaryEmail,
-            message: payload.message,
+        await this.saveNotificationAndRelatedEvent(uow, {
+          kind: "email",
+          templatedContent: {
+            type: "CONTACT_BY_EMAIL_REQUEST",
+            recipients: [contact.email],
+            cc: contact.copyEmails,
+            params: {
+              businessName,
+              contactFirstName: contact.firstName,
+              contactLastName: contact.lastName,
+              appellationLabel:
+                establishmentAggregate.immersionOffers.at(0)
+                  ?.appellationLabel ?? rome.romeLabel,
+              potentialBeneficiaryFirstName:
+                payload.potentialBeneficiaryFirstName,
+              potentialBeneficiaryLastName:
+                payload.potentialBeneficiaryLastName,
+              potentialBeneficiaryEmail: payload.potentialBeneficiaryEmail,
+              message: payload.message,
+            },
           },
+          followedIds,
         });
 
         break;
       }
       case "PHONE": {
-        await this.notificationGateway.sendEmail({
-          type: "CONTACT_BY_PHONE_INSTRUCTIONS",
-          recipients: [payload.potentialBeneficiaryEmail],
-          params: {
-            businessName,
-            contactFirstName: contact.firstName,
-            contactLastName: contact.lastName,
-            contactPhone: contact.phone,
-            potentialBeneficiaryFirstName:
-              payload.potentialBeneficiaryFirstName,
-            potentialBeneficiaryLastName: payload.potentialBeneficiaryLastName,
+        await this.saveNotificationAndRelatedEvent(uow, {
+          kind: "email",
+          templatedContent: {
+            type: "CONTACT_BY_PHONE_INSTRUCTIONS",
+            recipients: [payload.potentialBeneficiaryEmail],
+            params: {
+              businessName,
+              contactFirstName: contact.firstName,
+              contactLastName: contact.lastName,
+              contactPhone: contact.phone,
+              potentialBeneficiaryFirstName:
+                payload.potentialBeneficiaryFirstName,
+              potentialBeneficiaryLastName:
+                payload.potentialBeneficiaryLastName,
+            },
           },
+          followedIds,
         });
         break;
       }
       case "IN_PERSON": {
-        await this.notificationGateway.sendEmail({
-          type: "CONTACT_IN_PERSON_INSTRUCTIONS",
-          recipients: [payload.potentialBeneficiaryEmail],
-          params: {
-            businessName,
-            contactFirstName: contact.firstName,
-            contactLastName: contact.lastName,
-            businessAddress: addressDtoToString(
-              establishmentAggregate.establishment.address,
-            ),
-            potentialBeneficiaryFirstName:
-              payload.potentialBeneficiaryFirstName,
-            potentialBeneficiaryLastName: payload.potentialBeneficiaryLastName,
+        await this.saveNotificationAndRelatedEvent(uow, {
+          kind: "email",
+          templatedContent: {
+            type: "CONTACT_IN_PERSON_INSTRUCTIONS",
+            recipients: [payload.potentialBeneficiaryEmail],
+            params: {
+              businessName,
+              contactFirstName: contact.firstName,
+              contactLastName: contact.lastName,
+              businessAddress: addressDtoToString(
+                establishmentAggregate.establishment.address,
+              ),
+              potentialBeneficiaryFirstName:
+                payload.potentialBeneficiaryFirstName,
+              potentialBeneficiaryLastName:
+                payload.potentialBeneficiaryLastName,
+            },
           },
+          followedIds,
         });
         break;
       }
