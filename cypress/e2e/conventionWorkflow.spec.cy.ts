@@ -19,7 +19,7 @@ describe("Convention full workflow", () => {
   });
   it("creates a new convention", () => {
     basicFormConvention();
-    cy.wait(10000);
+    cy.wait(20000);
   });
 
   it("get signatories magicLink urls from email", () => {

@@ -112,6 +112,9 @@ export function basicFormConvention() {
     .clear()
     .type(getTomorrowDate());
   cy.get(
+    `#${domElementIds.conventionImmersionRoute.conventionSection.addHoursButton}`,
+  ).click();
+  cy.get(
     `#${domElementIds.conventionImmersionRoute.conventionSection.immersionAddress}`,
   )
     .clear()

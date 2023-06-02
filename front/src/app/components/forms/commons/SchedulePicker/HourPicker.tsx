@@ -3,7 +3,12 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { ErrorMessage } from "@hookform/error-message";
 import { useStyles } from "tss-react/dsfr";
-import { removeAtIndex, replaceArrayElement, TimePeriodDto } from "shared";
+import {
+  domElementIds,
+  removeAtIndex,
+  replaceArrayElement,
+  TimePeriodDto,
+} from "shared";
 
 type HourPickerProps = {
   name: string;
@@ -127,6 +132,10 @@ export const HourPicker = ({
           title="Ajouter des horaires"
           priority="secondary"
           onClick={() => add()}
+          nativeButtonProps={{
+            id: domElementIds.conventionImmersionRoute.conventionSection
+              .addHoursButton,
+          }}
         >
           Ajouter des horaires
         </Button>
