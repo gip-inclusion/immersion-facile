@@ -4,13 +4,20 @@ import { timeHHmmRegExp } from "./utils/date";
 
 // Change default error map behavior to provide context
 // https://github.com/colinhacks/zod/blob/master/ERROR_HANDLING.md#global-error-map
-z.setErrorMap((issue, ctx) =>
-  issue.code === "invalid_string" && issue.validation === "email"
-    ? {
-        message: `${localization.invalidEmailFormat} - email fourni : ${ctx.data}`,
-      }
-    : { message: ctx.defaultError },
-);
+z.setErrorMap((issue, ctx) => {
+  if (issue.code === "invalid_string" && issue.validation === "email")
+    return {
+      message: `${localization.invalidEmailFormat} - email fourni : ${ctx.data}`,
+    };
+
+  // Temporary regex instead of email - waiting for zod release
+  if (issue.code === "invalid_string" && issue.validation === "regex")
+    return {
+      message: `invalide - valeur fourni : ${ctx.data}`,
+    };
+
+  return { message: ctx.defaultError };
+});
 
 export const localization = {
   atLeastOneEmail: "Vous devez renseigner au moins un email",
