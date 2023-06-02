@@ -9,7 +9,6 @@ import {
   displayEmergencyContactInfos,
   EmailParamsByEmailType,
   expectToEqual,
-  FormEstablishmentDto,
   Signatory,
   TemplatedEmail,
 } from "shared";
@@ -122,55 +121,6 @@ export const expectEmailFinalValidationConfirmationMatchingConvention = (
       ),
     },
   ]);
-
-export const expectedEmailEstablishmentCreatedReviewMatchingEstablisment = (
-  templatedEmail: TemplatedEmail,
-  establishmentDto: FormEstablishmentDto,
-) =>
-  expectToEqual(templatedEmail, {
-    type: "NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION",
-    recipients: [establishmentDto.businessContact.email],
-    params: {
-      businessName: establishmentDto.businessName,
-      contactFirstName: establishmentDto.businessContact.firstName,
-      contactLastName: establishmentDto.businessContact.lastName,
-    },
-    cc: establishmentDto.businessContact.copyEmails,
-  });
-
-type ExpectedEmailConventionReviewMatchingConventionProps = {
-  templatedEmail: TemplatedEmail;
-  recipient: string;
-  convention: ConventionDto;
-  magicLink: string;
-  conventionStatusLink: string;
-  possibleRoleAction: string;
-  agency: AgencyDto;
-};
-
-export const expectedEmailConventionReviewMatchingConvention = ({
-  templatedEmail,
-  recipient,
-  convention,
-  magicLink,
-  conventionStatusLink,
-  possibleRoleAction,
-  agency,
-}: ExpectedEmailConventionReviewMatchingConventionProps) =>
-  expectToEqual(templatedEmail, {
-    type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
-    recipients: [recipient],
-    params: {
-      internshipKind: convention.internshipKind,
-      beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-      beneficiaryLastName: convention.signatories.beneficiary.lastName,
-      businessName: convention.businessName,
-      magicLink,
-      possibleRoleAction,
-      conventionStatusLink,
-      agencyLogoUrl: agency.logoUrl,
-    },
-  });
 
 export const expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected = (
   templatedEmail: TemplatedEmail,

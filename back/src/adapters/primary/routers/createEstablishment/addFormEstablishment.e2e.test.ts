@@ -9,6 +9,7 @@ import {
   buildTestApp,
   TestAppAndDeps,
 } from "../../../../_testBuilders/buildTestApp";
+import { processEventsForEmailToBeSent } from "../../../../_testBuilders/processEventsForEmailToBeSent";
 import { TEST_ESTABLISHMENT1_SIRET } from "../../../secondary/siret/InMemorySiretGateway";
 import { FormEstablishmentDtoPublicV0 } from "../DtoAndSchemas/v0/input/FormEstablishmentPublicV0.dto";
 import { FormEstablishmentDtoPublicV1 } from "../DtoAndSchemas/v1/input/FormEstablishmentPublicV1.dto";
@@ -61,7 +62,7 @@ describe("Add form establishment", () => {
 
       expect(response.status).toBe(200);
 
-      await eventCrawler.processNewEvents();
+      await processEventsForEmailToBeSent(eventCrawler);
 
       const sentEmails = gateways.notification.getSentEmails();
       expect(sentEmails).toHaveLength(1);
