@@ -1,10 +1,6 @@
 import { parseISO } from "date-fns";
 import {
-  addressDtoToString,
   AgencyDto,
-  ContactEstablishmentByMailDto,
-  ContactEstablishmentByPhoneDto,
-  ContactEstablishmentInPersonDto,
   ConventionDto,
   displayEmergencyContactInfos,
   EmailParamsByEmailType,
@@ -15,9 +11,6 @@ import {
 import { AppConfig } from "../adapters/primary/config/appConfig";
 import { ShortLinkId } from "../domain/core/ports/ShortLinkQuery";
 import { makeShortLinkUrl } from "../domain/core/ShortLink";
-import { ContactEntity } from "../domain/immersionOffer/entities/ContactEntity";
-import { EstablishmentEntity } from "../domain/immersionOffer/entities/EstablishmentEntity";
-import { AnnotatedImmersionOfferEntityV2 } from "../domain/immersionOffer/entities/ImmersionOfferEntity";
 
 // TODO: we should use hardcoded values instead of relying on the getValidatedConventionFinalConfirmationParams
 export const getValidatedConventionFinalConfirmationParams = (
@@ -141,74 +134,6 @@ export const expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected = (
       agency: agency.name,
       immersionProfession: convention.immersionAppellation.appellationLabel,
       agencyLogoUrl: agency.logoUrl,
-    },
-  });
-};
-
-export const expectContactByEmailRequest = (
-  templatedEmail: TemplatedEmail,
-  recipients: string[],
-  annotatedImmersionOffer: AnnotatedImmersionOfferEntityV2,
-  establishment: EstablishmentEntity,
-  contact: ContactEntity,
-  payload: ContactEstablishmentByMailDto,
-  copy: string[],
-) => {
-  expectToEqual(templatedEmail, {
-    type: "CONTACT_BY_EMAIL_REQUEST",
-    recipients,
-    params: {
-      businessName: establishment.name,
-      contactFirstName: contact.firstName,
-      contactLastName: contact.lastName,
-      appellationLabel: annotatedImmersionOffer.romeLabel,
-      potentialBeneficiaryFirstName: payload.potentialBeneficiaryFirstName,
-      potentialBeneficiaryLastName: payload.potentialBeneficiaryLastName,
-      potentialBeneficiaryEmail: payload.potentialBeneficiaryEmail,
-      message: payload.message,
-    },
-    cc: copy,
-  });
-};
-
-export const expectContactByPhoneInstructions = (
-  templatedEmail: TemplatedEmail,
-  recipients: string[],
-  establishment: EstablishmentEntity,
-  contact: ContactEntity,
-  payload: ContactEstablishmentByPhoneDto,
-) => {
-  expectToEqual(templatedEmail, {
-    type: "CONTACT_BY_PHONE_INSTRUCTIONS",
-    recipients,
-    params: {
-      businessName: establishment.name,
-      contactFirstName: contact.firstName,
-      contactLastName: contact.lastName,
-      contactPhone: contact.phone,
-      potentialBeneficiaryFirstName: payload.potentialBeneficiaryFirstName,
-      potentialBeneficiaryLastName: payload.potentialBeneficiaryLastName,
-    },
-  });
-};
-
-export const expectContactInPersonInstructions = (
-  templatedEmail: TemplatedEmail,
-  recipients: string[],
-  establishment: EstablishmentEntity,
-  contact: ContactEntity,
-  payload: ContactEstablishmentInPersonDto,
-) => {
-  expectToEqual(templatedEmail, {
-    type: "CONTACT_IN_PERSON_INSTRUCTIONS",
-    recipients,
-    params: {
-      businessName: establishment.name,
-      contactFirstName: contact.firstName,
-      contactLastName: contact.lastName,
-      businessAddress: addressDtoToString(establishment.address),
-      potentialBeneficiaryFirstName: payload.potentialBeneficiaryFirstName,
-      potentialBeneficiaryLastName: payload.potentialBeneficiaryLastName,
     },
   });
 };

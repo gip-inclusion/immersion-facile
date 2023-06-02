@@ -384,7 +384,7 @@ export const createUseCases = (
         ),
       notifyContactRequest: new NotifyContactRequest(
         uowPerformer,
-        gateways.notification,
+        saveNotificationAndRelatedEvent,
       ),
       notifyPoleEmploiUserAdvisorOnConventionFullySigned:
         new NotifyPoleEmploiUserAdvisorOnConventionFullySigned(
