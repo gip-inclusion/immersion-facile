@@ -13,7 +13,7 @@ z.setErrorMap((issue, ctx) => {
   // Temporary regex instead of email - waiting for zod release
   if (issue.code === "invalid_string" && issue.validation === "regex")
     return {
-      message: `invalide - valeur fourni : ${ctx.data}`,
+      message: `invalide - valeur fournie : ${ctx.data}`,
     };
 
   return { message: ctx.defaultError };

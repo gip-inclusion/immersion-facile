@@ -24,6 +24,7 @@ import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 import {
   formErrorsToFlatErrors,
+  makeFieldError,
   useFormContents,
 } from "src/app/hooks/formContents.hooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
@@ -72,6 +73,7 @@ export const EstablishmentForm = ({
     resolver: zodResolver(formEstablishmentSchema),
     mode: "onTouched",
   });
+
   const {
     handleSubmit,
     register,
@@ -79,6 +81,8 @@ export const EstablishmentForm = ({
     getValues,
     formState: { errors, submitCount, isSubmitting, touchedFields },
   } = methods;
+
+  const getFieldError = makeFieldError(methods.formState);
 
   const onSubmit: SubmitHandler<FormEstablishmentDto> = async (data) => {
     setIsSuccess(false);
@@ -174,6 +178,7 @@ export const EstablishmentForm = ({
               ...formContents.website,
               ...register("website"),
             }}
+            {...getFieldError("website")}
           />
           <Input
             label={formContents.additionalInformation.label}
@@ -183,6 +188,7 @@ export const EstablishmentForm = ({
               ...formContents.additionalInformation,
               ...register("additionalInformation"),
             }}
+            {...getFieldError("additionalInformation")}
           />
 
           <h2 className={fr.cx("fr-text--lead", "fr-mb-2w")}>
