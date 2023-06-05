@@ -12,7 +12,6 @@ import {
   defaultRetryDeadlineMs,
   ExponentialBackoffRetryStrategy,
 } from "../../secondary/core/ExponentialBackoffRetryStrategy";
-import { QpsRateLimiter } from "../../secondary/core/QpsRateLimiter";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { UuidV4Generator } from "../../secondary/core/UuidGeneratorImplementations";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
@@ -20,8 +19,6 @@ import { InseeSiretGateway } from "../../secondary/siret/InseeSiretGateway";
 import { AppConfig } from "../config/appConfig";
 import { configureCreateHttpClientForExternalApi } from "../config/createHttpClientForExternalApi";
 import { createPgUow } from "../config/uowConfig";
-
-const maxQpsSireneApi = 0.25;
 
 const logger = createLogger(__filename);
 
@@ -54,7 +51,6 @@ const transformPastFormEstablishmentsIntoSearchableData = async (
   const siretGateway = new InseeSiretGateway(
     config.inseeHttpConfig,
     timeGateway,
-    new QpsRateLimiter(maxQpsSireneApi, timeGateway, sleep),
     new ExponentialBackoffRetryStrategy(
       defaultMaxBackoffPeriodMs,
       defaultRetryDeadlineMs,
