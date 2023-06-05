@@ -1,10 +1,14 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { Role } from "shared";
 import { Loader } from "react-design-system";
 import { ConventionValidation } from "src/app/components/admin/ConventionValidation";
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { routes } from "src/app/routes/routes";
-import { FetchConventionRequestedPayload } from "src/core-logic/domain/convention/convention.slice";
+import {
+  conventionSlice,
+  FetchConventionRequestedPayload,
+} from "src/core-logic/domain/convention/convention.slice";
 import { NpsSection } from "../nps/NpsSection";
 import { ConventionManageActions } from "./ConventionManageActions";
 
@@ -19,6 +23,15 @@ export const ConventionManageContent = ({
 }: ConventionManageContentProps): JSX.Element => {
   const { convention, fetchConventionError, submitFeedback, isLoading } =
     useConvention({ jwt, conventionId });
+
+  const dispatch = useDispatch();
+
+  useEffect(
+    () => () => {
+      dispatch(conventionSlice.actions.clearFetchedConvention());
+    },
+    [],
+  );
 
   if (fetchConventionError) {
     fetchConventionError.includes("Le lien magique est périmé")
