@@ -17,6 +17,6 @@
     "front": "workspace:*",
     "html-validate": "^7.5.0",
     "shared": "workspace:*",
-    "typescript": "^4.9.5"
+    "typescript": "^5.1.3"
   }
 }
