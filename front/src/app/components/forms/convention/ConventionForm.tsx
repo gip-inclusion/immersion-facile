@@ -173,7 +173,7 @@ export const ConventionForm = ({
 
   const onConfirmSubmit = () => {
     if (!fetchedConvention) return;
-    // TODO: show feedback if convention is null
+    // TODO : show feedback if convention is null
     dispatch(
       conventionSlice.actions.saveConventionRequested(fetchedConvention),
     );
