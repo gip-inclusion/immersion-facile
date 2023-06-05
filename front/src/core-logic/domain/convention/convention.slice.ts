@@ -119,10 +119,8 @@ export const conventionSlice = createSlice({
       action: PayloadAction<ConventionReadDto>,
     ) => {
       state.isLoading = true;
-      state.convention = {
-        ...action.payload,
-        status: "READY_TO_SIGN",
-      };
+      action.payload.status = "READY_TO_SIGN";
+      state.convention = action.payload;
     },
     saveConventionSucceeded: (state) => {
       state.isLoading = false;
