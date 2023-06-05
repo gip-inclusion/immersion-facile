@@ -272,10 +272,9 @@ export const ConventionFormFields = ({
             id: domElementIds.conventionImmersionRoute.submitFormButton,
           }}
           onClick={handleSubmit(
-            (values) => {
-              setValue("status", "READY_TO_SIGN");
-              return onSubmit({ ...values, status: "READY_TO_SIGN" });
-            },
+            (values) =>
+              //setValue("status", "READY_TO_SIGN");
+              onSubmit(values),
             (errors) => {
               // eslint-disable-next-line @typescript-eslint/no-floating-promises
               validateSteps(false);
