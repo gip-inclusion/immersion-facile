@@ -22,7 +22,7 @@ export const ConventionMiniStagePage = ({
     <MainWrapper
       layout={"default"}
       pageHeader={
-        <PageHeader title={t.intro.conventionSignTitle} theme="candidate" />
+        <PageHeader title={t.intro.conventionTitle} theme="candidate" />
       }
     >
       <ConventionForm
