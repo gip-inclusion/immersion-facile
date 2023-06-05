@@ -175,7 +175,10 @@ export const ConventionForm = ({
     if (!fetchedConvention) return;
     // TODO : show feedback if convention is null
     dispatch(
-      conventionSlice.actions.saveConventionRequested(fetchedConvention),
+      conventionSlice.actions.saveConventionRequested({
+        ...fetchedConvention,
+        status: "READY_TO_SIGN",
+      }),
     );
   };
   const onSubmit: SubmitHandler<ConventionReadDto> = (values) => {
