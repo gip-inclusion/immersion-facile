@@ -1,3 +1,5 @@
+import axios from "axios";
+import Bottleneck from "bottleneck";
 import { formatISO, secondsToMilliseconds } from "date-fns";
 import {
   filterNotFalsy,
@@ -7,7 +9,6 @@ import {
   SiretDto,
   SiretEstablishmentDto,
 } from "shared";
-import { RateLimiter } from "../../../domain/core/ports/RateLimiter";
 import {
   RetryableError,
   RetryStrategy,
@@ -28,11 +29,12 @@ import {
 
 const logger = createLogger(__filename);
 
+const inseeMaxRequestsPerMinute = 500;
+
 export class InseeSiretGateway implements SiretGateway {
   public constructor(
     private readonly axiosConfig: AxiosConfig,
     private readonly timeGateway: TimeGateway,
-    private readonly rateLimiter: RateLimiter,
     private readonly retryStrategy: RetryStrategy,
   ) {}
 
@@ -57,7 +59,7 @@ export class InseeSiretGateway implements SiretGateway {
       .apply(async () => {
         try {
           const axios = this.createAxiosInstance();
-          const response = await this.rateLimiter.whenReady(() =>
+          const response = await this.limiter.schedule(() =>
             axios.get("/siret", {
               params: this.createSiretQueryParams(
                 siret,
@@ -72,10 +74,14 @@ export class InseeSiretGateway implements SiretGateway {
             establishment,
           );
         } catch (error: any) {
-          if (error.response?.status === 404) {
-            return;
+          if (axios.isAxiosError(error)) {
+            if (error.response?.status === 404) {
+              return;
+            }
+            if (isRetryableError(logger, error))
+              throw new RetryableError(error);
           }
-          if (isRetryableError(logger, error)) throw new RetryableError(error);
+
           logAxiosError(logger, error);
           throw error;
         }
@@ -111,6 +117,12 @@ export class InseeSiretGateway implements SiretGateway {
 
     return params;
   }
+
+  private limiter = new Bottleneck({
+    reservoir: inseeMaxRequestsPerMinute,
+    reservoirRefreshInterval: 60 * 1000, // number of ms
+    reservoirRefreshAmount: inseeMaxRequestsPerMinute,
+  });
 }
 
 export type InseeApiRawEstablishment = {
