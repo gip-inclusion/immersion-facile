@@ -41,6 +41,21 @@ describe("Add form establishment", () => {
       const { eventCrawler, gateways, request, inMemoryUow }: TestAppAndDeps =
         await buildTestApp();
 
+      gateways.addressApi.setAddressAndPosition([
+        {
+          position: {
+            lat: 48.8715,
+            lon: 2.3019,
+          },
+          address: {
+            city: "Paris",
+            streetNumberAndAddress: "10 avenue des Champs Elysées",
+            postcode: "75008",
+            departmentCode: "75",
+          },
+        },
+      ]);
+
       inMemoryUow.romeRepository.appellations =
         defaultValidFormEstablishment.appellations;
 
