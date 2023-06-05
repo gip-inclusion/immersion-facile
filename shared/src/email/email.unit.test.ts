@@ -20,6 +20,12 @@ describe("email schemas validation", () => {
     });
 
     const invalidEmailsSet = [
+      "beta.gouv.fr",
+      "capitainehaddock.",
+      "capitainehaddock",
+      "capitainehaddock@",
+      "capitainehaddock@f",
+      "capitainehaddock@gmail",
       "capitaine.haddock@beta_gouv.fr",
       "capitaine.haddock@beta_go__uv.fr",
       "capitaine!!haddock@beta!gouv.fr",

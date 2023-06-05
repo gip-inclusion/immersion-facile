@@ -12,6 +12,7 @@ import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBui
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
 import { EstablishmentEntityBuilder } from "../../../../_testBuilders/EstablishmentEntityBuilder";
 import { ImmersionOfferEntityV2Builder } from "../../../../_testBuilders/ImmersionOfferEntityV2Builder";
+import { processEventsForEmailToBeSent } from "../../../../_testBuilders/processEventsForEmailToBeSent";
 import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
@@ -70,7 +71,7 @@ describe(`/${contactEstablishmentRoute} route`, () => {
       },
     ]);
 
-    await eventCrawler.processNewEvents();
+    await processEventsForEmailToBeSent(eventCrawler);
     expect(gateways.notification.getSentEmails()).toHaveLength(1);
     expect(gateways.notification.getSentEmails()[0].type).toBe(
       "CONTACT_BY_EMAIL_REQUEST",

@@ -1,6 +1,5 @@
 import { Pool } from "pg";
 import { UpdateAllPeAgencies } from "../../../domain/convention/useCases/agencies/UpdateAllPeAgencies";
-import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { HttpAddressGateway } from "../../secondary/addressGateway/HttpAddressGateway";
 import { addressesExternalTargets } from "../../secondary/addressGateway/HttpAddressGateway.targets";
@@ -16,7 +15,6 @@ const updateAllPeAgenciesScript = async () => {
   const config = AppConfig.createFromEnv();
   const accessTokenGateway = new PoleEmploiAccessTokenGateway(
     config.poleEmploiAccessTokenConfig,
-    noRateLimit,
     noRetries,
   );
 

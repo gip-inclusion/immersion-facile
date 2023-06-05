@@ -3,12 +3,12 @@ import { GenerateConventionMagicLinkUrl } from "../../../adapters/primary/config
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { NotificationGateway } from "../../generic/notifications/ports/NotificationGateway";
+import { SaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 
 export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends TransactionalUseCase<ConventionDto> {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly notificationGateway: NotificationGateway,
+    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
     private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     private readonly timeGateway: TimeGateway,
   ) {
@@ -33,27 +33,35 @@ export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends Transact
     const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);
 
     if (conventionPeAdvisor && conventionPeAdvisor.advisor && agency)
-      await this.notificationGateway.sendEmail({
-        type: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED",
-        recipients: [conventionPeAdvisor.advisor.email],
-        params: {
-          advisorFirstName: conventionPeAdvisor.advisor.firstName,
-          advisorLastName: conventionPeAdvisor.advisor.lastName,
-          businessName: conventionFromEvent.businessName,
-          dateEnd: conventionFromEvent.dateEnd,
-          dateStart: conventionFromEvent.dateStart,
-          beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-          beneficiaryLastName: convention.signatories.beneficiary.lastName,
-          beneficiaryEmail: convention.signatories.beneficiary.email,
-          immersionAddress: conventionFromEvent.immersionAddress,
-          magicLink: this.generateConventionMagicLinkUrl({
-            id: conventionFromEvent.id,
-            role: "validator",
-            targetRoute: frontRoutes.manageConvention,
-            email: conventionPeAdvisor.advisor.email,
-            now: this.timeGateway.now(),
-          }),
-          agencyLogoUrl: agency.logoUrl,
+      await this.saveNotificationAndRelatedEvent(uow, {
+        kind: "email",
+        templatedContent: {
+          type: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED",
+          recipients: [conventionPeAdvisor.advisor.email],
+          params: {
+            advisorFirstName: conventionPeAdvisor.advisor.firstName,
+            advisorLastName: conventionPeAdvisor.advisor.lastName,
+            businessName: convention.businessName,
+            dateEnd: convention.dateEnd,
+            dateStart: convention.dateStart,
+            beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+            beneficiaryLastName: convention.signatories.beneficiary.lastName,
+            beneficiaryEmail: convention.signatories.beneficiary.email,
+            immersionAddress: convention.immersionAddress,
+            magicLink: this.generateConventionMagicLinkUrl({
+              id: convention.id,
+              role: "validator",
+              targetRoute: frontRoutes.manageConvention,
+              email: conventionPeAdvisor.advisor.email,
+              now: this.timeGateway.now(),
+            }),
+            agencyLogoUrl: agency.logoUrl,
+          },
+        },
+        followedIds: {
+          conventionId: convention.id,
+          agencyId: convention.agencyId,
+          establishmentSiret: convention.siret,
         },
       });
   }

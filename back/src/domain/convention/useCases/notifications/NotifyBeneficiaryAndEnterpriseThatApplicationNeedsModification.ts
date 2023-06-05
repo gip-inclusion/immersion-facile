@@ -19,7 +19,7 @@ import {
 } from "../../../core/ports/UnitOfWork";
 import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { NotificationGateway } from "../../../generic/notifications/ports/NotificationGateway";
+import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 
 // prettier-ignore
 export type ConventionRequiresModificationPayload = z.infer<typeof conventionRequiresModificationSchema>
@@ -32,7 +32,7 @@ const conventionRequiresModificationSchema = z.object({
 export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification extends TransactionalUseCase<ConventionRequiresModificationPayload> {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly notificationGateway: NotificationGateway,
+    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
     private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     private readonly timeGateway: TimeGateway,
     private readonly shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
@@ -78,24 +78,32 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
         uow,
       });
 
-      await this.notificationGateway.sendEmail({
-        type: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
-        recipients: [email],
-        params: {
-          internshipKind: convention.internshipKind,
-          beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-          beneficiaryLastName: convention.signatories.beneficiary.lastName,
-          businessName: convention.businessName,
-          justification,
-          signature: agency.signature,
-          immersionAppellation: convention.immersionAppellation,
-          magicLink: await makeShortMagicLink(
-            frontRoutes.conventionImmersionRoute,
-          ),
-          conventionStatusLink: await makeShortMagicLink(
-            frontRoutes.conventionStatusDashboard,
-          ),
-          agencyLogoUrl: agency.logoUrl,
+      await this.saveNotificationAndRelatedEvent(uow, {
+        kind: "email",
+        templatedContent: {
+          type: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
+          recipients: [email],
+          params: {
+            internshipKind: convention.internshipKind,
+            beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+            beneficiaryLastName: convention.signatories.beneficiary.lastName,
+            businessName: convention.businessName,
+            justification,
+            signature: agency.signature,
+            immersionAppellation: convention.immersionAppellation,
+            magicLink: await makeShortMagicLink(
+              frontRoutes.conventionImmersionRoute,
+            ),
+            conventionStatusLink: await makeShortMagicLink(
+              frontRoutes.conventionStatusDashboard,
+            ),
+            agencyLogoUrl: agency.logoUrl,
+          },
+        },
+        followedIds: {
+          conventionId: convention.id,
+          agencyId: convention.agencyId,
+          establishmentSiret: convention.siret,
         },
       });
     }

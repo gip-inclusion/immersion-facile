@@ -1,5 +1,4 @@
 import { expectToEqual } from "shared";
-import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { AppConfig } from "../../primary/config/appConfig";
 import { configureCreateHttpClientForExternalApi } from "../../primary/config/createHttpClientForExternalApi";
@@ -30,7 +29,6 @@ describe("HttpSirenGateway", () => {
       new InseeSiretGateway(
         config.inseeHttpConfig,
         new RealTimeGateway(),
-        noRateLimit,
         noRetries,
       ),
     );

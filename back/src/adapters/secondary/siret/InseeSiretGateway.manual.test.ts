@@ -1,5 +1,4 @@
 import { expectObjectsToMatch } from "shared";
-import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { SiretGateway } from "../../../domain/sirene/ports/SirenGateway";
 import { AppConfig } from "../../primary/config/appConfig";
@@ -21,7 +20,6 @@ describe("HttpSirenGateway", () => {
     siretGateway = new InseeSiretGateway(
       config.inseeHttpConfig,
       new RealTimeGateway(),
-      noRateLimit,
       noRetries,
     );
   });

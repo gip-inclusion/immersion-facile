@@ -17,13 +17,13 @@ import {
 } from "../../../core/ports/UnitOfWork";
 import { prepareMagicShortLinkMaker } from "../../../core/ShortLink";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { NotificationGateway } from "../../../generic/notifications/ports/NotificationGateway";
+import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../peConnect/dto/PeConnect.dto";
 
 export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUseCase<ConventionDto> {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly notificationGateway: NotificationGateway,
+    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
     private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     private readonly timeGateway: TimeGateway,
     private readonly shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
@@ -44,29 +44,37 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
       throw new NotFoundError(
         `Unable to send mail. No agency config found for ${convention.agencyId}`,
       );
-    await this.notificationGateway.sendEmail({
-      type: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
-      recipients: [
-        ...Object.values(convention.signatories).map(
-          (signatory) => signatory.email,
-        ),
-        ...agency.counsellorEmails,
-        ...agency.validatorEmails,
-        ...getPeAdvisorEmailIfExist(
-          await uow.conventionPoleEmploiAdvisorRepository.getByConventionId(
-            convention.id,
+    await this.saveNotificationAndRelatedEvent(uow, {
+      kind: "email",
+      templatedContent: {
+        type: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+        recipients: [
+          ...Object.values(convention.signatories).map(
+            (signatory) => signatory.email,
           ),
+          ...agency.counsellorEmails,
+          ...agency.validatorEmails,
+          ...getPeAdvisorEmailIfExist(
+            await uow.conventionPoleEmploiAdvisorRepository.getByConventionId(
+              convention.id,
+            ),
+          ),
+          ...(convention.signatories.establishmentRepresentative.email !==
+          convention.establishmentTutor.email
+            ? [convention.establishmentTutor.email]
+            : []),
+        ],
+        params: await this.getValidatedConventionFinalConfirmationParams(
+          agency,
+          convention,
+          uow,
         ),
-        ...(convention.signatories.establishmentRepresentative.email !==
-        convention.establishmentTutor.email
-          ? [convention.establishmentTutor.email]
-          : []),
-      ],
-      params: await this.getValidatedConventionFinalConfirmationParams(
-        agency,
-        convention,
-        uow,
-      ),
+      },
+      followedIds: {
+        conventionId: convention.id,
+        agencyId: convention.agencyId,
+        establishmentSiret: convention.siret,
+      },
     });
   }
   private async getValidatedConventionFinalConfirmationParams(
