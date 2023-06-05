@@ -1,5 +1,5 @@
 import React from "react";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
@@ -65,51 +65,53 @@ export const ContactByEmail = ({
     onSuccess();
   };
   return (
-    <form onSubmit={handleSubmit(onFormValid)}>
-      <>
-        <p className={fr.cx("fr-pb-3w")}>
-          Cette entreprise a choisi d'être contactée par mail. Veuillez
-          compléter ce formulaire qui sera transmis à l'entreprise.
-        </p>
-        <EmailValidationInput
-          label="Votre email *"
-          nativeInputProps={{
-            ...register("potentialBeneficiaryEmail"),
-            type: "email",
-          }}
-          {...getFieldError("potentialBeneficiaryEmail")}
-        />
-        <Input
-          label="Votre prénom *"
-          nativeInputProps={register("potentialBeneficiaryFirstName")}
-          {...getFieldError("potentialBeneficiaryFirstName")}
-        />
-        <Input
-          label="Votre nom *"
-          nativeInputProps={register("potentialBeneficiaryLastName")}
-          {...getFieldError("potentialBeneficiaryLastName")}
-        />
-        <Input
-          label="Votre message *"
-          textArea
-          nativeTextAreaProps={{
-            ...register("message"),
-            rows: 6,
-          }}
-          {...getFieldError("message")}
-        />
+    <FormProvider {...methods}>
+      <form onSubmit={handleSubmit(onFormValid)}>
+        <>
+          <p className={fr.cx("fr-pb-3w")}>
+            Cette entreprise a choisi d'être contactée par mail. Veuillez
+            compléter ce formulaire qui sera transmis à l'entreprise.
+          </p>
+          <EmailValidationInput
+            label="Votre email *"
+            nativeInputProps={{
+              ...register("potentialBeneficiaryEmail"),
+              type: "email",
+            }}
+            {...getFieldError("potentialBeneficiaryEmail")}
+          />
+          <Input
+            label="Votre prénom *"
+            nativeInputProps={register("potentialBeneficiaryFirstName")}
+            {...getFieldError("potentialBeneficiaryFirstName")}
+          />
+          <Input
+            label="Votre nom *"
+            nativeInputProps={register("potentialBeneficiaryLastName")}
+            {...getFieldError("potentialBeneficiaryLastName")}
+          />
+          <Input
+            label="Votre message *"
+            textArea
+            nativeTextAreaProps={{
+              ...register("message"),
+              rows: 6,
+            }}
+            {...getFieldError("message")}
+          />
 
-        <Button
-          priority="secondary"
-          type="submit"
-          disabled={isSubmitting}
-          nativeButtonProps={{
-            id: domElementIds.search.contactByMailButton,
-          }}
-        >
-          Envoyer
-        </Button>
-      </>
-    </form>
+          <Button
+            priority="secondary"
+            type="submit"
+            disabled={isSubmitting}
+            nativeButtonProps={{
+              id: domElementIds.search.contactByMailButton,
+            }}
+          >
+            Envoyer
+          </Button>
+        </>
+      </form>
+    </FormProvider>
   );
 };
