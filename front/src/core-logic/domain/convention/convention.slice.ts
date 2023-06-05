@@ -16,7 +16,8 @@ type ConventionValidationFeedbackKind =
   | "modificationAskedFromCounsellorOrValidator"
   | "markedAsEligible"
   | "markedAsValidated"
-  | "cancelled";
+  | "cancelled"
+  | "deprecated";
 
 type ConventionSignatoryFeedbackKind =
   | "justSubmitted"

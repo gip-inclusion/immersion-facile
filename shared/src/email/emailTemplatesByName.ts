@@ -1153,4 +1153,44 @@ export const emailTemplatesByName =
         subContent: defaultSignature("immersion"),
       }),
     },
+    DEPRECATED_CONVENTION_NOTIFICATION: {
+      niceName: "Notification de convention obsolète",
+      tags: ["dépreciation demande d'immersion"],
+      createEmailVariables: ({
+        immersionProfession,
+        beneficiaryFirstName,
+        beneficiaryLastName,
+        deprecationReason,
+        agency,
+        businessName,
+        signature,
+        internshipKind,
+        agencyLogoUrl,
+      }) => ({
+        subject:
+          internshipKind === "immersion"
+            ? `Refus de la demande d'immersion pour observer l'activité de ${immersionProfession} au sein de ${businessName}`
+            : `Mini Stage - Refus de la demande de mini stage pour l'activité de ${immersionProfession} au sein de ${businessName}`,
+        greetings: "Bonjour,",
+        content: `
+      Nous vous informons que la demande ${
+        internshipKind === "immersion"
+          ? "d'immersion professionnelle"
+          : "de mini stage"
+      } de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName} a été refusée par ${agency}.
+      
+      Les raisons en sont ${deprecationReason} par ${agency}.       
+      
+      Vous pouvez vous rapprocher de votre conseiller${
+        internshipKind === "immersion"
+          ? ""
+          : " de la chambre de commerce et d'instrustrie - CCI"
+      } pour en échanger.      
+      
+      Bien cordialement,       
+      ${signature} 
+      `,
+        agencyLogoUrl,
+      }),
+    },
   });
