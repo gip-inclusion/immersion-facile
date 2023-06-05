@@ -3,6 +3,7 @@ import { decode } from "js-base64";
 import { ConventionId } from "../convention/convention.dto";
 import { SiretDto } from "../siret/siret";
 import { Flavor } from "../typeFlavors";
+import { ExcludeFromExisting } from "../utils";
 
 export const createConventionMagicLinkPayload = ({
   id,
@@ -46,7 +47,7 @@ export const stringToMd5 = (str: string) =>
 
 export type CreateConventionMagicLinkPayloadProperties = {
   id: ConventionId;
-  role: Role;
+  role: RoleExcludingBackoffice;
   email: string;
   now: Date;
   durationDays?: number;
@@ -76,6 +77,8 @@ export type ConventionMagicLinkPayload = AppJwtPayload & {
 };
 
 export type Role = (typeof allRoles)[number];
+
+export type RoleExcludingBackoffice = ExcludeFromExisting<Role, "backOffice">;
 
 export const allRoles = [
   "beneficiary",

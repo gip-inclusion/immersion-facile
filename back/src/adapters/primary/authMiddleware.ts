@@ -69,6 +69,7 @@ export const createApiKeyAuthMiddlewareV0 = (
     }
 
     try {
+      console.log("AUTHORIZATION ===>", req.headers.authorization);
       const { id } = verifyJwt(req.headers.authorization);
       const apiConsumer = await getApiConsumerById(id);
       if (!apiConsumer) {
@@ -130,6 +131,7 @@ export const makeApiKeyAuthMiddlewareV1 = (
     }
 
     try {
+      console.log("AUTHORIZATION ===>", req.headers.authorization);
       const { id } = verifyJwt(req.headers.authorization);
 
       const apiConsumer = await getApiConsumerById(id);
@@ -188,6 +190,7 @@ export const makeMagicLinkAuthMiddleware = (
     }
     try {
       const payload = verifyJwt(maybeJwt);
+      console.log("PAYLOAD===>", payload);
       // TODO : check that if exp > now, it throws 401
       const currentJwtVersion = currentJwtVersions[payloadKey];
 
@@ -226,6 +229,7 @@ export const makeMagicLinkAuthMiddleware = (
 
       next();
     } catch (err: any) {
+      console.log("ERROR===>", err);
       const unsafePayload = jwt.decode(maybeJwt) as ConventionMagicLinkPayload;
       if (err instanceof TokenExpiredError) {
         logger.warn(
@@ -238,6 +242,7 @@ export const makeMagicLinkAuthMiddleware = (
       }
 
       try {
+        console.log("deprecatedJWT===>", maybeJwt);
         verifyDeprecatedJwt(maybeJwt);
         return sendNeedsRenewedLinkError(res, err);
       } catch (error: any) {

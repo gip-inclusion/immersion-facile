@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
   AgencyDto,
   allRoles,
+  BackOfficeJwtPayload,
   ConventionDto,
   conventionSchema,
   CreateConventionMagicLinkPayloadProperties,
@@ -61,7 +62,15 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
         agency,
       );
       if (email instanceof Error) throw email;
-
+      if(role === "backOffice") {
+        const conventionMagicLinkPayload:  BackOfficeJwtPayload=
+        {
+          iat: ,
+          role,
+          sub: "admin",
+          version:1,
+        }; 
+      }
       const conventionMagicLinkPayload: CreateConventionMagicLinkPayloadProperties =
         {
           id: convention.id,

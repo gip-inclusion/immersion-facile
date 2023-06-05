@@ -4,7 +4,7 @@ import {
   decodeJwtWithoutSignatureCheck,
   expectToEqual,
   GenerateMagicLinkRequestDto,
-  Role,
+  RoleExcludingBackoffice,
 } from "shared";
 import { AppConfigBuilder } from "../../../_testBuilders/AppConfigBuilder";
 import { generateConventionJwtTestFn } from "../../../_testBuilders/jwtTestHelper";
@@ -16,7 +16,7 @@ describe("Generate magic links", () => {
   describe("Magic link generator use case", () => {
     it("Generates magic links with its fn", async () => {
       const id = "add5c20e-6dd2-45af-affe-927358005251";
-      const role = "validator" as Role;
+      const role: RoleExcludingBackoffice = "validator";
       const email = "foo@bar.com";
       const timeGateway = new CustomTimeGateway();
       const result = await new GenerateConventionMagicLinkUseCase(

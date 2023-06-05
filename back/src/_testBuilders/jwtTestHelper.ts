@@ -1,4 +1,5 @@
 import {
+  BackOfficeJwtPayload,
   CreateConventionMagicLinkPayloadProperties,
   filterNotFalsy,
 } from "shared";
@@ -19,17 +20,25 @@ export const generateEditFormEstablishmentJwtTestFn: GenerateEditFormEstablishme
     return siret + "-in-token";
   };
 
-export const fakeGenerateMagicLinkUrlFn: GenerateConventionMagicLinkUrl = ({
-  email,
-  id,
-  now,
-  exp,
-  durationDays,
-  iat,
-  version,
-  role,
-  targetRoute,
-}: CreateConventionMagicLinkPayloadProperties & { targetRoute: string }) => {
+type GenerateMagicLinkUrlParams = { targetRoute: string } & (
+  | CreateConventionMagicLinkPayloadProperties
+  | BackOfficeJwtPayload
+);
+
+export const fakeGenerateMagicLinkUrlFn: GenerateConventionMagicLinkUrl = (
+  params: GenerateMagicLinkUrlParams,
+) => {
+  if (params.role === "backOffice") {
+    const { exp, iat, version, role, targetRoute, sub } = params;
+    const fakeJwt = [exp, iat, version, role, sub]
+      .filter(filterNotFalsy)
+      .join("/");
+    return `http://fake-magic-link/${targetRoute}/${fakeJwt}`;
+  }
+
+  const { email, id, now, exp, durationDays, iat, version, role, targetRoute } =
+    params;
+
   const fakeJwt = [
     id,
     role,

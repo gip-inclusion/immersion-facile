@@ -4,7 +4,7 @@ import { PeConnectIdentity } from "../federatedIdentities/federatedIdentity.dto"
 import { AppellationDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { ScheduleDto } from "../schedule/Schedule.dto";
 import { SiretDto } from "../siret/siret";
-import { Role } from "../tokens/token.dto";
+import { Role, RoleExcludingBackoffice } from "../tokens/token.dto";
 import { Flavor } from "../typeFlavors";
 
 export type ConventionStatus = (typeof conventionStatuses)[number];
@@ -244,7 +244,7 @@ const _isAssignable = (isValid: UpdateConventionStatusRequestDto): { status: Con
 
 export type GenerateMagicLinkRequestDto = {
   applicationId: ConventionId;
-  role: Role;
+  role: RoleExcludingBackoffice;
   expired: boolean;
 };
 

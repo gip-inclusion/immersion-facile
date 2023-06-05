@@ -1,5 +1,6 @@
 import {
   AgencyDtoBuilder,
+  BackOfficeJwtPayload,
   ConventionDtoBuilder,
   CreateConventionMagicLinkPayloadProperties,
   expectPromiseToFailWith,
@@ -171,6 +172,33 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
         });
       },
     );
+    it("generate different payload for backoffice admin role", async () => {
+      const role: Role = "backOffice";
+      const shortLinkIds = ["shortLinkId1", "shortLinkId2"];
+      shortLinkIdGateway.addMoreShortLinkIds(shortLinkIds);
+      const justification = "Change required.";
+      const backofficePayload: Pick<BackOfficeJwtPayload, "role" | "sub"> = {
+        role,
+        sub: "admin",
+      };
+
+      await usecase.execute({
+        convention,
+        justification,
+        roles: [role],
+      });
+
+      expectToEqual(uow.shortLinkQuery.getShortLinks(), {
+        [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
+          ...backofficePayload,
+          targetRoute: frontRoutes.conventionImmersionRoute,
+        }),
+        [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
+          ...backofficePayload,
+          targetRoute: frontRoutes.conventionStatusDashboard,
+        }),
+      });
+    });
   });
 
   describe("Wrong paths", () => {
