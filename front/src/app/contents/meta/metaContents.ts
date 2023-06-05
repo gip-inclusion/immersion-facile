@@ -126,7 +126,7 @@ export const standardMetaContent: Record<StandardPageSlugs, MetaContentType> = {
   },
   cgu: {
     title: "Conditions générales d'utilisation",
-    description: "pages des conditions générales d'utilisations",
+    description: "Page des conditions générales d'utilisation",
   },
   "politique-de-confidentialite": {
     title: "Politique de confidentialité",
@@ -139,6 +139,10 @@ export const standardMetaContent: Record<StandardPageSlugs, MetaContentType> = {
   "plan-du-site": {
     title: "Plan du site",
     description: "Plan du site: Immersion Facile",
+  },
+  "obligations-des-parties": {
+    title: "Obligations des parties",
+    description: "Faciliter la réalisation des immersions professionnelles.",
   },
 };
 

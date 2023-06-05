@@ -13,6 +13,7 @@ export const standardPageSlugs = [
   "politique-de-confidentialite",
   "declaration-accessibilite",
   "plan-du-site",
+  "obligations-des-parties",
 ] as const;
 
 export const adminTabs = [
