@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Input, InputProps } from "@codegouvfr/react-dsfr/Input";
-import {
-  ConventionReadDto,
-  ValidateEmailReason,
-  ValidateEmailStatus,
-} from "shared";
+import { Email, ValidateEmailReason, ValidateEmailStatus } from "shared";
 import { emailValidationGateway } from "src/config/dependencies";
 
 type EmailValidationInputProps = InputProps.RegularInput & {
@@ -20,7 +16,6 @@ type StateRelated = {
 const defaultErrorMessage =
   "L'adresse email ne semble pas valide. Si vous êtes sûr de ne pas avoir fait d'erreur, vous pouvez tout de même faire une demande de convention.";
 const emailSeemsValidMessage = "L'adresse email a l'air valide";
-const emailEmptyMessage = "L'adresse email ne peut pas être vide";
 
 const feedbackMessages = (
   proposal: string | null | undefined,
@@ -61,7 +56,8 @@ export const EmailValidationInput = (props: EmailValidationInputProps) => {
     state: props.state,
     stateRelatedMessage: props.stateRelatedMessage,
   });
-
+  const [currentInputValue, setCurrentInputValue] = useState<string>("");
+  const { trigger } = useFormContext();
   useEffect(() => {
     const { state, stateRelatedMessage } = props;
     setStateRelated({
@@ -70,48 +66,32 @@ export const EmailValidationInput = (props: EmailValidationInputProps) => {
     });
   }, [props.state, props.stateRelatedMessage]);
 
-  const { trigger } = useFormContext<ConventionReadDto>();
-
-  const onInputBlur = async (
-    event: React.FocusEvent<HTMLInputElement, Element>,
-  ): Promise<void> => {
-    const email = event.target.value;
-
-    if (props.nativeInputProps?.name) {
-      await trigger(props.nativeInputProps.name as keyof ConventionReadDto);
-    }
-
-    const isFieldValid =
-      stateRelated.state !== undefined || stateRelated.state !== "error";
-
-    if (!isFieldValid) {
-      setStateRelated({
-        state: props.state || "error",
-        stateRelatedMessage: props.stateRelatedMessage || emailEmptyMessage,
-      });
-      return;
-    }
-    if (isFieldValid) {
-      emailValidationGateway
-        .getEmailStatus(email)
-        .then((status) => {
-          props.nativeInputProps?.onBlur?.(event);
-          props.onEmailValidationFeedback?.(status);
-          setStateRelated(
-            getStateRelatedFromStatus(status, {
-              state: props.state,
-              stateRelatedMessage: props.stateRelatedMessage,
-            }),
-          );
-        })
-        .catch((error) => {
-          // do nothing on HTTP request error
-          // eslint-disable-next-line no-console
-          console.error(error);
-        });
+  const onInputBlur = async () => {
+    try {
+      const isFieldValid = await trigger(props.nativeInputProps?.name);
+      if (currentInputValue && isFieldValid) {
+        await sendEmailValidationRequest(currentInputValue);
+      }
+    } catch (error: any) {
+      // eslint-disable-next-line no-console
+      console.error(error);
     }
   };
+  const sendEmailValidationRequest = async (email: Email) => {
+    const emailValidationStatus = await emailValidationGateway.getEmailStatus(
+      email,
+    );
+    props.onEmailValidationFeedback?.(emailValidationStatus);
+    setStateRelated(
+      getStateRelatedFromStatus(emailValidationStatus, {
+        state: stateRelated.state,
+        stateRelatedMessage: stateRelated.stateRelatedMessage,
+      }),
+    );
+  };
+
   const onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCurrentInputValue(event.target.value);
     setStateRelated({
       state: "default",
       stateRelatedMessage: "",
