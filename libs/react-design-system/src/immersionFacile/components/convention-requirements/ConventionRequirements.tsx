@@ -15,8 +15,26 @@ export const ConventionRequirements = () => {
         <h2 className={cx(cx(fr.cx("fr-h4"), `${componentName}__title`))}>
           Avant de commencer !
         </h2>
-        <p>Vous aurez besoin :</p>
+
         <ul className={cx(`${componentName}__list`)}>
+          <li className={cx(fr.cx("fr-my-2w"), `${componentName}__item`)}>
+            <span
+              className={cx(
+                fr.cx("fr-icon-questionnaire-line"),
+                `${componentName}__item-icon`,
+              )}
+            ></span>
+            <span className={cx(`${componentName}__item-content`)}>
+              <a
+                href="https://tally.so/r/w2X7xV"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <strong>Vérifiez</strong>
+              </a>{" "}
+              si vous pouvez faire votre demande de convention en ligne.
+            </span>
+          </li>
           <li className={cx(fr.cx("fr-my-2w"), `${componentName}__item`)}>
             <span
               className={cx(
@@ -25,28 +43,8 @@ export const ConventionRequirements = () => {
               )}
             ></span>
             <span className={cx(`${componentName}__item-content`)}>
-              D’environ <strong>5 minutes</strong> de temps libre.
-            </span>
-          </li>
-          <li className={cx(fr.cx("fr-my-2w"), `${componentName}__item`)}>
-            <span
-              className={cx(
-                fr.cx("fr-icon-map-pin-2-line"),
-                `${componentName}__item-icon`,
-              )}
-            ></span>
-            <span className={cx(`${componentName}__item-content`)}>
-              D’avoir une <strong>structure d’accompagnement</strong> : Pôle
-              emploi, Mission locale, Cap Emploi... Si vous n'avez pas de
-              structure d'accompagnement,{" "}
-              <a
-                href="https://aide.immersion-facile.beta.gouv.fr/fr/article/je-nai-pas-de-structure-daccompagnement-et-je-veux-faire-une-immersion-1x15rdp/"
-                target="_blank"
-                rel="noreferrer"
-              >
-                retrouvez nos conseils ici
-              </a>
-              .
+              Prévoyez environ <strong>5 minutes</strong> de temps libre pour
+              remplir le formulaire.
             </span>
           </li>
           <li className={cx(fr.cx("fr-my-2w"), `${componentName}__item`)}>
@@ -57,9 +55,9 @@ export const ConventionRequirements = () => {
               )}
             ></span>
             <span className={cx(`${componentName}__item-content`)}>
-              D’avoir l’
-              <strong>email de l’entreprise</strong> où vous souhaitez faire
-              votre immersion, ou bien de remplir le formulaire avec elle.
+              Préparez l’<strong>email de l’entreprise</strong> où vous
+              souhaitez faire votre immersion, ou bien remplissez le formulaire
+              avec elle.
             </span>
           </li>
         </ul>
