@@ -24,6 +24,12 @@ import {
   initialConventionState,
 } from "./convention.slice";
 
+const conventionReadDtoRemainingProps = {
+  agencyDepartment: "75",
+  agencyId: "some-agency-id",
+  agencyName: "some-agency-name",
+};
+
 describe("Convention slice", () => {
   let store: ReduxStore;
   let dependencies: TestDependencies;
@@ -40,9 +46,12 @@ describe("Convention slice", () => {
 
   describe("Save convention", () => {
     it("saves a new convention", () => {
-      const convention = new ConventionDtoBuilder().build();
+      const convention = new ConventionDtoBuilder().withStatus("DRAFT").build();
       store.dispatch(
-        conventionSlice.actions.saveConventionRequested(convention),
+        conventionSlice.actions.saveConventionRequested({
+          ...convention,
+          ...conventionReadDtoRemainingProps,
+        }),
       );
       expectConventionState({
         isLoading: true,
@@ -52,6 +61,9 @@ describe("Convention slice", () => {
         isLoading: false,
         feedback: { kind: "justSubmitted" },
       });
+      expect(store.getState().convention.convention?.status).toBe(
+        "READY_TO_SIGN",
+      );
       expectAddConventionToHaveBeenCalled(1);
       expectUpdateConventionToHaveBeenCalled(0);
     });
@@ -79,7 +91,10 @@ describe("Convention slice", () => {
       }));
       const convention = new ConventionDtoBuilder().build();
       store.dispatch(
-        conventionSlice.actions.saveConventionRequested(convention),
+        conventionSlice.actions.saveConventionRequested({
+          ...convention,
+          ...conventionReadDtoRemainingProps,
+        }),
       );
       expectConventionState({
         isLoading: true,
@@ -96,7 +111,10 @@ describe("Convention slice", () => {
     it("shows message when something goes wrong when saving", () => {
       const convention = new ConventionDtoBuilder().build();
       store.dispatch(
-        conventionSlice.actions.saveConventionRequested(convention),
+        conventionSlice.actions.saveConventionRequested({
+          ...convention,
+          ...conventionReadDtoRemainingProps,
+        }),
       );
       expectConventionState({
         isLoading: true,

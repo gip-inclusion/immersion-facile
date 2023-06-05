@@ -172,11 +172,11 @@ export const ConventionForm = ({
   }, [fetchedConvention]);
 
   const onConfirmSubmit = () => {
-    const conventionToSave = {
-      ...getValues(),
-      workConditions: undefinedIfEmptyString(getValues().workConditions),
-    };
-    dispatch(conventionSlice.actions.saveConventionRequested(conventionToSave));
+    if (!fetchedConvention) return;
+    // TODO: show feedback if convention is null
+    dispatch(
+      conventionSlice.actions.saveConventionRequested(fetchedConvention),
+    );
   };
   const onSubmit: SubmitHandler<ConventionReadDto> = (values) => {
     const conventionToSave = {

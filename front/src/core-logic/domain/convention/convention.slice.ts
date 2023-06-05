@@ -3,7 +3,6 @@ import {
   AbsoluteUrl,
   AgencyId,
   BackOfficeJwt,
-  ConventionDto,
   ConventionId,
   ConventionMagicLinkJwt,
   ConventionReadDto,
@@ -115,8 +114,15 @@ export const conventionSlice = createSlice({
       state.formUi.agencyDepartment = action.payload;
     },
     // Save convention
-    saveConventionRequested: (state, _action: PayloadAction<ConventionDto>) => {
+    saveConventionRequested: (
+      state,
+      action: PayloadAction<ConventionReadDto>,
+    ) => {
       state.isLoading = true;
+      state.convention = {
+        ...action.payload,
+        status: "READY_TO_SIGN",
+      };
     },
     saveConventionSucceeded: (state) => {
       state.isLoading = false;
