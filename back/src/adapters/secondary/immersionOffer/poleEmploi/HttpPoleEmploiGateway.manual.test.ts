@@ -3,7 +3,6 @@ import {
   PoleEmploiBroadcastResponse,
   PoleEmploiConvention,
 } from "../../../../domain/convention/ports/PoleEmploiGateway";
-import { noRateLimit } from "../../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../../domain/core/ports/RetryStrategy";
 import { AppConfig } from "../../../primary/config/appConfig";
 import { configureCreateHttpClientForExternalApi } from "../../../primary/config/createHttpClientForExternalApi";
@@ -14,7 +13,6 @@ import { createPoleEmploiTargets } from "./PoleEmploi.targets";
 const config = AppConfig.createFromEnv();
 const accessTokenGateway = new PoleEmploiAccessTokenGateway(
   config.poleEmploiAccessTokenConfig,
-  noRateLimit,
   noRetries,
 );
 

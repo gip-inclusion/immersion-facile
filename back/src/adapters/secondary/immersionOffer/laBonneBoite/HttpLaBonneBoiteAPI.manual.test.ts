@@ -1,4 +1,3 @@
-import { noRateLimit } from "../../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../../domain/core/ports/RetryStrategy";
 import { LaBonneBoiteRequestParams } from "../../../../domain/immersionOffer/ports/LaBonneBoiteAPI";
 import { AppConfig } from "../../../primary/config/appConfig";
@@ -10,7 +9,6 @@ import { createLbbTargets } from "./LaBonneBoiteTargets";
 const config = AppConfig.createFromEnv();
 const accessTokenGateway = new PoleEmploiAccessTokenGateway(
   config.poleEmploiAccessTokenConfig,
-  noRateLimit,
   noRetries,
 );
 

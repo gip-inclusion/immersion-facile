@@ -6,12 +6,9 @@ import {
   defaultRetryDeadlineMs,
   ExponentialBackoffRetryStrategy,
 } from "../../secondary/core/ExponentialBackoffRetryStrategy";
-import { QpsRateLimiter } from "../../secondary/core/QpsRateLimiter";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { InseeSiretGateway } from "../../secondary/siret/InseeSiretGateway";
 import { AppConfig } from "../config/appConfig";
-
-const maxQpsSireneApi = 0.25;
 
 const logger = createLogger(__filename);
 
@@ -33,7 +30,6 @@ const freeQuarantinedFormEstablishmentsWithCorrectSiret = async () => {
   const siretGateway = new InseeSiretGateway(
     config.inseeHttpConfig,
     timeGateway,
-    new QpsRateLimiter(maxQpsSireneApi, timeGateway, sleep),
     new ExponentialBackoffRetryStrategy(
       defaultMaxBackoffPeriodMs,
       defaultRetryDeadlineMs,

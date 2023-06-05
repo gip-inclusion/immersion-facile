@@ -5,7 +5,6 @@ import {
   immersionFacileContactEmail,
   pipeWithValue,
 } from "shared";
-import { noRateLimit } from "../../../domain/core/ports/RateLimiter";
 import { noRetries } from "../../../domain/core/ports/RetryStrategy";
 import { TimeGateway } from "../../../domain/core/ports/TimeGateway";
 import { DashboardGateway } from "../../../domain/dashboard/port/DashboardGateway";
@@ -106,7 +105,6 @@ export const createGateways = async (config: AppConfig) => {
     ? new CachingAccessTokenGateway(
         new PoleEmploiAccessTokenGateway(
           config.poleEmploiAccessTokenConfig,
-          noRateLimit,
           noRetries,
         ),
       )
@@ -171,19 +169,9 @@ const getSiretGateway = (
 ) => {
   const gatewayByProvider = {
     HTTPS: () =>
-      new InseeSiretGateway(
-        config.inseeHttpConfig,
-        timeGateway,
-        noRateLimit,
-        noRetries,
-      ),
+      new InseeSiretGateway(config.inseeHttpConfig, timeGateway, noRetries),
     INSEE: () =>
-      new InseeSiretGateway(
-        config.inseeHttpConfig,
-        timeGateway,
-        noRateLimit,
-        noRetries,
-      ),
+      new InseeSiretGateway(config.inseeHttpConfig, timeGateway, noRetries),
     IN_MEMORY: () => new InMemorySiretGateway(),
     ANNUAIRE_DES_ENTREPRISES: () =>
       new AnnuaireDesEntreprisesSiretGateway(
@@ -192,12 +180,7 @@ const getSiretGateway = (
             timeout: config.externalAxiosTimeout,
           }),
         )(annuaireDesEntreprisesSiretTargets),
-        new InseeSiretGateway(
-          config.inseeHttpConfig,
-          timeGateway,
-          noRateLimit,
-          noRetries,
-        ),
+        new InseeSiretGateway(config.inseeHttpConfig, timeGateway, noRetries),
       ),
   };
   return gatewayByProvider[provider]();

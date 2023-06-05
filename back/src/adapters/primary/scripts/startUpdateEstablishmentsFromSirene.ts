@@ -10,7 +10,6 @@ import {
   defaultRetryDeadlineMs,
   ExponentialBackoffRetryStrategy,
 } from "../../secondary/core/ExponentialBackoffRetryStrategy";
-import { QpsRateLimiter } from "../../secondary/core/QpsRateLimiter";
 import { RealTimeGateway } from "../../secondary/core/TimeGateway/RealTimeGateway";
 import { PgEstablishmentAggregateRepository } from "../../secondary/pg/PgEstablishmentAggregateRepository";
 import { InseeSiretGateway } from "../../secondary/siret/InseeSiretGateway";
@@ -19,7 +18,6 @@ import { configureCreateHttpClientForExternalApi } from "../config/createHttpCli
 import { handleEndOfScriptNotification } from "./handleEndOfScriptNotification";
 
 const logger = createLogger(__filename);
-const MAX_QPS_SIRENE__AND_ADDRESS_API = 0.49;
 
 const stats: PipelineStats = new PipelineStats(
   "startUpdateEstablishmentsFromSirene",
@@ -40,15 +38,11 @@ const main = async () => {
     sleep,
     random,
   );
-  const rateLimiter = new QpsRateLimiter(
-    MAX_QPS_SIRENE__AND_ADDRESS_API,
-    timeGateway,
-    sleep,
-  );
+
   const siretGateway = new InseeSiretGateway(
     config.inseeHttpConfig,
     timeGateway,
-    rateLimiter,
+
     retryStrategy,
   );
 
