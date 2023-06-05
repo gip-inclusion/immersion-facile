@@ -30,6 +30,7 @@ export class InMemoryEventBus implements EventBus {
   constructor(
     private timeGateway: TimeGateway,
     private uowPerformer: UnitOfWorkPerformer,
+    private throwOnPublishFailure: boolean = false,
   ) {
     this.subscriptions = {};
   }
@@ -98,7 +99,11 @@ export class InMemoryEventBus implements EventBus {
 
     const failuresOrUndefined: (EventFailure | void)[] = await Promise.all(
       getSubscriptionIdsToPublish(event, callbacksById).map(
-        makeExecuteCbMatchingSubscriptionId(event, callbacksById),
+        makeExecuteCbMatchingSubscriptionId(
+          event,
+          callbacksById,
+          this.throwOnPublishFailure,
+        ),
       ),
     );
 
@@ -161,7 +166,11 @@ const publishEventWithNoCallbacks = (
 };
 
 const makeExecuteCbMatchingSubscriptionId =
-  (event: DomainEvent, callbacksById: SubscriptionsForTopic) =>
+  (
+    event: DomainEvent,
+    callbacksById: SubscriptionsForTopic,
+    throwOnPublishFailure: boolean,
+  ) =>
   async (subscriptionId: SubscriptionId): Promise<void | EventFailure> => {
     const cb = callbacksById[subscriptionId];
     logger.info(
@@ -173,6 +182,16 @@ const makeExecuteCbMatchingSubscriptionId =
       await cb(event);
     } catch (error: any) {
       monitorErrorInCallback(error, event);
+      if (throwOnPublishFailure) {
+        throw new Error(
+          [
+            `Could not process event with id : ${event.id}.`,
+            `Subscription ${subscriptionId} failed on topic ${event.topic}.`,
+            `Error was : ${error.message}`,
+          ].join("\n"),
+          { cause: error },
+        );
+      }
       return { subscriptionId, errorMessage: error.message };
     }
   };

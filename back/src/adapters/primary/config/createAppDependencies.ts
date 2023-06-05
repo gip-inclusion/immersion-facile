@@ -32,7 +32,11 @@ export const createAppDependencies = async (config: AppConfig) => {
 
   const { uowPerformer, inMemoryUow } = createUowPerformer(config, getPgPoolFn);
 
-  const eventBus = new InMemoryEventBus(gateways.timeGateway, uowPerformer);
+  const eventBus = new InMemoryEventBus(
+    gateways.timeGateway,
+    uowPerformer,
+    config.nodeEnv === "test",
+  );
   const generateApiJwt = makeGenerateJwtES256<"apiConsumer">(
     config.apiJwtPrivateKey,
     undefined, // no expiration
