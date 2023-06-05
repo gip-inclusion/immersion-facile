@@ -76,4 +76,13 @@ export const statusTransitionConfigs: Record<
       ...validSignatoryRoles,
     ],
   },
+  DEPRECATED: {
+    validInitialStatuses: [
+      "ACCEPTED_BY_COUNSELLOR",
+      "IN_REVIEW",
+      "PARTIALLY_SIGNED",
+      "READY_TO_SIGN",
+    ],
+    validRoles: ["backOffice"],
+  },
 };
