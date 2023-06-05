@@ -46,7 +46,9 @@ describe("Convention slice", () => {
 
   describe("Save convention", () => {
     it("saves a new convention", () => {
-      const convention = new ConventionDtoBuilder().withStatus("DRAFT").build();
+      const convention = new ConventionDtoBuilder()
+        .withStatus("READY_TO_SIGN")
+        .build();
       store.dispatch(
         conventionSlice.actions.saveConventionRequested({
           ...convention,
