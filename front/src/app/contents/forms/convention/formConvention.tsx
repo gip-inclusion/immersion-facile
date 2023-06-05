@@ -719,12 +719,16 @@ export const sidebarStepContent = (
 export const formUiSections: Partial<FormFieldKeys>[][] = [
   ["agencyId"],
   keys(beneficiarySection("immersion")),
-  keys(
-    mergeRight(
-      establishmentRepresentativeSection("immersion"),
-      establishmentTutorSection("immersion"),
+  [
+    ...keys(
+      mergeRight(
+        establishmentRepresentativeSection("immersion"),
+        establishmentTutorSection("immersion"),
+      ),
     ),
-  ),
+    "siret",
+    "businessName",
+  ],
   ["dateStart", "dateEnd", "schedule", "immersionAddress"],
   [
     "individualProtection",
