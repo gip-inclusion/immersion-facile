@@ -109,7 +109,7 @@ const establishmentTutorSchema: z.Schema<EstablishmentTutor> =
   signatorySchema.merge(
     z.object({
       role: z.enum(["establishment-tutor", "establishment"]),
-      job: zString,
+      job: zStringPossiblyEmpty,
     }),
   );
 
