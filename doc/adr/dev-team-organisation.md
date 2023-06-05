@@ -42,23 +42,34 @@
 - 2023-02-16 - porte parole de l'équipe. Notamment quand c'est pour défendre l'équipe si des deadlines impossibles sont demandées
 - 2023-02-16 - tranche quand on arrive pas à trancher
 
-## Processus de décisions de l'équipe
+## Processus de décisions de l'organisation de l'équipe (ce document)
 
-- 2023-02-16 - C'est pour les décisions importante. Se fait en équipe complète !
+- 2023-06-02 - Ce document ne peut-être modifié qu'avec l'accord de l'équipe entière.
+- 2023-06-02 - Ajouter un membre de l'équipe se fait sous reserve d'un accord unanime.
+- 2023-06-02 - Conditions de départs
+  - le membre de l'équipe qui souhaite partir peut partir
+  - tout le monde sauf celui/celle qui doit partir décide de son départ
 
-- 2023-02-16 - On établi le sujet en question :
+## Processus de décisions techniques de l'équipe (ADR)
+
+- 2023-06-02 - Ce processus de décision s'enclenche lorsque :
+  - un dev estime qu'il y a une décision à prendre par l'équipe
+  - un désaccord entre deux devs même après le débat
+- 2023-02-16 - C'est pour les décisions importantes. Se fait en équipe complète !
+
+- 2023-06-02 - On établit le sujet en question :
 
   1. Chacun donne son opinion
-  2. Si la décision est unanime -> on adopte la décision
-  3. S' il y a un consensus -> on adopte la décision
+  2. Si la décision est unanime (unanimité) -> on adopte la décision
+  3. S' il y a un consensus (personne n'est contre) -> on adopte la décision
   4. Des gens pour / des gens contre
      - jusqu'à majorité 3 / 4 -> on adopte la décision
-     - majorité 3 / 5 ou moins -> on adopte pas la décision -> et on prolonge les dicussions
+     - majorité 3 / 5 ou moins -> on adopte pas la décision -> et on prolonge les discussions
   5. droit de veto pour le lead dev
 
-- 2023-02-16 - Une fois la décision prise, la responsabilité est porté par toute l'équipe.
+- 2023-02-16 - Une fois la décision prise, la responsabilité est portée par toute l'équipe.
 
-- 2023-02-16 - Les prises de décisions doivent être documentés dans un ADR, et daté. Si on reviens sur une décision, on refait un autre ADR. Comment la prise de décision a été fait doit être indiqué dans l'ADR.
+- 2023-02-16 - Les prises de décisions doivent être documentées dans un ADR, et datées. Si on revient sur une décision, on refait un autre ADR. Comment la prise de décision a été faite doit être indiquée dans l'ADR.
 
 ---
 
