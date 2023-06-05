@@ -24,6 +24,7 @@ import {
 import {
   ConventionFormLayout,
   ConventionFormSidebar,
+  Loader,
   SubmitConfirmationSection,
 } from "react-design-system";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
@@ -119,6 +120,7 @@ export const ConventionForm = ({
   const fetchedConvention: ConventionReadDto | null = useAppSelector(
     conventionSelectors.convention,
   );
+  const isLoading = useAppSelector(conventionSelectors.isLoading);
   const fetchConventionError = useAppSelector(conventionSelectors.fetchError);
   const dispatch = useDispatch();
   const getInitialFormValues = (mode: ConventionFormProps["mode"]) => {
@@ -253,6 +255,7 @@ export const ConventionForm = ({
           () => (
             <>
               <section>
+                {isLoading && <Loader />}
                 <ConventionSummary />
                 <ConventionFeedbackNotification
                   submitFeedback={submitFeedback}
@@ -279,6 +282,7 @@ export const ConventionForm = ({
                       nativeButtonProps: {
                         id: domElementIds.conventionImmersionRoute
                           .confirmSubmitFormButton,
+                        disabled: isLoading,
                       },
                     },
                   ]}
