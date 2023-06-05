@@ -123,6 +123,17 @@ export type EmailParamsByEmailType = {
     agency: string;
     agencyLogoUrl: AbsoluteUrl | undefined;
   };
+  DEPRECATED_CONVENTION_NOTIFICATION: {
+    internshipKind: InternshipKind;
+    beneficiaryFirstName: string;
+    beneficiaryLastName: string;
+    deprecationReason: string;
+    businessName: string;
+    signature: string;
+    immersionProfession: string;
+    agency: string;
+    agencyLogoUrl: AbsoluteUrl | undefined;
+  };
   CONVENTION_MODIFICATION_REQUEST_NOTIFICATION: {
     internshipKind: InternshipKind;
     beneficiaryFirstName: string;

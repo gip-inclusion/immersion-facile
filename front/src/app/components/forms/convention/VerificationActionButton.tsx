@@ -271,5 +271,5 @@ const confirmByStatus: Record<ConventionStatusWithJustification, string> = {
   DRAFT: "Confirmer la demande de modification",
   REJECTED: "Confirmer le refus",
   CANCELLED: "Confirmer l'annulation",
-  DEPRECATED: "Confirmer la dépréciation",
+  DEPRECATED: "Confirmer que la demande est obsolète",
 };
