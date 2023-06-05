@@ -1,5 +1,5 @@
 import React from "react";
-import { fr } from "@codegouvfr/react-dsfr";
+import { fr, type FrCxArg } from "@codegouvfr/react-dsfr";
 import { makeStyles } from "tss-react/dsfr";
 import Styles from "./MainWrapper.styles";
 
@@ -41,8 +41,8 @@ export const MainWrapper = ({
     },
   }))();
   const classNameValue = cx(
-    vSpacing ? fr.cx(`fr-py-${vSpacing}w`) : "",
-    hSpacing ? fr.cx(`fr-px-${hSpacing}w`) : "",
+    vSpacing ? fr.cx(`fr-py-${vSpacing}w` as FrCxArg) : "",
+    hSpacing ? fr.cx(`fr-px-${hSpacing}w` as FrCxArg) : "",
     Styles.root,
     useBackground ? Styles.withBackground : "",
     className,
