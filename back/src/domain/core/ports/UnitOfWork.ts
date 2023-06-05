@@ -5,7 +5,6 @@ import { ConventionQueries } from "../../convention/ports/ConventionQueries";
 import { ConventionRepository } from "../../convention/ports/ConventionRepository";
 import { ImmersionAssessmentRepository } from "../../convention/ports/ImmersionAssessmentRepository";
 import { InclusionConnectedUserRepository } from "../../dashboard/port/InclusionConnectedUserRepository";
-import { PostalCodeDepartmentRegionQueries } from "../../generic/geo/ports/PostalCodeDepartmentRegionQueries";
 import { NotificationRepository } from "../../generic/notifications/ports/NotificationRepository";
 import { AuthenticatedUserRepository } from "../../generic/OAuth/ports/AuthenticatedUserRepositiory";
 import { OngoingOAuthRepository } from "../../generic/OAuth/ports/OngoingOAuthRepositiory";
@@ -43,7 +42,6 @@ export type UnitOfWork = {
   ongoingOAuthRepository: OngoingOAuthRepository;
   outboxQueries: OutboxQueries;
   outboxRepository: OutboxRepository;
-  postalCodeDepartmentRegionQueries: PostalCodeDepartmentRegionQueries;
   romeRepository: RomeRepository;
   searchMadeRepository: SearchMadeRepository;
   shortLinkQuery: ShortLinkQuery;

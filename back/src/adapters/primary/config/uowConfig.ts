@@ -45,12 +45,10 @@ import { PgNotificationRepository } from "../../secondary/pg/PgNotificationRepos
 import { PgOngoingOAuthRepository } from "../../secondary/pg/PgOngoingOAuthRepository";
 import { PgOutboxQueries } from "../../secondary/pg/PgOutboxQueries";
 import { PgOutboxRepository } from "../../secondary/pg/PgOutboxRepository";
-import { PgPostalCodeDepartmentRegionQueries } from "../../secondary/pg/PgPostalCodeDepartmentRegionQueries";
 import { PgRomeRepository } from "../../secondary/pg/PgRomeRepository";
 import { PgSearchMadeRepository } from "../../secondary/pg/PgSearchMadeRepository";
 import { PgShortLinkRepository } from "../../secondary/pg/PgShortLinkRepository";
 import { PgUowPerformer } from "../../secondary/pg/PgUowPerformer";
-import { stubPostalCodeDepartmentRegionQueries } from "../../secondary/StubPostalCodeDepartmentRegionQueries";
 import { AppConfig } from "./appConfig";
 import { GetPgPoolFn } from "./createGateways";
 
@@ -89,7 +87,6 @@ export const createInMemoryUow = () => {
     ongoingOAuthRepository: new InMemoryOngoingOAuthRepository(),
     outboxRepository,
     outboxQueries,
-    postalCodeDepartmentRegionQueries: stubPostalCodeDepartmentRegionQueries,
     romeRepository: new InMemoryRomeRepository(),
     searchMadeRepository: new InMemorySearchMadeRepository(),
     shortLinkQuery: shortLinkRepository,
@@ -124,9 +121,6 @@ export const createPgUow = (client: PoolClient): UnitOfWork => {
     ongoingOAuthRepository: new PgOngoingOAuthRepository(client),
     outboxRepository: new PgOutboxRepository(client),
     outboxQueries: new PgOutboxQueries(client),
-    postalCodeDepartmentRegionQueries: new PgPostalCodeDepartmentRegionQueries(
-      client,
-    ),
     romeRepository: new PgRomeRepository(client),
     searchMadeRepository: new PgSearchMadeRepository(client),
     shortLinkRepository,
