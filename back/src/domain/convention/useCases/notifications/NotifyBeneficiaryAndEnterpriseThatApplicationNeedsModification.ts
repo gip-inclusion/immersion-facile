@@ -68,6 +68,10 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
           role,
           email,
           now: this.timeGateway.now(),
+          // UGLY : need to rework, handling of JWT payloads
+          ...(role === "backOffice"
+            ? { sub: this.config.backofficeUsername }
+            : {}),
         };
 
       const makeShortMagicLink = prepareMagicShortLinkMaker({
