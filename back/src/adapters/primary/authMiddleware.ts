@@ -203,14 +203,15 @@ export const makeMagicLinkAuthMiddleware = (
 
       switch (payloadKey) {
         case "convention":
-          if ("role" in payload && payload.role === "backOffice")
+          if ("role" in payload && payload.role === "backOffice") {
             req.payloads = {
               backOffice: backOfficeJwtPayloadSchema.parse(payload),
             };
-          else
+          } else {
             req.payloads = {
               convention: payload as ConventionMagicLinkPayload,
             };
+          }
           break;
         case "establishment":
           req.payloads = { establishment: payload as EstablishmentJwtPayload };

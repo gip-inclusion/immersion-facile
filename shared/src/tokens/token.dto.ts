@@ -9,6 +9,7 @@ export const createConventionMagicLinkPayload = ({
   role,
   email,
   now,
+  sub,
   durationDays = 31,
   iat = Math.round(now.getTime() / 1000),
   exp = iat + durationDays * 24 * 3600,
@@ -20,6 +21,7 @@ export const createConventionMagicLinkPayload = ({
   iat,
   exp,
   emailHash: stringToMd5(email),
+  ...(sub ? { sub } : {}),
 });
 
 export const createEstablishmentMagicLinkPayload = ({
@@ -53,6 +55,7 @@ export type CreateConventionMagicLinkPayloadProperties = {
   iat?: number;
   exp?: number;
   version?: number;
+  sub?: string;
 };
 
 export type AppJwtPayload = {
@@ -73,6 +76,7 @@ export type ConventionMagicLinkPayload = AppJwtPayload & {
   applicationId: ConventionId;
   role: Role;
   emailHash: string; //< md5 of email
+  sub?: string;
 };
 
 export type Role = (typeof allRoles)[number];
