@@ -44,6 +44,7 @@ type ConventionDomainTopic = ExtractFromDomainTopics<
   | "ImmersionApplicationRejected"
   | "ImmersionApplicationRequiresModification"
   | "ImmersionApplicationCancelled"
+  | "ConventionDeprecated"
 > | null; // null is used to indicate that no domain event should be sent
 
 type SetupInitialStateParams = {

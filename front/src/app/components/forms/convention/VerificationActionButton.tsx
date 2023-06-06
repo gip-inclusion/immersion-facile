@@ -263,8 +263,8 @@ const JustificationModalContent = ({
 const inputLabelByStatus: Record<ConventionStatusWithJustification, string> = {
   DRAFT: "Précisez la raison et la modification nécessaire",
   REJECTED: "Pourquoi l'immersion est-elle refusée ?",
-  CANCELLED: "Pourquoi souhaitez-vous annuler cette convention?",
-  DEPRECATED: "Pourquoi l'immersion est-elle obsolète",
+  CANCELLED: "Pourquoi souhaitez-vous annuler cette convention ?",
+  DEPRECATED: "Pourquoi l'immersion est-elle obsolète ?",
 };
 
 const confirmByStatus: Record<ConventionStatusWithJustification, string> = {

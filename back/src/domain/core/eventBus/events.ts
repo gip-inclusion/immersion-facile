@@ -62,7 +62,7 @@ export type DomainEvent =
   | GenericEvent<"ImmersionApplicationRejected", ConventionDto>
   | GenericEvent<"ImmersionApplicationCancelled", ConventionDto>
   | GenericEvent<"ImmersionApplicationRequiresModification", ConventionRequiresModificationPayload>
-  | GenericEvent<"ImmersionApplicationDeprecated", ConventionDto>
+  | GenericEvent<"ConventionDeprecated", ConventionDto>
 
   // MAGIC LINK RENEWAL
   | GenericEvent<"MagicLinkRenewalRequested", RenewMagicLinkPayload>

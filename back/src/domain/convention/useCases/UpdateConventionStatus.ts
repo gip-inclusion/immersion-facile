@@ -32,7 +32,7 @@ const domainTopicByTargetStatusMap: Record<
   REJECTED: "ImmersionApplicationRejected",
   CANCELLED: "ImmersionApplicationCancelled",
   DRAFT: "ImmersionApplicationRequiresModification",
-  DEPRECATED: "ImmersionApplicationDeprecated",
+  DEPRECATED: "ConventionDeprecated",
 };
 
 type UpdateConventionStatusPayload = {

@@ -82,7 +82,8 @@ export const statusTransitionConfigs: Record<
       "IN_REVIEW",
       "PARTIALLY_SIGNED",
       "READY_TO_SIGN",
+      "DRAFT",
     ],
-    validRoles: ["backOffice"],
+    validRoles: ["counsellor", "validator", "backOffice"],
   },
 };
