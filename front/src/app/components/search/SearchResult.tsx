@@ -33,6 +33,7 @@ const SearchResultComponent = ({
   const { cx } = useStyles();
 
   const {
+    siret,
     name,
     customizedName,
     distance_m,
@@ -91,7 +92,10 @@ const SearchResultComponent = ({
 
   return (
     <div className={fr.cx("fr-col-12", "fr-col-md-6", layout)}>
-      <div className={cx(fr.cx("fr-card"), componentName)}>
+      <div
+        className={cx(fr.cx("fr-card"), componentName)}
+        data-establishment-siret={siret}
+      >
         <div className={fr.cx("fr-card__body")}>
           <div className={fr.cx("fr-card__content")}>
             <h3 className={fr.cx("fr-card__title")}>{establismentName}</h3>

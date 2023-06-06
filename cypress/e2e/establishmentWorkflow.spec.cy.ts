@@ -6,9 +6,14 @@ import {
   featureFlagsRoute,
   siretTargets,
   establishmentTargets,
+  frontRoutes,
+  immersionOffersRoute,
 } from "shared";
+import { connectToAdmin } from "../utils/admin";
 
 const baseApiRoute = "/api/";
+const providedSiret = "41433740200039";
+const providedLocation = "Tain-l'Hermitage";
 
 describe("Establishment creation and modification workflow", () => {
   it("creates a new establishment", () => {
@@ -19,8 +24,8 @@ describe("Establishment creation and modification workflow", () => {
     cy.intercept(
       "GET",
       `${baseApiRoute}${siretTargets.getSiretInfoIfNotAlreadySaved.url.replace(
-        "/:siret",
-        "",
+        ":siret",
+        providedSiret,
       )}`,
     ).as("siretIfNotAlreadySavedRequest");
 
@@ -45,8 +50,6 @@ describe("Establishment creation and modification workflow", () => {
     cy.get(
       `#${domElementIds.homeEstablishments.heroHeader.addEstablishmentForm}`,
     ).click();
-
-    const providedSiret = "41433740200039";
 
     cy.get(
       `#${domElementIds.homeEstablishments.siretModal.siretFetcherInput}`,
@@ -82,7 +85,6 @@ describe("Establishment creation and modification workflow", () => {
 
     cy.get(`#${domElementIds.establishment.appellations} .fr-input`).then(
       ($element) => {
-        console.log($element);
         const listboxId = $element.attr("aria-controls");
         cy.get(`#${listboxId} .MuiAutocomplete-option`).then((options) => {
           options.eq(0).trigger("click");
@@ -125,18 +127,116 @@ describe("Establishment creation and modification workflow", () => {
       .should("eq", 200);
     cy.get(".fr-alert--success").should("exist");
   });
+
+  it("modifies an existing establishment", () => {
+    cy.intercept(
+      "GET",
+      `${baseApiRoute}${siretTargets.getSiretInfoIfNotAlreadySaved.url.replace(
+        ":siret",
+        providedSiret,
+      )}`,
+    ).as("siretIfNotAlreadySavedRequest");
+
+    cy.intercept(
+      "POST",
+      `${baseApiRoute}${establishmentTargets.requestEmailToUpdateFormRoute.url.replace(
+        ":siret",
+        providedSiret,
+      )}`,
+    ).as("requestEmailToUpdateEstablishmentRequest");
+
+    cy.intercept(
+      "PUT",
+      `${baseApiRoute}${establishmentTargets.addFormEstablishment.url}`,
+    ).as("addFormEstablishmentRequest");
+
+    cy.visit("/");
+    cy.get(`#${domElementIds.home.heroHeader.establishment}`).click();
+    cy.get(
+      `#${domElementIds.homeEstablishments.heroHeader.editEstablishmentForm}`,
+    ).click();
+    cy.get(
+      `#${domElementIds.homeEstablishments.siretModal.siretFetcherInput}`,
+    ).type(providedSiret);
+    cy.wait("@siretIfNotAlreadySavedRequest")
+      .its("response.statusCode")
+      .should("eq", 409);
+    cy.get(
+      `#${domElementIds.homeEstablishments.siretModal.editEstablishmentButton}`,
+    ).click();
+    cy.wait("@requestEmailToUpdateEstablishmentRequest")
+      .its("response.statusCode")
+      .should("eq", 200);
+    connectToAdmin();
+    cy.get(".fr-tabs__tab").contains("Emails").click();
+    cy.get(`.fr-accordion__btn:contains("EDIT_FORM_ESTABLISHMENT_LINK")`)
+      .first()
+      .should("exist")
+      .each(($el) => {
+        cy.wrap($el).click();
+        $el
+          .parents(".fr-accordion")
+          .find("a:contains('Lien vers la page')")
+          .each((_, element) => {
+            cy.wrap(element).click();
+            cy.get(`#${domElementIds.establishment.siret} input`)
+              .should("be.disabled")
+              .should("have.value", providedSiret);
+
+            cy.get(`#${domElementIds.establishment.businessContact.job}`)
+              .clear()
+              .type(faker.name.jobTitle(), {
+                force: true,
+              });
+            cy.get(`#${domElementIds.establishment.businessContact.phone}`)
+              .clear()
+              .type(faker.phone.number("06########"), {
+                force: true,
+              });
+            cy.get(`#${domElementIds.establishment.businessContact.email}`)
+              .clear()
+              .type(faker.internet.email(), {
+                force: true,
+              });
+            cy.get(`#${domElementIds.establishment.submitButton}`).click();
+            cy.wait("@addFormEstablishmentRequest")
+              .its("response.statusCode")
+              .should("eq", 200);
+            cy.get(".fr-alert--success").should("exist");
+          });
+      });
+  });
+  it("searches for an existing establishment", () => {
+    cy.visit(frontRoutes.search);
+    cy.intercept(
+      "GET",
+      `${baseApiRoute}${addressTargets.lookupLocation.url}?query=**`,
+    ).as("lookupLocationRequest");
+
+    cy.intercept("GET", `${baseApiRoute}${immersionOffersRoute}?**`).as(
+      "searchImmersionRequest",
+    );
+
+    cy.get(`#${domElementIds.search.placeAutocompleteInput}`).type(
+      providedLocation,
+    );
+    cy.wait("@lookupLocationRequest")
+      .its("response.statusCode")
+      .should("be.oneOf", [200, 304]);
+    cy.get(`#${domElementIds.search.placeAutocompleteInput}`).then(
+      ($element) => {
+        const listboxId = $element.attr("aria-controls");
+        cy.get(`#${listboxId} .MuiAutocomplete-option`).then((options) => {
+          options.eq(0).trigger("click");
+        });
+      },
+    );
+    cy.get(`#${domElementIds.search.searchSubmitButton}`).click();
+    cy.wait("@searchImmersionRequest")
+      .its("response.statusCode")
+      .should("be.oneOf", [200, 304]);
+    cy.get(
+      `.im-search-result[data-establishment-siret=${providedSiret}]`,
+    ).should("have.length", 1);
+  });
 });
-
-// on peut faire une recherche qui trouve l'établissement
-
-// 2.
-// on retourne sur la home
-// on saisie le même siret
-// on a un message et un bouton pour demander la modification
-// on clique sur le bouton
-// on va dans l'admin voir les mails
-// on clique sur le lien
-// on edite l'établissement
-// on valide
-
-// on peut faire une recherche qui trouve l'établissement

@@ -71,6 +71,7 @@ export const domElementIds = {
   homeEstablishments: {
     siretModal: {
       siretFetcherInput: "siret-fetcher-input",
+      editEstablishmentButton: "edit-establishment-button",
     },
     heroHeader: {
       addEstablishmentForm: buildHeroHeaderId("establishment-form-register"),
