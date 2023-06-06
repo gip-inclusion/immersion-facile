@@ -25,6 +25,7 @@ import { GetConvention } from "../../../domain/convention/useCases/GetConvention
 import { ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/convention/useCases/notifications/ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature";
 import { DeliverRenewedMagicLink } from "../../../domain/convention/useCases/notifications/DeliverRenewedMagicLink";
 import { NotifyAllActorsOfFinalConventionValidation } from "../../../domain/convention/useCases/notifications/NotifyAllActorsOfFinalConventionValidation";
+import { NotifyAllActorsThatConventionIsDeprecated } from "../../../domain/convention/useCases/notifications/NotifyAllActorsThatConventionIsDeprecated";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 import { NotifyConventionReminder } from "../../../domain/convention/useCases/notifications/NotifyConventionReminder";
@@ -362,6 +363,11 @@ export const createUseCases = (
       ),
       notifyBeneficiaryAndEnterpriseThatConventionIsRejected:
         new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
+          uowPerformer,
+          saveNotificationAndRelatedEvent,
+        ),
+      notifyAllActorsThatConventionIsDeprecated:
+        new NotifyAllActorsThatConventionIsDeprecated(
           uowPerformer,
           saveNotificationAndRelatedEvent,
         ),
