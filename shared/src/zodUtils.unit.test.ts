@@ -1,4 +1,4 @@
-import { zToBolean, zToNumber } from "./zodUtils";
+import { zToBoolean, zToNumber } from "./zodUtils";
 
 describe("zToBolean schema validation", () => {
   it.each([
@@ -7,15 +7,15 @@ describe("zToBolean schema validation", () => {
     [true, true],
     ["1", true],
     [1, true],
-    ["false", true],
-    ["FALSE", true],
-    ["0", true],
+    ["false", false],
+    ["FALSE", false],
+    ["0", false],
     [undefined, false],
     [null, false],
     [false, false],
     [0, false],
-  ])("boolean '%s' to be parsed to '%s'", (boolean, expectedBoolean) => {
-    expect(zToBolean.parse(boolean)).toBe(expectedBoolean);
+  ])("boolean '%s' to be parsed to %s", (boolean, expectedBoolean) => {
+    expect(zToBoolean.parse(boolean)).toBe(expectedBoolean);
   });
 });
 
