@@ -77,7 +77,9 @@ const getUseCasesByTopics = (
   ImmersionApplicationCancelled: [
     useCases.broadcastToPoleEmploiOnConventionUpdates,
   ],
-  ImmersionApplicationDeprecated: [],
+  ImmersionApplicationDeprecated: [
+    useCases.notifyAllActorsThatConventionIsDeprecated,
+  ],
   ConventionReminderRequired: [useCases.notifyConventionReminder],
 
   // Establishment form related

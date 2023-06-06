@@ -303,6 +303,7 @@ describe("conventionDtoSchema", () => {
           "PARTIALLY_SIGNED",
           "REJECTED",
           "CANCELLED",
+          "DEPRECATED",
         ]);
 
       it.each(allowWithoutSignature.map((status) => ({ status })))(

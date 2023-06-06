@@ -59,6 +59,7 @@ const statusesAllowedWithoutSign: ConventionStatus[] = [
   "PARTIALLY_SIGNED",
   "REJECTED",
   "CANCELLED",
+  "DEPRECATED",
 ];
 
 export const mustBeSignedByEveryone = (
