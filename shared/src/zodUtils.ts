@@ -88,7 +88,11 @@ export const makezTrimmedString = (message: string) =>
 
 export const zBoolean = z.boolean(requiredBoolean);
 
-export const zToBolean = z.coerce.boolean(requiredBoolean);
+export const zToBoolean = z
+  .any()
+  .transform((v) =>
+    ["true", "1"].includes((v ?? "false").toString().toLowerCase()),
+  );
 
 export const zToNumber = z.coerce.number();
 

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { appellationSchema, romeCodeSchema } from "../rome";
 import { siretSchema } from "../siret/siret.schema";
-import { zToBolean, zToNumber } from "../zodUtils";
+import { zToBoolean, zToNumber } from "../zodUtils";
 import { SearchImmersionQueryParamsDto } from "./SearchImmersionQueryParams.dto";
 
 export const searchImmersionQueryParamsSchema: z.Schema<SearchImmersionQueryParamsDto> =
@@ -12,7 +12,7 @@ export const searchImmersionQueryParamsSchema: z.Schema<SearchImmersionQueryPara
     latitude: zToNumber,
     longitude: zToNumber,
     distance_km: zToNumber.positive("'distance_km' doit être > 0").max(100),
-    voluntaryToImmersion: zToBolean.optional(),
+    voluntaryToImmersion: zToBoolean.optional(),
     place: z.string().optional(),
     sortedBy: z.enum(["distance", "date"]).optional(),
   });
