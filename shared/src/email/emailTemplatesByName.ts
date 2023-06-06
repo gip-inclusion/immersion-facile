@@ -1180,7 +1180,15 @@ export const emailTemplatesByName =
           internshipKind === "immersion"
             ? "une immersion professionnelle"
             : "un mini stage"
-        } du ${dateStart} au ${dateEnd} dans l'entreprise ${businessName} est supprimé.
+        } du ${
+          isStringDate(dateStart)
+            ? toDisplayedDate(new Date(dateStart), true)
+            : "DATE INVALIDE"
+        } au ${
+          isStringDate(dateEnd)
+            ? toDisplayedDate(new Date(dateEnd), true)
+            : "DATE INVALIDE"
+        } dans l'entreprise ${businessName} est supprimé.
       
       Les raisons en sont: ${deprecationReason}.         
       
