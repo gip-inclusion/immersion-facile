@@ -449,4 +449,14 @@ export const defaultEmailValueByEmailKind: {
   IC_USER_RIGHTS_HAS_CHANGED: {
     agencyName: "AGENCY_NAME",
   },
+  DEPRECATED_CONVENTION_NOTIFICATION: {
+    beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
+    beneficiaryLastName: "BENEFICIARY_LAST_NAME",
+    businessName: "BUSINESS_NAME",
+    dateStart: "DATE_START",
+    dateEnd: "DATE_END",
+    deprecationReason: "DEPRECATION_REASON",
+    immersionProfession: "IMMERSION_PROFESSION",
+    internshipKind: "immersion",
+  },
 };

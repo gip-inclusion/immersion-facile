@@ -1161,36 +1161,32 @@ export const emailTemplatesByName =
         beneficiaryFirstName,
         beneficiaryLastName,
         deprecationReason,
-        agency,
         businessName,
-        signature,
         internshipKind,
-        agencyLogoUrl,
+        dateStart,
+        dateEnd,
       }) => ({
         subject:
           internshipKind === "immersion"
-            ? `Refus de la demande d'immersion pour observer l'activité de ${immersionProfession} au sein de ${businessName}`
-            : `Mini Stage - Refus de la demande de mini stage pour l'activité de ${immersionProfession} au sein de ${businessName}`,
+            ? `Demande d'immersion pour observer l'activité de ${immersionProfession} au sein de ${businessName} obsolète`
+            : `Mini Stage - Demande de mini stage pour l'activité de ${immersionProfession} au sein de ${businessName} obsolète`,
         greetings: "Bonjour,",
         content: `
       Nous vous informons que la demande ${
         internshipKind === "immersion"
           ? "d'immersion professionnelle"
           : "de mini stage"
-      } de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName} a été refusée par ${agency}.
+      } de ${beneficiaryFirstName} ${beneficiaryLastName} pour réaliser ${
+          internshipKind === "immersion"
+            ? "une immersion professionnelle"
+            : "un mini stage"
+        } du ${dateStart} au ${dateEnd} dans l'entreprise ${businessName} est supprimé.
       
-      Les raisons en sont ${deprecationReason} par ${agency}.       
-      
-      Vous pouvez vous rapprocher de votre conseiller${
-        internshipKind === "immersion"
-          ? ""
-          : " de la chambre de commerce et d'instrustrie - CCI"
-      } pour en échanger.      
+      Les raisons en sont: ${deprecationReason}.         
       
       Bien cordialement,       
-      ${signature} 
       `,
-        agencyLogoUrl,
+        subContent: defaultSignature("immersion"),
       }),
     },
   });

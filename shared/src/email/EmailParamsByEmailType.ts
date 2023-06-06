@@ -129,10 +129,9 @@ export type EmailParamsByEmailType = {
     beneficiaryLastName: string;
     deprecationReason: string;
     businessName: string;
-    signature: string;
     immersionProfession: string;
-    agency: string;
-    agencyLogoUrl: AbsoluteUrl | undefined;
+    dateStart: string;
+    dateEnd: string;
   };
   CONVENTION_MODIFICATION_REQUEST_NOTIFICATION: {
     internshipKind: InternshipKind;
