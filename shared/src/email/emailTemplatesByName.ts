@@ -1194,7 +1194,7 @@ export const emailTemplatesByName =
       
       Bien cordialement,       
       `,
-        subContent: defaultSignature("immersion"),
+        subContent: defaultSignature(internshipKind),
       }),
     },
   });

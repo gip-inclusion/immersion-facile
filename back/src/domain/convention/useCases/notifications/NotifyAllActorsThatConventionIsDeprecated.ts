@@ -1,3 +1,4 @@
+import { uniq } from "ramda";
 import { ConventionDto, conventionSchema } from "shared";
 import {
   UnitOfWork,
@@ -34,17 +35,14 @@ export class NotifyAllActorsThatConventionIsDeprecated extends TransactionalUseC
       beneficiaryRepresentative,
     } = convention.signatories;
 
-    const recipients = [
+    const recipients = uniq([
       beneficiary.email,
       establishmentRepresentative.email,
       ...agency.counsellorEmails,
       ...agency.validatorEmails,
-    ];
-
-    if (beneficiaryCurrentEmployer && beneficiaryCurrentEmployer.email)
-      recipients.push(beneficiaryCurrentEmployer.email);
-    if (beneficiaryRepresentative && beneficiaryRepresentative.email)
-      recipients.push(beneficiaryRepresentative.email);
+      ...(beneficiaryCurrentEmployer ? [beneficiaryCurrentEmployer.email] : []),
+      ...(beneficiaryRepresentative ? [beneficiaryRepresentative.email] : []),
+    ]);
 
     await this.saveNotificationAndRelatedEvent(uow, {
       kind: "email",
@@ -62,7 +60,11 @@ export class NotifyAllActorsThatConventionIsDeprecated extends TransactionalUseC
           immersionProfession: convention.immersionAppellation.appellationLabel,
         },
       },
-      followedIds: {},
+      followedIds: {
+        conventionId: convention.id,
+        agencyId: convention.agencyId,
+        establishmentSiret: convention.siret,
+      },
     });
   }
 }
