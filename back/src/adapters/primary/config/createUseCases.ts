@@ -331,14 +331,14 @@ export const createUseCases = (
       notifyLastSigneeThatConventionHasBeenSigned:
         new NotifyLastSigneeThatConventionHasBeenSigned(
           uowPerformer,
-          gateways.notification,
+          saveNotificationAndRelatedEvent,
           generateConventionMagicLinkUrl,
           gateways.timeGateway,
         ),
       notifyAllActorsOfFinalConventionValidation:
         new NotifyAllActorsOfFinalConventionValidation(
           uowPerformer,
-          gateways.notification,
+          saveNotificationAndRelatedEvent,
           generateConventionMagicLinkUrl,
           gateways.timeGateway,
           gateways.shortLinkGenerator,
@@ -346,7 +346,7 @@ export const createUseCases = (
         ),
       notifyNewConventionNeedsReview: new NotifyNewApplicationNeedsReview(
         uowPerformer,
-        gateways.notification,
+        saveNotificationAndRelatedEvent,
         generateConventionMagicLinkUrl,
         gateways.timeGateway,
         gateways.shortLinkGenerator,
@@ -363,12 +363,12 @@ export const createUseCases = (
       notifyBeneficiaryAndEnterpriseThatConventionIsRejected:
         new NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected(
           uowPerformer,
-          gateways.notification,
+          saveNotificationAndRelatedEvent,
         ),
       notifyBeneficiaryAndEnterpriseThatConventionNeedsModifications:
         new NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification(
           uowPerformer,
-          gateways.notification,
+          saveNotificationAndRelatedEvent,
           generateConventionMagicLinkUrl,
           gateways.timeGateway,
           gateways.shortLinkGenerator,
@@ -378,15 +378,18 @@ export const createUseCases = (
         gateways.notification,
       ),
       notifyConfirmationEstablishmentCreated:
-        new NotifyConfirmationEstablishmentCreated(gateways.notification),
+        new NotifyConfirmationEstablishmentCreated(
+          uowPerformer,
+          saveNotificationAndRelatedEvent,
+        ),
       notifyContactRequest: new NotifyContactRequest(
         uowPerformer,
-        gateways.notification,
+        saveNotificationAndRelatedEvent,
       ),
       notifyPoleEmploiUserAdvisorOnConventionFullySigned:
         new NotifyPoleEmploiUserAdvisorOnConventionFullySigned(
           uowPerformer,
-          gateways.notification,
+          saveNotificationAndRelatedEvent,
           generateConventionMagicLinkUrl,
           gateways.timeGateway,
         ),

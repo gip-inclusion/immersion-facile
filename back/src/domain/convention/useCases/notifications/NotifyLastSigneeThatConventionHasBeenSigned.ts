@@ -15,7 +15,7 @@ import {
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { NotificationGateway } from "../../../generic/notifications/ports/NotificationGateway";
+import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 
 export const missingConventionMessage = (conventionId: ConventionId) =>
   `Missing convention ${conventionId} on convention repository.`;
@@ -29,7 +29,7 @@ export const noSignatoryMessage = (convention: ConventionDto): string =>
 export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUseCase<ConventionDto> {
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly notificationGateway: NotificationGateway,
+    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
     private readonly generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     private readonly timeGateway: TimeGateway,
   ) {
@@ -42,30 +42,37 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
     convention: ConventionDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    const repositoryConvention = await uow.conventionRepository.getById(
+    const savedConvention = await uow.conventionRepository.getById(
       convention.id,
     );
-    if (!repositoryConvention)
+    if (!savedConvention)
       throw new Error(missingConventionMessage(convention.id));
     const [agency] = await uow.agencyRepository.getByIds([
-      repositoryConvention.agencyId,
+      savedConvention.agencyId,
     ]);
-    if (!agency) throw new Error(missingAgencyMessage(repositoryConvention));
-    return this.onRepositoryConvention(repositoryConvention, agency);
+    if (!agency) throw new Error(missingAgencyMessage(savedConvention));
+    return this.onRepositoryConvention(uow, savedConvention, agency);
   }
 
   private onRepositoryConvention(
-    repositoryConvention: ConventionDto,
+    uow: UnitOfWork,
+    convention: ConventionDto,
     agency: AgencyDto,
   ): Promise<void> {
     const lastSigneeEmail = this.lastSigneeEmail(
-      Object.values(repositoryConvention.signatories),
+      Object.values(convention.signatories),
     );
     if (lastSigneeEmail)
-      return this.notificationGateway.sendEmail(
-        this.emailToSend(repositoryConvention, lastSigneeEmail, agency),
-      );
-    throw new Error(noSignatoryMessage(repositoryConvention));
+      return this.saveNotificationAndRelatedEvent(uow, {
+        kind: "email",
+        templatedContent: this.emailToSend(convention, lastSigneeEmail, agency),
+        followedIds: {
+          conventionId: convention.id,
+          agencyId: convention.agencyId,
+          establishmentSiret: convention.siret,
+        },
+      });
+    throw new Error(noSignatoryMessage(convention));
   }
 
   private lastSigneeEmail(

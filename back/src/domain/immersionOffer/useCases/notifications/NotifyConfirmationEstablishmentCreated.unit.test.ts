@@ -1,30 +1,61 @@
 import { FormEstablishmentDtoBuilder } from "shared";
-import { expectedEmailEstablishmentCreatedReviewMatchingEstablisment } from "../../../../_testBuilders/emailAssertions";
-import { InMemoryNotificationGateway } from "../../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
+import {
+  ExpectSavedNotificationsAndEvents,
+  makeExpectSavedNotificationsAndEvents,
+} from "../../../../_testBuilders/makeExpectSavedNotificationsAndEvents";
+import { createInMemoryUow } from "../../../../adapters/primary/config/uowConfig";
+import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
+import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
+import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
+import { makeCreateNewEvent } from "../../../core/eventBus/EventBus";
+import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { NotifyConfirmationEstablishmentCreated } from "./NotifyConfirmationEstablishmentCreated";
 
 describe("NotifyConfirmationEstablismentCreated", () => {
   const validEstablishment = FormEstablishmentDtoBuilder.valid().build();
-  let notificationGateway: InMemoryNotificationGateway;
+  let notifyConfirmationEstablishmentCreated: NotifyConfirmationEstablishmentCreated;
+  let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
 
   beforeEach(() => {
-    notificationGateway = new InMemoryNotificationGateway();
+    const uow = createInMemoryUow();
+    const uowPerformer = new InMemoryUowPerformer(uow);
+    const uuidGenerator = new UuidV4Generator();
+    const timeGateway = new CustomTimeGateway();
+    const createNewEvent = makeCreateNewEvent({ uuidGenerator, timeGateway });
+    const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
+      createNewEvent,
+      uuidGenerator,
+      timeGateway,
+    );
+    expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
+      uow.notificationRepository,
+      uow.outboxRepository,
+    );
+    notifyConfirmationEstablishmentCreated =
+      new NotifyConfirmationEstablishmentCreated(
+        uowPerformer,
+        saveNotificationAndRelatedEvent,
+      );
   });
-
-  const createUseCase = () =>
-    new NotifyConfirmationEstablishmentCreated(notificationGateway);
 
   describe("When establishment is valid", () => {
     it("Nominal case: Sends notification email to Establisment contact", async () => {
-      await createUseCase().execute(validEstablishment);
+      await notifyConfirmationEstablishmentCreated.execute(validEstablishment);
 
-      const sentEmails = notificationGateway.getSentEmails();
-      expect(sentEmails).toHaveLength(1);
-
-      expectedEmailEstablishmentCreatedReviewMatchingEstablisment(
-        sentEmails[0],
-        validEstablishment,
-      );
+      expectSavedNotificationsAndEvents({
+        emails: [
+          {
+            type: "NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION",
+            recipients: [validEstablishment.businessContact.email],
+            params: {
+              businessName: validEstablishment.businessName,
+              contactFirstName: validEstablishment.businessContact.firstName,
+              contactLastName: validEstablishment.businessContact.lastName,
+            },
+            cc: validEstablishment.businessContact.copyEmails,
+          },
+        ],
+      });
     });
   });
 });
