@@ -1,4 +1,5 @@
 import { parseISO } from "date-fns";
+import { uniq } from "ramda";
 import {
   AgencyDto,
   ConventionDto,
@@ -48,7 +49,7 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
       kind: "email",
       templatedContent: {
         type: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
-        recipients: [
+        recipients: uniq([
           ...Object.values(convention.signatories).map(
             (signatory) => signatory.email,
           ),
@@ -63,7 +64,7 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
           convention.establishmentTutor.email
             ? [convention.establishmentTutor.email]
             : []),
-        ],
+        ]),
         params: await this.getValidatedConventionFinalConfirmationParams(
           agency,
           convention,

@@ -54,12 +54,15 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
 
     switch (payload.contactMode) {
       case "EMAIL": {
+        const cc = contact.copyEmails.filter(
+          (email) => email !== contact.email,
+        );
         await this.saveNotificationAndRelatedEvent(uow, {
           kind: "email",
           templatedContent: {
             type: "CONTACT_BY_EMAIL_REQUEST",
             recipients: [contact.email],
-            cc: contact.copyEmails,
+            cc,
             params: {
               businessName,
               contactFirstName: contact.firstName,
