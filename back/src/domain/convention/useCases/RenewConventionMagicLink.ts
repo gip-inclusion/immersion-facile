@@ -114,6 +114,7 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
               conventionStatusLink: await makeMagicShortLink(
                 frontRoutes.conventionStatusDashboard,
               ),
+              conventionId: applicationId,
             },
           }),
         );

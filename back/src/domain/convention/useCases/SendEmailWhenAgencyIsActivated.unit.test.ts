@@ -1,28 +1,56 @@
 import { AgencyDtoBuilder } from "shared";
-import { InMemoryNotificationGateway } from "../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
-import { SendEmailWhenAgencyIsActivated } from "../../../domain/convention/useCases/SendEmailWhenAgencyIsActivated";
+import { makeExpectSavedNotificationsAndEvents } from "../../../_testBuilders/makeExpectSavedNotificationsAndEvents";
+import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
+import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
+import { UuidV4Generator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
+import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
+import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
+import { makeSaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
+import { SendEmailWhenAgencyIsActivated } from "./SendEmailWhenAgencyIsActivated";
 
 describe("SendEmailWhenAgencyIsActivated", () => {
   it("Sends an email to validators with agency name", async () => {
     // Prepare
-    const notificationGateway = new InMemoryNotificationGateway();
-    const useCase = new SendEmailWhenAgencyIsActivated(notificationGateway);
+    const uow = createInMemoryUow();
+    const uowPerformer = new InMemoryUowPerformer(uow);
+    const expectSavedNotificationsAndEvents =
+      makeExpectSavedNotificationsAndEvents(
+        uow.notificationRepository,
+        uow.outboxRepository,
+      );
+    const timeGateway = new CustomTimeGateway();
+    const uuidGenerator = new UuidV4Generator();
+    const createNewEvent = makeCreateNewEvent({ uuidGenerator, timeGateway });
+    const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
+      createNewEvent,
+      uuidGenerator,
+      timeGateway,
+    );
+    const useCase = new SendEmailWhenAgencyIsActivated(
+      uowPerformer,
+      saveNotificationAndRelatedEvent,
+    );
     const updatedAgency = AgencyDtoBuilder.create()
       .withValidatorEmails(["toto@email.com"])
       .withName("just-activated-agency")
+      .withLogoUrl("https://logo.com")
       .build();
 
     // Act
     await useCase.execute({ agency: updatedAgency });
 
     // Assert
-    const sentEmails = notificationGateway.getSentEmails();
-    expect(sentEmails).toHaveLength(1);
-
-    expect(sentEmails[0].type).toBe("AGENCY_WAS_ACTIVATED");
-    expect(sentEmails[0].params).toEqual({
-      agencyName: "just-activated-agency",
+    expectSavedNotificationsAndEvents({
+      emails: [
+        {
+          type: "AGENCY_WAS_ACTIVATED",
+          recipients: ["toto@email.com"],
+          params: {
+            agencyName: "just-activated-agency",
+            agencyLogoUrl: "https://logo.com",
+          },
+        },
+      ],
     });
-    expect(sentEmails[0].recipients).toEqual(["toto@email.com"]);
   });
 });

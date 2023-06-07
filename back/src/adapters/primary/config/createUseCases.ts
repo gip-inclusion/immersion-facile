@@ -134,7 +134,7 @@ export const createUseCases = (
       ),
       notifyIcUserAgencyRightChanged: new NotifyIcUserAgencyRightChanged(
         uowPerformer,
-        gateways.notification,
+        saveNotificationAndRelatedEvent,
       ),
       getIcUsers: new GetInclusionConnectedUsers(uowPerformer),
       getUserAgencyDashboardUrl: new GetInclusionConnectedUser(
@@ -282,7 +282,7 @@ export const createUseCases = (
         ),
       requestEditFormEstablishment: new RequestEditFormEstablishment(
         uowPerformer,
-        gateways.notification,
+        saveNotificationAndRelatedEvent,
         gateways.timeGateway,
         makeGenerateEditFormEstablishmentUrl(
           config,
@@ -315,7 +315,8 @@ export const createUseCases = (
       privateListAgencies: new PrivateListAgencies(uowPerformer),
       getAgencyPublicInfoById: new GetAgencyPublicInfoById(uowPerformer),
       sendEmailWhenAgencyIsActivated: new SendEmailWhenAgencyIsActivated(
-        gateways.notification,
+        uowPerformer,
+        saveNotificationAndRelatedEvent,
       ),
       // METABASE
       ...dashboardUseCases(gateways.dashboardGateway, gateways.timeGateway),
@@ -381,7 +382,8 @@ export const createUseCases = (
           config,
         ),
       deliverRenewedMagicLink: new DeliverRenewedMagicLink(
-        gateways.notification,
+        uowPerformer,
+        saveNotificationAndRelatedEvent,
       ),
       notifyConfirmationEstablishmentCreated:
         new NotifyConfirmationEstablishmentCreated(
@@ -406,7 +408,8 @@ export const createUseCases = (
           gateways.timeGateway,
         ),
       shareConventionByEmail: new ShareApplicationLinkByEmail(
-        gateways.notification,
+        uowPerformer,
+        saveNotificationAndRelatedEvent,
       ),
       addAgency: new AddAgency(uowPerformer, createNewEvent),
       updateAgencyStatus: new UpdateAgencyStatus(uowPerformer, createNewEvent),
