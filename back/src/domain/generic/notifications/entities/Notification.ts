@@ -1,5 +1,6 @@
 import {
   AgencyId,
+  AuthenticatedUserId,
   ConventionId,
   Flavor,
   SiretDto,
@@ -17,6 +18,7 @@ export type FollowedIds = {
   conventionId?: ConventionId;
   establishmentSiret?: SiretDto;
   agencyId?: AgencyId;
+  userId?: AuthenticatedUserId;
 };
 
 export type NotificationKind = (typeof notificationKinds)[number];

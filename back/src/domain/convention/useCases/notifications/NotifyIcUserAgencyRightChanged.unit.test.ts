@@ -1,16 +1,22 @@
 import {
   AgencyDtoBuilder,
   expectPromiseToFailWith,
-  expectToEqual,
   IcUserRoleForAgencyParams,
   InclusionConnectedUser,
 } from "shared";
 import {
+  ExpectSavedNotificationsAndEvents,
+  makeExpectSavedNotificationsAndEvents,
+} from "../../../../_testBuilders/makeExpectSavedNotificationsAndEvents";
+import {
   createInMemoryUow,
   InMemoryUnitOfWork,
 } from "../../../../adapters/primary/config/uowConfig";
+import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
+import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { InMemoryNotificationGateway } from "../../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
+import { makeCreateNewEvent } from "../../../core/eventBus/EventBus";
+import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { NotifyIcUserAgencyRightChanged } from "./NotifyIcUserAgencyRightChanged";
 
 const icUserRoleParams: IcUserRoleForAgencyParams = {
@@ -20,18 +26,30 @@ const icUserRoleParams: IcUserRoleForAgencyParams = {
 };
 
 describe("SendEmailWhenAgencyIsActivated", () => {
-  let notificationGateway: InMemoryNotificationGateway;
   let uow: InMemoryUnitOfWork;
   let uowPerformer: InMemoryUowPerformer;
   let notifyIcUserAgencyRightChanged: NotifyIcUserAgencyRightChanged;
+  let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
 
   beforeEach(() => {
-    notificationGateway = new InMemoryNotificationGateway();
     uow = createInMemoryUow();
     uowPerformer = new InMemoryUowPerformer(uow);
+    expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
+      uow.notificationRepository,
+      uow.outboxRepository,
+    );
+
+    const timeGateway = new CustomTimeGateway();
+    const uuidGenerator = new UuidV4Generator();
+    const createNewEvent = makeCreateNewEvent({ uuidGenerator, timeGateway });
+    const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
+      createNewEvent,
+      uuidGenerator,
+      timeGateway,
+    );
     notifyIcUserAgencyRightChanged = new NotifyIcUserAgencyRightChanged(
       uowPerformer,
-      notificationGateway,
+      saveNotificationAndRelatedEvent,
     );
   });
   it("throw error when no agency found", async () => {
@@ -40,7 +58,9 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       `Unable to send mail. No agency config found for ${icUserRoleParams.agencyId}`,
     );
 
-    expectToEqual(notificationGateway.getSentEmails(), []);
+    expectSavedNotificationsAndEvents({
+      emails: [],
+    });
   });
 
   it("throw error when no user found", async () => {
@@ -56,7 +76,9 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       `User with id ${icUserRoleParams.userId} not found`,
     );
 
-    expectToEqual(notificationGateway.getSentEmails(), []);
+    expectSavedNotificationsAndEvents({
+      emails: [],
+    });
   });
 
   it("Sends an email to validators with agency name", async () => {
@@ -84,15 +106,17 @@ describe("SendEmailWhenAgencyIsActivated", () => {
 
     await notifyIcUserAgencyRightChanged.execute(icUserRoleParams);
 
-    const sentEmails = notificationGateway.getSentEmails();
-    expectToEqual(sentEmails, [
-      {
-        type: "IC_USER_RIGHTS_HAS_CHANGED",
-        params: { agencyName: agency.name },
-        recipients: [icUser.email],
-      },
-    ]);
+    expectSavedNotificationsAndEvents({
+      emails: [
+        {
+          type: "IC_USER_RIGHTS_HAS_CHANGED",
+          params: { agencyName: agency.name },
+          recipients: [icUser.email],
+        },
+      ],
+    });
   });
+
   it("Should not sends an email to validators with agency name when the new role is: to review", async () => {
     const agency = new AgencyDtoBuilder()
       .withId("agency-1")
@@ -122,7 +146,8 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       userId: "jbab-123",
     });
 
-    const sentEmails = notificationGateway.getSentEmails();
-    expect(sentEmails).toHaveLength(0);
+    expectSavedNotificationsAndEvents({
+      emails: [],
+    });
   });
 });
