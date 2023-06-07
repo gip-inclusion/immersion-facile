@@ -213,40 +213,25 @@ export const ConventionForm = ({
         formSuccessfullySubmitted,
         shouldRedirectToError: !!(routeParams.jwt && fetchConventionError),
       })
-        .with(
-          {
-            reduxFormUiReady: false,
-          },
-          () => null,
-        )
-        .with(
-          {
-            shouldRedirectToError: true,
-          },
-          () => (
-            <>
-              {routeParams.jwt && fetchConventionError && (
-                <ShowErrorOrRedirectToRenewMagicLink
-                  errorMessage={fetchConventionError}
-                  jwt={routeParams.jwt}
-                />
-              )}
-            </>
-          ),
-        )
-        .with(
-          {
-            formSuccessfullySubmitted: true,
-          },
-          () => (
-            <SubmitConfirmationSection
-              idToCopy={getValues().id}
-              copyButtonIsDisabled={copyButtonIsDisabled}
-              copyButtonLabel={copyButtonLabel}
-              onCopyButtonClick={onCopyButtonClick}
-            />
-          ),
-        )
+        .with({ reduxFormUiReady: false }, () => null)
+        .with({ shouldRedirectToError: true }, () => (
+          <>
+            {routeParams.jwt && fetchConventionError && (
+              <ShowErrorOrRedirectToRenewMagicLink
+                errorMessage={fetchConventionError}
+                jwt={routeParams.jwt}
+              />
+            )}
+          </>
+        ))
+        .with({ formSuccessfullySubmitted: true }, () => (
+          <SubmitConfirmationSection
+            idToCopy={getValues().id}
+            copyButtonIsDisabled={copyButtonIsDisabled}
+            copyButtonLabel={copyButtonLabel}
+            onCopyButtonClick={onCopyButtonClick}
+          />
+        ))
         .with(
           {
             showSummary: true,
