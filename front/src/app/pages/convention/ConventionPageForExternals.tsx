@@ -1,5 +1,6 @@
 import React from "react";
 import { Route } from "type-route";
+import { MainWrapper } from "react-design-system";
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
 import { conventionInitialValuesFromUrl } from "src/app/components/forms/convention/conventionHelpers";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
@@ -40,22 +41,22 @@ export const ConventionPageForExternals = ({
     />
   ) : (
     <HeaderFooterLayout>
-      <ConventionForm
-        conventionProperties={conventionInitialValuesFromUrl({
-          route,
-          internshipKind: "immersion",
-        })}
-        routeParams={route.params}
-        mode="create"
-      />
+      <MainWrapper layout="default">
+        <ConventionForm
+          conventionProperties={conventionInitialValuesFromUrl({
+            route,
+            internshipKind: "immersion",
+          })}
+          routeParams={route.params}
+          mode="create"
+        />
+      </MainWrapper>
     </HeaderFooterLayout>
   );
 };
 
-type ConventionFormSource = "diagoriente";
-
-const externalConsumers: Partial<
-  Record<ConventionFormSource, { isIframe: boolean }>
-> = {
+export type ConventionFormSource = keyof typeof externalConsumers;
+const externalConsumers = {
   diagoriente: { isIframe: true },
-};
+  "milo-paris": { isIframe: false },
+} satisfies Record<string, { isIframe: boolean }>;
