@@ -49,9 +49,9 @@ const prepareUseCase = () => {
   const uuidGenerator = new UuidV4Generator();
   const createNewEvent = makeCreateNewEvent({ uuidGenerator, timeGateway });
   const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
-    createNewEvent,
     uuidGenerator,
     timeGateway,
+    createNewEvent,
   );
 
   const generateEditFormEstablishmentUrl = (payload: EstablishmentJwtPayload) =>

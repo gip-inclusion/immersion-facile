@@ -4,7 +4,6 @@ import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { UuidV4Generator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
 import { makeSaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 import { SendEmailWhenAgencyIsActivated } from "./SendEmailWhenAgencyIsActivated";
 
@@ -20,9 +19,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
       );
     const timeGateway = new CustomTimeGateway();
     const uuidGenerator = new UuidV4Generator();
-    const createNewEvent = makeCreateNewEvent({ uuidGenerator, timeGateway });
     const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
-      createNewEvent,
       uuidGenerator,
       timeGateway,
     );
