@@ -44,7 +44,7 @@ export class PgNotificationRepository implements NotificationRepository {
         const templatedContent = {
           ...notification.templatedContent,
           recipients,
-          ...(cc.length ? { cc } : {}),
+          cc,
         };
 
         return this.saveEmailNotification({
