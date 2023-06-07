@@ -149,6 +149,7 @@ export const AgencySelector = ({
         nativeSelectProps={{
           ...agencyIdField,
           ...register(agencyIdName),
+          value: getValues(agencyIdName) as string,
           disabled: disabled || isLoading || !agencyDepartment,
         }}
       />
