@@ -22,7 +22,6 @@ import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGatew
 import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
-import { makeCreateNewEvent } from "../../../core/eventBus/EventBus";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import { makeShortLinkUrl } from "../../../core/ShortLink";
 import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
@@ -72,9 +71,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
     shortLinkIdGateway = new DeterministShortLinkIdGeneratorGateway();
 
     const uuidGenerator = new UuidV4Generator();
-    const createNewEvent = makeCreateNewEvent({ uuidGenerator, timeGateway });
     const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
-      createNewEvent,
       uuidGenerator,
       timeGateway,
     );

@@ -33,10 +33,6 @@ import { CustomTimeGateway } from "../../../../adapters/secondary/core/TimeGatew
 import { UuidV4Generator } from "../../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
-import {
-  CreateNewEvent,
-  makeCreateNewEvent,
-} from "../../../core/eventBus/EventBus";
 import { ReminderKind } from "../../../core/eventsPayloads/ConventionReminderPayload";
 import { TimeGateway } from "../../../core/ports/TimeGateway";
 import { makeShortLinkUrl } from "../../../core/ShortLink";
@@ -65,7 +61,6 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
   let timeGateway: CustomTimeGateway;
   let shortLinkIdGeneratorGateway: DeterministShortLinkIdGeneratorGateway;
   let config: AppConfig;
-  let createNewEvent: CreateNewEvent;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
 
   beforeEach(() => {
@@ -74,12 +69,7 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
     const uuidGenerator = new UuidV4Generator();
     shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
     uow = createInMemoryUow();
-    createNewEvent = makeCreateNewEvent({
-      timeGateway,
-      uuidGenerator,
-    });
     const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
-      createNewEvent,
       uuidGenerator,
       timeGateway,
     );

@@ -105,9 +105,9 @@ export const createUseCases = (
     quarantinedTopics: config.quarantinedTopics,
   });
   const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
-    createNewEvent,
     uuidGenerator,
     gateways.timeGateway,
+    createNewEvent,
   );
   const addFormEstablishment = new AddFormEstablishment(
     uowPerformer,

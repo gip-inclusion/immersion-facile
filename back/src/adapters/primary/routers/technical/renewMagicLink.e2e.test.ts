@@ -13,6 +13,7 @@ import {
   buildTestApp,
   InMemoryGateways,
 } from "../../../../_testBuilders/buildTestApp";
+import { processEventsForEmailToBeSent } from "../../../../_testBuilders/processEventsForEmailToBeSent";
 import {
   GenerateConventionJwt,
   makeGenerateJwtES256,
@@ -85,7 +86,7 @@ describe("Magic link renewal flow", () => {
 
     expect(response.status).toBe(200);
 
-    await eventCrawler.processNewEvents();
+    await processEventsForEmailToBeSent(eventCrawler);
 
     const sentEmails = gateways.notification.getSentEmails();
 
