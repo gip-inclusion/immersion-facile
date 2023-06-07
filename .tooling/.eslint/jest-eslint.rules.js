@@ -1,5 +1,4 @@
 module.exports = {
-  "jest/consistent-test-it": "error",
   "jest/expect-expect": [
     "error",
     {
