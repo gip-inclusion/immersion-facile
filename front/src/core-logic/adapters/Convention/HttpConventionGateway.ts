@@ -86,7 +86,7 @@ export class HttpConventionGateway implements ConventionGateway {
     jwt: string,
   ): Promise<string> {
     const { data } = await this.httpClient.post(
-      `/auth/${conventionsRoute}/${jwt}`,
+      `/auth/${conventionsRoute}/${conventionDto.id}`,
       conventionDto,
       { headers: { authorization: jwt } },
     );

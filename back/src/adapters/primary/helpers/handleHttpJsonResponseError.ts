@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { HttpClientError, HttpServerError } from "shared";
-import { HttpError, UnauthorizedError } from "./httpErrors";
+import { HttpError } from "./httpErrors";
 import { unhandledError } from "./unhandledError";
 
 export const handleHttpJsonResponseError = (
@@ -11,9 +11,6 @@ export const handleHttpJsonResponseError = (
   if (!isManagedError(error)) return unhandledError(error, req, res);
 
   if (error instanceof HttpError) {
-    if (error instanceof UnauthorizedError)
-      res.setHeader("WWW-Authenticate", "Basic");
-
     res.status(error.httpCode);
 
     return res.json({ errors: toValidJSONObjectOrString(error) });
