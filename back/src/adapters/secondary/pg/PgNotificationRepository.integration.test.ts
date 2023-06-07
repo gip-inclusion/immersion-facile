@@ -68,4 +68,33 @@ describe("PgNotificationRepository", () => {
     const response = await pgNotificationRepository.getByIdAndKind(id, "email");
     expect(response).toEqual(emailNotification);
   });
+
+  it("save and eliminates duplicates when they exit", async () => {
+    const email: TemplatedEmail = {
+      type: "AGENCY_WAS_ACTIVATED",
+      recipients: ["bob@mail.com", "jane@mail.com", "bob@mail.com"],
+      cc: ["copy@mail.com", "jane@mail.com"],
+      params: { agencyName: "My agency", agencyLogoUrl: "https://my-logo.com" },
+    };
+    const id = "22222222-2222-4444-2222-222222222222";
+    const emailNotification: Notification = {
+      id,
+      kind: "email",
+      createdAt: new Date("2023-01-01").toISOString(),
+      followedIds: { agencyId: "cccccccc-1111-4111-1111-cccccccccccc" },
+      templatedContent: email,
+    };
+
+    await pgNotificationRepository.save(emailNotification);
+
+    const response = await pgNotificationRepository.getByIdAndKind(id, "email");
+    expect(response).toEqual({
+      ...emailNotification,
+      templatedContent: {
+        ...emailNotification.templatedContent,
+        recipients: ["bob@mail.com", "jane@mail.com"],
+        cc: ["copy@mail.com"],
+      },
+    });
+  });
 });
