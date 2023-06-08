@@ -27,6 +27,8 @@ const validRequest: ContactEstablishmentRequestDto = {
   potentialBeneficiaryLastName: "potential_beneficiary_last_name",
   potentialBeneficiaryEmail: "potential_beneficiary@email.fr",
   message: "message_to_send",
+  immersionObjective: "Confirmer un projet professionnel",
+  potentialBeneficiaryPhone: "0654783402",
 };
 
 describe(`/${contactEstablishmentRoute} route`, () => {

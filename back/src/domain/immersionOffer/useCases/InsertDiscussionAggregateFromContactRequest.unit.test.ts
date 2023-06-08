@@ -59,6 +59,8 @@ describe("Insert discussion aggregate from contact request DTO", () => {
       potentialBeneficiaryEmail: "antoine.tourasse@email.com",
       contactMode: "EMAIL",
       message: "Bonjour, j'aimerais venir jouer chez vous. Je suis sympa.",
+      immersionObjective: "Confirmer un projet professionnel",
+      potentialBeneficiaryPhone: "0654783402",
     };
     await insertDiscussionAggregate.execute(contactRequestDto);
 
@@ -141,6 +143,8 @@ describe("Insert discussion aggregate from contact request DTO", () => {
       potentialBeneficiaryEmail: "bob.marley@email.com",
       contactMode: "EMAIL",
       message: "Bonjour, j'aimerais venir jouer chez vous. Je suis sympa.",
+      immersionObjective: "Confirmer un projet professionnel",
+      potentialBeneficiaryPhone: "0654783402",
     };
     await insertDiscussionAggregate.execute(secondContactRequestDto);
 

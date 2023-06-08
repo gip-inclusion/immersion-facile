@@ -27,6 +27,9 @@ export const contactEstablishmentByMailSchema: z.Schema<ContactEstablishmentByMa
     ...commonFields,
     contactMode: preferEmailContactSchema,
     message: zTrimmedString,
+    potentialBeneficiaryPhone: zTrimmedString,
+    immersionObjective: zTrimmedString,
+    potentialBeneficiaryLinkedinOrCv: zTrimmedString.optional(),
   });
 
 export const contactEstablishmentByPhoneSchema: z.Schema<ContactEstablishmentByPhoneDto> =

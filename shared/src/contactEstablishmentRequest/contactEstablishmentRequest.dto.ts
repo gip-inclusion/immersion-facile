@@ -13,6 +13,9 @@ export type ContactInformations<T extends ContactMethod> = {
 
 export type ContactEstablishmentByMailDto = ContactInformations<"EMAIL"> & {
   message: string;
+  potentialBeneficiaryPhone: string;
+  immersionObjective: string;
+  potentialBeneficiaryLinkedinOrCv?: string;
 };
 
 export type ContactEstablishmentInPersonDto = ContactInformations<"IN_PERSON">;
