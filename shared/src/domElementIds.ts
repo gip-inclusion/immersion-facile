@@ -101,6 +101,8 @@ export const domElementIds = {
     searchSubmitButton: "im-search__submit-search",
     searchSortOptionBase: "search-sort-option-",
     contactByMailButton: "im-contact-establishment__contact-email-button",
+    contactByMailCloseButton:
+      "im-contact-establishment__contact-email-close-button",
     contactByPhoneButton: "im-contact-establishment__contact-phone-button",
     contactInPersonButton: "im-contact-establishment__contact-in-person-button",
   },

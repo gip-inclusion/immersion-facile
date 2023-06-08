@@ -16,6 +16,7 @@ export type ContactModalContentProps = {
   offer: RomeDto;
   searchResultData?: SearchImmersionResultDto;
   onSuccess: () => void;
+  onClose: () => void;
 };
 
 export const ModalContactContent = ({
@@ -24,11 +25,17 @@ export const ModalContactContent = ({
   offer,
   onSuccess,
   searchResultData,
+  onClose,
 }: ContactModalContentProps) => {
   switch (contactMethod) {
     case "EMAIL":
       return (
-        <ContactByEmail siret={siret} offer={offer} onSuccess={onSuccess} />
+        <ContactByEmail
+          siret={siret}
+          offer={offer}
+          onSuccess={onSuccess}
+          onClose={onClose}
+        />
       );
     case "PHONE":
       return (

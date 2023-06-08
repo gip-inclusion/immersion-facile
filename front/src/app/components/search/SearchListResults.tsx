@@ -106,6 +106,7 @@ export const SearchListResults = () => {
                     },
                     contactMethod: searchResult.contactMode,
                     searchResultData: searchResult,
+                    onClose: () => closeContactModal(),
                   });
                   openContactModal();
                 }}
@@ -164,9 +165,10 @@ export const SearchListResults = () => {
       <ContactModal
         title={
           modalContent?.contactMethod
-            ? "Contactez l'entreprise"
+            ? `Contactez l'entreprise ${modalContent.searchResultData?.name}`
             : "Tentez votre chance !"
         }
+        size="large"
       >
         {modalContent && (
           <ModalContactContent
@@ -176,6 +178,9 @@ export const SearchListResults = () => {
                 getFeedBackMessage(modalContent.contactMethod),
               );
               setSuccessfullyValidated(true);
+              closeContactModal();
+            }}
+            onClose={() => {
               closeContactModal();
             }}
           />

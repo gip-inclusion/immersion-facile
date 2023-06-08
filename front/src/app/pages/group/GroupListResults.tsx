@@ -77,6 +77,7 @@ export const GroupListResults = ({ results }: GroupListResultsProps) => {
                   },
                   contactMethod: searchResult.contactMode,
                   searchResultData: searchResult,
+                  onClose: () => closeContactModal(),
                 });
                 openContactModal();
               }}

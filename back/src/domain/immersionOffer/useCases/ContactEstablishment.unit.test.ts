@@ -87,6 +87,8 @@ describe("ContactEstablishment", () => {
       ...validRequest,
       contactMode: "EMAIL",
       message: "message_to_send",
+      immersionObjective: "Confirmer un projet professionnel",
+      potentialBeneficiaryPhone: "0654783402",
     };
     await contactEstablishment.execute(validEmailRequest);
 

@@ -14,7 +14,7 @@ type ContactInformationPublicV1<T extends ContactMethod> = {
   contactMode: T;
 };
 
-type ContactEstablishmentByMailPublicV1Dto =
+export type ContactEstablishmentByMailPublicV1Dto =
   ContactInformationPublicV1<"EMAIL"> & {
     message: string;
   };
@@ -30,4 +30,13 @@ export type ContactEstablishmentPublicV1Dto =
 
 export const contactEstablishmentPublicV1ToDomain = (
   contactRequest: ContactEstablishmentPublicV1Dto,
-): ContactEstablishmentRequestDto => contactRequest;
+): ContactEstablishmentRequestDto => {
+  if (contactRequest.contactMode === "EMAIL")
+    return {
+      ...contactRequest,
+      potentialBeneficiaryPhone: "Numéro de téléphone Non communiqué",
+      immersionObjective: "Object non communiqué",
+    };
+
+  return contactRequest;
+};
