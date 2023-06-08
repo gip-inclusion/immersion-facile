@@ -11,7 +11,7 @@ const defaultHeader = (agencyLogoUrl?: string) => `
     <tr>
       <td width="35%">
         <a href="https://immersion-facile.beta.gouv.fr/">
-          <img src="https://immersion.cellar-c2.services.clever-cloud.com/ac685d94-401a-4f93-b288-1100a8d96297.png" width="223" height="108" alt="Immersion Facilitée - République Française"/>
+          <img src="https://immersion.cellar-c2.services.clever-cloud.com/logo-if-mailing.png" width="223" height="108" alt="Immersion Facilitée - République Française"/>
         </a>
       </td>
       ${
