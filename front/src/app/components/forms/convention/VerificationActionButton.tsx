@@ -111,7 +111,11 @@ export const VerificationActionButton = ({
     <>
       <Button
         iconId={selectedIcon ?? "fr-icon-checkbox-circle-line"}
-        priority={newStatus === "REJECTED" ? "secondary" : "primary"}
+        priority={
+          newStatus === "REJECTED" || newStatus === "DEPRECATED"
+            ? "secondary"
+            : "primary"
+        }
         onClick={() => {
           doesStatusNeedsJustification(newStatus)
             ? ModalByStatus(newStatus).openModal()
