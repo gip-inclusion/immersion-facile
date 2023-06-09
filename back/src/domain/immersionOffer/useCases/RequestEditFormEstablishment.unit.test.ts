@@ -1,4 +1,9 @@
-import { EstablishmentJwtPayload, expectPromiseToFailWithError } from "shared";
+import { addHours, addSeconds } from "date-fns";
+import {
+  EstablishmentJwtPayload,
+  expectPromiseToFailWithError,
+  TemplatedEmail,
+} from "shared";
 import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
 import { makeExpectSavedNotificationsAndEvents } from "../../../_testBuilders/makeExpectSavedNotificationsAndEvents";
@@ -15,6 +20,7 @@ import { RequestEditFormEstablishment } from "./RequestEditFormEstablishment";
 const siret = "12345678912345";
 const contactEmail = "jerome@gmail.com";
 const copyEmails = ["copy@gmail.com"];
+
 const setMethodGetContactEmailFromSiret = (
   establishmentAggregateRepo: EstablishmentAggregateRepository,
 ) => {
@@ -33,8 +39,6 @@ const setMethodGetContactEmailFromSiret = (
 
 const prepareUseCase = () => {
   const uow = createInMemoryUow();
-  const outboxRepository = uow.outboxRepository;
-  const outboxQueries = uow.outboxQueries;
   const establishmentAggregateRepository = uow.establishmentAggregateRepository;
 
   const expectSavedNotificationsAndEvents =
@@ -62,13 +66,13 @@ const prepareUseCase = () => {
     saveNotificationAndRelatedEvent,
     timeGateway,
     generateEditFormEstablishmentUrl,
-    createNewEvent,
   );
+
   return {
     useCase,
-    outboxQueries,
-    outboxRepository,
     establishmentAggregateRepository,
+    notificationRepository: uow.notificationRepository,
+    outboxRepository: uow.outboxRepository,
     timeGateway,
     expectSavedNotificationsAndEvents,
   };
@@ -113,37 +117,35 @@ describe("RequestUpdateFormEstablishment", () => {
         ],
       });
     });
-
-    it("Saves an event in outbox repo", async () => {
-      // Prepare
-      const { useCase, outboxRepository } = prepareUseCase();
-
-      // Act
-      await useCase.execute(siret);
-
-      // Assert
-      expect(outboxRepository.events).toHaveLength(2);
-      expect(outboxRepository.events[1]).toMatchObject({
-        topic: "FormEstablishmentEditLinkSent",
-        payload: { siret },
-      });
-    });
   });
+
   describe("If an email has already been sent for this establishment.", () => {
-    it("Throws an error if an email has already been sent to this contact and the edit link is still valid", async () => {
+    it("Throws an error if an email has already been sent to this contact less than 24h ago", async () => {
       // Prepare
-      const { useCase, outboxQueries, timeGateway } = prepareUseCase();
+      const { useCase, notificationRepository, timeGateway } = prepareUseCase();
 
-      outboxQueries.getLastPayloadOfFormEstablishmentEditLinkSentWithSiret =
-        //eslint-disable-next-line @typescript-eslint/require-await
-        async (siret: string) => ({
-          siret,
-          iat: new Date("2021-01-01T12:00:00.000").getTime(),
-          exp: new Date("2021-01-02T12:00:00.000").getTime(),
-          version: 1,
-        });
+      const initialMailDate = new Date("2021-01-01T13:00:00.000");
 
-      timeGateway.setNextDate(new Date("2021-01-01T13:00:00.000")); // The last email's link for this siret has not expired
+      notificationRepository.notifications = [
+        {
+          kind: "email",
+          id: "111111111111-1111-4000-1111-111111111111",
+          createdAt: initialMailDate.toISOString(),
+          followedIds: {},
+          templatedContent: {
+            type: "EDIT_FORM_ESTABLISHMENT_LINK",
+            recipients: [contactEmail],
+            params: { editFrontUrl: "my-edit-link.com" },
+          },
+        },
+      ];
+
+      const newModificationAskedDateLessThan24hAfterInitial = addHours(
+        initialMailDate,
+        23,
+      );
+
+      timeGateway.setNextDate(newModificationAskedDateLessThan24hAfterInitial);
 
       // Act and assert
       await expectPromiseToFailWithError(
@@ -160,20 +162,56 @@ describe("RequestUpdateFormEstablishment", () => {
     const {
       useCase,
       outboxRepository,
-      outboxQueries,
-      expectSavedNotificationsAndEvents,
+      notificationRepository,
       timeGateway,
+      expectSavedNotificationsAndEvents,
     } = prepareUseCase();
 
-    outboxQueries.getLastPayloadOfFormEstablishmentEditLinkSentWithSiret =
-      //eslint-disable-next-line @typescript-eslint/require-await
-      async (siret: string) => ({
-        siret,
-        iat: new Date("2021-01-01T12:00:00.000").getTime(),
-        exp: new Date("2021-01-02T12:00:00.000").getTime(),
-        version: 1,
-      });
-    timeGateway.setNextDate(new Date("2021-01-02T13:00:00.000")); // 1 hour after the link of the last email for this siret has expired
+    const initialMailDate = new Date("2021-01-01T13:00:00.000");
+
+    const alreadySentEmail: TemplatedEmail = {
+      type: "EDIT_FORM_ESTABLISHMENT_LINK",
+      recipients: [contactEmail],
+      params: { editFrontUrl: "my-edit-link.com" },
+    };
+
+    const alreadySentNotification = {
+      kind: "email",
+      id: "111111111111-1111-4000-1111-111111111111",
+      createdAt: initialMailDate.toISOString(),
+      followedIds: {},
+      templatedContent: alreadySentEmail,
+    };
+
+    notificationRepository.notifications = [
+      {
+        kind: "email",
+        id: "111111111111-1111-4000-1111-111111111111",
+        createdAt: initialMailDate.toISOString(),
+        followedIds: {},
+        templatedContent: alreadySentEmail,
+      },
+    ];
+    await outboxRepository.save({
+      id: "123",
+      topic: "NotificationAdded",
+      occurredAt: initialMailDate.toISOString(),
+      publications: [
+        {
+          publishedAt: addSeconds(initialMailDate, 1).toISOString(),
+          failures: [],
+        },
+      ],
+      payload: { id: alreadySentNotification.id, kind: "email" },
+      wasQuarantined: false,
+    });
+
+    const newModificationAskedDateMoreThan24hAfterInitial = addHours(
+      initialMailDate,
+      25,
+    );
+
+    timeGateway.setNextDate(newModificationAskedDateMoreThan24hAfterInitial);
 
     // Act
     await useCase.execute(siret);
@@ -181,6 +219,7 @@ describe("RequestUpdateFormEstablishment", () => {
     // Assert
     expectSavedNotificationsAndEvents({
       emails: [
+        alreadySentEmail,
         {
           kind: "EDIT_FORM_ESTABLISHMENT_LINK",
           recipients: ["jerome@gmail.com"],
@@ -192,6 +231,5 @@ describe("RequestUpdateFormEstablishment", () => {
         },
       ],
     });
-    expect(outboxRepository.events).toHaveLength(2);
   });
 });

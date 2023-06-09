@@ -284,7 +284,6 @@ export const createUseCases = (
           config,
           generateEditEstablishmentJwt,
         ),
-        createNewEvent,
       ),
 
       notifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm:

@@ -1,10 +1,8 @@
-import { addHours } from "date-fns";
 import { SuperTest, Test } from "supertest";
-import { EstablishmentJwtPayload, requestEmailToUpdateFormRoute } from "shared";
+import { requestEmailToUpdateFormRoute } from "shared";
 import { buildTestApp } from "../../../../_testBuilders/buildTestApp";
 import { ContactEntityBuilder } from "../../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../../_testBuilders/EstablishmentAggregateBuilder";
-import { DomainEvent } from "../../../../domain/core/eventBus/events";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
 
 describe("Route to generate an establishment edition link", () => {
@@ -24,26 +22,18 @@ describe("Route to generate an establishment edition link", () => {
   });
   it("Returns 400 with an error message if previous edit link for this siret has not yet expired", async () => {
     // Prepare
-    const now = new Date();
-    const lastPayload: EstablishmentJwtPayload = {
-      siret: "11111111111111",
-      iat: now.getTime(),
-      exp: addHours(now, 24).getTime(),
-      version: 1,
-    };
-    await inMemoryUow.outboxRepository.save({
-      topic: "FormEstablishmentEditLinkSent",
-      payload: lastPayload,
-    } as DomainEvent);
+    // first query of modification link
+    await request.post(`/${requestEmailToUpdateFormRoute}/11111111111111`);
 
-    // Act and assert
-    await request
-      .post(`/${requestEmailToUpdateFormRoute}/11111111111111`)
-      .expect(400, {
-        errors: `Un email a déjà été envoyé au contact référent de l'établissement le ${new Date(
-          lastPayload.iat,
-        ).toLocaleDateString("fr-FR")}`,
-      });
+    // second query soon after which should fail
+    const response = await request.post(
+      `/${requestEmailToUpdateFormRoute}/11111111111111`,
+    );
+
+    expect(response.body.errors).toContain(
+      "Un email a déjà été envoyé au contact référent de l'établissement",
+    );
+    expect(response.status).toBe(400);
   });
 
   it("Returns 200  if an edit link for this siret is still valid", async () => {
