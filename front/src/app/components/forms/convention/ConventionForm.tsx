@@ -132,10 +132,9 @@ export const ConventionForm = ({
     resolver: zodResolver(conventionWithoutExternalIdSchema),
     mode: "onTouched",
   });
-  const { getValues, reset, formState } = methods;
+  const { getValues, reset } = methods;
 
-  const formSuccessfullySubmitted =
-    formState.isSubmitted && submitFeedback.kind === "justSubmitted";
+  const formSuccessfullySubmitted = submitFeedback.kind === "justSubmitted";
 
   useMatomo(conventionProperties.internshipKind);
 

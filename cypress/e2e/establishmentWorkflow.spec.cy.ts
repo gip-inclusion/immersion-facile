@@ -9,7 +9,6 @@ import {
   frontRoutes,
   immersionOffersRoute,
 } from "shared";
-import { connectToAdmin } from "../utils/admin";
 
 const baseApiRoute = "/api/";
 const providedSiret = "41433740200039";
@@ -150,7 +149,7 @@ describe("Establishment creation and modification workflow", () => {
       `${baseApiRoute}${establishmentTargets.addFormEstablishment.url}`,
     ).as("addFormEstablishmentRequest");
     requestEstablishmentModification();
-    connectToAdmin();
+    cy.connectToAdmin();
     // TODO: wrap this in a function (e.g. openEmailInAdmin(emailType, callback))
     cy.get(".fr-tabs__tab").contains("Emails").click();
     cy.get(`.fr-accordion__btn:contains("EDIT_FORM_ESTABLISHMENT_LINK")`)
