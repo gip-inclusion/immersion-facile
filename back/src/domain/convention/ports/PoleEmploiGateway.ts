@@ -18,6 +18,7 @@ export const conventionStatusToPoleEmploiStatus = {
   // si rejeté
   REJECTED: "REJETÉ",
   CANCELLED: "DEMANDE_ANNULEE",
+  DEPRECATED: "DEMANDE_OBSOLETE",
 
   // // à venir potentiellement
   // ABANDONNED: "ABANDONNÉ",

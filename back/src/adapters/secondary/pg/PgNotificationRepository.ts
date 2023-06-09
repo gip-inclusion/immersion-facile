@@ -1,5 +1,6 @@
 import { PoolClient } from "pg";
 import format from "pg-format";
+import { uniq } from "ramda";
 import { exhaustiveCheck } from "shared";
 import {
   EmailNotification,
@@ -34,8 +35,23 @@ export class PgNotificationRepository implements NotificationRepository {
     switch (notification.kind) {
       case "sms":
         return this.saveSmsNotification(notification);
-      case "email":
-        return this.saveEmailNotification(notification);
+      case "email": {
+        const recipients = uniq(notification.templatedContent.recipients);
+        const cc = uniq(notification.templatedContent.cc ?? []).filter(
+          (ccEmail) => !recipients.includes(ccEmail),
+        );
+
+        const templatedContent = {
+          ...notification.templatedContent,
+          recipients,
+          cc,
+        };
+
+        return this.saveEmailNotification({
+          ...notification,
+          templatedContent,
+        });
+      }
       default:
         return exhaustiveCheck(notification, {
           variableName: "notificationKind",

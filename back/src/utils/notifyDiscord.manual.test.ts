@@ -28,6 +28,7 @@ describe("Notify Discord", () => {
         emails: ["test@mail.com"],
         magicLink: "http://0000magicLink00000",
         conventionStatusLink: "http://0000conventionStatusLink00000",
+        conventionId: "123",
       },
       publications: [
         {

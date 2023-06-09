@@ -46,6 +46,13 @@ export const createMagicLinkRouter = (
     )
     .post(async (req, res) =>
       sendHttpResponse(req, res, () => {
+        if (req.payloads?.backOffice) {
+          return deps.useCases.updateConvention.execute({
+            id: req.params.conventionId,
+            convention: req.body,
+          });
+        }
+
         if (!req.payloads?.convention) throw new UnauthorizedError();
         return deps.useCases.updateConvention.execute({
           id: req.payloads.convention.applicationId,

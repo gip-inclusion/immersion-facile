@@ -17,7 +17,6 @@ import { InMemoryNotificationRepository } from "../../../../adapters/secondary/I
 import { InMemoryShortLinkQuery } from "../../../../adapters/secondary/InMemoryShortLinkQuery";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../../adapters/secondary/shortLinkIdGeneratorGateway/DeterministShortLinkIdGeneratorGateway";
-import { makeCreateNewEvent } from "../../../core/eventBus/EventBus";
 import { ShortLinkId } from "../../../core/ports/ShortLinkQuery";
 import {
   EmailNotification,
@@ -57,12 +56,7 @@ describe("Add Convention Notifications", () => {
       .build();
     shortLinkGenerator = new DeterministShortLinkIdGeneratorGateway();
     const uuidGenerator = new UuidV4Generator();
-    const createNewEvent = makeCreateNewEvent({
-      timeGateway,
-      uuidGenerator,
-    });
     const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
-      createNewEvent,
       uuidGenerator,
       timeGateway,
     );

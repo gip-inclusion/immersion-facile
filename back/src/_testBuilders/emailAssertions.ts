@@ -137,3 +137,24 @@ export const expectNotifyBeneficiaryAndEnterpriseThatApplicationIsRejected = (
     },
   });
 };
+
+export const expectNotifyBeneficiaryAndEnterpriseThatConventionIsDeprecated = (
+  templatedEmail: TemplatedEmail,
+  recipients: string[],
+  convention: ConventionDto,
+) => {
+  expectToEqual(templatedEmail, {
+    type: "DEPRECATED_CONVENTION_NOTIFICATION",
+    recipients,
+    params: {
+      internshipKind: convention.internshipKind,
+      beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+      beneficiaryLastName: convention.signatories.beneficiary.lastName,
+      businessName: convention.businessName,
+      deprecationReason: convention.statusJustification || "",
+      immersionProfession: convention.immersionAppellation.appellationLabel,
+      dateEnd: convention.dateEnd,
+      dateStart: convention.dateStart,
+    },
+  });
+};

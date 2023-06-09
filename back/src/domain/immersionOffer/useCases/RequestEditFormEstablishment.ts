@@ -10,14 +10,14 @@ import { CreateNewEvent } from "../../core/eventBus/EventBus";
 import { TimeGateway } from "../../core/ports/TimeGateway";
 import { UnitOfWork, UnitOfWorkPerformer } from "../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { NotificationGateway } from "../../generic/notifications/ports/NotificationGateway";
+import { SaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
 
 export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto> {
   inputSchema = siretSchema;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private notificationGateway: NotificationGateway,
+    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
     private timeGateway: TimeGateway,
     private generateEditFormEstablishmentUrl: GenerateEditFormEstablishmentJwt,
     private createNewEvent: CreateNewEvent,
@@ -60,11 +60,17 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto>
 
     const editFrontUrl = this.generateEditFormEstablishmentUrl(payload);
 
-    await this.notificationGateway.sendEmail({
-      type: "EDIT_FORM_ESTABLISHMENT_LINK",
-      recipients: [contact.email],
-      cc: contact.copyEmails,
-      params: { editFrontUrl },
+    await this.saveNotificationAndRelatedEvent(uow, {
+      kind: "email",
+      templatedContent: {
+        type: "EDIT_FORM_ESTABLISHMENT_LINK",
+        recipients: [contact.email],
+        cc: contact.copyEmails,
+        params: { editFrontUrl },
+      },
+      followedIds: {
+        establishmentSiret: siret,
+      },
     });
 
     const event = this.createNewEvent({

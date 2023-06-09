@@ -50,6 +50,13 @@ const { CancelModal, openCancelModal, closeCancelModal } = createModal({
   isOpenedByDefault: false,
 });
 
+const { DeprecateModal, openDeprecateModal, closeDeprecateModal } = createModal(
+  {
+    name: "deprecate",
+    isOpenedByDefault: false,
+  },
+);
+
 const ModalByStatus = (status: VerificationActionsModal) => {
   const modals = {
     DRAFT: {
@@ -66,6 +73,11 @@ const ModalByStatus = (status: VerificationActionsModal) => {
       modal: CancelModal,
       openModal: openCancelModal,
       closeModal: closeCancelModal,
+    },
+    DEPRECATED: {
+      modal: DeprecateModal,
+      openModal: openDeprecateModal,
+      closeModal: closeDeprecateModal,
     },
   };
   return modals[status];
@@ -91,13 +103,19 @@ export const VerificationActionButton = ({
     ACCEPTED_BY_COUNSELLOR:
       domElementIds.manageConvention.conventionValidationValidateButton,
     CANCELLED: domElementIds.manageConvention.conventionValidationCancelButton,
+    DEPRECATED:
+      domElementIds.manageConvention.conventionValidationDeprecateButton,
   };
 
   return (
     <>
       <Button
         iconId={selectedIcon ?? "fr-icon-checkbox-circle-line"}
-        priority={newStatus === "REJECTED" ? "secondary" : "primary"}
+        priority={
+          newStatus === "REJECTED" || newStatus === "DEPRECATED"
+            ? "secondary"
+            : "primary"
+        }
         onClick={() => {
           doesStatusNeedsJustification(newStatus)
             ? ModalByStatus(newStatus).openModal()
@@ -249,11 +267,13 @@ const JustificationModalContent = ({
 const inputLabelByStatus: Record<ConventionStatusWithJustification, string> = {
   DRAFT: "Précisez la raison et la modification nécessaire",
   REJECTED: "Pourquoi l'immersion est-elle refusée ?",
-  CANCELLED: "Pourquoi souhaitez-vous annuler cette convention?",
+  CANCELLED: "Pourquoi souhaitez-vous annuler cette convention ?",
+  DEPRECATED: "Pourquoi l'immersion est-elle obsolète ?",
 };
 
 const confirmByStatus: Record<ConventionStatusWithJustification, string> = {
   DRAFT: "Confirmer la demande de modification",
   REJECTED: "Confirmer le refus",
   CANCELLED: "Confirmer l'annulation",
+  DEPRECATED: "Confirmer que la demande est obsolète",
 };

@@ -15,7 +15,6 @@ import {
   TEST_ROME_LABEL,
 } from "../../../../adapters/secondary/immersionOffer/InMemoryEstablishmentAggregateRepository";
 import { InMemoryUowPerformer } from "../../../../adapters/secondary/InMemoryUowPerformer";
-import { makeCreateNewEvent } from "../../../core/eventBus/EventBus";
 import { makeSaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 import { NotifyContactRequest } from "./NotifyContactRequest";
 
@@ -53,9 +52,7 @@ describe("NotifyContactRequest", () => {
 
     const uuidGenerator = new UuidV4Generator();
     const timeGateway = new CustomTimeGateway();
-    const createNewEvent = makeCreateNewEvent({ uuidGenerator, timeGateway });
     const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
-      createNewEvent,
       uuidGenerator,
       timeGateway,
     );

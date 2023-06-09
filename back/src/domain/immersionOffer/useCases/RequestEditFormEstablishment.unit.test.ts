@@ -1,19 +1,16 @@
-import {
-  EstablishmentJwtPayload,
-  expectPromiseToFailWithError,
-  TemplatedEmail,
-} from "shared";
+import { EstablishmentJwtPayload, expectPromiseToFailWithError } from "shared";
 import { ContactEntityBuilder } from "../../../_testBuilders/ContactEntityBuilder";
 import { EstablishmentAggregateBuilder } from "../../../_testBuilders/EstablishmentAggregateBuilder";
+import { makeExpectSavedNotificationsAndEvents } from "../../../_testBuilders/makeExpectSavedNotificationsAndEvents";
 import { createInMemoryUow } from "../../../adapters/primary/config/uowConfig";
 import { BadRequestError } from "../../../adapters/primary/helpers/httpErrors";
 import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/CustomTimeGateway";
 import { UuidV4Generator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
-import { InMemoryNotificationGateway } from "../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
-import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
-import { EstablishmentAggregateRepository } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
-import { RequestEditFormEstablishment } from "../../../domain/immersionOffer/useCases/RequestEditFormEstablishment";
+import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
+import { makeSaveNotificationAndRelatedEvent } from "../../generic/notifications/entities/Notification";
+import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
+import { RequestEditFormEstablishment } from "./RequestEditFormEstablishment";
 
 const siret = "12345678912345";
 const contactEmail = "jerome@gmail.com";
@@ -40,32 +37,40 @@ const prepareUseCase = () => {
   const outboxQueries = uow.outboxQueries;
   const establishmentAggregateRepository = uow.establishmentAggregateRepository;
 
+  const expectSavedNotificationsAndEvents =
+    makeExpectSavedNotificationsAndEvents(
+      uow.notificationRepository,
+      uow.outboxRepository,
+    );
+
   setMethodGetContactEmailFromSiret(establishmentAggregateRepository); // In most of the tests, we need the contact to be defined
 
   const timeGateway = new CustomTimeGateway();
-  const notificationGateway = new InMemoryNotificationGateway();
   const uuidGenerator = new UuidV4Generator();
+  const createNewEvent = makeCreateNewEvent({ uuidGenerator, timeGateway });
+  const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
+    uuidGenerator,
+    timeGateway,
+    createNewEvent,
+  );
 
   const generateEditFormEstablishmentUrl = (payload: EstablishmentJwtPayload) =>
     `www.immersion-facile.fr/edit?jwt=jwtOfSiret[${payload.siret}]`;
 
   const useCase = new RequestEditFormEstablishment(
     new InMemoryUowPerformer(uow),
-    notificationGateway,
+    saveNotificationAndRelatedEvent,
     timeGateway,
     generateEditFormEstablishmentUrl,
-    makeCreateNewEvent({
-      timeGateway,
-      uuidGenerator,
-    }),
+    createNewEvent,
   );
   return {
     useCase,
     outboxQueries,
     outboxRepository,
     establishmentAggregateRepository,
-    notificationGateway,
     timeGateway,
+    expectSavedNotificationsAndEvents,
   };
 };
 
@@ -89,24 +94,26 @@ describe("RequestUpdateFormEstablishment", () => {
   describe("If no email has been sent yet.", () => {
     it("Sends an email to the contact of the establishment with eventually email in CC", async () => {
       // Prepare
-      const { useCase, notificationGateway } = prepareUseCase();
+      const { useCase, expectSavedNotificationsAndEvents } = prepareUseCase();
 
       // Act
       await useCase.execute(siret);
 
       // Assert
-      const actualSentEmails = notificationGateway.getSentEmails();
-      expect(actualSentEmails).toHaveLength(1);
-      const expectedEmail: TemplatedEmail = {
-        type: "EDIT_FORM_ESTABLISHMENT_LINK",
-        recipients: [contactEmail],
-        cc: copyEmails,
-        params: {
-          editFrontUrl: `www.immersion-facile.fr/edit?jwt=jwtOfSiret[${siret}]`,
-        },
-      };
-      expect(actualSentEmails[0]).toEqual(expectedEmail);
+      expectSavedNotificationsAndEvents({
+        emails: [
+          {
+            type: "EDIT_FORM_ESTABLISHMENT_LINK",
+            recipients: [contactEmail],
+            cc: copyEmails,
+            params: {
+              editFrontUrl: `www.immersion-facile.fr/edit?jwt=jwtOfSiret[${siret}]`,
+            },
+          },
+        ],
+      });
     });
+
     it("Saves an event in outbox repo", async () => {
       // Prepare
       const { useCase, outboxRepository } = prepareUseCase();
@@ -115,8 +122,8 @@ describe("RequestUpdateFormEstablishment", () => {
       await useCase.execute(siret);
 
       // Assert
-      expect(outboxRepository.events).toHaveLength(1);
-      expect(outboxRepository.events[0]).toMatchObject({
+      expect(outboxRepository.events).toHaveLength(2);
+      expect(outboxRepository.events[1]).toMatchObject({
         topic: "FormEstablishmentEditLinkSent",
         payload: { siret },
       });
@@ -154,7 +161,7 @@ describe("RequestUpdateFormEstablishment", () => {
       useCase,
       outboxRepository,
       outboxQueries,
-      notificationGateway,
+      expectSavedNotificationsAndEvents,
       timeGateway,
     } = prepareUseCase();
 
@@ -172,7 +179,19 @@ describe("RequestUpdateFormEstablishment", () => {
     await useCase.execute(siret);
 
     // Assert
-    expect(notificationGateway.getSentEmails()).toHaveLength(1);
-    expect(outboxRepository.events).toHaveLength(1);
+    expectSavedNotificationsAndEvents({
+      emails: [
+        {
+          type: "EDIT_FORM_ESTABLISHMENT_LINK",
+          recipients: ["jerome@gmail.com"],
+          cc: ["copy@gmail.com"],
+          params: {
+            editFrontUrl:
+              "www.immersion-facile.fr/edit?jwt=jwtOfSiret[12345678912345]",
+          },
+        },
+      ],
+    });
+    expect(outboxRepository.events).toHaveLength(2);
   });
 });

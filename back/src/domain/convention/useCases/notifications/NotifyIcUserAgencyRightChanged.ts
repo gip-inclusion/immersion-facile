@@ -8,7 +8,7 @@ import {
   UnitOfWorkPerformer,
 } from "../../../core/ports/UnitOfWork";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { NotificationGateway } from "../../../generic/notifications/ports/NotificationGateway";
+import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 
 export class NotifyIcUserAgencyRightChanged extends TransactionalUseCase<
   IcUserRoleForAgencyParams,
@@ -18,7 +18,7 @@ export class NotifyIcUserAgencyRightChanged extends TransactionalUseCase<
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private readonly notificationGateway: NotificationGateway,
+    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
   ) {
     super(uowPerformer);
   }
@@ -41,11 +41,18 @@ export class NotifyIcUserAgencyRightChanged extends TransactionalUseCase<
       throw new NotFoundError(`User with id ${params.userId} not found`);
 
     if (params.role !== "toReview")
-      await this.notificationGateway.sendEmail({
-        type: "IC_USER_RIGHTS_HAS_CHANGED",
-        recipients: [user.email],
-        params: {
-          agencyName: agency.name,
+      await this.saveNotificationAndRelatedEvent(uow, {
+        kind: "email",
+        templatedContent: {
+          type: "IC_USER_RIGHTS_HAS_CHANGED",
+          recipients: [user.email],
+          params: {
+            agencyName: agency.name,
+          },
+        },
+        followedIds: {
+          agencyId: agency.id,
+          userId: user.id,
         },
       });
   }

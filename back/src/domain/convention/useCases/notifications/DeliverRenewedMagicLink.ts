@@ -1,14 +1,23 @@
 import { z } from "zod";
-import { InternshipKind, internshipKindSchema } from "shared";
-import { UseCase } from "../../../core/UseCase";
-import { NotificationGateway } from "../../../generic/notifications/ports/NotificationGateway";
+import {
+  conventionIdSchema,
+  InternshipKind,
+  internshipKindSchema,
+} from "shared";
+import {
+  UnitOfWork,
+  UnitOfWorkPerformer,
+} from "../../../core/ports/UnitOfWork";
+import { TransactionalUseCase } from "../../../core/UseCase";
+import { SaveNotificationAndRelatedEvent } from "../../../generic/notifications/entities/Notification";
 
 // prettier-ignore
 export type RenewMagicLinkPayload  = {
   internshipKind:InternshipKind
   emails:string[]
   magicLink:string,
-  conventionStatusLink:string
+  conventionStatusLink: string,
+  conventionId?: string,
 }
 export const renewMagicLinkPayloadSchema: z.Schema<RenewMagicLinkPayload> =
   z.object({
@@ -16,25 +25,39 @@ export const renewMagicLinkPayloadSchema: z.Schema<RenewMagicLinkPayload> =
     emails: z.array(z.string()),
     magicLink: z.string(),
     conventionStatusLink: z.string(),
+    conventionId: conventionIdSchema.optional(),
   });
 
-export class DeliverRenewedMagicLink extends UseCase<RenewMagicLinkPayload> {
-  constructor(private readonly notificationGateway: NotificationGateway) {
-    super();
+export class DeliverRenewedMagicLink extends TransactionalUseCase<RenewMagicLinkPayload> {
+  constructor(
+    uowPerformer: UnitOfWorkPerformer,
+    private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
+  ) {
+    super(uowPerformer);
   }
 
   inputSchema = renewMagicLinkPayloadSchema;
 
-  public async _execute({
-    emails,
-    magicLink,
-    conventionStatusLink,
-    internshipKind,
-  }: RenewMagicLinkPayload): Promise<void> {
-    await this.notificationGateway.sendEmail({
-      type: "MAGIC_LINK_RENEWAL",
-      recipients: emails,
-      params: { internshipKind, magicLink, conventionStatusLink },
+  public async _execute(
+    {
+      emails,
+      magicLink,
+      conventionStatusLink,
+      internshipKind,
+      conventionId,
+    }: RenewMagicLinkPayload,
+    uow: UnitOfWork,
+  ): Promise<void> {
+    await this.saveNotificationAndRelatedEvent(uow, {
+      kind: "email",
+      templatedContent: {
+        type: "MAGIC_LINK_RENEWAL",
+        recipients: emails,
+        params: { internshipKind, magicLink, conventionStatusLink },
+      },
+      followedIds: {
+        conventionId,
+      },
     });
   }
 }

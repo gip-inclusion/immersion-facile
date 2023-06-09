@@ -301,20 +301,28 @@ const establishmentSignsApplication = async (
   await processEventsForEmailToBeSent(eventCrawler);
 
   const sentEmails = gateways.notification.getSentEmails();
-  expect(sentEmails).toHaveLength(numberOfEmailInitialySent + 1);
+  expect(sentEmails.map((email) => email.type)).toStrictEqual([
+    "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+    "NEW_CONVENTION_AGENCY_NOTIFICATION",
+    "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+    "SIGNEE_HAS_SIGNED_CONVENTION",
+    "SIGNEE_HAS_SIGNED_CONVENTION",
+    "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+  ]);
+
   const needsReviewEmail = expectEmailOfType(
     sentEmails[sentEmails.length - 1],
     "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
   );
   expect(needsReviewEmail.recipients).toEqual([validatorEmail]);
 
-  const validateMagicLink = await shortLinkRedirectToLinkWithValidation(
-    needsReviewEmail.params.magicLink,
-    request,
-  );
-
   return {
-    validatorReviewJwt: expectJwtInMagicLinkAndGetIt(validateMagicLink),
+    validatorReviewJwt: expectJwtInMagicLinkAndGetIt(
+      await shortLinkRedirectToLinkWithValidation(
+        needsReviewEmail.params.magicLink,
+        request,
+      ),
+    ),
   };
 };
 
@@ -352,25 +360,34 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
   );
 
   await processEventsForEmailToBeSent(eventCrawler);
+
   const sentEmails = gateways.notification.getSentEmails();
-  expect(sentEmails).toHaveLength(numberOfEmailInitialySent + 2);
+  expect(sentEmails.map((email) => email.type)).toStrictEqual([
+    "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+    "NEW_CONVENTION_AGENCY_NOTIFICATION",
+    "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+    "SIGNEE_HAS_SIGNED_CONVENTION",
+    "SIGNEE_HAS_SIGNED_CONVENTION",
+    "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+    "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+  ]);
+
   const needsToTriggerConventionSentEmail = expectEmailOfType(
     sentEmails[sentEmails.length - 1],
     "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
   );
-
   expect(needsToTriggerConventionSentEmail.recipients).toEqual([
     "beneficiary@email.fr",
     "establishment@example.com",
     validatorEmail,
   ]);
 
-  const conventionDocumentLink = await shortLinkRedirectToLinkWithValidation(
-    needsToTriggerConventionSentEmail.params.magicLink,
-    request,
+  expectJwtInMagicLinkAndGetIt(
+    await shortLinkRedirectToLinkWithValidation(
+      needsToTriggerConventionSentEmail.params.magicLink,
+      request,
+    ),
   );
-
-  expectJwtInMagicLinkAndGetIt(conventionDocumentLink);
 };
 
 const makeSignatories = (

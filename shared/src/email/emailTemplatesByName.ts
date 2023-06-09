@@ -1153,4 +1153,48 @@ export const emailTemplatesByName =
         subContent: defaultSignature("immersion"),
       }),
     },
+    DEPRECATED_CONVENTION_NOTIFICATION: {
+      niceName: "Notification de convention obsolète",
+      tags: ["dépreciation demande d'immersion"],
+      createEmailVariables: ({
+        immersionProfession,
+        beneficiaryFirstName,
+        beneficiaryLastName,
+        deprecationReason,
+        businessName,
+        internshipKind,
+        dateStart,
+        dateEnd,
+      }) => ({
+        subject:
+          internshipKind === "immersion"
+            ? `Demande d'immersion pour observer l'activité de ${immersionProfession} au sein de ${businessName} obsolète`
+            : `Mini Stage - Demande de mini stage pour l'activité de ${immersionProfession} au sein de ${businessName} obsolète`,
+        greetings: "Bonjour,",
+        content: `
+      Nous vous informons que la demande ${
+        internshipKind === "immersion"
+          ? "d'immersion professionnelle"
+          : "de mini stage"
+      } de ${beneficiaryFirstName} ${beneficiaryLastName} pour réaliser ${
+          internshipKind === "immersion"
+            ? "une immersion professionnelle"
+            : "un mini stage"
+        } du ${
+          isStringDate(dateStart)
+            ? toDisplayedDate(new Date(dateStart), true)
+            : "DATE INVALIDE"
+        } au ${
+          isStringDate(dateEnd)
+            ? toDisplayedDate(new Date(dateEnd), true)
+            : "DATE INVALIDE"
+        } dans l'entreprise ${businessName} est supprimé.
+      
+      Les raisons en sont: ${deprecationReason}.         
+      
+      Bien cordialement,       
+      `,
+        subContent: defaultSignature(internshipKind),
+      }),
+    },
   });

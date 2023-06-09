@@ -32,6 +32,7 @@ const domainTopicByTargetStatusMap: Record<
   REJECTED: "ImmersionApplicationRejected",
   CANCELLED: "ImmersionApplicationCancelled",
   DRAFT: "ImmersionApplicationRequiresModification",
+  DEPRECATED: "ConventionDeprecated",
 };
 
 type UpdateConventionStatusPayload = {
@@ -76,7 +77,9 @@ export class UpdateConventionStatus extends TransactionalUseCase<
           : undefined,
       )
       .withStatusJustification(
-        status === "CANCELLED" || status === "REJECTED"
+        status === "CANCELLED" ||
+          status === "REJECTED" ||
+          status === "DEPRECATED"
           ? params.statusJustification
           : undefined,
       );
@@ -95,7 +98,9 @@ export class UpdateConventionStatus extends TransactionalUseCase<
           updatedDto,
           domainTopic,
           role,
-          params.status === "REJECTED" || params.status === "DRAFT"
+          params.status === "REJECTED" ||
+            params.status === "DRAFT" ||
+            params.status === "DEPRECATED"
             ? params.statusJustification
             : undefined,
         ),

@@ -1,12 +1,16 @@
 import {
   AgencyId,
+  AuthenticatedUserId,
   ConventionId,
   Flavor,
   SiretDto,
   TemplatedEmail,
   TemplatedSms,
 } from "shared";
-import { CreateNewEvent } from "../../../core/eventBus/EventBus";
+import {
+  CreateNewEvent,
+  makeCreateNewEvent,
+} from "../../../core/eventBus/EventBus";
 import { DateStr, TimeGateway } from "../../../core/ports/TimeGateway";
 import { UnitOfWork } from "../../../core/ports/UnitOfWork";
 import { UuidGenerator } from "../../../core/ports/UuidGenerator";
@@ -17,6 +21,7 @@ export type FollowedIds = {
   conventionId?: ConventionId;
   establishmentSiret?: SiretDto;
   agencyId?: AgencyId;
+  userId?: AuthenticatedUserId;
 };
 
 export type NotificationKind = (typeof notificationKinds)[number];
@@ -53,9 +58,12 @@ export type SaveNotificationAndRelatedEvent = ReturnType<
 >;
 export const makeSaveNotificationAndRelatedEvent =
   (
-    createNewEvent: CreateNewEvent,
     uuidGenerator: UuidGenerator,
     timeGateway: TimeGateway,
+    createNewEvent: CreateNewEvent = makeCreateNewEvent({
+      uuidGenerator,
+      timeGateway,
+    }),
   ) =>
   async (
     uow: UnitOfWork,

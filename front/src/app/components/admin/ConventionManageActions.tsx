@@ -69,6 +69,16 @@ export const ConventionManageActions = ({
         </VerificationActionButton>
       )}
 
+      {isAllowedTransition(convention.status, "DEPRECATED", role) && (
+        <VerificationActionButton
+          disabled={disabled}
+          newStatus="DEPRECATED"
+          onSubmit={createOnSubmitWithFeedbackKind("deprecated")}
+        >
+          {t.verification.markAsDeprecated}
+        </VerificationActionButton>
+      )}
+
       {isAllowedTransition(convention.status, "DRAFT", role) && (
         <VerificationActionButton
           disabled={disabled}

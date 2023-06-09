@@ -43,6 +43,7 @@ export const conventionStatusesWithJustification = [
   "REJECTED",
   "DRAFT",
   "CANCELLED",
+  "DEPRECATED",
 ] as const;
 export const conventionStatuses = [
   ...conventionStatusesWithoutJustification,
@@ -174,7 +175,6 @@ export type Beneficiary<T extends InternshipKind> =
 export type LevelOfEducation = (typeof levelsOfEducation)[number];
 
 export const levelsOfEducation = [
-  "5ème",
   "4ème",
   "3ème",
   "2nde",

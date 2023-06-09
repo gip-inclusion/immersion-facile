@@ -71,6 +71,7 @@ export const domElementIds = {
   homeEstablishments: {
     siretModal: {
       siretFetcherInput: "siret-fetcher-input",
+      editEstablishmentButton: "edit-establishment-button",
     },
     heroHeader: {
       addEstablishmentForm: buildHeroHeaderId("establishment-form-register"),
@@ -228,6 +229,8 @@ export const domElementIds = {
     conventionValidationRequestEditButton:
       "im-convention-validation__request-edit-button",
     conventionValidationCancelButton: "im-convention-validation__cancel-button",
+    conventionValidationDeprecateButton:
+      "im-convention-validation__deprecate-button",
     justificationModalCancelButton: "im-justification-modal__cancel-button",
     justificationModalSubmitButton: "im-justification-modal__submit-button",
   },
@@ -256,6 +259,7 @@ export const domElementIds = {
     maxContactsPerWeek: "establishment-maxContactPerWeek",
     errorSiretAlreadyExistButton:
       "im-form-add-establishment__edit-establishment-button",
+    submitButton: "im-form-add-establishment__submit-button",
   },
 
   immersionAssessment: {

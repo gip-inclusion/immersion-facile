@@ -213,6 +213,25 @@ describe("UpdateConventionStatus", () => {
     });
   });
 
+  describe("* -> DEPRECATED transition", () => {
+    testForAllRolesAndInitialStatusCases({
+      updateStatusParams: {
+        status: "DEPRECATED",
+        statusJustification: "my deprecation justification",
+      },
+      expectedDomainTopic: "ConventionDeprecated",
+      updatedFields: { statusJustification: "my deprecation justification" },
+      allowedRoles: ["backOffice", "validator", "counsellor"],
+      allowedInitialStatuses: [
+        "PARTIALLY_SIGNED",
+        "READY_TO_SIGN",
+        "IN_REVIEW",
+        "ACCEPTED_BY_COUNSELLOR",
+        "DRAFT",
+      ],
+    });
+  });
+
   it("fails for unknown application ids", async () => {
     const { updateConventionStatus, conventionRepository } =
       await setupInitialState({ initialStatus: "IN_REVIEW" });

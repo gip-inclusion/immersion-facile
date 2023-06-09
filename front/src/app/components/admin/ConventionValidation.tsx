@@ -23,6 +23,7 @@ const labelByStatus: Record<ConventionStatus, string> = {
   PARTIALLY_SIGNED: "[✍️ Partiellement signée]",
   READY_TO_SIGN: "[📄 En cours de signature]",
   REJECTED: "[❌ DEMANDE REJETÉE]",
+  DEPRECATED: "[❌ DEMANDE OBSOLÈTE]",
 };
 
 export interface ConventionValidationProps {

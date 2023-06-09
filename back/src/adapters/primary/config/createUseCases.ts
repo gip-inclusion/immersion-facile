@@ -25,6 +25,7 @@ import { GetConvention } from "../../../domain/convention/useCases/GetConvention
 import { ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature } from "../../../domain/convention/useCases/notifications/ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignature";
 import { DeliverRenewedMagicLink } from "../../../domain/convention/useCases/notifications/DeliverRenewedMagicLink";
 import { NotifyAllActorsOfFinalConventionValidation } from "../../../domain/convention/useCases/notifications/NotifyAllActorsOfFinalConventionValidation";
+import { NotifyAllActorsThatConventionIsDeprecated } from "../../../domain/convention/useCases/notifications/NotifyAllActorsThatConventionIsDeprecated";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected";
 import { NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification } from "../../../domain/convention/useCases/notifications/NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification";
 import { NotifyConventionReminder } from "../../../domain/convention/useCases/notifications/NotifyConventionReminder";
@@ -104,9 +105,9 @@ export const createUseCases = (
     quarantinedTopics: config.quarantinedTopics,
   });
   const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
-    createNewEvent,
     uuidGenerator,
     gateways.timeGateway,
+    createNewEvent,
   );
   const addFormEstablishment = new AddFormEstablishment(
     uowPerformer,
@@ -133,7 +134,7 @@ export const createUseCases = (
       ),
       notifyIcUserAgencyRightChanged: new NotifyIcUserAgencyRightChanged(
         uowPerformer,
-        gateways.notification,
+        saveNotificationAndRelatedEvent,
       ),
       getIcUsers: new GetInclusionConnectedUsers(uowPerformer),
       getUserAgencyDashboardUrl: new GetInclusionConnectedUser(
@@ -281,7 +282,7 @@ export const createUseCases = (
         ),
       requestEditFormEstablishment: new RequestEditFormEstablishment(
         uowPerformer,
-        gateways.notification,
+        saveNotificationAndRelatedEvent,
         gateways.timeGateway,
         makeGenerateEditFormEstablishmentUrl(
           config,
@@ -314,7 +315,8 @@ export const createUseCases = (
       privateListAgencies: new PrivateListAgencies(uowPerformer),
       getAgencyPublicInfoById: new GetAgencyPublicInfoById(uowPerformer),
       sendEmailWhenAgencyIsActivated: new SendEmailWhenAgencyIsActivated(
-        gateways.notification,
+        uowPerformer,
+        saveNotificationAndRelatedEvent,
       ),
       // METABASE
       ...dashboardUseCases(gateways.dashboardGateway, gateways.timeGateway),
@@ -365,6 +367,11 @@ export const createUseCases = (
           uowPerformer,
           saveNotificationAndRelatedEvent,
         ),
+      notifyAllActorsThatConventionIsDeprecated:
+        new NotifyAllActorsThatConventionIsDeprecated(
+          uowPerformer,
+          saveNotificationAndRelatedEvent,
+        ),
       notifyBeneficiaryAndEnterpriseThatConventionNeedsModifications:
         new NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification(
           uowPerformer,
@@ -375,7 +382,8 @@ export const createUseCases = (
           config,
         ),
       deliverRenewedMagicLink: new DeliverRenewedMagicLink(
-        gateways.notification,
+        uowPerformer,
+        saveNotificationAndRelatedEvent,
       ),
       notifyConfirmationEstablishmentCreated:
         new NotifyConfirmationEstablishmentCreated(
@@ -400,7 +408,8 @@ export const createUseCases = (
           gateways.timeGateway,
         ),
       shareConventionByEmail: new ShareApplicationLinkByEmail(
-        gateways.notification,
+        uowPerformer,
+        saveNotificationAndRelatedEvent,
       ),
       addAgency: new AddAgency(uowPerformer, createNewEvent),
       updateAgencyStatus: new UpdateAgencyStatus(uowPerformer, createNewEvent),

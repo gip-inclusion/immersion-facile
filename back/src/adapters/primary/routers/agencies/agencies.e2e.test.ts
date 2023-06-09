@@ -11,6 +11,7 @@ import {
   buildTestApp,
   InMemoryGateways,
 } from "../../../../_testBuilders/buildTestApp";
+import { processEventsForEmailToBeSent } from "../../../../_testBuilders/processEventsForEmailToBeSent";
 import { BasicEventCrawler } from "../../../secondary/core/EventCrawlerImplementations";
 import { AppConfig } from "../../config/appConfig";
 import { InMemoryUnitOfWork } from "../../config/uowConfig";
@@ -138,7 +139,7 @@ describe(`/${agenciesRoute} route`, () => {
       ).toBe("active");
       expect(inMemoryUow.outboxRepository.events).toHaveLength(1);
 
-      await eventCrawler.processNewEvents();
+      await processEventsForEmailToBeSent(eventCrawler);
       expect(gateways.notification.getSentEmails()).toHaveLength(1);
     });
   });

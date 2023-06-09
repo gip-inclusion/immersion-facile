@@ -173,6 +173,7 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
     markAsValidated: "Valider la demande",
     markAsCancelled: "Annuler la demande",
     conventionAlreadyCancelled: "Demande déjà annulée.",
+    markAsDeprecated: "Marquer la demande comme obsolète",
   },
   sign: {
     title:
