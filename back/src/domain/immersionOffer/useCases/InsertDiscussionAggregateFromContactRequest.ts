@@ -49,6 +49,14 @@ export class InsertDiscussionAggregateFromContactRequest extends TransactionalUs
               },
             ]
           : [],
+      immerssionObject:
+        params.contactMode === "EMAIL" ? params.immersionObjective : "",
+      potentialBeneficiaryCvOrLinkedin:
+        params.contactMode === "EMAIL"
+          ? params.potentialBeneficiaryCvOrLinkedin
+          : "",
+      potentialBeneficiaryPhone:
+        params.contactMode === "EMAIL" ? params.potentialBeneficiaryPhone : "",
     };
 
     await uow.discussionAggregateRepository.insertDiscussionAggregate(

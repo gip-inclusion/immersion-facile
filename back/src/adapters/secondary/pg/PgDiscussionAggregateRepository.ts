@@ -14,10 +14,18 @@ export class PgDiscussionAggregateRepository
   async insertDiscussionAggregate(discussion: DiscussionAggregate) {
     await this.client.query(
       `INSERT INTO discussions (
-         id, contact_mode, siret, rome_code,
+         id, 
+         contact_mode, 
+         siret, 
+         rome_code,
          potential_beneficiary_first_name,
-         potential_beneficiary_last_name, potential_beneficiary_email, created_at 
-       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+         potential_beneficiary_last_name, 
+         potential_beneficiary_email, 
+         potential_beneficiary_phone,
+         immerssion_objective,
+         potential_beneficiary_cv_link_or_linkedin, 
+         created_at 
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
       [
         discussion.id,
         discussion.contactMode,
@@ -26,6 +34,9 @@ export class PgDiscussionAggregateRepository
         discussion.potentialBeneficiaryFirstName,
         discussion.potentialBeneficiaryLastName,
         discussion.potentialBeneficiaryEmail,
+        discussion.potentialBeneficiaryPhone,
+        discussion.immerssionObject,
+        discussion.potentialBeneficiaryCvOrLinkedin,
         discussion.createdAt.toISOString(),
       ],
     );
@@ -68,6 +79,9 @@ export class PgDiscussionAggregateRepository
         'potentialBeneficiaryFirstName',  potential_beneficiary_first_name,
         'potentialBeneficiaryLastName',  potential_beneficiary_last_name,
         'potentialBeneficiaryEmail',  potential_beneficiary_email,
+        'immerssionObject', immerssion_objective ,
+        'potentialBeneficiaryPhone', potential_beneficiary_phone ,
+        'potentialBeneficiaryCvOrLinkedin', potential_beneficiary_cv_link_or_linkedin ,
         'createdAt', created_at,
         'exchanges', exchanges
     ) AS discussion

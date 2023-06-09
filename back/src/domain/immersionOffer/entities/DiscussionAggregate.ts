@@ -14,6 +14,9 @@ export type DiscussionAggregate = {
   contactMode: ContactMethod;
   createdAt: Date;
   exchanges: ExchangeEntity[];
+  potentialBeneficiaryPhone: string;
+  immerssionObject: string;
+  potentialBeneficiaryCvOrLinkedin?: string;
 };
 
 export type ExchangeEntity = {

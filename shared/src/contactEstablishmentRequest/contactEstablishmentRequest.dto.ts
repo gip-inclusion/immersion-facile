@@ -15,7 +15,7 @@ export type ContactEstablishmentByMailDto = ContactInformations<"EMAIL"> & {
   message: string;
   potentialBeneficiaryPhone: string;
   immersionObjective: string;
-  potentialBeneficiaryLinkedinOrCv?: string;
+  potentialBeneficiaryCvOrLinkedin?: string;
 };
 
 export type ContactEstablishmentInPersonDto = ContactInformations<"IN_PERSON">;
