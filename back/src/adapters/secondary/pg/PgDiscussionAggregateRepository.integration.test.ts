@@ -33,6 +33,9 @@ describe("PgDiscussionAggregateRepository", () => {
   it("Methode insertDiscussionAggregate", async () => {
     // Prepare
     const siret = "01234567891011";
+    const immerssionObject = "Confirmer un projet professionnel";
+    const potentialBeneficiaryCvOrLinkedin = "http://fakelink.com";
+    const potentialBeneficiaryPhone = "0654678976";
     const establishmentAggregateRepo = new PgEstablishmentAggregateRepository(
       client,
     );
@@ -48,6 +51,9 @@ describe("PgDiscussionAggregateRepository", () => {
     const discussionAggregate = createDiscussionAggregate({
       id: "9f6dad2c-6f02-11ec-90d6-0242ac120003",
       siret,
+      immerssionObject,
+      potentialBeneficiaryPhone,
+      potentialBeneficiaryCvOrLinkedin,
       createdAt,
     });
 
@@ -64,6 +70,9 @@ describe("PgDiscussionAggregateRepository", () => {
   it("Methode getDiscussionsBySiretSince", async () => {
     const siret = "11112222333344";
     const since = new Date("2023-03-05");
+    const immerssionObject = "";
+    const potentialBeneficiaryCvOrLinkedin = "";
+    const potentialBeneficiaryPhone = "";
 
     const establishmentAggregateRepo = new PgEstablishmentAggregateRepository(
       client,
@@ -78,18 +87,27 @@ describe("PgDiscussionAggregateRepository", () => {
     const discussionAggregate1 = createDiscussionAggregate({
       id: "bbbbbd2c-6f02-11ec-90d6-0242ac120003",
       siret,
+      immerssionObject,
+      potentialBeneficiaryPhone,
+      potentialBeneficiaryCvOrLinkedin,
       createdAt: new Date("2023-03-05"),
     });
 
     const discussionAggregate2 = createDiscussionAggregate({
       id: "cccccd2c-6f02-11ec-90d6-0242ac120003",
       siret,
+      immerssionObject,
+      potentialBeneficiaryPhone,
+      potentialBeneficiaryCvOrLinkedin,
       createdAt: new Date("2023-03-07"),
     });
 
     const discussionAggregateToOld = createDiscussionAggregate({
       id: "aaaaad2c-6f02-11ec-90d6-0242ac120003",
       siret,
+      immerssionObject,
+      potentialBeneficiaryPhone,
+      potentialBeneficiaryCvOrLinkedin,
       createdAt: new Date("2023-03-04"),
     });
 

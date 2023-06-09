@@ -49,7 +49,7 @@ export const ContactByEmail = ({
     potentialBeneficiaryEmail: "",
     message: initialMessage,
     immersionObjective: "",
-    potentialBeneficiaryLinkedinOrCv: "",
+    potentialBeneficiaryCvOrLinkedin: "",
     potentialBeneficiaryPhone: "",
   };
 
@@ -153,7 +153,7 @@ export const ContactByEmail = ({
           <Input
             label="Page LinkedIn ou CV en ligne (facultatif)"
             nativeInputProps={{
-              ...register("potentialBeneficiaryLinkedinOrCv"),
+              ...register("potentialBeneficiaryCvOrLinkedin"),
             }}
           />
 

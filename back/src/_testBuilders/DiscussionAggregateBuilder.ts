@@ -11,10 +11,16 @@ import { DiscussionAggregate } from "../domain/immersionOffer/entities/Discussio
 export const createDiscussionAggregate = ({
   id,
   siret,
+  immerssionObject,
+  potentialBeneficiaryCvOrLinkedin,
+  potentialBeneficiaryPhone,
   createdAt,
 }: {
   id: string;
   siret: SiretDto;
+  potentialBeneficiaryPhone: string;
+  immerssionObject: string;
+  potentialBeneficiaryCvOrLinkedin: string;
   createdAt: Date;
 }): DiscussionAggregate => ({
   id,
@@ -33,4 +39,7 @@ export const createDiscussionAggregate = ({
       sender: "potentialBeneficiary",
     },
   ],
+  immerssionObject,
+  potentialBeneficiaryPhone,
+  potentialBeneficiaryCvOrLinkedin,
 });
