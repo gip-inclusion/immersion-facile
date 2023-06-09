@@ -87,7 +87,7 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification exte
       await this.saveNotificationAndRelatedEvent(uow, {
         kind: "email",
         templatedContent: {
-          type: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
+          kind: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
           recipients: [email],
           params: {
             internshipKind: convention.internshipKind,

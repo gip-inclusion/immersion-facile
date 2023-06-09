@@ -42,7 +42,7 @@ describe("NotifyConfirmationEstablismentCreated", () => {
       expectSavedNotificationsAndEvents({
         emails: [
           {
-            type: "NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION",
+            kind: "NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION",
             recipients: [validEstablishment.businessContact.email],
             params: {
               businessName: validEstablishment.businessName,

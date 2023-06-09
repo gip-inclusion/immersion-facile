@@ -36,7 +36,7 @@ export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends Transact
       await this.saveNotificationAndRelatedEvent(uow, {
         kind: "email",
         templatedContent: {
-          type: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED",
+          kind: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED",
           recipients: [conventionPeAdvisor.advisor.email],
           params: {
             advisorFirstName: conventionPeAdvisor.advisor.firstName,

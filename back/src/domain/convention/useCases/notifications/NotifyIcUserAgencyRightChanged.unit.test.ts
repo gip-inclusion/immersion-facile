@@ -106,7 +106,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
     expectSavedNotificationsAndEvents({
       emails: [
         {
-          type: "IC_USER_RIGHTS_HAS_CHANGED",
+          kind: "IC_USER_RIGHTS_HAS_CHANGED",
           params: { agencyName: agency.name },
           recipients: [icUser.email],
         },

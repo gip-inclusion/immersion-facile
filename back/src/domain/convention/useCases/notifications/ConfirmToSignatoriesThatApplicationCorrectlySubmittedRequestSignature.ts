@@ -106,7 +106,7 @@ export class ConfirmToSignatoriesThatApplicationCorrectlySubmittedRequestSignatu
     });
 
     return {
-      type: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+      kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
       recipients: [signatory.email],
       params: {
         internshipKind: convention.internshipKind,

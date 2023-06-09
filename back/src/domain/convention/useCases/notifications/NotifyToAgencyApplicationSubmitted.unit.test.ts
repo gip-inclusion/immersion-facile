@@ -161,7 +161,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
     expectSavedNotificationsAndEvents({
       emails: [
         {
-          type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
+          kind: "NEW_CONVENTION_AGENCY_NOTIFICATION",
           recipients: [councellorEmail],
           params: {
             internshipKind: validConvention.internshipKind,
@@ -173,7 +173,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
           },
         },
         {
-          type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
+          kind: "NEW_CONVENTION_AGENCY_NOTIFICATION",
           recipients: [councellorEmail2],
           params: {
             internshipKind: validConvention.internshipKind,
@@ -217,7 +217,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
     expectSavedNotificationsAndEvents({
       emails: [
         {
-          type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
+          kind: "NEW_CONVENTION_AGENCY_NOTIFICATION",
           recipients: [validatorEmail],
           params: {
             internshipKind: validConvention.internshipKind,
@@ -280,7 +280,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
     expectSavedNotificationsAndEvents({
       emails: [
         {
-          type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
+          kind: "NEW_CONVENTION_AGENCY_NOTIFICATION",
           recipients: [councellorEmail],
           params: {
             internshipKind: validConvention.internshipKind,
@@ -294,7 +294,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
           },
         },
         {
-          type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
+          kind: "NEW_CONVENTION_AGENCY_NOTIFICATION",
           recipients: [councellorEmail2],
           params: {
             internshipKind: validConvention.internshipKind,
@@ -374,7 +374,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
     expectSavedNotificationsAndEvents({
       emails: [
         {
-          type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
+          kind: "NEW_CONVENTION_AGENCY_NOTIFICATION",
           recipients: [councellorEmail],
           params: {
             internshipKind: validConvention.internshipKind,
@@ -389,7 +389,7 @@ describe("NotifyToAgencyApplicationSubmitted", () => {
           },
         },
         {
-          type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
+          kind: "NEW_CONVENTION_AGENCY_NOTIFICATION",
           recipients: [councellorEmail2],
           params: {
             internshipKind: validConvention.internshipKind,

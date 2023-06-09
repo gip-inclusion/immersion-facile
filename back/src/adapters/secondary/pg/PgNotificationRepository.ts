@@ -88,7 +88,7 @@ export class PgNotificationRepository implements NotificationRepository {
       id,
       createdAt,
       followedIds,
-      templatedContent: { type: kind, recipients, cc, params },
+      templatedContent: { kind, recipients, cc, params },
     } = notification;
 
     await this.client.query(
@@ -144,7 +144,7 @@ export class PgNotificationRepository implements NotificationRepository {
             'agencyId', agency_id
           ),
           'templatedContent', JSON_BUILD_OBJECT(
-              'type', email_kind,
+              'kind', email_kind,
               'recipients', ARRAY(SELECT email FROM notifications_email_recipients WHERE notifications_email_id = $1 AND recipient_type = 'to'),
               'cc', ARRAY(SELECT email FROM notifications_email_recipients WHERE notifications_email_id = $1 AND recipient_type = 'cc'),
               'params', params
@@ -181,7 +181,7 @@ export class PgNotificationRepository implements NotificationRepository {
             'agencyId', agency_id
           ),
           'templatedContent', JSON_BUILD_OBJECT(
-              'type', email_kind,
+              'kind', email_kind,
               'recipients', ARRAY(SELECT email FROM notifications_email_recipients WHERE notifications_email_id = e.id AND recipient_type = 'to'),
               'cc', ARRAY(SELECT email FROM notifications_email_recipients WHERE notifications_email_id = e.id AND recipient_type = 'cc'),
               'params', params

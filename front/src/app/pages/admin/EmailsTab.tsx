@@ -34,8 +34,11 @@ export const EmailsTab = () => {
   return (
     <div>
       <ToggleSwitch
-        label={"Show mail or sms"}
-        helperText={"helper text"}
+        label={
+          notificationKindToShow === "sms"
+            ? "Sms (pour voir les emails décocher)"
+            : "Emails (pour voir les sms cocher)"
+        }
         checked={notificationKindToShow === "sms"}
         showCheckedHint={notificationKindToShow === "sms"}
         onChange={() =>
@@ -44,7 +47,12 @@ export const EmailsTab = () => {
           )
         }
       />
-      <DsfrTitle level={5} text="Derniers emails envoyés" />
+      <DsfrTitle
+        level={5}
+        text={`Derniers ${
+          notificationKindToShow === "email" ? "Emails" : "Sms"
+        } envoyés`}
+      />
       {errorMessage ? (
         <Alert title={"Oups..."} severity="error" description={errorMessage} />
       ) : (

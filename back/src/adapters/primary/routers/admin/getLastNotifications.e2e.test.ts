@@ -47,7 +47,7 @@ describe(`${adminTargets.getLastNotifications.url} route`, () => {
         createdAt: dateNow.toISOString(),
         kind: "email",
         templatedContent: {
-          type: "AGENCY_WAS_ACTIVATED",
+          kind: "AGENCY_WAS_ACTIVATED",
           recipients: ["toto@email.com"],
           params: {
             agencyName: "Agence du Grand Est",

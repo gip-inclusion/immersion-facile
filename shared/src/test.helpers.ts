@@ -67,9 +67,9 @@ export const expectEmailOfType = <
 >(
   email: E,
   expectedEmailType: T,
-): Extract<E, { type: T }> => {
+): Extract<E, { kind: T }> => {
   expect(email.kind).toBe(expectedEmailType);
-  return email as Extract<E, { type: T }>;
+  return email as Extract<E, { kind: T }>;
 };
 
 export const expectToEqual = <T>(actual: T, expected: T) => {

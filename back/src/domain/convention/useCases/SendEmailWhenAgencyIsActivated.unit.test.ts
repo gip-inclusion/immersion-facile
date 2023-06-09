@@ -40,7 +40,7 @@ describe("SendEmailWhenAgencyIsActivated", () => {
     expectSavedNotificationsAndEvents({
       emails: [
         {
-          type: "AGENCY_WAS_ACTIVATED",
+          kind: "AGENCY_WAS_ACTIVATED",
           recipients: ["toto@email.com"],
           params: {
             agencyName: "just-activated-agency",

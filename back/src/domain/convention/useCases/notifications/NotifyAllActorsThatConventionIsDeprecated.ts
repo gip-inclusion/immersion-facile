@@ -47,7 +47,7 @@ export class NotifyAllActorsThatConventionIsDeprecated extends TransactionalUseC
     await this.saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
-        type: "DEPRECATED_CONVENTION_NOTIFICATION",
+        kind: "DEPRECATED_CONVENTION_NOTIFICATION",
         recipients,
         params: {
           internshipKind: convention.internshipKind,

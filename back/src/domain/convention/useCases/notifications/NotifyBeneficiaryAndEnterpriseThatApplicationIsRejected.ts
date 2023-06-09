@@ -39,7 +39,7 @@ export class NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected extends Tra
     await this.saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
-        type: "REJECTED_CONVENTION_NOTIFICATION",
+        kind: "REJECTED_CONVENTION_NOTIFICATION",
         recipients,
         params: {
           internshipKind: convention.internshipKind,

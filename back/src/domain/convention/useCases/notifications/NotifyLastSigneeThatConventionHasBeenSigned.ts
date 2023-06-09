@@ -109,7 +109,7 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
     });
 
     return {
-      type: "SIGNEE_HAS_SIGNED_CONVENTION",
+      kind: "SIGNEE_HAS_SIGNED_CONVENTION",
       params: {
         agencyLogoUrl: agency.logoUrl,
         internshipKind: convention.internshipKind,

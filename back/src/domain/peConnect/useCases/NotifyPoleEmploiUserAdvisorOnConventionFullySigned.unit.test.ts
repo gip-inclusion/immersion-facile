@@ -91,7 +91,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
     expectSavedNotificationsAndEvents({
       emails: [
         {
-          type: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED",
+          kind: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED",
           recipients: [advisor.email],
           params: {
             advisorFirstName: advisor.firstName,

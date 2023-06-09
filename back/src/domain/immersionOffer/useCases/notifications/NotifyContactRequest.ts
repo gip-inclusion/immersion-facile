@@ -60,7 +60,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
         await this.saveNotificationAndRelatedEvent(uow, {
           kind: "email",
           templatedContent: {
-            type: "CONTACT_BY_EMAIL_REQUEST",
+            kind: "CONTACT_BY_EMAIL_REQUEST",
             recipients: [contact.email],
             cc,
             params: {
@@ -87,7 +87,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
         await this.saveNotificationAndRelatedEvent(uow, {
           kind: "email",
           templatedContent: {
-            type: "CONTACT_BY_PHONE_INSTRUCTIONS",
+            kind: "CONTACT_BY_PHONE_INSTRUCTIONS",
             recipients: [payload.potentialBeneficiaryEmail],
             params: {
               businessName,
@@ -108,7 +108,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
         await this.saveNotificationAndRelatedEvent(uow, {
           kind: "email",
           templatedContent: {
-            type: "CONTACT_IN_PERSON_INSTRUCTIONS",
+            kind: "CONTACT_IN_PERSON_INSTRUCTIONS",
             recipients: [payload.potentialBeneficiaryEmail],
             params: {
               businessName,
