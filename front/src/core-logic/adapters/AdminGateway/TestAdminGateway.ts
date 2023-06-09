@@ -6,6 +6,7 @@ import {
   FormEstablishmentBatchDto,
   IcUserRoleForAgencyParams,
   InclusionConnectedUser,
+  NotificationsByKind,
 } from "shared";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
@@ -36,6 +37,10 @@ export class TestAdminGateway implements AdminGateway {
     return this.getAgencyUsersToReviewResponse$;
   }
 
+  getLastNotifications(_token: BackOfficeJwt): Observable<NotificationsByKind> {
+    return this.lastNotifications$;
+  }
+
   public getAgencyUsersToReviewResponse$ = new Subject<
     InclusionConnectedUser[]
   >();
@@ -43,4 +48,5 @@ export class TestAdminGateway implements AdminGateway {
   public token$ = new Subject<string>();
   public dashboardUrl$ = new Subject<AbsoluteUrl>();
   public establishmentBatchResponse$ = new Subject<EstablishmentBatchReport>();
+  public lastNotifications$ = new Subject<NotificationsByKind>();
 }

@@ -14,7 +14,6 @@ import { ImmersionSearchGateway } from "src/core-logic/ports/ImmersionSearchGate
 import { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
 import { NavigationGateway } from "src/core-logic/ports/NavigationGateway";
 import { RomeAutocompleteGateway } from "src/core-logic/ports/RomeAutocompleteGateway";
-import { SentEmailGateway } from "src/core-logic/ports/SentEmailGateway";
 import { SiretGatewayThroughBack } from "src/core-logic/ports/SiretGatewayThroughBack";
 import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 import { createStore } from "src/core-logic/storeConfig/store";
@@ -33,7 +32,6 @@ export type Dependencies = {
   romeAutocompleteGateway: RomeAutocompleteGateway;
   navigationGateway: NavigationGateway;
   deviceRepository: DeviceRepository;
-  sentEmailGateway: SentEmailGateway;
   minSearchResultsToPreventRefetch: number;
   scheduler: SchedulerLike;
   emailValidationGateway: EmailValidationGateway;

@@ -3,7 +3,6 @@ import { Dependencies } from "src/config/dependencies";
 import { TestAdminGateway } from "src/core-logic/adapters/AdminGateway/TestAdminGateway";
 import { InMemoryConventionGateway } from "src/core-logic/adapters/Convention/InMemoryConventionGateway";
 import { createTestDeviceRepository } from "src/core-logic/adapters/DeviceRepository/createTestDeviceRepository";
-import { TestSentEmailGateway } from "src/core-logic/adapters/EmailGateway/TestSentEmailGateway";
 import { InMemoryEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/InMemoryEstablishmentGateway";
 import { InMemoryImmersionSearchGateway } from "src/core-logic/adapters/ImmersionSearchGateway/InMemoryImmersionSearchGateway";
 import { TestInclusionConnectedGateway } from "src/core-logic/adapters/InclusionConnected/TestInclusionConnectedGateway";
@@ -34,7 +33,6 @@ const createTestDependencies = () =>
     inclusionConnectedGateway: new TestInclusionConnectedGateway(),
     deviceRepository: createTestDeviceRepository(),
     navigationGateway: new InMemoryNavigationGateway(),
-    sentEmailGateway: new TestSentEmailGateway(),
     scheduler: new VirtualTimeScheduler(),
     minSearchResultsToPreventRefetch: 2,
     emailValidationGateway: new InMemoryEmailValidationGateway(),

@@ -5,7 +5,6 @@ import { SimulatedAdminGateway } from "src/core-logic/adapters/AdminGateway/Simu
 import { InMemoryAgencyGateway } from "src/core-logic/adapters/AgencyGateway/InMemoryAgencyGateway";
 import { SimulatedImmersionAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/SimulatedImmersionAssessmentGateway";
 import { InMemoryConventionGateway } from "src/core-logic/adapters/Convention/InMemoryConventionGateway";
-import { StubSentEmailGateway } from "src/core-logic/adapters/EmailGateway/StubSentEmailGateway";
 import { InMemoryEmailValidationGateway } from "src/core-logic/adapters/EmailValidation/InMemoryEmailValidationGateway";
 import { InMemoryEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/InMemoryEstablishmentGateway";
 import {
@@ -41,7 +40,6 @@ export const createInMemoryDependencies = (): Dependencies => ({
     seedRomeDtos,
     SIMULATED_LATENCY_MS,
   ),
-  sentEmailGateway: new StubSentEmailGateway(),
   siretGatewayThroughBack: getSimulatedSiretGatewayThroughBack(),
   technicalGateway: new SimulatedTechnicalGateway(),
   inclusionConnectedGateway: new SimulatedInclusionConnectedGateway(),

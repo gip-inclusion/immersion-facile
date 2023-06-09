@@ -9,6 +9,7 @@ import {
   GetDashboardParams,
   IcUserRoleForAgencyParams,
   InclusionConnectedUser,
+  NotificationsByKind,
   UserAndPassword,
 } from "shared";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
@@ -118,5 +119,13 @@ export class SimulatedAdminGateway implements AdminGateway {
     return agencyId === "non-existing-agency-id"
       ? throwError(() => new Error(`Agency Id ${agencyId} not found`))
       : of(undefined);
+  }
+
+  getLastNotifications(_token: BackOfficeJwt): Observable<NotificationsByKind> {
+    const notificationsByKind: NotificationsByKind = {
+      emails: [],
+      sms: [],
+    };
+    return of(notificationsByKind);
   }
 }
