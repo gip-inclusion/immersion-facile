@@ -149,25 +149,9 @@ describe("Establishment creation and modification workflow", () => {
       "PUT",
       `${baseApiRoute}${establishmentTargets.addFormEstablishment.url}`,
     ).as("addFormEstablishmentRequest");
-
-    cy.visit("/");
-    cy.get(`#${domElementIds.home.heroHeader.establishment}`).click();
-    cy.get(
-      `#${domElementIds.homeEstablishments.heroHeader.editEstablishmentForm}`,
-    ).click();
-    cy.get(
-      `#${domElementIds.homeEstablishments.siretModal.siretFetcherInput}`,
-    ).type(providedSiret);
-    cy.wait("@siretIfNotAlreadySavedRequest")
-      .its("response.statusCode")
-      .should("eq", 409);
-    cy.get(
-      `#${domElementIds.homeEstablishments.siretModal.editEstablishmentButton}`,
-    ).click();
-    cy.wait("@requestEmailToUpdateEstablishmentRequest")
-      .its("response.statusCode")
-      .should("eq", 200);
+    requestEstablishmentModification();
     connectToAdmin();
+    // TODO: wrap this in a function (e.g. openEmailInAdmin(emailType, callback))
     cy.get(".fr-tabs__tab").contains("Emails").click();
     cy.get(`.fr-accordion__btn:contains("EDIT_FORM_ESTABLISHMENT_LINK")`)
       .first()
@@ -179,30 +163,7 @@ describe("Establishment creation and modification workflow", () => {
           .find("a:contains('Lien vers la page')")
           .each((_, element) => {
             cy.wrap(element).click();
-            cy.get(`#${domElementIds.establishment.siret} input`)
-              .should("be.disabled")
-              .should("have.value", providedSiret);
-
-            cy.get(`#${domElementIds.establishment.businessContact.job}`)
-              .clear()
-              .type(faker.name.jobTitle(), {
-                force: true,
-              });
-            cy.get(`#${domElementIds.establishment.businessContact.phone}`)
-              .clear()
-              .type(faker.phone.number("06########"), {
-                force: true,
-              });
-            cy.get(`#${domElementIds.establishment.businessContact.email}`)
-              .clear()
-              .type(faker.internet.email(), {
-                force: true,
-              });
-            cy.get(`#${domElementIds.establishment.submitButton}`).click();
-            cy.wait("@addFormEstablishmentRequest")
-              .its("response.statusCode")
-              .should("eq", 200);
-            cy.get(".fr-alert--success").should("exist");
+            editAndSubmitModifiedEstablishment();
           });
       });
   });
@@ -240,3 +201,49 @@ describe("Establishment creation and modification workflow", () => {
     ).should("have.length", 1);
   });
 });
+
+const requestEstablishmentModification = () => {
+  cy.visit("/");
+  cy.get(`#${domElementIds.home.heroHeader.establishment}`).click();
+  cy.get(
+    `#${domElementIds.homeEstablishments.heroHeader.editEstablishmentForm}`,
+  ).click();
+  cy.get(
+    `#${domElementIds.homeEstablishments.siretModal.siretFetcherInput}`,
+  ).type(providedSiret);
+  cy.wait("@siretIfNotAlreadySavedRequest")
+    .its("response.statusCode")
+    .should("eq", 409);
+  cy.get(
+    `#${domElementIds.homeEstablishments.siretModal.editEstablishmentButton}`,
+  ).click();
+  cy.wait("@requestEmailToUpdateEstablishmentRequest")
+    .its("response.statusCode")
+    .should("eq", 200);
+};
+
+const editAndSubmitModifiedEstablishment = () => {
+  cy.get(`#${domElementIds.establishment.siret} input`)
+    .should("be.disabled")
+    .should("have.value", providedSiret);
+  cy.get(`#${domElementIds.establishment.businessContact.job}`)
+    .clear()
+    .type(faker.name.jobTitle(), {
+      force: true,
+    });
+  cy.get(`#${domElementIds.establishment.businessContact.phone}`)
+    .clear()
+    .type(faker.phone.number("06########"), {
+      force: true,
+    });
+  cy.get(`#${domElementIds.establishment.businessContact.email}`)
+    .clear()
+    .type(faker.internet.email(), {
+      force: true,
+    });
+  cy.get(`#${domElementIds.establishment.submitButton}`).click();
+  cy.wait("@addFormEstablishmentRequest")
+    .its("response.statusCode")
+    .should("eq", 200);
+  cy.get(".fr-alert--success").should("exist");
+};
