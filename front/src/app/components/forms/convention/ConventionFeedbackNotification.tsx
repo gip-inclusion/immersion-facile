@@ -71,7 +71,7 @@ export const createConventionFeedbackMessageByKind = (
   ),
   cancelled: "Succès. La convention a bien été annulée.",
   deprecated:
-    "Succès. La convention a bien été supprimé. La confirmation de cette suppression va être communiquée par mail à chacun des signataires.",
+    "Succès. La convention a bien été supprimée. La confirmation de cette suppression va être communiquée par mail à chacun des signataires.",
 });
 
 const InitialSubmitSuccessMessageBase = ({

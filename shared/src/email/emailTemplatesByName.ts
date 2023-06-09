@@ -1188,7 +1188,7 @@ export const emailTemplatesByName =
           isStringDate(dateEnd)
             ? toDisplayedDate(new Date(dateEnd), true)
             : "DATE INVALIDE"
-        } dans l'entreprise ${businessName} est supprimé.
+        } dans l'entreprise ${businessName} est supprimée.
       
       Les raisons en sont: ${deprecationReason}.         
       
