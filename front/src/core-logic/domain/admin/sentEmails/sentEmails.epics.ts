@@ -9,13 +9,17 @@ import {
 type SentEmailsAction = ActionOfSlice<typeof sentEmailsSlice>;
 type SentEmailEpic = AppEpic<SentEmailsAction>;
 
-const getSentEmail: SentEmailEpic = (action$, state$, { sentEmailGateway }) =>
+const getSentEmail: SentEmailEpic = (action$, state$, { adminGateway }) =>
   action$.pipe(
     filter(sentEmailsSlice.actions.lastSentEmailsRequested.match),
     switchMap(() =>
-      sentEmailGateway.getLatest(state$.value.admin.adminAuth.adminToken || ""),
+      adminGateway.getLastNotifications(
+        state$.value.admin.adminAuth.adminToken || "",
+      ),
     ),
-    map(sentEmailsSlice.actions.lastSentEmailsSucceeded),
+    map(({ emails }) =>
+      sentEmailsSlice.actions.lastSentEmailsSucceeded(emails),
+    ),
     catchEpicError((error) =>
       sentEmailsSlice.actions.lastSentEmailsFailed(error.message),
     ),

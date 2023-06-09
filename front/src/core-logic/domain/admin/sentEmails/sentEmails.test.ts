@@ -1,4 +1,4 @@
-import { EmailSentDto, expectToEqual } from "shared";
+import { EmailNotification, expectToEqual } from "shared";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { sentEmailsSlice } from "src/core-logic/domain/admin/sentEmails/sentEmails.slice";
 import {
@@ -19,10 +19,13 @@ describe("sentEmails slice", () => {
     it("gets the last emails sent from the backend", () => {
       store.dispatch(sentEmailsSlice.actions.lastSentEmailsRequested());
       expectIsLoadingToBe(true);
-      const sentEmails: EmailSentDto[] = [
+      const sentEmails: EmailNotification[] = [
         {
-          sentAt: "2022-07-10",
-          templatedEmail: {
+          id: "123",
+          createdAt: "2022-07-10",
+          kind: "email",
+          followedIds: {},
+          templatedContent: {
             type: "EDIT_FORM_ESTABLISHMENT_LINK",
             recipients: ["bob@mail.com"],
             params: { editFrontUrl: "my-url" },
@@ -53,18 +56,23 @@ describe("sentEmails slice", () => {
     expect(adminSelectors.sentEmails.error(store.getState())).toBe(expected);
   };
 
-  const expectSentEmails = (expected: EmailSentDto[]) => {
+  const expectSentEmails = (expected: EmailNotification[]) => {
     expectToEqual(
       adminSelectors.sentEmails.sentEmails(store.getState()),
       expected,
     );
   };
 
-  const feedSentEmailGatewayWithEmails = (sentEmails: EmailSentDto[]) => {
-    dependencies.sentEmailGateway.sentEmails$.next(sentEmails);
+  const feedSentEmailGatewayWithEmails = (
+    emailNotifications: EmailNotification[],
+  ) => {
+    dependencies.adminGateway.lastNotifications$.next({
+      sms: [],
+      emails: emailNotifications,
+    });
   };
 
   const feedSentEmailGatewayWithError = (error: Error) => {
-    dependencies.sentEmailGateway.sentEmails$.error(error);
+    dependencies.adminGateway.lastNotifications$.error(error);
   };
 });

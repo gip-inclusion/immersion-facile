@@ -1,10 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { EmailSentDto } from "shared";
+import { EmailNotification } from "shared";
 
 export type SentEmailsState = {
   isLoading: boolean;
   error: string | null;
-  sentEmails: EmailSentDto[];
+  sentEmails: EmailNotification[];
 };
 
 export const sentEmailInitialState: SentEmailsState = {
@@ -20,7 +20,10 @@ export const sentEmailsSlice = createSlice({
     lastSentEmailsRequested: (state) => {
       state.isLoading = true;
     },
-    lastSentEmailsSucceeded: (state, action: PayloadAction<EmailSentDto[]>) => {
+    lastSentEmailsSucceeded: (
+      state,
+      action: PayloadAction<EmailNotification[]>,
+    ) => {
       state.sentEmails = action.payload;
       state.error = null;
       state.isLoading = false;

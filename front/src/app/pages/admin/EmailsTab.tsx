@@ -4,7 +4,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { keys } from "ramda";
-import { EmailSentDto, EmailVariables } from "shared";
+import { EmailNotification, EmailVariables } from "shared";
 import { DsfrTitle } from "react-design-system";
 import { TextCell } from "src/app/components/admin/TextCell";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -39,8 +39,8 @@ export const EmailsTab = () => {
         <Alert title={"Oups..."} severity="error" description={errorMessage} />
       ) : (
         <ul className={fr.cx("fr-accordions-group")}>
-          {latestEmails.map((email, index) => (
-            <li key={index}>
+          {latestEmails.map((email) => (
+            <li key={email.id}>
               <Email email={email} />
               <hr />
             </li>
@@ -51,34 +51,34 @@ export const EmailsTab = () => {
   );
 };
 
-const Email = ({ email }: { email: EmailSentDto }) => {
-  const sentAtDate = new Date(email.sentAt);
+const Email = ({ email }: { email: EmailNotification }) => {
+  const sentAtDate = new Date(email.createdAt);
   return (
     <Accordion
-      label={`${email.error ? "❌" : "✅"} ${
-        email.templatedEmail.type
+      label={`✅ ${
+        email.templatedContent.type
       } envoyé le ${sentAtDate.toLocaleDateString(
         "fr",
       )} à ${sentAtDate.toLocaleTimeString("fr")}`}
       className={`im-email-info-container ${
-        "conventionId" in email.templatedEmail.params
-          ? `im-email-info-container--convention-${email.templatedEmail.params.conventionId}`
+        "conventionId" in email.templatedContent.params
+          ? `im-email-info-container--convention-${email.templatedContent.params.conventionId}`
           : ""
       }`}
     >
-      <TextCell title="Type" contents={email.templatedEmail.type} />
+      <TextCell title="Type" contents={email.templatedContent.type} />
       <TextCell
         title="Destinataires"
-        contents={email.templatedEmail.recipients.join(", ")}
+        contents={email.templatedContent.recipients.join(", ")}
       />
-      <TextCell title="CC" contents={email.templatedEmail.cc?.join(", ")} />
+      <TextCell title="CC" contents={email.templatedContent.cc?.join(", ")} />
       <TextCell
         title="Paramètres"
         contents={
           <ul className={fr.cx("fr-text--xs")}>
-            {keys(email.templatedEmail.params).map((key: EmailVariables) => {
+            {keys(email.templatedContent.params).map((key: EmailVariables) => {
               const value = (
-                email.templatedEmail.params as Record<EmailVariables, string>
+                email.templatedContent.params as Record<EmailVariables, string>
               )[key];
 
               const links: EmailVariables[] = [
@@ -107,9 +107,6 @@ const Email = ({ email }: { email: EmailSentDto }) => {
           </ul>
         }
       />
-      {email?.error && (
-        <TextCell title="Message d'erreur" contents={email.error} />
-      )}
     </Accordion>
   );
 };
