@@ -1,5 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { EmailNotification, SmsNotification } from "shared";
+import {
+  EmailNotification,
+  NotificationsByKind,
+  SmsNotification,
+} from "shared";
 
 export type SentEmailsState = {
   isLoading: boolean;
@@ -24,9 +28,10 @@ export const notificationsSlice = createSlice({
     },
     lastSentEmailsSucceeded: (
       state,
-      action: PayloadAction<EmailNotification[]>,
+      action: PayloadAction<NotificationsByKind>,
     ) => {
-      state.lastEmails = action.payload;
+      state.lastEmails = action.payload.emails;
+      state.lastSms = action.payload.sms;
       state.error = null;
       state.isLoading = false;
     },

@@ -88,7 +88,7 @@ const DisplayedNotification = ({
   const notificationDate = new Date(notification.createdAt);
   return (
     <Accordion
-      label={`✅ ${
+      label={`✉️ ${
         notification.templatedContent.kind
       } envoyé le ${notificationDate.toLocaleDateString(
         "fr",

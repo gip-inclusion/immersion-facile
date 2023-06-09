@@ -51,7 +51,7 @@ describe("notifications slice", () => {
         },
       ];
       feedGatewayWithNotifications({ emails, sms });
-      expectNotifications({ emails, sms: [] });
+      expectNotifications({ emails, sms });
       expectIsLoadingToBe(false);
     });
 
