@@ -11,15 +11,26 @@ import {
 } from "../../domain/generic/notifications/ports/NotificationRepository";
 
 export class InMemoryNotificationRepository implements NotificationRepository {
-  async getEmailsByFilters(filters: EmailNotificationFilters) {
+  async getEmailsByFilters(filters: EmailNotificationFilters = {}) {
     return this.notifications.filter(
       (notification): notification is EmailNotification => {
         if (notification.kind !== "email") return false;
-        if (!notification.templatedContent.recipients.includes(filters.email))
+
+        if (
+          filters.email &&
+          !notification.templatedContent.recipients.includes(filters.email)
+        )
           return false;
-        if (notification.templatedContent.type !== filters.emailKind)
+
+        if (
+          filters.emailKind &&
+          notification.templatedContent.kind !== filters.emailKind
+        )
           return false;
-        return new Date(notification.createdAt) > filters.since;
+
+        return filters.since
+          ? new Date(notification.createdAt) > filters.since
+          : true;
       },
     );
   }
@@ -39,10 +50,7 @@ export class InMemoryNotificationRepository implements NotificationRepository {
 
   async getLastNotifications() {
     return {
-      emails: this.notifications.filter(
-        (notification): notification is EmailNotification =>
-          notification.kind === "email",
-      ),
+      emails: await this.getEmailsByFilters({}),
       sms: this.notifications.filter(
         (notification): notification is SmsNotification =>
           notification.kind === "sms",

@@ -20,11 +20,51 @@ export class PgNotificationRepository implements NotificationRepository {
     private maxRetrievedNotifications: number = 30,
   ) {}
 
-  async getEmailsByFilters(
-    _params: EmailNotificationFilters,
-  ): Promise<EmailNotification[]> {
-    await "";
-    throw new Error("Not Implementented");
+  async getEmailsByFilters({
+    since,
+    emailKind,
+    email,
+  }: EmailNotificationFilters = {}): Promise<EmailNotification[]> {
+    const filterValues: any[] = [];
+    const filterConditions: string[] = [];
+
+    if (since) {
+      filterConditions.push(`created_at >= $${filterValues.length + 1}`);
+      filterValues.push(since.toISOString());
+    }
+
+    if (emailKind) {
+      filterConditions.push(`email_kind = $${filterValues.length + 1}`);
+      filterValues.push(emailKind);
+    }
+
+    if (email) {
+      filterConditions.push(`r.email = $${filterValues.length + 1}`);
+      filterValues.push(email);
+    }
+
+    const subQueryToGetEmailsNotificationsIds = `SELECT e.id FROM notifications_email e
+      LEFT JOIN notifications_email_recipients r ON id = r.notifications_email_id
+      ${
+        filterConditions.length > 0
+          ? "WHERE " + filterConditions.join(" AND ")
+          : ""
+      }
+      GROUP BY e.id
+      ORDER BY created_at DESC
+      LIMIT $${filterValues.length + 1}`;
+
+    const response = await this.client.query(
+      `SELECT ${buildEmailNotificationObject} as notif
+        FROM notifications_email e
+        LEFT JOIN notifications_email_recipients r ON e.id = r.notifications_email_id
+        WHERE e.id IN (${subQueryToGetEmailsNotificationsIds})
+        GROUP BY e.id
+        ORDER BY created_at DESC`,
+      [...filterValues, this.maxRetrievedNotifications],
+    );
+
+    return response.rows.map((row) => row.notif);
   }
 
   async getByIdAndKind(
@@ -33,9 +73,9 @@ export class PgNotificationRepository implements NotificationRepository {
   ): Promise<Notification | undefined> {
     switch (kind) {
       case "sms":
-        return this.getSmsNotification(id);
+        return this.getSmsNotificationById(id);
       case "email":
-        return this.getEmailNotification(id);
+        return this.getEmailNotificationById(id);
       default:
         exhaustiveCheck(kind, {
           variableName: "notificationKind",
@@ -125,7 +165,7 @@ export class PgNotificationRepository implements NotificationRepository {
     }
   }
 
-  private async getSmsNotification(
+  private async getSmsNotificationById(
     id: NotificationId,
   ): Promise<SmsNotification> {
     const response = await this.client.query(
@@ -139,29 +179,16 @@ export class PgNotificationRepository implements NotificationRepository {
     return response.rows[0]?.notif;
   }
 
-  private async getEmailNotification(
+  private async getEmailNotificationById(
     id: NotificationId,
   ): Promise<EmailNotification> {
     const response = await this.client.query(
       `
-        SELECT JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
-          'id', id,
-          'kind', 'email',
-          'createdAt', TO_CHAR(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
-          'followedIds', JSON_BUILD_OBJECT(
-            'conventionId', convention_id,
-            'establishmentId', establishment_siret,
-            'agencyId', agency_id
-          ),
-          'templatedContent', JSON_BUILD_OBJECT(
-              'kind', email_kind,
-              'recipients', ARRAY(SELECT email FROM notifications_email_recipients WHERE notifications_email_id = $1 AND recipient_type = 'to'),
-              'cc', ARRAY(SELECT email FROM notifications_email_recipients WHERE notifications_email_id = $1 AND recipient_type = 'cc'),
-              'params', params
-            )
-        )) as notif
+        SELECT ${buildEmailNotificationObject} as notif
         FROM notifications_email e
+        LEFT JOIN notifications_email_recipients r ON r.notifications_email_id = e.id
         WHERE id = $1
+        GROUP BY e.id
           `,
       [id],
     );
@@ -179,33 +206,8 @@ export class PgNotificationRepository implements NotificationRepository {
       [this.maxRetrievedNotifications],
     );
 
-    const emailsResponse = await this.client.query(
-      `
-        SELECT JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
-          'id', id,
-          'kind', 'email',
-          'createdAt', TO_CHAR(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
-          'followedIds', JSON_BUILD_OBJECT(
-            'conventionId', convention_id,
-            'establishmentId', establishment_siret,
-            'agencyId', agency_id
-          ),
-          'templatedContent', JSON_BUILD_OBJECT(
-              'kind', email_kind,
-              'recipients', ARRAY(SELECT email FROM notifications_email_recipients WHERE notifications_email_id = e.id AND recipient_type = 'to'),
-              'cc', ARRAY(SELECT email FROM notifications_email_recipients WHERE notifications_email_id = e.id AND recipient_type = 'cc'),
-              'params', params
-            )
-        )) as notif
-        FROM notifications_email e
-        ORDER BY created_at DESC
-        LIMIT $1
-          `,
-      [this.maxRetrievedNotifications],
-    );
-
     return {
-      emails: emailsResponse.rows.map((row) => row.notif),
+      emails: await this.getEmailsByFilters(),
       sms: smsResponse.rows.map((row) => row.notif),
     };
   }
@@ -223,6 +225,23 @@ const buildSmsNotificationObject = `JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
           'templatedContent', JSON_BUILD_OBJECT(
               'kind', sms_kind,
               'recipientPhone', recipient_phone,
+              'params', params
+            )
+        ))`;
+
+const buildEmailNotificationObject = `JSON_STRIP_NULLS(JSON_BUILD_OBJECT(
+          'id', e.id,
+          'kind', 'email',
+          'createdAt', TO_CHAR(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+          'followedIds', JSON_BUILD_OBJECT(
+            'conventionId', convention_id,
+            'establishmentId', establishment_siret,
+            'agencyId', agency_id
+          ),
+          'templatedContent', JSON_BUILD_OBJECT(
+              'kind', email_kind,
+              'recipients', ARRAY_REMOVE(ARRAY_AGG(CASE WHEN r.recipient_type = 'to' THEN r.email ELSE NULL END), NULL),
+              'cc', ARRAY_REMOVE(ARRAY_AGG(CASE WHEN r.recipient_type = 'cc' THEN r.email ELSE NULL END), NULL),
               'params', params
             )
         ))`;
