@@ -114,7 +114,7 @@ describe("PgNotificationRepository", () => {
         createdAt: new Date("2023-06-09T19:00").toISOString(),
         followedIds: { agencyId },
         templatedContent: {
-          type: "AGENCY_WAS_ACTIVATED",
+          kind: "AGENCY_WAS_ACTIVATED",
           recipients: ["bob@mail.com"],
           cc: [],
           params: { agencyName: "My agency", agencyLogoUrl: "http://logo.com" },
@@ -126,7 +126,7 @@ describe("PgNotificationRepository", () => {
         createdAt: new Date("2023-06-09T15:00").toISOString(),
         followedIds: { agencyId },
         templatedContent: {
-          type: "EDIT_FORM_ESTABLISHMENT_LINK",
+          kind: "EDIT_FORM_ESTABLISHMENT_LINK",
           recipients: ["bob@mail.com"],
           cc: [],
           params: { editFrontUrl: "http://edit-link.com" },
@@ -138,7 +138,7 @@ describe("PgNotificationRepository", () => {
         createdAt: new Date("2023-06-09T21:00").toISOString(),
         followedIds: { agencyId },
         templatedContent: {
-          type: "AGENCY_LAST_REMINDER",
+          kind: "AGENCY_LAST_REMINDER",
           recipients: ["yo@remind.com"],
           cc: [],
           params: {
@@ -187,7 +187,7 @@ const createTemplatedEmailAndNotification = ({
   cc?: string[];
 }) => {
   const email: TemplatedEmail = {
-    type: "AGENCY_WAS_ACTIVATED",
+    kind: "AGENCY_WAS_ACTIVATED",
     recipients,
     cc,
     params: { agencyName: "My agency", agencyLogoUrl: "https://my-logo.com" },

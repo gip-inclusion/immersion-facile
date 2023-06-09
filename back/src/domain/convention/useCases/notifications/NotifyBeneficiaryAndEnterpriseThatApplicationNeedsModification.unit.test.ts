@@ -150,7 +150,7 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationNeedsModification", () =>
         expectSavedNotificationsAndEvents({
           emails: [
             {
-              type: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
+              kind: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
               recipients: [expectedRecipient!],
               params: {
                 internshipKind: convention.internshipKind,

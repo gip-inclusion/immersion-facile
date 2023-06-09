@@ -73,15 +73,13 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
     await processEventsForEmailToBeSent(eventCrawler);
 
     expectSentEmails(gateways.notification, [
+      { kind: "NEW_CONVENTION_AGENCY_NOTIFICATION" },
       {
-        type: "NEW_CONVENTION_AGENCY_NOTIFICATION",
-      },
-      {
-        type: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+        kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
         recipients: [validConvention.signatories.beneficiary.email],
       },
       {
-        type: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+        kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
         recipients: [
           validConvention.signatories.establishmentRepresentative.email,
         ],
@@ -301,7 +299,7 @@ const establishmentSignsApplication = async (
   await processEventsForEmailToBeSent(eventCrawler);
 
   const sentEmails = gateways.notification.getSentEmails();
-  expect(sentEmails.map((email) => email.type)).toStrictEqual([
+  expect(sentEmails.map((email) => email.kind)).toStrictEqual([
     "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
     "NEW_CONVENTION_AGENCY_NOTIFICATION",
     "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
@@ -362,7 +360,7 @@ const validatorValidatesApplicationWhichTriggersConventionToBeSent = async (
   await processEventsForEmailToBeSent(eventCrawler);
 
   const sentEmails = gateways.notification.getSentEmails();
-  expect(sentEmails.map((email) => email.type)).toStrictEqual([
+  expect(sentEmails.map((email) => email.kind)).toStrictEqual([
     "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
     "NEW_CONVENTION_AGENCY_NOTIFICATION",
     "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",

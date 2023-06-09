@@ -56,7 +56,7 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
   it("should throw if no recipient is provided", async () => {
     const triggerSendEmail = () =>
       notificationGateway.sendEmail({
-        type: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+        kind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
         recipients: [],
         params: {
           scheduleText: "",
@@ -71,7 +71,7 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
 
   it("should not send email if recipient are not in white list", async () => {
     await notificationGateway.sendEmail({
-      type: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+      kind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
       recipients: ["i-am-not-allowed@mail.net"],
       params: {
         scheduleText: "",
@@ -83,7 +83,7 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
 
   it("should filter emails according to predicate", async () => {
     await notificationGateway.sendEmail({
-      type: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+      kind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
       recipients: [
         "beneficiary@gmail.com",
         "advisor@gmail.com",
@@ -107,7 +107,7 @@ describe("SendingBlueHtmlNotificationGateway unit", () => {
     ];
 
     await notificationGateway.sendEmail({
-      type: "AGENCY_WAS_ACTIVATED",
+      kind: "AGENCY_WAS_ACTIVATED",
       recipients: ["establishment-ceo@gmail.com"],
       cc: carbonCopy,
       params: {

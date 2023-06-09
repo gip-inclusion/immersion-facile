@@ -23,7 +23,7 @@ export class SendEmailWhenAgencyIsActivated extends TransactionalUseCase<WithAge
     await this.saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
-        type: "AGENCY_WAS_ACTIVATED",
+        kind: "AGENCY_WAS_ACTIVATED",
         recipients: agency.validatorEmails,
         params: {
           agencyName: agency.name,

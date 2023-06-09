@@ -6,9 +6,9 @@ import { CustomTimeGateway } from "../../../adapters/secondary/core/TimeGateway/
 import { UuidV4Generator } from "../../../adapters/secondary/core/UuidGeneratorImplementations";
 import { InMemoryUowPerformer } from "../../../adapters/secondary/InMemoryUowPerformer";
 import { InMemoryNotificationGateway } from "../../../adapters/secondary/notificationGateway/InMemoryNotificationGateway";
-import { makeCreateNewEvent } from "../../../domain/core/eventBus/EventBus";
-import { EstablishmentAggregateRepository } from "../../../domain/immersionOffer/ports/EstablishmentAggregateRepository";
-import { SuggestEditFormEstablishment } from "../../../domain/immersionOffer/useCases/SuggestEditFormEstablishment";
+import { makeCreateNewEvent } from "../../core/eventBus/EventBus";
+import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
+import { SuggestEditFormEstablishment } from "./SuggestEditFormEstablishment";
 
 const siret = "12345678912345";
 const contactEmail = "jerome@gmail.com";
@@ -101,7 +101,7 @@ describe("SuggestEditFormEstablishment", () => {
     // Assert
     const sentEmails = notificationGateway.getSentEmails();
     expect(sentEmails).toHaveLength(1);
-    expect(sentEmails[0].type).toBe("SUGGEST_EDIT_FORM_ESTABLISHMENT");
+    expect(sentEmails[0].kind).toBe("SUGGEST_EDIT_FORM_ESTABLISHMENT");
     expect(outboxRepository.events).toHaveLength(1);
   });
 });

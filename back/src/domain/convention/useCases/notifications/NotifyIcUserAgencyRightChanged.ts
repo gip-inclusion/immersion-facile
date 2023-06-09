@@ -44,7 +44,7 @@ export class NotifyIcUserAgencyRightChanged extends TransactionalUseCase<
       await this.saveNotificationAndRelatedEvent(uow, {
         kind: "email",
         templatedContent: {
-          type: "IC_USER_RIGHTS_HAS_CHANGED",
+          kind: "IC_USER_RIGHTS_HAS_CHANGED",
           recipients: [user.email],
           params: {
             agencyName: agency.name,

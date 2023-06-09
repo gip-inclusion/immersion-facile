@@ -89,7 +89,7 @@ export class NotifyNewApplicationNeedsReview extends TransactionalUseCase<Conven
         });
 
         return {
-          type: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+          kind: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
           recipients: [recipientEmail],
           params: {
             internshipKind: convention.internshipKind,

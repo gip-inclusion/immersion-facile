@@ -83,7 +83,7 @@ describe("SendEmailWithImmersionAssessmentCreationLink", () => {
     const sentEmails = notificationGateway.getSentEmails();
     expectToEqual(sentEmails, [
       {
-        type: "CREATE_IMMERSION_ASSESSMENT",
+        kind: "CREATE_IMMERSION_ASSESSMENT",
         recipients: [
           immersionApplicationEndingTomorrow.establishmentTutor.email,
         ],

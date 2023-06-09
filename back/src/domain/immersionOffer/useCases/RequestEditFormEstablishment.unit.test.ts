@@ -103,7 +103,7 @@ describe("RequestUpdateFormEstablishment", () => {
       expectSavedNotificationsAndEvents({
         emails: [
           {
-            type: "EDIT_FORM_ESTABLISHMENT_LINK",
+            kind: "EDIT_FORM_ESTABLISHMENT_LINK",
             recipients: [contactEmail],
             cc: copyEmails,
             params: {
@@ -182,7 +182,7 @@ describe("RequestUpdateFormEstablishment", () => {
     expectSavedNotificationsAndEvents({
       emails: [
         {
-          type: "EDIT_FORM_ESTABLISHMENT_LINK",
+          kind: "EDIT_FORM_ESTABLISHMENT_LINK",
           recipients: ["jerome@gmail.com"],
           cc: ["copy@gmail.com"],
           params: {

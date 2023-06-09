@@ -242,7 +242,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     const templatedEmail: TemplatedEmail =
       kind === "FirstReminderForAgency"
         ? {
-            type: "AGENCY_FIRST_REMINDER",
+            kind: "AGENCY_FIRST_REMINDER",
             recipients: [email],
             params: {
               agencyName: agency.name,
@@ -258,7 +258,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
             },
           }
         : {
-            type: "AGENCY_LAST_REMINDER",
+            kind: "AGENCY_LAST_REMINDER",
             recipients: [email],
             params: {
               beneficiaryFirstName:
@@ -305,7 +305,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     });
 
     return {
-      type:
+      kind:
         kind === "FirstReminderForSignatories"
           ? "SIGNATORY_FIRST_REMINDER"
           : "SIGNATORY_LAST_REMINDER",

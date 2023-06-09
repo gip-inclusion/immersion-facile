@@ -93,7 +93,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
             agencyLogoUrl: agency.logoUrl,
           },
           recipients: [signedConvention.signatories.beneficiary.email],
-          type: "SIGNEE_HAS_SIGNED_CONVENTION",
+          kind: "SIGNEE_HAS_SIGNED_CONVENTION",
         },
       ],
     });
@@ -134,7 +134,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
           recipients: [
             signedConvention.signatories.establishmentRepresentative.email,
           ],
-          type: "SIGNEE_HAS_SIGNED_CONVENTION",
+          kind: "SIGNEE_HAS_SIGNED_CONVENTION",
         },
       ],
     });

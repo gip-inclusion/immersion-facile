@@ -63,7 +63,7 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto>
     await this.saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
-        type: "EDIT_FORM_ESTABLISHMENT_LINK",
+        kind: "EDIT_FORM_ESTABLISHMENT_LINK",
         recipients: [contact.email],
         cc: contact.copyEmails,
         params: { editFrontUrl },

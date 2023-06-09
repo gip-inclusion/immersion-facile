@@ -16,7 +16,7 @@ export class InMemoryNotificationGateway implements NotificationGateway {
   public async sendEmail(templatedEmail: TemplatedEmail): Promise<void> {
     logger.info(
       templatedEmail.params,
-      `sending email : ${templatedEmail.type}`,
+      `sending email : ${templatedEmail.kind}`,
     );
     this.pushEmail(templatedEmail);
   }
