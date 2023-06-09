@@ -71,6 +71,7 @@ export const domElementIds = {
   homeEstablishments: {
     siretModal: {
       siretFetcherInput: "siret-fetcher-input",
+      editEstablishmentButton: "edit-establishment-button",
     },
     heroHeader: {
       addEstablishmentForm: buildHeroHeaderId("establishment-form-register"),
@@ -258,6 +259,7 @@ export const domElementIds = {
     maxContactsPerWeek: "establishment-maxContactPerWeek",
     errorSiretAlreadyExistButton:
       "im-form-add-establishment__edit-establishment-button",
+    submitButton: "im-form-add-establishment__submit-button",
   },
 
   immersionAssessment: {

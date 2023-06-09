@@ -70,7 +70,15 @@ const ModifyEstablishmentRequestForMailUpdate = ({
       Nous avons bien trouvé votre établissement dans notre base de donnée.
     </p>
     <div className={fr.cx("fr-grid-row", "fr-grid-row--center")}>
-      <Button type="button" onClick={onClick} priority="secondary">
+      <Button
+        type="button"
+        onClick={onClick}
+        priority="secondary"
+        nativeButtonProps={{
+          id: domElementIds.homeEstablishments.siretModal
+            .editEstablishmentButton,
+        }}
+      >
         Recevoir le mail de modification
       </Button>
     </div>
