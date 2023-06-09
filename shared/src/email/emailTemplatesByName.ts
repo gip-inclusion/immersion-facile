@@ -799,21 +799,45 @@ export const emailTemplatesByName =
         potentialBeneficiaryLastName,
         appellationLabel,
         businessName,
+        immersionObject,
+        potentialBeneficiaryPhone,
+        potentialBeneficiaryCvOrLinkedin,
         message,
       }) => ({
         subject: `${potentialBeneficiaryFirstName} ${potentialBeneficiaryLastName} vous contacte pour une demande d'immersion sur le métier de ${appellationLabel}`,
         greetings: `Bonjour ${contactFirstName} ${contactLastName},`,
         content: `
-      ${potentialBeneficiaryFirstName} ${potentialBeneficiaryLastName} vous écrit :
-      ${message}
+        Un candidat souhaite faire une immersion pour ${immersionObject} sur le métier de ${appellationLabel} dans votre entreprise ${businessName}.
 
-      L'immersion souhaitée porte sur le métier de ${appellationLabel} dans votre entreprise ${businessName}.
+        voici son message:
 
-      <strong>Sa candidature vous intéresse ? Voici les étapes à suivre :</strong>
-      - Préparez votre échange grâce à notre <a href="https://aide.immersion-facile.beta.gouv.fr/fr/article/etudier-une-demande-dimmersion-professionnelle-1ehkehm/">page d'aide</a>.
-      - Prenez contact avec le candidat : <a href="mailto:${potentialBeneficiaryEmail}?subject=Suite à votre demande d'immersion chez ${businessName}">${potentialBeneficiaryEmail}</a>
+      "${message}"
+
+      ${potentialBeneficiaryFirstName} 
+      ${potentialBeneficiaryLastName}
+
+      ${
+        potentialBeneficiaryCvOrLinkedin &&
+        `Plus d'info sur ce candidat: <a href="${potentialBeneficiaryCvOrLinkedin}">${potentialBeneficiaryCvOrLinkedin}</a>`
+      }
+
+      <strong>Sa candidature vous intéresse ? </strong>
+
+      Prenez contact avec le candidat par email ou par téléphone:
+      
       `,
-        subContent: defaultSignature("immersion"),
+        buttons: [
+          {
+            label: `${potentialBeneficiaryEmail}`,
+            url: `mailto:${potentialBeneficiaryEmail}?subject=Suite à votre demande d'immersion chez ${businessName}`,
+          },
+          {
+            label: `${potentialBeneficiaryPhone}`,
+            url: `tel:${potentialBeneficiaryPhone}`,
+          },
+        ],
+        subContent: `Vous pouvez préparer votre échange grâce à notre <a href="https://aide.immersion-facile.beta.gouv.fr/fr/article/etudier-une-demande-dimmersion-professionnelle-1ehkehm/">page d'aide</a>.
+        ${defaultSignature("immersion")}`,
       }),
     },
     CONTACT_BY_PHONE_INSTRUCTIONS: {
