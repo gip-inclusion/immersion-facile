@@ -133,7 +133,7 @@ describe("RequestUpdateFormEstablishment", () => {
           createdAt: initialMailDate.toISOString(),
           followedIds: {},
           templatedContent: {
-            type: "EDIT_FORM_ESTABLISHMENT_LINK",
+            kind: "EDIT_FORM_ESTABLISHMENT_LINK",
             recipients: [contactEmail],
             params: { editFrontUrl: "my-edit-link.com" },
           },
@@ -170,7 +170,7 @@ describe("RequestUpdateFormEstablishment", () => {
     const initialMailDate = new Date("2021-01-01T13:00:00.000");
 
     const alreadySentEmail: TemplatedEmail = {
-      type: "EDIT_FORM_ESTABLISHMENT_LINK",
+      kind: "EDIT_FORM_ESTABLISHMENT_LINK",
       recipients: [contactEmail],
       params: { editFrontUrl: "my-edit-link.com" },
     };
