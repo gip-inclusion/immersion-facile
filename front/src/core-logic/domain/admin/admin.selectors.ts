@@ -6,9 +6,9 @@ const adminAuthSelector = createSelector(
   adminStateSelector,
   ({ adminAuth }) => adminAuth,
 );
-const sentEmailsStateSelector = createSelector(
+const notificationsStateSelector = createSelector(
   adminStateSelector,
-  ({ sentEmails }) => sentEmails,
+  ({ notifications }) => notifications,
 );
 const dashboardState = createSelector(
   adminStateSelector,
@@ -25,19 +25,20 @@ export const adminSelectors = {
     isLoading: createSelector(adminAuthSelector, ({ isLoading }) => isLoading),
     error: createSelector(adminAuthSelector, ({ error }) => error),
   },
-  sentEmails: {
+  notifications: {
     isLoading: createSelector(
-      sentEmailsStateSelector,
+      notificationsStateSelector,
       ({ isLoading }) => isLoading,
     ),
     error: createSelector(
-      sentEmailsStateSelector,
+      notificationsStateSelector,
       ({ error }) => (error && knownErrors[error]) ?? error,
     ),
-    sentEmails: createSelector(
-      sentEmailsStateSelector,
-      ({ sentEmails }) => sentEmails,
+    emails: createSelector(
+      notificationsStateSelector,
+      ({ lastEmails }) => lastEmails,
     ),
+    sms: createSelector(notificationsStateSelector, ({ lastSms }) => lastSms),
   },
   dashboardUrls: {
     urls: createSelector(dashboardState, ({ urls }) => urls),
