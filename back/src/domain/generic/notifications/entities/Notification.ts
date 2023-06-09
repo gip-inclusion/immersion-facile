@@ -3,7 +3,7 @@ import {
   NotificationContent,
   NotificationId,
   NotificationKind,
-} from "shared/src/notifications/notifications.dto";
+} from "shared";
 import {
   CreateNewEvent,
   makeCreateNewEvent,

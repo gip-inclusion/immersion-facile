@@ -5,7 +5,7 @@ import {
   BeneficiaryRepresentative,
   ConventionDtoBuilder,
 } from "shared";
-import { EmailNotification } from "shared/src/notifications/notifications.dto";
+import { EmailNotification } from "shared";
 import { expectNotifyBeneficiaryAndEnterpriseThatConventionIsDeprecated } from "../../../../_testBuilders/emailAssertions";
 import {
   createInMemoryUow,

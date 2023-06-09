@@ -4,7 +4,7 @@ import {
   NotificationId,
   NotificationKind,
   SmsNotification,
-} from "shared/src/notifications/notifications.dto";
+} from "shared";
 import { NotificationRepository } from "../../domain/generic/notifications/ports/NotificationRepository";
 
 export class InMemoryNotificationRepository implements NotificationRepository {

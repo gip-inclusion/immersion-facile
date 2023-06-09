@@ -11,7 +11,7 @@ import {
   NotificationKind,
   notificationKinds,
   SmsNotification,
-} from "shared/src/notifications/notifications.dto";
+} from "shared";
 import { InMemoryOutboxRepository } from "../adapters/secondary/core/InMemoryOutboxRepository";
 import { InMemoryNotificationRepository } from "../adapters/secondary/InMemoryNotificationRepository";
 import { NotificationAddedEvent } from "../domain/core/eventBus/events";
