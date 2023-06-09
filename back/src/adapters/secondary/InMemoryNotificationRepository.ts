@@ -5,9 +5,25 @@ import {
   NotificationKind,
   SmsNotification,
 } from "shared";
-import { NotificationRepository } from "../../domain/generic/notifications/ports/NotificationRepository";
+import {
+  EmailNotificationFilters,
+  NotificationRepository,
+} from "../../domain/generic/notifications/ports/NotificationRepository";
 
 export class InMemoryNotificationRepository implements NotificationRepository {
+  async getEmailsByFilters(filters: EmailNotificationFilters) {
+    return this.notifications.filter(
+      (notification): notification is EmailNotification => {
+        if (notification.kind !== "email") return false;
+        if (!notification.templatedContent.recipients.includes(filters.email))
+          return false;
+        if (notification.templatedContent.type !== filters.emailKind)
+          return false;
+        return new Date(notification.createdAt) > filters.since;
+      },
+    );
+  }
+
   async getByIdAndKind(
     id: NotificationId,
     kind: NotificationKind,

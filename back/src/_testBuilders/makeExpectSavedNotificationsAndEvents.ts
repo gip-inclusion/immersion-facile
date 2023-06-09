@@ -75,6 +75,7 @@ export const makeExpectSavedNotificationsAndEvents =
         notificationsOfKind.map(({ templatedContent }) => templatedContent),
         expectedTemplatedContent,
       );
+
       expectToEqual(
         notificationsOfKind.map(
           ({ id }): WithNotificationIdAndKind => ({ id, kind }),

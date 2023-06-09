@@ -9,13 +9,23 @@ import {
   NotificationKind,
   SmsNotification,
 } from "shared";
-import { NotificationRepository } from "../../../domain/generic/notifications/ports/NotificationRepository";
+import {
+  EmailNotificationFilters,
+  NotificationRepository,
+} from "../../../domain/generic/notifications/ports/NotificationRepository";
 
 export class PgNotificationRepository implements NotificationRepository {
   constructor(
     private client: PoolClient,
     private maxRetrievedNotifications: number = 30,
   ) {}
+
+  async getEmailsByFilters(
+    _params: EmailNotificationFilters,
+  ): Promise<EmailNotification[]> {
+    await "";
+    throw new Error("Not Implementented");
+  }
 
   async getByIdAndKind(
     id: NotificationId,
